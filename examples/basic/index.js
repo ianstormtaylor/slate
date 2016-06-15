@@ -125,7 +125,7 @@ class App extends React.Component {
         renderMark={renderMark}
         state={this.state.state}
         onChange={(state) => {
-          console.log('State:', state)
+          console.log('Change:', state.toJS())
           this.setState({ state })
         }}
       />
