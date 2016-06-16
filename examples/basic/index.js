@@ -10,13 +10,11 @@ import ReactDOM from 'react-dom'
 const state = {
   nodes: [
     {
-      key: '1',
       kind: 'node',
       type: 'code',
       data: {},
       children: [
         {
-          key: '2',
           type: 'text',
           ranges: [
             {
@@ -28,13 +26,11 @@ const state = {
       ]
     },
     {
-      key: '3',
       kind: 'node',
       type: 'paragraph',
       data: {},
       children: [
         {
-          key: '4',
           type: 'text',
           ranges: [
             {
@@ -53,13 +49,7 @@ const state = {
         }
       ]
     }
-  ],
-  selection: {
-    anchorKey: '4',
-    anchorOffset: 14,
-    focusKey: '4',
-    focusOffset: 14
-  }
+  ]
 }
 
 /**
