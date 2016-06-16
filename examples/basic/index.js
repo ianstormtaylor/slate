@@ -114,7 +114,8 @@ class App extends React.Component {
         renderMark={renderMark}
         state={this.state.state}
         onChange={(state) => {
-          console.log('Change:', state.toJS())
+          console.log('Selection:', state.selection.toJS())
+          console.log('Text:', state.nodes.last().children.first().characters.map(c => c.text).toJS())
           this.setState({ state })
         }}
       />
