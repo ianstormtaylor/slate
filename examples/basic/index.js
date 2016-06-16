@@ -89,7 +89,6 @@ function renderNode(node) {
       }
     }
     default: {
-      debugger
       throw new Error(`Unknown node type "${node.type}".`)
     }
   }
