@@ -55,10 +55,10 @@ const state = {
     }
   ],
   selection: {
-    anchorKey: '3.4',
-    anchorOffset: 9,
-    focusKey: '3.4',
-    focusOffset: 18
+    anchorKey: '4',
+    anchorOffset: 14,
+    focusKey: '4',
+    focusOffset: 14
   }
 }
 
