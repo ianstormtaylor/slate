@@ -13,7 +13,7 @@ const state = {
       kind: 'node',
       type: 'code',
       data: {},
-      children: [
+      nodes: [
         {
           type: 'text',
           ranges: [
@@ -29,7 +29,7 @@ const state = {
       kind: 'node',
       type: 'paragraph',
       data: {},
-      children: [
+      nodes: [
         {
           type: 'text',
           ranges: [
@@ -114,8 +114,7 @@ class App extends React.Component {
         renderMark={renderMark}
         state={this.state.state}
         onChange={(state) => {
-          console.log('Selection:', state.selection.toJS())
-          console.log('Text:', state.nodes.last().children.first().characters.map(c => c.text).toJS())
+          console.log('State:', state.toJS())
           this.setState({ state })
         }}
       />
