@@ -10,40 +10,33 @@ import ReactDOM from 'react-dom'
 const state = {
   nodes: [
     {
-      kind: 'node',
       type: 'code',
-      data: {},
       nodes: [
         {
           type: 'text',
           ranges: [
             {
-              text: 'A\nfew\nlines\nof\ncode.',
-              marks: []
+              text: 'A\nfew\nlines\nof\ncode.'
             }
           ]
         }
       ]
     },
     {
-      kind: 'node',
       type: 'paragraph',
-      data: {},
       nodes: [
         {
           type: 'text',
           ranges: [
             {
-              text: 'A ',
-              marks: []
+              text: 'A '
             },
             {
               text: 'simple',
               marks: ['bold']
             },
             {
-              text: ' paragraph of text.',
-              marks: []
+              text: ' paragraph of text.'
             }
           ]
         }
