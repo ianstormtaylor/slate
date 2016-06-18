@@ -1,5 +1,5 @@
 
-import Editor, { State } from '../..'
+import Editor, { State, Raw } from '../..'
 import React from 'react'
 import ReactDOM from 'react-dom'
 
@@ -33,7 +33,11 @@ const state = {
             },
             {
               text: 'simple',
-              marks: ['bold']
+              marks: [
+                {
+                  type: 'bold'
+                }
+              ]
             },
             {
               text: ' paragraph of text.'
@@ -78,14 +82,14 @@ function renderNode(node) {
 }
 
 function renderMark(mark) {
-  switch (mark) {
+  switch (mark.type) {
     case 'bold': {
       return {
         fontWeight: 'bold'
       }
     }
     default: {
-      throw new Error(`Unknown mark type "${mark}".`)
+      throw new Error(`Unknown mark type "${mark.type}".`)
     }
   }
 }
@@ -97,7 +101,7 @@ function renderMark(mark) {
 class App extends React.Component {
 
   state = {
-    state: State.create(state)
+    state: Raw.deserialize(state)
   };
 
   render() {
