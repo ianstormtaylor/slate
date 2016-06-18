@@ -1,2 +1,3 @@
-node_modules
 build.js
+dist
+node_modules
