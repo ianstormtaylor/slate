@@ -1,6 +1,7 @@
 
 # Binaries.
 bin = ./node_modules/.bin
+babel = $(bin)/babel
 browserify = $(bin)/browserify
 standard = $(bin)/standard
 mocha = $(bin)/mocha
@@ -19,11 +20,20 @@ endif
 
 # Remove the generated files.
 clean:
-	@ rm -rf ./node_modules
+	@ rm -rf ./dist ./node_modules
 
-# Build the examples.
-examples: ./node_modules
+# Build the source.
+dist: ./node_modules $(shell find ./lib)
+	@ $(babel) --out-dir ./dist ./lib
+	@ touch ./dist
+
+# Build the basic example.
+example-basic: ./node_modules
 	@ $(browserify) --debug --transform babelify --outfile ./examples/basic/build.js ./examples/basic/index.js
+
+# Build the plaintext example.
+example-plaintext: ./node_modules
+	@ $(browserify) --debug --transform babelify --outfile ./examples/plaintext/build.js ./examples/plaintext/index.js
 
 # Lint the sources files with Standard JS.
 lint: ./node_modules
@@ -36,7 +46,7 @@ node_modules: ./package.json
 
 # Build the test source.
 test/support/build.js: ./node_modules $(shell find ./lib) ./test/browser.js
-	@ $(browserify) --transform babelify --outfile ./test/support/build.js ./test/browser.js
+	@ $(browserify) --debug --transform babelify --outfile ./test/support/build.js ./test/browser.js
 
 # Run the tests.
 test: test-browser test-server
@@ -49,9 +59,13 @@ test-browser: ./node_modules ./test/support/build.js
 test-server: ./node_modules
 	@ $(mocha) --reporter spec --timeout 5000 ./test/server.js
 
-# Watch the examples.
-watch-examples: ./node_modules
-	@ $(MAKE) examples browserify=$(watchify)
+# Watch the basic example.
+watch-example-basic: ./node_modules
+	@ $(MAKE) example-basic browserify=$(watchify)
+
+# Watch the plaintext example.
+watch-example-plaintext: ./node_modules
+	@ $(MAKE) example-plaintext browserify=$(watchify)
 
 # Phony targets.
 .PHONY: examples

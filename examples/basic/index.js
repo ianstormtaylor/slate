@@ -75,9 +75,6 @@ function renderNode(node) {
         )
       }
     }
-    default: {
-      throw new Error(`Unknown node type "${node.type}".`)
-    }
   }
 }
 
@@ -87,9 +84,6 @@ function renderMark(mark) {
       return {
         fontWeight: 'bold'
       }
-    }
-    default: {
-      throw new Error(`Unknown mark type "${mark.type}".`)
     }
   }
 }
@@ -112,6 +106,7 @@ class App extends React.Component {
         state={this.state.state}
         onChange={(state) => {
           console.log('State:', state.toJS())
+          console.log('Content:', Raw.serialize(state))
           this.setState({ state })
         }}
       />
