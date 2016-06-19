@@ -25,7 +25,7 @@ class App extends React.Component {
       <Editor
         state={this.state.state}
         onChange={(state) => {
-          console.log('State:', state.toJS())
+          console.log('Document:', state.document.toJS())
           console.log('Content:', Plaintext.serialize(state))
           this.setState({ state })
         }}
