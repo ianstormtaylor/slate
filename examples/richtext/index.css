@@ -15,6 +15,34 @@ p {
   margin: 0;
 }
 
-p + p {
+.editor p + p {
   margin-top: 1em;
+}
+
+.menu {
+  margin: 0 -10px;
+  padding: 1px 0 9px 7px;
+  border-bottom: 2px solid #eee;
+  margin-bottom: 10px;
+}
+
+.menu > * {
+  display: inline-block;
+}
+
+.menu > * + * {
+  margin-left: 10px;
+}
+
+.button {
+  color: #ccc;
+  cursor: pointer;
+}
+
+.button[data-active="true"] {
+  color: black;
+}
+
+.material-icons {
+  font-size: 18px;
 }
