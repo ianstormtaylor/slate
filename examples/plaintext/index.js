@@ -8,7 +8,7 @@ import { Plaintext } from '../..'
  * State.
  */
 
-const state = 'A string of plain text.'
+const state = 'This is editable plain text, just like a <textarea>!'
 
 /**
  * App.

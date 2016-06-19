@@ -7,4 +7,6 @@ html {
 main {
   background: #fff;
   padding: 10px;
+  max-width: 40em;
+  margin: 0 auto;
 }
