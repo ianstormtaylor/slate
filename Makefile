@@ -35,6 +35,10 @@ example-basic: ./node_modules
 example-plaintext: ./node_modules
 	@ $(browserify) --debug --transform babelify --outfile ./examples/plaintext/build.js ./examples/plaintext/index.js
 
+# Build the richtext example.
+example-richtext: ./node_modules
+	@ $(browserify) --debug --transform babelify --outfile ./examples/richtext/build.js ./examples/richtext/index.js
+
 # Lint the sources files with Standard JS.
 lint: ./node_modules
 	@ $(standard) ./lib
@@ -66,6 +70,10 @@ watch-example-basic: ./node_modules
 # Watch the plaintext example.
 watch-example-plaintext: ./node_modules
 	@ $(MAKE) example-plaintext browserify=$(watchify)
+
+# Watch the richtext example.
+watch-example-richtext: ./node_modules
+	@ $(MAKE) example-richtext browserify=$(watchify)
 
 # Phony targets.
 .PHONY: examples

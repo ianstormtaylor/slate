@@ -1,7 +1,8 @@
 
-import Editor, { State, Raw } from '../..'
+import Editor from '../..'
 import React from 'react'
 import ReactDOM from 'react-dom'
+import { Raw } from '../..'
 
 /**
  * State.
@@ -10,29 +11,27 @@ import ReactDOM from 'react-dom'
 const state = {
   nodes: [
     {
-      type: 'code',
-      nodes: [
-        {
-          type: 'text',
-          ranges: [
-            {
-              text: 'A\nfew\nlines\nof\ncode.'
-            }
-          ]
-        }
-      ]
-    },
-    {
       type: 'paragraph',
       nodes: [
         {
           type: 'text',
           ranges: [
             {
-              text: 'A '
+              text: 'This is '
             },
             {
-              text: 'simple',
+              text: 'editable',
+              marks: [
+                {
+                  type: 'italic'
+                }
+              ]
+            },
+            {
+              text: ' '
+            },
+            {
+              text: 'rich',
               marks: [
                 {
                   type: 'bold'
@@ -40,7 +39,18 @@ const state = {
               ]
             },
             {
-              text: ' paragraph of text.'
+              text: ' text, much better than a '
+            },
+            {
+              text: '<textarea>',
+              marks: [
+                {
+                  type: 'code'
+                }
+              ]
+            },
+            {
+              text: '!'
             }
           ]
         }
@@ -62,11 +72,11 @@ class App extends React.Component {
   render() {
     return (
       <Editor
+        state={this.state.state}
         renderNode={node => this.renderNode(node)}
         renderMark={mark => this.renderMark(mark)}
-        state={this.state.state}
         onChange={(state) => {
-          console.log('State:', state.toJS())
+          console.log('Document:', state.document.toJS())
           console.log('Content:', Raw.serialize(state))
           this.setState({ state })
         }}
@@ -76,24 +86,9 @@ class App extends React.Component {
 
   renderNode(node) {
     switch (node.type) {
-      case 'code': {
-        return (props) => {
-          return (
-            <pre>
-              <code>
-                {props.children}
-              </code>
-            </pre>
-          )
-        }
-      }
       case 'paragraph': {
         return (props) => {
-          return (
-            <p>
-              {props.children}
-            </p>
-          )
+          return <p>{props.children}</p>
         }
       }
     }
@@ -104,6 +99,19 @@ class App extends React.Component {
       case 'bold': {
         return {
           fontWeight: 'bold'
+        }
+      }
+      case 'italic': {
+        return {
+          fontStyle: 'italic'
+        }
+      }
+      case 'code': {
+        return {
+          fontFamily: 'monospace',
+          backgroundColor: '#eee',
+          padding: '3px',
+          borderRadius: '4px'
         }
       }
     }

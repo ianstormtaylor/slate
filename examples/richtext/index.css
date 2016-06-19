@@ -15,10 +15,6 @@ p {
   margin: 0;
 }
 
-pre {
-  margin: 0;
-}
-
-main * + * {
+p + p {
   margin-top: 1em;
 }
