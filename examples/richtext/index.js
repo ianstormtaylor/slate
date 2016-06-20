@@ -1,8 +1,7 @@
 
-import Editor from '../..'
+import Editor, { Mark, Raw } from '../..'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { Raw } from '../..'
 
 /**
  * State.
@@ -72,13 +71,7 @@ class App extends React.Component {
   isMarkActive(type) {
     const { state } = this.state
     const { document, selection } = state
-    const { startKey, startOffset } = selection
-    const startNode = document.getNode(startKey)
-    if (!startNode) return false
-
-    const { characters } = startNode
-    const character = characters.get(startOffset)
-    const { marks } = character
+    const marks = document.getMarksAtRange(selection)
     return marks.some(mark => mark.type == type)
   }
 
@@ -88,13 +81,14 @@ class App extends React.Component {
     let { state } = this.state
     const { marks } = state
     const isActive = this.isMarkActive(type)
+    const mark = Mark.create({ type })
 
     state = state
       .transform()
-      [isActive ? 'unmark' : 'mark']()
+      [isActive ? 'unmark' : 'mark'](mark)
       .apply()
 
-    this.onChange(state)
+    this.setState({ state })
   }
 
   render() {
