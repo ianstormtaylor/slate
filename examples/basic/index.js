@@ -66,8 +66,11 @@ class App extends React.Component {
         renderMark={mark => this.renderMark(mark)}
         state={this.state.state}
         onChange={(state) => {
-          console.log('State:', state.toJS())
+          console.groupCollapsed('Change!')
+          console.log('Document:', state.document.toJS())
+          console.log('Selection:', state.selection.toJS())
           console.log('Content:', Raw.serialize(state))
+          console.groupEnd()
           this.setState({ state })
         }}
       />

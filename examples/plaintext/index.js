@@ -25,8 +25,11 @@ class App extends React.Component {
       <Editor
         state={this.state.state}
         onChange={(state) => {
+          console.groupCollapsed('Change!')
           console.log('Document:', state.document.toJS())
+          console.log('Selection:', state.selection.toJS())
           console.log('Content:', Plaintext.serialize(state))
+          console.groupEnd()
           this.setState({ state })
         }}
       />
