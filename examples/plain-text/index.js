@@ -1,5 +1,5 @@
 
-import Editor, { Character, Document, Element, State, Text } from '../..'
+import Editor, { Character, Document, Block, State, Text } from '../..'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import state from './state.json'
@@ -19,13 +19,13 @@ function deserialize(string) {
     }, Character.createList())
 
   const text = Text.create({ characters })
-  const texts = Element.createMap([text])
-  const node = Element.create({
+  const texts = Block.createMap([text])
+  const node = Block.create({
     type: 'paragraph',
     nodes: texts,
   })
 
-  const nodes = Element.createMap([node])
+  const nodes = Block.createMap([node])
   const document = Document.create({ nodes })
   const state = State.create({ document })
   return state

@@ -186,7 +186,8 @@ class App extends React.Component {
   onBackspace(e, state) {
     if (state.isCurrentlyExpanded) return
     if (state.currentStartOffset != 0) return
-    const node = state.currentWrappingNodes.first()
+    const node = state.currentBlockNodes.first()
+    if (!node) debugger
     if (node.type == 'paragraph') return
 
     e.preventDefault()
@@ -207,7 +208,8 @@ class App extends React.Component {
 
   onEnter(e, state) {
     if (state.isCurrentlyExpanded) return
-    const node = state.currentWrappingNodes.first()
+    const node = state.currentBlockNodes.first()
+    if (!node) debugger
     if (state.currentStartOffset == 0 && node.length == 0) return this.onBackspace(e, state)
     if (state.currentEndOffset != node.length) return
 
