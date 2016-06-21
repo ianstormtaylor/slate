@@ -1,84 +1,9 @@
 
-import Editor, { Mark, Raw } from '../..'
+import Editor, { Raw } from '../..'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import keycode from 'keycode'
-
-/**
- * Define the initial state.
- *
- * @type {Object} state
- */
-
-const state = {
-  nodes: [
-    {
-      type: 'paragraph',
-      nodes: [
-        {
-          type: 'text',
-          ranges: [
-            {
-              text: 'The editor gives you full control over the logic you can add. For example, it\'s fairly common to want to add markdown-like shortcuts to editors. So that, when you start a line with "> " you get a blockquote that looks like this:',
-            }
-          ]
-        }
-      ]
-    },
-    {
-      type: 'block-quote',
-      nodes: [
-        {
-          type: 'text',
-          ranges: [
-            {
-              text: 'A wise quote.'
-            }
-          ]
-        }
-      ]
-    },
-    {
-      type: 'paragraph',
-      nodes: [
-        {
-          type: 'text',
-          ranges: [
-            {
-              text: 'Order when you start a line with "## " you get a level-two heading, like this:',
-            }
-          ]
-        }
-      ]
-    },
-    {
-      type: 'heading-two',
-      nodes: [
-        {
-          type: 'text',
-          ranges: [
-            {
-              text: 'Try it out!'
-            }
-          ]
-        }
-      ]
-    },
-    {
-      type: 'paragraph',
-      nodes: [
-        {
-          type: 'text',
-          ranges: [
-            {
-              text: 'Try it out for yourself! Try starting a new line with ">", "-", or "#"s.'
-            }
-          ]
-        }
-      ]
-    }
-  ]
-}
+import state from './state.json'
 
 /**
  * Define our example app.

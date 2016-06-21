@@ -31,10 +31,6 @@ dist:  $(shell find ./lib)
 example-auto-markdown:
 	@ $(browserify) --debug --transform babelify --outfile ./examples/auto-markdown/build.js ./examples/auto-markdown/index.js
 
-# Build the basic example.
-example-basic:
-	@ $(browserify) --debug --transform babelify --outfile ./examples/basic/build.js ./examples/basic/index.js
-
 # Build the plain-text example.
 example-plain-text:
 	@ $(browserify) --debug --transform babelify --outfile ./examples/plain-text/build.js ./examples/plain-text/index.js
@@ -69,10 +65,6 @@ test-server:
 # Watch the auto-markdown example.
 watch-example-auto-markdown:
 	@ $(MAKE) example-auto-markdown browserify=$(watchify)
-
-# Watch the basic example.
-watch-example-basic:
-	@ $(MAKE) example-basic browserify=$(watchify)
 
 # Watch the plain-text example.
 watch-example-plain-text:

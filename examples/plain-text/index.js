@@ -2,14 +2,7 @@
 import Editor, { Character, Document, Element, State, Text } from '../..'
 import React from 'react'
 import ReactDOM from 'react-dom'
-
-/**
- * The initial editor state.
- *
- * @type {String}
- */
-
-const state = 'This is editable plain text, just like a <textarea>!'
+import state from './state.json'
 
 /**
  * A helper to deserialize a string into an editor state.
@@ -52,16 +45,28 @@ function serialize(state) {
 }
 
 /**
- * The example's app.
+ * The example app.
  *
  * @type {Component} App
  */
 
 class App extends React.Component {
 
+  /**
+   * Deserialize the initial editor state.
+   *
+   * @type {Object}
+   */
+
   state = {
     state: deserialize(state)
   };
+
+  /**
+   * Render the editor.
+   *
+   * @return {Component} component
+   */
 
   render() {
     return (
@@ -82,7 +87,7 @@ class App extends React.Component {
 }
 
 /**
- * Attach.
+ * Mount the example app.
  */
 
 const app = <App />
