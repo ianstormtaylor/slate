@@ -188,7 +188,7 @@ class App extends React.Component {
   renderMarkButton(type, icon) {
     const isActive = this.hasMark(type)
     return (
-      <span className="button" onClick={e => this.onClickMark(e, type)} data-active={isActive}>
+      <span className="button" onMouseDown={e => this.onClickMark(e, type)} data-active={isActive}>
         <span className="material-icons">{icon}</span>
       </span>
     )
@@ -197,7 +197,7 @@ class App extends React.Component {
   renderBlockButton(type, icon) {
     const isActive = this.hasBlock(type)
     return (
-      <span className="button" onClick={e => this.onClickBlock(e, type)} data-active={isActive}>
+      <span className="button" onMouseDown={e => this.onClickBlock(e, type)} data-active={isActive}>
         <span className="material-icons">{icon}</span>
       </span>
     )

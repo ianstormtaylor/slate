@@ -5,7 +5,9 @@ import ReactDOM from 'react-dom'
 import keycode from 'keycode'
 
 /**
- * State.
+ * Define the initial state.
+ *
+ * @type {Object} state
  */
 
 const state = {
@@ -17,7 +19,7 @@ const state = {
           type: 'text',
           ranges: [
             {
-              text: 'Since it\'s rich text, you can do things like turn a selection of text ',
+              text: 'The editor gives you full control over the logic you can add. For example, it\'s fairly common to want to add markdown-like shortcuts to editors. So that, when you start a line with "> " you get a blockquote that looks like this:',
             }
           ]
         }
@@ -43,7 +45,33 @@ const state = {
           type: 'text',
           ranges: [
             {
-              text: 'Try it out for yourself!'
+              text: 'Order when you start a line with "## " you get a level-two heading, like this:',
+            }
+          ]
+        }
+      ]
+    },
+    {
+      type: 'heading-two',
+      nodes: [
+        {
+          type: 'text',
+          ranges: [
+            {
+              text: 'Try it out!'
+            }
+          ]
+        }
+      ]
+    },
+    {
+      type: 'paragraph',
+      nodes: [
+        {
+          type: 'text',
+          ranges: [
+            {
+              text: 'Try it out for yourself! Try starting a new line with ">", "-", or "#"s.'
             }
           ]
         }
@@ -53,14 +81,28 @@ const state = {
 }
 
 /**
- * App.
+ * Define our example app.
+ *
+ * @type {Component} App
  */
 
 class App extends React.Component {
 
+  /**
+   * Deserialize the raw initial state.
+   *
+   * @type {Object}
+   */
+
   state = {
     state: Raw.deserialize(state)
   };
+
+  /**
+   * Render the example.
+   *
+   * @return {Component} component
+   */
 
   render() {
     return (
@@ -82,6 +124,13 @@ class App extends React.Component {
       </div>
     )
   }
+
+  /**
+   * Render each of our custom `node` types.
+   *
+   * @param {Node} node
+   * @return {Component} component
+   */
 
   renderNode(node) {
     switch (node.type) {
@@ -121,9 +170,33 @@ class App extends React.Component {
     }
   }
 
+  /**
+   * On key down, check for our specific key shortcuts.
+   *
+   * @param {Event} e
+   * @param {State} state
+   * @return {State or Null} state
+   */
+
   onKeyDown(e, state) {
     const key = keycode(e.which)
-    if (key != 'space') return
+    switch (key) {
+      case 'space': return this.onSpace(e, state)
+      case 'backspace': return this.onBackspace(e, state)
+      case 'enter': return this.onEnter(e, state)
+    }
+  }
+
+  /**
+   * On space, if it was after an auto-markdown shortcut, convert the current
+   * node into the shortcut's corresponding type.
+   *
+   * @param {Event} e
+   * @param {State} state
+   * @return {State or Null} state
+   */
+
+  onSpace(e, state) {
     if (state.isCurrentlyExpanded) return
     let { selection } = state
     const { currentTextNodes, document } = state
@@ -135,28 +208,29 @@ class App extends React.Component {
 
     switch (chars) {
       case '#':
-        transform = transform.setType('header-one')
+        transform = transform.setType('heading-one')
         break
       case '##':
-        transform = transform.setType('header-two')
+        transform = transform.setType('heading-two')
         break
       case '###':
-        transform = transform.setType('header-three')
+        transform = transform.setType('heading-three')
         break
       case '####':
-        transform = transform.setType('header-four')
+        transform = transform.setType('heading-four')
         break
       case '#####':
-        transform = transform.setType('header-five')
+        transform = transform.setType('heading-five')
         break
       case '######':
-        transform = transform.setType('header-six')
+        transform = transform.setType('heading-six')
         break
       case '>':
         transform = transform.setType('block-quote')
         break
       case '-':
         transform = transform.setType('list-item')
+        const wrapper = document.getParentNode(node)
         if (wrapper.type == 'paragraph') transform = transform.setType('bulleted-list')
         if (wrapper.type == 'bulleted-list') transform = transform.wrap('list-item')
         if (wrapper.type == 'list-item') transform = transform.wrap('unordered-list')
@@ -164,7 +238,6 @@ class App extends React.Component {
       default:
         return
     }
-
 
     state = transform
       .deleteAtRange(selection.extendBackwardToStartOf(node))
@@ -176,10 +249,67 @@ class App extends React.Component {
     return state
   }
 
+  /**
+   * On backspace, if at the start of a non-paragraph, convert it back into a
+   * paragraph node.
+   *
+   * @param {Event} e
+   * @param {State} state
+   * @return {State or Null} state
+   */
+
+  onBackspace(e, state) {
+    if (state.isCurrentlyExpanded) return
+    if (state.currentStartOffset != 0) return
+    const node = state.currentWrappingNodes.first()
+    if (node.type == 'paragraph') return
+
+    e.preventDefault()
+    return state
+      .transform()
+      .setType('paragraph')
+      .apply()
+  }
+
+  /**
+   * On return, if at the end of a node type that should not be extended,
+   * create a new paragraph below it.
+   *
+   * @param {Event} e
+   * @param {State} state
+   * @return {State or Null} state
+   */
+
+  onEnter(e, state) {
+    if (state.isCurrentlyExpanded) return
+    const node = state.currentWrappingNodes.first()
+    if (state.currentStartOffset == 0 && node.length == 0) return this.onBackspace(e, state)
+    if (state.currentEndOffset != node.length) return
+
+    if (
+      node.type != 'heading-one' &&
+      node.type != 'heading-two' &&
+      node.type != 'heading-three' &&
+      node.type != 'heading-four' &&
+      node.type != 'heading-five' &&
+      node.type != 'heading-six' &&
+      node.type != 'block-quote'
+    ) {
+      return
+    }
+
+    e.preventDefault()
+    return state
+      .transform()
+      .split()
+      .setType('paragraph')
+      .apply()
+  }
+
 }
 
 /**
- * Attach.
+ * Mount the app.
  */
 
 const app = <App />
