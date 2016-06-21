@@ -15,7 +15,15 @@ p {
   margin: 0;
 }
 
-.editor p + p {
+blockquote {
+  border-left: 2px solid #ddd;
+  margin-left: 0;
+  padding-left: 10px;
+  color: #aaa;
+  font-style: italic;
+}
+
+.editor > * > * + * {
   margin-top: 1em;
 }
 
