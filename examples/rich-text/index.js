@@ -54,6 +54,55 @@ const state = {
           ]
         }
       ]
+    },
+    {
+      type: 'paragraph',
+      nodes: [
+        {
+          type: 'text',
+          ranges: [
+            {
+              text: 'Since it\'s rich text, you can do things like turn a selection of text ',
+            },
+            {
+              text: 'bold',
+              marks: [
+                {
+                  type: 'bold'
+                }
+              ]
+            },{
+              text: ', or add a semanticlly rendered block quote in the middle of the page, like this:'
+            }
+          ]
+        }
+      ]
+    },
+    {
+      type: 'block-quote',
+      nodes: [
+        {
+          type: 'text',
+          ranges: [
+            {
+              text: 'A wise quote.'
+            }
+          ]
+        }
+      ]
+    },
+    {
+      type: 'paragraph',
+      nodes: [
+        {
+          type: 'text',
+          ranges: [
+            {
+              text: 'Try it out for yourself!'
+            }
+          ]
+        }
+      ]
     }
   ]
 }
