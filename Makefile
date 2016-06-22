@@ -39,6 +39,10 @@ example-plain-text:
 example-rich-text:
 	@ $(browserify) --debug --transform babelify --outfile ./examples/rich-text/build.js ./examples/rich-text/index.js
 
+# Build the table example.
+example-table:
+	@ $(browserify) --debug --transform babelify --outfile ./examples/table/build.js ./examples/table/index.js
+
 # Install the dependencies.
 install:
 	@ npm install
@@ -73,6 +77,10 @@ watch-example-plain-text:
 # Watch the rich-text example.
 watch-example-rich-text:
 	@ $(MAKE) example-rich-text browserify=$(watchify)
+
+# Watch the table example.
+watch-example-table:
+	@ $(MAKE) example-table browserify=$(watchify)
 
 # Phony targets.
 .PHONY: examples
