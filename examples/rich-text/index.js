@@ -22,8 +22,8 @@ class App extends React.Component {
 
   hasBlock(type) {
     const { state } = this.state
-    const { currentWrappingNodes } = state
-    return currentWrappingNodes.some(node => node.type == type)
+    const { currentBlockNodes } = state
+    return currentBlockNodes.some(node => node.type == type)
   }
 
   onClickMark(e, type) {
