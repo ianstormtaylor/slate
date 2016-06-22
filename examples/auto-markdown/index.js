@@ -63,7 +63,7 @@ class App extends React.Component {
         return (props) => <blockquote>{props.children}</blockquote>
       }
       case 'bulleted-list': {
-        return (props) => <ul>{props.chidlren}</ul>
+        return (props) => <ul>{props.children}</ul>
       }
       case 'heading-one': {
         return (props) => <h1>{props.children}</h1>
@@ -84,10 +84,7 @@ class App extends React.Component {
         return (props) => <h6>{props.children}</h6>
       }
       case 'list-item': {
-        return (props) => <li>{props.chidlren}</li>
-      }
-      case 'numbered-list': {
-        return (props) => <ol>{props.children}</ol>
+        return (props) => <li>{props.children}</li>
       }
       case 'paragraph': {
         return (props) => <p>{props.children}</p>
@@ -153,16 +150,21 @@ class App extends React.Component {
       case '>':
         transform = transform.setType('block-quote')
         break
+      case '*':
       case '-':
-        transform = transform.setType('list-item')
-        const wrapper = document.getParentNode(node)
-        if (wrapper.type == 'paragraph') transform = transform.setType('bulleted-list')
-        if (wrapper.type == 'bulleted-list') transform = transform.wrap('list-item')
-        if (wrapper.type == 'list-item') transform = transform.wrap('unordered-list')
+      case '+':
+        if (node.type == 'list-item') break
+        transform = node.type == 'list-item'
+          ? transform
+          : transform
+              .setType('list-item')
+              .wrap('bulleted-list')
         break
       default:
         return
     }
+
+    e.preventDefault()
 
     state = transform
       .deleteAtRange(selection.extendBackwardToStartOf(node))
@@ -170,7 +172,6 @@ class App extends React.Component {
 
     selection = selection.moveToStartOf(node)
     state = state.merge({ selection })
-    e.preventDefault()
     return state
   }
 
@@ -189,12 +190,16 @@ class App extends React.Component {
     const node = state.currentBlockNodes.first()
     if (!node) debugger
     if (node.type == 'paragraph') return
-
     e.preventDefault()
-    return state
+
+    let transform = state
       .transform()
       .setType('paragraph')
-      .apply()
+
+    if (node.type == 'list-item') transform = transform.unwrap('bulleted-list')
+
+    state = transform.apply()
+    return state
   }
 
   /**
