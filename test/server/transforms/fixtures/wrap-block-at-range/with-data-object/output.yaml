@@ -3,7 +3,7 @@ nodes:
   - kind: block
     type: quote
     data:
-      thing: two
+      key: value
     nodes:
       - kind: block
         type: paragraph

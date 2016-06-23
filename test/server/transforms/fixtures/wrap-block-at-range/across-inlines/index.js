@@ -13,6 +13,6 @@ export default function (state) {
 
   return state
     .transform()
-    .unwrapBlockAtRange(range, 'quote')
+    .wrapBlockAtRange(range, 'quote')
     .apply()
 }

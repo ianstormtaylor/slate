@@ -1,0 +1,29 @@
+
+nodes:
+  - kind: block
+    type: paragraph
+    nodes:
+      - kind: inline
+        type: link
+        nodes:
+          - kind: text
+            ranges:
+              - text: wo
+      - kind: inline
+        type: link
+        nodes:
+          - kind: text
+            ranges:
+              - text: rd
+      - kind: inline
+        type: link
+        nodes:
+          - kind: text
+            ranges:
+              - text: an
+      - kind: inline
+        type: link
+        nodes:
+          - kind: text
+            ranges:
+              - text: other

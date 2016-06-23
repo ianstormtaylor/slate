@@ -7,13 +7,13 @@ export default function (state) {
   const first = texts.first()
   const range = selection.merge({
     anchorKey: first.key,
-    anchorOffset: 0,
+    anchorOffset: 1,
     focusKey: first.key,
-    focusOffset: 0
+    focusOffset: 3
   })
 
   return state
     .transform()
-    .wrapBlockAtRange(range, 'quote', Data.create({ key: 'value' }))
+    .wrapInlineAtRange(range, 'hashtag', Data.create({ key: 'value' }))
     .apply()
 }
