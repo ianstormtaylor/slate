@@ -1,0 +1,48 @@
+
+html {
+  background: #eee;
+  padding: 20px;
+}
+
+main {
+  background: #fff;
+  padding: 10px;
+  max-width: 40em;
+  margin: 0 auto;
+}
+
+p {
+  margin: 0;
+}
+
+.editor > * > * + * {
+  margin-top: 1em;
+}
+
+.menu {
+  margin: 0 -10px;
+  padding: 1px 0 9px 8px;
+  border-bottom: 2px solid #eee;
+  margin-bottom: 10px;
+}
+
+.menu > * {
+  display: inline-block;
+}
+
+.menu > * + * {
+  margin-left: 10px;
+}
+
+.button {
+  color: #ccc;
+  cursor: pointer;
+}
+
+.button[data-active="true"] {
+  color: black;
+}
+
+.material-icons {
+  font-size: 18px;
+}

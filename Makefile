@@ -31,6 +31,10 @@ dist:  $(shell find ./lib)
 example-auto-markdown:
 	@ $(browserify) --debug --transform babelify --outfile ./examples/auto-markdown/build.js ./examples/auto-markdown/index.js
 
+# Build the links example.
+example-links:
+	@ $(browserify) --debug --transform babelify --outfile ./examples/links/build.js ./examples/links/index.js
+
 # Build the plain-text example.
 example-plain-text:
 	@ $(browserify) --debug --transform babelify --outfile ./examples/plain-text/build.js ./examples/plain-text/index.js
@@ -52,23 +56,27 @@ lint:
 	@ $(standard) ./lib
 
 # Build the test source.
-test/support/build.js:  $(shell find ./lib) ./test/browser.js
-	@ $(browserify) --debug --transform babelify --outfile ./test/support/build.js ./test/browser.js
+test/browser/support/build.js: $(shell find ./lib) ./test/browser/index.js
+	@ $(browserify) --debug --transform babelify --outfile ./test/browser/support/build.js ./test/browser/index.js
 
 # Run the tests.
 test: test-browser test-server
 
 # Run the browser-side tests.
-test-browser:  ./test/support/build.js
-	@ $(mocha-phantomjs) --reporter spec --timeout 5000 ./test/support/browser.html
+test-browser: ./test/browser/support/build.js
+	@ $(mocha-phantomjs) --reporter spec --timeout 5000 ./test/browser/support/browser.html
 
 # Run the server-side tests.
 test-server:
-	@ $(mocha) --reporter spec --timeout 5000 ./test/server.js
+	@ $(mocha) --compilers js:babel-core/register --reporter spec --timeout 5000 ./test/server
 
 # Watch the auto-markdown example.
 watch-example-auto-markdown:
 	@ $(MAKE) example-auto-markdown browserify=$(watchify)
+
+# Watch the links example.
+watch-example-links:
+	@ $(MAKE) example-links browserify=$(watchify)
 
 # Watch the plain-text example.
 watch-example-plain-text:

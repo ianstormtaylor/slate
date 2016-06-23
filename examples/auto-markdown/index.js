@@ -24,6 +24,7 @@ class App extends React.Component {
   };
 
   /**
+   *
    * Render the example.
    *
    * @return {Component} component
@@ -153,12 +154,10 @@ class App extends React.Component {
       case '*':
       case '-':
       case '+':
-        if (node.type == 'list-item') break
-        transform = node.type == 'list-item'
-          ? transform
-          : transform
-              .setType('list-item')
-              .wrap('bulleted-list')
+        if (node.type == 'list-item') return
+        transform = transform
+          .setType('list-item')
+          .wrapBlock('bulleted-list')
         break
       default:
         return
@@ -196,7 +195,7 @@ class App extends React.Component {
       .transform()
       .setType('paragraph')
 
-    if (node.type == 'list-item') transform = transform.unwrap('bulleted-list')
+    if (node.type == 'list-item') transform = transform.unwrapBlock('bulleted-list')
 
     state = transform.apply()
     return state
