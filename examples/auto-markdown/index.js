@@ -24,6 +24,29 @@ class App extends React.Component {
   };
 
   /**
+   * Get the block type for a series of auto-markdown shortcut `chars`.
+   *
+   * @param {String} chars
+   * @return {String} block
+   */
+
+  getType(chars) {
+    switch (chars) {
+      case '*':
+      case '-':
+      case '+': return 'list-item'
+      case '>': return 'block-quote'
+      case '#': return 'heading-one'
+      case '##': return 'heading-two'
+      case '###': return 'heading-three'
+      case '####': return 'heading-four'
+      case '#####': return 'heading-five'
+      case '######': return 'heading-six'
+      default: return null
+    }
+  }
+
+  /**
    *
    * Render the example.
    *
@@ -120,57 +143,27 @@ class App extends React.Component {
    */
 
   onSpace(e, state) {
-    if (state.isCurrentlyExpanded) return
+    if (state.isExpanded) return
     let { selection } = state
-    const { currentTextNodes, document } = state
-    const { startOffset } = selection
-    const node = currentTextNodes.first()
-    const { text } = node
-    const chars = text.slice(0, startOffset).replace(/\s*/g, '')
-    let transform = state.transform()
+    const { startText, startBlock, startOffset } = state
+    const chars = startBlock.text.slice(0, startOffset).replace(/\s*/g, '')
+    const type = this.getType(chars)
 
-    switch (chars) {
-      case '#':
-        transform = transform.setType('heading-one')
-        break
-      case '##':
-        transform = transform.setType('heading-two')
-        break
-      case '###':
-        transform = transform.setType('heading-three')
-        break
-      case '####':
-        transform = transform.setType('heading-four')
-        break
-      case '#####':
-        transform = transform.setType('heading-five')
-        break
-      case '######':
-        transform = transform.setType('heading-six')
-        break
-      case '>':
-        transform = transform.setType('block-quote')
-        break
-      case '*':
-      case '-':
-      case '+':
-        if (node.type == 'list-item') return
-        transform = transform
-          .setType('list-item')
-          .wrapBlock('bulleted-list')
-        break
-      default:
-        return
-    }
-
+    if (!type) return
+    if (type == 'list-item' && startBlock.type == 'list-item') return
     e.preventDefault()
 
+    let transform = state
+      .transform()
+      .setBlock(type)
+
+    if (type == 'list-item') transform = transform.wrapBlock('bulleted-list')
+
     state = transform
-      .deleteAtRange(selection.extendBackwardToStartOf(node))
+      .extendToStartOf(startBlock)
+      .delete()
       .apply()
 
-    selection = selection.moveToStartOf(node)
-    state = state.merge({ selection })
     return state
   }
 
@@ -184,18 +177,18 @@ class App extends React.Component {
    */
 
   onBackspace(e, state) {
-    if (state.isCurrentlyExpanded) return
-    if (state.currentStartOffset != 0) return
-    const node = state.currentBlockNodes.first()
-    if (!node) debugger
-    if (node.type == 'paragraph') return
+    if (state.isExpanded) return
+    if (state.startOffset != 0) return
+    const { startBlock } = state
+
+    if (startBlock.type == 'paragraph') return
     e.preventDefault()
 
     let transform = state
       .transform()
-      .setType('paragraph')
+      .setBlock('paragraph')
 
-    if (node.type == 'list-item') transform = transform.unwrapBlock('bulleted-list')
+    if (startBlock.type == 'list-item') transform = transform.unwrapBlock('bulleted-list')
 
     state = transform.apply()
     return state
@@ -211,20 +204,19 @@ class App extends React.Component {
    */
 
   onEnter(e, state) {
-    if (state.isCurrentlyExpanded) return
-    const node = state.currentBlockNodes.first()
-    if (!node) debugger
-    if (state.currentStartOffset == 0 && node.length == 0) return this.onBackspace(e, state)
-    if (state.currentEndOffset != node.length) return
+    if (state.isExpanded) return
+    const { startBlock, startOffset, endOffset } = state
+    if (startOffset == 0 && startBlock.length == 0) return this.onBackspace(e, state)
+    if (endOffset != startBlock.length) return
 
     if (
-      node.type != 'heading-one' &&
-      node.type != 'heading-two' &&
-      node.type != 'heading-three' &&
-      node.type != 'heading-four' &&
-      node.type != 'heading-five' &&
-      node.type != 'heading-six' &&
-      node.type != 'block-quote'
+      startBlock.type != 'heading-one' &&
+      startBlock.type != 'heading-two' &&
+      startBlock.type != 'heading-three' &&
+      startBlock.type != 'heading-four' &&
+      startBlock.type != 'heading-five' &&
+      startBlock.type != 'heading-six' &&
+      startBlock.type != 'block-quote'
     ) {
       return
     }
@@ -232,8 +224,8 @@ class App extends React.Component {
     e.preventDefault()
     return state
       .transform()
-      .split()
-      .setType('paragraph')
+      .splitBlock()
+      .setBlock('paragraph')
       .apply()
   }
 

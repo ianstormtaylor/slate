@@ -11,6 +11,7 @@ watchify = $(bin)/watchify
 
 # Flags.
 DEBUG ?=
+GREP ?=
 
 # Config.
 ifeq ($(DEBUG),true)
@@ -93,6 +94,7 @@ test-browser: ./test/support/build.js
 	@ $(mocha-phantomjs) \
 		--reporter spec \
 		--timeout 5000 \
+		--fgrep "$(GREP)" \
 		./test/support/browser.html
 
 # Run the server-side tests.
@@ -102,6 +104,7 @@ test-server:
 		--require source-map-support/register \
 		--reporter spec \
 		--timeout 5000 \
+		--fgrep "$(GREP)" \
 		./test/server.js
 
 # Watch the auto-markdown example.
