@@ -56,19 +56,24 @@ lint:
 	@ $(standard) ./lib
 
 # Build the test source.
-test/browser/support/build.js: $(shell find ./lib) ./test/browser/index.js
-	@ $(browserify) --debug --transform babelify --outfile ./test/browser/support/build.js ./test/browser/index.js
+test/browser/support/build.js: $(shell find ./lib) ./test/browser.js
+	@ $(browserify) --debug --transform babelify --outfile ./test/support/build.js ./test/browser.js
 
 # Run the tests.
 test: test-browser test-server
 
 # Run the browser-side tests.
-test-browser: ./test/browser/support/build.js
-	@ $(mocha-phantomjs) --reporter spec --timeout 5000 ./test/browser/support/browser.html
+test-browser: ./test/support/build.js
+	@ $(mocha-phantomjs) --reporter spec --timeout 5000 ./test/support/browser.html
 
 # Run the server-side tests.
 test-server:
-	@ $(mocha) --compilers js:babel-core/register --reporter spec --timeout 5000 ./test/server
+	@ $(mocha) \
+		--compilers js:babel-core/register \
+		--require source-map-support/register \
+		--reporter spec \
+		--timeout 5000 \
+		./test/server.js
 
 # Watch the auto-markdown example.
 watch-example-auto-markdown:

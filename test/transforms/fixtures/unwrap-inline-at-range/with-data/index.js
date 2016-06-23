@@ -1,5 +1,5 @@
 
-import { Data } from '../../../../../..'
+import { Data } from '../../../../..'
 
 export default function (state) {
   const { document, selection } = state

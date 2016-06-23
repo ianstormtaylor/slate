@@ -3,8 +3,8 @@ import assert from 'assert'
 import fs from 'fs'
 import readMetadata from 'read-metadata'
 import toCamel from 'to-camel-case'
-import { Raw, State } from '../../..'
-import { equal } from '../../helpers/assert-json'
+import { Raw, State } from '../..'
+import { equal } from '../helpers/assert-json'
 import { resolve } from 'path'
 
 /**

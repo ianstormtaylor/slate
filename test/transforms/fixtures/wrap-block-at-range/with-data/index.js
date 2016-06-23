@@ -1,5 +1,5 @@
 
-import { Data } from '../../../../../..'
+import { Data } from '../../../../..'
 
 export default function (state) {
   const { document, selection } = state
@@ -9,11 +9,11 @@ export default function (state) {
     anchorKey: first.key,
     anchorOffset: 0,
     focusKey: first.key,
-    focusOffset: 1
+    focusOffset: 0
   })
 
   return state
     .transform()
-    .markAtRange(range, 'bold', { key: 'value' })
+    .wrapBlockAtRange(range, 'quote', Data.create({ key: 'value' }))
     .apply()
 }
