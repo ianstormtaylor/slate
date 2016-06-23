@@ -25,6 +25,7 @@
     "mocha-phantomjs": "^4.0.2",
     "react-dom": "^15.1.0",
     "read-metadata": "^1.0.0",
+    "source-map-support": "^0.4.0",
     "standard": "^7.1.2",
     "to-camel-case": "^1.0.0",
     "watchify": "^3.7.0"
