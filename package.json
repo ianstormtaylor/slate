@@ -24,10 +24,12 @@
     "mocha": "^2.5.3",
     "mocha-phantomjs": "^4.0.2",
     "react-dom": "^15.1.0",
+    "react-router": "^2.5.1",
     "read-metadata": "^1.0.0",
     "source-map-support": "^0.4.0",
     "standard": "^7.1.2",
     "to-camel-case": "^1.0.0",
+    "to-title-case": "^1.0.0",
     "watchify": "^3.7.0"
   }
 }

@@ -24,52 +24,20 @@ clean:
 	@ rm -rf ./dist
 
 # Build the source.
-dist:  $(shell find ./lib)
+dist:  $(shell find ./lib) package.json
 	@ $(babel) \
 		--out-dir \
 		./dist \
 		./lib
 	@ touch ./dist
 
-# Build the auto-markdown example.
-example-auto-markdown:
+# Build the examples.
+examples:
 	@ $(browserify) \
 		--debug \
 		--transform babelify \
-		--outfile ./examples/auto-markdown/build.js \
-		./examples/auto-markdown/index.js
-
-# Build the links example.
-example-links:
-	@ $(browserify) \
-		--debug \
-		--transform babelify \
-		--outfile ./examples/links/build.js \
-		./examples/links/index.js
-
-# Build the plain-text example.
-example-plain-text:
-	@ $(browserify) \
-		--debug \
-		--transform babelify \
-		--outfile ./examples/plain-text/build.js \
-		./examples/plain-text/index.js
-
-# Build the rich-text example.
-example-rich-text:
-	@ $(browserify) \
-		--debug \
-		--transform babelify \
-		--outfile ./examples/rich-text/build.js \
-		./examples/rich-text/index.js
-
-# Build the table example.
-example-table:
-	@ $(browserify) \
-		--debug \
-		--transform babelify \
-		--outfile ./examples/table/build.js \
-		./examples/table/index.js
+		--outfile ./examples/build.js \
+		./examples/index.js
 
 # Install the dependencies.
 install:
@@ -107,25 +75,9 @@ test-server:
 		--fgrep "$(GREP)" \
 		./test/server.js
 
-# Watch the auto-markdown example.
-watch-example-auto-markdown:
-	@ $(MAKE) example-auto-markdown browserify=$(watchify)
-
-# Watch the links example.
-watch-example-links:
-	@ $(MAKE) example-links browserify=$(watchify)
-
-# Watch the plain-text example.
-watch-example-plain-text:
-	@ $(MAKE) example-plain-text browserify=$(watchify)
-
-# Watch the rich-text example.
-watch-example-rich-text:
-	@ $(MAKE) example-rich-text browserify=$(watchify)
-
-# Watch the table example.
-watch-example-table:
-	@ $(MAKE) example-table browserify=$(watchify)
+# Watch the examples.
+watch-examples:
+	@ $(MAKE) examples browserify=$(watchify)
 
 # Phony targets.
 .PHONY: examples

@@ -6,10 +6,12 @@ import state from './state.json'
 import { Map } from 'immutable'
 
 /**
- * App.
+ * The links example.
+ *
+ * @type {Component} Links
  */
 
-class App extends React.Component {
+class Links extends React.Component {
 
   state = {
     state: Raw.deserialize(state)
@@ -72,7 +74,7 @@ class App extends React.Component {
   /**
    * Render the app.
    *
-   * @return {Component} component
+   * @return {Element} element
    */
 
   render() {
@@ -87,7 +89,7 @@ class App extends React.Component {
   /**
    * Render the toolbar.
    *
-   * @return {Component} component
+   * @return {Element} element
    */
 
   renderToolbar() {
@@ -104,7 +106,7 @@ class App extends React.Component {
   /**
    * Render the editor.
    *
-   * @return {Component} component
+   * @return {Element} element
    */
 
   renderEditor() {
@@ -130,7 +132,7 @@ class App extends React.Component {
    * Render our custom `node`.
    *
    * @param {Node} node
-   * @return {Component} component
+   * @return {Element} element
    */
 
   renderNode(node) {
@@ -151,9 +153,7 @@ class App extends React.Component {
 }
 
 /**
- * Attach.
+ * Export.
  */
 
-const app = <App />
-const root = document.body.querySelector('main')
-ReactDOM.render(app, root)
+export default Links

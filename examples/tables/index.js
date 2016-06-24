@@ -1,17 +1,16 @@
 
 import Editor, { Raw } from '../..'
 import React from 'react'
-import ReactDOM from 'react-dom'
 import keycode from 'keycode'
 import state from './state.json'
 
 /**
- * Define our example app.
+ * The tables example.
  *
- * @type {Component} App
+ * @type {Component} Tables
  */
 
-class App extends React.Component {
+class Tables extends React.Component {
 
   /**
    * Deserialize the raw initial state.
@@ -154,9 +153,7 @@ class App extends React.Component {
 }
 
 /**
- * Mount the app.
+ * Export.
  */
 
-const app = <App />
-const root = document.body.querySelector('main')
-ReactDOM.render(app, root)
+export default Tables

@@ -1,7 +1,6 @@
 
 import Editor, { Character, Document, Block, State, Text } from '../..'
 import React from 'react'
-import ReactDOM from 'react-dom'
 import state from './state.json'
 
 /**
@@ -41,12 +40,12 @@ function serialize(state) {
 }
 
 /**
- * The example app.
+ * The plain text example.
  *
- * @type {Component} App
+ * @type {Component} PlainText
  */
 
-class App extends React.Component {
+class PlainText extends React.Component {
 
   /**
    * Deserialize the initial editor state.
@@ -83,9 +82,7 @@ class App extends React.Component {
 }
 
 /**
- * Mount the example app.
+ * Export.
  */
 
-const app = <App />
-const root = document.body.querySelector('main')
-ReactDOM.render(app, root)
+export default PlainText

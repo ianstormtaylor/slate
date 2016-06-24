@@ -1,14 +1,15 @@
 
 import Editor, { Mark, Raw } from '../..'
 import React from 'react'
-import ReactDOM from 'react-dom'
 import state from './state.json'
 
 /**
- * App.
+ * The rich text example.
+ *
+ * @type {Component} RichText
  */
 
-class App extends React.Component {
+class RichText extends React.Component {
 
   state = {
     state: Raw.deserialize(state)
@@ -177,9 +178,7 @@ class App extends React.Component {
 }
 
 /**
- * Attach.
+ * Export.
  */
 
-const app = <App />
-const root = document.body.querySelector('main')
-ReactDOM.render(app, root)
+export default RichText
