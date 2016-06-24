@@ -5,4 +5,4 @@ nodes:
     nodes:
       - kind: text
         ranges:
-          - text: word
+          - text: woother

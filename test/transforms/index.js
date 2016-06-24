@@ -4,7 +4,7 @@ import fs from 'fs'
 import readMetadata from 'read-metadata'
 import toCamel from 'to-camel-case'
 import { Raw, State } from '../..'
-import { equal } from '../helpers/assert-json'
+import { equal, strictEqual } from '../helpers/assert-json'
 import { resolve } from 'path'
 
 /**
@@ -30,7 +30,7 @@ describe('transforms', () => {
           let state = Raw.deserialize(input)
           state = fn(state)
           const output = Raw.serialize(state)
-          equal(output, expected)
+          strictEqual(output, expected)
         })
       }
     })

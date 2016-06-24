@@ -5,10 +5,4 @@ nodes:
     nodes:
       - kind: text
         ranges:
-          - text: ""
-  - kind: block
-    type: paragraph
-    nodes:
-      - kind: text
-        ranges:
           - text: word
