@@ -3,6 +3,7 @@
 bin = ./node_modules/.bin
 babel = $(bin)/babel
 browserify = $(bin)/browserify
+exorcist = $(bin)/exorcist
 standard = $(bin)/standard
 mocha = $(bin)/mocha
 mocha-phantomjs = $(bin)/mocha-phantomjs
@@ -34,10 +35,10 @@ dist:  $(shell find ./lib) package.json
 # Build the examples.
 examples:
 	@ $(browserify) \
+		./examples/index.js \
 		--debug \
 		--transform babelify \
-		--outfile ./examples/build.js \
-		./examples/index.js
+		| $(exorcist) ./examples/build.js.map > ./examples/build.js
 
 # Install the dependencies.
 install:
@@ -77,7 +78,11 @@ test-server:
 
 # Watch the examples.
 watch-examples:
-	@ $(MAKE) examples browserify=$(watchify)
+	@ $(watchify) \
+		./examples/index.js \
+		--debug \
+		--transform babelify \
+		--outfile "$(exorcist) ./examples/build.js.map > ./examples/build.js"
 
 # Phony targets.
 .PHONY: examples

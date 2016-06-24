@@ -21,6 +21,7 @@
     "babelify": "^7.3.0",
     "browserify": "^13.0.1",
     "component-type": "^1.2.1",
+    "exorcist": "^0.4.0",
     "mocha": "^2.5.3",
     "mocha-phantomjs": "^4.0.2",
     "react-dom": "^15.1.0",
