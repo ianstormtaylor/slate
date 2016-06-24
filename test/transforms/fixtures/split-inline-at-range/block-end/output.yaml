@@ -9,3 +9,9 @@ nodes:
           - kind: text
             ranges:
               - text: word
+      - kind: inline
+        type: link
+        nodes:
+          - kind: text
+            ranges:
+              - text: ""

@@ -8,4 +8,10 @@ nodes:
         nodes:
           - kind: text
             ranges:
+              - text: ""
+      - kind: inline
+        type: link
+        nodes:
+          - kind: text
+            ranges:
               - text: word
