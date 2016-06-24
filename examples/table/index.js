@@ -100,9 +100,7 @@ class App extends React.Component {
    */
 
   onKeyDown(e, state) {
-    if (state.isCurrentlyExpanded) return
-    const node = state.currentBlockNodes.first()
-    if (node.type != 'table-cell') return
+    if (state.startNode.type != 'table-cell') return
 
     const key = keycode(e.which)
     switch (key) {
@@ -121,7 +119,7 @@ class App extends React.Component {
    */
 
   onBackspace(e, state) {
-    if (state.currentStartOffset != 0) return
+    if (state.startOffset != 0) return
     e.preventDefault()
     return state
   }
@@ -135,8 +133,7 @@ class App extends React.Component {
    */
 
   onDelete(e, state) {
-    const node = state.currentBlockNodes.first()
-    if (state.currentEndOffset != node.length) return
+    if (state.endOffset != state.startNode.length) return
     e.preventDefault()
     return state
   }

@@ -16,14 +16,14 @@ class App extends React.Component {
 
   hasMark(type) {
     const { state } = this.state
-    const { currentMarks } = state
-    return currentMarks.some(mark => mark.type == type)
+    const { marks } = state
+    return marks.some(mark => mark.type == type)
   }
 
   hasBlock(type) {
     const { state } = this.state
-    const { currentBlockNodes } = state
-    return currentBlockNodes.some(node => node.type == type)
+    const { blocks } = state
+    return blocks.some(node => node.type == type)
   }
 
   onClickMark(e, type) {
@@ -46,7 +46,7 @@ class App extends React.Component {
 
     state = state
       .transform()
-      .setType(isActive ? 'paragraph' : type)
+      .setBlock(isActive ? 'paragraph' : type)
       .apply()
 
     this.setState({ state })

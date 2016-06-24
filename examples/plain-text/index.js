@@ -12,21 +12,17 @@ import state from './state.json'
  */
 
 function deserialize(string) {
-  const characters = string
-    .split('')
-    .reduce((list, char) => {
-      return list.push(Character.create({ text: char }))
-    }, Character.createList())
-
-  const text = Text.create({ characters })
-  const texts = Block.createMap([text])
-  const node = Block.create({
-    type: 'paragraph',
-    nodes: texts,
+  const characters = string.split('').map(char => {
+    return { text: char }
   })
 
-  const nodes = Block.createMap([node])
-  const document = Document.create({ nodes })
+  const text = Text.create({ characters })
+  const block = Block.create({
+    type: 'paragraph',
+    nodes: [text]
+  })
+
+  const document = Document.create({ nodes: [block] })
   const state = State.create({ document })
   return state
 }
