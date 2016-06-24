@@ -22,10 +22,9 @@ class App extends React.Component {
    */
 
   hasLinks() {
-    let { state } = this.state
-    const { currentInlineNodes } = state
-    const hasLinks = currentInlineNodes.some(inline => inline.type == 'link')
-    return hasLinks
+    const { state } = this.state
+    const { inlines } = state
+    return inlines.some(inline => inline.type == 'link')
   }
 
   /**
@@ -47,11 +46,11 @@ class App extends React.Component {
         .apply()
     }
 
-    else if (state.isCurrentlyExpanded) {
-      // const href = window.prompt('Enter the URL of the link:')
+    else if (state.isExpanded) {
+      const href = window.prompt('Enter the URL of the link:')
       state = state
         .transform()
-        .wrapInline('link', new Map({ href: 'https://google.com' }))
+        .wrapInline('link', new Map({ href }))
         .apply()
     }
 
@@ -63,6 +62,7 @@ class App extends React.Component {
         .insertText(text)
         .extendBackward(text.length)
         .wrapInline('link', new Map({ href }))
+        .moveToEnd(text.length)
         .apply()
     }
 
