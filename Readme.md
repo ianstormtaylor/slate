@@ -11,9 +11,10 @@ _Slate was inspired by [Draft.js](https://facebook.github.io/draft-js/) and [Pro
 
 ## Principles
 
-- Build around a nested, recursive tree model just like the DOM, so that complex schemas are possible.
-- Make plugins a first-class consideration, so that almost all the logic is customizable.
-- Don't bake any opinions about data types and schema into the core library.
+- Built with React and Immutable for performant stateless re-rendering and developing ease.
+- Based on a nested, recursive tree model just like the DOM, so that complex components are possible.
+- Made with plugins as a first-class consideration, so that almost all the logic is customizable.
+- Doesn't bake any opinions about the schema being edited into the core library.
 
 ## Examples
 
