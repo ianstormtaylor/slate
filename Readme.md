@@ -1,4 +1,8 @@
 
+
+<table>
+    <tr>
+        <td width="600">
 ![Slate](support/banner.png)
 
 Slate is a completely customizable framework for building rich text editors in the browser. You can think of it like a pluggable implementation of `contenteditable`, built with React and Immutable. Slate was inspired by libraries like [Draft.js](https://facebook.github.io/draft-js/) and [Prosemirror](http://prosemirror.net/).
@@ -25,3 +29,7 @@ To get a sense for how Slate works, check out a few of the examples:
 - Auto-markdown
 - Links
 - Tables
+
+</td>
+</tr>
+</table>
