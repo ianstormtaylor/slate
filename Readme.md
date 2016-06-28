@@ -2,7 +2,7 @@
 
 ![Slate](support/banner.png)
 
-Slate is a completely customizable framework for building rich text editors in the browser. You can think of it like a pluggable implementation of `contenteditable`, built with React and Immutable. Slate was inspired by libraries like [Draft.js](https://facebook.github.io/draft-js/) and [Prosemirror](http://prosemirror.net/).
+Slate is a completely customizable framework for building rich text editors in the browser. You can think of it like a pluggable implementation of `contenteditable`, built with React and Immutable. Slate was inspired by [Draft.js](https://facebook.github.io/draft-js/) and [Prosemirror](http://prosemirror.net/).
 
 ###### Table of Contents
 
@@ -16,6 +16,7 @@ Slate is a completely customizable framework for building rich text editors in t
 - Based on a nested, recursive tree model just like the DOM, so that complex components are possible.
 - Made with plugins as a first-class consideration, so that almost all the logic is customizable.
 - Doesn't bake any opinions about the schema being edited into the core library.
+- Designed to allow for collaborative editing to be layered on top.
 
 ## Examples
 
