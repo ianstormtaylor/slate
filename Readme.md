@@ -36,6 +36,7 @@ To get a sense for how you might use Slate, check out a few of the examples:
 - [Rich text](examples/rich-text) — showing the features you'd expect from a basic editor.
 - [Auto-markdown](examples/auto-markdown) — showing how to add key handlers for Markdown-like shortcuts.
 - [Links](examples/links) — showing how wrap text in inline nodes with associated data.
+- [Hovering menu](examples/hovering-menu) — showing how a contextual hovering menu can be implemented.
 - [Tables](examples/tables) — showing how to nest blocks to render more advanced components.
 
 
