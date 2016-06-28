@@ -8,8 +8,9 @@ Slate is a completely customizable framework for building rich text editors in t
 - [Examples](#examples)
 - [Plugins](#plugins)
 - [Documentation](#documentation)
+- [Contributing](#contributing)
 
-_Slate is currently in **beta**, while work is being done on: cross-browser support, atomic node support, and collaboration support. It's completely useable, but you might need to pull request one or two fixes for your use case._
+_Slate is currently in **beta**, while work is being done on: cross-browser support, atomic node support, and collaboration support. It's useable now, but you might need to pull request one or two fixes for your use case._
 
 
 ## Principles
@@ -25,11 +26,15 @@ _Slate is currently in **beta**, while work is being done on: cross-browser supp
 
 To get a sense for how you might use Slate, check out a few of the examples:
 
-- Rich Text
-- Plain Text
-- Auto-markdown
-- Links
-- Tables
+- [Rich Text](examples/rich-text)
+- [Plain Text](examples/plain-text)
+- [Auto-markdown](examples/auto-markdown)
+- [Links](examples/links)
+- [Tables](examples/tables)
 
 
-## Getting Started
+## Documentation
+
+If you're using Slate for the first time, check out the [Getting Started Guide](docs/getting-started.md) to familiarize yourself with Slate's architecture and mental models.
+
+After that, you'll probably just want the [API Reference](docs/reference.md).
