@@ -47,6 +47,24 @@ If you have an idea for an example that shows a common use case, pull request it
 If you're using Slate for the first time, check out the [Getting Started](docs/getting-started.md) guide to familiarize yourself with Slate's architecture and mental models. After that, you'll probably just want the [API Reference](docs/reference.md).
 
 - [Getting Started](docs/getting-started.md)
+
+- [Core Concepts](docs/concepts.md)
   - [Stateless & Immutability](docs/getting-started.md#stateless-immutability)
   - [The Document Model](docs/getting-started.md#the-document-model)
+  - Selections
+
 - [API Reference](docs/reference.md)
+  - Components
+    - Editor
+  - Models
+    - Block
+    - Character
+    - Data
+    - Document
+    - Inline
+    - Mark
+    - Node
+    - Selection
+    - State
+    - Text
+    - Transform
