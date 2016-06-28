@@ -35,6 +35,4 @@ To get a sense for how you might use Slate, check out a few of the examples:
 
 ## Documentation
 
-If you're using Slate for the first time, check out the [Getting Started Guide](docs/getting-started.md) to familiarize yourself with Slate's architecture and mental models.
-
-After that, you'll probably just want the [API Reference](docs/reference.md).
+If you're using Slate for the first time, check out the [Getting Started Guide](docs/getting-started.md) to familiarize yourself with Slate's architecture and mental models. After that, you'll probably just want the [API Reference](docs/reference.md).
