@@ -19,7 +19,7 @@ _Slate is currently in **beta**, while work is being done on: cross-browser supp
 
 **Stateless and immutable.** By using React and Immutable.js, the Slate editor is built in a stateless fashion using immutable data structures, which leads to better performance, and also a much easier time writing plugins.
 
-**Nested document model.** The document model used for Slate is a nested, recursive tree, just like the DOM itself. This means that creating complex components like tables or nested block quotes is possible for building advanced use cases. But it's also easy to keep it simple by only using a single level of hierachy.
+**Nested document model.** The document model used for Slate is a nested, recursive tree, just like the DOM itself. This means that creating complex components like tables or nested block quotes is possible for advanced use cases. But it's also easy to keep it simple by only using a single level of hierachy.
 
 **Schema-less core.** Slate's core logic doesn't assume anything about the schema of the data you'll be editing, which means that there are no assumptions baked into the library that'll trip you up when you need to go beyond basic usage.
 
@@ -30,11 +30,11 @@ _Slate is currently in **beta**, while work is being done on: cross-browser supp
 
 To get a sense for how you might use Slate, check out a few of the examples:
 
-- [Rich Text](examples/rich-text)
-- [Plain Text](examples/plain-text)
-- [Auto-markdown](examples/auto-markdown)
-- [Links](examples/links)
-- [Tables](examples/tables)
+- [Plain Text](examples/plain-text), showing the most basic case: a glorified `<textarea>`.
+- [Rich Text](examples/rich-text), showing the features you'd expect from a basic editor.
+- [Auto-markdown](examples/auto-markdown), showing how to add key handlers for Markdown-like shortcuts.
+- [Links](examples/links), showing how wrap text in inline nodes with associated data.
+- [Tables](examples/tables), showing how to nest blocks to render more advanced components.
 
 
 ## Documentation
