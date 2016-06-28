@@ -95,7 +95,7 @@ class Links extends React.Component {
   renderToolbar() {
     const hasLinks = this.hasLinks()
     return (
-      <div className="menu">
+      <div className="menu toolbar-menu">
         <span className="button" onMouseDown={e => this.onClickLink(e)} data-active={hasLinks}>
           <span className="material-icons">link</span>
         </span>

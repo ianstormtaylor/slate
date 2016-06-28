@@ -75,13 +75,6 @@ td {
   margin-top: 1em;
 }
 
-.menu {
-  margin: 0 -10px;
-  padding: 1px 0 9px 8px;
-  border-bottom: 2px solid #eee;
-  margin-bottom: 10px;
-}
-
 .menu > * {
   display: inline-block;
 }
@@ -97,4 +90,32 @@ td {
 
 .button[data-active="true"] {
   color: black;
+}
+
+.toolbar-menu {
+  padding: 1px 0 9px 8px;
+  margin: 0 -10px;
+  border-bottom: 2px solid #eee;
+  margin-bottom: 10px;
+}
+
+.hover-menu {
+  padding: 8px 7px 6px;
+  position: absolute;
+  z-index: 1;
+  top: -10000px;
+  left: -10000px;
+  margin-top: -3px;
+  opacity: 0;
+  background-color: #222;
+  border-radius: 4px;
+  transition: opacity 1s;
+}
+
+.hover-menu .button {
+  color: #aaa;
+}
+
+.hover-menu .button[data-active="true"] {
+  color: #fff;
 }
