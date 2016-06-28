@@ -1,3 +1,4 @@
+*.sketch
 build.js
 build.js.map
 dist
