@@ -13,7 +13,7 @@ Slate is a completely customizable framework for building rich text editors in t
 _Slate is currently in **beta**, while work is being done on: cross-browser support, atomic node support, and collaboration support. It's useable now, but you might need to pull request one or two fixes for your use case._
 
 
-### Principles
+## Principles
 
 **First-class plugins.** The most important factor of Slate is that plugins are first-class entities—the core editor logic is even implemented as its own plugin. This means that you're able to fully customize the editing experience. So you can build complex interations like those found in the Medium or Canvas editors.
 
@@ -26,7 +26,7 @@ _Slate is currently in **beta**, while work is being done on: cross-browser supp
 **Collaboration friendly.** The data model Slate uses—specifically how transforms are applied to the document—has been designed to allow for collaborative editing to be layered on top, so you won't need to rethink everything if you decide to make your editor collaborative.
 
 
-### Examples
+## Examples
 
 To get a sense for how you might use Slate, check out a few of the examples:
 
