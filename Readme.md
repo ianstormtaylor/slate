@@ -13,16 +13,20 @@ Slate is a completely customizable framework for building rich text editors in t
 _Slate is currently in **beta**, while work is being done on: cross-browser support, atomic node support, and collaboration support. It's useable now, but you might need to pull request one or two fixes for your use case._
 
 
-## Principles
+### Principles
 
-- Built with React and Immutable for performant stateless re-rendering and developing ease.
-- Based on a nested, recursive tree model just like the DOM, so that complex components are possible.
-- Made with plugins as a first-class consideration, so that almost all the logic is customizable.
-- Doesn't bake any opinions about the schema being edited into the core library.
-- Designed to allow for collaborative editing to be layered on top.
+**First-class plugins.** The most important factor of Slate is that plugins are first-class entities—the core editor logic is even implemented as its own plugin. This means that you're able to fully customize the editing experience. So you can build complex interations like those found in the Medium or Canvas editors.
+
+**Stateless and immutable.** By using React and Immutable.js, the Slate editor is built in a stateless fashion using immutable data structures, which leads to better performance, and also a much easier time writing plugins.
+
+**Nested document model.** The document model used for Slate is a nested, recursive tree, just like the DOM itself. This means that creating complex components like tables or nested block quotes is possible for building advanced use cases. But it's also easy to keep it simple by only using a single level of hierachy.
+
+**Schema-less core.** The core of Slate doesn't assume anything about the schema of the data you'll be editing, which means that there are any assumptions baked into the library that will trip you up when you need to go beyond the most basic usage.
+
+**Collaboration friendly.** The data model Slate uses—specifically how transforms are applied to the document—has been designed to allow for collaborative editing to be layered on top, so you won't need to rethink everything if you decide to make your editor collaborative.
 
 
-## Examples
+### Examples
 
 To get a sense for how you might use Slate, check out a few of the examples:
 
