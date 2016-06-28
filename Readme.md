@@ -32,12 +32,12 @@ _Slate is currently in **beta**, while work is being done on: cross-browser supp
 
 To get a sense for how you might use Slate, check out a few of the examples:
 
-- [Plain text](examples/plain-text) — showing the most basic case: a glorified `<textarea>`.
-- [Rich text](examples/rich-text) — showing the features you'd expect from a basic editor.
-- [Auto-markdown](examples/auto-markdown) — showing how to add key handlers for Markdown-like shortcuts.
-- [Links](examples/links) — showing how wrap text in inline nodes with associated data.
-- [Hovering menu](examples/hovering-menu) — showing how a contextual hovering menu can be implemented.
-- [Tables](examples/tables) — showing how to nest blocks to render more advanced components.
+- [**Plain text**](examples/plain-text) — showing the most basic case: a glorified `<textarea>`.
+- [**Rich text**](examples/rich-text) — showing the features you'd expect from a basic editor.
+- [**Auto-markdown**](examples/auto-markdown) — showing how to add key handlers for Markdown-like shortcuts.
+- [**Links**](examples/links) — showing how wrap text in inline nodes with associated data.
+- [**Hovering menu**](examples/hovering-menu) — showing how a contextual hovering menu can be implemented.
+- [**Tables**](examples/tables) — showing how to nest blocks to render more advanced components.
 
 If you have an idea for an example that shows a common use case, pull request it!
 
