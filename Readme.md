@@ -21,7 +21,7 @@ _Slate is currently in **beta**, while work is being done on: cross-browser supp
 
 **Nested document model.** The document model used for Slate is a nested, recursive tree, just like the DOM itself. This means that creating complex components like tables or nested block quotes is possible for building advanced use cases. But it's also easy to keep it simple by only using a single level of hierachy.
 
-**Schema-less core.** The core of Slate doesn't assume anything about the schema of the data you'll be editing, which means that there are any assumptions baked into the library that will trip you up when you need to go beyond the most basic usage.
+**Schema-less core.** Slate's core logic doesn't assume anything about the schema of the data you'll be editing, which means that there are no assumptions baked into the library that'll trip you up when you need to go beyond basic usage.
 
 **Collaboration friendly.** The data model Slate uses—specifically how transforms are applied to the document—has been designed to allow for collaborative editing to be layered on top, so you won't need to rethink everything if you decide to make your editor collaborative.
 
