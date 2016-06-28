@@ -1,7 +1,12 @@
 
 # Slate
 
-Slate is a 
+Slate is a completely customizable framework for building rich text editors in the browser. You can think of it like a pluggable implementation of `contenteditable`, built with React and Immutable.
+
+_Slate was inspired by [Draft.js](https://facebook.github.io/draft-js/) and [Prosemirror](http://prosemirror.net/)._
+
+- [Principles](#principles)
+- [Examples](#examples)
 
 
 ## Principles
