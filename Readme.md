@@ -39,7 +39,14 @@ To get a sense for how you might use Slate, check out a few of the examples:
 - [Hovering menu](examples/hovering-menu) — showing how a contextual hovering menu can be implemented.
 - [Tables](examples/tables) — showing how to nest blocks to render more advanced components.
 
+If you have an idea for an example that shows a common use case, pull request it!
+
 
 ## Documentation
 
-If you're using Slate for the first time, check out the [Getting Started Guide](docs/getting-started.md) to familiarize yourself with Slate's architecture and mental models. After that, you'll probably just want the [API Reference](docs/reference.md).
+If you're using Slate for the first time, check out the [Getting Started](docs/getting-started.md) guide to familiarize yourself with Slate's architecture and mental models. After that, you'll probably just want the [API Reference](docs/reference.md).
+
+- [Getting Started](docs/getting-started.md)
+  - [Stateless & Immutability](docs/getting-started.md#stateless-immutability)
+  - [The Document Model](docs/getting-started.md#the-document-model)
+- [API Reference](docs/reference.md)
