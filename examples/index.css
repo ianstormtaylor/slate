@@ -6,11 +6,6 @@ html {
   background: #eee;
 }
 
-main {
-  max-width: 42em;
-  margin: 0 auto;
-}
-
 p {
   margin: 0;
 }
@@ -73,8 +68,10 @@ td {
  */
 
 .example {
-  background: #fff;
+  max-width: 42em;
+  margin: 0 auto;
   padding: 20px;
+  background: #fff;
 }
 
 .editor > * > * + * {

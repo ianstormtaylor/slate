@@ -11,6 +11,7 @@ import AutoMarkdown from './auto-markdown'
 import HoveringMenu from './hovering-menu'
 import Images from './images'
 import Links from './links'
+import PasteHtml from './paste-html'
 import PlainText from './plain-text'
 import RichText from './rich-text'
 import Tables from './tables'
@@ -47,14 +48,28 @@ class App extends React.Component {
   renderTabBar() {
     return (
       <div className="tabs">
-        <Link className="tab" activeClassName="active" to="rich-text">Rich Text</Link>
-        <Link className="tab" activeClassName="active" to="plain-text">Plain Text</Link>
-        <Link className="tab" activeClassName="active" to="auto-markdown">Auto-markdown</Link>
-        <Link className="tab" activeClassName="active" to="hovering-menu">Hovering Menu</Link>
-        <Link className="tab" activeClassName="active" to="links">Links</Link>
-        <Link className="tab" activeClassName="active" to="images">Images</Link>
-        <Link className="tab" activeClassName="active" to="tables">Tables</Link>
+        {this.renderTab('Rich Text', 'rich-text')}
+        {this.renderTab('Plain Text', 'plain-text')}
+        {this.renderTab('Auto-markdown', 'auto-markdown')}
+        {this.renderTab('Hovering Menu', 'hovering-menu')}
+        {this.renderTab('Links', 'links')}
+        {this.renderTab('Images', 'images')}
+        {this.renderTab('Tables', 'tables')}
+        {this.renderTab('Paste HTML', 'paste-html')}
       </div>
+    )
+  }
+
+  /**
+   * Render a tab with `name` and `slug`.
+   *
+   * @param {String} name
+   * @param {String} slug
+   */
+
+  renderTab(name, slug) {
+    return (
+      <Link className="tab" activeClassName="active" to={slug}>{name}</Link>
     )
   }
 
@@ -88,6 +103,7 @@ const router = (
       <Route path="hovering-menu" component={HoveringMenu} />
       <Route path="images" component={Images} />
       <Route path="links" component={Links} />
+      <Route path="paste-html" component={PasteHtml} />
       <Route path="plain-text" component={PlainText} />
       <Route path="rich-text" component={RichText} />
       <Route path="tables" component={Tables} />

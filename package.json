@@ -20,6 +20,7 @@
     "babel-preset-stage-0": "^6.5.0",
     "babelify": "^7.3.0",
     "browserify": "^13.0.1",
+    "cheerio": "^0.20.0",
     "component-type": "^1.2.1",
     "exorcist": "^0.4.0",
     "mocha": "^2.5.3",
@@ -33,6 +34,7 @@
     "standard": "^7.1.2",
     "to-camel-case": "^1.0.0",
     "to-title-case": "^1.0.0",
-    "watchify": "^3.7.0"
+    "watchify": "^3.7.0",
+    "xml2js": "^0.4.16"
   }
 }
