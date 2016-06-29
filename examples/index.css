@@ -10,6 +10,11 @@ p {
   margin: 0;
 }
 
+pre {
+  padding: 10px;
+  background-color: #eee;
+}
+
 img {
   max-width: 100%;
 }

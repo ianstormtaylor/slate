@@ -31,9 +31,7 @@ const BLOCKS = {
  */
 
 const MARKS = {
-  b: 'bold',
   strong: 'bold',
-  i: 'italic',
   em: 'italic',
   u: 'underline',
   s: 'strikethrough',
@@ -48,7 +46,7 @@ const MARKS = {
 
 const RULES = [
   {
-    deserialize(el) {
+    deserialize(el, next) {
       const block = BLOCKS[el.tagName]
       if (!block) return
       return {
@@ -74,10 +72,14 @@ const RULES = [
     deserialize(el, next) {
       if (el.tagName != 'pre') return
       const code = el.children[0]
+      const children = code && code.tagName == 'code'
+        ? code.children
+        : el.children
+
       return {
         kind: 'block',
-        type: 'code-block',
-        nodes: next(code.children)
+        type: 'code',
+        nodes: next(children)
       }
     }
   },
@@ -149,14 +151,18 @@ class PasteHtml extends React.Component {
 
   renderNode(node) {
     switch (node.type) {
-      case 'code': return (props) => <pre><code>{props.chidlren}</code></pre>
-      case 'quote': return (props) => <blockquote>{props.children}</blockquote>
-      case 'bulleted-list': return (props) => <ul>{props.chidlren}</ul>
+      case 'bulleted-list': return (props) => <ul>{props.children}</ul>
+      case 'code': return (props) => <pre><code>{props.children}</code></pre>
       case 'heading-one': return (props) => <h1>{props.children}</h1>
       case 'heading-two': return (props) => <h2>{props.children}</h2>
-      case 'list-item': return (props) => <li>{props.chidlren}</li>
+      case 'heading-three': return (props) => <h3>{props.children}</h3>
+      case 'heading-four': return (props) => <h4>{props.children}</h4>
+      case 'heading-five': return (props) => <h5>{props.children}</h5>
+      case 'heading-six': return (props) => <h6>{props.children}</h6>
+      case 'list-item': return (props) => <li>{props.children}</li>
       case 'numbered-list': return (props) => <ol>{props.children}</ol>
       case 'paragraph': return (props) => <p>{props.children}</p>
+      case 'quote': return (props) => <blockquote>{props.children}</blockquote>
       case 'link': return (props) => {
         const { data } = props.node
         const href = data.get('href')
