@@ -9,6 +9,7 @@ import { Router, Route, Link, IndexRedirect, hashHistory } from 'react-router'
 
 import AutoMarkdown from './auto-markdown'
 import HoveringMenu from './hovering-menu'
+import Images from './images'
 import Links from './links'
 import PlainText from './plain-text'
 import RichText from './rich-text'
@@ -51,6 +52,7 @@ class App extends React.Component {
         <Link className="tab" activeClassName="active" to="auto-markdown">Auto-markdown</Link>
         <Link className="tab" activeClassName="active" to="hovering-menu">Hovering Menu</Link>
         <Link className="tab" activeClassName="active" to="links">Links</Link>
+        <Link className="tab" activeClassName="active" to="images">Images</Link>
         <Link className="tab" activeClassName="active" to="tables">Tables</Link>
       </div>
     )
@@ -84,6 +86,7 @@ const router = (
       <IndexRedirect to="rich-text" />
       <Route path="auto-markdown" component={AutoMarkdown} />
       <Route path="hovering-menu" component={HoveringMenu} />
+      <Route path="images" component={Images} />
       <Route path="links" component={Links} />
       <Route path="plain-text" component={PlainText} />
       <Route path="rich-text" component={RichText} />

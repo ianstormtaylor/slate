@@ -8,9 +8,9 @@ Slate is like a pluggable implementation of `contenteditable`, built with React 
 
 - [Principles](#principles)
 - [Examples](#examples)
-- [Plugins](#plugins)
+- Plugins
 - [Documentation](#documentation)
-- [Contributing](#contributing)
+- Contributing
 
 _Slate is currently in **beta**, while work is being done on: cross-browser support, atomic node support, and collaboration support. It's useable now, but you might need to pull request one or two fixes for your use case._
 
@@ -52,6 +52,7 @@ If you're using Slate for the first time, check out the [Getting Started](docs/g
   - [The Document Model](docs/getting-started.md#the-document-model)
   - Selections
 - [**API Reference**](docs/reference.md)
+  - Plugins
   - Components
     - Editor
   - Models

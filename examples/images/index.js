@@ -1,0 +1,172 @@
+
+import Editor, { Mark, Raw } from '../..'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import state from './state.json'
+import { Map } from 'immutable'
+
+/**
+ * The images example.
+ *
+ * @type {Component} Images
+ */
+
+class Images extends React.Component {
+
+  state = {
+    state: Raw.deserialize(state)
+  };
+
+  /**
+   * Insert an image with `src` at the current selection.
+   *
+   * @param {String} src
+   */
+
+  insertImage(src) {
+    let { state } = this.state
+
+    if (state.isExpanded) {
+      state = state
+        .transform()
+        .delete()
+        .apply()
+    }
+
+    const { anchorBlock, selection } = state
+
+    if (anchorBlock.text == '') {
+      state = state
+        .transform()
+        .setBlock('image', { src })
+        .apply()
+    }
+
+    else if (selection.isAtEndOf(anchorBlock)) {
+      state = state
+        .transform()
+        .splitBlock()
+        .setBlock('image', { src })
+        .apply()
+    }
+
+    else if (selection.isAtStartOf(anchorBlock)) {
+      state = state
+        .transform()
+        .splitBlock()
+        .moveToStartOfPreviousBlock()
+        .setBlock('image', { src })
+        .apply()
+    }
+
+    else {
+      state = state
+        .transform()
+        .splitBlock()
+        .splitBlock()
+        .moveToStartOfPreviousBlock()
+        .setBlock('image', { src })
+        .apply()
+    }
+
+    this.setState({ state })
+  }
+
+  /**
+   * On clicking the image button, prompt for an image and insert it.
+   *
+   * @param {Event} e
+   */
+
+  onClickImage(e) {
+    e.preventDefault()
+    const src = window.prompt('Enter the URL of the image:')
+    if (!src) return
+    this.insertImage(src)
+  }
+
+  /**
+   * Render the app.
+   *
+   * @return {Element} element
+   */
+
+  render() {
+    return (
+      <div>
+        {this.renderToolbar()}
+        {this.renderEditor()}
+      </div>
+    )
+  }
+
+  /**
+   * Render the toolbar.
+   *
+   * @return {Element} element
+   */
+
+  renderToolbar() {
+    return (
+      <div className="menu toolbar-menu">
+        <span className="button" onMouseDown={e => this.onClickImage(e)}>
+          <span className="material-icons">image</span>
+        </span>
+      </div>
+    )
+  }
+
+  /**
+   * Render the editor.
+   *
+   * @return {Element} element
+   */
+
+  renderEditor() {
+    return (
+      <div className="editor">
+        <Editor
+          state={this.state.state}
+          renderNode={node => this.renderNode(node)}
+          onChange={(state) => {
+            console.groupCollapsed('Change!')
+            console.log('Document:', state.document.toJS())
+            console.log('Selection:', state.selection.toJS())
+            console.log('Content:', Raw.serialize(state))
+            console.groupEnd()
+            this.setState({ state })
+          }}
+        />
+      </div>
+    )
+  }
+
+  /**
+   * Render our custom `node`.
+   *
+   * @param {Node} node
+   * @return {Element} element
+   */
+
+  renderNode(node) {
+    switch (node.type) {
+      case 'image': {
+        return (props) => {
+          const { data } = props.node
+          const src = data.get('src')
+          return <img src={src} />
+        }
+      }
+      case 'paragraph': {
+        return (props) => <p>{props.children}</p>
+      }
+    }
+  }
+
+}
+
+/**
+ * Export.
+ */
+
+export default Images
