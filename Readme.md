@@ -17,11 +17,11 @@ _Slate is currently in **beta**, while work is being done on: cross-browser supp
 
 ## Principles
 
-1. **First-class plugins.** The most important factor of Slate is that plugins are first-class entities—the core editor logic is even implemented as its own plugin. This means that you're able to fully customize the editing experience. So you can build complex interations like those found in the Medium or Canvas editors.
+1. **First-class plugins.** The most important part of Slate is that plugins are first-class entities—the core editor logic is even implemented as its own plugin. That means you can _completely_ customize the editing experience, to build complex editors like Medium's or Canvas's without having to fight against the library's assumptions.
 
 2. **Schema-less core.** Slate's core logic doesn't assume anything about the schema of the data you'll be editing, which means that there are no assumptions baked into the library that'll trip you up when you need to go beyond basic usage.
 
-3. **Nested document model.** The document model used for Slate is a nested, recursive tree, just like the DOM itself. This means that creating complex components like tables or nested block quotes is possible for advanced use cases. But it's also easy to keep it simple by only using a single level of hierachy.
+3. **Nested document model.** The document model used for Slate is a nested, recursive tree, just like the DOM itself. This means that creating complex components like tables or nested block quotes are possible for advanced use cases. But it's also easy to keep it simple by only using a single level of hierachy.
 
 4. **Stateless and immutable.** By using React and Immutable.js, the Slate editor is built in a stateless fashion using immutable data structures, which leads to better performance, and also a much easier time writing plugins.
 

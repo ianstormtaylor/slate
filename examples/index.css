@@ -17,6 +17,11 @@ pre {
 
 img {
   max-width: 100%;
+  max-height: 20em;
+}
+
+img[data-active="true"] {
+  box-shadow: 0 0 0 2px blue;
 }
 
 blockquote {

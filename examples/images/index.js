@@ -152,9 +152,11 @@ class Images extends React.Component {
     switch (node.type) {
       case 'image': {
         return (props) => {
-          const { data } = props.node
+          const { node, state } = props
+          const { data } = node
+          const isActive = state.blocks.includes(node)
           const src = data.get('src')
-          return <img src={src} />
+          return <img src={src} data-active={isActive} />
         }
       }
       case 'paragraph': {
