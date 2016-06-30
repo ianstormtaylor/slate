@@ -12,6 +12,6 @@ export default function (state) {
 
   return state
     .transform()
-    .setInlineAtRange(range, { type: 'code' })
+    .setBlockAtRange(range, 'code')
     .apply()
 }

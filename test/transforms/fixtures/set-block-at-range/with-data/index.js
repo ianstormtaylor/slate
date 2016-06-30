@@ -1,5 +1,5 @@
 
-import { Map } from 'immutable'
+import { Data } from '../../../../..'
 
 export default function (state) {
   const { document, selection } = state
@@ -14,6 +14,9 @@ export default function (state) {
 
   return state
     .transform()
-    .setBlockAtRange(range, 'code', new Map({ key: 'value' }))
+    .setBlockAtRange(range, {
+      type: 'code',
+      data: Data.create({ key: 'value' })
+    })
     .apply()
 }

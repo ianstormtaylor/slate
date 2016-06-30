@@ -1,5 +1,5 @@
 
-import { Map } from 'immutable'
+import { Data } from '../../../../..'
 
 export default function (state) {
   const { document, selection } = state
@@ -14,6 +14,6 @@ export default function (state) {
 
   return state
     .transform()
-    .setInlineAtRange(range, new Map({ key: 'value' }))
+    .setInlineAtRange(range, { data: Data.create({ key: 'value' }) })
     .apply()
 }

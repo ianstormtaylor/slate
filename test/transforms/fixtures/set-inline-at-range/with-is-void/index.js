@@ -12,6 +12,9 @@ export default function (state) {
 
   return state
     .transform()
-    .setInlineAtRange(range, { type: 'code' })
+    .setInlineAtRange(range, {
+      type: 'emoji',
+      isVoid: true
+    })
     .apply()
 }

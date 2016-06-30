@@ -34,40 +34,25 @@ class Images extends React.Component {
     }
 
     const { anchorBlock, selection } = state
+    let transform = state.transform()
 
-    if (anchorBlock.text == '') {
-      state = state
-        .transform()
-        .setBlock('image', { src })
-        .apply()
+    if (anchorBlock.text != '') {
+      if (selection.isAtEndOf(anchorBlock)) {
+        transform = transform.splitBlock()
+      } else if (selection.isAtStartOf(anchorBlock)) {
+        transform = transform.splitBlock().moveToStartOfPreviousBlock()
+      } else {
+        transform = transform.splitBlock().splitBlock().moveToStartOfPreviousBlock()
+      }
     }
 
-    else if (selection.isAtEndOf(anchorBlock)) {
-      state = state
-        .transform()
-        .splitBlock()
-        .setBlock('image', { src })
-        .apply()
-    }
-
-    else if (selection.isAtStartOf(anchorBlock)) {
-      state = state
-        .transform()
-        .splitBlock()
-        .moveToStartOfPreviousBlock()
-        .setBlock('image', { src })
-        .apply()
-    }
-
-    else {
-      state = state
-        .transform()
-        .splitBlock()
-        .splitBlock()
-        .moveToStartOfPreviousBlock()
-        .setBlock('image', { src })
-        .apply()
-    }
+    state = transform
+      .setBlock({
+        type: 'image',
+        isVoid: true,
+        data: { src }
+      })
+      .apply()
 
     this.setState({ state })
   }
