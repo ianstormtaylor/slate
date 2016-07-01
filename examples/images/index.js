@@ -139,7 +139,7 @@ class Images extends React.Component {
         return (props) => {
           const { node, state } = props
           const { data } = node
-          const isActive = state.blocks.includes(node)
+          const isActive = state.selection.isFocused && state.blocks.includes(node)
           const src = data.get('src')
           return <img src={src} data-active={isActive} />
         }
