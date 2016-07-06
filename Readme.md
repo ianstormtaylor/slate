@@ -14,7 +14,7 @@ _Slate is currently in **beta**, while work is being done on: cross-browser supp
 
 
 <br/>
-## Principles
+### Principles
 
 1. **First-class plugins.** The most important part of Slate is that plugins are first-class entities—the core editor logic is even implemented as its own plugin. That means you can _completely_ customize the editing experience, to build complex editors like Medium's or Canvas's without having to fight against the library's assumptions.
 
@@ -28,7 +28,7 @@ _Slate is currently in **beta**, while work is being done on: cross-browser supp
 
 
 <br/>
-## Examples
+### Examples
 
 To get a sense for how you might use Slate, check out a few of the examples:
 
@@ -46,7 +46,7 @@ If you have an idea for an example that shows a common use case, pull request it
 
 
 <br/>
-## Documentation
+### Documentation
 
 If you're using Slate for the first time, check out the [Getting Started](./docs/getting-started) guide and the [Core Concepts](./docs/concepts) to familiarize yourself with Slate's architecture and mental models:
 
