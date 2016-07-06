@@ -1,5 +1,5 @@
 
-import Editor, { Mark, Raw } from '../..'
+import { Editor, Mark, Raw } from '../..'
 import Portal from 'react-portal'
 import React from 'react'
 import position from 'selection-position'

@@ -1,5 +1,5 @@
 
-import Editor, { Raw } from '../..'
+import { Editor, Raw } from '../..'
 import React from 'react'
 import keycode from 'keycode'
 import state from './state.json'

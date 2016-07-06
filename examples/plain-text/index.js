@@ -1,5 +1,5 @@
 
-import Editor, { Character, Document, Block, State, Text } from '../..'
+import { Block, Character, Document, Editor, State, Text } from '../..'
 import React from 'react'
 import state from './state.json'
 

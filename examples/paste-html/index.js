@@ -1,5 +1,5 @@
 
-import Editor, { Html, Raw } from '../..'
+import { Editor, Html, Raw } from '../..'
 import React from 'react'
 import state from './state.json'
 

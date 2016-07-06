@@ -1,5 +1,5 @@
 
-import Editor, { Mark, Raw, Selection } from '../..'
+import { Editor, Mark, Raw, Selection } from '../..'
 import Prism from 'prismjs'
 import React from 'react'
 import keycode from 'keycode'
