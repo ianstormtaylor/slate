@@ -8,7 +8,7 @@
 <p align="center"><a href="#principles">Principles</a> · <a href="#examples">Examples</a> · Plugins · <a href="#documentation">Documentation</a> · Contributing</p>
 <br/>
 
-Slate lets you build editors like [Medium](https://medium.com/), [Dropbox Paper](https://www.dropbox.com/paper) or [Canvas](https://usecanvas.com/)—which are becoming table stakes for applications today—without getting your codebase mired in complexity.
+Slate lets you build rich, intuitive editors like [Medium](https://medium.com/), [Dropbox Paper](https://www.dropbox.com/paper) or [Canvas](https://usecanvas.com/)—which are becoming table stakes for applications on the web—without your codebase getting mired in complexity.
 
 It can do this because all of its logic is implemented with a series of plugins. You can think of it like a pluggable implementation of `contenteditable`, built on top of React and Immutable. It was inspired by libraries like [Draft.js](https://facebook.github.io/draft-js/) and [Prosemirror](http://prosemirror.net/).
 
