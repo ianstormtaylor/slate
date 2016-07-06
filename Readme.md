@@ -5,7 +5,7 @@
 <p align="center">A <em>completely</em> customizable framework <br/>for building rich text editors in the browser.</p>
 <br/>
 
-<p align="center"><a href="#principles">Principles</a> · <a href="#examples">Examples</a> · <s>Plugins</s> · <a href="#documentation">Documentation</a> · Contributing</p>
+<p align="center"><a href="#principles">Principles</a> · <a href="#examples">Examples</a> · <strikethrough>Plugins</strikethrough> · <a href="#documentation">Documentation</a> · Contributing</p>
 <br/>
 
 Slate lets you build rich, intuitive editors like those in [Medium](https://medium.com/), [Dropbox Paper](https://www.dropbox.com/paper) or [Canvas](https://usecanvas.com/)—which are becoming table stakes for applications on the web—without your codebase getting mired in complexity.
