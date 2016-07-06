@@ -1,12 +1,11 @@
 
 This directory contains the React components that Slate renders. The only one that is publicly accessible is the `Editor`, which composes the others. But here's what they all do:
 
-
-#### Editor
-
-The `Editor` is the highest-level component that you render from inside your application. Its goal is to present a very clean API for the user, and to encapsulate all of the plugin-level logic. 
-
-Many of the properties passed into the editor are combined to create a plugin of its own, that is given the highest priority. This makes overriding core logic super simple, without having to write a separate plugin.
+- [Content](#content)
+- [Editor](#editor)
+- [Leaf](#leaf)
+- [Text](#text)
+- [Void](#void)
 
 
 #### Content
@@ -16,6 +15,13 @@ Many of the properties passed into the editor are combined to create a plugin of
 `Content` handles things attaching event listeners to the DOM and triggering updates based on events. However, it does not have any awareness of "plugins" as a concept, bubbling all of that logic up to the `Editor` itself.
 
 You'll notice there are **no** `Block` or `Inline` components. That's because those rendering components are provided by the user, and rendered directly by the `Content` component. You can find the default renderers in the [`Core`](../plugins/core.js) plugin's logic.
+
+
+#### Editor
+
+The `Editor` is the highest-level component that you render from inside your application. Its goal is to present a very clean API for the user, and to encapsulate all of the plugin-level logic. 
+
+Many of the properties passed into the editor are combined to create a plugin of its own, that is given the highest priority. This makes overriding core logic super simple, without having to write a separate plugin.
 
 
 #### Text
