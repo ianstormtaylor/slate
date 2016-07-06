@@ -7,9 +7,12 @@
     "immutable": "^3.8.1",
     "keycode": "^2.1.2",
     "lodash": "^4.13.1",
-    "react": "^15.1.0",
     "ua-parser-js": "^0.7.10",
     "uid": "0.0.2"
+  },
+  "peerDependencies": {
+    "react": "^0.14.0 || ^15.0.0",
+    "react-dom": "^0.14.0 || ^15.0.0"
   },
   "devDependencies": {
     "babel-cli": "^6.10.1",
@@ -25,6 +28,8 @@
     "exorcist": "^0.4.0",
     "mocha": "^2.5.3",
     "mocha-phantomjs": "^4.0.2",
+    "prismjs": "^1.5.1",
+    "react": "^15.2.0",
     "react-dom": "^15.1.0",
     "react-portal": "^2.2.0",
     "react-router": "^2.5.1",
