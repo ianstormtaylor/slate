@@ -13,6 +13,7 @@ Slate is like a pluggable implementation of `contenteditable`, built with React 
 _Slate is currently in **beta**, while work is being done on: cross-browser support, atomic node support, and collaboration support. It's useable now, but you might need to pull request one or two fixes for your use case._
 
 
+<br/>
 ## Principles
 
 1. **First-class plugins.** The most important part of Slate is that plugins are first-class entities—the core editor logic is even implemented as its own plugin. That means you can _completely_ customize the editing experience, to build complex editors like Medium's or Canvas's without having to fight against the library's assumptions.
@@ -26,6 +27,7 @@ _Slate is currently in **beta**, while work is being done on: cross-browser supp
 5. **Collaboration friendly.** The data model Slate uses—specifically how transforms are applied to the document—has been designed to allow for collaborative editing to be layered on top, so you won't need to rethink everything if you decide to make your editor collaborative.
 
 
+<br/>
 ## Examples
 
 To get a sense for how you might use Slate, check out a few of the examples:
@@ -43,6 +45,7 @@ To get a sense for how you might use Slate, check out a few of the examples:
 If you have an idea for an example that shows a common use case, pull request it!
 
 
+<br/>
 ## Documentation
 
 If you're using Slate for the first time, check out the [Getting Started](./docs/getting-started) guide and the [Core Concepts](./docs/concepts) to familiarize yourself with Slate's architecture and mental models:
