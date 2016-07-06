@@ -6,9 +6,43 @@ import position from 'selection-position'
 import state from './state.json'
 
 /**
+ * Node renderers.
+ *
+ * @type {Object}
+ */
+
+const NODES = {
+  paragraph: props => <p>{props.children}</p>
+}
+
+/**
+ * Mark renderers.
+ *
+ * @type {Object}
+ */
+
+const MARKS = {
+  bold: {
+    fontWeight: 'bold'
+  },
+  code: {
+    fontFamily: 'monospace',
+    backgroundColor: '#eee',
+    padding: '3px',
+    borderRadius: '4px'
+  },
+  italic: {
+    fontStyle: 'italic'
+  },
+  underlined: {
+    textDecoration: 'underline'
+  }
+}
+
+/**
  * The rich text example.
  *
- * @type {Component} HoveringMenu
+ * @type {Component}
  */
 
 class HoveringMenu extends React.Component {
@@ -101,8 +135,8 @@ class HoveringMenu extends React.Component {
       <div className="editor">
         <Editor
           state={this.state.state}
-          renderNode={node => this.renderNode(node)}
-          renderMark={mark => this.renderMark(mark)}
+          renderNode={node => NODES[node.type]}
+          renderMark={mark => MARKS[mark.type]}
           onChange={(state) => {
             console.groupCollapsed('Change!')
             console.log('Document:', state.document.toJS())
@@ -114,42 +148,6 @@ class HoveringMenu extends React.Component {
         />
       </div>
     )
-  }
-
-  renderNode(node) {
-    switch (node.type) {
-      case 'paragraph': {
-        return (props) => <p>{props.children}</p>
-      }
-    }
-  }
-
-  renderMark(mark) {
-    switch (mark.type) {
-      case 'bold': {
-        return {
-          fontWeight: 'bold'
-        }
-      }
-      case 'code': {
-        return {
-          fontFamily: 'monospace',
-          backgroundColor: '#eee',
-          padding: '3px',
-          borderRadius: '4px'
-        }
-      }
-      case 'italic': {
-        return {
-          fontStyle: 'italic'
-        }
-      }
-      case 'underlined': {
-        return {
-          textDecoration: 'underline'
-        }
-      }
-    }
   }
 
 }

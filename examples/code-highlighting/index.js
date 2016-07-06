@@ -6,13 +6,21 @@ import keycode from 'keycode'
 import state from './state.json'
 
 /**
- * Node and mark renderers.
+ * Node renderers.
+ *
+ * @type {Object}
  */
 
 const NODES = {
   code: props => <pre><code>{props.children}</code></pre>,
   paragraph: props => <p>{props.children}</p>
 }
+
+/**
+ * Mark renderers.
+ *
+ * @type {Object}
+ */
 
 const MARKS = {
   'highlight-comment': {
@@ -29,7 +37,7 @@ const MARKS = {
 /**
  * Example.
  *
- * @type {Component} CodeHighlighting
+ * @type {Component}
  */
 
 class CodeHighlighting extends React.Component {
@@ -56,8 +64,8 @@ class CodeHighlighting extends React.Component {
       <div className="editor">
         <Editor
           state={this.state.state}
-          renderNode={(...args) => this.renderNode(...args)}
-          renderMark={(...args) => this.renderMark(...args)}
+          renderNode={node => NODES[node.type]}
+          renderMark={mark => MARKS[mark.type] || {}}
           renderDecorations={(...args) => this.renderDecorations(...args)}
           onKeyDown={(...args) => this.onKeyDown(...args)}
           onChange={(state) => {
@@ -73,14 +81,6 @@ class CodeHighlighting extends React.Component {
     )
   }
 
-  renderNode(node) {
-    return NODES[node.type]
-  }
-
-  renderMark(mark) {
-    return MARKS[mark.type] || {}
-  }
-
   renderDecorations(text, state, editor) {
     let characters = text.characters
     const { document } = state
@@ -88,7 +88,6 @@ class CodeHighlighting extends React.Component {
     if (block.type != 'code') return characters
 
     const string = text.text
-    console.log('render decorations:', string)
     const grammar = Prism.languages.javascript
     const tokens = Prism.tokenize(string, grammar)
     let offset = 0
@@ -116,28 +115,6 @@ class CodeHighlighting extends React.Component {
     return characters
   }
 
-  // renderDecorations(text) {
-  //   const { state } = this.state
-  //   const { document } = state
-  //   const block = document.getClosestBlock(text)
-  //   if (block.type != 'code') return
-
-  //   const string = text.text
-  //   if (cache[string]) return cache[string]
-
-  //   const grammar = Prism.languages.javascript
-  //   const tokens = Prism.tokenize(string, grammar)
-  //   const ranges = tokens.map((token) => {
-  //     return typeof token == 'string'
-  //       ? { text: token }
-  //       : {
-  //           text: token.content,
-  //           marks: [{ type: token.type }]
-  //         }
-  //   })
-
-  //   return cached[string] = ranges
-  // }
 }
 
 /**

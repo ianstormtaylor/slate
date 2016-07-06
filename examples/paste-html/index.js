@@ -4,12 +4,62 @@ import React from 'react'
 import state from './state.json'
 
 /**
+ * Node renderers.
+ *
+ * @type {Object}
+ */
+
+const NODES = {
+  'bulleted-list': props => <ul>{props.children}</ul>,
+  'code': props => <pre><code>{props.children}</code></pre>,
+  'heading-one': props => <h1>{props.children}</h1>,
+  'heading-two': props => <h2>{props.children}</h2>,
+  'heading-three': props => <h3>{props.children}</h3>,
+  'heading-four': props => <h4>{props.children}</h4>,
+  'heading-five': props => <h5>{props.children}</h5>,
+  'heading-six': props => <h6>{props.children}</h6>,
+  'list-item': props => <li>{props.children}</li>,
+  'numbered-list': props => <ol>{props.children}</ol>,
+  'paragraph': props => <p>{props.children}</p>,
+  'quote': props => <blockquote>{props.children}</blockquote>,
+  'link': (props) => {
+    const { data } = props.node
+    const href = data.get('href')
+    return <a href={href}>{props.children}</a>
+  }
+}
+
+/**
+ * Mark renderers.
+ *
+ * @type {Object}
+ */
+
+const MARKS = {
+  bold: {
+    fontWeight: 'bold'
+  },
+  code: {
+    fontFamily: 'monospace',
+    backgroundColor: '#eee',
+    padding: '3px',
+    borderRadius: '4px'
+  },
+  italic: {
+    fontStyle: 'italic'
+  },
+  underlined: {
+    textDecoration: 'underline'
+  }
+}
+
+/**
  * Tags to blocks.
  *
  * @type {Object}
  */
 
-const BLOCKS = {
+const BLOCK_TAGS = {
   p: 'paragraph',
   li: 'list-item',
   ul: 'bulleted-list',
@@ -30,7 +80,7 @@ const BLOCKS = {
  * @type {Object}
  */
 
-const MARKS = {
+const MARK_TAGS = {
   strong: 'bold',
   em: 'italic',
   u: 'underline',
@@ -47,7 +97,7 @@ const MARKS = {
 const RULES = [
   {
     deserialize(el, next) {
-      const block = BLOCKS[el.tagName]
+      const block = BLOCK_TAGS[el.tagName]
       if (!block) return
       return {
         kind: 'block',
@@ -58,7 +108,7 @@ const RULES = [
   },
   {
     deserialize(el, next) {
-      const mark = MARKS[el.tagName]
+      const mark = MARK_TAGS[el.tagName]
       if (!mark) return
       return {
         kind: 'mark',
@@ -101,6 +151,8 @@ const RULES = [
 
 /**
  * Create a new HTML serializer with `RULES`.
+ *
+ * @type {Html}
  */
 
 const serializer = new Html(RULES)
@@ -108,7 +160,7 @@ const serializer = new Html(RULES)
 /**
  * The rich text example.
  *
- * @type {Component} PasteHtml
+ * @type {Component}
  */
 
 class PasteHtml extends React.Component {
@@ -133,8 +185,8 @@ class PasteHtml extends React.Component {
       <div className="editor">
         <Editor
           state={this.state.state}
-          renderNode={node => this.renderNode(node)}
-          renderMark={mark => this.renderMark(mark)}
+          renderNode={node => NODES[node.type]}
+          renderMark={mark => MARKS[mark.type]}
           onPaste={(...args) => this.onPaste(...args)}
           onChange={(state) => {
             console.groupCollapsed('Change!')
@@ -147,56 +199,6 @@ class PasteHtml extends React.Component {
         />
       </div>
     )
-  }
-
-  renderNode(node) {
-    switch (node.type) {
-      case 'bulleted-list': return (props) => <ul>{props.children}</ul>
-      case 'code': return (props) => <pre><code>{props.children}</code></pre>
-      case 'heading-one': return (props) => <h1>{props.children}</h1>
-      case 'heading-two': return (props) => <h2>{props.children}</h2>
-      case 'heading-three': return (props) => <h3>{props.children}</h3>
-      case 'heading-four': return (props) => <h4>{props.children}</h4>
-      case 'heading-five': return (props) => <h5>{props.children}</h5>
-      case 'heading-six': return (props) => <h6>{props.children}</h6>
-      case 'list-item': return (props) => <li>{props.children}</li>
-      case 'numbered-list': return (props) => <ol>{props.children}</ol>
-      case 'paragraph': return (props) => <p>{props.children}</p>
-      case 'quote': return (props) => <blockquote>{props.children}</blockquote>
-      case 'link': return (props) => {
-        const { data } = props.node
-        const href = data.get('href')
-        return <a href={href}>{props.children}</a>
-      }
-    }
-  }
-
-  renderMark(mark) {
-    switch (mark.type) {
-      case 'bold': {
-        return {
-          fontWeight: 'bold'
-        }
-      }
-      case 'code': {
-        return {
-          fontFamily: 'monospace',
-          backgroundColor: '#eee',
-          padding: '3px',
-          borderRadius: '4px'
-        }
-      }
-      case 'italic': {
-        return {
-          fontStyle: 'italic'
-        }
-      }
-      case 'underlined': {
-        return {
-          textDecoration: 'underline'
-        }
-      }
-    }
   }
 
 }

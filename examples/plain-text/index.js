@@ -34,15 +34,15 @@ function deserialize(string) {
  */
 
 function serialize(state) {
-  return state.document.nodes
-    .map(node => node.text)
+  return state.blocks
+    .map(block => block.text)
     .join('\n')
 }
 
 /**
  * The plain text example.
  *
- * @type {Component} PlainText
+ * @type {Component}
  */
 
 class PlainText extends React.Component {

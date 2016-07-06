@@ -5,9 +5,28 @@ import keycode from 'keycode'
 import state from './state.json'
 
 /**
+ * Node renderers.
+ *
+ * @type {Object}
+ */
+
+const NODES = {
+  'block-quote': props => <blockquote>{props.children}</blockquote>,
+  'bulleted-list': props => <ul>{props.children}</ul>,
+  'heading-one': props => <h1>{props.children}</h1>,
+  'heading-two': props => <h2>{props.children}</h2>,
+  'heading-three': props => <h3>{props.children}</h3>,
+  'heading-four': props => <h4>{props.children}</h4>,
+  'heading-five': props => <h5>{props.children}</h5>,
+  'heading-six': props => <h6>{props.children}</h6>,
+  'list-item': props => <li>{props.children}</li>,
+  'paragraph': props => <p>{props.children}</p>
+}
+
+/**
  * The auto-markdown example.
  *
- * @type {Component} AutoMarkdown
+ * @type {Component}
  */
 
 class AutoMarkdown extends React.Component {
@@ -57,8 +76,7 @@ class AutoMarkdown extends React.Component {
       <div className="editor">
         <Editor
           state={this.state.state}
-          renderNode={node => this.renderNode(node)}
-          renderMark={mark => this.renderMark(mark)}
+          renderNode={node => NODES[node.type]}
           onKeyDown={(e, state) => this.onKeyDown(e, state)}
           onChange={(state) => {
             console.groupCollapsed('Change!')
@@ -71,48 +89,6 @@ class AutoMarkdown extends React.Component {
         />
       </div>
     )
-  }
-
-  /**
-   * Render each of our custom `node` types.
-   *
-   * @param {Node} node
-   * @return {Component} component
-   */
-
-  renderNode(node) {
-    switch (node.type) {
-      case 'block-quote': {
-        return (props) => <blockquote>{props.children}</blockquote>
-      }
-      case 'bulleted-list': {
-        return (props) => <ul>{props.children}</ul>
-      }
-      case 'heading-one': {
-        return (props) => <h1>{props.children}</h1>
-      }
-      case 'heading-two': {
-        return (props) => <h2>{props.children}</h2>
-      }
-      case 'heading-three': {
-        return (props) => <h3>{props.children}</h3>
-      }
-      case 'heading-four': {
-        return (props) => <h4>{props.children}</h4>
-      }
-      case 'heading-five': {
-        return (props) => <h5>{props.children}</h5>
-      }
-      case 'heading-six': {
-        return (props) => <h6>{props.children}</h6>
-      }
-      case 'list-item': {
-        return (props) => <li>{props.children}</li>
-      }
-      case 'paragraph': {
-        return (props) => <p>{props.children}</p>
-      }
-    }
   }
 
   /**

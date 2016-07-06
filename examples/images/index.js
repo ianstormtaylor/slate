@@ -6,9 +6,26 @@ import state from './state.json'
 import { Map } from 'immutable'
 
 /**
+ * Node renderers.
+ *
+ * @type {Object}
+ */
+
+const NODES = {
+  paragraph: props => <p>{props.children}</p>,
+  image: (props) => {
+    const { node, state } = props
+    const { data } = node
+    const isActive = state.isFocused && state.blocks.includes(node)
+    const src = data.get('src')
+    return <img src={src} data-active={isActive} />
+  }
+}
+
+/**
  * The images example.
  *
- * @type {Component} Images
+ * @type {Component}
  */
 
 class Images extends React.Component {
@@ -112,7 +129,7 @@ class Images extends React.Component {
       <div className="editor">
         <Editor
           state={this.state.state}
-          renderNode={node => this.renderNode(node)}
+          renderNode={node => NODES[node.type]}
           onChange={(state) => {
             console.groupCollapsed('Change!')
             console.log('Document:', state.document.toJS())
@@ -124,30 +141,6 @@ class Images extends React.Component {
         />
       </div>
     )
-  }
-
-  /**
-   * Render our custom `node`.
-   *
-   * @param {Node} node
-   * @return {Element} element
-   */
-
-  renderNode(node) {
-    switch (node.type) {
-      case 'image': {
-        return (props) => {
-          const { node, state } = props
-          const { data } = node
-          const isActive = state.selection.isFocused && state.blocks.includes(node)
-          const src = data.get('src')
-          return <img src={src} data-active={isActive} />
-        }
-      }
-      case 'paragraph': {
-        return (props) => <p>{props.children}</p>
-      }
-    }
   }
 
 }

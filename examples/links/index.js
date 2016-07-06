@@ -6,9 +6,24 @@ import state from './state.json'
 import { Map } from 'immutable'
 
 /**
+ * Node renderers.
+ *
+ * @type {Object}
+ */
+
+const NODES = {
+  paragraph: props => <p>{props.children}</p>,
+  link: (props) => {
+    const { data } = props.node
+    const href = data.get('href')
+    return <a href={href}>{props.children}</a>
+  }
+}
+
+/**
  * The links example.
  *
- * @type {Component} Links
+ * @type {Component}
  */
 
 class Links extends React.Component {
@@ -114,7 +129,7 @@ class Links extends React.Component {
       <div className="editor">
         <Editor
           state={this.state.state}
-          renderNode={node => this.renderNode(node)}
+          renderNode={node => NODES[node.type]}
           onChange={(state) => {
             console.groupCollapsed('Change!')
             console.log('Document:', state.document.toJS())
@@ -126,28 +141,6 @@ class Links extends React.Component {
         />
       </div>
     )
-  }
-
-  /**
-   * Render our custom `node`.
-   *
-   * @param {Node} node
-   * @return {Element} element
-   */
-
-  renderNode(node) {
-    switch (node.type) {
-      case 'link': {
-        return (props) => {
-          const { data } = props.node
-          const href = data.get('href')
-          return <a href={href}>{props.children}</a>
-        }
-      }
-      case 'paragraph': {
-        return (props) => <p>{props.children}</p>
-      }
-    }
   }
 
 }

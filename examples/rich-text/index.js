@@ -4,9 +4,49 @@ import React from 'react'
 import state from './state.json'
 
 /**
+ * Node renderers.
+ *
+ * @type {Object}
+ */
+
+const NODES = {
+  'block-quote': props => <blockquote>{props.children}</blockquote>,
+  'bulleted-list': props => <ul>{props.chidlren}</ul>,
+  'heading-one': props => <h1>{props.children}</h1>,
+  'heading-two': props => <h2>{props.children}</h2>,
+  'list-item': props => <li>{props.chidlren}</li>,
+  'numbered-list': props => <ol>{props.children}</ol>,
+  'paragraph': props => <p>{props.children}</p>
+}
+
+/**
+ * Mark renderers.
+ *
+ * @type {Object}
+ */
+
+const MARKS = {
+  bold: {
+    fontWeight: 'bold'
+  },
+  code: {
+    fontFamily: 'monospace',
+    backgroundColor: '#eee',
+    padding: '3px',
+    borderRadius: '4px'
+  },
+  italic: {
+    fontStyle: 'italic'
+  },
+  underlined: {
+    textDecoration: 'underline'
+  }
+}
+
+/**
  * The rich text example.
  *
- * @type {Component} RichText
+ * @type {Component}
  */
 
 class RichText extends React.Component {
@@ -101,8 +141,8 @@ class RichText extends React.Component {
       <div className="editor">
         <Editor
           state={this.state.state}
-          renderNode={node => this.renderNode(node)}
-          renderMark={mark => this.renderMark(mark)}
+          renderNode={node => NODES[node.type]}
+          renderMark={mark => MARKS[mark.type]}
           onChange={(state) => {
             console.groupCollapsed('Change!')
             console.log('Document:', state.document.toJS())
@@ -115,61 +155,6 @@ class RichText extends React.Component {
       </div>
     )
   }
-
-  renderNode(node) {
-    switch (node.type) {
-      case 'block-quote': {
-        return (props) => <blockquote>{props.children}</blockquote>
-      }
-      case 'bulleted-list': {
-        return (props) => <ul>{props.chidlren}</ul>
-      }
-      case 'heading-one': {
-        return (props) => <h1>{props.children}</h1>
-      }
-      case 'heading-two': {
-        return (props) => <h2>{props.children}</h2>
-      }
-      case 'list-item': {
-        return (props) => <li>{props.chidlren}</li>
-      }
-      case 'numbered-list': {
-        return (props) => <ol>{props.children}</ol>
-      }
-      case 'paragraph': {
-        return (props) => <p>{props.children}</p>
-      }
-    }
-  }
-
-  renderMark(mark) {
-    switch (mark.type) {
-      case 'bold': {
-        return {
-          fontWeight: 'bold'
-        }
-      }
-      case 'code': {
-        return {
-          fontFamily: 'monospace',
-          backgroundColor: '#eee',
-          padding: '3px',
-          borderRadius: '4px'
-        }
-      }
-      case 'italic': {
-        return {
-          fontStyle: 'italic'
-        }
-      }
-      case 'underlined': {
-        return {
-          textDecoration: 'underline'
-        }
-      }
-    }
-  }
-
 }
 
 /**

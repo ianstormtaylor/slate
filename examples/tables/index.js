@@ -5,9 +5,34 @@ import keycode from 'keycode'
 import state from './state.json'
 
 /**
+ * Node renderers.
+ *
+ * @type {Object}
+ */
+
+const NODES = {
+  'paragraph': props => <p>{props.children}</p>,
+  'table': props => <table><tbody>{props.children}</tbody></table>,
+  'table-row': props => <tr>{props.children}</tr>,
+  'table-cell': props => <td>{props.children}</td>
+}
+
+/**
+ * Mark renderers.
+ *
+ * @type {Object}
+ */
+
+const MARKS = {
+  bold: {
+    fontWeight: 'bold'
+  }
+}
+
+/**
  * The tables example.
  *
- * @type {Component} Tables
+ * @type {Component}
  */
 
 class Tables extends React.Component {
@@ -33,8 +58,8 @@ class Tables extends React.Component {
       <div className="editor">
         <Editor
           state={this.state.state}
-          renderNode={node => this.renderNode(node)}
-          renderMark={mark => this.renderMark(mark)}
+          renderNode={node => NODES[node.type]}
+          renderMark={mark => MARKS[mark.type]}
           onKeyDown={(e, state) => this.onKeyDown(e, state)}
           onChange={(state) => {
             console.groupCollapsed('Change!')
@@ -47,47 +72,6 @@ class Tables extends React.Component {
         />
       </div>
     )
-  }
-
-  /**
-   * Render each of our custom `mark` types.
-   *
-   * @param {Mark} mark
-   * @return {Component} component
-   */
-
-  renderMark(mark) {
-    switch (mark.type) {
-      case 'bold': {
-        return {
-          fontWeight: 'bold'
-        }
-      }
-    }
-  }
-
-  /**
-   * Render each of our custom `node` types.
-   *
-   * @param {Node} node
-   * @return {Component} component
-   */
-
-  renderNode(node) {
-    switch (node.type) {
-      case 'paragraph': {
-        return (props) => <p>{props.children}</p>
-      }
-      case 'table': {
-        return (props) => <table border="2px"><tbody>{props.children}</tbody></table>
-      }
-      case 'table-row': {
-        return (props) => <tr>{props.children}</tr>
-      }
-      case 'table-cell': {
-        return (props) => <td>{props.children}</td>
-      }
-    }
   }
 
   /**
