@@ -60,10 +60,9 @@ If you're using Slate for the first time, check out the [Getting Started](./docs
   - The Selection Model
   - Plugins
 
-After that, you'll probably just want the [API Reference](./docs/reference):
+Once you've gotten familiar with those, you'll probably want to check out the full [API Reference](./docs/reference):
 
 - **API Reference**
-  - Plugins
   - Components
     - Editor
   - Models
@@ -78,3 +77,4 @@ After that, you'll probably just want the [API Reference](./docs/reference):
     - State
     - Text
     - Transform
+  - Plugins
