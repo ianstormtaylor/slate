@@ -2,11 +2,15 @@
 
 <p align="center"><img src="support/banner.png" /></p>
 
-<p align="center">A <em>completely</em> customizable framework <br/>for building rich text editors in the browser.<br/><br/></p>
+<p align="center">A <em>completely</em> customizable framework <br/>for building rich text editors in the browser.</p>
+<br/>
+<br/>
+
+<p align="center"><a href="#principles">Principles</a> • <a href="#examples">Examples</a> • Plugins • <a href="#documentation">Documentation</a> • Contributing</p>
+<br/>
+<br/>
 
 Slate is like a pluggable implementation of `contenteditable`, built with React and Immutable. It lets you build editors like [Medium](https://medium.com/), [Dropbox Paper](https://www.dropbox.com/paper), or [Canvas](https://usecanvas.com/). And was inspired by libraries like [Draft.js](https://facebook.github.io/draft-js/) and [Prosemirror](http://prosemirror.net/).
-
-<p align="center"><a href="#principles"><strong>Principles</strong></a> • <a href="#examples"><strong>Examples</strong></a> • <strong>Plugins</strong> • <a href="#documentation"><strong>Documentation</strong></a> • <strong>Contributing</strong></p>
 
 _Slate is currently in **beta**, while work is being done on: cross-browser support, atomic node support, and collaboration support. It's useable now, but you might need to pull request one or two fixes for your use case._
 
