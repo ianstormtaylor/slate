@@ -8,7 +8,9 @@
 <p align="center"><a href="#principles">Principles</a> · <a href="#examples">Examples</a> · Plugins · <a href="#documentation">Documentation</a> · Contributing</p>
 <br/>
 
-Slate is like a pluggable implementation of `contenteditable`, built with React and Immutable. It lets you build editors like [Medium](https://medium.com/), [Dropbox Paper](https://www.dropbox.com/paper), or [Canvas](https://usecanvas.com/). And was inspired by libraries like [Draft.js](https://facebook.github.io/draft-js/) and [Prosemirror](http://prosemirror.net/).
+Slate lets you build editors like [Medium](https://medium.com/), [Dropbox Paper](https://www.dropbox.com/paper) or [Canvas](https://usecanvas.com/)—which are becoming table stakes for applications today—without getting your codebase mired in complexity.
+
+It can do this because all of its logic is implemented with a series of plugins. You can think of it like a pluggable implementation of `contenteditable`, built on top of React and Immutable. It was inspired by libraries like [Draft.js](https://facebook.github.io/draft-js/) and [Prosemirror](http://prosemirror.net/).
 
 _Slate is currently in **beta**, while work is being done on: cross-browser support, atomic node support, and collaboration support. It's useable now, but you might need to pull request one or two fixes for your use case._
 
