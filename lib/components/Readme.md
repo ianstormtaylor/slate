@@ -24,16 +24,16 @@ The `Editor` is the highest-level component that you render from inside your app
 Many of the properties passed into the editor are combined to create a plugin of its own, that is given the highest priority. This makes overriding core logic super simple, without having to write a separate plugin.
 
 
-#### Text
-
-A `Text` component is rendered for each [`Text`](../models#text) model in the document tree. This component handles grouping the characters of the text node into ranges that have the same set of [`Marks`](../models#mark), and then delegates rendering each range to...
-
-
 #### Leaf
 
 The `Leaf` component is the lowest-level component in the React tree. Its goal is to encapsulate the logic that works at the lowest level, on the actual strings of text in the DOM.
 
 One `Leaf` component is rendered for each range of text with a unique set of [`Marks`](../models#mark). It handles both applying the mark styles to the text, and translating the current [`Selection`](../models#selection) into a real DOM selection, since it knows about the string offsets.
+
+
+#### Text
+
+A `Text` component is rendered for each [`Text`](../models#text) model in the document tree. This component handles grouping the characters of the text node into ranges that have the same set of [`Marks`](../models#mark), and then delegates rendering each range to...
 
 
 #### Void
