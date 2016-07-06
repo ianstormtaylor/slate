@@ -15,7 +15,7 @@ It handles all of the heavy lifting of actually parsing the HTML, and iterating 
 
 #### Raw
 
-The `Raw` serializer is the simplest serializer, which translates a [`State`](../models#state) into JSON. 
+The `Raw` serializer is the simplest serializer, which translates a [`State`](../models#state) into JSON.
 
 It doesn't just use Immutable.js's [`.toJSON()`](https://facebook.github.io/immutable-js/docs/#/List/toJS) method. Instead, it performs a little bit of "minifying" logic to reduce unnecessary information from being in the raw output.
 
