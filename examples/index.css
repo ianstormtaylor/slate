@@ -1,9 +1,12 @@
 
 html {
-  padding: 20px;
   font-family: 'Roboto', sans-serif;
   line-height: 1.4;
   background: #eee;
+}
+
+body {
+  margin: 0;
 }
 
 p {
@@ -54,23 +57,24 @@ td {
  */
 
 .tabs {
+  padding: 20px;
+  background-color: #222;
   text-align: center;
   margin-bottom: 30px;
 }
 
 .tab {
-  color: #aaa;
+  color: #777;
   display: inline-block;
   text-decoration: none;
 }
 
 .tab + .tab {
-  margin-left: 20px;
+  margin-left: 30px;
 }
 
 .tab.active {
-  color: black;
-  font-weight: bold;
+  color: white;
 }
 
 /**
