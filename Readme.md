@@ -36,8 +36,11 @@ To get a sense for how you might use Slate, check out a few of the examples:
 - [**Rich text**](examples/rich-text) — showing the features you'd expect from a basic editor.
 - [**Auto-markdown**](examples/auto-markdown) — showing how to add key handlers for Markdown-like shortcuts.
 - [**Links**](examples/links) — showing how wrap text in inline nodes with associated data.
+- [**Images**](examples/images) — showing how to use void (text-less) nodes to add images.
 - [**Hovering menu**](examples/hovering-menu) — showing how a contextual hovering menu can be implemented.
 - [**Tables**](examples/tables) — showing how to nest blocks to render more advanced components.
+- [**Paste HTML**](examples/paste-html) — showing how to use an HTML serializer to handle pasted HTML.
+- [**Code Highlighting**](examples/code-highlighting) — showing how to use decorators to dynamically mark text.
 
 If you have an idea for an example that shows a common use case, pull request it!
 
@@ -47,11 +50,12 @@ If you have an idea for an example that shows a common use case, pull request it
 If you're using Slate for the first time, check out the [Getting Started](docs/getting-started.md) guide to familiarize yourself with Slate's architecture and mental models. After that, you'll probably just want the [API Reference](docs/reference.md).
 
 - [**Getting Started**](docs/getting-started.md)
-- [**Core Concepts**](docs/concepts.md)
-  - [Stateless & Immutability](docs/getting-started.md#stateless-immutability)
+- **Core Concepts**
+  - Statelessness & Immutability
   - [The Document Model](docs/getting-started.md#the-document-model)
-  - Selections
-- [**API Reference**](docs/reference.md)
+  - The Selection Model
+  - Writing Plugins
+- **API Reference**
   - Plugins
   - Components
     - Editor

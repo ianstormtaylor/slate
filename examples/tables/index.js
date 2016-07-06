@@ -83,7 +83,7 @@ class Tables extends React.Component {
    */
 
   onKeyDown(e, state) {
-    if (state.startNode.type != 'table-cell') return
+    if (state.startBlock.type != 'table-cell') return
 
     const key = keycode(e.which)
     switch (key) {
@@ -116,7 +116,7 @@ class Tables extends React.Component {
    */
 
   onDelete(e, state) {
-    if (state.endOffset != state.startNode.length) return
+    if (state.endOffset != state.startText.length) return
     e.preventDefault()
     return state
   }
