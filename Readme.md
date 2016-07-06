@@ -47,14 +47,21 @@ If you have an idea for an example that shows a common use case, pull request it
 
 ## Documentation
 
-If you're using Slate for the first time, check out the [Getting Started](docs/getting-started.md) guide to familiarize yourself with Slate's architecture and mental models. After that, you'll probably just want the [API Reference](docs/reference.md).
+If you're using Slate for the first time, check out the [Getting Started](./docs/getting-started) guide and the [Core Concepts](./docs/concepts) to familiarize yourself with Slate's architecture and mental models:
 
 - [**Getting Started**](docs/getting-started.md)
+  - Installing Slate
+  - Adding Slate to Your App
+  - Customizing Slate's Behavior
+  - Adding Plugins
 - **Core Concepts**
   - Statelessness & Immutability
   - [The Document Model](docs/getting-started.md#the-document-model)
   - The Selection Model
-  - Writing Plugins
+  - Plugins
+
+After that, you'll probably just want the [API Reference](./docs/reference):
+
 - **API Reference**
   - Plugins
   - Components
