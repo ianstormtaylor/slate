@@ -56,6 +56,7 @@ If you're using Slate for the first time, check out the [Getting Started](./docs
   - Customizing Slate's Behavior
   - Adding Plugins
 
+<br/>
 - **Core Concepts**
   - Statelessness & Immutability
   - [The Document Model](docs/getting-started.md#the-document-model)
