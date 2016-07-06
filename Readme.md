@@ -5,7 +5,7 @@
 <p align="center">A <em>completely</em> customizable framework <br/>for building rich text editors in the browser.</p>
 <br/>
 
-<p align="center"><a href="#principles">Principles</a> · <a href="#examples">Examples</a> · <s>Plugins</s> · <a href="#documentation">Documentation</a> · Contributing</p>
+<p align="center"><a href="#principles">Principles</a> · <a href="#examples">Examples</a> · <s>Plugins</s> · <a href="#documentation">Documentation</a> · <s>Contributing</s></p>
 <br/>
 
 Slate lets you build rich, intuitive editors like those in [Medium](https://medium.com/), [Dropbox Paper](https://www.dropbox.com/paper) or [Canvas](https://usecanvas.com/)—which are becoming table stakes for applications on the web—without your codebase getting mired in complexity.
@@ -53,32 +53,32 @@ If you have an idea for an example that shows a common use case, pull request it
 If you're using Slate for the first time, check out the [Getting Started](./docs/getting-started) guide and the [Core Concepts](./docs/concepts) to familiarize yourself with Slate's architecture and mental models. Once you've gotten familiar with those, you'll probably want to check out the full [API Reference](./docs/reference).
 
 - [**Getting Started**](docs/getting-started.md)
-  - Installing Slate
-  - Adding Slate to Your App
-  - Customizing Slate's Behavior
-  - Adding Plugins
+  - ~~Installing Slate~~
+  - ~~Adding Slate to Your App~~
+  - ~~Customizing Slate's Behavior~~
+  - ~~Adding Plugins~~
 
-- **Core Concepts**
-  - Statelessness & Immutability
+- ~~**Core Concepts**~~
+  - ~~Statelessness & Immutability~~
   - [The Document Model](docs/getting-started.md#the-document-model)
-  - The Selection Model
-  - Plugins
+  - ~~The Selection Model~~
+  - ~~Plugins~~
 
-- **API Reference**
-  - Components
-    - Editor
-  - Models
-    - Block
-    - Character
-    - Data
-    - Document
-    - Inline
-    - Mark
-    - Node
-    - Selection
-    - State
-    - Text
-    - Transform
-  - Plugins
+- ~~**API Reference**~~
+  - ~~Components~~
+    - ~~Editor~~
+  - ~~Models~~
+    - ~~Block~~
+    - ~~Character~~
+    - ~~Data~~
+    - ~~Document~~
+    - ~~Inline~~
+    - ~~Mark~~
+    - ~~Node~~
+    - ~~Selection~~
+    - ~~State~~
+    - ~~Text~~
+    - ~~Transform~~
+  - ~~Plugins~~
 
 If even that's not enough, you can always [read the source itself](./lib), which is explained along with a handful of readme's.
