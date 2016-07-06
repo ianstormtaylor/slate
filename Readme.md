@@ -78,3 +78,5 @@ Once you've gotten familiar with those, you'll probably want to check out the fu
     - Text
     - Transform
   - Plugins
+
+If even that's not enough, you can always [read the source itself](./lib), which is explained along with a handful of readme's.
