@@ -3,7 +3,7 @@ import { Editor, Mark, Raw, Selection } from '../..'
 import Prism from 'prismjs'
 import React from 'react'
 import keycode from 'keycode'
-import state from './state.json'
+import initialState from './state.json'
 
 /**
  * Node renderers.
@@ -43,10 +43,19 @@ const MARKS = {
 class CodeHighlighting extends React.Component {
 
   state = {
-    state: Raw.deserialize(state)
+    state: Raw.deserialize(initialState)
   };
 
-  onKeyDown(e, state, editor) {
+  onChange = (state) => {
+    console.groupCollapsed('Change!')
+    console.log('Document:', state.document.toJS())
+    console.log('Selection:', state.selection.toJS())
+    console.log('Content:', Raw.serialize(state))
+    console.groupEnd()
+    this.setState({ state })
+  }
+
+  onKeyDown = (e, state, editor) => {
     const key = keycode(e.which)
     if (key != 'enter') return
     const { startBlock } = state
@@ -59,29 +68,30 @@ class CodeHighlighting extends React.Component {
     return transform.apply()
   }
 
-  render() {
+  render = () => {
     return (
       <div className="editor">
         <Editor
           state={this.state.state}
-          renderNode={node => NODES[node.type]}
-          renderMark={mark => MARKS[mark.type] || {}}
-          renderDecorations={(...args) => this.renderDecorations(...args)}
-          onKeyDown={(...args) => this.onKeyDown(...args)}
-          onChange={(state) => {
-            console.groupCollapsed('Change!')
-            console.log('Document:', state.document.toJS())
-            console.log('Selection:', state.selection.toJS())
-            console.log('Content:', Raw.serialize(state))
-            console.groupEnd()
-            this.setState({ state })
-          }}
+          renderNode={this.renderNode}
+          renderMark={this.renderMark}
+          renderDecorations={this.renderDecorations}
+          onKeyDown={this.onKeyDown}
+          onChange={this.onChange}
         />
       </div>
     )
   }
 
-  renderDecorations(text, state, editor) {
+  renderNode = (node) => {
+    return NODES[node.type]
+  }
+
+  renderMark = (mark) => {
+    return MARKS[mark.type] || {}
+  }
+
+  renderDecorations = (text, state, editor) => {
     let characters = text.characters
     const { document } = state
     const block = document.getClosestBlock(text)

@@ -1,7 +1,7 @@
 
 import { Editor, Mark, Raw } from '../..'
 import React from 'react'
-import state from './state.json'
+import initialState from './state.json'
 
 /**
  * Node renderers.
@@ -52,22 +52,20 @@ const MARKS = {
 class RichText extends React.Component {
 
   state = {
-    state: Raw.deserialize(state)
+    state: Raw.deserialize(initialState)
   };
 
-  hasMark(type) {
+  hasMark = (type) => {
     const { state } = this.state
-    const { marks } = state
-    return marks.some(mark => mark.type == type)
+    return state.marks.some(mark => mark.type == type)
   }
 
-  hasBlock(type) {
+  hasBlock = (type) => {
     const { state } = this.state
-    const { blocks } = state
-    return blocks.some(node => node.type == type)
+    return state.blocks.some(node => node.type == type)
   }
 
-  onClickMark(e, type) {
+  onClickMark = (e, type) => {
     e.preventDefault()
     const isActive = this.hasMark(type)
     let { state } = this.state
@@ -80,7 +78,7 @@ class RichText extends React.Component {
     this.setState({ state })
   }
 
-  onClickBlock(e, type) {
+  onClickBlock = (e, type) => {
     e.preventDefault()
     const isActive = this.hasBlock(type)
     let { state } = this.state
@@ -93,7 +91,7 @@ class RichText extends React.Component {
     this.setState({ state })
   }
 
-  render() {
+  render = () => {
     return (
       <div>
         {this.renderToolbar()}
@@ -102,7 +100,7 @@ class RichText extends React.Component {
     )
   }
 
-  renderToolbar() {
+  renderToolbar = () => {
     return (
       <div className="menu toolbar-menu">
         {this.renderMarkButton('bold', 'format_bold')}
@@ -118,43 +116,58 @@ class RichText extends React.Component {
     )
   }
 
-  renderMarkButton(type, icon) {
+  renderMarkButton = (type, icon) => {
     const isActive = this.hasMark(type)
+    const onMouseDown = e => this.onClickMark(e, type)
+
     return (
-      <span className="button" onMouseDown={e => this.onClickMark(e, type)} data-active={isActive}>
+      <span className="button" onMouseDown={onMouseDown} data-active={isActive}>
         <span className="material-icons">{icon}</span>
       </span>
     )
   }
 
-  renderBlockButton(type, icon) {
+  renderBlockButton = (type, icon) => {
     const isActive = this.hasBlock(type)
+    const onMouseDown = e => this.onClickBlock(e, type)
+
     return (
-      <span className="button" onMouseDown={e => this.onClickBlock(e, type)} data-active={isActive}>
+      <span className="button" onMouseDown={onMouseDown} data-active={isActive}>
         <span className="material-icons">{icon}</span>
       </span>
     )
   }
 
-  renderEditor() {
+  renderEditor = () => {
     return (
       <div className="editor">
         <Editor
           state={this.state.state}
-          renderNode={node => NODES[node.type]}
-          renderMark={mark => MARKS[mark.type]}
-          onChange={(state) => {
-            console.groupCollapsed('Change!')
-            console.log('Document:', state.document.toJS())
-            console.log('Selection:', state.selection.toJS())
-            console.log('Content:', Raw.serialize(state))
-            console.groupEnd()
-            this.setState({ state })
-          }}
+          renderNode={this.renderNode}
+          renderMark={this.renderMark}
+          onChange={this.onChange}
         />
       </div>
     )
   }
+
+  renderNode = (node) => {
+    return NODES[node.type]
+  }
+
+  renderMark = (mark) => {
+    return MARKS[mark.type]
+  }
+
+  onChange = (state) => {
+    console.groupCollapsed('Change!')
+    console.log('Document:', state.document.toJS())
+    console.log('Selection:', state.selection.toJS())
+    console.log('Content:', Raw.serialize(state))
+    console.groupEnd()
+    this.setState({ state })
+  }
+
 }
 
 /**

@@ -1,8 +1,8 @@
 
 import { Editor, Raw } from '../..'
 import React from 'react'
+import initialState from './state.json'
 import keycode from 'keycode'
-import state from './state.json'
 
 /**
  * Node renderers.
@@ -44,7 +44,7 @@ class Tables extends React.Component {
    */
 
   state = {
-    state: Raw.deserialize(state)
+    state: Raw.deserialize(initialState)
   };
 
   /**
@@ -53,25 +53,55 @@ class Tables extends React.Component {
    * @return {Component} component
    */
 
-  render() {
+  render = () => {
     return (
       <div className="editor">
         <Editor
           state={this.state.state}
-          renderNode={node => NODES[node.type]}
-          renderMark={mark => MARKS[mark.type]}
-          onKeyDown={(e, state) => this.onKeyDown(e, state)}
-          onChange={(state) => {
-            console.groupCollapsed('Change!')
-            console.log('Document:', state.document.toJS())
-            console.log('Selection:', state.selection.toJS())
-            console.log('Content:', Raw.serialize(state))
-            console.groupEnd()
-            this.setState({ state })
-          }}
+          renderNode={this.renderNode}
+          renderMark={this.renderMark}
+          onKeyDown={this.onKeyDown}
+          onChange={this.onChange}
         />
       </div>
     )
+  }
+
+  /**
+   * Render a `node`.
+   *
+   * @param {Node} node
+   * @return {Element}
+   */
+
+  renderNode = (node) => {
+    return NODES[node.type]
+  }
+
+  /**
+   * Render a `mark`.
+   *
+   * @param {Mark} mark
+   * @return {Element}
+   */
+
+  renderMark = (mark) => {
+    return MARKS[mark.type]
+  }
+
+  /**
+   * On change.
+   *
+   * @param {State} state
+   */
+
+  onChange = (state) => {
+    console.groupCollapsed('Change!')
+    console.log('Document:', state.document.toJS())
+    console.log('Selection:', state.selection.toJS())
+    console.log('Content:', Raw.serialize(state))
+    console.groupEnd()
+    this.setState({ state })
   }
 
   /**
@@ -82,11 +112,9 @@ class Tables extends React.Component {
    * @return {State or Null} state
    */
 
-  onKeyDown(e, state) {
+  onKeyDown = (e, state) => {
     if (state.startBlock.type != 'table-cell') return
-
-    const key = keycode(e.which)
-    switch (key) {
+    switch (keycode(e.which)) {
       case 'backspace': return this.onBackspace(e, state)
       case 'delete': return this.onDelete(e, state)
       case 'enter': return this.onEnter(e, state)
@@ -101,7 +129,7 @@ class Tables extends React.Component {
    * @return {State or Null} state
    */
 
-  onBackspace(e, state) {
+  onBackspace = (e, state) => {
     if (state.startOffset != 0) return
     e.preventDefault()
     return state
@@ -115,7 +143,7 @@ class Tables extends React.Component {
    * @return {State or Null} state
    */
 
-  onDelete(e, state) {
+  onDelete = (e, state) => {
     if (state.endOffset != state.startText.length) return
     e.preventDefault()
     return state
@@ -129,7 +157,7 @@ class Tables extends React.Component {
    * @return {State or Null} state
    */
 
-  onEnter(e, state) {
+  onEnter = (e, state) => {
     e.preventDefault()
     return state
   }

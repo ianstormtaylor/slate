@@ -2,7 +2,7 @@
 import { Editor, Mark, Raw } from '../..'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import state from './state.json'
+import initialState from './state.json'
 import { Map } from 'immutable'
 
 /**
@@ -29,7 +29,7 @@ const NODES = {
 class Links extends React.Component {
 
   state = {
-    state: Raw.deserialize(state)
+    state: Raw.deserialize(initialState)
   };
 
   /**
@@ -38,10 +38,9 @@ class Links extends React.Component {
    * @return {Boolean} hasLinks
    */
 
-  hasLinks() {
+  hasLinks = () => {
     const { state } = this.state
-    const { inlines } = state
-    return inlines.some(inline => inline.type == 'link')
+    return state.inlines.some(inline => inline.type == 'link')
   }
 
   /**
@@ -51,7 +50,7 @@ class Links extends React.Component {
    * @param {Event} e
    */
 
-  onClickLink(e) {
+  onClickLink = (e) => {
     e.preventDefault()
     let { state } = this.state
     const hasLinks = this.hasLinks()
@@ -92,7 +91,7 @@ class Links extends React.Component {
    * @return {Element} element
    */
 
-  render() {
+  render = () => {
     return (
       <div>
         {this.renderToolbar()}
@@ -107,11 +106,11 @@ class Links extends React.Component {
    * @return {Element} element
    */
 
-  renderToolbar() {
+  renderToolbar = () => {
     const hasLinks = this.hasLinks()
     return (
       <div className="menu toolbar-menu">
-        <span className="button" onMouseDown={e => this.onClickLink(e)} data-active={hasLinks}>
+        <span className="button" onMouseDown={this.onClickLink} data-active={hasLinks}>
           <span className="material-icons">link</span>
         </span>
       </div>
@@ -124,23 +123,42 @@ class Links extends React.Component {
    * @return {Element} element
    */
 
-  renderEditor() {
+  renderEditor = () => {
     return (
       <div className="editor">
         <Editor
           state={this.state.state}
-          renderNode={node => NODES[node.type]}
-          onChange={(state) => {
-            console.groupCollapsed('Change!')
-            console.log('Document:', state.document.toJS())
-            console.log('Selection:', state.selection.toJS())
-            console.log('Content:', Raw.serialize(state))
-            console.groupEnd()
-            this.setState({ state })
-          }}
+          renderNode={this.renderNode}
+          onChange={this.onChange}
         />
       </div>
     )
+  }
+
+  /**
+   * Render a `node`.
+   *
+   * @param {Node} node
+   * @return {Element}
+   */
+
+  renderNode = (node) => {
+    return NODES[node.type]
+  }
+
+  /**
+   * On change.
+   *
+   * @param {State} state
+   */
+
+  onChange = (state) => {
+    console.groupCollapsed('Change!')
+    console.log('Document:', state.document.toJS())
+    console.log('Selection:', state.selection.toJS())
+    console.log('Content:', Raw.serialize(state))
+    console.groupEnd()
+    this.setState({ state })
   }
 
 }

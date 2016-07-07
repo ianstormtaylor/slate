@@ -1,7 +1,7 @@
 
 import { Editor, Html, Raw } from '../..'
 import React from 'react'
-import state from './state.json'
+import initialState from './state.json'
 
 /**
  * Node renderers.
@@ -166,10 +166,41 @@ const serializer = new Html(RULES)
 class PasteHtml extends React.Component {
 
   state = {
-    state: Raw.deserialize(state)
+    state: Raw.deserialize(initialState)
   };
 
-  onPaste(e, paste, state, editor) {
+  render = () => {
+    return (
+      <div className="editor">
+        <Editor
+          state={this.state.state}
+          renderNode={this.renderNode}
+          renderMark={this.renderMark}
+          onPaste={this.onPaste}
+          onChange={this.onChange}
+        />
+      </div>
+    )
+  }
+
+  renderNode = (node) => {
+    return NODES[node.type]
+  }
+
+  renderMark = (mark) => {
+    return MARKS[mark.type]
+  }
+
+  onChange = (state) => {
+    console.groupCollapsed('Change!')
+    console.log('Document:', state.document.toJS())
+    console.log('Selection:', state.selection.toJS())
+    console.log('Content:', Raw.serialize(state))
+    console.groupEnd()
+    this.setState({ state })
+  }
+
+  onPaste = (e, paste, state, editor) => {
     if (paste.type != 'html') return
     const { html } = paste
     const { document } = serializer.deserialize(html)
@@ -178,27 +209,6 @@ class PasteHtml extends React.Component {
       .transform()
       .insertFragment(document)
       .apply()
-  }
-
-  render() {
-    return (
-      <div className="editor">
-        <Editor
-          state={this.state.state}
-          renderNode={node => NODES[node.type]}
-          renderMark={mark => MARKS[mark.type]}
-          onPaste={(...args) => this.onPaste(...args)}
-          onChange={(state) => {
-            console.groupCollapsed('Change!')
-            console.log('Document:', state.document.toJS())
-            console.log('Selection:', state.selection.toJS())
-            console.log('Content:', Raw.serialize(state))
-            console.groupEnd()
-            this.setState({ state })
-          }}
-        />
-      </div>
-    )
   }
 
 }

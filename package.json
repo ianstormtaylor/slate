@@ -6,7 +6,7 @@
   "main": "./dist/index.js",
   "scripts": {
     "prepublish": "make dist",
-    "test": "make test"
+    "test": "make check"
   },
   "dependencies": {
     "cheerio": "^0.20.0",

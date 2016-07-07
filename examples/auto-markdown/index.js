@@ -2,7 +2,7 @@
 import { Editor, Raw } from '../..'
 import React from 'react'
 import keycode from 'keycode'
-import state from './state.json'
+import initialState from './state.json'
 
 /**
  * Node renderers.
@@ -38,7 +38,7 @@ class AutoMarkdown extends React.Component {
    */
 
   state = {
-    state: Raw.deserialize(state)
+    state: Raw.deserialize(initialState)
   };
 
   /**
@@ -48,7 +48,7 @@ class AutoMarkdown extends React.Component {
    * @return {String} block
    */
 
-  getType(chars) {
+  getType = (chars) => {
     switch (chars) {
       case '*':
       case '-':
@@ -71,24 +71,43 @@ class AutoMarkdown extends React.Component {
    * @return {Component} component
    */
 
-  render() {
+  render = () => {
     return (
       <div className="editor">
         <Editor
           state={this.state.state}
-          renderNode={node => NODES[node.type]}
-          onKeyDown={(e, state) => this.onKeyDown(e, state)}
-          onChange={(state) => {
-            console.groupCollapsed('Change!')
-            console.log('Document:', state.document.toJS())
-            console.log('Selection:', state.selection.toJS())
-            console.log('Content:', Raw.serialize(state))
-            console.groupEnd()
-            this.setState({ state })
-          }}
+          onChange={this.onChange}
+          onKeyDown={this.onKeyDown}
+          renderNode={this.renderNode}
         />
       </div>
     )
+  }
+
+  /**
+   * Render a `node`.
+   *
+   * @param {Node} node
+   * @return {Element}
+   */
+
+  renderNode = (node) => {
+    return NODES[node.type]
+  }
+
+  /**
+   * On change.
+   *
+   * @param {State} state
+   */
+
+  onChange = (state) => {
+    console.groupCollapsed('Change!')
+    console.log('Document:', state.document.toJS())
+    console.log('Selection:', state.selection.toJS())
+    console.log('Content:', Raw.serialize(state))
+    console.groupEnd()
+    this.setState({ state })
   }
 
   /**
@@ -99,7 +118,7 @@ class AutoMarkdown extends React.Component {
    * @return {State or Null} state
    */
 
-  onKeyDown(e, state) {
+  onKeyDown = (e, state) => {
     const key = keycode(e.which)
     switch (key) {
       case 'space': return this.onSpace(e, state)
@@ -117,7 +136,7 @@ class AutoMarkdown extends React.Component {
    * @return {State or Null} state
    */
 
-  onSpace(e, state) {
+  onSpace = (e, state) => {
     if (state.isExpanded) return
     let { selection } = state
     const { startText, startBlock, startOffset } = state
@@ -151,7 +170,7 @@ class AutoMarkdown extends React.Component {
    * @return {State or Null} state
    */
 
-  onBackspace(e, state) {
+  onBackspace = (e, state) => {
     if (state.isExpanded) return
     if (state.startOffset != 0) return
     const { startBlock } = state
@@ -178,7 +197,7 @@ class AutoMarkdown extends React.Component {
    * @return {State or Null} state
    */
 
-  onEnter(e, state) {
+  onEnter = (e, state) => {
     if (state.isExpanded) return
     const { startBlock, startOffset, endOffset } = state
     if (startOffset == 0 && startBlock.length == 0) return this.onBackspace(e, state)

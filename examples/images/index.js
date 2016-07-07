@@ -2,7 +2,7 @@
 import { Editor, Mark, Raw } from '../..'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import state from './state.json'
+import initialState from './state.json'
 import { Map } from 'immutable'
 
 /**
@@ -31,8 +31,96 @@ const NODES = {
 class Images extends React.Component {
 
   state = {
-    state: Raw.deserialize(state)
+    state: Raw.deserialize(initialState)
   };
+
+  /**
+   * Render the app.
+   *
+   * @return {Element} element
+   */
+
+  render = () => {
+    return (
+      <div>
+        {this.renderToolbar()}
+        {this.renderEditor()}
+      </div>
+    )
+  }
+
+  /**
+   * Render the toolbar.
+   *
+   * @return {Element} element
+   */
+
+  renderToolbar = () => {
+    return (
+      <div className="menu toolbar-menu">
+        <span className="button" onMouseDown={this.onClickImage}>
+          <span className="material-icons">image</span>
+        </span>
+      </div>
+    )
+  }
+
+  /**
+   * Render the editor.
+   *
+   * @return {Element} element
+   */
+
+  renderEditor = () => {
+    return (
+      <div className="editor">
+        <Editor
+          state={this.state.state}
+          renderNode={this.renderNode}
+          onChange={this.onChange}
+        />
+      </div>
+    )
+  }
+
+  /**
+   * Render a `node`.
+   *
+   * @param {Node} node
+   * @return {Element}
+   */
+
+  renderNode = (node) => {
+    return NODES[node.type]
+  }
+
+  /**
+   * On change.
+   *
+   * @param {State} state
+   */
+
+  onChange = (state) => {
+    console.groupCollapsed('Change!')
+    console.log('Document:', state.document.toJS())
+    console.log('Selection:', state.selection.toJS())
+    console.log('Content:', Raw.serialize(state))
+    console.groupEnd()
+    this.setState({ state })
+  }
+
+  /**
+   * On clicking the image button, prompt for an image and insert it.
+   *
+   * @param {Event} e
+   */
+
+  onClickImage = (e) => {
+    e.preventDefault()
+    const src = window.prompt('Enter the URL of the image:')
+    if (!src) return
+    this.insertImage(src)
+  }
 
   /**
    * Insert an image with `src` at the current selection.
@@ -40,7 +128,7 @@ class Images extends React.Component {
    * @param {String} src
    */
 
-  insertImage(src) {
+  insertImage = (src) => {
     let { state } = this.state
 
     if (state.isExpanded) {
@@ -72,75 +160,6 @@ class Images extends React.Component {
       .apply()
 
     this.setState({ state })
-  }
-
-  /**
-   * On clicking the image button, prompt for an image and insert it.
-   *
-   * @param {Event} e
-   */
-
-  onClickImage(e) {
-    e.preventDefault()
-    const src = window.prompt('Enter the URL of the image:')
-    if (!src) return
-    this.insertImage(src)
-  }
-
-  /**
-   * Render the app.
-   *
-   * @return {Element} element
-   */
-
-  render() {
-    return (
-      <div>
-        {this.renderToolbar()}
-        {this.renderEditor()}
-      </div>
-    )
-  }
-
-  /**
-   * Render the toolbar.
-   *
-   * @return {Element} element
-   */
-
-  renderToolbar() {
-    return (
-      <div className="menu toolbar-menu">
-        <span className="button" onMouseDown={e => this.onClickImage(e)}>
-          <span className="material-icons">image</span>
-        </span>
-      </div>
-    )
-  }
-
-  /**
-   * Render the editor.
-   *
-   * @return {Element} element
-   */
-
-  renderEditor() {
-    return (
-      <div className="editor">
-        <Editor
-          state={this.state.state}
-          renderNode={node => NODES[node.type]}
-          onChange={(state) => {
-            console.groupCollapsed('Change!')
-            console.log('Document:', state.document.toJS())
-            console.log('Selection:', state.selection.toJS())
-            console.log('Content:', Raw.serialize(state))
-            console.groupEnd()
-            this.setState({ state })
-          }}
-        />
-      </div>
-    )
   }
 
 }

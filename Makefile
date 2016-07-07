@@ -47,16 +47,19 @@ examples:
 install:
 	@ npm install
 
-# Lint the sources files with Standard JS.
+# Lint the source files.
 lint:
-	@ $(eslint) "lib/**/*.js"
+	@ $(eslint) \
+		"lib/**/*.js" \
+		"examples/**/*.js" --ignore-pattern "build.js"
 
 # Build the test source.
-test/browser/support/build.js: $(shell find ./lib) ./test/browser.js
+test/support/build.js: $(shell find ./lib) ./test/browser.js
 	@ $(browserify) \
+		./test/browser.js \
 		--debug \
 		--transform babelify \
-		--outfile ./test/support/build.js ./test/browser.js
+		--outfile ./test/support/build.js
 
 # Run the tests.
 test: test-browser test-server

@@ -1,7 +1,10 @@
 {
-  "env": {
-    "browser": true,
-    "node": true
+  "plugins": [
+    "import",
+    "react"
+  ],
+  "settings": {
+    "import/extensions": [".js"]
   },
   "parser": "babel-eslint",
   "parserOptions": {
@@ -9,10 +12,10 @@
       "jsx": true
     }
   },
-  "plugins": [
-    "import",
-    "react"
-  ],
+  "env": {
+    "browser": true,
+    "node": true
+  },
   "rules": {
     "block-spacing": "error",
     "comma-dangle": ["error", "only-multiline"],
@@ -25,9 +28,7 @@
     "dot-notation": ["error", { "allowKeywords": true }],
     "eol-last": "error",
     "func-style": ["error", "declaration"],
-    "import/default": "error",
     "import/export": "error",
-    "import/named": "error",
     "import/namespace": "error",
     "import/newline-after-import": "error",
     "import/no-deprecated": "error",
@@ -41,7 +42,6 @@
     "new-parens": "error",
     "no-array-constructor": "error",
     "no-class-assign": "error",
-    "no-console": "warn",
     "no-const-assign": "error",
     "no-debugger": "warn",
     "no-dupe-args": "error",

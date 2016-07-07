@@ -1,7 +1,7 @@
 
 import { Block, Character, Document, Editor, State, Text } from '../..'
 import React from 'react'
-import state from './state.json'
+import initialState from './state.json'
 
 /**
  * A helper to deserialize a string into an editor state.
@@ -54,7 +54,7 @@ class PlainText extends React.Component {
    */
 
   state = {
-    state: deserialize(state)
+    state: deserialize(initialState)
   };
 
   /**
@@ -63,20 +63,28 @@ class PlainText extends React.Component {
    * @return {Component} component
    */
 
-  render() {
+  render = () => {
     return (
       <Editor
         state={this.state.state}
-        onChange={(state) => {
-          console.groupCollapsed('Change!')
-          console.log('Document:', state.document.toJS())
-          console.log('Selection:', state.selection.toJS())
-          console.log('Content:', serialize(state))
-          console.groupEnd()
-          this.setState({ state })
-        }}
+        onChange={this.onChange}
       />
     )
+  }
+
+  /**
+   * On change.
+   *
+   * @param {State} state
+   */
+
+  onChange = (state) => {
+    console.groupCollapsed('Change!')
+    console.log('Document:', state.document.toJS())
+    console.log('Selection:', state.selection.toJS())
+    console.log('Content:', serialize(state))
+    console.groupEnd()
+    this.setState({ state })
   }
 
 }

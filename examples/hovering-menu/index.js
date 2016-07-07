@@ -3,7 +3,7 @@ import { Editor, Mark, Raw } from '../..'
 import Portal from 'react-portal'
 import React from 'react'
 import position from 'selection-position'
-import state from './state.json'
+import initialState from './state.json'
 
 /**
  * Node renderers.
@@ -48,37 +48,74 @@ const MARKS = {
 class HoveringMenu extends React.Component {
 
   state = {
-    state: Raw.deserialize(state)
+    state: Raw.deserialize(initialState)
   };
 
-  componentDidMount() {
+  componentDidMount = () => {
     this.updateMenu()
   }
 
-  componentDidUpdate() {
+  componentDidUpdate = () => {
     this.updateMenu()
   }
 
-  hasMark(type) {
+  render = () => {
+    return (
+      <div>
+        {this.renderMenu()}
+        {this.renderEditor()}
+      </div>
+    )
+  }
+
+  renderMenu = () => {
     const { state } = this.state
-    const { marks } = state
-    return marks.some(mark => mark.type == type)
+    const isOpen = state.isExpanded && state.isFocused
+    return (
+      <Portal isOpened onOpen={this.onOpen}>
+        <div className="menu hover-menu">
+          {this.renderMarkButton('bold', 'format_bold')}
+          {this.renderMarkButton('italic', 'format_italic')}
+          {this.renderMarkButton('underlined', 'format_underlined')}
+          {this.renderMarkButton('code', 'code')}
+        </div>
+      </Portal>
+    )
   }
 
-  onClickMark(e, type) {
-    e.preventDefault()
+  renderMarkButton = (type, icon) => {
     const isActive = this.hasMark(type)
-    let { state } = this.state
+    const onMouseDown = e => this.onClickMark(e, type)
 
-    state = state
-      .transform()
-      [isActive ? 'unmark' : 'mark'](type)
-      .apply()
-
-    this.setState({ state })
+    return (
+      <span className="button" onMouseDown={onMouseDown} data-active={isActive}>
+        <span className="material-icons">{icon}</span>
+      </span>
+    )
   }
 
-  updateMenu() {
+  renderEditor = () => {
+    return (
+      <div className="editor">
+        <Editor
+          state={this.state.state}
+          renderNode={this.renderNode}
+          renderMark={this.renderMark}
+          onChange={this.onChange}
+        />
+      </div>
+    )
+  }
+
+  renderNode = (node) => {
+    return NODES[node.type]
+  }
+
+  renderMark = (mark) => {
+    return MARKS[mark.type]
+  }
+
+  updateMenu = () => {
     const { menu, state } = this.state
     if (!menu) return
 
@@ -93,61 +130,35 @@ class HoveringMenu extends React.Component {
     menu.style.left = `${rect.left + window.scrollX - menu.offsetWidth / 2 + rect.width / 2}px`
   }
 
-  onOpen(el) {
-    this.setState({ menu: el.firstChild })
-  }
-
-  render() {
-    return (
-      <div>
-        {this.renderMenu()}
-        {this.renderEditor()}
-      </div>
-    )
-  }
-
-  renderMenu() {
+  hasMark = (type) => {
     const { state } = this.state
-    const isOpen = state.isExpanded && state.isFocused
-    return (
-      <Portal isOpened={true} onOpen={el => this.onOpen(el)} >
-        <div className="menu hover-menu">
-          {this.renderMarkButton('bold', 'format_bold')}
-          {this.renderMarkButton('italic', 'format_italic')}
-          {this.renderMarkButton('underlined', 'format_underlined')}
-          {this.renderMarkButton('code', 'code')}
-        </div>
-      </Portal>
-    )
+    return state.marks.some(mark => mark.type == type)
   }
 
-  renderMarkButton(type, icon) {
+  onChange = (state) => {
+    console.groupCollapsed('Change!')
+    console.log('Document:', state.document.toJS())
+    console.log('Selection:', state.selection.toJS())
+    console.log('Content:', Raw.serialize(state))
+    console.groupEnd()
+    this.setState({ state })
+  }
+
+  onClickMark = (e, type) => {
+    e.preventDefault()
     const isActive = this.hasMark(type)
-    return (
-      <span className="button" onMouseDown={e => this.onClickMark(e, type)} data-active={isActive}>
-        <span className="material-icons">{icon}</span>
-      </span>
-    )
+    let { state } = this.state
+
+    state = state
+      .transform()
+      [isActive ? 'unmark' : 'mark'](type)
+      .apply()
+
+    this.setState({ state })
   }
 
-  renderEditor() {
-    return (
-      <div className="editor">
-        <Editor
-          state={this.state.state}
-          renderNode={node => NODES[node.type]}
-          renderMark={mark => MARKS[mark.type]}
-          onChange={(state) => {
-            console.groupCollapsed('Change!')
-            console.log('Document:', state.document.toJS())
-            console.log('Selection:', state.selection.toJS())
-            console.log('Content:', Raw.serialize(state))
-            console.groupEnd()
-            this.setState({ state })
-          }}
-        />
-      </div>
-    )
+  onOpen = (el) => {
+    this.setState({ menu: el.firstChild })
   }
 
 }
