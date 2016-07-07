@@ -4,7 +4,7 @@ bin = ./node_modules/.bin
 babel = $(bin)/babel
 browserify = $(bin)/browserify
 exorcist = $(bin)/exorcist
-standard = $(bin)/standard
+eslint = $(bin)/eslint
 mocha = $(bin)/mocha
 mocha-phantomjs = $(bin)/mocha-phantomjs
 node = node
@@ -19,6 +19,9 @@ ifeq ($(DEBUG),true)
 	mocha += debug
 	node += debug
 endif
+
+# Run all of the checks.
+check: lint test
 
 # Remove the generated files.
 clean:
@@ -46,7 +49,7 @@ install:
 
 # Lint the sources files with Standard JS.
 lint:
-	@ $(standard) ./lib
+	@ $(eslint) "lib/**/*.js"
 
 # Build the test source.
 test/browser/support/build.js: $(shell find ./lib) ./test/browser.js
@@ -62,8 +65,6 @@ test: test-browser test-server
 test-browser: ./test/support/build.js
 	@ $(mocha-phantomjs) \
 		--reporter spec \
-		--timeout 5000 \
-		--fgrep "$(GREP)" \
 		./test/support/browser.html
 
 # Run the server-side tests.
@@ -72,7 +73,6 @@ test-server:
 		--compilers js:babel-core/register \
 		--require source-map-support/register \
 		--reporter spec \
-		--timeout 5000 \
 		--fgrep "$(GREP)" \
 		./test/server.js
 
