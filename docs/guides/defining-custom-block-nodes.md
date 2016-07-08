@@ -245,5 +245,5 @@ class App extends React.Component {
 And there you have it! If you press **⌘-`** while inside a code block, it should turn back into a paragraph!
 
 <br/>
-<p align="center"><strong>Next:</strong><br/><a href="./adding-custom-formatting.md">Applying Custom Formatting</a></p>
+<p align="center"><strong>Next:</strong><br/><a href="./applying-custom-formatting.md">Applying Custom Formatting</a></p>
 <br/>

@@ -76,8 +76,8 @@ class App extends React.Component {
   }
 
   // Define a new handler which prints the key code that was pressed.
-  onKeyDown(e, state) {
-    console.log(e.which)
+  onKeyDown(event, state) {
+    console.log(event.which)
   }
 
 }
@@ -137,8 +137,8 @@ class App extends React.Component {
 
 With that added, try typing `&`, and you should see it automatically become `and` instead!
 
-That gives you a sense for what you can do with Slate's event handlers. Each one will be called with the `event` object, and the current `state` of the editor.
+That gives you a sense for what you can do with Slate's event handlers. Each one will be called with the `event` object, and the current `state` of the editor. And if you return a new `state`, the editor will be updated. Simple!
 
 <br/>
-<p align="center"><strong>Next:</strong><br/><a href="./adding-custom-block-nodes.md">Adding Custom Block Nodes</a></p>
+<p align="center"><strong>Next:</strong><br/><a href="./defining-custom-block-nodes.md">Defining Custom Block Nodes</a></p>
 <br/>
