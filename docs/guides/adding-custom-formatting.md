@@ -9,49 +9,7 @@ In the last guide we learned how to use Slate's event handlers to change its con
 
 In this guide, we'll show you how to add custom formatting options, like **bold**, _italic_, `code` or ~~strikethrough~~.
 
-So we start with our app from earlier:
-
-```js
-class App extends React.Component {
-
-  constructor(props) {
-    super(props)
-    this.state = {
-      state: initialState
-    }
-  }
-
-  render() {
-    return (
-      <Editor
-        state={this.state.state}
-        onChange={state => this.onChange(state)}
-        onKeyDown={e, state => this.onKeyDown(e, state)}
-      />
-    )
-  }
-
-  onChange(state) {
-    this.setState({ state })
-  }
-
-  onKeyDown(event, state) {
-    if (event.which != 55 || !event.shiftKey) return
-
-    const newState = state
-      .transform()
-      .insertText('and')
-      .apply()
-    
-    return newState
-  }
-
-}
-```
-
-But we'll get rid of that useless `onKeyDown` handler logic, and we'll replace it with logic that will add a **bold** format to the currently selected text.
-
-Here's what that looks like:
+So we start with our app from earlier, but we'll get rid of that useless `onKeyDown` handler logic, and we'll replace it with logic that will add a **bold** format to the currently selected text:
 
 ```js
 class App extends React.Component {
@@ -104,7 +62,7 @@ So let's define our `bold` mark:
 
 
 ```js
-// Define a simple dictionary of styles that make text bold.
+// Define a set of styles that make text bold.
 const BOLD_MARK = {
   fontWeight: 'bold'
 }
