@@ -28,10 +28,7 @@ To keep things simple, we'll use the `Raw` serializer that ships with Slate to c
 ```js
 import { Editor, Raw } from 'slate'
 
-/**
- * Create our initial state...
- */
-
+// Create our initial state...
 const initialState = Raw.deserialize([
   {
     kind: 'block',
@@ -56,10 +53,6 @@ Once you've got a `State` object create, via the `Raw` serializer, or any other 
 import React from 'react'
 import { Editor, Raw } from 'state'
 
-/**
- * Create our initial state...
- */
-
 const initialState = Raw.deserialize([
   {
     kind: 'block',
@@ -77,14 +70,13 @@ const initialState = Raw.deserialize([
   }
 ])
 
-/**
- * Our app.
- */
-
+// Define our app...
 class App extends React.Component {
 
   constructor(props) {
     super(props)
+
+    // Set the initial state when the app is first constructed.
     this.state = {
       state: initialState
     }
@@ -94,11 +86,14 @@ class App extends React.Component {
     return (
       <Editor
         state={this.state.state}
-        onChange={(state) => {
-          this.setState({ state })
-        }}
+        onChange={state => this.onChange(state)}
       />
     )
+  }
+
+  onChange(state) {
+    // Update the app's React state with the new editor state.
+    this.setState({ state })
   }
 
 }
@@ -111,8 +106,8 @@ And that's it!
 That's the most basic example of Slate. If you render that onto the page, you should see a paragraph with the text `A line of text in a paragraph.`. And when you type, you should see the text change!
 
 <br/>
-<p align="center"><strong>Next:</strong><br/><a href="./customizing-slates-behavior.md">Customizing Slate's Behavior</a></p>
-
+<p align="center"><strong>Next:</strong><br/><a href="./adding-event-handlers.md">Adding Event Handlers</a></p>
+<br/>
 
 
 
