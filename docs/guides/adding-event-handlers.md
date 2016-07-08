@@ -27,9 +27,14 @@ class App extends React.Component {
     return (
       <Editor
         state={this.state.state}
+        renderNode={node => this.renderNode(node)}
         onChange={state => this.onChange(state)}
       />
     )
+  }
+
+  renderNode(node) {
+    if (node.type == 'paragraph') return ParagraphNode
   }
 
   onChange(state) {
@@ -55,10 +60,15 @@ class App extends React.Component {
     return (
       <Editor
         state={this.state.state}
+        renderNode={node => this.renderNode(node)}
         onChange={state => this.onChange(state)}
-        onKeyDown={e, state => this.onKeyDown(e, state)}
+        onKeyDown={(e, state) => this.onKeyDown(e, state)}
       />
     )
+  }
+
+  renderNode(node) {
+    if (node.type == 'paragraph') return ParagraphNode
   }
 
   onChange(state) {
@@ -93,10 +103,15 @@ class App extends React.Component {
     return (
       <Editor
         state={this.state.state}
+        renderNode={node => this.renderNode(node)}
         onChange={state => this.onChange(state)}
-        onKeyDown={e, state => this.onKeyDown(e, state)}
+        onKeyDown={(e, state) => this.onKeyDown(e, state)}
       />
     )
+  }
+
+  renderNode(node) {
+    if (node.type == 'paragraph') return ParagraphNode
   }
 
   onChange(state) {
@@ -125,5 +140,5 @@ With that added, try typing `&`, and you should see it automatically become `and
 That gives you a sense for what you can do with Slate's event handlers. Each one will be called with the `event` object, and the current `state` of the editor.
 
 <br/>
-<p align="center"><strong>Next:</strong><br/><a href="./adding-custom-formatting.md">Adding Custom Formatting</a></p>
+<p align="center"><strong>Next:</strong><br/><a href="./adding-custom-block-nodes.md">Adding Custom Block Nodes</a></p>
 <br/>

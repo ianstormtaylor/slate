@@ -47,7 +47,18 @@ const initialState = Raw.deserialize([
 ])
 ```
 
-Once you've got a `State` object create, via the `Raw` serializer, or any other serialization method you want, you can pass it into the `Editor` component inside your application:
+Okay, now we've got our initial state in a format that Slate understands. But Slate doesn't know anything about our schema, specifically how to render `paragraph` block nodes.
+
+So we need to define a paragraph node renderer, which is just a simple React component, like so:
+
+```js
+// A simple React component that wraps text in a `<p>` element.
+const ParagraphNode = (props) => {
+  return <p>{props.children}</p>
+}
+```
+
+And now that we've our initial state and our paragraph renderer, we define our `App` and pass them into Slate's `Editor` component, like so:
 
 ```js
 import React from 'react'
@@ -70,6 +81,10 @@ const initialState = Raw.deserialize([
   }
 ])
 
+const ParagraphNode = (props) => {
+  return <p>{props.children}</p>
+}
+
 // Define our app...
 class App extends React.Component {
 
@@ -86,9 +101,14 @@ class App extends React.Component {
     return (
       <Editor
         state={this.state.state}
+        renderNode={node => this.renderNode(node)}
         onChange={state => this.onChange(state)}
       />
     )
+  }
+
+  renderNode(node) {
+    if (node.type == 'paragraph') return ParagraphNode
   }
 
   onChange(state) {
