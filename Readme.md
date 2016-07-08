@@ -50,21 +50,22 @@ If you have an idea for an example that shows a common use case, pull request it
 <br/>
 ### Documentation
 
-If you're using Slate for the first time, check out the [Getting Started](./docs/getting-started) guide and the [Core Concepts](./docs/concepts) to familiarize yourself with Slate's architecture and mental models. Once you've gotten familiar with those, you'll probably want to check out the full [API Reference](./docs/reference).
+If you're using Slate for the first time, check out the [Getting Started](./docs/guides/installing-slate.md) guides and the [Core Concepts](./docs/concepts) to familiarize yourself with Slate's architecture and mental models. Once you've gotten familiar with those, you'll probably want to check out the full [API Reference](./docs/reference).
 
-- [**Getting Started**](docs/getting-started.md)
-  - Installing Slate
-  - Adding Slate to Your App
-  - Customizing Slate's Behavior
+- [**Guides**](docs/guides/installing-slate.md)
+  - [Installing Slate](docs/guides/installing-slate.md)
+  - [Adding Event Handlers](docs/guides/adding-event-handlers.md)
+  - [Adding Custom Formatting](docs/guides/adding-custom-formatting.md)
+  - [Adding Custom Block Types](docs/guides/adding-custom-block-types.md)
   - Adding Plugins
 
-- [**Core Concepts**](docs/concepts.md)
+- [**Concepts**](docs/concepts.md)
   - Statelessness & Immutability
   - [The Document Model](docs/getting-started.md#the-document-model)
   - The Selection Model
   - Plugins
 
-- **API Reference**
+- **Reference**
   - Components
     - Editor
   - Models

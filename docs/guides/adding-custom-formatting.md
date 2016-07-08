@@ -114,7 +114,7 @@ Pretty simple, right?
 
 And now, let's tell Slate about that mark. To do that, we'll need to pass in a `renderMark` function to the `Editor`, which it will call with any mark it finds. And when it calls it with a bold mark, we'll return our `BOLD_MARK` styles. Like so:
 
-```
+```js
 const BOLD_MARK = {
   fontWeight: 'bold'
 }
