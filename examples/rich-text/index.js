@@ -1,7 +1,8 @@
 
-import { Editor, Mark, Raw } from '../..'
+import { Editor, Mark, Raw, Utils } from '../..'
 import React from 'react'
 import initialState from './state.json'
+import keycode from 'keycode'
 
 /**
  * Node renderers.
@@ -54,42 +55,6 @@ class RichText extends React.Component {
   state = {
     state: Raw.deserialize(initialState)
   };
-
-  hasMark = (type) => {
-    const { state } = this.state
-    return state.marks.some(mark => mark.type == type)
-  }
-
-  hasBlock = (type) => {
-    const { state } = this.state
-    return state.blocks.some(node => node.type == type)
-  }
-
-  onClickMark = (e, type) => {
-    e.preventDefault()
-    const isActive = this.hasMark(type)
-    let { state } = this.state
-
-    state = state
-      .transform()
-      [isActive ? 'unmark' : 'mark'](type)
-      .apply()
-
-    this.setState({ state })
-  }
-
-  onClickBlock = (e, type) => {
-    e.preventDefault()
-    const isActive = this.hasBlock(type)
-    let { state } = this.state
-
-    state = state
-      .transform()
-      .setBlock(isActive ? 'paragraph' : type)
-      .apply()
-
-    this.setState({ state })
-  }
 
   render = () => {
     return (
@@ -146,6 +111,7 @@ class RichText extends React.Component {
           renderNode={this.renderNode}
           renderMark={this.renderMark}
           onChange={this.onChange}
+          onKeyDown={this.onKeyDown}
         />
       </div>
     )
@@ -159,12 +125,79 @@ class RichText extends React.Component {
     return MARKS[mark.type]
   }
 
+  hasMark = (type) => {
+    const { state } = this.state
+    return state.marks.some(mark => mark.type == type)
+  }
+
+  hasBlock = (type) => {
+    const { state } = this.state
+    return state.blocks.some(node => node.type == type)
+  }
+
   onChange = (state) => {
     console.groupCollapsed('Change!')
     console.log('Document:', state.document.toJS())
     console.log('Selection:', state.selection.toJS())
     console.log('Content:', Raw.serialize(state))
     console.groupEnd()
+    this.setState({ state })
+  }
+
+  onKeyDown = (e, state) => {
+    if (!Utils.Key.isCommand(e)) return
+    const key = keycode(e.which)
+    let mark
+
+    switch (key) {
+      case 'b':
+        mark = 'bold'
+        break
+      case 'i':
+        mark = 'italic'
+        break
+      case 'u':
+        mark = 'underlined'
+        break
+      case '`':
+        mark = 'code'
+        break
+      default:
+        return
+    }
+
+    state = state
+      .transform()
+      [this.hasMark(mark) ? 'unmark' : 'mark'](mark)
+      .apply()
+
+    e.preventDefault()
+    return state
+  }
+
+  onClickMark = (e, type) => {
+    e.preventDefault()
+    const isActive = this.hasMark(type)
+    let { state } = this.state
+
+    state = state
+      .transform()
+      [isActive ? 'unmark' : 'mark'](type)
+      .apply()
+
+    this.setState({ state })
+  }
+
+  onClickBlock = (e, type) => {
+    e.preventDefault()
+    const isActive = this.hasBlock(type)
+    let { state } = this.state
+
+    state = state
+      .transform()
+      .setBlock(isActive ? 'paragraph' : type)
+      .apply()
+
     this.setState({ state })
   }
 
