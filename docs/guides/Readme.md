@@ -3,8 +3,8 @@ These guides introduce you to the different parts of Slate in a step-by-step way
 
 - [Installing Slate](./installing-slate.md)
 - [Adding Event Handlers](./adding-event-handlers.md)
-- [Adding Custom Formatting](./adding-custom-formatting.md)
-- [Adding Custom Block Types](./adding-custom-block-types.md)
-- Adding Plugins
+- [Defining Custom Block Nodes](./defining-custom-block-nodes.md)
+- [Applying Custom Formatting](./applying-custom-formatting.md)
+- [Using Plugins](./using-plugins.md)
 
 _If you have an idea for a guide, or notice something that isn't clear, submit a pull request!_

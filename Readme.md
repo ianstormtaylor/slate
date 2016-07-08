@@ -55,9 +55,9 @@ If you're using Slate for the first time, check out the [Getting Started](./docs
 - [**Guides**](docs/guides/installing-slate.md)
   - [Installing Slate](docs/guides/installing-slate.md)
   - [Adding Event Handlers](docs/guides/adding-event-handlers.md)
-  - [Adding Custom Formatting](docs/guides/adding-custom-formatting.md)
-  - [Adding Custom Block Types](docs/guides/adding-custom-block-types.md)
-  - Adding Plugins
+  - [Defining Custom Block Nodes](docs/guides/defining-custom-block-nodes.md)
+  - [Applying Custom Formatting](docs/guides/applying-custom-formatting.md)
+  - [Using Plugins](docs/guides/using-plugins.md)
 
 - [**Concepts**](docs/concepts.md)
   - Statelessness & Immutability

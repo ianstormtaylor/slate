@@ -253,7 +253,7 @@ class App extends React.Component {
         const isBold = state.marks.some(mark => mark.type == 'bold')
         return state
           .transform()
-          [isBold ? 'mark' : 'unmark']('bold')
+          [isBold ? 'unmark' : 'mark']('bold')
           .apply()
       }
       case 192: {
