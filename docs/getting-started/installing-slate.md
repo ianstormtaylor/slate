@@ -1,9 +1,5 @@
 
-### Getting Started
-
-- [**Installing Slate**]()
-- [Customizing Slate's Behavior](./customizing-slates-behavior)
-- [Adding Plugins](./adding-plugins)
+### Installing Slate
 
 Slate is an npm module, so to install it you do:
 
@@ -114,7 +110,8 @@ And that's it!
 
 That's the most basic example of Slate. If you render that onto the page, you should see a paragraph with the text `A line of text in a paragraph.`. And when you type, you should see the text change!
 
-<p align="center"><strong>Next:</strong><br /><a href="./customizing-slates-behavior.md">Customizing Slate's Behavior</a></p>
+<br/>
+<p align="center"><strong>Next:</strong><br/><a href="./customizing-slates-behavior.md">Customizing Slate's Behavior</a></p>
 
 
 
