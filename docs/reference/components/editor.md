@@ -5,6 +5,7 @@ The top-level React component that renders the Slate editor itself.
 
 ```js
 <Editor
+  onChange={Function}
   plugins={Array}
   state={State}
 />
@@ -31,15 +32,15 @@ These properties are actually an implicit plugin defintion. Internally, they are
 
 ### Properties
 
-#### `onChange(state)`
+#### `onChange: Function`
 
 A change handler that will be called with the newly-changed editor `state`. You should usually pass the newly changed `state` back into the editor through its `state` property. This hook allows you to add persistence logic to your editor.
 
-#### `plugins`
+#### `plugins: Array`
 
 An array of [`Plugins`](../plugins) that define the editor's behavior.
 
-#### `state`
+#### `state: State`
 
 A [`State`](../models/state) object representing the current state of the editor.
 
@@ -82,6 +83,6 @@ const plugins = [
 
 Return the editor's current internal state.
 
-#### `onChange(state)`
+#### `onChange(state: State)`
 
 Effectively the same as `setState`, invoking this method will update the state of the editor, running it through all of it's plugins, and passing it the parent component, before it cycles back down as the new `state` property of the editor.
