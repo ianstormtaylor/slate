@@ -5,6 +5,7 @@ babel = $(bin)/babel
 browserify = $(bin)/browserify
 exorcist = $(bin)/exorcist
 eslint = $(bin)/eslint
+http-server = $(bin)/http-server
 mocha = $(bin)/mocha
 mocha-phantomjs = $(bin)/mocha-phantomjs
 node = node
@@ -52,6 +53,10 @@ lint:
 	@ $(eslint) \
 		"lib/**/*.js" \
 		"examples/**/*.js" --ignore-pattern "build.js"
+
+# Start the examples server.
+start-examples:
+	@ $(http-server) ./examples
 
 # Build the test source.
 test/support/build.js: $(shell find ./lib) ./test/browser.js

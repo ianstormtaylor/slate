@@ -4,6 +4,13 @@ import ReactDOM from 'react-dom'
 import { Router, Route, Link, IndexRedirect, hashHistory } from 'react-router'
 
 /**
+ * Perf.
+ */
+
+import Perf from 'react-addons-perf'
+window.Perf = Perf
+
+/**
  * Examples.
  */
 

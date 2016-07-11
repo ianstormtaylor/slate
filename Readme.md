@@ -26,7 +26,9 @@ _Slate is currently in **beta**, while work is being done on: cross-browser supp
 
 4. **Stateless and immutable.** By using React and Immutable.js, the Slate editor is built in a stateless fashion using immutable data structures, which leads to better performance, and also a much easier time writing plugins.
 
-5. **Collaboration friendly.** The data model Slate uses—specifically how transforms are applied to the document—has been designed to allow for collaborative editing to be layered on top, so you won't need to rethink everything if you decide to make your editor collaborative.
+5. **Intuitive transforms.** Slate's content is edited using "transforms", that are designed to be extremely intuitive to use, so that writing plugins and custom functionality is as simple as possible.
+
+6. **Collaboration friendly.** The data model Slate uses—specifically how transforms are applied to the document—has been designed to allow for collaborative editing to be layered on top, so you won't need to rethink everything if you decide to make your editor collaborative. (More work is required on this!)
 
 
 <br/>
@@ -52,16 +54,17 @@ If you have an idea for an example that shows a common use case, pull request it
 
 If you're using Slate for the first time, check out the [Getting Started](./docs/guides/installing-slate.md) guides and the [Core Concepts](./docs/concepts) to familiarize yourself with Slate's architecture and mental models. Once you've gotten familiar with those, you'll probably want to check out the full [API Reference](./docs/reference).
 
-- [**Guides**](docs/guides/installing-slate.md)
+- [**Guides**](docs/guides)
   - [Installing Slate](docs/guides/installing-slate.md)
   - [Adding Event Handlers](docs/guides/adding-event-handlers.md)
   - [Defining Custom Block Nodes](docs/guides/defining-custom-block-nodes.md)
   - [Applying Custom Formatting](docs/guides/applying-custom-formatting.md)
   - [Using Plugins](docs/guides/using-plugins.md)
+  - Saving to a Database
 
-- [**Concepts**](docs/concepts.md)
+- **Concepts**
   - Statelessness & Immutability
-  - [The Document Model](docs/getting-started.md#the-document-model)
+  - The Document Model
   - The Selection Model
   - Plugins
 

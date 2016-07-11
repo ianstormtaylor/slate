@@ -92,11 +92,11 @@ class CodeHighlighting extends React.Component {
   }
 
   renderDecorations = (text, state, editor) => {
-    let characters = text.characters
     const { document } = state
     const block = document.getClosestBlock(text)
-    if (block.type != 'code') return characters
+    if (block.type != 'code') return text.characters
 
+    let characters = text.characters.asMutable()
     const string = text.text
     const grammar = Prism.languages.javascript
     const tokens = Prism.tokenize(string, grammar)
@@ -122,7 +122,7 @@ class CodeHighlighting extends React.Component {
       offset = length
     }
 
-    return characters
+    return characters.asImmutable()
   }
 
 }
