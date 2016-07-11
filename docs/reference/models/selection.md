@@ -28,7 +28,44 @@ Often times, you don't need to specifically know which point is the "anchor" and
   - [`startKey`](#startkey-string)
   - [`startOffset`](#startoffset-number)
 - [Checking Methods](#checking-methods)
+  - [`hasAnchorAtEndOf`](hasanchoratendof-node) => Boolean`
+  - [`hasAnchorAtStartOf`](hasanchoratstartof-node) => Boolean`
+  - [`hasAnchorBetween`](hasanchorbetween-node-start-end) => Boolean`
+  - [`hasAnchorIn`](hasanchorin-node-start-end) => Boolean`
+  - [`hasEdgeAtEndOf`](hasedgeatendof-node) => Boolean`
+  - [`hasEdgeAtStartOf`](hasedgeatstartof-node) => Boolean`
+  - [`hasEdgeBetween`](hasedgebetween-node-start-end) => Boolean`
+  - [`hasEdgeIn`](hasedgein-node-start-end) => Boolean`
+  - [`hasEndAtEndOf`](hasendatendof-node) => Boolean`
+  - [`hasEndAtStartOf`](hasendatstartof-node) => Boolean`
+  - [`hasEndBetween`](hasendbetween-node-start-end) => Boolean`
+  - [`hasEndIn`](hasendin-node-start-end) => Boolean`
+  - [`hasFocusAtEndOf`](hasfocusatendof-node) => Boolean`
+  - [`hasFocusAtStartOf`](hasfocusatstartof-node) => Boolean`
+  - [`hasFocusBetween`](hasfocusbetween-node-start-end) => Boolean`
+  - [`hasFocusIn`](hasfocusin-node-start-end) => Boolean`
+  - [`hasStartAtEndOf`](hasstartatendof-node) => Boolean`
+  - [`hasStartAtStartOf`](hasstartatstartof-node) => Boolean`
+  - [`hasStartBetween`](hasstartbetween-node-start-end) => Boolean`
+  - [`hasStartIn`](hasstartin-node-start-end) => Boolean`
+  - [`isAtEndOf`](isatendof-node) => Boolean`
+  - [`isAtStartOf`](isatstartof-node) => Boolean`
 - [Transforming Methods](#transforming-methods)
+  - [`blur`](blur)`
+  - [`extendBackward`](extendbackward-n)`
+  - [`extendForward`](extendforward-n)`
+  - [`extendToEndOf`](extendtoendof-node)`
+  - [`extendToStartOf`](extendtostartof-node)`
+  - [`focus`](focus)`
+  - [`moveBackward`](movebackward-n)`
+  - [`moveForward`](moveforward-n)`
+  - [`moveToAnchor`](movetoanchor)`
+  - [`moveToEndOf`](movetoendof-node)`
+  - [`moveToEnd`](movetoend)`
+  - [`moveToFocus`](movetofocus)`
+  - [`moveToRangeOf`](movetorangeof-node)`
+  - [`moveToStartOf`](movetostartof-node)`
+  - [`moveToStart`](movetostart)`
 
 
 ### Properties
