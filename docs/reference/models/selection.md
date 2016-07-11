@@ -9,7 +9,9 @@ Often times, you don't need to specifically know which point is the "anchor" and
 
 - [Module](#module)
 - [Properties](#properties)
-- [Methods](#methods)
+- [Computed Properties](#computed-properties)
+- [Checking Methods](#checking-methods)
+- [Transforming Methods](#transforming-methods)
 
 
 ### Module
@@ -82,25 +84,103 @@ The opposite of `isBackward`, for convenience.
 #### `endKey: String`
 #### `endOffset: Number`
 
-A few convenience properties for accessing the first and last point of the selection. When the selection is forward, `start` refers to the `anchor` point and `end` refers to the `focus` point, and when it's backward they are reversed.
+A few convenience properties for accessing the first and last point of the selection. When the selection is forward, `start` refers to the `anchor` point and `end` refers to the `focus` point. And when it's backward they are reversed.
 
 
-### Methods
+### Checking Methods
 
 #### `hasAnchorAtStartOf(node: Node) => Boolean`
 #### `hasFocusAtStartOf(node: Node) => Boolean`
 #### `hasStartAtStartOf(node: Node) => Boolean`
 #### `hasEndAtStartOf(node: Node) => Boolean`
+#### `hasEdgeAtStartOf(node: Node) => Boolean`
 
-Determine whether a selection has an edge at the start of a `node`. Where `{Edge}` can be one of: `Anchor`, `Focus`, `Start` or `End`.
+Determine whether a selection has an edge at the start of a `node`. Where `{Edge}` can be one of: `Anchor`, `Focus`, `Start`, `End` or `Edge` (referring to either point).
+
+#### `hasAnchorAtEndOf(node: Node) => Boolean`
+#### `hasFocusAtEndOf(node: Node) => Boolean`
+#### `hasStartAtEndOf(node: Node) => Boolean`
+#### `hasEndAtEndOf(node: Node) => Boolean`
+#### `hasEdgeAtEndOf(node: Node) => Boolean`
+
+Determine whether a selection has an edge at the end of a `node`. Where `{Edge}` can be one of: `Anchor`, `Focus`, `Start`, `End` or `Edge` (referring to either point).
+
+#### `hasAnchorBetween(node: Node, start: Number, end: Number) => Boolean`
+#### `hasFocusBetween(node: Node, start: Number, end: Number) => Boolean`
+#### `hasStartBetween(node: Node, start: Number, end: Number) => Boolean`
+#### `hasEndBetween(node: Node, start: Number, end: Number) => Boolean`
+#### `hasEdgeBetween(node: Node, start: Number, end: Number) => Boolean`
+
+Determine whether a selection has an edge in a `node` between its `start` and `end` offset. Where `{Edge}` can be one of: `Anchor`, `Focus`, `Start`, `End` or `Edge` (referring to either point).
+
+#### `hasAnchorIn(node: Node, start: Number, end: Number) => Boolean`
+#### `hasFocusIn(node: Node, start: Number, end: Number) => Boolean`
+#### `hasStartIn(node: Node, start: Number, end: Number) => Boolean`
+#### `hasEndIn(node: Node, start: Number, end: Number) => Boolean`
+#### `hasEdgeIn(node: Node, start: Number, end: Number) => Boolean`
+
+Determine whether a selection has an edge inside a `node`. Where edge can be one of: `Anchor`, `Focus`, `Start`, `End` or `Edge` (referring to either point).
+
+#### `isAtStartOf(node: Node) => Boolean`
+
+Determine whether the selection is at the start of a `node`.
+
+#### `isAtEndOf(node: Node) => Boolean`
+
+Determine whether the selection is at the end of a `node`.
 
 
-### Methods
+### Transforming Methods
 
-#### `getState() => State`
+Since `Selection`s are immutable, all of the transforming methods return a new instance of the selection.
 
-Return the editor's current internal state.
+#### `blur() => Selection`
 
-#### `onChange(state: State) => Void`
+Change the selection's `isFocused` property to `false`.
 
-Effectively the same as `setState`. Invoking this method will update the state of the editor, running it through all of it's plugins, and passing it the parent component, before it cycles back down as the new `state` property of the editor.
+#### `focus() => Selection`
+
+Change the selection's `isFocused` property to `true`.
+
+#### `moveToAnchor() => Selection`
+#### `moveToFocus() => Selection`
+#### `moveToStart() => Selection`
+#### `moveToEnd() => Selection`
+
+Move both of the selection's points to an edge, collapsing it.
+
+#### `moveToStartOf(node: Node) => Selection`
+
+Move both of the selection's points to the start of a `node`.
+
+#### `moveToEndOf(node: Node) => Selection`
+
+Move both of the selection's points to the end of a `node`.
+
+#### `moveToRangeOf(node: Node) => Selection`
+
+Move the selection's anchor point to the start of a `node`, and its focus point to the end of the same `node`.
+
+#### `moveForward(n = 1: Number) => Selection`
+
+Increase the selection's `anchorOffset` and `focusOffset` by `n`, defaulting to `1`.
+
+#### `moveBackward(n = 1: Number) => Selection`
+
+Decrease the selection's `anchorOffset` and `focusOffset` by `n`, defaulting to `1`.
+
+#### `extendForward(n = 1: Number) => Selection`
+
+Increase the selection's `focusOffset` by `n`, default to `1`.
+
+#### `extendBackward(n = 1: Number) => Selection`
+
+Decrease the selection's `focusOffset` by `n`, default to `1`.
+
+#### `extendToStartOf(node: Node) => Selection`
+
+Move the selection's `focusOffset` to the start of a `node`.
+
+#### `extendToEndOf(node: Node) => Selection`
+
+Move the selection's `focusOffset` to the end of a `node`.
