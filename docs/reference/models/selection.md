@@ -28,25 +28,25 @@ Often times, you don't need to specifically know which point is the "anchor" and
   - [`startKey`](#startkey-string)
   - [`startOffset`](#startoffset-number)
 - [Checking Methods](#checking-methods)
-  - [`has{Edge}AtEndOf`](hasedgeatendof-node)
-  - [`has{Edge}AtStartOf`](hasedgeatstartof-node)
-  - [`has{Edge}Between`](hasedgebetween-node-start-end)
-  - [`has{Edge}In`](hasedgein-node-start-end)
-  - [`isAtEndOf`](isatendof-node)
-  - [`isAtStartOf`](isatstartof-node)
+  - [`has{Edge}AtEndOf(node)`](hasedgeatendof-node)
+  - [`has{Edge}AtStartOf(node)`](hasedgeatstartof-node)
+  - [`has{Edge}Between(node, start, end)`](hasedgebetween-node-start-end)
+  - [`has{Edge}In(node)`](hasedgein-node)
+  - [`isAtEndOf(node)`](isatendof-node)
+  - [`isAtStartOf(node)`](isatstartof-node)
 - [Transforming Methods](#transforming-methods)
-  - [`blur`](blur)
-  - [`extendBackward`](extendbackward-n)
-  - [`extendForward`](extendforward-n)
-  - [`extendToEndOf`](extendtoendof-node)
-  - [`extendToStartOf`](extendtostartof-node)
-  - [`focus`](focus)
-  - [`moveBackward`](movebackward-n)
-  - [`moveForward`](moveforward-n)
-  - [`moveToEndOf`](movetoendof-node)
-  - [`moveToRangeOf`](movetorangeof-node)
-  - [`moveToStartOf`](movetostartof-node)
-  - [`moveTo{Edge}`](movetoedge)
+  - [`blur()`](blur)
+  - [`extendBackward(n)`](extendbackward-n)
+  - [`extendForward(n)`](extendforward-n)
+  - [`extendToEndOf(node)`](extendtoendof-node)
+  - [`extendToStartOf(node)`](extendtostartof-node)
+  - [`focus()`](focus)
+  - [`moveBackward(n)`](movebackward-n)
+  - [`moveForward(n)`](moveforward-n)
+  - [`moveToEndOf(node)`](movetoendof-node)
+  - [`moveToRangeOf(node)`](movetorangeof-node)
+  - [`moveToStartOf(node)`](movetostartof-node)
+  - [`moveTo{Edge}()`](movetoedge)
 
 
 ### Properties
@@ -170,19 +170,19 @@ Move both of the selection's points to the end of a `node`.
 
 Move the selection's anchor point to the start of a `node`, and its focus point to the end of the same `node`.
 
-#### `moveForward(n = 1: Number) => Selection`
+#### `moveForward([n = 1: Number]) => Selection`
 
 Increase the selection's `anchorOffset` and `focusOffset` by `n`, defaulting to `1`.
 
-#### `moveBackward(n = 1: Number) => Selection`
+#### `moveBackward([n = 1: Number]) => Selection`
 
 Decrease the selection's `anchorOffset` and `focusOffset` by `n`, defaulting to `1`.
 
-#### `extendForward(n = 1: Number) => Selection`
+#### `extendForward([n = 1: Number]) => Selection`
 
 Increase the selection's `focusOffset` by `n`, default to `1`.
 
-#### `extendBackward(n = 1: Number) => Selection`
+#### `extendBackward([n = 1: Number]) => Selection`
 
 Decrease the selection's `focusOffset` by `n`, default to `1`.
 
