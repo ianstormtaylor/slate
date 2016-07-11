@@ -48,7 +48,7 @@ They are convenience properties, such that passing any of them will be treated e
 For example:
 
 ```js
-const plugins = [myPlugin]
+const plugins = [somePlugin]
 
 <Editor
   onChange={myOnChangeHandler}
@@ -60,11 +60,13 @@ const plugins = [myPlugin]
 Is equivalent to passing an additional, first-priority plugin, like:
 
 ```js
+const editorPlugin = {
+  onChange: myOnChangeHandler 
+}
+
 const plugins = [
-  { 
-    onChange: myOnChangeHandler 
-  },
-  myPlugin
+  editorPlugin,
+  somePlugin
 ]
 
 <Editor
