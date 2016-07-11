@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
-  "main": "./lib/index.js",
+  "main": "./dist/index.js",
   "scripts": {
     "prepublish": "make dist",
     "test": "make check"

@@ -26,7 +26,7 @@ check: lint test
 
 # Remove the generated files.
 clean:
-	@ rm -rf ./dist
+	@ rm -rf ./dist ./node_modules
 
 # Build the source.
 dist:  $(shell find ./lib) package.json
