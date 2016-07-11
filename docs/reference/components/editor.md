@@ -39,9 +39,33 @@ An array of [`Plugins`](../plugins) that define the editor's behavior.
 
 A [`State`](../models/state) object representing the current state of the editor.
 
-#### Plugin-like properties...
+#### `...`
 
-All other properties of the editor are equivalent to the properties of a [`Plugin`](../plugins)
+All other properties of the editor are equivalent to the properties of a [`Plugin`](../plugins). 
+
+They are convenience properties, such that passing any of them will be treated equivalently to passing them on the first plugin in the stack with those properties.
+
+For example:
+
+```js
+<Editor
+  onChange={myFunction}
+  state={state}
+/>
+```
+
+Is equivalent to:
+
+```js
+const plugins = [
+  { myFunction }
+]
+
+<Editor
+  plugins={plugins}
+  state={state}
+/>
+```
 
 
 ### Methods
