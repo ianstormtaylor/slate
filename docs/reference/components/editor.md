@@ -11,7 +11,7 @@ The top-level React component that renders the Slate editor itself.
   - [`onChange`](#onchange-function)
   - [`plugins`](#plugins-array)
   - [`state`](#state-state)
-  - [`...`](#)
+  - [`more...`](#more)
 - [Methods](#methods)
   - [`getState()`](#getstate-state)
   - [`onChange(state)`](#onchange-state-void)
@@ -39,7 +39,7 @@ An array of [`Plugins`](../plugins) that define the editor's behavior.
 
 A [`State`](../models/state) object representing the current state of the editor.
 
-#### `...`
+#### `more...`
 
 In addition to those two properties, the editor allows passing any of the properties that a [`Plugin`](../plugins) can define: 
 
