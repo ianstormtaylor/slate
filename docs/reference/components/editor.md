@@ -3,8 +3,6 @@
 
 The top-level React component that renders the Slate editor itself.
 
-The editor takes a `State` instance that contains it's content and selection, and an array of `plugins` that define its behavior. 
-
 
 ### Properties
 
@@ -51,7 +49,9 @@ These properties are actually just a convenience—an implicit plugin defintion.
 For example, these two snippets of code are equivalent:
 
 ```js
-const plugins = [somePlugin]
+const plugins = [
+  somePlugin
+]
 
 <Editor
   onKeyDown={myKeyHandler}
