@@ -31,6 +31,12 @@ These properties are actually an implicit plugin defintion. Internally, they are
 
 ### Properties
 
+#### `onChange(state)`
+
+A change handler that will be called with the newly-changed editor `state`. You should usually pass the newly changed `state` back into the editor through its `state` property.
+
+This is how you can add persistence logic to your editor.
+
 #### `plugins`
 
 An array of [`Plugins`](../plugins) that define the editor's behavior.
@@ -43,15 +49,13 @@ A [`State`](../models/state) object representing the current state of the editor
 
 All of the other properties of the editor are equivalent to the properties of a [`Plugin`](../plugins). 
 
-They are convenience properties, such that passing any of them will be treated equivalently to passing them on the first plugin in the stack with those properties.
-
-For example:
+They are convenience properties, treated equivalently to passing them as the first plugin in the plugin stack. For example:
 
 ```js
 const plugins = [somePlugin]
 
 <Editor
-  onChange={myOnChangeHandler}
+  onKeyDown={myKeyHandler}
   plugins={plugins}
   state={state}
 />
@@ -61,7 +65,7 @@ Is equivalent to passing an additional, first-priority plugin, like:
 
 ```js
 const editorPlugin = {
-  onChange: myOnChangeHandler 
+  onKeyDown: myKeyHandler 
 }
 
 const plugins = [
