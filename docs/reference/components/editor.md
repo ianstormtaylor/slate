@@ -79,14 +79,10 @@ const plugins = [
 
 ### Methods
 
-#### getState
-
-`getState() => State`
+#### `getState() => State`
 
 Return the editor's current internal state.
 
-#### onChange
-
-`onChange(state: State) => Void`
+#### `onChange(state: State) => Void`
 
 Effectively the same as `setState`. Invoking this method will update the state of the editor, running it through all of it's plugins, and passing it the parent component, before it cycles back down as the new `state` property of the editor.
