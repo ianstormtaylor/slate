@@ -1,18 +1,20 @@
 
 ### `<Editor>`
 
-The top-level React component that renders the Slate editor itself.
-
-- [Module](#module)
-- [Properties](#properties)
-- [Methods](#methods)
-
-
-### Module
-
 ```js
 import { Editor } from 'Slate'
 ```
+
+The top-level React component that renders the Slate editor itself.
+
+- [Properties](#properties)
+  - [`onChange`](#onchange-function)
+  - [`plugins`](#plugins-array)
+  - [`state`](#state-state)
+  - [`...`](#)
+- [Methods](#methods)
+  - [`getState()`](#getstate-state)
+  - [`onChange(state)`](#onchange-state-void)
 
 
 ### Properties

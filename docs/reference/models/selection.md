@@ -28,10 +28,10 @@ Often times, you don't need to specifically know which point is the "anchor" and
   - [`startKey`](#startkey-string)
   - [`startOffset`](#startoffset-number)
 - [Checking Methods](#checking-methods)
-  - [`has{Edge}AtEndOf`](has-edge-atendof-node)
-  - [`has{Edge}AtStartOf`](has-edge-atstartof-node)
-  - [`has{Edge}Between`](has-edge-between-node-start-end)
-  - [`has{Edge}In`](has-edge-in-node-start-end)
+  - [`has{Edge}AtEndOf`](hasedgeatendof-node)
+  - [`has{Edge}AtStartOf`](hasedgeatstartof-node)
+  - [`has{Edge}Between`](hasedgebetween-node-start-end)
+  - [`has{Edge}In`](hasedgein-node-start-end)
   - [`isAtEndOf`](isatendof-node)
   - [`isAtStartOf`](isatstartof-node)
 - [Transforming Methods](#transforming-methods)
@@ -46,7 +46,7 @@ Often times, you don't need to specifically know which point is the "anchor" and
   - [`moveToEndOf`](movetoendof-node)
   - [`moveToRangeOf`](movetorangeof-node)
   - [`moveToStartOf`](movetostartof-node)
-  - [`moveTo{Edge}`](moveto-edge)
+  - [`moveTo{Edge}`](movetoedge)
 
 
 ### Properties
