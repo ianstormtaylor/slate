@@ -1,4 +1,6 @@
 
+# Guides
+
 These guides introduce you to the different parts of Slate in a step-by-step way that build on each other, perfect for getting started. We recommend reading them in order, start to finish!
 
 - [Installing Slate](./installing-slate.md)
