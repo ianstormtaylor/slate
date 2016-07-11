@@ -27,6 +27,8 @@ Often times, you don't need to specifically know which point is the "anchor" and
   - [`isForward`](#isForward-boolean)
   - [`startKey`](#startkey-string)
   - [`startOffset`](#startoffset-number)
+- [Static Methods](#static-methods)
+  - [`create(properties)`](#create-properties) 
 - [Checking Methods](#checking-methods)
   - [`has{Edge}AtEndOf(node)`](hasedgeatendof-node)
   - [`has{Edge}AtStartOf(node)`](hasedgeatstartof-node)
@@ -52,7 +54,7 @@ Often times, you don't need to specifically know which point is the "anchor" and
 ## Properties
 
 ```js
-new Selection({
+Selection({
   anchorKey: String,
   anchorOffset: Number,
   focusKey: String,
@@ -113,6 +115,13 @@ The opposite of `isBackward`, for convenience.
 #### `endOffset: Number`
 
 A few convenience properties for accessing the first and last point of the selection. When the selection is forward, `start` refers to the `anchor` point and `end` refers to the `focus` point. And when it's backward they are reversed.
+
+
+## Static Methods
+
+#### `create(properties)`
+
+Create a new `Selection` instance with `properties`.
 
 
 ## Checking Methods

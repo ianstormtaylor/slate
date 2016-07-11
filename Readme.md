@@ -70,7 +70,7 @@ If you're using Slate for the first time, check out the [Getting Started](./docs
 
 - **Reference**
   - Components
-    - Editor
+    - [Editor](docs/reference/components/editor.md)
   - Models
     - Block
     - Character
@@ -79,7 +79,7 @@ If you're using Slate for the first time, check out the [Getting Started](./docs
     - Inline
     - Mark
     - Node
-    - Selection
+    - [Selection](docs/reference/models/selection.md)
     - State
     - Text
     - Transform
