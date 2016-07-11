@@ -3,6 +3,9 @@
 
 The top-level React component that renders the Slate editor itself.
 
+- [Properties](#properties)
+- [Methods](#methods)
+
 
 ### Properties
 
