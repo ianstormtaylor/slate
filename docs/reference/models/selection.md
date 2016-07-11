@@ -1,28 +1,34 @@
 
 ### `Selection`
 
+```js
+import { Selection } from 'Slate'
+```
+
 A selection in the document. Selections in Slate are modeled after the native [DOM Selection API](https://developer.mozilla.org/en-US/docs/Web/API/Selection), using terms like "anchor", "focus" and "collapsed".
 
 The "anchor" is the fixed point in a selection, and the "focus" is the non-fixed point, which may move when you move the cursor (eg. when pressing `Shift + Right Arrow`).
 
 Often times, you don't need to specifically know which point is the "anchor" and which is the "focus", and you just need to know which comes first and last in the document. For these cases, there are many convenience equivalent properties and methods referring to the "start" and "end" points.
 
-- [Module](#module)
 - [Properties](#properties)
   - [`anchorKey`](#anchorkey-string)
   - [`anchorOffset`](#anchoroffset-number)
   - [`focusKey`](#focuskey-string)
   - [`focusOffset`](#focusoffset-number)
+  - [`isBackward`](#isbackward-boolean)
+  - [`isFocused`](#isfocused-boolean)
 - [Computed Properties](#computed-properties)
+  - [`endKey`](#endkey-string)
+  - [`endOffset`](#endoffset-number) 
+  - [`isBlurred`](#isblurred-boolean)
+  - [`isCollapsed`](#iscollapsed-boolean)
+  - [`isExpanded`](#isExpanded-boolean)
+  - [`isForward`](#isForward-boolean)
+  - [`startKey`](#startkey-string)
+  - [`startOffset`](#startoffset-number)
 - [Checking Methods](#checking-methods)
 - [Transforming Methods](#transforming-methods)
-
-
-### Module
-
-```js
-import { Selection } from 'Slate'
-```
 
 
 ### Properties
