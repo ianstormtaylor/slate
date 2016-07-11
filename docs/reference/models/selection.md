@@ -28,7 +28,7 @@ Often times, you don't need to specifically know which point is the "anchor" and
   - [`startKey`](#startkey-string)
   - [`startOffset`](#startoffset-number)
 - [Static Methods](#static-methods)
-  - [`create(properties)`](#create-properties) 
+  - [`Selection.create(properties)`](#create-properties) 
 - [Checking Methods](#checking-methods)
   - [`has{Edge}AtEndOf(node)`](hasedgeatendof-node)
   - [`has{Edge}AtStartOf(node)`](hasedgeatstartof-node)
@@ -119,7 +119,7 @@ A few convenience properties for accessing the first and last point of the selec
 
 ## Static Methods
 
-#### `create(properties)`
+#### `Selection.create(properties)`
 
 Create a new `Selection` instance with `properties`.
 
