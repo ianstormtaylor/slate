@@ -28,25 +28,25 @@ Often times, you don't need to specifically know which point is the "anchor" and
   - [`startKey`](#startkey-string)
   - [`startOffset`](#startoffset-number)
 - [Checking Methods](#checking-methods)
-  - [`has{Edge}AtEndOf`](hasanchoratendof-node)`
-  - [`has{Edge}AtStartOf`](hasanchoratstartof-node)`
-  - [`has{Edge}Between`](hasanchorbetween-node-start-end)`
-  - [`has{Edge}In`](hasanchorin-node-start-end)`
-  - [`isAtEndOf`](isatendof-node)`
-  - [`isAtStartOf`](isatstartof-node)`
+  - [`has{Edge}AtEndOf`](has-edge-atendof-node)
+  - [`has{Edge}AtStartOf`](has-edge-atstartof-node)
+  - [`has{Edge}Between`](has-edge-between-node-start-end)
+  - [`has{Edge}In`](has-edge-in-node-start-end)
+  - [`isAtEndOf`](isatendof-node)
+  - [`isAtStartOf`](isatstartof-node)
 - [Transforming Methods](#transforming-methods)
-  - [`blur`](blur)`
-  - [`extendBackward`](extendbackward-n)`
-  - [`extendForward`](extendforward-n)`
-  - [`extendToEndOf`](extendtoendof-node)`
-  - [`extendToStartOf`](extendtostartof-node)`
-  - [`focus`](focus)`
-  - [`moveBackward`](movebackward-n)`
-  - [`moveForward`](moveforward-n)`
-  - [`moveToEndOf`](movetoendof-node)`
-  - [`moveToRangeOf`](movetorangeof-node)`
-  - [`moveToStartOf`](movetostartof-node)`
-  - [`moveTo{Point}`](movetoanchor)`
+  - [`blur`](blur)
+  - [`extendBackward`](extendbackward-n)
+  - [`extendForward`](extendforward-n)
+  - [`extendToEndOf`](extendtoendof-node)
+  - [`extendToStartOf`](extendtostartof-node)
+  - [`focus`](focus)
+  - [`moveBackward`](movebackward-n)
+  - [`moveForward`](moveforward-n)
+  - [`moveToEndOf`](movetoendof-node)
+  - [`moveToRangeOf`](movetorangeof-node)
+  - [`moveToStartOf`](movetostartof-node)
+  - [`moveTo{Edge}`](moveto-edge)
 
 
 ### Properties
