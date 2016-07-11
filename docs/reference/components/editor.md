@@ -29,7 +29,7 @@ The editor takes a `State` instance that contains it's content and selection, an
 These properties are actually an implicit plugin defintion. Internally, they are grouped together and turned into a plugin that is given first priority in the plugin stack. 
 
 
-#### Properties
+### Properties
 
 #### `plugins`
 
@@ -44,7 +44,7 @@ A [`State`](../models/state) object representing the current state of the editor
 All other properties of the editor are equivalent to the properties of a [`Plugin`](../plugins)
 
 
-#### Methods
+### Methods
 
 #### `getState()`
 
