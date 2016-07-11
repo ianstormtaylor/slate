@@ -1,5 +1,5 @@
 
-## `Selection`
+# `Selection`
 
 ```js
 import { Selection } from 'Slate'
