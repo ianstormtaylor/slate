@@ -9,6 +9,10 @@ Often times, you don't need to specifically know which point is the "anchor" and
 
 - [Module](#module)
 - [Properties](#properties)
+  - [`anchorKey`](#anchorkey-string)
+  - [`anchorOffset`](#anchoroffset-number)
+  - [`focusKey`](#focuskey-string)
+  - [`focusOffset`](#focusoffset-number)
 - [Computed Properties](#computed-properties)
 - [Checking Methods](#checking-methods)
 - [Transforming Methods](#transforming-methods)
