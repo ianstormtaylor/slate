@@ -1,5 +1,5 @@
 
-### `<Editor>`
+# `<Editor>`
 
 ```js
 import { Editor } from 'Slate'
@@ -17,7 +17,7 @@ The top-level React component that renders the Slate editor itself.
   - [`onChange(state)`](#onchange-state-void)
 
 
-### Properties
+## Properties
 
 ```js
 <Editor
@@ -90,7 +90,7 @@ const plugins = [
 ```
 
 
-### Methods
+## Methods
 
 #### `getState() => State`
 
