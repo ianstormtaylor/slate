@@ -1,5 +1,5 @@
 
-### `Selection`
+## `Selection`
 
 ```js
 import { Selection } from 'Slate'
@@ -49,7 +49,7 @@ Often times, you don't need to specifically know which point is the "anchor" and
   - [`moveTo{Edge}()`](movetoedge)
 
 
-### Properties
+## Properties
 
 ```js
 new Selection({
@@ -87,7 +87,7 @@ Whether the selection is backward. A selection is considered "backward" when its
 Whether the selection currently has focus.
 
 
-### Computed Properties
+## Computed Properties
 
 These properties aren't supplied when creating a selection, but are instead computed based on the real properties.
 
@@ -115,7 +115,7 @@ The opposite of `isBackward`, for convenience.
 A few convenience properties for accessing the first and last point of the selection. When the selection is forward, `start` refers to the `anchor` point and `end` refers to the `focus` point. And when it's backward they are reversed.
 
 
-### Checking Methods
+## Checking Methods
 
 #### `has{Edge}AtStartOf(node: Node) => Boolean`
 
@@ -142,7 +142,7 @@ Determine whether the selection is at the start of a `node`.
 Determine whether the selection is at the end of a `node`.
 
 
-### Transforming Methods
+## Transforming Methods
 
 Since `Selection`s are immutable, all of the transforming methods return a new instance of the selection.
 
