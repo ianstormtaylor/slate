@@ -3,34 +3,18 @@
 
 The top-level React component that renders the Slate editor itself.
 
-```js
-<Editor
-  onChange={Function}
-  plugins={Array}
-  state={State}
-/>
-```
-
-The editor takes a `State` instance that contains it's content and selection, and an array of `plugins` that define its behavior. In addition to those two properties, the editor allows passing any of the properties that a plugin can define: 
-
-```js
-<Editor
-  onBeforeInput={Function}
-  onChange={Function}
-  onKeyDown={Function}
-  onPaste={Function}
-  plugins={Array}
-  renderDecorations={Function}
-  renderMark={Function}
-  renderNode={Function}
-  state={State}
-/>
-```
-
-These properties are actually an implicit plugin defintion. Internally, they are grouped together and turned into a plugin that is given first priority in the plugin stack. 
+The editor takes a `State` instance that contains it's content and selection, and an array of `plugins` that define its behavior. 
 
 
 ### Properties
+
+```js
+<Editor
+  onChange={Function}
+  plugins={Array}
+  state={State}
+/>
+```
 
 #### `onChange: Function`
 
@@ -46,7 +30,25 @@ A [`State`](../models/state) object representing the current state of the editor
 
 #### `...`
 
-All of the other properties of the editor are equivalent to the properties of a [`Plugin`](../plugins). They are convenience properties, treated equivalently to passing them as the first plugin in the plugin stack. For example:
+In addition to those two properties, the editor allows passing any of the properties that a [`Plugin`](../plugins) can define: 
+
+```js
+<Editor
+  onBeforeInput={Function}
+  onChange={Function}
+  onKeyDown={Function}
+  onPaste={Function}
+  plugins={Array}
+  renderDecorations={Function}
+  renderMark={Function}
+  renderNode={Function}
+  state={State}
+/>
+```
+
+These properties are actually just a convenience—an implicit plugin defintion. Internally, they are grouped together and turned into a plugin that is given first priority in the plugin stack. 
+
+For example, these two snippets of code are equivalent:
 
 ```js
 const plugins = [somePlugin]
@@ -57,8 +59,6 @@ const plugins = [somePlugin]
   state={state}
 />
 ```
-
-Is equivalent to passing an additional, first-priority plugin, like:
 
 ```js
 const editorPlugin = {
@@ -85,4 +85,4 @@ Return the editor's current internal state.
 
 #### `onChange(state: State)`
 
-Effectively the same as `setState`, invoking this method will update the state of the editor, running it through all of it's plugins, and passing it the parent component, before it cycles back down as the new `state` property of the editor.
+Effectively the same as `setState`. Invoking this method will update the state of the editor, running it through all of it's plugins, and passing it the parent component, before it cycles back down as the new `state` property of the editor.
