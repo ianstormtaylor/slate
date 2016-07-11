@@ -28,28 +28,12 @@ Often times, you don't need to specifically know which point is the "anchor" and
   - [`startKey`](#startkey-string)
   - [`startOffset`](#startoffset-number)
 - [Checking Methods](#checking-methods)
-  - [`hasAnchorAtEndOf`](hasanchoratendof-node) => Boolean`
-  - [`hasAnchorAtStartOf`](hasanchoratstartof-node) => Boolean`
-  - [`hasAnchorBetween`](hasanchorbetween-node-start-end) => Boolean`
-  - [`hasAnchorIn`](hasanchorin-node-start-end) => Boolean`
-  - [`hasEdgeAtEndOf`](hasedgeatendof-node) => Boolean`
-  - [`hasEdgeAtStartOf`](hasedgeatstartof-node) => Boolean`
-  - [`hasEdgeBetween`](hasedgebetween-node-start-end) => Boolean`
-  - [`hasEdgeIn`](hasedgein-node-start-end) => Boolean`
-  - [`hasEndAtEndOf`](hasendatendof-node) => Boolean`
-  - [`hasEndAtStartOf`](hasendatstartof-node) => Boolean`
-  - [`hasEndBetween`](hasendbetween-node-start-end) => Boolean`
-  - [`hasEndIn`](hasendin-node-start-end) => Boolean`
-  - [`hasFocusAtEndOf`](hasfocusatendof-node) => Boolean`
-  - [`hasFocusAtStartOf`](hasfocusatstartof-node) => Boolean`
-  - [`hasFocusBetween`](hasfocusbetween-node-start-end) => Boolean`
-  - [`hasFocusIn`](hasfocusin-node-start-end) => Boolean`
-  - [`hasStartAtEndOf`](hasstartatendof-node) => Boolean`
-  - [`hasStartAtStartOf`](hasstartatstartof-node) => Boolean`
-  - [`hasStartBetween`](hasstartbetween-node-start-end) => Boolean`
-  - [`hasStartIn`](hasstartin-node-start-end) => Boolean`
-  - [`isAtEndOf`](isatendof-node) => Boolean`
-  - [`isAtStartOf`](isatstartof-node) => Boolean`
+  - [`has{Edge}AtEndOf`](hasanchoratendof-node)`
+  - [`has{Edge}AtStartOf`](hasanchoratstartof-node)`
+  - [`has{Edge}Between`](hasanchorbetween-node-start-end)`
+  - [`has{Edge}In`](hasanchorin-node-start-end)`
+  - [`isAtEndOf`](isatendof-node)`
+  - [`isAtStartOf`](isatstartof-node)`
 - [Transforming Methods](#transforming-methods)
   - [`blur`](blur)`
   - [`extendBackward`](extendbackward-n)`
@@ -59,13 +43,10 @@ Often times, you don't need to specifically know which point is the "anchor" and
   - [`focus`](focus)`
   - [`moveBackward`](movebackward-n)`
   - [`moveForward`](moveforward-n)`
-  - [`moveToAnchor`](movetoanchor)`
   - [`moveToEndOf`](movetoendof-node)`
-  - [`moveToEnd`](movetoend)`
-  - [`moveToFocus`](movetofocus)`
   - [`moveToRangeOf`](movetorangeof-node)`
   - [`moveToStartOf`](movetostartof-node)`
-  - [`moveToStart`](movetostart)`
+  - [`moveTo{Point}`](movetoanchor)`
 
 
 ### Properties
@@ -136,37 +117,21 @@ A few convenience properties for accessing the first and last point of the selec
 
 ### Checking Methods
 
-#### `hasAnchorAtStartOf(node: Node) => Boolean`
-#### `hasFocusAtStartOf(node: Node) => Boolean`
-#### `hasStartAtStartOf(node: Node) => Boolean`
-#### `hasEndAtStartOf(node: Node) => Boolean`
-#### `hasEdgeAtStartOf(node: Node) => Boolean`
+#### `has{Edge}AtStartOf(node: Node) => Boolean`
 
 Determine whether a selection has an edge at the start of a `node`. Where `{Edge}` can be one of: `Anchor`, `Focus`, `Start`, `End` or `Edge` (referring to either point).
 
-#### `hasAnchorAtEndOf(node: Node) => Boolean`
-#### `hasFocusAtEndOf(node: Node) => Boolean`
-#### `hasStartAtEndOf(node: Node) => Boolean`
-#### `hasEndAtEndOf(node: Node) => Boolean`
-#### `hasEdgeAtEndOf(node: Node) => Boolean`
+#### `has{Edge}AtEndOf(node: Node) => Boolean`
 
 Determine whether a selection has an edge at the end of a `node`. Where `{Edge}` can be one of: `Anchor`, `Focus`, `Start`, `End` or `Edge` (referring to either point).
 
-#### `hasAnchorBetween(node: Node, start: Number, end: Number) => Boolean`
-#### `hasFocusBetween(node: Node, start: Number, end: Number) => Boolean`
-#### `hasStartBetween(node: Node, start: Number, end: Number) => Boolean`
-#### `hasEndBetween(node: Node, start: Number, end: Number) => Boolean`
-#### `hasEdgeBetween(node: Node, start: Number, end: Number) => Boolean`
+#### `has{Edge}Between(node: Node, start: Number, end: Number) => Boolean`
 
 Determine whether a selection has an edge in a `node` between its `start` and `end` offset. Where `{Edge}` can be one of: `Anchor`, `Focus`, `Start`, `End` or `Edge` (referring to either point).
 
-#### `hasAnchorIn(node: Node, start: Number, end: Number) => Boolean`
-#### `hasFocusIn(node: Node, start: Number, end: Number) => Boolean`
-#### `hasStartIn(node: Node, start: Number, end: Number) => Boolean`
-#### `hasEndIn(node: Node, start: Number, end: Number) => Boolean`
-#### `hasEdgeIn(node: Node, start: Number, end: Number) => Boolean`
+#### `has{Edge}In(node: Node, start: Number, end: Number) => Boolean`
 
-Determine whether a selection has an edge inside a `node`. Where edge can be one of: `Anchor`, `Focus`, `Start`, `End` or `Edge` (referring to either point).
+Determine whether a selection has an edge inside a `node`. Where `{Edge}` can be one of: `Anchor`, `Focus`, `Start`, `End` or `Edge` (referring to either point).
 
 #### `isAtStartOf(node: Node) => Boolean`
 
@@ -189,12 +154,9 @@ Change the selection's `isFocused` property to `false`.
 
 Change the selection's `isFocused` property to `true`.
 
-#### `moveToAnchor() => Selection`
-#### `moveToFocus() => Selection`
-#### `moveToStart() => Selection`
-#### `moveToEnd() => Selection`
+#### `moveTo{Edge}() => Selection`
 
-Move both of the selection's points to an edge, collapsing it.
+Move both of the selection's points to an edge, collapsing it. Where `{Edge}` can be one of: `Anchor`, `Focus`, `Start` or `End`.
 
 #### `moveToStartOf(node: Node) => Selection`
 
