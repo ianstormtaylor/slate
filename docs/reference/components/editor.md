@@ -41,24 +41,30 @@ A [`State`](../models/state) object representing the current state of the editor
 
 #### `...`
 
-All other properties of the editor are equivalent to the properties of a [`Plugin`](../plugins). 
+All of the other properties of the editor are equivalent to the properties of a [`Plugin`](../plugins). 
 
 They are convenience properties, such that passing any of them will be treated equivalently to passing them on the first plugin in the stack with those properties.
 
 For example:
 
 ```js
+const plugins = [myPlugin]
+
 <Editor
-  onChange={myFunction}
+  onChange={myOnChangeHandler}
+  plugins={plugins}
   state={state}
 />
 ```
 
-Is equivalent to:
+Is equivalent to passing an additional, first-priority plugin, like:
 
 ```js
 const plugins = [
-  { myFunction }
+  { 
+    onChange: myOnChangeHandler 
+  },
+  myPlugin
 ]
 
 <Editor
