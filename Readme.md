@@ -52,7 +52,7 @@ If you have an idea for an example that shows a common use case, pull request it
 <br/>
 ### Plugins
 
-Slate encourages you to write small, reusable modules. Check out the list of public modules that you can use in your project!
+Slate encourages you to write small, reusable modules. Check out the public ones you can use in your project!
 
 - [**Plugins**](wiki#plugins) 
 - [**Serializers**](wiki#serializers)
