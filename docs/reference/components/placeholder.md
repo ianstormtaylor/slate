@@ -40,22 +40,22 @@ React child elements to render inside the placeholder `<span>` element.
 
 An optional class name string to add to the placeholder `<span>` element.
 
-### `node
+### `node`
 `Node`
 
 The node to render the placeholder element on top of. The placeholder is positioned absolutely, covering the entire node.
 
-### `parent
+### `parent`
 `Node`
 
 The node to check for non-empty content, to determine whether the placeholder should be shown or not.
 
-### `state
+### `state`
 `State`
 
 The current state of the editor.
 
-### `style
+### `style`
 `Object`
 
 An optional dictionary of styles to pass to the placeholder `<span>` element.
