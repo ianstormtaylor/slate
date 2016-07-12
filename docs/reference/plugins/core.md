@@ -36,7 +36,7 @@ The core plugin adds a default mark with an empty set of styles.
 
 ## Overriding Defaults
 
-Any plugin you add to the editor will override the default behavior of the core plugin simply because it is always resolved last.
+Any plugin you add to the editor will override the default behavior of the core plugin, because it is always resolved last.
 
 However, sometimes you might want to disable the logic of the core plugin without actually adding any logic yourself. For example, you might want to prevent the `enter` key from performing any action. In those cases, you'll need to define a "noop" handler. 
 
