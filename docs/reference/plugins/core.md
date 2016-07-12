@@ -1,7 +1,7 @@
 
 # Core Plugin
 
-Slate's editor is very unopinionated. The only logic it handles by default is logic associated with the `contenteditable` functionality itself—managing text, selections, etc.
+Slate's editor is very unopinionated. The only logic it handles by default is logic associated with the `contenteditable` functionality itself—managing text, selections, etc. That logic in contained in a single plugin, called the "core" plugin.
 
 - [Default Behavior](#behavior)
 - [Overriding Defaults](#overriding-defaults)
@@ -13,15 +13,15 @@ The default behavior of the core plugin performs the following logic:
 
 #### `onBeforeInput`
 
-When `onBeforeInput` is triggered, the core plugin simply inserts the text from `event.data` into the editor.
+When text is entered, the core plugin inserts the text from `event.data` into the editor.
 
 #### `onKeyDown`
 
-When `onKeyDown` is triggered, the core plugin handles performing some of the "native" behavior that `contenteditable` elements must do. For example it splits blocks on `enter`, removes characters `backspace`, triggers an undo state from the history on `cmd-z`, etc.
+When a key is pressed, the core plugin handles performing some of the "native" behavior that `contenteditable` elements must do. For example it splits blocks on `enter`, removes characters `backspace`, triggers an undo state from the history on `cmd-z`, etc.
 
 #### `onPaste`
 
-When `onPaste` is triggered, the core plugin handles all pastes of type `text` and `html` as plain text, and does nothing for those of type `files`. 
+When the user pastes content into the editor, the core plugin handles all pastes of type `text` and `html` as plain text, and does nothing for pastes of type `files`. 
 
 #### `renderNode`
 
