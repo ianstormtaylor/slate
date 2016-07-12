@@ -66,13 +66,13 @@ An optional dictionary of styles to apply to the content editable element.
 
 ```js
 <Editor
-  placeholder={Any}
-  placeholderClassName={string}
+  placeholder={String || Element}
+  placeholderClassName={String}
   placeholderStyle={Object}
 />
 ```
 
-#### `placeholder: Text or Element`
+#### `placeholder: String || Element`
 
 A placeholder string (or React element) that will be rendered as the default block type's placeholder.
 
