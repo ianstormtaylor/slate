@@ -16,7 +16,7 @@ const NODES = {
   link: (props) => {
     const { data } = props.node
     const href = data.get('href')
-    return <a href={href}>{props.children}</a>
+    return <a {...props.attributes} href={href}>{props.children}</a>
   }
 }
 

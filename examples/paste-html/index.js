@@ -10,22 +10,21 @@ import initialState from './state.json'
  */
 
 const NODES = {
-  'bulleted-list': props => <ul>{props.children}</ul>,
-  'code': props => <pre><code>{props.children}</code></pre>,
-  'heading-one': props => <h1>{props.children}</h1>,
-  'heading-two': props => <h2>{props.children}</h2>,
-  'heading-three': props => <h3>{props.children}</h3>,
-  'heading-four': props => <h4>{props.children}</h4>,
-  'heading-five': props => <h5>{props.children}</h5>,
-  'heading-six': props => <h6>{props.children}</h6>,
-  'list-item': props => <li>{props.children}</li>,
-  'numbered-list': props => <ol>{props.children}</ol>,
-  'paragraph': props => <p>{props.children}</p>,
-  'quote': props => <blockquote>{props.children}</blockquote>,
+  'bulleted-list': props => <ul {...props.attributes}>{props.children}</ul>,
+  'code': props => <pre><code {...props.attributes}>{props.children}</code></pre>,
+  'heading-one': props => <h1 {...props.attributes}>{props.children}</h1>,
+  'heading-two': props => <h2 {...props.attributes}>{props.children}</h2>,
+  'heading-three': props => <h3 {...props.attributes}>{props.children}</h3>,
+  'heading-four': props => <h4 {...props.attributes}>{props.children}</h4>,
+  'heading-five': props => <h5 {...props.attributes}>{props.children}</h5>,
+  'heading-six': props => <h6 {...props.attributes}>{props.children}</h6>,
+  'list-item': props => <li {...props.attributes}>{props.children}</li>,
+  'numbered-list': props => <ol {...props.attributes}>{props.children}</ol>,
+  'quote': props => <blockquote {...props.attributes}>{props.children}</blockquote>,
   'link': (props) => {
     const { data } = props.node
     const href = data.get('href')
-    return <a href={href}>{props.children}</a>
+    return <a href={href} {...props.attributes}>{props.children}</a>
   }
 }
 

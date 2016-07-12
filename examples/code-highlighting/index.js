@@ -12,8 +12,7 @@ import initialState from './state.json'
  */
 
 const NODES = {
-  code: props => <pre><code>{props.children}</code></pre>,
-  paragraph: props => <p>{props.children}</p>
+  code: props => <pre><code {...props.attributes}>{props.children}</code></pre>
 }
 
 /**

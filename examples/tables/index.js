@@ -11,10 +11,9 @@ import keycode from 'keycode'
  */
 
 const NODES = {
-  'paragraph': props => <p>{props.children}</p>,
-  'table': props => <table><tbody>{props.children}</tbody></table>,
-  'table-row': props => <tr>{props.children}</tr>,
-  'table-cell': props => <td>{props.children}</td>
+  'table': props => <table><tbody {...props.attributes}>{props.children}</tbody></table>,
+  'table-row': props => <tr {...props.attributes}>{props.children}</tr>,
+  'table-cell': props => <td {...props.attributes}>{props.children}</td>
 }
 
 /**

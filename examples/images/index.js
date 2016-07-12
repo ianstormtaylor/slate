@@ -12,13 +12,12 @@ import { Map } from 'immutable'
  */
 
 const NODES = {
-  paragraph: props => <p>{props.children}</p>,
   image: (props) => {
     const { node, state } = props
     const { data } = node
     const isActive = state.isFocused && state.blocks.includes(node)
     const src = data.get('src')
-    return <img src={src} data-active={isActive} />
+    return <img {...props.attributes} src={src} data-active={isActive} />
   }
 }
 

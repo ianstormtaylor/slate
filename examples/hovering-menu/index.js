@@ -6,16 +6,6 @@ import position from 'selection-position'
 import initialState from './state.json'
 
 /**
- * Node renderers.
- *
- * @type {Object}
- */
-
-const NODES = {
-  paragraph: props => <p>{props.children}</p>
-}
-
-/**
  * Mark renderers.
  *
  * @type {Object}
@@ -99,16 +89,11 @@ class HoveringMenu extends React.Component {
       <div className="editor">
         <Editor
           state={this.state.state}
-          renderNode={this.renderNode}
           renderMark={this.renderMark}
           onChange={this.onChange}
         />
       </div>
     )
-  }
-
-  renderNode = (node) => {
-    return NODES[node.type]
   }
 
   renderMark = (mark) => {
