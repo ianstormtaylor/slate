@@ -8,12 +8,15 @@ import { Editor } from 'slate'
 The top-level React component that renders the Slate editor itself.
 
 - [Properties](#properties)
+  - [`className`](#classname-string)
   - [`onChange`](#onchange-function)
+  - [`plugins`](#plugins-array)
+  - [`state`](#state-state)
+  - [`style`](#style-object)
+- [Placeholder Properties](#placeholder-properties)
   - [`placeholder`](#placeholder-text-or-element)
   - [`placeholderClassName`](#placeholderclassname-string)
   - [`placeholderStyle`](#placeholderstyle-string)
-  - [`plugins`](#plugins-array)
-  - [`state`](#state-state)
 - [Plugin-like Properties](#plugin-like-properties)
   - [`onBeforeInput`](#onbeforeinput-function)
   - [`onKeyDown`](#onkeydown-function)
@@ -30,15 +33,44 @@ The top-level React component that renders the Slate editor itself.
 
 ```js
 <Editor
+  className={string}
   onChange={Function}
   plugins={Array}
   state={State}
+  style={Object}
 />
 ```
+
+#### `className: String`
+
+An optional class name to apply to the content editable element.
 
 #### `onChange: Function`
 
 A change handler that will be called with the newly-changed editor `state`. You should usually pass the newly changed `state` back into the editor through its `state` property. This hook allows you to add persistence logic to your editor.
+
+#### `plugins: Array`
+
+An array of [`Plugins`](../plugins) that define the editor's behavior.
+
+#### `state: State`
+
+A [`State`](../models/state) object representing the current state of the editor.
+
+#### `style: Object`
+
+An optional dictionary of styles to apply to the content editable element.
+
+
+## Placeholder Properties
+
+```js
+<Editor
+  placeholder={Any}
+  placeholderClassName={string}
+  placeholderStyle={Object}
+/>
+```
 
 #### `placeholder: Text or Element`
 
@@ -51,14 +83,6 @@ An optional class name to apply to the default block type's placeholder.
 #### `placeholderStyle: Object`
 
 An optional dictionary of styles to apply to the default block type's placeholder. If `placeholder` is a string, and no class name or style dictionary is passed, this property will default to `{ opacity: '0.333' }`.
-
-#### `plugins: Array`
-
-An array of [`Plugins`](../plugins) that define the editor's behavior.
-
-#### `state: State`
-
-A [`State`](../models/state) object representing the current state of the editor.
 
 
 ## Plugin-like Properties
