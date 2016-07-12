@@ -87,7 +87,7 @@ An optional dictionary of styles to apply to the default block type's placeholde
 
 ## Plugin-like Properties
 
-In addition to its own properties, the editor allows passing any of the properties that a [`Plugin`](../plugins) defines as well. 
+In addition to its own properties, the editor allows passing any of the properties that a [plugin](../plugins/plugins.md) defines as well. 
 
 These properties are actually just a convenience—an implicit plugin defintion. Internally, they are grouped together and turned into a plugin that is given first priority in the plugin stack. 
 
@@ -120,6 +120,8 @@ const plugins = [
   state={state}
 />
 ```
+
+To see how these properties behave, check out the [Plugins reference](../plugins/plugins.md).
 
 
 ## Methods
