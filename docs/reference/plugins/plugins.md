@@ -8,16 +8,16 @@ Each editor has a "middleware stack" of plugins, which has a specific order.
 When the editor needs to resolve a plugin-related handler, it will loop through its plugin stack, searching for the first plugin that successfully returns a value. After receiving that value, the editor will **not** continue to search the remaining plugins; it returns early.
 
 - [Conventions](#conventions)
-- [Event Handler Properties](#event-handler-properties)
-  - [`onBeforeInput`](#onbeforeinput-event-state-editor-state-void)
-  - [`onKeyDown`](#onkeydown-event-state-editor-state-void)
-  - [`onPaste`](#onpaste-event-paste-state-editor-state-void)
+- [Event Handler Properties](#event-handle-properties)
+  - [`onBeforeInput`](#onbeforeinput)
+  - [`onKeyDown`](#onkeydown)
+  - [`onPaste`](#onpaste)
 - [Renderer Properties](#renderer-properties)
-  - [`renderDecorations`](#renderdecorations-text-characters-void)
-  - [`renderMark`](#rendermark-mark-object-void)
-  - [`renderNode`](#rendernode-node-component-void)
+  - [`renderDecorations`](#renderdecorations)
+  - [`renderMark`](#rendermark)
+  - [`renderNode`](#rendernode)
 - [Other Properties](#other-properties)
-  - [`onChange`](#onchange-state-state-void)
+  - [`onChange`](#onchange)
 
 
 ## Conventions
@@ -101,13 +101,15 @@ If no other plugin handles this event, it will be handled by the [Core plugin](.
 
 To customize the renderer output of the editor, plugins can define a set of "renderer" properties.
 
-#### `renderDecorations(text) => Characters || Void`
+### `renderDecorations` 
+`renderDecorations(text) => Characters || Void`
 
 The `renderDecorations` handler allows you to add dynamic, content-aware [`Marks`](../models/mark.md) to ranges of text, without having them show up in the serialized state of the editor. This is useful for things like code highlighting, where the marks will change as the user types.
 
 `renderDecorations` is called for every `text` node in the document, and should return a set of updated [`Characters`](../models/character.md) for the text node in question. Every plugin's decoration logic is called, and the resulting characters are unioned, such that multiple plugins can apply decorations to the same pieces of text.
 
-#### `renderMark(mark) => Object || Void`
+### `renderMark` 
+`renderMark(mark) => Object || Void`
 
 The `renderMark` handler allows you to define the styles that each mark should be rendered with. It takes a [`Mark`](../models/mark.md) object, and should return a dictionary of styles that will be applied via React's `style=` property. For example:
 
@@ -118,7 +120,8 @@ The `renderMark` handler allows you to define the styles that each mark should b
 }
 ```
 
-#### `renderNode(node) => Component || Void`
+### `renderNode` 
+`renderNode(node) => Component || Void`
 
 The `renderNode` handler allows you to define the component that will be used to render a node—both blocks and inlines. It takes a [`Node`](../models/node.md) object, and should return a React component.
 
@@ -163,7 +166,8 @@ The `node` itself is passed in, so you can access any custom data associated wit
 }
 ```
 
-#### `onChange(state) => State || Void`
+### `onChange` 
+`onChange(state) => State || Void`
 
 The `onChange` handler isn't a native browser event handler. Instead, it is invoked whenever the editor state changes. Returning a new state will update the editor's state, continuing down the plugin stack.
 
