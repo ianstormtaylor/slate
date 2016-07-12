@@ -1,9 +1,10 @@
 
-This directory contains the React components that Slate renders. The only one that is publicly accessible is the `Editor`, which composes the others. But here's what they all do:
+This directory contains the React components that Slate renders. Here's what they all do:
 
 - [Content](#content)
 - [Editor](#editor)
 - [Leaf](#leaf)
+- [Placeholder](#placeholder)
 - [Text](#text)
 - [Void](#void)
 
@@ -29,6 +30,11 @@ Many of the properties passed into the editor are combined to create a plugin of
 The `Leaf` component is the lowest-level component in the React tree. Its goal is to encapsulate the logic that works at the lowest level, on the actual strings of text in the DOM.
 
 One `Leaf` component is rendered for each range of text with a unique set of [`Marks`](../models#mark). It handles both applying the mark styles to the text, and translating the current [`Selection`](../models#selection) into a real DOM selection, since it knows about the string offsets.
+
+
+#### Placeholder
+
+A `Placeholder` component is just a convenience for rendering placeholders on top of empty nodes. It's used in the core plugin's default block renderer, but is also exposed to provide the convenient API for custom blocks as well.
 
 
 #### Text
