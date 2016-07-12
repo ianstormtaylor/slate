@@ -12,22 +12,22 @@ The "anchor" is the fixed point in a selection, and the "focus" is the non-fixed
 Often times, you don't need to specifically know which point is the "anchor" and which is the "focus", and you just need to know which comes first and last in the document. For these cases, there are many convenience equivalent properties and methods referring to the "start" and "end" points.
 
 - [Properties](#properties)
-  - [`anchorKey`](#anchorkey-string)
-  - [`anchorOffset`](#anchoroffset-number)
-  - [`focusKey`](#focuskey-string)
-  - [`focusOffset`](#focusoffset-number)
-  - [`isBackward`](#isbackward-boolean)
-  - [`isFocused`](#isfocused-boolean)
+  - [`anchorKey`](#anchorkey)
+  - [`anchorOffset`](#anchoroffset)
+  - [`focusKey`](#focuskey)
+  - [`focusOffset`](#focusoffset)
+  - [`isBackward`](#isbackward)
+  - [`isFocused`](#isfocused)
 - [Computed Properties](#computed-properties)
-  - [`endKey`](#endkey-string)
-  - [`endOffset`](#endoffset-number) 
-  - [`isBlurred`](#isblurred-boolean)
-  - [`isCollapsed`](#iscollapsed-boolean)
-  - [`isExpanded`](#isExpanded-boolean)
-  - [`isForward`](#isForward-boolean)
-  - [`startKey`](#startkey-string)
-  - [`startOffset`](#startoffset-number)
-- [Static Methods](#static-methods)
+  - [`endKey`](#endkey)
+  - [`endOffset`](#endoffset) 
+  - [`isBlurred`](#isblurred)
+  - [`isCollapsed`](#iscollapsed)
+  - [`isExpanded`](#isExpanded)
+  - [`isForward`](#isForward)
+  - [`startKey`](#startkey)
+  - [`startOffset`](#startoffset)
+- [Static Methods](#static)
   - [`Selection.create(properties)`](#create-properties) 
 - [Checking Methods](#checking-methods)
   - [`has{Edge}AtEndOf(node)`](hasedgeatendof-node)
@@ -64,27 +64,33 @@ Selection({
 })
 ```
 
-#### `anchorKey: String`
+### `anchorKey`
+`String`
 
 The key of the text node at the selection's anchor point.
 
-#### `anchorOffset: Number`
+### `anchorOffset`
+`Number`
 
 The numbers of characters from the start of the text node at the selection's anchor point.
 
-#### `focusKey: String`
+### `focusKey`
+`String`
 
 The key of the text node at the selection's focus point.
 
-#### `focusOffset: Number`
+### `focusOffset`
+`Number`
 
 The numbers of characters from the start of the text node at the selection's focus point.
 
-#### `isBackward: Boolean`
+### `isBackward`
+`Boolean`
 
 Whether the selection is backward. A selection is considered "backward" when its focus point references a location earlier in the document than its anchor point.
 
-#### `isFocused: Boolean`
+### `isFocused`
+`Boolean`
 
 Whether the selection currently has focus.
 
@@ -93,60 +99,71 @@ Whether the selection currently has focus.
 
 These properties aren't supplied when creating a selection, but are instead computed based on the real properties.
 
-#### `isBlurred: Boolean`
+### `isBlurred`
+`Boolean`
 
 The opposite of `isFocused`, for convenience.
 
-#### `isCollapsed: Boolean`
+### `isCollapsed`
+`Boolean`
 
 Whether the selection is collapsed. A selection is considered "collapsed" when the anchor point and focus point of the selection are the same.
 
-#### `isExpanded: Boolean`
+### `isExpanded`
+`Boolean`
 
 The opposite of `isCollapsed`, for convenience.
 
-#### `isForward: Boolean`
+### `isForward`
+`Boolean`
 
 The opposite of `isBackward`, for convenience.
 
-#### `startKey: String`
-#### `startOffset: Number`
-#### `endKey: String`
-#### `endOffset: Number`
+### `startKey`
+### `startOffset`
+### `endKey`
+### `endOffset`
 
 A few convenience properties for accessing the first and last point of the selection. When the selection is forward, `start` refers to the `anchor` point and `end` refers to the `focus` point. And when it's backward they are reversed.
 
 
 ## Static Methods
 
-#### `Selection.create(properties)`
+### `Selection.create`
+`Selection.create(properties: Object) => Selection`
 
 Create a new `Selection` instance with `properties`.
 
 
 ## Checking Methods
 
-#### `has{Edge}AtStartOf(node: Node) => Boolean`
+### `has{Edge}AtStartOf`
+`has{Edge}AtStartOf(node: Node) => Boolean`
 
 Determine whether a selection has an edge at the start of a `node`. Where `{Edge}` can be one of: `Anchor`, `Focus`, `Start`, `End` or `Edge` (referring to either point).
 
-#### `has{Edge}AtEndOf(node: Node) => Boolean`
+### `has{Edge}AtEndOf` 
+`has{Edge}AtEndOf(node: Node) => Boolean`
 
 Determine whether a selection has an edge at the end of a `node`. Where `{Edge}` can be one of: `Anchor`, `Focus`, `Start`, `End` or `Edge` (referring to either point).
 
-#### `has{Edge}Between(node: Node, start: Number, end: Number) => Boolean`
+### `has{Edge}Between` 
+`has{Edge}Between(node: Node, start: Number, end: Number) => Boolean`
 
 Determine whether a selection has an edge in a `node` between its `start` and `end` offset. Where `{Edge}` can be one of: `Anchor`, `Focus`, `Start`, `End` or `Edge` (referring to either point).
 
-#### `has{Edge}In(node: Node, start: Number, end: Number) => Boolean`
+### `has{Edge}In` 
+`has{Edge}In(node: Node, start: Number, end: Number) => Boolean`
 
 Determine whether a selection has an edge inside a `node`. Where `{Edge}` can be one of: `Anchor`, `Focus`, `Start`, `End` or `Edge` (referring to either point).
 
-#### `isAtStartOf(node: Node) => Boolean`
+### `isAtStartOf` 
+`isAtStartOf(node: Node) => Boolean`
 
 Determine whether the selection is at the start of a `node`.
 
-#### `isAtEndOf(node: Node) => Boolean`
+### `isAtEndOf` 
+`isAtEndOf(node: Node) => Boolean`
 
 Determine whether the selection is at the end of a `node`.
 
@@ -155,50 +172,50 @@ Determine whether the selection is at the end of a `node`.
 
 Since `Selection`s are immutable, all of the transforming methods return a new instance of the selection.
 
-#### `blur() => Selection`
+### `blur() => Selection`
 
 Change the selection's `isFocused` property to `false`.
 
-#### `focus() => Selection`
+### `focus() => Selection`
 
 Change the selection's `isFocused` property to `true`.
 
-#### `moveTo{Edge}() => Selection`
+### `moveTo{Edge}() => Selection`
 
 Move both of the selection's points to an edge, collapsing it. Where `{Edge}` can be one of: `Anchor`, `Focus`, `Start` or `End`.
 
-#### `moveToStartOf(node: Node) => Selection`
+### `moveToStartOf(node: Node) => Selection`
 
 Move both of the selection's points to the start of a `node`.
 
-#### `moveToEndOf(node: Node) => Selection`
+### `moveToEndOf(node: Node) => Selection`
 
 Move both of the selection's points to the end of a `node`.
 
-#### `moveToRangeOf(node: Node) => Selection`
+### `moveToRangeOf(node: Node) => Selection`
 
 Move the selection's anchor point to the start of a `node`, and its focus point to the end of the same `node`.
 
-#### `moveForward([n = 1: Number]) => Selection`
+### `moveForward([n = 1: Number]) => Selection`
 
 Increase the selection's `anchorOffset` and `focusOffset` by `n`, defaulting to `1`.
 
-#### `moveBackward([n = 1: Number]) => Selection`
+### `moveBackward([n = 1: Number]) => Selection`
 
 Decrease the selection's `anchorOffset` and `focusOffset` by `n`, defaulting to `1`.
 
-#### `extendForward([n = 1: Number]) => Selection`
+### `extendForward([n = 1: Number]) => Selection`
 
 Increase the selection's `focusOffset` by `n`, default to `1`.
 
-#### `extendBackward([n = 1: Number]) => Selection`
+### `extendBackward([n = 1: Number]) => Selection`
 
 Decrease the selection's `focusOffset` by `n`, default to `1`.
 
-#### `extendToStartOf(node: Node) => Selection`
+### `extendToStartOf(node: Node) => Selection`
 
 Move the selection's `focusOffset` to the start of a `node`.
 
-#### `extendToEndOf(node: Node) => Selection`
+### `extendToEndOf(node: Node) => Selection`
 
 Move the selection's `focusOffset` to the end of a `node`.
