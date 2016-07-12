@@ -9,6 +9,7 @@ The top-level React component that renders the Slate editor itself.
 
 - [Properties](#properties)
   - [`onChange`](#onchange-function)
+  - [`placeholder`](#placeholder-text-or-element)
   - [`plugins`](#plugins-array)
   - [`state`](#state-state)
 - [Plugin-like Properties](#plugin-like-properties)
@@ -36,6 +37,10 @@ The top-level React component that renders the Slate editor itself.
 #### `onChange: Function`
 
 A change handler that will be called with the newly-changed editor `state`. You should usually pass the newly changed `state` back into the editor through its `state` property. This hook allows you to add persistence logic to your editor.
+
+#### `placeholder: Text or Element`
+
+A placeholder string (or React element) that will be rendered as the default block type's placeholder.
 
 #### `plugins: Array`
 
