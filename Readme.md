@@ -5,7 +5,7 @@
 <p align="center">A <em>completely</em> customizable framework <br/>for building rich text editors in the browser.</p>
 <br/>
 
-<p align="center"><a href="#principles">Principles</a> · <a href="#examples">Examples</a> · Plugins · <a href="#documentation">Documentation</a> · Contributing</p>
+<p align="center"><a href="#principles">Principles</a> · <a href="#examples">Examples</a> · <a href="#plugins">Plugins</a> · <a href="#documentation">Documentation</a> · Contributing</p>
 <br/>
 
 Slate lets you build rich, intuitive editors like those in [Medium](https://medium.com/), [Dropbox Paper](https://www.dropbox.com/paper) or [Canvas](https://usecanvas.com/)—which are becoming table stakes for applications on the web—without your codebase getting mired in complexity.
@@ -47,6 +47,15 @@ To get a sense for how you might use Slate, check out a few of the examples:
 - [**Code Highlighting**](examples/code-highlighting) — showing how to use decorators to dynamically mark text.
 
 If you have an idea for an example that shows a common use case, pull request it!
+
+
+<br/>
+### Plugins
+
+Slate encourages you to write small, reusable modules. Check out the list of public modules that you can use in your project!
+
+- [**Plugins**](wiki#plugins) 
+- [**Serializers**](wiki#serializers)
 
 
 <br/>
