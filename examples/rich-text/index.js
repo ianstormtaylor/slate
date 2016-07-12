@@ -1,5 +1,5 @@
 
-import { Editor, Mark, Raw, Utils } from '../..'
+import { Editor, Mark, Placeholder, Raw, Utils } from '../..'
 import React from 'react'
 import initialState from './state.json'
 import keycode from 'keycode'
@@ -11,13 +11,12 @@ import keycode from 'keycode'
  */
 
 const NODES = {
-  'block-quote': props => <blockquote>{props.children}</blockquote>,
-  'bulleted-list': props => <ul>{props.chidlren}</ul>,
-  'heading-one': props => <h1>{props.children}</h1>,
-  'heading-two': props => <h2>{props.children}</h2>,
-  'list-item': props => <li>{props.chidlren}</li>,
-  'numbered-list': props => <ol>{props.children}</ol>,
-  'paragraph': props => <p>{props.children}</p>
+  'block-quote': props => <blockquote {...props.attributes}>{props.children}</blockquote>,
+  'bulleted-list': props => <ul {...props.attributes}>{props.chidlren}</ul>,
+  'heading-one': props => <h1 {...props.attributes}>{props.children}</h1>,
+  'heading-two': props => <h2 {...props.attributes}>{props.children}</h2>,
+  'list-item': props => <li {...props.attributes}>{props.chidlren}</li>,
+  'numbered-list': props => <ol {...props.attributes}>{props.children}</ol>
 }
 
 /**
@@ -107,6 +106,7 @@ class RichText extends React.Component {
     return (
       <div className="editor">
         <Editor
+          placeholder={'Enter some rich text...'}
           state={this.state.state}
           renderNode={this.renderNode}
           renderMark={this.renderMark}

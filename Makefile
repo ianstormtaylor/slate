@@ -34,7 +34,6 @@ dist:  $(shell find ./lib) package.json
 		--out-dir \
 		./dist \
 		./lib
-	@ touch ./dist
 
 # Build the examples.
 examples:
@@ -83,6 +82,14 @@ test-server:
 		--reporter spec \
 		--fgrep "$(GREP)" \
 		./test/server.js
+
+# Watch the source.
+watch-dist:  $(shell find ./lib) package.json
+	@ $(babel) \
+		--watch \
+		--out-dir \
+		./dist \
+		./lib
 
 # Watch the examples.
 watch-examples:
