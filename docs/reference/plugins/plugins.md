@@ -1,5 +1,5 @@
 
-# Plugin
+# Plugins
 
 Plugins can be attached to an editor to alter its behavior in different ways. Plugins are just simple Javascript objects, containing a set of properties that control different behaviors—event handling, change handling, rendering, etc.
 
@@ -35,10 +35,6 @@ export default MySlatePlugin(options) {
 
 ## Event Handler Properties
 
-All of the event handler properties are passed the same React `event` object you are used to from React's event handlers. They are also passed the current `state` of the editor, and the `editor` instance itself.
-
-Each event handler can choose to return a new `state` object, in which case the editor's state will be updated. If nothing is returned, the editor will simply continue resolving the plugin stack.
-
 ```js
 {
   onBeforeInput: Function,
@@ -47,19 +43,21 @@ Each event handler can choose to return a new `state` object, in which case the 
 }
 ```
 
+All of the event handler properties are passed the same React `event` object you are used to from React's event handlers. They are also passed the current `state` of the editor, and the `editor` instance itself.
+
+Each event handler can choose to return a new `state` object, in which case the editor's state will be updated. If nothing is returned, the editor will simply continue resolving the plugin stack.
+
 #### `onBeforeInput(event, state, editor) => State || Void`
 
 This handler is called right before a string of text is inserted into the `contenteditable` element. The `event.data` property will be the string of text that is being inserted.
 
-_Make sure to `event.preventDefault()` if you do not want the default insertion behavior to occur!_
-
-By default, if no other plugin resolves this event, the editor's core plugin will resolve it by insert the text from `event.data` into the editor. If you do not want this, or anything else to happen, you can "noop" this event:
+Make sure to `event.preventDefault()` if you do not want the default insertion behavior to occur! If no other plugin handles this event, it will be handled by the [Core plugin](./core.md).
 
 #### `onKeyDown(event, state, editor) => State || Void`
 
 This handler is called when any key is pressed in the `contenteditable` element, before any action is taken. Use the `event.which` property to determine which key was pressed.
 
-_Make sure to `event.preventDefault()` if you do not want the default insertion behavior to occur!_
+Make sure to `event.preventDefault()` if you do not want the default insertion behavior to occur! If no other plugin handles this event, it will be handled by the [Core plugin](./core.md).
 
 #### `onPaste(event, paste, state, editor) => State || Void`
 
@@ -85,7 +83,7 @@ The `paste` object is a convenience object created to standardize the paste meta
 }
 ```
 
-By default, the editor will handle all `text` and `html` pastes as plain text.
+If no other plugin handles this event, it will be handled by the [Core plugin](./core.md).
 
 
 ## Renderer Properties
@@ -97,6 +95,8 @@ By default, the editor will handle all `text` and `html` pastes as plain text.
   renderNode: Function
 }
 ```
+
+To customize the renderer output of the editor, plugins can define a set of "renderer" properties.
 
 #### `renderDecorations(text) => Characters || Void`
 
