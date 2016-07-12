@@ -31,7 +31,7 @@ The default block node also controls its own placeholder logic, which is control
 
 #### `renderMark`
 
-The core plugin adds no default styles to marks.
+The core plugin adds a default mark with an empty set of styles.
 
 
 ## Overriding Defaults
