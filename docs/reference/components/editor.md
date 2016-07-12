@@ -10,6 +10,8 @@ The top-level React component that renders the Slate editor itself.
 - [Properties](#properties)
   - [`onChange`](#onchange-function)
   - [`placeholder`](#placeholder-text-or-element)
+  - [`placeholderClassName`](#placeholderclassname-string)
+  - [`placeholderStyle`](#placeholderstyle-string)
   - [`plugins`](#plugins-array)
   - [`state`](#state-state)
 - [Plugin-like Properties](#plugin-like-properties)
@@ -41,6 +43,14 @@ A change handler that will be called with the newly-changed editor `state`. You 
 #### `placeholder: Text or Element`
 
 A placeholder string (or React element) that will be rendered as the default block type's placeholder.
+
+#### `placeholderClassName: String`
+
+An optional class name to apply to the default block type's placeholder.
+
+#### `placeholderStyle: Object`
+
+An optional dictionary of styles to apply to the default block type's placeholder. If `placeholder` is a string, and no class name or style dictionary is passed, this property will default to `{ opacity: '0.333' }`.
 
 #### `plugins: Array`
 
