@@ -71,6 +71,7 @@ If you're using Slate for the first time, check out the [Getting Started](./docs
 - **Reference**
   - Components
     - [Editor](docs/reference/components/editor.md)
+    - [Placeholder](docs/reference/components/placeholder.md)
   - Models
     - Block
     - Character
