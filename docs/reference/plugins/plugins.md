@@ -59,7 +59,8 @@ This handler is called when any key is pressed in the `contenteditable` element,
 
 Make sure to `event.preventDefault()` if you do not want the default insertion behavior to occur! If no other plugin handles this event, it will be handled by the [Core plugin](./core.md).
 
-#### `onPaste(event, paste, state, editor) => State || Void`
+### `onPaste`
+<code>(event, paste, state, editor) => State || Void</code>
 
 This handler is called when the user pastes content into the `contenteditable` element. The event is already prevented by default, so you must define a state change to have any affect occur.
 

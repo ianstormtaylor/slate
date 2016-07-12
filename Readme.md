@@ -85,6 +85,8 @@ If you're using Slate for the first time, check out the [Getting Started](./docs
     - Text
     - Transform
   - Plugins
+    - [Plugins](docs/reference/plugins/plugins.md)
+    - [Core](docs/reference/plugins/core.md)
 
 If even that's not enough, you can always [read the source itself](./lib), which is explained along with a handful of readme's.
 
