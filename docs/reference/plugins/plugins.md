@@ -130,10 +130,10 @@ The component will be called with a set of properties:
 />
 ```
 
-- `attributes: Object` — a dictionary of attributes that **you must** add to the top-level element of the rendered component. Using the [Object Spread Syntax (Stage 2)](https://github.com/sebmarkbage/ecmascript-rest-spread) this is as easy as `...props.attributes`.
-- `children: Any` — a set of React element children that **you must** render as the leaf element in your component.
-- `node: Node` the node being rendered.
-- `state: State` the current state of the editor.
+- `attributes` — a dictionary of attributes that **you must** add to the top-level element of the rendered component. Using the [Object Spread Syntax (Stage 2)](https://github.com/sebmarkbage/ecmascript-rest-spread) this is as easy as `...props.attributes`.
+- `children` — a set of React element children that **you must** render as the leaf element in your component.
+- `node` — the node being rendered.
+- `state` — the current state of the editor.
 
 Such that a simple code block renderer might look like this:
 
@@ -142,14 +142,14 @@ const CodeBlockRenderer = (props) => {
   return (
     <pre {...props.attributes}>
       <code>
-        {children}
+        {props.children}
       </code>
     </pre>
   )
 }    
 ```
 
-The `node` itself is passed in, such that you can access any custom data associated with it from its `data` property.
+The `node` itself is passed in, so you can access any custom data associated with it via its `data` property.
 
 
 ## Other Properties
