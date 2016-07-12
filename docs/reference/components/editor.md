@@ -8,15 +8,15 @@ import { Editor } from 'slate'
 The top-level React component that renders the Slate editor itself.
 
 - [Properties](#properties)
-  - [`className`](#classname-string)
-  - [`onChange`](#onchange-function)
-  - [`plugins`](#plugins-array)
-  - [`state`](#state-state)
-  - [`style`](#style-object)
+  - [`className`](#classname)
+  - [`onChange`](#onchange)
+  - [`plugins`](#plugins)
+  - [`state`](#state)
+  - [`style`](#style)
 - [Placeholder Properties](#placeholder-properties)
-  - [`placeholder`](#placeholder-text-or-element)
-  - [`placeholderClassName`](#placeholderclassname-string)
-  - [`placeholderStyle`](#placeholderstyle-string)
+  - [`placeholder`](#placeholder)
+  - [`placeholderClassName`](#placeholderclassname)
+  - [`placeholderStyle`](#placeholderstyle)
 - [Plugin-like Properties](#plugin-like-properties)
   - [`onBeforeInput`](#onbeforeinput-function)
   - [`onKeyDown`](#onkeydown-function)
@@ -41,23 +41,28 @@ The top-level React component that renders the Slate editor itself.
 />
 ```
 
-#### `className: String`
+### `className` 
+`String`
 
 An optional class name to apply to the content editable element.
 
-#### `onChange: Function`
+### `onChange`
+`Function`
 
 A change handler that will be called with the newly-changed editor `state`. You should usually pass the newly changed `state` back into the editor through its `state` property. This hook allows you to add persistence logic to your editor.
 
-#### `plugins: Array`
+### `plugins`
+`Array`
 
 An array of [`Plugins`](../plugins) that define the editor's behavior.
 
-#### `state: State`
+### `state`
+`State`
 
 A [`State`](../models/state) object representing the current state of the editor.
 
-#### `style: Object`
+### `style`
+`Object`
 
 An optional dictionary of styles to apply to the content editable element.
 
@@ -72,15 +77,18 @@ An optional dictionary of styles to apply to the content editable element.
 />
 ```
 
-#### `placeholder: String || Element`
+### `placeholder`
+`String || Element`
 
 A placeholder string (or React element) that will be rendered as the default block type's placeholder.
 
-#### `placeholderClassName: String`
+### `placeholderClassName`
+`String`
 
 An optional class name to apply to the default block type's placeholder.
 
-#### `placeholderStyle: Object`
+### `placeholderStyle`
+`Object`
 
 An optional dictionary of styles to apply to the default block type's placeholder. If `placeholder` is a string, and no class name or style dictionary is passed, this property will default to `{ opacity: '0.333' }`.
 
@@ -126,10 +134,12 @@ To see how these properties behave, check out the [Plugins reference](../plugins
 
 ## Methods
 
-#### `getState() => State`
+### `getState` 
+`getState() => State`
 
 Return the editor's current internal state.
 
-#### `onChange(state: State) => Void`
+### `onChange` 
+`onChange(state: State) => Void`
 
 Effectively the same as `setState`. Invoking this method will update the state of the editor, running it through all of it's plugins, and passing it the parent component, before it cycles back down as the new `state` property of the editor.
