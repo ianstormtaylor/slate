@@ -177,6 +177,26 @@ Since `Selection`s are immutable, all of the transforming methods return a new i
 
 Change the selection's `isFocused` property to `false`.
 
+### `extendBackward` 
+`extendBackward([n = 1: Number]) => Selection`
+
+Decrease the selection's `focusOffset` by `n`, default to `1`.
+
+### `extendForward` 
+`extendForward([n = 1: Number]) => Selection`
+
+Increase the selection's `focusOffset` by `n`, default to `1`.
+
+### `extendToEndOf` 
+`extendToEndOf(node: Node) => Selection`
+
+Move the selection's `focusOffset` to the end of a `node`.
+
+### `extendToStartOf` 
+`extendToStartOf(node: Node) => Selection`
+
+Move the selection's `focusOffset` to the start of a `node`.
+
 ### `focus` 
 `focus() => Selection`
 
@@ -186,11 +206,6 @@ Change the selection's `isFocused` property to `true`.
 `moveTo{Edge}() => Selection`
 
 Move both of the selection's points to an edge, collapsing it. Where `{Edge}` can be one of: `Anchor`, `Focus`, `Start` or `End`.
-
-### `moveToStartOf` 
-`moveToStartOf(node: Node) => Selection`
-
-Move both of the selection's points to the start of a `node`.
 
 ### `moveToEndOf` 
 `moveToEndOf(node: Node) => Selection`
@@ -202,32 +217,17 @@ Move both of the selection's points to the end of a `node`.
 
 Move the selection's anchor point to the start of a `node`, and its focus point to the end of the same `node`.
 
-### `moveForward` 
-`moveForward([n = 1: Number]) => Selection`
+### `moveToStartOf` 
+`moveToStartOf(node: Node) => Selection`
 
-Increase the selection's `anchorOffset` and `focusOffset` by `n`, defaulting to `1`.
+Move both of the selection's points to the start of a `node`.
 
 ### `moveBackward` 
 `moveBackward([n = 1: Number]) => Selection`
 
 Decrease the selection's `anchorOffset` and `focusOffset` by `n`, defaulting to `1`.
 
-### `extendForward` 
-`extendForward([n = 1: Number]) => Selection`
+### `moveForward` 
+`moveForward([n = 1: Number]) => Selection`
 
-Increase the selection's `focusOffset` by `n`, default to `1`.
-
-### `extendBackward` 
-`extendBackward([n = 1: Number]) => Selection`
-
-Decrease the selection's `focusOffset` by `n`, default to `1`.
-
-### `extendToStartOf` 
-`extendToStartOf(node: Node) => Selection`
-
-Move the selection's `focusOffset` to the start of a `node`.
-
-### `extendToEndOf` 
-`extendToEndOf(node: Node) => Selection`
-
-Move the selection's `focusOffset` to the end of a `node`.
+Increase the selection's `anchorOffset` and `focusOffset` by `n`, defaulting to `1`.
