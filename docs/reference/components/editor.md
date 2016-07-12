@@ -2,7 +2,7 @@
 # `<Editor>`
 
 ```js
-import { Editor } from 'Slate'
+import { Editor } from 'slate'
 ```
 
 The top-level React component that renders the Slate editor itself.
@@ -11,7 +11,13 @@ The top-level React component that renders the Slate editor itself.
   - [`onChange`](#onchange-function)
   - [`plugins`](#plugins-array)
   - [`state`](#state-state)
-  - [`more...`](#more)
+- [Plugin-like Properties](#plugin-like-properties)
+  - [`onBeforeInput`](#onbeforeinput-function)
+  - [`onKeyDown`](#onkeydown-function)
+  - [`onPaste`](#onpaste-function)
+  - [`renderDecorations`](#renderdecorations-function)
+  - [`renderMark`](#rendermark-function)
+  - [`renderNode`](#rendernode-function)
 - [Methods](#methods)
   - [`getState()`](#getstate-state)
   - [`onChange(state)`](#onchange-state-void)
@@ -39,23 +45,10 @@ An array of [`Plugins`](../plugins) that define the editor's behavior.
 
 A [`State`](../models/state) object representing the current state of the editor.
 
-#### `more...`
 
-In addition to those two properties, the editor allows passing any of the properties that a [`Plugin`](../plugins) can define: 
+## Plugin-like Properties
 
-```js
-<Editor
-  onBeforeInput={Function}
-  onChange={Function}
-  onKeyDown={Function}
-  onPaste={Function}
-  plugins={Array}
-  renderDecorations={Function}
-  renderMark={Function}
-  renderNode={Function}
-  state={State}
-/>
-```
+In addition to its own properties, the editor allows passing any of the properties that a [`Plugin`](../plugins) defines as well. 
 
 These properties are actually just a convenience—an implicit plugin defintion. Internally, they are grouped together and turned into a plugin that is given first priority in the plugin stack. 
 
