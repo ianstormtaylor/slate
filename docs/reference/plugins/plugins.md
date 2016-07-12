@@ -47,20 +47,21 @@ All of the event handler properties are passed the same React `event` object you
 
 Each event handler can choose to return a new `state` object, in which case the editor's state will be updated. If nothing is returned, the editor will simply continue resolving the plugin stack.
 
-#### `onBeforeInput(event, state, editor) => State || Void`
+### `onBeforeInput` 
+`onBeforeInput(event, state, editor) => State || Void`
 
 This handler is called right before a string of text is inserted into the `contenteditable` element. The `event.data` property will be the string of text that is being inserted.
 
 Make sure to `event.preventDefault()` if you do not want the default insertion behavior to occur! If no other plugin handles this event, it will be handled by the [Core plugin](./core.md).
 
-#### `onKeyDown(event, state, editor) => State || Void`
+### `onKeyDown` 
+`onKeyDown(event, state, editor) => State || Void`
 
 This handler is called when any key is pressed in the `contenteditable` element, before any action is taken. Use the `event.which` property to determine which key was pressed.
 
 Make sure to `event.preventDefault()` if you do not want the default insertion behavior to occur! If no other plugin handles this event, it will be handled by the [Core plugin](./core.md).
 
 ### `onPaste`
-
 `onPaste(event, paste, state, editor) => State || Void`
 
 This handler is called when the user pastes content into the `contenteditable` element. The event is already prevented by default, so you must define a state change to have any affect occur.
