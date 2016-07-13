@@ -5,7 +5,7 @@
 <p align="center">A <em>completely</em> customizable framework <br/>for building rich text editors in the browser.</p>
 <br/>
 
-<p align="center"><a href="#principles"><strong>Principles</strong></a> · <a href="#examples"><strong>Examples</strong></a> · <a href="#plugins"><strong>Plugins</strong></a> · <a href="#documentation"><strong>Documentation</strong></a> · <a href="./Contributing.md"><strong>Contributing!</strong></a></p>
+<p align="center"><a href="#why"><strong>Why?</strong></a> · <a href="#principles"><strong>Principles</strong></a> · <a href="#examples"><strong>Examples</strong></a> · <a href="#plugins"><strong>Plugins</strong></a> · <a href="#documentation"><strong>Documentation</strong></a> · <a href="./Contributing.md"><strong>Contributing!</strong></a></p>
 <br/>
 
 Slate lets you build rich, intuitive editors like those in [Medium](https://medium.com/), [Dropbox Paper](https://www.dropbox.com/paper) or [Canvas](https://usecanvas.com/)—which are becoming table stakes for applications on the web—without your codebase getting mired in complexity.
@@ -16,7 +16,35 @@ _**Slate is currently in beta**. It's useable now, but you might need to pull re
 
 
 <br/>
+### Why?
+
+Why create Slate? Well... 
+
+(Beware: this section has a few of [my](https://github.com/ianstormtaylor) opinions on the existing rich text editor landscape!)
+
+Before creating Slate, I tried a lot of the other rich text libraries out there. None of them were simple enough to use, but well-designed enough to handle complex use cases. 
+
+What I found was that while getting simple examples to work might be possible, once you started trying to build something like [Medium](), [Dropbox Paper](), or [Canvas]()[Medium](https://medium.com/), [Dropbox Paper](https://www.dropbox.com/paper) or [Canvas](https://usecanvas.com/)credibly hacky things to get the user experience you wanted. And some experiences were just impossible.
+
+Here's how Slate compares to some of the existing editors out there:
+
+- [Draft.js](https://facebook.github.io/draft-js/) — Slate borrowed a few concepts from Draft.js, namely its event system, its use of Immutable.js and React, and its goal of being a "framework" for creating editors. It also borrowed its plugin-centric design from the [Draft.js Plugins]() project. But the issues I ran into while using Draft.js were: that lots of the logic around the schema is hardcoded in "core" and difficult to customize, that the transform API is complex to use and not suited to collaborative editing in the future, that serialization isn't considered by the core library in a nice way, that the flat document model was limiting, and that lots of the API feels hacked together.
+
+- [Prosemirror](http://prosemirror.net/) — Slate borrowed a few concepts from Prosemirror, namely its nested document tree, and its transform model. But the issues I ran into while using it were: that the API is hard to understand, that the codebase wasn't structured around common node module practices, that lots of magic was built into the core library that was hard to customize, that toolbars and buttons are too tied to the editor itself, and that the documentation isn't great. (It's still in beta though!)
+
+- [Quill](http://quilljs.com/) — I never used Quill directly, so my hesitations about it are solely from considering it in early stages. The issues I see with it are: that the concept of "toolbars" is too coupled with the editor itself, that the configuration is too coupled to HTML classes and DOM nodes, that the idea of "formats" and "toolbars" being linked is limiting, and generally that too much "core" logic is given special priviledges and is hard to customize.
+
+- [Trix](https://trix-editor.org/) — I never used Trix directly either, so my issues with it are solely from considering it in early stages. The issues I found with it are: that it aims to be simple by limiting functionality instead of by limiting its own scope, that many behaviors are just impossible to implement with it, that it's too coupled to the DOM, and that the flat document model is limiting.
+
+Of course those are my own opinions, but if you've tried using any of those libraries you might have run into similar problems.
+
+Which brings me to how Slate solves all of that...
+
+
+<br/>
 ### Principles
+
+Slate tries to solve the question of "[Why?](#why)" with a few principles:
 
 1. **First-class plugins.** The most important part of Slate is that plugins are first-class entities—the core editor logic is even implemented as its own plugin. That means you can _completely_ customize the editing experience, to build complex editors like Medium's or Canvas's without having to fight against the library's assumptions.
 
@@ -29,6 +57,8 @@ _**Slate is currently in beta**. It's useable now, but you might need to pull re
 5. **Intuitive transforms.** Slate's content is edited using "transforms", that are designed to be extremely intuitive to use, so that writing plugins and custom functionality is as simple as possible.
 
 6. **Collaboration-ready data model.** The data model Slate uses—specifically how transforms are applied to the document—has been designed to allow for collaborative editing to be layered on top, so you won't need to rethink everything if you decide to make your editor collaborative. (More work is required on this!)
+
+7. **Clear "core" boundaries.** 
 
 
 <br/>
