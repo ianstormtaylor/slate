@@ -1,11 +1,11 @@
 
-import { Editor, Mark, Placeholder, Raw, Utils } from '../..'
+import { Editor, Mark, Raw, Utils } from '../..'
 import React from 'react'
 import initialState from './state.json'
 import keycode from 'keycode'
 
 /**
- * Node renderers.
+ * Defin a set of node renderers.
  *
  * @type {Object}
  */
@@ -20,7 +20,7 @@ const NODES = {
 }
 
 /**
- * Mark renderers.
+ * Define a set of mark renderers.
  *
  * @type {Object}
  */
@@ -51,93 +51,57 @@ const MARKS = {
 
 class RichText extends React.Component {
 
+  /**
+   * Deserialize the initial editor state.
+   *
+   * @type {Object}
+   */
+
   state = {
     state: Raw.deserialize(initialState)
   };
 
-  render = () => {
-    return (
-      <div>
-        {this.renderToolbar()}
-        {this.renderEditor()}
-      </div>
-    )
-  }
-
-  renderToolbar = () => {
-    return (
-      <div className="menu toolbar-menu">
-        {this.renderMarkButton('bold', 'format_bold')}
-        {this.renderMarkButton('italic', 'format_italic')}
-        {this.renderMarkButton('underlined', 'format_underlined')}
-        {this.renderMarkButton('code', 'code')}
-        {this.renderBlockButton('heading-one', 'looks_one')}
-        {this.renderBlockButton('heading-two', 'looks_two')}
-        {this.renderBlockButton('block-quote', 'format_quote')}
-        {this.renderBlockButton('numbered-list', 'format_list_numbered')}
-        {this.renderBlockButton('bulleted-list', 'format_list_bulleted')}
-      </div>
-    )
-  }
-
-  renderMarkButton = (type, icon) => {
-    const isActive = this.hasMark(type)
-    const onMouseDown = e => this.onClickMark(e, type)
-
-    return (
-      <span className="button" onMouseDown={onMouseDown} data-active={isActive}>
-        <span className="material-icons">{icon}</span>
-      </span>
-    )
-  }
-
-  renderBlockButton = (type, icon) => {
-    const isActive = this.hasBlock(type)
-    const onMouseDown = e => this.onClickBlock(e, type)
-
-    return (
-      <span className="button" onMouseDown={onMouseDown} data-active={isActive}>
-        <span className="material-icons">{icon}</span>
-      </span>
-    )
-  }
-
-  renderEditor = () => {
-    return (
-      <div className="editor">
-        <Editor
-          placeholder={'Enter some rich text...'}
-          state={this.state.state}
-          renderNode={this.renderNode}
-          renderMark={this.renderMark}
-          onChange={this.onChange}
-          onKeyDown={this.onKeyDown}
-        />
-      </div>
-    )
-  }
-
-  renderNode = (node) => {
-    return NODES[node.type]
-  }
-
-  renderMark = (mark) => {
-    return MARKS[mark.type]
-  }
+  /**
+   * Check if the current selection has a mark with `type` in it.
+   *
+   * @param {String} type
+   * @return {Boolean}
+   */
 
   hasMark = (type) => {
     const { state } = this.state
     return state.marks.some(mark => mark.type == type)
   }
 
+  /**
+   * Check if the any of the currently selected blocks are of `type`.
+   *
+   * @param {String} type
+   * @return {Boolean}
+   */
+
   hasBlock = (type) => {
     const { state } = this.state
     return state.blocks.some(node => node.type == type)
   }
 
+  /**
+   * On change, save the new state.
+   *
+   * @param {State} state
+   */
+
   onChange = (state) => {
     this.setState({ state })
   }
+
+  /**
+   * On key down, if it's a formatting command toggle a mark.
+   *
+   * @param {Event} e
+   * @param {State} state
+   * @return {State}
+   */
 
   onKeyDown = (e, state) => {
     if (!Utils.Key.isCommand(e)) return
@@ -170,6 +134,13 @@ class RichText extends React.Component {
     return state
   }
 
+  /**
+   * When a mark button is clicked, toggle the current mark.
+   *
+   * @param {Event} e
+   * @param {String} type
+   */
+
   onClickMark = (e, type) => {
     e.preventDefault()
     const isActive = this.hasMark(type)
@@ -183,6 +154,13 @@ class RichText extends React.Component {
     this.setState({ state })
   }
 
+  /**
+   * When a block button is clicked, toggle the block type.
+   *
+   * @param {Event} e
+   * @param {String} type
+   */
+
   onClickBlock = (e, type) => {
     e.preventDefault()
     const isActive = this.hasBlock(type)
@@ -194,6 +172,124 @@ class RichText extends React.Component {
       .apply()
 
     this.setState({ state })
+  }
+
+  /**
+   * Render.
+   *
+   * @return {Element}
+   */
+
+  render = () => {
+    return (
+      <div>
+        {this.renderToolbar()}
+        {this.renderEditor()}
+      </div>
+    )
+  }
+
+  /**
+   * Render the toolbar.
+   *
+   * @return {Element}
+   */
+
+  renderToolbar = () => {
+    return (
+      <div className="menu toolbar-menu">
+        {this.renderMarkButton('bold', 'format_bold')}
+        {this.renderMarkButton('italic', 'format_italic')}
+        {this.renderMarkButton('underlined', 'format_underlined')}
+        {this.renderMarkButton('code', 'code')}
+        {this.renderBlockButton('heading-one', 'looks_one')}
+        {this.renderBlockButton('heading-two', 'looks_two')}
+        {this.renderBlockButton('block-quote', 'format_quote')}
+        {this.renderBlockButton('numbered-list', 'format_list_numbered')}
+        {this.renderBlockButton('bulleted-list', 'format_list_bulleted')}
+      </div>
+    )
+  }
+
+  /**
+   * Render a mark-toggling toolbar button.
+   *
+   * @param {String} type
+   * @param {String} icon
+   * @return {Element}
+   */
+
+  renderMarkButton = (type, icon) => {
+    const isActive = this.hasMark(type)
+    const onMouseDown = e => this.onClickMark(e, type)
+
+    return (
+      <span className="button" onMouseDown={onMouseDown} data-active={isActive}>
+        <span className="material-icons">{icon}</span>
+      </span>
+    )
+  }
+
+  /**
+   * Render a block-toggling toolbar button.
+   *
+   * @param {String} type
+   * @param {String} icon
+   * @return {Element}
+   */
+
+  renderBlockButton = (type, icon) => {
+    const isActive = this.hasBlock(type)
+    const onMouseDown = e => this.onClickBlock(e, type)
+
+    return (
+      <span className="button" onMouseDown={onMouseDown} data-active={isActive}>
+        <span className="material-icons">{icon}</span>
+      </span>
+    )
+  }
+
+  /**
+   * Render the Slate editor.
+   *
+   * @return {Element}
+   */
+
+  renderEditor = () => {
+    return (
+      <div className="editor">
+        <Editor
+          placeholder={'Enter some rich text...'}
+          state={this.state.state}
+          renderNode={this.renderNode}
+          renderMark={this.renderMark}
+          onChange={this.onChange}
+          onKeyDown={this.onKeyDown}
+        />
+      </div>
+    )
+  }
+
+  /**
+   * Return a node renderer for a Slate `node`.
+   *
+   * @param {Node} node
+   * @return {Component or Void}
+   */
+
+  renderNode = (node) => {
+    return NODES[node.type]
+  }
+
+  /**
+   * Return a mark renderer for a Slate `mark`.
+   *
+   * @param {Mark} mark
+   * @return {Object or Void}
+   */
+
+  renderMark = (mark) => {
+    return MARKS[mark.type]
   }
 
 }
