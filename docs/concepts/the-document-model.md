@@ -15,13 +15,6 @@ After that, nesting can occur to any depth. `Block` nodes can contain other `Blo
 Each `Document`, `Block` and `Inline` node implements a [`Node`](../reference/models/node.md) interface, to make working with the nested tree easier.
 
 
-### Leaf Text Nodes
-
-One constraint of Slate documents is that the leaf nodes are always `Text` nodes. No `Block` or `Inline` node will ever have no children. It will always have at least an empty text node. (However, you can _render_ text-less nodes, see the [Void Nodes](#void-nodes) section below!)
-
-This constraint means that [`Selections`](../reference/models/selection.md) can always refer to text nodes, and many text-node-level operations are always "safe" regardless of the tree's structure.
-
-
 ### Characters & Marks
 
 As the leaves of the tree, `Text` nodes contain both the text content of the document as well as all of the text-level formatting, like **bold** and _italic_. In Slate, that formatting is referred to as [`Marks`](../reference/models/mark.md), and `Marks` are applied to individual [`Characters`](../reference/models/character.md).
@@ -31,4 +24,11 @@ As the leaves of the tree, `Text` nodes contain both the text content of the doc
 
 Just like the DOM, Slate's `Block` and `Inline` nodes can be "void" nodes, meaning that they have no content inside of them. When the `isVoid` flag of a node is enabled, it will be specially rendered, to preserve the editing experience that a user expects, without any extra work.
 
-Note though, even though the node is "void", it will still have an empty text node inside of it, as described above.
+Note that even though the node is "void", it will still have an empty text node inside of it. Because of...
+
+
+### Leaf Text Nodes
+
+One constraint of Slate documents is that the leaf nodes are always `Text` nodes. No `Block` or `Inline` node will ever have no children. It will always have at least an empty text node. (However, you can _render_ text-less nodes, see the [Void Nodes](#void-nodes) section above!)
+
+This constraint means that [`Selections`](../reference/models/selection.md) can always refer to text nodes, and many text-node-level operations are always "safe" regardless of the tree's structure.
