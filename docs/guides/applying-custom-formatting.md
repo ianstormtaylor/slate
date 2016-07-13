@@ -3,7 +3,7 @@
 <p align="center"><strong>Previous:</strong><br/><a href="./defining-custom-block-nodes.md">Defining Custom Block Nodes</a></p>
 <br/>
 
-### Applying Custom Formatting
+# Applying Custom Formatting
 
 In the previous guide we learned how to create custom block types that render chunks of text inside different containers. But Slate allows for more than just "blocks".
 
@@ -12,14 +12,6 @@ In this guide, we'll show you how to add custom formatting options, like **bold*
 So we start with our app from earlier:
 
 ```js
-const CodeNode = (props) => {
-  return <pre><code>{props.children}</code></pre>
-}
-
-const ParagraphNode = (props) => {
-  return <p>{props.children}</p>
-}
-
 class App extends React.Component {
 
   constructor(props) {
@@ -33,18 +25,10 @@ class App extends React.Component {
     return (
       <Editor
         state={this.state.state}
-        renderNode={node => this.renderNode(node)}
         onChange={state => this.onChange(state)}
         onKeyDown={e, state => this.onKeyDown(e, state)}
       />
     )
-  }
-
-  renderNode(node) {
-    switch (node.type) {
-      case 'code': return CodeNode
-      case 'paragraph': return ParagraphNode
-    }
   }
 
   onChange(state) {
@@ -81,15 +65,10 @@ class App extends React.Component {
     return (
       <Editor
         state={this.state.state}
-        renderNode={node => this.renderNode(node)}
         onChange={state => this.onChange(state)}
         onKeyDown={(e, state) => this.onKeyDown(e, state)}
       />
     )
-  }
-
-  renderNode(node) {
-    if (node.type == 'paragraph') return ParagraphNode
   }
 
   onChange(state) {
@@ -159,7 +138,6 @@ class App extends React.Component {
       <Editor
         state={this.state.state}
         renderMark={mark => this.renderMark(mark)}
-        renderNode={node => this.renderNode(node)}
         onChange={state => this.onChange(state)}
         onKeyDown={(e, state) => this.onKeyDown(e, state)}
       />
@@ -169,10 +147,6 @@ class App extends React.Component {
   // Define a mark rendering function that knows about "bold" marks.
   renderMark(mark) {
     if (mark.type == 'bold') return BOLD_MARK
-  }
-
-  renderNode(node) {
-    if (node.type == 'paragraph') return ParagraphNode
   }
 
   onChange(state) {
@@ -225,7 +199,6 @@ class App extends React.Component {
       <Editor
         state={this.state.state}
         renderMark={mark => this.renderMark(mark)}
-        renderNode={node => this.renderNode(node)}
         onChange={state => this.onChange(state)}
         onKeyDown={(e, state) => this.onKeyDown(e, state)}
       />
@@ -234,10 +207,6 @@ class App extends React.Component {
 
   renderMark(mark) {
     if (mark.type == 'bold') return BOLD_MARK
-  }
-
-  renderNode(node) {
-    if (node.type == 'paragraph') return ParagraphNode
   }
 
   onChange(state) {

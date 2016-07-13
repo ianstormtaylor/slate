@@ -3,7 +3,7 @@
 <p align="center"><strong>Previous:</strong><br/><a href="./installing-slate.md">Installing Slate</a></p>
 <br/>
 
-### Adding Event Handlers
+# Adding Event Handlers
 
 Okay, so you've got Slate installed and rendered on the page, and when you type in it, you can see the changes reflected. But you want to do more than just type a plaintext string.
 

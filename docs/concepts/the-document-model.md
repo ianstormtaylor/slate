@@ -1,4 +1,13 @@
 
+# The Document Model
+
+- recursive, nested tree 
+- document, blocks, and inlines implement node interface
+- blocks and inlines can be nested to any depth
+- blocks contain inlines and text
+- inlines contain text
+- always a text node at the leaves, for selection handling
+- void nodes can't have content, but still have an empty text node
 
 
 

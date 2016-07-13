@@ -1,6 +1,6 @@
 
 
-<p align="center"><img src="docs/banner.png" /></p>
+<p align="center"><img src="./docs/banner.png" /></p>
 
 <p align="center">A <em>completely</em> customizable framework <br/>for building rich text editors in the browser.</p>
 <br/>
@@ -36,15 +36,15 @@ _Slate is currently in **beta**, while work is being done on: cross-browser supp
 
 To get a sense for how you might use Slate, check out a few of the examples:
 
-- [**Plain text**](examples/plain-text) — showing the most basic case: a glorified `<textarea>`.
-- [**Rich text**](examples/rich-text) — showing the features you'd expect from a basic editor.
-- [**Auto-markdown**](examples/auto-markdown) — showing how to add key handlers for Markdown-like shortcuts.
-- [**Links**](examples/links) — showing how wrap text in inline nodes with associated data.
-- [**Images**](examples/images) — showing how to use void (text-less) nodes to add images.
-- [**Hovering menu**](examples/hovering-menu) — showing how a contextual hovering menu can be implemented.
-- [**Tables**](examples/tables) — showing how to nest blocks to render more advanced components.
-- [**Paste HTML**](examples/paste-html) — showing how to use an HTML serializer to handle pasted HTML.
-- [**Code Highlighting**](examples/code-highlighting) — showing how to use decorators to dynamically mark text.
+- [**Plain text**](./examples/plain-text) — showing the most basic case: a glorified `<textarea>`.
+- [**Rich text**](./examples/rich-text) — showing the features you'd expect from a basic editor.
+- [**Auto-markdown**](./examples/auto-markdown) — showing how to add key handlers for Markdown-like shortcuts.
+- [**Links**](./examples/links) — showing how wrap text in inline nodes with associated data.
+- [**Images**](./examples/images) — showing how to use void (text-less) nodes to add images.
+- [**Hovering menu**](./examples/hovering-menu) — showing how a contextual hovering menu can be implemented.
+- [**Tables**](./examples/tables) — showing how to nest blocks to render more advanced components.
+- [**Paste HTML**](./examples/paste-html) — showing how to use an HTML serializer to handle pasted HTML.
+- [**Code Highlighting**](./examples/code-highlighting) — showing how to use decorators to dynamically mark text.
 
 If you have an idea for an example that shows a common use case, pull request it!
 
@@ -54,8 +54,8 @@ If you have an idea for an example that shows a common use case, pull request it
 
 Slate encourages you to write small, reusable modules. Check out the public ones you can use in your project!
 
-- [**Plugins**](wiki#plugins) 
-- [**Serializers**](wiki#serializers)
+- [**Plugins**](./wiki#plugins) 
+- [**Serializers**](./wiki#serializers)
 
 
 <br/>
@@ -63,39 +63,41 @@ Slate encourages you to write small, reusable modules. Check out the public ones
 
 If you're using Slate for the first time, check out the [Getting Started](./docs/guides/installing-slate.md) guides and the [Core Concepts](./docs/concepts) to familiarize yourself with Slate's architecture and mental models. Once you've gotten familiar with those, you'll probably want to check out the full [API Reference](./docs/reference).
 
-- [**Guides**](docs/guides)
-  - [Installing Slate](docs/guides/installing-slate.md)
-  - [Adding Event Handlers](docs/guides/adding-event-handlers.md)
-  - [Defining Custom Block Nodes](docs/guides/defining-custom-block-nodes.md)
-  - [Applying Custom Formatting](docs/guides/applying-custom-formatting.md)
-  - [Using Plugins](docs/guides/using-plugins.md)
+- [**Guides**](./docs/guides)
+  - [Installing Slate](./docs/guides/installing-slate.md)
+  - [Adding Event Handlers](./docs/guides/adding-event-handlers.md)
+  - [Defining Custom Block Nodes](./docs/guides/defining-custom-block-nodes.md)
+  - [Applying Custom Formatting](./docs/guides/applying-custom-formatting.md)
+  - [Using Plugins](./docs/guides/using-plugins.md)
   - Saving to a Database
+  - Adding a Hovering Menu
+  - Rendering Adjacent Elements in Components
 
-- **Concepts**
+- [**Concepts**](./docs/concepts)
   - Statelessness & Immutability
   - The Document Model
   - The Selection Model
   - Plugins
 
-- **Reference**
-  - Components
-    - [Editor](docs/reference/components/editor.md)
-    - [Placeholder](docs/reference/components/placeholder.md)
-  - Models
-    - [Block](docs/reference/models/block.md)
-    - [Character](docs/reference/models/character.md)
-    - [Data](docs/reference/data.md)
-    - [Document](docs/reference/models/document.md)
-    - [Inline](docs/reference/models/inline.md)
-    - [Mark](docs/reference/mark.md)
-    - [Node](docs/reference/models/node.md)
-    - [Selection](docs/reference/models/selection.md)
-    - [State](docs/reference/models/state.md)
-    - [Text](docs/reference/text.md)
-    - [Transform](docs/reference/models/transform.md)
-  - Plugins
-    - [Plugins](docs/reference/plugins/plugins.md)
-    - [Core](docs/reference/plugins/core.md)
+- [**Reference**](./docs/reference)
+  - **Components**
+    - [Editor](./docs/reference/components/editor.md)
+    - [Placeholder](./docs/reference/components/placeholder.md)
+  - **Models**
+    - [Block](./docs/reference/models/block.md)
+    - [Character](./docs/reference/models/character.md)
+    - [Data](./docs/reference/data.md)
+    - [Document](./docs/reference/models/document.md)
+    - [Inline](./docs/reference/models/inline.md)
+    - [Mark](./docs/reference/mark.md)
+    - [Node](./docs/reference/models/node.md)
+    - [Selection](./docs/reference/models/selection.md)
+    - [State](./docs/reference/models/state.md)
+    - [Text](./docs/reference/text.md)
+    - [Transform](./docs/reference/models/transform.md)
+  - **Plugins**
+    - [Plugins](./docs/reference/plugins/plugins.md)
+    - [Core](./docs/reference/plugins/core.md)
 
 If even that's not enough, you can always [read the source itself](./lib), which is explained along with a handful of readme's.
 

@@ -1,5 +1,5 @@
 
-### Installing Slate
+# Installing Slate
 
 Slate is an npm module, so to install it you do:
 
@@ -18,6 +18,7 @@ Once you've install it, you'll need to import it.
 Slate exposes a set of modules that you'll use to build your editor. The most important of which is an `Editor` component.
 
 ```js
+// Import the Slate editor.
 import { Editor } from 'slate'
 ```
 
@@ -26,6 +27,7 @@ In addition to loading the editor, you need to give Slate a "initial state" to w
 To keep things simple, we'll use the `Raw` serializer that ships with Slate to create a new initial state that just contains a single paragraph block with some text in it:
 
 ```js
+// Import the "raw" serializer that ships with Slate.
 import { Editor, Raw } from 'slate'
 
 // Create our initial state...
@@ -47,20 +49,10 @@ const initialState = Raw.deserialize([
 ])
 ```
 
-Okay, now we've got our initial state in a format that Slate understands. But Slate doesn't know anything about our schema, specifically how to render `paragraph` block nodes.
-
-So we need to define a paragraph node renderer, which is just a simple React component, like so:
+And now that we've our initial state, we define our `App` and pass it into Slate's `Editor` component, like so:
 
 ```js
-// A simple React component that wraps text in a `<p>` element.
-const ParagraphNode = (props) => {
-  return <p>{props.children}</p>
-}
-```
-
-And now that we've our initial state and our paragraph renderer, we define our `App` and pass them into Slate's `Editor` component, like so:
-
-```js
+// Import React!
 import React from 'react'
 import { Editor, Raw } from 'state'
 
@@ -81,10 +73,6 @@ const initialState = Raw.deserialize([
   }
 ])
 
-const ParagraphNode = (props) => {
-  return <p>{props.children}</p>
-}
-
 // Define our app...
 class App extends React.Component {
 
@@ -101,14 +89,9 @@ class App extends React.Component {
     return (
       <Editor
         state={this.state.state}
-        renderNode={node => this.renderNode(node)}
         onChange={state => this.onChange(state)}
       />
     )
-  }
-
-  renderNode(node) {
-    if (node.type == 'paragraph') return ParagraphNode
   }
 
   onChange(state) {

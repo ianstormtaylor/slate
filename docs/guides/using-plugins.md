@@ -3,7 +3,7 @@
 <p align="center"><strong>Previous:</strong><br/><a href="./applying-custom-formatting.md">Applying Custom Formatting</a></p>
 <br/>
 
-### Using Formatting
+# Using Plugins
 
 Up to now, everything we've learned has been about how to write one-off logic for your specific Slate editor. But one of the most beautiful things about Slate is actually its plugin system, and how it lets you write less one-off code.
 
@@ -32,7 +32,6 @@ class App extends React.Component {
       <Editor
         state={this.state.state}
         renderMark={mark => this.renderMark(mark)}
-        renderNode={node => this.renderNode(node)}
         onChange={state => this.onChange(state)}
         onKeyDown={(e, state) => this.onKeyDown(e, state)}
       />
@@ -41,10 +40,6 @@ class App extends React.Component {
 
   renderMark(mark) {
     if (mark.type == 'bold') return BOLD_MARK
-  }
-
-  renderNode(node) {
-    if (node.type == 'paragraph') return ParagraphNode
   }
 
   onChange(state) {
@@ -138,7 +133,6 @@ class App extends React.Component {
         state={this.state.state}
         plugins={plugins}
         renderMark={mark => this.renderMark(mark)}
-        renderNode={node => this.renderNode(node)}
         onChange={state => this.onChange(state)}
       />
     )
@@ -146,10 +140,6 @@ class App extends React.Component {
 
   renderMark(mark) {
     if (mark.type == 'bold') return BOLD_MARK
-  }
-
-  renderNode(node) {
-    if (node.type == 'paragraph') return ParagraphNode
   }
 
   onChange(state) {
@@ -207,7 +197,6 @@ class App extends React.Component {
         state={this.state.state}
         plugins={plugins}
         renderMark={mark => this.renderMark(mark)}
-        renderNode={node => this.renderNode(node)}
         onChange={state => this.onChange(state)}
       />
     )
@@ -216,10 +205,6 @@ class App extends React.Component {
   // Update our render function to handle all the new marks...
   renderMark(mark) {
     return MARKS[mark.type]
-  }
-
-  renderNode(node) {
-    if (node.type == 'paragraph') return ParagraphNode
   }
 
   onChange(state) {
@@ -315,7 +300,6 @@ class App extends React.Component {
         state={this.state.state}
         plugins={plugins}
         renderMark={mark => this.renderMark(mark)}
-        renderNode={node => this.renderNode(node)}
         onChange={state => this.onChange(state)}
       />
     )
@@ -323,10 +307,6 @@ class App extends React.Component {
 
   renderMark(mark) {
     return MARKS[mark.type]
-  }
-
-  renderNode(node) {
-    if (node.type == 'paragraph') return ParagraphNode
   }
 
   onChange(state) {
