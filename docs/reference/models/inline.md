@@ -1,13 +1,13 @@
 
-# `Block`
+# `Inline`
 
 ```js
-import { Block } from 'slate'
+import { Inline } from 'slate'
 ```
 
-A block node in a Slate [`Document`](./document.md). Block nodes implement the [`Node`](./node.md) interface.
+A inline node in a Slate [`Document`](./document.md). Inline nodes implement the [`Node`](./node.md) interface.
 
-Block nodes may contain nested block nodes, inline nodes, and text nodes—just like in the DOM. They always contain at least one text node child.
+Inline nodes may contain nested inline nodes and text nodes—just like in the DOM. They always contain at least one text node child.
 
 - [Properties](#properties)
   - [`data`](#data)
@@ -25,7 +25,7 @@ Block nodes may contain nested block nodes, inline nodes, and text nodes—just 
 ## Properties
 
 ```js
-Block({
+Inline({
   data: Immutable.Map,
   isVoid: Boolean,
   key: String,
@@ -42,7 +42,7 @@ Arbitrary data associated with the node. Defaults to an empty `Map`.
 ### `isVoid`
 `Boolean`
 
-Whether the node is a "void" node, meaning that it has no child content (eg. images, videos, etc.). Defaults to `false`.
+Whether the node is a "void" node, meaning that it has no child content (eg. emoji, icons, etc.). Defaults to `false`.
 
 Note that even though a node may be "void", it will still contain a single, empty [`Text`](./text.md) node for consistency across other operations. However, when rendered by Slate that single [`Text`](./text.md) node will not be visible.
 
@@ -59,7 +59,7 @@ A list of child nodes. Defaults to a list with a single text node child.
 ### `type`
 `String`
 
-The custom type of the node (eg. `blockquote` or `list-item`).
+The custom type of the node (eg. `link` or `hashtag`).
 
 
 ## Computed Properties
@@ -67,7 +67,7 @@ The custom type of the node (eg. `blockquote` or `list-item`).
 ### `kind`
 `String`
 
-An immutable string value of `'block'` for easily separating this node from [`Inline`](./inline.md) or [`Text`](./text.md) nodes.
+An immutable string value of `'inline'` for easily separating this node from [`Block`](./block.md) or [`Text`](./text.md) nodes.
 
 ### `length`
 `Number`
@@ -82,4 +82,4 @@ A concatenated string of all of the descendant [`Text`](./text.md) nodes of this
 
 ## Node Methods
 
-Blocks implement the [`Node`](./node.md) interface. For information about their methods, see the [`Node` reference](./node.md).
+Inlines implement the [`Node`](./node.md) interface. For information about their methods, see the [`Node` reference](./node.md).
