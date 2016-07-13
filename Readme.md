@@ -98,6 +98,7 @@ If you're using Slate for the first time, check out the [Getting Started](./docs
   - Saving to a Database
   - Adding a Hovering Menu
   - Rendering Adjacent Elements in Components
+  - Adding Images Using Void Nodes
 - [**Concepts**](./docs/concepts)
   - [Statelessness & Immutability](./docs/concepts/statelessness-and-immutability.md)
   - [The Document Model](./docs/concepts/the-document-model.md)
