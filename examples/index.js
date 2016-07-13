@@ -4,13 +4,6 @@ import ReactDOM from 'react-dom'
 import { Router, Route, Link, IndexRedirect, hashHistory } from 'react-router'
 
 /**
- * Perf.
- */
-
-import Perf from 'react-addons-perf'
-window.Perf = Perf
-
-/**
  * Examples.
  */
 
@@ -23,6 +16,14 @@ import PasteHtml from './paste-html'
 import PlainText from './plain-text'
 import RichText from './rich-text'
 import Tables from './tables'
+
+/**
+ * Perf.
+ */
+
+import Perf from 'react-addons-perf'
+
+window.Perf = Perf
 
 /**
  * Define our example app.

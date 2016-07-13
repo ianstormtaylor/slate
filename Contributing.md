@@ -6,13 +6,23 @@ Want to contribute to Slate? That would be awesome!
 
 ### Running Tests
 
-To run the examples, you need to have the Slate repository cloned to your computed. After that, you need to `cd` into the directory where you cloned it, and run `make install` to install of its dependencies from `npm`.
+To run the examples, you need to have the Slate repository cloned to your computed. After that, you need to `cd` into the directory where you cloned it, and install the dependencies from `npm`.
+
+```
+make install
+```
 
 And then build the source and run the tests:
 
 ```
 make dist
 make test
+```
+
+And to run the linter:
+
+```
+make lint
 ```
 
 If you need to debug something, you can add a `debugger` line to the source, and then run `make test` with the `DEBUG=true` flag enabled.
@@ -26,7 +36,11 @@ make watch-dist
 
 ### Running Examples
 
-To run the examples, you need to have the Slate repository cloned to your computed. After that, you need to `cd` into the directory where you cloned it, and run `make install` to install of its dependencies from `npm`.
+To run the examples, you need to have the Slate repository cloned to your computed. After that, you need to `cd` into the directory where you cloned it, and install the dependencies from `npm`.
+
+```
+make install
+```
 
 And then build the source and run the examples server:
 

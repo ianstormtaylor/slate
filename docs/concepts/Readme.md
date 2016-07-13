@@ -6,7 +6,6 @@ This document explain the core concepts that Slate is built on around. It is hel
 - [Statelessness & Immutability](./statelessness-and-immutability.md)
 - [The Document Model](./the-document-model.md)
 - [The Selection Model](./the-selection-model.md)
-- [Transforms](./transforms.md)
 - [Plugins](./plugins.md)
 
 
