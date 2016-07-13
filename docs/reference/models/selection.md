@@ -2,10 +2,10 @@
 # `Selection`
 
 ```js
-import { Selection } from 'Slate'
+import { Selection } from 'slate'
 ```
 
-A selection in the document. Selections in Slate are modeled after the native [DOM Selection API](https://developer.mozilla.org/en-US/docs/Web/API/Selection), using terms like "anchor", "focus" and "collapsed".
+A selection of a Slate [`Document`](./document.md). Selections in Slate are modeled after the native [DOM Selection API](https://developer.mozilla.org/en-US/docs/Web/API/Selection), using terms like "anchor", "focus" and "collapsed".
 
 The "anchor" is the fixed point in a selection, and the "focus" is the non-fixed point, which may move when you move the cursor (eg. when pressing `Shift + Right Arrow`).
 

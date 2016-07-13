@@ -5,7 +5,7 @@
 <p align="center">A <em>completely</em> customizable framework <br/>for building rich text editors in the browser.</p>
 <br/>
 
-<p align="center"><a href="#principles">Principles</a> · <a href="#examples">Examples</a> · <a href="#plugins">Plugins</a> · <a href="#documentation">Documentation</a> · Contributing</p>
+<p align="center"><a href="#principles">Principles</a> · <a href="#examples">Examples</a> · <a href="#plugins">Plugins</a> · <a href="#documentation">Documentation</a> · Contributing!</p>
 <br/>
 
 Slate lets you build rich, intuitive editors like those in [Medium](https://medium.com/), [Dropbox Paper](https://www.dropbox.com/paper) or [Canvas](https://usecanvas.com/)—which are becoming table stakes for applications on the web—without your codebase getting mired in complexity.
@@ -103,9 +103,9 @@ If even that's not enough, you can always [read the source itself](./lib), which
 <br/>
 ### License
 
-The MIT License (MIT)
+The MIT License
 
-Copyright &copy; 2016, Ian Storm Taylor
+Copyright &copy; 2016, [Ian Storm Taylor](https://ianstormtaylor.com)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
