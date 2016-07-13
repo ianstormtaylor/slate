@@ -10,9 +10,9 @@
 
 Slate lets you build rich, intuitive editors like those in [Medium](https://medium.com/), [Dropbox Paper](https://www.dropbox.com/paper) or [Canvas](https://usecanvas.com/)—which are becoming table stakes for applications on the web—without your codebase getting mired in complexity.
 
-It can do this because all of its logic is implemented with a series of plugins, so you aren't ever constrained by what _is_ or _isn't_ in "core". You can think of it like a pluggable implementation of `contenteditable`, built on top of React and Immutable. It was inspired by libraries like [Draft.js](https://facebook.github.io/draft-js/), [Prosemirror](http://prosemirror.net/) and [Quill](http://quilljs.com/).
+It can do this because all of its logic is implemented with a series of plugins, so you aren't ever constrained by what _is_ or _isn't_ in "core". You can think of it like a pluggable implementation of `contenteditable`, built on top of [React](https://facebook.github.io/react/) and [Immutable](https://facebook.github.io/immutable-js/). It was inspired by libraries like [Draft.js](https://facebook.github.io/draft-js/), [Prosemirror](http://prosemirror.net/) and [Quill](http://quilljs.com/).
 
-_Slate is **currently in beta**, while work is being done on: cross-browser support, atomic node support, and collaboration support. It's useable now, but you might need to pull request one or two fixes for your use case._
+_**Slate is currently in beta**, while work is being done on: cross-browser support, atomic node support, and collaboration support. It's useable now, but you might need to pull request one or two fixes for your use case._
 
 
 <br/>
@@ -54,8 +54,8 @@ If you have an idea for an example that shows a common use case, pull request it
 
 Slate encourages you to write small, reusable modules. Check out the public ones you can use in your project!
 
-- [**Plugins**](./wiki#plugins) 
-- [**Serializers**](./wiki#serializers)
+- [**Plugins**](https://github.com/ianstormtaylor/slate/wiki#plugins) 
+- [**Serializers**](https://github.com/ianstormtaylor/slate/wiki#serializers)
 
 
 <br/>
@@ -72,13 +72,11 @@ If you're using Slate for the first time, check out the [Getting Started](./docs
   - Saving to a Database
   - Adding a Hovering Menu
   - Rendering Adjacent Elements in Components
-
 - [**Concepts**](./docs/concepts)
   - [Statelessness & Immutability](./docs/concepts/statelessness-and-immutability.md)
   - [The Document Model](./docs/concepts/the-document-model.md)
   - [The Selection Model](./docs/concepts/the-selection-model.md)
   - [Plugins](./docs/concepts/plugins.md)
-
 - [**Reference**](./docs/reference)
   - Components
     - [Editor](./docs/reference/components/editor.md)
