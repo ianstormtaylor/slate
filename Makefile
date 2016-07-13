@@ -11,6 +11,12 @@ mocha-phantomjs = $(bin)/mocha-phantomjs
 node = node
 watchify = $(bin)/watchify
 
+# Options.
+babel_flags =
+browserify_flags = --debug --transform babelify
+eslint_flags = --ignore-pattern "build.js"
+mocha_flags = --compilers js:babel-core/register --require source-map-support/register --reporter spec
+
 # Flags.
 DEBUG ?=
 GREP ?=
@@ -29,19 +35,12 @@ clean:
 	@ rm -rf ./dist ./node_modules
 
 # Build the source.
-dist:  $(shell find ./lib) package.json
-	@ $(babel) \
-		--out-dir \
-		./dist \
-		./lib
+dist: $(shell find ./lib) package.json
+	@ $(babel) $(babel_flags) --out-dir ./dist ./lib
 
 # Build the examples.
 examples:
-	@ $(browserify) \
-		./examples/index.js \
-		--debug \
-		--transform babelify \
-		| $(exorcist) ./examples/build.js.map > ./examples/build.js
+	@ $(browserify) $(browserify_flags) ./examples/index.js --outfile ./examples/build.js
 
 # Install the dependencies.
 install:
@@ -49,55 +48,23 @@ install:
 
 # Lint the source files.
 lint:
-	@ $(eslint) \
-		"lib/**/*.js" \
-		"examples/**/*.js" --ignore-pattern "build.js"
+	@ $(eslint) $(eslint_flags) "lib/**/*.js" "examples/**/*.js"
 
-# Start the examples server.
-start-examples:
+# Start the server.
+start:
 	@ $(http-server) ./examples
 
-# Build the test source.
-test/support/build.js: $(shell find ./lib) ./test/browser.js
-	@ $(browserify) \
-		./test/browser.js \
-		--debug \
-		--transform babelify \
-		--outfile ./test/support/build.js
-
 # Run the tests.
-test: test-server
-
-# Run the browser-side tests.
-test-browser: ./test/support/build.js
-	@ $(mocha-phantomjs) \
-		--reporter spec \
-		./test/support/browser.html
-
-# Run the server-side tests.
-test-server:
-	@ $(mocha) \
-		--compilers js:babel-core/register \
-		--require source-map-support/register \
-		--reporter spec \
-		--fgrep "$(GREP)" \
-		./test/server.js
+test:
+	@ $(mocha) $(mocha_flags) --fgrep "$(GREP)" ./test/server.js
 
 # Watch the source.
-watch-dist:  $(shell find ./lib) package.json
-	@ $(babel) \
-		--watch \
-		--out-dir \
-		./dist \
-		./lib
+watch-dist:
+	@ $(MAKE) dist babel_flags="$(babel_flags) --watch"
 
 # Watch the examples.
 watch-examples:
-	@ $(watchify) \
-		./examples/index.js \
-		--debug \
-		--transform babelify \
-		--outfile "$(exorcist) ./examples/build.js.map > ./examples/build.js"
+	@ $(MAKE) examples browserify=$(watchify)
 
 # Phony targets.
 .PHONY: examples
