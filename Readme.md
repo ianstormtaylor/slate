@@ -52,7 +52,7 @@ Slate tries to solve the question of "[Why?](#why)" with a few principles:
 
 6. **Collaboration-ready data model.** The data model Slate uses—specifically how transforms are applied to the document—has been designed to allow for collaborative editing to be layered on top, so you won't need to rethink everything if you decide to make your editor collaborative. (More work is required on this!)
 
-7. **Clear "core" boundaries.** 
+7. **Clear "core" boundaries.** With a plugin-first architecture, and a schema-less core, it becomes a lot clearer where the boundary is between "core" and "custom", which means that the core experience doesn't get bogged down in edge cases.
 
 
 <br/>
