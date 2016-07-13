@@ -4,7 +4,7 @@ import React from 'react'
 import initialState from './state.json'
 
 /**
- * Node renderers.
+ * Define a set of node renderers.
  *
  * @type {Object}
  */
@@ -29,7 +29,7 @@ const NODES = {
 }
 
 /**
- * Mark renderers.
+ * Define a set of mark renderers.
  *
  * @type {Object}
  */
@@ -157,16 +157,57 @@ const RULES = [
 const serializer = new Html(RULES)
 
 /**
- * The rich text example.
+ * The pasting html example.
  *
  * @type {Component}
  */
 
 class PasteHtml extends React.Component {
 
+  /**
+   * Deserialize the raw initial state.
+   *
+   * @type {Object}
+   */
+
   state = {
     state: Raw.deserialize(initialState)
   };
+
+  /**
+   * On change, save the new state.
+   *
+   * @param {State} state
+   */
+
+  onChange = (state) => {
+    this.setState({ state })
+  }
+
+  /**
+   * On paste, deserialize the HTML and then insert the fragment.
+   *
+   * @param {Event} e
+   * @param {Object} paste
+   * @param {State} state
+   */
+
+  onPaste = (e, paste, state) => {
+    if (paste.type != 'html') return
+    const { html } = paste
+    const { document } = serializer.deserialize(html)
+
+    return state
+      .transform()
+      .insertFragment(document)
+      .apply()
+  }
+
+  /**
+   * Render.
+   *
+   * @return {Component}
+   */
 
   render = () => {
     return (
@@ -182,27 +223,26 @@ class PasteHtml extends React.Component {
     )
   }
 
+  /**
+   * Return a node renderer for a Slate `node`.
+   *
+   * @param {Node} node
+   * @return {Component or Void}
+   */
+
   renderNode = (node) => {
     return NODES[node.type]
   }
 
+  /**
+   * Return a mark renderer for a Slate `mark`.
+   *
+   * @param {Mark} mark
+   * @return {Object or Void}
+   */
+
   renderMark = (mark) => {
     return MARKS[mark.type]
-  }
-
-  onChange = (state) => {
-    this.setState({ state })
-  }
-
-  onPaste = (e, paste, state, editor) => {
-    if (paste.type != 'html') return
-    const { html } = paste
-    const { document } = serializer.deserialize(html)
-
-    return state
-      .transform()
-      .insertFragment(document)
-      .apply()
   }
 
 }

@@ -6,7 +6,7 @@ import initialState from './state.json'
 import { Map } from 'immutable'
 
 /**
- * Node renderers.
+ * Define a set of node renderers.
  *
  * @type {Object}
  */
@@ -28,6 +28,12 @@ const NODES = {
  */
 
 class Images extends React.Component {
+
+  /**
+   * Deserialize the raw initial state.
+   *
+   * @type {Object}
+   */
 
   state = {
     state: Raw.deserialize(initialState)

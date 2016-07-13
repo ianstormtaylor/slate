@@ -5,7 +5,7 @@ import initialState from './state.json'
 import keycode from 'keycode'
 
 /**
- * Defin a set of node renderers.
+ * Define a set of node renderers.
  *
  * @type {Object}
  */

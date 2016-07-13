@@ -6,7 +6,7 @@ import keycode from 'keycode'
 import initialState from './state.json'
 
 /**
- * Node renderers.
+ * Define a set of node renderers.
  *
  * @type {Object}
  */
@@ -16,7 +16,7 @@ const NODES = {
 }
 
 /**
- * Mark renderers.
+ * Define a set of mark renderers.
  *
  * @type {Object}
  */
@@ -34,22 +34,42 @@ const MARKS = {
 }
 
 /**
- * Example.
+ * The code highlighting example.
  *
  * @type {Component}
  */
 
 class CodeHighlighting extends React.Component {
 
+  /**
+   * Deserialize the raw initial state.
+   *
+   * @type {Object}
+   */
+
   state = {
     state: Raw.deserialize(initialState)
   };
+
+  /**
+   * On change, save the new state.
+   *
+   * @param {State} state
+   */
 
   onChange = (state) => {
     this.setState({ state })
   }
 
-  onKeyDown = (e, state, editor) => {
+  /**
+   * On key down inside code blocks, insert soft new lines.
+   *
+   * @param {Event} e
+   * @param {State} state
+   * @return {State}
+   */
+
+  onKeyDown = (e, state) => {
     const key = keycode(e.which)
     if (key != 'enter') return
     const { startBlock } = state
@@ -61,6 +81,12 @@ class CodeHighlighting extends React.Component {
 
     return transform.apply()
   }
+
+  /**
+   * Render.
+   *
+   * @return {Component}
+   */
 
   render = () => {
     return (
@@ -77,15 +103,36 @@ class CodeHighlighting extends React.Component {
     )
   }
 
+  /**
+   * Return a node renderer for a Slate `node`.
+   *
+   * @param {Node} node
+   * @return {Component or Void}
+   */
+
   renderNode = (node) => {
     return NODES[node.type]
   }
+
+  /**
+   * Return a mark renderer for a Slate `mark`.
+   *
+   * @param {Mark} mark
+   * @return {Object or Void}
+   */
 
   renderMark = (mark) => {
     return MARKS[mark.type] || {}
   }
 
-  renderDecorations = (text, state, editor) => {
+  /**
+   * Render decorations on `text` nodes inside code blocks.
+   *
+   * @param {Text} text
+   * @return {Characters}
+   */
+
+  renderDecorations = (text, state) => {
     const { document } = state
     const block = document.getClosestBlock(text)
     if (block.type != 'code') return text.characters

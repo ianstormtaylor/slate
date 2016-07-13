@@ -6,7 +6,7 @@ import position from 'selection-position'
 import initialState from './state.json'
 
 /**
- * Mark renderers.
+ * Define a set of mark renderers.
  *
  * @type {Object}
  */
@@ -30,16 +30,26 @@ const MARKS = {
 }
 
 /**
- * The rich text example.
+ * The hovering menu example.
  *
  * @type {Component}
  */
 
 class HoveringMenu extends React.Component {
 
+  /**
+   * Deserialize the raw initial state.
+   *
+   * @type {Object}
+   */
+
   state = {
     state: Raw.deserialize(initialState)
   };
+
+  /**
+   * On update, update the menu.
+   */
 
   componentDidMount = () => {
     this.updateMenu()
@@ -49,6 +59,64 @@ class HoveringMenu extends React.Component {
     this.updateMenu()
   }
 
+  /**
+   * Check if the current selection has a mark with `type` in it.
+   *
+   * @param {String} type
+   * @return {Boolean}
+   */
+
+  hasMark = (type) => {
+    const { state } = this.state
+    return state.marks.some(mark => mark.type == type)
+  }
+
+  /**
+   * On change, save the new state.
+   *
+   * @param {State} state
+   */
+
+  onChange = (state) => {
+    this.setState({ state })
+  }
+
+  /**
+   * When a mark button is clicked, toggle the current mark.
+   *
+   * @param {Event} e
+   * @param {String} type
+   */
+
+  onClickMark = (e, type) => {
+    e.preventDefault()
+    const isActive = this.hasMark(type)
+    let { state } = this.state
+
+    state = state
+      .transform()
+      [isActive ? 'unmark' : 'mark'](type)
+      .apply()
+
+    this.setState({ state })
+  }
+
+  /**
+   * When the portal opens, cache the menu element.
+   *
+   * @param {Element} portal
+   */
+
+  onOpen = (portal) => {
+    this.setState({ menu: portal.firstChild })
+  }
+
+  /**
+   * Render.
+   *
+   * @return {Element}
+   */
+
   render = () => {
     return (
       <div>
@@ -57,6 +125,12 @@ class HoveringMenu extends React.Component {
       </div>
     )
   }
+
+  /**
+   * Render the hovering menu.
+   *
+   * @return {Element}
+   */
 
   renderMenu = () => {
     const { state } = this.state
@@ -73,6 +147,14 @@ class HoveringMenu extends React.Component {
     )
   }
 
+  /**
+   * Render a mark-toggling toolbar button.
+   *
+   * @param {String} type
+   * @param {String} icon
+   * @return {Element}
+   */
+
   renderMarkButton = (type, icon) => {
     const isActive = this.hasMark(type)
     const onMouseDown = e => this.onClickMark(e, type)
@@ -83,6 +165,12 @@ class HoveringMenu extends React.Component {
       </span>
     )
   }
+
+  /**
+   * Render the Slate editor.
+   *
+   * @return {Element}
+   */
 
   renderEditor = () => {
     return (
@@ -96,9 +184,20 @@ class HoveringMenu extends React.Component {
     )
   }
 
+  /**
+   * Return a mark renderer for a Slate `mark`.
+   *
+   * @param {Mark} mark
+   * @return {Object or Void}
+   */
+
   renderMark = (mark) => {
     return MARKS[mark.type]
   }
+
+  /**
+   * Update the menu's absolute position.
+   */
 
   updateMenu = () => {
     const { menu, state } = this.state
@@ -113,32 +212,6 @@ class HoveringMenu extends React.Component {
     menu.style.opacity = 1
     menu.style.top = `${rect.top + window.scrollY - menu.offsetHeight}px`
     menu.style.left = `${rect.left + window.scrollX - menu.offsetWidth / 2 + rect.width / 2}px`
-  }
-
-  hasMark = (type) => {
-    const { state } = this.state
-    return state.marks.some(mark => mark.type == type)
-  }
-
-  onChange = (state) => {
-    this.setState({ state })
-  }
-
-  onClickMark = (e, type) => {
-    e.preventDefault()
-    const isActive = this.hasMark(type)
-    let { state } = this.state
-
-    state = state
-      .transform()
-      [isActive ? 'unmark' : 'mark'](type)
-      .apply()
-
-    this.setState({ state })
-  }
-
-  onOpen = (el) => {
-    this.setState({ menu: el.firstChild })
   }
 
 }
