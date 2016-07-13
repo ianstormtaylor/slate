@@ -103,6 +103,12 @@ If even that's not enough, you can always [read the source itself](./lib), which
 
 
 <br/>
+### Contributing
+
+All contributions are super welcome! Check out the [Contributing instructions](./Contributing.md) for more info.
+
+
+<br/>
 ### License
 
 The MIT License
