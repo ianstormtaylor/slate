@@ -66,7 +66,7 @@ test/support/build.js: $(shell find ./lib) ./test/browser.js
 		--outfile ./test/support/build.js
 
 # Run the tests.
-test: test-browser test-server
+test: test-server
 
 # Run the browser-side tests.
 test-browser: ./test/support/build.js
