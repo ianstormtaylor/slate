@@ -74,16 +74,16 @@ If you're using Slate for the first time, check out the [Getting Started](./docs
   - Rendering Adjacent Elements in Components
 
 - [**Concepts**](./docs/concepts)
-  - Statelessness & Immutability
-  - The Document Model
-  - The Selection Model
-  - Plugins
+  - [Statelessness & Immutability](./docs/concepts/statelessness-and-immutability.md)
+  - [The Document Model](./docs/concepts/the-document-model.md)
+  - [The Selection Model](./docs/concepts/the-selection-model.md)
+  - [Plugins](./docs/concepts/plugins.md)
 
 - [**Reference**](./docs/reference)
-  - **Components**
+  - Components
     - [Editor](./docs/reference/components/editor.md)
     - [Placeholder](./docs/reference/components/placeholder.md)
-  - **Models**
+  - Models
     - [Block](./docs/reference/models/block.md)
     - [Character](./docs/reference/models/character.md)
     - [Data](./docs/reference/data.md)
@@ -95,7 +95,7 @@ If you're using Slate for the first time, check out the [Getting Started](./docs
     - [State](./docs/reference/models/state.md)
     - [Text](./docs/reference/text.md)
     - [Transform](./docs/reference/models/transform.md)
-  - **Plugins**
+  - Plugins
     - [Plugins](./docs/reference/plugins/plugins.md)
     - [Core](./docs/reference/plugins/core.md)
 
