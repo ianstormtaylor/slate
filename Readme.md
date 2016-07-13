@@ -32,9 +32,7 @@ Here's how Slate compares to some of the existing editors out there:
 
 - [**Trix**](https://trix-editor.org/) — I never used Trix directly either, so my issues with it are solely from considering it in early stages. The issues I found with it are: that it aims to be simple by limiting functionality instead of by limiting its own scope, that many behaviors are just impossible to implement with it, that it's too coupled to the DOM, and that the flat document model is limiting.
 
-Of course those are my own opinions, but if you've tried using any of those libraries you might have run into similar problems.
-
-Which brings me to how Slate solves all of that...
+Of course those are my own opinions, but if you've tried using any of those libraries you might have run into similar problems. Which brings me to how Slate solves all of that...
 
 
 <br/>
