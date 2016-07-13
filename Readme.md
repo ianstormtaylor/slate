@@ -90,9 +90,9 @@ If you're using Slate for the first time, check out the [Getting Started](./docs
     - [Mark](docs/reference/mark.md)
     - [Node](docs/reference/models/node.md)
     - [Selection](docs/reference/models/selection.md)
-    - State
+    - [State](docs/reference/models/state.md)
     - [Text](docs/reference/text.md)
-    - Transform
+    - [Transform](docs/reference/models/transform.md)
   - Plugins
     - [Plugins](docs/reference/plugins/plugins.md)
     - [Core](docs/reference/plugins/core.md)
