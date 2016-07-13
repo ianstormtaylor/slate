@@ -1,6 +1,6 @@
 
 
-<p align="center"><img src="./docs/banner.png" /></p>
+<p align="center"><a href="#"><img src="./docs/banner.png" /></a></p>
 
 <p align="center">A <em>completely</em> customizable framework <br/>for building rich text editors in the browser.</p>
 <br/>
@@ -8,7 +8,8 @@
 <p align="center"><a href="#why"><strong>Why?</strong></a> · <a href="#principles"><strong>Principles</strong></a> · <a href="#examples"><strong>Examples</strong></a> · <a href="#plugins"><strong>Plugins</strong></a> · <a href="#documentation"><strong>Documentation</strong></a> · <a href="./Contributing.md"><strong>Contributing!</strong></a></p>
 <br/>
 
-<p align="center"><a href="https://slate-slack.herokuapp.com"><img src="https://slate-slack.herokuapp.com/badge.svg"><a/></p>
+<p align="center"><a href="#"><img src="https://img.shields.io/npm/dm/localeval.svg?maxAge=2592000"></a> <a href="https://slate-slack.herokuapp.com"><img src="https://slate-slack.herokuapp.com/badge.svg"><a/></p>
+<br/>
 
 Slate lets you build rich, intuitive editors like those in [Medium](https://medium.com/), [Dropbox Paper](https://www.dropbox.com/paper) or [Canvas](https://usecanvas.com/)—which are becoming table stakes for applications on the web—without your codebase getting mired in complexity.
 
