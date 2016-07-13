@@ -78,7 +78,7 @@ class Links extends React.Component {
         .insertText(text)
         .extendBackward(text.length)
         .wrapInline('link', new Map({ href }))
-        .moveToEnd(text.length)
+        .collapseToEnd()
         .apply()
     }
 

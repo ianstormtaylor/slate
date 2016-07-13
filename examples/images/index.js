@@ -142,11 +142,21 @@ class Images extends React.Component {
 
     if (anchorBlock.text != '') {
       if (selection.isAtEndOf(anchorBlock)) {
-        transform = transform.splitBlock()
-      } else if (selection.isAtStartOf(anchorBlock)) {
-        transform = transform.splitBlock().moveToStartOfPreviousBlock()
-      } else {
-        transform = transform.splitBlock().splitBlock().moveToStartOfPreviousBlock()
+        transform = transform
+          .splitBlock()
+      }
+
+      else if (selection.isAtStartOf(anchorBlock)) {
+        transform = transform
+          .splitBlock()
+          .collapseToStartOfPreviousBlock()
+      }
+
+      else {
+        transform = transform
+          .splitBlock()
+          .splitBlock()
+          .collapseToStartOfPreviousBlock()
       }
     }
 

@@ -29,17 +29,17 @@ Transform methods can either operate on the [`Document`](./document.md), the [`S
   - [`wrapInline`](#wrapinline)
 - [Selection Transforms](#selection-transforms)
   - [`blur`](#blur)
-  - [`extend{Direction}`](#extenddirection)
+  - [`collapseTo{Edge}Of`](#collapsetoedgeof)
+  - [`collapseTo{Edge}Of{Direction}Block`](#collapsetoedgeofdirectionblock)
+  - [`collapseTo{Edge}Of{Direction}Text`](#collapsetoedgeofdirectiontext)
+  - [`collapseTo{Edge}`](#collapsetoedge)
   - [`extendTo{Edge}Of`](#extendtoedgeof)
+  - [`extend{Direction}`](#extenddirection)
   - [`focus`](#focus)
-  - [`move{Direction}`](#movedirection)
   - [`moveToOffsets`](#movetooffsets)
   - [`moveToRangeOf`](#movetorangeof)
   - [`moveTo`](#moveto)
-  - [`moveTo{Edge}`](#movetoedge)
-  - [`moveTo{Edge}Of`](#movetoedgeof)
-  - [`moveTo{Edge}Of{Direction}Block`](#movetoedgeofdirectionblock)
-  - [`moveTo{Edge}Of{Direction}Text`](#movetoedgeofdirectiontext)
+  - [`move{Direction}`](#movedirection)
 - [Document Transforms](#document-transforms)
   - [`deleteAtRange`](#deleteatrange)
   - [`deleteBackwardAtRange`](#deletebackwardatrange)
@@ -152,6 +152,26 @@ Wrap the [`Inline`](./inline.md) nodes in the current selection with a new [`Inl
 
 Blur the current selection.
 
+### `collapseTo{Edge}`
+`collapseTo{Edge}() => Transform`
+
+Collapse the current selection to its `{Edge}`. Where `{Edge}` is either `Anchor`, `Focus`, `Start` or `End`.
+
+### `collapseTo{Edge}Of`
+`collapseTo{Edge}Of(node: Node) => Transform`
+
+Collapse the current selection to the `{Edge}` of `node`. Where `{Edge}` is either `Start` or `End`.
+
+### `collapseTo{Edge}Of{Direction}Block`
+`collapseTo{Edge}Of{Direction}Block() => Transform`
+
+Collapse the current selection to the `{Edge}` of the next [`Block`](./block.md) node in `{Direction}`. Where `{Edge}` is either `{Start}` or `{End}` and `{Direction}` is either `Next` or `Previous`.
+
+### `collapseTo{Edge}Of{Direction}Text`
+`collapseTo{Edge}Of{Direction}Text() => Transform`
+
+Collapse the current selection to the `{Edge}` of the next [`Text`](./text.md) node in `{Direction}`. Where `{Edge}` is either `{Start}` or `{End}` and `{Direction}` is either `Next` or `Previous`.
+
 ### `extend{Direction}`
 `extend{Direction}(n: Number) => Transform`
 
@@ -186,26 +206,6 @@ Move the current selection's anchor point to the start of a `node` and its focus
 `moveTo(properties: Object) => Transform`
 
 Move the current selection to a selection with merged `properties`.
-
-### `collapseTo{Edge}`
-`collapseTo{Edge}() => Transform`
-
-Collapse the current selection to its `{Edge}`. Where `{Edge}` is either `Anchor`, `Focus`, `Start` or `End`.
-
-### `collapseTo{Edge}Of`
-`collapseTo{Edge}Of(node: Node) => Transform`
-
-Collapse the current selection to the `{Edge}` of `node`. Where `{Edge}` is either `Start` or `End`.
-
-### `collapseTo{Edge}Of{Direction}Block`
-`collapseTo{Edge}Of{Direction}Block() => Transform`
-
-Collapse the current selection to the `{Edge}` of the next [`Block`](./block.md) node in `{Direction}`. Where `{Edge}` is either `{Start}` or `{End}` and `{Direction}` is either `Next` or `Previous`.
-
-### `collapseTo{Edge}Of{Direction}Text`
-`collapseTo{Edge}Of{Direction}Text() => Transform`
-
-Collapse the current selection to the `{Edge}` of the next [`Text`](./text.md) node in `{Direction}`. Where `{Edge}` is either `{Start}` or `{End}` and `{Direction}` is either `Next` or `Previous`.
 
 
 ## Document Transforms
