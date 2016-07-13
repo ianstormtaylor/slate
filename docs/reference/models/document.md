@@ -15,6 +15,8 @@ Documents are made up of block nodes, inline nodes, and text nodes—just like i
   - [`kind`](#kind)
   - [`length`](#length)
   - [`text`](#text)
+- [Static Methods](#static-methods)
+  - [`Document.create`](#document-create)
 - [Node Methods](#node-methods)
 
 
@@ -22,7 +24,7 @@ Documents are made up of block nodes, inline nodes, and text nodes—just like i
 
 ```js
 Document({
-  nodes: Immutable.List,
+  nodes: Immutable.List<Node>,
 })
 ```
 
@@ -48,6 +50,14 @@ The sum of the lengths of all of the descendant [`Text`](./text.md) nodes of thi
 `String`
 
 A concatenated string of all of the descendant [`Text`](./text.md) nodes of this node.
+
+
+## Static Methods
+
+### `Document.create`
+`Document.create(properties: Object) => Document`
+
+Create a block from a plain Javascript object of `properties`.
 
 
 ## Node Methods

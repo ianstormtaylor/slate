@@ -19,6 +19,9 @@ Inline nodes may contain nested inline nodes and text nodes—just like in the D
   - [`kind`](#kind)
   - [`length`](#length)
   - [`text`](#text)
+- [Static Methods](#static-methods)
+  - [`Inline.create`](#inline-create)
+  - [`Inline.createList`](#inline-createlist)
 - [Node Methods](#node-methods)
 
 
@@ -26,10 +29,10 @@ Inline nodes may contain nested inline nodes and text nodes—just like in the D
 
 ```js
 Inline({
-  data: Immutable.Map,
+  data: Data,
   isVoid: Boolean,
   key: String,
-  nodes: Immutable.List,
+  nodes: Immutable.List<Node>,
   type: String
 })
 ```
@@ -78,6 +81,19 @@ The sum of the lengths of all of the descendant [`Text`](./text.md) nodes of thi
 `String`
 
 A concatenated string of all of the descendant [`Text`](./text.md) nodes of this node.
+
+
+## Static Methods
+
+### `Block.create`
+`Block.create(properties: Object) => Block`
+
+Create a block from a plain Javascript object of `properties`.
+
+### `Block.createList`
+`Block.createList(array: Array) => List`
+
+Create a list of block nodes from a plain Javascript `array`.
 
 
 ## Node Methods

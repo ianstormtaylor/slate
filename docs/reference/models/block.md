@@ -19,6 +19,9 @@ Block nodes may contain nested block nodes, inline nodes, and text nodes—just 
   - [`kind`](#kind)
   - [`length`](#length)
   - [`text`](#text)
+- [Static Methods](#static-methods)
+  - [`Block.create`](#block-create)
+  - [`Block.createList`](#block-createlist)
 - [Node Methods](#node-methods)
 
 
@@ -26,10 +29,10 @@ Block nodes may contain nested block nodes, inline nodes, and text nodes—just 
 
 ```js
 Block({
-  data: Immutable.Map,
+  data: Data,
   isVoid: Boolean,
   key: String,
-  nodes: Immutable.List,
+  nodes: Immutable.List<Node>,
   type: String
 })
 ```
@@ -78,6 +81,19 @@ The sum of the lengths of all of the descendant [`Text`](./text.md) nodes of thi
 `String`
 
 A concatenated string of all of the descendant [`Text`](./text.md) nodes of this node.
+
+
+## Static Methods
+
+### `Block.create`
+`Block.create(properties: Object) => Block`
+
+Create a block from a plain Javascript object of `properties`.
+
+### `Block.createList`
+`Block.createList(array: Array) => List`
+
+Create a list of block nodes from a plain Javascript `array`.
 
 
 ## Node Methods

@@ -1,0 +1,21 @@
+
+# `Data`
+
+```js
+import { Data } from 'slate'
+```
+
+Data is simply a thin wrapper around [`Immutable.Map`](https://facebook.github.io/immutable-js/docs/#/Map), so that you don't need to ever depend on Immutable directly, and for future compatibility.
+
+A data object can have any properties associated with it.
+
+- [Static Methods](#static-methods)
+  - [`Data.create`](#data-create)
+
+
+## Static Methods
+
+### `Data.create`
+`Data.create(properties: Object) => Data`
+
+Create a data object from a plain Javascript object of `properties`.

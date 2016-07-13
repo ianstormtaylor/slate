@@ -82,16 +82,16 @@ If you're using Slate for the first time, check out the [Getting Started](./docs
     - [Editor](docs/reference/components/editor.md)
     - [Placeholder](docs/reference/components/placeholder.md)
   - Models
-    - Block
-    - Character
-    - Data
-    - Document
-    - Inline
-    - Mark
-    - Node
+    - [Block](docs/reference/models/block.md)
+    - [Character](docs/reference/models/character.md)
+    - [Data](docs/reference/data.md)
+    - [Document](docs/reference/models/document.md)
+    - [Inline](docs/reference/models/inline.md)
+    - [Mark](docs/reference/mark.md)
+    - [Node](docs/reference/models/node.md)
     - [Selection](docs/reference/models/selection.md)
     - State
-    - Text
+    - [Text](docs/reference/text.md)
     - Transform
   - Plugins
     - [Plugins](docs/reference/plugins/plugins.md)
