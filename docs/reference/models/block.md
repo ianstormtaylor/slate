@@ -98,4 +98,4 @@ Create a list of block nodes from a plain Javascript `array`.
 
 ## Node Methods
 
-Blocks implement the [`Node`](./node.md) interface. For information about their methods, see the [`Node` reference](./node.md).
+Blocks implement the [`Node`](./node.md) interface. For information about all of the node methods, see the [`Node` reference](./node.md).

@@ -62,4 +62,4 @@ Create a block from a plain Javascript object of `properties`.
 
 ## Node Methods
 
-Documents implement the [`Node`](./node.md) interface. For information about their methods, see the [`Node` reference](./node.md).
+Documents implement the [`Node`](./node.md) interface. For information about all of the node methods, see the [`Node` reference](./node.md).
