@@ -153,11 +153,6 @@ class Links extends React.Component {
    */
 
   onChange = (state) => {
-    console.groupCollapsed('Change!')
-    console.log('Document:', state.document.toJS())
-    console.log('Selection:', state.selection.toJS())
-    console.log('Content:', Raw.serialize(state))
-    console.groupEnd()
     this.setState({ state })
   }
 
