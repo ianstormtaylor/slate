@@ -1,7 +1,6 @@
 
 import { Editor, Plain } from '../..'
 import React from 'react'
-import initialState from './state.json'
 
 /**
  * The plain text example.
@@ -18,7 +17,7 @@ class PlainText extends React.Component {
    */
 
   state = {
-    state: Plain.deserialize(initialState)
+    state: Plain.deserialize('This is editable plain text, just like a <textarea>!')
   };
 
   /**
