@@ -3,7 +3,6 @@ import { Editor, Plain } from '../..'
 import React from 'react'
 import initialState from './state.json'
 
-
 /**
  * The plain text example.
  *
@@ -23,6 +22,16 @@ class PlainText extends React.Component {
   };
 
   /**
+   * On change.
+   *
+   * @param {State} state
+   */
+
+  onChange = (state) => {
+    this.setState({ state })
+  }
+
+  /**
    * Render the editor.
    *
    * @return {Component} component
@@ -36,17 +45,6 @@ class PlainText extends React.Component {
         onChange={this.onChange}
       />
     )
-  }
-
-  /**
-   * On change.
-   *
-   * @param {State} state
-   */
-
-  onChange = (state) => {
-    console.log('Content:', Plain.serialize(state))
-    this.setState({ state })
   }
 
 }
