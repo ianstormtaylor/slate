@@ -57,7 +57,7 @@ Slate encourages you to write small, reusable modules. Check out the public ones
 - [`slate-auto-replace-text`](https://github.com/ianstormtaylor/slate-auto-replace-text) auto-replaces a string of text when typed. Useful for "smart" typography!
 - [`slate-collapse-on-escape`](https://github.com/ianstormtaylor/slate-collapse-on-escape) simply collapses the selection when `escape` is pressed.
 - [`slate-paste-linkify`](https://github.com/ianstormtaylor/slate-paste-linkify) wraps the selected text in a link when a URL is pasted from the clipboard.
-- [`slate-soft-break`](https://github.com/ianstormtaylor/slate-soft-break) adds a soft break on return.
+- [`slate-soft-break`](https://github.com/ianstormtaylor/slate-soft-break) adds a soft break when `enter` is pressed.
 - [**View all plugins...**](https://github.com/ianstormtaylor/slate/wiki)
 
 <br/>
