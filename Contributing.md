@@ -6,16 +6,15 @@ Want to contribute to Slate? That would be awesome!
 
 ### Running Tests
 
-To run the examples, you need to have the Slate repository cloned to your computed. After that, you need to `cd` into the directory where you cloned it, and install the dependencies from `npm`.
+To run the examples, you need to have the Slate repository cloned to your computer. After that, you need to `cd` into the directory where you cloned it, and install the dependencies from `npm`.
 
 ```
 make install
 ```
 
-And then build the source and run the tests:
+Which will also compile the source files. Then run the tests with:
 
 ```
-make dist
 make test
 ```
 
@@ -25,7 +24,9 @@ And to run the linter:
 make lint
 ```
 
-If you need to debug something, you can add a `debugger` line to the source, and then run `make test` with the `DEBUG=true` flag enabled.
+Or you can run both with `make check`, which is what is run by default.
+
+If you need to debug something, you can add a `debugger` line to the source, and then run `make test` with the `DEBUG=true` flag enabled. Or, if you only want to run a specific test or tests, you can add the `GREP="some string"` flag which will filter the tests being run.
 
 To keep the source rebuilding on every file change, you need to run an additional watching command:
 
@@ -36,27 +37,7 @@ make watch-dist
 
 ### Running Examples
 
-To run the examples, you need to have the Slate repository cloned to your computed. After that, you need to `cd` into the directory where you cloned it, and install the dependencies from `npm`.
-
-```
-make install
-```
-
-And then build the source and run the examples server:
-
-```
-make dist
-make start-examples
-```
-
-If you want to edit the source while running the examples and have those changes immediately reflected, you need to run two additional watching commands in your terminal:
-
-```
-make watch-dist
-```
-```
-make watch-examples
-```
+Check out the [Examples readme](./examples) to see how to get the examples running locally!
 
 
 ### Pull Requests
