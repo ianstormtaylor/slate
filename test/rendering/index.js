@@ -52,8 +52,9 @@ function clean(html) {
   $('*').each((i, el) => {
     $(el).removeAttr('data-key')
     $(el).removeAttr('data-offset-key')
-    $(el).removeAttr('style')
   })
+
+  $('[contenteditable]').removeAttr('style')
 
   return $.html()
 }
