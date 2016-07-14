@@ -8,6 +8,8 @@
 <p align="center"><a href="#why"><strong>Why?</strong></a> · <a href="#principles"><strong>Principles</strong></a> · <a href="#examples"><strong>Examples</strong></a> · <a href="#plugins"><strong>Plugins</strong></a> · <a href="#documentation"><strong>Documentation</strong></a> · <a href="./Contributing.md"><strong>Contributing!</strong></a></p>
 <br/>
 
+<p align="center"><a href="#"><img src="./docs/images/preview.png"></a></p>
+
 <p align="center"><a href="#"><img src="https://img.shields.io/npm/dt/localeval.svg?maxAge=2592000"></a> <a href="https://slate-slack.herokuapp.com"><img src="https://slate-slack.herokuapp.com/badge.svg"><a/></p>
 <br/>
 
