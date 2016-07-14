@@ -16,7 +16,7 @@ describe('transforms', () => {
   const transforms = fs.readdirSync(dir)
 
   for (const transform of transforms) {
-    describe(toCamel(transform), () => {
+    describe(`${toCamel(transform)}()`, () => {
       const dir = resolve(__dirname, './fixtures', transform)
       const tests = fs.readdirSync(dir)
 
