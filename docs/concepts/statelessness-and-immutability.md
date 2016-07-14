@@ -1,7 +1,7 @@
 
 # Statelessness & Immutability
 
-All of the data in Slate is immutable, thanks to [Immutable.js](https://facebook.github.io/immutable-js/). This makes it possible to achieve a much greater level of performance, and it makes maintaining a history of changes for undo/redo much simpler.
+All of the data in Slate is immutable, thanks to [Immutable.js](https://facebook.github.io/immutable-js/). This makes it much easier to reason about complex editing logic, and it makes maintaining a history of changes for undo/redo much simpler.
 
 _To learn more, check out the [`State` model reference](../reference/models/state.md)._
 
