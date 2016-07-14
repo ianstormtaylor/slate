@@ -12,10 +12,12 @@
   "dependencies": {
     "cheerio": "^0.20.0",
     "detect-browser": "^1.3.3",
+    "esrever": "^0.2.0",
     "immutable": "^3.8.1",
     "keycode": "^2.1.2",
     "lodash": "^4.13.1",
     "react-portal": "^2.2.0",
+    "reverse-string": "0.0.6",
     "ua-parser-js": "^0.7.10",
     "uid": "0.0.2"
   },
