@@ -15,6 +15,6 @@ _To learn more, check out the [Core Plugin reference](../reference/plugins/core.
 
 ### The Editor Plugin
 
-Plugins are so central to Slate's architecture, that the properties of the [`<Editor>`](../reference/components/editor.md) that allow you to add custom functionality (eg. `onKeyDown` or `onPaste`) are actually implemented as a plugin too. All of those properties actually just create an implicity, top-priority plugin that gets added at the beginning of the editor's plugin stack. But you'd never even know it!
+Plugins are so central to Slate's architecture, that the properties of the [`<Editor>`](../reference/components/editor.md) that allow you to add custom functionality (eg. `onKeyDown` or `onPaste`) are actually implemented as a plugin too. All of those properties actually just create an implicitly, top-priority plugin that gets added at the beginning of the editor's plugin stack. But you'd never even know it!
 
 _To learn more, check out the [`<Editor>` component reference](../reference/components/editor.md)._
