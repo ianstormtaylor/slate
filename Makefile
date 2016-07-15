@@ -6,6 +6,7 @@ browserify = $(bin)/browserify
 exorcist = $(bin)/exorcist
 eslint = $(bin)/eslint
 http-server = $(bin)/http-server
+gh-pages = $(bin)/gh-pages
 mocha = $(bin)/mocha
 mocha-phantomjs = $(bin)/mocha-phantomjs
 node = node
@@ -41,6 +42,10 @@ dist: $(shell find ./lib) package.json
 # Build the examples.
 examples:
 	@ $(browserify) $(browserify_flags) ./examples/index.js --outfile ./examples/build.js
+
+# Deploy the latest examples to GitHub pages.
+gh-pages:
+	@ $(gh-pages) --dist ./examples
 
 # Install the dependencies.
 install:

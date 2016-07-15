@@ -5,10 +5,10 @@
 <p align="center">A <em>completely</em> customizable framework <br/>for building rich text editors in the browser.</p>
 <br/>
 
-<p align="center"><a href="#why"><strong>Why?</strong></a> · <a href="#principles"><strong>Principles</strong></a> · <a href="#examples"><strong>Examples</strong></a> · <a href="#plugins"><strong>Plugins</strong></a> · <a href="#documentation"><strong>Documentation</strong></a> · <a href="./Contributing.md"><strong>Contributing!</strong></a></p>
+<p align="center"><a href="#why"><strong>Why?</strong></a> · <a href="#principles"><strong>Principles</strong></a> · <a href="https://ianstormtaylor.github.io/slate"><strong>Demo</strong></a> · <a href="#examples"><strong>Examples</strong></a> · <a href="#plugins"><strong>Plugins</strong></a> · <a href="#documentation"><strong>Documentation</strong></a> · <a href="./Contributing.md"><strong>Contributing!</strong></a></p>
 <br/>
 
-<p align="center"><a href="#"><img src="./docs/images/preview.png"></a></p>
+<p align="center"><a href="https://ianstormtaylor.github.io/slate"><img src="./docs/images/preview.png"></a></p>
 
 <p align="center"><a href="https://www.npmjs.com/package/slate"><img src="https://img.shields.io/npm/dt/localeval.svg?maxAge=2592000"></a> <a href="https://slate-slack.herokuapp.com"><img src="https://slate-slack.herokuapp.com/badge.svg"><a/></p>
 <br/>
@@ -58,6 +58,12 @@ Slate tries to solve the question of "[Why?](#why)" with a few principles:
 6. **Collaboration-ready data model.** The data model Slate uses—specifically how transforms are applied to the document—has been designed to allow for collaborative editing to be layered on top, so you won't need to rethink everything if you decide to make your editor collaborative. (More work is required on this!)
 
 7. **Clear "core" boundaries.** With a plugin-first architecture, and a schema-less core, it becomes a lot clearer where the boundary is between "core" and "custom", which means that the core experience doesn't get bogged down in edge cases.
+
+
+<br/>
+### Demo
+
+Check out the [**live demo**](https://ianstormtaylor.github.io/slate) of all of the examples!
 
 
 <br/>

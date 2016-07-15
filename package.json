@@ -39,6 +39,7 @@
     "eslint-plugin-import": "^1.10.2",
     "eslint-plugin-react": "^5.2.2",
     "exorcist": "^0.4.0",
+    "gh-pages": "^0.11.0",
     "http-server": "^0.9.0",
     "mocha": "^2.5.3",
     "mocha-phantomjs": "^4.0.2",
