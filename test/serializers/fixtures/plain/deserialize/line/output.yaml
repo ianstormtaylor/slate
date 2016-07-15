@@ -1,0 +1,13 @@
+
+nodes:
+  - type: line
+    isVoid: false
+    data: {}
+    nodes:
+      - characters:
+          - text: o
+            marks: []
+          - text: n
+            marks: []
+          - text: e
+            marks: []
