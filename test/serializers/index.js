@@ -7,84 +7,110 @@ import { equal, strictEqual } from '../helpers/assert-json'
 import { resolve } from 'path'
 
 /**
- * Serializers.
- */
-
-const SERIALIZERS = {
-
-  html: (dir) => {
-    const module = require(dir)
-    const html = new Html(module)
-    return {
-      extension: 'html',
-      deserialize: html.deserialize,
-      serialize: html.serialize,
-      read: file => fs.readFileSync(file, 'utf8').trim()
-    }
-  },
-
-  plain: (dir) => ({
-    extension: 'txt',
-    deserialize: Plain.deserialize,
-    serialize: Plain.serialize,
-    read: file => fs.readFileSync(file, 'utf8').trim()
-  }),
-
-  raw: (dir) => ({
-    extension: 'yaml',
-    deserialize: Raw.deserialize,
-    serialize: Raw.serialize,
-    read: file => readMetadata.sync(file)
-  })
-
-}
-
-/**
  * Tests.
  */
 
 describe('serializers', () => {
-  const serializers = fs.readdirSync(resolve(__dirname, './fixtures'))
+  describe('html', () => {
+    describe('deserialize()', () => {
+      const dir = resolve(__dirname, './fixtures/html/deserialize')
+      const tests = fs.readdirSync(dir)
 
-  for (const serializer of serializers) {
-    describe(serializer, () => {
-      describe('deserialize()', () => {
-        const dir = resolve(__dirname, './fixtures', serializer, 'deserialize')
-        const tests = fs.readdirSync(dir)
-
-        for (const test of tests) {
-          it(test, () => {
-            const innerDir = resolve(dir, test)
-            const Serializer = SERIALIZERS[serializer](innerDir)
-
-            const expected = readMetadata.sync(resolve(innerDir, 'output.yaml'))
-            const input = Serializer.read(resolve(innerDir, `input.${Serializer.extension}`))
-            const state = Serializer.deserialize(input)
-            const json = state.document.toJS()
-            strictEqual(clean(json), expected)
-          })
-        }
-      })
-
-      describe('serialize()', () => {
-        const dir = resolve(__dirname, './fixtures', serializer, 'serialize')
-        const tests = fs.readdirSync(dir)
-
-        for (const test of tests) {
-          it(test, () => {
-            const innerDir = resolve(dir, test)
-            const Serializer = SERIALIZERS[serializer](innerDir)
-
-            const input = require(resolve(innerDir, 'input.js')).default
-            const expected = Serializer.read(resolve(innerDir, `output.${Serializer.extension}`))
-            const serialized = Serializer.serialize(input)
-            debugger
-            strictEqual(serialized, expected)
-          })
-        }
-      })
+      for (const test of tests) {
+        it(test, () => {
+          const innerDir = resolve(dir, test)
+          const html = new Html(require(innerDir).default)
+          const expected = readMetadata.sync(resolve(innerDir, 'output.yaml'))
+          const input = fs.readFileSync(resolve(innerDir, 'input.html'), 'utf8')
+          const state = html.deserialize(input)
+          const json = state.document.toJS()
+          strictEqual(clean(json), expected)
+        })
+      }
     })
-  }
+
+    describe('serialize()', () => {
+      const dir = resolve(__dirname, './fixtures/html/serialize')
+      const tests = fs.readdirSync(dir)
+
+      for (const test of tests) {
+        it(test, () => {
+          const innerDir = resolve(dir, test)
+          const html = new Html(require(innerDir).default)
+          const input = require(resolve(innerDir, 'input.js')).default
+          const expected = fs.readFileSync(resolve(innerDir, 'output.html'), 'utf8')
+          const serialized = html.serialize(input)
+          strictEqual(serialized, expected.trim())
+        })
+      }
+    })
+  })
+
+  describe('plain', () => {
+    describe('deserialize()', () => {
+      const dir = resolve(__dirname, './fixtures/plain/deserialize')
+      const tests = fs.readdirSync(dir)
+
+      for (const test of tests) {
+        it(test, () => {
+          const innerDir = resolve(dir, test)
+          const expected = readMetadata.sync(resolve(innerDir, 'output.yaml'))
+          const input = fs.readFileSync(resolve(innerDir, 'input.txt'), 'utf8')
+          const state = Plain.deserialize(input.trim())
+          const json = state.document.toJS()
+          strictEqual(clean(json), expected)
+        })
+      }
+    })
+
+    describe('serialize()', () => {
+      const dir = resolve(__dirname, './fixtures/plain/serialize')
+      const tests = fs.readdirSync(dir)
+
+      for (const test of tests) {
+        it(test, () => {
+          const innerDir = resolve(dir, test)
+          const input = require(resolve(innerDir, 'input.js')).default
+          const expected = fs.readFileSync(resolve(innerDir, 'output.txt'), 'utf8')
+          const serialized = Plain.serialize(input)
+          strictEqual(serialized, expected.trim())
+        })
+      }
+    })
+  })
+
+  describe('raw', () => {
+    describe('deserialize()', () => {
+      const dir = resolve(__dirname, './fixtures/raw/deserialize')
+      const tests = fs.readdirSync(dir)
+
+      for (const test of tests) {
+        it(test, () => {
+          const innerDir = resolve(dir, test)
+          const expected = readMetadata.sync(resolve(innerDir, 'output.yaml'))
+          const input = readMetadata.sync(resolve(innerDir, 'input.yaml'))
+          const state = Raw.deserialize(input)
+          const json = state.document.toJS()
+          strictEqual(clean(json), expected)
+        })
+      }
+    })
+
+    describe('serialize()', () => {
+      const dir = resolve(__dirname, './fixtures/raw/serialize')
+      const tests = fs.readdirSync(dir)
+
+      for (const test of tests) {
+        it(test, () => {
+          const innerDir = resolve(dir, test)
+          const input = require(resolve(innerDir, 'input.js')).default
+          const expected = readMetadata.sync(resolve(innerDir, 'output.yaml'))
+          const serialized = Raw.serialize(input)
+          strictEqual(serialized, expected)
+        })
+      }
+    })
+  })
 })
 
 /**
