@@ -1,6 +1,5 @@
 language: node_js
-script: make test
 node_js:
-  - "stable"
-  - "4"
+  - "node"
   - "6"
+  - "4"
