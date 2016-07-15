@@ -33,7 +33,7 @@ Here's how Slate compares to some of the existing editors out there:
 
 - [**Prosemirror**](http://prosemirror.net/) — Slate borrowed a few concepts from Prosemirror, namely its nested document tree, and its transform model. But the issues I ran into while using it were: that the API is hard to understand, that the codebase wasn't structured around common node module practices, that lots of magic was built into the core library that was hard to customize, that toolbars and buttons are too tied to the editor itself, and that the documentation isn't great. (It's still in beta though!)
 
-- [**Quill**](http://quilljs.com/) — I never used Quill directly, so my hesitations about it are solely from considering it in early stages. The issues I see with it are: that the concept of "toolbars" is too coupled with the editor itself, that the configuration is too coupled to HTML classes and DOM nodes, that the idea of "formats" and "toolbars" being linked is limiting, and generally that too much "core" logic is given special priviledges and is hard to customize.
+- [**Quill**](http://quilljs.com/) — I never used Quill directly, so my hesitations about it are solely from considering it in early stages. The issues I see with it are: that the concept of "toolbars" is too coupled with the editor itself, that the configuration is too coupled to HTML classes and DOM nodes, that the idea of "formats" and "toolbars" being linked is limiting, and generally that too much "core" logic is given special privileges and is hard to customize.
 
 - [**Trix**](https://trix-editor.org/) — I never used Trix directly either, so my issues with it are solely from considering it in early stages. The issues I found with it are: that it aims to be simple by limiting functionality instead of by limiting its own scope, that many behaviors are just impossible to implement with it, that it's too coupled to the DOM, and that the flat document model is limiting.
 
@@ -49,7 +49,7 @@ Slate tries to solve the question of "[Why?](#why)" with a few principles:
 
 2. **Schema-less core.** Slate's core logic doesn't assume anything about the schema of the data you'll be editing, which means that there are no assumptions baked into the library that'll trip you up when you need to go beyond basic usage.
 
-3. **Nested document model.** The document model used for Slate is a nested, recursive tree, just like the DOM itself. This means that creating complex components like tables or nested block quotes are possible for advanced use cases. But it's also easy to keep it simple by only using a single level of hierachy.
+3. **Nested document model.** The document model used for Slate is a nested, recursive tree, just like the DOM itself. This means that creating complex components like tables or nested block quotes are possible for advanced use cases. But it's also easy to keep it simple by only using a single level of hierarchy.
 
 4. **Stateless and immutable data.** By using React and Immutable.js, the Slate editor is built in a stateless fashion using immutable data structures, which leads to much easier to reason about code, and a much easier time writing plugins.
 

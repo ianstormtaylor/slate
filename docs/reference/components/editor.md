@@ -97,7 +97,7 @@ An optional dictionary of styles to apply to the default block type's placeholde
 
 In addition to its own properties, the editor allows passing any of the properties that a [plugin](../plugins/plugins.md) defines as well. 
 
-These properties are actually just a convenience—an implicit plugin defintion. Internally, they are grouped together and turned into a plugin that is given first priority in the plugin stack. 
+These properties are actually just a convenience—an implicit plugin definition. Internally, they are grouped together and turned into a plugin that is given first priority in the plugin stack. 
 
 For example, these two snippets of code are equivalent:
 

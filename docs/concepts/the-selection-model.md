@@ -6,7 +6,7 @@ Slate keeps track of the user's selection in the editor in an immutable data sto
 
 ### Always References Text
 
-One of the contraints of the Slate document model is that [leaf nodes are always text nodes](./the-document-model.md#leaf-text-nodes). This constraint exists to make selection logic simpler. 
+One of the constraints of the Slate document model is that [leaf nodes are always text nodes](./the-document-model.md#leaf-text-nodes). This constraint exists to make selection logic simpler. 
 
 A selection always refers to text nodes. Such that even if you set a selection relative to a non-text node, Slate will automatically correct it for you.
 
