@@ -85,15 +85,15 @@ A concatenated string of all of the descendant [`Text`](./text.md) nodes of this
 
 ## Static Methods
 
-### `Block.create`
-`Block.create(properties: Object) => Block`
+### `Inline.create`
+`Inline.create(properties: Object) => Block`
 
 Create a block from a plain Javascript object of `properties`.
 
-### `Block.createList`
-`Block.createList(array: Array) => List`
+### `Inline.createList`
+`Inline.createList(array: Array) => List`
 
-Create a list of block nodes from a plain Javascript `array`.
+Create a list of inline nodes from a plain Javascript `array`.
 
 
 ## Node Methods
