@@ -11,8 +11,8 @@ A formatting mark that can be associated with [`Characters`](./character.md). Ma
   - [`data`](#data)
   - [`type`](#type)
 - [Static Methods](#static-methods)
-  - [`Mark.create`](#mark-create)
-  - [`Mark.createSet`](#mark-createset)
+  - [`Mark.create`](#markcreate)
+  - [`Mark.createSet`](#markcreateset)
 
 
 ## Properties

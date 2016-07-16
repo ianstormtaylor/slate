@@ -20,8 +20,8 @@ Inline nodes may contain nested inline nodes and text nodes—just like in the D
   - [`length`](#length)
   - [`text`](#text)
 - [Static Methods](#static-methods)
-  - [`Inline.create`](#inline-create)
-  - [`Inline.createList`](#inline-createlist)
+  - [`Inline.create`](#inlinecreate)
+  - [`Inline.createList`](#inlinecreatelist)
 - [Node Methods](#node-methods)
 
 

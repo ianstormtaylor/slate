@@ -16,7 +16,7 @@ Documents are made up of block nodes, inline nodes, and text nodes—just like i
   - [`length`](#length)
   - [`text`](#text)
 - [Static Methods](#static-methods)
-  - [`Document.create`](#document-create)
+  - [`Document.create`](#documentcreate)
 - [Node Methods](#node-methods)
 
 

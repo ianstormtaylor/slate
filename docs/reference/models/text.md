@@ -15,7 +15,7 @@ A text node in a Slate [`Document`](./document.md). Text nodes are always the bo
   - [`length`](#length)
   - [`text`](#text)
 - [Static Methods](#static-methods)
-  - [`Text.create`](#text-create)
+  - [`Text.create`](#textcreate)
 
 
 ## Properties

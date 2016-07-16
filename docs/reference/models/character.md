@@ -13,8 +13,8 @@ Characters are how Slate associates [`Marks`](./mark.md) with a range of text, f
   - [`marks`](#marks)
   - [`text`](#text)
 - [Static Methods](#static-methods)
-  - [`Character.create`](#character-create)
-  - [`Character.createList`](#character-createlist)
+  - [`Character.create`](#charactercreate)
+  - [`Character.createList`](#charactercreatelist)
 
 
 ## Properties
