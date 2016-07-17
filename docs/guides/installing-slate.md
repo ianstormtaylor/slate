@@ -32,14 +32,18 @@ import { Editor, Raw } from 'slate'
 
 // Create our initial state...
 const initialState = Raw.deserialize({
-  kind: 'block',
-  type: 'paragraph',
   nodes: [
     {
-      kind: 'text',
-      ranges: [
+      kind: 'block',
+      type: 'paragraph',
+      nodes: [
         {
-          text: 'A line of text in a paragraph.'
+          kind: 'text',
+          ranges: [
+            {
+              text: 'A line of text in a paragraph.'
+            }
+          ]
         }
       ]
     }

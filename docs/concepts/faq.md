@@ -3,10 +3,10 @@
 
 A series of common questions people have about Slate:
 
-- [How come content is pasted as plain text?](#how-come-content-is-pasted-as-plain-text)
+- [Why is content pasted as plain text?](#how-come-content-is-pasted-as-plain-text)
 
 
-#### How come content is pasted as plain text?
+### Why is content pasted as plain text?
 
 One of Slate's core principles is that, unlike most other editors, it does **not** prescribe a specific "schema" to the content you are editing. This means that Slate's core has no concept of "block quotes" or "bold formatting". 
 
