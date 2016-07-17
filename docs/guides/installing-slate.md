@@ -31,22 +31,20 @@ To keep things simple, we'll use the `Raw` serializer that ships with Slate to c
 import { Editor, Raw } from 'slate'
 
 // Create our initial state...
-const initialState = Raw.deserialize([
-  {
-    kind: 'block',
-    type: 'paragraph',
-    nodes: [
-      {
-        kind: 'text',
-        ranges: [
-          {
-            text: 'A line of text in a paragraph.'
-          }
-        ]
-      }
-    ]
-  }
-])
+const initialState = Raw.deserialize({
+  kind: 'block',
+  type: 'paragraph',
+  nodes: [
+    {
+      kind: 'text',
+      ranges: [
+        {
+          text: 'A line of text in a paragraph.'
+        }
+      ]
+    }
+  ]
+})
 ```
 
 And now that we've our initial state, we define our `App` and pass it into Slate's `Editor` component, like so:
