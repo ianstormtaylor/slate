@@ -20,8 +20,8 @@ Block nodes may contain nested block nodes, inline nodes, and text nodes—just 
   - [`length`](#length)
   - [`text`](#text)
 - [Static Methods](#static-methods)
-  - [`Block.create`](#block-create)
-  - [`Block.createList`](#block-createlist)
+  - [`Block.create`](#blockcreate)
+  - [`Block.createList`](#blockcreatelist)
 - [Node Methods](#node-methods)
 
 

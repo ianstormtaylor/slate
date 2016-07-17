@@ -28,7 +28,7 @@ Often times, you don't need to specifically know which point is the "anchor" and
   - [`startKey`](#startkey)
   - [`startOffset`](#startoffset)
 - [Static Methods](#static-methods)
-  - [`Selection.create`](#create) 
+  - [`Selection.create`](#selectioncreate) 
 - [Checking Methods](#checking-methods)
   - [`has{Edge}AtEndOf`](#hasedgeatendof)
   - [`has{Edge}AtStartOf`](#hasedgeatstartof)
