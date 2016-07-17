@@ -154,7 +154,7 @@ const RULES = [
  * @type {Html}
  */
 
-const serializer = new Html(RULES)
+const serializer = new Html({ rules: RULES })
 
 /**
  * The pasting html example.
