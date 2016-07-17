@@ -31,8 +31,8 @@ For convenience, in addition to transforms, many of the [`Selection`](./selectio
   - [`isExpanded`](#isExpanded)
   - [`isFocused`](#isfocused)
   - [`isForward`](#isForward)
-- [Static Methods](#static)
-  - [`State.create`](#create) 
+- [Static Methods](#static-methods)
+  - [`State.create`](#statecreate) 
 - [Methods](#methods)
   - [`transform`](#transform)
 
