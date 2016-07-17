@@ -11,7 +11,7 @@ For an example of the `Html` serializer in action, check out the [`paste-html` e
 
 - [Example](#example)
 - [Properties](#properties)
-  - [`rules`]
+  - [`rules`](#rules)
 - [Methods](#methods)
   - [`deserialize`](#deserialize)
   - [`serialize`](#serialize)
@@ -24,13 +24,17 @@ For an example of the `Html` serializer in action, check out the [`paste-html` e
 ## Example
 
 ```txt
-The Slate editor gives you full control over the logic you can add.\n
-In its simplest form, when representing plain text, Slate is a glorified <textarea>. But you can augment it to be much more than that.\n
-Check out http://slatejs.org for examples!
+The Slate editor gives you full control over the logic you can add.\nIn its simplest form, when representing plain text, Slate is a glorified <textarea>. But you can augment it to be much more than that.\nCheck out http://slatejs.org for examples!
 ```
 
 
 ## Properties
+
+```js
+new Html({
+  rules: Array
+})
+```
 
 ### `rules`
 `Array`
@@ -56,6 +60,13 @@ Serialize a `state` into an HTML string. How the string is serialized will be de
 To initialize an `Html` serialize, you must pass it an array of rules, defining your schema. Each rule defines how to deserialize and serialize a node or mark, by implementing two functions.
 
 ### Rule Properties
+
+```js
+{
+  deserialize: Function,
+  serialize: Function
+}
+```
 
 Each rule must define two properties:
 
