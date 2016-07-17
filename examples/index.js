@@ -14,6 +14,7 @@ import Images from './images'
 import Links from './links'
 import PasteHtml from './paste-html'
 import PlainText from './plain-text'
+import ReadOnly from './read-only'
 import RichText from './rich-text'
 import Tables from './tables'
 
@@ -66,6 +67,7 @@ class App extends React.Component {
         {this.renderTab('Tables', 'tables')}
         {this.renderTab('Code Highlighting', 'code-highlighting')}
         {this.renderTab('Paste HTML', 'paste-html')}
+        {this.renderTab('Read Only', 'read-only')}
       </div>
     )
   }
@@ -116,6 +118,7 @@ const router = (
       <Route path="links" component={Links} />
       <Route path="paste-html" component={PasteHtml} />
       <Route path="plain-text" component={PlainText} />
+      <Route path="read-only" component={ReadOnly} />
       <Route path="rich-text" component={RichText} />
       <Route path="tables" component={Tables} />
     </Route>

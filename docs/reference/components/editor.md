@@ -11,6 +11,7 @@ The top-level React component that renders the Slate editor itself.
   - [`className`](#classname)
   - [`onChange`](#onchange)
   - [`plugins`](#plugins)
+  - [`readOnly`](#readonly)
   - [`state`](#state)
   - [`style`](#style)
 - [Placeholder Properties](#placeholder-properties)
@@ -36,6 +37,7 @@ The top-level React component that renders the Slate editor itself.
   className={string}
   onChange={Function}
   plugins={Array}
+  readOnly={Boolean}
   state={State}
   style={Object}
 />
@@ -55,6 +57,11 @@ A change handler that will be called with the newly-changed editor `state`. You 
 `Array`
 
 An array of [`Plugins`](../plugins) that define the editor's behavior.
+
+### `readOnly`
+`Boolean`
+
+Whether the editor should be in "read-only" mode, where all of the rendering is the same, but the user is prevented from editing the editor's content.
 
 ### `state`
 `State`
