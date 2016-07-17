@@ -7,6 +7,7 @@ This document explain the core concepts that Slate is built on around. It is hel
 - [The Document Model](./the-document-model.md)
 - [The Selection Model](./the-selection-model.md)
 - [Plugins](./plugins.md)
+- [FAQ](./faq.md)
 
 
 
