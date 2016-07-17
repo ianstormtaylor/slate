@@ -18,6 +18,10 @@ This is the full reference documentation for all of the pieces of Slate, broken 
   - [State](./models/state.md)
   - [Text](./text.md)
   - [Transform](./models/transform.md)
+- **Serializers**
+  - [Html](./html.md)
+  - [Plain](./plain.md)
+  - [Raw](./raw.md) 
 - **Plugins**
   - [Plugins](./plugins/plugins.md)
   - [Core](./plugins/core.md)

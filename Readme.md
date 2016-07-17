@@ -131,6 +131,10 @@ If you're using Slate for the first time, check out the [Getting Started](./docs
     - [State](./docs/reference/models/state.md)
     - [Text](./docs/reference/text.md)
     - [Transform](./docs/reference/models/transform.md)
+  - Serializers
+    - [Html](./docs/reference/serializers/html.md)
+    - [Plain](./docs/reference/serializers/plain.md)
+    - [Raw](./docs/reference/serializers/raw.md) 
   - Plugins
     - [Plugins](./docs/reference/plugins/plugins.md)
     - [Core](./docs/reference/plugins/core.md)
