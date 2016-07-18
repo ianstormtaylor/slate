@@ -12,7 +12,7 @@ This is the full reference documentation for all of the pieces of Slate, broken 
   - [Data](./data.md)
   - [Document](./models/document.md)
   - [Inline](./models/inline.md)
-  - [Mark](./mark.md)
+  - [Mark](./models/mark.md)
   - [Node](./models/node.md)
   - [Selection](./models/selection.md)
   - [State](./models/state.md)
