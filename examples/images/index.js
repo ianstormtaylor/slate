@@ -3,6 +3,7 @@ import { Editor, Mark, Raw } from '../..'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import initialState from './state.json'
+import isImage from 'is-image-url'
 import { Map } from 'immutable'
 
 /**
@@ -83,6 +84,7 @@ class Images extends React.Component {
           state={this.state.state}
           renderNode={this.renderNode}
           onChange={this.onChange}
+          onPaste={this.onPaste}
         />
       </div>
     )
@@ -119,18 +121,35 @@ class Images extends React.Component {
     e.preventDefault()
     const src = window.prompt('Enter the URL of the image:')
     if (!src) return
-    this.insertImage(src)
+    let { state } = this.state
+    state = this.insertImage(state, src)
+    this.onChange(state)
+  }
+
+  /**
+   * On paste, if the pasted content is an image URL, insert it.
+   *
+   * @param {Event} e
+   * @param {Object} paste
+   * @param {State} state
+   * @return {State}
+   */
+
+  onPaste = (e, paste, state) => {
+    if (paste.type != 'text') return
+    if (!isImage(paste.text)) return
+    return this.insertImage(state, paste.text)
   }
 
   /**
    * Insert an image with `src` at the current selection.
    *
+   * @param {State} state
    * @param {String} src
+   * @return {State}
    */
 
-  insertImage = (src) => {
-    let { state } = this.state
-
+  insertImage = (state, src) => {
     if (state.isExpanded) {
       state = state
         .transform()
@@ -141,10 +160,13 @@ class Images extends React.Component {
     const { anchorBlock, selection } = state
     let transform = state.transform()
 
-    if (anchorBlock.text != '') {
+    if (anchorBlock.type == 'image') {
+      transform = transform.splitBlock()
+    }
+
+    else if (anchorBlock.text != '') {
       if (selection.isAtEndOf(anchorBlock)) {
-        transform = transform
-          .splitBlock()
+        transform = transform.splitBlock()
       }
 
       else if (selection.isAtStartOf(anchorBlock)) {
@@ -161,15 +183,13 @@ class Images extends React.Component {
       }
     }
 
-    state = transform
+    return transform
       .setBlock({
         type: 'image',
         isVoid: true,
         data: { src }
       })
       .apply()
-
-    this.setState({ state })
   }
 
 }
