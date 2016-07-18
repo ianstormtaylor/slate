@@ -17,12 +17,12 @@ Transform methods can either operate on the [`Document`](./document.md), the [`S
   - [`delete`](#delete)
   - [`insertFragment`](#insertfragment)
   - [`insertText`](#inserttext)
-  - [`mark`](#mark)
+  - [`addMark`](#addmark)
   - [`setBlock`](#setblock)
   - [`setInline`](#setinline)
   - [`splitBlock`](#splitblock)
   - [`splitInline`](#splitinline)
-  - [`unmark`](#unmark)
+  - [`removeMark`](#removemark)
   - [`unwrapBlock`](#unwrapblock)
   - [`unwrapInline`](#unwrapinline)
   - [`wrapBlock`](#wrapblock)
@@ -46,12 +46,12 @@ Transform methods can either operate on the [`Document`](./document.md), the [`S
   - [`deleteForwardAtRange`](#deleteforwardatrange)
   - [`insertFragmentAtRange`](#insertfragmentatrange)
   - [`insertTextAtRange`](#inserttextatrange)
-  - [`markAtRange`](#markatrange)
+  - [`addMarkAtRange`](#addmarkatrange)
   - [`setBlockAtRange`](#setblockatrange)
   - [`setInlineAtRange`](#setinlineatrange)
   - [`splitBlockAtRange`](#splitblockatrange)
   - [`splitInlineAtRange`](#splitinlineatrange)
-  - [`unmarkAtRange`](#unmarkatrange)
+  - [`removeMarkAtRange`](#removeMarkatrange)
   - [`unwrapBlockAtRange`](#unwrapblockatrange)
   - [`unwrapInlineAtRange`](#unwrapinlineatrange)
   - [`wrapBlockAtRange`](#wrapblockatrange)
@@ -90,9 +90,9 @@ Insert a `fragment` at the current selection. If the selection is expanded, it w
 
 Insert a string of `text` at the current selection. If the selection is expanded, it will be deleted first.
 
-### `mark`
-`mark(mark: Mark) => Transform`
-`mark(type: String) => Transform`
+### `addMark`
+`addMark(mark: Mark) => Transform`
+`addMark(type: String) => Transform`
 
 Add a [`mark`](./mark.md) to the characters in the current selection. For convenience, you can pass a `type` string to implicitly create a [`Mark`](./mark.md) of that type.
 
@@ -118,9 +118,9 @@ Split the [`Block`](./block.md) in the current selection by `depth` levels. If t
 
 Split the [`Inline`](./inline.md) node in the current selection by `depth` levels. If the selection is expanded, it will be deleted first. `depth` defaults to `Infinity`.
 
-### `unmark`
-`unmark(mark: Mark) => Transform`
-`unmark(type: String) => Transform`
+### `removeMark`
+`removeMark(mark: Mark) => Transform`
+`removeMark(type: String) => Transform`
 
 Remove a [`mark`](./mark.md) from the characters in the current selection. For convenience, you can pass a `type` string to implicitly create a [`Mark`](./mark.md) of that type.
 
@@ -235,9 +235,9 @@ Insert a `fragment` at a `range`. If the selection is expanded, it will be delet
 
 Insert a string of `text` at a `range`. If the selection is expanded, it will be deleted first.
 
-### `markAtRange`
-`markAtRange(range: Selection, mark: Mark) => Transform`
-`mark(range: Selection, type: String) => Transform`
+### `addMarkAtRange`
+`addMarkAtRange(range: Selection, mark: Mark) => Transform`
+`addMark(range: Selection, type: String) => Transform`
 
 Add a [`mark`](./mark.md) to the characters in a `range`. For convenience, you can pass a `type` string to implicitly create a [`Mark`](./mark.md) of that type.
 
@@ -263,9 +263,9 @@ Split the [`Block`](./block.md) in a `range` by `depth` levels. If the selection
 
 Split the [`Inline`](./inline.md) node in a `range` by `depth` levels. If the selection is expanded, it will be deleted first. `depth` defaults to `Infinity`.
 
-### `unmarkAtRange`
-`unmarkAtRange(range: Selection, mark: Mark) => Transform`
-`unmark(range: Selection, type: String) => Transform`
+### `removeMarkAtRange`
+`removeMarkAtRange(range: Selection, mark: Mark) => Transform`
+`removeMark(range: Selection, type: String) => Transform`
 
 Remove a [`mark`](./mark.md) from the characters in a `range`. For convenience, you can pass a `type` string to implicitly create a [`Mark`](./mark.md) of that type.
 

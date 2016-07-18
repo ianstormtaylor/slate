@@ -52,7 +52,7 @@ class App extends React.Component {
     const isBold = state.marks.some(mark => mark.type == 'bold')
     return state
       .transform()
-      [isBold ? 'unmark' : 'mark']('bold')
+      [isBold ? 'removeMark' : 'addMark']('bold')
       .apply()
   }
 
@@ -90,7 +90,7 @@ function MarkHotkey(options) {
       // Toggle the mark `type` based on whether it is active.
       return state
         .transform()
-        [isActive ? 'unmark' : 'mark'](type)
+        [isActive ? 'removeMark' : 'addMark'](type)
         .apply()
     }
   }
@@ -248,7 +248,7 @@ function MarkHotkey(options) {
       const isActive = state.marks.some(mark => mark.type == type)
       return state
         .transform()
-        [isActive ? 'unmark' : 'mark'](type)
+        [isActive ? 'removeMark' : 'addMark'](type)
         .apply()
     }
   }

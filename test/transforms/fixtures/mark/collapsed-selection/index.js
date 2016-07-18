@@ -12,7 +12,7 @@ export default function (state) {
       focusKey: first.key,
       focusOffset: 0
     })
-    .mark('bold')
+    .addMark('bold')
     .insertText('a')
     .apply()
 }

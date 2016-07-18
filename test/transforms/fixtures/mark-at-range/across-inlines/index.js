@@ -13,6 +13,6 @@ export default function (state) {
 
   return state
     .transform()
-    .markAtRange(range, 'bold')
+    .addMarkAtRange(range, 'bold')
     .apply()
 }

@@ -12,6 +12,6 @@ export default function (state) {
 
   return state
     .transform()
-    .unmarkAtRange(range, 'bold')
+    .removeMarkAtRange(range, 'bold')
     .apply()
 }

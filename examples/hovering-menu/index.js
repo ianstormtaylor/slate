@@ -95,7 +95,7 @@ class HoveringMenu extends React.Component {
 
     state = state
       .transform()
-      [isActive ? 'unmark' : 'mark'](type)
+      [isActive ? 'removeMark' : 'addMark'](type)
       .apply()
 
     this.setState({ state })

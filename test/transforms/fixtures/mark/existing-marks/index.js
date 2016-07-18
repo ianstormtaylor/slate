@@ -12,6 +12,6 @@ export default function (state) {
       focusKey: first.key,
       focusOffset: 2
     })
-    .mark('bold')
+    .addMark('bold')
     .apply()
 }
