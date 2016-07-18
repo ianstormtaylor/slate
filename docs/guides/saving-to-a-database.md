@@ -88,6 +88,7 @@ class App extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
+      // Update the initial value to be pulled from Local Storage.
       state: Plain.deserialize(localStorage.getItem('content'))
     }
   }
