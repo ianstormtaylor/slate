@@ -1,5 +1,5 @@
 
-import { Editor, Mark, Raw, Utils } from '../..'
+import { Editor, Mark, Raw, Utils } from '../../..'
 import React from 'react'
 import initialState from './state.json'
 import keycode from 'keycode'
@@ -17,7 +17,7 @@ const DEFAULT_NODE = 'paragraph'
  */
 
 const NODES = {
-  'block-quote': (props) => <blockquote {...props.attributes}>{props.children}</blockquote>,
+  'block-quote': props => <blockquote {...props.attributes}>{props.children}</blockquote>,
   'bulleted-list': props => <ul {...props.attributes}>{props.children}</ul>,
   'heading-one': props => <h1 {...props.attributes}>{props.children}</h1>,
   'heading-two': props => <h2 {...props.attributes}>{props.children}</h2>,
