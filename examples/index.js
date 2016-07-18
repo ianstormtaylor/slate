@@ -17,6 +17,8 @@ import PlainText from './plain-text'
 import ReadOnly from './read-only'
 import RichText from './rich-text'
 import Tables from './tables'
+import DevPerformancePlain from './development/performance-plain'
+import DevPerformanceRich from './development/performance-rich'
 
 /**
  * Perf.
@@ -121,6 +123,8 @@ const router = (
       <Route path="read-only" component={ReadOnly} />
       <Route path="rich-text" component={RichText} />
       <Route path="tables" component={Tables} />
+      <Route path="dev-performance-plain" component={DevPerformancePlain} />
+      <Route path="dev-performance-rich" component={DevPerformanceRich} />
     </Route>
   </Router>
 )

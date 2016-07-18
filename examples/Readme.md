@@ -48,3 +48,8 @@ make watch-dist
 ```
 make watch-examples
 ```
+
+
+## Development Examples
+
+There are also a series of examples that are for development only, for things like checking performance, in the `./development` directory. You can safely ignore those!
