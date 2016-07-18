@@ -48,21 +48,21 @@ All of the event handler properties are passed the same React `event` object you
 Each event handler can choose to return a new `state` object, in which case the editor's state will be updated. If nothing is returned, the editor will simply continue resolving the plugin stack.
 
 ### `onBeforeInput` 
-`onBeforeInput(event: Event, state: State, editor: Editor) => State || Void`
+`Function onBeforeInput(event: Event, state: State, editor: Editor) => State || Void`
 
 This handler is called right before a string of text is inserted into the `contenteditable` element. The `event.data` property will be the string of text that is being inserted.
 
 Make sure to `event.preventDefault()` if you do not want the default insertion behavior to occur! If no other plugin handles this event, it will be handled by the [Core plugin](./core.md).
 
 ### `onKeyDown` 
-`onKeyDown(event: Event, state: State, editor: Editor) => State || Void`
+`Function onKeyDown(event: Event, state: State, editor: Editor) => State || Void`
 
 This handler is called when any key is pressed in the `contenteditable` element, before any action is taken. Use the `event.which` property to determine which key was pressed.
 
 Make sure to `event.preventDefault()` if you do not want the default insertion behavior to occur! If no other plugin handles this event, it will be handled by the [Core plugin](./core.md).
 
 ### `onPaste`
-`onPaste(event: Event, paste: Object, state: State, editor: Editor) => State || Void`
+`Function onPaste(event: Event, paste: Object, state: State, editor: Editor) => State || Void`
 
 This handler is called when the user pastes content into the `contenteditable` element. The event is already prevented by default, so you must define a state change to have any affect occur.
 
@@ -102,14 +102,14 @@ If no other plugin handles this event, it will be handled by the [Core plugin](.
 To customize the renderer output of the editor, plugins can define a set of "renderer" properties.
 
 ### `renderDecorations` 
-`renderDecorations(text: Text) => Characters || Void`
+`Function renderDecorations(text: Text) => Characters || Void`
 
 The `renderDecorations` handler allows you to add dynamic, content-aware [`Marks`](../models/mark.md) to ranges of text, without having them show up in the serialized state of the editor. This is useful for things like code highlighting, where the marks will change as the user types.
 
 `renderDecorations` is called for every `text` node in the document, and should return a set of updated [`Characters`](../models/character.md) for the text node in question. Every plugin's decoration logic is called, and the resulting characters are unioned, such that multiple plugins can apply decorations to the same pieces of text.
 
 ### `renderMark` 
-`renderMark(mark: Mark) => Object || Void`
+`Function renderMark(mark: Mark) => Object || Void`
 
 The `renderMark` handler allows you to define the styles that each mark should be rendered with. It takes a [`Mark`](../models/mark.md) object, and should return a dictionary of styles that will be applied via React's `style=` property. For example:
 
@@ -121,7 +121,7 @@ The `renderMark` handler allows you to define the styles that each mark should b
 ```
 
 ### `renderNode` 
-`renderNode(node: Block || Inline) => Component || Void`
+`Function renderNode(node: Block || Inline) => Component || Void`
 
 The `renderNode` handler allows you to define the component that will be used to render a node—both blocks and inlines. It takes a [`Node`](../models/node.md) object, and should return a React component.
 
@@ -167,7 +167,7 @@ The `node` itself is passed in, so you can access any custom data associated wit
 ```
 
 ### `onChange` 
-`onChange(state: State) => State || Void`
+`Function onChange(state: State) => State || Void`
 
 The `onChange` handler isn't a native browser event handler. Instead, it is invoked whenever the editor state changes. Returning a new state will update the editor's state, continuing down the plugin stack.
 

@@ -81,7 +81,6 @@ Now whenever you edit the page, if you look in Local Storage, you should see the
 
 But... if you refresh the page, everything is still reset. That's because we need to make sure the initial state is pulled from that same Local Storage location, like so:
 
-
 ```js
 class App extends React.Component {
 
@@ -114,3 +113,40 @@ class App extends React.Component {
 
 Now you should be able to save changes across refreshes!
 
+However, if you inspect the change handler, you'll notice that it's actually saving the Local Storage value on _every_ change to the editor, even when only the selection changes! This is because `onChange` is called for _every_ change. For Local Storage this doesn't really matter, but if you're saving things to a database via HTTP request this would result in a lot of unnecessary requests.
+
+Instead of using `onChange`, Slate's editor also accepts an `onDocumentChange` convenience handler that you can use to isolate saving logic to only happen when the document itself has changed, like so:
+
+```js
+class App extends React.Component {
+
+  constructor(props) {
+    super(props)
+    this.state = {
+      // Update the initial value to be pulled from Local Storage.
+      state: Plain.deserialize(localStorage.getItem('content'))
+    }
+  }
+
+  render() {
+    return (
+      <Editor
+        state={this.state.state}
+        onChange={state => this.onChange(state)}
+      />
+    )
+  }
+
+  onChange(state) {
+    this.setState({ state })
+  }
+
+  onDocumentChange(document, state) {
+    const string = Plain.serialize(state)
+    localStorage.setItem('content', string)
+  }
+
+}
+```
+
+Now you're content will be saved only when the content itself changes!
