@@ -17,7 +17,10 @@ const DEFAULT_NODE = 'paragraph'
  */
 
 const NODES = {
-  'block-quote': props => <blockquote {...props.attributes}>{props.children}</blockquote>,
+  'block-quote': (props) => {
+    console.log('render quote block')
+    return <blockquote {...props.attributes}>{props.children}</blockquote>
+  },
   'bulleted-list': props => <ul {...props.attributes}>{props.children}</ul>,
   'heading-one': props => <h1 {...props.attributes}>{props.children}</h1>,
   'heading-two': props => <h2 {...props.attributes}>{props.children}</h2>,
