@@ -8,7 +8,6 @@ eslint = $(bin)/eslint
 http-server = $(bin)/http-server
 gh-pages = $(bin)/gh-pages
 mocha = $(bin)/mocha
-mocha-phantomjs = $(bin)/mocha-phantomjs
 node = node
 watchify = $(bin)/watchify
 
