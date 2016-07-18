@@ -123,16 +123,17 @@ class App extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      // Update the initial value to be pulled from Local Storage.
       state: Plain.deserialize(localStorage.getItem('content'))
     }
   }
 
   render() {
+    // Add the `onDocumentChange` handler to the editor.
     return (
       <Editor
         state={this.state.state}
         onChange={state => this.onChange(state)}
+        onDocumentChange={state => this.onDocumentChange(document, state)}
       />
     )
   }
@@ -141,6 +142,7 @@ class App extends React.Component {
     this.setState({ state })
   }
 
+  // Pull the saving logic out into the `onDocumentChange` handler.
   onDocumentChange(document, state) {
     const string = Plain.serialize(state)
     localStorage.setItem('content', string)
