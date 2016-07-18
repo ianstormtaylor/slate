@@ -84,7 +84,7 @@ class App extends React.Component {
       case 66: {
         return state
           .transform()
-          .mark('bold')
+          .addMark('bold')
           .apply()
       }
       // When "`" is pressed, keep our existing code block logic.
@@ -160,7 +160,7 @@ class App extends React.Component {
       case 66: {
         return state
           .transform()
-          .mark('bold')
+          .addMark('bold')
           .apply()
       }
       case 192: {
@@ -222,7 +222,7 @@ class App extends React.Component {
         const isBold = state.marks.some(mark => mark.type == 'bold')
         return state
           .transform()
-          [isBold ? 'unmark' : 'mark']('bold')
+          [isBold ? 'removeMark' : 'addMark']('bold')
           .apply()
       }
       case 192: {

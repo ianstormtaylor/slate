@@ -14,6 +14,6 @@ export default function (state) {
 
   return state
     .transform()
-    .markAtRange(range, 'bold', Data.create({ key: 'value' }))
+    .addMarkAtRange(range, 'bold', Data.create({ key: 'value' }))
     .apply()
 }

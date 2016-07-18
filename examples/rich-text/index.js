@@ -133,7 +133,7 @@ class RichText extends React.Component {
 
     state = state
       .transform()
-      [this.hasMark(mark) ? 'unmark' : 'mark'](mark)
+      [this.hasMark(mark) ? 'removeMark' : 'addMark'](mark)
       .apply()
 
     e.preventDefault()
@@ -154,7 +154,7 @@ class RichText extends React.Component {
 
     state = state
       .transform()
-      [isActive ? 'unmark' : 'mark'](type)
+      [isActive ? 'removeMark' : 'addMark'](type)
       .apply()
 
     this.setState({ state })

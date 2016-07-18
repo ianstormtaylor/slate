@@ -14,6 +14,6 @@ export default function (state) {
       focusKey: first.key,
       focusOffset: 1
     })
-    .mark('bold', Data.create({ key: 'value' }))
+    .addMark('bold', Data.create({ key: 'value' }))
     .apply()
 }
