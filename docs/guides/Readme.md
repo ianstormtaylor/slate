@@ -8,5 +8,6 @@ These guides introduce you to the different parts of Slate in a step-by-step way
 - [Defining Custom Block Nodes](./defining-custom-block-nodes.md)
 - [Applying Custom Formatting](./applying-custom-formatting.md)
 - [Using Plugins](./using-plugins.md)
+- [Saving to a Database](./saving-to-a-database.md)
 
 _If you have an idea for a guide, or notice something that isn't clear, submit a pull request!_
