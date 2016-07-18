@@ -11,6 +11,8 @@ All changes are performed through `Transform` objects, so that a history of chan
 
 Transform methods can either operate on the [`Document`](./document.md), the [`Selection`](./selection.md), or both at once.
 
+- [Methods](#methods)
+  - [`apply`](#apply)
 - [Document & Selection Transforms](#document-selection-transforms)
   - [`deleteBackward`](#deletebackward)
   - [`deleteForward`](#deleteforward)
@@ -56,11 +58,19 @@ Transform methods can either operate on the [`Document`](./document.md), the [`S
   - [`unwrapInlineAtRange`](#unwrapinlineatrange)
   - [`wrapBlockAtRange`](#wrapblockatrange)
   - [`wrapInlineAtRange`](#wrapinlineatrange)
+- [History Transforms](#history-transforms)
+  - [`redo`](#redo)
+  - [`undo`](#undo)
 
 
+## Methods
 
+### `apply`
+`apply(options: Object) => State`
 
+Applies all of the current transform steps, returning the newly transformed [`State`](./state.md). An `options` object is optional, containing values of:
 
+- `snapshot: Boolean` — override the editor's built-in logic of whether to create a new snapshot in the history, that can be reverted to later.
 
 
 ## Document & Selection Transforms
@@ -290,3 +300,14 @@ Wrap the [`Block`](./block.md) nodes in a `range` with a new [`Block`](./block.m
 Wrap the [`Inline`](./inline.md) nodes in a `range` with a new [`Inline`](./inline.md) node of `type`, with optional `data`.
 
 
+## History Transforms
+
+### `redo`
+`redo() => Transform`
+
+Move forward one step in the history.
+
+### `undo`
+`undo() => Transform`
+
+Move backward one step in the history.
