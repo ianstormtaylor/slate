@@ -29,7 +29,7 @@ describe('serializers', () => {
       }
     })
 
-    describe('serialize()', () => {
+    describe.skip('serialize()', () => {
       const dir = resolve(__dirname, './fixtures/html/serialize')
       const tests = fs.readdirSync(dir)
 
