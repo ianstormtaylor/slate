@@ -10,7 +10,7 @@ One of the constraints of the Slate document model is that [leaf nodes are alway
 
 A selection always refers to text nodes. Such that even if you set a selection relative to a non-text node, Slate will automatically correct it for you.
 
-This makes selection's easier to reason about, while still giving us the benefits of a recursive document tree, and it makes for a lot less boilerplate.
+This makes selections easier to reason about, while still giving us the benefits of a recursive document tree, and it makes for a lot less boilerplate.
 
 
 ### Leaf Blocks
