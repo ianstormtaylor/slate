@@ -41,6 +41,7 @@
     "exorcist": "^0.4.0",
     "gh-pages": "^0.11.0",
     "http-server": "^0.9.0",
+    "is-url": "^1.2.2",
     "mocha": "^2.5.3",
     "prismjs": "^1.5.1",
     "react": "^15.2.0",

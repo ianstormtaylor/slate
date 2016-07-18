@@ -3,6 +3,7 @@ import { Editor, Mark, Raw } from '../..'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import initialState from './state.json'
+import isUrl from 'is-url'
 import { Map } from 'immutable'
 
 /**
@@ -50,6 +51,16 @@ class Links extends React.Component {
   }
 
   /**
+   * On change.
+   *
+   * @param {State} state
+   */
+
+  onChange = (state) => {
+    this.setState({ state })
+  }
+
+  /**
    * When clicking a link, if the selection has a link in it, remove the link.
    * Otherwise, add a new link with an href and text.
    *
@@ -89,6 +100,31 @@ class Links extends React.Component {
     }
 
     this.setState({ state })
+  }
+
+  /**
+   * On paste, if the text is a link, wrap the selection in a link.
+   *
+   * @param {Event} e
+   * @param {Object} paste
+   * @param {State} state
+   */
+
+  onPaste = (e, paste, state) => {
+    if (state.isCollapsed) return
+    if (paste.type != 'text' && paste.type != 'html') return
+    if (!isUrl(paste.text)) return
+
+    let transform = state.transform()
+
+    if (this.hasLinks()) {
+      transform = transform.unwrapInline('link')
+    }
+
+    return transform
+      .wrapInline('link', { href: paste.text })
+      .collapseToEnd()
+      .apply()
   }
 
   /**
@@ -136,6 +172,7 @@ class Links extends React.Component {
           state={this.state.state}
           renderNode={this.renderNode}
           onChange={this.onChange}
+          onPaste={this.onPaste}
         />
       </div>
     )
@@ -150,16 +187,6 @@ class Links extends React.Component {
 
   renderNode = (node) => {
     return NODES[node.type]
-  }
-
-  /**
-   * On change.
-   *
-   * @param {State} state
-   */
-
-  onChange = (state) => {
-    this.setState({ state })
   }
 
 }
