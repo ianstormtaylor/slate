@@ -1,6 +1,6 @@
 {
   "name": "slate",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
   "main": "./dist/index.js",
