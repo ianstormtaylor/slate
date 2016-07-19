@@ -3,7 +3,8 @@ import { Editor, Mark, Raw } from '../..'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import initialState from './state.json'
-import isImage from 'is-image-url'
+import isImage from 'is-image'
+import isUrl from 'is-url'
 import { Map } from 'immutable'
 
 /**
@@ -137,6 +138,7 @@ class Images extends React.Component {
 
   onPaste = (e, paste, state) => {
     if (paste.type != 'text') return
+    if (!isUrl(paste.text)) return
     if (!isImage(paste.text)) return
     return this.insertImage(state, paste.text)
   }
