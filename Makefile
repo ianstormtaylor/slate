@@ -3,6 +3,7 @@
 bin = ./node_modules/.bin
 babel = $(bin)/babel
 browserify = $(bin)/browserify
+discify = $(bin)/discify
 exorcist = $(bin)/exorcist
 eslint = $(bin)/eslint
 http-server = $(bin)/http-server
@@ -33,6 +34,12 @@ check: lint test
 # Remove the generated files.
 clean:
 	@ rm -rf ./dist ./node_modules
+
+# Check the size of the dependencies.
+disc: dist
+	@ mkdir -p ./tmp
+	@ $(browserify) ./dist/index.js --full-paths --outfile ./tmp/build.js
+	@ $(discify) ./tmp/build.js --open
 
 # Build the source.
 dist: $(shell find ./lib) package.json
