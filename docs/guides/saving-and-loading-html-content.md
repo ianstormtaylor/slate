@@ -54,6 +54,7 @@ To start, let's create a new rule with a `deserialize` function for paragraph bl
 
 ```js
 const rules = [
+  // Add our first rule with a deserializing function.
   {
     deserialize(el, next) {
       if (el.tagName == 'p') {
@@ -86,6 +87,7 @@ const rules = [
         }
       }
     },
+    // Add a serializing function property to our rule...
     serialize(object, children) {
       if (obj.kind == 'block' && obj.type == 'paragraph') {
         return <p>{children}</p>
@@ -104,6 +106,7 @@ Okay, so now our serializer can handle `paragraph` nodes.
 Let's add the other types of blocks we want:
 
 ```js
+// Refactor block tags into a dictionary for cleanliness.
 const BLOCK_TAGS = {
   p: 'paragraph',
   blockquote: 'quote',
@@ -149,6 +152,7 @@ const BLOCK_TAGS = {
   pre: 'code'
 }
 
+// Add a dictionary of mark tags.
 const MARK_TAGS = {
   em: 'italic',
   strong: 'bold',
@@ -203,6 +207,7 @@ Great, that's all of the rules we need! Now let's create a new `Html` serializer
 ```js
 import { Html } from 'slate'
 
+// Create a new serializer instance with our `rules` from above.
 const html = new Html({ rules })
 ```
 
@@ -211,6 +216,7 @@ And finally, now that we have our serializer initialized, we can update our app 
 
 
 ```js
+// Load the initial state from Local Storage or a default.
 const initialState = (
   localStorage.get('content') ||
   '<p></p>'
@@ -226,6 +232,7 @@ class App extends React.Component {
   }
 
   render() {
+    // Add the `onDocumentChange` handler.
     return (
       <Editor
         state={this.state.state}
@@ -239,6 +246,7 @@ class App extends React.Component {
     this.setState({ state })
   }
 
+  // When the document changes, save the serialized HTML to Local Storage.
   onDocumentChange(document, state) {
     const string = html.serialize(state)
     localStorage.set('content', string)
