@@ -99,6 +99,7 @@ class RichText extends React.Component {
 
   onChange = (state) => {
     this.setState({ state })
+    console.log(state.document.toJS())
   }
 
   /**
@@ -169,29 +170,37 @@ class RichText extends React.Component {
 
   onClickBlock = (e, type) => {
     e.preventDefault()
-    const isActive = this.hasBlock(type)
     let { state } = this.state
+    let transform = state.transform()
+    const { document } = state
 
-    let transform = state
-      .transform()
-      .setBlock(isActive ? 'paragraph' : type)
+    // Handle everything but list buttons.
+    if (type != 'bulleted-list' && type != 'numbered-list') {
+      const isActive = this.hasBlock(type)
+      transform = transform.setBlock(isActive ? DEFAULT_NODE : type)
+    }
 
     // Handle the extra wrapping required for list buttons.
-    if (type == 'bulleted-list' || type == 'numbered-list') {
-      if (this.hasBlock('list-item')) {
+    else {
+      const isList = this.hasBlock('list-item')
+      const isType = state.blocks.some((block) => {
+        return !!document.getClosest(block, parent => parent.type == type)
+      })
+
+      if (isList && isType) {
         transform = transform
           .setBlock(DEFAULT_NODE)
-          .unwrapBlock(type)
+          .unwrapBlock('bulleted-list')
+          .unwrapBlock('numbered-list')
+      } else if (isList) {
+        transform = transform
+          .unwrapBlock(type == 'bulleted-list' ? 'numbered-list' : 'bulleted-list')
+          .wrapBlock(type)
       } else {
         transform = transform
           .setBlock('list-item')
           .wrapBlock(type)
       }
-    }
-
-    // Handle everything but list buttons.
-    else {
-      transform = transform.setBlock(isActive ? DEFAULT_NODE : type)
     }
 
     state = transform.apply()
