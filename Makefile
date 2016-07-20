@@ -37,6 +37,7 @@ clean:
 # Build the source.
 dist: $(shell find ./lib) package.json
 	@ $(babel) $(babel_flags) --out-dir ./dist ./lib
+	@ $(browserify) ./dist/index.js --standalone Slate --outfile ./dist/slate.js
 
 # Build the examples.
 examples:

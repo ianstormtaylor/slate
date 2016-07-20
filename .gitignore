@@ -3,3 +3,4 @@ build.js
 build.js.map
 dist
 node_modules
+!dist/slate.js
