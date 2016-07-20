@@ -2,6 +2,16 @@
 This document maintains a list of changes to Slate with each new version. Until `1.0.0` is released, breaking changes will be added as minor version bumps, and non-breaking changes won't be accounted for since the library is moving quickly.
 
 
+## `0.4.0`
+_July 20, 2016_
+
+###### BREAKING CHANGES
+
+- Change `renderMark(mark, state, editor)` to take an additional `marks` argument, so that it is now `renderMark(mark, marks, state, editor)`.
+
+This change allows you to render marks based on multiple marks presence at once, for example using a custom `*BoldItalic.otf` font when text has both `bold` and `italic` marks.
+
+
 ## `0.3.0`
 _July 20, 2016_
 
