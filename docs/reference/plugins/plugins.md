@@ -102,14 +102,14 @@ If no other plugin handles this event, it will be handled by the [Core plugin](.
 To customize the renderer output of the editor, plugins can define a set of "renderer" properties.
 
 ### `renderDecorations` 
-`Function renderDecorations(text: Text) => Characters || Void`
+`Function renderDecorations(text: Text, state: State, editor: Editor) => Characters || Void`
 
 The `renderDecorations` handler allows you to add dynamic, content-aware [`Marks`](../models/mark.md) to ranges of text, without having them show up in the serialized state of the editor. This is useful for things like code highlighting, where the marks will change as the user types.
 
 `renderDecorations` is called for every `text` node in the document, and should return a set of updated [`Characters`](../models/character.md) for the text node in question. Every plugin's decoration logic is called, and the resulting characters are unioned, such that multiple plugins can apply decorations to the same pieces of text.
 
 ### `renderMark` 
-`Function renderMark(mark: Mark) => Object || Void`
+`Function renderMark(mark: Mark, marks: Set, state: State, editor: Editor) => Object || Void`
 
 The `renderMark` handler allows you to define the styles that each mark should be rendered with. It takes a [`Mark`](../models/mark.md) object, and should return a dictionary of styles that will be applied via React's `style=` property. For example:
 
@@ -121,7 +121,7 @@ The `renderMark` handler allows you to define the styles that each mark should b
 ```
 
 ### `renderNode` 
-`Function renderNode(node: Block || Inline) => Component || Void`
+`Function renderNode(node: Block || Inline, state: State, editor: Editor) => Component || Void`
 
 The `renderNode` handler allows you to define the component that will be used to render a node—both blocks and inlines. It takes a [`Node`](../models/node.md) object, and should return a React component.
 
