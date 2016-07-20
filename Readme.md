@@ -37,7 +37,11 @@ Here's how Slate compares to some of the existing editors out there:
 
 - [**Trix**](https://trix-editor.org/) — I never used Trix directly either, so my issues with it are solely from considering it in early stages. The issues I found with it are: that it aims to be simple by limiting functionality instead of by limiting its own scope, that many behaviors are just impossible to implement with it, that it's too coupled to the DOM, and that the flat document model is limiting.
 
-Of course those are my own opinions, but if you've tried using any of those libraries you might have run into similar problems. Which brings me to how Slate solves all of that...
+- [**Medium Editor**](https://yabwe.github.io/medium-editor/) — I never used the Medium Editor directly either, so my issues with it are solely from considering it in early stages. The issues I found with it are: that it doesn't actually pave over `contenteditable`, so you continue wrestling with the DOM, that the concept of a "toolbar" is tightly coupled with core in many respects making it harder to customize, that the extension system requires learning an entirely new view abstraction, and that the editor relying on the DOM's HTML as its data model makes collaborative editing much more difficult.
+
+- [**Scribe**](https://github.com/guardian/scribe) — I added Scribe to this list after creating Slate, so the issues with it are solely from reading their documentation. In terms of plugin architectures, Slate and Scribe are very similar in striving to move as much possible logic from "core" into plugins as possible. The issues I found with Scribe are: that it works direclty on the DOM and its goal is to simply "fix" contenteditable, such that all userland and plugin logic still has to account for x-browser differences, that its data model is tied to the DOM, so serialization to formats besides HTML is more complex, that without a backing data model collaborative editing is much more difficult to layer in, and that it lacks broader mobile and browser support.
+
+Of course those are my own opinions, and if those libraries solve your needs, use them! But if you've tried using any of those libraries you might have run into similar problems. If so, you might like Slate. Which brings me to how Slate solves all of that...
 
 
 <br/>
