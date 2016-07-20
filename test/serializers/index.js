@@ -29,21 +29,21 @@ describe('serializers', () => {
       }
     })
 
-    // describe('serialize()', () => {
-    //   const dir = resolve(__dirname, './fixtures/html/serialize')
-    //   const tests = fs.readdirSync(dir)
+    describe('serialize()', () => {
+      const dir = resolve(__dirname, './fixtures/html/serialize')
+      const tests = fs.readdirSync(dir)
 
-    //   for (const test of tests) {
-    //     it(test, () => {
-    //       const innerDir = resolve(dir, test)
-    //       const html = new Html(require(innerDir).default)
-    //       const input = require(resolve(innerDir, 'input.js')).default
-    //       const expected = fs.readFileSync(resolve(innerDir, 'output.html'), 'utf8')
-    //       const serialized = html.serialize(input)
-    //       strictEqual(serialized, expected.trim())
-    //     })
-    //   }
-    // })
+      for (const test of tests) {
+        it(test, () => {
+          const innerDir = resolve(dir, test)
+          const html = new Html(require(innerDir).default)
+          const input = require(resolve(innerDir, 'input.js')).default
+          const expected = fs.readFileSync(resolve(innerDir, 'output.html'), 'utf8')
+          const serialized = html.serialize(input)
+          strictEqual(serialized, expected.trim())
+        })
+      }
+    })
   })
 
   describe('plain', () => {

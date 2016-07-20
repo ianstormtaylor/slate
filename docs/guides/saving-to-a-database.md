@@ -14,12 +14,14 @@ Let's start with a basic, plain text rendering editor:
 ```js
 import { Editor, Plain } from 'slate'
 
+const initialState = Plain.deserialize('The initial state string!')
+
 class App extends React.Component {
 
   constructor(props) {
     super(props)
     this.state = {
-      state: Plain.deserialize('A string of plain text.')
+      state: initialState
     }
   }
 
@@ -48,12 +50,14 @@ So, in our `onChange` handler, we need to save the `state`. But the `state` argu
 In this case, we're already using the [`Plain`](../reference/serializers/plain.md) serializer to create our intial state, so let's use it to serialize our saved state as well, like so:
 
 ```js
+const initialState = Plain.deserialize('The initial state string!')
+
 class App extends React.Component {
 
   constructor(props) {
     super(props)
     this.state = {
-      state: Plain.deserialize('A string of plain text.')
+      state: initialState
     }
   }
 
@@ -82,13 +86,18 @@ Now whenever you edit the page, if you look in Local Storage, you should see the
 But... if you refresh the page, everything is still reset. That's because we need to make sure the initial state is pulled from that same Local Storage location, like so:
 
 ```js
+// Update the initial value to be pulled from Local Storage.
+const initialState = (
+  Plain.deserialize(localStorage.getItem('content')) ||
+  'The initial state string!'
+)
+
 class App extends React.Component {
 
   constructor(props) {
     super(props)
     this.state = {
-      // Update the initial value to be pulled from Local Storage.
-      state: Plain.deserialize(localStorage.getItem('content'))
+      state: initialState
     }
   }
 
@@ -118,12 +127,17 @@ However, if you inspect the change handler, you'll notice that it's actually sav
 Instead of using `onChange`, Slate's editor also accepts an `onDocumentChange` convenience handler that you can use to isolate saving logic to only happen when the document itself has changed, like so:
 
 ```js
+const initialState = (
+  Plain.deserialize(localStorage.getItem('content')) ||
+  'The initial state string!'
+)
+
 class App extends React.Component {
 
   constructor(props) {
     super(props)
     this.state = {
-      state: Plain.deserialize(localStorage.getItem('content'))
+      state: initialState
     }
   }
 
@@ -152,3 +166,59 @@ class App extends React.Component {
 ```
 
 Now you're content will be saved only when the content itself changes!
+
+Success. But we're only saving plain text strings here. If you're working with rich text, you'll need to serialize the `state` object differently. The easiest option is to just replace calls to `Plain` with `Raw`:
+
+
+```js
+const initialState = (
+  Raw.deserialize(localStorage.getItem('content')) ||
+  {
+    nodes: [
+      {
+        kind: 'block',
+        type: 'paragraph'
+      }
+    ]
+  }
+)
+
+class App extends React.Component {
+
+  constructor(props) {
+    super(props)
+    this.state = {
+      state: initialState
+    }
+  }
+
+  render() {
+    return (
+      <Editor
+        state={this.state.state}
+        onChange={state => this.onChange(state)}
+        onDocumentChange={state => this.onDocumentChange(document, state)}
+      />
+    )
+  }
+
+  onChange(state) {
+    this.setState({ state })
+  }
+
+  onDocumentChange(document, state) {
+      // Switch to using the Raw serializer.
+    localStorage.setItem('content', Raw.serialize(state))
+  }
+
+}
+```
+
+That works! Now you can preserve any formatting that the user added.
+
+However, sometimes you may not want to use the raw JSON representation that Slate understands, and you may want something slightly more standardized, like good old fashioned HTML. In that case, check out the next guide...
+
+
+<br/>
+<p align="center"><strong>Next:</strong><br/><a href="./saving-and-loading-html-content.md">Saving and Loading HTML Content</a></p>
+<br/>

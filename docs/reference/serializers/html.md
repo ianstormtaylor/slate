@@ -16,9 +16,8 @@ For an example of the `Html` serializer in action, check out the [`paste-html` e
   - [`deserialize`](#deserialize)
   - [`serialize`](#serialize)
 - [Rules](#rules)
-  - [Rule Properties](#rule-properties)
-    - [`rule.deserialize`](#ruledeserialize)
-    - [`rule.serialize`](#ruleserialize)
+  - [`rule.deserialize`](#ruledeserialize)
+  - [`rule.serialize`](#ruleserialize)
 
 
 ## Example
@@ -59,7 +58,7 @@ Serialize a `state` into an HTML string. How the string is serialized will be de
 
 To initialize an `Html` serialize, you must pass it an array of rules, defining your schema. Each rule defines how to deserialize and serialize a node or mark, by implementing two functions.
 
-### Rule Properties
+Each rule must define two properties:
 
 ```js
 {
@@ -68,13 +67,48 @@ To initialize an `Html` serialize, you must pass it an array of rules, defining 
 }
 ```
 
-Each rule must define two properties:
 
 #### `rule.deserialize`
-`rule.deserialize(el: CheerioElement, next: Function) => Object`
+`rule.deserialize(el: CheerioElement, next: Function) => Object || Void`
+
+The `deserialize` function should return a plain Javascript object representing the deserialized state, or nothing if the rule in question doesn't know how to deserialize the object, in which case the next rule in the stack will be attempted. 
+
+The returned object is almost exactly equivalent to the objects returned by the [`Raw`](./raw.md) serializer, except an extra `kind: 'mark'` is added to account for the ability to nest marks.
+
+The object should be one of:
+
+```js
+{
+  kind: 'block',
+  type: String,
+  data: Object,
+  nodes: next(...)
+}
+
+{
+  kind: 'inline',
+  type: String,
+  data: Object,
+  nodes: next(...)
+}
+
+{
+  kind: 'mark',
+  type: String,
+  data: Object,
+  nodes: next(...)
+}
+
+{
+  kind: 'text',
+  ranges: Array
+}
+```
 
 
 #### `rule.serialize`
-`rule.serialize(object: Node || Mark) => ReactElement`
+`rule.serialize(object: Node || Mark || String, children: String || Element || Array) => Element || Void`
 
-_To implement still..._
+The `serialize` function should return a React element representing the serialized HTML, or nothing if the rule in question doesn't know how to serialize the object, in which case the next rule in the stack will be attempted.
+
+The function will be called with either a `Node`, a `Mark`, or a special `String` immutable object, with a `kind: 'string'` property and a `text` property containing the text string. In the case of the `String` property, the 
