@@ -4,4 +4,3 @@ build.js.map
 dist
 node_modules
 tmp
-!dist/slate.js
