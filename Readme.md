@@ -107,6 +107,7 @@ If you're using Slate for the first time, check out the [Getting Started](./docs
   - [Applying Custom Formatting](./docs/guides/applying-custom-formatting.md)
   - [Using Plugins](./docs/guides/using-plugins.md)
   - [Saving to a Database](./docs/guides/saving-to-a-database.md)
+  - [Saving and Loading HTML Content](./docs/guides/saving-and-loading-html-content.md)
   - Adding a Hovering Menu
   - Rendering Adjacent Elements in Components
   - Adding Images Using Void Nodes
