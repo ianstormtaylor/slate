@@ -213,9 +213,9 @@ Move the current selection's offsets to a new `anchorOffset` and `focusOffset`.
 Move the current selection's anchor point to the start of a `node` and its focus point to the end of the `node`.
 
 ### `moveTo`
-`moveTo(properties: Object) => Transform`
+`moveTo(properties: Selection || Object) => Transform`
 
-Move the current selection to a selection with merged `properties`.
+Move the current selection to a selection with merged `properties`. The `properties` can either be a [`Selection`](./selection.md) object or a plain Javascript object of selection properties.
 
 
 ## Document Transforms
