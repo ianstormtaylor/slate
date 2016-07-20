@@ -57,7 +57,7 @@ Slate tries to solve the question of "[Why?](#why)" with a few principles:
 
 4. **Stateless and immutable data.** By using React and Immutable.js, the Slate editor is built in a stateless fashion using immutable data structures, which leads to much easier to reason about code, and a much easier time writing plugins.
 
-5. **Intuitive transforms.** Slate's content is edited using "transforms", that are designed to be extremely intuitive to use, so that writing plugins and custom functionality is as simple as possible.
+5. **Intuitive transforms.** Slate's content is edited using "transforms", that are designed to be high level and extremely intuitive to use, so that writing plugins and custom functionality is as simple as possible.
 
 6. **Collaboration-ready data model.** The data model Slate uses—specifically how transforms are applied to the document—has been designed to allow for collaborative editing to be layered on top, so you won't need to rethink everything if you decide to make your editor collaborative. (More work is required on this!)
 
