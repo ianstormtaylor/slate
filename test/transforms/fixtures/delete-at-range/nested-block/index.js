@@ -13,6 +13,6 @@ export default function (state) {
 
   return state
     .transform()
-    .deleteAtRange(range, 'code')
+    .deleteAtRange(range)
     .apply()
 }

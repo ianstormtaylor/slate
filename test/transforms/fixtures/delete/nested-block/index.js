@@ -1,4 +1,6 @@
 
+import assert from 'assert'
+
 export default function (state) {
   const { document, selection } = state
   const texts = document.getTexts()
@@ -11,8 +13,16 @@ export default function (state) {
     focusOffset: 2
   })
 
-  return state
+  const next = state
     .transform()
-    .deleteAtRange(range)
+    .moveTo(range)
+    .delete()
     .apply()
+
+  assert.deepEqual(
+    next.selection.toJS(),
+    range.collapseToStart().toJS()
+  )
+
+  return next
 }
