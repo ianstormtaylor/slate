@@ -1,6 +1,4 @@
 
-import { Data } from '../../../../..'
-
 export default function (state) {
   const { document, selection } = state
   const texts = document.getTexts()
@@ -9,11 +7,11 @@ export default function (state) {
     anchorKey: first.key,
     anchorOffset: 0,
     focusKey: first.key,
-    focusOffset: 1
+    focusOffset: 2
   })
 
   return state
     .transform()
-    .addMarkAtRange(range, 'bold', Data.create({ key: 'value' }))
+    .toggleMarkAtRange(range, 'bold')
     .apply()
 }

@@ -1,4 +1,6 @@
 
+import { Mark } from '../../../../..'
+
 export default function (state) {
   const { document, selection } = state
   const texts = document.getTexts()
@@ -12,6 +14,9 @@ export default function (state) {
 
   return state
     .transform()
-    .addMarkAtRange(range, 'bold', { key: 'value' })
+    .toggleMarkAtRange(range, Mark.create({
+      type: 'bold',
+      data: { key: 'value' }
+    }))
     .apply()
 }

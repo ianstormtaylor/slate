@@ -1,6 +1,4 @@
 
-import { Data } from '../../../../..'
-
 export default function (state) {
   const { document, selection } = state
   const texts = document.getTexts()
@@ -12,8 +10,8 @@ export default function (state) {
       anchorKey: first.key,
       anchorOffset: 0,
       focusKey: first.key,
-      focusOffset: 1
+      focusOffset: 2
     })
-    .addMark('bold', Data.create({ key: 'value' }))
+    .toggleMark('bold')
     .apply()
 }

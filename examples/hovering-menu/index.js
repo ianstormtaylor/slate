@@ -90,12 +90,11 @@ class HoveringMenu extends React.Component {
 
   onClickMark = (e, type) => {
     e.preventDefault()
-    const isActive = this.hasMark(type)
     let { state } = this.state
 
     state = state
       .transform()
-      [isActive ? 'removeMark' : 'addMark'](type)
+      .toggleMark(type)
       .apply()
 
     this.setState({ state })

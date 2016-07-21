@@ -25,6 +25,7 @@ Transform methods can either operate on the [`Document`](./document.md), the [`S
   - [`splitBlock`](#splitblock)
   - [`splitInline`](#splitinline)
   - [`removeMark`](#removemark)
+  - [`toggleMark`](#togglemark)
   - [`unwrapBlock`](#unwrapblock)
   - [`unwrapInline`](#unwrapinline)
   - [`wrapBlock`](#wrapblock)
@@ -53,7 +54,8 @@ Transform methods can either operate on the [`Document`](./document.md), the [`S
   - [`setInlineAtRange`](#setinlineatrange)
   - [`splitBlockAtRange`](#splitblockatrange)
   - [`splitInlineAtRange`](#splitinlineatrange)
-  - [`removeMarkAtRange`](#removeMarkatrange)
+  - [`removeMarkAtRange`](#removemarkatrange)
+  - [`toggleMarkAtRange`](#togglemarkatrange)
   - [`unwrapBlockAtRange`](#unwrapblockatrange)
   - [`unwrapInlineAtRange`](#unwrapinlineatrange)
   - [`wrapBlockAtRange`](#wrapblockatrange)
@@ -102,9 +104,10 @@ Insert a string of `text` at the current selection. If the selection is expanded
 
 ### `addMark`
 `addMark(mark: Mark) => Transform`
+`addMark(properties: Object) => Transform`
 `addMark(type: String) => Transform`
 
-Add a [`mark`](./mark.md) to the characters in the current selection. For convenience, you can pass a `type` string to implicitly create a [`Mark`](./mark.md) of that type.
+Add a [`mark`](./mark.md) to the characters in the current selection. For convenience, you can pass a `type` string or `properties` object to implicitly create a [`Mark`](./mark.md) of that type.
 
 ### `setBlock`
 `setBlock(properties: Object) => Transform`
@@ -130,9 +133,17 @@ Split the [`Inline`](./inline.md) node in the current selection by `depth` level
 
 ### `removeMark`
 `removeMark(mark: Mark) => Transform`
+`removeMark(properties: Object) => Transform`
 `removeMark(type: String) => Transform`
 
-Remove a [`mark`](./mark.md) from the characters in the current selection. For convenience, you can pass a `type` string to implicitly create a [`Mark`](./mark.md) of that type.
+Remove a [`mark`](./mark.md) from the characters in the current selection. For convenience, you can pass a `type` string or `properties` object to implicitly create a [`Mark`](./mark.md) of that type.
+
+### `toggleMark`
+`toggleMark(mark: Mark) => Transform`
+`toggleMark(properties: Object) => Transform`
+`toggleMark(type: String) => Transform`
+
+Add or remove a [`mark`](./mark.md) from the characters in the current selection, depending on it already exists on any or not. For convenience, you can pass a `type` string or `properties` object to implicitly create a [`Mark`](./mark.md) of that type.
 
 ### `unwrapBlock`
 `unwrapBlock([type: String], [data: Data]) => Transform`
@@ -247,9 +258,10 @@ Insert a string of `text` at a `range`. If the selection is expanded, it will be
 
 ### `addMarkAtRange`
 `addMarkAtRange(range: Selection, mark: Mark) => Transform`
-`addMark(range: Selection, type: String) => Transform`
+`addMarkAtRange(range: Selection, properties: Object) => Transform`
+`addMarkAtRange(range: Selection, type: String) => Transform`
 
-Add a [`mark`](./mark.md) to the characters in a `range`. For convenience, you can pass a `type` string to implicitly create a [`Mark`](./mark.md) of that type.
+Add a [`mark`](./mark.md) to the characters in a `range`. For convenience, you can pass a `type` string or `properties` object to implicitly create a [`Mark`](./mark.md) of that type.
 
 ### `setBlockAtRange`
 `setBlockAtRange(range: Selection, properties: Object) => Transform`
@@ -275,9 +287,17 @@ Split the [`Inline`](./inline.md) node in a `range` by `depth` levels. If the se
 
 ### `removeMarkAtRange`
 `removeMarkAtRange(range: Selection, mark: Mark) => Transform`
-`removeMark(range: Selection, type: String) => Transform`
+`removeMarkAtRange(range: Selection, properties: Object) => Transform`
+`removeMarkAtRange(range: Selection, type: String) => Transform`
 
-Remove a [`mark`](./mark.md) from the characters in a `range`. For convenience, you can pass a `type` string to implicitly create a [`Mark`](./mark.md) of that type.
+Remove a [`mark`](./mark.md) from the characters in a `range`. For convenience, you can pass a `type` string or `properties` object to implicitly create a [`Mark`](./mark.md) of that type.
+
+### `toggleMarkAtRange`
+`toggleMarkAtRange(range: Selection, mark: Mark) => Transform`
+`toggleMarkAtRange(range: Selection, properties: Object) => Transform`
+`toggleMarkAtRange(range: Selection, type: String) => Transform`
+
+Add or remove a [`mark`](./mark.md) from the characters in a `range`, depending on whether any of them already have the mark. For convenience, you can pass a `type` string or `properties` object to implicitly create a [`Mark`](./mark.md) of that type.
 
 ### `unwrapBlockAtRange`
 `unwrapBlockAtRange(range: Selection, [type: String], [data: Data]) => Transform`

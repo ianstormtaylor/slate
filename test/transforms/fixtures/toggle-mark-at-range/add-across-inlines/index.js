@@ -1,6 +1,4 @@
 
-import assert from 'assert'
-
 export default function (state) {
   const { document, selection } = state
   const texts = document.getTexts()
@@ -13,13 +11,8 @@ export default function (state) {
     focusOffset: 2
   })
 
-  const next = state
+  return state
     .transform()
-    .moveTo(range)
-    .addMark('bold')
+    .toggleMarkAtRange(range, 'bold')
     .apply()
-
-  assert.deepEqual(next.selection.toJS(), range.toJS())
-
-  return next
 }
