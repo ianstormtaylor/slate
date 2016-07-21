@@ -67,7 +67,7 @@
     "examples:watch": "watchify --debug --transform babelify ./examples/index.js --outfile ./examples/build.js",
     "gh-pages": "gh-pages --dist ./examples",
     "lint": "eslint --ignore-pattern 'build.js' '{examples,lib}/**/*.js'",
-    "prepublish": "make dist",
+    "prepublish": "npm run dist",
     "start": "http-server ./examples",
     "test": "mocha --compilers js:babel-core/register --require source-map-support/register --reporter spec ./test/server.js"
   },
