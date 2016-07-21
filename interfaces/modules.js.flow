@@ -1,0 +1,7 @@
+declare module 'ua-parser-js' {
+  declare var exports:any;
+}
+
+declare module 'immutable' {
+  declare var exports:any;
+}

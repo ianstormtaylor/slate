@@ -1,7 +1,8 @@
 {
   "plugins": [
     "import",
-    "react"
+    "react",
+    "flow-vars"
   ],
   "settings": {
     "import/extensions": [".js"]
@@ -29,6 +30,8 @@
     "dot-notation": ["error", { "allowKeywords": true }],
     "eol-last": "error",
     "func-style": ["error", "declaration"],
+    "flow-vars/define-flow-type": 1,
+    "flow-vars/use-flow-type": 1,
     "import/export": "error",
     "import/namespace": "error",
     "import/newline-after-import": "error",
