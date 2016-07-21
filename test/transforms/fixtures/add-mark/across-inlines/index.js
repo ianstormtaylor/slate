@@ -1,18 +1,25 @@
 
+import assert from 'assert'
+
 export default function (state) {
   const { document, selection } = state
   const texts = document.getTexts()
   const first = texts.first()
   const second = texts.last()
+  const range = selection.merge({
+    anchorKey: first.key,
+    anchorOffset: 2,
+    focusKey: second.key,
+    focusOffset: 2
+  })
 
-  return state
+  const next = state
     .transform()
-    .moveTo({
-      anchorKey: first.key,
-      anchorOffset: 2,
-      focusKey: second.key,
-      focusOffset: 2
-    })
+    .moveTo(range)
     .addMark('bold')
     .apply()
+
+  assert.deepEqual(next.selection.toJS(), range.toJS())
+
+  return next
 }
