@@ -9,29 +9,29 @@ Want to contribute to Slate? That would be awesome!
 To run the examples, you need to have the Slate repository cloned to your computer. After that, you need to `cd` into the directory where you cloned it, and install the dependencies from `npm`.
 
 ```
-make install
+npm install
 ```
 
 Which will also compile the source files. Then run the tests with:
 
 ```
-make test
+npm test
 ```
 
 And to run the linter:
 
 ```
-make lint
+npm run lint
 ```
 
 Or you can run both with `make check`, which is what is run by default.
 
-If you need to debug something, you can add a `debugger` line to the source, and then run `make test` with the `DEBUG=true` flag enabled. Or, if you only want to run a specific test or tests, you can add the `GREP="some string"` flag which will filter the tests being run.
+If you need to debug something, you can add a `debugger` line to the source, and then run `npm test --debug`. Or, if you only want to run a specific test or tests, you can run `npm test --fgrep "match thisstring"` flag which will filter the tests being run.
 
 To keep the source rebuilding on every file change, you need to run an additional watching command:
 
 ```
-make watch-dist
+npm run dist:watch
 ```
 
 

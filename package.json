@@ -6,9 +6,21 @@
   "repository": "git://github.com/ianstormtaylor/slate.git",
   "main": "./dist/index.js",
   "scripts": {
+    "clean": "rm -rf ./dist ./node_modules",
+    "disc": "npm run disc:build && npm run disc:open",
+    "disc:build": "npm run dist && mkdir -p ./tmp && browserify ./dist/index.js --full-paths --outfile ./tmp/build.js",
+    "disc:open": "discify ./tmp/build.js --open",
+    "dist": "npm run dist:npm && npm run dist:bundle",
+    "dist:bundle": "browserify ./dist/index.js --standalone Slate --outfile ./dist/slate.js",
+    "dist:npm": "babel --out-dir ./dist ./lib",
+    "dist:watch": "babel --watch --out-dir ./dist ./lib",
+    "examples": "browserify --debug --transform babelify ./examples/index.js --outfile ./examples/build.js",
+    "examples:watch": "watchify --debug --transform babelify ./examples/index.js --outfile ./examples/build.js",
+    "gh-pages": "gh-pages --dist ./examples",
+    "lint": "eslint --ignore-pattern 'build.js' '{examples,lib}/**/*.js'",
     "prepublish": "make dist",
-    "start": "make start",
-    "test": "make check"
+    "start": "http-server ./examples",
+    "test": "mocha --compilers js:babel-core/register --require source-map-support/register --reporter spec ./test/server.js"
   },
   "dependencies": {
     "cheerio": "^0.20.0",

@@ -23,19 +23,19 @@ If you have an idea for an example that shows a common use case, pull request it
 To get the examples running on your machine, you need to have the Slate repository cloned to your computer. After that, you need to `cd` into the directory where you cloned it, and install the dependencies from `npm`.
 
 ```
-make install
+npm install
 ```
 
 Which will also build the source. Then build the examples:
 
 ```
-make examples
+npm run examples
 ```
 
 And then run the examples server:
 
 ```
-make start
+npm start
 ```
 
 Now you can open up `http://localhost:8080` in your browser and you'll see the examples site.
@@ -43,10 +43,10 @@ Now you can open up `http://localhost:8080` in your browser and you'll see the e
 If you want to edit the source while running the examples and have those changes immediately reflected, you need to run two additional watching commands in your terminal:
 
 ```
-make watch-dist
+npm run dist:watch
 ```
 ```
-make watch-examples
+npm run examples:watch
 ```
 
 
