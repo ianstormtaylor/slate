@@ -17,8 +17,7 @@ _July 20, 2016_
 
 #### BREAKING CHANGES
 
-- **Change `renderMark(mark, state, editor)` to `renderMark(mark, marks, state, editor)`.** 
-    This change allows you to render marks based on multiple `marks` presence at once on a given range of text, for example using a custom `BoldItalic.otf` font when text has both `bold` and `italic` marks.
+- **Change `renderMark(mark, state, editor)` to `renderMark(mark, marks, state, editor)`.** This change allows you to render marks based on multiple `marks` presence at once on a given range of text, for example using a custom `BoldItalic.otf` font when text has both `bold` and `italic` marks.
 
 
 ## `0.3.0`
@@ -34,9 +33,7 @@ _July 18, 2016_
 
 #### BREAKING CHANGES
 
-- **Renamed `transform.mark()` to `transform.addMark()` and `transform.unmark()` to `transform.removeMark()`.**
-
-The new names make it clearer that the transforms are actions being performed, and it paves the way for adding a `toggleMark` convenience as well.
+- **Renamed `transform.mark()` to `transform.addMark()` and `transform.unmark()` to `transform.removeMark()`.** The new names make it clearer that the transforms are actions being performed, and it paves the way for adding a `toggleMark` convenience as well.
 
 
 ## `0.1.0`
