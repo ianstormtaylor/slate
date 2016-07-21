@@ -1,0 +1,114 @@
+export interface NodeType {
+  key:string,
+  kind:string,
+  length:number,
+  nodes:List<NodeType>,
+  assertChild: (key:string | NodeType) => NodeType,
+  assertDescendant: (key:string | NodeType) => NodeType,
+  concatChildren: (nodes:List<NodeType>) => NodeType,
+  decorateTexts: (decorator:Function) => NodeType,
+  findDescendant: (iterator:Function) => NodeType,
+  filterDescendants: (iterator:Function) => List<NodeType>,
+  getBlocks: () => List<NodeType>,
+  getBlocksAtRange: (range:Selection) => List<NodeType>,
+  getBlocksAtRange: (range:Selection) => List<Character>,
+  getChildrenAfter: Function,
+  getChildrenAfterIncluding: Function,
+  getChildrenBefore: Function,
+  getChildrenBeforeIncluding: Function,
+  getChildrenBetween: Function,
+  getChildrenBetweenIncluding: Function,
+  getClosest: Function,
+  getClosestBlock: Function,
+  getClosestInline: Function,
+  getChild: Function,
+  getDescendant: Function,
+  getDepth: Function,
+  getFragmentAtRange: Function,
+  getFurthest: Function,
+  getFurthestBlock: Function,
+  getFurthestInline: Function,
+  getHighestChild: Function,
+  getHighestOnlyChildParent: Function,
+  getInlinesAtRange: Function,
+  getMarksAtRange: Function,
+  getNextBlock: Function,
+  getNextSibling: Function,
+  getNextText: Function,
+  getOffset: Function,
+  getOffsetAtRange: Function,
+  getParent: Function,
+  getPreviousSibling: Function,
+  getPreviousText: Function,
+  getPreviousBlock: Function,
+  getTextAtOffset: Function,
+  getTexts: Function,
+  getTextsAtRange: Function,
+  hasChild: Function,
+  hasDescendant: Function,
+  hasVoidParent: Function,
+  isInlineSplitAtRange:Function
+}
+
+export type NodeMethod = 'assertChild' |
+  'assertDescendant' |
+  'findDescendant' |
+  'filterDescendants' |
+  'getBlocks' |
+  'getBlocksAtRange' |
+  'getCharactersAtRange' |
+  'getChildrenAfter' |
+  'getChildrenAfterIncluding' |
+  'getChildrenBefore' |
+  'getChildrenBeforeIncluding' |
+  'getChildrenBetween' |
+  'getChildrenBetweenIncluding' |
+  'getClosest' |
+  'getClosestBlock' |
+  'getClosestInline' |
+  'getChild' |
+  'getDescendant' |
+  'getDepth' |
+  'getFragmentAtRange' |
+  'getFurthest' |
+  'getFurthestBlock' |
+  'getFurthestInline' |
+  'getHighestChild' |
+  'getHighestOnlyChildParent' |
+  'getInlinesAtRange' |
+  'getMarksAtRange' |
+  'getNextBlock' |
+  'getNextSibling' |
+  'getNextText' |
+  'getOffset' |
+  'getOffsetAtRange' |
+  'getParent' |
+  'getPreviousSibling' |
+  'getPreviousText' |
+  'getPreviousBlock' |
+  'getTextAtOffset' |
+  'getTexts' |
+  'getTextsAtRange' |
+  'hasChild' |
+  'hasDescendant' |
+  'hasVoidParent' |
+  'isInlineSplitAtRange'
+
+export type ContentState = any
+
+export type Editor = any;
+
+export type ContentPropTypes = {
+  className: string,
+  editor: Editor,
+  onBeforeInput: Function,
+  onChange: Function,
+  onKeyDown: Function,
+  onPaste: Function,
+  onSelect: Function,
+  readOnly?: boolean,
+  renderMark: Function,
+  renderNode: Function,
+  state: ContentState,
+  style: { [key:string]: any }
+}
