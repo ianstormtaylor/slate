@@ -3,7 +3,7 @@ import { Data } from '../../../../..'
 
 export default function (state) {
   const { document, selection } = state
-  const texts = document.getTextNodes()
+  const texts = document.getTexts()
   const first = texts.first()
 
   return state

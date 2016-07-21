@@ -9,7 +9,7 @@ export default function (state) {
   const fragment = Raw.deserialize(raw).document
 
   const { document, selection } = state
-  const texts = document.getTextNodes()
+  const texts = document.getTexts()
   const second = texts.get(1)
   const range = selection.merge({
     anchorKey: second.key,
