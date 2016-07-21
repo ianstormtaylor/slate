@@ -41,11 +41,7 @@ const initialState = Raw.deserialize({
       nodes: [
         {
           kind: 'text',
-          ranges: [
-            {
-              text: 'A line of text in a paragraph.'
-            }
-          ]
+          text: 'A line of text in a paragraph.'
         }
       ]
     }
@@ -67,11 +63,7 @@ const initialState = Raw.deserialize([
     nodes: [
       {
         kind: 'text',
-        ranges: [
-          {
-            text: 'A line of text in a paragraph.'
-          }
-        ]
+        text: 'A line of text in a paragraph.'
       }
     ]
   }
