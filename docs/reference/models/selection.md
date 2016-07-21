@@ -72,7 +72,7 @@ The key of the text node at the selection's anchor point.
 ### `anchorOffset`
 `Number`
 
-The numbers of characters from the start of the text node at the selection's anchor point.
+The number of characters from the start of the text node at the selection's anchor point.
 
 ### `focusKey`
 `String`
@@ -82,7 +82,7 @@ The key of the text node at the selection's focus point.
 ### `focusOffset`
 `Number`
 
-The numbers of characters from the start of the text node at the selection's focus point.
+The number of characters from the start of the text node at the selection's focus point.
 
 ### `isBackward`
 `Boolean`
