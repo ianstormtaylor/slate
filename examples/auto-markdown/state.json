@@ -6,11 +6,7 @@
       "nodes": [
         {
           "kind": "text",
-          "ranges": [
-            {
-              "text": "The editor gives you full control over the logic you can add. For example, it's fairly common to want to add markdown-like shortcuts to editors. So that, when you start a line with \"> \" you get a blockquote that looks like this:"
-            }
-          ]
+          "text": "The editor gives you full control over the logic you can add. For example, it's fairly common to want to add markdown-like shortcuts to editors. So that, when you start a line with \"> \" you get a blockquote that looks like this:"
         }
       ]
     },
@@ -20,11 +16,7 @@
       "nodes": [
         {
           "kind": "text",
-          "ranges": [
-            {
-              "text": "A wise quote."
-            }
-          ]
+          "text": "A wise quote."
         }
       ]
     },
@@ -34,11 +26,7 @@
       "nodes": [
         {
           "kind": "text",
-          "ranges": [
-            {
-              "text": "Order when you start a line with \"## \" you get a level-two heading, like this:"
-            }
-          ]
+          "text": "Order when you start a line with \"## \" you get a level-two heading, like this:"
         }
       ]
     },
@@ -48,11 +36,7 @@
       "nodes": [
         {
           "kind": "text",
-          "ranges": [
-            {
-              "text": "Try it out!"
-            }
-          ]
+          "text": "Try it out!"
         }
       ]
     },
@@ -62,11 +46,7 @@
       "nodes": [
         {
           "kind": "text",
-          "ranges": [
-            {
-              "text": "Try it out for yourself! Try starting a new line with \">\", \"-\", or \"#\"s."
-            }
-          ]
+          "text": "Try it out for yourself! Try starting a new line with \">\", \"-\", or \"#\"s."
         }
       ]
     }

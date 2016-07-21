@@ -6,11 +6,7 @@
       "nodes": [
         {
           "kind": "text",
-          "ranges": [
-            {
-              "text": "There are certain behaviors that require rendering dynamic marks on string of text, like rendering code highlighting. For example:"
-            }
-          ]
+          "text": "There are certain behaviors that require rendering dynamic marks on string of text, like rendering code highlighting. For example:"
         }
       ]
     },
@@ -20,11 +16,7 @@
       "nodes": [
         {
           "kind": "text",
-          "ranges": [
-            {
-              "text": "// A simple FizzBuzz implementation.\nfor (var i = 1; i <= 100; i++) {\n  if (i % 15 == 0) {\n    console.log('Fizz Buzz');\n  } else if (i % 5 == 0) {\n    console.log('Buzz');\n  } else if (i % 3 == 0) {\n    console.log('Fizz');\n  } else {\n    console.log(i);\n  }\n}"
-            }
-          ]
+          "text": "// A simple FizzBuzz implementation.\nfor (var i = 1; i <= 100; i++) {\n  if (i % 15 == 0) {\n    console.log('Fizz Buzz');\n  } else if (i % 5 == 0) {\n    console.log('Buzz');\n  } else if (i % 3 == 0) {\n    console.log('Fizz');\n  } else {\n    console.log(i);\n  }\n}"
         }
       ]
     },
@@ -34,11 +26,7 @@
       "nodes": [
         {
           "kind": "text",
-          "ranges": [
-            {
-              "text": "Try it out for yourself!"
-            }
-          ]
+          "text": "Try it out for yourself!"
         }
       ]
     }
