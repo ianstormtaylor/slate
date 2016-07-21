@@ -9,16 +9,18 @@ export default function (state) {
     anchorKey: first.key,
     anchorOffset: 0,
     focusKey: first.key,
-    focusOffset: 2
+    focusOffset: 0
   })
 
   const next = state
     .transform()
     .moveTo(range)
-    .toggleMark('bold')
+    .addMark('bold')
+    .removeMark('bold')
+    .insertText('a')
     .apply()
 
-  assert.deepEqual(next.selection.toJS(), range.toJS())
+  assert.deepEqual(next.selection.toJS(), range.moveForward().toJS())
 
   return next
 }

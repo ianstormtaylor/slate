@@ -15,7 +15,7 @@ export default function (state) {
   const next = state
     .transform()
     .moveTo(range)
-    .toggleMark('bold')
+    .removeMark('bold')
     .apply()
 
   assert.deepEqual(next.selection.toJS(), range.toJS())

@@ -5,7 +5,7 @@ nodes:
     nodes:
       - kind: text
         ranges:
-          - text: a
+          - text: w
             marks:
               - type: bold
-          - text: bword
+          - text: ord

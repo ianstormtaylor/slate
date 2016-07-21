@@ -1,4 +1,5 @@
 
+import { Mark } from '../../../../..'
 import assert from 'assert'
 
 export default function (state) {
@@ -9,13 +10,16 @@ export default function (state) {
     anchorKey: first.key,
     anchorOffset: 0,
     focusKey: first.key,
-    focusOffset: 2
+    focusOffset: 1
   })
 
   const next = state
     .transform()
     .moveTo(range)
-    .toggleMark('bold')
+    .removeMark(Mark.create({
+      type: 'bold',
+      data: { key: 'value' }
+    }))
     .apply()
 
   assert.deepEqual(next.selection.toJS(), range.toJS())
