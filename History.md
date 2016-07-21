@@ -2,6 +2,20 @@
 This document maintains a list of changes to Slate with each new version. Until `1.0.0` is released, breaking changes will be added as minor version bumps, and non-breaking changes won't be accounted for since the library is moving quickly.
 
 
+## `0.5.0`
+_July 20, 2016_
+
+###### BREAKING CHANGES
+
+- Change `node.getTextNodes()` to `node.getTexts()`
+
+This is just for consistency with the other existing `Node` methods like `getBlocks()`, `getInlines()`, etc. And it's nicely shorter. :wink:
+
+- Change internal `Node` logic to `throw` sooner when dealing with unexpected `Node` and `Selection` states.
+
+This shouldn't break anything for most folks, unless a strange edge-case was going undetected previously.
+
+
 ## `0.4.0`
 _July 20, 2016_
 
