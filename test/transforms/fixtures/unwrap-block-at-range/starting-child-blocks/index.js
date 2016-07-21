@@ -1,7 +1,7 @@
 
 export default function (state) {
   const { document, selection } = state
-  const texts = document.getTextNodes()
+  const texts = document.getTexts()
   const first = texts.get(0)
   const second = texts.get(1)
   const range = selection.merge({
