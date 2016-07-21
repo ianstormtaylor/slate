@@ -160,7 +160,7 @@ class App extends React.Component {
       case 66: {
         return state
           .transform()
-          .addMark('bold')
+          .toggleMark('bold')
           .apply()
       }
       case 192: {
@@ -177,68 +177,6 @@ class App extends React.Component {
 ```
 
 Now, if you try selecting a piece of text and hitting **⌘-B** you should see it turn bold! Magic!
-
-But we forgot one thing. When you hit **⌘-B** again, it should remove the bold formatting. To do that, we'll need to add a bit of logic to either add or remove the `bold` mark depending on what the currently selected marks on the text are:
-
-```js
-const BOLD_MARK = {
-  fontWeight: 'bold'
-}
-
-class App extends React.Component {
-
-  constructor(props) {
-    super(props)
-    this.state = {
-      state: initialState
-    }
-  }
-
-  render() {
-    return (
-      <Editor
-        state={this.state.state}
-        renderMark={mark => this.renderMark(mark)}
-        onChange={state => this.onChange(state)}
-        onKeyDown={(e, state) => this.onKeyDown(e, state)}
-      />
-    )
-  }
-
-  renderMark(mark) {
-    if (mark.type == 'bold') return BOLD_MARK
-  }
-
-  onChange(state) {
-    this.setState({ state })
-  }
-
-  onKeyDown(event, state) {
-    if (!event.metaKey) return
-
-    switch (event.which) {
-      case 66: {
-        // Loop through the current marks, check to see if any are bold.
-        const isBold = state.marks.some(mark => mark.type == 'bold')
-        return state
-          .transform()
-          [isBold ? 'removeMark' : 'addMark']('bold')
-          .apply()
-      }
-      case 192: {
-        const isCode = state.blocks.some(block => block.type == 'code')
-        return state
-          .transform()
-          .setBlock(isCode ? 'paragraph' : 'code')
-          .apply()
-      }
-    }
-  }
-
-}
-```
-
-Now when you repeatedly press **⌘-B** you should see the bold formatting be added and removed!
 
 <br/>
 <p align="center"><strong>Next:</strong><br/><a href="./using-plugins.md">Using Plugins</a></p>
