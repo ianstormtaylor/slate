@@ -12,6 +12,6 @@ export default function (state) {
 
   return state
     .transform()
-    .wrapBlockAtRange(range, 'quote', { key: 'value' })
+    .unwrapBlockAtRange(range, 'quote', { key: 'value' })
     .apply()
 }

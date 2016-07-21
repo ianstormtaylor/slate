@@ -1,4 +1,7 @@
 
+import { Data } from '../../../../..'
+import assert from 'assert'
+
 export default function (state) {
   const { document, selection } = state
   const texts = document.getTexts()
@@ -10,8 +13,16 @@ export default function (state) {
     focusOffset: 0
   })
 
-  return state
+  const next = state
     .transform()
-    .unwrapBlockAtRange(range, 'quote')
+    .moveTo(range)
+    .unwrapBlock('quote', Data.create({ key: 'value' }))
     .apply()
+
+  assert.deepEqual(
+    next.selection.toJS(),
+    range.toJS()
+  )
+
+  return next
 }
