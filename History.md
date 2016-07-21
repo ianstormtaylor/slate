@@ -17,7 +17,8 @@ _July 20, 2016_
 
 #### BREAKING CHANGES
 
-- **Change `renderMark(mark, state, editor)` to `renderMark(mark, marks, state, editor)`.** This change allows you to render marks based on multiple `marks` presence at once on a given range of text, for example using a custom `BoldItalic.otf` font when text has both `bold` and `italic` marks.
+- **Change `renderMark(mark, state, editor)` to `renderMark(mark, marks, state, editor)`.** 
+  This change allows you to render marks based on multiple `marks` presence at once on a given range of text, for example using a custom `BoldItalic.otf` font when text has both `bold` and `italic` marks.
 
 
 ## `0.3.0`
