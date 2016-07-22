@@ -54,7 +54,7 @@ function clean(html) {
     $(el).removeAttr('data-offset-key')
   })
 
-  $('[contenteditable]').removeAttr('style')
+  $.root().children().removeAttr('style')
 
   return $.html()
 }
