@@ -1,5 +1,5 @@
 
-import { Editor, Mark, Raw } from '../..'
+import { Editor, Mark, Raw, Void } from '../..'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import initialState from './state.json'
@@ -19,7 +19,11 @@ const NODES = {
     const { data } = node
     const isActive = state.isFocused && state.blocks.includes(node)
     const src = data.get('src')
-    return <img {...props.attributes} src={src} data-active={isActive} />
+    return (
+      <Void {...props} className="image-block">
+        <img {...props.attributes} src={src} data-active={isActive} />
+      </Void>
+    )
   }
 }
 

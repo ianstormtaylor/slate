@@ -24,10 +24,6 @@ img {
   max-height: 20em;
 }
 
-img[data-active="true"] {
-  box-shadow: 0 0 0 2px blue;
-}
-
 blockquote {
   border-left: 2px solid #ddd;
   margin-left: 0;
@@ -136,4 +132,12 @@ td {
 
 .hover-menu .button[data-active="true"] {
   color: #fff;
+}
+
+.image-block:focus {
+  outline: none;
+}
+
+.image-block:focus > * > img {
+  box-shadow: 0 0 0 2px blue;
 }
