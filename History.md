@@ -5,6 +5,13 @@ This document maintains a list of changes to Slate with each new version. Until 
 ---
 
 
+### `0.6.0` — _July 22, 2016_
+
+- **`data-offset-key` is now `<key>-<index>` instead of `<key>:<start>-<end>`.** This shouldn't actually affect anyone, unless you were specifically relying on that attribute in the DOM.
+
+This change greatly reduces the number of re-renders needed, since previously any additional characters would cause a cascading change in the `<start>` and `<end>` offsets of latter text ranges.
+
+
 ### `0.5.0` — _July 20, 2016_
 
 #### BREAKING CHANGES
