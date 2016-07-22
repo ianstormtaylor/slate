@@ -29,10 +29,6 @@ The core plugin renders a default block and inline node, wrapping in a `<div>` a
 
 The default block node also controls its own placeholder logic, which is controlled via the [`<Editor>`](../components/editor.md)'s placeholder options.
 
-#### `renderMark`
-
-The core plugin adds a default mark with an empty set of styles.
-
 
 ## Overriding Defaults
 
