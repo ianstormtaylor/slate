@@ -16,12 +16,10 @@ import { Map } from 'immutable'
 const NODES = {
   image: (props) => {
     const { node, state } = props
-    const { data } = node
-    const isActive = state.isFocused && state.blocks.includes(node)
-    const src = data.get('src')
+    const src = node.data.get('src')
     return (
       <Void {...props} className="image-block">
-        <img {...props.attributes} src={src} data-active={isActive} />
+        <img {...props.attributes} src={src} />
       </Void>
     )
   }
