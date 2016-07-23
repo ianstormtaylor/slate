@@ -87,6 +87,7 @@ class Images extends React.Component {
           state={this.state.state}
           renderNode={this.renderNode}
           onChange={this.onChange}
+          onDocumentChange={this.onDocumentChange}
           onPaste={this.onPaste}
         />
       </div>
@@ -112,6 +113,34 @@ class Images extends React.Component {
 
   onChange = (state) => {
     this.setState({ state })
+  }
+
+  /**
+   * On document change, if the last block is an image, add another paragraph.
+   *
+   * @param {Document} document
+   * @param {State} state
+   */
+
+  onDocumentChange = (document, state) => {
+    const blocks = document.getBlocks()
+    const last = blocks.last()
+    if (last.type != 'image') return
+
+    const normalized = state
+      .transform()
+      .collapseToEndOf(last)
+      .splitBlock()
+      .setBlock({
+        type: 'paragraph',
+        isVoid: false,
+        data: {}
+      })
+      .apply({
+        snapshot: false
+      })
+
+    this.onChange(normalized)
   }
 
   /**
