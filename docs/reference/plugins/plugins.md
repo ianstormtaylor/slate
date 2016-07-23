@@ -10,6 +10,7 @@ When the editor needs to resolve a plugin-related handler, it will loop through 
 - [Conventions](#conventions)
 - [Event Handler Properties](#event-handle-properties)
   - [`onBeforeInput`](#onbeforeinput)
+  - [`onDrop`](#ondrop)
   - [`onKeyDown`](#onkeydown)
   - [`onPaste`](#onpaste)
 - [Renderer Properties](#renderer-properties)
@@ -38,6 +39,7 @@ export default MySlatePlugin(options) {
 ```js
 {
   onBeforeInput: Function,
+  onDrop: Function,
   onKeyDown: Function,
   onPaste: Function
 }
@@ -53,6 +55,36 @@ Each event handler can choose to return a new `state` object, in which case the 
 This handler is called right before a string of text is inserted into the `contenteditable` element. The `event.data` property will be the string of text that is being inserted.
 
 Make sure to `event.preventDefault()` if you do not want the default insertion behavior to occur! If no other plugin handles this event, it will be handled by the [Core plugin](./core.md).
+
+### `onDrop`
+`Function onDrop(event: Event, drop: Object, state: State, editor: Editor) => State || Void`
+
+This handler is called when the user drops content into the `contenteditable` element. The event is already prevented by default, so you must define a state change to have any affect occur.
+
+The `drop` object is a convenience object created to standardize the drop metadata across browsers. Every drop object has a `type` property, can be one of `text`, `html` or `files`, and a `target` property which is a [`Selection`](../models/selection.md) indicating where the drop occured. Depending on the type, it's structure will be:
+
+```js
+{
+  type: 'text',
+  target: Selection,
+  text: String
+}
+
+{
+  type: 'html',
+  target: Selection,
+  text: String,
+  html: String
+}
+
+{
+  type: 'files',
+  target: Selection,
+  files: FileList
+}
+```
+
+If no other plugin handles this event, it will be handled by the [Core plugin](./core.md).
 
 ### `onKeyDown` 
 `Function onKeyDown(event: Event, state: State, editor: Editor) => State || Void`

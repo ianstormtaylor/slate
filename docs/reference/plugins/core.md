@@ -11,19 +11,23 @@ Slate's editor is very unopinionated. The only logic it handles by default is lo
 
 The default behavior of the core plugin performs the following logic:
 
-#### `onBeforeInput`
+### `onBeforeInput`
 
 When text is entered, the core plugin inserts the text from `event.data` into the editor.
 
-#### `onKeyDown`
+### `onDrop`
+
+When the user drops content into the editor, the core plugin handles drops of type `text` and `html` as plain text, and does nothing for drops of type `files`.
+
+### `onKeyDown`
 
 When a key is pressed, the core plugin handles performing some of the "native" behavior that `contenteditable` elements must do. For example it splits blocks on `enter`, removes characters `backspace`, triggers an undo state from the history on `cmd-z`, etc.
 
-#### `onPaste`
+### `onPaste`
 
 When the user pastes content into the editor, the core plugin handles all pastes of type `text` and `html` as plain text, and does nothing for pastes of type `files`. 
 
-#### `renderNode`
+### `renderNode`
 
 The core plugin renders a default block and inline node, wrapping in a `<div>` and `<span>`, respectively. Each of these nodes contains `shouldComponentUpdate` logic prevents unnecessary re-renders.
 
