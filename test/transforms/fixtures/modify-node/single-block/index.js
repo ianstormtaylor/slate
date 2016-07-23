@@ -5,6 +5,6 @@ export default function (state) {
 
   return state
     .transform()
-    .modifyNode(first.key, { data: {key: 'bar'} })
+    .setNodeByKey(first.key, { data: {key: 'bar'} })
     .apply()
 }

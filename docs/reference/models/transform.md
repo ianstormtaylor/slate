@@ -60,7 +60,7 @@ Transform methods can either operate on the [`Document`](./document.md), the [`S
   - [`unwrapInlineAtRange`](#unwrapinlineatrange)
   - [`wrapBlockAtRange`](#wrapblockatrange)
   - [`wrapInlineAtRange`](#wrapinlineatrange)
-  - [`modifyNode`](#modifyNode)
+  - [`setNodeByKey`](#setNodeByKey)
 - [History Transforms](#history-transforms)
   - [`redo`](#redo)
   - [`undo`](#undo)
@@ -320,9 +320,9 @@ Wrap the [`Block`](./block.md) nodes in a `range` with a new [`Block`](./block.m
 
 Wrap the [`Inline`](./inline.md) nodes in a `range` with a new [`Inline`](./inline.md) node of `type`, with optional `data`.
 
-### `modifyNode`
-`modifyNode(key: String, properties: Object) => Transform`
-`modifyNode(key: String, type: String) => Transform`
+### `setNodeByKey`
+`setNodeByKey(key: String, properties: Object) => Transform`
+`setNodeByKey(key: String, type: String) => Transform`
 
 Set the properties of the [`Node`](./node.md) having the specified `key`.
 
