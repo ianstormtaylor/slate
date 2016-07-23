@@ -95,7 +95,7 @@ Get all of the bottom-most [`Block`](./block.md) node descendants.
 Get a list of all of the [`Charaters`](./character.md) in a `range`.
 
 ### `getChild`
-`getChild(key: Key || Node) => Node || Void`
+`getChild(key: String || Node) => Node || Void`
 
 Get a child by `key`.
 
