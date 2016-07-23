@@ -108,7 +108,7 @@ These properties are exact proxies of their [`Selection`](./selection) equivalen
 Get the current key at an `{edge}`. Where `{edge}` is one of: `anchor`, `focus`, `start` or `end`.
 
 ### `{edge}Offset`
-`String`
+`Number`
 
 Get the current offset at an `{edge}`. Where `{edge}` is one of: `anchor`, `focus`, `start` or `end`.
 
