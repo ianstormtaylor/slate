@@ -56,18 +56,20 @@ And now that we've our initial state, we define our `App` and pass it into Slate
 import React from 'react'
 import { Editor, Raw } from 'slate'
 
-const initialState = Raw.deserialize([
-  {
-    kind: 'block',
-    type: 'paragraph',
-    nodes: [
-      {
-        kind: 'text',
-        text: 'A line of text in a paragraph.'
-      }
-    ]
-  }
-])
+const initialState = Raw.deserialize({
+  nodes: [
+    {
+      kind: 'block',
+      type: 'paragraph',
+      nodes: [
+        {
+          kind: 'text',
+          text: 'A line of text in a paragraph.'
+        }
+      ]
+    }
+  ]
+})
 
 // Define our app...
 class App extends React.Component {
