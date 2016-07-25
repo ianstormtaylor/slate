@@ -85,7 +85,6 @@
     "no-with": "error",
     "object-property-newline": ["error", { "allowMultiplePropertiesPerLine": true }],
     "object-shorthand": ["error", "always"],
-    "padded-blocks": ["error", "never"],
     "prefer-arrow-callback": "error",
     "prefer-rest-params": "error",
     "prefer-spread": "error",
