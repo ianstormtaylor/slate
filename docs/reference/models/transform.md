@@ -13,7 +13,7 @@ Transform methods can either operate on the [`Document`](./document.md), the [`S
 
 - [Methods](#methods)
   - [`apply`](#apply)
-- [Document & Selection Transforms](#document-selection-transforms)
+- [Current State Transforms](#current-state-transforms)
   - [`deleteBackward`](#deletebackward)
   - [`deleteForward`](#deleteforward)
   - [`delete`](#delete)
@@ -43,6 +43,8 @@ Transform methods can either operate on the [`Document`](./document.md), the [`S
   - [`moveToRangeOf`](#movetorangeof)
   - [`moveTo`](#moveto)
   - [`move{Direction}`](#movedirection)
+- [Node Transforms](#node-transforms)
+  - [`setNodeByKey`](#setNodeByKey)
 - [Document Transforms](#document-transforms)
   - [`deleteAtRange`](#deleteatrange)
   - [`deleteBackwardAtRange`](#deletebackwardatrange)
@@ -60,7 +62,6 @@ Transform methods can either operate on the [`Document`](./document.md), the [`S
   - [`unwrapInlineAtRange`](#unwrapinlineatrange)
   - [`wrapBlockAtRange`](#wrapblockatrange)
   - [`wrapInlineAtRange`](#wrapinlineatrange)
-  - [`setNodeByKey`](#setNodeByKey)
 - [History Transforms](#history-transforms)
   - [`redo`](#redo)
   - [`undo`](#undo)
@@ -76,7 +77,7 @@ Applies all of the current transform steps, returning the newly transformed [`St
 - `snapshot: Boolean` — override the editor's built-in logic of whether to create a new snapshot in the history, that can be reverted to later.
 
 
-## Document & Selection Transforms
+## Current State Transforms
 
 ### `deleteBackward`
 `deleteBackward(n: Number) => Transform`
@@ -230,6 +231,15 @@ Move the current selection's anchor point to the start of a `node` and its focus
 Move the current selection to a selection with merged `properties`. The `properties` can either be a [`Selection`](./selection.md) object or a plain Javascript object of selection properties.
 
 
+## Node Transforms
+
+### `setNodeByKey`
+`setNodeByKey(key: String, properties: Object) => Transform`
+`setNodeByKey(key: String, type: String) => Transform`
+
+Set a dictionary of `properties` on the [`Node`](./node.md) with a `key`. For convenience, you can pass a `type` string or `properties` object.
+
+
 ## Document Transforms
 
 ### `deleteBackwardAtRange`
@@ -319,12 +329,6 @@ Wrap the [`Block`](./block.md) nodes in a `range` with a new [`Block`](./block.m
 `wrapInlineAtRange(range: Selection, type: String, [data: Data]) => Transform`
 
 Wrap the [`Inline`](./inline.md) nodes in a `range` with a new [`Inline`](./inline.md) node of `type`, with optional `data`.
-
-### `setNodeByKey`
-`setNodeByKey(key: String, properties: Object) => Transform`
-`setNodeByKey(key: String, type: String) => Transform`
-
-Set the properties of the [`Node`](./node.md) having the specified `key`.
 
 
 ## History Transforms
