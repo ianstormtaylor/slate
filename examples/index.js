@@ -112,19 +112,7 @@ class App extends React.Component {
 const router = (
   <Router history={hashHistory}>
     <Route path="/" component={App}>
-      <IndexRedirect to="rich-text" />
       <Route path="auto-markdown" component={AutoMarkdown} />
-      <Route path="code-highlighting" component={CodeHighlighting} />
-      <Route path="hovering-menu" component={HoveringMenu} />
-      <Route path="images" component={Images} />
-      <Route path="links" component={Links} />
-      <Route path="paste-html" component={PasteHtml} />
-      <Route path="plain-text" component={PlainText} />
-      <Route path="read-only" component={ReadOnly} />
-      <Route path="rich-text" component={RichText} />
-      <Route path="tables" component={Tables} />
-      <Route path="dev-performance-plain" component={DevPerformancePlain} />
-      <Route path="dev-performance-rich" component={DevPerformanceRich} />
     </Route>
   </Router>
 )

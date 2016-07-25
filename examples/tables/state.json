@@ -6,11 +6,7 @@
       "nodes": [
         {
           "kind": "text",
-          "ranges": [
-            {
-              "text": "Since the editor is based on a recursive tree model, similar to an HTML document, you can create complex nested structures, like tables:"
-            }
-          ]
+          "text": "Since the editor is based on a recursive tree model, similar to an HTML document, you can create complex nested structures, like tables:"
         }
       ]
     },
@@ -30,7 +26,7 @@
                   "kind": "text",
                   "ranges": [
                     {
-                      "text": "",
+                      "text": ""
                     }
                   ]
                 }
@@ -237,11 +233,7 @@
       "nodes": [
         {
           "kind": "text",
-          "ranges": [
-            {
-              "text": "This table is just a basic example, but you could augment it to add support for table headers, adding column and rows, or even formulas if you wanted to get really crazy..."
-            }
-          ]
+          "text": "This table is just a basic example, but you could augment it to add support for table headers, adding column and rows, or even formulas if you wanted to get really crazy..."
         }
       ]
     }

@@ -44,7 +44,7 @@ class HoveringMenu extends React.Component {
    */
 
   state = {
-    state: Raw.deserialize(initialState)
+    state: Raw.deserialize(initialState, { terse: true })
   };
 
   /**

@@ -1,5 +1,5 @@
 
-import { Editor, Raw } from '../..'
+import { Editor, Raw, wrap } from '../..'
 import React from 'react'
 import keycode from 'keycode'
 import initialState from './state.json'
@@ -11,15 +11,15 @@ import initialState from './state.json'
  */
 
 const NODES = {
-  'block-quote': props => <blockquote {...props.attributes}>{props.children}</blockquote>,
-  'bulleted-list': props => <ul {...props.attributes}>{props.children}</ul>,
-  'heading-one': props => <h1 {...props.attributes}>{props.children}</h1>,
-  'heading-two': props => <h2 {...props.attributes}>{props.children}</h2>,
-  'heading-three': props => <h3 {...props.attributes}>{props.children}</h3>,
-  'heading-four': props => <h4 {...props.attributes}>{props.children}</h4>,
-  'heading-five': props => <h5 {...props.attributes}>{props.children}</h5>,
-  'heading-six': props => <h6 {...props.attributes}>{props.children}</h6>,
-  'list-item': props => <li {...props.attributes}>{props.children}</li>
+  'block-quote': props => <blockquote>{props.children}</blockquote>,
+  'bulleted-list': props => <ul>{props.children}</ul>,
+  'heading-one': props => <h1>{props.children}</h1>,
+  'heading-two': props => <h2>{props.children}</h2>,
+  'heading-three': props => <h3>{props.children}</h3>,
+  'heading-four': props => <h4>{props.children}</h4>,
+  'heading-five': props => <h5>{props.children}</h5>,
+  'heading-six': props => <h6>{props.children}</h6>,
+  'list-item': props => <li>{props.children}</li>
 }
 
 /**
@@ -37,7 +37,7 @@ class AutoMarkdown extends React.Component {
    */
 
   state = {
-    state: Raw.deserialize(initialState)
+    state: Raw.deserialize(initialState, { terse: true })
   };
 
   /**

@@ -1,5 +1,5 @@
 
-import { Editor, Draggable, Raw, Void } from '../..'
+import { Editor, Raw, wrap } from '../..'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import initialState from './state.json'
@@ -13,17 +13,11 @@ import isUrl from 'is-url'
  */
 
 const NODES = {
-  image: (props) => {
+  image: wrap()((props) => {
     const { node, state } = props
     const src = node.data.get('src')
-    return (
-      <Draggable {...props}>
-        <Void {...props} className="image-block">
-          <img {...props.attributes} src={src} />
-        </Void>
-      </Draggable>
-    )
-  }
+    return <img draggable src={src} />
+  })
 }
 
 /**
@@ -41,7 +35,7 @@ class Images extends React.Component {
    */
 
   state = {
-    state: Raw.deserialize(initialState)
+    state: Raw.deserialize(initialState, { terse: true })
   };
 
   /**
