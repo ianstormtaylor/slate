@@ -1,5 +1,5 @@
 
-import { Editor, Raw, wrap } from '../..'
+import { Editor, Raw, Void } from '../..'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import initialState from './state.json'
@@ -13,11 +13,15 @@ import isUrl from 'is-url'
  */
 
 const NODES = {
-  image: wrap()((props) => {
+  image: (props) => {
     const { node, state } = props
     const src = node.data.get('src')
-    return <img draggable src={src} />
-  })
+    return (
+      <Void {...props} className="image-block">
+        <img src={src} {...props.attributes} />
+      </Void>
+    )
+  }
 }
 
 /**
@@ -83,6 +87,7 @@ class Images extends React.Component {
           renderNode={this.renderNode}
           onChange={this.onChange}
           onDocumentChange={this.onDocumentChange}
+          onDrop={this.onDrop}
           onPaste={this.onPaste}
         />
       </div>
@@ -151,6 +156,25 @@ class Images extends React.Component {
     let { state } = this.state
     state = this.insertImage(state, src)
     this.onChange(state)
+  }
+
+  /**
+   * On drop, insert the image wherever it is dropped.
+   *
+   * @param {Event} e
+   * @param {Object} drop
+   * @param {State} state
+   * @return {State}
+   */
+
+  onDrop = (e, drop, state) => {
+    if (drop.type != 'node') return
+    return state
+      .transform()
+      .removeNodeByKey(drop.node.key)
+      .moveTo(drop.target)
+      .insertBlock(drop.node)
+      .apply()
   }
 
   /**
