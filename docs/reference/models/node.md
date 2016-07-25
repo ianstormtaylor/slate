@@ -9,7 +9,7 @@
   - [`kind`](#kind)
   - [`length`](#length)
   - [`text`](#text)
-- [Retrieval Methods](#retrieval-methods)
+- [Methods](#methods)
   - [`filterDescendants`](#filterdescendants)
   - [`findDescendant`](#finddescendant)
   - [`getBlocksAtRange`](#getblockatrange)
@@ -35,10 +35,6 @@
   - [`getTextsAtRange`](#gettextsatrange)
   - [`hasChild`](#haschild)
   - [`hasDescendant`](#hasdescendant)
-- [Transform Methods](#transform-methods)
-  - [`mapDescendants`](#mapdescendants)
-  - [`removeDescendant`](#removedescendant)
-  - [`updateDescendant`](#updatedescendant)
 
 
 ## Properties
@@ -67,7 +63,7 @@ The sum of the lengths of all of the descendant [`Text`](./text.md) nodes of thi
 A concatenated string of all of the descendant [`Text`](./text.md) nodes of this node.
 
 
-## Retrieval Methods
+## Methods
 
 ### `filterDescendants`
 `filterDescendants(iterator: Function) => List`
@@ -193,23 +189,3 @@ Check whether the node has a child node by `key`.
 `hasDescendant(key: String || Node) => Boolean`
 
 Check whether the node has a descendant node by `key`.
-
-
-## Transform Methods
-
-Since nodes are immutable, all of the transform methods return a new copy of the node in question.
-
-### `mapDescendants`
-`mapDescendants(iterator: Function) => Node` 
-
-Map all of the descendant nodes of a node through an `iterator` function.
-
-### `removeDescendant`
-`removeDescendant(key: String || Node) => Node`
-
-Remove a descendant node from the tree by `key`.
-
-### `updateDescendant`
-`updateDescendant(node: Node) => Node`
-
-Update a descendant `node` to the new value.

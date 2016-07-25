@@ -29,26 +29,13 @@ Often times, you don't need to specifically know which point is the "anchor" and
   - [`startOffset`](#startoffset)
 - [Static Methods](#static-methods)
   - [`Selection.create`](#selectioncreate) 
-- [Checking Methods](#checking-methods)
+- [Methods](#checking-methods)
   - [`has{Edge}AtEndOf`](#hasedgeatendof)
   - [`has{Edge}AtStartOf`](#hasedgeatstartof)
   - [`has{Edge}Between`](#hasedgebetween)
   - [`has{Edge}In`](#hasedgein)
   - [`isAtEndOf`](#isatendof)
   - [`isAtStartOf`](#isatstartof)
-- [Transforming Methods](#transforming-methods)
-  - [`blur`](blur)
-  - [`extendBackward`](#extendbackward)
-  - [`extendForward`](#extendforward)
-  - [`extendToEndOf`](#extendtoendof)
-  - [`extendToStartOf`](#extendtostartof)
-  - [`focus`](#focus)
-  - [`moveBackward`](#movebackward)
-  - [`moveForward`](#moveforward)
-  - [`moveToEndOf`](#movetoendof)
-  - [`moveToRangeOf`](#movetorangeof)
-  - [`moveToStartOf`](#movetostartof)
-  - [`moveTo{Edge}`](#movetoedge)
 
 
 ## Properties
@@ -135,7 +122,7 @@ A few convenience properties for accessing the first and last point of the selec
 Create a new `Selection` instance with `properties`.
 
 
-## Checking Methods
+## Methods
 
 ### `has{Edge}AtStartOf`
 `has{Edge}AtStartOf(node: Node) => Boolean`
@@ -166,68 +153,3 @@ Determine whether the selection is at the start of a `node`.
 `isAtEndOf(node: Node) => Boolean`
 
 Determine whether the selection is at the end of a `node`.
-
-
-## Transforming Methods
-
-Since `Selection`s are immutable, all of the transforming methods return a new instance of the selection.
-
-### `blur` 
-`blur() => Selection`
-
-Change the selection's `isFocused` property to `false`.
-
-### `extendBackward` 
-`extendBackward([n = 1: Number]) => Selection`
-
-Decrease the selection's `focusOffset` by `n`, default to `1`.
-
-### `extendForward` 
-`extendForward([n = 1: Number]) => Selection`
-
-Increase the selection's `focusOffset` by `n`, default to `1`.
-
-### `extendToEndOf` 
-`extendToEndOf(node: Node) => Selection`
-
-Move the selection's `focusOffset` to the end of a `node`.
-
-### `extendToStartOf` 
-`extendToStartOf(node: Node) => Selection`
-
-Move the selection's `focusOffset` to the start of a `node`.
-
-### `focus` 
-`focus() => Selection`
-
-Change the selection's `isFocused` property to `true`.
-
-### `moveTo{Edge}`
-`moveTo{Edge}() => Selection`
-
-Move both of the selection's points to an edge, collapsing it. Where `{Edge}` can be one of: `Anchor`, `Focus`, `Start` or `End`.
-
-### `moveToEndOf` 
-`moveToEndOf(node: Node) => Selection`
-
-Move both of the selection's points to the end of a `node`.
-
-### `moveToRangeOf` 
-`moveToRangeOf(node: Node) => Selection`
-
-Move the selection's anchor point to the start of a `node`, and its focus point to the end of the same `node`.
-
-### `moveToStartOf` 
-`moveToStartOf(node: Node) => Selection`
-
-Move both of the selection's points to the start of a `node`.
-
-### `moveBackward` 
-`moveBackward([n = 1: Number]) => Selection`
-
-Decrease the selection's `anchorOffset` and `focusOffset` by `n`, defaulting to `1`.
-
-### `moveForward` 
-`moveForward([n = 1: Number]) => Selection`
-
-Increase the selection's `anchorOffset` and `focusOffset` by `n`, defaulting to `1`.
