@@ -1,0 +1,15 @@
+
+nodes:
+  - kind: block
+    type: image
+    isVoid: true
+    nodes:
+      - kind: text
+        ranges:
+          - text: ""
+  - kind: block
+    type: image
+    nodes:
+      - kind: text
+        ranges:
+          - text: ""

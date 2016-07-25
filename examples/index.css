@@ -138,6 +138,6 @@ td {
   outline: none;
 }
 
-.image-block:focus > * > img {
+.image-block:focus img {
   box-shadow: 0 0 0 2px blue;
 }

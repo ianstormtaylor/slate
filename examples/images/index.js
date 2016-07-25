@@ -1,11 +1,10 @@
 
-import { Editor, Mark, Raw, Void } from '../..'
+import { Editor, Draggable, Raw, Void } from '../..'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import initialState from './state.json'
 import isImage from 'is-image'
 import isUrl from 'is-url'
-import { Map } from 'immutable'
 
 /**
  * Define a set of node renderers.
@@ -18,9 +17,11 @@ const NODES = {
     const { node, state } = props
     const src = node.data.get('src')
     return (
-      <Void {...props} className="image-block">
-        <img {...props.attributes} src={src} />
-      </Void>
+      <Draggable {...props}>
+        <Void {...props} className="image-block">
+          <img {...props.attributes} src={src} />
+        </Void>
+      </Draggable>
     )
   }
 }
