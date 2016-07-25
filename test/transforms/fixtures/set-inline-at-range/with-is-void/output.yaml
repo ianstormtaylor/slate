@@ -6,7 +6,3 @@ nodes:
       - kind: inline
         type: emoji
         isVoid: true
-        nodes:
-          - kind: text
-            ranges:
-              - text: ""

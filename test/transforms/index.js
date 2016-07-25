@@ -28,9 +28,9 @@ describe('transforms', () => {
           const input = readMetadata.sync(resolve(innerDir, 'input.yaml'))
           const expected = readMetadata.sync(resolve(innerDir, 'output.yaml'))
 
-          let state = Raw.deserialize(input)
+          let state = Raw.deserialize(input, { terse: true })
           state = fn(state)
-          const output = Raw.serialize(state)
+          const output = Raw.serialize(state, { terse: true })
           strictEqual(strip(output), strip(expected))
         })
       }

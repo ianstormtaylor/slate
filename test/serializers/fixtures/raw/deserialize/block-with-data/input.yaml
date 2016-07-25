@@ -1,10 +1,15 @@
 
-nodes:
-  - kind: block
-    type: paragraph
-    data:
-      key: value
-    nodes:
-      - kind: text
-        ranges:
-          - text: one
+kind: state
+document:
+  kind: document
+  nodes:
+    - kind: block
+      type: paragraph
+      data:
+        key: value
+      nodes:
+        - kind: text
+          ranges:
+            - kind: range
+              text: one
+              marks: []

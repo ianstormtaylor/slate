@@ -1,0 +1,21 @@
+
+nodes:
+  - type: paragraph
+    isVoid: false
+    data: {}
+    nodes:
+    - type: link
+      isVoid: false
+      data: {}
+      nodes:
+        - type: hashtag
+          isVoid: false
+          data: {}
+          nodes:
+            - characters:
+                - text: o
+                  marks: []
+                - text: n
+                  marks: []
+                - text: e
+                  marks: []

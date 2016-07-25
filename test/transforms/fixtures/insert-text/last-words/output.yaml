@@ -4,5 +4,4 @@ nodes:
     type: paragraph
     nodes:
       - kind: text
-        ranges:
-          - text: word a few words
+        text: word a few words

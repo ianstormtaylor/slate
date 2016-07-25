@@ -5,5 +5,4 @@ nodes:
     isVoid: true
     nodes:
       - kind: text
-        ranges:
-          - text: ""
+        text: ""

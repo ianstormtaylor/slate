@@ -4,5 +4,4 @@ nodes:
     type: code
     nodes:
       - kind: text
-        ranges:
-          - text: word
+        text: word

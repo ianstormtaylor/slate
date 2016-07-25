@@ -4,11 +4,9 @@ nodes:
     type: paragraph
     nodes:
       - kind: text
-        ranges:
-          - text: word
+        text: word
   - kind: block
     type: image
     nodes:
       - kind: text
-        ranges:
-          - text: ""
+        text: ""

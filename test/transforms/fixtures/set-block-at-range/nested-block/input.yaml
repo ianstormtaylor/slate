@@ -7,5 +7,4 @@ nodes:
         type: paragraph
         nodes:
           - kind: text
-            ranges:
-              - text: word
+            text: word

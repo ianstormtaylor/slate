@@ -7,35 +7,29 @@ nodes:
         type: paragraph
         nodes:
           - kind: text
-            ranges:
-              - text: one
+            text: one
       - kind: block
         type: paragraph
         nodes:
           - kind: text
-            ranges:
-              - text: two
+            text: two
       - kind: block
         type: paragraph
         nodes:
           - kind: text
-            ranges:
-              - text: three
+            text: three
       - kind: block
         type: paragraph
         nodes:
           - kind: text
-            ranges:
-              - text: four
+            text: four
       - kind: block
         type: paragraph
         nodes:
           - kind: text
-            ranges:
-              - text: five
+            text: five
       - kind: block
         type: paragraph
         nodes:
           - kind: text
-            ranges:
-              - text: six
+            text: six

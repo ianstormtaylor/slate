@@ -4,11 +4,9 @@ nodes:
     type: paragraph
     nodes:
       - kind: text
-        ranges:
-          - text: wo
+        text: wo
   - kind: block
     type: paragraph
     nodes:
       - kind: text
-        ranges:
-          - text: other
+        text: other

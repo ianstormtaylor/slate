@@ -7,9 +7,9 @@ import { Raw } from 'slate'
 
 The raw JSON serialized that ships by default with Slate. It converts a [`State`](../models/state.md) into a JSON object. 
 
-The raw JSON object created will omit default-value properties to reduce the serialized data's size. For example, if the dictionary of [`Data`](../models/data.md) for a [`Node`](../models/node.md) is empty, it will be omitted.
-
 In the raw format, text is represented as "ranges", which are a more compact way to represent the formatting applied to characters than the immutable model Slate uses internally.
+
+When saving the data to size-sensitive places, you the raw serializer can be told to omit properties that aren't _strictly_ required to deserialize later, reducing the serialized data's size. For example, if the dictionary of [`Data`](../models/data.md) for a [`Node`](../models/node.md) is empty, it will be omitted.
 
 - [Example](#example)
 - [Static Methods](#methods)
@@ -123,11 +123,11 @@ In the raw format, text is represented as "ranges", which are a more compact way
 ## Methods
 
 ### `Raw.deserialize`
-`Raw.deserialize(object: Object) => State`
+`Raw.deserialize(object: Object, [options: Object]) => State`
 
-Deserialize a raw JSON `object` into a [`State`](../models/state.md).
+Deserialize a raw JSON `object` into a [`State`](../models/state.md). You must pass the `terse: true` option if you want to deserialize a state that was previously serialized with `terse: true`.
 
 ### `Raw.serialize`
-`Raw.serialize(state: State) => Object`
+`Raw.serialize(state: State, [options: Object]) => Object`
 
-Serialize a `state` into a raw JSON object.
+Serialize a `state` into a raw JSON object. If you pass the `terse: true` option, the serialized format will omit properties that aren't _strictly_ required to deserialize later, reducing the serialized data's size. For example, if the dictionary of [`Data`](../models/data.md) for a [`Node`](../models/node.md) is empty, it will be omitted.

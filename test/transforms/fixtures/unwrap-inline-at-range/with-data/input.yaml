@@ -4,8 +4,7 @@ nodes:
     type: paragraph
     nodes:
       - kind: text
-        ranges:
-          - text: w
+        text: w
       - kind: inline
         type: hashtag
         data:
@@ -17,8 +16,6 @@ nodes:
               key: two
             nodes:
               - kind: text
-                ranges:
-                  - text: or
+                text: or
       - kind: text
-        ranges:
-          - text: d
+        text: d

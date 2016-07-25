@@ -6,5 +6,4 @@ nodes:
       key: bar
     nodes:
       - kind: text
-        ranges:
-          - text: word
+        text: word

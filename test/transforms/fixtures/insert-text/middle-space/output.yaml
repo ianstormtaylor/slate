@@ -4,5 +4,4 @@ nodes:
     type: paragraph
     nodes:
       - kind: text
-        ranges:
-          - text: w ord
+        text: w ord

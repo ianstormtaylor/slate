@@ -7,17 +7,14 @@ nodes:
         type: link
         nodes:
           - kind: text
-            ranges:
-              - text: wo
+            text: wo
       - kind: inline
         type: hashtag
         nodes:
           - kind: text
-            ranges:
-              - text: fragment
+            text: fragment
       - kind: inline
         type: link
         nodes:
           - kind: text
-            ranges:
-              - text: rd
+            text: rd

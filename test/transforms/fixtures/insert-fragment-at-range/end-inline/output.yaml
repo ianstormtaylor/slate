@@ -7,8 +7,6 @@ nodes:
         type: link
         nodes:
           - kind: text
-            ranges:
-              - text: word
+            text: word
       - kind: text
-        ranges:
-          - text: fragment
+        text: fragment

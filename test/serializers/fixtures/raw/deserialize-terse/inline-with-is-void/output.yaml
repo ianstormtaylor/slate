@@ -1,0 +1,11 @@
+
+nodes:
+  - type: paragraph
+    isVoid: false
+    data: {}
+    nodes:
+    - type: link
+      isVoid: true
+      data: {}
+      nodes:
+        - characters: []

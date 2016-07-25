@@ -4,14 +4,12 @@ nodes:
     type: paragraph
     nodes:
       - kind: text
-        ranges:
-          - text: wo
+        text: wo
       - kind: inline
         type: hashtag
         nodes:
           - kind: text
-            ranges:
-              - text: rd
+            text: rd
   - kind: block
     type: paragraph
     nodes:
@@ -19,8 +17,6 @@ nodes:
         type: hashtag
         nodes:
           - kind: text
-            ranges:
-              - text: an
+            text: an
       - kind: text
-        ranges:
-          - text: other
+        text: other

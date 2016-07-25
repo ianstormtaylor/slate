@@ -7,8 +7,7 @@ nodes:
         type: link
         nodes:
           - kind: text
-            ranges:
-              - text: wo
+            text: wo
   - kind: block
     type: paragraph
     nodes:
@@ -16,5 +15,4 @@ nodes:
         type: link
         nodes:
           - kind: text
-            ranges:
-              - text: rd
+            text: rd

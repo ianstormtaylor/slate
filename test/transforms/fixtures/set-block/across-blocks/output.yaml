@@ -4,11 +4,9 @@ nodes:
     type: code
     nodes:
       - kind: text
-        ranges:
-          - text: word
+        text: word
   - kind: block
     type: code
     nodes:
       - kind: text
-        ranges:
-          - text: another
+        text: another

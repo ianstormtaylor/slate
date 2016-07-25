@@ -7,5 +7,4 @@ nodes:
         type: hashtag
         nodes:
           - kind: text
-            ranges:
-              - text: fragment
+            text: fragment

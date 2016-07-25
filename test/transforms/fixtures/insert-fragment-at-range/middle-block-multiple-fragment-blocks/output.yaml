@@ -4,11 +4,9 @@ nodes:
     type: paragraph
     nodes:
       - kind: text
-        ranges:
-          - text: wofragment one
+        text: wofragment one
   - kind: block
     type: list-item
     nodes:
       - kind: text
-        ranges:
-          - text: fragment tword
+        text: fragment tword

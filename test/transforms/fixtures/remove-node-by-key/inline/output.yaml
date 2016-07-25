@@ -7,5 +7,4 @@ nodes:
         type: link
         nodes:
           - kind: text
-            ranges:
-              - text: another
+            text: another

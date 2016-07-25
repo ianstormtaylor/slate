@@ -4,5 +4,4 @@ nodes:
     type: list-item
     nodes:
       - kind: text
-        ranges:
-          - text: fragment
+        text: fragment

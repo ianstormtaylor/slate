@@ -21,7 +21,7 @@ describe('rendering', () => {
       const input = readMetadata.sync(resolve(dir, 'input.yaml'))
       const output = fs.readFileSync(resolve(dir, 'output.html'), 'utf8')
       const props = {
-        state: Raw.deserialize(input),
+        state: Raw.deserialize(input, { terse: true }),
         onChange: () => {},
         ...require(dir)
       }

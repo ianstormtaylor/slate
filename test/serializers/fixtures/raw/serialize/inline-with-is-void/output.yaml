@@ -1,12 +1,20 @@
 
-nodes:
-  - kind: block
-    type: paragraph
-    nodes:
-      - kind: inline
-        type: link
-        isVoid: true
-        nodes:
-          - kind: text
-            ranges:
-              - text: ""
+kind: state
+document:
+  kind: document
+  nodes:
+    - kind: block
+      type: paragraph
+      data: {}
+      isVoid: false
+      nodes:
+        - kind: inline
+          type: link
+          isVoid: true
+          data: {}
+          nodes:
+            - kind: text
+              ranges:
+                - kind: range
+                  text: ""
+                  marks: []

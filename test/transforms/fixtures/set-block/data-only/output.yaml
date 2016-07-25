@@ -6,5 +6,4 @@ nodes:
       key: value
     nodes:
       - kind: text
-        ranges:
-          - text: word
+        text: word

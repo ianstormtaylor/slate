@@ -4,14 +4,11 @@ nodes:
     type: paragraph
     nodes:
       - kind: text
-        ranges:
-          - text: word
+        text: word
       - kind: inline
         type: hashtag
         nodes:
           - kind: text
-            ranges:
-              - text: ""
+            text: ""
       - kind: text
-        ranges:
-          - text: ""
+        text: ""

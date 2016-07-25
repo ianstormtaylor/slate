@@ -7,8 +7,7 @@ nodes:
         type: one
         nodes:
           - kind: text
-            ranges:
-              - text: word
+            text: word
   - kind: block
     type: paragraph
     nodes:
@@ -16,5 +15,4 @@ nodes:
         type: two
         nodes:
           - kind: text
-            ranges:
-              - text: another
+            text: another

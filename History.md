@@ -5,6 +5,13 @@ This document maintains a list of changes to Slate with each new version. Until 
 ---
 
 
+### `0.7.0` — _July 24, 2016_
+
+#### BREAKING CHANGES
+
+- **The `Raw` serializer is no longer terse by default!** Previously, the `Raw` serializer would return a "terse" representation of the document, omitting information that wasn't _strictly_ necessary to deserialize later, like the `key` of nodes. By default this no longer happens. You have to opt-in to the behavior by passing `{ terse: true }` as the second `options` argument of the `deserialize` and `serialize` methods.
+
+
 ### `0.6.0` — _July 22, 2016_
 
 #### BREAKING CHANGES

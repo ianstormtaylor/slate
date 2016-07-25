@@ -7,8 +7,7 @@ nodes:
         type: link
         nodes:
           - kind: text
-            ranges:
-              - text: wo
+            text: wo
       - kind: inline
         type: hashtag
         nodes:
@@ -16,8 +15,7 @@ nodes:
             type: link
             nodes:
               - kind: text
-                ranges:
-                  - text: rd
+                text: rd
       - kind: inline
         type: hashtag
         nodes:
@@ -25,11 +23,9 @@ nodes:
             type: link
             nodes:
               - kind: text
-                ranges:
-                  - text: an
+                text: an
       - kind: inline
         type: link
         nodes:
           - kind: text
-            ranges:
-              - text: other
+            text: other

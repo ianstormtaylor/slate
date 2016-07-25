@@ -7,11 +7,9 @@ nodes:
         type: link
         nodes:
           - kind: text
-            ranges:
-              - text: ""
+            text: ""
       - kind: inline
         type: link
         nodes:
           - kind: text
-            ranges:
-              - text: word
+            text: word

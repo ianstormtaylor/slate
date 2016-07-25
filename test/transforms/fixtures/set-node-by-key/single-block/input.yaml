@@ -6,5 +6,4 @@ nodes:
       key: foo
     nodes:
       - kind: text
-        ranges:
-          - text: word
+        text: word

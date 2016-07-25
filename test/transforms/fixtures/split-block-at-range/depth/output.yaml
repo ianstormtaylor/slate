@@ -10,8 +10,7 @@ nodes:
             type: paragraph
             nodes:
               - kind: text
-                ranges:
-                  - text: wo
+                text: wo
   - kind: block
     type: paragraph
     nodes:
@@ -22,5 +21,4 @@ nodes:
             type: paragraph
             nodes:
               - kind: text
-                ranges:
-                  - text: rd
+                text: rd

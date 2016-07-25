@@ -4,17 +4,14 @@ nodes:
     type: paragraph
     nodes:
       - kind: text
-        ranges:
-          - text: wo
+        text: wo
   - kind: block
     type: image
     nodes:
       - kind: text
-        ranges:
-          - text: ""
+        text: ""
   - kind: block
     type: paragraph
     nodes:
       - kind: text
-        ranges:
-          - text: rd
+        text: rd
