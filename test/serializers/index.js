@@ -2,6 +2,7 @@
 import assert from 'assert'
 import fs from 'fs'
 import readMetadata from 'read-metadata'
+import strip from '../helpers/strip-dynamic'
 import { Html, Plain, Raw } from '../..'
 import { equal, strictEqual } from '../helpers/assert-json'
 import { resolve } from 'path'
@@ -24,7 +25,7 @@ describe('serializers', () => {
           const input = fs.readFileSync(resolve(innerDir, 'input.html'), 'utf8')
           const state = html.deserialize(input)
           const json = state.document.toJS()
-          strictEqual(clean(json), expected)
+          strictEqual(strip(json), expected)
         })
       }
     })
@@ -58,7 +59,7 @@ describe('serializers', () => {
           const input = fs.readFileSync(resolve(innerDir, 'input.txt'), 'utf8')
           const state = Plain.deserialize(input.trim())
           const json = state.document.toJS()
-          strictEqual(clean(json), expected)
+          strictEqual(strip(json), expected)
         })
       }
     })
@@ -91,7 +92,7 @@ describe('serializers', () => {
           const input = readMetadata.sync(resolve(innerDir, 'input.yaml'))
           const state = Raw.deserialize(input)
           const json = state.document.toJS()
-          strictEqual(clean(json), expected)
+          strictEqual(strip(json), expected)
         })
       }
     })
@@ -106,26 +107,9 @@ describe('serializers', () => {
           const input = require(resolve(innerDir, 'input.js')).default
           const expected = readMetadata.sync(resolve(innerDir, 'output.yaml'))
           const serialized = Raw.serialize(input)
-          strictEqual(serialized, expected)
+          strictEqual(strip(serialized), expected)
         })
       }
     })
   })
 })
-
-/**
- * Clean a `json` object of dynamic `key` properties.
- *
- * @param {Object} json
- * @return {Object}
- */
-
-function clean(json) {
-  const { key, cache, decorations, ...props } = json
-
-  if (props.nodes) {
-    props.nodes = props.nodes.map(clean)
-  }
-
-  return props
-}

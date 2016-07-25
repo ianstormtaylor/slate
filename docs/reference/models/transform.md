@@ -44,6 +44,7 @@ Transform methods can either operate on the [`Document`](./document.md), the [`S
   - [`moveTo`](#moveto)
   - [`move{Direction}`](#movedirection)
 - [Node Transforms](#node-transforms)
+  - [`removeNodeByKey`](#removeNodeByKey)
   - [`setNodeByKey`](#setNodeByKey)
 - [Document Transforms](#document-transforms)
   - [`deleteAtRange`](#deleteatrange)
@@ -233,11 +234,16 @@ Move the current selection to a selection with merged `properties`. The `propert
 
 ## Node Transforms
 
+### `removeNodeByKey`
+`removeNodeByKey(key: String) => Transform`
+
+Remove a [`Node`](./node.md) from the document by its `key`.
+
 ### `setNodeByKey`
 `setNodeByKey(key: String, properties: Object) => Transform`
 `setNodeByKey(key: String, type: String) => Transform`
 
-Set a dictionary of `properties` on the [`Node`](./node.md) with a `key`. For convenience, you can pass a `type` string or `properties` object.
+Set a dictionary of `properties` on a [`Node`](./node.md) by its `key`. For convenience, you can pass a `type` string or `properties` object.
 
 
 ## Document Transforms

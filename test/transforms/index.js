@@ -2,6 +2,7 @@
 import assert from 'assert'
 import fs from 'fs'
 import readMetadata from 'read-metadata'
+import strip from '../helpers/strip-dynamic'
 import toCamel from 'to-camel-case'
 import { Raw, State } from '../..'
 import { equal, strictEqual } from '../helpers/assert-json'
@@ -30,7 +31,7 @@ describe('transforms', () => {
           let state = Raw.deserialize(input)
           state = fn(state)
           const output = Raw.serialize(state)
-          strictEqual(output, expected)
+          strictEqual(strip(output), strip(expected))
         })
       }
     })
