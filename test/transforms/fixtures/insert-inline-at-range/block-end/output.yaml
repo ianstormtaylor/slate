@@ -10,5 +10,3 @@ nodes:
         nodes:
           - kind: text
             text: ""
-      - kind: text
-        text: ""
