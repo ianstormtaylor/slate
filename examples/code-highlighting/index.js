@@ -129,12 +129,11 @@ class CodeHighlighting extends React.Component {
    * Render decorations on `text` nodes inside code blocks.
    *
    * @param {Text} text
+   * @param {Block} block
    * @return {Characters}
    */
 
-  renderDecorations = (text, state) => {
-    const { document } = state
-    const block = document.getClosestBlock(text)
+  renderDecorations = (text, block) => {
     if (block.type != 'code') return text.characters
 
     let characters = text.characters.asMutable()

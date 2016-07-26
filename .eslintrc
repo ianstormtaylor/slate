@@ -44,6 +44,7 @@
     "no-array-constructor": "error",
     "no-class-assign": "error",
     "no-const-assign": "error",
+    "no-console": "warn",
     "no-debugger": "warn",
     "no-dupe-args": "error",
     "no-dupe-class-members": "error",
