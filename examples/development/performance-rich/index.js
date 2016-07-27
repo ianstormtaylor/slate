@@ -1,8 +1,7 @@
 
-import { Editor, Mark, Raw, Utils } from '../../..'
+import { Editor, Mark, Raw } from '../../..'
 import React from 'react'
 import initialState from './state.json'
-import keycode from 'keycode'
 
 /**
  * Define the default node type.
@@ -105,16 +104,16 @@ class RichText extends React.Component {
    * On key down, if it's a formatting command toggle a mark.
    *
    * @param {Event} e
+   * @param {Object} data
    * @param {State} state
    * @return {State}
    */
 
-  onKeyDown = (e, state) => {
-    if (!Utils.Key.isCommand(e)) return
-    const key = keycode(e.which)
+  onKeyDown = (e, data, state) => {
+    if (!data.isMod) return
     let mark
 
-    switch (key) {
+    switch (data.key) {
       case 'b':
         mark = 'bold'
         break

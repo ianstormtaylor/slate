@@ -106,14 +106,14 @@ class Links extends React.Component {
    * On paste, if the text is a link, wrap the selection in a link.
    *
    * @param {Event} e
-   * @param {Object} paste
+   * @param {Object} data
    * @param {State} state
    */
 
-  onPaste = (e, paste, state) => {
+  onPaste = (e, data, state) => {
     if (state.isCollapsed) return
-    if (paste.type != 'text' && paste.type != 'html') return
-    if (!isUrl(paste.text)) return
+    if (data.type != 'text' && data.type != 'html') return
+    if (!isUrl(data.text)) return
 
     let transform = state.transform()
 
@@ -122,7 +122,7 @@ class Links extends React.Component {
     }
 
     return transform
-      .wrapInline('link', { href: paste.text })
+      .wrapInline('link', { href: data.text })
       .collapseToEnd()
       .apply()
   }

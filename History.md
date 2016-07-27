@@ -5,6 +5,13 @@ This document maintains a list of changes to Slate with each new version. Until 
 ---
 
 
+### `0.8.0` — _July 27, 2016_
+
+- **The `onKeyDown` and `onBeforeInput` handlers signatures have changed!** Previously, some Slate handlers had a signature of `(e, state, editor)` and others had a signature of `(e, data, state, editor)`. Now all handlers will be passed a data object, even if it is empty. This is helpful for future compatibility where we might need to add data to a handler that previously didn't have any, and is nicer for consistency. The `onKeyDown` handler's new `data` object contains the `key` name and a series of `is*` properties to make handling hotkeys easier. The `onBeforeInput` handler's new `data` object is empty.
+
+- **The `Utils` export has been removed.** Previously, a `Key` utility and the `findDOMNode` utility were exposed under the `Utils` object. The `Key` has been removed in favor of the `data` object passed to `onKeyDown`. And then `findDOMNode` utility has been upgraded to a top-level named export, so you'll now need to access it via `import { findDOMNode } from 'slate'`.
+
+
 ### `0.7.0` — _July 24, 2016_
 
 #### BREAKING CHANGES

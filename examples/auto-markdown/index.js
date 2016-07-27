@@ -1,7 +1,6 @@
 
 import { Editor, Raw } from '../..'
 import React from 'react'
-import keycode from 'keycode'
 import initialState from './state.json'
 
 /**
@@ -108,13 +107,13 @@ class AutoMarkdown extends React.Component {
    * On key down, check for our specific key shortcuts.
    *
    * @param {Event} e
+   * @param {Data} data
    * @param {State} state
    * @return {State or Null} state
    */
 
-  onKeyDown = (e, state) => {
-    const key = keycode(e.which)
-    switch (key) {
+  onKeyDown = (e, data, state) => {
+    switch (data.key) {
       case 'space': return this.onSpace(e, state)
       case 'backspace': return this.onBackspace(e, state)
       case 'enter': return this.onEnter(e, state)

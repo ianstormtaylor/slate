@@ -2,7 +2,6 @@
 import { Editor, Mark, Raw, Selection } from '../..'
 import Prism from 'prismjs'
 import React from 'react'
-import keycode from 'keycode'
 import initialState from './state.json'
 
 /**
@@ -65,13 +64,13 @@ class CodeHighlighting extends React.Component {
    * On key down inside code blocks, insert soft new lines.
    *
    * @param {Event} e
+   * @param {Object} data
    * @param {State} state
    * @return {State}
    */
 
-  onKeyDown = (e, state) => {
-    const key = keycode(e.which)
-    if (key != 'enter') return
+  onKeyDown = (e, data, state) => {
+    if (data.key != 'enter') return
     const { startBlock } = state
     if (startBlock.type != 'code') return
 

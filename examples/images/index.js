@@ -162,18 +162,18 @@ class Images extends React.Component {
    * On drop, insert the image wherever it is dropped.
    *
    * @param {Event} e
-   * @param {Object} drop
+   * @param {Object} data
    * @param {State} state
    * @return {State}
    */
 
-  onDrop = (e, drop, state) => {
-    if (drop.type != 'node') return
+  onDrop = (e, data, state) => {
+    if (data.type != 'node') return
     return state
       .transform()
-      .removeNodeByKey(drop.node.key)
-      .moveTo(drop.target)
-      .insertBlock(drop.node)
+      .removeNodeByKey(data.node.key)
+      .moveTo(data.target)
+      .insertBlock(data.node)
       .apply()
   }
 
@@ -181,16 +181,16 @@ class Images extends React.Component {
    * On paste, if the pasted content is an image URL, insert it.
    *
    * @param {Event} e
-   * @param {Object} paste
+   * @param {Object} data
    * @param {State} state
    * @return {State}
    */
 
-  onPaste = (e, paste, state) => {
-    if (paste.type != 'text') return
-    if (!isUrl(paste.text)) return
-    if (!isImage(paste.text)) return
-    return this.insertImage(state, paste.text)
+  onPaste = (e, data, state) => {
+    if (data.type != 'text') return
+    if (!isUrl(data.text)) return
+    if (!isImage(data.text)) return
+    return this.insertImage(state, data.text)
   }
 
   /**

@@ -101,13 +101,14 @@ class Tables extends React.Component {
    * On key down, check for our specific key shortcuts.
    *
    * @param {Event} e
+   * @param {Object} data
    * @param {State} state
    * @return {State or Null} state
    */
 
-  onKeyDown = (e, state) => {
+  onKeyDown = (e, data, state) => {
     if (state.startBlock.type != 'table-cell') return
-    switch (keycode(e.which)) {
+    switch (data.key) {
       case 'backspace': return this.onBackspace(e, state)
       case 'delete': return this.onDelete(e, state)
       case 'enter': return this.onEnter(e, state)
