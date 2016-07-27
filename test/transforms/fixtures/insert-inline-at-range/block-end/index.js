@@ -12,6 +12,9 @@ export default function (state) {
 
   return state
     .transform()
-    .insertInlineAtRange(range, 'hashtag')
+    .insertInlineAtRange(range, {
+      type: 'hashtag',
+      isVoid: true
+    })
     .apply()
 }

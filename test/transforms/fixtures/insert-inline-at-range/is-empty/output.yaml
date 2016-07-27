@@ -1,7 +1,8 @@
 
 nodes:
   - kind: block
-    type: image
+    type: paragraph
     nodes:
-      - kind: text
-        text: ""
+      - kind: inline
+        type: hashtag
+        isVoid: true

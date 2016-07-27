@@ -60,7 +60,7 @@ describe('serializers', () => {
           const innerDir = resolve(dir, test)
           const expected = readMetadata.sync(resolve(innerDir, 'output.yaml'))
           const input = fs.readFileSync(resolve(innerDir, 'input.txt'), 'utf8')
-          const state = Plain.deserialize(input.trim())
+          const state = Plain.deserialize(input.replace(/\n$/m, ''))
           const json = state.document.toJS()
           strictEqual(strip(json), expected)
         })
@@ -77,7 +77,7 @@ describe('serializers', () => {
           const input = require(resolve(innerDir, 'input.js')).default
           const expected = fs.readFileSync(resolve(innerDir, 'output.txt'), 'utf8')
           const serialized = Plain.serialize(input)
-          strictEqual(serialized, expected.trim())
+          strictEqual(serialized, expected.replace(/\n$/m, ''))
         })
       }
     })

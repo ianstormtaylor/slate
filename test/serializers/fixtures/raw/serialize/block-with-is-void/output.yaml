@@ -11,5 +11,5 @@ document:
         - kind: text
           ranges:
             - kind: range
-              text: ""
+              text: " "
               marks: []

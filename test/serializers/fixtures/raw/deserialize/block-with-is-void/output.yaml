@@ -4,4 +4,6 @@ nodes:
     isVoid: true
     data: {}
     nodes:
-      - characters: []
+      - characters:
+          - text: " "
+            marks: []

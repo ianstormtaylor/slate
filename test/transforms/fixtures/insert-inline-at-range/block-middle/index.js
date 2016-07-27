@@ -12,6 +12,9 @@ export default function (state) {
 
   return state
     .transform()
-    .insertBlockAtRange(range, 'image')
+    .insertInlineAtRange(range, {
+      type: 'hashtag',
+      isVoid: true
+    })
     .apply()
 }

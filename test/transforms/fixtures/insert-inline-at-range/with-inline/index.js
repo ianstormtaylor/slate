@@ -1,5 +1,5 @@
 
-import { Block } from '../../../../..'
+import { Inline } from '../../../../..'
 
 export default function (state) {
   const { document, selection } = state
@@ -14,6 +14,9 @@ export default function (state) {
 
   return state
     .transform()
-    .insertBlockAtRange(range, Block.create({ type: 'image' }))
+    .insertInlineAtRange(range, Inline.create({
+      type: 'image',
+      isVoid: true
+    }))
     .apply()
 }

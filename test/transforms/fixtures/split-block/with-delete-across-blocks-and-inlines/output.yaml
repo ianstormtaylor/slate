@@ -12,11 +12,6 @@ nodes:
     type: paragraph
     nodes:
       - kind: inline
-        type: one
-        nodes:
-          - kind: text
-            text: ""
-      - kind: inline
         type: two
         nodes:
           - kind: text

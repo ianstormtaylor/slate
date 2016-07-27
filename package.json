@@ -72,7 +72,7 @@
     "lint": "eslint --ignore-pattern 'build.js' '{examples,lib}/**/*.js'",
     "prepublish": "npm run dist",
     "start": "http-server ./examples",
-    "test": "mocha --compilers js:babel-core/register --require source-map-support/register --reporter spec ./test/server.js"
+    "test": "mocha --compilers js:babel-core/register --reporter spec ./test/server.js"
   },
   "keywords": [
     "canvas",
