@@ -9,6 +9,7 @@ import { Router, Route, Link, IndexRedirect, hashHistory } from 'react-router'
 
 import AutoMarkdown from './auto-markdown'
 import CodeHighlighting from './code-highlighting'
+import Embeds from './embeds'
 import HoveringMenu from './hovering-menu'
 import Images from './images'
 import Links from './links'
@@ -67,6 +68,7 @@ class App extends React.Component {
         {this.renderTab('Hovering Menu', 'hovering-menu')}
         {this.renderTab('Links', 'links')}
         {this.renderTab('Images', 'images')}
+        {this.renderTab('Embeds', 'embeds')}
         {this.renderTab('Tables', 'tables')}
         {this.renderTab('Code Highlighting', 'code-highlighting')}
         {this.renderTab('Paste HTML', 'paste-html')}
@@ -117,6 +119,7 @@ const router = (
       <IndexRedirect to="rich-text" />
       <Route path="auto-markdown" component={AutoMarkdown} />
       <Route path="code-highlighting" component={CodeHighlighting} />
+      <Route path="embeds" component={Embeds} />
       <Route path="hovering-menu" component={HoveringMenu} />
       <Route path="images" component={Images} />
       <Route path="links" component={Links} />

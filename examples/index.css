@@ -1,5 +1,7 @@
 
-html {
+html,
+input,
+textarea {
   font-family: 'Roboto', sans-serif;
   line-height: 1.4;
   background: #eee;
@@ -39,6 +41,19 @@ table {
 td {
   padding: 10px;
   border: 2px solid #ddd;
+}
+
+input {
+  font-size: .85em;
+  width: 100%;
+  padding: .5em;
+  border: 2px solid #ddd;
+  background: #fafafa;
+}
+
+input:focus {
+  outline: 0;
+  border-color: blue;
 }
 
 /**
