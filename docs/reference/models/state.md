@@ -22,6 +22,8 @@ For convenience, in addition to transforms, many of the [`Selection`](./selectio
   - [`fragment`](#fragment)
   - [`inlines`](#inlines)
   - [`texts`](#texts)
+  - [`hasUndo`](#hasundo)
+  - [`hasRedo`](#hasredo)
 - [Selection-like Properties](#selection-like-properties)
   - [`{edge}Key`](#edgekey)
   - [`{edge}Offset`](#edgeoffset)
@@ -32,7 +34,7 @@ For convenience, in addition to transforms, many of the [`Selection`](./selectio
   - [`isFocused`](#isfocused)
   - [`isForward`](#isForward)
 - [Static Methods](#static-methods)
-  - [`State.create`](#statecreate) 
+  - [`State.create`](#statecreate)
 - [Methods](#methods)
   - [`transform`](#transform)
 
@@ -42,7 +44,7 @@ For convenience, in addition to transforms, many of the [`Selection`](./selectio
 ```js
 State({
   document: Document,
-  selection: Selection 
+  selection: Selection
 })
 ```
 
@@ -97,6 +99,15 @@ Get a list of the lowest-depth [`Inline`](./inline.md) nodes in the current sele
 
 Get a list of the [`Text`](./text.md) nodes in the current selection.
 
+### `hasUndo`
+`Boolean`
+
+Whether there are undoable events.
+
+### `hasRedo`
+`Boolean`
+
+Whether there are redoable events.
 
 ## Selection-like Properties
 
