@@ -19,5 +19,17 @@ export default function (state) {
     .wrapInline('outer')
     .apply()
 
+  const updated = next.document.getTexts().get(1)
+
+  assert.deepEqual(
+    next.selection.toJS(),
+    range.merge({
+      anchorKey: updated.key,
+      anchorOffset: 0,
+      focusKey: updated.key,
+      focusOffset: updated.length
+    }).toJS()
+  )
+
   return next
 }
