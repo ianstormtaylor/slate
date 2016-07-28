@@ -10,9 +10,13 @@ When the editor needs to resolve a plugin-related handler, it will loop through 
 - [Conventions](#conventions)
 - [Event Handler Properties](#event-handle-properties)
   - [`onBeforeInput`](#onbeforeinput)
+  - [`onBlur`](#onblur)
+  - [`onCopy`](#oncopy)
+  - [`onCut`](#oncut)
   - [`onDrop`](#ondrop)
   - [`onKeyDown`](#onkeydown)
   - [`onPaste`](#onpaste)
+  - [`onSelect`](#onselect)
 - [Renderer Properties](#renderer-properties)
   - [`renderDecorations`](#renderdecorations)
   - [`renderMark`](#rendermark)
@@ -39,29 +43,63 @@ export default MySlatePlugin(options) {
 ```js
 {
   onBeforeInput: Function,
+  onBlur: Function,
+  onCopy: Function,
+  onCut: Function,
   onDrop: Function,
   onKeyDown: Function,
-  onPaste: Function
+  onPaste: Function,
+  onSelect: Function
 }
 ```
 
-All of the event handler properties are passed the same React `event` object you are used to from React's event handlers. They are also passed the current `state` of the editor, and the `editor` instance itself.
+All of the event handler properties are passed the same React `event` object you are used to from React's event handlers. They are also passed a `data` object with Slate-specific information relating to the event, the current `state` of the editor, and the `editor` instance itself.
 
 Each event handler can choose to return a new `state` object, in which case the editor's state will be updated. If nothing is returned, the editor will simply continue resolving the plugin stack.
 
 ### `onBeforeInput` 
-`Function onBeforeInput(event: Event, state: State, editor: Editor) => State || Void`
+`Function onBeforeInput(event: Event, data: Object, state: State, editor: Editor) => State || Void`
 
-This handler is called right before a string of text is inserted into the `contenteditable` element. The `event.data` property will be the string of text that is being inserted.
+This handler is called right before a string of text is inserted into the `contenteditable` element.
 
 Make sure to `event.preventDefault()` if you do not want the default insertion behavior to occur! If no other plugin handles this event, it will be handled by the [Core plugin](./core.md).
 
+### `onBlur`
+`Function onBlur(event: Event, data: Object, state: State, editor: Editor) => State || Void`
+
+This handler is called when the editor's `contenteditable` element is blurred.
+
+If no other plugin handles this event, it will be handled by the [Core plugin](./core.md).
+
+### `onCopy`
+`Function onCopy(event: Event, data: Object, state: State, editor: Editor) => State || Void`
+
+This handler is called when the editor's `contenteditable` element is blurred.
+
+The `data` object contains a `type` string and associated data for that type. Right now the only type supported is `"fragment"`:
+
+```js
+{
+  type: 'fragment',
+  fragment: Document
+}
+```
+
+If no other plugin handles this event, it will be handled by the [Core plugin](./core.md).
+
+### `onCut`
+`Function onCut(event: Event, data: Object, state: State, editor: Editor) => State || Void`
+
+This handler is equivalent to the `onCopy` handler.
+
+If no other plugin handles this event, it will be handled by the [Core plugin](./core.md).
+
 ### `onDrop`
-`Function onDrop(event: Event, drop: Object, state: State, editor: Editor) => State || Void`
+`Function onDrop(event: Event, data: Object, state: State, editor: Editor) => State || Void`
 
 This handler is called when the user drops content into the `contenteditable` element. The event is already prevented by default, so you must define a state change to have any affect occur.
 
-The `drop` object is a convenience object created to standardize the drop metadata across browsers. Every drop object has a `type` property, can be one of `text`, `html` or `files`, and a `target` property which is a [`Selection`](../models/selection.md) indicating where the drop occured. Depending on the type, it's structure will be:
+The `data` object is a convenience object created to standardize the drop metadata across browsers. Every data object has a `type` property, can be one of `text`, `html` or `files`, and a `target` property which is a [`Selection`](../models/selection.md) indicating where the drop occured. Depending on the type, it's structure will be:
 
 ```js
 {
@@ -117,6 +155,15 @@ The `paste` object is a convenience object created to standardize the paste meta
   files: FileList
 }
 ```
+
+If no other plugin handles this event, it will be handled by the [Core plugin](./core.md).
+
+### `onSelect`
+`Function onSelect(event: Event, paste: Object, state: State, editor: Editor => State || Void`
+
+This handler is called whenever the native selection changes.
+
+The `data` object contains a State [`Selection`](../models/selection.md) object representing the new selection, and an `isNative` boolean connoting whether the editor needs to be re-rendered for the selection to be updated or correctly placed or not.
 
 If no other plugin handles this event, it will be handled by the [Core plugin](./core.md).
 

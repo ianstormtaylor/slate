@@ -15,6 +15,18 @@ The default behavior of the core plugin performs the following logic:
 
 When text is entered, the core plugin inserts the text from `event.data` into the editor.
 
+### `onBlur`
+
+When the editor is blurred, the core plugin updates the selection in Slate's internal data model without re-rendering.
+
+### `onCopy`
+
+When the user copies part of the document, the core plugin adds the copied text to the clipboard with a serialized version of the document intact, so that it can be deserialized and inserted on paste, preserving formatting.
+
+### `onCut`
+
+When the user cuts part of the document, the core plugin runs the same logic it runs for `onCopy`, but it also delete's the content in the current selection.
+
 ### `onDrop`
 
 When the user drops content into the editor, the core plugin handles drops of type `text` and `html` as plain text, and does nothing for drops of type `files`.
@@ -25,7 +37,11 @@ When a key is pressed, the core plugin handles performing some of the "native" b
 
 ### `onPaste`
 
-When the user pastes content into the editor, the core plugin handles all pastes of type `text` and `html` as plain text, and does nothing for pastes of type `files`. 
+When the user pastes content into the editor, the core plugin handles all pastes of type `text` and `html` as plain text, and does nothing for pastes of type `files`.
+
+### `onSelect`
+
+When the user makes a new selection in the DOM, the core plugin updates that selection in Slate's internal data model, re-rendering if it needs to. 
 
 ### `renderNode`
 
