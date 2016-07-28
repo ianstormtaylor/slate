@@ -340,11 +340,11 @@ Wrap the [`Inline`](./inline.md) nodes in a `range` with a new [`Inline`](./inli
 ## History Transforms
 
 ### `redo`
-`redo() => Transform`
+`redo() => State`
 
 Move forward one step in the history.
 
 ### `undo`
-`undo() => Transform`
+`undo() => State`
 
 Move backward one step in the history.
