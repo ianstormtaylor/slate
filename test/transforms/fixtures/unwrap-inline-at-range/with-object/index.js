@@ -1,27 +1,20 @@
 
-import assert from 'assert'
-
 export default function (state) {
   const { document, selection } = state
   const texts = document.getTexts()
   const first = texts.first()
   const range = selection.merge({
     anchorKey: first.key,
-    anchorOffset: 0,
+    anchorOffset: 1,
     focusKey: first.key,
-    focusOffset: 0
+    focusOffset: 3
   })
 
-  const next = state
+  return state
     .transform()
-    .moveTo(range)
-    .wrapBlock('quote', { key: 'value' })
+    .unwrapInlineAtRange(range, {
+      type: 'hashtag',
+      data: { key: 'one' }
+    })
     .apply()
-
-  assert.deepEqual(
-    next.selection.toJS(),
-    range.toJS()
-  )
-
-  return next
 }

@@ -1,5 +1,4 @@
 
-import { Data } from '../../../../..'
 import assert from 'assert'
 
 export default function (state) {
@@ -16,12 +15,22 @@ export default function (state) {
   const next = state
     .transform()
     .moveTo(range)
-    .unwrapInline('hashtag', Data.create({ key: 'one' }))
+    .wrapInline({
+      type: 'hashtag',
+      data: { key: 'value' }
+    })
     .apply()
+
+  const updated = next.document.getTexts().get(1)
 
   assert.deepEqual(
     next.selection.toJS(),
-    range.toJS()
+    range.merge({
+      anchorKey: updated.key,
+      anchorOffset: 0,
+      focusKey: updated.key,
+      focusOffset: updated.length
+    }).toJS()
   )
 
   return next

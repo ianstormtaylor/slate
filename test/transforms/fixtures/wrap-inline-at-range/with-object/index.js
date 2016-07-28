@@ -1,6 +1,4 @@
 
-import assert from 'assert'
-
 export default function (state) {
   const { document, selection } = state
   const texts = document.getTexts()
@@ -12,16 +10,11 @@ export default function (state) {
     focusOffset: 3
   })
 
-  const next = state
+  return state
     .transform()
-    .moveTo(range)
-    .unwrapInline('hashtag', { key: 'one' })
+    .wrapInlineAtRange(range, {
+      type: 'hashtag',
+      data: { key: 'value' }
+    })
     .apply()
-
-  assert.deepEqual(
-    next.selection.toJS(),
-    range.toJS()
-  )
-
-  return next
 }

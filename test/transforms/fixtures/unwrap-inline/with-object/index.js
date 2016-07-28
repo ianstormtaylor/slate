@@ -1,5 +1,5 @@
 
-import { Data } from '../../../../..'
+import assert from 'assert'
 
 export default function (state) {
   const { document, selection } = state
@@ -12,8 +12,19 @@ export default function (state) {
     focusOffset: 3
   })
 
-  return state
+  const next = state
     .transform()
-    .wrapInlineAtRange(range, 'hashtag', Data.create({ key: 'value' }))
+    .moveTo(range)
+    .unwrapInline({
+      type: 'hashtag',
+      data: { key: 'one' }
+    })
     .apply()
+
+  assert.deepEqual(
+    next.selection.toJS(),
+    range.toJS()
+  )
+
+  return next
 }

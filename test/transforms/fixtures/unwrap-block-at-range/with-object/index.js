@@ -1,19 +1,20 @@
 
-import { Data } from '../../../../..'
-
 export default function (state) {
   const { document, selection } = state
   const texts = document.getTexts()
   const first = texts.first()
   const range = selection.merge({
     anchorKey: first.key,
-    anchorOffset: 1,
+    anchorOffset: 0,
     focusKey: first.key,
-    focusOffset: 3
+    focusOffset: 0
   })
 
   return state
     .transform()
-    .unwrapInlineAtRange(range, 'hashtag', Data.create({ key: 'one' }))
+    .unwrapBlockAtRange(range, {
+      type: 'quote',
+      data: { key: 'value' }
+    })
     .apply()
 }

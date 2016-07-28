@@ -317,24 +317,24 @@ Remove a [`mark`](./mark.md) from the characters in a `range`. For convenience, 
 Add or remove a [`mark`](./mark.md) from the characters in a `range`, depending on whether any of them already have the mark. For convenience, you can pass a `type` string or `properties` object to implicitly create a [`Mark`](./mark.md) of that type.
 
 ### `unwrapBlockAtRange`
-`unwrapBlockAtRange(range: Selection, [type: String], [data: Data]) => Transform`
+`unwrapBlockAtRange(range: Selection, properties: Object || String) => Transform`
 
-Unwrap all [`Block`](./block.md) nodes in a `range` that match a `type` and/or `data`.
+Unwrap all [`Block`](./block.md) nodes in a `range` that match `properties`. For convenience, you can pass a `type` string or `properties` object.
 
 ### `unwrapInlineAtRange`
-`unwrapInlineAtRange(range: Selection, [type: String], [data: Data]) => Transform`
+`unwrapInlineAtRange(range: Selection, properties: Object || String) => Transform`
 
-Unwrap all [`Inline`](./inline.md) nodes in a `range` that match a `type` and/or `data`.
+Unwrap all [`Inline`](./inline.md) nodes in a `range` that match `properties`. For convenience, you can pass a `type` string or `properties` object.
 
 ### `wrapBlockAtRange`
-`wrapBlockAtRange(range: Selection, type: String, [data: Data]) => Transform`
+`wrapBlockAtRange(range: Selection, properties: Object || String) => Transform`
 
-Wrap the [`Block`](./block.md) nodes in a `range` with a new [`Block`](./block.md) node of `type`, with optional `data`.
+Wrap the [`Block`](./block.md) nodes in a `range` with a new [`Block`](./block.md) node with `properties`. For convenience, you can pass a `type` string or `properties` object.
 
 ### `wrapInlineAtRange`
-`wrapInlineAtRange(range: Selection, type: String, [data: Data]) => Transform`
+`wrapInlineAtRange(range: Selection, properties: Object || String) => Transform`
 
-Wrap the [`Inline`](./inline.md) nodes in a `range` with a new [`Inline`](./inline.md) node of `type`, with optional `data`.
+Wrap the [`Inline`](./inline.md) nodes in a `range` with a new [`Inline`](./inline.md) node with `properties`. For convenience, you can pass a `type` string or `properties` object.
 
 
 ## History Transforms
