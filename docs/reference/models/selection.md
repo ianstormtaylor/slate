@@ -140,7 +140,7 @@ Determine whether a selection has an edge at the end of a `node`. Where `{Edge}`
 Determine whether a selection has an edge in a `node` between its `start` and `end` offset. Where `{Edge}` can be one of: `Anchor`, `Focus`, `Start`, `End` or `Edge` (referring to either point).
 
 ### `has{Edge}In` 
-`has{Edge}In(node: Node, start: Number, end: Number) => Boolean`
+`has{Edge}In(node: Node) => Boolean`
 
 Determine whether a selection has an edge inside a `node`. Where `{Edge}` can be one of: `Anchor`, `Focus`, `Start`, `End` or `Edge` (referring to either point).
 
