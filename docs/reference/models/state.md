@@ -22,8 +22,8 @@ For convenience, in addition to transforms, many of the [`Selection`](./selectio
   - [`fragment`](#fragment)
   - [`inlines`](#inlines)
   - [`texts`](#texts)
-  - [`hasUndo`](#hasundo)
-  - [`hasRedo`](#hasredo)
+  - [`hasUndos`](#hasundos)
+  - [`hasRedos`](#hasredos)
 - [Selection-like Properties](#selection-like-properties)
   - [`{edge}Key`](#edgekey)
   - [`{edge}Offset`](#edgeoffset)
@@ -99,15 +99,15 @@ Get a list of the lowest-depth [`Inline`](./inline.md) nodes in the current sele
 
 Get a list of the [`Text`](./text.md) nodes in the current selection.
 
-### `hasUndo`
+### `hasUndos`
 `Boolean`
 
-Whether there are undoable events.
+Whether there are undoable snapshots to revert to in the history.
 
-### `hasRedo`
+### `hasRedos`
 `Boolean`
 
-Whether there are redoable events.
+Whether there are redoable snapshots to revert to in the history.
 
 ## Selection-like Properties
 
