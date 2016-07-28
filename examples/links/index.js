@@ -86,6 +86,7 @@ class Links extends React.Component {
       state = state
         .transform()
         .wrapInline('link', new Map({ href }))
+        .collapseToEnd()
         .apply()
     }
 
