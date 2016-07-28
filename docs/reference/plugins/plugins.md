@@ -184,7 +184,7 @@ If no other plugin handles this event, it will be handled by the [Core plugin](.
 
 This handler is called whenever the native selection changes.
 
-The `data` object contains a State [`Selection`](../models/selection.md) object representing the new selection, and an `isNative` boolean connoting whether the editor needs to be re-rendered for the selection to be updated or correctly placed or not.
+The `data` object contains a State [`Selection`](../models/selection.md) object representing the new selection.
 
 If no other plugin handles this event, it will be handled by the [Core plugin](./core.md).
 
