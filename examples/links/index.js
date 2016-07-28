@@ -58,6 +58,8 @@ class Links extends React.Component {
 
   onChange = (state) => {
     this.setState({ state })
+    console.log(state.selection.toJS())
+    console.log(state.document.toJS())
   }
 
   /**
