@@ -5,10 +5,10 @@ Want to contribute to Slate? That would be awesome!
 
 - [Reporting Bugs](#reporting-bugs)
 - [Asking Questions](#asking-questions)
-- [Submitting Pull Requests](#pull-requests)
+- [Submitting Pull Requests](#submitting-pull-requests)
 - [Running Tests](#running-tests)
 - [Running Examples](#running-examples)
-- [Adding Browser Support](#browser-support)
+- [Adding Browser Support](#adding-browser-support)
 
 
 ## Reporting Bugs
