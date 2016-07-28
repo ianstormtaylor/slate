@@ -317,22 +317,26 @@ Remove a [`mark`](./mark.md) from the characters in a `range`. For convenience, 
 Add or remove a [`mark`](./mark.md) from the characters in a `range`, depending on whether any of them already have the mark. For convenience, you can pass a `type` string or `properties` object to implicitly create a [`Mark`](./mark.md) of that type.
 
 ### `unwrapBlockAtRange`
-`unwrapBlockAtRange(range: Selection, properties: Object || String) => Transform`
+`unwrapBlockAtRange(range: Selection, properties: Object) => Transform`
+`unwrapBlockAtRange(range: Selection, type: String) => Transform`
 
 Unwrap all [`Block`](./block.md) nodes in a `range` that match `properties`. For convenience, you can pass a `type` string or `properties` object.
 
 ### `unwrapInlineAtRange`
-`unwrapInlineAtRange(range: Selection, properties: Object || String) => Transform`
+`unwrapInlineAtRange(range: Selection, properties: Object) => Transform`
+`unwrapInlineAtRange(range: Selection, type: String) => Transform`
 
 Unwrap all [`Inline`](./inline.md) nodes in a `range` that match `properties`. For convenience, you can pass a `type` string or `properties` object.
 
 ### `wrapBlockAtRange`
-`wrapBlockAtRange(range: Selection, properties: Object || String) => Transform`
+`wrapBlockAtRange(range: Selection, properties: Object) => Transform`
+`wrapBlockAtRange(range: Selection, type: String) => Transform`
 
 Wrap the [`Block`](./block.md) nodes in a `range` with a new [`Block`](./block.md) node with `properties`. For convenience, you can pass a `type` string or `properties` object.
 
 ### `wrapInlineAtRange`
-`wrapInlineAtRange(range: Selection, properties: Object || String) => Transform`
+`wrapInlineAtRange(range: Selection, properties: Object) => Transform`
+`wrapInlineAtRange(range: Selection, type: String) => Transform`
 
 Wrap the [`Inline`](./inline.md) nodes in a `range` with a new [`Inline`](./inline.md) node with `properties`. For convenience, you can pass a `type` string or `properties` object.
 
