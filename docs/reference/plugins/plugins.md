@@ -125,18 +125,39 @@ The `data` object is a convenience object created to standardize the drop metada
 If no other plugin handles this event, it will be handled by the [Core plugin](./core.md).
 
 ### `onKeyDown` 
-`Function onKeyDown(event: Event, state: State, editor: Editor) => State || Void`
+`Function onKeyDown(event: Event, data: Object, state: State, editor: Editor) => State || Void`
 
-This handler is called when any key is pressed in the `contenteditable` element, before any action is taken. Use the `event.which` property to determine which key was pressed.
+This handler is called when any key is pressed in the `contenteditable` element, before any action is taken.
+
+The `data` object contains the `key` which is a string name of the key that was pressed, as well as it's `code`. It also contains a series of helpful utility properties for determining hotkey logic. For example, `isCtrl` which is true if the <kbd>control</kbd> key was pressed, or 
+
+```js
+{
+  key: String,
+  code: Number,
+  isAlt: Boolean,
+  isCmd: Boolean,
+  isCtrl: Boolean,
+  isLine: Boolean,
+  isMeta: Boolean,
+  isMod: Boolean,
+  isShift: Boolean,
+  isWord: Boolean
+}
+```
+
+The `isMod` boolean is true if the <kbd>control</kbd> key was pressed on Windows or the <kbd>command</kbd> key was pressed on Mac.
+
+The `isLine` and `isWord` booleans represent whether the "line modifier" or "word modifier" hotkeys are pressed when deleteing or moving the cursor. For example, on a Mac <kbd>option + right</kbd> moves the cursor to the right one word at a time.
 
 Make sure to `event.preventDefault()` if you do not want the default insertion behavior to occur! If no other plugin handles this event, it will be handled by the [Core plugin](./core.md).
 
 ### `onPaste`
-`Function onPaste(event: Event, paste: Object, state: State, editor: Editor) => State || Void`
+`Function onPaste(event: Event, data: Object, state: State, editor: Editor) => State || Void`
 
 This handler is called when the user pastes content into the `contenteditable` element. The event is already prevented by default, so you must define a state change to have any affect occur.
 
-The `paste` object is a convenience object created to standardize the paste metadata across browsers. Every paste object has a `type` property, which can be one of `text`, `html` or `files`. Depending on the type, it's structure will be:
+The `data` object is a convenience object created to standardize the paste metadata across browsers. Every data object has a `type` property, which can be one of `text`, `html` or `files`. Depending on the type, it's structure will be:
 
 ```js
 {
@@ -159,7 +180,7 @@ The `paste` object is a convenience object created to standardize the paste meta
 If no other plugin handles this event, it will be handled by the [Core plugin](./core.md).
 
 ### `onSelect`
-`Function onSelect(event: Event, paste: Object, state: State, editor: Editor => State || Void`
+`Function onSelect(event: Event, data: Object, state: State, editor: Editor => State || Void`
 
 This handler is called whenever the native selection changes.
 
