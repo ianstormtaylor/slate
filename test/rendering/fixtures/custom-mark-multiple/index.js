@@ -16,10 +16,10 @@ const BOLD_ITALIC = {
 export function renderMark(mark, marks) {
   if (
     marks.size > 1 &&
-    marks.some(m => m.type == 'bold') &&
-    marks.some(m => m.type == 'italic')
+    marks.some(m => m.type == 'italic') &&
+    marks.some(m => m.type == 'bold')
   ) {
-    return BOLD_ITALIC
+    return mark.type == 'bold' ? BOLD_ITALIC : undefined
   }
 
   if (mark.type == 'bold') return BOLD
