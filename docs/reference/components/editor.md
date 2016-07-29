@@ -22,9 +22,13 @@ The top-level React component that renders the Slate editor itself.
   - [`placeholderStyle`](#placeholderstyle)
 - [Plugin-like Properties](#plugin-like-properties)
   - [`onBeforeInput`](#onbeforeinput)
+  - [`onBlur`](#onblur)
+  - [`onCopy`](#oncopy)
+  - [`onCut`](#oncut)
   - [`onDrop`](#ondrop)
   - [`onKeyDown`](#onkeydown)
   - [`onPaste`](#onpaste)
+  - [`onSelect`](#onselect)
   - [`renderDecorations`](#renderdecorations)
   - [`renderMark`](#rendermark)
   - [`renderNode`](#rendernode)
@@ -150,9 +154,13 @@ const plugins = [
 ```
 
 ### `onBeforeInput`
+### `onBlur`
+### `onCopy`
+### `onCut`
 ### `onDrop`
 ### `onKeyDown`
 ### `onPaste`
+### `onSelect`
 ### `renderDecorations`
 ### `renderMark`
 ### `renderNode`
