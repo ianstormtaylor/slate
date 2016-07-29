@@ -18,6 +18,7 @@ import PlainText from './plain-text'
 import Plugins from './plugins'
 import ReadOnly from './read-only'
 import RichText from './rich-text'
+import RTL from './rtl'
 import Tables from './tables'
 import DevPerformancePlain from './development/performance-plain'
 import DevPerformanceRich from './development/performance-rich'
@@ -73,6 +74,7 @@ class App extends React.Component {
         {this.renderTab('Code Highlighting', 'code-highlighting')}
         {this.renderTab('Paste HTML', 'paste-html')}
         {this.renderTab('Read-only', 'read-only')}
+        {this.renderTab('RTL', 'rtl')}
         {this.renderTab('Plugins', 'plugins')}
       </div>
     )
@@ -128,6 +130,7 @@ const router = (
       <Route path="plugins" component={Plugins} />
       <Route path="read-only" component={ReadOnly} />
       <Route path="rich-text" component={RichText} />
+      <Route path="rtl" component={RTL} />
       <Route path="tables" component={Tables} />
       <Route path="dev-performance-plain" component={DevPerformancePlain} />
       <Route path="dev-performance-rich" component={DevPerformanceRich} />
