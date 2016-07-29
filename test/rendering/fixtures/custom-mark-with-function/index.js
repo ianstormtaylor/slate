@@ -1,8 +1,8 @@
 
 import React from 'react'
 
-const BOLD = {
-  fontWeight: 'bold'
+function BOLD(props) {
+  return <strong>{props.children}</strong>
 }
 
 export function renderMark(mark) {

@@ -5,7 +5,9 @@ const BOLD = {
   fontWeight: 'bold'
 }
 
-const ITALIC = (props => <i>{props.children}</i>)
+function ITALIC(props) {
+  return <i>{props.children}</i>
+}
 
 export function renderMark(mark, marks) {
   if (mark.type == 'bold') return BOLD
