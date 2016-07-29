@@ -1,6 +1,6 @@
 *.sketch
-build.js
-build.js.map
 dist
+examples/build.dev.js
+examples/build.prod.js
 node_modules
 tmp
