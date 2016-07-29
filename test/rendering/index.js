@@ -16,7 +16,7 @@ describe('rendering', () => {
   const tests = fs.readdirSync(resolve(__dirname, './fixtures'))
 
   for (const test of tests) {
-    if (test[0] === '.') return
+    if (test[0] === '.') continue
 
     it(test, () => {
       const dir = resolve(__dirname, './fixtures', test)
