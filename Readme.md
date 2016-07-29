@@ -99,7 +99,7 @@ Slate encourages you to write small, reusable modules. Check out the public ones
 - [`slate-paste-linkify`](https://github.com/ianstormtaylor/slate-paste-linkify) wraps the selected text in a link when a URL is pasted from the clipboard.
 - [`slate-prism`](https://github.com/SamyPesse/slate-prism) highlights code blocks with [Prism.js](http://prismjs.com/)!
 - [`slate-soft-break`](https://github.com/ianstormtaylor/slate-soft-break) adds a soft break when `enter` is pressed.
-- [**View all plugins...**](https://github.com/ianstormtaylor/slate/wiki)
+- [**View all plugins on `npm`...**](https://www.npmjs.com/browse/keyword/slate)
 
 <br/>
 ### Documentation
