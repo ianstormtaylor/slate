@@ -3,13 +3,13 @@ import React from 'react'
 
 export default {
   rules: [
-    // the first one has no serialize()
+    // An empty rule that does not define `serialize`.
     {},
-    // the second has a serialize() that does not return anything
+    // A second rule that defines `serialize` but doesn't handle the cases.
     {
       serialize(obj, children) {}
     },
-    // then the real one
+    // The rule that actually matches.
     {
       serialize(obj, children) {
         if (obj.kind == 'block' && obj.type == 'paragraph') {
