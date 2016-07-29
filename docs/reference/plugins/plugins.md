@@ -209,14 +209,33 @@ The `renderDecorations` handler allows you to add dynamic, content-aware [`Marks
 `renderDecorations` is called for every `text` node in the document, and should return a set of updated [`Characters`](../models/character.md) for the text node in question. Every plugin's decoration logic is called, and the resulting characters are unioned, such that multiple plugins can apply decorations to the same pieces of text.
 
 ### `renderMark` 
-`Function renderMark(mark: Mark, marks: Set, state: State, editor: Editor) => Object || Void`
+`Function renderMark(mark: Mark, marks: Set, state: State, editor: Editor) => Component || Object || String || Void`
 
-The `renderMark` handler allows you to define the styles that each mark should be rendered with. It takes a [`Mark`](../models/mark.md) object, and should return a dictionary of styles that will be applied via React's `style=` property. For example:
+The `renderMark` handler allows you to define the styles that each mark should be rendered with. It is passed a `mark` and the set of `marks`, and should return either a React component, an object of styles, or a class string. For example any of these are valid return values:
 
 ```js
-{
-  fontWeight: 'bold',
-  fontStyle: 'italic'
+function Bold(props) {
+  return <strong>{props.children}</strong>
+}
+
+function renderMark(mark) {
+  if (mark.type == 'bold') return Bold
+}
+```
+
+```js
+function renderMark(mark) {
+  if (mark.type == 'bold') {
+    return {
+      fontWeight: 'bold'
+    }
+  }
+}
+```
+
+```js
+function renderMark(mark) {
+  if (mark.type == 'bold') return 'my-bold-class'
 }
 ```
 
