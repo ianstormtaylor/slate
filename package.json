@@ -81,7 +81,7 @@
     "examples:start": "http-server ./examples",
     "examples:watch": "watchify --debug --transform babelify ./examples/index.js --outfile ./examples/build.dev.js",
     "gh-pages": "npm run dist && npm run examples && gh-pages --dist ./examples",
-    "lint": "eslint --ignore-pattern 'build.js' '{examples,lib}/**/*.js'",
+    "lint": "eslint --ignore-pattern 'build.dev.js' --ignore-pattern 'build.prod.js' '{examples,lib}/**/*.js'",
     "prepublish": "npm run dist",
     "start": "npm run examples:start",
     "test": "npm run dist && npm run lint && npm run test:server",
