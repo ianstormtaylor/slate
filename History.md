@@ -5,6 +5,13 @@ This document maintains a list of changes to Slate with each new version. Until 
 ---
 
 
+### `0.10.0` — _July 29, 2016_
+
+#### BREAKING CHANGES
+
+- **Marks are now renderable as components.** Previously the only supported way to render marks was by returning a `style` object. Now you can return a style object, a class name string, or a full React component. Because of this, the DOM will be renderered slightly differently than before, resulting in an extra `<span>` when rendering non-component marks. This won't affect you unless you were depending on the DOM output by Slate for some reason.
+
+
 ### `0.9.0` — _July 28, 2016_
 
 #### BREAKING CHANGES
