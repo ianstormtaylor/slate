@@ -43,6 +43,23 @@ class PlainText extends React.Component {
   }
 
   /**
+   * On key down, if it's <shift-enter> add a soft break.
+   *
+   * @param {Event} e
+   * @param {Object} data
+   * @param {State} state
+   */
+
+  onKeyDown = (e, data, state) => {
+    if (data.key == 'enter' && data.isShift) {
+      return state
+        .transform()
+        .insertText('\n')
+        .apply()
+    }
+  }
+
+  /**
    * Render the editor.
    *
    * @return {Component} component
@@ -53,6 +70,7 @@ class PlainText extends React.Component {
       <Editor
         placeholder={'Enter some plain text...'}
         onChange={this.onChange}
+        onKeyDown={this.onKeyDown}
         renderNode={this.renderNode}
         state={this.state.state}
       />
