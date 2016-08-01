@@ -307,6 +307,7 @@ class RichText extends React.Component {
           renderMark={this.renderMark}
           onChange={this.onChange}
           onKeyDown={this.onKeyDown}
+          style={{}}
         />
       </div>
     )

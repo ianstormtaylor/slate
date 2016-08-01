@@ -1,6 +1,6 @@
 
 import assert from 'assert'
-import type from 'component-type'
+import type from 'type-of'
 
 /**
  * Assertion error.
