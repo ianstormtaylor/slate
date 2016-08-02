@@ -22,6 +22,7 @@ import RTL from './rtl'
 import Tables from './tables'
 import DevPerformancePlain from './development/performance-plain'
 import DevPerformanceRich from './development/performance-rich'
+import IFrameRendering from './iframe-rendering'
 
 /**
  * Perf.
@@ -76,6 +77,7 @@ class App extends React.Component {
         {this.renderTab('Read-only', 'read-only')}
         {this.renderTab('RTL', 'rtl')}
         {this.renderTab('Plugins', 'plugins')}
+        {this.renderTab('IFrame', 'iframe')}
       </div>
     )
   }
@@ -134,6 +136,7 @@ const router = (
       <Route path="tables" component={Tables} />
       <Route path="dev-performance-plain" component={DevPerformancePlain} />
       <Route path="dev-performance-rich" component={DevPerformanceRich} />
+      <Route path="iframe" component={IFrameRendering}/>
     </Route>
   </Router>
 )
