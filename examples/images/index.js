@@ -202,41 +202,9 @@ class Images extends React.Component {
    */
 
   insertImage = (state, src) => {
-    if (state.isExpanded) {
-      state = state
-        .transform()
-        .delete()
-        .apply()
-    }
-
-    const { anchorBlock, selection } = state
-    let transform = state.transform()
-
-    if (anchorBlock.type == 'image') {
-      transform = transform.splitBlock()
-    }
-
-    else if (anchorBlock.text != '') {
-      if (selection.isAtEndOf(anchorBlock)) {
-        transform = transform.splitBlock()
-      }
-
-      else if (selection.isAtStartOf(anchorBlock)) {
-        transform = transform
-          .splitBlock()
-          .collapseToStartOfPreviousBlock()
-      }
-
-      else {
-        transform = transform
-          .splitBlock()
-          .splitBlock()
-          .collapseToStartOfPreviousBlock()
-      }
-    }
-
-    return transform
-      .setBlock({
+    return state
+      .transform()
+      .insertBlock({
         type: 'image',
         isVoid: true,
         data: { src }
