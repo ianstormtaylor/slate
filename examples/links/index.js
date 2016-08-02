@@ -83,7 +83,10 @@ class Links extends React.Component {
       const href = window.prompt('Enter the URL of the link:')
       state = state
         .transform()
-        .wrapInline('link', new Map({ href }))
+        .wrapInline({
+          type: 'link',
+          data: { href }
+        })
         .collapseToEnd()
         .apply()
     }
@@ -95,7 +98,10 @@ class Links extends React.Component {
         .transform()
         .insertText(text)
         .extendBackward(text.length)
-        .wrapInline('link', new Map({ href }))
+        .wrapInline({
+          type: 'link',
+          data: { href }
+        })
         .collapseToEnd()
         .apply()
     }
@@ -123,7 +129,12 @@ class Links extends React.Component {
     }
 
     return transform
-      .wrapInline('link', { href: data.text })
+      .wrapInline({
+        type: 'link',
+        data: {
+          href: data.text
+        }
+      })
       .collapseToEnd()
       .apply()
   }
