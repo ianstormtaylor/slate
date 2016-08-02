@@ -28,15 +28,15 @@ export default function (state) {
 
   const updated = next.document.getTexts().get(1)
 
-  // assert.deepEqual(
-  //   next.selection.toJS(),
-  //   range.merge({
-  //     anchorKey: updated.key,
-  //     anchorOffset: last.length,
-  //     focusKey: updated.key,
-  //     focusOffset: last.length
-  //   }).toJS()
-  // )
+  assert.deepEqual(
+    next.selection.toJS(),
+    range.merge({
+      anchorKey: updated.key,
+      anchorOffset: last.length,
+      focusKey: updated.key,
+      focusOffset: last.length
+    }).toJS()
+  )
 
   return next
 }

@@ -22,15 +22,15 @@ export default function (state) {
   const two = next.document.getTexts().get(1)
   const three = next.document.getTexts().get(2)
 
-  // assert.deepEqual(
-  //   next.selection.toJS(),
-  //   range.merge({
-  //     anchorKey: two.key,
-  //     anchorOffset: 0,
-  //     focusKey: three.key,
-  //     focusOffset: three.length
-  //   }).toJS()
-  // )
+  assert.deepEqual(
+    next.selection.toJS(),
+    range.merge({
+      anchorKey: two.key,
+      anchorOffset: 0,
+      focusKey: three.key,
+      focusOffset: three.length
+    }).toJS()
+  )
 
   return next
 }
