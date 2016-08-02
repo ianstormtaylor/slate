@@ -99,10 +99,23 @@ Delete forward `n` characters at the current cursor. If the selection is expande
 
 Delete everything in the current selection.
 
+### `insertBlock`
+`insertBlock(block: Block) => Transform`
+`insertBlock(properties: Object) => Transform`
+`insertBlock(type: String) => Transform`
+
+Insert a new block at the same level as the current block, splitting the current block to make room if it is non-empty. If the selection is expanded, it will be deleted first.
+
 ### `insertFragment`
 `insertFragment(fragment: Document) => Transform`
 
 Insert a `fragment` at the current selection. If the selection is expanded, it will be deleted first.
+
+### `insertInline`
+`insertInline(inline: Inline) => Transform`
+`insertInline(properties: Object) => Transform`
+
+Insert a new inline at the current cursor position, splitting the text to make room if it is non-empty. If the selection is expanded, it will be deleted first.
 
 ### `insertText`
 `insertText(text: String) => Transform`
@@ -267,10 +280,23 @@ Delete forward `n` characters at a `range`. If the `range` is expanded, this met
 
 Delete everything in a `range`.
 
+### `insertBlockAtRange`
+`insertBlockAtRange(range: Selection, block: Block) => Transform`
+`insertBlockAtRange(range: Selection, properties: Object) => Transform`
+`insertBlockAtRange(range: Selection, type: String) => Transform`
+
+Insert a new block at the same level as the leaf block at a `range`, splitting the current block to make room if it is non-empty. If the selection is expanded, it will be deleted first.
+
 ### `insertFragmentAtRange`
 `insertFragmentAtRange(range: Selection, fragment: Document) => Transform`
 
 Insert a `fragment` at a `range`. If the selection is expanded, it will be deleted first.
+
+### `insertInlineAtRange`
+`insertInlineAtRange(range: Selection, inline: Inline) => Transform`
+`insertInlineAtRange(range: Selection, properties: Object) => Transform`
+
+Insert a new inline at a `range`, splitting the text to make room if it is non-empty. If the selection is expanded, it will be deleted first.
 
 ### `insertTextAtRange`
 `insertTextAtRange(range: Selection, text: String) => Transform`
