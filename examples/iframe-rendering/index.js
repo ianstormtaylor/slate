@@ -1,8 +1,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-
 import injector from 'react-frame-aware-selection-plugin'
-injector();
+
+injector()
 
 import { Editor, Mark, Raw } from '../..'
 import initialState from './state.json'
@@ -124,14 +124,16 @@ class IFrameRendering extends React.Component {
         return MARKS[mark.type]
     }
 
-    render () {
-        const bootstrapCDN =
+    render() {
+        const bootstrapCDN = (
             <link
                 href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
                 rel="stylesheet"
                 integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
-                crossOrigin="anonymous">
+                crossOrigin="anonymous"
+            >
             </link>
+        )
 
         return (
             <Frame head={bootstrapCDN} style={{width: `100%`, height: '300px'}}>

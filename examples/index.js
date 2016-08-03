@@ -136,7 +136,7 @@ const router = (
       <Route path="tables" component={Tables} />
       <Route path="dev-performance-plain" component={DevPerformancePlain} />
       <Route path="dev-performance-rich" component={DevPerformanceRich} />
-      <Route path="iframe" component={IFrameRendering}/>
+      <Route path="iframe" component={IFrameRendering} />
     </Route>
   </Router>
 )
