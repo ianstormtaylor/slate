@@ -1,76 +1,128 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-function resolveDocument (reactIFrameElementNode) {
-    const iFrame = ReactDOM.findDOMNode(reactIFrameElementNode);
-    return iFrame.contentDocument
+import injector from 'react-frame-aware-selection-plugin'
+injector();
+
+import { Editor, Mark, Raw } from '../..'
+import initialState from './state.json'
+import Frame from 'react-frame-component'
+
+const MARKS = {
+    bold: {
+        fontWeight: 'bold'
+    },
+    italic: {
+        fontStyle: 'italic'
+    }
 }
 
-//appending context to body > div, to suppress react warning
-function getRootDiv (doc) {
-    let rootDiv = doc.querySelector('div#root')
-    if (!rootDiv) {
-        rootDiv = doc.createElement('div')
-        rootDiv.setAttribute('id', 'root')
-        rootDiv.id = 'root'
-        rootDiv.setAttribute('style', 'width: 100%; height: 100%')
-
-        doc.body.appendChild(rootDiv)
-    }
-    return rootDiv
-}
-
-class IFrame extends React.Component {
-
-    static propTypes = {
-        head: React.PropTypes.node,
-        children: React.PropTypes.node,
-    }
-
-    //rendering plain frame.
-    render () {
-        return <iframe style={{border: 'solid 1px black', width: '100%'}}></iframe>
-    }
-
-    componentDidMount = () => {
-        this.renderContents()
-    }
-
-    componentDidUpdate = () => {
-        this.renderContents()
-    }
-
-    componentWillUnmount = () => this.getDocument().then((doc) => {
-        ReactDOM.unmountComponentAtNode(doc.body)
-        if (this.props.head) {
-            ReactDOM.unmountComponentAtNode(doc.head)
-        }
-    })
-
-    renderContents = () => this.getDocument().then((doc) => {
-        if (this.props.head) {
-            ReactDOM.unstable_renderSubtreeIntoContainer(this, this.props.head, doc.head)
-        }
-        const rootDiv = getRootDiv(doc)
-        ReactDOM.unstable_renderSubtreeIntoContainer(this, this.props.children, rootDiv)
-    })
-
-
-    getDocument = () => new Promise((resolve) => {
-        const resolveTick = () => { //using arrow function to preserve `this` context
-            let doc = resolveDocument(this)
-            if (doc && doc.readyState === 'complete') {
-                resolve(doc)
-            } else {
-                window.requestAnimationFrame(resolveTick)
-            }
-        }
-        resolveTick()
-    })
-
+const NODES = {
+    'table': props => <table className={"table"}><tbody {...props.attributes}>{props.children}</tbody></table>,
+    'table-row': props => <tr {...props.attributes}>{props.children}</tr>,
+    'table-cell': props => <td {...props.attributes}>{props.children}</td>
 }
 
 class IFrameRendering extends React.Component {
+
+    state = {
+        state: Raw.deserialize(initialState, { terse: true })
+    };
+
+    onChange = (state) => {
+        this.setState({ state })
+    }
+
+    /**
+     * On backspace, do nothing if at the start of a table cell.
+     *
+     * @param {Event} e
+     * @param {State} state
+     * @return {State or Null} state
+     */
+
+    onBackspace = (e, state) => {
+        if (state.startOffset != 0) return
+        e.preventDefault()
+        return state
+    }
+
+    /**
+     * On change.
+     *
+     * @param {State} state
+     */
+
+    onChange = (state) => {
+        this.setState({ state })
+    }
+
+    /**
+     * On delete, do nothing if at the end of a table cell.
+     *
+     * @param {Event} e
+     * @param {State} state
+     * @return {State or Null} state
+     */
+
+    onDelete = (e, state) => {
+        if (state.endOffset != state.startText.length) return
+        e.preventDefault()
+        return state
+    }
+
+    /**
+     * On return, do nothing if inside a table cell.
+     *
+     * @param {Event} e
+     * @param {State} state
+     * @return {State or Null} state
+     */
+
+    onEnter = (e, state) => {
+        e.preventDefault()
+        return state
+    }
+
+    /**
+     * On key down, check for our specific key shortcuts.
+     *
+     * @param {Event} e
+     * @param {Object} data
+     * @param {State} state
+     * @return {State or Null} state
+     */
+
+    onKeyDown = (e, data, state) => {
+        if (state.startBlock.type != 'table-cell') return
+        switch (data.key) {
+            case 'backspace': return this.onBackspace(e, state)
+            case 'delete': return this.onDelete(e, state)
+            case 'enter': return this.onEnter(e, state)
+        }
+    }
+
+    /**
+     * Return a node renderer for a Slate `node`.
+     *
+     * @param {Node} node
+     * @return {Component or Void}
+     */
+
+    renderNode = (node) => {
+        return NODES[node.type]
+    }
+
+    /**
+     * Return a mark renderer for a Slate `mark`.
+     *
+     * @param {Mark} mark
+     * @return {Object or Void}
+     */
+
+    renderMark = (mark) => {
+        return MARKS[mark.type]
+    }
 
     render () {
         const bootstrapCDN =
@@ -82,9 +134,15 @@ class IFrameRendering extends React.Component {
             </link>
 
         return (
-            <IFrame head={bootstrapCDN}>
-                <div>I'm in iframe</div>
-            </IFrame>
+            <Frame head={bootstrapCDN} style={{width: `100%`, height: '300px'}}>
+                <Editor
+                    state={this.state.state}
+                    onChange={this.onChange}
+                    renderNode={this.renderNode}
+                    renderMark={this.renderMark}
+                    onKeyDown={this.onKeyDown}
+                />
+            </Frame>
         )
     }
 
