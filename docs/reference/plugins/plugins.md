@@ -23,7 +23,7 @@ When the editor needs to resolve a plugin-related handler, it will loop through 
   - [`renderNode`](#rendernode)
 - [Other Properties](#other-properties)
   - [`onChange`](#onchange)
-  - [`onReceiveState`](#onreceivestate)
+  - [`onBeforeChange`](#onbeforechange)
 
 ## Conventions
 
@@ -294,9 +294,9 @@ Unlike the native event handlers, results from the `onChange` handler **are cumm
 
 This allows you to stack up changes across the entire plugin stack.
 
-### `onReceiveState`
-`Function onReceiveState(state: State) => State || Void`
+### `onBeforeChange`
+`Function onBeforeChange(state: State) => State || Void`
 
-The `onReceiveState` handler isn't a native browser event handler. Instead, it is invoked whenever the editor receives a new state. Returning a new state will update the editor's state before rendering, continuing down the plugin stack.
+The `onBeforeChange` handler isn't a native browser event handler. Instead, it is invoked whenever the editor receives a new state and before propagating a new state to `onChange`. Returning a new state will update the editor's state before rendering, continuing down the plugin stack.
 
-Like `onChange`, `onReceiveState` is cummulative.
+Like `onChange`, `onBeforeChange` is cummulative.
