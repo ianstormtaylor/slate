@@ -15,11 +15,11 @@ import isUrl from 'is-url'
 const NODES = {
   image: (props) => {
     const { node, state } = props
+    const isFocused = state.selection.hasEdgeIn(node)
     const src = node.data.get('src')
+    const className = isFocused ? 'active' : null
     return (
-      <Void {...props} className="image-block">
-        <img src={src} {...props.attributes} />
-      </Void>
+      <img src={src} className={className} {...props.attributes} />
     )
   }
 }

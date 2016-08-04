@@ -1,6 +1,5 @@
 
 import React from 'react'
-import { Void } from '../..'
 
 /**
  * An video embed component.
@@ -50,10 +49,10 @@ class Video extends React.Component {
 
   render = () => {
     return (
-      <Void {...this.props}>
+      <div {...this.props.attributes}>
         {this.renderVideo()}
         {this.renderInput()}
-      </Void>
+      </div>
     )
   }
 
