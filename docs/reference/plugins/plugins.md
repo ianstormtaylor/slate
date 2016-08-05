@@ -23,7 +23,7 @@ When the editor needs to resolve a plugin-related handler, it will loop through 
   - [`renderNode`](#rendernode)
 - [Other Properties](#other-properties)
   - [`onChange`](#onchange)
-
+  - [`onBeforeChange`](#onbeforechange)
 
 ## Conventions
 
@@ -57,7 +57,7 @@ All of the event handler properties are passed the same React `event` object you
 
 Each event handler can choose to return a new `state` object, in which case the editor's state will be updated. If nothing is returned, the editor will simply continue resolving the plugin stack.
 
-### `onBeforeInput` 
+### `onBeforeInput`
 `Function onBeforeInput(event: Event, data: Object, state: State, editor: Editor) => State || Void`
 
 This handler is called right before a string of text is inserted into the `contenteditable` element.
@@ -124,12 +124,12 @@ The `data` object is a convenience object created to standardize the drop metada
 
 If no other plugin handles this event, it will be handled by the [Core plugin](./core.md).
 
-### `onKeyDown` 
+### `onKeyDown`
 `Function onKeyDown(event: Event, data: Object, state: State, editor: Editor) => State || Void`
 
 This handler is called when any key is pressed in the `contenteditable` element, before any action is taken.
 
-The `data` object contains the `key` which is a string name of the key that was pressed, as well as it's `code`. It also contains a series of helpful utility properties for determining hotkey logic. For example, `isCtrl` which is true if the <kbd>control</kbd> key was pressed, or 
+The `data` object contains the `key` which is a string name of the key that was pressed, as well as it's `code`. It also contains a series of helpful utility properties for determining hotkey logic. For example, `isCtrl` which is true if the <kbd>control</kbd> key was pressed, or
 
 ```js
 {
@@ -201,14 +201,14 @@ If no other plugin handles this event, it will be handled by the [Core plugin](.
 
 To customize the renderer output of the editor, plugins can define a set of "renderer" properties.
 
-### `renderDecorations` 
+### `renderDecorations`
 `Function renderDecorations(text: Text, state: State, editor: Editor) => Characters || Void`
 
 The `renderDecorations` handler allows you to add dynamic, content-aware [`Marks`](../models/mark.md) to ranges of text, without having them show up in the serialized state of the editor. This is useful for things like code highlighting, where the marks will change as the user types.
 
 `renderDecorations` is called for every `text` node in the document, and should return a set of updated [`Characters`](../models/character.md) for the text node in question. Every plugin's decoration logic is called, and the resulting characters are unioned, such that multiple plugins can apply decorations to the same pieces of text.
 
-### `renderMark` 
+### `renderMark`
 `Function renderMark(mark: Mark, marks: Set, state: State, editor: Editor) => Component || Object || String || Void`
 
 The `renderMark` handler allows you to define the styles that each mark should be rendered with. It is passed a `mark` and the set of `marks`, and should return either a React component, an object of styles, or a class string. For example any of these are valid return values:
@@ -239,7 +239,7 @@ function renderMark(mark) {
 }
 ```
 
-### `renderNode` 
+### `renderNode`
 `Function renderNode(node: Block || Inline, state: State, editor: Editor) => Component || Void`
 
 The `renderNode` handler allows you to define the component that will be used to render a node—both blocks and inlines. It takes a [`Node`](../models/node.md) object, and should return a React component.
@@ -285,7 +285,7 @@ The `node` itself is passed in, so you can access any custom data associated wit
 }
 ```
 
-### `onChange` 
+### `onChange`
 `Function onChange(state: State) => State || Void`
 
 The `onChange` handler isn't a native browser event handler. Instead, it is invoked whenever the editor state changes. Returning a new state will update the editor's state, continuing down the plugin stack.
@@ -293,3 +293,10 @@ The `onChange` handler isn't a native browser event handler. Instead, it is invo
 Unlike the native event handlers, results from the `onChange` handler **are cummulative**! This means that every plugin in the stack that defines an `onChange` handler will have its handler resolved for every change the editor makes; the editor will not return early after the first plugin's handler is called.
 
 This allows you to stack up changes across the entire plugin stack.
+
+### `onBeforeChange`
+`Function onBeforeChange(state: State) => State || Void`
+
+The `onBeforeChange` handler isn't a native browser event handler. Instead, it is invoked whenever the editor receives a new state and before propagating a new state to `onChange`. Returning a new state will update the editor's state before rendering, continuing down the plugin stack.
+
+Like `onChange`, `onBeforeChange` is cummulative.

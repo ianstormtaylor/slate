@@ -1,12 +1,9 @@
 
-import { Void } from '../../../..'
 import React from 'react'
 
 function Image(props) {
   return (
-    <Void {...props}>
-      <img src={props.node.data.get('src')} />
-    </Void>
+    <img src={props.node.data.get('src')} {...props.attributes} />
   )
 }
 

@@ -26,6 +26,10 @@ img {
   max-height: 20em;
 }
 
+img.active {
+  box-shadow: 0 0 0 2px blue;
+}
+
 blockquote {
   border-left: 2px solid #ddd;
   margin-left: 0;
@@ -155,12 +159,4 @@ input:focus {
 
 .hover-menu .button[data-active="true"] {
   color: #fff;
-}
-
-.image-block:focus {
-  outline: none;
-}
-
-.image-block:focus img {
-  box-shadow: 0 0 0 2px blue;
 }

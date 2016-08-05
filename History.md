@@ -5,6 +5,13 @@ This document maintains a list of changes to Slate with each new version. Until 
 ---
 
 
+### `0.11.0` — _August 4, 2016_
+
+#### BREAKING CHANGES
+
+- **Void nodes are renderered implicitly again!** Previously Slate had required that you wrap void node renderers yourself with the exposed `<Void>` wrapping component. This was to allow for selection styling, but a change was made to make selection styling able to handled in Javascript. Now the `<Void>` wrapper will be implicitly rendered by Slate, so you do not need to worry about it, and "voidness" only needs to toggled in one place, the `isVoid: true` property of a node.
+
+
 ### `0.10.0` — _July 29, 2016_
 
 #### BREAKING CHANGES
