@@ -11,18 +11,19 @@ import AutoMarkdown from './auto-markdown'
 import CodeHighlighting from './code-highlighting'
 import Embeds from './embeds'
 import HoveringMenu from './hovering-menu'
+import Iframes from './iframes'
 import Images from './images'
 import Links from './links'
 import PasteHtml from './paste-html'
 import PlainText from './plain-text'
 import Plugins from './plugins'
+import RTL from './rtl'
 import ReadOnly from './read-only'
 import RichText from './rich-text'
-import RTL from './rtl'
 import Tables from './tables'
+
 import DevPerformancePlain from './development/performance-plain'
 import DevPerformanceRich from './development/performance-rich'
-import IFrameRendering from './iframe-rendering'
 
 /**
  * Perf.
@@ -77,7 +78,7 @@ class App extends React.Component {
         {this.renderTab('Read-only', 'read-only')}
         {this.renderTab('RTL', 'rtl')}
         {this.renderTab('Plugins', 'plugins')}
-        {this.renderTab('IFrame', 'iframe')}
+        {this.renderTab('Iframes', 'iframes')}
       </div>
     )
   }
@@ -121,10 +122,12 @@ const router = (
   <Router history={hashHistory}>
     <Route path="/" component={App}>
       <IndexRedirect to="rich-text" />
+
       <Route path="auto-markdown" component={AutoMarkdown} />
       <Route path="code-highlighting" component={CodeHighlighting} />
       <Route path="embeds" component={Embeds} />
       <Route path="hovering-menu" component={HoveringMenu} />
+      <Route path="iframes" component={Iframes} />
       <Route path="images" component={Images} />
       <Route path="links" component={Links} />
       <Route path="paste-html" component={PasteHtml} />
@@ -134,9 +137,9 @@ const router = (
       <Route path="rich-text" component={RichText} />
       <Route path="rtl" component={RTL} />
       <Route path="tables" component={Tables} />
+
       <Route path="dev-performance-plain" component={DevPerformancePlain} />
       <Route path="dev-performance-rich" component={DevPerformanceRich} />
-      <Route path="iframe" component={IFrameRendering} />
     </Route>
   </Router>
 )

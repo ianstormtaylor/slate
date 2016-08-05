@@ -12,6 +12,7 @@
     "direction": "^0.1.5",
     "element-scroll-to": "^1.1.0",
     "esrever": "^0.2.0",
+    "get-window": "^1.1.1",
     "immutable": "^3.8.1",
     "is-empty": "^1.0.0",
     "keycode": "^2.1.2",
