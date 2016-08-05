@@ -191,13 +191,8 @@ class Iframes extends React.Component {
 
     return (
       <div>
-        <p style={{ marginBottom: '10px' }}>This editor is rendered inside of an
-          <code>iframe</code> element, and everything works as usual! This is
-          helpful for scenarios where you need the content to be rendered in an
-          isolated, for example to create a "live example" with a specific set
-          of stylesheets applied.</p>
-        <p style={{ marginBottom: '10px' }}>In this example's case, we've added
-          Bootstrap's CSS to the <code>iframe</code> for default styles:</p>
+        <p style={{ marginBottom: '10px' }}>This editor is rendered inside of an <code>iframe</code> element, and everything works as usual! This is helpful for scenarios where you need the content to be rendered in an isolated, for example to create a "live example" with a specific set of stylesheets applied.</p>
+        <p style={{ marginBottom: '10px' }}>In this example's case, we've added Bootstrap's CSS to the <code>iframe</code> for default styles:</p>
         <Frame head={bootstrap} style={style}>
           <div style={{ padding: '20px' }}>
             {this.renderToolbar()}
