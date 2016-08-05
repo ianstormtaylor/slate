@@ -49,6 +49,8 @@
     "react": "^15.2.0",
     "react-addons-perf": "^15.2.1",
     "react-dom": "^15.1.0",
+    "react-frame-aware-selection-plugin": "0.0.1",
+    "react-frame-component": "^0.6.2",
     "react-router": "^2.5.1",
     "read-metadata": "^1.0.0",
     "selection-position": "^1.0.0",
