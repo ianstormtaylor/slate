@@ -89,7 +89,7 @@ const rules = [
     },
     // Add a serializing function property to our rule...
     serialize(object, children) {
-      if (obj.kind == 'block' && obj.type == 'paragraph') {
+      if (object.kind == 'block' && object.type == 'paragraph') {
         return <p>{children}</p>
       }
     }
@@ -127,8 +127,8 @@ const rules = [
     },
     // Switch serialize to handle more blocks...
     serialize(object, children) {
-      if (obj.kind != 'block') return
-      switch (obj.type) {
+      if (object.kind != 'block') return
+      switch (object.type) {
         case 'paragraph': return <p>{children}</p>
         case 'quote': return <blockquote>{children}</blockquote>
         case 'code': return <pre><code>{children}</code></pre>
@@ -171,8 +171,8 @@ const rules = [
       }
     },
     serialize(object, children) {
-      if (obj.kind != 'block') return
-      switch (obj.type) {
+      if (object.kind != 'block') return
+      switch (object.type) {
         case 'code': return <pre><code>{children}</code></pre>
         case 'paragraph': return <p>{children}</p>
         case 'quote': return <blockquote>{children}</blockquote>
@@ -191,8 +191,8 @@ const rules = [
       }
     },
     serialize(object, children) {
-      if (obj.kind != 'mark') return
-      switch (obj.type) {
+      if (object.kind != 'mark') return
+      switch (object.type) {
         case 'bold': return <strong>{children}</strong>
         case 'italic': return <em>{children}</em>
         case 'underline': return <u>{children}</u>
