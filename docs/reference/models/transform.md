@@ -32,6 +32,7 @@ Transform methods can either operate on the [`Document`](./document.md), the [`S
   - [`unwrapInline`](#unwrapinline)
   - [`wrapBlock`](#wrapblock)
   - [`wrapInline`](#wrapinline)
+  - [`wrapText`](#wraptext)
 - [Selection Transforms](#selection-transforms)
   - [`blur`](#blur)
   - [`collapseTo{Edge}Of`](#collapsetoedgeof)
@@ -184,6 +185,11 @@ Wrap the [`Block`](./block.md) nodes in the current selection with a new [`Block
 `wrapInline(type: String, [data: Data]) => Transform`
 
 Wrap the [`Inline`](./inline.md) nodes in the current selection with a new [`Inline`](./inline.md) node of `type`, with optional `data`.
+
+### `wrapText`
+`wrapText(before: String, after: String) => Transform`
+
+Surround the text in the current selection.
 
 
 ## Selection Transforms
