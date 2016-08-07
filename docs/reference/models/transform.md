@@ -109,7 +109,7 @@ Insert a new block at the same level as the current block, splitting the current
 ### `insertFragment`
 `insertFragment(fragment: Document) => Transform`
 
-Insert a `fragment` at the current selection. If the selection is expanded, it will be deleted first.
+Insert a [`fragment`](./document.md) at the current selection. If the selection is expanded, it will be deleted first.
 
 ### `insertInline`
 `insertInline(inline: Inline) => Transform`
@@ -290,7 +290,7 @@ Insert a new block at the same level as the leaf block at a `range`, splitting t
 ### `insertFragmentAtRange`
 `insertFragmentAtRange(range: Selection, fragment: Document) => Transform`
 
-Insert a `fragment` at a `range`. If the selection is expanded, it will be deleted first.
+Insert a [`fragment`](./document.md) at a `range`. If the selection is expanded, it will be deleted first.
 
 ### `insertInlineAtRange`
 `insertInlineAtRange(range: Selection, inline: Inline) => Transform`
