@@ -41,6 +41,7 @@
     "eslint": "^3.0.1",
     "eslint-plugin-import": "^1.10.2",
     "eslint-plugin-react": "^5.2.2",
+    "fbjs": "^0.8.3",
     "gh-pages": "^0.11.0",
     "http-server": "^0.9.0",
     "is-image": "^1.0.1",
