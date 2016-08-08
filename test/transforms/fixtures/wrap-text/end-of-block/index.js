@@ -25,7 +25,7 @@ export default function (state) {
     next.selection.toJS(),
     range.merge({
       anchorKey: updated.key,
-      anchorOffset: 6,
+      anchorOffset: 4,
       focusKey: updated.key,
       focusOffset: 6,
       isBackward: false
