@@ -50,18 +50,12 @@ Which will also compile the source files. Then run the tests with:
 npm test
 ```
 
-And to run the linter:
-
-```
-npm run lint
-```
-
 If you need to debug something, you can add a `debugger` line to the source, and then run `npm test debug`. Or, if you only want to run a specific test or tests, you can run `npm test -- --fgrep "match this string"` flag which will filter the tests being run.
 
 To keep the source rebuilding on every file change, you need to run an additional watching command:
 
 ```
-npm run dist:watch
+npm run watch
 ```
 
 
