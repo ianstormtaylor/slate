@@ -13,11 +13,11 @@ Want to contribute to Slate? That would be awesome!
 
 ## Reporting Bugs
 
-If you run into any weird behavior while using Slate, feel free to open a new issue in this repository! To be most helpful, please include the steps to reproduce the bug as best you can, ideally including a [JSFiddle](https://jsfiddle.net/2zokvrvt/4/) with a working example of the bug.
+If you run into any weird behavior while using Slate, feel free to open a new issue in this repository! To be most helpful, please include the steps to reproduce the bug as best you can, ideally including a [JSFiddle](https://jsfiddle.net/2zokvrvt/7/) with a working example of the bug.
 
-Here's a [JSFiddle template for Slate](https://jsfiddle.net/2zokvrvt/4/) to get you started:
+Here's a [JSFiddle template for Slate](https://jsfiddle.net/2zokvrvt/7/) to get you started:
 
-[![](./docs/images/jsfiddle.png)](https://jsfiddle.net/2zokvrvt/4/)
+[![](./docs/images/jsfiddle.png)](https://jsfiddle.net/2zokvrvt/7/)
 
 
 ## Asking Questions
