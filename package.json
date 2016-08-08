@@ -73,7 +73,7 @@
     "disc:build": "mkdir -p ./tmp && browserify ./dist/index.js --full-paths > ./tmp/build.js",
     "disc:open": "discify ./tmp/build.js --open",
     "dist": "npm-run-all dist:npm dist:max dist:min",
-    "dist:max": "browserify ./lib/index.js --transform babelify --transform [ browserify-global-shim --global ] > ./dist/slate.js",
+    "dist:max": "NODE_ENV=production browserify ./lib/index.js --transform babelify --transform envify --transform [ browserify-global-shim --global ] --standalone Slate > ./dist/slate.js",
     "dist:min": "NODE_ENV=production browserify ./lib/index.js --transform babelify --transform envify --transform [ browserify-global-shim --global ] --transform uglifyify --standalone Slate | uglifyjs > ./dist/slate.min.js",
     "dist:npm": "babel --out-dir ./dist ./lib",
     "examples": "npm-run-all examples:dev examples:prod",
