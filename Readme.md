@@ -108,15 +108,13 @@ If you're using Slate for the first time, check out the [Getting Started](./docs
 
 - [**Guides**](./docs/guides)
   - [Installing Slate](./docs/guides/installing-slate.md)
+  - [Using the Bundled Source](./docs/guides/using-the-bundled-source.md)
   - [Adding Event Handlers](./docs/guides/adding-event-handlers.md)
   - [Defining Custom Block Nodes](./docs/guides/defining-custom-block-nodes.md)
   - [Applying Custom Formatting](./docs/guides/applying-custom-formatting.md)
   - [Using Plugins](./docs/guides/using-plugins.md)
   - [Saving to a Database](./docs/guides/saving-to-a-database.md)
   - [Saving and Loading HTML Content](./docs/guides/saving-and-loading-html-content.md)
-  - Adding a Hovering Menu
-  - Rendering Adjacent Elements in Components
-  - Adding Images Using Void Nodes
 - [**Concepts**](./docs/concepts)
   - [Statelessness & Immutability](./docs/concepts/statelessness-and-immutability.md)
   - [The Document Model](./docs/concepts/the-document-model.md)
