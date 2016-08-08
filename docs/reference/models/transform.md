@@ -68,6 +68,7 @@ Transform methods can either operate on the [`Document`](./document.md), the [`S
   - [`unwrapInlineAtRange`](#unwrapinlineatrange)
   - [`wrapBlockAtRange`](#wrapblockatrange)
   - [`wrapInlineAtRange`](#wrapinlineatrange)
+  - [`wrapTextAtRange`](#wraptextatrange)
 - [History Transforms](#history-transforms)
   - [`redo`](#redo)
   - [`undo`](#undo)
@@ -376,6 +377,10 @@ Wrap the [`Block`](./block.md) nodes in a `range` with a new [`Block`](./block.m
 
 Wrap the [`Inline`](./inline.md) nodes in a `range` with a new [`Inline`](./inline.md) node with `properties`. For convenience, you can pass a `type` string or `properties` object.
 
+### `wrapTextAtRange`
+`wrapTextAtRange(range: Selection, prefix: String, suffix: String) => Transform`
+
+Surround the text in a `range`.
 
 ## History Transforms
 
