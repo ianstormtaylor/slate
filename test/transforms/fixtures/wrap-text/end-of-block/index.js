@@ -28,7 +28,7 @@ export default function (state) {
       anchorOffset: 6,
       focusKey: updated.key,
       focusOffset: 6,
-      isBackward: null
+      isBackward: false
     }).toJS()
   )
 

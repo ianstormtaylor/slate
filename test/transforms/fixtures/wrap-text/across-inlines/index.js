@@ -5,11 +5,12 @@ export default function (state) {
   const { document, selection } = state
   const texts = document.getTexts()
   const first = texts.first()
+  const last = texts.last()
   const range = selection.merge({
     anchorKey: first.key,
-    anchorOffset: 1,
-    focusKey: first.key,
-    focusOffset: 3
+    anchorOffset: 2,
+    focusKey: last.key,
+    focusOffset: 2
   })
 
   const next = state
@@ -19,15 +20,15 @@ export default function (state) {
     .apply()
 
 
-  const updated = next.document.getTexts().get(0)
+  const updated = next.document.getTexts().get(1)
 
   assert.deepEqual(
     next.selection.toJS(),
     range.merge({
       anchorKey: updated.key,
-      anchorOffset: 5,
+      anchorOffset: 2,
       focusKey: updated.key,
-      focusOffset: 5,
+      focusOffset: 2,
       isBackward: false
     }).toJS()
   )
