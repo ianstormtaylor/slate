@@ -88,7 +88,7 @@
     "test:server": "mocha --compilers js:babel-core/register --reporter spec ./test/server.js",
     "watch": "npm-run-all --parallel --print-label watch:dist watch:examples start",
     "watch:dist": "babel --watch --out-dir ./dist ./lib",
-    "watch:examples": "watchify --debug --transform babelify ./examples/index.js > ./examples/build.dev.js"
+    "watch:examples": "watchify --debug --transform babelify ./examples/index.js -o ./examples/build.dev.js"
   },
   "browserify-global-shim": {
     "immutable": "Immutable",
