@@ -5,6 +5,13 @@ This document maintains a list of changes to Slate with each new version. Until 
 ---
 
 
+### `0.12.0` — _August 9, 2016_
+
+#### BREAKING CHANGES
+
+- **The `data.files` property is now an `Array`. Previously it was a native `FileList` object, but needed to be changed to add full support for pasting an dropping files in all browsers. This shouldn't affect you unless you were specifically depending on it being array-like instead of a true `Array`.
+
+
 ### `0.11.0` — _August 4, 2016_
 
 #### BREAKING CHANGES
