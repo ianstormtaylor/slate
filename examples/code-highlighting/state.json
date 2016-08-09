@@ -13,6 +13,9 @@
     {
       "kind": "block",
       "type": "code",
+      "data": {
+        "language": "js"
+      },
       "nodes": [
         {
           "kind": "text",

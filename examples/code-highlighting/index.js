@@ -11,7 +11,41 @@ import initialState from './state.json'
  */
 
 const NODES = {
-  code: props => <pre><code {...props.attributes}>{props.children}</code></pre>
+  code: (props) => {
+    const { attributes, children, editor, node } = props
+    const language = node.data.get('language')
+
+    function onChange(e) {
+      const state = editor.getState()
+      const next = state
+        .transform()
+        .setNodeByKey(node.key, {
+          data: {
+            language: e.target.value
+          }
+        })
+        .apply()
+      editor.onChange(next)
+    }
+
+    return (
+      <div style={{ position: 'relative' }}>
+        <pre>
+          <code {...props.attributes}>{props.children}</code>
+        </pre>
+        <div
+          contentEditable={false}
+          style={{ position: 'absolute', top: '5px', right: '5px' }}
+        >
+          <select value={language} onChange={onChange} >
+            <option value="css">CSS</option>
+            <option value="js">JavaScript</option>
+            <option value="html">HTML</option>
+          </select>
+        </div>
+      </div>
+    )
+  }
 }
 
 /**
@@ -136,8 +170,9 @@ class CodeHighlighting extends React.Component {
     if (block.type != 'code') return text.characters
 
     let characters = text.characters.asMutable()
+    const language = block.data.get('language')
     const string = text.text
-    const grammar = Prism.languages.javascript
+    const grammar = Prism.languages[language]
     const tokens = Prism.tokenize(string, grammar)
     let offset = 0
 
