@@ -9,6 +9,48 @@ import initialState from './state.json'
  * @type {Object}
  */
 
+const schema = {
+  rules: [
+    {
+      match: { type: 'block-quote' },
+      component: props => <blockquote {...props.attributes}>{props.children}</blockquote>
+    },
+    {
+      match: { type: 'bulleted-list' },
+      component: props => <ul {...props.attributes}>{props.children}</ul>,
+    },
+    {
+      match: { type: 'heading-one' },
+      component: props => <h1 {...props.attributes}>{props.children}</h1>,
+    },
+    {
+      match: { type: 'heading-two' },
+      component: props => <h2 {...props.attributes}>{props.children}</h2>,
+    },
+    {
+      match: { type: 'heading-three' },
+      component: props => <h3 {...props.attributes}>{props.children}</h3>,
+    },
+    {
+      match: { type: 'heading-four' },
+      component: props => <h4 {...props.attributes}>{props.children}</h4>,
+    },
+    {
+      match: { type: 'heading-five' },
+      component: props => <h5 {...props.attributes}>{props.children}</h5>,
+    },
+    {
+      match: { type: 'heading-six' },
+      component: props => <h6 {...props.attributes}>{props.children}</h6>,
+    },
+    {
+      match: { type: 'list-item' },
+      component: props => <li {...props.attributes}>{props.children}</li>,
+    },
+  ]
+}
+
+
 const NODES = {
   'block-quote': props => <blockquote>{props.children}</blockquote>,
   'bulleted-list': props => <ul>{props.children}</ul>,

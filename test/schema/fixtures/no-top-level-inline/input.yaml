@@ -1,0 +1,14 @@
+
+nodes:
+  - kind: inline
+    type: default
+    nodes:
+      - kind: text
+        ranges:
+          - text: one
+  - kind: block
+    type: default
+    nodes:
+      - kind: text
+        ranges:
+          - text: two
