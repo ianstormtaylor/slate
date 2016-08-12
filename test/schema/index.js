@@ -2,7 +2,7 @@
 import fs from 'fs'
 import strip from '../helpers/strip-dynamic'
 import readMetadata from 'read-metadata'
-import { Raw } from '../..'
+import { Raw, Schema } from '../..'
 import { strictEqual } from '../helpers/assert-json'
 import { resolve } from 'path'
 
@@ -20,10 +20,10 @@ describe('schema', () => {
       const dir = resolve(__dirname, './fixtures', test)
       const input = readMetadata.sync(resolve(dir, 'input.yaml'))
       const expected = readMetadata.sync(resolve(dir, 'output.yaml'))
-      const schema = require(dir)
+      const schema = Schema.create(require(dir))
 
       let state = Raw.deserialize(input, { terse: true })
-      state = schema.normalize(state)
+      state = schema.transform(state)
       const output = Raw.serialize(state, { terse: true })
       strictEqual(strip(output), strip(expected))
     })

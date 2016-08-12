@@ -4,11 +4,9 @@ nodes:
     type: default
     nodes:
       - kind: text
-        ranges:
-          - text: one
+        text: one
   - kind: block
     type: default
     nodes:
       - kind: text
-        ranges:
-          - text: two
+        text: two
