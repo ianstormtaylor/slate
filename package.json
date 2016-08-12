@@ -68,7 +68,7 @@
     "watchify": "^3.7.0"
   },
   "scripts": {
-    "clean": "rm -rf ./dist ./node_modules ./examples/build.js",
+    "clean": "rm -rf ./dist ./node_modules ./examples/build.dev.js ./examples/build.prod.js",
     "disc": "npm-run-all dist disc:build disc:open",
     "disc:build": "mkdir -p ./tmp && browserify ./dist/index.js --full-paths > ./tmp/build.js",
     "disc:open": "discify ./tmp/build.js --open",
