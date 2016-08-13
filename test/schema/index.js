@@ -1,8 +1,9 @@
 
+import React from 'react'
 import fs from 'fs'
 import strip from '../helpers/strip-dynamic'
 import readMetadata from 'read-metadata'
-import { Raw, Schema } from '../..'
+import { Raw, Editor, Schema } from '../..'
 import { strictEqual } from '../helpers/assert-json'
 import { resolve } from 'path'
 
@@ -22,8 +23,8 @@ describe('schema', () => {
       const expected = readMetadata.sync(resolve(dir, 'output.yaml'))
       const schema = Schema.create(require(dir))
 
-      let state = Raw.deserialize(input, { terse: true })
-      state = schema.transform(state)
+      const state = Raw.deserialize(input, { terse: true })
+      const editor = <Editor state={state} schema={schema} />
       const output = Raw.serialize(state, { terse: true })
       strictEqual(strip(output), strip(expected))
     })

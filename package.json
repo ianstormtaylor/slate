@@ -84,8 +84,8 @@
     "open": "open http://localhost:8080/dev.html",
     "prepublish": "npm run dist",
     "start": "http-server ./examples",
-    "test": "npm-run-all lint dist:npm test:server",
-    "test:server": "mocha --compilers js:babel-core/register --reporter spec ./test/server.js",
+    "test": "npm-run-all lint dist:npm tests",
+    "tests": "mocha --compilers js:babel-core/register --reporter spec ./test/server.js",
     "watch": "npm-run-all --parallel --print-label watch:dist watch:examples start",
     "watch:dist": "babel --watch --out-dir ./dist ./lib",
     "watch:examples": "watchify --debug --transform babelify ./examples/index.js -o ./examples/build.dev.js"
