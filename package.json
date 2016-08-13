@@ -51,7 +51,7 @@
     "react": "^15.2.0",
     "react-addons-perf": "^15.2.1",
     "react-dom": "^15.1.0",
-    "react-frame-aware-selection-plugin": "0.0.4",
+    "react-frame-aware-selection-plugin": "0.0.5",
     "react-frame-component": "^0.6.2",
     "react-portal": "^2.2.0",
     "react-router": "^2.5.1",
