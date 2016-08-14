@@ -25,6 +25,7 @@ When the editor needs to resolve a plugin-related handler, it will loop through 
   - [`onChange`](#onchange)
   - [`onBeforeChange`](#onbeforechange)
 
+
 ## Conventions
 
 A plugin should always export a function that takes options. This way even if it doesn't take any options now, it won't be a breaking API change to take more options in the future. So a basic plugin might look like this:

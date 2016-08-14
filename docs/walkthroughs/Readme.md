@@ -1,7 +1,7 @@
 
-# Guides
+# Walkthroughs
 
-These guides introduce you to the different parts of Slate in a step-by-step way that build on each other, perfect for getting started. We recommend reading them in order, start to finish!
+These walkthroughs introduce you to the different parts of Slate in a step-by-step way that build on each other, perfect for getting started. We recommend reading them in order, start to finish!
 
 - [Installing Slate](./installing-slate.md)
 - [Using the Bundled Source](./using-the-bundled-source.md)
@@ -12,4 +12,4 @@ These guides introduce you to the different parts of Slate in a step-by-step way
 - [Saving to a Database](./saving-to-a-database.md)
 - [Saving and Loading HTML Content](./saving-and-loading-html-content.md)
 
-_If you have an idea for a guide, or notice something that isn't clear, submit a pull request!_
+_If you have an idea for a walkthrough, or notice something that isn't clear, submit a pull request!_
