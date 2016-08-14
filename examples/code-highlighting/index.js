@@ -5,64 +5,68 @@ import React from 'react'
 import initialState from './state.json'
 
 /**
- * Define a set of node renderers.
+ * Define a code block component.
  *
- * @type {Object}
+ * @param {Object} props
+ * @return {Element}
  */
 
-const NODES = {
-  code: (props) => {
-    const { attributes, children, editor, node } = props
-    const language = node.data.get('language')
+function CodeBlock(props) {
+  const { attributes, children, editor, node } = props
+  const language = node.data.get('language')
 
-    function onChange(e) {
-      const state = editor.getState()
-      const next = state
-        .transform()
-        .setNodeByKey(node.key, {
-          data: {
-            language: e.target.value
-          }
-        })
-        .apply()
-      editor.onChange(next)
-    }
-
-    return (
-      <div style={{ position: 'relative' }}>
-        <pre>
-          <code {...props.attributes}>{props.children}</code>
-        </pre>
-        <div
-          contentEditable={false}
-          style={{ position: 'absolute', top: '5px', right: '5px' }}
-        >
-          <select value={language} onChange={onChange} >
-            <option value="css">CSS</option>
-            <option value="js">JavaScript</option>
-            <option value="html">HTML</option>
-          </select>
-        </div>
-      </div>
-    )
+  function onChange(e) {
+    const state = editor.getState()
+    const next = state
+      .transform()
+      .setNodeByKey(node.key, {
+        data: {
+          language: e.target.value
+        }
+      })
+      .apply()
+    editor.onChange(next)
   }
+
+  return (
+    <div style={{ position: 'relative' }}>
+      <pre>
+        <code {...props.attributes}>{props.children}</code>
+      </pre>
+      <div
+        contentEditable={false}
+        style={{ position: 'absolute', top: '5px', right: '5px' }}
+      >
+        <select value={language} onChange={onChange} >
+          <option value="css">CSS</option>
+          <option value="js">JavaScript</option>
+          <option value="html">HTML</option>
+        </select>
+      </div>
+    </div>
+  )
 }
 
 /**
- * Define a set of mark renderers.
+ * Define a schema.
  *
  * @type {Object}
  */
 
-const MARKS = {
-  'highlight-comment': {
-    opacity: '0.33'
+const schema = {
+  nodes: {
+    code: CodeBlock
   },
-  'highlight-keyword': {
-    fontWeight: 'bold'
-  },
-  'highlight-punctuation': {
-    opacity: '0.75'
+  marks: {
+    'highlight-comment': {
+      opacity: '0.33'
+    },
+    'highlight-keyword': {
+      fontWeight: 'bold'
+    },
+    'highlight-punctuation': {
+      opacity: '0.75'
+    }
   }
 }
 
@@ -125,37 +129,14 @@ class CodeHighlighting extends React.Component {
     return (
       <div className="editor">
         <Editor
+          schema={schema}
           state={this.state.state}
-          renderNode={this.renderNode}
-          renderMark={this.renderMark}
           renderDecorations={this.renderDecorations}
           onKeyDown={this.onKeyDown}
           onChange={this.onChange}
         />
       </div>
     )
-  }
-
-  /**
-   * Return a node renderer for a Slate `node`.
-   *
-   * @param {Node} node
-   * @return {Component or Void}
-   */
-
-  renderNode = (node) => {
-    return NODES[node.type]
-  }
-
-  /**
-   * Return a mark renderer for a Slate `mark`.
-   *
-   * @param {Mark} mark
-   * @return {Object or Void}
-   */
-
-  renderMark = (mark) => {
-    return MARKS[mark.type] || {}
   }
 
   /**
