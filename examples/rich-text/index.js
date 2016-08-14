@@ -23,30 +23,23 @@ const schema = {
     'heading-two': props => <h2 {...props.attributes}>{props.children}</h2>,
     'list-item': props => <li {...props.attributes}>{props.children}</li>,
     'numbered-list': props => <ol {...props.attributes}>{props.children}</ol>,
-  }
-}
-
-/**
- * Define a set of mark renderers.
- *
- * @type {Object}
- */
-
-const MARKS = {
-  bold: {
-    fontWeight: 'bold'
   },
-  code: {
-    fontFamily: 'monospace',
-    backgroundColor: '#eee',
-    padding: '3px',
-    borderRadius: '4px'
-  },
-  italic: {
-    fontStyle: 'italic'
-  },
-  underlined: {
-    textDecoration: 'underline'
+  marks: {
+    bold: {
+      fontWeight: 'bold'
+    },
+    code: {
+      fontFamily: 'monospace',
+      backgroundColor: '#eee',
+      padding: '3px',
+      borderRadius: '4px'
+    },
+    italic: {
+      fontStyle: 'italic'
+    },
+    underlined: {
+      textDecoration: 'underline'
+    }
   }
 }
 
