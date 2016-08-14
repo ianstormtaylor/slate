@@ -48,6 +48,44 @@ function CodeBlock(props) {
 }
 
 /**
+ * Define a Prism.js decorator for code blocks.
+ *
+ * @param {Text} text
+ * @param {Block} block
+ */
+
+function codeBlockDecorator(text, block) {
+  let characters = text.characters.asMutable()
+  const language = block.data.get('language')
+  const string = text.text
+  const grammar = Prism.languages[language]
+  const tokens = Prism.tokenize(string, grammar)
+  let offset = 0
+
+  for (const token of tokens) {
+    if (typeof token == 'string') {
+      offset += token.length
+      continue
+    }
+
+    const length = offset + token.content.length
+    const type = `highlight-${token.type}`
+
+    for (let i = offset; i < length; i++) {
+      let char = characters.get(i)
+      let { marks } = char
+      marks = marks.add(Mark.create({ type }))
+      char = char.merge({ marks })
+      characters = characters.set(i, char)
+    }
+
+    offset = length
+  }
+
+  return characters.asImmutable()
+}
+
+/**
  * Define a schema.
  *
  * @type {Object}
@@ -57,36 +95,7 @@ const schema = {
   nodes: {
     code: {
       component: CodeBlock,
-      decorator: (block, text) => {
-        let characters = text.characters.asMutable()
-        const language = block.data.get('language')
-        const string = text.text
-        const grammar = Prism.languages[language]
-        const tokens = Prism.tokenize(string, grammar)
-        let offset = 0
-
-        for (const token of tokens) {
-          if (typeof token == 'string') {
-            offset += token.length
-            continue
-          }
-
-          const length = offset + token.content.length
-          const type = `highlight-${token.type}`
-
-          for (let i = offset; i < length; i++) {
-            let char = characters.get(i)
-            let { marks } = char
-            marks = marks.add(Mark.create({ type }))
-            char = char.merge({ marks })
-            characters = characters.set(i, char)
-          }
-
-          offset = length
-        }
-
-        return characters.asImmutable()
-      }
+      decorator: codeBlockDecorator,
     }
   },
   marks: {

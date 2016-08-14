@@ -6,26 +6,17 @@ import position from 'selection-position'
 import initialState from './state.json'
 
 /**
- * Define a set of mark renderers.
+ * Define a schema.
  *
  * @type {Object}
  */
 
-const MARKS = {
-  bold: {
-    fontWeight: 'bold'
-  },
-  code: {
-    fontFamily: 'monospace',
-    backgroundColor: '#eee',
-    padding: '3px',
-    borderRadius: '4px'
-  },
-  italic: {
-    fontStyle: 'italic'
-  },
-  underlined: {
-    textDecoration: 'underline'
+const schema = {
+  marks: {
+    bold: props => <strong>{props.children}</strong>,
+    code: props => <code>{props.children}</code>,
+    italic: props => <em>{props.children}</em>,
+    underlined: props => <u>{props.children}</u>,
   }
 }
 
@@ -175,23 +166,12 @@ class HoveringMenu extends React.Component {
     return (
       <div className="editor">
         <Editor
+          schema={schema}
           state={this.state.state}
-          renderMark={this.renderMark}
           onChange={this.onChange}
         />
       </div>
     )
-  }
-
-  /**
-   * Return a mark renderer for a Slate `mark`.
-   *
-   * @param {Mark} mark
-   * @return {Object or Void}
-   */
-
-  renderMark = (mark) => {
-    return MARKS[mark.type]
   }
 
   /**

@@ -1,16 +1,11 @@
 
-import React from 'react'
 import { Mark } from '../../../..'
 
 const BOLD = {
   fontWeight: 'bold'
 }
 
-export function renderMark(mark) {
-  if (mark.type == 'bold') return BOLD
-}
-
-export function renderDecorations(text) {
+function decorator(text) {
   let { characters } = text
   let second = characters.get(1)
   let mark = Mark.create({ type: 'bold' })
@@ -18,4 +13,15 @@ export function renderDecorations(text) {
   second = second.merge({ marks })
   characters = characters.set(1, second)
   return characters
+}
+
+export const schema = {
+  nodes: {
+    default: {
+      decorator
+    }
+  },
+  marks: {
+    bold: BOLD
+  }
 }

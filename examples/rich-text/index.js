@@ -299,23 +299,11 @@ class RichText extends React.Component {
           placeholder={'Enter some rich text...'}
           schema={schema}
           state={this.state.state}
-          renderMark={this.renderMark}
           onChange={this.onChange}
           onKeyDown={this.onKeyDown}
         />
       </div>
     )
-  }
-
-  /**
-   * Return a mark renderer for a Slate `mark`.
-   *
-   * @param {Mark} mark
-   * @return {Object or Void}
-   */
-
-  renderMark = (mark) => {
-    return MARKS[mark.type]
   }
 
 }

@@ -7,6 +7,8 @@ class Bold extends React.Component {
   }
 }
 
-export function renderMark(mark) {
-  if (mark.type == 'bold') return Bold
+export const schema = {
+  marks: {
+    bold: Bold
+  }
 }

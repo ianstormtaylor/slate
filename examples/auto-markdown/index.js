@@ -4,21 +4,23 @@ import React from 'react'
 import initialState from './state.json'
 
 /**
- * Define a set of node renderers.
+ * Define a schema.
  *
  * @type {Object}
  */
 
-const NODES = {
-  'block-quote': props => <blockquote>{props.children}</blockquote>,
-  'bulleted-list': props => <ul>{props.children}</ul>,
-  'heading-one': props => <h1>{props.children}</h1>,
-  'heading-two': props => <h2>{props.children}</h2>,
-  'heading-three': props => <h3>{props.children}</h3>,
-  'heading-four': props => <h4>{props.children}</h4>,
-  'heading-five': props => <h5>{props.children}</h5>,
-  'heading-six': props => <h6>{props.children}</h6>,
-  'list-item': props => <li>{props.children}</li>
+const schema = {
+  nodes: {
+    'block-quote': props => <blockquote>{props.children}</blockquote>,
+    'bulleted-list': props => <ul>{props.children}</ul>,
+    'heading-one': props => <h1>{props.children}</h1>,
+    'heading-two': props => <h2>{props.children}</h2>,
+    'heading-three': props => <h3>{props.children}</h3>,
+    'heading-four': props => <h4>{props.children}</h4>,
+    'heading-five': props => <h5>{props.children}</h5>,
+    'heading-six': props => <h6>{props.children}</h6>,
+    'list-item': props => <li>{props.children}</li>,
+  }
 }
 
 /**
@@ -73,24 +75,13 @@ class AutoMarkdown extends React.Component {
     return (
       <div className="editor">
         <Editor
+          schema={schema}
           state={this.state.state}
           onChange={this.onChange}
           onKeyDown={this.onKeyDown}
-          renderNode={this.renderNode}
         />
       </div>
     )
-  }
-
-  /**
-   * Render a `node`.
-   *
-   * @param {Node} node
-   * @return {Element}
-   */
-
-  renderNode = (node) => {
-    return NODES[node.type]
   }
 
   /**

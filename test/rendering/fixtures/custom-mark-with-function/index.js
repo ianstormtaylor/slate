@@ -1,10 +1,12 @@
 
 import React from 'react'
 
-function BOLD(props) {
+function Bold(props) {
   return <strong>{props.children}</strong>
 }
 
-export function renderMark(mark) {
-  if (mark.type == 'bold') return BOLD
+export const schema = {
+  marks: {
+    bold: Bold
+  }
 }

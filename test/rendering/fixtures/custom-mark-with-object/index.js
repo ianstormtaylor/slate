@@ -1,9 +1,9 @@
 
 import React from 'react'
 
-export function renderMark(mark) {
-  if (mark.type == 'bold') {
-    return {
+export const schema = {
+  marks: {
+    bold: {
       fontWeight: 'bold'
     }
   }
