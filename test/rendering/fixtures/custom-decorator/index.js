@@ -5,7 +5,7 @@ const BOLD = {
   fontWeight: 'bold'
 }
 
-function decorator(text) {
+function decorate(text, block) {
   let { characters } = text
   let second = characters.get(1)
   let mark = Mark.create({ type: 'bold' })
@@ -18,7 +18,7 @@ function decorator(text) {
 export const schema = {
   nodes: {
     default: {
-      decorator
+      decorate
     }
   },
   marks: {

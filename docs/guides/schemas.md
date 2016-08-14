@@ -16,8 +16,8 @@ Slate schemas are built up of a set of rules. Every rule has a few properties:
 ```js
 {
   match: Function || Object,
-  component: Component || Function || Object || String,
-  decorator: Function,
+  render: Component || Function || Object || String,
+  decorate: Function,
   validate: Function || Object,
   transform: Function
 }
