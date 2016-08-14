@@ -55,7 +55,39 @@ function CodeBlock(props) {
 
 const schema = {
   nodes: {
-    code: CodeBlock
+    code: {
+      component: CodeBlock,
+      decorator: (block, text) => {
+        let characters = text.characters.asMutable()
+        const language = block.data.get('language')
+        const string = text.text
+        const grammar = Prism.languages[language]
+        const tokens = Prism.tokenize(string, grammar)
+        let offset = 0
+
+        for (const token of tokens) {
+          if (typeof token == 'string') {
+            offset += token.length
+            continue
+          }
+
+          const length = offset + token.content.length
+          const type = `highlight-${token.type}`
+
+          for (let i = offset; i < length; i++) {
+            let char = characters.get(i)
+            let { marks } = char
+            marks = marks.add(Mark.create({ type }))
+            char = char.merge({ marks })
+            characters = characters.set(i, char)
+          }
+
+          offset = length
+        }
+
+        return characters.asImmutable()
+      }
+    }
   },
   marks: {
     'highlight-comment': {
@@ -131,53 +163,11 @@ class CodeHighlighting extends React.Component {
         <Editor
           schema={schema}
           state={this.state.state}
-          renderDecorations={this.renderDecorations}
           onKeyDown={this.onKeyDown}
           onChange={this.onChange}
         />
       </div>
     )
-  }
-
-  /**
-   * Render decorations on `text` nodes inside code blocks.
-   *
-   * @param {Text} text
-   * @param {Block} block
-   * @return {Characters}
-   */
-
-  renderDecorations = (text, block) => {
-    if (block.type != 'code') return text.characters
-
-    let characters = text.characters.asMutable()
-    const language = block.data.get('language')
-    const string = text.text
-    const grammar = Prism.languages[language]
-    const tokens = Prism.tokenize(string, grammar)
-    let offset = 0
-
-    for (const token of tokens) {
-      if (typeof token == 'string') {
-        offset += token.length
-        continue
-      }
-
-      const length = offset + token.content.length
-      const type = `highlight-${token.type}`
-
-      for (let i = offset; i < length; i++) {
-        let char = characters.get(i)
-        let { marks } = char
-        marks = marks.add(Mark.create({ type }))
-        char = char.merge({ marks })
-        characters = characters.set(i, char)
-      }
-
-      offset = length
-    }
-
-    return characters.asImmutable()
   }
 
 }
