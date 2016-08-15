@@ -94,8 +94,8 @@ function codeBlockDecorator(text, block) {
 const schema = {
   nodes: {
     code: {
-      component: CodeBlock,
-      decorator: codeBlockDecorator,
+      render: CodeBlock,
+      decorate: codeBlockDecorator,
     }
   },
   marks: {

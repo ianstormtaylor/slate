@@ -87,7 +87,7 @@
     "lint": "eslint --ignore-pattern 'build.dev.js' --ignore-pattern 'build.prod.js' '{examples,lib}/**/*.js'",
     "open": "open http://localhost:8080/dev.html",
     "prepublish": "npm run dist",
-    "publish": "np",
+    "release": "np",
     "start": "http-server ./examples",
     "test": "npm-run-all lint dist:npm tests",
     "tests": "mocha --compilers js:babel-core/register --reporter spec ./test/server.js",
