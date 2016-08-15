@@ -16,11 +16,8 @@ import { Editor } from 'slate'
 
 class App extends React.Component {
 
-  constructor(props) {
-    super(props)
-    this.state = {
-      state: Plain.deserialize('')
-    }
+  state = {
+    state: Plain.deserialize('')
   }
 
   render() {
@@ -213,8 +210,6 @@ const html = new Html({ rules })
 
 And finally, now that we have our serializer initialized, we can update our app to use it to save and load content, like so:
 
-
-
 ```js
 // Load the initial state from Local Storage or a default.
 const initialState = (
@@ -224,10 +219,20 @@ const initialState = (
 
 class App extends React.Component {
 
-  constructor(props) {
-    super(props)
-    this.state = {
-      state: html.deserialize(initialState)
+  state = {
+    state: html.deserialize(initialState),
+    // Add a schema with our nodes and marks...
+    schema: {
+      nodes: {
+        code: props => <pre {...props.attributes}>{props.children}</pre>,
+        paragraph: props => <p {...props.attributes}>{props.children}</p>,
+        quote: props => <blockquote {...props.attributes}>{props.children}</blockquote>,
+      },
+      marks: {
+        bold: props => <strong>{props.children}</strong>,
+        italic: props => <em>{props.children}</em>,
+        underline: props => <u>{props.children}</u>,
+      }
     }
   }
 
@@ -235,6 +240,7 @@ class App extends React.Component {
     // Add the `onDocumentChange` handler.
     return (
       <Editor
+        schema={this.state.schema}
         state={this.state.state}
         onChange={state => this.onChange(state)}
         onDocumentChange={(document, state) => this.onDocumentChange(document, state)}

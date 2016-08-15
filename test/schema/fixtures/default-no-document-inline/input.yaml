@@ -1,0 +1,12 @@
+
+nodes:
+  - kind: inline
+    type: default
+    nodes:
+      - kind: text
+        text: one
+  - kind: block
+    type: default
+    nodes:
+      - kind: text
+        text: two

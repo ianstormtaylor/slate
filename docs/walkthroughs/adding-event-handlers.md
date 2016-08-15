@@ -16,29 +16,17 @@ So we start with our app from earlier:
 ```js
 class App extends React.Component {
 
-  constructor(props) {
-    super(props)
-    this.state = {
-      state: initialState
-    }
+  state = {
+    state: initialState
   }
 
   render() {
     return (
       <Editor
         state={this.state.state}
-        renderNode={node => this.renderNode(node)}
-        onChange={state => this.onChange(state)}
+        onChange={state => this.setState({ state })}
       />
     )
-  }
-
-  renderNode(node) {
-    if (node.type == 'paragraph') return ParagraphNode
-  }
-
-  onChange(state) {
-    this.setState({ state })
   }
 
 }
@@ -49,30 +37,18 @@ And now we'll add an `onKeyDown` handler:
 ```js
 class App extends React.Component {
 
-  constructor(props) {
-    super(props)
-    this.state = {
-      state: initialState
-    }
+  state = {
+    state: initialState
   }
 
   render() {
     return (
       <Editor
         state={this.state.state}
-        renderNode={node => this.renderNode(node)}
-        onChange={state => this.onChange(state)}
+        onChange={state => this.setState({ state })}
         onKeyDown={(e, state) => this.onKeyDown(e, state)}
       />
     )
-  }
-
-  renderNode(node) {
-    if (node.type == 'paragraph') return ParagraphNode
-  }
-
-  onChange(state) {
-    this.setState({ state })
   }
 
   // Define a new handler which prints the key code that was pressed.
@@ -85,37 +61,25 @@ class App extends React.Component {
 
 Okay cool, so now when you press a key in the editor, you'll see the key's code printed to the console. Not very useful, but at least we know it's working. 
 
-Now we want to make it actually change the content. For the purposes of our example, let's say we want to make it so that whenever a user types `&` we actually add `and` to the content. 
+Now we want to make it actually change the content. For the purposes of our example, let's say we want to make it so that whenever a user types <kbd>&</kbd> we actually add `and` to the content. 
 
 Our `onKeyDown` handler might look like this:
 
 ```js
 class App extends React.Component {
 
-  constructor(props) {
-    super(props)
-    this.state = {
-      state: initialState
-    }
+  state = {
+    state: initialState
   }
 
   render() {
     return (
       <Editor
         state={this.state.state}
-        renderNode={node => this.renderNode(node)}
-        onChange={state => this.onChange(state)}
+        onChange={state => this.setState({ state })}
         onKeyDown={(e, state) => this.onKeyDown(e, state)}
       />
     )
-  }
-
-  renderNode(node) {
-    if (node.type == 'paragraph') return ParagraphNode
-  }
-
-  onChange(state) {
-    this.setState({ state })
   }
 
   onKeyDown(event, state) {
@@ -135,7 +99,7 @@ class App extends React.Component {
 }
 ```
 
-With that added, try typing `&`, and you should see it automatically become `and` instead!
+With that added, try typing <kbd>&</kbd>, and you should see it automatically become `and` instead!
 
 That gives you a sense for what you can do with Slate's event handlers. Each one will be called with the `event` object, and the current `state` of the editor. And if you return a new `state`, the editor will be updated. Simple!
 

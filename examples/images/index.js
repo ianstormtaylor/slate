@@ -7,20 +7,22 @@ import isImage from 'is-image'
 import isUrl from 'is-url'
 
 /**
- * Define a set of node renderers.
+ * Define a schema.
  *
  * @type {Object}
  */
 
-const NODES = {
-  image: (props) => {
-    const { node, state } = props
-    const isFocused = state.selection.hasEdgeIn(node)
-    const src = node.data.get('src')
-    const className = isFocused ? 'active' : null
-    return (
-      <img src={src} className={className} {...props.attributes} />
-    )
+const schema = {
+  nodes: {
+    image: (props) => {
+      const { node, state } = props
+      const isFocused = state.selection.hasEdgeIn(node)
+      const src = node.data.get('src')
+      const className = isFocused ? 'active' : null
+      return (
+        <img src={src} className={className} {...props.attributes} />
+      )
+    }
   }
 }
 
@@ -83,8 +85,8 @@ class Images extends React.Component {
     return (
       <div className="editor">
         <Editor
+          schema={schema}
           state={this.state.state}
-          renderNode={this.renderNode}
           onChange={this.onChange}
           onDocumentChange={this.onDocumentChange}
           onDrop={this.onDrop}
@@ -92,17 +94,6 @@ class Images extends React.Component {
         />
       </div>
     )
-  }
-
-  /**
-   * Render a `node`.
-   *
-   * @param {Node} node
-   * @return {Element}
-   */
-
-  renderNode = (node) => {
-    return NODES[node.type]
   }
 
   /**

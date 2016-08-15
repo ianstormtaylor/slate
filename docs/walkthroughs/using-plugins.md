@@ -14,45 +14,33 @@ So let's break that logic out into it's a reusable plugin that can toggle _any_ 
 Starting with our app from earlier:
 
 ```js
-const BOLD_MARK = {
-  fontWeight: 'bold'
-}
-
 class App extends React.Component {
 
-  constructor(props) {
-    super(props)
-    this.state = {
-      state: initialState
+  state = {
+    state: initialState,
+    schema: {
+      marks: {
+        bold: props => <strong>{props.children}</strong>
+      }
     }
   }
 
   render() {
     return (
       <Editor
+        schema={this.state.schema}
         state={this.state.state}
-        renderMark={mark => this.renderMark(mark)}
-        onChange={state => this.onChange(state)}
+        onChange={state => this.setState({ state })}
         onKeyDown={(e, state) => this.onKeyDown(e, state)}
       />
     )
   }
 
-  renderMark(mark) {
-    if (mark.type == 'bold') return BOLD_MARK
-  }
-
-  onChange(state) {
-    this.setState({ state })
-  }
-
   onKeyDown(event, state) {
     if (!event.metaKey || event.which != 66) return
-
-    const isBold = state.marks.some(mark => mark.type == 'bold')
     return state
       .transform()
-      [isBold ? 'removeMark' : 'addMark']('bold')
+      .toggleMark('bold')
       .apply()
   }
 
@@ -84,13 +72,10 @@ function MarkHotkey(options) {
       // Check that the key pressed matches our `code` option.
       if (!event.metaKey || event.which != code) return
 
-      // Determine whether our `type` option mark is currently active.
-      const isActive = state.marks.some(mark => mark.type == type)
-
-      // Toggle the mark `type` based on whether it is active.
+      // Toggle the mark `type`.
       return state
         .transform()
-        [isActive ? 'removeMark' : 'addMark'](type)
+        .toggleMark(type)
         .apply()
     }
   }
@@ -102,8 +87,8 @@ Boom! Now we're getting somewhere. That code is reusable for any type of mark.
 Now that we have our plugin, let's remove the hard-coded logic from our app, and replace it with our brand new `MarkHotkey` plugin instead, passing in the same options that will keep our **bold** functionality intact:
 
 ```js
-const BOLD_MARK = {
-  fontWeight: 'bold'
+function BoldMark(props) {
+  return <strong>{props.children}</strong>
 }
 
 // Initialize our bold-mark-adding plugin.
@@ -119,31 +104,25 @@ const plugins = [
 
 class App extends React.Component {
 
-  constructor(props) {
-    super(props)
-    this.state = {
-      state: initialState
+  state = {
+    state: initialState,
+    schema: {
+      marks: {
+        bold: props => <strong>{props.children}</strong>
+      }
     }
   }
 
-  // Add the `plugins` property to the editor, and remove `onKeyDown`.
   render() {
     return (
+      // Add the `plugins` property to the editor, and remove `onKeyDown`.
       <Editor
-        state={this.state.state}
         plugins={plugins}
-        renderMark={mark => this.renderMark(mark)}
-        onChange={state => this.onChange(state)}
+        schema={this.state.schema}
+        state={this.state.state}
+        onChange={state => this.setState({ state })}
       />
     )
-  }
-
-  renderMark(mark) {
-    if (mark.type == 'bold') return BOLD_MARK
-  }
-
-  onChange(state) {
-    this.setState({ state })
   }
 
 }
@@ -154,26 +133,7 @@ Awesome. If you test out the editor now, you'll notice that everything still wor
 Let's add _italic_, `code`, ~~strikethrough~~ and underline marks:
 
 ```js
-// Add our new mark renderers...
-const MARKS = {
-  bold: {
-    fontWeight: 'bold'
-  },
-  code: {
-    fontFamily: 'monospace'
-  },
-  italic: {
-    fontStyle: 'italic'
-  },
-  strikethrough: {
-    textDecoration: 'strikethrough'
-  },
-  underline: {
-    textDecoration: 'underline'
-  }
-}
-
-// Initialize our plugins...
+// Initialize a plugin for each mark...
 const plugins = [
   MarkHotkey({ code: 66, type: 'bold' }),
   MarkHotkey({ code: 192, type: 'code' }),
@@ -184,31 +144,29 @@ const plugins = [
 
 class App extends React.Component {
 
-  constructor(props) {
-    super(props)
-    this.state = {
-      state: initialState
+  state = {
+    state: initialState,
+    schema: {
+      marks: {
+        bold: props => <strong>{props.children}</strong>,
+        // Add our new mark renderers...
+        code: props => <code>{props.children}</code>,
+        italic: props => <em>{props.children}</em>,
+        strikethrough: props => <del>{props.children}</del>,
+        underline: props => <u>{props.children}</u>,
+      }
     }
   }
 
   render() {
     return (
       <Editor
-        state={this.state.state}
         plugins={plugins}
-        renderMark={mark => this.renderMark(mark)}
-        onChange={state => this.onChange(state)}
+        schema={this.state.schema}
+        state={this.state.state}
+        onChange={state => this.setState({ state })}
       />
     )
-  }
-
-  // Update our render function to handle all the new marks...
-  renderMark(mark) {
-    return MARKS[mark.type]
-  }
-
-  onChange(state) {
-    this.setState({ state })
   }
 
 }
@@ -244,11 +202,9 @@ function MarkHotkey(options) {
     onKeyDown(event, state) {
       // Change the comparison to use the key name.
       if (!event.metaKey || keycode(event.which) != key) return
-
-      const isActive = state.marks.some(mark => mark.type == type)
       return state
         .transform()
-        [isActive ? 'removeMark' : 'addMark'](type)
+        .toggleMark(type)
         .apply()
     }
   }
@@ -258,24 +214,6 @@ function MarkHotkey(options) {
 And now we can make our app code much clearer for the next person who reads it:
 
 ```js
-const MARKS = {
-  bold: {
-    fontWeight: 'bold'
-  },
-  code: {
-    fontFamily: 'monospace'
-  },
-  italic: {
-    fontStyle: 'italic'
-  },
-  strikethrough: {
-    textDecoration: 'strikethrough'
-  },
-  underline: {
-    textDecoration: 'underline'
-  }
-}
-
 // Use the much clearer key names instead of key codes!
 const plugins = [
   MarkHotkey({ key: 'b', type: 'bold' }),
@@ -287,30 +225,28 @@ const plugins = [
 
 class App extends React.Component {
 
-  constructor(props) {
-    super(props)
-    this.state = {
-      state: initialState
+  state = {
+    state: initialState,
+    schema: {
+      marks: {
+        bold: props => <strong>{props.children}</strong>,
+        code: props => <code>{props.children}</code>,
+        italic: props => <em>{props.children}</em>,
+        strikethrough: props => <del>{props.children}</del>,
+        underline: props => <u>{props.children}</u>,
+      }
     }
   }
 
   render() {
     return (
       <Editor
-        state={this.state.state}
         plugins={plugins}
-        renderMark={mark => this.renderMark(mark)}
-        onChange={state => this.onChange(state)}
+        schema={this.state.schema}
+        state={this.state.state}
+        onChange={state => this.setState({ state })}
       />
     )
-  }
-
-  renderMark(mark) {
-    return MARKS[mark.type]
-  }
-
-  onChange(state) {
-    this.setState({ state })
   }
 
 }

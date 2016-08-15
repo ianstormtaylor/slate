@@ -17,13 +17,11 @@ When the editor needs to resolve a plugin-related handler, it will loop through 
   - [`onKeyDown`](#onkeydown)
   - [`onPaste`](#onpaste)
   - [`onSelect`](#onselect)
-- [Renderer Properties](#renderer-properties)
-  - [`renderDecorations`](#renderdecorations)
-  - [`renderMark`](#rendermark)
-  - [`renderNode`](#rendernode)
 - [Other Properties](#other-properties)
   - [`onChange`](#onchange)
   - [`onBeforeChange`](#onbeforechange)
+  - [`schema`](#schema)
+
 
 ## Conventions
 
@@ -192,94 +190,6 @@ The `data` object contains a State [`Selection`](../models/selection.md) object 
 If no other plugin handles this event, it will be handled by the [Core plugin](./core.md).
 
 
-## Renderer Properties
-
-```js
-{
-  renderDecorations: Function,
-  renderMark: Function,
-  renderNode: Function
-}
-```
-
-To customize the renderer output of the editor, plugins can define a set of "renderer" properties.
-
-### `renderDecorations`
-`Function renderDecorations(text: Text, state: State, editor: Editor) => Characters || Void`
-
-The `renderDecorations` handler allows you to add dynamic, content-aware [`Marks`](../models/mark.md) to ranges of text, without having them show up in the serialized state of the editor. This is useful for things like code highlighting, where the marks will change as the user types.
-
-`renderDecorations` is called for every `text` node in the document, and should return a set of updated [`Characters`](../models/character.md) for the text node in question. Every plugin's decoration logic is called, and the resulting characters are unioned, such that multiple plugins can apply decorations to the same pieces of text.
-
-### `renderMark`
-`Function renderMark(mark: Mark, marks: Set, state: State, editor: Editor) => Component || Object || String || Void`
-
-The `renderMark` handler allows you to define the styles that each mark should be rendered with. It is passed a `mark` and the set of `marks`, and should return either a React component, an object of styles, or a class string. For example any of these are valid return values:
-
-```js
-function Bold(props) {
-  return <strong>{props.children}</strong>
-}
-
-function renderMark(mark) {
-  if (mark.type == 'bold') return Bold
-}
-```
-
-```js
-function renderMark(mark) {
-  if (mark.type == 'bold') {
-    return {
-      fontWeight: 'bold'
-    }
-  }
-}
-```
-
-```js
-function renderMark(mark) {
-  if (mark.type == 'bold') return 'my-bold-class'
-}
-```
-
-### `renderNode`
-`Function renderNode(node: Block || Inline, state: State, editor: Editor) => Component || Void`
-
-The `renderNode` handler allows you to define the component that will be used to render a node—both blocks and inlines. It takes a [`Node`](../models/node.md) object, and should return a React component.
-
-The component will be called with a set of properties:
-
-```js
-<Component
-  attributes={Object}
-  children={Any}
-  node={Node}
-  state={State}
-/>
-```
-
-- `attributes` — a dictionary of attributes that **you must** add to the top-level element of the rendered component. Using the [Object Spread Syntax (Stage 2)](https://github.com/sebmarkbage/ecmascript-rest-spread) this is as easy as `...props.attributes`.
-- `children` — a set of React element children that **you must** render as the leaf element in your component.
-- `node` — the node being rendered.
-- `state` — the current state of the editor.
-
-Such that a simple code block renderer might look like this:
-
-```js
-const CodeBlockRenderer = (props) => {
-  return (
-    <pre {...props.attributes}>
-      <code>
-        {props.children}
-      </code>
-    </pre>
-  )
-}    
-```
-
-The `node` itself is passed in, so you can access any custom data associated with it via its `data` property.
-
-
 ## Other Properties
 
 ```js
@@ -303,3 +213,8 @@ This allows you to stack up changes across the entire plugin stack.
 The `onBeforeChange` handler isn't a native browser event handler. Instead, it is invoked whenever the editor receives a new state and before propagating a new state to `onChange`. Returning a new state will update the editor's state before rendering, continuing down the plugin stack.
 
 Like `onChange`, `onBeforeChange` is cummulative.
+
+### `schema`
+`Object`
+
+The `schema` property allows you to define a set of rules that will be added to the editor's schema. The rules from each of the schemas returned by the plugins are collected into a single schema for the editor, and the rules are applied in the same order as the plugin stack.

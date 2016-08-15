@@ -5,6 +5,18 @@ This document maintains a list of changes to Slate with each new version. Until 
 ---
 
 
+### `0.13.0` — August 14, 2016
+
+###### BREAKING CHANGES
+
+- **The `renderNode` and `renderMark` properties are gone!** Previously, rendering nodes and marks happened via these two properties of the `<Editor>`, but this has been replaced by the new `schema` property. Check out the updated examples to see how to define a schema! There's a good chance this eliminates extra code for most use cases! :smile:
+
+- **The `renderDecorations` property is gone!** Decoration rendering has also been replaced by the new `schema` property of the `<Editor>`.
+
+
+---
+
+
 ### `0.12.0` — August 9, 2016
 
 ###### BREAKING CHANGES

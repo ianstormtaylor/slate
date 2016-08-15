@@ -5,64 +5,109 @@ import React from 'react'
 import initialState from './state.json'
 
 /**
- * Define a set of node renderers.
+ * Define a code block component.
  *
- * @type {Object}
+ * @param {Object} props
+ * @return {Element}
  */
 
-const NODES = {
-  code: (props) => {
-    const { attributes, children, editor, node } = props
-    const language = node.data.get('language')
+function CodeBlock(props) {
+  const { attributes, children, editor, node } = props
+  const language = node.data.get('language')
 
-    function onChange(e) {
-      const state = editor.getState()
-      const next = state
-        .transform()
-        .setNodeByKey(node.key, {
-          data: {
-            language: e.target.value
-          }
-        })
-        .apply()
-      editor.onChange(next)
-    }
-
-    return (
-      <div style={{ position: 'relative' }}>
-        <pre>
-          <code {...props.attributes}>{props.children}</code>
-        </pre>
-        <div
-          contentEditable={false}
-          style={{ position: 'absolute', top: '5px', right: '5px' }}
-        >
-          <select value={language} onChange={onChange} >
-            <option value="css">CSS</option>
-            <option value="js">JavaScript</option>
-            <option value="html">HTML</option>
-          </select>
-        </div>
-      </div>
-    )
+  function onChange(e) {
+    const state = editor.getState()
+    const next = state
+      .transform()
+      .setNodeByKey(node.key, {
+        data: {
+          language: e.target.value
+        }
+      })
+      .apply()
+    editor.onChange(next)
   }
+
+  return (
+    <div style={{ position: 'relative' }}>
+      <pre>
+        <code {...props.attributes}>{props.children}</code>
+      </pre>
+      <div
+        contentEditable={false}
+        style={{ position: 'absolute', top: '5px', right: '5px' }}
+      >
+        <select value={language} onChange={onChange} >
+          <option value="css">CSS</option>
+          <option value="js">JavaScript</option>
+          <option value="html">HTML</option>
+        </select>
+      </div>
+    </div>
+  )
 }
 
 /**
- * Define a set of mark renderers.
+ * Define a Prism.js decorator for code blocks.
+ *
+ * @param {Text} text
+ * @param {Block} block
+ */
+
+function codeBlockDecorator(text, block) {
+  let characters = text.characters.asMutable()
+  const language = block.data.get('language')
+  const string = text.text
+  const grammar = Prism.languages[language]
+  const tokens = Prism.tokenize(string, grammar)
+  let offset = 0
+
+  for (const token of tokens) {
+    if (typeof token == 'string') {
+      offset += token.length
+      continue
+    }
+
+    const length = offset + token.content.length
+    const type = `highlight-${token.type}`
+
+    for (let i = offset; i < length; i++) {
+      let char = characters.get(i)
+      let { marks } = char
+      marks = marks.add(Mark.create({ type }))
+      char = char.merge({ marks })
+      characters = characters.set(i, char)
+    }
+
+    offset = length
+  }
+
+  return characters.asImmutable()
+}
+
+/**
+ * Define a schema.
  *
  * @type {Object}
  */
 
-const MARKS = {
-  'highlight-comment': {
-    opacity: '0.33'
+const schema = {
+  nodes: {
+    code: {
+      render: CodeBlock,
+      decorate: codeBlockDecorator,
+    }
   },
-  'highlight-keyword': {
-    fontWeight: 'bold'
-  },
-  'highlight-punctuation': {
-    opacity: '0.75'
+  marks: {
+    'highlight-comment': {
+      opacity: '0.33'
+    },
+    'highlight-keyword': {
+      fontWeight: 'bold'
+    },
+    'highlight-punctuation': {
+      opacity: '0.75'
+    }
   }
 }
 
@@ -125,78 +170,13 @@ class CodeHighlighting extends React.Component {
     return (
       <div className="editor">
         <Editor
+          schema={schema}
           state={this.state.state}
-          renderNode={this.renderNode}
-          renderMark={this.renderMark}
-          renderDecorations={this.renderDecorations}
           onKeyDown={this.onKeyDown}
           onChange={this.onChange}
         />
       </div>
     )
-  }
-
-  /**
-   * Return a node renderer for a Slate `node`.
-   *
-   * @param {Node} node
-   * @return {Component or Void}
-   */
-
-  renderNode = (node) => {
-    return NODES[node.type]
-  }
-
-  /**
-   * Return a mark renderer for a Slate `mark`.
-   *
-   * @param {Mark} mark
-   * @return {Object or Void}
-   */
-
-  renderMark = (mark) => {
-    return MARKS[mark.type] || {}
-  }
-
-  /**
-   * Render decorations on `text` nodes inside code blocks.
-   *
-   * @param {Text} text
-   * @param {Block} block
-   * @return {Characters}
-   */
-
-  renderDecorations = (text, block) => {
-    if (block.type != 'code') return text.characters
-
-    let characters = text.characters.asMutable()
-    const language = block.data.get('language')
-    const string = text.text
-    const grammar = Prism.languages[language]
-    const tokens = Prism.tokenize(string, grammar)
-    let offset = 0
-
-    for (const token of tokens) {
-      if (typeof token == 'string') {
-        offset += token.length
-        continue
-      }
-
-      const length = offset + token.content.length
-      const type = `highlight-${token.type}`
-
-      for (let i = offset; i < length; i++) {
-        let char = characters.get(i)
-        let { marks } = char
-        marks = marks.add(Mark.create({ type }))
-        char = char.merge({ marks })
-        characters = characters.set(i, char)
-      }
-
-      offset = length
-    }
-
-    return characters.asImmutable()
   }
 
 }

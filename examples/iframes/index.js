@@ -20,28 +20,23 @@ injector()
 const DEFAULT_NODE = 'paragraph'
 
 /**
- * Define a set of node renderers.
+ * Define a schema.
  *
  * @type {Object}
  */
 
-const NODES = {
-  'block-code': props => <pre><code {...props.attributes}>{props.children}</code></pre>,
-  'block-quote': props => <blockquote {...props.attributes}>{props.children}</blockquote>,
-  'heading-two': props => <h2 {...props.attributes}>{props.children}</h2>,
-  'paragraph': props => <p {...props.attributes}>{props.children}</p>
-}
-
-/**
- * Define a set of mark renderers.
- *
- * @type {Object}
- */
-
-const MARKS = {
-  bold: props => <strong>{props.children}</strong>,
-  highlight: props => <mark>{props.children}</mark>,
-  italic: props => <em>{props.children}</em>,
+const schema = {
+  nodes: {
+    'block-code': props => <pre><code {...props.attributes}>{props.children}</code></pre>,
+    'block-quote': props => <blockquote {...props.attributes}>{props.children}</blockquote>,
+    'heading-two': props => <h2 {...props.attributes}>{props.children}</h2>,
+    'paragraph': props => <p {...props.attributes}>{props.children}</p>,
+  },
+  marks: {
+    bold: props => <strong>{props.children}</strong>,
+    highlight: props => <mark>{props.children}</mark>,
+    italic: props => <em>{props.children}</em>,
+  }
 }
 
 /**
@@ -274,35 +269,12 @@ class Iframes extends React.Component {
     return (
       <Editor
         placeholder={'Enter some rich text...'}
+        schema={schema}
         state={this.state.state}
-        renderNode={this.renderNode}
-        renderMark={this.renderMark}
         onChange={this.onChange}
         onKeyDown={this.onKeyDown}
       />
     )
-  }
-
-  /**
-   * Return a node renderer for a Slate `node`.
-   *
-   * @param {Node} node
-   * @return {Component or Void}
-   */
-
-  renderNode = (node) => {
-    return NODES[node.type]
-  }
-
-  /**
-   * Return a mark renderer for a Slate `mark`.
-   *
-   * @param {Mark} mark
-   * @return {Object or Void}
-   */
-
-  renderMark = (mark) => {
-    return MARKS[mark.type]
   }
 
 }

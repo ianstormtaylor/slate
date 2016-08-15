@@ -1,11 +1,10 @@
 
-import assert from 'assert'
 import fs from 'fs'
 import readMetadata from 'read-metadata'
 import strip from '../helpers/strip-dynamic'
 import toCamel from 'to-camel-case'
-import { Raw, State } from '../..'
-import { equal, strictEqual } from '../helpers/assert-json'
+import { Raw } from '../..'
+import { strictEqual } from '../helpers/assert-json'
 import { resolve } from 'path'
 
 /**

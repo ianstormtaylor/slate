@@ -5,13 +5,15 @@ import SoftBreak from 'slate-soft-break'
 import initialState from './state.json'
 
 /**
- * Define a set of node renderers.
+ * Define a schema.
  *
  * @type {Object}
  */
 
-const NODES = {
-  'block-quote': (props) => <blockquote {...props.attributes}>{props.children}</blockquote>,
+const schema = {
+  nodes: {
+    'block-quote': (props) => <blockquote {...props.attributes}>{props.children}</blockquote>,
+  }
 }
 
 /**
@@ -69,23 +71,12 @@ class PlainText extends React.Component {
     return (
       <Editor
         placeholder={'Enter some plain text...'}
+        schema={schema}
+        state={this.state.state}
         onChange={this.onChange}
         onKeyDown={this.onKeyDown}
-        renderNode={this.renderNode}
-        state={this.state.state}
       />
     )
-  }
-
-  /**
-   * Return a node renderer for a Slate `node`.
-   *
-   * @param {Node} node
-   * @return {Component or Void}
-   */
-
-  renderNode = (node) => {
-    return NODES[node.type]
   }
 
 }

@@ -18,11 +18,8 @@ const initialState = Plain.deserialize('The initial state string!')
 
 class App extends React.Component {
 
-  constructor(props) {
-    super(props)
-    this.state = {
-      state: initialState
-    }
+  state = {
+    state: initialState
   }
 
   render() {
@@ -54,11 +51,8 @@ const initialState = Plain.deserialize('The initial state string!')
 
 class App extends React.Component {
 
-  constructor(props) {
-    super(props)
-    this.state = {
-      state: initialState
-    }
+  state = {
+    state: initialState
   }
 
   render() {
@@ -94,11 +88,8 @@ const initialState = (
 
 class App extends React.Component {
 
-  constructor(props) {
-    super(props)
-    this.state = {
-      state: initialState
-    }
+  state = {
+    state: initialState
   }
 
   render() {
@@ -134,11 +125,8 @@ const initialState = (
 
 class App extends React.Component {
 
-  constructor(props) {
-    super(props)
-    this.state = {
-      state: initialState
-    }
+  state = {
+    state: initialState
   }
 
   render() {
@@ -185,11 +173,8 @@ const initialState = (
 
 class App extends React.Component {
 
-  constructor(props) {
-    super(props)
-    this.state = {
-      state: initialState
-    }
+  state = {
+    state: initialState
   }
 
   render() {

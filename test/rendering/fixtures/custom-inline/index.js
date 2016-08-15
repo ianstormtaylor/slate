@@ -6,6 +6,8 @@ function Link(props) {
   return <a {...props.attributes} href={href}>{props.children}</a>
 }
 
-export function renderNode(node) {
-  if (node.type == 'link') return Link
+export const schema = {
+  nodes: {
+    link: Link
+  }
 }

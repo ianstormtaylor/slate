@@ -24,7 +24,7 @@ Slate exposes a set of modules that you'll use to build your editor. The most im
 import { Editor } from 'slate'
 ```
 
-In addition to loading the editor, you need to give Slate a "initial state" to work with. Without it, Slate knows nothing about the type of content you want to create, since it has no knowledge of your schema.
+In addition to rendering the editor, you need to give Slate a "initial state" to render as content.
 
 To keep things simple, we'll use the `Raw` serializer that ships with Slate to create a new initial state that just contains a single paragraph block with some text in it:
 
@@ -46,8 +46,10 @@ const initialState = Raw.deserialize({
       ]
     }
   ]
-})
+}, { terse: true })
 ```
+
+The `terse: true` option there isn't important for now, but if you're curious about it you can check out the [`Raw` serializer reference](../reference/serializers/raw.md).
 
 And now that we've our initial state, we define our `App` and pass it into Slate's `Editor` component, like so:
 
@@ -69,32 +71,24 @@ const initialState = Raw.deserialize({
       ]
     }
   ]
-})
+}, { terse: true })
 
 // Define our app...
 class App extends React.Component {
 
-  constructor(props) {
-    super(props)
-
-    // Set the initial state when the app is first constructed.
-    this.state = {
-      state: initialState
-    }
+  // Set the initial state when the app is first constructed.
+  state = {
+    state: initialState
   }
 
+  // On change, update the app's React state with the new editor state.
   render() {
     return (
       <Editor
         state={this.state.state}
-        onChange={state => this.onChange(state)}
+        onChange={state => this.setState({ state })}
       />
     )
-  }
-
-  onChange(state) {
-    // Update the app's React state with the new editor state.
-    this.setState({ state })
   }
 
 }

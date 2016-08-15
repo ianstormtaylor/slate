@@ -5,26 +5,19 @@ import initialState from './state.json'
 import keycode from 'keycode'
 
 /**
- * Define a set of node renderers.
+ * Define a schema.
  *
  * @type {Object}
  */
 
-const NODES = {
-  'table': props => <table><tbody {...props.attributes}>{props.children}</tbody></table>,
-  'table-row': props => <tr {...props.attributes}>{props.children}</tr>,
-  'table-cell': props => <td {...props.attributes}>{props.children}</td>
-}
-
-/**
- * Define a set of mark renderers.
- *
- * @type {Object}
- */
-
-const MARKS = {
-  bold: {
-    fontWeight: 'bold'
+const schema = {
+  nodes: {
+    'table': props => <table><tbody {...props.attributes}>{props.children}</tbody></table>,
+    'table-row': props => <tr {...props.attributes}>{props.children}</tr>,
+    'table-cell': props => <td {...props.attributes}>{props.children}</td>,
+  },
+  marks: {
+    'bold': props => <strong>{props.children}</strong>
   }
 }
 
@@ -125,36 +118,13 @@ class Tables extends React.Component {
     return (
       <div className="editor">
         <Editor
+          schema={schema}
           state={this.state.state}
-          renderNode={this.renderNode}
-          renderMark={this.renderMark}
           onKeyDown={this.onKeyDown}
           onChange={this.onChange}
         />
       </div>
     )
-  }
-
-  /**
-   * Return a node renderer for a Slate `node`.
-   *
-   * @param {Node} node
-   * @return {Component or Void}
-   */
-
-  renderNode = (node) => {
-    return NODES[node.type]
-  }
-
-  /**
-   * Return a mark renderer for a Slate `mark`.
-   *
-   * @param {Mark} mark
-   * @return {Object or Void}
-   */
-
-  renderMark = (mark) => {
-    return MARKS[mark.type]
   }
 
 }

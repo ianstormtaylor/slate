@@ -104,17 +104,17 @@ Slate encourages you to write small, reusable modules. Check out the public ones
 <br/>
 ### Documentation
 
-If you're using Slate for the first time, check out the [Getting Started](./docs/guides/installing-slate.md) guides and the [Core Concepts](./docs/concepts) to familiarize yourself with Slate's architecture and mental models. Once you've gotten familiar with those, you'll probably want to check out the full [API Reference](./docs/reference).
+If you're using Slate for the first time, check out the [Getting Started](./docs/walkthroughs/installing-slate.md) walkthroughs and the [Core Concepts](./docs/concepts) to familiarize yourself with Slate's architecture and mental models. Once you've gotten familiar with those, you'll probably want to check out the full [API Reference](./docs/reference).
 
-- [**Guides**](./docs/guides)
-  - [Installing Slate](./docs/guides/installing-slate.md)
-  - [Using the Bundled Source](./docs/guides/using-the-bundled-source.md)
-  - [Adding Event Handlers](./docs/guides/adding-event-handlers.md)
-  - [Defining Custom Block Nodes](./docs/guides/defining-custom-block-nodes.md)
-  - [Applying Custom Formatting](./docs/guides/applying-custom-formatting.md)
-  - [Using Plugins](./docs/guides/using-plugins.md)
-  - [Saving to a Database](./docs/guides/saving-to-a-database.md)
-  - [Saving and Loading HTML Content](./docs/guides/saving-and-loading-html-content.md)
+- [**Walkthroughts**](./docs/walkthroughs)
+  - [Installing Slate](./docs/walkthroughs/installing-slate.md)
+  - [Using the Bundled Source](./docs/walkthroughs/using-the-bundled-source.md)
+  - [Adding Event Handlers](./docs/walkthroughs/adding-event-handlers.md)
+  - [Defining Custom Block Nodes](./docs/walkthroughs/defining-custom-block-nodes.md)
+  - [Applying Custom Formatting](./docs/walkthroughs/applying-custom-formatting.md)
+  - [Using Plugins](./docs/walkthroughs/using-plugins.md)
+  - [Saving to a Database](./docs/walkthroughs/saving-to-a-database.md)
+  - [Saving and Loading HTML Content](./docs/walkthroughs/saving-and-loading-html-content.md)
 - [**Concepts**](./docs/concepts)
   - [Statelessness & Immutability](./docs/concepts/statelessness-and-immutability.md)
   - [The Document Model](./docs/concepts/the-document-model.md)

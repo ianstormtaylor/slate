@@ -5,7 +5,7 @@
 
 # Defining Custom Block Nodes
 
-In our previous example, we started with a paragraph, but we never actually told Slate anything about the `paragraph` block type. We just let it use its internal default renderer.
+In our previous example, we started with a paragraph, but we never actually told Slate anything about the `paragraph` block type. We just let it use its internal default renderer, which uses a plain old `<div>`.
 
 But that's not all you can do. Slate lets you define any type of custom blocks you want, like block quotes, code blocks, list items, etc. 
 
@@ -14,30 +14,18 @@ We'll show you how. Let's start with our app from earlier:
 ```js
 class App extends React.Component {
 
-  constructor(props) {
-    super(props)
-    this.state = {
-      state: initialState
-    }
+  state = {
+    state: initialState
   }
 
   render() {
     return (
       <Editor
         state={this.state.state}
-        renderNode={node => this.renderNode(node)}
-        onChange={state => this.onChange(state)}
+        onChange={state => this.setState({ state })}
         onKeyDown={(e, state) => this.onKeyDown(e, state)}
       />
     )
-  }
-
-  renderNode(node) {
-    if (node.type == 'paragraph') return ParagraphNode
-  }
-
-  onChange(state) {
-    this.setState({ state })
   }
 
   onKeyDown(event, state) {
@@ -62,7 +50,7 @@ Node renderers are just simple React components, like so:
 
 ```js
 // Define a React component renderer for our code blocks.
-const CodeNode = (props) => {
+function CodeNode(props) {
   return <pre {...props.attributes}><code>{props.children}</code></pre>
 }
 ```
@@ -76,42 +64,32 @@ And see that `props.children` reference? Slate will automatically render all of 
 Now, let's add that renderer to our `Editor`:
 
 ```js
-const CodeNode = (props) => {
-  return <pre><code>{props.children}</code></pre>
-}
-
-const ParagraphNode = (props) => {
-  return <p>{props.children}</p>
+function CodeNode(props) {
+  return <pre {...props.attributes}><code>{props.children}</code></pre>
 }
 
 class App extends React.Component {
 
-  constructor(props) {
-    super(props)
-    this.state = {
-      state: initialState
+  state = {
+    state: initialState,
+    // Add a "schema" to our app's state that we can pass to the Editor.
+    schema: {
+      nodes: {
+        code: CodeNode
+      }
     }
   }
 
   render() {
     return (
+      // Pass in the `schema` property...
       <Editor
+        schema={this.state.schema}
         state={this.state.state}
-        renderNode={node => this.renderNode(node)}
-        onChange={state => this.onChange(state)}
+        onChange={state => this.setState({ state })}
         onKeyDown={e, state => this.onKeyDown(e, state)}
       />
     )
-  }
-
-  // Render the right component depending on the node `type`.
-  renderNode(node) {
-    if (node.type == 'code') return CodeNode
-    // Any nodes that fall through here will still use the default renderer.
-  }
-
-  onChange(state) {
-    this.setState({ state })
   }
 
   onKeyDown(event, state) {
@@ -128,43 +106,33 @@ class App extends React.Component {
 }
 ```
 
-Okay, but now we'll need a way for the user to actually turn a block into a code block. So let's change our `onKeyDown` function to add a **⌘-`** shortcut that does just that:
+Okay, but now we'll need a way for the user to actually turn a block into a code block. So let's change our `onKeyDown` function to add a <kbd>⌘-`</kbd> shortcut that does just that:
 
 ```js
-const CodeNode = (props) => {
-  return <pre><code>{props.children}</code></pre>
-}
-
-const ParagraphNode = (props) => {
-  return <p>{props.children}</p>
+function CodeNode(props) {
+  return <pre {...props.attributes}><code>{props.children}</code></pre>
 }
 
 class App extends React.Component {
 
-  constructor(props) {
-    super(props)
-    this.state = {
-      state: initialState
+  state = {
+    state: initialState,
+    schema: {
+      nodes: {
+        code: CodeNode
+      }
     }
   }
 
   render() {
     return (
       <Editor
+        schema={this.state.schema}
         state={this.state.state}
-        renderNode={node => this.renderNode(node)}
-        onChange={state => this.onChange(state)}
+        onChange={state => this.setState({ state })}
         onKeyDown={e, state => this.onKeyDown(e, state)}
       />
     )
-  }
-
-  renderNode(node) {
-    if (node.type == 'code') return CodeNode
-  }
-
-  onChange(state) {
-    this.setState({ state })
   }
 
   onKeyDown(event, state) {
@@ -182,45 +150,35 @@ class App extends React.Component {
 }
 ```
 
-Now, if you press **⌘-`**, the block your cursor is in should turn into a code block! Magic!
+Now, if you press <kbd>⌘-`</kbd>, the block your cursor is in should turn into a code block! Magic!
 
-But we forgot one thing. When you hit **⌘-`** again, it should change the code block back into a paragraph. To do that, we'll need to add a bit of logic to change the type we set based on whether any of the currently selected blocks are already a code block:
+But we forgot one thing. When you hit <kbd>⌘-`</kbd> again, it should change the code block back into a paragraph. To do that, we'll need to add a bit of logic to change the type we set based on whether any of the currently selected blocks are already a code block:
 
 ```js
-const CodeNode = (props) => {
-  return <pre><code>{props.children}</code></pre>
-}
-
-const ParagraphNode = (props) => {
-  return <p>{props.children}</p>
+function CodeNode(props) {
+  return <pre {...props.attributes}><code>{props.children}</code></pre>
 }
 
 class App extends React.Component {
 
-  constructor(props) {
-    super(props)
-    this.state = {
-      state: initialState
+  state = {
+    state: initialState,
+    schema: {
+      nodes: {
+        code: CodeNode
+      }
     }
   }
 
   render() {
     return (
       <Editor
+        schema={this.state.schema}
         state={this.state.state}
-        renderNode={node => this.renderNode(node)}
-        onChange={state => this.onChange(state)}
+        onChange={state => this.setState({ state })}
         onKeyDown={e, state => this.onKeyDown(e, state)}
       />
     )
-  }
-
-  renderNode(node) {
-    if (node.type == 'code') return CodeNode
-  }
-
-  onChange(state) {
-    this.setState({ state })
   }
 
   onKeyDown(event, state) {
@@ -240,7 +198,7 @@ class App extends React.Component {
 }
 ```
 
-And there you have it! If you press **⌘-`** while inside a code block, it should turn back into a paragraph!
+And there you have it! If you press <kbd>⌘-`</kbd> while inside a code block, it should turn back into a paragraph!
 
 <br/>
 <p align="center"><strong>Next:</strong><br/><a href="./applying-custom-formatting.md">Applying Custom Formatting</a></p>
