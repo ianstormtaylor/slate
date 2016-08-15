@@ -10,8 +10,8 @@ Every Slate editor has a "schema" associated with it, which contains information
 - [Rule Properties](#rule-properties)
   - [`decorate`](#decorate)
   - [`match`](#match)
+  - [`normalize`](#normalize)
   - [`render`](#render)
-  - [`transform`](#transform)
   - [`validate`](#validate)
 
 
@@ -94,8 +94,8 @@ Internally, the `marks` and `nodes` properties of a schema are simply converted 
 {
   match: Function,
   decorate: Function,
+  normalize: Function,
   render: Component || Function || Object || String,
-  transform: Function,
   validate: Function
 }
 ```
@@ -133,6 +133,23 @@ The `match` property is the only required property of a rule. It determines whic
 
 The `decorate` property allows you define a function that will apply extra marks to all of the ranges of text inside a node. It is called with a [`Text`](./text.md) node and the matched node. It should return a list of characters with the desired marks, which will then be added to the text before rendering.
 
+### `normalize`
+`Function normalize(transform: Transform, object: Node, failure: Any) => Transform`
+
+```js
+{
+  normalize: (transform, node, invalidChildren) => {
+    invalidChildren.forEach((child) => {
+      transform = transform.removeNodeByKey(child.key)
+    })
+
+    return transform
+  }
+}
+```
+
+The `normalize` property is a function to run that recovers the editor's state after the `validate` property of a rule has determined that an object is invalid. It is passed a [`Transform`](./transform.md) that it can use to make modifications. It is also passed the return value of the `validate` function, which makes it easy to quickly determine the failure reason from the validation.
+
 ### `render`
 `Component` <br/>
 `Function` <br/>
@@ -147,23 +164,6 @@ The `decorate` property allows you define a function that will apply extra marks
 
 The `render` property determines which React component Slate will use to render a [`Node`](./node.md) or [`Mark`](./mark.md). Mark renderers can also be defined as an object of styles or a class name string for convenience.
 
-### `transform`
-`Function transform(transform: Transform, object: Node, failure: Any) => Transform`
-
-```js
-{
-  transform: (transform, node, invalidChildren) => {
-    invalidChildren.forEach((child) => {
-      transform = transform.removeNodeByKey(child.key)
-    })
-
-    return transform
-  }
-}
-```
-
-The `transform` property is run to recover the editor's state after the `validate` property of a rule has determined that an object is invalid. It is passed a [`Transform`](./transform.md) that it can use to make modifications. It is also passed the return value of the `validate` function, which makes it easy to quickly determine the reason validation failed.
-
 ### `validate`
 `Function validate(object: Node) => Any || Void`
 
@@ -176,4 +176,4 @@ The `transform` property is run to recover the editor's state after the `validat
 }
 ```
 
-The `validate` property allows you to define a constraint that the matching object must abide by. It should return either `Void` if the object is valid, or any non-void value if it is invalid. This makes it easy to return the exact reason that the object is invalid, which makes it simple to recover from the invalid state with the `transform` property.
+The `validate` property allows you to define a constraint that the matching object must abide by. It should return either `Void` if the object is valid, or any non-void value if it is invalid. This makes it easy to return the exact reason that the object is invalid, which makes it simple to recover from the invalid state with the `normalize` property.
