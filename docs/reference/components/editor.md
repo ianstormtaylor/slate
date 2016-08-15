@@ -29,10 +29,11 @@ The top-level React component that renders the Slate editor itself.
   - [`onKeyDown`](#onkeydown)
   - [`onPaste`](#onpaste)
   - [`onSelect`](#onselect)
-  - [`renderDecorations`](#renderdecorations)
-  - [`renderMark`](#rendermark)
-  - [`renderNode`](#rendernode)
+  - [`schema`](#schema)
 - [Methods](#methods)
+  - [`blur`](#blur)
+  - [`focus`](#focus)
+  - [`getSchema()`](#getschema)
   - [`getState()`](#getstate)
   - [`onChange(state)`](#onchange)
 
@@ -161,19 +162,32 @@ const plugins = [
 ### `onKeyDown`
 ### `onPaste`
 ### `onSelect`
-### `renderDecorations`
-### `renderMark`
-### `renderNode`
+### `schema`
 
 To see how these properties behave, check out the [Plugins reference](../plugins/plugins.md).
 
 
 ## Methods
 
+### `blur`
+`blur() => Void`
+
+Programmatically blur the editor.
+
+### `focus`
+`blur() => Void`
+
+Programmatically focus the editor.
+
+### `getSchema` 
+`getSchema() => Schema`
+
+Return the editor's current schema.
+
 ### `getState` 
 `getState() => State`
 
-Return the editor's current internal state.
+Return the editor's current state.
 
 ### `onChange` 
 `onChange(state: State) => Void`
