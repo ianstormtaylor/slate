@@ -144,7 +144,7 @@ class App extends React.Component {
       .transform()
       .setBlock('code')
       .apply()
-    }
+    
   }
 
 }
@@ -192,7 +192,7 @@ class App extends React.Component {
       .transform()
       .setBlock(isCode ? 'paragraph' : 'code')
       .apply()
-    }
+    
   }
 
 }
