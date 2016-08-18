@@ -29,12 +29,12 @@ class App extends React.Component {
         state={this.state.state}
         state={this.state.state}
         onChange={state => this.setState({ state })}
-        onKeyDown={e, state => this.onKeyDown(e, state)}
+        onKeyDown={e, data, state => this.onKeyDown(e, data, state)}
       />
     )
   }
 
-  onKeyDown(event, state) {
+  onKeyDown(event, data, state) {
     if (event.which != 192 || !event.metaKey) return
     const isCode = state.blocks.some(block => block.type == 'code')
 
@@ -68,12 +68,12 @@ class App extends React.Component {
         schema={this.state.schema}
         state={this.state.state}
         onChange={state => this.setState({ state })}
-        onKeyDown={(e, state) => this.onKeyDown(e, state)}
+        onKeyDown={(e, data, state) => this.onKeyDown(e, data, state)}
       />
     )
   }
 
-  onKeyDown(event, state) {
+  onKeyDown(event, data, state) {
     if (!event.metaKey) return
 
     // Decide what to do based on the key code...
@@ -141,12 +141,12 @@ class App extends React.Component {
         schema={this.state.schema}
         state={this.state.state}
         onChange={state => this.setState({ state })}
-        onKeyDown={(e, state) => this.onKeyDown(e, state)}
+        onKeyDown={(e, data, state) => this.onKeyDown(e, data, state)}
       />
     )
   }
 
-  onKeyDown(event, state) {
+  onKeyDown(event, data, state) {
     if (!event.metaKey) return
 
     switch (event.which) {
