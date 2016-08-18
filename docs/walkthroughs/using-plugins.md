@@ -31,12 +31,12 @@ class App extends React.Component {
         schema={this.state.schema}
         state={this.state.state}
         onChange={state => this.setState({ state })}
-        onKeyDown={(e, state) => this.onKeyDown(e, state)}
+        onKeyDown={(e, data, state) => this.onKeyDown(e, data, state)}
       />
     )
   }
 
-  onKeyDown(event, state) {
+  onKeyDown(event, data, state) {
     if (!event.metaKey || event.which != 66) return
     return state
       .transform()
@@ -68,7 +68,7 @@ function MarkHotkey(options) {
 
   // Return our "plugin" object, containing the `onKeyDown` handler.
   return {
-    onKeyDown(event, state) {
+    onKeyDown(event, data, state) {
       // Check that the key pressed matches our `code` option.
       if (!event.metaKey || event.which != code) return
 
@@ -199,7 +199,7 @@ function MarkHotkey(options) {
   const { type, key } = options
 
   return {
-    onKeyDown(event, state) {
+    onKeyDown(event, data, state) {
       // Change the comparison to use the key name.
       if (!event.metaKey || keycode(event.which) != key) return
       return state
