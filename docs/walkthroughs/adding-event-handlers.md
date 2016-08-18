@@ -46,13 +46,13 @@ class App extends React.Component {
       <Editor
         state={this.state.state}
         onChange={state => this.setState({ state })}
-        onKeyDown={(e, state) => this.onKeyDown(e, state)}
+        onKeyDown={(e, data, state) => this.onKeyDown(e, data, state)}
       />
     )
   }
 
   // Define a new handler which prints the key code that was pressed.
-  onKeyDown(event, state) {
+  onKeyDown(event, data, state) {
     console.log(event.which)
   }
 
@@ -77,12 +77,12 @@ class App extends React.Component {
       <Editor
         state={this.state.state}
         onChange={state => this.setState({ state })}
-        onKeyDown={(e, state) => this.onKeyDown(e, state)}
+        onKeyDown={(e, data, state) => this.onKeyDown(e, data, state)}
       />
     )
   }
 
-  onKeyDown(event, state) {
+  onKeyDown(event, data, state) {
     // Return with no changes if it's not the "7" key with shift pressed.
     if (event.which != 55 || !event.shiftKey) return
 
