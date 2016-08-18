@@ -16,9 +16,6 @@ nodes:
             nodes:
               - kind: text
                 text: rd
-      - kind: inline
-        type: hashtag
-        nodes:
           - kind: inline
             type: link
             nodes:
