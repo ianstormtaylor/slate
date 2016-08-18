@@ -27,7 +27,7 @@ export default function (state) {
     .apply()
 
   const updated = next.document.getTexts().get(1)
-debugger
+
   assert.deepEqual(
     next.selection.toJS(),
     range.merge({
