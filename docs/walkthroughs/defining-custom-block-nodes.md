@@ -23,12 +23,12 @@ class App extends React.Component {
       <Editor
         state={this.state.state}
         onChange={state => this.setState({ state })}
-        onKeyDown={(e, state) => this.onKeyDown(e, state)}
+        onKeyDown={(e, data, state) => this.onKeyDown(e, data, state)}
       />
     )
   }
 
-  onKeyDown(event, state) {
+  onKeyDown(event, data, state) {
     if (event.which != 55 || !event.shiftKey) return
 
     const newState = state
@@ -87,12 +87,12 @@ class App extends React.Component {
         schema={this.state.schema}
         state={this.state.state}
         onChange={state => this.setState({ state })}
-        onKeyDown={e, state => this.onKeyDown(e, state)}
+        onKeyDown={(e, data, state) => this.onKeyDown(e, data, state)}
       />
     )
   }
 
-  onKeyDown(event, state) {
+  onKeyDown(event, data, state) {
     if (event.which != 55 || !event.shiftKey) return
 
     const newState = state
@@ -130,12 +130,12 @@ class App extends React.Component {
         schema={this.state.schema}
         state={this.state.state}
         onChange={state => this.setState({ state })}
-        onKeyDown={e, state => this.onKeyDown(e, state)}
+        onKeyDown={(e, data, state) => this.onKeyDown(e, data, state)}
       />
     )
   }
 
-  onKeyDown(event, state) {
+  onKeyDown(event, data, state) {
     // Return with no changes if it's not the "`" key with cmd/ctrl pressed.
     if (event.which != 192 || !event.metaKey) return
 
@@ -176,12 +176,12 @@ class App extends React.Component {
         schema={this.state.schema}
         state={this.state.state}
         onChange={state => this.setState({ state })}
-        onKeyDown={e, state => this.onKeyDown(e, state)}
+        onKeyDown={(e, data, state) => this.onKeyDown(e, data, state)}
       />
     )
   }
 
-  onKeyDown(event, state) {
+  onKeyDown(event, data, state) {
     if (event.which != 192 || !event.metaKey) return
 
     // Determine whether any of the currently selected blocks are code blocks.
