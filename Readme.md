@@ -127,14 +127,14 @@ If you're using Slate for the first time, check out the [Getting Started](./docs
   - Models
     - [Block](./docs/reference/models/block.md)
     - [Character](./docs/reference/models/character.md)
-    - [Data](./docs/reference/data.md)
+    - [Data](./docs/reference//models/data.md)
     - [Document](./docs/reference/models/document.md)
     - [Inline](./docs/reference/models/inline.md)
-    - [Mark](./docs/reference/mark.md)
+    - [Mark](./docs/reference//models/mark.md)
     - [Node](./docs/reference/models/node.md)
     - [Selection](./docs/reference/models/selection.md)
     - [State](./docs/reference/models/state.md)
-    - [Text](./docs/reference/text.md)
+    - [Text](./docs/reference//models/text.md)
     - [Transform](./docs/reference/models/transform.md)
   - Serializers
     - [Html](./docs/reference/serializers/html.md)
