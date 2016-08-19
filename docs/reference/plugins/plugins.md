@@ -145,9 +145,9 @@ The `data` object contains the `key` which is a string name of the key that was 
 }
 ```
 
-The `isMod` boolean is `true` if the <kbd>control</kbd> key was pressed on Windows or the <kbd>command</kbd> key was pressed on Mac _without_ the <kbd>alt/option<kbd> key was also being pressed. This is a convenience for adding hotkeys like <kbd>command+b</kbd>. 
+The `isMod` boolean is `true` if the <kbd>control</kbd> key was pressed on Windows or the <kbd>command</kbd> key was pressed on Mac _without_ the <kbd>alt/option</kbd> key was also being pressed. This is a convenience for adding hotkeys like <kbd>command+b</kbd>. 
 
-The `isModAlt` boolean is `true` if the <kbd>control</kbd> key was pressed on Windows or the <kbd>command</kbd> key was pressed on Mac _and_ the <kbd>alt/option<kbd> key was also being pressed. This is a convenience for secondary hotkeys like <kbd>command+option+1</kbd>.
+The `isModAlt` boolean is `true` if the <kbd>control</kbd> key was pressed on Windows or the <kbd>command</kbd> key was pressed on Mac _and_ the <kbd>alt/option</kbd> key was also being pressed. This is a convenience for secondary hotkeys like <kbd>command+option+1</kbd>.
 
 The `isLine` and `isWord` booleans represent whether the "line modifier" or "word modifier" hotkeys are pressed when deleteing or moving the cursor. For example, on a Mac <kbd>option + right</kbd> moves the cursor to the right one word at a time.
 
