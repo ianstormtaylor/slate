@@ -7,17 +7,19 @@ import isUrl from 'is-url'
 import { Map } from 'immutable'
 
 /**
- * Define a set of node renderers.
+ * Define a schema.
  *
  * @type {Object}
  */
 
-const NODES = {
-  paragraph: props => <p>{props.children}</p>,
-  link: (props) => {
-    const { data } = props.node
-    const href = data.get('href')
-    return <a {...props.attributes} href={href}>{props.children}</a>
+const schema = {
+  nodes: {
+    paragraph: props => <p>{props.children}</p>,
+    link: (props) => {
+      const { data } = props.node
+      const href = data.get('href')
+      return <a {...props.attributes} href={href}>{props.children}</a>
+    }
   }
 }
 
@@ -181,24 +183,13 @@ class Links extends React.Component {
     return (
       <div className="editor">
         <Editor
+          schema={schema}
           state={this.state.state}
-          renderNode={this.renderNode}
           onChange={this.onChange}
           onPaste={this.onPaste}
         />
       </div>
     )
-  }
-
-  /**
-   * Render a `node`.
-   *
-   * @param {Node} node
-   * @return {Element}
-   */
-
-  renderNode = (node) => {
-    return NODES[node.type]
   }
 
 }

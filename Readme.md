@@ -104,19 +104,17 @@ Slate encourages you to write small, reusable modules. Check out the public ones
 <br/>
 ### Documentation
 
-If you're using Slate for the first time, check out the [Getting Started](./docs/guides/installing-slate.md) guides and the [Core Concepts](./docs/concepts) to familiarize yourself with Slate's architecture and mental models. Once you've gotten familiar with those, you'll probably want to check out the full [API Reference](./docs/reference).
+If you're using Slate for the first time, check out the [Getting Started](./docs/walkthroughs/installing-slate.md) walkthroughs and the [Core Concepts](./docs/concepts) to familiarize yourself with Slate's architecture and mental models. Once you've gotten familiar with those, you'll probably want to check out the full [API Reference](./docs/reference).
 
-- [**Guides**](./docs/guides)
-  - [Installing Slate](./docs/guides/installing-slate.md)
-  - [Adding Event Handlers](./docs/guides/adding-event-handlers.md)
-  - [Defining Custom Block Nodes](./docs/guides/defining-custom-block-nodes.md)
-  - [Applying Custom Formatting](./docs/guides/applying-custom-formatting.md)
-  - [Using Plugins](./docs/guides/using-plugins.md)
-  - [Saving to a Database](./docs/guides/saving-to-a-database.md)
-  - [Saving and Loading HTML Content](./docs/guides/saving-and-loading-html-content.md)
-  - Adding a Hovering Menu
-  - Rendering Adjacent Elements in Components
-  - Adding Images Using Void Nodes
+- [**Walkthroughts**](./docs/walkthroughs)
+  - [Installing Slate](./docs/walkthroughs/installing-slate.md)
+  - [Using the Bundled Source](./docs/walkthroughs/using-the-bundled-source.md)
+  - [Adding Event Handlers](./docs/walkthroughs/adding-event-handlers.md)
+  - [Defining Custom Block Nodes](./docs/walkthroughs/defining-custom-block-nodes.md)
+  - [Applying Custom Formatting](./docs/walkthroughs/applying-custom-formatting.md)
+  - [Using Plugins](./docs/walkthroughs/using-plugins.md)
+  - [Saving to a Database](./docs/walkthroughs/saving-to-a-database.md)
+  - [Saving and Loading HTML Content](./docs/walkthroughs/saving-and-loading-html-content.md)
 - [**Concepts**](./docs/concepts)
   - [Statelessness & Immutability](./docs/concepts/statelessness-and-immutability.md)
   - [The Document Model](./docs/concepts/the-document-model.md)
@@ -129,14 +127,14 @@ If you're using Slate for the first time, check out the [Getting Started](./docs
   - Models
     - [Block](./docs/reference/models/block.md)
     - [Character](./docs/reference/models/character.md)
-    - [Data](./docs/reference/data.md)
+    - [Data](./docs/reference//models/data.md)
     - [Document](./docs/reference/models/document.md)
     - [Inline](./docs/reference/models/inline.md)
-    - [Mark](./docs/reference/mark.md)
+    - [Mark](./docs/reference//models/mark.md)
     - [Node](./docs/reference/models/node.md)
     - [Selection](./docs/reference/models/selection.md)
     - [State](./docs/reference/models/state.md)
-    - [Text](./docs/reference/text.md)
+    - [Text](./docs/reference//models/text.md)
     - [Transform](./docs/reference/models/transform.md)
   - Serializers
     - [Html](./docs/reference/serializers/html.md)

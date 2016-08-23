@@ -6,13 +6,15 @@ import Video from './video'
 import initialState from './state.json'
 
 /**
- * Define a set of node renderers.
+ * Define a schema.
  *
  * @type {Object}
  */
 
-const NODES = {
-  video: Video
+const schema = {
+  nodes: {
+    video: Video
+  }
 }
 
 /**
@@ -53,23 +55,12 @@ class Embeds extends React.Component {
     return (
       <div className="editor">
         <Editor
+          schema={schema}
           state={this.state.state}
-          renderNode={this.renderNode}
           onChange={this.onChange}
         />
       </div>
     )
-  }
-
-  /**
-   * Render a `node`.
-   *
-   * @param {Node} node
-   * @return {Element}
-   */
-
-  renderNode = (node) => {
-    return NODES[node.type]
   }
 
 }

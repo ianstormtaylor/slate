@@ -40,13 +40,10 @@ npm start
 
 Now you can open up `http://localhost:8080` in your browser and you'll see the examples site.
 
-If you want to edit the source while running the examples and have those changes immediately reflected, you need to run two additional watching commands in your terminal:
+If you want to edit the source while running the examples and have those changes immediately reflected, you can use the `watch` command instead, which will watch the source files for changes while running the server:
 
 ```
-npm run dist:watch
-```
-```
-npm run examples:watch
+npm run watch
 ```
 
 

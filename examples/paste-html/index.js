@@ -4,51 +4,35 @@ import React from 'react'
 import initialState from './state.json'
 
 /**
- * Define a set of node renderers.
+ * Define a schema.
  *
  * @type {Object}
  */
 
-const NODES = {
-  'bulleted-list': props => <ul {...props.attributes}>{props.children}</ul>,
-  'code': props => <pre><code {...props.attributes}>{props.children}</code></pre>,
-  'heading-one': props => <h1 {...props.attributes}>{props.children}</h1>,
-  'heading-two': props => <h2 {...props.attributes}>{props.children}</h2>,
-  'heading-three': props => <h3 {...props.attributes}>{props.children}</h3>,
-  'heading-four': props => <h4 {...props.attributes}>{props.children}</h4>,
-  'heading-five': props => <h5 {...props.attributes}>{props.children}</h5>,
-  'heading-six': props => <h6 {...props.attributes}>{props.children}</h6>,
-  'list-item': props => <li {...props.attributes}>{props.children}</li>,
-  'numbered-list': props => <ol {...props.attributes}>{props.children}</ol>,
-  'quote': props => <blockquote {...props.attributes}>{props.children}</blockquote>,
-  'link': (props) => {
-    const { data } = props.node
-    const href = data.get('href')
-    return <a href={href} {...props.attributes}>{props.children}</a>
-  }
-}
-
-/**
- * Define a set of mark renderers.
- *
- * @type {Object}
- */
-
-const MARKS = {
-  bold: {
-    fontWeight: 'bold'
+const schema = {
+  nodes: {
+    'bulleted-list': props => <ul {...props.attributes}>{props.children}</ul>,
+    'code': props => <pre><code {...props.attributes}>{props.children}</code></pre>,
+    'heading-one': props => <h1 {...props.attributes}>{props.children}</h1>,
+    'heading-two': props => <h2 {...props.attributes}>{props.children}</h2>,
+    'heading-three': props => <h3 {...props.attributes}>{props.children}</h3>,
+    'heading-four': props => <h4 {...props.attributes}>{props.children}</h4>,
+    'heading-five': props => <h5 {...props.attributes}>{props.children}</h5>,
+    'heading-six': props => <h6 {...props.attributes}>{props.children}</h6>,
+    'list-item': props => <li {...props.attributes}>{props.children}</li>,
+    'numbered-list': props => <ol {...props.attributes}>{props.children}</ol>,
+    'quote': props => <blockquote {...props.attributes}>{props.children}</blockquote>,
+    'link': (props) => {
+      const { data } = props.node
+      const href = data.get('href')
+      return <a href={href} {...props.attributes}>{props.children}</a>
+    }
   },
-  code: {
-    fontFamily: 'monospace',
-    backgroundColor: '#eee',
-    padding: '3px',
-    borderRadius: '4px'
-  },
-  italic: {
-    fontStyle: 'italic'
-  },
-  underlined: {
-    textDecoration: 'underline'
+  marks: {
+    bold: props => <strong>{props.children}</strong>,
+    code: props => <code>{props.children}</code>,
+    italic: props => <em>{props.children}</em>,
+    underlined: props => <u>{props.children}</u>,
   }
 }
 
@@ -212,36 +196,13 @@ class PasteHtml extends React.Component {
     return (
       <div className="editor">
         <Editor
+          schema={schema}
           state={this.state.state}
-          renderNode={this.renderNode}
-          renderMark={this.renderMark}
           onPaste={this.onPaste}
           onChange={this.onChange}
         />
       </div>
     )
-  }
-
-  /**
-   * Return a node renderer for a Slate `node`.
-   *
-   * @param {Node} node
-   * @return {Component or Void}
-   */
-
-  renderNode = (node) => {
-    return NODES[node.type]
-  }
-
-  /**
-   * Return a mark renderer for a Slate `mark`.
-   *
-   * @param {Mark} mark
-   * @return {Object or Void}
-   */
-
-  renderMark = (mark) => {
-    return MARKS[mark.type]
   }
 
 }

@@ -9,7 +9,9 @@ function ITALIC(props) {
   return <i>{props.children}</i>
 }
 
-export function renderMark(mark, marks) {
-  if (mark.type == 'bold') return BOLD
-  if (mark.type == 'italic') return ITALIC
+export const schema = {
+  marks: {
+    bold: BOLD,
+    italic: ITALIC
+  }
 }

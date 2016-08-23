@@ -7,6 +7,8 @@ function Image(props) {
   )
 }
 
-export function renderNode(node) {
-  if (node.type == 'image') return Image
+export const schema = {
+  nodes: {
+    image: Image
+  }
 }

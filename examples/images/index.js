@@ -7,20 +7,22 @@ import isImage from 'is-image'
 import isUrl from 'is-url'
 
 /**
- * Define a set of node renderers.
+ * Define a schema.
  *
  * @type {Object}
  */
 
-const NODES = {
-  image: (props) => {
-    const { node, state } = props
-    const isFocused = state.selection.hasEdgeIn(node)
-    const src = node.data.get('src')
-    const className = isFocused ? 'active' : null
-    return (
-      <img src={src} className={className} {...props.attributes} />
-    )
+const schema = {
+  nodes: {
+    image: (props) => {
+      const { node, state } = props
+      const isFocused = state.selection.hasEdgeIn(node)
+      const src = node.data.get('src')
+      const className = isFocused ? 'active' : null
+      return (
+        <img src={src} className={className} {...props.attributes} />
+      )
+    }
   }
 }
 
@@ -83,8 +85,8 @@ class Images extends React.Component {
     return (
       <div className="editor">
         <Editor
+          schema={schema}
           state={this.state.state}
-          renderNode={this.renderNode}
           onChange={this.onChange}
           onDocumentChange={this.onDocumentChange}
           onDrop={this.onDrop}
@@ -92,17 +94,6 @@ class Images extends React.Component {
         />
       </div>
     )
-  }
-
-  /**
-   * Render a `node`.
-   *
-   * @param {Node} node
-   * @return {Element}
-   */
-
-  renderNode = (node) => {
-    return NODES[node.type]
   }
 
   /**
@@ -164,11 +155,27 @@ class Images extends React.Component {
    * @param {Event} e
    * @param {Object} data
    * @param {State} state
+   * @param {Editor} editor
    * @return {State}
    */
 
-  onDrop = (e, data, state) => {
-    if (data.type != 'node') return
+  onDrop = (e, data, state, editor) => {
+    switch (data.type) {
+      case 'files': return this.onDropOrPasteFiles(e, data, state, editor)
+      case 'node': return this.onDropNode(e, data, state)
+    }
+  }
+
+  /**
+   * On drop node, insert the node wherever it is dropped.
+   *
+   * @param {Event} e
+   * @param {Object} data
+   * @param {State} state
+   * @return {State}
+   */
+
+  onDropNode = (e, data, state) => {
     return state
       .transform()
       .removeNodeByKey(data.node.key)
@@ -178,7 +185,50 @@ class Images extends React.Component {
   }
 
   /**
+   * On drop or paste files, read and insert the image files.
+   *
+   * @param {Event} e
+   * @param {Object} data
+   * @param {State} state
+   * @param {Editor} editor
+   * @return {State}
+   */
+
+  onDropOrPasteFiles = (e, data, state, editor) => {
+    for (const file of data.files) {
+      const reader = new FileReader()
+      const [ type, ext ] = file.type.split('/')
+      if (type != 'image') continue
+
+      reader.addEventListener('load', () => {
+        state = editor.getState()
+        state = this.insertImage(state, reader.result)
+        editor.onChange(state)
+      })
+
+      reader.readAsDataURL(file)
+    }
+  }
+
+  /**
    * On paste, if the pasted content is an image URL, insert it.
+   *
+   * @param {Event} e
+   * @param {Object} data
+   * @param {State} state
+   * @param {Editor} editor
+   * @return {State}
+   */
+
+  onPaste = (e, data, state, editor) => {
+    switch (data.type) {
+      case 'files': return this.onDropOrPasteFiles(e, data, state, editor)
+      case 'text': return this.onPasteText(e, data, state)
+    }
+  }
+
+  /**
+   * On paste text, if the pasted content is an image URL, insert it.
    *
    * @param {Event} e
    * @param {Object} data
@@ -186,8 +236,7 @@ class Images extends React.Component {
    * @return {State}
    */
 
-  onPaste = (e, data, state) => {
-    if (data.type != 'text') return
+  onPasteText = (e, data, state) => {
     if (!isUrl(data.text)) return
     if (!isImage(data.text)) return
     return this.insertImage(state, data.text)
