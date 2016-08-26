@@ -16,11 +16,11 @@
 
 ## Reference
 
-### Components
+### Component Reference
 - [Editor](./reference/components/editor.md)
 - [Placeholder](./reference/components/placeholder.md)
 
-### Models
+### Model Reference
 - [Block](./reference/models/block.md)
 - [Character](./reference/models/character.md)
 - [Data](./reference//models/data.md)
@@ -33,13 +33,13 @@
 - [Text](./reference//models/text.md)
 - [Transform](./reference/models/transform.md)
 
-### Serializers
+### Serializer Reference
 - [Html](./reference/serializers/html.md)
 - [Plain](./reference/serializers/plain.md)
 - [Raw](./reference/serializers/raw.md)
 
-### Plugins
-- [Plugins](./reference/plugins/plugins.md)
+### Plugin Reference
+- [Plugin](./reference/plugins/plugin.md)
 - [Core](./reference/plugins/core.md)
 
 
