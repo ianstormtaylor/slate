@@ -2,7 +2,7 @@
   "root": "./docs",
   "plugins": ["-highlight", "prism"],
   "structure": {
-    "readme": "./Readme.md",
-    "summary": "./Summary.md"
+    "readme": "Readme.md",
+    "summary": "Summary.md"
   }
 }
