@@ -16,28 +16,31 @@
 
 ## Reference
 
-- Components
-  - [Editor](./reference/components/editor.md)
-  - [Placeholder](./reference/components/placeholder.md)
-- Models
-  - [Block](./reference/models/block.md)
-  - [Character](./reference/models/character.md)
-  - [Data](./reference//models/data.md)
-  - [Document](./reference/models/document.md)
-  - [Inline](./reference/models/inline.md)
-  - [Mark](./reference//models/mark.md)
-  - [Node](./reference/models/node.md)
-  - [Selection](./reference/models/selection.md)
-  - [State](./reference/models/state.md)
-  - [Text](./reference//models/text.md)
-  - [Transform](./reference/models/transform.md)
-- Serializers
-  - [Html](./reference/serializers/html.md)
-  - [Plain](./reference/serializers/plain.md)
-  - [Raw](./reference/serializers/raw.md)
-- Plugins
-  - [Plugins](./reference/plugins/plugins.md)
-  - [Core](./reference/plugins/core.md)
+### Components
+- [Editor](./reference/components/editor.md)
+- [Placeholder](./reference/components/placeholder.md)
+
+### Models
+- [Block](./reference/models/block.md)
+- [Character](./reference/models/character.md)
+- [Data](./reference//models/data.md)
+- [Document](./reference/models/document.md)
+- [Inline](./reference/models/inline.md)
+- [Mark](./reference//models/mark.md)
+- [Node](./reference/models/node.md)
+- [Selection](./reference/models/selection.md)
+- [State](./reference/models/state.md)
+- [Text](./reference//models/text.md)
+- [Transform](./reference/models/transform.md)
+
+### Serializers
+- [Html](./reference/serializers/html.md)
+- [Plain](./reference/serializers/plain.md)
+- [Raw](./reference/serializers/raw.md)
+
+### Plugins
+- [Plugins](./reference/plugins/plugins.md)
+- [Core](./reference/plugins/core.md)
 
 
 ## General
