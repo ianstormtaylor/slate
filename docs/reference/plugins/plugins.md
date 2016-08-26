@@ -127,7 +127,7 @@ If no other plugin handles this event, it will be handled by the [Core plugin](.
 
 This handler is called when any key is pressed in the `contenteditable` element, before any action is taken.
 
-The `data` object contains the `key` which is a string name of the key that was pressed, as well as it's `code`. It also contains a series of helpful utility properties for determining hotkey logic. For example, `isCtrl` which is true if the <kbd>control</kbd> key was pressed, or
+The `data` object contains the `key` which is a string name of the key that was pressed, as well as it's `code`. It also contains a series of helpful utility properties for determining hotkey logic. For example, `isCtrl` which is true if the `control` key was pressed, or
 
 ```js
 {
@@ -145,11 +145,11 @@ The `data` object contains the `key` which is a string name of the key that was 
 }
 ```
 
-The `isMod` boolean is `true` if the <kbd>control</kbd> key was pressed on Windows or the <kbd>command</kbd> key was pressed on Mac _without_ the <kbd>alt/option</kbd> key was also being pressed. This is a convenience for adding hotkeys like <kbd>command+b</kbd>. 
+The `isMod` boolean is `true` if the `control` key was pressed on Windows or the `command` key was pressed on Mac _without_ the `alt/option` key was also being pressed. This is a convenience for adding hotkeys like `command+b`. 
 
-The `isModAlt` boolean is `true` if the <kbd>control</kbd> key was pressed on Windows or the <kbd>command</kbd> key was pressed on Mac _and_ the <kbd>alt/option</kbd> key was also being pressed. This is a convenience for secondary hotkeys like <kbd>command+option+1</kbd>.
+The `isModAlt` boolean is `true` if the `control` key was pressed on Windows or the `command` key was pressed on Mac _and_ the `alt/option` key was also being pressed. This is a convenience for secondary hotkeys like `command+option+1`.
 
-The `isLine` and `isWord` booleans represent whether the "line modifier" or "word modifier" hotkeys are pressed when deleteing or moving the cursor. For example, on a Mac <kbd>option + right</kbd> moves the cursor to the right one word at a time.
+The `isLine` and `isWord` booleans represent whether the "line modifier" or "word modifier" hotkeys are pressed when deleteing or moving the cursor. For example, on a Mac `option + right` moves the cursor to the right one word at a time.
 
 Make sure to `event.preventDefault()` if you do not want the default insertion behavior to occur! If no other plugin handles this event, it will be handled by the [Core plugin](./core.md).
 

@@ -6,7 +6,6 @@
 ## Walkthroughs
 
 - [Installing Slate](./walkthroughs/installing-slate.md)
-- [Using the Bundled Source](./walkthroughs/using-the-bundled-source.md)
 - [Adding Event Handlers](./walkthroughs/adding-event-handlers.md)
 - [Defining Custom Block Nodes](./walkthroughs/defining-custom-block-nodes.md)
 - [Applying Custom Formatting](./walkthroughs/applying-custom-formatting.md)
