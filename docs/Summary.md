@@ -1,4 +1,8 @@
 
+
+- [Introduction](./Readme.md)
+
+
 ## Walkthroughs
 
 - [Installing Slate](./walkthroughs/installing-slate.md)
@@ -35,4 +39,8 @@
 - Plugins
   - [Plugins](./reference/plugins/plugins.md)
   - [Core](./reference/plugins/core.md)
+
+
+## General
+
 - [FAQ](./concepts/faq.md)

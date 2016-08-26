@@ -23,7 +23,9 @@ For an example of the `Html` serializer in action, check out the [`paste-html` e
 ## Example
 
 ```txt
-The Slate editor gives you full control over the logic you can add.\nIn its simplest form, when representing plain text, Slate is a glorified <textarea>. But you can augment it to be much more than that.\nCheck out http://slatejs.org for examples!
+<p>The Slate editor gives you <em>complete</em> control over the logic you can add.</p>
+<p>In its simplest form, when representing plain text, Slate is a glorified <code>&laquo;textarea&raquo;</code>. But you can augment it to be much more than that.</p>
+<p>Check out <a href="http://slatejs.org">http://slatejs.org</a> for examples!</p>
 ```
 
 
@@ -111,4 +113,4 @@ The object should be one of:
 
 The `serialize` function should return a React element representing the serialized HTML, or nothing if the rule in question doesn't know how to serialize the object, in which case the next rule in the stack will be attempted.
 
-The function will be called with either a `Node`, a `Mark`, or a special `String` immutable object, with a `kind: 'string'` property and a `text` property containing the text string. In the case of the `String` property, the 
+The function will be called with either a `Node`, a `Mark`, or a special `String` immutable object, with a `kind: 'string'` property and a `text` property containing the text string.
