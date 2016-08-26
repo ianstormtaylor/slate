@@ -106,7 +106,7 @@ Slate encourages you to write small, reusable modules. Check out the public ones
 
 If you're using Slate for the first time, check out the [Getting Started](./docs/walkthroughs/installing-slate.md) walkthroughs and the [Core Concepts](./docs/concepts) to familiarize yourself with Slate's architecture and mental models. Once you've gotten familiar with those, you'll probably want to check out the full [API Reference](./docs/reference).
 
-- [**Walkthroughts**](./docs/walkthroughs)
+- [**Walkthroughs**](./docs/walkthroughs)
   - [Installing Slate](./docs/walkthroughs/installing-slate.md)
   - [Using the Bundled Source](./docs/walkthroughs/using-the-bundled-source.md)
   - [Adding Event Handlers](./docs/walkthroughs/adding-event-handlers.md)
@@ -115,11 +115,6 @@ If you're using Slate for the first time, check out the [Getting Started](./docs
   - [Using Plugins](./docs/walkthroughs/using-plugins.md)
   - [Saving to a Database](./docs/walkthroughs/saving-to-a-database.md)
   - [Saving and Loading HTML Content](./docs/walkthroughs/saving-and-loading-html-content.md)
-- [**Concepts**](./docs/concepts)
-  - [Statelessness & Immutability](./docs/concepts/statelessness-and-immutability.md)
-  - [The Document Model](./docs/concepts/the-document-model.md)
-  - [The Selection Model](./docs/concepts/the-selection-model.md)
-  - [Plugins](./docs/concepts/plugins.md)
 - [**Reference**](./docs/reference)
   - Components
     - [Editor](./docs/reference/components/editor.md)
