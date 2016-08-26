@@ -5,7 +5,7 @@
 <p align="center">A <em>completely</em> customizable framework <br/>for building rich text editors.</p>
 <br/>
 
-<p align="center"><a href="#why"><strong>Why?</strong></a> · <a href="#principles"><strong>Principles</strong></a> · <a href="http://slatejs.org"><strong>Demo</strong></a> · <a href="#examples"><strong>Examples</strong></a> · <a href="#plugins"><strong>Plugins</strong></a> · <a href="#documentation"><strong>Documentation</strong></a> · <a href="./Contributing.md"><strong>Contributing!</strong></a></p>
+<p align="center"><a href="#why"><strong>Why?</strong></a> · <a href="#principles"><strong>Principles</strong></a> · <a href="http://slatejs.org"><strong>Demo</strong></a> · <a href="#examples"><strong>Examples</strong></a> · <a href="#plugins"><strong>Plugins</strong></a> · <a href="http://docs.slatejs.org"><strong>Documentation</strong></a> · <a href="./Contributing.md"><strong>Contributing!</strong></a></p>
 <br/>
 
 <p align="center"><a href="http://slatejs.org"><img src="./docs/images/preview.png"></a></p>
@@ -104,41 +104,11 @@ Slate encourages you to write small, reusable modules. Check out the public ones
 <br/>
 ### Documentation
 
-If you're using Slate for the first time, check out the [Getting Started](./docs/walkthroughs/installing-slate.md) walkthroughs and the [Core Concepts](./docs/concepts) to familiarize yourself with Slate's architecture and mental models. Once you've gotten familiar with those, you'll probably want to check out the full [API Reference](./docs/reference).
+If you're using Slate for the first time, check out the [Getting Started](http://docs.slatejs.org/walkthroughs/installing-slate.md) walkthroughs to familiarize yourself with Slate's architecture and mental models. Once you've gotten familiar with those, you'll probably want to check out the full [API Reference](http://docs.slatejs.org/reference/components/editor).
 
-- [**Walkthroughs**](./docs/walkthroughs)
-  - [Installing Slate](./docs/walkthroughs/installing-slate.md)
-  - [Using the Bundled Source](./docs/walkthroughs/using-the-bundled-source.md)
-  - [Adding Event Handlers](./docs/walkthroughs/adding-event-handlers.md)
-  - [Defining Custom Block Nodes](./docs/walkthroughs/defining-custom-block-nodes.md)
-  - [Applying Custom Formatting](./docs/walkthroughs/applying-custom-formatting.md)
-  - [Using Plugins](./docs/walkthroughs/using-plugins.md)
-  - [Saving to a Database](./docs/walkthroughs/saving-to-a-database.md)
-  - [Saving and Loading HTML Content](./docs/walkthroughs/saving-and-loading-html-content.md)
-- [**Reference**](./docs/reference)
-  - Components
-    - [Editor](./docs/reference/components/editor.md)
-    - [Placeholder](./docs/reference/components/placeholder.md)
-  - Models
-    - [Block](./docs/reference/models/block.md)
-    - [Character](./docs/reference/models/character.md)
-    - [Data](./docs/reference//models/data.md)
-    - [Document](./docs/reference/models/document.md)
-    - [Inline](./docs/reference/models/inline.md)
-    - [Mark](./docs/reference//models/mark.md)
-    - [Node](./docs/reference/models/node.md)
-    - [Selection](./docs/reference/models/selection.md)
-    - [State](./docs/reference/models/state.md)
-    - [Text](./docs/reference//models/text.md)
-    - [Transform](./docs/reference/models/transform.md)
-  - Serializers
-    - [Html](./docs/reference/serializers/html.md)
-    - [Plain](./docs/reference/serializers/plain.md)
-    - [Raw](./docs/reference/serializers/raw.md) 
-  - Plugins
-    - [Plugins](./docs/reference/plugins/plugins.md)
-    - [Core](./docs/reference/plugins/core.md)
-- [**FAQ**](./docs/concepts/faq.md)
+- [**Walkthroughs**](http://docs.slatejs.org/walkthroughs)
+- [**Reference**](http://docs.slatejs.org/reference)
+- [**FAQ**](http://docs.slatejs.org/concepts/faq.md)
 
 If even that's not enough, you can always [read the source itself](./lib), which is explained along with a handful of readme's.
 
