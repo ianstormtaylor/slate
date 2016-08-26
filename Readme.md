@@ -104,11 +104,11 @@ Slate encourages you to write small, reusable modules. Check out the public ones
 <br/>
 ### Documentation
 
-If you're using Slate for the first time, check out the [Getting Started](http://docs.slatejs.org/walkthroughs/installing-slate.md) walkthroughs to familiarize yourself with Slate's architecture and mental models. Once you've gotten familiar with those, you'll probably want to check out the full [API Reference](http://docs.slatejs.org/reference/components/editor).
+If you're using Slate for the first time, check out the [Getting Started](http://docs.slatejs.org/walkthroughs/installing-slate.html) walkthroughs to familiarize yourself with Slate's architecture and mental models. Once you've gotten familiar with those, you'll probably want to check out the full [API Reference](http://docs.slatejs.org/reference/components/editor.html).
 
-- [**Walkthroughs**](http://docs.slatejs.org/walkthroughs)
-- [**Reference**](http://docs.slatejs.org/reference)
-- [**FAQ**](http://docs.slatejs.org/concepts/faq.md)
+- [**Walkthroughs**](http://docs.slatejs.org/walkthroughs/installing-slate.html)
+- [**Reference**](http://docs.slatejs.org/reference/components/editor.html)
+- [**FAQ**](http://docs.slatejs.org/concepts/faq.html)
 
 If even that's not enough, you can always [read the source itself](./lib), which is explained along with a handful of readme's.
 
