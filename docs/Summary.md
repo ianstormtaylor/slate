@@ -1,5 +1,4 @@
 
-
 - [Introduction](./Readme.md)
 
 
@@ -14,13 +13,14 @@
 - [Saving and Loading HTML Content](./walkthroughs/saving-and-loading-html-content.md)
 
 
-## Reference
+## Component Reference
 
-### Component Reference
 - [Editor](./reference/components/editor.md)
 - [Placeholder](./reference/components/placeholder.md)
 
-### Model Reference
+
+## Model Reference
+
 - [Block](./reference/models/block.md)
 - [Character](./reference/models/character.md)
 - [Data](./reference//models/data.md)
@@ -33,12 +33,16 @@
 - [Text](./reference//models/text.md)
 - [Transform](./reference/models/transform.md)
 
-### Serializer Reference
+
+## Serializer Reference
+
 - [Html](./reference/serializers/html.md)
 - [Plain](./reference/serializers/plain.md)
 - [Raw](./reference/serializers/raw.md)
 
-### Plugin Reference
+
+## Plugin Reference
+
 - [Plugin](./reference/plugins/plugin.md)
 - [Core](./reference/plugins/core.md)
 
