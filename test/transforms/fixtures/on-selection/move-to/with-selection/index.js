@@ -3,17 +3,16 @@ import assert from 'assert'
 
 export default function (state) {
   const { startText, selection } = state
-  const props = {
+  const sel = selection.merge({
     anchorKey: startText.key,
     anchorOffset: 0,
     focusKey: startText.key,
     focusOffset: startText.length,
-  }
+  })
 
-  const sel = selection.merge(props)
   const next = state
     .transform()
-    .setSelection(props)
+    .moveTo(sel)
     .apply()
 
   assert.deepEqual(

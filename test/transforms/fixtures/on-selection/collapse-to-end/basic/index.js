@@ -8,7 +8,7 @@ export default function (state) {
 
   const next = state
     .transform()
-    .setSelection({
+    .moveTo({
       anchorKey: second.key,
       anchorOffset: 0,
       focusKey: second.key,
