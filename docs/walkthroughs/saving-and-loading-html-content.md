@@ -213,7 +213,7 @@ And finally, now that we have our serializer initialized, we can update our app 
 ```js
 // Load the initial state from Local Storage or a default.
 const initialState = (
-  localStorage.get('content') ||
+  localStorage.getItem('content') ||
   '<p></p>'
 )
 
