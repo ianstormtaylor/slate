@@ -41,7 +41,7 @@ A list of child nodes.
 ### `kind`
 `String`
 
-An immutable string value of `'document'` for easily separating this node from [`Block`](./block.dm), [`Inline`](./inline.md) or [`Text`](./text.md) nodes.
+An immutable string value of `'document'` for easily separating this node from [`Block`](./block.md), [`Inline`](./inline.md) or [`Text`](./text.md) nodes.
 
 ### `length`
 `Number`
