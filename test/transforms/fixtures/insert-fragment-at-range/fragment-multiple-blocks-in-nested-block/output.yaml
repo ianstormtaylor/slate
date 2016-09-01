@@ -1,0 +1,35 @@
+
+nodes:
+  - kind: block
+    type: list-item
+    nodes:
+      - kind: block
+        type: paragraph
+        nodes:
+          - kind: text
+            ranges:
+              - text: Fi
+      - kind: block
+        type: paragraph
+        nodes:
+          - kind: text
+            ranges:
+              - text: fragment one
+      - kind: block
+        type: paragraph
+        nodes:
+          - kind: text
+            ranges:
+              - text: fragment two
+      - kind: block
+        type: paragraph
+        nodes:
+          - kind: text
+            ranges:
+              - text: rst child
+      - kind: block
+        type: paragraph
+        nodes:
+          - kind: text
+            ranges:
+              - text: Second child
