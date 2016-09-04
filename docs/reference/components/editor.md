@@ -175,7 +175,7 @@ To see how these properties behave, check out the [Plugins reference](../plugins
 Programmatically blur the editor.
 
 ### `focus`
-`blur() => Void`
+`focus() => Void`
 
 Programmatically focus the editor.
 
