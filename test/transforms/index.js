@@ -16,11 +16,13 @@ describe('transforms', () => {
   const transforms = fs.readdirSync(dir)
 
   for (const transform of transforms) {
+    if (transform[0] === '.') continue
     describe(`${toCamel(transform)}()`, () => {
       const dir = resolve(__dirname, './fixtures', transform)
       const tests = fs.readdirSync(dir)
 
       for (const test of tests) {
+        if (test[0] === '.') continue
         it(test, () => {
           const innerDir = resolve(dir, test)
           const fn = require(innerDir).default
