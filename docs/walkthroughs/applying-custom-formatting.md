@@ -27,7 +27,7 @@ class App extends React.Component {
     return (
       <Editor
         state={this.state.state}
-        state={this.state.state}
+        schema={this.state.schema}
         onChange={state => this.setState({ state })}
         onKeyDown={e, data, state => this.onKeyDown(e, data, state)}
       />
@@ -112,7 +112,7 @@ function BoldMark(props) {
 
 Pretty simple, right?
 
-And now, let's tell Slate about that mark. To do that, we'll add it to the `schema` object under a `marks` property, like so so:
+And now, let's tell Slate about that mark. To do that, we'll add it to the `schema` object under a `marks` property, like so:
 
 ```js
 function BoldMark(props) {
