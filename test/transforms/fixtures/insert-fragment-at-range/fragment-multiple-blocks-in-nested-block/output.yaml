@@ -7,14 +7,7 @@ nodes:
         type: paragraph
         nodes:
           - kind: text
-            ranges:
-              - text: Fi
-      - kind: block
-        type: paragraph
-        nodes:
-          - kind: text
-            ranges:
-              - text: fragment one
+            text: Fifragment one
       - kind: block
         type: paragraph
         nodes:
@@ -31,5 +24,4 @@ nodes:
         type: paragraph
         nodes:
           - kind: text
-            ranges:
-              - text: Second child
+            text: Second child
