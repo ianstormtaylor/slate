@@ -22,7 +22,8 @@ class Video extends React.Component {
       data: { video }
     }
 
-    const next = state
+    const next = editor
+      .getState()
       .transform()
       .setNodeByKey(node.key, properties)
       .apply()
