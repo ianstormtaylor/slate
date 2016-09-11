@@ -5,6 +5,20 @@ This document maintains a list of changes to Slate with each new version. Until 
 ---
 
 
+### `0.14.0` (next) — September 10, 2016
+
+###### BREAKING CHANGES
+
+- **The `undo` and `redo` transforms need to be applied!** Previously, `undo` and `redo` were special cased such that they did not require an `.apply()` call, and instead would return a new `State` directly. Now this is no longer the case, and they are just like every other transform.
+
+- **Transforms are no longer exposed on `State` or `Node`.** The transforms API has been completely refactored to be built up of "operations" for collaborative editing support. As part of this refactor, the transforms are now only available via the `state.transform()` API, and aren't exposed on the `State` or `Node` objects as they were before.
+
+- **The selection can now be "unset".** Previously, a selection could never be in an "unset" state where the `anchorKey` or `focusKey` was null. This is no longer technically true, although this shouldn't really affect anyone in practice.
+
+
+---
+
+
 ### `0.13.0` — August 15, 2016
 
 ###### BREAKING CHANGES
