@@ -39,13 +39,13 @@ Then you can add `slate.js` after those includes:
 <script src="./vendor/slate.js"></script>
 ```
 
-To make things easier, for quick prototyping, you can also use the [`npmcdn.com`](https://npmcdn.com/#/) delivery network that makes working with bundled npm modules easier. In that case, your includes would look like:
+To make things easier, for quick prototyping, you can also use the [`unpkg.com`](https://unpkg.com/#/) delivery network that makes working with bundled npm modules easier. In that case, your includes would look like:
 
 ```html
-<script src="https://npmcdn.com/react/dist/react.js"></script>
-<script src="https://npmcdn.com/react-dom/dist/react-dom.js"></script>
-<script src="https://npmcdn.com/immutable/dist/immutable.js"></script>
-<script src="https://npmcdn.com/slate/dist/slate.js"></script>
+<script src="https://unpkg.com/react/dist/react.js"></script>
+<script src="https://unpkg.com/react-dom/dist/react-dom.js"></script>
+<script src="https://unpkg.com/immutable/dist/immutable.js"></script>
+<script src="https://unpkg.com/slate/dist/slate.js"></script>
 ```
 
 That's it, you're ready to go!

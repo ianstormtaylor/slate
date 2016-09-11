@@ -18,6 +18,7 @@ describe('serializers', () => {
       const tests = fs.readdirSync(dir)
 
       for (const test of tests) {
+        if (test[0] === '.') continue
         it(test, () => {
           const innerDir = resolve(dir, test)
           const html = new Html(require(innerDir).default)
@@ -35,6 +36,7 @@ describe('serializers', () => {
       const tests = fs.readdirSync(dir)
 
       for (const test of tests) {
+        if (test[0] === '.') continue
         it(test, () => {
           const innerDir = resolve(dir, test)
           const html = new Html(require(innerDir).default)
@@ -56,6 +58,7 @@ describe('serializers', () => {
       const tests = fs.readdirSync(dir)
 
       for (const test of tests) {
+        if (test[0] === '.') continue
         it(test, () => {
           const innerDir = resolve(dir, test)
           const expected = readMetadata.sync(resolve(innerDir, 'output.yaml'))
@@ -72,6 +75,7 @@ describe('serializers', () => {
       const tests = fs.readdirSync(dir)
 
       for (const test of tests) {
+        if (test[0] === '.') continue
         it(test, () => {
           const innerDir = resolve(dir, test)
           const input = require(resolve(innerDir, 'input.js')).default
@@ -89,6 +93,7 @@ describe('serializers', () => {
       const tests = fs.readdirSync(dir)
 
       for (const test of tests) {
+        if (test[0] === '.') continue
         it(test, () => {
           const innerDir = resolve(dir, test)
           const expected = readMetadata.sync(resolve(innerDir, 'output.yaml'))
@@ -105,6 +110,7 @@ describe('serializers', () => {
       const tests = fs.readdirSync(dir)
 
       for (const test of tests) {
+        if (test[0] === '.') continue
         it(test, () => {
           const innerDir = resolve(dir, test)
           const input = require(resolve(innerDir, 'input.js')).default
@@ -121,6 +127,7 @@ describe('serializers', () => {
       const tests = fs.readdirSync(dir)
 
       for (const test of tests) {
+        if (test[0] === '.') continue
         it(test, () => {
           const innerDir = resolve(dir, test)
           const expected = readMetadata.sync(resolve(innerDir, 'output.yaml'))
@@ -137,6 +144,7 @@ describe('serializers', () => {
       const tests = fs.readdirSync(dir)
 
       for (const test of tests) {
+        if (test[0] === '.') continue
         it(test, () => {
           const innerDir = resolve(dir, test)
           const input = require(resolve(innerDir, 'input.js')).default

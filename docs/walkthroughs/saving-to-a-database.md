@@ -135,7 +135,7 @@ class App extends React.Component {
       <Editor
         state={this.state.state}
         onChange={state => this.onChange(state)}
-        onDocumentChange={state => this.onDocumentChange(document, state)}
+        onDocumentChange={(document, state) => this.onDocumentChange(document, state)}
       />
     )
   }
@@ -182,7 +182,7 @@ class App extends React.Component {
       <Editor
         state={this.state.state}
         onChange={state => this.onChange(state)}
-        onDocumentChange={state => this.onDocumentChange(document, state)}
+        onDocumentChange={(document, state) => this.onDocumentChange(document, state)}
       />
     )
   }

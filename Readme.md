@@ -5,7 +5,7 @@
 <p align="center">A <em>completely</em> customizable framework <br/>for building rich text editors.</p>
 <br/>
 
-<p align="center"><a href="#why"><strong>Why?</strong></a> · <a href="#principles"><strong>Principles</strong></a> · <a href="http://slatejs.org"><strong>Demo</strong></a> · <a href="#examples"><strong>Examples</strong></a> · <a href="#plugins"><strong>Plugins</strong></a> · <a href="#documentation"><strong>Documentation</strong></a> · <a href="./Contributing.md"><strong>Contributing!</strong></a></p>
+<p align="center"><a href="#why"><strong>Why?</strong></a> · <a href="#principles"><strong>Principles</strong></a> · <a href="http://slatejs.org"><strong>Demo</strong></a> · <a href="#examples"><strong>Examples</strong></a> · <a href="#plugins"><strong>Plugins</strong></a> · <a href="http://docs.slatejs.org"><strong>Documentation</strong></a> · <a href="./Contributing.md"><strong>Contributing!</strong></a></p>
 <br/>
 
 <p align="center"><a href="http://slatejs.org"><img src="./docs/images/preview.png"></a></p>
@@ -40,6 +40,8 @@ Here's how Slate compares to some of the existing editors out there:
 - [**Medium Editor**](https://yabwe.github.io/medium-editor/) — I never used the Medium Editor directly either, so my issues with it are solely from considering it in early stages. The issues I found with it are: that it doesn't actually pave over `contenteditable`, so you continue wrestling with the DOM, that the concept of a "toolbar" is tightly coupled with core in many respects making it harder to customize, that the extension system requires learning an entirely new view abstraction, and that the editor relying on the DOM's HTML as its data model makes collaborative editing much more difficult.
 
 - [**Scribe**](https://github.com/guardian/scribe) — I added Scribe to this list after creating Slate, so the issues with it are solely from reading their documentation. In terms of plugin architectures, Slate and Scribe are very similar in striving to move as much possible logic from "core" into plugins as possible. The issues I found with Scribe are: that it works directly on the DOM and its goal is to simply "fix" contenteditable such that all userland and plugin logic still has to account for x-browser differences, that its data model is tied to the DOM so serialization to formats besides HTML is more complex, that without a backing data model collaborative editing is much more difficult to layer in, and that it lacks broader mobile and browser support.
+
+- [**Mobiledoc Kit**](https://github.com/bustlelabs/mobiledoc-kit) — I added Mobiledoc Kit to this list after creating Slate as well, so the issues with it are solely from reading their documentation. In terms of the goal of customizability, Slate and Mobiledoc Kit are similar in striving to give the developer control over the rendering and serialization methods. The issues I found with Mobiledoc Kit are: that the JSON representation of content is complex to wrap your head around, that the naming terminology chosen doesn't build on prior art to make it easier to pick up, that the event handler architecture makes assumptions about use cases which leads to complexity, that the flat document model makes certain complex experiences difficult to build, and that core library makes assumptions about the behavior of specific types of nodes in the content.
 
 Of course those are my own opinions, and if those libraries solve your needs, use them! But if you've tried using any of those libraries you might have run into similar problems. If so, you might like Slate. Which brings me to how Slate solves all of that...
 
@@ -104,46 +106,11 @@ Slate encourages you to write small, reusable modules. Check out the public ones
 <br/>
 ### Documentation
 
-If you're using Slate for the first time, check out the [Getting Started](./docs/walkthroughs/installing-slate.md) walkthroughs and the [Core Concepts](./docs/concepts) to familiarize yourself with Slate's architecture and mental models. Once you've gotten familiar with those, you'll probably want to check out the full [API Reference](./docs/reference).
+If you're using Slate for the first time, check out the [Getting Started](http://docs.slatejs.org/walkthroughs/installing-slate.html) walkthroughs to familiarize yourself with Slate's architecture and mental models. Once you've gotten familiar with those, you'll probably want to check out the full [API Reference](http://docs.slatejs.org/reference/components/editor.html).
 
-- [**Walkthroughts**](./docs/walkthroughs)
-  - [Installing Slate](./docs/walkthroughs/installing-slate.md)
-  - [Using the Bundled Source](./docs/walkthroughs/using-the-bundled-source.md)
-  - [Adding Event Handlers](./docs/walkthroughs/adding-event-handlers.md)
-  - [Defining Custom Block Nodes](./docs/walkthroughs/defining-custom-block-nodes.md)
-  - [Applying Custom Formatting](./docs/walkthroughs/applying-custom-formatting.md)
-  - [Using Plugins](./docs/walkthroughs/using-plugins.md)
-  - [Saving to a Database](./docs/walkthroughs/saving-to-a-database.md)
-  - [Saving and Loading HTML Content](./docs/walkthroughs/saving-and-loading-html-content.md)
-- [**Concepts**](./docs/concepts)
-  - [Statelessness & Immutability](./docs/concepts/statelessness-and-immutability.md)
-  - [The Document Model](./docs/concepts/the-document-model.md)
-  - [The Selection Model](./docs/concepts/the-selection-model.md)
-  - [Plugins](./docs/concepts/plugins.md)
-- [**Reference**](./docs/reference)
-  - Components
-    - [Editor](./docs/reference/components/editor.md)
-    - [Placeholder](./docs/reference/components/placeholder.md)
-  - Models
-    - [Block](./docs/reference/models/block.md)
-    - [Character](./docs/reference/models/character.md)
-    - [Data](./docs/reference/data.md)
-    - [Document](./docs/reference/models/document.md)
-    - [Inline](./docs/reference/models/inline.md)
-    - [Mark](./docs/reference/mark.md)
-    - [Node](./docs/reference/models/node.md)
-    - [Selection](./docs/reference/models/selection.md)
-    - [State](./docs/reference/models/state.md)
-    - [Text](./docs/reference/text.md)
-    - [Transform](./docs/reference/models/transform.md)
-  - Serializers
-    - [Html](./docs/reference/serializers/html.md)
-    - [Plain](./docs/reference/serializers/plain.md)
-    - [Raw](./docs/reference/serializers/raw.md) 
-  - Plugins
-    - [Plugins](./docs/reference/plugins/plugins.md)
-    - [Core](./docs/reference/plugins/core.md)
-- [**FAQ**](./docs/concepts/faq.md)
+- [**Walkthroughs**](http://docs.slatejs.org/walkthroughs/installing-slate.html)
+- [**Reference**](http://docs.slatejs.org/reference/components/editor.html)
+- [**FAQ**](http://docs.slatejs.org/concepts/faq.html)
 
 If even that's not enough, you can always [read the source itself](./lib), which is explained along with a handful of readme's.
 

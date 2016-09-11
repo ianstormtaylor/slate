@@ -51,7 +51,7 @@ The top-level properties of a schema all give you a way to define `rules` that t
 An object that defines the [`Marks`](./mark.md) in the schema by `type`. Each key in the object refers to a mark by its `type`. The value defines how Slate will render the mark, and can either be a React component, an object of styles, or a class name.
 
 ### `nodes`
-`Object<type, Component || Function>`
+`Object<type, Component || Function>` <br/>
 `Object<type, Rule>`
 
 ```js

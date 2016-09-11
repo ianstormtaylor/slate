@@ -23,12 +23,12 @@ class App extends React.Component {
       <Editor
         state={this.state.state}
         onChange={state => this.setState({ state })}
-        onKeyDown={(e, state) => this.onKeyDown(e, state)}
+        onKeyDown={(e, data, state) => this.onKeyDown(e, data, state)}
       />
     )
   }
 
-  onKeyDown(event, state) {
+  onKeyDown(event, data, state) {
     if (event.which != 55 || !event.shiftKey) return
 
     const newState = state
@@ -87,12 +87,12 @@ class App extends React.Component {
         schema={this.state.schema}
         state={this.state.state}
         onChange={state => this.setState({ state })}
-        onKeyDown={e, state => this.onKeyDown(e, state)}
+        onKeyDown={(e, data, state) => this.onKeyDown(e, data, state)}
       />
     )
   }
 
-  onKeyDown(event, state) {
+  onKeyDown(event, data, state) {
     if (event.which != 55 || !event.shiftKey) return
 
     const newState = state
@@ -106,7 +106,7 @@ class App extends React.Component {
 }
 ```
 
-Okay, but now we'll need a way for the user to actually turn a block into a code block. So let's change our `onKeyDown` function to add a <kbd>⌘-`</kbd> shortcut that does just that:
+Okay, but now we'll need a way for the user to actually turn a block into a code block. So let's change our `onKeyDown` function to add a `⌘-\`` shortcut that does just that:
 
 ```js
 function CodeNode(props) {
@@ -130,12 +130,12 @@ class App extends React.Component {
         schema={this.state.schema}
         state={this.state.state}
         onChange={state => this.setState({ state })}
-        onKeyDown={e, state => this.onKeyDown(e, state)}
+        onKeyDown={(e, data, state) => this.onKeyDown(e, data, state)}
       />
     )
   }
 
-  onKeyDown(event, state) {
+  onKeyDown(event, data, state) {
     // Return with no changes if it's not the "`" key with cmd/ctrl pressed.
     if (event.which != 192 || !event.metaKey) return
 
@@ -144,15 +144,15 @@ class App extends React.Component {
       .transform()
       .setBlock('code')
       .apply()
-    }
+    
   }
 
 }
 ```
 
-Now, if you press <kbd>⌘-`</kbd>, the block your cursor is in should turn into a code block! Magic!
+Now, if you press `⌘-\``, the block your cursor is in should turn into a code block! Magic!
 
-But we forgot one thing. When you hit <kbd>⌘-`</kbd> again, it should change the code block back into a paragraph. To do that, we'll need to add a bit of logic to change the type we set based on whether any of the currently selected blocks are already a code block:
+But we forgot one thing. When you hit `⌘-\`` again, it should change the code block back into a paragraph. To do that, we'll need to add a bit of logic to change the type we set based on whether any of the currently selected blocks are already a code block:
 
 ```js
 function CodeNode(props) {
@@ -176,12 +176,12 @@ class App extends React.Component {
         schema={this.state.schema}
         state={this.state.state}
         onChange={state => this.setState({ state })}
-        onKeyDown={e, state => this.onKeyDown(e, state)}
+        onKeyDown={(e, data, state) => this.onKeyDown(e, data, state)}
       />
     )
   }
 
-  onKeyDown(event, state) {
+  onKeyDown(event, data, state) {
     if (event.which != 192 || !event.metaKey) return
 
     // Determine whether any of the currently selected blocks are code blocks.
@@ -192,13 +192,13 @@ class App extends React.Component {
       .transform()
       .setBlock(isCode ? 'paragraph' : 'code')
       .apply()
-    }
+    
   }
 
 }
 ```
 
-And there you have it! If you press <kbd>⌘-`</kbd> while inside a code block, it should turn back into a paragraph!
+And there you have it! If you press `⌘-\`` while inside a code block, it should turn back into a paragraph!
 
 <br/>
 <p align="center"><strong>Next:</strong><br/><a href="./applying-custom-formatting.md">Applying Custom Formatting</a></p>

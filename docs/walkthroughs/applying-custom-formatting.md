@@ -27,14 +27,14 @@ class App extends React.Component {
     return (
       <Editor
         state={this.state.state}
-        state={this.state.state}
+        schema={this.state.schema}
         onChange={state => this.setState({ state })}
-        onKeyDown={e, state => this.onKeyDown(e, state)}
+        onKeyDown={e, data, state => this.onKeyDown(e, data, state)}
       />
     )
   }
 
-  onKeyDown(event, state) {
+  onKeyDown(event, data, state) {
     if (event.which != 192 || !event.metaKey) return
     const isCode = state.blocks.some(block => block.type == 'code')
 
@@ -48,7 +48,7 @@ class App extends React.Component {
 }
 ```
 
-And now, we'll edit the `onKeyDown` handler to make it so that when you press <kbd>⌘-B</kbd>, it will add a "bold" mark to the currently selected text:
+And now, we'll edit the `onKeyDown` handler to make it so that when you press `⌘-B`, it will add a "bold" mark to the currently selected text:
 
 ```js
 class App extends React.Component {
@@ -68,12 +68,12 @@ class App extends React.Component {
         schema={this.state.schema}
         state={this.state.state}
         onChange={state => this.setState({ state })}
-        onKeyDown={(e, state) => this.onKeyDown(e, state)}
+        onKeyDown={(e, data, state) => this.onKeyDown(e, data, state)}
       />
     )
   }
 
-  onKeyDown(event, state) {
+  onKeyDown(event, data, state) {
     if (!event.metaKey) return
 
     // Decide what to do based on the key code...
@@ -99,7 +99,7 @@ class App extends React.Component {
 }
 ```
 
-Okay, so we've got the hotkey handler setup... but! If you happen to now try selecting text and hitting <kbd>⌘-B</kbd>, you'll get an error in your console. That's because we haven't told Slate how to render a "bold" mark.
+Okay, so we've got the hotkey handler setup... but! If you happen to now try selecting text and hitting `⌘-B`, you'll get an error in your console. That's because we haven't told Slate how to render a "bold" mark.
 
 For every mark type you want to add to your schema, you need to give Slate a "renderer" for that mark, just like nodes. So let's define our `bold` mark:
 
@@ -112,7 +112,7 @@ function BoldMark(props) {
 
 Pretty simple, right?
 
-And now, let's tell Slate about that mark. To do that, we'll add it to the `schema` object under a `marks` property, like so so:
+And now, let's tell Slate about that mark. To do that, we'll add it to the `schema` object under a `marks` property, like so:
 
 ```js
 function BoldMark(props) {
@@ -141,12 +141,12 @@ class App extends React.Component {
         schema={this.state.schema}
         state={this.state.state}
         onChange={state => this.setState({ state })}
-        onKeyDown={(e, state) => this.onKeyDown(e, state)}
+        onKeyDown={(e, data, state) => this.onKeyDown(e, data, state)}
       />
     )
   }
 
-  onKeyDown(event, state) {
+  onKeyDown(event, data, state) {
     if (!event.metaKey) return
 
     switch (event.which) {
@@ -169,7 +169,7 @@ class App extends React.Component {
 }
 ```
 
-Now, if you try selecting a piece of text and hitting <kbd>⌘-B</kbd> you should see it turn bold! Magic!
+Now, if you try selecting a piece of text and hitting `⌘-B` you should see it turn bold! Magic!
 
 <br/>
 <p align="center"><strong>Next:</strong><br/><a href="./using-plugins.md">Using Plugins</a></p>
