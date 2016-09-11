@@ -88,6 +88,7 @@
     "open": "open http://localhost:8080/dev.html",
     "prepublish": "npm run dist",
     "release": "np",
+    "release:next": "np --tag=next",
     "start": "http-server ./examples",
     "test": "npm-run-all lint dist:npm tests",
     "tests": "mocha --compilers js:babel-core/register --reporter spec ./test/server.js",
