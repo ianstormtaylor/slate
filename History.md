@@ -5,7 +5,7 @@ This document maintains a list of changes to Slate with each new version. Until 
 ---
 
 
-### `0.14.0` (next) — September 10, 2016
+### `0.14.0` — September 10, 2016
 
 ###### BREAKING CHANGES
 
