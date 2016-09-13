@@ -8,10 +8,10 @@ nodes:
         nodes:
           - kind: text
             ranges:
-              - text: First child
+              - text: first
       - kind: block
         type: paragraph
         nodes:
           - kind: text
             ranges:
-              - text: Second child
+              - text: second
