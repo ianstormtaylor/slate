@@ -434,11 +434,11 @@ Surround the text in a `range` with `prefix` and `suffix` strings. If the `suffi
 ## History Transforms
 
 ### `redo`
-`redo() => Transfirn`
+`redo() => Transform`
 
 Move forward one step in the history.
 
 ### `undo`
-`undo() => Transfirn`
+`undo() => Transform`
 
 Move backward one step in the history.
