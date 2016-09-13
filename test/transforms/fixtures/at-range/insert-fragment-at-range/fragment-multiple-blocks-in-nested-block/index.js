@@ -1,7 +1,7 @@
 
 import path from 'path'
 import readMetadata from 'read-metadata'
-import { Raw } from '../../../../..'
+import { Raw } from '../../../../../..'
 
 export default function (state) {
   const file = path.resolve(__dirname, 'fragment.yaml')
