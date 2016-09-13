@@ -12,14 +12,7 @@ nodes:
         type: paragraph
         nodes:
           - kind: text
-            ranges:
-              - text: fragment two
-      - kind: block
-        type: paragraph
-        nodes:
-          - kind: text
-            ranges:
-              - text: rst child
+            text: fragment tworst child
       - kind: block
         type: paragraph
         nodes:
