@@ -933,46 +933,6 @@ const Node = {
   },
 
   /**
-   * Insert child `nodes` after child by `key`.
-   *
-   * @param {String or Node} key
-   * @param {List} nodes
-   * @return {Node} node
-   */
-
-  insertChildrenAfter(key, nodes) {
-    const child = this.assertChild(key)
-    const index = this.nodes.indexOf(child)
-
-    nodes = this.nodes
-      .slice(0, index + 1)
-      .concat(nodes)
-      .concat(this.nodes.slice(index + 1))
-
-    return this.merge({ nodes })
-  },
-
-  /**
-   * Insert child `nodes` before child by `key`.
-   *
-   * @param {String or Node} key
-   * @param {List} nodes
-   * @return {Node} node
-   */
-
-  insertChildrenBefore(key, nodes) {
-    const child = this.assertChild(key)
-    const index = this.nodes.indexOf(child)
-
-    nodes = this.nodes
-      .slice(0, index)
-      .concat(nodes)
-      .concat(this.nodes.slice(index))
-
-    return this.merge({ nodes })
-  },
-
-  /**
    * Insert a `node` at `index`.
    *
    * @param {Number} index
@@ -1127,34 +1087,6 @@ const Node = {
     })
 
     return node
-  },
-
-  /**
-   * Remove children after a child by `key`.
-   *
-   * @param {String or Node} key
-   * @return {Node} node
-   */
-
-  removeChildrenAfter(key) {
-    const child = this.assertChild(key)
-    const index = this.nodes.indexOf(child)
-    const nodes = this.nodes.slice(0, index + 1)
-    return this.merge({ nodes })
-  },
-
-  /**
-   * Remove children after a child by `key`, including the child.
-   *
-   * @param {String or Node} key
-   * @return {Node} node
-   */
-
-  removeChildrenAfterIncluding(key) {
-    const child = this.assertChild(key)
-    const index = this.nodes.indexOf(child)
-    const nodes = this.nodes.slice(0, index)
-    return this.merge({ nodes })
   },
 
   /**

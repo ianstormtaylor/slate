@@ -47,8 +47,16 @@ Transform methods can either operate on the [`Document`](./document.md), the [`S
   - [`moveTo`](#moveto)
   - [`move{Direction}`](#movedirection)
 - [Node Transforms](#node-transforms)
-  - [`removeNodeByKey`](#removeNodeByKey)
-  - [`setNodeByKey`](#setNodeByKey)
+  - [`addMarkByKey`](#addmarkbykey)
+  - [`insertNodeByKey`](#insertnodebykey)
+  - [`insertTextByKey`](#inserttextbykey)
+  - [`moveNodeByKey`](#movenodebykey)
+  - [`removeMarkByKey`](#removemarkbykey)
+  - [`removeNodeByKey`](#removenodebykey)
+  - [`removeTextByKey`](#removetextbykey)
+  - [`setMarkByKey`](#setmarkbykey)
+  - [`setNodeByKey`](#setnodebykey)
+  - [`splitNodeByKey`](#splitnodebykey)
 - [Document Transforms](#document-transforms)
   - [`deleteAtRange`](#deleteatrange)
   - [`deleteBackwardAtRange`](#deletebackwardatrange)
@@ -258,16 +266,56 @@ Move the current selection to a selection with merged `properties`. The `propert
 
 ## Node Transforms
 
+### `addMarkByKey`
+`addMarkByKey(key: String, offset: Number, length: Number, mark: Mark) => Transform`
+
+Add a `mark` to `length` characters starting at an `offset` in a [`Node`](./node.md) by its `key`.
+
+### `insertNodeByKey`
+`insertNodeByKey(key: String, index: Number, node: Node) => Transform`
+
+Insert a `node` at `index` inside a parent [`Node`](./node.md) by its `key`.
+
+### `insertTextByKey`
+`insertTextByKey(key: String, offset: Number, text: String, [marks: Set]) => Transform`
+
+Insert `text` at an `offset` in a [`Node`](./node.md) with optional `marks`.
+
+### `moveNodeByKey`
+`moveNodeByKey(key: String, newKey: String, newIndex: Number) => Transform`
+
+Move a [`Node`](./node.md) by its `key` to a new parent node with its `newKey` and at a `newIndex`.
+
+### `removeMarkByKey`
+`removeMarkByKey(key: String, offset: Number, length: Number, mark: Mark) => Transform`
+
+Remove a `mark` from `length` characters starting at an `offset` in a [`Node`](./node.md) by its `key`.
+
 ### `removeNodeByKey`
 `removeNodeByKey(key: String) => Transform`
 
 Remove a [`Node`](./node.md) from the document by its `key`.
+
+### `removeTextByKey`
+`removeTextByKey(key: String, offset: Number, length: Number) => Transform`
+
+Remove `length` characters of text starting at an `offset` in a [`Node`](./node.md) by its `key`.
+
+### `setMarkByKey`
+`setMarkByKey(key: String, offset: Number, length: Number, mark: Mark, properties: Object) => Transform`
+
+Set a dictionary of `properties` on a [`mark`](./mark.md) on a [`Node`](./node.md) by its `key`.
 
 ### `setNodeByKey`
 `setNodeByKey(key: String, properties: Object) => Transform` <br/>
 `setNodeByKey(key: String, type: String) => Transform`
 
 Set a dictionary of `properties` on a [`Node`](./node.md) by its `key`. For convenience, you can pass a `type` string or `properties` object.
+
+### `splitNodeByKey`
+`splitNodeByKey(key: String, offset: Number) => Transform`
+
+Split a node by its `key` at an `offset`.
 
 
 ## Document Transforms
@@ -382,14 +430,15 @@ Wrap the [`Inline`](./inline.md) nodes in a `range` with a new [`Inline`](./inli
 
 Surround the text in a `range` with `prefix` and `suffix` strings. If the `suffix` is ommitted, the `prefix` will be used instead.
 
+
 ## History Transforms
 
 ### `redo`
-`redo() => State`
+`redo() => Transform`
 
 Move forward one step in the history.
 
 ### `undo`
-`undo() => State`
+`undo() => Transform`
 
 Move backward one step in the history.
