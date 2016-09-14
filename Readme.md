@@ -112,7 +112,7 @@ If you're using Slate for the first time, check out the [Getting Started](http:/
 - [**Reference**](http://docs.slatejs.org/reference/components/editor.html)
 - [**FAQ**](http://docs.slatejs.org/concepts/faq.html)
 
-If even that's not enough, you can always [read the source itself](./lib), which is explained along with a handful of readme's.
+If even that's not enough, you can always [read the source itself](./src), which is explained along with a handful of readme's.
 
 
 <br/>
