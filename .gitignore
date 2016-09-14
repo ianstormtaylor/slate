@@ -1,5 +1,4 @@
 *.sketch
-dist
 lib
 examples/build.dev.js
 examples/build.prod.js
