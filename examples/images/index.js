@@ -178,6 +178,7 @@ class Images extends React.Component {
   onDropNode = (e, data, state) => {
     return state
       .transform()
+      .unsetSelection()
       .removeNodeByKey(data.node.key)
       .moveTo(data.target)
       .insertBlock(data.node)
