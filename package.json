@@ -90,7 +90,7 @@
     "release": "np",
     "release:next": "np --tag=next",
     "start": "http-server ./examples",
-    "test": "npm-run-all lint lib:npm tests",
+    "test": "npm-run-all lint build:npm tests",
     "tests": "mocha --compilers js:babel-core/register --reporter spec ./test/server.js",
     "watch": "npm-run-all --parallel --print-label watch:lib watch:examples start",
     "watch:lib": "babel --watch --out-dir ./lib ./src",
