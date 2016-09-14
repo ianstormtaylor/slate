@@ -127,4 +127,34 @@ describe('transforms', () => {
       })
     }
   })
+
+  describe('on-history', () => {
+    const dir = resolve(__dirname, './fixtures/on-history')
+    const transforms = fs.readdirSync(dir)
+
+    for (const transform of transforms) {
+      if (transform[0] == '.') continue
+
+      describe(`${toCamel(transform)}()`, () => {
+        const transformDir = resolve(__dirname, './fixtures/on-history', transform)
+        const tests = fs.readdirSync(transformDir)
+
+        for (const test of tests) {
+          if (test[0] == '.') continue
+
+          it(test, () => {
+            const testDir = resolve(transformDir, test)
+            const fn = require(testDir).default
+            const input = readMetadata.sync(resolve(testDir, 'input.yaml'))
+            const expected = readMetadata.sync(resolve(testDir, 'output.yaml'))
+
+            let state = Raw.deserialize(input, { terse: true })
+            state = fn(state)
+            const output = Raw.serialize(state, { terse: true })
+            strictEqual(strip(output), strip(expected))
+          })
+        }
+      })
+    }
+  })
 })
