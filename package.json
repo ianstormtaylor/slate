@@ -73,7 +73,7 @@
   },
   "scripts": {
     "clean": "rm -rf ./lib ./node_modules ./examples/build.dev.js ./examples/build.prod.js",
-    "disc": "npm-run-all lib disc:build disc:open",
+    "disc": "npm-run-all build disc:build disc:open",
     "disc:build": "mkdir -p ./tmp && browserify ./lib/index.js --full-paths > ./tmp/build.js",
     "disc:open": "discify ./tmp/build.js --open",
     "build": "npm-run-all build:npm build:max build:min",
@@ -86,7 +86,7 @@
     "gh-pages": "npm run lib && npm run examples && gh-pages --lib ./examples",
     "lint": "eslint --ignore-pattern 'build.dev.js' --ignore-pattern 'build.prod.js' '{examples,src}/**/*.js'",
     "open": "open http://localhost:8080/dev.html",
-    "prepublish": "npm run lib",
+    "prepublish": "npm run build",
     "release": "np",
     "release:next": "np --tag=next",
     "start": "http-server ./examples",
