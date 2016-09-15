@@ -152,7 +152,7 @@ export function deleteBackwardAtRange(transform, range, n = 1) {
   }
 
   range = range.merge({
-    focusOffset: focusOffset - 1,
+    focusOffset: focusOffset - n,
     isBackward: true,
   })
 
@@ -204,7 +204,7 @@ export function deleteForwardAtRange(transform, range, n = 1) {
   }
 
   range = range.merge({
-    focusOffset: focusOffset + 1
+    focusOffset: focusOffset + n
   })
 
   return transform.deleteAtRange(range)
