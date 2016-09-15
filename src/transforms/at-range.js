@@ -604,7 +604,7 @@ export function unwrapBlockAtRange(transform, range, properties) {
       })
     })
     .filter(exists => exists)
-    .toSet()
+    .toOrderedSet()
     .toList()
 
   wrappers.forEach((block) => {
@@ -691,7 +691,7 @@ export function unwrapInlineAtRange(transform, range, properties) {
       })
     })
     .filter(exists => exists)
-    .toSet()
+    .toOrderedSet()
     .toList()
 
   inlines.forEach((inline) => {
@@ -730,7 +730,7 @@ export function wrapBlockAtRange(transform, range, block) {
       if (d == depth) return node
       return document.getClosest(node, p => document.getDepth(p) == depth)
     })
-    .toSet()
+    .toOrderedSet()
     .toList()
 
   const first = siblings.first()

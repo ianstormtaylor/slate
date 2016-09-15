@@ -160,7 +160,7 @@ const Node = {
     return this
       .getTexts()
       .map(text => this.getClosestBlock(text))
-      .toSet()
+      .toOrderedSet()
       .toList()
   },
 
@@ -586,7 +586,7 @@ const Node = {
       .getTexts()
       .map(text => this.getFurthestInline(text))
       .filter(exists => exists)
-      .toSet()
+      .toOrderedSet()
       .toList()
   },
 
@@ -602,7 +602,7 @@ const Node = {
       .getTextsAtRange(range)
       .map(text => this.getClosestInline(text))
       .filter(exists => exists)
-      .toSet()
+      .toOrderedSet()
       .toList()
   },
 
