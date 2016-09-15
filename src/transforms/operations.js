@@ -360,23 +360,27 @@ export function setSelectionOperation(transform, properties) {
   const { state } = transform
   const { document, selection } = state
   const prevProps = {}
+  const props = {}
+
+  // Remove any properties that are already equal to the current selection. And
+  // create a dictionary of the previous values for all of the properties that
+  // are being changed, for the inverse operation.
+  for (const k in properties) {
+    if (properties[k] == selection[k]) continue
+    props[k] = properties[k]
+    prevProps[k] = selection[k]
+  }
 
   // If the current selection has marks, and the new selection doesn't change
   // them in some way, they are old and should be removed.
   if (selection.marks && properties.marks == selection.marks) {
-    properties.marks = null
-  }
-
-  // Create a dictionary of the previous values for all of the properties that
-  // are being changed, for the inverse operation.
-  for (const k in properties) {
-    prevProps[k] = selection[k]
+    props.marks = null
   }
 
   // Resolve the selection keys into paths.
-  if (properties.anchorKey) {
-    properties.anchorPath = document.getPath(properties.anchorKey)
-    delete properties.anchorKey
+  if (props.anchorKey) {
+    props.anchorPath = document.getPath(props.anchorKey)
+    delete props.anchorKey
   }
 
   if (prevProps.anchorKey) {
@@ -384,9 +388,9 @@ export function setSelectionOperation(transform, properties) {
     delete prevProps.anchorKey
   }
 
-  if (properties.focusKey) {
-    properties.focusPath = document.getPath(properties.focusKey)
-    delete properties.focusKey
+  if (props.focusKey) {
+    props.focusPath = document.getPath(props.focusKey)
+    delete props.focusKey
   }
 
   if (prevProps.focusKey) {
@@ -403,7 +407,7 @@ export function setSelectionOperation(transform, properties) {
   // Define the operation.
   const operation = {
     type: 'set_selection',
-    properties,
+    properties: props,
     inverse,
   }
 
