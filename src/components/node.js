@@ -183,7 +183,7 @@ class Node extends React.Component {
 
     // If this isn't a block, or it's a wrapping block, abort.
     if (node.kind != 'block') return
-    if (node.nodes.first().kind == 'block') return
+    if (node.nodes.first() && node.nodes.first().kind == 'block') return
 
     // If the selection is blurred, or this block doesn't contain it, abort.
     if (selection.isBlurred) return
@@ -266,7 +266,7 @@ class Node extends React.Component {
 
     // If it's a block node with inline children, add the proper `dir` attribute
     // for text direction.
-    if (node.kind == 'block' && node.nodes.first().kind != 'block') {
+    if (node.kind == 'block' && node.nodes.first() && node.nodes.first().kind != 'block') {
       const direction = node.getTextDirection()
       if (direction == 'rtl') attributes.dir = 'rtl'
     }
