@@ -1,5 +1,14 @@
 
+import Debug from 'debug'
 import Transforms from '../transforms'
+
+/**
+ * Debug.
+ *
+ * @type {Function}
+ */
+
+const debug = Debug('slate:transform')
 
 /**
  * Transform.
@@ -42,7 +51,7 @@ class Transform {
    */
 
   apply(options = {}) {
-    let { merge, isNative = false, save = true } = options
+    let { merge, save, isNative = false } = options
     let { state, operations } = this
     let { history } = state
     let { undos, redos } = history
@@ -61,10 +70,13 @@ class Transform {
       )
     }
 
-    // Save the new operations.
-    if (save || !previous) {
-      this.save({ merge })
+    // If the save flag isn't set, determine whether we should save.
+    if (save == null) {
+      save = !isOnlySelections(operations)
     }
+
+    // Save the new operations.
+    if (save) this.save({ merge })
 
     // Return the new state with the `isNative` flag set.
     return this.state.merge({ isNative: !!isNative })
@@ -78,6 +90,7 @@ class Transform {
 
 Object.keys(Transforms).forEach((type) => {
   Transform.prototype[type] = function (...args) {
+    debug(type, { args })
     return Transforms[type](this, ...args)
   }
 })

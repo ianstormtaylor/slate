@@ -152,7 +152,7 @@ export function deleteBackwardAtRange(transform, range, n = 1) {
   }
 
   range = range.merge({
-    focusOffset: focusOffset - 1,
+    focusOffset: focusOffset - n,
     isBackward: true,
   })
 
@@ -204,7 +204,7 @@ export function deleteForwardAtRange(transform, range, n = 1) {
   }
 
   range = range.merge({
-    focusOffset: focusOffset + 1
+    focusOffset: focusOffset + n
   })
 
   return transform.deleteAtRange(range)
@@ -604,7 +604,7 @@ export function unwrapBlockAtRange(transform, range, properties) {
       })
     })
     .filter(exists => exists)
-    .toSet()
+    .toOrderedSet()
     .toList()
 
   wrappers.forEach((block) => {
@@ -691,7 +691,7 @@ export function unwrapInlineAtRange(transform, range, properties) {
       })
     })
     .filter(exists => exists)
-    .toSet()
+    .toOrderedSet()
     .toList()
 
   inlines.forEach((inline) => {
@@ -730,7 +730,7 @@ export function wrapBlockAtRange(transform, range, block) {
       if (d == depth) return node
       return document.getClosest(node, p => document.getDepth(p) == depth)
     })
-    .toSet()
+    .toOrderedSet()
     .toList()
 
   const first = siblings.first()
