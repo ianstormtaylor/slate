@@ -312,44 +312,9 @@ function setSelection(state, operation) {
 function splitNode(state, operation) {
   const { path, offset } = operation
   let { document } = state
-  let node = document.assertPath(path)
-  let parent = document.getParent(node)
-  const isParent = document == parent
-  const index = parent.nodes.indexOf(node)
 
-  let child = node
-  let one
-  let two
+  document = document.splitNode(path, offset)
 
-  if (node.kind != 'text') {
-    child = node.getTextAtOffset(offset)
-  }
-
-  while (child && child != parent) {
-    if (child.kind == 'text') {
-      const i = node.kind == 'text' ? offset : offset - node.getOffset(child)
-      const { characters } = child
-      const oneChars = characters.take(i)
-      const twoChars = characters.skip(i)
-      one = child.merge({ characters: oneChars })
-      two = child.merge({ characters: twoChars, key: uid() })
-    }
-
-    else {
-      const { nodes } = child
-      const oneNodes = nodes.takeUntil(n => n.key == one.key).push(one)
-      const twoNodes = nodes.skipUntil(n => n.key == one.key).rest().unshift(two)
-      one = child.merge({ nodes: oneNodes })
-      two = child.merge({ nodes: twoNodes, key: uid() })
-    }
-
-    child = document.getParent(child)
-  }
-
-  parent = parent.removeNode(index)
-  parent = parent.insertNode(index, two)
-  parent = parent.insertNode(index, one)
-  document = isParent ? parent : document.updateDescendant(parent)
   state = state.merge({ document })
   return state
 }
