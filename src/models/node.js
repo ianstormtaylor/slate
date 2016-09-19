@@ -1067,7 +1067,7 @@ const Node = {
             removals = removals.add(next.key)
             next = node.getNextSibling(next)
           }
-        }
+       }
 
         // ...that there are no extra empty text nodes.
         else if (desc.length == 0) {
@@ -1084,6 +1084,36 @@ const Node = {
     // Remove any nodes marked for removal.
     removals.forEach((key) => {
       node = node.removeDescendant(key)
+    })
+
+    // Ensure that void nodes are surrounded by text nodes
+    node = node.mapDescendants((desc) => {
+        if (desc.kind == 'text') {
+            return desc
+        }
+
+        const nodes = desc.nodes.reduce((accu, child, i) => {
+            if (!child.isVoid) {
+                return accu.push(child)
+            }
+
+            const prev = accu.last()
+            const next = desc.nodes.get(i + 1)
+
+            if (!prev || prev.kind !== 'text') {
+                accu = accu.push(Text.create())
+            }
+
+            accu = accu.push(child)
+
+            if (!next || next.kind !== 'text') {
+                accu = accu.push(Text.create())
+            }
+
+            return accu
+        }, List())
+
+        return desc.merge({ nodes })
     })
 
     return node
