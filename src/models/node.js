@@ -1067,7 +1067,7 @@ const Node = {
             removals = removals.add(next.key)
             next = node.getNextSibling(next)
           }
-       }
+        }
 
         // ...that there are no extra empty text nodes.
         else if (desc.length == 0) {
