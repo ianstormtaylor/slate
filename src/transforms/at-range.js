@@ -725,19 +725,50 @@ export function wrapBlockAtRange(transform, range, block) {
   const blocks = document.getBlocksAtRange(range)
   const firstblock = blocks.first()
   const lastblock = blocks.last()
+  let parent, siblings, index
 
-  // get first and last index of root nodes in the selection
-  const indexes = []
-  document.nodes.some((node, i) => {
-    if (node == firstblock || node.hasDescendant(firstblock)) indexes[0] = i
-    if (node == lastblock || node.hasDescendant(lastblock)) indexes[1] = i
-  })
+  // if there is only one block in the selection then we know the parent and siblings
+  if (blocks.length === 1) {
+    parent = document.getParent(firstblock)
+    siblings = blocks
+  }
+
+  // determine closest shared parent to all blocks in selection
+  else {
+    parent = document.getClosest(firstblock, p1 => {
+      return !!document.getClosest(lastblock, p2 => p1 == p2)
+    })
+  }
+
+  // if no shared parent could be found then the parent is the document
+  if (parent == null) parent = document
+
+  // create a list of direct children siblings of parent that fall in the selection
+  if (siblings == null) {
+    const indexes = parent.nodes.reduce((ind, node, i) => {
+      if (node == firstblock || node.hasDescendant(firstblock)) ind[0] = i
+      if (node == lastblock || node.hasDescendant(lastblock)) ind[1] = i
+      return ind
+    }, [])
+
+    index = indexes[0]
+    siblings = parent.nodes.slice(indexes[0], indexes[1] + 1)
+  }
+
+  // get the index to place the new wrapped node at
+  if (index == null) {
+    index = parent.nodes.indexOf(siblings.first())
+  }
 
   // inject the new block node into the parent
-  transform.insertNodeOperation([], indexes[0], block)
+  if (parent != document) {
+    transform.insertNodeByKey(parent.key, index, block)
+  } else {
+    transform.insertNodeOperation([], index, block)
+  }
 
   // move the sibling nodes into the new block node
-  document.nodes.slice(indexes[0], indexes[1] + 1).forEach((node, i) => {
+  siblings.forEach((node, i) => {
     transform.moveNodeByKey(node.key, block.key, i)
   })
 
