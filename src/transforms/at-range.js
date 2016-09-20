@@ -721,24 +721,53 @@ export function wrapBlockAtRange(transform, range, block) {
 
   const { state } = transform
   const { document } = state
+
   const blocks = document.getBlocksAtRange(range)
-  const depth = blocks.map(n => document.getDepth(n)).min()
+  const firstblock = blocks.first()
+  const lastblock = blocks.last()
+  let parent, siblings, index
 
-  const siblings = blocks
-    .map((node) => {
-      const d = document.getDepth(node)
-      if (d == depth) return node
-      return document.getClosest(node, p => document.getDepth(p) == depth)
+  // if there is only one block in the selection then we know the parent and siblings
+  if (blocks.length === 1) {
+    parent = document.getParent(firstblock)
+    siblings = blocks
+  }
+
+  // determine closest shared parent to all blocks in selection
+  else {
+    parent = document.getClosest(firstblock, p1 => {
+      return !!document.getClosest(lastblock, p2 => p1 == p2)
     })
-    .toOrderedSet()
-    .toList()
+  }
 
-  const first = siblings.first()
-  const parent = document.getParent(first)
-  const index = parent.nodes.indexOf(first)
+  // if no shared parent could be found then the parent is the document
+  if (parent == null) parent = document
 
-  transform.insertNodeByKey(parent.key, index, block)
+  // create a list of direct children siblings of parent that fall in the selection
+  if (siblings == null) {
+    const indexes = parent.nodes.reduce((ind, node, i) => {
+      if (node == firstblock || node.hasDescendant(firstblock)) ind[0] = i
+      if (node == lastblock || node.hasDescendant(lastblock)) ind[1] = i
+      return ind
+    }, [])
 
+    index = indexes[0]
+    siblings = parent.nodes.slice(indexes[0], indexes[1] + 1)
+  }
+
+  // get the index to place the new wrapped node at
+  if (index == null) {
+    index = parent.nodes.indexOf(siblings.first())
+  }
+
+  // inject the new block node into the parent
+  if (parent != document) {
+    transform.insertNodeByKey(parent.key, index, block)
+  } else {
+    transform.insertNodeOperation([], index, block)
+  }
+
+  // move the sibling nodes into the new block node
   siblings.forEach((node, i) => {
     transform.moveNodeByKey(node.key, block.key, i)
   })
