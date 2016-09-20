@@ -1093,7 +1093,8 @@ const Node = {
         }
 
         const nodes = desc.nodes.reduce((accu, child, i) => {
-            if (!child.isVoid) {
+            // We wrap only inline void nodes
+            if (!child.isVoid || child.kind === 'block') {
                 return accu.push(child)
             }
 
