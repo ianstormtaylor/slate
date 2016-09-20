@@ -1,7 +1,7 @@
 
 nodes:
   - kind: block
-    type: quote
+    type: code
     nodes:
       - kind: block
         type: quote
