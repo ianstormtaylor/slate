@@ -371,9 +371,18 @@ export function setSelectionOperation(transform, properties) {
     prevProps[k] = selection[k]
   }
 
-  // If the current selection has marks, and the new selection doesn't change
-  // them in some way, they are old and should be removed.
-  if (selection.marks && properties.marks == selection.marks) {
+  // If the selection moves, clear any marks, unless the new selection
+  // does change the marks in some way
+  const moved = [
+      'anchorKey',
+      'anchorOffset',
+      'focusKey',
+      'focusOffset',
+  ].some(p => props.hasOwnProperty(p))
+
+  if (selection.marks
+      && properties.marks == selection.marks
+      && moved) {
     props.marks = null
   }
 
