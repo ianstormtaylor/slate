@@ -31,6 +31,7 @@ class Void extends React.Component {
     children: React.PropTypes.any.isRequired,
     editor: React.PropTypes.object.isRequired,
     node: React.PropTypes.object.isRequired,
+    parent: React.PropTypes.object.isRequired,
     schema: React.PropTypes.object.isRequired,
     state: React.PropTypes.object.isRequired,
   };
@@ -137,6 +138,7 @@ class Void extends React.Component {
         schema={schema}
         state={state}
         node={child}
+        parent={node}
         ranges={ranges}
         index={index}
         text={text}
