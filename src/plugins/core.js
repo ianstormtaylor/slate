@@ -328,6 +328,8 @@ function Plugin(options = {}) {
       case 'enter': return onKeyDownEnter(e, data, state)
       case 'backspace': return onKeyDownBackspace(e, data, state)
       case 'delete': return onKeyDownDelete(e, data, state)
+      case 'left': return onKeyDownLeft(e, data, state)
+      case 'right': return onKeyDownRight(e, data, state)
       case 'y': return onKeyDownY(e, data, state)
       case 'z': return onKeyDownZ(e, data, state)
     }
@@ -447,6 +449,74 @@ function Plugin(options = {}) {
     return state
       .transform()
       .deleteForward(n)
+      .apply()
+  }
+
+  /**
+   * On `left` key down, move backward.
+   *
+   * COMPAT: This is required to solve for the case where an inline void node is
+   * surrounded by empty text nodes with zero-width spaces in them. Without this
+   * the zero-width spaces will cause two arrow keys to jump to the next text.
+   *
+   * @param {Event} e
+   * @param {Object} data
+   * @param {State} state
+   * @return {State}
+   */
+
+  function onKeyDownLeft(e, data, state) {
+    if (data.isCtrl) return
+    if (data.isOpt) return
+    if (state.isExpanded) return
+
+    const { document, startText } = state
+    const hasVoidParent = document.hasVoidParent(startText)
+    if (startText.text == '\u200B' && !hasVoidParent) return
+
+    const previousText = document.getPreviousText(startText)
+    if (!previousText) return
+
+    debug('onKeyDownLeft', { data })
+
+    e.preventDefault()
+    return state
+      .transform()
+      .collapseToEndOf(previousText)
+      .apply()
+  }
+
+  /**
+   * On `right` key down, move forward.
+   *
+   * COMPAT: This is required to solve for the case where an inline void node is
+   * surrounded by empty text nodes with zero-width spaces in them. Without this
+   * the zero-width spaces will cause two arrow keys to jump to the next text.
+   *
+   * @param {Event} e
+   * @param {Object} data
+   * @param {State} state
+   * @return {State}
+   */
+
+  function onKeyDownRight(e, data, state) {
+    if (data.isCtrl) return
+    if (data.isOpt) return
+    if (state.isExpanded) return
+
+    const { document, startText } = state
+    const hasVoidParent = document.hasVoidParent(startText)
+    if (startText.text == '\u200B' && !hasVoidParent) return
+
+    const nextText = document.getNextText(startText)
+    if (!nextText) return state
+
+    debug('onKeyDownRight', { data })
+
+    e.preventDefault()
+    return state
+      .transform()
+      .collapseToStartOf(nextText)
       .apply()
   }
 

@@ -245,9 +245,14 @@ class Leaf extends React.Component {
    */
 
   renderText({ parent, text, index, ranges }) {
-    // If the text is empty and it's the only child, we need to render a <br/>
-    // to get the block to have the proper height.
+    // COMPAT: If the text is empty and it's the only child, we need to render a
+    // <br/> to get the block to have the proper height.
     if (text == '' && parent.kind == 'block' && parent.text == '') return <br />
+
+    // COMPAT: If the text is empty otherwise, it's because it's on the edge of
+    // an inline void node, so we render a zero-width space so that the
+    // selection can be inserted next to it still.
+    if (text == '') return <span className="slate-zero-width-space">{'\u200B'}</span>
 
     // COMPAT: Browsers will collapse trailing new lines at the end of blocks,
     // so we need to add an extra trailing new lines to prevent that.
