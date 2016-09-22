@@ -1,4 +1,5 @@
 
+import Text from '../models/text'
 import Normalize from '../utils/normalize'
 import uid from '../utils/uid'
 
@@ -105,8 +106,21 @@ export function removeMarkByKey(transform, key, offset, length, mark) {
 export function removeNodeByKey(transform, key) {
   const { state } = transform
   const { document } = state
+  const node = document.assertDescendant(key)
+  const parent = document.getParent(key)
+  const index = parent.nodes.indexOf(node)
   const path = document.getPath(key)
-  return transform.removeNodeOperation(path)
+  transform.removeNodeOperation(path)
+
+  // If the node isn't a text node, or it isn't the last node in its parent,
+  // then we have nothing else to do.
+  if (node.kind != 'text' || parent.nodes.size > 1) return transform
+
+  // Otherwise, re-add an empty text node into the parent so that we guarantee
+  // to always have text nodes as the leaves of the node tree.
+  const text = Text.create()
+  transform.insertNodeByKey(parent.key, index, text)
+  return transform
 }
 
 /**

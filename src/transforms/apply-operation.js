@@ -126,21 +126,7 @@ function insertText(state, operation) {
 function joinNode(state, operation) {
   const { path, withPath } = operation
   let { document } = state
-  let target = document.assertPath(path)
-  let node = document.assertPath(withPath)
-  let parent = document.getParent(target)
-  const isParent = document == parent
-  const index = parent.nodes.indexOf(target)
-  const size = node.nodes.size
-
-  target.nodes.forEach((child, i) => {
-    node = node.insertNode(size + i, child)
-  })
-
-  parent = parent.removeNode(index)
-  document = isParent ? parent : document.updateDescendant(parent)
-  document = document.updateDescendant(node)
-  document = document.normalize()
+  document = document.joinNode(path, withPath)
   state = state.merge({ document })
   return state
 }
@@ -208,7 +194,6 @@ function removeNode(state, operation) {
   const isParent = document == parent
   parent = parent.removeNode(index)
   document = isParent ? parent : document.updateDescendant(parent)
-  document = document.normalize()
   state = state.merge({ document })
   return state
 }
