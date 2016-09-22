@@ -100,6 +100,20 @@ class Tables extends React.Component {
    */
 
   onKeyDown = (e, data, state) => {
+    const { document, selection } = state
+    const { startKey } = selection
+    const startNode = document.getDescendant(startKey)
+
+    if (selection.isAtStartOf(startNode)) {
+      const previous = document.getPreviousText(startNode)
+      const prevBlock = document.getClosestBlock(previous)
+
+      if (prevBlock.type == 'table-cell') {
+        e.preventDefault()
+        return state
+      }
+    }
+
     if (state.startBlock.type != 'table-cell') return
     switch (data.key) {
       case 'backspace': return this.onBackspace(e, state)

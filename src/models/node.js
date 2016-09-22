@@ -459,6 +459,85 @@ const Node = {
   },
 
   /**
+   * Split a node by `path` at `offset`.
+   *
+   * @param {String} path
+   * @param {Number} offset
+   * @return {Node}
+   */
+
+   splitNode(path, offset) {
+       let base = this
+       let node = base.assertPath(path)
+       let parent = base.getParent(node)
+       const isParent = base == parent
+       const index = parent.nodes.indexOf(node)
+
+       let child = node
+       let one
+       let two
+
+       if (node.kind != 'text') {
+         child = node.getTextAtOffset(offset)
+       }
+
+       while (child && child != parent) {
+         if (child.kind == 'text') {
+           const i = node.kind == 'text' ? offset : offset - node.getOffset(child)
+           const { characters } = child
+           const oneChars = characters.take(i)
+           const twoChars = characters.skip(i)
+           one = child.merge({ characters: oneChars })
+           two = child.merge({ characters: twoChars, key: uid() })
+         }
+
+         else {
+           const { nodes } = child
+           const oneNodes = nodes.takeUntil(n => n.key == one.key).push(one)
+           const twoNodes = nodes.skipUntil(n => n.key == one.key).rest().unshift(two)
+           one = child.merge({ nodes: oneNodes })
+           two = child.merge({ nodes: twoNodes, key: uid() })
+         }
+
+         child = base.getParent(child)
+       }
+
+       parent = parent.removeNode(index)
+       parent = parent.insertNode(index, two)
+       parent = parent.insertNode(index, one)
+       base = isParent ? parent : base.updateDescendant(parent)
+       return base
+   },
+
+  /**
+   * Split the block nodes at a `range`, to optional `height`.
+   *
+   * @param {Selection} range
+   * @param {Number} height (optional)
+   * @return {Node}
+   */
+
+  splitBlockAtRange(range, height = 1) {
+      const { startKey, startOffset } = range
+      let base = this
+      let node = base.assertDescendant(startKey)
+      let parent = base.getClosestBlock(node)
+      let offset = startOffset
+      let h = 0
+
+      while (parent && parent.kind == 'block' && h < height) {
+        offset += parent.getOffset(node)
+        node = parent
+        parent = base.getClosestBlock(parent)
+        h++
+      }
+
+      const path = base.getPath(node.key)
+      return this.splitNode(path, offset)
+        .normalize()
+  },
+
+  /**
    * Get a fragment of the node at a `range`.
    *
    * @param {Selection} range
