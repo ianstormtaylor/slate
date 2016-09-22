@@ -97,9 +97,7 @@ export function undo(transform) {
   // Replay the inverse of the previous operations.
   previous.slice().reverse().forEach(op => {
     op.inverse.forEach(inv => {
-      debugger
       transform.applyOperation(inv)
-      debugger
     })
   })
 
