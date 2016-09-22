@@ -117,7 +117,8 @@ export function deleteBackward(transform, n = 1) {
     if (prevBlock && prevBlock.isVoid) {
       after = selection
     } else if (prevInline && prevInline.isVoid) {
-      after = selection
+      const prevPrev = document.getPreviousText(previous)
+      after = selection.collapseToEndOf(prevPrev)
     } else {
       after = selection.collapseToEndOf(previous)
     }

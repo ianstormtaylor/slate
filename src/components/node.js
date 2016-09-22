@@ -253,7 +253,7 @@ class Node extends React.Component {
    */
 
   renderElement = () => {
-    const { editor, node, state } = this.props
+    const { editor, node, parent, state } = this.props
     const { Component } = this.state
     const children = node.nodes
       .map(child => this.renderNode(child))
