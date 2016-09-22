@@ -83,7 +83,7 @@
     "examples": "npm-run-all examples:dev examples:prod",
     "examples:dev": "browserify --debug --transform babelify ./examples/index.js > ./examples/build.dev.js",
     "examples:prod": "NODE_ENV=production browserify --transform babelify ./examples/index.js > ./examples/build.prod.js",
-    "gh-pages": "npm run build && npm run examples && gh-pages --lib ./examples",
+    "gh-pages": "npm run build && npm run examples && gh-pages --dist ./examples",
     "lint": "eslint --ignore-pattern 'build.dev.js' --ignore-pattern 'build.prod.js' '{examples,src}/**/*.js'",
     "open": "open http://localhost:8080/dev.html",
     "prepublish": "npm run build",
