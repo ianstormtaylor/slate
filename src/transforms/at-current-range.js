@@ -322,7 +322,13 @@ export function insertInline(transform, inline) {
   }
 
   else {
-    const text = document.getTexts().find(n => !keys.includes(n.key))
+    const text = document.getTexts().find((n) => {
+      if (keys.includes(n.key)) return false
+      const parent = document.getParent(n)
+      if (parent.kind != 'inline') return false
+      return true
+    })
+
     after = selection.collapseToEndOf(text)
   }
 

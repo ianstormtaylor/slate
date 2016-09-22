@@ -1,12 +1,8 @@
 
 nodes:
   - kind: block
-    type: paragraph
+    type: default
     nodes:
-      - kind: text
-        text: ""
       - kind: inline
         type: image
         isVoid: true
-      - kind: text
-        text: word

@@ -8,3 +8,5 @@ nodes:
       - kind: inline
         type: hashtag
         isVoid: true
+      - kind: text
+        text: ""
