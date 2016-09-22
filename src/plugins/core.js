@@ -188,11 +188,16 @@ function Plugin(options = {}) {
 
     const { fragment } = data
     const encoded = Base64.serializeNode(fragment)
+    const range = native.getRangeAt(0)
+    const contents = range.cloneContents()
+
+    // Remove any zero-width space spans from the cloned DOM so that they don't
+    // show up elsewhere when copied.
+    const zws = [].slice.call(contents.querySelectorAll('.slate-zero-width-space'))
+    zws.forEach(zw => zw.parentNode.removeChild(zw))
 
     // Wrap the first character of the selection in a span that has the encoded
     // fragment attached as an attribute, so it will show up in the copied HTML.
-    const range = native.getRangeAt(0)
-    const contents = range.cloneContents()
     const wrapper = window.document.createElement('span')
     const text = contents.childNodes[0]
     const char = text.textContent.slice(0, 1)
