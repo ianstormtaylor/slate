@@ -92,7 +92,8 @@ export function deleteAtRange(transform, range) {
     transform.moveNodeByKey(child.key, newKey, newIndex)
   })
 
-  transform.removeNodeByKey(endChild.key)
+  const lonely = document.getFurthest(endBlock, p => p.nodes.size == 1) || endBlock
+  transform.removeNodeByKey(lonely.key)
   transform.normalizeDocument()
   return transform
 }
