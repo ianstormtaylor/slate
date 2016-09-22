@@ -8,7 +8,7 @@ import { Map } from 'immutable'
 
 
 const EMOJIS = [
-    '😃', '😬', '🍔'
+  '😃', '😬', '🍔'
 ]
 
 
@@ -69,13 +69,14 @@ class Emojis extends React.Component {
     e.preventDefault()
     let { state } = this.state
 
-    state = state.transform()
-        .insertInline({
-            type: 'emoji',
-            isVoid: true,
-            data: { code }
-        })
-        .apply()
+    state = state
+      .transform()
+      .insertInline({
+        type: 'emoji',
+        isVoid: true,
+        data: { code }
+      })
+      .apply()
 
     this.setState({ state })
   }
@@ -105,13 +106,12 @@ class Emojis extends React.Component {
     return (
       <div className="menu toolbar-menu">
         {EMOJIS.map((emoji, i) => {
-            const onMouseDown = e => this.onClickEmoji(e, emoji)
-
-            return (
-                <span key={i} className="button" onMouseDown={onMouseDown}>
-                  <span className="material-icons">{emoji}</span>
-                </span>
-            )
+          const onMouseDown = e => this.onClickEmoji(e, emoji)
+          return (
+            <span key={i} className="button" onMouseDown={onMouseDown}>
+              <span className="material-icons">{emoji}</span>
+            </span>
+          )
         })}
       </div>
     )

@@ -167,5 +167,5 @@ input:focus {
 }
 
 .emoji.selected {
-    outline: 2px solid blue;
+  outline: 2px solid blue;
 }
