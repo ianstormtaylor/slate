@@ -21,7 +21,7 @@ export default function (state) {
     })
     .apply()
 
-  const updated = next.document.getTexts().last()
+  const updated = next.document.getTexts().get(1)
 
   assert.deepEqual(
     next.selection.toJS(),

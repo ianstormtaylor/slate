@@ -691,6 +691,7 @@ class Content extends React.Component {
       <Node
         key={node.key}
         node={node}
+        parent={state.document}
         schema={schema}
         state={state}
         editor={editor}

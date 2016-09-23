@@ -165,3 +165,7 @@ input:focus {
 .hover-menu .button[data-active="true"] {
   color: #fff;
 }
+
+.emoji.selected {
+  outline: 2px solid blue;
+}

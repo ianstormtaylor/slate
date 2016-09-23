@@ -32,6 +32,7 @@ class Leaf extends React.Component {
     isVoid: React.PropTypes.bool,
     marks: React.PropTypes.object.isRequired,
     node: React.PropTypes.object.isRequired,
+    parent: React.PropTypes.object.isRequired,
     ranges: React.PropTypes.object.isRequired,
     schema: React.PropTypes.object.isRequired,
     state: React.PropTypes.object.isRequired,
@@ -243,10 +244,15 @@ class Leaf extends React.Component {
    * @return {Element}
    */
 
-  renderText({ text, index, ranges }) {
-    // If the text is empty, we need to render a <br/> to get the block to have
-    // the proper height.
-    if (text == '') return <br />
+  renderText({ parent, text, index, ranges }) {
+    // COMPAT: If the text is empty and it's the only child, we need to render a
+    // <br/> to get the block to have the proper height.
+    if (text == '' && parent.kind == 'block' && parent.text == '') return <br />
+
+    // COMPAT: If the text is empty otherwise, it's because it's on the edge of
+    // an inline void node, so we render a zero-width space so that the
+    // selection can be inserted next to it still.
+    if (text == '') return <span className="slate-zero-width-space">{'\u200B'}</span>
 
     // COMPAT: Browsers will collapse trailing new lines at the end of blocks,
     // so we need to add an extra trailing new lines to prevent that.

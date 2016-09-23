@@ -31,6 +31,7 @@ class Void extends React.Component {
     children: React.PropTypes.any.isRequired,
     editor: React.PropTypes.object.isRequired,
     node: React.PropTypes.object.isRequired,
+    parent: React.PropTypes.object.isRequired,
     schema: React.PropTypes.object.isRequired,
     state: React.PropTypes.object.isRequired,
   };
@@ -66,7 +67,8 @@ class Void extends React.Component {
 
     // Make the outer wrapper relative, so the spacer can overlay it.
     const style = {
-      position: 'relative'
+      position: 'relative',
+      lineHeight: '0px'
     }
 
     return (
@@ -89,22 +91,12 @@ class Void extends React.Component {
    */
 
   renderSpacer = () => {
-    // COMPAT: In Firefox, if the <span> is positioned absolutely, it won't
-    // receive the cursor properly when navigating via arrow keys.
-    const style = IS_FIREFOX
-      ? {
-          pointerEvents: 'none',
-          width: '0px',
-          height: '0px',
-          lineHeight: '0px',
-          visibility: 'hidden'
-        }
-      : {
-          position: 'absolute',
-          top: '0px',
-          left: '-9999px',
-          textIndent: '-9999px'
-        }
+    const style = {
+      position: 'relative',
+      top: '0px',
+      left: '-9999px',
+      textIndent: '-9999px',
+    }
 
     return (
       <span style={style}>{this.renderLeaf()}</span>
@@ -137,6 +129,7 @@ class Void extends React.Component {
         schema={schema}
         state={state}
         node={child}
+        parent={node}
         ranges={ranges}
         index={index}
         text={text}

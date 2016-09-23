@@ -195,6 +195,16 @@ export function deleteForwardAtRange(transform, range, n = 1) {
 
   if (range.isAtEndOf(text)) {
     const next = document.getNextText(text)
+    const nextBlock = document.getClosestBlock(next)
+    const nextInline = document.getClosestInline(next)
+
+    if (nextBlock && nextBlock.isVoid) {
+      return transform.removeNodeByKey(nextBlock.key)
+    }
+
+    if (nextInline && nextInline.isVoid) {
+      return transform.removeNodeByKey(nextInline.key)
+    }
 
     range = range.merge({
       focusKey: next.key,

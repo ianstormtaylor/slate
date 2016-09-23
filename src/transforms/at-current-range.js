@@ -117,7 +117,8 @@ export function deleteBackward(transform, n = 1) {
     if (prevBlock && prevBlock.isVoid) {
       after = selection
     } else if (prevInline && prevInline.isVoid) {
-      after = selection
+      const prevPrev = document.getPreviousText(previous)
+      after = selection.collapseToEndOf(prevPrev)
     } else {
       after = selection.collapseToEndOf(previous)
     }
@@ -321,7 +322,13 @@ export function insertInline(transform, inline) {
   }
 
   else {
-    const text = document.getTexts().find(n => !keys.includes(n.key))
+    const text = document.getTexts().find((n) => {
+      if (keys.includes(n.key)) return false
+      const parent = document.getParent(n)
+      if (parent.kind != 'inline') return false
+      return true
+    })
+
     after = selection.collapseToEndOf(text)
   }
 

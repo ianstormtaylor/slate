@@ -33,6 +33,7 @@ class Node extends React.Component {
   static propTypes = {
     editor: React.PropTypes.object.isRequired,
     node: React.PropTypes.object.isRequired,
+    parent: React.PropTypes.object.isRequired,
     schema: React.PropTypes.object.isRequired,
     state: React.PropTypes.object.isRequired
   }
@@ -237,6 +238,7 @@ class Node extends React.Component {
       <Node
         key={child.key}
         node={child}
+        parent={this.props.node}
         editor={this.props.editor}
         schema={this.props.schema}
         state={this.props.state}
@@ -251,7 +253,7 @@ class Node extends React.Component {
    */
 
   renderElement = () => {
-    const { editor, node, state } = this.props
+    const { editor, node, parent, state } = this.props
     const { Component } = this.state
     const children = node.nodes
       .map(child => this.renderNode(child))
@@ -276,6 +278,7 @@ class Node extends React.Component {
         attributes={attributes}
         key={node.key}
         editor={editor}
+        parent={parent}
         node={node}
         state={state}
       >
@@ -325,7 +328,7 @@ class Node extends React.Component {
    */
 
   renderLeaf = (ranges, range, index, offset) => {
-    const { node, schema, state } = this.props
+    const { node, parent, schema, state } = this.props
     const text = range.text
     const marks = range.marks
 
@@ -335,6 +338,7 @@ class Node extends React.Component {
         index={index}
         marks={marks}
         node={node}
+        parent={parent}
         ranges={ranges}
         schema={schema}
         state={state}

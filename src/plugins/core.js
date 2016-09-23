@@ -188,11 +188,16 @@ function Plugin(options = {}) {
 
     const { fragment } = data
     const encoded = Base64.serializeNode(fragment)
+    const range = native.getRangeAt(0)
+    const contents = range.cloneContents()
+
+    // Remove any zero-width space spans from the cloned DOM so that they don't
+    // show up elsewhere when copied.
+    const zws = [].slice.call(contents.querySelectorAll('.slate-zero-width-space'))
+    zws.forEach(zw => zw.parentNode.removeChild(zw))
 
     // Wrap the first character of the selection in a span that has the encoded
     // fragment attached as an attribute, so it will show up in the copied HTML.
-    const range = native.getRangeAt(0)
-    const contents = range.cloneContents()
     const wrapper = window.document.createElement('span')
     const text = contents.childNodes[0]
     const char = text.textContent.slice(0, 1)
@@ -328,6 +333,8 @@ function Plugin(options = {}) {
       case 'enter': return onKeyDownEnter(e, data, state)
       case 'backspace': return onKeyDownBackspace(e, data, state)
       case 'delete': return onKeyDownDelete(e, data, state)
+      case 'left': return onKeyDownLeft(e, data, state)
+      case 'right': return onKeyDownRight(e, data, state)
       case 'y': return onKeyDownY(e, data, state)
       case 'z': return onKeyDownZ(e, data, state)
     }
@@ -448,6 +455,82 @@ function Plugin(options = {}) {
       .transform()
       .deleteForward(n)
       .apply()
+  }
+
+  /**
+   * On `left` key down, move backward.
+   *
+   * COMPAT: This is required to solve for the case where an inline void node is
+   * surrounded by empty text nodes with zero-width spaces in them. Without this
+   * the zero-width spaces will cause two arrow keys to jump to the next text.
+   *
+   * @param {Event} e
+   * @param {Object} data
+   * @param {State} state
+   * @return {State}
+   */
+
+  function onKeyDownLeft(e, data, state) {
+    if (data.isCtrl) return
+    if (data.isOpt) return
+    if (state.isExpanded) return
+
+    const { document, startText } = state
+    const hasVoidParent = document.hasVoidParent(startText)
+
+    if (
+      startText.text == '' ||
+      hasVoidParent
+    ) {
+      const previousText = document.getPreviousText(startText)
+      if (!previousText) return
+
+      debug('onKeyDownLeft', { data })
+
+      e.preventDefault()
+      return state
+        .transform()
+        .collapseToEndOf(previousText)
+        .apply()
+    }
+  }
+
+  /**
+   * On `right` key down, move forward.
+   *
+   * COMPAT: This is required to solve for the case where an inline void node is
+   * surrounded by empty text nodes with zero-width spaces in them. Without this
+   * the zero-width spaces will cause two arrow keys to jump to the next text.
+   *
+   * @param {Event} e
+   * @param {Object} data
+   * @param {State} state
+   * @return {State}
+   */
+
+  function onKeyDownRight(e, data, state) {
+    if (data.isCtrl) return
+    if (data.isOpt) return
+    if (state.isExpanded) return
+
+    const { document, startText } = state
+    const hasVoidParent = document.hasVoidParent(startText)
+
+    if (
+      startText.text == '' ||
+      hasVoidParent
+    ) {
+      const nextText = document.getNextText(startText)
+      if (!nextText) return state
+
+      debug('onKeyDownRight', { data })
+
+      e.preventDefault()
+      return state
+        .transform()
+        .collapseToStartOf(nextText)
+        .apply()
+    }
   }
 
   /**

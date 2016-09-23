@@ -1121,6 +1121,37 @@ const Node = {
       node = node.removeDescendant(key)
     })
 
+    // Ensure that void nodes are surrounded by text nodes
+    node = node.mapDescendants((desc) => {
+        if (desc.kind == 'text') {
+            return desc
+        }
+
+        const nodes = desc.nodes.reduce((accu, child, i) => {
+            // We wrap only inline void nodes
+            if (!child.isVoid || child.kind === 'block') {
+                return accu.push(child)
+            }
+
+            const prev = accu.last()
+            const next = desc.nodes.get(i + 1)
+
+            if (!prev || prev.kind !== 'text') {
+                accu = accu.push(Text.create())
+            }
+
+            accu = accu.push(child)
+
+            if (!next || next.kind !== 'text') {
+                accu = accu.push(Text.create())
+            }
+
+            return accu
+        }, List())
+
+        return desc.merge({ nodes })
+    })
+
     return node
   },
 
