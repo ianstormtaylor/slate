@@ -37,7 +37,25 @@ export function insertNodeByKey(transform, key, index, node) {
   const { document } = state
   const path = document.getPath(key)
   const newPath = path.slice().push(index)
-  return transform.insertNodeOperation(path, index, node)
+  transform.insertNodeOperation(path, index, node)
+
+  // If the node is an inline void, the parent is a block, and the node will be
+  // inserted at the block's edge, we need to add surrounding text nodes.
+  if (node.kind == 'inline' && node.isVoid) {
+    const parent = document.assertDescendant(key)
+
+    if (index == 0) {
+      const text = Text.create()
+      transform.insertNodeByKey(key, index, text)
+    }
+
+    if (index == parent.nodes.size) {
+      const text = Text.create()
+      transform.insertNodeByKey(key, index + 1, text)
+    }
+  }
+
+  return transform
 }
 
 /**
