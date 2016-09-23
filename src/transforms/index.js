@@ -142,6 +142,7 @@ import {
  */
 
 import {
+  normalize,
   normalizeDocument,
   normalizeSelection,
 } from './normalize'
@@ -282,6 +283,7 @@ export default {
    * Normalize.
    */
 
+  normalize,
   normalizeDocument,
   normalizeSelection,
 

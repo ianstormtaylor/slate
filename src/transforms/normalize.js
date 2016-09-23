@@ -1,4 +1,6 @@
 
+import Schema from '../models/schema'
+
 /**
  * Only allow block nodes in documents.
  *
@@ -60,18 +62,51 @@ const INLINE_CHILDREN_RULE = {
 }
 
 /**
- * The default schema.
+ * Join adjacent text nodes.
  *
  * @type {Object}
  */
 
-const SCHEMA = {
+const NO_ADJACENT_TEXT_RULE = {
+  match: (object) => {
+    return object.kind == 'block' || object.kind == 'inline'
+  },
+  validate: (node) => {
+    const { nodes } = node
+    const invalids = nodes
+      .filter((n, i) => {
+        const next = nodes.get(i + 1)
+        return n.kind == 'text' && next && next.kind == 'text'
+      })
+      .map((n, i) => {
+        const next = nodes.get(i + 1)
+        return [n, next]
+      })
+
+    return invalids.size ? invalids : null
+  },
+  normalize: (transform, node, pairs) => {
+    return pairs.reduce((t, pair) => {
+      const [ first, second ] = pair
+      return t.joinNodeByKey(first.key, second.key)
+    })
+  }
+}
+
+/**
+ * The internal normalizing schema.
+ *
+ * @type {Schema}
+ */
+
+const SCHEMA = Schema.create({
   rules: [
     DOCUMENT_CHILDREN_RULE,
     BLOCK_CHILDREN_RULE,
     INLINE_CHILDREN_RULE,
+    NO_ADJACENT_TEXT_RULE,
   ]
-}
+})
 
 /**
  * Normalize the state.
