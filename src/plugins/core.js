@@ -477,18 +477,22 @@ function Plugin(options = {}) {
 
     const { document, startText } = state
     const hasVoidParent = document.hasVoidParent(startText)
-    if (startText.text == '\u200B' && !hasVoidParent) return
 
-    const previousText = document.getPreviousText(startText)
-    if (!previousText) return
+    if (
+      startText.text == '' ||
+      hasVoidParent
+    ) {
+      const previousText = document.getPreviousText(startText)
+      if (!previousText) return
 
-    debug('onKeyDownLeft', { data })
+      debug('onKeyDownLeft', { data })
 
-    e.preventDefault()
-    return state
-      .transform()
-      .collapseToEndOf(previousText)
-      .apply()
+      e.preventDefault()
+      return state
+        .transform()
+        .collapseToEndOf(previousText)
+        .apply()
+    }
   }
 
   /**
@@ -511,18 +515,22 @@ function Plugin(options = {}) {
 
     const { document, startText } = state
     const hasVoidParent = document.hasVoidParent(startText)
-    if (startText.text == '\u200B' && !hasVoidParent) return
 
-    const nextText = document.getNextText(startText)
-    if (!nextText) return state
+    if (
+      startText.text == '' ||
+      hasVoidParent
+    ) {
+      const nextText = document.getNextText(startText)
+      if (!nextText) return state
 
-    debug('onKeyDownRight', { data })
+      debug('onKeyDownRight', { data })
 
-    e.preventDefault()
-    return state
-      .transform()
-      .collapseToStartOf(nextText)
-      .apply()
+      e.preventDefault()
+      return state
+        .transform()
+        .collapseToStartOf(nextText)
+        .apply()
+    }
   }
 
   /**
