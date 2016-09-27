@@ -113,8 +113,6 @@ class Void extends React.Component {
         position: 'relative',
         top: '0px',
         left: '-9999px',
-        height: '0px',
-        width: '0px',
         textIndent: '-9999px',
       }
     }
