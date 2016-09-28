@@ -1,5 +1,6 @@
 
 import Normalize from '../utils/normalize'
+import Block from '../models/block'
 
 /**
  * Add a `mark` to the characters in the current selection.
@@ -106,7 +107,16 @@ export function deleteBackward(transform, n = 1) {
   }
 
   else if (selection.isAtStartOf(document)) {
-    after = selection
+    if(document.hasVoidParent(startNode)) { // first node is void, like image etc
+      let nextBlock = document.getNextBlock(startNode)
+      if(!nextBlock) { // document is empty, so create an empty paragraph as placeholder
+        nextBlock = Block.create({type: 'paragraph'})
+        transform = transform.insertBlock(nextBlock)
+      }
+      after = selection.collapseToStartOf(nextBlock)
+    } else {
+      after = selection
+    }
   }
 
   else if (selection.isAtStartOf(startNode)) {
@@ -186,11 +196,15 @@ export function deleteForward(transform, n = 1) {
   }
 
   else if ((block && block.isVoid) || (inline && inline.isVoid)) {
-    const nextText = document.getNextText(startKey)
-    const prevText = document.getPreviousText(startKey)
+    const nextNode = document.getNextText(startKey)
+    let prevNode = document.getPreviousText(startKey)
+    if(!next && !prevNode) { // document is empty, so create an empty paragraph as placeholder
+      prevNode = Block.create({type: 'paragraph'})
+      transform = transform.insertBlock(prevNode)
+    }
     after = next
-      ? selection.collapseToStartOf(nextText)
-      : selection.collapseToEndOf(prevText)
+      ? selection.collapseToStartOf(nextNode)
+      : selection.collapseToEndOf(prevNode)
   }
 
   else if (previous && startOffset == 0 && startText.length == 1) {
