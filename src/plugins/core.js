@@ -578,9 +578,9 @@ function Plugin(options = {}) {
   /**
    * On `k` key down, delete untill the end of the line (mac only)
    *
-   * @param {Event} e 
-   * @param {Object} data 
-   * @param {State} state 
+   * @param {Event} e
+   * @param {Object} data
+   * @param {State} state
    * @return {State}
    */
 
