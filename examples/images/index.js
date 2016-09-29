@@ -128,7 +128,7 @@ class Images extends React.Component {
         data: {}
       })
       .apply({
-        snapshot: false
+        save: false
       })
 
     this.onChange(normalized)
