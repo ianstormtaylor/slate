@@ -286,14 +286,13 @@ const Node = {
    */
 
   getClosest(key, iterator) {
-    let node = this.assertDescendant(key)
-
-    while (node = this.getParent(node)) {
-      if (node == this) return null
-      if (iterator(node)) return node
+    let ancestors = this.getAncestors(key)
+    if (!ancestors) {
+      throw new Error(`Could not find a descendant node with key "${key}".`)
     }
 
-    return null
+    // Exclude this node itself
+    return ancestors.rest().findLast(iterator)
   },
 
   /**
