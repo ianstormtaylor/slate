@@ -786,6 +786,33 @@ const Node = {
   },
 
   /**
+   * Get the path of ancestors of a descendant node by `key`.
+   *
+   * @param {String || Node} node
+   * @return {List<Node> or Null}
+   */
+
+  getAncestors(key) {
+    key = Normalize.key(key)
+
+    if (key == this.key) return List()
+    if (this.hasChild(key)) return List([this])
+
+    let ancestors
+    this.nodes.find((node) => {
+      if (node.kind == 'text') return false
+      ancestors = node.getAncestors(key)
+      return ancestors
+    })
+
+    if (ancestors) {
+      return ancestors.unshift(this)
+    } else {
+      return null
+    }
+  },
+
+  /**
    * Get the node before a descendant node by `key`.
    *
    * @param {String or Node} key
