@@ -748,10 +748,13 @@ const Node = {
 
     let node = null
 
-    this.nodes.forEach((child) => {
-      if (child.kind == 'text') return
-      const match = child.getParent(key)
-      if (match) node = match
+    this.nodes.find((child) => {
+      if (child.kind == 'text') {
+        return false
+      } else {
+        node = child.getParent(key)
+        return node
+      }
     })
 
     return node
