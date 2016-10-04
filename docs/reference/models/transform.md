@@ -89,7 +89,7 @@ Transform methods can either operate on the [`Document`](./document.md), the [`S
 
 Applies all of the current transform steps, returning the newly transformed [`State`](./state.md). An `options` object is optional, containing values of:
 
-- `snapshot: Boolean` — override the editor's built-in logic of whether to create a new snapshot in the history, that can be reverted to later.
+- `save: Boolean` — override the editor's built-in logic of whether to create a new snapshot in the history, that can be reverted to later.
 
 
 ## Current State Transforms

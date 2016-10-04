@@ -67,8 +67,7 @@ class Void extends React.Component {
 
     // Make the outer wrapper relative, so the spacer can overlay it.
     const style = {
-      position: 'relative',
-      lineHeight: '0px'
+      position: 'relative'
     }
 
     return (
@@ -91,11 +90,31 @@ class Void extends React.Component {
    */
 
   renderSpacer = () => {
-    const style = {
-      position: 'relative',
-      top: '0px',
-      left: '-9999px',
-      textIndent: '-9999px',
+    const { node } = this.props
+    let style
+
+    if (node.kind == 'block') {
+      style = IS_FIREFOX
+        ? {
+            pointerEvents: 'none',
+            width: '0px',
+            height: '0px',
+            lineHeight: '0px',
+            visibility: 'hidden'
+          }
+        : {
+            position: 'absolute',
+            top: '0px',
+            left: '-9999px',
+            textIndent: '-9999px'
+          }
+    } else {
+      style = {
+        position: 'relative',
+        top: '0px',
+        left: '-9999px',
+        textIndent: '-9999px',
+      }
     }
 
     return (
