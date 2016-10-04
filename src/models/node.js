@@ -762,7 +762,7 @@ const Node = {
   /**
    * Get the path of a descendant node by `key`.
    *
-   * @param {String || Node} node
+   * @param {String || Node} key
    * @return {Array}
    */
 
@@ -771,17 +771,23 @@ const Node = {
 
     if (key == this.key) return []
 
-    let child = this.assertDescendant(key)
     let path = []
+    let childKey = key
     let parent
 
-    while (parent = this.getParent(child)) {
-      const index = parent.nodes.indexOf(child)
+    // Efficient with getParent memoization
+    while (parent = this.getParent(childKey)) {
+      const index = parent.nodes.findIndex(n => n.key === childKey)
       path.unshift(index)
-      child = parent
+      childKey = parent.key
     }
 
-    return path
+    if (childKey === key) {
+      // Did not loop once, meaning we could not find the child
+      throw new Error(`Could not find a descendant node with key "${key}".`)
+    } else {
+      return path
+    }
   },
 
   /**
