@@ -1198,10 +1198,13 @@ const Node = {
    */
 
   removeDescendant(key) {
+    key = Normalize.key(key)
+
     let node = this
-    const desc = node.assertDescendant(key)
-    let parent = node.getParent(desc)
-    const index = parent.nodes.indexOf(desc)
+    let parent = node.getParent(key)
+    if (!parent) throw new Error(`Could not find a descendant node with key "${key}".`)
+
+    const index = parent.nodes.findIndex(n => n.key === key)
     const isParent = node == parent
     const nodes = parent.nodes.splice(index, 1)
 
