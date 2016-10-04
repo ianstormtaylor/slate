@@ -429,7 +429,7 @@ class State extends new Record(DEFAULTS) {
       rule.normalize(transform, document, value)
     }
 
-    return transform.apply({ snapshot: false })
+    return transform.apply({ save: false })
   }
 
   /**
