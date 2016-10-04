@@ -1312,8 +1312,22 @@ const Node = {
    */
 
   updateDescendant(node) {
-    this.assertDescendant(node)
-    return this.mapDescendants(d => d.key == node.key ? node : d)
+    let found = false
+
+    const result = this.mapDescendants(d => {
+      if (d.key == node.key) {
+        found = true
+        return node
+      } else {
+        return d
+      }
+    })
+
+    if (!found) {
+      throw new Error(`Could not update descendant node with key "${node.key}".`)
+    } else {
+      return result
+    }
   },
 
   /**
