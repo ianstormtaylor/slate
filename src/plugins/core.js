@@ -6,6 +6,7 @@ import Placeholder from '../components/placeholder'
 import React from 'react'
 import String from '../utils/string'
 import getWindow from 'get-window'
+import { IS_MAC } from '../constants/environment'
 
 /**
  * Debug.
@@ -337,6 +338,7 @@ function Plugin(options = {}) {
       case 'right': return onKeyDownRight(e, data, state)
       case 'y': return onKeyDownY(e, data, state)
       case 'z': return onKeyDownZ(e, data, state)
+      case 'k': return onKeyDownK(e, data, state)
     }
   }
 
@@ -571,6 +573,28 @@ function Plugin(options = {}) {
       .transform()
       [data.isShift ? 'redo' : 'undo']()
       .apply({ save: false })
+  }
+
+  /**
+   * On `k` key down, delete untill the end of the line (mac only)
+   *
+   * @param {Event} e
+   * @param {Object} data
+   * @param {State} state
+   * @return {State}
+   */
+
+  function onKeyDownK(e, data, state) {
+    if (!IS_MAC || !data.isCtrl) return
+
+    debug('onKeyDownK', { data })
+
+    const { startOffset, startBlock } = state
+
+    return state
+      .transform()
+      .deleteForward(startBlock.text.length - startOffset)
+      .apply()
   }
 
   /**
