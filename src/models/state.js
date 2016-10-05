@@ -361,7 +361,9 @@ class State extends new Record(DEFAULTS) {
    */
 
   get marks() {
-    return this.selection.marks || this.document.getMarksAtRange(this.selection)
+    if (this.selection.anchorKey || this.selection.focusKey) {
+      return this.selection.marks || this.document.getMarksAtRange(this.selection)
+    }
   }
 
   /**
@@ -371,7 +373,9 @@ class State extends new Record(DEFAULTS) {
    */
 
   get blocks() {
-    return this.document.getBlocksAtRange(this.selection)
+    if (this.selection.anchorKey || this.selection.focusKey) {
+      return this.document.getBlocksAtRange(this.selection)
+    }
   }
 
   /**
@@ -381,7 +385,9 @@ class State extends new Record(DEFAULTS) {
    */
 
   get fragment() {
-    return this.document.getFragmentAtRange(this.selection)
+    if (this.selection.anchorKey || this.selection.focusKey) {
+      return this.document.getFragmentAtRange(this.selection)
+    }
   }
 
   /**
@@ -391,7 +397,9 @@ class State extends new Record(DEFAULTS) {
    */
 
   get inlines() {
-    return this.document.getInlinesAtRange(this.selection)
+    if (this.selection.anchorKey || this.selection.focusKey) {
+      return this.document.getInlinesAtRange(this.selection)
+    }
   }
 
   /**
@@ -401,7 +409,9 @@ class State extends new Record(DEFAULTS) {
    */
 
   get texts() {
-    return this.document.getTextsAtRange(this.selection)
+    if (this.selection.anchorKey || this.selection.focusKey) {
+      return this.document.getTextsAtRange(this.selection)
+    }
   }
 
   /**
