@@ -9,25 +9,26 @@ const { resolve } = require('path')
  * Performance benchmark
  */
 
-console.log('Benchmark\n')
+console.log('Benchmarks\n')
 
 let suite = new Benchmark.Suite()
 
-const suiteDir = resolve(__dirname, './operations')
-const operations = fs.readdirSync(suiteDir)
+const suiteDir = resolve(__dirname, './benchmarks')
+const benchmarks = fs.readdirSync(suiteDir)
 
-for (const operation of operations) {
-  if (operation[0] == '.') continue
+// For each benchmark to benchmark
+for (const benchmark of benchmarks) {
+  if (benchmark[0] == '.') continue
 
-  const operationDir = resolve(suiteDir, operation)
-  const fn = require(operationDir)
-  const input = readMetadata.sync(resolve(operationDir, 'input.yaml'))
+  const benchmarkDir = resolve(suiteDir, benchmark)
+  const fn = require(benchmarkDir)
+  const input = readMetadata.sync(resolve(benchmarkDir, 'input.yaml'))
 
   let state = Raw.deserialize(input, { terse: true })
 
   // add tests
   suite.add({
-    name: operation,
+    name: benchmark,
     fn: () => {
       return fn(state)
     }
@@ -36,12 +37,14 @@ for (const operation of operations) {
 
 
 suite
+  // Log results of each benchmark as they go
   .on('cycle', (event) => {
     console.log(String(event.target))
   })
+  // Log on error
   .on('error', (event) => {
     console.log(event.target.error)
   })
-  // run async to properly flush logs
+  // Run async to properly flush logs
   .run({ 'async': true })
 
