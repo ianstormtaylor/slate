@@ -1,4 +1,6 @@
 
-module.exports = function (state) {
-  return state.document.normalize()
+module.exports = {
+  run(state) {
+    return state.document.normalize()
+  }
 }
