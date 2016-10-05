@@ -39,6 +39,9 @@ suite
   .on('cycle', (event) => {
     console.log(String(event.target))
   })
+  .on('error', (event) => {
+    console.log(event.target.error)
+  })
   // run async to properly flush logs
   .run({ 'async': true })
 
