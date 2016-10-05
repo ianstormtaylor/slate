@@ -1,5 +1,5 @@
 language: node_js
-script: npm run lint && npm test
+script: npm run lint && npm test && npm run benchmarks
 node_js:
   - "node"
   - "6"
