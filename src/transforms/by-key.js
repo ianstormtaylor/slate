@@ -37,6 +37,7 @@ export function insertNodeByKey(transform, key, index, node) {
   const { document } = state
   const path = document.getPath(key)
   const newPath = path.slice().push(index)
+
   transform.insertNodeOperation(path, index, node)
 
   // If the node is an inline void, the parent is a block, and the node will be

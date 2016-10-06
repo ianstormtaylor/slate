@@ -90,8 +90,7 @@ function insertNode(state, operation) {
   let { document } = state
   let parent = document.assertPath(path)
   const isParent = document == parent
-  const nodes = parent.nodes.splice(index, 0, node)
-  parent = parent.merge({ nodes })
+  parent = parent.insertNode(index, node)
   document = isParent ? parent : document.updateDescendant(parent)
   state = state.merge({ document })
   return state

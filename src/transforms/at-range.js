@@ -729,6 +729,7 @@ export function unwrapInlineAtRange(transform, range, properties) {
 
 export function wrapBlockAtRange(transform, range, block) {
   block = Normalize.block(block)
+  block = block.merge({ nodes: block.nodes.clear() })
 
   const { state } = transform
   const { document } = state
@@ -799,6 +800,7 @@ export function wrapInlineAtRange(transform, range, inline) {
   if (range.isCollapsed) return transform
 
   inline = Normalize.inline(inline)
+  inline = inline.merge({ nodes: inline.nodes.clear() })
 
   const { startKey, startOffset, endKey, endOffset } = range
   let { state } = transform
