@@ -154,9 +154,32 @@ export function removeNodeByKey(transform, key) {
 
 export function removeTextByKey(transform, key, offset, length) {
   const { state } = transform
-  const { document } = state
+  let { document } = state
   const path = document.getPath(key)
-  return transform.removeTextOperation(path, offset, length)
+  transform.removeTextOperation(path, offset, length)
+
+  // If the text node is now empty, and not needed in the tree, remove it.
+  document = transform.state.document
+  const node = document.getDescendant(key)
+  const parent = document.getParent(key)
+
+  if (node.text != '') {
+    return transform
+  }
+
+  // If the text node is now empty, and not needed in the tree, remove it.
+  const previous = document.getPreviousSibling(key)
+  const next = document.getNextSibling(key)
+
+  if (
+    (parent.nodes.size == 1) ||
+    (previous && previous.isVoid == false) ||
+    (next && next.isVoid == false)
+  ) {
+    transform.removeNodeByKey(key)
+  }
+
+  return transform
 }
 
 /**

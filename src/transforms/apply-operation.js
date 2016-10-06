@@ -211,7 +211,6 @@ function removeText(state, operation) {
   let node = document.assertPath(path)
   node = node.removeText(offset, length)
   document = document.updateDescendant(node)
-  document = document.normalize()
   state = state.merge({ document })
   return state
 }
