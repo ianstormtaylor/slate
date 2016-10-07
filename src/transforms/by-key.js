@@ -78,6 +78,23 @@ export function insertTextByKey(transform, key, offset, text, marks) {
 }
 
 /**
+ * Join a node by `key` with a node `withKey`.
+ *
+ * @param {Transform} transform
+ * @param {String} key
+ * @param {String} withKey
+ * @return {Transform}
+ */
+
+export function joinNodeByKey(transform, key, withKey) {
+  const { state } = transform
+  const { document } = state
+  const path = document.getPath(key)
+  const withPath = document.getPath(withKey)
+  return transform.joinNodeOperation(path, withPath)
+}
+
+/**
  * Move a node by `key` to a new parent by `key` and `index`.
  *
  * @param {Transform} transform
@@ -124,21 +141,29 @@ export function removeMarkByKey(transform, key, offset, length, mark) {
 
 export function removeNodeByKey(transform, key) {
   const { state } = transform
-  const { document } = state
+  let { document } = state
   const node = document.assertDescendant(key)
-  const parent = document.getParent(key)
-  const index = parent.nodes.indexOf(node)
   const path = document.getPath(key)
+  const parent = document.getParent(key)
+  const previous = document.getPreviousSibling(key)
+  const next = document.getNextSibling(key)
   transform.removeNodeOperation(path)
 
-  // If the node isn't a text node, or it isn't the last node in its parent,
-  // then we have nothing else to do.
-  if (node.kind != 'text' || parent.nodes.size > 1) return transform
+  // If there are no more remaining nodes in the parent, re-add an empty text
+  // node so that we guarantee to always have text nodes as the tree's leaves.
+  if (parent.nodes.size == 1) {
+    const text = Text.create()
+    transform.insertNodeByKey(parent.key, 0, text)
+  }
 
-  // Otherwise, re-add an empty text node into the parent so that we guarantee
-  // to always have text nodes as the leaves of the node tree.
-  const text = Text.create()
-  transform.insertNodeByKey(parent.key, index, text)
+  // If the previous and next siblings are both text nodes, join them.
+  if (
+    (previous && previous.kind == 'text') &&
+    (next && next.kind == 'text')
+  ) {
+    transform.joinNodeByKey(next.key, previous.key)
+  }
+
   return transform
 }
 
@@ -158,21 +183,30 @@ export function removeTextByKey(transform, key, offset, length) {
   const path = document.getPath(key)
   transform.removeTextOperation(path, offset, length)
 
-  // If the text node is now empty, and not needed in the tree, remove it.
+  // If the text node is now empty, we might need to remove more nodes.
   document = transform.state.document
   const node = document.getDescendant(key)
   const parent = document.getParent(key)
+  const previous = document.getPreviousSibling(key)
+  const next = document.getNextSibling(key)
 
+  // If the text node isn't empty, don't do anything more.
   if (node.text != '') {
     return transform
   }
 
-  // If the text node is now empty, and not needed in the tree, remove it.
-  const previous = document.getPreviousSibling(key)
-  const next = document.getNextSibling(key)
-
+  // If the empty text node is the only node remaining in a non-void inline,
+  // remove the inline completely.
   if (
-    (parent.nodes.size == 1) ||
+    parent.kind == 'inline' &&
+    parent.isVoid == false &&
+    parent.nodes.size == 1
+  ) {
+    transform.removeNodeByKey(parent.key)
+  }
+
+  // Otherwise, if the text node is not needed in the tree any more, remove it.
+  else if (
     (previous && previous.isVoid == false) ||
     (next && next.isVoid == false)
   ) {
