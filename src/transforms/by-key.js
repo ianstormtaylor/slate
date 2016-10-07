@@ -191,7 +191,6 @@ export function removeNodeByKey(transform, key) {
     (previous && previous.kind == 'text') &&
     (next && next.kind == 'text')
   ) {
-    debugger
     transform.joinNodeByKey(next.key, previous.key)
   }
 
