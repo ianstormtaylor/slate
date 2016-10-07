@@ -94,7 +94,6 @@ export function deleteAtRange(transform, range) {
 
   const lonely = document.getFurthest(endBlock, p => p.nodes.size == 1) || endBlock
   transform.removeNodeByKey(lonely.key)
-  transform.normalizeDocument()
   return transform
 }
 
@@ -523,7 +522,6 @@ export function splitBlockAtRange(transform, range, height = 1) {
   }
 
   transform.splitNodeByKey(node.key, offset)
-  transform.normalizeDocument()
   return transform
 }
 
@@ -672,7 +670,6 @@ export function unwrapBlockAtRange(transform, range, properties) {
     }
   })
 
-  transform.normalizeDocument()
   return transform
 }
 
@@ -714,7 +711,6 @@ export function unwrapInlineAtRange(transform, range, properties) {
     })
   })
 
-  transform.normalizeDocument()
   return transform
 }
 

@@ -107,9 +107,39 @@ export function joinNodeByKey(transform, key, withKey) {
 export function moveNodeByKey(transform, key, newKey, newIndex) {
   const { state } = transform
   const { document } = state
+  const node = document.assertDescendant(key)
+  const prevParent = document.getParent(key)
   const path = document.getPath(key)
   const newPath = document.getPath(newKey)
-  return transform.moveNodeOperation(path, newPath, newIndex)
+  const parent = document.key == newKey ? document : document.assertDescendant(newKey)
+  const previous = newIndex == 0 ? null : parent.nodes.get(newIndex - 1)
+  const next = parent.nodes.get(newIndex)
+  transform.moveNodeOperation(path, newPath, newIndex)
+
+  // If the node to move is a text node, and it will be moved adjacent to
+  // another text node, join them together.
+  if (node.kind == 'text') {
+    if (next && next.kind == 'text') {
+      transform.joinNodeByKey(next.key, node.key)
+    }
+
+    if (previous && previous.kind == 'text') {
+      transform.joinNodeByKey(node.key, previous.key)
+    }
+  }
+
+  // If the node to be moved is the last child of its parent, then create a new
+  // empty text node in its place.
+  if (prevParent.nodes.size == 1) {
+    if (prevParent.kind == 'block') {
+      const text = Text.create()
+      transform.insertNodeByKey(prevParent.key, 0, text)
+    } else {
+      transform.removeNodeByKey(prevParent.key)
+    }
+  }
+
+  return transform
 }
 
 /**
@@ -161,6 +191,7 @@ export function removeNodeByKey(transform, key) {
     (previous && previous.kind == 'text') &&
     (next && next.kind == 'text')
   ) {
+    debugger
     transform.joinNodeByKey(next.key, previous.key)
   }
 

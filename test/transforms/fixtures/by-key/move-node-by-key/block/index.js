@@ -1,10 +1,10 @@
 
 export default function (state) {
   const { document, selection } = state
-  const first = document.getInlines().first()
+  const first = document.getBlocks().first()
 
   return state
     .transform()
-    .removeNodeByKey(first.key)
+    .moveNodeByKey(first.key, document.key, 1)
     .apply()
 }

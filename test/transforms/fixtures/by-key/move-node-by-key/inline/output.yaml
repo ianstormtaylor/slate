@@ -7,9 +7,9 @@ nodes:
         type: link
         nodes:
           - kind: text
-            text: word
+            text: two
       - kind: inline
         type: link
         nodes:
           - kind: text
-            text: another
+            text: one
