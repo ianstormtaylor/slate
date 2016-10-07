@@ -5,7 +5,7 @@ import Mark from './mark'
 import Selection from './selection'
 import Transform from './transform'
 import uid from '../utils/uid'
-import { Record, Set, Stack } from 'immutable'
+import { Record, Set, Stack, List } from 'immutable'
 
 /**
  * History.
@@ -361,9 +361,9 @@ class State extends new Record(DEFAULTS) {
    */
 
   get marks() {
-    if (this.selection.anchorKey || this.selection.focusKey) {
-      return this.selection.marks || this.document.getMarksAtRange(this.selection)
-    }
+    return this.selection.isUnset
+      ? new List()
+      : this.selection.marks || this.document.getMarksAtRange(this.selection)
   }
 
   /**
@@ -373,9 +373,9 @@ class State extends new Record(DEFAULTS) {
    */
 
   get blocks() {
-    if (this.selection.anchorKey || this.selection.focusKey) {
-      return this.document.getBlocksAtRange(this.selection)
-    }
+    return this.selection.isUnset
+      ? new List()
+      : this.document.getBlocksAtRange(this.selection)
   }
 
   /**
@@ -385,9 +385,9 @@ class State extends new Record(DEFAULTS) {
    */
 
   get fragment() {
-    if (this.selection.anchorKey || this.selection.focusKey) {
-      return this.document.getFragmentAtRange(this.selection)
-    }
+    return this.selection.isUnset
+      ? new List()
+      : this.document.getFragmentAtRange(this.selection)
   }
 
   /**
@@ -397,9 +397,9 @@ class State extends new Record(DEFAULTS) {
    */
 
   get inlines() {
-    if (this.selection.anchorKey || this.selection.focusKey) {
-      return this.document.getInlinesAtRange(this.selection)
-    }
+    return this.selection.isUnset
+      ? new List()
+      : this.document.getInlinesAtRange(this.selection)
   }
 
   /**
@@ -409,9 +409,9 @@ class State extends new Record(DEFAULTS) {
    */
 
   get texts() {
-    if (this.selection.anchorKey || this.selection.focusKey) {
-      return this.document.getTextsAtRange(this.selection)
-    }
+    return this.selection.isUnset
+      ? new List()
+      : this.document.getTextsAtRange(this.selection)
   }
 
   /**
