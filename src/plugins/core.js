@@ -358,9 +358,16 @@ function Plugin(options = {}) {
 
     // For void blocks, we don't want to split. Instead we just move to the
     // start of the next text node if one exists.
+    // If it doesn't exist, we create an empty paragraph.
     if (startBlock && startBlock.isVoid) {
       const text = document.getNextText(startKey)
-      if (!text) return
+      if (!text) {
+        return state
+          .transform()
+          .collapseToEndOf(startBlock)
+          .insertBlock('paragraph')
+          .apply()
+      }
       return state
         .transform()
         .collapseToStartOf(text)
