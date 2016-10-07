@@ -247,7 +247,6 @@ function setNode(state, operation) {
   let node = document.assertPath(path)
   node = node.merge(properties)
   document = document.updateDescendant(node)
-  document = document.normalize()
   state = state.merge({ document })
   return state
 }

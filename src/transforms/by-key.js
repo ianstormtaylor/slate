@@ -250,8 +250,58 @@ export function setNodeByKey(transform, key, properties) {
   const { state } = transform
   const { document } = state
   const node = document.assertDescendant(key)
+  const parent = document.getParent(key)
+  const index = parent.nodes.indexOf(node)
   const path = document.getPath(key)
-  return transform.setNodeOperation(path, properties)
+  const previous = document.getPreviousSibling(key)
+  const next = document.getNextSibling(key)
+  transform.setNodeOperation(path, properties)
+
+  // If the `isVoid` property is being changed to true, remove all of the node's
+  // children, and add additional text nodes around it if necessary.
+  if (properties.isVoid == true && node.isVoid == false) {
+    node.nodes.forEach((child) => {
+      transform.removeNodeByKey(child.key)
+    })
+
+    if (node.kind == 'inline') {
+      if (!next) {
+        const text = Text.create()
+        transform.insertNodeByKey(parent.key, index + 1, text)
+      }
+
+      if (!previous) {
+        const text = Text.create()
+        transform.insertNodeByKey(parent.key, index, text)
+      }
+    }
+  }
+
+  // If the `isVoid` property is being changed to `false` and the node is an
+  // inline node, remove any additional unnecessary text it.
+  if (
+    properties.isVoid == false &&
+    node.isVoid == true &&
+    node.kind == 'inline'
+  ) {
+    if (
+      previous &&
+      previous.kind == 'text' &&
+      previous.text == ''
+    ) {
+      transform.removeNodeByKey(previous.key)
+    }
+
+    if (
+      next &&
+      next.kind == 'text' &&
+      next.text == ''
+    ) {
+      transform.removeNodeByKey(next.key)
+    }
+  }
+
+  return transform
 }
 
 /**
