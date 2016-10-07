@@ -7,6 +7,7 @@ import React from 'react'
 import String from '../utils/string'
 import getWindow from 'get-window'
 import { IS_MAC } from '../constants/environment'
+import Raw from '../serializers/raw'
 
 /**
  * Debug.
@@ -354,26 +355,41 @@ function Plugin(options = {}) {
   function onKeyDownEnter(e, data, state) {
     debug('onKeyDownEnter', { data })
 
-    const { document, startKey, startBlock } = state
+    const { document, startKey, startBlock} = state
 
-    // For void blocks, we don't want to split. Instead we just move to the
-    // start of the next text node if one exists.
-    // If it doesn't exist, we create an empty paragraph.
+    // For void blocks, we don't want to split.
+    // Instead we insert an new empty paragraph block where appropriate
+
     if (startBlock && startBlock.isVoid) {
-      const text = document.getNextText(startKey)
-      if (!text) {
+      const nextBlock = document.getNextBlock(startKey)
+      const prevBlock = document.getPreviousBlock(startKey)
+      // Void block at the end of the document
+      if (!nextBlock) {
         return state
           .transform()
           .collapseToEndOf(startBlock)
           .insertBlock('paragraph')
           .apply()
       }
-      return state
-        .transform()
-        .collapseToStartOf(text)
-        .apply()
+      // Void block between two blocks
+      if (nextBlock && prevBlock) {
+        return state
+          .transform()
+          .collapseToEndOf(prevBlock)
+          .insertBlock('paragraph')
+          .collapseToStartOf(startBlock)
+          .apply()
+      }
+      // Void block in the beginning of the document
+      if (nextBlock && !prevBlock) {
+        const emptyParagraphBlock = Raw.deserializeNode({kind: 'block', type: 'paragraph', nodes: [{kind: 'text', text: '', ranges: []}]})
+        return state
+          .transform()
+          .collapseToStartOf(startBlock)
+          .insertNodeByKey(document.key, 0, emptyParagraphBlock)
+          .apply()
+      }
     }
-
     return state
       .transform()
       .splitBlock()
