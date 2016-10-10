@@ -362,7 +362,7 @@ class State extends new Record(DEFAULTS) {
 
   get marks() {
     return this.selection.isUnset
-      ? new List()
+      ? new Set()
       : this.selection.marks || this.document.getMarksAtRange(this.selection)
   }
 
@@ -386,7 +386,7 @@ class State extends new Record(DEFAULTS) {
 
   get fragment() {
     return this.selection.isUnset
-      ? new List()
+      ? Document.create()
       : this.document.getFragmentAtRange(this.selection)
   }
 
