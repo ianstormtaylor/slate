@@ -124,7 +124,9 @@ export function deleteBackward(transform, n = 1) {
     const prevBlock = document.getClosestBlock(previous)
     const prevInline = document.getClosestInline(previous)
 
-    if (prevBlock && prevBlock.isVoid) {
+    if(document.hasVoidParent(startNode)) { // current focus on void node, so delete current void node
+      after = selection.collapseToEndOf(previous)
+    } else if (prevBlock && prevBlock.isVoid) {
       after = selection
     } else if (prevInline && prevInline.isVoid) {
       const prevPrev = document.getPreviousText(previous)
