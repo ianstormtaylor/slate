@@ -281,7 +281,7 @@ function compareResult(result, reference = {}) {
  */
 
 function formatOpsSec(result) {
-  if (result.error) return 'Errored'
+  if (result.error) return result.error
   const { hz } = result
   const opsSec = Benchmark.formatNumber(`${hz.toFixed(hz < 100 ? 2 : 0)}`)
   return `${opsSec} ops/sec`
