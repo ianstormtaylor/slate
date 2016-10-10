@@ -1,5 +1,14 @@
-/* eslint-disable no-console, no-native-reassign */
-/* globals g_benchmark, g_input, g_Raw */
+/* eslint-disable no-native-reassign */
+/* globals g_getScope, g_setScope */
+
+// Performance benchmark
+
+const USAGE = `
+Usage: node ./perf/index.js [--compare referencePath] [--output outputPath]
+
+	--output outputPath	Output the benchmarks results as JSON at outputPath
+	--compare referencePath	Compare with results stored in the JSON at referencePath
+`
 
 const Benchmark = require('benchmark')
 const fs = require('fs')
@@ -13,10 +22,6 @@ const DEFAULT_BENCHMARK = {
   run(state) {}
 }
 
-/**
- * Performance benchmark
- */
-
 // Because Benchmark does not support scoped variables well, use
 // globals...  Each benchmark has its own namespace scope, that can be
 // accessed through the `g_getScope` global function
@@ -29,76 +34,156 @@ g_getScope = function () {
   return scopes[currentBenchmark]
 }
 
-console.log('Benchmarks\n')
+// --------------------------------------------------
+// Run benchmarks
+// --------------------------------------------------
 
-let suite = new Benchmark.Suite()
+function runBenchmarks() {
+  print('Benchmarks\n')
 
-const suiteDir = resolve(__dirname, './benchmarks')
-const benchmarks = fs.readdirSync(suiteDir)
+  // Command line options
+  const { outputPath, reference } = parseCommandLineOptions(process)
 
-// For each benchmark
-for (const benchmarkName of benchmarks) {
-  if (benchmarkName[0] == '.') continue
+  let suite = new Benchmark.Suite()
 
-  const benchmarkDir = resolve(suiteDir, benchmarkName)
-  // Because Benchmark does not support scoped variables well, use globals...
-  const benchmark = Object.assign({}, DEFAULT_BENCHMARK, require(benchmarkDir))
-  const input = readMetadata.sync(resolve(benchmarkDir, 'input.yaml'))
+  // For each benchmark
+  const suiteDir = resolve(__dirname, './benchmarks')
+  const benchmarks = fs.readdirSync(suiteDir)
+  for (const benchmarkName of benchmarks) {
+    if (benchmarkName[0] == '.') continue
+    const benchmarkDir = resolve(suiteDir, benchmarkName)
 
-  g_setScope(benchmarkName, {
-    Raw,
-    benchmark,
-    input
-  })
+    // Read benchmark specification
+    const benchmark = Object.assign({}, DEFAULT_BENCHMARK, require(benchmarkDir))
+    // Parse input Slate.State
+    const input = readMetadata.sync(resolve(benchmarkDir, 'input.yaml'))
 
-  // Add it to the benchmark suite
-  suite.add({
-    name: benchmarkName,
+    // Setup global scope for this benchmark
+    g_setScope(benchmarkName, {
+      Raw,
+      benchmark,
+      input
+    })
 
-    onStart() {
-      // Use this test's scope
-      currentBenchmark = benchmarkName
-    },
+    // Add it to the benchmark suite
+    suite.add({
+      name: benchmarkName,
 
-    // Time spent in setup is not taken into account
-    setup() {
-      // Create as much independant Slate.State as needed, to avoid
-      // memoization between calls to `fn`
-      const scope = g_getScope()
+      onStart() {
+        // Use this test's scope
+        currentBenchmark = benchmarkName
+      },
 
-      let states = []
-      let numberOfExecution = this.count
-      while (numberOfExecution--) {
-        states.push(
-          // Each benchmark is given the chance to do its own setup
-          scope.benchmark.setup(
-            scope.Raw.deserialize(scope.input, { terse: true })
+      // Time spent in setup is not taken into account
+      setup() {
+        // Create as much independant Slate.State as needed, to avoid
+        // memoization between calls to `fn`
+        const scope = g_getScope()
+
+        let states = []
+        let numberOfExecution = this.count
+        while (numberOfExecution--) {
+          states.push(
+            // Each benchmark is given the chance to do its own setup
+            scope.benchmark.setup(
+              scope.Raw.deserialize(scope.input, { terse: true })
+            )
           )
-        )
-      }
+        }
 
-      let stateIndex = 0
-    },
+        let stateIndex = 0
+      },
 
-    fn() {
       // Because of the way Benchmark compiles the functions,
       // the variables declared in `setup` are visible to `fn`
-      scope.benchmark.run(states[stateIndex])
-      // Next call will use another State instance
-      stateIndex++
-    }
+
+      fn() {
+        scope.benchmark.run(states[stateIndex])
+        // Next call will use another State instance
+        stateIndex++
+      }
+    })
+  }
+
+  suite
+  // Log results of each benchmark as they go
+  .on('cycle', (event) => {
+    print(String(event.target))
   })
+  // Log on error
+  .on('error', (event) => {
+    print(event.target.error)
+  })
+  // Run async to properly flush logs
+  .run({ 'async': true })
 }
 
-suite
-// Log results of each benchmark as they go
-.on('cycle', (event) => {
-  console.log(String(event.target))
-})
-// Log on error
-.on('error', (event) => {
-  console.log(event.target.error)
-})
-// Run async to properly flush logs
-.run({ 'async': true })
+/**
+ * @param {Node.Process} process
+ * @return {Object} { reference: JSON?, outputPath: String? }
+ */
 
+function parseCommandLineOptions(process) {
+  let outputPath, reference
+
+  const options = process.argv.slice(2)
+
+  if (options.length % 2 !== 0) {
+    printUsage()
+    throw new Error('Invalid number of arguments')
+  }
+
+  for (let i = 0; i < options.length; i++) {
+    let option = options[i]
+
+    switch (option) {
+
+    case '--output':
+      outputPath = options[i + 1]
+      i++
+      break
+
+    case '--compare':
+      let refPath = resolve(process.cwd(), options[i + 1])
+      if (exists(refPath)) {
+        let fileContents = fs.readFileSync(refPath, 'utf-8')
+        reference = JSON.parse(fileContents)
+      }
+
+      i++
+      break
+
+    default:
+      printUsage()
+      throw new Error(`Invalid argument ${option}`)
+    }
+  }
+
+  return {
+    outputPath,
+    reference
+  }
+}
+
+function printUsage() {
+  print(USAGE)
+}
+
+function exists(filepath) {
+  try {
+    fs.statSync(filepath)
+    return true
+  } catch (e) {
+    return false
+  }
+}
+
+function print(string) {
+  console.log(string) // eslint-disable-line no-console
+}
+
+
+// --------------------------------------------------
+// Main
+// --------------------------------------------------
+runBenchmarks()
