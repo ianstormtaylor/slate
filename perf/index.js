@@ -271,7 +271,7 @@ function compareResult(result, reference = {}) {
     print(indent(2), `rme: \xb1${result.stats.rme.toFixed(2)}%`) // rme: ±6.22%
   }
 
-  print('\n')
+  print('') // newline
 }
 
 /**
