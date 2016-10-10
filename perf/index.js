@@ -12,8 +12,8 @@ Usage: node ./perf/index.js [--compare referencePath] [--output outputPath]
 
 const Benchmark = require('benchmark')
 const fs = require('fs')
+const _ = require('lodash')
 const readMetadata = require('read-metadata')
-const toCamel = require('to-camel-case')
 const { Raw } = require('..')
 const { resolve } = require('path')
 
@@ -107,7 +107,7 @@ function runBenchmarks() {
   }
 
   function treatResult(event) {
-    const result = toResult(event)
+    const result = serializeResult(event)
     results[result.name] = result
     compareResult(result, reference)
   }
@@ -193,7 +193,7 @@ function save(results, path) {
   fs.writeFileSync(path, JSON.stringify(results))
 }
 
-function toResult(event) {
+function serializeResult(event) {
   const { target } = event
   const { error, name } = target
 
@@ -208,11 +208,15 @@ function toResult(event) {
   else {
     const { hz } = target
     const { mean, rme } = target.stats
+    const stats = _.pick(target.stats, [
+      'rme',
+      'mean',
+      'sample'
+    ])
 
     Object.assign(result, {
       hz,
-      mean,
-      rme
+      stats
     })
   }
 
@@ -241,24 +245,30 @@ function compareResult(result, reference = {}) {
     print(indent(2), 'Reference:	', formatOpsSec(ref))
   }
 
-  // Print difference
-  if (ref && !errored) {
-    const newMean = 1 / result.mean
-    const prevMean = 1 / ref.mean
-    const diffMean = (newMean - prevMean) / prevMean
+  // Print comparison
 
-    print(indent(2), `diff:	${diffMean.toFixed(2)}%`) // diff: -3.45%
+  if (ref && !errored) {
+    print(indent(2), `comparison: ${compare(result, ref)}`)
+  }
+
+  // Print difference as percentage
+  if (ref && !errored) {
+    const newMean = 1 / result.stats.mean
+    const prevMean = 1 / ref.stats.mean
+    const diffMean = 100 * (newMean - prevMean) / prevMean
+
+    print(indent(2), `diff: ${signed(diffMean.toFixed(2))}%`) // diff: -3.45%
   }
 
   // Print relative mean error
   if (ref && !errored) {
     const aRme = 100 * Math.sqrt(
-      (square(result.rme / 100) + square(ref.rme / 100)) / 2
+      (square(result.stats.rme / 100) + square(ref.stats.rme / 100)) / 2
     )
 
-    print(indent(2), `rme:	\xb1${aRme.toFixed(2)}%`) // rme: ±6.22%
+    print(indent(2), `rme: \xb1${aRme.toFixed(2)}%`) // rme: ±6.22%
   } else if (!result.error) {
-    print(indent(2), `rme:	\xb1${result.rme.toFixed(2)}%`) // rme: ±6.22%
+    print(indent(2), `rme: \xb1${result.stats.rme.toFixed(2)}%`) // rme: ±6.22%
   }
 
   print('\n')
@@ -277,12 +287,35 @@ function formatOpsSec(result) {
   return `${opsSec} ops/sec`
 }
 
+/**
+ * @param {Object} newResult
+ * @param {Object} oldResult
+ * @return {String} Faster, Slower, or Indeterminate
+ */
+
+function compare(newResult, oldResult) {
+  const comparison = (new Benchmark()).compare.call(newResult, oldResult)
+
+  switch (comparison) {
+  case 1:
+    return 'Faster'
+  case -1:
+    return 'Slower'
+  default:
+    return 'Indeterminate'
+  }
+}
+
 function indent(level = 0) {
   return Array(level + 1).join('  ')
 }
 
 function square(x) {
   return x * x
+}
+
+function signed(x) {
+  return x > 0 ? `+${x}` : `${x}`
 }
 
 function print(...strs) {
