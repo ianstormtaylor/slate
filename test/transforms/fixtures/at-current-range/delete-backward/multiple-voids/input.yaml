@@ -12,3 +12,9 @@ nodes:
     nodes:
       - kind: text
         text: ""
+  - kind: block
+    type: image
+    isVoid: true
+    nodes:
+      - kind: text
+        text: ""

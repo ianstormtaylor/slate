@@ -1,5 +1,7 @@
 
 nodes:
   - kind: block
-    type: image
-    isVoid: true
+    type: paragraph
+    nodes:
+      - kind: text
+        text: ""

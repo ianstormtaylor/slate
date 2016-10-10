@@ -138,28 +138,42 @@ export function deleteBackward(transform, n = 1) {
 
   else if (selection.isAtEndOf(startNode) && startNode.length == 1) {
     const block = document.getClosestBlock(startKey)
-    const highest = block.getHighestChild(startKey)
-    const previous = block.getPreviousSibling(highest)
-    const next = block.getNextSibling(highest)
 
-    if (previous) {
-      if (previous.kind == 'text') {
-        if (next && next.kind == 'text') {
-          after = selection.merge({
-            anchorKey: previous.key,
-            anchorOffset: previous.length,
-            focusKey: previous.key,
-            focusOffset: previous.length
-          })
-        } else {
-          after = selection.collapseToEndOf(previous)
+    if (block.isVoid) {
+      let previous = document.getPreviousText(startNode)
+      if (previous) after = selection.collapseToEndOf(previous)
+      else {
+        let next = document.getNextText(startNode)
+        if (next) after = selection.collapseToStartOf(next)
+        else {
+          let emptyBlock = Block.create({type: 'paragraph'})
+          transform = transform.insertBlock(emptyBlock)
         }
-      } else {
-        const last = previous.getTexts().last()
-        after = selection.collapseToEndOf(last)
       }
     } else {
-      after = selection.moveBackward(n)
+      const highest = block.getHighestChild(startKey)
+      const previous = block.getPreviousSibling(highest)
+      const next = block.getNextSibling(highest)
+
+      if (previous) {
+        if (previous.kind == 'text') {
+          if (next && next.kind == 'text') {
+            after = selection.merge({
+              anchorKey: previous.key,
+              anchorOffset: previous.length,
+              focusKey: previous.key,
+              focusOffset: previous.length
+            })
+          } else {
+            after = selection.collapseToEndOf(previous)
+          }
+        } else {
+          const last = previous.getTexts().last()
+          after = selection.collapseToEndOf(last)
+        }
+      } else {
+        after = selection.moveBackward(n)
+      }
     }
   }
 
