@@ -45,6 +45,7 @@ function runBenchmarks() {
   const { outputPath, reference } = parseCommandLineOptions(process)
 
   let suite = new Benchmark.Suite()
+  let results = {} // Can be saved as JSON
 
   // For each benchmark
   const suiteDir = resolve(__dirname, './benchmarks')
@@ -98,21 +99,30 @@ function runBenchmarks() {
       // the variables declared in `setup` are visible to `fn`
 
       fn() {
-        scope.benchmark.run(states[stateIndex])
+        scope.benchmark.run(states[stateIndex]) // eslint-disable-line no-undef
         // Next call will use another State instance
-        stateIndex++
+        stateIndex++ // eslint-disable-line no-undef
       }
     })
   }
 
+  function treatResult(event) {
+    const result = toResult(event)
+    results[result.name] = result
+    compareResult(result, reference)
+  }
+
   suite
-  // Log results of each benchmark as they go
-  .on('cycle', (event) => {
-    print(String(event.target))
-  })
-  // Log on error
-  .on('error', (event) => {
-    print(event.target.error)
+  // On benchmark success
+  .on('cycle', treatResult)
+  // On benchmark error
+  .on('error', treatResult)
+  // On suite completion
+  .on('complete', (event) => {
+    if (outputPath) {
+      save(results, outputPath)
+      print(`\nSaved results as JSON to ${outputPath}`)
+    }
   })
   // Run async to properly flush logs
   .run({ 'async': true })
@@ -178,10 +188,106 @@ function exists(filepath) {
   }
 }
 
-function print(string) {
-  console.log(string) // eslint-disable-line no-console
+function save(results, path) {
+  path = resolve(process.cwd(), path)
+  fs.writeFileSync(path, JSON.stringify(results))
 }
 
+function toResult(event) {
+  const { target } = event
+  const { error, name } = target
+
+  const result = {
+    name
+  }
+
+  if (target.error) {
+    Object.assign(result, { error })
+  }
+
+  else {
+    const { hz } = target
+    const { mean, rme } = target.stats
+
+    Object.assign(result, {
+      hz,
+      mean,
+      rme
+    })
+  }
+
+  return result
+}
+
+/**
+ * Pretty print a benchmark result, along with its reference.
+ * Mean difference, and rme computations inspired from
+ * https://github.com/facebook/immutable-js/blob/master/resources/bench.js
+ *
+ * @param {Object} result
+ * @param {Object} reference (optional)
+ */
+
+function compareResult(result, reference = {}) {
+  const { name } = result
+  const ref = reference[name]
+  const errored = ref && (ref.error || result.error)
+
+  print(indent(1), name)
+
+  print(indent(2), 'Current:	', formatOpsSec(result))
+
+  if (ref) {
+    print(indent(2), 'Reference:	', formatOpsSec(ref))
+  }
+
+  // Print difference
+  if (ref && !errored) {
+    const newMean = 1 / result.mean
+    const prevMean = 1 / ref.mean
+    const diffMean = (newMean - prevMean) / prevMean
+
+    print(indent(2), `diff:	${diffMean.toFixed(2)}%`) // diff: -3.45%
+  }
+
+  // Print relative mean error
+  if (ref && !errored) {
+    const aRme = 100 * Math.sqrt(
+      (square(result.rme / 100) + square(ref.rme / 100)) / 2
+    )
+
+    print(indent(2), `rme:	\xb1${aRme.toFixed(2)}%`) // rme: ±6.22%
+  } else if (!result.error) {
+    print(indent(2), `rme:	\xb1${result.rme.toFixed(2)}%`) // rme: ±6.22%
+  }
+
+  print('\n')
+}
+
+/**
+ * Pretty format a benchmark's ops/sec
+ * @param {Object} result
+ * @return {String}
+ */
+
+function formatOpsSec(result) {
+  if (result.error) return 'Errored'
+  const { hz } = result
+  const opsSec = Benchmark.formatNumber(`${hz.toFixed(hz < 100 ? 2 : 0)}`)
+  return `${opsSec} ops/sec`
+}
+
+function indent(level = 0) {
+  return Array(level + 1).join('  ')
+}
+
+function square(x) {
+  return x * x
+}
+
+function print(...strs) {
+  console.log(...strs) // eslint-disable-line no-console
+}
 
 // --------------------------------------------------
 // Main
