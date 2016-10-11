@@ -22,6 +22,10 @@ const DEFAULT_BENCHMARK = {
   run(state) {}
 }
 
+const BENCHMARK_OPTIONS = {
+  minSamples: 50
+}
+
 // Because Benchmark does not support scoped variables well, use
 // globals...  Each benchmark has its own namespace scope, that can be
 // accessed through the `g_getScope` global function
@@ -67,7 +71,7 @@ function runBenchmarks() {
     })
 
     // Add it to the benchmark suite
-    suite.add({
+    suite.add(Object.assign({}, BENCHMARK_OPTIONS, {
       name: benchmarkName,
 
       onStart() {
@@ -103,7 +107,7 @@ function runBenchmarks() {
         // Next call will use another State instance
         stateIndex++ // eslint-disable-line no-undef
       }
-    })
+    }))
   }
 
   function treatResult(event) {
