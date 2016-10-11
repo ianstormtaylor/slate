@@ -239,10 +239,10 @@ function compareResult(result, reference = {}) {
 
   print(indent(1), name)
 
-  print(indent(2), 'Current:	', formatOpsSec(result))
+  print(indent(2), 'Current:	', formatPerf(result))
 
   if (ref) {
-    print(indent(2), 'Reference:	', formatOpsSec(ref))
+    print(indent(2), 'Reference:	', formatPerf(ref))
   }
 
   // Print comparison
@@ -275,16 +275,17 @@ function compareResult(result, reference = {}) {
 }
 
 /**
- * Pretty format a benchmark's ops/sec
+ * Pretty format a benchmark's ops/sec along with its sample size
  * @param {Object} result
  * @return {String}
  */
 
-function formatOpsSec(result) {
+function formatPerf(result) {
   if (result.error) return result.error
   const { hz } = result
+  const runs = result.stats.sample.length
   const opsSec = Benchmark.formatNumber(`${hz.toFixed(hz < 100 ? 2 : 0)}`)
-  return `${opsSec} ops/sec`
+  return `${opsSec} ops/sec (${runs} runs sampled)`
 }
 
 /**
