@@ -1,4 +1,5 @@
 
+import 'jsdom-global/register'
 import React from 'react'
 import fs from 'fs'
 import jsdom from 'mocha-jsdom'
@@ -14,8 +15,6 @@ import { strictEqual } from '../helpers/assert-json'
  */
 
 describe('schema', () => {
-  jsdom()
-
   const tests = fs.readdirSync(resolve(__dirname, './fixtures'))
 
   for (const test of tests) {
