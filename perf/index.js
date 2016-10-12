@@ -115,17 +115,13 @@ function runBenchmarks() {
     }))
   }
 
-  function treatResult(event) {
+  suite
+  // On benchmark completion
+  .on('cycle', (event) => {
     const result = serializeResult(event)
     results[result.name] = result
     compareResult(result, reference)
-  }
-
-  suite
-  // On benchmark success
-  .on('cycle', treatResult)
-  // On benchmark error
-  .on('error', treatResult)
+  })
   // On suite completion
   .on('complete', (event) => {
     if (outputPath) {
