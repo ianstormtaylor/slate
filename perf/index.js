@@ -1,6 +1,3 @@
-/* eslint-disable no-native-reassign */
-/* globals g_getScope, g_setScope */
-
 // Performance benchmark
 
 const USAGE = `
@@ -23,19 +20,20 @@ const DEFAULT_BENCHMARK = {
 }
 
 const BENCHMARK_OPTIONS = {
-  minSamples: 50
+  // To ensure a better accuracy, force a minimum number of samples
+  minSamples: 50 // default 10
 }
 
-// Because Benchmark does not support scoped variables well, use
+// Because BenchmarkJS does not support scoped variables well, use
 // globals...  Each benchmark has its own namespace scope, that can be
-// accessed through the `g_getScope` global function
+// accessed through the `getScope` global function
 const scopes = {}
-let currentBenchmark // The benchmark being run
-g_setScope = function (name, scope) {
-  scopes[name] = scope
+global.currentBenchmark = undefined // The benchmark being run
+global.setScope = function (benchmarkName, scope) {
+  scopes[benchmarkName] = scope
 }
-g_getScope = function () {
-  return scopes[currentBenchmark]
+global.getScope = function () {
+  return scopes[global.currentBenchmark]
 }
 
 // --------------------------------------------------
@@ -64,7 +62,7 @@ function runBenchmarks() {
     const input = readMetadata.sync(resolve(benchmarkDir, 'input.yaml'))
 
     // Setup global scope for this benchmark
-    g_setScope(benchmarkName, {
+    global.setScope(benchmarkName, {
       Raw,
       benchmark,
       input
@@ -76,14 +74,14 @@ function runBenchmarks() {
 
       onStart() {
         // Use this test's scope
-        currentBenchmark = benchmarkName
+        global.currentBenchmark = benchmarkName
       },
 
       // Time spent in setup is not taken into account
       setup() {
         // Create as much independant Slate.State as needed, to avoid
         // memoization between calls to `fn`
-        const scope = g_getScope()
+        const scope = global.getScope()
 
         let states = []
         let numberOfExecution = this.count
