@@ -7,8 +7,14 @@ Usage: node ./perf/index.js [--compare referencePath] [--output outputPath]
 	--compare referencePath	Compare with results stored in the JSON at referencePath
 `
 
-const jsdomGlobal = require('jsdom-global')
 const Benchmark = require('benchmark')
+const jsdomGlobal = require('jsdom-global')
+
+// Setup virtual DOM for rendering tests, before loading React (so it
+// see the fake DOM), but after loading BenchmarkJS so that it does
+// not think we are running inside a browser.
+jsdomGlobal()
+
 const fs = require('fs')
 const _ = require('lodash')
 const readMetadata = require('read-metadata')
@@ -69,8 +75,6 @@ function runBenchmarks() {
       input
     })
 
-    let cleanupJsdom
-
     // Add it to the benchmark suite
     suite.add(Object.assign({}, BENCHMARK_OPTIONS, {
       name: benchmarkName,
@@ -78,12 +82,6 @@ function runBenchmarks() {
       onStart() {
         // Use this test's scope
         global.currentBenchmark = benchmarkName
-        // Setup jsdom globally
-        cleanupJsdom = jsdomGlobal()
-      },
-
-      onComplete() {
-        cleanupJsdom()
       },
 
       // Time spent in setup is not taken into account
