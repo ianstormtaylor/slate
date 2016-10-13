@@ -1,4 +1,3 @@
-
 import { Editor, Mark, Raw } from '../..'
 import Portal from 'react-portal'
 import React from 'react'
@@ -69,7 +68,7 @@ class HoveringMenu extends React.Component {
    */
 
   onChange = (state) => {
-    this.setState({ state })
+      this.setState({ state })
   }
 
   /**
@@ -163,6 +162,16 @@ class HoveringMenu extends React.Component {
    */
 
   renderEditor = () => {
+
+    // this is a fake-delay simulating a slow renderer
+    function sleep(milliSeconds){
+      var startTime = new Date().getTime(); // get the current time
+      while (new Date().getTime() < startTime + milliSeconds); // hog cpu
+    }
+
+    // 300ms is really high, but it makes the error easier to reproduce
+    sleep(300)
+
     return (
       <div className="editor">
         <Editor
