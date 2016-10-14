@@ -7,9 +7,4 @@ nodes:
         type: link
         nodes:
           - kind: text
-            text: ""
-      - kind: inline
-        type: link
-        nodes:
-          - kind: text
             text: word

@@ -308,7 +308,7 @@ export function setNodeByKey(transform, key, properties) {
   }
 
   // If the `isVoid` property is being changed to `false` and the node is an
-  // inline node, remove any additional unnecessary text it.
+  // inline node, remove any additional unnecessary text around it.
   if (
     properties.isVoid == false &&
     node.isVoid == true &&
@@ -344,8 +344,90 @@ export function setNodeByKey(transform, key, properties) {
  */
 
 export function splitNodeByKey(transform, key, offset) {
-  const { state } = transform
-  const { document } = state
+  let { state } = transform
+  let { document } = state
   const path = document.getPath(key)
-  return transform.splitNodeOperation(path, offset)
+  transform.splitNodeOperation(path, offset)
+
+  // Traverse the nodes on both sides of the split, ensuring that there are no
+  // empty inline nodes, or empty text nodes that should be removed.
+  state = transform.state
+  document = state.document
+  const parent = document.getParent(key)
+
+  // Define an iterator that will apply normalization transforms.
+  parent.filterDescendants((d) => {
+
+    // We don't need to do any normalization for block nodes.
+    if (d.kind == 'block') {
+      return
+    }
+
+    // If an inline void node has no text, add a space character.
+    if (
+      d.kind == 'inline' &&
+      d.text == '' &&
+      d.isVoid == true
+    ) {
+      transform.insertTextByKey(d.key, 0, ' ')
+    }
+
+    // If an non-void inline node has no text now, remove it.
+    if (
+      d.kind == 'inline' &&
+      d.text == '' &&
+      d.isVoid == false
+    ) {
+      transform.removeNodeByKey(d.key)
+    }
+
+    // Check to ensure that extra empty text nodes are preserved around inline
+    // void nodes.
+    if (
+      d.kind == 'inline' &&
+      d.isVoid == true
+    ) {
+      const previous = document.getPreviousSibling(d)
+      const next = document.getNextSibling(d)
+
+      if (
+        (!previous) ||
+        (previous.kind == 'block' || previous.kind == 'inline' && previous.isVoid)
+      ) {
+        const p = document.getParent(d)
+        const index = p.nodes.indexOf(d)
+        const text = Text.create()
+        transform.insertNodeByKey(p, index, text)
+      }
+
+      if (
+        (!next) ||
+        (next.kind == 'block' || next.kind == 'inline' && next.isVoid)
+      ) {
+        const p = document.getParent(d)
+        const index = p.nodes.indexOf(d)
+        const text = Text.create()
+        transform.insertNodeByKey(p, index + 1, text)
+      }
+    }
+
+    // If an empty text node is adjacent to an non-void inline node, remove it.
+    if (
+      d.kind == 'text' &&
+      d.text == ''
+    ) {
+      const previous = document.getPreviousSibling(d)
+      const next = document.getNextSibling(d)
+
+      if (
+        (previous && previous.kind == 'inline' && previous.isVoid == false) ||
+        (next && next.kind == 'inline' && next.isVoid == false)
+      ) {
+        transform.removeNodeByKey(d.key)
+      }
+    }
+  })
+
+  // Return the transform.
+  return transform
 }

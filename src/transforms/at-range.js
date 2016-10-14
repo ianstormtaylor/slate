@@ -268,7 +268,6 @@ export function insertBlockAtRange(transform, range, block) {
     transform.insertNodeByKey(parent.key, index + 1, block)
   }
 
-  transform.normalizeDocument()
   return transform
 }
 
@@ -385,7 +384,6 @@ export function insertInlineAtRange(transform, range, inline) {
 
   transform.splitNodeByKey(startKey, startOffset)
   transform.insertNodeByKey(parent.key, index + 1, inline)
-  transform.normalizeDocument()
   return transform
 }
 
@@ -818,15 +816,25 @@ export function wrapInlineAtRange(transform, range, inline) {
     : endChild.getOffset(endKey) + endOffset
 
   if (startBlock == endBlock) {
-    transform.splitNodeByKey(endChild.key, endOff)
-    transform.splitNodeByKey(startChild.key, startOff)
+    if (endOff != endChild.length) {
+      transform.splitNodeByKey(endChild.key, endOff)
+    }
+
+    if (startOff != 0) {
+      transform.splitNodeByKey(startChild.key, startOff)
+    }
 
     state = transform.state
     document = state.document
     startBlock = document.getClosestBlock(startKey)
     startChild = startBlock.getHighestChild(startKey)
-    const startInner = document.getNextSibling(startChild)
+
+    const startInner = startOff == 0
+      ? startChild
+      : document.getNextSibling(startChild)
+
     const startInnerIndex = startBlock.nodes.indexOf(startInner)
+
     const endInner = startKey == endKey ? startInner : startBlock.getHighestChild(endKey)
     const inlines = startBlock.nodes
       .skipUntil(n => n == startInner)
@@ -877,7 +885,6 @@ export function wrapInlineAtRange(transform, range, inline) {
     })
   }
 
-  transform.normalizeDocument()
   return transform
 }
 
