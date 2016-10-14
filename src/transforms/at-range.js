@@ -318,7 +318,9 @@ export function insertFragmentAtRange(transform, range, fragment) {
     })
   }
 
-  transform.splitNodeByKey(startChild.key, offset)
+  if (startOffset != 0) {
+    transform.splitNodeByKey(startChild.key, offset)
+  }
 
   state = transform.state
   document = state.document
@@ -345,7 +347,8 @@ export function insertFragmentAtRange(transform, range, fragment) {
     const inlineIndex = startBlock.nodes.indexOf(inlineChild)
 
     firstBlock.nodes.forEach((inline, i) => {
-      const newIndex = inlineIndex + i + 1
+      const offset = startOffset == 0 ? 0 : 1
+      const newIndex = inlineIndex + i + offset
       transform.insertNodeByKey(startBlock.key, newIndex, inline)
     })
   }
