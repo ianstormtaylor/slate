@@ -144,7 +144,6 @@ import {
  */
 
 import {
-  normalizeDocument,
   normalizeSelection,
 } from './normalize'
 
@@ -286,7 +285,6 @@ export default {
    * Normalize.
    */
 
-  normalizeDocument,
   normalizeSelection,
 
 }
