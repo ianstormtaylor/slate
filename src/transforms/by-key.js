@@ -56,6 +56,22 @@ export function insertNodeByKey(transform, key, index, node) {
     }
   }
 
+  // If the node is a text node, and it is insert next to a text node, it should
+  // be joined with it.
+  if (node.kind == 'text') {
+    const parent = document.assertDescendant(key)
+    const previous = index == 0 ? null : parent.nodes.get(index - 1)
+    const next = parent.nodes.get(index)
+
+    if (next && next.kind == 'text') {
+      transform.joinNodeByKey(next.key, node.key)
+    }
+
+    if (previous && previous.kind == 'text') {
+      transform.joinNodeByKey(node.key, previous.key)
+    }
+  }
+
   return transform
 }
 

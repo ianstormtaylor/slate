@@ -347,13 +347,12 @@ export function insertFragmentAtRange(transform, range, fragment) {
     const inlineIndex = startBlock.nodes.indexOf(inlineChild)
 
     firstBlock.nodes.forEach((inline, i) => {
-      const offset = startOffset == 0 ? 0 : 1
-      const newIndex = inlineIndex + i + offset
+      const o = startOffset == 0 ? 0 : 1
+      const newIndex = inlineIndex + i + o
       transform.insertNodeByKey(startBlock.key, newIndex, inline)
     })
   }
 
-  transform.normalizeDocument()
   return transform
 }
 
