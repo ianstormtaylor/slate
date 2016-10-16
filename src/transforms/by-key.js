@@ -210,3 +210,20 @@ export function unwrapInlineByKey(transform, key, properties) {
   const range = selection.moveToRangeOf(node)
   return transform.unwrapInline(range, properties)
 }
+
+/**
+ * Unwrap content from a block parent with `properties`.
+ *
+ * @param {Transform} transform
+ * @param {String} key
+ * @param {Object or String} properties
+ * @return {Transform}
+ */
+
+export function unwrapBlockByKey(transform, key, properties) {
+  const { state } = transform
+  const { document, selection } = state
+  const node = document.assertDescendant(key)
+  const range = selection.moveToRangeOf(node)
+  return transform.unwrapBlock(range, properties)
+}
