@@ -5,3 +5,8 @@ nodes:
     nodes:
       - kind: text
         text: word
+      - kind: inline
+        type: hashtag
+        nodes:
+          - kind: text
+            text: another

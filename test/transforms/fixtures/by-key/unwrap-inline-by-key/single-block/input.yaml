@@ -12,3 +12,8 @@ nodes:
             text: or
       - kind: text
         text: d
+      - kind: inline
+        type: hashtag
+        nodes:
+          - kind: text
+            text: another
