@@ -100,16 +100,6 @@ class Selection extends new Record(DEFAULTS) {
   }
 
   /**
-   * Check whether the selection's keys are not set.
-   *
-   * @return {Boolean}
-   */
-
-  get isUnset() {
-    return this.anchorKey == null || this.focusKey == null
-  }
-
-  /**
    * Get the start key.
    *
    * @return {String} startKey
@@ -291,21 +281,16 @@ class Selection extends new Record(DEFAULTS) {
     const { isCollapsed } = selection
     let { anchorKey, anchorOffset, focusKey, focusOffset, isBackward } = selection
 
-    // If the selection isn't formed yet or is malformed, ensure that it is
-    // properly zeroed out.
+    // If the selection isn't formed yet or is malformed, set it to the
+    // beginning of the node.
     if (
       anchorKey == null ||
       focusKey == null ||
       !node.hasDescendant(anchorKey) ||
       !node.hasDescendant(focusKey)
     ) {
-      return selection.merge({
-        anchorKey: null,
-        anchorOffset: 0,
-        focusKey: null,
-        focusOffset: 0,
-        isBackward: false
-      })
+      const firstText = node.getTexts().first()
+      return selection.collapseToStartOf(firstText)
     }
 
     // Get the anchor and focus nodes.
