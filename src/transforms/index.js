@@ -92,6 +92,7 @@ import {
   setMarkByKey,
   setNodeByKey,
   splitNodeByKey,
+  unwrapInlineByKey
 } from './by-key'
 
 /**
@@ -238,6 +239,7 @@ export default {
   setMarkByKey,
   setNodeByKey,
   splitNodeByKey,
+  unwrapInlineByKey,
 
   /**
    * On selection.
