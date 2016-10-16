@@ -387,7 +387,7 @@ export function setSelectionOperation(transform, properties) {
   }
 
   // Resolve the selection keys into paths.
-  if (props.anchorKey) {
+  /* if (props.anchorKey) {
     props.anchorPath = document.getPath(props.anchorKey)
     delete props.anchorKey
   }
@@ -405,7 +405,7 @@ export function setSelectionOperation(transform, properties) {
   if (prevProps.focusKey) {
     prevProps.focusPath = document.getPath(prevProps.focusKey)
     delete prevProps.focusKey
-  }
+  } */
 
   // Define an inverse of the operation for undoing.
   const inverse = [{
