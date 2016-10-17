@@ -105,19 +105,27 @@ const Node = {
   },
 
   /**
-   * Recursively find all ancestor nodes by `iterator`.
+   * Recursively find all descendant nodes by `iterator`. Breadth first.
    *
    * @param {Function} iterator
-   * @return {Node} node
+   * @return {Node or Null} node
    */
 
   findDescendant(iterator) {
-    return (
-      this.nodes.find(iterator) ||
-      this.nodes
-        .map(node => node.kind == 'text' ? null : node.findDescendant(iterator))
-        .find(exists => exists)
-    )
+    const found = this.nodes.find(iterator)
+    if (found) return found
+
+    let descendantFound = null
+    this.nodes.find(node => {
+      if (node.kind != 'text') {
+        descendantFound = node.findDescendant(iterator)
+        return descendantFound
+      } else {
+        return false
+      }
+    })
+
+    return descendantFound
   },
 
   /**
@@ -136,7 +144,7 @@ const Node = {
   },
 
   /**
-   * Recursively filter all ancestor nodes with `iterator`, depth-first.
+   * Recursively filter all descendant nodes with `iterator`, depth-first.
    *
    * @param {Function} iterator
    * @return {List} nodes
