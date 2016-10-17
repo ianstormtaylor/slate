@@ -1378,6 +1378,7 @@ memoize(Node, [
   'filterDescendantsDeep',
   'findDescendant',
   'findDescendantDeep',
+  'getAncestors',
   'getBlocks',
   'getBlocksAtRange',
   'getCharactersAtRange',
