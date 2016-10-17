@@ -125,8 +125,10 @@ class Node extends React.Component {
     // the node, to allow for intuitive selection-based rendering.
     if (
       this.props.node.kind != 'text' &&
-      this.props.state.isFocused &&
-      this.props.state.selection.hasEdgeIn(this.props.node)
+      (
+          props.state.isFocused != this.props.state.isFocused ||
+          this.props.state.selection.hasEdgeIn(this.props.node) != props.state.selection.hasEdgeIn(props.node)
+      )
     ) {
       return true
     }
