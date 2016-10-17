@@ -207,8 +207,9 @@ export function unwrapInlineByKey(transform, key, properties) {
   const { state } = transform
   const { document, selection } = state
   const node = document.assertDescendant(key)
-  const range = selection.moveToRangeOf(node)
-  return transform.unwrapInline(range, properties)
+  const texts = node.getTexts()
+  const range = selection.moveToRangeOf(texts.first(), texts.last())
+  return transform.unwrapInlineAtRange(range, properties)
 }
 
 /**
@@ -224,6 +225,7 @@ export function unwrapBlockByKey(transform, key, properties) {
   const { state } = transform
   const { document, selection } = state
   const node = document.assertDescendant(key)
-  const range = selection.moveToRangeOf(node)
-  return transform.unwrapBlock(range, properties)
+  const texts = node.getTexts()
+  const range = selection.moveToRangeOf(texts.first(), texts.last())
+  return transform.unwrapBlockAtRange(range, properties)
 }
