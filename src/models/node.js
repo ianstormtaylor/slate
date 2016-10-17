@@ -129,7 +129,29 @@ const Node = {
   },
 
   /**
-   * Recursively filter all ancestor nodes with `iterator`.
+   * Recursively find all descendant nodes by `iterator`. Depth first.
+   *
+   * @param {Function} iterator
+   * @return {Node or Null} node
+   */
+
+  findDescendantDeep(iterator) {
+    let descendantFound = null
+
+    const found = this.nodes.find(node => {
+      if (node.kind != 'text') {
+        descendantFound = node.findDescendantDeep(iterator)
+        return descendantFound || iterator(node)
+      }
+
+      return iterator(node) ? node : null
+    })
+
+    return descendantFound || found
+  },
+
+  /**
+   * Recursively filter all descendant nodes with `iterator`.
    *
    * @param {Function} iterator
    * @return {List} nodes
@@ -417,16 +439,7 @@ const Node = {
   getDescendant(key) {
     key = Normalize.key(key)
 
-    let child = this.getChild(key)
-    if (child) return child
-
-    this.nodes.find((node) => {
-      if (node.kind == 'text') return false
-      child = node.getDescendant(key)
-      return child
-    })
-
-    return child
+    return this.findDescendantDeep(node => node.key == key)
   },
 
   /**
@@ -1364,6 +1377,7 @@ memoize(Node, [
   'filterDescendants',
   'filterDescendantsDeep',
   'findDescendant',
+  'findDescendantDeep',
   'getBlocks',
   'getBlocksAtRange',
   'getCharactersAtRange',
