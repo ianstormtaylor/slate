@@ -674,10 +674,10 @@ const Node = {
     let last
 
     if (child.kind == 'block') {
-      last = child.getTexts().last()
+      last = child.getLastText()
     } else {
       const block = this.getClosestBlock(key)
-      last = block.getTexts().last()
+      last = block.getLastText()
     }
 
     const next = this.getNextText(last)
@@ -880,10 +880,10 @@ const Node = {
     let first
 
     if (child.kind == 'block') {
-      first = child.getTexts().first()
+      first = child.getFirstText()
     } else {
       const block = this.getClosestBlock(key)
-      first = block.getTexts().first()
+      first = block.getFirstText()
     }
 
     const previous = this.getPreviousText(first)
@@ -935,6 +935,34 @@ const Node = {
         ? texts.push(node)
         : texts.concat(node.getTexts())
     }, Block.createList())
+  },
+
+  /**
+   * Get the first child text node.
+   *
+   * @return {Node || Null} node
+   */
+
+  getFirstText() {
+    return this.findDescendantDeep(node => node.kind == 'text')
+  },
+
+  /**
+   * Get the last child text node.
+   *
+   * @return {Node} node
+   */
+
+  getLastText() {
+    let descendantFound = null
+
+    const found = this.nodes.findLast((node) => {
+      if (node.kind == 'text') return true
+      descendantFound = node.getLastText()
+      return descendantFound
+    })
+
+    return descendantFound || found
   },
 
   /**
@@ -1397,6 +1425,7 @@ memoize(Node, [
   'getDepth',
   'getDescendant',
   'getDescendantDecorators',
+  'getFirstText',
   'getFragmentAtRange',
   'getFurthest',
   'getFurthestBlock',
@@ -1404,6 +1433,7 @@ memoize(Node, [
   'getHighestChild',
   'getHighestOnlyChildParent',
   'getInlinesAtRange',
+  'getLastText',
   'getMarksAtRange',
   'getNextBlock',
   'getNextSibling',
