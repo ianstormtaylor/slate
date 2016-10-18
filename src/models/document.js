@@ -43,7 +43,7 @@ class Document extends new Record(DEFAULTS) {
     properties.key = properties.key || uid(4)
     properties.nodes = Block.createList(properties.nodes)
 
-    return new Document(properties).normalize()
+    return new Document(properties)
   }
 
   /**

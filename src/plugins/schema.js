@@ -1,5 +1,10 @@
 import Schema from '../models/schema'
 
+/*
+    This module contains the default schema to normalize documents
+ */
+
+
 /**
  * A default schema rule to only allow block nodes in documents.
  *

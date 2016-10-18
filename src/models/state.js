@@ -425,19 +425,8 @@ class State extends new Record(DEFAULTS) {
     const state = this
     const { document, selection } = this
     let transform = this.transform()
-    let failure
 
-    document.filterDescendantsDeep((node) => {
-      if (failure = node.validate(schema)) {
-        const { value, rule } = failure
-        rule.normalize(transform, node, value)
-      }
-    })
-
-    if (failure = document.validate(schema)) {
-      const { value, rule } = failure
-      rule.normalize(transform, document, value)
-    }
+    transform = document.normalize(transform, schema, null)
 
     return transform.apply({ save: false })
   }

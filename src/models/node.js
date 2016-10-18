@@ -14,6 +14,8 @@ import includes from 'lodash/includes'
 import memoize from '../utils/memoize'
 import uid from '../utils/uid'
 import { List, Map, OrderedSet, Set } from 'immutable'
+import { default as defaultSchema } from '../plugins/schema'
+
 
 /**
  * Node.
@@ -1040,122 +1042,6 @@ const Node = {
   },
 
   /**
-   * Normalize the node by joining any two adjacent text child nodes.
-   *
-   * @return {Node} node
-   */
-
-  normalize() {
-    let node = this
-    let keys = new Set()
-    let removals = new Set()
-
-    // Map this node's descendants, ensuring...
-    node = node.mapDescendants((desc) => {
-      if (removals.has(desc.key)) return desc
-
-      // ...that there are no duplicate keys.
-      if (keys.has(desc.key)) desc = desc.set('key', uid())
-      keys = keys.add(desc.key)
-
-      // ...that void nodes contain a single space of content.
-      if (desc.isVoid && desc.text != ' ') {
-        desc = desc.merge({
-          nodes: Text.createList([{
-            characters: Character.createList([{ text: ' ' }])
-          }])
-        })
-      }
-
-      // ...that no block or inline has no text node inside it.
-      if (desc.kind != 'text' && desc.nodes.size == 0) {
-        const text = Text.create()
-        const nodes = desc.nodes.push(text)
-        desc = desc.merge({ nodes })
-      }
-
-      // ...that no inline node is empty.
-      if (desc.kind == 'inline' && desc.text == '') {
-        removals = removals.add(desc.key)
-      }
-
-      return desc
-    })
-
-    // Remove any nodes marked for removal.
-    removals.forEach((key) => {
-      node = node.removeDescendant(key)
-    })
-
-    removals = removals.clear()
-
-    // And, ensuring...
-    node = node.mapDescendants((desc) => {
-      if (desc.kind == 'text') {
-        let next = node.getNextSibling(desc)
-
-        // ...that there are no adjacent text nodes.
-        if (next && next.kind == 'text') {
-          while (next && next.kind == 'text') {
-            const characters = desc.characters.concat(next.characters)
-            desc = desc.merge({ characters })
-            removals = removals.add(next.key)
-            next = node.getNextSibling(next)
-          }
-        }
-
-        // ...that there are no extra empty text nodes.
-        else if (desc.length == 0) {
-          const parent = node.getParent(desc)
-          if (!removals.has(parent.key) && parent.nodes.size > 1) {
-            removals = removals.add(desc.key)
-          }
-        }
-      }
-
-      return desc
-    })
-
-    // Remove any nodes marked for removal.
-    removals.forEach((key) => {
-      node = node.removeDescendant(key)
-    })
-
-    // Ensure that void nodes are surrounded by text nodes
-    node = node.mapDescendants((desc) => {
-        if (desc.kind == 'text') {
-            return desc
-        }
-
-        const nodes = desc.nodes.reduce((accu, child, i) => {
-            // We wrap only inline void nodes
-            if (!child.isVoid || child.kind === 'block') {
-                return accu.push(child)
-            }
-
-            const prev = accu.last()
-            const next = desc.nodes.get(i + 1)
-
-            if (!prev || prev.kind !== 'text') {
-                accu = accu.push(Text.create())
-            }
-
-            accu = accu.push(child)
-
-            if (!next || next.kind !== 'text') {
-                accu = accu.push(Text.create())
-            }
-
-            return accu
-        }, List())
-
-        return desc.merge({ nodes })
-    })
-
-    return node
-  },
-
-  /**
    * Remove a `node` from the children node map.
    *
    * @param {String or Node} key
@@ -1227,8 +1113,8 @@ const Node = {
         const { nodes } = child
         const oneNodes = nodes.takeUntil(n => n.key == one.key).push(one)
         const twoNodes = nodes.skipUntil(n => n.key == one.key).rest().unshift(two)
-        one = child.merge({ nodes: oneNodes }).normalize()
-        two = child.merge({ nodes: twoNodes, key: uid() }).normalize()
+        one = child.merge({ nodes: oneNodes })
+        two = child.merge({ nodes: twoNodes, key: uid() })
       }
 
       child = base.getParent(child)
@@ -1266,7 +1152,6 @@ const Node = {
 
     const path = base.getPath(node.key)
     return this.splitNode(path, offset)
-      .normalize()
   },
 
   /**
@@ -1290,8 +1175,38 @@ const Node = {
 
   validate(schema) {
     return schema.__validate(this)
-  }
+  },
 
+  /**
+   * Normalize the node using a schema, by pushing operations to a transform.
+   * "prevNode" can be used to prevent iterating over all children.
+   *
+   * @param {Transform} transform
+   * @param {Schema} schema
+   * @param {Node} prevNode?
+   * @return {Transform}
+   */
+
+  normalize(transform, schema, prevNode) {
+    if (prevNode === this) {
+      return this
+    }
+
+    // Normalize children
+    this.nodes.forEach(child => {
+      const prevChild = prevNode ? prevNode.getChild(child.key) : null
+      child.normalize(transform, schema, prevChild)
+    })
+
+    // Normalize the node itself
+    let failure
+    if (failure = this.validate(schema)) {
+      const { value, rule } = failure
+      rule.normalize(transform, this, value)
+    }
+
+    return transform
+  }
 }
 
 /**

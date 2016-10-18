@@ -53,7 +53,7 @@ class Inline extends new Record(DEFAULTS) {
     properties.isVoid = !!properties.isVoid
     properties.nodes = Inline.createList(properties.nodes)
 
-    return new Inline(properties).normalize()
+    return new Inline(properties)
   }
 
   /**
