@@ -7,6 +7,7 @@ import React from 'react'
 import String from '../utils/string'
 import getWindow from 'get-window'
 import { IS_MAC } from '../constants/environment'
+import { rules } from './schema'
 
 /**
  * Debug.
@@ -681,128 +682,64 @@ function Plugin(options = {}) {
   }
 
   /**
-   * A default schema rule to render block nodes.
-   *
-   * @type {Object}
+   * Extend core schema with rendering
    */
 
-  const BLOCK_RENDER_RULE = {
-    match: (node) => {
-      return node.kind == 'block'
-    },
-    render: (props) => {
-      return (
-        <div {...props.attributes} style={{ position: 'relative' }}>
-          {props.children}
-          {placeholder
-            ? <Placeholder
-                className={placeholderClassName}
-                node={props.node}
-                parent={props.state.document}
-                state={props.state}
-                style={placeholderStyle}
-              >
-                {placeholder}
-              </Placeholder>
-            : null}
-        </div>
-      )
-    }
-  }
+   /**
+    * A default schema rule to render block nodes.
+    *
+    * @type {Object}
+    */
 
-  /**
-   * A default schema rule to render inline nodes.
-   *
-   * @type {Object}
-   */
+   const BLOCK_RENDER_RULE = {
+     match: (node) => {
+       return node.kind == 'block'
+     },
+     render: (props) => {
+       return (
+         <div {...props.attributes} style={{ position: 'relative' }}>
+           {props.children}
+           {placeholder
+             ? <Placeholder
+                 className={placeholderClassName}
+                 node={props.node}
+                 parent={props.state.document}
+                 state={props.state}
+                 style={placeholderStyle}
+               >
+                 {placeholder}
+               </Placeholder>
+             : null}
+         </div>
+       )
+     }
+   }
 
-  const INLINE_RENDER_RULE = {
-    match: (node) => {
-      return node.kind == 'inline'
-    },
-    render: (props) => {
-      return (
-        <span {...props.attributes} style={{ position: 'relative' }}>
-          {props.children}
-        </span>
-      )
-    }
-  }
+   /**
+    * A default schema rule to render inline nodes.
+    *
+    * @type {Object}
+    */
 
-  /**
-   * A default schema rule to only allow block nodes in documents.
-   *
-   * @type {Object}
-   */
-
-  const DOCUMENT_CHILDREN_RULE = {
-    match: (node) => {
-      return node.kind == 'document'
-    },
-    validate: (document) => {
-      const { nodes } = document
-      const invalids = nodes.filter(n => n.kind != 'block')
-      return invalids.size ? invalids : null
-    },
-    normalize: (transform, document, invalids) => {
-      return invalids.reduce((t, n) => t.removeNodeByKey(n.key), transform)
-    }
-  }
-
-  /**
-   * A default schema rule to only allow block, inline and text nodes in blocks.
-   *
-   * @type {Object}
-   */
-
-  const BLOCK_CHILDREN_RULE = {
-    match: (node) => {
-      return node.kind == 'block'
-    },
-    validate: (block) => {
-      const { nodes } = block
-      const invalids = nodes.filter(n => n.kind != 'block' && n.kind != 'inline' && n.kind != 'text')
-      return invalids.size ? invalids : null
-    },
-    normalize: (transform, block, invalids) => {
-      return invalids.reduce((t, n) => t.removeNodeByKey(n.key), transform)
-    }
-  }
-
-  /**
-   * A default schema rule to only allow inline and text nodes in inlines.
-   *
-   * @type {Object}
-   */
-
-  const INLINE_CHILDREN_RULE = {
-    match: (object) => {
-      return object.kind == 'inline'
-    },
-    validate: (inline) => {
-      const { nodes } = inline
-      const invalids = nodes.filter(n => n.kind != 'inline' && n.kind != 'text')
-      return invalids.size ? invalids : null
-    },
-    normalize: (transform, inline, invalids) => {
-      return invalids.reduce((t, n) => t.removeNodeByKey(n.key), transform)
-    }
-  }
-
-  /**
-   * The default schema.
-   *
-   * @type {Object}
-   */
+   const INLINE_RENDER_RULE = {
+     match: (node) => {
+       return node.kind == 'inline'
+     },
+     render: (props) => {
+       return (
+         <span {...props.attributes} style={{ position: 'relative' }}>
+           {props.children}
+         </span>
+       )
+     }
+   }
 
   const schema = {
-    rules: [
-      BLOCK_RENDER_RULE,
-      INLINE_RENDER_RULE,
-      DOCUMENT_CHILDREN_RULE,
-      BLOCK_CHILDREN_RULE,
-      INLINE_CHILDREN_RULE,
-    ]
+      rules: [
+          BLOCK_RENDER_RULE,
+          INLINE_RENDER_RULE,
+          ...rules
+      ]
   }
 
   /**
