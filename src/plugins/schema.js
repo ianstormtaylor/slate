@@ -1,3 +1,4 @@
+import Schema from '../models/schema'
 
 /**
  * A default schema rule to only allow block nodes in documents.
@@ -40,6 +41,25 @@ const BLOCK_CHILDREN_RULE = {
 }
 
 /**
+ * A default schema rule to have at least one text node in blocks
+ *
+ * @type {Object}
+ */
+
+const MIN_TEXT_RULE = {
+    match: (object) => {
+      return object.kind == 'block' || object.kind == 'inline'
+    },
+    validate: (node) => {
+      const { nodes } = node
+      return nodes.size === 0 ? true : null
+    },
+    normalize: (transform, node) => {
+      return transform.insertTextByKey(node.key, 0, '')
+    }
+}
+
+/**
  * A default schema rule to only allow inline and text nodes in inlines.
  *
  * @type {Object}
@@ -59,18 +79,53 @@ const INLINE_CHILDREN_RULE = {
   }
 }
 
+
+/**
+ * Join adjacent text nodes.
+ *
+ * @type {Object}
+ */
+
+const NO_ADJACENT_TEXT_RULE = {
+  match: (object) => {
+    return object.kind == 'block' || object.kind == 'inline'
+  },
+  validate: (node) => {
+    const { nodes } = node
+    const invalids = nodes
+      .filter((n, i) => {
+        const next = nodes.get(i + 1)
+        return n.kind == 'text' && next && next.kind == 'text'
+      })
+      .map((n, i) => {
+        const next = nodes.get(i + 1)
+        return [n, next]
+      })
+
+    return invalids.size ? invalids : null
+  },
+  normalize: (transform, node, pairs) => {
+    return pairs.reduce((t, pair) => {
+      const [ first, second ] = pair
+      return t.joinNodeByKey(first.key, second.key)
+    })
+  }
+}
+
 /**
  * The default schema.
  *
  * @type {Object}
  */
 
-const schema = {
+const schema = Schema.create({
   rules: [
     DOCUMENT_CHILDREN_RULE,
     BLOCK_CHILDREN_RULE,
+    MIN_TEXT_RULE,
     INLINE_CHILDREN_RULE,
+    NO_ADJACENT_TEXT_RULE
   ]
-}
+})
 
 export default schema
