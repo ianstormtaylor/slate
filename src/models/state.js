@@ -5,7 +5,7 @@ import Mark from './mark'
 import Selection from './selection'
 import Transform from './transform'
 import uid from '../utils/uid'
-import { Record, Set, Stack } from 'immutable'
+import { Record, Set, Stack, List } from 'immutable'
 
 /**
  * History.
@@ -361,7 +361,9 @@ class State extends new Record(DEFAULTS) {
    */
 
   get marks() {
-    return this.selection.marks || this.document.getMarksAtRange(this.selection)
+    return this.selection.isUnset
+      ? new Set()
+      : this.selection.marks || this.document.getMarksAtRange(this.selection)
   }
 
   /**
@@ -371,7 +373,9 @@ class State extends new Record(DEFAULTS) {
    */
 
   get blocks() {
-    return this.document.getBlocksAtRange(this.selection)
+    return this.selection.isUnset
+      ? new List()
+      : this.document.getBlocksAtRange(this.selection)
   }
 
   /**
@@ -381,7 +385,9 @@ class State extends new Record(DEFAULTS) {
    */
 
   get fragment() {
-    return this.document.getFragmentAtRange(this.selection)
+    return this.selection.isUnset
+      ? Document.create()
+      : this.document.getFragmentAtRange(this.selection)
   }
 
   /**
@@ -391,7 +397,9 @@ class State extends new Record(DEFAULTS) {
    */
 
   get inlines() {
-    return this.document.getInlinesAtRange(this.selection)
+    return this.selection.isUnset
+      ? new List()
+      : this.document.getInlinesAtRange(this.selection)
   }
 
   /**
@@ -401,7 +409,9 @@ class State extends new Record(DEFAULTS) {
    */
 
   get texts() {
-    return this.document.getTextsAtRange(this.selection)
+    return this.selection.isUnset
+      ? new List()
+      : this.document.getTextsAtRange(this.selection)
   }
 
   /**
@@ -429,7 +439,7 @@ class State extends new Record(DEFAULTS) {
       rule.normalize(transform, document, value)
     }
 
-    return transform.apply({ snapshot: false })
+    return transform.apply({ save: false })
   }
 
   /**

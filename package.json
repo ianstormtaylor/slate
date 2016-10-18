@@ -1,7 +1,7 @@
 {
   "name": "slate",
   "description": "A completely customizable framework for building rich text editors.",
-  "version": "0.14.13",
+  "version": "0.14.15",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
   "main": "./lib/index.js",
@@ -87,6 +87,7 @@
     "lint": "eslint --ignore-pattern 'build.dev.js' --ignore-pattern 'build.prod.js' '{examples,src}/**/*.js'",
     "open": "open http://localhost:8080/dev.html",
     "prepublish": "npm run build",
+    "postpublish": "npm run gh-pages",
     "release": "np",
     "release:next": "np --tag=next",
     "start": "http-server ./examples",
