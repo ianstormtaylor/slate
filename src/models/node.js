@@ -942,6 +942,24 @@ const Node = {
    */
 
   insertNode(index, node) {
+    let keys = new Set([ this.key ])
+
+    this.findDescendant((desc) => {
+      keys = keys.add(desc.key)
+    })
+
+    if (keys.contains(node.key)) {
+      node = node.regenerateKey()
+    }
+
+    if (node.kind != 'text') {
+      node = node.mapDescendants((desc) => {
+        return keys.contains(desc.key)
+          ? desc.regenerateKey()
+          : desc
+      })
+    }
+
     const nodes = this.nodes.splice(index, 0, node)
     return this.merge({ nodes })
   },
@@ -1038,6 +1056,16 @@ const Node = {
     })
 
     return this.merge({ nodes })
+  },
+
+  /**
+   * Regenerate the node's key.
+   *
+   * @return {Node} node
+   */
+
+  regenerateKey() {
+    return this.merge({ key: uid() })
   },
 
   /**

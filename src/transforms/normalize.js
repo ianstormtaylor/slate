@@ -1,4 +1,3 @@
-
 import Schema from '../models/schema'
 import { default as defaultSchema } from '../plugins/schema'
 

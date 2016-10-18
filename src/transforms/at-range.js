@@ -95,6 +95,7 @@ export function deleteAtRange(transform, range) {
   const lonely = document.getFurthest(endBlock, p => p.nodes.size == 1) || endBlock
   transform.removeNodeByKey(lonely.key)
   transform.normalize()
+
   return transform
 }
 
@@ -270,6 +271,7 @@ export function insertBlockAtRange(transform, range, block) {
   }
 
   transform.normalize()
+
   return transform
 }
 
@@ -320,7 +322,9 @@ export function insertFragmentAtRange(transform, range, fragment) {
     })
   }
 
-  transform.splitNodeByKey(startChild.key, offset)
+  if (startOffset != 0) {
+    transform.splitNodeByKey(startChild.key, offset)
+  }
 
   state = transform.state
   document = state.document
@@ -347,12 +351,14 @@ export function insertFragmentAtRange(transform, range, fragment) {
     const inlineIndex = startBlock.nodes.indexOf(inlineChild)
 
     firstBlock.nodes.forEach((inline, i) => {
-      const newIndex = inlineIndex + i + 1
+      const o = startOffset == 0 ? 0 : 1
+      const newIndex = inlineIndex + i + o
       transform.insertNodeByKey(startBlock.key, newIndex, inline)
     })
   }
 
   transform.normalize()
+
   return transform
 }
 
@@ -387,6 +393,7 @@ export function insertInlineAtRange(transform, range, inline) {
   transform.splitNodeByKey(startKey, startOffset)
   transform.insertNodeByKey(parent.key, index + 1, inline)
   transform.normalize()
+
   return transform
 }
 
@@ -524,6 +531,7 @@ export function splitBlockAtRange(transform, range, height = 1) {
 
   transform.splitNodeByKey(node.key, offset)
   transform.normalize()
+
   return transform
 }
 
@@ -673,6 +681,7 @@ export function unwrapBlockAtRange(transform, range, properties) {
   })
 
   transform.normalize()
+
   return transform
 }
 
@@ -715,6 +724,7 @@ export function unwrapInlineAtRange(transform, range, properties) {
   })
 
   transform.normalize()
+
   return transform
 }
 
@@ -729,6 +739,7 @@ export function unwrapInlineAtRange(transform, range, properties) {
 
 export function wrapBlockAtRange(transform, range, block) {
   block = Normalize.block(block)
+  block = block.merge({ nodes: block.nodes.clear() })
 
   const { state } = transform
   const { document } = state
@@ -799,6 +810,7 @@ export function wrapInlineAtRange(transform, range, inline) {
   if (range.isCollapsed) return transform
 
   inline = Normalize.inline(inline)
+  inline = inline.merge({ nodes: inline.nodes.clear() })
 
   const { startKey, startOffset, endKey, endOffset } = range
   let { state } = transform
@@ -820,15 +832,25 @@ export function wrapInlineAtRange(transform, range, inline) {
     : endChild.getOffset(endKey) + endOffset
 
   if (startBlock == endBlock) {
-    transform.splitNodeByKey(endChild.key, endOff)
-    transform.splitNodeByKey(startChild.key, startOff)
+    if (endOff != endChild.length) {
+      transform.splitNodeByKey(endChild.key, endOff)
+    }
+
+    if (startOff != 0) {
+      transform.splitNodeByKey(startChild.key, startOff)
+    }
 
     state = transform.state
     document = state.document
     startBlock = document.getClosestBlock(startKey)
     startChild = startBlock.getHighestChild(startKey)
-    const startInner = document.getNextSibling(startChild)
+
+    const startInner = startOff == 0
+      ? startChild
+      : document.getNextSibling(startChild)
+
     const startInnerIndex = startBlock.nodes.indexOf(startInner)
+
     const endInner = startKey == endKey ? startInner : startBlock.getHighestChild(endKey)
     const inlines = startBlock.nodes
       .skipUntil(n => n == startInner)
@@ -880,6 +902,7 @@ export function wrapInlineAtRange(transform, range, inline) {
   }
 
   transform.normalize()
+
   return transform
 }
 
