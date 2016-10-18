@@ -113,7 +113,7 @@ const NO_ADJACENT_TEXT_RULE = {
     return pairs.reduce((t, pair) => {
       const [ first, second ] = pair
       return t.joinNodeByKey(first.key, second.key)
-    })
+    }, transform)
   }
 }
 
