@@ -45,7 +45,10 @@ function Plugin(options = {}) {
   function onBeforeChange(state, editor) {
     if (state.isNative) return state
     const schema = editor.getSchema()
-    return state.normalize(schema)
+
+    return state.transform()
+      .normalizeWith(schema)
+      .apply({ save: false })
   }
 
   /**

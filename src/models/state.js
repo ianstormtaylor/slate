@@ -426,7 +426,7 @@ class State extends new Record(DEFAULTS) {
     const { document, selection } = this
     let transform = this.transform()
 
-    transform = document.normalize(transform, schema, null)
+    transform = schema.__normalize(transform, document, null)
 
     return transform.apply({ save: false })
   }

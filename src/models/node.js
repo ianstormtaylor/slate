@@ -14,7 +14,6 @@ import includes from 'lodash/includes'
 import memoize from '../utils/memoize'
 import uid from '../utils/uid'
 import { List, Map, OrderedSet, Set } from 'immutable'
-import { default as defaultSchema } from '../plugins/schema'
 
 
 /**
@@ -1175,38 +1174,8 @@ const Node = {
 
   validate(schema) {
     return schema.__validate(this)
-  },
-
-  /**
-   * Normalize the node using a schema, by pushing operations to a transform.
-   * "prevNode" can be used to prevent iterating over all children.
-   *
-   * @param {Transform} transform
-   * @param {Schema} schema
-   * @param {Node} prevNode?
-   * @return {Transform}
-   */
-
-  normalize(transform, schema, prevNode) {
-    if (prevNode === this) {
-      return this
-    }
-
-    // Normalize children
-    this.nodes.forEach(child => {
-      const prevChild = prevNode ? prevNode.getChild(child.key) : null
-      child.normalize(transform, schema, prevChild)
-    })
-
-    // Normalize the node itself
-    let failure
-    if (failure = this.validate(schema)) {
-      const { value, rule } = failure
-      rule.normalize(transform, this, value)
-    }
-
-    return transform
   }
+
 }
 
 /**

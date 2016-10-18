@@ -1,15 +1,32 @@
 
 import Schema from '../models/schema'
-
+import { default as defaultSchema } from '../plugins/schema'
 
 /**
- * Normalize the state.
+ * Normalize the state with a schema.
+ *
+ * @param {Transform} transform
+ * @param {Schema} schema
+ * @return {Transform}
+ */
+
+export function normalizeWith(transform, schema) {
+  const { state } = transform
+  const { document } = state
+  return schema.__normalize(transform, document, null)
+}
+
+/**
+ * Normalize the state using the core schema.
+ * TODO: calling this transform should be useless
  *
  * @param {Transform} transform
  * @return {Transform}
  */
 
 export function normalize(transform) {
+  return transform.normalizeWith(defaultSchema)
+  /*
   let { state } = transform
   let { document, selection } = state
   let failure
@@ -35,22 +52,7 @@ export function normalize(transform) {
   let nextSelection = selection.normalize(document)
   if (!selection.equals(nextSelection)) transform.setSelection(selection)
   return transform
-}
-
-/**
- * Normalize the document.
- *
- * @param {Transform} transform
- * @return {Transform}
- */
-
-export function normalizeDocument(transform) {
-  let { state } = transform
-  let { document } = state
-  document = document.normalize()
-  state = state.merge({ document })
-  transform.state = state
-  return transform
+  */
 }
 
 /**
