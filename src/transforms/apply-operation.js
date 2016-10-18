@@ -48,6 +48,7 @@ export function applyOperation(transform, operation) {
   const { type } = operation
   const fn = OPERATIONS[type]
 
+  console.log('apply op', type, operation);
   if (!fn) {
     throw new Error(`Unknown operation type: "${type}".`)
   }

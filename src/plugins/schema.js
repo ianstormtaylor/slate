@@ -78,7 +78,7 @@ const INLINE_CHILDREN_RULE = {
     const { nodes } = inline
     const invalids = nodes.filter(n => n.kind != 'inline' && n.kind != 'text')
     return invalids.size ? invalids : null
-  },
+},
   normalize: (transform, inline, invalids) => {
     return invalids.reduce((t, n) => t.removeNodeByKey(n.key), transform)
   }
@@ -98,14 +98,15 @@ const NO_ADJACENT_TEXT_RULE = {
   validate: (node) => {
     const { nodes } = node
     const invalids = nodes
-      .filter((n, i) => {
-        const next = nodes.get(i + 1)
-        return n.kind == 'text' && next && next.kind == 'text'
-      })
       .map((n, i) => {
         const next = nodes.get(i + 1)
+        if (n.kind !== 'text' || !next || next.kind !== 'text') {
+          return
+        }
+
         return [n, next]
       })
+      .filter(Boolean)
 
     return invalids.size ? invalids : null
   },
