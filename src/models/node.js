@@ -982,6 +982,7 @@ const Node = {
 
   /**
    * Join a node by `key` with another `withKey`.
+   * It brings Node<key> after Node<WithKey>
    *
    * @param {String} key
    * @param {String} withKey
