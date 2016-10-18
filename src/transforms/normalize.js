@@ -1,6 +1,40 @@
 import Schema from '../models/schema'
 import { default as defaultSchema } from '../plugins/schema'
 
+
+/**
+* Normalize a node using a schema, by pushing operations to a transform.
+* "prevNode" can be used to prevent iterating over all children.
+*
+* @param {Transform} transform
+* @param {Node} node
+* @param {Node} prevNode?
+* @return {Transform}
+ */
+
+function normalizeNode(transform, schema, node, prevNode) {
+  if (prevNode === node) {
+    return transform
+  }
+
+  // Normalize children
+  if (node.nodes) {
+    transform = node.nodes.reduce((t, child) => {
+      const prevChild = prevNode ? prevNode.getChild(child.key) : null
+      return normalizeNode(transform, schema, child, prevChild)
+    }, transform)
+  }
+
+  // Normalize the node itself
+  let failure
+  if (failure = schema.__validate(node)) {
+    const { value, rule } = failure
+    transform = rule.normalize(transform, node, value)
+  }
+
+  return transform
+}
+
 /**
  * Normalize the state with a schema.
  *
@@ -12,7 +46,7 @@ import { default as defaultSchema } from '../plugins/schema'
 export function normalizeWith(transform, schema) {
   const { state } = transform
   const { document } = state
-  return schema.__normalize(transform, document, null)
+  return normalizeNode(transform, schema, document, null)
 }
 
 /**
@@ -25,33 +59,6 @@ export function normalizeWith(transform, schema) {
 
 export function normalize(transform) {
   return transform.normalizeWith(defaultSchema)
-  /*
-  let { state } = transform
-  let { document, selection } = state
-  let failure
-
-  // Normalize all of the document's nodes.
-  document.filterDescendantsDeep((node) => {
-    if (failure = node.validate(SCHEMA)) {
-      const { value, rule } = failure
-      rule.normalize(transform, node, value)
-    }
-  })
-
-  // Normalize the document itself.
-  if (failure = document.validate(SCHEMA)) {
-    const { value, rule } = failure
-    rule.normalize(transform, document, value)
-  }
-
-  // Normalize the selection.
-  // TODO: turn this into schema rules.
-  state = transform.state
-  document = state.document
-  let nextSelection = selection.normalize(document)
-  if (!selection.equals(nextSelection)) transform.setSelection(selection)
-  return transform
-  */
 }
 
 /**

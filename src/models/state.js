@@ -415,23 +415,6 @@ class State extends new Record(DEFAULTS) {
   }
 
   /**
-   * Normalize a state against a `schema`.
-   *
-   * @param {Schema} schema
-   * @return {State}
-   */
-
-  normalize(schema) {
-    const state = this
-    const { document, selection } = this
-    let transform = this.transform()
-
-    transform = schema.__normalize(transform, document, null)
-
-    return transform.apply({ save: false })
-  }
-
-  /**
    * Return a new `Transform` with the current state as a starting point.
    *
    * @return {Transform} transform

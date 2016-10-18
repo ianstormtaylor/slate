@@ -206,39 +206,6 @@ class Schema extends new Record(DEFAULTS) {
     }
   }
 
-  /**
-   * Normalize the node using a schema, by pushing operations to a transform.
-   * "prevNode" can be used to prevent iterating over all children.
-   *
-   * @param {Transform} transform
-   * @param {Node} node
-   * @param {Node} prevNode?
-   * @return {Transform}
-   */
-
-  __normalize(transform, node, prevNode) {
-    if (prevNode === node) {
-      return transform
-    }
-
-    // Normalize children
-    if (node.nodes) {
-        node.nodes.forEach(child => {
-          const prevChild = prevNode ? prevNode.getChild(child.key) : null
-          this.__normalize(transform, child, prevChild)
-        })
-    }
-
-    // Normalize the node itself
-    let failure
-    if (failure = this.__validate(node)) {
-      const { value, rule } = failure
-      rule.normalize(transform, node, value)
-    }
-
-    return transform
-  }
-
 }
 
 /**
