@@ -1,6 +1,7 @@
 
 import Debug from 'debug'
 import uid from '../utils/uid'
+import { default as defaultSchema } from '../plugins/schema'
 
 /**
  * Debug.
@@ -33,6 +34,8 @@ const OPERATIONS = {
   split_node: splitNode,
   // Selection operations.
   set_selection: setSelection,
+  // Normalize
+  normalize
 }
 
 /**
@@ -48,7 +51,6 @@ export function applyOperation(transform, operation) {
   const { type } = operation
   const fn = OPERATIONS[type]
 
-  console.log('apply op', type, operation);
   if (!fn) {
     throw new Error(`Unknown operation type: "${type}".`)
   }
@@ -57,7 +59,19 @@ export function applyOperation(transform, operation) {
 
   transform.state = fn(state, operation)
   transform.operations = operations.concat([operation])
+
   return transform
+}
+
+/**
+ * Normalize the state with core rules
+ *
+ * @param {State} state
+ * @return {State}
+ */
+
+function normalize(state) {
+    return state.normalize(defaultSchema)
 }
 
 /**

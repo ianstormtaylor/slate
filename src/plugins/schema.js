@@ -1,4 +1,5 @@
 import Schema from '../models/schema'
+import Text from '../models/text'
 
 /*
     This module contains the default schema to normalize documents
@@ -84,6 +85,45 @@ const INLINE_CHILDREN_RULE = {
   }
 }
 
+/**
+ * A default schema rule to ensure that inline void nodes are surrounded with text nodes
+ *
+ * @type {Object}
+ */
+
+const INLINE_VOID_TEXT_RULE = {
+  match: (object) => {
+    return object.kind == 'block'
+  },
+  validate: (block) => {
+    const invalids = block.nodes.reduce((accu, child, index) => {
+      if (child.kind === 'block' || !child.isVoid) {
+        return accu
+      }
+
+      const prevNode = index > 0 ? block.nodes.get(index - 1) : null
+      const nextNode = block.nodes.get(index + 1)
+
+      const prev = (!prevNode || prevNode.kind !== 'text')
+      const next = (!nextNode || nextNode.kind !== 'text')
+
+      if (next || prev) {
+        accu.push({ next, prev, index })
+      }
+
+      return accu
+    }, [])
+
+    return invalids.length ? invalids : null
+  },
+  normalize: (transform, block, invalids) => {
+    return invalids.reduce((t, { index, next, prev }) => {
+      if (prev) t = transform.insertNodeByKey(block.key, index, Text.create())
+      if (next) t = transform.insertNodeByKey(block.key, index + 1, Text.create())
+      return t
+    }, transform)
+  }
+}
 
 /**
  * Join adjacent text nodes.
@@ -111,10 +151,13 @@ const NO_ADJACENT_TEXT_RULE = {
     return invalids.size ? invalids : null
   },
   normalize: (transform, node, pairs) => {
-    return pairs.reduce((t, pair) => {
-      const [ first, second ] = pair
-      return t.joinNodeByKey(second.key, first.key)
-    }, transform)
+    return pairs
+        // We reverse the list since we want to handle 3 consecutive text nodes
+        .reverse()
+        .reduce((t, pair) => {
+          const [ first, second ] = pair
+          return t.joinNodeByKey(second.key, first.key)
+        }, transform)
   }
 }
 
@@ -130,6 +173,7 @@ const schema = Schema.create({
     BLOCK_CHILDREN_RULE,
     MIN_TEXT_RULE,
     INLINE_CHILDREN_RULE,
+    INLINE_VOID_TEXT_RULE,
     NO_ADJACENT_TEXT_RULE
   ]
 })

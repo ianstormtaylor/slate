@@ -146,8 +146,7 @@ import {
 
 import {
   normalize,
-  normalizeWith,
-  normalizeDocument,
+  normalizeWith
 } from './normalize'
 
 /**
@@ -290,7 +289,6 @@ export default {
    */
 
   normalize,
-  normalizeWith,
-  normalizeDocument,
+  normalizeWith
 
 }

@@ -7,7 +7,7 @@ import React from 'react'
 import String from '../utils/string'
 import getWindow from 'get-window'
 import { IS_MAC } from '../constants/environment'
-import { rules } from './schema'
+import { default as defaultSchema } from './schema'
 
 /**
  * Debug.
@@ -741,7 +741,7 @@ function Plugin(options = {}) {
       rules: [
           BLOCK_RENDER_RULE,
           INLINE_RENDER_RULE,
-          ...rules
+          ...defaultSchema.rules
       ]
   }
 
