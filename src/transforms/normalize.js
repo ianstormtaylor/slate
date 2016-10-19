@@ -6,19 +6,14 @@ import { default as defaultSchema } from '../plugins/schema'
  *
  * @param {Transform} transform
  * @param {Node} node
- * @param {Node} prevNode
  * @return {Transform}
  */
 
-export function normalizeWith(transform, schema, node, prevNode) {
+export function normalizeWith(transform, schema, node) {
     let { state } = transform
 
     // If no node specific, normalize the whole document
     node = node || state.document
-
-    if (node === prevNode) {
-      return transform
-    }
 
     const failure = schema.__validate(node)
 
@@ -37,7 +32,7 @@ export function normalizeWith(transform, schema, node, prevNode) {
             return transform
         }
 
-        return transform.normalizeWith(schema, node, prevNode)
+        return transform.normalizeWith(schema, node)
     }
 
     // No child, stop here
@@ -46,14 +41,12 @@ export function normalizeWith(transform, schema, node, prevNode) {
     }
 
     return node.nodes.reduce((t, child) => {
-      const prevChild = prevNode ? prevNode.getChild(child.key) : null
-      return t.normalizeWith(schema, child, prevChild)
+      return t.normalizeWith(schema, child)
     }, transform)
 }
 
 /**
  * Normalize the state using the core schema.
- * TODO: calling this transform should be useless
  *
  * @param {Transform} transform
  * @return {Transform}
@@ -63,6 +56,21 @@ export function normalize(transform) {
     return transform
         .normalizeWith(defaultSchema)
         .normalizeSelection()
+}
+
+/**
+ * Normalize a specific node of the document using core schema
+ *
+ * @param {Transform} transform
+ * @return {Transform}
+ */
+
+export function normalizeNodeByKey(transform, key) {
+    const { state } = transform
+    const { document } = state
+    const node = document.assertDescendant(key)
+
+    return transform.normalizeWith(defaultSchema, node)
 }
 
 /**

@@ -147,7 +147,8 @@ import {
 import {
   normalize,
   normalizeWith,
-  normalizeSelection
+  normalizeSelection,
+  normalizeNodeByKey
 } from './normalize'
 
 /**
@@ -291,6 +292,7 @@ export default {
 
   normalize,
   normalizeWith,
-  normalizeSelection
+  normalizeSelection,
+  normalizeNodeByKey
 
 }

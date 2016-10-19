@@ -154,31 +154,9 @@ export function removeTextByKey(transform, key, offset, length) {
   const { state } = transform
   let { document } = state
   const path = document.getPath(key)
-  transform.removeTextOperation(path, offset, length)
-
-  // If the text node is now empty, we might need to remove more nodes.
-  document = transform.state.document
-  const node = document.getDescendant(key)
   const parent = document.getParent(key)
-  const previous = document.getPreviousSibling(key)
-  const next = document.getNextSibling(key)
-
-  // If the text node isn't empty, don't do anything more.
-  if (node.text != '') {
-    return transform
-  }
-
-  // If the empty text node is the only node remaining in a non-void inline,
-  // remove the inline completely.
-  if (
-    parent.kind == 'inline' &&
-    parent.isVoid == false &&
-    parent.nodes.size == 1
-  ) {
-    transform.removeNodeByKey(parent.key)
-  }
-
-  return transform
+  return transform.removeTextOperation(path, offset, length)
+    .normalizeNodeByKey(parent)
 }
 
 /**
@@ -214,12 +192,7 @@ export function setNodeByKey(transform, key, properties) {
   properties = Normalize.nodeProperties(properties)
   const { state } = transform
   const { document } = state
-  const node = document.assertDescendant(key)
-  const parent = document.getParent(key)
-  const index = parent.nodes.indexOf(node)
   const path = document.getPath(key)
-  const previous = document.getPreviousSibling(key)
-  const next = document.getNextSibling(key)
   transform.setNodeOperation(path, properties)
 
   return transform
