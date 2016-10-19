@@ -47,7 +47,7 @@ const BLOCK_CHILDREN_RULE = {
 }
 
 /**
- * A default schema rule to have at least one text node in blocks
+ * A default schema rule to have at least one text node in blocks/inlines
  *
  * @type {Object}
  */
@@ -82,6 +82,24 @@ const INLINE_CHILDREN_RULE = {
 },
   normalize: (transform, inline, invalids) => {
     return invalids.reduce((t, n) => t.removeNodeByKey(n.key), transform)
+  }
+}
+
+/**
+ * A default schema rule to ensure that inline nodes are not empty
+ *
+ * @type {Object}
+ */
+
+const INLINE_NO_EMPTY = {
+  match: (object) => {
+    return object.kind == 'inline'
+  },
+  validate: (inline) => {
+    return inline.text == ''
+  },
+  normalize: (transform, node) => {
+      return transform.removeNodeByKey(node.key)
   }
 }
 
@@ -194,6 +212,7 @@ const schema = Schema.create({
     DOCUMENT_CHILDREN_RULE,
     BLOCK_CHILDREN_RULE,
     MIN_TEXT_RULE,
+    INLINE_NO_EMPTY,
     INLINE_CHILDREN_RULE,
     INLINE_VOID_TEXT_RULE,
     INLINE_VOID_TEXTS_AROUND_RULE,
