@@ -60,7 +60,9 @@ export function normalizeWith(transform, schema, node, prevNode) {
  */
 
 export function normalize(transform) {
-    return transform.normalizeWith(defaultSchema)
+    return transform
+        .normalizeWith(defaultSchema)
+        .normalizeSelection()
 }
 
 /**
