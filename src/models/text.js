@@ -45,6 +45,24 @@ class Text extends new Record(DEFAULTS) {
   }
 
   /**
+   * Create a new `Text` from a string
+   *
+   * @param {String} content
+   * @return {Text}
+   */
+
+  static createFromString(content) {
+      return Text.create({
+        characters: Character.createList(
+          content.split('')
+          .map(c => {
+            return { text: c }
+          })
+        )
+      })
+  }
+
+  /**
    * Create a list of `Texts` from an array.
    *
    * @param {Array} elements

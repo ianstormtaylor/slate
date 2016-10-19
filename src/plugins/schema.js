@@ -61,7 +61,7 @@ const MIN_TEXT_RULE = {
       return nodes.size === 0 ? true : null
     },
     normalize: (transform, node) => {
-      return transform.insertTextByKey(node.key, 0, '')
+      return transform.insertNodeByKey(node.key, 0, Text.create())
     }
 }
 
@@ -86,12 +86,34 @@ const INLINE_CHILDREN_RULE = {
 }
 
 /**
- * A default schema rule to ensure that inline void nodes are surrounded with text nodes
+ * A default schema rule to ensure that void nodes contain a single space of content.
  *
  * @type {Object}
  */
 
 const INLINE_VOID_TEXT_RULE = {
+  match: (object) => {
+    return (object.kind == 'inline' || object.kind == 'block') && object.isVoid
+  },
+  validate: (node) => {
+    return node.text !== ' ' || node.nodes.size !== 1
+  },
+  normalize: (transform, node) => {
+      transform = node.nodes.reduce((t, child) => {
+          return t.removeNodeByKey(child.key)
+      }, transform)
+
+      return transform.insertNodeByKey(node.key, 0, Text.createFromString(' '))
+  }
+}
+
+/**
+ * A default schema rule to ensure that inline void nodes are surrounded with text nodes
+ *
+ * @type {Object}
+ */
+
+const INLINE_VOID_TEXTS_AROUND_RULE = {
   match: (object) => {
     return object.kind == 'block'
   },
@@ -174,6 +196,7 @@ const schema = Schema.create({
     MIN_TEXT_RULE,
     INLINE_CHILDREN_RULE,
     INLINE_VOID_TEXT_RULE,
+    INLINE_VOID_TEXTS_AROUND_RULE,
     NO_ADJACENT_TEXT_RULE
   ]
 })

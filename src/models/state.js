@@ -51,7 +51,10 @@ class State extends new Record(DEFAULTS) {
       selection = selection.collapseToStartOf(text)
     }
 
-    return new State({ document, selection })
+    const state = new State({ document, selection })
+    return state.transform()
+      .normalize()
+      .apply({ save: false })
   }
 
   /**
