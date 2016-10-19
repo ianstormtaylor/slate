@@ -201,6 +201,49 @@ const NO_ADJACENT_TEXT_RULE = {
   }
 }
 
+
+/**
+ * Prevent extra empty text nodes.
+ *
+ * @type {Object}
+ */
+
+const NO_EMPTY_TEXT_RULE = {
+  match: (object) => {
+    return object.kind == 'block' || object.kind == 'inline'
+  },
+  validate: (node) => {
+    const { nodes } = node
+
+    if (nodes.size <= 1) {
+        return
+    }
+
+    const invalids = nodes
+      .filter((desc, i) => {
+        if (desc.kind != 'text' || desc.length > 0) {
+            return
+        }
+
+        // Empty text nodes are only allowed near inline void node
+        const next = nodes.get(i + 1)
+        const prev = i > 0 ? nodes.get(i - 1) : null
+
+        return (
+          (!next || !(next.kind === 'inline' && next.isVoid))
+          && (!prev || !(prev.kind === 'inline' && prev.isVoid))
+        )
+      })
+
+    return invalids.size ? invalids : null
+  },
+  normalize: (transform, node, invalids) => {
+    return invalids.reduce((t, text) => {
+        return t.removeNodeByKey(text.key)
+    }, transform)
+  }
+}
+
 /**
  * The default schema.
  *
@@ -212,11 +255,12 @@ const schema = Schema.create({
     DOCUMENT_CHILDREN_RULE,
     BLOCK_CHILDREN_RULE,
     MIN_TEXT_RULE,
-    INLINE_NO_EMPTY,
     INLINE_CHILDREN_RULE,
     INLINE_VOID_TEXT_RULE,
+    INLINE_NO_EMPTY,
     INLINE_VOID_TEXTS_AROUND_RULE,
-    NO_ADJACENT_TEXT_RULE
+    NO_ADJACENT_TEXT_RULE,
+    NO_EMPTY_TEXT_RULE
   ]
 })
 
