@@ -241,21 +241,3 @@ export function splitNodeByKey(transform, key, offset) {
 
   return transform.splitNodeOperation(path, offset)
 }
-
-/**
- * Unwrap content from an inline parent with `properties`.
- *
- * @param {Transform} transform
- * @param {String} key
- * @param {Object or String} properties
- * @return {Transform}
- */
-
-export function unwrapInlineByKey(transform, key, properties) {
-  const { state } = transform
-  const { document, selection } = state
-  const node = document.assertDescendant(key)
-  const range = selection.moveToRangeOf(node)
-
-  return transform.unwrapInline(range, properties)
-}
