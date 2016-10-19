@@ -5,6 +5,9 @@ import Text from '../models/text'
     This module contains the default schema to normalize documents
  */
 
+function isInlineVoid(node) {
+  return (node.kind == 'inline' && node.isVoid)
+}
 
 /**
  * A default schema rule to only allow block nodes in documents.
@@ -144,8 +147,8 @@ const INLINE_VOID_TEXTS_AROUND_RULE = {
       const prevNode = index > 0 ? block.nodes.get(index - 1) : null
       const nextNode = block.nodes.get(index + 1)
 
-      const prev = (!prevNode || prevNode.kind !== 'text')
-      const next = (!nextNode || nextNode.kind !== 'text')
+      const prev = (!prevNode || isInlineVoid(prevNode))
+      const next = (!nextNode || isInlineVoid(nextNode.kind))
 
       if (next || prev) {
         accu.push({ next, prev, index })
@@ -229,10 +232,23 @@ const NO_EMPTY_TEXT_RULE = {
         const next = nodes.get(i + 1)
         const prev = i > 0 ? nodes.get(i - 1) : null
 
-        return (
-          (!next || !(next.kind === 'inline' && next.isVoid))
-          && (!prev || !(prev.kind === 'inline' && prev.isVoid))
-        )
+        // If last one and previous is an inline void, we need to preserve it
+        if (!next && isInlineVoid(prev)) {
+            return
+        }
+
+        // If first one and next one is an inline, we preserve it
+        if (!prev && isInlineVoid(next)) {
+            return
+        }
+
+        // If surrounded by inline void, we preserve it
+        if (next && prev && isInlineVoid(next) && isInlineVoid(prev)) {
+            return
+        }
+
+        // Otherwise we remove it
+        return true
       })
 
     return invalids.size ? invalids : null
