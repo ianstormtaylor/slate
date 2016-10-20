@@ -33,9 +33,7 @@ const OPERATIONS = {
   set_node: setNode,
   split_node: splitNode,
   // Selection operations.
-  set_selection: setSelection,
-  // Normalize
-  normalize
+  set_selection: setSelection
 }
 
 /**
@@ -61,17 +59,6 @@ export function applyOperation(transform, operation) {
   transform.operations = operations.concat([operation])
 
   return transform
-}
-
-/**
- * Normalize the state with core rules
- *
- * @param {State} state
- * @return {State}
- */
-
-function normalize(state) {
-    return state.normalize(defaultSchema)
 }
 
 /**
