@@ -21,17 +21,17 @@ export default function (state) {
     })
     .apply()
 
-    // Selection is reset, in theory it should me on the emoji
-    first = next.document.getTexts().first()
-    assert.deepEqual(
-      next.selection.toJS(),
-      range.merge({
-          anchorKey: first.key,
-          anchorOffset: 0,
-          focusKey: first.key,
-          focusOffset: 0
-      }).toJS()
-    )
+  // Selection is reset, in theory it should me on the emoji
+  first = next.document.getTexts().first()
+  assert.deepEqual(
+    next.selection.toJS(),
+    range.merge({
+      anchorKey: first.key,
+      anchorOffset: 0,
+      focusKey: first.key,
+      focusOffset: 0
+    }).toJS()
+  )
 
   return next
 }
