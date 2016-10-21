@@ -1,4 +1,5 @@
 import Schema from '../models/schema'
+import warning from '../utils/warning'
 import { default as defaultSchema } from '../plugins/schema'
 
 /**
@@ -54,8 +55,19 @@ export function normalizeWith(transform, schema, node) {
 
 export function normalize(transform) {
     return transform
-        .normalizeWith(defaultSchema)
+        .normalizeDocument()
         .normalizeSelection()
+}
+
+/**
+ * Normalize the whole document
+ *
+ * @param {Transform} transform
+ * @return {Transform}
+ */
+
+export function normalizeDocument(transform) {
+    return transform.normalizeWith(defaultSchema)
 }
 
 /**
@@ -84,6 +96,25 @@ export function normalizeSelection(transform) {
   let { state } = transform
   let { document, selection } = state
   selection = selection.normalize(document)
+
+  // If the selection is nulled (not normal)
+  if (
+    selection.anchorKey == null ||
+    selection.focusKey == null ||
+    !document.hasDescendant(selection.anchorKey) ||
+    !document.hasDescendant(selection.focusKey)
+  ) {
+    warning('Selection was invalid and reset to start of the document')
+    const firstText = document.getTexts().first()
+    selection = selection.merge({
+      anchorKey: firstText.key,
+      anchorOffset: 0,
+      focusKey: firstText.key,
+      focusOffset: 0,
+      isBackward: false
+    })
+  }
+
   state = state.merge({ selection })
   transform.state = state
   return transform
