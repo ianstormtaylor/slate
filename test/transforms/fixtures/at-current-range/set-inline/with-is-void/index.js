@@ -4,7 +4,7 @@ import assert from 'assert'
 export default function (state) {
   const { document, selection } = state
   const texts = document.getTexts()
-  const first = texts.first()
+  let first = texts.first()
   const range = selection.merge({
     anchorKey: first.key,
     anchorOffset: 0,
@@ -21,10 +21,17 @@ export default function (state) {
     })
     .apply()
 
-  assert.deepEqual(
-    next.selection.toJS(),
-    range.toJS()
-  )
+    // Selection is reset, in theory it should me on the emoji
+    first = next.document.getTexts().first()
+    assert.deepEqual(
+      next.selection.toJS(),
+      range.merge({
+          anchorKey: first.key,
+          anchorOffset: 0,
+          focusKey: first.key,
+          focusOffset: 0
+      }).toJS()
+    )
 
   return next
 }
