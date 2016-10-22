@@ -94,7 +94,12 @@ export function deleteAtRange(transform, range) {
 
   const lonely = document.getFurthest(endBlock, p => p.nodes.size == 1) || endBlock
   transform.removeNodeByKey(lonely.key)
-  transform.normalizeDocument()
+
+  if (ancestor.kind == 'document') {
+    transform.normalizeDocument()
+  } else {
+    transform.normalizeNodeByKey(ancestor.key)
+  }
 
   return transform
 }
@@ -270,7 +275,11 @@ export function insertBlockAtRange(transform, range, block) {
     transform.insertNodeByKey(parent.key, index + 1, block)
   }
 
-  transform.normalizeDocument()
+  if (parent.kind == 'document') {
+    transform.normalizeDocument()
+  } else {
+    transform.normalizeNodeByKey(parent.key)
+  }
 
   return transform
 }
@@ -357,7 +366,11 @@ export function insertFragmentAtRange(transform, range, fragment) {
     })
   }
 
-  transform.normalizeDocument()
+  if (parent.kind == 'document') {
+    transform.normalizeDocument()
+  } else {
+    transform.normalizeNodeByKey(parent.key)
+  }
 
   return transform
 }
@@ -392,7 +405,12 @@ export function insertInlineAtRange(transform, range, inline) {
 
   transform.splitNodeByKey(startKey, startOffset)
   transform.insertNodeByKey(parent.key, index + 1, inline)
-  transform.normalizeDocument()
+
+  if (parent.kind == 'document') {
+    transform.normalizeDocument()
+  } else {
+    transform.normalizeNodeByKey(parent.key)
+  }
 
   return transform
 }
@@ -519,6 +537,7 @@ export function splitBlockAtRange(transform, range, height = 1) {
   const { document } = state
   let node = document.assertDescendant(startKey)
   let parent = document.getClosestBlock(node)
+  const firstParent = parent
   let offset = startOffset
   let h = 0
 
