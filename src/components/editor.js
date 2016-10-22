@@ -202,8 +202,6 @@ class Editor extends React.Component {
   onChange = (state) => {
     if (state == this.state.state) return
 
-    state = this.onBeforeChange(state)
-
     for (const plugin of this.state.plugins) {
       if (!plugin.onChange) continue
       const newState = plugin.onChange(state, this)
