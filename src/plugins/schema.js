@@ -102,7 +102,7 @@ const INLINE_NO_EMPTY = {
     return inline.text == ''
   },
   normalize: (transform, node) => {
-      return transform.removeNodeByKey(node.key)
+    return transform.removeNodeByKey(node.key)
   }
 }
 
@@ -270,9 +270,9 @@ const schema = Schema.create({
   rules: [
     DOCUMENT_CHILDREN_RULE,
     BLOCK_CHILDREN_RULE,
-    MIN_TEXT_RULE,
     INLINE_CHILDREN_RULE,
     INLINE_VOID_TEXT_RULE,
+    MIN_TEXT_RULE,
     INLINE_NO_EMPTY,
     INLINE_VOID_TEXTS_AROUND_RULE,
     NO_ADJACENT_TEXT_RULE,

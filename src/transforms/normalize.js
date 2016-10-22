@@ -1,56 +1,124 @@
 import Schema from '../models/schema'
+import Raw from '../serializers/raw'
 import warning from '../utils/warning'
 import { default as defaultSchema } from '../plugins/schema'
 
 /**
- * Normalize a node using a schema.
+ * Refresh a reference to a node that have been modified in a transform.
+ * @param  {Transform} transform
+ * @param  {Node} node
+ * @return {Node} newNode
+ */
+
+function _refreshNode(transform, node) {
+  const { state } = transform
+  const { document } = state
+
+  if (node.kind == 'document') {
+    return document
+  }
+
+  return document.getDescendant(node.key)
+}
+
+/**
+ * Normalize all children of a node
+ * @param  {Transform} transform
+ * @param  {Schema} schema
+ * @param  {Node} node
+ * @return {Transform} transform
+ */
+
+function _normalizeChildrenWith(transform, schema, node) {
+  let { state } = transform
+
+  if (!node.nodes) {
+    return transform
+  }
+
+  return node.nodes.reduce(
+    (t, child) => {
+      return t.normalizeNodeWith(schema, child)
+    },
+    transform
+  )
+}
+
+/**
+ * Normalize a node without its children
+ * @param  {Transform} transform
+ * @param  {Schema} schema
+ * @param  {Node} node
+ * @return {Transform} transform
+ */
+
+function _normalizeNodeWith(transform, schema, node) {
+  let { state } = transform
+  const failure = schema.__validate(node)
+
+  // Node is valid?
+  if (!failure) {
+    return transform
+  }
+
+  const { value, rule } = failure
+
+  // Normalize and get the new state
+  transform = rule.normalize(transform, node, value)
+
+  // Search for the updated node in the new state
+  const newNode = _refreshNode(transform, node)
+
+  // Node no longer exist, go back to normalize parents
+  if (!newNode) {
+    return transform
+  }
+
+  return normalizeNodeWith(transform, schema, newNode)
+}
+
+/**
+ * Normalize a node (itself and its children) using a schema.
  *
- * @param {Transform} transform
- * @param {Node} node
+ * @param  {Transform} transform
+ * @param  {Schema} schema
+ * @param  {Node} node
  * @return {Transform}
  */
 
-export function normalizeWith(transform, schema, node) {
-    let { state } = transform
+export function normalizeNodeWith(transform, schema, node) {
+  // Iterate over its children
+  transform = _normalizeChildrenWith(transform, schema, node)
 
-    // If no node specific, normalize the whole document
-    node = node || state.document
+  // Refresh the node reference, and normalize it
+  node = _refreshNode(transform, node)
+  if (node) {
+    transform = _normalizeNodeWith(transform, schema, node)
+  }
 
-    const failure = schema.__validate(node)
+  return transform
+}
 
-    if (failure) {
-        const { value, rule } = failure
+/**
+ * Normalize state using a schema.
+ *
+ * @param  {Transform} transform
+ * @param  {Schema} schema
+ * @return {Transform} transform
+ */
 
-        // Normalize and get the new state
-        transform = rule.normalize(transform, node, value)
-        const newState = transform.state
+export function normalizeWith(transform, schema) {
+  const { state } = transform
+  const { document } = state
 
-        // Search for the updated node in the new state
-        node = newState.document.getDescendant(node.key)
-
-        // Node no longer exist, exit
-        if (!node) {
-            return transform
-        }
-
-        return transform.normalizeWith(schema, node)
-    }
-
-    // No child, stop here
-    if (!node.nodes) {
-      return transform
-    }
-
-    return node.nodes.reduce((t, child) => {
-      return t.normalizeWith(schema, child)
-    }, transform)
+  return transform.normalizeNodeWith(schema, document)
 }
 
 /**
  * Normalize the state using the core schema.
  *
- * @param {Transform} transform
- * @return {Transform}
+ * @param  {Transform} transform
+ * @return {Transform} transform
  */
 
 export function normalize(transform) {
@@ -60,10 +128,10 @@ export function normalize(transform) {
 }
 
 /**
- * Normalize the whole document
+ * Normalize only the document
  *
- * @param {Transform} transform
- * @return {Transform}
+ * @param  {Transform} transform
+ * @return {Transform} transform
  */
 
 export function normalizeDocument(transform) {
@@ -71,10 +139,11 @@ export function normalizeDocument(transform) {
 }
 
 /**
- * Normalize a specific node of the document using core schema
+ * Normalize a specific node using core schema
  *
- * @param {Transform} transform
- * @return {Transform}
+ * @param  {Transform} transform
+ * @param  {Node or String} key
+ * @return {Transform} transform
  */
 
 export function normalizeNodeByKey(transform, key) {
@@ -82,14 +151,14 @@ export function normalizeNodeByKey(transform, key) {
     const { document } = state
     const node = document.assertDescendant(key)
 
-    return transform.normalizeWith(defaultSchema, node)
+    return transform.normalizeNodeWith(defaultSchema, node)
 }
 
 /**
- * Normalize the selection.
+ * Normalize only the selection.
  *
- * @param {Transform} transform
- * @return {Transform}
+ * @param  {Transform} transform
+ * @return {Transform} transform
  */
 
 export function normalizeSelection(transform) {
@@ -99,20 +168,19 @@ export function normalizeSelection(transform) {
 
   // If the selection is nulled (not normal)
   if (
-    selection.anchorKey == null ||
-    selection.focusKey == null ||
+    selection.isUnset ||
     !document.hasDescendant(selection.anchorKey) ||
     !document.hasDescendant(selection.focusKey)
   ) {
-    warning('Selection was invalid and reset to start of the document')
-    const firstText = document.getTexts().first()
-    selection = selection.merge({
-      anchorKey: firstText.key,
-      anchorOffset: 0,
-      focusKey: firstText.key,
-      focusOffset: 0,
-      isBackward: false
-    })
+      warning('Selection was invalid and reset to start of the document')
+      const firstText = document.getTexts().first()
+      selection = selection.merge({
+        anchorKey: firstText.key,
+        anchorOffset: 0,
+        focusKey: firstText.key,
+        focusOffset: 0,
+        isBackward: false
+      })
   }
 
   state = state.merge({ selection })
