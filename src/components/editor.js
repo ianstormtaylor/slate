@@ -122,9 +122,11 @@ class Editor extends React.Component {
       this.setState({ schema })
     }
 
-    this.setState({
-      state: this.onBeforeChange(props.state)
-    })
+    const state = this.onBeforeChange(props.state)
+    this.tmp.selection = state.selection
+    this.tmp.document = state.document
+
+    this.setState({ state })
   }
 
   /**
