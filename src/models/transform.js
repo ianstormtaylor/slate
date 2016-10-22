@@ -47,16 +47,17 @@ class Transform {
    *   @property {Boolean} isNative
    *   @property {Boolean} merge
    *   @property {Boolean} save
+   *   @property {Boolean} normalize
    * @return {State} state
    */
 
   apply(options = {}) {
     let transform = this
+    let { merge, save, isNative = false, normalize = true } = options
 
     // Ensure that the state is normalized.
-    transform = transform.normalize()
+    if (normalize) transform = transform.normalize()
 
-    let { merge, save, isNative = false } = options
     let { state, operations } = transform
     let { history } = state
     let { undos, redos } = history
