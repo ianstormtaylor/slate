@@ -74,7 +74,7 @@ function _normalizeNodeWith(transform, schema, node) {
     return transform
   }
 
-  return normalizeNodeWith(transform, schema, newNode)
+  return _normalizeNodeWith(transform, schema, newNode)
 }
 
 /**
