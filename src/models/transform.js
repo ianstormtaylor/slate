@@ -56,7 +56,7 @@ class Transform {
     let { merge, save, isNative = false, normalize = true } = options
 
     // Ensure that the state is normalized.
-    if (normalize) transform = transform.normalize()
+    // if (normalize) transform = transform.normalize()
 
     let { state, operations } = transform
     let { history } = state
