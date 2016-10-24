@@ -25,7 +25,7 @@ const DOCUMENT_CHILDREN_RULE = {
     return invalids.size ? invalids : null
   },
   normalize: (transform, document, invalids) => {
-    return invalids.reduce((t, n) => t.removeNodeByKey(n.key), transform)
+    return invalids.reduce((t, n) => t.removeNodeByKey(n.key, { normalize: false }), transform)
   }
 }
 
@@ -45,7 +45,7 @@ const BLOCK_CHILDREN_RULE = {
     return invalids.size ? invalids : null
   },
   normalize: (transform, block, invalids) => {
-    return invalids.reduce((t, n) => t.removeNodeByKey(n.key), transform)
+    return invalids.reduce((t, n) => t.removeNodeByKey(n.key, { normalize: false }), transform)
   }
 }
 
@@ -64,7 +64,7 @@ const MIN_TEXT_RULE = {
       return nodes.size === 0 ? true : null
     },
     normalize: (transform, node) => {
-      return transform.insertNodeByKey(node.key, 0, Text.create())
+      return transform.insertNodeByKey(node.key, 0, Text.create(), { normalize: false })
     }
 }
 
@@ -84,7 +84,7 @@ const INLINE_CHILDREN_RULE = {
     return invalids.size ? invalids : null
 },
   normalize: (transform, inline, invalids) => {
-    return invalids.reduce((t, n) => t.removeNodeByKey(n.key), transform)
+    return invalids.reduce((t, n) => t.removeNodeByKey(n.key, { normalize: false }), transform)
   }
 }
 
@@ -96,13 +96,23 @@ const INLINE_CHILDREN_RULE = {
 
 const INLINE_NO_EMPTY = {
   match: (object) => {
-    return object.kind == 'inline'
+    return object.kind == 'block'
   },
-  validate: (inline) => {
-    return inline.text == ''
+  validate: (block) => {
+    return block.nodes.some((child) => {
+      return child.kind == 'inline' && child.text == ''
+    })
   },
-  normalize: (transform, node) => {
-    return transform.removeNodeByKey(node.key)
+  normalize: (transform, block) => {
+    return block.nodes.reduce((tr, child, index) => {
+      if (child.kind == 'inline' && child.text == '') {
+        return transform
+          .removeNodeByKey(child.key, { normalize: false })
+          .insertNodeByKey(block.key, index, Text.createFromString(''), { normalize: false })
+      } else {
+        return tr
+      }
+    }, transform)
   }
 }
 
@@ -119,12 +129,12 @@ const INLINE_VOID_TEXT_RULE = {
   validate: (node) => {
     return node.text !== ' ' || node.nodes.size !== 1
   },
-  normalize: (transform, node) => {
+  normalize: (transform, node, result) => {
       transform = node.nodes.reduce((t, child) => {
-          return t.removeNodeByKey(child.key)
+          return t.removeNodeByKey(child.key, { normalize: false })
       }, transform)
 
-      return transform.insertNodeByKey(node.key, 0, Text.createFromString(' '))
+      return transform.insertNodeByKey(node.key, 0, Text.createFromString(' '), { normalize: false })
   }
 }
 
@@ -136,7 +146,7 @@ const INLINE_VOID_TEXT_RULE = {
 
 const INLINE_VOID_TEXTS_AROUND_RULE = {
   match: (object) => {
-    return object.kind == 'block'
+    return object.kind == 'block' || object.kind == 'inline'
   },
   validate: (block) => {
     const invalids = block.nodes.reduce((accu, child, index) => {
@@ -161,8 +171,8 @@ const INLINE_VOID_TEXTS_AROUND_RULE = {
   },
   normalize: (transform, block, invalids) => {
     return invalids.reduce((t, { index, next, prev }) => {
-      if (prev) t = transform.insertNodeByKey(block.key, index, Text.create())
-      if (next) t = transform.insertNodeByKey(block.key, index + 1, Text.create())
+      if (prev) t = transform.insertNodeByKey(block.key, index, Text.create(), { normalize: false })
+      if (next) t = transform.insertNodeByKey(block.key, index + 1, Text.create(), { normalize: false })
       return t
     }, transform)
   }
@@ -199,7 +209,7 @@ const NO_ADJACENT_TEXT_RULE = {
         .reverse()
         .reduce((t, pair) => {
           const [ first, second ] = pair
-          return t.joinNodeByKey(second.key, first.key)
+          return t.joinNodeByKey(second.key, first.key, { normalize: false })
         }, transform)
   }
 }
@@ -255,7 +265,7 @@ const NO_EMPTY_TEXT_RULE = {
   },
   normalize: (transform, node, invalids) => {
     return invalids.reduce((t, text) => {
-        return t.removeNodeByKey(text.key)
+        return t.removeNodeByKey(text.key, { normalize: false })
     }, transform)
   }
 }

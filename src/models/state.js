@@ -52,9 +52,8 @@ class State extends new Record(DEFAULTS) {
     }
 
     const state = new State({ document, selection })
-
-    // transform.apply will normalize the document
     return state.transform()
+      .normalize()
       .apply({ save: false })
   }
 
