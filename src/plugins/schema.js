@@ -102,7 +102,7 @@ const INLINE_NO_EMPTY = {
     return inline.text == ''
   },
   normalize: (transform, node) => {
-    return transform.removeNodeByKey(node.key, { normalize: false })
+    return transform.removeNodeByKey(node.key)
   }
 }
 
