@@ -1,7 +1,7 @@
 
+import 'jsdom-global/register'
 import React from 'react'
 import fs from 'fs'
-import jsdom from 'mocha-jsdom'
 import readMetadata from 'read-metadata'
 import strip from '../helpers/strip-dynamic'
 import { Raw, Editor, Schema } from '../..'
@@ -14,8 +14,6 @@ import { strictEqual } from '../helpers/assert-json'
  */
 
 describe('schema', () => {
-  jsdom()
-
   const tests = fs.readdirSync(resolve(__dirname, './fixtures'))
 
   for (const test of tests) {
