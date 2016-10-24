@@ -53,3 +53,11 @@ To add a benchmark, create a new folder in the `perf/benchmarks/` directory. It 
 Note 1: Everything must be sync.
 
 Note 2: To avoid unwanted memoization, a different instance of `state` will be passed for every `run` call.
+
+## Detailed options for the benchmark script
+
+You can also launch the benchmark script directly. See usage:
+
+``` shell
+babel-node ./perf/index.js -h
+```

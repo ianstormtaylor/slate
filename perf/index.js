@@ -1,10 +1,11 @@
 // Performance benchmark
 
 const USAGE = `
-Usage: node ./perf/index.js [--compare referencePath] [--output outputPath]
+Usage: babel-node ./perf/index.js [--compare referencePath] [--only benchmarkName] [--output outputPath]
 
-	--output outputPath	Output the benchmarks results as JSON at outputPath
 	--compare referencePath	Compare with results stored in the JSON at referencePath
+	--only benchmarkName	Only run the designated benchmark (named after the benchmark directory)
+	--output outputPath	Output the benchmarks results as JSON at outputPath
 `
 
 const Benchmark = require('benchmark')
@@ -51,7 +52,8 @@ function runBenchmarks() {
   print('Benchmarks\n')
 
   // Command line options
-  const { outputPath, reference } = parseCommandLineOptions(process)
+  const { outputPath, reference, only, help } = parseCommandLineOptions(process)
+  if (help) return printUsage()
 
   let suite = new Benchmark.Suite()
   let results = {} // Can be saved as JSON
@@ -61,6 +63,8 @@ function runBenchmarks() {
   const benchmarks = fs.readdirSync(suiteDir)
   for (const benchmarkName of benchmarks) {
     if (benchmarkName[0] == '.') continue
+    if (only && benchmarkName != only) continue
+
     const benchmarkDir = resolve(suiteDir, benchmarkName)
 
     // Read benchmark specification
@@ -135,26 +139,34 @@ function runBenchmarks() {
 
 /**
  * @param {Node.Process} process
- * @return {Object} { reference: JSON?, outputPath: String? }
+ * @return {Object} { reference: JSON?, outputPath: String?, only: String? }
  */
 
 function parseCommandLineOptions(process) {
-  let outputPath, reference
+  let outputPath,
+      reference,
+      only,
+      help = false
 
   const options = process.argv.slice(2)
-
-  if (options.length % 2 !== 0) {
-    printUsage()
-    throw new Error('Invalid number of arguments')
-  }
 
   for (let i = 0; i < options.length; i++) {
     let option = options[i]
 
     switch (option) {
 
+    case '-h':
+    case '--help':
+      help = true
+      break
+
     case '--output':
       outputPath = options[i + 1]
+      i++
+      break
+
+    case '--only':
+      only = options[i + 1]
       i++
       break
 
@@ -176,7 +188,9 @@ function parseCommandLineOptions(process) {
 
   return {
     outputPath,
-    reference
+    reference,
+    only,
+    help
   }
 }
 
