@@ -96,13 +96,23 @@ const INLINE_CHILDREN_RULE = {
 
 const INLINE_NO_EMPTY = {
   match: (object) => {
-    return object.kind == 'inline'
+    return object.kind == 'block'
   },
-  validate: (inline) => {
-    return inline.text == ''
+  validate: (block) => {
+    return block.nodes.some((child) => {
+      return child.kind == 'inline' && child.text == ''
+    })
   },
-  normalize: (transform, node) => {
-    return transform.removeNodeByKey(node.key, { normalize: false })
+  normalize: (transform, block) => {
+    return block.nodes.reduce((tr, child, index) => {
+      if (child.kind == 'inline' && child.text == '') {
+        return transform
+          .removeNodeByKey(child.key, { normalize: false })
+          .insertNodeByKey(block.key, index, Text.createFromString(''), { normalize: false })
+      } else {
+        return tr
+      }
+    }, transform)
   }
 }
 
