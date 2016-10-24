@@ -482,6 +482,7 @@ const Raw = {
   untersifyBlock(object) {
     if (object.isVoid || !object.nodes || !object.nodes.length) {
       return {
+        key: object.key,
         data: object.data,
         kind: object.kind,
         type: object.type,
@@ -508,6 +509,7 @@ const Raw = {
   untersifyInline(object) {
     if (object.isVoid || !object.nodes || !object.nodes.length) {
       return {
+        key: object.key,
         data: object.data,
         kind: object.kind,
         type: object.type,
@@ -567,6 +569,7 @@ const Raw = {
     if (object.ranges) return object
 
     return {
+      key: object.key,
       kind: object.kind,
       ranges: [{
         text: object.text,

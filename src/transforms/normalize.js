@@ -1,5 +1,3 @@
-import Schema from '../models/schema'
-import Raw from '../serializers/raw'
 import warning from '../utils/warning'
 import { default as defaultSchema } from '../plugins/schema'
 
@@ -30,8 +28,6 @@ function _refreshNode(transform, node) {
  */
 
 function _normalizeChildrenWith(transform, schema, node) {
-  let { state } = transform
-
   if (!node.nodes) {
     return transform
   }
@@ -53,7 +49,6 @@ function _normalizeChildrenWith(transform, schema, node) {
  */
 
 function _normalizeNodeWith(transform, schema, node) {
-  let { state } = transform
   const failure = schema.__validate(node)
 
   // Node is valid?
@@ -87,6 +82,7 @@ function _normalizeNodeWith(transform, schema, node) {
  */
 
 export function normalizeNodeWith(transform, schema, node) {
+  // console.log(`normalize node key=${node.key}`)
   // Iterate over its children
   transform = _normalizeChildrenWith(transform, schema, node)
 
@@ -149,7 +145,7 @@ export function normalizeDocument(transform) {
 export function normalizeNodeByKey(transform, key) {
     const { state } = transform
     const { document } = state
-    const node = document.assertDescendant(key)
+    const node = document.key == key ? document : document.assertDescendant(key)
 
     return transform.normalizeNodeWith(defaultSchema, node)
 }

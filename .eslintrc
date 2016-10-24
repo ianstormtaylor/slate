@@ -76,6 +76,7 @@
     "no-unreachable": "error",
     "no-unsafe-finally": "error",
     "no-unused-expressions": "error",
+    "no-unused-vars": "warn",
     "no-useless-call": "error",
     "no-useless-computed-key": "error",
     "no-useless-constructor": "error",
