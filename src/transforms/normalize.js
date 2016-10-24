@@ -96,6 +96,36 @@ export function normalizeNodeWith(transform, schema, node) {
 }
 
 /**
+ * Normalize a node its parents using a schema.
+ *
+ * @param  {Transform} transform
+ * @param  {Schema} schema
+ * @param  {Node} node
+ * @return {Transform}
+ */
+
+export function normalizeParentsWith(transform, schema, node) {
+  transform = _normalizeNodeWith(transform, schema, node)
+
+  // Normalize went back up to the document
+  if (node.kind == 'document') {
+    return transform
+  }
+
+  // We search for the new parent
+  node = _refreshNode(transform, node)
+  if (!node) {
+    return transform
+  }
+
+  const { state } = transform
+  const { document } = state
+  const parent = document.getParent(node.key)
+
+  return normalizeParentsWith(transform, schema, parent)
+}
+
+/**
  * Normalize state using a schema.
  *
  * @param  {Transform} transform
@@ -135,7 +165,7 @@ export function normalizeDocument(transform) {
 }
 
 /**
- * Normalize a specific node using core schema
+ * Normalize a node and its children using core schema
  *
  * @param  {Transform} transform
  * @param  {Node or String} key
@@ -143,11 +173,27 @@ export function normalizeDocument(transform) {
  */
 
 export function normalizeNodeByKey(transform, key) {
-    const { state } = transform
-    const { document } = state
-    const node = document.key == key ? document : document.assertDescendant(key)
+  const { state } = transform
+  const { document } = state
+  const node = document.key == key ? document : document.assertDescendant(key)
 
-    return transform.normalizeNodeWith(defaultSchema, node)
+  return transform.normalizeNodeWith(defaultSchema, node)
+}
+
+/**
+ * Normalize a node and its parent using core schema
+ *
+ * @param  {Transform} transform
+ * @param  {Node or String} key
+ * @return {Transform} transform
+ */
+
+export function normalizeParentsByKey(transform, key) {
+  const { state } = transform
+  const { document } = state
+  const node = document.key == key ? document : document.assertDescendant(key)
+
+  return transform.normalizeParentsWith(defaultSchema, node)
 }
 
 /**

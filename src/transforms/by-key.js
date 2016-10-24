@@ -225,7 +225,7 @@ export function removeTextByKey(transform, key, offset, length, options = {}) {
 
   transform = transform.removeTextOperation(path, offset, length)
   if (normalize) {
-    transform = transform.normalizeNodeByKey(parent.key)
+    transform = transform.normalizeParentsByKey(parent.key)
   }
 
   return transform
