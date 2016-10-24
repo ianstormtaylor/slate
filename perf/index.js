@@ -84,6 +84,7 @@ function runBenchmarks() {
       name: benchmarkName,
 
       onStart() {
+        print(indent(1), benchmarkName)
         // Use this test's scope
         global.currentBenchmark = benchmarkName
       },
@@ -255,8 +256,6 @@ function compareResult(result, reference = {}) {
   const { name } = result
   const ref = reference[name]
   const errored = ref && (ref.error || result.error)
-
-  print(indent(1), name)
 
   print(indent(2), 'Current:	', formatPerf(result))
 
