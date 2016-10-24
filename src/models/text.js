@@ -34,7 +34,7 @@ class Text extends new Record(DEFAULTS) {
    * Create a new `Text` with `properties`.
    *
    * @param {Object} properties
-   * @return {Text} text
+   * @return {Text}
    */
 
   static create(properties = {}) {
@@ -223,7 +223,7 @@ class Text extends new Record(DEFAULTS) {
    * @param {Numbder} index
    * @param {String} text
    * @param {String} marks (optional)
-   * @return {Text} text
+   * @return {Text}
    */
 
   insertText(index, text, marks) {
@@ -236,6 +236,16 @@ class Text extends new Record(DEFAULTS) {
       .concat(characters.slice(index))
 
     return this.merge({ characters })
+  }
+
+  /**
+   * Regenerate the node's key.
+   *
+   * @return {Text}
+   */
+
+  regenerateKey() {
+    return this.merge({ key: uid() })
   }
 
   /**
@@ -265,7 +275,7 @@ class Text extends new Record(DEFAULTS) {
    *
    * @param {Number} index
    * @param {Number} length
-   * @return {Text} text
+   * @return {Text}
    */
 
   removeText(index, length) {

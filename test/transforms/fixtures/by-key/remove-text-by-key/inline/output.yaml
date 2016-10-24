@@ -7,4 +7,4 @@ nodes:
         type: link
         nodes:
           - kind: text
-            text: word
+            text: wor

@@ -5,6 +5,6 @@ export default function (state) {
 
   return state
     .transform()
-    .removeNodeByKey(first.key)
+    .moveNodeByKey(first.key, document.key, 1)
     .apply()
 }

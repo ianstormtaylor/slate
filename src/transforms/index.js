@@ -15,6 +15,7 @@ import {
   addMarkOperation,
   insertNodeOperation,
   insertTextOperation,
+  joinNodeOperation,
   moveNodeOperation,
   removeMarkOperation,
   removeNodeOperation,
@@ -85,6 +86,7 @@ import {
   addMarkByKey,
   insertNodeByKey,
   insertTextByKey,
+  joinNodeByKey,
   moveNodeByKey,
   removeMarkByKey,
   removeNodeByKey,
@@ -142,7 +144,6 @@ import {
  */
 
 import {
-  normalizeDocument,
   normalizeSelection,
 } from './normalize'
 
@@ -167,6 +168,7 @@ export default {
   addMarkOperation,
   insertNodeOperation,
   insertTextOperation,
+  joinNodeOperation,
   moveNodeOperation,
   removeMarkOperation,
   removeNodeOperation,
@@ -231,6 +233,7 @@ export default {
   addMarkByKey,
   insertNodeByKey,
   insertTextByKey,
+  joinNodeByKey,
   moveNodeByKey,
   removeMarkByKey,
   removeNodeByKey,
@@ -282,7 +285,6 @@ export default {
    * Normalize.
    */
 
-  normalizeDocument,
   normalizeSelection,
 
 }

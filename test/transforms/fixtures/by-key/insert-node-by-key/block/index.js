@@ -1,10 +1,11 @@
 
+import { Block } from '../../../../../..'
+
 export default function (state) {
   const { document, selection } = state
-  const first = document.getTexts().first()
 
   return state
     .transform()
-    .removeNodeByKey(first.key)
+    .insertNodeByKey(document.key, 0, Block.create({ type: 'paragraph' }))
     .apply()
 }
