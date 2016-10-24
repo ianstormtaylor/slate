@@ -1015,9 +1015,5 @@ export function wrapTextAtRange(transform, range, prefix, suffix = prefix, optio
   transform.insertTextAtRange(start, prefix, { normalize })
   transform.insertTextAtRange(end, suffix, { normalize })
 
-  if (normalize) {
-
-  }
-
   return transform
 }
