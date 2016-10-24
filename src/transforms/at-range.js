@@ -802,11 +802,7 @@ export function wrapBlockAtRange(transform, range, block) {
   }
 
   // inject the new block node into the parent
-  if (parent != document) {
-    transform.insertNodeByKey(parent.key, index, block)
-  } else {
-    transform.insertNodeOperation([], index, block)
-  }
+  transform.insertNodeByKey(parent.key, index, block)
 
   // move the sibling nodes into the new block node
   siblings.forEach((node, i) => {
