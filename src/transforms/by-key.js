@@ -116,7 +116,8 @@ export function joinNodeByKey(transform, key, withKey, options = {}) {
 }
 
 /**
- * Move a node by `key` to a new parent by `key` and `index`.
+ * Move a node by `key` to a new parent by `newKey` and `index`.
+ * `newKey` is the key of the container (it can be the document itself)
  *
  * @param {Transform} transform
  * @param {String} key
@@ -133,16 +134,12 @@ export function moveNodeByKey(transform, key, newKey, newIndex, options = {}) {
   const { document } = state
   const path = document.getPath(key)
   const newPath = document.getPath(newKey)
+  const parent = document.key == newKey ? null : document.getCommonAncestor(key, newKey)
 
   transform = transform.moveNodeOperation(path, newPath, newIndex)
-  const parent = document.getCommonAncestor(key, newKey)
 
   if (normalize) {
-    if (parent) {
-      transform = transform.normalizeNodeByKey(parent.key)
-    } else {
-      transform = transform.normalizeDocument()
-    }
+    transform = transform.normalizeNodeByKey(parent.key)
   }
 
   return transform
