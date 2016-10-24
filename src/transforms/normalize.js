@@ -161,7 +161,10 @@ export function normalize(transform) {
  */
 
 export function normalizeDocument(transform) {
-    return transform.normalizeWith(defaultSchema)
+    console.time('normalizeDocument')
+    transform = transform.normalizeWith(defaultSchema)
+    console.timeEnd('normalizeDocument')
+    return transform
 }
 
 /**
@@ -173,11 +176,14 @@ export function normalizeDocument(transform) {
  */
 
 export function normalizeNodeByKey(transform, key) {
+  console.time('normalizeNodeByKey')
   const { state } = transform
   const { document } = state
   const node = document.key == key ? document : document.assertDescendant(key)
 
-  return transform.normalizeNodeWith(defaultSchema, node)
+  transform = transform.normalizeNodeWith(defaultSchema, node)
+  console.timeEnd('normalizeNodeByKey')
+  return transform
 }
 
 /**
@@ -189,11 +195,14 @@ export function normalizeNodeByKey(transform, key) {
  */
 
 export function normalizeParentsByKey(transform, key) {
+  console.time('normalizeParentsByKey')
   const { state } = transform
   const { document } = state
   const node = document.key == key ? document : document.assertDescendant(key)
 
-  return transform.normalizeParentsWith(defaultSchema, node)
+  transform = transform.normalizeParentsWith(defaultSchema, node)
+  console.timeEnd('normalizeParentsByKey')
+  return transform
 }
 
 /**
