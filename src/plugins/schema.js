@@ -137,7 +137,6 @@ const INLINE_VOID_TEXT_RULE = {
 const INLINE_VOID_TEXTS_AROUND_RULE = {
   match: (object) => {
     return object.kind == 'block'
-    return object.kind == 'block' || object.kind == 'inline'
   },
   validate: (block) => {
     const invalids = block.nodes.reduce((accu, child, index) => {
