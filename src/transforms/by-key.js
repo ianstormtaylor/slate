@@ -134,7 +134,7 @@ export function moveNodeByKey(transform, key, newKey, newIndex, options = {}) {
   const { document } = state
   const path = document.getPath(key)
   const newPath = document.getPath(newKey)
-  const parent = document.key == newKey ? null : document.getCommonAncestor(key, newKey)
+  const parent = document.key == newKey ? document : document.getCommonAncestor(key, newKey)
 
   transform = transform.moveNodeOperation(path, newPath, newIndex)
 
