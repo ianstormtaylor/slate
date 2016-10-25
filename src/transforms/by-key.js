@@ -330,16 +330,18 @@ export function splitNodeByKey(transform, key, offset, options = {}) {
  * @param {Transform} transform
  * @param {String} key
  * @param {Object or String} properties
+ * @param {Object} options
+ *   @param {Boolean} normalize
  * @return {Transform}
  */
 
-export function unwrapInlineByKey(transform, key, properties) {
+export function unwrapInlineByKey(transform, key, properties, options) {
   const { state } = transform
   const { document, selection } = state
   const node = document.assertDescendant(key)
   const texts = node.getTexts()
   const range = selection.moveToRangeOf(texts.first(), texts.last())
-  return transform.unwrapInlineAtRange(range, properties)
+  return transform.unwrapInlineAtRange(range, properties, options)
 }
 
 /**
@@ -348,14 +350,16 @@ export function unwrapInlineByKey(transform, key, properties) {
  * @param {Transform} transform
  * @param {String} key
  * @param {Object or String} properties
+ * @param {Object} options
+ *   @param {Boolean} normalize
  * @return {Transform}
  */
 
-export function unwrapBlockByKey(transform, key, properties) {
+export function unwrapBlockByKey(transform, key, properties, options) {
   const { state } = transform
   const { document, selection } = state
   const node = document.assertDescendant(key)
   const texts = node.getTexts()
   const range = selection.moveToRangeOf(texts.first(), texts.last())
-  return transform.unwrapBlockAtRange(range, properties)
+  return transform.unwrapBlockAtRange(range, properties, options)
 }

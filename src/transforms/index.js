@@ -251,10 +251,7 @@ export default {
   setNodeByKey,
   splitNodeByKey,
   unwrapInlineByKey,
-<<<<<<< HEAD
-=======
   unwrapBlockByKey,
->>>>>>> slate/master
 
   /**
    * On selection.
