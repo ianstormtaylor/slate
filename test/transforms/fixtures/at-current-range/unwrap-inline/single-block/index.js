@@ -21,7 +21,7 @@ export default function (state) {
 
   assert.deepEqual(
     next.selection.toJS(),
-    range.toJS()
+    range.collapseToStartOf(next.document).toJS()
   )
 
   return next
