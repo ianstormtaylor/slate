@@ -441,7 +441,7 @@ export function insertInlineAtRange(transform, range, inline, options = {}) {
  */
 
 export function insertTextAtRange(transform, range, text, marks, options = {}) {
-  const { normalize = true } = options
+  let { normalize } = options
   const { state } = transform
   const { document } = state
   const { startKey, startOffset } = range
@@ -453,6 +453,11 @@ export function insertTextAtRange(transform, range, text, marks, options = {}) {
 
   if (range.isExpanded) {
     transform = transform.deleteAtRange(range, { normalize: false })
+  }
+
+  // Unless specified, don't normalize if only inserting text
+  if (normalize !== undefined) {
+    normalize = range.isExpanded
   }
 
   return transform.insertTextByKey(startKey, startOffset, text, marks, { normalize })
