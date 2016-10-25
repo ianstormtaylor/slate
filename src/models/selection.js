@@ -1,5 +1,4 @@
 
-import includes from 'lodash/includes'
 import memoize from '../utils/memoize'
 import { Record } from 'immutable'
 
@@ -288,7 +287,6 @@ class Selection extends new Record(DEFAULTS) {
 
   normalize(node) {
     let selection = this
-    const { isCollapsed } = selection
     let { anchorKey, anchorOffset, focusKey, focusOffset, isBackward } = selection
 
     // If the selection isn't formed yet or is malformed, ensure that it is

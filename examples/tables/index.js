@@ -2,7 +2,6 @@
 import { Editor, Raw } from '../..'
 import React from 'react'
 import initialState from './state.json'
-import keycode from 'keycode'
 
 /**
  * Define a schema.

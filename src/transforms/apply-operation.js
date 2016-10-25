@@ -1,7 +1,5 @@
 
 import Debug from 'debug'
-import uid from '../utils/uid'
-import { default as defaultSchema } from '../plugins/schema'
 
 /**
  * Debug.

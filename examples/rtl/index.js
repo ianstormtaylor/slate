@@ -1,7 +1,6 @@
 
 import { Editor, Raw } from '../..'
 import React from 'react'
-import SoftBreak from 'slate-soft-break'
 import initialState from './state.json'
 
 /**

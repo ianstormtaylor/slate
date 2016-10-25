@@ -1,6 +1,5 @@
 
 import Normalize from '../utils/normalize'
-import uid from '../utils/uid'
 
 /**
  * Add mark to text at `offset` and `length` in node by `path`.
@@ -137,7 +136,6 @@ export function joinNodeOperation(transform, path, withPath) {
 
 export function moveNodeOperation(transform, path, newPath, newIndex) {
   const { state } = transform
-  const { document } = state
   const parentPath = path.slice(0, -1)
   const parentIndex = path[path.length - 1]
   const inversePath = newPath.slice().concat([newIndex])

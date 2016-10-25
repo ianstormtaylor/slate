@@ -122,8 +122,7 @@ class AutoMarkdown extends React.Component {
 
   onSpace = (e, state) => {
     if (state.isExpanded) return
-    let { selection } = state
-    const { startText, startBlock, startOffset } = state
+    const { startBlock, startOffset } = state
     const chars = startBlock.text.slice(0, startOffset).replace(/\s*/g, '')
     const type = this.getType(chars)
 

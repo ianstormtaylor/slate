@@ -1,7 +1,6 @@
 
 import { Editor, Raw } from '../..'
 import React from 'react'
-import ReactDOM from 'react-dom'
 import Video from './video'
 import initialState from './state.json'
 

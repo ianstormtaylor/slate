@@ -7,7 +7,6 @@ import React from 'react'
 import String from '../utils/string'
 import getWindow from 'get-window'
 import { IS_MAC } from '../constants/environment'
-import { default as defaultSchema } from './schema'
 
 /**
  * Debug.

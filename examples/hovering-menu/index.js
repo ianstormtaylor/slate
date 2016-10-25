@@ -1,5 +1,5 @@
 
-import { Editor, Mark, Raw } from '../..'
+import { Editor, Raw } from '../..'
 import Portal from 'react-portal'
 import React from 'react'
 import position from 'selection-position'
@@ -123,8 +123,6 @@ class HoveringMenu extends React.Component {
    */
 
   renderMenu = () => {
-    const { state } = this.state
-    const isOpen = state.isExpanded && state.isFocused
     return (
       <Portal isOpened onOpen={this.onOpen}>
         <div className="menu hover-menu">

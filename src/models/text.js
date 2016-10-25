@@ -192,7 +192,6 @@ class Text extends new Record(DEFAULTS) {
    */
 
   getRanges(decorators = []) {
-    const node = this
     const list = new List()
     let characters = this.getDecorations(decorators)
 

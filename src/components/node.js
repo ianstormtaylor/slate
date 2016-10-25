@@ -306,7 +306,7 @@ class Node extends React.Component {
     const ranges = node.getRanges(decorators)
     let offset = 0
 
-    const leaves = ranges.map((range, i, original) => {
+    const leaves = ranges.map((range, i) => {
       const leaf = this.renderLeaf(ranges, range, i, offset)
       offset += range.text.length
       return leaf

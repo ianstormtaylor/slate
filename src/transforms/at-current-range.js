@@ -633,7 +633,7 @@ export function wrapInline(transform, properties) {
 
 export function wrapText(transform, prefix, suffix = prefix) {
   const { state } = transform
-  const { document, selection } = state
+  const { selection } = state
   const { anchorOffset, anchorKey, focusOffset, focusKey, isBackward } = selection
   let after
 

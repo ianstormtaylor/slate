@@ -1,5 +1,5 @@
 
-import { Editor, Mark, Raw } from '../../..'
+import { Editor, Raw } from '../../..'
 import React from 'react'
 import initialState from './state.json'
 

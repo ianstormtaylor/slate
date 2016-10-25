@@ -1,5 +1,5 @@
 
-import { Editor, Mark, Raw, Selection } from '../..'
+import { Editor, Mark, Raw } from '../..'
 import Prism from 'prismjs'
 import React from 'react'
 import initialState from './state.json'
@@ -12,7 +12,7 @@ import initialState from './state.json'
  */
 
 function CodeBlock(props) {
-  const { attributes, children, editor, node } = props
+  const { editor, node } = props
   const language = node.data.get('language')
 
   function onChange(e) {
