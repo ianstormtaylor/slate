@@ -742,8 +742,7 @@ function Plugin(options = {}) {
   const schema = {
       rules: [
           BLOCK_RENDER_RULE,
-          INLINE_RENDER_RULE,
-          ...defaultSchema.rules
+          INLINE_RENDER_RULE
       ]
   }
 
