@@ -690,7 +690,7 @@ export function unwrapInlineAtRange(transform, range, properties) {
 
   const { state } = transform
   const { document } = state
-  const texts = document.getTexts()
+  const texts = document.getTextsAtRange(range)
   const inlines = texts
     .map((text) => {
       return document.getClosest(text, (parent) => {
