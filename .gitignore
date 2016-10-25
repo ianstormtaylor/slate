@@ -6,3 +6,4 @@ examples/build.prod.js
 node_modules
 tmp
 _book
+perf/reference.json

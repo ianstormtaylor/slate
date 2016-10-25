@@ -1,4 +1,5 @@
 
+import 'jsdom-global/register'
 import React from 'react'
 import fs from 'fs'
 import readMetadata from 'read-metadata'
