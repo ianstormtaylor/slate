@@ -1,13 +1,7 @@
 
-import Block from '../models/block'
-import Document from '../models/document'
-import Inline from '../models/inline'
-import Mark from '../models/mark'
 import Raw from './raw'
 import React from 'react'
 import ReactDOMServer from 'react-dom/server'
-import State from '../models/state'
-import Text from '../models/text'
 import cheerio from 'cheerio'
 import typeOf from 'type-of'
 import { Record } from 'immutable'

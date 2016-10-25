@@ -59,7 +59,7 @@ class Transform {
 
     let { state, operations } = transform
     let { history } = state
-    let { undos, redos } = history
+    let { undos } = history
     const previous = undos.peek()
 
     // If there are no operations, abort early.

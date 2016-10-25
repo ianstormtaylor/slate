@@ -1,10 +1,8 @@
 
 
 import Document from './document'
-import Mark from './mark'
 import Selection from './selection'
 import Transform from './transform'
-import uid from '../utils/uid'
 import { Record, Set, Stack, List } from 'immutable'
 
 /**

@@ -4,9 +4,6 @@ import CorePlugin from '../plugins/core'
 import Debug from 'debug'
 import React from 'react'
 import Schema from '../models/schema'
-import State from '../models/state'
-import isReactComponent from '../utils/is-react-component'
-import typeOf from 'type-of'
 
 /**
  * Debug.

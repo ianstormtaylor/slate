@@ -17,7 +17,7 @@ class Video extends React.Component {
 
   onChange = (e) => {
     const video = e.target.value
-    const { node, state, editor } = this.props
+    const { node, editor } = this.props
     const properties = {
       data: { video }
     }
@@ -90,7 +90,7 @@ class Video extends React.Component {
           src={video}
           frameBorder="0"
           style={iframeStyle}
-        ></iframe>
+        />
       </div>
     )
   }

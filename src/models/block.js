@@ -15,7 +15,7 @@ import Inline from './inline'
 import Node from './node'
 import Text from './text'
 import uid from '../utils/uid'
-import Immutable, { Map, List, Record } from 'immutable'
+import { Map, List, Record } from 'immutable'
 
 /**
  * Default properties.

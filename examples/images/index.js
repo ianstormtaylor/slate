@@ -1,7 +1,6 @@
 
-import { Editor, Raw, Void } from '../..'
+import { Editor, Raw } from '../..'
 import React from 'react'
-import ReactDOM from 'react-dom'
 import initialState from './state.json'
 import isImage from 'is-image'
 import isUrl from 'is-url'

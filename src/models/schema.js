@@ -2,7 +2,6 @@
 import React from 'react'
 import isReactComponent from '../utils/is-react-component'
 import typeOf from 'type-of'
-import memoize from '../utils/memoize'
 import { Record } from 'immutable'
 
 /**

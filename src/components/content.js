@@ -8,7 +8,6 @@ import Selection from '../models/selection'
 import Transfer from '../utils/transfer'
 import TYPES from '../constants/types'
 import getWindow from 'get-window'
-import includes from 'lodash/includes'
 import keycode from 'keycode'
 import { IS_FIREFOX, IS_MAC } from '../constants/environment'
 
@@ -366,7 +365,6 @@ class Content extends React.Component {
 
     const window = getWindow(e.target)
     const { state } = this.props
-    const { selection } = state
     const { dataTransfer, x, y } = e.nativeEvent
     const transfer = new Transfer(dataTransfer)
     const data = transfer.getData()
@@ -425,7 +423,7 @@ class Content extends React.Component {
 
     // Get the selection point.
     const native = window.getSelection()
-    const { anchorNode, anchorOffset, focusOffset } = native
+    const { anchorNode, anchorOffset } = native
     const point = this.getPoint(anchorNode, anchorOffset)
     const { key, index, start, end } = point
 

@@ -3,8 +3,6 @@ import Leaf from './leaf'
 import Mark from '../models/mark'
 import OffsetKey from '../utils/offset-key'
 import React from 'react'
-import ReactDOM from 'react-dom'
-import keycode from 'keycode'
 import { IS_FIREFOX } from '../constants/environment'
 
 /**

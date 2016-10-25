@@ -10,7 +10,6 @@
 
 function isInRange(index, text, range) {
   const { startKey, startOffset, endKey, endOffset } = range
-  let matcher
 
   if (text.key == startKey && text.key == endKey) {
     return startOffset <= index && index < endOffset

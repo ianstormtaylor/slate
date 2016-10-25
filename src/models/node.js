@@ -1,19 +1,14 @@
 
 import Block from './block'
 import Character from './character'
-import Data from './data'
 import Document from './document'
-import Inline from './inline'
 import Mark from './mark'
 import Normalize from '../utils/normalize'
-import Selection from './selection'
-import Text from './text'
 import direction from 'direction'
 import isInRange from '../utils/is-in-range'
-import includes from 'lodash/includes'
 import memoize from '../utils/memoize'
 import uid from '../utils/uid'
-import { List, Map, OrderedSet, Set } from 'immutable'
+import { List, Set } from 'immutable'
 
 
 /**
@@ -621,7 +616,6 @@ const Node = {
 
     // If the range is collapsed at the start of the node, check the previous.
     if (range.isCollapsed && startOffset == 0) {
-      const text = this.getDescendant(startKey)
       const previous = this.getPreviousText(startKey)
       if (!previous || !previous.length) return marks
       const char = previous.characters.get(previous.length - 1)
