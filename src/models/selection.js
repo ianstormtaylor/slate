@@ -1,5 +1,7 @@
 
 import memoize from '../utils/memoize'
+import getLeafText from '../utils/get-leaf-text'
+import warning from '../utils/warning'
 import { Record } from 'immutable'
 
 /**
@@ -312,6 +314,7 @@ class Selection extends new Record(DEFAULTS) {
 
     // If the anchor node isn't a text node, match it to one.
     if (anchorNode.kind != 'text') {
+      warning('Selection anchor is on a non text node, matching to leaf')
       let anchorText = anchorNode.getTextAtOffset(anchorOffset)
       let offset = anchorNode.getOffset(anchorText)
       anchorOffset = anchorOffset - offset
@@ -320,6 +323,7 @@ class Selection extends new Record(DEFAULTS) {
 
     // If the focus node isn't a text node, match it to one.
     if (focusNode.kind != 'text') {
+      warning('Selection focus is on a non text node, matching to leaf')
       let focusText = focusNode.getTextAtOffset(focusOffset)
       let offset = focusNode.getOffset(focusText)
       focusOffset = focusOffset - offset
@@ -433,10 +437,13 @@ class Selection extends new Record(DEFAULTS) {
   /**
    * Move to the start of a `node`.
    *
+   * @param {Node} node
    * @return {Selection} selection
    */
 
   collapseToStartOf(node) {
+    node = getLeafText(node)
+
     return this.merge({
       anchorKey: node.key,
       anchorOffset: 0,
@@ -453,6 +460,8 @@ class Selection extends new Record(DEFAULTS) {
    */
 
   collapseToEndOf(node) {
+    node = getLeafText(node)
+
     return this.merge({
       anchorKey: node.key,
       anchorOffset: node.length,
@@ -472,6 +481,9 @@ class Selection extends new Record(DEFAULTS) {
    */
 
   moveToRangeOf(start, end = start) {
+    start = getLeafText(start)
+    end = getLeafText(end)
+
     return this.merge({
       anchorKey: start.key,
       anchorOffset: 0,
