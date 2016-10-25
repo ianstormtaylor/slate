@@ -210,7 +210,7 @@ function exists(filepath) {
 
 function save(results, path) {
   path = resolve(process.cwd(), path)
-  fs.writeFileSync(path, JSON.stringify(results))
+  fs.writeFileSync(path, JSON.stringify(results, null, 2))
 }
 
 function serializeResult(event) {
