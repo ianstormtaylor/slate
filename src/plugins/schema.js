@@ -1,5 +1,6 @@
 import Schema from '../models/schema'
 import Text from '../models/text'
+import { List } from 'immutable'
 
 /*
     This module contains the default schema to normalize documents
@@ -157,22 +158,32 @@ const INLINE_VOID_TEXTS_AROUND_RULE = {
       const prevNode = index > 0 ? block.nodes.get(index - 1) : null
       const nextNode = block.nodes.get(index + 1)
 
-      const prev = (!prevNode || isInlineVoid(prevNode))
-      const next = (!nextNode || isInlineVoid(nextNode.kind))
+      const prev = !prevNode
+      const next = (!nextNode || isInlineVoid(nextNode))
 
       if (next || prev) {
-        accu.push({ next, prev, index })
+        return accu.push({ next, prev, index })
+      } else {
+        return accu
       }
+    }, new List())
 
-      return accu
-    }, [])
-
-    return invalids.length ? invalids : null
+    return !invalids.isEmpty() ? invalids : null
   },
   normalize: (transform, block, invalids) => {
+    // Shift for every text node inserted previously
+    let shift = 0
+
     return invalids.reduce((t, { index, next, prev }) => {
-      if (prev) t = transform.insertNodeByKey(block.key, index, Text.create(), { normalize: false })
-      if (next) t = transform.insertNodeByKey(block.key, index + 1, Text.create(), { normalize: false })
+      if (prev) {
+        t = t.insertNodeByKey(block.key, shift + index, Text.create(), { normalize: false })
+        shift = shift + 1
+      }
+      if (next) {
+        t = t.insertNodeByKey(block.key, shift + index + 1, Text.create(), { normalize: false })
+        shift = shift + 1
+      }
+
       return t
     }, transform)
   }

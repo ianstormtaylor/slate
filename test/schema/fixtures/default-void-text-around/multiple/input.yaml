@@ -1,0 +1,16 @@
+
+nodes:
+  - kind: block
+    type: default
+    nodes:
+      - kind: inline
+        isVoid: true
+        type: image
+      - kind: text
+        text: " Hello"
+      - kind: inline
+        isVoid: true
+        type: image
+      - kind: inline
+        isVoid: true
+        type: image
