@@ -94,7 +94,8 @@ import {
   setMarkByKey,
   setNodeByKey,
   splitNodeByKey,
-  unwrapInlineByKey
+  unwrapInlineByKey,
+  unwrapBlockByKey,
 } from './by-key'
 
 /**
@@ -250,6 +251,10 @@ export default {
   setNodeByKey,
   splitNodeByKey,
   unwrapInlineByKey,
+<<<<<<< HEAD
+=======
+  unwrapBlockByKey,
+>>>>>>> slate/master
 
   /**
    * On selection.
