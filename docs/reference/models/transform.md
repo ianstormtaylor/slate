@@ -331,7 +331,6 @@ Unwrap all inner content of an [`Inline`](./inline.md) node that match `properti
 
 Unwrap all inner content of a [`Block`](./block.md) node that match `properties`. For convenience, you can pass a `type` string or `properties` object.
 
->>>>>>> slate/master
 ## Document Transforms
 
 ### `deleteBackwardAtRange`
