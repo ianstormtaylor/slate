@@ -1,3 +1,5 @@
+/* eslint no-console: 0 */
+
 import Normalize from '../utils/normalize'
 
 /**
@@ -66,12 +68,11 @@ export function deleteAtRange(transform, range, options = {}) {
   let ancestor = document.getCommonAncestor(startKey, endKey)
   let startChild = ancestor.getHighestChild(startKey)
   let endChild = ancestor.getHighestChild(endKey)
-  const startOff = (startChild.key === startKey ? 0 : startChild.getOffset(startKey)) + startOffset
-  const endOff = (endChild.key === endKey ? 0 : endChild.getOffset(endKey)) + endOffset
+  const startOff = (startChild.kind == 'text' ? 0 : startChild.getOffset(startKey)) + startOffset
+  const endOff = (endChild.kind == 'text' ? 0 : endChild.getOffset(endKey)) + endOffset
 
-  transform = transform
-    .splitNodeByKey(startChild.key, startOff, { normalize: false })
-    .splitNodeByKey(endChild.key, endOff, { normalize: false })
+  transform = transform.splitNodeByKey(startChild.key, startOff, { normalize: false })
+  transform = transform.splitNodeByKey(endChild.key, endOff, { normalize: false })
 
   state = transform.state
   document = state.document
@@ -83,27 +84,27 @@ export function deleteAtRange(transform, range, options = {}) {
 
   const startIndex = ancestor.nodes.indexOf(startChild)
   const endIndex = ancestor.nodes.indexOf(endChild)
-  const middles = ancestor.nodes.slice(startIndex + 1, endIndex + 1)
+  const middles = ancestor.nodes.slice(
+      startIndex + 1,
+      endIndex + 1
+  )
 
   if (middles.size) {
     // remove first nodes directly so the document is not normalized
-    middles.butLast().forEach(child => {
-      transform.removeNodeOperation(transform.state.document.getPath(child.key))
+    middles.forEach(child => {
+      transform.removeNodeByKey(child.key, { normalize: false })
     })
-
-    // remove last node so the document is normalized
-    transform.removeNodeByKey(middles.last().key)
   }
 
   if (startBlock.key !== endBlock.key) {
     endBlock.nodes.forEach((child, i) => {
       const newKey = startBlock.key
       const newIndex = startBlock.nodes.size + i
-      transform.moveNodeByKey(child.key, newKey, newIndex)
+      transform.moveNodeByKey(child.key, newKey, newIndex, { normalize: false })
     })
 
     const lonely = document.getFurthest(endBlock, p => p.nodes.size == 1) || endBlock
-    transform.removeNodeByKey(lonely.key)
+    transform.removeNodeByKey(lonely.key, { normalize: false })
   }
 
   if (normalize) {
