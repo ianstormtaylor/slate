@@ -177,6 +177,7 @@ class Html {
       node = ret.kind == 'mark'
         ? this.deserializeMark(ret)
         : ret
+      break
     }
 
     return node || next(element.children)
