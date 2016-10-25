@@ -137,6 +137,11 @@ export function normalizeWith(transform, schema) {
   const { state } = transform
   const { document } = state
 
+  // Schema was not rule to edit the document
+  if (!schema.isNormalization) {
+    return transform
+  }
+
   return transform.normalizeNodeWith(schema, document)
 }
 

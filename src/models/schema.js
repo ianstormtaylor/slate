@@ -1,101 +1,9 @@
 
 import React from 'react'
-import includes from 'lodash/includes'
 import isReactComponent from '../utils/is-react-component'
 import typeOf from 'type-of'
 import memoize from '../utils/memoize'
 import { Record } from 'immutable'
-
-/**
- * Checks that the schema can perform, ordered by performance.
- *
- * @type {Object}
- */
-
-const CHECKS = {
-
-  kind(object, value) {
-    if (object.kind != value) return object.kind
-  },
-
-  type(object, value) {
-    if (object.type != value) return object.type
-  },
-
-  isVoid(object, value) {
-    if (object.isVoid != value) return object.isVoid
-  },
-
-  minChildren(object, value) {
-    if (object.nodes.size < value) return object.nodes.size
-  },
-
-  maxChildren(object, value) {
-    if (object.nodes.size > value) return object.nodes.size
-  },
-
-  kinds(object, value) {
-    if (!includes(value, object.kind)) return object.kind
-  },
-
-  types(object, value) {
-    if (!includes(value, object.type)) return object.type
-  },
-
-  minLength(object, value) {
-    const { length } = object
-    if (length < value) return length
-  },
-
-  maxLength(object, value) {
-    const { length } = object
-    if (length > value) return length
-  },
-
-  text(object, value) {
-    const { text } = object
-    switch (typeOf(value)) {
-      case 'function': if (value(text)) return text
-      case 'regexp': if (!text.match(value)) return text
-      default: if (text != value) return text
-    }
-  },
-
-  anyOf(object, value) {
-    const { nodes } = object
-    if (!nodes) return
-    const invalids = nodes.filterNot((child) => {
-      return value.some(match => match(child))
-    })
-
-    if (invalids.size) return invalids
-  },
-
-  noneOf(object, value) {
-    const { nodes } = object
-    if (!nodes) return
-    const invalids = nodes.filterNot((child) => {
-      return value.every(match => !match(child))
-    })
-
-    if (invalids.size) return invalids
-  },
-
-  exactlyOf(object, value) {
-    const { nodes } = object
-    if (!nodes) return
-    if (nodes.size != value.length) return nodes
-
-    const invalids = nodes.filterNot((child, i) => {
-      const match = value[i]
-      if (!match) return false
-      return match(child)
-    })
-
-    if (invalids.size) return invalids
-  },
-
-}
 
 /**
  * Default properties.
@@ -135,6 +43,15 @@ class Schema extends new Record(DEFAULTS) {
 
   get kind() {
     return 'schema'
+  }
+
+  /**
+   * Return true if one rule can normalize the document
+   */
+
+  get isNormalization() {
+    const { rules } = this
+    return rules.some(rule => rule.validate)
   }
 
   /**
