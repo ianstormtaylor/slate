@@ -19,10 +19,10 @@ export function addMarkByKey(transform, key, offset, length, mark, options = {})
   const { state } = transform
   const { document } = state
   const path = document.getPath(key)
-  const parent = document.getParent(key)
 
   transform = transform.addMarkOperation(path, offset, length, mark)
   if (normalize) {
+    const parent = document.getParent(key)
     transform = transform.normalizeNodeByKey(parent.key)
   }
 
@@ -73,10 +73,10 @@ export function insertTextByKey(transform, key, offset, text, marks, options = {
   const { state } = transform
   const { document } = state
   const path = document.getPath(key)
-  const parent = document.getParent(key)
 
   transform = transform.insertTextOperation(path, offset, text, marks)
   if (normalize) {
+    const parent = document.getParent(key)
     transform = transform.normalizeNodeByKey(parent.key)
   }
 
@@ -100,11 +100,11 @@ export function joinNodeByKey(transform, key, withKey, options = {}) {
   const { document } = state
   const path = document.getPath(key)
   const withPath = document.getPath(withKey)
-  const parent = document.getCommonAncestor(key, withKey)
 
   transform = transform.joinNodeOperation(path, withPath)
 
   if (normalize) {
+    const parent = document.getCommonAncestor(key, withKey)
     if (parent) {
       transform = transform.normalizeNodeByKey(parent.key)
     } else {
@@ -134,11 +134,11 @@ export function moveNodeByKey(transform, key, newKey, newIndex, options = {}) {
   const { document } = state
   const path = document.getPath(key)
   const newPath = document.getPath(newKey)
-  const parent = document.key == newKey ? document : document.getCommonAncestor(key, newKey)
 
   transform = transform.moveNodeOperation(path, newPath, newIndex)
 
   if (normalize) {
+    const parent = document.key == newKey ? document : document.getCommonAncestor(key, newKey)
     transform = transform.normalizeNodeByKey(parent.key)
   }
 
@@ -164,10 +164,10 @@ export function removeMarkByKey(transform, key, offset, length, mark, options = 
   const { state } = transform
   const { document } = state
   const path = document.getPath(key)
-  const parent = document.getParent(key)
 
   transform = transform.removeMarkOperation(path, offset, length, mark)
   if (normalize) {
+    const parent = document.getParent(key)
     transform = transform.normalizeNodeByKey(parent.key)
   }
 
@@ -189,11 +189,11 @@ export function removeNodeByKey(transform, key, options = {}) {
   const { state } = transform
   let { document } = state
   const path = document.getPath(key)
-  const parent = document.getParent(key)
 
   transform = transform.removeNodeOperation(path)
 
   if (normalize) {
+    const parent = document.getParent(key)
     if (parent) {
       transform = transform.normalizeNodeByKey(parent.key)
     } else {
@@ -221,10 +221,10 @@ export function removeTextByKey(transform, key, offset, length, options = {}) {
   const { state } = transform
   let { document } = state
   const path = document.getPath(key)
-  const parent = document.getParent(key)
 
   transform = transform.removeTextOperation(path, offset, length)
   if (normalize) {
+    const parent = document.getParent(key)
     transform = transform.normalizeParentsByKey(parent.key)
   }
 
@@ -251,10 +251,10 @@ export function setMarkByKey(transform, key, offset, length, mark, properties, o
   const { state } = transform
   const { document } = state
   const path = document.getPath(key)
-  const parent = document.getParent(key)
 
   transform = transform.setMarkOperation(path, offset, length, mark, properties)
   if (normalize) {
+    const parent = document.getParent(key)
     transform = transform.normalizeNodeByKey(parent.key)
   }
 
@@ -278,11 +278,11 @@ export function setNodeByKey(transform, key, properties, options = {}) {
   const { state } = transform
   const { document } = state
   const path = document.getPath(key)
-  const parent = document.getParent(key)
 
   transform = transform.setNodeOperation(path, properties)
 
   if (normalize) {
+    const parent = document.getParent(key)
     if (parent) {
       transform = transform.normalizeNodeByKey(parent.key)
     } else {
@@ -309,11 +309,11 @@ export function splitNodeByKey(transform, key, offset, options = {}) {
   let { state } = transform
   let { document } = state
   const path = document.getPath(key)
-  const parent = document.getParent(key)
 
   transform = transform.splitNodeOperation(path, offset)
 
   if (normalize) {
+    const parent = document.getParent(key)
     if (parent) {
       transform = transform.normalizeNodeByKey(parent.key)
     } else {
