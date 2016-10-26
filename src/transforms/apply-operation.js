@@ -296,9 +296,13 @@ function setNode(state, operation) {
   let { document } = state
   let node = document.assertPath(path)
 
-  // Deprecate using setNode for updating children
+  // Deprecate using setNode for updating children, or keys
   if (properties.nodes && properties.nodes != node.nodes) {
-    warning('Updating Node.nodes through setNode is deprecated. Use the appropriate insertion and removal functions, rather than, for example, setNodeByKey.')
+    warning('Updating Node.nodes through setNode is not allowed. Use appropriate insertion and removal functions.')
+    delete properties.nodes
+  } else if (properties.key && properties.key != node.key) {
+    warning('Updating Node.key through setNode is not allowed. You should not have to update keys yourself.')
+    delete properties.key
   }
 
   node = node.merge(properties)
