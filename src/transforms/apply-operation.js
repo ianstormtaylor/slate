@@ -116,10 +116,10 @@ function insertText(state, operation) {
 
   // Update the selection
   if (startKey == node.key && startOffset > offset) {
-    selection = selection.extendStartOffset(text.length)
+    selection = selection.moveStartOffset(text.length)
   }
   if (endKey == node.key && endOffset > offset) {
-    selection = selection.extendEndOffset(text.length)
+    selection = selection.moveEndOffset(text.length)
   }
 
   state = state.merge({ document, selection })

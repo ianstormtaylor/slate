@@ -576,7 +576,7 @@ class Selection extends new Record(DEFAULTS) {
    * @return {Selection} selection
    */
 
-  extendStartOffset(n = 1) {
+  moveStartOffset(n = 1) {
     return this.isBackward
       ? this.merge({ focusOffset: this.focusOffset + n })
       : this.merge({ anchorOffset: this.anchorOffset + n })
@@ -589,7 +589,7 @@ class Selection extends new Record(DEFAULTS) {
    * @return {Selection} selection
    */
 
-  extendEndOffset(n = 1) {
+  moveEndOffset(n = 1) {
       return this.isBackward
         ? this.merge({ anchorOffset: this.anchorOffset + n })
         : this.merge({ focusOffset: this.focusOffset + n })

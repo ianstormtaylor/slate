@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 import { Raw, Inline } from './src'
 
 function printNode(node, depth = 0) {
