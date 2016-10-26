@@ -1,5 +1,6 @@
 
 import Debug from 'debug'
+import warning from '../utils/warning'
 
 /**
  * Debug.
@@ -294,6 +295,12 @@ function setNode(state, operation) {
   const { path, properties } = operation
   let { document } = state
   let node = document.assertPath(path)
+
+  // Deprecate using setNode for updating children
+  if (properties.nodes && properties.nodes != node.nodes) {
+    warning('Updating Node.nodes through setNode is deprecated. Use the appropriate insertion and removal functions, rather than, for example, setNodeByKey.')
+  }
+
   node = node.merge(properties)
   document = document.updateDescendant(node)
   state = state.merge({ document })
