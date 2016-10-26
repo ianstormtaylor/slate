@@ -403,6 +403,9 @@ function splitNode(state, operation) {
   const newDocument = document.splitNode(path, offset)
 
   // Update selection
+  let { selection } = state
+  const { anchorKey, anchorOffset, focusKey, focusOffset } = selection
+
   const node = document.assertPath(path)
   // The text node that was split
   const splittedText = node.kind == 'text'
@@ -411,9 +414,6 @@ function splitNode(state, operation) {
   const textOffset = node.kind == 'text'
           ? offset
           : offset - node.getOffset(splittedText)
-
-  let { selection } = state
-  const { anchorKey, anchorOffset, focusKey, focusOffset } = selection
 
   // Should we update the selection ?
   const shouldUpdateAnchor = splittedText.key == anchorKey && textOffset <= anchorOffset
