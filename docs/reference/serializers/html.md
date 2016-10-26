@@ -53,7 +53,7 @@ Deserialize an HTML `string` into a [`State`](../models/state.md). How the strin
 ### `Html.serialize`
 `Html.serialize(state: State, [options: Object]) => String || Array`
 
-Serialize a `state` into an HTML string. How the string is serialized will be determined by the rules that the `Html` serializer was constructed with. If you pass the `returnElements: true` option, the return value will instead be an iterable list of the top-level React elements, to be rendered as children in your own React component.
+Serialize a `state` into an HTML string. How the string is serialized will be determined by the rules that the `Html` serializer was constructed with. If you pass `render: false` as an option, the return value will instead be an iterable list of the top-level React elements, to be rendered as children in your own React component.
 
 
 ## Rules

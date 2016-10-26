@@ -12,7 +12,7 @@ It doesn't hardcode any information about the schema itself (like which tag mean
 
 It handles all of the heavy lifting of actually parsing the HTML, and iterating over the elements, and all you have to supply it is a `serialize()` and `deserialize()` function for each type of [`Node`](../models#node) or [`Mark`](../models/#mark) you want it to handle.
 
-If called with `{returnElements: true}` as the optional second argument, the serializer will return an iterable list of the top-level React elements generated, instead of automatically rendering these to a markup string.
+If called with `{render: false}` as the optional second argument, the serializer will return an iterable list of the top-level React elements generated, instead of automatically rendering these to a markup string.
 
 
 #### Raw

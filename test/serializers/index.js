@@ -53,7 +53,7 @@ describe('serializers', () => {
       it('optionally returns an iterable list of React elements', () => {
         const html = new Html(require('./fixtures/html/serialize/block-nested').default)
         const input = require('./fixtures/html/serialize/block-nested/input.js').default
-        const serialized = html.serialize(input, { returnElements: true })
+        const serialized = html.serialize(input, { render: false })
         assert(Iterable.isIterable(serialized), 'did not return an interable list')
         assert(React.isValidElement(serialized.first()), 'did not return valid React elements')
       })
