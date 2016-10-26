@@ -29,28 +29,9 @@ const state = Raw.deserialize({
             key: 'container',
             nodes: [
                 {
-                    key: 'in1',
-                    kind: 'inline',
-                    type: 'link',
-                    nodes: [
-                        {
-                            key: 'sometext',
-                            kind: 'text',
-                            text: 'Hello'
-                        },
-                        {
-                            key: 'in2',
-                            kind: 'inline',
-                            type: 'image',
-                            isVoid: true,
-                            nodes: [
-                                {
-                                    kind: 'text',
-                                    text: ' '
-                                }
-                            ]
-                        }
-                    ]
+                    key: 'sometext',
+                    kind: 'text',
+                    text: 'Hello'
                 }
             ]
         }
@@ -60,7 +41,14 @@ const state = Raw.deserialize({
 print(state)
 
 const newState = state.transform()
-    .moveNodeByKey('in2', 'container')
+    .moveTo({
+        anchorKey: 'sometext',
+        focusKey: 'sometext',
+        anchorOffset: 3,
+        focusOffset: 3
+    })
+    .insertTextByKey('sometext', 1, 'X')
     .apply()
 
+console.log(newState.selection.toJS())
 print(newState)
