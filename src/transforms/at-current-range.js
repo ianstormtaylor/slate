@@ -1,5 +1,6 @@
 
 import Normalize from '../utils/normalize'
+import Block from '../models/block'
 
 /**
  * Add a `mark` to the characters in the current selection.
@@ -106,7 +107,16 @@ export function deleteBackward(transform, n = 1) {
   }
 
   else if (selection.isAtStartOf(document)) {
-    after = selection
+    if(document.hasVoidParent(startNode)) { // first node is void, like image etc
+      let nextBlock = document.getNextBlock(startNode)
+      if(!nextBlock) { // document is empty, so create an empty paragraph as placeholder
+        nextBlock = Block.create({type: 'paragraph'})
+        transform = transform.insertBlock(nextBlock)
+      }
+      after = selection.collapseToStartOf(nextBlock)
+    } else {
+      after = selection
+    }
   }
 
   else if (selection.isAtStartOf(startNode)) {
@@ -114,7 +124,9 @@ export function deleteBackward(transform, n = 1) {
     const prevBlock = document.getClosestBlock(previous)
     const prevInline = document.getClosestInline(previous)
 
-    if (prevBlock && prevBlock.isVoid) {
+    if(document.hasVoidParent(startNode)) { // current focus on void node, so delete current void node
+      after = selection.collapseToEndOf(previous)
+    } else if (prevBlock && prevBlock.isVoid) {
       after = selection
     } else if (prevInline && prevInline.isVoid) {
       const prevPrev = document.getPreviousText(previous)
@@ -126,28 +138,42 @@ export function deleteBackward(transform, n = 1) {
 
   else if (selection.isAtEndOf(startNode) && startNode.length == 1) {
     const block = document.getClosestBlock(startKey)
-    const highest = block.getHighestChild(startKey)
-    const previous = block.getPreviousSibling(highest)
-    const next = block.getNextSibling(highest)
 
-    if (previous) {
-      if (previous.kind == 'text') {
-        if (next && next.kind == 'text') {
-          after = selection.merge({
-            anchorKey: previous.key,
-            anchorOffset: previous.length,
-            focusKey: previous.key,
-            focusOffset: previous.length
-          })
-        } else {
-          after = selection.collapseToEndOf(previous)
+    if (block.isVoid) {
+      let previous = document.getPreviousText(startNode)
+      if (previous) after = selection.collapseToEndOf(previous)
+      else {
+        let next = document.getNextText(startNode)
+        if (next) after = selection.collapseToStartOf(next)
+        else {
+          let emptyBlock = Block.create({type: 'paragraph'})
+          transform = transform.insertBlock(emptyBlock)
         }
-      } else {
-        const last = previous.getTexts().last()
-        after = selection.collapseToEndOf(last)
       }
     } else {
-      after = selection.moveBackward(n)
+      const highest = block.getHighestChild(startKey)
+      const previous = block.getPreviousSibling(highest)
+      const next = block.getNextSibling(highest)
+
+      if (previous) {
+        if (previous.kind == 'text') {
+          if (next && next.kind == 'text') {
+            after = selection.merge({
+              anchorKey: previous.key,
+              anchorOffset: previous.length,
+              focusKey: previous.key,
+              focusOffset: previous.length
+            })
+          } else {
+            after = selection.collapseToEndOf(previous)
+          }
+        } else {
+          const last = previous.getTexts().last()
+          after = selection.collapseToEndOf(last)
+        }
+      } else {
+        after = selection.moveBackward(n)
+      }
     }
   }
 
@@ -186,11 +212,15 @@ export function deleteForward(transform, n = 1) {
   }
 
   else if ((block && block.isVoid) || (inline && inline.isVoid)) {
-    const nextText = document.getNextText(startKey)
-    const prevText = document.getPreviousText(startKey)
+    const nextNode = document.getNextText(startKey)
+    let prevNode = document.getPreviousText(startKey)
+    if(!next && !prevNode) { // document is empty, so create an empty paragraph as placeholder
+      prevNode = Block.create({type: 'paragraph'})
+      transform = transform.insertBlock(prevNode)
+    }
     after = next
-      ? selection.collapseToStartOf(nextText)
-      : selection.collapseToEndOf(prevText)
+      ? selection.collapseToStartOf(nextNode)
+      : selection.collapseToEndOf(prevNode)
   }
 
   else if (previous && startOffset == 0 && startText.length == 1) {
