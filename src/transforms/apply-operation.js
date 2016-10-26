@@ -106,11 +106,23 @@ function insertNode(state, operation) {
 
 function insertText(state, operation) {
   const { path, offset, text, marks } = operation
-  let { document } = state
+  let { document, selection } = state
+  const { startKey, endKey, startOffset, endOffset } = selection
   let node = document.assertPath(path)
+
+  // Update the document
   node = node.insertText(offset, text, marks)
   document = document.updateDescendant(node)
-  state = state.merge({ document })
+
+  // Update the selection
+  if (startKey == node.key && startOffset > offset) {
+    selection = selection.extendStartOffset(text.length)
+  }
+  if (endKey == node.key && endOffset > offset) {
+    selection = selection.extendEndOffset(text.length)
+  }
+
+  state = state.merge({ document, selection })
   return state
 }
 

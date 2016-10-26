@@ -570,6 +570,32 @@ class Selection extends new Record(DEFAULTS) {
   }
 
   /**
+   * Extend the start point forward `n` characters.
+   *
+   * @param {Number} n (optional)
+   * @return {Selection} selection
+   */
+
+  extendStartOffset(n = 1) {
+    return this.isBackward
+      ? this.merge({ focusOffset: this.focusOffset + n })
+      : this.merge({ anchorOffset: this.anchorOffset + n })
+  }
+
+  /**
+   * Extend the end point forward `n` characters.
+   *
+   * @param {Number} n (optional)
+   * @return {Selection} selection
+   */
+
+  extendEndOffset(n = 1) {
+      return this.isBackward
+        ? this.merge({ anchorOffset: this.anchorOffset + n })
+        : this.merge({ focusOffset: this.focusOffset + n })
+  }
+
+  /**
    * Extend the focus point to the start of a `node`.
    *
    * @param {Node} node
