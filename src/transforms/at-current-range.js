@@ -70,7 +70,7 @@ export function _delete(transform) {
         after = selection.collapseToEndOf(previous)
       }
     } else {
-      const last = previous.getTexts().last()
+      const last = previous.getLastText()
       after = selection.collapseToEndOf(last)
     }
   }
@@ -143,7 +143,7 @@ export function deleteBackward(transform, n = 1) {
           after = selection.collapseToEndOf(previous)
         }
       } else {
-        const last = previous.getTexts().last()
+        const last = previous.getLastText()
         after = selection.collapseToEndOf(last)
       }
     } else {
@@ -206,7 +206,7 @@ export function deleteForward(transform, n = 1) {
         after = selection.collapseToEndOf(previous)
       }
     } else {
-      const last = previous.getTexts().last()
+      const last = previous.getLastText()
       after = selection.collapseToEndOf(last)
     }
   }
@@ -259,7 +259,7 @@ export function insertFragment(transform, fragment) {
 
   if (!fragment.length) return transform
 
-  const lastText = fragment.getTexts().last()
+  const lastText = fragment.getLastText()
   const lastInline = fragment.getClosestInline(lastText)
   const beforeTexts = document.getTexts()
   const appending = selection.hasEdgeAtEndOf(document.getDescendant(selection.endKey))
@@ -575,7 +575,7 @@ export function wrapInline(transform, properties) {
   }
 
   else if (selection.startOffset == 0) {
-    const text = previous ? document.getNextText(previous) : document.getTexts().first()
+    const text = previous ? document.getNextText(previous) : document.getFirstText()
     after = selection.moveToRangeOf(text)
   }
 

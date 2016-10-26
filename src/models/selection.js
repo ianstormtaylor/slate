@@ -148,7 +148,7 @@ class Selection extends new Record(DEFAULTS) {
 
   hasAnchorAtStartOf(node) {
     if (this.anchorOffset != 0) return false
-    const first = node.kind == 'text' ? node : node.getTexts().first()
+    const first = node.kind == 'text' ? node : node.getFirstText()
     return this.anchorKey == first.key
   }
 
@@ -160,7 +160,7 @@ class Selection extends new Record(DEFAULTS) {
    */
 
   hasAnchorAtEndOf(node) {
-    const last = node.kind == 'text' ? node : node.getTexts().last()
+    const last = node.kind == 'text' ? node : node.getLastText()
     return this.anchorKey == last.key && this.anchorOffset == last.length
   }
 
@@ -202,7 +202,7 @@ class Selection extends new Record(DEFAULTS) {
    */
 
   hasFocusAtEndOf(node) {
-    const last = node.kind == 'text' ? node : node.getTexts().last()
+    const last = node.kind == 'text' ? node : node.getLastText()
     return this.focusKey == last.key && this.focusOffset == last.length
   }
 
@@ -215,7 +215,7 @@ class Selection extends new Record(DEFAULTS) {
 
   hasFocusAtStartOf(node) {
     if (this.focusOffset != 0) return false
-    const first = node.kind == 'text' ? node : node.getTexts().first()
+    const first = node.kind == 'text' ? node : node.getFirstText()
     return this.focusKey == first.key
   }
 
@@ -260,7 +260,7 @@ class Selection extends new Record(DEFAULTS) {
     const { isExpanded, startKey, startOffset } = this
     if (isExpanded) return false
     if (startOffset != 0) return false
-    const first = node.kind == 'text' ? node : node.getTexts().first()
+    const first = node.kind == 'text' ? node : node.getFirstText()
     return startKey == first.key
   }
 
@@ -274,7 +274,7 @@ class Selection extends new Record(DEFAULTS) {
   isAtEndOf(node) {
     const { endKey, endOffset, isExpanded } = this
     if (isExpanded) return false
-    const last = node.kind == 'text' ? node : node.getTexts().last()
+    const last = node.kind == 'text' ? node : node.getLastText()
     return endKey == last.key && endOffset == last.length
   }
 
