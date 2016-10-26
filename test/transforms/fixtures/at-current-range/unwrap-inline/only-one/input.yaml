@@ -11,11 +11,16 @@ nodes:
           - kind: text
             text: ll
       - kind: text
+        key: 'anchor'
         text: "o w"
       - kind: inline
         type: hashtag
         nodes:
           - kind: text
+            key: 'focus'
             text: or
       - kind: text
         text: d
+
+# Selection
+# hello [wor]d

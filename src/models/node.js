@@ -975,38 +975,37 @@ const Node = {
   },
 
   /**
-   * Join a node by `key` with another `withKey`.
-   * It brings Node<key> after Node<WithKey>
+   * Join a children node `first` with another children node `second`.
+   * `first` and `second` will be concatenated in that order.
+   * `first` and `second` must be two Nodes or two Text.
    *
-   * @param {String} key
-   * @param {String} withKey
+   * @param {Node} first
+   * @param {Node} second
    * @return {Node}
    */
 
-  joinNode(key, withKey) {
+  joinNode(first, second) {
     let node = this
-    let target = node.assertPath(key)
-    let withTarget = node.assertPath(withKey)
-    let parent = node.getParent(target)
+    let parent = node.getParent(second)
     const isParent = node == parent
-    const index = parent.nodes.indexOf(target)
+    const index = parent.nodes.indexOf(second)
 
-    if (target.kind == 'text') {
-      let { characters } = withTarget
-      characters = characters.concat(target.characters)
-      withTarget = withTarget.merge({ characters })
+    if (second.kind == 'text') {
+      let { characters } = first
+      characters = characters.concat(second.characters)
+      first = first.merge({ characters })
     }
 
     else {
-      const size = withTarget.nodes.size
-      target.nodes.forEach((child, i) => {
-        withTarget = withTarget.insertNode(size + i, child)
+      const size = first.nodes.size
+      second.nodes.forEach((child, i) => {
+        first = first.insertNode(size + i, child)
       })
     }
 
     parent = parent.removeNode(index)
     node = isParent ? parent : node.updateDescendant(parent)
-    node = node.updateDescendant(withTarget)
+    node = node.updateDescendant(first)
     return node
   },
 

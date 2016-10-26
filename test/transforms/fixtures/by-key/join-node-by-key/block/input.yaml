@@ -1,14 +1,16 @@
 
 nodes:
   - kind: block
+    key: 'key1'
     type: paragraph
     nodes:
       - kind: text
-        text: word
+        key: 'anchor'
+        text: The
   - kind: block
+    key: 'key2'
     type: paragraph
     nodes:
       - kind: text
-        text: another
-# Selection
-# w[ordanot]her
+        key: 'focus'
+        text: text

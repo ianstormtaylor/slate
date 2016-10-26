@@ -3,9 +3,10 @@ import assert from 'assert'
 
 export default function (state) {
   const { selection } = state
+
   const range = selection.merge({
     anchorKey: 'anchor',
-    anchorOffset: 2,
+    anchorOffset: 1,
     focusKey: 'focus',
     focusOffset: 2
   })
@@ -13,7 +14,7 @@ export default function (state) {
   const next = state
     .transform()
     .moveTo(range)
-    .unwrapInline('hashtag')
+    .joinNodeByKey('focus', 'anchor')
     .apply()
 
   assert.deepEqual(

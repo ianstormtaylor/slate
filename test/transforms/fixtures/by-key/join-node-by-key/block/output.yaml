@@ -1,0 +1,8 @@
+
+nodes:
+  - kind: block
+    key: key1
+    type: paragraph
+    nodes:
+      - kind: text
+        text: Thetext

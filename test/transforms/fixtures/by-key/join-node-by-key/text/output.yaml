@@ -4,13 +4,10 @@ nodes:
     type: paragraph
     nodes:
       - kind: text
-        text: he
+        key: 'anchor'
+        text: onethree
       - kind: inline
-        type: hashtag
+        type: link
         nodes:
           - kind: text
-            text: ll
-      - kind: text
-        text: "o word"
-# Selection
-# hello [wor]d
+            text: two
