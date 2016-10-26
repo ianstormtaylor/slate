@@ -1005,7 +1005,6 @@ const Node = {
 
     parent = parent.removeNode(index)
     node = isParent ? parent : node.updateDescendant(parent)
-    console.log(node)
     node = node.updateDescendant(first)
     return node
   },
