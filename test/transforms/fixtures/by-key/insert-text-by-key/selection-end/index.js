@@ -21,7 +21,9 @@ export default function (state) {
 
   assert.deepEqual(
     next.selection.toJS(),
-    nextSelection.toJS()
+    nextSelection.merge({
+      focusOffset: 6
+    }).toJS()
   )
 
   return next

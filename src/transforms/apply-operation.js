@@ -115,10 +115,10 @@ function insertText(state, operation) {
   document = document.updateDescendant(node)
 
   // Update the selection
-  if (startKey == node.key && startOffset > offset) {
+  if (startKey == node.key && startOffset >= offset) {
     selection = selection.moveStartOffset(text.length)
   }
-  if (endKey == node.key && endOffset > offset) {
+  if (endKey == node.key && endOffset >= offset) {
     selection = selection.moveEndOffset(text.length)
   }
 
