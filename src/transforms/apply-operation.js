@@ -253,7 +253,6 @@ function removeNode(state, operation) {
       .takeUntil(text => text.key == startKey)
       .filter(text => !getRemoved(text.key))
       .last()
-
     if (!prevText) selection = selection.unset()
     else selection = selection.moveStartTo(prevText.key, prevText.length)
   }
