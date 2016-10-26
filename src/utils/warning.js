@@ -15,7 +15,7 @@ export default function warning(message) {
   }
 
   if (typeof console !== 'undefined') {
-    console.error('Warning: ', message) // eslint-disable-line no-console
+    console.error(`Warning: ${message}`) // eslint-disable-line no-console
   }
 
   try {
