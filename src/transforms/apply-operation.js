@@ -136,9 +136,32 @@ function insertText(state, operation) {
 
 function joinNode(state, operation) {
   const { path, withPath } = operation
-  let { document } = state
-  document = document.joinNode(path, withPath)
-  state = state.merge({ document })
+  let { document, selection } = state
+  const first = document.assertPath(withPath)
+  const second = document.assertPath(path)
+
+  // Update doc
+  document = document.joinNode(first, second)
+
+  // Update selection
+  // When merging two texts together
+  if (second.kind == 'text') {
+    // The final key is the `first` key
+    if (selection.anchorKey == second.key) {
+      selection = selection.merge({
+        anchorKey: first.key,
+        anchorOffset: selection.anchorOffset + first.characters.size
+      })
+    }
+    if (selection.focusKey == second.key) {
+      selection = selection.merge({
+        focusKey: first.key,
+        focusOffset: selection.focusOffset + first.characters.size
+      })
+    }
+  }
+
+  state = state.merge({ document, selection })
   return state
 }
 
