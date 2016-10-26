@@ -1,0 +1,16 @@
+
+nodes:
+  - kind: block
+    key: 'key1'
+    type: paragraph
+    nodes:
+      - kind: text
+        key: 'anchor'
+        text: The
+  - kind: block
+    key: 'key2'
+    type: paragraph
+    nodes:
+      - kind: text
+        key: 'focus'
+        text: text
