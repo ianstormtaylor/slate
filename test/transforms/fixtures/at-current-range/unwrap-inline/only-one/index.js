@@ -2,14 +2,11 @@
 import assert from 'assert'
 
 export default function (state) {
-  const { document, selection } = state
-  const texts = document.getTexts()
-  const first = texts.get(2)
-  const last = texts.get(3)
+  const { selection } = state
   const range = selection.merge({
-    anchorKey: first.key,
+    anchorKey: 'anchor',
     anchorOffset: 2,
-    focusKey: last.key,
+    focusKey: 'focus',
     focusOffset: 2
   })
 
@@ -21,7 +18,10 @@ export default function (state) {
 
   assert.deepEqual(
     next.selection.toJS(),
-    range.collapseToStartOf(next.document).toJS()
+    range.merge({
+      focusKey: 'anchor',
+      focusOffset: 5
+    }).toJS()
   )
 
   return next

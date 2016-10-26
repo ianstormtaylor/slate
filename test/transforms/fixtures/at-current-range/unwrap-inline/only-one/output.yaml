@@ -12,3 +12,5 @@ nodes:
             text: ll
       - kind: text
         text: "o word"
+# Selection
+# hello [wor]d
