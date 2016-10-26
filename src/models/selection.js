@@ -596,6 +596,32 @@ class Selection extends new Record(DEFAULTS) {
   }
 
   /**
+   * Move the start key, while preserving the direction
+   *
+   * @param {String} key
+   * @return {Selection} selection
+   */
+
+  moveStartTo(key, offset = 0) {
+    return this.isBackward
+      ? this.merge({ focusKey: key, focusOffset: offset })
+      : this.merge({ anchorKey: key, anchorOffset: offset })
+  }
+
+  /**
+   * Move the end key, while preserving the direction
+   *
+   * @param {String} key
+   * @return {Selection} selection
+   */
+
+  moveEndTo(key, offset = 0) {
+    return this.isBackward
+      ? this.merge({ anchorKey: key, anchorOffset: offset })
+      : this.merge({ focusKey: key, focusOffset: offset })
+  }
+
+  /**
    * Extend the focus point to the start of a `node`.
    *
    * @param {Node} node
@@ -622,6 +648,23 @@ class Selection extends new Record(DEFAULTS) {
       focusKey: node.key,
       focusOffset: node.length,
       isBackward: null
+    })
+  }
+
+  /**
+   * Unset the selection
+   *
+   * @return {Selection} selection
+   */
+
+  unset() {
+    return this.merge({
+      anchorKey: null,
+      anchorOffset: 0,
+      focusKey: null,
+      focusOffset: 0,
+      isFocused: false,
+      isBackward: false
     })
   }
 
