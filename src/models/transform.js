@@ -51,8 +51,13 @@ class Transform {
    */
 
   apply(options = {}) {
+    let transform = this
+
+    // Ensure that the state is normalized.
+    transform = transform.normalize()
+
     let { merge, save, isNative = false } = options
-    let { state, operations } = this
+    let { state, operations } = transform
     let { history } = state
     let { undos, redos } = history
     const previous = undos.peek()

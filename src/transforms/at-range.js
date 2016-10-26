@@ -94,7 +94,7 @@ export function deleteAtRange(transform, range) {
 
   const lonely = document.getFurthest(endBlock, p => p.nodes.size == 1) || endBlock
   transform.removeNodeByKey(lonely.key)
-  transform.normalizeDocument()
+  transform.normalize()
   return transform
 }
 
@@ -269,7 +269,7 @@ export function insertBlockAtRange(transform, range, block) {
     transform.insertNodeByKey(parent.key, index + 1, block)
   }
 
-  transform.normalizeDocument()
+  transform.normalize()
   return transform
 }
 
@@ -352,7 +352,7 @@ export function insertFragmentAtRange(transform, range, fragment) {
     })
   }
 
-  transform.normalizeDocument()
+  transform.normalize()
   return transform
 }
 
@@ -386,7 +386,7 @@ export function insertInlineAtRange(transform, range, inline) {
 
   transform.splitNodeByKey(startKey, startOffset)
   transform.insertNodeByKey(parent.key, index + 1, inline)
-  transform.normalizeDocument()
+  transform.normalize()
   return transform
 }
 
@@ -523,7 +523,7 @@ export function splitBlockAtRange(transform, range, height = 1) {
   }
 
   transform.splitNodeByKey(node.key, offset)
-  transform.normalizeDocument()
+  transform.normalize()
   return transform
 }
 
@@ -672,7 +672,7 @@ export function unwrapBlockAtRange(transform, range, properties) {
     }
   })
 
-  transform.normalizeDocument()
+  transform.normalize()
   return transform
 }
 
@@ -714,7 +714,7 @@ export function unwrapInlineAtRange(transform, range, properties) {
     })
   })
 
-  transform.normalizeDocument()
+  transform.normalize()
   return transform
 }
 
@@ -879,7 +879,7 @@ export function wrapInlineAtRange(transform, range, inline) {
     })
   }
 
-  transform.normalizeDocument()
+  transform.normalize()
   return transform
 }
 

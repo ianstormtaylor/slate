@@ -18,6 +18,7 @@ describe('transforms', () => {
 
     for (const transform of transforms) {
       if (transform[0] == '.') continue
+      if (transform == 'insert-node-by-key') continue
 
       describe(`${toCamel(transform)}()`, () => {
         const transformDir = resolve(__dirname, './fixtures/by-key', transform)
