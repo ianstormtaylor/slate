@@ -231,10 +231,10 @@ function removeText(state, operation) {
 
   // Update the selection
   if (startKey == node.key && startOffset >= rangeOffset) {
-    selection = selection.extendStartOffset(-length)
+    selection = selection.moveStartOffset(-length)
   }
   if (endKey == node.key && endOffset >= rangeOffset) {
-    selection = selection.extendEndOffset(-length)
+    selection = selection.moveEndOffset(-length)
   }
 
   state = state.merge({ document, selection })
