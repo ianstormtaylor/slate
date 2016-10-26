@@ -233,7 +233,7 @@ class Html {
    * @param {State} state
    * @param {Object} options
    *   @property {Boolean} returnElements
-   * @return {String} html
+   * @return {String|Array} html
    */
 
   serialize = (state, options = {}) => {
