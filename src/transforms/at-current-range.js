@@ -262,6 +262,7 @@ export function insertFragment(transform, fragment) {
   const lastText = fragment.getTexts().last()
   const lastInline = fragment.getClosestInline(lastText)
   const beforeTexts = document.getTexts()
+  const appending = selection.hasEdgeAtEndOf(document.getDescendant(selection.endKey))
 
   transform.unsetSelection()
   transform.insertFragmentAtRange(selection, fragment)
@@ -270,15 +271,11 @@ export function insertFragment(transform, fragment) {
 
   const keys = beforeTexts.map(text => text.key)
   const news = document.getTexts().filter(n => !keys.includes(n.key))
-  const text = news.size ? news.takeLast(2).first() : null
+  const text = appending ? news.last() : news.takeLast(2).first()
   let after
 
   if (text && lastInline) {
     after = selection.collapseToEndOf(text)
-  }
-
-  else if (text && lastInline) {
-    after = selection.collapseToStart()
   }
 
   else if (text) {
