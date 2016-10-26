@@ -147,17 +147,18 @@ function joinNode(state, operation) {
   // Update selection
   // When merging two texts together
   if (second.kind == 'text') {
+    const { anchorKey, anchorOffset, focusKey, focusOffset } = selection
     // The final key is the `first` key
-    if (selection.anchorKey == second.key) {
+    if (anchorKey == second.key) {
       selection = selection.merge({
         anchorKey: first.key,
-        anchorOffset: selection.anchorOffset + first.characters.size
+        anchorOffset: anchorOffset + first.characters.size
       })
     }
-    if (selection.focusKey == second.key) {
+    if (focusKey == second.key) {
       selection = selection.merge({
         focusKey: first.key,
-        focusOffset: selection.focusOffset + first.characters.size
+        focusOffset: focusOffset + first.characters.size
       })
     }
   }
@@ -396,10 +397,58 @@ function setSelection(state, operation) {
 
 function splitNode(state, operation) {
   const { path, offset } = operation
-  let { document } = state
+  const { document } = state
 
-  document = document.splitNode(path, offset)
+  // Update document
+  const newDocument = document.splitNode(path, offset)
 
-  state = state.merge({ document })
+  // Update selection
+  const node = document.assertPath(path)
+  // The text node that was split
+  const splittedText = node.kind == 'text'
+          ? node
+          : node.getTextAtOffset(offset)
+  const textOffset = node.kind == 'text'
+          ? offset
+          : offset - node.getOffset(splittedText)
+
+  let { selection } = state
+  const { anchorKey, anchorOffset, focusKey, focusOffset } = selection
+
+  // Should we update the selection ?
+  const shouldUpdateAnchor = splittedText.key == anchorKey && textOffset <= anchorOffset
+  const shouldUpdateFocus = splittedText.key == focusKey && textOffset <= focusOffset
+  if (shouldUpdateFocus || shouldUpdateAnchor) {
+    // The node next to `node`, resulting from the split
+    const secondNode = newDocument.getNextSibling(node)
+    let secondText, newOffset
+
+    if (shouldUpdateAnchor) {
+      newOffset = anchorOffset - textOffset
+      secondText = secondNode.kind == 'text'
+        ? secondNode
+        : secondNode.getTextAtOffset(newOffset)
+      selection = selection.merge({
+        anchorKey: secondText.key,
+        anchorOffset: newOffset
+      })
+    }
+
+    if (shouldUpdateFocus) {
+      newOffset = focusOffset - textOffset
+      secondText = secondNode.kind == 'text'
+        ? secondNode
+        : secondNode.getTextAtOffset(newOffset)
+      selection = selection.merge({
+        focusKey: secondText.key,
+        focusOffset: newOffset
+      })
+    }
+  }
+
+  state = state.merge({
+    document: newDocument,
+    selection
+  })
   return state
 }
