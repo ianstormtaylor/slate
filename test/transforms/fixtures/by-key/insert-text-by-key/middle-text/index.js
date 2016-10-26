@@ -20,10 +20,10 @@ export default function (state) {
     .insertTextByKey(secondText.key, 2, 'X')
     .apply()
 
-    assert.deepEqual(
-      next.selection.toJS(),
-      nextSelection.toJS()
-    )
+  assert.deepEqual(
+    next.selection.toJS(),
+    nextSelection.toJS()
+  )
 
   return next
 }

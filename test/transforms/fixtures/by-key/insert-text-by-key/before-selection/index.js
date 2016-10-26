@@ -5,7 +5,6 @@ export default function (state) {
   const { document, selection } = state
   const texts = document.getTexts()
   const firstText = texts.first()
-  const secondText = texts.get(1)
 
   const nextSelection = selection.merge({
       anchorKey: firstText.key,
@@ -17,12 +16,15 @@ export default function (state) {
   const next = state
     .transform()
     .moveTo(nextSelection)
-    .insertTextByKey(secondText.key, 2, 'XX', [ { type: 'bold' } ])
+    .insertTextByKey(firstText.key, 0, 'XX')
     .apply()
 
   assert.deepEqual(
     next.selection.toJS(),
-    nextSelection.toJS()
+    nextSelection.merge({
+      anchorOffset: 4,
+      focusOffset: 4
+    }).toJS()
   )
 
   return next
