@@ -51,9 +51,9 @@ An array of rules to initialize the `Html` serializer with, defining your schema
 Deserialize an HTML `string` into a [`State`](../models/state.md). How the string is deserialized will be determined by the rules that the `Html` serializer was constructed with.
 
 ### `Html.serialize`
-`Html.serialize(state: State) => String`
+`Html.serialize(state: State, [options: Object]) => String || Array`
 
-Serialize a `state` into an HTML string. How the string is serialized will be determined by the rules that the `Html` serializer was constructed with.
+Serialize a `state` into an HTML string. How the string is serialized will be determined by the rules that the `Html` serializer was constructed with. If you pass `render: false` as an option, the return value will instead be an iterable list of the top-level React elements, to be rendered as children in your own React component.
 
 
 ## Rules
@@ -73,7 +73,7 @@ Each rule must define two properties:
 #### `rule.deserialize`
 `rule.deserialize(el: CheerioElement, next: Function) => Object || Void`
 
-The `deserialize` function should return a plain Javascript object representing the deserialized state, or nothing if the rule in question doesn't know how to deserialize the object, in which case the next rule in the stack will be attempted. 
+The `deserialize` function should return a plain Javascript object representing the deserialized state, or nothing if the rule in question doesn't know how to deserialize the object, in which case the next rule in the stack will be attempted.
 
 The returned object is almost exactly equivalent to the objects returned by the [`Raw`](./raw.md) serializer, except an extra `kind: 'mark'` is added to account for the ability to nest marks.
 
