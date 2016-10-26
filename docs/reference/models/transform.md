@@ -57,6 +57,8 @@ Transform methods can either operate on the [`Document`](./document.md), the [`S
   - [`setMarkByKey`](#setmarkbykey)
   - [`setNodeByKey`](#setnodebykey)
   - [`splitNodeByKey`](#splitnodebykey)
+  - [`unwrapInlineByKey`](#unwrapinlinebykey)
+  - [`unwrapBlockByKey`](#unwrapblockbykey)
 - [Document Transforms](#document-transforms)
   - [`deleteAtRange`](#deleteatrange)
   - [`deleteBackwardAtRange`](#deletebackwardatrange)
@@ -317,6 +319,17 @@ Set a dictionary of `properties` on a [`Node`](./node.md) by its `key`. For conv
 
 Split a node by its `key` at an `offset`.
 
+### `unwrapInlineByKey`
+`unwrapInlineByKey(key: String, properties: Object) => Transform` <br/>
+`unwrapInlineByKey(key: String, type: String) => Transform`
+
+Unwrap all inner content of an [`Inline`](./inline.md) node that match `properties`. For convenience, you can pass a `type` string or `properties` object.
+
+### `unwrapBlockByKey`
+`unwrapBlockByKey(key: String, properties: Object) => Transform` <br/>
+`unwrapBlockByKey(key: String, type: String) => Transform`
+
+Unwrap all inner content of a [`Block`](./block.md) node that match `properties`. For convenience, you can pass a `type` string or `properties` object.
 
 ## Document Transforms
 

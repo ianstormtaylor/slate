@@ -193,3 +193,39 @@ export function splitNodeByKey(transform, key, offset) {
   const path = document.getPath(key)
   return transform.splitNodeOperation(path, offset)
 }
+
+/**
+ * Unwrap content from an inline parent with `properties`.
+ *
+ * @param {Transform} transform
+ * @param {String} key
+ * @param {Object or String} properties
+ * @return {Transform}
+ */
+
+export function unwrapInlineByKey(transform, key, properties) {
+  const { state } = transform
+  const { document, selection } = state
+  const node = document.assertDescendant(key)
+  const texts = node.getTexts()
+  const range = selection.moveToRangeOf(texts.first(), texts.last())
+  return transform.unwrapInlineAtRange(range, properties)
+}
+
+/**
+ * Unwrap content from a block parent with `properties`.
+ *
+ * @param {Transform} transform
+ * @param {String} key
+ * @param {Object or String} properties
+ * @return {Transform}
+ */
+
+export function unwrapBlockByKey(transform, key, properties) {
+  const { state } = transform
+  const { document, selection } = state
+  const node = document.assertDescendant(key)
+  const texts = node.getTexts()
+  const range = selection.moveToRangeOf(texts.first(), texts.last())
+  return transform.unwrapBlockAtRange(range, properties)
+}
