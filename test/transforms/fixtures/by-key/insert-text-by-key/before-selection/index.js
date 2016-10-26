@@ -7,10 +7,10 @@ export default function (state) {
   const firstText = texts.first()
 
   const nextSelection = selection.merge({
-      anchorKey: firstText.key,
-      focusKey: firstText.key,
-      anchorOffset: 2,
-      focusOffset: 2
+    anchorKey: firstText.key,
+    focusKey: firstText.key,
+    anchorOffset: 2,
+    focusOffset: 2
   })
 
   const next = state
