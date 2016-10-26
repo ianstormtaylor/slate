@@ -43,13 +43,8 @@ class State extends new Record(DEFAULTS) {
   static create(properties = {}) {
     if (properties instanceof State) return properties
 
-    let document = Document.create(properties.document)
-    let selection = Selection.create(properties.selection)
-
-    if (selection.isUnset) {
-      const text = document.getTexts().first()
-      selection = selection.collapseToStartOf(text)
-    }
+    const document = Document.create(properties.document)
+    const selection = Selection.create(properties.selection).normalize(properties.document)
 
     return new State({ document, selection })
   }
@@ -361,9 +356,7 @@ class State extends new Record(DEFAULTS) {
    */
 
   get marks() {
-    return this.selection.isUnset
-      ? new Set()
-      : this.selection.marks || this.document.getMarksAtRange(this.selection)
+    return this.selection.marks || this.document.getMarksAtRange(this.selection)
   }
 
   /**
@@ -373,9 +366,7 @@ class State extends new Record(DEFAULTS) {
    */
 
   get blocks() {
-    return this.selection.isUnset
-      ? new List()
-      : this.document.getBlocksAtRange(this.selection)
+    return this.document.getBlocksAtRange(this.selection)
   }
 
   /**
@@ -385,9 +376,7 @@ class State extends new Record(DEFAULTS) {
    */
 
   get fragment() {
-    return this.selection.isUnset
-      ? Document.create()
-      : this.document.getFragmentAtRange(this.selection)
+    return this.document.getFragmentAtRange(this.selection)
   }
 
   /**
@@ -397,9 +386,7 @@ class State extends new Record(DEFAULTS) {
    */
 
   get inlines() {
-    return this.selection.isUnset
-      ? new List()
-      : this.document.getInlinesAtRange(this.selection)
+    return this.document.getInlinesAtRange(this.selection)
   }
 
   /**
@@ -409,9 +396,7 @@ class State extends new Record(DEFAULTS) {
    */
 
   get texts() {
-    return this.selection.isUnset
-      ? new List()
-      : this.document.getTextsAtRange(this.selection)
+    return this.document.getTextsAtRange(this.selection)
   }
 
   /**
