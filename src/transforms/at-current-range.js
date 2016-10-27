@@ -95,70 +95,11 @@ export function _delete(transform) {
 
 export function deleteBackward(transform, n = 1) {
   const { state } = transform
-  const { document, selection } = state
-  let after
-
-  const { startKey } = selection
-  const startNode = document.getDescendant(startKey)
-
-  if (selection.isExpanded) {
-    after = selection.collapseToStart()
-  }
-
-  else if (selection.isAtStartOf(document)) {
-    after = selection
-  }
-
-  else if (selection.isAtStartOf(startNode)) {
-    const previous = document.getPreviousText(startNode)
-    const prevBlock = document.getClosestBlock(previous)
-    const prevInline = document.getClosestInline(previous)
-
-    if (prevBlock && prevBlock.isVoid) {
-      after = selection
-    } else if (prevInline && prevInline.isVoid) {
-      const prevPrev = document.getPreviousText(previous)
-      after = selection.collapseToEndOf(prevPrev)
-    } else {
-      after = selection.collapseToEndOf(previous)
-    }
-  }
-
-  else if (selection.isAtEndOf(startNode) && startNode.length == 1) {
-    const block = document.getClosestBlock(startKey)
-    const highest = block.getHighestChild(startKey)
-    const previous = block.getPreviousSibling(highest)
-    const next = block.getNextSibling(highest)
-
-    if (previous) {
-      if (previous.kind == 'text') {
-        if (next && next.kind == 'text') {
-          after = selection.merge({
-            anchorKey: previous.key,
-            anchorOffset: previous.length,
-            focusKey: previous.key,
-            focusOffset: previous.length
-          })
-        } else {
-          after = selection.collapseToEndOf(previous)
-        }
-      } else {
-        const last = previous.getTexts().last()
-        after = selection.collapseToEndOf(last)
-      }
-    } else {
-      after = selection.moveBackward(n)
-    }
-  }
-
-  else {
-    after = selection.moveBackward(n)
-  }
+  const { selection } = state
 
   return transform
-    .unsetSelection()
     .deleteBackwardAtRange(selection, n)
-    .moveTo(after)
+    .collapseToEnd()
 }
 
 /**
@@ -171,54 +112,10 @@ export function deleteBackward(transform, n = 1) {
 
 export function deleteForward(transform, n = 1) {
   const { state } = transform
-  const { document, selection, startText } = state
-  const { startKey, startOffset } = selection
-  let after
-
-  const block = document.getClosestBlock(startKey)
-  const inline = document.getClosestInline(startKey)
-  const highest = block.getHighestChild(startKey)
-  const previous = block.getPreviousSibling(highest)
-  const next = block.getNextSibling(highest)
-
-  if (selection.isExpanded) {
-    after = selection.collapseToStart()
-  }
-
-  else if ((block && block.isVoid) || (inline && inline.isVoid)) {
-    const nextText = document.getNextText(startKey)
-    const prevText = document.getPreviousText(startKey)
-    after = next
-      ? selection.collapseToStartOf(nextText)
-      : selection.collapseToEndOf(prevText)
-  }
-
-  else if (previous && startOffset == 0 && startText.length == 1) {
-    if (previous.kind == 'text') {
-      if (next && next.kind == 'text') {
-        after = selection.merge({
-          anchorKey: previous.key,
-          anchorOffset: previous.length,
-          focusKey: previous.key,
-          focusOffset: previous.length
-        })
-      } else {
-        after = selection.collapseToEndOf(previous)
-      }
-    } else {
-      const last = previous.getTexts().last()
-      after = selection.collapseToEndOf(last)
-    }
-  }
-
-  else {
-    after = selection
-  }
-
+  const { selection } = state
   return transform
-    .unsetSelection()
     .deleteForwardAtRange(selection, n)
-    .moveTo(after)
+    .collapseToEnd()
 }
 
 /**
