@@ -103,7 +103,7 @@ class Node extends React.Component {
       if (!Immutable.is(props.node, this.props.node)) {
         return true
       } else {
-        warning('Encountered different references for identical node values in "shouldComponentUpdate". Check that you are preserving references')
+        warning('Encountered different references for identical node values in "shouldComponentUpdate". Check that you are preserving references for the following node:', props.node)
       }
     }
 

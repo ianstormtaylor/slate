@@ -9,13 +9,13 @@ const __DEV__ = (
  * @param {String} message
  */
 
-export default function warning(message) {
+export default function warning(message, ...more) {
   if (!__DEV__) {
     return
   }
 
   if (typeof console !== 'undefined') {
-    console.error(`Warning: ${message}`) // eslint-disable-line no-console
+    console.error(`Warning: ${message}`, ...more) // eslint-disable-line no-console
   }
 
   try {
