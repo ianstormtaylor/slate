@@ -99,11 +99,12 @@ class Node extends React.Component {
     }
 
     // If the node has changed, update.
-    if (Immutable.is(props.node, this.props.node)) {
-      if (props.node != this.props.node) {
-          warning('Encountered different references for identical node values in "shouldComponentUpdate". Check that you are preserving references')
+    if (props.node != this.props.node) {
+      if (!Immutable.is(props.node, this.props.node)) {
+        return true
+      } else {
+        warning('Encountered different references for identical node values in "shouldComponentUpdate". Check that you are preserving references')
       }
-      return true
     }
 
     // If the selection is focused and is inside the node, we need to update so
