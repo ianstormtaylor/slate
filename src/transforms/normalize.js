@@ -52,27 +52,39 @@ function _normalizeChildrenWith(transform, schema, node) {
  */
 
 function _normalizeNodeWith(transform, schema, node) {
-  const failure = schema.__validate(node)
+  let recursiveCount = 0
 
-  // Node is valid?
-  if (!failure) {
-    return transform
+  // Auxiliary function, called recursively, with a maximum calls safety net.
+  function _recur(_transform, _schema, _node) {
+    const failure = _schema.__validate(_node)
+
+    // Node is valid?
+    if (!failure) {
+      return _transform
+    }
+
+    const { value, rule } = failure
+
+    // Normalize and get the new state
+    _transform = rule.normalize(_transform, _node, value)
+
+    // Search for the updated node in the new state
+    const newNode = _refreshNode(_transform, _node)
+
+    // Node no longer exist, go back to normalize parents
+    if (!newNode) {
+      return _transform
+    }
+
+    recursiveCount++
+    if (recursiveCount > MAX_CALLS) {
+      throw new Error('Unexpected number of successive normalizations. Aborting.')
+    }
+
+    return _recur(_transform, _schema, _node)
   }
 
-  const { value, rule } = failure
-
-  // Normalize and get the new state
-  transform = rule.normalize(transform, node, value)
-
-  // Search for the updated node in the new state
-  const newNode = _refreshNode(transform, node)
-
-  // Node no longer exist, go back to normalize parents
-  if (!newNode) {
-    return transform
-  }
-
-  return _normalizeNodeWith(transform, schema, newNode)
+  return _recur(transform, schema, node)
 }
 
 /**
@@ -85,28 +97,16 @@ function _normalizeNodeWith(transform, schema, node) {
  */
 
 export function normalizeNodeWith(transform, schema, node) {
-  let recursiveCount = 0
+  // Iterate over its children
+  transform = _normalizeChildrenWith(transform, schema, node)
 
-  // Auxiliary function, called recursively, with a maximum calls safety net.
-  function _recur() {
-    recursiveCount++
-    if (recursiveCount > MAX_CALLS) {
-      warning('Unexpected number of successive normalizations. Aborting.')
-      return transform
-    }
-    // Iterate over its children
-    transform = _normalizeChildrenWith(transform, schema, node)
-
-    // Refresh the node reference, and normalize it
-    node = _refreshNode(transform, node)
-    if (node) {
-      transform = _normalizeNodeWith(transform, schema, node)
-    }
-
-    return transform
+  // Refresh the node reference, and normalize it
+  node = _refreshNode(transform, node)
+  if (node) {
+    transform = _normalizeNodeWith(transform, schema, node)
   }
 
-  return _recur(transform, schema, node)
+  return transform
 }
 
 /**
