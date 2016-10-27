@@ -1,6 +1,9 @@
 import warning from '../utils/warning'
 import { default as defaultSchema } from '../plugins/schema'
 
+// Maximum recursive calls for normalization
+const MAX_CALLS = 50
+
 /**
  * Refresh a reference to a node that have been modified in a transform.
  * @param  {Transform} transform
@@ -82,17 +85,28 @@ function _normalizeNodeWith(transform, schema, node) {
  */
 
 export function normalizeNodeWith(transform, schema, node) {
-  // console.log(`normalize node key=${node.key}`)
-  // Iterate over its children
-  transform = _normalizeChildrenWith(transform, schema, node)
+  let recursiveCount = 0
 
-  // Refresh the node reference, and normalize it
-  node = _refreshNode(transform, node)
-  if (node) {
-    transform = _normalizeNodeWith(transform, schema, node)
+  // Auxiliary function, called recursively, with a maximum calls safety net.
+  function _recur() {
+    recursiveCount++
+    if (recursiveCount > MAX_CALLS) {
+      warning('Unexpected number of successive normalizations. Aborting.')
+      return transform
+    }
+    // Iterate over its children
+    transform = _normalizeChildrenWith(transform, schema, node)
+
+    // Refresh the node reference, and normalize it
+    node = _refreshNode(transform, node)
+    if (node) {
+      transform = _normalizeNodeWith(transform, schema, node)
+    }
+
+    return transform
   }
 
-  return transform
+  return _recur(transform, schema, node)
 }
 
 /**
