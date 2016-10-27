@@ -4,11 +4,16 @@ nodes:
     type: paragraph
     nodes:
       - kind: text
+        key: 'anchor'
         text: w
       - kind: inline
         type: hashtag
         nodes:
           - kind: text
+            key: 'focus'
             text: or
       - kind: text
         text: d
+
+# selection:
+# w[or]d

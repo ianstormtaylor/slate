@@ -4,6 +4,7 @@ nodes:
     type: paragraph
     nodes:
       - kind: text
+        key: 'anchor' # w[o
         text: wo
       - kind: inline
         type: hashtag
@@ -19,4 +20,5 @@ nodes:
           - kind: text
             text: an
       - kind: text
+        key: 'focus' # ot]her
         text: other

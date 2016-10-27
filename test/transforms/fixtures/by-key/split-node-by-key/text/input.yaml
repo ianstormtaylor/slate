@@ -1,0 +1,10 @@
+
+nodes:
+  - kind: block
+    type: paragraph
+    nodes:
+      - kind: text
+        key: 'anchor'
+        text: onetwo
+# Selection
+# onet[w]o

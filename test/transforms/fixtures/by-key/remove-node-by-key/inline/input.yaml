@@ -1,0 +1,16 @@
+
+nodes:
+  - kind: block
+    type: paragraph
+    nodes:
+      - kind: inline
+        type: link
+        key: todelete
+        nodes:
+          - kind: text
+            text: removed
+  - kind: block
+    type: paragraph
+    nodes:
+      - kind: text
+        text: hello

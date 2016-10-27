@@ -1,5 +1,6 @@
 
 import Debug from 'debug'
+import warning from '../utils/warning'
 
 /**
  * Debug.
@@ -106,11 +107,23 @@ function insertNode(state, operation) {
 
 function insertText(state, operation) {
   const { path, offset, text, marks } = operation
-  let { document } = state
+  let { document, selection } = state
+  const { startKey, endKey, startOffset, endOffset } = selection
   let node = document.assertPath(path)
+
+  // Update the document
   node = node.insertText(offset, text, marks)
   document = document.updateDescendant(node)
-  state = state.merge({ document })
+
+  // Update the selection
+  if (startKey == node.key && startOffset >= offset) {
+    selection = selection.moveStartOffset(text.length)
+  }
+  if (endKey == node.key && endOffset >= offset) {
+    selection = selection.moveEndOffset(text.length)
+  }
+
+  state = state.merge({ document, selection })
   return state
 }
 
@@ -124,9 +137,33 @@ function insertText(state, operation) {
 
 function joinNode(state, operation) {
   const { path, withPath } = operation
-  let { document } = state
-  document = document.joinNode(path, withPath)
-  state = state.merge({ document })
+  let { document, selection } = state
+  const first = document.assertPath(withPath)
+  const second = document.assertPath(path)
+
+  // Update doc
+  document = document.joinNode(first, second)
+
+  // Update selection
+  // When merging two texts together
+  if (second.kind == 'text') {
+    const { anchorKey, anchorOffset, focusKey, focusOffset } = selection
+    // The final key is the `first` key
+    if (anchorKey == second.key) {
+      selection = selection.merge({
+        anchorKey: first.key,
+        anchorOffset: anchorOffset + first.characters.size
+      })
+    }
+    if (focusKey == second.key) {
+      selection = selection.merge({
+        focusKey: first.key,
+        focusOffset: focusOffset + first.characters.size
+      })
+    }
+  }
+
+  state = state.merge({ document, selection })
   return state
 }
 
@@ -143,12 +180,14 @@ function moveNode(state, operation) {
   let { document } = state
   const node = document.assertPath(path)
 
+  // Remove the node from its current parent
   let parent = document.getParent(node)
   const isParent = document == parent
   const index = parent.nodes.indexOf(node)
   parent = parent.removeNode(index)
   document = isParent ? parent : document.updateDescendant(parent)
 
+  // Insert the new node to its new parent
   let target = document.assertPath(newPath)
   const isTarget = document == target
   target = target.insertNode(newIndex, node)
@@ -186,14 +225,55 @@ function removeMark(state, operation) {
 
 function removeNode(state, operation) {
   const { path } = operation
-  let { document } = state
+  let { document, selection } = state
+  const { startKey, endKey } = selection
+
+  // Preserve previous document
+  const prevDocument = document
+
+  // Update the document
   const node = document.assertPath(path)
   let parent = document.getParent(node)
   const index = parent.nodes.indexOf(node)
   const isParent = document == parent
   parent = parent.removeNode(index)
   document = isParent ? parent : document.updateDescendant(parent)
-  state = state.merge({ document })
+
+  function getRemoved(key) {
+    if (key === node.key) return node
+    if (node.kind == 'text') return null
+    return node.getDescendant(key)
+  }
+
+  // Update the selection, if one of the anchor/focus has been removed
+  const startDesc = startKey ? getRemoved(startKey) : null
+  const endDesc = endKey ? getRemoved(endKey) : null
+
+  if (startDesc) {
+    const prevText = prevDocument.getTexts()
+      .takeUntil(text => text.key == startKey)
+      .filter(text => !getRemoved(text.key))
+      .last()
+    if (!prevText) selection = selection.unset()
+    else selection = selection.moveStartTo(prevText.key, prevText.length)
+  }
+  if (endDesc) {
+    // The whole selection is inside the node, we collapse to the previous text node
+    if (startKey == endKey) {
+      selection = selection.collapseToStart()
+    } else {
+      const nextText = prevDocument.getTexts()
+        .skipUntil(text => text.key == startKey)
+        .slice(1)
+        .filter(text => !getRemoved(text.key))
+        .first()
+
+      if (!nextText) selection = selection.unset()
+      else selection = selection.moveEndTo(nextText.key, 0)
+    }
+  }
+
+  state = state.merge({ document, selection })
   return state
 }
 
@@ -207,11 +287,25 @@ function removeNode(state, operation) {
 
 function removeText(state, operation) {
   const { path, offset, length } = operation
-  let { document } = state
+  let { document, selection } = state
+  const { startKey, endKey, startOffset, endOffset } = selection
   let node = document.assertPath(path)
+
+  const rangeOffset = offset + length
+
+  // Update the document
   node = node.removeText(offset, length)
   document = document.updateDescendant(node)
-  state = state.merge({ document })
+
+  // Update the selection
+  if (startKey == node.key && startOffset >= rangeOffset) {
+    selection = selection.moveStartOffset(-length)
+  }
+  if (endKey == node.key && endOffset >= rangeOffset) {
+    selection = selection.moveEndOffset(-length)
+  }
+
+  state = state.merge({ document, selection })
   return state
 }
 
@@ -245,6 +339,16 @@ function setNode(state, operation) {
   const { path, properties } = operation
   let { document } = state
   let node = document.assertPath(path)
+
+  // Deprecate using setNode for updating children, or keys
+  if (properties.nodes && properties.nodes != node.nodes) {
+    warning('Updating Node.nodes through setNode is not allowed. Use appropriate insertion and removal functions.')
+    delete properties.nodes
+  } else if (properties.key && properties.key != node.key) {
+    warning('Updating Node.key through setNode is not allowed. You should not have to update keys yourself.')
+    delete properties.key
+  }
+
   node = node.merge(properties)
   document = document.updateDescendant(node)
   state = state.merge({ document })
@@ -293,10 +397,58 @@ function setSelection(state, operation) {
 
 function splitNode(state, operation) {
   const { path, offset } = operation
-  let { document } = state
+  const { document } = state
 
-  document = document.splitNode(path, offset)
+  // Update document
+  const newDocument = document.splitNode(path, offset)
 
-  state = state.merge({ document })
+  // Update selection
+  let { selection } = state
+  const { anchorKey, anchorOffset, focusKey, focusOffset } = selection
+
+  const node = document.assertPath(path)
+  // The text node that was split
+  const splittedText = node.kind == 'text'
+          ? node
+          : node.getTextAtOffset(offset)
+  const textOffset = node.kind == 'text'
+          ? offset
+          : offset - node.getOffset(splittedText)
+
+  // Should we update the selection ?
+  const shouldUpdateAnchor = splittedText.key == anchorKey && textOffset <= anchorOffset
+  const shouldUpdateFocus = splittedText.key == focusKey && textOffset <= focusOffset
+  if (shouldUpdateFocus || shouldUpdateAnchor) {
+    // The node next to `node`, resulting from the split
+    const secondNode = newDocument.getNextSibling(node)
+    let secondText, newOffset
+
+    if (shouldUpdateAnchor) {
+      newOffset = anchorOffset - textOffset
+      secondText = secondNode.kind == 'text'
+        ? secondNode
+        : secondNode.getTextAtOffset(newOffset)
+      selection = selection.merge({
+        anchorKey: secondText.key,
+        anchorOffset: newOffset
+      })
+    }
+
+    if (shouldUpdateFocus) {
+      newOffset = focusOffset - textOffset
+      secondText = secondNode.kind == 'text'
+        ? secondNode
+        : secondNode.getTextAtOffset(newOffset)
+      selection = selection.merge({
+        focusKey: secondText.key,
+        focusOffset: newOffset
+      })
+    }
+  }
+
+  state = state.merge({
+    document: newDocument,
+    selection
+  })
   return state
 }
