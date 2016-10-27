@@ -363,3 +363,28 @@ export function unwrapBlockByKey(transform, key, properties, options) {
   const range = selection.moveToRangeOf(texts.first(), texts.last())
   return transform.unwrapBlockAtRange(range, properties, options)
 }
+
+/**
+ * Wrap a node in a block with `properties`.
+ *
+ * @param {Transform} transform
+ * @param {String} key The node to wrap
+ * @param {Block || Object || String} block The wrapping block (its children are discarded)
+ * @param {Object} options
+ *   @param {Boolean} normalize
+ * @return {Transform}
+ */
+
+export function wrapBlockByKey(transform, key, block, options) {
+  block = Normalize.block(block)
+  block = block.merge({ nodes: block.nodes.clear() })
+
+  const { document } = transform.state
+  const node = document.assertDescendant(key)
+  const parent = document.getParent(node)
+  const index = parent.nodes.indexOf(node)
+
+  return transform
+    .insertNodeByKey(parent.key, index, block, { normalize: false })
+    .moveNodeByKey(node.key, block.key, 0, options)
+}
