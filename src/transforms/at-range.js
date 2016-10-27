@@ -65,6 +65,8 @@ export function deleteAtRange(transform, range, options = {}) {
 
   let { state } = transform
   let { document } = state
+
+  // split the nodes at range, within the common ancestor
   let ancestor = document.getCommonAncestor(startKey, endKey)
   let startChild = ancestor.getHighestChild(startKey)
   let endChild = ancestor.getHighestChild(endKey)
@@ -76,18 +78,16 @@ export function deleteAtRange(transform, range, options = {}) {
 
   state = transform.state
   document = state.document
-  ancestor = document.getCommonAncestor(startKey, endKey)
   const startBlock = document.getClosestBlock(startKey)
   const endBlock = document.getClosestBlock(document.getNextText(endKey))
+
+  // remove all of the nodes between range
+  ancestor = document.getCommonAncestor(startKey, endKey)
   startChild = ancestor.getHighestChild(startKey)
   endChild = ancestor.getHighestChild(endKey)
-
   const startIndex = ancestor.nodes.indexOf(startChild)
   const endIndex = ancestor.nodes.indexOf(endChild)
-  const middles = ancestor.nodes.slice(
-      startIndex + 1,
-      endIndex + 1
-  )
+  const middles = ancestor.nodes.slice(startIndex + 1, endIndex + 1)
 
   if (middles.size) {
     // remove first nodes directly so the document is not normalized
@@ -110,6 +110,9 @@ export function deleteAtRange(transform, range, options = {}) {
   if (normalize) {
     transform.normalizeNodeByKey(ancestor.key)
   }
+
+  transform.normalizeDocument()
+
   return transform
 }
 

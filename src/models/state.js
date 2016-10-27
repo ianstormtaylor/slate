@@ -45,7 +45,7 @@ class State extends new Record(DEFAULTS) {
     let selection = Selection.create(properties.selection)
 
     if (selection.isUnset) {
-      const text = document.getTexts().first()
+      const text = document.getFirstText()
       selection = selection.collapseToStartOf(text)
     }
 

@@ -101,23 +101,53 @@ const Node = {
   },
 
   /**
-   * Recursively find all ancestor nodes by `iterator`.
+   * Recursively find all descendant nodes by `iterator`. Breadth first.
    *
    * @param {Function} iterator
-   * @return {Node} node
+   * @return {Node or Null} node
    */
 
   findDescendant(iterator) {
-    return (
-      this.nodes.find(iterator) ||
-      this.nodes
-        .map(node => node.kind == 'text' ? null : node.findDescendant(iterator))
-        .find(exists => exists)
-    )
+    const found = this.nodes.find(iterator)
+    if (found) return found
+
+    let descendantFound = null
+    this.nodes.find(node => {
+      if (node.kind != 'text') {
+        descendantFound = node.findDescendant(iterator)
+        return descendantFound
+      } else {
+        return false
+      }
+    })
+
+    return descendantFound
   },
 
   /**
-   * Recursively filter all ancestor nodes with `iterator`.
+   * Recursively find all descendant nodes by `iterator`. Depth first.
+   *
+   * @param {Function} iterator
+   * @return {Node or Null} node
+   */
+
+  findDescendantDeep(iterator) {
+    let descendantFound = null
+
+    const found = this.nodes.find(node => {
+      if (node.kind != 'text') {
+        descendantFound = node.findDescendantDeep(iterator)
+        return descendantFound || iterator(node)
+      }
+
+      return iterator(node) ? node : null
+    })
+
+    return descendantFound || found
+  },
+
+  /**
+   * Recursively filter all descendant nodes with `iterator`.
    *
    * @param {Function} iterator
    * @return {List} nodes
@@ -132,7 +162,7 @@ const Node = {
   },
 
   /**
-   * Recursively filter all ancestor nodes with `iterator`, depth-first.
+   * Recursively filter all descendant nodes with `iterator`, depth-first.
    *
    * @param {Function} iterator
    * @return {List} nodes
@@ -282,14 +312,13 @@ const Node = {
    */
 
   getClosest(key, iterator) {
-    let node = this.assertDescendant(key)
-
-    while (node = this.getParent(node)) {
-      if (node == this) return null
-      if (iterator(node)) return node
+    let ancestors = this.getAncestors(key)
+    if (!ancestors) {
+      throw new Error(`Could not find a descendant node with key "${key}".`)
     }
 
-    return null
+    // Exclude this node itself
+    return ancestors.rest().findLast(iterator)
   },
 
   /**
@@ -406,16 +435,7 @@ const Node = {
   getDescendant(key) {
     key = Normalize.key(key)
 
-    let child = this.getChild(key)
-    if (child) return child
-
-    this.nodes.find((node) => {
-      if (node.kind == 'text') return false
-      child = node.getDescendant(key)
-      return child
-    })
-
-    return child
+    return this.findDescendantDeep(node => node.key == key)
   },
 
   /**
@@ -649,10 +669,10 @@ const Node = {
     let last
 
     if (child.kind == 'block') {
-      last = child.getTexts().last()
+      last = child.getLastText()
     } else {
       const block = this.getClosestBlock(key)
-      last = block.getTexts().last()
+      last = block.getLastText()
     }
 
     const next = this.getNextText(last)
@@ -743,10 +763,13 @@ const Node = {
 
     let node = null
 
-    this.nodes.forEach((child) => {
-      if (child.kind == 'text') return
-      const match = child.getParent(key)
-      if (match) node = match
+    this.nodes.find((child) => {
+      if (child.kind == 'text') {
+        return false
+      } else {
+        node = child.getParent(key)
+        return node
+      }
     })
 
     return node
@@ -755,7 +778,7 @@ const Node = {
   /**
    * Get the path of a descendant node by `key`.
    *
-   * @param {String || Node} node
+   * @param {String || Node} key
    * @return {Array}
    */
 
@@ -764,17 +787,50 @@ const Node = {
 
     if (key == this.key) return []
 
-    let child = this.assertDescendant(key)
     let path = []
+    let childKey = key
     let parent
 
-    while (parent = this.getParent(child)) {
-      const index = parent.nodes.indexOf(child)
+    // Efficient with getParent memoization
+    while (parent = this.getParent(childKey)) {
+      const index = parent.nodes.findIndex(n => n.key === childKey)
       path.unshift(index)
-      child = parent
+      childKey = parent.key
     }
 
-    return path
+    if (childKey === key) {
+      // Did not loop once, meaning we could not find the child
+      throw new Error(`Could not find a descendant node with key "${key}".`)
+    } else {
+      return path
+    }
+  },
+
+  /**
+   * Get the path of ancestors of a descendant node by `key`.
+   *
+   * @param {String || Node} node
+   * @return {List<Node> or Null}
+   */
+
+  getAncestors(key) {
+    key = Normalize.key(key)
+
+    if (key == this.key) return List()
+    if (this.hasChild(key)) return List([this])
+
+    let ancestors
+    this.nodes.find((node) => {
+      if (node.kind == 'text') return false
+      ancestors = node.getAncestors(key)
+      return ancestors
+    })
+
+    if (ancestors) {
+      return ancestors.unshift(this)
+    } else {
+      return null
+    }
   },
 
   /**
@@ -819,10 +875,10 @@ const Node = {
     let first
 
     if (child.kind == 'block') {
-      first = child.getTexts().first()
+      first = child.getFirstText()
     } else {
       const block = this.getClosestBlock(key)
-      first = block.getTexts().first()
+      first = block.getFirstText()
     }
 
     const previous = this.getPreviousText(first)
@@ -874,6 +930,34 @@ const Node = {
         ? texts.push(node)
         : texts.concat(node.getTexts())
     }, Block.createList())
+  },
+
+  /**
+   * Get the first child text node.
+   *
+   * @return {Node || Null} node
+   */
+
+  getFirstText() {
+    return this.findDescendantDeep(node => node.kind == 'text')
+  },
+
+  /**
+   * Get the last child text node.
+   *
+   * @return {Node} node
+   */
+
+  getLastText() {
+    let descendantFound = null
+
+    const found = this.nodes.findLast((node) => {
+      if (node.kind == 'text') return true
+      descendantFound = node.getLastText()
+      return descendantFound
+    })
+
+    return descendantFound || found
   },
 
   /**
@@ -1070,10 +1154,13 @@ const Node = {
    */
 
   removeDescendant(key) {
+    key = Normalize.key(key)
+
     let node = this
-    const desc = node.assertDescendant(key)
-    let parent = node.getParent(desc)
-    const index = parent.nodes.indexOf(desc)
+    let parent = node.getParent(key)
+    if (!parent) throw new Error(`Could not find a descendant node with key "${key}".`)
+
+    const index = parent.nodes.findIndex(n => n.key === key)
     const isParent = node == parent
     const nodes = parent.nodes.splice(index, 1)
 
@@ -1183,8 +1270,22 @@ const Node = {
    */
 
   updateDescendant(node) {
-    this.assertDescendant(node)
-    return this.mapDescendants(d => d.key == node.key ? node : d)
+    let found = false
+
+    const result = this.mapDescendants(d => {
+      if (d.key == node.key) {
+        found = true
+        return node
+      } else {
+        return d
+      }
+    })
+
+    if (!found) {
+      throw new Error(`Could not update descendant node with key "${node.key}".`)
+    } else {
+      return result
+    }
   },
 
   /**
@@ -1210,6 +1311,8 @@ memoize(Node, [
   'filterDescendants',
   'filterDescendantsDeep',
   'findDescendant',
+  'findDescendantDeep',
+  'getAncestors',
   'getBlocks',
   'getBlocksAtRange',
   'getCharactersAtRange',
@@ -1228,6 +1331,7 @@ memoize(Node, [
   'getDepth',
   'getDescendant',
   'getDescendantDecorators',
+  'getFirstText',
   'getFragmentAtRange',
   'getFurthest',
   'getFurthestBlock',
@@ -1235,6 +1339,7 @@ memoize(Node, [
   'getHighestChild',
   'getHighestOnlyChildParent',
   'getInlinesAtRange',
+  'getLastText',
   'getMarksAtRange',
   'getNextBlock',
   'getNextSibling',

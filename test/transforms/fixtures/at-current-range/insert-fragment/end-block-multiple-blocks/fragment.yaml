@@ -1,0 +1,17 @@
+
+nodes:
+  - kind: block
+    type: list-item
+    nodes:
+      - kind: text
+        text: fragment
+  - kind: block
+    type: list-item
+    nodes:
+      - kind: text
+        text: second fragment
+  - kind: block
+    type: list-item
+    nodes:
+      - kind: text
+        text: third fragment

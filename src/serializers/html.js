@@ -225,12 +225,16 @@ class Html {
    * Serialize a `state` object into an HTML string.
    *
    * @param {State} state
-   * @return {String} html
+   * @param {Object} options
+   *   @property {Boolean} render
+   * @return {String|Array} html
    */
 
-  serialize = (state) => {
+  serialize = (state, options = {}) => {
     const { document } = state
     const elements = document.nodes.map(this.serializeNode)
+    if (options.render === false) return elements
+
     const html = ReactDOMServer.renderToStaticMarkup(<body>{elements}</body>)
     const inner = html.slice(6, -7)
     return inner

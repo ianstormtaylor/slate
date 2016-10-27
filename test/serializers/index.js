@@ -1,11 +1,14 @@
 
 import assert from 'assert'
+import type from 'type-of'
 import fs from 'fs'
 import readMetadata from 'read-metadata'
 import strip from '../helpers/strip-dynamic'
 import { Html, Json, Plain, Raw } from '../..'
 import { equal, strictEqual } from '../helpers/assert-json'
 import { resolve } from 'path'
+import React from 'react'
+import { Iterable } from 'immutable'
 
 /**
  * Tests.
@@ -46,6 +49,14 @@ describe('serializers', () => {
           strictEqual(serialized, expected.trim())
         })
       }
+
+      it('optionally returns an iterable list of React elements', () => {
+        const html = new Html(require('./fixtures/html/serialize/block-nested').default)
+        const input = require('./fixtures/html/serialize/block-nested/input.js').default
+        const serialized = html.serialize(input, { render: false })
+        assert(Iterable.isIterable(serialized), 'did not return an interable list')
+        assert(React.isValidElement(serialized.first()), 'did not return valid React elements')
+      })
     })
   })
 

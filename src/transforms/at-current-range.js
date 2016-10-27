@@ -70,7 +70,7 @@ export function _delete(transform) {
         after = selection.collapseToEndOf(previous)
       }
     } else {
-      const last = previous.getTexts().last()
+      const last = previous.getLastText()
       after = selection.collapseToEndOf(last)
     }
   }
@@ -113,6 +113,7 @@ export function deleteBackward(transform, n = 1) {
 export function deleteForward(transform, n = 1) {
   const { state } = transform
   const { selection } = state
+
   return transform
     .deleteForwardAtRange(selection, n)
     .collapseToEnd()
@@ -156,9 +157,10 @@ export function insertFragment(transform, fragment) {
 
   if (!fragment.length) return transform
 
-  const lastText = fragment.getTexts().last()
+  const lastText = fragment.getLastText()
   const lastInline = fragment.getClosestInline(lastText)
   const beforeTexts = document.getTexts()
+  const appending = selection.hasEdgeAtEndOf(document.getDescendant(selection.endKey))
 
   transform.unsetSelection()
   transform.insertFragmentAtRange(selection, fragment)
@@ -167,15 +169,11 @@ export function insertFragment(transform, fragment) {
 
   const keys = beforeTexts.map(text => text.key)
   const news = document.getTexts().filter(n => !keys.includes(n.key))
-  const text = news.size ? news.takeLast(2).first() : null
+  const text = appending ? news.last() : news.takeLast(2).first()
   let after
 
   if (text && lastInline) {
     after = selection.collapseToEndOf(text)
-  }
-
-  else if (text && lastInline) {
-    after = selection.collapseToStart()
   }
 
   else if (text) {
@@ -495,7 +493,7 @@ export function wrapInline(transform, properties) {
   }
 
   else if (selection.startOffset == 0) {
-    const text = previous ? document.getNextText(previous) : document.getTexts().first()
+    const text = previous ? document.getNextText(previous) : document.getFirstText()
     after = selection.moveToRangeOf(text)
   }
 
