@@ -1,4 +1,5 @@
 
+import Immutable from 'immutable'
 import Base64 from '../serializers/base-64'
 import Debug from 'debug'
 import React from 'react'
@@ -7,6 +8,7 @@ import TYPES from '../constants/types'
 import Leaf from './leaf'
 import Void from './void'
 import scrollTo from '../utils/scroll-to'
+import warning from '../utils/warning'
 
 /**
  * Debug.
@@ -97,7 +99,10 @@ class Node extends React.Component {
     }
 
     // If the node has changed, update.
-    if (props.node != this.props.node) {
+    if (Immutable.is(props.node, this.props.node)) {
+      if (props.node != this.props.node) {
+          warning('Encountered different references for identical node values in "shouldComponentUpdate". Check that you are preserving references')
+      }
       return true
     }
 
