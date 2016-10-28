@@ -55,8 +55,8 @@ function _normalizeNodeWith(transform, schema, node) {
   let recursiveCount = 0
 
   // Auxiliary function, called recursively, with a maximum calls safety net.
-  function _recur(_transform, _schema, _node) {
-    const failure = _schema.__validate(_node)
+  function _recur(_transform, _node) {
+    const failure = schema.__validate(_node)
 
     // Node is valid?
     if (!failure) {
@@ -81,10 +81,10 @@ function _normalizeNodeWith(transform, schema, node) {
       throw new Error('Unexpected number of successive normalizations. Aborting.')
     }
 
-    return _recur(_transform, _schema, _node)
+    return _recur(_transform, newNode)
   }
 
-  return _recur(transform, schema, node)
+  return _recur(transform, node)
 }
 
 /**
