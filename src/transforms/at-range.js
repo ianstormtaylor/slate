@@ -132,18 +132,17 @@ export function deleteBackwardAtRange(transform, range, n = 1, options = {}) {
   const { state } = transform
   const { document } = state
   const { startKey, focusOffset } = range
-  const text = document.getDescendant(startKey)
-  const block = document.getClosestBlock(startKey)
-  const inline = document.getClosestInline(startKey)
 
   if (range.isExpanded) {
     return transform.deleteAtRange(range, { normalize })
   }
 
+  const block = document.getClosestBlock(startKey)
   if (block && block.isVoid) {
     return transform.removeNodeByKey(block.key, { normalize })
   }
 
+  const inline = document.getClosestInline(startKey)
   if (inline && inline.isVoid) {
     return transform.removeNodeByKey(inline.key, { normalize })
   }
@@ -152,6 +151,7 @@ export function deleteBackwardAtRange(transform, range, n = 1, options = {}) {
     return transform
   }
 
+  const text = document.getDescendant(startKey)
   if (range.isAtStartOf(text)) {
     const prev = document.getPreviousText(text)
     const prevBlock = document.getClosestBlock(prev)
@@ -197,18 +197,17 @@ export function deleteForwardAtRange(transform, range, n = 1, options = {}) {
   const { state } = transform
   const { document } = state
   const { startKey, focusOffset } = range
-  const text = document.getDescendant(startKey)
-  const inline = document.getClosestInline(startKey)
-  const block = document.getClosestBlock(startKey)
 
   if (range.isExpanded) {
     return transform.deleteAtRange(range, { normalize })
   }
 
+  const block = document.getClosestBlock(startKey)
   if (block && block.isVoid) {
     return transform.removeNodeByKey(block.key, { normalize })
   }
 
+  const inline = document.getClosestInline(startKey)
   if (inline && inline.isVoid) {
     return transform.removeNodeByKey(inline.key, { normalize })
   }
@@ -217,6 +216,7 @@ export function deleteForwardAtRange(transform, range, n = 1, options = {}) {
     return transform
   }
 
+  const text = document.getDescendant(startKey)
   if (range.isAtEndOf(text)) {
     const next = document.getNextText(text)
     const nextBlock = document.getClosestBlock(next)
