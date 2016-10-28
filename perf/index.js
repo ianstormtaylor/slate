@@ -29,7 +29,7 @@ const DEFAULT_BENCHMARK = {
 
 const BENCHMARK_OPTIONS = {
   // To ensure a better accuracy, force a minimum number of samples
-  minSamples: 50 // default 10
+  minSamples: 80 // default 10
 }
 
 // Because BenchmarkJS does not support scoped variables well, use
@@ -210,7 +210,7 @@ function exists(filepath) {
 
 function save(results, path) {
   path = resolve(process.cwd(), path)
-  fs.writeFileSync(path, JSON.stringify(results))
+  fs.writeFileSync(path, JSON.stringify(results, null, 2))
 }
 
 function serializeResult(event) {
