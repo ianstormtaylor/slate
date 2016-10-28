@@ -20,9 +20,9 @@ nodes:
     - text: '!'
 - kind: block
   type: paragraph
-  key: _cursor_
   nodes:
   - kind: text
+    key: _cursor_
     ranges:
     - text: 'Since it''s rich text, you can do things like turn a selection of text '
     - text: 'bold'

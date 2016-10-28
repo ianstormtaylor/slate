@@ -36,10 +36,10 @@ nodes:
     type: paragraph
     nodes:
     - kind: block
-      key: _cursor_
       type: paragraph
       nodes:
       - kind: text
+        key: _cursor_
         ranges:
         - text: 'Since it''s rich text, you can do things like turn a selection of text '
         - text: 'bold'
