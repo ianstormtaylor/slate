@@ -15,11 +15,11 @@ export default function warning(message, ...more) {
   }
 
   try {
-      // --- Welcome to debugging Slate ---
-      // This error was thrown as a convenience so that you can use this stack
-      // to find the callsite that caused this warning to fire.
-      throw new Error(message)
-    } catch (x) {
-        // This error is only for debugging
-    }
+    // --- Welcome to debugging Slate ---
+    // This error was thrown as a convenience so that you can use this stack
+    // to find the callsite that caused this warning to fire.
+    throw new Error(message)
+  } catch (x) {
+    // This error is only for debugging
+  }
 }
