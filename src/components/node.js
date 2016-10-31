@@ -9,6 +9,7 @@ import Leaf from './leaf'
 import Void from './void'
 import scrollTo from '../utils/scroll-to'
 import warning from '../utils/warning'
+import isDev from '../utils/is-dev'
 
 /**
  * Debug.
@@ -100,7 +101,7 @@ class Node extends React.Component {
 
     // If the node has changed, update.
     if (props.node != this.props.node) {
-      if (!Immutable.is(props.node, this.props.node)) {
+      if (!isDev() || !Immutable.is(props.node, this.props.node)) {
         return true
       } else {
         warning('Encountered different references for identical node values in "shouldComponentUpdate". Check that you are preserving references for the following node:\n', props.node)

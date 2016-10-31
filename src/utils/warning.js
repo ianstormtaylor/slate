@@ -1,8 +1,4 @@
-const __DEV__ = (
-  typeof process !== 'undefined' &&
-  process.env &&
-  process.env.NODE_ENV !== 'production'
-)
+import isDev from './is-dev'
 
 /**
  * Log a development warning.
@@ -10,7 +6,7 @@ const __DEV__ = (
  */
 
 export default function warning(message, ...more) {
-  if (!__DEV__) {
+  if (!isDev()) {
     return
   }
 
