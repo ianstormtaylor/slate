@@ -1219,7 +1219,12 @@ const Node = {
 
       else {
         const { nodes } = child
-        const oneNodes = nodes.takeUntil(n => n.key == one.key).push(one)
+
+        // Try to preserve the nodes list to preserve reference of one == node to avoid re-render
+        // When spliting at the end of a text node, the first node is preserved
+        let oneNodes = nodes.takeUntil(n => n.key == one.key)
+        oneNodes = (oneNodes.size == (nodes.size - 1) && one == nodes.last()) ? nodes : oneNodes.push(one)
+
         const twoNodes = nodes.skipUntil(n => n.key == one.key).rest().unshift(two)
         one = child.merge({ nodes: oneNodes })
         two = child.merge({ nodes: twoNodes, key: uid() })
