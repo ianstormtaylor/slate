@@ -27,17 +27,19 @@ function _refreshNode(transform, node) {
  * @param  {Transform} transform
  * @param  {Schema} schema
  * @param  {Node} node
+ * @param  {Node} prevNode
  * @return {Transform} transform
  */
 
-function _normalizeChildrenWith(transform, schema, node) {
+function _normalizeChildrenWith(transform, schema, node, prevNode) {
   if (!node.nodes) {
     return transform
   }
 
   return node.nodes.reduce(
     (t, child) => {
-      return t.normalizeNodeWith(schema, child)
+      const prevChild = prevNode ? prevNode.getChild(child) : null
+      return t.normalizeNodeWith(schema, child, prevChild)
     },
     transform
   )
@@ -93,12 +95,18 @@ function _normalizeNodeWith(transform, schema, node) {
  * @param  {Transform} transform
  * @param  {Schema} schema
  * @param  {Node} node
+ * @param  {Node} prevNode
  * @return {Transform}
  */
 
-export function normalizeNodeWith(transform, schema, node) {
+export function normalizeNodeWith(transform, schema, node, prevNode) {
+  // Node has not changed
+  if (prevNode == node) {
+    return transform
+  }
+
   // Iterate over its children
-  transform = _normalizeChildrenWith(transform, schema, node)
+  transform = _normalizeChildrenWith(transform, schema, node, prevNode)
 
   // Refresh the node reference, and normalize it
   node = _refreshNode(transform, node)
@@ -144,10 +152,11 @@ export function normalizeParentsWith(transform, schema, node) {
  *
  * @param  {Transform} transform
  * @param  {Schema} schema
+ * @param  {Document} prevDocument
  * @return {Transform} transform
  */
 
-export function normalizeWith(transform, schema) {
+export function normalizeWith(transform, schema, prevDocument) {
   const { state } = transform
   const { document } = state
 
@@ -156,7 +165,7 @@ export function normalizeWith(transform, schema) {
     return transform
   }
 
-  return transform.normalizeNodeWith(schema, document)
+  return transform.normalizeNodeWith(schema, document, prevDocument)
 }
 
 /**
@@ -167,9 +176,12 @@ export function normalizeWith(transform, schema) {
  */
 
 export function normalize(transform) {
-    return transform
+    console.time('normalize')
+    transform = transform
         .normalizeDocument()
         .normalizeSelection()
+    console.timeEnd('normalize')
+    return transform
 }
 
 /**
@@ -180,7 +192,11 @@ export function normalize(transform) {
  */
 
 export function normalizeDocument(transform) {
-  return transform.normalizeWith(defaultSchema)
+  const { state, prevState } = transform
+  const { document } = state
+  const { document: prevDocument } = prevState || {}
+
+  return transform.normalizeWith(defaultSchema, prevDocument)
 }
 
 /**
@@ -192,11 +208,17 @@ export function normalizeDocument(transform) {
  */
 
 export function normalizeNodeByKey(transform, key) {
-  const { state } = transform
+  const { state, prevState } = transform
   const { document } = state
-  const node = document.key == key ? document : document.assertDescendant(key)
+  const { document: prevDocument } = prevState || {}
 
-  return transform.normalizeNodeWith(defaultSchema, node)
+  const node = document.key == key ? document : document.assertDescendant(key)
+  const prevNode = document.key == key ? prevDocument : prevDocument.getDescendant(key)
+
+  console.time('normalizeNodeByKey')
+  transform = transform.normalizeNodeWith(defaultSchema, node, prevNode)
+  console.timeEnd('normalizeNodeByKey')
+  return transform
 }
 
 /**
@@ -208,11 +230,15 @@ export function normalizeNodeByKey(transform, key) {
  */
 
 export function normalizeParentsByKey(transform, key) {
-  const { state } = transform
+  const { state, prevState } = transform
   const { document } = state
+  const { document: prevDocument } = prevState || {}
   const node = document.key == key ? document : document.assertDescendant(key)
-
-  return transform.normalizeParentsWith(defaultSchema, node)
+  const prevNode = document.key == key ? prevDocument : prevDocument.getDescendant(key)
+  console.time('normalizeParentsByKey')
+  transform = transform.normalizeParentsWith(defaultSchema, node, prevNode)
+  console.timeEnd('normalizeParentsByKey')
+  return transform
 }
 
 /**
@@ -223,6 +249,7 @@ export function normalizeParentsByKey(transform, key) {
  */
 
 export function normalizeSelection(transform) {
+  console.time('normalizeSelection')
   let { state } = transform
   let { document, selection } = state
   selection = selection.normalize(document)
@@ -246,5 +273,6 @@ export function normalizeSelection(transform) {
 
   state = state.merge({ selection })
   transform.state = state
+  console.timeEnd('normalizeSelection')
   return transform
 }

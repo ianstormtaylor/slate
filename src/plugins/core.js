@@ -32,6 +32,7 @@ function Plugin(options = {}) {
     placeholderClassName,
     placeholderStyle,
   } = options
+  let prevState
 
   /**
    * On before change, enforce the editor's schema.
@@ -45,9 +46,14 @@ function Plugin(options = {}) {
     if (state.isNative) return state
     const schema = editor.getSchema()
 
-    return state.transform()
-      .normalizeWith(schema)
+    console.time('onBeforeChange');
+    const newState = state.transform()
+      .normalizeWith(schema, prevState ? prevState.document : null)
       .apply({ save: false })
+    console.timeEnd('onBeforeChange');
+
+    prevState = newState
+    return newState;
   }
 
   /**

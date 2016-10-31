@@ -50,7 +50,7 @@ class State extends new Record(DEFAULTS) {
     }
 
     const state = new State({ document, selection })
-    return state.transform()
+    return state.transform({ normalized: false })
       .normalize()
       .apply({ save: false })
   }
@@ -418,12 +418,16 @@ class State extends new Record(DEFAULTS) {
   /**
    * Return a new `Transform` with the current state as a starting point.
    *
+   * @param {Object} properties
    * @return {Transform} transform
    */
 
-  transform() {
+  transform(properties = {}) {
     const state = this
-    return new Transform({ state })
+    return new Transform({
+        ...properties,
+        state
+    })
   }
 
 }
