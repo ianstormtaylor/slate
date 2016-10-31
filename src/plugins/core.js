@@ -32,7 +32,6 @@ function Plugin(options = {}) {
     placeholderClassName,
     placeholderStyle,
   } = options
-  let prevState
 
   /**
    * On before change, enforce the editor's schema.
@@ -43,8 +42,15 @@ function Plugin(options = {}) {
    */
 
   function onBeforeChange(state, editor) {
+    // Don't normalize with plugins schema when typing text in native mode
     if (state.isNative) return state
+
     const schema = editor.getSchema()
+    const { state: prevState } = editor.state
+
+    // Since schema can only normalize the document, we avoid creating
+    // a transform and normalize the selection if the document is the same
+    if (prevState && state.document == prevState.document) return state
 
     console.time('onBeforeChange');
     const newState = state.transform()
@@ -52,8 +58,7 @@ function Plugin(options = {}) {
       .apply({ save: false })
     console.timeEnd('onBeforeChange');
 
-    prevState = newState
-    return newState;
+    return newState
   }
 
   /**
