@@ -1,7 +1,6 @@
 
 import React from 'react'
 import isReactComponent from '../utils/is-react-component'
-import memoize from '../utils/memoize'
 import typeOf from 'type-of'
 import { Record } from 'immutable'
 
@@ -122,6 +121,7 @@ class Schema extends new Record(DEFAULTS) {
       value,
     }
   }
+
 }
 
 /**
@@ -221,14 +221,6 @@ function normalizeMarkComponent(render) {
       return props => <span className={render}>{props.children}</span>
   }
 }
-
-/**
- * Memoize validation for a schema
- */
-
-memoize(Schema.prototype, [
-  '__validate'
-])
 
 /**
  * Export.
