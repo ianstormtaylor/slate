@@ -105,11 +105,19 @@ export function normalizeNodeWith(transform, schema, node, prevNode) {
     return transform
   }
 
+  // For performance considerations, we will check if the transform was changed
+  const opCount = transform.operations.length
+
   // Iterate over its children
   transform = _normalizeChildrenWith(transform, schema, node, prevNode)
 
-  // Refresh the node reference, and normalize it
-  node = _refreshNode(transform, node)
+  const hasChanged = transform.operations.length != opCount
+  if (hasChanged) {
+    // Refresh the node reference
+    node = _refreshNode(transform, node)
+  }
+
+  // Now normalize the node itself if it still exist
   if (node) {
     transform = _normalizeNodeWith(transform, schema, node)
   }
@@ -160,8 +168,8 @@ export function normalizeWith(transform, schema, prevDocument) {
   const { state } = transform
   const { document } = state
 
-  // Schema was not rule to edit the document
   if (!schema.isNormalization) {
+    // Schema has no normalization rules
     return transform
   }
 
