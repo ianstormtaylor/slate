@@ -1315,8 +1315,6 @@ memoize(Node, [
   'assertDescendant',
   'filterDescendants',
   'filterDescendantsDeep',
-  'findDescendant',
-  'findDescendantDeep',
   'getAncestors',
   'getBlocks',
   'getBlocksAtRange',
