@@ -1,12 +1,21 @@
 language: node_js
+env:
+  matrix:
+  - TEST_TYPE=test
+  - TEST_TYPE=lint
+  - TEST_TYPE=benchmarks
 script:
-  - npm test
-  - npm run benchmarks
-  - npm run lint
+  - |
+    if [ "$TEST_TYPE" = test ]; then
+      npm test
+    elif [ "$TEST_TYPE" = benchmarks ]; then
+      npm run benchmarks
+    elif [ "$TEST_TYPE" = lint ]; then
+      npm run lint
+    fi
+# Slate is compiled with babel and run in the browser
 node_js:
   - "node"
-  - "6"
-  - "4"
 # Compiling package microtime requires C++11 compiler. Benchmarks will
 # automatically use microtime if installed.
 addons:
