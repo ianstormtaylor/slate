@@ -84,12 +84,12 @@ class Node extends React.Component {
   /**
    * Should the node update?
    *
-   * @param {Object} props
+   * @param {Object} nextProps
    * @param {Object} state
    * @return {Boolean}
    */
 
-  shouldComponentUpdate = (props) => {
+  shouldComponentUpdate = (nextProps) => {
     const { Component } = this.state
 
     // If the node is rendered with a `Component` that has enabled suppression
@@ -100,29 +100,33 @@ class Node extends React.Component {
     }
 
     // If the node has changed, update.
-    if (props.node != this.props.node) {
-      if (!isDev() || !Immutable.is(props.node, this.props.node)) {
+    if (nextProps.node != this.props.node) {
+      if (!isDev() || !Immutable.is(nextProps.node, this.props.node)) {
         return true
       } else {
-        warning('Encountered different references for identical node values in "shouldComponentUpdate". Check that you are preserving references for the following node:\n', props.node)
+        warning('Encountered different references for identical node values in "shouldComponentUpdate". Check that you are preserving references for the following node:\n', nextProps.node)
       }
     }
+
+    const nextHasEdgeIn = nextProps.state.selection.hasEdgeIn(nextProps.node)
 
     // If the selection is focused and is inside the node, we need to update so
     // that the selection will be set by one of the <Leaf> components.
     if (
-      props.state.isFocused &&
-      props.state.selection.hasEdgeIn(props.node)
+      nextProps.state.isFocused &&
+      nextHasEdgeIn
     ) {
       return true
     }
 
-    // If the selection is blurred but was previously focused inside the node,
+    const hasEdgeIn = this.props.state.selection.hasEdgeIn(nextProps.node)
+    // If the selection is blurred but was previously focused (or vice versa) inside the node,
     // we need to update to ensure the selection gets updated by re-rendering.
     if (
-      props.state.isBlurred &&
-      this.props.state.isFocused &&
-      this.props.state.selection.hasEdgeIn(props.node)
+      this.props.state.isFocused != nextProps.state.isFocused &&
+      (
+          hasEdgeIn || nextHasEdgeIn
+      )
     ) {
       return true
     }
@@ -132,18 +136,15 @@ class Node extends React.Component {
     // the node, to allow for intuitive selection-based rendering.
     if (
       this.props.node.kind != 'text' &&
-      (
-          props.state.isFocused != this.props.state.isFocused ||
-          this.props.state.selection.hasEdgeIn(this.props.node) != props.state.selection.hasEdgeIn(props.node)
-      )
+      hasEdgeIn != nextHasEdgeIn
     ) {
       return true
     }
 
     // For text nodes, which can have custom decorations, we need to check to
     // see if the block has changed, which has caused the decorations to change.
-    if (props.node.kind == 'text') {
-      const { node, schema, state } = props
+    if (nextProps.node.kind == 'text') {
+      const { node, schema, state } = nextProps
       const { document } = state
       const decorators = document.getDescendantDecorators(node.key, schema)
       const ranges = node.getRanges(decorators)
