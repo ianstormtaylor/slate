@@ -1333,6 +1333,7 @@ memoize(Node, [
   'getDecorators',
   'getDepth',
   'getDescendant',
+  'getDescendantAtPath',
   'getDescendantDecorators',
   'getFirstText',
   'getFragmentAtRange',
