@@ -12,6 +12,13 @@ import { Map } from 'immutable'
 const LEAF = {}
 
 /**
+ * An unique value used to detect cache misses
+ *
+ * @type {Object}
+ */
+const NO_SET = {}
+
+/**
  * Memoize all of the `properties` on a `object`.
  *
  * @param {Object} object
@@ -31,7 +38,10 @@ function memoize(object, properties) {
       const keys = [property, ...args, LEAF]
       const cache = this.__cache = this.__cache || new Map()
 
-      if (cache.hasIn(keys)) return cache.getIn(keys)
+      const cachedValue = cache.getIn(keys, NO_SET)
+      if (cachedValue !== NO_SET) {
+        return cachedValue
+      }
 
       const value = original.apply(this, args)
       this.__cache = cache.setIn(keys, value)
