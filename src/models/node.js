@@ -1326,7 +1326,6 @@ memoize(Node, [
   'getChildrenBeforeIncluding',
   'getChildrenBetween',
   'getChildrenBetweenIncluding',
-  'getClosest',
   'getClosestBlock',
   'getClosestInline',
   'getComponent',
