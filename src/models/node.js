@@ -1312,8 +1312,6 @@ const Node = {
 memoize(Node, [
   'assertChild',
   'assertDescendant',
-  'filterDescendants',
-  'filterDescendantsDeep',
   'getAncestors',
   'getBlocks',
   'getBlocksAtRange',
