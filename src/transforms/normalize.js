@@ -184,11 +184,9 @@ export function normalizeWith(transform, schema, prevDocument) {
  */
 
 export function normalize(transform) {
-    console.time('normalize')
     transform = transform
         .normalizeDocument()
         .normalizeSelection()
-    console.timeEnd('normalize')
     return transform
 }
 
@@ -200,8 +198,7 @@ export function normalize(transform) {
  */
 
 export function normalizeDocument(transform) {
-  const { state, prevState } = transform
-  const { document } = state
+  const { prevState } = transform
   const { document: prevDocument } = prevState || {}
 
   return transform.normalizeWith(defaultSchema, prevDocument)
@@ -223,9 +220,7 @@ export function normalizeNodeByKey(transform, key) {
   const node = document.key == key ? document : document.assertDescendant(key)
   const prevNode = document.key == key ? prevDocument : prevDocument.getDescendant(key)
 
-  console.time('normalizeNodeByKey')
   transform = transform.normalizeNodeWith(defaultSchema, node, prevNode)
-  console.timeEnd('normalizeNodeByKey')
   return transform
 }
 
@@ -243,9 +238,8 @@ export function normalizeParentsByKey(transform, key) {
   const { document: prevDocument } = prevState || {}
   const node = document.key == key ? document : document.assertDescendant(key)
   const prevNode = document.key == key ? prevDocument : prevDocument.getDescendant(key)
-  console.time('normalizeParentsByKey')
+
   transform = transform.normalizeParentsWith(defaultSchema, node, prevNode)
-  console.timeEnd('normalizeParentsByKey')
   return transform
 }
 
@@ -257,7 +251,6 @@ export function normalizeParentsByKey(transform, key) {
  */
 
 export function normalizeSelection(transform) {
-  console.time('normalizeSelection')
   let { state } = transform
   let { document, selection } = state
   selection = selection.normalize(document)
@@ -281,6 +274,5 @@ export function normalizeSelection(transform) {
 
   state = state.merge({ selection })
   transform.state = state
-  console.timeEnd('normalizeSelection')
   return transform
 }

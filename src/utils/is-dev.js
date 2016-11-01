@@ -10,5 +10,5 @@ const __DEV__ = (
  */
 
 export default function isDev() {
-  return __DEV__;
+  return __DEV__
 }

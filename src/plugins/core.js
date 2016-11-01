@@ -52,11 +52,9 @@ function Plugin(options = {}) {
     // a transform and normalize the selection if the document is the same
     if (prevState && state.document == prevState.document) return state
 
-    console.time('onBeforeChange');
     const newState = state.transform()
       .normalizeWith(schema, prevState ? prevState.document : null)
       .apply({ save: false })
-    console.timeEnd('onBeforeChange');
 
     return newState
   }
