@@ -1290,19 +1290,7 @@ const Node = {
     } else {
       return result
     }
-  },
-
-  /**
-   * Validate the node against a `schema`.
-   *
-   * @param {Schema} schema
-   * @return {Object || Void}
-   */
-
-  validate(schema) {
-    return schema.__validate(this)
   }
-
 }
 
 /**
@@ -1356,8 +1344,7 @@ memoize(Node, [
   'hasChild',
   'hasDescendant',
   'hasVoidParent',
-  'isInlineSplitAtRange',
-  'validate'
+  'isInlineSplitAtRange'
 ])
 
 /**
