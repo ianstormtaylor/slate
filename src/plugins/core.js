@@ -692,8 +692,8 @@ function Plugin(options = {}) {
       .transform()
       .moveTo(selection)
       // Since the document has not changed, We only normalize the selection
-      .normalizeSelection()
-      .apply({ normalize: false })
+      // This is done in transform.apply
+      .apply()
   }
 
   /**
