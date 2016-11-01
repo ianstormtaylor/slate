@@ -524,14 +524,13 @@ const Node = {
    */
 
   getFurthest(key, iterator) {
-    let node = this.assertDescendant(key)
-    let furthest = null
-
-    while (node = this.getClosest(node, iterator)) {
-      furthest = node
+    let ancestors = this.getAncestors(key)
+    if (!ancestors) {
+      throw new Error(`Could not find a descendant node with key "${key}".`)
     }
 
-    return furthest
+    // Exclude this node itself
+    return ancestors.rest().find(iterator)
   },
 
   /**
@@ -1336,7 +1335,6 @@ memoize(Node, [
   'getDescendantDecorators',
   'getFirstText',
   'getFragmentAtRange',
-  'getFurthest',
   'getFurthestBlock',
   'getFurthestInline',
   'getHighestChild',
