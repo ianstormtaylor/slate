@@ -237,58 +237,6 @@ const Node = {
   },
 
   /**
-   * Get children after a child by `key`.
-   *
-   * @param {String or Node} key
-   * @return {Node} node
-   */
-
-  getChildrenAfter(key) {
-    const child = this.assertChild(key)
-    const index = this.nodes.indexOf(child)
-    return this.nodes.slice(index + 1)
-  },
-
-  /**
-   * Get children after a child by `key`, including the child.
-   *
-   * @param {String or Node} key
-   * @return {Node} node
-   */
-
-  getChildrenAfterIncluding(key) {
-    const child = this.assertChild(key)
-    const index = this.nodes.indexOf(child)
-    return this.nodes.slice(index)
-  },
-
-  /**
-   * Get children before a child by `key`.
-   *
-   * @param {String or Node} key
-   * @return {Node} node
-   */
-
-  getChildrenBefore(key) {
-    const child = this.assertChild(key)
-    const index = this.nodes.indexOf(child)
-    return this.nodes.slice(0, index)
-  },
-
-  /**
-   * Get children before a child by `key`, including the child.
-   *
-   * @param {String or Node} key
-   * @return {Node} node
-   */
-
-  getChildrenBeforeIncluding(key) {
-    const child = this.assertChild(key)
-    const index = this.nodes.indexOf(child)
-    return this.nodes.slice(0, index + 1)
-  },
-
-  /**
    * Get children between two child keys.
    *
    * @param {String or Node} start
@@ -1336,19 +1284,11 @@ const Node = {
  */
 
 memoize(Node, [
-  'assertChild',
-  'assertDescendant',
   'getAncestors',
   'getBlocks',
   'getBlocksAtRange',
   'getCharactersAtRange',
   'getChild',
-  'getChildrenAfter',
-  'getChildrenAfterIncluding',
-  'getChildrenBefore',
-  'getChildrenBeforeIncluding',
-  'getChildrenBetween',
-  'getChildrenBetweenIncluding',
   'getClosestBlock',
   'getClosestInline',
   'getComponent',
@@ -1379,8 +1319,6 @@ memoize(Node, [
   'getTextDirection',
   'getTexts',
   'getTextsAtRange',
-  'hasChild',
-  'hasDescendant',
   'hasVoidParent',
   'isInlineSplitAtRange'
 ])
