@@ -46,11 +46,24 @@ class Schema extends new Record(DEFAULTS) {
 
   /**
    * Return true if one rule can normalize the document
+   *
+   * @return {Boolean} isNormalization
    */
 
   get isNormalization() {
     const { rules } = this
     return rules.some(rule => rule.validate)
+  }
+
+  /**
+   * Return true if one rule can decorate text nodes
+   *
+   * @return {Boolean} hasDecorators
+   */
+
+  get hasDecorators() {
+    const { rules } = this
+    return rules.some(rule => rule.decorate)
   }
 
   /**

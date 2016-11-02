@@ -143,8 +143,9 @@ class Node extends React.Component {
 
     // For text nodes, which can have custom decorations, we need to check to
     // see if the block has changed, which has caused the decorations to change.
-    if (nextProps.node.kind == 'text') {
+    if (nextProps.node.kind == 'text' && nextProps.schema.hasDecorators) {
       const { node, schema, state } = nextProps
+
       const { document } = state
       const decorators = document.getDescendantDecorators(node.key, schema)
       const ranges = node.getRanges(decorators)
@@ -155,7 +156,9 @@ class Node extends React.Component {
       const prevDecorators = prevDocument.getDescendantDecorators(prevNode.key, prevSchema)
       const prevRanges = prevNode.getRanges(prevDecorators)
 
-      if (!ranges.equals(prevRanges)) return true
+      if (!ranges.equals(prevRanges)) {
+        return true
+      }
     }
 
     // Otherwise, don't update.
