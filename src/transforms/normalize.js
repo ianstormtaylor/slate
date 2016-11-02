@@ -1,5 +1,6 @@
 import warning from '../utils/warning'
 import { default as defaultSchema } from '../plugins/schema'
+import Normalize from '../utils/normalize'
 
 // Maximum recursive calls for normalization
 const MAX_CALLS = 50
@@ -41,7 +42,7 @@ function _normalizeChildrenWith(transform, schema, node, prevNode) {
 
   return node.nodes.reduce(
     (t, child) => {
-      const prevChild = prevNode ? prevNode.getChild(child) : null
+      const prevChild = prevNode ? prevNode.getChild(child.key) : null
       return t.normalizeNodeWith(schema, child, prevChild)
     },
     transform
@@ -216,6 +217,7 @@ export function normalizeDocument(transform) {
  */
 
 export function normalizeNodeByKey(transform, key) {
+  key = Normalize.key(key)
   const { state, prevState } = transform
   const { document } = state
   const { document: prevDocument } = prevState || {}
@@ -236,6 +238,7 @@ export function normalizeNodeByKey(transform, key) {
  */
 
 export function normalizeParentsByKey(transform, key) {
+  key = Normalize.key(key)
   const { state, prevState } = transform
   const { document } = state
   const { document: prevDocument } = prevState || {}
