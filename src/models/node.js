@@ -670,12 +670,16 @@ const Node = {
    */
 
   getNextSibling(key) {
-    const node = this.assertDescendant(key)
-    return this
-      .getParent(node)
-      .nodes
-      .skipUntil(child => child == node)
-      .get(1)
+    key = Normalize.key(key)
+
+    const parent = this.getParent(key)
+    const after = parent.nodes
+      .skipUntil(child => child.key == key)
+
+    if (after.size == 0) {
+      throw new Error(`Could not find a child node with key "${key}".`)
+    }
+    return after.get(1)
   },
 
   /**
@@ -822,12 +826,16 @@ const Node = {
    */
 
   getPreviousSibling(key) {
-    const node = this.assertDescendant(key)
-    return this
-      .getParent(node)
-      .nodes
-      .takeUntil(child => child == node)
-      .last()
+    key = Normalize.key(key)
+    const parent = this.getParent(key)
+    const before = parent.nodes
+      .takeUntil(child => child.key == key)
+
+    if (before.size == parent.nodes.size) {
+      throw new Error(`Could not find a child node with key "${key}".`)
+    }
+
+    return before.last()
   },
 
   /**
