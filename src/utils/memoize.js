@@ -2,16 +2,6 @@
 import { Map } from 'immutable'
 
 /**
- * The leaf node of a cache tree.
- *
- * An object, so that immutable maps will key it by reference.
- *
- * @type {Object}
- */
-
-const LEAF = {}
-
-/**
  * An unique value used to detect cache misses
  *
  * @type {Object}
@@ -36,7 +26,7 @@ function memoize(object, properties) {
     }
 
     object[property] = function (...args) {
-      const keys = [property, ...args, LEAF]
+      const keys = [property, ...args]
       this.__cache = this.__cache || new Map()
 
       const cachedValue = this.__cache.getIn(keys, NO_SET)
