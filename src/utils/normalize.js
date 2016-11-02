@@ -6,6 +6,7 @@ import Data from '../models/data'
 import Mark from '../models/mark'
 import Selection from '../models/selection'
 import Text from '../models/text'
+import warning from './warning'
 import typeOf from 'type-of'
 
 /**
@@ -58,12 +59,13 @@ function inline(value) {
  */
 
 function key(value) {
+  if (typeOf(value) == 'string') return value
+
+  warning('Passing a node instead of a key to a method accepting a key can reduce performances')
   if (value instanceof Block) return value.key
   if (value instanceof Document) return value.key
   if (value instanceof Inline) return value.key
   if (value instanceof Text) return value.key
-
-  if (typeOf(value) == 'string') return value
 
   throw new Error(`Invalid \`key\` argument! It must be either a block, an inline, a text, or a string. You passed: "${value}".`)
 }
@@ -221,4 +223,3 @@ export default {
   selection,
   selectionProperties,
 }
-
