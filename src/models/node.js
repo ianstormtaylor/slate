@@ -955,7 +955,15 @@ const Node = {
    */
 
   getFirstText() {
-    return this.findDescendantDeep(node => node.kind == 'text')
+    let descendantFound = null
+
+    const found = this.nodes.find((node) => {
+      if (node.kind == 'text') return true
+      descendantFound = node.getFirstText()
+      return descendantFound
+    })
+
+    return descendantFound || found
   },
 
   /**
