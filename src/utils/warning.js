@@ -1,4 +1,4 @@
-import isDev from './is-dev'
+import IS_DEV from './is-dev'
 
 /**
  * Log a development warning.
@@ -6,7 +6,7 @@ import isDev from './is-dev'
  */
 
 export default function warning(message, ...more) {
-  if (!isDev()) {
+  if (!IS_DEV) {
     return
   }
 

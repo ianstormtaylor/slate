@@ -1,4 +1,4 @@
-const __DEV__ = (
+const IS_DEV = (
   typeof process !== 'undefined' &&
   process.env &&
   process.env.NODE_ENV !== 'production'
@@ -6,9 +6,7 @@ const __DEV__ = (
 
 /**
  * Return true if running slate in development
- * @return {Boolean} dev
+ * @type {Boolean}
  */
 
-export default function isDev() {
-  return __DEV__
-}
+export default IS_DEV
