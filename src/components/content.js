@@ -710,10 +710,8 @@ class Content extends React.Component {
  */
 
 function isNonEditable(event) {
-  const { target, currentTarget } = event
-  const nonEditable = target.closest('[contenteditable="false"]')
-  const isContained = currentTarget.contains(nonEditable)
-  return isContained
+  const { target } = event
+  return !target.isContentEditable
 }
 
 /**
