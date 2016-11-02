@@ -181,7 +181,7 @@ function moveNode(state, operation) {
   const node = document.assertPath(path)
 
   // Remove the node from its current parent
-  let parent = document.getParent(node)
+  let parent = document.getParent(node.key)
   const isParent = document == parent
   const index = parent.nodes.indexOf(node)
   parent = parent.removeNode(index)
@@ -233,7 +233,7 @@ function removeNode(state, operation) {
 
   // Update the document
   const node = document.assertPath(path)
-  let parent = document.getParent(node)
+  let parent = document.getParent(node.key)
   const index = parent.nodes.indexOf(node)
   const isParent = document == parent
   parent = parent.removeNode(index)
@@ -413,14 +413,14 @@ function splitNode(state, operation) {
           : node.getTextAtOffset(offset)
   const textOffset = node.kind == 'text'
           ? offset
-          : offset - node.getOffset(splittedText)
+          : offset - node.getOffset(splittedText.key)
 
   // Should we update the selection ?
   const shouldUpdateAnchor = splittedText.key == anchorKey && textOffset <= anchorOffset
   const shouldUpdateFocus = splittedText.key == focusKey && textOffset <= focusOffset
   if (shouldUpdateFocus || shouldUpdateAnchor) {
     // The node next to `node`, resulting from the split
-    const secondNode = newDocument.getNextSibling(node)
+    const secondNode = newDocument.getNextSibling(node.key)
     let secondText, newOffset
 
     if (shouldUpdateAnchor) {

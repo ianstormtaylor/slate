@@ -1,10 +1,10 @@
 
 export default function (state) {
-  const { document, selection } = state
+  const { document } = state
   const block = document.nodes.get(0)
 
   return state
     .transform()
-    .unwrapBlockByKey(block, 'quote')
+    .unwrapBlockByKey(block.key, 'quote')
     .apply()
 }

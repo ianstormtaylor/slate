@@ -48,10 +48,10 @@ export function _delete(transform) {
 
   const { startText } = state
   const { startKey, startOffset, endKey, endOffset } = selection
-  const block = document.getClosestBlock(startText)
-  const highest = block.getHighestChild(startText)
-  const previous = block.getPreviousSibling(highest)
-  const next = block.getNextSibling(highest)
+  const block = document.getClosestBlock(startText.key)
+  const highest = block.getHighestChild(startText.key)
+  const previous = block.getPreviousSibling(highest.key)
+  const next = block.getNextSibling(highest.key)
 
   if (
     previous &&
@@ -158,7 +158,7 @@ export function insertFragment(transform, fragment) {
   if (!fragment.length) return transform
 
   const lastText = fragment.getLastText()
-  const lastInline = fragment.getClosestInline(lastText)
+  const lastInline = fragment.getClosestInline(lastText.key)
   const beforeTexts = document.getTexts()
   const appending = selection.hasEdgeAtEndOf(document.getDescendant(selection.endKey))
 
@@ -204,7 +204,7 @@ export function insertInline(transform, inline) {
   let { document, selection, startText } = state
   let after
 
-  const hasVoid = document.hasVoidParent(startText)
+  const hasVoid = document.hasVoidParent(startText.key)
   const keys = document.getTexts().map(text => text.key)
 
   transform.unsetSelection()
@@ -219,7 +219,7 @@ export function insertInline(transform, inline) {
   else {
     const text = document.getTexts().find((n) => {
       if (keys.includes(n.key)) return false
-      const parent = document.getParent(n)
+      const parent = document.getParent(n.key)
       if (parent.kind != 'inline') return false
       return true
     })
@@ -314,7 +314,7 @@ export function splitBlock(transform, depth = 1) {
 
   const { startKey } = selection
   const startNode = document.getDescendant(startKey)
-  const nextNode = document.getNextText(startNode)
+  const nextNode = document.getNextText(startNode.key)
   const after = selection.collapseToStartOf(nextNode)
 
   return transform.moveTo(after)
@@ -344,7 +344,7 @@ export function splitInline(transform, depth = Infinity) {
   const { startKey, startOffset } = selection
   let startNode = document.assertDescendant(startKey)
   const furthestInline = document.getFurthestInline(startKey)
-  const offset = furthestInline.getOffset(startNode)
+  const offset = furthestInline.getOffset(startNode.key)
 
   // If the selection is at the start of end of the furthest inline, there isn't
   // anything to split, so abort.
@@ -363,7 +363,7 @@ export function splitInline(transform, depth = Infinity) {
 
   if (closestInline) {
     startNode = document.getDescendant(startKey)
-    const nextNode = document.getNextText(startNode)
+    const nextNode = document.getNextText(startNode.key)
     after = selection.collapseToStartOf(nextNode)
   }
 
@@ -493,7 +493,7 @@ export function wrapInline(transform, properties) {
   }
 
   else if (selection.startOffset == 0) {
-    const text = previous ? document.getNextText(previous) : document.getFirstText()
+    const text = previous ? document.getNextText(previous.key) : document.getFirstText()
     after = selection.moveToRangeOf(text)
   }
 
