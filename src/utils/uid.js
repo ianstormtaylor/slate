@@ -1,6 +1,8 @@
 
 import generate from 'uid'
 
+let N = 0
+
 /**
  * Create a unique identifier.
  *
@@ -8,7 +10,7 @@ import generate from 'uid'
  */
 
 function uid() {
-  return generate(4)
+  return (N++) + generate(4)
 }
 
 /**

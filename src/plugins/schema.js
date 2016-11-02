@@ -202,13 +202,13 @@ const NO_ADJACENT_TEXT_RULE = {
   validate: (node) => {
     const { nodes } = node
     const invalids = nodes
-      .map((n, i) => {
+      .map((child, i) => {
         const next = nodes.get(i + 1)
-        if (n.kind !== 'text' || !next || next.kind !== 'text') {
+        if (child.kind !== 'text' || !next || next.kind !== 'text') {
           return
         }
 
-        return [n, next]
+        return [child, next]
       })
       .filter(Boolean)
 
