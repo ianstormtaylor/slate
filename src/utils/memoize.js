@@ -37,15 +37,17 @@ function memoize(object, properties) {
 
     object[property] = function (...args) {
       const keys = [property, ...args, LEAF]
-      const cache = this.__cache = this.__cache || new Map()
+      this.__cache = this.__cache || new Map()
 
-      const cachedValue = cache.getIn(keys, NO_SET)
+      const cachedValue = this.__cache.getIn(keys, NO_SET)
       if (cachedValue !== NO_SET) {
         return cachedValue
       }
 
       const value = original.apply(this, args)
-      this.__cache = cache.setIn(keys, value)
+      // If `original` is recursive, it might have changed the cache,
+      // so read it from this.__cache
+      this.__cache = this.__cache.setIn(keys, value)
       return value
     }
   }
