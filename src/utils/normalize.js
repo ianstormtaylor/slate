@@ -61,7 +61,7 @@ function inline(value) {
 function key(value) {
   if (typeOf(value) == 'string') return value
 
-  warning('Passing a node instead of a key to a method accepting a key can reduce performances')
+  warning('Deprecation: Passing a node instead of a key to a method accepting a key can reduce performances')
   if (value instanceof Block) return value.key
   if (value instanceof Document) return value.key
   if (value instanceof Inline) return value.key
