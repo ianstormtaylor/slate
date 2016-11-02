@@ -21,6 +21,22 @@ import { List, Set } from 'immutable'
 const Node = {
 
   /**
+   * Return a set of all keys in the node.
+   *
+   * @return {Set<Node>} keys
+   */
+
+  getKeys() {
+    const keys = []
+
+    this.filterDescendants(desc => {
+      keys.push(desc.key)
+    })
+
+    return Set(keys)
+  },
+
+  /**
    * Assert that a node has a child by `key` and return it.
    *
    * @param {String or Node} key
@@ -1044,11 +1060,7 @@ const Node = {
    */
 
   insertNode(index, node) {
-    let keys = new Set([ this.key ])
-
-    this.findDescendant((desc) => {
-      keys = keys.add(desc.key)
-    })
+    let keys = this.getKeys()
 
     if (keys.contains(node.key)) {
       node = node.regenerateKey()
