@@ -3,7 +3,7 @@ const { default: memoize } = require('../../../lib/utils/memoize')
 module.exports = {
   setup(state) {
     let obj = {
-      fibonacci(n) {
+      fibonacci(n = 20) {
         if (n === 0 || n === 1) {
           return n
         } else {
@@ -17,6 +17,6 @@ module.exports = {
   },
 
   run(obj) {
-    obj.fibonacci(20)
+    obj.fibonacci()
   }
 }

@@ -179,6 +179,7 @@ const Node = {
 
   /**
    * Recursively filter all descendant nodes with `iterator`, depth-first.
+   * It is different from `filterDescendants` in regard of the order of results.
    *
    * @param {Function} iterator
    * @return {List} nodes
