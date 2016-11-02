@@ -434,8 +434,25 @@ const Node = {
 
   getDescendant(key) {
     key = Normalize.key(key)
+    return this._getDescendant(key)
+  },
 
-    return this.findDescendantDeep(node => node.key == key)
+  // This one is memoized
+  _getDescendant(key) {
+    let descendantFound = null
+
+    const found = this.nodes.find(node => {
+      if (node.key === key) {
+        return node
+      } else if (node.kind !== 'text') {
+        descendantFound = node._getDescendant(key)
+        return descendantFound
+      } else {
+        return false
+      }
+    })
+
+    return descendantFound || found
   },
 
   /**
@@ -1316,7 +1333,7 @@ memoize(Node, [
   'getComponent',
   'getDecorators',
   'getDepth',
-  'getDescendant',
+  '_getDescendant',
   'getDescendantAtPath',
   'getDescendantDecorators',
   'getFirstText',
