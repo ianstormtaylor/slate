@@ -32,7 +32,10 @@ function _refreshNode(transform, node) {
  */
 
 function _normalizeChildrenWith(transform, schema, node, prevNode) {
-  if (!node.nodes) {
+  if (
+    node.kind == 'text'
+    || (prevNode && prevNode.nodes == node.nodes)
+  ) {
     return transform
   }
 
