@@ -937,7 +937,11 @@ const Node = {
    */
 
   getTexts() {
-    return this.filterDescendants(node => node.kind == 'text')
+    return this.nodes.reduce((texts, node) => {
+      return node.kind == 'text'
+        ? texts.push(node)
+        : texts.concat(node.getTexts())
+    }, List())
   },
 
   /**
