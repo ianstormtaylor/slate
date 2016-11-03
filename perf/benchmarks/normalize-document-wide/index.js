@@ -1,6 +1,6 @@
 
 module.exports = {
   run(state) {
-    return state.transform().normalize().apply()
+    return state.transform({ normalized: false }).normalize().apply()
   }
 }
