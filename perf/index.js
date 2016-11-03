@@ -22,6 +22,8 @@ const readMetadata = require('read-metadata')
 const { Raw } = require('..')
 const { resolve } = require('path')
 
+window.__NO_MEMOIZE = true
+
 const DEFAULT_BENCHMARK = {
   setup(state) { return state },
   run(state) {}
@@ -95,27 +97,19 @@ function runBenchmarks() {
         // memoization between calls to `fn`
         const scope = global.getScope()
 
-        let states = []
-        let numberOfExecution = this.count
-        while (numberOfExecution--) {
-          states.push(
-            // Each benchmark is given the chance to do its own setup
-            scope.benchmark.setup(
-              scope.Raw.deserialize(scope.input, { terse: true })
-            )
-          )
-        }
-
-        let stateIndex = 0
+        const state =
+              // Each benchmark is given the chance to do its own setup
+              scope.benchmark.setup(
+                scope.Raw.deserialize(scope.input, { terse: true })
+              )
       },
 
       // Because of the way BenchmarkJS compiles the functions,
       // the variables declared in `setup` are visible to `fn`
 
       fn() {
-        scope.benchmark.run(states[stateIndex]) // eslint-disable-line no-undef
+        scope.benchmark.run(state) // eslint-disable-line no-undef
         // Next call will use another State instance
-        stateIndex++ // eslint-disable-line no-undef
       }
     }))
   }
