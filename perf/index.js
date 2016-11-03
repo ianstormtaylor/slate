@@ -110,6 +110,10 @@ function runBenchmarks() {
       fn() {
         scope.benchmark.run(state) // eslint-disable-line no-undef
         // Next call will use another State instance
+      },
+
+      onComplete() {
+        global.getScope().benchmark.teardown()
       }
     }))
   }
