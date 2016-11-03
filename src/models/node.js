@@ -378,6 +378,10 @@ const Node = {
    */
 
   getDescendantDecorators(key, schema) {
+    if (!schema.hasDecorators) {
+      return []
+    }
+
     const descendant = this.assertDescendant(key)
     let child = this.getHighestChild(key)
     let decorators = []
