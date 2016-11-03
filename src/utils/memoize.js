@@ -1,3 +1,4 @@
+/* global Map */
 
 /**
  * The leaf node of a cache tree. Used to support variable argument length.
