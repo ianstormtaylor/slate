@@ -1,5 +1,6 @@
 /* eslint no-console: 0 */
 
+import { List } from 'immutable'
 import Normalize from '../utils/normalize'
 
 /**
@@ -368,7 +369,7 @@ export function insertFragmentAtRange(transform, range, fragment, options = {}) 
 
   if (firstBlock != lastBlock) {
     const nextChild = startBlock.getNextSibling(startChild.key)
-    const nextNodes = startBlock.nodes.skipUntil(n => n.key == nextChild.key)
+    const nextNodes = nextChild ? startBlock.nodes.skipUntil(n => n.key == nextChild.key) : List()
     const lastIndex = lastBlock.nodes.size
 
     nextNodes.forEach((node, i) => {
