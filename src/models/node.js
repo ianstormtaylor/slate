@@ -163,6 +163,19 @@ const Node = {
   },
 
   /**
+   * Recursively iterate over all descendant nodes with `iterator`.
+   *
+   * @param {Function} iterator
+   */
+
+  forEachDescendant(iterator) {
+    return this.nodes.forEach((child, i, nodes) => {
+      iterator(child, i, nodes)
+      if (child.kind != 'text') child.forEachDescendant(iterator)
+    })
+  },
+
+  /**
    * Recursively filter all descendant nodes with `iterator`.
    *
    * @param {Function} iterator
@@ -170,11 +183,13 @@ const Node = {
    */
 
   filterDescendants(iterator) {
-    return this.nodes.reduce((matches, child, i, nodes) => {
-      if (iterator(child, i, nodes)) matches = matches.push(child)
-      if (child.kind != 'text') matches = matches.concat(child.filterDescendants(iterator))
-      return matches
-    }, Block.createList())
+    const matches = []
+
+    this.forEachDescendant((child, i, nodes) => {
+      if (iterator(child, i, nodes)) matches.push(child)
+    })
+
+    return List(matches)
   },
 
   /**
@@ -920,11 +935,7 @@ const Node = {
    */
 
   getTexts() {
-    return this.nodes.reduce((texts, node) => {
-      return node.kind == 'text'
-        ? texts.push(node)
-        : texts.concat(node.getTexts())
-    }, Block.createList())
+    return this.filterDescendants(node => node.kind == 'text')
   },
 
   /**
