@@ -79,7 +79,7 @@ export function deleteAtRange(transform, range, options = {}) {
   state = transform.state
   document = state.document
   const startBlock = document.getClosestBlock(startKey)
-  const endBlock = document.getClosestBlock(document.getNextText(endKey))
+  const endBlock = document.getClosestBlock(document.getNextText(endKey).key)
 
   // remove all of the nodes between range
   ancestor = document.getCommonAncestor(startKey, endKey)
@@ -103,7 +103,7 @@ export function deleteAtRange(transform, range, options = {}) {
       transform.moveNodeByKey(child.key, newKey, newIndex, { normalize: false })
     })
 
-    const lonely = document.getFurthest(endBlock, p => p.nodes.size == 1) || endBlock
+    const lonely = document.getFurthest(endBlock.key, p => p.nodes.size == 1) || endBlock
     transform.removeNodeByKey(lonely.key, { normalize: false })
   }
 
@@ -153,9 +153,9 @@ export function deleteBackwardAtRange(transform, range, n = 1, options = {}) {
 
   const text = document.getDescendant(startKey)
   if (range.isAtStartOf(text)) {
-    const prev = document.getPreviousText(text)
-    const prevBlock = document.getClosestBlock(prev)
-    const prevInline = document.getClosestInline(prev)
+    const prev = document.getPreviousText(text.key)
+    const prevBlock = document.getClosestBlock(prev.key)
+    const prevInline = document.getClosestInline(prev.key)
 
     if (prevBlock && prevBlock.isVoid) {
       return transform.removeNodeByKey(prevBlock.key, { normalize })
@@ -218,9 +218,9 @@ export function deleteForwardAtRange(transform, range, n = 1, options = {}) {
 
   const text = document.getDescendant(startKey)
   if (range.isAtEndOf(text)) {
-    const next = document.getNextText(text)
-    const nextBlock = document.getClosestBlock(next)
-    const nextInline = document.getClosestInline(next)
+    const next = document.getNextText(text.key)
+    const nextBlock = document.getClosestBlock(next.key)
+    const nextInline = document.getClosestInline(next.key)
 
     if (nextBlock && nextBlock.isVoid) {
       return transform.removeNodeByKey(nextBlock.key, { normalize })
@@ -270,7 +270,7 @@ export function insertBlockAtRange(transform, range, block, options = {}) {
   const { startKey, startOffset } = range
   const startText = document.assertDescendant(startKey)
   const startBlock = document.getClosestBlock(startKey)
-  const parent = document.getParent(startBlock)
+  const parent = document.getParent(startBlock.key)
   const index = parent.nodes.indexOf(startBlock)
 
   if (startBlock.isVoid) {
@@ -291,7 +291,7 @@ export function insertBlockAtRange(transform, range, block, options = {}) {
   }
 
   else {
-    const offset = startBlock.getOffset(startText) + startOffset
+    const offset = startBlock.getOffset(startText.key) + startOffset
     transform.splitNodeByKey(startBlock.key, offset, { normalize })
     transform.insertNodeByKey(parent.key, index + 1, block, { normalize })
   }
@@ -332,23 +332,23 @@ export function insertFragmentAtRange(transform, range, fragment, options = {}) 
   let { state } = transform
   let { document } = state
   let startText = document.getDescendant(startKey)
-  let startBlock = document.getClosestBlock(startText)
-  let startChild = startBlock.getHighestChild(startText)
-  const parent = document.getParent(startBlock)
+  let startBlock = document.getClosestBlock(startText.key)
+  let startChild = startBlock.getHighestChild(startText.key)
+  const parent = document.getParent(startBlock.key)
   const index = parent.nodes.indexOf(startBlock)
   const offset = startChild == startText
     ? startOffset
-    : startChild.getOffset(startText) + startOffset
+    : startChild.getOffset(startText.key) + startOffset
 
   const blocks = fragment.getBlocks()
   const firstBlock = blocks.first()
   const lastBlock = blocks.last()
 
   if (firstBlock != lastBlock) {
-    const lonelyParent = fragment.getFurthest(firstBlock, p => p.nodes.size == 1)
+    const lonelyParent = fragment.getFurthest(firstBlock.key, p => p.nodes.size == 1)
     const lonelyChild = lonelyParent || firstBlock
     const startIndex = parent.nodes.indexOf(startBlock)
-    fragment = fragment.removeDescendant(lonelyChild)
+    fragment = fragment.removeDescendant(lonelyChild.key)
 
     fragment.nodes.forEach((node, i) => {
       const newIndex = startIndex + i + 1
@@ -364,11 +364,11 @@ export function insertFragmentAtRange(transform, range, fragment, options = {}) 
   document = state.document
   startText = document.getDescendant(startKey)
   startBlock = document.getClosestBlock(startKey)
-  startChild = startBlock.getHighestChild(startText)
+  startChild = startBlock.getHighestChild(startText.key)
 
   if (firstBlock != lastBlock) {
-    const nextChild = startBlock.getNextSibling(startChild)
-    const nextNodes = startBlock.nodes.skipUntil(n => n == nextChild)
+    const nextChild = startBlock.getNextSibling(startChild.key)
+    const nextNodes = startBlock.nodes.skipUntil(n => n.key == nextChild.key)
     const lastIndex = lastBlock.nodes.size
 
     nextNodes.forEach((node, i) => {
@@ -381,7 +381,7 @@ export function insertFragmentAtRange(transform, range, fragment, options = {}) 
     transform.removeNodeByKey(startBlock.key, { normalize: false })
     transform.insertNodeByKey(parent.key, index, firstBlock, { normalize: false })
   } else {
-    const inlineChild = startBlock.getHighestChild(startText)
+    const inlineChild = startBlock.getHighestChild(startText.key)
     const inlineIndex = startBlock.nodes.indexOf(inlineChild)
 
     firstBlock.nodes.forEach((inline, i) => {
@@ -581,14 +581,14 @@ export function splitBlockAtRange(transform, range, height = 1, options = {}) {
   const { state } = transform
   const { document } = state
   let node = document.assertDescendant(startKey)
-  let parent = document.getClosestBlock(node)
+  let parent = document.getClosestBlock(node.key)
   let offset = startOffset
   let h = 0
 
   while (parent && parent.kind == 'block' && h < height) {
-    offset += parent.getOffset(node)
+    offset += parent.getOffset(node.key)
     node = parent
-    parent = document.getClosestBlock(parent)
+    parent = document.getClosestBlock(parent.key)
     h++
   }
 
@@ -619,14 +619,14 @@ export function splitInlineAtRange(transform, range, height = Infinity, options 
   const { state } = transform
   const { document } = state
   let node = document.assertDescendant(startKey)
-  let parent = document.getClosestInline(node)
+  let parent = document.getClosestInline(node.key)
   let offset = startOffset
   let h = 0
 
   while (parent && parent.kind == 'inline' && h < height) {
-    offset += parent.getOffset(node)
+    offset += parent.getOffset(node.key)
     node = parent
-    parent = document.getClosestInline(parent)
+    parent = document.getClosestInline(parent.key)
     h++
   }
 
@@ -687,7 +687,7 @@ export function unwrapBlockAtRange(transform, range, properties, options = {}) {
   const blocks = document.getBlocksAtRange(range)
   const wrappers = blocks
     .map((block) => {
-      return document.getClosest(block, (parent) => {
+      return document.getClosest(block.key, (parent) => {
         if (parent.kind != 'block') return false
         if (properties.type != null && parent.type != properties.type) return false
         if (properties.isVoid != null && parent.isVoid != properties.isVoid) return false
@@ -702,11 +702,11 @@ export function unwrapBlockAtRange(transform, range, properties, options = {}) {
   wrappers.forEach((block) => {
     const first = block.nodes.first()
     const last = block.nodes.last()
-    const parent = document.getParent(block)
+    const parent = document.getParent(block.key)
     const index = parent.nodes.indexOf(block)
 
     const children = block.nodes.filter((child) => {
-      return blocks.some(b => child == b || child.hasDescendant(b))
+      return blocks.some(b => child == b || child.hasDescendant(b.key))
     })
 
     const firstMatch = children.first()
@@ -738,12 +738,12 @@ export function unwrapBlockAtRange(transform, range, properties, options = {}) {
     }
 
     else {
-      const offset = block.getOffset(firstMatch)
+      const offset = block.getOffset(firstMatch.key)
 
       transform.splitNodeByKey(block.key, offset, { normalize: false })
       state = transform.state
       document = state.document
-      const extra = document.getPreviousSibling(firstMatch)
+      const extra = document.getPreviousSibling(firstMatch.key)
 
       children.forEach((child, i) => {
         transform.moveNodeByKey(child.key, parent.key, index + 1 + i, { normalize: false })
@@ -781,7 +781,7 @@ export function unwrapInlineAtRange(transform, range, properties, options = {}) 
   const texts = document.getTextsAtRange(range)
   const inlines = texts
     .map((text) => {
-      return document.getClosest(text, (parent) => {
+      return document.getClosest(text.key, (parent) => {
         if (parent.kind != 'inline') return false
         if (properties.type != null && parent.type != properties.type) return false
         if (properties.isVoid != null && parent.isVoid != properties.isVoid) return false
@@ -794,7 +794,7 @@ export function unwrapInlineAtRange(transform, range, properties, options = {}) 
     .toList()
 
   inlines.forEach((inline) => {
-    const parent = document.getParent(inline)
+    const parent = document.getParent(inline.key)
     const index = parent.nodes.indexOf(inline)
 
     inline.nodes.forEach((child, i) => {
@@ -836,14 +836,14 @@ export function wrapBlockAtRange(transform, range, block, options = {}) {
 
   // if there is only one block in the selection then we know the parent and siblings
   if (blocks.length === 1) {
-    parent = document.getParent(firstblock)
+    parent = document.getParent(firstblock.key)
     siblings = blocks
   }
 
   // determine closest shared parent to all blocks in selection
   else {
-    parent = document.getClosest(firstblock, p1 => {
-      return !!document.getClosest(lastblock, p2 => p1 == p2)
+    parent = document.getClosest(firstblock.key, p1 => {
+      return !!document.getClosest(lastblock.key, p2 => p1 == p2)
     })
   }
 
@@ -853,8 +853,8 @@ export function wrapBlockAtRange(transform, range, block, options = {}) {
   // create a list of direct children siblings of parent that fall in the selection
   if (siblings == null) {
     const indexes = parent.nodes.reduce((ind, node, i) => {
-      if (node == firstblock || node.hasDescendant(firstblock)) ind[0] = i
-      if (node == lastblock || node.hasDescendant(lastblock)) ind[1] = i
+      if (node == firstblock || node.hasDescendant(firstblock.key)) ind[0] = i
+      if (node == lastblock || node.hasDescendant(lastblock.key)) ind[1] = i
       return ind
     }, [])
 
@@ -935,7 +935,7 @@ export function wrapInlineAtRange(transform, range, inline, options = {}) {
 
     const startInner = startOff == 0
       ? startChild
-      : document.getNextSibling(startChild)
+      : document.getNextSibling(startChild.key)
 
     const startInnerIndex = startBlock.nodes.indexOf(startInner)
 

@@ -381,7 +381,7 @@ export function wrapBlockByKey(transform, key, block, options) {
 
   const { document } = transform.state
   const node = document.assertDescendant(key)
-  const parent = document.getParent(node)
+  const parent = document.getParent(node.key)
   const index = parent.nodes.indexOf(node)
 
   return transform

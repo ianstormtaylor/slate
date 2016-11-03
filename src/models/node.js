@@ -202,7 +202,7 @@ const Node = {
   getBlocks() {
     return this
       .getTexts()
-      .map(text => this.getClosestBlock(text))
+      .map(text => this.getClosestBlock(text.key))
       .toOrderedSet()
       .toList()
   },
@@ -217,7 +217,7 @@ const Node = {
   getBlocksAtRange(range) {
     return this
       .getTextsAtRange(range)
-      .map(text => this.getClosestBlock(text))
+      .map(text => this.getClosestBlock(text.key))
   },
 
   /**
@@ -277,6 +277,7 @@ const Node = {
    */
 
   getClosest(key, iterator) {
+    key = Normalize.key(key)
     let ancestors = this.getAncestors(key)
     if (!ancestors) {
       throw new Error(`Could not find a descendant node with key "${key}".`)
@@ -337,12 +338,12 @@ const Node = {
 
     while (oneParent) {
       ancestors = ancestors.push(oneParent)
-      oneParent = this.getParent(oneParent)
+      oneParent = this.getParent(oneParent.key)
     }
 
     while (twoParent) {
       if (ancestors.includes(twoParent)) return twoParent
-      twoParent = this.getParent(twoParent)
+      twoParent = this.getParent(twoParent.key)
     }
   },
 
@@ -508,6 +509,7 @@ const Node = {
   getFurthest(key, iterator) {
     let ancestors = this.getAncestors(key)
     if (!ancestors) {
+      key = Normalize.key(key)
       throw new Error(`Could not find a descendant node with key "${key}".`)
     }
 
@@ -581,7 +583,7 @@ const Node = {
   getInlines() {
     return this
       .getTexts()
-      .map(text => this.getFurthestInline(text))
+      .map(text => this.getFurthestInline(text.key))
       .filter(exists => exists)
       .toOrderedSet()
       .toList()
@@ -597,7 +599,7 @@ const Node = {
   getInlinesAtRange(range) {
     return this
       .getTextsAtRange(range)
-      .map(text => this.getClosestInline(text))
+      .map(text => this.getClosestInline(text.key))
       .filter(exists => exists)
       .toOrderedSet()
       .toList()
@@ -659,7 +661,7 @@ const Node = {
     const next = this.getNextText(last)
     if (!next) return null
 
-    return this.getClosestBlock(next)
+    return this.getClosestBlock(next.key)
   },
 
   /**
@@ -670,12 +672,16 @@ const Node = {
    */
 
   getNextSibling(key) {
-    const node = this.assertDescendant(key)
-    return this
-      .getParent(node)
-      .nodes
-      .skipUntil(child => child == node)
-      .get(1)
+    key = Normalize.key(key)
+
+    const parent = this.getParent(key)
+    const after = parent.nodes
+      .skipUntil(child => child.key == key)
+
+    if (after.size == 0) {
+      throw new Error(`Could not find a child node with key "${key}".`)
+    }
+    return after.get(1)
   },
 
   /**
@@ -822,12 +828,16 @@ const Node = {
    */
 
   getPreviousSibling(key) {
-    const node = this.assertDescendant(key)
-    return this
-      .getParent(node)
-      .nodes
-      .takeUntil(child => child == node)
-      .last()
+    key = Normalize.key(key)
+    const parent = this.getParent(key)
+    const before = parent.nodes
+      .takeUntil(child => child.key == key)
+
+    if (before.size == parent.nodes.size) {
+      throw new Error(`Could not find a child node with key "${key}".`)
+    }
+
+    return before.last()
   },
 
   /**
@@ -865,7 +875,7 @@ const Node = {
     const previous = this.getPreviousText(first)
     if (!previous) return null
 
-    return this.getClosestBlock(previous)
+    return this.getClosestBlock(previous.key)
   },
 
   /**
@@ -1055,7 +1065,7 @@ const Node = {
 
   joinNode(first, second) {
     let node = this
-    let parent = node.getParent(second)
+    let parent = node.getParent(second.key)
     const isParent = node == parent
     const index = parent.nodes.indexOf(second)
 
@@ -1180,7 +1190,7 @@ const Node = {
   splitNode(path, offset) {
     let base = this
     let node = base.assertPath(path)
-    let parent = base.getParent(node)
+    let parent = base.getParent(node.key)
     const isParent = base == parent
     const index = parent.nodes.indexOf(node)
 
@@ -1194,7 +1204,7 @@ const Node = {
 
     while (child && child != parent) {
       if (child.kind == 'text') {
-        const i = node.kind == 'text' ? offset : offset - node.getOffset(child)
+        const i = node.kind == 'text' ? offset : offset - node.getOffset(child.key)
         const { characters } = child
         const oneChars = characters.take(i)
         const twoChars = characters.skip(i)
@@ -1215,7 +1225,7 @@ const Node = {
         two = child.merge({ nodes: twoNodes, key: uid() })
       }
 
-      child = base.getParent(child)
+      child = base.getParent(child.key)
     }
 
     parent = parent.removeNode(index)
@@ -1237,14 +1247,14 @@ const Node = {
     const { startKey, startOffset } = range
     let base = this
     let node = base.assertDescendant(startKey)
-    let parent = base.getClosestBlock(node)
+    let parent = base.getClosestBlock(node.key)
     let offset = startOffset
     let h = 0
 
     while (parent && parent.kind == 'block' && h < height) {
-      offset += parent.getOffset(node)
+      offset += parent.getOffset(node.key)
       node = parent
-      parent = base.getClosestBlock(parent)
+      parent = base.getClosestBlock(parent.key)
       h++
     }
 
