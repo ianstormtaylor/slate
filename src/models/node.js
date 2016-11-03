@@ -29,11 +29,22 @@ const Node = {
   getKeys() {
     const keys = []
 
-    this.filterDescendants(desc => {
+    this.forEachDescendant(desc => {
       keys.push(desc.key)
     })
 
     return Set(keys)
+  },
+
+  /**
+   * Get the concatenated text `string` of all child nodes.
+   *
+   * @return {String} text
+   */
+
+  getText() {
+    return this.nodes
+      .reduce((result, node) => result + node.text, '')
   },
 
   /**
@@ -148,18 +159,31 @@ const Node = {
    */
 
   findDescendantDeep(iterator) {
-    let descendantFound = null
+    let found
 
-    const found = this.nodes.find(node => {
-      if (node.kind != 'text') {
-        descendantFound = node.findDescendantDeep(iterator)
-        return descendantFound || iterator(node)
+    this.forEachDescendant(node => {
+      if (iterator(node)) {
+        found = node
+        return false
       }
-
-      return iterator(node) ? node : null
     })
 
-    return descendantFound || found
+    return found
+  },
+
+  /**
+   * Recursively iterate over all descendant nodes with `iterator`.
+   *
+   * @param {Function} iterator
+   */
+
+  forEachDescendant(iterator) {
+    return this.nodes.forEach((child, i, nodes) => {
+      if (iterator(child, i, nodes) === false) {
+        return false
+      }
+      if (child.kind != 'text') child.forEachDescendant(iterator)
+    })
   },
 
   /**
@@ -170,11 +194,13 @@ const Node = {
    */
 
   filterDescendants(iterator) {
-    return this.nodes.reduce((matches, child, i, nodes) => {
-      if (iterator(child, i, nodes)) matches = matches.push(child)
-      if (child.kind != 'text') matches = matches.concat(child.filterDescendants(iterator))
-      return matches
-    }, Block.createList())
+    const matches = []
+
+    this.forEachDescendant((child, i, nodes) => {
+      if (iterator(child, i, nodes)) matches.push(child)
+    })
+
+    return List(matches)
   },
 
   /**
@@ -924,7 +950,7 @@ const Node = {
       return node.kind == 'text'
         ? texts.push(node)
         : texts.concat(node.getTexts())
-    }, Block.createList())
+    }, List())
   },
 
   /**
@@ -1298,6 +1324,7 @@ const Node = {
  */
 
 memoize(Node, [
+  'getText',
   'getAncestors',
   'getBlocks',
   'getBlocksAtRange',

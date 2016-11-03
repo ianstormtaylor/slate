@@ -112,8 +112,7 @@ class Text extends new Record(DEFAULTS) {
 
   get text() {
     return this.characters
-      .map(char => char.text)
-      .join('')
+      .reduce((result, char) => result + char.text, '')
   }
 
   /**
