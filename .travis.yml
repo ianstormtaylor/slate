@@ -9,7 +9,7 @@ script:
     if [ "$TEST_TYPE" = test ]; then
       npm test
     elif [ "$TEST_TYPE" = benchmarks ]; then
-      npm run benchmarks
+      npm run perf
     elif [ "$TEST_TYPE" = lint ]; then
       npm run lint
     fi
