@@ -42,6 +42,10 @@ function memoize(object, properties) {
     }
 
     object[property] = function (...args) {
+      if (window.__NO_MEMOIZE) {
+        return original.apply(this, args)
+      }
+
       const keys = [property, ...args]
       this.__cache = this.__cache || new Map()
 
