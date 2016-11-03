@@ -29,7 +29,7 @@ const Node = {
   getKeys() {
     const keys = []
 
-    this.filterDescendants(desc => {
+    this.forEachDescendant(desc => {
       keys.push(desc.key)
     })
 
