@@ -159,18 +159,16 @@ const Node = {
    */
 
   findDescendantDeep(iterator) {
-    let descendantFound = null
+    let found
 
-    const found = this.nodes.find(node => {
-      if (node.kind != 'text') {
-        descendantFound = node.findDescendantDeep(iterator)
-        return descendantFound || iterator(node)
+    this.forEachDescendant(node => {
+      if (iterator(node)) {
+        found = node
+        return false
       }
-
-      return iterator(node) ? node : null
     })
 
-    return descendantFound || found
+    return found
   },
 
   /**
