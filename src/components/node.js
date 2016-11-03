@@ -313,7 +313,7 @@ class Node extends React.Component {
   renderText = () => {
     const { node, schema, state } = this.props
     const { document } = state
-    const decorators = document.getDescendantDecorators(node.key, schema)
+    const decorators = schema.hasDecorators ? document.getDescendantDecorators(node.key, schema) : []
     const ranges = node.getRanges(decorators)
     let offset = 0
 
