@@ -83,9 +83,7 @@ class Document extends new Record(DEFAULTS) {
    */
 
   get text() {
-    return this.nodes
-      .map(node => node.text)
-      .join('')
+    return this.getText()
   }
 
 }

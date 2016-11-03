@@ -37,6 +37,17 @@ const Node = {
   },
 
   /**
+   * Get the concatenated text `string` of all child nodes.
+   *
+   * @return {String} text
+   */
+
+  getText() {
+    return this.nodes
+      .reduce((result, node) => result + node.text, '')
+  },
+
+  /**
    * Assert that a node has a child by `key` and return it.
    *
    * @param {String or Node} key
@@ -1315,6 +1326,7 @@ const Node = {
  */
 
 memoize(Node, [
+  'getText',
   'getAncestors',
   'getBlocks',
   'getBlocksAtRange',
