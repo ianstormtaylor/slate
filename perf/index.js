@@ -20,6 +20,8 @@ const fs = require('fs')
 const _ = require('lodash')
 const readMetadata = require('read-metadata')
 const { Raw } = require('..')
+const memoize = require('../lib/utils/memoize')
+
 const { resolve } = require('path')
 
 const DEFAULT_BENCHMARK = {
@@ -75,6 +77,7 @@ function runBenchmarks() {
     // Setup global scope for this benchmark
     global.setScope(benchmarkName, {
       Raw,
+      memoize,
       benchmark,
       input
     })
@@ -91,31 +94,25 @@ function runBenchmarks() {
 
       // Time spent in setup is not taken into account
       setup() {
-        // Create as much independant Slate.State as needed, to avoid
-        // memoization between calls to `fn`
         const scope = global.getScope()
-
-        let states = []
-        let numberOfExecution = this.count
-        while (numberOfExecution--) {
-          states.push(
-            // Each benchmark is given the chance to do its own setup
-            scope.benchmark.setup(
-              scope.Raw.deserialize(scope.input, { terse: true })
-            )
-          )
-        }
-
-        let stateIndex = 0
+        // Each benchmark is given the chance to do its own setup
+        const state = scope.benchmark.setup(
+          scope.Raw.deserialize(scope.input, { terse: true })
+        )
       },
 
       // Because of the way BenchmarkJS compiles the functions,
       // the variables declared in `setup` are visible to `fn`
 
       fn() {
-        scope.benchmark.run(states[stateIndex]) // eslint-disable-line no-undef
-        // Next call will use another State instance
-        stateIndex++ // eslint-disable-line no-undef
+        scope.benchmark.run(state) // eslint-disable-line no-undef
+        // Clear memoized values between each run
+        scope.memoize.__clear() // eslint-disable-line no-undef
+      },
+
+      onComplete() {
+        const teardown = global.getScope().benchmark.teardown
+        if (teardown) teardown()
       }
     }))
   }
