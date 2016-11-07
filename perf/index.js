@@ -26,6 +26,7 @@ const { resolve } = require('path')
 
 const DEFAULT_BENCHMARK = {
   setup(state) { return state },
+  teardown() {},
   run(state) {}
 }
 
@@ -111,8 +112,7 @@ function runBenchmarks() {
       },
 
       onComplete() {
-        const teardown = global.getScope().benchmark.teardown
-        if (teardown) teardown()
+        global.getScope().benchmark.teardown()
       }
     }))
   }
