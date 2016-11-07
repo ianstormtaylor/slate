@@ -332,12 +332,10 @@ class Selection extends new Record(DEFAULTS) {
 
     // If `isBackward` is not set, derive it.
     if (isBackward == null) {
-      let texts = node.getTexts()
-      let anchorIndex = texts.indexOf(anchorNode)
-      let focusIndex = texts.indexOf(focusNode)
-      isBackward = anchorIndex == focusIndex
-        ? anchorOffset > focusOffset
-        : anchorIndex > focusIndex
+      if (anchorKey === focusKey) {
+        isBackward = anchorOffset > focusOffset
+      } else {
+        isBackward = !node.areDescendantSorted(anchorKey, focusKey)
     }
 
     // Merge in any updated properties.

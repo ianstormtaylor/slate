@@ -471,6 +471,31 @@ const Node = {
   },
 
   /**
+   * True if the node has both descendants in that order, false
+   * otherwise. The order is depth-first, post-order.
+   *
+   * @param {String} key1
+   * @param {String} key2
+   * @return {Boolean} True if nodes are found in this order
+   */
+
+  areDescendantSorted(key1, key2) {
+    let sorted
+
+    this.forEachDescendant(n => {
+      if (n.key === key1) {
+        sorted = true
+        return false
+      } else if (n.key === key2) {
+        sorted = false
+        return false
+      }
+    })
+
+    return sorted
+  },
+
+  /**
    * Get the depth of a child node by `key`, with optional `startAt`.
    *
    * @param {String or Node} key
