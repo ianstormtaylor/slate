@@ -1,5 +1,18 @@
 /* global Map */
 
+import IS_DEV from './is-dev'
+
+/**
+ * This module serves to memoize methods on immutable instances.
+ */
+
+// Global: True if memoization should is enabled. Only effective in DEV mode
+let ENABLED = true
+
+// Global: Changing this cache key will clear all previous cached
+// results. Only effective in DEV mode
+let CACHE_KEY = 0
+
 /**
  * The leaf node of a cache tree. Used to support variable argument length.
  *
@@ -42,8 +55,15 @@ function memoize(object, properties) {
     }
 
     object[property] = function (...args) {
-      if (window.__NO_MEMOIZE) {
-        return original.apply(this, args)
+      if (IS_DEV) {
+        if (!ENABLED) {
+          // Memoization disabled
+          return original.apply(this, args)
+        } else if (CACHE_KEY !== this.__cache_key) {
+          // Previous caches must be cleared
+          this.__cache_key = CACHE_KEY
+          this.__cache = new Map()
+        }
       }
 
       const keys = [property, ...args]
@@ -119,7 +139,33 @@ function getIn(map, keys) {
 }
 
 /**
+ * In DEV mode, clears the previously memoized values, globally.
+ * @return {Void}
+ */
+
+function __clear() {
+  CACHE_KEY++
+  if (CACHE_KEY >= Number.MAX_SAFE_INTEGER) {
+    CACHE_KEY = 0
+  }
+}
+
+/**
+ * In DEV mode, enable or disable the use of memoize values, globally.
+ * @param {Boolean} enabled
+ * @return {Void}
+ */
+
+function __enable(enabled) {
+  ENABLED = enabled
+}
+
+/**
  * Export.
  */
 
-export default memoize
+export {
+  memoize as default,
+  __clear,
+  __enable
+}
