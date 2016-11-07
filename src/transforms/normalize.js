@@ -1,6 +1,7 @@
 import warning from '../utils/warning'
 import { default as defaultSchema } from '../plugins/schema'
 import Normalize from '../utils/normalize'
+import { Map } from 'immutable'
 
 // Maximum recursive calls for normalization
 const MAX_CALLS = 50
@@ -40,9 +41,13 @@ function _normalizeChildrenWith(transform, schema, node, prevNode) {
     return transform
   }
 
+  const prevChildrenMap = new Map().withMutations(map => {
+    if (prevNode) prevNode.nodes.forEach(n => map.set(n.key, n))
+  })
+
   return node.nodes.reduce(
     (t, child) => {
-      const prevChild = prevNode ? prevNode.getChild(child.key) : null
+      const prevChild = prevChildrenMap.get(child.key)
       return t.normalizeNodeWith(schema, child, prevChild)
     },
     transform
