@@ -111,7 +111,8 @@ function runBenchmarks() {
       },
 
       onComplete() {
-        global.getScope().benchmark.teardown()
+        const teardown = global.getScope().benchmark.teardown
+        if (teardown) teardown()
       }
     }))
   }
