@@ -1,5 +1,4 @@
 
-import memoize from '../utils/memoize'
 import getLeafText from '../utils/get-leaf-text'
 import warning from '../utils/warning'
 import { Record } from 'immutable'
@@ -697,23 +696,6 @@ EDGE_METHODS.forEach((pattern) => {
     return this[anchor](...args) || this[focus](...args)
   }
 })
-
-/**
- * Memoize read methods.
- */
-
-memoize(Selection.prototype, [
-  'hasAnchorAtStartOf',
-  'hasAnchorAtEndOf',
-  'hasAnchorBetween',
-  'hasAnchorIn',
-  'hasFocusAtEndOf',
-  'hasFocusAtStartOf',
-  'hasFocusBetween',
-  'hasFocusIn',
-  'isAtStartOf',
-  'isAtEndOf'
-])
 
 /**
  * Export.
