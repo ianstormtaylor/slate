@@ -178,12 +178,19 @@ const Node = {
    */
 
   forEachDescendant(iterator) {
-    return this.nodes.forEach((child, i, nodes) => {
+    let returned // Returned value of iterator. False to break from loop
+
+    this.nodes.forEach((child, i, nodes) => {
       if (iterator(child, i, nodes) === false) {
-        return false
+        return returned = false
       }
-      if (child.kind != 'text') child.forEachDescendant(iterator)
+
+      if (child.kind != 'text') {
+        return returned = child.forEachDescendant(iterator)
+      }
     })
+
+    return returned
   },
 
   /**
