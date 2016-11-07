@@ -978,11 +978,26 @@ const Node = {
    */
 
   getTexts() {
+    return List(this._getTexts())
+  },
+
+  /**
+   * Recursively get all of the child text nodes in order of appearance.
+   *
+   * @return {Array} nodes
+   */
+
+  // This one is memoized
+
+  _getTexts() {
     return this.nodes.reduce((texts, node) => {
-      return node.kind == 'text'
-        ? texts.push(node)
-        : texts.concat(node.getTexts())
-    }, List())
+      if (node.kind == 'text') {
+        texts.push(node)
+        return texts
+      } else {
+        return texts.concat(node._getTexts())
+      }
+    }, [])
   },
 
   /**
@@ -1390,7 +1405,7 @@ memoize(Node, [
   'getPreviousText',
   'getTextAtOffset',
   'getTextDirection',
-  'getTexts',
+  '_getTexts',
   'getTextsAtRange',
   'hasVoidParent',
   'isInlineSplitAtRange'
