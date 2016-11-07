@@ -190,8 +190,11 @@ class Selection extends new Record(DEFAULTS) {
    */
 
   hasAnchorIn(node) {
-    const nodes = node.kind == 'text' ? [node] : node.getTexts()
-    return nodes.some(n => n.key == this.anchorKey)
+    if (node.kind == 'text') {
+      return node.key === this.anchorKey
+    } else {
+      return node.hasDescendant(this.anchorKey)
+    }
   }
 
   /**
@@ -245,8 +248,11 @@ class Selection extends new Record(DEFAULTS) {
    */
 
   hasFocusIn(node) {
-    const nodes = node.kind == 'text' ? [node] : node.getTexts()
-    return nodes.some(n => n.key == this.focusKey)
+    if (node.kind == 'text') {
+      return node.key === this.focusKey
+    } else {
+      return node.hasDescendant(this.focusKey)
+    }
   }
 
   /**
