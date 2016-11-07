@@ -336,6 +336,7 @@ class Selection extends new Record(DEFAULTS) {
         isBackward = anchorOffset > focusOffset
       } else {
         isBackward = !node.areDescendantSorted(anchorKey, focusKey)
+      }
     }
 
     // Merge in any updated properties.
