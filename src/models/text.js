@@ -48,15 +48,16 @@ class Text extends new Record(DEFAULTS) {
    * Create a new `Text` from a string
    *
    * @param {String} content
+   * @param {Set<Mark>} marks (optional)
    * @return {Text}
    */
 
-  static createFromString(content) {
+  static createFromString(content, marks = Set()) {
       return Text.create({
         characters: Character.createList(
           content.split('')
           .map(c => {
-            return { text: c }
+            return { text: c, marks }
           })
         )
       })
