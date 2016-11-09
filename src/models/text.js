@@ -1,19 +1,10 @@
 
 import Character from './character'
 import Mark from './mark'
+import Range from './range'
 import memoize from '../utils/memoize'
 import uid from '../utils/uid'
 import { List, Record, Set } from 'immutable'
-
-/**
- * Range.
- */
-
-const Range = new Record({
-  kind: 'range',
-  marks: new Set(),
-  text: ''
-})
 
 /**
  * Default properties.
@@ -47,19 +38,30 @@ class Text extends new Record(DEFAULTS) {
   /**
    * Create a new `Text` from a string
    *
-   * @param {String} content
+   * @param {String} text
    * @param {Set<Mark>} marks (optional)
    * @return {Text}
    */
 
-  static createFromString(content, marks = Set()) {
+  static createFromString(text, marks = Set()) {
+      return Text.createFromRanges([
+          Range.create({ text, marks })
+      ])
+  }
+
+  /**
+   * Create a new `Text` from a list of ranges
+   *
+   * @param {List<Range> | Array<Range>} ranges
+   * @return {Text}
+   */
+
+  static createFromRanges(ranges) {
       return Text.create({
-        characters: Character.createList(
-          content.split('')
-          .map(c => {
-            return { text: c, marks }
-          })
-        )
+        characters: ranges.reduce((characters, range) => {
+          range = Range.create(range)
+          return characters.concat(range.getCharacters())
+        }, Character.createList())
       })
   }
 

@@ -16,7 +16,8 @@ A text node in a Slate [`Document`](./document.md). Text nodes are always the bo
   - [`text`](#text)
 - [Static Methods](#static-methods)
   - [`Text.create`](#textcreate)
-
+  - [`Text.createFromString`](#textcreatefromstring)
+  - [`Text.createFromRanges`](#textcreatefromranges)
 
 ## Properties
 
@@ -61,3 +62,13 @@ A concatenated string of all of the characters in the text node.
 `Text.create(properties: Object) => Text`
 
 Create a text from a plain Javascript object of `properties`.
+
+### `Text.createFromRanges`
+`Text.createFromRanges(ranges: List<Range>) => Text`
+
+Create a text from a list of text ranges.
+
+### `Text.createFromString`
+`Text.createFromString(text: String, marks: Set) => Text`
+
+Create a text from a plain `String` and a set of marks.
