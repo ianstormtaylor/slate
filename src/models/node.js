@@ -1110,7 +1110,7 @@ const Node = {
       })
     }
 
-    const nodes = this.nodes.splice(index, 0, node)
+    const nodes = this.nodes.insert(index, node)
     return this.merge({ nodes })
   },
 

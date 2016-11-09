@@ -216,7 +216,7 @@ export function removeNodeOperation(transform, path) {
   const { document } = state
   const node = document.assertPath(path)
   const inversePath = path.slice(0, -1)
-  const inverseIndex = path.slice(-1)
+  const inverseIndex = path[path.length - 1]
 
   const inverse = [{
     type: 'insert_node',
