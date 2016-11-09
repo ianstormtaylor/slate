@@ -392,63 +392,76 @@ function setSelection(state, operation) {
  *
  * @param {State} state
  * @param {Object} operation
+ *   @param {Array} operation.path The path of the node to split
+ *   @param {Number} operation.offset (optional) Split using a relative offset
+ *   @param {Number} operation.count (optional) Split after `count`
+ *   children. Cannot be used in combination with offset.
  * @return {State}
  */
 
 function splitNode(state, operation) {
-  const { path, offset } = operation
+  const { path, offset, count } = operation
   const { document } = state
 
-  // Update document
-  const newDocument = document.splitNode(path, offset)
-
-  // Update selection
-  let { selection } = state
-  const { anchorKey, anchorOffset, focusKey, focusOffset } = selection
-
-  const node = document.assertPath(path)
-  // The text node that was split
-  const splittedText = node.kind == 'text'
-          ? node
-          : node.getTextAtOffset(offset)
-  const textOffset = node.kind == 'text'
-          ? offset
-          : offset - node.getOffset(splittedText.key)
-
-  // Should we update the selection ?
-  const shouldUpdateAnchor = splittedText.key == anchorKey && textOffset <= anchorOffset
-  const shouldUpdateFocus = splittedText.key == focusKey && textOffset <= focusOffset
-  if (shouldUpdateFocus || shouldUpdateAnchor) {
-    // The node next to `node`, resulting from the split
-    const secondNode = newDocument.getNextSibling(node.key)
-    let secondText, newOffset
-
-    if (shouldUpdateAnchor) {
-      newOffset = anchorOffset - textOffset
-      secondText = secondNode.kind == 'text'
-        ? secondNode
-        : secondNode.getTextAtOffset(newOffset)
-      selection = selection.merge({
-        anchorKey: secondText.key,
-        anchorOffset: newOffset
-      })
-    }
-
-    if (shouldUpdateFocus) {
-      newOffset = focusOffset - textOffset
-      secondText = secondNode.kind == 'text'
-        ? secondNode
-        : secondNode.getTextAtOffset(newOffset)
-      selection = selection.merge({
-        focusKey: secondText.key,
-        focusOffset: newOffset
-      })
-    }
+  if (offset === undefined) {
+    return state.merge({
+      document: document.splitNodeAfter(path, count)
+      // No need to update selection
+    })
   }
 
-  state = state.merge({
-    document: newDocument,
-    selection
-  })
-  return state
+  else {
+    // Update document
+    let newDocument = document.splitNode(path, offset)
+
+    // Update selection
+    let { selection } = state
+    const { anchorKey, anchorOffset, focusKey, focusOffset } = selection
+
+    const node = document.assertPath(path)
+    // The text node that was split
+    const splittedText = node.kind == 'text'
+            ? node
+            : node.getTextAtOffset(offset)
+    const textOffset = node.kind == 'text'
+            ? offset
+            : offset - node.getOffset(splittedText.key)
+
+    // Should we update the selection ?
+    const shouldUpdateAnchor = splittedText.key == anchorKey && textOffset <= anchorOffset
+    const shouldUpdateFocus = splittedText.key == focusKey && textOffset <= focusOffset
+    if (shouldUpdateFocus || shouldUpdateAnchor) {
+      // The node next to `node`, resulting from the split
+      const secondNode = newDocument.getNextSibling(node.key)
+      let secondText, newOffset
+
+      if (shouldUpdateAnchor) {
+        newOffset = anchorOffset - textOffset
+        secondText = secondNode.kind == 'text'
+          ? secondNode
+          : secondNode.getTextAtOffset(newOffset)
+        selection = selection.merge({
+          anchorKey: secondText.key,
+          anchorOffset: newOffset
+        })
+      }
+
+      if (shouldUpdateFocus) {
+        newOffset = focusOffset - textOffset
+        secondText = secondNode.kind == 'text'
+          ? secondNode
+          : secondNode.getTextAtOffset(newOffset)
+        selection = selection.merge({
+          focusKey: secondText.key,
+          focusOffset: newOffset
+        })
+      }
+    }
+
+    state = state.merge({
+      document: newDocument,
+      selection
+    })
+    return state
+  }
 }

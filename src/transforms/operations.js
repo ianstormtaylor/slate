@@ -106,13 +106,26 @@ export function joinNodeOperation(transform, path, withPath) {
   const { state } = transform
   const { document } = state
   const node = document.assertPath(withPath)
-  const offset = node.length
 
-  const inverse = [{
-    type: 'split_node',
-    path: withPath,
-    offset,
-  }]
+  let inverse
+  if (node.kind === 'text') {
+    const offset = node.length
+
+    inverse = [{
+      type: 'split_node',
+      path: withPath,
+      offset,
+    }]
+  } else {
+    // The number of children after which we split
+    const count = node.nodes.count()
+
+    inverse = [{
+      type: 'split_node',
+      path: withPath,
+      count,
+    }]
+  }
 
   const operation = {
     type: 'join_node',

@@ -1259,7 +1259,7 @@ const Node = {
   /**
    * Split a node by `path` at `offset`.
    *
-   * @param {String} path
+   * @param {Array} path
    * @param {Number} offset
    * @return {Node}
    */
@@ -1308,6 +1308,40 @@ const Node = {
     parent = parent.removeNode(index)
     parent = parent.insertNode(index, two)
     parent = parent.insertNode(index, one)
+    base = isParent ? parent : base.updateDescendant(parent)
+    return base
+  },
+
+  /**
+   * Split a node by `path` after 'count' children.
+   * Does not work on Text nodes. Use `Node.splitNode` to split text nodes as well.
+   *
+   * @param {Array} path
+   * @param {Number} count
+   * @return {Node}
+   */
+
+  splitNodeAfter(path, count) {
+    let base = this
+    let node = base.assertPath(path)
+    if (node.kind === 'text') throw new Error('Cannot split text node at index. Use Node.splitNode at offset instead')
+    const { nodes } = node
+
+    let parent = base.getParent(node.key)
+    const isParent = base == parent
+
+    const oneNodes = nodes.take(count)
+    const twoNodes = nodes.skip(count)
+
+    const one = node.merge({ nodes: oneNodes })
+    const two = node.merge({ nodes: twoNodes, key: uid() })
+
+
+    const nodeIndex = parent.nodes.indexOf(node)
+    parent = parent.removeNode(nodeIndex)
+    parent = parent.insertNode(nodeIndex, two)
+    parent = parent.insertNode(nodeIndex, one)
+
     base = isParent ? parent : base.updateDescendant(parent)
     return base
   },
