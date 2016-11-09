@@ -248,11 +248,12 @@ export function setMarkByKey(transform, key, offset, length, mark, properties, o
   const { normalize = true } = options
   mark = Normalize.mark(mark)
   properties = Normalize.markProperties(properties)
+  const newMark = mark.merge(properties)
   const { state } = transform
   const { document } = state
   const path = document.getPath(key)
 
-  transform = transform.setMarkOperation(path, offset, length, mark, properties)
+  transform = transform.setMarkOperation(path, offset, length, mark, newMark)
   if (normalize) {
     const parent = document.getParent(key)
     transform = transform.normalizeNodeByKey(parent.key)

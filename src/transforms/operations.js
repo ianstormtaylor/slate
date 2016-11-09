@@ -290,23 +290,18 @@ export function removeTextOperation(transform, path, offset, length) {
  * @param {Number} offset
  * @param {Number} length
  * @param {Mark} mark
+ * @param {Mark} newMark
  * @return {Transform}
  */
 
-export function setMarkOperation(transform, path, offset, length, mark, properties) {
-  const inverseProps = {}
-
-  for (const k in properties) {
-    inverseProps[k] = mark[k]
-  }
-
+export function setMarkOperation(transform, path, offset, length, mark, newMark) {
   const inverse = [{
     type: 'set_mark',
     path,
     offset,
     length,
-    mark,
-    properties: inverseProps,
+    mark: newMark,
+    newMark: mark
   }]
 
   const operation = {
@@ -315,7 +310,7 @@ export function setMarkOperation(transform, path, offset, length, mark, properti
     offset,
     length,
     mark,
-    properties,
+    newMark,
     inverse,
   }
 

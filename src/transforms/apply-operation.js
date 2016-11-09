@@ -326,10 +326,10 @@ function removeText(state, operation) {
  */
 
 function setMark(state, operation) {
-  const { path, offset, length, mark, properties } = operation
+  const { path, offset, length, mark, newMark } = operation
   let { document } = state
   let node = document.assertPath(path)
-  node = node.updateMark(offset, length, mark, properties)
+  node = node.updateMark(offset, length, mark, newMark)
   document = document.updateDescendant(node)
   state = state.merge({ document })
   return state
