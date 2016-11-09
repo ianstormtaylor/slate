@@ -105,7 +105,7 @@ export function insertTextOperation(transform, path, offset, text, marks) {
 export function joinNodeOperation(transform, path, withPath) {
   const { state } = transform
   const { document } = state
-  const node = document.assertPath(path)
+  const node = document.assertPath(withPath)
   const offset = node.length
 
   const inverse = [{
