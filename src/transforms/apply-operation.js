@@ -132,33 +132,41 @@ function insertText(state, operation) {
  *
  * @param {State} state
  * @param {Object} operation
+ *   @param {Boolean} operation.deep (optional) Join recursively the
+ *   respective last node and first node of the nodes' children. Like a zipper :)
  * @return {State}
  */
 
 function joinNode(state, operation) {
-  const { path, withPath } = operation
+  const { path, withPath, deep = false } = operation
   let { document, selection } = state
   const first = document.assertPath(withPath)
   const second = document.assertPath(path)
 
   // Update doc
-  document = document.joinNode(first, second)
+  document = document.joinNode(first, second, { deep })
 
-  // Update selection
-  // When merging two texts together
-  if (second.kind == 'text') {
+  // Update selection if we merged two texts together
+  if (deep || second.kind == 'text') {
+    const firstText = deep
+            ? first.getLastText()
+            : first
+    const secondText = deep
+            ? second.getFirstText()
+            : second
+
     const { anchorKey, anchorOffset, focusKey, focusOffset } = selection
     // The final key is the `first` key
-    if (anchorKey == second.key) {
+    if (anchorKey == secondText.key) {
       selection = selection.merge({
-        anchorKey: first.key,
-        anchorOffset: anchorOffset + first.characters.size
+        anchorKey: firstText.key,
+        anchorOffset: anchorOffset + firstText.characters.size
       })
     }
-    if (focusKey == second.key) {
+    if (focusKey == secondText.key) {
       selection = selection.merge({
-        focusKey: first.key,
-        focusOffset: focusOffset + first.characters.size
+        focusKey: firstText.key,
+        focusOffset: focusOffset + firstText.characters.size
       })
     }
   }

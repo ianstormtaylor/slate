@@ -445,12 +445,14 @@ export function setSelectionOperation(transform, properties) {
  */
 
 export function splitNodeOperation(transform, path, offset) {
-  const inverseIndex = path[path.length - 1] + 1
-  const inversePath = path.slice(0, -1).concat([inverseIndex])
+  const inversePath = path.slice()
+  inversePath[path.length - 1] += 1
+
   const inverse = [{
     type: 'join_node',
     path: inversePath,
     withPath: path,
+    deep: true // we need to join nodes recursively
   }]
 
   const operation = {

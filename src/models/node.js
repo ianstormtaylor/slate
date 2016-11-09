@@ -1137,10 +1137,13 @@ const Node = {
    *
    * @param {Node} first
    * @param {Node} second
+   * @param {Boolean} options.deep (optional) Join recursively the
+   * respective last node and first node of the nodes' children. Like a zipper :)
    * @return {Node}
    */
 
-  joinNode(first, second) {
+  joinNode(first, second, options) {
+    const { deep = false } = options
     let node = this
     let parent = node.getParent(second.key)
     const isParent = node == parent
@@ -1157,6 +1160,11 @@ const Node = {
       second.nodes.forEach((child, i) => {
         first = first.insertNode(size + i, child)
       })
+
+      if (deep) {
+        // Join recursively
+        first = first.joinNode(first.nodes.get(size - 1), first.nodes.get(size), { deep })
+      }
     }
 
     parent = parent.removeNode(index)
