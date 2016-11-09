@@ -76,17 +76,19 @@ function Plugin(options = {}) {
     // Determine what the characters would be if natively inserted.
     const schema = editor.getSchema()
     const decorators = document.getDescendantDecorators(startKey, schema)
-    const prevChars = startText.getDecorations(decorators)
-    const prevChar = prevChars.get(startOffset - 1)
+    const initialChars = startText.getDecorations(decorators)
+    const prevChar = startOffset === 0 ? null : initialChars.get(startOffset - 1)
+    const nextChar = startOffset === initialChars.size ? null : initialChars.get(startOffset)
     const char = Character.create({
       text: e.data,
-      marks: prevChar && prevChar.marks
+      marks: (prevChar && prevChar.marks)
+        // When cursor is at start of a range of marks, without
+        // preceding text, the native behavior is to insert inside the
+        // range of marks.
+        || (!prevChar && nextChar && nextChar.marks)
     })
 
-    const chars = prevChars
-      .slice(0, startOffset)
-      .push(char)
-      .concat(prevChars.slice(startOffset))
+    const chars = initialChars.insert(startOffset, char)
 
     // Determine what the characters should be, if not natively inserted.
     let next = state
@@ -105,6 +107,7 @@ function Plugin(options = {}) {
       (state.isCollapsed) &&
       (state.startText.text != '') &&
       (state.selection.marks == null) &&
+      // Must not be, for example, at edge of an inline link
       (!startInline || !state.selection.isAtStartOf(startInline)) &&
       (!startInline || !state.selection.isAtEndOf(startInline)) &&
       (chars.equals(nextChars))
