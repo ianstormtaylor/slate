@@ -20,6 +20,7 @@ import Schema from './models/schema'
 import Selection from './models/selection'
 import State from './models/state'
 import Text from './models/text'
+import Range from './models/range'
 
 /**
  * Serializers.
@@ -58,6 +59,7 @@ export {
   Mark,
   Placeholder,
   Plain,
+  Range,
   Raw,
   Schema,
   Selection,
@@ -78,6 +80,7 @@ export default {
   Mark,
   Placeholder,
   Plain,
+  Range,
   Raw,
   Schema,
   Selection,
