@@ -493,13 +493,13 @@ function Plugin(options = {}) {
     if (state.isExpanded) return
 
     const { document, startText } = state
-    const hasVoidParent = document.hasVoidParent(startText)
+    const hasVoidParent = document.hasVoidParent(startText.key)
 
     if (
       startText.text == '' ||
       hasVoidParent
     ) {
-      const previousText = document.getPreviousText(startText)
+      const previousText = document.getPreviousText(startText.key)
       if (!previousText) return
 
       debug('onKeyDownLeft', { data })
