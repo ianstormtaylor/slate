@@ -1,4 +1,4 @@
-import IS_DEV from './is-dev'
+import IS_DEV from '../constants/is-dev'
 
 /**
  * Log a development warning.

@@ -5,7 +5,7 @@ const IS_DEV = (
 )
 
 /**
- * Return true if running slate in development
+ * True if running slate in development mode
  * @type {Boolean}
  */
 

@@ -5,11 +5,11 @@ import Debug from 'debug'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TYPES from '../constants/types'
+import IS_DEV from '../constants/is-dev'
 import Leaf from './leaf'
 import Void from './void'
 import scrollTo from '../utils/scroll-to'
 import warning from '../utils/warning'
-import IS_DEV from '../utils/is-dev'
 
 /**
  * Debug.

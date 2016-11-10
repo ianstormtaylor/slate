@@ -1,6 +1,6 @@
 /* global Map */
 
-import IS_DEV from './is-dev'
+import IS_DEV from '../constants/is-dev'
 
 /**
  * This module serves to memoize methods on immutable instances.
