@@ -149,11 +149,11 @@ function joinNode(state, operation) {
   // Update selection if we merged two texts together
   if (deep || second.kind == 'text') {
     const firstText = deep
-            ? first.getLastText()
-            : first
+      ? first.getLastText()
+      : first
     const secondText = deep
-            ? second.getFirstText()
-            : second
+      ? second.getFirstText()
+      : second
 
     const { anchorKey, anchorOffset, focusKey, focusOffset } = selection
     // The final key is the `first` key
@@ -429,11 +429,11 @@ function splitNode(state, operation) {
     const node = document.assertPath(path)
     // The text node that was split
     const splittedText = node.kind == 'text'
-            ? node
-            : node.getTextAtOffset(offset)
+      ? node
+      : node.getTextAtOffset(offset)
     const textOffset = node.kind == 'text'
-            ? offset
-            : offset - node.getOffset(splittedText.key)
+      ? offset
+      : offset - node.getOffset(splittedText.key)
 
     // Should we update the selection ?
     const shouldUpdateAnchor = splittedText.key == anchorKey && textOffset <= anchorOffset
