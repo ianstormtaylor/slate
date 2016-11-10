@@ -128,7 +128,7 @@ const INLINE_NO_EMPTY = {
  * @type {Object}
  */
 
-const INLINE_VOID_TEXT_RULE = {
+const VOID_TEXT_RULE = {
   match: (object) => {
     return (object.kind == 'inline' || object.kind == 'block') && object.isVoid
   },
@@ -297,7 +297,7 @@ const schema = Schema.create({
     DOCUMENT_CHILDREN_RULE,
     BLOCK_CHILDREN_RULE,
     INLINE_CHILDREN_RULE,
-    INLINE_VOID_TEXT_RULE,
+    VOID_TEXT_RULE,
     MIN_TEXT_RULE,
     INLINE_NO_EMPTY,
     INLINE_VOID_TEXTS_AROUND_RULE,
