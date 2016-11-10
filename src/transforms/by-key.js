@@ -340,8 +340,7 @@ export function unwrapInlineByKey(transform, key, properties, options) {
   const { state } = transform
   const { document, selection } = state
   const node = document.assertDescendant(key)
-  const texts = node.getTexts()
-  const range = selection.moveToRangeOf(texts.first(), texts.last())
+  const range = selection.moveToRangeOf(node.getFirstText(), node.getLastText())
   return transform.unwrapInlineAtRange(range, properties, options)
 }
 
@@ -360,8 +359,7 @@ export function unwrapBlockByKey(transform, key, properties, options) {
   const { state } = transform
   const { document, selection } = state
   const node = document.assertDescendant(key)
-  const texts = node.getTexts()
-  const range = selection.moveToRangeOf(texts.first(), texts.last())
+  const range = selection.moveToRangeOf(node.getFirstText(), node.getLastText())
   return transform.unwrapBlockAtRange(range, properties, options)
 }
 

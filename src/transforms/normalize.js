@@ -273,7 +273,7 @@ export function normalizeSelection(transform) {
     !document.hasDescendant(selection.focusKey)
   ) {
     warning('Selection was invalid and reset to start of the document')
-    const firstText = document.getTexts().first()
+    const firstText = document.getFirstText()
     selection = selection.merge({
       anchorKey: firstText.key,
       anchorOffset: 0,
