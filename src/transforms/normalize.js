@@ -85,7 +85,7 @@ export function normalizeWith(transform, schema, prevDocument) {
   const { state } = transform
   const { document } = state
 
-  if (!schema.isNormalization) {
+  if (!schema.hasValidators) {
     // Schema has no normalization rules
     return transform
   }

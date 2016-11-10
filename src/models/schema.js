@@ -50,7 +50,7 @@ class Schema extends new Record(DEFAULTS) {
    * @return {Boolean} isNormalization
    */
 
-  get isNormalization() {
+  get hasValidators() {
     const { rules } = this
     return rules.some(rule => rule.validate)
   }
