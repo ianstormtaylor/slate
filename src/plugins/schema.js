@@ -90,7 +90,12 @@ const INLINE_CHILDREN_RULE = {
 }
 
 /**
- * A default schema rule to ensure that inline nodes are not empty
+ * A default schema rule to ensure that inline nodes are not empty.
+ *
+ * This rule is applied to all blocks, because when they contain an
+ * empty inline, we need to remove the inline from that parent
+ * block. If `validate` was to be memoized, it should be against the
+ * parent node, not the inline themselves.
  *
  * @type {Object}
  */
