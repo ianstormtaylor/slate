@@ -7,98 +7,6 @@ import { Map } from 'immutable'
 const MAX_CALLS = 50
 
 /**
- * Refresh a reference to a node that have been modified in a transform.
- * @param  {Transform} transform
- * @param  {Node} node
- * @return {Node} newNode
- */
-
-function _refreshNode(transform, node) {
-  const { state } = transform
-  const { document } = state
-
-  if (node.kind == 'document') {
-    return document
-  }
-
-  return document.getDescendant(node.key)
-}
-
-/**
- * Normalize all children of a node
- * @param  {Transform} transform
- * @param  {Schema} schema
- * @param  {Node} node
- * @param  {Node} prevNode
- * @return {Transform} transform
- */
-
-function _normalizeChildrenWith(transform, schema, node, prevNode) {
-  if (
-    node.kind == 'text'
-    || (prevNode && prevNode.nodes == node.nodes)
-  ) {
-    return transform
-  }
-
-  const prevChildrenMap = new Map().withMutations(map => {
-    if (prevNode) prevNode.nodes.forEach(n => map.set(n.key, n))
-  })
-
-  return node.nodes.reduce(
-    (t, child) => {
-      const prevChild = prevChildrenMap.get(child.key)
-      return t.normalizeNodeWith(schema, child, prevChild)
-    },
-    transform
-  )
-}
-
-/**
- * Normalize a node without its children
- * @param  {Transform} transform
- * @param  {Schema} schema
- * @param  {Node} node
- * @return {Transform} transform
- */
-
-function _normalizeNodeWith(transform, schema, node) {
-  let recursiveCount = 0
-
-  // Auxiliary function, called recursively, with a maximum calls safety net.
-  function _recur(_transform, _node) {
-    const failure = schema.__validate(_node)
-
-    // Node is valid?
-    if (!failure) {
-      return _transform
-    }
-
-    const { value, rule } = failure
-
-    // Normalize and get the new state
-    _transform = rule.normalize(_transform, _node, value)
-
-    // Search for the updated node in the new state
-    const newNode = _refreshNode(_transform, _node)
-
-    // Node no longer exist, go back to normalize parents
-    if (!newNode) {
-      return _transform
-    }
-
-    recursiveCount++
-    if (recursiveCount > MAX_CALLS) {
-      throw new Error('Unexpected number of successive normalizations. Aborting.')
-    }
-
-    return _recur(_transform, newNode)
-  }
-
-  return _recur(transform, node)
-}
-
-/**
  * Normalize a node (itself and its children) using a schema.
  *
  * @param  {Transform} transform
@@ -118,17 +26,17 @@ export function normalizeNodeWith(transform, schema, node, prevNode) {
   const opCount = transform.operations.length
 
   // Iterate over its children
-  transform = _normalizeChildrenWith(transform, schema, node, prevNode)
+  transform = normalizeChildrenWith(transform, schema, node, prevNode)
 
   const hasChanged = transform.operations.length != opCount
   if (hasChanged) {
     // Refresh the node reference
-    node = _refreshNode(transform, node)
+    node = refreshNode(transform, node)
   }
 
   // Now normalize the node itself if it still exist
   if (node) {
-    transform = _normalizeNodeWith(transform, schema, node)
+    transform = normalizeNodeOnly(transform, schema, node)
   }
 
   return transform
@@ -144,7 +52,7 @@ export function normalizeNodeWith(transform, schema, node, prevNode) {
  */
 
 export function normalizeParentsWith(transform, schema, node) {
-  transform = _normalizeNodeWith(transform, schema, node)
+  transform = normalizeNodeOnly(transform, schema, node)
 
   // Normalize went back up to the document
   if (node.kind == 'document') {
@@ -152,7 +60,7 @@ export function normalizeParentsWith(transform, schema, node) {
   }
 
   // We search for the new parent
-  node = _refreshNode(transform, node)
+  node = refreshNode(transform, node)
   if (!node) {
     return transform
   }
@@ -286,4 +194,99 @@ export function normalizeSelection(transform) {
   state = state.merge({ selection })
   transform.state = state
   return transform
+}
+
+
+/**
+ * Refresh a reference to a node that have been modified in a transform.
+ * @param  {Transform} transform
+ * @param  {Node} node
+ * @return {Node} newNode
+ */
+
+function refreshNode(transform, node) {
+  const { state } = transform
+  const { document } = state
+
+  if (node.kind == 'document') {
+    return document
+  }
+
+  return document.getDescendant(node.key)
+}
+
+/**
+ * Normalize all children of a node
+ * @param  {Transform} transform
+ * @param  {Schema} schema
+ * @param  {Node} node
+ * @param  {Node} prevNode
+ * @return {Transform} transform
+ */
+
+function normalizeChildrenWith(transform, schema, node, prevNode) {
+  if (
+    node.kind == 'text'
+    || (prevNode && prevNode.nodes == node.nodes)
+  ) {
+    return transform
+  }
+
+  // Create a map beforehand, for performant lookup
+  const prevChildrenMap = new Map().withMutations(map => {
+    if (prevNode) prevNode.nodes.forEach(n => map.set(n.key, n))
+  })
+
+  return node.nodes.reduce(
+    (t, child) => {
+      const prevChild = prevChildrenMap.get(child.key)
+      return t.normalizeNodeWith(schema, child, prevChild)
+    },
+    transform
+  )
+}
+
+/**
+ * Normalize a node, but not its children
+ *
+ * @param  {Transform} transform
+ * @param  {Schema} schema
+ * @param  {Node} node
+ * @return {Transform} transform
+ */
+
+function normalizeNodeOnly(transform, schema, node) {
+  let recursiveCount = 0
+
+  // Auxiliary function, called recursively, with a maximum calls safety net.
+  function _recur(_transform, _node) {
+    const failure = schema.__validate(_node)
+
+    // Node is valid?
+    if (!failure) {
+      return _transform
+    }
+
+    const { value, rule } = failure
+
+    // Normalize and get the new state
+    _transform = rule.normalize(_transform, _node, value)
+
+    // Search for the updated node in the new state
+    const newNode = refreshNode(_transform, _node)
+
+    // Node no longer exist, go back to normalize parents
+    if (!newNode) {
+      return _transform
+    }
+
+    recursiveCount++
+    if (recursiveCount > MAX_CALLS) {
+      throw new Error('Unexpected number of successive normalizations. Aborting.')
+    }
+
+    return _recur(_transform, newNode)
+  }
+
+  return _recur(transform, node)
 }
