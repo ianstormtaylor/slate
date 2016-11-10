@@ -11,8 +11,7 @@ function getLeafText(node) {
     return node
   }
 
-  const texts = node.getTexts()
-  return texts.first()
+  return node.getFirstText()
 }
 
 /**
