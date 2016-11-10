@@ -262,8 +262,9 @@ function removeNode(state, operation) {
       .takeUntil(text => text.key == startKey)
       .filter(text => !getRemoved(text.key))
       .last()
-    if (!prevText) selection = selection.unset()
-    else selection = selection.moveStartTo(prevText.key, prevText.length)
+    selection = !prevText
+      ? selection.unset()
+      : selection.moveStartTo(prevText.key, prevText.length)
   }
   if (endDesc) {
     // The whole selection is inside the node, we collapse to the previous text node
@@ -276,8 +277,9 @@ function removeNode(state, operation) {
         .filter(text => !getRemoved(text.key))
         .first()
 
-      if (!nextText) selection = selection.unset()
-      else selection = selection.moveEndTo(nextText.key, 0)
+      selection = !nextText
+        ? selection.unset()
+        : selection.moveEndTo(nextText.key, 0)
     }
   }
 
