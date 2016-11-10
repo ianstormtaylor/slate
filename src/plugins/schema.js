@@ -3,7 +3,7 @@ import Text from '../models/text'
 import { List } from 'immutable'
 
 /*
-    This module contains the default schema to normalize documents
+ * This module contains the default schema to normalize documents
  */
 
 function isInlineVoid(node) {
