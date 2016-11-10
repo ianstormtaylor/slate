@@ -58,7 +58,7 @@ class Transform {
     let { merge, save, isNative = false } = options
 
     // Ensure that the selection is normalized.
-    transform = transform.normalizeSelection()
+    transform.normalizeSelection()
 
     let { state, operations } = transform
     let { history } = state

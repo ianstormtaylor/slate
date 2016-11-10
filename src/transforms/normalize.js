@@ -26,7 +26,7 @@ export function normalizeNodeWith(transform, schema, node, prevNode) {
   const opCount = transform.operations.length
 
   // Iterate over its children
-  transform = normalizeChildrenWith(transform, schema, node, prevNode)
+  normalizeChildrenWith(transform, schema, node, prevNode)
 
   const hasChanged = transform.operations.length != opCount
   if (hasChanged) {
@@ -36,7 +36,7 @@ export function normalizeNodeWith(transform, schema, node, prevNode) {
 
   // Now normalize the node itself if it still exist
   if (node) {
-    transform = normalizeNodeOnly(transform, schema, node)
+    normalizeNodeOnly(transform, schema, node)
   }
 
   return transform
@@ -52,7 +52,7 @@ export function normalizeNodeWith(transform, schema, node, prevNode) {
  */
 
 export function normalizeParentsWith(transform, schema, node) {
-  transform = normalizeNodeOnly(transform, schema, node)
+  normalizeNodeOnly(transform, schema, node)
 
   // Normalize went back up to the document
   if (node.kind == 'document') {
@@ -101,7 +101,7 @@ export function normalizeWith(transform, schema, prevDocument) {
  */
 
 export function normalize(transform) {
-  transform = transform
+  transform
     .normalizeDocument()
     .normalizeSelection()
   return transform
@@ -138,7 +138,7 @@ export function normalizeNodeByKey(transform, key) {
   const node = document.key == key ? document : document.assertDescendant(key)
   const prevNode = document.key == key ? prevDocument : prevDocument.getDescendant(key)
 
-  transform = transform.normalizeNodeWith(defaultSchema, node, prevNode)
+  transform.normalizeNodeWith(defaultSchema, node, prevNode)
   return transform
 }
 
@@ -158,7 +158,7 @@ export function normalizeParentsByKey(transform, key) {
   const node = document.key == key ? document : document.assertDescendant(key)
   const prevNode = document.key == key ? prevDocument : prevDocument.getDescendant(key)
 
-  transform = transform.normalizeParentsWith(defaultSchema, node, prevNode)
+  transform.normalizeParentsWith(defaultSchema, node, prevNode)
   return transform
 }
 
@@ -270,7 +270,7 @@ function normalizeNodeOnly(transform, schema, node) {
     const { value, rule } = failure
 
     // Normalize and get the new state
-    _transform = rule.normalize(_transform, _node, value)
+    rule.normalize(_transform, _node, value)
 
     // Search for the updated node in the new state
     const newNode = refreshNode(_transform, _node)

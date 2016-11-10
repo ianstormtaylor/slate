@@ -154,8 +154,8 @@ class CodeHighlighting extends React.Component {
     if (startBlock.type != 'code') return
 
     let transform = state.transform()
-    if (state.isExpanded) transform = transform.delete()
-    transform = transform.insertText('\n')
+    if (state.isExpanded) transform.delete()
+    transform.insertText('\n')
 
     return transform.apply()
   }

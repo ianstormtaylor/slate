@@ -125,7 +125,7 @@ class Links extends React.Component {
     let transform = state.transform()
 
     if (this.hasLinks()) {
-      transform = transform.unwrapInline('link')
+      transform.unwrapInline('link')
     }
 
     return transform

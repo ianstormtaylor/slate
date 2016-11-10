@@ -140,7 +140,7 @@ The `decorate` property allows you define a function that will apply extra marks
 {
   normalize: (transform, node, invalidChildren) => {
     invalidChildren.forEach((child) => {
-      transform = transform.removeNodeByKey(child.key)
+      transform.removeNodeByKey(child.key)
     })
 
     return transform

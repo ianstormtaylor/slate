@@ -173,11 +173,11 @@ class RichText extends React.Component {
     // Handle the extra wrapping required for list buttons.
     if (type == 'bulleted-list' || type == 'numbered-list') {
       if (this.hasBlock('list-item')) {
-        transform = transform
+        transform
           .setBlock(DEFAULT_NODE)
           .unwrapBlock(type)
       } else {
-        transform = transform
+        transform
           .setBlock('list-item')
           .wrapBlock(type)
       }
@@ -185,7 +185,7 @@ class RichText extends React.Component {
 
     // Handle everything but list buttons.
     else {
-      transform = transform.setBlock(isActive ? DEFAULT_NODE : type)
+      transform.setBlock(isActive ? DEFAULT_NODE : type)
     }
 
     state = transform.apply()

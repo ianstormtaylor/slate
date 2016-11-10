@@ -134,7 +134,7 @@ class AutoMarkdown extends React.Component {
       .transform()
       .setBlock(type)
 
-    if (type == 'list-item') transform = transform.wrapBlock('bulleted-list')
+    if (type == 'list-item') transform.wrapBlock('bulleted-list')
 
     state = transform
       .extendToStartOf(startBlock)
@@ -165,7 +165,7 @@ class AutoMarkdown extends React.Component {
       .transform()
       .setBlock('paragraph')
 
-    if (startBlock.type == 'list-item') transform = transform.unwrapBlock('bulleted-list')
+    if (startBlock.type == 'list-item') transform.unwrapBlock('bulleted-list')
 
     state = transform.apply()
     return state

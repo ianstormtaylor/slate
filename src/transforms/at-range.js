@@ -74,8 +74,8 @@ export function deleteAtRange(transform, range, options = {}) {
   const startOff = (startChild.kind == 'text' ? 0 : startChild.getOffset(startKey)) + startOffset
   const endOff = (endChild.kind == 'text' ? 0 : endChild.getOffset(endKey)) + endOffset
 
-  transform = transform.splitNodeByKey(startChild.key, startOff, { normalize: false })
-  transform = transform.splitNodeByKey(endChild.key, endOff, { normalize: false })
+  transform.splitNodeByKey(startChild.key, startOff, { normalize: false })
+  transform.splitNodeByKey(endChild.key, endOff, { normalize: false })
 
   state = transform.state
   document = state.document
@@ -319,7 +319,7 @@ export function insertFragmentAtRange(transform, range, fragment, options = {}) 
   const { normalize = true } = options
 
   if (range.isExpanded) {
-    transform = transform.deleteAtRange(range, { normalize: false })
+    transform.deleteAtRange(range, { normalize: false })
     range = range.collapseToStart()
   }
 
@@ -353,7 +353,7 @@ export function insertFragmentAtRange(transform, range, fragment, options = {}) 
 
     fragment.nodes.forEach((node, i) => {
       const newIndex = startIndex + i + 1
-      transform = transform.insertNodeByKey(parent.key, newIndex, node, { normalize: false })
+      transform.insertNodeByKey(parent.key, newIndex, node, { normalize: false })
     })
   }
 
@@ -464,7 +464,7 @@ export function insertTextAtRange(transform, range, text, marks, options = {}) {
   }
 
   if (range.isExpanded) {
-    transform = transform.deleteAtRange(range, { normalize: false })
+    transform.deleteAtRange(range, { normalize: false })
   }
 
   // Unless specified, don't normalize if only inserting text
@@ -869,15 +869,15 @@ export function wrapBlockAtRange(transform, range, block, options = {}) {
   }
 
   // inject the new block node into the parent
-  transform = transform.insertNodeByKey(parent.key, index, block, { normalize: false })
+  transform.insertNodeByKey(parent.key, index, block, { normalize: false })
 
   // move the sibling nodes into the new block node
   siblings.forEach((node, i) => {
-    transform = transform.moveNodeByKey(node.key, block.key, i, { normalize: false })
+    transform.moveNodeByKey(node.key, block.key, i, { normalize: false })
   })
 
   if (normalize) {
-    transform = transform.normalizeNodeByKey(parent.key)
+    transform.normalizeNodeByKey(parent.key)
   }
 
   return transform
@@ -955,7 +955,7 @@ export function wrapInlineAtRange(transform, range, inline, options = {}) {
     })
 
     if (normalize) {
-      transform = transform.normalizeNodeByKey(startBlock.key)
+      transform.normalizeNodeByKey(startBlock.key)
     }
   }
 
@@ -985,7 +985,7 @@ export function wrapInlineAtRange(transform, range, inline, options = {}) {
     })
 
     if (normalize) {
-      transform = transform
+      transform
         .normalizeNodeByKey(startBlock.key)
         .normalizeNodeByKey(endBlock.key)
     }
@@ -999,7 +999,7 @@ export function wrapInlineAtRange(transform, range, inline, options = {}) {
       })
 
       if (normalize) {
-        transform = transform.normalizeNodeByKey(block.key)
+        transform.normalizeNodeByKey(block.key)
       }
     })
   }

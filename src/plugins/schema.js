@@ -131,7 +131,7 @@ const INLINE_VOID_TEXT_RULE = {
     return node.text !== ' ' || node.nodes.size !== 1
   },
   normalize: (transform, node, result) => {
-    transform = node.nodes.reduce((t, child) => {
+    node.nodes.reduce((t, child) => {
       return t.removeNodeByKey(child.key, { normalize: false })
     }, transform)
 

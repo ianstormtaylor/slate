@@ -298,7 +298,7 @@ function Plugin(options = {}) {
 
     let transform = state.transform()
 
-    if (isInternal) transform = transform.delete()
+    if (isInternal) transform.delete()
 
     return transform
       .moveTo(target)
@@ -326,8 +326,8 @@ function Plugin(options = {}) {
     text
       .split('\n')
       .forEach((line, i) => {
-        if (i > 0) transform = transform.splitBlock()
-        transform = transform.insertText(line)
+        if (i > 0) transform.splitBlock()
+        transform.insertText(line)
       })
 
     return transform.apply()
@@ -668,8 +668,8 @@ function Plugin(options = {}) {
     data.text
       .split('\n')
       .forEach((line, i) => {
-        if (i > 0) transform = transform.splitBlock()
-        transform = transform.insertText(line)
+        if (i > 0) transform.splitBlock()
+        transform.insertText(line)
       })
 
     return transform.apply()
