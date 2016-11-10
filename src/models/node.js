@@ -182,11 +182,13 @@ const Node = {
 
     this.nodes.forEach((child, i, nodes) => {
       if (iterator(child, i, nodes) === false) {
-        return returned = false
+        returned = false
+        return false
       }
 
       if (child.kind != 'text') {
-        return returned = child.forEachDescendant(iterator)
+        returned = child.forEachDescendant(iterator)
+        return returned
       }
     })
 
