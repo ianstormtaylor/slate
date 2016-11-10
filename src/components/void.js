@@ -94,18 +94,18 @@ class Void extends React.Component {
     if (node.kind == 'block') {
       style = IS_FIREFOX
         ? {
-            pointerEvents: 'none',
-            width: '0px',
-            height: '0px',
-            lineHeight: '0px',
-            visibility: 'hidden'
-          }
+          pointerEvents: 'none',
+          width: '0px',
+          height: '0px',
+          lineHeight: '0px',
+          visibility: 'hidden'
+        }
         : {
-            position: 'absolute',
-            top: '0px',
-            left: '-9999px',
-            textIndent: '-9999px'
-          }
+          position: 'absolute',
+          top: '0px',
+          left: '-9999px',
+          textIndent: '-9999px'
+        }
     } else {
       style = {
         position: 'relative',

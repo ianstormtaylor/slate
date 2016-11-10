@@ -425,8 +425,8 @@ class State extends new Record(DEFAULTS) {
   transform(properties = {}) {
     const state = this
     return new Transform({
-        ...properties,
-        state
+      ...properties,
+      state
     })
   }
 

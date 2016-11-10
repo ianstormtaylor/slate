@@ -20,13 +20,12 @@ function block(value) {
   if (value instanceof Block) return value
 
   switch (typeOf(value)) {
-    case 'string':
-    case 'object': {
-      return Block.create(nodeProperties(value))
-    }
-    default: {
-      throw new Error(`Invalid \`block\` argument! It must be a block, an object, or a string. You passed: "${value}".`)
-    }
+  case 'string':
+  case 'object':
+    return Block.create(nodeProperties(value))
+
+  default:
+    throw new Error(`Invalid \`block\` argument! It must be a block, an object, or a string. You passed: "${value}".`)
   }
 }
 
@@ -41,13 +40,12 @@ function inline(value) {
   if (value instanceof Inline) return value
 
   switch (typeOf(value)) {
-    case 'string':
-    case 'object': {
-      return Inline.create(nodeProperties(value))
-    }
-    default: {
-      throw new Error(`Invalid \`inline\` argument! It must be an inline, an object, or a string. You passed: "${value}".`)
-    }
+  case 'string':
+  case 'object':
+    return Inline.create(nodeProperties(value))
+
+  default:
+    throw new Error(`Invalid \`inline\` argument! It must be an inline, an object, or a string. You passed: "${value}".`)
   }
 }
 
@@ -81,13 +79,12 @@ function mark(value) {
   if (value instanceof Mark) return value
 
   switch (typeOf(value)) {
-    case 'string':
-    case 'object': {
-      return Mark.create(markProperties(value))
-    }
-    default: {
-      throw new Error(`Invalid \`mark\` argument! It must be a mark, an object, or a string. You passed: "${value}".`)
-    }
+  case 'string':
+  case 'object':
+    return Mark.create(markProperties(value))
+
+  default:
+    throw new Error(`Invalid \`mark\` argument! It must be a mark, an object, or a string. You passed: "${value}".`)
   }
 }
 
@@ -102,23 +99,22 @@ function markProperties(value = {}) {
   const ret = {}
 
   switch (typeOf(value)) {
-    case 'string': {
-      ret.type = value
-      break
-    }
-    case 'object': {
-      for (const k in value) {
-        if (k == 'data') {
-          if (value[k] !== undefined) ret[k] = Data.create(value[k])
-        } else {
-          ret[k] = value[k]
-        }
+  case 'string':
+    ret.type = value
+    break
+
+  case 'object':
+    for (const k in value) {
+      if (k == 'data') {
+        if (value[k] !== undefined) ret[k] = Data.create(value[k])
+      } else {
+        ret[k] = value[k]
       }
-      break
     }
-    default: {
-      throw new Error(`Invalid mark \`properties\` argument! It must be an object, a string or a mark. You passed: "${value}".`)
-    }
+    break
+
+  default:
+    throw new Error(`Invalid mark \`properties\` argument! It must be an object, a string or a mark. You passed: "${value}".`)
   }
 
   return ret
@@ -135,24 +131,23 @@ function nodeProperties(value = {}) {
   const ret = {}
 
   switch (typeOf(value)) {
-    case 'string': {
-      ret.type = value
-      break
-    }
-    case 'object': {
-      if (value.isVoid !== undefined) ret.isVoid = !!value.isVoid
-      for (const k in value) {
-        if (k == 'data') {
-          if (value[k] !== undefined) ret[k] = Data.create(value[k])
-        } else {
-          ret[k] = value[k]
-        }
+  case 'string':
+    ret.type = value
+    break
+
+  case 'object':
+    if (value.isVoid !== undefined) ret.isVoid = !!value.isVoid
+    for (const k in value) {
+      if (k == 'data') {
+        if (value[k] !== undefined) ret[k] = Data.create(value[k])
+      } else {
+        ret[k] = value[k]
       }
-      break
     }
-    default: {
-      throw new Error(`Invalid node \`properties\` argument! It must be an object, a string or a node. You passed: "${value}".`)
-    }
+    break
+
+  default:
+    throw new Error(`Invalid node \`properties\` argument! It must be an object, a string or a node. You passed: "${value}".`)
   }
 
   return ret
@@ -169,12 +164,11 @@ function selection(value) {
   if (value instanceof Selection) return value
 
   switch (typeOf(value)) {
-    case 'object': {
-      return Selection.create(value)
-    }
-    default: {
-      throw new Error(`Invalid \`selection\` argument! It must be a selection or an object. You passed: "${value}".`)
-    }
+  case 'object':
+    return Selection.create(value)
+
+  default:
+    throw new Error(`Invalid \`selection\` argument! It must be a selection or an object. You passed: "${value}".`)
   }
 }
 
@@ -189,19 +183,18 @@ function selectionProperties(value = {}) {
   const ret = {}
 
   switch (typeOf(value)) {
-    case 'object': {
-      if (value.anchorKey !== undefined) ret.anchorKey = value.anchorKey
-      if (value.anchorOffset !== undefined) ret.anchorOffset = value.anchorOffset
-      if (value.focusKey !== undefined) ret.focusKey = value.focusKey
-      if (value.focusOffset !== undefined) ret.focusOffset = value.focusOffset
-      if (value.isBackward !== undefined) ret.isBackward = !!value.isBackward
-      if (value.isFocused !== undefined) ret.isFocused = !!value.isFocused
-      if (value.marks !== undefined) ret.marks = value.marks
-      break
-    }
-    default: {
-      throw new Error(`Invalid selection \`properties\` argument! It must be an object or a selection. You passed: "${value}".`)
-    }
+  case 'object':
+    if (value.anchorKey !== undefined) ret.anchorKey = value.anchorKey
+    if (value.anchorOffset !== undefined) ret.anchorOffset = value.anchorOffset
+    if (value.focusKey !== undefined) ret.focusKey = value.focusKey
+    if (value.focusOffset !== undefined) ret.focusOffset = value.focusOffset
+    if (value.isBackward !== undefined) ret.isBackward = !!value.isBackward
+    if (value.isFocused !== undefined) ret.isFocused = !!value.isFocused
+    if (value.marks !== undefined) ret.marks = value.marks
+    break
+
+  default:
+    throw new Error(`Invalid selection \`properties\` argument! It must be an object or a selection. You passed: "${value}".`)
   }
 
   return ret

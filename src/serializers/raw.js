@@ -110,13 +110,13 @@ const Raw = {
 
   deserializeNode(object, options) {
     switch (object.kind) {
-      case 'block': return Raw.deserializeBlock(object, options)
-      case 'document': return Raw.deserializeDocument(object, options)
-      case 'inline': return Raw.deserializeInline(object, options)
-      case 'text': return Raw.deserializeText(object, options)
-      default: {
-        throw new Error(`Unrecognized node kind "${object.kind}".`)
-      }
+    case 'block': return Raw.deserializeBlock(object, options)
+    case 'document': return Raw.deserializeDocument(object, options)
+    case 'inline': return Raw.deserializeInline(object, options)
+    case 'text': return Raw.deserializeText(object, options)
+    default: {
+      throw new Error(`Unrecognized node kind "${object.kind}".`)
+    }
     }
   },
 
@@ -291,13 +291,13 @@ const Raw = {
 
   serializeNode(node, options) {
     switch (node.kind) {
-      case 'block': return Raw.serializeBlock(node, options)
-      case 'document': return Raw.serializeDocument(node, options)
-      case 'inline': return Raw.serializeInline(node, options)
-      case 'text': return Raw.serializeText(node, options)
-      default: {
-        throw new Error(`Unrecognized node kind "${node.kind}".`)
-      }
+    case 'block': return Raw.serializeBlock(node, options)
+    case 'document': return Raw.serializeDocument(node, options)
+    case 'inline': return Raw.serializeInline(node, options)
+    case 'text': return Raw.serializeText(node, options)
+    default: {
+      throw new Error(`Unrecognized node kind "${node.kind}".`)
+    }
     }
   },
 

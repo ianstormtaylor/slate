@@ -380,10 +380,10 @@ export function setSelectionOperation(transform, properties) {
   // If the selection moves, clear any marks, unless the new selection
   // does change the marks in some way
   const moved = [
-      'anchorKey',
-      'anchorOffset',
-      'focusKey',
-      'focusOffset',
+    'anchorKey',
+    'anchorOffset',
+    'focusKey',
+    'focusOffset',
   ].some(p => props.hasOwnProperty(p))
 
   if (selection.marks

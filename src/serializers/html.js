@@ -129,17 +129,17 @@ class Html {
     elements.forEach((element) => {
       const node = this.deserializeElement(element)
       switch (typeOf(node)) {
-        case 'array':
-          nodes = nodes.concat(node)
-          break
-        case 'object':
-          nodes.push(node)
-          break
-        case 'null':
-        case 'undefined':
-          return
-        default:
-          throw new Error(`A rule returned an invalid deserialized representation: "${node}".`)
+      case 'array':
+        nodes = nodes.concat(node)
+        break
+      case 'object':
+        nodes.push(node)
+        break
+      case 'null':
+      case 'undefined':
+        return
+      default:
+        throw new Error(`A rule returned an invalid deserialized representation: "${node}".`)
       }
     })
 
@@ -158,15 +158,15 @@ class Html {
 
     const next = (elements) => {
       switch (typeOf(elements)) {
-        case 'array':
-          return this.deserializeElements(elements)
-        case 'object':
-          return this.deserializeElement(elements)
-        case 'null':
-        case 'undefined':
-          return
-        default:
-          throw new Error(`The \`next\` argument was called with invalid children: "${elements}".`)
+      case 'array':
+        return this.deserializeElements(elements)
+      case 'object':
+        return this.deserializeElement(elements)
+      case 'null':
+      case 'undefined':
+        return
+      default:
+        throw new Error(`The \`next\` argument was called with invalid children: "${elements}".`)
       }
     }
 

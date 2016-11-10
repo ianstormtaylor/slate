@@ -261,11 +261,11 @@ function Plugin(options = {}) {
     debug('onDrop', { data })
 
     switch (data.type) {
-      case 'text':
-      case 'html':
-        return onDropText(e, data, state)
-      case 'fragment':
-        return onDropFragment(e, data, state)
+    case 'text':
+    case 'html':
+      return onDropText(e, data, state)
+    case 'fragment':
+      return onDropFragment(e, data, state)
     }
   }
 
@@ -346,14 +346,14 @@ function Plugin(options = {}) {
     debug('onKeyDown', { data })
 
     switch (data.key) {
-      case 'enter': return onKeyDownEnter(e, data, state)
-      case 'backspace': return onKeyDownBackspace(e, data, state)
-      case 'delete': return onKeyDownDelete(e, data, state)
-      case 'left': return onKeyDownLeft(e, data, state)
-      case 'right': return onKeyDownRight(e, data, state)
-      case 'y': return onKeyDownY(e, data, state)
-      case 'z': return onKeyDownZ(e, data, state)
-      case 'k': return onKeyDownK(e, data, state)
+    case 'enter': return onKeyDownEnter(e, data, state)
+    case 'backspace': return onKeyDownBackspace(e, data, state)
+    case 'delete': return onKeyDownDelete(e, data, state)
+    case 'left': return onKeyDownLeft(e, data, state)
+    case 'right': return onKeyDownRight(e, data, state)
+    case 'y': return onKeyDownY(e, data, state)
+    case 'z': return onKeyDownZ(e, data, state)
+    case 'k': return onKeyDownK(e, data, state)
     }
   }
 
@@ -625,11 +625,11 @@ function Plugin(options = {}) {
     debug('onPaste', { data })
 
     switch (data.type) {
-      case 'fragment':
-        return onPasteFragment(e, data, state)
-      case 'text':
-      case 'html':
-        return onPasteText(e, data, state)
+    case 'fragment':
+      return onPasteFragment(e, data, state)
+    case 'text':
+    case 'html':
+      return onPasteText(e, data, state)
     }
   }
 
@@ -701,60 +701,60 @@ function Plugin(options = {}) {
    * Extend core schema with rendering
    */
 
-   /**
-    * A default schema rule to render block nodes.
-    *
-    * @type {Object}
-    */
+  /**
+   * A default schema rule to render block nodes.
+   *
+   * @type {Object}
+   */
 
-   const BLOCK_RENDER_RULE = {
-     match: (node) => {
-       return node.kind == 'block'
-     },
-     render: (props) => {
-       return (
-         <div {...props.attributes} style={{ position: 'relative' }}>
-           {props.children}
-           {placeholder
-             ? <Placeholder
-                 className={placeholderClassName}
-                 node={props.node}
-                 parent={props.state.document}
-                 state={props.state}
-                 style={placeholderStyle}
-               >
-                 {placeholder}
-               </Placeholder>
-             : null}
-         </div>
-       )
-     }
-   }
+  const BLOCK_RENDER_RULE = {
+    match: (node) => {
+      return node.kind == 'block'
+    },
+    render: (props) => {
+      return (
+        <div {...props.attributes} style={{ position: 'relative' }}>
+          {props.children}
+          {placeholder
+            ? <Placeholder
+                className={placeholderClassName}
+                node={props.node}
+                parent={props.state.document}
+                state={props.state}
+                style={placeholderStyle}
+              >
+              {placeholder}
+            </Placeholder>
+           : null}
+        </div>
+      )
+    }
+  }
 
-   /**
-    * A default schema rule to render inline nodes.
-    *
-    * @type {Object}
-    */
+  /**
+   * A default schema rule to render inline nodes.
+   *
+   * @type {Object}
+   */
 
-   const INLINE_RENDER_RULE = {
-     match: (node) => {
-       return node.kind == 'inline'
-     },
-     render: (props) => {
-       return (
-         <span {...props.attributes} style={{ position: 'relative' }}>
-           {props.children}
-         </span>
-       )
-     }
-   }
+  const INLINE_RENDER_RULE = {
+    match: (node) => {
+      return node.kind == 'inline'
+    },
+    render: (props) => {
+      return (
+        <span {...props.attributes} style={{ position: 'relative' }}>
+          {props.children}
+        </span>
+      )
+    }
+  }
 
   const schema = {
-      rules: [
-          BLOCK_RENDER_RULE,
-          INLINE_RENDER_RULE
-      ]
+    rules: [
+      BLOCK_RENDER_RULE,
+      INLINE_RENDER_RULE
+    ]
   }
 
   /**

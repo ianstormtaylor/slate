@@ -594,9 +594,9 @@ class Selection extends new Record(DEFAULTS) {
    */
 
   moveEndOffset(n = 1) {
-      return this.isBackward
-        ? this.merge({ anchorOffset: this.anchorOffset + n })
-        : this.merge({ focusOffset: this.focusOffset + n })
+    return this.isBackward
+      ? this.merge({ anchorOffset: this.anchorOffset + n })
+      : this.merge({ focusOffset: this.focusOffset + n })
   }
 
   /**

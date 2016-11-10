@@ -193,10 +193,10 @@ export function normalizeWith(transform, schema, prevDocument) {
  */
 
 export function normalize(transform) {
-    transform = transform
-        .normalizeDocument()
-        .normalizeSelection()
-    return transform
+  transform = transform
+    .normalizeDocument()
+    .normalizeSelection()
+  return transform
 }
 
 /**
@@ -272,15 +272,15 @@ export function normalizeSelection(transform) {
     !document.hasDescendant(selection.anchorKey) ||
     !document.hasDescendant(selection.focusKey)
   ) {
-      warning('Selection was invalid and reset to start of the document')
-      const firstText = document.getTexts().first()
-      selection = selection.merge({
-        anchorKey: firstText.key,
-        anchorOffset: 0,
-        focusKey: firstText.key,
-        focusOffset: 0,
-        isBackward: false
-      })
+    warning('Selection was invalid and reset to start of the document')
+    const firstText = document.getTexts().first()
+    selection = selection.merge({
+      anchorKey: firstText.key,
+      anchorOffset: 0,
+      focusKey: firstText.key,
+      focusOffset: 0,
+      isBackward: false
+    })
   }
 
   state = state.merge({ selection })

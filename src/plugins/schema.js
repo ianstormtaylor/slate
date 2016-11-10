@@ -57,16 +57,16 @@ const BLOCK_CHILDREN_RULE = {
  */
 
 const MIN_TEXT_RULE = {
-    match: (object) => {
-      return object.kind == 'block' || object.kind == 'inline'
-    },
-    validate: (node) => {
-      const { nodes } = node
-      return nodes.size === 0 ? true : null
-    },
-    normalize: (transform, node) => {
-      return transform.insertNodeByKey(node.key, 0, Text.create(), { normalize: false })
-    }
+  match: (object) => {
+    return object.kind == 'block' || object.kind == 'inline'
+  },
+  validate: (node) => {
+    const { nodes } = node
+    return nodes.size === 0 ? true : null
+  },
+  normalize: (transform, node) => {
+    return transform.insertNodeByKey(node.key, 0, Text.create(), { normalize: false })
+  }
 }
 
 /**
@@ -83,7 +83,7 @@ const INLINE_CHILDREN_RULE = {
     const { nodes } = inline
     const invalids = nodes.filter(n => n.kind != 'inline' && n.kind != 'text')
     return invalids.size ? invalids : null
-},
+  },
   normalize: (transform, inline, invalids) => {
     return invalids.reduce((t, n) => t.removeNodeByKey(n.key, { normalize: false }), transform)
   }
@@ -131,11 +131,11 @@ const INLINE_VOID_TEXT_RULE = {
     return node.text !== ' ' || node.nodes.size !== 1
   },
   normalize: (transform, node, result) => {
-      transform = node.nodes.reduce((t, child) => {
-          return t.removeNodeByKey(child.key, { normalize: false })
-      }, transform)
+    transform = node.nodes.reduce((t, child) => {
+      return t.removeNodeByKey(child.key, { normalize: false })
+    }, transform)
 
-      return transform.insertNodeByKey(node.key, 0, Text.createFromString(' '), { normalize: false })
+    return transform.insertNodeByKey(node.key, 0, Text.createFromString(' '), { normalize: false })
   }
 }
 
@@ -240,43 +240,43 @@ const NO_EMPTY_TEXT_RULE = {
     const { nodes } = node
 
     if (nodes.size <= 1) {
-        return
+      return
     }
 
     const invalids = nodes
-      .filter((desc, i) => {
-        if (desc.kind != 'text' || desc.length > 0) {
-            return
-        }
+    .filter((desc, i) => {
+      if (desc.kind != 'text' || desc.length > 0) {
+        return
+      }
 
-        // Empty text nodes are only allowed near inline void node
-        const next = nodes.get(i + 1)
-        const prev = i > 0 ? nodes.get(i - 1) : null
+      // Empty text nodes are only allowed near inline void node
+      const next = nodes.get(i + 1)
+      const prev = i > 0 ? nodes.get(i - 1) : null
 
-        // If last one and previous is an inline void, we need to preserve it
-        if (!next && isInlineVoid(prev)) {
-            return
-        }
+      // If last one and previous is an inline void, we need to preserve it
+      if (!next && isInlineVoid(prev)) {
+        return
+      }
 
-        // If first one and next one is an inline, we preserve it
-        if (!prev && isInlineVoid(next)) {
-            return
-        }
+      // If first one and next one is an inline, we preserve it
+      if (!prev && isInlineVoid(next)) {
+        return
+      }
 
-        // If surrounded by inline void, we preserve it
-        if (next && prev && isInlineVoid(next) && isInlineVoid(prev)) {
-            return
-        }
+      // If surrounded by inline void, we preserve it
+      if (next && prev && isInlineVoid(next) && isInlineVoid(prev)) {
+        return
+      }
 
-        // Otherwise we remove it
-        return true
-      })
+      // Otherwise we remove it
+      return true
+    })
 
     return invalids.size ? invalids : null
   },
   normalize: (transform, node, invalids) => {
     return invalids.reduce((t, text) => {
-        return t.removeNodeByKey(text.key, { normalize: false })
+      return t.removeNodeByKey(text.key, { normalize: false })
     }, transform)
   }
 }

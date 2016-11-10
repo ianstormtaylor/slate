@@ -38,6 +38,7 @@
     "import/no-named-as-default": "error",
     "import/no-named-as-default-member": "error",
     "import/no-unresolved": "error",
+    "indent": ["error", 2],
     "key-spacing": ["error", { "beforeColon": false, "afterColon": true }],
     "lines-around-comment": ["error", { "beforeBlockComment": true, "afterBlockComment": true }],
     "new-parens": "error",

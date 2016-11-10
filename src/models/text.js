@@ -44,9 +44,9 @@ class Text extends new Record(DEFAULTS) {
    */
 
   static createFromString(text, marks = Set()) {
-      return Text.createFromRanges([
-          Range.create({ text, marks })
-      ])
+    return Text.createFromRanges([
+      Range.create({ text, marks })
+    ])
   }
 
   /**
@@ -57,12 +57,12 @@ class Text extends new Record(DEFAULTS) {
    */
 
   static createFromRanges(ranges) {
-      return Text.create({
-        characters: ranges.reduce((characters, range) => {
-          range = Range.create(range)
-          return characters.concat(range.getCharacters())
-        }, Character.createList())
-      })
+    return Text.create({
+      characters: ranges.reduce((characters, range) => {
+        range = Range.create(range)
+        return characters.concat(range.getCharacters())
+      }, Character.createList())
+    })
   }
 
   /**
