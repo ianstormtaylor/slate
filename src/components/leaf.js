@@ -6,6 +6,24 @@ import ReactDOM from 'react-dom'
 import getWindow from 'get-window'
 
 /**
+ * Tests if the child is a descendant of parent.
+ *
+ * @param parent
+ * @param child
+ * @returns {boolean}
+ */
+
+function isDescendant(parent, child) {
+  if (!child || !parent) return false
+  let node = child.parentNode
+  while (node != null) {
+    if (node == parent) return true
+    node = node.parentNode
+  }
+  return false
+}
+
+/**
  * Debugger.
  *
  * @type {Function}
@@ -136,9 +154,6 @@ class Leaf extends React.Component {
     const { state, ranges, isVoid } = this.props
     const { selection } = state
 
-    // If the selection is blurred we have nothing to do.
-    if (selection.isBlurred) return
-
     let { anchorOffset, focusOffset } = selection
     const { node, index } = this.props
     const { start, end } = OffsetKey.findBounds(index, ranges)
@@ -148,6 +163,36 @@ class Leaf extends React.Component {
     const hasFocus = selection.hasFocusBetween(node, start, end)
     if (!hasAnchor && !hasFocus) return
 
+    // We have a selection to render, so prepare a few things...
+    const ref = ReactDOM.findDOMNode(this)
+    const el = findDeepestNode(ref)
+    const window = getWindow(el)
+
+    // If no selection is defined we're probably in a node environment and we can skip the selection magic.
+    if (!window || !window.getSelection) return
+
+    const native = window.getSelection()
+    const parent = ref.closest('[contenteditable]')
+
+    // If the selection is blurred but the DOM selection still focuses this leaf,
+    // we need to clean up the ranges and blur the contenteditable.
+    if (selection.isBlurred && (hasAnchor || hasFocus)) {
+      // We need to make sure that the selection from our state is up-to-date with the native selection.
+      // We can do this by checking if native.anchorNode is a descendant of our contenteditable parent, which is this
+      // slate instance. If it's not, the selection is no longer under this instance's responsibility and not further
+      // action is required.
+      if (!isDescendant(parent, native.anchorNode)) return
+
+      // Apparently our selection is blurred, but the DOM still has ranges in the nodes we manage. To fix this,
+      // we blur the contenteditable and remove all ranges.
+      native.removeAllRanges()
+      if (parent) parent.blur()
+      return
+    }
+
+    // If the selection is blurred we have nothing to do.
+    if (selection.isBlurred) return
+
     // If the leaf is a void leaf, ensure that it has no width. This is due to
     // void nodes always rendering an empty leaf, for browser compatibility.
     if (isVoid) {
@@ -155,10 +200,10 @@ class Leaf extends React.Component {
       focusOffset = 0
     }
 
-    // We have a selection to render, so prepare a few things...
-    const el = findDeepestNode(ReactDOM.findDOMNode(this))
-    const window = getWindow(el)
-    const native = window.getSelection()
+    // In firefox it is not enough to create a range, you also need to focus the contenteditable element.
+    function focus() {
+      if (parent) setTimeout(() => parent.focus(), 0)
+    }
 
     // If both the start and end are here, set the selection all at once.
     if (hasAnchor && hasFocus) {
@@ -167,6 +212,7 @@ class Leaf extends React.Component {
       range.setStart(el, anchorOffset - start)
       native.addRange(range)
       native.extend(el, focusOffset - start)
+      focus()
       return
     }
 
@@ -179,8 +225,10 @@ class Leaf extends React.Component {
         const range = window.document.createRange()
         range.setStart(el, anchorOffset - start)
         native.addRange(range)
+        focus()
       } else if (hasFocus) {
         native.extend(el, focusOffset - start)
+        focus()
       }
     }
 
@@ -194,6 +242,7 @@ class Leaf extends React.Component {
         const range = window.document.createRange()
         range.setStart(el, focusOffset - start)
         native.addRange(range)
+        focus()
       } else if (hasAnchor) {
         const endNode = native.focusNode
         const endOffset = native.focusOffset
@@ -202,6 +251,7 @@ class Leaf extends React.Component {
         range.setStart(el, anchorOffset - start)
         native.addRange(range)
         native.extend(endNode, endOffset)
+        focus()
       }
     }
 
