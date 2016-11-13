@@ -133,6 +133,7 @@ class Leaf extends React.Component {
    */
 
   updateSelection() {
+
     const { state, ranges, isVoid } = this.props
     const { selection } = state
 
@@ -156,7 +157,8 @@ class Leaf extends React.Component {
     }
 
     // We have a selection to render, so prepare a few things...
-    const el = findDeepestNode(ReactDOM.findDOMNode(this))
+    const ref = ReactDOM.findDOMNode(this)
+    const el = findDeepestNode(ref)
     const window = getWindow(el)
     const native = window.getSelection()
 
@@ -164,6 +166,8 @@ class Leaf extends React.Component {
     if (hasAnchor && hasFocus) {
       native.removeAllRanges()
       const range = window.document.createRange()
+      // Workaround for firefox focus issue
+      setTimeout(() => ref.focus(ref.closest('[contenteditable]').focus()), 0)
       range.setStart(el, anchorOffset - start)
       native.addRange(range)
       native.extend(el, focusOffset - start)
