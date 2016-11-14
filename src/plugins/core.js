@@ -53,7 +53,7 @@ function Plugin(options = {}) {
     if (prevState && state.document == prevState.document) return state
 
     const newState = state.transform()
-      .normalizeWith(schema, prevState ? prevState.document : null)
+      .normalizeWith(schema)
       .apply({ save: false })
 
     return newState

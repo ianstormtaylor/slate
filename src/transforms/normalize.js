@@ -1,7 +1,6 @@
 import warning from '../utils/warning'
 import { default as defaultSchema } from '../plugins/schema'
 import Normalize from '../utils/normalize'
-import { Map } from 'immutable'
 
 // Maximum recursive calls for normalization
 const MAX_CALLS = 50
@@ -12,21 +11,15 @@ const MAX_CALLS = 50
  * @param  {Transform} transform
  * @param  {Schema} schema
  * @param  {Node} node
- * @param  {Node} prevNode
  * @return {Transform}
  */
 
-export function normalizeNodeWith(transform, schema, node, prevNode) {
-  // Node has not changed
-  if (prevNode == node) {
-    return transform
-  }
-
+export function normalizeNodeWith(transform, schema, node) {
   // For performance considerations, we will check if the transform was changed
   const opCount = transform.operations.length
 
   // Iterate over its children
-  normalizeChildrenWith(transform, schema, node, prevNode)
+  normalizeChildrenWith(transform, schema, node)
 
   const hasChanged = transform.operations.length != opCount
   if (hasChanged) {
@@ -77,11 +70,10 @@ export function normalizeParentsWith(transform, schema, node) {
  *
  * @param  {Transform} transform
  * @param  {Schema} schema
- * @param  {Document} prevDocument
  * @return {Transform} transform
  */
 
-export function normalizeWith(transform, schema, prevDocument) {
+export function normalizeWith(transform, schema) {
   const { state } = transform
   const { document } = state
 
@@ -90,7 +82,7 @@ export function normalizeWith(transform, schema, prevDocument) {
     return transform
   }
 
-  return transform.normalizeNodeWith(schema, document, prevDocument)
+  return transform.normalizeNodeWith(schema, document)
 }
 
 /**
@@ -115,10 +107,7 @@ export function normalize(transform) {
  */
 
 export function normalizeDocument(transform) {
-  const { prevState } = transform
-  const { document: prevDocument } = prevState || {}
-
-  return transform.normalizeWith(defaultSchema, prevDocument)
+  return transform.normalizeWith(defaultSchema)
 }
 
 /**
@@ -131,14 +120,12 @@ export function normalizeDocument(transform) {
 
 export function normalizeNodeByKey(transform, key) {
   key = Normalize.key(key)
-  const { state, prevState } = transform
+  const { state } = transform
   const { document } = state
-  const { document: prevDocument } = prevState || {}
 
   const node = document.key == key ? document : document.assertDescendant(key)
-  const prevNode = document.key == key ? prevDocument : prevDocument.getDescendant(key)
 
-  transform.normalizeNodeWith(defaultSchema, node, prevNode)
+  transform.normalizeNodeWith(defaultSchema, node)
   return transform
 }
 
@@ -152,13 +139,11 @@ export function normalizeNodeByKey(transform, key) {
 
 export function normalizeParentsByKey(transform, key) {
   key = Normalize.key(key)
-  const { state, prevState } = transform
+  const { state } = transform
   const { document } = state
-  const { document: prevDocument } = prevState || {}
   const node = document.key == key ? document : document.assertDescendant(key)
-  const prevNode = document.key == key ? prevDocument : prevDocument.getDescendant(key)
 
-  transform.normalizeParentsWith(defaultSchema, node, prevNode)
+  transform.normalizeParentsWith(defaultSchema, node)
   return transform
 }
 
@@ -220,28 +205,16 @@ function refreshNode(transform, node) {
  * @param  {Transform} transform
  * @param  {Schema} schema
  * @param  {Node} node
- * @param  {Node} prevNode
  * @return {Transform} transform
  */
 
-function normalizeChildrenWith(transform, schema, node, prevNode) {
-  if (
-    node.kind == 'text'
-    || (prevNode && prevNode.nodes == node.nodes)
-  ) {
+function normalizeChildrenWith(transform, schema, node) {
+  if (node.kind == 'text') {
     return transform
   }
 
-  // Create a map beforehand, for performant lookup
-  const prevChildrenMap = new Map().withMutations(map => {
-    if (prevNode) prevNode.nodes.forEach(n => map.set(n.key, n))
-  })
-
   return node.nodes.reduce(
-    (t, child) => {
-      const prevChild = prevChildrenMap.get(child.key)
-      return t.normalizeNodeWith(schema, child, prevChild)
-    },
+    (t, child) => t.normalizeNodeWith(schema, child),
     transform
   )
 }
