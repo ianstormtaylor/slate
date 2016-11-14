@@ -1,6 +1,4 @@
 
-import generate from 'uid'
-
 let N = 0
 
 /**
@@ -10,7 +8,7 @@ let N = 0
  */
 
 function uid() {
-  return (N++) + generate(4)
+  return String(N++)
 }
 
 /**
