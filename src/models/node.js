@@ -1407,7 +1407,19 @@ const Node = {
     } else {
       return result
     }
+  },
+
+  /**
+   * Validate the node against a `schema`.
+   *
+   * @param {Schema} schema
+   * @return {Object || Void}
+   */
+
+  validate(schema) {
+    return schema.__validate(this)
   }
+
 }
 
 /**
@@ -1452,7 +1464,8 @@ memoize(Node, [
   '_getTexts',
   'getTextsAtRange',
   'hasVoidParent',
-  'isInlineSplitAtRange'
+  'isInlineSplitAtRange',
+  'validate'
 ])
 
 /**

@@ -329,6 +329,18 @@ class Text extends new Record(DEFAULTS) {
 
     return this.merge({ characters })
   }
+
+  /**
+   * Validate the text node against a `schema`.
+   *
+   * @param {Schema} schema
+   * @return {Object || Void}
+   */
+
+  validate(schema) {
+    return schema.__validate(this)
+  }
+
 }
 
 /**
@@ -338,7 +350,8 @@ class Text extends new Record(DEFAULTS) {
 memoize(Text.prototype, [
   'getDecorations',
   'getDecorators',
-  'getRanges'
+  'getRanges',
+  'validate'
 ])
 
 /**

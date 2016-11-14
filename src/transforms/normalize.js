@@ -233,7 +233,8 @@ function normalizeNodeOnly(transform, schema, node) {
 
   // Auxiliary function, called recursively, with a maximum calls safety net.
   function _recur(_transform, _node) {
-    const failure = schema.__validate(_node)
+    // _node.validate should be memoized
+    const failure = _node.validate(schema)
 
     // Node is valid?
     if (!failure) {
