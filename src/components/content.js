@@ -418,6 +418,7 @@ class Content extends React.Component {
   onInput = (e) => {
     if (this.tmp.isRendering) return
     if (this.tmp.isComposing) return
+    if (this.props.state.isBlurred) return
     if (isNonEditable(e)) return
     debug('onInput')
 
