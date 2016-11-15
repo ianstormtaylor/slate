@@ -74,7 +74,7 @@ A convenience handler property that will only be called for changes in state whe
 ### `plugins`
 `Array`
 
-An array of [`Plugins`](../plugins) that define the editor's behavior.
+An array of [`Plugins`](../plugins/plugin.md) that define the editor's behavior.
 
 ### `readOnly`
 `Boolean`
@@ -84,7 +84,7 @@ Whether the editor should be in "read-only" mode, where all of the rendering is 
 ### `state`
 `State`
 
-A [`State`](../models/state) object representing the current state of the editor.
+A [`State`](../models/state.md) object representing the current state of the editor.
 
 ### `style`
 `Object`
@@ -120,7 +120,7 @@ An optional dictionary of styles to apply to the default block type's placeholde
 
 ## Plugin-like Properties
 
-In addition to its own properties, the editor allows passing any of the properties that a [plugin](../plugins/plugins.md) defines as well. 
+In addition to its own properties, the editor allows passing any of the properties that a [plugin](../plugins/plugin.md) defines as well.
 
 These properties are actually just a convenience—an implicit plugin definition. Internally, they are grouped together and turned into a plugin that is given first priority in the plugin stack. 
 
@@ -164,7 +164,7 @@ const plugins = [
 ### `onSelect`
 ### `schema`
 
-To see how these properties behave, check out the [Plugins reference](../plugins/plugins.md).
+To see how these properties behave, check out the [Plugins reference](../plugins/plugin.md).
 
 
 ## Methods
