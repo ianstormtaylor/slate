@@ -639,7 +639,7 @@ const Node = {
     const marks = Mark.createSet()
 
     // If the range is collapsed at the start of the node, check the previous.
-    if (range.isCollapsed && startOffset == 0) {
+    if (range.isCollapsed && startOffset == 0 && startKey) {
       const text = this.getDescendant(startKey)
       const previous = this.getPreviousText(startKey)
       if (!previous || !previous.length) return marks
@@ -648,7 +648,7 @@ const Node = {
     }
 
     // If the range is collapsed, check the character before the start.
-    if (range.isCollapsed) {
+    if (range.isCollapsed && startKey) {
       const text = this.getDescendant(startKey)
       const char = text.characters.get(range.startOffset - 1)
       return char.marks
@@ -976,6 +976,9 @@ const Node = {
     range = range.normalize(this)
     const { startKey, endKey } = range
     const texts = this.getTexts()
+    if (!startKey || !endKey) {
+      return texts
+    }
     const startText = this.getDescendant(startKey)
     const endText = this.getDescendant(endKey)
     const start = texts.indexOf(startText)
