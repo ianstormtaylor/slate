@@ -4,6 +4,7 @@ import Debug from 'debug'
 import Node from './node'
 import OffsetKey from '../utils/offset-key'
 import React from 'react'
+import ReactDOM from 'react-dom'
 import Selection from '../models/selection'
 import Transfer from '../utils/transfer'
 import TYPES from '../constants/types'
@@ -27,6 +28,37 @@ const debug = Debug('slate:content')
  */
 
 function noop() {}
+
+/**
+ * Find the deepest descendant of a DOM `element`.
+ *
+ * @param {Element} node
+ * @return {Element}
+ */
+
+function findDeepestNode(element) {
+  return element.firstChild
+    ? findDeepestNode(element.firstChild)
+    : element
+}
+
+/**
+ * Tests if the child is a descendant of parent.
+ *
+ * @param parent
+ * @param child
+ * @returns {boolean}
+ */
+
+function isDescendant(parent, child) {
+  if (!child || !parent) return false
+  let node = child.parentNode
+  while (node != null) {
+    if (node == parent) return true
+    node = node.parentNode
+  }
+  return false
+}
 
 /**
  * Content.
@@ -122,16 +154,34 @@ class Content extends React.Component {
   }
 
   /**
-   * When finished rendering, move the `isRendering` flag on next tick.
+   * When finished rendering, move the `isRendering` flag on next tick and clean up the DOM's activeElement
+   * if neccessary.
    *
-   * @param {Object} props
-   * @param {Object} state
+   * @param {Object} prevProps
+   * @param {Object} prevState
    */
 
-  componentDidUpdate = (props, state) => {
+  componentDidUpdate = (prevProps, prevState) => {
     setTimeout(() => {
       this.tmp.isRendering = false
     }, 1)
+
+    // If this component was focused last render, but is not now we might need to clean up the activeElement.
+    if (this.props.state.isBlurred && prevProps.state.isFocused) {
+      // Get the current selection
+      const ref = ReactDOM.findDOMNode(this)
+      const el = findDeepestNode(ref)
+      const window = getWindow(el)
+      const native = window.getSelection()
+
+      // We need to make sure that the selection from our state is up-to-date with the native selection.
+      // We can do this by checking if native.anchorNode is a descendant of our this node.
+      if (isDescendant(ref, native.anchorNode)) {
+        // The selection was blurred, but the DOM selection state has not changed so we need to do this manually:
+        native.removeAllRanges()
+        if (ref) ref.blur()
+      }
+    }
   }
 
   /**
