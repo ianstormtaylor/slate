@@ -565,8 +565,10 @@ class Content extends React.Component {
    */
 
   onSelect = (e) => {
+
     if (this.props.readOnly) return
-    if (this.tmp.isRendering) return
+    // if this is enabled, the selection will not work properly:
+    // if (this.tmp.isRendering) return
     if (this.tmp.isCopying) return
     if (this.tmp.isComposing) return
     if (isNonEditable(e)) return
