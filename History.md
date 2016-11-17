@@ -5,6 +5,20 @@ This document maintains a list of changes to Slate with each new version. Until 
 ---
 
 
+### `0.15.0` - November 17, 2016
+
+###### BREAKING CHANGES
+
+- **The unique `key` generated values have changed.** Previously, Slate generated unique keys that looked like `'9dk3'`. But they were not very conflict-resistant. Now the keys are simple string of auto-incrementing numbers, like `'0'`, `'1'`, `'2'`. This makes more clear that keys are simply a convenient way to uniquely reference nodes in the **short-term** lifespan of a single in-memory instance of Slate. They are not designed to be used for long-term uniqueness. A new `setKeyGenerator` function has been exported that allows you to pass in your own key generating mechanism if you want to ensure uniqueness.
+
+- **The `Raw` serializer doesn't preserve keys by default.** Previously, the `Raw` serializer would omit keys when passed the `terse: true` option, but preserve them without it. Now it will always omit keys, unless you pass the new `preserveKeys: true` option. This better reflects that keys are temporary, in-memory IDs.
+
+- **Operations on the document now update the selection when needed.** This won't affect you unless you were doing some very specific things with transforms and updating selections. Overall, this makes it much easier to write transforms, since in most cases, the underlying operations will update the selection as you would expect without you doing anything.
+
+
+---
+
+
 ### `0.14.0` — September 10, 2016
 
 ###### BREAKING CHANGES
