@@ -267,12 +267,6 @@ class Leaf extends React.Component {
     // selection can be inserted next to it still.
     if (text == '') return <span className="slate-zero-width-space">{'\u200B'}</span>
 
-    // COMPAT: Browsers will collapse trailing new lines at the end of blocks,
-    // so we need to add an extra trailing new lines to prevent that.
-    const lastChar = text.charAt(text.length - 1)
-    const isLast = index == ranges.size - 1
-    if (isLast && lastChar == '\n') return `${text}\n`
-
     // Otherwise, just return the text.
     return text
   }
