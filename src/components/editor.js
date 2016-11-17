@@ -6,6 +6,7 @@ import React from 'react'
 import Schema from '../models/schema'
 import State from '../models/state'
 import isReactComponent from '../utils/is-react-component'
+import noop from '../utils/noop'
 import typeOf from 'type-of'
 
 /**
@@ -13,14 +14,6 @@ import typeOf from 'type-of'
  */
 
 const debug = Debug('slate:editor')
-
-/**
- * Noop.
- *
- * @type {Function}
- */
-
-function noop() {}
 
 /**
  * Event handlers to mix in to the editor.

@@ -5,15 +5,8 @@ import OffsetKey from '../utils/offset-key'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import keycode from 'keycode'
+import noop from '../utils/noop'
 import { IS_FIREFOX } from '../constants/environment'
-
-/**
- * Noop.
- *
- * @type {Function}
- */
-
-function noop() {}
 
 /**
  * Void.

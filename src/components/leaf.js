@@ -162,9 +162,10 @@ class Leaf extends React.Component {
     const native = window.getSelection()
     const parent = ref.closest('[contenteditable]')
 
-    // In firefox it is not enough to create a range, you also need to focus the contenteditable element.
+    // COMPAT: In Firefox, it's not enough to create a range, you also need to
+    // focus the contenteditable element. (2016/11/16)
     function focus() {
-      if (parent) setTimeout(() => parent.focus(), 0)
+      if (parent) setTimeout(() => parent.focus())
     }
 
     // If both the start and end are here, set the selection all at once.
@@ -175,45 +176,45 @@ class Leaf extends React.Component {
       native.addRange(range)
       native.extend(el, focusOffset - start)
       focus()
-      return
     }
 
-    // If the selection is forward, we can set things in sequence. In
-    // the first leaf to render, reset the selection and set the new start. And
-    // then in the second leaf to render, extend to the new end.
-    if (selection.isForward) {
-      if (hasAnchor) {
-        native.removeAllRanges()
-        const range = window.document.createRange()
-        range.setStart(el, anchorOffset - start)
-        native.addRange(range)
-        focus()
-      } else if (hasFocus) {
-        native.extend(el, focusOffset - start)
-        focus()
-      }
-    }
-
-    // Otherwise, if the selection is backward, we need to hack the order a bit.
-    // In the first leaf to render, set a phony start anchor to store the true
-    // end position. And then in the second leaf to render, set the start and
-    // extend the end to the stored value.
+    // Otherwise we need to set the selection across two different leaves.
     else {
-      if (hasFocus) {
-        native.removeAllRanges()
-        const range = window.document.createRange()
-        range.setStart(el, focusOffset - start)
-        native.addRange(range)
-        focus()
-      } else if (hasAnchor) {
-        const endNode = native.focusNode
-        const endOffset = native.focusOffset
-        native.removeAllRanges()
-        const range = window.document.createRange()
-        range.setStart(el, anchorOffset - start)
-        native.addRange(range)
-        native.extend(endNode, endOffset)
-        focus()
+      // If the selection is forward, we can set things in sequence. In the
+      // first leaf to render, reset the selection and set the new start. And
+      // then in the second leaf to render, extend to the new end.
+      if (selection.isForward) {
+        if (hasAnchor) {
+          native.removeAllRanges()
+          const range = window.document.createRange()
+          range.setStart(el, anchorOffset - start)
+          native.addRange(range)
+        } else if (hasFocus) {
+          native.extend(el, focusOffset - start)
+          focus()
+        }
+      }
+
+      // Otherwise, if the selection is backward, we need to hack the order a bit.
+      // In the first leaf to render, set a phony start anchor to store the true
+      // end position. And then in the second leaf to render, set the start and
+      // extend the end to the stored value.
+      else {
+        if (hasFocus) {
+          native.removeAllRanges()
+          const range = window.document.createRange()
+          range.setStart(el, focusOffset - start)
+          native.addRange(range)
+        } else if (hasAnchor) {
+          const endNode = native.focusNode
+          const endOffset = native.focusOffset
+          native.removeAllRanges()
+          const range = window.document.createRange()
+          range.setStart(el, anchorOffset - start)
+          native.addRange(range)
+          native.extend(endNode, endOffset)
+          focus()
+        }
       }
     }
 
