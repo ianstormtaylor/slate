@@ -257,7 +257,9 @@ class Leaf extends React.Component {
    * @return {Element}
    */
 
-  renderText({ parent, text, index, ranges }) {
+  renderText(props) {
+    const { node, state, parent, text, index, ranges } = props
+
     // COMPAT: If the text is empty and it's the only child, we need to render a
     // <br/> to get the block to have the proper height.
     if (text == '' && parent.kind == 'block' && parent.text == '') return <br />
@@ -269,9 +271,12 @@ class Leaf extends React.Component {
 
     // COMPAT: Browsers will collapse trailing new lines at the end of blocks,
     // so we need to add an extra trailing new lines to prevent that.
+    const block = state.document.getClosestBlock(node.key)
+    const lastText = block.getLastText()
     const lastChar = text.charAt(text.length - 1)
-    const isLast = index == ranges.size - 1
-    if (isLast && lastChar == '\n') return `${text}\n`
+    const isLastText = node == lastText
+    const isLastRange = index == ranges.size - 1
+    if (isLastText && isLastRange && lastChar == '\n') return `${text}\n`
 
     // Otherwise, just return the text.
     return text

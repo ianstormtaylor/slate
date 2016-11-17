@@ -441,23 +441,26 @@ class Content extends React.Component {
     const schema = editor.getSchema()
     const decorators = document.getDescendantDecorators(key, schema)
     const node = document.getDescendant(key)
+    const block = document.getClosestBlock(node.key)
     const ranges = node.getRanges(decorators)
-    const range = ranges.get(index)
+    const lastText = block.getLastText()
 
     // Get the text information.
-    const isLast = index == ranges.size - 1
-    const { text, marks } = range
     let { textContent } = anchorNode
     const lastChar = textContent.charAt(textContent.length - 1)
+    const isLastText = node == lastText
+    const isLastRange = index == ranges.size - 1
 
     // If we're dealing with the last leaf, and the DOM text ends in a new line,
     // we will have added another new line in <Leaf>'s render method to account
     // for browsers collapsing a single trailing new lines, so remove it.
-    if (isLast && lastChar == '\n') {
+    if (isLastText && isLastRange && lastChar == '\n') {
       textContent = textContent.slice(0, -1)
     }
 
     // If the text is no different, abort.
+    const range = ranges.get(index)
+    const { text, marks } = range
     if (textContent == text) return
 
     // Determine what the selection should be after changing the text.
