@@ -79,6 +79,7 @@ input:focus {
 
 .material-icons {
   font-size: 18px;
+  vertical-align: text-bottom;
 }
 
 /**
@@ -126,7 +127,7 @@ input:focus {
 }
 
 .menu > * + * {
-  margin-left: 10px;
+  margin-left: 15px;
 }
 
 .button {
