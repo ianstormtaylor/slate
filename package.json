@@ -18,7 +18,8 @@
     "keycode": "^2.1.2",
     "lodash": "^4.13.1",
     "type-of": "^2.0.1",
-    "ua-parser-js": "^0.7.10"
+    "ua-parser-js": "^0.7.10",
+    "uid": "0.0.2"
   },
   "peerDependencies": {
     "react": "^0.14.0 || ^15.0.0",

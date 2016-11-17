@@ -1,5 +1,5 @@
 
-let N = 0
+import generate from 'uid'
 
 /**
  * Create a unique identifier.
@@ -8,7 +8,7 @@ let N = 0
  */
 
 function uid() {
-  return String(N++)
+  return generate(10)
 }
 
 /**
