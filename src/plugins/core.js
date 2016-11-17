@@ -492,14 +492,14 @@ function Plugin(options = {}) {
     if (data.isOpt) return
     if (state.isExpanded) return
 
-    const { document, startText } = state
-    const hasVoidParent = document.hasVoidParent(startText.key)
+    const { document, startKey, startText } = state
+    const hasVoidParent = document.hasVoidParent(startKey)
 
     if (
       startText.text == '' ||
       hasVoidParent
     ) {
-      const previousText = document.getPreviousText(startText.key)
+      const previousText = document.getPreviousText(startKey)
       if (!previousText) return
 
       debug('onKeyDownLeft', { data })
@@ -530,14 +530,14 @@ function Plugin(options = {}) {
     if (data.isOpt) return
     if (state.isExpanded) return
 
-    const { document, startText } = state
-    const hasVoidParent = document.hasVoidParent(startText)
+    const { document, startKey, startText } = state
+    const hasVoidParent = document.hasVoidParent(startKey)
 
     if (
       startText.text == '' ||
       hasVoidParent
     ) {
-      const nextText = document.getNextText(startText)
+      const nextText = document.getNextText(startKey)
       if (!nextText) return state
 
       debug('onKeyDownRight', { data })

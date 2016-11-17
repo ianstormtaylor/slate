@@ -188,7 +188,7 @@ class RichText extends React.Component {
     else {
       const isList = this.hasBlock('list-item')
       const isType = state.blocks.some((block) => {
-        return !!document.getClosest(block, parent => parent.type == type)
+        return !!document.getClosest(block.key, parent => parent.type == type)
       })
 
       if (isList && isType) {
