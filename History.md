@@ -15,6 +15,10 @@ This document maintains a list of changes to Slate with each new version. Until 
 
 - **Operations on the document now update the selection when needed.** This won't affect you unless you were doing some very specific things with transforms and updating selections. Overall, this makes it much easier to write transforms, since in most cases, the underlying operations will update the selection as you would expect without you doing anything.
 
+###### DEPRECATION CHANGES
+
+- **Node accessor methods no longer accept being passed another node!** Previously, node accessor methods like `node.getParent` could be passed either a `key` string or a `node` object. For performance reasons, passing in a `node` object is being deprecated. So if you have any calls that look like: `node.getParent(descendant)`, they will now need to be written as `node.getParent(descendant.key)`. They will throw a warning for now, and will throw an error in a later version of Slate.
+
 
 ---
 
