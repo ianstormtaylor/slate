@@ -60,6 +60,7 @@ const Raw = {
 
   deserializeDocument(object, options) {
     return Document.create({
+      key: object.key,
       nodes: Block.createList(object.nodes.map((node) => {
         return Raw.deserializeNode(node, options)
       }))
@@ -210,6 +211,10 @@ const Raw = {
         .map(node => Raw.serializeNode(node, options))
     }
 
+    if (!options.preserveKeys) {
+      delete object.key
+    }
+
     return options.terse
       ? Raw.tersifyBlock(object)
       : object
@@ -225,10 +230,15 @@ const Raw = {
 
   serializeDocument(document, options = {}) {
     const object = {
+      key: document.key,
       kind: document.kind,
       nodes: document.nodes
         .toArray()
         .map(node => Raw.serializeNode(node, options))
+    }
+
+    if (!options.preserveKeys) {
+      delete object.key
     }
 
     return options.terse
@@ -254,6 +264,10 @@ const Raw = {
       nodes: inline.nodes
         .toArray()
         .map(node => Raw.serializeNode(node, options))
+    }
+
+    if (!options.preserveKeys) {
+      delete object.key
     }
 
     return options.terse
@@ -360,6 +374,10 @@ const Raw = {
         .map(range => Raw.serializeRange(range, options))
     }
 
+    if (!options.preserveKeys) {
+      delete object.key
+    }
+
     return options.terse
       ? Raw.tersifyText(object)
       : object
@@ -376,6 +394,7 @@ const Raw = {
     const ret = {}
     ret.kind = object.kind
     ret.type = object.type
+    if (object.key) ret.key = object.key
     if (!object.isVoid) ret.nodes = object.nodes
     if (object.isVoid) ret.isVoid = object.isVoid
     if (!isEmpty(object.data)) ret.data = object.data
@@ -390,9 +409,10 @@ const Raw = {
    */
 
   tersifyDocument(object) {
-    return {
-      nodes: object.nodes
-    }
+    const ret = {}
+    ret.nodes = object.nodes
+    if (object.key) ret.key = object.key
+    return ret
   },
 
   /**
@@ -406,6 +426,7 @@ const Raw = {
     const ret = {}
     ret.kind = object.kind
     ret.type = object.type
+    if (object.key) ret.key = object.key
     if (!object.isVoid) ret.nodes = object.nodes
     if (object.isVoid) ret.isVoid = object.isVoid
     if (!isEmpty(object.data)) ret.data = object.data
@@ -459,17 +480,17 @@ const Raw = {
    */
 
   tersifyText(object) {
+    const ret = {}
+    ret.kind = object.kind
+    if (object.key) ret.key = object.key
+
     if (object.ranges.length == 1 && object.ranges[0].marks == null) {
-      return {
-        kind: object.kind,
-        text: object.ranges[0].text
-      }
+      ret.text = object.ranges[0].text
+    } else {
+      ret.ranges = object.ranges
     }
 
-    return {
-      kind: object.kind,
-      ranges: object.ranges
-    }
+    return ret
   },
 
   /**
@@ -552,6 +573,7 @@ const Raw = {
     return {
       kind: 'state',
       document: {
+        key: object.key,
         kind: 'document',
         nodes: object.nodes
       }

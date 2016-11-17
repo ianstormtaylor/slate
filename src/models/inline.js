@@ -14,7 +14,7 @@ import Block from './block'
 import Data from './data'
 import Node from './node'
 import Text from './text'
-import uid from '../utils/uid'
+import generateKey from '../utils/generate-key'
 import { List, Map, Record } from 'immutable'
 
 /**
@@ -48,7 +48,7 @@ class Inline extends new Record(DEFAULTS) {
     if (properties instanceof Text) return properties
     if (!properties.type) throw new Error('You must pass an inline `type`.')
 
-    properties.key = properties.key || uid(4)
+    properties.key = properties.key || generateKey()
     properties.data = Data.create(properties.data)
     properties.isVoid = !!properties.isVoid
     properties.nodes = Inline.createList(properties.nodes)

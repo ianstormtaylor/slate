@@ -14,7 +14,7 @@ import Data from './data'
 import Inline from './inline'
 import Node from './node'
 import Text from './text'
-import uid from '../utils/uid'
+import generateKey from '../utils/generate-key'
 import { Map, List, Record } from 'immutable'
 
 /**
@@ -48,7 +48,7 @@ class Block extends new Record(DEFAULTS) {
     if (properties instanceof Text) return properties
     if (!properties.type) throw new Error('You must pass a block `type`.')
 
-    properties.key = properties.key || uid(4)
+    properties.key = properties.key || generateKey()
     properties.data = Data.create(properties.data)
     properties.isVoid = !!properties.isVoid
     properties.nodes = Block.createList(properties.nodes)

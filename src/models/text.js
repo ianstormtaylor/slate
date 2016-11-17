@@ -3,7 +3,7 @@ import Character from './character'
 import Mark from './mark'
 import Range from './range'
 import memoize from '../utils/memoize'
-import uid from '../utils/uid'
+import generateKey from '../utils/generate-key'
 import { List, Record, Set } from 'immutable'
 
 /**
@@ -30,7 +30,7 @@ class Text extends new Record(DEFAULTS) {
 
   static create(properties = {}) {
     if (properties instanceof Text) return properties
-    properties.key = properties.key || uid(4)
+    properties.key = properties.key || generateKey()
     properties.characters = Character.createList(properties.characters)
     return new Text(properties)
   }
@@ -264,7 +264,7 @@ class Text extends new Record(DEFAULTS) {
    */
 
   regenerateKey() {
-    return this.merge({ key: uid() })
+    return this.merge({ key: generateKey() })
   }
 
   /**

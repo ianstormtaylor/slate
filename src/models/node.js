@@ -7,7 +7,7 @@ import Normalize from '../utils/normalize'
 import direction from 'direction'
 import isInRange from '../utils/is-in-range'
 import memoize from '../utils/memoize'
-import uid from '../utils/uid'
+import generateKey from '../utils/generate-key'
 import { List, Set } from 'immutable'
 
 
@@ -1225,7 +1225,7 @@ const Node = {
    */
 
   regenerateKey() {
-    return this.merge({ key: uid() })
+    return this.merge({ key: generateKey() })
   },
 
   /**
@@ -1296,7 +1296,7 @@ const Node = {
         const oneChars = characters.take(i)
         const twoChars = characters.skip(i)
         one = child.merge({ characters: oneChars })
-        two = child.merge({ characters: twoChars, key: uid() })
+        two = child.merge({ characters: twoChars }).regenerateKey()
       }
 
       else {
@@ -1309,7 +1309,7 @@ const Node = {
 
         const twoNodes = nodes.skipUntil(n => n.key == one.key).rest().unshift(two)
         one = child.merge({ nodes: oneNodes })
-        two = child.merge({ nodes: twoNodes, key: uid() })
+        two = child.merge({ nodes: twoNodes }).regenerateKey()
       }
 
       child = base.getParent(child.key)
@@ -1344,7 +1344,7 @@ const Node = {
     const twoNodes = nodes.skip(count)
 
     const one = node.merge({ nodes: oneNodes })
-    const two = node.merge({ nodes: twoNodes, key: uid() })
+    const two = node.merge({ nodes: twoNodes }).regenerateKey()
 
 
     const nodeIndex = parent.nodes.indexOf(node)

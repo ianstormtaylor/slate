@@ -60,9 +60,6 @@ describe('serializers', () => {
     })
   })
 
-  describe('json', () => {
-  })
-
   describe('plain', () => {
     describe('deserialize()', () => {
       const dir = resolve(__dirname, './fixtures/plain/deserialize')
@@ -164,6 +161,20 @@ describe('serializers', () => {
           strictEqual(strip(serialized), expected)
         })
       }
+    })
+
+    describe('serialize({ preserveKeys: true })', () => {
+      it('should omit keys by default', () => {
+        const state = Plain.deserialize('string')
+        const serialized = Raw.serialize(state)
+        assert(typeof serialized.document.key === 'undefined')
+      })
+
+      it('should preserve keys', () => {
+        const state = Plain.deserialize('string')
+        const serialized = Raw.serialize(state, { preserveKeys: true })
+        assert(typeof serialized.document.key === 'string')
+      })
     })
   })
 })

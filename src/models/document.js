@@ -12,7 +12,7 @@ import './inline'
 
 import Block from './block'
 import Node from './node'
-import uid from '../utils/uid'
+import generateKey from '../utils/generate-key'
 import { OrderedMap, Record } from 'immutable'
 
 /**
@@ -40,7 +40,7 @@ class Document extends new Record(DEFAULTS) {
   static create(properties = {}) {
     if (properties instanceof Document) return properties
 
-    properties.key = properties.key || uid(4)
+    properties.key = properties.key || generateKey()
     properties.nodes = Block.createList(properties.nodes)
 
     return new Document(properties)

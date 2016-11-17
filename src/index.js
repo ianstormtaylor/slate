@@ -41,6 +41,7 @@ import Transforms from './transforms'
  */
 
 import findDOMNode from './utils/find-dom-node'
+import { setKeyGenerator } from './utils/generate-key'
 
 /**
  * Export.
@@ -66,7 +67,8 @@ export {
   State,
   Text,
   Transforms,
-  findDOMNode
+  findDOMNode,
+  setKeyGenerator
 }
 
 export default {
@@ -87,5 +89,6 @@ export default {
   State,
   Text,
   Transforms,
-  findDOMNode
+  findDOMNode,
+  setKeyGenerator
 }
