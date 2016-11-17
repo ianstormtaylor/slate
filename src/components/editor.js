@@ -4,20 +4,13 @@ import CorePlugin from '../plugins/core'
 import Debug from 'debug'
 import React from 'react'
 import Schema from '../models/schema'
+import noop from '../utils/noop'
 
 /**
  * Debug.
  */
 
 const debug = Debug('slate:editor')
-
-/**
- * Noop.
- *
- * @type {Function}
- */
-
-function noop() {}
 
 /**
  * Event handlers to mix in to the editor.

@@ -4,11 +4,13 @@ import Debug from 'debug'
 import Node from './node'
 import OffsetKey from '../utils/offset-key'
 import React from 'react'
+import ReactDOM from 'react-dom'
 import Selection from '../models/selection'
 import Transfer from '../utils/transfer'
 import TYPES from '../constants/types'
 import getWindow from 'get-window'
 import keycode from 'keycode'
+import noop from '../utils/noop'
 import { IS_FIREFOX, IS_MAC } from '../constants/environment'
 
 /**
@@ -18,14 +20,6 @@ import { IS_FIREFOX, IS_MAC } from '../constants/environment'
  */
 
 const debug = Debug('slate:content')
-
-/**
- * Noop.
- *
- * @type {Function}
- */
-
-function noop() {}
 
 /**
  * Content.
@@ -121,16 +115,29 @@ class Content extends React.Component {
   }
 
   /**
-   * When finished rendering, move the `isRendering` flag on next tick.
+   * When finished rendering, move the `isRendering` flag on next tick and
+   * clean up the DOM's activeElement if neccessary.
    *
-   * @param {Object} props
-   * @param {Object} state
+   * @param {Object} prevProps
+   * @param {Object} prevState
    */
 
-  componentDidUpdate = (props, state) => {
+  componentDidUpdate = (prevProps, prevState) => {
     setTimeout(() => {
       this.tmp.isRendering = false
     }, 1)
+
+    // If the state is blurred now, but was focused before, and the DOM still
+    // has a node inside the editor selected, we need to blur it.
+    if (this.props.state.isBlurred && prevProps.state.isFocused) {
+      const el = ReactDOM.findDOMNode(this)
+      const window = getWindow(el)
+      const native = window.getSelection()
+      if (!el.contains(native.anchorNode)) return
+
+      native.removeAllRanges()
+      el.blur()
+    }
   }
 
   /**
@@ -416,6 +423,7 @@ class Content extends React.Component {
   onInput = (e) => {
     if (this.tmp.isRendering) return
     if (this.tmp.isComposing) return
+    if (this.props.state.isBlurred) return
     if (isNonEditable(e)) return
     debug('onInput')
 

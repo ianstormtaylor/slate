@@ -36,7 +36,7 @@ The `Document` is where all of the content in the editor is stored. It is a recu
 
 #### Inline
 
-Similar to [`Block`](#block) nodes, but containing inline content instead of block-level contain. They too can be nested to any depth, but at the lowest level will always contain a single [`Text`](#text) node.
+Similar to [`Block`](#block) nodes, but containing inline content instead of block-level content. They too can be nested to any depth, but at the lowest level will always contain a single [`Text`](#text) node.
 
 
 #### Mark

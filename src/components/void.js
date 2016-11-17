@@ -3,15 +3,8 @@ import Leaf from './leaf'
 import Mark from '../models/mark'
 import OffsetKey from '../utils/offset-key'
 import React from 'react'
+import noop from '../utils/noop'
 import { IS_FIREFOX } from '../constants/environment'
-
-/**
- * Noop.
- *
- * @type {Function}
- */
-
-function noop() {}
 
 /**
  * Void.
