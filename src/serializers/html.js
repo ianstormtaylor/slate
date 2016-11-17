@@ -174,9 +174,7 @@ class Html {
       if (!rule.deserialize) continue
       const ret = rule.deserialize(element, next)
       if (!ret) continue
-      node = ret.kind == 'mark'
-        ? this.deserializeMark(ret)
-        : ret
+      node = ret.kind == 'mark' ? this.deserializeMark(ret) : ret
       break
     }
 
