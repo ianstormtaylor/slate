@@ -1,6 +1,6 @@
 
 /**
- * Prevent circuit.
+ * Prevent circular dependencies.
  */
 
 import './document'
@@ -19,6 +19,8 @@ import { Map, List, Record } from 'immutable'
 
 /**
  * Default properties.
+ *
+ * @type {Object}
  */
 
 const DEFAULTS = {
@@ -31,6 +33,8 @@ const DEFAULTS = {
 
 /**
  * Block.
+ *
+ * @type {Block}
  */
 
 class Block extends new Record(DEFAULTS) {
@@ -38,8 +42,8 @@ class Block extends new Record(DEFAULTS) {
   /**
    * Create a new `Block` with `properties`.
    *
-   * @param {Object} properties
-   * @return {Block} element
+   * @param {Object|Block} properties
+   * @return {Block}
    */
 
   static create(properties = {}) {
@@ -63,8 +67,8 @@ class Block extends new Record(DEFAULTS) {
   /**
    * Create a list of `Blocks` from an array.
    *
-   * @param {Array} elements
-   * @return {List} list
+   * @param {Array<Object|Block>} elements
+   * @return {List<Block>}
    */
 
   static createList(elements = []) {
@@ -75,7 +79,7 @@ class Block extends new Record(DEFAULTS) {
   /**
    * Get the node's kind.
    *
-   * @return {String} kind
+   * @return {String}
    */
 
   get kind() {
@@ -85,7 +89,7 @@ class Block extends new Record(DEFAULTS) {
   /**
    * Is the node empty?
    *
-   * @return {Boolean} isEmpty
+   * @return {Boolean}
    */
 
   get isEmpty() {
@@ -95,7 +99,7 @@ class Block extends new Record(DEFAULTS) {
   /**
    * Get the length of the concatenated text of the node.
    *
-   * @return {Number} length
+   * @return {Number}
    */
 
   get length() {
@@ -105,7 +109,7 @@ class Block extends new Record(DEFAULTS) {
   /**
    * Get the concatenated text `string` of all child nodes.
    *
-   * @return {String} text
+   * @return {String}
    */
 
   get text() {
@@ -125,6 +129,8 @@ for (const method in Node) {
 
 /**
  * Export.
+ *
+ * @type {Block}
  */
 
 export default Block

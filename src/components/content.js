@@ -82,7 +82,7 @@ class Content extends React.Component {
    *
    * @param {Object} props
    * @param {Object} state
-   * @return {Boolean} shouldUpdate
+   * @return {Boolean}
    */
 
   shouldComponentUpdate = (props, state) => {
@@ -625,7 +625,7 @@ class Content extends React.Component {
   /**
    * Render the editor content.
    *
-   * @return {Element} element
+   * @return {Element}
    */
 
   render = () => {
@@ -690,7 +690,7 @@ class Content extends React.Component {
    * Render a `node`.
    *
    * @param {Node} node
-   * @return {Element} element
+   * @return {Element}
    */
 
   renderNode = (node) => {
@@ -725,6 +725,8 @@ function isNonEditable(event) {
 
 /**
  * Export.
+ *
+ * @type {Component}
  */
 
 export default Content

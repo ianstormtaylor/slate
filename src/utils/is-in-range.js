@@ -5,7 +5,7 @@
  * @param {Number} index
  * @param {Text} text
  * @param {Selection} range
- * @return {Set} characters
+ * @return {Boolean}
  */
 
 function isInRange(index, text, range) {

@@ -28,8 +28,8 @@ export function collapseToAnchor(transform) {
 }
 
 /**
- * Move the anchor point to the
- *  focus point.
+ * Move the start point to the end point.
+ *
  * @param {Transform} transform
  * @return {Transform}
  */
@@ -42,8 +42,8 @@ export function collapseToEnd(transform) {
 }
 
 /**
- * Move the anchor point to the
- *  focus point.
+ * Move the anchor point to the focus point.
+ *
  * @param {Transform} transform
  * @return {Transform}
  */
@@ -56,7 +56,7 @@ export function collapseToFocus(transform) {
 }
 
 /**
- * Move the focus point to the anchor point.
+ * Move the end point to the start point.
  *
  * @param {Transform} transform
  * @return {Transform}
@@ -378,7 +378,7 @@ export function moveTo(transform, properties) {
 
 export function moveToOffsets(transform, anchor, fokus) {
   const { state } = transform
-  const { document, selection } = state
+  const { selection } = state
   const sel = selection.moveToOffsets(anchor, fokus)
   return transform.setSelectionOperation(sel)
 }

@@ -8,6 +8,8 @@ import noop from '../utils/noop'
 
 /**
  * Debug.
+ *
+ * @type {Function}
  */
 
 const debug = Debug('slate:editor')
@@ -38,7 +40,9 @@ const EVENT_HANDLERS = [
 class Editor extends React.Component {
 
   /**
-   * Properties.
+   * Property types.
+   *
+   * @type {Object}
    */
 
   static propTypes = {
@@ -60,6 +64,8 @@ class Editor extends React.Component {
 
   /**
    * Default properties.
+   *
+   * @type {Object}
    */
 
   static defaultProps = {
@@ -167,7 +173,7 @@ class Editor extends React.Component {
    * When the editor receives a new 'state'
    *
    * @param {State} state
-   * @return {State} newState
+   * @return {State}
    */
 
   onBeforeChange = (state) => {
@@ -275,6 +281,7 @@ class Editor extends React.Component {
    */
 
   resolvePlugins = (props) => {
+    // eslint-disable-next-line no-unused-vars
     const { onChange, plugins, ...editorPlugin } = props
     const corePlugin = CorePlugin(props)
     return [
@@ -316,6 +323,8 @@ for (const property of EVENT_HANDLERS) {
 
 /**
  * Export.
+ *
+ * @type {Component}
  */
 
 export default Editor

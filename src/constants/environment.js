@@ -5,6 +5,8 @@ import includes from 'lodash/includes'
 
 /**
  * Export.
+ *
+ * @type {Object}
  */
 
 export const IS_ANDROID = process.browser && browser.name == 'android'

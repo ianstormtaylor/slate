@@ -1,11 +1,13 @@
+
 import IS_DEV from '../constants/is-dev'
 
 /**
  * Log a development warning.
+ *
  * @param {String} message
  */
 
-export default function warning(message, ...more) {
+function warning(message, ...more) {
   if (!IS_DEV) {
     return
   }
@@ -15,11 +17,17 @@ export default function warning(message, ...more) {
   }
 
   try {
-    // --- Welcome to debugging Slate ---
+    // --- Welcome to debugging Slate! ---
     // This error was thrown as a convenience so that you can use this stack
     // to find the callsite that caused this warning to fire.
     throw new Error(message)
   } catch (x) {
-    // This error is only for debugging
+    // This error is only for debugging.
   }
 }
+
+/**
+ * Export.
+ */
+
+export default warning

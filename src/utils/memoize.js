@@ -1,15 +1,22 @@
+
 import Map from 'es6-map'
 import IS_DEV from '../constants/is-dev'
 
 /**
- * This module serves to memoize methods on immutable instances.
+ * GLOBAL: True if memoization should is enabled. Only effective in DEV mode.
+ *
+ * @type {Boolean}
  */
 
-// Global: True if memoization should is enabled. Only effective in DEV mode
 let ENABLED = true
 
-// Global: Changing this cache key will clear all previous cached
-// results. Only effective in DEV mode
+/**
+ * GLOBAL: Changing this cache key will clear all previous cached results.
+ * Only effective in DEV mode.
+ *
+ * @type {Number}
+ */
+
 let CACHE_KEY = 0
 
 /**
@@ -33,6 +40,8 @@ const UNDEFINED = {}
 
 /**
  * Default value for unset keys in native Maps
+ *
+ * @type {Undefined}
  */
 
 const UNSET = undefined
@@ -83,9 +92,9 @@ function memoize(object, properties) {
 /**
  * Set a value at a key path in a tree of Map, creating Maps on the go.
  *
- * @param{Map} map
- * @param{Array} keys
- * @param{Any} value
+ * @param {Map} map
+ * @param {Array} keys
+ * @param {Any} value
  * @return {Map}
  */
 
@@ -97,17 +106,16 @@ function setIn(map, keys, value) {
   for (const key of keys) {
     childMap = parentMap.get(key)
 
+    // If the path was not created yet...
     if (childMap === UNSET) {
-      // This path was not created yet
       childMap = new Map()
       parentMap.set(key, childMap)
     }
 
     parentMap = childMap
   }
-  // The whole map path was created
 
-  // Set the value to the bottom most map
+  // The whole path has been created, so set the value to the bottom most map.
   childMap.set(LEAF, value)
 
   return map
@@ -115,22 +123,24 @@ function setIn(map, keys, value) {
 
 /**
  * Get a value at a key path in a tree of Map.
- * If not set, returns UNSET.
- * If the set value is undefined, returns UNDEFINED
  *
- * @param{Map} map
- * @param{Array} keys
- * @return {Any | UNSET | UNDEFINED}
+ * If not set, returns UNSET.
+ * If the set value is undefined, returns UNDEFINED.
+ *
+ * @param {Map} map
+ * @param {Array} keys
+ * @return {Any|UNSET|UNDEFINED}
  */
 
 function getIn(map, keys) {
   let childMap
   for (const key of keys) {
     childMap = map.get(key)
+
     if (childMap === UNSET) {
-      // Not found
       return UNSET
     }
+
     map = childMap
   }
 
@@ -139,6 +149,7 @@ function getIn(map, keys) {
 
 /**
  * In DEV mode, clears the previously memoized values, globally.
+ *
  * @return {Void}
  */
 
@@ -151,6 +162,7 @@ function __clear() {
 
 /**
  * In DEV mode, enable or disable the use of memoize values, globally.
+ *
  * @param {Boolean} enabled
  * @return {Void}
  */
@@ -161,6 +173,8 @@ function __enable(enabled) {
 
 /**
  * Export.
+ *
+ * @type {Object}
  */
 
 export {

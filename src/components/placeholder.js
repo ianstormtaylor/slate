@@ -3,12 +3,16 @@ import React from 'react'
 
 /**
  * Placeholder.
+ *
+ * @type {Component}
  */
 
 class Placeholder extends React.Component {
 
   /**
-   * Properties.
+   * Property types.
+   *
+   * @type {Object}
    */
 
   static propTypes = {
@@ -48,10 +52,7 @@ class Placeholder extends React.Component {
     const { node, parent } = this.props
     if (node.text) return false
     if (parent.nodes.size > 1) return false
-
-    const isFirst = parent.nodes.first() === node
-    if (isFirst) return true
-
+    if (parent.nodes.first() === node) return true
     return false
   }
 
@@ -61,7 +62,7 @@ class Placeholder extends React.Component {
    * If the placeholder is a string, and no `className` or `style` has been
    * passed, give it a default style of lowered opacity.
    *
-   * @return {Element} element
+   * @return {Element}
    */
 
   render = () => {
@@ -98,6 +99,8 @@ class Placeholder extends React.Component {
 
 /**
  * Export.
+ *
+ * @type {Component}
  */
 
 export default Placeholder

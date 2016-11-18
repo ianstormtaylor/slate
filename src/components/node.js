@@ -9,7 +9,7 @@ import IS_DEV from '../constants/is-dev'
 import Leaf from './leaf'
 import Void from './void'
 import scrollTo from '../utils/scroll-to'
-import warning from '../utils/warning'
+import warn from '../utils/warn'
 
 /**
  * Debug.
@@ -104,7 +104,7 @@ class Node extends React.Component {
       if (!IS_DEV || !Immutable.is(nextProps.node, this.props.node)) {
         return true
       } else {
-        warning('Encountered different references for identical node values in "shouldComponentUpdate". Check that you are preserving references for the following node:\n', nextProps.node)
+        warn('Encountered different references for identical node values in "shouldComponentUpdate". Check that you are preserving references for the following node:\n', nextProps.node)
       }
     }
 
@@ -227,7 +227,7 @@ class Node extends React.Component {
   /**
    * Render.
    *
-   * @return {Element} element
+   * @return {Element}
    */
 
   render = () => {
@@ -243,7 +243,7 @@ class Node extends React.Component {
    * Render a `child` node.
    *
    * @param {Node} child
-   * @return {Element} element
+   * @return {Element}
    */
 
   renderNode = (child) => {
@@ -262,7 +262,7 @@ class Node extends React.Component {
   /**
    * Render an element `node`.
    *
-   * @return {Element} element
+   * @return {Element}
    */
 
   renderElement = () => {
@@ -307,7 +307,7 @@ class Node extends React.Component {
   /**
    * Render a text node.
    *
-   * @return {Element} element
+   * @return {Element}
    */
 
   renderText = () => {
@@ -333,7 +333,7 @@ class Node extends React.Component {
   /**
    * Render a single leaf node given a `range` and `offset`.
    *
-   * @param {List} ranges
+   * @param {List<Range>} ranges
    * @param {Range} range
    * @param {Number} index
    * @param {Number} offset

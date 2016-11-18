@@ -12,6 +12,8 @@ const TYPES = {
 
 /**
  * Export.
+ *
+ * @type {Object}
  */
 
 export default TYPES

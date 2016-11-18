@@ -4,7 +4,9 @@ import memoize from '../utils/memoize'
 import { Map, Record, Set } from 'immutable'
 
 /**
- * Record.
+ * Default properties.
+ *
+ * @type {Object}
  */
 
 const DEFAULTS = {
@@ -14,6 +16,8 @@ const DEFAULTS = {
 
 /**
  * Mark.
+ *
+ * @type {Mark}
  */
 
 class Mark extends new Record(DEFAULTS) {
@@ -21,8 +25,8 @@ class Mark extends new Record(DEFAULTS) {
   /**
    * Create a new `Mark` with `properties`.
    *
-   * @param {Object} properties
-   * @return {Mark} mark
+   * @param {Object|Mark} properties
+   * @return {Mark}
    */
 
   static create(properties = {}) {
@@ -35,8 +39,8 @@ class Mark extends new Record(DEFAULTS) {
   /**
    * Create a marks set from an array of marks.
    *
-   * @param {Array} array
-   * @return {Set} marks
+   * @param {Array<Object|Mark>} array
+   * @return {Set<Mark>}
    */
 
   static createSet(array = []) {
@@ -47,7 +51,7 @@ class Mark extends new Record(DEFAULTS) {
   /**
    * Get the kind.
    *
-   * @return {String} kind
+   * @return {String}
    */
 
   get kind() {
@@ -58,7 +62,7 @@ class Mark extends new Record(DEFAULTS) {
    * Get the component for the node from a `schema`.
    *
    * @param {Schema} schema
-   * @return {Component || Void}
+   * @return {Component|Void}
    */
 
   getComponent(schema) {
@@ -77,6 +81,8 @@ memoize(Mark.prototype, [
 
 /**
  * Export.
+ *
+ * @type {Mark}
  */
 
 export default Mark

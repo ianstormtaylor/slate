@@ -62,7 +62,7 @@ export function insertNodeByKey(transform, key, index, node, options = {}) {
  * @param {String} key
  * @param {Number} offset
  * @param {String} text
- * @param {Set} marks (optional)
+ * @param {Set<Mark>} marks (optional)
  * @param {Object} options
  *   @param {Boolean} normalize
  * @return {Transform}
@@ -267,7 +267,7 @@ export function setMarkByKey(transform, key, offset, length, mark, properties, o
  *
  * @param {Transform} transform
  * @param {String} key
- * @param {Object || String} properties
+ * @param {Object|String} properties
  * @param {Object} options
  *   @param {Boolean} normalize
  * @return {Transform}
@@ -330,7 +330,7 @@ export function splitNodeByKey(transform, key, offset, options = {}) {
  *
  * @param {Transform} transform
  * @param {String} key
- * @param {Object or String} properties
+ * @param {Object|String} properties
  * @param {Object} options
  *   @param {Boolean} normalize
  * @return {Transform}
@@ -349,7 +349,7 @@ export function unwrapInlineByKey(transform, key, properties, options) {
  *
  * @param {Transform} transform
  * @param {String} key
- * @param {Object or String} properties
+ * @param {Object|String} properties
  * @param {Object} options
  *   @param {Boolean} normalize
  * @return {Transform}
@@ -368,7 +368,7 @@ export function unwrapBlockByKey(transform, key, properties, options) {
  *
  * @param {Transform} transform
  * @param {String} key The node to wrap
- * @param {Block || Object || String} block The wrapping block (its children are discarded)
+ * @param {Block|Object|String} block The wrapping block (its children are discarded)
  * @param {Object} options
  *   @param {Boolean} normalize
  * @return {Transform}

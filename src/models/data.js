@@ -6,6 +6,8 @@ import { Map } from 'immutable'
  *
  * This isn't an immutable record, it's just a thin wrapper around `Map` so that
  * we can allow for more convenient creation.
+ *
+ * @type {Object}
  */
 
 const Data = {
@@ -27,6 +29,8 @@ const Data = {
 
 /**
  * Export.
+ *
+ * @type {Object}
  */
 
 export default Data

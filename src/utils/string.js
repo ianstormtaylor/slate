@@ -50,7 +50,7 @@ function isSurrogate(code) {
  * Is a character a word character? Needs the `remaining` characters too.
  *
  * @param {String} char
- * @param {String || Void} remaining
+ * @param {String|Void} remaining
  * @return {Boolean}
  */
 
@@ -122,27 +122,6 @@ function getCharOffsetForward(text, offset) {
 }
 
 /**
- * Get the length of a `string`.
- *
- * @param {String} string
- * @return {Number}
- */
-
-function getLength(string) {
-  let length = 0
-
-  for (
-    let i = 0, char = string.charAt(i);
-    i < string.length;
-    i += getCharLength(char)
-  ) {
-    length++
-  }
-
-  return length
-}
-
-/**
  * Get the offset to the end of the first word in `text`.
  *
  * @param {String} text
@@ -203,6 +182,8 @@ function getWordOffsetForward(text, offset) {
 
 /**
  * Export.
+ *
+ * @type {Object}
  */
 
 export default {

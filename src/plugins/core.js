@@ -81,11 +81,12 @@ function Plugin(options = {}) {
     const nextChar = startOffset === initialChars.size ? null : initialChars.get(startOffset)
     const char = Character.create({
       text: e.data,
-      marks: (prevChar && prevChar.marks)
-        // When cursor is at start of a range of marks, without
-        // preceding text, the native behavior is to insert inside the
-        // range of marks.
-        || (!prevChar && nextChar && nextChar.marks)
+      // When cursor is at start of a range of marks, without preceding text,
+      // the native behavior is to insert inside the range of marks.
+      marks: (
+        (prevChar && prevChar.marks) ||
+        (!prevChar && nextChar && nextChar.marks)
+      )
     })
 
     const chars = initialChars.insert(startOffset, char)
@@ -692,14 +693,10 @@ function Plugin(options = {}) {
     return state
       .transform()
       .moveTo(selection)
-      // Since the document has not changed, We only normalize the selection
-      // This is done in transform.apply
+      // Since the document has not changed, we only need to normalize the
+      // selection and this is done automatically in `transform.apply()`.
       .apply()
   }
-
-  /**
-   * Extend core schema with rendering
-   */
 
   /**
    * A default schema rule to render block nodes.
@@ -750,6 +747,12 @@ function Plugin(options = {}) {
     }
   }
 
+  /**
+   * Extend the core schema with rendering rules.
+   *
+   * @type {Object}
+   */
+
   const schema = {
     rules: [
       BLOCK_RENDER_RULE,
@@ -759,6 +762,8 @@ function Plugin(options = {}) {
 
   /**
    * Return the core plugin.
+   *
+   * @type {Object}
    */
 
   return {
@@ -777,6 +782,8 @@ function Plugin(options = {}) {
 
 /**
  * Export.
+ *
+ * @type {Object}
  */
 
 export default Plugin

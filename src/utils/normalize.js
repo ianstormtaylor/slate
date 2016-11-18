@@ -12,7 +12,7 @@ import typeOf from 'type-of'
 /**
  * Normalize a block argument `value`.
  *
- * @param {Block || String || Object} value
+ * @param {Block|String|Object} value
  * @return {Block}
  */
 
@@ -32,7 +32,7 @@ function block(value) {
 /**
  * Normalize an inline argument `value`.
  *
- * @param {Inline || String || Object} value
+ * @param {Inline|String|Object} value
  * @return {Inline}
  */
 
@@ -52,7 +52,7 @@ function inline(value) {
 /**
  * Normalize a key argument `value`.
  *
- * @param {String || Node} value
+ * @param {String|Node} value
  * @return {String}
  */
 
@@ -71,7 +71,7 @@ function key(value) {
 /**
  * Normalize a mark argument `value`.
  *
- * @param {Mark || String || Object} value
+ * @param {Mark|String|Object} value
  * @return {Mark}
  */
 
@@ -91,7 +91,7 @@ function mark(value) {
 /**
  * Normalize a mark properties argument `value`.
  *
- * @param {String || Object || Mark} value
+ * @param {String|Object|Mark} value
  * @return {Object}
  */
 
@@ -123,7 +123,7 @@ function markProperties(value = {}) {
 /**
  * Normalize a node properties argument `value`.
  *
- * @param {String || Object || Node} value
+ * @param {String|Object|Node} value
  * @return {Object}
  */
 
@@ -156,7 +156,7 @@ function nodeProperties(value = {}) {
 /**
  * Normalize a selection argument `value`.
  *
- * @param {Selection || Object} value
+ * @param {Selection|Object} value
  * @return {Selection}
  */
 
@@ -175,7 +175,7 @@ function selection(value) {
 /**
  * Normalize a selection properties argument `value`.
  *
- * @param {Object || Selection} value
+ * @param {Object|Selection} value
  * @return {Object}
  */
 

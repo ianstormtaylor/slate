@@ -123,7 +123,7 @@ export function deleteForward(transform, n = 1) {
  * Insert a `block` at the current selection.
  *
  * @param {Transform} transform
- * @param {String || Object || Block} block
+ * @param {String|Object|Block} block
  * @return {Transform}
  */
 
@@ -195,7 +195,7 @@ export function insertFragment(transform, fragment) {
  * Insert a `inline` at the current selection.
  *
  * @param {Transform} transform
- * @param {String || Object || Block} inline
+ * @param {String|Object|Block} inline
  * @return {Transform}
  */
 
@@ -235,7 +235,7 @@ export function insertInline(transform, inline) {
  *
  * @param {Transform} transform
  * @param {String} text
- * @param {Set} marks (optional)
+ * @param {Set<Mark>} marks (optional)
  * @return {Transform}
  */
 
@@ -427,7 +427,7 @@ export function toggleMark(transform, mark) {
  * Unwrap the current selection from a block parent with `properties`.
  *
  * @param {Transform} transform
- * @param {Object or String} properties
+ * @param {Object|String} properties
  * @return {Transform}
  */
 
@@ -441,7 +441,7 @@ export function unwrapBlock(transform, properties) {
  * Unwrap the current selection from an inline parent with `properties`.
  *
  * @param {Transform} transform
- * @param {Object or String} properties
+ * @param {Object|String} properties
  * @return {Transform}
  */
 
@@ -456,7 +456,7 @@ export function unwrapInline(transform, properties) {
  * `properties`.
  *
  * @param {Transform} transform
- * @param {Object or String} properties
+ * @param {Object|String} properties
  * @return {Transform}
  */
 
@@ -470,7 +470,7 @@ export function wrapBlock(transform, properties) {
  * Wrap the current selection in new inline nodes with `properties`.
  *
  * @param {Transform} transform
- * @param {Object or String} properties
+ * @param {Object|String} properties
  * @return {Transform}
  */
 

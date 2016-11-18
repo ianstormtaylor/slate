@@ -1,22 +1,33 @@
 
 /**
  * Offset key parser regex.
+ *
+ * @type {RegExp}
  */
 
 const PARSER = /^(\w+)(?:-(\d+))?$/
 
 /**
  * Offset key attribute name.
+ *
+ * @type {String}
  */
 
 const ATTRIBUTE = 'data-offset-key'
+
+/**
+ * Offset key attribute selector.
+ *
+ * @type {String}
+ */
+
 const SELECTOR = `[${ATTRIBUTE}]`
 
 /**
  * Find the start and end bounds from an `offsetKey` and `ranges`.
  *
  * @param {Number} index
- * @param {List} ranges
+ * @param {List<Range>} ranges
  * @return {Object}
  */
 
@@ -99,7 +110,7 @@ function findKey(element, offset) {
  * Find the selection point from an `offsetKey` and `ranges`.
  *
  * @param {Object} offsetKey
- * @param {List} ranges
+ * @param {List<Range>} ranges
  * @return {Object}
  */
 
@@ -131,7 +142,7 @@ function findPoint(offsetKey, ranges) {
 function parse(string) {
   const matches = PARSER.exec(string)
   if (!matches) throw new Error(`Invalid offset key string "${string}".`)
-  const [ original, key, index ] = matches
+  const [ original, key, index ] = matches // eslint-disable-line no-unused-vars
   return {
     key,
     index: parseInt(index, 10)
@@ -153,6 +164,8 @@ function stringify(object) {
 
 /**
  * Export.
+ *
+ * @type {Object}
  */
 
 export default {

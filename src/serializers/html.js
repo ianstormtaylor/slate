@@ -8,6 +8,8 @@ import { Record } from 'immutable'
 
 /**
  * String.
+ *
+ * @type {String}
  */
 
 const String = new Record({
@@ -67,7 +69,6 @@ class Html {
    *
    * @param {Object} options
    *   @property {Array} rules
-   * @return {Html} serializer
    */
 
   constructor(options = {}) {
@@ -81,7 +82,7 @@ class Html {
    * Deserialize pasted HTML.
    *
    * @param {String} html
-   * @return {State} state
+   * @return {State}
    */
 
   deserialize = (html) => {
@@ -120,7 +121,7 @@ class Html {
    * Deserialize an array of Cheerio `elements`.
    *
    * @param {Array} elements
-   * @return {Array} nodes
+   * @return {Array}
    */
 
   deserializeElements = (elements = []) => {
@@ -150,7 +151,7 @@ class Html {
    * Deserialize a Cheerio `element`.
    *
    * @param {Object} element
-   * @return {Mixed} node
+   * @return {Any}
    */
 
   deserializeElement = (element) => {
@@ -185,7 +186,7 @@ class Html {
    * Deserialize a `mark` object.
    *
    * @param {Object} mark
-   * @return {Array} nodes
+   * @return {Array}
    */
 
   deserializeMark = (mark) => {
@@ -226,7 +227,7 @@ class Html {
    * @param {State} state
    * @param {Object} options
    *   @property {Boolean} render
-   * @return {String|Array} html
+   * @return {String|Array}
    */
 
   serialize = (state, options = {}) => {
@@ -317,6 +318,8 @@ function addKey(element) {
 
 /**
  * Export.
+ *
+ * @type {Html}
  */
 
 export default Html

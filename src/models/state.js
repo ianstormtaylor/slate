@@ -7,6 +7,8 @@ import { Record, Set, Stack, List } from 'immutable'
 
 /**
  * History.
+ *
+ * @type {History}
  */
 
 const History = new Record({
@@ -16,6 +18,8 @@ const History = new Record({
 
 /**
  * Default properties.
+ *
+ * @type {Object}
  */
 
 const DEFAULTS = {
@@ -27,6 +31,8 @@ const DEFAULTS = {
 
 /**
  * State.
+ *
+ * @type {State}
  */
 
 class State extends new Record(DEFAULTS) {
@@ -34,8 +40,8 @@ class State extends new Record(DEFAULTS) {
   /**
    * Create a new `State` with `properties`.
    *
-   * @param {Object} properties
-   * @return {State} state
+   * @param {Object|State} properties
+   * @return {State}
    */
 
   static create(properties = {}) {
@@ -58,7 +64,7 @@ class State extends new Record(DEFAULTS) {
   /**
    * Get the kind.
    *
-   * @return {String} kind
+   * @return {String}
    */
 
   get kind() {
@@ -68,7 +74,7 @@ class State extends new Record(DEFAULTS) {
   /**
    * Are there undoable events?
    *
-   * @return {Boolean} hasUndos
+   * @return {Boolean}
    */
 
   get hasUndos() {
@@ -78,7 +84,7 @@ class State extends new Record(DEFAULTS) {
   /**
    * Are there redoable events?
    *
-   * @return {Boolean} hasRedos
+   * @return {Boolean}
    */
 
   get hasRedos() {
@@ -88,7 +94,7 @@ class State extends new Record(DEFAULTS) {
   /**
    * Is the current selection blurred?
    *
-   * @return {Boolean} isBlurred
+   * @return {Boolean}
    */
 
   get isBlurred() {
@@ -98,7 +104,7 @@ class State extends new Record(DEFAULTS) {
   /**
    * Is the current selection focused?
    *
-   * @return {Boolean} isFocused
+   * @return {Boolean}
    */
 
   get isFocused() {
@@ -108,7 +114,7 @@ class State extends new Record(DEFAULTS) {
   /**
    * Is the current selection collapsed?
    *
-   * @return {Boolean} isCollapsed
+   * @return {Boolean}
    */
 
   get isCollapsed() {
@@ -118,7 +124,7 @@ class State extends new Record(DEFAULTS) {
   /**
    * Is the current selection expanded?
    *
-   * @return {Boolean} isExpanded
+   * @return {Boolean}
    */
 
   get isExpanded() {
@@ -138,7 +144,7 @@ class State extends new Record(DEFAULTS) {
   /**
    * Is the current selection forward?
    *
-   * @return {Boolean} isForward
+   * @return {Boolean}
    */
 
   get isForward() {
@@ -148,7 +154,7 @@ class State extends new Record(DEFAULTS) {
   /**
    * Get the current start key.
    *
-   * @return {String} startKey
+   * @return {String}
    */
 
   get startKey() {
@@ -158,7 +164,7 @@ class State extends new Record(DEFAULTS) {
   /**
    * Get the current end key.
    *
-   * @return {String} endKey
+   * @return {String}
    */
 
   get endKey() {
@@ -168,7 +174,7 @@ class State extends new Record(DEFAULTS) {
   /**
    * Get the current start offset.
    *
-   * @return {String} startOffset
+   * @return {String}
    */
 
   get startOffset() {
@@ -178,7 +184,7 @@ class State extends new Record(DEFAULTS) {
   /**
    * Get the current end offset.
    *
-   * @return {String} endOffset
+   * @return {String}
    */
 
   get endOffset() {
@@ -188,7 +194,7 @@ class State extends new Record(DEFAULTS) {
   /**
    * Get the current anchor key.
    *
-   * @return {String} anchorKey
+   * @return {String}
    */
 
   get anchorKey() {
@@ -198,7 +204,7 @@ class State extends new Record(DEFAULTS) {
   /**
    * Get the current focus key.
    *
-   * @return {String} focusKey
+   * @return {String}
    */
 
   get focusKey() {
@@ -208,7 +214,7 @@ class State extends new Record(DEFAULTS) {
   /**
    * Get the current anchor offset.
    *
-   * @return {String} anchorOffset
+   * @return {String}
    */
 
   get anchorOffset() {
@@ -218,7 +224,7 @@ class State extends new Record(DEFAULTS) {
   /**
    * Get the current focus offset.
    *
-   * @return {String} focusOffset
+   * @return {String}
    */
 
   get focusOffset() {
@@ -228,7 +234,7 @@ class State extends new Record(DEFAULTS) {
   /**
    * Get the current start text node's closest block parent.
    *
-   * @return {Block} block
+   * @return {Block}
    */
 
   get startBlock() {
@@ -238,7 +244,7 @@ class State extends new Record(DEFAULTS) {
   /**
    * Get the current end text node's closest block parent.
    *
-   * @return {Block} block
+   * @return {Block}
    */
 
   get endBlock() {
@@ -248,7 +254,7 @@ class State extends new Record(DEFAULTS) {
   /**
    * Get the current anchor text node's closest block parent.
    *
-   * @return {Block} block
+   * @return {Block}
    */
 
   get anchorBlock() {
@@ -258,7 +264,7 @@ class State extends new Record(DEFAULTS) {
   /**
    * Get the current focus text node's closest block parent.
    *
-   * @return {Block} block
+   * @return {Block}
    */
 
   get focusBlock() {
@@ -268,7 +274,7 @@ class State extends new Record(DEFAULTS) {
   /**
    * Get the current start text node's closest inline parent.
    *
-   * @return {Inline} inline
+   * @return {Inline}
    */
 
   get startInline() {
@@ -278,7 +284,7 @@ class State extends new Record(DEFAULTS) {
   /**
    * Get the current end text node's closest inline parent.
    *
-   * @return {Inline} inline
+   * @return {Inline}
    */
 
   get endInline() {
@@ -288,7 +294,7 @@ class State extends new Record(DEFAULTS) {
   /**
    * Get the current anchor text node's closest inline parent.
    *
-   * @return {Inline} inline
+   * @return {Inline}
    */
 
   get anchorInline() {
@@ -298,7 +304,7 @@ class State extends new Record(DEFAULTS) {
   /**
    * Get the current focus text node's closest inline parent.
    *
-   * @return {Inline} inline
+   * @return {Inline}
    */
 
   get focusInline() {
@@ -308,7 +314,7 @@ class State extends new Record(DEFAULTS) {
   /**
    * Get the current start text node.
    *
-   * @return {Text} text
+   * @return {Text}
    */
 
   get startText() {
@@ -318,7 +324,7 @@ class State extends new Record(DEFAULTS) {
   /**
    * Get the current end node.
    *
-   * @return {Text} text
+   * @return {Text}
    */
 
   get endText() {
@@ -328,7 +334,7 @@ class State extends new Record(DEFAULTS) {
   /**
    * Get the current anchor node.
    *
-   * @return {Text} text
+   * @return {Text}
    */
 
   get anchorText() {
@@ -338,7 +344,7 @@ class State extends new Record(DEFAULTS) {
   /**
    * Get the current focus node.
    *
-   * @return {Text} text
+   * @return {Text}
    */
 
   get focusText() {
@@ -348,7 +354,7 @@ class State extends new Record(DEFAULTS) {
   /**
    * Get the characters in the current selection.
    *
-   * @return {List} characters
+   * @return {List<Character>}
    */
 
   get characters() {
@@ -358,7 +364,7 @@ class State extends new Record(DEFAULTS) {
   /**
    * Get the marks of the current selection.
    *
-   * @return {Set} marks
+   * @return {Set<Mark>}
    */
 
   get marks() {
@@ -370,7 +376,7 @@ class State extends new Record(DEFAULTS) {
   /**
    * Get the block nodes in the current selection.
    *
-   * @return {List} nodes
+   * @return {List<Block>}
    */
 
   get blocks() {
@@ -382,7 +388,7 @@ class State extends new Record(DEFAULTS) {
   /**
    * Get the fragment of the current selection.
    *
-   * @return {List} nodes
+   * @return {Document}
    */
 
   get fragment() {
@@ -394,7 +400,7 @@ class State extends new Record(DEFAULTS) {
   /**
    * Get the inline nodes in the current selection.
    *
-   * @return {List} nodes
+   * @return {List<Inline>}
    */
 
   get inlines() {
@@ -406,7 +412,7 @@ class State extends new Record(DEFAULTS) {
   /**
    * Get the text nodes in the current selection.
    *
-   * @return {List} nodes
+   * @return {List<Text>}
    */
 
   get texts() {
@@ -419,7 +425,7 @@ class State extends new Record(DEFAULTS) {
    * Return a new `Transform` with the current state as a starting point.
    *
    * @param {Object} properties
-   * @return {Transform} transform
+   * @return {Transform}
    */
 
   transform(properties = {}) {

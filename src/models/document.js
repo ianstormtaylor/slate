@@ -1,6 +1,6 @@
 
 /**
- * Prevent circuit.
+ * Prevent circular dependencies.
  */
 
 import './block'
@@ -16,7 +16,9 @@ import generateKey from '../utils/generate-key'
 import { OrderedMap, Record } from 'immutable'
 
 /**
- * Defaults.
+ * Default properties.
+ *
+ * @type {Object}
  */
 
 const DEFAULTS = {
@@ -26,6 +28,8 @@ const DEFAULTS = {
 
 /**
  * Document.
+ *
+ * @type {Document}
  */
 
 class Document extends new Record(DEFAULTS) {
@@ -33,8 +37,8 @@ class Document extends new Record(DEFAULTS) {
   /**
    * Create a new `Document` with `properties`.
    *
-   * @param {Objetc} properties
-   * @return {Document} document
+   * @param {Object|Document} properties
+   * @return {Document}
    */
 
   static create(properties = {}) {
@@ -49,7 +53,7 @@ class Document extends new Record(DEFAULTS) {
   /**
    * Get the node's kind.
    *
-   * @return {String} kind
+   * @return {String}
    */
 
   get kind() {
@@ -59,7 +63,7 @@ class Document extends new Record(DEFAULTS) {
   /**
    * Is the document empty?
    *
-   * @return {Boolean} isEmpty
+   * @return {Boolean}
    */
 
   get isEmpty() {
@@ -69,7 +73,7 @@ class Document extends new Record(DEFAULTS) {
   /**
    * Get the length of the concatenated text of the document.
    *
-   * @return {Number} length
+   * @return {Number}
    */
 
   get length() {
@@ -79,7 +83,7 @@ class Document extends new Record(DEFAULTS) {
   /**
    * Get the concatenated text `string` of all child nodes.
    *
-   * @return {String} text
+   * @return {String}
    */
 
   get text() {
@@ -98,6 +102,8 @@ for (const method in Node) {
 
 /**
  * Export.
+ *
+ * @type {Document}
  */
 
 export default Document

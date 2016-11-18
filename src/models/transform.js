@@ -36,7 +36,7 @@ class Transform {
   /**
    * Get the kind.
    *
-   * @return {String} kind
+   * @return {String}
    */
 
   get kind() {
@@ -50,7 +50,7 @@ class Transform {
    *   @property {Boolean} isNative
    *   @property {Boolean} merge
    *   @property {Boolean} save
-   * @return {State} state
+   * @return {State}
    */
 
   apply(options = {}) {

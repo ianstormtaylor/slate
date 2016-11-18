@@ -63,6 +63,8 @@ function serialize(state) {
 
 /**
  * Export.
+ *
+ * @type {Object}
  */
 
 export default {

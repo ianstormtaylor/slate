@@ -1,33 +1,40 @@
-import warning from '../utils/warning'
-import { default as defaultSchema } from '../plugins/schema'
-import Normalize from '../utils/normalize'
 
-// Maximum recursive calls for normalization
-const MAX_CALLS = 50
+import Normalize from '../utils/normalize'
+import warn from '../utils/warn'
+import { default as coreSchema } from '../plugins/schema'
 
 /**
- * Normalize a node (itself and its children) using a schema.
+ * Maximum recursive calls for normalization. Without a maximum, it is easy for
+ * a transform function of a schema rule to not fully validate the document,
+ * leading to an infinitely invalid loop.
  *
- * @param  {Transform} transform
- * @param  {Schema} schema
- * @param  {Node} node
+ * @type {Number}
+ */
+
+const MAX_ITERATIONS = 50
+
+/**
+ * Normalize a `node` and its children with a `schema`.
+ *
+ * @param {Transform} transform
+ * @param {Schema} schema
+ * @param {Node} node
  * @return {Transform}
  */
 
 export function normalizeNodeWith(transform, schema, node) {
-  // For performance considerations, we will check if the transform was changed
+  // For performance considerations, we will check if the transform was changed.
   const opCount = transform.operations.length
 
-  // Iterate over its children
+  // Iterate over its children.
   normalizeChildrenWith(transform, schema, node)
 
-  const hasChanged = transform.operations.length != opCount
-  if (hasChanged) {
-    // Refresh the node reference
-    node = refreshNode(transform, node)
+  // Re-find the node reference if necessary
+  if (transform.operations.length != opCount) {
+    node = refindNode(transform, node)
   }
 
-  // Now normalize the node itself if it still exist
+  // Now normalize the node itself if it still exists.
   if (node) {
     normalizeNodeOnly(transform, schema, node)
   }
@@ -36,24 +43,25 @@ export function normalizeNodeWith(transform, schema, node) {
 }
 
 /**
- * Normalize a node its parents using a schema.
+ * Normalize a `node` its parents with a `schema`.
  *
- * @param  {Transform} transform
- * @param  {Schema} schema
- * @param  {Node} node
+ * @param {Transform} transform
+ * @param {Schema} schema
+ * @param {Node} node
  * @return {Transform}
  */
 
 export function normalizeParentsWith(transform, schema, node) {
   normalizeNodeOnly(transform, schema, node)
 
-  // Normalize went back up to the document
+  // Normalize went back up to the very top of the document.
   if (node.kind == 'document') {
     return transform
   }
 
-  // We search for the new parent
-  node = refreshNode(transform, node)
+  // Re-find the node first.
+  node = refindNode(transform, node)
+
   if (!node) {
     return transform
   }
@@ -66,19 +74,19 @@ export function normalizeParentsWith(transform, schema, node) {
 }
 
 /**
- * Normalize state using a schema.
+ * Normalize state with a `schema`.
  *
- * @param  {Transform} transform
- * @param  {Schema} schema
- * @return {Transform} transform
+ * @param {Transform} transform
+ * @param {Schema} schema
+ * @return {Transform}
  */
 
 export function normalizeWith(transform, schema) {
   const { state } = transform
   const { document } = state
 
+  // If the schema has no validation rules, there's nothing to normalize.
   if (!schema.hasValidators) {
-    // Schema has no normalization rules
     return transform
   }
 
@@ -86,55 +94,53 @@ export function normalizeWith(transform, schema) {
 }
 
 /**
- * Normalize the state using the core schema.
+ * Normalize the document and selection with the core schema.
  *
- * @param  {Transform} transform
- * @return {Transform} transform
+ * @param {Transform} transform
+ * @return {Transform}
  */
 
 export function normalize(transform) {
-  transform
+  return transform
     .normalizeDocument()
     .normalizeSelection()
-  return transform
 }
 
 /**
- * Normalize only the document
+ * Normalize the document with the core schema.
  *
- * @param  {Transform} transform
- * @return {Transform} transform
+ * @param {Transform} transform
+ * @return {Transform}
  */
 
 export function normalizeDocument(transform) {
-  return transform.normalizeWith(defaultSchema)
+  return transform.normalizeWith(coreSchema)
 }
 
 /**
- * Normalize a node and its children using core schema
+ * Normalize a `node` and its children with the core schema.
  *
- * @param  {Transform} transform
- * @param  {Node or String} key
- * @return {Transform} transform
+ * @param {Transform} transform
+ * @param {Node|String} key
+ * @return {Transform}
  */
 
 export function normalizeNodeByKey(transform, key) {
   key = Normalize.key(key)
   const { state } = transform
   const { document } = state
-
   const node = document.key == key ? document : document.assertDescendant(key)
 
-  transform.normalizeNodeWith(defaultSchema, node)
+  transform.normalizeNodeWith(coreSchema, node)
   return transform
 }
 
 /**
  * Normalize a node and its parent using core schema
  *
- * @param  {Transform} transform
- * @param  {Node or String} key
- * @return {Transform} transform
+ * @param {Transform} transform
+ * @param {Node|String} key
+ * @return {Transform}
  */
 
 export function normalizeParentsByKey(transform, key) {
@@ -143,15 +149,15 @@ export function normalizeParentsByKey(transform, key) {
   const { document } = state
   const node = document.key == key ? document : document.assertDescendant(key)
 
-  transform.normalizeParentsWith(defaultSchema, node)
+  transform.normalizeParentsWith(coreSchema, node)
   return transform
 }
 
 /**
  * Normalize only the selection.
  *
- * @param  {Transform} transform
- * @return {Transform} transform
+ * @param {Transform} transform
+ * @return {Transform}
  */
 
 export function normalizeSelection(transform) {
@@ -159,13 +165,14 @@ export function normalizeSelection(transform) {
   let { document, selection } = state
   selection = selection.normalize(document)
 
-  // If the selection is nulled (not normal)
+  // If the selection is unset, or the anchor or focus key in the selection are
+  // pointing to nodes that no longer exist, warn and reset the selection.
   if (
     selection.isUnset ||
     !document.hasDescendant(selection.anchorKey) ||
     !document.hasDescendant(selection.focusKey)
   ) {
-    warning('Selection was invalid and reset to start of the document')
+    warn('Selection was invalid and reset to start of the document')
     const firstText = document.getFirstText()
     selection = selection.merge({
       anchorKey: firstText.key,
@@ -181,15 +188,15 @@ export function normalizeSelection(transform) {
   return transform
 }
 
-
 /**
- * Refresh a reference to a node that have been modified in a transform.
- * @param  {Transform} transform
- * @param  {Node} node
- * @return {Node} newNode
+ * Re-find a reference to a node that may have been modified in a transform.
+ *
+ * @param {Transform} transform
+ * @param {Node} node
+ * @return {Node}
  */
 
-function refreshNode(transform, node) {
+function refindNode(transform, node) {
   const { state } = transform
   const { document } = state
 
@@ -201,66 +208,60 @@ function refreshNode(transform, node) {
 }
 
 /**
- * Normalize all children of a node
- * @param  {Transform} transform
- * @param  {Schema} schema
- * @param  {Node} node
- * @return {Transform} transform
+ * Normalize the children of a `node` with a `schema`.
+ *
+ * @param {Transform} transform
+ * @param {Schema} schema
+ * @param {Node} node
+ * @return {Transform}
  */
 
 function normalizeChildrenWith(transform, schema, node) {
-  if (node.kind == 'text') {
-    return transform
-  }
+  if (node.kind == 'text') return transform
 
-  return node.nodes.reduce(
-    (t, child) => t.normalizeNodeWith(schema, child),
-    transform
-  )
+  node.nodes.forEach((child) => {
+    transform.normalizeNodeWith(schema, child)
+  })
+
+  return transform
 }
 
 /**
- * Normalize a node, but not its children
+ * Normalize a `node` with a `schema`, but not its children.
  *
- * @param  {Transform} transform
- * @param  {Schema} schema
- * @param  {Node} node
- * @return {Transform} transform
+ * @param {Transform} transform
+ * @param {Schema} schema
+ * @param {Node} node
+ * @return {Transform}
  */
 
 function normalizeNodeOnly(transform, schema, node) {
-  let recursiveCount = 0
+  let iterations = 0
 
-  // Auxiliary function, called recursively, with a maximum calls safety net.
-  function _recur(_transform, _node) {
-    // _node.validate should be memoized
-    const failure = _node.validate(schema)
-
-    // Node is valid?
-    if (!failure) {
-      return _transform
-    }
+  function normalizeRecursively(t, n) {
+    const failure = n.validate(schema)
+    if (!failure) return t
 
     const { value, rule } = failure
 
-    // Normalize and get the new state
-    rule.normalize(_transform, _node, value)
+    // Rule the `normalize` function for the rule with the invalid value.
+    rule.normalize(t, n, value)
 
-    // Search for the updated node in the new state
-    const newNode = refreshNode(_transform, _node)
+    // Re-find the node reference, in case it was updated. If the node no longer
+    // exists, we're done for this branch.
+    const newNode = refindNode(t, n)
+    if (!newNode) return t
 
-    // Node no longer exist, go back to normalize parents
-    if (!newNode) {
-      return _transform
-    }
+    // Increment the iterations counter, so that we don't exceed the max.
+    iterations++
 
-    recursiveCount++
-    if (recursiveCount > MAX_CALLS) {
+    if (iterations > MAX_ITERATIONS) {
       throw new Error('Unexpected number of successive normalizations. Aborting.')
     }
 
-    return _recur(_transform, newNode)
+    // Otherwise, recurse to validate again.
+    return normalizeRecursively(t, newNode)
   }
 
-  return _recur(transform, node)
+  return normalizeRecursively(transform, node)
 }

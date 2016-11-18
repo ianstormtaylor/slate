@@ -94,7 +94,7 @@ const Raw = {
    *
    * @param {Object} object
    * @param {Object} options (optional)
-   * @return {Mark} mark
+   * @return {Mark}
    */
 
   deserializeMark(object, options) {
@@ -106,7 +106,7 @@ const Raw = {
    *
    * @param {Object} object
    * @param {Object} options (optional)
-   * @return {Text}
+   * @return {Node}
    */
 
   deserializeNode(object, options) {
@@ -126,7 +126,7 @@ const Raw = {
    *
    * @param {Object} object
    * @param {Object} options (optional)
-   * @return {List}
+   * @return {List<Character>}
    */
 
   deserializeRange(object, options = {}) {
@@ -280,7 +280,7 @@ const Raw = {
    *
    * @param {Mark} mark
    * @param {Object} options (optional)
-   * @return {Object} Object
+   * @return {Object}
    */
 
   serializeMark(mark, options = {}) {
@@ -300,7 +300,7 @@ const Raw = {
    *
    * @param {Node} node
    * @param {Object} options (optional)
-   * @return {Object} object
+   * @return {Object}
    */
 
   serializeNode(node, options) {
@@ -603,6 +603,8 @@ const Raw = {
 
 /**
  * Export.
+ *
+ * @type {Object}
  */
 
 export default Raw

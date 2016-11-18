@@ -3,7 +3,7 @@
  * Find the DOM node for a `node`.
  *
  * @param {Node} node
- * @return {Element} el
+ * @return {Element}
  */
 
 function findDOMNode(node) {
@@ -20,6 +20,8 @@ returned from \`renderNode\`.`)
 
 /**
  * Export.
+ *
+ * @type {Function}
  */
 
 export default findDOMNode

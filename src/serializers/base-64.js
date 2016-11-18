@@ -5,7 +5,7 @@ import Raw from './raw'
  * Encode a JSON `object` as base-64 `string`.
  *
  * @param {Object} object
- * @return {String} encoded
+ * @return {String}
  */
 
 function encode(object) {
@@ -18,7 +18,7 @@ function encode(object) {
  * Decode a base-64 `string` to a JSON `object`.
  *
  * @param {String} string
- * @return {Object} object
+ * @return {Object}
  */
 
 function decode(string) {
@@ -31,7 +31,7 @@ function decode(string) {
  * Deserialize a State `string`.
  *
  * @param {String} string
- * @return {State} state
+ * @return {State}
  */
 
 function deserialize(string) {
@@ -44,7 +44,7 @@ function deserialize(string) {
  * Deserialize a Node `string`.
  *
  * @param {String} string
- * @return {Node} node
+ * @return {Node}
  */
 
 function deserializeNode(string) {
@@ -57,7 +57,7 @@ function deserializeNode(string) {
  * Serialize a `state`.
  *
  * @param {State} state
- * @return {String} encoded
+ * @return {String}
  */
 
 function serialize(state) {
@@ -70,7 +70,7 @@ function serialize(state) {
  * Serialize a `node`.
  *
  * @param {Node} node
- * @return {String} encoded
+ * @return {String}
  */
 
 function serializeNode(node) {
@@ -81,6 +81,8 @@ function serializeNode(node) {
 
 /**
  * Export.
+ *
+ * @type {Object}
  */
 
 export default {

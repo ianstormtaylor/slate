@@ -68,7 +68,7 @@ export function insertNodeOperation(transform, path, index, node) {
  * @param {Array} path
  * @param {Number} offset
  * @param {String} text
- * @param {Set} marks (optional)
+ * @param {Set<Mark>} marks (optional)
  * @return {Transform}
  */
 
@@ -148,7 +148,6 @@ export function joinNodeOperation(transform, path, withPath) {
  */
 
 export function moveNodeOperation(transform, path, newPath, newIndex) {
-  const { state } = transform
   const parentPath = path.slice(0, -1)
   const parentIndex = path[path.length - 1]
   const inversePath = newPath.slice().concat([newIndex])
@@ -322,7 +321,7 @@ export function setMarkOperation(transform, path, offset, length, mark, newMark)
  *
  * @param {Transform} transform
  * @param {Array} path
- * @param {Object || String} properties
+ * @param {Object} properties
  * @return {Transform}
  */
 
@@ -386,9 +385,11 @@ export function setSelectionOperation(transform, properties) {
     'focusOffset',
   ].some(p => props.hasOwnProperty(p))
 
-  if (selection.marks
-      && properties.marks == selection.marks
-      && moved) {
+  if (
+    selection.marks &&
+    properties.marks == selection.marks &&
+    moved
+  ) {
     props.marks = null
   }
 

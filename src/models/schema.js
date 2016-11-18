@@ -17,7 +17,7 @@ const DEFAULTS = {
 /**
  * Schema.
  *
- * @type {Record}
+ * @type {Schema}
  */
 
 class Schema extends new Record(DEFAULTS) {
@@ -25,8 +25,8 @@ class Schema extends new Record(DEFAULTS) {
   /**
    * Create a new `Schema` with `properties`.
    *
-   * @param {Object} properties
-   * @return {Schema} mark
+   * @param {Object|Schema} properties
+   * @return {Schema}
    */
 
   static create(properties = {}) {
@@ -37,7 +37,7 @@ class Schema extends new Record(DEFAULTS) {
   /**
    * Get the kind.
    *
-   * @return {String} kind
+   * @return {String}
    */
 
   get kind() {
@@ -47,7 +47,7 @@ class Schema extends new Record(DEFAULTS) {
   /**
    * Return true if one rule can normalize the document
    *
-   * @return {Boolean} isNormalization
+   * @return {Boolean}
    */
 
   get hasValidators() {
@@ -58,7 +58,7 @@ class Schema extends new Record(DEFAULTS) {
   /**
    * Return true if one rule can decorate text nodes
    *
-   * @return {Boolean} hasDecorators
+   * @return {Boolean}
    */
 
   get hasDecorators() {
@@ -74,7 +74,7 @@ class Schema extends new Record(DEFAULTS) {
    * much better performance.
    *
    * @param {Mixed} object
-   * @return {Component || Void}
+   * @return {Component|Void}
    */
 
   __getComponent(object) {
@@ -113,7 +113,7 @@ class Schema extends new Record(DEFAULTS) {
    * much better performance.
    *
    * @param {Mixed} object
-   * @return {Object || Void}
+   * @return {Object|Void}
    */
 
   __validate(object) {
@@ -218,7 +218,7 @@ function normalizeMarks(marks) {
 /**
  * Normalize a mark `render` property.
  *
- * @param {Component || Function || Object || String} render
+ * @param {Component|Function|Object|String} render
  * @return {Component}
  */
 
@@ -238,7 +238,7 @@ function normalizeMarkComponent(render) {
 /**
  * Export.
  *
- * @type {Record}
+ * @type {Schema}
  */
 
 export default Schema

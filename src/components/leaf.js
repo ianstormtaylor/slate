@@ -316,6 +316,8 @@ function findDeepestNode(element) {
 
 /**
  * Export.
+ *
+ * @type {Component}
  */
 
 export default Leaf

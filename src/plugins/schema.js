@@ -1,17 +1,10 @@
+
 import Schema from '../models/schema'
 import Text from '../models/text'
 import { List } from 'immutable'
 
-/*
- * This module contains the default schema to normalize documents
- */
-
-function isInlineVoid(node) {
-  return (node.kind == 'inline' && node.isVoid)
-}
-
 /**
- * A default schema rule to only allow block nodes in documents.
+ * Only allow block nodes in documents.
  *
  * @type {Object}
  */
@@ -31,7 +24,7 @@ const DOCUMENT_CHILDREN_RULE = {
 }
 
 /**
- * A default schema rule to only allow block, inline and text nodes in blocks.
+ * Only allow block, inline and text nodes in blocks.
  *
  * @type {Object}
  */
@@ -51,7 +44,7 @@ const BLOCK_CHILDREN_RULE = {
 }
 
 /**
- * A default schema rule to have at least one text node in blocks/inlines
+ * Ensure that block and inline nodes have at least one text child.
  *
  * @type {Object}
  */
@@ -65,12 +58,13 @@ const MIN_TEXT_RULE = {
     return nodes.size === 0 ? true : null
   },
   normalize: (transform, node) => {
-    return transform.insertNodeByKey(node.key, 0, Text.create(), { normalize: false })
+    const text = Text.create()
+    return transform.insertNodeByKey(node.key, 0, text, { normalize: false })
   }
 }
 
 /**
- * A default schema rule to only allow inline and text nodes in inlines.
+ * Only allow inline and text nodes in inlines.
  *
  * @type {Object}
  */
@@ -90,12 +84,12 @@ const INLINE_CHILDREN_RULE = {
 }
 
 /**
- * A default schema rule to ensure that inline nodes are not empty.
+ * Ensure that inline nodes are never empty.
  *
- * This rule is applied to all blocks, because when they contain an
- * empty inline, we need to remove the inline from that parent
- * block. If `validate` was to be memoized, it should be against the
- * parent node, not the inline themselves.
+ * This rule is applied to all blocks, because when they contain an empty
+ * inline, we need to remove the inline from that parent block. If `validate`
+ * was to be memoized, it should be against the parent node, not the inline
+ * themselves.
  *
  * @type {Object}
  */
@@ -123,7 +117,7 @@ const INLINE_NO_EMPTY = {
 }
 
 /**
- * A default schema rule to ensure that void nodes contain a single space of content.
+ * Ensure that void nodes contain a single space of content.
  *
  * @type {Object}
  */
@@ -145,7 +139,7 @@ const VOID_TEXT_RULE = {
 }
 
 /**
- * A default schema rule to ensure that inline void nodes are surrounded with text nodes
+ * Ensure that inline void nodes are surrounded with text nodes.
  *
  * @type {Object}
  */
@@ -221,15 +215,14 @@ const NO_ADJACENT_TEXT_RULE = {
   },
   normalize: (transform, node, pairs) => {
     return pairs
-        // We reverse the list since we want to handle 3 consecutive text nodes
-        .reverse()
-        .reduce((t, pair) => {
-          const [ first, second ] = pair
-          return t.joinNodeByKey(second.key, first.key, { normalize: false })
-        }, transform)
+      // We reverse the list since we want to handle 3 consecutive text nodes.
+      .reverse()
+      .reduce((t, pair) => {
+        const [ first, second ] = pair
+        return t.joinNodeByKey(second.key, first.key, { normalize: false })
+      }, transform)
   }
 }
-
 
 /**
  * Prevent extra empty text nodes.
@@ -248,32 +241,31 @@ const NO_EMPTY_TEXT_RULE = {
       return
     }
 
-    const invalids = nodes
-    .filter((desc, i) => {
+    const invalids = nodes.filter((desc, i) => {
       if (desc.kind != 'text' || desc.length > 0) {
         return
       }
 
-      // Empty text nodes are only allowed near inline void node
+      // Empty text nodes are only allowed near inline void node.
       const next = nodes.get(i + 1)
       const prev = i > 0 ? nodes.get(i - 1) : null
 
-      // If last one and previous is an inline void, we need to preserve it
+      // If last one and previous is an inline void, we need to preserve it.
       if (!next && isInlineVoid(prev)) {
         return
       }
 
-      // If first one and next one is an inline, we preserve it
+      // If first one and next one is an inline, we preserve it.
       if (!prev && isInlineVoid(next)) {
         return
       }
 
-      // If surrounded by inline void, we preserve it
+      // If surrounded by inline void, we preserve it.
       if (next && prev && isInlineVoid(next) && isInlineVoid(prev)) {
         return
       }
 
-      // Otherwise we remove it
+      // Otherwise we remove it.
       return true
     })
 
@@ -287,9 +279,20 @@ const NO_EMPTY_TEXT_RULE = {
 }
 
 /**
+ * Test if a `node` is an inline void node.
+ *
+ * @param {Node} node
+ * @return {Boolean}
+ */
+
+function isInlineVoid(node) {
+  return (node.kind == 'inline' && node.isVoid)
+}
+
+/**
  * The default schema.
  *
- * @type {Object}
+ * @type {Schema}
  */
 
 const schema = Schema.create({
@@ -305,5 +308,11 @@ const schema = Schema.create({
     NO_EMPTY_TEXT_RULE
   ]
 })
+
+/**
+ * Export.
+ *
+ * @type {Schema}
+ */
 
 export default schema

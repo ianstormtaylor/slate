@@ -10,12 +10,13 @@ import memoize from '../utils/memoize'
 import generateKey from '../utils/generate-key'
 import { List, Set } from 'immutable'
 
-
 /**
  * Node.
  *
  * And interface that `Document`, `Block` and `Inline` all implement, to make
  * working with the recursive node tree easier.
+ *
+ * @type {Object}
  */
 
 const Node = {
@@ -23,7 +24,7 @@ const Node = {
   /**
    * Return a set of all keys in the node.
    *
-   * @return {Set<Node>} keys
+   * @return {Set<Node>}
    */
 
   getKeys() {
@@ -39,18 +40,19 @@ const Node = {
   /**
    * Get the concatenated text `string` of all child nodes.
    *
-   * @return {String} text
+   * @return {String}
    */
 
   getText() {
-    return this.nodes
-      .reduce((result, node) => result + node.text, '')
+    return this.nodes.reduce((result, node) => {
+      return result + node.text
+    }, '')
   },
 
   /**
    * Assert that a node has a child by `key` and return it.
    *
-   * @param {String or Node} key
+   * @param {String} key
    * @return {Node}
    */
 
@@ -68,7 +70,7 @@ const Node = {
   /**
    * Assert that a node has a descendant by `key` and return it.
    *
-   * @param {String or Node} key
+   * @param {String} key
    * @return {Node}
    */
 
@@ -103,8 +105,8 @@ const Node = {
   /**
    * Concat children `nodes` on to the end of the node.
    *
-   * @param {List} nodes
-   * @return {Node} node
+   * @param {List<Node>} nodes
+   * @return {Node}
    */
 
   concatChildren(nodes) {
@@ -116,7 +118,7 @@ const Node = {
    * Decorate all of the text nodes with a `decorator` function.
    *
    * @param {Function} decorator
-   * @return {Node} node
+   * @return {Node}
    */
 
   decorateTexts(decorator) {
@@ -131,7 +133,7 @@ const Node = {
    * Recursively find all descendant nodes by `iterator`. Breadth first.
    *
    * @param {Function} iterator
-   * @return {Node or Null} node
+   * @return {Node|Null}
    */
 
   findDescendant(iterator) {
@@ -155,7 +157,7 @@ const Node = {
    * Recursively find all descendant nodes by `iterator`. Depth first.
    *
    * @param {Function} iterator
-   * @return {Node or Null} node
+   * @return {Node|Null}
    */
 
   findDescendantDeep(iterator) {
@@ -178,28 +180,29 @@ const Node = {
    */
 
   forEachDescendant(iterator) {
-    let returned // Returned value of iterator. False to break from loop
+    // If the iterator returns false it will break the loop.
+    let ret
 
     this.nodes.forEach((child, i, nodes) => {
       if (iterator(child, i, nodes) === false) {
-        returned = false
+        ret = false
         return false
       }
 
       if (child.kind != 'text') {
-        returned = child.forEachDescendant(iterator)
-        return returned
+        ret = child.forEachDescendant(iterator)
+        return ret
       }
     })
 
-    return returned
+    return ret
   },
 
   /**
    * Recursively filter all descendant nodes with `iterator`.
    *
    * @param {Function} iterator
-   * @return {List} nodes
+   * @return {List<Node>}
    */
 
   filterDescendants(iterator) {
@@ -217,7 +220,7 @@ const Node = {
    * It is different from `filterDescendants` in regard of the order of results.
    *
    * @param {Function} iterator
-   * @return {List} nodes
+   * @return {List<Node>}
    */
 
   filterDescendantsDeep(iterator) {
@@ -231,7 +234,7 @@ const Node = {
   /**
    * Get the closest block nodes for each text node in the node.
    *
-   * @return {List} nodes
+   * @return {List<Node>}
    */
 
   getBlocks() {
@@ -246,7 +249,7 @@ const Node = {
    * Get the closest block nodes for each text node in a `range`.
    *
    * @param {Selection} range
-   * @return {List} nodes
+   * @return {List<Node>}
    */
 
   getBlocksAtRange(range) {
@@ -259,7 +262,7 @@ const Node = {
    * Get a list of the characters in a `range`.
    *
    * @param {Selection} range
-   * @return {List} characters
+   * @return {List<Node>} characters
    */
 
   getCharactersAtRange(range) {
@@ -274,9 +277,9 @@ const Node = {
   /**
    * Get children between two child keys.
    *
-   * @param {String or Node} start
-   * @param {String or Node} end
-   * @return {Node} node
+   * @param {String} start
+   * @param {String} end
+   * @return {Node}
    */
 
   getChildrenBetween(start, end) {
@@ -290,9 +293,9 @@ const Node = {
   /**
    * Get children between two child keys, including the two children.
    *
-   * @param {String or Node} start
-   * @param {String or Node} end
-   * @return {Node} node
+   * @param {String} start
+   * @param {String} end
+   * @return {Node}
    */
 
   getChildrenBetweenIncluding(start, end) {
@@ -306,9 +309,9 @@ const Node = {
   /**
    * Get closest parent of node by `key` that matches `iterator`.
    *
-   * @param {String or Node} key
+   * @param {String} key
    * @param {Function} iterator
-   * @return {Node or Null} node
+   * @return {Node|Null}
    */
 
   getClosest(key, iterator) {
@@ -325,8 +328,8 @@ const Node = {
   /**
    * Get the closest block parent of a `node`.
    *
-   * @param {String or Node} key
-   * @return {Node or Null} node
+   * @param {String} key
+   * @return {Node|Null}
    */
 
   getClosestBlock(key) {
@@ -336,8 +339,8 @@ const Node = {
   /**
    * Get the closest inline parent of a `node`.
    *
-   * @param {String or Node} key
-   * @return {Node or Null} node
+   * @param {String} key
+   * @return {Node|Null}
    */
 
   getClosestInline(key) {
@@ -347,8 +350,8 @@ const Node = {
   /**
    * Get a child node by `key`.
    *
-   * @param {String or Node} key
-   * @return {Node or Null} node
+   * @param {String} key
+   * @return {Node|Null}
    */
 
   getChild(key) {
@@ -359,8 +362,8 @@ const Node = {
   /**
    * Get the common ancestor of nodes `one` and `two` by keys.
    *
-   * @param {String or Node} one
-   * @param {String or Node} two
+   * @param {String} one
+   * @param {String} two
    * @return {Node}
    */
 
@@ -386,7 +389,7 @@ const Node = {
    * Get the component for the node from a `schema`.
    *
    * @param {Schema} schema
-   * @return {Component || Void}
+   * @return {Component|Void}
    */
 
   getComponent(schema) {
@@ -434,7 +437,7 @@ const Node = {
    * Get a descendant node by `key`.
    *
    * @param {String} key
-   * @return {Node or Null} node
+   * @return {Node|Null}
    */
 
   getDescendant(key) {
@@ -464,7 +467,7 @@ const Node = {
    * Get a descendant by `path`.
    *
    * @param {Array} path
-   * @return {Node || Void}
+   * @return {Node|Null}
    */
 
   getDescendantAtPath(path) {
@@ -507,7 +510,7 @@ const Node = {
   /**
    * Get the depth of a child node by `key`, with optional `startAt`.
    *
-   * @param {String or Node} key
+   * @param {String} key
    * @param {Number} startAt (optional)
    * @return {Number} depth
    */
@@ -525,7 +528,7 @@ const Node = {
    * Get a fragment of the node at a `range`.
    *
    * @param {Selection} range
-   * @return {List} nodes
+   * @return {List<Node>}
    */
 
   getFragmentAtRange(range) {
@@ -565,9 +568,9 @@ const Node = {
   /**
    * Get the furthest parent of a node by `key` that matches an `iterator`.
    *
-   * @param {String or Node} key
+   * @param {String} key
    * @param {Function} iterator
-   * @return {Node or Null}
+   * @return {Node|Null}
    */
 
   getFurthest(key, iterator) {
@@ -584,8 +587,8 @@ const Node = {
   /**
    * Get the furthest block parent of a node by `key`.
    *
-   * @param {String or Node} key
-   * @return {Node or Null} node
+   * @param {String} key
+   * @return {Node|Null}
    */
 
   getFurthestBlock(key) {
@@ -595,8 +598,8 @@ const Node = {
   /**
    * Get the furthest inline parent of a node by `key`.
    *
-   * @param {String or Node} key
-   * @return {Node or Null} node
+   * @param {String} key
+   * @return {Node|Null}
    */
 
   getFurthestInline(key) {
@@ -606,8 +609,8 @@ const Node = {
   /**
    * Get the highest child ancestor of a node by `key`.
    *
-   * @param {String or Node} key
-   * @return {Node or Null} node
+   * @param {String} key
+   * @return {Node|Null}
    */
 
   getHighestChild(key) {
@@ -622,8 +625,8 @@ const Node = {
   /**
    * Get the highest parent of a node by `key` which has an only child.
    *
-   * @param {String or Node} key
-   * @return {Node or Null}
+   * @param {String} key
+   * @return {Node|Null}
    */
 
   getHighestOnlyChildParent(key) {
@@ -641,7 +644,7 @@ const Node = {
   /**
    * Get the furthest inline nodes for each text node in the node.
    *
-   * @return {List} nodes
+   * @return {List<Node>}
    */
 
   getInlines() {
@@ -657,7 +660,7 @@ const Node = {
    * Get the closest inline nodes for each text node in a `range`.
    *
    * @param {Selection} range
-   * @return {List} nodes
+   * @return {List<Node>}
    */
 
   getInlinesAtRange(range) {
@@ -673,7 +676,7 @@ const Node = {
    * Get a set of the marks in a `range`.
    *
    * @param {Selection} range
-   * @return {Set} marks
+   * @return {Set<Mark>}
    */
 
   getMarksAtRange(range) {
@@ -707,8 +710,8 @@ const Node = {
   /**
    * Get the block node before a descendant text node by `key`.
    *
-   * @param {String or Node} key
-   * @return {Node or Null} node
+   * @param {String} key
+   * @return {Node|Null}
    */
 
   getNextBlock(key) {
@@ -731,8 +734,8 @@ const Node = {
   /**
    * Get the node after a descendant by `key`.
    *
-   * @param {String or Node} key
-   * @return {Node or Null} node
+   * @param {String} key
+   * @return {Node|Null}
    */
 
   getNextSibling(key) {
@@ -751,8 +754,8 @@ const Node = {
   /**
    * Get the text node after a descendant text node by `key`.
    *
-   * @param {String or Node} key
-   * @return {Node or Null} node
+   * @param {String} key
+   * @return {Node|Null}
    */
 
   getNextText(key) {
@@ -765,8 +768,8 @@ const Node = {
   /**
    * Get the offset for a descendant text node by `key`.
    *
-   * @param {String or Node} key
-   * @return {Number} offset
+   * @param {String} key
+   * @return {Number}
    */
 
   getOffset(key) {
@@ -788,7 +791,7 @@ const Node = {
    * Get the offset from a `range`.
    *
    * @param {Selection} range
-   * @return {Number} offset
+   * @return {Number}
    */
 
   getOffsetAtRange(range) {
@@ -805,8 +808,8 @@ const Node = {
   /**
    * Get the parent of a child node by `key`.
    *
-   * @param {String or Node} key
-   * @return {Node or Null} node
+   * @param {String} key
+   * @return {Node|Null}
    */
 
   getParent(key) {
@@ -829,7 +832,7 @@ const Node = {
   /**
    * Get the path of a descendant node by `key`.
    *
-   * @param {String || Node} key
+   * @param {String|Node} key
    * @return {Array}
    */
 
@@ -860,8 +863,8 @@ const Node = {
   /**
    * Get the path of ancestors of a descendant node by `key`.
    *
-   * @param {String || Node} node
-   * @return {List<Node> or Null}
+   * @param {String|Node} key
+   * @return {List<Node>|Null}
    */
 
   getAncestors(key) {
@@ -887,8 +890,8 @@ const Node = {
   /**
    * Get the node before a descendant node by `key`.
    *
-   * @param {String or Node} key
-   * @return {Node or Null} node
+   * @param {String} key
+   * @return {Node|Null}
    */
 
   getPreviousSibling(key) {
@@ -907,8 +910,8 @@ const Node = {
   /**
    * Get the text node before a descendant text node by `key`.
    *
-   * @param {String or Node} key
-   * @return {Node or Null} node
+   * @param {String} key
+   * @return {Node|Null}
    */
 
   getPreviousText(key) {
@@ -921,8 +924,8 @@ const Node = {
   /**
    * Get the block node before a descendant text node by `key`.
    *
-   * @param {String or Node} key
-   * @return {Node or Null} node
+   * @param {String} key
+   * @return {Node|Null}
    */
 
   getPreviousBlock(key) {
@@ -946,7 +949,7 @@ const Node = {
    * Get the descendent text node at an `offset`.
    *
    * @param {String} offset
-   * @return {Node or Null} node
+   * @return {Node|Null}
    */
 
   getTextAtOffset(offset) {
@@ -962,7 +965,7 @@ const Node = {
   /**
    * Get the direction of the node's text.
    *
-   * @return {String} direction
+   * @return {String}
    */
 
   getTextDirection() {
@@ -976,21 +979,14 @@ const Node = {
   /**
    * Recursively get all of the child text nodes in order of appearance.
    *
-   * @return {List} nodes
+   * @return {List<Node>}
    */
 
   getTexts() {
     return List(this._getTexts())
   },
 
-  /**
-   * Recursively get all of the child text nodes in order of appearance.
-   *
-   * @return {Array} nodes
-   */
-
-  // This one is memoized
-
+  // This one is memoized for performance.
   _getTexts() {
     return this.nodes.reduce((texts, node) => {
       if (node.kind == 'text') {
@@ -1005,7 +1001,7 @@ const Node = {
   /**
    * Get the first child text node.
    *
-   * @return {Node || Null} node
+   * @return {Node|Null}
    */
 
   getFirstText() {
@@ -1023,7 +1019,7 @@ const Node = {
   /**
    * Get the last child text node.
    *
-   * @return {Node} node
+   * @return {Node|Null}
    */
 
   getLastText() {
@@ -1042,7 +1038,7 @@ const Node = {
    * Get all of the text nodes in a `range`.
    *
    * @param {Selection} range
-   * @return {List} nodes
+   * @return {List<Node>}
    */
 
   getTextsAtRange(range) {
@@ -1059,8 +1055,8 @@ const Node = {
   /**
    * Check if a child node exists by `key`.
    *
-   * @param {String or Node} key
-   * @return {Boolean} exists
+   * @param {String} key
+   * @return {Boolean}
    */
 
   hasChild(key) {
@@ -1070,8 +1066,8 @@ const Node = {
   /**
    * Recursively check if a child node exists by `key`.
    *
-   * @param {String or Node} key
-   * @return {Boolean} exists
+   * @param {String} key
+   * @return {Boolean}
    */
 
   hasDescendant(key) {
@@ -1081,7 +1077,7 @@ const Node = {
   /**
    * Check if a node has a void parent by `key`.
    *
-   * @param {String or Node} key
+   * @param {String} key
    * @return {Boolean}
    */
 
@@ -1120,7 +1116,7 @@ const Node = {
    * Check if the inline nodes are split at a `range`.
    *
    * @param {Selection} range
-   * @return {Boolean} isSplit
+   * @return {Boolean}
    */
 
   isInlineSplitAtRange(range) {
@@ -1180,7 +1176,7 @@ const Node = {
    * optimized to not return a new node if no changes are made.
    *
    * @param {Function} iterator
-   * @return {Node} node
+   * @return {Node}
    */
 
   mapChildren(iterator) {
@@ -1199,7 +1195,7 @@ const Node = {
    * optimized to not return a new node if no changes are made.
    *
    * @param {Function} iterator
-   * @return {Node} node
+   * @return {Node}
    */
 
   mapDescendants(iterator) {
@@ -1221,7 +1217,7 @@ const Node = {
   /**
    * Regenerate the node's key.
    *
-   * @return {Node} node
+   * @return {Node}
    */
 
   regenerateKey() {
@@ -1231,8 +1227,8 @@ const Node = {
   /**
    * Remove a `node` from the children node map.
    *
-   * @param {String or Node} key
-   * @return {Node} node
+   * @param {String} key
+   * @return {Node}
    */
 
   removeDescendant(key) {
@@ -1387,7 +1383,7 @@ const Node = {
    * Set a new value for a child node by `key`.
    *
    * @param {Node} node
-   * @return {Node} node
+   * @return {Node}
    */
 
   updateDescendant(node) {
@@ -1413,7 +1409,7 @@ const Node = {
    * Validate the node against a `schema`.
    *
    * @param {Schema} schema
-   * @return {Object || Void}
+   * @return {Object|Null}
    */
 
   validate(schema) {
@@ -1470,6 +1466,8 @@ memoize(Node, [
 
 /**
  * Export.
+ *
+ * @type {Object}
  */
 
 export default Node

@@ -5,6 +5,8 @@ import { Record, Set } from 'immutable'
 
 /**
  * Default properties.
+ *
+ * @type {Object}
  */
 
 const DEFAULTS = {
@@ -14,6 +16,8 @@ const DEFAULTS = {
 
 /**
  * Range.
+ *
+ * @type {Range}
  */
 
 class Range extends new Record(DEFAULTS) {
@@ -21,7 +25,7 @@ class Range extends new Record(DEFAULTS) {
   /**
    * Create a new `Range` with `properties`.
    *
-   * @param {Object} properties
+   * @param {Object|Range} properties
    * @return {Range}
    */
 
@@ -35,7 +39,7 @@ class Range extends new Record(DEFAULTS) {
   /**
    * Get the node's kind.
    *
-   * @return {String} kind
+   * @return {String}
    */
 
   get kind() {
@@ -45,7 +49,7 @@ class Range extends new Record(DEFAULTS) {
   /**
    * Return range as a list of characters
    *
-   * @return {List<Character>} characters
+   * @return {List<Character>}
    */
 
   getCharacters() {
@@ -64,6 +68,8 @@ class Range extends new Record(DEFAULTS) {
 
 /**
  * Export.
+ *
+ * @type {Range}
  */
 
 export default Range

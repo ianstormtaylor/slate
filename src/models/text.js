@@ -8,6 +8,8 @@ import { List, Record, Set } from 'immutable'
 
 /**
  * Default properties.
+ *
+ * @type {Object}
  */
 
 const DEFAULTS = {
@@ -17,6 +19,8 @@ const DEFAULTS = {
 
 /**
  * Text.
+ *
+ * @type {Text}
  */
 
 class Text extends new Record(DEFAULTS) {
@@ -24,7 +28,7 @@ class Text extends new Record(DEFAULTS) {
   /**
    * Create a new `Text` with `properties`.
    *
-   * @param {Object} properties
+   * @param {Object|Text} properties
    * @return {Text}
    */
 
@@ -52,7 +56,7 @@ class Text extends new Record(DEFAULTS) {
   /**
    * Create a new `Text` from a list of ranges
    *
-   * @param {List<Range> | Array<Range>} ranges
+   * @param {List<Range>|Array<Range>} ranges
    * @return {Text}
    */
 
@@ -69,7 +73,7 @@ class Text extends new Record(DEFAULTS) {
    * Create a list of `Texts` from an array.
    *
    * @param {Array} elements
-   * @return {List} map
+   * @return {List<Text>}
    */
 
   static createList(elements = []) {
@@ -80,7 +84,7 @@ class Text extends new Record(DEFAULTS) {
   /**
    * Get the node's kind.
    *
-   * @return {String} kind
+   * @return {String}
    */
 
   get kind() {
@@ -90,7 +94,7 @@ class Text extends new Record(DEFAULTS) {
   /**
    * Is the node empty?
    *
-   * @return {Boolean} isEmpty
+   * @return {Boolean}
    */
 
   get isEmpty() {
@@ -100,7 +104,7 @@ class Text extends new Record(DEFAULTS) {
   /**
    * Get the length of the concatenated text of the node.
    *
-   * @return {Number} length
+   * @return {Number}
    */
 
   get length() {
@@ -110,7 +114,7 @@ class Text extends new Record(DEFAULTS) {
   /**
    * Get the concatenated text of the node.
    *
-   * @return {String} text
+   * @return {String}
    */
 
   get text() {
@@ -144,7 +148,7 @@ class Text extends new Record(DEFAULTS) {
    * Derive a set of decorated characters with `decorators`.
    *
    * @param {Array} decorators
-   * @return {List}
+   * @return {List<Character>}
    */
 
   getDecorations(decorators) {
@@ -175,7 +179,7 @@ class Text extends new Record(DEFAULTS) {
    * Get the marks on the text at `index`.
    *
    * @param {Number} index
-   * @return {Set}
+   * @return {Set<Mark>}
    */
 
   getMarksAtIndex(index) {
@@ -189,8 +193,8 @@ class Text extends new Record(DEFAULTS) {
   /**
    * Derive the ranges for a list of `characters`.
    *
-   * @param {Array || Void} decorators (optional)
-   * @return {List}
+   * @param {Array|Void} decorators (optional)
+   * @return {List<Range>}
    */
 
   getRanges(decorators = []) {
@@ -334,7 +338,7 @@ class Text extends new Record(DEFAULTS) {
    * Validate the text node against a `schema`.
    *
    * @param {Schema} schema
-   * @return {Object || Void}
+   * @return {Object|Void}
    */
 
   validate(schema) {
@@ -356,6 +360,8 @@ memoize(Text.prototype, [
 
 /**
  * Export.
+ *
+ * @type {Text}
  */
 
 export default Text

@@ -1,6 +1,6 @@
 
 /**
- * Prevent circuit.
+ * Prevent circular dependencies.
  */
 
 import './block'
@@ -18,7 +18,9 @@ import generateKey from '../utils/generate-key'
 import { List, Map, Record } from 'immutable'
 
 /**
- * Record.
+ * Default properties.
+ *
+ * @type {Object}
  */
 
 const DEFAULTS = {
@@ -31,6 +33,8 @@ const DEFAULTS = {
 
 /**
  * Inline.
+ *
+ * @type {Inline}
  */
 
 class Inline extends new Record(DEFAULTS) {
@@ -38,8 +42,8 @@ class Inline extends new Record(DEFAULTS) {
   /**
    * Create a new `Inline` with `properties`.
    *
-   * @param {Object} properties
-   * @return {Inline} element
+   * @param {Object|Inline} properties
+   * @return {Inline}
    */
 
   static create(properties = {}) {
@@ -63,8 +67,8 @@ class Inline extends new Record(DEFAULTS) {
   /**
    * Create a list of `Inlines` from an array.
    *
-   * @param {Array} elements
-   * @return {List} map
+   * @param {Array<Object|Inline>} elements
+   * @return {List<Inline>}
    */
 
   static createList(elements = []) {
@@ -75,7 +79,7 @@ class Inline extends new Record(DEFAULTS) {
   /**
    * Get the node's kind.
    *
-   * @return {String} kind
+   * @return {String}
    */
 
   get kind() {
@@ -85,7 +89,7 @@ class Inline extends new Record(DEFAULTS) {
   /**
    * Is the node empty?
    *
-   * @return {Boolean} isEmpty
+   * @return {Boolean}
    */
 
   get isEmpty() {
@@ -95,7 +99,7 @@ class Inline extends new Record(DEFAULTS) {
   /**
    * Get the length of the concatenated text of the node.
    *
-   * @return {Number} length
+   * @return {Number}
    */
 
   get length() {
@@ -105,7 +109,7 @@ class Inline extends new Record(DEFAULTS) {
   /**
    * Get the concatenated text `string` of all child nodes.
    *
-   * @return {String} text
+   * @return {String}
    */
 
   get text() {
@@ -122,9 +126,10 @@ for (const method in Node) {
   Inline.prototype[method] = Node[method]
 }
 
-
 /**
  * Export.
+ *
+ * @type {Inline}
  */
 
 export default Inline

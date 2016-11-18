@@ -3,7 +3,7 @@
  * Get leaf text for a node
  *
  * @param {Node} node
- * @return {Text} text
+ * @return {Text}
  */
 
 function getLeafText(node) {

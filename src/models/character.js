@@ -3,25 +3,29 @@ import Mark from './mark'
 import { List, Record, Set } from 'immutable'
 
 /**
- * Record.
+ * Default properties.
+ *
+ * @type {Object}
  */
 
-const CharacterRecord = new Record({
+const DEFAULTS = {
   marks: new Set(),
   text: ''
-})
+}
 
 /**
  * Character.
+ *
+ * @type {Character}
  */
 
-class Character extends CharacterRecord {
+class Character extends new Record(DEFAULTS) {
 
   /**
    * Create a character record with `properties`.
    *
-   * @param {Object} properties
-   * @return {Character} character
+   * @param {Object|Character} properties
+   * @return {Character}
    */
 
   static create(properties = {}) {
@@ -33,8 +37,8 @@ class Character extends CharacterRecord {
   /**
    * Create a characters list from an array of characters.
    *
-   * @param {Array} array
-   * @return {List} characters
+   * @param {Array<Object|Character>} array
+   * @return {List<Character>}
    */
 
   static createList(array = []) {
@@ -46,8 +50,8 @@ class Character extends CharacterRecord {
    * Create a characters list from a `string` and optional `marks`.
    *
    * @param {String} string
-   * @param {Set} marks (optional)
-   * @return {List}
+   * @param {Set<Mark>} marks (optional)
+   * @return {List<Character>}
    */
 
   static createListFromText(string, marks) {
@@ -59,7 +63,7 @@ class Character extends CharacterRecord {
   /**
    * Get the kind.
    *
-   * @return {String} kind
+   * @return {String}
    */
 
   get kind() {
@@ -70,6 +74,8 @@ class Character extends CharacterRecord {
 
 /**
  * Export.
+ *
+ * @type {Character}
  */
 
 export default Character

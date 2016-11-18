@@ -1,3 +1,10 @@
+
+/**
+ * Is in development?
+ *
+ * @type {Boolean}
+ */
+
 const IS_DEV = (
   typeof process !== 'undefined' &&
   process.env &&
@@ -5,7 +12,8 @@ const IS_DEV = (
 )
 
 /**
- * True if running slate in development mode
+ * Export.
+ *
  * @type {Boolean}
  */
 

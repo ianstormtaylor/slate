@@ -16,6 +16,8 @@ class Void extends React.Component {
 
   /**
    * Property types.
+   *
+   * @type {Object}
    */
 
   static propTypes = {
@@ -152,6 +154,8 @@ class Void extends React.Component {
 
 /**
  * Export.
+ *
+ * @type {Component}
  */
 
 export default Void

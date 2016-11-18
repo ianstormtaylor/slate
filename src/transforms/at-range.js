@@ -10,7 +10,7 @@ import Normalize from '../utils/normalize'
  * @param {Selection} range
  * @param {Mixed} mark
  * @param {Object} options
- *   @param {Boolean} normalize
+ *   @property {Boolean} normalize
  * @return {Transform}
  */
 
@@ -46,7 +46,7 @@ export function addMarkAtRange(transform, range, mark, options = {}) {
  * @param {Transform} transform
  * @param {Selection} range
  * @param {Object} options
- *   @param {Boolean} normalize
+ *   @property {Boolean} normalize
  * @return {Transform}
  */
 
@@ -124,7 +124,7 @@ export function deleteAtRange(transform, range, options = {}) {
  * @param {Selection} range
  * @param {Number} n (optional)
  * @param {Object} options
- *   @param {Boolean} normalize
+ *   @property {Boolean} normalize
  * @return {Transform}
  */
 
@@ -189,7 +189,7 @@ export function deleteBackwardAtRange(transform, range, n = 1, options = {}) {
  * @param {Selection} range
  * @param {Number} n (optional)
  * @param {Object} options
- *   @param {Boolean} normalize
+ *   @property {Boolean} normalize
  * @return {Transform}
  */
 
@@ -251,9 +251,9 @@ export function deleteForwardAtRange(transform, range, n = 1, options = {}) {
  *
  * @param {Transform} transform
  * @param {Selection} range
- * @param {Block or String or Object} block
+ * @param {Block|String|Object} block
  * @param {Object} options
- *   @param {Boolean} normalize
+ *   @property {Boolean} normalize
  * @return {Transform}
  */
 
@@ -311,7 +311,7 @@ export function insertBlockAtRange(transform, range, block, options = {}) {
  * @param {Selection} range
  * @param {Document} fragment
  * @param {Object} options
- *   @param {Boolean} normalize
+ *   @property {Boolean} normalize
  * @return {Transform}
  */
 
@@ -404,9 +404,9 @@ export function insertFragmentAtRange(transform, range, fragment, options = {}) 
  *
  * @param {Transform} transform
  * @param {Selection} range
- * @param {Inline or String or Object} inline
+ * @param {Inline|String|Object} inline
  * @param {Object} options
- *   @param {Boolean} normalize
+ *   @property {Boolean} normalize
  * @return {Transform}
  */
 
@@ -446,9 +446,9 @@ export function insertInlineAtRange(transform, range, inline, options = {}) {
  * @param {Transform} transform
  * @param {Selection} range
  * @param {String} text
- * @param {Set} marks (optional)
+ * @param {Set<Mark>} marks (optional)
  * @param {Object} options
- *   @param {Boolean} normalize
+ *   @property {Boolean} normalize
  * @return {Transform}
  */
 
@@ -480,9 +480,9 @@ export function insertTextAtRange(transform, range, text, marks, options = {}) {
  *
  * @param {Transform} transform
  * @param {Selection} range
- * @param {Mark or String} mark (optional)
+ * @param {Mark|String} mark (optional)
  * @param {Object} options
- *   @param {Boolean} normalize
+ *   @property {Boolean} normalize
  * @return {Transform}
  */
 
@@ -517,9 +517,9 @@ export function removeMarkAtRange(transform, range, mark, options = {}) {
  *
  * @param {Transform} transform
  * @param {Selection} range
- * @param {Object || String} properties
+ * @param {Object|String} properties
  * @param {Object} options
- *   @param {Boolean} normalize
+ *   @property {Boolean} normalize
  * @return {Transform}
  */
 
@@ -541,9 +541,9 @@ export function setBlockAtRange(transform, range, properties, options = {}) {
  *
  * @param {Transform} transform
  * @param {Selection} range
- * @param {Object || String} properties
+ * @param {Object|String} properties
  * @param {Object} options
- *   @param {Boolean} normalize
+ *   @property {Boolean} normalize
  * @return {Transform}
  */
 
@@ -567,7 +567,7 @@ export function setInlineAtRange(transform, range, properties, options = {}) {
  * @param {Selection} range
  * @param {Number} height (optional)
  * @param {Object} options
- *   @param {Boolean} normalize
+ *   @property {Boolean} normalize
  * @return {Transform}
  */
 
@@ -605,7 +605,7 @@ export function splitBlockAtRange(transform, range, height = 1, options = {}) {
  * @param {Selection} range
  * @param {Number} height (optional)
  * @param {Object} options
- *   @param {Boolean} normalize
+ *   @property {Boolean} normalize
  * @return {Transform}
  */
 
@@ -642,7 +642,7 @@ export function splitInlineAtRange(transform, range, height = Infinity, options 
  * @param {Selection} range
  * @param {Mixed} mark
  * @param {Object} options
- *   @param {Boolean} normalize
+ *   @property {Boolean} normalize
  * @return {Transform}
  */
 
@@ -673,9 +673,9 @@ export function toggleMarkAtRange(transform, range, mark, options = {}) {
  *
  * @param {Transform} transform
  * @param {Selection} range
- * @param {String or Object} properties
+ * @param {String|Object} properties
  * @param {Object} options
- *   @param {Boolean} normalize
+ *   @property {Boolean} normalize
  * @return {Transform}
  */
 
@@ -767,9 +767,9 @@ export function unwrapBlockAtRange(transform, range, properties, options = {}) {
  *
  * @param {Transform} transform
  * @param {Selection} range
- * @param {String or Object} properties
+ * @param {String|Object} properties
  * @param {Object} options
- *   @param {Boolean} normalize
+ *   @property {Boolean} normalize
  * @return {Transform}
  */
 
@@ -816,9 +816,9 @@ export function unwrapInlineAtRange(transform, range, properties, options = {}) 
  *
  * @param {Transform} transform
  * @param {Selection} range
- * @param {Block || Object || String} block
+ * @param {Block|Object|String} block
  * @param {Object} options
- *   @param {Boolean} normalize
+ *   @property {Boolean} normalize
  * @return {Transform}
  */
 
@@ -888,9 +888,9 @@ export function wrapBlockAtRange(transform, range, block, options = {}) {
  *
  * @param {Transform} transform
  * @param {Selection} range
- * @param {Inline || Object || String} inline
+ * @param {Inline|Object|String} inline
  * @param {Object} options
- *   @param {Boolean} normalize
+ *   @property {Boolean} normalize
  * @return {Transform}
  */
 
@@ -1015,7 +1015,7 @@ export function wrapInlineAtRange(transform, range, inline, options = {}) {
  * @param {String} prefix
  * @param {String} suffix (optional)
  * @param {Object} options
- *   @param {Boolean} normalize
+ *   @property {Boolean} normalize
  * @return {Transform}
  */
 

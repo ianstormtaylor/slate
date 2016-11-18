@@ -65,7 +65,7 @@ class Transfer {
   /**
    * Get the Files content of the data transfer.
    *
-   * @return {Array || Void}
+   * @return {Array|Void}
    */
 
   getFiles() {
@@ -107,7 +107,7 @@ class Transfer {
     // attribute, it's actually a Base64-serialized fragment from a cut/copy.
     if (!encoded && html && ~html.indexOf('<span data-slate-fragment="')) {
       const matches = FRAGMENT_MATCHER.exec(html)
-      const [ full, attribute ] = matches
+      const [ full, attribute ] = matches // eslint-disable-line no-unused-vars
       encoded = attribute
     }
 
@@ -122,7 +122,7 @@ class Transfer {
   /**
    * Get the HTML content of the data transfer.
    *
-   * @return {String || Void}
+   * @return {String|Void}
    */
 
   getHtml() {
@@ -140,7 +140,7 @@ class Transfer {
   /**
    * Get the Slate node content of the data transfer.
    *
-   * @return {Node || Void}
+   * @return {Node|Void}
    */
 
   getNode() {
@@ -160,7 +160,7 @@ class Transfer {
   /**
    * Get the text content of the data transfer.
    *
-   * @return {String || Void}
+   * @return {String|Void}
    */
 
   getText() {
@@ -244,6 +244,8 @@ class Transfer {
 
 /**
  * Export.
+ *
+ * @type {Transfer}
  */
 
 export default Transfer

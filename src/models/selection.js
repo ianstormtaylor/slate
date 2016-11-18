@@ -1,10 +1,12 @@
 
 import getLeafText from '../utils/get-leaf-text'
-import warning from '../utils/warning'
+import warn from '../utils/warn'
 import { Record } from 'immutable'
 
 /**
  * Start-end-and-edge convenience methods to auto-generate.
+ *
+ * @type {Array}
  */
 
 const EDGE_METHODS = [
@@ -16,6 +18,8 @@ const EDGE_METHODS = [
 
 /**
  * Default properties.
+ *
+ * @type {Object}
  */
 
 const DEFAULTS = {
@@ -30,6 +34,8 @@ const DEFAULTS = {
 
 /**
  * Selection.
+ *
+ * @type {Selection}
  */
 
 class Selection extends new Record(DEFAULTS) {
@@ -37,8 +43,8 @@ class Selection extends new Record(DEFAULTS) {
   /**
    * Create a new `Selection` with `properties`.
    *
-   * @param {Object} properties
-   * @return {Selection} selection
+   * @param {Object|Selection} properties
+   * @return {Selection}
    */
 
   static create(properties = {}) {
@@ -49,7 +55,7 @@ class Selection extends new Record(DEFAULTS) {
   /**
    * Get the kind.
    *
-   * @return {String} kind
+   * @return {String}
    */
 
   get kind() {
@@ -59,7 +65,7 @@ class Selection extends new Record(DEFAULTS) {
   /**
    * Get whether the selection is blurred.
    *
-   * @return {Boolean} isBlurred
+   * @return {Boolean}
    */
 
   get isBlurred() {
@@ -69,7 +75,7 @@ class Selection extends new Record(DEFAULTS) {
   /**
    * Get whether the selection is collapsed.
    *
-   * @return {Boolean} isCollapsed
+   * @return {Boolean}
    */
 
   get isCollapsed() {
@@ -82,7 +88,7 @@ class Selection extends new Record(DEFAULTS) {
   /**
    * Get whether the selection is expanded.
    *
-   * @return {Boolean} isExpanded
+   * @return {Boolean}
    */
 
   get isExpanded() {
@@ -92,7 +98,7 @@ class Selection extends new Record(DEFAULTS) {
   /**
    * Get whether the selection is forward.
    *
-   * @return {Boolean} isForward
+   * @return {Boolean}
    */
 
   get isForward() {
@@ -112,7 +118,7 @@ class Selection extends new Record(DEFAULTS) {
   /**
    * Get the start key.
    *
-   * @return {String} startKey
+   * @return {String}
    */
 
   get startKey() {
@@ -259,7 +265,7 @@ class Selection extends new Record(DEFAULTS) {
    * Check whether the selection is at the start of a `node`.
    *
    * @param {Node} node
-   * @return {Boolean} isAtStart
+   * @return {Boolean}
    */
 
   isAtStartOf(node) {
@@ -274,7 +280,7 @@ class Selection extends new Record(DEFAULTS) {
    * Check whether the selection is at the end of a `node`.
    *
    * @param {Node} node
-   * @return {Boolean} isAtEnd
+   * @return {Boolean}
    */
 
   isAtEndOf(node) {
@@ -289,7 +295,7 @@ class Selection extends new Record(DEFAULTS) {
    * and focus nodes of the selection always refer to leaf text nodes.
    *
    * @param {Node} node
-   * @return {Selection} selection
+   * @return {Selection}
    */
 
   normalize(node) {
@@ -319,7 +325,7 @@ class Selection extends new Record(DEFAULTS) {
 
     // If the anchor node isn't a text node, match it to one.
     if (anchorNode.kind != 'text') {
-      warning('Selection anchor is on a non text node, matching to leaf')
+      warn('Selection anchor is on a non text node, matching to leaf')
       let anchorText = anchorNode.getTextAtOffset(anchorOffset)
       let offset = anchorNode.getOffset(anchorText)
       anchorOffset = anchorOffset - offset
@@ -328,7 +334,7 @@ class Selection extends new Record(DEFAULTS) {
 
     // If the focus node isn't a text node, match it to one.
     if (focusNode.kind != 'text') {
-      warning('Selection focus is on a non text node, matching to leaf')
+      warn('Selection focus is on a non text node, matching to leaf')
       let focusText = focusNode.getTextAtOffset(focusOffset)
       let offset = focusNode.getOffset(focusText)
       focusOffset = focusOffset - offset
@@ -357,7 +363,7 @@ class Selection extends new Record(DEFAULTS) {
   /**
    * Focus the selection.
    *
-   * @return {Selection} selection
+   * @return {Selection}
    */
 
   focus() {
@@ -369,7 +375,7 @@ class Selection extends new Record(DEFAULTS) {
   /**
    * Blur the selection.
    *
-   * @return {Selection} selection
+   * @return {Selection}
    */
 
   blur() {
@@ -381,7 +387,7 @@ class Selection extends new Record(DEFAULTS) {
   /**
    * Move the focus point to the anchor point.
    *
-   * @return {Selection} selection
+   * @return {Selection}
    */
 
   collapseToAnchor() {
@@ -395,7 +401,7 @@ class Selection extends new Record(DEFAULTS) {
   /**
    * Move the anchor point to the focus point.
    *
-   * @return {Selection} selection
+   * @return {Selection}
    */
 
   collapseToFocus() {
@@ -409,7 +415,7 @@ class Selection extends new Record(DEFAULTS) {
   /**
    * Move the end point to the start point.
    *
-   * @return {Selection} selection
+   * @return {Selection}
    */
 
   collapseToStart() {
@@ -425,7 +431,7 @@ class Selection extends new Record(DEFAULTS) {
   /**
    * Move the end point to the start point.
    *
-   * @return {Selection} selection
+   * @return {Selection}
    */
 
   collapseToEnd() {
@@ -442,7 +448,7 @@ class Selection extends new Record(DEFAULTS) {
    * Move to the start of a `node`.
    *
    * @param {Node} node
-   * @return {Selection} selection
+   * @return {Selection}
    */
 
   collapseToStartOf(node) {
@@ -460,7 +466,7 @@ class Selection extends new Record(DEFAULTS) {
   /**
    * Move to the end of a `node`.
    *
-   * @return {Selection} selection
+   * @return {Selection}
    */
 
   collapseToEndOf(node) {
@@ -481,7 +487,7 @@ class Selection extends new Record(DEFAULTS) {
    * @param {Node} start
    * @param {Node} end (optional)
    * @param {Document} document
-   * @return {Selection} selection
+   * @return {Selection}
    */
 
   moveToRangeOf(start, end = start) {
@@ -501,7 +507,7 @@ class Selection extends new Record(DEFAULTS) {
    * Move the selection forward `n` characters.
    *
    * @param {Number} n (optional)
-   * @return {Selection} selection
+   * @return {Selection}
    */
 
   moveForward(n = 1) {
@@ -515,7 +521,7 @@ class Selection extends new Record(DEFAULTS) {
    * Move the selection backward `n` characters.
    *
    * @param {Number} n (optional)
-   * @return {Selection} selection
+   * @return {Selection}
    */
 
   moveBackward(n = 1) {
@@ -530,7 +536,7 @@ class Selection extends new Record(DEFAULTS) {
    *
    * @param {Number} anchor
    * @param {Number} focus (optional)
-   * @return {Selection} selection
+   * @return {Selection}
    */
 
   moveToOffsets(anchor, focus = anchor) {
@@ -549,7 +555,7 @@ class Selection extends new Record(DEFAULTS) {
    * Extend the focus point forward `n` characters.
    *
    * @param {Number} n (optional)
-   * @return {Selection} selection
+   * @return {Selection}
    */
 
   extendForward(n = 1) {
@@ -563,7 +569,7 @@ class Selection extends new Record(DEFAULTS) {
    * Extend the focus point backward `n` characters.
    *
    * @param {Number} n (optional)
-   * @return {Selection} selection
+   * @return {Selection}
    */
 
   extendBackward(n = 1) {
@@ -577,7 +583,7 @@ class Selection extends new Record(DEFAULTS) {
    * Extend the start point forward `n` characters.
    *
    * @param {Number} n (optional)
-   * @return {Selection} selection
+   * @return {Selection}
    */
 
   moveStartOffset(n = 1) {
@@ -590,7 +596,7 @@ class Selection extends new Record(DEFAULTS) {
    * Extend the end point forward `n` characters.
    *
    * @param {Number} n (optional)
-   * @return {Selection} selection
+   * @return {Selection}
    */
 
   moveEndOffset(n = 1) {
@@ -603,7 +609,7 @@ class Selection extends new Record(DEFAULTS) {
    * Move the start key, while preserving the direction
    *
    * @param {String} key
-   * @return {Selection} selection
+   * @return {Selection}
    */
 
   moveStartTo(key, offset = 0) {
@@ -616,7 +622,7 @@ class Selection extends new Record(DEFAULTS) {
    * Move the end key, while preserving the direction
    *
    * @param {String} key
-   * @return {Selection} selection
+   * @return {Selection}
    */
 
   moveEndTo(key, offset = 0) {
@@ -629,7 +635,7 @@ class Selection extends new Record(DEFAULTS) {
    * Extend the focus point to the start of a `node`.
    *
    * @param {Node} node
-   * @return {Selection} selection
+   * @return {Selection}
    */
 
   extendToStartOf(node) {
@@ -644,7 +650,7 @@ class Selection extends new Record(DEFAULTS) {
    * Extend the focus point to the end of a `node`.
    *
    * @param {Node} node
-   * @return {Selection} selection
+   * @return {Selection}
    */
 
   extendToEndOf(node) {
@@ -658,7 +664,7 @@ class Selection extends new Record(DEFAULTS) {
   /**
    * Unset the selection
    *
-   * @return {Selection} selection
+   * @return {Selection}
    */
 
   unset() {
@@ -705,6 +711,8 @@ EDGE_METHODS.forEach((pattern) => {
 
 /**
  * Export.
+ *
+ * @type {Selection}
  */
 
 export default Selection

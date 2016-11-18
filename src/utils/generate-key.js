@@ -32,6 +32,8 @@ function setKeyGenerator(func) {
 
 /**
  * Export.
+ *
+ * @type {Object}
  */
 
 export {
