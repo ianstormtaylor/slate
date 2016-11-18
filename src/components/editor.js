@@ -93,7 +93,7 @@ class Editor extends React.Component {
 
     const state = this.onBeforeChange(props.state)
     this.cacheState(state)
-    this.state = { state }
+    this.state.state = state
 
     // Mix in the event handlers.
     for (const method of EVENT_HANDLERS) {
