@@ -6,7 +6,7 @@ import Data from '../models/data'
 import Mark from '../models/mark'
 import Selection from '../models/selection'
 import Text from '../models/text'
-import warning from './warning'
+import warn from './warn'
 import typeOf from 'type-of'
 
 /**
@@ -59,7 +59,7 @@ function inline(value) {
 function key(value) {
   if (typeOf(value) == 'string') return value
 
-  warning('Deprecation: Passing a node instead of a key to a method accepting a key can reduce performances')
+  warn('Deprecation: Passing a node instead of a key to a method accepting a key can reduce performances')
   if (value instanceof Block) return value.key
   if (value instanceof Document) return value.key
   if (value instanceof Inline) return value.key
