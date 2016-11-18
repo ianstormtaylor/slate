@@ -4,14 +4,48 @@ import warn from '../utils/warn'
 import { default as coreSchema } from '../plugins/schema'
 
 /**
- * Maximum recursive calls for normalization. Without a maximum, it is easy for
- * a transform function of a schema rule to not fully validate the document,
- * leading to an infinitely invalid loop.
+ * Normalize the document and selection with the core schema.
  *
- * @type {Number}
+ * @param {Transform} transform
+ * @return {Transform}
  */
 
-const MAX_ITERATIONS = 50
+export function normalize(transform) {
+  return transform
+    .normalizeDocument()
+    .normalizeSelection()
+}
+
+/**
+ * Normalize the document with the core schema.
+ *
+ * @param {Transform} transform
+ * @return {Transform}
+ */
+
+export function normalizeDocument(transform) {
+  return transform.normalizeWith(coreSchema)
+}
+
+/**
+ * Normalize state with a `schema`.
+ *
+ * @param {Transform} transform
+ * @param {Schema} schema
+ * @return {Transform}
+ */
+
+export function normalizeWith(transform, schema) {
+  const { state } = transform
+  const { document } = state
+
+  // If the schema has no validation rules, there's nothing to normalize.
+  if (!schema.hasValidators) {
+    return transform
+  }
+
+  return transform.normalizeNodeWith(schema, document)
+}
 
 /**
  * Normalize a `node` and its children with a `schema`.
@@ -29,7 +63,7 @@ export function normalizeNodeWith(transform, schema, node) {
   // Iterate over its children.
   normalizeChildrenWith(transform, schema, node)
 
-  // Re-find the node reference if necessary
+  // Re-find the node reference if necessary.
   if (transform.operations.length != opCount) {
     node = refindNode(transform, node)
   }
@@ -43,7 +77,7 @@ export function normalizeNodeWith(transform, schema, node) {
 }
 
 /**
- * Normalize a `node` its parents with a `schema`.
+ * Normalize a `node` and its parents with a `schema`.
  *
  * @param {Transform} transform
  * @param {Schema} schema
@@ -74,50 +108,6 @@ export function normalizeParentsWith(transform, schema, node) {
 }
 
 /**
- * Normalize state with a `schema`.
- *
- * @param {Transform} transform
- * @param {Schema} schema
- * @return {Transform}
- */
-
-export function normalizeWith(transform, schema) {
-  const { state } = transform
-  const { document } = state
-
-  // If the schema has no validation rules, there's nothing to normalize.
-  if (!schema.hasValidators) {
-    return transform
-  }
-
-  return transform.normalizeNodeWith(schema, document)
-}
-
-/**
- * Normalize the document and selection with the core schema.
- *
- * @param {Transform} transform
- * @return {Transform}
- */
-
-export function normalize(transform) {
-  return transform
-    .normalizeDocument()
-    .normalizeSelection()
-}
-
-/**
- * Normalize the document with the core schema.
- *
- * @param {Transform} transform
- * @return {Transform}
- */
-
-export function normalizeDocument(transform) {
-  return transform.normalizeWith(coreSchema)
-}
-
-/**
  * Normalize a `node` and its children with the core schema.
  *
  * @param {Transform} transform
@@ -136,7 +126,7 @@ export function normalizeNodeByKey(transform, key) {
 }
 
 /**
- * Normalize a node and its parent using core schema
+ * Normalize a `node` and its parent with the core schema.
  *
  * @param {Transform} transform
  * @param {Node|String} key
@@ -189,7 +179,8 @@ export function normalizeSelection(transform) {
 }
 
 /**
- * Re-find a reference to a node that may have been modified in a transform.
+ * Re-find a reference to a node that may have been modified or removed
+ * entirely by a transform.
  *
  * @param {Transform} transform
  * @param {Node} node
@@ -199,12 +190,9 @@ export function normalizeSelection(transform) {
 function refindNode(transform, node) {
   const { state } = transform
   const { document } = state
-
-  if (node.kind == 'document') {
-    return document
-  }
-
-  return document.getDescendant(node.key)
+  return node.kind == 'document'
+    ? document
+    : document.getDescendant(node.key)
 }
 
 /**
@@ -236,9 +224,10 @@ function normalizeChildrenWith(transform, schema, node) {
  */
 
 function normalizeNodeOnly(transform, schema, node) {
+  let max = schema.rules.length
   let iterations = 0
 
-  function normalizeRecursively(t, n) {
+  function iterate(t, n) {
     const failure = n.validate(schema)
     if (!failure) return t
 
@@ -249,19 +238,22 @@ function normalizeNodeOnly(transform, schema, node) {
 
     // Re-find the node reference, in case it was updated. If the node no longer
     // exists, we're done for this branch.
-    const newNode = refindNode(t, n)
-    if (!newNode) return t
+    n = refindNode(t, n)
+    if (!n) return t
 
-    // Increment the iterations counter, so that we don't exceed the max.
+    // Increment the iterations counter, and check to make sure that we haven't
+    // exceeded the max. Without this check, it's easy for the `validate` or
+    // `normalize` function of a schema rule to be written incorrectly and for
+    // an infinite invalid loop to occur.
     iterations++
 
-    if (iterations > MAX_ITERATIONS) {
-      throw new Error('Unexpected number of successive normalizations. Aborting.')
+    if (iterations > max) {
+      throw new Error('A schema rule could not be validated after sufficient iterations. This is usually due to a `rule.validate` or `rule.normalize` function of a schema being incorrectly written, causing an infinite loop.')
     }
 
-    // Otherwise, recurse to validate again.
-    return normalizeRecursively(t, newNode)
+    // Otherwise, iterate again.
+    return iterate(t, n)
   }
 
-  return normalizeRecursively(transform, node)
+  return iterate(transform, node)
 }

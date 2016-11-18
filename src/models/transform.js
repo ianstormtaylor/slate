@@ -22,8 +22,8 @@ class Transform {
    * Constructor.
    *
    * @param {Object} properties
-   *   @param {State} properties.state
-   *   @param {Boolean} properties.normalized
+   *   @property {State} properties.state
+   *   @property {Boolean} properties.normalized
    */
 
   constructor(properties) {
