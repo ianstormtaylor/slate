@@ -573,12 +573,12 @@ const Node = {
     node = node.splitBlockAtRange(end, Infinity)
 
     // Get the start and end nodes.
-    const startNode = node.getNextSibling(node.getHighestChild(startKey))
+    const startNode = node.getNextSibling(node.getHighestChild(startKey).key)
     const endNode = startKey == endKey
-      ? node.getHighestChild(next)
+      ? node.getHighestChild(next.key)
       : node.getHighestChild(endKey)
 
-    nodes = node.getChildrenBetweenIncluding(startNode, endNode)
+    nodes = node.getChildrenBetweenIncluding(startNode.key, endNode.key)
 
     // Return a new document fragment.
     return Document.create({ nodes })
