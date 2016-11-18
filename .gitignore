@@ -1,10 +1,16 @@
-*.sketch
+# Build files.
 dist
-lib
 examples/build.dev.js
 examples/build.prod.js
-node_modules
-tmp
-_book
+lib
 perf/reference.json
+
+# Temporary files.
+tmp
+
+# Gitbook files.
+_book
+
+# NPM files.
+node_modules
 npm-debug.log
