@@ -102,8 +102,9 @@ class Node extends React.Component {
     // If the node has changed, update. PERF: There are certain cases where the
     // node instance will have changed, but it's properties will be exactly the
     // same (copy-paste, delete backwards, etc.) in which case this will not
-    // catch a potentially avoidable re-render. But those cases should be much
-    // rarer than trying to deeply evaluate any changes in all nodes.
+    // catch a potentially avoidable re-render. But those cases are rare enough
+    // that they aren't really a drag on performance, so for simplicity we just
+    // let them through.
     if (nextProps.node != this.props.node) {
       return true
     }
