@@ -16,8 +16,8 @@ import SCHEMA from '../schemas/core'
  */
 
 export function addMarkByKey(transform, key, offset, length, mark, options = {}) {
-  const { normalize = true } = options
   mark = Normalize.mark(mark)
+  const { normalize = true } = options
   const { state } = transform
   const { document } = state
   const path = document.getPath(key)
@@ -164,8 +164,8 @@ export function moveNodeByKey(transform, key, newKey, newIndex, options = {}) {
  */
 
 export function removeMarkByKey(transform, key, offset, length, mark, options = {}) {
-  const { normalize = true } = options
   mark = Normalize.mark(mark)
+  const { normalize = true } = options
   const { state } = transform
   const { document } = state
   const path = document.getPath(key)
@@ -252,9 +252,9 @@ export function removeTextByKey(transform, key, offset, length, options = {}) {
  */
 
 export function setMarkByKey(transform, key, offset, length, mark, properties, options = {}) {
-  const { normalize = true } = options
   mark = Normalize.mark(mark)
   properties = Normalize.markProperties(properties)
+  const { normalize = true } = options
   const newMark = mark.merge(properties)
   const { state } = transform
   const { document } = state
@@ -282,8 +282,8 @@ export function setMarkByKey(transform, key, offset, length, mark, properties, o
  */
 
 export function setNodeByKey(transform, key, properties, options = {}) {
-  const { normalize = true } = options
   properties = Normalize.nodeProperties(properties)
+  const { normalize = true } = options
   const { state } = transform
   const { document } = state
   const path = document.getPath(key)

@@ -12,8 +12,6 @@ import warn from '../utils/warn'
  */
 
 export function normalize(transform, schema) {
-  assertSchema(schema)
-
   return transform
     .normalizeDocument(schema)
     .normalizeSelection(schema)
@@ -28,17 +26,9 @@ export function normalize(transform, schema) {
  */
 
 export function normalizeDocument(transform, schema) {
-  assertSchema(schema)
-
-  // If the schema has no validation rules, there's nothing to normalize.
-  if (!schema.hasValidators) {
-    return transform
-  }
-
   const { state } = transform
   const { document } = state
-
-  return normalizeNodeWith(transform, document, schema)
+  return transform.normalizeNodeByKey(document.key, schema)
 }
 
 /**

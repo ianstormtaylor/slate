@@ -16,9 +16,7 @@ import { List } from 'immutable'
  */
 
 export function addMarkAtRange(transform, range, mark, options = {}) {
-  if (range.isCollapsed) {
-    return transform
-  }
+  if (range.isCollapsed) return transform
 
   const { normalize = true } = options
   const { state } = transform
@@ -52,9 +50,7 @@ export function addMarkAtRange(transform, range, mark, options = {}) {
  */
 
 export function deleteAtRange(transform, range, options = {}) {
-  if (range.isCollapsed) {
-    return transform
-  }
+  if (range.isCollapsed) return transform
 
   const { normalize = true } = options
   const { startKey, startOffset, endKey, endOffset } = range
@@ -112,8 +108,6 @@ export function deleteAtRange(transform, range, options = {}) {
   if (normalize) {
     transform.normalizeNodeByKey(ancestor.key, SCHEMA)
   }
-
-  transform.normalizeDocument(SCHEMA)
 
   return transform
 }
@@ -488,11 +482,9 @@ export function insertTextAtRange(transform, range, text, marks, options = {}) {
  */
 
 export function removeMarkAtRange(transform, range, mark, options = {}) {
-  const { normalize = true } = options
-  if (range.isCollapsed) {
-    return transform
-  }
+  if (range.isCollapsed) return transform
 
+  const { normalize = true } = options
   const { state } = transform
   const { document } = state
   const texts = document.getTextsAtRange(range)
@@ -574,6 +566,7 @@ export function setInlineAtRange(transform, range, properties, options = {}) {
 
 export function splitBlockAtRange(transform, range, height = 1, options = {}) {
   const { normalize = true } = options
+
   if (range.isExpanded) {
     transform.deleteAtRange(range, { normalize })
     range = range.collapseToStart()
@@ -594,9 +587,7 @@ export function splitBlockAtRange(transform, range, height = 1, options = {}) {
     h++
   }
 
-  transform.splitNodeByKey(node.key, offset, { normalize })
-
-  return transform
+  return transform.splitNodeByKey(node.key, offset, { normalize })
 }
 
 /**
@@ -612,6 +603,7 @@ export function splitBlockAtRange(transform, range, height = 1, options = {}) {
 
 export function splitInlineAtRange(transform, range, height = Infinity, options = {}) {
   const { normalize = true } = options
+
   if (range.isExpanded) {
     transform.deleteAtRange(range, { normalize })
     range = range.collapseToStart()
@@ -648,13 +640,11 @@ export function splitInlineAtRange(transform, range, height = Infinity, options 
  */
 
 export function toggleMarkAtRange(transform, range, mark, options = {}) {
-  const { normalize = true } = options
-  if (range.isCollapsed) {
-    return transform
-  }
+  if (range.isCollapsed) return transform
 
   mark = Normalize.mark(mark)
 
+  const { normalize = true } = options
   const { state } = transform
   const { document } = state
   const marks = document.getMarksAtRange(range)
@@ -681,9 +671,9 @@ export function toggleMarkAtRange(transform, range, mark, options = {}) {
  */
 
 export function unwrapBlockAtRange(transform, range, properties, options = {}) {
-  const { normalize = true } = options
   properties = Normalize.nodeProperties(properties)
 
+  const { normalize = true } = options
   let { state } = transform
   let { document } = state
   const blocks = document.getBlocksAtRange(range)
@@ -1030,8 +1020,7 @@ export function wrapTextAtRange(transform, range, prefix, suffix = prefix, optio
     end = end.moveForward(prefix.length)
   }
 
-  transform.insertTextAtRange(start, prefix, [], { normalize })
-  transform.insertTextAtRange(end, suffix, [], { normalize })
-
   return transform
+    .insertTextAtRange(start, prefix, [], { normalize })
+    .insertTextAtRange(end, suffix, [], { normalize })
 }
