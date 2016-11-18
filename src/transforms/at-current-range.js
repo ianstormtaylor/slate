@@ -323,7 +323,8 @@ export function splitBlock(transform, depth = 1) {
   // block, the starting text node won't need to be split.
   if (
     (startOffset == 0) &&
-    (startText == startInline || startInline.getOffset(startText.key) == 0)
+    (startBlock.text != '') &&
+    (!startInline || startInline.getOffset(startText.key) == 0)
   ) {
     after = selection.collapseToStartOf(startText)
   }
