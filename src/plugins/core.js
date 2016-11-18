@@ -262,11 +262,11 @@ function Plugin(options = {}) {
     debug('onDrop', { data })
 
     switch (data.type) {
-    case 'text':
-    case 'html':
-      return onDropText(e, data, state)
-    case 'fragment':
-      return onDropFragment(e, data, state)
+      case 'text':
+      case 'html':
+        return onDropText(e, data, state)
+      case 'fragment':
+        return onDropFragment(e, data, state)
     }
   }
 
@@ -347,14 +347,14 @@ function Plugin(options = {}) {
     debug('onKeyDown', { data })
 
     switch (data.key) {
-    case 'enter': return onKeyDownEnter(e, data, state)
-    case 'backspace': return onKeyDownBackspace(e, data, state)
-    case 'delete': return onKeyDownDelete(e, data, state)
-    case 'left': return onKeyDownLeft(e, data, state)
-    case 'right': return onKeyDownRight(e, data, state)
-    case 'y': return onKeyDownY(e, data, state)
-    case 'z': return onKeyDownZ(e, data, state)
-    case 'k': return onKeyDownK(e, data, state)
+      case 'enter': return onKeyDownEnter(e, data, state)
+      case 'backspace': return onKeyDownBackspace(e, data, state)
+      case 'delete': return onKeyDownDelete(e, data, state)
+      case 'left': return onKeyDownLeft(e, data, state)
+      case 'right': return onKeyDownRight(e, data, state)
+      case 'y': return onKeyDownY(e, data, state)
+      case 'z': return onKeyDownZ(e, data, state)
+      case 'k': return onKeyDownK(e, data, state)
     }
   }
 
@@ -626,11 +626,11 @@ function Plugin(options = {}) {
     debug('onPaste', { data })
 
     switch (data.type) {
-    case 'fragment':
-      return onPasteFragment(e, data, state)
-    case 'text':
-    case 'html':
-      return onPasteText(e, data, state)
+      case 'fragment':
+        return onPasteFragment(e, data, state)
+      case 'text':
+      case 'html':
+        return onPasteText(e, data, state)
     }
   }
 

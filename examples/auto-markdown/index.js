@@ -50,17 +50,17 @@ class AutoMarkdown extends React.Component {
 
   getType = (chars) => {
     switch (chars) {
-    case '*':
-    case '-':
-    case '+': return 'list-item'
-    case '>': return 'block-quote'
-    case '#': return 'heading-one'
-    case '##': return 'heading-two'
-    case '###': return 'heading-three'
-    case '####': return 'heading-four'
-    case '#####': return 'heading-five'
-    case '######': return 'heading-six'
-    default: return null
+      case '*':
+      case '-':
+      case '+': return 'list-item'
+      case '>': return 'block-quote'
+      case '#': return 'heading-one'
+      case '##': return 'heading-two'
+      case '###': return 'heading-three'
+      case '####': return 'heading-four'
+      case '#####': return 'heading-five'
+      case '######': return 'heading-six'
+      default: return null
     }
   }
 
@@ -105,9 +105,9 @@ class AutoMarkdown extends React.Component {
 
   onKeyDown = (e, data, state) => {
     switch (data.key) {
-    case 'space': return this.onSpace(e, state)
-    case 'backspace': return this.onBackspace(e, state)
-    case 'enter': return this.onEnter(e, state)
+      case 'space': return this.onSpace(e, state)
+      case 'backspace': return this.onBackspace(e, state)
+      case 'enter': return this.onEnter(e, state)
     }
   }
 

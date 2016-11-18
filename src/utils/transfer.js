@@ -41,22 +41,22 @@ class Transfer {
     data.type = type
 
     switch (type) {
-    case 'files':
-      data.files = this.getFiles()
-      break
-    case 'fragment':
-      data.fragment = this.getFragment()
-      break
-    case 'html':
-      data.html = this.getHtml()
-      data.text = this.getText()
-      break
-    case 'node':
-      data.node = this.getNode()
-      break
-    case 'text':
-      data.text = this.getText()
-      break
+      case 'files':
+        data.files = this.getFiles()
+        break
+      case 'fragment':
+        data.fragment = this.getFragment()
+        break
+      case 'html':
+        data.html = this.getHtml()
+        data.text = this.getText()
+        break
+      case 'node':
+        data.node = this.getNode()
+        break
+      case 'text':
+        data.text = this.getText()
+        break
     }
 
     return data
@@ -76,8 +76,8 @@ class Transfer {
 
     if (data.items && data.items.length) {
       const fileItems = Array.from(data.items)
-              .map(item => item.kind == 'file' ? item.getAsFile() : null)
-              .filter(exists => exists)
+        .map(item => item.kind == 'file' ? item.getAsFile() : null)
+        .filter(exists => exists)
 
       if (fileItems.length) files = fileItems
     }

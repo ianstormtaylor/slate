@@ -115,9 +115,9 @@ class Tables extends React.Component {
 
     if (state.startBlock.type != 'table-cell') return
     switch (data.key) {
-    case 'backspace': return this.onBackspace(e, state)
-    case 'delete': return this.onDelete(e, state)
-    case 'enter': return this.onEnter(e, state)
+      case 'backspace': return this.onBackspace(e, state)
+      case 'delete': return this.onDelete(e, state)
+      case 'enter': return this.onEnter(e, state)
     }
   }
 

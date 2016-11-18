@@ -160,8 +160,8 @@ class Images extends React.Component {
 
   onDrop = (e, data, state, editor) => {
     switch (data.type) {
-    case 'files': return this.onDropOrPasteFiles(e, data, state, editor)
-    case 'node': return this.onDropNode(e, data, state)
+      case 'files': return this.onDropOrPasteFiles(e, data, state, editor)
+      case 'node': return this.onDropNode(e, data, state)
     }
   }
 
@@ -197,7 +197,7 @@ class Images extends React.Component {
   onDropOrPasteFiles = (e, data, state, editor) => {
     for (const file of data.files) {
       const reader = new FileReader()
-      const [ type, ext ] = file.type.split('/')
+      const [ type ] = file.type.split('/')
       if (type != 'image') continue
 
       reader.addEventListener('load', () => {
@@ -222,8 +222,8 @@ class Images extends React.Component {
 
   onPaste = (e, data, state, editor) => {
     switch (data.type) {
-    case 'files': return this.onDropOrPasteFiles(e, data, state, editor)
-    case 'text': return this.onPasteText(e, data, state)
+      case 'files': return this.onDropOrPasteFiles(e, data, state, editor)
+      case 'text': return this.onPasteText(e, data, state)
     }
   }
 

@@ -109,20 +109,20 @@ class RichText extends React.Component {
     let mark
 
     switch (data.key) {
-    case 'b':
-      mark = 'bold'
-      break
-    case 'i':
-      mark = 'italic'
-      break
-    case 'u':
-      mark = 'underlined'
-      break
-    case '`':
-      mark = 'code'
-      break
-    default:
-      return
+      case 'b':
+        mark = 'bold'
+        break
+      case 'i':
+        mark = 'italic'
+        break
+      case 'u':
+        mark = 'underlined'
+        break
+      case '`':
+        mark = 'code'
+        break
+      default:
+        return
     }
 
     state = state

@@ -226,12 +226,12 @@ function normalizeMarkComponent(render) {
   if (isReactComponent(render)) return render
 
   switch (typeOf(render)) {
-  case 'function':
-    return render
-  case 'object':
-    return props => <span style={render}>{props.children}</span>
-  case 'string':
-    return props => <span className={render}>{props.children}</span>
+    case 'function':
+      return render
+    case 'object':
+      return props => <span style={render}>{props.children}</span>
+    case 'string':
+      return props => <span className={render}>{props.children}</span>
   }
 }
 

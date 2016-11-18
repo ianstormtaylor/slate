@@ -104,14 +104,14 @@ class Iframes extends React.Component {
     let mark
 
     switch (data.key) {
-    case 'b':
-      mark = 'bold'
-      break
-    case 'i':
-      mark = 'italic'
-      break
-    default:
-      return
+      case 'b':
+        mark = 'bold'
+        break
+      case 'i':
+        mark = 'italic'
+        break
+      default:
+        return
     }
 
     state = state
