@@ -85,7 +85,8 @@ function Plugin(options = {}) {
       // the native behavior is to insert inside the range of marks.
       marks: (
         (prevChar && prevChar.marks) ||
-        (!prevChar && nextChar && nextChar.marks)
+        (nextChar && nextChar.marks) ||
+        []
       )
     })
 
