@@ -17,18 +17,12 @@ class App extends React.Component {
   state = {
     state: initialState
   }
-
-  render() {
-    return (
-      <Editor
-        state={this.state.state}
-        onChange={state => this.setState({ state })}
-        onKeyDown={(e, data, state) => this.onKeyDown(e, data, state)}
-      />
-    )
+  
+  onChange = (state) => {
+    this.setState({ state })
   }
 
-  onKeyDown(event, data, state) {
+  onKeyDown = (event, data, state) => {
     if (event.which != 55 || !event.shiftKey) return
 
     const newState = state
@@ -37,6 +31,16 @@ class App extends React.Component {
       .apply()
     
     return newState
+  }
+
+  render = () => {
+    return (
+      <Editor
+        state={this.state.state}
+        onChange={this.onChange}
+        onKeyDown={this.onKeyDown}
+      />
+    )
   }
 
 }
@@ -79,20 +83,12 @@ class App extends React.Component {
       }
     }
   }
-
-  render() {
-    return (
-      // Pass in the `schema` property...
-      <Editor
-        schema={this.state.schema}
-        state={this.state.state}
-        onChange={state => this.setState({ state })}
-        onKeyDown={(e, data, state) => this.onKeyDown(e, data, state)}
-      />
-    )
+  
+  onChange = (state) => {
+    this.setState({ state })
   }
 
-  onKeyDown(event, data, state) {
+  onKeyDown = (event, data, state) => {
     if (event.which != 55 || !event.shiftKey) return
 
     const newState = state
@@ -101,6 +97,18 @@ class App extends React.Component {
       .apply()
     
     return newState
+  }
+
+  render = () => {
+    return (
+      // Pass in the `schema` property...
+      <Editor
+        schema={this.state.schema}
+        state={this.state.state}
+        onChange={this.onChange}
+        onKeyDown={this.onKeyDown}
+      />
+    )
   }
 
 }
@@ -123,19 +131,12 @@ class App extends React.Component {
       }
     }
   }
-
-  render() {
-    return (
-      <Editor
-        schema={this.state.schema}
-        state={this.state.state}
-        onChange={state => this.setState({ state })}
-        onKeyDown={(e, data, state) => this.onKeyDown(e, data, state)}
-      />
-    )
+  
+  onChange = (state) => {
+    this.setState({ state })
   }
 
-  onKeyDown(event, data, state) {
+  onKeyDown = (event, data, state) => {
     // Return with no changes if it's not the "`" key with cmd/ctrl pressed.
     if (event.which != 192 || !event.metaKey) return
 
@@ -144,7 +145,17 @@ class App extends React.Component {
       .transform()
       .setBlock('code')
       .apply()
-    
+  }
+
+  render = () => {
+    return (
+      <Editor
+        schema={this.state.schema}
+        state={this.state.state}
+        onChange={this.onChange}
+        onKeyDown={this.onKeyDown}
+      />
+    )
   }
 
 }
@@ -169,19 +180,12 @@ class App extends React.Component {
       }
     }
   }
-
-  render() {
-    return (
-      <Editor
-        schema={this.state.schema}
-        state={this.state.state}
-        onChange={state => this.setState({ state })}
-        onKeyDown={(e, data, state) => this.onKeyDown(e, data, state)}
-      />
-    )
+  
+  onChange = (state) => {
+    this.setState({ state })
   }
 
-  onKeyDown(event, data, state) {
+  onKeyDown = (event, data, state) => {
     if (event.which != 192 || !event.metaKey) return
 
     // Determine whether any of the currently selected blocks are code blocks.
@@ -193,6 +197,17 @@ class App extends React.Component {
       .setBlock(isCode ? 'paragraph' : 'code')
       .apply()
     
+  }
+
+  render = () => {
+    return (
+      <Editor
+        schema={this.state.schema}
+        state={this.state.state}
+        onChange={this.onChange}
+        onKeyDown={this.onKeyDown}
+      />
+    )
   }
 
 }

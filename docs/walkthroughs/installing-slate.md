@@ -82,11 +82,16 @@ class App extends React.Component {
   }
 
   // On change, update the app's React state with the new editor state.
-  render() {
+  onChange = (state) => {
+    this.setState({ state })
+  }
+
+  // Render the editor.
+  render = () => {
     return (
       <Editor
         state={this.state.state}
-        onChange={state => this.setState({ state })}
+        onChange={this.onChange}
       />
     )
   }

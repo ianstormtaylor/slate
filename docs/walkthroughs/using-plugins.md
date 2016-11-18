@@ -25,23 +25,27 @@ class App extends React.Component {
     }
   }
 
-  render() {
-    return (
-      <Editor
-        schema={this.state.schema}
-        state={this.state.state}
-        onChange={state => this.setState({ state })}
-        onKeyDown={(e, data, state) => this.onKeyDown(e, data, state)}
-      />
-    )
+  onChange = (state) => {
+    this.setState({ state })
   }
 
-  onKeyDown(event, data, state) {
+  onKeyDown = (event, data, state) => {
     if (!event.metaKey || event.which != 66) return
     return state
       .transform()
       .toggleMark('bold')
       .apply()
+  }
+
+  render = () => {
+    return (
+      <Editor
+        schema={this.state.schema}
+        state={this.state.state}
+        onChange={this.onChange}
+        onKeyDown={this.onKeyDown}
+      />
+    )
   }
 
 }
@@ -112,15 +116,19 @@ class App extends React.Component {
       }
     }
   }
+  
+  onChange = (state) => {
+    this.setState({ state })
+  }
 
-  render() {
+  render = () => {
     return (
       // Add the `plugins` property to the editor, and remove `onKeyDown`.
       <Editor
         plugins={plugins}
         schema={this.state.schema}
         state={this.state.state}
-        onChange={state => this.setState({ state })}
+        onChange={this.onChange}
       />
     )
   }
@@ -157,14 +165,18 @@ class App extends React.Component {
       }
     }
   }
+  
+  onChange = (state) => {
+    this.setState({ state })
+  }
 
-  render() {
+  render = () => {
     return (
       <Editor
         plugins={plugins}
         schema={this.state.schema}
         state={this.state.state}
-        onChange={state => this.setState({ state })}
+        onChange={this.onChange}
       />
     )
   }
@@ -237,14 +249,18 @@ class App extends React.Component {
       }
     }
   }
+  
+  onChange = (state) => {
+    this.setState({ state })
+  }
 
-  render() {
+  render = () => {
     return (
       <Editor
         plugins={plugins}
         schema={this.state.schema}
         state={this.state.state}
-        onChange={state => this.setState({ state })}
+        onChange={this.onChange}
       />
     )
   }

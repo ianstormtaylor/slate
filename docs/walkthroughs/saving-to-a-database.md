@@ -21,18 +21,18 @@ class App extends React.Component {
   state = {
     state: initialState
   }
+  
+  onChange = (state) => {
+    this.setState({ state })
+  }
 
-  render() {
+  render = () => {
     return (
       <Editor
         state={this.state.state}
-        onChange={state => this.onChange(state)}
+        onChange={this.onChange}
       />
     )
-  }
-
-  onChange(state) {
-    this.setState({ state })
   }
 
 }
@@ -55,21 +55,21 @@ class App extends React.Component {
     state: initialState
   }
 
-  render() {
-    return (
-      <Editor
-        state={this.state.state}
-        onChange={state => this.onChange(state)}
-      />
-    )
-  }
-
-  onChange(state) {
+  onChange = (state) => {
     this.setState({ state })
 
     // Save the state to Local Storage.
     const string = Plain.serialize(state)
     localStorage.setItem('content', string)
+  }
+
+  render = () => {
+    return (
+      <Editor
+        state={this.state.state}
+        onChange={this.onChange}
+      />
+    )
   }
 
 }
@@ -92,20 +92,20 @@ class App extends React.Component {
     state: initialState
   }
 
-  render() {
-    return (
-      <Editor
-        state={this.state.state}
-        onChange={state => this.onChange(state)}
-      />
-    )
-  }
-
-  onChange(state) {
+  onChange = (state) => {
     this.setState({ state })
 
     const string = Plain.serialize(state)
     localStorage.setItem('content', string)
+  }
+
+  render = () => {
+    return (
+      <Editor
+        state={this.state.state}
+        onChange={this.onChange}
+      />
+    )
   }
 
 }
@@ -129,25 +129,25 @@ class App extends React.Component {
     state: initialState
   }
 
-  render() {
-    // Add the `onDocumentChange` handler to the editor.
-    return (
-      <Editor
-        state={this.state.state}
-        onChange={state => this.onChange(state)}
-        onDocumentChange={(document, state) => this.onDocumentChange(document, state)}
-      />
-    )
-  }
-
-  onChange(state) {
+  onChange = (state) => {
     this.setState({ state })
   }
 
   // Pull the saving logic out into the `onDocumentChange` handler.
-  onDocumentChange(document, state) {
+  onDocumentChange = (document, state) => {
     const string = Plain.serialize(state)
     localStorage.setItem('content', string)
+  }
+
+  render = () => {
+    // Add the `onDocumentChange` handler to the editor.
+    return (
+      <Editor
+        state={this.state.state}
+        onChange={this.onChange}
+        onDocumentChange={this.onDocumentChange}
+      />
+    )
   }
 
 }
@@ -177,23 +177,23 @@ class App extends React.Component {
     state: initialState
   }
 
-  render() {
-    return (
-      <Editor
-        state={this.state.state}
-        onChange={state => this.onChange(state)}
-        onDocumentChange={(document, state) => this.onDocumentChange(document, state)}
-      />
-    )
-  }
-
-  onChange(state) {
+  onChange = (state) => {
     this.setState({ state })
   }
 
-  onDocumentChange(document, state) {
+  onDocumentChange = (document, state) => {
       // Switch to using the Raw serializer.
     localStorage.setItem('content', Raw.serialize(state))
+  }
+
+  render = () => {
+    return (
+      <Editor
+        state={this.state.state}
+        onChange={this.onChange}
+        onDocumentChange={this.onDocumentChange}
+      />
+    )
   }
 
 }

@@ -20,11 +20,15 @@ class App extends React.Component {
     state: initialState
   }
 
-  render() {
+  onChange = (state) => {
+    this.setState({ state })
+  }
+
+  render = () => {
     return (
       <Editor
         state={this.state.state}
-        onChange={state => this.setState({ state })}
+        onChange={this.onChange}
       />
     )
   }
@@ -40,20 +44,24 @@ class App extends React.Component {
   state = {
     state: initialState
   }
-
-  render() {
-    return (
-      <Editor
-        state={this.state.state}
-        onChange={state => this.setState({ state })}
-        onKeyDown={(e, data, state) => this.onKeyDown(e, data, state)}
-      />
-    )
+  
+  onChange = (state) => {
+    this.setState({ state })
   }
 
   // Define a new handler which prints the key code that was pressed.
-  onKeyDown(event, data, state) {
+  onKeyDown = (event, data, state) => {
     console.log(event.which)
+  }
+
+  render = () => {
+    return (
+      <Editor
+        state={this.state.state}
+        onChange={this.onChange}
+        onKeyDown={this.onKeyDown}
+      />
+    )
   }
 
 }
@@ -71,18 +79,12 @@ class App extends React.Component {
   state = {
     state: initialState
   }
-
-  render() {
-    return (
-      <Editor
-        state={this.state.state}
-        onChange={state => this.setState({ state })}
-        onKeyDown={(e, data, state) => this.onKeyDown(e, data, state)}
-      />
-    )
+  
+  onChange = (state) => {
+    this.setState({ state })
   }
 
-  onKeyDown(event, data, state) {
+  onKeyDown = (event, data, state) => {
     // Return with no changes if it's not the "7" key with shift pressed.
     if (event.which != 55 || !event.shiftKey) return
 
@@ -94,6 +96,16 @@ class App extends React.Component {
     
     // Return the new state, which will cause the editor to update it.
     return newState
+  }
+
+  render = () => {
+    return (
+      <Editor
+        state={this.state.state}
+        onChange={this.onChange}
+        onKeyDown={this.onKeyDown}
+      />
+    )
   }
 
 }

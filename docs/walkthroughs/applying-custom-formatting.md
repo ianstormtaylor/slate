@@ -22,19 +22,12 @@ class App extends React.Component {
       }
     }
   }
-
-  render() {
-    return (
-      <Editor
-        state={this.state.state}
-        schema={this.state.schema}
-        onChange={state => this.setState({ state })}
-        onKeyDown={e, data, state => this.onKeyDown(e, data, state)}
-      />
-    )
+  
+  onChange = (state) => {
+    this.setState({ state })
   }
 
-  onKeyDown(event, data, state) {
+  onKeyDown = (event, data, state) => {
     if (event.which != 192 || !event.metaKey) return
     const isCode = state.blocks.some(block => block.type == 'code')
 
@@ -43,6 +36,17 @@ class App extends React.Component {
       .setBlock(isCode ? 'paragraph' : 'code')
       .apply()
     }
+  }
+
+  render = () => {
+    return (
+      <Editor
+        state={this.state.state}
+        schema={this.state.schema}
+        onChange={this.onChange}
+        onKeyDown={this.onKeyDown}
+      />
+    )
   }
 
 }
@@ -61,19 +65,12 @@ class App extends React.Component {
       }
     }
   }
-
-  render() {
-    return (
-      <Editor
-        schema={this.state.schema}
-        state={this.state.state}
-        onChange={state => this.setState({ state })}
-        onKeyDown={(e, data, state) => this.onKeyDown(e, data, state)}
-      />
-    )
+  
+  onChange = (state) => {
+    this.setState({ state })
   }
 
-  onKeyDown(event, data, state) {
+  onKeyDown = (event, data, state) => {
     if (!event.metaKey) return
 
     // Decide what to do based on the key code...
@@ -94,6 +91,17 @@ class App extends React.Component {
           .apply()
       }
     }
+  }
+
+  render = () => {
+    return (
+      <Editor
+        schema={this.state.schema}
+        state={this.state.state}
+        onChange={this.onChange}
+        onKeyDown={this.onKeyDown}
+      />
+    )
   }
 
 }
@@ -133,20 +141,12 @@ class App extends React.Component {
       }
     }
   }
-
-  // Add the `renderMark` handler to the editor.
-  render() {
-    return (
-      <Editor
-        schema={this.state.schema}
-        state={this.state.state}
-        onChange={state => this.setState({ state })}
-        onKeyDown={(e, data, state) => this.onKeyDown(e, data, state)}
-      />
-    )
+  
+  onChange = (state) => {
+    this.setState({ state })
   }
 
-  onKeyDown(event, data, state) {
+  onKeyDown = (event, data, state) => {
     if (!event.metaKey) return
 
     switch (event.which) {
@@ -164,6 +164,17 @@ class App extends React.Component {
           .apply()
       }
     }
+  }
+
+  render = () => {
+    return (
+      <Editor
+        schema={this.state.schema}
+        state={this.state.state}
+        onChange={this.onChange}
+        onKeyDown={this.onKeyDown}
+      />
+    )
   }
 
 }
