@@ -312,10 +312,28 @@ export function splitBlock(transform, depth = 1) {
   state = transform.state
   document = state.document
 
-  const { startKey } = selection
-  const startNode = document.getDescendant(startKey)
-  const nextNode = document.getNextText(startNode.key)
-  const after = selection.collapseToStartOf(nextNode)
+  const { startKey, startOffset } = selection
+  const startText = document.getNode(startKey)
+  const startBlock = document.getClosestBlock(startKey)
+  const startInline = startBlock.getFurthestInline(startKey)
+  const nextText = document.getNextText(startText.key)
+  let after
+
+  // If the selection is at the start of the highest inline child inside the
+  // block, the starting text node won't need to be split.
+  if (
+    (startOffset == 0) &&
+    (startBlock.text != '') &&
+    (!startInline || startInline.getOffset(startText.key) == 0)
+  ) {
+    after = selection.collapseToStartOf(startText)
+  }
+
+  // Otherwise, we'll need to move the selection forward one to account for the
+  // text node that was split.
+  else {
+    after = selection.collapseToStartOf(nextText)
+  }
 
   return transform.moveTo(after)
 }
