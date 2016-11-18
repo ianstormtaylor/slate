@@ -1,7 +1,8 @@
 /* eslint no-console: 0 */
 
-import { List } from 'immutable'
 import Normalize from '../utils/normalize'
+import SCHEMA from '../schemas/core'
+import { List } from 'immutable'
 
 /**
  * Add a new `mark` to the characters at `range`.
@@ -109,10 +110,10 @@ export function deleteAtRange(transform, range, options = {}) {
   }
 
   if (normalize) {
-    transform.normalizeNodeByKey(ancestor.key)
+    transform.normalizeNodeByKey(ancestor.key, SCHEMA)
   }
 
-  transform.normalizeDocument()
+  transform.normalizeDocument(SCHEMA)
 
   return transform
 }
@@ -298,7 +299,7 @@ export function insertBlockAtRange(transform, range, block, options = {}) {
   }
 
   if (normalize) {
-    transform.normalizeNodeByKey(parent.key)
+    transform.normalizeNodeByKey(parent.key, SCHEMA)
   }
 
   return transform
@@ -393,7 +394,7 @@ export function insertFragmentAtRange(transform, range, fragment, options = {}) 
   }
 
   if (normalize) {
-    transform.normalizeNodeByKey(parent.key)
+    transform.normalizeNodeByKey(parent.key, SCHEMA)
   }
 
   return transform
@@ -434,7 +435,7 @@ export function insertInlineAtRange(transform, range, inline, options = {}) {
   transform.insertNodeByKey(parent.key, index + 1, inline, { normalize: false })
 
   if (normalize) {
-    transform.normalizeNodeByKey(parent.key)
+    transform.normalizeNodeByKey(parent.key, SCHEMA)
   }
 
   return transform
@@ -467,7 +468,7 @@ export function insertTextAtRange(transform, range, text, marks, options = {}) {
     transform.deleteAtRange(range, { normalize: false })
   }
 
-  // Unless specified, don't normalize if only inserting text
+  // PERF: Unless specified, don't normalize if only inserting text.
   if (normalize !== undefined) {
     normalize = range.isExpanded
   }
@@ -756,7 +757,7 @@ export function unwrapBlockAtRange(transform, range, properties, options = {}) {
 
   // TODO: optmize to only normalize the right block
   if (normalize) {
-    transform.normalizeDocument()
+    transform.normalizeDocument(SCHEMA)
   }
 
   return transform
@@ -805,7 +806,7 @@ export function unwrapInlineAtRange(transform, range, properties, options = {}) 
 
   // TODO: optmize to only normalize the right block
   if (normalize) {
-    transform.normalizeDocument()
+    transform.normalizeDocument(SCHEMA)
   }
 
   return transform
@@ -877,7 +878,7 @@ export function wrapBlockAtRange(transform, range, block, options = {}) {
   })
 
   if (normalize) {
-    transform.normalizeNodeByKey(parent.key)
+    transform.normalizeNodeByKey(parent.key, SCHEMA)
   }
 
   return transform
@@ -955,7 +956,7 @@ export function wrapInlineAtRange(transform, range, inline, options = {}) {
     })
 
     if (normalize) {
-      transform.normalizeNodeByKey(startBlock.key)
+      transform.normalizeNodeByKey(startBlock.key, SCHEMA)
     }
   }
 
@@ -986,8 +987,8 @@ export function wrapInlineAtRange(transform, range, inline, options = {}) {
 
     if (normalize) {
       transform
-        .normalizeNodeByKey(startBlock.key)
-        .normalizeNodeByKey(endBlock.key)
+        .normalizeNodeByKey(startBlock.key, SCHEMA)
+        .normalizeNodeByKey(endBlock.key, SCHEMA)
     }
 
     blocks.slice(1, -1).forEach((block) => {
@@ -999,7 +1000,7 @@ export function wrapInlineAtRange(transform, range, inline, options = {}) {
       })
 
       if (normalize) {
-        transform.normalizeNodeByKey(block.key)
+        transform.normalizeNodeByKey(block.key, SCHEMA)
       }
     })
   }

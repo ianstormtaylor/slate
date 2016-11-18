@@ -86,6 +86,24 @@ const Node = {
   },
 
   /**
+   * Assert that a node's tree has a node by `key` and return it.
+   *
+   * @param {String} key
+   * @return {Node}
+   */
+
+  assertNode(key) {
+    const node = this.getNode(key)
+
+    if (!node) {
+      key = Normalize.key(key)
+      throw new Error(`Could not find a node with key "${key}".`)
+    }
+
+    return node
+  },
+
+  /**
    * Assert that a node exists at `path` and return it.
    *
    * @param {Array} path
@@ -137,10 +155,11 @@ const Node = {
    */
 
   findDescendant(iterator) {
-    const found = this.nodes.find(iterator)
-    if (found) return found
+    const childFound = this.nodes.find(iterator)
+    if (childFound) return childFound
 
     let descendantFound = null
+
     this.nodes.find(node => {
       if (node.kind != 'text') {
         descendantFound = node.findDescendant(iterator)
@@ -763,6 +782,18 @@ const Node = {
     return this.getTexts()
       .skipUntil(text => text.key == key)
       .get(1)
+  },
+
+  /**
+   * Get a node in the tree by `key`.
+   *
+   * @param {String} key
+   * @return {Node|Null}
+   */
+
+  getNode(key) {
+    key = Normalize.key(key)
+    return this.key == key ? this : this.getDescendant(key)
   },
 
   /**

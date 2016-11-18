@@ -53,7 +53,7 @@ function Plugin(options = {}) {
     if (prevState && state.document == prevState.document) return state
 
     const newState = state.transform()
-      .normalizeWith(schema)
+      .normalize(schema)
       .apply({ save: false })
 
     return newState
@@ -748,7 +748,7 @@ function Plugin(options = {}) {
   }
 
   /**
-   * Extend the core schema with rendering rules.
+   * Add default rendering rules to the schema.
    *
    * @type {Object}
    */

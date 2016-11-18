@@ -1,11 +1,9 @@
 
 import 'jsdom-global/register'
-import React from 'react'
 import fs from 'fs'
 import readMetadata from 'read-metadata'
 import strip from '../helpers/strip-dynamic'
 import { Raw, Schema } from '../..'
-import { mount } from 'enzyme'
 import { resolve } from 'path'
 import { strictEqual } from '../helpers/assert-json'
 
@@ -32,7 +30,7 @@ describe('schema', () => {
           const expected = readMetadata.sync(resolve(testDir, 'output.yaml'))
           const schema = Schema.create(require(testDir))
           const state = Raw.deserialize(input, { terse: true })
-          const normalized = state.transform().normalizeWith(schema).apply()
+          const normalized = state.transform().normalize(schema).apply()
           const output = Raw.serialize(normalized, { terse: true })
           strictEqual(strip(output), strip(expected))
         })

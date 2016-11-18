@@ -290,12 +290,12 @@ function isInlineVoid(node) {
 }
 
 /**
- * The default schema.
+ * The core schema.
  *
  * @type {Schema}
  */
 
-const schema = Schema.create({
+const SCHEMA = Schema.create({
   rules: [
     DOCUMENT_CHILDREN_RULE,
     BLOCK_CHILDREN_RULE,
@@ -315,4 +315,4 @@ const schema = Schema.create({
  * @type {Schema}
  */
 
-export default schema
+export default SCHEMA

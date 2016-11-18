@@ -1,6 +1,7 @@
 
 
 import Document from './document'
+import SCHEMA from '../schemas/core'
 import Selection from './selection'
 import Transform from './transform'
 import { Record, Set, Stack, List } from 'immutable'
@@ -57,7 +58,7 @@ class State extends new Record(DEFAULTS) {
 
     const state = new State({ document, selection })
     return state.transform({ normalized: false })
-      .normalize()
+      .normalize(SCHEMA)
       .apply({ save: false })
   }
 

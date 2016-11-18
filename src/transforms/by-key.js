@@ -1,4 +1,6 @@
+
 import Normalize from '../utils/normalize'
+import SCHEMA from '../schemas/core'
 
 /**
  * Add mark to text at `offset` and `length` in node by `key`.
@@ -21,9 +23,10 @@ export function addMarkByKey(transform, key, offset, length, mark, options = {})
   const path = document.getPath(key)
 
   transform.addMarkOperation(path, offset, length, mark)
+
   if (normalize) {
     const parent = document.getParent(key)
-    transform.normalizeNodeByKey(parent.key)
+    transform.normalizeNodeByKey(parent.key, SCHEMA)
   }
 
   return transform
@@ -48,8 +51,9 @@ export function insertNodeByKey(transform, key, index, node, options = {}) {
   const path = document.getPath(key)
 
   transform.insertNodeOperation(path, index, node)
+
   if (normalize) {
-    transform.normalizeNodeByKey(key)
+    transform.normalizeNodeByKey(key, SCHEMA)
   }
 
   return transform
@@ -75,9 +79,10 @@ export function insertTextByKey(transform, key, offset, text, marks, options = {
   const path = document.getPath(key)
 
   transform.insertTextOperation(path, offset, text, marks)
+
   if (normalize) {
     const parent = document.getParent(key)
-    transform.normalizeNodeByKey(parent.key)
+    transform.normalizeNodeByKey(parent.key, SCHEMA)
   }
 
   return transform
@@ -106,9 +111,9 @@ export function joinNodeByKey(transform, key, withKey, options = {}) {
   if (normalize) {
     const parent = document.getCommonAncestor(key, withKey)
     if (parent) {
-      transform.normalizeNodeByKey(parent.key)
+      transform.normalizeNodeByKey(parent.key, SCHEMA)
     } else {
-      transform.normalizeDocument()
+      transform.normalizeDocument(SCHEMA)
     }
   }
 
@@ -139,7 +144,7 @@ export function moveNodeByKey(transform, key, newKey, newIndex, options = {}) {
 
   if (normalize) {
     const parent = document.key == newKey ? document : document.getCommonAncestor(key, newKey)
-    transform.normalizeNodeByKey(parent.key)
+    transform.normalizeNodeByKey(parent.key, SCHEMA)
   }
 
   return transform
@@ -166,9 +171,10 @@ export function removeMarkByKey(transform, key, offset, length, mark, options = 
   const path = document.getPath(key)
 
   transform.removeMarkOperation(path, offset, length, mark)
+
   if (normalize) {
     const parent = document.getParent(key)
-    transform.normalizeNodeByKey(parent.key)
+    transform.normalizeNodeByKey(parent.key, SCHEMA)
   }
 
   return transform
@@ -195,9 +201,9 @@ export function removeNodeByKey(transform, key, options = {}) {
   if (normalize) {
     const parent = document.getParent(key)
     if (parent) {
-      transform.normalizeNodeByKey(parent.key)
+      transform.normalizeNodeByKey(parent.key, SCHEMA)
     } else {
-      transform.normalizeDocument()
+      transform.normalizeDocument(SCHEMA)
     }
   }
 
@@ -223,9 +229,10 @@ export function removeTextByKey(transform, key, offset, length, options = {}) {
   const path = document.getPath(key)
 
   transform.removeTextOperation(path, offset, length)
+
   if (normalize) {
     const parent = document.getParent(key)
-    transform.normalizeParentsByKey(parent.key)
+    transform.normalizeParentsByKey(parent.key, SCHEMA)
   }
 
   return transform
@@ -254,9 +261,10 @@ export function setMarkByKey(transform, key, offset, length, mark, properties, o
   const path = document.getPath(key)
 
   transform.setMarkOperation(path, offset, length, mark, newMark)
+
   if (normalize) {
     const parent = document.getParent(key)
-    transform.normalizeNodeByKey(parent.key)
+    transform.normalizeNodeByKey(parent.key, SCHEMA)
   }
 
   return transform
@@ -285,9 +293,9 @@ export function setNodeByKey(transform, key, properties, options = {}) {
   if (normalize) {
     const parent = document.getParent(key)
     if (parent) {
-      transform.normalizeNodeByKey(parent.key)
+      transform.normalizeNodeByKey(parent.key, SCHEMA)
     } else {
-      transform.normalizeDocument()
+      transform.normalizeDocument(SCHEMA)
     }
   }
 
@@ -316,9 +324,9 @@ export function splitNodeByKey(transform, key, offset, options = {}) {
   if (normalize) {
     const parent = document.getParent(key)
     if (parent) {
-      transform.normalizeNodeByKey(parent.key)
+      transform.normalizeNodeByKey(parent.key, SCHEMA)
     } else {
-      transform.normalizeDocument()
+      transform.normalizeDocument(SCHEMA)
     }
   }
 

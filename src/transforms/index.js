@@ -148,9 +148,6 @@ import {
 
 import {
   normalize,
-  normalizeWith,
-  normalizeNodeWith,
-  normalizeParentsWith,
   normalizeDocument,
   normalizeSelection,
   normalizeNodeByKey,
@@ -299,9 +296,6 @@ export default {
    */
 
   normalize,
-  normalizeWith,
-  normalizeNodeWith,
-  normalizeParentsWith,
   normalizeDocument,
   normalizeSelection,
   normalizeNodeByKey,
