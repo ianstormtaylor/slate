@@ -90,7 +90,10 @@ class Editor extends React.Component {
     this.state = {}
     this.state.plugins = this.resolvePlugins(props)
     this.state.schema = this.resolveSchema(this.state.plugins)
-    this.state.state = this.onBeforeChange(props.state)
+
+    const state = this.onBeforeChange(props.state)
+    this.cacheState(state)
+    this.state = { state }
 
     // Mix in the event handlers.
     for (const method of EVENT_HANDLERS) {
@@ -118,9 +121,21 @@ class Editor extends React.Component {
       this.setState({ schema })
     }
 
-    this.setState({
-      state: this.onBeforeChange(props.state)
-    })
+    const state = this.onBeforeChange(props.state)
+    this.cacheState(state)
+    this.setState({ state })
+  }
+
+  /**
+   * Cache a `state` in memory to be able to compare against it later, for
+   * things like `onDocumentChange`.
+   *
+   * @param {State} state
+   */
+
+  cacheState = (state) => {
+    this.tmp.document = state.document
+    this.tmp.selection = state.selection
   }
 
   /**
@@ -209,13 +224,13 @@ class Editor extends React.Component {
 
     if (state.document != this.tmp.document) {
       this.props.onDocumentChange(state.document, state)
-      this.tmp.document = state.document
     }
 
     if (state.selection != this.tmp.selection) {
       this.props.onSelectionChange(state.selection, state)
-      this.tmp.selection = state.selection
     }
+
+    this.cacheState(state)
   }
 
   /**
