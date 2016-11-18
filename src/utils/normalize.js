@@ -59,7 +59,7 @@ function inline(value) {
 function key(value) {
   if (typeOf(value) == 'string') return value
 
-  warn('Deprecation: Passing a node instead of a key to a method accepting a key can reduce performances')
+  warn('An object was passed to a Node method instead of a `key` string. This was previously supported, but is being deprecated because it can have a negative impact on performance. The object in question was:', value)
   if (value instanceof Block) return value.key
   if (value instanceof Document) return value.key
   if (value instanceof Inline) return value.key

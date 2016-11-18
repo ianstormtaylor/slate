@@ -5,15 +5,16 @@ import IS_DEV from '../constants/is-dev'
  * Log a development warning.
  *
  * @param {String} message
+ * @param {Any} ...args
  */
 
-function warning(message, ...more) {
+function warn(message, ...args) {
   if (!IS_DEV) {
     return
   }
 
   if (typeof console !== 'undefined') {
-    console.error(`Warning: ${message}`, ...more) // eslint-disable-line no-console
+    console.warn(`Warning: ${message}`, ...args) // eslint-disable-line no-console
   }
 
   try {
@@ -28,6 +29,8 @@ function warning(message, ...more) {
 
 /**
  * Export.
+ *
+ * @type {Function}
  */
 
-export default warning
+export default warn

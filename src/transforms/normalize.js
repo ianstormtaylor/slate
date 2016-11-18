@@ -102,7 +102,7 @@ export function normalizeSelection(transform) {
     !document.hasDescendant(selection.anchorKey) ||
     !document.hasDescendant(selection.focusKey)
   ) {
-    warn('The selection was invalid and reset to start of the document.')
+    warn('The selection was invalid and was reset to start of the document. The selection in question was:', selection)
 
     const firstText = document.getFirstText()
     selection = selection.merge({

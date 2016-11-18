@@ -325,7 +325,7 @@ class Selection extends new Record(DEFAULTS) {
 
     // If the anchor node isn't a text node, match it to one.
     if (anchorNode.kind != 'text') {
-      warn('Selection anchor is on a non text node, matching to leaf')
+      warn('The selection anchor was set to a Node that is not a Text node. This should not happen and can degrade performance. The node in question was:', anchorNode)
       let anchorText = anchorNode.getTextAtOffset(anchorOffset)
       let offset = anchorNode.getOffset(anchorText)
       anchorOffset = anchorOffset - offset
@@ -334,7 +334,7 @@ class Selection extends new Record(DEFAULTS) {
 
     // If the focus node isn't a text node, match it to one.
     if (focusNode.kind != 'text') {
-      warn('Selection focus is on a non text node, matching to leaf')
+      warn('The selection focus was set to a Node that is not a Text node. This should not happen and can degrade performance. The node in question was:', focusNode)
       let focusText = focusNode.getTextAtOffset(focusOffset)
       let offset = focusNode.getOffset(focusText)
       focusOffset = focusOffset - offset

@@ -104,7 +104,7 @@ class Node extends React.Component {
       if (!IS_DEV || !Immutable.is(nextProps.node, this.props.node)) {
         return true
       } else {
-        warn('Encountered different references for identical node values in "shouldComponentUpdate". Check that you are preserving references for the following node:\n', nextProps.node.toJS())
+        warn('A new immutable Node instance was encountered with an identical structure to the previous instance. This is usually a mistake and can impact performance. Make sure to preserve immutable references when nothing has changed. The node in question was:', nextProps.node)
       }
     }
 

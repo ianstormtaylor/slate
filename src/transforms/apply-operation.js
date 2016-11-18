@@ -350,12 +350,15 @@ function setNode(state, operation) {
   let { document } = state
   let node = document.assertPath(path)
 
-  // Deprecate using setNode for updating children, or keys
+  // Deprecate the ability to overwite a node's children.
   if (properties.nodes && properties.nodes != node.nodes) {
-    warn('Updating Node.nodes through setNode is not allowed. Use appropriate insertion and removal functions.')
+    warn('Updating a Node\'s `nodes` property via `setNode()` is not allowed. Use the appropriate insertion and removal operations instead. The opeartion in question was:', operation)
     delete properties.nodes
-  } else if (properties.key && properties.key != node.key) {
-    warn('Updating Node.key through setNode is not allowed. You should not have to update keys yourself.')
+  }
+
+  // Deprecate the ability to change a node's key.
+  if (properties.key && properties.key != node.key) {
+    warn('Updating a Node\'s `key` property via `setNode()` is not allowed. There should be no reason to do this. The opeartion in question was:', operation)
     delete properties.key
   }
 
