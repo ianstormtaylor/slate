@@ -99,13 +99,13 @@ class Node extends React.Component {
       return true
     }
 
-    // If the node has changed, update.
+    // If the node has changed, update. PERF: There are certain cases where the
+    // node instance will have changed, but it's properties will be exactly the
+    // same (copy-paste, delete backwards, etc.) in which case this will not
+    // catch a potentially avoidable re-render. But those cases should be much
+    // rarer than trying to deeply evaluate any changes in all nodes.
     if (nextProps.node != this.props.node) {
-      if (!IS_DEV || !Immutable.is(nextProps.node, this.props.node)) {
-        return true
-      } else {
-        warn('A new immutable Node instance was encountered with an identical structure to the previous instance. This is usually a mistake and can impact performance. Make sure to preserve immutable references when nothing has changed. The node in question was:', nextProps.node)
-      }
+      return true
     }
 
     const nextHasEdgeIn = nextProps.state.selection.hasEdgeIn(nextProps.node)
