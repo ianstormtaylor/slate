@@ -49,4 +49,5 @@
 
 ## General
 
-- [FAQ](./concepts/faq.md)
+- [FAQ](./general/faq.md)
+- [Resources](./general/resources.md)
