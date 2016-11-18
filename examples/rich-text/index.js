@@ -296,6 +296,7 @@ class RichText extends React.Component {
     return (
       <div className="editor">
         <Editor
+          spellCheck
           placeholder={'Enter some rich text...'}
           schema={schema}
           state={this.state.state}

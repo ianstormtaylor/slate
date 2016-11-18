@@ -104,37 +104,19 @@ class Content extends React.Component {
   }
 
   /**
-   * While rendering, set the `isRendering` flag.
-   *
-   * @param {Object} props
-   * @param {Object} state
-   */
-
-  componentWillUpdate = (props, state) => {
-    this.tmp.isRendering = true
-  }
-
-  /**
-   * When finished rendering, move the `isRendering` flag on next tick and
-   * clean up the DOM's activeElement if neccessary.
+   * On update, if the state is blurred now, but was focused before, and the
+   * DOM still has a node inside the editor selected, we need to blur it.
    *
    * @param {Object} prevProps
    * @param {Object} prevState
    */
 
   componentDidUpdate = (prevProps, prevState) => {
-    setTimeout(() => {
-      this.tmp.isRendering = false
-    }, 1)
-
-    // If the state is blurred now, but was focused before, and the DOM still
-    // has a node inside the editor selected, we need to blur it.
     if (this.props.state.isBlurred && prevProps.state.isFocused) {
       const el = ReactDOM.findDOMNode(this)
       const window = getWindow(el)
       const native = window.getSelection()
       if (!el.contains(native.anchorNode)) return
-
       native.removeAllRanges()
       el.blur()
     }
@@ -421,7 +403,6 @@ class Content extends React.Component {
    */
 
   onInput = (e) => {
-    if (this.tmp.isRendering) return
     if (this.tmp.isComposing) return
     if (this.props.state.isBlurred) return
     if (isNonEditable(e)) return
@@ -567,7 +548,6 @@ class Content extends React.Component {
 
   onSelect = (e) => {
     if (this.props.readOnly) return
-    if (this.tmp.isRendering) return
     if (this.tmp.isCopying) return
     if (this.tmp.isComposing) return
     if (isNonEditable(e)) return
@@ -654,7 +634,7 @@ class Content extends React.Component {
 
     // COMPAT: In Firefox, spellchecking can remove entire wrapping elements
     // including inline ones like `<a>`, which is jarring for the user but also
-    // causes the DOM to get into an irreconilable state.
+    // causes the DOM to get into an irreconcilable state. (2016/09/01)
     const spellCheck = IS_FIREFOX ? false : this.props.spellCheck
 
     return (
