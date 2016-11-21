@@ -204,10 +204,11 @@ class Transfer {
     if (this.hasNode()) return 'node'
 
     // COMPAT: Microsoft Word adds an image of the selected text to the data.
-    // Since files are preferred over HTML, this would cause the type to be
-    // considered `files`. But it also adds rich text data so we can check for
-    // that and properly set the type to `html`. (2016/11/21)
+    // Since files are preferred over HTML or text, this would cause the type to
+    // be considered `files`. But it also adds rich text data so we can check
+    // for that and properly set the type to `html` or `text`. (2016/11/21)
     if (this.hasRichText() && this.hasHtml()) return 'html'
+    if (this.hasRichText() && this.hasText()) return 'text'
 
     if (this.hasFiles()) return 'files'
     if (this.hasHtml()) return 'html'
