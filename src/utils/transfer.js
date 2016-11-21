@@ -158,6 +158,24 @@ class Transfer {
   }
 
   /**
+   * Get the rich text content of the data transfer.
+   *
+   * @return {String|Void}
+   */
+
+  getRichText() {
+    if ('richtext' in this.cache) return this.cache.richtext
+
+    let richtext
+    const string = this.data.getData('text/rtf')
+
+    if (string != '') richtext = string
+
+    this.cache.richtext = richtext
+    return richtext
+  }
+
+  /**
    * Get the text content of the data transfer.
    *
    * @return {String|Void}
@@ -184,6 +202,14 @@ class Transfer {
   getType() {
     if (this.hasFragment()) return 'fragment'
     if (this.hasNode()) return 'node'
+
+    // COMPAT: Microsoft Word adds an image of the selected text to the data.
+    // Since files are preferred over HTML or text, this would cause the type to
+    // be considered `files`. But it also adds rich text data so we can check
+    // for that and properly set the type to `html` or `text`. (2016/11/21)
+    if (this.hasRichText() && this.hasHtml()) return 'html'
+    if (this.hasRichText() && this.hasText()) return 'text'
+
     if (this.hasFiles()) return 'files'
     if (this.hasHtml()) return 'html'
     if (this.hasText()) return 'text'
@@ -208,6 +234,16 @@ class Transfer {
 
   hasHtml() {
     return this.getHtml() != null
+  }
+
+  /**
+   * Check whether the data transfer has rich text content.
+   *
+   * @return {Boolean}
+   */
+
+  hasRichText() {
+    return this.getRichText() != null
   }
 
   /**
