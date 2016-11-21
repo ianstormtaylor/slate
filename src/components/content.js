@@ -144,6 +144,27 @@ class Content extends React.Component {
   }
 
   /**
+   * The React ref method to set the root content element locally.
+   *
+   * @param {Element} n
+   */
+
+  ref = (n) => this.element = n
+
+  /**
+   * Check if an `event` is being fired from inside a non-contentediable child
+   * element, in which case we'll want to ignore it.
+   *
+   * @param {Event} event
+   * @return {Boolean}
+   */
+
+  isNonEditable = (event) => {
+    const { target } = event
+    return !target.isContentEditable || target !== this.element
+  }
+
+  /**
    * On before input, bubble up.
    *
    * @param {Event} e
@@ -151,7 +172,7 @@ class Content extends React.Component {
 
   onBeforeInput = (e) => {
     if (this.props.readOnly) return
-    if (isNonEditable(e)) return
+    if (this.isNonEditable(e)) return
 
     const data = {}
 
@@ -168,7 +189,7 @@ class Content extends React.Component {
   onBlur = (e) => {
     if (this.props.readOnly) return
     if (this.tmp.isCopying) return
-    if (isNonEditable(e)) return
+    if (this.isNonEditable(e)) return
 
     const data = {}
 
@@ -194,7 +215,7 @@ class Content extends React.Component {
    */
 
   onCompositionStart = (e) => {
-    if (isNonEditable(e)) return
+    if (this.isNonEditable(e)) return
 
     this.tmp.isComposing = true
     this.tmp.compositions++
@@ -211,7 +232,7 @@ class Content extends React.Component {
    */
 
   onCompositionEnd = (e) => {
-    if (isNonEditable(e)) return
+    if (this.isNonEditable(e)) return
 
     this.forces++
     const count = this.tmp.compositions
@@ -234,7 +255,7 @@ class Content extends React.Component {
    */
 
   onCopy = (e) => {
-    if (isNonEditable(e)) return
+    if (this.isNonEditable(e)) return
     const window = getWindow(e.target)
 
     this.tmp.isCopying = true
@@ -259,7 +280,7 @@ class Content extends React.Component {
 
   onCut = (e) => {
     if (this.props.readOnly) return
-    if (isNonEditable(e)) return
+    if (this.isNonEditable(e)) return
     const window = getWindow(e.target)
 
     this.tmp.isCopying = true
@@ -283,7 +304,7 @@ class Content extends React.Component {
    */
 
   onDragEnd = (e) => {
-    if (isNonEditable(e)) return
+    if (this.isNonEditable(e)) return
 
     this.tmp.isDragging = false
     this.tmp.isInternalDrag = null
@@ -298,7 +319,7 @@ class Content extends React.Component {
    */
 
   onDragOver = (e) => {
-    if (isNonEditable(e)) return
+    if (this.isNonEditable(e)) return
 
     const { dataTransfer } = e.nativeEvent
     const transfer = new Transfer(dataTransfer)
@@ -322,7 +343,7 @@ class Content extends React.Component {
    */
 
   onDragStart = (e) => {
-    if (isNonEditable(e)) return
+    if (this.isNonEditable(e)) return
 
     this.tmp.isDragging = true
     this.tmp.isInternalDrag = true
@@ -348,7 +369,7 @@ class Content extends React.Component {
 
   onDrop = (e) => {
     if (this.props.readOnly) return
-    if (isNonEditable(e)) return
+    if (this.isNonEditable(e)) return
 
     e.preventDefault()
 
@@ -405,7 +426,7 @@ class Content extends React.Component {
   onInput = (e) => {
     if (this.tmp.isComposing) return
     if (this.props.state.isBlurred) return
-    if (isNonEditable(e)) return
+    if (this.isNonEditable(e)) return
     debug('onInput')
 
     const window = getWindow(e.target)
@@ -475,7 +496,7 @@ class Content extends React.Component {
 
   onKeyDown = (e) => {
     if (this.props.readOnly) return
-    if (isNonEditable(e)) return
+    if (this.isNonEditable(e)) return
 
     const key = keycode(e.which)
     const data = {}
@@ -530,7 +551,7 @@ class Content extends React.Component {
 
   onPaste = (e) => {
     if (this.props.readOnly) return
-    if (isNonEditable(e)) return
+    if (this.isNonEditable(e)) return
 
     e.preventDefault()
     const transfer = new Transfer(e.clipboardData)
@@ -550,7 +571,7 @@ class Content extends React.Component {
     if (this.props.readOnly) return
     if (this.tmp.isCopying) return
     if (this.tmp.isComposing) return
-    if (isNonEditable(e)) return
+    if (this.isNonEditable(e)) return
 
     const window = getWindow(e.target)
     const { state } = this.props
@@ -640,6 +661,7 @@ class Content extends React.Component {
     return (
       <div
         key={this.forces}
+        ref={this.ref}
         contentEditable={!readOnly}
         suppressContentEditableWarning
         className={className}
@@ -688,19 +710,6 @@ class Content extends React.Component {
     )
   }
 
-}
-
-/**
- * Check if an `event` is being fired from inside a non-contentediable child
- * element, in which case we'll want to ignore it.
- *
- * @param {Event} event
- * @return {Boolean}
- */
-
-function isNonEditable(event) {
-  const { target } = event
-  return !target.isContentEditable
 }
 
 /**
