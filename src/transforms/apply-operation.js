@@ -143,26 +143,22 @@ function joinNode(state, operation) {
   const first = document.assertPath(withPath)
   const second = document.assertPath(path)
 
-  // Update doc
   document = document.joinNode(first, second, { deep })
 
-  // Update selection if we merged two texts together
+  // If the operation is deep, or the nodes are text nodes, it means we will be
+  // merging two text nodes together, so we need to update the selection.
   if (deep || second.kind == 'text') {
-    const firstText = deep
-      ? first.getLastText()
-      : first
-    const secondText = deep
-      ? second.getFirstText()
-      : second
-
     const { anchorKey, anchorOffset, focusKey, focusOffset } = selection
-    // The final key is the `first` key
+    const firstText = first.kind == 'text' ? first : first.getLastText()
+    const secondText = second.kind == 'text' ? second : second.getFirstText()
+
     if (anchorKey == secondText.key) {
       selection = selection.merge({
         anchorKey: firstText.key,
         anchorOffset: anchorOffset + firstText.characters.size
       })
     }
+
     if (focusKey == secondText.key) {
       selection = selection.merge({
         focusKey: firstText.key,
