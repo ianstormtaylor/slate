@@ -250,14 +250,18 @@ export function removeTextOperation(transform, path, offset, length) {
   const ranges = node.getRanges()
   const inverse = []
 
+  // Loop the ranges of text in the node, creating inverse insert operations for
+  // each of the ranges that overlap with the remove operation. This is
+  // necessary because insert's can only have a single set of marks associated
+  // with them, but removes can remove many.
   ranges.reduce((start, range) => {
     const { text, marks } = range
     const end = start + text.length
-    if (start > offset + length) return
-    if (end <= offset) return
+    if (start > offset + length) return end
+    if (end <= offset) return end
 
     const endOffset = Math.min(end, offset + length)
-    const string = text.slice(offset, endOffset)
+    const string = text.slice(offset - start, endOffset - start)
 
     inverse.push({
       type: 'insert_text',
