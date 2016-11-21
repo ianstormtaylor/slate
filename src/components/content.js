@@ -163,8 +163,12 @@ class Content extends React.Component {
    */
 
   isInContentEditable = (event) => {
+    const { element } = this
     const { target } = event
-    return target.isContentEditable && target === this.element
+    return (
+      (target.isContentEditable) &&
+      (target === element || target.closest('[contenteditable]') == element)
+    )
   }
 
   /**
