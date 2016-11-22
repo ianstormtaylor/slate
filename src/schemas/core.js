@@ -22,12 +22,13 @@ const DOCUMENT_CHILDREN_RULE = {
     return node.kind == 'document'
   },
   validate: (document) => {
-    const { nodes } = document
-    const invalids = nodes.filter(n => n.kind != 'block')
+    const invalids = document.nodes.filter(n => n.kind != 'block')
     return invalids.size ? invalids : null
   },
   normalize: (transform, document, invalids) => {
-    return invalids.reduce((t, n) => t.removeNodeByKey(n.key, OPTS), transform)
+    invalids.forEach((node) => {
+      transform.removeNodeByKey(node.key, OPTS)
+    })
   }
 }
 
@@ -47,7 +48,9 @@ const BLOCK_CHILDREN_RULE = {
     return invalids.size ? invalids : null
   },
   normalize: (transform, block, invalids) => {
-    return invalids.reduce((t, n) => t.removeNodeByKey(n.key, OPTS), transform)
+    invalids.forEach((node) => {
+      transform.removeNodeByKey(node.key, OPTS)
+    })
   }
 }
 
@@ -63,11 +66,11 @@ const MIN_TEXT_RULE = {
   },
   validate: (node) => {
     const { nodes } = node
-    return nodes.size === 0 ? true : null
+    return nodes.size == 0 ? true : null
   },
   normalize: (transform, node) => {
     const text = Text.create()
-    return transform.insertNodeByKey(node.key, 0, text, OPTS)
+    transform.insertNodeByKey(node.key, 0, text, OPTS)
   }
 }
 
@@ -87,7 +90,9 @@ const INLINE_CHILDREN_RULE = {
     return invalids.size ? invalids : null
   },
   normalize: (transform, inline, invalids) => {
-    return invalids.reduce((t, n) => t.removeNodeByKey(n.key, OPTS), transform)
+    invalids.forEach((node) => {
+      transform.removeNodeByKey(node.key, OPTS)
+    })
   }
 }
 
@@ -107,20 +112,20 @@ const INLINE_NO_EMPTY = {
     return object.kind == 'block'
   },
   validate: (block) => {
-    return block.nodes.some((child) => {
-      return child.kind == 'inline' && child.text == ''
-    })
+    const invalids = block.nodes.filter(n => n.kind == 'inline' && n.text == '')
+    return invalids.size ? invalids : null
   },
-  normalize: (transform, block) => {
-    return block.nodes.reduce((tr, child, index) => {
-      if (child.kind == 'inline' && child.text == '') {
-        return transform
-          .removeNodeByKey(child.key, OPTS)
-          .insertNodeByKey(block.key, index, Text.createFromString(''), OPTS)
-      } else {
-        return tr
-      }
-    }, transform)
+  normalize: (transform, block, invalids) => {
+    // If all of the block's nodes are invalid, insert an empty text node so
+    // that the selection will be preserved when they are all removed.
+    if (block.nodes.size == invalids.size) {
+      const text = Text.create()
+      transform.insertNodeByKey(block.key, 1, text, OPTS)
+    }
+
+    invalids.forEach((node) => {
+      transform.removeNodeByKey(node.key, OPTS)
+    })
   }
 }
 
@@ -138,10 +143,7 @@ const VOID_TEXT_RULE = {
     )
   },
   validate: (node) => {
-    return (
-      node.text !== ' ' ||
-      node.nodes.size !== 1
-    )
+    return node.text !== ' ' || node.nodes.size !== 1
   },
   normalize: (transform, node, result) => {
     const text = Text.createFromString(' ')
@@ -149,11 +151,9 @@ const VOID_TEXT_RULE = {
 
     transform.insertNodeByKey(node.key, index, text, OPTS)
 
-    node.nodes.forEach((child) => {
+    node.nodes.forEach(child => {
       transform.removeNodeByKey(child.key, OPTS)
     })
-
-    return transform
   }
 }
 
@@ -233,13 +233,12 @@ const NO_ADJACENT_TEXT_RULE = {
     return invalids.size ? invalids : null
   },
   normalize: (transform, node, pairs) => {
-    return pairs
-      // We reverse the list since we want to handle 3 consecutive text nodes.
-      .reverse()
-      .reduce((t, pair) => {
-        const [ first, second ] = pair
-        return t.joinNodeByKey(second.key, first.key, OPTS)
-      }, transform)
+    // We reverse the list to handle consecutive joins, since the earlier nodes
+    // will always exist after each join.
+    pairs.reverse().forEach((pair) => {
+      const [ first, second ] = pair
+      return transform.joinNodeByKey(second.key, first.key, OPTS)
+    })
   }
 }
 
@@ -291,9 +290,9 @@ const NO_EMPTY_TEXT_RULE = {
     return invalids.size ? invalids : null
   },
   normalize: (transform, node, invalids) => {
-    return invalids.reduce((t, text) => {
-      return t.removeNodeByKey(text.key, OPTS)
-    }, transform)
+    invalids.forEach((text) => {
+      transform.removeNodeByKey(text.key, OPTS)
+    })
   }
 }
 
