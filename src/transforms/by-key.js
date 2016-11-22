@@ -11,7 +11,7 @@ import SCHEMA from '../schemas/core'
  * @param {Number} length
  * @param {Mixed} mark
  * @param {Object} options
- *   @param {Boolean} normalize
+ *   @property {Boolean} normalize
  */
 
 export function addMarkByKey(transform, key, offset, length, mark, options = {}) {
@@ -37,7 +37,7 @@ export function addMarkByKey(transform, key, offset, length, mark, options = {})
  * @param {Number} index
  * @param {Node} node
  * @param {Object} options
- *   @param {Boolean} normalize
+ *   @property {Boolean} normalize
  */
 
 export function insertNodeByKey(transform, key, index, node, options = {}) {
@@ -62,7 +62,7 @@ export function insertNodeByKey(transform, key, index, node, options = {}) {
  * @param {String} text
  * @param {Set<Mark>} marks (optional)
  * @param {Object} options
- *   @param {Boolean} normalize
+ *   @property {Boolean} normalize
  */
 
 export function insertTextByKey(transform, key, offset, text, marks, options = {}) {
@@ -86,7 +86,7 @@ export function insertTextByKey(transform, key, offset, text, marks, options = {
  * @param {String} key
  * @param {String} withKey
  * @param {Object} options
- *   @param {Boolean} normalize
+ *   @property {Boolean} normalize
  */
 
 export function joinNodeByKey(transform, key, withKey, options = {}) {
@@ -113,7 +113,7 @@ export function joinNodeByKey(transform, key, withKey, options = {}) {
  * @param {String} newKey
  * @param {Number} index
  * @param {Object} options
- *   @param {Boolean} normalize
+ *   @property {Boolean} normalize
  */
 
 export function moveNodeByKey(transform, key, newKey, newIndex, options = {}) {
@@ -140,7 +140,7 @@ export function moveNodeByKey(transform, key, newKey, newIndex, options = {}) {
  * @param {Number} length
  * @param {Mark} mark
  * @param {Object} options
- *   @param {Boolean} normalize
+ *   @property {Boolean} normalize
  */
 
 export function removeMarkByKey(transform, key, offset, length, mark, options = {}) {
@@ -164,7 +164,7 @@ export function removeMarkByKey(transform, key, offset, length, mark, options = 
  * @param {Transform} transform
  * @param {String} key
  * @param {Object} options
- *   @param {Boolean} normalize
+ *   @property {Boolean} normalize
  */
 
 export function removeNodeByKey(transform, key, options = {}) {
@@ -189,7 +189,7 @@ export function removeNodeByKey(transform, key, options = {}) {
  * @param {Number} offset
  * @param {Number} length
  * @param {Object} options
- *   @param {Boolean} normalize
+ *   @property {Boolean} normalize
  */
 
 export function removeTextByKey(transform, key, offset, length, options = {}) {
@@ -215,7 +215,7 @@ export function removeTextByKey(transform, key, offset, length, options = {}) {
  * @param {Number} length
  * @param {Mark} mark
  * @param {Object} options
- *   @param {Boolean} normalize
+ *   @property {Boolean} normalize
  */
 
 export function setMarkByKey(transform, key, offset, length, mark, properties, options = {}) {
@@ -242,7 +242,7 @@ export function setMarkByKey(transform, key, offset, length, mark, properties, o
  * @param {String} key
  * @param {Object|String} properties
  * @param {Object} options
- *   @param {Boolean} normalize
+ *   @property {Boolean} normalize
  */
 
 export function setNodeByKey(transform, key, properties, options = {}) {
@@ -267,7 +267,7 @@ export function setNodeByKey(transform, key, properties, options = {}) {
  * @param {String} key
  * @param {Number} offset
  * @param {Object} options
- *   @param {Boolean} normalize
+ *   @property {Boolean} normalize
  */
 
 export function splitNodeByKey(transform, key, offset, options = {}) {
@@ -291,7 +291,7 @@ export function splitNodeByKey(transform, key, offset, options = {}) {
  * @param {String} key
  * @param {Object|String} properties
  * @param {Object} options
- *   @param {Boolean} normalize
+ *   @property {Boolean} normalize
  */
 
 export function unwrapInlineByKey(transform, key, properties, options) {
@@ -311,7 +311,7 @@ export function unwrapInlineByKey(transform, key, properties, options) {
  * @param {String} key
  * @param {Object|String} properties
  * @param {Object} options
- *   @param {Boolean} normalize
+ *   @property {Boolean} normalize
  */
 
 export function unwrapBlockByKey(transform, key, properties, options) {
@@ -331,7 +331,7 @@ export function unwrapBlockByKey(transform, key, properties, options) {
  * @param {String} key The node to wrap
  * @param {Block|Object|String} block The wrapping block (its children are discarded)
  * @param {Object} options
- *   @param {Boolean} normalize
+ *   @property {Boolean} normalize
  */
 
 export function wrapBlockByKey(transform, key, block, options) {
