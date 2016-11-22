@@ -43,8 +43,10 @@ const BLOCK_CHILDREN_RULE = {
     return node.kind == 'block'
   },
   validate: (block) => {
-    const { nodes } = block
-    const invalids = nodes.filter(n => n.kind != 'block' && n.kind != 'inline' && n.kind != 'text')
+    const invalids = block.nodes.filter((n) => {
+      return n.kind != 'block' && n.kind != 'inline' && n.kind != 'text'
+    })
+
     return invalids.size ? invalids : null
   },
   normalize: (transform, block, invalids) => {
@@ -65,8 +67,7 @@ const MIN_TEXT_RULE = {
     return object.kind == 'block' || object.kind == 'inline'
   },
   validate: (node) => {
-    const { nodes } = node
-    return nodes.size == 0 ? true : null
+    return node.nodes.size == 0 ? true : null
   },
   normalize: (transform, node) => {
     const text = Text.create()
@@ -85,8 +86,7 @@ const INLINE_CHILDREN_RULE = {
     return object.kind == 'inline'
   },
   validate: (inline) => {
-    const { nodes } = inline
-    const invalids = nodes.filter(n => n.kind != 'inline' && n.kind != 'text')
+    const invalids = inline.nodes.filter(n => n.kind != 'inline' && n.kind != 'text')
     return invalids.size ? invalids : null
   },
   normalize: (transform, inline, invalids) => {
@@ -158,7 +158,8 @@ const VOID_TEXT_RULE = {
 }
 
 /**
- * Ensure that inline void nodes are surrounded with text nodes.
+ * Ensure that inline void nodes are surrounded by text nodes, by adding extra
+ * blank text nodes if necessary.
  *
  * @type {Object}
  */
@@ -168,42 +169,39 @@ const INLINE_VOID_TEXTS_AROUND_RULE = {
     return object.kind == 'block' || object.kind == 'inline'
   },
   validate: (block) => {
-    const invalids = block.nodes.reduce((accu, child, index) => {
-      if (child.kind === 'block' || !child.isVoid) {
-        return accu
+    const invalids = block.nodes.reduce((list, child, index) => {
+      if (child.kind == 'block') return list
+      if (!child.isVoid) return list
+
+      const prev = index > 0 ? block.nodes.get(index - 1) : null
+      const next = block.nodes.get(index + 1)
+      const insertBefore = !prev
+      const insertAfter = !next || isInlineVoid(next)
+
+      if (insertAfter || insertBefore) {
+        list = list.push({ insertAfter, insertBefore, index })
       }
 
-      const prevNode = index > 0 ? block.nodes.get(index - 1) : null
-      const nextNode = block.nodes.get(index + 1)
-
-      const prev = !prevNode
-      const next = (!nextNode || isInlineVoid(nextNode))
-
-      if (next || prev) {
-        return accu.push({ next, prev, index })
-      } else {
-        return accu
-      }
+      return list
     }, new List())
 
-    return !invalids.isEmpty() ? invalids : null
+    return invalids.size ? invalids : null
   },
   normalize: (transform, block, invalids) => {
-    // Shift for every text node inserted previously
+    // Shift for every text node inserted previously.
     let shift = 0
 
-    return invalids.reduce((t, { index, next, prev }) => {
-      if (prev) {
-        t = t.insertNodeByKey(block.key, shift + index, Text.create(), OPTS)
-        shift = shift + 1
-      }
-      if (next) {
-        t = t.insertNodeByKey(block.key, shift + index + 1, Text.create(), OPTS)
-        shift = shift + 1
+    invalids.forEach(({ index, insertAfter, insertBefore }) => {
+      if (insertBefore) {
+        transform.insertNodeByKey(block.key, shift + index, Text.create(), OPTS)
+        shift++
       }
 
-      return t
-    }, transform)
+      if (insertAfter) {
+        transform.insertNodeByKey(block.key, shift + index + 1, Text.create(), OPTS)
+        shift++
+      }
+    })
   }
 }
 
