@@ -108,9 +108,7 @@ export function _delete(transform) {
 export function deleteBackward(transform, n = 1) {
   const { state } = transform
   const { selection } = state
-  transform
-    .deleteBackwardAtRange(selection, n)
-    .collapseToEnd()
+  transform.deleteBackwardAtRange(selection, n)
 }
 
 /**
@@ -123,9 +121,7 @@ export function deleteBackward(transform, n = 1) {
 export function deleteForward(transform, n = 1) {
   const { state } = transform
   const { selection } = state
-  transform
-    .deleteForwardAtRange(selection, n)
-    .collapseToEnd()
+  transform.deleteForwardAtRange(selection, n)
 }
 
 /**
@@ -136,19 +132,11 @@ export function deleteForward(transform, n = 1) {
  */
 
 export function insertBlock(transform, block) {
-  let { state } = transform
-  let { document, selection } = state
-  const keys = document.getTexts().map(text => text.key)
-
-  transform.unsetSelection()
+  block = Normalize.block(block)
+  const { state } = transform
+  const { selection } = state
   transform.insertBlockAtRange(selection, block)
-  state = transform.state
-  document = state.document
-
-  const text = document.getTexts().find(n => !keys.includes(n.key))
-  const after = selection.collapseToEndOf(text)
-
-  transform.moveTo(after)
+  transform.collapseToEndOf(block)
 }
 
 /**
@@ -209,34 +197,18 @@ export function insertFragment(transform, fragment) {
  */
 
 export function insertInline(transform, inline) {
-  let { state } = transform
-  let { document, selection, startText } = state
-  let after
-
-  const hasVoid = document.hasVoidParent(startText.key)
-  const keys = document.getTexts().map(text => text.key)
-
-  transform.unsetSelection()
+  inline = Normalize.inline(inline)
+  const { state } = transform
+  const { selection, startBlock } = state
   transform.insertInlineAtRange(selection, inline)
-  state = transform.state
-  document = state.document
 
-  if (hasVoid) {
-    after = selection
-  }
+  // If the start block is void, it won't have inserted at all.
+  if (startBlock.isVoid) return
 
-  else {
-    const text = document.getTexts().find((n) => {
-      if (keys.includes(n.key)) return false
-      const parent = document.getParent(n.key)
-      if (parent.kind != 'inline') return false
-      return true
-    })
-
-    after = selection.collapseToEndOf(text)
-  }
-
-  transform.moveTo(after)
+  // Otherwise, find the inserted inline node, and collapse to the start of it.
+  const { document } = transform.state
+  inline = document.assertNode(inline.key)
+  transform.collapseToEndOf(inline)
 }
 
 /**
