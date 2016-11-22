@@ -8,13 +8,11 @@ import warn from '../utils/warn'
  *
  * @param {Transform} transform
  * @param {Schema} schema
- * @return {Transform}
  */
 
 export function normalize(transform, schema) {
   transform.normalizeDocument(schema)
   transform.normalizeSelection(schema)
-  return transform
 }
 
 /**
@@ -22,14 +20,12 @@ export function normalize(transform, schema) {
  *
  * @param {Transform} transform
  * @param {Schema} schema
- * @return {Transform}
  */
 
 export function normalizeDocument(transform, schema) {
   const { state } = transform
   const { document } = state
   transform.normalizeNodeByKey(document.key, schema)
-  return transform
 }
 
 /**
@@ -38,24 +34,20 @@ export function normalizeDocument(transform, schema) {
  * @param {Transform} transform
  * @param {Node|String} key
  * @param {Schema} schema
- * @return {Transform}
  */
 
 export function normalizeNodeByKey(transform, key, schema) {
   assertSchema(schema)
-  key = Normalize.key(key)
 
   // If the schema has no validation rules, there's nothing to normalize.
-  if (!schema.hasValidators) {
-    return transform
-  }
+  if (!schema.hasValidators) return
 
+  key = Normalize.key(key)
   const { state } = transform
   const { document } = state
   const node = document.assertNode(key)
 
   normalizeNodeWith(transform, node, schema)
-  return transform
 }
 
 /**
@@ -64,31 +56,26 @@ export function normalizeNodeByKey(transform, key, schema) {
  * @param {Transform} transform
  * @param {Node|String} key
  * @param {Schema} schema
- * @return {Transform}
  */
 
 export function normalizeParentsByKey(transform, key, schema) {
   assertSchema(schema)
-  key = Normalize.key(key)
 
   // If the schema has no validation rules, there's nothing to normalize.
-  if (!schema.hasValidators) {
-    return transform
-  }
+  if (!schema.hasValidators) return
 
+  key = Normalize.key(key)
   const { state } = transform
   const { document } = state
   const node = document.assertNode(key)
 
   normalizeParentsWith(transform, node, schema)
-  return transform
 }
 
 /**
  * Normalize only the selection.
  *
  * @param {Transform} transform
- * @return {Transform}
  */
 
 export function normalizeSelection(transform) {
@@ -117,7 +104,6 @@ export function normalizeSelection(transform) {
 
   state = state.merge({ selection })
   transform.state = state
-  return transform
 }
 
 /**
@@ -126,7 +112,6 @@ export function normalizeSelection(transform) {
  * @param {Transform} transform
  * @param {Node} node
  * @param {Schema} schema
- * @return {Transform}
  */
 
 function normalizeNodeWith(transform, node, schema) {
@@ -145,8 +130,6 @@ function normalizeNodeWith(transform, node, schema) {
   if (node) {
     normalizeNodeOnly(transform, node, schema)
   }
-
-  return transform
 }
 
 /**
@@ -155,29 +138,23 @@ function normalizeNodeWith(transform, node, schema) {
  * @param {Transform} transform
  * @param {Node} node
  * @param {Schema} schema
- * @return {Transform}
  */
 
 function normalizeParentsWith(transform, node, schema) {
   normalizeNodeOnly(transform, node, schema)
 
   // Normalize went back up to the very top of the document.
-  if (node.kind == 'document') {
-    return transform
-  }
+  if (node.kind == 'document') return
 
   // Re-find the node first.
   node = refindNode(transform, node)
-
-  if (!node) {
-    return transform
-  }
+  if (!node) return
 
   const { state } = transform
   const { document } = state
   const parent = document.getParent(node.key)
 
-  return normalizeParentsWith(transform, parent, schema)
+  normalizeParentsWith(transform, parent, schema)
 }
 
 /**
@@ -203,17 +180,14 @@ function refindNode(transform, node) {
  * @param {Transform} transform
  * @param {Node} node
  * @param {Schema} schema
- * @return {Transform}
  */
 
 function normalizeChildrenWith(transform, node, schema) {
-  if (node.kind == 'text') return transform
+  if (node.kind == 'text') return
 
   node.nodes.forEach((child) => {
     normalizeNodeWith(transform, child, schema)
   })
-
-  return transform
 }
 
 /**
@@ -222,7 +196,6 @@ function normalizeChildrenWith(transform, node, schema) {
  * @param {Transform} transform
  * @param {Node} node
  * @param {Schema} schema
- * @return {Transform}
  */
 
 function normalizeNodeOnly(transform, node, schema) {
@@ -231,7 +204,7 @@ function normalizeNodeOnly(transform, node, schema) {
 
   function iterate(t, n) {
     const failure = n.validate(schema)
-    if (!failure) return t
+    if (!failure) return
 
     const { value, rule } = failure
 
@@ -241,7 +214,7 @@ function normalizeNodeOnly(transform, node, schema) {
     // Re-find the node reference, in case it was updated. If the node no longer
     // exists, we're done for this branch.
     n = refindNode(t, n)
-    if (!n) return t
+    if (!n) return
 
     // Increment the iterations counter, and check to make sure that we haven't
     // exceeded the max. Without this check, it's easy for the `validate` or
@@ -254,10 +227,10 @@ function normalizeNodeOnly(transform, node, schema) {
     }
 
     // Otherwise, iterate again.
-    return iterate(t, n)
+    iterate(t, n)
   }
 
-  return iterate(transform, node)
+  iterate(transform, node)
 }
 
 /**

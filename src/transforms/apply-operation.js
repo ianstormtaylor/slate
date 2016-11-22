@@ -40,7 +40,6 @@ const OPERATIONS = {
  *
  * @param {Transform} transform
  * @param {Object} operation
- * @return {Transform}
  */
 
 export function applyOperation(transform, operation) {
@@ -53,11 +52,8 @@ export function applyOperation(transform, operation) {
   }
 
   debug(type, operation)
-
   transform.state = fn(state, operation)
   transform.operations = operations.concat([operation])
-
-  return transform
 }
 
 /**

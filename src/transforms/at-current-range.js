@@ -6,7 +6,6 @@ import Normalize from '../utils/normalize'
  *
  * @param {Transform} transform
  * @param {Mark} mark
- * @return {Transform}
  */
 
 export function addMark(transform, mark) {
@@ -16,19 +15,19 @@ export function addMark(transform, mark) {
   const { document, selection } = state
 
   if (selection.isExpanded) {
-    return transform.addMarkAtRange(selection, mark)
+    transform.addMarkAtRange(selection, mark)
   }
 
   else if (selection.marks) {
     const marks = selection.marks.add(mark)
     const sel = selection.merge({ marks })
-    return transform.moveTo(sel)
+    transform.moveTo(sel)
   }
 
   else {
     const marks = document.getMarksAtRange(selection).add(mark)
     const sel = selection.merge({ marks })
-    return transform.moveTo(sel)
+    transform.moveTo(sel)
   }
 }
 
@@ -36,7 +35,6 @@ export function addMark(transform, mark) {
  * Delete at the current selection.
  *
  * @param {Transform} transform
- * @return {Transform}
  */
 
 export function _delete(transform) {
@@ -44,7 +42,7 @@ export function _delete(transform) {
   const { document, selection } = state
 
   // If the selection is collapsed, there's nothing to delete.
-  if (selection.isCollapsed) return transform
+  if (selection.isCollapsed) return
 
   const { startText } = state
   const { startKey, startOffset, endKey, endOffset } = selection
@@ -95,7 +93,7 @@ export function _delete(transform) {
     after = selection.collapseToStart()
   }
 
-  return transform
+  transform
     .unsetSelection()
     .deleteAtRange(selection)
     .moveTo(after)
@@ -106,14 +104,12 @@ export function _delete(transform) {
  *
  * @param {Transform} transform
  * @param {Number} n (optional)
- * @return {Transform}
  */
 
 export function deleteBackward(transform, n = 1) {
   const { state } = transform
   const { selection } = state
-
-  return transform
+  transform
     .deleteBackwardAtRange(selection, n)
     .collapseToEnd()
 }
@@ -123,14 +119,12 @@ export function deleteBackward(transform, n = 1) {
  *
  * @param {Transform} transform
  * @param {Number} n (optional)
- * @return {Transform}
  */
 
 export function deleteForward(transform, n = 1) {
   const { state } = transform
   const { selection } = state
-
-  return transform
+  transform
     .deleteForwardAtRange(selection, n)
     .collapseToEnd()
 }
@@ -140,7 +134,6 @@ export function deleteForward(transform, n = 1) {
  *
  * @param {Transform} transform
  * @param {String|Object|Block} block
- * @return {Transform}
  */
 
 export function insertBlock(transform, block) {
@@ -156,7 +149,7 @@ export function insertBlock(transform, block) {
   const text = document.getTexts().find(n => !keys.includes(n.key))
   const after = selection.collapseToEndOf(text)
 
-  return transform.moveTo(after)
+  transform.moveTo(after)
 }
 
 /**
@@ -164,14 +157,13 @@ export function insertBlock(transform, block) {
  *
  * @param {Transform} transform
  * @param {Document} fragment
- * @return {Transform}
  */
 
 export function insertFragment(transform, fragment) {
   let { state } = transform
   let { document, selection } = state
 
-  if (!fragment.length) return transform
+  if (!fragment.length) return
 
   const { startText, endText } = state
   const lastText = fragment.getLastText()
@@ -207,7 +199,7 @@ export function insertFragment(transform, fragment) {
       .moveForward(lastText.length)
   }
 
-  return transform.moveTo(after)
+  transform.moveTo(after)
 }
 
 /**
@@ -215,7 +207,6 @@ export function insertFragment(transform, fragment) {
  *
  * @param {Transform} transform
  * @param {String|Object|Block} inline
- * @return {Transform}
  */
 
 export function insertInline(transform, inline) {
@@ -246,7 +237,7 @@ export function insertInline(transform, inline) {
     after = selection.collapseToEndOf(text)
   }
 
-  return transform.moveTo(after)
+  transform.moveTo(after)
 }
 
 /**
@@ -255,7 +246,6 @@ export function insertInline(transform, inline) {
  * @param {Transform} transform
  * @param {String} text
  * @param {Set<Mark>} marks (optional)
- * @return {Transform}
  */
 
 export function insertText(transform, text, marks) {
@@ -279,7 +269,7 @@ export function insertText(transform, text, marks) {
 
   marks = marks || selection.marks
 
-  return transform
+  transform
     .unsetSelection()
     .insertTextAtRange(selection, text, marks)
     .moveTo(after)
@@ -290,13 +280,12 @@ export function insertText(transform, text, marks) {
  *
  * @param {Transform} transform
  * @param {Object} properties
- * @return {Transform}
  */
 
 export function setBlock(transform, properties) {
   const { state } = transform
   const { selection } = state
-  return transform.setBlockAtRange(selection, properties)
+  transform.setBlockAtRange(selection, properties)
 }
 
 /**
@@ -304,13 +293,12 @@ export function setBlock(transform, properties) {
  *
  * @param {Transform} transform
  * @param {Object} properties
- * @return {Transform}
  */
 
 export function setInline(transform, properties) {
   const { state } = transform
   const { selection } = state
-  return transform.setInlineAtRange(selection, properties)
+  transform.setInlineAtRange(selection, properties)
 }
 
 /**
@@ -318,7 +306,6 @@ export function setInline(transform, properties) {
  *
  * @param {Transform} transform
  * @param {Number} depth (optional)
- * @return {Transform}
  */
 
 export function splitBlock(transform, depth = 1) {
@@ -354,7 +341,7 @@ export function splitBlock(transform, depth = 1) {
     after = selection.collapseToStartOf(nextText)
   }
 
-  return transform.moveTo(after)
+  transform.moveTo(after)
 }
 
 /**
@@ -362,7 +349,6 @@ export function splitBlock(transform, depth = 1) {
  *
  * @param {Transform} transform
  * @param {Number} depth (optional)
- * @return {Transform}
  */
 
 export function splitInline(transform, depth = Infinity) {
@@ -389,7 +375,7 @@ export function splitInline(transform, depth = Infinity) {
     (offset + startOffset == 0) ||
     (offset + startNode.length == startOffset)
   ) {
-    return transform
+    return
   }
 
   transform.unsetSelection()
@@ -404,7 +390,7 @@ export function splitInline(transform, depth = Infinity) {
     after = selection.collapseToStartOf(nextNode)
   }
 
-  return transform.moveTo(after)
+  transform.moveTo(after)
 }
 
 /**
@@ -412,29 +398,27 @@ export function splitInline(transform, depth = Infinity) {
  *
  * @param {Transform} transform
  * @param {Mark} mark
- * @return {Transform}
  */
 
 export function removeMark(transform, mark) {
   mark = Normalize.mark(mark)
-
   const { state } = transform
   const { document, selection } = state
 
   if (selection.isExpanded) {
-    return transform.removeMarkAtRange(selection, mark)
+    transform.removeMarkAtRange(selection, mark)
   }
 
   else if (selection.marks) {
     const marks = selection.marks.remove(mark)
     const sel = selection.merge({ marks })
-    return transform.moveTo(sel)
+    transform.moveTo(sel)
   }
 
   else {
     const marks = document.getMarksAtRange(selection).remove(mark)
     const sel = selection.merge({ marks })
-    return transform.moveTo(sel)
+    transform.moveTo(sel)
   }
 }
 
@@ -444,19 +428,17 @@ export function removeMark(transform, mark) {
  *
  * @param {Transform} transform
  * @param {Mark} mark
- * @return {Transform}
  */
 
 export function toggleMark(transform, mark) {
   mark = Normalize.mark(mark)
-
   const { state } = transform
   const exists = state.marks.some(m => m.equals(mark))
 
   if (exists) {
-    return transform.removeMark(mark)
+    transform.removeMark(mark)
   } else {
-    return transform.addMark(mark)
+    transform.addMark(mark)
   }
 }
 
@@ -465,13 +447,12 @@ export function toggleMark(transform, mark) {
  *
  * @param {Transform} transform
  * @param {Object|String} properties
- * @return {Transform}
  */
 
 export function unwrapBlock(transform, properties) {
   const { state } = transform
   const { selection } = state
-  return transform.unwrapBlockAtRange(selection, properties)
+  transform.unwrapBlockAtRange(selection, properties)
 }
 
 /**
@@ -479,13 +460,12 @@ export function unwrapBlock(transform, properties) {
  *
  * @param {Transform} transform
  * @param {Object|String} properties
- * @return {Transform}
  */
 
 export function unwrapInline(transform, properties) {
   const { state } = transform
   const { selection } = state
-  return transform.unwrapInlineAtRange(selection, properties)
+  transform.unwrapInlineAtRange(selection, properties)
 }
 
 /**
@@ -494,13 +474,12 @@ export function unwrapInline(transform, properties) {
  *
  * @param {Transform} transform
  * @param {Object|String} properties
- * @return {Transform}
  */
 
 export function wrapBlock(transform, properties) {
   const { state } = transform
   const { selection } = state
-  return transform.wrapBlockAtRange(selection, properties)
+  transform.wrapBlockAtRange(selection, properties)
 }
 
 /**
@@ -508,7 +487,6 @@ export function wrapBlock(transform, properties) {
  *
  * @param {Transform} transform
  * @param {Object|String} properties
- * @return {Transform}
  */
 
 export function wrapInline(transform, properties) {
@@ -551,7 +529,7 @@ export function wrapInline(transform, properties) {
   }
 
   after = after.normalize(document)
-  return transform.moveTo(after)
+  transform.moveTo(after)
 }
 
 /**
@@ -560,7 +538,6 @@ export function wrapInline(transform, properties) {
  * @param {Transform} transform
  * @param {String} prefix
  * @param {String} suffix
- * @return {Transform}
  */
 
 export function wrapText(transform, prefix, suffix = prefix) {
@@ -580,7 +557,7 @@ export function wrapText(transform, prefix, suffix = prefix) {
     })
   }
 
-  return transform
+  transform
     .unsetSelection()
     .wrapTextAtRange(selection, prefix, suffix)
     .moveTo(after)

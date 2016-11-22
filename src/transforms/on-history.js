@@ -3,7 +3,6 @@
  * Redo to the next state in the history.
  *
  * @param {Transform} transform
- * @return {Transform}
  */
 
 export function redo(transform) {
@@ -13,7 +12,7 @@ export function redo(transform) {
 
   // If there's no next snapshot, abort.
   let next = redos.peek()
-  if (!next) return transform
+  if (!next) return
 
   // Shift the next state into the undo stack.
   redos = redos.pop()
@@ -31,7 +30,6 @@ export function redo(transform) {
 
   // Update the transform.
   transform.state = state
-  return transform
 }
 
 /**
@@ -39,7 +37,6 @@ export function redo(transform) {
  *
  * @param {Transform} transform
  * @param {Object} options
- * @return {Transform}
  */
 
 export function save(transform, options = {}) {
@@ -49,7 +46,7 @@ export function save(transform, options = {}) {
   let { undos, redos } = history
 
   // If there are no operations, abort.
-  if (!operations.length) return transform
+  if (!operations.length) return
 
   // Create a new save point or merge the operations into the previous one.
   if (merge) {
@@ -71,14 +68,12 @@ export function save(transform, options = {}) {
 
   // Update the transform.
   transform.state = state
-  return transform
 }
 
 /**
  * Undo the previous operations in the history.
  *
  * @param {Transform} transform
- * @return {Transform}
  */
 
 export function undo(transform) {
@@ -88,7 +83,7 @@ export function undo(transform) {
 
   // If there's no previous snapshot, abort.
   let previous = undos.peek()
-  if (!previous) return transform
+  if (!previous) return
 
   // Shift the previous operations into the redo stack.
   undos = undos.pop()
@@ -108,5 +103,4 @@ export function undo(transform) {
 
   // Update the transform.
   transform.state = state
-  return transform
 }
