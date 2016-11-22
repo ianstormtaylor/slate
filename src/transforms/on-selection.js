@@ -352,10 +352,10 @@ export function moveTo(transform, properties) {
  * @param {Number} focus (optional)
  */
 
-export function moveToOffsets(transform, anchor, fokus) {
+export function moveToOffsets(transform, anchor, _focus) {
   const { state } = transform
   const { selection } = state
-  const sel = selection.moveToOffsets(anchor, fokus)
+  const sel = selection.moveToOffsets(anchor, _focus)
   transform.setSelectionOperation(sel)
 }
 
@@ -371,6 +371,34 @@ export function moveToRangeOf(transform, start, end) {
   const { state } = transform
   const { document, selection } = state
   const sel = selection.moveToRangeOf(start, end).normalize(document)
+  transform.setSelectionOperation(sel)
+}
+
+/**
+ * Move the start offset by `n`.
+ *
+ * @param {Transform} transform
+ * @param {Number} n
+ */
+
+export function moveStartOffset(transform, n) {
+  const { state } = transform
+  const { document, selection } = state
+  const sel = selection.moveStartOffset(n).normalize(document)
+  transform.setSelectionOperation(sel)
+}
+
+/**
+ * Move the end offset by `n`.
+ *
+ * @param {Transform} transform
+ * @param {Number} n
+ */
+
+export function moveEndOffset(transform, n) {
+  const { state } = transform
+  const { document, selection } = state
+  const sel = selection.moveEndOffset(n).normalize(document)
   transform.setSelectionOperation(sel)
 }
 

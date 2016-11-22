@@ -499,22 +499,14 @@ export function wrapInline(transform, properties) {
 export function wrapText(transform, prefix, suffix = prefix) {
   const { state } = transform
   const { selection } = state
-  const { anchorOffset, anchorKey, focusOffset, focusKey, isBackward } = selection
-  let after
+  transform.wrapTextAtRange(selection, prefix, suffix)
 
-  if (anchorKey == focusKey) {
-    after = selection.moveForward(prefix.length)
+  // Adding the suffix will have pushed the end of the selection further on, so
+  // we need to move it back to account for this.
+  transform.moveEndOffset(0 - suffix.length)
+
+  // If the selection was collapsed, it will have moved the start offset too.
+  if (selection.isCollapsed) {
+    transform.moveStartOffset(0 - prefix.length)
   }
-
-  else {
-    after = selection.merge({
-      anchorOffset: isBackward ? anchorOffset : anchorOffset + prefix.length,
-      focusOffset: isBackward ? focusOffset + prefix.length : focusOffset
-    })
-  }
-
-  transform
-    .unsetSelection()
-    .wrapTextAtRange(selection, prefix, suffix)
-    .moveTo(after)
 }
