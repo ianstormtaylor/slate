@@ -10,25 +10,24 @@ import Normalize from '../utils/normalize'
 
 export function addMark(transform, mark) {
   mark = Normalize.mark(mark)
-
   const { state } = transform
   const { document, selection } = state
 
   if (selection.isExpanded) {
     transform.addMarkAtRange(selection, mark)
+    return
   }
 
-  else if (selection.marks) {
+  if (selection.marks) {
     const marks = selection.marks.add(mark)
     const sel = selection.merge({ marks })
     transform.moveTo(sel)
+    return
   }
 
-  else {
-    const marks = document.getMarksAtRange(selection).add(mark)
-    const sel = selection.merge({ marks })
-    transform.moveTo(sel)
-  }
+  const marks = document.getMarksAtRange(selection).add(mark)
+  const sel = selection.merge({ marks })
+  transform.moveTo(sel)
 }
 
 /**
@@ -407,19 +406,19 @@ export function removeMark(transform, mark) {
 
   if (selection.isExpanded) {
     transform.removeMarkAtRange(selection, mark)
+    return
   }
 
-  else if (selection.marks) {
+  if (selection.marks) {
     const marks = selection.marks.remove(mark)
     const sel = selection.merge({ marks })
     transform.moveTo(sel)
+    return
   }
 
-  else {
-    const marks = document.getMarksAtRange(selection).remove(mark)
-    const sel = selection.merge({ marks })
-    transform.moveTo(sel)
-  }
+  const marks = document.getMarksAtRange(selection).remove(mark)
+  const sel = selection.merge({ marks })
+  transform.moveTo(sel)
 }
 
 /**
