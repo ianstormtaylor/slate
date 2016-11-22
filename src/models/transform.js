@@ -99,7 +99,8 @@ class Transform {
 Object.keys(Transforms).forEach((type) => {
   Transform.prototype[type] = function (...args) {
     debug(type, { args })
-    return Transforms[type](this, ...args)
+    Transforms[type](this, ...args)
+    return this
   }
 })
 
