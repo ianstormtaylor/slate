@@ -67,7 +67,7 @@ const MIN_TEXT_RULE = {
     return object.kind == 'block' || object.kind == 'inline'
   },
   validate: (node) => {
-    return node.nodes.size == 0 ? true : null
+    return node.nodes.size == 0
   },
   normalize: (transform, node) => {
     const text = Text.create()
@@ -216,14 +216,11 @@ const NO_ADJACENT_TEXT_RULE = {
     return object.kind == 'block' || object.kind == 'inline'
   },
   validate: (node) => {
-    const { nodes } = node
-    const invalids = nodes
+    const invalids = node.nodes
       .map((child, i) => {
-        const next = nodes.get(i + 1)
-        if (child.kind !== 'text' || !next || next.kind !== 'text') {
-          return
-        }
-
+        const next = node.nodes.get(i + 1)
+        if (child.kind != 'text') return
+        if (!next || next.kind != 'text') return
         return [child, next]
       })
       .filter(Boolean)
@@ -241,7 +238,7 @@ const NO_ADJACENT_TEXT_RULE = {
 }
 
 /**
- * Prevent extra empty text nodes.
+ * Prevent extra empty text nodes, except when adjacent to inline void nodes.
  *
  * @type {Object}
  */
@@ -252,36 +249,25 @@ const NO_EMPTY_TEXT_RULE = {
   },
   validate: (node) => {
     const { nodes } = node
-
-    if (nodes.size <= 1) {
-      return
-    }
+    if (nodes.size <= 1) return
 
     const invalids = nodes.filter((desc, i) => {
-      if (desc.kind != 'text' || desc.length > 0) {
-        return
-      }
+      if (desc.kind != 'text') return
+      if (desc.length > 0) return
 
-      // Empty text nodes are only allowed near inline void node.
-      const next = nodes.get(i + 1)
       const prev = i > 0 ? nodes.get(i - 1) : null
+      const next = nodes.get(i + 1)
 
-      // If last one and previous is an inline void, we need to preserve it.
-      if (!next && isInlineVoid(prev)) {
-        return
-      }
+      // If it's the first node, and the next is a void, preserve it.
+      if (!prev && isInlineVoid(next)) return
 
-      // If first one and next one is an inline, we preserve it.
-      if (!prev && isInlineVoid(next)) {
-        return
-      }
+      // It it's the last node, and the previous is a void, preserve it.
+      if (!next && isInlineVoid(prev)) return
 
-      // If surrounded by inline void, we preserve it.
-      if (next && prev && isInlineVoid(next) && isInlineVoid(prev)) {
-        return
-      }
+      // If it's surrounded by voids, preserve it.
+      if (next && prev && isInlineVoid(next) && isInlineVoid(prev)) return
 
-      // Otherwise we remove it.
+      // Otherwise, remove it.
       return true
     })
 
