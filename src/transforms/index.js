@@ -129,6 +129,7 @@ import {
   moveTo,
   moveToOffsets,
   moveToRangeOf,
+  unsetMarks,
   unsetSelection,
 } from './on-selection'
 
@@ -281,6 +282,7 @@ export default {
   moveTo,
   moveToOffsets,
   moveToRangeOf,
+  unsetMarks,
   unsetSelection,
 
   /**

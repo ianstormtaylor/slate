@@ -221,29 +221,10 @@ export function insertInline(transform, inline) {
 
 export function insertText(transform, text, marks) {
   const { state } = transform
-  const { document, selection } = state
-  const { startKey } = selection
-  const isVoid = document.hasVoidParent(startKey)
-  let after
-
-  if (isVoid) {
-    after = selection
-  }
-
-  else if (selection.isExpanded) {
-    after = selection.collapseToStart().moveForward(text.length)
-  }
-
-  else {
-    after = selection.moveForward(text.length)
-  }
-
+  const { selection } = state
   marks = marks || selection.marks
-
-  transform
-    .unsetSelection()
-    .insertTextAtRange(selection, text, marks)
-    .moveTo(after)
+  transform.insertTextAtRange(selection, text, marks)
+  transform.unsetMarks()
 }
 
 /**

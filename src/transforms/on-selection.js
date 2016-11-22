@@ -375,6 +375,16 @@ export function moveToRangeOf(transform, start, end) {
 }
 
 /**
+ * Unset the selection's marks.
+ *
+ * @param {Transform} transform
+ */
+
+export function unsetMarks(transform) {
+  transform.setSelectionOperation({ marks: null })
+}
+
+/**
  * Unset the selection, removing an association to a node.
  *
  * @param {Transform} transform
