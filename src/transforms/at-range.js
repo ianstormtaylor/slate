@@ -313,23 +313,31 @@ export function insertBlockAtRange(transform, range, block, options = {}) {
 export function insertFragmentAtRange(transform, range, fragment, options = {}) {
   const { normalize = true } = options
 
+  // If the range is expanded, delete it first.
   if (range.isExpanded) {
     transform.deleteAtRange(range, { normalize: false })
     range = range.collapseToStart()
   }
 
+  // If the fragment is empty, there's nothing to do after deleting.
   if (!fragment.length) {
     return transform
   }
 
+  // Regenerate the keys for all of the fragments nodes, so that they're
+  // guaranteed not to collide with the existing keys in the document. Otherwise
+  // they will be rengerated automatically and we won't have an easy way to
+  // reference them.
   fragment = fragment.mapDescendants(child => child.regenerateKey())
 
+  // Calculate a few things...
   const { startKey, startOffset } = range
   let { state } = transform
   let { document } = state
   let startText = document.getDescendant(startKey)
   let startBlock = document.getClosestBlock(startText.key)
   let startChild = startBlock.getHighestChild(startText.key)
+  const isAtStart = range.isAtStartOf(startBlock)
   const parent = document.getParent(startBlock.key)
   const index = parent.nodes.indexOf(startBlock)
   const offset = startChild == startText
@@ -340,6 +348,8 @@ export function insertFragmentAtRange(transform, range, fragment, options = {}) 
   const firstBlock = blocks.first()
   const lastBlock = blocks.last()
 
+  // If the first and last block aren't the same, we need to insert all of the
+  // nodes after the fragment's first block at the index.
   if (firstBlock != lastBlock) {
     const lonelyParent = fragment.getFurthest(firstBlock.key, p => p.nodes.size == 1)
     const lonelyChild = lonelyParent || firstBlock
@@ -352,18 +362,23 @@ export function insertFragmentAtRange(transform, range, fragment, options = {}) 
     })
   }
 
+  // Check if we need to split the node.
   if (startOffset != 0) {
     transform.splitNodeByKey(startChild.key, offset, { normalize: false })
   }
 
+  // Update our variables with the new state.
   state = transform.state
   document = state.document
   startText = document.getDescendant(startKey)
   startBlock = document.getClosestBlock(startKey)
   startChild = startBlock.getHighestChild(startText.key)
 
+  // If the first and last block aren't the same, we need to move any of the
+  // starting block's children after the split into the last block of the
+  // fragment, which has already been inserted.
   if (firstBlock != lastBlock) {
-    const nextChild = startBlock.getNextSibling(startChild.key)
+    const nextChild = isAtStart ? startChild : startBlock.getNextSibling(startChild.key)
     const nextNodes = nextChild ? startBlock.nodes.skipUntil(n => n.key == nextChild.key) : List()
     const lastIndex = lastBlock.nodes.size
 
@@ -373,10 +388,16 @@ export function insertFragmentAtRange(transform, range, fragment, options = {}) 
     })
   }
 
+  // If the starting block is empty, we replace it entirely with the first block
+  // of the fragment, since this leads to a more expected behavior for the user.
   if (startBlock.isEmpty) {
     transform.removeNodeByKey(startBlock.key, { normalize: false })
     transform.insertNodeByKey(parent.key, index, firstBlock, { normalize: false })
-  } else {
+  }
+
+  // Otherwise, we maintain the starting block, and insert all of the first
+  // block's inline nodes into it at the split point.
+  else {
     const inlineChild = startBlock.getHighestChild(startText.key)
     const inlineIndex = startBlock.nodes.indexOf(inlineChild)
 
@@ -387,6 +408,7 @@ export function insertFragmentAtRange(transform, range, fragment, options = {}) 
     })
   }
 
+  // Normalize if requested.
   if (normalize) {
     transform.normalizeNodeByKey(parent.key, SCHEMA)
   }

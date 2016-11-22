@@ -1,0 +1,12 @@
+
+nodes:
+  - kind: block
+    type: list-item
+    nodes:
+      - kind: text
+        text: one
+  - kind: block
+    type: list-item
+    nodes:
+      - kind: text
+        text: two
