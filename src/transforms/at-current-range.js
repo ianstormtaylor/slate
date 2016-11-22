@@ -136,7 +136,10 @@ export function insertBlock(transform, block) {
   const { state } = transform
   const { selection } = state
   transform.insertBlockAtRange(selection, block)
-  transform.collapseToEndOf(block)
+
+  // If the node was successfully inserted, update the selection.
+  const node = transform.state.document.getNode(block.key)
+  if (node) transform.collapseToEndOf(node)
 }
 
 /**
@@ -199,16 +202,12 @@ export function insertFragment(transform, fragment) {
 export function insertInline(transform, inline) {
   inline = Normalize.inline(inline)
   const { state } = transform
-  const { selection, startBlock } = state
+  const { selection } = state
   transform.insertInlineAtRange(selection, inline)
 
-  // If the start block is void, it won't have inserted at all.
-  if (startBlock.isVoid) return
-
-  // Otherwise, find the inserted inline node, and collapse to the start of it.
-  const { document } = transform.state
-  inline = document.assertNode(inline.key)
-  transform.collapseToEndOf(inline)
+  // If the node was successfully inserted, update the selection.
+  const node = transform.state.document.getNode(inline.key)
+  if (node) transform.collapseToEndOf(node)
 }
 
 /**
@@ -221,10 +220,15 @@ export function insertInline(transform, inline) {
 
 export function insertText(transform, text, marks) {
   const { state } = transform
-  const { selection } = state
+  const { document, selection } = state
   marks = marks || selection.marks
   transform.insertTextAtRange(selection, text, marks)
-  transform.unsetMarks()
+
+  // If the text was successfully inserted, and the selection had marks on it,
+  // unset the selection's marks.
+  if (selection.marks && document != transform.state.document) {
+    transform.unsetMarks()
+  }
 }
 
 /**
