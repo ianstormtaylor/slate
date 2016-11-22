@@ -57,6 +57,7 @@ class State extends new Record(DEFAULTS) {
     }
 
     const state = new State({ document, selection })
+
     return state.transform({ normalized: false })
       .normalize(SCHEMA)
       .apply({ save: false })

@@ -106,13 +106,23 @@ class Selection extends new Record(DEFAULTS) {
   }
 
   /**
+   * Check whether the selection's keys are set.
+   *
+   * @return {Boolean}
+   */
+
+  get isSet() {
+    return this.anchorKey != null && this.focusKey != null
+  }
+
+  /**
    * Check whether the selection's keys are not set.
    *
    * @return {Boolean}
    */
 
   get isUnset() {
-    return this.anchorKey == null || this.focusKey == null
+    return !this.isSet
   }
 
   /**

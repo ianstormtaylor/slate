@@ -12,9 +12,9 @@ import warn from '../utils/warn'
  */
 
 export function normalize(transform, schema) {
+  transform.normalizeDocument(schema)
+  transform.normalizeSelection(schema)
   return transform
-    .normalizeDocument(schema)
-    .normalizeSelection(schema)
 }
 
 /**
@@ -28,7 +28,8 @@ export function normalize(transform, schema) {
 export function normalizeDocument(transform, schema) {
   const { state } = transform
   const { document } = state
-  return transform.normalizeNodeByKey(document.key, schema)
+  transform.normalizeNodeByKey(document.key, schema)
+  return transform
 }
 
 /**

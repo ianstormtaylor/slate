@@ -191,6 +191,19 @@ class Text extends new Record(DEFAULTS) {
   }
 
   /**
+   * Get a node by `key`, to parallel other nodes.
+   *
+   * @param {String} key
+   * @return {Node|Null}
+   */
+
+  getNode(key) {
+    return this.key == key
+      ? this
+      : null
+  }
+
+  /**
    * Derive the ranges for a list of `characters`.
    *
    * @param {Array|Void} decorators (optional)
@@ -238,6 +251,17 @@ class Text extends new Record(DEFAULTS) {
 
     // Return the ranges.
     return ranges
+  }
+
+  /**
+   * Check if the node has a node by `key`, to parallel other nodes.
+   *
+   * @param {String} key
+   * @return {Boolean}
+   */
+
+  hasNode(key) {
+    return !!this.getNode(key)
   }
 
   /**

@@ -1106,6 +1106,17 @@ const Node = {
   },
 
   /**
+   * Recursively check if a node exists by `key`.
+   *
+   * @param {String} key
+   * @return {Boolean}
+   */
+
+  hasNode(key) {
+    return !!this.getNode(key)
+  },
+
+  /**
    * Check if a node has a void parent by `key`.
    *
    * @param {String} key
@@ -1480,6 +1491,7 @@ memoize(Node, [
   'getNextBlock',
   'getNextSibling',
   'getNextText',
+  'getNode',
   'getOffset',
   'getOffsetAtRange',
   'getParent',

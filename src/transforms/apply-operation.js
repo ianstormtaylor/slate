@@ -231,54 +231,50 @@ function removeNode(state, operation) {
   const { path } = operation
   let { document, selection } = state
   const { startKey, endKey } = selection
-
-  // Preserve previous document
-  const prevDocument = document
-
-  // Update the document
   const node = document.assertPath(path)
+
+  // If the selection is set, check to see if it needs to be updated.
+  if (selection.isSet) {
+    const hasStartNode = node.hasNode(startKey)
+    const hasEndNode = node.hasNode(endKey)
+
+    // If one of the selection's nodes is being removed, we need to update it.
+    if (hasStartNode) {
+      const prev = document.getPreviousText(startKey)
+      const next = document.getNextText(startKey)
+
+      if (prev) {
+        selection = selection.moveStartTo(prev.key, prev.length)
+      } else if (next) {
+        selection = selection.moveStartTo(next.key, 0)
+      } else {
+        selection = selection.unset()
+      }
+    }
+
+    if (hasEndNode) {
+      const prev = document.getPreviousText(endKey)
+      const next = document.getNextText(endKey)
+
+      if (prev) {
+        selection = selection.moveEndTo(prev.key, prev.length)
+      } else if (next) {
+        selection = selection.moveEndTo(next.key, 0)
+      } else {
+        selection = selection.unset()
+      }
+    }
+
+  }
+
+  // Remove the node from the document.
   let parent = document.getParent(node.key)
   const index = parent.nodes.indexOf(node)
   const isParent = document == parent
   parent = parent.removeNode(index)
   document = isParent ? parent : document.updateDescendant(parent)
 
-  function getRemoved(key) {
-    if (key === node.key) return node
-    if (node.kind == 'text') return null
-    return node.getDescendant(key)
-  }
-
-  // Update the selection, if one of the anchor/focus has been removed
-  const startDesc = startKey ? getRemoved(startKey) : null
-  const endDesc = endKey ? getRemoved(endKey) : null
-
-  if (startDesc) {
-    const prevText = prevDocument.getTexts()
-      .takeUntil(text => text.key == startKey)
-      .filter(text => !getRemoved(text.key))
-      .last()
-    selection = !prevText
-      ? selection.unset()
-      : selection.moveStartTo(prevText.key, prevText.length)
-  }
-  if (endDesc) {
-    // The whole selection is inside the node, we collapse to the previous text node
-    if (startKey == endKey) {
-      selection = selection.collapseToStart()
-    } else {
-      const nextText = prevDocument.getTexts()
-        .skipUntil(text => text.key == startKey)
-        .slice(1)
-        .filter(text => !getRemoved(text.key))
-        .first()
-
-      selection = !nextText
-        ? selection.unset()
-        : selection.moveEndTo(nextText.key, 0)
-    }
-  }
-
+  // Update the document and selection.
   state = state.merge({ document, selection })
   return state
 }

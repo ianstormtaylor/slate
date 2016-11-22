@@ -4,6 +4,14 @@ import Text from '../models/text'
 import { List } from 'immutable'
 
 /**
+ * Options object with normalize set to `false`.
+ *
+ * @type {Object}
+ */
+
+const OPTS = { normalize: false }
+
+/**
  * Only allow block nodes in documents.
  *
  * @type {Object}
@@ -19,7 +27,7 @@ const DOCUMENT_CHILDREN_RULE = {
     return invalids.size ? invalids : null
   },
   normalize: (transform, document, invalids) => {
-    return invalids.reduce((t, n) => t.removeNodeByKey(n.key, { normalize: false }), transform)
+    return invalids.reduce((t, n) => t.removeNodeByKey(n.key, OPTS), transform)
   }
 }
 
@@ -39,7 +47,7 @@ const BLOCK_CHILDREN_RULE = {
     return invalids.size ? invalids : null
   },
   normalize: (transform, block, invalids) => {
-    return invalids.reduce((t, n) => t.removeNodeByKey(n.key, { normalize: false }), transform)
+    return invalids.reduce((t, n) => t.removeNodeByKey(n.key, OPTS), transform)
   }
 }
 
@@ -59,7 +67,7 @@ const MIN_TEXT_RULE = {
   },
   normalize: (transform, node) => {
     const text = Text.create()
-    return transform.insertNodeByKey(node.key, 0, text, { normalize: false })
+    return transform.insertNodeByKey(node.key, 0, text, OPTS)
   }
 }
 
@@ -79,7 +87,7 @@ const INLINE_CHILDREN_RULE = {
     return invalids.size ? invalids : null
   },
   normalize: (transform, inline, invalids) => {
-    return invalids.reduce((t, n) => t.removeNodeByKey(n.key, { normalize: false }), transform)
+    return invalids.reduce((t, n) => t.removeNodeByKey(n.key, OPTS), transform)
   }
 }
 
@@ -107,8 +115,8 @@ const INLINE_NO_EMPTY = {
     return block.nodes.reduce((tr, child, index) => {
       if (child.kind == 'inline' && child.text == '') {
         return transform
-          .removeNodeByKey(child.key, { normalize: false })
-          .insertNodeByKey(block.key, index, Text.createFromString(''), { normalize: false })
+          .removeNodeByKey(child.key, OPTS)
+          .insertNodeByKey(block.key, index, Text.createFromString(''), OPTS)
       } else {
         return tr
       }
@@ -117,24 +125,35 @@ const INLINE_NO_EMPTY = {
 }
 
 /**
- * Ensure that void nodes contain a single space of content.
+ * Ensure that void nodes contain a text node with a single space of text.
  *
  * @type {Object}
  */
 
 const VOID_TEXT_RULE = {
   match: (object) => {
-    return (object.kind == 'inline' || object.kind == 'block') && object.isVoid
+    return (
+      (object.kind == 'inline' || object.kind == 'block') &&
+      (object.isVoid)
+    )
   },
   validate: (node) => {
-    return node.text !== ' ' || node.nodes.size !== 1
+    return (
+      node.text !== ' ' ||
+      node.nodes.size !== 1
+    )
   },
   normalize: (transform, node, result) => {
-    node.nodes.reduce((t, child) => {
-      return t.removeNodeByKey(child.key, { normalize: false })
-    }, transform)
+    const text = Text.createFromString(' ')
+    const index = node.nodes.size
 
-    return transform.insertNodeByKey(node.key, 0, Text.createFromString(' '), { normalize: false })
+    transform.insertNodeByKey(node.key, index, text, OPTS)
+
+    node.nodes.forEach((child) => {
+      transform.removeNodeByKey(child.key, OPTS)
+    })
+
+    return transform
   }
 }
 
@@ -175,11 +194,11 @@ const INLINE_VOID_TEXTS_AROUND_RULE = {
 
     return invalids.reduce((t, { index, next, prev }) => {
       if (prev) {
-        t = t.insertNodeByKey(block.key, shift + index, Text.create(), { normalize: false })
+        t = t.insertNodeByKey(block.key, shift + index, Text.create(), OPTS)
         shift = shift + 1
       }
       if (next) {
-        t = t.insertNodeByKey(block.key, shift + index + 1, Text.create(), { normalize: false })
+        t = t.insertNodeByKey(block.key, shift + index + 1, Text.create(), OPTS)
         shift = shift + 1
       }
 
@@ -219,7 +238,7 @@ const NO_ADJACENT_TEXT_RULE = {
       .reverse()
       .reduce((t, pair) => {
         const [ first, second ] = pair
-        return t.joinNodeByKey(second.key, first.key, { normalize: false })
+        return t.joinNodeByKey(second.key, first.key, OPTS)
       }, transform)
   }
 }
@@ -273,7 +292,7 @@ const NO_EMPTY_TEXT_RULE = {
   },
   normalize: (transform, node, invalids) => {
     return invalids.reduce((t, text) => {
-      return t.removeNodeByKey(text.key, { normalize: false })
+      return t.removeNodeByKey(text.key, OPTS)
     }, transform)
   }
 }
