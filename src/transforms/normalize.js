@@ -47,7 +47,7 @@ export function normalizeNodeByKey(transform, key, schema) {
   const { document } = state
   const node = document.assertNode(key)
 
-  normalizeNodeWith(transform, node, schema)
+  normalizeNodeAndChildren(transform, node, schema)
 }
 
 /**
@@ -69,11 +69,11 @@ export function normalizeParentsByKey(transform, key, schema) {
   const { document } = state
   const node = document.assertNode(key)
 
-  normalizeParentsWith(transform, node, schema)
+  normalizeNodeAndParents(transform, node, schema)
 }
 
 /**
- * Normalize only the selection.
+ * Normalize the selection.
  *
  * @param {Transform} transform
  */
@@ -114,21 +114,26 @@ export function normalizeSelection(transform) {
  * @param {Schema} schema
  */
 
-function normalizeNodeWith(transform, node, schema) {
-  // For performance considerations, we will check if the transform was changed.
-  const opCount = transform.operations.length
+function normalizeNodeAndChildren(transform, node, schema) {
+  // For performance considerations, we will check if the transform has actually
+  // added operations to the queue.
+  const count = transform.operations.length
 
   // Iterate over its children.
-  normalizeChildrenWith(transform, node, schema)
+  if (node.kind != 'text') {
+    node.nodes.forEach((child) => {
+      normalizeNodeAndChildren(transform, child, schema)
+    })
+  }
 
   // Re-find the node reference if necessary.
-  if (transform.operations.length != opCount) {
+  if (transform.operations.length != count) {
     node = refindNode(transform, node)
   }
 
   // Now normalize the node itself if it still exists.
   if (node) {
-    normalizeNodeOnly(transform, node, schema)
+    normalizeNode(transform, node, schema)
   }
 }
 
@@ -140,10 +145,10 @@ function normalizeNodeWith(transform, node, schema) {
  * @param {Schema} schema
  */
 
-function normalizeParentsWith(transform, node, schema) {
-  normalizeNodeOnly(transform, node, schema)
+function normalizeNodeAndParents(transform, node, schema) {
+  normalizeNode(transform, node, schema)
 
-  // Normalize went back up to the very top of the document.
+  // We're at the top of the document.
   if (node.kind == 'document') return
 
   // Re-find the node first.
@@ -154,7 +159,7 @@ function normalizeParentsWith(transform, node, schema) {
   const { document } = state
   const parent = document.getParent(node.key)
 
-  normalizeParentsWith(transform, parent, schema)
+  normalizeNodeAndParents(transform, parent, schema)
 }
 
 /**
@@ -175,22 +180,6 @@ function refindNode(transform, node) {
 }
 
 /**
- * Normalize the children of a `node` with a `schema`.
- *
- * @param {Transform} transform
- * @param {Node} node
- * @param {Schema} schema
- */
-
-function normalizeChildrenWith(transform, node, schema) {
-  if (node.kind == 'text') return
-
-  node.nodes.forEach((child) => {
-    normalizeNodeWith(transform, child, schema)
-  })
-}
-
-/**
  * Normalize a `node` with a `schema`, but not its children.
  *
  * @param {Transform} transform
@@ -198,7 +187,7 @@ function normalizeChildrenWith(transform, node, schema) {
  * @param {Schema} schema
  */
 
-function normalizeNodeOnly(transform, node, schema) {
+function normalizeNode(transform, node, schema) {
   let max = schema.rules.length
   let iterations = 0
 
@@ -206,9 +195,8 @@ function normalizeNodeOnly(transform, node, schema) {
     const failure = n.validate(schema)
     if (!failure) return
 
+    // Run the `normalize` function for the rule with the invalid value.
     const { value, rule } = failure
-
-    // Rule the `normalize` function for the rule with the invalid value.
     rule.normalize(t, n, value)
 
     // Re-find the node reference, in case it was updated. If the node no longer
@@ -240,9 +228,9 @@ function normalizeNodeOnly(transform, node, schema) {
  */
 
 function assertSchema(schema) {
-  if (schema instanceof Schema) return
-
-  if (schema == null) {
+  if (schema instanceof Schema) {
+    return
+  } else if (schema == null) {
     throw new Error('You must pass a `schema` object.')
   } else {
     throw new Error(`You passed an invalid \`schema\` object: ${schema}.`)
