@@ -218,38 +218,12 @@ export function setInline(transform, properties) {
 
 export function splitBlock(transform, depth = 1) {
   let { state } = transform
-  let { document, selection } = state
-
-  transform.unsetSelection()
-  transform.splitBlockAtRange(selection, depth)
-
-  state = transform.state
-  document = state.document
-
-  const { startKey, startOffset } = selection
-  const startText = document.getNode(startKey)
-  const startBlock = document.getClosestBlock(startKey)
-  const startInline = startBlock.getFurthestInline(startKey)
-  const nextText = document.getNextText(startText.key)
-  let after
-
-  // If the selection is at the start of the highest inline child inside the
-  // block, the starting text node won't need to be split.
-  if (
-    (startOffset == 0) &&
-    (startBlock.text != '') &&
-    (!startInline || startInline.getOffset(startText.key) == 0)
-  ) {
-    after = selection.collapseToStartOf(startText)
-  }
-
-  // Otherwise, we'll need to move the selection forward one to account for the
-  // text node that was split.
-  else {
-    after = selection.collapseToStartOf(nextText)
-  }
-
-  transform.moveTo(after)
+  let { selection } = state
+  transform
+    .snapshotSelection()
+    .splitBlockAtRange(selection, depth)
+    .collapseToEnd()
+    .snapshotSelection()
 }
 
 /**
