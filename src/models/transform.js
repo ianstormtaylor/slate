@@ -29,7 +29,6 @@ class Transform {
   constructor(properties) {
     const { state, normalized = true } = properties
     this.state = state
-    this.prevState = normalized ? state : null
     this.operations = []
   }
 
