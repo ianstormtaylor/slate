@@ -235,44 +235,11 @@ export function splitBlock(transform, depth = 1) {
 
 export function splitInline(transform, depth = Infinity) {
   let { state } = transform
-  let { document, selection } = state
-
-  // If the selection is expanded, remove it first.
-  if (selection.isExpanded) {
-    transform.delete()
-    state = transform.state
-    document = state.document
-    selection = state.selection
-  }
-
-  let after = selection
-  const { startKey, startOffset } = selection
-  let startNode = document.assertDescendant(startKey)
-  const furthestInline = document.getFurthestInline(startKey)
-  const offset = furthestInline.getOffset(startNode.key)
-
-  // If the selection is at the start of end of the furthest inline, there isn't
-  // anything to split, so abort.
-  if (
-    (offset + startOffset == 0) ||
-    (offset + startNode.length == startOffset)
-  ) {
-    return
-  }
-
-  transform.unsetSelection()
-  transform.splitInlineAtRange(selection, depth)
-  state = transform.state
-  document = state.document
-  const closestInline = document.getClosestInline(startKey)
-
-  if (closestInline) {
-    startNode = document.getDescendant(startKey)
-    const nextNode = document.getNextText(startNode.key)
-    after = selection.collapseToStartOf(nextNode)
-  }
-
-  transform.moveTo(after)
+  let { selection } = state
+  transform
+    .snapshotSelection()
+    .splitInlineAtRange(selection, depth)
+    .snapshotSelection()
 }
 
 /**
