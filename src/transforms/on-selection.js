@@ -413,6 +413,18 @@ export function unsetMarks(transform) {
 }
 
 /**
+ * Snapshot the current selection.
+ *
+ * @param {Transform} transform
+ */
+
+export function snapshotSelection(transform) {
+  const { state } = transform
+  const { selection } = state
+  transform.setSelectionOperation(selection, { snapshot: true })
+}
+
+/**
  * Unset the selection, removing an association to a node.
  *
  * @param {Transform} transform

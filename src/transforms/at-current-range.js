@@ -38,64 +38,16 @@ export function addMark(transform, mark) {
 
 export function _delete(transform) {
   const { state } = transform
-  const { document, selection } = state
-
-  // If the selection is collapsed, there's nothing to delete.
+  const { selection } = state
   if (selection.isCollapsed) return
 
-  const { startText } = state
-  const { startKey, startOffset, endKey, endOffset } = selection
-  const block = document.getClosestBlock(startKey)
-  const highest = block.getHighestChild(startKey)
-  const previous = block.getPreviousSibling(highest.key)
-  const next = block.getNextSibling(highest.key)
-  let after
-
-  // If there's a previous node, and we're at the start of the current node,
-  // and the selection encompasses the entire current node, it won't exist after
-  // deleting, so we need to update the selection's keys.
-  if (
-    previous &&
-    startOffset == 0 &&
-    (endKey != startKey || endOffset == startText.length)
-  ) {
-
-    // If the nodes on either sides are text nodes, they will end up being
-    // combined, so we need to set the selection to right in between them.
-    if (previous.kind == 'text' && next && next.kind == 'text') {
-      after = selection.merge({
-        anchorKey: previous.key,
-        anchorOffset: previous.length,
-        focusKey: previous.key,
-        focusOffset: previous.length
-      })
-    }
-
-    // Otherwise, if only the previous node is a text node, it won't be merged,
-    // so collapse to the end of it.
-    else if (previous.kind == 'text') {
-      after = selection.collapseToEndOf(previous)
-    }
-
-    // Otherwise, if the previous node isn't a text node, we need to get the
-    // last text node inside of it and collapse to the end of that.
-    else {
-      const last = previous.getLastText()
-      after = selection.collapseToEndOf(last)
-    }
-  }
-
-  // Otherwise, if the inline is an online child
-
-  // Otherwise simply collapse the selection.
-  else {
-    after = selection.collapseToStart()
-  }
-
   transform
-    .unsetSelection()
+    .snapshotSelection()
     .deleteAtRange(selection)
-    .moveTo(after)
+    // Ensure that the selection is collapsed to the start, because in certain
+    // cases when deleting across inline nodes this isn't guaranteed.
+    .collapseToStart()
+    .snapshotSelection()
 }
 
 /**

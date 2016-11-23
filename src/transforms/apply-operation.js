@@ -285,15 +285,10 @@ function removeNode(state, operation) {
 
 function removeText(state, operation) {
   const { path, offset, length } = operation
+  const rangeOffset = offset + length
   let { document, selection } = state
   const { startKey, endKey, startOffset, endOffset } = selection
   let node = document.assertPath(path)
-
-  const rangeOffset = offset + length
-
-  // Update the document
-  node = node.removeText(offset, length)
-  document = document.updateDescendant(node)
 
   // Update the selection
   if (startKey == node.key && startOffset >= rangeOffset) {
@@ -303,6 +298,8 @@ function removeText(state, operation) {
     selection = selection.moveEndOffset(-length)
   }
 
+  node = node.removeText(offset, length)
+  document = document.updateDescendant(node)
   state = state.merge({ document, selection })
   return state
 }

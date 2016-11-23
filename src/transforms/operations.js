@@ -352,7 +352,7 @@ export function setNodeOperation(transform, path, properties) {
  * @param {Mixed} selection
  */
 
-export function setSelectionOperation(transform, properties) {
+export function setSelectionOperation(transform, properties, options = {}) {
   properties = Normalize.selectionProperties(properties)
 
   const { state } = transform
@@ -364,7 +364,7 @@ export function setSelectionOperation(transform, properties) {
   // create a dictionary of the previous values for all of the properties that
   // are being changed, for the inverse operation.
   for (const k in properties) {
-    if (properties[k] == selection[k]) continue
+    if (!options.snapshot && properties[k] == selection[k]) continue
     props[k] = properties[k]
     prevProps[k] = selection[k]
   }

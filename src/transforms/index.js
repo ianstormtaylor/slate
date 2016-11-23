@@ -133,6 +133,7 @@ import {
   moveToRangeOf,
   unsetMarks,
   unsetSelection,
+  snapshotSelection,
 } from './on-selection'
 
 /**
@@ -288,6 +289,7 @@ export default {
   moveToRangeOf,
   unsetMarks,
   unsetSelection,
+  snapshotSelection,
 
   /**
    * History.
