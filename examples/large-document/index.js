@@ -54,9 +54,9 @@ class LargeDocument extends React.Component {
 
   constructor() {
     super()
-    console.time('deserializeLargDocument')
+    console.time('deserializeLargeDocument')
     this.state = { state: Raw.deserialize({ nodes }, { terse: true }) }
-    console.timeEnd('deserializeLargDocument')
+    console.timeEnd('deserializeLargeDocument')
   }
 
   /**
@@ -80,6 +80,7 @@ class LargeDocument extends React.Component {
       <Editor
         placeholder={'Enter some plain text...'}
         schema={schema}
+        spellcheck={false}
         state={this.state.state}
         onChange={this.onChange}
       />
