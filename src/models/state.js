@@ -45,22 +45,31 @@ class State extends new Record(DEFAULTS) {
    * @return {State}
    */
 
-  static create(properties = {}) {
+  static create(properties = {}, options = {}) {
     if (properties instanceof State) return properties
 
-    let document = Document.create(properties.document)
+    // Create a document and selection.
+    const document = Document.create(properties.document)
     let selection = Selection.create(properties.selection)
 
+    // If the selection isn't set, default it to the beginning of the document.
     if (selection.isUnset) {
       const text = document.getFirstText()
       selection = selection.collapseToStartOf(text)
     }
 
+    // Create a new state.
     const state = new State({ document, selection })
 
-    return state.transform()
-      .normalize(SCHEMA)
-      .apply({ save: false })
+    // Normalize the state before returning if requested.
+    if (options.normalize) {
+      return state
+        .transform()
+        .normalize(SCHEMA)
+        .apply({ save: false })
+    } else {
+      return state
+    }
   }
 
   /**
