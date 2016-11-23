@@ -51,28 +51,6 @@ export function normalizeNodeByKey(transform, key, schema) {
 }
 
 /**
- * Normalize a `node` and its parents with a `schema`.
- *
- * @param {Transform} transform
- * @param {Node|String} key
- * @param {Schema} schema
- */
-
-export function normalizeParentsByKey(transform, key, schema) {
-  assertSchema(schema)
-
-  // If the schema has no validation rules, there's nothing to normalize.
-  if (!schema.hasValidators) return
-
-  key = Normalize.key(key)
-  const { state } = transform
-  const { document } = state
-  const node = document.assertNode(key)
-
-  normalizeNodeAndParents(transform, node, schema)
-}
-
-/**
  * Normalize the selection.
  *
  * @param {Transform} transform
@@ -135,31 +113,6 @@ function normalizeNodeAndChildren(transform, node, schema) {
   if (node) {
     normalizeNode(transform, node, schema)
   }
-}
-
-/**
- * Normalize a `node` and its parents with a `schema`.
- *
- * @param {Transform} transform
- * @param {Node} node
- * @param {Schema} schema
- */
-
-function normalizeNodeAndParents(transform, node, schema) {
-  normalizeNode(transform, node, schema)
-
-  // We're at the top of the document.
-  if (node.kind == 'document') return
-
-  // Re-find the node first.
-  node = refindNode(transform, node)
-  if (!node) return
-
-  const { state } = transform
-  const { document } = state
-  const parent = document.getParent(node.key)
-
-  normalizeNodeAndParents(transform, parent, schema)
 }
 
 /**

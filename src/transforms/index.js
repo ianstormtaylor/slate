@@ -155,7 +155,6 @@ import {
   normalizeDocument,
   normalizeSelection,
   normalizeNodeByKey,
-  normalizeParentsByKey,
 } from './normalize'
 
 /**
@@ -307,5 +306,4 @@ export default {
   normalizeDocument,
   normalizeSelection,
   normalizeNodeByKey,
-  normalizeParentsByKey,
 }

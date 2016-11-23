@@ -201,8 +201,8 @@ export function removeTextByKey(transform, key, offset, length, options = {}) {
   transform.removeTextOperation(path, offset, length)
 
   if (normalize) {
-    const parent = document.getParent(key)
-    transform.normalizeParentsByKey(parent.key, SCHEMA)
+    const block = document.getClosestBlock(key)
+    transform.normalizeNodeByKey(block.key, SCHEMA)
   }
 }
 
