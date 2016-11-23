@@ -387,6 +387,9 @@ const Node = {
    */
 
   getCommonAncestor(one, two) {
+    if (one == this.key) return this
+    if (two == this.key) return this
+
     this.assertDescendant(one)
     this.assertDescendant(two)
     let ancestors = new List()

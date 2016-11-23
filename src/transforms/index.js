@@ -126,10 +126,14 @@ import {
   focus,
   moveBackward,
   moveForward,
+  moveEndOffset,
+  moveStartOffset,
   moveTo,
   moveToOffsets,
   moveToRangeOf,
+  unsetMarks,
   unsetSelection,
+  snapshotSelection,
 } from './on-selection'
 
 /**
@@ -151,7 +155,6 @@ import {
   normalizeDocument,
   normalizeSelection,
   normalizeNodeByKey,
-  normalizeParentsByKey,
 } from './normalize'
 
 /**
@@ -278,10 +281,14 @@ export default {
   focus,
   moveBackward,
   moveForward,
+  moveEndOffset,
+  moveStartOffset,
   moveTo,
   moveToOffsets,
   moveToRangeOf,
+  unsetMarks,
   unsetSelection,
+  snapshotSelection,
 
   /**
    * History.
@@ -299,5 +306,4 @@ export default {
   normalizeDocument,
   normalizeSelection,
   normalizeNodeByKey,
-  normalizeParentsByKey,
 }

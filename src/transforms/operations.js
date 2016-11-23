@@ -9,7 +9,6 @@ import Normalize from '../utils/normalize'
  * @param {Number} offset
  * @param {Number} length
  * @param {Mixed} mark
- * @return {Transform}
  */
 
 export function addMarkOperation(transform, path, offset, length, mark) {
@@ -30,7 +29,7 @@ export function addMarkOperation(transform, path, offset, length, mark) {
     inverse,
   }
 
-  return transform.applyOperation(operation)
+  transform.applyOperation(operation)
 }
 
 /**
@@ -40,7 +39,6 @@ export function addMarkOperation(transform, path, offset, length, mark) {
  * @param {Array} path
  * @param {Number} index
  * @param {Node} node
- * @return {Transform}
  */
 
 export function insertNodeOperation(transform, path, index, node) {
@@ -58,7 +56,7 @@ export function insertNodeOperation(transform, path, index, node) {
     inverse,
   }
 
-  return transform.applyOperation(operation)
+  transform.applyOperation(operation)
 }
 
 /**
@@ -69,7 +67,6 @@ export function insertNodeOperation(transform, path, index, node) {
  * @param {Number} offset
  * @param {String} text
  * @param {Set<Mark>} marks (optional)
- * @return {Transform}
  */
 
 export function insertTextOperation(transform, path, offset, text, marks) {
@@ -90,7 +87,7 @@ export function insertTextOperation(transform, path, offset, text, marks) {
     inverse,
   }
 
-  return transform.applyOperation(operation)
+  transform.applyOperation(operation)
 }
 
 /**
@@ -99,7 +96,6 @@ export function insertTextOperation(transform, path, offset, text, marks) {
  * @param {Transform} transform
  * @param {Array} path
  * @param {Array} withPath
- * @return {Transform}
  */
 
 export function joinNodeOperation(transform, path, withPath) {
@@ -134,7 +130,7 @@ export function joinNodeOperation(transform, path, withPath) {
     inverse,
   }
 
-  return transform.applyOperation(operation)
+  transform.applyOperation(operation)
 }
 
 /**
@@ -144,7 +140,6 @@ export function joinNodeOperation(transform, path, withPath) {
  * @param {Array} path
  * @param {Array} newPath
  * @param {Number} newIndex
- * @return {Transform}
  */
 
 export function moveNodeOperation(transform, path, newPath, newIndex) {
@@ -167,7 +162,7 @@ export function moveNodeOperation(transform, path, newPath, newIndex) {
     inverse,
   }
 
-  return transform.applyOperation(operation)
+  transform.applyOperation(operation)
 }
 
 /**
@@ -178,7 +173,6 @@ export function moveNodeOperation(transform, path, newPath, newIndex) {
  * @param {Number} offset
  * @param {Number} length
  * @param {Mark} mark
- * @return {Transform}
  */
 
 export function removeMarkOperation(transform, path, offset, length, mark) {
@@ -199,7 +193,7 @@ export function removeMarkOperation(transform, path, offset, length, mark) {
     inverse,
   }
 
-  return transform.applyOperation(operation)
+  transform.applyOperation(operation)
 }
 
 /**
@@ -207,7 +201,6 @@ export function removeMarkOperation(transform, path, offset, length, mark) {
  *
  * @param {Transform} transform
  * @param {Array} path
- * @return {Transform}
  */
 
 export function removeNodeOperation(transform, path) {
@@ -230,7 +223,7 @@ export function removeNodeOperation(transform, path) {
     inverse,
   }
 
-  return transform.applyOperation(operation)
+  transform.applyOperation(operation)
 }
 
 /**
@@ -240,7 +233,6 @@ export function removeNodeOperation(transform, path) {
  * @param {Array} path
  * @param {Number} offset
  * @param {Number} length
- * @return {Transform}
  */
 
 export function removeTextOperation(transform, path, offset, length) {
@@ -282,7 +274,7 @@ export function removeTextOperation(transform, path, offset, length) {
     inverse,
   }
 
-  return transform.applyOperation(operation)
+  transform.applyOperation(operation)
 }
 
 /**
@@ -294,7 +286,6 @@ export function removeTextOperation(transform, path, offset, length) {
  * @param {Number} length
  * @param {Mark} mark
  * @param {Mark} newMark
- * @return {Transform}
  */
 
 export function setMarkOperation(transform, path, offset, length, mark, newMark) {
@@ -317,7 +308,7 @@ export function setMarkOperation(transform, path, offset, length, mark, newMark)
     inverse,
   }
 
-  return transform.applyOperation(operation)
+  transform.applyOperation(operation)
 }
 
 /**
@@ -326,7 +317,6 @@ export function setMarkOperation(transform, path, offset, length, mark, newMark)
  * @param {Transform} transform
  * @param {Array} path
  * @param {Object} properties
- * @return {Transform}
  */
 
 export function setNodeOperation(transform, path, properties) {
@@ -352,7 +342,7 @@ export function setNodeOperation(transform, path, properties) {
     inverse,
   }
 
-  return transform.applyOperation(operation)
+  transform.applyOperation(operation)
 }
 
 /**
@@ -360,10 +350,9 @@ export function setNodeOperation(transform, path, properties) {
  *
  * @param {Transform} transform
  * @param {Mixed} selection
- * @return {Transform}
  */
 
-export function setSelectionOperation(transform, properties) {
+export function setSelectionOperation(transform, properties, options = {}) {
   properties = Normalize.selectionProperties(properties)
 
   const { state } = transform
@@ -375,7 +364,7 @@ export function setSelectionOperation(transform, properties) {
   // create a dictionary of the previous values for all of the properties that
   // are being changed, for the inverse operation.
   for (const k in properties) {
-    if (properties[k] == selection[k]) continue
+    if (!options.snapshot && properties[k] == selection[k]) continue
     props[k] = properties[k]
     prevProps[k] = selection[k]
   }
@@ -432,7 +421,7 @@ export function setSelectionOperation(transform, properties) {
   }
 
   // Apply the operation.
-  return transform.applyOperation(operation)
+  transform.applyOperation(operation)
 }
 
 /**
@@ -441,7 +430,6 @@ export function setSelectionOperation(transform, properties) {
  * @param {Transform} transform
  * @param {Array} path
  * @param {Number} offset
- * @return {Transform}
  */
 
 export function splitNodeOperation(transform, path, offset) {
@@ -462,5 +450,5 @@ export function splitNodeOperation(transform, path, offset) {
     inverse,
   }
 
-  return transform.applyOperation(operation)
+  transform.applyOperation(operation)
 }

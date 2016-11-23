@@ -8,13 +8,11 @@ import warn from '../utils/warn'
  *
  * @param {Transform} transform
  * @param {Schema} schema
- * @return {Transform}
  */
 
 export function normalize(transform, schema) {
   transform.normalizeDocument(schema)
   transform.normalizeSelection(schema)
-  return transform
 }
 
 /**
@@ -22,14 +20,12 @@ export function normalize(transform, schema) {
  *
  * @param {Transform} transform
  * @param {Schema} schema
- * @return {Transform}
  */
 
 export function normalizeDocument(transform, schema) {
   const { state } = transform
   const { document } = state
   transform.normalizeNodeByKey(document.key, schema)
-  return transform
 }
 
 /**
@@ -38,57 +34,26 @@ export function normalizeDocument(transform, schema) {
  * @param {Transform} transform
  * @param {Node|String} key
  * @param {Schema} schema
- * @return {Transform}
  */
 
 export function normalizeNodeByKey(transform, key, schema) {
   assertSchema(schema)
-  key = Normalize.key(key)
 
   // If the schema has no validation rules, there's nothing to normalize.
-  if (!schema.hasValidators) {
-    return transform
-  }
+  if (!schema.hasValidators) return
 
+  key = Normalize.key(key)
   const { state } = transform
   const { document } = state
   const node = document.assertNode(key)
 
-  normalizeNodeWith(transform, node, schema)
-  return transform
+  normalizeNodeAndChildren(transform, node, schema)
 }
 
 /**
- * Normalize a `node` and its parents with a `schema`.
+ * Normalize the selection.
  *
  * @param {Transform} transform
- * @param {Node|String} key
- * @param {Schema} schema
- * @return {Transform}
- */
-
-export function normalizeParentsByKey(transform, key, schema) {
-  assertSchema(schema)
-  key = Normalize.key(key)
-
-  // If the schema has no validation rules, there's nothing to normalize.
-  if (!schema.hasValidators) {
-    return transform
-  }
-
-  const { state } = transform
-  const { document } = state
-  const node = document.assertNode(key)
-
-  normalizeParentsWith(transform, node, schema)
-  return transform
-}
-
-/**
- * Normalize only the selection.
- *
- * @param {Transform} transform
- * @return {Transform}
  */
 
 export function normalizeSelection(transform) {
@@ -117,7 +82,6 @@ export function normalizeSelection(transform) {
 
   state = state.merge({ selection })
   transform.state = state
-  return transform
 }
 
 /**
@@ -126,58 +90,29 @@ export function normalizeSelection(transform) {
  * @param {Transform} transform
  * @param {Node} node
  * @param {Schema} schema
- * @return {Transform}
  */
 
-function normalizeNodeWith(transform, node, schema) {
-  // For performance considerations, we will check if the transform was changed.
-  const opCount = transform.operations.length
+function normalizeNodeAndChildren(transform, node, schema) {
+  // For performance considerations, we will check if the transform has actually
+  // added operations to the queue.
+  const count = transform.operations.length
 
   // Iterate over its children.
-  normalizeChildrenWith(transform, node, schema)
+  if (node.kind != 'text') {
+    node.nodes.forEach((child) => {
+      normalizeNodeAndChildren(transform, child, schema)
+    })
+  }
 
   // Re-find the node reference if necessary.
-  if (transform.operations.length != opCount) {
+  if (transform.operations.length != count) {
     node = refindNode(transform, node)
   }
 
   // Now normalize the node itself if it still exists.
   if (node) {
-    normalizeNodeOnly(transform, node, schema)
+    normalizeNode(transform, node, schema)
   }
-
-  return transform
-}
-
-/**
- * Normalize a `node` and its parents with a `schema`.
- *
- * @param {Transform} transform
- * @param {Node} node
- * @param {Schema} schema
- * @return {Transform}
- */
-
-function normalizeParentsWith(transform, node, schema) {
-  normalizeNodeOnly(transform, node, schema)
-
-  // Normalize went back up to the very top of the document.
-  if (node.kind == 'document') {
-    return transform
-  }
-
-  // Re-find the node first.
-  node = refindNode(transform, node)
-
-  if (!node) {
-    return transform
-  }
-
-  const { state } = transform
-  const { document } = state
-  const parent = document.getParent(node.key)
-
-  return normalizeParentsWith(transform, parent, schema)
 }
 
 /**
@@ -198,50 +133,29 @@ function refindNode(transform, node) {
 }
 
 /**
- * Normalize the children of a `node` with a `schema`.
- *
- * @param {Transform} transform
- * @param {Node} node
- * @param {Schema} schema
- * @return {Transform}
- */
-
-function normalizeChildrenWith(transform, node, schema) {
-  if (node.kind == 'text') return transform
-
-  node.nodes.forEach((child) => {
-    normalizeNodeWith(transform, child, schema)
-  })
-
-  return transform
-}
-
-/**
  * Normalize a `node` with a `schema`, but not its children.
  *
  * @param {Transform} transform
  * @param {Node} node
  * @param {Schema} schema
- * @return {Transform}
  */
 
-function normalizeNodeOnly(transform, node, schema) {
+function normalizeNode(transform, node, schema) {
   let max = schema.rules.length
   let iterations = 0
 
   function iterate(t, n) {
     const failure = n.validate(schema)
-    if (!failure) return t
+    if (!failure) return
 
+    // Run the `normalize` function for the rule with the invalid value.
     const { value, rule } = failure
-
-    // Rule the `normalize` function for the rule with the invalid value.
     rule.normalize(t, n, value)
 
     // Re-find the node reference, in case it was updated. If the node no longer
     // exists, we're done for this branch.
     n = refindNode(t, n)
-    if (!n) return t
+    if (!n) return
 
     // Increment the iterations counter, and check to make sure that we haven't
     // exceeded the max. Without this check, it's easy for the `validate` or
@@ -254,10 +168,10 @@ function normalizeNodeOnly(transform, node, schema) {
     }
 
     // Otherwise, iterate again.
-    return iterate(t, n)
+    iterate(t, n)
   }
 
-  return iterate(transform, node)
+  iterate(transform, node)
 }
 
 /**
@@ -267,9 +181,9 @@ function normalizeNodeOnly(transform, node, schema) {
  */
 
 function assertSchema(schema) {
-  if (schema instanceof Schema) return
-
-  if (schema == null) {
+  if (schema instanceof Schema) {
+    return
+  } else if (schema == null) {
     throw new Error('You must pass a `schema` object.')
   } else {
     throw new Error(`You passed an invalid \`schema\` object: ${schema}.`)
