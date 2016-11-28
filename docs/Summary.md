@@ -47,6 +47,11 @@
 - [Core](./reference/plugins/core.md)
 
 
+## Utils Reference
+
+- [Utils](./reference/utils/utils.md)
+
+
 ## General
 
 - [FAQ](./general/faq.md)

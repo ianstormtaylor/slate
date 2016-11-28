@@ -25,3 +25,5 @@ This is the full reference documentation for all of the pieces of Slate, broken 
 - **Plugins**
   - [Plugins](./plugins/plugin.md)
   - [Core](./plugins/core.md)
+- **Utils**
+  - [Utils](./utils/utils.md)
