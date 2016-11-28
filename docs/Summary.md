@@ -15,8 +15,8 @@
 
 ## Component Reference
 
-- [Editor](./reference/components/editor.md)
-- [Placeholder](./reference/components/placeholder.md)
+- [<Editor>](./reference/components/editor.md)
+- [<Placeholder>](./reference/components/placeholder.md)
 
 
 ## Model Reference
