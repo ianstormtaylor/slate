@@ -13,7 +13,7 @@ import './inline'
 import Block from './block'
 import Node from './node'
 import generateKey from '../utils/generate-key'
-import { OrderedMap, Record } from 'immutable'
+import { List, Record } from 'immutable'
 
 /**
  * Default properties.
@@ -23,7 +23,7 @@ import { OrderedMap, Record } from 'immutable'
 
 const DEFAULTS = {
   key: null,
-  nodes: new OrderedMap(),
+  nodes: new List(),
 }
 
 /**
