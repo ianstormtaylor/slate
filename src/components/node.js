@@ -1,15 +1,12 @@
 
-import Immutable from 'immutable'
 import Base64 from '../serializers/base-64'
 import Debug from 'debug'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TYPES from '../constants/types'
-import IS_DEV from '../constants/is-dev'
 import Leaf from './leaf'
 import Void from './void'
 import scrollTo from '../utils/scroll-to'
-import warn from '../utils/warn'
 
 /**
  * Debug.
@@ -232,9 +229,11 @@ class Node extends React.Component {
    */
 
   render = () => {
-    this.debug('render')
-
+    const { props } = this
     const { node } = this.props
+
+    this.debug('render', { props })
+
     return node.kind == 'text'
       ? this.renderText()
       : this.renderElement()

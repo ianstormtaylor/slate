@@ -4,6 +4,7 @@ import OffsetKey from '../utils/offset-key'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import getWindow from 'get-window'
+import { IS_FIREFOX } from '../constants/environment'
 
 /**
  * Debugger.
@@ -133,13 +134,13 @@ class Leaf extends React.Component {
    */
 
   updateSelection() {
-    const { state, ranges, isVoid } = this.props
+    const { state, ranges } = this.props
     const { selection } = state
 
     // If the selection is blurred we have nothing to do.
     if (selection.isBlurred) return
 
-    let { anchorOffset, focusOffset } = selection
+    const { anchorOffset, focusOffset } = selection
     const { node, index } = this.props
     const { start, end } = OffsetKey.findBounds(index, ranges)
 
@@ -147,13 +148,6 @@ class Leaf extends React.Component {
     const hasAnchor = selection.hasAnchorBetween(node, start, end)
     const hasFocus = selection.hasFocusBetween(node, start, end)
     if (!hasAnchor && !hasFocus) return
-
-    // If the leaf is a void leaf, ensure that it has no width. This is due to
-    // void nodes always rendering an empty leaf, for browser compatibility.
-    if (isVoid) {
-      anchorOffset = 0
-      focusOffset = 0
-    }
 
     // We have a selection to render, so prepare a few things...
     const ref = ReactDOM.findDOMNode(this)
@@ -165,6 +159,7 @@ class Leaf extends React.Component {
     // COMPAT: In Firefox, it's not enough to create a range, you also need to
     // focus the contenteditable element. (2016/11/16)
     function focus() {
+      if (!IS_FIREFOX) return
       if (parent) setTimeout(() => parent.focus())
     }
 
@@ -218,7 +213,7 @@ class Leaf extends React.Component {
       }
     }
 
-    this.debug('updateSelection')
+    this.debug('updateSelection', { selection })
   }
 
   /**
@@ -228,8 +223,6 @@ class Leaf extends React.Component {
    */
 
   render() {
-    this.debug('render')
-
     const { props } = this
     const { node, index } = props
     const offsetKey = OffsetKey.stringify({
@@ -242,6 +235,9 @@ class Leaf extends React.Component {
     // renders where we don't update the leaves cause React's internal state to
     // get out of sync, causing it to not realize the DOM needs updating.
     this.tmp.renders++
+
+
+    this.debug('render', { props })
 
     return (
       <span key={this.tmp.renders} data-offset-key={offsetKey}>

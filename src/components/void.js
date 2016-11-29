@@ -1,10 +1,19 @@
 
+import Debug from 'debug'
 import Leaf from './leaf'
 import Mark from '../models/mark'
 import OffsetKey from '../utils/offset-key'
 import React from 'react'
 import noop from '../utils/noop'
 import { IS_FIREFOX } from '../constants/environment'
+
+/**
+ * Debug.
+ *
+ * @type {Function}
+ */
+
+const debug = Debug('slate:void')
 
 /**
  * Void.
@@ -30,18 +39,38 @@ class Void extends React.Component {
   };
 
   /**
-   * When one of the wrapper elements it clicked, select the void node.
+   * Debug.
    *
-   * @param {Event} e
+   * @param {String} message
+   * @param {Mixed} ...args
    */
 
-  onClick = (e) => {
-    e.preventDefault()
+  debug = (message, ...args) => {
+    const { node } = this.props
+    const { key, type } = node
+    let id = `${key} (${type})`
+    debug(message, `${id}`, ...args)
+  }
+
+  /**
+   * When one of the wrapper elements it clicked, select the void node.
+   *
+   * @param {Event} event
+   */
+
+  onClick = (event) => {
+    event.preventDefault()
+    this.debug('onClick', { event })
+
     const { node, editor } = this.props
     const next = editor
       .getState()
       .transform()
-      .collapseToStartOf(node)
+      // COMPAT: In Chrome & Safari, selections that are at the zero offset of
+      // an inline node will be automatically replaced to be at the last offset
+      // of a previous inline node, which screws us up, so we always want to set
+      // it to the end of the node. (2016/11/29)
+      .collapseToEndOf(node)
       .focus()
       .apply()
 
@@ -55,13 +84,16 @@ class Void extends React.Component {
    */
 
   render = () => {
-    const { children, node } = this.props
+    const { props } = this
+    const { children, node } = props
     const Tag = node.kind == 'block' ? 'div' : 'span'
 
     // Make the outer wrapper relative, so the spacer can overlay it.
     const style = {
       position: 'relative'
     }
+
+    this.debug('render', { props })
 
     return (
       <Tag style={style} onClick={this.onClick}>

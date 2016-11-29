@@ -258,25 +258,25 @@ class Editor extends React.Component {
    */
 
   render = () => {
-    debug('render')
-
-    const handlers = {}
+    const { props, state } = this
+    const handlers = { onChange: this.onChange }
 
     for (const property of EVENT_HANDLERS) {
       handlers[property] = this[property]
     }
 
+    debug('render', { props, state })
+
     return (
       <Content
         {...handlers}
-        className={this.props.className}
+        className={props.className}
         editor={this}
-        onChange={this.onChange}
-        readOnly={this.props.readOnly}
-        schema={this.state.schema}
-        spellCheck={this.props.spellCheck}
-        state={this.state.state}
-        style={this.props.style}
+        readOnly={props.readOnly}
+        schema={state.schema}
+        spellCheck={props.spellCheck}
+        state={state.state}
+        style={props.style}
       />
     )
   }

@@ -174,34 +174,34 @@ class Content extends React.Component {
   /**
    * On before input, bubble up.
    *
-   * @param {Event} e
+   * @param {Event} event
    */
 
-  onBeforeInput = (e) => {
+  onBeforeInput = (event) => {
     if (this.props.readOnly) return
-    if (!this.isInContentEditable(e)) return
+    if (!this.isInContentEditable(event)) return
 
     const data = {}
 
-    debug('onBeforeInput', data)
-    this.props.onBeforeInput(e, data)
+    debug('onBeforeInput', { event, data })
+    this.props.onBeforeInput(event, data)
   }
 
   /**
    * On blur, update the selection to be not focused.
    *
-   * @param {Event} e
+   * @param {Event} event
    */
 
-  onBlur = (e) => {
+  onBlur = (event) => {
     if (this.props.readOnly) return
     if (this.tmp.isCopying) return
-    if (!this.isInContentEditable(e)) return
+    if (!this.isInContentEditable(event)) return
 
     const data = {}
 
-    debug('onBlur', data)
-    this.props.onBlur(e, data)
+    debug('onBlur', { event, data })
+    this.props.onBlur(event, data)
   }
 
   /**
@@ -218,16 +218,16 @@ class Content extends React.Component {
   /**
    * On composition start, set the `isComposing` flag.
    *
-   * @param {Event} e
+   * @param {Event} event
    */
 
-  onCompositionStart = (e) => {
-    if (!this.isInContentEditable(e)) return
+  onCompositionStart = (event) => {
+    if (!this.isInContentEditable(event)) return
 
     this.tmp.isComposing = true
     this.tmp.compositions++
 
-    debug('onCompositionStart')
+    debug('onCompositionStart', { event })
   }
 
   /**
@@ -235,11 +235,11 @@ class Content extends React.Component {
    * increment the `forces` key, which will force the contenteditable element
    * to completely re-render, since IME puts React in an unreconcilable state.
    *
-   * @param {Event} e
+   * @param {Event} event
    */
 
-  onCompositionEnd = (e) => {
-    if (!this.isInContentEditable(e)) return
+  onCompositionEnd = (event) => {
+    if (!this.isInContentEditable(event)) return
 
     this.forces++
     const count = this.tmp.compositions
@@ -252,18 +252,18 @@ class Content extends React.Component {
       this.tmp.isComposing = false
     })
 
-    debug('onCompositionEnd')
+    debug('onCompositionEnd', { event })
   }
 
   /**
    * On copy, defer to `onCutCopy`, then bubble up.
    *
-   * @param {Event} e
+   * @param {Event} event
    */
 
-  onCopy = (e) => {
-    if (!this.isInContentEditable(e)) return
-    const window = getWindow(e.target)
+  onCopy = (event) => {
+    if (!this.isInContentEditable(event)) return
+    const window = getWindow(event.target)
 
     this.tmp.isCopying = true
     window.requestAnimationFrame(() => {
@@ -275,20 +275,20 @@ class Content extends React.Component {
     data.type = 'fragment'
     data.fragment = state.fragment
 
-    debug('onCopy', data)
-    this.props.onCopy(e, data)
+    debug('onCopy', { event, data })
+    this.props.onCopy(event, data)
   }
 
   /**
    * On cut, defer to `onCutCopy`, then bubble up.
    *
-   * @param {Event} e
+   * @param {Event} event
    */
 
-  onCut = (e) => {
+  onCut = (event) => {
     if (this.props.readOnly) return
-    if (!this.isInContentEditable(e)) return
-    const window = getWindow(e.target)
+    if (!this.isInContentEditable(event)) return
+    const window = getWindow(event.target)
 
     this.tmp.isCopying = true
     window.requestAnimationFrame(() => {
@@ -300,61 +300,61 @@ class Content extends React.Component {
     data.type = 'fragment'
     data.fragment = state.fragment
 
-    debug('onCut', data)
-    this.props.onCut(e, data)
+    debug('onCut', { event, data })
+    this.props.onCut(event, data)
   }
 
   /**
    * On drag end, unset the `isDragging` flag.
    *
-   * @param {Event} e
+   * @param {Event} event
    */
 
-  onDragEnd = (e) => {
-    if (!this.isInContentEditable(e)) return
+  onDragEnd = (event) => {
+    if (!this.isInContentEditable(event)) return
 
     this.tmp.isDragging = false
     this.tmp.isInternalDrag = null
 
-    debug('onDragEnd')
+    debug('onDragEnd', { event })
   }
 
   /**
    * On drag over, set the `isDragging` flag and the `isInternalDrag` flag.
    *
-   * @param {Event} e
+   * @param {Event} event
    */
 
-  onDragOver = (e) => {
-    if (!this.isInContentEditable(e)) return
+  onDragOver = (event) => {
+    if (!this.isInContentEditable(event)) return
 
-    const { dataTransfer } = e.nativeEvent
+    const { dataTransfer } = event.nativeEvent
     const transfer = new Transfer(dataTransfer)
 
     // Prevent default when nodes are dragged to allow dropping.
     if (transfer.getType() == 'node') {
-      e.preventDefault()
+      event.preventDefault()
     }
 
     if (this.tmp.isDragging) return
     this.tmp.isDragging = true
     this.tmp.isInternalDrag = false
 
-    debug('onDragOver')
+    debug('onDragOver', { event })
   }
 
   /**
    * On drag start, set the `isDragging` flag and the `isInternalDrag` flag.
    *
-   * @param {Event} e
+   * @param {Event} event
    */
 
-  onDragStart = (e) => {
-    if (!this.isInContentEditable(e)) return
+  onDragStart = (event) => {
+    if (!this.isInContentEditable(event)) return
 
     this.tmp.isDragging = true
     this.tmp.isInternalDrag = true
-    const { dataTransfer } = e.nativeEvent
+    const { dataTransfer } = event.nativeEvent
     const transfer = new Transfer(dataTransfer)
 
     // If it's a node being dragged, the data type is already set.
@@ -365,24 +365,25 @@ class Content extends React.Component {
     const encoded = Base64.serializeNode(fragment)
     dataTransfer.setData(TYPES.FRAGMENT, encoded)
 
-    debug('onDragStart')
+    debug('onDragStart', { event })
   }
 
   /**
    * On drop.
    *
-   * @param {Event} e
+   * @param {Event} event
    */
 
-  onDrop = (e) => {
+  onDrop = (event) => {
     if (this.props.readOnly) return
-    if (!this.isInContentEditable(e)) return
+    if (!this.isInContentEditable(event)) return
 
-    e.preventDefault()
+    event.preventDefault()
 
-    const window = getWindow(e.target)
+    const window = getWindow(event.target)
     const { state } = this.props
-    const { dataTransfer, x, y } = e.nativeEvent
+    const { nativeEvent } = event
+    const { dataTransfer, x, y } = nativeEvent
     const transfer = new Transfer(dataTransfer)
     const data = transfer.getData()
 
@@ -394,7 +395,7 @@ class Content extends React.Component {
       range = window.document.caretRangeFromPoint(x, y)
     } else {
       range = window.document.createRange()
-      range.setStart(e.nativeEvent.rangeParent, e.nativeEvent.rangeOffset)
+      range.setStart(nativeEvent.rangeParent, nativeEvent.rangeOffset)
     }
 
     const startNode = range.startContainer
@@ -419,24 +420,24 @@ class Content extends React.Component {
       data.isInternal = this.tmp.isInternalDrag
     }
 
-    debug('onDrop', data)
-    this.props.onDrop(e, data)
+    debug('onDrop', { event, data })
+    this.props.onDrop(event, data)
   }
 
   /**
    * On input, handle spellcheck and other similar edits that don't go trigger
    * the `onBeforeInput` and instead update the DOM directly.
    *
-   * @param {Event} e
+   * @param {Event} event
    */
 
-  onInput = (e) => {
+  onInput = (event) => {
     if (this.tmp.isComposing) return
     if (this.props.state.isBlurred) return
-    if (!this.isInContentEditable(e)) return
-    debug('onInput')
+    if (!this.isInContentEditable(event)) return
+    debug('onInput', { event })
 
-    const window = getWindow(e.target)
+    const window = getWindow(event.target)
 
     // Get the selection point.
     const native = window.getSelection()
@@ -498,14 +499,15 @@ class Content extends React.Component {
    * On key down, prevent the default behavior of certain commands that will
    * leave the editor in an out-of-sync state, then bubble up.
    *
-   * @param {Event} e
+   * @param {Event} event
    */
 
-  onKeyDown = (e) => {
+  onKeyDown = (event) => {
     if (this.props.readOnly) return
-    if (!this.isInContentEditable(e)) return
+    if (!this.isInContentEditable(event)) return
 
-    const key = keycode(e.which)
+    const { altKey, ctrlKey, metaKey, shiftKey, which } = event
+    const key = keycode(which)
     const data = {}
 
     // When composing, these characters commit the composition but also move the
@@ -515,22 +517,22 @@ class Content extends React.Component {
       this.tmp.isComposing &&
       (key == 'left' || key == 'right' || key == 'up' || key == 'down')
     ) {
-      e.preventDefault()
+      event.preventDefault()
       return
     }
 
     // Add helpful properties for handling hotkeys to the data object.
-    data.code = e.which
+    data.code = which
     data.key = key
-    data.isAlt = e.altKey
-    data.isCmd = IS_MAC ? e.metaKey && !e.altKey : false
-    data.isCtrl = e.ctrlKey && !e.altKey
-    data.isLine = IS_MAC ? e.metaKey : false
-    data.isMeta = e.metaKey
-    data.isMod = IS_MAC ? e.metaKey && !e.altKey : e.ctrlKey && !e.altKey
-    data.isModAlt = IS_MAC ? e.metaKey && e.altKey : e.ctrlKey && e.altKey
-    data.isShift = e.shiftKey
-    data.isWord = IS_MAC ? e.altKey : e.ctrlKey
+    data.isAlt = altKey
+    data.isCmd = IS_MAC ? metaKey && !altKey : false
+    data.isCtrl = ctrlKey && !altKey
+    data.isLine = IS_MAC ? metaKey : false
+    data.isMeta = metaKey
+    data.isMod = IS_MAC ? metaKey && !altKey : ctrlKey && !altKey
+    data.isModAlt = IS_MAC ? metaKey && altKey : ctrlKey && altKey
+    data.isShift = shiftKey
+    data.isWord = IS_MAC ? altKey : ctrlKey
 
     // These key commands have native behavior in contenteditable elements which
     // will cause our state to be out of sync, so prevent them.
@@ -543,44 +545,44 @@ class Content extends React.Component {
       (key == 'y' && data.isMod) ||
       (key == 'z' && data.isMod)
     ) {
-      e.preventDefault()
+      event.preventDefault()
     }
 
-    debug('onKeyDown', data)
-    this.props.onKeyDown(e, data)
+    debug('onKeyDown', { event, data })
+    this.props.onKeyDown(event, data)
   }
 
   /**
    * On paste, determine the type and bubble up.
    *
-   * @param {Event} e
+   * @param {Event} event
    */
 
-  onPaste = (e) => {
+  onPaste = (event) => {
     if (this.props.readOnly) return
-    if (!this.isInContentEditable(e)) return
+    if (!this.isInContentEditable(event)) return
 
-    e.preventDefault()
-    const transfer = new Transfer(e.clipboardData)
+    event.preventDefault()
+    const transfer = new Transfer(event.clipboardData)
     const data = transfer.getData()
 
-    debug('onPaste', data)
-    this.props.onPaste(e, data)
+    debug('onPaste', { event, data })
+    this.props.onPaste(event, data)
   }
 
   /**
    * On select, update the current state's selection.
    *
-   * @param {Event} e
+   * @param {Event} event
    */
 
-  onSelect = (e) => {
+  onSelect = (event) => {
     if (this.props.readOnly) return
     if (this.tmp.isCopying) return
     if (this.tmp.isComposing) return
-    if (!this.isInContentEditable(e)) return
+    if (!this.isInContentEditable(event)) return
 
-    const window = getWindow(e.target)
+    const window = getWindow(event.target)
     const { state } = this.props
     let { document, selection } = state
     const native = window.getSelection()
@@ -626,8 +628,8 @@ class Content extends React.Component {
         .normalize(document)
     }
 
-    debug('onSelect', { data, selection: data.selection.toJS() })
-    this.props.onSelect(e, data)
+    debug('onSelect', { event, data })
+    this.props.onSelect(event, data)
   }
 
   /**
@@ -637,9 +639,8 @@ class Content extends React.Component {
    */
 
   render = () => {
-    debug('render')
-
-    const { className, readOnly, state } = this.props
+    const { props } = this
+    const { className, readOnly, state } = props
     const { document } = state
     const children = document.nodes
       .map(node => this.renderNode(node))
@@ -657,13 +658,15 @@ class Content extends React.Component {
       // weird ways. This hides that. (2016/06/21)
       ...(readOnly ? {} : { WebkitUserModify: 'read-write-plaintext-only' }),
       // Allow for passed-in styles to override anything.
-      ...this.props.style,
+      ...props.style,
     }
 
     // COMPAT: In Firefox, spellchecking can remove entire wrapping elements
     // including inline ones like `<a>`, which is jarring for the user but also
     // causes the DOM to get into an irreconcilable state. (2016/09/01)
-    const spellCheck = IS_FIREFOX ? false : this.props.spellCheck
+    const spellCheck = IS_FIREFOX ? false : props.spellCheck
+
+    debug('render', { props })
 
     return (
       <div
