@@ -371,11 +371,12 @@ function Plugin(options = {}) {
   function onKeyDownEnter(e, data, state) {
     debug('onKeyDownEnter', { data })
 
-    const { document, startKey, startBlock } = state
+    const { document, startKey } = state
+    const hasVoidParent = document.hasVoidParent(startKey)
 
-    // For void blocks, we don't want to split. Instead we just move to the
-    // start of the next text node if one exists.
-    if (startBlock && startBlock.isVoid) {
+    // For void nodes, we don't want to split. Instead we just move to the start
+    // of the next text node if one exists.
+    if (hasVoidParent) {
       const text = document.getNextText(startKey)
       if (!text) return
       return state
