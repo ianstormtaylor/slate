@@ -747,7 +747,7 @@ const Node = {
       last = block.getLastText()
     }
 
-    const next = this.getNextText(last)
+    const next = this.getNextText(last.key)
     if (!next) return null
 
     return this.getClosestBlock(next.key)
@@ -973,7 +973,7 @@ const Node = {
       first = block.getFirstText()
     }
 
-    const previous = this.getPreviousText(first)
+    const previous = this.getPreviousText(first.key)
     if (!previous) return null
 
     return this.getClosestBlock(previous.key)
