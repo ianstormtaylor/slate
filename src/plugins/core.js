@@ -353,6 +353,8 @@ function Plugin(options = {}) {
       case 'delete': return onKeyDownDelete(e, data, state)
       case 'left': return onKeyDownLeft(e, data, state)
       case 'right': return onKeyDownRight(e, data, state)
+      case 'up': return onKeyDownUp(e, data, state)
+      case 'down': return onKeyDownDown(e, data, state)
       case 'd': return onKeyDownD(e, data, state)
       case 'h': return onKeyDownH(e, data, state)
       case 'k': return onKeyDownK(e, data, state)
@@ -508,6 +510,68 @@ function Plugin(options = {}) {
         [method](nextText)
         .apply()
     }
+  }
+
+  /**
+   * On `up` key down, for Macs, fix select to start of block.
+   *
+   * OPTION-SHIFT-UP is supposed to expand to the start of the current block
+   * then the start of the previous block and so on.
+   *
+   * On Chrome and possibly other browsers, OPTION-SHIFT-UP expands the
+   * selection to the start of the current block then extends the selection to
+   * somewhere in the previous block but not to the start of the next
+   * block. This problem does not appear for OPTION-UP.
+   *
+   * @param {Event} e
+   * @param {Object} data
+   * @param {State} state
+   * @return {State}
+   */
+
+  function onKeyDownUp(e, data, state) {
+    if (!IS_MAC || data.isCtrl || !data.isAlt || !data.isShift) return;
+    e.preventDefault();
+    const {selection, document, focusBlock} = state
+    const isStart = selection.hasFocusAtStartOf(focusBlock)
+    const selectBlock = isStart ? document.getPreviousBlock(focusBlock.get('key')) : focusBlock;
+    if (!selectBlock) return;
+    var selectText = selectBlock.getTextAtOffset(0);
+    return state
+      .transform()
+      .extendToStartOf(selectText)
+      .apply();
+  }
+
+  /**
+   * On `down` key down, for Macs, fix select to end of block.
+   *
+   * OPTION-SHIFT-DOWN is supposed to expand to the end of the current block
+   * then the end of the next block and so on.
+   *
+   * On Chrome and possibly other browsers, OPTION-SHIFT-DOWN expands the
+   * selection to the end of the current block then extends the selection to
+   * somewhere in the next block but not to the end of the next
+   * block. This problem does not appear for OPTION-DOWN.
+   *
+   * @param {Event} e
+   * @param {Object} data
+   * @param {State} state
+   * @return {State}
+   */
+
+  function onKeyDownDown(e, data, state) {
+    if (!IS_MAC || data.isCtrl || !data.isAlt || !data.isShift) return;
+    e.preventDefault();
+    const {selection, document, focusBlock} = state
+    const isEnd = selection.hasFocusAtEndOf(focusBlock)
+    const selectBlock = isEnd ? document.getNextBlock(focusBlock.get('key')) : focusBlock;
+    if (!selectBlock) return;
+    var selectText = selectBlock.getTextAtOffset(selectBlock.length);
+    return state
+      .transform()
+      .extendToEndOf(selectText)
+      .apply();
   }
 
   /**
