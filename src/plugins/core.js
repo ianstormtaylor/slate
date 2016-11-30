@@ -530,17 +530,17 @@ function Plugin(options = {}) {
    */
 
   function onKeyDownUp(e, data, state) {
-    if (!IS_MAC || data.isCtrl || !data.isAlt || !data.isShift) return;
-    e.preventDefault();
+    if (!IS_MAC || data.isCtrl || !data.isAlt || !data.isShift) return
+    e.preventDefault()
     const {selection, document, focusBlock} = state
     const isStart = selection.hasFocusAtStartOf(focusBlock)
-    const selectBlock = isStart ? document.getPreviousBlock(focusBlock.get('key')) : focusBlock;
-    if (!selectBlock) return;
-    var selectText = selectBlock.getTextAtOffset(0);
+    const selectBlock = isStart ? document.getPreviousBlock(focusBlock.get('key')) : focusBlock
+    if (!selectBlock) return
+    const selectText = selectBlock.getTextAtOffset(0)
     return state
       .transform()
       .extendToStartOf(selectText)
-      .apply();
+      .apply()
   }
 
   /**
@@ -561,17 +561,17 @@ function Plugin(options = {}) {
    */
 
   function onKeyDownDown(e, data, state) {
-    if (!IS_MAC || data.isCtrl || !data.isAlt || !data.isShift) return;
-    e.preventDefault();
+    if (!IS_MAC || data.isCtrl || !data.isAlt || !data.isShift) return
+    e.preventDefault()
     const {selection, document, focusBlock} = state
     const isEnd = selection.hasFocusAtEndOf(focusBlock)
-    const selectBlock = isEnd ? document.getNextBlock(focusBlock.get('key')) : focusBlock;
-    if (!selectBlock) return;
-    var selectText = selectBlock.getTextAtOffset(selectBlock.length);
+    const selectBlock = isEnd ? document.getNextBlock(focusBlock.get('key')) : focusBlock
+    if (!selectBlock) return
+    const selectText = selectBlock.getTextAtOffset(selectBlock.length)
     return state
       .transform()
       .extendToEndOf(selectText)
-      .apply();
+      .apply()
   }
 
   /**
