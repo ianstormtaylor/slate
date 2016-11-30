@@ -1,6 +1,7 @@
 /* eslint no-console: 0 */
 
 import Normalize from '../utils/normalize'
+import String from '../utils/string'
 import SCHEMA from '../schemas/core'
 import { List } from 'immutable'
 
@@ -120,6 +121,55 @@ export function deleteAtRange(transform, range, options = {}) {
 }
 
 /**
+ * Delete backward until the character boundary at a `range`.
+ *
+ * @param {Transform} transform
+ * @param {Selection} range
+ * @param {Object} options
+ *   @property {Boolean} normalize
+ */
+
+export function deleteCharBackwardAtRange(transform, range, options) {
+  const { state } = transform
+  const { startOffset, startBlock } = state
+  const { text } = startBlock
+  const n = String.getCharOffsetBackward(text, startOffset)
+  transform.deleteBackwardAtRange(range, n, options)
+}
+
+/**
+ * Delete backward until the line boundary at a `range`.
+ *
+ * @param {Transform} transform
+ * @param {Selection} range
+ * @param {Object} options
+ *   @property {Boolean} normalize
+ */
+
+export function deleteLineBackwardAtRange(transform, range, options) {
+  const { state } = transform
+  const { startOffset } = state
+  transform.deleteBackwardAtRange(range, startOffset, options)
+}
+
+/**
+ * Delete backward until the word boundary at a `range`.
+ *
+ * @param {Transform} transform
+ * @param {Selection} range
+ * @param {Object} options
+ *   @property {Boolean} normalize
+ */
+
+export function deleteWordBackwardAtRange(transform, range, options) {
+  const { state } = transform
+  const { startOffset, startBlock } = state
+  const { text } = startBlock
+  const n = String.getWordOffsetBackward(text, startOffset)
+  transform.deleteBackwardAtRange(range, n, options)
+}
+
+/**
  * Delete backward `n` characters at a `range`.
  *
  * @param {Transform} transform
@@ -187,6 +237,55 @@ export function deleteBackwardAtRange(transform, range, n = 1, options = {}) {
   })
 
   transform.deleteAtRange(range, { normalize })
+}
+
+/**
+ * Delete forward until the character boundary at a `range`.
+ *
+ * @param {Transform} transform
+ * @param {Selection} range
+ * @param {Object} options
+ *   @property {Boolean} normalize
+ */
+
+export function deleteCharForwardAtRange(transform, range, options) {
+  const { state } = transform
+  const { startOffset, startBlock } = state
+  const { text } = startBlock
+  const n = String.getCharOffsetForward(text, startOffset)
+  transform.deleteForwardAtRange(range, n, options)
+}
+
+/**
+ * Delete forward until the line boundary at a `range`.
+ *
+ * @param {Transform} transform
+ * @param {Selection} range
+ * @param {Object} options
+ *   @property {Boolean} normalize
+ */
+
+export function deleteLineForwardAtRange(transform, range, options) {
+  const { state } = transform
+  const { startOffset, startBlock } = state
+  transform.deleteForwardAtRange(range, startBlock.length - startOffset, options)
+}
+
+/**
+ * Delete forward until the word boundary at a `range`.
+ *
+ * @param {Transform} transform
+ * @param {Selection} range
+ * @param {Object} options
+ *   @property {Boolean} normalize
+ */
+
+export function deleteWordForwardAtRange(transform, range, options) {
+  const { state } = transform
+  const { startOffset, startBlock } = state
+  const { text } = startBlock
+  const n = String.getWordOffsetForward(text, startOffset)
+  transform.deleteForwardAtRange(range, n, options)
 }
 
 /**
