@@ -519,12 +519,9 @@ function Plugin(options = {}) {
 
   function onKeyDownK(e, data, state) {
     if (!IS_MAC || !data.isCtrl) return
-
-    const { startOffset, startBlock } = state
-
     return state
       .transform()
-      .deleteForward(startBlock.length - startOffset)
+      .deleteLineForward()
       .apply()
   }
 
