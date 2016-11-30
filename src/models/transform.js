@@ -23,11 +23,10 @@ class Transform {
    *
    * @param {Object} properties
    *   @property {State} properties.state
-   *   @property {Boolean} properties.normalized
    */
 
   constructor(properties) {
-    const { state, normalized = true } = properties
+    const { state } = properties
     this.state = state
     this.operations = []
   }

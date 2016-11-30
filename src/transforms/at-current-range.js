@@ -64,6 +64,42 @@ export function deleteBackward(transform, n = 1) {
 }
 
 /**
+ * Delete backward until the character boundary at the current selection.
+ *
+ * @param {Transform} transform
+ */
+
+export function deleteCharBackward(transform) {
+  const { state } = transform
+  const { selection } = state
+  transform.deleteCharBackwardAtRange(selection)
+}
+
+/**
+ * Delete backward until the line boundary at the current selection.
+ *
+ * @param {Transform} transform
+ */
+
+export function deleteLineBackward(transform) {
+  const { state } = transform
+  const { selection } = state
+  transform.deleteLineBackwardAtRange(selection)
+}
+
+/**
+ * Delete backward until the word boundary at the current selection.
+ *
+ * @param {Transform} transform
+ */
+
+export function deleteWordBackward(transform) {
+  const { state } = transform
+  const { selection } = state
+  transform.deleteWordBackwardAtRange(selection)
+}
+
+/**
  * Delete forward `n` characters at the current selection.
  *
  * @param {Transform} transform
@@ -74,6 +110,42 @@ export function deleteForward(transform, n = 1) {
   const { state } = transform
   const { selection } = state
   transform.deleteForwardAtRange(selection, n)
+}
+
+/**
+ * Delete forward until the character boundary at the current selection.
+ *
+ * @param {Transform} transform
+ */
+
+export function deleteCharForward(transform) {
+  const { state } = transform
+  const { selection } = state
+  transform.deleteCharForwardAtRange(selection)
+}
+
+/**
+ * Delete forward until the line boundary at the current selection.
+ *
+ * @param {Transform} transform
+ */
+
+export function deleteLineForward(transform) {
+  const { state } = transform
+  const { selection } = state
+  transform.deleteLineForwardAtRange(selection)
+}
+
+/**
+ * Delete forward until the word boundary at the current selection.
+ *
+ * @param {Transform} transform
+ */
+
+export function deleteWordForward(transform) {
+  const { state } = transform
+  const { selection } = state
+  transform.deleteWordForwardAtRange(selection)
 }
 
 /**

@@ -353,9 +353,11 @@ function Plugin(options = {}) {
       case 'delete': return onKeyDownDelete(e, data, state)
       case 'left': return onKeyDownLeft(e, data, state)
       case 'right': return onKeyDownRight(e, data, state)
+      case 'd': return onKeyDownD(e, data, state)
+      case 'h': return onKeyDownH(e, data, state)
+      case 'k': return onKeyDownK(e, data, state)
       case 'y': return onKeyDownY(e, data, state)
       case 'z': return onKeyDownZ(e, data, state)
-      case 'k': return onKeyDownK(e, data, state)
     }
   }
 
@@ -369,8 +371,6 @@ function Plugin(options = {}) {
    */
 
   function onKeyDownEnter(e, data, state) {
-    debug('onKeyDownEnter', { data })
-
     const { document, startKey } = state
     const hasVoidParent = document.hasVoidParent(startKey)
 
@@ -401,36 +401,13 @@ function Plugin(options = {}) {
    */
 
   function onKeyDownBackspace(e, data, state) {
-    debug('onKeyDownBackspace', { data })
-
-    // If expanded, delete regularly.
-    if (state.isExpanded) {
-      return state
-        .transform()
-        .delete()
-        .apply()
-    }
-
-    const { startOffset, startBlock } = state
-    const text = startBlock.text
-    let n
-
-    // Determine how far backwards to delete.
-    if (data.isWord) {
-      n = String.getWordOffsetBackward(text, startOffset)
-    }
-
-    else if (data.isLine) {
-      n = startOffset
-    }
-
-    else {
-      n = String.getCharOffsetBackward(text, startOffset)
-    }
+    let boundary = 'Char'
+    if (data.isWord) boundary = 'Word'
+    if (data.isLine) boundary = 'Line'
 
     return state
       .transform()
-      .deleteBackward(n)
+      [`delete${boundary}Backward`]()
       .apply()
   }
 
@@ -444,36 +421,13 @@ function Plugin(options = {}) {
    */
 
   function onKeyDownDelete(e, data, state) {
-    debug('onKeyDownDelete', { data })
-
-    // If expanded, delete regularly.
-    if (state.isExpanded) {
-      return state
-        .transform()
-        .delete()
-        .apply()
-    }
-
-    const { startOffset, startBlock } = state
-    const text = startBlock.text
-    let n
-
-    // Determine how far forwards to delete.
-    if (data.isWord) {
-      n = String.getWordOffsetForward(text, startOffset)
-    }
-
-    else if (data.isLine) {
-      n = text.length - startOffset
-    }
-
-    else {
-      n = String.getCharOffsetForward(text, startOffset)
-    }
+    let boundary = 'Char'
+    if (data.isWord) boundary = 'Word'
+    if (data.isLine) boundary = 'Line'
 
     return state
       .transform()
-      .deleteForward(n)
+      [`delete${boundary}Forward`]()
       .apply()
   }
 
@@ -504,8 +458,6 @@ function Plugin(options = {}) {
     ) {
       const previousText = document.getPreviousText(startKey)
       if (!previousText) return
-
-      debug('onKeyDownLeft', { data })
 
       e.preventDefault()
       return state
@@ -543,8 +495,6 @@ function Plugin(options = {}) {
       const nextText = document.getNextText(startKey)
       if (!nextText) return state
 
-      debug('onKeyDownRight', { data })
-
       // COMPAT: In Chrome & Safari, selections that are at the zero offset of
       // an inline node will be automatically replaced to be at the last offset
       // of a previous inline node, which screws us up, so we always want to set
@@ -561,6 +511,60 @@ function Plugin(options = {}) {
   }
 
   /**
+   * On `d` key down, for Macs, delete one character forward.
+   *
+   * @param {Event} e
+   * @param {Object} data
+   * @param {State} state
+   * @return {State}
+   */
+
+  function onKeyDownD(e, data, state) {
+    if (!IS_MAC || !data.isCtrl) return
+    e.preventDefault()
+    return state
+      .transform()
+      .deleteCharForward()
+      .apply()
+  }
+
+  /**
+   * On `h` key down, for Macs, delete until the end of the line.
+   *
+   * @param {Event} e
+   * @param {Object} data
+   * @param {State} state
+   * @return {State}
+   */
+
+  function onKeyDownH(e, data, state) {
+    if (!IS_MAC || !data.isCtrl) return
+    e.preventDefault()
+    return state
+      .transform()
+      .deleteCharBackward()
+      .apply()
+  }
+
+  /**
+   * On `k` key down, for Macs, delete until the end of the line.
+   *
+   * @param {Event} e
+   * @param {Object} data
+   * @param {State} state
+   * @return {State}
+   */
+
+  function onKeyDownK(e, data, state) {
+    if (!IS_MAC || !data.isCtrl) return
+    e.preventDefault()
+    return state
+      .transform()
+      .deleteLineForward()
+      .apply()
+  }
+
+  /**
    * On `y` key down, redo.
    *
    * @param {Event} e
@@ -571,8 +575,6 @@ function Plugin(options = {}) {
 
   function onKeyDownY(e, data, state) {
     if (!data.isMod) return
-
-    debug('onKeyDownY', { data })
 
     return state
       .transform()
@@ -592,34 +594,10 @@ function Plugin(options = {}) {
   function onKeyDownZ(e, data, state) {
     if (!data.isMod) return
 
-    debug('onKeyDownZ', { data })
-
     return state
       .transform()
       [data.isShift ? 'redo' : 'undo']()
       .apply({ save: false })
-  }
-
-  /**
-   * On `k` key down, delete untill the end of the line (mac only)
-   *
-   * @param {Event} e
-   * @param {Object} data
-   * @param {State} state
-   * @return {State}
-   */
-
-  function onKeyDownK(e, data, state) {
-    if (!IS_MAC || !data.isCtrl) return
-
-    debug('onKeyDownK', { data })
-
-    const { startOffset, startBlock } = state
-
-    return state
-      .transform()
-      .deleteForward(startBlock.text.length - startOffset)
-      .apply()
   }
 
   /**
@@ -695,15 +673,11 @@ function Plugin(options = {}) {
    */
 
   function onSelect(e, data, state) {
-    const { selection } = data
-
-    debug('onSelect', { data, selection: selection.toJS() })
+    debug('onSelect', { data })
 
     return state
       .transform()
-      .moveTo(selection)
-      // Since the document has not changed, we only need to normalize the
-      // selection and this is done automatically in `transform.apply()`.
+      .moveTo(data.selection)
       .apply()
   }
 
