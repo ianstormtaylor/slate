@@ -1,17 +1,22 @@
 
-import uniqueId from 'lodash/uniqueId'
+/**
+ * An auto-incrementing index for generating keys.
+ *
+ * @type {Number}
+ */
+
+let n
 
 /**
- * Default the generator function to Lodash's implementation, which just returns
- * incrementing numbers as strings.
+ * The global key generating function.
  *
  * @type {Function}
  */
 
-let generate = uniqueId
+let generate
 
 /**
- * Create a key.
+ * Generate a key.
  *
  * @return {String}
  */
@@ -31,6 +36,21 @@ function setKeyGenerator(func) {
 }
 
 /**
+ * Reset the key generating function to its initial state.
+ */
+
+function resetKeyGenerator() {
+  n = 0
+  generate = () => `${n++}`
+}
+
+/**
+ * Set the initial state.
+ */
+
+resetKeyGenerator()
+
+/**
  * Export.
  *
  * @type {Object}
@@ -38,5 +58,6 @@ function setKeyGenerator(func) {
 
 export {
   generateKey as default,
-  setKeyGenerator
+  setKeyGenerator,
+  resetKeyGenerator
 }
