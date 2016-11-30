@@ -673,15 +673,11 @@ function Plugin(options = {}) {
    */
 
   function onSelect(e, data, state) {
-    const { selection } = data
-
-    debug('onSelect', { data, selection: selection.toJS() })
+    debug('onSelect', { data })
 
     return state
       .transform()
-      .moveTo(selection)
-      // Since the document has not changed, we only need to normalize the
-      // selection and this is done automatically in `transform.apply()`.
+      .moveTo(data.selection)
       .apply()
   }
 
