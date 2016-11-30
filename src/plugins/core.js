@@ -353,9 +353,11 @@ function Plugin(options = {}) {
       case 'delete': return onKeyDownDelete(e, data, state)
       case 'left': return onKeyDownLeft(e, data, state)
       case 'right': return onKeyDownRight(e, data, state)
+      case 'd': return onKeyDownD(e, data, state)
+      case 'h': return onKeyDownH(e, data, state)
+      case 'k': return onKeyDownK(e, data, state)
       case 'y': return onKeyDownY(e, data, state)
       case 'z': return onKeyDownZ(e, data, state)
-      case 'k': return onKeyDownK(e, data, state)
     }
   }
 
@@ -509,7 +511,43 @@ function Plugin(options = {}) {
   }
 
   /**
-   * On `k` key down, delete untill the end of the line (mac only)
+   * On `d` key down, for Macs, delete one character forward.
+   *
+   * @param {Event} e
+   * @param {Object} data
+   * @param {State} state
+   * @return {State}
+   */
+
+  function onKeyDownD(e, data, state) {
+    if (!IS_MAC || !data.isCtrl) return
+    e.preventDefault()
+    return state
+      .transform()
+      .deleteCharForward()
+      .apply()
+  }
+
+  /**
+   * On `h` key down, for Macs, delete until the end of the line.
+   *
+   * @param {Event} e
+   * @param {Object} data
+   * @param {State} state
+   * @return {State}
+   */
+
+  function onKeyDownH(e, data, state) {
+    if (!IS_MAC || !data.isCtrl) return
+    e.preventDefault()
+    return state
+      .transform()
+      .deleteCharBackward()
+      .apply()
+  }
+
+  /**
+   * On `k` key down, for Macs, delete until the end of the line.
    *
    * @param {Event} e
    * @param {Object} data
@@ -519,6 +557,7 @@ function Plugin(options = {}) {
 
   function onKeyDownK(e, data, state) {
     if (!IS_MAC || !data.isCtrl) return
+    e.preventDefault()
     return state
       .transform()
       .deleteLineForward()
