@@ -61,6 +61,7 @@ export function deleteAtRange(transform, range, options = {}) {
   const { normalize = true } = options
   const { startKey, startOffset, endKey, endOffset } = range
 
+  // If the start and end key are the same, we can just remove text.
   if (startKey == endKey) {
     const index = startOffset
     const length = endOffset - startOffset
@@ -68,10 +69,9 @@ export function deleteAtRange(transform, range, options = {}) {
     return
   }
 
+  // Split at the range edges within a common ancestor, without normalizing.
   let { state } = transform
   let { document } = state
-
-  // split the nodes at range, within the common ancestor
   let ancestor = document.getCommonAncestor(startKey, endKey)
   let startChild = ancestor.getHighestChild(startKey)
   let endChild = ancestor.getHighestChild(endKey)
@@ -81,12 +81,9 @@ export function deleteAtRange(transform, range, options = {}) {
   transform.splitNodeByKey(startChild.key, startOff, OPTS)
   transform.splitNodeByKey(endChild.key, endOff, OPTS)
 
+  // Refresh variables.
   state = transform.state
   document = state.document
-  const startBlock = document.getClosestBlock(startKey)
-  const endBlock = document.getClosestBlock(document.getNextText(endKey).key)
-
-  // remove all of the nodes between range
   ancestor = document.getCommonAncestor(startKey, endKey)
   startChild = ancestor.getHighestChild(startKey)
   endChild = ancestor.getHighestChild(endKey)
@@ -94,12 +91,17 @@ export function deleteAtRange(transform, range, options = {}) {
   const endIndex = ancestor.nodes.indexOf(endChild)
   const middles = ancestor.nodes.slice(startIndex + 1, endIndex + 1)
 
+  // Remove all of the middle nodes, between the splits.
   if (middles.size) {
-    // remove first nodes directly so the document is not normalized
     middles.forEach(child => {
       transform.removeNodeByKey(child.key, OPTS)
     })
   }
+
+  // If the start and end block are different, move all of the nodes from the
+  // end block into the start block.
+  const startBlock = document.getClosestBlock(startKey)
+  const endBlock = document.getClosestBlock(document.getNextText(endKey).key)
 
   if (startBlock.key !== endBlock.key) {
     endBlock.nodes.forEach((child, i) => {

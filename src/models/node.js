@@ -990,8 +990,14 @@ const Node = {
     let length = 0
     return this
       .getTexts()
-      .find((text) => {
+      .find((text, i, texts) => {
+        const next = texts.get(i + 1)
         length += text.length
+
+        // If the next text is an empty string, return false, because we want
+        // the furthest text node at the offset, and it will also match.
+        if (next && next.length == 0) return false
+
         return length >= offset
       })
   },
