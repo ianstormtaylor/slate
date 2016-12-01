@@ -842,13 +842,16 @@ export function unwrapBlockAtRange(transform, range, properties, options = {}) {
       transform.splitNodeByKey(block.key, offset, OPTS)
       state = transform.state
       document = state.document
-      const extra = document.getPreviousSibling(firstMatch.key)
 
       children.forEach((child, i) => {
+        if (i == 0) {
+          const extra = child
+          child = document.getNextBlock(child.key)
+          transform.removeNodeByKey(extra.key, OPTS)
+        }
+
         transform.moveNodeByKey(child.key, parent.key, index + 1 + i, OPTS)
       })
-
-      transform.removeNodeByKey(extra.key, OPTS)
     }
   })
 

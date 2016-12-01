@@ -987,7 +987,13 @@ const Node = {
    */
 
   getTextAtOffset(offset) {
+    // PERF: Add a few shortcuts for the obvious cases.
+    if (offset == 0) return this.getFirstText()
+    if (offset == this.length) return this.getLastText()
+    if (offset < 0 || offset > this.length) return null
+
     let length = 0
+
     return this
       .getTexts()
       .find((text, i, texts) => {
@@ -998,7 +1004,7 @@ const Node = {
         // the furthest text node at the offset, and it will also match.
         if (next && next.length == 0) return false
 
-        return length >= offset
+        return length > offset
       })
   },
 
@@ -1331,6 +1337,7 @@ const Node = {
     let child = node
     let one
     let two
+
 
     if (node.kind != 'text') {
       child = node.getTextAtOffset(offset)
