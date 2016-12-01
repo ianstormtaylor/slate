@@ -670,7 +670,7 @@ class Content extends React.Component {
 
     return (
       <div
-        data-slate-content={true}
+        data-slate-content
         key={this.forces}
         ref={this.ref}
         contentEditable={!readOnly}
