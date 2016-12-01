@@ -530,7 +530,7 @@ function Plugin(options = {}) {
    */
 
   function onKeyDownUp(e, data, state) {
-    if (!IS_MAC || data.isCtrl || !data.isAlt || !data.isShift) return
+    if (!IS_MAC || data.isCtrl || !data.isAlt) return
     e.preventDefault()
     const {selection, document, focusBlock} = state
     const isStart = selection.hasFocusAtStartOf(focusBlock)
@@ -539,7 +539,7 @@ function Plugin(options = {}) {
     const selectText = selectBlock.getTextAtOffset(0)
     return state
       .transform()
-      .extendToStartOf(selectText)
+      [data.isShift ? 'extendToStartOf' : 'collapseToStartOf'](selectText)
       .apply()
   }
 
@@ -561,7 +561,7 @@ function Plugin(options = {}) {
    */
 
   function onKeyDownDown(e, data, state) {
-    if (!IS_MAC || data.isCtrl || !data.isAlt || !data.isShift) return
+    if (!IS_MAC || data.isCtrl || !data.isAlt) return
     e.preventDefault()
     const {selection, document, focusBlock} = state
     const isEnd = selection.hasFocusAtEndOf(focusBlock)
@@ -570,7 +570,7 @@ function Plugin(options = {}) {
     const selectText = selectBlock.getTextAtOffset(selectBlock.length)
     return state
       .transform()
-      .extendToEndOf(selectText)
+      [data.isShift ? 'extendToEndOf' : 'collapseToEndOf'](selectText)
       .apply()
   }
 
