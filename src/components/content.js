@@ -623,6 +623,31 @@ class Content extends React.Component {
         isBackward: null
       }
 
+      // If the selection is at the end of a non-void inline node, and there is
+      // a node after it, put it in the node after instead.
+      const anchorText = document.getNode(anchor.key)
+      const focusText = document.getNode(focus.key)
+      const anchorInline = document.getClosestInline(anchor.key)
+      const focusInline = document.getClosestInline(focus.key)
+
+      if (anchorInline && anchor.offset == anchorText.length) {
+        const block = document.getClosestBlock(anchor.key)
+        const next = block.getNextText(anchor.key)
+        if (next) {
+          properties.anchorKey = next.key
+          properties.anchorOffset = 0
+        }
+      }
+
+      if (focusInline && focus.offset == focusText.length) {
+        const block = document.getClosestBlock(focus.key)
+        const next = block.getNextText(focus.key)
+        if (next) {
+          properties.focusKey = next.key
+          properties.focusOffset = 0
+        }
+      }
+
       data.selection = selection
         .merge(properties)
         .normalize(document)
