@@ -420,8 +420,6 @@ function splitNode(state, operation) {
   const splitAnchor = text.key == anchorKey && textOffset <= anchorOffset
   const splitFocus = text.key == focusKey && textOffset <= focusOffset
 
-  debugger
-
   // If either the anchor of focus was after the split, we need to update them.
   if (splitFocus || splitAnchor) {
     const nextText = document.getNextText(text.key)
