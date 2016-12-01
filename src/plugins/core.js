@@ -513,15 +513,11 @@ function Plugin(options = {}) {
   }
 
   /**
-   * On `up` key down, for Macs, fix select to start of block.
+   * On `up` key down, for Macs, move the selection to start of the block.
    *
-   * OPTION-SHIFT-UP is supposed to expand to the start of the current block
-   * then the start of the previous block and so on.
-   *
-   * On Chrome and possibly other browsers, OPTION-SHIFT-UP expands the
-   * selection to the start of the current block then extends the selection to
-   * somewhere in the previous block but not to the start of the next
-   * block. This problem does not appear for OPTION-UP.
+   * COMPAT: Certain browsers don't handle the selection updates properly. In
+   * Chrome, option-shift-up doesn't properly extend the selection. And in
+   * Firefox, option-up doesn't properly move the selection.
    *
    * @param {Event} e
    * @param {Object} data
@@ -531,28 +527,29 @@ function Plugin(options = {}) {
 
   function onKeyDownUp(e, data, state) {
     if (!IS_MAC || data.isCtrl || !data.isAlt) return
+
+    const transform = data.isShift ? 'extendToStartOf' : 'collapseToStartOf'
+    const { selection, document, focusKey, focusBlock } = state
+    const block = selection.hasFocusAtStartOf(focusBlock)
+      ? document.getPreviousBlock(focusKey)
+      : focusBlock
+
+    if (!block) return
+    const text = block.getFirstText()
+
     e.preventDefault()
-    const {selection, document, focusBlock} = state
-    const isStart = selection.hasFocusAtStartOf(focusBlock)
-    const selectBlock = isStart ? document.getPreviousBlock(focusBlock.get('key')) : focusBlock
-    if (!selectBlock) return
-    const selectText = selectBlock.getTextAtOffset(0)
     return state
       .transform()
-      [data.isShift ? 'extendToStartOf' : 'collapseToStartOf'](selectText)
+      [transform](text)
       .apply()
   }
 
   /**
-   * On `down` key down, for Macs, fix select to end of block.
+   * On `down` key down, for Macs, move the selection to end of the block.
    *
-   * OPTION-SHIFT-DOWN is supposed to expand to the end of the current block
-   * then the end of the next block and so on.
-   *
-   * On Chrome and possibly other browsers, OPTION-SHIFT-DOWN expands the
-   * selection to the end of the current block then extends the selection to
-   * somewhere in the next block but not to the end of the next
-   * block. This problem does not appear for OPTION-DOWN.
+   * COMPAT: Certain browsers don't handle the selection updates properly. In
+   * Chrome, option-shift-down doesn't properly extend the selection. And in
+   * Firefox, option-down doesn't properly move the selection.
    *
    * @param {Event} e
    * @param {Object} data
@@ -562,15 +559,20 @@ function Plugin(options = {}) {
 
   function onKeyDownDown(e, data, state) {
     if (!IS_MAC || data.isCtrl || !data.isAlt) return
+
+    const transform = data.isShift ? 'extendToEndOf' : 'collapseToEndOf'
+    const { selection, document, focusKey, focusBlock } = state
+    const block = selection.hasFocusAtEndOf(focusBlock)
+      ? document.getNextBlock(focusKey)
+      : focusBlock
+
+    if (!block) return
+    const text = block.getLastText()
+
     e.preventDefault()
-    const {selection, document, focusBlock} = state
-    const isEnd = selection.hasFocusAtEndOf(focusBlock)
-    const selectBlock = isEnd ? document.getNextBlock(focusBlock.get('key')) : focusBlock
-    if (!selectBlock) return
-    const selectText = selectBlock.getTextAtOffset(selectBlock.length)
     return state
       .transform()
-      [data.isShift ? 'extendToEndOf' : 'collapseToEndOf'](selectText)
+      [transform](text)
       .apply()
   }
 
