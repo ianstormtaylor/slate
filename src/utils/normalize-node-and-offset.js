@@ -17,8 +17,8 @@ function normalizeNodeAndOffset(node, offset) {
     const index = isLast ? offset - 1 : offset
     node = getNonComment(node, index, direction)
 
-    // If the node is not a text node, traverse until we have one.
-    while (node.nodeType != 3) {
+    // If the node is not a text or a <br> node, traverse until we have one.
+    while (node.nodeType == 1 && node.tagName != 'BR') {
       const i = isLast ? node.childNodes.length - 1 : 0
       node = getNonComment(node, i, direction)
     }
