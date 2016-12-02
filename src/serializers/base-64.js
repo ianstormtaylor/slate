@@ -73,8 +73,8 @@ function serialize(state) {
  * @return {String}
  */
 
-function serializeNode(node) {
-  const raw = Raw.serializeNode(node)
+function serializeNode(node, options) {
+  const raw = Raw.serializeNode(node, options)
   const encoded = encode(raw)
   return encoded
 }
