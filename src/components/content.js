@@ -510,6 +510,13 @@ class Content extends React.Component {
     const key = keycode(which)
     const data = {}
 
+    // Keep track of an `isShifting` flag, because it's often used to trigger
+    // "Paste and Match Style" commands, but isn't available on the event in a
+    // normal paste event.
+    if (key == 'shift') {
+      this.tmp.isShifting = true
+    }
+
     // When composing, these characters commit the composition but also move the
     // selection before we're able to handle it, so prevent their default,
     // selection-moving behavior.
@@ -553,6 +560,21 @@ class Content extends React.Component {
   }
 
   /**
+   * On key up, unset the `isShifting` flag.
+   *
+   * @param {Event} event
+   */
+
+  onKeyUp = (event) => {
+    const { which } = event
+    const key = keycode(which)
+
+    if (key == 'shift') {
+      this.tmp.isShifting = false
+    }
+  }
+
+  /**
    * On paste, determine the type and bubble up.
    *
    * @param {Event} event
@@ -565,6 +587,10 @@ class Content extends React.Component {
     event.preventDefault()
     const transfer = new Transfer(event.clipboardData)
     const data = transfer.getData()
+
+    // Attach the `isShift` flag, so that people can use it to trigger "Paste
+    // and Match Style" logic.
+    data.isShift = !!this.tmp.isShifting
 
     debug('onPaste', { event, data })
     this.props.onPaste(event, data)
@@ -712,7 +738,7 @@ class Content extends React.Component {
         onDrop={this.onDrop}
         onInput={this.onInput}
         onKeyDown={this.onKeyDown}
-        onKeyUp={noop}
+        onKeyUp={this.onKeyUp}
         onPaste={this.onPaste}
         onSelect={this.onSelect}
         spellCheck={spellCheck}
