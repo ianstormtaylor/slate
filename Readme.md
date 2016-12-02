@@ -101,6 +101,7 @@ Slate encourages you to write small, reusable modules. Check out the public ones
 - [`slate-paste-linkify`](https://github.com/ianstormtaylor/slate-paste-linkify) wraps the selected text in a link when a URL is pasted from the clipboard.
 - [`slate-prism`](https://github.com/SamyPesse/slate-prism) highlights code blocks with [Prism.js](http://prismjs.com/)!
 - [`slate-soft-break`](https://github.com/ianstormtaylor/slate-soft-break) adds a soft break when `enter` is pressed.
+- [`slate-drop-or-paste-images`](https://github.com/ianstormtaylor/slate-drop-or-paste-images) handles image dropping or pasting
 - [**View all plugins on `npm`...**](https://www.npmjs.com/browse/keyword/slate)
 
 <br/>
