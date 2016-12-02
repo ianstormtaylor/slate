@@ -1,4 +1,5 @@
 
+
 nodes:
   - kind: block
     type: default
@@ -6,9 +7,14 @@ nodes:
       - kind: text
         text: ""
       - kind: inline
-        type: default
+        type: link
         nodes:
           - kind: text
-            text: one
+            text: "Hello "
+      - kind: text
+        text: ""
+      - kind: inline
+        isVoid: true
+        type: image
       - kind: text
         text: ""

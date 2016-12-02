@@ -1,0 +1,10 @@
+
+nodes:
+  - kind: block
+    type: default
+    nodes:
+      - kind: inline
+        type: link
+        nodes:
+          - kind: text
+            text: "Hello"
