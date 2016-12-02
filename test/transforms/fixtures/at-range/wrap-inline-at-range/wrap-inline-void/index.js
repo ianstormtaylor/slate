@@ -2,7 +2,6 @@
 export default function (state) {
   const { document, selection } = state
   const texts = document.getTexts()
-  // The first text is the one arround the inline void
   const second = texts.get(1)
   const range = selection.merge({
     anchorKey: second.key,
