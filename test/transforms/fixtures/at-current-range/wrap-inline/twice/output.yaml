@@ -7,10 +7,14 @@ nodes:
       - kind: inline
         type: outer
         nodes:
+          - kind: text
+            text: ""
           - kind: inline
             type: inner
             nodes:
               - kind: text
                 text: word
+          - kind: text
+            text: ""
       - kind: text
         text: " after"

@@ -12,6 +12,8 @@ nodes:
         nodes:
           - kind: text
             text: hyperlink
+      - kind: text
+        text: ""
   - kind: block
     type: paragraph
     nodes:

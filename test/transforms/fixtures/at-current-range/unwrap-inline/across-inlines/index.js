@@ -4,12 +4,12 @@ import assert from 'assert'
 export default function (state) {
   const { document, selection } = state
   const texts = document.getTexts()
-  const first = texts.first()
-  const second = texts.last()
+  const second = texts.get(1)
+  const twelfth = texts.last(11)
   const range = selection.merge({
-    anchorKey: first.key,
+    anchorKey: second.key,
     anchorOffset: 2,
-    focusKey: second.key,
+    focusKey: twelfth.key,
     focusOffset: 2
   })
 

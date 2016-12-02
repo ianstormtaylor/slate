@@ -20,15 +20,15 @@ export default function (state) {
     .apply()
 
   const two = next.document.getTexts().get(1)
-  const three = next.document.getTexts().get(2)
+  const five = next.document.getTexts().get(4)
 
   assert.deepEqual(
     next.selection.toJS(),
     range.merge({
       anchorKey: two.key,
       anchorOffset: 0,
-      focusKey: three.key,
-      focusOffset: three.length
+      focusKey: five.key,
+      focusOffset: five.length
     }).toJS()
   )
 

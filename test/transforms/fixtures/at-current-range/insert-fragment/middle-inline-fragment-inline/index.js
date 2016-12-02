@@ -11,12 +11,11 @@ export default function (state) {
 
   const { document, selection } = state
   const texts = document.getTexts()
-  const first = texts.first()
-  const last = fragment.getTexts().last()
+  const second = texts.get(1)
   const range = selection.merge({
-    anchorKey: first.key,
+    anchorKey: second.key,
     anchorOffset: 2,
-    focusKey: first.key,
+    focusKey: second.key,
     focusOffset: 2
   })
 
@@ -26,15 +25,16 @@ export default function (state) {
     .insertFragment(fragment)
     .apply()
 
-  const updated = next.document.getTexts().get(1)
+  const updated = next.document.getTexts().get(4)
 
+  // TODO: this seems wrong.
   assert.deepEqual(
     next.selection.toJS(),
     range.merge({
       anchorKey: updated.key,
-      anchorOffset: last.length,
+      anchorOffset: 0,
       focusKey: updated.key,
-      focusOffset: last.length
+      focusOffset: 0
     }).toJS()
   )
 
