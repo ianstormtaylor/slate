@@ -34,9 +34,9 @@ function decode(string) {
  * @return {State}
  */
 
-function deserialize(string) {
+function deserialize(string, options) {
   const raw = decode(string)
-  const state = Raw.deserialize(raw)
+  const state = Raw.deserialize(raw, options)
   return state
 }
 
@@ -47,9 +47,9 @@ function deserialize(string) {
  * @return {Node}
  */
 
-function deserializeNode(string) {
+function deserializeNode(string, options) {
   const raw = decode(string)
-  const node = Raw.deserializeNode(raw)
+  const node = Raw.deserializeNode(raw, options)
   return node
 }
 
@@ -60,8 +60,8 @@ function deserializeNode(string) {
  * @return {String}
  */
 
-function serialize(state) {
-  const raw = Raw.serialize(state)
+function serialize(state, options) {
+  const raw = Raw.serialize(state, options)
   const encoded = encode(raw)
   return encoded
 }
@@ -73,8 +73,8 @@ function serialize(state) {
  * @return {String}
  */
 
-function serializeNode(node) {
-  const raw = Raw.serializeNode(node)
+function serializeNode(node, options) {
+  const raw = Raw.serializeNode(node, options)
   const encoded = encode(raw)
   return encoded
 }
