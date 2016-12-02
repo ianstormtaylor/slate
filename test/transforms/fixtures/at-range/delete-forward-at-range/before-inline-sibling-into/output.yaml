@@ -9,6 +9,6 @@ nodes:
         type: link
         nodes:
           - kind: text
-            text: two
+            text: wo
       - kind: text
         text: three

@@ -2,16 +2,16 @@
 export default function (state) {
   const { document, selection } = state
   const texts = document.getTexts()
-  const first = texts.first()
+  const last = texts.last()
   const range = selection.merge({
-    anchorKey: first.key,
-    anchorOffset: 0,
-    focusKey: first.key,
-    focusOffset: 0
+    anchorKey: last.key,
+    anchorOffset: last.length,
+    focusKey: last.key,
+    focusOffset: last.length
   })
 
   return state
     .transform()
-    .deleteForwardAtRange(range)
+    .deleteBackwardAtRange(range)
     .apply()
 }
