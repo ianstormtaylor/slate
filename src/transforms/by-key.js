@@ -324,6 +324,30 @@ export function unwrapBlockByKey(transform, key, properties, options) {
   transform.unwrapBlockAtRange(range, properties, options)
 }
 
+
+/**
+ * Wrap a node in an inline with `properties`.
+ *
+ * @param {Transform} transform
+ * @param {String} key The node to wrap
+ * @param {Block|Object|String} inline The wrapping inline (its children are discarded)
+ * @param {Object} options
+ *   @property {Boolean} normalize
+ */
+
+export function wrapInlineByKey(transform, key, inline, options) {
+  inline = Normalize.inline(inline)
+  inline = inline.merge({ nodes: inline.nodes.clear() })
+
+  const { document } = transform.state
+  const node = document.assertDescendant(key)
+  const parent = document.getParent(node.key)
+  const index = parent.nodes.indexOf(node)
+
+  transform.insertNodeByKey(parent.key, index, inline, { normalize: false })
+  transform.moveNodeByKey(node.key, inline.key, 0, options)
+}
+
 /**
  * Wrap a node in a block with `properties`.
  *

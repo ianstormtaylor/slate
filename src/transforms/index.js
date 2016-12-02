@@ -109,6 +109,7 @@ import {
   unwrapInlineByKey,
   unwrapBlockByKey,
   wrapBlockByKey,
+  wrapInlineByKey,
 } from './by-key'
 
 /**
@@ -278,6 +279,7 @@ export default {
   unwrapInlineByKey,
   unwrapBlockByKey,
   wrapBlockByKey,
+  wrapInlineByKey,
 
   /**
    * On selection.
