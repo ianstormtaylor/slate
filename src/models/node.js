@@ -1143,6 +1143,17 @@ const Node = {
   },
 
   /**
+   * Check if a node has an inline parent by `key`.
+   *
+   * @param {String} key
+   * @return {Node|Null}
+   */
+
+  hasInlineParent(key) {
+    return !!this.getClosestInline(key)
+  },
+
+  /**
    * Insert a `node` at `index`.
    *
    * @param {Number} index

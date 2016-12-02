@@ -516,6 +516,18 @@ function Plugin(options = {}) {
       const nextText = document.getNextText(startKey)
       if (!nextText) return state
 
+      // COMPAT: selections that are in an empty text node followed by an inline node
+      // will be reset in the empty text node
+      const nextHasInlineParent = document.hasInlineParent(nextText.key)
+      if (nextHasInlineParent) {
+        e.preventDefault()
+        return state
+          .transform()
+          .collapseToStartOf(nextText)
+          .moveForward(1)
+          .apply()
+      }
+
       // COMPAT: In Chrome & Safari, selections that are at the zero offset of
       // an inline node will be automatically replaced to be at the last offset
       // of a previous inline node, which screws us up, so we always want to set
