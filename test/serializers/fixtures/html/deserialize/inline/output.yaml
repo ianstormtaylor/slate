@@ -4,14 +4,16 @@ nodes:
     isVoid: false
     data: {}
     nodes:
-    - type: link
-      isVoid: false
-      data: {}
-      nodes:
-        - characters:
-            - text: o
-              marks: []
-            - text: n
-              marks: []
-            - text: e
-              marks: []
+      - characters: []
+      - type: link
+        isVoid: false
+        data: {}
+        nodes:
+          - characters:
+              - text: o
+                marks: []
+              - text: n
+                marks: []
+              - text: e
+                marks: []
+      - characters: []

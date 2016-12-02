@@ -8,6 +8,11 @@ document:
       data: {}
       isVoid: false
       nodes:
+        - kind: text
+          ranges:
+            - kind: range
+              text: ""
+              marks: []
         - kind: inline
           type: link
           isVoid: false
@@ -19,3 +24,8 @@ document:
                 - kind: range
                   text: one
                   marks: []
+        - kind: text
+          ranges:
+            - kind: range
+              text: ""
+              marks: []

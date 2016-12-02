@@ -4,10 +4,12 @@ nodes:
     isVoid: false
     data: {}
     nodes:
+    - characters: []
     - type: link
       isVoid: false
       data: {}
       nodes:
+        - characters: []
         - type: hashtag
           isVoid: false
           data: {}
@@ -19,3 +21,5 @@ nodes:
                   marks: []
                 - text: e
                   marks: []
+        - characters: []
+    - characters: []

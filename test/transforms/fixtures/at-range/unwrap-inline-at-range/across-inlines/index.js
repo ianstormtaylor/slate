@@ -2,12 +2,12 @@
 export default function (state) {
   const { document, selection } = state
   const texts = document.getTexts()
-  const first = texts.first()
-  const second = texts.last()
+  const second = texts.get(1)
+  const thirteenth = texts.get(12)
   const range = selection.merge({
-    anchorKey: first.key,
+    anchorKey: second.key,
     anchorOffset: 2,
-    focusKey: second.key,
+    focusKey: thirteenth.key,
     focusOffset: 2
   })
 

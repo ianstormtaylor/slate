@@ -10,6 +10,8 @@ nodes:
         data:
           key: one
         nodes:
+          - kind: text
+            text: ""
           - kind: inline
             type: hashtag
             data:
@@ -17,5 +19,7 @@ nodes:
             nodes:
               - kind: text
                 text: or
+          - kind: text
+            text: ""
       - kind: text
         text: d
