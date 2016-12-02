@@ -178,13 +178,13 @@ const rules = [
     },
     validate: (node) => {
       const invalids = node.nodes.reduce((list, child, index) => {
-        if (child.kind == 'block') return list
-        if (!child.isVoid) return list
+        if (child.kind !== 'inline') return list
 
         const prev = index > 0 ? node.nodes.get(index - 1) : null
         const next = node.nodes.get(index + 1)
+        // We don't test if "prev" is inline, since it has already been processed in the loop
         const insertBefore = !prev
-        const insertAfter = !next || isInlineVoid(next)
+        const insertAfter = !next || (next.kind == 'inline')
 
         if (insertAfter || insertBefore) {
           list = list.push({ insertAfter, insertBefore, index })
@@ -267,13 +267,13 @@ const rules = [
         const next = nodes.get(i + 1)
 
         // If it's the first node, and the next is a void, preserve it.
-        if (!prev && isInlineVoid(next)) return
+        if (!prev && next.kind == 'inline') return
 
-        // It it's the last node, and the previous is a void, preserve it.
-        if (!next && isInlineVoid(prev)) return
+        // It it's the last node, and the previous is an inline, preserve it.
+        if (!next && prev.kind == 'inline') return
 
-        // If it's surrounded by voids, preserve it.
-        if (next && prev && isInlineVoid(next) && isInlineVoid(prev)) return
+        // If it's surrounded by inlines, preserve it.
+        if (next && prev && next.kind == 'inline' && prev.kind == 'inline') return
 
         // Otherwise, remove it.
         return true
@@ -289,17 +289,6 @@ const rules = [
   }
 
 ]
-
-/**
- * Test if a `node` is an inline void node.
- *
- * @param {Node} node
- * @return {Boolean}
- */
-
-function isInlineVoid(node) {
-  return (node.kind == 'inline' && node.isVoid)
-}
 
 /**
  * Create the core schema.
