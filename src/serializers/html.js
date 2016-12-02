@@ -69,6 +69,7 @@ class Html {
    *
    * @param {Object} options
    *   @property {Array} rules
+   *   @property {String} defaultBlockType
    */
 
   constructor(options = {}) {
@@ -76,6 +77,8 @@ class Html {
       ...(options.rules || []),
       TEXT_RULE
     ]
+
+    this.defaultBlockType = options.defaultBlockType || 'paragraph'
   }
 
   /**
@@ -105,7 +108,7 @@ class Html {
 
       const block = {
         kind: 'block',
-        type: 'paragraph',
+        type: this.defaultBlockType,
         nodes: [node]
       }
 
