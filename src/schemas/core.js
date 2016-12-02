@@ -178,11 +178,11 @@ const rules = [
     },
     validate: (node) => {
       const invalids = node.nodes.reduce((list, child, index) => {
-        if (child.kind == 'block') return list
-        if (!child.isVoid) return list
+        if (child.kind !== 'inline') return list
 
         const prev = index > 0 ? node.nodes.get(index - 1) : null
         const next = node.nodes.get(index + 1)
+        // We don't test if "prev" is inline, since it has already been processed in the loop
         const insertBefore = !prev
         const insertAfter = !next || (next.kind == 'inline')
 
