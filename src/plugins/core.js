@@ -469,7 +469,7 @@ function Plugin(options = {}) {
 
   function onKeyDownLeft(e, data, state) {
     if (data.isCtrl) return
-    if (data.isOpt) return
+    if (data.isAlt) return
     if (state.isExpanded) return
 
     const { document, startKey, startText } = state
@@ -529,7 +529,7 @@ function Plugin(options = {}) {
 
   function onKeyDownRight(e, data, state) {
     if (data.isCtrl) return
-    if (data.isOpt) return
+    if (data.isAlt) return
     if (state.isExpanded) return
 
     const { document, startKey, startText } = state
