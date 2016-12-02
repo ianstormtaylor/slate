@@ -387,6 +387,9 @@ const Node = {
    */
 
   getCommonAncestor(one, two) {
+    one = Normalize.key(one)
+    two = Normalize.key(two)
+
     if (one == this.key) return this
     if (two == this.key) return this
 
@@ -514,6 +517,9 @@ const Node = {
    */
 
   areDescendantSorted(key1, key2) {
+    key1 = Normalize.key(key1)
+    key2 = Normalize.key(key2)
+
     let sorted
 
     this.forEachDescendant(n => {
