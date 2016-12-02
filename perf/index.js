@@ -17,7 +17,6 @@ const jsdomGlobal = require('jsdom-global')
 jsdomGlobal()
 
 const fs = require('fs')
-const _ = require('lodash')
 const readMetadata = require('read-metadata')
 const { Raw } = require('..')
 const memoize = require('../lib/utils/memoize')
@@ -97,7 +96,7 @@ function runBenchmarks() {
       setup() {
         const scope = global.getScope()
         // Each benchmark is given the chance to do its own setup
-        const state = scope.benchmark.setup(
+        const state = scope.benchmark.setup( // eslint-disable-line no-unused-vars
           scope.Raw.deserialize(scope.input, { terse: true })
         )
       },
@@ -119,20 +118,20 @@ function runBenchmarks() {
 
   suite
   // On benchmark completion
-  .on('cycle', (event) => {
-    const result = serializeResult(event)
-    results[result.name] = result
-    compareResult(result, reference)
-  })
+    .on('cycle', (event) => {
+      const result = serializeResult(event)
+      results[result.name] = result
+      compareResult(result, reference)
+    })
   // On suite completion
-  .on('complete', (event) => {
-    if (outputPath) {
-      save(results, outputPath)
-      print(`\nSaved results as JSON to ${outputPath}`)
-    }
-  })
+    .on('complete', (event) => {
+      if (outputPath) {
+        save(results, outputPath)
+        print(`\nSaved results as JSON to ${outputPath}`)
+      }
+    })
   // Run async to properly flush logs
-  .run({ 'async': true })
+    .run({ 'async': true })
 }
 
 /**
@@ -141,10 +140,10 @@ function runBenchmarks() {
  */
 
 function parseCommandLineOptions(process) {
-  let outputPath,
-      reference,
-      only,
-      help = false
+  let outputPath
+  let reference
+  let only
+  let help = false
 
   const options = process.argv.slice(2)
 
@@ -224,12 +223,12 @@ function serializeResult(event) {
 
   else {
     const { hz } = target
-    const { mean, rme } = target.stats
-    const stats = _.pick(target.stats, [
-      'rme',
-      'mean',
-      'sample'
-    ])
+    const { mean, rme, sample } = target.stats
+    const stats = {
+      rme,
+      mean,
+      sample
+    }
 
     Object.assign(result, {
       hz,

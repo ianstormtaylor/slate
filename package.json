@@ -16,7 +16,6 @@
     "immutable": "^3.8.1",
     "is-empty": "^1.0.0",
     "keycode": "^2.1.2",
-    "lodash": "^4.13.1",
     "type-of": "^2.0.1",
     "ua-parser-js": "^0.7.10"
   },
