@@ -4,6 +4,7 @@ import CorePlugin from '../plugins/core'
 import Debug from 'debug'
 import React from 'react'
 import Schema from '../models/schema'
+import State from '../models/state'
 import noop from '../utils/noop'
 
 /**
@@ -58,7 +59,7 @@ class Editor extends React.Component {
     readOnly: React.PropTypes.bool,
     schema: React.PropTypes.object,
     spellCheck: React.PropTypes.bool,
-    state: React.PropTypes.object.isRequired,
+    state: React.PropTypes.instanceOf(State).isRequired,
     style: React.PropTypes.object
   };
 
