@@ -60,6 +60,7 @@ Transform methods can either operate on the [`Document`](./document.md), the [`S
   - [`unwrapInlineByKey`](#unwrapinlinebykey)
   - [`unwrapBlockByKey`](#unwrapblockbykey)
   - [`wrapBlockByKey`](#wrapblockbykey)
+  - [`wrapInlineByKey`](#wrapinlinebykey)
 - [Document Transforms](#document-transforms)
   - [`deleteAtRange`](#deleteatrange)
   - [`deleteBackwardAtRange`](#deletebackwardatrange)
@@ -337,6 +338,12 @@ Unwrap all inner content of a [`Block`](./block.md) node that match `properties`
 `wrapBlockByKey(key: String, type: String) => Transform`
 
 Wrap the given node in a [`Block`](./block.md) node that match `properties`. For convenience, you can pass a `type` string or `properties` object.
+
+### `wrapInlineByKey`
+`wrapInlineByKey(key: String, properties: Object) => Transform` <br/>
+`wrapInlineByKey(key: String, type: String) => Transform`
+
+Wrap the given node in a [`Inline`](./inline.md) node that match `properties`. For convenience, you can pass a `type` string or `properties` object.
 
 ## Document Transforms
 

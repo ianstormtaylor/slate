@@ -987,15 +987,24 @@ export function wrapBlockAtRange(transform, range, block, options = {}) {
  */
 
 export function wrapInlineAtRange(transform, range, inline, options = {}) {
-  if (range.isCollapsed) return
+  let { state } = transform
+  let { document } = state
+  const { normalize = true } = options
+  const { startKey, startOffset, endKey, endOffset } = range
+
+  if (range.isCollapsed) {
+    // Wrapping an inline void
+    const inlineParent = document.getClosestInline(startKey)
+    if (!inlineParent.isVoid) {
+      return
+    }
+
+    return transform.wrapInlineByKey(inlineParent.key, inline, options)
+  }
 
   inline = Normalize.inline(inline)
   inline = inline.merge({ nodes: inline.nodes.clear() })
 
-  const { normalize = true } = options
-  const { startKey, startOffset, endKey, endOffset } = range
-  let { state } = transform
-  let { document } = state
   const blocks = document.getBlocksAtRange(range)
   let startBlock = document.getClosestBlock(startKey)
   let endBlock = document.getClosestBlock(endKey)
