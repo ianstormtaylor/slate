@@ -10,8 +10,8 @@
 
 function normalizeNodeAndOffset(node, offset) {
   // If it's an element node, its offset refers to the index of its children
-  // including comment nodes, so convert it to a text equivalent.
-  if (node.nodeType == 1) {
+  // including comment nodes, so try to find the right text child node.
+  if (node.nodeType == 1 && node.childNodes.length) {
     const isLast = offset == node.childNodes.length
     const direction = isLast ? 'backward' : 'forward'
     const index = isLast ? offset - 1 : offset
