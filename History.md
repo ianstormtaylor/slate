@@ -5,6 +5,16 @@ This document maintains a list of changes to Slate with each new version. Until 
 ---
 
 
+### `0.16.0` — December 2, 2016
+
+###### BREAKING CHANGES
+
+- **Inline nodes are now always surrounded by text nodes.** Previously this behavior only occured for inline nodes with `isVoid: true`. Now, all inline nodes will always be surrounded by text nodes. If text nodes don't exist, empty ones will be created. This allows for more consistent behavior across Slate, and parity with other editing experiences.
+
+
+---
+
+
 ### `0.15.0` - November 17, 2016
 
 ###### BREAKING CHANGES
