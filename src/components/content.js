@@ -10,7 +10,6 @@ import Transfer from '../utils/transfer'
 import TYPES from '../constants/types'
 import getWindow from 'get-window'
 import keycode from 'keycode'
-import noop from '../utils/noop'
 import { IS_FIREFOX, IS_MAC } from '../constants/environment'
 
 /**
@@ -656,7 +655,7 @@ class Content extends React.Component {
       const anchorInline = document.getClosestInline(anchor.key)
       const focusInline = document.getClosestInline(focus.key)
 
-      if (anchorInline && anchor.offset == anchorText.length) {
+      if (anchorInline && !anchorInline.isVoid && anchor.offset == anchorText.length) {
         const block = document.getClosestBlock(anchor.key)
         const next = block.getNextText(anchor.key)
         if (next) {
@@ -665,7 +664,7 @@ class Content extends React.Component {
         }
       }
 
-      if (focusInline && focus.offset == focusText.length) {
+      if (focusInline && !focusInline.isVoid && focus.offset == focusText.length) {
         const block = document.getClosestBlock(focus.key)
         const next = block.getNextText(focus.key)
         if (next) {

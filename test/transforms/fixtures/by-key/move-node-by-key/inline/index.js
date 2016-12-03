@@ -6,6 +6,6 @@ export default function (state) {
 
   return state
     .transform()
-    .moveNodeByKey(first.key, block.key, 1)
+    .moveNodeByKey(first.key, block.key, 3)
     .apply()
 }

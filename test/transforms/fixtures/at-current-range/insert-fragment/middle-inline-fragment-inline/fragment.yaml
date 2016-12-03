@@ -3,8 +3,12 @@ nodes:
   - kind: block
     type: list-item
     nodes:
+      - kind: text
+        text: ""
       - kind: inline
         type: hashtag
         nodes:
           - kind: text
             text: fragment
+      - kind: text
+        text: ""

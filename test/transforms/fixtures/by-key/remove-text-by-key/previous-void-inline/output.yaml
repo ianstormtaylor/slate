@@ -8,8 +8,12 @@ nodes:
       - kind: inline
         type: image
         isVoid: true
+      - kind: text
+        text: ""
       - kind: inline
         type: link
         nodes:
           - kind: text
             text: two
+      - kind: text
+        text: ""

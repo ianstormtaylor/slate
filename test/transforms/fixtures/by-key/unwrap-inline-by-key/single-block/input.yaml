@@ -17,3 +17,5 @@ nodes:
         nodes:
           - kind: text
             text: another
+      - kind: text
+        text: ""

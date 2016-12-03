@@ -3,9 +3,13 @@ nodes:
   - kind: block
     type: default
     nodes:
+      - kind: text
+        text: ""
       - kind: inline
         type: default
         nodes:
           - kind: text
             ranges:
               - text: word
+      - kind: text
+        text: ""

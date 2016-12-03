@@ -1,10 +1,10 @@
 
 export default function (state) {
-  const { document, selection } = state
-  const second = document.getTexts().get(1)
+  const { document } = state
+  const third = document.getTexts().get(2)
 
   return state
     .transform()
-    .removeTextByKey(second.key, 0, 1)
+    .removeTextByKey(third.key, 0, 1)
     .apply()
 }

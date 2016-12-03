@@ -4,7 +4,7 @@ import assert from 'assert'
 export default function (state) {
   const { document, selection } = state
   const texts = document.getTexts()
-  const secondText = texts.get(1)
+  const secondText = texts.get(3)
 
   const nextSelection = selection.merge({
     anchorKey: secondText.key,

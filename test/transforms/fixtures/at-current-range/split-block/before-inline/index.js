@@ -18,7 +18,7 @@ export default function (state) {
     .splitBlock()
     .apply()
 
-  const updated = next.document.getTexts().get(1)
+  const updated = next.document.getTexts().get(2)
 
   assert.deepEqual(
     next.selection.toJS(),
