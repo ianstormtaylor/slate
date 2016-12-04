@@ -8,7 +8,6 @@
   "dependencies": {
     "cheerio": "^0.22.0",
     "debug": "^2.3.2",
-    "detect-browser": "^1.3.3",
     "direction": "^0.1.5",
     "es6-map": "^0.1.4",
     "esrever": "^0.2.0",
@@ -16,8 +15,7 @@
     "immutable": "^3.8.1",
     "is-empty": "^1.0.0",
     "keycode": "^2.1.2",
-    "type-of": "^2.0.1",
-    "ua-parser-js": "^0.7.10"
+    "type-of": "^2.0.1"
   },
   "peerDependencies": {
     "react": "^0.14.0 || ^15.0.0",
