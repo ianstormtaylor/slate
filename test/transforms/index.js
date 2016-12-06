@@ -1,6 +1,6 @@
 
-import fs from 'fs'
-import readMetadata from 'read-metadata'
+import fs from 'fs-promise'
+import readYaml from 'read-yaml-promise'
 import strip from '../helpers/strip-dynamic'
 import toCamel from 'to-camel-case'
 import { Raw } from '../..'
@@ -11,7 +11,7 @@ import { resolve } from 'path'
  * Tests.
  */
 
-describe('transforms', () => {
+describe('transforms', async () => {
   describe('by-key', () => {
     const dir = resolve(__dirname, './fixtures/by-key')
     const transforms = fs.readdirSync(dir)
@@ -26,11 +26,11 @@ describe('transforms', () => {
         for (const test of tests) {
           if (test[0] == '.') continue
 
-          it(test, () => {
+          it(test, async () => {
             const testDir = resolve(transformDir, test)
             const fn = require(testDir).default
-            const input = readMetadata.sync(resolve(testDir, 'input.yaml'))
-            const expected = readMetadata.sync(resolve(testDir, 'output.yaml'))
+            const input = await readYaml(resolve(testDir, 'input.yaml'))
+            const expected = await readYaml(resolve(testDir, 'output.yaml'))
 
             let state = Raw.deserialize(input, { terse: true })
             state = fn(state)
@@ -56,10 +56,10 @@ describe('transforms', () => {
         for (const test of tests) {
           if (test[0] == '.') continue
 
-          it(test, () => {
+          it(test, async () => {
             const testDir = resolve(transformDir, test)
             const fn = require(testDir).default
-            const input = readMetadata.sync(resolve(testDir, 'input.yaml'))
+            const input = await readYaml(resolve(testDir, 'input.yaml'))
             const state = Raw.deserialize(input, { terse: true })
             fn(state)
           })
@@ -82,11 +82,11 @@ describe('transforms', () => {
         for (const test of tests) {
           if (test[0] == '.') continue
 
-          it(test, () => {
+          it(test, async () => {
             const testDir = resolve(transformDir, test)
             const fn = require(testDir).default
-            const input = readMetadata.sync(resolve(testDir, 'input.yaml'))
-            const expected = readMetadata.sync(resolve(testDir, 'output.yaml'))
+            const input = await readYaml(resolve(testDir, 'input.yaml'))
+            const expected = await readYaml(resolve(testDir, 'output.yaml'))
 
             let state = Raw.deserialize(input, { terse: true })
             state = fn(state)
@@ -112,11 +112,11 @@ describe('transforms', () => {
         for (const test of tests) {
           if (test[0] == '.') continue
 
-          it(test, () => {
+          it(test, async () => {
             const testDir = resolve(transformDir, test)
             const fn = require(testDir).default
-            const input = readMetadata.sync(resolve(testDir, 'input.yaml'))
-            const expected = readMetadata.sync(resolve(testDir, 'output.yaml'))
+            const input = await readYaml(resolve(testDir, 'input.yaml'))
+            const expected = await readYaml(resolve(testDir, 'output.yaml'))
 
             let state = Raw.deserialize(input, { terse: true })
             state = fn(state)
@@ -142,11 +142,11 @@ describe('transforms', () => {
         for (const test of tests) {
           if (test[0] == '.') continue
 
-          it(test, () => {
+          it(test, async () => {
             const testDir = resolve(transformDir, test)
             const fn = require(testDir).default
-            const input = readMetadata.sync(resolve(testDir, 'input.yaml'))
-            const expected = readMetadata.sync(resolve(testDir, 'output.yaml'))
+            const input = await readYaml(resolve(testDir, 'input.yaml'))
+            const expected = await readYaml(resolve(testDir, 'output.yaml'))
 
             let state = Raw.deserialize(input, { terse: true })
             state = fn(state)

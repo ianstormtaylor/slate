@@ -3,8 +3,8 @@ import React from 'react'
 import ReactDOM from 'react-dom/server'
 import assert from 'assert'
 import cheerio from 'cheerio'
-import fs from 'fs'
-import readMetadata from 'read-metadata'
+import fs from 'fs-promise'
+import readYaml from 'read-yaml-promise'
 import { Editor, Raw } from '../..'
 import { resolve } from 'path'
 
@@ -18,10 +18,10 @@ describe('rendering', () => {
   for (const test of tests) {
     if (test[0] === '.') continue
 
-    it(test, () => {
+    it(test, async () => {
       const dir = resolve(__dirname, './fixtures', test)
-      const input = readMetadata.sync(resolve(dir, 'input.yaml'))
-      const output = fs.readFileSync(resolve(dir, 'output.html'), 'utf8')
+      const input = await readYaml(resolve(dir, 'input.yaml'))
+      const output = await fs.readFile(resolve(dir, 'output.html'), 'utf8')
       const props = {
         state: Raw.deserialize(input, { terse: true }),
         onChange: () => {},
