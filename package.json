@@ -63,6 +63,7 @@
     "react-frame-component": "^0.6.2",
     "react-portal": "^2.2.0",
     "react-router": "^2.5.1",
+    "read-metadata": "^1.0.0",
     "read-yaml-promise": "^1.0.2",
     "selection-position": "^1.0.0",
     "slate-auto-replace-text": "^0.3.0",
