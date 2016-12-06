@@ -1,7 +1,6 @@
 
-import 'jsdom-global/register'
 import fs from 'fs'
-import readMetadata from 'read-metadata'
+import readYaml from 'read-yaml-promise'
 import strip from '../helpers/strip-dynamic'
 import { Raw, Schema } from '../..'
 import { resolve } from 'path'
@@ -24,10 +23,10 @@ describe('schema', () => {
       for (const test of tests) {
         if (test[0] == '.') continue
 
-        it(test, () => {
+        it(test, async () => {
           const testDir = resolve(__dirname, './fixtures', category, test)
-          const input = readMetadata.sync(resolve(testDir, 'input.yaml'))
-          const expected = readMetadata.sync(resolve(testDir, 'output.yaml'))
+          const input = await readYaml(resolve(testDir, 'input.yaml'))
+          const expected = await readYaml(resolve(testDir, 'output.yaml'))
           const schema = Schema.create(require(testDir))
           const state = Raw.deserialize(input, { terse: true })
           const normalized = state.transform().normalize(schema).apply()

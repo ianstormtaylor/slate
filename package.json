@@ -25,6 +25,7 @@
     "babel-cli": "^6.10.1",
     "babel-core": "^6.9.1",
     "babel-eslint": "^6.1.0",
+    "babel-jest": "^17.0.2",
     "babel-preset-es2015": "^6.9.0",
     "babel-preset-react": "^6.5.0",
     "babel-preset-stage-0": "^6.5.0",
@@ -41,10 +42,12 @@
     "eslint-plugin-react": "^6.4.1",
     "faker": "^3.1.0",
     "fbjs": "^0.8.3",
+    "fs-promise": "^1.0.0",
     "gh-pages": "^0.11.0",
     "http-server": "^0.9.0",
     "is-image": "^1.0.1",
     "is-url": "^1.2.2",
+    "jest": "^17.0.3",
     "jsdom": "9.6.0",
     "jsdom-global": "2.1.0",
     "microtime": "2.1.1",
@@ -61,6 +64,7 @@
     "react-portal": "^2.2.0",
     "react-router": "^2.5.1",
     "read-metadata": "^1.0.0",
+    "read-yaml-promise": "^1.0.2",
     "selection-position": "^1.0.0",
     "slate-auto-replace-text": "^0.3.0",
     "slate-collapse-on-escape": "^0.2.0",
@@ -98,7 +102,7 @@
     "release:next": "np --tag=next",
     "start": "http-server ./examples",
     "test": "npm-run-all build:test tests",
-    "tests": "mocha --compilers js:babel-core/register --reporter spec ./test/server.js",
+    "tests": "jest",
     "watch": "npm-run-all --parallel --print-label watch:lib watch:examples start",
     "watch:lib": "babel --watch --out-dir ./lib ./src",
     "watch:examples": "watchify --debug --transform babelify ./examples/index.js -o ./examples/build.dev.js"
@@ -108,6 +112,10 @@
     "react": "React",
     "react-dom": "ReactDOM",
     "react-dom/server": "ReactDOMServer"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testRegex": "/test/(rendering|schema|serializers|transforms)/index\\.js$"
   },
   "keywords": [
     "canvas",
