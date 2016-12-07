@@ -8,6 +8,12 @@ import {
 } from './apply-operation'
 
 /**
+ * Call external transform.
+ */
+
+import call from './call'
+
+/**
  * Operations.
  */
 
@@ -183,6 +189,12 @@ export default {
    */
 
   applyOperation,
+
+  /**
+   * Call external transform.
+   */
+
+  call,
 
   /**
    * Operations.

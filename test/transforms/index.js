@@ -157,4 +157,24 @@ describe('transforms', async () => {
       })
     }
   })
+
+  describe('call', () => {
+    const dir = resolve(__dirname, './fixtures/call')
+    const tests = fs.readdirSync(dir)
+    for (const test of tests) {
+      if (test[0] == '.') continue
+
+      it(test, async () => {
+        const testDir = resolve(dir, test)
+        const fn = require(testDir).default
+        const input = await readYaml(resolve(testDir, 'input.yaml'))
+        const expected = await readYaml(resolve(testDir, 'output.yaml'))
+
+        let state = Raw.deserialize(input, { terse: true })
+        state = fn(state)
+        const output = Raw.serialize(state, { terse: true })
+        strictEqual(strip(output), strip(expected))
+      })
+    }
+  })
 })
