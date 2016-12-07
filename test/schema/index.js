@@ -1,10 +1,10 @@
 
+import assert from 'assert'
 import fs from 'fs'
 import readYaml from 'read-yaml-promise'
 import strip from '../helpers/strip-dynamic'
 import { Raw, Schema } from '../..'
 import { resolve } from 'path'
-import { strictEqual } from '../helpers/assert-json'
 
 /**
  * Tests.
@@ -31,7 +31,7 @@ describe('schema', () => {
           const state = Raw.deserialize(input, { terse: true })
           const normalized = state.transform().normalize(schema).apply()
           const output = Raw.serialize(normalized, { terse: true })
-          strictEqual(strip(output), strip(expected))
+          assert.deepEqual(strip(output), strip(expected))
         })
       }
     })

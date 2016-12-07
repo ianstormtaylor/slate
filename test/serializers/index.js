@@ -4,7 +4,6 @@ import fs from 'fs'
 import readYaml from 'read-yaml-promise'
 import strip from '../helpers/strip-dynamic'
 import { Html, Plain, Raw } from '../..'
-import { strictEqual } from '../helpers/assert-json'
 import { resolve } from 'path'
 import React from 'react'
 import { Iterable } from 'immutable'
@@ -28,7 +27,7 @@ describe('serializers', () => {
           const input = fs.readFileSync(resolve(innerDir, 'input.html'), 'utf8')
           const state = html.deserialize(input)
           const json = state.document.toJS()
-          strictEqual(strip(json), expected)
+          assert.deepEqual(strip(json), expected)
         })
       }
     })
@@ -45,7 +44,7 @@ describe('serializers', () => {
           const input = require(resolve(innerDir, 'input.js')).default
           const expected = fs.readFileSync(resolve(innerDir, 'output.html'), 'utf8')
           const serialized = html.serialize(input)
-          strictEqual(serialized, expected.trim())
+          assert.deepEqual(serialized, expected.trim())
         })
       }
 
@@ -72,7 +71,7 @@ describe('serializers', () => {
           const input = fs.readFileSync(resolve(innerDir, 'input.txt'), 'utf8')
           const state = Plain.deserialize(input.replace(/\n$/m, ''))
           const json = state.document.toJS()
-          strictEqual(strip(json), expected)
+          assert.deepEqual(strip(json), expected)
         })
       }
     })
@@ -88,7 +87,7 @@ describe('serializers', () => {
           const input = require(resolve(innerDir, 'input.js')).default
           const expected = fs.readFileSync(resolve(innerDir, 'output.txt'), 'utf8')
           const serialized = Plain.serialize(input)
-          strictEqual(serialized, expected.replace(/\n$/m, ''))
+          assert.deepEqual(serialized, expected.replace(/\n$/m, ''))
         })
       }
     })
@@ -107,7 +106,7 @@ describe('serializers', () => {
           const input = await readYaml(resolve(innerDir, 'input.yaml'))
           const state = Raw.deserialize(input)
           const json = state.document.toJS()
-          strictEqual(strip(json), expected)
+          assert.deepEqual(strip(json), expected)
         })
       }
     })
@@ -124,7 +123,7 @@ describe('serializers', () => {
           const expected = await readYaml(resolve(innerDir, 'output.yaml'))
           const serialized = Raw.serialize(input)
           serialized.document = strip(serialized.document)
-          strictEqual(serialized, expected)
+          assert.deepEqual(serialized, expected)
         })
       }
     })
@@ -141,7 +140,7 @@ describe('serializers', () => {
           const input = await readYaml(resolve(innerDir, 'input.yaml'))
           const state = Raw.deserialize(input, { terse: true })
           const json = state.document.toJS()
-          strictEqual(strip(json), expected)
+          assert.deepEqual(strip(json), expected)
         })
       }
     })
@@ -157,7 +156,7 @@ describe('serializers', () => {
           const input = require(resolve(innerDir, 'input.js')).default
           const expected = await readYaml(resolve(innerDir, 'output.yaml'))
           const serialized = Raw.serialize(input, { terse: true })
-          strictEqual(strip(serialized), expected)
+          assert.deepEqual(strip(serialized), expected)
         })
       }
     })
