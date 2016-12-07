@@ -5,8 +5,6 @@ import { Block } from '../../../../../..'
 export default function (state) {
   const { document, selection } = state
   const first = document.getBlocks().first()
-
-  debugger
   const next = state
     .transform()
     .insertNodeByKey(document.key, 0, first)
