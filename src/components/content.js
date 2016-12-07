@@ -166,7 +166,7 @@ class Content extends React.Component {
     const { target } = event
     return (
       (target.isContentEditable) &&
-      (target === element || target.closest('[data-slate-content]') === element)
+      (target === element || target.closest('[data-slate-editor]') === element)
     )
   }
 
@@ -720,7 +720,7 @@ class Content extends React.Component {
 
     return (
       <div
-        data-slate-content
+        data-slate-editor
         key={this.forces}
         ref={this.ref}
         contentEditable={!readOnly}
