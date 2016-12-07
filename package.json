@@ -113,10 +113,6 @@
     "react-dom": "ReactDOM",
     "react-dom/server": "ReactDOMServer"
   },
-  "jest": {
-    "testEnvironment": "node",
-    "testRegex": "/test/(rendering|schema|serializers|transforms)/index\\.js$"
-  },
   "keywords": [
     "canvas",
     "contenteditable",
