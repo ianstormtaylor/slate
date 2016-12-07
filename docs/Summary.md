@@ -29,6 +29,7 @@
 - [Mark](./reference//models/mark.md)
 - [Node](./reference/models/node.md)
 - [Selection](./reference/models/selection.md)
+- [Schema](./reference/models/schema.md)
 - [State](./reference/models/state.md)
 - [Text](./reference//models/text.md)
 - [Transform](./reference/models/transform.md)
