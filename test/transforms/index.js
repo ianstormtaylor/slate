@@ -12,6 +12,7 @@ import { resolve } from 'path'
  */
 
 describe('transforms', () => {
+  
   describe('by-key', () => {
     const dir = resolve(__dirname, './fixtures/by-key')
     const transforms = fs.readdirSync(dir)
@@ -126,7 +127,7 @@ describe('transforms', () => {
         }
       })
     }
-  })
+ })
 
   describe('on-history', () => {
     const dir = resolve(__dirname, './fixtures/on-history')
@@ -154,6 +155,24 @@ describe('transforms', () => {
             strictEqual(strip(output), strip(expected))
           })
         }
+      })
+    }
+  })
+
+  describe('call', () => {
+    const dir = resolve(__dirname, './fixtures/call')
+    const tests = fs.readdirSync(dir)
+    for (const test of tests) {
+      it(test, () => {
+        const testDir = resolve(dir, test)
+        const fn = require(testDir).default
+        const input = readMetadata.sync(resolve(testDir, 'input.yaml'))
+        const expected = readMetadata.sync(resolve(testDir, 'output.yaml'))
+
+        let state = Raw.deserialize(input, { terse: true })
+        state = fn(state)
+        const output = Raw.serialize(state, { terse: true })
+        strictEqual(strip(output), strip(expected))
       })
     }
   })
