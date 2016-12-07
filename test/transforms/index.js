@@ -1,10 +1,10 @@
 
+import assert from 'assert'
 import fs from 'fs-promise'
 import readYaml from 'read-yaml-promise'
 import strip from '../helpers/strip-dynamic'
 import toCamel from 'to-camel-case'
 import { Raw } from '../..'
-import { strictEqual } from '../helpers/assert-json'
 import { resolve } from 'path'
 
 /**
@@ -35,7 +35,7 @@ describe('transforms', async () => {
             let state = Raw.deserialize(input, { terse: true })
             state = fn(state)
             const output = Raw.serialize(state, { terse: true })
-            strictEqual(strip(output), strip(expected))
+            assert.deepEqual(strip(output), strip(expected))
           })
         }
       })
@@ -91,7 +91,7 @@ describe('transforms', async () => {
             let state = Raw.deserialize(input, { terse: true })
             state = fn(state)
             const output = Raw.serialize(state, { terse: true })
-            strictEqual(strip(output), strip(expected))
+            assert.deepEqual(strip(output), strip(expected))
           })
         }
       })
@@ -121,7 +121,7 @@ describe('transforms', async () => {
             let state = Raw.deserialize(input, { terse: true })
             state = fn(state)
             const output = Raw.serialize(state, { terse: true })
-            strictEqual(strip(output), strip(expected))
+            assert.deepEqual(strip(output), strip(expected))
           })
         }
       })
@@ -151,7 +151,7 @@ describe('transforms', async () => {
             let state = Raw.deserialize(input, { terse: true })
             state = fn(state)
             const output = Raw.serialize(state, { terse: true })
-            strictEqual(strip(output), strip(expected))
+            assert.deepEqual(strip(output), strip(expected))
           })
         }
       })
