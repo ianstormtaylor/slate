@@ -173,7 +173,7 @@ describe('transforms', async () => {
         let state = Raw.deserialize(input, { terse: true })
         state = fn(state)
         const output = Raw.serialize(state, { terse: true })
-        strictEqual(strip(output), strip(expected))
+        assert.deepEqual(strip(output), strip(expected))
       })
     }
   })
