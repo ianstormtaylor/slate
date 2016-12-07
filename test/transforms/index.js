@@ -12,7 +12,7 @@ import { resolve } from 'path'
  */
 
 describe('transforms', () => {
-  
+
   describe('by-key', () => {
     const dir = resolve(__dirname, './fixtures/by-key')
     const transforms = fs.readdirSync(dir)
@@ -127,7 +127,7 @@ describe('transforms', () => {
         }
       })
     }
- })
+  })
 
   describe('on-history', () => {
     const dir = resolve(__dirname, './fixtures/on-history')
