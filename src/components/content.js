@@ -10,7 +10,6 @@ import Transfer from '../utils/transfer'
 import TYPES from '../constants/types'
 import getWindow from 'get-window'
 import keycode from 'keycode'
-import noop from '../utils/noop'
 import { IS_FIREFOX, IS_MAC } from '../constants/environment'
 
 /**
@@ -510,6 +509,13 @@ class Content extends React.Component {
     const key = keycode(which)
     const data = {}
 
+    // Keep track of an `isShifting` flag, because it's often used to trigger
+    // "Paste and Match Style" commands, but isn't available on the event in a
+    // normal paste event.
+    if (key == 'shift') {
+      this.tmp.isShifting = true
+    }
+
     // When composing, these characters commit the composition but also move the
     // selection before we're able to handle it, so prevent their default,
     // selection-moving behavior.
@@ -553,6 +559,21 @@ class Content extends React.Component {
   }
 
   /**
+   * On key up, unset the `isShifting` flag.
+   *
+   * @param {Event} event
+   */
+
+  onKeyUp = (event) => {
+    const { which } = event
+    const key = keycode(which)
+
+    if (key == 'shift') {
+      this.tmp.isShifting = false
+    }
+  }
+
+  /**
    * On paste, determine the type and bubble up.
    *
    * @param {Event} event
@@ -565,6 +586,10 @@ class Content extends React.Component {
     event.preventDefault()
     const transfer = new Transfer(event.clipboardData)
     const data = transfer.getData()
+
+    // Attach the `isShift` flag, so that people can use it to trigger "Paste
+    // and Match Style" logic.
+    data.isShift = !!this.tmp.isShifting
 
     debug('onPaste', { event, data })
     this.props.onPaste(event, data)
@@ -621,6 +646,31 @@ class Content extends React.Component {
         focusOffset: focus.offset,
         isFocused: true,
         isBackward: null
+      }
+
+      // If the selection is at the end of a non-void inline node, and there is
+      // a node after it, put it in the node after instead.
+      const anchorText = document.getNode(anchor.key)
+      const focusText = document.getNode(focus.key)
+      const anchorInline = document.getClosestInline(anchor.key)
+      const focusInline = document.getClosestInline(focus.key)
+
+      if (anchorInline && !anchorInline.isVoid && anchor.offset == anchorText.length) {
+        const block = document.getClosestBlock(anchor.key)
+        const next = block.getNextText(anchor.key)
+        if (next) {
+          properties.anchorKey = next.key
+          properties.anchorOffset = 0
+        }
+      }
+
+      if (focusInline && !focusInline.isVoid && focus.offset == focusText.length) {
+        const block = document.getClosestBlock(focus.key)
+        const next = block.getNextText(focus.key)
+        if (next) {
+          properties.focusKey = next.key
+          properties.focusOffset = 0
+        }
       }
 
       data.selection = selection
@@ -687,7 +737,7 @@ class Content extends React.Component {
         onDrop={this.onDrop}
         onInput={this.onInput}
         onKeyDown={this.onKeyDown}
-        onKeyUp={noop}
+        onKeyUp={this.onKeyUp}
         onPaste={this.onPaste}
         onSelect={this.onSelect}
         spellCheck={spellCheck}

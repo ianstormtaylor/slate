@@ -4,10 +4,5 @@ nodes:
     type: paragraph
     nodes:
       - kind: text
-        key: 'key'
+        key: key
         text: some
-      - kind: inline
-        type: link
-        nodes:
-          - kind: text
-            text: text

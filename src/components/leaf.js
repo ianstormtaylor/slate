@@ -140,9 +140,10 @@ class Leaf extends React.Component {
     // If the selection is blurred we have nothing to do.
     if (selection.isBlurred) return
 
-    const { anchorOffset, focusOffset } = selection
     const { node, index } = this.props
     const { start, end } = OffsetKey.findBounds(index, ranges)
+    const anchorOffset = selection.anchorOffset - start
+    const focusOffset = selection.focusOffset - start
 
     // If neither matches, the selection doesn't start or end here, so exit.
     const hasAnchor = selection.hasAnchorBetween(node, start, end)
@@ -167,9 +168,9 @@ class Leaf extends React.Component {
     if (hasAnchor && hasFocus) {
       native.removeAllRanges()
       const range = window.document.createRange()
-      range.setStart(el, anchorOffset - start)
+      range.setStart(el, anchorOffset)
       native.addRange(range)
-      native.extend(el, focusOffset - start)
+      native.extend(el, focusOffset)
       focus()
     }
 
@@ -182,10 +183,10 @@ class Leaf extends React.Component {
         if (hasAnchor) {
           native.removeAllRanges()
           const range = window.document.createRange()
-          range.setStart(el, anchorOffset - start)
+          range.setStart(el, anchorOffset)
           native.addRange(range)
         } else if (hasFocus) {
-          native.extend(el, focusOffset - start)
+          native.extend(el, focusOffset)
           focus()
         }
       }
@@ -198,14 +199,14 @@ class Leaf extends React.Component {
         if (hasFocus) {
           native.removeAllRanges()
           const range = window.document.createRange()
-          range.setStart(el, focusOffset - start)
+          range.setStart(el, focusOffset)
           native.addRange(range)
         } else if (hasAnchor) {
           const endNode = native.focusNode
           const endOffset = native.focusOffset
           native.removeAllRanges()
           const range = window.document.createRange()
-          range.setStart(el, anchorOffset - start)
+          range.setStart(el, anchorOffset)
           native.addRange(range)
           native.extend(endNode, endOffset)
           focus()

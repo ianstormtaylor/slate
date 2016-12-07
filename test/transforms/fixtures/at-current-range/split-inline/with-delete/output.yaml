@@ -3,13 +3,19 @@ nodes:
   - kind: block
     type: paragraph
     nodes:
+      - kind: text
+        text: ""
       - kind: inline
         type: link
         nodes:
           - kind: text
             text: w
+      - kind: text
+        text: ""
       - kind: inline
         type: link
         nodes:
           - kind: text
             text: d
+      - kind: text
+        text: ""

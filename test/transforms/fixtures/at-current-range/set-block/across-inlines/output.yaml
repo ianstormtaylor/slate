@@ -3,16 +3,24 @@ nodes:
   - kind: block
     type: code
     nodes:
+      - kind: text
+        text: ""
       - kind: inline
         type: link
         nodes:
           - kind: text
             text: word
+      - kind: text
+        text: ""
   - kind: block
     type: code
     nodes:
+      - kind: text
+        text: ""
       - kind: inline
         type: link
         nodes:
           - kind: text
             text: another
+      - kind: text
+        text: ""

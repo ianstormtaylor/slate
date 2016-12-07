@@ -15,3 +15,5 @@ nodes:
         nodes:
           - kind: text
             text: two
+      - kind: text
+        text: ""

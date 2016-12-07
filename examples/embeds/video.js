@@ -10,6 +10,18 @@ import React from 'react'
 class Video extends React.Component {
 
   /**
+   * Check if the node is selected.
+   *
+   * @return {Boolean}
+   */
+
+  isSelected = () => {
+    const { node, state } = this.props
+    const isSelected = state.selection.hasEdgeIn(node)
+    return isSelected
+  }
+
+  /**
    * When the input text changes, update the `video` data on the node.
    *
    * @param {Event} e
@@ -65,11 +77,26 @@ class Video extends React.Component {
 
   renderVideo = () => {
     const video = this.props.node.data.get('video')
+    const isSelected = this.isSelected()
+
     const wrapperStyle = {
       position: 'relative',
       paddingBottom: '66.66%',
       paddingTop: '25px',
-      height: '0'
+      height: '0',
+      outline: isSelected ? '2px solid blue' : 'none',
+    }
+
+    const maskStyle = {
+      display: isSelected ? 'none' : 'block',
+      position: 'absolute',
+      top: '0px',
+      left: '0px',
+      right: '0px',
+      bottom: '0px',
+      height: '100%',
+      cursor: 'cell',
+      zIndex: 1,
     }
 
     const iframeStyle = {
@@ -77,11 +104,12 @@ class Video extends React.Component {
       top: '0px',
       left: '0px',
       width: '100%',
-      height: '100%'
+      height: '100%',
     }
 
     return (
       <div style={wrapperStyle}>
+        <div style={maskStyle} />
         <iframe
           id="ytplayer"
           type="text/html"

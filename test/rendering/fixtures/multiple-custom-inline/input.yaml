@@ -3,6 +3,8 @@ nodes:
   - kind: block
     type: default
     nodes:
+      - kind: text
+        text: ""
       - kind: inline
         type: link
         data:
@@ -11,6 +13,8 @@ nodes:
           - kind: text
             ranges:
               - text: another
+      - kind: text
+        text: ""
       - kind: inline
         type: link
         data:
@@ -19,3 +23,5 @@ nodes:
           - kind: text
             ranges:
               - text: word
+      - kind: text
+        text: ""

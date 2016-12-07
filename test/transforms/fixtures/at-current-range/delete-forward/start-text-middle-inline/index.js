@@ -4,12 +4,12 @@ import assert from 'assert'
 export default function (state) {
   const { document, selection } = state
   const texts = document.getTexts()
-  const first = texts.first()
-  const last = texts.last()
+  const first = texts.get(0)
+  const second = texts.get(1)
   const range = selection.merge({
     anchorKey: first.key,
     anchorOffset: 0,
-    focusKey: last.key,
+    focusKey: second.key,
     focusOffset: 1
   })
 
@@ -19,6 +19,7 @@ export default function (state) {
     .deleteForward()
     .apply()
 
+  // TODO: fix this behavior.
   /* const updated = next.document.getTexts().last()
 
   assert.deepEqual(

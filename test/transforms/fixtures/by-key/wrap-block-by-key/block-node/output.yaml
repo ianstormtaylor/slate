@@ -11,8 +11,3 @@ nodes:
             nodes:
               - kind: text
                 text: some code
-      - kind: inline
-        type: link
-        nodes:
-          - kind: text
-            text: text

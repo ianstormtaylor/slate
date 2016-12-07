@@ -1,0 +1,19 @@
+
+nodes:
+  - kind: block
+    type: paragraph
+    nodes:
+      - kind: text
+        text: ""
+      - kind: inline
+        type: link
+        nodes:
+          - kind: text
+            text: ""
+          - kind: inline
+            isVoid: true
+            type: image
+          - kind: text
+            text: ""
+      - kind: text
+        text: ""

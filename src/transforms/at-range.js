@@ -185,52 +185,64 @@ export function deleteBackwardAtRange(transform, range, n = 1, options = {}) {
   const { document } = state
   const { startKey, focusOffset } = range
 
+  // If the range is expanded, perform a regular delete instead.
   if (range.isExpanded) {
     transform.deleteAtRange(range, { normalize })
     return
   }
 
+  // If the closest block is void, delete it.
   const block = document.getClosestBlock(startKey)
   if (block && block.isVoid) {
     transform.removeNodeByKey(block.key, { normalize })
     return
   }
 
+  // If the closest inline is void, delete it.
   const inline = document.getClosestInline(startKey)
   if (inline && inline.isVoid) {
     transform.removeNodeByKey(inline.key, { normalize })
     return
   }
 
+  // If the range is at the start of the document, abort.
   if (range.isAtStartOf(document)) {
     return
   }
 
+  // If the range is at the start of the text node, we need to figure out what
+  // is behind it to know how to delete...
   const text = document.getDescendant(startKey)
   if (range.isAtStartOf(text)) {
     const prev = document.getPreviousText(text.key)
     const prevBlock = document.getClosestBlock(prev.key)
     const prevInline = document.getClosestInline(prev.key)
 
+    // If the previous block is void, remove it.
     if (prevBlock && prevBlock.isVoid) {
       transform.removeNodeByKey(prevBlock.key, { normalize })
       return
     }
 
+    // If the previous inline is void, remove it.
     if (prevInline && prevInline.isVoid) {
       transform.removeNodeByKey(prevInline.key, { normalize })
       return
     }
 
+    // If the previous text's block is inside the current block, then we need
+    // to remove a character when deleteing. Otherwise, we just want to join
+    // the two blocks together.
     range = range.merge({
       anchorKey: prev.key,
-      anchorOffset: prev.length,
+      anchorOffset: prevBlock == block ? prev.length - 1 : prev.length,
     })
 
     transform.deleteAtRange(range, { normalize })
     return
   }
 
+  // Otherwise, just remove a character backwards.
   range = range.merge({
     focusOffset: focusOffset - n,
     isBackward: true,
@@ -341,9 +353,12 @@ export function deleteForwardAtRange(transform, range, n = 1, options = {}) {
       return
     }
 
+    // If the next text's block is inside the current block, then we need
+    // to remove a character when deleteing. Otherwise, we just want to join
+    // the two blocks together.
     range = range.merge({
       focusKey: next.key,
-      focusOffset: 0
+      focusOffset: nextBlock == block ? 1 : 0
     })
 
     transform.deleteAtRange(range, { normalize })
@@ -842,13 +857,16 @@ export function unwrapBlockAtRange(transform, range, properties, options = {}) {
       transform.splitNodeByKey(block.key, offset, OPTS)
       state = transform.state
       document = state.document
-      const extra = document.getPreviousSibling(firstMatch.key)
 
       children.forEach((child, i) => {
+        if (i == 0) {
+          const extra = child
+          child = document.getNextBlock(child.key)
+          transform.removeNodeByKey(extra.key, OPTS)
+        }
+
         transform.moveNodeByKey(child.key, parent.key, index + 1 + i, OPTS)
       })
-
-      transform.removeNodeByKey(extra.key, OPTS)
     }
   })
 
@@ -984,15 +1002,24 @@ export function wrapBlockAtRange(transform, range, block, options = {}) {
  */
 
 export function wrapInlineAtRange(transform, range, inline, options = {}) {
-  if (range.isCollapsed) return
+  let { state } = transform
+  let { document } = state
+  const { normalize = true } = options
+  const { startKey, startOffset, endKey, endOffset } = range
+
+  if (range.isCollapsed) {
+    // Wrapping an inline void
+    const inlineParent = document.getClosestInline(startKey)
+    if (!inlineParent.isVoid) {
+      return
+    }
+
+    return transform.wrapInlineByKey(inlineParent.key, inline, options)
+  }
 
   inline = Normalize.inline(inline)
   inline = inline.merge({ nodes: inline.nodes.clear() })
 
-  const { normalize = true } = options
-  const { startKey, startOffset, endKey, endOffset } = range
-  let { state } = transform
-  let { document } = state
   const blocks = document.getBlocksAtRange(range)
   let startBlock = document.getClosestBlock(startKey)
   let endBlock = document.getClosestBlock(endKey)

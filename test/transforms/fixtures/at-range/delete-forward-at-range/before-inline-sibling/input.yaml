@@ -4,11 +4,11 @@ nodes:
     type: paragraph
     nodes:
       - kind: text
-        text: one
+        text: a
       - kind: inline
         type: link
         nodes:
           - kind: text
             text: two
       - kind: text
-        text: a
+        text: three

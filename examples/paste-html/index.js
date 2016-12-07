@@ -178,6 +178,8 @@ class PasteHtml extends React.Component {
 
   onPaste = (e, data, state) => {
     if (data.type != 'html') return
+    if (data.isShift) return
+
     const { document } = serializer.deserialize(data.html)
 
     return state

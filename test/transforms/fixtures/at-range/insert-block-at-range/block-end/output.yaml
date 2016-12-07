@@ -10,17 +10,6 @@ nodes:
     nodes:
       - kind: text
         text: ""
-nodes:
-  - kind: block
-    type: paragraph
-    nodes:
-      - kind: text
-        text: word
-  - kind: block
-    type: image
-    nodes:
-      - kind: text
-        text: ""
   - kind: block
     type: paragraph
     nodes:

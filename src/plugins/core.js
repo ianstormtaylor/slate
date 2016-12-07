@@ -4,7 +4,6 @@ import Character from '../models/character'
 import Debug from 'debug'
 import Placeholder from '../components/placeholder'
 import React from 'react'
-import String from '../utils/string'
 import getWindow from 'get-window'
 import { IS_MAC } from '../constants/environment'
 
@@ -71,7 +70,11 @@ function Plugin(options = {}) {
    */
 
   function onBeforeInput(e, data, state, editor) {
-    const { document, startKey, startOffset, startInline, startText } = state
+    const { document, startKey, startBlock, startOffset, startInline, startText } = state
+    const pText = startBlock.getPreviousText(startKey)
+    const pInline = pText && startBlock.getClosestInline(pText.key)
+    const nText = startBlock.getNextText(startKey)
+    const nInline = nText && startBlock.getClosestInline(nText.key)
 
     // Determine what the characters would be if natively inserted.
     const schema = editor.getSchema()
@@ -103,15 +106,30 @@ function Plugin(options = {}) {
 
     // We do not have to re-render if the current selection is collapsed, the
     // current node is not empty, there are no marks on the cursor, the cursor
-    // is not at the edge of an inline node, and the natively inserted
+    // is not at the edge of an inline node, the cursor isn't at the starting
+    // edge of a text node after an inline node, and the natively inserted
     // characters would be the same as the non-native.
     const isNative = (
+      // If the selection is expanded, we don't know what the edit will look
+      // like so we can't let it happen natively.
       (state.isCollapsed) &&
-      (state.startText.text != '') &&
+      // If the selection has marks, then we need to render it non-natively
+      // because we need to create the new marks as well.
       (state.selection.marks == null) &&
-      // Must not be, for example, at edge of an inline link
+      // If the text node in question has no content, browsers might do weird
+      // things so we need to insert it normally instead.
+      (state.startText.text != '') &&
+      // COMPAT: Browsers do weird things when typing at the edges of inline
+      // nodes, so we can't let them render natively. (?)
       (!startInline || !state.selection.isAtStartOf(startInline)) &&
       (!startInline || !state.selection.isAtEndOf(startInline)) &&
+      // COMPAT: In Chrome & Safari, it isn't possible to have a selection at
+      // the starting edge of a text node after another inline node. It will
+      // have been automatically changed. So we can't render natively because
+      // the cursor isn't technique in the right spot. (2016/12/01)
+      (!(pInline && !pInline.isVoid && startOffset == 0)) &&
+      (!(nInline && !nInline.isVoid && startOffset == startText.length)) &&
+      // If the
       (chars.equals(nextChars))
     )
 
@@ -353,6 +371,8 @@ function Plugin(options = {}) {
       case 'delete': return onKeyDownDelete(e, data, state)
       case 'left': return onKeyDownLeft(e, data, state)
       case 'right': return onKeyDownRight(e, data, state)
+      case 'up': return onKeyDownUp(e, data, state)
+      case 'down': return onKeyDownDown(e, data, state)
       case 'd': return onKeyDownD(e, data, state)
       case 'h': return onKeyDownH(e, data, state)
       case 'k': return onKeyDownK(e, data, state)
@@ -434,7 +454,10 @@ function Plugin(options = {}) {
   /**
    * On `left` key down, move backward.
    *
-   * COMPAT: This is required to solve for the case where an inline void node is
+   * COMPAT: This is required to make navigating with the left arrow work when
+   * a void node is selected.
+   *
+   * COMPAT: This is also required to solve for the case where an inline node is
    * surrounded by empty text nodes with zero-width spaces in them. Without this
    * the zero-width spaces will cause two arrow keys to jump to the next text.
    *
@@ -446,23 +469,39 @@ function Plugin(options = {}) {
 
   function onKeyDownLeft(e, data, state) {
     if (data.isCtrl) return
-    if (data.isOpt) return
+    if (data.isAlt) return
     if (state.isExpanded) return
 
     const { document, startKey, startText } = state
     const hasVoidParent = document.hasVoidParent(startKey)
 
-    if (
-      startText.text == '' ||
-      hasVoidParent
-    ) {
-      const previousText = document.getPreviousText(startKey)
-      if (!previousText) return
-
+    // If the current text node is empty, or we're inside a void parent, we're
+    // going to need to handle the selection behavior.
+    if (startText.text == '' || hasVoidParent) {
       e.preventDefault()
+      const previous = document.getPreviousText(startKey)
+
+      // If there's no previous text node in the document, abort.
+      if (!previous) return
+
+      // If the previous text is in the current block, and inside a non-void
+      // inline node, move one character into the inline node.
+      const { startBlock } = state
+      const previousBlock = document.getClosestBlock(previous.key)
+      const previousInline = document.getClosestInline(previous.key)
+
+      if (previousBlock == startBlock && previousInline && !previousInline.isVoid) {
+        return state
+          .transform()
+          .collapseToEndOf(previous)
+          .moveBackward(1)
+          .apply()
+      }
+
+      // Otherwise, move to the end of the previous node.
       return state
         .transform()
-        .collapseToEndOf(previousText)
+        .collapseToEndOf(previous)
         .apply()
     }
   }
@@ -470,9 +509,17 @@ function Plugin(options = {}) {
   /**
    * On `right` key down, move forward.
    *
-   * COMPAT: This is required to solve for the case where an inline void node is
+   * COMPAT: This is required to make navigating with the right arrow work when
+   * a void node is selected.
+   *
+   * COMPAT: This is also required to solve for the case where an inline node is
    * surrounded by empty text nodes with zero-width spaces in them. Without this
    * the zero-width spaces will cause two arrow keys to jump to the next text.
+   *
+   * COMPAT: In Chrome & Safari, selections that are at the zero offset of
+   * an inline node will be automatically replaced to be at the last offset
+   * of a previous inline node, which screws us up, so we never want to set the
+   * selection to the very start of an inline node here. (2016/11/29)
    *
    * @param {Event} e
    * @param {Object} data
@@ -482,32 +529,115 @@ function Plugin(options = {}) {
 
   function onKeyDownRight(e, data, state) {
     if (data.isCtrl) return
-    if (data.isOpt) return
+    if (data.isAlt) return
     if (state.isExpanded) return
 
     const { document, startKey, startText } = state
     const hasVoidParent = document.hasVoidParent(startKey)
 
-    if (
-      startText.text == '' ||
-      hasVoidParent
-    ) {
-      const nextText = document.getNextText(startKey)
-      if (!nextText) return state
-
-      // COMPAT: In Chrome & Safari, selections that are at the zero offset of
-      // an inline node will be automatically replaced to be at the last offset
-      // of a previous inline node, which screws us up, so we always want to set
-      // it to the end of the node. (2016/11/29)
-      const hasNextVoidParent = document.hasVoidParent(nextText.key)
-      const method = hasNextVoidParent ? 'collapseToEndOf' : 'collapseToStartOf'
-
+    // If the current text node is empty, or we're inside a void parent, we're
+    // going to need to handle the selection behavior.
+    if (startText.text == '' || hasVoidParent) {
       e.preventDefault()
+      const next = document.getNextText(startKey)
+
+      // If there's no next text node in the document, abort.
+      if (!next) return state
+
+      // If the next text is inside a void node, move to the end of it.
+      const isInVoid = document.hasVoidParent(next.key)
+
+      if (isInVoid) {
+        return state
+          .transform()
+          .collapseToEndOf(next)
+          .apply()
+      }
+
+      // If the next text is in the current block, and inside an inline node,
+      // move one character into the inline node.
+      const { startBlock } = state
+      const nextBlock = document.getClosestBlock(next.key)
+      const nextInline = document.getClosestInline(next.key)
+
+      if (nextBlock == startBlock && nextInline) {
+        return state
+          .transform()
+          .collapseToStartOf(next)
+          .moveForward(1)
+          .apply()
+      }
+
+      // Otherwise, move to the start of the next text node.
       return state
         .transform()
-        [method](nextText)
+        .collapseToStartOf(next)
         .apply()
     }
+  }
+
+  /**
+   * On `up` key down, for Macs, move the selection to start of the block.
+   *
+   * COMPAT: Certain browsers don't handle the selection updates properly. In
+   * Chrome, option-shift-up doesn't properly extend the selection. And in
+   * Firefox, option-up doesn't properly move the selection.
+   *
+   * @param {Event} e
+   * @param {Object} data
+   * @param {State} state
+   * @return {State}
+   */
+
+  function onKeyDownUp(e, data, state) {
+    if (!IS_MAC || data.isCtrl || !data.isAlt) return
+
+    const transform = data.isShift ? 'extendToStartOf' : 'collapseToStartOf'
+    const { selection, document, focusKey, focusBlock } = state
+    const block = selection.hasFocusAtStartOf(focusBlock)
+      ? document.getPreviousBlock(focusKey)
+      : focusBlock
+
+    if (!block) return
+    const text = block.getFirstText()
+
+    e.preventDefault()
+    return state
+      .transform()
+      [transform](text)
+      .apply()
+  }
+
+  /**
+   * On `down` key down, for Macs, move the selection to end of the block.
+   *
+   * COMPAT: Certain browsers don't handle the selection updates properly. In
+   * Chrome, option-shift-down doesn't properly extend the selection. And in
+   * Firefox, option-down doesn't properly move the selection.
+   *
+   * @param {Event} e
+   * @param {Object} data
+   * @param {State} state
+   * @return {State}
+   */
+
+  function onKeyDownDown(e, data, state) {
+    if (!IS_MAC || data.isCtrl || !data.isAlt) return
+
+    const transform = data.isShift ? 'extendToEndOf' : 'collapseToEndOf'
+    const { selection, document, focusKey, focusBlock } = state
+    const block = selection.hasFocusAtEndOf(focusBlock)
+      ? document.getNextBlock(focusKey)
+      : focusBlock
+
+    if (!block) return
+    const text = block.getLastText()
+
+    e.preventDefault()
+    return state
+      .transform()
+      [transform](text)
+      .apply()
   }
 
   /**

@@ -10,3 +10,5 @@ nodes:
         nodes:
           - kind: text
             text: word
+      - kind: text
+        text: ""

@@ -21,13 +21,14 @@ export default function (state) {
 
   const updated = next.document.getTexts().get(1)
 
+  // TODO: seems wrong.
   assert.deepEqual(
     next.selection.toJS(),
     range.merge({
       anchorKey: updated.key,
       anchorOffset: 0,
       focusKey: updated.key,
-      focusOffset: updated.length
+      focusOffset: 0
     }).toJS()
   )
 

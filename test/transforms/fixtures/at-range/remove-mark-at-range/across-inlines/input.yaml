@@ -3,6 +3,8 @@ nodes:
   - kind: block
     type: paragraph
     nodes:
+      - kind: text
+        text: ""
       - kind: inline
         type: link
         nodes:
@@ -11,9 +13,13 @@ nodes:
               - text: word
                 marks:
                   - type: bold
+      - kind: text
+        text: ""
   - kind: block
     type: paragraph
     nodes:
+      - kind: text
+        text: ""
       - kind: inline
         type: link
         nodes:
@@ -22,3 +28,5 @@ nodes:
               - text: another
                 marks:
                   - type: bold
+      - kind: text
+        text: ""

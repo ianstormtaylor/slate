@@ -387,6 +387,9 @@ const Node = {
    */
 
   getCommonAncestor(one, two) {
+    one = Normalize.key(one)
+    two = Normalize.key(two)
+
     if (one == this.key) return this
     if (two == this.key) return this
 
@@ -514,6 +517,9 @@ const Node = {
    */
 
   areDescendantSorted(key1, key2) {
+    key1 = Normalize.key(key1)
+    key2 = Normalize.key(key2)
+
     let sorted
 
     this.forEachDescendant(n => {
@@ -987,18 +993,18 @@ const Node = {
    */
 
   getTextAtOffset(offset) {
+    // PERF: Add a few shortcuts for the obvious cases.
+    if (offset == 0) return this.getFirstText()
+    if (offset == this.length) return this.getLastText()
+    if (offset < 0 || offset > this.length) return null
+
     let length = 0
+
     return this
       .getTexts()
       .find((text, i, texts) => {
-        const next = texts.get(i + 1)
         length += text.length
-
-        // If the next text is an empty string, return false, because we want
-        // the furthest text node at the offset, and it will also match.
-        if (next && next.length == 0) return false
-
-        return length >= offset
+        return length > offset
       })
   },
 
@@ -1331,6 +1337,7 @@ const Node = {
     let child = node
     let one
     let two
+
 
     if (node.kind != 'text') {
       child = node.getTextAtOffset(offset)

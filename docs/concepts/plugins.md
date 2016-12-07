@@ -3,7 +3,7 @@
 
 In Slate, all custom logic added to the editor is done via plugins. Plugins have complete control over the schema, the behaviors, and the rendering of the components of the editor. Slate encourages you to break up code into small, reusable modules that can be shared with others, and easily reasoned about.
 
-_To learn more, check out the [Using Plugins guide](../guides/using-plugins.md), or the [Plugins reference](../reference/plugins/plugins.md)._
+_To learn more, check out the [Using Plugins guide](../walkthroughs/using-plugins.md), or the [Plugins reference](../reference/plugins/plugins.md)._
 
 
 ### The Core Plugin
