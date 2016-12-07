@@ -276,7 +276,7 @@ export function splitNodeByKey(transform, key, offset, options = {}) {
   let { document } = state
   const path = document.getPath(key)
 
-  transform.splitNodeOperation(path, offset)
+  transform.splitNodeAtOffsetOperation(path, offset)
 
   if (normalize) {
     const parent = document.getParent(key)
