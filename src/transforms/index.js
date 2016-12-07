@@ -115,6 +115,7 @@ import {
   splitNodeByKey,
   unwrapInlineByKey,
   unwrapBlockByKey,
+  unwrapNodeByKey,
   wrapBlockByKey,
   wrapInlineByKey,
 } from './by-key'
@@ -292,6 +293,7 @@ export default {
   splitNodeByKey,
   unwrapInlineByKey,
   unwrapBlockByKey,
+  unwrapNodeByKey,
   wrapBlockByKey,
   wrapInlineByKey,
 

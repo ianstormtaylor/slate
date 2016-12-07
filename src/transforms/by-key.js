@@ -324,6 +324,44 @@ export function unwrapBlockByKey(transform, key, properties, options) {
   transform.unwrapBlockAtRange(range, properties, options)
 }
 
+/**
+ * Unwrap a node from its parent. If the node has siblings, its parent
+ * will be split. Otherwise, the parent is removed, and simply
+ * replaced by the node itself.
+ *
+ * Cannot unwrap a root node.
+ *
+ * @param {Transform} transform
+ * @param {String} key
+ * @param {Object} options
+ *   @property {Boolean} normalize
+ */
+
+export function unwrapNodeByKey(transform, key, options) {
+  const { state } = transform
+  const { document } = state
+  const parent = document.getParent(key)
+  const node = parent.getChild(key)
+
+  const parentParent = document.getParent(parent.key)
+  const parentIndex = parentParent.nodes.indexOf(parent)
+
+  if (parent.nodes.size === 1) {
+
+    // Remove the parent
+    transform.removeNodeByKey(parent.key, { normalize: false })
+    // and replace it by the node itself
+    transform.insertNodeByKey(parentParent.key, parentIndex, node)
+  } else {
+    const parentPath = document.getPath(parent.key)
+    const index = parent.nodes.indexOf(node)
+
+    // Split the parent
+    transform.splitNodeOperation(parentPath, index)
+    // Extract the node in between the splitted node
+    transform.moveNodeByKey(key, parentParent.key, parentIndex + 1)
+  }
+}
 
 /**
  * Wrap a node in an inline with `properties`.
