@@ -432,7 +432,7 @@ export function setSelectionOperation(transform, properties, options = {}) {
  * @param {Number} offset
  */
 
-export function splitNodeOperation(transform, path, offset) {
+export function splitNodeAtOffsetOperation(transform, path, offset) {
   const inversePath = path.slice()
   inversePath[path.length - 1] += 1
 
@@ -440,13 +440,45 @@ export function splitNodeOperation(transform, path, offset) {
     type: 'join_node',
     path: inversePath,
     withPath: path,
-    deep: true // we need to join nodes recursively
+    // we will split down to the text nodes, so we must join nodes recursively
+    deep: true
   }]
 
   const operation = {
     type: 'split_node',
     path,
     offset,
+    count: null,
+    inverse,
+  }
+
+  transform.applyOperation(operation)
+}
+
+/**
+ * Split a node by `path` after its 'count' child.
+ *
+ * @param {Transform} transform
+ * @param {Array} path
+ * @param {Number} count
+ */
+
+export function splitNodeOperation(transform, path, count) {
+  const inversePath = path.slice()
+  inversePath[path.length - 1] += 1
+
+  const inverse = [{
+    type: 'join_node',
+    path: inversePath,
+    withPath: path,
+    deep: false
+  }]
+
+  const operation = {
+    type: 'split_node',
+    path,
+    offset: null,
+    count,
     inverse,
   }
 

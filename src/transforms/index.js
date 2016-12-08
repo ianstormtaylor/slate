@@ -29,6 +29,7 @@ import {
   setMarkOperation,
   setNodeOperation,
   setSelectionOperation,
+  splitNodeAtOffsetOperation,
   splitNodeOperation,
 } from './operations'
 
@@ -114,6 +115,7 @@ import {
   splitNodeByKey,
   unwrapInlineByKey,
   unwrapBlockByKey,
+  unwrapNodeByKey,
   wrapBlockByKey,
   wrapInlineByKey,
 } from './by-key'
@@ -211,6 +213,7 @@ export default {
   setMarkOperation,
   setNodeOperation,
   setSelectionOperation,
+  splitNodeAtOffsetOperation,
   splitNodeOperation,
 
   /**
@@ -290,6 +293,7 @@ export default {
   splitNodeByKey,
   unwrapInlineByKey,
   unwrapBlockByKey,
+  unwrapNodeByKey,
   wrapBlockByKey,
   wrapInlineByKey,
 
