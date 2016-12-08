@@ -325,11 +325,11 @@ export function unwrapBlockByKey(transform, key, properties, options) {
 }
 
 /**
- * Unwrap a node from its parent. If the node has siblings, its parent
- * will be split. Otherwise, the parent is removed, and simply
- * replaced by the node itself.
+ * Unwrap a single node from its parent.
  *
- * Cannot unwrap a root node.
+ * If the node is surrounded with siblings, its parent will be
+ * split. If the node is the only child, the parent is removed, and
+ * simply replaced by the node itself.  Cannot unwrap a root node.
  *
  * @param {Transform} transform
  * @param {String} key

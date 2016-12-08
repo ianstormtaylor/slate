@@ -59,6 +59,7 @@ Transform methods can either operate on the [`Document`](./document.md), the [`S
   - [`splitNodeByKey`](#splitnodebykey)
   - [`unwrapInlineByKey`](#unwrapinlinebykey)
   - [`unwrapBlockByKey`](#unwrapblockbykey)
+  - [`unwrapNodeByKey`](#unwrapnodebykey)
   - [`wrapBlockByKey`](#wrapblockbykey)
   - [`wrapInlineByKey`](#wrapinlinebykey)
 - [Document Transforms](#document-transforms)
@@ -332,6 +333,11 @@ Unwrap all inner content of an [`Inline`](./inline.md) node that match `properti
 `unwrapBlockByKey(key: String, type: String) => Transform`
 
 Unwrap all inner content of a [`Block`](./block.md) node that match `properties`. For convenience, you can pass a `type` string or `properties` object.
+
+### `unwrapNodeByKey`
+`unwrapNodeByKey(key: String) => Transform`
+
+Unwrap a single node from its parent. If the node is surrounded with siblings, its parent will be split. If the node is the only child, the parent is removed, and simply replaced by the node itself. Cannot unwrap a root node.
 
 ### `wrapBlockByKey`
 `wrapBlockByKey(key: String, properties: Object) => Transform` <br/>
