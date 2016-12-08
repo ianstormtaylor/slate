@@ -344,22 +344,36 @@ export function unwrapNodeByKey(transform, key, options = {}) {
   const parent = document.getParent(key)
   const node = parent.getChild(key)
 
+  const index = parent.nodes.indexOf(node)
+  const isFirst = index === 0
+  const isLast = index === parent.nodes.size - 1
+
   const parentParent = document.getParent(parent.key)
   const parentIndex = parentParent.nodes.indexOf(parent)
 
-  if (parent.nodes.size === 1) {
 
+  if (parent.nodes.size === 1) {
     // Remove the parent
     transform.removeNodeByKey(parent.key, { normalize: false })
     // and replace it by the node itself
     transform.insertNodeByKey(parentParent.key, parentIndex, node, options)
-  } else {
-    const parentPath = document.getPath(parent.key)
-    const index = parent.nodes.indexOf(node)
+  }
 
+  else if (isFirst) {
+    // Just move the node before its parent
+    transform.moveNodeByKey(key, parentParent.key, parentIndex, options)
+  }
+
+  else if (isLast) {
+    // Just move the node after its parent
+    transform.moveNodeByKey(key, parentParent.key, parentIndex + 1, options)
+  }
+
+  else {
+    const parentPath = document.getPath(parent.key)
     // Split the parent
     transform.splitNodeOperation(parentPath, index)
-    // Extract the node in between the splitted node
+    // Extract the node in between the splitted parent
     transform.moveNodeByKey(key, parentParent.key, parentIndex + 1, { normalize: false })
 
     if (normalize) {
