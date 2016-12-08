@@ -337,7 +337,8 @@ export function unwrapBlockByKey(transform, key, properties, options) {
  *   @property {Boolean} normalize
  */
 
-export function unwrapNodeByKey(transform, key, options) {
+export function unwrapNodeByKey(transform, key, options = {}) {
+  const { normalize = true } = options
   const { state } = transform
   const { document } = state
   const parent = document.getParent(key)
@@ -351,7 +352,7 @@ export function unwrapNodeByKey(transform, key, options) {
     // Remove the parent
     transform.removeNodeByKey(parent.key, { normalize: false })
     // and replace it by the node itself
-    transform.insertNodeByKey(parentParent.key, parentIndex, node)
+    transform.insertNodeByKey(parentParent.key, parentIndex, node, options)
   } else {
     const parentPath = document.getPath(parent.key)
     const index = parent.nodes.indexOf(node)
@@ -359,7 +360,11 @@ export function unwrapNodeByKey(transform, key, options) {
     // Split the parent
     transform.splitNodeOperation(parentPath, index)
     // Extract the node in between the splitted node
-    transform.moveNodeByKey(key, parentParent.key, parentIndex + 1)
+    transform.moveNodeByKey(key, parentParent.key, parentIndex + 1, { normalize: false })
+
+    if (normalize) {
+      transform.normalizeNodeByKey(parentParent.key, SCHEMA)
+    }
   }
 }
 
