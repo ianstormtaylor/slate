@@ -229,7 +229,7 @@ function Plugin(options = {}) {
 
     // Remove any zero-width space spans from the cloned DOM so that they don't
     // show up elsewhere when copied.
-    const zws = [].slice.call(contents.querySelectorAll('.slate-zero-width-space'))
+    const zws = [].slice.call(contents.querySelectorAll('[data-slate-zero-width]'))
     zws.forEach(zw => zw.parentNode.removeChild(zw))
 
     // Wrap the first character of the selection in a span that has the encoded
