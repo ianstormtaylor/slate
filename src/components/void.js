@@ -96,7 +96,7 @@ class Void extends React.Component {
     this.debug('render', { props })
 
     return (
-      <Tag style={style} onClick={this.onClick}>
+      <Tag data-slate-void style={style} onClick={this.onClick}>
         {this.renderSpacer()}
         <Tag contentEditable={false}>
           {children}

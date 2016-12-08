@@ -26,6 +26,14 @@ const ATTRIBUTE = 'data-offset-key'
 const SELECTOR = `[${ATTRIBUTE}]`
 
 /**
+ * Void node selection.
+ *
+ * @type {String}
+ */
+
+const VOID_SELECTOR = '[data-slate-void]'
+
+/**
  * Find the start and end bounds from an `offsetKey` and `ranges`.
  *
  * @param {Number} index
@@ -57,29 +65,24 @@ function findBounds(index, ranges) {
 
 function findKey(rawNode, rawOffset) {
   let { node, offset } = normalizeNodeAndOffset(rawNode, rawOffset)
+  const { parentNode } = node
 
   // Find the closest parent with an offset key attribute.
-  const closest = node.parentNode.closest(SELECTOR)
+  let closest = parentNode.closest(SELECTOR)
   let offsetKey
 
-  // Get the key from the closest matching node if one exists.
-  if (closest) {
-    offsetKey = closest.getAttribute(ATTRIBUTE)
+  // For void nodes, the element with the offset key will be a cousin, not an
+  // ancestor, so find it by going down from the nearest void parent.
+  if (!closest) {
+    const closestVoid = parentNode.closest(VOID_SELECTOR)
+    closest = closestVoid.querySelector(SELECTOR)
+    offset = closest.textContent.length
   }
 
-  // Otherwise, for void node scenarios, a cousin node will be selected, and
-  // we need to select the first text node cousin we can find.
-  else {
-    while (node = node.parentNode) {
-      const cousin = node.querySelector(SELECTOR)
-      if (!cousin) continue
-      offsetKey = cousin.getAttribute(ATTRIBUTE)
-      offset = cousin.textContent.length
-      break
-    }
-  }
+  // Get the string value of the offset key attribute.
+  offsetKey = closest.getAttribute(ATTRIBUTE)
 
-  // If we still didn't find an offset key, error. This is a bug.
+  // If we still didn't find an offset key, this is a bug.
   if (!offsetKey) {
     throw new Error(`Unable to find offset key for ${node} with offset "${offset}".`)
   }
