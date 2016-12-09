@@ -19,7 +19,7 @@ const debug = Debug('slate:stack')
  * @type {Array}
  */
 
-const EVENTS_METHODS = [
+const EVENT_METHODS = [
   'onBeforeInput',
   'onBlur',
   'onCopy',
@@ -48,7 +48,7 @@ const ACCUMULATOR_METHODS = [
  */
 
 const RUNNABLE_METHODS = []
-  .concat(EVENTS_METHODS)
+  .concat(EVENT_METHODS)
   .concat(ACCUMULATOR_METHODS)
 
 /**
@@ -75,7 +75,8 @@ class Stack extends new Record(DEFAULTS) {
    *
    * @param {Object} properties
    *   @property {Array} plugins
-   *   @property {Mixed} ...handlers]
+   *   @property {Schema|Object} schema
+   *   @property {Function} ...handlers
    */
 
   static create(properties) {

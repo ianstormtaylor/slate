@@ -101,12 +101,13 @@ class Editor extends React.Component {
     this.tmp = {}
     this.state = {}
 
-    // Resolve the plugins and create a plugins stack.
+    // Create a new `Stack`, omitting the `onChange` property since that has
+    // special significance on the editor itself.
     const { onChange, ...rest } = props // eslint-disable-line no-unused-vars
     const stack = Stack.create(rest)
     this.state.stack = stack
 
-    // Resolve the state, processing before change first.
+    // Resolve the state, running `onBeforeChange` first.
     const state = stack.onBeforeChange(props.state, this)
     this.cacheState(state)
     this.state.state = state
