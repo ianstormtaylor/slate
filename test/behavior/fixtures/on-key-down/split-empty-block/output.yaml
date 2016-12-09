@@ -1,0 +1,31 @@
+
+document:
+  key: a
+  nodes:
+  - key: b
+    kind: block
+    type: paragraph
+    nodes:
+    - key: c
+      kind: text
+      text: ""
+  - key: d
+    kind: block
+    type: code
+    nodes:
+    - key: e
+      kind: text
+      text: ""
+  - key: "1"
+    kind: block
+    type: code
+    nodes:
+    - key: "0"
+      kind: text
+      text: ""
+selection:
+  anchorKey: "0"
+  anchorOffset: 0
+  focusKey: "0"
+  focusOffset: 0
+  isFocused: true

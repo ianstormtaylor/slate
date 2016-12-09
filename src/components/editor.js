@@ -1,9 +1,8 @@
 
 import Content from './content'
-import CorePlugin from '../plugins/core'
 import Debug from 'debug'
 import React from 'react'
-import Schema from '../models/schema'
+import Stack from '../models/stack'
 import State from '../models/state'
 import noop from '../utils/noop'
 
@@ -29,7 +28,19 @@ const EVENT_HANDLERS = [
   'onDrop',
   'onKeyDown',
   'onPaste',
-  'onSelect'
+  'onSelect',
+]
+
+/**
+ * Plugin-related properties of the editor.
+ *
+ * @type {Array}
+ */
+
+const PLUGINS_PROPS = [
+  ...EVENT_HANDLERS,
+  'plugins',
+  'schema',
 ]
 
 /**
@@ -80,7 +91,7 @@ class Editor extends React.Component {
   };
 
   /**
-   * When created, compute the plugins from `props`.
+   * When constructed, create a new `Stack` and run `onBeforeChange`.
    *
    * @param {Object} props
    */
@@ -89,40 +100,47 @@ class Editor extends React.Component {
     super(props)
     this.tmp = {}
     this.state = {}
-    this.state.plugins = this.resolvePlugins(props)
-    this.state.schema = this.resolveSchema(this.state.plugins)
 
-    const state = this.onBeforeChange(props.state)
+    // Create a new `Stack`, omitting the `onChange` property since that has
+    // special significance on the editor itself.
+    const { onChange, ...rest } = props // eslint-disable-line no-unused-vars
+    const stack = Stack.create(rest)
+    this.state.stack = stack
+
+    // Resolve the state, running `onBeforeChange` first.
+    const state = stack.onBeforeChange(props.state, this)
     this.cacheState(state)
     this.state.state = state
 
-    // Mix in the event handlers.
+    // Create a bound event handler for each event.
     for (const method of EVENT_HANDLERS) {
       this[method] = (...args) => {
-        this.onEvent(method, ...args)
+        const next = this.state.stack[method](this.state.state, this, ...args)
+        this.onChange(next)
       }
     }
   }
 
   /**
-   * When the `props` are updated, recompute the state and plugins.
+   * When the `props` are updated, create a new `Stack` if necessary, and
+   * run `onBeforeChange`.
    *
    * @param {Object} props
    */
 
   componentWillReceiveProps = (props) => {
-    if (props.plugins != this.props.plugins) {
-      const plugins = this.resolvePlugins(props)
-      const schema = this.resolveSchema(plugins)
-      this.setState({ plugins, schema })
+    let { stack } = this.state
+
+    // If any plugin-related properties will change, create a new `Stack`.
+    for (const prop of PLUGINS_PROPS) {
+      if (props[prop] == this.props[prop]) continue
+      const { onChange, ...rest } = props // eslint-disable-line no-unused-vars
+      stack = Stack.create(rest)
+      this.setState({ stack })
     }
 
-    else if (props.schema != this.props.schema) {
-      const schema = this.resolveSchema(this.state.plugins)
-      this.setState({ schema })
-    }
-
-    const state = this.onBeforeChange(props.state)
+    // Resolve the state, running the before change handler of the stack.
+    const state = stack.onBeforeChange(props.state, this)
     this.cacheState(state)
     this.setState({ state })
   }
@@ -166,43 +184,23 @@ class Editor extends React.Component {
   }
 
   /**
-   * Get the editor's current `schema`.
+   * Get the editor's current schema.
    *
    * @return {Schema}
    */
 
   getSchema = () => {
-    return this.state.schema
+    return this.state.stack.schema
   }
 
   /**
-   * Get the editor's current `state`.
+   * Get the editor's current state.
    *
    * @return {State}
    */
 
   getState = () => {
     return this.state.state
-  }
-
-  /**
-   * When the editor receives a new 'state'
-   *
-   * @param {State} state
-   * @return {State}
-   */
-
-  onBeforeChange = (state) => {
-    if (state == this.state.state) return state
-
-    for (const plugin of this.state.plugins) {
-      if (!plugin.onBeforeChange) continue
-      const newState = plugin.onBeforeChange(state, this)
-      if (newState == null) continue
-      state = newState
-    }
-
-    return state
   }
 
   /**
@@ -213,43 +211,16 @@ class Editor extends React.Component {
 
   onChange = (state) => {
     if (state == this.state.state) return
+    const { tmp, props } = this
+    const { stack } = this.state
+    const { onChange, onDocumentChange, onSelectionChange } = props
 
-    for (const plugin of this.state.plugins) {
-      if (!plugin.onChange) continue
-      const newState = plugin.onChange(state, this)
-      if (newState == null) continue
-      state = newState
-    }
-
-    this.props.onChange(state)
-
-    if (state.document != this.tmp.document) {
-      this.props.onDocumentChange(state.document, state)
-    }
-
-    if (state.selection != this.tmp.selection) {
-      this.props.onSelectionChange(state.selection, state)
-    }
+    state = stack.onChange(state, this)
+    onChange(state)
+    if (state.document != tmp.document) onDocumentChange(state.document, state)
+    if (state.selection != tmp.selection) onSelectionChange(state.selection, state)
 
     this.cacheState(state)
-  }
-
-  /**
-   * When an event by `name` fires, pass it through the plugins, and update the
-   * state if one of them chooses to.
-   *
-   * @param {String} name
-   * @param {Mixed} ...args
-   */
-
-  onEvent = (name, ...args) => {
-    for (const plugin of this.state.plugins) {
-      if (!plugin[name]) continue
-      const newState = plugin[name](...args, this.state.state, this)
-      if (!newState) continue
-      this.onChange(newState)
-      break
-    }
   }
 
   /**
@@ -260,7 +231,7 @@ class Editor extends React.Component {
 
   render = () => {
     const { props, state } = this
-    const handlers = { onChange: this.onChange }
+    const handlers = {}
 
     for (const property of EVENT_HANDLERS) {
       handlers[property] = this[property]
@@ -271,60 +242,16 @@ class Editor extends React.Component {
     return (
       <Content
         {...handlers}
-        className={props.className}
         editor={this}
+        onChange={this.onChange}
+        schema={this.getSchema()}
+        state={this.getState()}
+        className={props.className}
         readOnly={props.readOnly}
-        schema={state.schema}
         spellCheck={props.spellCheck}
-        state={state.state}
         style={props.style}
       />
     )
-  }
-
-  /**
-   * Resolve the editor's current plugins from `props` when they change.
-   *
-   * Add a plugin made from the editor's own `props` at the beginning of the
-   * stack. That way, you can add a `onKeyDown` handler to the editor itself,
-   * and it will override all of the existing plugins.
-   *
-   * Also add the "core" functionality plugin that handles the most basic events
-   * for the editor, like delete characters and such.
-   *
-   * @param {Object} props
-   * @return {Array}
-   */
-
-  resolvePlugins = (props) => {
-    // eslint-disable-next-line no-unused-vars
-    const { onChange, plugins, ...editorPlugin } = props
-    const corePlugin = CorePlugin(props)
-    return [
-      editorPlugin,
-      ...plugins,
-      corePlugin
-    ]
-  }
-
-  /**
-   * Resolve the editor's schema from a set of `plugins`.
-   *
-   * @param {Array} plugins
-   * @return {Schema}
-   */
-
-  resolveSchema = (plugins) => {
-    let rules = []
-
-    for (const plugin of plugins) {
-      if (!plugin.schema) continue
-      const schema = Schema.create(plugin.schema)
-      rules = rules.concat(schema.rules)
-    }
-
-    const schema = Schema.create({ rules })
-    return schema
   }
 
 }

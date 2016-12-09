@@ -22,7 +22,7 @@ class Transform {
    * Constructor.
    *
    * @param {Object} properties
-   *   @property {State} properties.state
+   *   @property {State} state
    */
 
   constructor(properties) {

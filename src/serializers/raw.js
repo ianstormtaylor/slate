@@ -4,6 +4,7 @@ import Character from '../models/character'
 import Document from '../models/document'
 import Inline from '../models/inline'
 import Mark from '../models/mark'
+import Selection from '../models/selection'
 import State from '../models/state'
 import Text from '../models/text'
 import isEmpty from 'is-empty'
@@ -145,6 +146,24 @@ const Raw = {
   },
 
   /**
+   * Deserialize a JSON `object` representing a `Selection`.
+   *
+   * @param {Object} object
+   * @param {Object} options (optional)
+   * @return {State}
+   */
+
+  deserializeSelection(object, options = {}) {
+    return Selection.create({
+      anchorKey: object.anchorKey,
+      anchorOffset: object.anchorOffset,
+      focusKey: object.focusKey,
+      focusOffset: object.focusOffset,
+      isFocused: object.isFocused,
+    })
+  },
+
+  /**
    * Deserialize a JSON `object` representing a `State`.
    *
    * @param {Object} object
@@ -155,9 +174,14 @@ const Raw = {
   deserializeState(object, options = {}) {
     if (options.terse) object = Raw.untersifyState(object)
 
-    return State.create({
-      document: Raw.deserializeDocument(object.document, options)
-    })
+    const document = Raw.deserializeDocument(object.document, options)
+    let selection
+
+    if (object.selection != null) {
+      selection = Raw.deserializeSelection(object.selection, options)
+    }
+
+    return State.create({ document, selection })
   },
 
   /**
@@ -338,6 +362,30 @@ const Raw = {
   },
 
   /**
+   * Serialize a `selection`.
+   *
+   * @param {Selection} selection
+   * @param {Object} options (optional)
+   * @return {Object}
+   */
+
+  serializeSelection(selection, options = {}) {
+    const object = {
+      kind: selection.kind,
+      anchorKey: selection.anchorKey,
+      anchorOffset: selection.anchorOffset,
+      focusKey: selection.focusKey,
+      focusOffset: selection.focusOffset,
+      isBackward: selection.isBackward,
+      isFocused: selection.isFocused,
+    }
+
+    return options.terse
+      ? Raw.tersifySelection(object)
+      : object
+  },
+
+  /**
    * Serialize a `state`.
    *
    * @param {State} state
@@ -348,12 +396,19 @@ const Raw = {
   serializeState(state, options = {}) {
     const object = {
       document: Raw.serializeDocument(state.document, options),
+      selection: Raw.serializeSelection(state.selection, options),
       kind: state.kind
     }
 
-    return options.terse
+    if (!options.preserveSelection) {
+      delete object.selection
+    }
+
+    const ret = options.terse
       ? Raw.tersifyState(object)
       : object
+
+    return ret
   },
 
   /**
@@ -462,6 +517,23 @@ const Raw = {
   },
 
   /**
+   * Create a terse representation of a selection `object.`
+   *
+   * @param {Object} object
+   * @return {Object}
+   */
+
+  tersifySelection(object) {
+    return {
+      anchorKey: object.anchorKey,
+      anchorOffset: object.anchorOffset,
+      focusKey: object.focusKey,
+      focusOffset: object.focusOffset,
+      isFocused: object.isFocused,
+    }
+  },
+
+  /**
    * Create a terse representation of a state `object`.
    *
    * @param {Object} object
@@ -469,7 +541,14 @@ const Raw = {
    */
 
   tersifyState(object) {
-    return object.document
+    if (object.selection == null) {
+      return object.document
+    }
+
+    return {
+      document: object.document,
+      selection: object.selection
+    }
   },
 
   /**
@@ -563,6 +642,25 @@ const Raw = {
   },
 
   /**
+   * Convert a terse representation of a selection `object` into a non-terse one.
+   *
+   * @param {Object} object
+   * @return {Object}
+   */
+
+  untersifySelection(object) {
+    return {
+      kind: 'selection',
+      anchorKey: object.anchorKey,
+      anchorOffset: object.anchorOffset,
+      focusKey: object.focusKey,
+      focusOffset: object.focusOffset,
+      isBackward: null,
+      isFocused: false
+    }
+  },
+
+  /**
    * Convert a terse representation of a state `object` into a non-terse one.
    *
    * @param {Object} object
@@ -570,6 +668,14 @@ const Raw = {
    */
 
   untersifyState(object) {
+    if (object.selection != null) {
+      return {
+        kind: 'state',
+        document: object.document,
+        selection: object.selection,
+      }
+    }
+
     return {
       kind: 'state',
       document: {

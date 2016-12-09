@@ -18,6 +18,7 @@ import Inline from './models/inline'
 import Mark from './models/mark'
 import Schema from './models/schema'
 import Selection from './models/selection'
+import Stack from './models/stack'
 import State from './models/state'
 import Text from './models/text'
 import Range from './models/range'
@@ -64,6 +65,7 @@ export {
   Raw,
   Schema,
   Selection,
+  Stack,
   State,
   Text,
   Transforms,
@@ -87,6 +89,7 @@ export default {
   Raw,
   Schema,
   Selection,
+  Stack,
   State,
   Text,
   Transforms,
