@@ -2,6 +2,7 @@
 import Normalize from '../utils/normalize'
 import Schema from '../models/schema'
 import warn from '../utils/warn'
+import { Set } from 'immutable'
 
 /**
  * Normalize the document and selection with a `schema`.
@@ -93,23 +94,44 @@ export function normalizeSelection(transform) {
  */
 
 function normalizeNodeAndChildren(transform, node, schema) {
-  // For performance considerations, we will check if the transform has actually
-  // added operations to the queue.
-  const count = transform.operations.length
+  if (node.kind == 'text') {
+    normalizeNode(transform, node, schema)
+    return
+  }
 
-  // Iterate over its children.
-  if (node.kind != 'text') {
-    node.nodes.forEach((child) => {
+  // We can't just loop the children and normalize them, because in the process
+  // of normalizing one child, we might end up creating another. Instead, we
+  // have to normalize one at a time, and check for new children along the way.
+  let stack = node.nodes.map(n => n.key).toStack()
+  let set = new Set()
+
+  // While there is still a child key that hasn't been normalized yet...
+  while (stack.size) {
+    const ops = transform.operations.length
+    let key
+
+    // Unwind the stack, normalizing every child and adding it to the set.
+    while (key = stack.peek()) {
+      const child = node.getChild(key)
       normalizeNodeAndChildren(transform, child, schema)
-    })
+      set = set.add(key)
+      stack = stack.pop()
+    }
+
+    // PERF: Only re-find the node and re-normalize any new children if
+    // operations occured that might have changed it.
+    if (transform.operations.length != ops) {
+      node = refindNode(transform, node)
+
+      // Add any new children back onto the stack.
+      node.nodes.forEach(n => {
+        if (set.has(n.key)) return
+        stack = stack.push(n.key)
+      })
+    }
   }
 
-  // Re-find the node reference if necessary.
-  if (transform.operations.length != count) {
-    node = refindNode(transform, node)
-  }
-
-  // Now normalize the node itself if it still exists.
+  // Normalize the node itself if it still exists.
   if (node) {
     normalizeNode(transform, node, schema)
   }
