@@ -45,7 +45,7 @@ function Plugin(options = {}) {
     if (state.isNative) return state
 
     const schema = editor.getSchema()
-    const { state: prevState } = editor.state
+    const prevState = editor.getState()
 
     // Since schema can only normalize the document, we avoid creating
     // a transform and normalize the selection if the document is the same
@@ -55,6 +55,7 @@ function Plugin(options = {}) {
       .normalize(schema)
       .apply({ save: false })
 
+    debug('onBeforeChange')
     return newState
   }
 

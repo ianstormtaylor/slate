@@ -102,8 +102,7 @@
     "release:next": "np --tag=next",
     "start": "http-server ./examples",
     "test": "npm-run-all build:test tests",
-    "tests": "mocha --compilers js:babel-core/register ./test/server.js",
-    "tests:browser": "mocha-phantomjs -p /usr/local/Cellar/phantomjs/2.1.1/bin/phantomjs ./test/support/browser.html",
+    "tests": "mocha --compilers js:babel-core/register ./test/index.js",
     "watch": "npm-run-all --parallel --print-label watch:lib watch:examples start",
     "watch:lib": "babel --watch --out-dir ./lib ./src",
     "watch:examples": "watchify --debug --transform babelify ./examples/index.js -o ./examples/build.dev.js"

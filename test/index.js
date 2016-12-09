@@ -15,6 +15,7 @@ import './rendering'
 import './schema'
 import './serializers'
 import './transforms'
+import './behavior'
 
 /**
  * Reset Slate's internal state before each text.

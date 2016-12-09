@@ -1,12 +1,10 @@
 
 import assert from 'assert'
 import fs from 'fs'
-import React from 'react'
 import readYaml from 'read-yaml-promise'
 import toCamel from 'to-camel-case'
-import { Editor, Raw } from '../..'
+import { Stack, Raw } from '../..'
 import { resolve } from 'path'
-import TestUtils from 'react-addons-test-utils'
 
 /**
  * Tests.
@@ -32,16 +30,11 @@ describe('behavior', () => {
           const expected = await readYaml(resolve(dir, 'output.yaml'))
           const module = require(dir)
           const fn = module.default
+
           let state = Raw.deserialize(input, { terse: true })
-
-          const props = {
-            state,
-            ...(module.props || {}),
-            onChange: (newState) => state = newState,
-          }
-
-          const editor = TestUtils.renderIntoDocument(<Editor {...props} />)
-          fn(state, editor)
+          const props = module.props || {}
+          const stack = Stack.create(props)
+          state = fn(state, stack)
 
           const output = Raw.serialize(state, {
             terse: true,

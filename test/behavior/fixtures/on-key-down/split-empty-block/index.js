@@ -1,6 +1,6 @@
 
-import simulate from '../../../../helpers/simulate'
+import Simulate from '../../../../helpers/simulate'
 
-export default function (state, editor) {
-  simulate(editor, 'keyDown', 'enter')
+export default function (state, stack) {
+  return Simulate.keyDown(stack, state, null, { key: 'enter' })
 }

@@ -1,6 +1,6 @@
 
-import simulate from '../../../../helpers/simulate'
+import Simulate from '../../../../helpers/simulate'
 
-export default function (state, editor) {
-  simulate(editor, 'blur')
+export default function (state, stack) {
+  return Simulate.blur(stack, state)
 }
