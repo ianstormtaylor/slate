@@ -6,7 +6,7 @@ import OffsetKey from '../utils/offset-key'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import Selection from '../models/selection'
-import Transfer from '../utils/transfer'
+import getTransferData from '../utils/get-transfer-data'
 import TYPES from '../constants/types'
 import getWindow from 'get-window'
 import keycode from 'keycode'
@@ -328,10 +328,10 @@ class Content extends React.Component {
     if (!this.isInContentEditable(event)) return
 
     const { dataTransfer } = event.nativeEvent
-    const transfer = new Transfer(dataTransfer)
+    const data = getTransferData(dataTransfer)
 
     // Prevent default when nodes are dragged to allow dropping.
-    if (transfer.getType() == 'node') {
+    if (data.type == 'node') {
       event.preventDefault()
     }
 
@@ -354,10 +354,10 @@ class Content extends React.Component {
     this.tmp.isDragging = true
     this.tmp.isInternalDrag = true
     const { dataTransfer } = event.nativeEvent
-    const transfer = new Transfer(dataTransfer)
+    const data = getTransferData(dataTransfer)
 
     // If it's a node being dragged, the data type is already set.
-    if (transfer.getType() == 'node') return
+    if (data.type == 'node') return
 
     const { state } = this.props
     const { fragment } = state
@@ -383,8 +383,7 @@ class Content extends React.Component {
     const { state } = this.props
     const { nativeEvent } = event
     const { dataTransfer, x, y } = nativeEvent
-    const transfer = new Transfer(dataTransfer)
-    const data = transfer.getData()
+    const data = getTransferData(dataTransfer)
 
     // Resolve the point where the drop occured.
     let range
@@ -584,8 +583,7 @@ class Content extends React.Component {
     if (!this.isInContentEditable(event)) return
 
     event.preventDefault()
-    const transfer = new Transfer(event.clipboardData)
-    const data = transfer.getData()
+    const data = getTransferData(event.clipboardData)
 
     // Attach the `isShift` flag, so that people can use it to trigger "Paste
     // and Match Style" logic.
