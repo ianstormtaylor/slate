@@ -597,9 +597,17 @@ class Selection extends new Record(DEFAULTS) {
    */
 
   moveStartOffset(n = 1) {
-    return this.isBackward
-      ? this.merge({ focusOffset: this.focusOffset + n })
-      : this.merge({ anchorOffset: this.anchorOffset + n })
+    if (this.isBackward) {
+      return this.merge({
+        focusOffset: this.focusOffset + n,
+        isBackward: null
+      })
+    } else {
+      return this.merge({
+        anchorOffset: this.anchorOffset + n,
+        isBackward: null
+      })
+    }
   }
 
   /**
@@ -610,9 +618,17 @@ class Selection extends new Record(DEFAULTS) {
    */
 
   moveEndOffset(n = 1) {
-    return this.isBackward
-      ? this.merge({ anchorOffset: this.anchorOffset + n })
-      : this.merge({ focusOffset: this.focusOffset + n })
+    if (this.isBackward) {
+      return this.merge({
+        anchorOffset: this.anchorOffset + n,
+        isBackward: null
+      })
+    } else {
+      return this.merge({
+        focusOffset: this.focusOffset + n,
+        isBackward: null
+      })
+    }
   }
 
   /**
@@ -623,9 +639,19 @@ class Selection extends new Record(DEFAULTS) {
    */
 
   moveStartTo(key, offset = 0) {
-    return this.isBackward
-      ? this.merge({ focusKey: key, focusOffset: offset })
-      : this.merge({ anchorKey: key, anchorOffset: offset })
+    if (this.isBackward) {
+      return this.merge({
+        focusKey: key,
+        focusOffset: offset,
+        isBackward: null
+      })
+    } else {
+      return this.merge({
+        anchorKey: key,
+        anchorOffset: offset,
+        isBackward: null
+      })
+    }
   }
 
   /**
@@ -636,9 +662,19 @@ class Selection extends new Record(DEFAULTS) {
    */
 
   moveEndTo(key, offset = 0) {
-    return this.isBackward
-      ? this.merge({ anchorKey: key, anchorOffset: offset })
-      : this.merge({ focusKey: key, focusOffset: offset })
+    if (this.isBackward) {
+      return this.merge({
+        anchorKey: key,
+        anchorOffset: offset,
+        isBackward: null
+      })
+    } else {
+      return this.merge({
+        focusKey: key,
+        focusOffset: offset,
+        isBackward: null
+      })
+    }
   }
 
   /**
