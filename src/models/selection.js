@@ -4,19 +4,6 @@ import warn from '../utils/warn'
 import { Record } from 'immutable'
 
 /**
- * Start-end-and-edge convenience methods to auto-generate.
- *
- * @type {Array}
- */
-
-const EDGE_METHODS = [
-  'has%AtStartOf',
-  'has%AtEndOf',
-  'has%Between',
-  'has%In',
-]
-
-/**
  * Default properties.
  *
  * @type {Object}
@@ -423,38 +410,6 @@ class Selection extends new Record(DEFAULTS) {
   }
 
   /**
-   * Move the end point to the start point.
-   *
-   * @return {Selection}
-   */
-
-  collapseToStart() {
-    return this.merge({
-      anchorKey: this.startKey,
-      anchorOffset: this.startOffset,
-      focusKey: this.startKey,
-      focusOffset: this.startOffset,
-      isBackward: false
-    })
-  }
-
-  /**
-   * Move the end point to the start point.
-   *
-   * @return {Selection}
-   */
-
-  collapseToEnd() {
-    return this.merge({
-      anchorKey: this.endKey,
-      anchorOffset: this.endOffset,
-      focusKey: this.endKey,
-      focusOffset: this.endOffset,
-      isBackward: false
-    })
-  }
-
-  /**
    * Move to the start of a `node`.
    *
    * @param {Node} node
@@ -590,45 +545,35 @@ class Selection extends new Record(DEFAULTS) {
   }
 
   /**
-   * Extend the start point forward `n` characters.
+   * Move the anchor offset `n` characters.
    *
    * @param {Number} n (optional)
    * @return {Selection}
    */
 
-  moveStartOffset(n = 1) {
-    if (this.isBackward) {
-      return this.merge({
-        focusOffset: this.focusOffset + n,
-        isBackward: null
-      })
-    } else {
-      return this.merge({
-        anchorOffset: this.anchorOffset + n,
-        isBackward: null
-      })
-    }
+  moveAnchorOffset(n = 1) {
+    const { anchorKey, focusKey, focusOffset } = this
+    const anchorOffset = this.anchorOffset + n
+    return this.merge({
+      anchorOffset,
+      isBackward: anchorKey == focusKey ? anchorOffset > focusOffset : this.isBackward
+    })
   }
 
   /**
-   * Extend the end point forward `n` characters.
+   * Move the anchor offset `n` characters.
    *
    * @param {Number} n (optional)
    * @return {Selection}
    */
 
-  moveEndOffset(n = 1) {
-    if (this.isBackward) {
-      return this.merge({
-        anchorOffset: this.anchorOffset + n,
-        isBackward: null
-      })
-    } else {
-      return this.merge({
-        focusOffset: this.focusOffset + n,
-        isBackward: null
-      })
-    }
+  moveFocusOffset(n = 1) {
+    const { focusKey, anchorKey, anchorOffset } = this
+    const focusOffset = this.focusOffset + n
+    return this.merge({
+      focusOffset,
+      isBackward: focusKey == anchorKey ? anchorOffset > focusOffset : this.isBackward
+    })
   }
 
   /**
@@ -724,14 +669,37 @@ class Selection extends new Record(DEFAULTS) {
     })
   }
 
+  /**
+   * Flip the selection.
+   *
+   * @return {Selection}
+   */
+
+  flip() {
+    return this.merge({
+      anchorKey: this.focusKey,
+      anchorOffset: this.focusOffset,
+      focusKey: this.anchorKey,
+      focusOffset: this.anchorOffset,
+      isBackward: this.isBackward == null ? null : !this.isBackward,
+    })
+  }
+
 }
 
 /**
  * Add start, end and edge convenience methods.
  */
 
-EDGE_METHODS.forEach((pattern) => {
-  const [ p, s ] = pattern.split('%')
+[
+  ['has', 'AtStartOf', true],
+  ['has', 'AtEndOf', true],
+  ['has', 'Between', true],
+  ['has', 'In', true],
+  ['collapseTo', ''],
+  ['move', 'Offset'],
+].forEach((opts) => {
+  const [ p, s, hasEdge ] = opts
   const anchor = `${p}Anchor${s}`
   const edge = `${p}Edge${s}`
   const end = `${p}End${s}`
@@ -750,8 +718,10 @@ EDGE_METHODS.forEach((pattern) => {
       : this[focus](...args)
   }
 
-  Selection.prototype[edge] = function (...args) {
-    return this[anchor](...args) || this[focus](...args)
+  if (hasEdge) {
+    Selection.prototype[edge] = function (...args) {
+      return this[anchor](...args) || this[focus](...args)
+    }
   }
 })
 

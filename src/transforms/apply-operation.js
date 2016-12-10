@@ -104,7 +104,7 @@ function insertNode(state, operation) {
 function insertText(state, operation) {
   const { path, offset, text, marks } = operation
   let { document, selection } = state
-  const { startKey, endKey, startOffset, endOffset } = selection
+  const { anchorKey, focusKey, anchorOffset, focusOffset } = selection
   let node = document.assertPath(path)
 
   // Update the document
@@ -112,11 +112,11 @@ function insertText(state, operation) {
   document = document.updateDescendant(node)
 
   // Update the selection
-  if (startKey == node.key && startOffset >= offset) {
-    selection = selection.moveStartOffset(text.length)
+  if (anchorKey == node.key && anchorOffset >= offset) {
+    selection = selection.moveAnchorOffset(text.length)
   }
-  if (endKey == node.key && endOffset >= offset) {
-    selection = selection.moveEndOffset(text.length)
+  if (focusKey == node.key && focusOffset >= offset) {
+    selection = selection.moveFocusOffset(text.length)
   }
 
   state = state.merge({ document, selection })
@@ -287,15 +287,15 @@ function removeText(state, operation) {
   const { path, offset, length } = operation
   const rangeOffset = offset + length
   let { document, selection } = state
-  const { startKey, endKey, startOffset, endOffset } = selection
+  const { anchorKey, focusKey, anchorOffset, focusOffset } = selection
   let node = document.assertPath(path)
 
   // Update the selection
-  if (startKey == node.key && startOffset >= rangeOffset) {
-    selection = selection.moveStartOffset(-length)
+  if (anchorKey == node.key && anchorOffset >= rangeOffset) {
+    selection = selection.moveAnchorOffset(-length)
   }
-  if (endKey == node.key && endOffset >= rangeOffset) {
-    selection = selection.moveEndOffset(-length)
+  if (focusKey == node.key && focusOffset >= rangeOffset) {
+    selection = selection.moveFocusOffset(-length)
   }
 
   node = node.removeText(offset, length)

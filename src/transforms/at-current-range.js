@@ -466,12 +466,18 @@ export function wrapText(transform, prefix, suffix = prefix) {
   const { selection } = state
   transform.wrapTextAtRange(selection, prefix, suffix)
 
+  // If the selection was collapsed, it will have moved the start offset too.
+  if (selection.isCollapsed) {
+    transform.moveStartOffset(0 - prefix.length)
+  }
+
   // Adding the suffix will have pushed the end of the selection further on, so
   // we need to move it back to account for this.
   transform.moveEndOffset(0 - suffix.length)
 
-  // If the selection was collapsed, it will have moved the start offset too.
-  if (selection.isCollapsed) {
-    transform.moveStartOffset(0 - prefix.length)
+  // There's a chance that the selection points moved "through" each other,
+  // resulting in a now-incorrect selection direction.
+  if (selection.isForward != transform.state.selection.isForward) {
+    transform.flipSelection()
   }
 }

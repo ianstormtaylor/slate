@@ -22,6 +22,8 @@ export const moveToRangeOf = generate('moveToRangeOf')
 export const moveStartOffset = generate('moveStartOffset')
 export const moveEndOffset = generate('moveEndOffset')
 
+export const flipSelection = generate('flip')
+
 /**
  * Move the selection to the end of the next block.
  *
