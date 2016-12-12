@@ -134,6 +134,8 @@ class Content extends React.Component {
     const { document } = state
     const schema = editor.getSchema()
     const offsetKey = OffsetKey.findKey(element, offset)
+    if (!offsetKey) return null
+
     const { key } = offsetKey
     const node = document.getDescendant(key)
     const decorators = document.getDescendantDecorators(key, schema)
@@ -399,6 +401,8 @@ class Content extends React.Component {
     const startNode = range.startContainer
     const startOffset = range.startOffset
     const point = this.getPoint(startNode, startOffset)
+    if (!point) return
+
     const target = Selection.create({
       anchorKey: point.key,
       anchorOffset: point.offset,
@@ -441,9 +445,10 @@ class Content extends React.Component {
     const native = window.getSelection()
     const { anchorNode, anchorOffset } = native
     const point = this.getPoint(anchorNode, anchorOffset)
-    const { key, index, start, end } = point
+    if (!point) return
 
     // Get the range in question.
+    const { key, index, start, end } = point
     const { state, editor } = this.props
     const { document, selection } = state
     const schema = editor.getSchema()
@@ -622,6 +627,7 @@ class Content extends React.Component {
       const { anchorNode, anchorOffset, focusNode, focusOffset } = native
       const anchor = this.getPoint(anchorNode, anchorOffset)
       const focus = this.getPoint(focusNode, focusOffset)
+      if (!anchor || !focus) return
 
       // There are valid situations where a select event will fire when we're
       // already at that position (for example when entering a character), since

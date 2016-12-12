@@ -75,6 +75,7 @@ function findKey(rawNode, rawOffset) {
   // ancestor, so find it by going down from the nearest void parent.
   if (!closest) {
     const closestVoid = parentNode.closest(VOID_SELECTOR)
+    if (!closestVoid) return null
     closest = closestVoid.querySelector(SELECTOR)
     offset = closest.textContent.length
   }
@@ -82,10 +83,8 @@ function findKey(rawNode, rawOffset) {
   // Get the string value of the offset key attribute.
   offsetKey = closest.getAttribute(ATTRIBUTE)
 
-  // If we still didn't find an offset key, this is a bug.
-  if (!offsetKey) {
-    throw new Error(`Unable to find offset key for ${node} with offset "${offset}".`)
-  }
+  // If we still didn't find an offset key, abort.
+  if (!offsetKey) return null
 
   // Return the parsed the offset key.
   const parsed = parse(offsetKey)
