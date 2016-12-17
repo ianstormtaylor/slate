@@ -93,7 +93,7 @@ Transform methods can either operate on the [`Document`](./document.md), the [`S
 
 ### `state`
 
-An instance of [`State`](./state.md) where the transform was created from.
+A [`State`](./state.md) with the transform's current operations applied. Each time you run a new transform function this property will be updated.
 
 
 ## Methods
