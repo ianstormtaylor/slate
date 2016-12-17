@@ -13,6 +13,7 @@ Transform methods can either operate on the [`Document`](./document.md), the [`S
 
 - [Methods](#methods)
   - [`apply`](#apply)
+  - [`call`](#call)
 - [Current State Transforms](#current-state-transforms)
   - [`deleteBackward`](#deletebackward)
   - [`deleteForward`](#deleteforward)
@@ -96,6 +97,23 @@ Applies all of the current transform steps, returning the newly transformed [`St
 
 - `save: Boolean` — override the editor's built-in logic of whether to create a new snapshot in the history, that can be reverted to later.
 
+### `call`
+`call(customTransform: Function, ...arguments) => Transform`
+
+This method calls the provided function argument `customTransform` with the current instance of the `Transform` object as the first argument and passes through the remaining arguments.
+
+The function signature for `customTransform` is:
+
+`customTransform(transform: Transform, ...arguments)`
+
+The purpose of `call` is to enable custom transform methods to exist and called in a chain. For example:
+
+```
+return state.transform()
+  .call(myCustomInsertTableTransform, columns, rows)
+  .focus()
+  .apply()
+```
 
 ## Current State Transforms
 
