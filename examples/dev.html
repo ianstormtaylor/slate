@@ -8,6 +8,17 @@
   </head>
   <body>
     <main></main>
-    <script src="build.dev.js"></script>
+    <script>
+      // Dynamically creates the script tag and adds the current time in ms
+      // as a query on the URL. This ensures the script is always reloaded.
+      //
+      // Useful during debugging because we want to see changes to the
+      // JavaScript code immediately.
+      var head = document.getElementsByTagName('head')[0];
+      var script = document.createElement('script');
+      script.type = 'text/javascript';
+      script.src = 'build.dev.js?' + new Date().getTime();
+      head.appendChild(script);
+    </script>
   </body>
 </html>
