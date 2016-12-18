@@ -86,8 +86,33 @@ input:focus {
  * App.
  */
 
+.topbar {
+  padding: 10px 15px;
+  color: #AAA;
+  background: #000;
+}
+
+.topbar-title {
+  margin-right: 0.5em;
+}
+
+.topbar-links {
+  float: right;
+}
+
+.topbar-link {
+  margin-left: 1em;
+  color: #AAA;
+  text-decoration: none;
+}
+
+.topbar-link:hover {
+  color: #FFF;
+  text-decoration: underline;
+}
+
 .tabs {
-  padding: 20px;
+  padding: 15px 15px;
   background-color: #222;
   text-align: center;
   margin-bottom: 30px;
@@ -97,14 +122,22 @@ input:focus {
   color: #777;
   display: inline-block;
   text-decoration: none;
+  padding: 0.2em 0.5em;
+  border-radius: 0.2em;
+  margin-bottom: 0.2em;
+}
+
+.tab:hover {
+  background: #333;
 }
 
 .tab + .tab {
-  margin-left: 30px;
+  margin-left: 0.5em;
 }
 
 .tab.active {
   color: white;
+  background: #333;
 }
 
 /**
