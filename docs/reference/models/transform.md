@@ -11,6 +11,8 @@ All changes are performed through `Transform` objects, so that a history of chan
 
 Transform methods can either operate on the [`Document`](./document.md), the [`Selection`](./selection.md), or both at once.
 
+- [Properties](#properties)
+  - [`state`](#state)
 - [Methods](#methods)
   - [`apply`](#apply)
   - [`call`](#call)
@@ -86,6 +88,13 @@ Transform methods can either operate on the [`Document`](./document.md), the [`S
 - [History Transforms](#history-transforms)
   - [`redo`](#redo)
   - [`undo`](#undo)
+
+
+## Properties
+
+### `state`
+
+A [`State`](./state.md) with the transform's current operations applied. Each time you run a new transform function this property will be updated.
 
 
 ## Methods
