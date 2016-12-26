@@ -53,8 +53,31 @@ class App extends React.Component {
   render() {
     return (
       <div className="app">
+        {this.renderTopBar()}
         {this.renderTabBar()}
         {this.renderExample()}
+      </div>
+    )
+  }
+
+  /**
+   * Render the top bar.
+   *
+   * @return {Element} element
+   */
+
+  renderTopBar() {
+    return (
+      <div className="topbar">
+        <span className="topbar-title">Slate Examples</span>
+        <div className="topbar-links">
+          <a className="topbar-link" href="https://github.com/ianstormtaylor/slate">
+            GitHub
+          </a>
+          <a className="topbar-link" href="https://docs.slatejs.org/">
+            Docs
+          </a>
+        </div>
       </div>
     )
   }
