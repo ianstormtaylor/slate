@@ -62,6 +62,8 @@ class Editor extends React.Component {
     onBeforeChange: React.PropTypes.func,
     onChange: React.PropTypes.func,
     onDocumentChange: React.PropTypes.func,
+    onEditorLockChange: React.PropTypes.func,
+    onReadOnlyChange: React.PropTypes.func,
     onSelectionChange: React.PropTypes.func,
     placeholder: React.PropTypes.any,
     placeholderClassName: React.PropTypes.string,
@@ -83,6 +85,8 @@ class Editor extends React.Component {
   static defaultProps = {
     onChange: noop,
     onDocumentChange: noop,
+    onEditorLockChange: noop,
+    onReadOnlyChange: noop,
     onSelectionChange: noop,
     plugins: [],
     readOnly: false,
@@ -100,6 +104,8 @@ class Editor extends React.Component {
     super(props)
     this.tmp = {}
     this.state = {}
+
+    this.state.locked = false
 
     // Create a new `Stack`, omitting the `onChange` property since that has
     // special significance on the editor itself.
@@ -139,8 +145,15 @@ class Editor extends React.Component {
       this.setState({ stack })
     }
 
+    let { state } = props
+
+    // Run the readonly change handler if needed.
+    if (props.readOnly !== this.props.readOnly) {
+      state = stack.onReadOnlyChange(state, this, props.readOnly)
+    }
+
     // Resolve the state, running the before change handler of the stack.
-    const state = stack.onBeforeChange(props.state, this)
+    state = stack.onBeforeChange(state, this)
     this.cacheState(state)
     this.setState({ state })
   }
@@ -179,6 +192,34 @@ class Editor extends React.Component {
       .transform()
       .focus()
       .apply()
+
+    this.onChange(state)
+  }
+
+  /**
+   * Put the editor in locked state.
+   */
+
+  lock = () => {
+    if (this.state.locked) return
+
+    let {stack, state } = this.state
+    this.setState({locked: true})
+    state = stack.onEditorLockChange(state, this, true)
+
+    this.onChange(state)
+  }
+
+  /**
+   * Unlock the editor.
+   */
+
+  unlock = () => {
+    if (!this.state.locked) return
+
+    let { stack, state } = this.state
+    this.setState({locked: false})
+    state = stack.onEditorLockChange(state, this, false)
 
     this.onChange(state)
   }
@@ -247,7 +288,7 @@ class Editor extends React.Component {
         schema={this.getSchema()}
         state={this.getState()}
         className={props.className}
-        readOnly={props.readOnly}
+        readOnly={props.readOnly || state.locked}
         spellCheck={props.spellCheck}
         style={props.style}
       />
