@@ -34,6 +34,7 @@ class Node extends React.Component {
     editor: React.PropTypes.object.isRequired,
     node: React.PropTypes.object.isRequired,
     parent: React.PropTypes.object.isRequired,
+    readOnly: React.PropTypes.bool.isRequired,
     schema: React.PropTypes.object.isRequired,
     state: React.PropTypes.object.isRequired
   }
@@ -87,6 +88,8 @@ class Node extends React.Component {
    */
 
   shouldComponentUpdate = (nextProps) => {
+    if (nextProps.readOnly !== this.props.readOnly) return true
+
     const { Component } = this.state
 
     // If the node is rendered with a `Component` that has enabled suppression
@@ -253,6 +256,7 @@ class Node extends React.Component {
         node={child}
         parent={this.props.node}
         editor={this.props.editor}
+        readOnly={this.props.readOnly}
         schema={this.props.schema}
         state={this.props.state}
       />
@@ -266,7 +270,7 @@ class Node extends React.Component {
    */
 
   renderElement = () => {
-    const { editor, node, parent, state } = this.props
+    const { editor, node, parent, readOnly, state } = this.props
     const { Component } = this.state
     const children = node.nodes
       .map(child => this.renderNode(child))
@@ -293,6 +297,7 @@ class Node extends React.Component {
         editor={editor}
         parent={parent}
         node={node}
+        readOnly={readOnly}
         state={state}
       >
         {children}
