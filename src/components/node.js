@@ -88,6 +88,8 @@ class Node extends React.Component {
    */
 
   shouldComponentUpdate = (nextProps) => {
+    // If the `readOnly` status has changed, we need to re-render in case there is
+    // any user-land logic that depends on it, like nested editable contents.
     if (nextProps.readOnly !== this.props.readOnly) return true
 
     const { Component } = this.state
