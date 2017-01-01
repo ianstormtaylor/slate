@@ -761,7 +761,7 @@ class Content extends React.Component {
    */
 
   renderNode = (node) => {
-    const { editor, schema, state } = this.props
+    const { editor, readOnly, schema, state } = this.props
 
     return (
       <Node
@@ -771,6 +771,7 @@ class Content extends React.Component {
         schema={schema}
         state={state}
         editor={editor}
+        readOnly={readOnly}
       />
     )
   }
