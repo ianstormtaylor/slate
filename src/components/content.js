@@ -50,7 +50,8 @@ class Content extends React.Component {
     schema: React.PropTypes.object,
     spellCheck: React.PropTypes.bool.isRequired,
     state: React.PropTypes.object.isRequired,
-    style: React.PropTypes.object
+    style: React.PropTypes.object,
+    tabIndex: React.PropTypes.number
   };
 
   /**
@@ -694,7 +695,7 @@ class Content extends React.Component {
 
   render = () => {
     const { props } = this
-    const { className, readOnly, state } = props
+    const { className, readOnly, state, tabIndex } = props
     const { document } = state
     const children = document.nodes
       .map(node => this.renderNode(node))
@@ -747,6 +748,7 @@ class Content extends React.Component {
         onSelect={this.onSelect}
         spellCheck={spellCheck}
         style={style}
+        tabIndex={tabIndex}
       >
         {children}
       </div>

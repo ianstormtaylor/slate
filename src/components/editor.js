@@ -71,7 +71,8 @@ class Editor extends React.Component {
     schema: React.PropTypes.object,
     spellCheck: React.PropTypes.bool,
     state: React.PropTypes.instanceOf(State).isRequired,
-    style: React.PropTypes.object
+    style: React.PropTypes.object,
+    tabIndex: React.PropTypes.number
   };
 
   /**
@@ -250,6 +251,7 @@ class Editor extends React.Component {
         readOnly={props.readOnly}
         spellCheck={props.spellCheck}
         style={props.style}
+        tabIndex={props.tabIndex}
       />
     )
   }
