@@ -97,7 +97,7 @@ Indicates if it should participate to [sequential keyboard navigation](https://d
 
 ### `role`
 
-ARIA property to define the role of the editor, it defaults to `textbox` when erditable.
+ARIA property to define the role of the editor, it defaults to `textbox` when editable.
 
 ## Placeholder Properties
 
