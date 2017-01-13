@@ -95,6 +95,10 @@ An optional dictionary of styles to apply to the content editable element.
 
 Indicates if it should participate to [sequential keyboard navigation](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/tabindex).
 
+### `role`
+
+ARIA property to define the role of the editor, it defaults to `textbox` when erditable.
+
 ## Placeholder Properties
 
 ```js

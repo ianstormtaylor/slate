@@ -47,6 +47,7 @@ class Content extends React.Component {
     onPaste: React.PropTypes.func.isRequired,
     onSelect: React.PropTypes.func.isRequired,
     readOnly: React.PropTypes.bool.isRequired,
+    role: React.PropTypes.string,
     schema: React.PropTypes.object,
     spellCheck: React.PropTypes.bool.isRequired,
     state: React.PropTypes.object.isRequired,
@@ -695,7 +696,7 @@ class Content extends React.Component {
 
   render = () => {
     const { props } = this
-    const { className, readOnly, state, tabIndex } = props
+    const { className, readOnly, state, tabIndex, role } = props
     const { document } = state
     const children = document.nodes
       .map(node => this.renderNode(node))
@@ -748,6 +749,7 @@ class Content extends React.Component {
         onSelect={this.onSelect}
         spellCheck={spellCheck}
         style={style}
+        role={readOnly ? null : (role || 'textbox')}
         tabIndex={tabIndex}
       >
         {children}
