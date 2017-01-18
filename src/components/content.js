@@ -11,6 +11,7 @@ import TYPES from '../constants/types'
 import getWindow from 'get-window'
 import keycode from 'keycode'
 import { IS_FIREFOX, IS_MAC } from '../constants/environment'
+import { Broadcast} from 'react-broadcast'
 
 /**
  * Debug.
@@ -696,6 +697,43 @@ class Content extends React.Component {
     const { props } = this
     const { className, readOnly, state } = props
     const { document } = state
+    
+    // COMPAT: In Firefox, spellchecking can remove entire wrapping elements
+    // including inline ones like `<a>`, which is jarring for the user but also
+    // causes the DOM to get into an irreconcilable state. (2016/09/01)
+    const spellCheck = IS_FIREFOX ? false : props.spellCheck
+
+    debug('render', { props })
+    
+    if(props.children){
+      return <Broadcast channel="slateEditor" value={this.props}>
+        <div
+            data-slate-editor
+            key={this.forces}
+            ref={this.ref}
+            className={className}
+            onBeforeInput={this.onBeforeInput}
+            onBlur={this.onBlur}
+            onCompositionEnd={this.onCompositionEnd}
+            onCompositionStart={this.onCompositionStart}
+            onCopy={this.onCopy}
+            onCut={this.onCut}
+            onDragEnd={this.onDragEnd}
+            onDragOver={this.onDragOver}
+            onDragStart={this.onDragStart}
+            onDrop={this.onDrop}
+            onInput={this.onInput}
+            onKeyDown={this.onKeyDown}
+            onKeyUp={this.onKeyUp}
+            onPaste={this.onPaste}
+            onSelect={this.onSelect}
+            spellCheck={spellCheck}
+          >
+          {props.children}
+        </div>
+      </Broadcast>
+    }
+    
     const children = document.nodes
       .map(node => this.renderNode(node))
       .toArray()
@@ -714,13 +752,6 @@ class Content extends React.Component {
       // Allow for passed-in styles to override anything.
       ...props.style,
     }
-
-    // COMPAT: In Firefox, spellchecking can remove entire wrapping elements
-    // including inline ones like `<a>`, which is jarring for the user but also
-    // causes the DOM to get into an irreconcilable state. (2016/09/01)
-    const spellCheck = IS_FIREFOX ? false : props.spellCheck
-
-    debug('render', { props })
 
     return (
       <div

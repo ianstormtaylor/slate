@@ -250,6 +250,7 @@ class Editor extends React.Component {
         readOnly={props.readOnly}
         spellCheck={props.spellCheck}
         style={props.style}
+        children={props.children}
       />
     )
   }

@@ -5,6 +5,7 @@
 
 import Editor from './components/editor'
 import Placeholder from './components/placeholder'
+import NodeEditor from './components/editor'
 
 /**
  * Models.
@@ -80,6 +81,7 @@ export default {
   Data,
   Document,
   Editor,
+  NodeEditor,
   Html,
   Inline,
   Mark,
