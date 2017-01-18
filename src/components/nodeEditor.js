@@ -19,12 +19,12 @@ const debug = Debug('slate:nodeEditor')
 
 class NodeEditor extends React.Component {
 	render = () => {
-	const {node} = this.props;
+		const node = typeof this.props.node == 'function' ? this.props.node(state) : this.props.node;
 		if(!node){
 			return null;
 		}
-	return <Subscriber channel="slateEditor">
-        {props => {
+		return <Subscriber channel="slateEditor">
+		{props => {
 			const { editor, readOnly, schema, state } = props;
 			let style = {
 			  // Prevent the default outline styles.
