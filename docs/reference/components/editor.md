@@ -51,7 +51,7 @@ The top-level React component that renders the Slate editor itself.
 />
 ```
 
-### `className` 
+### `className`
 `String`
 
 An optional class name to apply to the content editable element.
@@ -91,6 +91,13 @@ A [`State`](../models/state.md) object representing the current state of the edi
 
 An optional dictionary of styles to apply to the content editable element.
 
+### `tabIndex`
+
+Indicates if it should participate to [sequential keyboard navigation](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/tabindex).
+
+### `role`
+
+ARIA property to define the role of the editor, it defaults to `textbox` when editable.
 
 ## Placeholder Properties
 
@@ -122,7 +129,7 @@ An optional dictionary of styles to apply to the default block type's placeholde
 
 In addition to its own properties, the editor allows passing any of the properties that a [plugin](../plugins/plugin.md) defines as well.
 
-These properties are actually just a convenience—an implicit plugin definition. Internally, they are grouped together and turned into a plugin that is given first priority in the plugin stack. 
+These properties are actually just a convenience—an implicit plugin definition. Internally, they are grouped together and turned into a plugin that is given first priority in the plugin stack.
 
 For example, these two snippets of code are equivalent:
 
@@ -140,7 +147,7 @@ const plugins = [
 
 ```js
 const editorPlugin = {
-  onKeyDown: myKeyHandler 
+  onKeyDown: myKeyHandler
 }
 
 const plugins = [
@@ -179,17 +186,17 @@ Programmatically blur the editor.
 
 Programmatically focus the editor.
 
-### `getSchema` 
+### `getSchema`
 `getSchema() => Schema`
 
 Return the editor's current schema.
 
-### `getState` 
+### `getState`
 `getState() => State`
 
 Return the editor's current state.
 
-### `onChange` 
+### `onChange`
 `onChange(state: State) => Void`
 
 Effectively the same as `setState`. Invoking this method will update the state of the editor, running it through all of it's plugins, and passing it the parent component, before it cycles back down as the new `state` property of the editor.
