@@ -1,6 +1,7 @@
 
 kind: state
 document:
+  data: {}
   kind: document
   nodes:
     - kind: block

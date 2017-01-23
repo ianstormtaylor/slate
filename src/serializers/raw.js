@@ -62,6 +62,7 @@ const Raw = {
   deserializeDocument(object, options) {
     return Document.create({
       key: object.key,
+      data: object.data,
       nodes: Block.createList(object.nodes.map((node) => {
         return Raw.deserializeNode(node, options)
       }))
@@ -254,6 +255,7 @@ const Raw = {
 
   serializeDocument(document, options = {}) {
     const object = {
+      data: document.data.toJSON(),
       key: document.key,
       kind: document.kind,
       nodes: document.nodes
@@ -467,6 +469,7 @@ const Raw = {
     const ret = {}
     ret.nodes = object.nodes
     if (object.key) ret.key = object.key
+    if (!isEmpty(object.data)) ret.data = object.data
     return ret
   },
 
@@ -679,6 +682,7 @@ const Raw = {
     return {
       kind: 'state',
       document: {
+        data: object.data,
         key: object.key,
         kind: 'document',
         nodes: object.nodes

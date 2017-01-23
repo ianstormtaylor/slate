@@ -32,7 +32,8 @@ const OPERATIONS = {
   set_node: setNode,
   split_node: splitNode,
   // Selection operations.
-  set_selection: setSelection
+  set_selection: setSelection,
+  set_document_data: setDocumentData
 }
 
 /**
@@ -301,6 +302,23 @@ function removeText(state, operation) {
   node = node.removeText(offset, length)
   document = document.updateDescendant(node)
   state = state.merge({ document, selection })
+  return state
+}
+
+/**
+ * Set `data` property on document.
+ *
+ * @param {State} state
+ * @param {Object} operation
+ * @return {State}
+ */
+
+function setDocumentData(state, operation) {
+  let { document } = state
+  const { data } = operation
+
+  document = document.merge({ data })
+  state = state.merge({ document })
   return state
 }
 
