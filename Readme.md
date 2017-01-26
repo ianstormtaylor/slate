@@ -21,6 +21,7 @@ _**Slate is currently in beta**. It's useable now, but you might need to pull re
 
 
 <br/>
+
 ### Why?
 
 Why create Slate? Well... _(Beware: this section has a few of [my](https://github.com/ianstormtaylor) opinions!)_
@@ -47,6 +48,7 @@ Of course those are my own opinions, and if those libraries solve your needs, us
 
 
 <br/>
+
 ### Principles
 
 Slate tries to solve the question of "[Why?](#why)" with a few principles:
@@ -67,12 +69,14 @@ Slate tries to solve the question of "[Why?](#why)" with a few principles:
 
 
 <br/>
+
 ### Demo
 
 Check out the [**live demo**](http://slatejs.org) of all of the examples!
 
 
 <br/>
+
 ### Examples
 
 To get a sense for how you might use Slate, check out a few of the examples:
@@ -91,6 +95,7 @@ If you have an idea for an example that shows a common use case, pull request it
 
 
 <br/>
+
 ### Plugins
 
 Slate encourages you to write small, reusable modules. Check out the public ones you can use in your project!
@@ -105,6 +110,7 @@ Slate encourages you to write small, reusable modules. Check out the public ones
 - [**View all plugins on `npm`...**](https://www.npmjs.com/browse/keyword/slate)
 
 <br/>
+
 ### Documentation
 
 If you're using Slate for the first time, check out the [Getting Started](http://docs.slatejs.org/walkthroughs/installing-slate.html) walkthroughs to familiarize yourself with Slate's architecture and mental models. Once you've gotten familiar with those, you'll probably want to check out the full [API Reference](http://docs.slatejs.org/reference/components/editor.html).
@@ -118,6 +124,7 @@ If even that's not enough, you can always [read the source itself](./src), which
 
 
 <br/>
+
 ### Contributing!
 
 All contributions are super welcome! Check out the [Contributing instructions](./Contributing.md) for more info!
