@@ -68,7 +68,7 @@ An object that defines the [`Marks`](./mark.md) in the schema by `type`. Each ke
 }
 ```
 
-An object that defines the [`Block`](./block.md) and [`Inline`](./inline.md) nodes in the schema by `type`. Each key in the object refers to a node by its `type`. The values defines how Slate will render the node, and can optionall define any other property of a schema `Rule`.
+An object that defines the [`Block`](./block.md) and [`Inline`](./inline.md) nodes in the schema by `type`. Each key in the object refers to a node by its `type`. The values defines how Slate will render the node, and can optionally define any other property of a schema `Rule`.
 
 ### `rules`
 `Array<Rule>`
