@@ -32,8 +32,7 @@ const OPERATIONS = {
   set_node: setNode,
   split_node: splitNode,
   // Selection operations.
-  set_selection: setSelection,
-  set_document_data: setDocumentData
+  set_selection: setSelection
 }
 
 /**
@@ -306,23 +305,6 @@ function removeText(state, operation) {
 }
 
 /**
- * Set `data` property on document.
- *
- * @param {State} state
- * @param {Object} operation
- * @return {State}
- */
-
-function setDocumentData(state, operation) {
-  let { document } = state
-  const { data } = operation
-
-  document = document.merge({ data })
-  state = state.merge({ document })
-  return state
-}
-
-/**
  * Set `properties` on mark on text at `offset` and `length` in node by `path`.
  *
  * @param {State} state
@@ -366,7 +348,7 @@ function setNode(state, operation) {
   }
 
   node = node.merge(properties)
-  document = document.updateDescendant(node)
+  document = node.kind === 'document' ? node : document.updateDescendant(node)
   state = state.merge({ document })
   return state
 }

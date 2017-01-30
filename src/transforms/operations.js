@@ -290,13 +290,15 @@ export function setDocumentDataOperation(transform, data) {
   const inverseData = document.data
 
   const inverse = [{
-    type: 'set_document_data',
-    data: inverseData,
+    type: 'set_node',
+    path: [],
+    properties: {data: inverseData}
   }]
 
   const operation = {
-    type: 'set_document_data',
-    data,
+    type: 'set_node',
+    path: [],
+    properties: {data},
     inverse,
   }
 
