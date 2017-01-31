@@ -255,8 +255,8 @@ export function setNodeByKey(transform, key, properties, options = {}) {
   transform.setNodeOperation(path, properties)
 
   if (normalize) {
-    const parent = document.getParent(key)
-    transform.normalizeNodeByKey(parent.key, SCHEMA)
+    const node = key === document.key ? document : document.getParent(key)
+    transform.normalizeNodeByKey(node.key, SCHEMA)
   }
 }
 
