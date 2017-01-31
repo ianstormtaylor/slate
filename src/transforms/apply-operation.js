@@ -348,7 +348,7 @@ function setNode(state, operation) {
   }
 
   node = node.merge(properties)
-  document = document.updateDescendant(node)
+  document = node.kind === 'document' ? node : document.updateDescendant(node)
   state = state.merge({ document })
   return state
 }
