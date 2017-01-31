@@ -29,7 +29,6 @@ import {
   setMarkOperation,
   setNodeOperation,
   setSelectionOperation,
-  setDocumentDataOperation,
   splitNodeAtOffsetOperation,
   splitNodeOperation,
 } from './operations'
@@ -215,7 +214,6 @@ export default {
   setMarkOperation,
   setNodeOperation,
   setSelectionOperation,
-  setDocumentDataOperation,
   splitNodeAtOffsetOperation,
   splitNodeOperation,
 

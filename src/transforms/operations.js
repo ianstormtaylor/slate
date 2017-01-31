@@ -278,34 +278,6 @@ export function removeTextOperation(transform, path, offset, length) {
 }
 
 /**
- * Set `data` property on document.
- *
- * @param {Transform} transform
- * @param {Object} data
- */
-
-export function setDocumentDataOperation(transform, data) {
-  const { state } = transform
-  const { document } = state
-  const inverseData = document.data
-
-  const inverse = [{
-    type: 'set_node',
-    path: [],
-    properties: {data: inverseData}
-  }]
-
-  const operation = {
-    type: 'set_node',
-    path: [],
-    properties: {data},
-    inverse,
-  }
-
-  transform.applyOperation(operation)
-}
-
-/**
  * Set `properties` on mark on text at `offset` and `length` in node by `path`.
  *
  * @param {Transform} transform
