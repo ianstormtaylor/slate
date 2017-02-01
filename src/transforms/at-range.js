@@ -131,8 +131,8 @@ export function deleteAtRange(transform, range, options = {}) {
 
 export function deleteCharBackwardAtRange(transform, range, options) {
   const { state } = transform
-  const { startOffset, startBlock } = state
-  const { text } = startBlock
+  const { startOffset, startText } = state
+  const { text } = startText
   const n = String.getCharOffsetBackward(text, startOffset)
   transform.deleteBackwardAtRange(range, n, options)
 }
