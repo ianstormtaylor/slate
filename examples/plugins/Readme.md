@@ -1,8 +1,6 @@
 
-# Plain Text Example
+# Plugins Example
 
-![](../../docs/images/plain-text-example.png)
-
-This is the most basic Slate example. It's basically a glorified `<textarea>`. But it gives you a sense for the absolute basics of Slate.
+This example shows how you can extend Slate with plugins! The example shows plugins that perform simple operations on keypress.
 
 Check out the [Examples readme](..) to see how to run it!
