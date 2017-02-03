@@ -1,8 +1,8 @@
 
-# Plain Text Example
+# Right-to-Left Example
 
-![](../../docs/images/plain-text-example.png)
+This example shows how Slate automatically detects and handles right-to-left text editing (like in Arabic, Hebrew, etc.).
 
-This is the most basic Slate example. It's basically a glorified `<textarea>`. But it gives you a sense for the absolute basics of Slate.
+Bonus: Features poetry from Khalil Gibran, from his book [The Prophet](https://en.wikipedia.org/wiki/The_Prophet_(book)).
 
 Check out the [Examples readme](..) to see how to run it!
