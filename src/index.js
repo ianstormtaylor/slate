@@ -22,7 +22,7 @@ import Stack from './models/stack'
 import State from './models/state'
 import Text from './models/text'
 import Range from './models/range'
-
+import SCHEMA  from './schemas/core'
 /**
  * Serializers.
  */
@@ -71,7 +71,8 @@ export {
   Transforms,
   findDOMNode,
   resetKeyGenerator,
-  setKeyGenerator
+  setKeyGenerator,
+  SCHEMA
 }
 
 export default {
@@ -95,5 +96,6 @@ export default {
   Transforms,
   findDOMNode,
   resetKeyGenerator,
-  setKeyGenerator
+  setKeyGenerator,
+  SCHEMA
 }
