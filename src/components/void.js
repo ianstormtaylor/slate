@@ -86,11 +86,20 @@ class Void extends React.Component {
   render = () => {
     const { props } = this
     const { children, node } = props
-    const Tag = node.kind == 'block' ? 'div' : 'span'
+    let Tag, style
 
     // Make the outer wrapper relative, so the spacer can overlay it.
-    const style = {
-      position: 'relative'
+    if (node.kind === 'block') {
+      Tag = 'div'
+      style = {
+        position: 'relative'
+      }
+    } else {
+      Tag = 'span'
+      style = {
+        display: 'inline-block',
+        position: 'relative'
+      }
     }
 
     this.debug('render', { props })
