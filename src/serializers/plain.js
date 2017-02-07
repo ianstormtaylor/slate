@@ -1,51 +1,41 @@
 
-import Block from '../models/block'
-import Document from '../models/document'
-import State from '../models/state'
-import Text from '../models/text'
+import Raw from '../serializers/raw'
 
 /**
  * Deserialize a plain text `string` to a state.
  *
  * @param {String} string
+ * @param {Object} options
+ *   @property {Boolean} toRaw
  * @return {State}
  */
 
-function deserialize(string) {
-  return State.create({
-    document: Document.create({
-      nodes: string.split('\n').map(deserializeLine)
-    })
-  })
-}
+function deserialize(string, options = {}) {
+  const raw = {
+    kind: 'state',
+    document: {
+      kind: 'document',
+      nodes: string.split('\n').map((line) => {
+        return {
+          kind: 'block',
+          type: 'line',
+          nodes: [
+            {
+              kind: 'text',
+              ranges: [
+                {
+                  text: line,
+                  marks: [],
+                }
+              ]
+            }
+          ]
+        }
+      }),
+    }
+  }
 
-/**
- * Deserialize a `line` of text.
- *
- * @param {String} line
- * @return {Block}
- */
-
-function deserializeLine(line) {
-  return Block.create({
-    type: 'line',
-    nodes: [
-      Text.create({
-        characters: line.split('').map(deserializeCharacter)
-      })
-    ]
-  })
-}
-
-/**
- * Deserialize a `character`.
- *
- * @param {String} char
- * @return {Character}
- */
-
-function deserializeCharacter(char) {
-  return { text: char }
+  return options.toRaw ? raw : Raw.deserialize(raw)
 }
 
 /**

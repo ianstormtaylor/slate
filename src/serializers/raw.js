@@ -671,7 +671,7 @@ const Raw = {
    */
 
   untersifyState(object) {
-    if (object.selection != null) {
+    if (object.selection || object.document) {
       return {
         kind: 'state',
         document: object.document,

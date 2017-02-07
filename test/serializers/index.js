@@ -30,6 +30,30 @@ describe('serializers', () => {
           assert.deepEqual(strip(json), expected)
         })
       }
+
+      it('optionally returns a raw representation', () => {
+        const html = new Html(require('./fixtures/html/deserialize/block').default)
+        const input = fs.readFileSync(resolve(__dirname, './fixtures/html/deserialize/block/input.html'), 'utf8')
+        const serialized = html.deserialize(input, { toRaw: true })
+        assert.deepEqual(serialized, {
+          kind: 'state',
+          document: {
+            kind: 'document',
+            nodes: [
+              {
+                kind: 'block',
+                type: 'paragraph',
+                nodes: [
+                  {
+                    kind: 'text',
+                    text: 'one'
+                  }
+                ]
+              }
+            ]
+          }
+        })
+      })
     })
 
     describe('serialize()', () => {
@@ -74,6 +98,34 @@ describe('serializers', () => {
           assert.deepEqual(strip(json), expected)
         })
       }
+
+      it('optionally returns a raw representation', () => {
+        const input = fs.readFileSync(resolve(__dirname, './fixtures/plain/deserialize/line/input.txt'), 'utf8')
+        const serialized = Plain.deserialize(input.replace(/\n$/m, ''), { toRaw: true })
+        assert.deepEqual(serialized, {
+          kind: 'state',
+          document: {
+            kind: 'document',
+            nodes: [
+              {
+                kind: 'block',
+                type: 'line',
+                nodes: [
+                  {
+                    kind: 'text',
+                    ranges: [
+                      {
+                        marks: [],
+                        text: 'one',
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        })
+      })
     })
 
     describe('serialize()', () => {
