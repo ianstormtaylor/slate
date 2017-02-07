@@ -96,6 +96,8 @@ class Void extends React.Component {
       }
     } else {
       Tag = 'span'
+      // COMPAT: In Chrome, without setting `display: inline-block` the cursor
+      // will disappear when placed before an inline void node. (2017/02/07)
       style = {
         display: 'inline-block',
         position: 'relative'
@@ -144,7 +146,7 @@ class Void extends React.Component {
         }
     } else {
       style = {
-        position: 'relative',
+        position: 'absolute',
         top: '0px',
         left: '-9999px',
         textIndent: '-9999px',
