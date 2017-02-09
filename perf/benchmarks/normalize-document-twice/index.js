@@ -1,6 +1,6 @@
 
 module.exports = {
-  run(state) {
+  run(state, schema) {
     const selection = state.selection.merge({
       anchorKey: '_cursor_',
       anchorOffset: 0,
@@ -9,11 +9,11 @@ module.exports = {
     })
 
     return state
-      .transform({ normalized: false }).normalize().apply()
+      .transform({ normalized: false }).normalize(schema).apply()
       .transform()
       // Make a fast, dummy change
       .moveTo(selection).insertText('inserted text')
       // We want to compare the speed of that second normalize (optimized through memoization, or other means)
-      .normalize().apply()
+      .normalize(schema).apply()
   }
 }

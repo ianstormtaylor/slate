@@ -18,7 +18,7 @@ jsdomGlobal()
 
 const fs = require('fs')
 const readMetadata = require('read-metadata')
-const { Raw } = require('..')
+const { SCHEMA, Raw } = require('..')
 const memoize = require('../lib/utils/memoize')
 
 const { resolve } = require('path')
@@ -79,7 +79,8 @@ function runBenchmarks() {
       Raw,
       memoize,
       benchmark,
-      input
+      input,
+      SCHEMA
     })
 
     // Add it to the benchmark suite
@@ -105,7 +106,7 @@ function runBenchmarks() {
       // the variables declared in `setup` are visible to `fn`
 
       fn() {
-        scope.benchmark.run(state) // eslint-disable-line no-undef
+        scope.benchmark.run(state, scope.SCHEMA) // eslint-disable-line no-undef
         // Clear memoized values between each run
         scope.memoize.__clear() // eslint-disable-line no-undef
       },
