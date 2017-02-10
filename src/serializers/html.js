@@ -70,6 +70,7 @@ class Html {
    * @param {Object} options
    *   @property {Array} rules
    *   @property {String} defaultBlockType
+   *   @property {String|Object} defaultBlockType
    */
 
   constructor(options = {}) {
@@ -108,10 +109,21 @@ class Html {
         return memo
       }
 
-      const block = {
-        kind: 'block',
-        type: this.defaultBlockType,
-        nodes: [node]
+      let block
+      if (this.defaultBlockType.constructor.name === 'String') {
+        block = {
+          kind: 'block',
+          type: this.defaultBlockType,
+          nodes: [node]
+        }
+      } else {
+        block = Object.assign(
+          this.defaultBlockType,
+          {
+            kind: 'block',
+            nodes: [node]
+          }
+        )
       }
 
       memo.push(block)
