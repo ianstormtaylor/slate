@@ -96,12 +96,6 @@ class Void extends React.Component {
       }
     } else {
       Tag = 'span'
-      // COMPAT: In Chrome, without setting `display: inline-block` the cursor
-      // will disappear when placed before an inline void node. (2017/02/07)
-      style = {
-        display: 'inline-block',
-        position: 'relative'
-      }
     }
 
     this.debug('render', { props })
@@ -145,12 +139,8 @@ class Void extends React.Component {
           textIndent: '-9999px'
         }
     } else {
-      style = {
-        position: 'absolute',
-        top: '0px',
-        left: '-9999px',
-        textIndent: '-9999px',
-      }
+      // Set `color` to `transparent` to hide caret inside the spacer.
+      style = {color: 'transparent'}
     }
 
     return (
