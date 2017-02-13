@@ -260,6 +260,7 @@ const Node = {
     return this
       .getTexts()
       .map(text => this.getClosestBlock(text.key))
+      // Eliminate duplicates
       .toOrderedSet()
       .toList()
   },
@@ -275,6 +276,9 @@ const Node = {
     return this
       .getTextsAtRange(range)
       .map(text => this.getClosestBlock(text.key))
+      // Eliminate duplicates
+      .toOrderedSet()
+      .toList()
   },
 
   /**
