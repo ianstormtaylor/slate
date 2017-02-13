@@ -39,6 +39,8 @@ const EVENT_METHODS = [
 const ACCUMULATOR_METHODS = [
   'onBeforeChange',
   'onChange',
+  'onEditorLockChange',
+  'onReadOnlyChange'
 ]
 
 /**
