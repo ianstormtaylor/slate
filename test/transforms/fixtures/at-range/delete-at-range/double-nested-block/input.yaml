@@ -1,0 +1,32 @@
+
+document:
+  key: a
+  nodes:
+  - key: b
+    kind: block
+    type: list
+    nodes:
+    - key: c
+      kind: block
+      type: item
+      nodes:
+      - key: d
+        kind: block
+        type: line
+        nodes:
+        - key: e
+          kind: text
+          text: "Text"
+      - key: f
+        kind: block
+        type: line
+        nodes:
+        - key: g
+          kind: text
+          text: ""
+selection:
+  anchorKey: e
+  anchorOffset: 4
+  focusKey: g
+  focusOffset: 0
+  isFocused: true
