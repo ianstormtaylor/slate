@@ -112,11 +112,7 @@ export function deleteAtRange(transform, range, options = {}) {
     })
 
     // Remove parents of endBlock as long as they have a single child
-    const lonely = document.getAncestors(endBlock.key)
-      // Take parents until there are siblings
-      .skipLast().reverse().takeUntil(p => p.nodes.size > 1)
-      // Pick the highest, or endBlock
-      .unshift(endBlock).last()
+    const lonely = document.getHighestOnlyChildParent(endBlock.key) || endBlock
     transform.removeNodeByKey(lonely.key, OPTS)
   }
 

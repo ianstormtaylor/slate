@@ -658,15 +658,20 @@ const Node = {
    */
 
   getHighestOnlyChildParent(key) {
-    let child = this.assertDescendant(key)
-    let match = null
-    let parent
+    const ancestors = this.getAncestors(key)
 
-    while (parent = this.getParent(child)) {
-      if (parent == null || parent.nodes.size > 1) return match
-      match = parent
-      child = parent
+    if (!ancestors) {
+      key = Normalize.key(key)
+      throw new Error(`Could not find a descendant node with key "${key}".`)
     }
+
+    return ancestors
+      // Skip this node
+      .skipLast()
+      // Take parents until there are more than one child
+      .reverse().takeUntil(p => p.nodes.size > 1)
+      // Pick the highest
+      .last()
   },
 
   /**
