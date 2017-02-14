@@ -16,9 +16,9 @@ export default {
     }
   ],
   defaultBlockType: {
-    type: 'contentBlock',
+    type: 'default',
     data: {
-      style: 'default'
+      key: 'value'
     }
   }
 }

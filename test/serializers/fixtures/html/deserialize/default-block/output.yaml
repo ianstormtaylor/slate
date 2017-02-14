@@ -11,9 +11,10 @@ nodes:
             marks: []
           - text: e
             marks: []
-  - type: contentBlock
+  - type: default
     isVoid: false
-    data: {style: default}
+    data:
+      key: value
     nodes:
       - characters:
           - text: t

@@ -109,10 +109,16 @@ class Html {
         return memo
       }
 
-      const commonProps = {kind: 'block', nodes: [node]}
-      const block = this.defaultBlockType.typeof === 'string'
-        ? {type: this.defaultBlockType, ...commonProps}
-        : {...commonProps, ...this.defaultBlockType}
+      const { defaultBlockType } = this
+      const defaults = typeof defaultBlockType == 'string'
+        ? { type: defaultBlockType }
+        : defaultBlockType
+
+      const block = {
+        kind: 'block',
+        nodes: [node],
+        ...defaults
+      }
 
       memo.push(block)
       return memo
