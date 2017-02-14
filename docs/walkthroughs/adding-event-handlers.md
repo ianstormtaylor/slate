@@ -88,11 +88,14 @@ class App extends React.Component {
     // Return with no changes if it's not the "7" key with shift pressed.
     if (event.which != 55 || !event.shiftKey) return
 
-    // Otherwise, transform the state by insert "and" at the cursor's position.
+    // Otherwise, transform the state by inserting "and" at the cursor's position.
     const newState = state
       .transform()
       .insertText('and')
       .apply()
+      
+    // Prevent the ampersand character from being inserted.
+    event.preventDefault()
     
     // Return the new state, which will cause the editor to update it.
     return newState
