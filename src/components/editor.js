@@ -39,6 +39,9 @@ const EVENT_HANDLERS = [
 
 const PLUGINS_PROPS = [
   ...EVENT_HANDLERS,
+  'placeholder',
+  'placeholderClassName',
+  'placeholderStyle',
   'plugins',
   'schema',
 ]
