@@ -70,6 +70,7 @@ class Html {
    * @param {Object} options
    *   @property {Array} rules
    *   @property {String} defaultBlockType
+   *   @property {String|Object} defaultBlockType
    */
 
   constructor(options = {}) {
@@ -108,11 +109,10 @@ class Html {
         return memo
       }
 
-      const block = {
-        kind: 'block',
-        type: this.defaultBlockType,
-        nodes: [node]
-      }
+      const commonProps = {kind: 'block', nodes: [node]}
+      const block = this.defaultBlockType.typeof === 'string'
+        ? {type: this.defaultBlockType, ...commonProps}
+        : {...commonProps, ...this.defaultBlockType}
 
       memo.push(block)
       return memo
