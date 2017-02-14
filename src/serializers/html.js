@@ -109,22 +109,10 @@ class Html {
         return memo
       }
 
-      let block
-      if (this.defaultBlockType.constructor.name === 'String') {
-        block = {
-          kind: 'block',
-          type: this.defaultBlockType,
-          nodes: [node]
-        }
-      } else {
-        block = Object.assign(
-          this.defaultBlockType,
-          {
-            kind: 'block',
-            nodes: [node]
-          }
-        )
-      }
+      const commonProps = {kind: 'block', nodes: [node]}
+      const block = this.defaultBlockType.typeof === 'string'
+        ? {type: this.defaultBlockType, ...commonProps}
+        : {...commonProps, ...this.defaultBlockType}
 
       memo.push(block)
       return memo
