@@ -35,6 +35,7 @@ class Content extends React.Component {
    */
 
   static propTypes = {
+    autoCorrect: React.PropTypes.bool.isRequired,
     className: React.PropTypes.string,
     editor: React.PropTypes.object.isRequired,
     onBeforeInput: React.PropTypes.func.isRequired,
@@ -98,6 +99,7 @@ class Content extends React.Component {
     return (
       props.className != this.props.className ||
       props.schema != this.props.schema ||
+      props.autoCorrect != this.props.autoCorrect ||
       props.spellCheck != this.props.spellCheck ||
       props.state != this.props.state ||
       props.style != this.props.style
@@ -747,6 +749,7 @@ class Content extends React.Component {
         onKeyUp={this.onKeyUp}
         onPaste={this.onPaste}
         onSelect={this.onSelect}
+        autoCorrect={props.autoCorrect}
         spellCheck={spellCheck}
         style={style}
         role={readOnly ? null : (role || 'textbox')}

@@ -61,6 +61,7 @@ class Editor extends React.Component {
    */
 
   static propTypes = {
+    autoCorrect: React.PropTypes.bool,
     className: React.PropTypes.string,
     onBeforeChange: React.PropTypes.func,
     onChange: React.PropTypes.func,
@@ -86,6 +87,7 @@ class Editor extends React.Component {
    */
 
   static defaultProps = {
+    autoCorrect: true,
     onChange: noop,
     onDocumentChange: noop,
     onSelectionChange: noop,
@@ -253,6 +255,7 @@ class Editor extends React.Component {
         state={this.getState()}
         className={props.className}
         readOnly={props.readOnly}
+        autoCorrect={props.autoCorrect}
         spellCheck={props.spellCheck}
         style={props.style}
         tabIndex={props.tabIndex}
