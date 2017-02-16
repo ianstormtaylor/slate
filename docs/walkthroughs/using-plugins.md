@@ -31,6 +31,7 @@ class App extends React.Component {
 
   onKeyDown = (event, data, state) => {
     if (!event.metaKey || event.which != 66) return
+    event.preventDefault()
     return state
       .transform()
       .toggleMark('bold')
@@ -75,6 +76,9 @@ function MarkHotkey(options) {
     onKeyDown(event, data, state) {
       // Check that the key pressed matches our `code` option.
       if (!event.metaKey || event.which != code) return
+
+      // Prevent the default characters from being inserted.
+      event.preventDefault()
 
       // Toggle the mark `type`.
       return state
@@ -214,6 +218,7 @@ function MarkHotkey(options) {
     onKeyDown(event, data, state) {
       // Change the comparison to use the key name.
       if (!event.metaKey || keycode(event.which) != key) return
+      event.preventDefault()
       return state
         .transform()
         .toggleMark(type)
