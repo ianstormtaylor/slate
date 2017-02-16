@@ -11,7 +11,7 @@ function scrollWindow(window, cursorTop, cursorLeft, cursorHeight) {
   let cursorBottom = cursorTop + cursorHeight
 
   if (cursorTop < 0 || cursorBottom > window.innerHeight) {
-    deltaY = cursorTop - window.scrollY + window.innerHeight / 2 + cursorHeight / 2
+    deltaY = cursorTop - window.scrollY + window.innerHeight / 2 - cursorHeight / 2
   }
 
   if (cursorLeft < 0 || cursorLeft > window.innerWidth) {
@@ -37,7 +37,7 @@ function scrollTo(element) {
       let currentY = cursorTop
       let cursorBottom = cursorTop + cursorHeight
       if (cursorTop < wrapperRect.top || cursorBottom > wrapperRect.bottom) {
-        cursorTop = wrapperRect.top + wrapperRect.height / 2 + cursorHeight / 2
+        cursorTop = wrapperRect.top + wrapperRect.height / 2 - cursorHeight / 2
         wrapper.scrollTop += currentY - cursorTop
       }
 
