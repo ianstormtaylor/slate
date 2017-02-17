@@ -91,9 +91,7 @@ class Void extends React.Component {
     // Make the outer wrapper relative, so the spacer can overlay it.
     if (node.kind === 'block') {
       Tag = 'div'
-      style = {
-        position: 'relative'
-      }
+      style = { position: 'relative' }
     } else {
       Tag = 'span'
     }
@@ -139,8 +137,9 @@ class Void extends React.Component {
           textIndent: '-9999px'
         }
     } else {
-      // Set `color` to `transparent` to hide caret inside the spacer.
-      style = {color: 'transparent'}
+      style = {
+        color: 'transparent'
+      }
     }
 
     return (
