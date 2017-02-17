@@ -59,7 +59,6 @@ class Void extends React.Component {
    */
 
   onClick = (event) => {
-    event.preventDefault()
     this.debug('onClick', { event })
 
     const { node, editor } = this.props
