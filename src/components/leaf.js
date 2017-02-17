@@ -264,7 +264,12 @@ class Leaf extends React.Component {
     // COMPAT: If the text is empty otherwise, it's because it's on the edge of
     // an inline void node, so we render a zero-width space so that the
     // selection can be inserted next to it still.
-    if (text == '') return <span data-slate-zero-width>{'\u200B'}</span>
+    if (text == '') {
+      // COMPAT: In Chrome, zero-width space produces graphics glitches, so use
+      // hair space in place of it. (2017/02/12)
+      const space = IS_FIREFOX ? '\u200B' : '\u200A'
+      return <span data-slate-zero-width>{space}</span>
+    }
 
     // COMPAT: Browsers will collapse trailing new lines at the end of blocks,
     // so we need to add an extra trailing new lines to prevent that.

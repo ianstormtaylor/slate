@@ -91,17 +91,9 @@ class Void extends React.Component {
     // Make the outer wrapper relative, so the spacer can overlay it.
     if (node.kind === 'block') {
       Tag = 'div'
-      style = {
-        position: 'relative'
-      }
+      style = { position: 'relative' }
     } else {
       Tag = 'span'
-      // COMPAT: In Chrome, without setting `display: inline-block` the cursor
-      // will disappear when placed before an inline void node. (2017/02/07)
-      style = {
-        display: 'inline-block',
-        position: 'relative'
-      }
     }
 
     this.debug('render', { props })
@@ -146,10 +138,7 @@ class Void extends React.Component {
         }
     } else {
       style = {
-        position: 'absolute',
-        top: '0px',
-        left: '-9999px',
-        textIndent: '-9999px',
+        color: 'transparent'
       }
     }
 
