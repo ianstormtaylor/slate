@@ -221,7 +221,7 @@ function Plugin(options = {}) {
   function onCutOrCopy(e, data, state) {
     const window = getWindow(e.target)
     const native = window.getSelection()
-    if (!native.rangeCount) return
+    if (native.isCollapsed) return
 
     const { fragment } = data
     const encoded = Base64.serializeNode(fragment)
