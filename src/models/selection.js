@@ -324,7 +324,7 @@ class Selection extends new Record(DEFAULTS) {
     if (anchorNode.kind != 'text') {
       warn('The selection anchor was set to a Node that is not a Text node. This should not happen and can degrade performance. The node in question was:', anchorNode)
       let anchorText = anchorNode.getTextAtOffset(anchorOffset)
-      let offset = anchorNode.getOffset(anchorText)
+      let offset = anchorNode.getOffset(anchorText.key)
       anchorOffset = anchorOffset - offset
       anchorNode = anchorText
     }
@@ -333,7 +333,7 @@ class Selection extends new Record(DEFAULTS) {
     if (focusNode.kind != 'text') {
       warn('The selection focus was set to a Node that is not a Text node. This should not happen and can degrade performance. The node in question was:', focusNode)
       let focusText = focusNode.getTextAtOffset(focusOffset)
-      let offset = focusNode.getOffset(focusText)
+      let offset = focusNode.getOffset(focusText.key)
       focusOffset = focusOffset - offset
       focusNode = focusText
     }
