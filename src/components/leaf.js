@@ -29,25 +29,16 @@ class Leaf extends React.Component {
    */
 
   static propTypes = {
+    editor: React.PropTypes.object.isRequired,
     index: React.PropTypes.number.isRequired,
-    isVoid: React.PropTypes.bool,
     marks: React.PropTypes.object.isRequired,
     node: React.PropTypes.object.isRequired,
+    offset: React.PropTypes.number.isRequired,
     parent: React.PropTypes.object.isRequired,
     ranges: React.PropTypes.object.isRequired,
     schema: React.PropTypes.object.isRequired,
     state: React.PropTypes.object.isRequired,
     text: React.PropTypes.string.isRequired
-  };
-
-  /**
-   * Default properties.
-   *
-   * @type {Object}
-   */
-
-  static defaultProps = {
-    isVoid: false
   };
 
   /**
@@ -292,14 +283,27 @@ class Leaf extends React.Component {
    */
 
   renderMarks(props) {
-    const { marks, schema } = props
-    const text = this.renderText(props)
+    const { marks, schema, node, offset, text, state, editor } = props
+    const children = this.renderText(props)
 
-    return marks.reduce((children, mark) => {
+    return marks.reduce((memo, mark) => {
       const Component = mark.getComponent(schema)
-      if (!Component) return children
-      return <Component mark={mark} marks={marks}>{children}</Component>
-    }, text)
+      if (!Component) return memo
+      return (
+        <Component
+          editor={editor}
+          mark={mark}
+          marks={marks}
+          node={node}
+          offset={offset}
+          schema={schema}
+          state={state}
+          text={text}
+        >
+          {memo}
+        </Component>
+      )
+    }, children)
   }
 }
 

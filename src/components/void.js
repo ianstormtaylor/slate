@@ -4,7 +4,6 @@ import Leaf from './leaf'
 import Mark from '../models/mark'
 import OffsetKey from '../utils/offset-key'
 import React from 'react'
-import noop from '../utils/noop'
 import { IS_FIREFOX } from '../constants/environment'
 
 /**
@@ -153,10 +152,11 @@ class Void extends React.Component {
    */
 
   renderLeaf = () => {
-    const { node, schema, state } = this.props
+    const { node, schema, state, editor } = this.props
     const child = node.getFirstText()
     const ranges = child.getRanges()
     const text = ''
+    const offset = 0
     const marks = Mark.createSet()
     const index = 0
     const offsetKey = OffsetKey.stringify({
@@ -166,17 +166,17 @@ class Void extends React.Component {
 
     return (
       <Leaf
-        isVoid
-        renderMark={noop}
         key={offsetKey}
-        schema={schema}
-        state={state}
+        editor={editor}
+        index={index}
+        marks={marks}
         node={child}
+        offset={offset}
         parent={node}
         ranges={ranges}
-        index={index}
+        schema={schema}
+        state={state}
         text={text}
-        marks={marks}
       />
     )
   }

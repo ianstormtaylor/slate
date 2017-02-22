@@ -348,16 +348,18 @@ class Node extends React.Component {
    */
 
   renderLeaf = (ranges, range, index, offset) => {
-    const { node, parent, schema, state } = this.props
+    const { node, parent, schema, state, editor } = this.props
     const text = range.text
     const marks = range.marks
 
     return (
       <Leaf
         key={`${node.key}-${index}`}
+        editor={editor}
         index={index}
         marks={marks}
         node={node}
+        offset={offset}
         parent={parent}
         ranges={ranges}
         schema={schema}
