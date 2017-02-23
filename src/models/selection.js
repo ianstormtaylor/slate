@@ -1,5 +1,4 @@
 
-import getLeafText from '../utils/get-leaf-text'
 import warn from '../utils/warn'
 import { Record } from 'immutable'
 
@@ -417,8 +416,7 @@ class Selection extends new Record(DEFAULTS) {
    */
 
   collapseToStartOf(node) {
-    node = getLeafText(node)
-
+    node = node.kind == 'text' ? node : node.getFirstText()
     return this.merge({
       anchorKey: node.key,
       anchorOffset: 0,
@@ -435,8 +433,7 @@ class Selection extends new Record(DEFAULTS) {
    */
 
   collapseToEndOf(node) {
-    node = getLeafText(node)
-
+    node = node.kind == 'text' ? node : node.getLastText()
     return this.merge({
       anchorKey: node.key,
       anchorOffset: node.length,
@@ -456,9 +453,8 @@ class Selection extends new Record(DEFAULTS) {
    */
 
   moveToRangeOf(start, end = start) {
-    start = getLeafText(start)
-    end = getLeafText(end)
-
+    start = start.kind == 'text' ? start : start.getFirstText()
+    end = end.kind == 'text' ? end : end.getLastText()
     return this.merge({
       anchorKey: start.key,
       anchorOffset: 0,
