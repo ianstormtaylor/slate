@@ -97,7 +97,7 @@ Get all of the bottom-most [`Block`](./block.md) node descendants.
 ### `getCharactersAtRange`
 `getCharactersAtRange(range: Selection) => List`
 
-Get a list of all of the [`Charaters`](./character.md) in a `range`.
+Get a list of all of the [`Characters`](./character.md) in a `range`.
 
 ### `getChild`
 `getChild(key: String || Node) => Node || Void`
