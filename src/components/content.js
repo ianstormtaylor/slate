@@ -698,7 +698,7 @@ class Content extends React.Component {
 
   render = () => {
     const { props } = this
-    const { className, readOnly, state, tabIndex, role} = props
+    const { className, readOnly, state, tabIndex, role } = props
     const { document } = state
     const children = props.children || document.nodes
       .map(node => this.renderNode(node))
