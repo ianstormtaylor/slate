@@ -211,7 +211,7 @@ export function deleteBackwardAtRange(transform, range, n = 1, options = {}) {
     return
   }
   // If the closest is not void, but empty, remove it
-  if (block && !block.isVoid && block.isEmpty) {
+  if (block && !block.isVoid && block.isEmpty && document.nodes.size !== 1) {
     transform.removeNodeByKey(block.key, { normalize })
     return
   }
@@ -395,7 +395,7 @@ export function deleteForwardAtRange(transform, range, n = 1, options = {}) {
     return
   }
   // If the closest is not void, but empty, remove it
-  if (block && !block.isVoid && block.isEmpty) {
+  if (block && !block.isVoid && block.isEmpty && document.nodes.size !== 1) {
     transform.removeNodeByKey(block.key, { normalize })
     return
   }
