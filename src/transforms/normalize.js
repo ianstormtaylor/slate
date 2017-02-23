@@ -60,16 +60,24 @@ export function normalizeNodeByKey(transform, key, schema) {
 export function normalizeSelection(transform) {
   let { state } = transform
   let { document, selection } = state
+
+  // If document is empty, return
+  if (document.nodes.size === 0) {
+    return
+  }
+
   selection = selection.normalize(document)
 
   // If the selection is unset, or the anchor or focus key in the selection are
-  // pointing to nodes that no longer exist, warn and reset the selection.
+  // pointing to nodes that no longer exist, warn (if not unset) and reset the selection.
   if (
     selection.isUnset ||
     !document.hasDescendant(selection.anchorKey) ||
     !document.hasDescendant(selection.focusKey)
   ) {
-    warn('The selection was invalid and was reset to start of the document. The selection in question was:', selection)
+    if (!selection.isUnset) {
+      warn('The selection was invalid and was reset to start of the document. The selection in question was:', selection)
+    }
 
     const firstText = document.getFirstText()
     selection = selection.merge({
