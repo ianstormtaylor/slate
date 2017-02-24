@@ -6,19 +6,19 @@
 import getWindow from 'get-window'
 
 function scrollWindow(window, cursorTop, cursorLeft, cursorHeight) {
-  let deltaX = 0
-  let deltaY = 0
+  let scrollX = window.scrollX
+  let scrollY = window.scrollY
   let cursorBottom = cursorTop + cursorHeight
 
   if (cursorTop < 0 || cursorBottom > window.innerHeight) {
-    deltaY = cursorTop - window.scrollY + window.innerHeight / 2 - cursorHeight / 2
+    scrollY += cursorTop - window.innerHeight / 2 + cursorHeight / 2
   }
 
   if (cursorLeft < 0 || cursorLeft > window.innerWidth) {
-    deltaX = cursorLeft - window.scrollX + window.innerWidth / 2
+    scrollX += cursorLeft - window.innerWidth / 2
   }
 
-  window.scrollBy(deltaX, deltaY)
+  window.scrollTo(scrollX, scrollY)
 }
 
 function scrollTo(element) {
@@ -36,7 +36,7 @@ function scrollTo(element) {
       let wrapperRect = wrapper.getBoundingClientRect()
       let currentY = cursorTop
       let cursorBottom = cursorTop + cursorHeight
-      if (cursorTop < wrapperRect.top || cursorBottom > wrapperRect.bottom) {
+      if (cursorTop < wrapperRect.top || cursorBottom > wrapperRect.top + wrapper.offsetHeight) {
         cursorTop = wrapperRect.top + wrapperRect.height / 2 - cursorHeight / 2
         wrapper.scrollTop += currentY - cursorTop
       }
