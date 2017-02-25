@@ -27,7 +27,7 @@ const defaultBlock = {
 
 const schema = {
   nodes: {
-    image: props => {
+    image: (props) => {
       const { node, state } = props
       const isFocused = state.selection.hasEdgeIn(node)
       const src = node.data.get('src')
@@ -36,17 +36,17 @@ const schema = {
         <img src={src} className={className} {...props.attributes} />
       )
     },
-    paragraph: props => {
+    paragraph: (props) => {
       return <p {...props.attributes}>{props.children}</p>
     }
   },
   rules: [
     // Rule to insert a paragraph block if the document is empty
     {
-      match: node => {
+      match: (node) => {
         return node.kind == 'document'
       },
-      validate: document => {
+      validate: (document) => {
         return document.nodes.size ? null : true
       },
       normalize: (transform, document) => {
@@ -58,10 +58,10 @@ const schema = {
     // Rule to insert a paragraph below a void node (the image)
     // if that node is the last one in the document
     {
-      match: node => {
+      match: (node) => {
         return node.kind == 'document'
       },
-      validate: document => {
+      validate: (document) => {
         const lastNode = document.nodes.last()
         return lastNode && lastNode.isVoid ? true : null
       },
