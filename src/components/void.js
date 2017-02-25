@@ -47,7 +47,7 @@ class Void extends React.Component {
   debug = (message, ...args) => {
     const { node } = this.props
     const { key, type } = node
-    let id = `${key} (${type})`
+    const id = `${key} (${type})`
     debug(message, `${id}`, ...args)
   }
 

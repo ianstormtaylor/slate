@@ -52,15 +52,15 @@ class Transform {
    */
 
   apply(options = {}) {
-    let transform = this
+    const transform = this
     let { merge, save, isNative = false } = options
 
     // Ensure that the selection is normalized.
     transform.normalizeSelection()
 
-    let { state, operations } = transform
-    let { history } = state
-    let { undos } = history
+    const { state, operations } = transform
+    const { history } = state
+    const { undos } = history
     const previous = undos.peek()
 
     // If there are no operations, abort early.

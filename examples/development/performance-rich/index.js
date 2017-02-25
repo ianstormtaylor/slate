@@ -166,7 +166,7 @@ class RichText extends React.Component {
     const isActive = this.hasBlock(type)
     let { state } = this.state
 
-    let transform = state
+    const transform = state
       .transform()
       .setBlock(isActive ? 'paragraph' : type)
 

@@ -166,43 +166,40 @@ class Leaf extends React.Component {
     }
 
     // Otherwise we need to set the selection across two different leaves.
-    else {
-      // If the selection is forward, we can set things in sequence. In the
-      // first leaf to render, reset the selection and set the new start. And
-      // then in the second leaf to render, extend to the new end.
-      if (selection.isForward) {
-        if (hasAnchor) {
-          native.removeAllRanges()
-          const range = window.document.createRange()
-          range.setStart(el, anchorOffset)
-          native.addRange(range)
-        } else if (hasFocus) {
-          native.extend(el, focusOffset)
-          focus()
-        }
+    // If the selection is forward, we can set things in sequence. In the
+    // first leaf to render, reset the selection and set the new start. And
+    // then in the second leaf to render, extend to the new end.
+    else if (selection.isForward) {
+      if (hasAnchor) {
+        native.removeAllRanges()
+        const range = window.document.createRange()
+        range.setStart(el, anchorOffset)
+        native.addRange(range)
+      } else if (hasFocus) {
+        native.extend(el, focusOffset)
+        focus()
       }
+    }
 
-      // Otherwise, if the selection is backward, we need to hack the order a bit.
-      // In the first leaf to render, set a phony start anchor to store the true
-      // end position. And then in the second leaf to render, set the start and
-      // extend the end to the stored value.
-      else {
-        if (hasFocus) {
-          native.removeAllRanges()
-          const range = window.document.createRange()
-          range.setStart(el, focusOffset)
-          native.addRange(range)
-        } else if (hasAnchor) {
-          const endNode = native.focusNode
-          const endOffset = native.focusOffset
-          native.removeAllRanges()
-          const range = window.document.createRange()
-          range.setStart(el, anchorOffset)
-          native.addRange(range)
-          native.extend(endNode, endOffset)
-          focus()
-        }
-      }
+    // Otherwise, if the selection is backward, we need to hack the order a bit.
+    // In the first leaf to render, set a phony start anchor to store the true
+    // end position. And then in the second leaf to render, set the start and
+    // extend the end to the stored value.
+    else if (hasFocus) {
+      native.removeAllRanges()
+      const range = window.document.createRange()
+      range.setStart(el, focusOffset)
+      native.addRange(range)
+    }
+    else if (hasAnchor) {
+      const endNode = native.focusNode
+      const endOffset = native.focusOffset
+      native.removeAllRanges()
+      const range = window.document.createRange()
+      range.setStart(el, anchorOffset)
+      native.addRange(range)
+      native.extend(endNode, endOffset)
+      focus()
     }
 
     this.debug('updateSelection', { selection })
@@ -305,6 +302,7 @@ class Leaf extends React.Component {
       )
     }, children)
   }
+
 }
 
 /**

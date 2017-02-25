@@ -295,7 +295,7 @@ class Selection extends new Record(DEFAULTS) {
    */
 
   normalize(node) {
-    let selection = this
+    const selection = this
     let { anchorKey, anchorOffset, focusKey, focusOffset, isBackward } = selection
 
     // If the selection isn't formed yet or is malformed, ensure that it is
@@ -322,8 +322,8 @@ class Selection extends new Record(DEFAULTS) {
     // If the anchor node isn't a text node, match it to one.
     if (anchorNode.kind != 'text') {
       warn('The selection anchor was set to a Node that is not a Text node. This should not happen and can degrade performance. The node in question was:', anchorNode)
-      let anchorText = anchorNode.getTextAtOffset(anchorOffset)
-      let offset = anchorNode.getOffset(anchorText.key)
+      const anchorText = anchorNode.getTextAtOffset(anchorOffset)
+      const offset = anchorNode.getOffset(anchorText.key)
       anchorOffset = anchorOffset - offset
       anchorNode = anchorText
     }
@@ -331,8 +331,8 @@ class Selection extends new Record(DEFAULTS) {
     // If the focus node isn't a text node, match it to one.
     if (focusNode.kind != 'text') {
       warn('The selection focus was set to a Node that is not a Text node. This should not happen and can degrade performance. The node in question was:', focusNode)
-      let focusText = focusNode.getTextAtOffset(focusOffset)
-      let offset = focusNode.getOffset(focusText.key)
+      const focusText = focusNode.getTextAtOffset(focusOffset)
+      const offset = focusNode.getOffset(focusText.key)
       focusOffset = focusOffset - offset
       focusNode = focusText
     }

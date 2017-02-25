@@ -402,9 +402,8 @@ class Content extends React.Component {
       range.setStart(nativeEvent.rangeParent, nativeEvent.rangeOffset)
     }
 
-    const startNode = range.startContainer
-    const startOffset = range.startOffset
-    const point = this.getPoint(startNode, startOffset)
+    const { startContainer, startOffset } = range
+    const point = this.getPoint(startContainer, startOffset)
     if (!point) return
 
     const target = Selection.create({
@@ -616,7 +615,7 @@ class Content extends React.Component {
 
     const window = getWindow(event.target)
     const { state } = this.props
-    let { document, selection } = state
+    const { document, selection } = state
     const native = window.getSelection()
     const data = {}
 
@@ -704,7 +703,7 @@ class Content extends React.Component {
       .map(node => this.renderNode(node))
       .toArray()
 
-    let style = {
+    const style = {
       // Prevent the default outline styles.
       outline: 'none',
       // Preserve adjacent whitespace and new lines.

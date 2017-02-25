@@ -170,7 +170,7 @@ export function removeMarkByKey(transform, key, offset, length, mark, options = 
 export function removeNodeByKey(transform, key, options = {}) {
   const { normalize = true } = options
   const { state } = transform
-  let { document } = state
+  const { document } = state
   const path = document.getPath(key)
 
   transform.removeNodeOperation(path)
@@ -195,7 +195,7 @@ export function removeNodeByKey(transform, key, options = {}) {
 export function removeTextByKey(transform, key, offset, length, options = {}) {
   const { normalize = true } = options
   const { state } = transform
-  let { document } = state
+  const { document } = state
   const path = document.getPath(key)
 
   transform.removeTextOperation(path, offset, length)
@@ -272,8 +272,8 @@ export function setNodeByKey(transform, key, properties, options = {}) {
 
 export function splitNodeByKey(transform, key, offset, options = {}) {
   const { normalize = true } = options
-  let { state } = transform
-  let { document } = state
+  const { state } = transform
+  const { document } = state
   const path = document.getPath(key)
 
   transform.splitNodeAtOffsetOperation(path, offset)
@@ -353,27 +353,26 @@ export function unwrapNodeByKey(transform, key, options = {}) {
 
 
   if (parent.nodes.size === 1) {
-    // Remove the parent
+    // Remove the parent and replace it by the node itself.
     transform.removeNodeByKey(parent.key, { normalize: false })
-    // and replace it by the node itself
     transform.insertNodeByKey(parentParent.key, parentIndex, node, options)
   }
 
   else if (isFirst) {
-    // Just move the node before its parent
+    // Just move the node before its parent.
     transform.moveNodeByKey(key, parentParent.key, parentIndex, options)
   }
 
   else if (isLast) {
-    // Just move the node after its parent
+    // Just move the node after its parent.
     transform.moveNodeByKey(key, parentParent.key, parentIndex + 1, options)
   }
 
   else {
     const parentPath = document.getPath(parent.key)
-    // Split the parent
+    // Split the parent.
     transform.splitNodeOperation(parentPath, index)
-    // Extract the node in between the splitted parent
+    // Extract the node in between the splitted parent.
     transform.moveNodeByKey(key, parentParent.key, parentIndex + 1, { normalize: false })
 
     if (normalize) {

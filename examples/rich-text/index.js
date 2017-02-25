@@ -163,7 +163,7 @@ class RichText extends React.Component {
   onClickBlock = (e, type) => {
     e.preventDefault()
     let { state } = this.state
-    let transform = state.transform()
+    const transform = state.transform()
     const { document } = state
 
     // Handle everything but list buttons.

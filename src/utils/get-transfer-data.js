@@ -20,9 +20,9 @@ const FRAGMENT_MATCHER = /data-slate-fragment="([^\s]+)"/
 function getTransferData(transfer) {
   let fragment = transfer.getData(TYPES.FRAGMENT) || null
   let node = transfer.getData(TYPES.NODE) || null
-  let html = transfer.getData('text/html') || null
-  let rich = transfer.getData('text/rtf') || null
-  let text = transfer.getData('text/plain') || null
+  const html = transfer.getData('text/html') || null
+  const rich = transfer.getData('text/rtf') || null
+  const text = transfer.getData('text/plain') || null
   let files
 
   // If there isn't a fragment, but there is HTML, check to see if the HTML is

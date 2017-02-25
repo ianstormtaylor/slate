@@ -317,7 +317,7 @@ function Plugin(options = {}) {
         : selection.endOffset)
     }
 
-    let transform = state.transform()
+    const transform = state.transform()
 
     if (isInternal) transform.delete()
 
@@ -340,7 +340,7 @@ function Plugin(options = {}) {
     debug('onDropText', { data })
 
     const { text, target } = data
-    let transform = state
+    const transform = state
       .transform()
       .moveTo(target)
 
@@ -784,7 +784,7 @@ function Plugin(options = {}) {
   function onPasteText(e, data, state) {
     debug('onPasteText', { data })
 
-    let transform = state.transform()
+    const transform = state.transform()
 
     data.text
       .split('\n')
@@ -836,9 +836,9 @@ function Plugin(options = {}) {
                 state={props.state}
                 style={placeholderStyle}
               >
-              {placeholder}
-            </Placeholder>
-           : null}
+                {placeholder}
+              </Placeholder>
+            : null}
         </div>
       )
     }

@@ -30,7 +30,7 @@ const Node = {
   getKeys() {
     const keys = []
 
-    this.forEachDescendant(desc => {
+    this.forEachDescendant((desc) => {
       keys.push(desc.key)
     })
 
@@ -160,7 +160,7 @@ const Node = {
 
     let descendantFound = null
 
-    this.nodes.find(node => {
+    this.nodes.find((node) => {
       if (node.kind != 'text') {
         descendantFound = node.findDescendant(iterator)
         return descendantFound
@@ -182,7 +182,7 @@ const Node = {
   findDescendantDeep(iterator) {
     let found
 
-    this.forEachDescendant(node => {
+    this.forEachDescendant((node) => {
       if (iterator(node)) {
         found = node
         return false
@@ -339,7 +339,7 @@ const Node = {
 
   getClosest(key, iterator) {
     key = Normalize.key(key)
-    let ancestors = this.getAncestors(key)
+    const ancestors = this.getAncestors(key)
     if (!ancestors) {
       throw new Error(`Could not find a descendant node with key "${key}".`)
     }
@@ -478,7 +478,7 @@ const Node = {
   _getDescendant(key) {
     let descendantFound = null
 
-    const found = this.nodes.find(node => {
+    const found = this.nodes.find((node) => {
       if (node.key === key) {
         return node
       } else if (node.kind !== 'text') {
@@ -526,7 +526,7 @@ const Node = {
 
     let sorted
 
-    this.forEachDescendant(n => {
+    this.forEachDescendant((n) => {
       if (n.key === key1) {
         sorted = true
         return false
@@ -606,7 +606,7 @@ const Node = {
    */
 
   getFurthest(key, iterator) {
-    let ancestors = this.getAncestors(key)
+    const ancestors = this.getAncestors(key)
     if (!ancestors) {
       key = Normalize.key(key)
       throw new Error(`Could not find a descendant node with key "${key}".`)
@@ -647,7 +647,7 @@ const Node = {
 
   getHighestChild(key) {
     key = Normalize.key(key)
-    return this.nodes.find(node => {
+    return this.nodes.find((node) => {
       if (node.key == key) return true
       if (node.kind == 'text') return false
       return node.hasDescendant(key)
@@ -890,7 +890,7 @@ const Node = {
 
     if (key == this.key) return []
 
-    let path = []
+    const path = []
     let childKey = key
     let parent
 
@@ -1024,11 +1024,8 @@ const Node = {
    */
 
   getTextDirection() {
-    const text = this.text
-    const dir = direction(text)
-    return dir == 'neutral'
-      ? undefined
-      : dir
+    const dir = direction(this.text)
+    return dir == 'neutral' ? undefined : dir
   },
 
   /**
@@ -1160,7 +1157,7 @@ const Node = {
    */
 
   insertNode(index, node) {
-    let keys = this.getKeys()
+    const keys = this.getKeys()
 
     if (keys.contains(node.key)) {
       node = node.regenerateKey()
@@ -1220,7 +1217,7 @@ const Node = {
     }
 
     else {
-      const size = first.nodes.size
+      const { size } = first.nodes
       second.nodes.forEach((child, i) => {
         first = first.insertNode(size + i, child)
       })
@@ -1246,10 +1243,10 @@ const Node = {
    */
 
   mapChildren(iterator) {
-    let nodes = this.nodes
+    let { nodes } = this
 
     nodes.forEach((node, i) => {
-      let ret = iterator(node, i, this.nodes)
+      const ret = iterator(node, i, this.nodes)
       if (ret != node) nodes = nodes.set(ret.key, ret)
     })
 
@@ -1265,7 +1262,7 @@ const Node = {
    */
 
   mapDescendants(iterator) {
-    let nodes = this.nodes
+    let { nodes } = this
 
     nodes.forEach((node, i) => {
       let ret = node
@@ -1338,7 +1335,7 @@ const Node = {
 
   splitNode(path, offset) {
     let base = this
-    let node = base.assertPath(path)
+    const node = base.assertPath(path)
     let parent = base.getParent(node.key)
     const isParent = base == parent
     const index = parent.nodes.indexOf(node)
@@ -1396,7 +1393,7 @@ const Node = {
 
   splitNodeAfter(path, count) {
     let base = this
-    let node = base.assertPath(path)
+    const node = base.assertPath(path)
     if (node.kind === 'text') throw new Error('Cannot split text node at index. Use Node.splitNode at offset instead')
     const { nodes } = node
 
@@ -1429,7 +1426,7 @@ const Node = {
 
   splitBlockAtRange(range, height = 1) {
     const { startKey, startOffset } = range
-    let base = this
+    const base = this
     let node = base.assertDescendant(startKey)
     let parent = base.getClosestBlock(node.key)
     let offset = startOffset
@@ -1456,7 +1453,7 @@ const Node = {
   updateDescendant(node) {
     let found = false
 
-    const result = this.mapDescendants(d => {
+    const result = this.mapDescendants((d) => {
       if (d.key == node.key) {
         found = true
         return node

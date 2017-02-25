@@ -132,7 +132,7 @@ function normalizeNodeAndChildren(transform, node, schema) {
       node = refindNode(transform, node)
 
       // Add any new children back onto the stack.
-      node.nodes.forEach(n => {
+      node.nodes.forEach((n) => {
         if (set.has(n.key)) return
         stack = stack.push(n.key)
       })
@@ -171,7 +171,7 @@ function refindNode(transform, node) {
  */
 
 function normalizeNode(transform, node, schema) {
-  let max = schema.rules.length
+  const max = schema.rules.length
   let iterations = 0
 
   function iterate(t, n) {

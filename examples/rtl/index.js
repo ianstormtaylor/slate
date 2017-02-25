@@ -11,7 +11,7 @@ import initialState from './state.json'
 
 const schema = {
   nodes: {
-    'block-quote': (props) => <blockquote {...props.attributes}>{props.children}</blockquote>,
+    'block-quote': props => <blockquote {...props.attributes}>{props.children}</blockquote>,
   }
 }
 

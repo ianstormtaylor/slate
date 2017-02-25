@@ -55,7 +55,7 @@ class Character extends new Record(DEFAULTS) {
    */
 
   static createListFromText(string, marks) {
-    const chars = string.split('').map(text => { return { text, marks } })
+    const chars = string.split('').map((text) => { return { text, marks } })
     const list = Character.createList(chars)
     return list
   }

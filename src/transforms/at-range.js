@@ -94,7 +94,7 @@ export function deleteAtRange(transform, range, options = {}) {
 
   // Remove all of the middle nodes, between the splits.
   if (middles.size) {
-    middles.forEach(child => {
+    middles.forEach((child) => {
       transform.removeNodeByKey(child.key, OPTS)
     })
   }
@@ -793,7 +793,7 @@ export function setInlineAtRange(transform, range, properties, options = {}) {
   const inlines = document.getInlinesAtRange(range)
 
   inlines.forEach((inline) => {
-    transform.setNodeByKey(inline.key, properties, { normalize})
+    transform.setNodeByKey(inline.key, properties, { normalize })
   })
 }
 
@@ -940,7 +940,7 @@ export function unwrapBlockAtRange(transform, range, properties, options = {}) {
     })
 
     const firstMatch = children.first()
-    let lastMatch = children.last()
+    const lastMatch = children.last()
 
     if (first == firstMatch && last == lastMatch) {
       block.nodes.forEach((child, i) => {
@@ -1061,23 +1061,25 @@ export function wrapBlockAtRange(transform, range, block, options = {}) {
   const lastblock = blocks.last()
   let parent, siblings, index
 
-  // if there is only one block in the selection then we know the parent and siblings
+  // If there is only one block in the selection then we know the parent and
+  // siblings.
   if (blocks.length === 1) {
     parent = document.getParent(firstblock.key)
     siblings = blocks
   }
 
-  // determine closest shared parent to all blocks in selection
+  // Determine closest shared parent to all blocks in selection.
   else {
-    parent = document.getClosest(firstblock.key, p1 => {
+    parent = document.getClosest(firstblock.key, (p1) => {
       return !!document.getClosest(lastblock.key, p2 => p1 == p2)
     })
   }
 
-  // if no shared parent could be found then the parent is the document
+  // If no shared parent could be found then the parent is the document.
   if (parent == null) parent = document
 
-  // create a list of direct children siblings of parent that fall in the selection
+  // Create a list of direct children siblings of parent that fall in the
+  // selection.
   if (siblings == null) {
     const indexes = parent.nodes.reduce((ind, node, i) => {
       if (node == firstblock || node.hasDescendant(firstblock.key)) ind[0] = i
@@ -1089,15 +1091,15 @@ export function wrapBlockAtRange(transform, range, block, options = {}) {
     siblings = parent.nodes.slice(indexes[0], indexes[1] + 1)
   }
 
-  // get the index to place the new wrapped node at
+  // Get the index to place the new wrapped node at.
   if (index == null) {
     index = parent.nodes.indexOf(siblings.first())
   }
 
-  // inject the new block node into the parent
+  // Inject the new block node into the parent.
   transform.insertNodeByKey(parent.key, index, block, OPTS)
 
-  // move the sibling nodes into the new block node
+  // Move the sibling nodes into the new block node.
   siblings.forEach((node, i) => {
     transform.moveNodeByKey(node.key, block.key, i, OPTS)
   })
@@ -1140,7 +1142,7 @@ export function wrapInlineAtRange(transform, range, inline, options = {}) {
   let startBlock = document.getClosestBlock(startKey)
   let endBlock = document.getClosestBlock(endKey)
   let startChild = startBlock.getHighestChild(startKey)
-  let endChild = endBlock.getHighestChild(endKey)
+  const endChild = endBlock.getHighestChild(endKey)
   const startIndex = startBlock.nodes.indexOf(startChild)
   const endIndex = endBlock.nodes.indexOf(endChild)
 

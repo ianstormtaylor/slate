@@ -43,7 +43,7 @@ const OPERATIONS = {
  */
 
 export function applyOperation(transform, operation) {
-  let { state, operations } = transform
+  const { state, operations } = transform
   const { type } = operation
   const fn = OPERATIONS[type]
 
@@ -260,7 +260,6 @@ function removeNode(state, operation) {
         selection = selection.unset()
       }
     }
-
   }
 
   // Remove the node from the document.
@@ -362,7 +361,7 @@ function setNode(state, operation) {
  */
 
 function setSelection(state, operation) {
-  let properties = { ...operation.properties }
+  const properties = { ...operation.properties }
   let { document, selection } = state
 
   if (properties.anchorPath !== undefined) {

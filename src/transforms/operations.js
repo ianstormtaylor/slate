@@ -440,7 +440,7 @@ export function splitNodeAtOffsetOperation(transform, path, offset) {
     type: 'join_node',
     path: inversePath,
     withPath: path,
-    // we will split down to the text nodes, so we must join nodes recursively
+    // We will split down to the text nodes, so we must join nodes recursively.
     deep: true
   }]
 

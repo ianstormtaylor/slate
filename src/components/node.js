@@ -62,7 +62,7 @@ class Node extends React.Component {
   debug = (message, ...args) => {
     const { node } = this.props
     const { key, kind, type } = node
-    let id = kind == 'text' ? `${key} (${kind})` : `${key} (${type})`
+    const id = kind == 'text' ? `${key} (${kind})` : `${key} (${type})`
     debug(message, `${id}`, ...args)
   }
 
@@ -349,8 +349,7 @@ class Node extends React.Component {
 
   renderLeaf = (ranges, range, index, offset) => {
     const { node, parent, schema, state, editor } = this.props
-    const text = range.text
-    const marks = range.marks
+    const { text, marks } = range
 
     return (
       <Leaf

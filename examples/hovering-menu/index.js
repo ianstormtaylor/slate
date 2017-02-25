@@ -2,8 +2,8 @@
 import { Editor, Raw } from '../..'
 import Portal from 'react-portal'
 import React from 'react'
-import position from 'selection-position'
 import initialState from './state.json'
+import position from 'selection-position'
 
 /**
  * Define a schema.
