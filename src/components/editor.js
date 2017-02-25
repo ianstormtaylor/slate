@@ -260,6 +260,7 @@ class Editor extends React.Component {
         style={props.style}
         tabIndex={props.tabIndex}
         role={props.role}
+        children={props.children}     
       />
     )
   }

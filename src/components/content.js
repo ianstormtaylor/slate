@@ -699,7 +699,7 @@ class Content extends React.Component {
     const { props } = this
     const { className, readOnly, state, tabIndex, role } = props
     const { document } = state
-    const children = document.nodes
+    const children = props.children || document.nodes
       .map(node => this.renderNode(node))
       .toArray()
 
@@ -754,7 +754,7 @@ class Content extends React.Component {
         role={readOnly ? null : (role || 'textbox')}
         tabIndex={tabIndex}
       >
-        {children}
+        {typeof children == 'function' ? children(state) : children}
       </div>
     )
   }
