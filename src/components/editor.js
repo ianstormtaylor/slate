@@ -1,6 +1,7 @@
 
 import Content from './content'
 import Debug from 'debug'
+import Portal from 'react-portal'
 import React from 'react'
 import Stack from '../models/stack'
 import State from '../models/state'
@@ -238,7 +239,9 @@ class Editor extends React.Component {
 
   render = () => {
     const { props, state } = this
+    const { stack } = state
     const handlers = {}
+    const children = stack.render(state.state, this)
 
     for (const property of EVENT_HANDLERS) {
       handlers[property] = this[property]
@@ -260,7 +263,9 @@ class Editor extends React.Component {
         style={props.style}
         tabIndex={props.tabIndex}
         role={props.role}
-      />
+      >
+        {children.map((child, i) => <Portal key={i} isOpened>{child}</Portal>)}
+      </Content>
     )
   }
 

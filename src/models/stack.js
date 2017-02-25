@@ -19,7 +19,7 @@ const debug = Debug('slate:stack')
  * @type {Array}
  */
 
-const EVENT_METHODS = [
+const EVENT_HANDLER_METHODS = [
   'onBeforeInput',
   'onBlur',
   'onCopy',
@@ -36,20 +36,20 @@ const EVENT_METHODS = [
  * @type {Array}
  */
 
-const ACCUMULATOR_METHODS = [
+const STATE_ACCUMULATOR_METHODS = [
   'onBeforeChange',
   'onChange',
 ]
 
 /**
- * All the runnable methods.
+ * Methods that accumulate an array.
  *
  * @type {Array}
  */
 
-const RUNNABLE_METHODS = []
-  .concat(EVENT_METHODS)
-  .concat(ACCUMULATOR_METHODS)
+const ARRAY_ACCUMULATOR_METHODS = [
+  'render'
+]
 
 /**
  * Default properties.
@@ -95,17 +95,19 @@ class Stack extends new Record(DEFAULTS) {
     return 'stack'
   }
 
-  /**
-   * Run a `method` in the stack with `state`.
-   *
-   * @param {String} method
-   * @param {State} state
-   * @param {Editor} editor
-   * @param {Mixed} ...args
-   * @return {State}
-   */
+}
 
-  run(method, state, editor, ...args) {
+/**
+ * Mix in the event handler methods.
+ *
+ * @param {State} state
+ * @param {Editor} editor
+ * @param {Mixed} ...args
+ * @return {State|Null}
+ */
+
+for (const method of EVENT_HANDLER_METHODS) {
+  Stack.prototype[method] = function (state, editor, ...args) {
     debug(method)
 
     if (method == 'onChange') {
@@ -115,30 +117,74 @@ class Stack extends new Record(DEFAULTS) {
     for (const plugin of this.plugins) {
       if (!plugin[method]) continue
       const next = plugin[method](...args, state, editor)
-
-      if (next == null) {
-        continue
-      } else if (next instanceof State) {
-        state = next
-        if (!ACCUMULATOR_METHODS.includes(method)) break
-      } else {
-        throw new Error(`A plugin returned an unexpected state value: ${next}`)
-      }
+      if (next == null) continue
+      assertState(next)
+      return next
     }
 
     return state
   }
-
 }
 
 /**
- * Mix in the runnable methods.
+ * Mix in the state accumulator methods.
+ *
+ * @param {State} state
+ * @param {Editor} editor
+ * @param {Mixed} ...args
+ * @return {State|Null}
  */
 
-for (const method of RUNNABLE_METHODS) {
-  Stack.prototype[method] = function (...args) {
-    return this.run(method, ...args)
+for (const method of STATE_ACCUMULATOR_METHODS) {
+  Stack.prototype[method] = function (state, editor, ...args) {
+    debug(method)
+
+    for (const plugin of this.plugins) {
+      if (!plugin[method]) continue
+      const next = plugin[method](...args, state, editor)
+      if (next == null) continue
+      assertState(next)
+      state = next
+    }
+
+    return state
   }
+}
+
+/**
+ * Mix in the array accumulator methods.
+ *
+ * @param {State} state
+ * @param {Editor} editor
+ * @param {Mixed} ...args
+ * @return {Array}
+ */
+
+for (const method of ARRAY_ACCUMULATOR_METHODS) {
+  Stack.prototype[method] = function (state, editor, ...args) {
+    debug(method)
+    const array = []
+
+    for (const plugin of this.plugins) {
+      if (!plugin[method]) continue
+      const next = plugin[method](...args, state, editor)
+      if (next == null) continue
+      array.push(next)
+    }
+
+    return array
+  }
+}
+
+/**
+ * Assert that a `value` is a state object.
+ *
+ * @param {Mixed} value
+ */
+
+function assertState(value) {
+  if (value instanceof State) return
+  throw new Error(`A plugin returned an unexpected state value: ${value}`)
 }
 
 /**
