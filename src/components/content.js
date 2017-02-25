@@ -36,7 +36,7 @@ class Content extends React.Component {
 
   static propTypes = {
     autoCorrect: React.PropTypes.bool.isRequired,
-    children: React.PropTypes.object.isRequired,
+    children: React.PropTypes.array.isRequired,
     className: React.PropTypes.string,
     editor: React.PropTypes.object.isRequired,
     onBeforeInput: React.PropTypes.func.isRequired,
