@@ -36,6 +36,7 @@ class Content extends React.Component {
 
   static propTypes = {
     autoCorrect: React.PropTypes.bool.isRequired,
+    children: React.PropTypes.object.isRequired,
     className: React.PropTypes.string,
     editor: React.PropTypes.object.isRequired,
     onBeforeInput: React.PropTypes.func.isRequired,
@@ -755,6 +756,7 @@ class Content extends React.Component {
         tabIndex={tabIndex}
       >
         {children}
+        {this.props.children}
       </div>
     )
   }
