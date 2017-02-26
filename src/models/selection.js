@@ -407,6 +407,52 @@ class Selection extends new Record(DEFAULTS) {
   }
 
   /**
+   * Move the selection to `anchorOffset`.
+   *
+   * @param {Number} anchorOffset
+   * @return {Selection}
+   */
+
+  moveAnchorOffsetTo(anchorOffset) {
+    return this.merge({
+      anchorOffset,
+      isBackward: this.anchorKey == this.focusKey
+        ? anchorOffset > this.focusOffset
+        : this.isBackward
+    })
+  }
+
+  /**
+   * Move the selection to `focusOffset`.
+   *
+   * @param {Number} focusOffset
+   * @return {Selection}
+   */
+
+  moveFocusOffsetTo(focusOffset) {
+    return this.merge({
+      focusOffset,
+      isBackward: this.anchorKey == this.focusKey
+        ? this.anchorOffset > focusOffset
+        : this.isBackward
+    })
+  }
+
+  /**
+   * Move the selection to `anchorOffset` and `focusOffset`.
+   *
+   * @param {Number} anchorOffset
+   * @param {Number} focusOffset (optional)
+   * @return {Selection}
+   */
+
+  moveOffsetsTo(anchorOffset, focusOffset = anchorOffset) {
+    this
+      .moveAnchorOffsetTo(anchorOffset)
+      .moveFocusOffsetTo(focusOffset)
+  }
+
+  /**
    * Move the focus point to the anchor point.
    *
    * @return {Selection}
@@ -663,14 +709,8 @@ class Selection extends new Record(DEFAULTS) {
    */
 
   moveToOffsets(anchorOffset, focusOffset = anchorOffset) {
-    warn('The `Selection.moveToOffsets` method is deprecated.')
-    const props = { anchorOffset, focusOffset }
-
-    if (this.anchorKey == this.focusKey) {
-      props.isBackward = anchorOffset > focusOffset
-    }
-
-    return this.merge(props)
+    warn('The `Selection.moveToOffsets` method is deprecated, please switch to using `Selection.moveOffsetsTo` instead.')
+    return this.moveOffsetsTo(anchorOffset, focusOffset)
   }
 
 }
