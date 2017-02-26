@@ -204,13 +204,13 @@ export function insertFragment(transform, fragment) {
   else if (newText) {
     after = selection
       .collapseToStartOf(newText)
-      .moveForward(lastText.length)
+      .move(lastText.length)
   }
 
   else {
     after = selection
       .collapseToStart()
-      .moveForward(lastText.length)
+      .move(lastText.length)
   }
 
   transform.moveTo(after)

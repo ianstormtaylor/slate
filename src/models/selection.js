@@ -748,9 +748,9 @@ const EDGE_METHODS = [
   ['has', 'AtEndOf', true],
   ['has', 'Between', true],
   ['has', 'In', true],
-  ['moveTo', ''],
   ['collapseTo', ''],
   ['move', ''],
+  ['moveTo', ''],
   ['move', 'To'],
   ['move', 'OffsetTo'],
 ]

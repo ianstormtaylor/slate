@@ -581,7 +581,7 @@ const Node = {
 
     const next = node.getNextText(startKey)
     const end = startKey == endKey
-      ? range.collapseToStartOf(next).moveForward(endOffset - startOffset)
+      ? range.collapseToStartOf(next).move(endOffset - startOffset)
       : range.collapseToEnd()
     node = node.splitBlockAtRange(end, Infinity)
 

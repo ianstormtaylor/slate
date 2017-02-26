@@ -113,10 +113,10 @@ function insertText(state, operation) {
 
   // Update the selection
   if (anchorKey == node.key && anchorOffset >= offset) {
-    selection = selection.moveAnchorOffset(text.length)
+    selection = selection.moveAnchor(text.length)
   }
   if (focusKey == node.key && focusOffset >= offset) {
-    selection = selection.moveFocusOffset(text.length)
+    selection = selection.moveFocus(text.length)
   }
 
   state = state.merge({ document, selection })
@@ -291,10 +291,10 @@ function removeText(state, operation) {
 
   // Update the selection
   if (anchorKey == node.key && anchorOffset >= rangeOffset) {
-    selection = selection.moveAnchorOffset(-length)
+    selection = selection.moveAnchor(-length)
   }
   if (focusKey == node.key && focusOffset >= rangeOffset) {
-    selection = selection.moveFocusOffset(-length)
+    selection = selection.moveFocus(-length)
   }
 
   node = node.removeText(offset, length)

@@ -482,7 +482,7 @@ class Content extends React.Component {
 
     // Determine what the selection should be after changing the text.
     const delta = textContent.length - text.length
-    const after = selection.collapseToEnd().moveForward(delta)
+    const after = selection.collapseToEnd().move(delta)
 
     // Create an updated state with the text replaced.
     const next = state

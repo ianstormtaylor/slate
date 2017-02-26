@@ -1257,7 +1257,7 @@ export function wrapTextAtRange(transform, range, prefix, suffix = prefix, optio
   let end = range.collapseToEnd()
 
   if (startKey == endKey) {
-    end = end.moveForward(prefix.length)
+    end = end.move(prefix.length)
   }
 
   transform.insertTextAtRange(start, prefix, [], { normalize })
