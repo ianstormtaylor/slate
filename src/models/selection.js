@@ -447,7 +447,7 @@ class Selection extends new Record(DEFAULTS) {
    */
 
   moveOffsetsTo(anchorOffset, focusOffset = anchorOffset) {
-    this
+    return this
       .moveAnchorOffsetTo(anchorOffset)
       .moveFocusOffsetTo(focusOffset)
   }
@@ -529,7 +529,7 @@ class Selection extends new Record(DEFAULTS) {
    */
 
   moveToRangeOf(start, end = start) {
-    this
+    return this
       .moveAnchorToStartOf(start)
       .moveFocusToEndOf(end)
   }
