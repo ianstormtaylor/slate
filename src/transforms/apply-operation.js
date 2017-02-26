@@ -11,6 +11,14 @@ import warn from '../utils/warn'
 const debug = Debug('slate:operation')
 
 /**
+ * Transforms.
+ *
+ * @type {Object}
+ */
+
+const Transforms = {}
+
+/**
  * Operations.
  *
  * @type {Object}
@@ -42,7 +50,7 @@ const OPERATIONS = {
  * @param {Object} operation
  */
 
-export function applyOperation(transform, operation) {
+Transforms.applyOperation = (transform, operation) => {
   const { state, operations } = transform
   const { type } = operation
   const fn = OPERATIONS[type]
@@ -441,3 +449,11 @@ function splitNode(state, operation) {
   state = state.merge({ document, selection })
   return state
 }
+
+/**
+ * Export.
+ *
+ * @type {Object}
+ */
+
+export default Transforms

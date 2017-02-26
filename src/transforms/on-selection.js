@@ -1,28 +1,52 @@
 
 /**
- * Auto-generate many transforms based on the `Selection` methods.
+ * Transforms.
+ *
+ * @type {Object}
  */
 
-export const blur = generate('blur')
-export const collapseToAnchor = generate('collapseToAnchor')
-export const collapseToEnd = generate('collapseToEnd')
-export const collapseToFocus = generate('collapseToFocus')
-export const collapseToStart = generate('collapseToStart')
-export const collapseToEndOf = generate('collapseToEndOf')
-export const collapseToStartOf = generate('collapseToStartOf')
-export const extendBackward = generate('extendBackward')
-export const extendForward = generate('extendForward')
-export const extendToEndOf = generate('extendToEndOf')
-export const extendToStartOf = generate('extendToStartOf')
-export const focus = generate('focus')
-export const moveBackward = generate('moveBackward')
-export const moveForward = generate('moveForward')
-export const moveToOffsets = generate('moveToOffsets')
-export const moveToRangeOf = generate('moveToRangeOf')
-export const moveStartOffset = generate('moveStartOffset')
-export const moveEndOffset = generate('moveEndOffset')
+const Transforms = {}
 
-export const flipSelection = generate('flip')
+/**
+ * Auto-generate many transforms based on `Selection` methods.
+ */
+
+const GENERATED_TRANSFORMS = [
+  ['blur'],
+  ['collapseToAnchor'],
+  ['collapseToEnd'],
+  ['collapseToFocus'],
+  ['collapseToStart'],
+  ['collapseToEndOf'],
+  ['collapseToStartOf'],
+  ['extendBackward'],
+  ['extendForward'],
+  ['extendToEndOf'],
+  ['extendToStartOf'],
+  ['focus'],
+
+  ['moveToRangeOf'],
+
+  // TODO: deprecate these names, in favor of new ones.
+  ['moveBackward'],
+  ['moveForward'],
+  ['moveToOffsets'],
+  ['moveStart', 'moveStartOffset'],
+  ['moveEnd', 'moveEndOffset'],
+
+  ['flip', 'flipSelection'],
+]
+
+GENERATED_TRANSFORMS.forEach((opts) => {
+  const [ method, name = method ] = opts
+
+  Transforms[name] = (transform, ...args) => {
+    const { state } = transform
+    const { document, selection } = state
+    const sel = selection[method](...args).normalize(document)
+    transform.setSelectionOperation(sel)
+  }
+})
 
 /**
  * Move the selection to the end of the next block.
@@ -30,7 +54,7 @@ export const flipSelection = generate('flip')
  * @param {Transform} tansform
  */
 
-export function collapseToEndOfNextBlock(transform) {
+Transforms.collapseToEndOfNextBlock = (transform) => {
   const { state } = transform
   const { document, selection } = state
   const blocks = document.getBlocksAtRange(selection)
@@ -48,7 +72,7 @@ export function collapseToEndOfNextBlock(transform) {
  * @param {Transform} tansform
  */
 
-export function collapseToEndOfNextText(transform) {
+Transforms.collapseToEndOfNextText = (transform) => {
   const { state } = transform
   const { document, selection } = state
   const texts = document.getTextsAtRange(selection)
@@ -66,7 +90,7 @@ export function collapseToEndOfNextText(transform) {
  * @param {Transform} tansform
  */
 
-export function collapseToEndOfPreviousBlock(transform) {
+Transforms.collapseToEndOfPreviousBlock = (transform) => {
   const { state } = transform
   const { document, selection } = state
   const blocks = document.getBlocksAtRange(selection)
@@ -84,7 +108,7 @@ export function collapseToEndOfPreviousBlock(transform) {
  * @param {Transform} tansform
  */
 
-export function collapseToEndOfPreviousText(transform) {
+Transforms.collapseToEndOfPreviousText = (transform) => {
   const { state } = transform
   const { document, selection } = state
   const texts = document.getTextsAtRange(selection)
@@ -102,7 +126,7 @@ export function collapseToEndOfPreviousText(transform) {
  * @param {Transform} tansform
  */
 
-export function collapseToStartOfNextBlock(transform) {
+Transforms.collapseToStartOfNextBlock = (transform) => {
   const { state } = transform
   const { document, selection } = state
   const blocks = document.getBlocksAtRange(selection)
@@ -120,7 +144,7 @@ export function collapseToStartOfNextBlock(transform) {
  * @param {Transform} tansform
  */
 
-export function collapseToStartOfNextText(transform) {
+Transforms.collapseToStartOfNextText = (transform) => {
   const { state } = transform
   const { document, selection } = state
   const texts = document.getTextsAtRange(selection)
@@ -138,7 +162,7 @@ export function collapseToStartOfNextText(transform) {
  * @param {Transform} tansform
  */
 
-export function collapseToStartOfPreviousBlock(transform) {
+Transforms.collapseToStartOfPreviousBlock = (transform) => {
   const { state } = transform
   const { document, selection } = state
   const blocks = document.getBlocksAtRange(selection)
@@ -156,7 +180,7 @@ export function collapseToStartOfPreviousBlock(transform) {
  * @param {Transform} tansform
  */
 
-export function collapseToStartOfPreviousText(transform) {
+Transforms.collapseToStartOfPreviousText = (transform) => {
   const { state } = transform
   const { document, selection } = state
   const texts = document.getTextsAtRange(selection)
@@ -175,7 +199,7 @@ export function collapseToStartOfPreviousText(transform) {
  * @param {Object} properties
  */
 
-export function moveTo(transform, properties) {
+Transforms.moveTo = (transform, properties) => {
   transform.setSelectionOperation(properties)
 }
 
@@ -185,7 +209,7 @@ export function moveTo(transform, properties) {
  * @param {Transform} transform
  */
 
-export function unsetMarks(transform) {
+Transforms.unsetMarks = (transform) => {
   transform.setSelectionOperation({ marks: null })
 }
 
@@ -195,7 +219,7 @@ export function unsetMarks(transform) {
  * @param {Transform} transform
  */
 
-export function snapshotSelection(transform) {
+Transforms.snapshotSelection = (transform) => {
   const { state } = transform
   const { selection } = state
   transform.setSelectionOperation(selection, { snapshot: true })
@@ -207,7 +231,7 @@ export function snapshotSelection(transform) {
  * @param {Transform} transform
  */
 
-export function unsetSelection(transform) {
+Transforms.unsetSelection = (transform) => {
   transform.setSelectionOperation({
     anchorKey: null,
     anchorOffset: 0,
@@ -219,17 +243,9 @@ export function unsetSelection(transform) {
 }
 
 /**
- * Generate a selection transform for `method`.
+ * Export.
  *
- * @param {String} method
- * @return {Function}
+ * @type {Object}
  */
 
-function generate(method) {
-  return (transform, ...args) => {
-    const { state } = transform
-    const { document, selection } = state
-    const sel = selection[method](...args).normalize(document)
-    transform.setSelectionOperation(sel)
-  }
-}
+export default Transforms

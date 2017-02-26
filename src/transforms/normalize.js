@@ -5,13 +5,21 @@ import warn from '../utils/warn'
 import { Set } from 'immutable'
 
 /**
+ * Transforms.
+ *
+ * @type {Object}
+ */
+
+const Transforms = {}
+
+/**
  * Normalize the document and selection with a `schema`.
  *
  * @param {Transform} transform
  * @param {Schema} schema
  */
 
-export function normalize(transform, schema) {
+Transforms.normalize = (transform, schema) => {
   transform.normalizeDocument(schema)
   transform.normalizeSelection(schema)
 }
@@ -23,7 +31,7 @@ export function normalize(transform, schema) {
  * @param {Schema} schema
  */
 
-export function normalizeDocument(transform, schema) {
+Transforms.normalizeDocument = (transform, schema) => {
   const { state } = transform
   const { document } = state
   transform.normalizeNodeByKey(document.key, schema)
@@ -37,7 +45,7 @@ export function normalizeDocument(transform, schema) {
  * @param {Schema} schema
  */
 
-export function normalizeNodeByKey(transform, key, schema) {
+Transforms.normalizeNodeByKey = (transform, key, schema) => {
   assertSchema(schema)
 
   // If the schema has no validation rules, there's nothing to normalize.
@@ -57,7 +65,7 @@ export function normalizeNodeByKey(transform, key, schema) {
  * @param {Transform} transform
  */
 
-export function normalizeSelection(transform) {
+Transforms.normalizeSelection = (transform) => {
   let { state } = transform
   let { document, selection } = state
 
@@ -219,3 +227,11 @@ function assertSchema(schema) {
     throw new Error(`You passed an invalid \`schema\` object: ${schema}.`)
   }
 }
+
+/**
+ * Export.
+ *
+ * @type {Object}
+ */
+
+export default Transforms

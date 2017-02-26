@@ -3,6 +3,14 @@ import Normalize from '../utils/normalize'
 import SCHEMA from '../schemas/core'
 
 /**
+ * Transforms.
+ *
+ * @type {Object}
+ */
+
+const Transforms = {}
+
+/**
  * Add mark to text at `offset` and `length` in node by `key`.
  *
  * @param {Transform} transform
@@ -14,7 +22,7 @@ import SCHEMA from '../schemas/core'
  *   @property {Boolean} normalize
  */
 
-export function addMarkByKey(transform, key, offset, length, mark, options = {}) {
+Transforms.addMarkByKey = (transform, key, offset, length, mark, options = {}) => {
   mark = Normalize.mark(mark)
   const { normalize = true } = options
   const { state } = transform
@@ -40,7 +48,7 @@ export function addMarkByKey(transform, key, offset, length, mark, options = {})
  *   @property {Boolean} normalize
  */
 
-export function insertNodeByKey(transform, key, index, node, options = {}) {
+Transforms.insertNodeByKey = (transform, key, index, node, options = {}) => {
   const { normalize = true } = options
   const { state } = transform
   const { document } = state
@@ -65,7 +73,7 @@ export function insertNodeByKey(transform, key, index, node, options = {}) {
  *   @property {Boolean} normalize
  */
 
-export function insertTextByKey(transform, key, offset, text, marks, options = {}) {
+Transforms.insertTextByKey = (transform, key, offset, text, marks, options = {}) => {
   const { normalize = true } = options
   const { state } = transform
   const { document } = state
@@ -89,7 +97,7 @@ export function insertTextByKey(transform, key, offset, text, marks, options = {
  *   @property {Boolean} normalize
  */
 
-export function joinNodeByKey(transform, key, withKey, options = {}) {
+Transforms.joinNodeByKey = (transform, key, withKey, options = {}) => {
   const { normalize = true } = options
   const { state } = transform
   const { document } = state
@@ -116,7 +124,7 @@ export function joinNodeByKey(transform, key, withKey, options = {}) {
  *   @property {Boolean} normalize
  */
 
-export function moveNodeByKey(transform, key, newKey, newIndex, options = {}) {
+Transforms.moveNodeByKey = (transform, key, newKey, newIndex, options = {}) => {
   const { normalize = true } = options
   const { state } = transform
   const { document } = state
@@ -143,7 +151,7 @@ export function moveNodeByKey(transform, key, newKey, newIndex, options = {}) {
  *   @property {Boolean} normalize
  */
 
-export function removeMarkByKey(transform, key, offset, length, mark, options = {}) {
+Transforms.removeMarkByKey = (transform, key, offset, length, mark, options = {}) => {
   mark = Normalize.mark(mark)
   const { normalize = true } = options
   const { state } = transform
@@ -167,7 +175,7 @@ export function removeMarkByKey(transform, key, offset, length, mark, options = 
  *   @property {Boolean} normalize
  */
 
-export function removeNodeByKey(transform, key, options = {}) {
+Transforms.removeNodeByKey = (transform, key, options = {}) => {
   const { normalize = true } = options
   const { state } = transform
   const { document } = state
@@ -192,7 +200,7 @@ export function removeNodeByKey(transform, key, options = {}) {
  *   @property {Boolean} normalize
  */
 
-export function removeTextByKey(transform, key, offset, length, options = {}) {
+Transforms.removeTextByKey = (transform, key, offset, length, options = {}) => {
   const { normalize = true } = options
   const { state } = transform
   const { document } = state
@@ -218,7 +226,7 @@ export function removeTextByKey(transform, key, offset, length, options = {}) {
  *   @property {Boolean} normalize
  */
 
-export function setMarkByKey(transform, key, offset, length, mark, properties, options = {}) {
+Transforms.setMarkByKey = (transform, key, offset, length, mark, properties, options = {}) => {
   mark = Normalize.mark(mark)
   properties = Normalize.markProperties(properties)
   const { normalize = true } = options
@@ -245,7 +253,7 @@ export function setMarkByKey(transform, key, offset, length, mark, properties, o
  *   @property {Boolean} normalize
  */
 
-export function setNodeByKey(transform, key, properties, options = {}) {
+Transforms.setNodeByKey = (transform, key, properties, options = {}) => {
   properties = Normalize.nodeProperties(properties)
   const { normalize = true } = options
   const { state } = transform
@@ -270,7 +278,7 @@ export function setNodeByKey(transform, key, properties, options = {}) {
  *   @property {Boolean} normalize
  */
 
-export function splitNodeByKey(transform, key, offset, options = {}) {
+Transforms.splitNodeByKey = (transform, key, offset, options = {}) => {
   const { normalize = true } = options
   const { state } = transform
   const { document } = state
@@ -294,7 +302,7 @@ export function splitNodeByKey(transform, key, offset, options = {}) {
  *   @property {Boolean} normalize
  */
 
-export function unwrapInlineByKey(transform, key, properties, options) {
+Transforms.unwrapInlineByKey = (transform, key, properties, options) => {
   const { state } = transform
   const { document, selection } = state
   const node = document.assertDescendant(key)
@@ -314,7 +322,7 @@ export function unwrapInlineByKey(transform, key, properties, options) {
  *   @property {Boolean} normalize
  */
 
-export function unwrapBlockByKey(transform, key, properties, options) {
+Transforms.unwrapBlockByKey = (transform, key, properties, options) => {
   const { state } = transform
   const { document, selection } = state
   const node = document.assertDescendant(key)
@@ -337,7 +345,7 @@ export function unwrapBlockByKey(transform, key, properties, options) {
  *   @property {Boolean} normalize
  */
 
-export function unwrapNodeByKey(transform, key, options = {}) {
+Transforms.unwrapNodeByKey = (transform, key, options = {}) => {
   const { normalize = true } = options
   const { state } = transform
   const { document } = state
@@ -391,7 +399,7 @@ export function unwrapNodeByKey(transform, key, options = {}) {
  *   @property {Boolean} normalize
  */
 
-export function wrapInlineByKey(transform, key, inline, options) {
+Transforms.wrapInlineByKey = (transform, key, inline, options) => {
   inline = Normalize.inline(inline)
   inline = inline.merge({ nodes: inline.nodes.clear() })
 
@@ -414,7 +422,7 @@ export function wrapInlineByKey(transform, key, inline, options) {
  *   @property {Boolean} normalize
  */
 
-export function wrapBlockByKey(transform, key, block, options) {
+Transforms.wrapBlockByKey = (transform, key, block, options) => {
   block = Normalize.block(block)
   block = block.merge({ nodes: block.nodes.clear() })
 
@@ -426,3 +434,11 @@ export function wrapBlockByKey(transform, key, block, options) {
   transform.insertNodeByKey(parent.key, index, block, { normalize: false })
   transform.moveNodeByKey(node.key, block.key, 0, options)
 }
+
+/**
+ * Export.
+ *
+ * @type {Object}
+ */
+
+export default Transforms
