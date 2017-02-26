@@ -752,6 +752,7 @@ const EDGE_METHODS = [
   ['collapseTo', ''],
   ['move', ''],
   ['move', 'To'],
+  ['move', 'OffsetTo'],
 ]
 
 EDGE_METHODS.forEach((opts) => {
