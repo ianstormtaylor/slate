@@ -340,11 +340,13 @@ class Selection extends new Record(DEFAULTS) {
    */
 
   moveAnchor(n = 1) {
-    const { anchorKey, focusKey, focusOffset } = this
+    const { anchorKey, focusKey, focusOffset, isBackward } = this
     const anchorOffset = this.anchorOffset + n
     return this.merge({
       anchorOffset,
-      isBackward: anchorKey == focusKey ? anchorOffset > focusOffset : this.isBackward
+      isBackward: anchorKey == focusKey
+        ? anchorOffset > focusOffset
+        : isBackward
     })
   }
 
@@ -356,11 +358,13 @@ class Selection extends new Record(DEFAULTS) {
    */
 
   moveFocus(n = 1) {
-    const { focusKey, anchorKey, anchorOffset } = this
+    const { anchorKey, anchorOffset, focusKey, isBackward } = this
     const focusOffset = this.focusOffset + n
     return this.merge({
       focusOffset,
-      isBackward: focusKey == anchorKey ? anchorOffset > focusOffset : this.isBackward
+      isBackward: focusKey == anchorKey
+        ? anchorOffset > focusOffset
+        : isBackward
     })
   }
 
@@ -437,6 +441,7 @@ class Selection extends new Record(DEFAULTS) {
   /**
    * Move the selection's anchor point to the end of a `node`.
    *
+   * @param {Node} node
    * @return {Selection}
    */
 
@@ -460,6 +465,7 @@ class Selection extends new Record(DEFAULTS) {
   /**
    * Move the selection's focus point to the end of a `node`.
    *
+   * @param {Node} node
    * @return {Selection}
    */
 
@@ -473,52 +479,13 @@ class Selection extends new Record(DEFAULTS) {
    *
    * @param {Node} start
    * @param {Node} end (optional)
-   * @param {Document} document
    * @return {Selection}
    */
 
   moveToRangeOf(start, end = start) {
-    start = getFirst(start)
-    end = getLast(end)
-    return this.merge({
-      anchorKey: start.key,
-      anchorOffset: 0,
-      focusKey: end.key,
-      focusOffset: end.length,
-      isBackward: null, // TODO: can be smarter here for isBackward.
-    })
-  }
-
-  /**
-   * Extend the focus point to the start of a `node`.
-   *
-   * @param {Node} node
-   * @return {Selection}
-   */
-
-  extendToStartOf(node) {
-    node = getFirst(node)
-    return this.merge({
-      focusKey: node.key,
-      focusOffset: 0,
-      isBackward: null
-    })
-  }
-
-  /**
-   * Extend the focus point to the end of a `node`.
-   *
-   * @param {Node} node
-   * @return {Selection}
-   */
-
-  extendToEndOf(node) {
-    node = getLast(node)
-    return this.merge({
-      focusKey: node.key,
-      focusOffset: node.length,
-      isBackward: null
-    })
+    this
+      .moveAnchorToStartOf(start)
+      .moveFocusToEndOf(end)
   }
 
   /**
