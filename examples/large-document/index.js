@@ -80,7 +80,7 @@ class LargeDocument extends React.Component {
       <Editor
         placeholder={'Enter some plain text...'}
         schema={schema}
-        spellcheck={false}
+        spellCheck={false}
         state={this.state.state}
         onChange={this.onChange}
       />

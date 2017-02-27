@@ -1,0 +1,26 @@
+data: {}
+nodes:
+  - type: paragraph
+    isVoid: false
+    data: {}
+    nodes:
+      - characters:
+          - text: o
+            marks: []
+          - text: n
+            marks: []
+          - text: e
+            marks: []
+  - type: default
+    isVoid: false
+    data:
+      key: value
+    nodes:
+      - characters:
+          - text: t
+            marks: []
+          - text: w
+            marks: []
+          - text: o
+            marks: []
+

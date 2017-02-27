@@ -29,25 +29,16 @@ class Leaf extends React.Component {
    */
 
   static propTypes = {
+    editor: React.PropTypes.object.isRequired,
     index: React.PropTypes.number.isRequired,
-    isVoid: React.PropTypes.bool,
     marks: React.PropTypes.object.isRequired,
     node: React.PropTypes.object.isRequired,
+    offset: React.PropTypes.number.isRequired,
     parent: React.PropTypes.object.isRequired,
     ranges: React.PropTypes.object.isRequired,
     schema: React.PropTypes.object.isRequired,
     state: React.PropTypes.object.isRequired,
     text: React.PropTypes.string.isRequired
-  };
-
-  /**
-   * Default properties.
-   *
-   * @type {Object}
-   */
-
-  static defaultProps = {
-    isVoid: false
   };
 
   /**
@@ -175,43 +166,40 @@ class Leaf extends React.Component {
     }
 
     // Otherwise we need to set the selection across two different leaves.
-    else {
-      // If the selection is forward, we can set things in sequence. In the
-      // first leaf to render, reset the selection and set the new start. And
-      // then in the second leaf to render, extend to the new end.
-      if (selection.isForward) {
-        if (hasAnchor) {
-          native.removeAllRanges()
-          const range = window.document.createRange()
-          range.setStart(el, anchorOffset)
-          native.addRange(range)
-        } else if (hasFocus) {
-          native.extend(el, focusOffset)
-          focus()
-        }
+    // If the selection is forward, we can set things in sequence. In the
+    // first leaf to render, reset the selection and set the new start. And
+    // then in the second leaf to render, extend to the new end.
+    else if (selection.isForward) {
+      if (hasAnchor) {
+        native.removeAllRanges()
+        const range = window.document.createRange()
+        range.setStart(el, anchorOffset)
+        native.addRange(range)
+      } else if (hasFocus) {
+        native.extend(el, focusOffset)
+        focus()
       }
+    }
 
-      // Otherwise, if the selection is backward, we need to hack the order a bit.
-      // In the first leaf to render, set a phony start anchor to store the true
-      // end position. And then in the second leaf to render, set the start and
-      // extend the end to the stored value.
-      else {
-        if (hasFocus) {
-          native.removeAllRanges()
-          const range = window.document.createRange()
-          range.setStart(el, focusOffset)
-          native.addRange(range)
-        } else if (hasAnchor) {
-          const endNode = native.focusNode
-          const endOffset = native.focusOffset
-          native.removeAllRanges()
-          const range = window.document.createRange()
-          range.setStart(el, anchorOffset)
-          native.addRange(range)
-          native.extend(endNode, endOffset)
-          focus()
-        }
-      }
+    // Otherwise, if the selection is backward, we need to hack the order a bit.
+    // In the first leaf to render, set a phony start anchor to store the true
+    // end position. And then in the second leaf to render, set the start and
+    // extend the end to the stored value.
+    else if (hasFocus) {
+      native.removeAllRanges()
+      const range = window.document.createRange()
+      range.setStart(el, focusOffset)
+      native.addRange(range)
+    }
+    else if (hasAnchor) {
+      const endNode = native.focusNode
+      const endOffset = native.focusOffset
+      native.removeAllRanges()
+      const range = window.document.createRange()
+      range.setStart(el, anchorOffset)
+      native.addRange(range)
+      native.extend(endNode, endOffset)
+      focus()
     }
 
     this.debug('updateSelection', { selection })
@@ -264,7 +252,12 @@ class Leaf extends React.Component {
     // COMPAT: If the text is empty otherwise, it's because it's on the edge of
     // an inline void node, so we render a zero-width space so that the
     // selection can be inserted next to it still.
-    if (text == '') return <span data-slate-zero-width>{'\u200B'}</span>
+    if (text == '') {
+      // COMPAT: In Chrome, zero-width space produces graphics glitches, so use
+      // hair space in place of it. (2017/02/12)
+      const space = IS_FIREFOX ? '\u200B' : '\u200A'
+      return <span data-slate-zero-width>{space}</span>
+    }
 
     // COMPAT: Browsers will collapse trailing new lines at the end of blocks,
     // so we need to add an extra trailing new lines to prevent that.
@@ -287,15 +280,29 @@ class Leaf extends React.Component {
    */
 
   renderMarks(props) {
-    const { marks, schema } = props
-    const text = this.renderText(props)
+    const { marks, schema, node, offset, text, state, editor } = props
+    const children = this.renderText(props)
 
-    return marks.reduce((children, mark) => {
+    return marks.reduce((memo, mark) => {
       const Component = mark.getComponent(schema)
-      if (!Component) return children
-      return <Component mark={mark} marks={marks}>{children}</Component>
-    }, text)
+      if (!Component) return memo
+      return (
+        <Component
+          editor={editor}
+          mark={mark}
+          marks={marks}
+          node={node}
+          offset={offset}
+          schema={schema}
+          state={state}
+          text={text}
+        >
+          {memo}
+        </Component>
+      )
+    }, children)
   }
+
 }
 
 /**

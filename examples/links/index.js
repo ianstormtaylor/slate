@@ -122,7 +122,7 @@ class Links extends React.Component {
     if (data.type != 'text' && data.type != 'html') return
     if (!isUrl(data.text)) return
 
-    let transform = state.transform()
+    const transform = state.transform()
 
     if (this.hasLinks()) {
       transform.unwrapInline('link')

@@ -1,67 +1,58 @@
 
 /**
- * Copied from `element-scroll-to`, but edited to account for `window` being
- * inside of iframes.
- *
- * https://github.com/webmodules/element-scroll-to
+ * Helps scroll the cursor into the middle of view if it isn't in view
  */
 
 import getWindow from 'get-window'
 
-function scrollWrapperElements(element, options) {
-  let window = getWindow(element)
-  let elementRect = element.getBoundingClientRect()
-  let wrapper = element.parentNode
+function scrollWindow(window, cursorTop, cursorLeft, cursorHeight) {
+  let scrollX = window.scrollX
+  let scrollY = window.scrollY
+  const cursorBottom = cursorTop + cursorHeight
 
-  while (wrapper != window.document.body) {
-    let wrapperRect = wrapper.getBoundingClientRect()
-    let margin = options.margin
-    let deltaX = 0
-    let deltaY = 0
-
-    if (elementRect.top < wrapperRect.top + margin) {
-      deltaY = elementRect.top - wrapperRect.top - margin
-    } else if (elementRect.bottom > wrapperRect.bottom - margin) {
-      deltaY = elementRect.bottom - wrapperRect.bottom + margin
-    }
-    if (elementRect.left < wrapperRect.left + margin) {
-      deltaX = elementRect.left - wrapperRect.left - margin
-    } else if (elementRect.right > wrapperRect.right - margin) {
-      deltaX = elementRect.right - wrapperRect.right + margin
-    }
-    wrapper.scrollTop += deltaY
-    wrapper.scrollLeft += deltaX
-    wrapper = wrapper.parentNode
+  if (cursorTop < 0 || cursorBottom > window.innerHeight) {
+    scrollY += cursorTop - window.innerHeight / 2 + cursorHeight / 2
   }
 
-  return elementRect
+  if (cursorLeft < 0 || cursorLeft > window.innerWidth) {
+    scrollX += cursorLeft - window.innerWidth / 2
+  }
+
+  window.scrollTo(scrollX, scrollY)
 }
 
-function scrollWindow(element, options, elementRect) {
-  let window = getWindow(element)
-  let margin = options.margin
-  let deltaX = 0
-  let deltaY = 0
+function scrollTo(element) {
+  const window = getWindow(element)
+  const s = window.getSelection()
+  if (s.rangeCount > 0) {
+    const selectionRect = s.getRangeAt(0).getBoundingClientRect()
+    let innerRect = selectionRect
+    let wrapper = element
+    const cursorHeight = innerRect.height
+    let cursorTop = innerRect.top
+    let cursorLeft = innerRect.left
 
-  if (elementRect.top < 0 + margin) {
-    deltaY = elementRect.top - margin
-  } else if (elementRect.bottom > window.innerHeight - margin) {
-    deltaY = elementRect.bottom - window.innerHeight + margin
+    while (wrapper != window.document.body) {
+      const wrapperRect = wrapper.getBoundingClientRect()
+      const currentY = cursorTop
+      const cursorBottom = cursorTop + cursorHeight
+      if (cursorTop < wrapperRect.top || cursorBottom > wrapperRect.top + wrapper.offsetHeight) {
+        cursorTop = wrapperRect.top + wrapperRect.height / 2 - cursorHeight / 2
+        wrapper.scrollTop += currentY - cursorTop
+      }
+
+      const currentLeft = cursorLeft
+      if (cursorLeft < wrapperRect.left || cursorLeft > wrapperRect.right) {
+        cursorLeft = wrapperRect.left + wrapperRect.width / 2
+        wrapper.scrollLeft += currentLeft - cursorLeft
+      }
+
+      innerRect = wrapperRect
+      wrapper = wrapper.parentNode
+    }
+
+    scrollWindow(window, cursorTop, cursorLeft, cursorHeight)
   }
-  if (elementRect.left < 0 + margin) {
-    deltaX = elementRect.left - margin
-  } else if (elementRect.right > window.innerWidth - margin) {
-    deltaX = elementRect.right - window.innerWidth + margin
-  }
-
-  window.scrollBy(deltaX, deltaY)
-}
-
-function scrollTo(element, options) {
-  options = options || {}
-  options.margin = options.margin || 0
-  let rect = scrollWrapperElements(element, options)
-  scrollWindow(element, options, rect)
 }
 
 export default scrollTo

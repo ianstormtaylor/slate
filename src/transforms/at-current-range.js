@@ -289,8 +289,8 @@ export function setInline(transform, properties) {
  */
 
 export function splitBlock(transform, depth = 1) {
-  let { state } = transform
-  let { selection } = state
+  const { state } = transform
+  const { selection } = state
   transform
     .snapshotSelection()
     .splitBlockAtRange(selection, depth)
@@ -306,8 +306,8 @@ export function splitBlock(transform, depth = 1) {
  */
 
 export function splitInline(transform, depth = Infinity) {
-  let { state } = transform
-  let { selection } = state
+  const { state } = transform
+  const { selection } = state
   transform
     .snapshotSelection()
     .splitInlineAtRange(selection, depth)

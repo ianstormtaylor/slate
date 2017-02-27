@@ -130,7 +130,7 @@ class AutoMarkdown extends React.Component {
     if (type == 'list-item' && startBlock.type == 'list-item') return
     e.preventDefault()
 
-    let transform = state
+    const transform = state
       .transform()
       .setBlock(type)
 
@@ -161,7 +161,7 @@ class AutoMarkdown extends React.Component {
     if (startBlock.type == 'paragraph') return
     e.preventDefault()
 
-    let transform = state
+    const transform = state
       .transform()
       .setBlock('paragraph')
 

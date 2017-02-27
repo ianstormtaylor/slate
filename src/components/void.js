@@ -4,7 +4,6 @@ import Leaf from './leaf'
 import Mark from '../models/mark'
 import OffsetKey from '../utils/offset-key'
 import React from 'react'
-import noop from '../utils/noop'
 import { IS_FIREFOX } from '../constants/environment'
 
 /**
@@ -48,7 +47,7 @@ class Void extends React.Component {
   debug = (message, ...args) => {
     const { node } = this.props
     const { key, type } = node
-    let id = `${key} (${type})`
+    const id = `${key} (${type})`
     debug(message, `${id}`, ...args)
   }
 
@@ -59,7 +58,6 @@ class Void extends React.Component {
    */
 
   onClick = (event) => {
-    event.preventDefault()
     this.debug('onClick', { event })
 
     const { node, editor } = this.props
@@ -86,11 +84,14 @@ class Void extends React.Component {
   render = () => {
     const { props } = this
     const { children, node } = props
-    const Tag = node.kind == 'block' ? 'div' : 'span'
+    let Tag, style
 
     // Make the outer wrapper relative, so the spacer can overlay it.
-    const style = {
-      position: 'relative'
+    if (node.kind === 'block') {
+      Tag = 'div'
+      style = { position: 'relative' }
+    } else {
+      Tag = 'span'
     }
 
     this.debug('render', { props })
@@ -135,10 +136,7 @@ class Void extends React.Component {
         }
     } else {
       style = {
-        position: 'relative',
-        top: '0px',
-        left: '-9999px',
-        textIndent: '-9999px',
+        color: 'transparent'
       }
     }
 
@@ -154,10 +152,11 @@ class Void extends React.Component {
    */
 
   renderLeaf = () => {
-    const { node, schema, state } = this.props
+    const { node, schema, state, editor } = this.props
     const child = node.getFirstText()
     const ranges = child.getRanges()
     const text = ''
+    const offset = 0
     const marks = Mark.createSet()
     const index = 0
     const offsetKey = OffsetKey.stringify({
@@ -167,17 +166,17 @@ class Void extends React.Component {
 
     return (
       <Leaf
-        isVoid
-        renderMark={noop}
         key={offsetKey}
-        schema={schema}
-        state={state}
+        editor={editor}
+        index={index}
+        marks={marks}
         node={child}
+        offset={offset}
         parent={node}
         ranges={ranges}
-        index={index}
+        schema={schema}
+        state={state}
         text={text}
-        marks={marks}
       />
     )
   }

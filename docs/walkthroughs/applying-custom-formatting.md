@@ -29,6 +29,7 @@ class App extends React.Component {
 
   onKeyDown = (event, data, state) => {
     if (event.which != 192 || !event.metaKey) return
+    event.preventDefault()
     const isCode = state.blocks.some(block => block.type == 'code')
 
     return state
@@ -77,6 +78,7 @@ class App extends React.Component {
     switch (event.which) {
       // When "B" is pressed, add a "bold" mark to the text.
       case 66: {
+        event.preventDefault()
         return state
           .transform()
           .addMark('bold')
@@ -85,6 +87,7 @@ class App extends React.Component {
       // When "`" is pressed, keep our existing code block logic.
       case 192: {
         const isCode = state.blocks.some(block => block.type == 'code')
+        event.preventDefault()
         return state
           .transform()
           .setBlock(isCode ? 'paragraph' : 'code')
@@ -151,6 +154,7 @@ class App extends React.Component {
 
     switch (event.which) {
       case 66: {
+        event.preventDefault()
         return state
           .transform()
           .toggleMark('bold')
@@ -158,6 +162,7 @@ class App extends React.Component {
       }
       case 192: {
         const isCode = state.blocks.some(block => block.type == 'code')
+        event.preventDefault()
         return state
           .transform()
           .setBlock(isCode ? 'paragraph' : 'code')

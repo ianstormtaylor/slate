@@ -1,4 +1,5 @@
 
+data: {}
 nodes:
   - type: line
     isVoid: false

@@ -126,7 +126,7 @@ const rules = [
 
       transform.insertNodeByKey(node.key, index, text, OPTS)
 
-      node.nodes.forEach(child => {
+      node.nodes.forEach((child) => {
         transform.removeNodeByKey(child.key, OPTS)
       })
     }

@@ -64,6 +64,7 @@ class Range extends new Record(DEFAULTS) {
         })
       }))
   }
+
 }
 
 /**

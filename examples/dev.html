@@ -4,10 +4,26 @@
     <title>Slate</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,400i,700,700i&subset=latin-ext" >
-    <link rel="stylesheet" href="index.css">
   </head>
   <body>
     <main></main>
-    <script src="build.dev.js"></script>
+    <script>
+      // Dynamically creates the script and link tag and adds the current time
+      // in ms as a query on the URL. This ensures the script and the link is
+      // always reloaded.
+      //
+      // Useful during debugging because we want to see changes to the
+      // JavaScript and CSS code immediately.
+      var head = document.getElementsByTagName('head')[0]
+      var script = document.createElement('script')
+      var time = new Date().getTime()
+      script.type = 'text/javascript'
+      script.src = 'build.dev.js?' + time
+      head.appendChild(script)
+      var link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = 'index.css?' + time
+      head.appendChild(link)
+    </script>
   </body>
 </html>

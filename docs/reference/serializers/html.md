@@ -46,14 +46,18 @@ An array of rules to initialize the `Html` serializer with, defining your schema
 ## Methods
 
 ### `Html.deserialize`
-`Html.deserialize(html: String) => State`
+`Html.deserialize(html: String, [options: Object]) => State`
 
 Deserialize an HTML `string` into a [`State`](../models/state.md). How the string is deserialized will be determined by the rules that the `Html` serializer was constructed with.
+
+If you pass `toRaw: true` as an option, the return value will be a [`Raw`](./raw.md) JSON object instead of a [`State`](../models/state.md) object.
 
 ### `Html.serialize`
 `Html.serialize(state: State, [options: Object]) => String || Array`
 
-Serialize a `state` into an HTML string. How the string is serialized will be determined by the rules that the `Html` serializer was constructed with. If you pass `render: false` as an option, the return value will instead be an iterable list of the top-level React elements, to be rendered as children in your own React component.
+Serialize a `state` into an HTML string. How the string is serialized will be determined by the rules that the `Html` serializer was constructed with. 
+
+If you pass `render: false` as an option, the return value will instead be an iterable list of the top-level React elements, to be rendered as children in your own React component.
 
 
 ## Rules

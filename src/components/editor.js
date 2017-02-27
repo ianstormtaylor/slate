@@ -1,6 +1,7 @@
 
 import Content from './content'
 import Debug from 'debug'
+import Portal from 'react-portal'
 import React from 'react'
 import Stack from '../models/stack'
 import State from '../models/state'
@@ -39,6 +40,9 @@ const EVENT_HANDLERS = [
 
 const PLUGINS_PROPS = [
   ...EVENT_HANDLERS,
+  'placeholder',
+  'placeholderClassName',
+  'placeholderStyle',
   'plugins',
   'schema',
 ]
@@ -58,6 +62,7 @@ class Editor extends React.Component {
    */
 
   static propTypes = {
+    autoCorrect: React.PropTypes.bool,
     className: React.PropTypes.string,
     onBeforeChange: React.PropTypes.func,
     onChange: React.PropTypes.func,
@@ -68,10 +73,12 @@ class Editor extends React.Component {
     placeholderStyle: React.PropTypes.object,
     plugins: React.PropTypes.array,
     readOnly: React.PropTypes.bool,
+    role: React.PropTypes.string,
     schema: React.PropTypes.object,
     spellCheck: React.PropTypes.bool,
     state: React.PropTypes.instanceOf(State).isRequired,
-    style: React.PropTypes.object
+    style: React.PropTypes.object,
+    tabIndex: React.PropTypes.number
   };
 
   /**
@@ -81,6 +88,7 @@ class Editor extends React.Component {
    */
 
   static defaultProps = {
+    autoCorrect: true,
     onChange: noop,
     onDocumentChange: noop,
     onSelectionChange: noop,
@@ -231,7 +239,9 @@ class Editor extends React.Component {
 
   render = () => {
     const { props, state } = this
+    const { stack } = state
     const handlers = {}
+    const children = stack.render(state.state, this)
 
     for (const property of EVENT_HANDLERS) {
       handlers[property] = this[property]
@@ -248,9 +258,14 @@ class Editor extends React.Component {
         state={this.getState()}
         className={props.className}
         readOnly={props.readOnly}
+        autoCorrect={props.autoCorrect}
         spellCheck={props.spellCheck}
         style={props.style}
-      />
+        tabIndex={props.tabIndex}
+        role={props.role}
+      >
+        {children.map((child, i) => <Portal key={i} isOpened>{child}</Portal>)}
+      </Content>
     )
   }
 
