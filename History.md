@@ -8,7 +8,7 @@ This document maintains a list of changes to Slate with each new version. Until 
 
 ###### DEPRECATION CHANGES
 
-- **Selection methods and transforms have been refactored!** Previously there were many inconsistencies in the naming and handling of selection changes. This has all been cleaned up, but in the process some methods have been deprecated. The full list, along with the new counterpart is:
+- **Some selection methods have been deprecated!** Previously there were many inconsistencies in the naming and handling of selection changes. This has all been cleaned up, but in the process some methods have been deprecated. Here is a full list of the deprecated methods and their new alternatives:
   - `moveToOffsets` -> `moveOffsetsTo`
   - `moveForward` -> `move`
   - `moveBackward` -> `move`
@@ -19,6 +19,19 @@ This document maintains a list of changes to Slate with each new version. Until 
   - `extendForward` -> `extend`
   - `extendBackward` -> `extend`
   - `unset` -> `deselect`
+
+- **Some selection transforms have been deprecated!** Along with the methods, the selection-based transforms have also been refactored, resulting in deprecations. Here is a full list of the deprecated transforms and their new alternatives:
+  - `moveTo` -> `select`
+  - `moveToOffsets` -> `moveOffsetsTo`
+  - `moveForward` -> `move`
+  - `moveBackward` -> `move`
+  - `moveStartOffset` -> `moveStart`
+  - `moveEndOffset` -> `moveEnd`
+  - `extendForward` -> `extend`
+  - `extendBackward` -> `extend`
+  - `flipSelection` -> `flip`
+  - `unsetSelection` -> `deselect`
+  - `unsetMarks`
 
 
 ---
