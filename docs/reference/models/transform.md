@@ -45,10 +45,10 @@ Transform methods can either operate on the [`Document`](./document.md), the [`S
   - [`extendTo{Edge}Of`](#extendtoedgeof)
   - [`extend{Direction}`](#extenddirection)
   - [`focus`](#focus)
-  - [`moveToOffsets`](#movetooffsets)
+  - [`move`](#move)
+  - [`moveOffsetsTo`](#moveoffsetsto)
   - [`moveToRangeOf`](#movetorangeof)
   - [`moveTo`](#moveto)
-  - [`move{Direction}`](#movedirection)
 - [Node Transforms](#node-transforms)
   - [`addMarkByKey`](#addmarkbykey)
   - [`insertNodeByKey`](#insertnodebykey)
@@ -275,13 +275,13 @@ Extend the current selection to the `{Edge}` of a `node`. Where `{Edge}` is eith
 
 Focus the current selection.
 
-### `move{Direction}`
-`move{Direction}(n: Number) => Transform`
+### `move`
+`move(n: Number) => Transform`
 
-Move the current selection's points  `n` characters in `{Direction}`. Where `{Direction}` is either `Backward` or `Forward`.
+Move the current selection's offsets by  `n`.
 
-### `moveToOffsets`
-`moveToOffsets(anchorOffset: Number, focusOffset: Number) => Transform`
+### `moveOffsetsTo`
+`moveOffsetsTo(anchorOffset: Number, focusOffset: Number) => Transform`
 
 Move the current selection's offsets to a new `anchorOffset` and `focusOffset`.
 
