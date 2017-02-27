@@ -259,7 +259,7 @@ Transforms.insertText = (transform, text, marks) => {
   // If the text was successfully inserted, and the selection had marks on it,
   // unset the selection's marks.
   if (selection.marks && document != transform.state.document) {
-    transform.unsetMarks()
+    transform.select({ marks: null })
   }
 }
 

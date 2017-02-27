@@ -49,7 +49,7 @@ class Selection extends new Record(DEFAULTS) {
   }
 
   /**
-   * Get whether the selection is blurred.
+   * Check whether the selection is blurred.
    *
    * @return {Boolean}
    */
@@ -59,7 +59,7 @@ class Selection extends new Record(DEFAULTS) {
   }
 
   /**
-   * Get whether the selection is collapsed.
+   * Check whether the selection is collapsed.
    *
    * @return {Boolean}
    */
@@ -72,7 +72,7 @@ class Selection extends new Record(DEFAULTS) {
   }
 
   /**
-   * Get whether the selection is expanded.
+   * Check whether the selection is expanded.
    *
    * @return {Boolean}
    */
@@ -82,7 +82,7 @@ class Selection extends new Record(DEFAULTS) {
   }
 
   /**
-   * Get whether the selection is forward.
+   * Check whether the selection is forward.
    *
    * @return {Boolean}
    */
@@ -118,27 +118,37 @@ class Selection extends new Record(DEFAULTS) {
    */
 
   get startKey() {
-    return this.isBackward
-      ? this.focusKey
-      : this.anchorKey
+    return this.isBackward ? this.focusKey : this.anchorKey
   }
+
+  /**
+   * Get the start offset.
+   *
+   * @return {String}
+   */
 
   get startOffset() {
-    return this.isBackward
-      ? this.focusOffset
-      : this.anchorOffset
+    return this.isBackward ? this.focusOffset : this.anchorOffset
   }
+
+  /**
+   * Get the end key.
+   *
+   * @return {String}
+   */
 
   get endKey() {
-    return this.isBackward
-      ? this.anchorKey
-      : this.focusKey
+    return this.isBackward ? this.anchorKey : this.focusKey
   }
 
+  /**
+   * Get the end offset.
+   *
+   * @return {String}
+   */
+
   get endOffset() {
-    return this.isBackward
-      ? this.anchorOffset
-      : this.focusOffset
+    return this.isBackward ? this.anchorOffset : this.focusOffset
   }
 
   /**
@@ -149,6 +159,7 @@ class Selection extends new Record(DEFAULTS) {
    */
 
   hasAnchorAtStartOf(node) {
+    // PERF: Do a check for a `0` offset first since it's quickest.
     if (this.anchorOffset != 0) return false
     const first = getFirst(node)
     return this.anchorKey == first.key
@@ -300,12 +311,12 @@ class Selection extends new Record(DEFAULTS) {
   }
 
   /**
-   * Unset the selection
+   * Unset the selection.
    *
    * @return {Selection}
    */
 
-  unset() {
+  deselect() {
     return this.merge({
       anchorKey: null,
       anchorOffset: 0,
@@ -605,6 +616,17 @@ class Selection extends new Record(DEFAULTS) {
   }
 
   /**
+   * Unset the selection.
+   *
+   * @return {Selection}
+   */
+
+  unset() {
+    warn('The `Selection.unset` method is deprecated, please switch to using `Selection.deselect` instead.')
+    return this.deselect()
+  }
+
+  /**
    * Move the selection forward `n` characters.
    *
    * @param {Number} n (optional)
@@ -726,16 +748,11 @@ const MOVE_METHODS = [
   ['move', 'ToEndOf'],
 ]
 
-MOVE_METHODS.forEach((opts) => {
-  const [ p, s ] = opts
-  const move = `${p}${s}`
-  const anchor = `${p}Anchor${s}`
-  const focus = `${p}Focus${s}`
-
-  Selection.prototype[move] = function (...args) {
+MOVE_METHODS.forEach(([ p, s ]) => {
+  Selection.prototype[`${p}${s}`] = function (...args) {
     return this
-      [anchor](...args)
-      [focus](...args)
+      [`${p}Anchor${s}`](...args)
+      [`${p}Focus${s}`](...args)
   }
 })
 
@@ -755,28 +772,24 @@ const EDGE_METHODS = [
   ['move', 'OffsetTo'],
 ]
 
-EDGE_METHODS.forEach((opts) => {
-  const [ p, s, hasEdge ] = opts
+EDGE_METHODS.forEach(([ p, s, hasEdge ]) => {
   const anchor = `${p}Anchor${s}`
-  const edge = `${p}Edge${s}`
-  const end = `${p}End${s}`
   const focus = `${p}Focus${s}`
-  const start = `${p}Start${s}`
 
-  Selection.prototype[start] = function (...args) {
+  Selection.prototype[`${p}Start${s}`] = function (...args) {
     return this.isBackward
       ? this[focus](...args)
       : this[anchor](...args)
   }
 
-  Selection.prototype[end] = function (...args) {
+  Selection.prototype[`${p}End${s}`] = function (...args) {
     return this.isBackward
       ? this[anchor](...args)
       : this[focus](...args)
   }
 
   if (hasEdge) {
-    Selection.prototype[edge] = function (...args) {
+    Selection.prototype[`${p}Edge${s}`] = function (...args) {
       return this[anchor](...args) || this[focus](...args)
     }
   }
@@ -800,9 +813,7 @@ const ALIAS_METHODS = [
   ['extendToEndOf', 'moveFocusToEndOf'],
 ]
 
-ALIAS_METHODS.forEach((opts) => {
-  const [ alias, method ] = opts
-
+ALIAS_METHODS.forEach(([ alias, method ]) => {
   Selection.prototype[alias] = function (...args) {
     return this[method](...args)
   }
