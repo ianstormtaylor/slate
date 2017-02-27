@@ -14,13 +14,13 @@ export default function (state) {
 
   const next = state
     .transform()
-    .moveTo(range)
+    .select(range)
     .deleteBackward(3)
     .apply()
 
   assert.deepEqual(
     next.selection.toJS(),
-    range.moveBackward(3).toJS()
+    range.move(-3).toJS()
   )
 
   return next

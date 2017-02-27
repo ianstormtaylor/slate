@@ -16,7 +16,7 @@ export default function (state) {
 
   const next = state
     .transform()
-    .moveTo(nextSelection)
+    .select(nextSelection)
     .insertTextByKey(secondText.key, 0, 'X')
     .apply()
 

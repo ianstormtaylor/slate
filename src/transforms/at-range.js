@@ -6,6 +6,14 @@ import SCHEMA from '../schemas/core'
 import { List } from 'immutable'
 
 /**
+ * Transforms.
+ *
+ * @type {Object}
+ */
+
+const Transforms = {}
+
+/**
  * An options object with normalize set to `false`.
  *
  * @type {Object}
@@ -25,7 +33,7 @@ const OPTS = {
  *   @property {Boolean} normalize
  */
 
-export function addMarkAtRange(transform, range, mark, options = {}) {
+Transforms.addMarkAtRange = (transform, range, mark, options = {}) => {
   if (range.isCollapsed) return
 
   const { normalize = true } = options
@@ -56,7 +64,7 @@ export function addMarkAtRange(transform, range, mark, options = {}) {
  *   @property {Boolean} normalize
  */
 
-export function deleteAtRange(transform, range, options = {}) {
+Transforms.deleteAtRange = (transform, range, options = {}) => {
   if (range.isCollapsed) return
 
   const { normalize = true } = options
@@ -130,7 +138,7 @@ export function deleteAtRange(transform, range, options = {}) {
  *   @property {Boolean} normalize
  */
 
-export function deleteCharBackwardAtRange(transform, range, options) {
+Transforms.deleteCharBackwardAtRange = (transform, range, options) => {
   const { state } = transform
   const { document } = state
   const { startKey, startOffset } = range
@@ -151,7 +159,7 @@ export function deleteCharBackwardAtRange(transform, range, options) {
  *   @property {Boolean} normalize
  */
 
-export function deleteLineBackwardAtRange(transform, range, options) {
+Transforms.deleteLineBackwardAtRange = (transform, range, options) => {
   const { state } = transform
   const { document } = state
   const { startKey, startOffset } = range
@@ -170,7 +178,7 @@ export function deleteLineBackwardAtRange(transform, range, options) {
  *   @property {Boolean} normalize
  */
 
-export function deleteWordBackwardAtRange(transform, range, options) {
+Transforms.deleteWordBackwardAtRange = (transform, range, options) => {
   const { state } = transform
   const { document } = state
   const { startKey, startOffset } = range
@@ -192,7 +200,7 @@ export function deleteWordBackwardAtRange(transform, range, options) {
  *   @property {Boolean} normalize
  */
 
-export function deleteBackwardAtRange(transform, range, n = 1, options = {}) {
+Transforms.deleteBackwardAtRange = (transform, range, n = 1, options = {}) => {
   const { normalize = true } = options
   const { state } = transform
   const { document } = state
@@ -314,7 +322,7 @@ export function deleteBackwardAtRange(transform, range, n = 1, options = {}) {
  *   @property {Boolean} normalize
  */
 
-export function deleteCharForwardAtRange(transform, range, options) {
+Transforms.deleteCharForwardAtRange = (transform, range, options) => {
   const { state } = transform
   const { document } = state
   const { startKey, startOffset } = range
@@ -335,7 +343,7 @@ export function deleteCharForwardAtRange(transform, range, options) {
  *   @property {Boolean} normalize
  */
 
-export function deleteLineForwardAtRange(transform, range, options) {
+Transforms.deleteLineForwardAtRange = (transform, range, options) => {
   const { state } = transform
   const { document } = state
   const { startKey, startOffset } = range
@@ -354,7 +362,7 @@ export function deleteLineForwardAtRange(transform, range, options) {
  *   @property {Boolean} normalize
  */
 
-export function deleteWordForwardAtRange(transform, range, options) {
+Transforms.deleteWordForwardAtRange = (transform, range, options) => {
   const { state } = transform
   const { document } = state
   const { startKey, startOffset } = range
@@ -376,7 +384,7 @@ export function deleteWordForwardAtRange(transform, range, options) {
  *   @property {Boolean} normalize
  */
 
-export function deleteForwardAtRange(transform, range, n = 1, options = {}) {
+Transforms.deleteForwardAtRange = (transform, range, n = 1, options = {}) => {
   const { normalize = true } = options
   const { state } = transform
   const { document } = state
@@ -498,7 +506,7 @@ export function deleteForwardAtRange(transform, range, n = 1, options = {}) {
  *   @property {Boolean} normalize
  */
 
-export function insertBlockAtRange(transform, range, block, options = {}) {
+Transforms.insertBlockAtRange = (transform, range, block, options = {}) => {
   block = Normalize.block(block)
   const { normalize = true } = options
 
@@ -553,7 +561,7 @@ export function insertBlockAtRange(transform, range, block, options = {}) {
  *   @property {Boolean} normalize
  */
 
-export function insertFragmentAtRange(transform, range, fragment, options = {}) {
+Transforms.insertFragmentAtRange = (transform, range, fragment, options = {}) => {
   const { normalize = true } = options
 
   // If the range is expanded, delete it first.
@@ -665,7 +673,7 @@ export function insertFragmentAtRange(transform, range, fragment, options = {}) 
  *   @property {Boolean} normalize
  */
 
-export function insertInlineAtRange(transform, range, inline, options = {}) {
+Transforms.insertInlineAtRange = (transform, range, inline, options = {}) => {
   const { normalize = true } = options
   inline = Normalize.inline(inline)
 
@@ -702,7 +710,7 @@ export function insertInlineAtRange(transform, range, inline, options = {}) {
  *   @property {Boolean} normalize
  */
 
-export function insertTextAtRange(transform, range, text, marks, options = {}) {
+Transforms.insertTextAtRange = (transform, range, text, marks, options = {}) => {
   let { normalize } = options
   const { state } = transform
   const { document } = state
@@ -733,7 +741,7 @@ export function insertTextAtRange(transform, range, text, marks, options = {}) {
  *   @property {Boolean} normalize
  */
 
-export function removeMarkAtRange(transform, range, mark, options = {}) {
+Transforms.removeMarkAtRange = (transform, range, mark, options = {}) => {
   if (range.isCollapsed) return
 
   const { normalize = true } = options
@@ -765,7 +773,7 @@ export function removeMarkAtRange(transform, range, mark, options = {}) {
  *   @property {Boolean} normalize
  */
 
-export function setBlockAtRange(transform, range, properties, options = {}) {
+Transforms.setBlockAtRange = (transform, range, properties, options = {}) => {
   const { normalize = true } = options
   const { state } = transform
   const { document } = state
@@ -786,7 +794,7 @@ export function setBlockAtRange(transform, range, properties, options = {}) {
  *   @property {Boolean} normalize
  */
 
-export function setInlineAtRange(transform, range, properties, options = {}) {
+Transforms.setInlineAtRange = (transform, range, properties, options = {}) => {
   const { normalize = true } = options
   const { state } = transform
   const { document } = state
@@ -807,7 +815,7 @@ export function setInlineAtRange(transform, range, properties, options = {}) {
  *   @property {Boolean} normalize
  */
 
-export function splitBlockAtRange(transform, range, height = 1, options = {}) {
+Transforms.splitBlockAtRange = (transform, range, height = 1, options = {}) => {
   const { normalize = true } = options
 
   if (range.isExpanded) {
@@ -843,7 +851,7 @@ export function splitBlockAtRange(transform, range, height = 1, options = {}) {
  *   @property {Boolean} normalize
  */
 
-export function splitInlineAtRange(transform, range, height = Infinity, options = {}) {
+Transforms.splitInlineAtRange = (transform, range, height = Infinity, options = {}) => {
   const { normalize = true } = options
 
   if (range.isExpanded) {
@@ -880,7 +888,7 @@ export function splitInlineAtRange(transform, range, height = Infinity, options 
  *   @property {Boolean} normalize
  */
 
-export function toggleMarkAtRange(transform, range, mark, options = {}) {
+Transforms.toggleMarkAtRange = (transform, range, mark, options = {}) => {
   if (range.isCollapsed) return
 
   mark = Normalize.mark(mark)
@@ -908,7 +916,7 @@ export function toggleMarkAtRange(transform, range, mark, options = {}) {
  *   @property {Boolean} normalize
  */
 
-export function unwrapBlockAtRange(transform, range, properties, options = {}) {
+Transforms.unwrapBlockAtRange = (transform, range, properties, options = {}) => {
   properties = Normalize.nodeProperties(properties)
 
   const { normalize = true } = options
@@ -1002,7 +1010,7 @@ export function unwrapBlockAtRange(transform, range, properties, options = {}) {
  *   @property {Boolean} normalize
  */
 
-export function unwrapInlineAtRange(transform, range, properties, options = {}) {
+Transforms.unwrapInlineAtRange = (transform, range, properties, options = {}) => {
   properties = Normalize.nodeProperties(properties)
 
   const { normalize = true } = options
@@ -1048,7 +1056,7 @@ export function unwrapInlineAtRange(transform, range, properties, options = {}) 
  *   @property {Boolean} normalize
  */
 
-export function wrapBlockAtRange(transform, range, block, options = {}) {
+Transforms.wrapBlockAtRange = (transform, range, block, options = {}) => {
   block = Normalize.block(block)
   block = block.merge({ nodes: block.nodes.clear() })
 
@@ -1119,7 +1127,7 @@ export function wrapBlockAtRange(transform, range, block, options = {}) {
  *   @property {Boolean} normalize
  */
 
-export function wrapInlineAtRange(transform, range, inline, options = {}) {
+Transforms.wrapInlineAtRange = (transform, range, inline, options = {}) => {
   let { state } = transform
   let { document } = state
   const { normalize = true } = options
@@ -1250,16 +1258,24 @@ export function wrapInlineAtRange(transform, range, inline, options = {}) {
  *   @property {Boolean} normalize
  */
 
-export function wrapTextAtRange(transform, range, prefix, suffix = prefix, options = {}) {
+Transforms.wrapTextAtRange = (transform, range, prefix, suffix = prefix, options = {}) => {
   const { normalize = true } = options
   const { startKey, endKey } = range
   const start = range.collapseToStart()
   let end = range.collapseToEnd()
 
   if (startKey == endKey) {
-    end = end.moveForward(prefix.length)
+    end = end.move(prefix.length)
   }
 
   transform.insertTextAtRange(start, prefix, [], { normalize })
   transform.insertTextAtRange(end, suffix, [], { normalize })
 }
+
+/**
+ * Export.
+ *
+ * @type {Object}
+ */
+
+export default Transforms

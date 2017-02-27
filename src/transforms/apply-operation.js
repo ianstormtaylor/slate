@@ -11,6 +11,14 @@ import warn from '../utils/warn'
 const debug = Debug('slate:operation')
 
 /**
+ * Transforms.
+ *
+ * @type {Object}
+ */
+
+const Transforms = {}
+
+/**
  * Operations.
  *
  * @type {Object}
@@ -42,7 +50,7 @@ const OPERATIONS = {
  * @param {Object} operation
  */
 
-export function applyOperation(transform, operation) {
+Transforms.applyOperation = (transform, operation) => {
   const { state, operations } = transform
   const { type } = operation
   const fn = OPERATIONS[type]
@@ -113,10 +121,10 @@ function insertText(state, operation) {
 
   // Update the selection
   if (anchorKey == node.key && anchorOffset >= offset) {
-    selection = selection.moveAnchorOffset(text.length)
+    selection = selection.moveAnchor(text.length)
   }
   if (focusKey == node.key && focusOffset >= offset) {
-    selection = selection.moveFocusOffset(text.length)
+    selection = selection.moveFocus(text.length)
   }
 
   state = state.merge({ document, selection })
@@ -244,7 +252,7 @@ function removeNode(state, operation) {
       } else if (next) {
         selection = selection.moveStartTo(next.key, 0)
       } else {
-        selection = selection.unset()
+        selection = selection.deselect()
       }
     }
 
@@ -257,7 +265,7 @@ function removeNode(state, operation) {
       } else if (next) {
         selection = selection.moveEndTo(next.key, 0)
       } else {
-        selection = selection.unset()
+        selection = selection.deselect()
       }
     }
   }
@@ -291,10 +299,10 @@ function removeText(state, operation) {
 
   // Update the selection
   if (anchorKey == node.key && anchorOffset >= rangeOffset) {
-    selection = selection.moveAnchorOffset(-length)
+    selection = selection.moveAnchor(-length)
   }
   if (focusKey == node.key && focusOffset >= rangeOffset) {
-    selection = selection.moveFocusOffset(-length)
+    selection = selection.moveFocus(-length)
   }
 
   node = node.removeText(offset, length)
@@ -441,3 +449,11 @@ function splitNode(state, operation) {
   state = state.merge({ document, selection })
   return state
 }
+
+/**
+ * Export.
+ *
+ * @type {Object}
+ */
+
+export default Transforms

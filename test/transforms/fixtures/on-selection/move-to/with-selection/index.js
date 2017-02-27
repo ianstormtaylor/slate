@@ -12,7 +12,7 @@ export default function (state) {
 
   const next = state
     .transform()
-    .moveTo(sel)
+    .select(sel)
     .apply()
 
   assert.deepEqual(

@@ -312,9 +312,9 @@ function Plugin(options = {}) {
       selection.endKey == target.endKey &&
       selection.endOffset < target.endOffset
     ) {
-      target = target.moveBackward(selection.startKey == selection.endKey
-        ? selection.endOffset - selection.startOffset
-        : selection.endOffset)
+      target = target.move(selection.startKey == selection.endKey
+        ? 0 - selection.endOffset - selection.startOffset
+        : 0 - selection.endOffset)
     }
 
     const transform = state.transform()
@@ -322,7 +322,7 @@ function Plugin(options = {}) {
     if (isInternal) transform.delete()
 
     return transform
-      .moveTo(target)
+      .select(target)
       .insertFragment(fragment)
       .apply()
   }
@@ -342,7 +342,7 @@ function Plugin(options = {}) {
     const { text, target } = data
     const transform = state
       .transform()
-      .moveTo(target)
+      .select(target)
 
     text
       .split('\n')
@@ -492,11 +492,11 @@ function Plugin(options = {}) {
       const previousInline = document.getClosestInline(previous.key)
 
       if (previousBlock === startBlock && previousInline && !previousInline.isVoid) {
-        const extendOrMove = data.isShift ? 'extendBackward' : 'moveBackward'
+        const extendOrMove = data.isShift ? 'extend' : 'move'
         return state
           .transform()
           .collapseToEndOf(previous)
-          [extendOrMove](1)
+          [extendOrMove](-1)
           .apply()
       }
 
@@ -563,7 +563,7 @@ function Plugin(options = {}) {
       const nextInline = document.getClosestInline(next.key)
 
       if (nextBlock == startBlock && nextInline) {
-        const extendOrMove = data.isShift ? 'extendForward' : 'moveBackward'
+        const extendOrMove = data.isShift ? 'extend' : 'move'
         return state
           .transform()
           .collapseToStartOf(next)
@@ -810,7 +810,7 @@ function Plugin(options = {}) {
 
     return state
       .transform()
-      .moveTo(data.selection)
+      .select(data.selection)
       .apply()
   }
 

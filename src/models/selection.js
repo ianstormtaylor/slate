@@ -49,7 +49,7 @@ class Selection extends new Record(DEFAULTS) {
   }
 
   /**
-   * Get whether the selection is blurred.
+   * Check whether the selection is blurred.
    *
    * @return {Boolean}
    */
@@ -59,7 +59,7 @@ class Selection extends new Record(DEFAULTS) {
   }
 
   /**
-   * Get whether the selection is collapsed.
+   * Check whether the selection is collapsed.
    *
    * @return {Boolean}
    */
@@ -72,7 +72,7 @@ class Selection extends new Record(DEFAULTS) {
   }
 
   /**
-   * Get whether the selection is expanded.
+   * Check whether the selection is expanded.
    *
    * @return {Boolean}
    */
@@ -82,7 +82,7 @@ class Selection extends new Record(DEFAULTS) {
   }
 
   /**
-   * Get whether the selection is forward.
+   * Check whether the selection is forward.
    *
    * @return {Boolean}
    */
@@ -118,27 +118,37 @@ class Selection extends new Record(DEFAULTS) {
    */
 
   get startKey() {
-    return this.isBackward
-      ? this.focusKey
-      : this.anchorKey
+    return this.isBackward ? this.focusKey : this.anchorKey
   }
+
+  /**
+   * Get the start offset.
+   *
+   * @return {String}
+   */
 
   get startOffset() {
-    return this.isBackward
-      ? this.focusOffset
-      : this.anchorOffset
+    return this.isBackward ? this.focusOffset : this.anchorOffset
   }
+
+  /**
+   * Get the end key.
+   *
+   * @return {String}
+   */
 
   get endKey() {
-    return this.isBackward
-      ? this.anchorKey
-      : this.focusKey
+    return this.isBackward ? this.anchorKey : this.focusKey
   }
 
+  /**
+   * Get the end offset.
+   *
+   * @return {String}
+   */
+
   get endOffset() {
-    return this.isBackward
-      ? this.anchorOffset
-      : this.focusOffset
+    return this.isBackward ? this.anchorOffset : this.focusOffset
   }
 
   /**
@@ -149,8 +159,9 @@ class Selection extends new Record(DEFAULTS) {
    */
 
   hasAnchorAtStartOf(node) {
+    // PERF: Do a check for a `0` offset first since it's quickest.
     if (this.anchorOffset != 0) return false
-    const first = node.kind == 'text' ? node : node.getFirstText()
+    const first = getFirst(node)
     return this.anchorKey == first.key
   }
 
@@ -162,7 +173,7 @@ class Selection extends new Record(DEFAULTS) {
    */
 
   hasAnchorAtEndOf(node) {
-    const last = node.kind == 'text' ? node : node.getLastText()
+    const last = getLast(node)
     return this.anchorKey == last.key && this.anchorOffset == last.length
   }
 
@@ -192,11 +203,9 @@ class Selection extends new Record(DEFAULTS) {
    */
 
   hasAnchorIn(node) {
-    if (node.kind == 'text') {
-      return node.key === this.anchorKey
-    } else {
-      return node.hasDescendant(this.anchorKey)
-    }
+    return node.kind == 'text'
+      ? node.key == this.anchorKey
+      : node.hasDescendant(this.anchorKey)
   }
 
   /**
@@ -207,7 +216,7 @@ class Selection extends new Record(DEFAULTS) {
    */
 
   hasFocusAtEndOf(node) {
-    const last = node.kind == 'text' ? node : node.getLastText()
+    const last = getLast(node)
     return this.focusKey == last.key && this.focusOffset == last.length
   }
 
@@ -220,7 +229,7 @@ class Selection extends new Record(DEFAULTS) {
 
   hasFocusAtStartOf(node) {
     if (this.focusOffset != 0) return false
-    const first = node.kind == 'text' ? node : node.getFirstText()
+    const first = getFirst(node)
     return this.focusKey == first.key
   }
 
@@ -250,11 +259,9 @@ class Selection extends new Record(DEFAULTS) {
    */
 
   hasFocusIn(node) {
-    if (node.kind == 'text') {
-      return node.key === this.focusKey
-    } else {
-      return node.hasDescendant(this.focusKey)
-    }
+    return node.kind == 'text'
+      ? node.key == this.focusKey
+      : node.hasDescendant(this.focusKey)
   }
 
   /**
@@ -265,11 +272,7 @@ class Selection extends new Record(DEFAULTS) {
    */
 
   isAtStartOf(node) {
-    const { isExpanded, startKey, startOffset } = this
-    if (isExpanded) return false
-    if (startOffset != 0) return false
-    const first = node.kind == 'text' ? node : node.getFirstText()
-    return startKey == first.key
+    return this.isCollapsed && this.hasAnchorAtStartOf(node)
   }
 
   /**
@@ -280,10 +283,266 @@ class Selection extends new Record(DEFAULTS) {
    */
 
   isAtEndOf(node) {
-    const { endKey, endOffset, isExpanded } = this
-    if (isExpanded) return false
-    const last = node.kind == 'text' ? node : node.getLastText()
-    return endKey == last.key && endOffset == last.length
+    return this.isCollapsed && this.hasAnchorAtEndOf(node)
+  }
+
+  /**
+   * Focus the selection.
+   *
+   * @return {Selection}
+   */
+
+  focus() {
+    return this.merge({
+      isFocused: true
+    })
+  }
+
+  /**
+   * Blur the selection.
+   *
+   * @return {Selection}
+   */
+
+  blur() {
+    return this.merge({
+      isFocused: false
+    })
+  }
+
+  /**
+   * Unset the selection.
+   *
+   * @return {Selection}
+   */
+
+  deselect() {
+    return this.merge({
+      anchorKey: null,
+      anchorOffset: 0,
+      focusKey: null,
+      focusOffset: 0,
+      isFocused: false,
+      isBackward: false
+    })
+  }
+
+  /**
+   * Flip the selection.
+   *
+   * @return {Selection}
+   */
+
+  flip() {
+    return this.merge({
+      anchorKey: this.focusKey,
+      anchorOffset: this.focusOffset,
+      focusKey: this.anchorKey,
+      focusOffset: this.anchorOffset,
+      isBackward: this.isBackward == null ? null : !this.isBackward,
+    })
+  }
+
+  /**
+   * Move the anchor offset `n` characters.
+   *
+   * @param {Number} n (optional)
+   * @return {Selection}
+   */
+
+  moveAnchor(n = 1) {
+    const { anchorKey, focusKey, focusOffset, isBackward } = this
+    const anchorOffset = this.anchorOffset + n
+    return this.merge({
+      anchorOffset,
+      isBackward: anchorKey == focusKey
+        ? anchorOffset > focusOffset
+        : isBackward
+    })
+  }
+
+  /**
+   * Move the anchor offset `n` characters.
+   *
+   * @param {Number} n (optional)
+   * @return {Selection}
+   */
+
+  moveFocus(n = 1) {
+    const { anchorKey, anchorOffset, focusKey, isBackward } = this
+    const focusOffset = this.focusOffset + n
+    return this.merge({
+      focusOffset,
+      isBackward: focusKey == anchorKey
+        ? anchorOffset > focusOffset
+        : isBackward
+    })
+  }
+
+  /**
+   * Move the selection's anchor point to a `key` and `offset`.
+   *
+   * @param {String} key
+   * @param {Number} offset
+   * @return {Selection}
+   */
+
+  moveAnchorTo(key, offset) {
+    const { anchorKey, focusKey, focusOffset, isBackward } = this
+    return this.merge({
+      anchorKey: key,
+      anchorOffset: offset,
+      isBackward: key == focusKey
+        ? offset > focusOffset
+        : key == anchorKey ? isBackward : null
+    })
+  }
+
+  /**
+   * Move the selection's focus point to a `key` and `offset`.
+   *
+   * @param {String} key
+   * @param {Number} offset
+   * @return {Selection}
+   */
+
+  moveFocusTo(key, offset) {
+    const { focusKey, anchorKey, anchorOffset, isBackward } = this
+    return this.merge({
+      focusKey: key,
+      focusOffset: offset,
+      isBackward: key == anchorKey
+        ? anchorOffset > offset
+        : key == focusKey ? isBackward : null
+    })
+  }
+
+  /**
+   * Move the selection to `anchorOffset`.
+   *
+   * @param {Number} anchorOffset
+   * @return {Selection}
+   */
+
+  moveAnchorOffsetTo(anchorOffset) {
+    return this.merge({
+      anchorOffset,
+      isBackward: this.anchorKey == this.focusKey
+        ? anchorOffset > this.focusOffset
+        : this.isBackward
+    })
+  }
+
+  /**
+   * Move the selection to `focusOffset`.
+   *
+   * @param {Number} focusOffset
+   * @return {Selection}
+   */
+
+  moveFocusOffsetTo(focusOffset) {
+    return this.merge({
+      focusOffset,
+      isBackward: this.anchorKey == this.focusKey
+        ? this.anchorOffset > focusOffset
+        : this.isBackward
+    })
+  }
+
+  /**
+   * Move the selection to `anchorOffset` and `focusOffset`.
+   *
+   * @param {Number} anchorOffset
+   * @param {Number} focusOffset (optional)
+   * @return {Selection}
+   */
+
+  moveOffsetsTo(anchorOffset, focusOffset = anchorOffset) {
+    return this
+      .moveAnchorOffsetTo(anchorOffset)
+      .moveFocusOffsetTo(focusOffset)
+  }
+
+  /**
+   * Move the focus point to the anchor point.
+   *
+   * @return {Selection}
+   */
+
+  moveToAnchor() {
+    return this.moveFocusTo(this.anchorKey, this.anchorOffset)
+  }
+
+  /**
+   * Move the anchor point to the focus point.
+   *
+   * @return {Selection}
+   */
+
+  moveToFocus() {
+    return this.moveAnchorTo(this.focusKey, this.focusOffset)
+  }
+
+  /**
+   * Move the selection's anchor point to the start of a `node`.
+   *
+   * @param {Node} node
+   * @return {Selection}
+   */
+
+  moveAnchorToStartOf(node) {
+    node = getFirst(node)
+    return this.moveAnchorTo(node.key, 0)
+  }
+
+  /**
+   * Move the selection's anchor point to the end of a `node`.
+   *
+   * @param {Node} node
+   * @return {Selection}
+   */
+
+  moveAnchorToEndOf(node) {
+    node = getLast(node)
+    return this.moveAnchorTo(node.key, node.length)
+  }
+
+  /**
+   * Move the selection's focus point to the start of a `node`.
+   *
+   * @param {Node} node
+   * @return {Selection}
+   */
+
+  moveFocusToStartOf(node) {
+    node = getFirst(node)
+    return this.moveFocusTo(node.key, 0)
+  }
+
+  /**
+   * Move the selection's focus point to the end of a `node`.
+   *
+   * @param {Node} node
+   * @return {Selection}
+   */
+
+  moveFocusToEndOf(node) {
+    node = getLast(node)
+    return this.moveFocusTo(node.key, node.length)
+  }
+
+  /**
+   * Move to the entire range of `start` and `end` nodes.
+   *
+   * @param {Node} start
+   * @param {Node} end (optional)
+   * @return {Selection}
+   */
+
+  moveToRangeOf(start, end = start) {
+    return this
+      .moveAnchorToStartOf(start)
+      .moveFocusToEndOf(end)
   }
 
   /**
@@ -311,7 +570,7 @@ class Selection extends new Record(DEFAULTS) {
         anchorOffset: 0,
         focusKey: null,
         focusOffset: 0,
-        isBackward: false
+        isBackward: false,
       })
     }
 
@@ -357,111 +616,14 @@ class Selection extends new Record(DEFAULTS) {
   }
 
   /**
-   * Focus the selection.
+   * Unset the selection.
    *
    * @return {Selection}
    */
 
-  focus() {
-    return this.merge({
-      isFocused: true
-    })
-  }
-
-  /**
-   * Blur the selection.
-   *
-   * @return {Selection}
-   */
-
-  blur() {
-    return this.merge({
-      isFocused: false
-    })
-  }
-
-  /**
-   * Move the focus point to the anchor point.
-   *
-   * @return {Selection}
-   */
-
-  collapseToAnchor() {
-    return this.merge({
-      focusKey: this.anchorKey,
-      focusOffset: this.anchorOffset,
-      isBackward: false
-    })
-  }
-
-  /**
-   * Move the anchor point to the focus point.
-   *
-   * @return {Selection}
-   */
-
-  collapseToFocus() {
-    return this.merge({
-      anchorKey: this.focusKey,
-      anchorOffset: this.focusOffset,
-      isBackward: false
-    })
-  }
-
-  /**
-   * Move to the start of a `node`.
-   *
-   * @param {Node} node
-   * @return {Selection}
-   */
-
-  collapseToStartOf(node) {
-    node = node.kind == 'text' ? node : node.getFirstText()
-    return this.merge({
-      anchorKey: node.key,
-      anchorOffset: 0,
-      focusKey: node.key,
-      focusOffset: 0,
-      isBackward: false
-    })
-  }
-
-  /**
-   * Move to the end of a `node`.
-   *
-   * @return {Selection}
-   */
-
-  collapseToEndOf(node) {
-    node = node.kind == 'text' ? node : node.getLastText()
-    return this.merge({
-      anchorKey: node.key,
-      anchorOffset: node.length,
-      focusKey: node.key,
-      focusOffset: node.length,
-      isBackward: false
-    })
-  }
-
-  /**
-   * Move to the entire range of `start` and `end` nodes.
-   *
-   * @param {Node} start
-   * @param {Node} end (optional)
-   * @param {Document} document
-   * @return {Selection}
-   */
-
-  moveToRangeOf(start, end = start) {
-    start = start.kind == 'text' ? start : start.getFirstText()
-    end = end.kind == 'text' ? end : end.getLastText()
-    return this.merge({
-      anchorKey: start.key,
-      anchorOffset: 0,
-      focusKey: end.key,
-      focusOffset: end.length,
-      isBackward: null,
-    })
+  unset() {
+    warn('The `Selection.unset` method is deprecated, please switch to using `Selection.deselect` instead.')
+    return this.deselect()
   }
 
   /**
@@ -472,10 +634,8 @@ class Selection extends new Record(DEFAULTS) {
    */
 
   moveForward(n = 1) {
-    return this.merge({
-      anchorOffset: this.anchorOffset + n,
-      focusOffset: this.focusOffset + n
-    })
+    warn('The `Selection.moveForward(n)` method is deprecated, please switch to using `Selection.move(n)` instead.')
+    return this.move(n)
   }
 
   /**
@@ -486,58 +646,8 @@ class Selection extends new Record(DEFAULTS) {
    */
 
   moveBackward(n = 1) {
-    return this.merge({
-      anchorOffset: this.anchorOffset - n,
-      focusOffset: this.focusOffset - n
-    })
-  }
-
-  /**
-   * Move the selection to `anchor` and `focus` offsets.
-   *
-   * @param {Number} anchor
-   * @param {Number} focus (optional)
-   * @return {Selection}
-   */
-
-  moveToOffsets(anchor, focus = anchor) {
-    const props = {}
-    props.anchorOffset = anchor
-    props.focusOffset = focus
-
-    if (this.anchorKey == this.focusKey) {
-      props.isBackward = anchor > focus
-    }
-
-    return this.merge(props)
-  }
-
-  /**
-   * Extend the focus point forward `n` characters.
-   *
-   * @param {Number} n (optional)
-   * @return {Selection}
-   */
-
-  extendForward(n = 1) {
-    return this.merge({
-      focusOffset: this.focusOffset + n,
-      isBackward: null
-    })
-  }
-
-  /**
-   * Extend the focus point backward `n` characters.
-   *
-   * @param {Number} n (optional)
-   * @return {Selection}
-   */
-
-  extendBackward(n = 1) {
-    return this.merge({
-      focusOffset: this.focusOffset - n,
-      isBackward: null
-    })
+    warn('The `Selection.moveBackward(n)` method is deprecated, please switch to using `Selection.move(-n)` (with a negative number) instead.')
+    return this.move(0 - n)
   }
 
   /**
@@ -548,178 +658,188 @@ class Selection extends new Record(DEFAULTS) {
    */
 
   moveAnchorOffset(n = 1) {
-    const { anchorKey, focusKey, focusOffset } = this
-    const anchorOffset = this.anchorOffset + n
-    return this.merge({
-      anchorOffset,
-      isBackward: anchorKey == focusKey ? anchorOffset > focusOffset : this.isBackward
-    })
+    warn('The `Selection.moveAnchorOffset(n)` method is deprecated, please switch to using `Selection.moveAnchor(n)` instead.')
+    return this.moveAnchor(n)
   }
 
   /**
-   * Move the anchor offset `n` characters.
+   * Move the focus offset `n` characters.
    *
    * @param {Number} n (optional)
    * @return {Selection}
    */
 
   moveFocusOffset(n = 1) {
-    const { focusKey, anchorKey, anchorOffset } = this
-    const focusOffset = this.focusOffset + n
-    return this.merge({
-      focusOffset,
-      isBackward: focusKey == anchorKey ? anchorOffset > focusOffset : this.isBackward
-    })
+    warn('The `Selection.moveFocusOffset(n)` method is deprecated, please switch to using `Selection.moveFocus(n)` instead.')
+    return this.moveFocus(n)
   }
 
   /**
-   * Move the start key, while preserving the direction
+   * Move the start offset `n` characters.
    *
-   * @param {String} key
+   * @param {Number} n (optional)
    * @return {Selection}
    */
 
-  moveStartTo(key, offset = 0) {
-    if (this.isBackward) {
-      return this.merge({
-        focusKey: key,
-        focusOffset: offset,
-        isBackward: null
-      })
-    } else {
-      return this.merge({
-        anchorKey: key,
-        anchorOffset: offset,
-        isBackward: null
-      })
-    }
+  moveStartOffset(n = 1) {
+    warn('The `Selection.moveStartOffset(n)` method is deprecated, please switch to using `Selection.moveStart(n)` instead.')
+    return this.moveStart(n)
   }
 
   /**
-   * Move the end key, while preserving the direction
+   * Move the focus offset `n` characters.
    *
-   * @param {String} key
+   * @param {Number} n (optional)
    * @return {Selection}
    */
 
-  moveEndTo(key, offset = 0) {
-    if (this.isBackward) {
-      return this.merge({
-        anchorKey: key,
-        anchorOffset: offset,
-        isBackward: null
-      })
-    } else {
-      return this.merge({
-        focusKey: key,
-        focusOffset: offset,
-        isBackward: null
-      })
-    }
+  moveEndOffset(n = 1) {
+    warn('The `Selection.moveEndOffset(n)` method is deprecated, please switch to using `Selection.moveEnd(n)` instead.')
+    return this.moveEnd(n)
   }
 
   /**
-   * Extend the focus point to the start of a `node`.
+   * Extend the focus point forward `n` characters.
    *
-   * @param {Node} node
+   * @param {Number} n (optional)
    * @return {Selection}
    */
 
-  extendToStartOf(node) {
-    return this.merge({
-      focusKey: node.key,
-      focusOffset: 0,
-      isBackward: null
-    })
+  extendForward(n = 1) {
+    warn('The `Selection.extendForward(n)` method is deprecated, please switch to using `Selection.extend(n)` instead.')
+    return this.extend(n)
   }
 
   /**
-   * Extend the focus point to the end of a `node`.
+   * Extend the focus point backward `n` characters.
    *
-   * @param {Node} node
+   * @param {Number} n (optional)
    * @return {Selection}
    */
 
-  extendToEndOf(node) {
-    return this.merge({
-      focusKey: node.key,
-      focusOffset: node.length,
-      isBackward: null
-    })
+  extendBackward(n = 1) {
+    warn('The `Selection.extendBackward(n)` method is deprecated, please switch to using `Selection.extend(-n)` (with a negative number) instead.')
+    return this.extend(0 - n)
   }
 
   /**
-   * Unset the selection
+   * Move the selection to `anchorOffset` and `focusOffset`.
    *
+   * @param {Number} anchorOffset
+   * @param {Number} focusOffset (optional)
    * @return {Selection}
    */
 
-  unset() {
-    return this.merge({
-      anchorKey: null,
-      anchorOffset: 0,
-      focusKey: null,
-      focusOffset: 0,
-      isFocused: false,
-      isBackward: false
-    })
-  }
-
-  /**
-   * Flip the selection.
-   *
-   * @return {Selection}
-   */
-
-  flip() {
-    return this.merge({
-      anchorKey: this.focusKey,
-      anchorOffset: this.focusOffset,
-      focusKey: this.anchorKey,
-      focusOffset: this.anchorOffset,
-      isBackward: this.isBackward == null ? null : !this.isBackward,
-    })
+  moveToOffsets(anchorOffset, focusOffset = anchorOffset) {
+    warn('The `Selection.moveToOffsets` method is deprecated, please switch to using `Selection.moveOffsetsTo` instead.')
+    return this.moveOffsetsTo(anchorOffset, focusOffset)
   }
 
 }
 
 /**
- * Add start, end and edge convenience methods.
+ * Mix in some "move" convenience methods.
  */
 
-[
+const MOVE_METHODS = [
+  ['move', ''],
+  ['move', 'To'],
+  ['move', 'ToStartOf'],
+  ['move', 'ToEndOf'],
+]
+
+MOVE_METHODS.forEach(([ p, s ]) => {
+  Selection.prototype[`${p}${s}`] = function (...args) {
+    return this
+      [`${p}Anchor${s}`](...args)
+      [`${p}Focus${s}`](...args)
+  }
+})
+
+/**
+ * Mix in the "start", "end" and "edge" convenience methods.
+ */
+
+const EDGE_METHODS = [
   ['has', 'AtStartOf', true],
   ['has', 'AtEndOf', true],
   ['has', 'Between', true],
   ['has', 'In', true],
   ['collapseTo', ''],
-  ['move', 'Offset'],
-].forEach((opts) => {
-  const [ p, s, hasEdge ] = opts
-  const anchor = `${p}Anchor${s}`
-  const edge = `${p}Edge${s}`
-  const end = `${p}End${s}`
-  const focus = `${p}Focus${s}`
-  const start = `${p}Start${s}`
+  ['move', ''],
+  ['moveTo', ''],
+  ['move', 'To'],
+  ['move', 'OffsetTo'],
+]
 
-  Selection.prototype[start] = function (...args) {
+EDGE_METHODS.forEach(([ p, s, hasEdge ]) => {
+  const anchor = `${p}Anchor${s}`
+  const focus = `${p}Focus${s}`
+
+  Selection.prototype[`${p}Start${s}`] = function (...args) {
     return this.isBackward
       ? this[focus](...args)
       : this[anchor](...args)
   }
 
-  Selection.prototype[end] = function (...args) {
+  Selection.prototype[`${p}End${s}`] = function (...args) {
     return this.isBackward
       ? this[anchor](...args)
       : this[focus](...args)
   }
 
   if (hasEdge) {
-    Selection.prototype[edge] = function (...args) {
+    Selection.prototype[`${p}Edge${s}`] = function (...args) {
       return this[anchor](...args) || this[focus](...args)
     }
   }
 })
+
+/**
+ * Mix in some aliases for convenience / parallelism with the browser APIs.
+ */
+
+const ALIAS_METHODS = [
+  ['collapseTo', 'moveTo'],
+  ['collapseToAnchor', 'moveToAnchor'],
+  ['collapseToFocus', 'moveToFocus'],
+  ['collapseToStart', 'moveToStart'],
+  ['collapseToEnd', 'moveToEnd'],
+  ['collapseToStartOf', 'moveToStartOf'],
+  ['collapseToEndOf', 'moveToEndOf'],
+  ['extend', 'moveFocus'],
+  ['extendTo', 'moveFocusTo'],
+  ['extendToStartOf', 'moveFocusToStartOf'],
+  ['extendToEndOf', 'moveFocusToEndOf'],
+]
+
+ALIAS_METHODS.forEach(([ alias, method ]) => {
+  Selection.prototype[alias] = function (...args) {
+    return this[method](...args)
+  }
+})
+
+/**
+ * Get the first text of a `node`.
+ *
+ * @param {Node} node
+ * @return {Text}
+ */
+
+function getFirst(node) {
+  return node.kind == 'text' ? node : node.getFirstText()
+}
+
+/**
+ * Get the last text of a `node`.
+ *
+ * @param {Node} node
+ * @return {Text}
+ */
+
+function getLast(node) {
+  return node.kind == 'text' ? node : node.getLastText()
+}
 
 /**
  * Export.

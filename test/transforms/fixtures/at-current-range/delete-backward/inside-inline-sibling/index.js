@@ -15,7 +15,7 @@ export default function (state) {
 
   const next = state
     .transform()
-    .moveTo(range)
+    .select(range)
     .deleteBackward()
     .apply()
 
@@ -23,7 +23,7 @@ export default function (state) {
 
   assert.deepEqual(
     next.selection.toJS(),
-    range.collapseToStartOf(updated).moveForward(first.length).toJS()
+    range.collapseToStartOf(updated).move(first.length).toJS()
   )
 
   return next
