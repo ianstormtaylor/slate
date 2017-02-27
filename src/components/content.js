@@ -487,7 +487,7 @@ class Content extends React.Component {
     // Create an updated state with the text replaced.
     const next = state
       .transform()
-      .moveTo({
+      .select({
         anchorKey: key,
         anchorOffset: start,
         focusKey: key,
@@ -495,7 +495,7 @@ class Content extends React.Component {
       })
       .delete()
       .insertText(textContent, marks)
-      .moveTo(after)
+      .select(after)
       .apply()
 
     // Change the current state.

@@ -13,7 +13,7 @@ export default function (state) {
   const sel = selection.merge(props)
   const next = state
     .transform()
-    .moveTo(props)
+    .select(props)
     .apply()
 
   assert.deepEqual(

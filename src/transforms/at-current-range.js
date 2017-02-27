@@ -29,13 +29,13 @@ Transforms.addMark = (transform, mark) => {
   if (selection.marks) {
     const marks = selection.marks.add(mark)
     const sel = selection.merge({ marks })
-    transform.moveTo(sel)
+    transform.select(sel)
     return
   }
 
   const marks = document.getMarksAtRange(selection).add(mark)
   const sel = selection.merge({ marks })
-  transform.moveTo(sel)
+  transform.select(sel)
 }
 
 /**
@@ -196,7 +196,7 @@ Transforms.insertFragment = (transform, fragment) => {
     selection.hasEdgeAtStartOf(startText)
   )
 
-  transform.unsetSelection()
+  transform.deselect()
   transform.insertFragmentAtRange(selection, fragment)
   state = transform.state
   document = state.document
@@ -221,7 +221,7 @@ Transforms.insertFragment = (transform, fragment) => {
       .move(lastText.length)
   }
 
-  transform.moveTo(after)
+  transform.select(after)
 }
 
 /**
@@ -342,13 +342,13 @@ Transforms.removeMark = (transform, mark) => {
   if (selection.marks) {
     const marks = selection.marks.remove(mark)
     const sel = selection.merge({ marks })
-    transform.moveTo(sel)
+    transform.select(sel)
     return
   }
 
   const marks = document.getMarksAtRange(selection).remove(mark)
   const sel = selection.merge({ marks })
-  transform.moveTo(sel)
+  transform.select(sel)
 }
 
 /**
@@ -426,7 +426,7 @@ Transforms.wrapInline = (transform, properties) => {
   const { startKey } = selection
   const previous = document.getPreviousText(startKey)
 
-  transform.unsetSelection()
+  transform.deselect()
   transform.wrapInlineAtRange(selection, properties)
   state = transform.state
   document = state.document
@@ -458,7 +458,7 @@ Transforms.wrapInline = (transform, properties) => {
   }
 
   after = after.normalize(document)
-  transform.moveTo(after)
+  transform.select(after)
 }
 
 /**
@@ -476,17 +476,17 @@ Transforms.wrapText = (transform, prefix, suffix = prefix) => {
 
   // If the selection was collapsed, it will have moved the start offset too.
   if (selection.isCollapsed) {
-    transform.moveStartOffset(0 - prefix.length)
+    transform.moveStart(0 - prefix.length)
   }
 
   // Adding the suffix will have pushed the end of the selection further on, so
   // we need to move it back to account for this.
-  transform.moveEndOffset(0 - suffix.length)
+  transform.moveEnd(0 - suffix.length)
 
   // There's a chance that the selection points moved "through" each other,
   // resulting in a now-incorrect selection direction.
   if (selection.isForward != transform.state.selection.isForward) {
-    transform.flipSelection()
+    transform.flip()
   }
 }
 

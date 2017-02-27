@@ -252,7 +252,7 @@ function removeNode(state, operation) {
       } else if (next) {
         selection = selection.moveStartTo(next.key, 0)
       } else {
-        selection = selection.unset()
+        selection = selection.deselect()
       }
     }
 
@@ -265,7 +265,7 @@ function removeNode(state, operation) {
       } else if (next) {
         selection = selection.moveEndTo(next.key, 0)
       } else {
-        selection = selection.unset()
+        selection = selection.deselect()
       }
     }
   }

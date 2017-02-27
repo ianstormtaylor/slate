@@ -322,7 +322,7 @@ function Plugin(options = {}) {
     if (isInternal) transform.delete()
 
     return transform
-      .moveTo(target)
+      .select(target)
       .insertFragment(fragment)
       .apply()
   }
@@ -342,7 +342,7 @@ function Plugin(options = {}) {
     const { text, target } = data
     const transform = state
       .transform()
-      .moveTo(target)
+      .select(target)
 
     text
       .split('\n')
@@ -810,7 +810,7 @@ function Plugin(options = {}) {
 
     return state
       .transform()
-      .moveTo(data.selection)
+      .select(data.selection)
       .apply()
   }
 

@@ -15,7 +15,7 @@ export default function (state) {
 
   const next = state
     .transform()
-    .moveTo(nextSelection)
+    .select(nextSelection)
     .removeTextByKey(firstText.key, 2, 1)
     .apply()
 
