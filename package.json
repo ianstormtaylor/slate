@@ -1,7 +1,7 @@
 {
   "name": "slate",
   "description": "A completely customizable framework for building rich text editors.",
-  "version": "0.16.8",
+  "version": "0.16.28",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
   "main": "./lib/index.js",
@@ -15,6 +15,7 @@
     "immutable": "^3.8.1",
     "is-empty": "^1.0.0",
     "keycode": "^2.1.2",
+    "react-portal": "^3.0.0",
     "type-of": "^2.0.1"
   },
   "peerDependencies": {
@@ -54,12 +55,11 @@
     "np": "^2.9.0",
     "npm-run-all": "^2.3.0",
     "prismjs": "^1.5.1",
-    "react": "~15.2.0",
-    "react-addons-perf": "~15.2.1",
-    "react-dom": "~15.2.0",
-    "react-frame-aware-selection-plugin": "0.0.5",
+    "react": "^15.4.2",
+    "react-addons-perf": "^15.4.2",
+    "react-dom": "^15.4.2",
+    "react-frame-aware-selection-plugin": "^1.0.0",
     "react-frame-component": "^0.6.2",
-    "react-portal": "^2.2.0",
     "react-router": "^2.5.1",
     "read-metadata": "^1.0.0",
     "read-yaml-promise": "^1.0.2",
@@ -103,7 +103,7 @@
     "tests": "mocha --compilers js:babel-core/register ./test/index.js",
     "watch": "npm-run-all --parallel --print-label watch:lib watch:examples start",
     "watch:lib": "babel --watch --out-dir ./lib ./src",
-    "watch:examples": "watchify --debug --transform babelify ./examples/index.js -o ./examples/build.dev.js"
+    "watch:examples": "watchify --debug --transform babelify ./examples/index.js -o ./examples/build.dev.js -v"
   },
   "browserify-global-shim": {
     "immutable": "Immutable",

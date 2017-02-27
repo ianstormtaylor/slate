@@ -11,7 +11,7 @@ export function redo(transform) {
   let { undos, redos } = history
 
   // If there's no next snapshot, abort.
-  let next = redos.peek()
+  const next = redos.peek()
   if (!next) return
 
   // Shift the next state into the undo stack.
@@ -19,7 +19,7 @@ export function redo(transform) {
   undos = undos.push(next)
 
   // Replay the next operations.
-  next.forEach(op => {
+  next.forEach((op) => {
     transform.applyOperation(op)
   })
 
@@ -82,7 +82,7 @@ export function undo(transform) {
   let { undos, redos } = history
 
   // If there's no previous snapshot, abort.
-  let previous = undos.peek()
+  const previous = undos.peek()
   if (!previous) return
 
   // Shift the previous operations into the redo stack.
@@ -90,8 +90,8 @@ export function undo(transform) {
   redos = redos.push(previous)
 
   // Replay the inverse of the previous operations.
-  previous.slice().reverse().forEach(op => {
-    op.inverse.forEach(inv => {
+  previous.slice().reverse().forEach((op) => {
+    op.inverse.forEach((inv) => {
       transform.applyOperation(inv)
     })
   })

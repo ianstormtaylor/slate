@@ -48,7 +48,7 @@ class State extends new Record(DEFAULTS) {
   static create(properties = {}) {
     if (properties instanceof State) return properties
 
-    let document = Document.create(properties.document)
+    const document = Document.create(properties.document)
     let selection = Selection.create(properties.selection)
 
     if (selection.isUnset) {

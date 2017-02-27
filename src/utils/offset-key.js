@@ -69,7 +69,6 @@ function findKey(rawNode, rawOffset) {
 
   // Find the closest parent with an offset key attribute.
   let closest = parentNode.closest(SELECTOR)
-  let offsetKey
 
   // For void nodes, the element with the offset key will be a cousin, not an
   // ancestor, so find it by going down from the nearest void parent.
@@ -81,7 +80,7 @@ function findKey(rawNode, rawOffset) {
   }
 
   // Get the string value of the offset key attribute.
-  offsetKey = closest.getAttribute(ATTRIBUTE)
+  const offsetKey = closest.getAttribute(ATTRIBUTE)
 
   // If we still didn't find an offset key, abort.
   if (!offsetKey) return null

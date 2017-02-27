@@ -35,7 +35,7 @@ export function collapseToEndOfNextBlock(transform) {
   const { document, selection } = state
   const blocks = document.getBlocksAtRange(selection)
   const last = blocks.last()
-  const next = document.getNextBlock(last)
+  const next = document.getNextBlock(last.key)
   if (!next) return
 
   const sel = selection.collapseToEndOf(next)
@@ -53,7 +53,7 @@ export function collapseToEndOfNextText(transform) {
   const { document, selection } = state
   const texts = document.getTextsAtRange(selection)
   const last = texts.last()
-  const next = document.getNextText(last)
+  const next = document.getNextText(last.key)
   if (!next) return
 
   const sel = selection.collapseToEndOf(next)
@@ -71,7 +71,7 @@ export function collapseToEndOfPreviousBlock(transform) {
   const { document, selection } = state
   const blocks = document.getBlocksAtRange(selection)
   const first = blocks.first()
-  const previous = document.getPreviousBlock(first)
+  const previous = document.getPreviousBlock(first.key)
   if (!previous) return
 
   const sel = selection.collapseToEndOf(previous)
@@ -89,7 +89,7 @@ export function collapseToEndOfPreviousText(transform) {
   const { document, selection } = state
   const texts = document.getTextsAtRange(selection)
   const first = texts.first()
-  const previous = document.getPreviousText(first)
+  const previous = document.getPreviousText(first.key)
   if (!previous) return
 
   const sel = selection.collapseToEndOf(previous)
@@ -107,7 +107,7 @@ export function collapseToStartOfNextBlock(transform) {
   const { document, selection } = state
   const blocks = document.getBlocksAtRange(selection)
   const last = blocks.last()
-  const next = document.getNextBlock(last)
+  const next = document.getNextBlock(last.key)
   if (!next) return
 
   const sel = selection.collapseToStartOf(next)
@@ -125,7 +125,7 @@ export function collapseToStartOfNextText(transform) {
   const { document, selection } = state
   const texts = document.getTextsAtRange(selection)
   const last = texts.last()
-  const next = document.getNextText(last)
+  const next = document.getNextText(last.key)
   if (!next) return
 
   const sel = selection.collapseToStartOf(next)
@@ -143,7 +143,7 @@ export function collapseToStartOfPreviousBlock(transform) {
   const { document, selection } = state
   const blocks = document.getBlocksAtRange(selection)
   const first = blocks.first()
-  const previous = document.getPreviousBlock(first)
+  const previous = document.getPreviousBlock(first.key)
   if (!previous) return
 
   const sel = selection.collapseToStartOf(previous)
@@ -161,7 +161,7 @@ export function collapseToStartOfPreviousText(transform) {
   const { document, selection } = state
   const texts = document.getTextsAtRange(selection)
   const first = texts.first()
-  const previous = document.getPreviousText(first)
+  const previous = document.getPreviousText(first.key)
   if (!previous) return
 
   const sel = selection.collapseToStartOf(previous)

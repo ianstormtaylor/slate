@@ -145,7 +145,7 @@ The `data` object contains the `key` which is a string name of the key that was 
 }
 ```
 
-The `isMod` boolean is `true` if the `control` key was pressed on Windows or the `command` key was pressed on Mac _without_ the `alt/option` key was also being pressed. This is a convenience for adding hotkeys like `command+b`. 
+The `isMod` boolean is `true` if the `control` key was pressed on Windows or the `command` key was pressed on Mac _without_ the `alt/option` key also being pressed. This is a convenience for adding hotkeys like `command+b`. 
 
 The `isModAlt` boolean is `true` if the `control` key was pressed on Windows or the `command` key was pressed on Mac _and_ the `alt/option` key was also being pressed. This is a convenience for secondary hotkeys like `command+option+1`.
 

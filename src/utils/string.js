@@ -59,8 +59,9 @@ function isWord(char, remaining) {
 
   // If it's a chameleon character, recurse to see if the next one is or not.
   if (CHAMELEON.test(char)) {
-    const next = remaining.charAt(0)
+    let next = remaining.charAt(0)
     const length = getCharLength(next)
+    next = remaining.slice(0, length)
     const rest = remaining.slice(length)
     if (isWord(next, rest)) return true
   }
@@ -136,13 +137,14 @@ function getWordOffset(text) {
 
   while (char = text.charAt(i)) {
     const l = getCharLength(char)
+    char = text.slice(i, i + l)
     const rest = text.slice(i + l)
 
     if (isWord(char, rest)) {
       started = true
-      length++
+      length += l
     } else if (!started) {
-      length++
+      length += l
     } else {
       break
     }
@@ -164,7 +166,8 @@ function getWordOffset(text) {
 function getWordOffsetBackward(text, offset) {
   text = text.slice(0, offset)
   text = reverse(text)
-  return getWordOffset(text)
+  const o = getWordOffset(text)
+  return o
 }
 
 /**
@@ -177,7 +180,8 @@ function getWordOffsetBackward(text, offset) {
 
 function getWordOffsetForward(text, offset) {
   text = text.slice(offset)
-  return getWordOffset(text)
+  const o = getWordOffset(text)
+  return o
 }
 
 /**

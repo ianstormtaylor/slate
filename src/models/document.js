@@ -10,10 +10,11 @@ import './inline'
  * Dependencies.
  */
 
+import Data from './data'
 import Block from './block'
 import Node from './node'
 import generateKey from '../utils/generate-key'
-import { List, Record } from 'immutable'
+import { List, Map, Record } from 'immutable'
 
 /**
  * Default properties.
@@ -22,6 +23,7 @@ import { List, Record } from 'immutable'
  */
 
 const DEFAULTS = {
+  data: new Map(),
   key: null,
   nodes: new List(),
 }
@@ -45,6 +47,7 @@ class Document extends new Record(DEFAULTS) {
     if (properties instanceof Document) return properties
 
     properties.key = properties.key || generateKey()
+    properties.data = Data.create(properties.data)
     properties.nodes = Block.createList(properties.nodes)
 
     return new Document(properties)

@@ -221,7 +221,7 @@ function Plugin(options = {}) {
   function onCutOrCopy(e, data, state) {
     const window = getWindow(e.target)
     const native = window.getSelection()
-    if (!native.rangeCount) return
+    if (native.isCollapsed) return
 
     const { fragment } = data
     const encoded = Base64.serializeNode(fragment)
@@ -317,7 +317,7 @@ function Plugin(options = {}) {
         : selection.endOffset)
     }
 
-    let transform = state.transform()
+    const transform = state.transform()
 
     if (isInternal) transform.delete()
 
@@ -340,7 +340,7 @@ function Plugin(options = {}) {
     debug('onDropText', { data })
 
     const { text, target } = data
-    let transform = state
+    const transform = state
       .transform()
       .moveTo(target)
 
@@ -491,11 +491,12 @@ function Plugin(options = {}) {
       const previousBlock = document.getClosestBlock(previous.key)
       const previousInline = document.getClosestInline(previous.key)
 
-      if (previousBlock == startBlock && previousInline && !previousInline.isVoid) {
+      if (previousBlock === startBlock && previousInline && !previousInline.isVoid) {
+        const extendOrMove = data.isShift ? 'extendBackward' : 'moveBackward'
         return state
           .transform()
           .collapseToEndOf(previous)
-          .moveBackward(1)
+          [extendOrMove](1)
           .apply()
       }
 
@@ -562,10 +563,11 @@ function Plugin(options = {}) {
       const nextInline = document.getClosestInline(next.key)
 
       if (nextBlock == startBlock && nextInline) {
+        const extendOrMove = data.isShift ? 'extendForward' : 'moveBackward'
         return state
           .transform()
           .collapseToStartOf(next)
-          .moveForward(1)
+          [extendOrMove](1)
           .apply()
       }
 
@@ -782,7 +784,7 @@ function Plugin(options = {}) {
   function onPasteText(e, data, state) {
     debug('onPasteText', { data })
 
-    let transform = state.transform()
+    const transform = state.transform()
 
     data.text
       .split('\n')
@@ -834,9 +836,9 @@ function Plugin(options = {}) {
                 state={props.state}
                 style={placeholderStyle}
               >
-              {placeholder}
-            </Placeholder>
-           : null}
+                {placeholder}
+              </Placeholder>
+            : null}
         </div>
       )
     }

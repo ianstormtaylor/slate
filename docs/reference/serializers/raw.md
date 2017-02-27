@@ -9,7 +9,7 @@ The raw JSON serialized that ships by default with Slate. It converts a [`State`
 
 In the raw format, text is represented as "ranges", which are a more compact way to represent the formatting applied to characters than the immutable model Slate uses internally.
 
-When saving the data to size-sensitive places, you the raw serializer can be told to omit properties that aren't _strictly_ required to deserialize later, reducing the serialized data's size. For example, if the dictionary of [`Data`](../models/data.md) for a [`Node`](../models/node.md) is empty, it will be omitted.
+When saving the data to size-sensitive places, the raw serializer can be told to omit properties that aren't _strictly_ required to deserialize later, reducing the serialized data's size. For example, if the dictionary of [`Data`](../models/data.md) for a [`Node`](../models/node.md) is empty, it will be omitted.
 
 - [Example](#example)
 - [Static Methods](#methods)

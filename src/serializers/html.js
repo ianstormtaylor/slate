@@ -70,6 +70,7 @@ class Html {
    * @param {Object} options
    *   @property {Array} rules
    *   @property {String} defaultBlockType
+   *   @property {String|Object} defaultBlockType
    */
 
   constructor(options = {}) {
@@ -85,10 +86,12 @@ class Html {
    * Deserialize pasted HTML.
    *
    * @param {String} html
+   * @param {Object} options
+   *   @property {Boolean} toRaw
    * @return {State}
    */
 
-  deserialize = (html) => {
+  deserialize = (html, options = {}) => {
     const $ = cheerio.load(html).root()
     const children = $.children().toArray()
     let nodes = this.deserializeElements(children)
@@ -106,17 +109,34 @@ class Html {
         return memo
       }
 
+      const { defaultBlockType } = this
+      const defaults = typeof defaultBlockType == 'string'
+        ? { type: defaultBlockType }
+        : defaultBlockType
+
       const block = {
         kind: 'block',
-        type: this.defaultBlockType,
-        nodes: [node]
+        nodes: [node],
+        ...defaults
       }
 
       memo.push(block)
       return memo
     }, [])
 
-    const state = Raw.deserialize({ nodes }, { terse: true })
+    const raw = {
+      kind: 'state',
+      document: {
+        kind: 'document',
+        nodes,
+      }
+    }
+
+    if (options.toRaw) {
+      return raw
+    }
+
+    const state = Raw.deserialize(raw, { terse: true })
     return state
   }
 

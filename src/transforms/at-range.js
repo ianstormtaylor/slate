@@ -94,7 +94,7 @@ export function deleteAtRange(transform, range, options = {}) {
 
   // Remove all of the middle nodes, between the splits.
   if (middles.size) {
-    middles.forEach(child => {
+    middles.forEach((child) => {
       transform.removeNodeByKey(child.key, OPTS)
     })
   }
@@ -111,7 +111,8 @@ export function deleteAtRange(transform, range, options = {}) {
       transform.moveNodeByKey(child.key, newKey, newIndex, OPTS)
     })
 
-    const lonely = document.getFurthest(endBlock.key, p => p.nodes.size == 1) || endBlock
+    // Remove parents of endBlock as long as they have a single child
+    const lonely = document.getHighestOnlyChildParent(endBlock.key) || endBlock
     transform.removeNodeByKey(lonely.key, OPTS)
   }
 
@@ -131,9 +132,13 @@ export function deleteAtRange(transform, range, options = {}) {
 
 export function deleteCharBackwardAtRange(transform, range, options) {
   const { state } = transform
-  const { startOffset, startBlock } = state
+  const { document } = state
+  const { startKey, startOffset } = range
+  const startBlock = document.getClosestBlock(startKey)
+  const offset = startBlock.getOffset(startKey)
+  const o = offset + startOffset
   const { text } = startBlock
-  const n = String.getCharOffsetBackward(text, startOffset)
+  const n = String.getCharOffsetBackward(text, o)
   transform.deleteBackwardAtRange(range, n, options)
 }
 
@@ -148,8 +153,12 @@ export function deleteCharBackwardAtRange(transform, range, options) {
 
 export function deleteLineBackwardAtRange(transform, range, options) {
   const { state } = transform
-  const { startOffset } = state
-  transform.deleteBackwardAtRange(range, startOffset, options)
+  const { document } = state
+  const { startKey, startOffset } = range
+  const startBlock = document.getClosestBlock(startKey)
+  const offset = startBlock.getOffset(startKey)
+  const o = offset + startOffset
+  transform.deleteBackwardAtRange(range, o, options)
 }
 
 /**
@@ -163,9 +172,13 @@ export function deleteLineBackwardAtRange(transform, range, options) {
 
 export function deleteWordBackwardAtRange(transform, range, options) {
   const { state } = transform
-  const { startOffset, startBlock } = state
+  const { document } = state
+  const { startKey, startOffset } = range
+  const startBlock = document.getClosestBlock(startKey)
+  const offset = startBlock.getOffset(startKey)
+  const o = offset + startOffset
   const { text } = startBlock
-  const n = String.getWordOffsetBackward(text, startOffset)
+  const n = String.getWordOffsetBackward(text, o)
   transform.deleteBackwardAtRange(range, n, options)
 }
 
@@ -191,9 +204,14 @@ export function deleteBackwardAtRange(transform, range, n = 1, options = {}) {
     return
   }
 
-  // If the closest block is void, delete it.
   const block = document.getClosestBlock(startKey)
+  // If the closest block is void, delete it.
   if (block && block.isVoid) {
+    transform.removeNodeByKey(block.key, { normalize })
+    return
+  }
+  // If the closest is not void, but empty, remove it
+  if (block && !block.isVoid && block.isEmpty && document.nodes.size !== 1) {
     transform.removeNodeByKey(block.key, { normalize })
     return
   }
@@ -230,22 +248,58 @@ export function deleteBackwardAtRange(transform, range, n = 1, options = {}) {
       return
     }
 
-    // If the previous text's block is inside the current block, then we need
-    // to remove a character when deleteing. Otherwise, we just want to join
-    // the two blocks together.
+    // If we're deleting by one character and the previous text node is not
+    // inside the current block, we need to join the two blocks together.
+    if (n == 1 && prevBlock != block) {
+      range = range.merge({
+        anchorKey: prev.key,
+        anchorOffset: prev.length,
+      })
+
+      transform.deleteAtRange(range, { normalize })
+      return
+    }
+  }
+
+  // If the focus offset is farther than the number of characters to delete,
+  // just remove the characters backwards inside the current node.
+  if (n < focusOffset) {
     range = range.merge({
-      anchorKey: prev.key,
-      anchorOffset: prevBlock == block ? prev.length - 1 : prev.length,
+      focusOffset: focusOffset - n,
+      isBackward: true,
     })
 
     transform.deleteAtRange(range, { normalize })
     return
   }
 
-  // Otherwise, just remove a character backwards.
+  // Otherwise, we need to see how many nodes backwards to go.
+  let node = text
+  let offset = 0
+  let traversed = focusOffset
+
+  while (n > traversed) {
+    node = document.getPreviousText(node.key)
+    const next = traversed + node.length
+    if (n <= next) {
+      offset = next - n
+      break
+    } else {
+      traversed = next
+    }
+  }
+
+  // If the focus node is inside a void, go up until right after it.
+  if (document.hasVoidParent(node.key)) {
+    const parent = document.getClosest(node.key, p => p.isVoid)
+    node = document.getNextText(parent.key)
+    offset = 0
+  }
+
   range = range.merge({
-    focusOffset: focusOffset - n,
-    isBackward: true,
+    focusKey: node.key,
+    focusOffset: offset,
+    isBackward: true
   })
 
   transform.deleteAtRange(range, { normalize })
@@ -262,9 +316,13 @@ export function deleteBackwardAtRange(transform, range, n = 1, options = {}) {
 
 export function deleteCharForwardAtRange(transform, range, options) {
   const { state } = transform
-  const { startOffset, startBlock } = state
+  const { document } = state
+  const { startKey, startOffset } = range
+  const startBlock = document.getClosestBlock(startKey)
+  const offset = startBlock.getOffset(startKey)
+  const o = offset + startOffset
   const { text } = startBlock
-  const n = String.getCharOffsetForward(text, startOffset)
+  const n = String.getCharOffsetForward(text, o)
   transform.deleteForwardAtRange(range, n, options)
 }
 
@@ -279,8 +337,12 @@ export function deleteCharForwardAtRange(transform, range, options) {
 
 export function deleteLineForwardAtRange(transform, range, options) {
   const { state } = transform
-  const { startOffset, startBlock } = state
-  transform.deleteForwardAtRange(range, startBlock.length - startOffset, options)
+  const { document } = state
+  const { startKey, startOffset } = range
+  const startBlock = document.getClosestBlock(startKey)
+  const offset = startBlock.getOffset(startKey)
+  const o = offset + startOffset
+  transform.deleteForwardAtRange(range, o, options)
 }
 
 /**
@@ -294,9 +356,13 @@ export function deleteLineForwardAtRange(transform, range, options) {
 
 export function deleteWordForwardAtRange(transform, range, options) {
   const { state } = transform
-  const { startOffset, startBlock } = state
+  const { document } = state
+  const { startKey, startOffset } = range
+  const startBlock = document.getClosestBlock(startKey)
+  const offset = startBlock.getOffset(startKey)
+  const o = offset + startOffset
   const { text } = startBlock
-  const n = String.getWordOffsetForward(text, startOffset)
+  const n = String.getWordOffsetForward(text, o)
   transform.deleteForwardAtRange(range, n, options)
 }
 
@@ -316,57 +382,107 @@ export function deleteForwardAtRange(transform, range, n = 1, options = {}) {
   const { document } = state
   const { startKey, focusOffset } = range
 
+  // If the range is expanded, perform a regular delete instead.
   if (range.isExpanded) {
     transform.deleteAtRange(range, { normalize })
     return
   }
 
   const block = document.getClosestBlock(startKey)
+  // If the closest block is void, delete it.
   if (block && block.isVoid) {
     transform.removeNodeByKey(block.key, { normalize })
     return
   }
+  // If the closest is not void, but empty, remove it
+  if (block && !block.isVoid && block.isEmpty && document.nodes.size !== 1) {
+    transform.removeNodeByKey(block.key, { normalize })
+    return
+  }
 
+  // If the closest inline is void, delete it.
   const inline = document.getClosestInline(startKey)
   if (inline && inline.isVoid) {
     transform.removeNodeByKey(inline.key, { normalize })
     return
   }
 
+  // If the range is at the start of the document, abort.
   if (range.isAtEndOf(document)) {
     return
   }
 
+  // If the range is at the start of the text node, we need to figure out what
+  // is behind it to know how to delete...
   const text = document.getDescendant(startKey)
   if (range.isAtEndOf(text)) {
     const next = document.getNextText(text.key)
     const nextBlock = document.getClosestBlock(next.key)
     const nextInline = document.getClosestInline(next.key)
 
+    // If the previous block is void, remove it.
     if (nextBlock && nextBlock.isVoid) {
       transform.removeNodeByKey(nextBlock.key, { normalize })
       return
     }
 
+    // If the previous inline is void, remove it.
     if (nextInline && nextInline.isVoid) {
       transform.removeNodeByKey(nextInline.key, { normalize })
       return
     }
 
-    // If the next text's block is inside the current block, then we need
-    // to remove a character when deleteing. Otherwise, we just want to join
-    // the two blocks together.
+    // If we're deleting by one character and the previous text node is not
+    // inside the current block, we need to join the two blocks together.
+    if (n == 1 && nextBlock != block) {
+      range = range.merge({
+        focusKey: next.key,
+        focusOffset: 0
+      })
+
+      transform.deleteAtRange(range, { normalize })
+      return
+    }
+  }
+
+  // If the remaining characters to the end of the node is greater than or equal
+  // to the number of characters to delete, just remove the characters forwards
+  // inside the current node.
+  if (n <= (text.length - focusOffset)) {
     range = range.merge({
-      focusKey: next.key,
-      focusOffset: nextBlock == block ? 1 : 0
+      focusOffset: focusOffset + n
     })
 
     transform.deleteAtRange(range, { normalize })
     return
   }
 
+  // Otherwise, we need to see how many nodes forwards to go.
+  let node = text
+  let offset = focusOffset
+  let traversed = text.length - focusOffset
+
+  while (n > traversed) {
+    node = document.getNextText(node.key)
+    const next = traversed + node.length
+    if (n <= next) {
+      offset = n - traversed
+      break
+    } else {
+      traversed = next
+    }
+  }
+
+  // If the focus node is inside a void, go up until right before it.
+  if (document.hasVoidParent(node.key)) {
+    const parent = document.getClosest(node.key, p => p.isVoid)
+    node = document.getPreviousText(parent.key)
+    offset = node.length
+  }
+
   range = range.merge({
-    focusOffset: focusOffset + n
+    focusKey: node.key,
+    focusOffset: offset,
   })
 
   transform.deleteAtRange(range, { normalize })
@@ -677,7 +793,7 @@ export function setInlineAtRange(transform, range, properties, options = {}) {
   const inlines = document.getInlinesAtRange(range)
 
   inlines.forEach((inline) => {
-    transform.setNodeByKey(inline.key, properties, { normalize})
+    transform.setNodeByKey(inline.key, properties, { normalize })
   })
 }
 
@@ -824,7 +940,7 @@ export function unwrapBlockAtRange(transform, range, properties, options = {}) {
     })
 
     const firstMatch = children.first()
-    let lastMatch = children.last()
+    const lastMatch = children.last()
 
     if (first == firstMatch && last == lastMatch) {
       block.nodes.forEach((child, i) => {
@@ -945,23 +1061,25 @@ export function wrapBlockAtRange(transform, range, block, options = {}) {
   const lastblock = blocks.last()
   let parent, siblings, index
 
-  // if there is only one block in the selection then we know the parent and siblings
+  // If there is only one block in the selection then we know the parent and
+  // siblings.
   if (blocks.length === 1) {
     parent = document.getParent(firstblock.key)
     siblings = blocks
   }
 
-  // determine closest shared parent to all blocks in selection
+  // Determine closest shared parent to all blocks in selection.
   else {
-    parent = document.getClosest(firstblock.key, p1 => {
+    parent = document.getClosest(firstblock.key, (p1) => {
       return !!document.getClosest(lastblock.key, p2 => p1 == p2)
     })
   }
 
-  // if no shared parent could be found then the parent is the document
+  // If no shared parent could be found then the parent is the document.
   if (parent == null) parent = document
 
-  // create a list of direct children siblings of parent that fall in the selection
+  // Create a list of direct children siblings of parent that fall in the
+  // selection.
   if (siblings == null) {
     const indexes = parent.nodes.reduce((ind, node, i) => {
       if (node == firstblock || node.hasDescendant(firstblock.key)) ind[0] = i
@@ -973,15 +1091,15 @@ export function wrapBlockAtRange(transform, range, block, options = {}) {
     siblings = parent.nodes.slice(indexes[0], indexes[1] + 1)
   }
 
-  // get the index to place the new wrapped node at
+  // Get the index to place the new wrapped node at.
   if (index == null) {
     index = parent.nodes.indexOf(siblings.first())
   }
 
-  // inject the new block node into the parent
+  // Inject the new block node into the parent.
   transform.insertNodeByKey(parent.key, index, block, OPTS)
 
-  // move the sibling nodes into the new block node
+  // Move the sibling nodes into the new block node.
   siblings.forEach((node, i) => {
     transform.moveNodeByKey(node.key, block.key, i, OPTS)
   })
@@ -1024,7 +1142,7 @@ export function wrapInlineAtRange(transform, range, inline, options = {}) {
   let startBlock = document.getClosestBlock(startKey)
   let endBlock = document.getClosestBlock(endKey)
   let startChild = startBlock.getHighestChild(startKey)
-  let endChild = endBlock.getHighestChild(endKey)
+  const endChild = endBlock.getHighestChild(endKey)
   const startIndex = startBlock.nodes.indexOf(startChild)
   const endIndex = endBlock.nodes.indexOf(endChild)
 

@@ -56,6 +56,7 @@ function clean(html) {
     $(el).removeAttr('data-offset-key')
   })
 
+  $.root().children().removeAttr('autocorrect')
   $.root().children().removeAttr('spellcheck')
   $.root().children().removeAttr('style')
 

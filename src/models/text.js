@@ -212,7 +212,7 @@ class Text extends new Record(DEFAULTS) {
 
   getRanges(decorators = []) {
     const list = new List()
-    let characters = this.getDecorations(decorators)
+    const characters = this.getDecorations(decorators)
 
     // If there are no characters, return one empty range.
     if (characters.size == 0) {
@@ -327,8 +327,8 @@ class Text extends new Record(DEFAULTS) {
 
   removeText(index, length) {
     let { characters } = this
-    let start = index
-    let end = index + length
+    const start = index
+    const end = index + length
     characters = characters.filterNot((char, i) => start <= i && i < end)
     return this.merge({ characters })
   }

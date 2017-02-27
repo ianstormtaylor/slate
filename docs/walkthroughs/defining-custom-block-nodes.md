@@ -24,6 +24,8 @@ class App extends React.Component {
 
   onKeyDown = (event, data, state) => {
     if (event.which != 55 || !event.shiftKey) return
+      
+    event.preventDefault()
 
     const newState = state
       .transform()
@@ -90,6 +92,8 @@ class App extends React.Component {
 
   onKeyDown = (event, data, state) => {
     if (event.which != 55 || !event.shiftKey) return
+      
+    event.preventDefault()
 
     const newState = state
       .transform()
@@ -139,6 +143,9 @@ class App extends React.Component {
   onKeyDown = (event, data, state) => {
     // Return with no changes if it's not the "`" key with cmd/ctrl pressed.
     if (event.which != 192 || !event.metaKey) return
+    
+    // Prevent the "`" from being inserted by default.
+    event.preventDefault()
 
     // Otherwise, set the currently selected blocks type to "code".
     return state
@@ -187,6 +194,8 @@ class App extends React.Component {
 
   onKeyDown = (event, data, state) => {
     if (event.which != 192 || !event.metaKey) return
+    
+    event.preventDefault()
 
     // Determine whether any of the currently selected blocks are code blocks.
     const isCode = state.blocks.some(block => block.type == 'code')

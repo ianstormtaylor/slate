@@ -35,6 +35,8 @@ class Content extends React.Component {
    */
 
   static propTypes = {
+    autoCorrect: React.PropTypes.bool.isRequired,
+    children: React.PropTypes.array.isRequired,
     className: React.PropTypes.string,
     editor: React.PropTypes.object.isRequired,
     onBeforeInput: React.PropTypes.func.isRequired,
@@ -47,10 +49,12 @@ class Content extends React.Component {
     onPaste: React.PropTypes.func.isRequired,
     onSelect: React.PropTypes.func.isRequired,
     readOnly: React.PropTypes.bool.isRequired,
+    role: React.PropTypes.string,
     schema: React.PropTypes.object,
     spellCheck: React.PropTypes.bool.isRequired,
     state: React.PropTypes.object.isRequired,
-    style: React.PropTypes.object
+    style: React.PropTypes.object,
+    tabIndex: React.PropTypes.number
   };
 
   /**
@@ -96,6 +100,7 @@ class Content extends React.Component {
     return (
       props.className != this.props.className ||
       props.schema != this.props.schema ||
+      props.autoCorrect != this.props.autoCorrect ||
       props.spellCheck != this.props.spellCheck ||
       props.state != this.props.state ||
       props.style != this.props.style
@@ -398,9 +403,8 @@ class Content extends React.Component {
       range.setStart(nativeEvent.rangeParent, nativeEvent.rangeOffset)
     }
 
-    const startNode = range.startContainer
-    const startOffset = range.startOffset
-    const point = this.getPoint(startNode, startOffset)
+    const { startContainer, startOffset } = range
+    const point = this.getPoint(startContainer, startOffset)
     if (!point) return
 
     const target = Selection.create({
@@ -612,7 +616,7 @@ class Content extends React.Component {
 
     const window = getWindow(event.target)
     const { state } = this.props
-    let { document, selection } = state
+    const { document, selection } = state
     const native = window.getSelection()
     const data = {}
 
@@ -694,13 +698,13 @@ class Content extends React.Component {
 
   render = () => {
     const { props } = this
-    const { className, readOnly, state } = props
+    const { className, readOnly, state, tabIndex, role } = props
     const { document } = state
     const children = document.nodes
       .map(node => this.renderNode(node))
       .toArray()
 
-    let style = {
+    const style = {
       // Prevent the default outline styles.
       outline: 'none',
       // Preserve adjacent whitespace and new lines.
@@ -745,10 +749,14 @@ class Content extends React.Component {
         onKeyUp={this.onKeyUp}
         onPaste={this.onPaste}
         onSelect={this.onSelect}
+        autoCorrect={props.autoCorrect}
         spellCheck={spellCheck}
         style={style}
+        role={readOnly ? null : (role || 'textbox')}
+        tabIndex={tabIndex}
       >
         {children}
+        {this.props.children}
       </div>
     )
   }
@@ -761,7 +769,7 @@ class Content extends React.Component {
    */
 
   renderNode = (node) => {
-    const { editor, schema, state } = this.props
+    const { editor, readOnly, schema, state } = this.props
 
     return (
       <Node
@@ -771,6 +779,7 @@ class Content extends React.Component {
         schema={schema}
         state={state}
         editor={editor}
+        readOnly={readOnly}
       />
     )
   }
