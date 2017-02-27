@@ -4,6 +4,25 @@ This document maintains a list of changes to Slate with each new version. Until 
 
 ---
 
+### `0.17.0` — February 27, 2017
+
+###### DEPRECATION CHANGES
+
+- **Selection methods and transforms have been refactored!** Previously there were many inconsistencies in the naming and handling of selection changes. This has all been cleaned up, but in the process some methods have been deprecated. The full list, along with the new counterpart is:
+  - `moveToOffsets` -> `moveOffsetsTo`
+  - `moveForward` -> `move`
+  - `moveBackward` -> `move`
+  - `moveAnchorOffset` -> `moveAnchor`
+  - `moveFocusOffset` -> `moveFocus`
+  - `moveStartOffset` -> `moveStart`
+  - `moveEndOffset` -> `moveEnd`
+  - `extendForward` -> `extend`
+  - `extendBackward` -> `extend`
+  - `unset` -> `deselect`
+
+
+---
+
 
 ### `0.16.0` — December 2, 2016
 
