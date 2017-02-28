@@ -35,8 +35,8 @@ class Content extends React.Component {
    */
 
   static propTypes = {
-    autoFocus: React.PropTypes.bool.isRequired,
     autoCorrect: React.PropTypes.bool.isRequired,
+    autoFocus: React.PropTypes.bool.isRequired,
     children: React.PropTypes.array.isRequired,
     className: React.PropTypes.string,
     editor: React.PropTypes.object.isRequired,
