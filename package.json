@@ -16,6 +16,7 @@
     "is-empty": "^1.0.0",
     "keycode": "^2.1.2",
     "react-portal": "^3.0.0",
+    "selection-is-backward": "^1.0.0",
     "type-of": "^2.0.1"
   },
   "peerDependencies": {
@@ -63,7 +64,6 @@
     "react-router": "^2.5.1",
     "read-metadata": "^1.0.0",
     "read-yaml-promise": "^1.0.2",
-    "selection-position": "^1.0.0",
     "slate-auto-replace-text": "^0.3.0",
     "slate-collapse-on-escape": "^0.2.0",
     "slate-soft-break": "^0.2.0",

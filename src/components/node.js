@@ -6,7 +6,8 @@ import ReactDOM from 'react-dom'
 import TYPES from '../constants/types'
 import Leaf from './leaf'
 import Void from './void'
-import scrollTo from '../utils/scroll-to'
+import getWindow from 'get-window'
+import scrollToSelection from '../utils/scroll-to-selection'
 
 /**
  * Debug.
@@ -207,7 +208,9 @@ class Node extends React.Component {
     if (!selection.hasEndIn(node)) return
 
     const el = ReactDOM.findDOMNode(this)
-    scrollTo(el)
+    const window = getWindow(el)
+    const native = window.getSelection()
+    scrollToSelection(native)
 
     this.debug('updateScroll', el)
   }
