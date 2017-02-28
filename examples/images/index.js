@@ -136,7 +136,6 @@ class Images extends React.Component {
           schema={schema}
           state={this.state.state}
           onChange={this.onChange}
-          onDocumentChange={this.onDocumentChange}
           onDrop={this.onDrop}
           onPaste={this.onPaste}
         />
