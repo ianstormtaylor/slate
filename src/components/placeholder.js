@@ -22,7 +22,7 @@ class Placeholder extends React.Component {
     parent: React.PropTypes.object.isRequired,
     state: React.PropTypes.object.isRequired,
     style: React.PropTypes.object
-  };
+  }
 
   /**
    * Should the placeholder update?

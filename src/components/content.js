@@ -35,6 +35,7 @@ class Content extends React.Component {
    */
 
   static propTypes = {
+    autoFocus: React.PropTypes.bool.isRequired,
     autoCorrect: React.PropTypes.bool.isRequired,
     children: React.PropTypes.array.isRequired,
     className: React.PropTypes.string,
@@ -55,7 +56,7 @@ class Content extends React.Component {
     state: React.PropTypes.object.isRequired,
     style: React.PropTypes.object,
     tabIndex: React.PropTypes.number
-  };
+  }
 
   /**
    * Default properties.
@@ -65,7 +66,7 @@ class Content extends React.Component {
 
   static defaultProps = {
     style: {}
-  };
+  }
 
   /**
    * Constructor.
@@ -105,6 +106,17 @@ class Content extends React.Component {
       props.state != this.props.state ||
       props.style != this.props.style
     )
+  }
+
+  /**
+   * On mount, if `autoFocus` is set, focus the editor.
+   */
+
+  componentDidMount = () => {
+    if (this.props.autoFocus) {
+      const el = ReactDOM.findDOMNode(this)
+      el.focus()
+    }
   }
 
   /**

@@ -35,7 +35,7 @@ class Void extends React.Component {
     parent: React.PropTypes.object.isRequired,
     schema: React.PropTypes.object.isRequired,
     state: React.PropTypes.object.isRequired,
-  };
+  }
 
   /**
    * Debug.

@@ -39,7 +39,7 @@ class Leaf extends React.Component {
     schema: React.PropTypes.object.isRequired,
     state: React.PropTypes.object.isRequired,
     text: React.PropTypes.string.isRequired
-  };
+  }
 
   /**
    * Constructor.

@@ -48,6 +48,23 @@ const PLUGINS_PROPS = [
 ]
 
 /**
+ * Pass-through properties of the editor.
+ *
+ * @type {Array}
+ */
+
+const PASS_THROUGH_PROPS = [
+  'autoCorrect',
+  'autoFocus',
+  'className',
+  'readOnly',
+  'role',
+  'spellCheck',
+  'style',
+  'tabIndex',
+]
+
+/**
  * Editor.
  *
  * @type {Component}
@@ -63,6 +80,7 @@ class Editor extends React.Component {
 
   static propTypes = {
     autoCorrect: React.PropTypes.bool,
+    autoFocus: React.PropTypes.bool,
     className: React.PropTypes.string,
     onBeforeChange: React.PropTypes.func,
     onChange: React.PropTypes.func,
@@ -78,8 +96,8 @@ class Editor extends React.Component {
     spellCheck: React.PropTypes.bool,
     state: React.PropTypes.instanceOf(State).isRequired,
     style: React.PropTypes.object,
-    tabIndex: React.PropTypes.number
-  };
+    tabIndex: React.PropTypes.number,
+  }
 
   /**
    * Default properties.
@@ -88,6 +106,7 @@ class Editor extends React.Component {
    */
 
   static defaultProps = {
+    autoFocus: false,
     autoCorrect: true,
     onChange: noop,
     onDocumentChange: noop,
@@ -95,8 +114,8 @@ class Editor extends React.Component {
     plugins: [],
     readOnly: false,
     schema: {},
-    spellCheck: true
-  };
+    spellCheck: true,
+  }
 
   /**
    * When constructed, create a new `Stack` and run `onBeforeChange`.
@@ -241,10 +260,15 @@ class Editor extends React.Component {
     const { props, state } = this
     const { stack } = state
     const handlers = {}
+    const passes = {}
     const children = stack.render(state.state, this)
 
     for (const property of EVENT_HANDLERS) {
       handlers[property] = this[property]
+    }
+
+    for (const property of PASS_THROUGH_PROPS) {
+      passes[property] = this.props[property]
     }
 
     debug('render', { props, state })
@@ -252,17 +276,11 @@ class Editor extends React.Component {
     return (
       <Content
         {...handlers}
+        {...passes}
         editor={this}
         onChange={this.onChange}
         schema={this.getSchema()}
         state={this.getState()}
-        className={props.className}
-        readOnly={props.readOnly}
-        autoCorrect={props.autoCorrect}
-        spellCheck={props.spellCheck}
-        style={props.style}
-        tabIndex={props.tabIndex}
-        role={props.role}
       >
         {children.map((child, i) => <Portal key={i} isOpened>{child}</Portal>)}
       </Content>
