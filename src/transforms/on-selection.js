@@ -21,6 +21,20 @@ Transforms.select = (transform, properties) => {
 }
 
 /**
+ * Selects the whole selection.
+ *
+ * @param {Transform} transform
+ * @param {Object} properties
+ */
+
+Transforms.selectAll = (transform, properties) => {
+  let newSelection = properties.moveAnchorToStartOf(transform.state.document)
+  newSelection = newSelection.moveFocusToEndOf(transform.state.document)
+  newSelection = newSelection.focus()
+  transform.setSelectionOperation(newSelection)
+}
+
+/**
  * Snapshot the current selection.
  *
  * @param {Transform} transform
