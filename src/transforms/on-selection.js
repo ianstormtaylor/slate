@@ -21,6 +21,22 @@ Transforms.select = (transform, properties) => {
 }
 
 /**
+ * Selects the whole selection.
+ *
+ * @param {Transform} transform
+ * @param {Object} properties
+ */
+
+Transforms.selectAll = (transform) => {
+  const { state } = transform
+  const { document, selection } = state
+  const next = selection
+    .moveToRangeOf(document)
+    .focus()
+  transform.setSelectionOperation(next)
+}
+
+/**
  * Snapshot the current selection.
  *
  * @param {Transform} transform
