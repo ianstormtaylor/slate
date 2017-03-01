@@ -48,8 +48,9 @@ Transform methods can either operate on the [`Document`](./document.md), the [`S
   - [`move`](#move)
   - [`moveOffsetsTo`](#moveoffsetsto)
   - [`moveToRangeOf`](#movetorangeof)
-  - [`moveTo`](#moveto)
+  - [`select`](#select)
   - [`selectAll`](#selectall)
+  - [`deselect`](#deselect)
 - [Node Transforms](#node-transforms)
   - [`addMarkByKey`](#addmarkbykey)
   - [`insertNodeByKey`](#insertnodebykey)
@@ -286,20 +287,25 @@ Move the current selection's offsets by  `n`.
 
 Move the current selection's offsets to a new `anchorOffset` and `focusOffset`.
 
-### `moveTo`
-`moveTo(properties: Selection || Object) => Transform`
-
-Move the current selection to a selection with merged `properties`. The `properties` can either be a [`Selection`](./selection.md) object or a plain Javascript object of selection properties.
-
 ### `moveToRangeOf`
 `moveToRangeOf(node: Node) => Transform`
 
 Move the current selection's anchor point to the start of a `node` and its focus point to the end of the `node`.
 
+### `select`
+`select(properties: Selection || Object) => Transform`
+
+Set the current selection to a selection with merged `properties`. The `properties` can either be a [`Selection`](./selection.md) object or a plain Javascript object of selection properties.
+
 ### `selectAll`
 `selectAll() => Transform`
 
 Select the entire document and focus the selection.
+
+### `deselect`
+`deselect() => Transform`
+
+Unset the selection.
 
 
 ## Node Transforms
