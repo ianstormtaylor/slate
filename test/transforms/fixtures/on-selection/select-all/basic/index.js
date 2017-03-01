@@ -14,7 +14,6 @@ export default function (state) {
     anchorOffset: 0,
     focusKey: '4',
     focusOffset: 5,
-    isFocused: true
   })
 
   assert.deepEqual(

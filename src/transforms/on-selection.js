@@ -30,9 +30,7 @@ Transforms.select = (transform, properties) => {
 Transforms.selectAll = (transform) => {
   const { state } = transform
   const { document, selection } = state
-  const next = selection
-    .moveToRangeOf(document)
-    .focus()
+  const next = selection.moveToRangeOf(document)
   transform.setSelectionOperation(next)
 }
 
