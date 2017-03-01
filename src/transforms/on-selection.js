@@ -27,11 +27,13 @@ Transforms.select = (transform, properties) => {
  * @param {Object} properties
  */
 
-Transforms.selectAll = (transform, properties) => {
-  let newSelection = properties.moveAnchorToStartOf(transform.state.document)
-  newSelection = newSelection.moveFocusToEndOf(transform.state.document)
-  newSelection = newSelection.focus()
-  transform.setSelectionOperation(newSelection)
+Transforms.selectAll = (transform) => {
+  const { state } = transform
+  const { document, selection } = state
+  const next = selection
+    .moveToRangeOf(document)
+    .focus()
+  transform.setSelectionOperation(next)
 }
 
 /**
