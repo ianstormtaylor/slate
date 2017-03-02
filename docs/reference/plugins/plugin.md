@@ -205,7 +205,7 @@ _Note: This is **not** Slate's internal selection representation (although it mi
 
 The `onChange` handler isn't a native browser event handler. Instead, it is invoked whenever the editor state changes. Returning a new state will update the editor's state, continuing down the plugin stack.
 
-Unlike the native event handlers, results from the `onChange` handler **are cummulative**! This means that every plugin in the stack that defines an `onChange` handler will have its handler resolved for every change the editor makes; the editor will not return early after the first plugin's handler is called.
+Unlike the native event handlers, results from the `onChange` handler **are cumulative**! This means that every plugin in the stack that defines an `onChange` handler will have its handler resolved for every change the editor makes; the editor will not return early after the first plugin's handler is called.
 
 This allows you to stack up changes across the entire plugin stack.
 
