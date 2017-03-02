@@ -36,7 +36,6 @@ class App extends React.Component {
       .transform()
       .setBlock(isCode ? 'paragraph' : 'code')
       .apply()
-    }
   }
 
   render = () => {
