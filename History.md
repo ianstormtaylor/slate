@@ -4,6 +4,17 @@ This document maintains a list of changes to Slate with each new version. Until 
 
 ---
 
+
+### `0.18.0` — March 2, 2017
+
+###### BREAKING CHANGES
+
+- **The `plugin.render` property is now called `plugin.renderPortal`.** This is to make way for the new `plugin.render` property that offers HOC-like behavior, so that plugins can augment the editor however they choose.
+
+
+---
+
+
 ### `0.17.0` — February 27, 2017
 
 ###### DEPRECATION CHANGES

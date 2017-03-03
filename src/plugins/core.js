@@ -1,5 +1,6 @@
 
 import Base64 from '../serializers/base-64'
+import Content from '../components/content'
 import Character from '../models/character'
 import Debug from 'debug'
 import Placeholder from '../components/placeholder'
@@ -815,6 +816,43 @@ function Plugin(options = {}) {
   }
 
   /**
+   * Render.
+   *
+   * @param {Object} props
+   * @param {State} state
+   * @param {Editor} editor
+   * @return {Object}
+   */
+
+  function render(props, state, editor) {
+    return (
+      <Content
+        autoCorrect={props.autoCorrect}
+        autoFocus={props.autoFocus}
+        className={props.className}
+        children={props.children}
+        editor={editor}
+        onBeforeInput={editor.onBeforeInput}
+        onBlur={editor.onBlur}
+        onChange={editor.onChange}
+        onCopy={editor.onCopy}
+        onCut={editor.onCut}
+        onDrop={editor.onDrop}
+        onKeyDown={editor.onKeyDown}
+        onPaste={editor.onPaste}
+        onSelect={editor.onSelect}
+        readOnly={props.readOnly}
+        role={props.role}
+        schema={editor.getSchema()}
+        spellCheck={props.spellCheck}
+        state={state}
+        style={props.style}
+        tabIndex={props.tabIndex}
+      />
+    )
+  }
+
+  /**
    * A default schema rule to render block nodes.
    *
    * @type {Object}
@@ -892,6 +930,7 @@ function Plugin(options = {}) {
     onKeyDown,
     onPaste,
     onSelect,
+    render,
     schema,
   }
 }

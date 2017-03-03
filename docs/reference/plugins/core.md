@@ -43,6 +43,10 @@ When the user pastes content into the editor, the core plugin handles all pastes
 
 When the user makes a new selection in the DOM, the core plugin updates that selection in Slate's internal data model, re-rendering if it needs to. 
 
+### `render`
+
+Renders all of the default contents of the editor!
+
 ### `schema`
 
 The core plugin defines a schema that enforces a few constraints on the content and defines default block and inline node renderer components—wrapping in a `<div>` and `<span>`, respectively. Each of these components contains `shouldComponentUpdate` logic that prevents unnecessary re-renders.

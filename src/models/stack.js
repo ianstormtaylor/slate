@@ -42,16 +42,6 @@ const STATE_ACCUMULATOR_METHODS = [
 ]
 
 /**
- * Methods that accumulate an array.
- *
- * @type {Array}
- */
-
-const ARRAY_ACCUMULATOR_METHODS = [
-  'render'
-]
-
-/**
  * Default properties.
  *
  * @type {Object}
@@ -93,6 +83,53 @@ class Stack extends new Record(DEFAULTS) {
 
   get kind() {
     return 'stack'
+  }
+
+  /**
+   * Invoke `render` on all of the plugins in reverse, building up a tree of
+   * higher-order components.
+   *
+   * @param {State} state
+   * @param {Editor} editor
+   * @param {Object} children
+   * @param {Object} props
+   * @return {Component}
+   */
+
+  render = (state, editor, props) => {
+    debug('render')
+    const plugins = this.plugins.slice().reverse()
+    let children
+
+    for (const plugin of plugins) {
+      if (!plugin.render) continue
+      children = plugin.render(props, state, editor)
+      props.children = children
+    }
+
+    return children
+  }
+
+  /**
+   * Invoke `renderPortal` on all of the plugins, building a list of portals.
+   *
+   * @param {State} state
+   * @param {Editor} editor
+   * @return {Array}
+   */
+
+  renderPortal = (state, editor) => {
+    debug('renderPortal')
+    const portals = []
+
+    for (const plugin of this.plugins) {
+      if (!plugin.renderPortal) continue
+      const portal = plugin.renderPortal(state, editor)
+      if (portal == null) continue
+      portals.push(portal)
+    }
+
+    return portals
   }
 
 }
@@ -148,31 +185,6 @@ for (const method of STATE_ACCUMULATOR_METHODS) {
     }
 
     return state
-  }
-}
-
-/**
- * Mix in the array accumulator methods.
- *
- * @param {State} state
- * @param {Editor} editor
- * @param {Mixed} ...args
- * @return {Array}
- */
-
-for (const method of ARRAY_ACCUMULATOR_METHODS) {
-  Stack.prototype[method] = function (state, editor, ...args) {
-    debug(method)
-    const array = []
-
-    for (const plugin of this.plugins) {
-      if (!plugin[method]) continue
-      const next = plugin[method](...args, state, editor)
-      if (next == null) continue
-      array.push(next)
-    }
-
-    return array
   }
 }
 

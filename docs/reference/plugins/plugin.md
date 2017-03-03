@@ -20,6 +20,8 @@ When the editor needs to resolve a plugin-related handler, it will loop through 
 - [Other Properties](#other-properties)
   - [`onChange`](#onchange)
   - [`onBeforeChange`](#onbeforechange)
+  - [`render`](#render)
+  - [`renderPortal`](#renderportal)
   - [`schema`](#schema)
 
 
@@ -181,7 +183,7 @@ The `data` object is a convenience object created to standardize the paste metad
 If no other plugin handles this event, it will be handled by the [Core plugin](./core.md).
 
 ### `onSelect`
-`Function onSelect(event: Event, data: Object, state: State, editor: Editor => State || Void`
+`Function onSelect(event: Event, data: Object, state: State, editor: Editor) => State || Void`
 
 This handler is called whenever the native DOM selection changes. 
 
@@ -215,6 +217,16 @@ This allows you to stack up changes across the entire plugin stack.
 The `onBeforeChange` handler isn't a native browser event handler. Instead, it is invoked whenever the editor receives a new state and before propagating a new state to `onChange`. Returning a new state will update the editor's state before rendering, continuing down the plugin stack.
 
 Like `onChange`, `onBeforeChange` is cummulative.
+
+### `render`
+`Function render(props: Object, state: State, editor: Editor) => Object || Void`
+
+The `render` property allows you to define higher-order-component-like behavior. It is passed all of the properties of the editor, including `props.children`. You can then choose to wrap the existing `children` in any custom elements or proxy the properties however you choose. This can be useful for rendering toolbars, styling the editor, rendering validation, etc.
+ 
+### `renderPortal`
+`Function renderPortal(state: State, editor: Editor) => Object || Void`
+
+The `renderPortal` property allows you to define extra elements that will render outside of the editor, in a separate [portal](). This is useful for rendering hovering menus, or other cases where you don't need to render inside the editor, but want to add elements to the DOM.
 
 ### `schema`
 `Object`

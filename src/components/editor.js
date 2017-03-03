@@ -1,5 +1,4 @@
 
-import Content from './content'
 import Debug from 'debug'
 import Portal from 'react-portal'
 import React from 'react'
@@ -45,23 +44,6 @@ const PLUGINS_PROPS = [
   'placeholderStyle',
   'plugins',
   'schema',
-]
-
-/**
- * Pass-through properties of the editor.
- *
- * @type {Array}
- */
-
-const PASS_THROUGH_PROPS = [
-  'autoCorrect',
-  'autoFocus',
-  'className',
-  'readOnly',
-  'role',
-  'spellCheck',
-  'style',
-  'tabIndex',
 ]
 
 /**
@@ -258,32 +240,14 @@ class Editor extends React.Component {
   render = () => {
     const { props, state } = this
     const { stack } = state
-    const handlers = {}
-    const passes = {}
-    const children = stack.render(state.state, this)
-
-    for (const property of EVENT_HANDLERS) {
-      handlers[property] = this[property]
-    }
-
-    for (const property of PASS_THROUGH_PROPS) {
-      passes[property] = this.props[property]
-    }
+    const children = stack
+      .renderPortal(state.state, this)
+      .map((child, i) => <Portal key={i} isOpened>{child}</Portal>)
 
     debug('render', { props, state })
 
-    return (
-      <Content
-        {...handlers}
-        {...passes}
-        editor={this}
-        onChange={this.onChange}
-        schema={this.getSchema()}
-        state={this.getState()}
-      >
-        {children.map((child, i) => <Portal key={i} isOpened>{child}</Portal>)}
-      </Content>
-    )
+    const tree = stack.render(state.state, this, { ...props, children })
+    return tree
   }
 
 }
