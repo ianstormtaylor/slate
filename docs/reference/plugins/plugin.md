@@ -21,7 +21,6 @@ When the editor needs to resolve a plugin-related handler, it will loop through 
   - [`onChange`](#onchange)
   - [`onBeforeChange`](#onbeforechange)
   - [`render`](#render)
-  - [`renderPortal`](#renderportal)
   - [`schema`](#schema)
 
 
@@ -222,11 +221,6 @@ Like `onChange`, `onBeforeChange` is cummulative.
 `Function render(props: Object, state: State, editor: Editor) => Object || Void`
 
 The `render` property allows you to define higher-order-component-like behavior. It is passed all of the properties of the editor, including `props.children`. You can then choose to wrap the existing `children` in any custom elements or proxy the properties however you choose. This can be useful for rendering toolbars, styling the editor, rendering validation, etc.
- 
-### `renderPortal`
-`Function renderPortal(state: State, editor: Editor) => Object || Void`
-
-The `renderPortal` property allows you to define extra elements that will render outside of the editor, in a separate [portal](). This is useful for rendering hovering menus, or other cases where you don't need to render inside the editor, but want to add elements to the DOM.
 
 ### `schema`
 `Object`
