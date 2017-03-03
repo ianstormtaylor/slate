@@ -601,7 +601,7 @@ class Selection extends new Record(DEFAULTS) {
       if (anchorNode.key === focusNode.key) {
         isBackward = anchorOffset > focusOffset
       } else {
-        isBackward = !node.areDescendantSorted(anchorNode.key, focusNode.key)
+        isBackward = !node.areDescendantsSorted(anchorNode.key, focusNode.key)
       }
     }
 

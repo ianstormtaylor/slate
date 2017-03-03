@@ -4,6 +4,29 @@ This document maintains a list of changes to Slate with each new version. Until 
 
 ---
 
+### `0.19.0` — March 3, 2017
+
+###### BREAKING CHANGES
+
+- **The `filterDescendants` and `findDescendants` methods are now depth-first. This shouldn't affect almost anyone, since they are usually not the best things to be using for performance reasons. If you happen to have a very specific use case that needs breadth-first, (or even likely something better), you'll need to implement it yourself.
+
+###### DEPRECATION CHANGES
+
+- **Some `Node` methods have been deprecated!** There were a few methods that had been added over time that were either poorly named that have been deprecated and renamed, and a handful of methods that are no longer useful for the core library that have been deprecated. Here's a full list:
+  - `areDescendantSorted` -> `areDescendantsSorted`
+  - `getHighestChild` -> `getFurthestAncestor`
+  - `getHighestOnlyChildParent` -> `getFurthestOnlyChildAncestor`
+  - `concatChildren`
+  - `decorateTexts`
+  - `filterDescendantsDeep`
+  - `findDescendantDeep`
+  - `getChildrenBetween`
+  - `getChildrenBetweenIncluding`
+  - `isInlineSplitAtRange`
+
+
+---
+
 
 ### `0.18.0` — March 2, 2017
 
@@ -19,7 +42,7 @@ This document maintains a list of changes to Slate with each new version. Until 
 
 ###### DEPRECATION CHANGES
 
-- **Some selection methods have been deprecated!** Previously there were many inconsistencies in the naming and handling of selection changes. This has all been cleaned up, but in the process some methods have been deprecated. Here is a full list of the deprecated methods and their new alternatives:
+- **Some `Selection` methods have been deprecated!** Previously there were many inconsistencies in the naming and handling of selection changes. This has all been cleaned up, but in the process some methods have been deprecated. Here is a full list of the deprecated methods and their new alternatives:
   - `moveToOffsets` -> `moveOffsetsTo`
   - `moveForward` -> `move`
   - `moveBackward` -> `move`

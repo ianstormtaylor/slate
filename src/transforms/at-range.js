@@ -82,8 +82,8 @@ Transforms.deleteAtRange = (transform, range, options = {}) => {
   let { state } = transform
   let { document } = state
   let ancestor = document.getCommonAncestor(startKey, endKey)
-  let startChild = ancestor.getHighestChild(startKey)
-  let endChild = ancestor.getHighestChild(endKey)
+  let startChild = ancestor.getFurthestAncestor(startKey)
+  let endChild = ancestor.getFurthestAncestor(endKey)
   const startOff = (startChild.kind == 'text' ? 0 : startChild.getOffset(startKey)) + startOffset
   const endOff = (endChild.kind == 'text' ? 0 : endChild.getOffset(endKey)) + endOffset
 
@@ -94,8 +94,8 @@ Transforms.deleteAtRange = (transform, range, options = {}) => {
   state = transform.state
   document = state.document
   ancestor = document.getCommonAncestor(startKey, endKey)
-  startChild = ancestor.getHighestChild(startKey)
-  endChild = ancestor.getHighestChild(endKey)
+  startChild = ancestor.getFurthestAncestor(startKey)
+  endChild = ancestor.getFurthestAncestor(endKey)
   const startIndex = ancestor.nodes.indexOf(startChild)
   const endIndex = ancestor.nodes.indexOf(endChild)
   const middles = ancestor.nodes.slice(startIndex + 1, endIndex + 1)
@@ -120,7 +120,7 @@ Transforms.deleteAtRange = (transform, range, options = {}) => {
     })
 
     // Remove parents of endBlock as long as they have a single child
-    const lonely = document.getHighestOnlyChildParent(endBlock.key) || endBlock
+    const lonely = document.getFurthestOnlyChildAncestor(endBlock.key) || endBlock
     transform.removeNodeByKey(lonely.key, OPTS)
   }
 
@@ -299,7 +299,7 @@ Transforms.deleteBackwardAtRange = (transform, range, n = 1, options = {}) => {
 
   // If the focus node is inside a void, go up until right after it.
   if (document.hasVoidParent(node.key)) {
-    const parent = document.getClosest(node.key, p => p.isVoid)
+    const parent = document.getClosestVoid(node.key)
     node = document.getNextText(parent.key)
     offset = 0
   }
@@ -483,7 +483,7 @@ Transforms.deleteForwardAtRange = (transform, range, n = 1, options = {}) => {
 
   // If the focus node is inside a void, go up until right before it.
   if (document.hasVoidParent(node.key)) {
-    const parent = document.getClosest(node.key, p => p.isVoid)
+    const parent = document.getClosestVoid(node.key)
     node = document.getPreviousText(parent.key)
     offset = node.length
   }
@@ -585,7 +585,7 @@ Transforms.insertFragmentAtRange = (transform, range, fragment, options = {}) =>
   let { document } = state
   let startText = document.getDescendant(startKey)
   let startBlock = document.getClosestBlock(startText.key)
-  let startChild = startBlock.getHighestChild(startText.key)
+  let startChild = startBlock.getFurthestAncestor(startText.key)
   const isAtStart = range.isAtStartOf(startBlock)
   const parent = document.getParent(startBlock.key)
   const index = parent.nodes.indexOf(startBlock)
@@ -621,7 +621,7 @@ Transforms.insertFragmentAtRange = (transform, range, fragment, options = {}) =>
   document = state.document
   startText = document.getDescendant(startKey)
   startBlock = document.getClosestBlock(startKey)
-  startChild = startBlock.getHighestChild(startText.key)
+  startChild = startBlock.getFurthestAncestor(startText.key)
 
   // If the first and last block aren't the same, we need to move any of the
   // starting block's children after the split into the last block of the
@@ -647,7 +647,7 @@ Transforms.insertFragmentAtRange = (transform, range, fragment, options = {}) =>
   // Otherwise, we maintain the starting block, and insert all of the first
   // block's inline nodes into it at the split point.
   else {
-    const inlineChild = startBlock.getHighestChild(startText.key)
+    const inlineChild = startBlock.getFurthestAncestor(startText.key)
     const inlineIndex = startBlock.nodes.indexOf(inlineChild)
 
     firstBlock.nodes.forEach((inline, i) => {
@@ -1149,8 +1149,8 @@ Transforms.wrapInlineAtRange = (transform, range, inline, options = {}) => {
   const blocks = document.getBlocksAtRange(range)
   let startBlock = document.getClosestBlock(startKey)
   let endBlock = document.getClosestBlock(endKey)
-  let startChild = startBlock.getHighestChild(startKey)
-  const endChild = endBlock.getHighestChild(endKey)
+  let startChild = startBlock.getFurthestAncestor(startKey)
+  const endChild = endBlock.getFurthestAncestor(endKey)
   const startIndex = startBlock.nodes.indexOf(startChild)
   const endIndex = endBlock.nodes.indexOf(endChild)
 
@@ -1174,7 +1174,7 @@ Transforms.wrapInlineAtRange = (transform, range, inline, options = {}) => {
     state = transform.state
     document = state.document
     startBlock = document.getClosestBlock(startKey)
-    startChild = startBlock.getHighestChild(startKey)
+    startChild = startBlock.getFurthestAncestor(startKey)
 
     const startInner = startOff == 0
       ? startChild
@@ -1182,7 +1182,7 @@ Transforms.wrapInlineAtRange = (transform, range, inline, options = {}) => {
 
     const startInnerIndex = startBlock.nodes.indexOf(startInner)
 
-    const endInner = startKey == endKey ? startInner : startBlock.getHighestChild(endKey)
+    const endInner = startKey == endKey ? startInner : startBlock.getFurthestAncestor(endKey)
     const inlines = startBlock.nodes
       .skipUntil(n => n == startInner)
       .takeUntil(n => n == endInner)

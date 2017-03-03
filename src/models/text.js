@@ -378,6 +378,7 @@ class Text extends new Record(DEFAULTS) {
 memoize(Text.prototype, [
   'getDecorations',
   'getDecorators',
+  'getMarksAtIndex',
   'getRanges',
   'validate'
 ])
