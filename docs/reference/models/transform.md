@@ -43,9 +43,11 @@ Transform methods can either operate on the [`Document`](./document.md), the [`S
   - [`collapseTo{Edge}Of{Direction}Text`](#collapsetoedgeofdirectiontext)
   - [`collapseTo{Edge}`](#collapsetoedge)
   - [`extendTo{Edge}Of`](#extendtoedgeof)
-  - [`extend{Direction}`](#extenddirection)
+  - [`extend`](#extend)
+  - [`flip`](#flip)
   - [`focus`](#focus)
   - [`move`](#move)
+  - [`move{Edge}`](#moveedge)
   - [`moveOffsetsTo`](#moveoffsetsto)
   - [`moveToRangeOf`](#movetorangeof)
   - [`select`](#select)
@@ -262,15 +264,20 @@ Collapse the current selection to the `{Edge}` of the next [`Block`](./block.md)
 
 Collapse the current selection to the `{Edge}` of the next [`Text`](./text.md) node in `{Direction}`. Where `{Edge}` is either `{Start}` or `{End}` and `{Direction}` is either `Next` or `Previous`.
 
-### `extend{Direction}`
-`extend{Direction}(n: Number) => Transform`
+### `extend`
+`extend(n: Number) => Transform`
 
-Extend the current selection's points `n` characters in `{Direction}`. Where `{Direction}` is either `Backward` or `Forward`.
+Extend the current selection's points by `n` characters. `n` can be positive or negative to indicate direction.
 
 ### `extendTo{Edge}Of`
 `extendTo{Edge}Of(node: Node) => Transform`
 
 Extend the current selection to the `{Edge}` of a `node`. Where `{Edge}` is either `Start` or `End`.
+
+### `flip`
+`flip() => Transform`
+
+Flip the selection.
 
 ### `focus`
 `focus() => Transform`
@@ -281,6 +288,11 @@ Focus the current selection.
 `move(n: Number) => Transform`
 
 Move the current selection's offsets by  `n`.
+
+### `move{Edge}`
+`move{Edge}(n: Number) => Transform`
+
+Move the current selection's `edge` offset by  `n`. `edge` can be one of `Start`, `End`.
 
 ### `moveOffsetsTo`
 `moveOffsetsTo(anchorOffset: Number, focusOffset: Number) => Transform`
