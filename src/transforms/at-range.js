@@ -1032,7 +1032,7 @@ Transforms.unwrapInlineAtRange = (transform, range, properties, options = {}) =>
     .toList()
 
   inlines.forEach((inline) => {
-    const parent = document.getParent(inline.key)
+    const parent = transform.state.document.getParent(inline.key)
     const index = parent.nodes.indexOf(inline)
 
     inline.nodes.forEach((child, i) => {
