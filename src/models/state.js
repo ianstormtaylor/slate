@@ -42,10 +42,12 @@ class State extends new Record(DEFAULTS) {
    * Create a new `State` with `properties`.
    *
    * @param {Object|State} properties
+   * @param {Object} options
+   *   @property {Boolean} normalize
    * @return {State}
    */
 
-  static create(properties = {}) {
+  static create(properties = {}, options = {}) {
     if (properties instanceof State) return properties
 
     const document = Document.create(properties.document)
@@ -58,9 +60,9 @@ class State extends new Record(DEFAULTS) {
 
     const state = new State({ document, selection })
 
-    return state.transform()
-      .normalize(SCHEMA)
-      .apply({ save: false })
+    return options.normalize === false
+      ? state
+      : state.transform().normalize(SCHEMA).apply({ save: false })
   }
 
   /**

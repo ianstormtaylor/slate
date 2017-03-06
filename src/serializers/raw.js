@@ -182,7 +182,7 @@ const Raw = {
       selection = Raw.deserializeSelection(object.selection, options)
     }
 
-    return State.create({ document, selection })
+    return State.create({ document, selection }, options)
   },
 
   /**

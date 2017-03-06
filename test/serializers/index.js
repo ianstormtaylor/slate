@@ -54,6 +54,31 @@ describe('serializers', () => {
           }
         })
       })
+
+      it('optionally does not normalize', () => {
+        const html = new Html(require('./fixtures/html/deserialize/inline-with-is-void').default)
+        const input = fs.readFileSync(resolve(__dirname, './fixtures/html/deserialize/inline-with-is-void/input.html'), 'utf8')
+        const serialized = html.deserialize(input, { toRaw: true, normalize: false })
+        assert.deepEqual(serialized, {
+          kind: 'state',
+          document: {
+            kind: 'document',
+            nodes: [
+              {
+                kind: 'block',
+                type: 'paragraph',
+                nodes: [
+                  {
+                    kind: 'inline',
+                    type: 'link',
+                    isVoid: true,
+                  }
+                ]
+              }
+            ]
+          }
+        })
+      })
     })
 
     describe('serialize()', () => {
