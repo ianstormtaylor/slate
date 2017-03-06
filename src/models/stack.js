@@ -22,6 +22,7 @@ const debug = Debug('slate:stack')
 const EVENT_HANDLER_METHODS = [
   'onBeforeInput',
   'onBlur',
+  'onFocus',
   'onCopy',
   'onCut',
   'onDrop',
