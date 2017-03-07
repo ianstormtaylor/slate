@@ -2,7 +2,7 @@
 import Base64 from '../serializers/base-64'
 import Debug from 'debug'
 import Node from './node'
-import OffsetKey from '../utils/offset-key'
+import getPoint from '../utils/get-point'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import Selection from '../models/selection'
@@ -148,24 +148,7 @@ class Content extends React.Component {
 
   getPoint(element, offset) {
     const { state, editor } = this.props
-    const { document } = state
-    const schema = editor.getSchema()
-
-    // If we can't find an offset key, we can't get a point.
-    const offsetKey = OffsetKey.findKey(element, offset)
-    if (!offsetKey) return null
-
-    // COMPAT: If someone is clicking from one Slate editor into another, the
-    // select event fires two, once for the old editor's `element` first, and
-    // then afterwards for the correct `element`. (2017/03/03)
-    const { key } = offsetKey
-    const node = document.getDescendant(key)
-    if (!node) return null
-
-    const decorators = document.getDescendantDecorators(key, schema)
-    const ranges = node.getRanges(decorators)
-    const point = OffsetKey.findPoint(offsetKey, ranges)
-    return point
+    return getPoint(element, offset, state, editor)
   }
 
   /**
