@@ -45,6 +45,7 @@ If you want to edit the source while running the examples and have those changes
 ```
 npm run watch
 ```
+And open `http://localhost:8080/dev.html`
 
 
 ## Development Examples
