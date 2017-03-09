@@ -2,6 +2,7 @@
 import { Editor, Mark, Raw } from '../..'
 import React from 'react'
 import initialState from './state.json'
+/* global Prism */
 // Prism is loaded in ../index.html or ./dev.html
 
 
@@ -72,6 +73,7 @@ class CodeHighlighting extends React.Component {
       </div>
     )
   }
+
 }
 
 
@@ -83,7 +85,6 @@ class CodeHighlighting extends React.Component {
  */
 
 function CodeBlock(props) {
-
   const { editor, node } = props
   const language = node.data.get('language')
 
@@ -143,7 +144,7 @@ function prismDecorator(text, block) {
   const tokens = Prism.tokenize(string, grammar)
 
   // Current Token position in the string
-  let offset = 0
+  const offset = 0
 
   characters = mergePrismTokensInCharacters(characters, tokens, offset)
 
@@ -153,15 +154,15 @@ function prismDecorator(text, block) {
 
 /**
  * Define Marks by the Prism tokens and add them to the characters
- * 
+ *
  * @param {Characters} characters
  * @param {Array<PrimsTokens>} tokens
  * @param {number} [offset=0]
  * @returns
  */
-function mergePrismTokensInCharacters(characters, tokens, offset = 0) {    
+
+function mergePrismTokensInCharacters(characters, tokens, offset = 0) {
   tokens.forEach((token) => {
-    
     if (typeof token == 'string') {
       // It not a token, just is string to indicate the content of the Parent token
       // Nothing to do here
@@ -174,10 +175,10 @@ function mergePrismTokensInCharacters(characters, tokens, offset = 0) {
     // The Type of the Mark
     // This has to be styled in Schema.marks
     const type = token.type
-    
+
     characters = applyMarksToCharacters(characters, offset, length, type)
 
-    if(Array.isArray(token.content)) {
+    if (Array.isArray(token.content)) {
       // This Tokens has child tokens, same again
       characters = mergePrismTokensInCharacters(characters, token.content, offset)
     }
@@ -190,13 +191,14 @@ function mergePrismTokensInCharacters(characters, tokens, offset = 0) {
 
 /**
  * Adds Marks to the characters in the given range
- * 
+ *
  * @param {Characters} characters
  * @param {number} offset
  * @param {number} length
  * @param {string} markType
  * @returns {Characters}
  */
+
 function applyMarksToCharacters(characters, offset, length, markType) {
   for (let i = offset; i < length; i++) {
     let char = characters.get(i)
@@ -213,6 +215,7 @@ function applyMarksToCharacters(characters, offset, length, markType) {
  *
  * @type {Object}
  */
+
 const schema = {
   nodes: {
     code: {
@@ -245,9 +248,6 @@ const schema = {
     'boolean': {
       color: '#905'
     },
-    'property': {
-      opacity: .7
-    },
     'string': {
       color: '#690'
     },
@@ -266,7 +266,7 @@ const schema = {
     // Markdown
     'title': {
       fontSize: '25px',
-      margin: "20px 0 10px 0",
+      margin: '20px 0 10px 0',
     },
     'bold': {
       fontWeight: 'bold'
@@ -281,7 +281,7 @@ const schema = {
     },
     'hr': {
       borderBottom: '2px solid #000',
-      display: "inline-block",
+      display: 'inline-block',
       width: '100%',
       margin: '10px 0',
       opacity: 0.5
@@ -291,7 +291,7 @@ const schema = {
       textDecoration: 'underline'
     },
 
-    // HTML 
+    // HTML
     'tag': {
       color: '#009'
     }
