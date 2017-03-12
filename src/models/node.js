@@ -525,9 +525,9 @@ const Node = {
       : node.getFurthestAncestor(endKey)
 
     // Get children range of nodes from start to end nodes
-    const starIndex = node.nodes.indexOf(startNode)
+    const startIndex = node.nodes.indexOf(startNode)
     const endIndex = node.nodes.indexOf(endNode)
-    nodes = node.nodes.slice(starIndex, endIndex + 1)
+    nodes = node.nodes.slice(startIndex, endIndex + 1)
 
     // Return a new document fragment.
     return Document.create({ nodes })
