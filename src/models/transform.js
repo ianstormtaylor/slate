@@ -53,7 +53,7 @@ class Transform {
 
   apply(options = {}) {
     const transform = this
-    let { merge, save, isNative = false } = options
+    let { merge, save, isNative = false, selectionNeedsRedraw = true } = options
 
     // Ensure that the selection is normalized.
     transform.normalizeSelection()
@@ -85,7 +85,7 @@ class Transform {
     if (save) this.save({ merge })
 
     // Return the new state with the `isNative` flag set.
-    return this.state.merge({ isNative: !!isNative })
+    return this.state.merge({ isNative: !!isNative, selectionNeedsRedraw: !!selectionNeedsRedraw })
   }
 
 }

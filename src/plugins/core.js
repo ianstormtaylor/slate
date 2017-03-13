@@ -812,7 +812,7 @@ function Plugin(options = {}) {
     return state
       .transform()
       .select(data.selection)
-      .apply()
+      .apply({ selectionNeedsRedraw: false })
   }
 
   /**

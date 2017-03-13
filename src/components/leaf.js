@@ -101,7 +101,7 @@ class Leaf extends React.Component {
     if (props.state.isFocused) {
       const { index, node, ranges, state } = props
       const { start, end } = OffsetKey.findBounds(index, ranges)
-      if (state.selection.hasEdgeBetween(node, start, end)) return true
+      if (state.selectionNeedsRedraw && state.selection.hasEdgeBetween(node, start, end)) return true
     }
 
     // Otherwise, don't update.
