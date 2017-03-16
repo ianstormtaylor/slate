@@ -508,7 +508,7 @@ Transforms.deleteForwardAtRange = (transform, range, n = 1, options = {}) => {
 
 Transforms.insertBlockAtRange = (transform, range, block, options = {}) => {
   block = Normalize.block(block)
-  const { normalize = true } = options
+  const { normalize = true, replaceEmpty = true } = options
 
   if (range.isExpanded) {
     transform.deleteAtRange(range)
@@ -527,7 +527,7 @@ Transforms.insertBlockAtRange = (transform, range, block, options = {}) => {
     transform.insertNodeByKey(parent.key, index + 1, block, { normalize })
   }
 
-  else if (startBlock.isEmpty) {
+  else if (startBlock.isEmpty && replaceEmpty) {
     transform.removeNodeByKey(startBlock.key)
     transform.insertNodeByKey(parent.key, index, block, { normalize })
   }

@@ -163,11 +163,11 @@ Transforms.deleteWordForward = (transform) => {
  * @param {String|Object|Block} block
  */
 
-Transforms.insertBlock = (transform, block) => {
+Transforms.insertBlock = (transform, block, options) => {
   block = Normalize.block(block)
   const { state } = transform
   const { selection } = state
-  transform.insertBlockAtRange(selection, block)
+  transform.insertBlockAtRange(selection, block, options)
 
   // If the node was successfully inserted, update the selection.
   const node = transform.state.document.getNode(block.key)
