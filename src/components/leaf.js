@@ -88,23 +88,16 @@ class Leaf extends React.Component {
     const text = this.renderText(props)
     if (el.textContent != text) return true
 
-    // If the selection was previously focused, and now it isn't, re-render so
-    // that the selection will be properly removed.
-    if (this.props.state.isFocused && props.state.isBlurred) {
-      const { index, node, ranges, state } = this.props
-      const { start, end } = OffsetKey.findBounds(index, ranges)
-      if (state.selection.hasEdgeBetween(node, start, end)) return true
-    }
-
-    // If the selection will be focused, only re-render if this leaf contains
-    // one or both of the selection's edges.
-    if (props.state.isFocused) {
+    // If the selection will be focused and native selection is not already
+    // in syncro with it, update native selection.
+    if (props.state.isFocused && props.selectionNeedsRedraw) {
       const { index, node, ranges, state } = props
       const { start, end } = OffsetKey.findBounds(index, ranges)
-      if (state.selectionNeedsRedraw && state.selection.hasEdgeBetween(node, start, end)) return true
+      if (state.selection.hasEdgeBetween(node, start, end)) {
+        this.updateSelection(props)
+      }
     }
 
-    // Otherwise, don't update.
     return false
   }
 
@@ -113,25 +106,25 @@ class Leaf extends React.Component {
    */
 
   componentDidMount() {
-    this.updateSelection()
+    this.updateSelection(this.props)
   }
 
   componentDidUpdate() {
-    this.updateSelection()
+    this.updateSelection(this.props)
   }
 
   /**
    * Update the DOM selection if it's inside the leaf.
    */
 
-  updateSelection() {
-    const { state, ranges } = this.props
+  updateSelection(props) {
+    const { state, ranges } = props
     const { selection } = state
 
     // If the selection is blurred we have nothing to do.
     if (selection.isBlurred) return
 
-    const { node, index } = this.props
+    const { node, index } = props
     const { start, end } = OffsetKey.findBounds(index, ranges)
     const anchorOffset = selection.anchorOffset - start
     const focusOffset = selection.focusOffset - start

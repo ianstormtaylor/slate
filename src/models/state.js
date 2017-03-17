@@ -27,8 +27,7 @@ const DEFAULTS = {
   document: new Document(),
   selection: new Selection(),
   history: new History(),
-  isNative: false,
-  selectionNeedsRedraw: true
+  isNative: false
 }
 
 /**

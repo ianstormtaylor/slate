@@ -37,6 +37,7 @@ class Node extends React.Component {
     parent: React.PropTypes.object.isRequired,
     readOnly: React.PropTypes.bool.isRequired,
     schema: React.PropTypes.object.isRequired,
+    selectionNeedsRedraw: React.PropTypes.bool.isRequired,
     state: React.PropTypes.object.isRequired
   }
 
@@ -263,6 +264,7 @@ class Node extends React.Component {
         editor={this.props.editor}
         readOnly={this.props.readOnly}
         schema={this.props.schema}
+        selectionNeedsRedraw={this.props.selectionNeedsRedraw}
         state={this.props.state}
       />
     )
@@ -351,7 +353,7 @@ class Node extends React.Component {
    */
 
   renderLeaf = (ranges, range, index, offset) => {
-    const { node, parent, schema, state, editor } = this.props
+    const { node, parent, schema, selectionNeedsRedraw, state, editor } = this.props
     const { text, marks } = range
 
     return (
@@ -365,6 +367,7 @@ class Node extends React.Component {
         parent={parent}
         ranges={ranges}
         schema={schema}
+        selectionNeedsRedraw={selectionNeedsRedraw}
         state={state}
         text={text}
       />
