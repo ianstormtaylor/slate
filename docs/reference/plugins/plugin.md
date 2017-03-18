@@ -11,6 +11,7 @@ When the editor needs to resolve a plugin-related handler, it will loop through 
 - [Event Handler Properties](#event-handle-properties)
   - [`onBeforeInput`](#onbeforeinput)
   - [`onBlur`](#onblur)
+  - [`onFocus`](#onfocus)
   - [`onCopy`](#oncopy)
   - [`onCut`](#oncut)
   - [`onDrop`](#ondrop)
@@ -43,6 +44,7 @@ export default MySlatePlugin(options) {
 {
   onBeforeInput: Function,
   onBlur: Function,
+  onFocus: Function,
   onCopy: Function,
   onCut: Function,
   onDrop: Function,
@@ -67,6 +69,13 @@ Make sure to `event.preventDefault()` if you do not want the default insertion b
 `Function onBlur(event: Event, data: Object, state: State, editor: Editor) => State || Void`
 
 This handler is called when the editor's `contenteditable` element is blurred.
+
+If no other plugin handles this event, it will be handled by the [Core plugin](./core.md).
+
+### `onFocus`
+`Function onFocus(event: Event, data: Object, state: State, editor: Editor) => State || Void`
+
+This handler is called when the editor's `contenteditable` element is focused.
 
 If no other plugin handles this event, it will be handled by the [Core plugin](./core.md).
 

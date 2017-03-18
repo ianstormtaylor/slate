@@ -168,6 +168,26 @@ function Plugin(options = {}) {
   }
 
   /**
+   * On focus.
+   *
+   * @param {Event} e
+   * @param {Object} data
+   * @param {State} state
+   * @return {State}
+   */
+
+  function onFocus(e, data, state) {
+    const isNative = true
+
+    debug('onFocus', { data, isNative })
+
+    return state
+      .transform()
+      .focus()
+      .apply({ isNative })
+  }
+
+  /**
    * On copy.
    *
    * @param {Event} e
@@ -834,6 +854,7 @@ function Plugin(options = {}) {
         editor={editor}
         onBeforeInput={editor.onBeforeInput}
         onBlur={editor.onBlur}
+        onFocus={editor.onFocus}
         onChange={editor.onChange}
         onCopy={editor.onCopy}
         onCut={editor.onCut}
@@ -924,6 +945,7 @@ function Plugin(options = {}) {
     onBeforeChange,
     onBeforeInput,
     onBlur,
+    onFocus,
     onCopy,
     onCut,
     onDrop,

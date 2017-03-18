@@ -46,6 +46,7 @@ class Content extends React.Component {
     onCopy: React.PropTypes.func.isRequired,
     onCut: React.PropTypes.func.isRequired,
     onDrop: React.PropTypes.func.isRequired,
+    onFocus: React.PropTypes.func.isRequired,
     onKeyDown: React.PropTypes.func.isRequired,
     onPaste: React.PropTypes.func.isRequired,
     onSelect: React.PropTypes.func.isRequired,
@@ -227,6 +228,23 @@ class Content extends React.Component {
 
     debug('onBlur', { event, data })
     this.props.onBlur(event, data)
+  }
+
+  /**
+   * On focus, update the selection to be focused.
+   *
+   * @param {Event} event
+   */
+
+  onFocus = (event) => {
+    if (this.props.readOnly) return
+    if (this.tmp.isCopying) return
+    if (!this.isInContentEditable(event)) return
+
+    const data = {}
+
+    debug('onFocus', { event, data })
+    this.props.onFocus(event, data)
   }
 
   /**
@@ -755,6 +773,7 @@ class Content extends React.Component {
         className={className}
         onBeforeInput={this.onBeforeInput}
         onBlur={this.onBlur}
+        onFocus={this.onFocus}
         onCompositionEnd={this.onCompositionEnd}
         onCompositionStart={this.onCompositionStart}
         onCopy={this.onCopy}
