@@ -13,17 +13,17 @@ function scrollToSelection(selection) {
   const backward = isBackward(selection)
   const range = selection.getRangeAt(0)
   const rect = range.getBoundingClientRect()
-  const { innerWidth, innerHeight, scrollY, scrollX } = window
-  const top = (backward ? rect.top : rect.bottom) + scrollY
-  const left = (backward ? rect.left : rect.right) + scrollX
+  const { innerWidth, innerHeight, pageYOffset, pageXOffset } = window
+  const top = (backward ? rect.top : rect.bottom) + pageYOffset
+  const left = (backward ? rect.left : rect.right) + pageXOffset
 
-  const x = left < scrollX || innerWidth + scrollX < left
+  const x = left < pageXOffset || innerWidth + pageXOffset < left
     ? left - innerWidth / 2
-    : scrollX
+    : pageXOffset
 
-  const y = top < scrollY || innerHeight + scrollY < top
+  const y = top < pageYOffset || innerHeight + pageYOffset < top
     ? top - innerHeight / 2
-    : scrollY
+    : pageYOffset
 
   window.scrollTo(x, y)
 }
