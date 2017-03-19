@@ -88,15 +88,9 @@ class Leaf extends React.Component {
     const text = this.renderText(props)
     if (el.textContent != text) return true
 
-    // If the selection will be focused and native selection is not already
-    // in syncro with it, update native selection.
-    if (props.state.isFocused && props.selectionNeedsRedraw) {
-      const { index, node, ranges, state } = props
-      const { start, end } = OffsetKey.findBounds(index, ranges)
-      if (state.selection.hasEdgeBetween(node, start, end)) {
-        this.updateSelection(props)
-      }
-    }
+    // When just selection is changed we don't need to re-render, but still we
+    // have to update native selection.
+    if (props.redrawSelection) this.updateSelection(props)
 
     return false
   }
@@ -118,16 +112,9 @@ class Leaf extends React.Component {
    */
 
   updateSelection(props) {
-    const { state, ranges } = props
+    const { index, node, ranges, state } = props
     const { selection } = state
-
-    // If the selection is blurred we have nothing to do.
-    if (selection.isBlurred) return
-
-    const { node, index } = props
     const { start, end } = OffsetKey.findBounds(index, ranges)
-    const anchorOffset = selection.anchorOffset - start
-    const focusOffset = selection.focusOffset - start
 
     // If neither matches, the selection doesn't start or end here, so exit.
     const hasAnchor = selection.hasAnchorBetween(node, start, end)
@@ -135,6 +122,8 @@ class Leaf extends React.Component {
     if (!hasAnchor && !hasFocus) return
 
     // We have a selection to render, so prepare a few things...
+    const anchorOffset = selection.anchorOffset - start
+    const focusOffset = selection.focusOffset - start
     const ref = ReactDOM.findDOMNode(this)
     const el = findDeepestNode(ref)
     const window = getWindow(el)

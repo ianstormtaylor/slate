@@ -708,8 +708,8 @@ class Content extends React.Component {
     // Store the document and selection after the `onSelect` event.
     // At rendering time, if they are unchanged we'll avoid to render
     // the native selection again.
-    this.onSelectDocument = document
-    this.onSelectSelection = data.selection
+    this.tmp.document = document
+    this.tmp.selection = data.selection
 
     debug('onSelect', { event, data })
     this.props.onSelect(event, data)
@@ -726,25 +726,24 @@ class Content extends React.Component {
     const { className, readOnly, state, tabIndex, role } = props
     const { document, selection } = state
 
-    let selectionNeedsRedraw = true
+    // If selection is blurred or document and selection are the same we have
+    // stored after `onSelect` event, selection does not need to be rendered.
+    let redrawSelection = selection.isFocused
 
-    // If document and selection are the same we have stored after `onSelect`
-    // event, native selection does not need to be rendered again.
-    if (this.onSelectSelection) {
-      selectionNeedsRedraw = (
-        this.onSelectSelection.anchorKey !== selection.anchorKey ||
-        this.onSelectSelection.anchorOffset !== selection.anchorOffset ||
-        this.onSelectSelection.focusKey !== selection.focusKey ||
-        this.onSelectSelection.focusOffset !== selection.focusOffset ||
-        this.onSelectDocument !== document
+    if (this.tmp.selection) {
+      redrawSelection = (
+        redrawSelection && (
+          !selection.equals(this.tmp.selection) ||
+          document !== this.tmp.document
+        )
       )
 
-      this.onSelectDocument = null
-      this.onSelectSelection = null
+      this.tmp.document = null
+      this.tmp.selection = null
     }
 
     const children = document.nodes
-      .map(node => this.renderNode(node, selectionNeedsRedraw))
+      .map(node => this.renderNode(node, { redrawSelection }))
       .toArray()
 
     const style = {
@@ -811,7 +810,8 @@ class Content extends React.Component {
    * @return {Element}
    */
 
-  renderNode = (node, selectionNeedsRedraw) => {
+  renderNode = (node, options) => {
+    const { redrawSelection } = options
     const { editor, readOnly, schema, state } = this.props
 
     return (
@@ -823,7 +823,7 @@ class Content extends React.Component {
         state={state}
         editor={editor}
         readOnly={readOnly}
-        selectionNeedsRedraw={selectionNeedsRedraw}
+        redrawSelection={redrawSelection}
       />
     )
   }
