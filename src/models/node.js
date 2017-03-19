@@ -524,7 +524,10 @@ const Node = {
       ? node.getFurthestAncestor(next.key)
       : node.getFurthestAncestor(endKey)
 
-    nodes = node.getChildrenBetweenIncluding(startNode.key, endNode.key)
+    // Get children range of nodes from start to end nodes
+    const startIndex = node.nodes.indexOf(startNode)
+    const endIndex = node.nodes.indexOf(endNode)
+    nodes = node.nodes.slice(startIndex, endIndex + 1)
 
     // Return a new document fragment.
     return Document.create({ nodes })
