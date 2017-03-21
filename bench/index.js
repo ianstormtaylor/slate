@@ -3,44 +3,43 @@
  * Polyfills.
  */
 
-import 'jsdom-global/register'
+require('jsdom-global/register')
 
 /**
  * Dependencies.
  */
 
-import bench from 'nanobench'
-import fs from 'fs'
-import path from 'path'
-import readMetadata from 'read-metadata'
-import { __clear } from '../lib/utils/memoize'
-import { Raw } from '..'
+const fs = require('fs')
+const path = require('path')
+const readMetadata = require('read-metadata')
+const { __clear } = require('../lib/utils/memoize')
+const { Raw } = require('..')
 
 /**
  * Benchmarks.
  */
 
-const fixtures = path.resolve(__dirname, './fixtures')
-const benchmarks = fs.readdirSync(fixtures)
+suite('benchmarks', () => {
+  const fixtures = path.resolve(__dirname, './fixtures')
+  const benchmarks = fs.readdirSync(fixtures)
 
-for (const benchmark of benchmarks) {
-  if (benchmark[0] === '.') continue
-  const dir = path.resolve(fixtures, benchmark)
-  const input = readMetadata.sync(path.resolve(dir, 'input.yaml'))
-  const initial = Raw.deserialize(input, { terse: true })
-  const module = require(dir)
-  const run = module.default
+  benchmarks.forEach((benchmark) => {
+    if (benchmark[0] === '.') return
+    if (benchmark === 'normalize-document-twice') return
 
-  bench(benchmark, (b) => {
-    let state = initial
-    if (module.before) state = module.before(state)
-    b.start()
+    const dir = path.resolve(fixtures, benchmark)
+    const input = readMetadata.sync(path.resolve(dir, 'input.yaml'))
+    const initial = Raw.deserialize(input, { terse: true })
+    const module = require(dir)
+    const run = module.default
+    const state = module.before ? module.before(initial) : initial
 
-    for (let i = 0; i < 100; i++) {
+    bench(benchmark, () => { // eslint-disable-line no-undef
       run(state)
-    }
+    })
 
-    b.end()
-    __clear()
+    after(() => {
+      __clear()
+    })
   })
-}
+})
