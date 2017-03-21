@@ -105,32 +105,10 @@ class Stack extends new Record(DEFAULTS) {
     for (const plugin of plugins) {
       if (!plugin.render) continue
       children = plugin.render(props, state, editor)
-      props.children = children
+      props = { ...props, children }
     }
 
     return children
-  }
-
-  /**
-   * Invoke `renderPortal` on all of the plugins, building a list of portals.
-   *
-   * @param {State} state
-   * @param {Editor} editor
-   * @return {Array}
-   */
-
-  renderPortal = (state, editor) => {
-    debug('renderPortal')
-    const portals = []
-
-    for (const plugin of this.plugins) {
-      if (!plugin.renderPortal) continue
-      const portal = plugin.renderPortal(state, editor)
-      if (portal == null) continue
-      portals.push(portal)
-    }
-
-    return portals
   }
 
 }

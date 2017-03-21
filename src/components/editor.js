@@ -241,13 +241,10 @@ class Editor extends React.Component {
   render = () => {
     const { props, state } = this
     const { stack } = state
-    const children = stack
-      .renderPortal(state.state, this)
-      .map((child, i) => <Portal key={i} isOpened>{child}</Portal>)
 
     debug('render', { props, state })
 
-    const tree = stack.render(state.state, this, { ...props, children })
+    const tree = stack.render(state.state, this, props)
     return tree
   }
 
