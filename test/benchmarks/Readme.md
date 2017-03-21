@@ -1,3 +1,4 @@
+
 # Benchmarks
 
 This folder contains a set of benchmarks used to compare performances between Slate's version. We use [BenchmarkJS](https://benchmarkjs.com/) to measure performances.

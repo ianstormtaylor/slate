@@ -3,8 +3,7 @@ dist
 examples/build.dev.js
 examples/build.prod.js
 lib
-perf/reference.json
-test/support/build.js
+test/benchmarks/reference.json
 
 # Temporary files.
 tmp

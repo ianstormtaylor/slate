@@ -3,7 +3,7 @@ module.exports = {
   setup(state) {
     // Move cursor
     return state.transform()
-      .moveTo({
+      .select({
         anchorKey: '_cursor_',
         anchorOffset: 10,
         focusKey: '_cursor_',
@@ -13,6 +13,6 @@ module.exports = {
   },
 
   run(state) {
-    return state.transform().splitBlock().apply()
+    return state.transform().insertText('a').apply()
   }
 }

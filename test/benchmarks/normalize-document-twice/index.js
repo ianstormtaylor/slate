@@ -12,7 +12,7 @@ module.exports = {
       .transform({ normalized: false }).normalize().apply()
       .transform()
       // Make a fast, dummy change
-      .moveTo(selection).insertText('inserted text')
+      .select(selection).insertText('inserted text')
       // We want to compare the speed of that second normalize (optimized through memoization, or other means)
       .normalize().apply()
   }

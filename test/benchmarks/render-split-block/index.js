@@ -7,7 +7,7 @@ module.exports = {
   setup(state) {
     // Move cursor
     return state.transform()
-      .moveTo({
+      .select({
         anchorKey: '_cursor_',
         anchorOffset: 10,
         focusKey: '_cursor_',
