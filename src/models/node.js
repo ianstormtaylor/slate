@@ -6,7 +6,7 @@ import generateKey from '../utils/generate-key'
 import isInRange from '../utils/is-in-range'
 import memoize from '../utils/memoize'
 import warn from '../utils/warn'
-import { List, Set } from 'immutable'
+import { List, OrderedSet, Set } from 'immutable'
 
 /**
  * Node.
@@ -688,7 +688,7 @@ const Node = {
   getMarks() {
     return this
       .getCharacters()
-      .reduce((marks, char) => marks.union(char.marks), new Set())
+      .reduce((marks, char) => marks.union(char.marks), new OrderedSet())
   },
 
   /**
@@ -720,7 +720,7 @@ const Node = {
     // Otherwise, get a set of the marks for each character in the range.
     return this
       .getCharactersAtRange(range)
-      .reduce((memo, char) => memo.union(char.marks), new Set())
+      .reduce((memo, char) => memo.union(char.marks), new OrderedSet())
   },
 
   /**
