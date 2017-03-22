@@ -1,14 +1,4 @@
 
-/**
- * Polyfills.
- */
-
-import 'jsdom-global/register'
-
-/**
- * Dependencies.
- */
-
 import fs from 'fs'
 import path from 'path'
 import readMetadata from 'read-metadata'
@@ -23,7 +13,7 @@ const types = fs.readdirSync(outer)
 
 types.forEach((type) => {
   suite(type, () => {
-    set('iterations', 80) // eslint-disable-line no-undef
+    set('iterations', 100) // eslint-disable-line no-undef
     set('mintime', 2000) // eslint-disable-line no-undef
 
     const inner = path.resolve(outer, type)
@@ -31,7 +21,6 @@ types.forEach((type) => {
 
     benchmarks.forEach((benchmark) => {
       if (benchmark[0] === '.') return
-      if (benchmark === 'normalize-document-twice') return
 
       const dir = path.resolve(inner, benchmark)
       const input = readMetadata.sync(path.resolve(dir, 'input.yaml'))
@@ -42,9 +31,6 @@ types.forEach((type) => {
 
       bench(benchmark, () => { // eslint-disable-line no-undef
         run(state)
-      })
-
-      after(() => {
         if (module.after) module.after()
       })
     })

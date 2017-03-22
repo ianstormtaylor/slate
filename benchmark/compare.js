@@ -22,8 +22,8 @@ baseline.forEach((suite, i) => {
 
   suite.benchmarks.forEach((base, j) => {
     const comp = comparison[i].benchmarks[j]
-    const b = (base.iterations / base.elapsed)
-    const c = (comp.iterations / comp.elapsed)
+    const b = base.iterations / base.elapsed * 100
+    const c = comp.iterations / comp.elapsed * 100
     const threshold = b * THRESHOLD
     const slower = (b - c) > threshold
     const faster = (b - c) < (0 - threshold)

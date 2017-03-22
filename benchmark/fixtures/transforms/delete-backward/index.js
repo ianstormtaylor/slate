@@ -1,6 +1,4 @@
 
-import { __clear } from '../../../../lib/utils/memoize'
-
 export default function (state) {
   state
     .transform()
@@ -18,8 +16,4 @@ export function before(state) {
       focusOffset: 10
     })
     .apply()
-}
-
-export function after() {
-  __clear()
 }
