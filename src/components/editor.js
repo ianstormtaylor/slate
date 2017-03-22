@@ -1,6 +1,5 @@
 
 import Debug from 'debug'
-import Portal from 'react-portal'
 import React from 'react'
 import Stack from '../models/stack'
 import State from '../models/state'
