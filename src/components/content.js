@@ -703,13 +703,18 @@ class Content extends React.Component {
       data.selection = selection
         .merge(properties)
         .normalize(document)
-    }
 
-    // Store the document and selection after the `onSelect` event.
-    // At rendering time, if they are unchanged we'll avoid to render
-    // the native selection again.
-    this.tmp.document = document
-    this.tmp.selection = data.selection
+      // If selection edges aren't inside void inline nodes, store document and
+      // selection. At rendering time, if they are unchanged there will be no
+      // need to render the native selection again.
+      if (
+        (!anchorInline || !anchorInline.isVoid) &&
+        (!focusInline || !focusInline.isVoid)
+      ) {
+        this.tmp.document = document
+        this.tmp.selection = data.selection
+      }
+    }
 
     debug('onSelect', { event, data })
     this.props.onSelect(event, data)
@@ -726,16 +731,14 @@ class Content extends React.Component {
     const { className, readOnly, state, tabIndex, role } = props
     const { document, selection } = state
 
-    // If selection is blurred or document and selection are the same we have
-    // stored after `onSelect` event, selection does not need to be rendered.
-    let redrawSelection = selection.isFocused
+    // If document and selection are the same we have stored after `onSelect`
+    // event, native selection does not need to be re-rendered.
+    let redrawSelection = true
 
     if (this.tmp.selection) {
       redrawSelection = (
-        redrawSelection && (
-          !selection.equals(this.tmp.selection) ||
-          document !== this.tmp.document
-        )
+        !selection.equals(this.tmp.selection) ||
+        document !== this.tmp.document
       )
 
       this.tmp.document = null
