@@ -1,5 +1,5 @@
 
-import { Editor } from '../../..'
+import { Editor } from '../../../..'
 import React from 'react'
 import ReactDOM from 'react-dom'
 

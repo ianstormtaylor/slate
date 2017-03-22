@@ -23,7 +23,7 @@ const types = fs.readdirSync(outer)
 
 types.forEach((type) => {
   suite(type, () => {
-    set('iterations', 200) // eslint-disable-line no-undef
+    set('iterations', 80) // eslint-disable-line no-undef
     set('mintime', 2000) // eslint-disable-line no-undef
 
     const inner = path.resolve(outer, type)

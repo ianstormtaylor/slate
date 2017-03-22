@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
 
 import chalk from 'chalk'
-import baseline from '../tmp/bench-baseline'
-import comparison from '../tmp/bench-comparison'
+import baseline from '../tmp/benchmark-baseline'
+import comparison from '../tmp/benchmark-comparison'
 
 /**
  * Constants.
@@ -14,9 +14,10 @@ const THRESHOLD = 0.2
  * Print.
  */
 
+console.log()
+console.log(`  benchmarks`)
+
 baseline.forEach((suite, i) => {
-  console.log()
-  console.log(`  benchmarks`)
   console.log(`    ${suite.name}`)
 
   suite.benchmarks.forEach((base, j) => {
@@ -35,6 +36,6 @@ baseline.forEach((suite, i) => {
     console.log(`      ${base.title}`)
     console.log(`        ${output}`)
   })
-
-  console.log()
 })
+
+console.log()
