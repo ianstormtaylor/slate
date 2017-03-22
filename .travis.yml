@@ -3,13 +3,10 @@ env:
   matrix:
   - TEST_TYPE=test
   - TEST_TYPE=lint
-  - TEST_TYPE=benchmarks
 script:
   - |
     if [ "$TEST_TYPE" = test ]; then
-      npm test
-    elif [ "$TEST_TYPE" = benchmarks ]; then
-      npm run perf
+      npm run test
     elif [ "$TEST_TYPE" = lint ]; then
       npm run lint
     fi
