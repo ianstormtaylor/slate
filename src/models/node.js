@@ -208,22 +208,22 @@ const Node = {
   },
 
   /**
-   * Get the closest block nodes for each text node in the node.
+   * Get the leaf block descendants of the node.
    *
    * @return {List<Node>}
    */
 
   getBlocks() {
-    return this
-      .getTexts()
-      .map(text => this.getClosestBlock(text.key))
-      // Eliminate duplicates by converting to a `Set` first.
-      .toOrderedSet()
-      .toList()
+    return this.nodes.reduce((blocks, node) => {
+      if (node.kind != 'block') return blocks
+      return node.isLeafBlock()
+        ? blocks.push(node)
+        : blocks.concat(node.getBlocks())
+    }, new List())
   },
 
   /**
-   * Get the closest block nodes for each text node in a `range`.
+   * Get the leaf block descendants in a `range`.
    *
    * @param {Selection} range
    * @return {List<Node>}
@@ -236,6 +236,21 @@ const Node = {
       // Eliminate duplicates by converting to a `Set` first.
       .toOrderedSet()
       .toList()
+  },
+
+  /**
+   * Get all of the leaf blocks that match a `type`.
+   *
+   * @param {String} type
+   * @return {List<Node>}
+   */
+
+  getBlocksByType(type) {
+    return this.nodes.reduce((blocks, node) => {
+      if (node.kind != 'block') return blocks
+      if (node.isLeafBlock() && node.type == type) return blocks.push(node)
+      return blocks.concat(node.getBlocksByType(type))
+    }, new List())
   },
 
   /**
@@ -620,12 +635,12 @@ const Node = {
    */
 
   getInlines() {
-    return this
-      .getTexts()
-      .map(text => this.getClosestInline(text.key))
-      .filter(exists => exists)
-      .toOrderedSet()
-      .toList()
+    return this.nodes.reduce((inlines, node) => {
+      if (node.kind == 'text') return inlines
+      return node.isLeafInline()
+        ? inlines.push(node)
+        : inlines.concat(node.getInlines())
+    }, new List())
   },
 
   /**
@@ -642,6 +657,21 @@ const Node = {
       .filter(exists => exists)
       .toOrderedSet()
       .toList()
+  },
+
+  /**
+   * Get all of the leaf inline nodes that match a `type`.
+   *
+   * @param {String} type
+   * @return {List<Node>}
+   */
+
+  getInlinesByType(type) {
+    return this.nodes.reduce((inlines, node) => {
+      if (node.kind == 'text') return inlines
+      if (node.isLeafInline() && node.type == type) return inlines.push(node)
+      return inlines.concat(node.getInlinesByType(type))
+    }, new List())
   },
 
   /**
@@ -732,8 +762,8 @@ const Node = {
   getMarksByType(type) {
     return this.nodes.reduce((marks, node) => {
       return node.kind == 'text'
-        ? node.getMarks().filter(m => m.type == type)
-        : node.getMarksByType(type)
+        ? marks.union(node.getMarks().filter(m => m.type == type))
+        : marks.union(node.getMarksByType(type))
     }, new OrderedSet())
   },
 
@@ -1107,6 +1137,32 @@ const Node = {
 
     const nodes = this.nodes.insert(index, node)
     return this.merge({ nodes })
+  },
+
+  /**
+   * Check whether the node is a leaf block.
+   *
+   * @return {Boolean}
+   */
+
+  isLeafBlock() {
+    return (
+      this.kind == 'block' &&
+      this.nodes.every(n => n.kind != 'block')
+    )
+  },
+
+  /**
+   * Check whether the node is a leaf inline.
+   *
+   * @return {Boolean}
+   */
+
+  isLeafInline() {
+    return (
+      this.kind == 'inline' &&
+      this.nodes.every(n => n.kind != 'inline')
+    )
   },
 
   /**
@@ -1565,6 +1621,7 @@ memoize(Node, [
   'getAncestors',
   'getBlocks',
   'getBlocksAtRange',
+  'getBlocksByType',
   'getCharacters',
   'getCharactersAtRange',
   'getChild',
@@ -1589,10 +1646,12 @@ memoize(Node, [
   'getFurthestOnlyChildAncestor',
   'getInlines',
   'getInlinesAtRange',
+  'getInlinesByType',
   'getKeys',
   'getLastText',
   'getMarks',
   'getMarksAtRange',
+  'getMarksByType',
   'getNextBlock',
   'getNextSibling',
   'getNextText',
@@ -1614,6 +1673,8 @@ memoize(Node, [
   'hasNode',
   'hasVoidParent',
   'isInlineSplitAtRange',
+  'isLeafBlock',
+  'isLeafInline',
   'validate',
 ])
 
