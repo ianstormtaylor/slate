@@ -143,7 +143,7 @@ const Node = {
    */
 
   findDescendant(iterator) {
-    let found
+    let found = null
 
     this.forEachDescendant((node, i, nodes) => {
       if (iterator(node, i, nodes)) {
@@ -245,9 +245,11 @@ const Node = {
    */
 
   getCharacters() {
-    return this
-      .getTexts()
-      .reduce((chars, text) => chars.concat(text.characters), new List())
+    return this.nodes.reduce((chars, node) => {
+      return node.kind == 'text'
+        ? chars.concat(node.characters)
+        : chars.concat(node.getCharacters())
+    }, new List())
   },
 
   /**
@@ -612,7 +614,7 @@ const Node = {
   },
 
   /**
-   * Get the furthest inline nodes for each text node in the node.
+   * Get the closest inline nodes for each text node in the node.
    *
    * @return {List<Node>}
    */
@@ -620,7 +622,7 @@ const Node = {
   getInlines() {
     return this
       .getTexts()
-      .map(text => this.getFurthestInline(text.key))
+      .map(text => this.getClosestInline(text.key))
       .filter(exists => exists)
       .toOrderedSet()
       .toList()
@@ -679,20 +681,20 @@ const Node = {
   /**
    * Get all of the marks for all of the characters of every text node.
    *
-   * @return {Set<Mark>}
+   * @return {OrderedSet<Mark>}
    */
 
   getMarks() {
-    return this
-      .getCharacters()
-      .reduce((marks, char) => marks.union(char.marks), new OrderedSet())
+    return this.nodes.reduce((marks, node) => {
+      return marks.union(node.getMarks())
+    }, new OrderedSet())
   },
 
   /**
    * Get a set of the marks in a `range`.
    *
    * @param {Selection} range
-   * @return {Set<Mark>}
+   * @return {OrderedSet<Mark>}
    */
 
   getMarksAtRange(range) {
@@ -718,6 +720,21 @@ const Node = {
     return this
       .getCharactersAtRange(range)
       .reduce((memo, char) => memo.union(char.marks), new OrderedSet())
+  },
+
+  /**
+   * Get all of the marks that match a `type`.
+   *
+   * @param {String} type
+   * @return {OrderedSet<Mark>}
+   */
+
+  getMarksByType(type) {
+    return this.nodes.reduce((marks, node) => {
+      return node.kind == 'text'
+        ? node.getMarks().filter(m => m.type == type)
+        : node.getMarksByType(type)
+    }, new OrderedSet())
   },
 
   /**
@@ -944,14 +961,14 @@ const Node = {
   },
 
   /**
-   * Get the concatenated text `string` of all child nodes.
+   * Get the concatenated text string of all child nodes.
    *
    * @return {String}
    */
 
   getText() {
-    return this.nodes.reduce((result, node) => {
-      return result + node.text
+    return this.nodes.reduce((string, node) => {
+      return string + node.text
     }, '')
   },
 
