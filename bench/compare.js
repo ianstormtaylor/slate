@@ -8,7 +8,7 @@ import comparison from '../tmp/bench-comparison'
  * Constants.
  */
 
-const THRESHOLD = 0.1
+const THRESHOLD = 0.2
 
 /**
  * Print.
