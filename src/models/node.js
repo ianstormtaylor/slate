@@ -500,9 +500,6 @@ const Node = {
     let node = this
     let nodes = new List()
 
-    // If the range is collapsed, there's nothing to do.
-    if (range.isCollapsed) return Document.create({ nodes })
-
     // Make sure the children exist.
     const { startKey, startOffset, endKey, endOffset } = range
     node.assertDescendant(startKey)
