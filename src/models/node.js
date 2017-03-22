@@ -223,7 +223,7 @@ const Node = {
   },
 
   /**
-   * Get the closest block nodes for each text node in a `range`.
+   * Get the leaf block descendants in a `range`.
    *
    * @param {Selection} range
    * @return {List<Node>}
@@ -236,6 +236,21 @@ const Node = {
       // Eliminate duplicates by converting to a `Set` first.
       .toOrderedSet()
       .toList()
+  },
+
+  /**
+   * Get all of the leaf blocks that match a `type`.
+   *
+   * @param {String} type
+   * @return {List<Node>}
+   */
+
+  getBlocksByType(type) {
+    return this.nodes.reduce((blocks, node) => {
+      if (node.kind != 'block') return blocks
+      if (node.isLeafBlock() && node.type == type) return blocks.push(node)
+      return blocks.concat(node.getBlocksByType(type))
+    }, new List())
   },
 
   /**
@@ -645,6 +660,21 @@ const Node = {
   },
 
   /**
+   * Get all of the leaf inline nodes that match a `type`.
+   *
+   * @param {String} type
+   * @return {List<Node>}
+   */
+
+  getInlinesByType(type) {
+    return this.nodes.reduce((inlines, node) => {
+      if (node.kind == 'text') return inlines
+      if (node.isLeafInline() && node.type == type) return inlines.push(node)
+      return inlines.concat(node.getInlinesByType(type))
+    }, new List())
+  },
+
+  /**
    * Return a set of all keys in the node.
    *
    * @return {Set<Node>}
@@ -732,8 +762,8 @@ const Node = {
   getMarksByType(type) {
     return this.nodes.reduce((marks, node) => {
       return node.kind == 'text'
-        ? node.getMarks().filter(m => m.type == type)
-        : node.getMarksByType(type)
+        ? marks.union(node.getMarks().filter(m => m.type == type))
+        : marks.union(node.getMarksByType(type))
     }, new OrderedSet())
   },
 
@@ -1591,6 +1621,7 @@ memoize(Node, [
   'getAncestors',
   'getBlocks',
   'getBlocksAtRange',
+  'getBlocksByType',
   'getCharacters',
   'getCharactersAtRange',
   'getChild',
@@ -1615,6 +1646,7 @@ memoize(Node, [
   'getFurthestOnlyChildAncestor',
   'getInlines',
   'getInlinesAtRange',
+  'getInlinesByType',
   'getKeys',
   'getLastText',
   'getMarks',
