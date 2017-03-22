@@ -20,6 +20,9 @@ const { Raw } = require('..')
  */
 
 suite('benchmarks', () => {
+  set('iterations', 200) // eslint-disable-line no-undef
+  set('mintime', 2000) // eslint-disable-line no-undef
+
   const fixtures = path.resolve(__dirname, './fixtures')
   const benchmarks = fs.readdirSync(fixtures)
 
