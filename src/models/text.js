@@ -4,7 +4,7 @@ import Mark from './mark'
 import Range from './range'
 import memoize from '../utils/memoize'
 import generateKey from '../utils/generate-key'
-import { List, Record, Set } from 'immutable'
+import { List, Record, OrderedSet, Set } from 'immutable'
 
 /**
  * Default properties.
@@ -173,6 +173,18 @@ class Text extends new Record(DEFAULTS) {
 
   getDecorators(schema) {
     return schema.__getDecorators(this)
+  }
+
+  /**
+   * Get all of the marks on the text.
+   *
+   * @return {OrderedSet<Mark>}
+   */
+
+  getMarks() {
+    return this.characters.reduce((marks, char) => {
+      return marks.union(char.marks)
+    }, new OrderedSet())
   }
 
   /**
