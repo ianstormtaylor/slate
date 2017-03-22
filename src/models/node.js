@@ -143,7 +143,7 @@ const Node = {
    */
 
   findDescendant(iterator) {
-    let found
+    let found = null
 
     this.forEachDescendant((node, i, nodes) => {
       if (iterator(node, i, nodes)) {
