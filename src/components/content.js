@@ -139,19 +139,6 @@ class Content extends React.Component {
   }
 
   /**
-   * Get a point from a native selection's DOM `element` and `offset`.
-   *
-   * @param {Element} element
-   * @param {Number} offset
-   * @return {Object}
-   */
-
-  getPoint(element, offset) {
-    const { state, editor } = this.props
-    return getPoint(element, offset, state, editor)
-  }
-
-  /**
    * The React ref method to set the root content element locally.
    *
    * @param {Element} n
@@ -389,7 +376,7 @@ class Content extends React.Component {
     event.preventDefault()
 
     const window = getWindow(event.target)
-    const { state } = this.props
+    const { state, editor } = this.props
     const { nativeEvent } = event
     const { dataTransfer, x, y } = nativeEvent
     const data = getTransferData(dataTransfer)
@@ -406,7 +393,7 @@ class Content extends React.Component {
     }
 
     const { startContainer, startOffset } = range
-    const point = this.getPoint(startContainer, startOffset)
+    const point = getPoint(startContainer, startOffset, state, editor)
     if (!point) return
 
     const target = Selection.create({
@@ -446,16 +433,16 @@ class Content extends React.Component {
     debug('onInput', { event })
 
     const window = getWindow(event.target)
+    const { state, editor } = this.props
 
     // Get the selection point.
     const native = window.getSelection()
     const { anchorNode, anchorOffset } = native
-    const point = this.getPoint(anchorNode, anchorOffset)
+    const point = getPoint(anchorNode, anchorOffset, state, editor)
     if (!point) return
 
     // Get the range in question.
     const { key, index, start, end } = point
-    const { state, editor } = this.props
     const { document, selection } = state
     const schema = editor.getSchema()
     const decorators = document.getDescendantDecorators(key, schema)
@@ -617,7 +604,7 @@ class Content extends React.Component {
     if (!this.isInContentEditable(event)) return
 
     const window = getWindow(event.target)
-    const { state } = this.props
+    const { state, editor } = this.props
     const { document, selection } = state
     const native = window.getSelection()
     const data = {}
@@ -631,8 +618,8 @@ class Content extends React.Component {
     // Otherwise, determine the Slate selection from the native one.
     else {
       const { anchorNode, anchorOffset, focusNode, focusOffset } = native
-      const anchor = this.getPoint(anchorNode, anchorOffset)
-      const focus = this.getPoint(focusNode, focusOffset)
+      const anchor = getPoint(anchorNode, anchorOffset, state, editor)
+      const focus = getPoint(focusNode, focusOffset, state, editor)
       if (!anchor || !focus) return
 
       // There are valid situations where a select event will fire when we're
