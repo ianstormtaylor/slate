@@ -3,6 +3,7 @@ import Base64 from '../serializers/base-64'
 import Content from '../components/content'
 import Character from '../models/character'
 import Debug from 'debug'
+import getPoint from '../utils/get-point'
 import Placeholder from '../components/placeholder'
 import React from 'react'
 import getWindow from 'get-window'
@@ -97,9 +98,38 @@ function Plugin(options = {}) {
 
     const chars = initialChars.insert(startOffset, char)
 
+    let transform = state.transform()
+
+    // COMPAT: In iOS, when choosing from the predictive text suggestions, the
+    // native selection will be changed to span the existing word, so that the word
+    // is replaced. But the `select` event for this change doesn't fire until after
+    // the `beforeInput` event, even though the native selection is updated. So we
+    // need to manually adjust the selection to be in sync. (03/18/2017)
+    const window = getWindow(event.target)
+    const native = window.getSelection()
+    const { anchorNode, anchorOffset, focusNode, focusOffset } = native
+    const anchorPoint = getPoint(anchorNode, anchorOffset, state, editor)
+    const focusPoint = getPoint(focusNode, focusOffset, state, editor)
+    if (anchorPoint && focusPoint) {
+      const { selection } = state
+      if (
+        selection.anchorKey !== anchorPoint.key ||
+        selection.anchorOffset !== anchorPoint.offset ||
+        selection.focusKey !== focusPoint.key ||
+        selection.focusOffset !== focusPoint.offset
+      ) {
+        transform = transform
+          .select({
+            anchorKey: anchorPoint.key,
+            anchorOffset: anchorPoint.offset,
+            focusKey: focusPoint.key,
+            focusOffset: focusPoint.offset
+          })
+      }
+    }
+
     // Determine what the characters should be, if not natively inserted.
-    let next = state
-      .transform()
+    let next = transform
       .insertText(e.data)
       .apply()
 

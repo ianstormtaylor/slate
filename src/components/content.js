@@ -2,7 +2,7 @@
 import Base64 from '../serializers/base-64'
 import Debug from 'debug'
 import Node from './node'
-import OffsetKey from '../utils/offset-key'
+import getPoint from '../utils/get-point'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import Selection from '../models/selection'
@@ -137,36 +137,6 @@ class Content extends React.Component {
       native.removeAllRanges()
       el.blur()
     }
-  }
-
-  /**
-   * Get a point from a native selection's DOM `element` and `offset`.
-   *
-   * @param {Element} element
-   * @param {Number} offset
-   * @return {Object}
-   */
-
-  getPoint(element, offset) {
-    const { state, editor } = this.props
-    const { document } = state
-    const schema = editor.getSchema()
-
-    // If we can't find an offset key, we can't get a point.
-    const offsetKey = OffsetKey.findKey(element, offset)
-    if (!offsetKey) return null
-
-    // COMPAT: If someone is clicking from one Slate editor into another, the
-    // select event fires two, once for the old editor's `element` first, and
-    // then afterwards for the correct `element`. (2017/03/03)
-    const { key } = offsetKey
-    const node = document.getDescendant(key)
-    if (!node) return null
-
-    const decorators = document.getDescendantDecorators(key, schema)
-    const ranges = node.getRanges(decorators)
-    const point = OffsetKey.findPoint(offsetKey, ranges)
-    return point
   }
 
   /**
@@ -424,7 +394,7 @@ class Content extends React.Component {
     event.preventDefault()
 
     const window = getWindow(event.target)
-    const { state } = this.props
+    const { state, editor } = this.props
     const { nativeEvent } = event
     const { dataTransfer, x, y } = nativeEvent
     const data = getTransferData(dataTransfer)
@@ -441,7 +411,7 @@ class Content extends React.Component {
     }
 
     const { startContainer, startOffset } = range
-    const point = this.getPoint(startContainer, startOffset)
+    const point = getPoint(startContainer, startOffset, state, editor)
     if (!point) return
 
     const target = Selection.create({
@@ -481,16 +451,16 @@ class Content extends React.Component {
     debug('onInput', { event })
 
     const window = getWindow(event.target)
+    const { state, editor } = this.props
 
     // Get the selection point.
     const native = window.getSelection()
     const { anchorNode, anchorOffset } = native
-    const point = this.getPoint(anchorNode, anchorOffset)
+    const point = getPoint(anchorNode, anchorOffset, state, editor)
     if (!point) return
 
     // Get the range in question.
     const { key, index, start, end } = point
-    const { state, editor } = this.props
     const { document, selection } = state
     const schema = editor.getSchema()
     const decorators = document.getDescendantDecorators(key, schema)
@@ -652,7 +622,7 @@ class Content extends React.Component {
     if (!this.isInContentEditable(event)) return
 
     const window = getWindow(event.target)
-    const { state } = this.props
+    const { state, editor } = this.props
     const { document, selection } = state
     const native = window.getSelection()
     const data = {}
@@ -666,8 +636,8 @@ class Content extends React.Component {
     // Otherwise, determine the Slate selection from the native one.
     else {
       const { anchorNode, anchorOffset, focusNode, focusOffset } = native
-      const anchor = this.getPoint(anchorNode, anchorOffset)
-      const focus = this.getPoint(focusNode, focusOffset)
+      const anchor = getPoint(anchorNode, anchorOffset, state, editor)
+      const focus = getPoint(focusNode, focusOffset, state, editor)
       if (!anchor || !focus) return
 
       // There are valid situations where a select event will fire when we're
