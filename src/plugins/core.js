@@ -100,8 +100,11 @@ function Plugin(options = {}) {
 
     let transform = state.transform()
 
-    // Determine if selection is out of sync, which can happen during autocorrect,
-    // and update accordingly.
+    // COMPAT: In iOS, when choosing from the predictive text suggestions, the
+    // native selection will be changed to span the existing word, so that the word
+    // is replaced. But the `select` event for this change doesn't fire until after
+    // the `beforeInput` event, even though the native selection is updated. So we
+    // need to manually adjust the selection to be in sync. (03/18/2017)
     const window = getWindow(event.target)
     const native = window.getSelection()
     const { anchorNode, anchorOffset, focusNode, focusOffset } = native
