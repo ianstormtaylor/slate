@@ -74,7 +74,7 @@ function getTransferType(data) {
   if (data.rich && data.html) return 'html'
   if (data.rich && data.text) return 'text'
 
-  if (data.files) return 'files'
+  if (data.files && data.files.length) return 'files'
   if (data.html) return 'html'
   if (data.text) return 'text'
   return 'unknown'
