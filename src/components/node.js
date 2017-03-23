@@ -145,23 +145,35 @@ class Node extends React.Component {
       return true
     }
 
-    // For text nodes, which can have custom decorations, we need to check to
-    // see if the block has changed, which has caused the decorations to change.
-    if (nextProps.node.kind == 'text' && nextProps.schema.hasDecorators) {
-      const { node, schema, state } = nextProps
+    if (nextProps.node.kind == 'text') {
+      // For text nodes, which can have custom decorations, we need to check to
+      // see if the block has changed, which has caused the decorations to change.
+      if (nextProps.schema.hasDecorators) {
+        const { node, schema, state } = nextProps
 
-      const { document } = state
-      const decorators = document.getDescendantDecorators(node.key, schema)
-      const ranges = node.getRanges(decorators)
+        const { document } = state
+        const decorators = document.getDescendantDecorators(node.key, schema)
+        const ranges = node.getRanges(decorators)
 
-      const prevNode = this.props.node
-      const prevSchema = this.props.schema
-      const prevDocument = this.props.state.document
-      const prevDecorators = prevDocument.getDescendantDecorators(prevNode.key, prevSchema)
-      const prevRanges = prevNode.getRanges(prevDecorators)
+        const prevNode = this.props.node
+        const prevSchema = this.props.schema
+        const prevDocument = this.props.state.document
+        const prevDecorators = prevDocument.getDescendantDecorators(prevNode.key, prevSchema)
+        const prevRanges = prevNode.getRanges(prevDecorators)
 
-      if (!ranges.equals(prevRanges)) {
-        return true
+        if (!ranges.equals(prevRanges)) {
+          return true
+        }
+      }
+
+      // If text node was last in block and now it is not, we need re-render to
+      // cleanup unnecessary '<br/>' or '\n'
+      const { parent } = nextProps
+      if (parent.kind == 'block') {
+        const prevParent = this.props.parent
+        if (parent.nodes.last() != nextProps.node && prevParent.nodes.last() == nextProps.node) {
+          return true
+        }
       }
     }
 
