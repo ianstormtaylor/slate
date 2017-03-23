@@ -98,7 +98,7 @@ function Plugin(options = {}) {
 
     const chars = initialChars.insert(startOffset, char)
 
-    let nextTransform = state.transform()
+    let transform = state.transform()
 
     // Determine if selection is out of sync, which can happen during autocorrect,
     // and update accordingly.
@@ -115,7 +115,7 @@ function Plugin(options = {}) {
         selection.focusKey !== focusPoint.key ||
         selection.focusOffset !== focusPoint.offset
       ) {
-        nextTransform = nextTransform
+        transform = transform
           .select({
             anchorKey: anchorPoint.key,
             anchorOffset: anchorPoint.offset,
@@ -126,7 +126,7 @@ function Plugin(options = {}) {
     }
 
     // Determine what the characters should be, if not natively inserted.
-    let next = nextTransform
+    let next = transform
       .insertText(e.data)
       .apply()
 
