@@ -8,6 +8,7 @@ import { Router, Route, Link, IndexRedirect, hashHistory } from 'react-router'
  */
 
 import AutoMarkdown from './auto-markdown'
+import CheckLists from './check-lists'
 import CodeHighlighting from './code-highlighting'
 import Embeds from './embeds'
 import Emojis from './emojis'
@@ -101,6 +102,7 @@ class App extends React.Component {
         {this.renderTab('Embeds', 'embeds')}
         {this.renderTab('Emojis', 'emojis')}
         {this.renderTab('Tables', 'tables')}
+        {this.renderTab('Check Lists', 'check-lists')}
         {this.renderTab('Code Highlighting', 'code-highlighting')}
         {this.renderTab('Paste HTML', 'paste-html')}
         {this.renderTab('Read-only', 'read-only')}
@@ -153,6 +155,7 @@ const router = (
       <IndexRedirect to="rich-text" />
 
       <Route path="auto-markdown" component={AutoMarkdown} />
+      <Route path="check-lists" component={CheckLists} />
       <Route path="code-highlighting" component={CodeHighlighting} />
       <Route path="embeds" component={Embeds} />
       <Route path="emojis" component={Emojis} />

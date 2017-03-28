@@ -203,3 +203,12 @@ input:focus {
 .emoji.selected {
   outline: 2px solid blue;
 }
+
+.check-list-item + .check-list-item {
+  margin-top: 0;
+}
+
+.check-list-item [contenteditable="false"] {
+  display: inline-block;
+  margin-right: 0.75em;
+}
