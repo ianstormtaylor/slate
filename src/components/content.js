@@ -691,6 +691,17 @@ class Content extends React.Component {
       data.selection = selection
         .merge(properties)
         .normalize(document)
+
+      // If selection edges aren't inside void inline nodes, store document and
+      // selection. At rendering time, if they are unchanged there will be no
+      // need to render the native selection again.
+      if (
+        (!anchorInline || !anchorInline.isVoid) &&
+        (!focusInline || !focusInline.isVoid)
+      ) {
+        this.tmp.document = document
+        this.tmp.selection = data.selection
+      }
     }
 
     debug('onSelect', { event, data })
@@ -706,9 +717,24 @@ class Content extends React.Component {
   render = () => {
     const { props } = this
     const { className, readOnly, state, tabIndex, role } = props
-    const { document } = state
+    const { document, selection } = state
+
+    // If document and selection are the same we have stored after `onSelect`
+    // event, native selection does not need to be re-rendered.
+    let redrawSelection = true
+
+    if (this.tmp.selection) {
+      redrawSelection = (
+        !selection.equals(this.tmp.selection) ||
+        document !== this.tmp.document
+      )
+
+      this.tmp.document = null
+      this.tmp.selection = null
+    }
+
     const children = document.nodes
-      .map(node => this.renderNode(node))
+      .map(node => this.renderNode(node, { redrawSelection }))
       .toArray()
 
     const style = {
@@ -776,7 +802,8 @@ class Content extends React.Component {
    * @return {Element}
    */
 
-  renderNode = (node) => {
+  renderNode = (node, options) => {
+    const { redrawSelection } = options
     const { editor, readOnly, schema, state } = this.props
 
     return (
@@ -788,6 +815,7 @@ class Content extends React.Component {
         state={state}
         editor={editor}
         readOnly={readOnly}
+        redrawSelection={redrawSelection}
       />
     )
   }
