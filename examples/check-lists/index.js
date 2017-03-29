@@ -96,8 +96,13 @@ class CheckLists extends React.Component {
   }
 
   /**
-   * On key down, if enter is pressed inside of a check list item, make sure
-   * that when it is split the new item starts unchecked.
+   * On key down...
+   *
+   * If enter is pressed inside of a check list item, make sure that when it
+   * is split the new item starts unchecked.
+   *
+   * If backspace is pressed when collapsed at the start of a check list item,
+   * then turn it back into a paragraph.
    *
    * @param {Event} e
    * @param {Object} data
@@ -106,13 +111,28 @@ class CheckLists extends React.Component {
    */
 
   onKeyDown = (e, data, state) => {
-    if (data.key != 'enter') return
-    if (state.startBlock.type != 'check-list-item') return
-    return state
-      .transform()
-      .splitBlock()
-      .setBlock({ data: { checked: false }})
-      .apply()
+    if (
+      data.key == 'enter' &&
+      state.startBlock.type == 'check-list-item'
+    ) {
+      return state
+        .transform()
+        .splitBlock()
+        .setBlock({ data: { checked: false }})
+        .apply()
+    }
+
+    if (
+      data.key == 'backspace' &&
+      state.isCollapsed &&
+      state.startBlock.type == 'check-list-item' &&
+      state.selection.startOffset == 0
+    ) {
+      return state
+        .transform()
+        .setBlock('paragraph')
+        .apply()
+    }
   }
 
   /**
