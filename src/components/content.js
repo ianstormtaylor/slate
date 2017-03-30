@@ -290,6 +290,13 @@ class Content extends React.Component {
     if (this.props.readOnly) return
     if (this.tmp.isCopying) return
     if (!this.isInContentEditable(event)) return
+    // COMPAT: When editor contains nested editable elements, in some situations,
+    // the focus goes to those elements. In Firefox, this must be prevented
+    // because it results in issues with keyboard navigation. (2017/03/30)
+    if (IS_FIREFOX && event.target !== this.element) {
+      this.element.focus()
+      return
+    }
 
     const data = {}
 
