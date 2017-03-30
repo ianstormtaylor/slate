@@ -40,15 +40,21 @@ class CheckListItem extends React.Component {
     const { attributes, children, node } = this.props
     const checked = node.data.get('checked')
     return (
-      <div {...attributes} className="check-list-item">
-        <span contentEditable={false}>
+      <div
+        className="check-list-item"
+        contentEditable={false}
+        {...attributes}
+      >
+        <span>
           <input
             type="checkbox"
             checked={checked}
             onChange={this.onChange}
           />
         </span>
-        {children}
+        <span contentEditable>
+          {children}
+        </span>
       </div>
     )
   }
