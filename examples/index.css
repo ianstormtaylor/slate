@@ -208,7 +208,19 @@ input:focus {
   margin-top: 0;
 }
 
-.check-list-item [contenteditable="false"] {
-  display: inline-block;
+.check-list-item {
+  display: flex;
+  flex-direction: row;
+}
+
+.check-list-item > span:first-child {
   margin-right: 0.75em;
+}
+
+.check-list-item > span:last-child {
+  flex: 1;
+}
+
+.check-list-item > span:last-child:focus {
+  outline: none;
 }
