@@ -272,6 +272,7 @@ class Content extends React.Component {
     if (this.props.readOnly) return
     if (this.tmp.isCopying) return
     if (!this.isInContentEditable(event)) return
+    if (this.element.contains(event.relatedTarget)) return
 
     const data = {}
 
