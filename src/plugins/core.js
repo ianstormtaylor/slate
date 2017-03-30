@@ -187,34 +187,11 @@ function Plugin(options = {}) {
    */
 
   function onBlur(e, data, state) {
-    const isNative = true
-
-    debug('onBlur', { data, isNative })
-
+    debug('onBlur', { data })
     return state
       .transform()
       .blur()
-      .apply({ isNative })
-  }
-
-  /**
-   * On focus.
-   *
-   * @param {Event} e
-   * @param {Object} data
-   * @param {State} state
-   * @return {State}
-   */
-
-  function onFocus(e, data, state) {
-    const isNative = true
-
-    debug('onFocus', { data, isNative })
-
-    return state
-      .transform()
-      .focus()
-      .apply({ isNative })
+      .apply()
   }
 
   /**
@@ -975,7 +952,6 @@ function Plugin(options = {}) {
     onBeforeChange,
     onBeforeInput,
     onBlur,
-    onFocus,
     onCopy,
     onCut,
     onDrop,

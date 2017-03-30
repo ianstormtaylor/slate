@@ -41,13 +41,13 @@ class CheckListItem extends React.Component {
     const checked = node.data.get('checked')
     return (
       <div {...attributes} className="check-list-item">
-        <div contentEditable={false}>
+        <span contentEditable={false}>
           <input
             type="checkbox"
             checked={checked}
             onChange={this.onChange}
           />
-        </div>
+        </span>
         {children}
       </div>
     )

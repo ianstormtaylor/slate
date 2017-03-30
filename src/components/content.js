@@ -79,7 +79,7 @@ class Content extends React.Component {
     super(props)
     this.tmp = {}
     this.tmp.compositions = 0
-    this.forces = 0
+    this.tmp.forces = 0
   }
 
   /**
@@ -110,10 +110,12 @@ class Content extends React.Component {
   }
 
   /**
-   * On mount, if `autoFocus` is set, focus the editor.
+   * On mount, update the selection, and focus the editor if `autoFocus` is set.
    */
 
   componentDidMount = () => {
+    this.updateSelection()
+
     if (this.props.autoFocus) {
       const el = ReactDOM.findDOMNode(this)
       el.focus()
@@ -121,22 +123,99 @@ class Content extends React.Component {
   }
 
   /**
-   * On update, if the state is blurred now, but was focused before, and the
-   * DOM still has a node inside the editor selected, we need to blur it.
-   *
-   * @param {Object} prevProps
-   * @param {Object} prevState
+   * On update, update the selection.
    */
 
-  componentDidUpdate = (prevProps, prevState) => {
-    if (this.props.state.isBlurred && prevProps.state.isFocused) {
-      const el = ReactDOM.findDOMNode(this)
-      const window = getWindow(el)
-      const native = window.getSelection()
+  componentDidUpdate = () => {
+    this.updateSelection()
+  }
+
+  /**
+   * Update the native DOM selection to reflect the internal model.
+   */
+
+  updateSelection = () => {
+    const { state } = this.props
+    const { selection } = state
+    const el = ReactDOM.findDOMNode(this)
+    const window = getWindow(el)
+    const native = window.getSelection()
+
+    // If both selections are blurred, do nothing.
+    if (!native.rangeCount && selection.isBlurred) return
+
+    // If the selection has been blurred, but hasn't been updated in the DOM,
+    // blur the DOM selection.
+    if (selection.isBlurred) {
       if (!el.contains(native.anchorNode)) return
       native.removeAllRanges()
       el.blur()
+      debug('updateSelection', { selection, native })
+      return
     }
+
+    // Otherwise, figure out which DOM nodes should be selected...
+    const { anchorText, focusText } = state
+    const { anchorKey, anchorOffset, focusKey, focusOffset } = selection
+    const anchorRanges = anchorText.getRanges()
+    const focusRanges = focusText.getRanges()
+    let a = 0
+    let f = 0
+    let anchorIndex
+    let focusIndex
+    let anchorOff
+    let focusOff
+
+    anchorRanges.forEach((range, i, ranges) => {
+      const { length } = range.text
+      a += length
+      if (a < anchorOffset) return
+      anchorIndex = i
+      anchorOff = anchorOffset - (a - length)
+      return false
+    })
+
+    focusRanges.forEach((range, i, ranges) => {
+      const { length } = range.text
+      f += length
+      if (f < focusOffset) return
+      focusIndex = i
+      focusOff = focusOffset - (f - length)
+      return false
+    })
+
+    const anchorSpan = el.querySelector(`[data-offset-key="${anchorKey}-${anchorIndex}"]`)
+    const focusSpan = el.querySelector(`[data-offset-key="${focusKey}-${focusIndex}"]`)
+    const anchorEl = anchorSpan.firstChild
+    const focusEl = focusSpan.firstChild
+
+    // If they are already selected, do nothing.
+    if (
+      anchorEl == native.anchorNode &&
+      anchorOff == native.anchorOffset &&
+      focusEl == native.focusNode &&
+      focusOff == native.focusOffset
+    ) {
+      return
+    }
+
+    // Otherwise, set the `isSelecting` flag and update the selection.
+    this.tmp.isSelecting = true
+    native.removeAllRanges()
+    const range = window.document.createRange()
+    range.setStart(anchorEl, anchorOff)
+    native.addRange(range)
+    native.extend(focusEl, focusOff)
+
+    // Then unset the `isSelecting` flag after a delay.
+    setTimeout(() => {
+      // COMPAT: In Firefox, it's not enough to create a range, you also need to
+      // focus the contenteditable element too. (2016/11/16)
+      if (IS_FIREFOX) el.focus()
+      this.tmp.isSelecting = false
+    })
+
+    debug('updateSelection', { selection, native })
   }
 
   /**
@@ -254,7 +333,7 @@ class Content extends React.Component {
   onCompositionEnd = (event) => {
     if (!this.isInContentEditable(event)) return
 
-    this.forces++
+    this.tmp.forces++
     const count = this.tmp.compositions
 
     // The `count` check here ensures that if another composition starts
@@ -619,6 +698,7 @@ class Content extends React.Component {
     if (this.props.readOnly) return
     if (this.tmp.isCopying) return
     if (this.tmp.isComposing) return
+    if (this.tmp.isSelecting) return
     if (!this.isInContentEditable(event)) return
 
     const window = getWindow(event.target)
@@ -640,10 +720,11 @@ class Content extends React.Component {
       const focus = getPoint(focusNode, focusOffset, state, editor)
       if (!anchor || !focus) return
 
-      // There are valid situations where a select event will fire when we're
-      // already at that position (for example when entering a character), since
-      // our `insertText` transform already updates the selection. In those
-      // cases we can safely ignore the event.
+      // There are situations where a select event will fire with a new native
+      // selection that resolves to the same internal position. In those cases
+      // we don't need to trigger any changes, since our internal model is
+      // already up to date, but we do want to update the native selection again
+      // to make sure it is in sync.
       if (
         anchor.key == selection.anchorKey &&
         anchor.offset == selection.anchorOffset &&
@@ -651,6 +732,7 @@ class Content extends React.Component {
         focus.offset == selection.focusOffset &&
         selection.isFocused
       ) {
+        this.updateSelection()
         return
       }
 
@@ -736,7 +818,7 @@ class Content extends React.Component {
     return (
       <div
         data-slate-editor
-        key={this.forces}
+        key={this.tmp.forces}
         ref={this.ref}
         contentEditable={!readOnly}
         suppressContentEditableWarning
