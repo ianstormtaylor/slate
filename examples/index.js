@@ -7,7 +7,6 @@ import { Router, Route, Link, IndexRedirect, hashHistory } from 'react-router'
  * Examples.
  */
 
-import AutoMarkdown from './auto-markdown'
 import CheckLists from './check-lists'
 import CodeHighlighting from './code-highlighting'
 import Embeds from './embeds'
@@ -18,6 +17,8 @@ import Iframes from './iframes'
 import Images from './images'
 import LargeDocument from './large-document'
 import Links from './links'
+import MarkdownPreview from './markdown-preview'
+import MarkdownShortcuts from './markdown-shortcuts'
 import PasteHtml from './paste-html'
 import PlainText from './plain-text'
 import Plugins from './plugins'
@@ -94,22 +95,23 @@ class App extends React.Component {
       <div className="tabs">
         {this.renderTab('Rich Text', 'rich-text')}
         {this.renderTab('Plain Text', 'plain-text')}
-        {this.renderTab('Auto-markdown', 'auto-markdown')}
         {this.renderTab('Hovering Menu', 'hovering-menu')}
-        {this.renderTab('Large Document', 'large')}
         {this.renderTab('Links', 'links')}
         {this.renderTab('Images', 'images')}
         {this.renderTab('Embeds', 'embeds')}
         {this.renderTab('Emojis', 'emojis')}
-        {this.renderTab('Tables', 'tables')}
+        {this.renderTab('Markdown Preview', 'markdown-preview')}
+        {this.renderTab('Markdown Shortcuts', 'markdown-shortcuts')}
         {this.renderTab('Check Lists', 'check-lists')}
         {this.renderTab('Code Highlighting', 'code-highlighting')}
+        {this.renderTab('Tables', 'tables')}
         {this.renderTab('Paste HTML', 'paste-html')}
         {this.renderTab('Read-only', 'read-only')}
         {this.renderTab('RTL', 'rtl')}
         {this.renderTab('Plugins', 'plugins')}
         {this.renderTab('Iframes', 'iframes')}
         {this.renderTab('Focus & Blur', 'focus-blur')}
+        {this.renderTab('Large Document', 'large')}
       </div>
     )
   }
@@ -154,7 +156,6 @@ const router = (
     <Route path="/" component={App}>
       <IndexRedirect to="rich-text" />
 
-      <Route path="auto-markdown" component={AutoMarkdown} />
       <Route path="check-lists" component={CheckLists} />
       <Route path="code-highlighting" component={CodeHighlighting} />
       <Route path="embeds" component={Embeds} />
@@ -165,6 +166,8 @@ const router = (
       <Route path="images" component={Images} />
       <Route path="large" component={LargeDocument} />
       <Route path="links" component={Links} />
+      <Route path="markdown-preview" component={MarkdownPreview} />
+      <Route path="markdown-shortcuts" component={MarkdownShortcuts} />
       <Route path="paste-html" component={PasteHtml} />
       <Route path="plain-text" component={PlainText} />
       <Route path="plugins" component={Plugins} />

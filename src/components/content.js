@@ -9,6 +9,7 @@ import Selection from '../models/selection'
 import getTransferData from '../utils/get-transfer-data'
 import TYPES from '../constants/types'
 import getWindow from 'get-window'
+import findDeepestNode from '../utils/find-deepest-node'
 import keycode from 'keycode'
 import { IS_FIREFOX, IS_MAC } from '../constants/environment'
 
@@ -135,8 +136,8 @@ class Content extends React.Component {
    */
 
   updateSelection = () => {
-    const { state } = this.props
-    const { selection } = state
+    const { editor, state } = this.props
+    const { document, selection } = state
     const el = ReactDOM.findDOMNode(this)
     const window = getWindow(el)
     const native = window.getSelection()
@@ -157,8 +158,11 @@ class Content extends React.Component {
     // Otherwise, figure out which DOM nodes should be selected...
     const { anchorText, focusText } = state
     const { anchorKey, anchorOffset, focusKey, focusOffset } = selection
-    const anchorRanges = anchorText.getRanges()
-    const focusRanges = focusText.getRanges()
+    const schema = editor.getSchema()
+    const anchorDecorators = document.getDescendantDecorators(anchorKey, schema)
+    const focusDecorators = document.getDescendantDecorators(focusKey, schema)
+    const anchorRanges = anchorText.getRanges(anchorDecorators)
+    const focusRanges = focusText.getRanges(focusDecorators)
     let a = 0
     let f = 0
     let anchorIndex
@@ -186,8 +190,8 @@ class Content extends React.Component {
 
     const anchorSpan = el.querySelector(`[data-offset-key="${anchorKey}-${anchorIndex}"]`)
     const focusSpan = el.querySelector(`[data-offset-key="${focusKey}-${focusIndex}"]`)
-    const anchorEl = anchorSpan.firstChild
-    const focusEl = focusSpan.firstChild
+    const anchorEl = findDeepestNode(anchorSpan)
+    const focusEl = findDeepestNode(focusSpan)
 
     // If they are already selected, do nothing.
     if (

@@ -29,7 +29,7 @@ const schema = {
  * @type {Component}
  */
 
-class AutoMarkdown extends React.Component {
+class MarkdownShortcuts extends React.Component {
 
   /**
    * Deserialize the raw initial state.
@@ -212,4 +212,4 @@ class AutoMarkdown extends React.Component {
  * Export.
  */
 
-export default AutoMarkdown
+export default MarkdownShortcuts

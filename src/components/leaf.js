@@ -3,6 +3,7 @@ import Debug from 'debug'
 import OffsetKey from '../utils/offset-key'
 import React from 'react'
 import ReactDOM from 'react-dom'
+import findDeepestNode from '../utils/find-deepest-node'
 import { IS_FIREFOX } from '../constants/environment'
 
 /**
@@ -188,19 +189,6 @@ class Leaf extends React.Component {
     }, children)
   }
 
-}
-
-/**
- * Find the deepest descendant of a DOM `element`.
- *
- * @param {Element} node
- * @return {Element}
- */
-
-function findDeepestNode(element) {
-  return element.firstChild
-    ? findDeepestNode(element.firstChild)
-    : element
 }
 
 /**
