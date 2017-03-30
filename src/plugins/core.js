@@ -105,7 +105,7 @@ function Plugin(options = {}) {
     // is replaced. But the `select` event for this change doesn't fire until after
     // the `beforeInput` event, even though the native selection is updated. So we
     // need to manually adjust the selection to be in sync. (03/18/2017)
-    const window = getWindow(event.target)
+    const window = getWindow(e.target)
     const native = window.getSelection()
     const { anchorNode, anchorOffset, focusNode, focusOffset } = native
     const anchorPoint = getPoint(anchorNode, anchorOffset, state, editor)
