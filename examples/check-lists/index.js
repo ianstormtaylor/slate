@@ -52,7 +52,7 @@ class CheckListItem extends React.Component {
             onChange={this.onChange}
           />
         </span>
-        <span contentEditable>
+        <span contentEditable suppressContentEditableWarning>
           {children}
         </span>
       </div>

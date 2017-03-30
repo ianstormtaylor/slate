@@ -211,6 +211,7 @@ input:focus {
 .check-list-item {
   display: flex;
   flex-direction: row;
+  align-items: center;
 }
 
 .check-list-item > span:first-child {
