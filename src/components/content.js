@@ -237,12 +237,12 @@ class Content extends React.Component {
    * @return {Boolean}
    */
 
-  isInContentEditable = (event) => {
+  isInEditor = (event) => {
     const { element } = this
     const { target } = event
     return (
       (target.isContentEditable) &&
-      (target === element || target.closest('[data-slate-editor]') === element)
+      (target == element || target.closest('[data-slate-editor]') == element)
     )
   }
 
@@ -254,7 +254,7 @@ class Content extends React.Component {
 
   onBeforeInput = (event) => {
     if (this.props.readOnly) return
-    if (!this.isInContentEditable(event)) return
+    if (!this.isInEditor(event)) return
 
     const data = {}
 
@@ -271,7 +271,11 @@ class Content extends React.Component {
   onBlur = (event) => {
     if (this.props.readOnly) return
     if (this.tmp.isCopying) return
-    if (!this.isInContentEditable(event)) return
+    if (!this.isInEditor(event)) return
+
+    // If the element that is now focused is actually inside the editor, we
+    // need to ignore it. This can happen in situations where there is a nested
+    // `contenteditable="true"` node that isn't another Slate editor.
     if (this.element.contains(event.relatedTarget)) return
 
     const data = {}
@@ -289,11 +293,12 @@ class Content extends React.Component {
   onFocus = (event) => {
     if (this.props.readOnly) return
     if (this.tmp.isCopying) return
-    if (!this.isInContentEditable(event)) return
-    // COMPAT: When editor contains nested editable elements, in some situations,
-    // the focus goes to those elements. In Firefox, this must be prevented
-    // because it results in issues with keyboard navigation. (2017/03/30)
-    if (IS_FIREFOX && event.target !== this.element) {
+    if (!this.isInEditor(event)) return
+
+    // COMPAT: If the editor has nested editable elements, the focus can go to
+    // those elements. In Firefox, this must be prevented because it results in
+    // issues with keyboard navigation. (2017/03/30)
+    if (IS_FIREFOX && event.target != this.element) {
       this.element.focus()
       return
     }
@@ -322,7 +327,7 @@ class Content extends React.Component {
    */
 
   onCompositionStart = (event) => {
-    if (!this.isInContentEditable(event)) return
+    if (!this.isInEditor(event)) return
 
     this.tmp.isComposing = true
     this.tmp.compositions++
@@ -339,7 +344,7 @@ class Content extends React.Component {
    */
 
   onCompositionEnd = (event) => {
-    if (!this.isInContentEditable(event)) return
+    if (!this.isInEditor(event)) return
 
     this.tmp.forces++
     const count = this.tmp.compositions
@@ -362,7 +367,7 @@ class Content extends React.Component {
    */
 
   onCopy = (event) => {
-    if (!this.isInContentEditable(event)) return
+    if (!this.isInEditor(event)) return
     const window = getWindow(event.target)
 
     this.tmp.isCopying = true
@@ -387,7 +392,7 @@ class Content extends React.Component {
 
   onCut = (event) => {
     if (this.props.readOnly) return
-    if (!this.isInContentEditable(event)) return
+    if (!this.isInEditor(event)) return
     const window = getWindow(event.target)
 
     this.tmp.isCopying = true
@@ -411,7 +416,7 @@ class Content extends React.Component {
    */
 
   onDragEnd = (event) => {
-    if (!this.isInContentEditable(event)) return
+    if (!this.isInEditor(event)) return
 
     this.tmp.isDragging = false
     this.tmp.isInternalDrag = null
@@ -426,7 +431,7 @@ class Content extends React.Component {
    */
 
   onDragOver = (event) => {
-    if (!this.isInContentEditable(event)) return
+    if (!this.isInEditor(event)) return
 
     const { dataTransfer } = event.nativeEvent
     const data = getTransferData(dataTransfer)
@@ -450,7 +455,7 @@ class Content extends React.Component {
    */
 
   onDragStart = (event) => {
-    if (!this.isInContentEditable(event)) return
+    if (!this.isInEditor(event)) return
 
     this.tmp.isDragging = true
     this.tmp.isInternalDrag = true
@@ -476,7 +481,7 @@ class Content extends React.Component {
 
   onDrop = (event) => {
     if (this.props.readOnly) return
-    if (!this.isInContentEditable(event)) return
+    if (!this.isInEditor(event)) return
 
     event.preventDefault()
 
@@ -534,7 +539,7 @@ class Content extends React.Component {
   onInput = (event) => {
     if (this.tmp.isComposing) return
     if (this.props.state.isBlurred) return
-    if (!this.isInContentEditable(event)) return
+    if (!this.isInEditor(event)) return
     debug('onInput', { event })
 
     const window = getWindow(event.target)
@@ -605,7 +610,7 @@ class Content extends React.Component {
 
   onKeyDown = (event) => {
     if (this.props.readOnly) return
-    if (!this.isInContentEditable(event)) return
+    if (!this.isInEditor(event)) return
 
     const { altKey, ctrlKey, metaKey, shiftKey, which } = event
     const key = keycode(which)
@@ -683,7 +688,7 @@ class Content extends React.Component {
 
   onPaste = (event) => {
     if (this.props.readOnly) return
-    if (!this.isInContentEditable(event)) return
+    if (!this.isInEditor(event)) return
 
     event.preventDefault()
     const data = getTransferData(event.clipboardData)
@@ -707,7 +712,7 @@ class Content extends React.Component {
     if (this.tmp.isCopying) return
     if (this.tmp.isComposing) return
     if (this.tmp.isSelecting) return
-    if (!this.isInContentEditable(event)) return
+    if (!this.isInEditor(event)) return
 
     const window = getWindow(event.target)
     const { state, editor } = this.props
