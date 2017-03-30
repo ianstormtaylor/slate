@@ -25,6 +25,32 @@
     },
     {
       "kind": "block",
+      "type": "code",
+      "data": {
+        "language": "css"
+      },
+      "nodes": [
+        {
+          "kind": "text",
+          "text": ".slate {\n  color: #red;\n  font-size: 20px\n}"
+        }
+      ]
+    },
+    {
+      "kind": "block",
+      "type": "code",
+      "data": {
+        "language": "markdown"
+      },
+      "nodes": [
+        {
+          "kind": "text",
+          "text": "#markdown\n***\n* list item 1\n* list item 2\nLorem ipsum dolor sit amet, **consectetuer** adipiscing elit. Aenean commodo *ligula* eget dolor. Aenean massa.\n[Wikipedia](http://www.wikipedia.org)"
+        }
+      ]
+    },
+    {
+      "kind": "block",
       "type": "paragraph",
       "nodes": [
         {
