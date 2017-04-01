@@ -134,14 +134,16 @@ const Raw = {
   deserializeRange(object, options = {}) {
     if (options.terse) object = Raw.untersifyRange(object)
 
+    const marks = Mark.createSet(object.marks.map((mark) => {
+      return Raw.deserializeMark(mark, options)
+    }))
+
     return Character.createList(object.text
       .split('')
       .map((char) => {
         return Character.create({
           text: char,
-          marks: Mark.createSet(object.marks.map((mark) => {
-            return Raw.deserializeMark(mark, options)
-          }))
+          marks,
         })
       }))
   },
