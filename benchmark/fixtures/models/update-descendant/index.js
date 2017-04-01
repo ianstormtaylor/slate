@@ -6,8 +6,11 @@ export default function ({ state, next }) {
 }
 
 export function before(state) {
-  const last = state.document.getLastText()
-  const next = last.insertText(0, 'some text')
+  const texts = state.document.getTexts()
+  const { size } = texts
+  const text = texts.get(Math.round(size / 2))
+  const next = text.insertText(0, 'some text')
+  __clear()
   return { state, next }
 }
 

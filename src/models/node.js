@@ -1423,22 +1423,19 @@ const Node = {
    */
 
   updateDescendant(node) {
-    let found = false
+    let child = this.assertDescendant(node.key)
+    const ancestors = this.getAncestors(node.key)
 
-    const result = this.mapDescendants((d) => {
-      if (d.key == node.key) {
-        found = true
-        return node
-      } else {
-        return d
-      }
+    ancestors.reverse().forEach((parent) => {
+      let { nodes } = parent
+      const index = nodes.indexOf(child)
+      child = parent
+      nodes = nodes.set(index, node)
+      parent = parent.set('nodes', nodes)
+      node = parent
     })
 
-    if (!found) {
-      throw new Error(`Could not update descendant node with key "${node.key}".`)
-    } else {
-      return result
-    }
+    return node
   },
 
   /**

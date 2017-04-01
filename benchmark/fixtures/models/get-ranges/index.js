@@ -7,6 +7,7 @@ export default function (text) {
 
 export function before(state) {
   const text = state.document.getFirstText()
+  __clear()
   return text
 }
 
