@@ -909,27 +909,17 @@ const Node = {
    */
 
   getPath(key) {
-    key = Normalize.key(key)
-
-    if (key == this.key) return []
-
+    let child = this.assertNode(key)
+    const ancestors = this.getAncestors(key)
     const path = []
-    let childKey = key
-    let parent
 
-    // Efficient with getParent memoization
-    while (parent = this.getParent(childKey)) {
-      const index = parent.nodes.findIndex(n => n.key === childKey)
+    ancestors.reverse().forEach((ancestor) => {
+      const index = ancestor.nodes.indexOf(child)
       path.unshift(index)
-      childKey = parent.key
-    }
+      child = ancestor
+    })
 
-    if (childKey === key) {
-      // Did not loop once, meaning we could not find the child
-      throw new Error(`Could not find a descendant node with key "${key}".`)
-    } else {
-      return path
-    }
+    return path
   },
 
   /**
