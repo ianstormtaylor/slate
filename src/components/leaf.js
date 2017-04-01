@@ -29,6 +29,7 @@ class Leaf extends React.Component {
    */
 
   static propTypes = {
+    block: React.PropTypes.object.isRequired,
     editor: React.PropTypes.object.isRequired,
     index: React.PropTypes.number.isRequired,
     marks: React.PropTypes.object.isRequired,
@@ -129,7 +130,7 @@ class Leaf extends React.Component {
    */
 
   renderText(props) {
-    const { node, state, parent, text, index, ranges } = props
+    const { block, node, parent, text, index, ranges } = props
 
     // COMPAT: If the text is empty and it's the only child, we need to render a
     // <br/> to get the block to have the proper height.
@@ -147,7 +148,6 @@ class Leaf extends React.Component {
 
     // COMPAT: Browsers will collapse trailing new lines at the end of blocks,
     // so we need to add an extra trailing new lines to prevent that.
-    const block = state.document.getClosestBlock(node.key)
     const lastText = block.getLastText()
     const lastChar = text.charAt(text.length - 1)
     const isLastText = node == lastText
