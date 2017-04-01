@@ -167,7 +167,7 @@ function Plugin(options = {}) {
 
     // Add the `isNative` flag directly, so we don't have to re-transform.
     if (isNative) {
-      next = next.merge({ isNative })
+      next = next.set('isNative', isNative)
     }
 
     // If not native, prevent default so that the DOM remains untouched.

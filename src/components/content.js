@@ -726,7 +726,7 @@ class Content extends React.Component {
 
     // If there are no ranges, the editor was blurred natively.
     if (!native.rangeCount) {
-      data.selection = selection.merge({ isFocused: false })
+      data.selection = selection.set('isFocused', false)
       data.isNative = true
     }
 

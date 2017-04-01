@@ -97,7 +97,7 @@ Transforms.normalizeSelection = (transform) => {
     })
   }
 
-  state = state.merge({ selection })
+  state = state.set('selection', selection)
   transform.state = state
 }
 

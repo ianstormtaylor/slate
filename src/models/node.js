@@ -1136,7 +1136,7 @@ const Node = {
     }
 
     const nodes = this.nodes.insert(index, node)
-    return this.merge({ nodes })
+    return this.set('nodes', nodes)
   },
 
   /**
@@ -1187,7 +1187,7 @@ const Node = {
     if (second.kind == 'text') {
       let { characters } = first
       characters = characters.concat(second.characters)
-      first = first.merge({ characters })
+      first = first.set('characters', characters)
     }
 
     else {
@@ -1224,7 +1224,7 @@ const Node = {
       if (ret != node) nodes = nodes.set(ret.key, ret)
     })
 
-    return this.merge({ nodes })
+    return this.set('nodes', nodes)
   },
 
   /**
@@ -1248,7 +1248,7 @@ const Node = {
       nodes = nodes.set(index, ret)
     })
 
-    return this.merge({ nodes })
+    return this.set('nodes', nodes)
   },
 
   /**
@@ -1258,7 +1258,8 @@ const Node = {
    */
 
   regenerateKey() {
-    return this.merge({ key: generateKey() })
+    const key = generateKey()
+    return this.set('key', key)
   },
 
   /**
@@ -1279,11 +1280,8 @@ const Node = {
     const isParent = node == parent
     const nodes = parent.nodes.splice(index, 1)
 
-    parent = parent.merge({ nodes })
-    node = isParent
-      ? parent
-      : node.updateDescendant(parent)
-
+    parent = parent.set('nodes', nodes)
+    node = isParent ? parent : node.updateDescendant(parent)
     return node
   },
 
@@ -1296,7 +1294,7 @@ const Node = {
 
   removeNode(index) {
     const nodes = this.nodes.splice(index, 1)
-    return this.merge({ nodes })
+    return this.set('nodes', nodes)
   },
 
   /**
@@ -1356,8 +1354,8 @@ const Node = {
         const { characters } = child
         const oneChars = characters.take(i)
         const twoChars = characters.skip(i)
-        one = child.merge({ characters: oneChars })
-        two = child.merge({ characters: twoChars }).regenerateKey()
+        one = child.set('characters', oneChars)
+        two = child.set('characters', twoChars).regenerateKey()
       }
 
       else {
@@ -1369,8 +1367,8 @@ const Node = {
         oneNodes = (oneNodes.size == (nodes.size - 1) && one == nodes.last()) ? nodes : oneNodes.push(one)
 
         const twoNodes = nodes.skipUntil(n => n.key == one.key).rest().unshift(two)
-        one = child.merge({ nodes: oneNodes })
-        two = child.merge({ nodes: twoNodes }).regenerateKey()
+        one = child.set('nodes', oneNodes)
+        two = child.set('nodes', twoNodes).regenerateKey()
       }
 
       child = base.getParent(child.key)
@@ -1404,8 +1402,8 @@ const Node = {
     const oneNodes = nodes.take(count)
     const twoNodes = nodes.skip(count)
 
-    const one = node.merge({ nodes: oneNodes })
-    const two = node.merge({ nodes: twoNodes }).regenerateKey()
+    const one = node.set('nodes', oneNodes)
+    const two = node.set('nodes', twoNodes).regenerateKey()
 
 
     const nodeIndex = parent.nodes.indexOf(node)
@@ -1478,7 +1476,7 @@ const Node = {
   concatChildren(nodes) {
     warn('The `Node.concatChildren(nodes)` method is deprecated.')
     nodes = this.nodes.concat(nodes)
-    return this.merge({ nodes })
+    return this.set('nodes', nodes)
   },
 
   /**

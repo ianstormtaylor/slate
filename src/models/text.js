@@ -118,8 +118,7 @@ class Text extends new Record(DEFAULTS) {
    */
 
   get text() {
-    return this.characters
-      .reduce((result, char) => result + char.text, '')
+    return this.characters.reduce((string, char) => string + char.text, '')
   }
 
   /**
@@ -137,11 +136,11 @@ class Text extends new Record(DEFAULTS) {
       if (i >= index + length) return char
       let { marks } = char
       marks = marks.add(mark)
-      char = char.merge({ marks })
+      char = char.set('marks', marks)
       return char
     })
 
-    return this.merge({ characters })
+    return this.set('characters', characters)
   }
 
   /**
@@ -302,7 +301,7 @@ class Text extends new Record(DEFAULTS) {
       .concat(chars)
       .concat(characters.slice(index))
 
-    return this.merge({ characters })
+    return this.set('characters', characters)
   }
 
   /**
@@ -312,7 +311,8 @@ class Text extends new Record(DEFAULTS) {
    */
 
   regenerateKey() {
-    return this.merge({ key: generateKey() })
+    const key = generateKey()
+    return this.set('key', key)
   }
 
   /**
@@ -330,11 +330,11 @@ class Text extends new Record(DEFAULTS) {
       if (i >= index + length) return char
       let { marks } = char
       marks = marks.remove(mark)
-      char = char.merge({ marks })
+      char = char.set('marks', marks)
       return char
     })
 
-    return this.merge({ characters })
+    return this.set('characters', characters)
   }
 
   /**
@@ -350,7 +350,7 @@ class Text extends new Record(DEFAULTS) {
     const start = index
     const end = index + length
     characters = characters.filterNot((char, i) => start <= i && i < end)
-    return this.merge({ characters })
+    return this.set('characters', characters)
   }
 
   /**
@@ -371,11 +371,11 @@ class Text extends new Record(DEFAULTS) {
       if (!marks.has(mark)) return char
       marks = marks.remove(mark)
       marks = marks.add(newMark)
-      char = char.merge({ marks })
+      char = char.set('marks', marks)
       return char
     })
 
-    return this.merge({ characters })
+    return this.set('characters', characters)
   }
 
   /**
