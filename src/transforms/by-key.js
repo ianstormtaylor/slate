@@ -401,7 +401,7 @@ Transforms.unwrapNodeByKey = (transform, key, options = {}) => {
 
 Transforms.wrapInlineByKey = (transform, key, inline, options) => {
   inline = Normalize.inline(inline)
-  inline = inline.merge({ nodes: inline.nodes.clear() })
+  inline = inline.set('nodes', inline.nodes.clear())
 
   const { document } = transform.state
   const node = document.assertDescendant(key)
@@ -424,7 +424,7 @@ Transforms.wrapInlineByKey = (transform, key, inline, options) => {
 
 Transforms.wrapBlockByKey = (transform, key, block, options) => {
   block = Normalize.block(block)
-  block = block.merge({ nodes: block.nodes.clear() })
+  block = block.set('nodes', block.nodes.clear())
 
   const { document } = transform.state
   const node = document.assertDescendant(key)

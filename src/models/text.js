@@ -4,7 +4,7 @@ import Mark from './mark'
 import Range from './range'
 import memoize from '../utils/memoize'
 import generateKey from '../utils/generate-key'
-import { List, Record, OrderedSet, Set } from 'immutable'
+import { List, Record, OrderedSet, Set, is } from 'immutable'
 
 /**
  * Default properties.
@@ -118,8 +118,7 @@ class Text extends new Record(DEFAULTS) {
    */
 
   get text() {
-    return this.characters
-      .reduce((result, char) => result + char.text, '')
+    return this.characters.reduce((string, char) => string + char.text, '')
   }
 
   /**
@@ -137,11 +136,11 @@ class Text extends new Record(DEFAULTS) {
       if (i >= index + length) return char
       let { marks } = char
       marks = marks.add(mark)
-      char = char.merge({ marks })
+      char = char.set('marks', marks)
       return char
     })
 
-    return this.merge({ characters })
+    return this.set('characters', characters)
   }
 
   /**
@@ -223,43 +222,51 @@ class Text extends new Record(DEFAULTS) {
    */
 
   getRanges(decorators = []) {
-    const list = new List()
     const characters = this.getDecorations(decorators)
+    let ranges = []
+
+    // PERF: cache previous values for faster lookup.
+    let prevChar
+    let prevRange
 
     // If there are no characters, return one empty range.
     if (characters.size == 0) {
-      return list.push(new Range())
+      ranges.push({})
     }
 
-    // Convert the now-decorated characters into ranges.
-    const ranges = characters.reduce((memo, char, i) => {
-      const { marks, text } = char
+    // Otherwise, loop the characters and build the ranges...
+    else {
+      characters.forEach((char, i) => {
+        const { marks, text } = char
 
-      // The first one can always just be created.
-      if (i == 0) {
-        return memo.push(new Range({ text, marks }))
-      }
+        // The first one can always just be created.
+        if (i == 0) {
+          prevChar = char
+          prevRange = { text, marks }
+          ranges.push(prevRange)
+          return
+        }
 
-      // Otherwise, compare to the previous and see if a new range should be
-      // created, or whether the text should be added to the previous range.
-      const previous = characters.get(i - 1)
-      const prevMarks = previous.marks
-      const added = marks.filterNot(mark => prevMarks.includes(mark))
-      const removed = prevMarks.filterNot(mark => marks.includes(mark))
-      const isSame = !added.size && !removed.size
+        // Otherwise, compare the current and previous marks.
+        const prevMarks = prevChar.marks
+        const isSame = is(marks, prevMarks)
 
-      // If the marks are the same, add the text to the previous range.
-      if (isSame) {
-        const index = memo.size - 1
-        let prevRange = memo.get(index)
-        let prevText = prevRange.get('text')
-        prevRange = prevRange.set('text', prevText += text)
-        return memo.set(index, prevRange)
-      }
+        // If the marks are the same, add the text to the previous range.
+        if (isSame) {
+          prevChar = char
+          prevRange.text += text
+          return
+        }
 
-      // Otherwise, create a new range.
-      return memo.push(new Range({ text, marks }))
-    }, list)
+        // Otherwise, create a new range.
+        prevChar = char
+        prevRange = { text, marks }
+        ranges.push(prevRange)
+      }, [])
+    }
+
+    // PERF: convert the ranges to immutable objects after iterating.
+    ranges = new List(ranges.map(object => new Range(object)))
 
     // Return the ranges.
     return ranges
@@ -294,7 +301,7 @@ class Text extends new Record(DEFAULTS) {
       .concat(chars)
       .concat(characters.slice(index))
 
-    return this.merge({ characters })
+    return this.set('characters', characters)
   }
 
   /**
@@ -304,7 +311,8 @@ class Text extends new Record(DEFAULTS) {
    */
 
   regenerateKey() {
-    return this.merge({ key: generateKey() })
+    const key = generateKey()
+    return this.set('key', key)
   }
 
   /**
@@ -322,11 +330,11 @@ class Text extends new Record(DEFAULTS) {
       if (i >= index + length) return char
       let { marks } = char
       marks = marks.remove(mark)
-      char = char.merge({ marks })
+      char = char.set('marks', marks)
       return char
     })
 
-    return this.merge({ characters })
+    return this.set('characters', characters)
   }
 
   /**
@@ -342,7 +350,7 @@ class Text extends new Record(DEFAULTS) {
     const start = index
     const end = index + length
     characters = characters.filterNot((char, i) => start <= i && i < end)
-    return this.merge({ characters })
+    return this.set('characters', characters)
   }
 
   /**
@@ -363,11 +371,11 @@ class Text extends new Record(DEFAULTS) {
       if (!marks.has(mark)) return char
       marks = marks.remove(mark)
       marks = marks.add(newMark)
-      char = char.merge({ marks })
+      char = char.set('marks', marks)
       return char
     })
 
-    return this.merge({ characters })
+    return this.set('characters', characters)
   }
 
   /**

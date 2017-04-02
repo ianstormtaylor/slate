@@ -78,7 +78,7 @@ function addMark(state, operation) {
   let node = document.assertPath(path)
   node = node.addMark(offset, length, mark)
   document = document.updateDescendant(node)
-  state = state.merge({ document })
+  state = state.set('document', document)
   return state
 }
 
@@ -97,7 +97,7 @@ function insertNode(state, operation) {
   const isParent = document == parent
   parent = parent.insertNode(index, node)
   document = isParent ? parent : document.updateDescendant(parent)
-  state = state.merge({ document })
+  state = state.set('document', document)
   return state
 }
 
@@ -127,7 +127,7 @@ function insertText(state, operation) {
     selection = selection.moveFocus(text.length)
   }
 
-  state = state.merge({ document, selection })
+  state = state.set('document', document).set('selection', selection)
   return state
 }
 
@@ -171,7 +171,7 @@ function joinNode(state, operation) {
     }
   }
 
-  state = state.merge({ document, selection })
+  state = state.set('document', document).set('selection', selection)
   return state
 }
 
@@ -201,7 +201,7 @@ function moveNode(state, operation) {
   target = target.insertNode(newIndex, node)
   document = isTarget ? target : document.updateDescendant(target)
 
-  state = state.merge({ document })
+  state = state.set('document', document)
   return state
 }
 
@@ -219,7 +219,7 @@ function removeMark(state, operation) {
   let node = document.assertPath(path)
   node = node.removeMark(offset, length, mark)
   document = document.updateDescendant(node)
-  state = state.merge({ document })
+  state = state.set('document', document)
   return state
 }
 
@@ -278,7 +278,7 @@ function removeNode(state, operation) {
   document = isParent ? parent : document.updateDescendant(parent)
 
   // Update the document and selection.
-  state = state.merge({ document, selection })
+  state = state.set('document', document).set('selection', selection)
   return state
 }
 
@@ -307,7 +307,7 @@ function removeText(state, operation) {
 
   node = node.removeText(offset, length)
   document = document.updateDescendant(node)
-  state = state.merge({ document, selection })
+  state = state.set('document', document).set('selection', selection)
   return state
 }
 
@@ -325,7 +325,7 @@ function setMark(state, operation) {
   let node = document.assertPath(path)
   node = node.updateMark(offset, length, mark, newMark)
   document = document.updateDescendant(node)
-  state = state.merge({ document })
+  state = state.set('document', document)
   return state
 }
 
@@ -356,7 +356,7 @@ function setNode(state, operation) {
 
   node = node.merge(properties)
   document = node.kind === 'document' ? node : document.updateDescendant(node)
-  state = state.merge({ document })
+  state = state.set('document', document)
   return state
 }
 
@@ -388,7 +388,7 @@ function setSelection(state, operation) {
 
   selection = selection.merge(properties)
   selection = selection.normalize(document)
-  state = state.merge({ selection })
+  state = state.set('selection', selection)
   return state
 }
 
@@ -411,7 +411,7 @@ function splitNode(state, operation) {
   // If there's no offset, it's using the `count` instead.
   if (offset == null) {
     document = document.splitNodeAfter(path, count)
-    state = state.merge({ document })
+    state = state.set('document', document)
     return state
   }
 
@@ -446,7 +446,7 @@ function splitNode(state, operation) {
     }
   }
 
-  state = state.merge({ document, selection })
+  state = state.set('document', document).set('selection', selection)
   return state
 }
 

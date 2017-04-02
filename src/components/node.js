@@ -32,6 +32,7 @@ class Node extends React.Component {
    */
 
   static propTypes = {
+    block: React.PropTypes.object,
     editor: React.PropTypes.object.isRequired,
     node: React.PropTypes.object.isRequired,
     parent: React.PropTypes.object.isRequired,
@@ -229,6 +230,7 @@ class Node extends React.Component {
       <Node
         key={child.key}
         node={child}
+        block={this.props.node.kind == 'block' ? this.props.node : this.props.block}
         parent={this.props.node}
         editor={this.props.editor}
         readOnly={this.props.readOnly}
@@ -247,9 +249,7 @@ class Node extends React.Component {
   renderElement = () => {
     const { editor, node, parent, readOnly, state } = this.props
     const { Component } = this.state
-    const children = node.nodes
-      .map(child => this.renderNode(child))
-      .toArray()
+    const children = node.nodes.map(this.renderNode).toArray()
 
     // Attributes that the developer must to mix into the element in their
     // custom node renderer component.
@@ -321,12 +321,13 @@ class Node extends React.Component {
    */
 
   renderLeaf = (ranges, range, index, offset) => {
-    const { node, parent, schema, state, editor } = this.props
+    const { block, node, parent, schema, state, editor } = this.props
     const { text, marks } = range
 
     return (
       <Leaf
         key={`${node.key}-${index}`}
+        block={block}
         editor={editor}
         index={index}
         marks={marks}
