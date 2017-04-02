@@ -214,12 +214,23 @@ const Node = {
    */
 
   getBlocks() {
-    return this.nodes.reduce((blocks, node) => {
-      if (node.kind != 'block') return blocks
-      return node.isLeafBlock()
-        ? blocks.push(node)
-        : blocks.concat(node.getBlocks())
-    }, new List())
+    const array = this.getBlocksAsArray()
+    return new List(array)
+  },
+
+  /**
+   * Get the leaf block descendants of the node.
+   *
+   * @return {List<Node>}
+   */
+
+  getBlocksAsArray() {
+    return this.nodes.reduce((array, child) => {
+      if (child.kind != 'block') return array
+      if (!child.isLeafBlock()) return array.concat(child.getBlocksAsArray())
+      array.push(child)
+      return array
+    }, [])
   },
 
   /**
@@ -635,12 +646,29 @@ const Node = {
    */
 
   getInlines() {
-    return this.nodes.reduce((inlines, node) => {
-      if (node.kind == 'text') return inlines
-      return node.isLeafInline()
-        ? inlines.push(node)
-        : inlines.concat(node.getInlines())
-    }, new List())
+    const array = this.getInlinesAsArray()
+    return new List(array)
+  },
+
+  /**
+   * Get the closest inline nodes for each text node in the node, as an array.
+   *
+   * @return {List<Node>}
+   */
+
+  getInlinesAsArray() {
+    let array = []
+
+    this.nodes.forEach((child) => {
+      if (child.kind == 'text') return
+      if (child.isLeafInline()) {
+        array.push(child)
+      } else {
+        array = array.concat(child.getInlinesAsArray())
+      }
+    })
+
+    return array
   },
 
   /**
@@ -1033,11 +1061,28 @@ const Node = {
    */
 
   getTexts() {
-    return this.nodes.reduce((texts, node) => {
-      return node.kind == 'text'
-        ? texts.push(node)
-        : texts.concat(node.getTexts())
-    }, new List())
+    const array = this.getTextsAsArray()
+    return new List(array)
+  },
+
+  /**
+   * Recursively get all the leaf text nodes in order of appearance, as array.
+   *
+   * @return {List<Node>}
+   */
+
+  getTextsAsArray() {
+    let array = []
+
+    this.nodes.forEach((node) => {
+      if (node.kind == 'text') {
+        array.push(node)
+      } else {
+        array = array.concat(node.getTextsAsArray())
+      }
+    })
+
+    return array
   },
 
   /**
@@ -1605,6 +1650,7 @@ memoize(Node, [
   'areDescendantsSorted',
   'getAncestors',
   'getBlocks',
+  'getBlocksAsArray',
   'getBlocksAtRange',
   'getBlocksByType',
   'getCharacters',
@@ -1630,6 +1676,7 @@ memoize(Node, [
   'getFurthestAncestor',
   'getFurthestOnlyChildAncestor',
   'getInlines',
+  'getInlinesAsArray',
   'getInlinesAtRange',
   'getInlinesByType',
   'getKeys',
@@ -1652,6 +1699,7 @@ memoize(Node, [
   'getTextAtOffset',
   'getTextDirection',
   'getTexts',
+  'getTextsAsArray',
   'getTextsAtRange',
   'hasChild',
   'hasDescendant',
