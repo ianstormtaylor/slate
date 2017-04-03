@@ -4,7 +4,6 @@ import Debug from 'debug'
 import Node from './node'
 import getPoint from '../utils/get-point'
 import React from 'react'
-import ReactDOM from 'react-dom'
 import Selection from '../models/selection'
 import getTransferData from '../utils/get-transfer-data'
 import TYPES from '../constants/types'
@@ -118,8 +117,7 @@ class Content extends React.Component {
     this.updateSelection()
 
     if (this.props.autoFocus) {
-      const el = ReactDOM.findDOMNode(this)
-      el.focus()
+      this.element.focus()
     }
   }
 
@@ -138,8 +136,7 @@ class Content extends React.Component {
   updateSelection = () => {
     const { editor, state } = this.props
     const { document, selection } = state
-    const el = ReactDOM.findDOMNode(this)
-    const window = getWindow(el)
+    const window = getWindow(this.element)
     const native = window.getSelection()
 
     // If both selections are blurred, do nothing.
@@ -148,9 +145,9 @@ class Content extends React.Component {
     // If the selection has been blurred, but hasn't been updated in the DOM,
     // blur the DOM selection.
     if (selection.isBlurred) {
-      if (!el.contains(native.anchorNode)) return
+      if (!this.element.contains(native.anchorNode)) return
       native.removeAllRanges()
-      el.blur()
+      this.element.blur()
       debug('updateSelection', { selection, native })
       return
     }
@@ -188,8 +185,8 @@ class Content extends React.Component {
       return false
     })
 
-    const anchorSpan = el.querySelector(`[data-offset-key="${anchorKey}-${anchorIndex}"]`)
-    const focusSpan = el.querySelector(`[data-offset-key="${focusKey}-${focusIndex}"]`)
+    const anchorSpan = this.element.querySelector(`[data-offset-key="${anchorKey}-${anchorIndex}"]`)
+    const focusSpan = this.element.querySelector(`[data-offset-key="${focusKey}-${focusIndex}"]`)
     const anchorEl = findDeepestNode(anchorSpan)
     const focusEl = findDeepestNode(focusSpan)
 
@@ -215,7 +212,7 @@ class Content extends React.Component {
     setTimeout(() => {
       // COMPAT: In Firefox, it's not enough to create a range, you also need to
       // focus the contenteditable element too. (2016/11/16)
-      if (IS_FIREFOX) el.focus()
+      if (IS_FIREFOX) this.element.focus()
       this.tmp.isSelecting = false
     })
 
