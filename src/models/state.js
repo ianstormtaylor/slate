@@ -4,7 +4,7 @@ import Document from './document'
 import SCHEMA from '../schemas/core'
 import Selection from './selection'
 import Transform from './transform'
-import { Record, Set, Stack, List } from 'immutable'
+import { Record, Set, Stack, List, Map } from 'immutable'
 
 /**
  * History.
@@ -27,6 +27,7 @@ const DEFAULTS = {
   document: new Document(),
   selection: new Selection(),
   history: new History(),
+  data: new Map(),
   isNative: false
 }
 
@@ -52,13 +53,24 @@ class State extends new Record(DEFAULTS) {
 
     const document = Document.create(properties.document)
     let selection = Selection.create(properties.selection)
+    let data = new Map()
 
     if (selection.isUnset) {
       const text = document.getFirstText()
       selection = selection.collapseToStartOf(text)
     }
 
-    const state = new State({ document, selection })
+    // Set default value for `data`.
+    if (options.plugins) {
+      for (const plugin of options.plugins) {
+        if (plugin.data) data = data.merge(plugin.data)
+      }
+    }
+
+    // Then add data provided in `properties`.
+    if (properties.data) data = data.merge(properties.data)
+
+    const state = new State({ document, selection, data })
 
     return options.normalize === false
       ? state
