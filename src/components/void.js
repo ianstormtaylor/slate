@@ -152,7 +152,7 @@ class Void extends React.Component {
    */
 
   renderLeaf = () => {
-    const { node, schema, state, editor } = this.props
+    const { block, node, schema, state, editor } = this.props
     const child = node.getFirstText()
     const ranges = child.getRanges()
     const text = ''
@@ -167,6 +167,7 @@ class Void extends React.Component {
     return (
       <Leaf
         key={offsetKey}
+        block={block}
         editor={editor}
         index={index}
         marks={marks}
