@@ -70,12 +70,13 @@ function codeBlockDecorator(text, block) {
 
     const length = offset + token.content.length
     const type = `highlight-${token.type}`
+    const mark = Mark.create({ type })
 
     for (let i = offset; i < length; i++) {
       let char = characters.get(i)
       let { marks } = char
-      marks = marks.add(Mark.create({ type }))
-      char = char.merge({ marks })
+      marks = marks.add(mark)
+      char = char.set('marks', marks)
       characters.set(i, char)
     }
 

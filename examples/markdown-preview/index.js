@@ -41,7 +41,7 @@ function addMarks(characters, tokens, offset) {
       let char = characters.get(i)
       let { marks } = char
       marks = marks.add(mark)
-      char = char.merge({ marks })
+      char = char.set('marks', marks)
       characters.set(i, char)
     }
 
