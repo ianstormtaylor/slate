@@ -29,6 +29,7 @@ class Void extends React.Component {
    */
 
   static propTypes = {
+    block: React.PropTypes.object,
     children: React.PropTypes.any.isRequired,
     editor: React.PropTypes.object.isRequired,
     node: React.PropTypes.object.isRequired,
@@ -167,7 +168,7 @@ class Void extends React.Component {
     return (
       <Leaf
         key={offsetKey}
-        block={block}
+        block={node.kind == 'block' ? node : block}
         editor={editor}
         index={index}
         marks={marks}

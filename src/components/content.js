@@ -878,6 +878,7 @@ class Content extends React.Component {
     return (
       <Node
         key={node.key}
+        block={null}
         node={node}
         parent={state.document}
         schema={schema}

@@ -226,16 +226,17 @@ class Node extends React.Component {
    */
 
   renderNode = (child) => {
+    const { block, editor, node, readOnly, schema, state } = this.props
     return (
       <Node
         key={child.key}
         node={child}
-        block={this.props.node.kind == 'block' ? this.props.node : this.props.block}
-        parent={this.props.node}
-        editor={this.props.editor}
-        readOnly={this.props.readOnly}
-        schema={this.props.schema}
-        state={this.props.state}
+        block={node.kind == 'block' ? node : block}
+        parent={node}
+        editor={editor}
+        readOnly={readOnly}
+        schema={schema}
+        state={state}
       />
     )
   }
