@@ -361,9 +361,8 @@ Transforms.unwrapNodeByKey = (transform, key, options = {}) => {
 
 
   if (parent.nodes.size === 1) {
-    // Remove the parent and replace it by the node itself.
-    transform.removeNodeByKey(parent.key, { normalize: false })
-    transform.insertNodeByKey(parentParent.key, parentIndex, node, options)
+    transform.moveNodeByKey(key, parentParent.key, parentIndex, { normalize: false })
+    transform.removeNodeByKey(parent.key, options)
   }
 
   else if (isFirst) {
