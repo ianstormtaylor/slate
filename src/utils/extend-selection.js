@@ -7,6 +7,7 @@
  * @param {Number} offset Text offset to extend to
  * @returns {Selection} Mutated Selection instance
  */
+
 function extendSelection(selection, el, offset) {
   // Use native method when possible
   if (typeof selection.extend === 'function') return selection.extend(el, offset)
