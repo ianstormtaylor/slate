@@ -2,10 +2,10 @@
 /**
  * Extends the given selection to a given node and offset
  *
- * @param {Selection} selection
- * @param {Element} node
- * @param {Number} offset
- * @return {Selection}
+ * @param {Selection} selection Selection instance
+ * @param {Element} el Node to extend to
+ * @param {Number} offset Text offset to extend to
+ * @returns {Selection} Mutated Selection instance
  */
 function extendSelection(selection, el, offset) {
   // Use native method when possible
