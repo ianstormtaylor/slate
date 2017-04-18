@@ -1,6 +1,6 @@
 
 import normalizeNodeAndOffset from './normalize-node-and-offset'
-import findClosestNode from './find-closest-node';
+import findClosestNode from './find-closest-node'
 
 /**
  * Offset key parser regex.

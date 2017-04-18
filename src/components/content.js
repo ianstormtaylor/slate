@@ -3,7 +3,7 @@ import Base64 from '../serializers/base-64'
 import Debug from 'debug'
 import Node from './node'
 import getPoint from '../utils/get-point'
-import findClosestNode from '../utils/find-closest-node';
+import findClosestNode from '../utils/find-closest-node'
 import React from 'react'
 import Selection from '../models/selection'
 import getTransferData from '../utils/get-transfer-data'
