@@ -3,6 +3,7 @@ import Base64 from '../serializers/base-64'
 import Debug from 'debug'
 import Node from './node'
 import getPoint from '../utils/get-point'
+import extendSelection from '../utils/extend-selection'
 import findClosestNode from '../utils/find-closest-node'
 import React from 'react'
 import Selection from '../models/selection'
@@ -207,7 +208,7 @@ class Content extends React.Component {
     const range = window.document.createRange()
     range.setStart(anchorEl, anchorOff)
     native.addRange(range)
-    native.extend(focusEl, focusOff)
+    extendSelection(native, focusEl, focusOff)
 
     // Then unset the `isSelecting` flag after a delay.
     setTimeout(() => {
