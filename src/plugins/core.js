@@ -261,11 +261,17 @@ function Plugin(options = {}) {
     const zws = [].slice.call(contents.querySelectorAll('[data-slate-zero-width]'))
     zws.forEach(zw => zw.parentNode.removeChild(zw))
 
-    // Insert an empty span that has the encoded fragment attached as an attribute.
-    const dataContainer = window.document.createElement('span')
+    // Wrap the first character of the selection in a span that has the encoded
+    // fragment attached as an attribute, so it will show up in the copied HTML.
+    const wrapper = window.document.createElement('span')
     const text = contents.childNodes[0]
-    dataContainer.setAttribute('data-slate-fragment', encoded)
-    contents.insertBefore(dataContainer, text)
+    const char = text.textContent.slice(0, 1)
+    const first = window.document.createTextNode(char)
+    const rest = text.textContent.slice(1)
+    text.textContent = rest
+    wrapper.appendChild(first)
+    wrapper.setAttribute('data-slate-fragment', encoded)
+    contents.insertBefore(wrapper, text)
 
     // Add the phony content to the DOM, and select it, so it will be copied.
     const body = window.document.querySelector('body')
