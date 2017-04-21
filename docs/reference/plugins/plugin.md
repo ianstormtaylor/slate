@@ -63,7 +63,7 @@ Each event handler can choose to return a new `state` object, in which case the 
 
 This handler is called right before a string of text is inserted into the `contenteditable` element.
 
-Make sure to `event.preventDefault()` if you do not want the default insertion behavior to occur! If no other plugin handles this event, it will be handled by the [Core plugin](./core.md).
+Make sure to `event.preventDefault()` (and return `state`) if you do not want the default insertion behavior to occur! If no other plugin handles this event, it will be handled by the [Core plugin](./core.md).
 
 ### `onBlur`
 `Function onBlur(event: Event, data: Object, state: State, editor: Editor) => State || Void`
@@ -161,7 +161,7 @@ The `isModAlt` boolean is `true` if the `control` key was pressed on Windows or 
 
 The `isLine` and `isWord` booleans represent whether the "line modifier" or "word modifier" hotkeys are pressed when deleteing or moving the cursor. For example, on a Mac `option + right` moves the cursor to the right one word at a time.
 
-Make sure to `event.preventDefault()` if you do not want the default insertion behavior to occur! If no other plugin handles this event, it will be handled by the [Core plugin](./core.md).
+Make sure to `event.preventDefault()` (and return `state`) if you do not want the default insertion behavior to occur! If no other plugin handles this event, it will be handled by the [Core plugin](./core.md).
 
 ### `onPaste`
 `Function onPaste(event: Event, data: Object, state: State, editor: Editor) => State || Void`
