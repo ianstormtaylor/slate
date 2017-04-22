@@ -124,6 +124,14 @@ class Html {
       return memo
     }, [])
 
+    if (nodes.length === 0) {
+      nodes = [{
+        kind: 'block',
+        type: 'paragraph',
+        nodes: [],
+      }]
+    }
+
     const raw = {
       kind: 'state',
       document: {
