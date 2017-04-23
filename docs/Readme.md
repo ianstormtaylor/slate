@@ -71,15 +71,15 @@ Check out the [**live demo**](http://slatejs.org) of all of the examples!
 
 To get a sense for how you might use Slate, check out a few of the examples:
 
-- [**Plain text**](https://github.com/ianstormtaylor/slate/examples/plain-text) — showing the most basic case: a glorified `<textarea>`.
-- [**Rich text**](https://github.com/ianstormtaylor/slate/examples/rich-text) — showing the features you'd expect from a basic editor.
-- [**Auto-markdown**](https://github.com/ianstormtaylor/slate/examples/auto-markdown) — showing how to add key handlers for Markdown-like shortcuts.
-- [**Links**](https://github.com/ianstormtaylor/slate/examples/links) — showing how wrap text in inline nodes with associated data.
-- [**Images**](https://github.com/ianstormtaylor/slate/examples/images) — showing how to use void (text-less) nodes to add images.
-- [**Hovering menu**](https://github.com/ianstormtaylor/slate/examples/hovering-menu) — showing how a contextual hovering menu can be implemented.
-- [**Tables**](https://github.com/ianstormtaylor/slate/examples/tables) — showing how to nest blocks to render more advanced components.
-- [**Paste HTML**](https://github.com/ianstormtaylor/slate/examples/paste-html) — showing how to use an HTML serializer to handle pasted HTML.
-- [**Code Highlighting**](https://github.com/ianstormtaylor/slate/examples/code-highlighting) — showing how to use decorators to dynamically mark text.
+- [**Plain text**](https://github.com/ianstormtaylor/slate/tree/master/examples/plain-text) — showing the most basic case: a glorified `<textarea>`.
+- [**Rich text**](https://github.com/ianstormtaylor/slate/tree/master/examples/rich-text) — showing the features you'd expect from a basic editor.
+- [**Auto-markdown**](https://github.com/ianstormtaylor/slate/tree/master/examples/auto-markdown) — showing how to add key handlers for Markdown-like shortcuts.
+- [**Links**](https://github.com/ianstormtaylor/slate/tree/master/examples/links) — showing how wrap text in inline nodes with associated data.
+- [**Images**](https://github.com/ianstormtaylor/slate/tree/master/examples/images) — showing how to use void (text-less) nodes to add images.
+- [**Hovering menu**](https://github.com/ianstormtaylor/slate/tree/master/examples/hovering-menu) — showing how a contextual hovering menu can be implemented.
+- [**Tables**](https://github.com/ianstormtaylor/slate/tree/master/examples/tables) — showing how to nest blocks to render more advanced components.
+- [**Paste HTML**](https://github.com/ianstormtaylor/slate/tree/master/examples/paste-html) — showing how to use an HTML serializer to handle pasted HTML.
+- [**Code Highlighting**](https://github.com/ianstormtaylor/slate/tree/master/examples/code-highlighting) — showing how to use decorators to dynamically mark text.
 
 If you have an idea for an example that shows a common use case, pull request it!
 
