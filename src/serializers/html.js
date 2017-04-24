@@ -96,6 +96,11 @@ class Html {
     const children = $.children().toArray()
     let nodes = this.deserializeElements(children)
 
+    const { defaultBlockType } = this
+    const defaults = typeof defaultBlockType == 'string'
+      ? { type: defaultBlockType }
+      : defaultBlockType
+
     // HACK: ensure for now that all top-level inline are wrapped into a block.
     nodes = nodes.reduce((memo, node, i, original) => {
       if (node.kind == 'block') {
@@ -108,11 +113,6 @@ class Html {
         block.nodes.push(node)
         return memo
       }
-
-      const { defaultBlockType } = this
-      const defaults = typeof defaultBlockType == 'string'
-        ? { type: defaultBlockType }
-        : defaultBlockType
 
       const block = {
         kind: 'block',
@@ -127,8 +127,8 @@ class Html {
     if (nodes.length === 0) {
       nodes = [{
         kind: 'block',
-        type: 'paragraph',
         nodes: [],
+        ...defaults
       }]
     }
 
