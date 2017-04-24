@@ -117,7 +117,7 @@ Transforms.deleteAtRange = (transform, range, options = {}) => {
     let blockToKeep = startBlock
 
     // We keep the style of the blockToKeep. endBlock should keep style if deleting empty line.
-    if (startBlock.isEmpty && !endBlock.isEmpty) {
+    if (startBlock.isEmpty) {
       blockToRemove = startBlock
       blockToKeep = endBlock
     }
