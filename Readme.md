@@ -26,11 +26,11 @@
 
 <p align="center">
   <a href="https://www.npmjs.com/package/slate"><img src="https://img.shields.io/npm/dt/localeval.svg?maxAge=2592000"></a> 
+  <a href="https://unpkg.com/slate@0.19.20/dist/slate.min.js"><img src="https://camo.githubusercontent.com/1fc98058815d91270a61227a28add53d0dbf7438/687474703a2f2f696d672e626164676573697a652e696f2f68747470733a2f2f756e706b672e636f6d2f736c61746540302e31392e32302f646973742f736c6174652e6d696e2e6a733f636f6d7072657373696f6e3d677a6970266c6162656c3d677a697025323073697a65" alt="gzip size" data-canonical-src="http://img.badgesize.io/https://unpkg.com/slate@0.19.20/dist/slate.min.js?compression=gzip&amp;label=gzip%20size"></a>
   <a href="https://travis-ci.org/ianstormtaylor/slate"><img src="https://travis-ci.org/ianstormtaylor/slate.svg?branch=master"></a> 
   <a href="https://slate-slack.herokuapp.com"><img src="https://slate-slack.herokuapp.com/badge.svg"><a/> 
   <a href="https://github.com/ianstormtaylor/slate/releases"><img src="https://img.shields.io/github/release/ianstormtaylor/slate.svg?maxAge=2592000"></a> 
   <a href="./License.md"><img src="https://img.shields.io/npm/l/slate.svg?maxAge=2592000"></a> 
-  <a href="https://unpkg.com/slate@0.19.20/dist/slate.min.js"><img src="https://camo.githubusercontent.com/1fc98058815d91270a61227a28add53d0dbf7438/687474703a2f2f696d672e626164676573697a652e696f2f68747470733a2f2f756e706b672e636f6d2f736c61746540302e31392e32302f646973742f736c6174652e6d696e2e6a733f636f6d7072657373696f6e3d677a6970266c6162656c3d677a697025323073697a65" alt="gzip size" data-canonical-src="http://img.badgesize.io/https://unpkg.com/slate@0.19.20/dist/slate.min.js?compression=gzip&amp;label=gzip%20size"></a>
 </p>
 <br/>
 
