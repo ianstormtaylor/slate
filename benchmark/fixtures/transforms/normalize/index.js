@@ -1,5 +1,5 @@
 
-import SCHEMA from '../../../../lib/constants/schema'
+import SCHEMA from '../../../../lib/schemas/core'
 
 export default function (state) {
   state
