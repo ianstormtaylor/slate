@@ -224,7 +224,7 @@ This allows you to stack up changes across the entire plugin stack.
 
 The `onBeforeChange` handler isn't a native browser event handler. Instead, it is invoked whenever the editor receives a new state and before propagating a new state to `onChange`. Returning a new state will update the editor's state before rendering, continuing down the plugin stack.
 
-Like `onChange`, `onBeforeChange` is cummulative.
+Like `onChange`, `onBeforeChange` is cumulative.
 
 ### `render`
 `Function render(props: Object, state: State, editor: Editor) => Object || Void`
