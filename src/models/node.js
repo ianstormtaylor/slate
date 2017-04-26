@@ -1399,7 +1399,11 @@ const Node = {
         // Try to preserve the nodes list to preserve reference of one == node to avoid re-render
         // When spliting at the end of a text node, the first node is preserved
         let oneNodes = nodes.takeUntil(n => n.key == one.key)
-        oneNodes = (oneNodes.size == (nodes.size - 1) && one == nodes.last()) ? nodes : oneNodes.push(one)
+        // HACK: workaround to avoid duplicating inline blocks
+        // https://github.com/ianstormtaylor/slate/issues/612
+        if(!one.isVoid) {
+          oneNodes = (oneNodes.size == (nodes.size - 1) && one == nodes.last()) ? nodes : oneNodes.push(one)
+        }
 
         const twoNodes = nodes.skipUntil(n => n.key == one.key).rest().unshift(two)
         one = child.set('nodes', oneNodes)
