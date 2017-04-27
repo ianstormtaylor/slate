@@ -1,0 +1,134 @@
+{
+  "nodes": [
+    {
+      "kind": "block",
+      "type": "paragraph",
+      "nodes": [
+        {
+          "kind": "text",
+          "ranges": [
+            {
+              "text": "With Slate you can build complex block types that have their own embedded content and behaviors, like rendering checkboxes inside check list items!"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "block",
+      "type": "check-list-item",
+      "data": {
+        "checked": true,
+      },
+      "nodes": [
+        {
+          "kind": "text",
+          "ranges": [
+            {
+              "text": "Slide to the left."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "block",
+      "type": "check-list-item",
+      "data": {
+        "checked": true,
+      },
+      "nodes": [
+        {
+          "kind": "text",
+          "ranges": [
+            {
+              "text": "Slide to the right."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "block",
+      "type": "check-list-item",
+      "data": {
+        "checked": false,
+      },
+      "nodes": [
+        {
+          "kind": "text",
+          "ranges": [
+            {
+              "text": "Criss-cross."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "block",
+      "type": "check-list-item",
+      "data": {
+        "checked": true,
+      },
+      "nodes": [
+        {
+          "kind": "text",
+          "ranges": [
+            {
+              "text": "Criss-cross!"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "block",
+      "type": "check-list-item",
+      "data": {
+        "checked": false,
+      },
+      "nodes": [
+        {
+          "kind": "text",
+          "ranges": [
+            {
+              "text": "Cha cha real smooth…"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "block",
+      "type": "check-list-item",
+      "data": {
+        "checked": false,
+      },
+      "nodes": [
+        {
+          "kind": "text",
+          "ranges": [
+            {
+              "text": "Let's go to work!"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "block",
+      "type": "paragraph",
+      "nodes": [
+        {
+          "kind": "text",
+          "ranges": [
+            {
+              "text": "Try it out for yourself!"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

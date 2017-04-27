@@ -28,13 +28,13 @@ Transforms.addMark = (transform, mark) => {
 
   if (selection.marks) {
     const marks = selection.marks.add(mark)
-    const sel = selection.merge({ marks })
+    const sel = selection.set('marks', marks)
     transform.select(sel)
     return
   }
 
   const marks = document.getMarksAtRange(selection).add(mark)
-  const sel = selection.merge({ marks })
+  const sel = selection.set('marks', marks)
   transform.select(sel)
 }
 
@@ -341,13 +341,13 @@ Transforms.removeMark = (transform, mark) => {
 
   if (selection.marks) {
     const marks = selection.marks.remove(mark)
-    const sel = selection.merge({ marks })
+    const sel = selection.set('marks', marks)
     transform.select(sel)
     return
   }
 
   const marks = document.getMarksAtRange(selection).remove(mark)
-  const sel = selection.merge({ marks })
+  const sel = selection.set('marks', marks)
   transform.select(sel)
 }
 

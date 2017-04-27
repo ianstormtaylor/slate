@@ -3,7 +3,7 @@ import Debug from 'debug'
 import OffsetKey from '../utils/offset-key'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import getWindow from 'get-window'
+import findDeepestNode from '../utils/find-deepest-node'
 import { IS_FIREFOX } from '../constants/environment'
 
 /**
@@ -29,6 +29,7 @@ class Leaf extends React.Component {
    */
 
   static propTypes = {
+    block: React.PropTypes.object.isRequired,
     editor: React.PropTypes.object.isRequired,
     index: React.PropTypes.number.isRequired,
     marks: React.PropTypes.object.isRequired,
@@ -88,121 +89,8 @@ class Leaf extends React.Component {
     const text = this.renderText(props)
     if (el.textContent != text) return true
 
-    // If the selection was previously focused, and now it isn't, re-render so
-    // that the selection will be properly removed.
-    if (this.props.state.isFocused && props.state.isBlurred) {
-      const { index, node, ranges, state } = this.props
-      const { start, end } = OffsetKey.findBounds(index, ranges)
-      if (state.selection.hasEdgeBetween(node, start, end)) return true
-    }
-
-    // If the selection will be focused, only re-render if this leaf contains
-    // one or both of the selection's edges.
-    if (props.state.isFocused) {
-      const { index, node, ranges, state } = props
-      const { start, end } = OffsetKey.findBounds(index, ranges)
-      if (state.selection.hasEdgeBetween(node, start, end)) return true
-    }
-
     // Otherwise, don't update.
     return false
-  }
-
-  /**
-   * When the DOM updates, try updating the selection.
-   */
-
-  componentDidMount() {
-    this.updateSelection()
-  }
-
-  componentDidUpdate() {
-    this.updateSelection()
-  }
-
-  /**
-   * Update the DOM selection if it's inside the leaf.
-   */
-
-  updateSelection() {
-    const { state, ranges } = this.props
-    const { selection } = state
-
-    // If the selection is blurred we have nothing to do.
-    if (selection.isBlurred) return
-
-    const { node, index } = this.props
-    const { start, end } = OffsetKey.findBounds(index, ranges)
-    const anchorOffset = selection.anchorOffset - start
-    const focusOffset = selection.focusOffset - start
-
-    // If neither matches, the selection doesn't start or end here, so exit.
-    const hasAnchor = selection.hasAnchorBetween(node, start, end)
-    const hasFocus = selection.hasFocusBetween(node, start, end)
-    if (!hasAnchor && !hasFocus) return
-
-    // We have a selection to render, so prepare a few things...
-    const ref = ReactDOM.findDOMNode(this)
-    const el = findDeepestNode(ref)
-    const window = getWindow(el)
-    const native = window.getSelection()
-    const parent = ref.closest('[contenteditable]')
-
-    // COMPAT: In Firefox, it's not enough to create a range, you also need to
-    // focus the contenteditable element. (2016/11/16)
-    function focus() {
-      if (!IS_FIREFOX) return
-      if (parent) setTimeout(() => parent.focus())
-    }
-
-    // If both the start and end are here, set the selection all at once.
-    if (hasAnchor && hasFocus) {
-      native.removeAllRanges()
-      const range = window.document.createRange()
-      range.setStart(el, anchorOffset)
-      native.addRange(range)
-      native.extend(el, focusOffset)
-      focus()
-    }
-
-    // Otherwise we need to set the selection across two different leaves.
-    // If the selection is forward, we can set things in sequence. In the
-    // first leaf to render, reset the selection and set the new start. And
-    // then in the second leaf to render, extend to the new end.
-    else if (selection.isForward) {
-      if (hasAnchor) {
-        native.removeAllRanges()
-        const range = window.document.createRange()
-        range.setStart(el, anchorOffset)
-        native.addRange(range)
-      } else if (hasFocus) {
-        native.extend(el, focusOffset)
-        focus()
-      }
-    }
-
-    // Otherwise, if the selection is backward, we need to hack the order a bit.
-    // In the first leaf to render, set a phony start anchor to store the true
-    // end position. And then in the second leaf to render, set the start and
-    // extend the end to the stored value.
-    else if (hasFocus) {
-      native.removeAllRanges()
-      const range = window.document.createRange()
-      range.setStart(el, focusOffset)
-      native.addRange(range)
-    }
-    else if (hasAnchor) {
-      const endNode = native.focusNode
-      const endOffset = native.focusOffset
-      native.removeAllRanges()
-      const range = window.document.createRange()
-      range.setStart(el, anchorOffset)
-      native.addRange(range)
-      native.extend(endNode, endOffset)
-      focus()
-    }
-
-    this.debug('updateSelection', { selection })
   }
 
   /**
@@ -225,7 +113,6 @@ class Leaf extends React.Component {
     // get out of sync, causing it to not realize the DOM needs updating.
     this.tmp.renders++
 
-
     this.debug('render', { props })
 
     return (
@@ -243,7 +130,7 @@ class Leaf extends React.Component {
    */
 
   renderText(props) {
-    const { node, state, parent, text, index, ranges } = props
+    const { block, node, parent, text, index, ranges } = props
 
     // COMPAT: If the text is empty and it's the only child, we need to render a
     // <br/> to get the block to have the proper height.
@@ -261,7 +148,6 @@ class Leaf extends React.Component {
 
     // COMPAT: Browsers will collapse trailing new lines at the end of blocks,
     // so we need to add an extra trailing new lines to prevent that.
-    const block = state.document.getClosestBlock(node.key)
     const lastText = block.getLastText()
     const lastChar = text.charAt(text.length - 1)
     const isLastText = node == lastText
@@ -303,19 +189,6 @@ class Leaf extends React.Component {
     }, children)
   }
 
-}
-
-/**
- * Find the deepest descendant of a DOM `element`.
- *
- * @param {Element} node
- * @return {Element}
- */
-
-function findDeepestNode(element) {
-  return element.firstChild
-    ? findDeepestNode(element.firstChild)
-    : element
 }
 
 /**

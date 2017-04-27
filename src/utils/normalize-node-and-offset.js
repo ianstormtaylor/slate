@@ -15,13 +15,13 @@ function normalizeNodeAndOffset(node, offset) {
     const isLast = offset == node.childNodes.length
     const direction = isLast ? 'backward' : 'forward'
     const index = isLast ? offset - 1 : offset
-    node = getNonComment(node, index, direction)
+    node = getEditableChild(node, index, direction)
 
     // If the node has children, traverse until we have a leaf node. Leaf nodes
     // can be either text nodes, or other void DOM nodes.
     while (node.nodeType == 1 && node.childNodes.length) {
       const i = isLast ? node.childNodes.length - 1 : 0
-      node = getNonComment(node, i, direction)
+      node = getEditableChild(node, i, direction)
     }
 
     // Determine the new offset inside the text node.
@@ -33,7 +33,8 @@ function normalizeNodeAndOffset(node, offset) {
 }
 
 /**
- * Get the nearest non-comment to `index` in a `parent`, preferring `direction`.
+ * Get the nearest editable child at `index` in a `parent`, preferring
+ * `direction`.
  *
  * @param {Element} parent
  * @param {Number} index
@@ -41,14 +42,20 @@ function normalizeNodeAndOffset(node, offset) {
  * @return {Element|Null}
  */
 
-function getNonComment(parent, index, direction) {
+function getEditableChild(parent, index, direction) {
   const { childNodes } = parent
   let child = childNodes[index]
   let i = index
   let triedForward = false
   let triedBackward = false
 
-  while (child.nodeType == 8) {
+  // While the child is a comment node, or an element node with no children,
+  // keep iterating to find a sibling non-void, non-comment node.
+  while (
+    (child.nodeType == 8) ||
+    (child.nodeType == 1 && child.childNodes.length == 0) ||
+    (child.nodeType == 1 && child.getAttribute('contenteditable') == 'false')
+  ) {
     if (triedForward && triedBackward) break
 
     if (i >= childNodes.length) {

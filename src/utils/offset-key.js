@@ -1,5 +1,6 @@
 
 import normalizeNodeAndOffset from './normalize-node-and-offset'
+import findClosestNode from './find-closest-node'
 
 /**
  * Offset key parser regex.
@@ -68,12 +69,12 @@ function findKey(rawNode, rawOffset) {
   const { parentNode } = node
 
   // Find the closest parent with an offset key attribute.
-  let closest = parentNode.closest(SELECTOR)
+  let closest = findClosestNode(parentNode, SELECTOR)
 
   // For void nodes, the element with the offset key will be a cousin, not an
   // ancestor, so find it by going down from the nearest void parent.
   if (!closest) {
-    const closestVoid = parentNode.closest(VOID_SELECTOR)
+    const closestVoid = findClosestNode(parentNode, VOID_SELECTOR)
     if (!closestVoid) return null
     closest = closestVoid.querySelector(SELECTOR)
     offset = closest.textContent.length

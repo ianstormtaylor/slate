@@ -29,6 +29,7 @@ class Void extends React.Component {
    */
 
   static propTypes = {
+    block: React.PropTypes.object,
     children: React.PropTypes.any.isRequired,
     editor: React.PropTypes.object.isRequired,
     node: React.PropTypes.object.isRequired,
@@ -152,7 +153,7 @@ class Void extends React.Component {
    */
 
   renderLeaf = () => {
-    const { node, schema, state, editor } = this.props
+    const { block, node, schema, state, editor } = this.props
     const child = node.getFirstText()
     const ranges = child.getRanges()
     const text = ''
@@ -167,6 +168,7 @@ class Void extends React.Component {
     return (
       <Leaf
         key={offsetKey}
+        block={node.kind == 'block' ? node : block}
         editor={editor}
         index={index}
         marks={marks}
