@@ -139,7 +139,7 @@ class Node extends React.Component {
     }
 
     // If the custom props of the editor changed
-    if (nextProps.props !== props.props || !shallowEqual(nextProps.props, props.props)) {
+    if (!shallowEqual(nextProps.props, props.props)) {
       return true
     }
 
@@ -331,7 +331,7 @@ class Node extends React.Component {
    */
 
   renderLeaf = (ranges, range, index, offset) => {
-    const { block, node, parent, schema, state, editor } = this.props
+    const { block, node, parent, schema, state, editor, props } = this.props
     const { text, marks } = range
 
     return (
@@ -348,6 +348,7 @@ class Node extends React.Component {
         schema={schema}
         state={state}
         text={text}
+        props={props}
       />
     )
   }
