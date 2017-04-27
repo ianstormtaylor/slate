@@ -16,6 +16,9 @@ The top-level React component that renders the Slate editor itself.
   - [`readOnly`](#readonly)
   - [`state`](#state)
   - [`style`](#style)
+  - [`tabIndex`](#tabindex)
+  - [`role`](#role)
+  - [`props`](#props)
 - [Placeholder Properties](#placeholder-properties)
   - [`placeholder`](#placeholder)
   - [`placeholderClassName`](#placeholderclassname)
@@ -99,6 +102,10 @@ Indicates if it should participate to [sequential keyboard navigation](https://d
 ### `role`
 
 ARIA property to define the role of the editor, it defaults to `textbox` when editable.
+
+### `props`
+
+Custom properties to pass to all node components. An update of these props re-renders all the nodes.
 
 ## Placeholder Properties
 
