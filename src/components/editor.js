@@ -73,13 +73,14 @@ class Editor extends React.Component {
     placeholderClassName: React.PropTypes.string,
     placeholderStyle: React.PropTypes.object,
     plugins: React.PropTypes.array,
+    props: React.PropTypes.object,
     readOnly: React.PropTypes.bool,
     role: React.PropTypes.string,
     schema: React.PropTypes.object,
     spellCheck: React.PropTypes.bool,
     state: React.PropTypes.instanceOf(State).isRequired,
     style: React.PropTypes.object,
-    tabIndex: React.PropTypes.number,
+    tabIndex: React.PropTypes.number
   }
 
   /**

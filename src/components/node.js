@@ -3,6 +3,7 @@ import Base64 from '../serializers/base-64'
 import Debug from 'debug'
 import React from 'react'
 import ReactDOM from 'react-dom'
+import shallowEqual from 'fbjs/lib/shallowEqual'
 import TYPES from '../constants/types'
 import Leaf from './leaf'
 import Void from './void'
@@ -36,6 +37,7 @@ class Node extends React.Component {
     editor: React.PropTypes.object.isRequired,
     node: React.PropTypes.object.isRequired,
     parent: React.PropTypes.object.isRequired,
+    props: React.PropTypes.object,
     readOnly: React.PropTypes.bool.isRequired,
     schema: React.PropTypes.object.isRequired,
     state: React.PropTypes.object.isRequired
@@ -134,6 +136,11 @@ class Node extends React.Component {
       const last = props.parent.nodes.last()
       const nextLast = nextProps.parent.nodes.last()
       if (props.node == last && nextProps.node != nextLast) return true
+    }
+
+    // If the custom props of the editor changed
+    if (nextProps.props !== props.props || !shallowEqual(nextProps.props, props.props)) {
+      return true
     }
 
     // Otherwise, don't update.
