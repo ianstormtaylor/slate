@@ -10,6 +10,7 @@ A simple component that adds a placeholder to a node. It encapsulates all of the
 - [Properties](#properties)
   - [`children`](#children)
   - [`className`](#className)
+  - [`firstOnly`](#firstOnly)
   - [`node`](#node)
   - [`parent`](#parent)
   - [`state`](#state)
@@ -39,6 +40,11 @@ React child elements to render inside the placeholder `<span>` element.
 `String`
 
 An optional class name string to add to the placeholder `<span>` element.
+
+### `firstOnly`
+`Boolean`
+
+An optional toggle that allows the Placeholder to render even if it is not the first node of the parent. This is useful for cases where the Placeholder should show up at every empty instance of the node. Defaults to `false`.
 
 ### `node`
 `Node`

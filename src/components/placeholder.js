@@ -18,10 +18,21 @@ class Placeholder extends React.Component {
   static propTypes = {
     children: React.PropTypes.any.isRequired,
     className: React.PropTypes.string,
+    firstOnly: React.PropTypes.bool,
     node: React.PropTypes.object.isRequired,
     parent: React.PropTypes.object.isRequired,
     state: React.PropTypes.object.isRequired,
     style: React.PropTypes.object
+  }
+
+  /**
+   * Default properties.
+   *
+   * @type {Object}
+   */
+
+  static defaultProps = {
+    firstOnly: true
   }
 
   /**
@@ -36,6 +47,7 @@ class Placeholder extends React.Component {
     return (
       props.children != this.props.children ||
       props.className != this.props.className ||
+      props.firstOnly != this.props.firstOnly ||
       props.parent != this.props.parent ||
       props.node != this.props.node ||
       props.style != this.props.style
@@ -49,10 +61,15 @@ class Placeholder extends React.Component {
    */
 
   isVisible = () => {
-    const { node, parent } = this.props
+    const { firstOnly, node, parent } = this.props
     if (node.text) return false
     if (parent.nodes.size > 1) return false
-    if (parent.nodes.first() === node) return true
+
+    const index = parent.nodes && parent.nodes.indexOf(node)
+    const isFirst = index === 0
+    if (index === -1) return false
+    if (!firstOnly || (firstOnly && isFirst)) return true
+
     return false
   }
 
