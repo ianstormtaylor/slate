@@ -233,7 +233,7 @@ class Node extends React.Component {
    */
 
   renderNode = (child) => {
-    const { block, editor, node, readOnly, schema, state } = this.props
+    const { block, editor, node, readOnly, schema, state, props } = this.props
     return (
       <Node
         key={child.key}
@@ -244,6 +244,7 @@ class Node extends React.Component {
         readOnly={readOnly}
         schema={schema}
         state={state}
+        props={props}
       />
     )
   }
@@ -255,7 +256,7 @@ class Node extends React.Component {
    */
 
   renderElement = () => {
-    const { editor, node, parent, readOnly, state } = this.props
+    const { editor, node, parent, readOnly, state, props } = this.props
     const { Component } = this.state
     const children = node.nodes.map(this.renderNode).toArray()
 
@@ -282,6 +283,7 @@ class Node extends React.Component {
         node={node}
         readOnly={readOnly}
         state={state}
+        props={props}
       >
         {children}
       </Component>
