@@ -59,6 +59,7 @@ function clean(html) {
   $.root().children().removeAttr('autocorrect')
   $.root().children().removeAttr('spellcheck')
   $.root().children().removeAttr('style')
+  $.root().children().removeAttr('data-gramm')
 
   return $.html()
 }
