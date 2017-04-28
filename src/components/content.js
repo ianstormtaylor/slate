@@ -112,10 +112,20 @@ class Content extends React.Component {
   }
 
   /**
-   * On mount, update the selection, and focus the editor if `autoFocus` is set.
+   * When the editor first mounts in the DOM we need to:
+   *
+   *   - Setup the original state for `isWindowFocused`.
+   *   - Attach window focus and blur listeners for tab switching.
+   *   - Update the selection, in case it starts focused.
+   *   - Focus the editor if `autoFocus` is set.
    */
 
   componentDidMount = () => {
+    const window = getWindow(this.element)
+    window.addEventListener('focus', this.onWindowFocus, true)
+    window.addEventListener('blur', this.onWindowBlur, true)
+    this.tmp.isWindowFocused = !window.document.hidden
+
     this.updateSelection()
 
     if (this.props.autoFocus) {
@@ -129,6 +139,16 @@ class Content extends React.Component {
 
   componentDidUpdate = () => {
     this.updateSelection()
+  }
+
+  /**
+   * Before unmounting, detach our window focus and blur listeners.
+   */
+
+  componentWillUnmount = () => {
+    const window = getWindow(this.element)
+    window.removeEventListener('focus', this.onWindowFocus, true)
+    window.removeEventListener('blur', this.onWindowBlur, true)
   }
 
   /**
@@ -274,6 +294,7 @@ class Content extends React.Component {
   onBlur = (event) => {
     if (this.props.readOnly) return
     if (this.tmp.isCopying) return
+    if (!this.tmp.isWindowFocused) return
     if (!this.isInEditor(event)) return
 
     // If the element that is now focused is actually inside the editor, we
@@ -296,6 +317,7 @@ class Content extends React.Component {
   onFocus = (event) => {
     if (this.props.readOnly) return
     if (this.tmp.isCopying) return
+    if (!this.tmp.isWindowFocused) return
     if (!this.isInEditor(event)) return
 
     // COMPAT: If the editor has nested editable elements, the focus can go to
@@ -793,6 +815,28 @@ class Content extends React.Component {
 
     debug('onSelect', { event, data })
     this.props.onSelect(event, data)
+  }
+
+  /**
+   * On window blur, unset the `isWindowFocused` flag.
+   *
+   * @param {Event} event
+   */
+
+  onWindowBlur = (e) => {
+    debug('onWindowBlur')
+    this.tmp.isWindowFocused = false
+  }
+
+  /**
+   * On window focus, update the `isWindowFocused` flag.
+   *
+   * @param {Event} event
+   */
+
+  onWindowFocus = (e) => {
+    debug('onWindowFocus')
+    this.tmp.isWindowFocused = true
   }
 
   /**
