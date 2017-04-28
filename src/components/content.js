@@ -880,6 +880,7 @@ class Content extends React.Component {
         data-slate-editor
         key={this.tmp.forces}
         ref={this.ref}
+        data-key={document.key}
         contentEditable={!readOnly}
         suppressContentEditableWarning
         className={className}
