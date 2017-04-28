@@ -52,6 +52,7 @@ class Content extends React.Component {
     onKeyDown: React.PropTypes.func.isRequired,
     onPaste: React.PropTypes.func.isRequired,
     onSelect: React.PropTypes.func.isRequired,
+    props: React.PropTypes.object,
     readOnly: React.PropTypes.bool.isRequired,
     role: React.PropTypes.string,
     schema: React.PropTypes.object,
@@ -924,7 +925,7 @@ class Content extends React.Component {
    */
 
   renderNode = (node) => {
-    const { editor, readOnly, schema, state } = this.props
+    const { editor, readOnly, schema, state, props } = this.props
 
     return (
       <Node
@@ -936,6 +937,7 @@ class Content extends React.Component {
         state={state}
         editor={editor}
         readOnly={readOnly}
+        props={props}
       />
     )
   }

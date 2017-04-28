@@ -3,6 +3,7 @@ import Base64 from '../serializers/base-64'
 import Debug from 'debug'
 import React from 'react'
 import ReactDOM from 'react-dom'
+import shallowEqual from 'fbjs/lib/shallowEqual'
 import TYPES from '../constants/types'
 import Leaf from './leaf'
 import Void from './void'
@@ -36,6 +37,7 @@ class Node extends React.Component {
     editor: React.PropTypes.object.isRequired,
     node: React.PropTypes.object.isRequired,
     parent: React.PropTypes.object.isRequired,
+    props: React.PropTypes.object,
     readOnly: React.PropTypes.bool.isRequired,
     schema: React.PropTypes.object.isRequired,
     state: React.PropTypes.object.isRequired
@@ -136,6 +138,11 @@ class Node extends React.Component {
       if (props.node == last && nextProps.node != nextLast) return true
     }
 
+    // If the custom props of the editor changed
+    if (!shallowEqual(nextProps.props, props.props)) {
+      return true
+    }
+
     // Otherwise, don't update.
     return false
   }
@@ -226,7 +233,7 @@ class Node extends React.Component {
    */
 
   renderNode = (child) => {
-    const { block, editor, node, readOnly, schema, state } = this.props
+    const { block, editor, node, readOnly, schema, state, props } = this.props
     return (
       <Node
         key={child.key}
@@ -237,6 +244,7 @@ class Node extends React.Component {
         readOnly={readOnly}
         schema={schema}
         state={state}
+        props={props}
       />
     )
   }
@@ -248,7 +256,7 @@ class Node extends React.Component {
    */
 
   renderElement = () => {
-    const { editor, node, parent, readOnly, state } = this.props
+    const { editor, node, parent, readOnly, state, props } = this.props
     const { Component } = this.state
     const children = node.nodes.map(this.renderNode).toArray()
 
@@ -275,6 +283,7 @@ class Node extends React.Component {
         node={node}
         readOnly={readOnly}
         state={state}
+        props={props}
       >
         {children}
       </Component>
@@ -322,7 +331,7 @@ class Node extends React.Component {
    */
 
   renderLeaf = (ranges, range, index, offset) => {
-    const { block, node, parent, schema, state, editor } = this.props
+    const { block, node, parent, schema, state, editor, props } = this.props
     const { text, marks } = range
 
     return (
@@ -339,6 +348,7 @@ class Node extends React.Component {
         schema={schema}
         state={state}
         text={text}
+        props={props}
       />
     )
   }

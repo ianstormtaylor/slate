@@ -3,6 +3,7 @@ import Debug from 'debug'
 import OffsetKey from '../utils/offset-key'
 import React from 'react'
 import ReactDOM from 'react-dom'
+import shallowEqual from 'fbjs/lib/shallowEqual'
 import findDeepestNode from '../utils/find-deepest-node'
 import { IS_FIREFOX } from '../constants/environment'
 
@@ -36,6 +37,7 @@ class Leaf extends React.Component {
     node: React.PropTypes.object.isRequired,
     offset: React.PropTypes.number.isRequired,
     parent: React.PropTypes.object.isRequired,
+    props: React.PropTypes.object,
     ranges: React.PropTypes.object.isRequired,
     schema: React.PropTypes.object.isRequired,
     state: React.PropTypes.object.isRequired,
@@ -80,6 +82,11 @@ class Leaf extends React.Component {
       props.schema != this.props.schema ||
       props.text != this.props.text
     ) {
+      return true
+    }
+
+    // If custom props have changed, re-render
+    if (!shallowEqual(props.props, this.props.props)) {
       return true
     }
 
@@ -182,6 +189,7 @@ class Leaf extends React.Component {
           schema={schema}
           state={state}
           text={text}
+          props={props.props}
         >
           {memo}
         </Component>

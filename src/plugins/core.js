@@ -876,6 +876,7 @@ function Plugin(options = {}) {
         state={state}
         style={props.style}
         tabIndex={props.tabIndex}
+        props={props.props}
       />
     )
   }
