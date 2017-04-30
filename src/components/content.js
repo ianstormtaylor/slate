@@ -1,17 +1,19 @@
 
-import Base64 from '../serializers/base-64'
 import Debug from 'debug'
+import React from 'react'
+import Types from 'prop-types'
+import getWindow from 'get-window'
+import keycode from 'keycode'
+
+import TYPES from '../constants/types'
+import Base64 from '../serializers/base-64'
 import Node from './node'
-import getPoint from '../utils/get-point'
+import Selection from '../models/selection'
 import extendSelection from '../utils/extend-selection'
 import findClosestNode from '../utils/find-closest-node'
-import React from 'react'
-import Selection from '../models/selection'
-import getTransferData from '../utils/get-transfer-data'
-import TYPES from '../constants/types'
-import getWindow from 'get-window'
 import findDeepestNode from '../utils/find-deepest-node'
-import keycode from 'keycode'
+import getPoint from '../utils/get-point'
+import getTransferData from '../utils/get-transfer-data'
 import { IS_FIREFOX, IS_MAC } from '../constants/environment'
 
 /**
@@ -37,28 +39,28 @@ class Content extends React.Component {
    */
 
   static propTypes = {
-    autoCorrect: React.PropTypes.bool.isRequired,
-    autoFocus: React.PropTypes.bool.isRequired,
-    children: React.PropTypes.array.isRequired,
-    className: React.PropTypes.string,
-    editor: React.PropTypes.object.isRequired,
-    onBeforeInput: React.PropTypes.func.isRequired,
-    onBlur: React.PropTypes.func.isRequired,
-    onChange: React.PropTypes.func.isRequired,
-    onCopy: React.PropTypes.func.isRequired,
-    onCut: React.PropTypes.func.isRequired,
-    onDrop: React.PropTypes.func.isRequired,
-    onFocus: React.PropTypes.func.isRequired,
-    onKeyDown: React.PropTypes.func.isRequired,
-    onPaste: React.PropTypes.func.isRequired,
-    onSelect: React.PropTypes.func.isRequired,
-    readOnly: React.PropTypes.bool.isRequired,
-    role: React.PropTypes.string,
-    schema: React.PropTypes.object,
-    spellCheck: React.PropTypes.bool.isRequired,
-    state: React.PropTypes.object.isRequired,
-    style: React.PropTypes.object,
-    tabIndex: React.PropTypes.number
+    autoCorrect: Types.bool.isRequired,
+    autoFocus: Types.bool.isRequired,
+    children: Types.array.isRequired,
+    className: Types.string,
+    editor: Types.object.isRequired,
+    onBeforeInput: Types.func.isRequired,
+    onBlur: Types.func.isRequired,
+    onChange: Types.func.isRequired,
+    onCopy: Types.func.isRequired,
+    onCut: Types.func.isRequired,
+    onDrop: Types.func.isRequired,
+    onFocus: Types.func.isRequired,
+    onKeyDown: Types.func.isRequired,
+    onPaste: Types.func.isRequired,
+    onSelect: Types.func.isRequired,
+    readOnly: Types.bool.isRequired,
+    role: Types.string,
+    schema: Types.object,
+    spellCheck: Types.bool.isRequired,
+    state: Types.object.isRequired,
+    style: Types.object,
+    tabIndex: Types.number
   }
 
   /**
@@ -112,10 +114,20 @@ class Content extends React.Component {
   }
 
   /**
-   * On mount, update the selection, and focus the editor if `autoFocus` is set.
+   * When the editor first mounts in the DOM we need to:
+   *
+   *   - Setup the original state for `isWindowFocused`.
+   *   - Attach window focus and blur listeners for tab switching.
+   *   - Update the selection, in case it starts focused.
+   *   - Focus the editor if `autoFocus` is set.
    */
 
   componentDidMount = () => {
+    const window = getWindow(this.element)
+    window.addEventListener('focus', this.onWindowFocus, true)
+    window.addEventListener('blur', this.onWindowBlur, true)
+    this.tmp.isWindowFocused = !window.document.hidden
+
     this.updateSelection()
 
     if (this.props.autoFocus) {
@@ -129,6 +141,16 @@ class Content extends React.Component {
 
   componentDidUpdate = () => {
     this.updateSelection()
+  }
+
+  /**
+   * Before unmounting, detach our window focus and blur listeners.
+   */
+
+  componentWillUnmount = () => {
+    const window = getWindow(this.element)
+    window.removeEventListener('focus', this.onWindowFocus, true)
+    window.removeEventListener('blur', this.onWindowBlur, true)
   }
 
   /**
@@ -274,6 +296,7 @@ class Content extends React.Component {
   onBlur = (event) => {
     if (this.props.readOnly) return
     if (this.tmp.isCopying) return
+    if (!this.tmp.isWindowFocused) return
     if (!this.isInEditor(event)) return
 
     // If the element that is now focused is actually inside the editor, we
@@ -296,6 +319,7 @@ class Content extends React.Component {
   onFocus = (event) => {
     if (this.props.readOnly) return
     if (this.tmp.isCopying) return
+    if (!this.tmp.isWindowFocused) return
     if (!this.isInEditor(event)) return
 
     // COMPAT: If the editor has nested editable elements, the focus can go to
@@ -796,6 +820,28 @@ class Content extends React.Component {
   }
 
   /**
+   * On window blur, unset the `isWindowFocused` flag.
+   *
+   * @param {Event} event
+   */
+
+  onWindowBlur = (e) => {
+    debug('onWindowBlur')
+    this.tmp.isWindowFocused = false
+  }
+
+  /**
+   * On window focus, update the `isWindowFocused` flag.
+   *
+   * @param {Event} event
+   */
+
+  onWindowFocus = (e) => {
+    debug('onWindowFocus')
+    this.tmp.isWindowFocused = true
+  }
+
+  /**
    * Render the editor content.
    *
    * @return {Element}
@@ -836,6 +882,7 @@ class Content extends React.Component {
         data-slate-editor
         key={this.tmp.forces}
         ref={this.ref}
+        data-key={document.key}
         contentEditable={!readOnly}
         suppressContentEditableWarning
         className={className}

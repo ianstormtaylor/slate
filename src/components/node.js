@@ -1,9 +1,11 @@
 
-import Base64 from '../serializers/base-64'
 import Debug from 'debug'
 import React from 'react'
 import ReactDOM from 'react-dom'
+import Types from 'prop-types'
+
 import TYPES from '../constants/types'
+import Base64 from '../serializers/base-64'
 import Leaf from './leaf'
 import Void from './void'
 import getWindow from 'get-window'
@@ -32,13 +34,13 @@ class Node extends React.Component {
    */
 
   static propTypes = {
-    block: React.PropTypes.object,
-    editor: React.PropTypes.object.isRequired,
-    node: React.PropTypes.object.isRequired,
-    parent: React.PropTypes.object.isRequired,
-    readOnly: React.PropTypes.bool.isRequired,
-    schema: React.PropTypes.object.isRequired,
-    state: React.PropTypes.object.isRequired
+    block: Types.object,
+    editor: Types.object.isRequired,
+    node: Types.object.isRequired,
+    parent: Types.object.isRequired,
+    readOnly: Types.bool.isRequired,
+    schema: Types.object.isRequired,
+    state: Types.object.isRequired
   }
 
   /**
