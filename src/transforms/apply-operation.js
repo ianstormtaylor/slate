@@ -187,19 +187,24 @@ function moveNode(state, operation) {
   const { path, newPath, newIndex } = operation
   let { document } = state
   const node = document.assertPath(path)
+  const index = path.pop()
 
   // Remove the node from its current parent
   let parent = document.getParent(node.key)
-  const isParent = document == parent
-  const index = parent.nodes.indexOf(node)
   parent = parent.removeNode(index)
-  document = isParent ? parent : document.updateDescendant(parent)
+  document = parent.kind === 'document' ? parent : document.updateDescendant(parent)
+
+  // When `parent` is an ancestor of `target` and `node` index is less than the
+  // index of the `target` ancestor with the same depth of `node`, then removing
+  // `node` changes the path to `target`. So we have to adjust `newPath`.
+  const d = path.length
+  const isAncestor = d === 0 ? true : path.every((x, i) => x === newPath[i])
+  if (isAncestor && index < newPath[d]) newPath[d]--
 
   // Insert the new node to its new parent
   let target = document.assertPath(newPath)
-  const isTarget = document == target
   target = target.insertNode(newIndex, node)
-  document = isTarget ? target : document.updateDescendant(target)
+  document = target.kind === 'document' ? target : document.updateDescendant(target)
 
   state = state.set('document', document)
   return state
