@@ -3,6 +3,7 @@ import Debug from 'debug'
 import React from 'react'
 import Types from 'prop-types'
 import getWindow from 'get-window'
+import isWindow from 'is-window'
 import keycode from 'keycode'
 
 import TYPES from '../constants/types'
@@ -825,7 +826,8 @@ class Content extends React.Component {
    * @param {Event} event
    */
 
-  onWindowBlur = (e) => {
+  onWindowBlur = (event) => {
+    if (!isWindow(event.target)) return
     debug('onWindowBlur')
     this.tmp.isWindowFocused = false
   }
@@ -836,7 +838,8 @@ class Content extends React.Component {
    * @param {Event} event
    */
 
-  onWindowFocus = (e) => {
+  onWindowFocus = (event) => {
+    if (!isWindow(event.target)) return
     debug('onWindowFocus')
     this.tmp.isWindowFocused = true
   }
