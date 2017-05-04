@@ -12,7 +12,7 @@
 - [Methods](#methods)
   - [`filterDescendants`](#filterdescendants)
   - [`findDescendant`](#finddescendant)
-  - [`getBlocksAtRange`](#getblockatrange)
+  - [`getBlocksAtRange`](#getblocksatrange)
   - [`getBlocks`](#getblocks)
   - [`getCharactersAtRange`](#getcharactersatrange)
   - [`getChild`](#getchild)
@@ -21,13 +21,15 @@
   - [`getClosest`](#getclosest)
   - [`getDepth`](#getdepth)
   - [`getDescendant`](#getdescendant)
+  - [`getFirstText`](#getfirsttext)
   - [`getFragmentAtRange`](#getfragmentatrange)
   - [`getInlinesAtRange`](#getinlinesatrange)
+  - [`getLastText`](#getlasttext)
   - [`getMarksAtRange`](#getmarksatrange)
   - [`getNextBlock`](#getnextblock)
   - [`getNextSibling`](#getnextsibling)
   - [`getNextText`](#getnexttext)
-  - [`getParent`](#parent)
+  - [`getParent`](#getparent)
   - [`getPreviousBlock`](#getpreviousblock)
   - [`getPreviousSibling`](#getprevioussibling)
   - [`getPreviousText`](#getprevioustext)
@@ -129,6 +131,11 @@ Get the depth of a descendant node by `key`.
 
 Get a descendant node by `key`.
 
+### `getFirstText`
+`getFirstText() => Node || Void`
+
+Get the first child text node inside a node.
+
 ### `getFragmentAtRange`
 `getFragmentAtRange(range: Selection) => Document`
 
@@ -138,6 +145,11 @@ Get a document fragment of the nodes in a `range`.
 `getInlinesAtRange(range: Selection) => List`
 
 Get all of the top-most [`Inline`](./inline.md) nodes in a `range`.
+
+### `getLastText`
+`getLastText() => Node || Void`
+
+Get the last child text node inside a node.
 
 ### `getMarksAtRange`
 `getMarksAtRange(range: Selection) => Set`

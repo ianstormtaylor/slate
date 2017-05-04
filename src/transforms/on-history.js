@@ -33,8 +33,8 @@ Transforms.redo = (transform) => {
 
   // Update the history.
   state = transform.state
-  history = history.merge({ undos, redos })
-  state = state.merge({ history })
+  history = history.set('undos', undos).set('redos', redos)
+  state = state.set('history', history)
 
   // Update the transform.
   transform.state = state
@@ -71,8 +71,8 @@ Transforms.save = (transform, options = {}) => {
   redos = redos.clear()
 
   // Update the state.
-  history = history.merge({ undos, redos })
-  state = state.merge({ history })
+  history = history.set('undos', undos).set('redos', redos)
+  state = state.set('history', history)
 
   // Update the transform.
   transform.state = state
@@ -106,8 +106,8 @@ Transforms.undo = (transform) => {
 
   // Update the history.
   state = transform.state
-  history = history.merge({ undos, redos })
-  state = state.merge({ history })
+  history = history.set('undos', undos).set('redos', redos)
+  state = state.set('history', history)
 
   // Update the transform.
   transform.state = state

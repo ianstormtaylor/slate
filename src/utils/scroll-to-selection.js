@@ -9,6 +9,8 @@ import isBackward from 'selection-is-backward'
  */
 
 function scrollToSelection(selection) {
+  if (!selection.anchorNode) return
+
   const window = getWindow(selection.anchorNode)
   const backward = isBackward(selection)
   const range = selection.getRangeAt(0)

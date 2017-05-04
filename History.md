@@ -8,7 +8,7 @@ This document maintains a list of changes to Slate with each new version. Until 
 
 ###### BREAKING CHANGES
 
-- **The `filterDescendants` and `findDescendants` methods are now depth-first. This shouldn't affect almost anyone, since they are usually not the best things to be using for performance reasons. If you happen to have a very specific use case that needs breadth-first, (or even likely something better), you'll need to implement it yourself.
+- **The `filterDescendants` and `findDescendants` methods are now depth-first.** This shouldn't affect almost anyone, since they are usually not the best things to be using for performance reasons. If you happen to have a very specific use case that needs breadth-first, (or even likely something better), you'll need to implement it yourself.
 
 ###### DEPRECATION CHANGES
 

@@ -17,6 +17,23 @@ const schema = {
   nodes: {
     'heading': props => <h1 {...props.attributes}>{props.children}</h1>,
     'paragraph': props => <p {...props.attributes} style={{ marginBottom: 20 }}>{props.children}</p>,
+  },
+  marks: {
+    bold: {
+      fontWeight: 'bold'
+    },
+    code: {
+      fontFamily: 'monospace',
+      backgroundColor: '#eee',
+      padding: '3px',
+      borderRadius: '4px'
+    },
+    italic: {
+      fontStyle: 'italic'
+    },
+    underlined: {
+      textDecoration: 'underline'
+    }
   }
 }
 
@@ -26,14 +43,14 @@ for (let h = 0; h < HEADINGS; h++) {
   nodes.push({
     kind: 'block',
     type: 'heading',
-    nodes: [ { kind: 'text', text: faker.lorem.sentence() } ]
+    nodes: [{ kind: 'text', text: faker.lorem.sentence() }]
   })
 
   for (let p = 0; p < PARAGRAPHS; p++) {
     nodes.push({
       kind: 'block',
       type: 'paragraph',
-      nodes: [ { kind: 'text', text: faker.lorem.paragraph() } ]
+      nodes: [{ kind: 'text', text: faker.lorem.paragraph() }]
     })
   }
 }
@@ -55,7 +72,7 @@ class LargeDocument extends React.Component {
   constructor() {
     super()
     console.time('deserializeLargeDocument')
-    this.state = { state: Raw.deserialize({ nodes }, { terse: true }) }
+    this.state = { state: Raw.deserialize({ nodes }, { normalize: false, terse: true }) }
     console.timeEnd('deserializeLargeDocument')
   }
 
@@ -67,6 +84,45 @@ class LargeDocument extends React.Component {
 
   onChange = (state) => {
     this.setState({ state })
+  }
+
+  /**
+   * On key down, if it's a formatting command toggle a mark.
+   *
+   * @param {Event} e
+   * @param {Object} data
+   * @param {State} state
+   * @return {State}
+   */
+
+  onKeyDown = (e, data, state) => {
+    if (!data.isMod) return
+    let mark
+
+    switch (data.key) {
+      case 'b':
+        mark = 'bold'
+        break
+      case 'i':
+        mark = 'italic'
+        break
+      case 'u':
+        mark = 'underlined'
+        break
+      case '`':
+        mark = 'code'
+        break
+      default:
+        return
+    }
+
+    state = state
+      .transform()
+      .toggleMark(mark)
+      .apply()
+
+    e.preventDefault()
+    return state
   }
 
   /**
@@ -83,6 +139,7 @@ class LargeDocument extends React.Component {
         spellCheck={false}
         state={this.state.state}
         onChange={this.onChange}
+        onKeyDown={this.onKeyDown}
       />
     )
   }

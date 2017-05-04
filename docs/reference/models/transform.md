@@ -335,7 +335,7 @@ Insert a `node` at `index` inside a parent [`Node`](./node.md) by its `key`.
 ### `insertTextByKey`
 `insertTextByKey(key: String, offset: Number, text: String, [marks: Set]) => Transform`
 
-Insert `text` at an `offset` in a [`Node`](./node.md) with optional `marks`.
+Insert `text` at an `offset` in a [`Text Node`](./text.md) with optional `marks`.
 
 ### `moveNodeByKey`
 `moveNodeByKey(key: String, newKey: String, newIndex: Number) => Transform`

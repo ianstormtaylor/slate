@@ -7,7 +7,7 @@ import { Document } from 'slate'
 
 The top-level node in Slate's document model.
 
-Documents are made up of block nodes, inline nodes, and text nodes—just like in the DOM.
+Documents are made up of block nodes, inline nodes, and text nodes—just like in the DOM. Note that direct descendants of a document node have to be block nodes.
 
 In some places, you'll see mention of "fragments", which are also `Document` objects, just that aren't attached to the main `State`. For example, when cutting-and-pasting a selection of content, that content will be referred to as a document "fragment".
 

@@ -361,9 +361,8 @@ Transforms.unwrapNodeByKey = (transform, key, options = {}) => {
 
 
   if (parent.nodes.size === 1) {
-    // Remove the parent and replace it by the node itself.
-    transform.removeNodeByKey(parent.key, { normalize: false })
-    transform.insertNodeByKey(parentParent.key, parentIndex, node, options)
+    transform.moveNodeByKey(key, parentParent.key, parentIndex, { normalize: false })
+    transform.removeNodeByKey(parent.key, options)
   }
 
   else if (isFirst) {
@@ -401,7 +400,7 @@ Transforms.unwrapNodeByKey = (transform, key, options = {}) => {
 
 Transforms.wrapInlineByKey = (transform, key, inline, options) => {
   inline = Normalize.inline(inline)
-  inline = inline.merge({ nodes: inline.nodes.clear() })
+  inline = inline.set('nodes', inline.nodes.clear())
 
   const { document } = transform.state
   const node = document.assertDescendant(key)
@@ -424,7 +423,7 @@ Transforms.wrapInlineByKey = (transform, key, inline, options) => {
 
 Transforms.wrapBlockByKey = (transform, key, block, options) => {
   block = Normalize.block(block)
-  block = block.merge({ nodes: block.nodes.clear() })
+  block = block.set('nodes', block.nodes.clear())
 
   const { document } = transform.state
   const node = document.assertDescendant(key)

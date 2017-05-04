@@ -203,3 +203,25 @@ input:focus {
 .emoji.selected {
   outline: 2px solid blue;
 }
+
+.check-list-item + .check-list-item {
+  margin-top: 0;
+}
+
+.check-list-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.check-list-item > span:first-child {
+  margin-right: 0.75em;
+}
+
+.check-list-item > span:last-child {
+  flex: 1;
+}
+
+.check-list-item > span:last-child:focus {
+  outline: none;
+}

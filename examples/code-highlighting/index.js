@@ -55,7 +55,7 @@ function CodeBlock(props) {
  */
 
 function codeBlockDecorator(text, block) {
-  let characters = text.characters.asMutable()
+  const characters = text.characters.asMutable()
   const language = block.data.get('language')
   const string = text.text
   const grammar = Prism.languages[language]
@@ -70,13 +70,14 @@ function codeBlockDecorator(text, block) {
 
     const length = offset + token.content.length
     const type = `highlight-${token.type}`
+    const mark = Mark.create({ type })
 
     for (let i = offset; i < length; i++) {
       let char = characters.get(i)
       let { marks } = char
-      marks = marks.add(Mark.create({ type }))
-      char = char.merge({ marks })
-      characters = characters.set(i, char)
+      marks = marks.add(mark)
+      char = char.set('marks', marks)
+      characters.set(i, char)
     }
 
     offset = length

@@ -1058,7 +1058,7 @@ Transforms.unwrapInlineAtRange = (transform, range, properties, options = {}) =>
 
 Transforms.wrapBlockAtRange = (transform, range, block, options = {}) => {
   block = Normalize.block(block)
-  block = block.merge({ nodes: block.nodes.clear() })
+  block = block.set('nodes', block.nodes.clear())
 
   const { normalize = true } = options
   const { state } = transform
@@ -1144,7 +1144,7 @@ Transforms.wrapInlineAtRange = (transform, range, inline, options = {}) => {
   }
 
   inline = Normalize.inline(inline)
-  inline = inline.merge({ nodes: inline.nodes.clear() })
+  inline = inline.set('nodes', inline.nodes.clear())
 
   const blocks = document.getBlocksAtRange(range)
   let startBlock = document.getClosestBlock(startKey)
