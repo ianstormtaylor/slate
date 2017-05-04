@@ -185,7 +185,7 @@ Transforms.insertFragment = (transform, fragment) => {
   let { state } = transform
   let { document, selection } = state
 
-  if (!fragment.length) return
+  if (!fragment.nodes.size) return
 
   const { startText, endText } = state
   const lastText = fragment.getLastText()

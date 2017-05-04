@@ -5,7 +5,6 @@ import initialState from './state.json'
 import isImage from 'is-image'
 import isUrl from 'is-url'
 
-
 /**
  * Default block to be inserted when the document is empty,
  * and after an image is the last node in the document.
@@ -41,7 +40,7 @@ const schema = {
     }
   },
   rules: [
-    // Rule to insert a paragraph block if the document is empty
+    // Rule to insert a paragraph block if the document is empty.
     {
       match: (node) => {
         return node.kind == 'document'
@@ -51,12 +50,11 @@ const schema = {
       },
       normalize: (transform, document) => {
         const block = Block.create(defaultBlock)
-        transform
-          .insertNodeByKey(document.key, 0, block)
+        transform.insertNodeByKey(document.key, 0, block)
       }
     },
-    // Rule to insert a paragraph below a void node (the image)
-    // if that node is the last one in the document
+    // Rule to insert a paragraph below a void node (the image) if that node is
+    // the last one in the document.
     {
       match: (node) => {
         return node.kind == 'document'
@@ -67,8 +65,7 @@ const schema = {
       },
       normalize: (transform, document) => {
         const block = Block.create(defaultBlock)
-        transform
-          .insertNodeByKey(document.key, document.nodes.size, block)
+        transform.insertNodeByKey(document.key, document.nodes.size, block)
       }
     }
   ]
