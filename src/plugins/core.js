@@ -247,9 +247,10 @@ function Plugin(options = {}) {
    */
 
   function onCutOrCopy(e, data, state) {
+    const inVoidNode = state.fragment.nodes.some(node => node.isVoid)
     const window = getWindow(e.target)
     const native = window.getSelection()
-    if (native.isCollapsed) return
+    if (native.isCollapsed && !inVoidNode) return
 
     const { fragment } = data
     const encoded = Base64.serializeNode(fragment)
@@ -264,14 +265,24 @@ function Plugin(options = {}) {
     // Wrap the first character of the selection in a span that has the encoded
     // fragment attached as an attribute, so it will show up in the copied HTML.
     const wrapper = window.document.createElement('span')
-    const text = contents.childNodes[0]
-    const char = text.textContent.slice(0, 1)
-    const first = window.document.createTextNode(char)
-    const rest = text.textContent.slice(1)
-    text.textContent = rest
-    wrapper.appendChild(first)
     wrapper.setAttribute('data-slate-fragment', encoded)
-    contents.insertBefore(wrapper, text)
+
+    const text = contents.childNodes[0]
+
+    if (text) {
+      const char = text.textContent.slice(0, 1)
+      const first = window.document.createTextNode(char)
+      const rest = text.textContent.slice(1)
+      text.textContent = rest
+      wrapper.appendChild(first)
+      contents.insertBefore(wrapper, text)
+    } else {
+      // TODO: incase of void nodes, appended a span with no content
+      // except data-slate-fragment.. but that still doesn't work.
+
+      contents.appendChild(wrapper)
+    }
+
 
     // Add the phony content to the DOM, and select it, so it will be copied.
     const body = window.document.querySelector('body')
