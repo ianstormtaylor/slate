@@ -3,7 +3,6 @@ import Debug from 'debug'
 import React from 'react'
 import Types from 'prop-types'
 import getWindow from 'get-window'
-import isWindow from 'is-window'
 import keycode from 'keycode'
 
 import TYPES from '../constants/types'
@@ -117,18 +116,11 @@ class Content extends React.Component {
   /**
    * When the editor first mounts in the DOM we need to:
    *
-   *   - Setup the original state for `isWindowFocused`.
-   *   - Attach window focus and blur listeners for tab switching.
    *   - Update the selection, in case it starts focused.
    *   - Focus the editor if `autoFocus` is set.
    */
 
   componentDidMount = () => {
-    const window = getWindow(this.element)
-    window.addEventListener('focus', this.onWindowFocus, true)
-    window.addEventListener('blur', this.onWindowBlur, true)
-    this.tmp.isWindowFocused = !window.document.hidden
-
     this.updateSelection()
 
     if (this.props.autoFocus) {
@@ -145,16 +137,6 @@ class Content extends React.Component {
   }
 
   /**
-   * Before unmounting, detach our window focus and blur listeners.
-   */
-
-  componentWillUnmount = () => {
-    const window = getWindow(this.element)
-    window.removeEventListener('focus', this.onWindowFocus, true)
-    window.removeEventListener('blur', this.onWindowBlur, true)
-  }
-
-  /**
    * Update the native DOM selection to reflect the internal model.
    */
 
@@ -167,10 +149,10 @@ class Content extends React.Component {
     // If both selections are blurred, do nothing.
     if (!native.rangeCount && selection.isBlurred) return
 
-    // If the selection has been blurred, but hasn't been updated in the DOM,
-    // blur the DOM selection.
+    // If the selection has been blurred, but is still inside the editor in the
+    // DOM, blur it manually.
     if (selection.isBlurred) {
-      if (!this.element.contains(native.anchorNode)) return
+      if (!this.isInEditor(native.anchorNode)) return
       native.removeAllRanges()
       this.element.blur()
       debug('updateSelection', { selection, native })
@@ -255,17 +237,16 @@ class Content extends React.Component {
   }
 
   /**
-   * Check if an `event` is being fired from within the contenteditable element.
-   * This will return false for edits happening in non-contenteditable children,
-   * such as void nodes and other nested Slate editors.
+   * Check if an event `target` is fired from within the contenteditable
+   * element. This should be false for edits happening in non-contenteditable
+   * children, such as void nodes and other nested Slate editors.
    *
-   * @param {Event} event
+   * @param {Element} target
    * @return {Boolean}
    */
 
-  isInEditor = (event) => {
+  isInEditor = (target) => {
     const { element } = this
-    const { target } = event
     return (
       (target.isContentEditable) &&
       (target == element || findClosestNode(target, '[data-slate-editor]') == element)
@@ -280,7 +261,7 @@ class Content extends React.Component {
 
   onBeforeInput = (event) => {
     if (this.props.readOnly) return
-    if (!this.isInEditor(event)) return
+    if (!this.isInEditor(event.target)) return
 
     const data = {}
 
@@ -297,13 +278,13 @@ class Content extends React.Component {
   onBlur = (event) => {
     if (this.props.readOnly) return
     if (this.tmp.isCopying) return
-    if (!this.tmp.isWindowFocused) return
-    if (!this.isInEditor(event)) return
+    if (!this.isInEditor(event.target)) return
 
-    // If the element that is now focused is actually inside the editor, we
-    // need to ignore it. This can happen in situations where there is a nested
-    // `contenteditable="true"` node that isn't another Slate editor.
-    if (this.element.contains(event.relatedTarget)) return
+    // If the active element is still the editor, the blur event is due to the
+    // window itself being blurred (eg. when changing tabs) so we should ignore
+    // the event, since we want to maintain focus when returning.
+    const window = getWindow(this.element)
+    if (window.document.activeElement == this.element) return
 
     const data = {}
 
@@ -320,8 +301,7 @@ class Content extends React.Component {
   onFocus = (event) => {
     if (this.props.readOnly) return
     if (this.tmp.isCopying) return
-    if (!this.tmp.isWindowFocused) return
-    if (!this.isInEditor(event)) return
+    if (!this.isInEditor(event.target)) return
 
     // COMPAT: If the editor has nested editable elements, the focus can go to
     // those elements. In Firefox, this must be prevented because it results in
@@ -355,7 +335,7 @@ class Content extends React.Component {
    */
 
   onCompositionStart = (event) => {
-    if (!this.isInEditor(event)) return
+    if (!this.isInEditor(event.target)) return
 
     this.tmp.isComposing = true
     this.tmp.compositions++
@@ -372,7 +352,7 @@ class Content extends React.Component {
    */
 
   onCompositionEnd = (event) => {
-    if (!this.isInEditor(event)) return
+    if (!this.isInEditor(event.target)) return
 
     this.tmp.forces++
     const count = this.tmp.compositions
@@ -395,7 +375,7 @@ class Content extends React.Component {
    */
 
   onCopy = (event) => {
-    if (!this.isInEditor(event)) return
+    if (!this.isInEditor(event.target)) return
     const window = getWindow(event.target)
 
     this.tmp.isCopying = true
@@ -420,7 +400,7 @@ class Content extends React.Component {
 
   onCut = (event) => {
     if (this.props.readOnly) return
-    if (!this.isInEditor(event)) return
+    if (!this.isInEditor(event.target)) return
     const window = getWindow(event.target)
 
     this.tmp.isCopying = true
@@ -444,7 +424,7 @@ class Content extends React.Component {
    */
 
   onDragEnd = (event) => {
-    if (!this.isInEditor(event)) return
+    if (!this.isInEditor(event.target)) return
 
     this.tmp.isDragging = false
     this.tmp.isInternalDrag = null
@@ -459,7 +439,7 @@ class Content extends React.Component {
    */
 
   onDragOver = (event) => {
-    if (!this.isInEditor(event)) return
+    if (!this.isInEditor(event.target)) return
 
     const { dataTransfer } = event.nativeEvent
     const data = getTransferData(dataTransfer)
@@ -483,7 +463,7 @@ class Content extends React.Component {
    */
 
   onDragStart = (event) => {
-    if (!this.isInEditor(event)) return
+    if (!this.isInEditor(event.target)) return
 
     this.tmp.isDragging = true
     this.tmp.isInternalDrag = true
@@ -509,7 +489,7 @@ class Content extends React.Component {
 
   onDrop = (event) => {
     if (this.props.readOnly) return
-    if (!this.isInEditor(event)) return
+    if (!this.isInEditor(event.target)) return
 
     event.preventDefault()
 
@@ -567,7 +547,7 @@ class Content extends React.Component {
   onInput = (event) => {
     if (this.tmp.isComposing) return
     if (this.props.state.isBlurred) return
-    if (!this.isInEditor(event)) return
+    if (!this.isInEditor(event.target)) return
     debug('onInput', { event })
 
     const window = getWindow(event.target)
@@ -638,7 +618,7 @@ class Content extends React.Component {
 
   onKeyDown = (event) => {
     if (this.props.readOnly) return
-    if (!this.isInEditor(event)) return
+    if (!this.isInEditor(event.target)) return
 
     const { altKey, ctrlKey, metaKey, shiftKey, which } = event
     const key = keycode(which)
@@ -716,7 +696,7 @@ class Content extends React.Component {
 
   onPaste = (event) => {
     if (this.props.readOnly) return
-    if (!this.isInEditor(event)) return
+    if (!this.isInEditor(event.target)) return
 
     event.preventDefault()
     const data = getTransferData(event.clipboardData)
@@ -740,7 +720,7 @@ class Content extends React.Component {
     if (this.tmp.isCopying) return
     if (this.tmp.isComposing) return
     if (this.tmp.isSelecting) return
-    if (!this.isInEditor(event)) return
+    if (!this.isInEditor(event.target)) return
 
     const window = getWindow(event.target)
     const { state, editor } = this.props
@@ -818,30 +798,6 @@ class Content extends React.Component {
 
     debug('onSelect', { event, data })
     this.props.onSelect(event, data)
-  }
-
-  /**
-   * On window blur, unset the `isWindowFocused` flag.
-   *
-   * @param {Event} event
-   */
-
-  onWindowBlur = (event) => {
-    if (!isWindow(event.target)) return
-    debug('onWindowBlur')
-    this.tmp.isWindowFocused = false
-  }
-
-  /**
-   * On window focus, update the `isWindowFocused` flag.
-   *
-   * @param {Event} event
-   */
-
-  onWindowFocus = (event) => {
-    if (!isWindow(event.target)) return
-    debug('onWindowFocus')
-    this.tmp.isWindowFocused = true
   }
 
   /**
