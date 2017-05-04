@@ -1,5 +1,6 @@
 
 import React from 'react'
+import Types from 'prop-types'
 
 /**
  * Placeholder.
@@ -16,13 +17,13 @@ class Placeholder extends React.Component {
    */
 
   static propTypes = {
-    children: React.PropTypes.any.isRequired,
-    className: React.PropTypes.string,
-    firstOnly: React.PropTypes.bool,
-    node: React.PropTypes.object.isRequired,
-    parent: React.PropTypes.object,
-    state: React.PropTypes.object.isRequired,
-    style: React.PropTypes.object
+    children: Types.any.isRequired,
+    className: Types.string,
+    firstOnly: Types.bool,
+    node: Types.object.isRequired,
+    parent: Types.object,
+    state: Types.object.isRequired,
+    style: Types.object
   }
 
   /**
@@ -68,8 +69,10 @@ class Placeholder extends React.Component {
       if (parent.nodes.size > 1) return false
       if (parent.nodes.first() === node) return true
       return false
+
     } else {
       return true
+
     }
   }
 

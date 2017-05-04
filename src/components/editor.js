@@ -2,6 +2,8 @@
 import Debug from 'debug'
 import Portal from 'react-portal'
 import React from 'react'
+import Types from 'prop-types'
+
 import Stack from '../models/stack'
 import State from '../models/state'
 import noop from '../utils/noop'
@@ -62,24 +64,24 @@ class Editor extends React.Component {
    */
 
   static propTypes = {
-    autoCorrect: React.PropTypes.bool,
-    autoFocus: React.PropTypes.bool,
-    className: React.PropTypes.string,
-    onBeforeChange: React.PropTypes.func,
-    onChange: React.PropTypes.func,
-    onDocumentChange: React.PropTypes.func,
-    onSelectionChange: React.PropTypes.func,
-    placeholder: React.PropTypes.any,
-    placeholderClassName: React.PropTypes.string,
-    placeholderStyle: React.PropTypes.object,
-    plugins: React.PropTypes.array,
-    readOnly: React.PropTypes.bool,
-    role: React.PropTypes.string,
-    schema: React.PropTypes.object,
-    spellCheck: React.PropTypes.bool,
-    state: React.PropTypes.instanceOf(State).isRequired,
-    style: React.PropTypes.object,
-    tabIndex: React.PropTypes.number,
+    autoCorrect: Types.bool,
+    autoFocus: Types.bool,
+    className: Types.string,
+    onBeforeChange: Types.func,
+    onChange: Types.func,
+    onDocumentChange: Types.func,
+    onSelectionChange: Types.func,
+    placeholder: Types.any,
+    placeholderClassName: Types.string,
+    placeholderStyle: Types.object,
+    plugins: Types.array,
+    readOnly: Types.bool,
+    role: Types.string,
+    schema: Types.object,
+    spellCheck: Types.bool,
+    state: Types.instanceOf(State).isRequired,
+    style: Types.object,
+    tabIndex: Types.number,
   }
 
   /**
@@ -258,7 +260,7 @@ class Editor extends React.Component {
  */
 
 for (const property of EVENT_HANDLERS) {
-  Editor.propTypes[property] = React.PropTypes.func
+  Editor.propTypes[property] = Types.func
 }
 
 /**
