@@ -50,7 +50,7 @@ class App extends React.Component {
 
 Now let's add "code blocks" to our editor.
 
-The problem is, code blocks won't just be rendered as a plain paragraph, they'll need to be renderer differently. To make that happen, we need to define a "renderer" for `code` nodes
+The problem is, code blocks won't just be rendered as a plain paragraph, they'll need to be rendered differently. To make that happen, we need to define a "renderer" for `code` nodes
 
 Node renderers are just simple React components, like so:
 
