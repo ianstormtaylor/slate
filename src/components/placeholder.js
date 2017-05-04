@@ -49,7 +49,7 @@ class Placeholder extends React.Component {
       props.children != this.props.children ||
       props.className != this.props.className ||
       props.firstOnly != this.props.firstOnly ||
-      (props.firstOnly && (props.parent != this.props.parent)) ||
+      props.parent != this.props.parent ||
       props.node != this.props.node ||
       props.style != this.props.style
     )
