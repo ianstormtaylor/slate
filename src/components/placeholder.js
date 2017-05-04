@@ -69,10 +69,8 @@ class Placeholder extends React.Component {
       if (parent.nodes.size > 1) return false
       if (parent.nodes.first() === node) return true
       return false
-
     } else {
       return true
-
     }
   }
 
