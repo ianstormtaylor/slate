@@ -277,8 +277,10 @@ function Plugin(options = {}) {
       wrapper.appendChild(first)
       contents.insertBefore(wrapper, text)
     } else {
-      // TODO: incase of void nodes.. where there is no text
+      // TODO: incase of void nodes, appended a span with no content
+      // except data-slate-fragment.. but that still doesn't work.
 
+      contents.appendChild(wrapper)
     }
 
 
