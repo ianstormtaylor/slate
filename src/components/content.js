@@ -387,7 +387,6 @@ class Content extends React.Component {
     const data = {}
     data.type = 'fragment'
     data.fragment = state.fragment
-    data.inVoidNode = state.fragment.nodes.some(node => node.isVoid)
 
     debug('onCopy', { event, data })
     this.props.onCopy(event, data)
@@ -413,7 +412,6 @@ class Content extends React.Component {
     const data = {}
     data.type = 'fragment'
     data.fragment = state.fragment
-    data.inVoidNode = state.fragment.nodes.some(node => node.isVoid)
 
     debug('onCut', { event, data })
     this.props.onCut(event, data)

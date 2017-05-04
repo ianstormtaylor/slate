@@ -247,9 +247,10 @@ function Plugin(options = {}) {
    */
 
   function onCutOrCopy(e, data, state) {
+    const inVoidNode = state.fragment.nodes.some(node => node.isVoid)
     const window = getWindow(e.target)
     const native = window.getSelection()
-    if (native.isCollapsed && !data.inVoidNode) return
+    if (native.isCollapsed && !inVoidNode) return
 
     const { fragment } = data
     const encoded = Base64.serializeNode(fragment)
