@@ -271,7 +271,7 @@ function Plugin(options = {}) {
       const node = findDOMNode(isVoidBlock ? endBlock : endInline)
       r.setEndAfter(node)
       contents = r.cloneContents()
-      attach = node
+      attach = contents.childNodes[contents.childNodes.length - 1].firstChild
     }
 
     // Remove any zero-width space spans from the cloned DOM so that they don't
