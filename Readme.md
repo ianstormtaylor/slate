@@ -57,7 +57,7 @@ Here's how Slate compares to some of the existing editors out there:
 
 - [**Quill**](http://quilljs.com/) — I never used Quill directly, so my hesitations about it are solely from considering it in early stages—and it has changed since then. The issues I see with it are: that the concept of "toolbars" is too coupled with the editor itself, that the configuration is too coupled to HTML classes and DOM nodes, that the idea of "formats" and "toolbars" being linked is limiting, and generally that too much "core" logic is given special privileges and is hard to customize.
 
-For more opinionated, and potentially useless, comparisons check out the [Comparisons](./docs/comparisons.md) document._
+For more opinionated, and potentially useless, comparisons check out the [Comparisons](./docs/general/comparisons.md) document._
 
 Of course those are my own opinions, and if those libraries solve your needs, use them! But if you've tried using any of those libraries you might have run into similar problems. If so, you might like Slate. Which brings me to how Slate solves all of that...
 

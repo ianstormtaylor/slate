@@ -1,17 +1,19 @@
 
-import Base64 from '../serializers/base-64'
 import Debug from 'debug'
+import React from 'react'
+import Types from 'prop-types'
+import getWindow from 'get-window'
+import keycode from 'keycode'
+
+import TYPES from '../constants/types'
+import Base64 from '../serializers/base-64'
 import Node from './node'
-import getPoint from '../utils/get-point'
+import Selection from '../models/selection'
 import extendSelection from '../utils/extend-selection'
 import findClosestNode from '../utils/find-closest-node'
-import React from 'react'
-import Selection from '../models/selection'
-import getTransferData from '../utils/get-transfer-data'
-import TYPES from '../constants/types'
-import getWindow from 'get-window'
 import findDeepestNode from '../utils/find-deepest-node'
-import keycode from 'keycode'
+import getPoint from '../utils/get-point'
+import getTransferData from '../utils/get-transfer-data'
 import { IS_FIREFOX, IS_MAC } from '../constants/environment'
 
 /**
@@ -37,28 +39,28 @@ class Content extends React.Component {
    */
 
   static propTypes = {
-    autoCorrect: React.PropTypes.bool.isRequired,
-    autoFocus: React.PropTypes.bool.isRequired,
-    children: React.PropTypes.array.isRequired,
-    className: React.PropTypes.string,
-    editor: React.PropTypes.object.isRequired,
-    onBeforeInput: React.PropTypes.func.isRequired,
-    onBlur: React.PropTypes.func.isRequired,
-    onChange: React.PropTypes.func.isRequired,
-    onCopy: React.PropTypes.func.isRequired,
-    onCut: React.PropTypes.func.isRequired,
-    onDrop: React.PropTypes.func.isRequired,
-    onFocus: React.PropTypes.func.isRequired,
-    onKeyDown: React.PropTypes.func.isRequired,
-    onPaste: React.PropTypes.func.isRequired,
-    onSelect: React.PropTypes.func.isRequired,
-    readOnly: React.PropTypes.bool.isRequired,
-    role: React.PropTypes.string,
-    schema: React.PropTypes.object,
-    spellCheck: React.PropTypes.bool.isRequired,
-    state: React.PropTypes.object.isRequired,
-    style: React.PropTypes.object,
-    tabIndex: React.PropTypes.number
+    autoCorrect: Types.bool.isRequired,
+    autoFocus: Types.bool.isRequired,
+    children: Types.array.isRequired,
+    className: Types.string,
+    editor: Types.object.isRequired,
+    onBeforeInput: Types.func.isRequired,
+    onBlur: Types.func.isRequired,
+    onChange: Types.func.isRequired,
+    onCopy: Types.func.isRequired,
+    onCut: Types.func.isRequired,
+    onDrop: Types.func.isRequired,
+    onFocus: Types.func.isRequired,
+    onKeyDown: Types.func.isRequired,
+    onPaste: Types.func.isRequired,
+    onSelect: Types.func.isRequired,
+    readOnly: Types.bool.isRequired,
+    role: Types.string,
+    schema: Types.object,
+    spellCheck: Types.bool.isRequired,
+    state: Types.object.isRequired,
+    style: Types.object,
+    tabIndex: Types.number
   }
 
   /**
@@ -112,7 +114,10 @@ class Content extends React.Component {
   }
 
   /**
-   * On mount, update the selection, and focus the editor if `autoFocus` is set.
+   * When the editor first mounts in the DOM we need to:
+   *
+   *   - Update the selection, in case it starts focused.
+   *   - Focus the editor if `autoFocus` is set.
    */
 
   componentDidMount = () => {
@@ -144,10 +149,10 @@ class Content extends React.Component {
     // If both selections are blurred, do nothing.
     if (!native.rangeCount && selection.isBlurred) return
 
-    // If the selection has been blurred, but hasn't been updated in the DOM,
-    // blur the DOM selection.
+    // If the selection has been blurred, but is still inside the editor in the
+    // DOM, blur it manually.
     if (selection.isBlurred) {
-      if (!this.element.contains(native.anchorNode)) return
+      if (!this.isInEditor(native.anchorNode)) return
       native.removeAllRanges()
       this.element.blur()
       debug('updateSelection', { selection, native })
@@ -232,17 +237,16 @@ class Content extends React.Component {
   }
 
   /**
-   * Check if an `event` is being fired from within the contenteditable element.
-   * This will return false for edits happening in non-contenteditable children,
-   * such as void nodes and other nested Slate editors.
+   * Check if an event `target` is fired from within the contenteditable
+   * element. This should be false for edits happening in non-contenteditable
+   * children, such as void nodes and other nested Slate editors.
    *
-   * @param {Event} event
+   * @param {Element} target
    * @return {Boolean}
    */
 
-  isInEditor = (event) => {
+  isInEditor = (target) => {
     const { element } = this
-    const { target } = event
     return (
       (target.isContentEditable) &&
       (target == element || findClosestNode(target, '[data-slate-editor]') == element)
@@ -257,7 +261,7 @@ class Content extends React.Component {
 
   onBeforeInput = (event) => {
     if (this.props.readOnly) return
-    if (!this.isInEditor(event)) return
+    if (!this.isInEditor(event.target)) return
 
     const data = {}
 
@@ -274,12 +278,13 @@ class Content extends React.Component {
   onBlur = (event) => {
     if (this.props.readOnly) return
     if (this.tmp.isCopying) return
-    if (!this.isInEditor(event)) return
+    if (!this.isInEditor(event.target)) return
 
-    // If the element that is now focused is actually inside the editor, we
-    // need to ignore it. This can happen in situations where there is a nested
-    // `contenteditable="true"` node that isn't another Slate editor.
-    if (this.element.contains(event.relatedTarget)) return
+    // If the active element is still the editor, the blur event is due to the
+    // window itself being blurred (eg. when changing tabs) so we should ignore
+    // the event, since we want to maintain focus when returning.
+    const window = getWindow(this.element)
+    if (window.document.activeElement == this.element) return
 
     const data = {}
 
@@ -296,7 +301,7 @@ class Content extends React.Component {
   onFocus = (event) => {
     if (this.props.readOnly) return
     if (this.tmp.isCopying) return
-    if (!this.isInEditor(event)) return
+    if (!this.isInEditor(event.target)) return
 
     // COMPAT: If the editor has nested editable elements, the focus can go to
     // those elements. In Firefox, this must be prevented because it results in
@@ -330,7 +335,7 @@ class Content extends React.Component {
    */
 
   onCompositionStart = (event) => {
-    if (!this.isInEditor(event)) return
+    if (!this.isInEditor(event.target)) return
 
     this.tmp.isComposing = true
     this.tmp.compositions++
@@ -347,7 +352,7 @@ class Content extends React.Component {
    */
 
   onCompositionEnd = (event) => {
-    if (!this.isInEditor(event)) return
+    if (!this.isInEditor(event.target)) return
 
     this.tmp.forces++
     const count = this.tmp.compositions
@@ -370,7 +375,7 @@ class Content extends React.Component {
    */
 
   onCopy = (event) => {
-    if (!this.isInEditor(event)) return
+    if (!this.isInEditor(event.target)) return
     const window = getWindow(event.target)
 
     this.tmp.isCopying = true
@@ -395,7 +400,7 @@ class Content extends React.Component {
 
   onCut = (event) => {
     if (this.props.readOnly) return
-    if (!this.isInEditor(event)) return
+    if (!this.isInEditor(event.target)) return
     const window = getWindow(event.target)
 
     this.tmp.isCopying = true
@@ -419,7 +424,7 @@ class Content extends React.Component {
    */
 
   onDragEnd = (event) => {
-    if (!this.isInEditor(event)) return
+    if (!this.isInEditor(event.target)) return
 
     this.tmp.isDragging = false
     this.tmp.isInternalDrag = null
@@ -434,7 +439,7 @@ class Content extends React.Component {
    */
 
   onDragOver = (event) => {
-    if (!this.isInEditor(event)) return
+    if (!this.isInEditor(event.target)) return
 
     const { dataTransfer } = event.nativeEvent
     const data = getTransferData(dataTransfer)
@@ -458,7 +463,7 @@ class Content extends React.Component {
    */
 
   onDragStart = (event) => {
-    if (!this.isInEditor(event)) return
+    if (!this.isInEditor(event.target)) return
 
     this.tmp.isDragging = true
     this.tmp.isInternalDrag = true
@@ -484,7 +489,7 @@ class Content extends React.Component {
 
   onDrop = (event) => {
     if (this.props.readOnly) return
-    if (!this.isInEditor(event)) return
+    if (!this.isInEditor(event.target)) return
 
     event.preventDefault()
 
@@ -542,7 +547,7 @@ class Content extends React.Component {
   onInput = (event) => {
     if (this.tmp.isComposing) return
     if (this.props.state.isBlurred) return
-    if (!this.isInEditor(event)) return
+    if (!this.isInEditor(event.target)) return
     debug('onInput', { event })
 
     const window = getWindow(event.target)
@@ -613,7 +618,7 @@ class Content extends React.Component {
 
   onKeyDown = (event) => {
     if (this.props.readOnly) return
-    if (!this.isInEditor(event)) return
+    if (!this.isInEditor(event.target)) return
 
     const { altKey, ctrlKey, metaKey, shiftKey, which } = event
     const key = keycode(which)
@@ -691,7 +696,7 @@ class Content extends React.Component {
 
   onPaste = (event) => {
     if (this.props.readOnly) return
-    if (!this.isInEditor(event)) return
+    if (!this.isInEditor(event.target)) return
 
     event.preventDefault()
     const data = getTransferData(event.clipboardData)
@@ -715,7 +720,7 @@ class Content extends React.Component {
     if (this.tmp.isCopying) return
     if (this.tmp.isComposing) return
     if (this.tmp.isSelecting) return
-    if (!this.isInEditor(event)) return
+    if (!this.isInEditor(event.target)) return
 
     const window = getWindow(event.target)
     const { state, editor } = this.props
@@ -836,6 +841,7 @@ class Content extends React.Component {
         data-slate-editor
         key={this.tmp.forces}
         ref={this.ref}
+        data-key={document.key}
         contentEditable={!readOnly}
         suppressContentEditableWarning
         className={className}
