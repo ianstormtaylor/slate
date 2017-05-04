@@ -44,7 +44,7 @@ An optional class name string to add to the placeholder `<span>` element.
 ### `firstOnly`
 `Boolean`
 
-An optional toggle that allows the Placeholder to render even if it is not the first node of the parent. This is useful for cases where the Placeholder should show up at every empty instance of the node. Defaults to `false`.
+An optional toggle that allows the Placeholder to render even if it is not the first node of the parent. This is useful for cases where the Placeholder should show up at every empty instance of the node. Defaults to `true`.
 
 ### `node`
 `Node`
@@ -54,7 +54,7 @@ The node to render the placeholder element on top of. The placeholder is positio
 ### `parent`
 `Node`
 
-The node to check for non-empty content, to determine whether the placeholder should be shown or not.
+The node to check for non-empty content, to determine whether the placeholder should be shown or not, if `firstOnly` is set to `false`.
 
 ### `state`
 `State`
