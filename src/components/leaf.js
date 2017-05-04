@@ -1,8 +1,10 @@
 
 import Debug from 'debug'
-import OffsetKey from '../utils/offset-key'
 import React from 'react'
 import ReactDOM from 'react-dom'
+import Types from 'prop-types'
+
+import OffsetKey from '../utils/offset-key'
 import findDeepestNode from '../utils/find-deepest-node'
 import { IS_FIREFOX } from '../constants/environment'
 
@@ -29,17 +31,17 @@ class Leaf extends React.Component {
    */
 
   static propTypes = {
-    block: React.PropTypes.object.isRequired,
-    editor: React.PropTypes.object.isRequired,
-    index: React.PropTypes.number.isRequired,
-    marks: React.PropTypes.object.isRequired,
-    node: React.PropTypes.object.isRequired,
-    offset: React.PropTypes.number.isRequired,
-    parent: React.PropTypes.object.isRequired,
-    ranges: React.PropTypes.object.isRequired,
-    schema: React.PropTypes.object.isRequired,
-    state: React.PropTypes.object.isRequired,
-    text: React.PropTypes.string.isRequired
+    block: Types.object.isRequired,
+    editor: Types.object.isRequired,
+    index: Types.number.isRequired,
+    marks: Types.object.isRequired,
+    node: Types.object.isRequired,
+    offset: Types.number.isRequired,
+    parent: Types.object.isRequired,
+    ranges: Types.object.isRequired,
+    schema: Types.object.isRequired,
+    state: Types.object.isRequired,
+    text: Types.string.isRequired
   }
 
   /**
