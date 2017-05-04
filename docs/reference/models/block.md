@@ -7,7 +7,7 @@ import { Block } from 'slate'
 
 A block node in a Slate [`Document`](./document.md). Block nodes implement the [`Node`](./node.md) interface.
 
-Block nodes may contain nested block nodes (both void and non-void), inline nodes, text nodes and just regular DOM elements (with `contentEditable = {false}`). Block nodes always contain at least one text node child.
+Block nodes may contain nested block nodes, inline nodes, and text nodes—just like in the DOM. They always contain at least one text node child.
 
 - [Properties](#properties)
   - [`data`](#data)
