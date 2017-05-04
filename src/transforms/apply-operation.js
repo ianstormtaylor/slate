@@ -115,6 +115,10 @@ function insertText(state, operation) {
   const { anchorKey, focusKey, anchorOffset, focusOffset } = selection
   let node = document.assertPath(path)
 
+  if (node.kind != 'text') {
+    node = node.getTextAtOffset(offset)
+  }
+
   // Update the document
   node = node.insertText(offset, text, marks)
   document = document.updateDescendant(node)
