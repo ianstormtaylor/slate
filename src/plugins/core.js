@@ -7,7 +7,8 @@ import getPoint from '../utils/get-point'
 import Placeholder from '../components/placeholder'
 import React from 'react'
 import getWindow from 'get-window'
-import { IS_MAC } from '../constants/environment'
+import findDOMNode from '../utils/find-dom-node'
+import { IS_CHROME, IS_MAC, IS_SAFARI } from '../constants/environment'
 
 /**
  * Debug.
@@ -249,29 +250,54 @@ function Plugin(options = {}) {
   function onCutOrCopy(e, data, state) {
     const window = getWindow(e.target)
     const native = window.getSelection()
-    if (native.isCollapsed) return
+    const { endBlock, endInline } = state
+    const isVoidBlock = endBlock && endBlock.isVoid
+    const isVoidInline = endInline && endInline.isVoid
+    const isVoid = isVoidBlock || isVoidInline
+
+    // If the selection is collapsed, and it isn't inside a void node, abort.
+    if (native.isCollapsed && !isVoid) return
 
     const { fragment } = data
     const encoded = Base64.serializeNode(fragment)
     const range = native.getRangeAt(0)
-    const contents = range.cloneContents()
+    let contents = range.cloneContents()
+    let attach = contents.childNodes[0]
+
+    // If the end node is a void node, we need to move the end of the range from
+    // the void node's spacer span, to the end of the void node's content.
+    if (isVoid) {
+      const r = range.cloneRange()
+      const node = findDOMNode(isVoidBlock ? endBlock : endInline)
+      r.setEndAfter(node)
+      contents = r.cloneContents()
+      attach = node
+    }
 
     // Remove any zero-width space spans from the cloned DOM so that they don't
-    // show up elsewhere when copied.
+    // show up elsewhere when pasted.
     const zws = [].slice.call(contents.querySelectorAll('[data-slate-zero-width]'))
     zws.forEach(zw => zw.parentNode.removeChild(zw))
 
-    // Wrap the first character of the selection in a span that has the encoded
-    // fragment attached as an attribute, so it will show up in the copied HTML.
-    const wrapper = window.document.createElement('span')
-    const text = contents.childNodes[0]
-    const char = text.textContent.slice(0, 1)
-    const first = window.document.createTextNode(char)
-    const rest = text.textContent.slice(1)
-    text.textContent = rest
-    wrapper.appendChild(first)
-    wrapper.setAttribute('data-slate-fragment', encoded)
-    contents.insertBefore(wrapper, text)
+    // COMPAT: In Chrome and Safari, if the last element in the selection to
+    // copy has `contenteditable="false"` the copy will fail, and nothing will
+    // be put in the clipboard. So we remove them all. (2017/05/04)
+    if (IS_CHROME || IS_SAFARI) {
+      const els = [].slice.call(contents.querySelectorAll('[contenteditable="false"]'))
+      els.forEach(el => el.removeAttribute('contenteditable'))
+    }
+
+    // Set a `data-slate-fragment` attribute on a non-empty node, so it shows up
+    // in the HTML, and can be used for intra-Slate pasting. If it's a text
+    // node, wrap it in a `<span>` so we have something to set an attribute on.
+    if (attach.nodeType == 3) {
+      const span = window.document.createElement('span')
+      span.appendChild(attach)
+      contents.appendChild(span)
+      attach = span
+    }
+
+    attach.setAttribute('data-slate-fragment', encoded)
 
     // Add the phony content to the DOM, and select it, so it will be copied.
     const body = window.document.querySelector('body')
