@@ -1400,7 +1400,7 @@ const Node = {
         // When spliting at the end of a text node, the first node is preserved
         let oneNodes = nodes.takeUntil(n => n.key == one.key)
 
-        if(!one.isVoid) {
+        if (!one.isVoid) {
           oneNodes = (oneNodes.size == (nodes.size - 1) && one == nodes.last()) ? nodes : oneNodes.push(one)
         }
 
