@@ -86,27 +86,27 @@ input:focus {
  * App.
  */
 
-.topbar {
+.nav {
   padding: 10px 15px;
   color: #AAA;
   background: #000;
 }
 
-.topbar-title {
+.nav-title {
   margin-right: 0.5em;
 }
 
-.topbar-links {
+.nav-links {
   float: right;
 }
 
-.topbar-link {
+.nav-link {
   margin-left: 1em;
   color: #AAA;
   text-decoration: none;
 }
 
-.topbar-link:hover {
+.nav-link:hover {
   color: #FFF;
   text-decoration: underline;
 }
