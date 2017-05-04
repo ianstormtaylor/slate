@@ -275,9 +275,12 @@ function Plugin(options = {}) {
       const rest = text.textContent.slice(1)
       text.textContent = rest
       wrapper.appendChild(first)
+      contents.insertBefore(wrapper, text)
+    } else {
+      // TODO: incase of void nodes.. where there is no text
+
     }
 
-    contents.insertBefore(wrapper, text)
 
     // Add the phony content to the DOM, and select it, so it will be copied.
     const body = window.document.querySelector('body')
