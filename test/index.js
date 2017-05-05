@@ -11,6 +11,7 @@ import 'babel-polyfill'
  * Tests.
  */
 
+import './plugins'
 import './rendering'
 import './schema'
 import './serializers'
