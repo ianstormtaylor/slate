@@ -52,13 +52,13 @@ Transforms.save = (transform, options = {}) => {
   let { state, operations } = transform
   let { history } = state
   let { undos, redos } = history
+  let previous = undos.peek()
 
   // If there are no operations, abort.
   if (!operations.length) return
 
   // Create a new save point or merge the operations into the previous one.
-  if (merge) {
-    let previous = undos.peek()
+  if (merge && previous) {
     undos = undos.pop()
     previous = previous.concat(operations)
     undos = undos.push(previous)

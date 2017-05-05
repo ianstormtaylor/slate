@@ -56,7 +56,7 @@ function Plugin(options = {}) {
 
     const newState = state.transform()
       .normalize(schema)
-      .apply({ save: false })
+      .apply({ merge: true })
 
     debug('onBeforeChange')
     return newState
