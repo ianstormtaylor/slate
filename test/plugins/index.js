@@ -12,7 +12,7 @@ import { resolve } from 'path'
  * Tests.
  */
 
-describe('plugins', () => {
+describe.only('plugins', () => {
   const tests = fs.readdirSync(resolve(__dirname, './fixtures'))
 
   for (const test of tests) {

@@ -16,12 +16,13 @@ function decorate(text, block) {
 }
 
 export const plugins = [{
-  match: () => true,
-  decorate,
-}]
-
-export const schema = {
-  marks: {
-    bold: BOLD
+  schema: {
+    marks: {
+      bold: BOLD
+    },
+    rules: [{
+      match: () => true,
+      decorate,
+    }]
   }
-}
+}]
