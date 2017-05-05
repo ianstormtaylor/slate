@@ -241,12 +241,22 @@ const Node = {
    */
 
   getBlocksAtRange(range) {
+    const array = this.getBlocksAtRangeAsArray(range)
+    // Eliminate duplicates by converting to an `OrderedSet` first.
+    return new List(new OrderedSet(array))
+  },
+
+  /**
+   * Get the leaf block descendants in a `range` as an array
+   *
+   * @param {Selection} range
+   * @return {Array}
+   */
+
+  getBlocksAtRangeAsArray(range) {
     return this
-      .getTextsAtRange(range)
+      .getTextsAtRangeAsArray(range)
       .map(text => this.getClosestBlock(text.key))
-      // Eliminate duplicates by converting to a `Set` first.
-      .toOrderedSet()
-      .toList()
   },
 
   /**
@@ -257,41 +267,79 @@ const Node = {
    */
 
   getBlocksByType(type) {
-    return this.nodes.reduce((blocks, node) => {
-      if (node.kind != 'block') return blocks
-      if (node.isLeafBlock() && node.type == type) return blocks.push(node)
-      return blocks.concat(node.getBlocksByType(type))
-    }, new List())
+    const array = this.getBlocksByTypeAsArray(type)
+    return new List(array)
+  },
+
+  /**
+   * Get all of the leaf blocks that match a `type` as an array
+   *
+   * @param {String} type
+   * @return {Array}
+   */
+
+  getBlocksByTypeAsArray(type) {
+    return this.nodes.reduce((array, node) => {
+      if (node.kind != 'block') return array
+      if (node.isLeafBlock() && node.type == type) return array.push(node)
+      return array.concat(node.getBlocksByTypeAsArray(type))
+    }, [])
   },
 
   /**
    * Get all of the characters for every text node.
    *
-   * @return {List<Character>} characters
+   * @return {List<Character>}
    */
 
   getCharacters() {
-    return this.nodes.reduce((chars, node) => {
+    const array = this.getCharactersAsArray()
+    return new List(array)
+  },
+
+  /**
+   * Get all of the characters for every text node as an array
+   *
+   * @return {Array}
+   */
+
+  getCharactersAsArray() {
+    return this.nodes.reduce((arr, node) => {
       return node.kind == 'text'
-        ? chars.concat(node.characters)
-        : chars.concat(node.getCharacters())
-    }, new List())
+        ? arr.concat(node.characters.toArray())
+        : arr.concat(node.getCharactersAsArray())
+    }, [])
   },
 
   /**
    * Get a list of the characters in a `range`.
    *
    * @param {Selection} range
-   * @return {List<Character>} characters
+   * @return {List<Character>}
    */
 
   getCharactersAtRange(range) {
+    const array = this.getCharactersAtRangeAsArray(range)
+    return new List(array)
+  },
+
+  /**
+   * Get a list of the characters in a `range` as an array.
+   *
+   * @param {Selection} range
+   * @return {Array}
+   */
+
+  getCharactersAtRangeAsArray(range) {
     return this
       .getTextsAtRange(range)
-      .reduce((characters, text) => {
-        const chars = text.characters.filter((char, i) => isInRange(i, text, range))
-        return characters.concat(chars)
-      }, new List())
+      .reduce((arr, text) => {
+        const chars = text.characters
+          .filter((char, i) => isInRange(i, text, range))
+          .toArray()
+
+        return arr.concat(chars)
+      }, [])
   },
 
   /**
@@ -422,11 +470,10 @@ const Node = {
 
   getDepth(key, startAt = 1) {
     this.assertDescendant(key)
-    return this.hasChild(key)
-      ? startAt
-      : this
-        .getFurthestAncestor(key)
-        .getDepth(key, startAt + 1)
+    if (this.hasChild(key)) return startAt
+    return this
+      .getFurthestAncestor(key)
+      .getDepth(key, startAt + 1)
   },
 
   /**
@@ -679,12 +726,23 @@ const Node = {
    */
 
   getInlinesAtRange(range) {
+    const array = this.getInlinesAtRangeAsArray(range)
+    // Remove duplicates by converting it to an `OrderedSet` first.
+    return new List(new OrderedSet(array))
+  },
+
+  /**
+   * Get the closest inline nodes for each text node in a `range` as an array.
+   *
+   * @param {Selection} range
+   * @return {Array}
+   */
+
+  getInlinesAtRangeAsArray(range) {
     return this
-      .getTextsAtRange(range)
+      .getTextsAtRangeAsArray(range)
       .map(text => this.getClosestInline(text.key))
       .filter(exists => exists)
-      .toOrderedSet()
-      .toList()
   },
 
   /**
@@ -695,17 +753,29 @@ const Node = {
    */
 
   getInlinesByType(type) {
+    const array = this.getInlinesByTypeAsArray(type)
+    return new List(array)
+  },
+
+  /**
+   * Get all of the leaf inline nodes that match a `type` as an array.
+   *
+   * @param {String} type
+   * @return {Array}
+   */
+
+  getInlinesByTypeAsArray(type) {
     return this.nodes.reduce((inlines, node) => {
       if (node.kind == 'text') return inlines
       if (node.isLeafInline() && node.type == type) return inlines.push(node)
-      return inlines.concat(node.getInlinesByType(type))
-    }, new List())
+      return inlines.concat(node.getInlinesByTypeAsArray(type))
+    }, [])
   },
 
   /**
    * Return a set of all keys in the node.
    *
-   * @return {Set<Node>}
+   * @return {Set<String>}
    */
 
   getKeys() {
@@ -715,7 +785,7 @@ const Node = {
       keys.push(desc.key)
     })
 
-    return Set(keys)
+    return new Set(keys)
   },
 
   /**
@@ -739,13 +809,47 @@ const Node = {
   /**
    * Get all of the marks for all of the characters of every text node.
    *
-   * @return {OrderedSet<Mark>}
+   * @return {Set<Mark>}
    */
 
   getMarks() {
+    const array = this.getMarksAsArray()
+    return new Set(array)
+  },
+
+  /**
+   * Get all of the marks for all of the characters of every text node.
+   *
+   * @return {OrderedSet<Mark>}
+   */
+
+  getOrderedMarks() {
+    const array = this.getMarksAsArray()
+    return new OrderedSet(array)
+  },
+
+  /**
+   * Get all of the marks as an array.
+   *
+   * @return {Array}
+   */
+
+  getMarksAsArray() {
     return this.nodes.reduce((marks, node) => {
-      return marks.union(node.getMarks())
-    }, new OrderedSet())
+      return marks.concat(node.getMarksAsArray())
+    }, [])
+  },
+
+  /**
+   * Get a set of the marks in a `range`.
+   *
+   * @param {Selection} range
+   * @return {Set<Mark>}
+   */
+
+  getMarksAtRange(range) {
+    const array = this.getMarksAtRangeAsArray(range)
+    return new Set(array)
   },
 
   /**
@@ -755,29 +859,55 @@ const Node = {
    * @return {OrderedSet<Mark>}
    */
 
-  getMarksAtRange(range) {
+  getOrderedMarksAtRange(range) {
+    const array = this.getMarksAtRangeAsArray(range)
+    return new OrderedSet(array)
+  },
+
+  /**
+   * Get a set of the marks in a `range`.
+   *
+   * @param {Selection} range
+   * @return {Array}
+   */
+
+  getMarksAtRangeAsArray(range) {
     range = range.normalize(this)
     const { startKey, startOffset } = range
 
     // If the range is collapsed at the start of the node, check the previous.
     if (range.isCollapsed && startOffset == 0) {
       const previous = this.getPreviousText(startKey)
-      if (!previous || !previous.length) return new Set()
+      if (!previous || !previous.length) return []
       const char = previous.characters.get(previous.length - 1)
-      return char.marks
+      return char.marks.toArray()
     }
 
     // If the range is collapsed, check the character before the start.
     if (range.isCollapsed) {
       const text = this.getDescendant(startKey)
       const char = text.characters.get(range.startOffset - 1)
-      return char.marks
+      return char.marks.toArray()
     }
 
     // Otherwise, get a set of the marks for each character in the range.
     return this
       .getCharactersAtRange(range)
-      .reduce((memo, char) => memo.union(char.marks), new OrderedSet())
+      .reduce((memo, char) => {
+        return memo.concat(char.marks.toArray())
+      }, [])
+  },
+
+  /**
+   * Get all of the marks that match a `type`.
+   *
+   * @param {String} type
+   * @return {Set<Mark>}
+   */
+
+  getMarksByType(type) {
+    const array = this.getMarksByTypeAsArray(type)
+    return new Set(array)
   },
 
   /**
@@ -787,12 +917,24 @@ const Node = {
    * @return {OrderedSet<Mark>}
    */
 
-  getMarksByType(type) {
-    return this.nodes.reduce((marks, node) => {
+  getOrderedMarksByType(type) {
+    const array = this.getMarksByTypeAsArray(type)
+    return new OrderedSet(array)
+  },
+
+  /**
+   * Get all of the marks that match a `type` as an array.
+   *
+   * @param {String} type
+   * @return {Array}
+   */
+
+  getMarksByTypeAsArray(type) {
+    return this.nodes.reduce((array, node) => {
       return node.kind == 'text'
-        ? marks.union(node.getMarks().filter(m => m.type == type))
-        : marks.union(node.getMarksByType(type))
-    }, new OrderedSet())
+        ? array.concat(node.getMarksAsArray().filter(m => m.type == type))
+        : array.concat(node.getMarksByTypeAsArray(type))
+    }, [])
   },
 
   /**
@@ -1093,11 +1235,28 @@ const Node = {
    */
 
   getTextsAtRange(range) {
+    const array = this.getTextsAtRangeAsArray(range)
+    return new List(array)
+  },
+
+  /**
+   * Get all of the text nodes in a `range` as an array.
+   *
+   * @param {Selection} range
+   * @return {Array}
+   */
+
+  getTextsAtRangeAsArray(range) {
     range = range.normalize(this)
     const { startKey, endKey } = range
-    const texts = this.getTexts()
     const startText = this.getDescendant(startKey)
+
+    // PERF: the most common case is when the range is in a single text node,
+    // where we can avoid a lot of iterating of the tree.
+    if (startKey == endKey) return [startText]
+
     const endText = this.getDescendant(endKey)
+    const texts = this.getTextsAsArray()
     const start = texts.indexOf(startText)
     const end = texts.indexOf(endText)
     return texts.slice(start, end + 1)
@@ -1652,9 +1811,13 @@ memoize(Node, [
   'getBlocks',
   'getBlocksAsArray',
   'getBlocksAtRange',
+  'getBlocksAtRangeAsArray',
   'getBlocksByType',
+  'getBlocksByTypeAsArray',
   'getCharacters',
+  'getCharactersAsArray',
   'getCharactersAtRange',
+  'getCharactersAtRangeAsArray',
   'getChild',
   'getChildrenBetween',
   'getChildrenBetweenIncluding',
@@ -1665,7 +1828,6 @@ memoize(Node, [
   'getComponent',
   'getDecorators',
   'getDepth',
-  'getDescendant',
   'getDescendant',
   'getDescendantAtPath',
   'getDescendantDecorators',
@@ -1678,12 +1840,20 @@ memoize(Node, [
   'getInlines',
   'getInlinesAsArray',
   'getInlinesAtRange',
+  'getInlinesAtRangeAsArray',
   'getInlinesByType',
+  'getInlinesByTypeAsArray',
   'getKeys',
   'getLastText',
   'getMarks',
+  'getOrderedMarks',
+  'getMarksAsArray',
   'getMarksAtRange',
+  'getOrderedMarksAtRange',
+  'getMarksAtRangeAsArray',
   'getMarksByType',
+  'getOrderedMarksByType',
+  'getMarksByTypeAsArray',
   'getNextBlock',
   'getNextSibling',
   'getNextText',
@@ -1701,6 +1871,7 @@ memoize(Node, [
   'getTexts',
   'getTextsAsArray',
   'getTextsAtRange',
+  'getTextsAtRangeAsArray',
   'hasChild',
   'hasDescendant',
   'hasNode',

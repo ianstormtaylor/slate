@@ -31,9 +31,14 @@ baseline.forEach((suite, i) => {
     const faster = (b - c) < (0 - threshold)
     const percent = Math.round(Math.abs(b - c) / b * 100)
 
-    let output = `${b.toFixed(2)} --> ${c.toFixed(2)} iterations/sec`
+    let output = `${b.toFixed(2)} → ${c.toFixed(2)} iterations/sec`
     if (slower) output = chalk.red(`${output} (${percent}% slower)`)
-    if (faster) output = chalk.green(`${output} (${percent}% faster)`)
+    else if (faster) output = chalk.green(`${output} (${percent}% faster)`)
+    else output = chalk.gray(output)
+
+    if (percent > 1000) output += ' 😱'
+    else if (faster && percent > 100) output += ' 🙌'
+    else if (slower && percent > 100) output += ' 😟'
 
     console.log(`      ${base.title}`)
     console.log(`        ${output}`)
