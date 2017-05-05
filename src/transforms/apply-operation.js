@@ -188,21 +188,39 @@ function moveNode(state, operation) {
   let { document } = state
   const node = document.assertPath(path)
   const index = path.pop()
+  const parentDepth = path.length
 
   // Remove the node from its current parent
   let parent = document.getParent(node.key)
   parent = parent.removeNode(index)
   document = parent.kind === 'document' ? parent : document.updateDescendant(parent)
 
-  // When `parent` is an ancestor of `target` and `node` index is less than the
-  // index of the `target` ancestor with the same depth of `node`, then removing
-  // `node` changes the path to `target`. So we have to adjust `newPath`.
-  const d = path.length
-  const isAncestor = d === 0 ? true : path.every((x, i) => x === newPath[i])
-  if (isAncestor && index < newPath[d]) newPath[d]--
+  // Check if `parent` is an anchestor of `target`
+  const isAncestor = path.every((x, i) => x === newPath[i])
+
+  let target
+
+  // If `parent` ia an ancestor of `target` and they have the same depth,
+  // then `parent` and `target` are the same node.
+  if (isAncestor && parentDepth === newPath.length) {
+    target = parent
+  }
+
+  // Else if `parent` is an ancestor of `target` and `node` index is less than
+  // the index of the `target` ancestor with the same depth of `node`,
+  // then removing `node` changes the path to `target`.
+  // So we have to adjust `newPath` before picking `target`.
+  else if (isAncestor && index < newPath[parentDepth]) {
+    newPath[parentDepth]--
+    target = document.assertPath(newPath)
+  }
+
+  // Else pick `target`
+  else {
+    target = document.assertPath(newPath)
+  }
 
   // Insert the new node to its new parent
-  let target = document.assertPath(newPath)
   target = target.insertNode(newIndex, node)
   document = target.kind === 'document' ? target : document.updateDescendant(target)
 
