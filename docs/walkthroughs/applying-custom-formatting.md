@@ -123,7 +123,9 @@ function BoldMark(props) {
 
 Pretty simple, right?
 
-And now, let's tell Slate about that mark. To do that, we'll add it to the `schema` object under a `marks` property, like so:
+And now, let's tell Slate about that mark.
+To do that, we'll add it to the `schema` object under a `marks` property.
+Also, let's allow our mark to be toggled by changing `addMark` to `toggleMark`.
 
 ```js
 function BoldMark(props) {
