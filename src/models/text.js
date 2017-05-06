@@ -407,14 +407,21 @@ class Text extends new Record(DEFAULTS) {
  */
 
 memoize(Text.prototype, [
-  'getDecorations',
-  'getDecorators',
   'getMarks',
   'getMarksAsArray',
+], {
+  takesArguments: false,
+})
+
+memoize(Text.prototype, [
+  'getDecorations',
+  'getDecorators',
   'getMarksAtIndex',
   'getRanges',
   'validate'
-])
+], {
+  takesArguments: true,
+})
 
 /**
  * Export.
