@@ -1806,16 +1806,35 @@ const Node = {
  */
 
 memoize(Node, [
-  'areDescendantsSorted',
-  'getAncestors',
   'getBlocks',
   'getBlocksAsArray',
+  'getCharacters',
+  'getCharactersAsArray',
+  'getFirstText',
+  'getInlines',
+  'getInlinesAsArray',
+  'getKeys',
+  'getLastText',
+  'getMarks',
+  'getOrderedMarks',
+  'getMarksAsArray',
+  'getText',
+  'getTextDirection',
+  'getTexts',
+  'getTextsAsArray',
+  'isLeafBlock',
+  'isLeafInline',
+], {
+  takesArguments: false
+})
+
+memoize(Node, [
+  'areDescendantsSorted',
+  'getAncestors',
   'getBlocksAtRange',
   'getBlocksAtRangeAsArray',
   'getBlocksByType',
   'getBlocksByTypeAsArray',
-  'getCharacters',
-  'getCharactersAsArray',
   'getCharactersAtRange',
   'getCharactersAtRangeAsArray',
   'getChild',
@@ -1831,23 +1850,15 @@ memoize(Node, [
   'getDescendant',
   'getDescendantAtPath',
   'getDescendantDecorators',
-  'getFirstText',
   'getFragmentAtRange',
   'getFurthestBlock',
   'getFurthestInline',
   'getFurthestAncestor',
   'getFurthestOnlyChildAncestor',
-  'getInlines',
-  'getInlinesAsArray',
   'getInlinesAtRange',
   'getInlinesAtRangeAsArray',
   'getInlinesByType',
   'getInlinesByTypeAsArray',
-  'getKeys',
-  'getLastText',
-  'getMarks',
-  'getOrderedMarks',
-  'getMarksAsArray',
   'getMarksAtRange',
   'getOrderedMarksAtRange',
   'getMarksAtRangeAsArray',
@@ -1865,11 +1876,7 @@ memoize(Node, [
   'getPreviousBlock',
   'getPreviousSibling',
   'getPreviousText',
-  'getText',
   'getTextAtOffset',
-  'getTextDirection',
-  'getTexts',
-  'getTextsAsArray',
   'getTextsAtRange',
   'getTextsAtRangeAsArray',
   'hasChild',
@@ -1877,10 +1884,10 @@ memoize(Node, [
   'hasNode',
   'hasVoidParent',
   'isInlineSplitAtRange',
-  'isLeafBlock',
-  'isLeafInline',
   'validate',
-])
+], {
+  takesArguments: true
+})
 
 /**
  * Export.
