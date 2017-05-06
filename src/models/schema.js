@@ -78,7 +78,7 @@ class Schema extends new Record(DEFAULTS) {
    */
 
   __getComponent(object) {
-    const match = this.rules.find(rule => rule.render && rule.match(object))
+    const match = this.rules.find(rule => rule.render && (!rule.match || rule.match(object)))
     if (!match) return
     return match.render
   }
@@ -96,7 +96,7 @@ class Schema extends new Record(DEFAULTS) {
 
   __getDecorators(object) {
     return this.rules
-      .filter(rule => rule.decorate && rule.match(object))
+      .filter(rule => rule.decorate && (!rule.match || rule.match(object)))
       .map((rule) => {
         return (text) => {
           return rule.decorate(text, object)
@@ -121,7 +121,7 @@ class Schema extends new Record(DEFAULTS) {
 
     const match = this.rules.find((rule) => {
       if (!rule.validate) return
-      if (!rule.match(object)) return
+      if (!rule.match || !rule.match(object)) return
 
       value = rule.validate(object)
       return value

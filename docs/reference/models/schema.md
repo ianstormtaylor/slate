@@ -100,7 +100,7 @@ Internally, the `marks` and `nodes` properties of a schema are simply converted 
 }
 ```
 
-Slate schemas are built up of a set of rules. Each of the properties will add certain functionality to the schema, based on the properties it defines. 
+Slate schemas are built up of a set of rules. Each of the properties will add certain functionality to the schema, based on the properties it defines.
 
 ### `match`
 `Function match(object: Node || Mark)`
@@ -111,7 +111,7 @@ Slate schemas are built up of a set of rules. Each of the properties will add ce
 }
 ```
 
-The `match` property is the only required property of a rule. It determines which objects the rule applies to. 
+The `match` property determines which objects the rule applies to. It defaults to applying to all objects. (i.e. `() => true`)
 
 ### `decorate`
 `Function decorate(text: Node, object: Node) => List<Characters>`
