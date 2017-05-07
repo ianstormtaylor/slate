@@ -181,9 +181,20 @@ class Text extends new Record(DEFAULTS) {
    */
 
   getMarks() {
-    return this.characters.reduce((marks, char) => {
-      return marks.union(char.marks)
-    }, new OrderedSet())
+    const array = this.getMarksAsArray()
+    return new OrderedSet(array)
+  }
+
+  /**
+   * Get all of the marks on the text as an array
+   *
+   * @return {Array}
+   */
+
+  getMarksAsArray() {
+    return this.characters.reduce((array, char) => {
+      return array.concat(char.marks.toArray())
+    }, [])
   }
 
   /**
@@ -396,12 +407,21 @@ class Text extends new Record(DEFAULTS) {
  */
 
 memoize(Text.prototype, [
+  'getMarks',
+  'getMarksAsArray',
+], {
+  takesArguments: false,
+})
+
+memoize(Text.prototype, [
   'getDecorations',
   'getDecorators',
   'getMarksAtIndex',
   'getRanges',
   'validate'
-])
+], {
+  takesArguments: true,
+})
 
 /**
  * Export.

@@ -1,0 +1,14 @@
+
+nodes:
+  - kind: block
+    key: a
+    type: image
+    isVoid: true
+  - kind: block
+    key: b
+    type: image
+    isVoid: true
+  - kind: block
+    key: c
+    type: image
+    isVoid: true

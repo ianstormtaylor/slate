@@ -571,7 +571,7 @@ Transforms.insertFragmentAtRange = (transform, range, fragment, options = {}) =>
   }
 
   // If the fragment is empty, there's nothing to do after deleting.
-  if (!fragment.length) return
+  if (!fragment.nodes.size) return
 
   // Regenerate the keys for all of the fragments nodes, so that they're
   // guaranteed not to collide with the existing keys in the document. Otherwise
@@ -596,6 +596,12 @@ Transforms.insertFragmentAtRange = (transform, range, fragment, options = {}) =>
   const blocks = fragment.getBlocks()
   const firstBlock = blocks.first()
   const lastBlock = blocks.last()
+
+  // If the fragment only contains a void block, use `insertBlock` instead.
+  if (firstBlock == lastBlock && firstBlock.isVoid) {
+    transform.insertBlockAtRange(range, firstBlock, options)
+    return
+  }
 
   // If the first and last block aren't the same, we need to insert all of the
   // nodes after the fragment's first block at the index.

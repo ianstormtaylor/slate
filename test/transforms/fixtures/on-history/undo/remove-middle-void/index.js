@@ -2,7 +2,7 @@
 export default function (state) {
   return state
     .transform()
-    .removeNodeByKey('key1')
+    .removeNodeByKey('b')
     .apply()
 
     .transform()

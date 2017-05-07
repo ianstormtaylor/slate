@@ -8,7 +8,7 @@ import TYPES from '../constants/types'
  * @type {RegExp}
  */
 
-const FRAGMENT_MATCHER = /data-slate-fragment="([^\s]+)"/
+const FRAGMENT_MATCHER = / data-slate-fragment="([^\s]+)"/
 
 /**
  * Get the data and type from a native data `transfer`.
@@ -30,7 +30,7 @@ function getTransferData(transfer) {
   if (
     !fragment &&
     html &&
-    ~html.indexOf('<span data-slate-fragment="')
+    ~html.indexOf(' data-slate-fragment="')
   ) {
     const matches = FRAGMENT_MATCHER.exec(html)
     const [ full, encoded ] = matches // eslint-disable-line no-unused-vars

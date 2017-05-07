@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 
-import { Editor, Raw } from '../..'
+import { Editor, Raw } from '../../..'
 import React from 'react'
 import faker from 'faker'
 
