@@ -1,13 +1,12 @@
-
-import { Block } from '../../../../../..'
+// Import { Block } from '../../../../../..'
 
 export default function (state) {
-  const testBlock = Block.create({ type: 'paragraph' })
+  const { document } = state
 
-  // TODO: insert 'word' to the last text node in the last paragraph block
+  const lastBlock = document.getBlocks().last()
 
   return state
     .transform()
-    .insertTextByKey(document.key, 0, 'word')
+    .insertTextByKey(lastBlock.key, 11, 'word')
     .apply()
 }

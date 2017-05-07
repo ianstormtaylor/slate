@@ -1,14 +1,12 @@
 
-import { Block } from '../../../../../..'
-
 export default function (state) {
-  const { document, selection } = state
+  const { document } = state
 
-  const testBlock = Block.create({ type: 'paragraph' })
+  // Const testBlock = Block.create({ type: 'paragraph' })
+  const firstBlock = document.getBlocks().first()
 
   return state
     .transform()
-    .insertBlock(testBlock)
-    .insertTextByKey(testBlock.key, 0, 'works!')
+    .insertTextByKey(firstBlock.key, 3, ' works!')
     .apply()
 }
