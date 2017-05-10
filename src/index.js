@@ -7,6 +7,12 @@ import Editor from './components/editor'
 import Placeholder from './components/placeholder'
 
 /**
+* Constants.
+*/
+
+import { KEY_ENTER, KEY_TAB, KEY_BACKSPACE } from './constants/keys'
+
+/**
  * Models.
  */
 
@@ -71,7 +77,10 @@ export {
   Transforms,
   findDOMNode,
   resetKeyGenerator,
-  setKeyGenerator
+  setKeyGenerator,
+  KEY_ENTER,
+  KEY_TAB,
+  KEY_BACKSPACE
 }
 
 export default {
@@ -95,5 +104,8 @@ export default {
   Transforms,
   findDOMNode,
   resetKeyGenerator,
-  setKeyGenerator
+  setKeyGenerator,
+  KEY_ENTER,
+  KEY_TAB,
+  KEY_BACKSPACE
 }
