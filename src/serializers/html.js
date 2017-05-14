@@ -2,7 +2,7 @@
 import Raw from './raw'
 import React from 'react'
 import ReactDOMServer from 'react-dom/server'
-import cheerio from 'cheerio'
+import htmlparser2 from 'htmlparser2'
 import typeOf from 'type-of'
 import { Record } from 'immutable'
 
@@ -27,6 +27,8 @@ const String = new Record({
 const TEXT_RULE = {
 
   deserialize(el) {
+    console.log("GOT EL'", el)
+
     if (el.tagName == 'br') {
       return {
         kind: 'text',
@@ -92,8 +94,17 @@ class Html {
    */
 
   deserialize = (html, options = {}) => {
-    const $ = cheerio.load(html).root()
-    const children = $.children().toArray()
+    let out = ''
+    const domhandler = new htmlparser2.DomHandler((error, dom) => {
+      if (error) throw error
+      out = dom
+    })
+    const parser = new htmlparser2.Parser(domhandler, {decodeEntities: true})
+    parser.write(html)
+    parser.end()
+    console.log('done now', out)
+    const children = out
+
     let nodes = this.deserializeElements(children)
 
     // HACK: ensure for now that all top-level inline are wrapped into a block.
@@ -141,7 +152,7 @@ class Html {
   }
 
   /**
-   * Deserialize an array of Cheerio `elements`.
+   * Deserialize an array of htmlparser2 `elements`.
    *
    * @param {Array} elements
    * @return {Array}
@@ -171,7 +182,7 @@ class Html {
   }
 
   /**
-   * Deserialize a Cheerio `element`.
+   * Deserialize a htmlparser2 `element`.
    *
    * @param {Object} element
    * @return {Any}
@@ -202,6 +213,7 @@ class Html {
       break
     }
 
+    console.log('return', node, element)
     return node || next(element.children)
   }
 

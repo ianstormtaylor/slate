@@ -6,12 +6,12 @@
   "repository": "git://github.com/ianstormtaylor/slate.git",
   "main": "./lib/index.js",
   "dependencies": {
-    "cheerio": "^0.22.0",
     "debug": "^2.3.2",
     "direction": "^0.1.5",
     "es6-map": "^0.1.4",
     "esrever": "^0.2.0",
     "get-window": "^1.1.1",
+    "htmlparser2": "^3.9.2",
     "immutable": "^3.8.1",
     "is-empty": "^1.0.0",
     "is-in-browser": "^1.1.3",
