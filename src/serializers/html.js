@@ -27,8 +27,6 @@ const String = new Record({
 const TEXT_RULE = {
 
   deserialize(el) {
-    console.log("GOT EL'", el)
-
     if (el.tagName == 'br') {
       return {
         kind: 'text',
@@ -94,16 +92,7 @@ class Html {
    */
 
   deserialize = (html, options = {}) => {
-    let out = ''
-    const domhandler = new htmlparser2.DomHandler((error, dom) => {
-      if (error) throw error
-      out = dom
-    })
-    const parser = new htmlparser2.Parser(domhandler, {decodeEntities: true})
-    parser.write(html)
-    parser.end()
-    console.log('done now', out)
-    const children = out
+    const children = htmlparser2.parseDOM(html)
 
     let nodes = this.deserializeElements(children)
 
@@ -213,7 +202,6 @@ class Html {
       break
     }
 
-    console.log('return', node, element)
     return node || next(element.children)
   }
 
