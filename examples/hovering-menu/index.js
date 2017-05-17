@@ -3,7 +3,6 @@ import { Editor, Raw } from '../..'
 import Portal from 'react-portal'
 import React from 'react'
 import initialState from './state.json'
-import position from 'selection-position'
 
 /**
  * Define a schema.
@@ -185,7 +184,9 @@ class HoveringMenu extends React.Component {
       return
     }
 
-    const rect = position()
+    const selection = window.getSelection()
+    const range = selection.getRangeAt(0)
+    const rect = range.getBoundingClientRect()
     menu.style.opacity = 1
     menu.style.top = `${rect.top + window.scrollY - menu.offsetHeight}px`
     menu.style.left = `${rect.left + window.scrollX - menu.offsetWidth / 2 + rect.width / 2}px`

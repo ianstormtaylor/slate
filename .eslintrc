@@ -21,7 +21,7 @@
     "arrow-parens": ["error", "as-needed", { "requireForBlockBody": true }],
     "arrow-spacing": "error",
     "block-spacing": "error",
-    "capitalized-comments": ["error", "always", { "ignoreConsecutiveComments": true }],
+    "capitalized-comments": ["error", "always", { "ignoreConsecutiveComments": true, "ignoreInlineComments": true }],
     "comma-dangle": ["error", "only-multiline"],
     "comma-spacing": ["error", { "before": false, "after": true }],
     "comma-style": ["error", "last"],

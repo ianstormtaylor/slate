@@ -1,9 +1,11 @@
 
 import Debug from 'debug'
+import React from 'react'
+import Types from 'prop-types'
+
 import Leaf from './leaf'
 import Mark from '../models/mark'
 import OffsetKey from '../utils/offset-key'
-import React from 'react'
 import { IS_FIREFOX } from '../constants/environment'
 
 /**
@@ -29,13 +31,14 @@ class Void extends React.Component {
    */
 
   static propTypes = {
-    children: React.PropTypes.any.isRequired,
-    editor: React.PropTypes.object.isRequired,
-    node: React.PropTypes.object.isRequired,
-    parent: React.PropTypes.object.isRequired,
-    schema: React.PropTypes.object.isRequired,
-    state: React.PropTypes.object.isRequired,
-  };
+    block: Types.object,
+    children: Types.any.isRequired,
+    editor: Types.object.isRequired,
+    node: Types.object.isRequired,
+    parent: Types.object.isRequired,
+    schema: Types.object.isRequired,
+    state: Types.object.isRequired,
+  }
 
   /**
    * Debug.
@@ -152,7 +155,7 @@ class Void extends React.Component {
    */
 
   renderLeaf = () => {
-    const { node, schema, state, editor } = this.props
+    const { block, node, schema, state, editor } = this.props
     const child = node.getFirstText()
     const ranges = child.getRanges()
     const text = ''
@@ -167,6 +170,7 @@ class Void extends React.Component {
     return (
       <Leaf
         key={offsetKey}
+        block={node.kind == 'block' ? node : block}
         editor={editor}
         index={index}
         marks={marks}

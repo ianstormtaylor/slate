@@ -4,6 +4,72 @@ This document maintains a list of changes to Slate with each new version. Until 
 
 ---
 
+### `0.19.0` — March 3, 2017
+
+###### BREAKING CHANGES
+
+- **The `filterDescendants` and `findDescendants` methods are now depth-first.** This shouldn't affect almost anyone, since they are usually not the best things to be using for performance reasons. If you happen to have a very specific use case that needs breadth-first, (or even likely something better), you'll need to implement it yourself.
+
+###### DEPRECATION CHANGES
+
+- **Some `Node` methods have been deprecated!** There were a few methods that had been added over time that were either poorly named that have been deprecated and renamed, and a handful of methods that are no longer useful for the core library that have been deprecated. Here's a full list:
+  - `areDescendantSorted` -> `areDescendantsSorted`
+  - `getHighestChild` -> `getFurthestAncestor`
+  - `getHighestOnlyChildParent` -> `getFurthestOnlyChildAncestor`
+  - `concatChildren`
+  - `decorateTexts`
+  - `filterDescendantsDeep`
+  - `findDescendantDeep`
+  - `getChildrenBetween`
+  - `getChildrenBetweenIncluding`
+  - `isInlineSplitAtRange`
+
+
+---
+
+
+### `0.18.0` — March 2, 2017
+
+###### BREAKING CHANGES
+
+- **The `plugin.render` property is now called `plugin.renderPortal`.** This is to make way for the new `plugin.render` property that offers HOC-like behavior, so that plugins can augment the editor however they choose.
+
+
+---
+
+
+### `0.17.0` — February 27, 2017
+
+###### DEPRECATION CHANGES
+
+- **Some `Selection` methods have been deprecated!** Previously there were many inconsistencies in the naming and handling of selection changes. This has all been cleaned up, but in the process some methods have been deprecated. Here is a full list of the deprecated methods and their new alternatives:
+  - `moveToOffsets` -> `moveOffsetsTo`
+  - `moveForward` -> `move`
+  - `moveBackward` -> `move`
+  - `moveAnchorOffset` -> `moveAnchor`
+  - `moveFocusOffset` -> `moveFocus`
+  - `moveStartOffset` -> `moveStart`
+  - `moveEndOffset` -> `moveEnd`
+  - `extendForward` -> `extend`
+  - `extendBackward` -> `extend`
+  - `unset` -> `deselect`
+
+- **Some selection transforms have been deprecated!** Along with the methods, the selection-based transforms have also been refactored, resulting in deprecations. Here is a full list of the deprecated transforms and their new alternatives:
+  - `moveTo` -> `select`
+  - `moveToOffsets` -> `moveOffsetsTo`
+  - `moveForward` -> `move`
+  - `moveBackward` -> `move`
+  - `moveStartOffset` -> `moveStart`
+  - `moveEndOffset` -> `moveEnd`
+  - `extendForward` -> `extend`
+  - `extendBackward` -> `extend`
+  - `flipSelection` -> `flip`
+  - `unsetSelection` -> `deselect`
+  - `unsetMarks`
+
+
+---
+
 
 ### `0.16.0` — December 2, 2016
 

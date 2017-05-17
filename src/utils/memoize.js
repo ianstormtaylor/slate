@@ -3,7 +3,7 @@ import Map from 'es6-map'
 import IS_DEV from '../constants/is-dev'
 
 /**
- * GLOBAL: True if memoization should is enabled. Only effective in DEV mode.
+ * GLOBAL: True if memoization should is enabled. Only effective when `IS_DEV`.
  *
  * @type {Boolean}
  */
@@ -12,7 +12,7 @@ let ENABLED = true
 
 /**
  * GLOBAL: Changing this cache key will clear all previous cached results.
- * Only effective in DEV mode.
+ * Only effective when `IS_DEV`.
  *
  * @type {Number}
  */
@@ -20,9 +20,8 @@ let ENABLED = true
 let CACHE_KEY = 0
 
 /**
- * The leaf node of a cache tree. Used to support variable argument length.
- *
- * A unique object, so that native Maps will key it by reference.
+ * The leaf node of a cache tree. Used to support variable argument length. A
+ * unique object, so that native Maps will key it by reference.
  *
  * @type {Object}
  */
@@ -30,8 +29,8 @@ let CACHE_KEY = 0
 const LEAF = {}
 
 /**
- * A value to represent a memoized undefined value. Allows efficient
- * value retrieval using Map.get only.
+ * A value to represent a memoized undefined value. Allows efficient value
+ * retrieval using Map.get only.
  *
  * @type {Object}
  */
@@ -54,7 +53,9 @@ const UNSET = undefined
  * @return {Record}
  */
 
-function memoize(object, properties) {
+function memoize(object, properties, options = {}) {
+  const { takesArguments = true } = options
+
   for (const property of properties) {
     const original = object[property]
 
@@ -64,61 +65,48 @@ function memoize(object, properties) {
 
     object[property] = function (...args) {
       if (IS_DEV) {
-        if (!ENABLED) {
-          // Memoization disabled
-          return original.apply(this, args)
-        } else if (CACHE_KEY !== this.__cache_key) {
-          // Previous caches must be cleared
+        // If memoization is disabled, call into the original method.
+        if (!ENABLED) return original.apply(this, args)
+
+        // If the cache key is different, previous caches must be cleared.
+        if (CACHE_KEY !== this.__cache_key) {
           this.__cache_key = CACHE_KEY
           this.__cache = new Map()
         }
       }
 
-      const keys = [property, ...args]
-      this.__cache = this.__cache || new Map()
+      if (!this.__cache) {
+        this.__cache = new Map()
+      }
 
-      const cachedValue = getIn(this.__cache, keys)
+      let cachedValue
+      let keys
+
+      if (takesArguments) {
+        keys = [property, ...args]
+        cachedValue = getIn(this.__cache, keys)
+      } else {
+        cachedValue = this.__cache.get(property)
+      }
+
+      // If we've got a result already, return it.
       if (cachedValue !== UNSET) {
         return cachedValue === UNDEFINED ? undefined : cachedValue
       }
 
+      // Otherwise calculate what it should be once and cache it.
       const value = original.apply(this, args)
-      this.__cache = setIn(this.__cache, keys, value)
+      const v = value === undefined ? UNDEFINED : value
+
+      if (takesArguments) {
+        this.__cache = setIn(this.__cache, keys, v)
+      } else {
+        this.__cache.set(property, v)
+      }
+
       return value
     }
   }
-}
-
-/**
- * Set a value at a key path in a tree of Map, creating Maps on the go.
- *
- * @param {Map} map
- * @param {Array} keys
- * @param {Any} value
- * @return {Map}
- */
-
-function setIn(map, keys, value) {
-  value = value === undefined ? UNDEFINED : value
-
-  let parentMap = map
-  let childMap
-  for (const key of keys) {
-    childMap = parentMap.get(key)
-
-    // If the path was not created yet...
-    if (childMap === UNSET) {
-      childMap = new Map()
-      parentMap.set(key, childMap)
-    }
-
-    parentMap = childMap
-  }
-
-  // The whole path has been created, so set the value to the bottom most map.
-  childMap.set(LEAF, value)
-
-  return map
 }
 
 /**
@@ -133,18 +121,42 @@ function setIn(map, keys, value) {
  */
 
 function getIn(map, keys) {
-  let childMap
   for (const key of keys) {
-    childMap = map.get(key)
-
-    if (childMap === UNSET) {
-      return UNSET
-    }
-
-    map = childMap
+    map = map.get(key)
+    if (map === UNSET) return UNSET
   }
 
-  return childMap.get(LEAF)
+  return map.get(LEAF)
+}
+
+/**
+ * Set a value at a key path in a tree of Map, creating Maps on the go.
+ *
+ * @param {Map} map
+ * @param {Array} keys
+ * @param {Any} value
+ * @return {Map}
+ */
+
+function setIn(map, keys, value) {
+  let parent = map
+  let child
+
+  for (const key of keys) {
+    child = parent.get(key)
+
+    // If the path was not created yet...
+    if (child === UNSET) {
+      child = new Map()
+      parent.set(key, child)
+    }
+
+    parent = child
+  }
+
+  // The whole path has been created, so set the value to the bottom most map.
+  child.set(LEAF, value)
+  return map
 }
 
 /**
@@ -155,6 +167,7 @@ function getIn(map, keys) {
 
 function __clear() {
   CACHE_KEY++
+
   if (CACHE_KEY >= Number.MAX_SAFE_INTEGER) {
     CACHE_KEY = 0
   }

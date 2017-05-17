@@ -14,13 +14,13 @@ export default function (state) {
 
   const next = state
     .transform()
-    .moveTo(range)
+    .select(range)
     .insertText(' ')
     .apply()
 
   assert.deepEqual(
     next.selection.toJS(),
-    range.moveForward().toJS()
+    range.move(1).toJS()
   )
 
   return next

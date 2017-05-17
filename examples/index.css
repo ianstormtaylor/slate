@@ -86,27 +86,27 @@ input:focus {
  * App.
  */
 
-.topbar {
+.nav {
   padding: 10px 15px;
   color: #AAA;
   background: #000;
 }
 
-.topbar-title {
+.nav-title {
   margin-right: 0.5em;
 }
 
-.topbar-links {
+.nav-links {
   float: right;
 }
 
-.topbar-link {
+.nav-link {
   margin-left: 1em;
   color: #AAA;
   text-decoration: none;
 }
 
-.topbar-link:hover {
+.nav-link:hover {
   color: #FFF;
   text-decoration: underline;
 }
@@ -202,4 +202,26 @@ input:focus {
 
 .emoji.selected {
   outline: 2px solid blue;
+}
+
+.check-list-item + .check-list-item {
+  margin-top: 0;
+}
+
+.check-list-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.check-list-item > span:first-child {
+  margin-right: 0.75em;
+}
+
+.check-list-item > span:last-child {
+  flex: 1;
+}
+
+.check-list-item > span:last-child:focus {
+  outline: none;
 }

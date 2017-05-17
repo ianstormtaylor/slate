@@ -8,7 +8,7 @@ import TYPES from '../constants/types'
  * @type {RegExp}
  */
 
-const FRAGMENT_MATCHER = /data-slate-fragment="([^\s]+)"/
+const FRAGMENT_MATCHER = / data-slate-fragment="([^\s]+)"/
 
 /**
  * Get the data and type from a native data `transfer`.
@@ -30,7 +30,7 @@ function getTransferData(transfer) {
   if (
     !fragment &&
     html &&
-    ~html.indexOf('<span data-slate-fragment="')
+    ~html.indexOf(' data-slate-fragment="')
   ) {
     const matches = FRAGMENT_MATCHER.exec(html)
     const [ full, encoded ] = matches // eslint-disable-line no-unused-vars
@@ -43,15 +43,11 @@ function getTransferData(transfer) {
 
   // Get and normalize files if they exist.
   if (transfer.items && transfer.items.length) {
-    const fileItems = Array.from(transfer.items)
+    files = Array.from(transfer.items)
       .map(item => item.kind == 'file' ? item.getAsFile() : null)
       .filter(exists => exists)
-
-    if (fileItems.length) files = fileItems
-  }
-
-  if (transfer.files && transfer.files.length) {
-    files = Array.from(files)
+  } else if (transfer.files && transfer.files.length) {
+    files = Array.from(transfer.files)
   }
 
   // Determine the type of the data.
@@ -78,7 +74,7 @@ function getTransferType(data) {
   if (data.rich && data.html) return 'html'
   if (data.rich && data.text) return 'text'
 
-  if (data.files) return 'files'
+  if (data.files && data.files.length) return 'files'
   if (data.html) return 'html'
   if (data.text) return 'text'
   return 'unknown'

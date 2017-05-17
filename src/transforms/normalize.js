@@ -5,13 +5,21 @@ import warn from '../utils/warn'
 import { Set } from 'immutable'
 
 /**
+ * Transforms.
+ *
+ * @type {Object}
+ */
+
+const Transforms = {}
+
+/**
  * Normalize the document and selection with a `schema`.
  *
  * @param {Transform} transform
  * @param {Schema} schema
  */
 
-export function normalize(transform, schema) {
+Transforms.normalize = (transform, schema) => {
   transform.normalizeDocument(schema)
   transform.normalizeSelection(schema)
 }
@@ -23,7 +31,7 @@ export function normalize(transform, schema) {
  * @param {Schema} schema
  */
 
-export function normalizeDocument(transform, schema) {
+Transforms.normalizeDocument = (transform, schema) => {
   const { state } = transform
   const { document } = state
   transform.normalizeNodeByKey(document.key, schema)
@@ -37,7 +45,7 @@ export function normalizeDocument(transform, schema) {
  * @param {Schema} schema
  */
 
-export function normalizeNodeByKey(transform, key, schema) {
+Transforms.normalizeNodeByKey = (transform, key, schema) => {
   assertSchema(schema)
 
   // If the schema has no validation rules, there's nothing to normalize.
@@ -57,7 +65,7 @@ export function normalizeNodeByKey(transform, key, schema) {
  * @param {Transform} transform
  */
 
-export function normalizeSelection(transform) {
+Transforms.normalizeSelection = (transform) => {
   let { state } = transform
   let { document, selection } = state
 
@@ -89,7 +97,7 @@ export function normalizeSelection(transform) {
     })
   }
 
-  state = state.merge({ selection })
+  state = state.set('selection', selection)
   transform.state = state
 }
 
@@ -110,21 +118,27 @@ function normalizeNodeAndChildren(transform, node, schema) {
   // We can't just loop the children and normalize them, because in the process
   // of normalizing one child, we might end up creating another. Instead, we
   // have to normalize one at a time, and check for new children along the way.
-  let stack = node.nodes.map(n => n.key).toStack()
-  let set = new Set()
+  // PERF: use a mutable array here instead of an immutable stack.
+  const keys = node.nodes.toArray().map(n => n.key)
 
   // While there is still a child key that hasn't been normalized yet...
-  while (stack.size) {
+  while (keys.length) {
     const ops = transform.operations.length
     let key
 
+    // PERF: use a mutable set here since we'll be add to it a lot.
+    let set = new Set().asMutable()
+
     // Unwind the stack, normalizing every child and adding it to the set.
-    while (key = stack.peek()) {
+    while (key = keys[0]) {
       const child = node.getChild(key)
       normalizeNodeAndChildren(transform, child, schema)
-      set = set.add(key)
-      stack = stack.pop()
+      set.add(key)
+      keys.shift()
     }
+
+    // Turn the set immutable to be able to compare against it.
+    set = set.asImmutable()
 
     // PERF: Only re-find the node and re-normalize any new children if
     // operations occured that might have changed it.
@@ -134,7 +148,7 @@ function normalizeNodeAndChildren(transform, node, schema) {
       // Add any new children back onto the stack.
       node.nodes.forEach((n) => {
         if (set.has(n.key)) return
-        stack = stack.push(n.key)
+        keys.unshift(n.key)
       })
     }
   }
@@ -219,3 +233,11 @@ function assertSchema(schema) {
     throw new Error(`You passed an invalid \`schema\` object: ${schema}.`)
   }
 }
+
+/**
+ * Export.
+ *
+ * @type {Object}
+ */
+
+export default Transforms
