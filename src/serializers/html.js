@@ -191,15 +191,15 @@ class Html {
 
     for (const rule of this.rules) {
       if (!rule.deserialize) continue
-
       const ret = rule.deserialize(element, next)
-      if (ret === undefined) continue
-      if (ret === null) break
-
       const type = typeOf(ret)
-      if (type != 'array' && type != 'object') {
+
+      if (type != 'array' && type != 'object' && type != 'null' && type != 'undefined') {
         throw new Error(`A rule returned an invalid deserialized representation: "${node}".`)
       }
+
+      if (ret === undefined) continue
+      if (ret === null) return null
 
       node = ret.kind == 'mark' ? this.deserializeMark(ret) : ret
       break

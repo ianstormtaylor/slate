@@ -10,9 +10,21 @@ export default {
     },
     {
       deserialize(el, next) {
+        if (el.tagName == 'hr') {
+          return {
+            kind: 'block',
+            type: 'divider',
+            isVoid: true,
+          }
+        }
+      }
+    },
+    {
+      deserialize(el, next) {
         return {
           kind: 'block',
           type: 'paragraph',
+          nodes: next(el.children),
         }
       }
     },

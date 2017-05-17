@@ -5,4 +5,10 @@ nodes:
     isVoid: false
     data: {}
     nodes:
-      - characters: []
+      - type: divider
+        isVoid: true
+        data: {}
+        nodes:
+          - characters:
+              - marks: []
+                text: " "
