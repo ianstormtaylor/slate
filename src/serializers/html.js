@@ -159,11 +159,6 @@ class Html {
         case 'object':
           nodes.push(node)
           break
-        case 'null':
-        case 'undefined':
-          return
-        default:
-          throw new Error(`A rule returned an invalid deserialized representation: "${node}".`)
       }
     })
 
@@ -196,8 +191,16 @@ class Html {
 
     for (const rule of this.rules) {
       if (!rule.deserialize) continue
+
       const ret = rule.deserialize(element, next)
-      if (!ret) continue
+      if (ret === undefined) continue
+      if (ret === null) break
+
+      const type = typeOf(ret)
+      if (type != 'array' && type != 'object') {
+        throw new Error(`A rule returned an invalid deserialized representation: "${node}".`)
+      }
+
       node = ret.kind == 'mark' ? this.deserializeMark(ret) : ret
       break
     }
