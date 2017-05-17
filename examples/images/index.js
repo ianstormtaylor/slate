@@ -5,7 +5,6 @@ import initialState from './state.json'
 import isImage from 'is-image'
 import isUrl from 'is-url'
 
-
 /**
  * Default block to be inserted when the document is empty,
  * and after an image is the last node in the document.
@@ -29,9 +28,9 @@ const schema = {
   nodes: {
     image: (props) => {
       const { node, state } = props
-      const isFocused = state.selection.hasEdgeIn(node)
+      const active = state.isFocused && state.selection.hasEdgeIn(node)
       const src = node.data.get('src')
-      const className = isFocused ? 'active' : null
+      const className = active ? 'active' : null
       return (
         <img src={src} className={className} {...props.attributes} />
       )
@@ -41,7 +40,7 @@ const schema = {
     }
   },
   rules: [
-    // Rule to insert a paragraph block if the document is empty
+    // Rule to insert a paragraph block if the document is empty.
     {
       match: (node) => {
         return node.kind == 'document'
@@ -51,12 +50,11 @@ const schema = {
       },
       normalize: (transform, document) => {
         const block = Block.create(defaultBlock)
-        transform
-          .insertNodeByKey(document.key, 0, block)
+        transform.insertNodeByKey(document.key, 0, block)
       }
     },
-    // Rule to insert a paragraph below a void node (the image)
-    // if that node is the last one in the document
+    // Rule to insert a paragraph below a void node (the image) if that node is
+    // the last one in the document.
     {
       match: (node) => {
         return node.kind == 'document'
@@ -67,8 +65,7 @@ const schema = {
       },
       normalize: (transform, document) => {
         const block = Block.create(defaultBlock)
-        transform
-          .insertNodeByKey(document.key, document.nodes.size, block)
+        transform.insertNodeByKey(document.key, document.nodes.size, block)
       }
     }
   ]
@@ -136,7 +133,6 @@ class Images extends React.Component {
           schema={schema}
           state={this.state.state}
           onChange={this.onChange}
-          onDocumentChange={this.onDocumentChange}
           onDrop={this.onDrop}
           onPaste={this.onPaste}
         />
@@ -198,9 +194,9 @@ class Images extends React.Component {
   onDropNode = (e, data, state) => {
     return state
       .transform()
-      .unsetSelection()
+      .deselect()
       .removeNodeByKey(data.node.key)
-      .moveTo(data.target)
+      .select(data.target)
       .insertBlock(data.node)
       .apply()
   }

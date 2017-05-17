@@ -29,7 +29,7 @@ Often times, you don't need to specifically know which point is the "anchor" and
   - [`startOffset`](#startoffset)
 - [Static Methods](#static-methods)
   - [`Selection.create`](#selectioncreate) 
-- [Methods](#checking-methods)
+- [Checking Methods](#checking-methods)
   - [`has{Edge}AtEndOf`](#hasedgeatendof)
   - [`has{Edge}AtStartOf`](#hasedgeatstartof)
   - [`has{Edge}Between`](#hasedgebetween)
@@ -122,7 +122,7 @@ A few convenience properties for accessing the first and last point of the selec
 Create a new `Selection` instance with `properties`.
 
 
-## Methods
+## Checking Methods
 
 ### `has{Edge}AtStartOf`
 `has{Edge}AtStartOf(node: Node) => Boolean`

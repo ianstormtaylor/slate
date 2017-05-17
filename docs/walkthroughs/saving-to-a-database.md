@@ -44,7 +44,7 @@ What we need to do is save the changes you make somewhere. For this example, we'
 
 So, in our `onChange` handler, we need to save the `state`. But the `state` argument that `onChange` receives is an immutable object, so we can't just save it as-is. We need to serialize it to a format we understand first.
 
-In this case, we're already using the [`Plain`](../reference/serializers/plain.md) serializer to create our intial state, so let's use it to serialize our saved state as well, like so:
+In this case, we're already using the [`Plain`](../reference/serializers/plain.md) serializer to create our initial state, so let's use it to serialize our saved state as well, like so:
 
 ```js
 const initialContent = 'The initial string of content!'

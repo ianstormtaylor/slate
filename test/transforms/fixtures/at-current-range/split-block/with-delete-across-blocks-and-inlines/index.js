@@ -15,7 +15,7 @@ export default function (state) {
 
   const next = state
     .transform()
-    .moveTo(range)
+    .select(range)
     .splitBlock()
     .apply()
 

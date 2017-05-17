@@ -1,4 +1,6 @@
 
+import browser from 'is-in-browser'
+
 /**
  * Browser matching rules.
  *
@@ -43,7 +45,7 @@ let OS
  * Run the matchers when in browser.
  */
 
-if (process.browser) {
+if (browser) {
   const { userAgent } = window.navigator
 
   for (const rule of BROWSER_RULES) {

@@ -2,6 +2,14 @@
 import Normalize from '../utils/normalize'
 
 /**
+ * Transforms.
+ *
+ * @type {Object}
+ */
+
+const Transforms = {}
+
+/**
  * Add mark to text at `offset` and `length` in node by `path`.
  *
  * @param {Transform} transform
@@ -11,7 +19,7 @@ import Normalize from '../utils/normalize'
  * @param {Mixed} mark
  */
 
-export function addMarkOperation(transform, path, offset, length, mark) {
+Transforms.addMarkOperation = (transform, path, offset, length, mark) => {
   const inverse = [{
     type: 'remove_mark',
     path,
@@ -41,7 +49,7 @@ export function addMarkOperation(transform, path, offset, length, mark) {
  * @param {Node} node
  */
 
-export function insertNodeOperation(transform, path, index, node) {
+Transforms.insertNodeOperation = (transform, path, index, node) => {
   const inversePath = path.slice().concat([index])
   const inverse = [{
     type: 'remove_node',
@@ -69,7 +77,7 @@ export function insertNodeOperation(transform, path, index, node) {
  * @param {Set<Mark>} marks (optional)
  */
 
-export function insertTextOperation(transform, path, offset, text, marks) {
+Transforms.insertTextOperation = (transform, path, offset, text, marks) => {
   const inverseLength = text.length
   const inverse = [{
     type: 'remove_text',
@@ -98,7 +106,7 @@ export function insertTextOperation(transform, path, offset, text, marks) {
  * @param {Array} withPath
  */
 
-export function joinNodeOperation(transform, path, withPath) {
+Transforms.joinNodeOperation = (transform, path, withPath) => {
   const { state } = transform
   const { document } = state
   const node = document.assertPath(withPath)
@@ -142,7 +150,7 @@ export function joinNodeOperation(transform, path, withPath) {
  * @param {Number} newIndex
  */
 
-export function moveNodeOperation(transform, path, newPath, newIndex) {
+Transforms.moveNodeOperation = (transform, path, newPath, newIndex) => {
   const parentPath = path.slice(0, -1)
   const parentIndex = path[path.length - 1]
   const inversePath = newPath.slice().concat([newIndex])
@@ -175,7 +183,7 @@ export function moveNodeOperation(transform, path, newPath, newIndex) {
  * @param {Mark} mark
  */
 
-export function removeMarkOperation(transform, path, offset, length, mark) {
+Transforms.removeMarkOperation = (transform, path, offset, length, mark) => {
   const inverse = [{
     type: 'add_mark',
     path,
@@ -203,7 +211,7 @@ export function removeMarkOperation(transform, path, offset, length, mark) {
  * @param {Array} path
  */
 
-export function removeNodeOperation(transform, path) {
+Transforms.removeNodeOperation = (transform, path) => {
   const { state } = transform
   const { document } = state
   const node = document.assertPath(path)
@@ -235,7 +243,7 @@ export function removeNodeOperation(transform, path) {
  * @param {Number} length
  */
 
-export function removeTextOperation(transform, path, offset, length) {
+Transforms.removeTextOperation = (transform, path, offset, length) => {
   const { state } = transform
   const { document } = state
   const node = document.assertPath(path)
@@ -288,7 +296,7 @@ export function removeTextOperation(transform, path, offset, length) {
  * @param {Mark} newMark
  */
 
-export function setMarkOperation(transform, path, offset, length, mark, newMark) {
+Transforms.setMarkOperation = (transform, path, offset, length, mark, newMark) => {
   const inverse = [{
     type: 'set_mark',
     path,
@@ -319,7 +327,7 @@ export function setMarkOperation(transform, path, offset, length, mark, newMark)
  * @param {Object} properties
  */
 
-export function setNodeOperation(transform, path, properties) {
+Transforms.setNodeOperation = (transform, path, properties) => {
   const { state } = transform
   const { document } = state
   const node = document.assertPath(path)
@@ -352,7 +360,7 @@ export function setNodeOperation(transform, path, properties) {
  * @param {Mixed} selection
  */
 
-export function setSelectionOperation(transform, properties, options = {}) {
+Transforms.setSelectionOperation = (transform, properties, options = {}) => {
   properties = Normalize.selectionProperties(properties)
 
   const { state } = transform
@@ -432,7 +440,7 @@ export function setSelectionOperation(transform, properties, options = {}) {
  * @param {Number} offset
  */
 
-export function splitNodeAtOffsetOperation(transform, path, offset) {
+Transforms.splitNodeAtOffsetOperation = (transform, path, offset) => {
   const inversePath = path.slice()
   inversePath[path.length - 1] += 1
 
@@ -463,7 +471,7 @@ export function splitNodeAtOffsetOperation(transform, path, offset) {
  * @param {Number} count
  */
 
-export function splitNodeOperation(transform, path, count) {
+Transforms.splitNodeOperation = (transform, path, count) => {
   const inversePath = path.slice()
   inversePath[path.length - 1] += 1
 
@@ -484,3 +492,11 @@ export function splitNodeOperation(transform, path, count) {
 
   transform.applyOperation(operation)
 }
+
+/**
+ * Export.
+ *
+ * @type {Object}
+ */
+
+export default Transforms

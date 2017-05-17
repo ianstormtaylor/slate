@@ -233,7 +233,7 @@
       "nodes": [
         {
           "kind": "text",
-          "text": "This table is just a basic example, but you could augment it to add support for table headers, adding column and rows, or even formulas if you wanted to get really crazy..."
+          "text": "This table is just a basic example of rendering a table, and it doesn\'t have fancy functionality. But you could augment it to add support for navigating with arrow keys, displaying table headers, adding column and rows, or even formulas if you wanted to get really crazy!"
         }
       ]
     }

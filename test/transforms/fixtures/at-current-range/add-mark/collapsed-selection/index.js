@@ -14,12 +14,12 @@ export default function (state) {
 
   const next = state
     .transform()
-    .moveTo(range)
+    .select(range)
     .addMark('bold')
     .insertText('a')
     .apply()
 
-  assert.deepEqual(next.selection.toJS(), range.moveForward().toJS())
+  assert.deepEqual(next.selection.toJS(), range.move(1).toJS())
 
   return next
 }

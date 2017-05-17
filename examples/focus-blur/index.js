@@ -124,6 +124,7 @@ class FocusBlur extends React.Component {
     return (
       <div className="editor">
         <Editor
+          autoFocus
           schema={schema}
           state={this.state.state}
           onChange={this.onChange}

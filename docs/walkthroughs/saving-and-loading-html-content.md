@@ -243,7 +243,7 @@ class App extends React.Component {
   // When the document changes, save the serialized HTML to Local Storage.
   onDocumentChange = (document, state) => {
     const string = html.serialize(state)
-    localStorage.set('content', string)
+    localStorage.setItem('content', string)
   }
 
   render = () => {

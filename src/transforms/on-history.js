@@ -1,11 +1,19 @@
 
 /**
+ * Transforms.
+ *
+ * @type {Object}
+ */
+
+const Transforms = {}
+
+/**
  * Redo to the next state in the history.
  *
  * @param {Transform} transform
  */
 
-export function redo(transform) {
+Transforms.redo = (transform) => {
   let { state } = transform
   let { history } = state
   let { undos, redos } = history
@@ -25,8 +33,8 @@ export function redo(transform) {
 
   // Update the history.
   state = transform.state
-  history = history.merge({ undos, redos })
-  state = state.merge({ history })
+  history = history.set('undos', undos).set('redos', redos)
+  state = state.set('history', history)
 
   // Update the transform.
   transform.state = state
@@ -39,18 +47,18 @@ export function redo(transform) {
  * @param {Object} options
  */
 
-export function save(transform, options = {}) {
+Transforms.save = (transform, options = {}) => {
   const { merge = false } = options
   let { state, operations } = transform
   let { history } = state
   let { undos, redos } = history
+  let previous = undos.peek()
 
   // If there are no operations, abort.
   if (!operations.length) return
 
   // Create a new save point or merge the operations into the previous one.
-  if (merge) {
-    let previous = undos.peek()
+  if (merge && previous) {
     undos = undos.pop()
     previous = previous.concat(operations)
     undos = undos.push(previous)
@@ -63,8 +71,8 @@ export function save(transform, options = {}) {
   redos = redos.clear()
 
   // Update the state.
-  history = history.merge({ undos, redos })
-  state = state.merge({ history })
+  history = history.set('undos', undos).set('redos', redos)
+  state = state.set('history', history)
 
   // Update the transform.
   transform.state = state
@@ -76,7 +84,7 @@ export function save(transform, options = {}) {
  * @param {Transform} transform
  */
 
-export function undo(transform) {
+Transforms.undo = (transform) => {
   let { state } = transform
   let { history } = state
   let { undos, redos } = history
@@ -98,9 +106,17 @@ export function undo(transform) {
 
   // Update the history.
   state = transform.state
-  history = history.merge({ undos, redos })
-  state = state.merge({ history })
+  history = history.set('undos', undos).set('redos', redos)
+  state = state.set('history', history)
 
   // Update the transform.
   transform.state = state
 }
+
+/**
+ * Export.
+ *
+ * @type {Object}
+ */
+
+export default Transforms

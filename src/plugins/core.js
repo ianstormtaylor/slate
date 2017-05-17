@@ -1,11 +1,14 @@
 
 import Base64 from '../serializers/base-64'
+import Content from '../components/content'
 import Character from '../models/character'
 import Debug from 'debug'
+import getPoint from '../utils/get-point'
 import Placeholder from '../components/placeholder'
 import React from 'react'
 import getWindow from 'get-window'
-import { IS_MAC } from '../constants/environment'
+import findDOMNode from '../utils/find-dom-node'
+import { IS_CHROME, IS_MAC, IS_SAFARI } from '../constants/environment'
 
 /**
  * Debug.
@@ -53,7 +56,7 @@ function Plugin(options = {}) {
 
     const newState = state.transform()
       .normalize(schema)
-      .apply({ save: false })
+      .apply({ merge: true })
 
     debug('onBeforeChange')
     return newState
@@ -96,9 +99,38 @@ function Plugin(options = {}) {
 
     const chars = initialChars.insert(startOffset, char)
 
+    let transform = state.transform()
+
+    // COMPAT: In iOS, when choosing from the predictive text suggestions, the
+    // native selection will be changed to span the existing word, so that the word
+    // is replaced. But the `select` event for this change doesn't fire until after
+    // the `beforeInput` event, even though the native selection is updated. So we
+    // need to manually adjust the selection to be in sync. (03/18/2017)
+    const window = getWindow(e.target)
+    const native = window.getSelection()
+    const { anchorNode, anchorOffset, focusNode, focusOffset } = native
+    const anchorPoint = getPoint(anchorNode, anchorOffset, state, editor)
+    const focusPoint = getPoint(focusNode, focusOffset, state, editor)
+    if (anchorPoint && focusPoint) {
+      const { selection } = state
+      if (
+        selection.anchorKey !== anchorPoint.key ||
+        selection.anchorOffset !== anchorPoint.offset ||
+        selection.focusKey !== focusPoint.key ||
+        selection.focusOffset !== focusPoint.offset
+      ) {
+        transform = transform
+          .select({
+            anchorKey: anchorPoint.key,
+            anchorOffset: anchorPoint.offset,
+            focusKey: focusPoint.key,
+            focusOffset: focusPoint.offset
+          })
+      }
+    }
+
     // Determine what the characters should be, if not natively inserted.
-    let next = state
-      .transform()
+    let next = transform
       .insertText(e.data)
       .apply()
 
@@ -136,7 +168,7 @@ function Plugin(options = {}) {
 
     // Add the `isNative` flag directly, so we don't have to re-transform.
     if (isNative) {
-      next = next.merge({ isNative })
+      next = next.set('isNative', isNative)
     }
 
     // If not native, prevent default so that the DOM remains untouched.
@@ -156,14 +188,11 @@ function Plugin(options = {}) {
    */
 
   function onBlur(e, data, state) {
-    const isNative = true
-
-    debug('onBlur', { data, isNative })
-
+    debug('onBlur', { data })
     return state
       .transform()
       .blur()
-      .apply({ isNative })
+      .apply()
   }
 
   /**
@@ -221,29 +250,54 @@ function Plugin(options = {}) {
   function onCutOrCopy(e, data, state) {
     const window = getWindow(e.target)
     const native = window.getSelection()
-    if (native.isCollapsed) return
+    const { endBlock, endInline } = state
+    const isVoidBlock = endBlock && endBlock.isVoid
+    const isVoidInline = endInline && endInline.isVoid
+    const isVoid = isVoidBlock || isVoidInline
+
+    // If the selection is collapsed, and it isn't inside a void node, abort.
+    if (native.isCollapsed && !isVoid) return
 
     const { fragment } = data
     const encoded = Base64.serializeNode(fragment)
     const range = native.getRangeAt(0)
-    const contents = range.cloneContents()
+    let contents = range.cloneContents()
+    let attach = contents.childNodes[0]
+
+    // If the end node is a void node, we need to move the end of the range from
+    // the void node's spacer span, to the end of the void node's content.
+    if (isVoid) {
+      const r = range.cloneRange()
+      const node = findDOMNode(isVoidBlock ? endBlock : endInline)
+      r.setEndAfter(node)
+      contents = r.cloneContents()
+      attach = contents.childNodes[contents.childNodes.length - 1].firstChild
+    }
 
     // Remove any zero-width space spans from the cloned DOM so that they don't
-    // show up elsewhere when copied.
+    // show up elsewhere when pasted.
     const zws = [].slice.call(contents.querySelectorAll('[data-slate-zero-width]'))
     zws.forEach(zw => zw.parentNode.removeChild(zw))
 
-    // Wrap the first character of the selection in a span that has the encoded
-    // fragment attached as an attribute, so it will show up in the copied HTML.
-    const wrapper = window.document.createElement('span')
-    const text = contents.childNodes[0]
-    const char = text.textContent.slice(0, 1)
-    const first = window.document.createTextNode(char)
-    const rest = text.textContent.slice(1)
-    text.textContent = rest
-    wrapper.appendChild(first)
-    wrapper.setAttribute('data-slate-fragment', encoded)
-    contents.insertBefore(wrapper, text)
+    // COMPAT: In Chrome and Safari, if the last element in the selection to
+    // copy has `contenteditable="false"` the copy will fail, and nothing will
+    // be put in the clipboard. So we remove them all. (2017/05/04)
+    if (IS_CHROME || IS_SAFARI) {
+      const els = [].slice.call(contents.querySelectorAll('[contenteditable="false"]'))
+      els.forEach(el => el.removeAttribute('contenteditable'))
+    }
+
+    // Set a `data-slate-fragment` attribute on a non-empty node, so it shows up
+    // in the HTML, and can be used for intra-Slate pasting. If it's a text
+    // node, wrap it in a `<span>` so we have something to set an attribute on.
+    if (attach.nodeType == 3) {
+      const span = window.document.createElement('span')
+      span.appendChild(attach)
+      contents.appendChild(span)
+      attach = span
+    }
+
+    attach.setAttribute('data-slate-fragment', encoded)
 
     // Add the phony content to the DOM, and select it, so it will be copied.
     const body = window.document.querySelector('body')
@@ -312,9 +366,9 @@ function Plugin(options = {}) {
       selection.endKey == target.endKey &&
       selection.endOffset < target.endOffset
     ) {
-      target = target.moveBackward(selection.startKey == selection.endKey
-        ? selection.endOffset - selection.startOffset
-        : selection.endOffset)
+      target = target.move(selection.startKey == selection.endKey
+        ? 0 - selection.endOffset - selection.startOffset
+        : 0 - selection.endOffset)
     }
 
     const transform = state.transform()
@@ -322,7 +376,7 @@ function Plugin(options = {}) {
     if (isInternal) transform.delete()
 
     return transform
-      .moveTo(target)
+      .select(target)
       .insertFragment(fragment)
       .apply()
   }
@@ -342,7 +396,7 @@ function Plugin(options = {}) {
     const { text, target } = data
     const transform = state
       .transform()
-      .moveTo(target)
+      .select(target)
 
     text
       .split('\n')
@@ -492,11 +546,11 @@ function Plugin(options = {}) {
       const previousInline = document.getClosestInline(previous.key)
 
       if (previousBlock === startBlock && previousInline && !previousInline.isVoid) {
-        const extendOrMove = data.isShift ? 'extendBackward' : 'moveBackward'
+        const extendOrMove = data.isShift ? 'extend' : 'move'
         return state
           .transform()
           .collapseToEndOf(previous)
-          [extendOrMove](1)
+          [extendOrMove](-1)
           .apply()
       }
 
@@ -563,7 +617,7 @@ function Plugin(options = {}) {
       const nextInline = document.getClosestInline(next.key)
 
       if (nextBlock == startBlock && nextInline) {
-        const extendOrMove = data.isShift ? 'extendForward' : 'moveBackward'
+        const extendOrMove = data.isShift ? 'extend' : 'move'
         return state
           .transform()
           .collapseToStartOf(next)
@@ -810,8 +864,46 @@ function Plugin(options = {}) {
 
     return state
       .transform()
-      .moveTo(data.selection)
+      .select(data.selection)
       .apply()
+  }
+
+  /**
+   * Render.
+   *
+   * @param {Object} props
+   * @param {State} state
+   * @param {Editor} editor
+   * @return {Object}
+   */
+
+  function render(props, state, editor) {
+    return (
+      <Content
+        autoCorrect={props.autoCorrect}
+        autoFocus={props.autoFocus}
+        className={props.className}
+        children={props.children}
+        editor={editor}
+        onBeforeInput={editor.onBeforeInput}
+        onBlur={editor.onBlur}
+        onFocus={editor.onFocus}
+        onChange={editor.onChange}
+        onCopy={editor.onCopy}
+        onCut={editor.onCut}
+        onDrop={editor.onDrop}
+        onKeyDown={editor.onKeyDown}
+        onPaste={editor.onPaste}
+        onSelect={editor.onSelect}
+        readOnly={props.readOnly}
+        role={props.role}
+        schema={editor.getSchema()}
+        spellCheck={props.spellCheck}
+        state={state}
+        style={props.style}
+        tabIndex={props.tabIndex}
+      />
+    )
   }
 
   /**
@@ -892,6 +984,7 @@ function Plugin(options = {}) {
     onKeyDown,
     onPaste,
     onSelect,
+    render,
     schema,
   }
 }

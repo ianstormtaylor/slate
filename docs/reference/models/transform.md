@@ -43,12 +43,16 @@ Transform methods can either operate on the [`Document`](./document.md), the [`S
   - [`collapseTo{Edge}Of{Direction}Text`](#collapsetoedgeofdirectiontext)
   - [`collapseTo{Edge}`](#collapsetoedge)
   - [`extendTo{Edge}Of`](#extendtoedgeof)
-  - [`extend{Direction}`](#extenddirection)
+  - [`extend`](#extend)
+  - [`flip`](#flip)
   - [`focus`](#focus)
-  - [`moveToOffsets`](#movetooffsets)
+  - [`move`](#move)
+  - [`move{Edge}`](#moveedge)
+  - [`moveOffsetsTo`](#moveoffsetsto)
   - [`moveToRangeOf`](#movetorangeof)
-  - [`moveTo`](#moveto)
-  - [`move{Direction}`](#movedirection)
+  - [`select`](#select)
+  - [`selectAll`](#selectall)
+  - [`deselect`](#deselect)
 - [Node Transforms](#node-transforms)
   - [`addMarkByKey`](#addmarkbykey)
   - [`insertNodeByKey`](#insertnodebykey)
@@ -260,28 +264,38 @@ Collapse the current selection to the `{Edge}` of the next [`Block`](./block.md)
 
 Collapse the current selection to the `{Edge}` of the next [`Text`](./text.md) node in `{Direction}`. Where `{Edge}` is either `{Start}` or `{End}` and `{Direction}` is either `Next` or `Previous`.
 
-### `extend{Direction}`
-`extend{Direction}(n: Number) => Transform`
+### `extend`
+`extend(n: Number) => Transform`
 
-Extend the current selection's points `n` characters in `{Direction}`. Where `{Direction}` is either `Backward` or `Forward`.
+Extend the current selection's points by `n` characters. `n` can be positive or negative to indicate direction.
 
 ### `extendTo{Edge}Of`
 `extendTo{Edge}Of(node: Node) => Transform`
 
 Extend the current selection to the `{Edge}` of a `node`. Where `{Edge}` is either `Start` or `End`.
 
+### `flip`
+`flip() => Transform`
+
+Flip the selection.
+
 ### `focus`
 `focus() => Transform`
 
 Focus the current selection.
 
-### `move{Direction}`
-`move{Direction}(n: Number) => Transform`
+### `move`
+`move(n: Number) => Transform`
 
-Move the current selection's points  `n` characters in `{Direction}`. Where `{Direction}` is either `Backward` or `Forward`.
+Move the current selection's offsets by  `n`.
 
-### `moveToOffsets`
-`moveToOffsets(anchorOffset: Number, focusOffset: Number) => Transform`
+### `move{Edge}`
+`move{Edge}(n: Number) => Transform`
+
+Move the current selection's `edge` offset by  `n`. `edge` can be one of `Start`, `End`.
+
+### `moveOffsetsTo`
+`moveOffsetsTo(anchorOffset: Number, focusOffset: Number) => Transform`
 
 Move the current selection's offsets to a new `anchorOffset` and `focusOffset`.
 
@@ -290,10 +304,20 @@ Move the current selection's offsets to a new `anchorOffset` and `focusOffset`.
 
 Move the current selection's anchor point to the start of a `node` and its focus point to the end of the `node`.
 
-### `moveTo`
-`moveTo(properties: Selection || Object) => Transform`
+### `select`
+`select(properties: Selection || Object) => Transform`
 
-Move the current selection to a selection with merged `properties`. The `properties` can either be a [`Selection`](./selection.md) object or a plain Javascript object of selection properties.
+Set the current selection to a selection with merged `properties`. The `properties` can either be a [`Selection`](./selection.md) object or a plain Javascript object of selection properties.
+
+### `selectAll`
+`selectAll() => Transform`
+
+Select the entire document and focus the selection.
+
+### `deselect`
+`deselect() => Transform`
+
+Unset the selection.
 
 
 ## Node Transforms
@@ -311,7 +335,7 @@ Insert a `node` at `index` inside a parent [`Node`](./node.md) by its `key`.
 ### `insertTextByKey`
 `insertTextByKey(key: String, offset: Number, text: String, [marks: Set]) => Transform`
 
-Insert `text` at an `offset` in a [`Node`](./node.md) with optional `marks`.
+Insert `text` at an `offset` in a [`Text Node`](./text.md) with optional `marks`.
 
 ### `moveNodeByKey`
 `moveNodeByKey(key: String, newKey: String, newIndex: Number) => Transform`

@@ -77,7 +77,9 @@ class Mark extends new Record(DEFAULTS) {
 
 memoize(Mark.prototype, [
   'getComponent',
-])
+], {
+  takesArguments: true,
+})
 
 /**
  * Export.

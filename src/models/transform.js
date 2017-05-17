@@ -85,7 +85,7 @@ class Transform {
     if (save) this.save({ merge })
 
     // Return the new state with the `isNative` flag set.
-    return this.state.merge({ isNative: !!isNative })
+    return this.state.set('isNative', !!isNative)
   }
 
 }

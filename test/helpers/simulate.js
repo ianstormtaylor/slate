@@ -8,6 +8,7 @@
 const EVENT_HANDLERS = [
   'onBeforeInput',
   'onBlur',
+  'onFocus',
   'onCopy',
   'onCut',
   'onDrop',

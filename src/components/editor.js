@@ -1,8 +1,9 @@
 
-import Content from './content'
 import Debug from 'debug'
 import Portal from 'react-portal'
 import React from 'react'
+import Types from 'prop-types'
+
 import Stack from '../models/stack'
 import State from '../models/state'
 import noop from '../utils/noop'
@@ -24,6 +25,7 @@ const debug = Debug('slate:editor')
 const EVENT_HANDLERS = [
   'onBeforeInput',
   'onBlur',
+  'onFocus',
   'onCopy',
   'onCut',
   'onDrop',
@@ -62,24 +64,25 @@ class Editor extends React.Component {
    */
 
   static propTypes = {
-    autoCorrect: React.PropTypes.bool,
-    className: React.PropTypes.string,
-    onBeforeChange: React.PropTypes.func,
-    onChange: React.PropTypes.func,
-    onDocumentChange: React.PropTypes.func,
-    onSelectionChange: React.PropTypes.func,
-    placeholder: React.PropTypes.any,
-    placeholderClassName: React.PropTypes.string,
-    placeholderStyle: React.PropTypes.object,
-    plugins: React.PropTypes.array,
-    readOnly: React.PropTypes.bool,
-    role: React.PropTypes.string,
-    schema: React.PropTypes.object,
-    spellCheck: React.PropTypes.bool,
-    state: React.PropTypes.instanceOf(State).isRequired,
-    style: React.PropTypes.object,
-    tabIndex: React.PropTypes.number
-  };
+    autoCorrect: Types.bool,
+    autoFocus: Types.bool,
+    className: Types.string,
+    onBeforeChange: Types.func,
+    onChange: Types.func,
+    onDocumentChange: Types.func,
+    onSelectionChange: Types.func,
+    placeholder: Types.any,
+    placeholderClassName: Types.string,
+    placeholderStyle: Types.object,
+    plugins: Types.array,
+    readOnly: Types.bool,
+    role: Types.string,
+    schema: Types.object,
+    spellCheck: Types.bool,
+    state: Types.instanceOf(State).isRequired,
+    style: Types.object,
+    tabIndex: Types.number,
+  }
 
   /**
    * Default properties.
@@ -88,6 +91,7 @@ class Editor extends React.Component {
    */
 
   static defaultProps = {
+    autoFocus: false,
     autoCorrect: true,
     onChange: noop,
     onDocumentChange: noop,
@@ -95,8 +99,8 @@ class Editor extends React.Component {
     plugins: [],
     readOnly: false,
     schema: {},
-    spellCheck: true
-  };
+    spellCheck: true,
+  }
 
   /**
    * When constructed, create a new `Stack` and run `onBeforeChange`.
@@ -222,13 +226,12 @@ class Editor extends React.Component {
     const { tmp, props } = this
     const { stack } = this.state
     const { onChange, onDocumentChange, onSelectionChange } = props
+    const { document, selection } = tmp
 
     state = stack.onChange(state, this)
     onChange(state)
-    if (state.document != tmp.document) onDocumentChange(state.document, state)
-    if (state.selection != tmp.selection) onSelectionChange(state.selection, state)
-
-    this.cacheState(state)
+    if (state.document != document) onDocumentChange(state.document, state)
+    if (state.selection != selection) onSelectionChange(state.selection, state)
   }
 
   /**
@@ -240,33 +243,14 @@ class Editor extends React.Component {
   render = () => {
     const { props, state } = this
     const { stack } = state
-    const handlers = {}
-    const children = stack.render(state.state, this)
-
-    for (const property of EVENT_HANDLERS) {
-      handlers[property] = this[property]
-    }
+    const children = stack
+      .renderPortal(state.state, this)
+      .map((child, i) => <Portal key={i} isOpened>{child}</Portal>)
 
     debug('render', { props, state })
 
-    return (
-      <Content
-        {...handlers}
-        editor={this}
-        onChange={this.onChange}
-        schema={this.getSchema()}
-        state={this.getState()}
-        className={props.className}
-        readOnly={props.readOnly}
-        autoCorrect={props.autoCorrect}
-        spellCheck={props.spellCheck}
-        style={props.style}
-        tabIndex={props.tabIndex}
-        role={props.role}
-      >
-        {children.map((child, i) => <Portal key={i} isOpened>{child}</Portal>)}
-      </Content>
-    )
+    const tree = stack.render(state.state, this, { ...props, children })
+    return tree
   }
 
 }
@@ -276,7 +260,7 @@ class Editor extends React.Component {
  */
 
 for (const property of EVENT_HANDLERS) {
-  Editor.propTypes[property] = React.PropTypes.func
+  Editor.propTypes[property] = Types.func
 }
 
 /**

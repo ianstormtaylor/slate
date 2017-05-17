@@ -1,12 +1,15 @@
 
-import Base64 from '../serializers/base-64'
 import Debug from 'debug'
 import React from 'react'
 import ReactDOM from 'react-dom'
+import Types from 'prop-types'
+
 import TYPES from '../constants/types'
+import Base64 from '../serializers/base-64'
 import Leaf from './leaf'
 import Void from './void'
-import scrollTo from '../utils/scroll-to'
+import getWindow from 'get-window'
+import scrollToSelection from '../utils/scroll-to-selection'
 
 /**
  * Debug.
@@ -31,12 +34,13 @@ class Node extends React.Component {
    */
 
   static propTypes = {
-    editor: React.PropTypes.object.isRequired,
-    node: React.PropTypes.object.isRequired,
-    parent: React.PropTypes.object.isRequired,
-    readOnly: React.PropTypes.bool.isRequired,
-    schema: React.PropTypes.object.isRequired,
-    state: React.PropTypes.object.isRequired
+    block: Types.object,
+    editor: Types.object.isRequired,
+    node: Types.object.isRequired,
+    parent: Types.object.isRequired,
+    readOnly: Types.bool.isRequired,
+    schema: Types.object.isRequired,
+    state: Types.object.isRequired
   }
 
   /**
@@ -88,80 +92,50 @@ class Node extends React.Component {
    */
 
   shouldComponentUpdate = (nextProps) => {
+    const { props } = this
     const { Component } = this.state
 
-    // If the node is rendered with a `Component` that has enabled suppression
-    // of update checking, always return true so that it can deal with update
-    // checking itself.
-    if (Component && Component.suppressShouldComponentUpdate) {
-      return true
+    // If the `Component` has enabled suppression of update checking, always
+    // return true so that it can deal with update checking itself.
+    if (Component && Component.suppressShouldComponentUpdate) return true
+
+    // If the `readOnly` status has changed, re-render in case there is any
+    // user-land logic that depends on it, like nested editable contents.
+    if (nextProps.readOnly != props.readOnly) return true
+
+    // If the node has changed, update. PERF: There are cases where it will have
+    // changed, but it's properties will be exactly the same (eg. copy-paste)
+    // which this won't catch. But that's rare and not a drag on performance, so
+    // for simplicity we just let them through.
+    if (nextProps.node != props.node) return true
+
+    // If the node is a block or inline, which can have custom renderers, we
+    // include an extra check to re-render if the node's focus changes, to make
+    // it simple for users to show a node's "selected" state.
+    if (nextProps.node.kind != 'text') {
+      const hasEdgeIn = props.state.selection.hasEdgeIn(props.node)
+      const nextHasEdgeIn = nextProps.state.selection.hasEdgeIn(nextProps.node)
+      const hasFocus = props.state.isFocused || nextProps.state.isFocused
+      const hasEdge = hasEdgeIn || nextHasEdgeIn
+      if (hasFocus && hasEdge) return true
     }
 
-    // If the `readOnly` status has changed, we need to re-render in case there is
-    // any user-land logic that depends on it, like nested editable contents.
-    if (nextProps.readOnly !== this.props.readOnly) return true
-
-    // If the node has changed, update. PERF: There are certain cases where the
-    // node instance will have changed, but it's properties will be exactly the
-    // same (copy-paste, delete backwards, etc.) in which case this will not
-    // catch a potentially avoidable re-render. But those cases are rare enough
-    // that they aren't really a drag on performance, so for simplicity we just
-    // let them through.
-    if (nextProps.node != this.props.node) {
-      return true
-    }
-
-    const nextHasEdgeIn = nextProps.state.selection.hasEdgeIn(nextProps.node)
-
-    // If the selection is focused and is inside the node, we need to update so
-    // that the selection will be set by one of the <Leaf> components.
-    if (
-      nextProps.state.isFocused &&
-      nextHasEdgeIn
-    ) {
-      return true
-    }
-
-    const hasEdgeIn = this.props.state.selection.hasEdgeIn(nextProps.node)
-    // If the selection is blurred but was previously focused (or vice versa) inside the node,
-    // we need to update to ensure the selection gets updated by re-rendering.
-    if (
-      this.props.state.isFocused != nextProps.state.isFocused &&
-      (
-          hasEdgeIn || nextHasEdgeIn
-      )
-    ) {
-      return true
-    }
-
-    // For block and inline nodes, which can have custom renderers, we need to
-    // include another check for whether the previous selection had an edge in
-    // the node, to allow for intuitive selection-based rendering.
-    if (
-      this.props.node.kind != 'text' &&
-      hasEdgeIn != nextHasEdgeIn
-    ) {
-      return true
-    }
-
-    // For text nodes, which can have custom decorations, we need to check to
-    // see if the block has changed, which has caused the decorations to change.
+    // If the node is a text node, re-render if the current decorations have
+    // changed, even if the content of the text node itself hasn't.
     if (nextProps.node.kind == 'text' && nextProps.schema.hasDecorators) {
-      const { node, schema, state } = nextProps
+      const nextDecorators = nextProps.state.document.getDescendantDecorators(nextProps.node.key, nextProps.schema)
+      const decorators = props.state.document.getDescendantDecorators(props.node.key, props.schema)
+      const nextRanges = nextProps.node.getRanges(nextDecorators)
+      const ranges = props.node.getRanges(decorators)
+      if (!nextRanges.equals(ranges)) return true
+    }
 
-      const { document } = state
-      const decorators = document.getDescendantDecorators(node.key, schema)
-      const ranges = node.getRanges(decorators)
-
-      const prevNode = this.props.node
-      const prevSchema = this.props.schema
-      const prevDocument = this.props.state.document
-      const prevDecorators = prevDocument.getDescendantDecorators(prevNode.key, prevSchema)
-      const prevRanges = prevNode.getRanges(prevDecorators)
-
-      if (!ranges.equals(prevRanges)) {
-        return true
-      }
+    // If the node is a text node, and its parent is a block node, and it was
+    // the last child of the block, re-render to cleanup extra `<br/>` or `\n`.
+    if (nextProps.node.kind == 'text' && nextProps.parent.kind == 'block') {
+      const last = props.parent.nodes.last()
+      const nextLast = nextProps.parent.nodes.last()
+      if (props.node == last && nextProps.node != nextLast) return true
     }
 
     // Otherwise, don't update.
@@ -207,7 +181,9 @@ class Node extends React.Component {
     if (!selection.hasEndIn(node)) return
 
     const el = ReactDOM.findDOMNode(this)
-    scrollTo(el)
+    const window = getWindow(el)
+    const native = window.getSelection()
+    scrollToSelection(native)
 
     this.debug('updateScroll', el)
   }
@@ -252,15 +228,17 @@ class Node extends React.Component {
    */
 
   renderNode = (child) => {
+    const { block, editor, node, readOnly, schema, state } = this.props
     return (
       <Node
         key={child.key}
         node={child}
-        parent={this.props.node}
-        editor={this.props.editor}
-        readOnly={this.props.readOnly}
-        schema={this.props.schema}
-        state={this.props.state}
+        block={node.kind == 'block' ? node : block}
+        parent={node}
+        editor={editor}
+        readOnly={readOnly}
+        schema={schema}
+        state={state}
       />
     )
   }
@@ -274,9 +252,7 @@ class Node extends React.Component {
   renderElement = () => {
     const { editor, node, parent, readOnly, state } = this.props
     const { Component } = this.state
-    const children = node.nodes
-      .map(child => this.renderNode(child))
-      .toArray()
+    const children = node.nodes.map(this.renderNode).toArray()
 
     // Attributes that the developer must to mix into the element in their
     // custom node renderer component.
@@ -348,12 +324,13 @@ class Node extends React.Component {
    */
 
   renderLeaf = (ranges, range, index, offset) => {
-    const { node, parent, schema, state, editor } = this.props
+    const { block, node, parent, schema, state, editor } = this.props
     const { text, marks } = range
 
     return (
       <Leaf
         key={`${node.key}-${index}`}
+        block={block}
         editor={editor}
         index={index}
         marks={marks}

@@ -1,0 +1,26 @@
+
+nodes:
+  - kind: block
+    type: figure
+    key: a
+    nodes:
+    - kind: block
+      type: image
+      key: aa
+      isVoid: true
+  - kind: block
+    type: figure
+    key: b
+    nodes:
+    - kind: block
+      type: image
+      key: bb
+      isVoid: true
+  - kind: block
+    type: figure
+    key: c
+    nodes:
+    - kind: block
+      type: image
+      key: cc
+      isVoid: true

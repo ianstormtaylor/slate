@@ -125,9 +125,15 @@ When saving the data to size-sensitive places, the raw serializer can be told to
 ### `Raw.deserialize`
 `Raw.deserialize(object: Object, [options: Object]) => State`
 
-Deserialize a raw JSON `object` into a [`State`](../models/state.md). You must pass the `terse: true` option if you want to deserialize a state that was previously serialized with `terse: true`.
+Deserialize a raw JSON `object` into a [`State`](../models/state.md). 
+
+You must pass the `terse: true` option if you want to deserialize a state that was previously serialized with `terse: true`.
+
+If you are serializing directly for storage in a database, or in other scenarios where you know the state will not be tampered with, you can pass in a `normalize: false` option which will greatly speed up the deserialization time, since it doesn't need to ensure that the state is fully normalized.
 
 ### `Raw.serialize`
 `Raw.serialize(state: State, [options: Object]) => Object`
 
-Serialize a `state` into a raw JSON object. If you pass the `terse: true` option, the serialized format will omit properties that aren't _strictly_ required to deserialize later, reducing the serialized data's size. For example, if the dictionary of [`Data`](../models/data.md) for a [`Node`](../models/node.md) is empty, it will be omitted.
+Serialize a `state` into a raw JSON object. 
+
+If you pass the `terse: true` option, the serialized format will omit properties that aren't _strictly_ required to deserialize later, reducing the serialized data's size. For example, if the dictionary of [`Data`](../models/data.md) for a [`Node`](../models/node.md) is empty, it will be omitted.
