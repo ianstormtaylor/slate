@@ -55,7 +55,7 @@ const PLUGINS_PROPS = [
  * @type {Component}
  */
 
-class Editor extends React.Component {
+class Editor extends React.PureComponent {
 
   /**
    * Property types.
