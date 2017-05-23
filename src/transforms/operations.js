@@ -1,5 +1,6 @@
 
 import Normalize from '../utils/normalize'
+import applyOperation from '../utils/apply-operation'
 
 /**
  * Transforms.
@@ -8,6 +9,19 @@ import Normalize from '../utils/normalize'
  */
 
 const Transforms = {}
+
+/**
+ * Apply an `operation` to the current state.
+ *
+ * @param {Transform} transform
+ * @param {Object} operation
+ */
+
+Transforms.applyOperation = (transform, operation) => {
+  const { state, operations } = transform
+  transform.state = applyOperation(state, operation)
+  transform.operations = operations.concat([operation])
+}
 
 /**
  * Add mark to text at `offset` and `length` in node by `path`.

@@ -11,14 +11,6 @@ import warn from '../utils/warn'
 const debug = Debug('slate:operation')
 
 /**
- * Transforms.
- *
- * @type {Object}
- */
-
-const Transforms = {}
-
-/**
  * Operations.
  *
  * @type {Object}
@@ -44,14 +36,14 @@ const OPERATIONS = {
 }
 
 /**
- * Apply an `operation` to the current state.
+ * Apply an `operation` to a `state`.
  *
- * @param {Transform} transform
+ * @param {State} state
  * @param {Object} operation
+ * @return {State} state
  */
 
-Transforms.applyOperation = (transform, operation) => {
-  const { state, operations } = transform
+function applyOperation(state, operation) {
   const { type } = operation
   const fn = OPERATIONS[type]
 
@@ -60,8 +52,8 @@ Transforms.applyOperation = (transform, operation) => {
   }
 
   debug(type, operation)
-  transform.state = fn(state, operation)
-  transform.operations = operations.concat([operation])
+  state = fn(state, operation)
+  return state
 }
 
 /**
@@ -476,7 +468,7 @@ function splitNode(state, operation) {
 /**
  * Export.
  *
- * @type {Object}
+ * @type {Function}
  */
 
-export default Transforms
+export default applyOperation

@@ -1,5 +1,4 @@
 
-import ApplyOperation from './apply-operation'
 import AtCurrentRange from './at-current-range'
 import AtRange from './at-range'
 import ByKey from './by-key'
@@ -16,7 +15,6 @@ import Operations from './operations'
  */
 
 export default {
-  ...ApplyOperation,
   ...AtCurrentRange,
   ...AtRange,
   ...ByKey,
