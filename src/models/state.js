@@ -1,21 +1,11 @@
 
 
 import Document from './document'
+import History from './history'
 import SCHEMA from '../schemas/core'
 import Selection from './selection'
 import Transform from './transform'
-import { Record, Set, Stack, List } from 'immutable'
-
-/**
- * History.
- *
- * @type {History}
- */
-
-const History = new Record({
-  undos: new Stack(),
-  redos: new Stack()
-})
+import { Record, Set, List } from 'immutable'
 
 /**
  * Default properties.
@@ -62,7 +52,7 @@ class State extends new Record(DEFAULTS) {
 
     return options.normalize === false
       ? state
-      : state.transform().normalize(SCHEMA).apply({ save: false })
+      : state.transform().normalize(SCHEMA).save(false).apply()
   }
 
   /**
@@ -428,16 +418,11 @@ class State extends new Record(DEFAULTS) {
   /**
    * Return a new `Transform` with the current state as a starting point.
    *
-   * @param {Object} properties
    * @return {Transform}
    */
 
-  transform(properties = {}) {
-    const state = this
-    return new Transform({
-      ...properties,
-      state
-    })
+  transform() {
+    return new Transform({ state: this })
   }
 
 }

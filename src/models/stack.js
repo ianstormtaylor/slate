@@ -2,7 +2,7 @@
 import CorePlugin from '../plugins/core'
 import Debug from 'debug'
 import Schema from './schema'
-import State from './state'
+import warn from '../utils/warn'
 import { Record } from 'immutable'
 
 /**
@@ -19,27 +19,20 @@ const debug = Debug('slate:stack')
  * @type {Array}
  */
 
-const EVENT_HANDLER_METHODS = [
+const METHODS = [
+  'onBeforeChange',
   'onBeforeInput',
+  'onBeforeTransform',
   'onBlur',
-  'onFocus',
+  'onChange',
   'onCopy',
   'onCut',
   'onDrop',
+  'onFocus',
   'onKeyDown',
   'onPaste',
   'onSelect',
-]
-
-/**
- * Methods that accumulate an updated state.
- *
- * @type {Array}
- */
-
-const STATE_ACCUMULATOR_METHODS = [
-  'onBeforeChange',
-  'onChange',
+  'onTransform',
 ]
 
 /**
@@ -97,7 +90,7 @@ class Stack extends new Record(DEFAULTS) {
    * @return {Component}
    */
 
-  render = (state, editor, props) => {
+  render(state, editor, props) {
     debug('render')
     const plugins = this.plugins.slice().reverse()
     let children
@@ -119,7 +112,7 @@ class Stack extends new Record(DEFAULTS) {
    * @return {Array}
    */
 
-  renderPortal = (state, editor) => {
+  renderPortal(state, editor) {
     debug('renderPortal')
     const portals = []
 
@@ -136,68 +129,37 @@ class Stack extends new Record(DEFAULTS) {
 }
 
 /**
- * Mix in the event handler methods.
+ * Mix in the stack methods.
  *
- * @param {State} state
+ * @param {Transform} transform
  * @param {Editor} editor
  * @param {Mixed} ...args
- * @return {State|Null}
  */
 
-for (const method of EVENT_HANDLER_METHODS) {
-  Stack.prototype[method] = function (state, editor, ...args) {
+for (const method of METHODS) {
+  Stack.prototype[method] = function (transform, editor, ...args) {
     debug(method)
 
     if (method == 'onChange') {
-      state = this.onBeforeChange(state, editor)
+      warn('The `onChange` handler has been deprecated, use `onTransform` instead.')
+      return this.onTransform(transform, editor, ...args)
+    }
+
+    if (method == 'onBeforeChange') {
+      warn('The `onBeforeChange` handler has been deprecated, use `onBeforeTransform` instead.')
+      return this.onBeforeTransform(transform, editor, ...args)
+    }
+
+    if (method == 'onTransform') {
+      transform = this.onBeforeTransform(transform, editor)
     }
 
     for (const plugin of this.plugins) {
       if (!plugin[method]) continue
-      const next = plugin[method](...args, state, editor)
+      const next = plugin[method](...args, transform, editor)
       if (next == null) continue
-      assertState(next)
-      return next
     }
-
-    return state
   }
-}
-
-/**
- * Mix in the state accumulator methods.
- *
- * @param {State} state
- * @param {Editor} editor
- * @param {Mixed} ...args
- * @return {State|Null}
- */
-
-for (const method of STATE_ACCUMULATOR_METHODS) {
-  Stack.prototype[method] = function (state, editor, ...args) {
-    debug(method)
-
-    for (const plugin of this.plugins) {
-      if (!plugin[method]) continue
-      const next = plugin[method](...args, state, editor)
-      if (next == null) continue
-      assertState(next)
-      state = next
-    }
-
-    return state
-  }
-}
-
-/**
- * Assert that a `value` is a state object.
- *
- * @param {Mixed} value
- */
-
-function assertState(value) {
-  if (value instanceof State) return
-  throw new Error(`A plugin returned an unexpected state value: ${value}`)
 }
 
 /**

@@ -29,6 +29,7 @@ class Transform {
     const { state } = properties
     this.state = state
     this.operations = []
+    this.isNative(false)
   }
 
   /**
@@ -53,12 +54,12 @@ class Transform {
 
   apply(options = {}) {
     const transform = this
-    let { merge, save, isNative = false } = options
+    let { _merge: merge, _save: save } = this
 
     // Ensure that the selection is normalized.
     transform.normalizeSelection()
 
-    const { state, operations } = transform
+    let { state, operations } = transform
     const { history } = state
     const { undos } = history
     const previous = undos.peek()
@@ -81,11 +82,14 @@ class Transform {
       save = !isOnlySelections(operations)
     }
 
-    // Save the new operations.
-    if (save) this.save({ merge })
+    // Save the new operations, updating the state.
+    if (save) {
+      transform.commit({ merge })
+      state = transform.state
+    }
 
-    // Return the new state with the `isNative` flag set.
-    return this.state.set('isNative', !!isNative)
+    // Return the new state.
+    return state
   }
 
 }

@@ -14,6 +14,7 @@ import Block from './models/block'
 import Character from './models/character'
 import Data from './models/data'
 import Document from './models/document'
+import History from './models/history'
 import Inline from './models/inline'
 import Mark from './models/mark'
 import Schema from './models/schema'
@@ -57,6 +58,7 @@ export {
   Data,
   Document,
   Editor,
+  History,
   Html,
   Inline,
   Mark,
@@ -82,6 +84,7 @@ export default {
   Data,
   Document,
   Editor,
+  History,
   Html,
   Inline,
   Mark,

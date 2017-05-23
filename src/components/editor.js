@@ -7,6 +7,7 @@ import Types from 'prop-types'
 import Stack from '../models/stack'
 import State from '../models/state'
 import noop from '../utils/noop'
+import warn from '../utils/warn'
 
 /**
  * Debug.
@@ -67,10 +68,11 @@ class Editor extends React.Component {
     autoCorrect: Types.bool,
     autoFocus: Types.bool,
     className: Types.string,
-    onBeforeChange: Types.func,
+    onBeforeTransform: Types.func,
     onChange: Types.func,
     onDocumentChange: Types.func,
     onSelectionChange: Types.func,
+    onTransform: Types.func,
     placeholder: Types.any,
     placeholderClassName: Types.string,
     placeholderStyle: Types.object,
@@ -115,44 +117,43 @@ class Editor extends React.Component {
 
     // Create a new `Stack`, omitting the `onChange` property since that has
     // special significance on the editor itself.
-    const { onChange, ...rest } = props // eslint-disable-line no-unused-vars
+    const { state, onChange, ...rest } = props // eslint-disable-line no-unused-vars
     const stack = Stack.create(rest)
     this.state.stack = stack
 
-    // Resolve the state, running `onBeforeChange` first.
-    const state = stack.onBeforeChange(props.state, this)
+    // Cache and set the state.
     this.cacheState(state)
     this.state.state = state
 
     // Create a bound event handler for each event.
     for (const method of EVENT_HANDLERS) {
       this[method] = (...args) => {
-        const next = this.state.stack[method](this.state.state, this, ...args)
-        this.onChange(next)
+        const stk = this.state.stack
+        const transform = this.transform()
+        stk[method](transform, this, ...args)
+        this.applyTransform(transform)
       }
     }
   }
 
   /**
-   * When the `props` are updated, create a new `Stack` if necessary, and
-   * run `onBeforeChange`.
+   * When the `props` are updated, create a new `Stack` if necessary.
    *
    * @param {Object} props
    */
 
   componentWillReceiveProps = (props) => {
-    let { stack } = this.state
+    const { state } = props
 
     // If any plugin-related properties will change, create a new `Stack`.
     for (const prop of PLUGINS_PROPS) {
       if (props[prop] == this.props[prop]) continue
       const { onChange, ...rest } = props // eslint-disable-line no-unused-vars
-      stack = Stack.create(rest)
+      const stack = Stack.create(rest)
       this.setState({ stack })
     }
 
-    // Resolve the state, running the before change handler of the stack.
-    const state = stack.onBeforeChange(props.state, this)
+    // Cache and save the state.
     this.cacheState(state)
     this.setState({ state })
   }
@@ -179,7 +180,7 @@ class Editor extends React.Component {
       .blur()
       .apply()
 
-    this.onChange(state)
+    this.applyChange(state)
   }
 
   /**
@@ -192,7 +193,17 @@ class Editor extends React.Component {
       .focus()
       .apply()
 
-    this.onChange(state)
+    this.applyChange(state)
+  }
+
+  /**
+   * Create a transform with the latest editor state.
+   *
+   * @return {Transform}
+   */
+
+  transform = () => {
+    return this.state.state.transform()
   }
 
   /**
@@ -216,22 +227,41 @@ class Editor extends React.Component {
   }
 
   /**
-   * When the `state` changes, pass through plugins, then bubble up.
+   * On change.
    *
    * @param {State} state
    */
 
   onChange = (state) => {
+    warn('The `editor.onChange(state)` method is deprecated, use `editor.applyTransform(transform)` instead.')
     if (state == this.state.state) return
     const { tmp, props } = this
-    const { stack } = this.state
     const { onChange, onDocumentChange, onSelectionChange } = props
     const { document, selection } = tmp
 
-    state = stack.onChange(state, this)
     onChange(state)
     if (state.document != document) onDocumentChange(state.document, state)
     if (state.selection != selection) onSelectionChange(state.selection, state)
+  }
+
+  /**
+   * Apply a `transform`.
+   *
+   * @param {Transform} transform
+   */
+
+  applyTransform = (transform) => {
+    const { stack } = this.state
+    const { onChange, onDocumentChange, onSelectionChange } = this.props
+    const { document, selection } = this.tmp
+
+    stack.onTransform(transform, this)
+    const next = transform.apply()
+    if (next == this.state.state) return
+
+    onChange(next, transform)
+    if (next.document != document) onDocumentChange(next.document, next, transform)
+    if (next.selection != selection) onSelectionChange(next.selection, next, transform)
   }
 
   /**

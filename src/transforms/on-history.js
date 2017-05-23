@@ -8,6 +8,28 @@
 const Transforms = {}
 
 /**
+ * Set a save flag on the transform.
+ *
+ * @param {Transform} transform
+ * @param {Boolean} value
+ */
+
+Transforms.save = (transform, value) => {
+  transform._save = value
+}
+
+/**
+ * Set a merge flag on the transform.
+ *
+ * @param {Transform} transform
+ * @param {Boolean} value
+ */
+
+Transforms.merge = (transform, value) => {
+  transform._merge = value
+}
+
+/**
  * Redo to the next state in the history.
  *
  * @param {Transform} transform
@@ -41,13 +63,13 @@ Transforms.redo = (transform) => {
 }
 
 /**
- * Save the operations into the history.
+ * Commit the operations into the history.
  *
  * @param {Transform} transform
  * @param {Object} options
  */
 
-Transforms.save = (transform, options = {}) => {
+Transforms.commit = (transform, options = {}) => {
   const { merge = false } = options
   let { state, operations } = transform
   let { history } = state
