@@ -2,7 +2,6 @@
 import CorePlugin from '../plugins/core'
 import Debug from 'debug'
 import Schema from './schema'
-import warn from '../utils/warn'
 import { Record } from 'immutable'
 
 /**
@@ -20,11 +19,9 @@ const debug = Debug('slate:stack')
  */
 
 const METHODS = [
-  'onBeforeChange',
   'onBeforeInput',
   'onBeforeTransform',
   'onBlur',
-  'onChange',
   'onCopy',
   'onCut',
   'onDrop',
@@ -139,20 +136,6 @@ class Stack extends new Record(DEFAULTS) {
 for (const method of METHODS) {
   Stack.prototype[method] = function (transform, editor, ...args) {
     debug(method)
-
-    if (method == 'onChange') {
-      warn('The `onChange` handler has been deprecated, use `onTransform` instead.')
-      return this.onTransform(transform, editor, ...args)
-    }
-
-    if (method == 'onBeforeChange') {
-      warn('The `onBeforeChange` handler has been deprecated, use `onBeforeTransform` instead.')
-      return this.onBeforeTransform(transform, editor, ...args)
-    }
-
-    if (method == 'onTransform') {
-      transform = this.onBeforeTransform(transform, editor)
-    }
 
     for (const plugin of this.plugins) {
       if (!plugin[method]) continue

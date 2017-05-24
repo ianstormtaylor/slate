@@ -86,12 +86,12 @@ class RichText extends React.Component {
   }
 
   /**
-   * On change, save the new state.
+   * On change, save the new `state`.
    *
-   * @param {State} state
+   * @param {Transform} transform
    */
 
-  onChange = (state) => {
+  onChange = ({ state, operations }) => {
     this.setState({ state })
   }
 
@@ -100,11 +100,11 @@ class RichText extends React.Component {
    *
    * @param {Event} e
    * @param {Object} data
-   * @param {State} state
-   * @return {State}
+   * @param {Transform} transform
+   * @return {Transform}
    */
 
-  onKeyDown = (e, data, state) => {
+  onKeyDown = (e, data, transform) => {
     if (!data.isMod) return
     let mark
 
@@ -125,13 +125,8 @@ class RichText extends React.Component {
         return
     }
 
-    state = state
-      .transform()
-      .toggleMark(mark)
-      .apply()
-
     e.preventDefault()
-    return state
+    return transform.toggleMark(mark)
   }
 
   /**
@@ -143,14 +138,9 @@ class RichText extends React.Component {
 
   onClickMark = (e, type) => {
     e.preventDefault()
-    let { state } = this.state
-
-    state = state
-      .transform()
-      .toggleMark(type)
-      .apply()
-
-    this.setState({ state })
+    const { state } = this.state
+    const transform = state.transform().toggleMark(type)
+    this.onChange(transform)
   }
 
   /**
@@ -162,7 +152,7 @@ class RichText extends React.Component {
 
   onClickBlock = (e, type) => {
     e.preventDefault()
-    let { state } = this.state
+    const { state } = this.state
     const transform = state.transform()
     const { document } = state
 
@@ -207,8 +197,7 @@ class RichText extends React.Component {
       }
     }
 
-    state = transform.apply()
-    this.setState({ state })
+    this.onChange(transform)
   }
 
   /**
@@ -296,12 +285,12 @@ class RichText extends React.Component {
     return (
       <div className="editor">
         <Editor
-          spellCheck
-          placeholder={'Enter some rich text...'}
-          schema={schema}
           state={this.state.state}
           onChange={this.onChange}
           onKeyDown={this.onKeyDown}
+          schema={schema}
+          placeholder={'Enter some rich text...'}
+          spellCheck
         />
       </div>
     )
