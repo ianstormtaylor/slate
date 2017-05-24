@@ -116,8 +116,7 @@ class Stack extends new Record(DEFAULTS) {
     for (const plugin of this.plugins) {
       if (!plugin.renderPortal) continue
       const portal = plugin.renderPortal(state, editor)
-      if (portal == null) continue
-      portals.push(portal)
+      if (portal) portals.push(portal)
     }
 
     return portals
@@ -140,7 +139,7 @@ for (const method of METHODS) {
     for (const plugin of this.plugins) {
       if (!plugin[method]) continue
       const next = plugin[method](...args, transform, editor)
-      if (next == null) continue
+      if (next != null) break
     }
   }
 }
