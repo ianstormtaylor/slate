@@ -173,7 +173,7 @@ const initialContent = (
 class App extends React.Component {
 
   state = {
-    state: Raw.deserialize(initialContent)
+    state: Raw.deserialize(initialContent, {terse: true})
   }
 
   onChange = (state) => {
