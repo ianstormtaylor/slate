@@ -3,10 +3,17 @@ import { Editor, Raw } from '../..'
 import React from 'react'
 import initialState from './state.json'
 
-const EMOJIS = [
-  '😃', '😬', '😂', '😅', '😆', '😍', '😱', '👋', '👏', '👍', '🙌', '👌', '🙏', '👻', '🍔', '🍑', '🍆', '🔑'
-]
+/**
+ * Emojis.
+ *
+ * @type {Array}
+ */
 
+const EMOJIS = [
+  '😃', '😬', '😂', '😅', '😆', '😍',
+  '😱', '👋', '👏', '👍', '🙌', '👌',
+  '🙏', '👻', '🍔', '🍑', '🍆', '🔑',
+]
 
 /**
  * Define a schema.
@@ -43,15 +50,15 @@ class Emojis extends React.Component {
 
   state = {
     state: Raw.deserialize(initialState, { terse: true })
-  };
+  }
 
   /**
    * On change.
    *
-   * @param {State} state
+   * @param {Transform} transform
    */
 
-  onChange = (state) => {
+  onChange = ({ state }) => {
     this.setState({ state })
   }
 
@@ -63,18 +70,15 @@ class Emojis extends React.Component {
 
   onClickEmoji = (e, code) => {
     e.preventDefault()
-    let { state } = this.state
-
-    state = state
+    const transform = this.state.state
       .transform()
       .insertInline({
         type: 'emoji',
         isVoid: true,
         data: { code }
       })
-      .apply()
 
-    this.setState({ state })
+    this.onChange(transform)
   }
 
   /**
