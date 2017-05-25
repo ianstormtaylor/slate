@@ -551,7 +551,11 @@ class Content extends React.Component {
     debug('onInput', { event })
 
     const window = getWindow(event.target)
-    const { state, editor } = this.props
+    const { editor } = this.props
+    const { pendingOnBeforeInputState } = editor.tmp
+    const state = pendingOnBeforeInputState ?
+      pendingOnBeforeInputState :
+      this.props.state
 
     // Get the selection point.
     const native = window.getSelection()
@@ -585,7 +589,10 @@ class Content extends React.Component {
     // If the text is no different, abort.
     const range = ranges.get(index)
     const { text, marks } = range
-    if (textContent == text) return
+    if (textContent == text) {
+      this.onChange(state)
+      return
+    }
 
     // Determine what the selection should be after changing the text.
     const delta = textContent.length - text.length
