@@ -1388,7 +1388,11 @@ const Node = {
     const isParent = node == parent
     const index = parent.nodes.indexOf(second)
 
-    if (second.kind == 'text') {
+    if (first.kind != second.kind) {
+      throw new Error(`Tried to join two nodes of different kinds: "${first.kind}" and "${second.kind}".`)
+    }
+
+    else if (first.kind == 'text') {
       let { characters } = first
       characters = characters.concat(second.characters)
       first = first.set('characters', characters)

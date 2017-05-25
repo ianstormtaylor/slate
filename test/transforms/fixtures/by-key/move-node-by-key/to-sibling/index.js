@@ -1,6 +1,6 @@
 
 export default function (state) {
-  const { document, selection } = state
+  const { document } = state
   const first = document.getBlocks().first()
   const container = document.nodes.last()
 

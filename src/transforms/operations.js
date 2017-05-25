@@ -55,25 +55,22 @@ Transforms.addMarkOperation = (transform, path, offset, length, mark) => {
 }
 
 /**
- * Insert a `node` at `index` in a node by `path`.
+ * Insert a `node` at `path`.
  *
  * @param {Transform} transform
  * @param {Array} path
- * @param {Number} index
  * @param {Node} node
  */
 
-Transforms.insertNodeOperation = (transform, path, index, node) => {
-  const inversePath = path.slice().concat([index])
+Transforms.insertNodeOperation = (transform, path, node) => {
   const inverse = [{
     type: 'remove_node',
-    path: inversePath,
+    path,
   }]
 
   const operation = {
     type: 'insert_node',
     path,
-    index,
     node,
     inverse,
   }
@@ -124,11 +121,10 @@ Transforms.joinNodeOperation = (transform, path, withPath) => {
   const { state } = transform
   const { document } = state
   const node = document.assertPath(withPath)
-
   let inverse
+
   if (node.kind === 'text') {
     const offset = node.length
-
     inverse = [{
       type: 'split_node',
       path: withPath,
@@ -137,7 +133,6 @@ Transforms.joinNodeOperation = (transform, path, withPath) => {
   } else {
     // The number of children after which we split
     const count = node.nodes.count()
-
     inverse = [{
       type: 'split_node',
       path: withPath,
@@ -164,23 +159,17 @@ Transforms.joinNodeOperation = (transform, path, withPath) => {
  * @param {Number} newIndex
  */
 
-Transforms.moveNodeOperation = (transform, path, newPath, newIndex) => {
-  const parentPath = path.slice(0, -1)
-  const parentIndex = path[path.length - 1]
-  const inversePath = newPath.slice().concat([newIndex])
-
+Transforms.moveNodeOperation = (transform, path, newPath) => {
   const inverse = [{
     type: 'move_node',
-    path: inversePath,
-    newPath: parentPath,
-    newIndex: parentIndex,
+    path: newPath,
+    newPath: path,
   }]
 
   const operation = {
     type: 'move_node',
     path,
     newPath,
-    newIndex,
     inverse,
   }
 
@@ -229,13 +218,10 @@ Transforms.removeNodeOperation = (transform, path) => {
   const { state } = transform
   const { document } = state
   const node = document.assertPath(path)
-  const inversePath = path.slice(0, -1)
-  const inverseIndex = path[path.length - 1]
 
   const inverse = [{
     type: 'insert_node',
-    path: inversePath,
-    index: inverseIndex,
+    path,
     node,
   }]
 

@@ -54,7 +54,7 @@ Transforms.insertNodeByKey = (transform, key, index, node, options = {}) => {
   const { document } = state
   const path = document.getPath(key)
 
-  transform.insertNodeOperation(path, index, node)
+  transform.insertNodeOperation([ ...path, index], node)
 
   if (normalize) {
     transform.normalizeNodeByKey(key, SCHEMA)
@@ -131,7 +131,7 @@ Transforms.moveNodeByKey = (transform, key, newKey, newIndex, options = {}) => {
   const path = document.getPath(key)
   const newPath = document.getPath(newKey)
 
-  transform.moveNodeOperation(path, newPath, newIndex)
+  transform.moveNodeOperation(path, [...newPath, newIndex])
 
   if (normalize) {
     const parent = document.getCommonAncestor(key, newKey)
@@ -359,7 +359,6 @@ Transforms.unwrapNodeByKey = (transform, key, options = {}) => {
   const parentParent = document.getParent(parent.key)
   const parentIndex = parentParent.nodes.indexOf(parent)
 
-
   if (parent.nodes.size === 1) {
     transform.moveNodeByKey(key, parentParent.key, parentIndex, { normalize: false })
     transform.removeNodeByKey(parent.key, options)
@@ -380,6 +379,7 @@ Transforms.unwrapNodeByKey = (transform, key, options = {}) => {
     // Split the parent.
     transform.splitNodeOperation(parentPath, index)
     // Extract the node in between the splitted parent.
+
     transform.moveNodeByKey(key, parentParent.key, parentIndex + 1, { normalize: false })
 
     if (normalize) {
