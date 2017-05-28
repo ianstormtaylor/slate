@@ -24,7 +24,7 @@ function getPoint(element, offset, state, editor) {
   // then afterwards for the correct `element`. (2017/03/03)
   const { key } = offsetKey
   const node = document.getDescendant(key)
-  if (!node) return null
+  if (!node || !node.getRanges) return null
 
   const decorators = document.getDescendantDecorators(key, schema)
   const ranges = node.getRanges(decorators)
