@@ -180,12 +180,16 @@ class Node extends React.Component {
     if (selection.isBlurred) return
     if (!selection.hasEndIn(node)) return
 
-    const el = ReactDOM.findDOMNode(this)
-    const window = getWindow(el)
-    const native = window.getSelection()
-    scrollToSelection(native)
+    // The native selection will be updated after componentDidMount or componentDidUpdate.
+    // Use setTimeout to queue scrolling to the last when the native selection has been updated to the correct value.
+    setTimeout(() => {
+      const el = ReactDOM.findDOMNode(this)
+      const window = getWindow(el)
+      const native = window.getSelection()
+      scrollToSelection(native)
 
-    this.debug('updateScroll', el)
+      this.debug('updateScroll', el)
+    })
   }
 
   /**
