@@ -1,0 +1,16 @@
+
+data: {}
+nodes:
+  - type: paragraph
+    isVoid: false
+    data: {}
+    nodes:
+      - characters:
+          - text: t
+            marks: []
+          - text: e
+            marks: []
+          - text: x
+            marks: []
+          - text: t
+            marks: []
