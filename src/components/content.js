@@ -247,6 +247,8 @@ class Content extends React.Component {
 
   isInEditor = (target) => {
     const { element } = this
+    // If `target` is a text node use the parent in the check.
+    if (target.nodeType === 3) target = target.parentElement
     return (
       (target.isContentEditable) &&
       (target == element || findClosestNode(target, '[data-slate-editor]') == element)
