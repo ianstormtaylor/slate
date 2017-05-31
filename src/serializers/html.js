@@ -2,7 +2,7 @@
 import Raw from './raw'
 import React from 'react'
 import ReactDOMServer from 'react-dom/server'
-import cheerio from 'cheerio'
+import htmlparser2 from 'htmlparser2'
 import typeOf from 'type-of'
 import { Record } from 'immutable'
 
@@ -94,8 +94,8 @@ class Html {
    */
 
   deserialize = (html, options = {}) => {
-    const $ = cheerio.load(html).root()
-    const children = $.children().toArray()
+    const children = htmlparser2.parseDOM(html)
+
     let nodes = this.deserializeElements(children)
 
     // HACK: ensure for now that all top-level inline are wrapped into a block.
@@ -143,7 +143,7 @@ class Html {
   }
 
   /**
-   * Deserialize an array of Cheerio `elements`.
+   * Deserialize an array of htmlparser2 `elements`.
    *
    * @param {Array} elements
    * @return {Array}
@@ -168,7 +168,7 @@ class Html {
   }
 
   /**
-   * Deserialize a Cheerio `element`.
+   * Deserialize a htmlparser2 `element`.
    *
    * @param {Object} element
    * @return {Any}

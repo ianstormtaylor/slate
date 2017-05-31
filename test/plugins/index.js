@@ -1,4 +1,3 @@
-
 import React from 'react'
 import ReactDOM from 'react-dom/server'
 import assert from 'assert'
@@ -25,7 +24,7 @@ describe('plugins', () => {
       const props = {
         state: Raw.deserialize(input, { terse: true }),
         onChange: () => {},
-        ...require(dir)
+        ...require(dir),
       }
 
       const string = ReactDOM.renderToStaticMarkup(<Editor {...props} />)
