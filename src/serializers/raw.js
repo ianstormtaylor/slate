@@ -1,5 +1,4 @@
 
-import { Map } from 'immutable'
 import Block from '../models/block'
 import Character from '../models/character'
 import Document from '../models/document'
@@ -50,28 +49,6 @@ const Raw = {
         return Raw.deserializeNode(node, options)
       }))
     })
-  },
-
-  /**
-   * Deserialize a JSON object representing `data`.
-   *
-   * @param {Object} object
-   * @param {Object} options (optional)
-   * @return {Map}
-   */
-
-  deserializeData(object, options) {
-    const { plugins } = options
-    let data = new Map()
-
-    if (!plugins) return data
-
-    for (const plugin of plugins) {
-      const { deserialize } = plugin
-      if (deserialize) data = data.merge(deserialize(object))
-    }
-
-    return data
   },
 
   /**
@@ -202,17 +179,12 @@ const Raw = {
 
     const document = Raw.deserializeDocument(object.document, options)
     let selection
-    let data
 
-    if (object.selection) {
+    if (object.selection != null) {
       selection = Raw.deserializeSelection(object.selection, options)
     }
 
-    if (object.data) {
-      data = Raw.deserializeData(object.data, options)
-    }
-
-    return State.create({ document, selection, data }, options)
+    return State.create({ document, selection }, options)
   },
 
   /**
@@ -273,28 +245,6 @@ const Raw = {
     return options.terse
       ? Raw.tersifyBlock(object)
       : object
-  },
-
-  /**
-   * Serialize `data`.
-   *
-   * @param {data} Map
-   * @param {Object} options (optional)
-   * @return {Object}
-   */
-
-  serializeData(data, options) {
-    const { plugins } = options
-    let object = {}
-
-    if (!plugins) return object
-
-    for (const plugin of plugins) {
-      const { serialize } = plugin
-      if (serialize) object = Object.assign(object, serialize(data))
-    }
-
-    return object
   },
 
   /**
@@ -450,15 +400,12 @@ const Raw = {
   serializeState(state, options = {}) {
     const object = {
       document: Raw.serializeDocument(state.document, options),
+      selection: Raw.serializeSelection(state.selection, options),
       kind: state.kind
     }
 
-    if (options.preserveSelection) {
-      object.selection = Raw.serializeSelection(state.selection, options)
-    }
-
-    if (options.preserveData) {
-      object.data = Raw.serializeData(state.data, options)
+    if (!options.preserveSelection) {
+      delete object.selection
     }
 
     const ret = options.terse
@@ -599,16 +546,14 @@ const Raw = {
    */
 
   tersifyState(object) {
-    const { document, selection, data } = object
+    if (object.selection == null) {
+      return object.document
+    }
 
-    if (!selection && !data) return document
-
-    object = { document }
-
-    if (selection) object.selection = selection
-    if (data && Object.keys(data).length) object.data = data
-
-    return object
+    return {
+      document: object.document,
+      selection: object.selection
+    }
   },
 
   /**
@@ -728,12 +673,11 @@ const Raw = {
    */
 
   untersifyState(object) {
-    if (object.document) {
+    if (object.selection || object.document) {
       return {
         kind: 'state',
         document: object.document,
         selection: object.selection,
-        data: object.data
       }
     }
 
