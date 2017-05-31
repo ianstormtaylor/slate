@@ -83,7 +83,8 @@ class Content extends React.Component {
     super(props)
     this.tmp = {}
     this.tmp.compositions = 0
-    this.tmp.forces = 0
+    this.state = {}
+    this.state.forces = 0
   }
 
   /**
@@ -109,7 +110,8 @@ class Content extends React.Component {
       props.autoCorrect != this.props.autoCorrect ||
       props.spellCheck != this.props.spellCheck ||
       props.state != this.props.state ||
-      props.style != this.props.style
+      props.style != this.props.style ||
+      state.forces != this.state.forces
     )
   }
 
@@ -354,7 +356,8 @@ class Content extends React.Component {
   onCompositionEnd = (event) => {
     if (!this.isInEditor(event.target)) return
 
-    this.tmp.forces++
+    const forces = this.state.forces + 1
+    this.setState({ forces })
     const count = this.tmp.compositions
 
     // The `count` check here ensures that if another composition starts
@@ -839,7 +842,7 @@ class Content extends React.Component {
     return (
       <div
         data-slate-editor
-        key={this.tmp.forces}
+        key={this.state.forces}
         ref={this.ref}
         data-key={document.key}
         contentEditable={!readOnly}
