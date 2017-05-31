@@ -2,6 +2,8 @@
 dist
 examples/build.dev.js
 examples/build.prod.js
+perf/reference.json
+test/support/build.js
 lib
 
 # Temporary files.
