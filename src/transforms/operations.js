@@ -286,6 +286,43 @@ Transforms.removeTextOperation = (transform, path, offset, length) => {
 }
 
 /**
+ * Merge `properties` into state `data`.
+ * `properties` can be an object or an array of `[key, value]` pairs.
+ * The array form can be used to store data with keys different from strings.
+ *
+ * @param {Transform} transform
+ * @param {Object|Array} properties
+ */
+
+Transforms.setDataOperation = (transform, properties) => {
+  const { state } = transform
+  const { data } = state
+  let inverseProps
+
+  if (properties instanceof Array) {
+    inverseProps = properties.map(prop => [prop[0], data.get(prop[0])])
+  } else {
+    inverseProps = {}
+    for (const k in properties) {
+      inverseProps[k] = data[k]
+    }
+  }
+
+  const inverse = [{
+    type: 'set_data',
+    properties: inverseProps
+  }]
+
+  const operation = {
+    type: 'set_data',
+    properties,
+    inverse,
+  }
+
+  transform.applyOperation(operation)
+}
+
+/**
  * Set `properties` on mark on text at `offset` and `length` in node by `path`.
  *
  * @param {Transform} transform
