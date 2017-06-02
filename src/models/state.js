@@ -426,6 +426,22 @@ class State extends new Record(DEFAULTS) {
   }
 
   /**
+   * Check whether the selection is empty.
+   *
+   * @return {Boolean}
+   */
+
+  get isEmpty() {
+    const { startKey, endKey, startOffset, endOffset } = this
+
+    if (startKey == endKey) {
+      return (startOffset == endOffset)
+    }
+
+    return this.fragment.text.length == 0
+  }
+
+  /**
    * Return a new `Transform` with the current state as a starting point.
    *
    * @param {Object} properties
