@@ -438,10 +438,10 @@ Transforms.wrapInline = (transform, properties) => {
   else if (selection.startOffset == 0) {
     // Find the inline that has been inserted.
     // We want to handle multiple wrap, so we need to take the highest parent
-    const inline = document.getAncestors(selection.startKey)
+    const inline = document.getAncestors(startKey)
       .find(parent => (
         parent.kind == 'inline' &&
-        parent.getOffset(selection.startKey) == 0
+        parent.getOffset(startKey) == 0
       ))
 
     const start = inline ? document.getPreviousText(inline.getFirstText().key) : document.getFirstText()
