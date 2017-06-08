@@ -18,15 +18,16 @@ export default function (state) {
     .wrapInline('hashtag')
     .apply()
 
-  const updated = next.document.getTexts().get(1)
+  const anchor = next.document.getTexts().get(0)
+  const focus = next.document.getTexts().get(2)
 
   assert.deepEqual(
     next.selection.toJS(),
     range.merge({
-      anchorKey: updated.key,
-      anchorOffset: 0,
-      focusKey: updated.key,
-      focusOffset: updated.length
+      anchorKey: anchor.key,
+      anchorOffset: anchor.length,
+      focusKey: focus.key,
+      focusOffset: 0
     }).toJS()
   )
 
