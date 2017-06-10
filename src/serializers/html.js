@@ -35,6 +35,8 @@ const TEXT_RULE = {
     }
 
     if (el.type == 'text') {
+      if (el.data && el.data.match(/<!--.*?-->/)) return
+
       return {
         kind: 'text',
         text: el.data
