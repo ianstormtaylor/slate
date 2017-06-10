@@ -1,0 +1,9 @@
+
+nodes:
+  - kind: block
+    type: paragraph
+    key: a
+    nodes:
+      - kind: text
+        key: b
+        text: word
