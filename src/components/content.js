@@ -83,7 +83,6 @@ class Content extends React.Component {
     super(props)
     this.tmp = {}
     this.tmp.compositions = 0
-    this.tmp.forces = 0
   }
 
   /**
@@ -339,35 +338,19 @@ class Content extends React.Component {
 
   onCompositionStart = (event) => {
     if (!this.isInEditor(event.target)) return
-
     this.tmp.isComposing = true
-    this.tmp.compositions++
-
     debug('onCompositionStart', { event })
   }
 
   /**
-   * On composition end, remove the `isComposing` flag on the next tick. Also
-   * increment the `forces` key, which will force the contenteditable element
-   * to completely re-render, since IME puts React in an unreconcilable state.
+   * On composition end, remove the `isComposing` flag on the next tick.
    *
    * @param {Event} event
    */
 
   onCompositionEnd = (event) => {
     if (!this.isInEditor(event.target)) return
-
-    this.tmp.forces++
-    const count = this.tmp.compositions
-
-    // The `count` check here ensures that if another composition starts
-    // before the timeout has closed out this one, we will abort unsetting the
-    // `isComposing` flag, since a composition in still in affect.
-    setTimeout(() => {
-      if (this.tmp.compositions > count) return
-      this.tmp.isComposing = false
-    })
-
+    this.tmp.isComposing = false
     debug('onCompositionEnd', { event })
   }
 
@@ -842,7 +825,6 @@ class Content extends React.Component {
     return (
       <div
         data-slate-editor
-        key={this.tmp.forces}
         ref={this.ref}
         data-key={document.key}
         contentEditable={!readOnly}
