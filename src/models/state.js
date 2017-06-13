@@ -435,11 +435,11 @@ class State extends new Record(DEFAULTS) {
     const { startOffset, endOffset } = this
 
     if (this.isCollapsed) {
-      return
+      return true
     }
 
     if (endOffset != 0 && startOffset != 0) {
-      return
+      return false
     }
 
     return this.fragment.text.length == 0
