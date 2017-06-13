@@ -432,10 +432,14 @@ class State extends new Record(DEFAULTS) {
    */
 
   get isEmpty() {
-    const { startKey, endKey, startOffset, endOffset } = this
+    const { startOffset, endOffset } = this
 
-    if (startKey == endKey) {
-      return (startOffset == endOffset)
+    if (this.isCollapsed) {
+      return
+    }
+
+    if (endOffset != 0 && startOffset != 0) {
+      return
     }
 
     return this.fragment.text.length == 0
