@@ -178,8 +178,8 @@ describe('transforms', async () => {
     }
   })
 
-  describe('set-data', () => {
-    const dir = resolve(__dirname, './fixtures/set-data')
+  describe('state-data', () => {
+    const dir = resolve(__dirname, './fixtures/state-data')
     const tests = fs.readdirSync(dir)
 
     for (const test of tests) {
@@ -193,8 +193,8 @@ describe('transforms', async () => {
 
         let state = Raw.deserialize(input, { terse: true })
         state = fn(state)
-        const json = Array.from(state.data.entries())
-        assert.deepEqual(strip(json), expected)
+        const output = Raw.serialize(state, { terse: true, preserveStateData: true })
+        assert.deepEqual(strip(output), strip(expected))
       })
     }
   })
