@@ -14,7 +14,8 @@ import findClosestNode from '../utils/find-closest-node'
 import findDeepestNode from '../utils/find-deepest-node'
 import getPoint from '../utils/get-point'
 import getTransferData from '../utils/get-transfer-data'
-import { IS_FIREFOX, IS_MAC } from '../constants/environment'
+import getHtmlFromNativePaste from '../utils/get-html-from-native-paste'
+import { IS_FIREFOX, IS_MAC, IS_IE } from '../constants/environment'
 
 /**
  * Debug.
@@ -698,15 +699,25 @@ class Content extends React.Component {
     if (this.props.readOnly) return
     if (!this.isInEditor(event.target)) return
 
-    event.preventDefault()
+    const handleData = (data) => {
+      // Attach the `isShift` flag, so that people can use it to trigger "Paste
+      // and Match Style" logic.
+      data.isShift = !!this.tmp.isShifting
+
+      debug('onPaste', { event, data })
+      this.props.onPaste(event, data)
+    }
+
     const data = getTransferData(event.clipboardData)
 
-    // Attach the `isShift` flag, so that people can use it to trigger "Paste
-    // and Match Style" logic.
-    data.isShift = !!this.tmp.isShifting
+    const doesNotSupportHtmlFromClipboard = IS_IE // May be extended with IS_EDGE and IS_SAFARI...?
 
-    debug('onPaste', { event, data })
-    this.props.onPaste(event, data)
+    if (doesNotSupportHtmlFromClipboard) {
+      getHtmlFromNativePaste(this, data, handleData)
+    } else {
+      event.preventDefault()
+      handleData(data)
+    }
   }
 
   /**
