@@ -1,4 +1,4 @@
-
+import 'babel-polyfill'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { HashRouter, NavLink, Route, Redirect, Switch } from 'react-router-dom'
