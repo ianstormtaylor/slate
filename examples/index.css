@@ -225,3 +225,7 @@ input:focus {
 .check-list-item > span:last-child:focus {
   outline: none;
 }
+
+.spelling-error {
+  background-color: rgba(255,0,0, 0.2);
+}
