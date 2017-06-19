@@ -18,9 +18,9 @@ Utility functions that ship with Slate that may be useful for certain use cases.
 ## Functions
 
 ### `findDOMNode`
-`findDOMNode(key: String) => DOMElement`
+`findDOMNode(node : Node) => DOMElement`
 
-Allows you to find the DOM node for a Slate [`Node`](../models/node.md) by passing its `key` string. Modelled after React's built-in `findDOMNode` helper.
+Allows you to find the DOM node for a Slate [`Node`](../models/node.md). Modelled after React's built-in `findDOMNode` helper.
 
 ### `resetKeyGenerator`
 `resetkeygenerator() => Void`
