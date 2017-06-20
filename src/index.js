@@ -42,6 +42,8 @@ import Transforms from './transforms'
  */
 
 import findDOMNode from './utils/find-dom-node'
+import getPoint from './utils/get-point'
+import extendSelection from './utils/extend-selection'
 import { resetKeyGenerator, setKeyGenerator } from './utils/generate-key'
 
 /**
@@ -70,6 +72,8 @@ export {
   Text,
   Transforms,
   findDOMNode,
+  getPoint,
+  extendSelection,
   resetKeyGenerator,
   setKeyGenerator
 }
@@ -94,6 +98,8 @@ export default {
   Text,
   Transforms,
   findDOMNode,
+  getPoint,
+  extendSelection,
   resetKeyGenerator,
   setKeyGenerator
 }

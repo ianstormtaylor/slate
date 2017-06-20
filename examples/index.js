@@ -11,6 +11,7 @@ import FocusBlur from './focus-blur'
 import HoveringMenu from './hovering-menu'
 import Iframes from './iframes'
 import Images from './images'
+import DropIndicator from './images-drop-indicator'
 import Links from './links'
 import MarkdownPreview from './markdown-preview'
 import MarkdownShortcuts from './markdown-shortcuts'
@@ -46,6 +47,7 @@ const EXAMPLES = [
   ['Hovering Menu', HoveringMenu, '/hovering-menu'],
   ['Links', Links, '/links'],
   ['Images', Images, '/images'],
+  ['Drop Indicator', DropIndicator, '/images-drop-indicator'],
   ['Embeds', Embeds, '/embeds'],
   ['Emojis', Emojis, '/emojis'],
   ['Markdown Preview', MarkdownPreview, '/markdown-preview'],
