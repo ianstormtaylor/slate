@@ -26,6 +26,7 @@ const EVENT_HANDLER_METHODS = [
   'onCopy',
   'onCut',
   'onDrop',
+  'onDragOver',
   'onKeyDown',
   'onPaste',
   'onSelect',
@@ -100,6 +101,7 @@ class Stack extends new Record(DEFAULTS) {
   render = (state, editor, props) => {
     debug('render')
     const plugins = this.plugins.slice().reverse()
+
     let children
 
     for (const plugin of plugins) {

@@ -344,6 +344,10 @@ function Plugin(options = {}) {
     }
   }
 
+  function onDragOver() {
+    
+  }
+
   /**
    * On drop fragment.
    *
@@ -892,6 +896,7 @@ function Plugin(options = {}) {
         onCopy={editor.onCopy}
         onCut={editor.onCut}
         onDrop={editor.onDrop}
+        onDragOver={editor.onDragOver}
         onKeyDown={editor.onKeyDown}
         onPaste={editor.onPaste}
         onSelect={editor.onSelect}
@@ -981,6 +986,7 @@ function Plugin(options = {}) {
     onCopy,
     onCut,
     onDrop,
+    onDragOver,
     onKeyDown,
     onPaste,
     onSelect,

@@ -50,6 +50,7 @@ class Content extends React.Component {
     onCopy: Types.func.isRequired,
     onCut: Types.func.isRequired,
     onDrop: Types.func.isRequired,
+    onDragOver: Types.func.isRequired,
     onFocus: Types.func.isRequired,
     onKeyDown: Types.func.isRequired,
     onPaste: Types.func.isRequired,
@@ -452,11 +453,13 @@ class Content extends React.Component {
       event.preventDefault()
     }
 
-    if (this.tmp.isDragging) return
+    // if (this.tmp.isDragging) return
     this.tmp.isDragging = true
     this.tmp.isInternalDrag = false
 
     debug('onDragOver', { event })
+
+    this.props.onDragOver(event, data)
   }
 
   /**
@@ -492,7 +495,7 @@ class Content extends React.Component {
 
   onDrop = (event) => {
     if (this.props.readOnly) return
-    if (!this.isInEditor(event.target)) return
+    // if (!this.isInEditor(event.target)) return
 
     event.preventDefault()
 
@@ -513,23 +516,23 @@ class Content extends React.Component {
       range.setStart(nativeEvent.rangeParent, nativeEvent.rangeOffset)
     }
 
-    const { startContainer, startOffset } = range
-    const point = getPoint(startContainer, startOffset, state, editor)
-    if (!point) return
+    // const { startContainer, startOffset } = range
+    // const point = getPoint(startContainer, startOffset, state, editor)
+    // if (!point) return
 
-    const target = Selection.create({
-      anchorKey: point.key,
-      anchorOffset: point.offset,
-      focusKey: point.key,
-      focusOffset: point.offset,
-      isFocused: true
-    })
+    // const target = Selection.create({
+    //   anchorKey: point.key,
+    //   anchorOffset: point.offset,
+    //   focusKey: point.key,
+    //   focusOffset: point.offset,
+    //   isFocused: true
+    // })
 
-    // If the target is inside a void node, abort.
-    if (state.document.hasVoidParent(point.key)) return
+    // // If the target is inside a void node, abort.
+    // // if (state.document.hasVoidParent(point.key)) return
 
-    // Add drop-specific information to the data.
-    data.target = target
+    // // Add drop-specific information to the data.
+    // data.target = target
     data.effect = dataTransfer.dropEffect
 
     if (data.type == 'fragment' || data.type == 'node') {
