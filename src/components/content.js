@@ -82,7 +82,7 @@ class Content extends React.Component {
   constructor(props) {
     super(props)
     this.tmp = {}
-    this.tmp.compositions = 0
+    this.tmp.forces = 0
   }
 
   /**
@@ -140,6 +140,7 @@ class Content extends React.Component {
    */
 
   updateSelection = () => {
+    if (this.tmp.isComposing) return;
     const { editor, state } = this.props
     const { document, selection } = state
     const window = getWindow(this.element)
@@ -351,6 +352,9 @@ class Content extends React.Component {
   onCompositionEnd = (event) => {
     if (!this.isInEditor(event.target)) return
     this.tmp.isComposing = false
+    this.tmp.forces++
+    this.forceUpdate()
+
     debug('onCompositionEnd', { event })
   }
 
@@ -825,6 +829,7 @@ class Content extends React.Component {
     return (
       <div
         data-slate-editor
+        key={this.tmp.forces}
         ref={this.ref}
         data-key={document.key}
         contentEditable={!readOnly}
