@@ -140,7 +140,7 @@ class Content extends React.Component {
    */
 
   updateSelection = () => {
-    if (this.tmp.isComposing) return;
+    if (this.tmp.isComposing) return
     const { editor, state } = this.props
     const { document, selection } = state
     const window = getWindow(this.element)
@@ -344,7 +344,9 @@ class Content extends React.Component {
   }
 
   /**
-   * On composition end, remove the `isComposing` flag on the next tick.
+   * On composition end, remove the `isComposing` flag on the next tick. Also
+   * increment the `forces` key, which will force the contenteditable element
+   * to completely re-render, since IME puts React in an unreconcilable state.
    *
    * @param {Event} event
    */
