@@ -1,13 +1,12 @@
 import { findDOMNode } from 'react-dom'
 
 /**
- * Get clipboard html data by capturing the html inserted by the browser's native paste action.
- *
- * To make this work, `preventDefault()` may not be called on the `onPaste` event.
- * If pasted html can be retreived, it is added to the given `data` object, setting the `type` to `html`.
- * As this method is asynchronous, a callback is needed to return the `data` object.
- *
- * Solution adapted from http://stackoverflow.com/a/6804718).
+ * Get clipboard HTML data by capturing the HTML inserted by the browser's
+ * native paste action. To make this work, `preventDefault()` may not be
+ * called on the `onPaste` event. If pasted HTML can be retreived, it is
+ * added to the given `data` object, setting the `type` to `html`. As this
+ * method is asynchronous, a callback is needed to return the `data` object.
+ * This solution was adapted from http://stackoverflow.com/a/6804718.
  *
  * @param {React.Component} component
  * @param {Object} data
@@ -15,26 +14,26 @@ import { findDOMNode } from 'react-dom'
  */
 
 function getHtmlFromNativePaste(component, data, callback) {
-  const contentNode = findDOMNode(component)
+  const el = findDOMNode(component)
 
-  const clipboardNode = contentNode.cloneNode()
-  clipboardNode.setAttribute('class', '')
-  clipboardNode.setAttribute('style', 'position: fixed; left: -9999px')
+  // Clone contentedible element, move out of screen and set focus.
+  const clone = el.cloneNode()
+  clone.setAttribute('class', '')
+  clone.setAttribute('style', 'position: fixed; left: -9999px')
+  el.parentNode.insertBefore(clone, el)
+  clone.focus()
 
-  contentNode.parentNode.insertBefore(clipboardNode, contentNode)
-
-  clipboardNode.focus()
-
-  // Clear call stack to let native paste behaviour occur, then get what was pasted from the DOM
+  // Clear call stack to let native paste behaviour occur on cloned element,
+  // then get what was pasted from the DOM and remove cloned element.
   setTimeout(() => {
-    if (clipboardNode.childElementCount > 0) {
-      // If contains any child nodes, that is the html content
-      const html = clipboardNode.innerHTML
-      clipboardNode.parentNode.removeChild(clipboardNode)
+    if (clone.childElementCount > 0) {
+      // If the node contains any child nodes, that is the HTML content.
+      const html = clone.innerHTML
+      clone.parentNode.removeChild(clone)
 
       callback({ ...data, html, type: 'html' })
     } else {
-      // Only plain text, no html
+      // Only plain text, no HTML.
       callback(data)
     }
   }, 0)

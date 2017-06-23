@@ -18,11 +18,11 @@ const FRAGMENT_MATCHER = / data-slate-fragment="([^\s]+)"/
  */
 
 function getTransferData(transfer) {
-  let fragment = getFragment(transfer)
-  let node = getNode(transfer)
-  const html = getHtml(transfer)
-  const rich = getRichText(transfer)
-  const text = getText(transfer)
+  let fragment = getType(transfer, TYPES.FRAGMENT)
+  let node = getType(transfer, TYPES.NODE)
+  const html = getType(transfer, 'text/html')
+  const rich = getType(transfer, 'text/rtf')
+  const text = getType(transfer, 'text/plain')
   let files
 
   // If there isn't a fragment, but there is HTML, check to see if the HTML is
@@ -81,58 +81,22 @@ function getTransferType(data) {
 }
 
 /**
- * Get fragment from transfers's `data` if possible, otherwise return null
+ * Get one of types `TYPES.FRAGMENT`, `TYPES.NODE`, `text/html`, `text/rtf` or
+ * `text/plain` from transfers's `data` if possible, otherwise return null.
  *
  * @param {Object} transfer
+ * @param {String} type
  * @return {String}
  */
 
-function getFragment(transfer) {
-  return transfer.types && transfer.types.indexOf(TYPES.FRAGMENT) !== -1 ? transfer.getData(TYPES.FRAGMENT) || null : null
-}
+function getType(transfer, type) {
+  if (!transfer.types || !transfer.types.length) {
+    // COMPAT: In IE 11, there is no `types` field but `getData('Text')`
+    // is supported`. (2017/06/23)
+    return type === 'text/plain' ? transfer.getData('Text') || null : null
+  }
 
-/**
- * Get node from transfers's `data` if possible, otherwise return null
- *
- * @param {Object} transfer
- * @return {String}
- */
-
-function getNode(transfer) {
-  return transfer.types && transfer.types.indexOf(TYPES.NODE) !== -1 ? transfer.getData(TYPES.NODE) || null : null
-}
-
-/**
- * Get html from transfers's `data` if possible, otherwise return null
- *
- * @param {Object} transfer
- * @return {String}
- */
-
-function getHtml(transfer) {
-  return transfer.types && transfer.types.length ? transfer.getData('text/html') || null : null
-}
-
-/**
- * Get rich text from transfers's `data` if possible, otherwise return null
- *
- * @param {Object} transfer
- * @return {String}
- */
-
-function getRichText(transfer) {
-  return transfer.types && transfer.types.length ? transfer.getData('text/rtf') || null : null
-}
-
-/**
- * Get text from transfers's `data` if possible, otherwise return null
- *
- * @param {Object} transfer
- * @return {String}
- */
-
-function getText(transfer) {
-  return transfer.types && transfer.types.length ? transfer.getData('text/plain') || null : transfer.getData('Text')
+  return transfer.types.indexOf(type) !== -1 ? transfer.getData(type) || null : null
 }
 
 /**

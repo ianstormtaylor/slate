@@ -710,9 +710,11 @@ class Content extends React.Component {
 
     const data = getTransferData(event.clipboardData)
 
-    const doesNotSupportHtmlFromClipboard = IS_IE // May be extended with IS_EDGE and IS_SAFARI...?
-
-    if (doesNotSupportHtmlFromClipboard) {
+    // COMPAT: In IE 11, only plain text can be retrieved from the event's
+    // `clipboardData`. To get HTML, use the browser's native paste action which
+    // can only be handled synchronously. (2017/06/23)
+    if (IS_IE) {
+      // Do not use `event.preventDefault()` as we need the native paste action.
       getHtmlFromNativePaste(this, data, handleData)
     } else {
       event.preventDefault()
