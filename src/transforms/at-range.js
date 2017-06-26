@@ -220,6 +220,7 @@ Transforms.deleteBackwardAtRange = (transform, range, n = 1, options = {}) => {
   }
   // If the closest is not void, but empty, remove it
   if (block && !block.isVoid && block.isEmpty && document.nodes.size !== 1) {
+    transform.unwrapNodeByKey(block.key)
     transform.removeNodeByKey(block.key, { normalize })
     return
   }
@@ -404,6 +405,7 @@ Transforms.deleteForwardAtRange = (transform, range, n = 1, options = {}) => {
   }
   // If the closest is not void, but empty, remove it
   if (block && !block.isVoid && block.isEmpty && document.nodes.size !== 1) {
+    transform.unwrapNodeByKey(block.key)
     transform.removeNodeByKey(block.key, { normalize })
     return
   }
