@@ -492,7 +492,6 @@ class Content extends React.Component {
 
   onDrop = (event) => {
     if (this.props.readOnly) return
-    if (!this.isInEditor(event.target)) return
 
     event.preventDefault()
 
@@ -525,8 +524,10 @@ class Content extends React.Component {
       isFocused: true
     })
 
-    // If the target is inside a void node, abort.
-    if (state.document.hasVoidParent(point.key)) return
+    // If the target is inside a void node.
+    if (state.document.hasVoidParent(point.key)) {
+      data.isInsideVoid = true
+    }
 
     // Add drop-specific information to the data.
     data.target = target
