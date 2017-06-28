@@ -31,6 +31,25 @@ describe('serializers', () => {
         })
       }
 
+      it('can deserialize an empty string', () => {
+        const html = new Html()
+        const input = ''
+        const serialized = html.deserialize(input, { toRaw: true })
+        assert.deepEqual(serialized, {
+          kind: 'state',
+          document: {
+            kind: 'document',
+            nodes: [
+              {
+                kind: 'block',
+                type: 'paragraph',
+                nodes: []
+              }
+            ]
+          }
+        })
+      })
+
       it('optionally returns a raw representation', () => {
         const html = new Html(require('./fixtures/html/deserialize/block').default)
         const input = fs.readFileSync(resolve(__dirname, './fixtures/html/deserialize/block/input.html'), 'utf8')
