@@ -30,7 +30,7 @@ When the editor needs to resolve a plugin-related handler, it will loop through 
 A plugin should always export a function that takes options. This way even if it doesn't take any options now, it won't be a breaking API change to take more options in the future. So a basic plugin might look like this:
 
 ```js
-export default MySlatePlugin(options) {
+export default function MySlatePlugin(options) {
   return {
     // Return properties that describe your logic here...
   }
@@ -107,7 +107,7 @@ If no other plugin handles this event, it will be handled by the [Core plugin](.
 
 This handler is called when the user drops content into the `contenteditable` element. The event is already prevented by default, so you must define a state change to have any affect occur.
 
-The `data` object is a convenience object created to standardize the drop metadata across browsers. Every data object has a `type` property, can be one of `text`, `html` or `files`, and a `target` property which is a [`Selection`](../models/selection.md) indicating where the drop occured. Depending on the type, it's structure will be:
+The `data` object is a convenience object created to standardize the drop metadata across browsers. Every data object has a `type` property, which can be one of `text`, `html` or `files`, and a `target` property which is a [`Selection`](../models/selection.md) indicating where the drop occurred. Depending on the type, its structure will be:
 
 ```js
 {
@@ -155,11 +155,11 @@ The `data` object contains the `key` which is a string name of the key that was 
 }
 ```
 
-The `isMod` boolean is `true` if the `control` key was pressed on Windows or the `command` key was pressed on Mac _without_ the `alt/option` key also being pressed. This is a convenience for adding hotkeys like `command+b`. 
+The `isMod` boolean is `true` if the `control` key was pressed on Windows or the `command` key was pressed on Mac _without_ the `alt/option` key also being pressed. This is a convenience for adding hotkeys like `command+b`.
 
 The `isModAlt` boolean is `true` if the `control` key was pressed on Windows or the `command` key was pressed on Mac _and_ the `alt/option` key was also being pressed. This is a convenience for secondary hotkeys like `command+option+1`.
 
-The `isLine` and `isWord` booleans represent whether the "line modifier" or "word modifier" hotkeys are pressed when deleteing or moving the cursor. For example, on a Mac `option + right` moves the cursor to the right one word at a time.
+The `isLine` and `isWord` booleans represent whether the "line modifier" or "word modifier" hotkeys are pressed when deleting or moving the cursor. For example, on a Mac `option + right` moves the cursor to the right one word at a time.
 
 Make sure to `event.preventDefault()` (and return `state`) if you do not want the default insertion behavior to occur! If no other plugin handles this event, it will be handled by the [Core plugin](./core.md).
 
