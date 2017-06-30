@@ -1,7 +1,7 @@
 
 # Introduction
 
-[Slate](https://github.com/ianstormtaylor/slate) is a _completely_ customizable framework for building rich text editors. [GitHub ⬈](https://ianstormtaylor.com/slate)
+[Slate](http://slatejs.org) is a _completely_ customizable framework for building rich text editors. [GitHub ⬈](https://github.com/ianstormtaylor/slate)
 
 Slate lets you build rich, intuitive editors like those in [Medium](https://medium.com/), [Dropbox Paper](https://www.dropbox.com/paper) or [Canvas](https://usecanvas.com/)—which are becoming table stakes for applications on the web—without your codebase getting mired in complexity.
 
