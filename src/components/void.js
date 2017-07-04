@@ -34,9 +34,9 @@ class Void extends React.Component {
     block: Types.object,
     children: Types.any.isRequired,
     editor: Types.object.isRequired,
-    readOnly: Types.bool.isRequired,
     node: Types.object.isRequired,
     parent: Types.object.isRequired,
+    readOnly: Types.bool.isRequired,
     schema: Types.object.isRequired,
     state: Types.object.isRequired,
   }
