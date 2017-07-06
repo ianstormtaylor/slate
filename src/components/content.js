@@ -699,26 +699,26 @@ class Content extends React.Component {
     if (this.props.readOnly) return
     if (!this.isInEditor(event.target)) return
 
-    const handleData = (data) => {
-      // Attach the `isShift` flag, so that people can use it to trigger "Paste
-      // and Match Style" logic.
-      data.isShift = !!this.tmp.isShifting
-
-      debug('onPaste', { event, data })
-      this.props.onPaste(event, data)
-    }
-
     const data = getTransferData(event.clipboardData)
+
+    // Attach the `isShift` flag, so that people can use it to trigger "Paste
+    // and Match Style" logic.
+    data.isShift = !!this.tmp.isShifting
+    debug('onPaste', { event, data })
 
     // COMPAT: In IE 11, only plain text can be retrieved from the event's
     // `clipboardData`. To get HTML, use the browser's native paste action which
     // can only be handled synchronously. (2017/06/23)
     if (IS_IE) {
       // Do not use `event.preventDefault()` as we need the native paste action.
-      getHtmlFromNativePaste(this, data, handleData)
+      getHtmlFromNativePaste(event.target, (html) => {
+        // If pasted HTML can be retreived, it is added to the `data` object,
+        // setting the `type` to `html`.
+        this.props.onPaste(event, html === undefined ? data : { ...data, html, type: 'html' })
+      })
     } else {
       event.preventDefault()
-      handleData(data)
+      this.props.onPaste(event, data)
     }
   }
 
