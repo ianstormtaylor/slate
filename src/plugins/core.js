@@ -399,21 +399,21 @@ function Plugin(options = {}) {
       .transform()
       .select(target)
 
-    let hasVoidParent = document.hasVoidParent(target.get('anchorKey'));
+    let hasVoidParent = document.hasVoidParent(target.get('anchorKey'))
 
     // For void targets, we want to find the nearest non-void text node
     if (hasVoidParent) {
-      let node = document.getNode(target.get('anchorKey'));
-    
+      let node = document.getNode(target.get('anchorKey'))
+
       while (hasVoidParent) {
-        node = document.getNextText(node.get('key'));
+        node = document.getNextText(node.get('key'))
 
-        if (!node) break;
+        if (!node) break
 
-        hasVoidParent = document.hasVoidParent(node.get('key'));
+        hasVoidParent = document.hasVoidParent(node.get('key'))
       }
 
-      if (node) transform.collapseToStartOf(node);
+      if (node) transform.collapseToStartOf(node)
     }
 
     text

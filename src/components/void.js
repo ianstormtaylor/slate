@@ -42,7 +42,7 @@ class Void extends React.Component {
 
   /**
    * State
-   * 
+   *
    * @type {Object}
    */
 
@@ -92,40 +92,40 @@ class Void extends React.Component {
   /**
    * Increment counter, and temporarily switch node to editable to allow drop events
    * Counter required as onDragLeave fires when hovering over child elements
-   * 
+   *
    * @param {Event} event
    */
 
   onDragEnter = () => {
     this.setState((prevState) => {
-      const dragCounter = prevState.dragCounter + 1;
-      return { dragCounter, editable: undefined };
+      const dragCounter = prevState.dragCounter + 1
+      return { dragCounter, editable: undefined }
     })
   }
 
   /**
    * Decrement counter, and if counter 0, then no longer dragging over node
    * and thus switch back to non-editable
-   * 
+   *
    * @param {Event} event
    */
 
   onDragLeave = () => {
     this.setState((prevState) => {
-      const dragCounter = prevState.dragCounter + 1;
-      const editable = dragCounter === 0 ? false : undefined;
-      return { dragCounter, editable };
+      const dragCounter = prevState.dragCounter + 1
+      const editable = dragCounter === 0 ? false : undefined
+      return { dragCounter, editable }
     })
   }
 
   /**
    * If dropped item onto node, then reset state
-   * 
+   *
    * @param {Event} event
    */
 
   onDrop = () => {
-    this.setState({ dragCounter: 0, editable: false });
+    this.setState({ dragCounter: 0, editable: false })
   }
 
   /**
