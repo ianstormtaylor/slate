@@ -268,9 +268,9 @@ class Images extends React.Component {
    */
 
   insertImage = (state, target, src) => {
-    let transform = state.transform();
+    const transform = state.transform()
 
-    if (target) transform.select(target);
+    if (target) transform.select(target)
 
     return transform
       .insertBlock({
