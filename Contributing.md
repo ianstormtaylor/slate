@@ -44,7 +44,7 @@ To run the examples, you need to have the Slate repository cloned to your comput
 npm install
 ```
 
-Which will also compile the source files. Then run the tests with:
+Which will also compile the source files (If using Windows, you may need to install [Window-Build-Tools](https://github.com/felixrieseberg/windows-build-tools) to compile the native dependencies). Then run the tests with:
 
 ```
 npm run tests
