@@ -394,9 +394,27 @@ function Plugin(options = {}) {
     debug('onDropText', { data })
 
     const { text, target } = data
+    const { document } = state
     const transform = state
       .transform()
       .select(target)
+
+    let hasVoidParent = document.hasVoidParent(target.get('anchorKey'));
+
+    // For void targets, we want to find the nearest non-void text node
+    if (hasVoidParent) {
+      let node = document.getNode(target.get('anchorKey'));
+    
+      while (hasVoidParent) {
+        node = document.getNextText(node.get('key'));
+
+        if (!node) break;
+
+        hasVoidParent = document.hasVoidParent(node.get('key'));
+      }
+
+      if (node) transform.collapseToStartOf(node);
+    }
 
     text
       .split('\n')
