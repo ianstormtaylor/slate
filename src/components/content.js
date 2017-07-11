@@ -524,7 +524,13 @@ class Content extends React.Component {
 
     // Add drop-specific information to the data.
     data.target = target
-    data.effect = dataTransfer.dropEffect
+
+    // Edge throws "Permission denied" errors when accessing `dropEffect` or `effectAllowed`
+    try {
+      data.effect = dataTransfer.dropEffect
+    } catch(err) {
+      data.effect = null
+    }
 
     if (data.type == 'fragment' || data.type == 'node') {
       data.isInternal = this.tmp.isInternalDrag
