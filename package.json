@@ -106,7 +106,7 @@
     "test": "npm-run-all build:test tests",
     "tests": "mocha --compilers js:babel-core/register ./test/index.js",
     "watch": "npm-run-all --parallel --print-label watch:lib watch:examples start",
-    "watch:lib": "babel --watch --out-dir ./lib ./src",
+    "watch:lib": "babel --watch --out-dir ./lib ./src --source-maps inline",
     "watch:examples": "watchify --debug --transform babelify ./examples/index.js -o ./examples/build.dev.js -v"
   },
   "browserify-global-shim": {
