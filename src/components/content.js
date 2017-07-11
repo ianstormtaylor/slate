@@ -14,6 +14,7 @@ import findClosestNode from '../utils/find-closest-node'
 import findDeepestNode from '../utils/find-deepest-node'
 import getPoint from '../utils/get-point'
 import getTransferData from '../utils/get-transfer-data'
+import setTransferData from '../utils/set-transfer-data'
 import { IS_FIREFOX, IS_MAC } from '../constants/environment'
 
 /**
@@ -473,7 +474,8 @@ class Content extends React.Component {
     const { state } = this.props
     const { fragment } = state
     const encoded = Base64.serializeNode(fragment)
-    dataTransfer.setData(TYPES.FRAGMENT, encoded)
+
+    setTransferData(dataTransfer, TYPES.FRAGMENT, encoded)
 
     debug('onDragStart', { event })
   }
