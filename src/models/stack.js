@@ -135,6 +135,34 @@ class Stack extends new Record(DEFAULTS) {
 
 }
 
+function callEventMethodsOfPlugins(index, method, plugins, state, editor, ...args) {
+  const plugin = plugins[index]
+
+  if (!plugin) return state
+
+  const nextIndex = index + 1
+
+  if (!plugin[method]) {
+    return callEventMethodsOfPlugins(nextIndex, method, plugins, state, editor, ...args)
+  }
+
+  const nextState = plugin[method](...args, state, editor)
+
+  if (nextState == null) {
+    return callEventMethodsOfPlugins(nextIndex, method, plugins, state, editor, ...args)
+  }
+
+  if (nextState.inSequence) {
+    assertState(nextState.state)
+
+    return callEventMethodsOfPlugins(nextIndex, method, plugins, nextState.state, editor, ...args)
+  }
+
+  assertState(nextState)
+
+  return nextState
+}
+
 /**
  * Mix in the event handler methods.
  *
@@ -148,15 +176,7 @@ for (const method of EVENT_HANDLER_METHODS) {
   Stack.prototype[method] = function (state, editor, ...args) {
     debug(method)
 
-    for (const plugin of this.plugins) {
-      if (!plugin[method]) continue
-      const next = plugin[method](...args, state, editor)
-      if (next == null) continue
-      assertState(next)
-      return next
-    }
-
-    return state
+    return callEventMethodsOfPlugins(0, method, this.plugins, state, editor, ...args)
   }
 }
 
