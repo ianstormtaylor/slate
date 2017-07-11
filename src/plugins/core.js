@@ -336,7 +336,6 @@ function Plugin(options = {}) {
     debug('onDrop', { data })
 
     switch (data.type) {
-      case 'node':
       case 'text':
       case 'html':
         return onDropText(e, data, state)
