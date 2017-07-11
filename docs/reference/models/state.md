@@ -33,6 +33,7 @@ For convenience, in addition to transforms, many of the [`Selection`](./selectio
   - [`isExpanded`](#isExpanded)
   - [`isFocused`](#isfocused)
   - [`isForward`](#isForward)
+  - [`isEmpty`](#isEmpty)
 - [Static Methods](#static-methods)
   - [`State.create`](#statecreate)
 - [Methods](#methods)
@@ -153,6 +154,10 @@ Whether the current selection is focused.
 
 Whether the current selection is forward.
 
+### `isEmpty`
+`Boolean`
+
+Whether the current selection is empty.
 
 ## Static Methods
 
