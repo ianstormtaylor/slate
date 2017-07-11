@@ -444,13 +444,7 @@ class Content extends React.Component {
   onDragOver = (event) => {
     if (!this.isInEditor(event.target)) return
 
-    const { dataTransfer } = event.nativeEvent
-    const data = getTransferData(dataTransfer)
-
-    // Prevent default when nodes are dragged to allow dropping.
-    if (data.type == 'node') {
-      event.preventDefault()
-    }
+    event.preventDefault();
 
     if (this.tmp.isDragging) return
     this.tmp.isDragging = true
