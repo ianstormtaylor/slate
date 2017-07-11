@@ -49,14 +49,21 @@ function getTransferData(transfer) {
   // Decode a fragment or node if they exist.
   if (fragment) fragment = Base64.deserializeNode(fragment)
   if (node) node = Base64.deserializeNode(node)
-
-  // Get and normalize files if they exist.
-  if (transfer.items && transfer.items.length) {
-    files = Array.from(transfer.items)
-      .map(item => item.kind == 'file' ? item.getAsFile() : null)
-      .filter(exists => exists)
-  } else if (transfer.files && transfer.files.length) {
-    files = Array.from(transfer.files)
+  
+  // Edge sometimes throws 'NotSupportedError' whena accessing `transfer.items`
+  try {
+    // Get and normalize files if they exist.
+    if (transfer.items && transfer.items.length) {
+      files = Array.from(transfer.items)
+        .map(item => item.kind == 'file' ? item.getAsFile() : null)
+        .filter(exists => exists)
+    } else if (transfer.files && transfer.files.length) {
+      files = Array.from(transfer.files)
+    }
+  } catch (err) {
+    if (transfer.files && transfer.files.length) {
+      files = Array.from(transfer.files)
+    }
   }
 
   // Determine the type of the data.
