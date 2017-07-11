@@ -341,7 +341,47 @@ function Plugin(options = {}) {
         return onDropText(e, data, state)
       case 'fragment':
         return onDropFragment(e, data, state)
+      case 'node':
+        return onDropNode(e, data, state)
     }
+  }
+
+  /**
+   * On drop node, insert the node wherever it is dropped.
+   *
+   * @param {Event} e
+   * @param {Object} data
+   * @param {State} state
+   * @return {State}
+   */
+
+  function onDropNode(e, data, state) {
+    debug('onDropNode', { data })
+
+    const { selection } = state
+    let { node, target, isInternal } = data
+
+    // If the drag is internal and the target is after the selection, it
+    // needs to account for the selection's content being deleted.
+    if (
+      isInternal &&
+      selection.endKey == target.endKey &&
+      selection.endOffset < target.endOffset
+    ) {
+      target = target.move(selection.startKey == selection.endKey
+        ? 0 - selection.endOffset - selection.startOffset
+        : 0 - selection.endOffset)
+    }
+
+    const transform = state.transform()
+
+    if (isInternal) transform.delete()
+
+    return transform
+      .select(target)
+      .insertBlock(node)
+      .removeNodeByKey(node.key)
+      .apply()
   }
 
   /**
