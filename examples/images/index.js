@@ -161,7 +161,7 @@ class Images extends React.Component {
     const src = window.prompt('Enter the URL of the image:')
     if (!src) return
     let { state } = this.state
-    state = this.insertImage(state, src)
+    state = this.insertImage(state, null, src)
     this.onChange(state)
   }
 
@@ -219,7 +219,7 @@ class Images extends React.Component {
 
       reader.addEventListener('load', () => {
         state = editor.getState()
-        state = this.insertImage(state, reader.result)
+        state = this.insertImage(state, data.target, reader.result)
         editor.onChange(state)
       })
 
@@ -256,7 +256,7 @@ class Images extends React.Component {
   onPasteText = (e, data, state) => {
     if (!isUrl(data.text)) return
     if (!isImage(data.text)) return
-    return this.insertImage(state, data.text)
+    return this.insertImage(state, data.target, data.text)
   }
 
   /**
@@ -267,9 +267,12 @@ class Images extends React.Component {
    * @return {State}
    */
 
-  insertImage = (state, src) => {
-    return state
-      .transform()
+  insertImage = (state, target, src) => {
+    const transform = state.transform()
+
+    if (target) transform.select(target)
+
+    return transform
       .insertBlock({
         type: 'image',
         isVoid: true,
