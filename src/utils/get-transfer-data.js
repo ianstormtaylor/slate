@@ -39,8 +39,8 @@ function getTransferData(transfer) {
 
   // Handle embedded types in text (Edge doesn't handle custom data types)
   if (text) {
-    let embeddedTypes = getEmbeddedTypes(text)
-    
+    const embeddedTypes = getEmbeddedTypes(text)
+
     if (embeddedTypes[TYPES.FRAGMENT]) fragment = embeddedTypes[TYPES.FRAGMENT]
     if (embeddedTypes[TYPES.NODE]) node = embeddedTypes[TYPES.NODE]
     if (embeddedTypes['text/plain']) text = embeddedTypes['text/plain']
@@ -49,7 +49,7 @@ function getTransferData(transfer) {
   // Decode a fragment or node if they exist.
   if (fragment) fragment = Base64.deserializeNode(fragment)
   if (node) node = Base64.deserializeNode(node)
-  
+
   // Edge sometimes throws 'NotSupportedError' whena accessing `transfer.items`
   try {
     // Get and normalize files if they exist.
@@ -75,7 +75,7 @@ function getTransferData(transfer) {
 /**
  * Takes text input, checks whether contains embedded data
  * and returns object with original text +/- additional data
- * 
+ *
  * @param {String} text
  * @return {Object}
  */

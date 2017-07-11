@@ -445,7 +445,7 @@ class Content extends React.Component {
   onDragOver = (event) => {
     if (!this.isInEditor(event.target)) return
 
-    event.preventDefault();
+    event.preventDefault()
 
     if (this.tmp.isDragging) return
     this.tmp.isDragging = true
@@ -530,7 +530,7 @@ class Content extends React.Component {
     // Edge throws "Permission denied" errors when accessing `dropEffect` or `effectAllowed`
     try {
       data.effect = dataTransfer.dropEffect
-    } catch(err) {
+    } catch (err) {
       data.effect = null
     }
 

@@ -2,7 +2,7 @@
  * Set data on dataTransfer
  * In Edge, custom types throw errors, so embed all non-standard types
  * in text/plain compound object.
- * 
+ *
  * @param {DataTransfer} dataTransfer
  * @param {String} type
  * @param {String} content
@@ -14,7 +14,7 @@ function setTransferData(dataTransfer, type, content) {
   } catch (err) {
     const prefix = 'SLATE-DATA-EMBED::'
     let obj = {}
-    let text = dataTransfer.getData('text/plain')
+    const text = dataTransfer.getData('text/plain')
 
     // If prefixed, assume embedded drag data
     if (text.substring(0, prefix.length) === prefix) {
