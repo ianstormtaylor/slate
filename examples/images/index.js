@@ -178,27 +178,7 @@ class Images extends React.Component {
   onDrop = (e, data, state, editor) => {
     switch (data.type) {
       case 'files': return this.onDropOrPasteFiles(e, data, state, editor)
-      case 'node': return this.onDropNode(e, data, state)
     }
-  }
-
-  /**
-   * On drop node, insert the node wherever it is dropped.
-   *
-   * @param {Event} e
-   * @param {Object} data
-   * @param {State} state
-   * @return {State}
-   */
-
-  onDropNode = (e, data, state) => {
-    return state
-      .transform()
-      .deselect()
-      .removeNodeByKey(data.node.key)
-      .select(data.target)
-      .insertBlock(data.node)
-      .apply()
   }
 
   /**
