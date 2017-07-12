@@ -14,6 +14,7 @@ import findClosestNode from '../utils/find-closest-node'
 import findDeepestNode from '../utils/find-deepest-node'
 import getPoint from '../utils/get-point'
 import getTransferData from '../utils/get-transfer-data'
+import setTransferData from '../utils/set-transfer-data'
 import { IS_FIREFOX, IS_MAC } from '../constants/environment'
 
 /**
@@ -444,13 +445,7 @@ class Content extends React.Component {
   onDragOver = (event) => {
     if (!this.isInEditor(event.target)) return
 
-    const { dataTransfer } = event.nativeEvent
-    const data = getTransferData(dataTransfer)
-
-    // Prevent default when nodes are dragged to allow dropping.
-    if (data.type == 'node') {
-      event.preventDefault()
-    }
+    event.preventDefault()
 
     if (this.tmp.isDragging) return
     this.tmp.isDragging = true
@@ -479,7 +474,8 @@ class Content extends React.Component {
     const { state } = this.props
     const { fragment } = state
     const encoded = Base64.serializeNode(fragment)
-    dataTransfer.setData(TYPES.FRAGMENT, encoded)
+
+    setTransferData(dataTransfer, TYPES.FRAGMENT, encoded)
 
     debug('onDragStart', { event })
   }
@@ -530,7 +526,14 @@ class Content extends React.Component {
 
     // Add drop-specific information to the data.
     data.target = target
-    data.effect = dataTransfer.dropEffect
+
+    // COMPAT: Edge throws "Permission denied" errors when
+    // accessing `dropEffect` or `effectAllowed` (2017/7/12)
+    try {
+      data.effect = dataTransfer.dropEffect
+    } catch (err) {
+      data.effect = null
+    }
 
     if (data.type == 'fragment' || data.type == 'node') {
       data.isInternal = this.tmp.isInternalDrag

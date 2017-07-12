@@ -22,7 +22,7 @@ function getTransferData(transfer) {
   let node = transfer.getData(TYPES.NODE) || null
   const html = transfer.getData('text/html') || null
   const rich = transfer.getData('text/rtf') || null
-  const text = transfer.getData('text/plain') || null
+  let text = transfer.getData('text/plain') || null
   let files
 
   // If there isn't a fragment, but there is HTML, check to see if the HTML is
@@ -37,23 +37,65 @@ function getTransferData(transfer) {
     if (encoded) fragment = encoded
   }
 
+  // COMPAT: Edge doesn't handle custom data types
+  // These will be embedded in text/plain in this case (2017/7/12)
+  if (text) {
+    const embeddedTypes = getEmbeddedTypes(text)
+
+    if (embeddedTypes[TYPES.FRAGMENT]) fragment = embeddedTypes[TYPES.FRAGMENT]
+    if (embeddedTypes[TYPES.NODE]) node = embeddedTypes[TYPES.NODE]
+    if (embeddedTypes['text/plain']) text = embeddedTypes['text/plain']
+  }
+
   // Decode a fragment or node if they exist.
   if (fragment) fragment = Base64.deserializeNode(fragment)
   if (node) node = Base64.deserializeNode(node)
 
-  // Get and normalize files if they exist.
-  if (transfer.items && transfer.items.length) {
-    files = Array.from(transfer.items)
-      .map(item => item.kind == 'file' ? item.getAsFile() : null)
-      .filter(exists => exists)
-  } else if (transfer.files && transfer.files.length) {
-    files = Array.from(transfer.files)
+  // COMPAT: Edge sometimes throws 'NotSupportedError'
+  // when accessing `transfer.items` (2017/7/12)
+  try {
+    // Get and normalize files if they exist.
+    if (transfer.items && transfer.items.length) {
+      files = Array.from(transfer.items)
+        .map(item => item.kind == 'file' ? item.getAsFile() : null)
+        .filter(exists => exists)
+    } else if (transfer.files && transfer.files.length) {
+      files = Array.from(transfer.files)
+    }
+  } catch (err) {
+    if (transfer.files && transfer.files.length) {
+      files = Array.from(transfer.files)
+    }
   }
 
   // Determine the type of the data.
   const data = { files, fragment, html, node, rich, text }
   data.type = getTransferType(data)
   return data
+}
+
+/**
+ * Takes text input, checks whether contains embedded data
+ * and returns object with original text +/- additional data
+ *
+ * @param {String} text
+ * @return {Object}
+ */
+
+function getEmbeddedTypes(text) {
+  const prefix = 'SLATE-DATA-EMBED::'
+
+  if (text.substring(0, prefix.length) !== prefix) {
+    return { 'text/plain': text }
+  }
+
+  // Attempt to parse, if fails then just standard text/plain
+  // Otherwise, already had data embedded
+  try {
+    return JSON.parse(text.substring(prefix.length))
+  } catch (err) {
+    throw new Error('Unable to parse custom embedded drag data')
+  }
 }
 
 /**

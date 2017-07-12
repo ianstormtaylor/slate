@@ -10,6 +10,7 @@ import Leaf from './leaf'
 import Void from './void'
 import getWindow from 'get-window'
 import scrollToSelection from '../utils/scroll-to-selection'
+import setTransferData from '../utils/set-transfer-data'
 
 /**
  * Debug.
@@ -218,8 +219,9 @@ class Node extends React.Component {
     }
 
     const encoded = Base64.serializeNode(node, { preserveKeys: true })
-    const data = e.nativeEvent.dataTransfer
-    data.setData(TYPES.NODE, encoded)
+    const { dataTransfer } = e.nativeEvent
+
+    setTransferData(dataTransfer, TYPES.NODE, encoded)
 
     this.debug('onDragStart', e)
   }
