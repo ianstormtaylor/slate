@@ -521,9 +521,6 @@ class Content extends React.Component {
       isFocused: true
     })
 
-    // If the target is inside a void node, abort.
-    if (state.document.hasVoidParent(point.key)) return
-
     // Add drop-specific information to the data.
     data.target = target
 

@@ -434,9 +434,25 @@ function Plugin(options = {}) {
     debug('onDropText', { data })
 
     const { text, target } = data
+    const { document } = state
     const transform = state
       .transform()
       .select(target)
+
+    let hasVoidParent = document.hasVoidParent(target.anchorKey)
+
+    // Insert text into nearest text node
+    if (hasVoidParent) {
+      let node = document.getNode(target.anchorKey)
+
+      while (hasVoidParent) {
+        node = document.getNextText(node.key)
+        if (!node) break
+        hasVoidParent = document.hasVoidParent(node.key)
+      }
+
+      if (node) transform.collapseToStartOf(node)
+    }
 
     text
       .split('\n')
