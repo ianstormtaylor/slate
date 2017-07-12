@@ -527,7 +527,8 @@ class Content extends React.Component {
     // Add drop-specific information to the data.
     data.target = target
 
-    // Edge throws "Permission denied" errors when accessing `dropEffect` or `effectAllowed`
+    // COMPAT: Edge throws "Permission denied" errors when
+    // accessing `dropEffect` or `effectAllowed` (2017/7/12)
     try {
       data.effect = dataTransfer.dropEffect
     } catch (err) {

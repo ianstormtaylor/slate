@@ -1,7 +1,7 @@
 /**
  * Set data on dataTransfer
- * In Edge, custom types throw errors, so embed all non-standard types
- * in text/plain compound object.
+ * COMPAT: In Edge, custom types throw errors, so embed all non-standard
+ * types in text/plain compound object. (2017/7/12)
  *
  * @param {DataTransfer} dataTransfer
  * @param {String} type

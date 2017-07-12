@@ -37,7 +37,8 @@ function getTransferData(transfer) {
     if (encoded) fragment = encoded
   }
 
-  // Handle embedded types in text (Edge doesn't handle custom data types)
+  // COMPAT: Edge doesn't handle custom data types
+  // These will be embedded in text/plain in this case (2017/7/12)
   if (text) {
     const embeddedTypes = getEmbeddedTypes(text)
 
@@ -50,7 +51,8 @@ function getTransferData(transfer) {
   if (fragment) fragment = Base64.deserializeNode(fragment)
   if (node) node = Base64.deserializeNode(node)
 
-  // Edge sometimes throws 'NotSupportedError' whena accessing `transfer.items`
+  // COMPAT: Edge sometimes throws 'NotSupportedError'
+  // when accessing `transfer.items` (2017/7/12)
   try {
     // Get and normalize files if they exist.
     if (transfer.items && transfer.items.length) {
@@ -91,7 +93,7 @@ function getEmbeddedTypes(text) {
   // Otherwise, already had data embedded
   try {
     return JSON.parse(text.substring(prefix.length))
-  } catch (err2) {
+  } catch (err) {
     throw new Error('Unable to parse custom embedded drag data')
   }
 }
