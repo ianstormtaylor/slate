@@ -904,7 +904,8 @@ const Node = {
     return this
       .getCharactersAtRange(range)
       .reduce((memo, char) => {
-        return memo.concat(char.marks.toArray())
+        char.marks.toArray().forEach(c => memo.push(c))
+        return memo
       }, [])
   },
 

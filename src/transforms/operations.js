@@ -286,6 +286,36 @@ Transforms.removeTextOperation = (transform, path, offset, length) => {
 }
 
 /**
+ * Merge `properties` into state `data`.
+ *
+ * @param {Transform} transform
+ * @param {Object} properties
+ */
+
+Transforms.setDataOperation = (transform, properties) => {
+  const { state } = transform
+  const { data } = state
+  const inverseProps = {}
+
+  for (const k in properties) {
+    inverseProps[k] = data[k]
+  }
+
+  const inverse = [{
+    type: 'set_data',
+    properties: inverseProps
+  }]
+
+  const operation = {
+    type: 'set_data',
+    properties,
+    inverse,
+  }
+
+  transform.applyOperation(operation)
+}
+
+/**
  * Set `properties` on mark on text at `offset` and `length` in node by `path`.
  *
  * @param {Transform} transform

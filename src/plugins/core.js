@@ -324,7 +324,46 @@ function Plugin(options = {}) {
         return onDropText(e, data, transform)
       case 'fragment':
         return onDropFragment(e, data, transform)
+      case 'node':
+        return onDropNode(e, data, transform)
     }
+  }
+
+  /**
+   * On drop node, insert the node wherever it is dropped.
+   *
+   * @param {Event} e
+   * @param {Object} data
+   * @param {Transform} transform
+   */
+
+  function onDropNode(e, data, transform) {
+    debug('onDropNode', { data })
+
+    const { state } = transform
+    const { selection } = state
+    let { node, target, isInternal } = data
+
+    // If the drag is internal and the target is after the selection, it
+    // needs to account for the selection's content being deleted.
+    if (
+      isInternal &&
+      selection.endKey == target.endKey &&
+      selection.endOffset < target.endOffset
+    ) {
+      target = target.move(selection.startKey == selection.endKey
+        ? 0 - selection.endOffset - selection.startOffset
+        : 0 - selection.endOffset)
+    }
+
+    if (isInternal) {
+      transform.delete()
+    }
+
+    return transform
+      .select(target)
+      .insertBlock(node)
+      .removeNodeByKey(node.key)
   }
 
   /**
@@ -373,11 +412,35 @@ function Plugin(options = {}) {
 
   function onDropText(e, data, transform) {
     debug('onDropText', { data })
-    transform.select(data.target)
-    data.text.split('\n').forEach((line, i) => {
-      if (i > 0) transform.splitBlock()
-      transform.insertText(line)
-    })
+
+    const { state } = transform
+    const { document } = state
+    const { text, target } = data
+    const { anchorKey } = target
+
+    transform.select(target)
+
+    let hasVoidParent = document.hasVoidParent(anchorKey)
+
+    // Insert text into nearest text node
+    if (hasVoidParent) {
+      let node = document.getNode(anchorKey)
+
+      while (hasVoidParent) {
+        node = document.getNextText(node.key)
+        if (!node) break
+        hasVoidParent = document.hasVoidParent(node.key)
+      }
+
+      if (node) transform.collapseToStartOf(node)
+    }
+
+    text
+      .split('\n')
+      .forEach((line, i) => {
+        if (i > 0) transform.splitBlock()
+        transform.insertText(line)
+      })
   }
 
   /**
