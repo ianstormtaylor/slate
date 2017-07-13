@@ -1,6 +1,6 @@
 
 import Base64 from '../serializers/base-64'
-import TYPES from '../constants/types'
+import TRANSFER_TRANSFER_TYPES from '../constants/transfer-types'
 
 /**
  * Fragment matching regexp for HTML nodes.
@@ -18,8 +18,8 @@ const FRAGMENT_MATCHER = / data-slate-fragment="([^\s]+)"/
  */
 
 function getTransferData(transfer) {
-  let fragment = transfer.getData(TYPES.FRAGMENT) || null
-  let node = transfer.getData(TYPES.NODE) || null
+  let fragment = transfer.getData(TRANSFER_TYPES.FRAGMENT) || null
+  let node = transfer.getData(TRANSFER_TYPES.NODE) || null
   const html = transfer.getData('text/html') || null
   const rich = transfer.getData('text/rtf') || null
   let text = transfer.getData('text/plain') || null
@@ -42,8 +42,8 @@ function getTransferData(transfer) {
   if (text) {
     const embeddedTypes = getEmbeddedTypes(text)
 
-    if (embeddedTypes[TYPES.FRAGMENT]) fragment = embeddedTypes[TYPES.FRAGMENT]
-    if (embeddedTypes[TYPES.NODE]) node = embeddedTypes[TYPES.NODE]
+    if (embeddedTypes[TRANSFER_TYPES.FRAGMENT]) fragment = embeddedTypes[TRANSFER_TYPES.FRAGMENT]
+    if (embeddedTypes[TRANSFER_TYPES.NODE]) node = embeddedTypes[TRANSFER_TYPES.NODE]
     if (embeddedTypes['text/plain']) text = embeddedTypes['text/plain']
   }
 
