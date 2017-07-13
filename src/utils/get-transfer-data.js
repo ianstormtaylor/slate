@@ -1,6 +1,6 @@
 
 import Base64 from '../serializers/base-64'
-import TRANSFER_TRANSFER_TYPES from '../constants/transfer-types'
+import TRANSFER_TYPES from '../constants/transfer-types'
 
 /**
  * Fragment matching regexp for HTML nodes.

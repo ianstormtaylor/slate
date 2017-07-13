@@ -1,6 +1,7 @@
 
 import Data from './data'
 import memoize from '../utils/memoize'
+import TYPES from './types'
 import { Map, Record, Set } from 'immutable'
 
 /**
@@ -11,7 +12,8 @@ import { Map, Record, Set } from 'immutable'
 
 const DEFAULTS = {
   data: new Map(),
-  type: null
+  type: null,
+  [TYPES.IS_SLATE_MARK]: true,
 }
 
 /**
@@ -30,9 +32,10 @@ class Mark extends new Record(DEFAULTS) {
    */
 
   static create(properties = {}) {
-    if (properties instanceof Mark) return properties
+    if (properties[TYPES.IS_SLATE_MARK]) return properties
     if (!properties.type) throw new Error('You must provide a `type` for the mark.')
     properties.data = Data.create(properties.data)
+    properties[TYPES.IS_SLATE_MARK] = true
     return new Mark(properties)
   }
 

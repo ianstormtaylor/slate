@@ -10,10 +10,11 @@ import './inline'
  * Dependencies.
  */
 
+
 import Data from './data'
-import Inline from './inline'
 import Node from './node'
 import Text from './text'
+import TYPES from './types'
 import generateKey from '../utils/generate-key'
 import { Map, List, Record } from 'immutable'
 
@@ -28,7 +29,8 @@ const DEFAULTS = {
   isVoid: false,
   key: null,
   nodes: new List(),
-  type: null
+  type: null,
+  [TYPES.IS_SLATE_BLOCK]: true
 }
 
 /**
@@ -47,15 +49,16 @@ class Block extends new Record(DEFAULTS) {
    */
 
   static create(properties = {}) {
-    if (properties instanceof Block) return properties
-    if (properties instanceof Inline) return properties
-    if (properties instanceof Text) return properties
-    if (!properties.type) throw new Error('You must pass a block `type`.')
+    if (properties[TYPES.IS_SLATE_BLOCK]) return properties
+    if (properties[TYPES.IS_SLATE_INLINE]) return properties
+    if (properties[TYPES.IS_SLATE_TEXT]) return properties
+    if (!properties.type) { throw new Error('You must pass a block `type`.') }
 
     properties.key = properties.key || generateKey()
     properties.data = Data.create(properties.data)
     properties.isVoid = !!properties.isVoid
     properties.nodes = Block.createList(properties.nodes)
+    properties[TYPES.IS_SLATE_BLOCK] = true
 
     if (properties.nodes.size == 0) {
       properties.nodes = properties.nodes.push(Text.create())
@@ -125,7 +128,6 @@ class Block extends new Record(DEFAULTS) {
 for (const method in Node) {
   Block.prototype[method] = Node[method]
 }
-
 
 /**
  * Export.

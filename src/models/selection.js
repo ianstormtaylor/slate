@@ -1,5 +1,6 @@
 
 import warn from '../utils/warn'
+import TYPES from './types'
 import { Record } from 'immutable'
 
 /**
@@ -16,6 +17,7 @@ const DEFAULTS = {
   isBackward: null,
   isFocused: false,
   marks: null,
+  [TYPES.IS_SLATE_SELECTION]: true
 }
 
 /**
@@ -34,7 +36,8 @@ class Selection extends new Record(DEFAULTS) {
    */
 
   static create(properties = {}) {
-    if (properties instanceof Selection) return properties
+    if (properties[TYPES.IS_SLATE_SELECTION]) return properties
+    properties[TYPES.IS_SLATE_SELECTION] = true
     return new Selection(properties)
   }
 

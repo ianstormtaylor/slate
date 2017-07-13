@@ -13,6 +13,7 @@ import './inline'
 import Data from './data'
 import Block from './block'
 import Node from './node'
+import TYPES from './types'
 import generateKey from '../utils/generate-key'
 import { List, Map, Record } from 'immutable'
 
@@ -26,6 +27,7 @@ const DEFAULTS = {
   data: new Map(),
   key: null,
   nodes: new List(),
+  [TYPES.IS_SLATE_DOCUMENT]: true
 }
 
 /**
@@ -44,11 +46,12 @@ class Document extends new Record(DEFAULTS) {
    */
 
   static create(properties = {}) {
-    if (properties instanceof Document) return properties
+    if (properties[TYPES.IS_SLATE_DOCUMENT]) return properties
 
     properties.key = properties.key || generateKey()
     properties.data = Data.create(properties.data)
     properties.nodes = Block.createList(properties.nodes)
+    properties[TYPES.IS_SLATE_DOCUMENT] = true
 
     return new Document(properties)
   }

@@ -4,6 +4,7 @@ import Document from './document'
 import SCHEMA from '../schemas/core'
 import Selection from './selection'
 import Transform from './transform'
+import TYPES from './types'
 import { Record, Set, Stack, List, Map } from 'immutable'
 
 /**
@@ -28,7 +29,8 @@ const DEFAULTS = {
   selection: new Selection(),
   history: new History(),
   data: new Map(),
-  isNative: false
+  isNative: false,
+  [TYPES.IS_SLATE_STATE]: true,
 }
 
 /**
@@ -49,7 +51,7 @@ class State extends new Record(DEFAULTS) {
    */
 
   static create(properties = {}, options = {}) {
-    if (properties instanceof State) return properties
+    if (properties[TYPES.IS_SLATE_STATE]) return properties
 
     const document = Document.create(properties.document)
     let selection = Selection.create(properties.selection)
@@ -70,7 +72,7 @@ class State extends new Record(DEFAULTS) {
     // Then add data provided in `properties`.
     if (properties.data) data = data.merge(properties.data)
 
-    const state = new State({ document, selection, data })
+    const state = new State({ document, selection, data, [TYPES.IS_SLATE_STATE]: true })
 
     return options.normalize === false
       ? state

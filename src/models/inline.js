@@ -10,10 +10,10 @@ import './document'
  * Dependencies.
  */
 
-import Block from './block'
 import Data from './data'
 import Node from './node'
 import Text from './text'
+import TYPES from './types'
 import generateKey from '../utils/generate-key'
 import { List, Map, Record } from 'immutable'
 
@@ -28,7 +28,8 @@ const DEFAULTS = {
   isVoid: false,
   key: null,
   nodes: new List(),
-  type: null
+  type: null,
+  [TYPES.IS_SLATE_INLINE]: true
 }
 
 /**
@@ -47,15 +48,16 @@ class Inline extends new Record(DEFAULTS) {
    */
 
   static create(properties = {}) {
-    if (properties instanceof Block) return properties
-    if (properties instanceof Inline) return properties
-    if (properties instanceof Text) return properties
+    if (properties[TYPES.IS_SLATE_BLOCK]) return properties
+    if (properties[TYPES.IS_SLATE_INLINE]) return properties
+    if (properties[TYPES.IS_SLATE_TEXT]) return properties
     if (!properties.type) throw new Error('You must pass an inline `type`.')
 
     properties.key = properties.key || generateKey()
     properties.data = Data.create(properties.data)
     properties.isVoid = !!properties.isVoid
     properties.nodes = Inline.createList(properties.nodes)
+    properties[TYPES.IS_SLATE_INLINE] = true
 
     if (properties.nodes.size == 0) {
       properties.nodes = properties.nodes.push(Text.create())

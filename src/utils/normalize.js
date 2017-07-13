@@ -1,13 +1,13 @@
 
 import Block from '../models/block'
-import Document from '../models/document'
 import Inline from '../models/inline'
 import Data from '../models/data'
 import Mark from '../models/mark'
 import Selection from '../models/selection'
-import Text from '../models/text'
+import TYPES from '../models/types'
 import warn from './warn'
 import typeOf from 'type-of'
+
 
 /**
  * Normalize a block argument `value`.
@@ -17,7 +17,7 @@ import typeOf from 'type-of'
  */
 
 function block(value) {
-  if (value instanceof Block) return value
+  if (value[TYPES.IS_SLATE_BLOCK]) return value
 
   switch (typeOf(value)) {
     case 'string':
@@ -37,7 +37,7 @@ function block(value) {
  */
 
 function inline(value) {
-  if (value instanceof Inline) return value
+  if (value[TYPES.IS_SLATE_INLINE]) return value
 
   switch (typeOf(value)) {
     case 'string':
@@ -60,10 +60,10 @@ function key(value) {
   if (typeOf(value) == 'string') return value
 
   warn('An object was passed to a Node method instead of a `key` string. This was previously supported, but is being deprecated because it can have a negative impact on performance. The object in question was:', value)
-  if (value instanceof Block) return value.key
-  if (value instanceof Document) return value.key
-  if (value instanceof Inline) return value.key
-  if (value instanceof Text) return value.key
+  if (value[TYPES.IS_SLATE_BLOCK]) return value.key
+  if (value[TYPES.IS_SLATE_DOCUMENT]) return value.key
+  if (value[TYPES.IS_SLATE_INLINE]) return value.key
+  if (value[TYPES.IS_SLATE_TEXT]) return value.key
 
   throw new Error(`Invalid \`key\` argument! It must be either a block, an inline, a text, or a string. You passed: "${value}".`)
 }
@@ -76,7 +76,7 @@ function key(value) {
  */
 
 function mark(value) {
-  if (value instanceof Mark) return value
+  if (value[TYPES.IS_SLATE_MARK]) return value
 
   switch (typeOf(value)) {
     case 'string':
@@ -161,7 +161,7 @@ function nodeProperties(value = {}) {
  */
 
 function selection(value) {
-  if (value instanceof Selection) return value
+  if (value[TYPES.IS_SLATE_SELECTION]) return value
 
   switch (typeOf(value)) {
     case 'object':

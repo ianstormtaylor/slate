@@ -2,6 +2,7 @@
 import Character from './character'
 import Mark from './mark'
 import Range from './range'
+import TYPES from './types'
 import memoize from '../utils/memoize'
 import generateKey from '../utils/generate-key'
 import { List, Record, OrderedSet, Set, is } from 'immutable'
@@ -14,7 +15,8 @@ import { List, Record, OrderedSet, Set, is } from 'immutable'
 
 const DEFAULTS = {
   characters: new List(),
-  key: null
+  key: null,
+  [TYPES.IS_SLATE_TEXT]: true,
 }
 
 /**
@@ -33,9 +35,10 @@ class Text extends new Record(DEFAULTS) {
    */
 
   static create(properties = {}) {
-    if (properties instanceof Text) return properties
+    if (properties[TYPES.IS_SLATE_TEXT]) return properties
     properties.key = properties.key || generateKey()
     properties.characters = Character.createList(properties.characters)
+    properties[TYPES.IS_SLATE_TEXT] = true
     return new Text(properties)
   }
 

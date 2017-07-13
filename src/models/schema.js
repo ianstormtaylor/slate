@@ -2,6 +2,7 @@
 import React from 'react'
 import isReactComponent from '../utils/is-react-component'
 import typeOf from 'type-of'
+import TYPES from './types'
 import { Record } from 'immutable'
 
 /**
@@ -12,6 +13,7 @@ import { Record } from 'immutable'
 
 const DEFAULTS = {
   rules: [],
+  [TYPES.IS_SLATE_SCHEMA]: true
 }
 
 /**
@@ -30,7 +32,7 @@ class Schema extends new Record(DEFAULTS) {
    */
 
   static create(properties = {}) {
-    if (properties instanceof Schema) return properties
+    if (properties[TYPES.IS_SLATE_SCHEMA]) return properties
     return new Schema(normalizeProperties(properties))
   }
 
@@ -157,7 +159,7 @@ function normalizeProperties(properties) {
     rules = rules.concat(array)
   }
 
-  return { rules }
+  return { rules, [TYPES.IS_SLATE_SCHEMA]: true }
 }
 
 /**

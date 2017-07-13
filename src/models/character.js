@@ -1,5 +1,6 @@
 
 import Mark from './mark'
+import TYPES from './types'
 import { List, Record, Set } from 'immutable'
 
 /**
@@ -10,7 +11,8 @@ import { List, Record, Set } from 'immutable'
 
 const DEFAULTS = {
   marks: new Set(),
-  text: ''
+  text: '',
+  [TYPES.IS_SLATE_CHARACTER]: true
 }
 
 /**
@@ -29,8 +31,9 @@ class Character extends new Record(DEFAULTS) {
    */
 
   static create(properties = {}) {
-    if (properties instanceof Character) return properties
+    if (properties[TYPES.IS_SLATE_CHARACTER]) return properties
     properties.marks = Mark.createSet(properties.marks)
+    properties[TYPES.IS_SLATE_CHARACTER] = true
     return new Character(properties)
   }
 
