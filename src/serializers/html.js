@@ -2,7 +2,7 @@
 import Raw from './raw'
 import React from 'react'
 import ReactDOMServer from 'react-dom/server'
-import cheerio from 'cheerio'
+import parse5 from 'parse5'
 import typeOf from 'type-of'
 import { Record } from 'immutable'
 
@@ -94,8 +94,7 @@ class Html {
    */
 
   deserialize = (html, options = {}) => {
-    const $ = cheerio.load(html).root()
-    const children = $.children().toArray()
+    const children = parse5.parseFragment(html).childNodes
     let nodes = this.deserializeElements(children)
 
     const { defaultBlockType } = this
@@ -151,7 +150,7 @@ class Html {
   }
 
   /**
-   * Deserialize an array of Cheerio `elements`.
+   * Deserialize an array of DOM elements.
    *
    * @param {Array} elements
    * @return {Array}
@@ -160,7 +159,7 @@ class Html {
   deserializeElements = (elements = []) => {
     let nodes = []
 
-    elements.forEach((element) => {
+    elements.map(this.convertElementFormat).filter(e => e).forEach((element) => {
       const node = this.deserializeElement(element)
       switch (typeOf(node)) {
         case 'array':
@@ -176,7 +175,7 @@ class Html {
   }
 
   /**
-   * Deserialize a Cheerio `element`.
+   * Deserialize a DOM element.
    *
    * @param {Object} element
    * @return {Any}
@@ -334,6 +333,47 @@ class Html {
       if (!rule.serialize) continue
       const ret = rule.serialize(string, string.text)
       if (ret) return ret
+    }
+  }
+
+  /**
+   * Convert a DOM element to match expected (cheerio) syntax.
+   *
+   * @param {Object} element
+   * @return {Object}
+   */
+
+  convertElementFormat = (element) => {
+    if (element.nodeName === '#text') {
+      if (element.value === '\n') {
+        // Remove cruft node inserted by parse5
+        return null
+      } else {
+        // Return text node mapped to expected format
+        return {
+          type: 'text',
+          data: element.value,
+          next: null,
+          prev: null,
+          parent: element.parentNode
+        }
+      }
+    } else {
+      // Move children to correct attr
+      element.children = element.childNodes
+      delete element.childNodes
+
+      // Convert attrs from array to object
+      if (Array.isArray(element.attrs)) {
+        const convertedAttrs = {}
+        element.attrs.forEach(({ name, value }) => {
+          convertedAttrs[name] = value
+        })
+        element.attribs = convertedAttrs
+        delete element.attrs
+      }
+
+      return element
     }
   }
 
