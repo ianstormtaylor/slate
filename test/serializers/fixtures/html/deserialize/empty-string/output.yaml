@@ -1,0 +1,7 @@
+data: {}
+nodes:
+  - type: paragraph
+    isVoid: false
+    data: {}
+    nodes:
+      - characters: []
