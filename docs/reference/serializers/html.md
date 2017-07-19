@@ -13,7 +13,7 @@ For an example of the `Html` serializer in action, check out the [`paste-html` e
 - [Properties](#properties)
   - [`rules`](#rules)
   - [`defaultBlockType`](#defaultblocktype)
-  - [`domParser`](#domparser)
+  - [`parseHtml`](#parsehtml)
 - [Methods](#methods)
   - [`deserialize`](#deserialize)
   - [`serialize`](#serialize)
@@ -49,10 +49,10 @@ An array of rules to initialize the `Html` serializer with, defining your schema
 
 A default block type for blocks which do not match any rule. Can be a string such as `paragraph` or an object with a `type` attribute such as `{ type: 'paragraph' }`.
 
-### `domParser`
+### `parseHtml`
 `Function`
 
-A function to parse an HTML string and return a DOM object. Defaults to the native `DOMParser` in browser environments that support it. For older browsers or server-side rendering, you can include the [parse5](https://www.npmjs.com/package/parse5) package and pass `parse5.parseFragment` as the `domParser` option.
+A function to parse an HTML string and return a DOM object. Defaults to using the native `DOMParser` in browser environments that support it. For older browsers or server-side rendering, you can include the [parse5](https://www.npmjs.com/package/parse5) package and pass `parse5.parseFragment` as the `parseHtml` option.
 
 ## Methods
 

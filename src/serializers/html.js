@@ -71,7 +71,7 @@ class Html {
    * @param {Object} options
    *   @property {Array} rules
    *   @property {String|Object} defaultBlockType
-   *   @property {Function} domParser
+   *   @property {Function} parseHtml
    */
 
   constructor(options = {}) {
@@ -83,16 +83,15 @@ class Html {
     this.defaultBlockType = options.defaultBlockType || 'paragraph'
 
     // Set DOM parser function or fallback to native DOMParser if present.
-    if (options.domParser !== null) {
-      this._parseHtml = options.domParser
+    if (options.parseHtml !== null) {
+      this.parseHtml = options.parseHtml
     } else if (typeof DOMParser !== 'undefined') {
-      this._parseHtml = (html) => {
-        const domParser = new DOMParser()
-        return domParser.parseFromString(html, 'application/xml')
+      this.parseHtml = (html) => {
+        return new DOMParser().parseFromString(html, 'application/xml')
       }
     } else {
       throw new Error(
-        'Native DOMParser is not present in this environment; you must supply a parse function via options.domParser'
+        'Native DOMParser is not present in this environment; you must supply a parse function via options.parseHtml'
       )
     }
   }
@@ -107,7 +106,7 @@ class Html {
    */
 
   deserialize = (html, options = {}) => {
-    const children = this._parseHtml(html).childNodes
+    const children = this.parseHtml(html).childNodes
     let nodes = this.deserializeElements(children)
 
     const { defaultBlockType } = this

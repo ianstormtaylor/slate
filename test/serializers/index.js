@@ -23,7 +23,7 @@ describe('serializers', () => {
         if (test[0] === '.') continue
         it(test, async () => {
           const innerDir = resolve(dir, test)
-          const htmlOpts = Object.assign({}, require(innerDir).default, { domParser: parse5.parseFragment })
+          const htmlOpts = Object.assign({}, require(innerDir).default, { parseHtml: parse5.parseFragment })
           const html = new Html(htmlOpts)
           const expected = await readYaml(resolve(innerDir, 'output.yaml'))
           const input = fs.readFileSync(resolve(innerDir, 'input.html'), 'utf8')
@@ -35,7 +35,7 @@ describe('serializers', () => {
 
       it('optionally returns a raw representation', () => {
         const fixture = require('./fixtures/html/deserialize/block').default
-        const htmlOpts = Object.assign({}, fixture, { domParser: parse5.parseFragment })
+        const htmlOpts = Object.assign({}, fixture, { parseHtml: parse5.parseFragment })
         const html = new Html(htmlOpts)
         const input = fs.readFileSync(resolve(__dirname, './fixtures/html/deserialize/block/input.html'), 'utf8')
         const serialized = html.deserialize(input, { toRaw: true })
@@ -61,7 +61,7 @@ describe('serializers', () => {
 
       it('optionally does not normalize', () => {
         const fixture = require('./fixtures/html/deserialize/inline-with-is-void').default
-        const htmlOpts = Object.assign({}, fixture, { domParser: parse5.parseFragment })
+        const htmlOpts = Object.assign({}, fixture, { parseHtml: parse5.parseFragment })
         const html = new Html(htmlOpts)
         const input = fs.readFileSync(resolve(__dirname, './fixtures/html/deserialize/inline-with-is-void/input.html'), 'utf8')
         const serialized = html.deserialize(input, { toRaw: true, normalize: false })
@@ -95,7 +95,7 @@ describe('serializers', () => {
         if (test[0] === '.') continue
         it(test, async () => {
           const innerDir = resolve(dir, test)
-          const htmlOpts = Object.assign({}, require(innerDir).default, { domParser: parse5.parseFragment })
+          const htmlOpts = Object.assign({}, require(innerDir).default, { parseHtml: parse5.parseFragment })
           const html = new Html(htmlOpts)
           const input = require(resolve(innerDir, 'input.js')).default
           const expected = fs.readFileSync(resolve(innerDir, 'output.html'), 'utf8')
@@ -106,7 +106,7 @@ describe('serializers', () => {
 
       it('optionally returns an iterable list of React elements', () => {
         const fixture = require('./fixtures/html/serialize/block-nested').default
-        const htmlOpts = Object.assign({}, fixture, { domParser: parse5.parseFragment })
+        const htmlOpts = Object.assign({}, fixture, { parseHtml: parse5.parseFragment })
         const html = new Html(htmlOpts)
         const input = require('./fixtures/html/serialize/block-nested/input.js').default
         const serialized = html.serialize(input, { render: false })
