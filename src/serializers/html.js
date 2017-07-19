@@ -92,8 +92,7 @@ class Html {
       }
     } else {
       throw new Error(
-        `Native DOMParser is not present in this environment; you must 
-        supply a parse function via options.domParser`
+        'Native DOMParser is not present in this environment; you must supply a parse function via options.domParser'
       )
     }
   }
