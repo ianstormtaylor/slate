@@ -88,7 +88,7 @@ class Html {
     } else if (typeof DOMParser !== 'undefined') {
       this._parseHtml = (html) => {
         const domParser = new DOMParser()
-        return domParser.parseFromString(html, 'text/html')
+        return domParser.parseFromString(html, 'application/xml')
       }
     } else {
       throw new Error(
