@@ -70,8 +70,8 @@ class Html {
    *
    * @param {Object} options
    *   @property {Array} rules
-   *   @property {String} defaultBlockType
    *   @property {String|Object} defaultBlockType
+   *   @property {Function} domParser
    */
 
   constructor(options = {}) {
