@@ -8,14 +8,14 @@ export default {
             return {
               kind: 'block',
               type: 'paragraph',
-              nodes: next(el.children)
+              nodes: next(el.childNodes)
             }
           }
           case 'em': {
             return {
               kind: 'mark',
               type: 'italic',
-              nodes: next(el.children)
+              nodes: next(el.childNodes)
             }
           }
         }

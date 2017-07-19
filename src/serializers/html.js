@@ -33,12 +33,12 @@ const TEXT_RULE = {
       }
     }
 
-    if (el.type == 'text') {
-      if (el.data && el.data.match(/<!--.*?-->/)) return
+    if (el.nodeName == '#text') {
+      if (el.value && el.value.match(/<!--.*?-->/)) return
 
       return {
         kind: 'text',
-        text: el.data
+        text: el.value
       }
     }
   },
@@ -173,7 +173,7 @@ class Html {
   deserializeElements = (elements = []) => {
     let nodes = []
 
-    elements.map(this.convertElementFormat).filter(e => e).forEach((element) => {
+    elements.filter(this.cruftNewline).forEach((element) => {
       const node = this.deserializeElement(element)
       switch (typeOf(node)) {
         case 'array':
@@ -228,7 +228,7 @@ class Html {
       break
     }
 
-    return node || next(element.children)
+    return node || next(element.childNodes)
   }
 
   /**
@@ -239,7 +239,7 @@ class Html {
    */
 
   deserializeMark = (mark) => {
-    const { type, data } = mark
+    const { type, value } = mark
 
     const applyMark = (node) => {
       if (node.kind == 'mark') {
@@ -250,7 +250,7 @@ class Html {
         if (!node.ranges) node.ranges = [{ text: node.text }]
         node.ranges = node.ranges.map((range) => {
           range.marks = range.marks || []
-          range.marks.push({ type, data })
+          range.marks.push({ type, value })
           return range
         })
       }
@@ -351,44 +351,14 @@ class Html {
   }
 
   /**
-   * Convert a DOM element to match expected (cheerio) syntax.
+   * Filter out cruft newline nodes inserted by the DOM parser.
    *
    * @param {Object} element
-   * @return {Object}
+   * @return {Boolean}
    */
 
-  convertElementFormat = (element) => {
-    if (element.nodeName === '#text') {
-      if (element.value === '\n') {
-        // Remove cruft node inserted by parse5
-        return null
-      } else {
-        // Return text node mapped to expected format
-        return {
-          type: 'text',
-          data: element.value,
-          next: null,
-          prev: null,
-          parent: element.parentNode
-        }
-      }
-    } else {
-      // Move children to correct attr
-      element.children = element.childNodes
-      delete element.childNodes
-
-      // Convert attrs from array to object
-      if (Array.isArray(element.attrs)) {
-        const convertedAttrs = {}
-        element.attrs.forEach(({ name, value }) => {
-          convertedAttrs[name] = value
-        })
-        element.attribs = convertedAttrs
-        delete element.attrs
-      }
-
-      return element
-    }
+  cruftNewline = (element) => {
+    return !(element.nodeName == '#text' && element.value == '\n')
   }
 
 }

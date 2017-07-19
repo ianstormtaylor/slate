@@ -58,7 +58,7 @@ const rules = [
         return {
           kind: 'block',
           type: 'paragraph',
-          nodes: next(el.children)
+          nodes: next(el.childNodes)
         }
       }
     }
@@ -80,7 +80,7 @@ const rules = [
         return {
           kind: 'block',
           type: 'paragraph',
-          nodes: next(el.children)
+          nodes: next(el.childNodes)
         }
       }
     },
@@ -119,7 +119,7 @@ const rules = [
       return {
         kind: 'block',
         type: type,
-        nodes: next(el.children)
+        nodes: next(el.childNodes)
       }
     },
     // Switch serialize to handle more blocks...
@@ -137,7 +137,7 @@ const rules = [
 
 Now each of our block types is handled.
 
-You'll notice that even though code blocks are nested in a `<pre>` and a `<code>` element, we don't need to specifically handle that case in our `deserialize` function, because the `Html` serializer will automatically recurse through `el.children` if no matching deserializer is found. This way, unknown tags will just be skipped over in the tree, instead of their contents omitted completely.
+You'll notice that even though code blocks are nested in a `<pre>` and a `<code>` element, we don't need to specifically handle that case in our `deserialize` function, because the `Html` serializer will automatically recurse through `el.childNodes` if no matching deserializer is found. This way, unknown tags will just be skipped over in the tree, instead of their contents omitted completely.
 
 Okay. So now our serializer can handle blocks, but we need to add our marks to it as well. Let's do that with a new rule...
 
@@ -164,7 +164,7 @@ const rules = [
       return {
         kind: 'block',
         type: type,
-        nodes: next(el.children)
+        nodes: next(el.childNodes)
       }
     },
     serialize(object, children) {
@@ -184,7 +184,7 @@ const rules = [
       return {
         kind: 'mark',
         type: type,
-        nodes: next(el.children)
+        nodes: next(el.childNodes)
       }
     },
     serialize(object, children) {
