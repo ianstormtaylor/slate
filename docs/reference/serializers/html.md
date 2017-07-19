@@ -75,9 +75,9 @@ Each rule must define two properties:
 
 
 #### `rule.deserialize`
-`rule.deserialize(el: Node, next: Function) => Object || Void`
+`rule.deserialize(el: Element, next: Function) => Object || Void`
 
-The `deserialize` function should return a plain Javascript object representing the deserialized state, or nothing if the rule in question doesn't know how to deserialize the object, in which case the next rule in the stack will be attempted.
+The `deserialize` function receives a DOM element and should return a plain Javascript object representing the deserialized state, or nothing if the rule in question doesn't know how to deserialize the object, in which case the next rule in the stack will be attempted.
 
 The returned object is almost exactly equivalent to the objects returned by the [`Raw`](./raw.md) serializer, except an extra `kind: 'mark'` is added to account for the ability to nest marks.
 

@@ -2,7 +2,6 @@
 import Raw from './raw'
 import React from 'react'
 import ReactDOMServer from 'react-dom/server'
-import parse5 from 'parse5'
 import typeOf from 'type-of'
 import { Record } from 'immutable'
 
@@ -82,6 +81,21 @@ class Html {
     ]
 
     this.defaultBlockType = options.defaultBlockType || 'paragraph'
+
+    // Set DOM parser function or fallback to native DOMParser if present.
+    if (options.domParser !== null) {
+      this._parseHtml = options.domParser
+    } else if (typeof DOMParser !== 'undefined') {
+      this._parseHtml = (html) => {
+        const domParser = new DOMParser()
+        return domParser.parseFromString(html, 'text/html')
+      }
+    } else {
+      throw new Error(
+        `Native DOMParser is not present in this environment; you must 
+        supply a parse function via options.domParser`
+      )
+    }
   }
 
   /**
@@ -94,7 +108,7 @@ class Html {
    */
 
   deserialize = (html, options = {}) => {
-    const children = parse5.parseFragment(html).childNodes
+    const children = this._parseHtml(html).childNodes
     let nodes = this.deserializeElements(children)
 
     const { defaultBlockType } = this
