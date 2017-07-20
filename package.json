@@ -6,7 +6,6 @@
   "repository": "git://github.com/ianstormtaylor/slate.git",
   "main": "./lib/index.js",
   "dependencies": {
-    "cheerio": "^0.22.0",
     "debug": "^2.3.2",
     "direction": "^0.1.5",
     "es6-map": "^0.1.4",
@@ -59,6 +58,7 @@
     "mocha": "^2.5.3",
     "np": "^2.9.0",
     "npm-run-all": "^2.3.0",
+    "parse5": "^3.0.2",
     "prismjs": "^1.5.1",
     "react": "^15.4.2",
     "react-addons-perf": "^15.4.2",

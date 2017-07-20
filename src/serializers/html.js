@@ -2,7 +2,6 @@
 import Raw from './raw'
 import React from 'react'
 import ReactDOMServer from 'react-dom/server'
-import cheerio from 'cheerio'
 import typeOf from 'type-of'
 import { Record } from 'immutable'
 
@@ -34,12 +33,12 @@ const TEXT_RULE = {
       }
     }
 
-    if (el.type == 'text') {
-      if (el.data && el.data.match(/<!--.*?-->/)) return
+    if (el.nodeName == '#text') {
+      if (el.value && el.value.match(/<!--.*?-->/)) return
 
       return {
         kind: 'text',
-        text: el.data
+        text: el.value
       }
     }
   },
@@ -71,8 +70,8 @@ class Html {
    *
    * @param {Object} options
    *   @property {Array} rules
-   *   @property {String} defaultBlockType
    *   @property {String|Object} defaultBlockType
+   *   @property {Function} parseHtml
    */
 
   constructor(options = {}) {
@@ -82,6 +81,19 @@ class Html {
     ]
 
     this.defaultBlockType = options.defaultBlockType || 'paragraph'
+
+    // Set DOM parser function or fallback to native DOMParser if present.
+    if (options.parseHtml !== null) {
+      this.parseHtml = options.parseHtml
+    } else if (typeof DOMParser !== 'undefined') {
+      this.parseHtml = (html) => {
+        return new DOMParser().parseFromString(html, 'application/xml')
+      }
+    } else {
+      throw new Error(
+        'Native DOMParser is not present in this environment; you must supply a parse function via options.parseHtml'
+      )
+    }
   }
 
   /**
@@ -94,8 +106,7 @@ class Html {
    */
 
   deserialize = (html, options = {}) => {
-    const $ = cheerio.load(html).root()
-    const children = $.children().toArray()
+    const children = this.parseHtml(html).childNodes
     let nodes = this.deserializeElements(children)
 
     const { defaultBlockType } = this
@@ -151,7 +162,7 @@ class Html {
   }
 
   /**
-   * Deserialize an array of Cheerio `elements`.
+   * Deserialize an array of DOM elements.
    *
    * @param {Array} elements
    * @return {Array}
@@ -160,7 +171,7 @@ class Html {
   deserializeElements = (elements = []) => {
     let nodes = []
 
-    elements.forEach((element) => {
+    elements.filter(this.cruftNewline).forEach((element) => {
       const node = this.deserializeElement(element)
       switch (typeOf(node)) {
         case 'array':
@@ -176,7 +187,7 @@ class Html {
   }
 
   /**
-   * Deserialize a Cheerio `element`.
+   * Deserialize a DOM element.
    *
    * @param {Object} element
    * @return {Any}
@@ -215,7 +226,7 @@ class Html {
       break
     }
 
-    return node || next(element.children)
+    return node || next(element.childNodes)
   }
 
   /**
@@ -226,7 +237,7 @@ class Html {
    */
 
   deserializeMark = (mark) => {
-    const { type, data } = mark
+    const { type, value } = mark
 
     const applyMark = (node) => {
       if (node.kind == 'mark') {
@@ -237,7 +248,7 @@ class Html {
         if (!node.ranges) node.ranges = [{ text: node.text }]
         node.ranges = node.ranges.map((range) => {
           range.marks = range.marks || []
-          range.marks.push({ type, data })
+          range.marks.push({ type, value })
           return range
         })
       }
@@ -335,6 +346,17 @@ class Html {
       const ret = rule.serialize(string, string.text)
       if (ret) return ret
     }
+  }
+
+  /**
+   * Filter out cruft newline nodes inserted by the DOM parser.
+   *
+   * @param {Object} element
+   * @return {Boolean}
+   */
+
+  cruftNewline = (element) => {
+    return !(element.nodeName == '#text' && element.value == '\n')
   }
 
 }
