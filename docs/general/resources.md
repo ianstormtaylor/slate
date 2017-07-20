@@ -12,3 +12,4 @@ A few resources that are helpful when using Slate.
 ## Showcase
 
 - [ORY Editor](https://editor.ory.am/) — a self-contained, inline WYSIWYG editor library built on top of Slate.
+- [Reboo Editor](http://slate-editor.bonde.org/) — a drop-in WYSIWYG editor built with Slate.
