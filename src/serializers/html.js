@@ -38,7 +38,7 @@ const TEXT_RULE = {
 
       return {
         kind: 'text',
-        text: el.value
+        text: el.textContent
       }
     }
   },
@@ -83,7 +83,7 @@ class Html {
     this.defaultBlockType = options.defaultBlockType || 'paragraph'
 
     // Set DOM parser function or fallback to native DOMParser if present.
-    if (options.parseHtml !== null) {
+    if (options.parseHtml) {
       this.parseHtml = options.parseHtml
     } else if (typeof DOMParser !== 'undefined') {
       this.parseHtml = (html) => {
@@ -169,19 +169,19 @@ class Html {
    */
 
   deserializeElements = (elements = []) => {
-    let nodes = []
+    const nodes = []
 
-    elements.filter(this.cruftNewline).forEach((element) => {
-      const node = this.deserializeElement(element)
-      switch (typeOf(node)) {
-        case 'array':
-          nodes = nodes.concat(node)
-          break
-        case 'object':
+    for (const element of elements) {
+      if (this.cruftNewline(element)) {
+        const node = this.deserializeElement(element)
+
+        if (Array.isArray(node)) {
+          nodes.push(...node)
+        } else {
           nodes.push(node)
-          break
+        }
       }
-    })
+    }
 
     return nodes
   }
@@ -197,10 +197,11 @@ class Html {
     let node
 
     const next = (elements) => {
+      if (NodeList.prototype.isPrototypeOf(elements)) {
+        return this.deserializeElements(elements)
+      }
       switch (typeOf(elements)) {
-        case 'array':
-          return this.deserializeElements(elements)
-        case 'object':
+        case 'element':
           return this.deserializeElement(elements)
         case 'null':
         case 'undefined':
