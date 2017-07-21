@@ -85,7 +85,7 @@ const RULES = [
       return {
         kind: 'block',
         type: block,
-        nodes: next(el.children)
+        nodes: next(el.childNodes)
       }
     }
   },
@@ -96,23 +96,23 @@ const RULES = [
       return {
         kind: 'mark',
         type: mark,
-        nodes: next(el.children)
+        nodes: next(el.childNodes)
       }
     }
   },
   {
-    // Special case for code blocks, which need to grab the nested children.
+    // Special case for code blocks, which need to grab the nested childNodes.
     deserialize(el, next) {
       if (el.tagName != 'pre') return
-      const code = el.children[0]
-      const children = code && code.tagName == 'code'
-        ? code.children
-        : el.children
+      const code = el.childNodes[0]
+      const childNodes = code && code.tagName == 'code'
+        ? code.childNodes
+        : el.childNodes
 
       return {
         kind: 'block',
         type: 'code',
-        nodes: next(children)
+        nodes: next(childNodes)
       }
     }
   },
@@ -123,9 +123,9 @@ const RULES = [
       return {
         kind: 'inline',
         type: 'link',
-        nodes: next(el.children),
+        nodes: next(el.childNodes),
         data: {
-          href: el.attribs.href
+          href: el.attrs.find(({ name }) => name == 'href').value
         }
       }
     }

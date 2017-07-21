@@ -13,7 +13,9 @@ Want to contribute to Slate? That would be awesome!
 
 ## Reporting Bugs
 
-If you run into any weird behavior while using Slate, feel free to open a new issue in this repository! To be most helpful, please include the steps to reproduce the bug as best you can, ideally including a [JSFiddle](https://jsfiddle.net/2zokvrvt/7/) with a working example of the bug.
+If you run into any weird behavior while using Slate, feel free to open a new issue in this repository! Please run a **search before opening** a new issue, to make sure that someone else hasn't already reported or solved the bug you've found.
+
+To be most helpful, please include the steps to reproduce the bug as best you can, ideally including a [JSFiddle](https://jsfiddle.net/2zokvrvt/7/) with a working example of the bug.
 
 Here's a [JSFiddle template for Slate](https://jsfiddle.net/2zokvrvt/7/) to get you started:
 
@@ -22,11 +24,11 @@ Here's a [JSFiddle template for Slate](https://jsfiddle.net/2zokvrvt/7/) to get 
 
 ## Asking Questions
 
-Questions are very welcome :smile:! Previous questions that folks have asked are tagged with a [`question`](https://github.com/ianstormtaylor/slate/issues?q=is%3Aissue+is%3Aclosed+label%3Aquestion) label, so before opening a new issue double-check that someone hasn't asked it before. But if you don't see anything, or if you're not sure if it's the same, err on the side of asking!
-
 We've also got a [Slate Slack team](https://slate-slack.herokuapp.com) where you can ask questions and get answers from other people using Slate:
 
 [![](./docs/images/slack.png)](https://slate-slack.herokuapp.com)
+
+Please use the Slack instead of asking questions in issues, since we want to reserve issues for keeping track of bugs and features. We close questions in issues so that maintaining the project isn't overwhelming.
 
 
 ## Submitting Pull Requests

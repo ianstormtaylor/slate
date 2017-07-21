@@ -9,7 +9,7 @@ export default {
               kind: 'block',
               type: 'paragraph',
               data: { key: 'value' },
-              nodes: next(el.children)
+              nodes: next(el.childNodes)
             }
           }
         }
