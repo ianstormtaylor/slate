@@ -120,12 +120,14 @@ const RULES = [
     // Special case for links, to grab their href.
     deserialize(el, next) {
       if (el.tagName != 'a') return
+      // Convert NamedNodeMap to Array
+      const attrs = Array.prototype.slice.call(el.attributes)
       return {
         kind: 'inline',
         type: 'link',
         nodes: next(el.childNodes),
         data: {
-          href: el.attrs.find(({ name }) => name == 'href').value
+          href: attrs.find(({ name }) => name == 'href').value
         }
       }
     }
