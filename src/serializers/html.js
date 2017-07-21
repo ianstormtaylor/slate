@@ -33,12 +33,12 @@ const TEXT_RULE = {
       }
     }
 
-    if (el.nodeName == '#text') {
+    if (el.tagName == 'span' || el.nodeName == '#text') {
       if (el.value && el.value.match(/<!--.*?-->/)) return
 
       return {
         kind: 'text',
-        text: el.value
+        text: el.value || el.nodeValue
       }
     }
   },
@@ -83,11 +83,13 @@ class Html {
     this.defaultBlockType = options.defaultBlockType || 'paragraph'
 
     // Set DOM parser function or fallback to native DOMParser if present.
-    if (options.parseHtml !== null) {
+    if (typeof options.parseHtml === 'function') {
       this.parseHtml = options.parseHtml
     } else if (typeof DOMParser !== 'undefined') {
       this.parseHtml = (html) => {
-        return new DOMParser().parseFromString(html, 'application/xml')
+        const parsed = new DOMParser().parseFromString(html, 'text/html')
+        // Unwrap from <html> and <body>
+        return parsed.childNodes[0].childNodes[1]
       }
     } else {
       throw new Error(
@@ -106,7 +108,7 @@ class Html {
    */
 
   deserialize = (html, options = {}) => {
-    const children = this.parseHtml(html).childNodes
+    const children = Array.from(this.parseHtml(html).childNodes)
     let nodes = this.deserializeElements(children)
 
     const { defaultBlockType } = this
@@ -196,7 +198,14 @@ class Html {
   deserializeElement = (element) => {
     let node
 
+    if (!element.tagName) {
+      element.tagName = ''
+    }
+
     const next = (elements) => {
+      if (typeof NodeList !== 'undefined' && elements instanceof NodeList) {
+        elements = Array.from(elements)
+      }
       switch (typeOf(elements)) {
         case 'array':
           return this.deserializeElements(elements)
