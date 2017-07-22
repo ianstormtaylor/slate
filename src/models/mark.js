@@ -13,7 +13,6 @@ import { Map, Record, Set } from 'immutable'
 const DEFAULTS = {
   data: new Map(),
   type: null,
-  [TYPES.IS_SLATE_MARK]: true,
 }
 
 /**
@@ -32,10 +31,9 @@ class Mark extends new Record(DEFAULTS) {
    */
 
   static create(properties = {}) {
-    if (properties[TYPES.IS_SLATE_MARK]) return properties
+    if (Mark.isMark(properties)) return properties
     if (!properties.type) throw new Error('You must provide a `type` for the mark.')
     properties.data = Data.create(properties.data)
-    properties[TYPES.IS_SLATE_MARK] = true
     return new Mark(properties)
   }
 
@@ -52,9 +50,26 @@ class Mark extends new Record(DEFAULTS) {
   }
 
   /**
-   * Get the kind.
+   * Determines if the passed in paramter is a Slate Mark or not
    *
-   * @return {String}
+   * @param {*} maybeMark
+   * @return {Boolean}
+   */
+
+  static isMark(maybeMark) {
+    return !!(maybeMark && maybeMark[TYPES.IS_SLATE_MARK])
+  }
+
+  /**
+   *  Get Pseduo-symbol that shows this is a Slate Mark
+   *
+   * @return {Boolean}
+   */
+
+  [TYPES.IS_SLATE_MARK] = true
+
+  /**
+   * Get the kind.
    */
 
   get kind() {

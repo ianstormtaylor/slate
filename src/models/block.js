@@ -4,7 +4,6 @@
  */
 
 import './document'
-import './inline'
 
 /**
  * Dependencies.
@@ -13,6 +12,7 @@ import './inline'
 
 import Data from './data'
 import Node from './node'
+import Inline from './inline'
 import Text from './text'
 import TYPES from './types'
 import generateKey from '../utils/generate-key'
@@ -30,7 +30,6 @@ const DEFAULTS = {
   key: null,
   nodes: new List(),
   type: null,
-  [TYPES.IS_SLATE_BLOCK]: true
 }
 
 /**
@@ -49,16 +48,15 @@ class Block extends new Record(DEFAULTS) {
    */
 
   static create(properties = {}) {
-    if (properties[TYPES.IS_SLATE_BLOCK]) return properties
-    if (properties[TYPES.IS_SLATE_INLINE]) return properties
-    if (properties[TYPES.IS_SLATE_TEXT]) return properties
+    if (Block.isBlock(properties)) return properties
+    if (Inline.isInline(properties)) return properties
+    if (Text.isText(properties)) return properties
     if (!properties.type) { throw new Error('You must pass a block `type`.') }
 
     properties.key = properties.key || generateKey()
     properties.data = Data.create(properties.data)
     properties.isVoid = !!properties.isVoid
     properties.nodes = Block.createList(properties.nodes)
-    properties[TYPES.IS_SLATE_BLOCK] = true
 
     if (properties.nodes.size == 0) {
       properties.nodes = properties.nodes.push(Text.create())
@@ -78,6 +76,23 @@ class Block extends new Record(DEFAULTS) {
     if (List.isList(elements)) return elements
     return new List(elements.map(Block.create))
   }
+
+  /**
+   * Determines if the passed in paramter is a Slate Block or not
+   *
+   * @param {*} maybeBlock
+   * @return {Boolean}
+   */
+
+  static isBlock(maybeBlock) {
+    return !!(maybeBlock && maybeBlock[TYPES.IS_SLATE_BLOCK])
+  }
+
+  /**
+   *  Pseduo-symbol that shows this is a Slate Block
+   */
+
+  [TYPES.IS_SLATE_BLOCK] = true
 
   /**
    * Get the node's kind.

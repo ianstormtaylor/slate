@@ -30,7 +30,6 @@ const DEFAULTS = {
   history: new History(),
   data: new Map(),
   isNative: false,
-  [TYPES.IS_SLATE_STATE]: true,
 }
 
 /**
@@ -51,7 +50,7 @@ class State extends new Record(DEFAULTS) {
    */
 
   static create(properties = {}, options = {}) {
-    if (properties[TYPES.IS_SLATE_STATE]) return properties
+    if (State.isState(properties)) return properties
 
     const document = Document.create(properties.document)
     let selection = Selection.create(properties.selection)
@@ -72,12 +71,29 @@ class State extends new Record(DEFAULTS) {
     // Then add data provided in `properties`.
     if (properties.data) data = data.merge(properties.data)
 
-    const state = new State({ document, selection, data, [TYPES.IS_SLATE_STATE]: true })
+    const state = new State({ document, selection, data })
 
     return options.normalize === false
       ? state
       : state.transform().normalize(SCHEMA).apply({ save: false })
   }
+
+  /**
+   * Determines if the passed in paramter is a Slate State or not
+   *
+   * @param {*} maybeState
+   * @return {Boolean}
+   */
+
+  static isState(maybeState) {
+    return !!(maybeState && maybeState[TYPES.IS_SLATE_STATE])
+  }
+
+  /**
+   *  Get Pseduo-symbol that shows this is a Slate State
+   */
+
+  [TYPES.IS_SLATE_STATE] = true
 
   /**
    * Get the kind.

@@ -13,7 +13,6 @@ import { Record, Set } from 'immutable'
 const DEFAULTS = {
   marks: new Set(),
   text: '',
-  [TYPES.IS_SLATE_RANGE]: true
 }
 
 /**
@@ -32,12 +31,28 @@ class Range extends new Record(DEFAULTS) {
    */
 
   static create(properties = {}) {
-    if (properties[TYPES.IS_SLATE_RANGE]) return properties
+    if (Range.isRange(properties)) return properties
     properties.text = properties.text
     properties.marks = Mark.createSet(properties.marks)
-    properties[TYPES.IS_SLATE_RANGE] = true
     return new Range(properties)
   }
+
+  /**
+   * Determines if the passed in paramter is a Slate Range or not
+   *
+   * @param {*} maybeRange
+   * @return {Boolean}
+   */
+
+  static isRange(maybeRange) {
+    return !!(maybeRange && maybeRange[TYPES.IS_SLATE_RANGE])
+  }
+
+  /**
+   *  Get Pseduo-symbol that shows this is a Slate Range
+   */
+
+  [TYPES.IS_SLATE_RANGE] = true
 
   /**
    * Get the node's kind.

@@ -17,7 +17,6 @@ const DEFAULTS = {
   isBackward: null,
   isFocused: false,
   marks: null,
-  [TYPES.IS_SLATE_SELECTION]: true
 }
 
 /**
@@ -36,10 +35,26 @@ class Selection extends new Record(DEFAULTS) {
    */
 
   static create(properties = {}) {
-    if (properties[TYPES.IS_SLATE_SELECTION]) return properties
-    properties[TYPES.IS_SLATE_SELECTION] = true
+    if (this.isSelection(properties)) return properties
     return new Selection(properties)
   }
+
+  /**
+   * Determines if the passed in paramter is a Slate Selection or not
+   *
+   * @param {*} maybeSelection
+   * @return {Boolean}
+   */
+
+  static isSelection(maybeSelection) {
+    return !!(maybeSelection && maybeSelection[TYPES.IS_SLATE_SELECTION])
+  }
+
+  /**
+   *  Get Pseduo-symbol that shows this is a Slate Selection
+   */
+
+  [TYPES.IS_SLATE_SELECTION] = true
 
   /**
    * Get the kind.

@@ -27,7 +27,6 @@ const DEFAULTS = {
   data: new Map(),
   key: null,
   nodes: new List(),
-  [TYPES.IS_SLATE_DOCUMENT]: true
 }
 
 /**
@@ -46,15 +45,31 @@ class Document extends new Record(DEFAULTS) {
    */
 
   static create(properties = {}) {
-    if (properties[TYPES.IS_SLATE_DOCUMENT]) return properties
+    if (Document.isDocument(properties)) return properties
 
     properties.key = properties.key || generateKey()
     properties.data = Data.create(properties.data)
     properties.nodes = Block.createList(properties.nodes)
-    properties[TYPES.IS_SLATE_DOCUMENT] = true
 
     return new Document(properties)
   }
+
+  /**
+   * Determines if the passed in paramter is a Slate Document or not
+   *
+   * @param {*} maybeDocument
+   * @return {Boolean}
+   */
+
+  static isDocument(maybeDocument) {
+    return !!(maybeDocument && maybeDocument[TYPES.IS_SLATE_DOCUMENT])
+  }
+
+  /**
+   *  Get Pseduo-symbol that shows this is a Slate Document
+   */
+
+  [TYPES.IS_SLATE_DOCUMENT] = true
 
   /**
    * Get the node's kind.

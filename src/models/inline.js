@@ -3,13 +3,13 @@
  * Prevent circular dependencies.
  */
 
-import './block'
 import './document'
 
 /**
  * Dependencies.
  */
 
+import Block from './block'
 import Data from './data'
 import Node from './node'
 import Text from './text'
@@ -29,7 +29,6 @@ const DEFAULTS = {
   key: null,
   nodes: new List(),
   type: null,
-  [TYPES.IS_SLATE_INLINE]: true
 }
 
 /**
@@ -48,16 +47,15 @@ class Inline extends new Record(DEFAULTS) {
    */
 
   static create(properties = {}) {
-    if (properties[TYPES.IS_SLATE_BLOCK]) return properties
-    if (properties[TYPES.IS_SLATE_INLINE]) return properties
-    if (properties[TYPES.IS_SLATE_TEXT]) return properties
+    if (Block.isBlock(properties)) return properties
+    if (Inline.isInline(properties)) return properties
+    if (Text.isText(properties)) return properties
     if (!properties.type) throw new Error('You must pass an inline `type`.')
 
     properties.key = properties.key || generateKey()
     properties.data = Data.create(properties.data)
     properties.isVoid = !!properties.isVoid
     properties.nodes = Inline.createList(properties.nodes)
-    properties[TYPES.IS_SLATE_INLINE] = true
 
     if (properties.nodes.size == 0) {
       properties.nodes = properties.nodes.push(Text.create())
@@ -77,6 +75,23 @@ class Inline extends new Record(DEFAULTS) {
     if (List.isList(elements)) return elements
     return new List(elements.map(Inline.create))
   }
+
+  /**
+   * Determines if the passed in paramter is a Slate Inline or not
+   *
+   * @param {*} maybeInline
+   * @return {Boolean}
+   */
+
+  static isInline(maybeInline) {
+    return !!(maybeInline && maybeInline[TYPES.IS_SLATE_INLINE])
+  }
+
+  /**
+   *  Get Pseduo-symbol that shows this is a Slate Inline
+   */
+
+  [TYPES.IS_SLATE_INLINE] = true
 
   /**
    * Get the node's kind.

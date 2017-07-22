@@ -13,7 +13,6 @@ import { Record } from 'immutable'
 
 const DEFAULTS = {
   rules: [],
-  [TYPES.IS_SLATE_SCHEMA]: true
 }
 
 /**
@@ -32,9 +31,26 @@ class Schema extends new Record(DEFAULTS) {
    */
 
   static create(properties = {}) {
-    if (properties[TYPES.IS_SLATE_SCHEMA]) return properties
+    if (Schema.isSchema(properties)) return properties
     return new Schema(normalizeProperties(properties))
   }
+
+  /**
+   * Determines if the passed in paramter is a Slate Schema or not
+   *
+   * @param {*} maybeSchema
+   * @return {Boolean}
+   */
+
+  static isSchema(maybeSchema) {
+    return !!(maybeSchema && maybeSchema[TYPES.IS_SLATE_SCHEMA])
+  }
+
+  /**
+   *  Get Pseduo-symbol that shows this is a Slate Schema
+   */
+
+  [TYPES.IS_SLATE_SCHEMA] = true
 
   /**
    * Get the kind.

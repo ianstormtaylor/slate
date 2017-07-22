@@ -12,7 +12,6 @@ import { List, Record, Set } from 'immutable'
 const DEFAULTS = {
   marks: new Set(),
   text: '',
-  [TYPES.IS_SLATE_CHARACTER]: true
 }
 
 /**
@@ -31,9 +30,8 @@ class Character extends new Record(DEFAULTS) {
    */
 
   static create(properties = {}) {
-    if (properties[TYPES.IS_SLATE_CHARACTER]) return properties
+    if (Character.isCharacter(properties)) return properties
     properties.marks = Mark.createSet(properties.marks)
-    properties[TYPES.IS_SLATE_CHARACTER] = true
     return new Character(properties)
   }
 
@@ -62,6 +60,23 @@ class Character extends new Record(DEFAULTS) {
     const list = Character.createList(chars)
     return list
   }
+
+  /**
+   * Determines if the passed in paramter is a Slate Character or not
+   *
+   * @param {*} maybeCharacter
+   * @return {Boolean}
+   */
+
+  static isCharacter(maybeCharacter) {
+    return !!(maybeCharacter && maybeCharacter[TYPES.IS_SLATE_CHARACTER])
+  }
+
+  /**
+   *  Pseduo-symbol that shows this is a Slate Character
+   */
+
+  [TYPES.IS_SLATE_CHARACTER] = true
 
   /**
    * Get the kind.

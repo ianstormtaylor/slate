@@ -16,7 +16,6 @@ import { List, Record, OrderedSet, Set, is } from 'immutable'
 const DEFAULTS = {
   characters: new List(),
   key: null,
-  [TYPES.IS_SLATE_TEXT]: true,
 }
 
 /**
@@ -35,10 +34,9 @@ class Text extends new Record(DEFAULTS) {
    */
 
   static create(properties = {}) {
-    if (properties[TYPES.IS_SLATE_TEXT]) return properties
+    if (Text.isText(properties)) return properties
     properties.key = properties.key || generateKey()
     properties.characters = Character.createList(properties.characters)
-    properties[TYPES.IS_SLATE_TEXT] = true
     return new Text(properties)
   }
 
@@ -83,6 +81,23 @@ class Text extends new Record(DEFAULTS) {
     if (List.isList(elements)) return elements
     return new List(elements.map(Text.create))
   }
+
+  /**
+   * Determines if the passed in paramter is a Slate Text or not
+   *
+   * @param {*} maybeText
+   * @return {Boolean}
+   */
+
+  static isText(maybeText) {
+    return !!(maybeText && maybeText[TYPES.IS_SLATE_TEXT])
+  }
+
+  /**
+   * Pseudo-symbol that shows this is a Slate Text
+   */
+
+  [TYPES.IS_SLATE_TEXT] = true
 
   /**
    * Get the node's kind.
