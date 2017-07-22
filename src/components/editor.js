@@ -5,7 +5,7 @@ import React from 'react'
 import Types from 'prop-types'
 
 import Stack from '../models/stack'
-import TYPES from '../models/types'
+import SlatePropTypes from '../models/slate-prop-types'
 import noop from '../utils/noop'
 
 /**
@@ -50,20 +50,6 @@ const PLUGINS_PROPS = [
 ]
 
 /**
- *  Function that determines if a prop is a Slate State or not.
- *
- * @type {Function}
- */
-
-function requiredSlateState(props, propName, componentName = 'ANONYMOUS') {
-  const state = props[propName]
-  if (!state) return new Error(`${propName} in ${componentName} is required`)
-  if (!state[TYPES.IS_SLATE_STATE]) return new Error(`${propName} in ${componentName} is not a Slate State`)
-
-  return null
-}
-
-/**
  * Editor.
  *
  * @type {Component}
@@ -93,7 +79,7 @@ class Editor extends React.Component {
     role: Types.string,
     schema: Types.object,
     spellCheck: Types.bool,
-    state: requiredSlateState,
+    state: SlatePropTypes.slateState.isRequired,
     style: Types.object,
     tabIndex: Types.number,
   }

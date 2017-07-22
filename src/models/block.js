@@ -9,7 +9,6 @@ import './document'
  * Dependencies.
  */
 
-
 import Data from './data'
 import Node from './node'
 import Inline from './inline'

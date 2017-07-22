@@ -1,12 +1,13 @@
 
 import Block from '../models/block'
+import Document from '../models/document'
 import Inline from '../models/inline'
 import Data from '../models/data'
 import Mark from '../models/mark'
 import Selection from '../models/selection'
+import Text from '../models/text'
 import warn from './warn'
 import typeOf from 'type-of'
-
 
 /**
  * Normalize a block argument `value`.
