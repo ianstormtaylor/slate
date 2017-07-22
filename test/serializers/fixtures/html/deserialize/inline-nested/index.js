@@ -8,21 +8,21 @@ export default {
             return {
               kind: 'block',
               type: 'paragraph',
-              nodes: next(el.children)
+              nodes: next(el.childNodes)
             }
           }
           case 'a': {
             return {
               kind: 'inline',
               type: 'link',
-              nodes: next(el.children)
+              nodes: next(el.childNodes)
             }
           }
           case 'b': {
             return {
               kind: 'inline',
               type: 'hashtag',
-              nodes: next(el.children)
+              nodes: next(el.childNodes)
             }
           }
         }
