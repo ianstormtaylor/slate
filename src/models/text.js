@@ -94,12 +94,6 @@ class Text extends new Record(DEFAULTS) {
   }
 
   /**
-   * Pseudo-symbol that shows this is a Slate Text
-   */
-
-  [TYPES.IS_SLATE_TEXT] = true
-
-  /**
    * Get the node's kind.
    *
    * @return {String}
@@ -419,6 +413,12 @@ class Text extends new Record(DEFAULTS) {
   }
 
 }
+
+/**
+ * Pseudo-symbol that shows this is a Slate Text
+ */
+
+Text.prototype[TYPES.IS_SLATE_TEXT] = true
 
 /**
  * Memoize read methods.

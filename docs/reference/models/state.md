@@ -36,6 +36,7 @@ For convenience, in addition to transforms, many of the [`Selection`](./selectio
   - [`isEmpty`](#isEmpty)
 - [Static Methods](#static-methods)
   - [`State.create`](#statecreate)
+  - [`State.isState`](#stateisstate)
 - [Methods](#methods)
   - [`transform`](#transform)
 
@@ -165,6 +166,11 @@ Whether the current selection is empty.
 `State.create(properties: Object) => State`
 
 Create a new `State` instance with `properties`.
+
+### `State.isState`
+`State.isState(maybeState: Any) => Boolean`
+
+Returns a boolean if the passed in argument is a `State`.
 
 
 ## Methods

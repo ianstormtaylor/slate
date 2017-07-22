@@ -66,12 +66,6 @@ class Document extends new Record(DEFAULTS) {
   }
 
   /**
-   *  Get Pseduo-symbol that shows this is a Slate Document
-   */
-
-  [TYPES.IS_SLATE_DOCUMENT] = true
-
-  /**
    * Get the node's kind.
    *
    * @return {String}
@@ -112,6 +106,12 @@ class Document extends new Record(DEFAULTS) {
   }
 
 }
+
+/**
+ * Pseduo-symbol that shows this is a Slate Document
+ */
+
+Document.prototype[TYPES.IS_SLATE_DOCUMENT] = true
 
 /**
  * Mix in `Node` methods.

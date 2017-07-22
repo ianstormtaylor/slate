@@ -90,12 +90,6 @@ class State extends new Record(DEFAULTS) {
   }
 
   /**
-   *  Get Pseduo-symbol that shows this is a Slate State
-   */
-
-  [TYPES.IS_SLATE_STATE] = true
-
-  /**
    * Get the kind.
    *
    * @return {String}
@@ -491,6 +485,12 @@ class State extends new Record(DEFAULTS) {
   }
 
 }
+
+/**
+ * Pseduo-symbol that shows this is a Slate State
+ */
+
+State.prototype[TYPES.IS_SLATE_STATE] = true
 
 /**
  * Export.

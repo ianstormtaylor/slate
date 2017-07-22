@@ -88,12 +88,6 @@ class Block extends new Record(DEFAULTS) {
   }
 
   /**
-   *  Pseduo-symbol that shows this is a Slate Block
-   */
-
-  [TYPES.IS_SLATE_BLOCK] = true
-
-  /**
    * Get the node's kind.
    *
    * @return {String}
@@ -134,6 +128,12 @@ class Block extends new Record(DEFAULTS) {
   }
 
 }
+
+/**
+ * Pseduo-symbol that shows this is a Slate Block
+ */
+
+Block.prototype[TYPES.IS_SLATE_BLOCK] = true
 
 /**
  * Mix in `Node` methods.

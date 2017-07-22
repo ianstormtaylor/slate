@@ -88,12 +88,6 @@ class Inline extends new Record(DEFAULTS) {
   }
 
   /**
-   *  Get Pseduo-symbol that shows this is a Slate Inline
-   */
-
-  [TYPES.IS_SLATE_INLINE] = true
-
-  /**
    * Get the node's kind.
    *
    * @return {String}
@@ -134,6 +128,12 @@ class Inline extends new Record(DEFAULTS) {
   }
 
 }
+
+/**
+ * Pseduo-symbol that shows this is a Slate Inline
+ */
+
+Inline.prototype[TYPES.IS_SLATE_INLINE] = true
 
 /**
  * Mix in `Node` methods.

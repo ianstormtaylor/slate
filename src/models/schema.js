@@ -47,12 +47,6 @@ class Schema extends new Record(DEFAULTS) {
   }
 
   /**
-   *  Get Pseduo-symbol that shows this is a Slate Schema
-   */
-
-  [TYPES.IS_SLATE_SCHEMA] = true
-
-  /**
    * Get the kind.
    *
    * @return {String}
@@ -252,6 +246,12 @@ function normalizeMarkComponent(render) {
       return props => <span className={render}>{props.children}</span>
   }
 }
+
+/**
+ * Pseduo-symbol that shows this is a Slate Schema
+ */
+
+Schema.prototype[TYPES.IS_SLATE_SCHEMA] = true
 
 /**
  * Export.

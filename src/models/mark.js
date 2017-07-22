@@ -61,14 +61,6 @@ class Mark extends new Record(DEFAULTS) {
   }
 
   /**
-   *  Get Pseduo-symbol that shows this is a Slate Mark
-   *
-   * @return {Boolean}
-   */
-
-  [TYPES.IS_SLATE_MARK] = true
-
-  /**
    * Get the kind.
    */
 
@@ -88,6 +80,12 @@ class Mark extends new Record(DEFAULTS) {
   }
 
 }
+
+/**
+ * Pseduo-symbol that shows this is a Slate Mark
+ */
+
+Mark.prototype[TYPES.IS_SLATE_MARK] = true
 
 /**
  * Memoize read methods.

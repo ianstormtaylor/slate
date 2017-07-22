@@ -49,12 +49,6 @@ class Range extends new Record(DEFAULTS) {
   }
 
   /**
-   *  Get Pseduo-symbol that shows this is a Slate Range
-   */
-
-  [TYPES.IS_SLATE_RANGE] = true
-
-  /**
    * Get the node's kind.
    *
    * @return {String}
@@ -84,6 +78,12 @@ class Range extends new Record(DEFAULTS) {
   }
 
 }
+
+/**
+ * Pseduo-symbol that shows this is a Slate Range
+ */
+
+Range.prototype[TYPES.IS_SLATE_RANGE] = true
 
 /**
  * Export.

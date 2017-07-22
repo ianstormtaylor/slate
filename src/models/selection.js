@@ -51,12 +51,6 @@ class Selection extends new Record(DEFAULTS) {
   }
 
   /**
-   *  Get Pseduo-symbol that shows this is a Slate Selection
-   */
-
-  [TYPES.IS_SLATE_SELECTION] = true
-
-  /**
    * Get the kind.
    *
    * @return {String}
@@ -754,6 +748,12 @@ class Selection extends new Record(DEFAULTS) {
   }
 
 }
+
+/**
+ * Pseduo-symbol that shows this is a Slate Selection
+ */
+
+Selection.prototype[TYPES.IS_SLATE_SELECTION] = true
 
 /**
  * Mix in some "move" convenience methods.

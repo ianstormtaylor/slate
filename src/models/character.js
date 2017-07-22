@@ -73,12 +73,6 @@ class Character extends new Record(DEFAULTS) {
   }
 
   /**
-   *  Pseduo-symbol that shows this is a Slate Character
-   */
-
-  [TYPES.IS_SLATE_CHARACTER] = true
-
-  /**
    * Get the kind.
    *
    * @return {String}
@@ -89,6 +83,12 @@ class Character extends new Record(DEFAULTS) {
   }
 
 }
+
+/**
+ * Pseduo-symbol that shows this is a Slate Character
+ */
+
+Character.prototype[TYPES.IS_SLATE_CHARACTER] = true
 
 /**
  * Export.

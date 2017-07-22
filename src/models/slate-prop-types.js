@@ -136,7 +136,7 @@ const slateSelection = createChainablePropType(
 
 const slateState = createChainablePropType(
   (props, propName, componentName) => {
-    return !State.isState(props[propName]) ? new Error(`${propName} in ${componentName} is not a Slate State`) : null
+    return !State.isState(props[propName]) ? new Error(`${propName} in ${componentName} is not a Slate State ${props[propName]}`) : null
   }
 )
 
