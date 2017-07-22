@@ -4,7 +4,6 @@ import Inline from '../models/inline'
 import Data from '../models/data'
 import Mark from '../models/mark'
 import Selection from '../models/selection'
-import TYPES from '../models/types'
 import warn from './warn'
 import typeOf from 'type-of'
 
@@ -17,7 +16,7 @@ import typeOf from 'type-of'
  */
 
 function block(value) {
-  if (value[TYPES.IS_SLATE_BLOCK]) return value
+  if (Block.isBlock(value)) return value
 
   switch (typeOf(value)) {
     case 'string':
@@ -37,7 +36,7 @@ function block(value) {
  */
 
 function inline(value) {
-  if (value[TYPES.IS_SLATE_INLINE]) return value
+  if (Inline.isInline(value)) return value
 
   switch (typeOf(value)) {
     case 'string':
@@ -60,10 +59,10 @@ function key(value) {
   if (typeOf(value) == 'string') return value
 
   warn('An object was passed to a Node method instead of a `key` string. This was previously supported, but is being deprecated because it can have a negative impact on performance. The object in question was:', value)
-  if (value[TYPES.IS_SLATE_BLOCK]) return value.key
-  if (value[TYPES.IS_SLATE_DOCUMENT]) return value.key
-  if (value[TYPES.IS_SLATE_INLINE]) return value.key
-  if (value[TYPES.IS_SLATE_TEXT]) return value.key
+  if (Block.isBlock(value)) return value.key
+  if (Document.isDocument(value)) return value.key
+  if (Inline.isInline(value)) return value.key
+  if (Text.isText(value)) return value.key
 
   throw new Error(`Invalid \`key\` argument! It must be either a block, an inline, a text, or a string. You passed: "${value}".`)
 }
@@ -76,7 +75,7 @@ function key(value) {
  */
 
 function mark(value) {
-  if (value[TYPES.IS_SLATE_MARK]) return value
+  if (Mark.isMark(value)) return value
 
   switch (typeOf(value)) {
     case 'string':
@@ -161,7 +160,7 @@ function nodeProperties(value = {}) {
  */
 
 function selection(value) {
-  if (value[TYPES.IS_SLATE_SELECTION]) return value
+  if (Selection.isSelection(value)) return value
 
   switch (typeOf(value)) {
     case 'object':

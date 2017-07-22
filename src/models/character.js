@@ -11,7 +11,7 @@ import { List, Record, Set } from 'immutable'
 
 const DEFAULTS = {
   marks: new Set(),
-  text: '',
+  text: ''
 }
 
 /**

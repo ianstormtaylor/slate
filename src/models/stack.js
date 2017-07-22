@@ -2,7 +2,7 @@
 import CorePlugin from '../plugins/core'
 import Debug from 'debug'
 import Schema from './schema'
-import TYPES from './types'
+import State from './state'
 import { Record } from 'immutable'
 
 /**
@@ -196,7 +196,7 @@ for (const method of STATE_ACCUMULATOR_METHODS) {
  */
 
 function assertState(value) {
-  if (value[TYPES.IS_SLATE_STATE]) return
+  if (State.isState(value)) return
   throw new Error(`A plugin returned an unexpected state value: ${value}`)
 }
 

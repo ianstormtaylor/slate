@@ -12,7 +12,7 @@ import { Map, Record, Set } from 'immutable'
 
 const DEFAULTS = {
   data: new Map(),
-  type: null,
+  type: null
 }
 
 /**

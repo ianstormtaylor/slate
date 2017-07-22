@@ -29,7 +29,7 @@ const DEFAULTS = {
   selection: new Selection(),
   history: new History(),
   data: new Map(),
-  isNative: false,
+  isNative: false
 }
 
 /**

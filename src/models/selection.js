@@ -35,7 +35,7 @@ class Selection extends new Record(DEFAULTS) {
    */
 
   static create(properties = {}) {
-    if (this.isSelection(properties)) return properties
+    if (Selection.isSelection(properties)) return properties
     return new Selection(properties)
   }
 

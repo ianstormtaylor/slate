@@ -29,7 +29,7 @@ const DEFAULTS = {
   isVoid: false,
   key: null,
   nodes: new List(),
-  type: null,
+  type: null
 }
 
 /**
@@ -51,7 +51,7 @@ class Block extends new Record(DEFAULTS) {
     if (Block.isBlock(properties)) return properties
     if (Inline.isInline(properties)) return properties
     if (Text.isText(properties)) return properties
-    if (!properties.type) { throw new Error('You must pass a block `type`.') }
+    if (!properties.type) throw new Error('You must pass a block `type`.')
 
     properties.key = properties.key || generateKey()
     properties.data = Data.create(properties.data)

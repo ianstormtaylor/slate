@@ -175,7 +175,7 @@ function normalizeProperties(properties) {
     rules = rules.concat(array)
   }
 
-  return { rules, [TYPES.IS_SLATE_SCHEMA]: true }
+  return { rules }
 }
 
 /**

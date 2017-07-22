@@ -28,7 +28,7 @@ const DEFAULTS = {
   isVoid: false,
   key: null,
   nodes: new List(),
-  type: null,
+  type: null
 }
 
 /**

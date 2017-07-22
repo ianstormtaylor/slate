@@ -15,7 +15,7 @@ import { List, Record, OrderedSet, Set, is } from 'immutable'
 
 const DEFAULTS = {
   characters: new List(),
-  key: null,
+  key: null
 }
 
 /**

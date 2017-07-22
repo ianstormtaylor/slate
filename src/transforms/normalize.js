@@ -1,6 +1,6 @@
 
 import Normalize from '../utils/normalize'
-import TYPES from '../models/types'
+import Schema from '../models/schema'
 import warn from '../utils/warn'
 import { Set } from 'immutable'
 
@@ -225,7 +225,7 @@ function normalizeNode(transform, node, schema) {
  */
 
 function assertSchema(schema) {
-  if (schema[TYPES.IS_SLATE_SCHEMA]) {
+  if (Schema.isSchema(schema)) {
     return
   } else if (schema == null) {
     throw new Error('You must pass a `schema` object.')
