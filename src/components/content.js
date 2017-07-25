@@ -175,16 +175,6 @@ class Content extends React.Component {
     let anchorOff
     let focusOff
 
-    console.log('=============')
-    if (focusKey !== anchorKey && anchorOffset === 0 && focusOffset === 0) {
-      console.log('next block selected', selection)
-    } else {
-      console.log('selection', selection)
-    }
-
-    console.log('anchorRanges', anchorRanges)
-    console.log('focusRanges', focusRanges)
-
     anchorRanges.forEach((range, i, ranges) => {
       const { length } = range.text
       a += length
@@ -226,8 +216,16 @@ class Content extends React.Component {
     native.addRange(range)
     extendSelection(native, focusEl, focusOff)
 
-    if (focusKey !== anchorKey && anchorOffset === 0 && focusOffset === 0) {
-      // Update selection here
+    // Make sure double/triple-click doesn't select the next block
+    if (anchorKey !== focusKey && anchorOffset === 0 && focusOffset === 0) {
+      // Create an updated state with the text replaced.
+      const next = state
+        .transform()
+        .moveToRangeOf(state.startBlock)
+        .apply()
+
+      // Change the current state.
+      this.onChange(next)
     }
 
     // Then unset the `isSelecting` flag after a delay.
