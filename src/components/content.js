@@ -216,9 +216,9 @@ class Content extends React.Component {
     native.addRange(range)
     extendSelection(native, focusEl, focusOff)
 
-    // Make sure double/triple-click doesn't select the next block
+    // Make sure double/triple-click doesn't select the next block.
     if (anchorKey !== focusKey && anchorOffset === 0 && focusOffset === 0) {
-      // Create an updated state with the text replaced.
+      // Create an updated state with the selection adjusted.
       const next = state
         .transform()
         .moveToRangeOf(state.startBlock)
