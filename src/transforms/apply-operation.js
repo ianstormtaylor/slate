@@ -40,7 +40,9 @@ const OPERATIONS = {
   set_node: setNode,
   split_node: splitNode,
   // Selection operations.
-  set_selection: setSelection
+  set_selection: setSelection,
+  // State data operations.
+  set_data: setData
 }
 
 /**
@@ -187,8 +189,8 @@ function moveNode(state, operation) {
   const { path, newPath, newIndex } = operation
   let { document } = state
   const node = document.assertPath(path)
-  const index = path.pop()
-  const parentDepth = path.length
+  const index = path[path.length - 1]
+  const parentPath = path.slice(0, -1)
 
   // Remove the node from its current parent
   let parent = document.getParent(node.key)
@@ -196,13 +198,13 @@ function moveNode(state, operation) {
   document = parent.kind === 'document' ? parent : document.updateDescendant(parent)
 
   // Check if `parent` is an anchestor of `target`
-  const isAncestor = path.every((x, i) => x === newPath[i])
+  const isAncestor = parentPath.every((x, i) => x === newPath[i])
 
   let target
 
-  // If `parent` ia an ancestor of `target` and they have the same depth,
-  // then `parent` and `target` are the same node.
-  if (isAncestor && parentDepth === newPath.length) {
+  // If `parent` is an ancestor of `target` and their paths have same length,
+  // then `parent` and `target` are equal.
+  if (isAncestor && parentPath.length === newPath.length) {
     target = parent
   }
 
@@ -210,8 +212,8 @@ function moveNode(state, operation) {
   // the index of the `target` ancestor with the same depth of `node`,
   // then removing `node` changes the path to `target`.
   // So we have to adjust `newPath` before picking `target`.
-  else if (isAncestor && index < newPath[parentDepth]) {
-    newPath[parentDepth]--
+  else if (isAncestor && index < newPath[parentPath.length]) {
+    newPath[parentPath.length]--
     target = document.assertPath(newPath)
   }
 
@@ -331,6 +333,23 @@ function removeText(state, operation) {
   node = node.removeText(offset, length)
   document = document.updateDescendant(node)
   state = state.set('document', document).set('selection', selection)
+  return state
+}
+
+/**
+ * Set `data` on `state`.
+ *
+ * @param {State} state
+ * @param {Object} operation
+ * @return {State}
+ */
+
+function setData(state, operation) {
+  const { properties } = operation
+  let { data } = state
+
+  data = data.merge(properties)
+  state = state.set('data', data)
   return state
 }
 

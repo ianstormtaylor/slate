@@ -424,7 +424,6 @@ Transforms.wrapInline = (transform, properties) => {
   let after
 
   const { startKey } = selection
-  const previous = document.getPreviousText(startKey)
 
   transform.deselect()
   transform.wrapInlineAtRange(selection, properties)
@@ -437,8 +436,21 @@ Transforms.wrapInline = (transform, properties) => {
   }
 
   else if (selection.startOffset == 0) {
-    const text = previous ? document.getNextText(previous.key) : document.getFirstText()
-    after = selection.moveToRangeOf(text)
+    // Find the inline that has been inserted.
+    // We want to handle multiple wrap, so we need to take the highest parent
+    const inline = document.getAncestors(startKey)
+      .find(parent => (
+        parent.kind == 'inline' &&
+        parent.getOffset(startKey) == 0
+      ))
+
+    const start = inline ? document.getPreviousText(inline.getFirstText().key) : document.getFirstText()
+    const end = document.getNextText(inline ? inline.getLastText().key : start.key)
+
+    // Move selection to wrap around the inline
+    after = selection
+      .moveAnchorToEndOf(start)
+      .moveFocusToStartOf(end)
   }
 
   else if (selection.startKey == selection.endKey) {

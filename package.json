@@ -1,12 +1,11 @@
 {
   "name": "slate",
   "description": "A completely customizable framework for building rich text editors.",
-  "version": "0.20.1",
+  "version": "0.21.0",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
   "main": "./lib/index.js",
   "dependencies": {
-    "cheerio": "^0.22.0",
     "debug": "^2.3.2",
     "direction": "^0.1.5",
     "es6-map": "^0.1.4",
@@ -59,6 +58,7 @@
     "mocha": "^2.5.3",
     "np": "^2.9.0",
     "npm-run-all": "^2.3.0",
+    "parse5": "^3.0.2",
     "prismjs": "^1.5.1",
     "react": "^15.4.2",
     "react-addons-perf": "^15.4.2",
@@ -106,7 +106,7 @@
     "test": "npm-run-all build:test tests",
     "tests": "mocha --compilers js:babel-core/register ./test/index.js",
     "watch": "npm-run-all --parallel --print-label watch:lib watch:examples start",
-    "watch:lib": "babel --watch --out-dir ./lib ./src",
+    "watch:lib": "babel --watch --out-dir ./lib ./src --source-maps inline",
     "watch:examples": "watchify --debug --transform babelify ./examples/index.js -o ./examples/build.dev.js -v"
   },
   "browserify-global-shim": {

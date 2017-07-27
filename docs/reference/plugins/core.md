@@ -67,7 +67,7 @@ However, sometimes you might want to disable the logic of the core plugin withou
 A noop `onBeforeInput` handler looks like:
 
 ```js
-function onBeforeInput(event, state, editor) {
+function onBeforeInput(event, data, state) {
   event.preventDefault()
   return state
 }
