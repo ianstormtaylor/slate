@@ -33,7 +33,7 @@ const TEXT_RULE = {
       }
     }
 
-    if (el.tagName == 'span' || el.nodeName == '#text') {
+    if (el.nodeName == '#text') {
       if (el.value && el.value.match(/<!--.*?-->/)) return
 
       return {
