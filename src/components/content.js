@@ -217,6 +217,18 @@ class Content extends React.Component {
     native.addRange(range)
     extendSelection(native, focusEl, focusOff)
 
+    // Make sure double/triple-click doesn't select the next block.
+    if (anchorKey !== focusKey && anchorOffset === 0 && focusOffset === 0) {
+      // Create an updated state with the selection adjusted.
+      const next = state
+        .transform()
+        .moveToRangeOf(state.startBlock)
+        .apply()
+
+      // Change the current state.
+      this.onChange(next)
+    }
+
     // Then unset the `isSelecting` flag after a delay.
     setTimeout(() => {
       // COMPAT: In Firefox, it's not enough to create a range, you also need to
