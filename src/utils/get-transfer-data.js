@@ -18,11 +18,11 @@ const FRAGMENT_MATCHER = / data-slate-fragment="([^\s]+)"/
  */
 
 function getTransferData(transfer) {
-  let fragment = transfer.getData(TYPES.FRAGMENT) || null
-  let node = transfer.getData(TYPES.NODE) || null
-  const html = transfer.getData('text/html') || null
-  const rich = transfer.getData('text/rtf') || null
-  let text = transfer.getData('text/plain') || null
+  let fragment = getType(transfer, TYPES.FRAGMENT)
+  let node = getType(transfer, TYPES.NODE)
+  const html = getType(transfer, 'text/html')
+  const rich = getType(transfer, 'text/rtf')
+  let text = getType(transfer, 'text/plain')
   let files
 
   // If there isn't a fragment, but there is HTML, check to see if the HTML is
@@ -120,6 +120,25 @@ function getTransferType(data) {
   if (data.html) return 'html'
   if (data.text) return 'text'
   return 'unknown'
+}
+
+/**
+ * Get one of types `TYPES.FRAGMENT`, `TYPES.NODE`, `text/html`, `text/rtf` or
+ * `text/plain` from transfers's `data` if possible, otherwise return null.
+ *
+ * @param {Object} transfer
+ * @param {String} type
+ * @return {String}
+ */
+
+function getType(transfer, type) {
+  if (!transfer.types || !transfer.types.length) {
+    // COMPAT: In IE 11, there is no `types` field but `getData('Text')`
+    // is supported`. (2017/06/23)
+    return type === 'text/plain' ? transfer.getData('Text') || null : null
+  }
+
+  return transfer.types.indexOf(type) !== -1 ? transfer.getData(type) || null : null
 }
 
 /**
