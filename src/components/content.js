@@ -558,7 +558,7 @@ class Content extends React.Component {
     const { state, editor } = this.props
 
     if (editor.tmp.pendingOnBeforeInputState !== undefined) {
-      editor.onChange(this.tmp.pendingOnBeforeInputState)
+      editor.onChange(editor.tmp.pendingOnBeforeInputState)
       editor.tmp.pendingOnBeforeInputState = undefined
     }
 
