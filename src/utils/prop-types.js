@@ -1,13 +1,13 @@
-import Block from './block'
-import Character from './character'
-import Document from './document'
-import Inline from './inline'
-import Mark from './mark'
-import Range from './range'
-import Schema from './schema'
-import Selection from './selection'
-import State from './state'
-import Text from './text'
+import Block from '../models/block'
+import Character from '../models/character'
+import Document from '../models/document'
+import Inline from '../models/inline'
+import Mark from '../models/mark'
+import Range from '../models/range'
+import Schema from '../models/schema'
+import Selection from '../models/selection'
+import State from '../models/state'
+import Text from '../models/text'
 
 /**
  * HOC Function that takes in a predicate prop type function, and allows an isRequired chain

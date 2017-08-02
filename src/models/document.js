@@ -13,7 +13,7 @@ import './inline'
 import Data from './data'
 import Block from './block'
 import Node from './node'
-import TYPES from './types'
+import MODEL_TYPES from '../constants/model-types'
 import generateKey from '../utils/generate-key'
 import { List, Map, Record } from 'immutable'
 
@@ -62,7 +62,7 @@ class Document extends new Record(DEFAULTS) {
    */
 
   static isDocument(maybeDocument) {
-    return !!(maybeDocument && maybeDocument[TYPES.IS_SLATE_DOCUMENT])
+    return !!(maybeDocument && maybeDocument[MODEL_TYPES.DOCUMENT])
   }
 
   /**
@@ -111,7 +111,7 @@ class Document extends new Record(DEFAULTS) {
  * Pseduo-symbol that shows this is a Slate Document
  */
 
-Document.prototype[TYPES.IS_SLATE_DOCUMENT] = true
+Document.prototype[MODEL_TYPES.DOCUMENT] = true
 
 /**
  * Mix in `Node` methods.

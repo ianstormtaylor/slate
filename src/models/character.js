@@ -1,6 +1,6 @@
 
 import Mark from './mark'
-import TYPES from './types'
+import MODEL_TYPES from '../constants/model-types'
 import { List, Record, Set } from 'immutable'
 
 /**
@@ -69,7 +69,7 @@ class Character extends new Record(DEFAULTS) {
    */
 
   static isCharacter(maybeCharacter) {
-    return !!(maybeCharacter && maybeCharacter[TYPES.IS_SLATE_CHARACTER])
+    return !!(maybeCharacter && maybeCharacter[MODEL_TYPES.CHARACTER])
   }
 
   /**
@@ -88,7 +88,7 @@ class Character extends new Record(DEFAULTS) {
  * Pseduo-symbol that shows this is a Slate Character
  */
 
-Character.prototype[TYPES.IS_SLATE_CHARACTER] = true
+Character.prototype[MODEL_TYPES.CHARACTER] = true
 
 /**
  * Export.

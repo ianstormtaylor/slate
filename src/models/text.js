@@ -2,7 +2,7 @@
 import Character from './character'
 import Mark from './mark'
 import Range from './range'
-import TYPES from './types'
+import MODEL_TYPES from '../constants/model-types'
 import memoize from '../utils/memoize'
 import generateKey from '../utils/generate-key'
 import { List, Record, OrderedSet, Set, is } from 'immutable'
@@ -90,7 +90,7 @@ class Text extends new Record(DEFAULTS) {
    */
 
   static isText(maybeText) {
-    return !!(maybeText && maybeText[TYPES.IS_SLATE_TEXT])
+    return !!(maybeText && maybeText[MODEL_TYPES.TEXT])
   }
 
   /**
@@ -418,7 +418,7 @@ class Text extends new Record(DEFAULTS) {
  * Pseudo-symbol that shows this is a Slate Text
  */
 
-Text.prototype[TYPES.IS_SLATE_TEXT] = true
+Text.prototype[MODEL_TYPES.TEXT] = true
 
 /**
  * Memoize read methods.

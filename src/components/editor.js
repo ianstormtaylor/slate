@@ -5,7 +5,7 @@ import React from 'react'
 import Types from 'prop-types'
 
 import Stack from '../models/stack'
-import SlatePropTypes from '../models/slate-prop-types'
+import SlatePropTypes from '../utils/prop-types'
 import noop from '../utils/noop'
 
 /**

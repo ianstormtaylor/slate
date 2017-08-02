@@ -13,7 +13,7 @@ import Data from './data'
 import Node from './node'
 import Inline from './inline'
 import Text from './text'
-import TYPES from './types'
+import MODEL_TYPES from '../constants/model-types'
 import generateKey from '../utils/generate-key'
 import { Map, List, Record } from 'immutable'
 
@@ -84,7 +84,7 @@ class Block extends new Record(DEFAULTS) {
    */
 
   static isBlock(maybeBlock) {
-    return !!(maybeBlock && maybeBlock[TYPES.IS_SLATE_BLOCK])
+    return !!(maybeBlock && maybeBlock[MODEL_TYPES.BLOCK])
   }
 
   /**
@@ -133,7 +133,7 @@ class Block extends new Record(DEFAULTS) {
  * Pseduo-symbol that shows this is a Slate Block
  */
 
-Block.prototype[TYPES.IS_SLATE_BLOCK] = true
+Block.prototype[MODEL_TYPES.BLOCK] = true
 
 /**
  * Mix in `Node` methods.

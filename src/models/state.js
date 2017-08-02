@@ -4,7 +4,7 @@ import Document from './document'
 import SCHEMA from '../schemas/core'
 import Selection from './selection'
 import Transform from './transform'
-import TYPES from './types'
+import MODEL_TYPES from '../constants/model-types'
 import { Record, Set, Stack, List, Map } from 'immutable'
 
 /**
@@ -86,7 +86,7 @@ class State extends new Record(DEFAULTS) {
    */
 
   static isState(maybeState) {
-    return !!(maybeState && maybeState[TYPES.IS_SLATE_STATE])
+    return !!(maybeState && maybeState[MODEL_TYPES.STATE])
   }
 
   /**
@@ -490,7 +490,7 @@ class State extends new Record(DEFAULTS) {
  * Pseduo-symbol that shows this is a Slate State
  */
 
-State.prototype[TYPES.IS_SLATE_STATE] = true
+State.prototype[MODEL_TYPES.STATE] = true
 
 /**
  * Export.

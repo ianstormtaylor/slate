@@ -5,7 +5,7 @@ import Types from 'prop-types'
 import getWindow from 'get-window'
 import keycode from 'keycode'
 
-import TYPES from '../constants/types'
+import MODEL_TYPES from '../constants/model-types'
 import Base64 from '../serializers/base-64'
 import Node from './node'
 import Selection from '../models/selection'

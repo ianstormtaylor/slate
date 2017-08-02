@@ -1,7 +1,7 @@
 
 import Character from './character'
 import Mark from './mark'
-import TYPES from './types'
+import MODEL_TYPES from '../constants/model-types'
 import { Record, Set } from 'immutable'
 
 /**
@@ -45,7 +45,7 @@ class Range extends new Record(DEFAULTS) {
    */
 
   static isRange(maybeRange) {
-    return !!(maybeRange && maybeRange[TYPES.IS_SLATE_RANGE])
+    return !!(maybeRange && maybeRange[MODEL_TYPES.RANGE])
   }
 
   /**
@@ -83,7 +83,7 @@ class Range extends new Record(DEFAULTS) {
  * Pseduo-symbol that shows this is a Slate Range
  */
 
-Range.prototype[TYPES.IS_SLATE_RANGE] = true
+Range.prototype[MODEL_TYPES.RANGE] = true
 
 /**
  * Export.

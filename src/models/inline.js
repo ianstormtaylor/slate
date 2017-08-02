@@ -13,7 +13,7 @@ import Block from './block'
 import Data from './data'
 import Node from './node'
 import Text from './text'
-import TYPES from './types'
+import MODEL_TYPES from '../constants/model-types'
 import generateKey from '../utils/generate-key'
 import { List, Map, Record } from 'immutable'
 
@@ -84,7 +84,7 @@ class Inline extends new Record(DEFAULTS) {
    */
 
   static isInline(maybeInline) {
-    return !!(maybeInline && maybeInline[TYPES.IS_SLATE_INLINE])
+    return !!(maybeInline && maybeInline[MODEL_TYPES.INLINE])
   }
 
   /**
@@ -133,7 +133,7 @@ class Inline extends new Record(DEFAULTS) {
  * Pseduo-symbol that shows this is a Slate Inline
  */
 
-Inline.prototype[TYPES.IS_SLATE_INLINE] = true
+Inline.prototype[MODEL_TYPES.INLINE] = true
 
 /**
  * Mix in `Node` methods.
