@@ -100,10 +100,6 @@ class Content extends React.Component {
     // the cursor will be added or removed again.
     if (props.readOnly != this.props.readOnly) return true
 
-    // If the state has been transformed natively, never re-render, or else we
-    // will end up duplicating content.
-    if (props.state.isNative) return false
-
     return (
       props.className != this.props.className ||
       props.schema != this.props.schema ||
@@ -734,7 +730,6 @@ class Content extends React.Component {
     // If there are no ranges, the editor was blurred natively.
     if (!native.rangeCount) {
       data.selection = selection.set('isFocused', false)
-      data.isNative = true
     }
 
     // Otherwise, determine the Slate selection from the native one.

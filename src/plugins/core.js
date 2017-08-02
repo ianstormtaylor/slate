@@ -44,9 +44,6 @@ function Plugin(options = {}) {
    */
 
   function onBeforeChange(state, editor) {
-    // Don't normalize with plugins schema when typing text in native mode
-    if (state.isNative) return state
-
     const schema = editor.getSchema()
     const prevState = editor.getState()
 
@@ -137,44 +134,9 @@ function Plugin(options = {}) {
     const nextText = next.startText
     const nextChars = nextText.getDecorations(decorators)
 
-    // We do not have to re-render if the current selection is collapsed, the
-    // current node is not empty, there are no marks on the cursor, the cursor
-    // is not at the edge of an inline node, the cursor isn't at the starting
-    // edge of a text node after an inline node, and the natively inserted
-    // characters would be the same as the non-native.
-    const isNative = (
-      // If the selection is expanded, we don't know what the edit will look
-      // like so we can't let it happen natively.
-      (state.isCollapsed) &&
-      // If the selection has marks, then we need to render it non-natively
-      // because we need to create the new marks as well.
-      (state.selection.marks == null) &&
-      // If the text node in question has no content, browsers might do weird
-      // things so we need to insert it normally instead.
-      (state.startText.text != '') &&
-      // COMPAT: Browsers do weird things when typing at the edges of inline
-      // nodes, so we can't let them render natively. (?)
-      (!startInline || !state.selection.isAtStartOf(startInline)) &&
-      (!startInline || !state.selection.isAtEndOf(startInline)) &&
-      // COMPAT: In Chrome & Safari, it isn't possible to have a selection at
-      // the starting edge of a text node after another inline node. It will
-      // have been automatically changed. So we can't render natively because
-      // the cursor isn't technique in the right spot. (2016/12/01)
-      (!(pInline && !pInline.isVoid && startOffset == 0)) &&
-      (!(nInline && !nInline.isVoid && startOffset == startText.length)) &&
-      // If the
-      (chars.equals(nextChars))
-    )
+    e.preventDefault()
 
-    // Add the `isNative` flag directly, so we don't have to re-transform.
-    if (isNative) {
-      next = next.set('isNative', isNative)
-    }
-
-    // If not native, prevent default so that the DOM remains untouched.
-    if (!isNative) e.preventDefault()
-
-    debug('onBeforeInput', { data, isNative })
+    debug('onBeforeInput', { data })
     return next
   }
 

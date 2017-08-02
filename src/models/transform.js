@@ -45,7 +45,6 @@ class Transform {
    * Apply the transform and return the new state.
    *
    * @param {Object} options
-   *   @property {Boolean} isNative
    *   @property {Boolean} merge
    *   @property {Boolean} save
    * @return {State}
@@ -53,7 +52,7 @@ class Transform {
 
   apply(options = {}) {
     const transform = this
-    let { merge, save, isNative = false } = options
+    let { merge, save } = options
 
     // Ensure that the selection is normalized.
     transform.normalizeSelection()
@@ -84,8 +83,8 @@ class Transform {
     // Save the new operations.
     if (save) this.save({ merge })
 
-    // Return the new state with the `isNative` flag set.
-    return this.state.set('isNative', !!isNative)
+    // Return the new state.
+    return this.state
   }
 
 }
