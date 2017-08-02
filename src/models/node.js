@@ -1377,43 +1377,33 @@ const Node = {
    *
    * @param {Node} first
    * @param {Node} second
-   * @param {Boolean} options.deep (optional) Join recursively the
-   * respective last node and first node of the nodes' children. Like a zipper :)
    * @return {Node}
    */
 
-  joinNode(first, second, options) {
-    const { deep = false } = options
+  joinNode(withIndex, index) {
     let node = this
-    let parent = node.getParent(second.key)
-    const isParent = node == parent
-    const index = parent.nodes.indexOf(second)
+    let one = node.nodes.get(withIndex)
+    const two = node.nodes.get(index)
 
-    if (first.kind != second.kind) {
-      throw new Error(`Tried to join two nodes of different kinds: "${first.kind}" and "${second.kind}".`)
+    if (one.kind != two.kind) {
+      throw new Error(`Tried to join two nodes of different kinds: "${one.kind}" and "${two.kind}".`)
     }
 
-    else if (first.kind == 'text') {
-      let { characters } = first
-      characters = characters.concat(second.characters)
-      first = first.set('characters', characters)
+    // If the nodes are text nodes, concatenate their characters together.
+    if (one.kind == 'text') {
+      const characters = one.characters.concat(two.characters)
+      one = one.set('characters', characters)
     }
 
+    // Otherwise, concatenate their child nodes together.
     else {
-      const { size } = first.nodes
-      second.nodes.forEach((child, i) => {
-        first = first.insertNode(size + i, child)
-      })
-
-      if (deep) {
-        // Join recursively
-        first = first.joinNode(first.nodes.get(size - 1), first.nodes.get(size), { deep })
-      }
+      const nodes = one.nodes.concat(two.nodes)
+      one = one.set('nodes', nodes)
     }
 
-    parent = parent.removeNode(index)
-    node = isParent ? parent : node.updateDescendant(parent)
-    node = node.updateDescendant(first)
+    node = node.removeNode(index)
+    node = node.removeNode(withIndex)
+    node = node.insertNode(withIndex, one)
     return node
   },
 
@@ -1534,94 +1524,42 @@ const Node = {
   },
 
   /**
-   * Split a node by `path` at `offset`.
+   * Split a child node by `index` at `position`.
    *
-   * @param {Array} path
-   * @param {Number} offset
+   * @param {Number} index
+   * @param {Number} position
    * @return {Node}
    */
 
-  splitNode(path, offset) {
-    let base = this
-    const node = base.assertPath(path)
-    let parent = base.getParent(node.key)
-    const isParent = base == parent
-    const index = parent.nodes.indexOf(node)
-
-    let child = node
+  splitNode(index, position) {
+    let node = this
+    const child = node.nodes.get(index)
     let one
     let two
 
-
-    if (node.kind != 'text') {
-      child = node.getTextAtOffset(offset)
+    // If the child is a text node, the `position` refers to the text offset at
+    // which to split it.
+    if (child.kind == 'text') {
+      const befores = child.characters.take(position)
+      const afters = child.characters.skip(position)
+      one = child.set('characters', befores)
+      two = child.set('characters', afters).regenerateKey()
     }
 
-    while (child && child != parent) {
-      if (child.kind == 'text') {
-        const i = node.kind == 'text' ? offset : offset - node.getOffset(child.key)
-        const { characters } = child
-        const oneChars = characters.take(i)
-        const twoChars = characters.skip(i)
-        one = child.set('characters', oneChars)
-        two = child.set('characters', twoChars).regenerateKey()
-      }
-
-      else {
-        const { nodes } = child
-
-        // Try to preserve the nodes list to preserve reference of one == node to avoid re-render
-        // When spliting at the end of a text node, the first node is preserved
-        let oneNodes = nodes.takeUntil(n => n.key == one.key)
-        oneNodes = (oneNodes.size == (nodes.size - 1) && one == nodes.last()) ? nodes : oneNodes.push(one)
-
-        const twoNodes = nodes.skipUntil(n => n.key == one.key).rest().unshift(two)
-        one = child.set('nodes', oneNodes)
-        two = child.set('nodes', twoNodes).regenerateKey()
-      }
-
-      child = base.getParent(child.key)
+    // Otherwise, if the child is not a text node, the `position` refers to the
+    // index at which to split its children.
+    else {
+      const befores = child.nodes.take(position)
+      const afters = child.nodes.skip(position)
+      one = child.set('nodes', befores)
+      two = child.set('nodes', afters).regenerateKey()
     }
 
-    parent = parent.removeNode(index)
-    parent = parent.insertNode(index, two)
-    parent = parent.insertNode(index, one)
-    base = isParent ? parent : base.updateDescendant(parent)
-    return base
-  },
-
-  /**
-   * Split a node by `path` after 'count' children.
-   * Does not work on Text nodes. Use `Node.splitNode` to split text nodes as well.
-   *
-   * @param {Array} path
-   * @param {Number} count
-   * @return {Node}
-   */
-
-  splitNodeAfter(path, count) {
-    let base = this
-    const node = base.assertPath(path)
-    if (node.kind === 'text') throw new Error('Cannot split text node at index. Use Node.splitNode at offset instead')
-    const { nodes } = node
-
-    let parent = base.getParent(node.key)
-    const isParent = base == parent
-
-    const oneNodes = nodes.take(count)
-    const twoNodes = nodes.skip(count)
-
-    const one = node.set('nodes', oneNodes)
-    const two = node.set('nodes', twoNodes).regenerateKey()
-
-
-    const nodeIndex = parent.nodes.indexOf(node)
-    parent = parent.removeNode(nodeIndex)
-    parent = parent.insertNode(nodeIndex, two)
-    parent = parent.insertNode(nodeIndex, one)
-
-    base = isParent ? parent : base.updateDescendant(parent)
-    return base
+    // Remove the old node and insert the newly split children.
+    node = node.removeNode(index)
+    node = node.insertNode(index, two)
+    node = node.insertNode(index, one)
+    return node
   },
 
   /**

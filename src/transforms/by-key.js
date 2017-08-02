@@ -269,22 +269,59 @@ Transforms.setNodeByKey = (transform, key, properties, options = {}) => {
 }
 
 /**
- * Split a node by `key` at `offset`.
+ * Split a node by `key` at `position`.
  *
  * @param {Transform} transform
  * @param {String} key
- * @param {Number} offset
+ * @param {Number} position
  * @param {Object} options
  *   @property {Boolean} normalize
  */
 
-Transforms.splitNodeByKey = (transform, key, offset, options = {}) => {
+Transforms.splitNodeByKey = (transform, key, position, options = {}) => {
   const { normalize = true } = options
   const { state } = transform
   const { document } = state
   const path = document.getPath(key)
 
-  transform.splitNodeAtOffsetOperation(path, offset)
+  transform.splitNodeOperation(path, position)
+
+  if (normalize) {
+    const parent = document.getParent(key)
+    transform.normalizeNodeByKey(parent.key, SCHEMA)
+  }
+}
+
+/**
+ * Split a node deeply down the tree by `key`, `textKey` and `textOffset`.
+ *
+ * @param {Transform} transform
+ * @param {String} key
+ * @param {Number} position
+ * @param {Object} options
+ *   @property {Boolean} normalize
+ */
+
+Transforms.splitDescendantsByKey = (transform, key, textKey, textOffset, options = {}) => {
+  if (key == textKey) {
+    transform.splitNodeByKey(textKey, textOffset, options)
+    return
+  }
+
+  const { normalize = true } = options
+  const { state } = transform
+  const { document } = state
+
+  const text = document.getNode(textKey)
+  const ancestors = document.getAncestors(textKey)
+  const nodes = ancestors.skipUntil(a => a.key == key).reverse().unshift(text)
+  let previous
+
+  nodes.forEach((node) => {
+    const index = previous ? node.nodes.indexOf(previous) + 1 : textOffset
+    previous = node
+    transform.splitNodeByKey(node.key, index, { normalize: false })
+  })
 
   if (normalize) {
     const parent = document.getParent(key)
@@ -375,11 +412,10 @@ Transforms.unwrapNodeByKey = (transform, key, options = {}) => {
   }
 
   else {
-    const parentPath = document.getPath(parent.key)
     // Split the parent.
-    transform.splitNodeOperation(parentPath, index)
-    // Extract the node in between the splitted parent.
+    transform.splitNodeByKey(parent.key, index, { normalize: false })
 
+    // Extract the node in between the splitted parent.
     transform.moveNodeByKey(key, parentParent.key, parentIndex + 1, { normalize: false })
 
     if (normalize) {

@@ -419,58 +419,9 @@ Transforms.wrapBlock = (transform, properties) => {
  */
 
 Transforms.wrapInline = (transform, properties) => {
-  let { state } = transform
-  let { document, selection } = state
-  let after
-
-  const { startKey } = selection
-
-  transform.deselect()
+  const { state } = transform
+  const { selection } = state
   transform.wrapInlineAtRange(selection, properties)
-  state = transform.state
-  document = state.document
-
-  // Determine what the selection should be after wrapping.
-  if (selection.isCollapsed) {
-    after = selection
-  }
-
-  else if (selection.startOffset == 0) {
-    // Find the inline that has been inserted.
-    // We want to handle multiple wrap, so we need to take the highest parent
-    const inline = document.getAncestors(startKey)
-      .find(parent => (
-        parent.kind == 'inline' &&
-        parent.getOffset(startKey) == 0
-      ))
-
-    const start = inline ? document.getPreviousText(inline.getFirstText().key) : document.getFirstText()
-    const end = document.getNextText(inline ? inline.getLastText().key : start.key)
-
-    // Move selection to wrap around the inline
-    after = selection
-      .moveAnchorToEndOf(start)
-      .moveFocusToStartOf(end)
-  }
-
-  else if (selection.startKey == selection.endKey) {
-    const text = document.getNextText(selection.startKey)
-    after = selection.moveToRangeOf(text)
-  }
-
-  else {
-    const anchor = document.getNextText(selection.anchorKey)
-    const focus = document.getDescendant(selection.focusKey)
-    after = selection.merge({
-      anchorKey: anchor.key,
-      anchorOffset: 0,
-      focusKey: focus.key,
-      focusOffset: selection.focusOffset
-    })
-  }
-
-  after = after.normalize(document)
-  transform.select(after)
 }
 
 /**

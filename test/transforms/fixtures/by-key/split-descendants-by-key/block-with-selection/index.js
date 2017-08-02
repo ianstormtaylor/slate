@@ -3,26 +3,28 @@ import assert from 'assert'
 
 export default function (state) {
   const { selection } = state
+
   const range = selection.merge({
     anchorKey: 'b',
     anchorOffset: 0,
     focusKey: 'b',
-    focusOffset: 4
+    focusOffset: 3
   })
 
   const next = state
     .transform()
     .select(range)
-    .wrapInline('hashtag')
+    .splitDescendantsByKey('a', 'b', 2)
     .apply()
+
+
+  const second = next.document.getTexts().last()
 
   assert.deepEqual(
     next.selection.toJS(),
     range.merge({
-      anchorKey: '4',
-      anchorOffset: 0,
-      focusKey: '3',
-      focusOffset: 0
+      focusKey: second.key,
+      focusOffset: 1
     }).toJS()
   )
 

@@ -19,14 +19,14 @@ export default function (state) {
     .wrapInline('outer')
     .apply()
 
-  const anchor = next.document.getTexts().get(0)
+  const anchor = next.document.getTexts().get(2)
   const focus = next.document.getTexts().get(4)
 
   assert.deepEqual(
     next.selection.toJS(),
     range.merge({
       anchorKey: anchor.key,
-      anchorOffset: anchor.length,
+      anchorOffset: 0,
       focusKey: focus.key,
       focusOffset: 0
     }).toJS()

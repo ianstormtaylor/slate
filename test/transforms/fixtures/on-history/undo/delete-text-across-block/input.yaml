@@ -4,11 +4,11 @@ nodes:
     type: paragraph
     nodes:
       - kind: text
-        key: 'key1'
+        key: a
         text: The
   - kind: block
     type: paragraph
     nodes:
       - kind: text
-        key: 'key2'
+        key: b
         text: text

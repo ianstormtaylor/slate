@@ -138,35 +138,33 @@ function insertText(state, operation) {
  */
 
 function joinNode(state, operation) {
-  const { path, withPath, deep = false } = operation
+  const { path, withPath } = operation
   let { document, selection } = state
-  const first = document.assertPath(withPath)
-  const second = document.assertPath(path)
+  const one = document.assertPath(withPath)
+  const two = document.assertPath(path)
+  let parent = document.getParent(one.key)
+  const oneIndex = parent.nodes.indexOf(one)
+  const twoIndex = parent.nodes.indexOf(two)
 
-  document = document.joinNode(first, second, { deep })
+  // Perform the join in the document.
+  parent = parent.joinNode(oneIndex, twoIndex)
+  document = parent.key == document.key ? parent : document.updateDescendant(parent)
 
-  // If the operation is deep, or the nodes are text nodes, it means we will be
-  // merging two text nodes together, so we need to update the selection.
-  if (deep || second.kind == 'text') {
+  // If the nodes are text nodes and the selection is inside the second node
+  // update it to refer to the first node instead.
+  if (one.kind == 'text') {
     const { anchorKey, anchorOffset, focusKey, focusOffset } = selection
-    const firstText = first.kind == 'text' ? first : first.getLastText()
-    const secondText = second.kind == 'text' ? second : second.getFirstText()
 
-    if (anchorKey == secondText.key) {
-      selection = selection.merge({
-        anchorKey: firstText.key,
-        anchorOffset: anchorOffset + firstText.characters.size
-      })
+    if (anchorKey == two.key) {
+      selection = selection.moveAnchorTo(one.key, one.length + anchorOffset)
     }
 
-    if (focusKey == secondText.key) {
-      selection = selection.merge({
-        focusKey: firstText.key,
-        focusOffset: focusOffset + firstText.characters.size
-      })
+    if (focusKey == two.key) {
+      selection = selection.moveFocusTo(one.key, one.length + focusOffset)
     }
   }
 
+  // Update the document and selection.
   state = state.set('document', document).set('selection', selection)
   return state
 }
@@ -436,55 +434,38 @@ function setSelection(state, operation) {
  *
  * @param {State} state
  * @param {Object} operation
- *   @param {Array} operation.path The path of the node to split
- *   @param {Number} operation.offset (optional) Split using a relative offset
- *   @param {Number} operation.count (optional) Split after `count`
- *   children. Cannot be used in combination with offset.
  * @return {State}
  */
 
 function splitNode(state, operation) {
-  const { path, offset, count } = operation
+  const { path, position } = operation
   let { document, selection } = state
 
-  // If there's no offset, it's using the `count` instead.
-  if (offset == null) {
-    document = document.splitNodeAfter(path, count)
-    state = state.set('document', document)
-    return state
-  }
-
-  // Otherwise, split using the `offset`, but calculate a few things first.
+  // Calculate a few things...
   const node = document.assertPath(path)
-  const text = node.kind == 'text' ? node : node.getTextAtOffset(offset)
-  const textOffset = node.kind == 'text' ? offset : offset - node.getOffset(text.key)
-  const { anchorKey, anchorOffset, focusKey, focusOffset } = selection
+  let parent = document.getParent(node.key)
+  const index = parent.nodes.indexOf(node)
+  const isParent = parent == document
 
-  document = document.splitNode(path, offset)
+  // Split the node by its parent.
+  parent = parent.splitNode(index, position)
+  document = isParent ? parent : document.updateDescendant(parent)
 
-  // Determine whether we need to update the selection.
-  const splitAnchor = text.key == anchorKey && textOffset <= anchorOffset
-  const splitFocus = text.key == focusKey && textOffset <= focusOffset
+  // Determine whether we need to update the selection...
+  const { startKey, endKey, startOffset, endOffset } = selection
+  const next = document.getNextText(node.key)
 
-  // If either the anchor of focus was after the split, we need to update them.
-  if (splitFocus || splitAnchor) {
-    const nextText = document.getNextText(text.key)
-
-    if (splitAnchor) {
-      selection = selection.merge({
-        anchorKey: nextText.key,
-        anchorOffset: anchorOffset - textOffset
-      })
-    }
-
-    if (splitFocus) {
-      selection = selection.merge({
-        focusKey: nextText.key,
-        focusOffset: focusOffset - textOffset
-      })
-    }
+  // If the start point is after or equal to the split, update it.
+  if (node.key == startKey && position <= startOffset) {
+    selection = selection.moveStartTo(next.key, startOffset - position)
   }
 
+  // If the end point is after or equal to the split, update it.
+  if (node.key == endKey && position <= endOffset) {
+    selection = selection.moveEndTo(next.key, endOffset - position)
+  }
+
+  // Return the updated state.
   state = state.set('document', document).set('selection', selection)
   return state
 }

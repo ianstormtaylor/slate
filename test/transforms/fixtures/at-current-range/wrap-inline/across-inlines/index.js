@@ -19,17 +19,16 @@ export default function (state) {
     .wrapInline('hashtag')
     .apply()
 
-  const three = next.document.getTexts().get(2)
-  const seven = next.document.getTexts().get(6)
+  const five = next.document.getTexts().get(4)
+  const ten = next.document.getTexts().get(9)
 
-  // TODO: seems wrong.
   assert.deepEqual(
     next.selection.toJS(),
     range.merge({
-      anchorKey: three.key,
+      anchorKey: five.key,
       anchorOffset: 0,
-      focusKey: seven.key,
-      focusOffset: seven.length
+      focusKey: ten.key,
+      focusOffset: 0
     }).toJS()
   )
 

@@ -84,11 +84,18 @@ Transforms.deleteAtRange = (transform, range, options = {}) => {
   let ancestor = document.getCommonAncestor(startKey, endKey)
   let startChild = ancestor.getFurthestAncestor(startKey)
   let endChild = ancestor.getFurthestAncestor(endKey)
-  const startOff = (startChild.kind == 'text' ? 0 : startChild.getOffset(startKey)) + startOffset
-  const endOff = (endChild.kind == 'text' ? 0 : endChild.getOffset(endKey)) + endOffset
 
-  transform.splitNodeByKey(startChild.key, startOff, OPTS)
-  transform.splitNodeByKey(endChild.key, endOff, OPTS)
+  if (startChild.kind == 'text') {
+    transform.splitNodeByKey(startChild.key, startOffset, OPTS)
+  } else {
+    transform.splitDescendantsByKey(startChild.key, startKey, startOffset, OPTS)
+  }
+
+  if (endChild.kind == 'text') {
+    transform.splitNodeByKey(endChild.key, endOffset, OPTS)
+  } else {
+    transform.splitDescendantsByKey(endChild.key, endKey, endOffset, OPTS)
+  }
 
   // Refresh variables.
   state = transform.state
@@ -99,6 +106,7 @@ Transforms.deleteAtRange = (transform, range, options = {}) => {
   const startIndex = ancestor.nodes.indexOf(startChild)
   const endIndex = ancestor.nodes.indexOf(endChild)
   const middles = ancestor.nodes.slice(startIndex + 1, endIndex + 1)
+  const next = document.getNextText(endKey)
 
   // Remove all of the middle nodes, between the splits.
   if (middles.size) {
@@ -109,8 +117,10 @@ Transforms.deleteAtRange = (transform, range, options = {}) => {
 
   // If the start and end block are different, move all of the nodes from the
   // end block into the start block.
+  state = transform.state
+  document = state.document
   const startBlock = document.getClosestBlock(startKey)
-  const endBlock = document.getClosestBlock(document.getNextText(endKey).key)
+  const endBlock = document.getClosestBlock(next.key)
 
   if (startBlock.key !== endBlock.key) {
     endBlock.nodes.forEach((child, i) => {
@@ -518,7 +528,6 @@ Transforms.insertBlockAtRange = (transform, range, block, options = {}) => {
   const { state } = transform
   const { document } = state
   const { startKey, startOffset } = range
-  const startText = document.assertDescendant(startKey)
   const startBlock = document.getClosestBlock(startKey)
   const parent = document.getParent(startBlock.key)
   const index = parent.nodes.indexOf(startBlock)
@@ -541,8 +550,7 @@ Transforms.insertBlockAtRange = (transform, range, block, options = {}) => {
   }
 
   else {
-    const offset = startBlock.getOffset(startText.key) + startOffset
-    transform.splitNodeByKey(startBlock.key, offset, { normalize })
+    transform.splitDescendantsByKey(startBlock.key, startKey, startOffset, OPTS)
     transform.insertNodeByKey(parent.key, index + 1, block, { normalize })
   }
 
@@ -589,10 +597,6 @@ Transforms.insertFragmentAtRange = (transform, range, fragment, options = {}) =>
   const isAtStart = range.isAtStartOf(startBlock)
   const parent = document.getParent(startBlock.key)
   const index = parent.nodes.indexOf(startBlock)
-  const offset = startChild == startText
-    ? startOffset
-    : startChild.getOffset(startText.key) + startOffset
-
   const blocks = fragment.getBlocks()
   const firstBlock = blocks.first()
   const lastBlock = blocks.last()
@@ -619,7 +623,7 @@ Transforms.insertFragmentAtRange = (transform, range, fragment, options = {}) =>
 
   // Check if we need to split the node.
   if (startOffset != 0) {
-    transform.splitNodeByKey(startChild.key, offset, OPTS)
+    transform.splitDescendantsByKey(startChild.key, startKey, startOffset, OPTS)
   }
 
   // Update our variables with the new state.
@@ -834,17 +838,15 @@ Transforms.splitBlockAtRange = (transform, range, height = 1, options = {}) => {
   const { document } = state
   let node = document.assertDescendant(startKey)
   let parent = document.getClosestBlock(node.key)
-  let offset = startOffset
   let h = 0
 
   while (parent && parent.kind == 'block' && h < height) {
-    offset += parent.getOffset(node.key)
     node = parent
     parent = document.getClosestBlock(parent.key)
     h++
   }
 
-  transform.splitNodeByKey(node.key, offset, { normalize })
+  transform.splitDescendantsByKey(node.key, startKey, startOffset, { normalize })
 }
 
 /**
@@ -870,17 +872,15 @@ Transforms.splitInlineAtRange = (transform, range, height = Infinity, options = 
   const { document } = state
   let node = document.assertDescendant(startKey)
   let parent = document.getClosestInline(node.key)
-  let offset = startOffset
   let h = 0
 
   while (parent && parent.kind == 'inline' && h < height) {
-    offset += parent.getOffset(node.key)
     node = parent
     parent = document.getClosestInline(parent.key)
     h++
   }
 
-  transform.splitNodeByKey(node.key, offset, { normalize })
+  transform.splitDescendantsByKey(node.key, startKey, startOffset, { normalize })
 }
 
 /**
@@ -982,9 +982,8 @@ Transforms.unwrapBlockAtRange = (transform, range, properties, options = {}) => 
     }
 
     else {
-      const offset = block.getOffset(firstMatch.key)
-
-      transform.splitNodeByKey(block.key, offset, OPTS)
+      const firstText = firstMatch.getFirstText()
+      transform.splitDescendantsByKey(block.key, firstText.key, 0, OPTS)
       state = transform.state
       document = state.document
 
@@ -1156,38 +1155,28 @@ Transforms.wrapInlineAtRange = (transform, range, inline, options = {}) => {
   let startBlock = document.getClosestBlock(startKey)
   let endBlock = document.getClosestBlock(endKey)
   let startChild = startBlock.getFurthestAncestor(startKey)
-  const endChild = endBlock.getFurthestAncestor(endKey)
+  let endChild = endBlock.getFurthestAncestor(endKey)
+
+  transform.splitDescendantsByKey(endChild.key, endKey, endOffset, OPTS)
+  transform.splitDescendantsByKey(startChild.key, startKey, startOffset, OPTS)
+
+  state = transform.state
+  document = state.document
+  startBlock = document.getDescendant(startBlock.key)
+  endBlock = document.getDescendant(endBlock.key)
+  startChild = startBlock.getFurthestAncestor(startKey)
+  endChild = endBlock.getFurthestAncestor(endKey)
   const startIndex = startBlock.nodes.indexOf(startChild)
   const endIndex = endBlock.nodes.indexOf(endChild)
 
-  const startOff = startChild.key == startKey
-    ? startOffset
-    : startChild.getOffset(startKey) + startOffset
-
-  const endOff = endChild.key == endKey
-    ? endOffset
-    : endChild.getOffset(endKey) + endOffset
-
   if (startBlock == endBlock) {
-    if (endOff != endChild.length) {
-      transform.splitNodeByKey(endChild.key, endOff, OPTS)
-    }
-
-    if (startOff != 0) {
-      transform.splitNodeByKey(startChild.key, startOff, OPTS)
-    }
-
     state = transform.state
     document = state.document
     startBlock = document.getClosestBlock(startKey)
     startChild = startBlock.getFurthestAncestor(startKey)
 
-    const startInner = startOff == 0
-      ? startChild
-      : document.getNextSibling(startChild.key)
-
+    const startInner = document.getNextSibling(startChild.key)
     const startInnerIndex = startBlock.nodes.indexOf(startInner)
-
     const endInner = startKey == endKey ? startInner : startBlock.getFurthestAncestor(endKey)
     const inlines = startBlock.nodes
       .skipUntil(n => n == startInner)
@@ -1208,14 +1197,6 @@ Transforms.wrapInlineAtRange = (transform, range, inline, options = {}) => {
   }
 
   else {
-    transform.splitNodeByKey(startChild.key, startOff, OPTS)
-    transform.splitNodeByKey(endChild.key, endOff, OPTS)
-
-    state = transform.state
-    document = state.document
-    startBlock = document.getDescendant(startBlock.key)
-    endBlock = document.getDescendant(endBlock.key)
-
     const startInlines = startBlock.nodes.slice(startIndex + 1)
     const endInlines = endBlock.nodes.slice(0, endIndex + 1)
     const startNode = inline.regenerateKey()

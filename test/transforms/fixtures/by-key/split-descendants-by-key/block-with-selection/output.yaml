@@ -1,12 +1,16 @@
 
 nodes:
   - kind: block
+    key: a
     type: paragraph
     nodes:
       - kind: text
-        text: The
+        key: b
+        text: wo
   - kind: block
+    key: 1
     type: paragraph
     nodes:
       - kind: text
-        text: text
+        key: 2
+        text: rd
