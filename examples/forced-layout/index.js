@@ -88,7 +88,7 @@ class ForcedLayout extends React.Component {
    * @return {Component} component
    */
 
-  render = () => {
+  render() {
     return (
       <Editor
         state={this.state.state}

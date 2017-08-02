@@ -85,7 +85,7 @@ The fourth is an example of using the plugin.render property to create a higher-
    * @return {Component} component
    */
 
-  render = () => {
+  render() {
     return (
       <Editor
         placeholder={'Enter some text...'}
