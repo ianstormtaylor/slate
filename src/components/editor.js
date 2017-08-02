@@ -79,7 +79,7 @@ class Editor extends React.Component {
     role: Types.string,
     schema: Types.object,
     spellCheck: Types.bool,
-    state: SlatePropTypes.slateState.isRequired,
+    state: SlatePropTypes.state.isRequired,
     style: Types.object,
     tabIndex: Types.number,
   }

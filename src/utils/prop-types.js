@@ -38,7 +38,7 @@ function createChainablePropType(predicate) {
  * @type {Function}
  */
 
-const slateBlock = createChainablePropType(
+const block = createChainablePropType(
   (props, propName, componentName) => {
     return !Block.isBlock(props[propName]) ? new Error(`${propName} in ${componentName} is not a Slate Block`) : null
   }
@@ -50,7 +50,7 @@ const slateBlock = createChainablePropType(
  * @type {Function}
  */
 
-const slateCharacter = createChainablePropType(
+const character = createChainablePropType(
   (props, propName, componentName) => {
     return !Character.isCharacter(props[propName]) ? new Error(`${propName} in ${componentName} is not a Slate Character`) : null
   }
@@ -62,7 +62,7 @@ const slateCharacter = createChainablePropType(
  * @type {Function}
  */
 
-const slateDocument = createChainablePropType(
+const document = createChainablePropType(
   (props, propName, componentName) => {
     return !Document.isDocument(props[propName]) ? new Error(`${propName} in ${componentName} is not a Slate Document`) : null
   }
@@ -74,7 +74,7 @@ const slateDocument = createChainablePropType(
  * @type {Function}
  */
 
-const slateInline = createChainablePropType(
+const inline = createChainablePropType(
   (props, propName, componentName) => {
     return !Inline.isInline(props[propName]) ? new Error(`${propName} in ${componentName} is not a Slate Inline`) : null
   }
@@ -86,7 +86,7 @@ const slateInline = createChainablePropType(
  * @type {Function}
  */
 
-const slateMark = createChainablePropType(
+const mark = createChainablePropType(
   (props, propName, componentName) => {
     return !Mark.isMark(props[propName]) ? new Error(`${propName} in ${componentName} is not a Slate Mark`) : null
   }
@@ -98,7 +98,7 @@ const slateMark = createChainablePropType(
  * @type {Function}
  */
 
-const slateRange = createChainablePropType(
+const range = createChainablePropType(
   (props, propName, componentName) => {
     return !Range.isRange(props[propName]) ? new Error(`${propName} in ${componentName} is not a Slate Range`) : null
   }
@@ -110,7 +110,7 @@ const slateRange = createChainablePropType(
  * @type {Function}
  */
 
-const slateSchema = createChainablePropType(
+const schema = createChainablePropType(
   (props, propName, componentName) => {
     return !Schema.isSchema(props[propName]) ? new Error(`${propName} in ${componentName} is not a Slate Schema`) : null
   }
@@ -122,7 +122,7 @@ const slateSchema = createChainablePropType(
  * @type {Function}
  */
 
-const slateSelection = createChainablePropType(
+const selection = createChainablePropType(
   (props, propName, componentName) => {
     return !Selection.isSelection(props[propName]) ? new Error(`${propName} in ${componentName} is not a Slate Selection`) : null
   }
@@ -134,7 +134,7 @@ const slateSelection = createChainablePropType(
  * @type {Function}
  */
 
-const slateState = createChainablePropType(
+const state = createChainablePropType(
   (props, propName, componentName) => {
     return !State.isState(props[propName]) ? new Error(`${propName} in ${componentName} is not a Slate State ${props[propName]}`) : null
   }
@@ -146,7 +146,7 @@ const slateState = createChainablePropType(
  * @type {Function}
  */
 
-const slateText = createChainablePropType(
+const text = createChainablePropType(
   (props, propName, componentName) => {
     return !Text.isText(props[propName]) ? new Error(`${propName} in ${componentName} is not a Slate Text`) : null
   }
@@ -159,14 +159,14 @@ const slateText = createChainablePropType(
  */
 
 export default {
-  slateBlock,
-  slateCharacter,
-  slateDocument,
-  slateInline,
-  slateMark,
-  slateRange,
-  slateSchema,
-  slateSelection,
-  slateState,
-  slateText,
+  block,
+  character,
+  document,
+  inline,
+  mark,
+  range,
+  schema,
+  selection,
+  state,
+  text,
 }
