@@ -7,7 +7,6 @@ import Types from 'prop-types'
 import Stack from '../models/stack'
 import State from '../models/state'
 import noop from '../utils/noop'
-import warn from '../utils/warn'
 
 /**
  * Debug.

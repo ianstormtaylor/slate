@@ -10,21 +10,15 @@ export default function (state) {
     focusOffset: 3
   })
 
-  debugger
-
   const first = state
     .transform()
     .deleteAtRange(range)
     .apply()
 
-  debugger
-
   const next = first
     .transform()
     .undo()
     .apply()
-
-  debugger
 
   assert.deepEqual(next.selection.toJS(), selection.toJS())
 

@@ -8,7 +8,6 @@ import Placeholder from '../components/placeholder'
 import React from 'react'
 import getWindow from 'get-window'
 import findDOMNode from '../utils/find-dom-node'
-import warn from '../utils/warn'
 import { IS_CHROME, IS_MAC, IS_SAFARI } from '../constants/environment'
 
 /**
