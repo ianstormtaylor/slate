@@ -80,7 +80,7 @@ const MARK_TAGS = {
 const RULES = [
   {
     deserialize(el, next) {
-      const block = BLOCK_TAGS[el.tagName]
+      const block = BLOCK_TAGS[el.tagName.toLowerCase()]
       if (!block) return
       return {
         kind: 'block',
@@ -91,7 +91,7 @@ const RULES = [
   },
   {
     deserialize(el, next) {
-      const mark = MARK_TAGS[el.tagName]
+      const mark = MARK_TAGS[el.tagName.toLowerCase()]
       if (!mark) return
       return {
         kind: 'mark',
@@ -103,9 +103,9 @@ const RULES = [
   {
     // Special case for code blocks, which need to grab the nested childNodes.
     deserialize(el, next) {
-      if (el.tagName != 'pre') return
+      if (el.tagName.toLowerCase() != 'pre') return
       const code = el.childNodes[0]
-      const childNodes = code && code.tagName == 'code'
+      const childNodes = code && code.tagName.toLowerCase() == 'code'
         ? code.childNodes
         : el.childNodes
 
@@ -119,7 +119,7 @@ const RULES = [
   {
     // Special case for links, to grab their href.
     deserialize(el, next) {
-      if (el.tagName != 'a') return
+      if (el.tagName.toLowerCase() != 'a') return
       return {
         kind: 'inline',
         type: 'link',

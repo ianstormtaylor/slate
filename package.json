@@ -1,7 +1,7 @@
 {
   "name": "slate",
   "description": "A completely customizable framework for building rich text editors.",
-  "version": "0.21.0",
+  "version": "0.21.1",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
   "main": "./lib/index.js",
@@ -64,7 +64,7 @@
     "react-addons-perf": "^15.4.2",
     "react-dom": "^15.4.2",
     "react-frame-aware-selection-plugin": "^1.0.0",
-    "react-frame-component": "^1.0.3",
+    "react-frame-component": "^1.1.1",
     "react-router": "^2.5.1",
     "react-router-dom": "^4.1.1",
     "read-metadata": "^1.0.0",

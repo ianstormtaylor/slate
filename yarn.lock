@@ -4855,9 +4855,9 @@ react-frame-aware-selection-plugin@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/react-frame-aware-selection-plugin/-/react-frame-aware-selection-plugin-1.0.0.tgz#6a0d40efd56721179160159709f10ec70469c2ec"
 
-react-frame-component@^1.0.3:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/react-frame-component/-/react-frame-component-1.0.3.tgz#00a5deea81671927ea973954a0d8eb19ecc339de"
+react-frame-component@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/react-frame-component/-/react-frame-component-1.1.1.tgz#05b7f5689a2d373f25baf0c9adb0e59d78103388"
 
 react-portal@^3.1.0:
   version "3.1.0"
