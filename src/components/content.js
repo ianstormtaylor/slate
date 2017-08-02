@@ -476,7 +476,7 @@ class Content extends React.Component {
     const { fragment } = state
     const encoded = Base64.serializeNode(fragment)
 
-    setTransferData(dataTransfer, TYPES.FRAGMENT, encoded)
+    setTransferData(dataTransfer, MODEL_TYPES.FRAGMENT, encoded)
 
     debug('onDragStart', { event })
   }
