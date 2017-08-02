@@ -557,6 +557,11 @@ class Content extends React.Component {
     const window = getWindow(event.target)
     const { state, editor } = this.props
 
+    if (editor.tmp.pendingOnBeforeInputState !== undefined) {
+      editor.onChange(this.tmp.pendingOnBeforeInputState)
+      editor.tmp.pendingOnBeforeInputState = undefined
+    }
+
     // Get the selection point.
     const native = window.getSelection()
     const { anchorNode, anchorOffset } = native

@@ -127,7 +127,31 @@ class Editor extends React.Component {
     // Create a bound event handler for each event.
     for (const method of EVENT_HANDLERS) {
       this[method] = (...args) => {
+        if (method === 'onBeforeInput') {
+          if (this.tmp.pendingOnBeforeInputState !== undefined) {
+            this.onChange(this.tmp.pendingOnBeforeInputState)
+            this.tmp.pendingOnBeforeInputState = undefined
+          }
+
+          const next = this.state.stack[method](this.state.state, this, ...args)
+
+          if (!event.defaultPrevented) {
+            this.tmp.pendingOnBeforeInputState = next
+            setTimeout(() => {
+              if (this.tmp.pendingOnBeforeInputState !== undefined) {
+                this.onChange(this.tmp.pendingOnBeforeInputState)
+                this.tmp.pendingOnBeforeInputState = undefined
+              }
+            })
+          } else {
+            this.onChange(next)
+          }
+
+          return
+        }
+
         const next = this.state.stack[method](this.state.state, this, ...args)
+
         this.onChange(next)
       }
     }
