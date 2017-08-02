@@ -3,7 +3,6 @@
  * Prevent circular dependencies.
  */
 
-import './block'
 import './document'
 
 /**
@@ -14,6 +13,7 @@ import Block from './block'
 import Data from './data'
 import Node from './node'
 import Text from './text'
+import MODEL_TYPES from '../constants/model-types'
 import generateKey from '../utils/generate-key'
 import { List, Map, Record } from 'immutable'
 
@@ -47,9 +47,9 @@ class Inline extends new Record(DEFAULTS) {
    */
 
   static create(properties = {}) {
-    if (properties instanceof Block) return properties
-    if (properties instanceof Inline) return properties
-    if (properties instanceof Text) return properties
+    if (Block.isBlock(properties)) return properties
+    if (Inline.isInline(properties)) return properties
+    if (Text.isText(properties)) return properties
     if (!properties.type) throw new Error('You must pass an inline `type`.')
 
     properties.key = properties.key || generateKey()
@@ -74,6 +74,17 @@ class Inline extends new Record(DEFAULTS) {
   static createList(elements = []) {
     if (List.isList(elements)) return elements
     return new List(elements.map(Inline.create))
+  }
+
+  /**
+   * Determines if the passed in paramter is a Slate Inline or not
+   *
+   * @param {*} maybeInline
+   * @return {Boolean}
+   */
+
+  static isInline(maybeInline) {
+    return !!(maybeInline && maybeInline[MODEL_TYPES.INLINE])
   }
 
   /**
@@ -117,6 +128,12 @@ class Inline extends new Record(DEFAULTS) {
   }
 
 }
+
+/**
+ * Pseduo-symbol that shows this is a Slate Inline
+ */
+
+Inline.prototype[MODEL_TYPES.INLINE] = true
 
 /**
  * Mix in `Node` methods.

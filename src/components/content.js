@@ -5,7 +5,7 @@ import Types from 'prop-types'
 import getWindow from 'get-window'
 import keycode from 'keycode'
 
-import TYPES from '../constants/types'
+import TRANSFER_TYPES from '../constants/transfer-types'
 import Base64 from '../serializers/base-64'
 import Node from './node'
 import Selection from '../models/selection'
@@ -476,7 +476,7 @@ class Content extends React.Component {
     const { fragment } = state
     const encoded = Base64.serializeNode(fragment)
 
-    setTransferData(dataTransfer, TYPES.FRAGMENT, encoded)
+    setTransferData(dataTransfer, TRANSFER_TYPES.FRAGMENT, encoded)
 
     debug('onDragStart', { event })
   }

@@ -4,7 +4,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import Types from 'prop-types'
 
-import TYPES from '../constants/types'
+import TRANSFER_TYPES from '../constants/transfer-types'
 import Base64 from '../serializers/base-64'
 import Leaf from './leaf'
 import Void from './void'
@@ -221,7 +221,7 @@ class Node extends React.Component {
     const encoded = Base64.serializeNode(node, { preserveKeys: true })
     const { dataTransfer } = e.nativeEvent
 
-    setTransferData(dataTransfer, TYPES.NODE, encoded)
+    setTransferData(dataTransfer, TRANSFER_TYPES.NODE, encoded)
 
     this.debug('onDragStart', e)
   }

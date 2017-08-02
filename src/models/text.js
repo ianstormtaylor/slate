@@ -2,6 +2,7 @@
 import Character from './character'
 import Mark from './mark'
 import Range from './range'
+import MODEL_TYPES from '../constants/model-types'
 import memoize from '../utils/memoize'
 import generateKey from '../utils/generate-key'
 import { List, Record, OrderedSet, Set, is } from 'immutable'
@@ -33,7 +34,7 @@ class Text extends new Record(DEFAULTS) {
    */
 
   static create(properties = {}) {
-    if (properties instanceof Text) return properties
+    if (Text.isText(properties)) return properties
     properties.key = properties.key || generateKey()
     properties.characters = Character.createList(properties.characters)
     return new Text(properties)
@@ -79,6 +80,17 @@ class Text extends new Record(DEFAULTS) {
   static createList(elements = []) {
     if (List.isList(elements)) return elements
     return new List(elements.map(Text.create))
+  }
+
+  /**
+   * Determines if the passed in paramter is a Slate Text or not
+   *
+   * @param {*} maybeText
+   * @return {Boolean}
+   */
+
+  static isText(maybeText) {
+    return !!(maybeText && maybeText[MODEL_TYPES.TEXT])
   }
 
   /**
@@ -401,6 +413,12 @@ class Text extends new Record(DEFAULTS) {
   }
 
 }
+
+/**
+ * Pseudo-symbol that shows this is a Slate Text
+ */
+
+Text.prototype[MODEL_TYPES.TEXT] = true
 
 /**
  * Memoize read methods.

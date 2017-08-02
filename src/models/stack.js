@@ -196,7 +196,7 @@ for (const method of STATE_ACCUMULATOR_METHODS) {
  */
 
 function assertState(value) {
-  if (value instanceof State) return
+  if (State.isState(value)) return
   throw new Error(`A plugin returned an unexpected state value: ${value}`)
 }
 

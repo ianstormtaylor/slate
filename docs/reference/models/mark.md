@@ -13,6 +13,7 @@ A formatting mark that can be associated with [`Characters`](./character.md). Ma
 - [Static Methods](#static-methods)
   - [`Mark.create`](#markcreate)
   - [`Mark.createSet`](#markcreateset)
+  - [`Mark.isMark`](#markismark)
 
 
 ## Properties
@@ -46,3 +47,8 @@ Create a mark from a plain Javascript object of `properties`.
 `Mark.createSet(array: Array) => Set`
 
 Create a set of marks from a plain Javascript `array`.
+
+### `Mark.isMark`
+`Mark.isMark(maybeMark: Any) => Boolean`
+
+Returns a boolean if the passed in argument is a `Mark`.

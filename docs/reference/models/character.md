@@ -15,6 +15,7 @@ Characters are how Slate associates [`Marks`](./mark.md) with a range of text, f
 - [Static Methods](#static-methods)
   - [`Character.create`](#charactercreate)
   - [`Character.createList`](#charactercreatelist)
+  - [`Character.isCharacter`](#characterischaracter)
 
 
 ## Properties
@@ -48,3 +49,8 @@ Create a character from a plain Javascript object of `properties`.
 `Character.createList(array: Array) => List`
 
 Create a list of characters from a plain Javascript `array`.
+
+### `Character.isCharacter`
+`Character.isCharacter(maybeCharacter: Any) => Boolean`
+
+Returns a boolean if the passed in argument is a `Character`.
