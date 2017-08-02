@@ -1,7 +1,6 @@
 
 import Base64 from '../serializers/base-64'
 import Content from '../components/content'
-import Character from '../models/character'
 import Debug from 'debug'
 import getPoint from '../utils/get-point'
 import Placeholder from '../components/placeholder'
@@ -60,8 +59,7 @@ function Plugin(options = {}) {
   }
 
   /**
-   * On before input, see if we can let the browser continue with it's native
-   * input behavior, to avoid a re-render for performance.
+   * On before input.
    *
    * @param {Event} e
    * @param {Object} data
@@ -71,30 +69,7 @@ function Plugin(options = {}) {
    */
 
   function onBeforeInput(e, data, state, editor) {
-    const { document, startKey, startBlock, startOffset, startInline, startText } = state
-    const pText = startBlock.getPreviousText(startKey)
-    const pInline = pText && startBlock.getClosestInline(pText.key)
-    const nText = startBlock.getNextText(startKey)
-    const nInline = nText && startBlock.getClosestInline(nText.key)
-
-    // Determine what the characters would be if natively inserted.
-    const schema = editor.getSchema()
-    const decorators = document.getDescendantDecorators(startKey, schema)
-    const initialChars = startText.getDecorations(decorators)
-    const prevChar = startOffset === 0 ? null : initialChars.get(startOffset - 1)
-    const nextChar = startOffset === initialChars.size ? null : initialChars.get(startOffset)
-    const char = Character.create({
-      text: e.data,
-      // When cursor is at start of a range of marks, without preceding text,
-      // the native behavior is to insert inside the range of marks.
-      marks: (
-        (prevChar && prevChar.marks) ||
-        (nextChar && nextChar.marks) ||
-        []
-      )
-    })
-
-    const chars = initialChars.insert(startOffset, char)
+    e.preventDefault()
 
     let transform = state.transform()
 
@@ -126,15 +101,9 @@ function Plugin(options = {}) {
       }
     }
 
-    // Determine what the characters should be, if not natively inserted.
-    let next = transform
+    const next = transform
       .insertText(e.data)
       .apply()
-
-    const nextText = next.startText
-    const nextChars = nextText.getDecorations(decorators)
-
-    e.preventDefault()
 
     debug('onBeforeInput', { data })
     return next
