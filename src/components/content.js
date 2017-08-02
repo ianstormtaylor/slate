@@ -822,7 +822,7 @@ class Content extends React.Component {
    * @return {Element}
    */
 
-  render = () => {
+  render() {
     const { props } = this
     const { className, readOnly, state, tabIndex, role } = props
     const { document } = state

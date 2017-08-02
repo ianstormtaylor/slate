@@ -217,7 +217,7 @@ class RichText extends React.Component {
    * @return {Element}
    */
 
-  render = () => {
+  render() {
     return (
       <div>
         {this.renderToolbar()}

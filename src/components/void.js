@@ -137,7 +137,7 @@ class Void extends React.Component {
    * @return {Element}
    */
 
-  render = () => {
+  render() {
     const { props } = this
     const { children, node } = props
     let Tag, style

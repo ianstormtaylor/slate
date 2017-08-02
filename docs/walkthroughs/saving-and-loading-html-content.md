@@ -24,7 +24,7 @@ class App extends React.Component {
     this.setState({ state })
   }
 
-  render = () => {
+  render() {
     return (
       <Editor
         state={this.state.state}
@@ -246,7 +246,7 @@ class App extends React.Component {
     localStorage.setItem('content', string)
   }
 
-  render = () => {
+  render() {
     // Add the `onDocumentChange` handler.
     return (
       <Editor

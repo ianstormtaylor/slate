@@ -60,7 +60,7 @@ class Video extends React.Component {
    * @return {Element}
    */
 
-  render = () => {
+  render() {
     return (
       <div {...this.props.attributes}>
         {this.renderVideo()}

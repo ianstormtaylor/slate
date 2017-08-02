@@ -240,7 +240,7 @@ class Editor extends React.Component {
    * @return {Element}
    */
 
-  render = () => {
+  render() {
     const { props, state } = this
     const { stack } = state
     const children = stack

@@ -127,7 +127,7 @@ class Tables extends React.Component {
    * @return {Component} component
    */
 
-  render = () => {
+  render() {
     return (
       <div className="editor">
         <Editor

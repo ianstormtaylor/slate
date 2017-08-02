@@ -167,7 +167,7 @@ class CodeHighlighting extends React.Component {
    * @return {Component}
    */
 
-  render = () => {
+  render() {
     return (
       <div className="editor">
         <Editor

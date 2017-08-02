@@ -232,7 +232,7 @@ class Node extends React.Component {
    * @return {Element}
    */
 
-  render = () => {
+  render() {
     const { props } = this
     const { node } = this.props
 
