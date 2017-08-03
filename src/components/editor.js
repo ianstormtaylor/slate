@@ -135,7 +135,8 @@ class Editor extends React.Component {
 
           const next = this.state.stack[method](this.state.state, this, ...args)
 
-          if (!event.defaultPrevented) {
+          const e = args[0]
+          if (!e.defaultPrevented) {
             // This fix is according to https://github.com/facebook/draft-js/pull/667
             // The native event is allowed to occur. To allow user onChange handlers to
             // change the inserted text, we wait until the text is actually inserted
