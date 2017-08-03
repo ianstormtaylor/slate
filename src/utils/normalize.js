@@ -7,7 +7,7 @@ import Mark from '../models/mark'
 import Selection from '../models/selection'
 import Text from '../models/text'
 import warn from './warn'
-import typeOf from 'type-of'
+import typeOf from '../utils/type-of'
 
 /**
  * Normalize a block argument `value`.

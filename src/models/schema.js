@@ -1,7 +1,7 @@
 
 import React from 'react'
 import isReactComponent from '../utils/is-react-component'
-import typeOf from 'type-of'
+import typeOf from '../utils/type-of'
 import { Record } from 'immutable'
 
 /**

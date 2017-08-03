@@ -2,7 +2,7 @@
 import Raw from './raw'
 import React from 'react'
 import ReactDOMServer from 'react-dom/server'
-import typeOf from 'type-of'
+import typeOf from '../utils/type-of'
 import { Record } from 'immutable'
 
 /**
