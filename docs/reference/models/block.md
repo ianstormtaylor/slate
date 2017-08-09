@@ -22,6 +22,7 @@ Block nodes may contain nested block nodes, inline nodes, and text nodes—just 
 - [Static Methods](#static-methods)
   - [`Block.create`](#blockcreate)
   - [`Block.createList`](#blockcreatelist)
+  - [`Block.isBlock`](#blockisblock)
 - [Node Methods](#node-methods)
 
 
@@ -95,6 +96,10 @@ Create a block from a plain Javascript object of `properties`.
 
 Create a list of block nodes from a plain Javascript `array`.
 
+### `Block.isBlock`
+`Block.isBlock(maybeBlock: Any) => Boolean`
+
+Returns a boolean if the passed in argument is a `Block`.
 
 ## Node Methods
 

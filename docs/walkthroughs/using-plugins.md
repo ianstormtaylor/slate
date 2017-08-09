@@ -38,7 +38,7 @@ class App extends React.Component {
       .apply()
   }
 
-  render = () => {
+  render() {
     return (
       <Editor
         schema={this.state.schema}
@@ -125,7 +125,7 @@ class App extends React.Component {
     this.setState({ state })
   }
 
-  render = () => {
+  render() {
     return (
       // Add the `plugins` property to the editor, and remove `onKeyDown`.
       <Editor
@@ -174,7 +174,7 @@ class App extends React.Component {
     this.setState({ state })
   }
 
-  render = () => {
+  render() {
     return (
       <Editor
         plugins={plugins}
@@ -259,7 +259,7 @@ class App extends React.Component {
     this.setState({ state })
   }
 
-  render = () => {
+  render() {
     return (
       <Editor
         plugins={plugins}

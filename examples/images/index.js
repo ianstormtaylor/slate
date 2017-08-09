@@ -95,7 +95,7 @@ class Images extends React.Component {
    * @return {Element} element
    */
 
-  render = () => {
+  render() {
     return (
       <div>
         {this.renderToolbar()}

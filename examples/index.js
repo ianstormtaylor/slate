@@ -8,6 +8,7 @@ import CodeHighlighting from './code-highlighting'
 import Embeds from './embeds'
 import Emojis from './emojis'
 import FocusBlur from './focus-blur'
+import ForcedLayout from './forced-layout'
 import HoveringMenu from './hovering-menu'
 import Iframes from './iframes'
 import Images from './images'
@@ -59,6 +60,7 @@ const EXAMPLES = [
   ['Plugins', Plugins, '/plugins'],
   ['Iframes', Iframes, '/iframes'],
   ['Focus & Blur', FocusBlur, '/focus-blur'],
+  ['Forced Layout', ForcedLayout, '/forced-layout'],
 
   ['DEV:Large', DevLargeDocument, '/dev-large', true],
   ['DEV:Plain', DevPerformancePlain, '/dev-performance-plain', true],

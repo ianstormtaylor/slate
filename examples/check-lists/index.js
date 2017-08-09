@@ -30,7 +30,7 @@ class CheckListItem extends React.Component {
    * @return {Element}
    */
 
-  render = () => {
+  render() {
     const { attributes, children, node } = this.props
     const checked = node.data.get('checked')
     return (
@@ -139,7 +139,7 @@ class CheckLists extends React.Component {
    * @return {Element}
    */
 
-  render = () => {
+  render() {
     return (
       <div>
         <div className="editor">

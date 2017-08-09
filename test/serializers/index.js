@@ -7,6 +7,7 @@ import { Html, Plain, Raw } from '../..'
 import { resolve } from 'path'
 import React from 'react'
 import { Iterable } from 'immutable'
+import parse5 from 'parse5'
 
 /**
  * Tests.
@@ -22,7 +23,8 @@ describe('serializers', () => {
         if (test[0] === '.') continue
         it(test, async () => {
           const innerDir = resolve(dir, test)
-          const html = new Html(require(innerDir).default)
+          const htmlOpts = Object.assign({}, require(innerDir).default, { parseHtml: parse5.parseFragment })
+          const html = new Html(htmlOpts)
           const expected = await readYaml(resolve(innerDir, 'output.yaml'))
           const input = fs.readFileSync(resolve(innerDir, 'input.html'), 'utf8')
           const state = html.deserialize(input)
@@ -32,7 +34,9 @@ describe('serializers', () => {
       }
 
       it('optionally returns a raw representation', () => {
-        const html = new Html(require('./fixtures/html/deserialize/block').default)
+        const fixture = require('./fixtures/html/deserialize/block').default
+        const htmlOpts = Object.assign({}, fixture, { parseHtml: parse5.parseFragment })
+        const html = new Html(htmlOpts)
         const input = fs.readFileSync(resolve(__dirname, './fixtures/html/deserialize/block/input.html'), 'utf8')
         const serialized = html.deserialize(input, { toRaw: true })
         assert.deepEqual(serialized, {
@@ -56,7 +60,9 @@ describe('serializers', () => {
       })
 
       it('optionally does not normalize', () => {
-        const html = new Html(require('./fixtures/html/deserialize/inline-with-is-void').default)
+        const fixture = require('./fixtures/html/deserialize/inline-with-is-void').default
+        const htmlOpts = Object.assign({}, fixture, { parseHtml: parse5.parseFragment })
+        const html = new Html(htmlOpts)
         const input = fs.readFileSync(resolve(__dirname, './fixtures/html/deserialize/inline-with-is-void/input.html'), 'utf8')
         const serialized = html.deserialize(input, { toRaw: true, normalize: false })
         assert.deepEqual(serialized, {
@@ -89,7 +95,8 @@ describe('serializers', () => {
         if (test[0] === '.') continue
         it(test, async () => {
           const innerDir = resolve(dir, test)
-          const html = new Html(require(innerDir).default)
+          const htmlOpts = Object.assign({}, require(innerDir).default, { parseHtml: parse5.parseFragment })
+          const html = new Html(htmlOpts)
           const input = require(resolve(innerDir, 'input.js')).default
           const expected = fs.readFileSync(resolve(innerDir, 'output.html'), 'utf8')
           const serialized = html.serialize(input)
@@ -98,7 +105,9 @@ describe('serializers', () => {
       }
 
       it('optionally returns an iterable list of React elements', () => {
-        const html = new Html(require('./fixtures/html/serialize/block-nested').default)
+        const fixture = require('./fixtures/html/serialize/block-nested').default
+        const htmlOpts = Object.assign({}, fixture, { parseHtml: parse5.parseFragment })
+        const html = new Html(htmlOpts)
         const input = require('./fixtures/html/serialize/block-nested/input.js').default
         const serialized = html.serialize(input, { render: false })
         assert(Iterable.isIterable(serialized), 'did not return an interable list')

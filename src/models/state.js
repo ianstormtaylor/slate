@@ -6,6 +6,7 @@ import SCHEMA from '../schemas/core'
 import Selection from './selection'
 import Transform from './transform'
 import { Record, Set, List, Map } from 'immutable'
+import MODEL_TYPES from '../constants/model-types'
 
 /**
  * Default properties.
@@ -39,7 +40,7 @@ class State extends new Record(DEFAULTS) {
    */
 
   static create(properties = {}, options = {}) {
-    if (properties instanceof State) return properties
+    if (State.isState(properties)) return properties
 
     const document = Document.create(properties.document)
     let selection = Selection.create(properties.selection)
@@ -65,6 +66,17 @@ class State extends new Record(DEFAULTS) {
     return options.normalize === false
       ? state
       : state.transform().normalize(SCHEMA).save(false).apply()
+  }
+
+  /**
+   * Determines if the passed in paramter is a Slate State or not
+   *
+   * @param {*} maybeState
+   * @return {Boolean}
+   */
+
+  static isState(maybeState) {
+    return !!(maybeState && maybeState[MODEL_TYPES.STATE])
   }
 
   /**
@@ -458,6 +470,12 @@ class State extends new Record(DEFAULTS) {
   }
 
 }
+
+/**
+ * Pseduo-symbol that shows this is a Slate State
+ */
+
+State.prototype[MODEL_TYPES.STATE] = true
 
 /**
  * Export.

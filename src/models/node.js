@@ -254,9 +254,19 @@ const Node = {
    */
 
   getBlocksAtRangeAsArray(range) {
-    return this
-      .getTextsAtRangeAsArray(range)
-      .map(text => this.getClosestBlock(text.key))
+    range = range.normalize(this)
+    const { startKey, endKey } = range
+    const startBlock = this.getClosestBlock(startKey)
+
+    // PERF: the most common case is when the range is in a single block node,
+    // where we can avoid a lot of iterating of the tree.
+    if (startKey == endKey) return [startBlock]
+
+    const endBlock = this.getClosestBlock(endKey)
+    const blocks = this.getBlocksAsArray()
+    const start = blocks.indexOf(startBlock)
+    const end = blocks.indexOf(endBlock)
+    return blocks.slice(start, end + 1)
   },
 
   /**

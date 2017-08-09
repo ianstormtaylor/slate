@@ -5,7 +5,7 @@ import React from 'react'
 import Types from 'prop-types'
 
 import Stack from '../models/stack'
-import State from '../models/state'
+import SlatePropTypes from '../utils/prop-types'
 import noop from '../utils/noop'
 
 /**
@@ -80,7 +80,7 @@ class Editor extends React.Component {
     role: Types.string,
     schema: Types.object,
     spellCheck: Types.bool,
-    state: Types.instanceOf(State).isRequired,
+    state: SlatePropTypes.state.isRequired,
     style: Types.object,
     tabIndex: Types.number,
   }
@@ -246,7 +246,7 @@ class Editor extends React.Component {
    * @return {Element}
    */
 
-  render = () => {
+  render() {
     const { props, state } = this
     const { stack } = state
     const children = stack

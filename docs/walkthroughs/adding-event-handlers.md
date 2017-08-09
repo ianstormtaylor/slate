@@ -24,7 +24,7 @@ class App extends React.Component {
     this.setState({ state })
   }
 
-  render = () => {
+  render() {
     return (
       <Editor
         state={this.state.state}
@@ -54,7 +54,7 @@ class App extends React.Component {
     console.log(event.which)
   }
 
-  render = () => {
+  render() {
     return (
       <Editor
         state={this.state.state}
@@ -101,7 +101,7 @@ class App extends React.Component {
     return newState
   }
 
-  render = () => {
+  render() {
     return (
       <Editor
         state={this.state.state}

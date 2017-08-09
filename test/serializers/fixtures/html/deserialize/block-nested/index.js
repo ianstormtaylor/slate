@@ -8,14 +8,14 @@ export default {
             return {
               kind: 'block',
               type: 'paragraph',
-              nodes: next(el.children)
+              nodes: next(el.childNodes)
             }
           }
           case 'blockquote': {
             return {
               kind: 'block',
               type: 'quote',
-              nodes: next(el.children)
+              nodes: next(el.childNodes)
             }
           }
         }

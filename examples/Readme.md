@@ -7,6 +7,7 @@ This directory contains a set of examples that give you an idea for how you migh
 
 - [**Plain text**](./plain-text) — showing the most basic case: a glorified `<textarea>`.
 - [**Rich text**](./rich-text) — showing the features you'd expect from a basic editor.
+- [**Forced Layout**](./forced-layout) - showing how to use schema rules to enforce document structure
 - [**Auto-markdown**](./auto-markdown) — showing how to add key handlers for Markdown-like shortcuts.
 - [**Links**](./links) — showing how wrap text in inline nodes with associated data.
 - [**Images**](./images) — showing how to use void (text-less) nodes to add images.

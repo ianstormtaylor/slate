@@ -87,7 +87,7 @@ class App extends React.Component {
   }
 
   // Render the editor.
-  render = () => {
+  render() {
     return (
       <Editor
         state={this.state.state}

@@ -5,7 +5,7 @@ import Types from 'prop-types'
 import getWindow from 'get-window'
 import keycode from 'keycode'
 
-import TYPES from '../constants/types'
+import TRANSFER_TYPES from '../constants/transfer-types'
 import Base64 from '../serializers/base-64'
 import Node from './node'
 import Selection from '../models/selection'
@@ -15,7 +15,8 @@ import findDeepestNode from '../utils/find-deepest-node'
 import getPoint from '../utils/get-point'
 import getTransferData from '../utils/get-transfer-data'
 import setTransferData from '../utils/set-transfer-data'
-import { IS_FIREFOX, IS_MAC } from '../constants/environment'
+import getHtmlFromNativePaste from '../utils/get-html-from-native-paste'
+import { IS_FIREFOX, IS_MAC, IS_IE } from '../constants/environment'
 
 /**
  * Debug.
@@ -475,7 +476,7 @@ class Content extends React.Component {
     const { fragment } = state
     const encoded = Base64.serializeNode(fragment)
 
-    setTransferData(dataTransfer, TYPES.FRAGMENT, encoded)
+    setTransferData(dataTransfer, TRANSFER_TYPES.FRAGMENT, encoded)
 
     debug('onDragStart', { event })
   }
@@ -701,15 +702,27 @@ class Content extends React.Component {
     if (this.props.readOnly) return
     if (!this.isInEditor(event.target)) return
 
-    event.preventDefault()
     const data = getTransferData(event.clipboardData)
 
     // Attach the `isShift` flag, so that people can use it to trigger "Paste
     // and Match Style" logic.
     data.isShift = !!this.tmp.isShifting
-
     debug('onPaste', { event, data })
-    this.props.onPaste(event, data)
+
+    // COMPAT: In IE 11, only plain text can be retrieved from the event's
+    // `clipboardData`. To get HTML, use the browser's native paste action which
+    // can only be handled synchronously. (2017/06/23)
+    if (IS_IE) {
+      // Do not use `event.preventDefault()` as we need the native paste action.
+      getHtmlFromNativePaste(event.target, (html) => {
+        // If pasted HTML can be retreived, it is added to the `data` object,
+        // setting the `type` to `html`.
+        this.props.onPaste(event, html === undefined ? data : { ...data, html, type: 'html' })
+      })
+    } else {
+      event.preventDefault()
+      this.props.onPaste(event, data)
+    }
   }
 
   /**
@@ -809,7 +822,7 @@ class Content extends React.Component {
    * @return {Element}
    */
 
-  render = () => {
+  render() {
     const { props } = this
     const { className, readOnly, state, tabIndex, role } = props
     const { document } = state

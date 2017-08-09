@@ -4,16 +4,16 @@
  */
 
 import './document'
-import './inline'
 
 /**
  * Dependencies.
  */
 
 import Data from './data'
-import Inline from './inline'
 import Node from './node'
+import Inline from './inline'
 import Text from './text'
+import MODEL_TYPES from '../constants/model-types'
 import generateKey from '../utils/generate-key'
 import { Map, List, Record } from 'immutable'
 
@@ -47,9 +47,9 @@ class Block extends new Record(DEFAULTS) {
    */
 
   static create(properties = {}) {
-    if (properties instanceof Block) return properties
-    if (properties instanceof Inline) return properties
-    if (properties instanceof Text) return properties
+    if (Block.isBlock(properties)) return properties
+    if (Inline.isInline(properties)) return properties
+    if (Text.isText(properties)) return properties
     if (!properties.type) throw new Error('You must pass a block `type`.')
 
     properties.key = properties.key || generateKey()
@@ -74,6 +74,17 @@ class Block extends new Record(DEFAULTS) {
   static createList(elements = []) {
     if (List.isList(elements)) return elements
     return new List(elements.map(Block.create))
+  }
+
+  /**
+   * Determines if the passed in paramter is a Slate Block or not
+   *
+   * @param {*} maybeBlock
+   * @return {Boolean}
+   */
+
+  static isBlock(maybeBlock) {
+    return !!(maybeBlock && maybeBlock[MODEL_TYPES.BLOCK])
   }
 
   /**
@@ -119,13 +130,18 @@ class Block extends new Record(DEFAULTS) {
 }
 
 /**
+ * Pseduo-symbol that shows this is a Slate Block
+ */
+
+Block.prototype[MODEL_TYPES.BLOCK] = true
+
+/**
  * Mix in `Node` methods.
  */
 
 for (const method in Node) {
   Block.prototype[method] = Node[method]
 }
-
 
 /**
  * Export.

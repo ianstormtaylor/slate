@@ -35,7 +35,7 @@ class App extends React.Component {
     return newState
   }
 
-  render = () => {
+  render() {
     return (
       <Editor
         state={this.state.state}
@@ -103,7 +103,7 @@ class App extends React.Component {
     return newState
   }
 
-  render = () => {
+  render() {
     return (
       // Pass in the `schema` property...
       <Editor
@@ -154,7 +154,7 @@ class App extends React.Component {
       .apply()
   }
 
-  render = () => {
+  render() {
     return (
       <Editor
         schema={this.state.schema}
@@ -208,7 +208,7 @@ class App extends React.Component {
     
   }
 
-  render = () => {
+  render() {
     return (
       <Editor
         schema={this.state.schema}

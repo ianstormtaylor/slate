@@ -106,7 +106,7 @@ class HoveringMenu extends React.Component {
    * @return {Element}
    */
 
-  render = () => {
+  render() {
     return (
       <div>
         {this.renderMenu()}
