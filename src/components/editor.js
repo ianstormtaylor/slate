@@ -5,6 +5,7 @@ import React from 'react'
 import Types from 'prop-types'
 
 import Stack from '../models/stack'
+import State from '../models/state'
 import SlatePropTypes from '../utils/prop-types'
 import noop from '../utils/noop'
 
@@ -226,7 +227,7 @@ class Editor extends React.Component {
    */
 
   onChange = (transform) => {
-    if (transform instanceof State) {
+    if (State.isState(transform)) {
       throw new Error('As of slate@0.21.0 the `editor.onChange` method must be passed a `Transform` not a `State`.')
     }
 

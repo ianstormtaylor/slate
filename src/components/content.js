@@ -323,17 +323,6 @@ class Content extends React.Component {
   }
 
   /**
-   * On change, bubble up.
-   *
-   * @param {State} state
-   */
-
-  onChange = (state) => {
-    debug('onChange', state)
-    this.props.onChange(state)
-  }
-
-  /**
    * On composition start, set the `isComposing` flag.
    *
    * @param {Event} event
@@ -595,22 +584,19 @@ class Content extends React.Component {
     const delta = textContent.length - text.length
     const after = selection.collapseToEnd().move(delta)
 
-    // Create an updated state with the text replaced.
-    const next = state
-      .transform()
-      .select({
-        anchorKey: key,
-        anchorOffset: start,
-        focusKey: key,
-        focusOffset: end
-      })
-      .delete()
-      .insertText(textContent, marks)
-      .select(after)
-      .apply()
-
-    // Change the current state.
-    this.onChange(next)
+    // Change the current state to have the text replaced.
+    editor.transform((transform) => {
+      transform
+        .select({
+          anchorKey: key,
+          anchorOffset: start,
+          focusKey: key,
+          focusOffset: end
+        })
+        .delete()
+        .insertText(textContent, marks)
+        .select(after)
+    })
   }
 
   /**

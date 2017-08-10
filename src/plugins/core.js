@@ -845,7 +845,6 @@ function Plugin(options = {}) {
         onBeforeInput={editor.onBeforeInput}
         onBlur={editor.onBlur}
         onFocus={editor.onFocus}
-        onChange={editor.onChange}
         onCopy={editor.onCopy}
         onCut={editor.onCut}
         onDrop={editor.onDrop}
