@@ -13,6 +13,7 @@ import './inline'
 import Data from './data'
 import Block from './block'
 import Node from './node'
+import MODEL_TYPES from '../constants/model-types'
 import generateKey from '../utils/generate-key'
 import { List, Map, Record } from 'immutable'
 
@@ -44,13 +45,24 @@ class Document extends new Record(DEFAULTS) {
    */
 
   static create(properties = {}) {
-    if (properties instanceof Document) return properties
+    if (Document.isDocument(properties)) return properties
 
     properties.key = properties.key || generateKey()
     properties.data = Data.create(properties.data)
     properties.nodes = Block.createList(properties.nodes)
 
     return new Document(properties)
+  }
+
+  /**
+   * Determines if the passed in paramter is a Slate Document or not
+   *
+   * @param {*} maybeDocument
+   * @return {Boolean}
+   */
+
+  static isDocument(maybeDocument) {
+    return !!(maybeDocument && maybeDocument[MODEL_TYPES.DOCUMENT])
   }
 
   /**
@@ -94,6 +106,12 @@ class Document extends new Record(DEFAULTS) {
   }
 
 }
+
+/**
+ * Pseduo-symbol that shows this is a Slate Document
+ */
+
+Document.prototype[MODEL_TYPES.DOCUMENT] = true
 
 /**
  * Mix in `Node` methods.

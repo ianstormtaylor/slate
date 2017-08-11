@@ -1,0 +1,18 @@
+
+nodes:
+  - kind: block
+    key: a
+    type: paragraph
+    nodes:
+      - kind: text
+        key: c
+        text: ""
+      - kind: inline
+        type: hashtag
+        nodes:
+          - kind: text
+            key: b
+            text: word
+      - kind: text
+        key: d
+        text: ""

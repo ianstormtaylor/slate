@@ -22,6 +22,7 @@ Inline nodes may contain nested inline nodes and text nodes—just like in the D
 - [Static Methods](#static-methods)
   - [`Inline.create`](#inlinecreate)
   - [`Inline.createList`](#inlinecreatelist)
+  - [`Inline.isInline`](#inlineisinline)
 - [Node Methods](#node-methods)
 
 
@@ -94,6 +95,11 @@ Create a block from a plain Javascript object of `properties`.
 `Inline.createList(array: Array) => List`
 
 Create a list of inline nodes from a plain Javascript `array`.
+
+### `Inline.isInline`
+`Inline.isInline(maybeInline: Any) => Boolean`
+
+Returns a boolean if the passed in argument is a `Inline`.
 
 
 ## Node Methods

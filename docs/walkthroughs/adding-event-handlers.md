@@ -7,7 +7,7 @@
 
 Okay, so you've got Slate installed and rendered on the page, and when you type in it, you can see the changes reflected. But you want to do more than just type a plaintext string.
 
-What makes Slate great is how easy it is to customize. Just like other React components you're used it, Slate allows you to pass in handlers that are triggered on certain events. You've already seen on the `onChange` handler can be used to store the changed editor state, but let's try add something more...
+What makes Slate great is how easy it is to customize. Just like other React components you're used to, Slate allows you to pass in handlers that are triggered on certain events. You've already seen on the `onChange` handler can be used to store the changed editor state, but let's try add something more...
 
 We'll show you how to use the `onKeyDown` handler to change the editor's content when the user presses a button.
 
@@ -24,7 +24,7 @@ class App extends React.Component {
     this.setState({ state })
   }
 
-  render = () => {
+  render() {
     return (
       <Editor
         state={this.state.state}
@@ -54,7 +54,7 @@ class App extends React.Component {
     console.log(event.which)
   }
 
-  render = () => {
+  render() {
     return (
       <Editor
         state={this.state.state}
@@ -101,7 +101,7 @@ class App extends React.Component {
     return newState
   }
 
-  render = () => {
+  render() {
     return (
       <Editor
         state={this.state.state}

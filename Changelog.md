@@ -4,6 +4,26 @@ This document maintains a list of changes to Slate with each new version. Until 
 
 ---
 
+### `0.21.0` — July 20, 2017
+
+###### BREAKING CHANGES
+
+- **The `Html` serializer now uses `DOMParser` instead of `cheerio`.** Previously, the `Html` serializer used the `cheerio` library for representing elements in the serialization rule logic, but cheerio was a very large dependency. It has been removed, and the native browser `DOMParser` is now used instead. All HTML serialization rules will need to be updated. If you are working with Slate on the server, you can now pass in a custom serializer to the `Html` constructor, using the `parse5` library.
+
+
+---
+
+
+### `0.20.0` — May 17, 2017
+
+###### BREAKING CHANGES
+
+- **Returning `null` from the `Html` serializer skips the element.** Previously, `null` and `undefined` had the same behavior of skipping the rule and trying the rest of the rules. Now if you explicitly return `null` it will skip the element itself.
+
+
+---
+
+
 ### `0.19.0` — March 3, 2017
 
 ###### BREAKING CHANGES

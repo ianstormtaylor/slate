@@ -225,3 +225,10 @@ input:focus {
 .check-list-item > span:last-child:focus {
   outline: none;
 }
+
+.word-counter {
+  margin-top: 10px;
+  padding: 12px;
+  background-color: #EBEBEB;
+  display: inline-block;
+}

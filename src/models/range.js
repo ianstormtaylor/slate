@@ -1,6 +1,7 @@
 
 import Character from './character'
 import Mark from './mark'
+import MODEL_TYPES from '../constants/model-types'
 import { Record, Set } from 'immutable'
 
 /**
@@ -30,10 +31,21 @@ class Range extends new Record(DEFAULTS) {
    */
 
   static create(properties = {}) {
-    if (properties instanceof Range) return properties
+    if (Range.isRange(properties)) return properties
     properties.text = properties.text
     properties.marks = Mark.createSet(properties.marks)
     return new Range(properties)
+  }
+
+  /**
+   * Determines if the passed in paramter is a Slate Range or not
+   *
+   * @param {*} maybeRange
+   * @return {Boolean}
+   */
+
+  static isRange(maybeRange) {
+    return !!(maybeRange && maybeRange[MODEL_TYPES.RANGE])
   }
 
   /**
@@ -66,6 +78,12 @@ class Range extends new Record(DEFAULTS) {
   }
 
 }
+
+/**
+ * Pseduo-symbol that shows this is a Slate Range
+ */
+
+Range.prototype[MODEL_TYPES.RANGE] = true
 
 /**
  * Export.

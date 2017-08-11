@@ -225,7 +225,7 @@ function normalizeNode(transform, node, schema) {
  */
 
 function assertSchema(schema) {
-  if (schema instanceof Schema) {
+  if (Schema.isSchema(schema)) {
     return
   } else if (schema == null) {
     throw new Error('You must pass a `schema` object.')

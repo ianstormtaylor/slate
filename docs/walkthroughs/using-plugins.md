@@ -38,7 +38,7 @@ class App extends React.Component {
       .apply()
   }
 
-  render = () => {
+  render() {
     return (
       <Editor
         schema={this.state.schema}
@@ -69,7 +69,7 @@ In this case our plugin object will have one property: a `onKeyDown` handler, wi
 
 ```js
 function MarkHotkey(options) {
-  const { type, code } = options
+  const { type, code, isAltKey = false } = options
 
   // Return our "plugin" object, containing the `onKeyDown` handler.
   return {
@@ -125,7 +125,7 @@ class App extends React.Component {
     this.setState({ state })
   }
 
-  render = () => {
+  render() {
     return (
       // Add the `plugins` property to the editor, and remove `onKeyDown`.
       <Editor
@@ -174,7 +174,7 @@ class App extends React.Component {
     this.setState({ state })
   }
 
-  render = () => {
+  render() {
     return (
       <Editor
         plugins={plugins}
@@ -212,12 +212,12 @@ import keycode from `keycode`
 
 function MarkHotkey(options) {
   // Change the options to take a `key`.
-  const { type, key } = options
+  const { type, key, isAltKey = false } = options
 
   return {
     onKeyDown(event, data, state) {
       // Change the comparison to use the key name.
-      if (!event.metaKey || keycode(event.which) != key) return
+      if (!event.metaKey || keycode(event.which) != key || event.altKey != isAltKey) return
       event.preventDefault()
       return state
         .transform()
@@ -259,7 +259,7 @@ class App extends React.Component {
     this.setState({ state })
   }
 
-  render = () => {
+  render() {
     return (
       <Editor
         plugins={plugins}

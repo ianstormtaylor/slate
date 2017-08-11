@@ -184,7 +184,7 @@ const Raw = {
       selection = Raw.deserializeSelection(object.selection, options)
     }
 
-    return State.create({ document, selection }, options)
+    return State.create({ data: object.data, document, selection }, options)
   },
 
   /**
@@ -400,12 +400,15 @@ const Raw = {
   serializeState(state, options = {}) {
     const object = {
       document: Raw.serializeDocument(state.document, options),
-      selection: Raw.serializeSelection(state.selection, options),
       kind: state.kind
     }
 
-    if (!options.preserveSelection) {
-      delete object.selection
+    if (options.preserveSelection) {
+      object.selection = Raw.serializeSelection(state.selection, options)
+    }
+
+    if (options.preserveStateData) {
+      object.data = state.data.toJSON()
     }
 
     const ret = options.terse
@@ -546,14 +549,17 @@ const Raw = {
    */
 
   tersifyState(object) {
-    if (object.selection == null) {
-      return object.document
+    const { data, document, selection } = object
+    const emptyData = isEmpty(data)
+
+    if (!selection && emptyData) {
+      return document
     }
 
-    return {
-      document: object.document,
-      selection: object.selection
-    }
+    const ret = { document }
+    if (!emptyData) ret.data = data
+    if (selection) ret.selection = selection
+    return ret
   },
 
   /**
@@ -673,9 +679,10 @@ const Raw = {
    */
 
   untersifyState(object) {
-    if (object.selection || object.document) {
+    if (object.document) {
       return {
         kind: 'state',
+        data: object.data,
         document: object.document,
         selection: object.selection,
       }

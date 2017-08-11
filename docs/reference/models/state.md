@@ -33,8 +33,10 @@ For convenience, in addition to transforms, many of the [`Selection`](./selectio
   - [`isExpanded`](#isExpanded)
   - [`isFocused`](#isfocused)
   - [`isForward`](#isForward)
+  - [`isEmpty`](#isEmpty)
 - [Static Methods](#static-methods)
   - [`State.create`](#statecreate)
+  - [`State.isState`](#stateisstate)
 - [Methods](#methods)
   - [`transform`](#transform)
 
@@ -153,6 +155,10 @@ Whether the current selection is focused.
 
 Whether the current selection is forward.
 
+### `isEmpty`
+`Boolean`
+
+Whether the current selection is empty.
 
 ## Static Methods
 
@@ -160,6 +166,11 @@ Whether the current selection is forward.
 `State.create(properties: Object) => State`
 
 Create a new `State` instance with `properties`.
+
+### `State.isState`
+`State.isState(maybeState: Any) => Boolean`
+
+Returns a boolean if the passed in argument is a `State`.
 
 
 ## Methods

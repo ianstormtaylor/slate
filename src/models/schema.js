@@ -2,6 +2,7 @@
 import React from 'react'
 import isReactComponent from '../utils/is-react-component'
 import typeOf from 'type-of'
+import MODEL_TYPES from '../constants/model-types'
 import { Record } from 'immutable'
 
 /**
@@ -30,8 +31,19 @@ class Schema extends new Record(DEFAULTS) {
    */
 
   static create(properties = {}) {
-    if (properties instanceof Schema) return properties
+    if (Schema.isSchema(properties)) return properties
     return new Schema(normalizeProperties(properties))
+  }
+
+  /**
+   * Determines if the passed in paramter is a Slate Schema or not
+   *
+   * @param {*} maybeSchema
+   * @return {Boolean}
+   */
+
+  static isSchema(maybeSchema) {
+    return !!(maybeSchema && maybeSchema[MODEL_TYPES.SCHEMA])
   }
 
   /**
@@ -234,6 +246,12 @@ function normalizeMarkComponent(render) {
       return props => <span className={render}>{props.children}</span>
   }
 }
+
+/**
+ * Pseduo-symbol that shows this is a Slate Schema
+ */
+
+Schema.prototype[MODEL_TYPES.SCHEMA] = true
 
 /**
  * Export.

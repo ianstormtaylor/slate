@@ -1,6 +1,7 @@
 
 import Data from './data'
 import memoize from '../utils/memoize'
+import MODEL_TYPES from '../constants/model-types'
 import { Map, Record, Set } from 'immutable'
 
 /**
@@ -30,7 +31,7 @@ class Mark extends new Record(DEFAULTS) {
    */
 
   static create(properties = {}) {
-    if (properties instanceof Mark) return properties
+    if (Mark.isMark(properties)) return properties
     if (!properties.type) throw new Error('You must provide a `type` for the mark.')
     properties.data = Data.create(properties.data)
     return new Mark(properties)
@@ -49,9 +50,18 @@ class Mark extends new Record(DEFAULTS) {
   }
 
   /**
-   * Get the kind.
+   * Determines if the passed in paramter is a Slate Mark or not
    *
-   * @return {String}
+   * @param {*} maybeMark
+   * @return {Boolean}
+   */
+
+  static isMark(maybeMark) {
+    return !!(maybeMark && maybeMark[MODEL_TYPES.MARK])
+  }
+
+  /**
+   * Get the kind.
    */
 
   get kind() {
@@ -70,6 +80,12 @@ class Mark extends new Record(DEFAULTS) {
   }
 
 }
+
+/**
+ * Pseduo-symbol that shows this is a Slate Mark
+ */
+
+Mark.prototype[MODEL_TYPES.MARK] = true
 
 /**
  * Memoize read methods.

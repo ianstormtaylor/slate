@@ -50,7 +50,7 @@ class Embeds extends React.Component {
    * @return {Element} element
    */
 
-  render = () => {
+  render() {
     return (
       <div className="editor">
         <Editor

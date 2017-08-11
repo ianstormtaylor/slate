@@ -26,7 +26,7 @@ class App extends React.Component {
     this.setState({ state })
   }
 
-  render = () => {
+  render() {
     return (
       <Editor
         state={this.state.state}
@@ -63,7 +63,7 @@ class App extends React.Component {
     localStorage.setItem('content', content)
   }
 
-  render = () => {
+  render() {
     return (
       <Editor
         state={this.state.state}
@@ -99,7 +99,7 @@ class App extends React.Component {
     localStorage.setItem('content', content)
   }
 
-  render = () => {
+  render() {
     return (
       <Editor
         state={this.state.state}
@@ -138,7 +138,7 @@ class App extends React.Component {
     localStorage.setItem('content', content)
   }
 
-  render = () => {
+  render() {
     // Add the `onDocumentChange` handler to the editor.
     return (
       <Editor
@@ -173,7 +173,7 @@ const initialContent = (
 class App extends React.Component {
 
   state = {
-    state: Raw.deserialize(initialContent)
+    state: Raw.deserialize(initialContent, {terse: true})
   }
 
   onChange = (state) => {
@@ -186,7 +186,7 @@ class App extends React.Component {
     localStorage.setItem('content', content)
   }
 
-  render = () => {
+  render() {
     return (
       <Editor
         state={this.state.state}

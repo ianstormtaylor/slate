@@ -20,6 +20,7 @@ In some places, you'll see mention of "fragments", which are also `Document` obj
   - [`text`](#text)
 - [Static Methods](#static-methods)
   - [`Document.create`](#documentcreate)
+  - [`Document.isDocument`](#documentisdocument)
 - [Node Methods](#node-methods)
 
 
@@ -66,6 +67,11 @@ A concatenated string of all of the descendant [`Text`](./text.md) nodes of this
 `Document.create(properties: Object) => Document`
 
 Create a block from a plain Javascript object of `properties`.
+
+### `Document.isDocument`
+`Document.isDocument(maybeDocument: Any) => Boolean`
+
+Returns a boolean if the passed in argument is a `Document`.
 
 
 ## Node Methods

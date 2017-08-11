@@ -13,6 +13,8 @@ Every Slate editor has a "schema" associated with it, which contains information
   - [`normalize`](#normalize)
   - [`render`](#render)
   - [`validate`](#validate)
+- [Static Methods](#static-methods)
+  - [`Schema.isSchema`](#schemaisschema)
 
 
 ## Properties
@@ -177,3 +179,10 @@ The `render` property determines which React component Slate will use to render 
 ```
 
 The `validate` property allows you to define a constraint that the matching object must abide by. It should return either `Void` if the object is valid, or any non-void value if it is invalid. This makes it easy to return the exact reason that the object is invalid, which makes it simple to recover from the invalid state with the `normalize` property.
+
+## Static Methods
+
+### `Schema.isSchema`
+`Schema.isSchema(maybeSchema: Any) => Boolean`
+
+Returns a boolean if the passed in argument is a `Schema`.

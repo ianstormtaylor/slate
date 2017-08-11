@@ -12,6 +12,8 @@ For an example of the `Html` serializer in action, check out the [`paste-html` e
 - [Example](#example)
 - [Properties](#properties)
   - [`rules`](#rules)
+  - [`defaultBlockType`](#defaultblocktype)
+  - [`parseHtml`](#parsehtml)
 - [Methods](#methods)
   - [`deserialize`](#deserialize)
   - [`serialize`](#serialize)
@@ -42,6 +44,15 @@ new Html({
 
 An array of rules to initialize the `Html` serializer with, defining your schema.
 
+### `defaultBlockType`
+`String|Object`
+
+A default block type for blocks which do not match any rule. Can be a string such as `paragraph` or an object with a `type` attribute such as `{ type: 'paragraph' }`.
+
+### `parseHtml`
+`Function`
+
+A function to parse an HTML string and return a DOM object. Defaults to using the native `DOMParser` in browser environments that support it. For older browsers or server-side rendering, you can include the [parse5](https://www.npmjs.com/package/parse5) package and pass `parse5.parseFragment` as the `parseHtml` option.
 
 ## Methods
 
@@ -75,9 +86,9 @@ Each rule must define two properties:
 
 
 #### `rule.deserialize`
-`rule.deserialize(el: CheerioElement, next: Function) => Object || Void`
+`rule.deserialize(el: Element, next: Function) => Object || Void`
 
-The `deserialize` function should return a plain Javascript object representing the deserialized state, or nothing if the rule in question doesn't know how to deserialize the object, in which case the next rule in the stack will be attempted.
+The `deserialize` function receives a DOM element and should return a plain Javascript object representing the deserialized state, or nothing if the rule in question doesn't know how to deserialize the object, in which case the next rule in the stack will be attempted.
 
 The returned object is almost exactly equivalent to the objects returned by the [`Raw`](./raw.md) serializer, except an extra `kind: 'mark'` is added to account for the ability to nest marks.
 

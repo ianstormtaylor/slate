@@ -37,7 +37,7 @@ class PlainText extends React.Component {
    * @return {Component} component
    */
 
-  render = () => {
+  render() {
     return (
       <Editor
         placeholder={'Enter some plain text...'}

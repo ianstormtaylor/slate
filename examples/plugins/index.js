@@ -6,6 +6,31 @@ import CollapseOnEscape from 'slate-collapse-on-escape'
 import SoftBreak from 'slate-soft-break'
 
 /**
+ * Word Count plugin
+ *
+ * Example of using plugin.render to create a HOC
+ * https://docs.slatejs.org/reference/plugins/plugin.html#render
+ */
+
+function WordCount(options) {
+  return {
+    render(props) {
+      return (
+        <div>
+          <div>
+            {props.children}
+          </div>
+          <span className="word-counter">
+            Word Count: {props.state.document.text.split(' ').length}
+          </span>
+        </div>
+      )
+    }
+  }
+}
+
+
+/**
  * Plugins.
  */
 
@@ -14,7 +39,8 @@ const plugins = [
   AutoReplaceText('(r)', '®'),
   AutoReplaceText('(tm)', '™'),
   CollapseOnEscape(),
-  SoftBreak()
+  SoftBreak(),
+  WordCount()
 ]
 
 /**
@@ -32,13 +58,15 @@ class Plugins extends React.Component {
    */
 
   state = {
-    state: Plain.deserialize(`This example shows how you can extend Slate with plugins! It uses three fairly simple plugins, but you can use any plugins you want, or write your own!
+    state: Plain.deserialize(`This example shows how you can extend Slate with plugins! It uses four fairly simple plugins, but you can use any plugins you want, or write your own!
 
 The first is an "auto replacer". Try typing "(c)" and you'll see it turn into a copyright symbol automatically!
 
 The second is a simple plugin to collapse the selection whenever the escape key is pressed. Try selecting some text and pressing escape.
 
-And the third is another simple plugin that inserts a "soft" break when enter is pressed instead of creating a new block. Try pressing enter!`)
+The third is another simple plugin that inserts a "soft" break when enter is pressed instead of creating a new block. Try pressing enter!
+
+The fourth is an example of using the plugin.render property to create a higher-order-component.`)
   };
 
   /**
@@ -57,7 +85,7 @@ And the third is another simple plugin that inserts a "soft" break when enter is
    * @return {Component} component
    */
 
-  render = () => {
+  render() {
     return (
       <Editor
         placeholder={'Enter some text...'}

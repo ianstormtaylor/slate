@@ -148,10 +148,6 @@ for (const method of EVENT_HANDLER_METHODS) {
   Stack.prototype[method] = function (state, editor, ...args) {
     debug(method)
 
-    if (method == 'onChange') {
-      state = this.onBeforeChange(state, editor)
-    }
-
     for (const plugin of this.plugins) {
       if (!plugin[method]) continue
       const next = plugin[method](...args, state, editor)
@@ -177,6 +173,10 @@ for (const method of STATE_ACCUMULATOR_METHODS) {
   Stack.prototype[method] = function (state, editor, ...args) {
     debug(method)
 
+    if (method == 'onChange') {
+      state = this.onBeforeChange(state, editor)
+    }
+
     for (const plugin of this.plugins) {
       if (!plugin[method]) continue
       const next = plugin[method](...args, state, editor)
@@ -196,7 +196,7 @@ for (const method of STATE_ACCUMULATOR_METHODS) {
  */
 
 function assertState(value) {
-  if (value instanceof State) return
+  if (State.isState(value)) return
   throw new Error(`A plugin returned an unexpected state value: ${value}`)
 }
 

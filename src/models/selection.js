@@ -1,5 +1,6 @@
 
 import warn from '../utils/warn'
+import MODEL_TYPES from '../constants/model-types'
 import { Record } from 'immutable'
 
 /**
@@ -34,8 +35,19 @@ class Selection extends new Record(DEFAULTS) {
    */
 
   static create(properties = {}) {
-    if (properties instanceof Selection) return properties
+    if (Selection.isSelection(properties)) return properties
     return new Selection(properties)
+  }
+
+  /**
+   * Determines if the passed in paramter is a Slate Selection or not
+   *
+   * @param {*} maybeSelection
+   * @return {Boolean}
+   */
+
+  static isSelection(maybeSelection) {
+    return !!(maybeSelection && maybeSelection[MODEL_TYPES.SELECTION])
   }
 
   /**
@@ -736,6 +748,12 @@ class Selection extends new Record(DEFAULTS) {
   }
 
 }
+
+/**
+ * Pseduo-symbol that shows this is a Slate Selection
+ */
+
+Selection.prototype[MODEL_TYPES.SELECTION] = true
 
 /**
  * Mix in some "move" convenience methods.

@@ -1,0 +1,20 @@
+
+data: {}
+nodes:
+  - type: paragraph
+    isVoid: false
+    data: {}
+    nodes:
+    - characters: []
+  - type: divider
+    isVoid: true
+    data: {}
+    nodes:
+    - characters:
+        - text: " "
+          marks: []
+  - type: paragraph
+    isVoid: false
+    data: {}
+    nodes:
+    - characters: []

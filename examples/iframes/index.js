@@ -168,7 +168,7 @@ class Iframes extends React.Component {
    * @return {Element}
    */
 
-  render = () => {
+  render() {
     const bootstrap = (
       <link
         href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"

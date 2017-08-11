@@ -8,7 +8,7 @@ export default {
             return {
               kind: 'block',
               type: 'paragraph',
-              nodes: next(el.children)
+              nodes: next(el.childNodes)
             }
           }
           case 'a': {

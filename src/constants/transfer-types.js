@@ -1,4 +1,3 @@
-
 /**
  * Slate-specific data transfer types.
  *

@@ -4,12 +4,13 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import Types from 'prop-types'
 
-import TYPES from '../constants/types'
+import TRANSFER_TYPES from '../constants/transfer-types'
 import Base64 from '../serializers/base-64'
 import Leaf from './leaf'
 import Void from './void'
 import getWindow from 'get-window'
 import scrollToSelection from '../utils/scroll-to-selection'
+import setTransferData from '../utils/set-transfer-data'
 
 /**
  * Debug.
@@ -162,6 +163,17 @@ class Node extends React.Component {
   }
 
   /**
+   * There is a corner case, that some nodes are unmounted right after they update
+   * Then, when the timer execute, it will throw the error
+   * `findDOMNode was called on an unmounted component`
+   * We should clear the timer from updateScroll here
+   */
+
+  componentWillUnmount = () => {
+    clearTimeout(this.scrollTimer)
+  }
+
+  /**
    * Update the scroll position after a change as occured if this is a leaf
    * block and it has the selection's ending edge. This ensures that scrolling
    * matches native `contenteditable` behavior even for cases where the edit is
@@ -180,12 +192,16 @@ class Node extends React.Component {
     if (selection.isBlurred) return
     if (!selection.hasEndIn(node)) return
 
-    const el = ReactDOM.findDOMNode(this)
-    const window = getWindow(el)
-    const native = window.getSelection()
-    scrollToSelection(native)
+    // The native selection will be updated after componentDidMount or componentDidUpdate.
+    // Use setTimeout to queue scrolling to the last when the native selection has been updated to the correct value.
+    this.scrollTimer = setTimeout(() => {
+      const el = ReactDOM.findDOMNode(this)
+      const window = getWindow(el)
+      const native = window.getSelection()
+      scrollToSelection(native)
 
-    this.debug('updateScroll', el)
+      this.debug('updateScroll', el)
+    })
   }
 
   /**
@@ -196,9 +212,16 @@ class Node extends React.Component {
 
   onDragStart = (e) => {
     const { node } = this.props
+
+    // Only void node are draggable
+    if (!node.isVoid) {
+      return
+    }
+
     const encoded = Base64.serializeNode(node, { preserveKeys: true })
-    const data = e.nativeEvent.dataTransfer
-    data.setData(TYPES.NODE, encoded)
+    const { dataTransfer } = e.nativeEvent
+
+    setTransferData(dataTransfer, TRANSFER_TYPES.NODE, encoded)
 
     this.debug('onDragStart', e)
   }
@@ -209,7 +232,7 @@ class Node extends React.Component {
    * @return {Element}
    */
 
-  render = () => {
+  render() {
     const { props } = this
     const { node } = this.props
 

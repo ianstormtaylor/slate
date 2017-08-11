@@ -23,6 +23,11 @@
   - [`getDescendant`](#getdescendant)
   - [`getFirstText`](#getfirsttext)
   - [`getFragmentAtRange`](#getfragmentatrange)
+  - [`getFurthestAncestor`](#getfurthestancestor)
+  - [`getFurthestBlock`](#getfurthestblock)
+  - [`getFurthestInline`](#getfurthestinline)
+  - [`getFurthestOnlyChildAncestor`](#getfurthestonlychildancestor)
+  - [`getFurthestBlock`](#getfurthestblock)
   - [`getInlinesAtRange`](#getinlinesatrange)
   - [`getLastText`](#getlasttext)
   - [`getMarksAtRange`](#getmarksatrange)
@@ -140,6 +145,31 @@ Get the first child text node inside a node.
 `getFragmentAtRange(range: Selection) => Document`
 
 Get a document fragment of the nodes in a `range`.
+
+### `getFurthest`
+`getFurthest(key: String, iterator: Function) => Node || Null`
+
+Get the furthest parent of a node by `key` that matches an `iterator`.
+
+### `getFurthestAncestor`
+`getFurthestAncestor(key: String) => Node || Null`
+
+Get the furthest ancestor of a node by `key`.
+
+### `getFurthestBlock`
+`getFurthestBlock(key: String) => Node || Null`
+
+Get the furthest block parent of a node by `key`.
+
+### `getFurthestInline`
+`getFurthestInline(key: String) => Node || Null`
+
+Get the furthest inline parent of a node by `key`.
+
+### `getFurthestOnlyChildAncestor`
+`getFurthestOnlyChildAncestor(key: String) => Node || Null`
+
+Get the furthest ancestor of a node by `key` that has only one child.
 
 ### `getInlinesAtRange`
 `getInlinesAtRange(range: Selection) => List`

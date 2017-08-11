@@ -254,9 +254,19 @@ const Node = {
    */
 
   getBlocksAtRangeAsArray(range) {
-    return this
-      .getTextsAtRangeAsArray(range)
-      .map(text => this.getClosestBlock(text.key))
+    range = range.normalize(this)
+    const { startKey, endKey } = range
+    const startBlock = this.getClosestBlock(startKey)
+
+    // PERF: the most common case is when the range is in a single block node,
+    // where we can avoid a lot of iterating of the tree.
+    if (startKey == endKey) return [startBlock]
+
+    const endBlock = this.getClosestBlock(endKey)
+    const blocks = this.getBlocksAsArray()
+    const start = blocks.indexOf(startBlock)
+    const end = blocks.indexOf(endBlock)
+    return blocks.slice(start, end + 1)
   },
 
   /**
@@ -280,9 +290,14 @@ const Node = {
 
   getBlocksByTypeAsArray(type) {
     return this.nodes.reduce((array, node) => {
-      if (node.kind != 'block') return array
-      if (node.isLeafBlock() && node.type == type) return array.push(node)
-      return array.concat(node.getBlocksByTypeAsArray(type))
+      if (node.kind != 'block') {
+        return array
+      } else if (node.isLeafBlock() && node.type == type) {
+        array.push(node)
+        return array
+      } else {
+        return array.concat(node.getBlocksByTypeAsArray(type))
+      }
     }, [])
   },
 
@@ -766,9 +781,14 @@ const Node = {
 
   getInlinesByTypeAsArray(type) {
     return this.nodes.reduce((inlines, node) => {
-      if (node.kind == 'text') return inlines
-      if (node.isLeafInline() && node.type == type) return inlines.push(node)
-      return inlines.concat(node.getInlinesByTypeAsArray(type))
+      if (node.kind == 'text') {
+        return inlines
+      } else if (node.isLeafInline() && node.type == type) {
+        inlines.push(node)
+        return inlines
+      } else {
+        return inlines.concat(node.getInlinesByTypeAsArray(type))
+      }
     }, [])
   },
 
@@ -894,7 +914,8 @@ const Node = {
     return this
       .getCharactersAtRange(range)
       .reduce((memo, char) => {
-        return memo.concat(char.marks.toArray())
+        char.marks.toArray().forEach(c => memo.push(c))
+        return memo
       }, [])
   },
 
