@@ -88,14 +88,14 @@ const APPLIERS = {
   },
 
   /**
-   * Join a node at `path` with the previous node.
+   * Merge a node at `path` with the previous node.
    *
    * @param {State} state
    * @param {Object} operation
    * @return {State}
    */
 
-  join_node(state, operation) {
+  merge_node(state, operation) {
     const { path } = operation
     const withPath = path.slice(0, path.length - 1).concat([path[path.length - 1] - 1])
     let { document, selection } = state
@@ -105,8 +105,8 @@ const APPLIERS = {
     const oneIndex = parent.nodes.indexOf(one)
     const twoIndex = parent.nodes.indexOf(two)
 
-    // Perform the join in the document.
-    parent = parent.joinNode(oneIndex, twoIndex)
+    // Perform the merge in the document.
+    parent = parent.mergeNode(oneIndex, twoIndex)
     document = parent.key == document.key ? parent : document.updateDescendant(parent)
 
     // If the nodes are text nodes and the selection is inside the second node

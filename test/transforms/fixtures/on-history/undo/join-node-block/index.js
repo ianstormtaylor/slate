@@ -6,7 +6,7 @@ export default function (state) {
 
   const next = state
     .transform()
-    .joinNodeByKey('key2', 'key1')
+    .mergeNodeByKey('key2')
     .apply()
 
     .transform()

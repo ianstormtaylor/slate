@@ -14,7 +14,7 @@ export default function (state) {
   const next = state
     .transform()
     .select(range)
-    .joinNodeByKey('c')
+    .mergeNodeByKey('c')
     .apply()
 
   assert.deepEqual(

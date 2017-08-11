@@ -56,10 +56,10 @@ function invertOperation(op) {
   }
 
   /**
-   * Join node.
+   * Merge node.
    */
 
-  if (type == 'join_node') {
+  if (type == 'merge_node') {
     const { path } = op
     const { length } = path
     const last = length - 1
@@ -80,7 +80,7 @@ function invertOperation(op) {
     const last = length - 1
     return {
       ...op,
-      type: 'join_node',
+      type: 'merge_node',
       path: path.slice(0, last).concat([path[last] + 1]),
     }
   }

@@ -267,7 +267,7 @@ Transforms.deleteBackwardAtRange = (transform, range, n = 1, options = {}) => {
     }
 
     // If we're deleting by one character and the previous text node is not
-    // inside the current block, we need to join the two blocks together.
+    // inside the current block, we need to merge the two blocks together.
     if (n == 1 && prevBlock != block) {
       range = range.merge({
         anchorKey: prev.key,
@@ -451,7 +451,7 @@ Transforms.deleteForwardAtRange = (transform, range, n = 1, options = {}) => {
     }
 
     // If we're deleting by one character and the previous text node is not
-    // inside the current block, we need to join the two blocks together.
+    // inside the current block, we need to merge the two blocks together.
     if (n == 1 && nextBlock != block) {
       range = range.merge({
         focusKey: next.key,

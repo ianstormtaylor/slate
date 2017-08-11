@@ -1381,7 +1381,7 @@ const Node = {
   },
 
   /**
-   * Join a children node `first` with another children node `second`.
+   * Merge a children node `first` with another children node `second`.
    * `first` and `second` will be concatenated in that order.
    * `first` and `second` must be two Nodes or two Text.
    *
@@ -1390,13 +1390,13 @@ const Node = {
    * @return {Node}
    */
 
-  joinNode(withIndex, index) {
+  mergeNode(withIndex, index) {
     let node = this
     let one = node.nodes.get(withIndex)
     const two = node.nodes.get(index)
 
     if (one.kind != two.kind) {
-      throw new Error(`Tried to join two nodes of different kinds: "${one.kind}" and "${two.kind}".`)
+      throw new Error(`Tried to merge two nodes of different kinds: "${one.kind}" and "${two.kind}".`)
     }
 
     // If the nodes are text nodes, concatenate their characters together.

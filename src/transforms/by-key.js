@@ -104,7 +104,7 @@ Transforms.insertTextByKey = (transform, key, offset, text, marks, options = {})
 }
 
 /**
- * Join a node by `key` with the previous node.
+ * Merge a node by `key` with the previous node.
  *
  * @param {Transform} transform
  * @param {String} key
@@ -112,7 +112,7 @@ Transforms.insertTextByKey = (transform, key, offset, text, marks, options = {})
  *   @property {Boolean} normalize
  */
 
-Transforms.joinNodeByKey = (transform, key, options = {}) => {
+Transforms.mergeNodeByKey = (transform, key, options = {}) => {
   const { normalize = true } = options
   const { state } = transform
   const { document } = state
@@ -120,13 +120,13 @@ Transforms.joinNodeByKey = (transform, key, options = {}) => {
   const previous = document.getPreviousSibling(key)
 
   if (!previous) {
-    throw new Error(`Unable to join node with key "${key}", no previous key.`)
+    throw new Error(`Unable to merge node with key "${key}", no previous key.`)
   }
 
   const position = previous.kind == 'text' ? previous.length : previous.nodes.size
 
   transform.applyOperation({
-    type: 'join_node',
+    type: 'merge_node',
     path,
     position,
   })

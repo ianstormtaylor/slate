@@ -214,7 +214,7 @@ const rules = [
   },
 
   /**
-   * Join adjacent text nodes.
+   * Merge adjacent text nodes.
    *
    * @type {Object}
    */
@@ -236,9 +236,9 @@ const rules = [
       return invalids.size ? invalids : null
     },
     normalize: (transform, node, invalids) => {
-      // Reverse the list to handle consecutive joins, since the earlier nodes
-      // will always exist after each join.
-      invalids.reverse().forEach(n => transform.joinNodeByKey(n.key, OPTS))
+      // Reverse the list to handle consecutive merges, since the earlier nodes
+      // will always exist after each merge.
+      invalids.reverse().forEach(n => transform.mergeNodeByKey(n.key, OPTS))
     }
   },
 
