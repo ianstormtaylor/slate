@@ -38,6 +38,7 @@
     "browserify-global-shim": "^1.0.3",
     "browserify-shim": "^3.8.12",
     "chalk": "^1.1.3",
+    "cross-env": "^5.0.5",
     "disc": "^1.3.2",
     "envify": "^3.4.1",
     "eslint": "^3.8.1",
@@ -83,12 +84,14 @@
     "bench": "npm-run-all build:npm benchs",
     "benchs": "babel-node ./node_modules/.bin/_matcha --reporter ./benchmark/reporter ./benchmark/index.js > ./tmp/benchmark-comparison.json && babel-node ./benchmark/compare",
     "benchs:save": "babel-node ./node_modules/.bin/_matcha --reporter ./benchmark/reporter ./benchmark/index.js > ./tmp/benchmark-baseline.json",
-    "build": "mkdir -p ./dist && npm-run-all build:npm build:max build:min",
-    "build:max": "NODE_ENV=production browserify ./src/index.js --transform babelify --transform envify --transform [ browserify-global-shim --global ] --standalone Slate > ./dist/slate.js",
-    "build:min": "NODE_ENV=production browserify ./src/index.js --transform babelify --transform envify --transform [ browserify-global-shim --global ] --transform uglifyify --standalone Slate | uglifyjs > ./dist/slate.min.js",
-    "build:npm": "babel --out-dir ./lib ./src",
+    "build": "npm run clean && mkdir -p ./dist && npm-run-all build:npm build:max build:min build:commonjs build:es",
+    "build:max": "NODE_ENV=production browserify ./src/index.js --transform babelify --transform envify --transform [ browserify-shim --global ] --standalone Slate > ./dist/slate.js",
+    "build:min": "NODE_ENV=production browserify ./src/index.js --transform babelify --transform envify --transform [ browserify-shim --global ] --transform uglifyify --standalone Slate | uglifyjs > ./dist/slate.min.js",
+    "build:npm": "NODE_ENV=production babel --out-dir ./lib ./src",
+    "build:commonjs": "cross-env NODE_ENV=production cross-env BABEL_ENV=commonjs babel ./src --out-dir ./dist/commonjs",
+    "build:es": "cross-env NODE_ENV=production cross-env BABEL_ENV=es babel ./src --out-dir ./dist/es",
     "build:test": "babel --out-dir ./lib ./src --source-maps inline",
-    "clean": "rm -rf ./lib ./node_modules ./examples/build.dev.js ./examples/build.prod.js",
+    "clean": "rm -rf ./lib ./dist ./examples/build.dev.js ./examples/build.prod.js",
     "disc": "npm-run-all build disc:build disc:open",
     "disc:build": "mkdir -p ./tmp && browserify ./lib/index.js --full-paths --transform uglifyify --standalone Slate | uglifyjs > ./tmp/build.js",
     "disc:open": "discify ./tmp/build.js --open",
@@ -99,7 +102,6 @@
     "lint": "eslint --ignore-pattern 'build.dev.js' --ignore-pattern 'build.prod.js' '{examples,src}/**/*.js'",
     "open": "open http://localhost:8080/dev.html",
     "postpublish": "npm run gh-pages",
-    "prepublish": "npm run build",
     "release": "np",
     "release:next": "np --tag=next",
     "start": "http-server ./examples",
@@ -109,11 +111,12 @@
     "watch:examples": "watchify --debug --transform babelify ./examples/index.js -o ./examples/build.dev.js -v",
     "watch:lib": "babel --watch --out-dir ./lib ./src --source-maps inline"
   },
-  "browserify-global-shim": {
+  "browserify-shim": {
     "immutable": "Immutable",
     "react": "React",
     "react-dom": "ReactDOM",
-    "react-dom/server": "ReactDOMServer"
+    "react-dom/server": "ReactDOMServer",
+    "debug": "Debug"
   },
   "keywords": [
     "canvas",

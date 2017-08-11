@@ -2,7 +2,6 @@
 import Base64 from '../serializers/base-64'
 import Content from '../components/content'
 import Character from '../models/character'
-import Debug from 'debug'
 import getPoint from '../utils/get-point'
 import Placeholder from '../components/placeholder'
 import React from 'react'
@@ -16,7 +15,7 @@ import { IS_CHROME, IS_MAC, IS_SAFARI } from '../constants/environment'
  * @type {Function}
  */
 
-const debug = Debug('slate:core')
+const debug = console.log
 
 /**
  * The default plugin.

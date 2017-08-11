@@ -1,5 +1,4 @@
 
-import Debug from 'debug'
 import React from 'react'
 import Types from 'prop-types'
 
@@ -14,7 +13,7 @@ import { IS_FIREFOX } from '../constants/environment'
  * @type {Function}
  */
 
-const debug = Debug('slate:void')
+const debug = console.log
 
 /**
  * Void.

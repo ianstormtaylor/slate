@@ -1,5 +1,4 @@
 
-import Debug from 'debug'
 import Transforms from '../transforms'
 
 /**
@@ -8,7 +7,7 @@ import Transforms from '../transforms'
  * @type {Function}
  */
 
-const debug = Debug('slate:transform')
+const debug = console.log
 
 /**
  * Transform.

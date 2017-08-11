@@ -1,5 +1,4 @@
 
-import Debug from 'debug'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import Types from 'prop-types'
@@ -18,7 +17,7 @@ import setTransferData from '../utils/set-transfer-data'
  * @type {Function}
  */
 
-const debug = Debug('slate:node')
+const debug = console.log
 
 /**
  * Node.
