@@ -229,19 +229,16 @@ const rules = [
           const next = node.nodes.get(i + 1)
           if (child.kind != 'text') return
           if (!next || next.kind != 'text') return
-          return [child, next]
+          return next
         })
         .filter(Boolean)
 
       return invalids.size ? invalids : null
     },
-    normalize: (transform, node, pairs) => {
-      // We reverse the list to handle consecutive joins, since the earlier nodes
+    normalize: (transform, node, invalids) => {
+      // Reverse the list to handle consecutive joins, since the earlier nodes
       // will always exist after each join.
-      pairs.reverse().forEach((pair) => {
-        const [ first, second ] = pair
-        return transform.joinNodeByKey(second.key, first.key, OPTS)
-      })
+      invalids.reverse().forEach(n => transform.joinNodeByKey(n.key, OPTS))
     }
   },
 

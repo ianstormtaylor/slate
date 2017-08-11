@@ -48,7 +48,6 @@ class Content extends React.Component {
     editor: Types.object.isRequired,
     onBeforeInput: Types.func.isRequired,
     onBlur: Types.func.isRequired,
-    onChange: Types.func.isRequired,
     onCopy: Types.func.isRequired,
     onCut: Types.func.isRequired,
     onDrop: Types.func.isRequired,

@@ -1,4 +1,6 @@
 
+import invert from '../operations/invert'
+
 /**
  * Transforms.
  *
@@ -120,10 +122,8 @@ Transforms.undo = (transform) => {
   redos = redos.push(previous)
 
   // Replay the inverse of the previous operations.
-  previous.slice().reverse().forEach((op) => {
-    op.inverse.forEach((inv) => {
-      transform.applyOperation(inv)
-    })
+  previous.slice().reverse().map(invert).forEach((inverse) => {
+    transform.applyOperation(inverse)
   })
 
   // Update the history.

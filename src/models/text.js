@@ -382,11 +382,13 @@ class Text extends new Record(DEFAULTS) {
    * @param {Number} index
    * @param {Number} length
    * @param {Mark} mark
-   * @param {Mark} newMark
+   * @param {Object} properties
    * @return {Text}
    */
 
-  updateMark(index, length, mark, newMark) {
+  updateMark(index, length, mark, properties) {
+    const newMark = mark.merge(properties)
+
     const characters = this.characters.map((char, i) => {
       if (i < index) return char
       if (i >= index + length) return char

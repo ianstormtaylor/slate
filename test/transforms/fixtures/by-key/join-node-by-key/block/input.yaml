@@ -1,16 +1,16 @@
 
 nodes:
   - kind: block
-    key: 'key1'
+    key: a
     type: paragraph
     nodes:
       - kind: text
-        key: 'anchor'
+        key: b
         text: The
   - kind: block
-    key: 'key2'
+    key: c
     type: paragraph
     nodes:
       - kind: text
-        key: 'focus'
+        key: d
         text: text

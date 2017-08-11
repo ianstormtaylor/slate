@@ -25,6 +25,12 @@ import Text from './models/text'
 import Range from './models/range'
 
 /**
+ * Operations.
+ */
+
+import Operations from './operations'
+
+/**
  * Serializers.
  */
 
@@ -42,7 +48,6 @@ import Transforms from './transforms'
  * Utils.
  */
 
-import applyOperation from './utils/apply-operation'
 import findDOMNode from './utils/find-dom-node'
 import { resetKeyGenerator, setKeyGenerator } from './utils/generate-key'
 
@@ -62,6 +67,7 @@ export {
   Html,
   Inline,
   Mark,
+  Operations,
   Placeholder,
   Plain,
   Range,
@@ -72,7 +78,6 @@ export {
   State,
   Text,
   Transforms,
-  applyOperation,
   findDOMNode,
   resetKeyGenerator,
   setKeyGenerator
@@ -88,6 +93,7 @@ export default {
   Html,
   Inline,
   Mark,
+  Operations,
   Placeholder,
   Plain,
   Range,
@@ -98,7 +104,6 @@ export default {
   State,
   Text,
   Transforms,
-  applyOperation,
   findDOMNode,
   resetKeyGenerator,
   setKeyGenerator

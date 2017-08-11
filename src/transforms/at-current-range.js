@@ -196,7 +196,6 @@ Transforms.insertFragment = (transform, fragment) => {
     selection.hasEdgeAtStartOf(startText)
   )
 
-  transform.deselect()
   transform.insertFragmentAtRange(selection, fragment)
   state = transform.state
   document = state.document

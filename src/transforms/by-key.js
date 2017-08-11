@@ -29,7 +29,13 @@ Transforms.addMarkByKey = (transform, key, offset, length, mark, options = {}) =
   const { document } = state
   const path = document.getPath(key)
 
-  transform.addMarkOperation(path, offset, length, mark)
+  transform.applyOperation({
+    type: 'add_mark',
+    path,
+    offset,
+    length,
+    mark,
+  })
 
   if (normalize) {
     const parent = document.getParent(key)
@@ -54,7 +60,11 @@ Transforms.insertNodeByKey = (transform, key, index, node, options = {}) => {
   const { document } = state
   const path = document.getPath(key)
 
-  transform.insertNodeOperation([ ...path, index], node)
+  transform.applyOperation({
+    type: 'insert_node',
+    path: [...path, index],
+    node,
+  })
 
   if (normalize) {
     transform.normalizeNodeByKey(key, SCHEMA)
@@ -79,7 +89,13 @@ Transforms.insertTextByKey = (transform, key, offset, text, marks, options = {})
   const { document } = state
   const path = document.getPath(key)
 
-  transform.insertTextOperation(path, offset, text, marks)
+  transform.applyOperation({
+    type: 'insert_text',
+    path,
+    offset,
+    text,
+    marks,
+  })
 
   if (normalize) {
     const parent = document.getParent(key)
@@ -88,26 +104,35 @@ Transforms.insertTextByKey = (transform, key, offset, text, marks, options = {})
 }
 
 /**
- * Join a node by `key` with a node `withKey`.
+ * Join a node by `key` with the previous node.
  *
  * @param {Transform} transform
  * @param {String} key
- * @param {String} withKey
  * @param {Object} options
  *   @property {Boolean} normalize
  */
 
-Transforms.joinNodeByKey = (transform, key, withKey, options = {}) => {
+Transforms.joinNodeByKey = (transform, key, options = {}) => {
   const { normalize = true } = options
   const { state } = transform
   const { document } = state
   const path = document.getPath(key)
-  const withPath = document.getPath(withKey)
+  const previous = document.getPreviousSibling(key)
 
-  transform.joinNodeOperation(path, withPath)
+  if (!previous) {
+    throw new Error(`Unable to join node with key "${key}", no previous key.`)
+  }
+
+  const position = previous.kind == 'text' ? previous.length : previous.nodes.size
+
+  transform.applyOperation({
+    type: 'join_node',
+    path,
+    position,
+  })
 
   if (normalize) {
-    const parent = document.getCommonAncestor(key, withKey)
+    const parent = document.getParent(key)
     transform.normalizeNodeByKey(parent.key, SCHEMA)
   }
 }
@@ -131,7 +156,11 @@ Transforms.moveNodeByKey = (transform, key, newKey, newIndex, options = {}) => {
   const path = document.getPath(key)
   const newPath = document.getPath(newKey)
 
-  transform.moveNodeOperation(path, [...newPath, newIndex])
+  transform.applyOperation({
+    type: 'move_node',
+    path,
+    newPath: [...newPath, newIndex],
+  })
 
   if (normalize) {
     const parent = document.getCommonAncestor(key, newKey)
@@ -158,7 +187,13 @@ Transforms.removeMarkByKey = (transform, key, offset, length, mark, options = {}
   const { document } = state
   const path = document.getPath(key)
 
-  transform.removeMarkOperation(path, offset, length, mark)
+  transform.applyOperation({
+    type: 'remove_mark',
+    path,
+    offset,
+    length,
+    mark,
+  })
 
   if (normalize) {
     const parent = document.getParent(key)
@@ -180,8 +215,13 @@ Transforms.removeNodeByKey = (transform, key, options = {}) => {
   const { state } = transform
   const { document } = state
   const path = document.getPath(key)
+  const node = document.getNode(key)
 
-  transform.removeNodeOperation(path)
+  transform.applyOperation({
+    type: 'remove_node',
+    path,
+    node,
+  })
 
   if (normalize) {
     const parent = document.getParent(key)
@@ -205,8 +245,44 @@ Transforms.removeTextByKey = (transform, key, offset, length, options = {}) => {
   const { state } = transform
   const { document } = state
   const path = document.getPath(key)
+  const node = document.getNode(key)
+  const ranges = node.getRanges()
+  const { text } = node
 
-  transform.removeTextOperation(path, offset, length)
+  const removals = []
+  const bx = offset
+  const by = offset + length
+  let o = 0
+
+  ranges.forEach((range) => {
+    const { marks } = range
+    const ax = o
+    const ay = ax + range.text.length
+
+    o += range.text.length
+
+    // If the range doesn't overlap with the removal, continue on.
+    if (ay < bx || by < ax) return
+
+    // Otherwise, determine which offset and characters overlap.
+    const start = Math.max(ax, bx)
+    const end = Math.min(ay, by)
+    const string = text.slice(start, end)
+
+    removals.push({
+      type: 'remove_text',
+      path,
+      offset: start,
+      text: string,
+      marks,
+    })
+  })
+
+  // Apply the removals in reverse order, so that subsequent removals aren't
+  // impacted by previous ones.
+  removals.reverse().forEach((op) => {
+    transform.applyOperation(op)
+  })
 
   if (normalize) {
     const block = document.getClosestBlock(key)
@@ -230,12 +306,18 @@ Transforms.setMarkByKey = (transform, key, offset, length, mark, properties, opt
   mark = Normalize.mark(mark)
   properties = Normalize.markProperties(properties)
   const { normalize = true } = options
-  const newMark = mark.merge(properties)
   const { state } = transform
   const { document } = state
   const path = document.getPath(key)
 
-  transform.setMarkOperation(path, offset, length, mark, newMark)
+  transform.applyOperation({
+    type: 'set_mark',
+    path,
+    offset,
+    length,
+    mark,
+    properties,
+  })
 
   if (normalize) {
     const parent = document.getParent(key)
@@ -259,11 +341,16 @@ Transforms.setNodeByKey = (transform, key, properties, options = {}) => {
   const { state } = transform
   const { document } = state
   const path = document.getPath(key)
+  const node = document.getNode(key)
 
-  transform.setNodeOperation(path, properties)
+  transform.applyOperation({
+    type: 'set_node',
+    path,
+    node,
+    properties,
+  })
 
   if (normalize) {
-    const node = key === document.key ? document : document.getParent(key)
     transform.normalizeNodeByKey(node.key, SCHEMA)
   }
 }
@@ -284,7 +371,11 @@ Transforms.splitNodeByKey = (transform, key, position, options = {}) => {
   const { document } = state
   const path = document.getPath(key)
 
-  transform.splitNodeOperation(path, position)
+  transform.applyOperation({
+    type: 'split_node',
+    path,
+    position,
+  })
 
   if (normalize) {
     const parent = document.getParent(key)

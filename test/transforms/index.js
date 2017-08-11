@@ -178,8 +178,8 @@ describe('transforms', async () => {
     }
   })
 
-  describe('state-data', () => {
-    const dir = resolve(__dirname, './fixtures/state-data')
+  describe('general', () => {
+    const dir = resolve(__dirname, './fixtures/general')
     const tests = fs.readdirSync(dir)
 
     for (const test of tests) {

@@ -1,4 +1,5 @@
 
+import Normalize from '../utils/normalize'
 import warn from '../utils/warn'
 
 /**
@@ -16,8 +17,58 @@ const Transforms = {}
  * @param {Object} properties
  */
 
-Transforms.select = (transform, properties) => {
-  transform.setSelectionOperation(properties)
+Transforms.select = (transform, properties, options = {}) => {
+  properties = Normalize.selectionProperties(properties)
+
+  const { state } = transform
+  const { document } = state
+  const sel = state.selection.toJSON()
+  const props = {}
+
+  // Remove any properties that are already equal to the current selection. And
+  // create a dictionary of the previous values for all of the properties that
+  // are being changed, for the inverse operation.
+  for (const k in properties) {
+    if (!options.snapshot && properties[k] == sel[k]) continue
+    props[k] = properties[k]
+  }
+
+  // Resolve the selection keys into paths.
+  sel.anchorPath = document.getPath(sel.anchorKey)
+  delete sel.anchorKey
+
+  if (props.anchorKey) {
+    props.anchorPath = document.getPath(props.anchorKey)
+    delete props.anchorKey
+  }
+
+  sel.focusPath = document.getPath(sel.focusKey)
+  delete sel.focusKey
+
+  if (props.focusKey) {
+    props.focusPath = document.getPath(props.focusKey)
+    delete props.focusKey
+  }
+
+  // If the selection moves, clear any marks, unless the new selection
+  // properties change the marks in some way.
+  const moved = [
+    'anchorPath',
+    'anchorOffset',
+    'focusPath',
+    'focusOffset',
+  ].some(p => props.hasOwnProperty(p))
+
+  if (sel.marks && properties.marks == sel.marks && moved) {
+    props.marks = null
+  }
+
+  // Apply the operation.
+  transform.applyOperation({
+    type: 'set_selection',
+    properties: props,
+    selection: sel,
+  })
 }
 
 /**
@@ -31,7 +82,7 @@ Transforms.selectAll = (transform) => {
   const { state } = transform
   const { document, selection } = state
   const next = selection.moveToRangeOf(document)
-  transform.setSelectionOperation(next)
+  transform.select(next)
 }
 
 /**
@@ -43,7 +94,7 @@ Transforms.selectAll = (transform) => {
 Transforms.snapshotSelection = (transform) => {
   const { state } = transform
   const { selection } = state
-  transform.setSelectionOperation(selection, { snapshot: true })
+  transform.select(selection, { snapshot: true })
 }
 
 /**
@@ -66,7 +117,7 @@ Transforms.moveTo = (transform, properties) => {
 
 Transforms.unsetMarks = (transform) => {
   warn('The `unsetMarks()` transform is deprecated.')
-  transform.setSelectionOperation({ marks: null })
+  transform.select({ marks: null })
 }
 
 /**
@@ -77,7 +128,7 @@ Transforms.unsetMarks = (transform) => {
 
 Transforms.unsetSelection = (transform) => {
   warn('The `unsetSelection()` transform is deprecated, please use `deselect()` instead.')
-  transform.setSelectionOperation({
+  transform.select({
     anchorKey: null,
     anchorOffset: 0,
     focusKey: null,
@@ -140,7 +191,7 @@ PROXY_TRANSFORMS.forEach((method) => {
     const { document, selection } = state
     let next = selection[method](...args)
     if (normalize) next = next.normalize(document)
-    transform.setSelectionOperation(next)
+    transform.select(next)
   }
 })
 
@@ -192,7 +243,7 @@ PREFIXES.forEach((prefix) => {
           const target = document[get](node.key)
           if (!target) return
           const next = selection[method](target)
-          transform.setSelectionOperation(next)
+          transform.select(next)
         }
       })
     })
@@ -220,7 +271,7 @@ DEPRECATED_TRANSFORMS.forEach(([ old, current, warning ]) => {
     const { state } = transform
     const { document, selection } = state
     const sel = selection[current](...args).normalize(document)
-    transform.setSelectionOperation(sel)
+    transform.select(sel)
   }
 })
 
