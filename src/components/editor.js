@@ -1,5 +1,4 @@
 
-import Debug from 'debug'
 import Portal from 'react-portal'
 import React from 'react'
 import Types from 'prop-types'
@@ -14,7 +13,7 @@ import noop from '../utils/noop'
  * @type {Function}
  */
 
-const debug = Debug('slate:editor')
+const debug = console.log
 
 /**
  * Event handlers to mix in to the editor.

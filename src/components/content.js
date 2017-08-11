@@ -1,5 +1,4 @@
 
-import Debug from 'debug'
 import React from 'react'
 import Types from 'prop-types'
 import getWindow from 'get-window'
@@ -24,7 +23,7 @@ import { IS_FIREFOX, IS_MAC, IS_IE } from '../constants/environment'
  * @type {Function}
  */
 
-const debug = Debug('slate:content')
+const debug = console.log
 
 /**
  * Content.

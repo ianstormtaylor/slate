@@ -1,5 +1,4 @@
 
-import Debug from 'debug'
 import warn from '../utils/warn'
 
 /**
@@ -8,7 +7,7 @@ import warn from '../utils/warn'
  * @type {Function}
  */
 
-const debug = Debug('slate:operation')
+const debug = console.log
 
 /**
  * Transforms.

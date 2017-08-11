@@ -1,6 +1,5 @@
 
 import CorePlugin from '../plugins/core'
-import Debug from 'debug'
 import Schema from './schema'
 import State from './state'
 import { Record } from 'immutable'
@@ -11,7 +10,7 @@ import { Record } from 'immutable'
  * @type {Function}
  */
 
-const debug = Debug('slate:stack')
+const debug = console.log
 
 /**
  * Methods that are triggered on events and can change the state.
