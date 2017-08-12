@@ -45,6 +45,7 @@ class Content extends React.Component {
     autoFocus: Types.bool.isRequired,
     children: Types.array.isRequired,
     className: Types.string,
+    container: Types.any,
     editor: Types.object.isRequired,
     onBeforeInput: Types.func.isRequired,
     onBlur: Types.func.isRequired,
@@ -72,6 +73,7 @@ class Content extends React.Component {
    */
 
   static defaultProps = {
+    container: 'div',
     style: {}
   }
 
@@ -824,7 +826,8 @@ class Content extends React.Component {
 
   render() {
     const { props } = this
-    const { className, readOnly, state, tabIndex, role } = props
+    const { className, readOnly, state, tabIndex, role, container } = props
+    const Container = container;
     const { document } = state
     const children = document.nodes
       .map(node => this.renderNode(node))
@@ -853,7 +856,7 @@ class Content extends React.Component {
     debug('render', { props })
 
     return (
-      <div
+      <Container
         data-slate-editor
         key={this.tmp.forces}
         ref={this.ref}
@@ -889,7 +892,7 @@ class Content extends React.Component {
       >
         {children}
         {this.props.children}
-      </div>
+      </Container>
     )
   }
 

@@ -5,6 +5,7 @@ import { HashRouter, NavLink, Route, Redirect, Switch } from 'react-router-dom'
 
 import CheckLists from './check-lists'
 import CodeHighlighting from './code-highlighting'
+import CustomWrapper from './custom-wrapper'
 import Embeds from './embeds'
 import Emojis from './emojis'
 import FocusBlur from './focus-blur'
@@ -61,7 +62,7 @@ const EXAMPLES = [
   ['Iframes', Iframes, '/iframes'],
   ['Focus & Blur', FocusBlur, '/focus-blur'],
   ['Forced Layout', ForcedLayout, '/forced-layout'],
-
+  ['Custom Wrapper', CustomWrapper, '/custom-wrapper'],
   ['DEV:Large', DevLargeDocument, '/dev-large', true],
   ['DEV:Plain', DevPerformancePlain, '/dev-performance-plain', true],
   ['DEV:Rich', DevPerformanceRich, '/dev-performance-rich', true],

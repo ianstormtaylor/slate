@@ -1,0 +1,95 @@
+{
+  "nodes": [
+    {
+      "kind": "block",
+      "type": "paragraph",
+      "nodes": [
+        {
+          "kind": "text",
+          "ranges": [
+            {
+              "text": "This is editable "
+            },
+            {
+              "text": "rich",
+              "marks": [
+                {
+                  "type": "bold"
+                }
+              ]
+            },
+            {
+              "text": " text, "
+            },
+            {
+              "text": "much",
+              "marks": [
+                {
+                  "type": "italic"
+                }
+              ]
+            },
+            {
+              "text": " better than a "
+            },
+            {
+              "text": "<textarea>",
+              "marks": [
+                {
+                  "type": "code"
+                }
+              ]
+            },
+            {
+              "text": "!"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "block",
+      "type": "paragraph",
+      "nodes": [
+        {
+          "kind": "text",
+          "ranges": [
+            {
+              "text": "Since it's rich text, you can do things like turn a selection of text "
+            },
+            {
+              "text": "bold",
+              "marks": [
+                {
+                  "type": "bold"
+                }
+              ]
+            },{
+              "text": ", or add a semantically rendered block quote in the middle of the page, like this:"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "block",
+      "type": "block-quote",
+      "nodes": [
+        {
+          "kind": "text",
+          "text": "A wise quote."
+        }
+      ]
+    },
+    {
+      "kind": "block",
+      "type": "paragraph",
+      "nodes": [
+        {
+          "kind": "text",
+          "text": "Try it out for yourself!"
+        }
+      ]
+    }
+  ]
+}
