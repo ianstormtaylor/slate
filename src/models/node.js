@@ -1179,7 +1179,7 @@ const Node = {
 
   getText() {
     return this.nodes.reduce((string, node) => {
-      return string + node.text
+      return node.kind == 'block' ? `${string}\n${node.text}` : string + node.text
     }, '')
   },
 
