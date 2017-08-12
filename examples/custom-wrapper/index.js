@@ -3,9 +3,22 @@ import { Editor, Raw } from '../..'
 import React from 'react'
 import initialState from './state.json'
 
-const ContainerElement = (props) => {
-  return <span>{props.children}</span>
-};
+/**
+ * Define our custom wrapper component
+ * that will be used to wrap the editor in place
+ * of the default <div>
+ */
+
+class ContainerElement extends React.Component {
+
+  render() {
+    return (
+      <span>{this.props.children}</span>
+    )
+  }
+
+}
+
 
 /**
  * Define the default node type.
