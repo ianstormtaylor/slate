@@ -1178,8 +1178,12 @@ const Node = {
    */
 
   getText() {
-    return this.nodes.reduce((string, node) => {
-      return node.kind == 'block' ? `${string}\n${node.text}` : string + node.text
+    return this.nodes.reduce((string, node, index) => {
+      if (node.kind == 'block' && index > 0) {
+        return `${string}\n${node.text}`
+      } else {
+        return string + node.text
+      }
     }, '')
   },
 
