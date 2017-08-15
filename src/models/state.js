@@ -28,8 +28,7 @@ const DEFAULTS = {
   document: new Document(),
   selection: new Selection(),
   history: new History(),
-  data: new Map(),
-  isNative: false
+  data: new Map()
 }
 
 /**
