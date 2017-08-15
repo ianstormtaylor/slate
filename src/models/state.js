@@ -402,18 +402,18 @@ class State extends new Record(DEFAULTS) {
   }
 
   /**
-   * Get a set of mark sets of the current selection.
+   * Get the marks of the current selection, for each character
    *
    * @return {Array<Array<Mark>>}
    */
 
-  get marksRaw() {
+  get marksPerCharacter() {
     return this.selection.isUnset
-      ? [[]]
+      ? []
       : (
         this.selection.marks
           ? [this.selection.marks.toArray()]
-          : this.document.getMarksAtRangeAsArray(this.selection, { raw: true })
+          : this.document.getMarksAtRangeAsArray(this.selection, { perCharacter: true })
       )
   }
 

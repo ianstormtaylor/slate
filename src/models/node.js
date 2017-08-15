@@ -892,30 +892,30 @@ const Node = {
    * @return {Array}
    */
 
-  getMarksAtRangeAsArray(range, options = { raw: false }) {
+  getMarksAtRangeAsArray(range, options = { perCharacter: false }) {
     range = range.normalize(this)
     const { startKey, startOffset } = range
 
     // If the range is collapsed at the start of the node, check the previous.
     if (range.isCollapsed && startOffset == 0) {
       const previous = this.getPreviousText(startKey)
-      if (!previous || !previous.length) return options.raw ? [[]] : []
+      if (!previous || !previous.length) return []
       const char = previous.characters.get(previous.length - 1)
-      return options.raw ? [char.marks.toArray()] : char.marks.toArray()
+      return options.perCharacter ? [char.marks.toArray()] : char.marks.toArray()
     }
 
     // If the range is collapsed, check the character before the start.
     if (range.isCollapsed) {
       const text = this.getDescendant(startKey)
       const char = text.characters.get(range.startOffset - 1)
-      return options.raw ? [char.marks.toArray()] : char.marks.toArray()
+      return options.perCharacter ? [char.marks.toArray()] : char.marks.toArray()
     }
 
     // Otherwise, get a set of the marks for each character in the range.
     return this
       .getCharactersAtRange(range)
       .reduce((memo, char) => {
-        if (options.raw) {
+        if (options.perCharacter) {
           memo.push(char.marks.toArray())
         } else {
           char.marks.toArray().forEach(c => memo.push(c))
