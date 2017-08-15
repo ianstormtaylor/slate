@@ -15,7 +15,11 @@ Want to contribute to Slate? That would be awesome!
 
 If you run into any weird behavior while using Slate, feel free to open a new issue in this repository! Please run a **search before opening** a new issue, to make sure that someone else hasn't already reported or solved the bug you've found.
 
-To be most helpful, please include the steps to reproduce the bug as best you can, ideally including a [JSFiddle](https://jsfiddle.net/2zokvrvt/7/) with a working example of the bug.
+Any issue you open must include:
+
+- A [JSFiddle](https://jsfiddle.net/2zokvrvt/7/) that reproduces the bug with a minimal setup.
+- A GIF showing the issue in action. (Using something like [RecordIt](http://recordit.co/).)
+- A clear explanation of what the issue is.
 
 Here's a [JSFiddle template for Slate](https://jsfiddle.net/2zokvrvt/7/) to get you started:
 
