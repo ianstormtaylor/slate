@@ -362,9 +362,9 @@ Transforms.removeMark = (transform, mark) => {
 Transforms.toggleMark = (transform, mark) => {
   mark = Normalize.mark(mark)
   const { state } = transform
-  
-  const arr = state.document.getMarksAtRange(state.selection, { reduce: false })
-  const every = arr.every(marks => marks.size && marks.some(m => m.equals(mark)))
+
+  const raw_marks = state.marksRaw
+  const every = raw_marks.length && raw_marks.every(marks => marks.some(m => m.equals(mark)))
 
   if (every) {
     transform.removeMark(mark)

@@ -918,7 +918,7 @@ const Node = {
         if (options.reduce) {
           char.marks.toArray().forEach(c => memo.push(c))
         } else {
-          memo.push(char.marks)
+          memo.push(char.marks.toArray())
         }
         return memo
       }, [])

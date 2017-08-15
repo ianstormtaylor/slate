@@ -402,6 +402,22 @@ class State extends new Record(DEFAULTS) {
   }
 
   /**
+   * Get a set of mark sets of the current selection.
+   *
+   * @return {Array<Array<Mark>>}
+   */
+
+  get marksRaw() {
+    return this.selection.isUnset
+      ? [[]]
+      : (
+        this.selection.marks
+          ? [this.selection.marks.toArray()]
+          : this.document.getMarksAtRangeAsArray(this.selection, { reduce: false })
+      )
+  }
+
+  /**
    * Get the block nodes in the current selection.
    *
    * @return {List<Block>}
