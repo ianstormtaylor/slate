@@ -478,6 +478,7 @@ function Plugin(options = {}) {
 
     switch (data.key) {
       case 'enter': return onKeyDownEnter(e, data, state)
+      case 'space': return onKeyDownSpace(e, data, state)
       case 'backspace': return onKeyDownBackspace(e, data, state)
       case 'delete': return onKeyDownDelete(e, data, state)
       case 'left': return onKeyDownLeft(e, data, state)
@@ -520,6 +521,27 @@ function Plugin(options = {}) {
       .transform()
       .splitBlock()
       .apply()
+  }
+
+  /**
+   * On `Space` key down, prevent the default browser behavior
+   * in Chrome, since in some situation it will result in loss of text.
+   * Reference: https://github.com/ianstormtaylor/slate/issues/938
+   *
+   * @param {Event} e
+   * @param {Object} data
+   * @param {State} state
+   * @return {State|Null}
+   */
+
+  function onKeyDownSpace(e, data, state) {
+    if (IS_CHROME) {
+      e.preventDefault()
+      return state
+        .transform()
+        .insertText(' ')
+        .apply()
+    }
   }
 
   /**
