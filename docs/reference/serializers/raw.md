@@ -138,7 +138,7 @@ Serialize a `state` into a raw JSON object.
 
 #### Options
 
-* `terse` (Boolean, default `false`) — if you pass the `terse: true` option, the serialized format will omit properties that aren't _strictly_ required to deserialize later, reducing the serialized data's size. For example, if the dictionary of [`Data`](../models/data.md) for a [`Node`](../models/node.md) is empty, it will be omitted;
-* `preserveKeys` (Boolean, default `false`) — set to `true` to preserve keys;
-* `preserveSelection` (Boolean, default `false`) — set to `true` to serialize the [`Selection`](../models/selection.md) (`state.selection`);
-* `preserveStateData` (Boolean, default `false`) — set to `true` to serialize `state.data`
+* `terse` (Boolean, default `false`) — if you pass the `terse: true` option, the serialized format will omit properties that aren't _strictly_ required to deserialize later, reducing the serialized data's size. For example, if the dictionary of [`Data`](../models/data.md) for a [`Node`](../models/node.md) is empty, it will be omitted.
+* `preserveKeys` (Boolean, default `false`) — set to `true` to preserve the keys on nodes in the serialized document and selection.
+* `preserveSelection` (Boolean, default `false`) — set to `true` to add the [`Selection`](../models/selection.md) (`state.selection`) to the serialized output.
+* `preserveStateData` (Boolean, default `false`) — set to `true` to add the `state.data` to the serialized output.
