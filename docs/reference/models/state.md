@@ -18,6 +18,7 @@ For convenience, in addition to transforms, many of the [`Selection`](./selectio
   - [`{edge}Text`](#edgetext)
   - [`{edge}Block`](#edgeblock)
   - [`marks`](#marks)
+  - [`marksPerCharacter`](#marksPerCharacter)
   - [`blocks`](#blocks)
   - [`fragment`](#fragment)
   - [`inlines`](#inlines)
@@ -79,7 +80,11 @@ Get the leaf [`Block`](./block.md) node at `{edge}`. Where `{edge}` is one of: `
 ### `marks`
 `Set`
 
-Get a  set of the [`Marks`](./mark.md) in the current selection.
+Get a set of the [`Marks`](./mark.md) in the current selection.
+
+### `marksPerCharacter`
+
+Get the [`Marks`](./mark.md) in the current selection for each [`Character`](./character.md) individually. Each item in the array returned by `marksPerCharacter` contains the array of `Marks` for a character.
 
 ### `blocks`
 `List`
