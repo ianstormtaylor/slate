@@ -251,7 +251,9 @@ class Content extends React.Component {
     const { element } = this
     // COMPAT: Text nodes don't have `isContentEditable` property. So, when
     // `target` is a text node use its parent element for check.
-    const el = target.nodeType === 3 ? target.parentElement : target
+    // COMPAT: `parentElement` is not defined on text nodes in certain browsers:
+    // https://developer.mozilla.org/en-US/docs/Web/API/Node/parentElement#Browser_compatibility
+    const el = (target.nodeType === 3 && target.parentElement) ? target.parentElement : target
     return (
       (el.isContentEditable) &&
       (el === element || findClosestNode(el, '[data-slate-editor]') === element)
