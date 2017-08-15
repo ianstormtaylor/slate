@@ -14,3 +14,6 @@ _book
 # NPM files.
 node_modules
 npm-debug.log
+
+# Mac stuff.
+.DS_Store
