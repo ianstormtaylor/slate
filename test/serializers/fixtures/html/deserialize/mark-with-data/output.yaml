@@ -1,0 +1,20 @@
+
+data: {}
+nodes:
+  - type: paragraph
+    isVoid: false
+    data: {}
+    nodes:
+      - characters:
+          - text: o
+            marks:
+              - type: highlight
+                data: { backgroundColor: "green" }
+          - text: n
+            marks:
+              - type: highlight
+                data: { backgroundColor: "green" }
+          - text: e
+            marks:
+              - type: highlight
+                data: { backgroundColor: "green" }

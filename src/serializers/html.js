@@ -246,7 +246,7 @@ class Html {
    */
 
   deserializeMark = (mark) => {
-    const { type, value } = mark
+    const { type, data } = mark
 
     const applyMark = (node) => {
       if (node.kind == 'mark') {
@@ -257,7 +257,7 @@ class Html {
         if (!node.ranges) node.ranges = [{ text: node.text }]
         node.ranges = node.ranges.map((range) => {
           range.marks = range.marks || []
-          range.marks.push({ type, value })
+          range.marks.push({ type, data })
           return range
         })
       }
