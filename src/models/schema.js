@@ -90,7 +90,7 @@ class Schema extends new Record(DEFAULTS) {
    */
 
   __getComponent(object) {
-    const match = this.rules.find(rule => rule.render && rule.match(object))
+    const match = this.rules.filter(rule => rule.render && rule.match(object))[0]
     if (!match) return
     return match.render
   }
@@ -131,13 +131,13 @@ class Schema extends new Record(DEFAULTS) {
   __validate(object) {
     let value
 
-    const match = this.rules.find((rule) => {
+    const match = this.rules.filter((rule) => {
       if (!rule.validate) return
       if (!rule.match(object)) return
 
       value = rule.validate(object)
       return value
-    })
+    })[0]
 
     if (!value) return
 

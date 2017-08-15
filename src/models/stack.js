@@ -147,12 +147,12 @@ class Stack extends new Record(DEFAULTS) {
  */
 
 for(let i = 0; i < EVENT_HANDLER_METHODS.length; i++) {
-  const method = STATE_ACCUMULATOR_METHODS[i]
+  const method = EVENT_HANDLER_METHODS[i]
   Stack.prototype[method] = function (state, editor, ...args) {
     debug(method)
 
     for(let i = 0; i < this.plugins.length; i++) {
-      const plugins = this.plugins[i]
+      const plugin = this.plugins[i]
       if (!plugin[method]) continue
       const next = plugin[method](...args, state, editor)
       if (next == null) continue

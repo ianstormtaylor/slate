@@ -145,7 +145,7 @@ class Editor extends React.Component {
     let { stack } = this.state
 
     // If any plugin-related properties will change, create a new `Stack`.
-    for(let i = 0; i < PLUGIN_PROPS.length; i++) {
+    for(let i = 0; i < PLUGINS_PROPS.length; i++) {
       const prop = PLUGINS_PROPS[i]
       if (props[prop] == this.props[prop]) continue
       const { onChange, ...rest } = props // eslint-disable-line no-unused-vars
