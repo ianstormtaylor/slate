@@ -54,7 +54,7 @@ const rules = [
   // Add our first rule with a deserializing function.
   {
     deserialize(el, next) {
-      if (el.tagName == 'p') {
+      if (el.tagName == 'P') {
         return {
           kind: 'block',
           type: 'paragraph',
@@ -76,7 +76,7 @@ Okay, that's `deserialize`, now let's define the `serialize` property of the par
 const rules = [
   {
     deserialize(el, next) {
-      if (el.tagName == 'p') {
+      if (el.tagName == 'P') {
         return {
           kind: 'block',
           type: 'paragraph',
@@ -105,9 +105,9 @@ Let's add the other types of blocks we want:
 ```js
 // Refactor block tags into a dictionary for cleanliness.
 const BLOCK_TAGS = {
-  p: 'paragraph',
-  blockquote: 'quote',
-  pre: 'code'
+  P: 'paragraph',
+  BLOCKQUOTE: 'quote',
+  PRE: 'code'
 }
 
 const rules = [
@@ -144,16 +144,16 @@ Okay. So now our serializer can handle blocks, but we need to add our marks to i
 
 ```js
 const BLOCK_TAGS = {
-  blockquote: 'quote',
-  p: 'paragraph',
-  pre: 'code'
+  BLOCKQUOTE: 'quote',
+  P: 'paragraph',
+  PRE: 'code'
 }
 
 // Add a dictionary of mark tags.
 const MARK_TAGS = {
-  em: 'italic',
-  strong: 'bold',
-  u: 'underline',
+  EM: 'italic',
+  STRONG: 'bold',
+  U: 'underline',
 }
 
 const rules = [
