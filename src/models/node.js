@@ -867,8 +867,8 @@ const Node = {
    * @return {Set<Mark>}
    */
 
-  getMarksAtRange(range) {
-    const array = this.getMarksAtRangeAsArray(range)
+  getMarksAtRange(range, options) {
+    const array = this.getMarksAtRangeAsArray(range, options)
     return new Set(array)
   },
 
@@ -879,8 +879,8 @@ const Node = {
    * @return {OrderedSet<Mark>}
    */
 
-  getOrderedMarksAtRange(range) {
-    const array = this.getMarksAtRangeAsArray(range)
+  getOrderedMarksAtRange(range, options) {
+    const array = this.getMarksAtRangeAsArray(range, options)
     return new OrderedSet(array)
   },
 
@@ -888,10 +888,11 @@ const Node = {
    * Get a set of the marks in a `range`.
    *
    * @param {Selection} range
+   * @param {Object} options
    * @return {Array}
    */
 
-  getMarksAtRangeAsArray(range) {
+  getMarksAtRangeAsArray(range, options = { reduce: true }) {
     range = range.normalize(this)
     const { startKey, startOffset } = range
 
@@ -914,7 +915,11 @@ const Node = {
     return this
       .getCharactersAtRange(range)
       .reduce((memo, char) => {
-        char.marks.toArray().forEach(c => memo.push(c))
+        if (options.reduce) {
+          char.marks.toArray().forEach(c => memo.push(c))
+        } else {
+          memo.push(char.marks)
+        }
         return memo
       }, [])
   },
