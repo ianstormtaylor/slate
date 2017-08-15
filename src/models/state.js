@@ -409,11 +409,11 @@ class State extends new Record(DEFAULTS) {
 
   get marksRaw() {
     return this.selection.isUnset
-      ? [[]]
+      ? []
       : (
         this.selection.marks
           ? [this.selection.marks.toArray()]
-          : this.document.getMarksAtRangeAsArray(this.selection, { reduce: false })
+          : this.document.getMarksAtRangeAsArray(this.selection, { raw: true })
       )
   }
 
