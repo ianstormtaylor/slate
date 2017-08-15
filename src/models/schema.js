@@ -4,6 +4,7 @@ import isReactComponent from '../utils/is-react-component'
 import typeOf from 'type-of'
 import MODEL_TYPES from '../constants/model-types'
 import { Record } from 'immutable'
+import find from '../utils/find'
 
 /**
  * Default properties.
@@ -90,7 +91,7 @@ class Schema extends new Record(DEFAULTS) {
    */
 
   __getComponent(object) {
-    const match = this.rules.filter(rule => rule.render && rule.match(object))[0]
+    const match = find(this.rules, rule => rule.render && rule.match(object))
     if (!match) return
     return match.render
   }
@@ -131,13 +132,13 @@ class Schema extends new Record(DEFAULTS) {
   __validate(object) {
     let value
 
-    const match = this.rules.filter((rule) => {
+    const match = find(this.rules, (rule) => {
       if (!rule.validate) return
       if (!rule.match(object)) return
 
       value = rule.validate(object)
       return value
-    })[0]
+    })
 
     if (!value) return
 
