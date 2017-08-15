@@ -363,8 +363,7 @@ Transforms.toggleMark = (transform, mark) => {
   mark = Normalize.mark(mark)
   const { state } = transform
 
-  const raw_marks = state.marksRaw
-  const every = raw_marks.length && raw_marks.every(marks => marks.some(m => m.equals(mark)))
+  const every = !state.marksRaw.some(marks => !marks.some(m => m.equals(mark)))
 
   if (every) {
     transform.removeMark(mark)

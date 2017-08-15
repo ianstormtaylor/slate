@@ -899,16 +899,16 @@ const Node = {
     // If the range is collapsed at the start of the node, check the previous.
     if (range.isCollapsed && startOffset == 0) {
       const previous = this.getPreviousText(startKey)
-      if (!previous || !previous.length) return []
+      if (!previous || !previous.length) return options.raw ? [[]] : []
       const char = previous.characters.get(previous.length - 1)
-      return char.marks.toArray()
+      return options.raw ? [char.marks.toArray()] : char.marks.toArray()
     }
 
     // If the range is collapsed, check the character before the start.
     if (range.isCollapsed) {
       const text = this.getDescendant(startKey)
       const char = text.characters.get(range.startOffset - 1)
-      return char.marks.toArray()
+      return options.raw ? [char.marks.toArray()] : char.marks.toArray()
     }
 
     // Otherwise, get a set of the marks for each character in the range.
