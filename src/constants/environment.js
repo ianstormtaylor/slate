@@ -48,7 +48,7 @@ let OS
 if (browser) {
   const { userAgent } = window.navigator
 
-  for(let i = 0; i < BROWSER_RULES.length; i++) {
+  for (let i = 0; i < BROWSER_RULES.length; i++) {
     const [ name, regexp ] = BROWSER_RULES[i]
     if (regexp.test(userAgent)) {
       BROWSER = name
@@ -56,7 +56,7 @@ if (browser) {
     }
   }
 
-  for(let i = 0; i < OS_RULES.length; i++) {
+  for (let i = 0; i < OS_RULES.length; i++) {
     const [ name, regexp ] = OS_RULES[i]
     if (regexp.test(userAgent)) {
       OS = name

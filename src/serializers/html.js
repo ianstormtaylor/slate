@@ -219,7 +219,7 @@ class Html {
       }
     }
 
-    for(let i = 0; i < this.rules.length; i++) {
+    for (let i = 0; i < this.rules.length; i++) {
       const rule = this.rules[i]
       if (!rule.deserialize) continue
       const ret = rule.deserialize(element, next)
@@ -312,7 +312,7 @@ class Html {
 
     const children = node.nodes.map(this.serializeNode)
 
-    for(let i = 0; i < this.rules.length; i++) {
+    for (let i = 0; i < this.rules.length; i++) {
       const rule = this.rules[i]
       if (!rule.serialize) continue
       const ret = rule.serialize(node, children)
@@ -334,7 +334,7 @@ class Html {
     const text = this.serializeString(string)
 
     return range.marks.reduce((children, mark) => {
-      for(let i = 0; i < this.rules.length; i++) {
+      for (let i = 0; i < this.rules.length; i++) {
         const rule = this.rules[i]
         if (!rule.serialize) continue
         const ret = rule.serialize(mark, children)
@@ -353,7 +353,7 @@ class Html {
    */
 
   serializeString = (string) => {
-    for(let i = 0; i < this.rules.length; i++) {
+    for (let i = 0; i < this.rules.length; i++) {
       const rule = this.rules[i]
       if (!rule.serialize) continue
       const ret = rule.serialize(string, string.text)

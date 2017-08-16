@@ -56,7 +56,7 @@ const UNSET = undefined
 function memoize(object, properties, options = {}) {
   const { takesArguments = true } = options
 
-  for(let i = 0; i < properties.length; i++) {
+  for (let i = 0; i < properties.length; i++) {
     const property = properties[i]
     const original = object[property]
 
@@ -122,7 +122,7 @@ function memoize(object, properties, options = {}) {
  */
 
 function getIn(map, keys) {
-  for(let i = 0; i < keys.length; i++) {
+  for (let i = 0; i < keys.length; i++) {
     const key = keys[i]
     map = map.get(key)
     if (map === UNSET) return UNSET
@@ -144,7 +144,7 @@ function setIn(map, keys, value) {
   let parent = map
   let child
 
-  for(let i = 0; i < keys.length; i++) {
+  for (let i = 0; i < keys.length; i++) {
     const key = keys[i]
     child = parent.get(key)
 

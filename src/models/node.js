@@ -526,7 +526,7 @@ const Node = {
   getDescendantAtPath(path) {
     let descendant = this
 
-    for(var i = 0; i < path.length; i++) {
+    for (let i = 0; i < path.length; i++) {
       const index = path[i]
       if (!descendant) return
       if (!descendant.nodes) return
