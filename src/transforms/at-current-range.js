@@ -362,9 +362,9 @@ Transforms.removeMark = (transform, mark) => {
 Transforms.toggleMark = (transform, mark) => {
   mark = Normalize.mark(mark)
   const { state } = transform
+  const exists = state.activeMarks.some(m => m.equals(mark))
 
-  const every = state.activeMarks.some(m => m.equals(mark))
-  if (every) {
+  if (exists) {
     transform.removeMark(mark)
   } else {
     transform.addMark(mark)
