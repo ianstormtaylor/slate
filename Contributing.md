@@ -9,6 +9,7 @@ Want to contribute to Slate? That would be awesome!
 - [Running Tests](#running-tests)
 - [Running Examples](#running-examples)
 - [Adding Browser Support](#adding-browser-support)
+- [Testing Input Methods](#testing-input-methods)
 
 
 ## Reporting Bugs
@@ -73,5 +74,10 @@ Check out the [Examples readme](./examples) to see how to get the examples runni
 ## Adding Browser Support
 
 Slate aims to targeted all of the modern browsers, and eventually the modern mobile platforms. Right now browser support is limited to the latest versions of [Chrome](https://www.google.com/chrome/browser/desktop/), [Firefox](https://www.mozilla.org/en-US/firefox/new/), and [Safari](http://www.apple.com/safari/), but if you are interested in adding support for another modern platform, that is welcomed!
+
+
+## Testing Input Methods
+
+[Here's a helpful page](https://github.com/Microsoft/vscode/wiki/IME-Test) detailing how to test various input scenarios on Windows, Mac and Linux.
 
 
