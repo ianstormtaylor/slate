@@ -162,6 +162,10 @@ function Plugin(options = {}) {
       // the cursor isn't technique in the right spot. (2016/12/01)
       (!(pInline && !pInline.isVoid && startOffset == 0)) &&
       (!(nInline && !nInline.isVoid && startOffset == startText.length)) &&
+      // COMPAT: When inserting a Space character, Chrome will sometimes
+      // split the text node into two adjacent text nodes. See:
+      // https://github.com/ianstormtaylor/slate/issues/938
+      (!(e.data === ' ' && IS_CHROME)) &&
       // If the
       (chars.equals(nextChars))
     )
@@ -478,7 +482,6 @@ function Plugin(options = {}) {
 
     switch (data.key) {
       case 'enter': return onKeyDownEnter(e, data, state)
-      case 'space': return onKeyDownSpace(e, data, state)
       case 'backspace': return onKeyDownBackspace(e, data, state)
       case 'delete': return onKeyDownDelete(e, data, state)
       case 'left': return onKeyDownLeft(e, data, state)
@@ -521,27 +524,6 @@ function Plugin(options = {}) {
       .transform()
       .splitBlock()
       .apply()
-  }
-
-  /**
-   * On `Space` key down, prevent the default browser behavior
-   * in Chrome, since in some situation it will result in loss of text.
-   * Reference: https://github.com/ianstormtaylor/slate/issues/938
-   *
-   * @param {Event} e
-   * @param {Object} data
-   * @param {State} state
-   * @return {State|Null}
-   */
-
-  function onKeyDownSpace(e, data, state) {
-    if (IS_CHROME) {
-      e.preventDefault()
-      return state
-        .transform()
-        .insertText(' ')
-        .apply()
-    }
   }
 
   /**
