@@ -4,7 +4,7 @@ import isReactComponent from '../utils/is-react-component'
 import typeOf from 'type-of'
 import MODEL_TYPES from '../constants/model-types'
 import { Record } from 'immutable'
-import find from '../utils/find'
+import find from 'lodash/find'
 
 /**
  * Default properties.
