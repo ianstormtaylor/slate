@@ -70,9 +70,7 @@ class RichText extends React.Component {
 
   hasMark = (type) => {
     const { state } = this.state
-    const characterMarks = state.marksPerCharacter
-    return characterMarks.length &&
-      characterMarks.every(charMarks => charMarks.some(mark => mark.type == type))
+    return state.activeMarks.some(mark => mark.type == type)
   }
 
   /**

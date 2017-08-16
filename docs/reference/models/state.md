@@ -18,7 +18,7 @@ For convenience, in addition to transforms, many of the [`Selection`](./selectio
   - [`{edge}Text`](#edgetext)
   - [`{edge}Block`](#edgeblock)
   - [`marks`](#marks)
-  - [`marksPerCharacter`](#marksPerCharacter)
+  - [`activeMarks`](#activeMarks)
   - [`blocks`](#blocks)
   - [`fragment`](#fragment)
   - [`inlines`](#inlines)
@@ -82,9 +82,10 @@ Get the leaf [`Block`](./block.md) node at `{edge}`. Where `{edge}` is one of: `
 
 Get a set of the [`Marks`](./mark.md) in the current selection.
 
-### `marksPerCharacter`
+### `activeMarks`
+`Set`
 
-Get the [`Marks`](./mark.md) in the current selection for each [`Character`](./character.md) individually. Each item in the array returned by `marksPerCharacter` contains the array of `Marks` for a character.
+Get a subset of the [`Marks`](./mark.md) that are present in _all_ the characters in the current selection. It can be used to determine the active/inactive state of toolbar buttons corresponding to marks, based on the usual rich text editing conventions.
 
 ### `blocks`
 `List`
