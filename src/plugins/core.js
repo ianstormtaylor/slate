@@ -940,7 +940,6 @@ function Plugin(options = {}) {
         autoFocus={props.autoFocus}
         className={props.className}
         children={props.children}
-        container={props.container}
         editor={editor}
         onBeforeInput={editor.onBeforeInput}
         onBlur={editor.onBlur}
@@ -959,6 +958,7 @@ function Plugin(options = {}) {
         state={state}
         style={props.style}
         tabIndex={props.tabIndex}
+        tagName={props.tagName}
       />
     )
   }
