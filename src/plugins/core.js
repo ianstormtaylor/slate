@@ -526,6 +526,7 @@ function Plugin(options = {}) {
   /**
    * On `Space` key down, prevent the default browser behavior
    * in Chrome, since in some situation it will result in loss of text.
+   * (unless we're composing or we're on a Mac and we want to insert emoji)
    * Reference: https://github.com/ianstormtaylor/slate/issues/938
    *
    * @param {Event} e
@@ -535,7 +536,7 @@ function Plugin(options = {}) {
    */
 
   function onKeyDownSpace(e, data, state) {
-    if (IS_CHROME) {
+    if (IS_CHROME && !data.isComposing && !(IS_MAC && e.metaKey && e.ctrlKey)) {
       e.preventDefault()
       return state
         .transform()
