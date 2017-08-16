@@ -660,7 +660,6 @@ class Content extends React.Component {
     data.isModAlt = IS_MAC ? metaKey && altKey : ctrlKey && altKey
     data.isShift = shiftKey
     data.isWord = IS_MAC ? altKey : ctrlKey
-    data.isComposing = this.tmp.isComposing
 
     // These key commands have native behavior in contenteditable elements which
     // will cause our state to be out of sync, so prevent them.
