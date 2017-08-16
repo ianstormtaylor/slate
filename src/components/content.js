@@ -62,7 +62,8 @@ class Content extends React.Component {
     spellCheck: Types.bool.isRequired,
     state: Types.object.isRequired,
     style: Types.object,
-    tabIndex: Types.number
+    tabIndex: Types.number,
+    tagName: Types.string
   }
 
   /**
@@ -72,7 +73,8 @@ class Content extends React.Component {
    */
 
   static defaultProps = {
-    style: {}
+    style: {},
+    tagName: 'div'
   }
 
   /**
@@ -826,7 +828,8 @@ class Content extends React.Component {
 
   render() {
     const { props } = this
-    const { className, readOnly, state, tabIndex, role } = props
+    const { className, readOnly, state, tabIndex, role, tagName } = props
+    const Container = tagName
     const { document } = state
     const children = document.nodes
       .map(node => this.renderNode(node))
@@ -855,7 +858,7 @@ class Content extends React.Component {
     debug('render', { props })
 
     return (
-      <div
+      <Container
         data-slate-editor
         key={this.tmp.forces}
         ref={this.ref}
@@ -891,7 +894,7 @@ class Content extends React.Component {
       >
         {children}
         {this.props.children}
-      </div>
+      </Container>
     )
   }
 
