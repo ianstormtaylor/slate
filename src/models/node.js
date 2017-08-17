@@ -953,11 +953,10 @@ const Node = {
     // Otherwise, get a set of the marks for each character in the range.
     const chars = this.getCharactersAtRange(range)
     const first = chars.first()
-    if (!first) return []
     let memo = first.marks
     chars.slice(1).forEach((char) => {
       memo = memo.intersect(char.marks)
-      return memo.size
+      return memo.size != 0
     })
     return memo.toArray()
   },
