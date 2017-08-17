@@ -54,7 +54,7 @@ const rules = [
   // Add our first rule with a deserializing function.
   {
     deserialize(el, next) {
-      if (el.tagName == 'P') {
+      if (el.tagName.toLowerCase() == 'p') {
         return {
           kind: 'block',
           type: 'paragraph',
@@ -70,13 +70,15 @@ If you've worked with the [`Raw`](../reference/serializers/raw.md) serializer be
 
 The `el` argument that the `deserialize` function receives is just a DOM element. And the `next` argument is a function that will deserialize any element(s) we pass it, which is how you recurse through each node's children.
 
+A quick note on `el.tagName` -- in browser environments, Slate uses the native `DOMParser` to parse HTML, which returns uppercase tag names. In server-side or node environments, we recommend [providing parse5](https://docs.slatejs.org/reference/serializers/html.html#parsehtml) to parse HTML; however, parse5 returns lowercase tag names due to some subtle complexities in specifications. Consequentially, we recommend using case-insensitive tag comparisons, so your code just works everywhere without having to worry about the parser implementation.
+
 Okay, that's `deserialize`, now let's define the `serialize` property of the paragraph rule as well:
 
 ```js
 const rules = [
   {
     deserialize(el, next) {
-      if (el.tagName == 'P') {
+      if (el.tagName.toLowerCase() == 'p') {
         return {
           kind: 'block',
           type: 'paragraph',
@@ -105,16 +107,16 @@ Let's add the other types of blocks we want:
 ```js
 // Refactor block tags into a dictionary for cleanliness.
 const BLOCK_TAGS = {
-  P: 'paragraph',
-  BLOCKQUOTE: 'quote',
-  PRE: 'code'
+  p: 'paragraph',
+  blockquote: 'quote',
+  pre: 'code'
 }
 
 const rules = [
   {
     // Switch deserialize to handle more blocks...
     deserialize(el, next) {
-      const type = BLOCK_TAGS[el.tagName]
+      const type = BLOCK_TAGS[el.tagName.toLowerCase()]
       if (!type) return
       return {
         kind: 'block',
@@ -144,22 +146,22 @@ Okay. So now our serializer can handle blocks, but we need to add our marks to i
 
 ```js
 const BLOCK_TAGS = {
-  BLOCKQUOTE: 'quote',
-  P: 'paragraph',
-  PRE: 'code'
+  blockquote: 'quote',
+  p: 'paragraph',
+  pre: 'code'
 }
 
 // Add a dictionary of mark tags.
 const MARK_TAGS = {
-  EM: 'italic',
-  STRONG: 'bold',
-  U: 'underline',
+  em: 'italic',
+  strong: 'bold',
+  u: 'underline',
 }
 
 const rules = [
   {
     deserialize(el, next) {
-      const type = BLOCK_TAGS[el.tagName]
+      const type = BLOCK_TAGS[el.tagName.toLowerCase()]
       if (!type) return
       return {
         kind: 'block',
@@ -179,7 +181,7 @@ const rules = [
   // Add a new rule that handles marks...
   {
     deserialize(el, next) {
-      const type = MARK_TAGS[el.tagName]
+      const type = MARK_TAGS[el.tagName.toLowerCase()]
       if (!type) return
       return {
         kind: 'mark',

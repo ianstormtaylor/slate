@@ -3,14 +3,14 @@ export default {
   rules: [
     {
       deserialize(el, next) {
-        if (el.tagName == 'div') {
+        if (el.tagName.toLowerCase() == 'div') {
           return null
         }
       }
     },
     {
       deserialize(el, next) {
-        if (el.tagName == 'hr') {
+        if (el.tagName.toLowerCase() == 'hr') {
           return {
             kind: 'block',
             type: 'divider',
