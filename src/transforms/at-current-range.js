@@ -33,7 +33,7 @@ Transforms.addMark = (transform, mark) => {
     return
   }
 
-  const marks = document.getMarksAtRange(selection).add(mark)
+  const marks = document.getActiveMarksAtRange(selection).add(mark)
   const sel = selection.set('marks', marks)
   transform.select(sel)
 }
@@ -346,7 +346,7 @@ Transforms.removeMark = (transform, mark) => {
     return
   }
 
-  const marks = document.getMarksAtRange(selection).remove(mark)
+  const marks = document.getActiveMarksAtRange(selection).remove(mark)
   const sel = selection.set('marks', marks)
   transform.select(sel)
 }
