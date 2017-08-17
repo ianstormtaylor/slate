@@ -8,14 +8,19 @@ import { Editor } from 'slate'
 The top-level React component that renders the Slate editor itself.
 
 - [Properties](#properties)
+  - [`autoCorrect`](#autocorrect)
+  - [`autoFocus`](#autofocus)
   - [`className`](#classname)
   - [`onChange`](#onchange)
   - [`onDocumentChange`](#ondocumentchange)
   - [`onSelectionChange`](#onselectionchange)
   - [`plugins`](#plugins)
   - [`readOnly`](#readonly)
+  - [`role`](#role)
+  - [`spellCheck`](#spellcheck)
   - [`state`](#state)
   - [`style`](#style)
+  - [`tabIndex`](#tabindex)
 - [Placeholder Properties](#placeholder-properties)
   - [`placeholder`](#placeholder)
   - [`placeholderClassName`](#placeholderclassname)
@@ -38,19 +43,35 @@ The top-level React component that renders the Slate editor itself.
   - [`getState()`](#getstate)
   - [`onChange(state)`](#onchange)
 
-
 ## Properties
 
 ```js
 <Editor
-  className={string}
+  autoCorrect={Boolean}
+  autoFocus={Boolean}
+  className={String}
   onChange={Function}
+  onDocumentChange={Function}
+  onSelectionChange={Function}
   plugins={Array}
   readOnly={Boolean}
+  role={String}
+  spellCheck={Boolean}
   state={State}
   style={Object}
+  tabIndex={Number}
 />
 ```
+
+### `autoCorrect`
+`Boolean`
+
+Whether the editor should attempt to autocorrect spellcheck errors.
+
+### `autoFocus`
+`Boolean`
+
+An optional attribute that, when set to true, attempts to give the content editable element focus when it's loaded onto the page.
 
 ### `className`
 `String`
@@ -82,6 +103,16 @@ An array of [`Plugins`](../plugins/plugin.md) that define the editor's behavior.
 
 Whether the editor should be in "read-only" mode, where all of the rendering is the same, but the user is prevented from editing the editor's content.
 
+### `spellCheck`
+`Boolean`
+
+Whether spellcheck is turned on for the editor.
+
+### `role`
+`String`
+
+ARIA property to define the role of the editor, it defaults to `textbox` when editable.
+
 ### `state`
 `State`
 
@@ -93,12 +124,9 @@ A [`State`](../models/state.md) object representing the current state of the edi
 An optional dictionary of styles to apply to the content editable element.
 
 ### `tabIndex`
+`Number`
 
 Indicates if it should participate to [sequential keyboard navigation](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/tabindex).
-
-### `role`
-
-ARIA property to define the role of the editor, it defaults to `textbox` when editable.
 
 ## Placeholder Properties
 
