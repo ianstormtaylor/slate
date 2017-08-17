@@ -1,6 +1,0 @@
-# Automatically normalize line endings for all text-based files
-# http://git-scm.com/docs/gitattributes#_end_of_line_conversion
-* text=auto
-
-# Declare files that will always have LF line endings on checkout.
-*.js text eol=lf
