@@ -14,3 +14,5 @@ _book
 # NPM files.
 node_modules
 npm-debug.log
+
+.idea
