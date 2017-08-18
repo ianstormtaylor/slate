@@ -101,6 +101,11 @@ Get a list of the lowest-depth [`Inline`](./inline.md) nodes in the current sele
 
 Get a list of the [`Text`](./text.md) nodes in the current selection.
 
+### `characters`
+`List`
+
+Get a list of the [`Character`](./character.md) objects in the current selection.
+
 ### `hasUndos`
 `Boolean`
 
