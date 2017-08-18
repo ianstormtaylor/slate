@@ -15,4 +15,5 @@ _book
 node_modules
 npm-debug.log
 
+# IntelliJ IEDA editor config dir
 .idea
