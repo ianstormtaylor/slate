@@ -4,3 +4,4 @@ examples
 src
 test
 tmp
+.babelrc
