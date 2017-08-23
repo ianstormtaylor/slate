@@ -7,7 +7,7 @@ export default function (state) {
     anchorKey: first.key,
     anchorOffset: 0,
     focusKey: first.key,
-    focusOffset: first.length
+    focusOffset: first.text.length
   })
 
   return state

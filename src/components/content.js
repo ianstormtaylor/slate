@@ -776,7 +776,7 @@ class Content extends React.Component {
       const anchorInline = document.getClosestInline(anchor.key)
       const focusInline = document.getClosestInline(focus.key)
 
-      if (anchorInline && !anchorInline.isVoid && anchor.offset == anchorText.length) {
+      if (anchorInline && !anchorInline.isVoid && anchor.offset == anchorText.text.length) {
         const block = document.getClosestBlock(anchor.key)
         const next = block.getNextText(anchor.key)
         if (next) {
@@ -785,7 +785,7 @@ class Content extends React.Component {
         }
       }
 
-      if (focusInline && !focusInline.isVoid && focus.offset == focusText.length) {
+      if (focusInline && !focusInline.isVoid && focus.offset == focusText.text.length) {
         const block = document.getClosestBlock(focus.key)
         const next = block.getNextText(focus.key)
         if (next) {

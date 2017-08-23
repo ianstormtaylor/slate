@@ -71,7 +71,7 @@ class Tables extends React.Component {
    */
 
   onDelete = (e, state) => {
-    if (state.endOffset != state.startText.length) return
+    if (state.endOffset != state.startText.text.length) return
     e.preventDefault()
     return state
   }

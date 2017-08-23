@@ -15,9 +15,9 @@ export default function (state) {
   const last = fragment.getTexts().last()
   const range = selection.merge({
     anchorKey: first.key,
-    anchorOffset: first.length,
+    anchorOffset: first.text.length,
     focusKey: first.key,
-    focusOffset: first.length
+    focusOffset: first.text.length
   })
 
   const next = state
@@ -30,9 +30,9 @@ export default function (state) {
     next.selection.toJS(),
     range.merge({
       anchorKey: first.key,
-      anchorOffset: first.length + last.length,
+      anchorOffset: first.text.length + last.text.length,
       focusKey: first.key,
-      focusOffset: first.length + last.length
+      focusOffset: first.text.length + last.text.length
     }).toJS()
   )
 

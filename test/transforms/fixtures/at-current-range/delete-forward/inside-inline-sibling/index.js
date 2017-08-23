@@ -23,7 +23,7 @@ export default function (state) {
 
   assert.deepEqual(
     next.selection.toJS(),
-    range.collapseToStartOf(updated).move(first.length).toJS()
+    range.collapseToStartOf(updated).move(first.text.length).toJS()
   )
 
   return next

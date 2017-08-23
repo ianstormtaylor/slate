@@ -211,13 +211,13 @@ Transforms.insertFragment = (transform, fragment) => {
   else if (newText) {
     after = selection
       .collapseToStartOf(newText)
-      .move(lastText.length)
+      .move(lastText.text.length)
   }
 
   else {
     after = selection
       .collapseToStart()
-      .move(lastText.length)
+      .move(lastText.text.length)
   }
 
   transform.select(after)

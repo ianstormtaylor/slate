@@ -7,7 +7,7 @@ export default function (state) {
     anchorKey: startText.key,
     anchorOffset: 0,
     focusKey: startText.key,
-    focusOffset: startText.length,
+    focusOffset: startText.text.length,
   })
 
   const next = state

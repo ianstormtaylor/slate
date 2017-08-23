@@ -8,7 +8,7 @@ export default function (state) {
     .setMarkByKey(
       first.key,
       0,
-      first.length,
+      first.text.length,
       {
         type: 'bold',
         data: { key: true }

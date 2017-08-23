@@ -8,7 +8,7 @@ export default function (state) {
     anchorKey: first.key,
     anchorOffset: 1,
     focusKey: last.key,
-    focusOffset: last.length - 1
+    focusOffset: last.text.length - 1
   })
 
   return state

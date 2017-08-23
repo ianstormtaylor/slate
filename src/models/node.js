@@ -899,8 +899,8 @@ const Node = {
     // If the range is collapsed at the start of the node, check the previous.
     if (range.isCollapsed && startOffset == 0) {
       const previous = this.getPreviousText(startKey)
-      if (!previous || !previous.length) return []
-      const char = previous.characters.get(previous.length - 1)
+      if (!previous || previous.text.length == 0) return []
+      const char = previous.characters.get(previous.text.length - 1)
       return char.marks.toArray()
     }
 
@@ -1043,7 +1043,7 @@ const Node = {
     const child = this.getFurthestAncestor(key)
     const offset = this.nodes
       .takeUntil(n => n == child)
-      .reduce((memo, n) => memo + n.length, 0)
+      .reduce((memo, n) => memo + n.text.length, 0)
 
     // Recurse if need be.
     return this.hasChild(key)
@@ -1194,15 +1194,15 @@ const Node = {
   getTextAtOffset(offset) {
     // PERF: Add a few shortcuts for the obvious cases.
     if (offset == 0) return this.getFirstText()
-    if (offset == this.length) return this.getLastText()
-    if (offset < 0 || offset > this.length) return null
+    if (offset == this.text.length) return this.getLastText()
+    if (offset < 0 || offset > this.text.length) return null
 
     let length = 0
 
     return this
       .getTexts()
-      .find((text, i, texts) => {
-        length += text.length
+      .find((node, i, nodes) => {
+        length += node.text.length
         return length > offset
       })
   },

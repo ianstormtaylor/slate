@@ -123,7 +123,7 @@ Transforms.mergeNodeByKey = (transform, key, options = {}) => {
     throw new Error(`Unable to merge node with key "${key}", no previous key.`)
   }
 
-  const position = previous.kind == 'text' ? previous.length : previous.nodes.size
+  const position = previous.kind == 'text' ? previous.text.length : previous.nodes.size
 
   transform.applyOperation({
     type: 'merge_node',

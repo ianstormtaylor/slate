@@ -5,9 +5,9 @@ export default function (state) {
   const last = texts.last()
   const range = selection.merge({
     anchorKey: last.key,
-    anchorOffset: last.length - 2,
+    anchorOffset: last.text.length - 2,
     focusKey: last.key,
-    focusOffset: last.length - 2
+    focusOffset: last.text.length - 2
   })
 
   return state

@@ -183,8 +183,8 @@ class MarkdownShortcuts extends React.Component {
   onEnter = (e, state) => {
     if (state.isExpanded) return
     const { startBlock, startOffset, endOffset } = state
-    if (startOffset == 0 && startBlock.length == 0) return this.onBackspace(e, state)
-    if (endOffset != startBlock.length) return
+    if (startOffset == 0 && startBlock.text.length == 0) return this.onBackspace(e, state)
+    if (endOffset != startBlock.text.length) return
 
     if (
       startBlock.type != 'heading-one' &&

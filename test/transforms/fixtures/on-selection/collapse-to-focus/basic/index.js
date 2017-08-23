@@ -12,16 +12,16 @@ export default function (state) {
       anchorKey: second.key,
       anchorOffset: 0,
       focusKey: second.key,
-      focusOffset: second.length
+      focusOffset: second.text.length
     })
     .collapseToFocus()
     .apply()
 
   assert.deepEqual(next.selection.toJS(), {
     anchorKey: second.key,
-    anchorOffset: second.length,
+    anchorOffset: second.text.length,
     focusKey: second.key,
-    focusOffset: second.length,
+    focusOffset: second.text.length,
     isBackward: false,
     isFocused: false,
     marks: null,

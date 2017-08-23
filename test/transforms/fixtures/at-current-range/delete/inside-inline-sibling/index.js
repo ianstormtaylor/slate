@@ -8,9 +8,9 @@ export default function (state) {
   const second = texts.get(1)
   const range = selection.merge({
     anchorKey: second.key,
-    anchorOffset: second.length - 1,
+    anchorOffset: second.text.length - 1,
     focusKey: second.key,
-    focusOffset: second.length
+    focusOffset: second.text.length
   })
 
   const next = state
@@ -25,9 +25,9 @@ export default function (state) {
     next.selection.toJS(),
     range.merge({
       anchorKey: updated.key,
-      anchorOffset: first.length,
+      anchorOffset: first.text.length,
       focusKey: updated.key,
-      focusOffset: first.length
+      focusOffset: first.text.length
     }).toJS()
   )
 

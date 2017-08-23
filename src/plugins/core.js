@@ -154,7 +154,7 @@ function Plugin(options = {}) {
       // have been automatically changed. So we can't render natively because
       // the cursor isn't technique in the right spot. (2016/12/01)
       (!(pInline && !pInline.isVoid && startOffset == 0)) &&
-      (!(nInline && !nInline.isVoid && startOffset == startText.length)) &&
+      (!(nInline && !nInline.isVoid && startOffset == startText.text.length)) &&
       // COMPAT: When inserting a Space character, Chrome will sometimes
       // split the text node into two adjacent text nodes. See:
       // https://github.com/ianstormtaylor/slate/issues/938

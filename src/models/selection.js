@@ -186,7 +186,7 @@ class Selection extends new Record(DEFAULTS) {
 
   hasAnchorAtEndOf(node) {
     const last = getLast(node)
-    return this.anchorKey == last.key && this.anchorOffset == last.length
+    return this.anchorKey == last.key && this.anchorOffset == last.text.length
   }
 
   /**
@@ -229,7 +229,7 @@ class Selection extends new Record(DEFAULTS) {
 
   hasFocusAtEndOf(node) {
     const last = getLast(node)
-    return this.focusKey == last.key && this.focusOffset == last.length
+    return this.focusKey == last.key && this.focusOffset == last.text.length
   }
 
   /**
@@ -516,7 +516,7 @@ class Selection extends new Record(DEFAULTS) {
 
   moveAnchorToEndOf(node) {
     node = getLast(node)
-    return this.moveAnchorTo(node.key, node.length)
+    return this.moveAnchorTo(node.key, node.text.length)
   }
 
   /**
@@ -540,7 +540,7 @@ class Selection extends new Record(DEFAULTS) {
 
   moveFocusToEndOf(node) {
     node = getLast(node)
-    return this.moveFocusTo(node.key, node.length)
+    return this.moveFocusTo(node.key, node.text.length)
   }
 
   /**

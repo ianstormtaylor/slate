@@ -115,11 +115,11 @@ const APPLIERS = {
       const { anchorKey, anchorOffset, focusKey, focusOffset } = selection
 
       if (anchorKey == two.key) {
-        selection = selection.moveAnchorTo(one.key, one.length + anchorOffset)
+        selection = selection.moveAnchorTo(one.key, one.text.length + anchorOffset)
       }
 
       if (focusKey == two.key) {
-        selection = selection.moveFocusTo(one.key, one.length + focusOffset)
+        selection = selection.moveFocusTo(one.key, one.text.length + focusOffset)
       }
     }
 
@@ -227,7 +227,7 @@ const APPLIERS = {
         const next = document.getNextText(startKey)
 
         if (prev) {
-          selection = selection.moveStartTo(prev.key, prev.length)
+          selection = selection.moveStartTo(prev.key, prev.text.length)
         } else if (next) {
           selection = selection.moveStartTo(next.key, 0)
         } else {
@@ -240,7 +240,7 @@ const APPLIERS = {
         const next = document.getNextText(endKey)
 
         if (prev) {
-          selection = selection.moveEndTo(prev.key, prev.length)
+          selection = selection.moveEndTo(prev.key, prev.text.length)
         } else if (next) {
           selection = selection.moveEndTo(next.key, 0)
         } else {

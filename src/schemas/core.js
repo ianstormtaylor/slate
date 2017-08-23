@@ -258,7 +258,7 @@ const rules = [
 
       const invalids = nodes.filter((desc, i) => {
         if (desc.kind != 'text') return
-        if (desc.length > 0) return
+        if (desc.text.length > 0) return
 
         const prev = i > 0 ? nodes.get(i - 1) : null
         const next = nodes.get(i + 1)

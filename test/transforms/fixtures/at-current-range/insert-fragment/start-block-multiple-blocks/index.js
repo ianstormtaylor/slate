@@ -31,9 +31,9 @@ export default function (state) {
     next.selection.toJS(),
     range.merge({
       anchorKey: last.key,
-      anchorOffset: fragment.getTexts().last().length,
+      anchorOffset: fragment.getTexts().last().text.length,
       focusKey: last.key,
-      focusOffset: fragment.getTexts().last().length
+      focusOffset: fragment.getTexts().last().text.length
     }).toJS()
   )
 

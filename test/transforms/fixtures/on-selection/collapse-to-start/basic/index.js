@@ -12,7 +12,7 @@ export default function (state) {
       anchorKey: second.key,
       anchorOffset: 0,
       focusKey: second.key,
-      focusOffset: second.length
+      focusOffset: second.text.length
     })
     .collapseToStart()
     .apply()

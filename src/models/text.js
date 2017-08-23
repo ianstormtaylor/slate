@@ -114,16 +114,6 @@ class Text extends new Record(DEFAULTS) {
   }
 
   /**
-   * Get the length of the concatenated text of the node.
-   *
-   * @return {Number}
-   */
-
-  get length() {
-    return this.text.length
-  }
-
-  /**
    * Get the concatenated text of the node.
    *
    * @return {String}

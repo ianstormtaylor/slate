@@ -8,9 +8,9 @@ export default function (state) {
   const second = texts.get(1)
   const range = selection.merge({
     anchorKey: second.key,
-    anchorOffset: second.length,
+    anchorOffset: second.text.length,
     focusKey: second.key,
-    focusOffset: second.length
+    focusOffset: second.text.length
   })
 
   const next = state
@@ -23,7 +23,7 @@ export default function (state) {
 
   assert.deepEqual(
     next.selection.toJS(),
-    range.collapseToStartOf(updated).move(first.length).toJS()
+    range.collapseToStartOf(updated).move(first.text.length).toJS()
   )
 
   return next

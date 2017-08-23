@@ -42,10 +42,10 @@ Transforms.addMarkAtRange = (transform, range, mark, options = {}) => {
   const { startKey, startOffset, endKey, endOffset } = range
   const texts = document.getTextsAtRange(range)
 
-  texts.forEach((text) => {
-    const { key } = text
+  texts.forEach((node) => {
+    const { key } = node
     let index = 0
-    let length = text.length
+    let length = node.text.length
 
     if (key == startKey) index = startOffset
     if (key == endKey) length = endOffset
@@ -271,7 +271,7 @@ Transforms.deleteBackwardAtRange = (transform, range, n = 1, options = {}) => {
     if (n == 1 && prevBlock != block) {
       range = range.merge({
         anchorKey: prev.key,
-        anchorOffset: prev.length,
+        anchorOffset: prev.text.length,
       })
 
       transform.deleteAtRange(range, { normalize })
@@ -298,7 +298,7 @@ Transforms.deleteBackwardAtRange = (transform, range, n = 1, options = {}) => {
 
   while (n > traversed) {
     node = document.getPreviousText(node.key)
-    const next = traversed + node.length
+    const next = traversed + node.text.length
     if (n <= next) {
       offset = next - n
       break
@@ -466,7 +466,7 @@ Transforms.deleteForwardAtRange = (transform, range, n = 1, options = {}) => {
   // If the remaining characters to the end of the node is greater than or equal
   // to the number of characters to delete, just remove the characters forwards
   // inside the current node.
-  if (n <= (text.length - focusOffset)) {
+  if (n <= (text.text.length - focusOffset)) {
     range = range.merge({
       focusOffset: focusOffset + n
     })
@@ -478,11 +478,11 @@ Transforms.deleteForwardAtRange = (transform, range, n = 1, options = {}) => {
   // Otherwise, we need to see how many nodes forwards to go.
   let node = text
   let offset = focusOffset
-  let traversed = text.length - focusOffset
+  let traversed = text.text.length - focusOffset
 
   while (n > traversed) {
     node = document.getNextText(node.key)
-    const next = traversed + node.length
+    const next = traversed + node.text.length
     if (n <= next) {
       offset = n - traversed
       break
@@ -495,7 +495,7 @@ Transforms.deleteForwardAtRange = (transform, range, n = 1, options = {}) => {
   if (document.hasVoidParent(node.key)) {
     const parent = document.getClosestVoid(node.key)
     node = document.getPreviousText(parent.key)
-    offset = node.length
+    offset = node.text.length
   }
 
   range = range.merge({
@@ -760,10 +760,10 @@ Transforms.removeMarkAtRange = (transform, range, mark, options = {}) => {
   const texts = document.getTextsAtRange(range)
   const { startKey, startOffset, endKey, endOffset } = range
 
-  texts.forEach((text) => {
-    const { key } = text
+  texts.forEach((node) => {
+    const { key } = node
     let index = 0
-    let length = text.length
+    let length = node.text.length
 
     if (key == startKey) index = startOffset
     if (key == endKey) length = endOffset
