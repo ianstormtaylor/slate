@@ -24,6 +24,7 @@ export default function (state) {
     .select(range)
     .insertText('a', marks)
     .apply()
+    .state
 
   assert.deepEqual(
     next.selection.toJS(),

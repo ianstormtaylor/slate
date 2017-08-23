@@ -18,6 +18,7 @@ export default function (state) {
     .select(nextSelection)
     .removeTextByKey(firstText.key, 0, 1)
     .apply()
+    .state
 
   assert.deepEqual(
     next.selection.toJS(),

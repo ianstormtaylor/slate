@@ -16,6 +16,7 @@ export default function (state) {
       type: 'link'
     })
     .apply()
+    .state
 
   return next
 }

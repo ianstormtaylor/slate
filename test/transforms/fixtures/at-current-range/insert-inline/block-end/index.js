@@ -20,6 +20,7 @@ export default function (state) {
       isVoid: true
     })
     .apply()
+    .state
 
   const updated = next.document.getTexts().get(1)
 

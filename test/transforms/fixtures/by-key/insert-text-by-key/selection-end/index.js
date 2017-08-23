@@ -18,6 +18,7 @@ export default function (state) {
     .select(nextSelection)
     .insertTextByKey(firstText.key, 4, 'XX')
     .apply()
+    .state
 
   assert.deepEqual(
     next.selection.toJS(),

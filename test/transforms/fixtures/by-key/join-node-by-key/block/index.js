@@ -16,6 +16,7 @@ export default function (state) {
     .select(range)
     .mergeNodeByKey('c')
     .apply()
+    .state
 
   assert.deepEqual(
     next.selection.toJS(),

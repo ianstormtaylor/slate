@@ -12,15 +12,18 @@ export default function (state) {
     .collapseToStartOf(first)
     .insertText('text')
     .apply()
+    .state
 
     .transform()
     .collapseToStartOf(second)
     .insertText('text')
     .apply()
+    .state
 
     .transform()
     .undo()
     .apply()
+    .state
 
   return next
 }

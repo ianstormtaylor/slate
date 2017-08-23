@@ -17,6 +17,7 @@ export default function (state) {
     .select(range)
     .insertText(' a few words')
     .apply()
+    .state
 
   assert.deepEqual(
     next.selection.toJS(),

@@ -10,6 +10,7 @@ export default function (state) {
     .transform()
     .collapseToEnd()
     .apply()
+    .state
 
   assert.deepEqual(next.selection.toJS(), {
     anchorKey: first.key,

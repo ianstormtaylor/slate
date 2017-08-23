@@ -18,6 +18,7 @@ export default function (state) {
     .toggleMark('bold')
     .insertText('a')
     .apply()
+    .state
 
   assert.deepEqual(next.selection.toJS(), range.move(1).toJS())
 

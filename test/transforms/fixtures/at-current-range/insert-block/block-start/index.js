@@ -17,6 +17,7 @@ export default function (state) {
     .select(range)
     .insertBlock('image')
     .apply()
+    .state
 
   const updated = next.document.getTexts().first()
 

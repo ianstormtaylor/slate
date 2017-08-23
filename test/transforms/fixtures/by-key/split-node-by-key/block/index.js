@@ -4,6 +4,7 @@ export default function (state) {
     .transform()
     .splitNodeByKey('a', 0)
     .apply()
+    .state
 
   return next
 }

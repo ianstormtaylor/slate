@@ -4,4 +4,5 @@ export default function (state) {
     .transform()
     .setData({ key: 'value' })
     .apply()
+    .state
 }

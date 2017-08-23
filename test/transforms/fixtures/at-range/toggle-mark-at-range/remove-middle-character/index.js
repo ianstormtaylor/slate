@@ -14,4 +14,5 @@ export default function (state) {
     .transform()
     .toggleMarkAtRange(range, 'bold')
     .apply()
+    .state
 }

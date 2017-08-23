@@ -8,10 +8,12 @@ export default function (state) {
         data: { src: 'world.png' }
     })
     .apply()
+    .state
 
     .transform()
     .undo()
     .apply()
+    .state
 
   return next
 }

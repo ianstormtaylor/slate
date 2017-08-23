@@ -14,4 +14,5 @@ export default function (state) {
     .transform()
     .insertTextAtRange(range, ' a few words ')
     .apply()
+    .state
 }

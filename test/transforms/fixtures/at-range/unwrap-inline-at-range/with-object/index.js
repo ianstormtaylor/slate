@@ -18,4 +18,5 @@ export default function (state) {
       data: { key: 'one' }
     })
     .apply()
+    .state
 }

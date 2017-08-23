@@ -7,4 +7,5 @@ export default function (state) {
     .collapseToStartOf(nodeToBeFocused)
     .deleteBackward()
     .apply()
+    .state
 }

@@ -17,6 +17,7 @@ export default function (state) {
     .select(range)
     .setInline('code')
     .apply()
+    .state
 
   assert.deepEqual(
     next.selection.toJS(),

@@ -10,4 +10,5 @@ export default function (state) {
       isVoid: true
     })
     .apply()
+    .state
 }

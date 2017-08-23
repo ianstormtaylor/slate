@@ -24,6 +24,7 @@ export default function (state) {
     .select(range)
     .insertFragment(fragment)
     .apply()
+    .state
 
   const last = next.document.getTexts().last()
 

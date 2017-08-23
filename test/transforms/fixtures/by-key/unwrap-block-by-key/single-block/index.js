@@ -7,4 +7,5 @@ export default function (state) {
     .transform()
     .unwrapBlockByKey(block.key, 'quote')
     .apply()
+    .state
 }

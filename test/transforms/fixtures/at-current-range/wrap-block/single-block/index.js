@@ -17,6 +17,7 @@ export default function (state) {
     .select(range)
     .wrapBlock('quote')
     .apply()
+    .state
 
   assert.deepEqual(
     next.selection.toJS(),

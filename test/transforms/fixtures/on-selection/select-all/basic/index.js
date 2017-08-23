@@ -8,6 +8,7 @@ export default function (state) {
     .transform()
     .selectAll(selection)
     .apply()
+    .state
 
   const sel = selection.merge({
     anchorKey: '0',

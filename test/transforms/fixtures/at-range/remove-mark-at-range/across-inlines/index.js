@@ -15,4 +15,5 @@ export default function (state) {
     .transform()
     .removeMarkAtRange(range, 'bold')
     .apply()
+    .state
 }

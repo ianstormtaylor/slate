@@ -44,8 +44,10 @@ class Mark extends new Record(DEFAULTS) {
    * @return {Set<Mark>}
    */
 
-  static createSet(array = []) {
+  static createSet(array) {
     if (Set.isSet(array)) return array
+    // Account for passing in `null` as well as undefined.
+    if (array == null) array = []
     return new Set(array.map(Mark.create))
   }
 

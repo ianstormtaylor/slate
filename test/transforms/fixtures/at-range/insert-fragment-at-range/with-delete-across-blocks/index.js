@@ -23,4 +23,5 @@ export default function (state) {
     .transform()
     .insertFragmentAtRange(range, fragment)
     .apply()
+    .state
 }

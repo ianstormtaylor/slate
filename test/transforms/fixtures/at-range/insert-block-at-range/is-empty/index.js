@@ -14,4 +14,5 @@ export default function (state) {
     .transform()
     .insertBlockAtRange(range, 'image')
     .apply()
+    .state
 }

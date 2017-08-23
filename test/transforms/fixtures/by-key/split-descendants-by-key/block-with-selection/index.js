@@ -16,6 +16,7 @@ export default function (state) {
     .select(range)
     .splitDescendantsByKey('a', 'b', 2)
     .apply()
+    .state
 
 
   const second = next.document.getTexts().last()

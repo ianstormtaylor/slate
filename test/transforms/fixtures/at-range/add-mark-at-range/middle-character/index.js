@@ -14,4 +14,5 @@ export default function (state) {
     .transform()
     .addMarkAtRange(range, 'bold')
     .apply()
+    .state
 }

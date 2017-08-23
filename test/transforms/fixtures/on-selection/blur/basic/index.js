@@ -9,6 +9,7 @@ export default function (state) {
     .focus()
     .blur()
     .apply()
+    .state
 
   assert.deepEqual(
     next.selection.toJS(),

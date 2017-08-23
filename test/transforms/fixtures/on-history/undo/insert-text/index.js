@@ -17,10 +17,12 @@ export default function (state) {
     .select(range)
     .insertText('text')
     .apply()
+    .state
 
     .transform()
     .undo()
     .apply()
+    .state
 
   assert.deepEqual(next.selection.toJS(), selection.toJS())
   return next

@@ -7,4 +7,5 @@ export default function (state) {
     .transform()
     .removeTextByKey(third.key, 0, 1)
     .apply()
+    .state
 }

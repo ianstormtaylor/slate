@@ -8,4 +8,5 @@ export default function (state) {
     .transform()
     .wrapBlockAtRange(range, 'bulleted-list')
     .apply()
+    .state
 }

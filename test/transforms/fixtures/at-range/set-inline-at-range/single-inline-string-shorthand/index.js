@@ -14,4 +14,5 @@ export default function (state) {
     .transform()
     .setInlineAtRange(range, 'code')
     .apply()
+    .state
 }

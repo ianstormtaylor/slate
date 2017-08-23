@@ -61,11 +61,18 @@ class State extends new Record(DEFAULTS) {
     // Then add data provided in `properties`.
     if (properties.data) data = data.merge(properties.data)
 
-    const state = new State({ document, selection, data })
+    let state = new State({ document, selection, data })
 
-    return options.normalize === false
-      ? state
-      : state.transform().normalize(SCHEMA).save(false).apply()
+    if (options.normalize !== false) {
+      state = state
+        .transform()
+        .normalize(SCHEMA)
+        .save(false)
+        .apply()
+        .state
+    }
+
+    return state
   }
 
   /**

@@ -29,7 +29,8 @@ describe('schema', () => {
           const expected = await readYaml(resolve(testDir, 'output.yaml'))
           const schema = Schema.create(require(testDir))
           const state = Raw.deserialize(input, { terse: true })
-          const normalized = state.transform().normalize(schema).apply()
+          const transform = state.transform().normalize(schema).apply()
+          const normalized = transform.state
           const output = Raw.serialize(normalized, { terse: true })
           assert.deepEqual(strip(output), strip(expected))
         })

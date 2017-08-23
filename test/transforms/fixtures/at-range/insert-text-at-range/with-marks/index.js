@@ -22,4 +22,5 @@ export default function (state) {
     .transform()
     .insertTextAtRange(range, 'a', marks)
     .apply()
+    .state
 }

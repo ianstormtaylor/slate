@@ -19,6 +19,7 @@ export default function (state) {
       type: 'link'
     })
     .apply()
+    .state
 
   assert.deepEqual(
     next.selection.toJS(),

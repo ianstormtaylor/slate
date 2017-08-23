@@ -12,10 +12,12 @@ export default function (state) {
     .setNodeByKey(document.nodes.first().key, { data: { any: 'thing' }})
     .select(selection.moveToRangeOf(dest))
     .apply()
+    .state
 
     .transform()
     .undo()
     .apply()
+    .state
 
   assert.deepEqual(next.selection.toJS(), selection.toJS())
   return next

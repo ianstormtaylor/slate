@@ -18,6 +18,7 @@ export default function (state) {
     .select(range)
     .delete()
     .apply()
+    .state
 
   assert.deepEqual(
     next.selection.toJS(),

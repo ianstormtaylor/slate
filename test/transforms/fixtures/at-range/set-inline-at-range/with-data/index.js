@@ -19,4 +19,5 @@ export default function (state) {
       data: Data.create({ key: 'value' })
     })
     .apply()
+    .state
 }

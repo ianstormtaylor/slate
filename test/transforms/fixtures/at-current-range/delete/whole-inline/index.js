@@ -17,6 +17,7 @@ export default function (state) {
     .select(range)
     .delete()
     .apply()
+    .state
 
   const updated = state.document.getFirstText()
 

@@ -20,6 +20,7 @@ export default function (state) {
       data: { key: 'value' }
     })
     .apply()
+    .state
 
   assert.deepEqual(next.selection.toJS(), range.toJS())
 

@@ -20,6 +20,7 @@ export default function (state) {
       data: { key: 'value' }
     })
     .apply()
+    .state
 
   const nexts = next.document.getTexts()
   const two = nexts.get(1)

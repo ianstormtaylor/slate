@@ -16,4 +16,5 @@ export default function (state) {
     .transform()
     .deleteAtRange(range)
     .apply()
+    .state
 }

@@ -16,10 +16,12 @@ export default function (state) {
     })
     .delete()
     .apply()
+    .state
 
     .transform()
     .undo()
     .apply()
+    .state
 
   assert.deepEqual(next.selection.toJS(), selection.toJS())
   return next

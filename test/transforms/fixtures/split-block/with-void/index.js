@@ -17,6 +17,7 @@ export default function (state) {
     .select(range)
     .splitBlock()
     .apply()
+    .state
 
   console.dir(next.document.getBlocks().toJS());
 

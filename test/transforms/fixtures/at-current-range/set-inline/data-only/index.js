@@ -18,6 +18,7 @@ export default function (state) {
     .select(range)
     .setInline({ data: Data.create({ key: 'value' }) })
     .apply()
+    .state
 
   assert.deepEqual(
     next.selection.toJS(),

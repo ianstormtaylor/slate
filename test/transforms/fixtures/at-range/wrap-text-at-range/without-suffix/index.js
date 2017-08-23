@@ -14,4 +14,5 @@ export default function (state) {
     .transform()
     .wrapTextAtRange(range, '**')
     .apply()
+    .state
 }

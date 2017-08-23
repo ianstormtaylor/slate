@@ -18,4 +18,5 @@ export default function (state) {
       }
     )
     .apply()
+    .state
 }

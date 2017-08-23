@@ -7,4 +7,5 @@ export default function (state) {
     .transform()
     .setNodeByKey(first.key, 'code')
     .apply()
+    .state
 }

@@ -16,6 +16,7 @@ export default function (state) {
     .select(range)
     .splitNodeByKey('anchor', 3, { normalize: false })
     .apply()
+    .state
 
   // The second text
   const second = next.document.getTexts().last()

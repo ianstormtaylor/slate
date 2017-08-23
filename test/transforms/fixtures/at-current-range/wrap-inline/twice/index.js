@@ -18,6 +18,7 @@ export default function (state) {
     .wrapInline('inner')
     .wrapInline('outer')
     .apply()
+    .state
 
   const anchor = next.document.getTexts().get(2)
   const focus = next.document.getTexts().get(4)

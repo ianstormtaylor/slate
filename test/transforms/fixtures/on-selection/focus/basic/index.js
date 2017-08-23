@@ -11,6 +11,7 @@ export default function (state) {
     .transform()
     .focus()
     .apply()
+    .state
 
   assert.deepEqual(
     next.selection.toJS(),

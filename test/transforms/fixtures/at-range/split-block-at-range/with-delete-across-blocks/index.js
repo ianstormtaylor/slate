@@ -15,4 +15,5 @@ export default function (state) {
     .transform()
     .splitBlockAtRange(range)
     .apply()
+    .state
 }

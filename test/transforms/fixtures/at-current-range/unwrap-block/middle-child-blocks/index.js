@@ -18,6 +18,7 @@ export default function (state) {
     .select(range)
     .unwrapBlock('quote')
     .apply()
+    .state
 
   const updated = next.document.getTexts().get(2)
 

@@ -17,6 +17,7 @@ export default function (state) {
     .select(range)
     .wrapText('[[', ']]')
     .apply()
+    .state
 
 
   const updated = next.document.getTexts().get(0)

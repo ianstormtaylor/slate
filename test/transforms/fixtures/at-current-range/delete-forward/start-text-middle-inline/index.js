@@ -18,6 +18,7 @@ export default function (state) {
     .select(range)
     .deleteForward()
     .apply()
+    .state
 
   // TODO: fix this behavior.
   /* const updated = next.document.getTexts().last()

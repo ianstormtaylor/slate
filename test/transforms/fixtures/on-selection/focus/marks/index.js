@@ -18,6 +18,7 @@ export default function (state) {
     .addMark('bold')
     .focus()
     .apply()
+    .state
 
   assert.deepEqual(
     next.selection.toJS(),

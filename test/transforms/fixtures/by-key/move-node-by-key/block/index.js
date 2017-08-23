@@ -7,4 +7,5 @@ export default function (state) {
     .transform()
     .moveNodeByKey(first.key, document.key, 1)
     .apply()
+    .state
 }

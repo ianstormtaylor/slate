@@ -14,4 +14,5 @@ export default function (state) {
     .transform()
     .deleteCharForwardAtRange(range)
     .apply()
+    .state
 }

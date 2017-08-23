@@ -16,6 +16,7 @@ export default function (state) {
     })
     .collapseToFocus()
     .apply()
+    .state
 
   assert.deepEqual(next.selection.toJS(), {
     anchorKey: second.key,

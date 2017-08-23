@@ -4,4 +4,5 @@ export default function (state) {
     .transform()
     .deleteAtRange(state.selection)
     .apply()
+    .state
 }

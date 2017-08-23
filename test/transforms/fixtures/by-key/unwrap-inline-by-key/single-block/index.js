@@ -9,6 +9,7 @@ export default function (state) {
     .transform()
     .unwrapInlineByKey(inline.key, 'hashtag')
     .apply()
+    .state
 
   return next
 }

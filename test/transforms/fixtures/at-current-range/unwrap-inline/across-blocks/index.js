@@ -15,6 +15,7 @@ export default function (state) {
     .select(range)
     .unwrapInline('hashtag')
     .apply()
+    .state
 
   // Test selection
   const { document } = next

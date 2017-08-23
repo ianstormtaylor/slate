@@ -26,6 +26,7 @@ export default function (state) {
     .select(range)
     .insertFragment(fragment)
     .apply()
+    .state
 
   assert.deepEqual(
     next.selection.toJS(),

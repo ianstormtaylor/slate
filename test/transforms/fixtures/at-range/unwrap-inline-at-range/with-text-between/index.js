@@ -15,4 +15,5 @@ export default function (state) {
     .transform()
     .unwrapInlineAtRange(range, 'link')
     .apply()
+    .state
 }

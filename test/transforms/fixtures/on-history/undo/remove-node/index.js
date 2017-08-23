@@ -4,8 +4,10 @@ export default function (state) {
     .transform()
     .removeNodeByKey('key1')
     .apply()
+    .state
 
     .transform()
     .undo()
     .apply()
+    .state
 }

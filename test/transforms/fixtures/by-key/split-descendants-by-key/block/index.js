@@ -4,6 +4,7 @@ export default function (state) {
     .transform()
     .splitDescendantsByKey('a', 'b', 2)
     .apply()
+    .state
 
   return next
 }

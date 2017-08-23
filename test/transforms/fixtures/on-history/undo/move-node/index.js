@@ -8,10 +8,12 @@ export default function (state) {
     .transform()
     .moveNodeByKey('key2', 'key1', 0)
     .apply()
+    .state
 
     .transform()
     .undo()
     .apply()
+    .state
 
   assert.deepEqual(next.selection.toJS(), selection.toJS())
   return next

@@ -8,4 +8,5 @@ export default function (state) {
     .transform()
     .moveNodeByKey(first.key, block.key, 3)
     .apply()
+    .state
 }

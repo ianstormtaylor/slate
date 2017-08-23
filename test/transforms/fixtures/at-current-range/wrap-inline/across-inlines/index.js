@@ -18,6 +18,7 @@ export default function (state) {
     .select(range)
     .wrapInline('hashtag')
     .apply()
+    .state
 
   const five = next.document.getTexts().get(4)
   const ten = next.document.getTexts().get(9)

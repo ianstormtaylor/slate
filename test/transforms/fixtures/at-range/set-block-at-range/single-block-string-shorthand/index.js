@@ -14,4 +14,5 @@ export default function (state) {
     .transform()
     .setBlockAtRange(range, 'code')
     .apply()
+    .state
 }

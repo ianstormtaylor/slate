@@ -20,6 +20,7 @@ export default function (state) {
       isVoid: true
     })
     .apply()
+    .state
 
   assert.deepEqual(
     next.selection.toJS(),

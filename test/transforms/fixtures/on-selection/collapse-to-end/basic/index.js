@@ -16,6 +16,7 @@ export default function (state) {
     })
     .collapseToEnd()
     .apply()
+    .state
 
   assert.deepEqual(next.selection.toJS(), {
     anchorKey: second.key,

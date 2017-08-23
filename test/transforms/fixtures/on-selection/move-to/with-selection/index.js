@@ -14,6 +14,7 @@ export default function (state) {
     .transform()
     .select(sel)
     .apply()
+    .state
 
   assert.deepEqual(
     next.selection.toJS(),

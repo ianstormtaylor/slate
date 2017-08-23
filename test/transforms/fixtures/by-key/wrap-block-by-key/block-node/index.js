@@ -4,4 +4,5 @@ export default function (state) {
     .transform()
     .wrapBlockByKey('key', 'quote')
     .apply()
+    .state
 }

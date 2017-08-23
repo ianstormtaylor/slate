@@ -9,6 +9,7 @@ export default function (state) {
     .transform()
     .insertNodeByKey(document.key, 0, first)
     .apply()
+    .state
 
   const one = next.document.getBlocks().first()
   const two = next.document.getBlocks().last()

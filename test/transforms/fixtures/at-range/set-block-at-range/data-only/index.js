@@ -16,4 +16,5 @@ export default function (state) {
     .transform()
     .setBlockAtRange(range, { data: Data.create({ key: 'value' }) })
     .apply()
+    .state
 }

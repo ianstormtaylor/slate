@@ -50,7 +50,8 @@ EVENT_HANDLERS.forEach((handler) => {
 
     stack[handler](transform, editor, event, data)
     stack.onTransform(transform, editor)
-    const next = transform.apply()
+    transform.apply()
+    const next = transform.state
     if (next == state) return state
     return next
   }

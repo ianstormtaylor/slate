@@ -8,4 +8,5 @@ export default function (state) {
     .transform()
     .insertNodeByKey(document.key, 0, Block.create({ type: 'paragraph' }))
     .apply()
+    .state
 }

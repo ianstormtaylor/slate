@@ -15,4 +15,5 @@ export default function (state) {
     .transform()
     .wrapBlockAtRange(range, 'quote')
     .apply()
+    .state
 }

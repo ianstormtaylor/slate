@@ -17,4 +17,5 @@ export default function (state) {
       data: { key: 'value' }
     })
     .apply()
+    .state
 }
