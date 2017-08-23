@@ -307,7 +307,6 @@ class Text extends new Record(DEFAULTS) {
    */
 
   insertText(index, text, marks) {
-    marks = marks || this.getMarksAtIndex(index)
     let { characters } = this
     const chars = Character.createListFromText(text, marks)
 

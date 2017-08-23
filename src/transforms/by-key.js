@@ -88,6 +88,8 @@ Transforms.insertTextByKey = (transform, key, offset, text, marks, options = {})
   const { state } = transform
   const { document } = state
   const path = document.getPath(key)
+  const node = document.getNode(key)
+  marks = marks || node.getMarksAtIndex(offset)
 
   transform.applyOperation({
     type: 'insert_text',
