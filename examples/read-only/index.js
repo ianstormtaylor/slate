@@ -23,10 +23,10 @@ class ReadOnly extends React.Component {
   /**
    * On change.
    *
-   * @param {State} state
+   * @param {Transform} transform
    */
 
-  onChange = (state) => {
+  onChange = ({ state }) => {
     this.setState({ state })
   }
 

@@ -91,7 +91,7 @@ class RichText extends React.Component {
    * @param {Transform} transform
    */
 
-  onChange = ({ state, operations }) => {
+  onChange = ({ state }) => {
     this.setState({ state })
   }
 
@@ -126,7 +126,8 @@ class RichText extends React.Component {
     }
 
     e.preventDefault()
-    return transform.toggleMark(mark)
+    transform.toggleMark(mark)
+    return true
   }
 
   /**
@@ -139,7 +140,7 @@ class RichText extends React.Component {
   onClickMark = (e, type) => {
     e.preventDefault()
     const { state } = this.state
-    const transform = state.transform().toggleMark(type)
+    const transform = state.transform().toggleMark(type).apply()
     this.onChange(transform)
   }
 
@@ -197,6 +198,7 @@ class RichText extends React.Component {
       }
     }
 
+    transform.apply()
     this.onChange(transform)
   }
 

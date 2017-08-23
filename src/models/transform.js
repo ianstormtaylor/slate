@@ -49,7 +49,7 @@ class Transform {
    *   @property {Boolean} isNative
    *   @property {Boolean} merge
    *   @property {Boolean} save
-   * @return {State}
+   * @return {Transform}
    */
 
   apply(options = {}) {
@@ -65,7 +65,9 @@ class Transform {
     const previous = undos.peek()
 
     // If there are no operations, abort early.
-    if (!operations.length) return state
+    if (!operations.length) {
+      return this
+    }
 
     // If there's a previous save point, determine if the new operations should
     // be merged into the previous ones.
@@ -88,8 +90,7 @@ class Transform {
       state = transform.state
     }
 
-    // Return the new state.
-    return state
+    return this
   }
 
 }

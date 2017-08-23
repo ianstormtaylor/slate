@@ -42,23 +42,23 @@ class Tables extends React.Component {
    * On backspace, do nothing if at the start of a table cell.
    *
    * @param {Event} e
-   * @param {State} state
-   * @return {State or Null} state
+   * @param {Transform} transform
    */
 
-  onBackspace = (e, state) => {
+  onBackspace = (e, transform) => {
+    const { state } = transform
     if (state.startOffset != 0) return
     e.preventDefault()
-    return state
+    return true
   }
 
   /**
    * On change.
    *
-   * @param {State} state
+   * @param {Transform} transform
    */
 
-  onChange = (state) => {
+  onChange = ({ state }) => {
     this.setState({ state })
   }
 
@@ -66,27 +66,26 @@ class Tables extends React.Component {
    * On delete, do nothing if at the end of a table cell.
    *
    * @param {Event} e
-   * @param {State} state
-   * @return {State or Null} state
+   * @param {Transform} transform
    */
 
-  onDelete = (e, state) => {
+  onDelete = (e, transform) => {
+    const { state } = transform
     if (state.endOffset != state.startText.text.length) return
     e.preventDefault()
-    return state
+    return true
   }
 
   /**
    * On return, do nothing if inside a table cell.
    *
    * @param {Event} e
-   * @param {State} state
-   * @return {State or Null} state
+   * @param {Transform} transform
    */
 
-  onEnter = (e, state) => {
+  onEnter = (e, transform) => {
     e.preventDefault()
-    return state
+    return true
   }
 
   /**
@@ -94,11 +93,11 @@ class Tables extends React.Component {
    *
    * @param {Event} e
    * @param {Object} data
-   * @param {State} state
-   * @return {State or Null} state
+   * @param {Transform} transform
    */
 
-  onKeyDown = (e, data, state) => {
+  onKeyDown = (e, data, transform) => {
+    const { state } = transform
     const { document, selection } = state
     const { startKey } = selection
     const startNode = document.getDescendant(startKey)
@@ -109,11 +108,14 @@ class Tables extends React.Component {
 
       if (prevBlock.type == 'table-cell') {
         e.preventDefault()
-        return state
+        return true
       }
     }
 
-    if (state.startBlock.type != 'table-cell') return
+    if (state.startBlock.type != 'table-cell') {
+      return
+    }
+
     switch (data.key) {
       case 'backspace': return this.onBackspace(e, state)
       case 'delete': return this.onDelete(e, state)

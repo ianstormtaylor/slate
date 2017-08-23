@@ -299,10 +299,8 @@ Transforms.splitBlock = (transform, depth = 1) => {
   const { state } = transform
   const { selection } = state
   transform
-    .snapshotSelection()
     .splitBlockAtRange(selection, depth)
     .collapseToEnd()
-    .snapshotSelection()
 }
 
 /**
@@ -316,9 +314,7 @@ Transforms.splitInline = (transform, depth = Infinity) => {
   const { state } = transform
   const { selection } = state
   transform
-    .snapshotSelection()
     .splitInlineAtRange(selection, depth)
-    .snapshotSelection()
 }
 
 /**

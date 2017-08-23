@@ -88,10 +88,10 @@ class RichText extends React.Component {
   /**
    * On change, save the new state.
    *
-   * @param {State} state
+   * @param {Transform} transform
    */
 
-  onChange = (state) => {
+  onChange = ({ state }) => {
     this.setState({ state })
   }
 
@@ -100,11 +100,11 @@ class RichText extends React.Component {
    *
    * @param {Event} e
    * @param {Object} data
-   * @param {State} state
+   * @param {Transform} transform
    * @return {State}
    */
 
-  onKeyDown = (e, data, state) => {
+  onKeyDown = (e, data, transform) => {
     if (!data.isMod) return
     let mark
 
@@ -125,13 +125,9 @@ class RichText extends React.Component {
         return
     }
 
-    state = state
-      .transform()
-      [this.hasMark(mark) ? 'removeMark' : 'addMark'](mark)
-      .apply()
-
+    transform[this.hasMark(mark) ? 'removeMark' : 'addMark'](mark)
     e.preventDefault()
-    return state
+    return true
   }
 
   /**
@@ -144,14 +140,12 @@ class RichText extends React.Component {
   onClickMark = (e, type) => {
     e.preventDefault()
     const isActive = this.hasMark(type)
-    let { state } = this.state
-
-    state = state
+    const transform = this.state.state
       .transform()
       [isActive ? 'removeMark' : 'addMark'](type)
       .apply()
 
-    this.setState({ state })
+    this.onChange(transform)
   }
 
   /**
@@ -164,9 +158,7 @@ class RichText extends React.Component {
   onClickBlock = (e, type) => {
     e.preventDefault()
     const isActive = this.hasBlock(type)
-    let { state } = this.state
-
-    const transform = state
+    const transform = this.state.state
       .transform()
       .setBlock(isActive ? 'paragraph' : type)
 
@@ -188,8 +180,8 @@ class RichText extends React.Component {
       transform.setBlock(isActive ? DEFAULT_NODE : type)
     }
 
-    state = transform.apply()
-    this.setState({ state })
+    transform.apply()
+    this.onChange(transform)
   }
 
   /**

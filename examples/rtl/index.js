@@ -36,10 +36,10 @@ class PlainText extends React.Component {
   /**
    * On change.
    *
-   * @param {State} state
+   * @param {Transform} transform
    */
 
-  onChange = (state) => {
+  onChange = ({ state }) => {
     this.setState({ state })
   }
 
@@ -48,15 +48,14 @@ class PlainText extends React.Component {
    *
    * @param {Event} e
    * @param {Object} data
-   * @param {State} state
+   * @param {Transform} transform
    */
 
-  onKeyDown = (e, data, state) => {
+  onKeyDown = (e, data, transform) => {
     if (data.key == 'enter' && data.isShift) {
-      return state
-        .transform()
-        .insertText('\n')
-        .apply()
+      e.preventDefault()
+      transform.insertText('\n')
+      return true
     }
   }
 

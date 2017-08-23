@@ -36,10 +36,10 @@ class FocusBlur extends React.Component {
   /**
    * On change.
    *
-   * @param {State} state
+   * @param {Transform} transform
    */
 
-  onChange = (state) => {
+  onChange = ({ state }) => {
     this.setState({ state })
   }
 
@@ -54,12 +54,12 @@ class FocusBlur extends React.Component {
     e.preventDefault()
 
     setTimeout(() => {
-      const state = this.state.state
+      const transform = this.state.state
         .transform()
         [name]()
         .apply()
 
-      this.setState({ state })
+      this.onChange(transform)
     }, timeout)
   }
 

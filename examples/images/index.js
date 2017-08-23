@@ -72,6 +72,26 @@ const schema = {
 }
 
 /**
+ * A transform function to standardize inserting images.
+ *
+ * @param {Transform} transform
+ * @param {String} src
+ * @param {Selection} target
+ */
+
+function insertImage(transform, src, target) {
+  if (target) {
+    transform.select(target)
+  }
+
+  transform.insertBlock({
+    type: 'image',
+    isVoid: true,
+    data: { src }
+  })
+}
+
+/**
  * The images example.
  *
  * @type {Component}
@@ -143,10 +163,10 @@ class Images extends React.Component {
   /**
    * On change.
    *
-   * @param {State} state
+   * @param {Transform} transform
    */
 
-  onChange = (state) => {
+  onChange = ({ state }) => {
     this.setState({ state })
   }
 
@@ -160,9 +180,13 @@ class Images extends React.Component {
     e.preventDefault()
     const src = window.prompt('Enter the URL of the image:')
     if (!src) return
-    let { state } = this.state
-    state = this.insertImage(state, null, src)
-    this.onChange(state)
+
+    const transform = this.state.state
+      .transform()
+      .call(insertImage, src)
+      .apply()
+
+    this.onChange(transform)
   }
 
   /**
@@ -170,14 +194,13 @@ class Images extends React.Component {
    *
    * @param {Event} e
    * @param {Object} data
-   * @param {State} state
+   * @param {Transform} transform
    * @param {Editor} editor
-   * @return {State}
    */
 
-  onDrop = (e, data, state, editor) => {
+  onDrop = (e, data, transform, editor) => {
     switch (data.type) {
-      case 'files': return this.onDropOrPasteFiles(e, data, state, editor)
+      case 'files': return this.onDropOrPasteFiles(e, data, transform, editor)
     }
   }
 
@@ -186,21 +209,20 @@ class Images extends React.Component {
    *
    * @param {Event} e
    * @param {Object} data
-   * @param {State} state
+   * @param {Transform} transform
    * @param {Editor} editor
-   * @return {State}
    */
 
-  onDropOrPasteFiles = (e, data, state, editor) => {
+  onDropOrPasteFiles = (e, data, transform, editor) => {
     for (const file of data.files) {
       const reader = new FileReader()
       const [ type ] = file.type.split('/')
       if (type != 'image') continue
 
       reader.addEventListener('load', () => {
-        state = editor.getState()
-        state = this.insertImage(state, data.target, reader.result)
-        editor.onChange(state)
+        editor.transform((t) => {
+          t.call(insertImage, reader.result, data.target)
+        })
       })
 
       reader.readAsDataURL(file)
@@ -212,15 +234,14 @@ class Images extends React.Component {
    *
    * @param {Event} e
    * @param {Object} data
-   * @param {State} state
+   * @param {Transform} transform
    * @param {Editor} editor
-   * @return {State}
    */
 
-  onPaste = (e, data, state, editor) => {
+  onPaste = (e, data, transform, editor) => {
     switch (data.type) {
-      case 'files': return this.onDropOrPasteFiles(e, data, state, editor)
-      case 'text': return this.onPasteText(e, data, state)
+      case 'files': return this.onDropOrPasteFiles(e, data, transform, editor)
+      case 'text': return this.onPasteText(e, data, transform)
     }
   }
 
@@ -229,36 +250,13 @@ class Images extends React.Component {
    *
    * @param {Event} e
    * @param {Object} data
-   * @param {State} state
-   * @return {State}
+   * @param {Transform} transform
    */
 
-  onPasteText = (e, data, state) => {
+  onPasteText = (e, data, transform) => {
     if (!isUrl(data.text)) return
     if (!isImage(data.text)) return
-    return this.insertImage(state, data.target, data.text)
-  }
-
-  /**
-   * Insert an image with `src` at the current selection.
-   *
-   * @param {State} state
-   * @param {String} src
-   * @return {State}
-   */
-
-  insertImage = (state, target, src) => {
-    const transform = state.transform()
-
-    if (target) transform.select(target)
-
-    return transform
-      .insertBlock({
-        type: 'image',
-        isVoid: true,
-        data: { src }
-      })
-      .apply()
+    transform.call(insertImage, data.text, data.target)
   }
 
 }
