@@ -589,24 +589,39 @@ const Node = {
 
   getFragmentAtRange(range) {
     let node = this
-    let nodes = new List()
 
     // Make sure the children exist.
     const { startKey, startOffset, endKey, endOffset } = range
-    node.assertDescendant(startKey)
-    node.assertDescendant(endKey)
+    const startText = node.assertDescendant(startKey)
+    const endText = node.assertDescendant(endKey)
 
     // Split at the start and end.
-    const start = range.collapseToStart()
-    node = node.splitBlockAtRange(start, Infinity)
+    let child = startText
+    let previous
+    let parent
 
-    const next = node.getNextText(startKey)
-    const end = startKey == endKey
-      ? range.collapseToStartOf(next).move(endOffset - startOffset)
-      : range.collapseToEnd()
-    node = node.splitBlockAtRange(end, Infinity)
+    while (parent = node.getParent(child.key)) {
+      const index = parent.nodes.indexOf(child)
+      const position = child.kind == 'text' ? startOffset : child.nodes.indexOf(previous)
+      parent = parent.splitNode(index, position)
+      node = node.updateDescendant(parent)
+      previous = parent.nodes.get(index + 1)
+      child = parent
+    }
+
+    child = endText
+
+    while (parent = node.getParent(child.key)) {
+      const index = parent.nodes.indexOf(child)
+      const position = child.kind == 'text' ? endOffset : child.nodes.indexOf(previous)
+      parent = parent.splitNode(index, position)
+      node = node.updateDescendant(parent)
+      previous = parent.nodes.get(index + 1)
+      child = parent
+    }
 
     // Get the start and end nodes.
+    const next = node.getNextText(startKey)
     const startNode = node.getNextSibling(node.getFurthestAncestor(startKey).key)
     const endNode = startKey == endKey
       ? node.getFurthestAncestor(next.key)
@@ -615,7 +630,7 @@ const Node = {
     // Get children range of nodes from start to end nodes
     const startIndex = node.nodes.indexOf(startNode)
     const endIndex = node.nodes.indexOf(endNode)
-    nodes = node.nodes.slice(startIndex, endIndex + 1)
+    const nodes = node.nodes.slice(startIndex, endIndex + 1)
 
     // Return a new document fragment.
     return Document.create({ nodes })
@@ -1508,33 +1523,6 @@ const Node = {
   },
 
   /**
-   * Split the block nodes at a `range`, to optional `height`.
-   *
-   * @param {Selection} range
-   * @param {Number} height (optional)
-   * @return {Node}
-   */
-
-  splitBlockAtRange(range, height = 1) {
-    const { startKey, startOffset } = range
-    const base = this
-    let node = base.assertDescendant(startKey)
-    let parent = base.getClosestBlock(node.key)
-    let offset = startOffset
-    let h = 0
-
-    while (parent && parent.kind == 'block' && h < height) {
-      offset += parent.getOffset(node.key)
-      node = parent
-      parent = base.getClosestBlock(parent.key)
-      h++
-    }
-
-    const path = base.getPath(node.key)
-    return this.splitNode(path, offset)
-  },
-
-  /**
    * Split a child node by `index` at `position`.
    *
    * @param {Number} index
@@ -1581,6 +1569,10 @@ const Node = {
    */
 
   updateDescendant(node) {
+    if (node.key == this.key) {
+      return node
+    }
+
     let child = this.assertDescendant(node.key)
     const ancestors = this.getAncestors(node.key)
 
