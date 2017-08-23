@@ -48,16 +48,16 @@ let OS
 if (browser) {
   const { userAgent } = window.navigator
 
-  for (const rule of BROWSER_RULES) {
-    const [ name, regexp ] = rule
+  for (let i = 0; i < BROWSER_RULES.length; i++) {
+    const [ name, regexp ] = BROWSER_RULES[i]
     if (regexp.test(userAgent)) {
       BROWSER = name
       break
     }
   }
 
-  for (const rule of OS_RULES) {
-    const [ name, regexp ] = rule
+  for (let i = 0; i < OS_RULES.length; i++) {
+    const [ name, regexp ] = OS_RULES[i]
     if (regexp.test(userAgent)) {
       OS = name
       break

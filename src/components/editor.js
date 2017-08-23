@@ -126,7 +126,8 @@ class Editor extends React.Component {
     this.state.state = state
 
     // Create a bound event handler for each event.
-    for (const method of EVENT_HANDLERS) {
+    for (let i = 0; i < EVENT_HANDLERS.length; i++) {
+      const method = EVENT_HANDLERS[i]
       this[method] = (...args) => {
         const stk = this.state.stack
         const transform = this.state.state.transform()
@@ -148,7 +149,8 @@ class Editor extends React.Component {
     const { state } = props
 
     // If any plugin-related properties will change, create a new `Stack`.
-    for (const prop of PLUGINS_PROPS) {
+    for (let i = 0; i < PLUGINS_PROPS.length; i++) {
+      const prop = PLUGINS_PROPS[i]
       if (props[prop] == this.props[prop]) continue
       const { onChange, ...rest } = props // eslint-disable-line no-unused-vars
       const stack = Stack.create(rest)
@@ -266,7 +268,8 @@ class Editor extends React.Component {
  * Mix in the property types for the event handlers.
  */
 
-for (const property of EVENT_HANDLERS) {
+for (let i = 0; i < EVENT_HANDLERS.length; i++) {
+  const property = EVENT_HANDLERS[i]
   Editor.propTypes[property] = Types.func
 }
 

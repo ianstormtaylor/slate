@@ -92,7 +92,8 @@ class Stack extends new Record(DEFAULTS) {
     const plugins = this.plugins.slice().reverse()
     let children
 
-    for (const plugin of plugins) {
+    for (let i = 0; i < plugins.length; i++) {
+      const plugin = plugins[i]
       if (!plugin.render) continue
       children = plugin.render(props, state, editor)
       props.children = children
@@ -113,7 +114,8 @@ class Stack extends new Record(DEFAULTS) {
     debug('renderPortal')
     const portals = []
 
-    for (const plugin of this.plugins) {
+    for (let i = 0; i < this.plugins.length; i++) {
+      const plugin = this.plugins[i]
       if (!plugin.renderPortal) continue
       const portal = plugin.renderPortal(state, editor)
       if (portal) portals.push(portal)
@@ -132,11 +134,13 @@ class Stack extends new Record(DEFAULTS) {
  * @param {Mixed} ...args
  */
 
-for (const method of METHODS) {
+for (let i = 0; i < METHODS.length; i++) {
+  const method = METHODS[i]
   Stack.prototype[method] = function (transform, editor, ...args) {
     debug(method)
 
-    for (const plugin of this.plugins) {
+    for (let k = 0; k < this.plugins.length; k++) {
+      const plugin = this.plugins[k]
       if (!plugin[method]) continue
       const next = plugin[method](...args, transform, editor)
       if (next != null) break
@@ -154,7 +158,8 @@ for (const method of METHODS) {
 function resolveSchema(plugins) {
   let rules = []
 
-  for (const plugin of plugins) {
+  for (let i = 0; i < plugins.length; i++) {
+    const plugin = plugins[i]
     if (plugin.schema == null) continue
     const schema = Schema.create(plugin.schema)
     rules = rules.concat(schema.rules)

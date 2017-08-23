@@ -11,6 +11,16 @@ export default {
               nodes: next(el.childNodes)
             }
           }
+          case 'mark': {
+            return {
+              kind: 'mark',
+              type: 'highlight',
+              data: {
+                backgroundColor: 'green',
+              },
+              nodes: next(el.childNodes)
+            }
+          }
         }
       }
     }

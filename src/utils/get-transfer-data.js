@@ -8,7 +8,7 @@ import TRANSFER_TYPES from '../constants/transfer-types'
  * @type {RegExp}
  */
 
-const FRAGMENT_MATCHER = / data-slate-fragment="([^\s]+)"/
+const FRAGMENT_MATCHER = / data-slate-fragment="([^\s"]+)"/
 
 /**
  * Get the data and type from a native data `transfer`.

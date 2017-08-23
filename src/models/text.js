@@ -167,7 +167,8 @@ class Text extends new Record(DEFAULTS) {
     let { characters } = node
     if (characters.size == 0) return characters
 
-    for (const decorator of decorators) {
+    for (let i = 0; i < decorators.length; i++) {
+      const decorator = decorators[i]
       const decorateds = decorator(node)
       characters = characters.merge(decorateds)
     }
