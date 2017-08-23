@@ -16,7 +16,7 @@ const Transforms = {}
  * @param {Boolean} value
  */
 
-Transforms.save = (transform, value) => {
+Transforms.setSave = (transform, value) => {
   transform._save = value
 }
 
@@ -27,7 +27,7 @@ Transforms.save = (transform, value) => {
  * @param {Boolean} value
  */
 
-Transforms.merge = (transform, value) => {
+Transforms.setMerge = (transform, value) => {
   transform._merge = value
 }
 

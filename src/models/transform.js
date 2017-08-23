@@ -29,7 +29,7 @@ class Transform {
     const { state } = properties
     this.state = state
     this.operations = []
-    this.isNative(false)
+    this.setIsNative(false)
   }
 
   /**

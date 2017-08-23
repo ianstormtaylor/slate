@@ -43,7 +43,7 @@ Transforms.call = (transform, fn, ...args) => {
  * @param {Boolean} value
  */
 
-Transforms.isNative = (transform, value) => {
+Transforms.setIsNative = (transform, value) => {
   let { state } = transform
   state = state.set('isNative', value)
   transform.state = state

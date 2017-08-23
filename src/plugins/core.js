@@ -165,7 +165,7 @@ function Plugin(options = {}) {
 
     // If `isNative`, set the flag on the transform.
     if (isNative) {
-      transform.isNative(true)
+      transform.setIsNative(true)
     }
 
     // Otherwise, prevent default so that the DOM remains untouched.
@@ -751,7 +751,7 @@ function Plugin(options = {}) {
 
   function onKeyDownY(e, data, transform) {
     if (!data.isMod) return
-    transform.redo().save(false)
+    transform.redo().setSave(false)
   }
 
   /**
@@ -764,7 +764,7 @@ function Plugin(options = {}) {
 
   function onKeyDownZ(e, data, transform) {
     if (!data.isMod) return
-    transform[data.isShift ? 'redo' : 'undo']().save(false)
+    transform[data.isShift ? 'redo' : 'undo']().setSave(false)
   }
 
   /**

@@ -67,7 +67,7 @@ class State extends new Record(DEFAULTS) {
       state = state
         .transform()
         .normalize(SCHEMA)
-        .save(false)
+        .setSave(false)
         .apply()
         .state
     }
