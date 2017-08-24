@@ -142,7 +142,7 @@ Block.prototype[MODEL_TYPES.BLOCK] = true
  */
 
 Object.getOwnPropertyNames(Node.prototype).forEach((method) => {
-  Block.prototype[method] = Node[method]
+  Block.prototype[method] = Node.prototype[method]
 })
 
 /**

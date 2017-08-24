@@ -134,7 +134,7 @@ Inline.prototype[MODEL_TYPES.INLINE] = true
  */
 
 Object.getOwnPropertyNames(Node.prototype).forEach((method) => {
-  Inline.prototype[method] = Node[method]
+  Inline.prototype[method] = Node.prototype[method]
 })
 
 /**

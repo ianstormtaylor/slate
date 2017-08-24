@@ -109,7 +109,7 @@ Document.prototype[MODEL_TYPES.DOCUMENT] = true
  */
 
 Object.getOwnPropertyNames(Node.prototype).forEach((method) => {
-  Document.prototype[method] = Node[method]
+  Document.prototype[method] = Node.prototype[method]
 })
 
 /**
