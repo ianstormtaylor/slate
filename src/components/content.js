@@ -392,8 +392,6 @@ class Content extends React.Component {
 
     const { state } = this.props
     const data = {}
-    data.type = 'fragment'
-    data.fragment = state.fragment
 
     debug('onCopy', { event, data })
     this.props.onCopy(event, data)
@@ -417,8 +415,6 @@ class Content extends React.Component {
 
     const { state } = this.props
     const data = {}
-    data.type = 'fragment'
-    data.fragment = state.fragment
 
     debug('onCut', { event, data })
     this.props.onCut(event, data)

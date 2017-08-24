@@ -264,7 +264,7 @@ function Plugin(options = {}) {
     // If the selection is collapsed, and it isn't inside a void node, abort.
     if (native.isCollapsed && !isVoid) return
 
-    const { fragment } = data
+    const { fragment } = state
     const encoded = Base64.serializeNode(fragment)
     const range = native.getRangeAt(0)
     let contents = range.cloneContents()
