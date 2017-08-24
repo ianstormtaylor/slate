@@ -18,6 +18,8 @@ import { IS_CHROME, IS_MAC, IS_SAFARI } from '../constants/environment'
 
 const debug = Debug('slate:core')
 
+const xml_serializer = new XMLSerializer();
+
 /**
  * The default plugin.
  *
@@ -303,28 +305,9 @@ function Plugin(options = {}) {
 
     attach.setAttribute('data-slate-fragment', encoded)
 
-    // Add the phony content to the DOM, and select it, so it will be copied.
-    const body = window.document.querySelector('body')
-    const div = window.document.createElement('div')
-    div.setAttribute('contenteditable', true)
-    div.style.position = 'absolute'
-    div.style.left = '-9999px'
-    div.appendChild(contents)
-    body.appendChild(div)
-
-    // COMPAT: In Firefox, trying to use the terser `native.selectAllChildren`
-    // throws an error, so we use the older `range` equivalent. (2016/06/21)
-    const r = window.document.createRange()
-    r.selectNodeContents(div)
-    native.removeAllRanges()
-    native.addRange(r)
-
-    // Revert to the previous selection right after copying.
-    window.requestAnimationFrame(() => {
-      body.removeChild(div)
-      native.removeAllRanges()
-      native.addRange(range)
-    })
+    e.nativeEvent.clipboardData.setData('text/html', xml_serializer.serializeToString(contents))
+    e.nativeEvent.clipboardData.setData('text/plain', contents.textContent)
+    e.preventDefault();
   }
 
   /**
