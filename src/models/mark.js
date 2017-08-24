@@ -34,7 +34,7 @@ class Mark extends new Record(DEFAULTS) {
     if (Mark.isMark(attrs)) return attrs
 
     if (!attrs.type) {
-      throw new Error('You must provide a `type` for the mark.')
+      throw new Error(`You must provide \`attrs.type\` to \`Mark.create(attrs)\`.`)
     }
 
     const mark = new Mark({
@@ -46,7 +46,7 @@ class Mark extends new Record(DEFAULTS) {
   }
 
   /**
-   * Create a marks set from an array of marks.
+   * Create a set of marks.
    *
    * @param {Array<Object|Mark>} elements
    * @return {Set<Mark>}

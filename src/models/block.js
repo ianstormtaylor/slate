@@ -40,7 +40,7 @@ const DEFAULTS = {
 class Block extends new Record(DEFAULTS) {
 
   /**
-   * Create a `Block` with `attrs`.
+   * Create a new `Block` with `attrs`.
    *
    * @param {Object|Block} attrs
    * @return {Block}

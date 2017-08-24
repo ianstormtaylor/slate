@@ -25,7 +25,7 @@ function block(value) {
       return Block.create(nodeProperties(value))
     }
     default: {
-      throw new Error(`Invalid \`block\` argument! It must be a block, an object, or a string. You passed: "${value}".`)
+      throw new Error(`Invalid \`block\` argument! It must be a block, an object, or a string. You passed: ${value}`)
     }
   }
 }
@@ -46,7 +46,7 @@ function inline(value) {
       return Inline.create(nodeProperties(value))
     }
     default: {
-      throw new Error(`Invalid \`inline\` argument! It must be an inline, an object, or a string. You passed: "${value}".`)
+      throw new Error(`Invalid \`inline\` argument! It must be an inline, an object, or a string. You passed: ${value}`)
     }
   }
 }
@@ -112,6 +112,7 @@ function key(value) {
   if (typeOf(value) == 'string') return value
 
   warn('An object was passed to a Node method instead of a `key` string. This was previously supported, but is being deprecated because it can have a negative impact on performance. The object in question was:', value)
+
   if (Block.isBlock(value)) return value.key
   if (Document.isDocument(value)) return value.key
   if (Inline.isInline(value)) return value.key

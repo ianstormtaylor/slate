@@ -13,7 +13,7 @@ import { Map } from 'immutable'
 const Data = {
 
   /**
-   * Create a `Data` with `attrs`.
+   * Create a new `Data` with `attrs`.
    *
    * @param {Object} attrs
    * @return {Data} data

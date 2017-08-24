@@ -1,5 +1,4 @@
 
-
 import Document from './document'
 import History from './history'
 import SCHEMA from '../schemas/core'
