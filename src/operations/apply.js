@@ -33,7 +33,7 @@ const APPLIERS = {
     let { document } = state
     let node = document.assertPath(path)
     node = node.addMark(offset, length, mark)
-    document = document.updateDescendant(node)
+    document = document.updateNode(node)
     state = state.set('document', document)
     return state
   },
@@ -53,9 +53,8 @@ const APPLIERS = {
     const rest = path.slice(0, -1)
     let { document } = state
     let parent = document.assertPath(rest)
-    const isParent = document == parent
     parent = parent.insertNode(index, node)
-    document = isParent ? parent : document.updateDescendant(parent)
+    document = document.updateNode(parent)
     state = state.set('document', document)
     return state
   },
@@ -77,7 +76,7 @@ const APPLIERS = {
 
     // Update the document
     node = node.insertText(offset, text, marks)
-    document = document.updateDescendant(node)
+    document = document.updateNode(node)
 
     // Update the selection
     if (anchorKey == node.key && anchorOffset >= offset) {
@@ -111,7 +110,7 @@ const APPLIERS = {
 
     // Perform the merge in the document.
     parent = parent.mergeNode(oneIndex, twoIndex)
-    document = parent.key == document.key ? parent : document.updateDescendant(parent)
+    document = document.updateNode(parent)
 
     // If the nodes are text nodes and the selection is inside the second node
     // update it to refer to the first node instead.
@@ -152,7 +151,7 @@ const APPLIERS = {
     // Remove the node from its current parent.
     let parent = document.getParent(node.key)
     parent = parent.removeNode(oldIndex)
-    document = parent.kind === 'document' ? parent : document.updateDescendant(parent)
+    document = document.updateNode(parent)
 
     // Find the new target...
     let target
@@ -183,7 +182,7 @@ const APPLIERS = {
 
     // Insert the new node to its new parent.
     target = target.insertNode(newIndex, node)
-    document = target.kind === 'document' ? target : document.updateDescendant(target)
+    document = document.updateNode(target)
     state = state.set('document', document)
     return state
   },
@@ -202,7 +201,7 @@ const APPLIERS = {
     let { document } = state
     let node = document.assertPath(path)
     node = node.removeMark(offset, length, mark)
-    document = document.updateDescendant(node)
+    document = document.updateNode(node)
     state = state.set('document', document)
     return state
   },
@@ -257,9 +256,8 @@ const APPLIERS = {
     // Remove the node from the document.
     let parent = document.getParent(node.key)
     const index = parent.nodes.indexOf(node)
-    const isParent = document == parent
     parent = parent.removeNode(index)
-    document = isParent ? parent : document.updateDescendant(parent)
+    document = document.updateNode(parent)
 
     // Update the document and selection.
     state = state.set('document', document).set('selection', selection)
@@ -292,7 +290,7 @@ const APPLIERS = {
     }
 
     node = node.removeText(offset, length)
-    document = document.updateDescendant(node)
+    document = document.updateNode(node)
     state = state.set('document', document).set('selection', selection)
     return state
   },
@@ -328,7 +326,7 @@ const APPLIERS = {
     let { document } = state
     let node = document.assertPath(path)
     node = node.updateMark(offset, length, mark, properties)
-    document = document.updateDescendant(node)
+    document = document.updateNode(node)
     state = state.set('document', document)
     return state
   },
@@ -359,7 +357,7 @@ const APPLIERS = {
     }
 
     node = node.merge(properties)
-    document = node.kind === 'document' ? node : document.updateDescendant(node)
+    document = document.updateNode(node)
     state = state.set('document', document)
     return state
   },
@@ -412,11 +410,10 @@ const APPLIERS = {
     const node = document.assertPath(path)
     let parent = document.getParent(node.key)
     const index = parent.nodes.indexOf(node)
-    const isParent = parent == document
 
     // Split the node by its parent.
     parent = parent.splitNode(index, position)
-    document = isParent ? parent : document.updateDescendant(parent)
+    document = document.updateNode(parent)
 
     // Determine whether we need to update the selection...
     const { startKey, endKey, startOffset, endOffset } = selection

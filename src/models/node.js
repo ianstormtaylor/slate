@@ -651,7 +651,7 @@ class Node {
       const index = parent.nodes.indexOf(child)
       const position = child.kind == 'text' ? startOffset : child.nodes.indexOf(previous)
       parent = parent.splitNode(index, position)
-      node = node.updateDescendant(parent)
+      node = node.updateNode(parent)
       previous = parent.nodes.get(index + 1)
       child = parent
     }
@@ -662,7 +662,7 @@ class Node {
       const index = parent.nodes.indexOf(child)
       const position = child.kind == 'text' ? endOffset : child.nodes.indexOf(previous)
       parent = parent.splitNode(index, position)
-      node = node.updateDescendant(parent)
+      node = node.updateNode(parent)
       previous = parent.nodes.get(index + 1)
       child = parent
     }
@@ -1560,11 +1560,10 @@ class Node {
     if (!parent) throw new Error(`Could not find a descendant node with key "${key}".`)
 
     const index = parent.nodes.findIndex(n => n.key === key)
-    const isParent = node == parent
     const nodes = parent.nodes.splice(index, 1)
 
     parent = parent.set('nodes', nodes)
-    node = isParent ? parent : node.updateDescendant(parent)
+    node = node.updateNode(parent)
     return node
   }
 
@@ -1626,7 +1625,7 @@ class Node {
    * @return {Node}
    */
 
-  updateDescendant(node) {
+  updateNode(node) {
     if (node.key == this.key) {
       return node
     }
