@@ -142,6 +142,7 @@ Block.prototype[MODEL_TYPES.BLOCK] = true
  */
 
 Object.getOwnPropertyNames(Node.prototype).forEach((method) => {
+  if (method == 'constructor') return
   Block.prototype[method] = Node.prototype[method]
 })
 

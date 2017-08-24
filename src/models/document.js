@@ -109,6 +109,7 @@ Document.prototype[MODEL_TYPES.DOCUMENT] = true
  */
 
 Object.getOwnPropertyNames(Node.prototype).forEach((method) => {
+  if (method == 'constructor') return
   Document.prototype[method] = Node.prototype[method]
 })
 

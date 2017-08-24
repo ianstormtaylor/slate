@@ -134,6 +134,7 @@ Inline.prototype[MODEL_TYPES.INLINE] = true
  */
 
 Object.getOwnPropertyNames(Node.prototype).forEach((method) => {
+  if (method == 'constructor') return
   Inline.prototype[method] = Node.prototype[method]
 })
 
