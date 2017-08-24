@@ -305,12 +305,33 @@ function Plugin(options = {}) {
 
     attach.setAttribute('data-slate-fragment', encoded)
 
-    if (!_XmlSerializer) {
-      _XmlSerializer = new XMLSerializer()
-    }
+    let htmlData
 
-    e.nativeEvent.clipboardData.setData('text/html', _XmlSerializer.serializeToString(contents))
-    e.nativeEvent.clipboardData.setData('text/plain', contents.textContent)
+    // Use the HtmlSerializer passed in the event data
+    if (data.htmlSerializer && typeof data.htmlSerializer === 'function') {
+      htmlData = data.htmlSerializer.serialize(contents)
+    } else {
+      // Fall back to the native XMLSerializer
+      // Note: the terser .outerHTML does not work on DocumentFragment
+      if (!_XmlSerializer) {
+        _XmlSerializer = new XMLSerializer()
+      }
+      htmlData = _XmlSerializer.serializeToString(contents)
+    }
+    e.nativeEvent.clipboardData.setData('text/html', htmlData)
+
+    let textData
+    // Use the PlainSerializer passed in the event data
+    if (data.plainSerializer && typeof data.plainSerializer === 'function') {
+      textData = data.plainSerializer.serialize(contents)
+    } else {
+      // Fall back to the native .textContent
+      textData = contents.textContent
+    }
+    e.nativeEvent.clipboardData.setData('text/plain', textData)
+
+    // Prevent the default copy action, to make sure our custom data
+    // lands into the clipboard instead.
     e.preventDefault()
   }
 

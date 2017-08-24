@@ -390,7 +390,6 @@ class Content extends React.Component {
       this.tmp.isCopying = false
     })
 
-    const { state } = this.props
     const data = {}
 
     debug('onCopy', { event, data })
@@ -413,7 +412,6 @@ class Content extends React.Component {
       this.tmp.isCopying = false
     })
 
-    const { state } = this.props
     const data = {}
 
     debug('onCut', { event, data })
