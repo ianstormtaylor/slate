@@ -27,17 +27,22 @@ const DEFAULTS = {
 class Text extends new Record(DEFAULTS) {
 
   /**
-   * Create a new `Text` with `properties`.
+   * Create a new `Text` with `attrs`.
    *
-   * @param {Object|Text} properties
+   * @param {Object|Text} attrs
    * @return {Text}
    */
 
-  static create(properties = {}) {
-    if (Text.isText(properties)) return properties
-    properties.key = properties.key || generateKey()
-    properties.characters = Character.createList(properties.characters)
-    return new Text(properties)
+  static create(attrs = {}) {
+    if (Text.isText(attrs)) return attrs
+    if (attrs.ranges) return Text.createFromRanges(attrs.ranges)
+
+    const text = new Text({
+      characters: Character.createList(attrs.characters),
+      key: attrs.key || generateKey(),
+    })
+
+    return text
   }
 
   /**
@@ -48,10 +53,10 @@ class Text extends new Record(DEFAULTS) {
    * @return {Text}
    */
 
-  static createFromString(text, marks = Set()) {
-    return Text.createFromRanges([
-      Range.create({ text, marks })
-    ])
+  static createFromString(string, marks = Set()) {
+    const range = Range.create({ text: string, marks })
+    const text = Text.createFromRanges([range])
+    return text
   }
 
   /**
@@ -62,12 +67,14 @@ class Text extends new Record(DEFAULTS) {
    */
 
   static createFromRanges(ranges) {
-    return Text.create({
-      characters: ranges.reduce((characters, range) => {
-        range = Range.create(range)
-        return characters.concat(range.getCharacters())
+    const characters = ranges
+      .map(Range.create)
+      .reduce((list, range) => {
+        return list.concat(range.getCharacters())
       }, Character.createList())
-    })
+
+    const text = Text.create({ characters })
+    return text
   }
 
   /**
@@ -78,8 +85,12 @@ class Text extends new Record(DEFAULTS) {
    */
 
   static createList(elements = []) {
-    if (List.isList(elements)) return elements
-    return new List(elements.map(Text.create))
+    if (List.isList(elements)) {
+      return elements
+    }
+
+    const list = new List(elements.map(Text.create))
+    return list
   }
 
   /**

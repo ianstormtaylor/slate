@@ -31,24 +31,24 @@ const DEFAULTS = {
 class State extends new Record(DEFAULTS) {
 
   /**
-   * Create a new `State` with `properties`.
+   * Create a new `State` with `attrs`.
    *
-   * @param {Object|State} properties
+   * @param {Object|State} attrs
    * @param {Object} options
    *   @property {Boolean} normalize
    * @return {State}
    */
 
-  static create(properties = {}, options = {}) {
-    if (State.isState(properties)) return properties
+  static create(attrs = {}, options = {}) {
+    if (State.isState(attrs)) return attrs
 
-    const document = Document.create(properties.document)
-    let selection = Selection.create(properties.selection)
+    const document = Document.create(attrs.document)
+    let selection = Selection.create(attrs.selection)
     let data = new Map()
 
     if (selection.isUnset) {
       const text = document.getFirstText()
-      selection = selection.collapseToStartOf(text)
+      if (text) selection = selection.collapseToStartOf(text)
     }
 
     // Set default value for `data`.
@@ -58,8 +58,8 @@ class State extends new Record(DEFAULTS) {
       }
     }
 
-    // Then add data provided in `properties`.
-    if (properties.data) data = data.merge(properties.data)
+    // Then add data provided in `attrs`.
+    if (attrs.data) data = data.merge(attrs.data)
 
     let state = new State({ document, selection, data })
 
@@ -469,11 +469,12 @@ class State extends new Record(DEFAULTS) {
   /**
    * Return a new `Transform` with the current state as a starting point.
    *
+   * @param {Object} properties
    * @return {Transform}
    */
 
-  transform() {
-    return new Transform({ state: this })
+  transform(properties = {}) {
+    return new Transform({ ...properties, state: this })
   }
 
 }

@@ -41,7 +41,7 @@ const rules = [
   },
 
   /**
-   * Only allow block, inline and text nodes in blocks.
+   * Only allow block nodes or inline and text nodes in blocks.
    *
    * @type {Object}
    */
@@ -51,10 +51,14 @@ const rules = [
       return node.kind == 'block'
     },
     validate: (block) => {
-      const invalids = block.nodes.filter((n) => {
-        return n.kind != 'block' && n.kind != 'inline' && n.kind != 'text'
-      })
+      const first = block.nodes.first()
+      if (!first) return null
 
+      const kinds = first.kind == 'block'
+        ? ['block']
+        : ['inline', 'text']
+
+      const invalids = block.nodes.filter(n => !kinds.includes(n.kind))
       return invalids.size ? invalids : null
     },
     normalize: (transform, block, invalids) => {

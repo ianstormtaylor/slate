@@ -2,7 +2,7 @@
 import { Block } from '../../../../../..'
 
 export default function (state) {
-  const { document, selection } = state
+  const { document } = state
 
   return state
     .transform()

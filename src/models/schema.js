@@ -25,15 +25,16 @@ const DEFAULTS = {
 class Schema extends new Record(DEFAULTS) {
 
   /**
-   * Create a new `Schema` with `properties`.
+   * Create a new `Schema` with `attrs`.
    *
-   * @param {Object|Schema} properties
+   * @param {Object|Schema} attrs
    * @return {Schema}
    */
 
-  static create(properties = {}) {
-    if (Schema.isSchema(properties)) return properties
-    return new Schema(normalizeProperties(properties))
+  static create(attrs = {}) {
+    if (Schema.isSchema(attrs)) return attrs
+    const schema = new Schema(normalizeProperties(attrs))
+    return schema
   }
 
   /**

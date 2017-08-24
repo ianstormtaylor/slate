@@ -1,5 +1,6 @@
 
 import Debug from 'debug'
+import Normalize from '../utils/normalize'
 import warn from '../utils/warn'
 
 /**
@@ -27,7 +28,8 @@ const APPLIERS = {
    */
 
   add_mark(state, operation) {
-    const { path, offset, length, mark } = operation
+    const { path, offset, length } = operation
+    const mark = Normalize.mark(operation.mark)
     let { document } = state
     let node = document.assertPath(path)
     node = node.addMark(offset, length, mark)
@@ -45,7 +47,8 @@ const APPLIERS = {
    */
 
   insert_node(state, operation) {
-    const { path, node } = operation
+    const { path } = operation
+    const node = Normalize.node(operation.node)
     const index = path[path.length - 1]
     const rest = path.slice(0, -1)
     let { document } = state
@@ -66,7 +69,8 @@ const APPLIERS = {
    */
 
   insert_text(state, operation) {
-    const { path, offset, text, marks } = operation
+    const { path, offset, text } = operation
+    const marks = operation.marks && operation.marks.map(Normalize.mark)
     let { document, selection } = state
     const { anchorKey, focusKey, anchorOffset, focusOffset } = selection
     let node = document.assertPath(path)
@@ -193,7 +197,8 @@ const APPLIERS = {
    */
 
   remove_mark(state, operation) {
-    const { path, offset, length, mark } = operation
+    const { path, offset, length } = operation
+    const mark = Normalize.mark(operation.mark)
     let { document } = state
     let node = document.assertPath(path)
     node = node.removeMark(offset, length, mark)
@@ -277,10 +282,11 @@ const APPLIERS = {
     const { anchorKey, focusKey, anchorOffset, focusOffset } = selection
     let node = document.assertPath(path)
 
-    // Update the selection
+    // Update the selection.
     if (anchorKey == node.key && anchorOffset >= rangeOffset) {
       selection = selection.moveAnchor(-length)
     }
+
     if (focusKey == node.key && focusOffset >= rangeOffset) {
       selection = selection.moveFocus(-length)
     }
@@ -317,7 +323,8 @@ const APPLIERS = {
    */
 
   set_mark(state, operation) {
-    const { path, offset, length, mark, properties } = operation
+    const { path, offset, length, properties } = operation
+    const mark = Normalize.mark(operation.mark)
     let { document } = state
     let node = document.assertPath(path)
     node = node.updateMark(offset, length, mark, properties)

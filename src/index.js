@@ -17,6 +17,7 @@ import Document from './models/document'
 import History from './models/history'
 import Inline from './models/inline'
 import Mark from './models/mark'
+import Node from './models/node'
 import Schema from './models/schema'
 import Selection from './models/selection'
 import Stack from './models/stack'
@@ -67,6 +68,7 @@ export {
   Html,
   Inline,
   Mark,
+  Node,
   Operations,
   Placeholder,
   Plain,
@@ -93,6 +95,7 @@ export default {
   Html,
   Inline,
   Mark,
+  Node,
   Operations,
   Placeholder,
   Plain,

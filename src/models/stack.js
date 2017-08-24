@@ -54,16 +54,17 @@ class Stack extends new Record(DEFAULTS) {
   /**
    * Constructor.
    *
-   * @param {Object} properties
+   * @param {Object} attrs
    *   @property {Array} plugins
    *   @property {Schema|Object} schema
    *   @property {Function} ...handlers
    */
 
-  static create(properties) {
-    const plugins = resolvePlugins(properties)
+  static create(attrs) {
+    const plugins = resolvePlugins(attrs)
     const schema = resolveSchema(plugins)
-    return new Stack({ plugins, schema })
+    const stack = new Stack({ plugins, schema })
+    return stack
   }
 
   /**

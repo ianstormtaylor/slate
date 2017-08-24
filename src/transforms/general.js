@@ -23,6 +23,19 @@ Transforms.applyOperation = (transform, operation) => {
 }
 
 /**
+ * Apply a series of `operations` to the current state.
+ *
+ * @param {Transform} transform
+ * @param {Array} operations
+ */
+
+Transforms.applyOperations = (transform, operations = []) => {
+  for (const op of operations) {
+    transform.applyOperation(op)
+  }
+}
+
+/**
  * Call a `fn` as if it was a core transform. This is a convenience method to
  * make using non-core transforms easier to read and chain.
  *

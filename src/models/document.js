@@ -11,7 +11,6 @@ import './inline'
  */
 
 import Data from './data'
-import Block from './block'
 import Node from './node'
 import MODEL_TYPES from '../constants/model-types'
 import generateKey from '../utils/generate-key'
@@ -38,20 +37,22 @@ const DEFAULTS = {
 class Document extends new Record(DEFAULTS) {
 
   /**
-   * Create a new `Document` with `properties`.
+   * Create a new `Document` with `attrs`.
    *
-   * @param {Object|Document} properties
+   * @param {Object|Document} attrs
    * @return {Document}
    */
 
-  static create(properties = {}) {
-    if (Document.isDocument(properties)) return properties
+  static create(attrs = {}) {
+    if (Document.isDocument(attrs)) return attrs
 
-    properties.key = properties.key || generateKey()
-    properties.data = Data.create(properties.data)
-    properties.nodes = Block.createList(properties.nodes)
+    const document = new Document({
+      key: attrs.key || generateKey(),
+      data: Data.create(attrs.data),
+      nodes: Node.createList(attrs.nodes),
+    })
 
-    return new Document(properties)
+    return document
   }
 
   /**
@@ -107,9 +108,9 @@ Document.prototype[MODEL_TYPES.DOCUMENT] = true
  * Mix in `Node` methods.
  */
 
-for (const method in Node) {
+Object.getOwnPropertyNames(Node.prototype).forEach((method) => {
   Document.prototype[method] = Node[method]
-}
+})
 
 /**
  * Export.

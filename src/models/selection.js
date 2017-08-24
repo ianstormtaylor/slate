@@ -28,15 +28,16 @@ const DEFAULTS = {
 class Selection extends new Record(DEFAULTS) {
 
   /**
-   * Create a new `Selection` with `properties`.
+   * Create a new `Selection` with `attrs`.
    *
-   * @param {Object|Selection} properties
+   * @param {Object|Selection} attrs
    * @return {Selection}
    */
 
-  static create(properties = {}) {
-    if (Selection.isSelection(properties)) return properties
-    return new Selection(properties)
+  static create(attrs = {}) {
+    if (Selection.isSelection(attrs)) return attrs
+    const selection = new Selection(attrs)
+    return selection
   }
 
   /**
@@ -217,7 +218,7 @@ class Selection extends new Record(DEFAULTS) {
   hasAnchorIn(node) {
     return node.kind == 'text'
       ? node.key == this.anchorKey
-      : node.hasDescendant(this.anchorKey)
+      : this.anchorKey != null && node.hasDescendant(this.anchorKey)
   }
 
   /**
@@ -273,7 +274,7 @@ class Selection extends new Record(DEFAULTS) {
   hasFocusIn(node) {
     return node.kind == 'text'
       ? node.key == this.focusKey
-      : node.hasDescendant(this.focusKey)
+      : this.focusKey != null && node.hasDescendant(this.focusKey)
   }
 
   /**

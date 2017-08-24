@@ -40,28 +40,32 @@ const DEFAULTS = {
 class Inline extends new Record(DEFAULTS) {
 
   /**
-   * Create a new `Inline` with `properties`.
+   * Create a new `Inline` with `attrs`.
    *
-   * @param {Object|Inline} properties
+   * @param {Object|Inline} attrs
    * @return {Inline}
    */
 
-  static create(properties = {}) {
-    if (Block.isBlock(properties)) return properties
-    if (Inline.isInline(properties)) return properties
-    if (Text.isText(properties)) return properties
-    if (!properties.type) throw new Error('You must pass an inline `type`.')
+  static create(attrs = {}) {
+    if (Block.isBlock(attrs)) return attrs
+    if (Inline.isInline(attrs)) return attrs
+    if (Text.isText(attrs)) return attrs
 
-    properties.key = properties.key || generateKey()
-    properties.data = Data.create(properties.data)
-    properties.isVoid = !!properties.isVoid
-    properties.nodes = Inline.createList(properties.nodes)
-
-    if (properties.nodes.size == 0) {
-      properties.nodes = properties.nodes.push(Text.create())
+    if (!attrs.type) {
+      throw new Error('You must pass an inline `type`.')
     }
 
-    return new Inline(properties)
+    const { nodes } = attrs
+    const empty = !nodes || nodes.size == 0 || nodes.length == 0
+    const inline = new Inline({
+      type: attrs.type,
+      key: attrs.key || generateKey(),
+      data: Data.create(attrs.data),
+      isVoid: !!attrs.isVoid,
+      nodes: Node.createList(empty ? [Text.create()] : nodes),
+    })
+
+    return inline
   }
 
   /**
@@ -129,9 +133,9 @@ Inline.prototype[MODEL_TYPES.INLINE] = true
  * Mix in `Node` methods.
  */
 
-for (const method in Node) {
+Object.getOwnPropertyNames(Node.prototype).forEach((method) => {
   Inline.prototype[method] = Node[method]
-}
+})
 
 /**
  * Export.

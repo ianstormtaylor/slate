@@ -24,17 +24,21 @@ const DEFAULTS = {
 class Range extends new Record(DEFAULTS) {
 
   /**
-   * Create a new `Range` with `properties`.
+   * Create a new `Range` with `attrs`.
    *
-   * @param {Object|Range} properties
+   * @param {Object|Range} attrs
    * @return {Range}
    */
 
-  static create(properties = {}) {
-    if (Range.isRange(properties)) return properties
-    properties.text = properties.text
-    properties.marks = Mark.createSet(properties.marks)
-    return new Range(properties)
+  static create(attrs = {}) {
+    if (Range.isRange(attrs)) return attrs
+
+    const range = new Range({
+      text: attrs.text,
+      marks: Mark.createSet(attrs.marks),
+    })
+
+    return range
   }
 
   /**
@@ -66,8 +70,7 @@ class Range extends new Record(DEFAULTS) {
 
   getCharacters() {
     const { marks } = this
-
-    return Character.createList(this.text
+    const characters = Character.createList(this.text
       .split('')
       .map((char) => {
         return Character.create({
@@ -75,6 +78,8 @@ class Range extends new Record(DEFAULTS) {
           marks
         })
       }))
+
+    return characters
   }
 
 }

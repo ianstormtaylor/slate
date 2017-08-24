@@ -1,6 +1,9 @@
 
+import Block from './block'
 import Document from './document'
+import Inline from './inline'
 import Normalize from '../utils/normalize'
+import Text from './text'
 import direction from 'direction'
 import generateKey from '../utils/generate-key'
 import isInRange from '../utils/is-in-range'
@@ -14,10 +17,54 @@ import { List, OrderedSet, Set } from 'immutable'
  * And interface that `Document`, `Block` and `Inline` all implement, to make
  * working with the recursive node tree easier.
  *
- * @type {Object}
+ * @type {Node}
  */
 
-const Node = {
+class Node {
+
+  /**
+   * Create a new `Node` with `attrs`.
+   *
+   * @param {Object|Node} attrs
+   * @return {Node}
+   */
+
+  static create(attrs = {}) {
+    if (Block.isBlock(attrs)) return attrs
+    if (Document.isDocument(attrs)) return attrs
+    if (Inline.isInline(attrs)) return attrs
+    if (Text.isText(attrs)) return attrs
+
+    switch (attrs.kind) {
+      case 'block': return Block.create(attrs)
+      case 'document': return Document.create(attrs)
+      case 'inline': return Inline.create(attrs)
+      case 'text': return Text.create(attrs)
+      default: {
+        throw new Error(`You must pass a \`kind\` attribute to create a \`Node\`.`)
+      }
+    }
+  }
+
+  /**
+   * Create a list of `Nodes` from an array.
+   *
+   * @param {Array<Object|Node>} elements
+   * @return {List<Node>}
+   */
+
+  static createList(elements = []) {
+    if (List.isList(elements)) {
+      return elements
+    }
+
+    if (Array.isArray(elements)) {
+      const list = new List(elements.map(Node.create))
+      return list
+    }
+
+    throw new Error(`Node.createList() must be passed an \`Array\` or a \`List\`. You passed: ${elements}`)
+  }
 
   /**
    * True if the node has both descendants in that order, false otherwise. The
@@ -45,7 +92,7 @@ const Node = {
     })
 
     return sorted
-  },
+  }
 
   /**
    * Assert that a node has a child by `key` and return it.
@@ -63,7 +110,7 @@ const Node = {
     }
 
     return child
-  },
+  }
 
   /**
    * Assert that a node has a descendant by `key` and return it.
@@ -81,7 +128,7 @@ const Node = {
     }
 
     return descendant
-  },
+  }
 
   /**
    * Assert that a node's tree has a node by `key` and return it.
@@ -99,7 +146,7 @@ const Node = {
     }
 
     return node
-  },
+  }
 
   /**
    * Assert that a node exists at `path` and return it.
@@ -116,7 +163,7 @@ const Node = {
     }
 
     return descendant
-  },
+  }
 
   /**
    * Recursively filter all descendant nodes with `iterator`.
@@ -133,7 +180,7 @@ const Node = {
     })
 
     return List(matches)
-  },
+  }
 
   /**
    * Recursively find all descendant nodes by `iterator`.
@@ -153,7 +200,7 @@ const Node = {
     })
 
     return found
-  },
+  }
 
   /**
    * Recursively iterate over all descendant nodes with `iterator`. If the
@@ -178,7 +225,7 @@ const Node = {
     })
 
     return ret
-  },
+  }
 
   /**
    * Get the path of ancestors of a descendant node by `key`.
@@ -205,7 +252,7 @@ const Node = {
     } else {
       return null
     }
-  },
+  }
 
   /**
    * Get the leaf block descendants of the node.
@@ -216,7 +263,7 @@ const Node = {
   getBlocks() {
     const array = this.getBlocksAsArray()
     return new List(array)
-  },
+  }
 
   /**
    * Get the leaf block descendants of the node.
@@ -231,7 +278,7 @@ const Node = {
       array.push(child)
       return array
     }, [])
-  },
+  }
 
   /**
    * Get the leaf block descendants in a `range`.
@@ -244,7 +291,7 @@ const Node = {
     const array = this.getBlocksAtRangeAsArray(range)
     // Eliminate duplicates by converting to an `OrderedSet` first.
     return new List(new OrderedSet(array))
-  },
+  }
 
   /**
    * Get the leaf block descendants in a `range` as an array
@@ -267,7 +314,7 @@ const Node = {
     const start = blocks.indexOf(startBlock)
     const end = blocks.indexOf(endBlock)
     return blocks.slice(start, end + 1)
-  },
+  }
 
   /**
    * Get all of the leaf blocks that match a `type`.
@@ -279,7 +326,7 @@ const Node = {
   getBlocksByType(type) {
     const array = this.getBlocksByTypeAsArray(type)
     return new List(array)
-  },
+  }
 
   /**
    * Get all of the leaf blocks that match a `type` as an array
@@ -299,7 +346,7 @@ const Node = {
         return array.concat(node.getBlocksByTypeAsArray(type))
       }
     }, [])
-  },
+  }
 
   /**
    * Get all of the characters for every text node.
@@ -310,7 +357,7 @@ const Node = {
   getCharacters() {
     const array = this.getCharactersAsArray()
     return new List(array)
-  },
+  }
 
   /**
    * Get all of the characters for every text node as an array
@@ -324,7 +371,7 @@ const Node = {
         ? arr.concat(node.characters.toArray())
         : arr.concat(node.getCharactersAsArray())
     }, [])
-  },
+  }
 
   /**
    * Get a list of the characters in a `range`.
@@ -336,7 +383,7 @@ const Node = {
   getCharactersAtRange(range) {
     const array = this.getCharactersAtRangeAsArray(range)
     return new List(array)
-  },
+  }
 
   /**
    * Get a list of the characters in a `range` as an array.
@@ -355,7 +402,7 @@ const Node = {
 
         return arr.concat(chars)
       }, [])
-  },
+  }
 
   /**
    * Get a child node by `key`.
@@ -367,7 +414,7 @@ const Node = {
   getChild(key) {
     key = Normalize.key(key)
     return this.nodes.find(node => node.key == key)
-  },
+  }
 
   /**
    * Get closest parent of node by `key` that matches `iterator`.
@@ -386,7 +433,7 @@ const Node = {
 
     // Exclude this node itself.
     return ancestors.rest().findLast(iterator)
-  },
+  }
 
   /**
    * Get the closest block parent of a `node`.
@@ -397,7 +444,7 @@ const Node = {
 
   getClosestBlock(key) {
     return this.getClosest(key, parent => parent.kind == 'block')
-  },
+  }
 
   /**
    * Get the closest inline parent of a `node`.
@@ -408,7 +455,7 @@ const Node = {
 
   getClosestInline(key) {
     return this.getClosest(key, parent => parent.kind == 'inline')
-  },
+  }
 
   /**
    * Get the closest void parent of a `node`.
@@ -419,7 +466,7 @@ const Node = {
 
   getClosestVoid(key) {
     return this.getClosest(key, parent => parent.isVoid)
-  },
+  }
 
   /**
    * Get the common ancestor of nodes `one` and `two` by keys.
@@ -451,7 +498,7 @@ const Node = {
       if (ancestors.includes(twoParent)) return twoParent
       twoParent = this.getParent(twoParent.key)
     }
-  },
+  }
 
   /**
    * Get the component for the node from a `schema`.
@@ -462,7 +509,7 @@ const Node = {
 
   getComponent(schema) {
     return schema.__getComponent(this)
-  },
+  }
 
   /**
    * Get the decorations for the node from a `schema`.
@@ -473,7 +520,7 @@ const Node = {
 
   getDecorators(schema) {
     return schema.__getDecorators(this)
-  },
+  }
 
   /**
    * Get the depth of a child node by `key`, with optional `startAt`.
@@ -489,7 +536,7 @@ const Node = {
     return this
       .getFurthestAncestor(key)
       .getDepth(key, startAt + 1)
-  },
+  }
 
   /**
    * Get a descendant node by `key`.
@@ -514,7 +561,7 @@ const Node = {
     })
 
     return descendantFound || found
-  },
+  }
 
   /**
    * Get a descendant by `path`.
@@ -534,7 +581,7 @@ const Node = {
     }
 
     return descendant
-  },
+  }
 
   /**
    * Get the decorators for a descendant by `key` given a `schema`.
@@ -560,7 +607,7 @@ const Node = {
 
     decorators = decorators.concat(descendant.getDecorators(schema))
     return decorators
-  },
+  }
 
   /**
    * Get the first child text node.
@@ -578,7 +625,7 @@ const Node = {
     })
 
     return descendantFound || found
-  },
+  }
 
   /**
    * Get a fragment of the node at a `range`.
@@ -634,7 +681,7 @@ const Node = {
 
     // Return a new document fragment.
     return Document.create({ nodes })
-  },
+  }
 
   /**
    * Get the furthest parent of a node by `key` that matches an `iterator`.
@@ -653,7 +700,7 @@ const Node = {
 
     // Exclude this node itself
     return ancestors.rest().find(iterator)
-  },
+  }
 
   /**
    * Get the furthest block parent of a node by `key`.
@@ -664,7 +711,7 @@ const Node = {
 
   getFurthestBlock(key) {
     return this.getFurthest(key, node => node.kind == 'block')
-  },
+  }
 
   /**
    * Get the furthest inline parent of a node by `key`.
@@ -675,7 +722,7 @@ const Node = {
 
   getFurthestInline(key) {
     return this.getFurthest(key, node => node.kind == 'inline')
-  },
+  }
 
   /**
    * Get the furthest ancestor of a node by `key`.
@@ -691,7 +738,7 @@ const Node = {
       if (node.kind == 'text') return false
       return node.hasDescendant(key)
     })
-  },
+  }
 
   /**
    * Get the furthest ancestor of a node by `key` that has only one child.
@@ -715,7 +762,7 @@ const Node = {
       .reverse().takeUntil(p => p.nodes.size > 1)
       // And pick the highest.
       .last()
-  },
+  }
 
   /**
    * Get the closest inline nodes for each text node in the node.
@@ -726,7 +773,7 @@ const Node = {
   getInlines() {
     const array = this.getInlinesAsArray()
     return new List(array)
-  },
+  }
 
   /**
    * Get the closest inline nodes for each text node in the node, as an array.
@@ -747,7 +794,7 @@ const Node = {
     })
 
     return array
-  },
+  }
 
   /**
    * Get the closest inline nodes for each text node in a `range`.
@@ -760,7 +807,7 @@ const Node = {
     const array = this.getInlinesAtRangeAsArray(range)
     // Remove duplicates by converting it to an `OrderedSet` first.
     return new List(new OrderedSet(array))
-  },
+  }
 
   /**
    * Get the closest inline nodes for each text node in a `range` as an array.
@@ -774,7 +821,7 @@ const Node = {
       .getTextsAtRangeAsArray(range)
       .map(text => this.getClosestInline(text.key))
       .filter(exists => exists)
-  },
+  }
 
   /**
    * Get all of the leaf inline nodes that match a `type`.
@@ -786,7 +833,7 @@ const Node = {
   getInlinesByType(type) {
     const array = this.getInlinesByTypeAsArray(type)
     return new List(array)
-  },
+  }
 
   /**
    * Get all of the leaf inline nodes that match a `type` as an array.
@@ -806,7 +853,7 @@ const Node = {
         return inlines.concat(node.getInlinesByTypeAsArray(type))
       }
     }, [])
-  },
+  }
 
   /**
    * Return a set of all keys in the node.
@@ -822,7 +869,7 @@ const Node = {
     })
 
     return new Set(keys)
-  },
+  }
 
   /**
    * Get the last child text node.
@@ -840,7 +887,7 @@ const Node = {
     })
 
     return descendantFound || found
-  },
+  }
 
   /**
    * Get all of the marks for all of the characters of every text node.
@@ -851,7 +898,7 @@ const Node = {
   getMarks() {
     const array = this.getMarksAsArray()
     return new Set(array)
-  },
+  }
 
   /**
    * Get all of the marks for all of the characters of every text node.
@@ -862,7 +909,7 @@ const Node = {
   getOrderedMarks() {
     const array = this.getMarksAsArray()
     return new OrderedSet(array)
-  },
+  }
 
   /**
    * Get all of the marks as an array.
@@ -874,7 +921,7 @@ const Node = {
     return this.nodes.reduce((marks, node) => {
       return marks.concat(node.getMarksAsArray())
     }, [])
-  },
+  }
 
   /**
    * Get a set of the marks in a `range`.
@@ -886,7 +933,7 @@ const Node = {
   getMarksAtRange(range) {
     const array = this.getMarksAtRangeAsArray(range)
     return new Set(array)
-  },
+  }
 
   /**
    * Get a set of the marks in a `range`.
@@ -898,7 +945,7 @@ const Node = {
   getOrderedMarksAtRange(range) {
     const array = this.getMarksAtRangeAsArray(range)
     return new OrderedSet(array)
-  },
+  }
 
   /**
    * Get a set of the marks in a `range`.
@@ -933,7 +980,7 @@ const Node = {
         char.marks.toArray().forEach(c => memo.push(c))
         return memo
       }, [])
-  },
+  }
 
   /**
    * Get all of the marks that match a `type`.
@@ -945,7 +992,7 @@ const Node = {
   getMarksByType(type) {
     const array = this.getMarksByTypeAsArray(type)
     return new Set(array)
-  },
+  }
 
   /**
    * Get all of the marks that match a `type`.
@@ -957,7 +1004,7 @@ const Node = {
   getOrderedMarksByType(type) {
     const array = this.getMarksByTypeAsArray(type)
     return new OrderedSet(array)
-  },
+  }
 
   /**
    * Get all of the marks that match a `type` as an array.
@@ -972,7 +1019,7 @@ const Node = {
         ? array.concat(node.getMarksAsArray().filter(m => m.type == type))
         : array.concat(node.getMarksByTypeAsArray(type))
     }, [])
-  },
+  }
 
   /**
    * Get the block node before a descendant text node by `key`.
@@ -996,7 +1043,7 @@ const Node = {
     if (!next) return null
 
     return this.getClosestBlock(next.key)
-  },
+  }
 
   /**
    * Get the node after a descendant by `key`.
@@ -1016,7 +1063,7 @@ const Node = {
       throw new Error(`Could not find a child node with key "${key}".`)
     }
     return after.get(1)
-  },
+  }
 
   /**
    * Get the text node after a descendant text node by `key`.
@@ -1030,7 +1077,7 @@ const Node = {
     return this.getTexts()
       .skipUntil(text => text.key == key)
       .get(1)
-  },
+  }
 
   /**
    * Get a node in the tree by `key`.
@@ -1042,7 +1089,18 @@ const Node = {
   getNode(key) {
     key = Normalize.key(key)
     return this.key == key ? this : this.getDescendant(key)
-  },
+  }
+
+  /**
+   * Get a node in the tree by `path`.
+   *
+   * @param {Array} path
+   * @return {Node|Null}
+   */
+
+  getNodeAtPath(path) {
+    return path.length ? this.getDescendantAtPath(path) : this
+  }
 
   /**
    * Get the offset for a descendant text node by `key`.
@@ -1064,7 +1122,7 @@ const Node = {
     return this.hasChild(key)
       ? offset
       : offset + child.getOffset(key)
-  },
+  }
 
   /**
    * Get the offset from a `range`.
@@ -1082,7 +1140,7 @@ const Node = {
 
     const { startKey, startOffset } = range
     return this.getOffset(startKey) + startOffset
-  },
+  }
 
   /**
    * Get the parent of a child node by `key`.
@@ -1106,7 +1164,7 @@ const Node = {
     })
 
     return node
-  },
+  }
 
   /**
    * Get the path of a descendant node by `key`.
@@ -1127,7 +1185,7 @@ const Node = {
     })
 
     return path
-  },
+  }
 
   /**
    * Get the block node before a descendant text node by `key`.
@@ -1151,7 +1209,7 @@ const Node = {
     if (!previous) return null
 
     return this.getClosestBlock(previous.key)
-  },
+  }
 
   /**
    * Get the node before a descendant node by `key`.
@@ -1171,7 +1229,7 @@ const Node = {
     }
 
     return before.last()
-  },
+  }
 
   /**
    * Get the text node before a descendant text node by `key`.
@@ -1185,7 +1243,7 @@ const Node = {
     return this.getTexts()
       .takeUntil(text => text.key == key)
       .last()
-  },
+  }
 
   /**
    * Get the concatenated text string of all child nodes.
@@ -1197,7 +1255,7 @@ const Node = {
     return this.nodes.reduce((string, node) => {
       return string + node.text
     }, '')
-  },
+  }
 
   /**
    * Get the descendent text node at an `offset`.
@@ -1220,7 +1278,7 @@ const Node = {
         length += node.text.length
         return length > offset
       })
-  },
+  }
 
   /**
    * Get the direction of the node's text.
@@ -1231,7 +1289,7 @@ const Node = {
   getTextDirection() {
     const dir = direction(this.text)
     return dir == 'neutral' ? undefined : dir
-  },
+  }
 
   /**
    * Recursively get all of the child text nodes in order of appearance.
@@ -1242,7 +1300,7 @@ const Node = {
   getTexts() {
     const array = this.getTextsAsArray()
     return new List(array)
-  },
+  }
 
   /**
    * Recursively get all the leaf text nodes in order of appearance, as array.
@@ -1262,7 +1320,7 @@ const Node = {
     })
 
     return array
-  },
+  }
 
   /**
    * Get all of the text nodes in a `range`.
@@ -1274,7 +1332,7 @@ const Node = {
   getTextsAtRange(range) {
     const array = this.getTextsAtRangeAsArray(range)
     return new List(array)
-  },
+  }
 
   /**
    * Get all of the text nodes in a `range` as an array.
@@ -1297,7 +1355,7 @@ const Node = {
     const start = texts.indexOf(startText)
     const end = texts.indexOf(endText)
     return texts.slice(start, end + 1)
-  },
+  }
 
   /**
    * Check if a child node exists by `key`.
@@ -1308,7 +1366,7 @@ const Node = {
 
   hasChild(key) {
     return !!this.getChild(key)
-  },
+  }
 
   /**
    * Recursively check if a child node exists by `key`.
@@ -1319,7 +1377,7 @@ const Node = {
 
   hasDescendant(key) {
     return !!this.getDescendant(key)
-  },
+  }
 
   /**
    * Recursively check if a node exists by `key`.
@@ -1330,7 +1388,7 @@ const Node = {
 
   hasNode(key) {
     return !!this.getNode(key)
-  },
+  }
 
   /**
    * Check if a node has a void parent by `key`.
@@ -1341,7 +1399,7 @@ const Node = {
 
   hasVoidParent(key) {
     return !!this.getClosest(key, parent => parent.isVoid)
-  },
+  }
 
   /**
    * Insert a `node` at `index`.
@@ -1368,7 +1426,7 @@ const Node = {
 
     const nodes = this.nodes.insert(index, node)
     return this.set('nodes', nodes)
-  },
+  }
 
   /**
    * Check whether the node is a leaf block.
@@ -1381,7 +1439,7 @@ const Node = {
       this.kind == 'block' &&
       this.nodes.every(n => n.kind != 'block')
     )
-  },
+  }
 
   /**
    * Check whether the node is a leaf inline.
@@ -1394,7 +1452,7 @@ const Node = {
       this.kind == 'inline' &&
       this.nodes.every(n => n.kind != 'inline')
     )
-  },
+  }
 
   /**
    * Merge a children node `first` with another children node `second`.
@@ -1431,7 +1489,7 @@ const Node = {
     node = node.removeNode(withIndex)
     node = node.insertNode(withIndex, one)
     return node
-  },
+  }
 
   /**
    * Map all child nodes, updating them in their parents. This method is
@@ -1450,7 +1508,7 @@ const Node = {
     })
 
     return this.set('nodes', nodes)
-  },
+  }
 
   /**
    * Map all descendant nodes, updating them in their parents. This method is
@@ -1474,7 +1532,7 @@ const Node = {
     })
 
     return this.set('nodes', nodes)
-  },
+  }
 
   /**
    * Regenerate the node's key.
@@ -1485,7 +1543,7 @@ const Node = {
   regenerateKey() {
     const key = generateKey()
     return this.set('key', key)
-  },
+  }
 
   /**
    * Remove a `node` from the children node map.
@@ -1508,7 +1566,7 @@ const Node = {
     parent = parent.set('nodes', nodes)
     node = isParent ? parent : node.updateDescendant(parent)
     return node
-  },
+  }
 
   /**
    * Remove a node at `index`.
@@ -1520,7 +1578,7 @@ const Node = {
   removeNode(index) {
     const nodes = this.nodes.splice(index, 1)
     return this.set('nodes', nodes)
-  },
+  }
 
   /**
    * Split a child node by `index` at `position`.
@@ -1559,7 +1617,7 @@ const Node = {
     node = node.insertNode(index, two)
     node = node.insertNode(index, one)
     return node
-  },
+  }
 
   /**
    * Set a new value for a child node by `key`.
@@ -1586,7 +1644,7 @@ const Node = {
     })
 
     return node
-  },
+  }
 
   /**
    * Validate the node against a `schema`.
@@ -1597,7 +1655,7 @@ const Node = {
 
   validate(schema) {
     return schema.__validate(this)
-  },
+  }
 
   /**
    * True if the node has both descendants in that order, false otherwise. The
@@ -1611,7 +1669,7 @@ const Node = {
   areDescendantSorted(first, second) {
     warn('The Node.areDescendantSorted(first, second) method is deprecated, please use `Node.areDescendantsSorted(first, second) instead.')
     return this.areDescendantsSorted(first, second)
-  },
+  }
 
   /**
    * Concat children `nodes` on to the end of the node.
@@ -1624,7 +1682,7 @@ const Node = {
     warn('The `Node.concatChildren(nodes)` method is deprecated.')
     nodes = this.nodes.concat(nodes)
     return this.set('nodes', nodes)
-  },
+  }
 
   /**
    * Decorate all of the text nodes with a `decorator` function.
@@ -1640,7 +1698,7 @@ const Node = {
         ? child.decorateCharacters(decorator)
         : child
     })
-  },
+  }
 
   /**
    * Recursively filter all descendant nodes with `iterator`, depth-first.
@@ -1657,7 +1715,7 @@ const Node = {
       if (iterator(child, i, nodes)) matches = matches.push(child)
       return matches
     }, new List())
-  },
+  }
 
   /**
    * Recursively find all descendant nodes by `iterator`. Depth first.
@@ -1678,7 +1736,7 @@ const Node = {
     })
 
     return found
-  },
+  }
 
   /**
    * Get children between two child keys.
@@ -1695,7 +1753,7 @@ const Node = {
     end = this.assertChild(end)
     end = this.nodes.indexOf(end)
     return this.nodes.slice(start + 1, end)
-  },
+  }
 
   /**
    * Get children between two child keys, including the two children.
@@ -1712,7 +1770,7 @@ const Node = {
     end = this.assertChild(end)
     end = this.nodes.indexOf(end)
     return this.nodes.slice(start, end + 1)
-  },
+  }
 
   /**
    * Get the highest child ancestor of a node by `key`.
@@ -1724,7 +1782,7 @@ const Node = {
   getHighestChild(key) {
     warn('The `Node.getHighestChild(key) method is deprecated, please use `Node.getFurthestAncestor(key) instead.')
     return this.getFurthestAncestor(key)
-  },
+  }
 
   /**
    * Get the highest parent of a node by `key` which has an only child.
@@ -1736,7 +1794,7 @@ const Node = {
   getHighestOnlyChildParent(key) {
     warn('The `Node.getHighestOnlyChildParent(key)` method is deprecated, please use `Node.getFurthestOnlyChildAncestor` instead.')
     return this.getFurthestOnlyChildAncestor(key)
-  },
+  }
 
   /**
    * Check if the inline nodes are split at a `range`.
@@ -1753,7 +1811,7 @@ const Node = {
     const { startKey } = range
     const start = this.getFurthestInline(startKey) || this.getDescendant(startKey)
     return range.isAtStartOf(start) || range.isAtEndOf(start)
-  },
+  }
 
 }
 
@@ -1761,7 +1819,7 @@ const Node = {
  * Memoize read methods.
  */
 
-memoize(Node, [
+memoize(Node.prototype, [
   'getBlocks',
   'getBlocksAsArray',
   'getCharacters',
@@ -1784,7 +1842,7 @@ memoize(Node, [
   takesArguments: false
 })
 
-memoize(Node, [
+memoize(Node.prototype, [
   'areDescendantsSorted',
   'getAncestors',
   'getBlocksAtRange',
@@ -1825,6 +1883,7 @@ memoize(Node, [
   'getNextSibling',
   'getNextText',
   'getNode',
+  'getNodeAtPath',
   'getOffset',
   'getOffsetAtRange',
   'getParent',

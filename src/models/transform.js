@@ -19,15 +19,16 @@ const debug = Debug('slate:transform')
 class Transform {
 
   /**
-   * Constructor.
+   * Create a new `Transform` with `attrs`.
    *
-   * @param {Object} properties
+   * @param {Object} attrs
    *   @property {State} state
    */
 
-  constructor(properties) {
-    const { state } = properties
+  constructor(attrs) {
+    const { source, state } = attrs
     this.state = state
+    this.source = source
     this.operations = []
     this.setIsNative(false)
   }
