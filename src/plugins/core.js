@@ -219,8 +219,7 @@ function Plugin(options = {}) {
     // Once the fake cut content has successfully been added to the clipboard,
     // delete the content in the current selection.
     window.requestAnimationFrame(() => {
-      const t = editor.transform().delete()
-      editor.applyTransform(t)
+      editor.transform(t => t.delete())
     })
   }
 
