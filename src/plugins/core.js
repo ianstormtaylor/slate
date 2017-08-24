@@ -18,7 +18,7 @@ import { IS_CHROME, IS_MAC, IS_SAFARI } from '../constants/environment'
 
 const debug = Debug('slate:core')
 
-const xml_serializer = new XMLSerializer();
+let _XmlSerializer
 
 /**
  * The default plugin.
@@ -305,9 +305,13 @@ function Plugin(options = {}) {
 
     attach.setAttribute('data-slate-fragment', encoded)
 
-    e.nativeEvent.clipboardData.setData('text/html', xml_serializer.serializeToString(contents))
+    if (!_XmlSerializer) {
+      _XmlSerializer = new XMLSerializer()
+    }
+
+    e.nativeEvent.clipboardData.setData('text/html', _XmlSerializer.serializeToString(contents))
     e.nativeEvent.clipboardData.setData('text/plain', contents.textContent)
-    e.preventDefault();
+    e.preventDefault()
   }
 
   /**
