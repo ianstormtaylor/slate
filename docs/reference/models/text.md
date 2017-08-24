@@ -12,7 +12,6 @@ A text node in a Slate [`Document`](./document.md). Text nodes are always the bo
   - [`key`](#key)
 - [Computed Properties](#computed-properties)
   - [`kind`](#kind)
-  - [`length`](#length)
   - [`text`](#text)
 - [Static Methods](#static-methods)
   - [`Text.create`](#textcreate)
@@ -45,11 +44,6 @@ A unique identifier for the node.
 `String`
 
 An immutable string value of `'text'` for easily separating this node from [`Inline`](./inline.md) or [`Block`](./block.md) nodes.
-
-### `length`
-`Number`
-
-The length of all of the characters in the text node.
 
 ### `text`
 `String`

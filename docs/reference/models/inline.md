@@ -17,7 +17,6 @@ Inline nodes may contain nested inline nodes and text nodes—just like in the D
   - [`type`](#type)
 - [Computed Properties](#computed-properties)
   - [`kind`](#kind)
-  - [`length`](#length)
   - [`text`](#text)
 - [Static Methods](#static-methods)
   - [`Inline.create`](#inlinecreate)
@@ -72,11 +71,6 @@ The custom type of the node (eg. `link` or `hashtag`).
 `String`
 
 An immutable string value of `'inline'` for easily separating this node from [`Block`](./block.md) or [`Text`](./text.md) nodes.
-
-### `length`
-`Number`
-
-The sum of the lengths of all of the descendant [`Text`](./text.md) nodes of this node.
 
 ### `text`
 `String`

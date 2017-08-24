@@ -104,11 +104,9 @@ A [`State`](./state.md) with the transform's current operations applied. Each ti
 ## Methods
 
 ### `apply`
-`apply(options: Object) => State`
+`apply(options: Object) => Transform`
 
-Applies all of the current transform steps, returning the newly transformed [`State`](./state.md). An `options` object is optional, containing values of:
-
-- `save: Boolean` — override the editor's built-in logic of whether to create a new snapshot in the history, that can be reverted to later.
+Applies current transform steps, saving them to the history if needed.
 
 ### `call`
 `call(customTransform: Function, ...arguments) => Transform`
