@@ -33,6 +33,7 @@ The top-level React component that renders the Slate editor itself.
   - [`onCut`](#oncut)
   - [`onDrop`](#ondrop)
   - [`onKeyDown`](#onkeydown)
+  - [`onKeyUp`](#onkeyup)
   - [`onPaste`](#onpaste)
   - [`onSelect`](#onselect)
   - [`schema`](#schema)
@@ -197,6 +198,7 @@ const plugins = [
 ### `onCut`
 ### `onDrop`
 ### `onKeyDown`
+### `onKeyUp`
 ### `onPaste`
 ### `onSelect`
 ### `schema`
