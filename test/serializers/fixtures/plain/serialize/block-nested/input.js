@@ -18,6 +18,23 @@ export default State.create({
                 ])
               }
             ])
+          },
+          {
+            type: 'paragraph',
+            nodes: Block.createList([
+              {
+                type: 'paragraph',
+                nodes: Text.createList([
+                  {
+                    characters: Character.createList([
+                      { text: 't' },
+                      { text: 'w' },
+                      { text: 'o' }
+                    ])
+                  }
+                ])
+              }
+            ])
           }
         ])
       }
