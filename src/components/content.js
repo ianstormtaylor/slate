@@ -267,7 +267,7 @@ class Content extends React.Component {
 
   isInEditor = (target) => {
     const { element } = this
-    return findClosestNode(el, '[data-slate-editor]') === element
+    return findClosestNode(target, '[data-slate-editor]') === element
   }
 
   /**
