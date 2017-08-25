@@ -106,11 +106,13 @@ class Transform {
 
   /**
    * Noop.
+   *
+   * @return {State}
    */
 
   apply(options = {}) {
-    warn('The `transform.apply()` method is deprecrated and no longer necessary, so it has been no-op\'d.')
-    return this
+    warn('The `transform.apply()` method is deprecrated and no longer necessary, as all operations are applied immediately when invoked. You can access the transform\'s state, which is already pre-computed, directly via `transform.state` instead.')
+    return this.state
   }
 
 }
@@ -126,6 +128,60 @@ Object.keys(Transforms).forEach((type) => {
     return this
   }
 })
+
+/**
+ * Add deprecation warnings in case people try to access a transform as a state.
+ */
+
+;[
+  'hasUndos',
+  'hasRedos',
+  'isBlurred',
+  'isFocused',
+  'isCollapsed',
+  'isExpanded',
+  'isBackward',
+  'isForward',
+  'startKey',
+  'endKey',
+  'startOffset',
+  'endOffset',
+  'anchorKey',
+  'focusKey',
+  'anchorOffset',
+  'focusOffset',
+  'startBlock',
+  'endBlock',
+  'anchorBlock',
+  'focusBlock',
+  'startInline',
+  'endInline',
+  'anchorInline',
+  'focusInline',
+  'startText',
+  'endText',
+  'anchorText',
+  'focusText',
+  'characters',
+  'marks',
+  'blocks',
+  'fragment',
+  'inlines',
+  'texts',
+  'isEmpty',
+].forEach((getter) => {
+  Object.defineProperty(Transform.prototype, getter, {
+    get() {
+      warn(`You attempted to access the \`${getter}\` property of what was previously a \`state\` object but is now a \`transform\` object. This syntax has been deprecated as plugins are now passed \`transform\` objects instead of \`state\` objects.`)
+      return this.state[getter]
+    }
+  })
+})
+
+Transform.prototype.transform = function () {
+  warn('You attempted to call `.transform()` on what was previously a `state` object but is now already a `transform` object. This syntax has been deprecated as plugins are now passed `transform` objects instead of `state` objects.')
+  return this
+}
 
 /**
  * Export.
