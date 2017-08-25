@@ -38,17 +38,6 @@ function deserialize(string, options = {}) {
   return options.toRaw ? raw : Raw.deserialize(raw)
 }
 
-function getSerializedTextForNode(node) {
-  if (node.kind == 'document' || node.kind === 'block') {
-    return node.nodes
-      .map(childNode => getSerializedTextForNode(childNode))
-      .filter(text => text != '')
-      .join('\n')
-  } else {
-    return node.text
-  }
-}
-
 
 /**
  * Serialize a `state` to plain text.
@@ -58,7 +47,28 @@ function getSerializedTextForNode(node) {
  */
 
 function serialize(state) {
-  return getSerializedTextForNode(state.document)
+  return serializeNode(state.document)
+}
+
+/**
+ * Serialize a `node` to plain text.
+ * For blocks, or document, it recursively calls itself
+ * to aggregate the text.
+ * For other types of nodes, it uses the .text property
+ *
+ * @param {State} state
+ * @return {String}
+ */
+
+function serializeNode(node) {
+  if (node.kind == 'document' || node.kind === 'block') {
+    return node.nodes
+      .map(childNode => serializeNode(childNode))
+      .filter(text => text != '')
+      .join('\n')
+  } else {
+    return node.text
+  }
 }
 
 /**
