@@ -1,7 +1,7 @@
 
 import Debug from 'debug'
 import Normalize from '../utils/normalize'
-import warn from '../utils/warn'
+import logger from '../utils/logger'
 
 /**
  * Debug.
@@ -363,15 +363,15 @@ const APPLIERS = {
     let { document } = state
     let node = document.assertPath(path)
 
-    // Deprecate the ability to overwite a node's children.
+    // Warn when trying to overwite a node's children.
     if (properties.nodes && properties.nodes != node.nodes) {
-      warn('Updating a Node\'s `nodes` property via `setNode()` is not allowed. Use the appropriate insertion and removal operations instead. The opeartion in question was:', operation)
+      logger.warn('Updating a Node\'s `nodes` property via `setNode()` is not allowed. Use the appropriate insertion and removal operations instead. The opeartion in question was:', operation)
       delete properties.nodes
     }
 
-    // Deprecate the ability to change a node's key.
+    // Warn when trying to change a node's key.
     if (properties.key && properties.key != node.key) {
-      warn('Updating a Node\'s `key` property via `setNode()` is not allowed. There should be no reason to do this. The opeartion in question was:', operation)
+      logger.warn('Updating a Node\'s `key` property via `setNode()` is not allowed. There should be no reason to do this. The opeartion in question was:', operation)
       delete properties.key
     }
 

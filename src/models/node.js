@@ -7,8 +7,8 @@ import Text from './text'
 import direction from 'direction'
 import generateKey from '../utils/generate-key'
 import isInRange from '../utils/is-in-range'
+import logger from '../utils/logger'
 import memoize from '../utils/memoize'
-import warn from '../utils/warn'
 import { List, OrderedSet, Set } from 'immutable'
 
 /**
@@ -1666,7 +1666,7 @@ class Node {
    */
 
   areDescendantSorted(first, second) {
-    warn('The Node.areDescendantSorted(first, second) method is deprecated, please use `Node.areDescendantsSorted(first, second) instead.')
+    logger.deprecate('0.19.0', 'The Node.areDescendantSorted(first, second) method is deprecated, please use `Node.areDescendantsSorted(first, second) instead.')
     return this.areDescendantsSorted(first, second)
   }
 
@@ -1678,7 +1678,7 @@ class Node {
    */
 
   concatChildren(nodes) {
-    warn('The `Node.concatChildren(nodes)` method is deprecated.')
+    logger.deprecate('0.19.0', 'The `Node.concatChildren(nodes)` method is deprecated.')
     nodes = this.nodes.concat(nodes)
     return this.set('nodes', nodes)
   }
@@ -1691,7 +1691,7 @@ class Node {
    */
 
   decorateTexts(decorator) {
-    warn('The `Node.decorateTexts(decorator) method is deprecated.')
+    logger.deprecate('0.19.0', 'The `Node.decorateTexts(decorator) method is deprecated.')
     return this.mapDescendants((child) => {
       return child.kind == 'text'
         ? child.decorateCharacters(decorator)
@@ -1708,7 +1708,7 @@ class Node {
    */
 
   filterDescendantsDeep(iterator) {
-    warn('The Node.filterDescendantsDeep(iterator) method is deprecated.')
+    logger.deprecate('0.19.0', 'The Node.filterDescendantsDeep(iterator) method is deprecated.')
     return this.nodes.reduce((matches, child, i, nodes) => {
       if (child.kind != 'text') matches = matches.concat(child.filterDescendantsDeep(iterator))
       if (iterator(child, i, nodes)) matches = matches.push(child)
@@ -1724,7 +1724,7 @@ class Node {
    */
 
   findDescendantDeep(iterator) {
-    warn('The Node.findDescendantDeep(iterator) method is deprecated.')
+    logger.deprecate('0.19.0', 'The Node.findDescendantDeep(iterator) method is deprecated.')
     let found
 
     this.forEachDescendant((node) => {
@@ -1746,7 +1746,7 @@ class Node {
    */
 
   getChildrenBetween(start, end) {
-    warn('The `Node.getChildrenBetween(start, end)` method is deprecated.')
+    logger.deprecate('0.19.0', 'The `Node.getChildrenBetween(start, end)` method is deprecated.')
     start = this.assertChild(start)
     start = this.nodes.indexOf(start)
     end = this.assertChild(end)
@@ -1763,7 +1763,7 @@ class Node {
    */
 
   getChildrenBetweenIncluding(start, end) {
-    warn('The `Node.getChildrenBetweenIncluding(start, end)` method is deprecated.')
+    logger.deprecate('0.19.0', 'The `Node.getChildrenBetweenIncluding(start, end)` method is deprecated.')
     start = this.assertChild(start)
     start = this.nodes.indexOf(start)
     end = this.assertChild(end)
@@ -1779,7 +1779,7 @@ class Node {
    */
 
   getHighestChild(key) {
-    warn('The `Node.getHighestChild(key) method is deprecated, please use `Node.getFurthestAncestor(key) instead.')
+    logger.deprecate('0.19.0', 'The `Node.getHighestChild(key) method is deprecated, please use `Node.getFurthestAncestor(key) instead.')
     return this.getFurthestAncestor(key)
   }
 
@@ -1791,7 +1791,7 @@ class Node {
    */
 
   getHighestOnlyChildParent(key) {
-    warn('The `Node.getHighestOnlyChildParent(key)` method is deprecated, please use `Node.getFurthestOnlyChildAncestor` instead.')
+    logger.deprecate('0.19.0', 'The `Node.getHighestOnlyChildParent(key)` method is deprecated, please use `Node.getFurthestOnlyChildAncestor` instead.')
     return this.getFurthestOnlyChildAncestor(key)
   }
 
@@ -1803,7 +1803,7 @@ class Node {
    */
 
   isInlineSplitAtRange(range) {
-    warn('The `Node.isInlineSplitAtRange(range)` method is deprecated.')
+    logger.deprecate('0.19.0', 'The `Node.isInlineSplitAtRange(range)` method is deprecated.')
     range = range.normalize(this)
     if (range.isExpanded) throw new Error()
 

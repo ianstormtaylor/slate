@@ -1,5 +1,5 @@
 
-import warn from '../utils/warn'
+import logger from '../utils/logger'
 import MODEL_TYPES from '../constants/model-types'
 import { Record } from 'immutable'
 
@@ -587,7 +587,7 @@ class Selection extends new Record(DEFAULTS) {
 
     // If the selection is malformed, warn and zero it out.
     if (!anchorNode || !focusNode) {
-      warn('The selection was invalid and was reset. The selection in question was:', selection)
+      logger.warn('The selection was invalid and was reset. The selection in question was:', selection)
       const first = node.getFirstText()
       return selection.merge({
         anchorKey: first ? first.key : null,
@@ -600,7 +600,7 @@ class Selection extends new Record(DEFAULTS) {
 
     // If the anchor node isn't a text node, match it to one.
     if (anchorNode.kind != 'text') {
-      warn('The selection anchor was set to a Node that is not a Text node. This should not happen and can degrade performance. The node in question was:', anchorNode)
+      logger.warn('The selection anchor was set to a Node that is not a Text node. This should not happen and can degrade performance. The node in question was:', anchorNode)
       const anchorText = anchorNode.getTextAtOffset(anchorOffset)
       const offset = anchorNode.getOffset(anchorText.key)
       anchorOffset = anchorOffset - offset
@@ -609,7 +609,7 @@ class Selection extends new Record(DEFAULTS) {
 
     // If the focus node isn't a text node, match it to one.
     if (focusNode.kind != 'text') {
-      warn('The selection focus was set to a Node that is not a Text node. This should not happen and can degrade performance. The node in question was:', focusNode)
+      logger.warn('The selection focus was set to a Node that is not a Text node. This should not happen and can degrade performance. The node in question was:', focusNode)
       const focusText = focusNode.getTextAtOffset(focusOffset)
       const offset = focusNode.getOffset(focusText.key)
       focusOffset = focusOffset - offset
@@ -642,7 +642,7 @@ class Selection extends new Record(DEFAULTS) {
    */
 
   unset() {
-    warn('The `Selection.unset` method is deprecated, please switch to using `Selection.deselect` instead.')
+    logger.deprecate('0.17.0', 'The `Selection.unset` method is deprecated, please switch to using `Selection.deselect` instead.')
     return this.deselect()
   }
 
@@ -654,7 +654,7 @@ class Selection extends new Record(DEFAULTS) {
    */
 
   moveForward(n = 1) {
-    warn('The `Selection.moveForward(n)` method is deprecated, please switch to using `Selection.move(n)` instead.')
+    logger.deprecate('0.17.0', 'The `Selection.moveForward(n)` method is deprecated, please switch to using `Selection.move(n)` instead.')
     return this.move(n)
   }
 
@@ -666,7 +666,7 @@ class Selection extends new Record(DEFAULTS) {
    */
 
   moveBackward(n = 1) {
-    warn('The `Selection.moveBackward(n)` method is deprecated, please switch to using `Selection.move(-n)` (with a negative number) instead.')
+    logger.deprecate('0.17.0', 'The `Selection.moveBackward(n)` method is deprecated, please switch to using `Selection.move(-n)` (with a negative number) instead.')
     return this.move(0 - n)
   }
 
@@ -678,7 +678,7 @@ class Selection extends new Record(DEFAULTS) {
    */
 
   moveAnchorOffset(n = 1) {
-    warn('The `Selection.moveAnchorOffset(n)` method is deprecated, please switch to using `Selection.moveAnchor(n)` instead.')
+    logger.deprecate('0.17.0', 'The `Selection.moveAnchorOffset(n)` method is deprecated, please switch to using `Selection.moveAnchor(n)` instead.')
     return this.moveAnchor(n)
   }
 
@@ -690,7 +690,7 @@ class Selection extends new Record(DEFAULTS) {
    */
 
   moveFocusOffset(n = 1) {
-    warn('The `Selection.moveFocusOffset(n)` method is deprecated, please switch to using `Selection.moveFocus(n)` instead.')
+    logger.deprecate('0.17.0', 'The `Selection.moveFocusOffset(n)` method is deprecated, please switch to using `Selection.moveFocus(n)` instead.')
     return this.moveFocus(n)
   }
 
@@ -702,7 +702,7 @@ class Selection extends new Record(DEFAULTS) {
    */
 
   moveStartOffset(n = 1) {
-    warn('The `Selection.moveStartOffset(n)` method is deprecated, please switch to using `Selection.moveStart(n)` instead.')
+    logger.deprecate('0.17.0', 'The `Selection.moveStartOffset(n)` method is deprecated, please switch to using `Selection.moveStart(n)` instead.')
     return this.moveStart(n)
   }
 
@@ -714,7 +714,7 @@ class Selection extends new Record(DEFAULTS) {
    */
 
   moveEndOffset(n = 1) {
-    warn('The `Selection.moveEndOffset(n)` method is deprecated, please switch to using `Selection.moveEnd(n)` instead.')
+    logger.deprecate('0.17.0', 'The `Selection.moveEndOffset(n)` method is deprecated, please switch to using `Selection.moveEnd(n)` instead.')
     return this.moveEnd(n)
   }
 
@@ -726,7 +726,7 @@ class Selection extends new Record(DEFAULTS) {
    */
 
   extendForward(n = 1) {
-    warn('The `Selection.extendForward(n)` method is deprecated, please switch to using `Selection.extend(n)` instead.')
+    logger.deprecate('0.17.0', 'The `Selection.extendForward(n)` method is deprecated, please switch to using `Selection.extend(n)` instead.')
     return this.extend(n)
   }
 
@@ -738,7 +738,7 @@ class Selection extends new Record(DEFAULTS) {
    */
 
   extendBackward(n = 1) {
-    warn('The `Selection.extendBackward(n)` method is deprecated, please switch to using `Selection.extend(-n)` (with a negative number) instead.')
+    logger.deprecate('0.17.0', 'The `Selection.extendBackward(n)` method is deprecated, please switch to using `Selection.extend(-n)` (with a negative number) instead.')
     return this.extend(0 - n)
   }
 
@@ -751,7 +751,7 @@ class Selection extends new Record(DEFAULTS) {
    */
 
   moveToOffsets(anchorOffset, focusOffset = anchorOffset) {
-    warn('The `Selection.moveToOffsets` method is deprecated, please switch to using `Selection.moveOffsetsTo` instead.')
+    logger.deprecate('0.17.0', 'The `Selection.moveToOffsets` method is deprecated, please switch to using `Selection.moveOffsetsTo` instead.')
     return this.moveOffsetsTo(anchorOffset, focusOffset)
   }
 

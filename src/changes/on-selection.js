@@ -1,7 +1,7 @@
 
 import Normalize from '../utils/normalize'
+import logger from '../utils/logger'
 import pick from 'lodash/pick'
-import warn from '../utils/warn'
 
 /**
  * Changes.
@@ -108,7 +108,7 @@ Changes.snapshotSelection = (change) => {
  */
 
 Changes.moveTo = (change, properties) => {
-  warn('The `moveTo()` change is deprecated, please use `select()` instead.')
+  logger.deprecate('0.17.0', 'The `moveTo()` change is deprecated, please use `select()` instead.')
   change.select(properties)
 }
 
@@ -119,7 +119,7 @@ Changes.moveTo = (change, properties) => {
  */
 
 Changes.unsetMarks = (change) => {
-  warn('The `unsetMarks()` change is deprecated.')
+  logger.deprecate('0.17.0', 'The `unsetMarks()` change is deprecated.')
   change.select({ marks: null })
 }
 
@@ -130,7 +130,7 @@ Changes.unsetMarks = (change) => {
  */
 
 Changes.unsetSelection = (change) => {
-  warn('The `unsetSelection()` change is deprecated, please use `deselect()` instead.')
+  logger.deprecate('0.17.0', 'The `unsetSelection()` change is deprecated, please use `deselect()` instead.')
   change.select({
     anchorKey: null,
     anchorOffset: 0,
@@ -270,7 +270,7 @@ const DEPRECATED_TRANSFORMS = [
 
 DEPRECATED_TRANSFORMS.forEach(([ old, current, warning ]) => {
   Changes[old] = (change, ...args) => {
-    warn(warning)
+    logger.deprecate('0.17.0', warning)
     const { state } = change
     const { document, selection } = state
     const sel = selection[current](...args).normalize(document)

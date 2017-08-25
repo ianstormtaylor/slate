@@ -2,7 +2,7 @@
 import Debug from 'debug'
 import Changes from '../changes'
 import apply from '../operations/apply'
-import warn from '../utils/warn'
+import logger from '../utils/logger'
 
 /**
  * Debug.
@@ -111,7 +111,7 @@ class Change {
    */
 
   apply(options = {}) {
-    warn('The `change.apply()` method is deprecrated and no longer necessary, as all operations are applied immediately when invoked. You can access the change\'s state, which is already pre-computed, directly via `change.state` instead.')
+    logger.deprecate('0.22.0', 'The `change.apply()` method is deprecrated and no longer necessary, as all operations are applied immediately when invoked. You can access the change\'s state, which is already pre-computed, directly via `change.state` instead.')
     return this.state
   }
 
@@ -172,14 +172,14 @@ Object.keys(Changes).forEach((type) => {
 ].forEach((getter) => {
   Object.defineProperty(Change.prototype, getter, {
     get() {
-      warn(`You attempted to access the \`${getter}\` property of what was previously a \`state\` object but is now a \`change\` object. This syntax has been deprecated as plugins are now passed \`change\` objects instead of \`state\` objects.`)
+      logger.deprecate('0.22.0', `You attempted to access the \`${getter}\` property of what was previously a \`state\` object but is now a \`change\` object. This syntax has been deprecated as plugins are now passed \`change\` objects instead of \`state\` objects.`)
       return this.state[getter]
     }
   })
 })
 
 Change.prototype.transform = function () {
-  warn('You attempted to call `.transform()` on what was previously a `state` object but is now already a `change` object. This syntax has been deprecated as plugins are now passed `change` objects instead of `state` objects.')
+  logger.deprecate('0.22.0', 'You attempted to call `.transform()` on what was previously a `state` object but is now already a `change` object. This syntax has been deprecated as plugins are now passed `change` objects instead of `state` objects.')
   return this
 }
 

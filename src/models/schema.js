@@ -3,8 +3,8 @@ import MODEL_TYPES from '../constants/model-types'
 import React from 'react'
 import find from 'lodash/find'
 import isReactComponent from '../utils/is-react-component'
+import logger from '../utils/logger'
 import typeOf from 'type-of'
-import warn from '../utils/warn'
 import { Record } from 'immutable'
 
 /**
@@ -173,7 +173,7 @@ function normalizeProperties(properties) {
   }
 
   if (properties.transform) {
-    warn('The `schema.transform` property has been deprecated in favor of `schema.change`.')
+    logger.deprecate('0.22.0', 'The `schema.transform` property has been deprecated in favor of `schema.change`.')
     properties.change = properties.transform
     delete properties.transform
   }

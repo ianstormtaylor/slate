@@ -5,7 +5,7 @@ import Change from './change'
 import Document from './document'
 import History from './history'
 import Selection from './selection'
-import warn from '../utils/warn'
+import logger from '../utils/logger'
 import { Record, Set, List, Map } from 'immutable'
 
 /**
@@ -482,7 +482,7 @@ class State extends new Record(DEFAULTS) {
    */
 
   transform(...args) {
-    warn('The `state.transform()` method has been deprecated in favor of `state.change()`.')
+    logger.deprecate('0.22.0', 'The `state.transform()` method has been deprecated in favor of `state.change()`.')
     return this.change(...args)
   }
 
