@@ -6,7 +6,7 @@ import Data from '../models/data'
 import Mark from '../models/mark'
 import Selection from '../models/selection'
 import Text from '../models/text'
-import warn from './warn'
+import logger from './logger'
 import typeOf from 'type-of'
 import { Set } from 'immutable'
 
@@ -112,7 +112,7 @@ function node(value) {
 function key(value) {
   if (typeOf(value) == 'string') return value
 
-  warn('An object was passed to a Node method instead of a `key` string. This was previously supported, but is being deprecated because it can have a negative impact on performance. The object in question was:', value)
+  logger.warn('An object was passed to a Node method instead of a `key` string. This was previously supported, but is being deprecated because it can have a negative impact on performance. The object in question was:', value)
 
   if (Block.isBlock(value)) return value.key
   if (Document.isDocument(value)) return value.key
