@@ -852,6 +852,7 @@ function Plugin(options = {}) {
         onCut={editor.onCut}
         onDrop={editor.onDrop}
         onKeyDown={editor.onKeyDown}
+        onKeyUp={editor.onKeyUp}
         onPaste={editor.onPaste}
         onSelect={editor.onSelect}
         readOnly={props.readOnly}

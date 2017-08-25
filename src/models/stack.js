@@ -27,6 +27,7 @@ const METHODS = [
   'onDrop',
   'onFocus',
   'onKeyDown',
+  'onKeyUp',
   'onPaste',
   'onSelect',
   'onChange',
