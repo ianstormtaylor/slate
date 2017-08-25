@@ -42,7 +42,7 @@ class Change {
       merge: attrs.merge === undefined ? null : attrs.merge,
     }
 
-    this.setIsNative(false)
+    this.setIsNative(attrs.isNative === undefined ? false : attrs.isNative)
   }
 
   /**
