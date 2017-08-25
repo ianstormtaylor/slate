@@ -16,6 +16,7 @@ When the editor needs to resolve a plugin-related handler, it will loop through 
   - [`onCut`](#oncut)
   - [`onDrop`](#ondrop)
   - [`onKeyDown`](#onkeydown)
+  - [`onKeyUp`](#onkeyup)
   - [`onPaste`](#onpaste)
   - [`onSelect`](#onselect)
 - [Other Properties](#other-properties)
@@ -49,6 +50,7 @@ export default function MySlatePlugin(options) {
   onCut: Function,
   onDrop: Function,
   onKeyDown: Function,
+  onKeyUp: Function,
   onPaste: Function,
   onSelect: Function
 }
@@ -162,6 +164,13 @@ The `isModAlt` boolean is `true` if the `control` key was pressed on Windows or 
 The `isLine` and `isWord` booleans represent whether the "line modifier" or "word modifier" hotkeys are pressed when deleting or moving the cursor. For example, on a Mac `option + right` moves the cursor to the right one word at a time.
 
 Make sure to `event.preventDefault()` (and return `state`) if you do not want the default insertion behavior to occur! If no other plugin handles this event, it will be handled by the [Core plugin](./core.md).
+
+### `onKeyUp`
+`Function onKeUp(event: Event, data: Object, state: State, editor: Editor) => State || Void`
+
+This handler is called when any key is released in the `contenteditable` element.
+
+The `data` object contains the same information as the `data` object of `onKeyDown`.
 
 ### `onPaste`
 `Function onPaste(event: Event, data: Object, state: State, editor: Editor) => State || Void`

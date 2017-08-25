@@ -27,6 +27,7 @@ const EVENT_HANDLER_METHODS = [
   'onCut',
   'onDrop',
   'onKeyDown',
+  'onKeyUp',
   'onPaste',
   'onSelect',
 ]
