@@ -18,6 +18,10 @@ import typeOf from 'type-of'
 
 function block(value) {
   if (Block.isBlock(value)) return value
+  if (Inline.isInline(value)) throw new Error(`Invalid \`block\` argument! It must be a block, an object, or a string. You passed: "${value}".`)
+  if (Mark.isMark(value)) throw new Error(`Invalid \`block\` argument! It must be a block, an object, or a string. You passed: "${value}".`)
+  if (Text.isText(value)) throw new Error(`Invalid \`block\` argument! It must be a block, an object, or a string. You passed: "${value}".`)
+  if (Selection.isSelection(value)) throw new Error(`Invalid \`block\` argument! It must be a block, an object, or a string. You passed: "${value}".`)
 
   switch (typeOf(value)) {
     case 'string':
@@ -38,6 +42,10 @@ function block(value) {
 
 function inline(value) {
   if (Inline.isInline(value)) return value
+  if (Block.isBlock(value)) throw new Error(`Invalid \`inline\` argument! It must be an inline, an object, or a string. You passed: "${value}".`)
+  if (Mark.isMark(value)) throw new Error(`Invalid \`inline\` argument! It must be an inline, an object, or a string. You passed: "${value}".`)
+  if (Text.isText(value)) throw new Error(`Invalid \`inline\` argument! It must be an inline, an object, or a string. You passed: "${value}".`)
+  if (Selection.isSelection(value)) throw new Error(`Invalid \`inline\` argument! It must be an inline, an object, or a string. You passed: "${value}".`)
 
   switch (typeOf(value)) {
     case 'string':
@@ -77,6 +85,10 @@ function key(value) {
 
 function mark(value) {
   if (Mark.isMark(value)) return value
+  if (Block.isBlock(value)) throw new Error(`Invalid \`mark\` argument! It must be a mark, an object, or a string. You passed: "${value}".`)
+  if (Inline.isInline(value)) throw new Error(`Invalid \`mark\` argument! It must be a mark, an object, or a string. You passed: "${value}".`)
+  if (Text.isText(value)) throw new Error(`Invalid \`mark\` argument! It must be a mark, an object, or a string. You passed: "${value}".`)
+  if (Selection.isSelection(value)) throw new Error(`Invalid \`mark\` argument! It must be a mark, an object, or a string. You passed: "${value}".`)
 
   switch (typeOf(value)) {
     case 'string':
@@ -107,6 +119,8 @@ function markProperties(value = {}) {
       for (const k in value) {
         if (k == 'data') {
           if (value[k] !== undefined) ret[k] = Data.create(value[k])
+        } else if (k.startsWith('@@__')) {
+          return
         } else {
           ret[k] = value[k]
         }
@@ -140,6 +154,8 @@ function nodeProperties(value = {}) {
       for (const k in value) {
         if (k == 'data') {
           if (value[k] !== undefined) ret[k] = Data.create(value[k])
+        } else if (k.startsWith('@@__')) {
+          return
         } else {
           ret[k] = value[k]
         }
@@ -162,6 +178,11 @@ function nodeProperties(value = {}) {
 
 function selection(value) {
   if (Selection.isSelection(value)) return value
+  if (Mark.isMark(value)) throw new Error(`Invalid \`selection\` argument! It must be a selection or an object. You passed: "${value}".`)
+  if (Block.isBlock(value)) throw new Error(`Invalid \`selection\` argument! It must be a selection or an object. You passed: "${value}".`)
+  if (Inline.isInline(value)) throw new Error(`Invalid \`selection\` argument! It must be a selection or an object. You passed: "${value}".`)
+  if (Text.isText(value)) throw new Error(`Invalid \`selection\` argument! It must be a selection or an object. You passed: "${value}".`)
+  if (Selection.isSelection(value)) throw new Error(`Invalid \`selection\` argument! It must be a selection or an object. You passed: "${value}".`)
 
   switch (typeOf(value)) {
     case 'object':

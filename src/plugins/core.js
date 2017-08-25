@@ -1,7 +1,9 @@
 
 import Base64 from '../serializers/base-64'
 import Content from '../components/content'
+import Block from '../models/block'
 import Character from '../models/character'
+import Inline from '../models/inline'
 import Debug from 'debug'
 import getPoint from '../utils/get-point'
 import Placeholder from '../components/placeholder'
@@ -364,6 +366,7 @@ function Plugin(options = {}) {
 
     const { selection } = state
     let { node, target, isInternal } = data
+    const isInline = Inline.isInline(node)
 
     // If the drag is internal and the target is after the selection, it
     // needs to account for the selection's content being deleted.
@@ -380,12 +383,24 @@ function Plugin(options = {}) {
     const transform = state.transform()
 
     if (isInternal) transform.delete()
+    if (isInline && !node.isVoid) return
 
-    return transform
-      .select(target)
-      .insertBlock(node)
-      .removeNodeByKey(node.key)
-      .apply()
+    switch (true) {
+      case Block.isBlock(node):
+        return transform
+          .select(target)
+          .insertBlock(node)
+          .removeNodeByKey(node.key)
+          .apply()
+      case Inline.isInline(node):
+        return transform
+          .select(target)
+          .insertInline(node)
+          .removeNodeByKey(node.key)
+          .apply()
+      default:
+        return
+    }
   }
 
   /**
