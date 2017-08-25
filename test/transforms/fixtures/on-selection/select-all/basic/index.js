@@ -7,7 +7,6 @@ export default function (state) {
   const next = state
     .transform()
     .selectAll(selection)
-    .apply()
     .state
 
   const sel = selection.merge({

@@ -17,7 +17,6 @@ export default function (state) {
     .transform()
     .select(range)
     .splitBlock()
-    .apply()
     .state
 
   const updated = next.document.getTexts().last()

@@ -119,7 +119,6 @@ describe('transforms', async () => {
             const expected = await readYaml(resolve(testDir, 'output.yaml'))
 
             let state = Raw.deserialize(input, { terse: true })
-            debugger
             state = fn(state)
             const output = Raw.serialize(state, { terse: true })
             assert.deepEqual(strip(output), strip(expected))

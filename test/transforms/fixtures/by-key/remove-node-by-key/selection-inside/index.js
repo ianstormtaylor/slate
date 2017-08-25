@@ -18,7 +18,6 @@ export default function (state) {
     .transform()
     .select(nextSelection)
     .removeNodeByKey('todelete')
-    .apply()
     .state
 
   assert.deepEqual(

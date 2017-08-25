@@ -11,6 +11,5 @@ export default function (state) {
   return state
     .transform()
     .call(insertCustomBlock)
-    .apply()
     .state
 }

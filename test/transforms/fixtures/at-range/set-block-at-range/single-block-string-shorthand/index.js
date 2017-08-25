@@ -13,6 +13,5 @@ export default function (state) {
   return state
     .transform()
     .setBlockAtRange(range, 'code')
-    .apply()
     .state
 }

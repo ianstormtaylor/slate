@@ -14,7 +14,6 @@ export default function (state) {
   const next = state
     .transform()
     .select(props)
-    .apply()
     .state
 
   assert.deepEqual(

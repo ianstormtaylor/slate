@@ -8,6 +8,7 @@ import Selection from '../models/selection'
 import Text from '../models/text'
 import warn from './warn'
 import typeOf from 'type-of'
+import { Set } from 'immutable'
 
 /**
  * Normalize a block argument `value`.
@@ -142,6 +143,22 @@ function mark(value) {
   }
 }
 
+function marks(values) {
+  if (Set.isSet(values)) return values
+
+  switch (typeOf(values)) {
+    case 'array': {
+      return Mark.createSet(values)
+    }
+    case 'null': {
+      return null
+    }
+    default: {
+      throw new Error('error')
+    }
+  }
+}
+
 /**
  * Normalize a mark properties argument `value`.
  *
@@ -270,6 +287,7 @@ export default {
   node,
   key,
   mark,
+  marks,
   markProperties,
   nodeProperties,
   selection,

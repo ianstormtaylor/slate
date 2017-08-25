@@ -77,7 +77,6 @@ class Emojis extends React.Component {
         isVoid: true,
         data: { code }
       })
-      .apply()
 
     this.onChange(transform)
   }

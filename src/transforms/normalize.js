@@ -1,7 +1,6 @@
 
 import Normalize from '../utils/normalize'
 import Schema from '../models/schema'
-import warn from '../utils/warn'
 import { Set } from 'immutable'
 
 /**
@@ -21,7 +20,6 @@ const Transforms = {}
 
 Transforms.normalize = (transform, schema) => {
   transform.normalizeDocument(schema)
-  transform.normalizeSelection(schema)
 }
 
 /**
@@ -57,58 +55,6 @@ Transforms.normalizeNodeByKey = (transform, key, schema) => {
   const node = document.assertNode(key)
 
   normalizeNodeAndChildren(transform, node, schema)
-}
-
-/**
- * Normalize the selection.
- *
- * @param {Transform} transform
- */
-
-Transforms.normalizeSelection = (transform) => {
-  let { state } = transform
-  let { document, selection } = state
-  const { anchorKey, focusKey } = selection
-  const first = document.getFirstText()
-
-  // If document is empty, return
-  if (document.nodes.size === 0) {
-    return
-  }
-
-  selection = selection.normalize(document)
-
-  // If the selection points to nodes that no longer exist, log a warning and
-  // reset the selection.
-  if (
-    (!selection.isUnset) &&
-    (!document.hasDescendant(anchorKey) || !document.hasDescendant(focusKey))
-  ) {
-    warn('The selection was invalid and was reset to start of the document. The selection in question was:', selection)
-
-    selection = selection.merge({
-      anchorKey: null,
-      anchorOffset: 0,
-      focusKey: null,
-      focusOffset: 0,
-      isBackward: false,
-    })
-  }
-
-  // If the selection is unset and there is a text node in the document, set the
-  // selection to the start of the text node.
-  if (selection.isUnset && first) {
-    selection = selection.merge({
-      anchorKey: first.key,
-      anchorOffset: 0,
-      focusKey: first.key,
-      focusOffset: 0,
-      isBackward: false,
-    })
-  }
-
-  state = state.set('selection', selection)
-  transform.state = state
 }
 
 /**

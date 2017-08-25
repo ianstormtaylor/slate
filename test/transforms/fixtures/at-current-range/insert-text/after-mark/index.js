@@ -16,7 +16,6 @@ export default function (state) {
     .transform()
     .select(range)
     .insertText('a')
-    .apply()
     .state
 
   assert.deepEqual(

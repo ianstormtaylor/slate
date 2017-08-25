@@ -1,5 +1,6 @@
 
 import Normalize from '../utils/normalize'
+import pick from 'lodash/pick'
 import warn from '../utils/warn'
 
 /**
@@ -21,9 +22,11 @@ Transforms.select = (transform, properties, options = {}) => {
   properties = Normalize.selectionProperties(properties)
 
   const { state } = transform
-  const { document } = state
-  const sel = state.selection.toJSON()
+  const { document, selection } = state
   const props = {}
+  const sel = selection.toJSON()
+  const next = selection.merge(properties).normalize(document)
+  properties = pick(next, Object.keys(properties))
 
   // Remove any properties that are already equal to the current selection. And
   // create a dictionary of the previous values for all of the properties that

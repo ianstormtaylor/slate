@@ -17,6 +17,5 @@ export default function (state) {
         data: { key: false }
       }
     )
-    .apply()
     .state
 }

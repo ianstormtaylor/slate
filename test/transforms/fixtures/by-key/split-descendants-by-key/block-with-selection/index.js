@@ -15,7 +15,6 @@ export default function (state) {
     .transform()
     .select(range)
     .splitDescendantsByKey('a', 'b', 2)
-    .apply()
     .state
 
 

@@ -16,6 +16,5 @@ export default function (state) {
       type: 'quote',
       data: { key: 'value' }
     })
-    .apply()
     .state
 }

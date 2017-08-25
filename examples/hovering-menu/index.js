@@ -83,7 +83,6 @@ class HoveringMenu extends React.Component {
     const transform = this.state.state
       .transform()
       .toggleMark(type)
-      .apply()
     this.onChange(transform)
   }
 

@@ -18,7 +18,6 @@ export default function (state) {
     .transform()
     .select(nextSelection)
     .insertTextByKey(secondText.key, 2, 'XX', [ { type: 'bold' } ])
-    .apply()
     .state
 
   assert.deepEqual(

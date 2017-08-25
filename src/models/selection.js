@@ -570,14 +570,8 @@ class Selection extends new Record(DEFAULTS) {
     const selection = this
     let { anchorKey, anchorOffset, focusKey, focusOffset, isBackward } = selection
 
-    // If the selection isn't formed yet or is malformed, ensure that it is
-    // properly zeroed out.
-    if (
-      anchorKey == null ||
-      focusKey == null ||
-      !node.hasDescendant(anchorKey) ||
-      !node.hasDescendant(focusKey)
-    ) {
+    // If the selection is unset, make sure it is properly zeroed out.
+    if (anchorKey == null || focusKey == null) {
       return selection.merge({
         anchorKey: null,
         anchorOffset: 0,
@@ -590,6 +584,19 @@ class Selection extends new Record(DEFAULTS) {
     // Get the anchor and focus nodes.
     let anchorNode = node.getDescendant(anchorKey)
     let focusNode = node.getDescendant(focusKey)
+
+    // If the selection is malformed, warn and zero it out.
+    if (!anchorNode || !focusNode) {
+      warn('The selection was invalid and was reset. The selection in question was:', selection)
+      const first = node.getFirstText()
+      return selection.merge({
+        anchorKey: first ? first.key : null,
+        anchorOffset: 0,
+        focusKey: first ? first.key : null,
+        focusOffset: 0,
+        isBackward: false,
+      })
+    }
 
     // If the anchor node isn't a text node, match it to one.
     if (anchorNode.kind != 'text') {

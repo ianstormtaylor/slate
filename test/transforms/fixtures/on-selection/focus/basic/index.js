@@ -10,7 +10,6 @@ export default function (state) {
   const next = state
     .transform()
     .focus()
-    .apply()
     .state
 
   assert.deepEqual(

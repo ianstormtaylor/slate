@@ -18,6 +18,5 @@ export default function (state) {
       type: 'bold',
       data: { key: 'value' }
     }))
-    .apply()
     .state
 }

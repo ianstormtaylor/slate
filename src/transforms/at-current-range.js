@@ -18,6 +18,7 @@ const Transforms = {}
 
 Transforms.addMark = (transform, mark) => {
   mark = Normalize.mark(mark)
+
   const { state } = transform
   const { document, selection } = state
 
@@ -253,6 +254,7 @@ Transforms.insertText = (transform, text, marks) => {
   const { state } = transform
   const { document, selection } = state
   marks = marks || selection.marks
+
   transform.insertTextAtRange(selection, text, marks)
 
   // If the text was successfully inserted, and the selection had marks on it,

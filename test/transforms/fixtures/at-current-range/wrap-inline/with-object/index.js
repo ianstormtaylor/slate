@@ -19,7 +19,6 @@ export default function (state) {
       type: 'hashtag',
       data: { key: 'value' }
     })
-    .apply()
     .state
 
   const nexts = next.document.getTexts()

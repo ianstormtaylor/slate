@@ -15,7 +15,6 @@ export default function (state) {
     .wrapInlineAtRange(range, {
       type: 'link'
     })
-    .apply()
     .state
 
   return next

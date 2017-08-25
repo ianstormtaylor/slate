@@ -17,7 +17,6 @@ export default function (state) {
     .transform()
     .select(range)
     .unwrapBlock('quote')
-    .apply()
     .state
 
   const updated = next.document.getTexts().get(2)

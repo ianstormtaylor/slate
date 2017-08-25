@@ -6,6 +6,5 @@ export default function (state) {
   return state
     .transform()
     .moveNodeByKey(first.key, document.key, 1)
-    .apply()
     .state
 }

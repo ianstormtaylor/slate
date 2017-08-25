@@ -7,6 +7,5 @@ export default function (state) {
   return state
     .transform()
     .insertNodeByKey(document.key, 0, Block.create({ type: 'paragraph' }))
-    .apply()
     .state
 }

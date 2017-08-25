@@ -13,6 +13,5 @@ export default function (state) {
   return state
     .transform()
     .splitInlineAtRange(range, 1)
-    .apply()
     .state
 }

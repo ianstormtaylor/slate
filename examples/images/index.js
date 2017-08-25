@@ -184,7 +184,6 @@ class Images extends React.Component {
     const transform = this.state.state
       .transform()
       .call(insertImage, src)
-      .apply()
 
     this.onChange(transform)
   }

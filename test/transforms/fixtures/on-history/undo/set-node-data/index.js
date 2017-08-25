@@ -7,12 +7,10 @@ export default function (state) {
     .setNodeByKey(document.nodes.first().key, {
         data: { src: 'world.png' }
     })
-    .apply()
     .state
 
     .transform()
     .undo()
-    .apply()
     .state
 
   return next

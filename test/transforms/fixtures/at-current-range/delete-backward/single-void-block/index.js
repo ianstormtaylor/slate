@@ -6,6 +6,5 @@ export default function (state) {
     .transform()
     .collapseToEndOf(nodeToBeFocused)
     .deleteBackward()
-    .apply()
     .state
 }

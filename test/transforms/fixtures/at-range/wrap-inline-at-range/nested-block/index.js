@@ -13,6 +13,5 @@ export default function (state) {
   return state
     .transform()
     .wrapInlineAtRange(range, 'hashtag')
-    .apply()
     .state
 }

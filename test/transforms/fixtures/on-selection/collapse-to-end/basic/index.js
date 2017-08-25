@@ -15,7 +15,6 @@ export default function (state) {
       focusOffset: second.text.length
     })
     .collapseToEnd()
-    .apply()
     .state
 
   assert.deepEqual(next.selection.toJS(), {

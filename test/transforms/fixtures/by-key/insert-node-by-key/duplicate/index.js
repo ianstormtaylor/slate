@@ -8,7 +8,6 @@ export default function (state) {
   const next = state
     .transform()
     .insertNodeByKey(document.key, 0, first)
-    .apply()
     .state
 
   const one = next.document.getBlocks().first()

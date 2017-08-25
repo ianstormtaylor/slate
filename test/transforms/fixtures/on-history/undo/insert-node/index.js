@@ -8,12 +8,10 @@ export default function (state) {
   let next = state
     .transform()
     .insertNodeByKey('key1', 0, Block.create({ type: 'default' }))
-    .apply()
     .state
 
     .transform()
     .undo()
-    .apply()
     .state
 
   assert.deepEqual(next.selection.toJS(), selection.toJS())

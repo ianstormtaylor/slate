@@ -19,7 +19,6 @@ export default function (state) {
       type: 'code',
       data: { key: 'value' }
     })
-    .apply()
     .state
 
   assert.deepEqual(

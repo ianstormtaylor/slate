@@ -9,7 +9,6 @@ export default function (state) {
   const next = state
     .transform()
     .collapseToEnd()
-    .apply()
     .state
 
   assert.deepEqual(next.selection.toJS(), {

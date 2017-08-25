@@ -16,6 +16,5 @@ export default function (state) {
       type: 'image',
       isVoid: true
     })
-    .apply()
     .state
 }

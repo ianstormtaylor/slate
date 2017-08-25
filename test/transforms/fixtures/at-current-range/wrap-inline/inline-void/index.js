@@ -18,7 +18,6 @@ export default function (state) {
     .wrapInline({
       type: 'link'
     })
-    .apply()
     .state
 
   assert.deepEqual(

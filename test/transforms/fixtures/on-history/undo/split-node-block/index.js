@@ -7,13 +7,11 @@ export default function (state) {
   let next = state
     .transform()
     .splitNodeByKey('key1', 3)
-    .apply()
     .state
 
   next = next
     .transform()
     .undo()
-    .apply()
     .state
 
   assert.deepEqual(next.selection.toJS(), selection.toJS())

@@ -17,7 +17,6 @@ export default function (state) {
     .transform()
     .select(range)
     .deleteBackward()
-    .apply()
     .state
 
   const updated = next.document.getTexts().first()

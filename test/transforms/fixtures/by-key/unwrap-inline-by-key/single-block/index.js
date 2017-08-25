@@ -8,7 +8,6 @@ export default function (state) {
   const next = state
     .transform()
     .unwrapInlineByKey(inline.key, 'hashtag')
-    .apply()
     .state
 
   return next

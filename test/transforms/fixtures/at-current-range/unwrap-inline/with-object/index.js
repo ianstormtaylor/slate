@@ -19,7 +19,6 @@ export default function (state) {
       type: 'hashtag',
       data: { key: 'one' }
     })
-    .apply()
     .state
 
   assert.deepEqual(

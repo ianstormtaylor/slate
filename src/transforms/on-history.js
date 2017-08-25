@@ -10,96 +10,22 @@ import invert from '../operations/invert'
 const Transforms = {}
 
 /**
- * Set a save flag on the transform.
- *
- * @param {Transform} transform
- * @param {Boolean} value
- */
-
-Transforms.setSave = (transform, value) => {
-  transform._save = value
-}
-
-/**
- * Set a merge flag on the transform.
- *
- * @param {Transform} transform
- * @param {Boolean} value
- */
-
-Transforms.setMerge = (transform, value) => {
-  transform._merge = value
-}
-
-/**
  * Redo to the next state in the history.
  *
  * @param {Transform} transform
  */
 
 Transforms.redo = (transform) => {
-  let { state } = transform
-  let { history } = state
-  let { undos, redos } = history
+  const { state } = transform
+  const { history } = state
+  if (!history) return
 
-  // If there's no next snapshot, abort.
-  const next = redos.peek()
-  if (!next) return
+  const operations = history.forward()
+  if (!operations) return
 
-  // Shift the next state into the undo stack.
-  redos = redos.pop()
-  undos = undos.push(next)
-
-  // Replay the next operations.
-  next.forEach((op) => {
-    transform.applyOperation(op)
+  operations.forEach((op) => {
+    transform.applyOperation(op, { save: false })
   })
-
-  // Update the history.
-  state = transform.state
-  history = history.set('undos', undos).set('redos', redos)
-  state = state.set('history', history)
-
-  // Update the transform.
-  transform.state = state
-}
-
-/**
- * Commit the operations into the history.
- *
- * @param {Transform} transform
- * @param {Object} options
- */
-
-Transforms.commit = (transform, options = {}) => {
-  const { merge = false } = options
-  let { state, operations } = transform
-  let { history } = state
-  let { undos, redos } = history
-  let previous = undos.peek()
-
-  // If there are no operations, abort.
-  if (!operations.length) return
-
-  // Create a new save point or merge the operations into the previous one.
-  if (merge && previous) {
-    undos = undos.pop()
-    previous = previous.concat(operations)
-    undos = undos.push(previous)
-  } else {
-    undos = undos.push(operations)
-  }
-
-  // Clear the redo stack and constrain the undos stack.
-  if (undos.size > 100) undos = undos.take(100)
-  redos = redos.clear()
-
-  // Update the state.
-  history = history.set('undos', undos).set('redos', redos)
-  state = state.set('history', history)
-
-  // Update the transform.
-  transform.state = state
 }
 
 /**
@@ -109,30 +35,16 @@ Transforms.commit = (transform, options = {}) => {
  */
 
 Transforms.undo = (transform) => {
-  let { state } = transform
-  let { history } = state
-  let { undos, redos } = history
+  const { state } = transform
+  const { history } = state
+  if (!history) return
 
-  // If there's no previous snapshot, abort.
-  const previous = undos.peek()
-  if (!previous) return
+  const operations = history.back()
+  if (!operations) return
 
-  // Shift the previous operations into the redo stack.
-  undos = undos.pop()
-  redos = redos.push(previous)
-
-  // Replay the inverse of the previous operations.
-  previous.slice().reverse().map(invert).forEach((inverse) => {
-    transform.applyOperation(inverse)
+  operations.slice().reverse().map(invert).forEach((inverse) => {
+    transform.applyOperation(inverse, { save: false })
   })
-
-  // Update the history.
-  state = transform.state
-  history = history.set('undos', undos).set('redos', redos)
-  state = state.set('history', history)
-
-  // Update the transform.
-  transform.state = state
 }
 
 /**

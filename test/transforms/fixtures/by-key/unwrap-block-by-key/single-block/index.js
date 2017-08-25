@@ -6,6 +6,5 @@ export default function (state) {
   return state
     .transform()
     .unwrapBlockByKey(block.key, 'quote')
-    .apply()
     .state
 }

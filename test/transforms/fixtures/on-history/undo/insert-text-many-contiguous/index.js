@@ -10,17 +10,14 @@ export default function (state) {
     .transform()
     .collapseToStartOf(first)
     .insertText('text')
-    .apply()
     .state
 
     .transform()
     .insertText('text')
-    .apply()
     .state
 
     .transform()
     .undo()
-    .apply()
     .state
 
   return next

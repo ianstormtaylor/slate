@@ -7,6 +7,5 @@ export default function (state) {
   return state
     .transform()
     .wrapBlockAtRange(range, 'bulleted-list')
-    .apply()
     .state
 }

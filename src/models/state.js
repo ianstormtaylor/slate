@@ -64,10 +64,8 @@ class State extends new Record(DEFAULTS) {
 
     if (options.normalize !== false) {
       state = state
-        .transform()
+        .transform({ save: false })
         .normalize(SCHEMA)
-        .setSave(false)
-        .apply()
         .state
     }
 
@@ -102,7 +100,7 @@ class State extends new Record(DEFAULTS) {
    */
 
   get hasUndos() {
-    return this.history.undos.size > 0
+    return this.history.undos.length > 0
   }
 
   /**
@@ -112,7 +110,7 @@ class State extends new Record(DEFAULTS) {
    */
 
   get hasRedos() {
-    return this.history.redos.size > 0
+    return this.history.redos.length > 0
   }
 
   /**

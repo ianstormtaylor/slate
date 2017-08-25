@@ -19,7 +19,6 @@ export default function (state) {
       type: 'image',
       isVoid: true
     })
-    .apply()
     .state
 
   const updated = next.document.getTexts().get(2)

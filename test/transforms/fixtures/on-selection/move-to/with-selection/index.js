@@ -13,7 +13,6 @@ export default function (state) {
   const next = state
     .transform()
     .select(sel)
-    .apply()
     .state
 
   assert.deepEqual(

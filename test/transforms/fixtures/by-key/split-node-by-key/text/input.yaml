@@ -1,10 +1,9 @@
 
 nodes:
   - kind: block
+    key: a
     type: paragraph
     nodes:
       - kind: text
-        key: 'anchor'
+        key: b
         text: onetwo
-# Selection
-# onet[w]o

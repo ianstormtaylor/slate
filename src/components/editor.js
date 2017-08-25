@@ -235,13 +235,12 @@ class Editor extends React.Component {
 
     const { onChange, onDocumentChange, onSelectionChange } = this.props
     const { document, selection } = this.tmp
-    transform.apply()
-    const next = transform.state
-    if (next == this.state.state) return
+    const { state } = transform
+    if (state == this.state.state) return
 
     onChange(transform)
-    if (next.document != document) onDocumentChange(next.document, transform)
-    if (next.selection != selection) onSelectionChange(next.selection, transform)
+    if (state.document != document) onDocumentChange(state.document, transform)
+    if (state.selection != selection) onSelectionChange(state.selection, transform)
   }
 
   /**

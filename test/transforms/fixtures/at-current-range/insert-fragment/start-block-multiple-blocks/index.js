@@ -23,7 +23,6 @@ export default function (state) {
     .transform()
     .select(range)
     .insertFragment(fragment)
-    .apply()
     .state
 
   const last = next.document.getTexts().last()

@@ -6,6 +6,5 @@ export default function (state) {
   return state
     .transform()
     .removeTextByKey(first.key, 3, 1)
-    .apply()
     .state
 }

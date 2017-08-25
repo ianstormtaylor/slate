@@ -8,7 +8,6 @@ export default function (state) {
     .transform()
     .focus()
     .blur()
-    .apply()
     .state
 
   assert.deepEqual(

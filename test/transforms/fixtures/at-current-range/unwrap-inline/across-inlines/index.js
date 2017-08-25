@@ -17,7 +17,6 @@ export default function (state) {
     .transform()
     .select(range)
     .unwrapInline('hashtag')
-    .apply()
     .state
 
   assert.deepEqual(

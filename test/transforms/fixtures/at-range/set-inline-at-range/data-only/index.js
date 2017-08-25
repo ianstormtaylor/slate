@@ -15,6 +15,5 @@ export default function (state) {
   return state
     .transform()
     .setInlineAtRange(range, { data: Data.create({ key: 'value' }) })
-    .apply()
     .state
 }

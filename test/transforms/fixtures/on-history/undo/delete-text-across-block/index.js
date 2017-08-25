@@ -13,13 +13,11 @@ export default function (state) {
   const first = state
     .transform()
     .deleteAtRange(range)
-    .apply()
     .state
 
   const next = first
     .transform()
     .undo()
-    .apply()
     .state
 
   assert.deepEqual(next.selection.toJS(), selection.toJS())

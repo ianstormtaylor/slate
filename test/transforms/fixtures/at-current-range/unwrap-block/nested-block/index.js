@@ -16,7 +16,6 @@ export default function (state) {
     .transform()
     .select(range)
     .unwrapBlock('quote')
-    .apply()
     .state
 
   assert.deepEqual(

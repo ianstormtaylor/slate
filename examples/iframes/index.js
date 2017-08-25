@@ -130,7 +130,6 @@ class Iframes extends React.Component {
     const transform = this.state.state
       .transform()
       .toggleMark(type)
-      .apply()
     this.onChange(transform)
   }
 
@@ -147,7 +146,6 @@ class Iframes extends React.Component {
     const transform = this.state.state
       .transform()
       .setBlock(isActive ? DEFAULT_NODE : type)
-      .apply()
     this.onChange(transform)
   }
 

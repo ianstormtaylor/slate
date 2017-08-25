@@ -16,7 +16,6 @@ export default function (state) {
     .transform()
     .select(range)
     .splitBlock(Infinity)
-    .apply()
     .state
 
   const updated = next.document.getTexts().last()

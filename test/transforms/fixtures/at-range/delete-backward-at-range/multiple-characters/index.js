@@ -13,6 +13,5 @@ export default function (state) {
   return state
     .transform()
     .deleteBackwardAtRange(range, 3)
-    .apply()
     .state
 }

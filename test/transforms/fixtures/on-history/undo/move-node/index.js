@@ -4,15 +4,18 @@ import assert from 'assert'
 export default function (state) {
   const { selection } = state
 
-  let next = state
+  const t1 = state
     .transform()
-    .moveNodeByKey('key2', 'key1', 0)
-    .apply()
+    .moveNodeByKey('d', 'a', 0)
+
+  const s1 = t1
     .state
 
+  const t2 = s1
     .transform()
     .undo()
-    .apply()
+
+  const next = t2
     .state
 
   assert.deepEqual(next.selection.toJS(), selection.toJS())

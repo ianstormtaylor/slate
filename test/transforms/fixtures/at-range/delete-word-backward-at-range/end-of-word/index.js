@@ -13,6 +13,5 @@ export default function (state) {
   return state
     .transform()
     .deleteWordBackwardAtRange(range)
-    .apply()
     .state
 }

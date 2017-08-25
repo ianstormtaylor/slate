@@ -16,7 +16,6 @@ export default function (state) {
     .transform()
     .select(range)
     .setInline('code')
-    .apply()
     .state
 
   assert.deepEqual(

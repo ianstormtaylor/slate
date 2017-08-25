@@ -17,7 +17,6 @@ export default function (state) {
     .transform()
     .select(range)
     .setInline({ data: Data.create({ key: 'value' }) })
-    .apply()
     .state
 
   assert.deepEqual(

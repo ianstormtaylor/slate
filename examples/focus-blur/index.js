@@ -57,7 +57,6 @@ class FocusBlur extends React.Component {
       const transform = this.state.state
         .transform()
         [name]()
-        .apply()
 
       this.onChange(transform)
     }, timeout)

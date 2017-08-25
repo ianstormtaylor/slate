@@ -6,6 +6,5 @@ export default function (state) {
   return state
     .transform()
     .setNodeByKey(first.key, { data: {key: 'bar'} })
-    .apply()
     .state
 }

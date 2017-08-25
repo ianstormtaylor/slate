@@ -17,7 +17,6 @@ export default function (state) {
     .select(range)
     .wrapInline('inner')
     .wrapInline('outer')
-    .apply()
     .state
 
   const anchor = next.document.getTexts().get(2)

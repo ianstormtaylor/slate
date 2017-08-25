@@ -16,6 +16,5 @@ export default function (state) {
       type: 'hashtag',
       data: { key: 'value' }
     })
-    .apply()
     .state
 }

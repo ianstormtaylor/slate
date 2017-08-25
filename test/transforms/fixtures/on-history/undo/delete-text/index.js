@@ -5,24 +5,27 @@ export default function (state) {
   const { document, selection } = state
   const texts = document.getTexts()
   const first = texts.first()
+  const range = selection.merge({
+    anchorKey: first.key,
+    anchorOffset: 0,
+    focusKey: first.key,
+    focusOffset: first.text.length
+  })
 
   const next = state
     .transform()
-    .select({
-      anchorKey: first.key,
-      anchorOffset: 0,
-      focusKey: first.key,
-      focusOffset: first.text.length
-    })
+    .select(range)
     .delete()
-    .apply()
     .state
 
     .transform()
     .undo()
-    .apply()
     .state
 
-  assert.deepEqual(next.selection.toJS(), selection.toJS())
+  assert.deepEqual(
+    next.selection.toJS(),
+    range.merge({ anchorOffset: 4 }).toJS(),
+  )
+
   return next
 }

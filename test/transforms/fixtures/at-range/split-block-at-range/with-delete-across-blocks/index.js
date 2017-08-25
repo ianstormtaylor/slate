@@ -14,6 +14,5 @@ export default function (state) {
   return state
     .transform()
     .splitBlockAtRange(range)
-    .apply()
     .state
 }

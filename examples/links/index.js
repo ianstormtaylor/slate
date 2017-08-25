@@ -117,7 +117,6 @@ class Links extends React.Component {
         .call(wrapLink, href)
     }
 
-    transform.apply()
     this.onChange(transform)
   }
 

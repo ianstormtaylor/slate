@@ -16,7 +16,6 @@ export default function (state) {
     .transform()
     .select(range)
     .splitInline(1)
-    .apply()
     .state
 
   const updated = next.document.getTexts().get(4)

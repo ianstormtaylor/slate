@@ -24,7 +24,6 @@ export default function (state) {
     .transform()
     .select(range)
     .insertFragment(fragment)
-    .apply()
     .state
 
   const updated = next.document.getTexts().get(1)

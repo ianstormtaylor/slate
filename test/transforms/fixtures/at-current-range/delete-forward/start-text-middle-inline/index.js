@@ -17,7 +17,6 @@ export default function (state) {
     .transform()
     .select(range)
     .deleteForward()
-    .apply()
     .state
 
   // TODO: fix this behavior.

@@ -23,7 +23,6 @@ export default function (state) {
     .transform()
     .select(range)
     .insertText('a', marks)
-    .apply()
     .state
 
   assert.deepEqual(

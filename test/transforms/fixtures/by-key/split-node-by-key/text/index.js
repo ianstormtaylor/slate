@@ -5,17 +5,16 @@ export default function (state) {
   const { selection } = state
 
   const range = selection.merge({
-    anchorKey: 'anchor',
+    anchorKey: 'b',
     anchorOffset: 4,
-    focusKey: 'anchor',
+    focusKey: 'b',
     focusOffset: 5
   })
 
   const next = state
     .transform()
     .select(range)
-    .splitNodeByKey('anchor', 3, { normalize: false })
-    .apply()
+    .splitNodeByKey('b', 3, { normalize: false })
     .state
 
   // The second text

@@ -1,14 +1,20 @@
 
 nodes:
   - kind: block
-    key: 'key1'
-    type: paragraph
+    key: a
+    type: quote
     nodes:
-      - kind: text
-        text: The
+      - kind: block
+        key: b
+        type: paragraph
+        nodes:
+          - kind: text
+            key: c
+            text: The
   - kind: block
-    key: 'key2'
+    key: d
     type: paragraph
     nodes:
       - kind: text
+        key: e
         text: text

@@ -16,7 +16,6 @@ export default function (state) {
     .transform()
     .select(range)
     .wrapText('[[', ']]')
-    .apply()
     .state
 
 

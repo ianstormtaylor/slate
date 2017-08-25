@@ -69,7 +69,10 @@ const APPLIERS = {
 
   insert_text(state, operation) {
     const { path, offset, text } = operation
-    const marks = operation.marks && operation.marks.map(Normalize.mark)
+
+    let { marks } = operation
+    if (Array.isArray(marks)) marks = Normalize.marks(marks)
+
     let { document, selection } = state
     const { anchorKey, focusKey, anchorOffset, focusOffset } = selection
     let node = document.assertPath(path)
@@ -116,13 +119,20 @@ const APPLIERS = {
     // update it to refer to the first node instead.
     if (one.kind == 'text') {
       const { anchorKey, anchorOffset, focusKey, focusOffset } = selection
+      let normalize = false
 
       if (anchorKey == two.key) {
         selection = selection.moveAnchorTo(one.key, one.text.length + anchorOffset)
+        normalize = true
       }
 
       if (focusKey == two.key) {
         selection = selection.moveFocusTo(one.key, one.text.length + focusOffset)
+        normalize = true
+      }
+
+      if (normalize) {
+        selection = selection.normalize(document)
       }
     }
 
@@ -224,6 +234,7 @@ const APPLIERS = {
     if (selection.isSet) {
       const hasStartNode = node.hasNode(startKey)
       const hasEndNode = node.hasNode(endKey)
+      let normalize = false
 
       // If one of the selection's nodes is being removed, we need to update it.
       if (hasStartNode) {
@@ -232,8 +243,10 @@ const APPLIERS = {
 
         if (prev) {
           selection = selection.moveStartTo(prev.key, prev.text.length)
+          normalize = true
         } else if (next) {
           selection = selection.moveStartTo(next.key, 0)
+          normalize = true
         } else {
           selection = selection.deselect()
         }
@@ -245,11 +258,17 @@ const APPLIERS = {
 
         if (prev) {
           selection = selection.moveEndTo(prev.key, prev.text.length)
+          normalize = true
         } else if (next) {
           selection = selection.moveEndTo(next.key, 0)
+          normalize = true
         } else {
           selection = selection.deselect()
         }
+      }
+
+      if (normalize) {
+        selection = selection.normalize(document)
       }
     }
 
@@ -374,6 +393,10 @@ const APPLIERS = {
     const properties = { ...operation.properties }
     let { document, selection } = state
 
+    if (properties.marks !== undefined) {
+      properties.marks = Normalize.marks(properties.marks)
+    }
+
     if (properties.anchorPath !== undefined) {
       properties.anchorKey = properties.anchorPath === null
         ? null
@@ -418,15 +441,24 @@ const APPLIERS = {
     // Determine whether we need to update the selection...
     const { startKey, endKey, startOffset, endOffset } = selection
     const next = document.getNextText(node.key)
+    let normalize = false
 
     // If the start point is after or equal to the split, update it.
     if (node.key == startKey && position <= startOffset) {
       selection = selection.moveStartTo(next.key, startOffset - position)
+      normalize = true
     }
 
     // If the end point is after or equal to the split, update it.
     if (node.key == endKey && position <= endOffset) {
       selection = selection.moveEndTo(next.key, endOffset - position)
+      normalize = true
+    }
+
+    // Normalize the selection if we changed it, since the methods we use might
+    // leave it in a non-normalized state.
+    if (normalize) {
+      selection = selection.normalize(document)
     }
 
     // Return the updated state.

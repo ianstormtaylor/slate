@@ -17,7 +17,6 @@ export default function (state) {
     .addMark('bold')
     .focus()
     .blur()
-    .apply()
     .state
 
   assert.deepEqual(

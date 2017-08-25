@@ -16,6 +16,5 @@ export default function (state) {
       type: 'emoji',
       isVoid: true
     })
-    .apply()
     .state
 }

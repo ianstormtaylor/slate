@@ -16,7 +16,6 @@ export default function (state) {
     .transform()
     .select(range)
     .deleteForward(3)
-    .apply()
     .state
 
   assert.deepEqual(

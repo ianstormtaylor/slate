@@ -750,7 +750,7 @@ function Plugin(options = {}) {
 
   function onKeyDownY(e, data, transform) {
     if (!data.isMod) return
-    transform.redo().setSave(false)
+    transform.redo()
   }
 
   /**
@@ -763,7 +763,7 @@ function Plugin(options = {}) {
 
   function onKeyDownZ(e, data, transform) {
     if (!data.isMod) return
-    transform[data.isShift ? 'redo' : 'undo']().setSave(false)
+    transform[data.isShift ? 'redo' : 'undo']()
   }
 
   /**
