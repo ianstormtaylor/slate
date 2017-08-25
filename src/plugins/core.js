@@ -162,6 +162,10 @@ function Plugin(options = {}) {
       // the cursor isn't technique in the right spot. (2016/12/01)
       (!(pInline && !pInline.isVoid && startOffset == 0)) &&
       (!(nInline && !nInline.isVoid && startOffset == startText.length)) &&
+      // COMPAT: When inserting a Space character, Chrome will sometimes
+      // split the text node into two adjacent text nodes. See:
+      // https://github.com/ianstormtaylor/slate/issues/938
+      (!(e.data === ' ' && IS_CHROME)) &&
       // If the
       (chars.equals(nextChars))
     )
@@ -958,6 +962,7 @@ function Plugin(options = {}) {
         state={state}
         style={props.style}
         tabIndex={props.tabIndex}
+        tagName={props.tagName}
       />
     )
   }
