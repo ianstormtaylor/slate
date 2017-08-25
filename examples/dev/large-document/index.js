@@ -79,7 +79,7 @@ class LargeDocument extends React.Component {
   /**
    * On change.
    *
-   * @param {Transform} transform
+   * @param {Change} change
    */
 
   onChange = ({ state }) => {
@@ -91,10 +91,10 @@ class LargeDocument extends React.Component {
    *
    * @param {Event} e
    * @param {Object} data
-   * @param {Transform} transform
+   * @param {Change} change
    */
 
-  onKeyDown = (e, data, transform) => {
+  onKeyDown = (e, data, change) => {
     if (!data.isMod) return
     let mark
 
@@ -115,8 +115,8 @@ class LargeDocument extends React.Component {
         return
     }
 
-    transform.toggleMark(mark)
     e.preventDefault()
+    change.toggleMark(mark)
     return true
   }
 

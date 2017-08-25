@@ -20,7 +20,7 @@ class CheckListItem extends React.Component {
   onChange = (e) => {
     const checked = e.target.checked
     const { editor, node } = this.props
-    editor.transform(t => t.setNodeByKey(node.key, { data: { checked }}))
+    editor.change(c => c.setNodeByKey(node.key, { data: { checked }}))
   }
 
   /**
@@ -88,7 +88,7 @@ class CheckLists extends React.Component {
   /**
    * On change, save the new state.
    *
-   * @param {Transform} transform
+   * @param {Change} change
    */
 
   onChange = ({ state }) => {
@@ -106,18 +106,18 @@ class CheckLists extends React.Component {
    *
    * @param {Event} e
    * @param {Object} data
-   * @param {Transform} transform
+   * @param {Change} change
    * @return {State|Void}
    */
 
-  onKeyDown = (e, data, transform) => {
-    const { state } = transform
+  onKeyDown = (e, data, change) => {
+    const { state } = change
 
     if (
       data.key == 'enter' &&
       state.startBlock.type == 'check-list-item'
     ) {
-      return transform
+      return change
         .splitBlock()
         .setBlock({ data: { checked: false }})
     }
@@ -128,7 +128,7 @@ class CheckLists extends React.Component {
       state.startBlock.type == 'check-list-item' &&
       state.selection.startOffset == 0
     ) {
-      return transform
+      return change
         .setBlock('paragraph')
     }
   }

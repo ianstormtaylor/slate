@@ -1,10 +1,11 @@
 
+import MODEL_TYPES from '../constants/model-types'
 import React from 'react'
+import find from 'lodash/find'
 import isReactComponent from '../utils/is-react-component'
 import typeOf from 'type-of'
-import MODEL_TYPES from '../constants/model-types'
+import warn from '../utils/warn'
 import { Record } from 'immutable'
-import find from 'lodash/find'
 
 /**
  * Default properties.
@@ -169,6 +170,12 @@ function normalizeProperties(properties) {
   if (marks) {
     const array = normalizeMarks(marks)
     rules = rules.concat(array)
+  }
+
+  if (properties.transform) {
+    warn('The `schema.transform` property has been deprecated in favor of `schema.change`.')
+    properties.change = properties.transform
+    delete properties.transform
   }
 
   return { rules }

@@ -68,11 +68,10 @@ class Editor extends React.Component {
     autoCorrect: Types.bool,
     autoFocus: Types.bool,
     className: Types.string,
-    onBeforeTransform: Types.func,
+    onBeforeChange: Types.func,
     onChange: Types.func,
     onDocumentChange: Types.func,
     onSelectionChange: Types.func,
-    onTransform: Types.func,
     placeholder: Types.any,
     placeholderClassName: Types.string,
     placeholderStyle: Types.object,
@@ -130,11 +129,11 @@ class Editor extends React.Component {
       const method = EVENT_HANDLERS[i]
       this[method] = (...args) => {
         const stk = this.state.stack
-        const transform = this.state.state.transform()
-        stk[method](transform, this, ...args)
-        stk.onBeforeTransform(transform, this)
-        stk.onTransform(transform, this)
-        this.onChange(transform)
+        const change = this.state.state.change()
+        stk[method](change, this, ...args)
+        stk.onBeforeChange(change, this)
+        stk.onChange(change, this)
+        this.onChange(change)
       }
     }
   }
@@ -179,7 +178,7 @@ class Editor extends React.Component {
    */
 
   blur = () => {
-    this.transform(t => t.blur())
+    this.change(t => t.blur())
   }
 
   /**
@@ -187,7 +186,7 @@ class Editor extends React.Component {
    */
 
   focus = () => {
-    this.transform(t => t.focus())
+    this.change(t => t.focus())
   }
 
   /**
@@ -211,36 +210,36 @@ class Editor extends React.Component {
   }
 
   /**
-   * Perform a transform `fn` on the editor's current state.
+   * Perform a change `fn` on the editor's current state.
    *
    * @param {Function} fn
    */
 
-  transform = (fn) => {
-    const transform = this.state.state.transform()
-    fn(transform)
-    this.onChange(transform)
+  change = (fn) => {
+    const change = this.state.state.change()
+    fn(change)
+    this.onChange(change)
   }
 
   /**
    * On change.
    *
-   * @param {Transform} transform
+   * @param {Change} change
    */
 
-  onChange = (transform) => {
-    if (State.isState(transform)) {
-      throw new Error('As of slate@0.21.0 the `editor.onChange` method must be passed a `Transform` not a `State`.')
+  onChange = (change) => {
+    if (State.isState(change)) {
+      throw new Error('As of slate@0.22.0 the `editor.onChange` method must be passed a `Change` object not a `State` object.')
     }
 
     const { onChange, onDocumentChange, onSelectionChange } = this.props
     const { document, selection } = this.tmp
-    const { state } = transform
+    const { state } = change
     if (state == this.state.state) return
 
-    onChange(transform)
-    if (state.document != document) onDocumentChange(state.document, transform)
-    if (state.selection != selection) onSelectionChange(state.selection, transform)
+    onChange(change)
+    if (state.document != document) onDocumentChange(state.document, change)
+    if (state.selection != selection) onSelectionChange(state.selection, change)
   }
 
   /**

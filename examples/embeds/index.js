@@ -37,7 +37,7 @@ class Embeds extends React.Component {
   /**
    * On change.
    *
-   * @param {Transform} transform
+   * @param {Change} change
    */
 
   onChange = ({ state }) => {

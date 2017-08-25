@@ -161,7 +161,7 @@ class PasteHtml extends React.Component {
   /**
    * On change, save the new state.
    *
-   * @param {Transform} transform
+   * @param {Change} change
    */
 
   onChange = ({ state }) => {
@@ -173,14 +173,14 @@ class PasteHtml extends React.Component {
    *
    * @param {Event} e
    * @param {Object} data
-   * @param {Transform} transform
+   * @param {Change} change
    */
 
-  onPaste = (e, data, transform) => {
+  onPaste = (e, data, change) => {
     if (data.type != 'html') return
     if (data.isShift) return
     const { document } = serializer.deserialize(data.html)
-    transform.insertFragment(document)
+    change.insertFragment(document)
     return true
   }
 

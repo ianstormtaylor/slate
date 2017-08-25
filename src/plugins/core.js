@@ -36,18 +36,18 @@ function Plugin(options = {}) {
   } = options
 
   /**
-   * On before transform, enforce the editor's schema.
+   * On before change, enforce the editor's schema.
    *
-   * @param {Transform} transform
+   * @param {Change} change
    * @param {Editor} schema
    */
 
-  function onBeforeTransform(transform, editor) {
-    const { state } = transform
+  function onBeforeChange(change, editor) {
+    const { state } = change
     const schema = editor.getSchema()
     const prevState = editor.getState()
 
-    // PERF: Skip normalizing if the transform is native, since we know that it
+    // PERF: Skip normalizing if the change is native, since we know that it
     // can't have changed anything that requires a core schema fix.
     if (state.isNative) return
 
@@ -55,8 +55,8 @@ function Plugin(options = {}) {
     // schema only normalizes changes to the document, not selection.
     if (prevState && state.document == prevState.document) return
 
-    transform.normalize(schema)
-    debug('onBeforeTransform')
+    change.normalize(schema)
+    debug('onBeforeChange')
   }
 
   /**
@@ -65,12 +65,12 @@ function Plugin(options = {}) {
    *
    * @param {Event} e
    * @param {Object} data
-   * @param {Transform} transform
+   * @param {Change} change
    * @param {Editor} editor
    */
 
-  function onBeforeInput(e, data, transform, editor) {
-    const { state } = transform
+  function onBeforeInput(e, data, change, editor) {
+    const { state } = change
     const { document, startKey, startBlock, startOffset, startInline, startText } = state
     const pText = startBlock.getPreviousText(startKey)
     const pInline = pText && startBlock.getClosestInline(pText.key)
@@ -114,7 +114,7 @@ function Plugin(options = {}) {
         selection.focusKey !== focusPoint.key ||
         selection.focusOffset !== focusPoint.offset
       ) {
-        transform = transform
+        change = change
           .select({
             anchorKey: anchorPoint.key,
             anchorOffset: anchorPoint.offset,
@@ -125,8 +125,8 @@ function Plugin(options = {}) {
     }
 
     // Determine what the characters should be, if not natively inserted.
-    transform.insertText(e.data)
-    const next = transform.state
+    change.insertText(e.data)
+    const next = change.state
     const nextText = next.startText
     const nextChars = nextText.getDecorations(decorators)
 
@@ -163,9 +163,9 @@ function Plugin(options = {}) {
       (chars.equals(nextChars))
     )
 
-    // If `isNative`, set the flag on the transform.
+    // If `isNative`, set the flag on the change.
     if (isNative) {
-      transform.setIsNative(true)
+      change.setIsNative(true)
     }
 
     // Otherwise, prevent default so that the DOM remains untouched.
@@ -181,12 +181,12 @@ function Plugin(options = {}) {
    *
    * @param {Event} e
    * @param {Object} data
-   * @param {Transform} transform
+   * @param {Change} change
    */
 
-  function onBlur(e, data, transform) {
+  function onBlur(e, data, change) {
     debug('onBlur', { data })
-    transform.blur()
+    change.blur()
   }
 
   /**
@@ -194,12 +194,12 @@ function Plugin(options = {}) {
    *
    * @param {Event} e
    * @param {Object} data
-   * @param {Transform} transform
+   * @param {Change} change
    */
 
-  function onCopy(e, data, transform) {
+  function onCopy(e, data, change) {
     debug('onCopy', data)
-    onCutOrCopy(e, data, transform)
+    onCutOrCopy(e, data, change)
   }
 
   /**
@@ -207,19 +207,19 @@ function Plugin(options = {}) {
    *
    * @param {Event} e
    * @param {Object} data
-   * @param {Transform} transform
+   * @param {Change} change
    * @param {Editor} editor
    */
 
-  function onCut(e, data, transform, editor) {
+  function onCut(e, data, change, editor) {
     debug('onCut', data)
-    onCutOrCopy(e, data, transform)
+    onCutOrCopy(e, data, change)
     const window = getWindow(e.target)
 
     // Once the fake cut content has successfully been added to the clipboard,
     // delete the content in the current selection.
     window.requestAnimationFrame(() => {
-      editor.transform(t => t.delete())
+      editor.change(t => t.delete())
     })
   }
 
@@ -229,13 +229,13 @@ function Plugin(options = {}) {
    *
    * @param {Event} e
    * @param {Object} data
-   * @param {Transform} transform
+   * @param {Change} change
    */
 
-  function onCutOrCopy(e, data, transform) {
+  function onCutOrCopy(e, data, change) {
     const window = getWindow(e.target)
     const native = window.getSelection()
-    const { state } = transform
+    const { state } = change
     const { endBlock, endInline } = state
     const isVoidBlock = endBlock && endBlock.isVoid
     const isVoidInline = endInline && endInline.isVoid
@@ -314,20 +314,20 @@ function Plugin(options = {}) {
    *
    * @param {Event} e
    * @param {Object} data
-   * @param {Transform} transform
+   * @param {Change} change
    */
 
-  function onDrop(e, data, transform) {
+  function onDrop(e, data, change) {
     debug('onDrop', { data })
 
     switch (data.type) {
       case 'text':
       case 'html':
-        return onDropText(e, data, transform)
+        return onDropText(e, data, change)
       case 'fragment':
-        return onDropFragment(e, data, transform)
+        return onDropFragment(e, data, change)
       case 'node':
-        return onDropNode(e, data, transform)
+        return onDropNode(e, data, change)
     }
   }
 
@@ -336,13 +336,13 @@ function Plugin(options = {}) {
    *
    * @param {Event} e
    * @param {Object} data
-   * @param {Transform} transform
+   * @param {Change} change
    */
 
-  function onDropNode(e, data, transform) {
+  function onDropNode(e, data, change) {
     debug('onDropNode', { data })
 
-    const { state } = transform
+    const { state } = change
     const { selection } = state
     let { node, target, isInternal } = data
 
@@ -359,10 +359,10 @@ function Plugin(options = {}) {
     }
 
     if (isInternal) {
-      transform.delete()
+      change.delete()
     }
 
-    return transform
+    return change
       .select(target)
       .insertBlock(node)
       .removeNodeByKey(node.key)
@@ -373,13 +373,13 @@ function Plugin(options = {}) {
    *
    * @param {Event} e
    * @param {Object} data
-   * @param {Transform} transform
+   * @param {Change} change
    */
 
-  function onDropFragment(e, data, transform) {
+  function onDropFragment(e, data, change) {
     debug('onDropFragment', { data })
 
-    const { state } = transform
+    const { state } = change
     const { selection } = state
     let { fragment, target, isInternal } = data
 
@@ -396,10 +396,10 @@ function Plugin(options = {}) {
     }
 
     if (isInternal) {
-      transform.delete()
+      change.delete()
     }
 
-    transform
+    change
       .select(target)
       .insertFragment(fragment)
   }
@@ -409,18 +409,18 @@ function Plugin(options = {}) {
    *
    * @param {Event} e
    * @param {Object} data
-   * @param {Transform} transform
+   * @param {Change} change
    */
 
-  function onDropText(e, data, transform) {
+  function onDropText(e, data, change) {
     debug('onDropText', { data })
 
-    const { state } = transform
+    const { state } = change
     const { document } = state
     const { text, target } = data
     const { anchorKey } = target
 
-    transform.select(target)
+    change.select(target)
 
     let hasVoidParent = document.hasVoidParent(anchorKey)
 
@@ -434,14 +434,14 @@ function Plugin(options = {}) {
         hasVoidParent = document.hasVoidParent(node.key)
       }
 
-      if (node) transform.collapseToStartOf(node)
+      if (node) change.collapseToStartOf(node)
     }
 
     text
       .split('\n')
       .forEach((line, i) => {
-        if (i > 0) transform.splitBlock()
-        transform.insertText(line)
+        if (i > 0) change.splitBlock()
+        change.insertText(line)
       })
   }
 
@@ -450,25 +450,25 @@ function Plugin(options = {}) {
    *
    * @param {Event} e
    * @param {Object} data
-   * @param {Transform} transform
+   * @param {Change} change
    */
 
-  function onKeyDown(e, data, transform) {
+  function onKeyDown(e, data, change) {
     debug('onKeyDown', { data })
 
     switch (data.key) {
-      case 'enter': return onKeyDownEnter(e, data, transform)
-      case 'backspace': return onKeyDownBackspace(e, data, transform)
-      case 'delete': return onKeyDownDelete(e, data, transform)
-      case 'left': return onKeyDownLeft(e, data, transform)
-      case 'right': return onKeyDownRight(e, data, transform)
-      case 'up': return onKeyDownUp(e, data, transform)
-      case 'down': return onKeyDownDown(e, data, transform)
-      case 'd': return onKeyDownD(e, data, transform)
-      case 'h': return onKeyDownH(e, data, transform)
-      case 'k': return onKeyDownK(e, data, transform)
-      case 'y': return onKeyDownY(e, data, transform)
-      case 'z': return onKeyDownZ(e, data, transform)
+      case 'enter': return onKeyDownEnter(e, data, change)
+      case 'backspace': return onKeyDownBackspace(e, data, change)
+      case 'delete': return onKeyDownDelete(e, data, change)
+      case 'left': return onKeyDownLeft(e, data, change)
+      case 'right': return onKeyDownRight(e, data, change)
+      case 'up': return onKeyDownUp(e, data, change)
+      case 'down': return onKeyDownDown(e, data, change)
+      case 'd': return onKeyDownD(e, data, change)
+      case 'h': return onKeyDownH(e, data, change)
+      case 'k': return onKeyDownK(e, data, change)
+      case 'y': return onKeyDownY(e, data, change)
+      case 'z': return onKeyDownZ(e, data, change)
     }
   }
 
@@ -477,11 +477,11 @@ function Plugin(options = {}) {
    *
    * @param {Event} e
    * @param {Object} data
-   * @param {Transform} transform
+   * @param {Change} change
    */
 
-  function onKeyDownEnter(e, data, transform) {
-    const { state } = transform
+  function onKeyDownEnter(e, data, change) {
+    const { state } = change
     const { document, startKey } = state
     const hasVoidParent = document.hasVoidParent(startKey)
 
@@ -490,11 +490,11 @@ function Plugin(options = {}) {
     if (hasVoidParent) {
       const text = document.getNextText(startKey)
       if (!text) return
-      transform.collapseToStartOf(text)
+      change.collapseToStartOf(text)
       return
     }
 
-    transform.splitBlock()
+    change.splitBlock()
   }
 
   /**
@@ -502,14 +502,14 @@ function Plugin(options = {}) {
    *
    * @param {Event} e
    * @param {Object} data
-   * @param {Transform} transform
+   * @param {Change} change
    */
 
-  function onKeyDownBackspace(e, data, transform) {
+  function onKeyDownBackspace(e, data, change) {
     let boundary = 'Char'
     if (data.isWord) boundary = 'Word'
     if (data.isLine) boundary = 'Line'
-    transform[`delete${boundary}Backward`]()
+    change[`delete${boundary}Backward`]()
   }
 
   /**
@@ -517,14 +517,14 @@ function Plugin(options = {}) {
    *
    * @param {Event} e
    * @param {Object} data
-   * @param {Transform} transform
+   * @param {Change} change
    */
 
-  function onKeyDownDelete(e, data, transform) {
+  function onKeyDownDelete(e, data, change) {
     let boundary = 'Char'
     if (data.isWord) boundary = 'Word'
     if (data.isLine) boundary = 'Line'
-    transform[`delete${boundary}Forward`]()
+    change[`delete${boundary}Forward`]()
   }
 
   /**
@@ -539,11 +539,11 @@ function Plugin(options = {}) {
    *
    * @param {Event} e
    * @param {Object} data
-   * @param {Transform} transform
+   * @param {Change} change
    */
 
-  function onKeyDownLeft(e, data, transform) {
-    const { state } = transform
+  function onKeyDownLeft(e, data, change) {
+    const { state } = change
 
     if (data.isCtrl) return
     if (data.isAlt) return
@@ -569,12 +569,12 @@ function Plugin(options = {}) {
 
       if (previousBlock === startBlock && previousInline && !previousInline.isVoid) {
         const extendOrMove = data.isShift ? 'extend' : 'move'
-        transform.collapseToEndOf(previous)[extendOrMove](-1)
+        change.collapseToEndOf(previous)[extendOrMove](-1)
         return
       }
 
       // Otherwise, move to the end of the previous node.
-      transform.collapseToEndOf(previous)
+      change.collapseToEndOf(previous)
     }
   }
 
@@ -595,11 +595,11 @@ function Plugin(options = {}) {
    *
    * @param {Event} e
    * @param {Object} data
-   * @param {Transform} transform
+   * @param {Change} change
    */
 
-  function onKeyDownRight(e, data, transform) {
-    const { state } = transform
+  function onKeyDownRight(e, data, change) {
+    const { state } = change
 
     if (data.isCtrl) return
     if (data.isAlt) return
@@ -619,7 +619,7 @@ function Plugin(options = {}) {
 
       // If the next text is inside a void node, move to the end of it.
       if (document.hasVoidParent(next.key)) {
-        transform.collapseToEndOf(next)
+        change.collapseToEndOf(next)
         return
       }
 
@@ -631,12 +631,12 @@ function Plugin(options = {}) {
 
       if (nextBlock == startBlock && nextInline) {
         const extendOrMove = data.isShift ? 'extend' : 'move'
-        transform.collapseToStartOf(next)[extendOrMove](1)
+        change.collapseToStartOf(next)[extendOrMove](1)
         return
       }
 
       // Otherwise, move to the start of the next text node.
-      transform.collapseToStartOf(next)
+      change.collapseToStartOf(next)
     }
   }
 
@@ -649,13 +649,13 @@ function Plugin(options = {}) {
    *
    * @param {Event} e
    * @param {Object} data
-   * @param {Transform} transform
+   * @param {Change} change
    */
 
-  function onKeyDownUp(e, data, transform) {
+  function onKeyDownUp(e, data, change) {
     if (!IS_MAC || data.isCtrl || !data.isAlt) return
 
-    const { state } = transform
+    const { state } = change
     const extendOrCollapse = data.isShift ? 'extendToStartOf' : 'collapseToStartOf'
     const { selection, document, focusKey, focusBlock } = state
     const block = selection.hasFocusAtStartOf(focusBlock)
@@ -666,7 +666,7 @@ function Plugin(options = {}) {
     const text = block.getFirstText()
 
     e.preventDefault()
-    transform[extendOrCollapse](text)
+    change[extendOrCollapse](text)
   }
 
   /**
@@ -678,13 +678,13 @@ function Plugin(options = {}) {
    *
    * @param {Event} e
    * @param {Object} data
-   * @param {Transform} transform
+   * @param {Change} change
    */
 
-  function onKeyDownDown(e, data, transform) {
+  function onKeyDownDown(e, data, change) {
     if (!IS_MAC || data.isCtrl || !data.isAlt) return
 
-    const { state } = transform
+    const { state } = change
     const extendOrCollapse = data.isShift ? 'extendToEndOf' : 'collapseToEndOf'
     const { selection, document, focusKey, focusBlock } = state
     const block = selection.hasFocusAtEndOf(focusBlock)
@@ -695,7 +695,7 @@ function Plugin(options = {}) {
     const text = block.getLastText()
 
     e.preventDefault()
-    transform[extendOrCollapse](text)
+    change[extendOrCollapse](text)
   }
 
   /**
@@ -703,13 +703,13 @@ function Plugin(options = {}) {
    *
    * @param {Event} e
    * @param {Object} data
-   * @param {Transform} transform
+   * @param {Change} change
    */
 
-  function onKeyDownD(e, data, transform) {
+  function onKeyDownD(e, data, change) {
     if (!IS_MAC || !data.isCtrl) return
     e.preventDefault()
-    transform.deleteCharForward()
+    change.deleteCharForward()
   }
 
   /**
@@ -717,13 +717,13 @@ function Plugin(options = {}) {
    *
    * @param {Event} e
    * @param {Object} data
-   * @param {Transform} transform
+   * @param {Change} change
    */
 
-  function onKeyDownH(e, data, transform) {
+  function onKeyDownH(e, data, change) {
     if (!IS_MAC || !data.isCtrl) return
     e.preventDefault()
-    transform.deleteCharBackward()
+    change.deleteCharBackward()
   }
 
   /**
@@ -731,13 +731,13 @@ function Plugin(options = {}) {
    *
    * @param {Event} e
    * @param {Object} data
-   * @param {Transform} transform
+   * @param {Change} change
    */
 
-  function onKeyDownK(e, data, transform) {
+  function onKeyDownK(e, data, change) {
     if (!IS_MAC || !data.isCtrl) return
     e.preventDefault()
-    transform.deleteLineForward()
+    change.deleteLineForward()
   }
 
   /**
@@ -745,12 +745,12 @@ function Plugin(options = {}) {
    *
    * @param {Event} e
    * @param {Object} data
-   * @param {Transform} transform
+   * @param {Change} change
    */
 
-  function onKeyDownY(e, data, transform) {
+  function onKeyDownY(e, data, change) {
     if (!data.isMod) return
-    transform.redo()
+    change.redo()
   }
 
   /**
@@ -758,12 +758,12 @@ function Plugin(options = {}) {
    *
    * @param {Event} e
    * @param {Object} data
-   * @param {Transform} transform
+   * @param {Change} change
    */
 
-  function onKeyDownZ(e, data, transform) {
+  function onKeyDownZ(e, data, change) {
     if (!data.isMod) return
-    transform[data.isShift ? 'redo' : 'undo']()
+    change[data.isShift ? 'redo' : 'undo']()
   }
 
   /**
@@ -771,18 +771,18 @@ function Plugin(options = {}) {
    *
    * @param {Event} e
    * @param {Object} data
-   * @param {Transform} transform
+   * @param {Change} change
    */
 
-  function onPaste(e, data, transform) {
+  function onPaste(e, data, change) {
     debug('onPaste', { data })
 
     switch (data.type) {
       case 'fragment':
-        return onPasteFragment(e, data, transform)
+        return onPasteFragment(e, data, change)
       case 'text':
       case 'html':
-        return onPasteText(e, data, transform)
+        return onPasteText(e, data, change)
     }
   }
 
@@ -791,12 +791,12 @@ function Plugin(options = {}) {
    *
    * @param {Event} e
    * @param {Object} data
-   * @param {Transform} transform
+   * @param {Change} change
    */
 
-  function onPasteFragment(e, data, transform) {
+  function onPasteFragment(e, data, change) {
     debug('onPasteFragment', { data })
-    transform.insertFragment(data.fragment)
+    change.insertFragment(data.fragment)
   }
 
   /**
@@ -804,14 +804,14 @@ function Plugin(options = {}) {
    *
    * @param {Event} e
    * @param {Object} data
-   * @param {Transform} transform
+   * @param {Change} change
    */
 
-  function onPasteText(e, data, transform) {
+  function onPasteText(e, data, change) {
     debug('onPasteText', { data })
     data.text.split('\n').forEach((line, i) => {
-      if (i > 0) transform.splitBlock()
-      transform.insertText(line)
+      if (i > 0) change.splitBlock()
+      change.insertText(line)
     })
   }
 
@@ -820,12 +820,12 @@ function Plugin(options = {}) {
    *
    * @param {Event} e
    * @param {Object} data
-   * @param {Transform} transform
+   * @param {Change} change
    */
 
-  function onSelect(e, data, transform) {
+  function onSelect(e, data, change) {
     debug('onSelect', { data })
-    transform.select(data.selection)
+    change.select(data.selection)
   }
 
   /**
@@ -935,7 +935,7 @@ function Plugin(options = {}) {
    */
 
   return {
-    onBeforeTransform,
+    onBeforeChange,
     onBeforeInput,
     onBlur,
     onCopy,

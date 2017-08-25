@@ -88,7 +88,7 @@ class RichText extends React.Component {
   /**
    * On change, save the new state.
    *
-   * @param {Transform} transform
+   * @param {Change} change
    */
 
   onChange = ({ state }) => {
@@ -100,11 +100,11 @@ class RichText extends React.Component {
    *
    * @param {Event} e
    * @param {Object} data
-   * @param {Transform} transform
+   * @param {Change} change
    * @return {State}
    */
 
-  onKeyDown = (e, data, transform) => {
+  onKeyDown = (e, data, change) => {
     if (!data.isMod) return
     let mark
 
@@ -125,7 +125,7 @@ class RichText extends React.Component {
         return
     }
 
-    transform[this.hasMark(mark) ? 'removeMark' : 'addMark'](mark)
+    change[this.hasMark(mark) ? 'removeMark' : 'addMark'](mark)
     e.preventDefault()
     return true
   }
@@ -140,12 +140,12 @@ class RichText extends React.Component {
   onClickMark = (e, type) => {
     e.preventDefault()
     const isActive = this.hasMark(type)
-    const transform = this.state.state
-      .transform()
+    const change = this.state.state
+      .change()
       [isActive ? 'removeMark' : 'addMark'](type)
       .apply()
 
-    this.onChange(transform)
+    this.onChange(change)
   }
 
   /**
@@ -158,18 +158,18 @@ class RichText extends React.Component {
   onClickBlock = (e, type) => {
     e.preventDefault()
     const isActive = this.hasBlock(type)
-    const transform = this.state.state
-      .transform()
+    const change = this.state.state
+      .change()
       .setBlock(isActive ? 'paragraph' : type)
 
     // Handle the extra wrapping required for list buttons.
     if (type == 'bulleted-list' || type == 'numbered-list') {
       if (this.hasBlock('list-item')) {
-        transform
+        change
           .setBlock(DEFAULT_NODE)
           .unwrapBlock(type)
       } else {
-        transform
+        change
           .setBlock('list-item')
           .wrapBlock(type)
       }
@@ -177,11 +177,10 @@ class RichText extends React.Component {
 
     // Handle everything but list buttons.
     else {
-      transform.setBlock(isActive ? DEFAULT_NODE : type)
+      change.setBlock(isActive ? DEFAULT_NODE : type)
     }
 
-    transform.apply()
-    this.onChange(transform)
+    this.onChange(change)
   }
 
   /**

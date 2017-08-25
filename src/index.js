@@ -40,10 +40,10 @@ import Plain from './serializers/plain'
 import Raw from './serializers/raw'
 
 /**
- * Transforms.
+ * Changes.
  */
 
-import Transforms from './transforms'
+import Changes from './changes'
 
 /**
  * Utils.
@@ -79,7 +79,7 @@ export {
   Stack,
   State,
   Text,
-  Transforms,
+  Changes,
   findDOMNode,
   resetKeyGenerator,
   setKeyGenerator
@@ -106,7 +106,7 @@ export default {
   Stack,
   State,
   Text,
-  Transforms,
+  Changes,
   findDOMNode,
   resetKeyGenerator,
   setKeyGenerator

@@ -102,8 +102,8 @@ class Content extends React.Component {
     // the cursor will be added or removed again.
     if (props.readOnly != this.props.readOnly) return true
 
-    // If the state has been transformed natively, never re-render, or else we
-    // will end up duplicating content.
+    // If the state has been changed natively, never re-render, or else we'll
+    // end up duplicating content.
     if (props.state.isNative) return false
 
     return (
@@ -586,8 +586,8 @@ class Content extends React.Component {
     const after = selection.collapseToEnd().move(delta)
 
     // Change the current state to have the text replaced.
-    editor.transform((transform) => {
-      transform
+    editor.change((change) => {
+      change
         .select({
           anchorKey: key,
           anchorOffset: start,

@@ -33,7 +33,7 @@ class App extends React.Component {
     if (!event.metaKey || event.which != 66) return
     event.preventDefault()
     return state
-      .transform()
+      .change()
       .toggleMark('bold')
       .apply()
   }
@@ -82,7 +82,7 @@ function MarkHotkey(options) {
 
       // Toggle the mark `type`.
       return state
-        .transform()
+        .change()
         .toggleMark(type)
         .apply()
     }
@@ -220,7 +220,7 @@ function MarkHotkey(options) {
       if (!event.metaKey || keycode(event.which) != key || event.altKey != isAltKey) return
       event.preventDefault()
       return state
-        .transform()
+        .change()
         .toggleMark(type)
         .apply()
     }

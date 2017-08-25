@@ -64,7 +64,7 @@ class HoveringMenu extends React.Component {
   /**
    * On change.
    *
-   * @param {Transform} transform
+   * @param {Change} change
    */
 
   onChange = ({ state }) => {
@@ -80,10 +80,10 @@ class HoveringMenu extends React.Component {
 
   onClickMark = (e, type) => {
     e.preventDefault()
-    const transform = this.state.state
-      .transform()
+    const change = this.state.state
+      .change()
       .toggleMark(type)
-    this.onChange(transform)
+    this.onChange(change)
   }
 
   /**

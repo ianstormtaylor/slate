@@ -42,11 +42,11 @@ class Tables extends React.Component {
    * On backspace, do nothing if at the start of a table cell.
    *
    * @param {Event} e
-   * @param {Transform} transform
+   * @param {Change} change
    */
 
-  onBackspace = (e, transform) => {
-    const { state } = transform
+  onBackspace = (e, change) => {
+    const { state } = change
     if (state.startOffset != 0) return
     e.preventDefault()
     return true
@@ -55,7 +55,7 @@ class Tables extends React.Component {
   /**
    * On change.
    *
-   * @param {Transform} transform
+   * @param {Change} change
    */
 
   onChange = ({ state }) => {
@@ -66,11 +66,11 @@ class Tables extends React.Component {
    * On delete, do nothing if at the end of a table cell.
    *
    * @param {Event} e
-   * @param {Transform} transform
+   * @param {Change} change
    */
 
-  onDelete = (e, transform) => {
-    const { state } = transform
+  onDelete = (e, change) => {
+    const { state } = change
     if (state.endOffset != state.startText.text.length) return
     e.preventDefault()
     return true
@@ -80,10 +80,10 @@ class Tables extends React.Component {
    * On return, do nothing if inside a table cell.
    *
    * @param {Event} e
-   * @param {Transform} transform
+   * @param {Change} change
    */
 
-  onEnter = (e, transform) => {
+  onEnter = (e, change) => {
     e.preventDefault()
     return true
   }
@@ -93,11 +93,11 @@ class Tables extends React.Component {
    *
    * @param {Event} e
    * @param {Object} data
-   * @param {Transform} transform
+   * @param {Change} change
    */
 
-  onKeyDown = (e, data, transform) => {
-    const { state } = transform
+  onKeyDown = (e, data, change) => {
+    const { state } = change
     const { document, selection } = state
     const { startKey } = selection
     const startNode = document.getDescendant(startKey)

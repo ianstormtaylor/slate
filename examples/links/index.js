@@ -22,29 +22,29 @@ const schema = {
 }
 
 /**
- * A transform helper to standardize wrapping links.
+ * A change helper to standardize wrapping links.
  *
- * @param {Transform} transform
+ * @param {Change} change
  * @param {String} href
  */
 
-function wrapLink(transform, href) {
-  transform.wrapInline({
+function wrapLink(change, href) {
+  change.wrapInline({
     type: 'link',
     data: { href }
   })
 
-  transform.collapseToEnd()
+  change.collapseToEnd()
 }
 
 /**
- * A transform helper to standardize unwrapping links.
+ * A change helper to standardize unwrapping links.
  *
- * @param {Transform} transform
+ * @param {Change} change
  */
 
-function unwrapLink(transform) {
-  transform.unwrapInline('link')
+function unwrapLink(change) {
+  change.unwrapInline('link')
 }
 
 /**
@@ -79,7 +79,7 @@ class Links extends React.Component {
   /**
    * On change.
    *
-   * @param {Transform} transform
+   * @param {Change} change
    */
 
   onChange = ({ state }) => {
@@ -97,27 +97,27 @@ class Links extends React.Component {
     e.preventDefault()
     const { state } = this.state
     const hasLinks = this.hasLinks()
-    const transform = state.transform()
+    const change = state.change()
 
     if (hasLinks) {
-      transform.call(unwrapLink)
+      change.call(unwrapLink)
     }
 
     else if (state.isExpanded) {
       const href = window.prompt('Enter the URL of the link:')
-      transform.call(wrapLink, href)
+      change.call(wrapLink, href)
     }
 
     else {
       const href = window.prompt('Enter the URL of the link:')
       const text = window.prompt('Enter the text for the link:')
-      transform
+      change
         .insertText(text)
         .extend(0 - text.length)
         .call(wrapLink, href)
     }
 
-    this.onChange(transform)
+    this.onChange(change)
   }
 
   /**
@@ -125,19 +125,19 @@ class Links extends React.Component {
    *
    * @param {Event} e
    * @param {Object} data
-   * @param {Transform} transform
+   * @param {Change} change
    */
 
-  onPaste = (e, data, transform) => {
-    if (transform.state.isCollapsed) return
+  onPaste = (e, data, change) => {
+    if (change.state.isCollapsed) return
     if (data.type != 'text' && data.type != 'html') return
     if (!isUrl(data.text)) return
 
     if (this.hasLinks()) {
-      transform.call(unwrapLink)
+      change.call(unwrapLink)
     }
 
-    transform.call(wrapLink, data.text)
+    change.call(wrapLink, data.text)
     return true
   }
 

@@ -55,7 +55,7 @@ class Emojis extends React.Component {
   /**
    * On change.
    *
-   * @param {Transform} transform
+   * @param {Change} change
    */
 
   onChange = ({ state }) => {
@@ -70,15 +70,15 @@ class Emojis extends React.Component {
 
   onClickEmoji = (e, code) => {
     e.preventDefault()
-    const transform = this.state.state
-      .transform()
+    const change = this.state.state
+      .change()
       .insertInline({
         type: 'emoji',
         isVoid: true,
         data: { code }
       })
 
-    this.onChange(transform)
+    this.onChange(change)
   }
 
   /**

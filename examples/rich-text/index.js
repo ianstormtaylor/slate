@@ -88,7 +88,7 @@ class RichText extends React.Component {
   /**
    * On change, save the new `state`.
    *
-   * @param {Transform} transform
+   * @param {Change} change
    */
 
   onChange = ({ state }) => {
@@ -100,11 +100,11 @@ class RichText extends React.Component {
    *
    * @param {Event} e
    * @param {Object} data
-   * @param {Transform} transform
-   * @return {Transform}
+   * @param {Change} change
+   * @return {Change}
    */
 
-  onKeyDown = (e, data, transform) => {
+  onKeyDown = (e, data, change) => {
     if (!data.isMod) return
     let mark
 
@@ -126,7 +126,7 @@ class RichText extends React.Component {
     }
 
     e.preventDefault()
-    transform.toggleMark(mark)
+    change.toggleMark(mark)
     return true
   }
 
@@ -140,8 +140,8 @@ class RichText extends React.Component {
   onClickMark = (e, type) => {
     e.preventDefault()
     const { state } = this.state
-    const transform = state.transform().toggleMark(type)
-    this.onChange(transform)
+    const change = state.change().toggleMark(type)
+    this.onChange(change)
   }
 
   /**
@@ -154,7 +154,7 @@ class RichText extends React.Component {
   onClickBlock = (e, type) => {
     e.preventDefault()
     const { state } = this.state
-    const transform = state.transform()
+    const change = state.change()
     const { document } = state
 
     // Handle everything but list buttons.
@@ -163,14 +163,14 @@ class RichText extends React.Component {
       const isList = this.hasBlock('list-item')
 
       if (isList) {
-        transform
+        change
           .setBlock(isActive ? DEFAULT_NODE : type)
           .unwrapBlock('bulleted-list')
           .unwrapBlock('numbered-list')
       }
 
       else {
-        transform
+        change
           .setBlock(isActive ? DEFAULT_NODE : type)
       }
     }
@@ -183,22 +183,22 @@ class RichText extends React.Component {
       })
 
       if (isList && isType) {
-        transform
+        change
           .setBlock(DEFAULT_NODE)
           .unwrapBlock('bulleted-list')
           .unwrapBlock('numbered-list')
       } else if (isList) {
-        transform
+        change
           .unwrapBlock(type == 'bulleted-list' ? 'numbered-list' : 'bulleted-list')
           .wrapBlock(type)
       } else {
-        transform
+        change
           .setBlock('list-item')
           .wrapBlock(type)
       }
     }
 
-    this.onChange(transform)
+    this.onChange(change)
   }
 
   /**

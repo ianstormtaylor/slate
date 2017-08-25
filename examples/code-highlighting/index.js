@@ -16,7 +16,7 @@ function CodeBlock(props) {
   const language = node.data.get('language')
 
   function onChange(e) {
-    editor.transform(t => t.setNodeByKey(node.key, { data: { language: e.target.value }}))
+    editor.change(c => c.setNodeByKey(node.key, { data: { language: e.target.value }}))
   }
 
   return (
@@ -124,7 +124,7 @@ class CodeHighlighting extends React.Component {
   /**
    * On change, save the new state.
    *
-   * @param {Transform} transform
+   * @param {Change} change
    */
 
   onChange = ({ state }) => {
@@ -136,17 +136,17 @@ class CodeHighlighting extends React.Component {
    *
    * @param {Event} e
    * @param {Object} data
-   * @param {Transform} transform
-   * @return {Transform}
+   * @param {Change} change
+   * @return {Change}
    */
 
-  onKeyDown = (e, data, transform) => {
-    const { state } = transform
+  onKeyDown = (e, data, change) => {
+    const { state } = change
     const { startBlock } = state
     if (data.key != 'enter') return
     if (startBlock.type != 'code') return
-    if (state.isExpanded) transform.delete()
-    return transform.insertText('\n')
+    if (state.isExpanded) change.delete()
+    return change.insertText('\n')
   }
 
   /**

@@ -19,8 +19,8 @@ When the editor needs to resolve a plugin-related handler, it will loop through 
   - [`onPaste`](#onpaste)
   - [`onSelect`](#onselect)
 - [Other Properties](#other-properties)
-  - [`onTransform`](#ontransform)
-  - [`onBeforeTransform`](#onbeforetransform)
+  - [`onChange`](#onchange)
+  - [`onBeforeChange`](#onbeforechange)
   - [`render`](#render)
   - [`schema`](#schema)
 
@@ -204,15 +204,15 @@ _Note: This is **not** Slate's internal selection representation (although it mi
 }
 ```
 
-### `onTransform`
-`Function onTransform(transform: Transform) => Any || Void`
+### `onChange`
+`Function onChange(change: Change) => Any || Void`
 
-The `onTransform` handler isn't a native browser event handler. Instead, it is invoked whenever the editor state changes. This allows plugins to augment a transform however they want.
+The `onChange` handler isn't a native browser event handler. Instead, it is invoked whenever the editor state changes. This allows plugins to augment a change however they want.
 
-### `onBeforeTransform`
-`Function onBeforeTransform(state: State) => State || Void`
+### `onBeforeChange`
+`Function onBeforeChange(state: State) => State || Void`
 
-The `onBeforeTransform` handler isn't a native browser event handler. Instead, it is invoked whenever the editor receives a new state and before propagating a new state to `onTransform`.
+The `onBeforeChange` handler isn't a native browser event handler. Instead, it is invoked whenever the editor receives a new state and before propagating a new state to `onChange`.
 
 ### `render`
 `Function render(props: Object, state: State, editor: Editor) => Object || Void`

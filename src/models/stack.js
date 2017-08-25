@@ -20,7 +20,7 @@ const debug = Debug('slate:stack')
 
 const METHODS = [
   'onBeforeInput',
-  'onBeforeTransform',
+  'onBeforeChange',
   'onBlur',
   'onCopy',
   'onCut',
@@ -29,7 +29,7 @@ const METHODS = [
   'onKeyDown',
   'onPaste',
   'onSelect',
-  'onTransform',
+  'onChange',
 ]
 
 /**
@@ -130,20 +130,20 @@ class Stack extends new Record(DEFAULTS) {
 /**
  * Mix in the stack methods.
  *
- * @param {Transform} transform
+ * @param {Change} change
  * @param {Editor} editor
  * @param {Mixed} ...args
  */
 
 for (let i = 0; i < METHODS.length; i++) {
   const method = METHODS[i]
-  Stack.prototype[method] = function (transform, editor, ...args) {
+  Stack.prototype[method] = function (change, editor, ...args) {
     debug(method)
 
     for (let k = 0; k < this.plugins.length; k++) {
       const plugin = this.plugins[k]
       if (!plugin[method]) continue
-      const next = plugin[method](...args, transform, editor)
+      const next = plugin[method](...args, change, editor)
       if (next != null) break
     }
   }

@@ -83,7 +83,7 @@ class Iframes extends React.Component {
   /**
    * On change.
    *
-   * @param {Transform} transform
+   * @param {Change} change
    */
 
   onChange = ({ state }) => {
@@ -95,11 +95,11 @@ class Iframes extends React.Component {
    *
    * @param {Event} e
    * @param {Object} data
-   * @param {Transform} transform
+   * @param {Change} change
    * @return {State}
    */
 
-  onKeyDown = (e, data, transform) => {
+  onKeyDown = (e, data, change) => {
     if (!data.isMod) return
     let mark
 
@@ -115,7 +115,7 @@ class Iframes extends React.Component {
     }
 
     e.preventDefault()
-    return transform.toggleMark(mark)
+    return change.toggleMark(mark)
   }
 
   /**
@@ -127,10 +127,10 @@ class Iframes extends React.Component {
 
   onClickMark = (e, type) => {
     e.preventDefault()
-    const transform = this.state.state
-      .transform()
+    const change = this.state.state
+      .change()
       .toggleMark(type)
-    this.onChange(transform)
+    this.onChange(change)
   }
 
   /**
@@ -143,10 +143,10 @@ class Iframes extends React.Component {
   onClickBlock = (e, type) => {
     e.preventDefault()
     const isActive = this.hasBlock(type)
-    const transform = this.state.state
-      .transform()
+    const change = this.state.state
+      .change()
       .setBlock(isActive ? DEFAULT_NODE : type)
-    this.onChange(transform)
+    this.onChange(change)
   }
 
   /**

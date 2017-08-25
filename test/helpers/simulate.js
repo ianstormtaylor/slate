@@ -24,8 +24,8 @@ const EVENT_HANDLERS = [
  */
 
 const CHANGE_HANDLERS = [
-  'onBeforeTransform',
-  'onTransform'
+  'onBeforeChange',
+  'onChange'
 ]
 
 /**
@@ -46,11 +46,12 @@ EVENT_HANDLERS.forEach((handler) => {
   Simulate[method] = function (stack, state, e, data) {
     const editor = createEditor(stack, state)
     const event = createEvent(e || {})
-    const transform = state.transform()
+    const change = state.change()
 
-    stack[handler](transform, editor, event, data)
-    stack.onTransform(transform, editor)
-    const next = transform.state
+    stack[handler](change, editor, event, data)
+    stack.onBeforeChange(change, editor)
+    stack.onChange(change, editor)
+    const next = change.state
     if (next == state) return state
     return next
   }

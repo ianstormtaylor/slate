@@ -33,9 +33,9 @@ const rules = [
       const invalids = document.nodes.filter(n => n.kind != 'block')
       return invalids.size ? invalids : null
     },
-    normalize: (transform, document, invalids) => {
+    normalize: (change, document, invalids) => {
       invalids.forEach((node) => {
-        transform.removeNodeByKey(node.key, OPTS)
+        change.removeNodeByKey(node.key, OPTS)
       })
     }
   },
@@ -61,9 +61,9 @@ const rules = [
       const invalids = block.nodes.filter(n => !kinds.includes(n.kind))
       return invalids.size ? invalids : null
     },
-    normalize: (transform, block, invalids) => {
+    normalize: (change, block, invalids) => {
       invalids.forEach((node) => {
-        transform.removeNodeByKey(node.key, OPTS)
+        change.removeNodeByKey(node.key, OPTS)
       })
     }
   },
@@ -82,9 +82,9 @@ const rules = [
       const invalids = inline.nodes.filter(n => n.kind != 'inline' && n.kind != 'text')
       return invalids.size ? invalids : null
     },
-    normalize: (transform, inline, invalids) => {
+    normalize: (change, inline, invalids) => {
       invalids.forEach((node) => {
-        transform.removeNodeByKey(node.key, OPTS)
+        change.removeNodeByKey(node.key, OPTS)
       })
     }
   },
@@ -102,9 +102,9 @@ const rules = [
     validate: (node) => {
       return node.nodes.size == 0
     },
-    normalize: (transform, node) => {
+    normalize: (change, node) => {
       const text = Text.create()
-      transform.insertNodeByKey(node.key, 0, text, OPTS)
+      change.insertNodeByKey(node.key, 0, text, OPTS)
     }
   },
 
@@ -124,14 +124,14 @@ const rules = [
     validate: (node) => {
       return node.text !== ' ' || node.nodes.size !== 1
     },
-    normalize: (transform, node, result) => {
+    normalize: (change, node, result) => {
       const text = Text.createFromString(' ')
       const index = node.nodes.size
 
-      transform.insertNodeByKey(node.key, index, text, OPTS)
+      change.insertNodeByKey(node.key, index, text, OPTS)
 
       node.nodes.forEach((child) => {
-        transform.removeNodeByKey(child.key, OPTS)
+        change.removeNodeByKey(child.key, OPTS)
       })
     }
   },
@@ -155,16 +155,16 @@ const rules = [
       const invalids = block.nodes.filter(n => n.kind == 'inline' && n.text == '')
       return invalids.size ? invalids : null
     },
-    normalize: (transform, block, invalids) => {
+    normalize: (change, block, invalids) => {
       // If all of the block's nodes are invalid, insert an empty text node so
       // that the selection will be preserved when they are all removed.
       if (block.nodes.size == invalids.size) {
         const text = Text.create()
-        transform.insertNodeByKey(block.key, 1, text, OPTS)
+        change.insertNodeByKey(block.key, 1, text, OPTS)
       }
 
       invalids.forEach((node) => {
-        transform.removeNodeByKey(node.key, OPTS)
+        change.removeNodeByKey(node.key, OPTS)
       })
     }
   },
@@ -199,18 +199,18 @@ const rules = [
 
       return invalids.size ? invalids : null
     },
-    normalize: (transform, block, invalids) => {
+    normalize: (change, block, invalids) => {
       // Shift for every text node inserted previously.
       let shift = 0
 
       invalids.forEach(({ index, insertAfter, insertBefore }) => {
         if (insertBefore) {
-          transform.insertNodeByKey(block.key, shift + index, Text.create(), OPTS)
+          change.insertNodeByKey(block.key, shift + index, Text.create(), OPTS)
           shift++
         }
 
         if (insertAfter) {
-          transform.insertNodeByKey(block.key, shift + index + 1, Text.create(), OPTS)
+          change.insertNodeByKey(block.key, shift + index + 1, Text.create(), OPTS)
           shift++
         }
       })
@@ -239,10 +239,10 @@ const rules = [
 
       return invalids.size ? invalids : null
     },
-    normalize: (transform, node, invalids) => {
+    normalize: (change, node, invalids) => {
       // Reverse the list to handle consecutive merges, since the earlier nodes
       // will always exist after each merge.
-      invalids.reverse().forEach(n => transform.mergeNodeByKey(n.key, OPTS))
+      invalids.reverse().forEach(n => change.mergeNodeByKey(n.key, OPTS))
     }
   },
 
@@ -282,9 +282,9 @@ const rules = [
 
       return invalids.size ? invalids : null
     },
-    normalize: (transform, node, invalids) => {
+    normalize: (change, node, invalids) => {
       invalids.forEach((text) => {
-        transform.removeNodeByKey(text.key, OPTS)
+        change.removeNodeByKey(text.key, OPTS)
       })
     }
   }

@@ -1,11 +1,12 @@
 
+import MODEL_TYPES from '../constants/model-types'
+import SCHEMA from '../schemas/core'
+import Change from './change'
 import Document from './document'
 import History from './history'
-import SCHEMA from '../schemas/core'
 import Selection from './selection'
-import Transform from './transform'
+import warn from '../utils/warn'
 import { Record, Set, List, Map } from 'immutable'
-import MODEL_TYPES from '../constants/model-types'
 
 /**
  * Default properties.
@@ -64,7 +65,7 @@ class State extends new Record(DEFAULTS) {
 
     if (options.normalize !== false) {
       state = state
-        .transform({ save: false })
+        .change({ save: false })
         .normalize(SCHEMA)
         .state
     }
@@ -464,14 +465,25 @@ class State extends new Record(DEFAULTS) {
   }
 
   /**
-   * Return a new `Transform` with the current state as a starting point.
+   * Create a new `Change` with the current state as a starting point.
    *
-   * @param {Object} properties
-   * @return {Transform}
+   * @param {Object} attrs
+   * @return {Change}
    */
 
-  transform(properties = {}) {
-    return new Transform({ ...properties, state: this })
+  change(attrs = {}) {
+    return new Change({ ...attrs, state: this })
+  }
+
+  /**
+   * Deprecated.
+   *
+   * @return {Change}
+   */
+
+  transform(...args) {
+    warn('The `state.transform()` method has been deprecated in favor of `state.change()`.')
+    return this.change(...args)
   }
 
 }

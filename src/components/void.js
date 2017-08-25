@@ -79,8 +79,8 @@ class Void extends React.Component {
 
     const { node, editor } = this.props
 
-    editor.transform((transform) => {
-      transform
+    editor.change((change) => {
+      change
         // COMPAT: In Chrome & Safari, selections that are at the zero offset of
         // an inline node will be automatically replaced to be at the last
         // offset of a previous inline node, which screws us up, so we always
