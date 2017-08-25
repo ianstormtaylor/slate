@@ -156,7 +156,7 @@ class Content extends React.Component {
     // If the selection has been blurred, but is still inside the editor in the
     // DOM, blur it manually.
     if (selection.isBlurred) {
-      if (!this.isInEditor(native.anchorNode)) return
+      if (!this.isEditableInEditor(native.anchorNode)) return
       native.removeAllRanges()
       this.element.blur()
       debug('updateSelection', { selection, native })
@@ -249,15 +249,28 @@ class Content extends React.Component {
    * @return {Boolean}
    */
 
+  isEditableInEditor = (target) => {
+    // COMPAT: Text nodes don't have `isContentEditable` property. So, when
+    // `target` is a text node use its parent node for check.
+    const el = target.nodeType === 3 ? target.parentNode : target
+    return (el.isContentEditable) && this.isInEditor(target)
+  }
+
+
+  /**
+   * Check if an event `target` is fired within the editor,
+   * including void nodes and other nested Slate editors.
+   *
+   * @param {Element} target
+   * @return {Boolean}
+   */
+
   isInEditor = (target) => {
     const { element } = this
     // COMPAT: Text nodes don't have `isContentEditable` property. So, when
     // `target` is a text node use its parent node for check.
     const el = target.nodeType === 3 ? target.parentNode : target
-    return (
-      (el.isContentEditable) &&
-      (el === element || findClosestNode(el, '[data-slate-editor]') === element)
-    )
+    return (el === element || findClosestNode(el, '[data-slate-editor]') === element)
   }
 
   /**
@@ -268,7 +281,7 @@ class Content extends React.Component {
 
   onBeforeInput = (event) => {
     if (this.props.readOnly) return
-    if (!this.isInEditor(event.target)) return
+    if (!this.isEditableInEditor(event.target)) return
 
     const data = {}
 
@@ -285,7 +298,7 @@ class Content extends React.Component {
   onBlur = (event) => {
     if (this.props.readOnly) return
     if (this.tmp.isCopying) return
-    if (!this.isInEditor(event.target)) return
+    if (!this.isEditableInEditor(event.target)) return
 
     // If the active element is still the editor, the blur event is due to the
     // window itself being blurred (eg. when changing tabs) so we should ignore
@@ -308,7 +321,7 @@ class Content extends React.Component {
   onFocus = (event) => {
     if (this.props.readOnly) return
     if (this.tmp.isCopying) return
-    if (!this.isInEditor(event.target)) return
+    if (!this.isEditableInEditor(event.target)) return
 
     // COMPAT: If the editor has nested editable elements, the focus can go to
     // those elements. In Firefox, this must be prevented because it results in
@@ -342,7 +355,7 @@ class Content extends React.Component {
    */
 
   onCompositionStart = (event) => {
-    if (!this.isInEditor(event.target)) return
+    if (!this.isEditableInEditor(event.target)) return
 
     this.tmp.isComposing = true
     this.tmp.compositions++
@@ -359,7 +372,7 @@ class Content extends React.Component {
    */
 
   onCompositionEnd = (event) => {
-    if (!this.isInEditor(event.target)) return
+    if (!this.isEditableInEditor(event.target)) return
 
     this.tmp.forces++
     const count = this.tmp.compositions
@@ -553,7 +566,7 @@ class Content extends React.Component {
   onInput = (event) => {
     if (this.tmp.isComposing) return
     if (this.props.state.isBlurred) return
-    if (!this.isInEditor(event.target)) return
+    if (!this.isEditableInEditor(event.target)) return
     debug('onInput', { event })
 
     const window = getWindow(event.target)
@@ -624,7 +637,7 @@ class Content extends React.Component {
 
   onKeyDown = (event) => {
     if (this.props.readOnly) return
-    if (!this.isInEditor(event.target)) return
+    if (!this.isEditableInEditor(event.target)) return
 
     const { altKey, ctrlKey, metaKey, shiftKey, which } = event
     const key = keycode(which)
@@ -738,7 +751,7 @@ class Content extends React.Component {
     if (this.tmp.isCopying) return
     if (this.tmp.isComposing) return
     if (this.tmp.isSelecting) return
-    if (!this.isInEditor(event.target)) return
+    if (!this.isEditableInEditor(event.target)) return
 
     const window = getWindow(event.target)
     const { state, editor } = this.props
