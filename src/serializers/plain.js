@@ -38,6 +38,18 @@ function deserialize(string, options = {}) {
   return options.toRaw ? raw : Raw.deserialize(raw)
 }
 
+function getSerializedTextForNode(node) {
+  if (node.kind == 'document' || node.kind === 'block') {
+    return node.nodes
+      .map(childNode => getSerializedTextForNode(childNode))
+      .filter(text => text != '')
+      .join('\n')
+  } else {
+    return node.text
+  }
+}
+
+
 /**
  * Serialize a `state` to plain text.
  *
@@ -46,9 +58,7 @@ function deserialize(string, options = {}) {
  */
 
 function serialize(state) {
-  return state.document.nodes
-    .map(block => block.text)
-    .join('\n')
+  return getSerializedTextForNode(state.document)
 }
 
 /**
