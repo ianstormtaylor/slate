@@ -170,7 +170,7 @@ Make sure to `event.preventDefault()` (and return `state`) if you do not want th
 
 This handler is called when any key is released in the `contenteditable` element.
 
-The `data` object contains the same information as the `data` object of `onKeyDown`
+The `data` object contains the same information as the `data` object of `onKeyDown`.
 
 ### `onPaste`
 `Function onPaste(event: Event, data: Object, state: State, editor: Editor) => State || Void`
