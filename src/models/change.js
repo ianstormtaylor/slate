@@ -31,10 +31,6 @@ class Change {
     const { state } = attrs
     const { history } = state
 
-    if (history) {
-      history.checkpoint(true)
-    }
-
     this.state = state
     this.operations = []
     this.flags = {
@@ -70,7 +66,10 @@ class Change {
     const { history } = state
 
     if (history && save) {
-      history.save(operation, { merge })
+      history.save(operation, {
+        merge,
+        checkpoint: this.operations.length == 0,
+      })
     }
 
     this.state = apply(state, operation)

@@ -27,10 +27,6 @@ class History {
   constructor(attrs = {}) {
     this.undos = attrs.undos || []
     this.redos = attrs.redos || []
-    this.flags = {
-      checkpoint: true,
-    }
-
     this._shouldMerge = attrs.shouldMerge || shouldMerge
     this._shouldSave = attrs.shouldSave || shouldSave
   }
@@ -76,39 +72,30 @@ class History {
   }
 
   /**
-   * Set the `checkpoint` flag telling the history whether to create a new
-   * save point when it receives the next operation that isn't merged.
-   *
-   * @param {Boolean} checkpoint
-   */
-
-  checkpoint(checkpoint) {
-    debug('checkpoint', checkpoint)
-    this.flags.checkpoint = checkpoint
-  }
-
-  /**
    * Save an `operation` into the history.
    *
    * @param {Object} operation
    */
 
   save(operation, options = {}) {
-    let { merge } = options
+    let { merge, checkpoint } = options
     const { undos } = this
     const prevBatch = undos[undos.length - 1]
     const prevOperation = prevBatch && prevBatch[prevBatch.length - 1]
     const save = this._shouldSave(operation, prevOperation)
     if (!save) return
 
+    if (checkpoint == null) {
+      checkpoint = undos.length === 0
+    }
+
     if (merge == null) {
       merge = this._shouldMerge(operation, prevOperation)
     }
 
-    if (merge || this.flags.checkpoint == false) {
+    if (merge || !checkpoint) {
       prevBatch.push(operation)
     } else {
-      this.checkpoint(false)
       const batch = [operation]
       undos.push(batch)
       if (undos.length > 100) undos.shift()
