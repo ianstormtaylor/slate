@@ -491,10 +491,10 @@ class Content extends React.Component {
    */
 
   onDrop = (event) => {
+    event.preventDefault()
+
     if (this.props.readOnly) return
     if (!this.isInEditor(event.target)) return
-
-    event.preventDefault()
 
     const window = getWindow(event.target)
     const { state, editor } = this.props
