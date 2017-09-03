@@ -23,11 +23,12 @@ node_modules/
 
 A minified version called `slate.min.js` is also included for convenience.
 
-Before you can add `slate.js` to your page, you need to bring your own copy of `immutable`, `react` and `react-dom`, like so:
+Before you can add `slate.js` to your page, you need to bring your own copy of `immutable`, `react`, `react-dom` and `react-dom-server`, like so:
 
 ```html
 <script src="./vendor/react.js"></script>
 <script src="./vendor/react-dom.js"></script>
+<script src="./vendor/react-dom-server.js"></script>
 <script src="./vendor/immutable.js"></script>
 ```
 
@@ -44,6 +45,7 @@ To make things easier, for quick prototyping, you can also use the [`unpkg.com`]
 ```html
 <script src="https://unpkg.com/react/dist/react.js"></script>
 <script src="https://unpkg.com/react-dom/dist/react-dom.js"></script>
+<script src="https://unpkg.com/react-dom/dist/react-dom-server.js"></script>
 <script src="https://unpkg.com/immutable/dist/immutable.js"></script>
 <script src="https://unpkg.com/slate/dist/slate.js"></script>
 ```

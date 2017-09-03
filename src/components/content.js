@@ -54,6 +54,7 @@ class Content extends React.Component {
     onDrop: Types.func.isRequired,
     onFocus: Types.func.isRequired,
     onKeyDown: Types.func.isRequired,
+    onKeyUp: Types.func.isRequired,
     onPaste: Types.func.isRequired,
     onSelect: Types.func.isRequired,
     readOnly: Types.bool.isRequired,
@@ -686,12 +687,29 @@ class Content extends React.Component {
    */
 
   onKeyUp = (event) => {
-    const { which } = event
+    const { altKey, ctrlKey, metaKey, shiftKey, which } = event
     const key = keycode(which)
+    const data = {}
 
     if (key == 'shift') {
       this.tmp.isShifting = false
     }
+
+    // Add helpful properties for handling hotkeys to the data object.
+    data.code = which
+    data.key = key
+    data.isAlt = altKey
+    data.isCmd = IS_MAC ? metaKey && !altKey : false
+    data.isCtrl = ctrlKey && !altKey
+    data.isLine = IS_MAC ? metaKey : false
+    data.isMeta = metaKey
+    data.isMod = IS_MAC ? metaKey && !altKey : ctrlKey && !altKey
+    data.isModAlt = IS_MAC ? metaKey && altKey : ctrlKey && altKey
+    data.isShift = shiftKey
+    data.isWord = IS_MAC ? altKey : ctrlKey
+
+    debug('onKeyUp', { event, data })
+    this.props.onKeyUp(event, data)
   }
 
   /**
