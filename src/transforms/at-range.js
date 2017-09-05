@@ -68,15 +68,7 @@ Transforms.deleteAtRange = (transform, range, options = {}) => {
   if (range.isCollapsed) return
 
   const { normalize = true } = options
-  const { startKey, startOffset, endKey, endOffset } = range
-
-  // If the start and end key are the same, we can just remove text.
-  if (startKey == endKey) {
-    const index = startOffset
-    const length = endOffset - startOffset
-    transform.removeTextByKey(startKey, index, length, { normalize })
-    return
-  }
+  let { startKey, startOffset, endKey, endOffset } = range
 
   // Split at the range edges within a common ancestor, without normalizing.
   let { state } = transform
@@ -84,9 +76,83 @@ Transforms.deleteAtRange = (transform, range, options = {}) => {
   let ancestor = document.getCommonAncestor(startKey, endKey)
   let startChild = ancestor.getFurthestAncestor(startKey)
   let endChild = ancestor.getFurthestAncestor(endKey)
+
+  // If the start child is a void node, and the range begins or
+  // ends (when range is backward) at the start of it, remove it
+  // and set nextSibling as startChild until there is no startChild
+  // that is a void node and included in the selection range
+  let startChildIncludesVoid = startChild.isVoid && (
+    range.anchorOffset === 0 && !range.isBackward ||
+    range.focusOffset === 0 && range.isBackward
+  )
+  while (startChildIncludesVoid) {
+    const nextSibling = document.getNextSibling(startChild.key)
+    transform.removeNodeByKey(startChild.key, OPTS)
+    // Abort if no nextSibling or we are about to process the endChild which is aslo a void node
+    if (!nextSibling || endChild.key === nextSibling.key && nextSibling.isVoid) {
+      startChildIncludesVoid = false
+      return
+    }
+    // Process the next void
+    if (nextSibling.isVoid) {
+      startChild = nextSibling
+    }
+    // Set the startChild, startKey and startOffset in the beginning of the next non void sibling
+    if (!nextSibling.isVoid) {
+      startChild = nextSibling
+      if (startChild.getTexts) {
+        startKey = startChild.getTexts().first().key
+      } else {
+        startKey = startChild.key
+      }
+      startOffset = 0
+      startChildIncludesVoid = false
+    }
+  }
+
+  // If the start child is a void node, and the range ends or
+  // begins (when range is backward) at the end of it move to nextSibling
+  const startChildEndOfVoid = startChild.isVoid && (
+    range.anchorOffset === 1 && !range.isBackward ||
+    range.focusOffset === 1 && range.isBackward
+  )
+  if (startChildEndOfVoid) {
+    const nextSibling = document.getNextSibling(startChild.key)
+    if (nextSibling) {
+      startChild = nextSibling
+      if (startChild.getTexts) {
+        startKey = startChild.getTexts().first().key
+      } else {
+        startKey = startChild.key
+      }
+      startOffset = 0
+    }
+  }
+
+  // If the start and end key are the same, we can just remove it.
+  if (startKey == endKey) {
+    // If it is a void node, remove the whole node
+    if (ancestor.isVoid) {
+      // Deselect if this is the only node left in document
+      if (document.nodes.size === 1) {
+        transform.deselect()
+      }
+      transform.removeNodeByKey(ancestor.key, OPTS)
+      return
+    }
+    // Remove the text
+    const index = startOffset
+    const length = endOffset - startOffset
+    transform.removeTextByKey(startKey, index, length, { normalize })
+    return
+  }
+
+  // Split at the range edges within a common ancestor, without normalizing.
+  ancestor = document.getCommonAncestor(startKey, endKey)
+  startChild = ancestor.getFurthestAncestor(startKey)
+  endChild = ancestor.getFurthestAncestor(endKey)
   const startOff = (startChild.kind == 'text' ? 0 : startChild.getOffset(startKey)) + startOffset
   const endOff = (endChild.kind == 'text' ? 0 : endChild.getOffset(endKey)) + endOffset
-
   transform.splitNodeByKey(startChild.key, startOff, OPTS)
   transform.splitNodeByKey(endChild.key, endOff, OPTS)
 
@@ -107,11 +173,18 @@ Transforms.deleteAtRange = (transform, range, options = {}) => {
     })
   }
 
-  // If the start and end block are different, move all of the nodes from the
-  // end block into the start block.
+
   const startBlock = document.getClosestBlock(startKey)
   const endBlock = document.getClosestBlock(document.getNextText(endKey).key)
 
+  // If the endBlock is void, just remove the startBlock
+  if (endBlock.isVoid) {
+    transform.removeNodeByKey(startBlock.key)
+    return
+  }
+
+  // If the start and end block are different, move all of the nodes from the
+  // end block into the start block
   if (startBlock.key !== endBlock.key) {
     endBlock.nodes.forEach((child, i) => {
       const newKey = startBlock.key
