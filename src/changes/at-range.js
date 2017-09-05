@@ -70,7 +70,7 @@ Changes.deleteAtRange = (change, range, options = {}) => {
   let { startKey, startOffset, endKey, endOffset } = range
 
   // Split at the range edges within a common ancestor, without normalizing.
-  let { state } = transform
+  let { state } = change
   let { document } = state
   let ancestor = document.getCommonAncestor(startKey, endKey)
   let startChild = ancestor.getFurthestAncestor(startKey)
@@ -87,7 +87,7 @@ Changes.deleteAtRange = (change, range, options = {}) => {
 
   while (startChildIncludesVoid) {
     const nextSibling = document.getNextSibling(startChild.key)
-    transform.removeNodeByKey(startChild.key, OPTS)
+    change.removeNodeByKey(startChild.key, OPTS)
     // Abort if no nextSibling or we are about to process the endChild which is aslo a void node
     if (!nextSibling || endChild.key === nextSibling.key && nextSibling.isVoid) {
       startChildIncludesVoid = false
@@ -136,9 +136,9 @@ Changes.deleteAtRange = (change, range, options = {}) => {
     if (ancestor.isVoid) {
       // Deselect if this is the only node left in document
       if (document.nodes.size === 1) {
-        transform.deselect()
+        change.deselect()
       }
-      transform.removeNodeByKey(ancestor.key, OPTS)
+      change.removeNodeByKey(ancestor.key, OPTS)
       return
     }
     // Remove the text
@@ -149,11 +149,11 @@ Changes.deleteAtRange = (change, range, options = {}) => {
   }
 
   // Split at the range edges within a common ancestor, without normalizing.
-  let { state } = change
-  let { document } = state
-  let ancestor = document.getCommonAncestor(startKey, endKey)
-  let startChild = ancestor.getFurthestAncestor(startKey)
-  let endChild = ancestor.getFurthestAncestor(endKey)
+  state = change.state
+  document = state.document
+  ancestor = document.getCommonAncestor(startKey, endKey)
+  startChild = ancestor.getFurthestAncestor(startKey)
+  endChild = ancestor.getFurthestAncestor(endKey)
 
   if (startChild.kind == 'text') {
     change.splitNodeByKey(startChild.key, startOffset, OPTS)
@@ -194,7 +194,7 @@ Changes.deleteAtRange = (change, range, options = {}) => {
 
   // If the endBlock is void, just remove the startBlock
   if (endBlock.isVoid) {
-    transform.removeNodeByKey(startBlock.key)
+    change.removeNodeByKey(startBlock.key)
     return
   }
 

@@ -46,7 +46,7 @@ Changes.addMarkByKey = (change, key, offset, length, mark, options = {}) => {
 /**
  * Insert a `fragment` at `index` in a node by `key`.
  *
- * @param {Transform} transform
+ * @param {Change} change
  * @param {String} key
  * @param {Number} index
  * @param {Fragment} fragment
@@ -54,13 +54,15 @@ Changes.addMarkByKey = (change, key, offset, length, mark, options = {}) => {
  *   @property {Boolean} normalize
  */
 
-Transforms.insertFragmentByKey = (transform, key, index, fragment, options = {}) => {
+Changes.insertFragmentByKey = (change, key, index, fragment, options = {}) => {
   const { normalize = true } = options
 
-  fragment.nodes.forEach((node, i) => transform.insertNodeByKey(key, index + i, node))
+  fragment.nodes.forEach((node, i) => {
+    change.insertNodeByKey(key, index + i, node)
+  })
 
   if (normalize) {
-    transform.normalizeNodeByKey(key, SCHEMA)
+    change.normalizeNodeByKey(key, SCHEMA)
   }
 }
 

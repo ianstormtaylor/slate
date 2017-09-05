@@ -1,7 +1,7 @@
 
 nodes:
   - kind: block
-    type: video
+    type: quote
     nodes:
       - kind: text
         text: ""
@@ -12,4 +12,4 @@ nodes:
     type: paragraph
     nodes:
       - kind: text
-        text: "Some text"
+        text: text

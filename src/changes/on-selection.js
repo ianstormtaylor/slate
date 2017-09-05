@@ -37,19 +37,19 @@ Changes.select = (change, properties, options = {}) => {
   }
 
   // Resolve the selection keys into paths.
-  sel.anchorPath = document.getPath(sel.anchorKey)
+  sel.anchorPath = sel.anchorKey == null ? null : document.getPath(sel.anchorKey)
   delete sel.anchorKey
 
   if (props.anchorKey) {
-    props.anchorPath = document.getPath(props.anchorKey)
+    props.anchorPath = props.anchorKey == null ? null : document.getPath(props.anchorKey)
     delete props.anchorKey
   }
 
-  sel.focusPath = document.getPath(sel.focusKey)
+  sel.focusPath = sel.focusKey == null ? null : document.getPath(sel.focusKey)
   delete sel.focusKey
 
   if (props.focusKey) {
-    props.focusPath = document.getPath(props.focusKey)
+    props.focusPath = props.focusKey == null ? null : document.getPath(props.focusKey)
     delete props.focusKey
   }
 

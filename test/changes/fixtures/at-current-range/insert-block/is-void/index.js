@@ -15,13 +15,8 @@ export default function (state) {
   const next = state
     .change()
     .select(range)
-<<<<<<< HEAD:test/changes/fixtures/at-current-range/insert-block/is-void/index.js
-    .insertBlock('image')
+    .insertBlock('quote')
     .state
-=======
-    .insertBlock('video')
-    .apply()
->>>>>>> master:test/transforms/fixtures/at-current-range/insert-block/is-void/index.js
 
   const updated = next.document.getTexts().first()
 
