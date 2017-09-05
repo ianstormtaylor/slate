@@ -449,7 +449,9 @@ class Content extends React.Component {
   onDragOver = (event) => {
     if (!this.isInEditor(event.target)) return
 
-    event.preventDefault()
+    if (!this.tmp.isInternalDrag) {
+      event.preventDefault()
+    }
 
     if (this.tmp.isDragging) return
     this.tmp.isDragging = true
