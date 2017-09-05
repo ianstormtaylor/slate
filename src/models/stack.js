@@ -1,4 +1,5 @@
 
+import MODEL_TYPES from '../constants/model-types'
 import CorePlugin from '../plugins/core'
 import Debug from 'debug'
 import Schema from './schema'
@@ -69,6 +70,17 @@ class Stack extends new Record(DEFAULTS) {
   }
 
   /**
+   * Check if a `value` is a `Stack`.
+   *
+   * @param {Any} value
+   * @return {Boolean}
+   */
+
+  static isStack(value) {
+    return !!(value && value[MODEL_TYPES.STACK])
+  }
+
+  /**
    * Get the kind.
    *
    * @return {String}
@@ -127,6 +139,12 @@ class Stack extends new Record(DEFAULTS) {
   }
 
 }
+
+/**
+ * Attach a pseudo-symbol for type checking.
+ */
+
+Stack.prototype[MODEL_TYPES.STACK] = true
 
 /**
  * Mix in the stack methods.

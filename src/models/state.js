@@ -74,14 +74,14 @@ class State extends new Record(DEFAULTS) {
   }
 
   /**
-   * Determines if the passed in paramter is a Slate State or not
+   * Check if a `value` is a `State`.
    *
-   * @param {*} maybeState
+   * @param {Any} value
    * @return {Boolean}
    */
 
-  static isState(maybeState) {
-    return !!(maybeState && maybeState[MODEL_TYPES.STATE])
+  static isState(value) {
+    return !!(value && value[MODEL_TYPES.STATE])
   }
 
   /**
@@ -489,7 +489,7 @@ class State extends new Record(DEFAULTS) {
 }
 
 /**
- * Pseduo-symbol that shows this is a Slate State
+ * Attach a pseudo-symbol for type checking.
  */
 
 State.prototype[MODEL_TYPES.STATE] = true

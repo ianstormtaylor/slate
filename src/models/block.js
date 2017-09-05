@@ -89,14 +89,14 @@ class Block extends new Record(DEFAULTS) {
   }
 
   /**
-   * Determines if the passed in paramter is a Slate Block or not
+   * Check if a `value` is a `Block`.
    *
-   * @param {*} maybeBlock
+   * @param {Any} value
    * @return {Boolean}
    */
 
-  static isBlock(maybeBlock) {
-    return !!(maybeBlock && maybeBlock[MODEL_TYPES.BLOCK])
+  static isBlock(value) {
+    return !!(value && value[MODEL_TYPES.BLOCK])
   }
 
   /**
@@ -132,7 +132,7 @@ class Block extends new Record(DEFAULTS) {
 }
 
 /**
- * Pseduo-symbol for type checking.
+ * Attach a pseudo-symbol for type checking.
  */
 
 Block.prototype[MODEL_TYPES.BLOCK] = true

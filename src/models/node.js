@@ -67,6 +67,22 @@ class Node {
   }
 
   /**
+   * Check if a `value` is a `Node`.
+   *
+   * @param {Any} value
+   * @return {Boolean}
+   */
+
+  static isNode(value) {
+    return (
+      Block.isBlock(value) ||
+      Document.isDocument(value) ||
+      Inline.isInline(value) ||
+      Text.isText(value)
+    )
+  }
+
+  /**
    * True if the node has both descendants in that order, false otherwise. The
    * order is depth-first, post-order.
    *

@@ -81,14 +81,14 @@ class Inline extends new Record(DEFAULTS) {
   }
 
   /**
-   * Determines if the passed in paramter is a Slate Inline or not
+   * Check if a `value` is a `Inline`.
    *
-   * @param {*} maybeInline
+   * @param {Any} value
    * @return {Boolean}
    */
 
-  static isInline(maybeInline) {
-    return !!(maybeInline && maybeInline[MODEL_TYPES.INLINE])
+  static isInline(value) {
+    return !!(value && value[MODEL_TYPES.INLINE])
   }
 
   /**
@@ -124,7 +124,7 @@ class Inline extends new Record(DEFAULTS) {
 }
 
 /**
- * Pseduo-symbol that shows this is a Slate Inline
+ * Attach a pseudo-symbol for type checking.
  */
 
 Inline.prototype[MODEL_TYPES.INLINE] = true

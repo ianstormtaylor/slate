@@ -42,14 +42,14 @@ class Range extends new Record(DEFAULTS) {
   }
 
   /**
-   * Determines if the passed in paramter is a Slate Range or not
+   * Check if a `value` is a `Range`.
    *
-   * @param {*} maybeRange
+   * @param {Any} value
    * @return {Boolean}
    */
 
-  static isRange(maybeRange) {
-    return !!(maybeRange && maybeRange[MODEL_TYPES.RANGE])
+  static isRange(value) {
+    return !!(value && value[MODEL_TYPES.RANGE])
   }
 
   /**
@@ -85,7 +85,7 @@ class Range extends new Record(DEFAULTS) {
 }
 
 /**
- * Pseduo-symbol that shows this is a Slate Range
+ * Attach a pseudo-symbol for type checking.
  */
 
 Range.prototype[MODEL_TYPES.RANGE] = true

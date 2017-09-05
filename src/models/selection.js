@@ -41,14 +41,14 @@ class Selection extends new Record(DEFAULTS) {
   }
 
   /**
-   * Determines if the passed in paramter is a Slate Selection or not
+   * Check if a `value` is a `Selection`.
    *
-   * @param {*} maybeSelection
+   * @param {Any} value
    * @return {Boolean}
    */
 
-  static isSelection(maybeSelection) {
-    return !!(maybeSelection && maybeSelection[MODEL_TYPES.SELECTION])
+  static isSelection(value) {
+    return !!(value && value[MODEL_TYPES.SELECTION])
   }
 
   /**
@@ -758,7 +758,7 @@ class Selection extends new Record(DEFAULTS) {
 }
 
 /**
- * Pseduo-symbol that shows this is a Slate Selection
+ * Attach a pseudo-symbol for type checking.
  */
 
 Selection.prototype[MODEL_TYPES.SELECTION] = true

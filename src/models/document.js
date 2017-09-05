@@ -56,14 +56,14 @@ class Document extends new Record(DEFAULTS) {
   }
 
   /**
-   * Determines if the passed in paramter is a Slate Document or not
+   * Check if a `value` is a `Document`.
    *
-   * @param {*} maybeDocument
+   * @param {Any} value
    * @return {Boolean}
    */
 
-  static isDocument(maybeDocument) {
-    return !!(maybeDocument && maybeDocument[MODEL_TYPES.DOCUMENT])
+  static isDocument(value) {
+    return !!(value && value[MODEL_TYPES.DOCUMENT])
   }
 
   /**
@@ -99,7 +99,7 @@ class Document extends new Record(DEFAULTS) {
 }
 
 /**
- * Pseduo-symbol that shows this is a Slate Document
+ * Attach a pseudo-symbol for type checking.
  */
 
 Document.prototype[MODEL_TYPES.DOCUMENT] = true

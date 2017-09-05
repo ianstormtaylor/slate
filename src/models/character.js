@@ -75,14 +75,14 @@ class Character extends new Record(DEFAULTS) {
   }
 
   /**
-   * Determines if the passed in paramter is a Slate Character or not
+   * Check if a `value` is a `Character`.
    *
-   * @param {*} maybeCharacter
+   * @param {Any} value
    * @return {Boolean}
    */
 
-  static isCharacter(maybeCharacter) {
-    return !!(maybeCharacter && maybeCharacter[MODEL_TYPES.CHARACTER])
+  static isCharacter(value) {
+    return !!(value && value[MODEL_TYPES.CHARACTER])
   }
 
   /**
@@ -98,7 +98,7 @@ class Character extends new Record(DEFAULTS) {
 }
 
 /**
- * Pseduo-symbol that shows this is a Slate Character
+ * Attach a pseudo-symbol for type checking.
  */
 
 Character.prototype[MODEL_TYPES.CHARACTER] = true

@@ -1,4 +1,5 @@
 
+import MODEL_TYPES from '../constants/model-types'
 import Debug from 'debug'
 import Changes from '../changes'
 import apply from '../operations/apply'
@@ -21,6 +22,17 @@ const debug = Debug('slate:change')
 class Change {
 
   /**
+   * Check if a `value` is a `Change`.
+   *
+   * @param {Any} value
+   * @return {Boolean}
+   */
+
+  static isChange(value) {
+    return !!(value && value[MODEL_TYPES.CHANGE])
+  }
+
+  /**
    * Create a new `Change` with `attrs`.
    *
    * @param {Object} attrs
@@ -29,7 +41,6 @@ class Change {
 
   constructor(attrs) {
     const { state } = attrs
-    const { history } = state
 
     this.state = state
     this.operations = []
@@ -61,18 +72,20 @@ class Change {
    */
 
   applyOperation(operation, options = {}) {
-    const { state, flags } = this
+    const { flags } = this
     const { save = flags.save, merge = flags.merge } = options
-    const { history } = state
+    let { state } = this
+    let { history } = state
+
+    state = apply(state, operation)
 
     if (history && save) {
-      history.save(operation, {
-        merge,
-        checkpoint: this.operations.length == 0,
-      })
+      const checkpoint = this.operations.length == 0
+      history = history.save(operation, { merge, checkpoint })
+      state = state.set('history', history)
     }
 
-    this.state = apply(state, operation)
+    this.state = state
     this.operations.push(operation)
     return this
   }
@@ -115,6 +128,12 @@ class Change {
   }
 
 }
+
+/**
+ * Attach a pseudo-symbol for type checking.
+ */
+
+Change.prototype[MODEL_TYPES.CHANGE] = true
 
 /**
  * Add a change method for each of the changes.

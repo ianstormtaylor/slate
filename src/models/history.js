@@ -1,6 +1,8 @@
 
+import MODEL_TYPES from '../constants/model-types'
 import Debug from 'debug'
 import isEqual from 'lodash/isEqual'
+import { Record, Stack } from 'immutable'
 
 /**
  * Debug.
@@ -11,24 +13,55 @@ import isEqual from 'lodash/isEqual'
 const debug = Debug('slate:history')
 
 /**
+ * Default properties.
+ *
+ * @type {Object}
+ */
+
+const DEFAULTS = {
+  redos: new Stack(),
+  undos: new Stack(),
+  shouldSave,
+  shouldMerge,
+}
+
+/**
  * History.
  *
  * @type {History}
  */
 
-class History {
+class History extends new Record(DEFAULTS) {
 
   /**
    * Create a new `History` with `attrs`.
    *
    * @param {Object} attrs
+   * @return {History}
    */
 
-  constructor(attrs = {}) {
-    this.undos = attrs.undos || []
-    this.redos = attrs.redos || []
-    this._shouldMerge = attrs.shouldMerge || shouldMerge
-    this._shouldSave = attrs.shouldSave || shouldSave
+  static create(attrs = {}) {
+    if (History.isHistory(attrs)) return attrs
+
+    const history = new History({
+      undos: attrs.undos || new Stack(),
+      redos: attrs.redos || new Stack(),
+      shouldSave: attrs.shouldSave || shouldSave,
+      shouldMerge: attrs.shouldMerge || shouldMerge,
+    })
+
+    return history
+  }
+
+  /**
+   * Check if a `value` is a `History`.
+   *
+   * @param {Any} value
+   * @return {Boolean}
+   */
+
+  static isHistory(value) {
+    return !!(value && value[MODEL_TYPES.HISTORY])
   }
 
   /**
@@ -42,72 +75,60 @@ class History {
   }
 
   /**
-   * Move the history backward, for undoing.
-   *
-   * @return {Array}
-   */
-
-  back() {
-    const { redos, undos } = this
-    const operations = undos.pop()
-    if (!operations) return
-    redos.push(operations)
-    debug('back', operations)
-    return operations
-  }
-
-  /**
-   * Move the history forward, for redoing.
-   *
-   * @return {Array}
-   */
-
-  forward() {
-    const { redos, undos } = this
-    const operations = redos.pop()
-    if (!operations) return
-    undos.push(operations)
-    debug('forward', operations)
-    return operations
-  }
-
-  /**
    * Save an `operation` into the history.
    *
    * @param {Object} operation
+   * @param {Object} options
+   * @return {History}
    */
 
   save(operation, options = {}) {
     let { merge, checkpoint } = options
-    const { undos } = this
-    const prevBatch = undos[undos.length - 1]
+    let history = this
+    let { undos } = history
+    const prevBatch = undos.peek()
     const prevOperation = prevBatch && prevBatch[prevBatch.length - 1]
-    const save = this._shouldSave(operation, prevOperation)
-    if (!save) return
+    const save = history.shouldSave(operation, prevOperation)
+    if (!save) return history
 
     if (checkpoint == null) {
       checkpoint = undos.length === 0
     }
 
     if (merge == null) {
-      merge = this._shouldMerge(operation, prevOperation)
+      merge = history.shouldMerge(operation, prevOperation)
     }
+
+    debug('save', { operation, merge, checkpoint })
+
+    let batch
 
     if (merge || !checkpoint) {
-      prevBatch.push(operation)
+      undos = undos.pop()
+      batch = prevBatch.slice()
+      batch.push(operation)
     } else {
-      const batch = [operation]
-      undos.push(batch)
-      if (undos.length > 100) undos.shift()
+      batch = [operation]
     }
 
-    debug('save', operation)
+    undos = undos.push(batch)
+    if (undos.length > 100) undos = undos.take(100)
+
+    history = history.set('undos', undos)
+    return history
   }
 
 }
 
 /**
- * Check whether to merge an operation `o`, given a previous operation `p`.
+ * Attach a pseudo-symbol for type checking.
+ */
+
+History.prototype[MODEL_TYPES.HISTORY] = true
+
+/**
+ * The default checking function for whether to merge an operation `o`, given a
+ * previous operation `p`.
  *
  * @param {Object} o
  * @param {Object} p
@@ -138,7 +159,8 @@ function shouldMerge(o, p) {
 }
 
 /**
- * Check whether to save an operation `o`, given a previous operation `p`.
+ * The default checking function for whether to save an operation `o`, given a
+ * previous operation `p`.
  *
  * @param {Object} o
  * @param {Object} p

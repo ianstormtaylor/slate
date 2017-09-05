@@ -70,14 +70,14 @@ class Mark extends new Record(DEFAULTS) {
   }
 
   /**
-   * Determines if the passed in paramter is a Slate Mark or not
+   * Check if a `value` is a `Mark`.
    *
-   * @param {*} maybeMark
+   * @param {Any} value
    * @return {Boolean}
    */
 
-  static isMark(maybeMark) {
-    return !!(maybeMark && maybeMark[MODEL_TYPES.MARK])
+  static isMark(value) {
+    return !!(value && value[MODEL_TYPES.MARK])
   }
 
   /**
@@ -102,7 +102,7 @@ class Mark extends new Record(DEFAULTS) {
 }
 
 /**
- * Pseduo-symbol that shows this is a Slate Mark
+ * Attach a pseudo-symbol for type checking.
  */
 
 Mark.prototype[MODEL_TYPES.MARK] = true

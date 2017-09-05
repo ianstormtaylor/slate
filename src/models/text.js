@@ -94,14 +94,14 @@ class Text extends new Record(DEFAULTS) {
   }
 
   /**
-   * Determines if the passed in paramter is a Slate Text or not
+   * Check if a `value` is a `Text`.
    *
-   * @param {*} maybeText
+   * @param {Any} value
    * @return {Boolean}
    */
 
-  static isText(maybeText) {
-    return !!(maybeText && maybeText[MODEL_TYPES.TEXT])
+  static isText(value) {
+    return !!(value && value[MODEL_TYPES.TEXT])
   }
 
   /**
@@ -418,7 +418,7 @@ class Text extends new Record(DEFAULTS) {
 }
 
 /**
- * Pseudo-symbol that shows this is a Slate Text
+ * Attach a pseudo-symbol for type checking.
  */
 
 Text.prototype[MODEL_TYPES.TEXT] = true

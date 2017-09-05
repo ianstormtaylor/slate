@@ -39,14 +39,14 @@ class Schema extends new Record(DEFAULTS) {
   }
 
   /**
-   * Determines if the passed in paramter is a Slate Schema or not
+   * Check if a `value` is a `Schema`.
    *
-   * @param {*} maybeSchema
+   * @param {Any} value
    * @return {Boolean}
    */
 
-  static isSchema(maybeSchema) {
-    return !!(maybeSchema && maybeSchema[MODEL_TYPES.SCHEMA])
+  static isSchema(value) {
+    return !!(value && value[MODEL_TYPES.SCHEMA])
   }
 
   /**
@@ -257,7 +257,7 @@ function normalizeMarkComponent(render) {
 }
 
 /**
- * Pseduo-symbol that shows this is a Slate Schema
+ * Attach a pseudo-symbol for type checking.
  */
 
 Schema.prototype[MODEL_TYPES.SCHEMA] = true
