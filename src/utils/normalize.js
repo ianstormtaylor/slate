@@ -18,19 +18,21 @@ import typeOf from 'type-of'
 
 function block(value) {
   if (Block.isBlock(value)) return value
+  
   if (
     Inline.isInline(value) ||
     Mark.isMark(value) ||
     Text.isText(value) ||
     Selection.isSelection(value)
-  ) throw new Error(`Invalid \`block\` argument! It must be a block, an object, or a string. You passed: "${value}".`)
+  ) {
+    throw new Error(`Invalid \`block\` argument! It must be a block, an object, or a string. You passed: "${value}".`)
+  }
 
 
   switch (typeOf(value)) {
     case 'string':
     case 'object':
       return Block.create(nodeProperties(value))
-
     default:
       throw new Error(`Invalid \`block\` argument! It must be a block, an object, or a string. You passed: "${value}".`)
   }
@@ -45,18 +47,20 @@ function block(value) {
 
 function inline(value) {
   if (Inline.isInline(value)) return value
+  
   if (
     Block.isBlock(value) ||
     Mark.isMark(value) ||
     Text.isText(value) ||
     Selection.isSelection(value)
-  ) throw new Error(`Invalid \`inline\` argument! It must be an inline, an object, or a string. You passed: "${value}".`)
+  ) {
+    throw new Error(`Invalid \`inline\` argument! It must be an inline, an object, or a string. You passed: "${value}".`)
+  }
 
   switch (typeOf(value)) {
     case 'string':
     case 'object':
       return Inline.create(nodeProperties(value))
-
     default:
       throw new Error(`Invalid \`inline\` argument! It must be an inline, an object, or a string. You passed: "${value}".`)
   }
@@ -73,13 +77,15 @@ function key(value) {
   if (typeOf(value) == 'string') return value
 
   warn('An object was passed to a Node method instead of a `key` string. This was previously supported, but is being deprecated because it can have a negative impact on performance. The object in question was:', value)
+  
   if (
     Block.isBlock(value) ||
     Document.isDocument(value) ||
     Inline.isInline(value) ||
     Text.isText(value)
-  ) return value.key
-
+  ) {
+    return value.key
+  }
 
   throw new Error(`Invalid \`key\` argument! It must be either a block, an inline, a text, or a string. You passed: "${value}".`)
 }
@@ -93,19 +99,20 @@ function key(value) {
 
 function mark(value) {
   if (Mark.isMark(value)) return value
+  
   if (
     Block.isBlock(value) ||
     Inline.isInline(value) ||
     Text.isText(value) ||
     Selection.isSelection(value)
-  ) throw new Error(`Invalid \`mark\` argument! It must be a mark, an object, or a string. You passed: "${value}".`)
-
+  ) {
+    throw new Error(`Invalid \`mark\` argument! It must be a mark, an object, or a string. You passed: "${value}".`)
+  }
 
   switch (typeOf(value)) {
     case 'string':
     case 'object':
       return Mark.create(markProperties(value))
-
     default:
       throw new Error(`Invalid \`mark\` argument! It must be a mark, an object, or a string. You passed: "${value}".`)
   }
@@ -189,18 +196,19 @@ function nodeProperties(value = {}) {
 
 function selection(value) {
   if (Selection.isSelection(value)) return value
+  
   if (
     Mark.isMark(value) ||
     Block.isBlock(value) ||
     Inline.isInline(value) ||
-    Text.isText(value) ||
-    Selection.isSelection(value)
-  ) throw new Error(`Invalid \`selection\` argument! It must be a selection or an object. You passed: "${value}".`)``
+    Text.isText(value)
+  ) {
+    throw new Error(`Invalid \`selection\` argument! It must be a selection or an object. You passed: "${value}".`)``
+  }
 
   switch (typeOf(value)) {
     case 'object':
       return Selection.create(value)
-
     default:
       throw new Error(`Invalid \`selection\` argument! It must be a selection or an object. You passed: "${value}".`)
   }
@@ -226,7 +234,6 @@ function selectionProperties(value = {}) {
       if (value.isFocused !== undefined) ret.isFocused = !!value.isFocused
       if (value.marks !== undefined) ret.marks = value.marks
       break
-
     default:
       throw new Error(`Invalid selection \`properties\` argument! It must be an object or a selection. You passed: "${value}".`)
   }
