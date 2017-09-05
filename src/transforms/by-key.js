@@ -38,6 +38,27 @@ Transforms.addMarkByKey = (transform, key, offset, length, mark, options = {}) =
 }
 
 /**
+ * Insert a `fragment` at `index` in a node by `key`.
+ *
+ * @param {Transform} transform
+ * @param {String} key
+ * @param {Number} index
+ * @param {Fragment} fragment
+ * @param {Object} options
+ *   @property {Boolean} normalize
+ */
+
+Transforms.insertFragmentByKey = (transform, key, index, fragment, options = {}) => {
+  const { normalize = true } = options
+
+  fragment.nodes.forEach((node, i) => transform.insertNodeByKey(key, index + i, node))
+
+  if (normalize) {
+    transform.normalizeNodeByKey(key, SCHEMA)
+  }
+}
+
+/**
  * Insert a `node` at `index` in a node by `key`.
  *
  * @param {Transform} transform
