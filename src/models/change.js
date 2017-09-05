@@ -4,6 +4,7 @@ import Debug from 'debug'
 import Changes from '../changes'
 import apply from '../operations/apply'
 import logger from '../utils/logger'
+import pick from 'lodash/pick'
 
 /**
  * Debug.
@@ -41,14 +42,9 @@ class Change {
 
   constructor(attrs) {
     const { state } = attrs
-
     this.state = state
     this.operations = []
-    this.flags = {
-      save: attrs.save === undefined ? true : attrs.save,
-      merge: attrs.merge === undefined ? null : attrs.merge,
-    }
-
+    this.flags = pick(attrs, ['merge', 'save'])
     this.setIsNative(attrs.isNative === undefined ? false : attrs.isNative)
   }
 
@@ -72,19 +68,32 @@ class Change {
    */
 
   applyOperation(operation, options = {}) {
-    const { flags } = this
-    const { save = flags.save, merge = flags.merge } = options
+    const { operations, flags } = this
     let { state } = this
     let { history } = state
 
+    // Default options to the change-level flags, this allows for setting
+    // specific options for all of the operations of a given change.
+    options = { ...flags, ...options }
+
+    // Derive the default option values.
+    const {
+      merge = operations.length == 0 ? null : true,
+      save = true,
+      skip = null,
+    } = options
+
+    // Apply the operation to the state.
+    debug('apply', { operation, save, merge })
     state = apply(state, operation)
 
+    // If needed, save the operation to the history.
     if (history && save) {
-      const checkpoint = this.operations.length == 0
-      history = history.save(operation, { merge, checkpoint })
+      history = history.save(operation, { merge, skip })
       state = state.set('history', history)
     }
 
+    // Update the mutable change object.
     this.state = state
     this.operations.push(operation)
     return this

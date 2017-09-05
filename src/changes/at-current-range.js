@@ -51,12 +51,10 @@ Changes.delete = (change) => {
   if (selection.isCollapsed) return
 
   change
-    .snapshotSelection()
     .deleteAtRange(selection)
     // Ensure that the selection is collapsed to the start, because in certain
     // cases when deleting across inline nodes this isn't guaranteed.
     .collapseToStart()
-    .snapshotSelection()
 }
 
 /**

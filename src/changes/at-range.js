@@ -66,6 +66,8 @@ Changes.addMarkAtRange = (change, range, mark, options = {}) => {
 Changes.deleteAtRange = (change, range, options = {}) => {
   if (range.isCollapsed) return
 
+  change.snapshotSelection()
+
   const { normalize = true } = options
   let { startKey, startOffset, endKey, endOffset } = range
 

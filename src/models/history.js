@@ -21,8 +21,6 @@ const debug = Debug('slate:history')
 const DEFAULTS = {
   redos: new Stack(),
   undos: new Stack(),
-  shouldSave,
-  shouldMerge,
 }
 
 /**
@@ -46,8 +44,6 @@ class History extends new Record(DEFAULTS) {
     const history = new History({
       undos: attrs.undos || new Stack(),
       redos: attrs.redos || new Stack(),
-      shouldSave: attrs.shouldSave || shouldSave,
-      shouldMerge: attrs.shouldMerge || shouldMerge,
     })
 
     return history
@@ -83,36 +79,44 @@ class History extends new Record(DEFAULTS) {
    */
 
   save(operation, options = {}) {
-    let { merge, checkpoint } = options
     let history = this
     let { undos } = history
+    let { merge, skip } = options
     const prevBatch = undos.peek()
     const prevOperation = prevBatch && prevBatch[prevBatch.length - 1]
-    const save = history.shouldSave(operation, prevOperation)
-    if (!save) return history
 
-    if (checkpoint == null) {
-      checkpoint = undos.length === 0
+    if (skip == null) {
+      skip = shouldSkip(operation, prevOperation)
+    }
+
+    if (skip) {
+      return history
     }
 
     if (merge == null) {
-      merge = history.shouldMerge(operation, prevOperation)
+      merge = shouldMerge(operation, prevOperation)
     }
 
-    debug('save', { operation, merge, checkpoint })
+    debug('save', { operation, merge })
 
-    let batch
-
-    if (merge || !checkpoint) {
-      undos = undos.pop()
-      batch = prevBatch.slice()
+    // If the `merge` flag is true, add the operation to the previous batch.
+    if (merge) {
+      const batch = prevBatch.slice()
       batch.push(operation)
-    } else {
-      batch = [operation]
+      undos = undos.pop()
+      undos = undos.push(batch)
     }
 
-    undos = undos.push(batch)
-    if (undos.length > 100) undos = undos.take(100)
+    // Otherwise, create a new batch with the operation.
+    else {
+      const batch = [operation]
+      undos = undos.push(batch)
+    }
+
+    // Constrain the history to 100 entries for memory's sake.
+    if (undos.length > 100) {
+      undos = undos.take(100)
+    }
 
     history = history.set('undos', undos)
     return history
@@ -127,8 +131,7 @@ class History extends new Record(DEFAULTS) {
 History.prototype[MODEL_TYPES.HISTORY] = true
 
 /**
- * The default checking function for whether to merge an operation `o`, given a
- * previous operation `p`.
+ * Check whether to merge a new operation `o` into the previous operation `p`.
  *
  * @param {Object} o
  * @param {Object} p
@@ -159,23 +162,22 @@ function shouldMerge(o, p) {
 }
 
 /**
- * The default checking function for whether to save an operation `o`, given a
- * previous operation `p`.
+ * Check whether to skip a new operation `o`, given previous operation `p`.
  *
  * @param {Object} o
  * @param {Object} p
  * @return {Boolean}
  */
 
-function shouldSave(o, p) {
-  if (!p) return true
+function shouldSkip(o, p) {
+  if (!p) return false
 
-  const save = (
-    o.type != 'set_selection' ||
-    p.type != 'set_selection'
+  const skip = (
+    o.type == 'set_selection' &&
+    p.type == 'set_selection'
   )
 
-  return save
+  return skip
 }
 
 /**

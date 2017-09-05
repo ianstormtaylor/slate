@@ -1,5 +1,6 @@
 
 import Normalize from '../utils/normalize'
+import isEmpty from 'is-empty'
 import logger from '../utils/logger'
 import pick from 'lodash/pick'
 
@@ -21,6 +22,7 @@ const Changes = {}
 Changes.select = (change, properties, options = {}) => {
   properties = Normalize.selectionProperties(properties)
 
+  const { snapshot = false } = options
   const { state } = change
   const { document, selection } = state
   const props = {}
@@ -32,7 +34,7 @@ Changes.select = (change, properties, options = {}) => {
   // create a dictionary of the previous values for all of the properties that
   // are being changed, for the inverse operation.
   for (const k in properties) {
-    if (!options.snapshot && properties[k] == sel[k]) continue
+    if (snapshot == false && properties[k] == sel[k]) continue
     props[k] = properties[k]
   }
 
@@ -66,19 +68,23 @@ Changes.select = (change, properties, options = {}) => {
     props.marks = null
   }
 
+  // If there are no new properties to set, abort.
+  if (isEmpty(props)) {
+    return
+  }
+
   // Apply the operation.
   change.applyOperation({
     type: 'set_selection',
     properties: props,
     selection: sel,
-  })
+  }, snapshot ? { skip: false, merge: false } : {})
 }
 
 /**
- * Selects the whole selection.
+ * Select the whole document.
  *
  * @param {Change} change
- * @param {Object} properties
  */
 
 Changes.selectAll = (change) => {

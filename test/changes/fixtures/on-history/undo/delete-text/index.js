@@ -24,7 +24,7 @@ export default function (state) {
 
   assert.deepEqual(
     next.selection.toJS(),
-    range.merge({ anchorOffset: 4 }).toJS(),
+    range.toJS(),
   )
 
   return next
