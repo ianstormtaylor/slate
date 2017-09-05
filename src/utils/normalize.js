@@ -20,6 +20,16 @@ import { Set } from 'immutable'
 function block(value) {
   if (Block.isBlock(value)) return value
 
+  if (
+    Inline.isInline(value) ||
+    Mark.isMark(value) ||
+    Text.isText(value) ||
+    Selection.isSelection(value)
+  ) {
+    throw new Error(`Invalid \`block\` argument! It must be a block, an object, or a string. You passed: ${value}`)
+  }
+
+
   switch (typeOf(value)) {
     case 'string':
     case 'object': {
@@ -41,6 +51,15 @@ function block(value) {
 function inline(value) {
   if (Inline.isInline(value)) return value
 
+  if (
+    Block.isBlock(value) ||
+    Mark.isMark(value) ||
+    Text.isText(value) ||
+    Selection.isSelection(value)
+  ) {
+    throw new Error(`Invalid \`inline\` argument! It must be an inline, an object, or a string. You passed: ${value}`)
+  }
+
   switch (typeOf(value)) {
     case 'string':
     case 'object': {
@@ -61,6 +80,15 @@ function inline(value) {
 
 function text(value) {
   if (Text.isText(value)) return value
+
+  if (
+    Block.isBlock(value) ||
+    Inline.isInline(value) ||
+    Mark.isMark(value) ||
+    Selection.isSelection(value)
+  ) {
+    throw new Error(`Invalid \`text\` argument! It must be a text, an object, or a string. You passed: ${value}`)
+  }
 
   switch (typeOf(value)) {
     case 'object': {
@@ -114,10 +142,14 @@ function key(value) {
 
   logger.warn('An object was passed to a Node method instead of a `key` string. This was previously supported, but is being deprecated because it can have a negative impact on performance. The object in question was:', value)
 
-  if (Block.isBlock(value)) return value.key
-  if (Document.isDocument(value)) return value.key
-  if (Inline.isInline(value)) return value.key
-  if (Text.isText(value)) return value.key
+  if (
+    Block.isBlock(value) ||
+    Document.isDocument(value) ||
+    Inline.isInline(value) ||
+    Text.isText(value)
+  ) {
+    return value.key
+  }
 
   throw new Error(`Invalid \`key\` argument! It must be either a block, an inline, a text, or a string. You passed: ${value}`)
 }
@@ -131,6 +163,14 @@ function key(value) {
 
 function mark(value) {
   if (Mark.isMark(value)) return value
+  if (
+    Block.isBlock(value) ||
+    Inline.isInline(value) ||
+    Text.isText(value) ||
+    Selection.isSelection(value)
+  ) {
+    throw new Error(`Invalid \`mark\` argument! It must be a mark, an object, or a string. You passed: ${value}`)
+  }
 
   switch (typeOf(value)) {
     case 'string':
@@ -143,6 +183,13 @@ function mark(value) {
   }
 }
 
+/**
+ * Normalize a set of marks argument `values`.
+ *
+ * @param {Set<Marks>|Array} values
+ * @return {Set<Marks>}
+ */
+
 function marks(values) {
   if (Set.isSet(values)) return values
 
@@ -154,7 +201,7 @@ function marks(values) {
       return null
     }
     default: {
-      throw new Error('error')
+      throw new Error(`Invalid \`marks\` argument! It must be a set of marks or an array. You passed: ${value}`)
     }
   }
 }
@@ -178,6 +225,8 @@ function markProperties(value = {}) {
       for (const k in value) {
         if (k == 'data') {
           if (value[k] !== undefined) ret[k] = Data.create(value[k])
+        } else if (k.startsWith('@@__SLATE')) {
+          return
         } else {
           ret[k] = value[k]
         }
@@ -212,6 +261,8 @@ function nodeProperties(value = {}) {
       for (const k in value) {
         if (k == 'data') {
           if (value[k] !== undefined) ret[k] = Data.create(value[k])
+        } else if (k.startsWith('@@__SLATE')) {
+          return
         } else {
           ret[k] = value[k]
         }
@@ -235,6 +286,14 @@ function nodeProperties(value = {}) {
 
 function selection(value) {
   if (Selection.isSelection(value)) return value
+  if (
+    Mark.isMark(value) ||
+    Block.isBlock(value) ||
+    Inline.isInline(value) ||
+    Text.isText(value)
+  ) {
+    throw new Error(`Invalid \`selection\` argument! It must be a selection or an object. You passed: ${value}`)``
+  }
 
   switch (typeOf(value)) {
     case 'object': {

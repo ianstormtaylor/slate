@@ -10,4 +10,9 @@ nodes:
     type: paragraph
     nodes:
       - kind: text
-        text: "Some text"
+        text: one
+  - kind: block
+    type: paragraph
+    nodes:
+      - kind: text
+        text: two

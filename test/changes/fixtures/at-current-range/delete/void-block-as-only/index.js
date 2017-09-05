@@ -9,25 +9,26 @@ export default function (state) {
     anchorKey: first.key,
     anchorOffset: 0,
     focusKey: first.key,
-    focusOffset: 0
+    focusOffset: 1
   })
 
   const next = state
     .change()
     .select(range)
-<<<<<<< HEAD:test/changes/fixtures/at-current-range/insert-block/is-void/index.js
-    .insertBlock('image')
+    .delete()
     .state
-=======
-    .insertBlock('video')
-    .apply()
->>>>>>> master:test/transforms/fixtures/at-current-range/insert-block/is-void/index.js
-
-  const updated = next.document.getTexts().first()
 
   assert.deepEqual(
     next.selection.toJS(),
-    range.collapseToStartOf(updated).toJS()
+    {
+      anchorKey: null,
+      anchorOffset: 0,
+      focusKey: null,
+      focusOffset: 0,
+      isBackward: false,
+      isFocused: false,
+      marks: null
+    }
   )
 
   return next

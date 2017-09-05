@@ -436,9 +436,6 @@ class Content extends React.Component {
 
   onDragOver = (event) => {
     if (!this.isInEditor(event.target)) return
-
-    event.preventDefault()
-
     if (this.tmp.isDragging) return
     this.tmp.isDragging = true
     this.tmp.isInternalDrag = false
@@ -479,10 +476,10 @@ class Content extends React.Component {
    */
 
   onDrop = (event) => {
+    event.preventDefault()
+
     if (this.props.readOnly) return
     if (!this.isInEditor(event.target)) return
-
-    event.preventDefault()
 
     const window = getWindow(event.target)
     const { state, editor } = this.props

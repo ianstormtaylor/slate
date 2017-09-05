@@ -113,7 +113,7 @@ class Void extends React.Component {
 
   onDragLeave = () => {
     this.setState((prevState) => {
-      const dragCounter = prevState.dragCounter + 1
+      const dragCounter = prevState.dragCounter - 1
       const editable = dragCounter === 0 ? false : undefined
       return { dragCounter, editable }
     })
