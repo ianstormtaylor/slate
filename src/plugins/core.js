@@ -383,21 +383,20 @@ function Plugin(options = {}) {
 
     if (isInternal) transform.delete()
 
-    switch (true) {
-      case Block.isBlock(node):
-        return transform
-          .select(target)
-          .insertBlock(node)
-          .removeNodeByKey(node.key)
-          .apply()
-      case Inline.isInline(node):
-        return transform
-          .select(target)
-          .insertInline(node)
-          .removeNodeByKey(node.key)
-          .apply()
-      default:
-        return
+    if (Block.isBlock(node)) {
+      return transform
+        .select(target)
+        .insertBlock(node)
+        .removeNodeByKey(node.key)
+        .apply()
+    }
+      
+    if (Inline.isInline(node)) {
+      return transform
+        .select(target)
+        .insertInline(node)
+        .removeNodeByKey(node.key)
+        .apply()
     }
   }
 
