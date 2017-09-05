@@ -130,7 +130,7 @@ function markProperties(value = {}) {
       for (const k in value) {
         if (k == 'data') {
           if (value[k] !== undefined) ret[k] = Data.create(value[k])
-        } else if (k.startsWith('@@__')) {
+        } else if (k.startsWith('@@__SLATE')) {
           return
         } else {
           ret[k] = value[k]
@@ -165,7 +165,7 @@ function nodeProperties(value = {}) {
       for (const k in value) {
         if (k == 'data') {
           if (value[k] !== undefined) ret[k] = Data.create(value[k])
-        } else if (k.startsWith('@@__')) {
+        } else if (k.startsWith('@@__SLATE')) {
           return
         } else {
           ret[k] = value[k]
