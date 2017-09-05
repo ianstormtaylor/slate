@@ -79,7 +79,7 @@ An object that defines the [`Block`](./block.md) and [`Inline`](./inline.md) nod
 [
   {
     match: { kind: 'block', type: 'code' },
-    component: props => <pre {...props.attributes}><code>{props.children}</code></pre>,
+    render: props => <pre {...props.attributes}><code>{props.children}</code></pre>,
     decorate: myCodeHighlighter
   }
 ]
