@@ -366,7 +366,6 @@ function Plugin(options = {}) {
 
     const { selection } = state
     let { node, target, isInternal } = data
-    const isInline = Inline.isInline(node)
 
     // If the drag is internal and the target is after the selection, it
     // needs to account for the selection's content being deleted.
@@ -383,7 +382,6 @@ function Plugin(options = {}) {
     const transform = state.transform()
 
     if (isInternal) transform.delete()
-    if (isInline && !node.isVoid) return
 
     switch (true) {
       case Block.isBlock(node):
