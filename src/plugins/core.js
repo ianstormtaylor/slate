@@ -373,7 +373,7 @@ function Plugin(options = {}) {
       selection.endOffset < target.endOffset
     ) {
       target = target.move(selection.startKey == selection.endKey
-        ? 0 - selection.endOffset - selection.startOffset
+        ? 0 - selection.endOffset + selection.startOffset
         : 0 - selection.endOffset)
     }
 
@@ -411,7 +411,7 @@ function Plugin(options = {}) {
       selection.endOffset < target.endOffset
     ) {
       target = target.move(selection.startKey == selection.endKey
-        ? 0 - selection.endOffset - selection.startOffset
+        ? 0 - selection.endOffset + selection.startOffset
         : 0 - selection.endOffset)
     }
 
