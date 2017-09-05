@@ -1,7 +1,9 @@
 
 import Base64 from '../serializers/base-64'
 import Content from '../components/content'
+import Block from '../models/block'
 import Character from '../models/character'
+import Inline from '../models/inline'
 import Debug from 'debug'
 import getPoint from '../utils/get-point'
 import Placeholder from '../components/placeholder'
@@ -381,11 +383,20 @@ function Plugin(options = {}) {
 
     if (isInternal) transform.delete()
 
-    return transform
-      .select(target)
-      .insertBlock(node)
-      .removeNodeByKey(node.key)
-      .apply()
+    if (Block.isBlock(node)) {
+      return transform
+        .select(target)
+        .insertBlock(node)
+        .removeNodeByKey(node.key)
+        .apply()
+    }
+    if (Inline.isInline(node)) {
+      return transform
+        .select(target)
+        .insertInline(node)
+        .removeNodeByKey(node.key)
+        .apply()
+    }
   }
 
   /**
