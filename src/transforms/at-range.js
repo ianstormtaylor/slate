@@ -597,7 +597,11 @@ Transforms.insertBlockAtRange = (transform, range, block, options = {}) => {
   const index = parent.nodes.indexOf(startBlock)
 
   if (startBlock.isVoid) {
-    transform.insertNodeByKey(parent.key, index + 1, block, { normalize })
+    let beforeOrAfterIndex = index
+    if (range.isAtEndOf(startBlock)) {
+      beforeOrAfterIndex++
+    }
+    transform.insertNodeByKey(parent.key, beforeOrAfterIndex, block, { normalize })
   }
 
   else if (startBlock.isEmpty) {

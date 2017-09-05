@@ -15,10 +15,10 @@ export default function (state) {
   const next = state
     .transform()
     .select(range)
-    .insertBlock('image')
+    .insertBlock('video')
     .apply()
 
-  const updated = next.document.getTexts().last()
+  const updated = next.document.getTexts().first()
 
   assert.deepEqual(
     next.selection.toJS(),
