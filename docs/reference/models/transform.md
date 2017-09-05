@@ -56,6 +56,7 @@ Transform methods can either operate on the [`Document`](./document.md), the [`S
 - [Node Transforms](#node-transforms)
   - [`addMarkByKey`](#addmarkbykey)
   - [`insertNodeByKey`](#insertnodebykey)
+  - [`insertFragmentByKey`](#insertfragmentbykey)
   - [`insertTextByKey`](#inserttextbykey)
   - [`moveNodeByKey`](#movenodebykey)
   - [`removeMarkByKey`](#removemarkbykey)
@@ -331,6 +332,11 @@ Add a `mark` to `length` characters starting at an `offset` in a [`Node`](./node
 `insertNodeByKey(key: String, index: Number, node: Node) => Transform`
 
 Insert a `node` at `index` inside a parent [`Node`](./node.md) by its `key`.
+
+### `insertFragmentByKey`
+`insertFragmentByKey(key: String, index: Number, fragment: Fragment) => Transform`
+
+Insert a [`Fragment`](./fragment.md) at `index` inside a parent [`Node`](./node.md) by its `key`.
 
 ### `insertTextByKey`
 `insertTextByKey(key: String, offset: Number, text: String, [marks: Set]) => Transform`
