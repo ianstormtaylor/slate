@@ -18,7 +18,6 @@ import typeOf from 'type-of'
 
 function block(value) {
   if (Block.isBlock(value)) return value
-  
   if (
     Inline.isInline(value) ||
     Mark.isMark(value) ||
@@ -47,7 +46,6 @@ function block(value) {
 
 function inline(value) {
   if (Inline.isInline(value)) return value
-  
   if (
     Block.isBlock(value) ||
     Mark.isMark(value) ||
@@ -77,7 +75,6 @@ function key(value) {
   if (typeOf(value) == 'string') return value
 
   warn('An object was passed to a Node method instead of a `key` string. This was previously supported, but is being deprecated because it can have a negative impact on performance. The object in question was:', value)
-  
   if (
     Block.isBlock(value) ||
     Document.isDocument(value) ||
@@ -99,7 +96,6 @@ function key(value) {
 
 function mark(value) {
   if (Mark.isMark(value)) return value
-  
   if (
     Block.isBlock(value) ||
     Inline.isInline(value) ||
@@ -196,7 +192,6 @@ function nodeProperties(value = {}) {
 
 function selection(value) {
   if (Selection.isSelection(value)) return value
-  
   if (
     Mark.isMark(value) ||
     Block.isBlock(value) ||

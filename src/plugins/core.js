@@ -390,7 +390,6 @@ function Plugin(options = {}) {
         .removeNodeByKey(node.key)
         .apply()
     }
-      
     if (Inline.isInline(node)) {
       return transform
         .select(target)
