@@ -101,7 +101,7 @@ class State extends new Record(DEFAULTS) {
    */
 
   get hasUndos() {
-    return this.history.undos.length > 0
+    return this.history.undos.size > 0
   }
 
   /**
@@ -111,7 +111,7 @@ class State extends new Record(DEFAULTS) {
    */
 
   get hasRedos() {
-    return this.history.redos.length > 0
+    return this.history.redos.size > 0
   }
 
   /**
