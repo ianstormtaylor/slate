@@ -10,6 +10,38 @@ import Normalize from '../utils/normalize'
 const Changes = {}
 
 /**
+ * Mix in the changes that just pass through to their at-range equivalents
+ * because they don't have any effect on the selection.
+ */
+
+const PROXY_TRANSFORMS = [
+  'deleteBackward',
+  'deleteCharBackward',
+  'deleteLineBackward',
+  'deleteWordBackward',
+  'deleteForward',
+  'deleteCharForward',
+  'deleteWordForward',
+  'deleteLineForward',
+  'setBlock',
+  'setInline',
+  'splitInline',
+  'unwrapBlock',
+  'unwrapInline',
+  'wrapBlock',
+  'wrapInline',
+]
+
+PROXY_TRANSFORMS.forEach((method) => {
+  Changes[method] = (change, ...args) => {
+    const { state } = change
+    const { selection } = state
+    const methodAtRange = `${method}AtRange`
+    change[methodAtRange](selection, ...args)
+  }
+})
+
+/**
  * Add a `mark` to the characters in the current selection.
  *
  * @param {Change} change
@@ -18,25 +50,24 @@ const Changes = {}
 
 Changes.addMark = (change, mark) => {
   mark = Normalize.mark(mark)
-
   const { state } = change
   const { document, selection } = state
 
   if (selection.isExpanded) {
     change.addMarkAtRange(selection, mark)
-    return
   }
 
-  if (selection.marks) {
+  else if (selection.marks) {
     const marks = selection.marks.add(mark)
     const sel = selection.set('marks', marks)
     change.select(sel)
-    return
   }
 
-  const marks = document.getActiveMarksAtRange(selection).add(mark)
-  const sel = selection.set('marks', marks)
-  change.select(sel)
+  else {
+    const marks = document.getActiveMarksAtRange(selection).add(mark)
+    const sel = selection.set('marks', marks)
+    change.select(sel)
+  }
 }
 
 /**
@@ -48,111 +79,12 @@ Changes.addMark = (change, mark) => {
 Changes.delete = (change) => {
   const { state } = change
   const { selection } = state
-  if (selection.isCollapsed) return
+  change.deleteAtRange(selection)
 
-  change
-    .deleteAtRange(selection)
-    // Ensure that the selection is collapsed to the start, because in certain
-    // cases when deleting across inline nodes this isn't guaranteed.
-    .collapseToStart()
-}
-
-/**
- * Delete backward `n` characters at the current selection.
- *
- * @param {Change} change
- * @param {Number} n (optional)
- */
-
-Changes.deleteBackward = (change, n = 1) => {
-  const { state } = change
-  const { selection } = state
-  change.deleteBackwardAtRange(selection, n)
-}
-
-/**
- * Delete backward until the character boundary at the current selection.
- *
- * @param {Change} change
- */
-
-Changes.deleteCharBackward = (change) => {
-  const { state } = change
-  const { selection } = state
-  change.deleteCharBackwardAtRange(selection)
-}
-
-/**
- * Delete backward until the line boundary at the current selection.
- *
- * @param {Change} change
- */
-
-Changes.deleteLineBackward = (change) => {
-  const { state } = change
-  const { selection } = state
-  change.deleteLineBackwardAtRange(selection)
-}
-
-/**
- * Delete backward until the word boundary at the current selection.
- *
- * @param {Change} change
- */
-
-Changes.deleteWordBackward = (change) => {
-  const { state } = change
-  const { selection } = state
-  change.deleteWordBackwardAtRange(selection)
-}
-
-/**
- * Delete forward `n` characters at the current selection.
- *
- * @param {Change} change
- * @param {Number} n (optional)
- */
-
-Changes.deleteForward = (change, n = 1) => {
-  const { state } = change
-  const { selection } = state
-  change.deleteForwardAtRange(selection, n)
-}
-
-/**
- * Delete forward until the character boundary at the current selection.
- *
- * @param {Change} change
- */
-
-Changes.deleteCharForward = (change) => {
-  const { state } = change
-  const { selection } = state
-  change.deleteCharForwardAtRange(selection)
-}
-
-/**
- * Delete forward until the line boundary at the current selection.
- *
- * @param {Change} change
- */
-
-Changes.deleteLineForward = (change) => {
-  const { state } = change
-  const { selection } = state
-  change.deleteLineForwardAtRange(selection)
-}
-
-/**
- * Delete forward until the word boundary at the current selection.
- *
- * @param {Change} change
- */
-
-Changes.deleteWordForward = (change) => {
-  const { state } = change
-  const { selection } = state
-  change.deleteWordForwardAtRange(selection)
+  // Ensure that the selection is collapsed to the start, because in certain
+  // cases when deleting across inline nodes, when splitting the inline node the
+  // end point of the selection will end up after the split point.
+  change.collapseToStart()
 }
 
 /**
@@ -181,11 +113,10 @@ Changes.insertBlock = (change, block) => {
  */
 
 Changes.insertFragment = (change, fragment) => {
-  let { state } = change
-  let { document, selection } = state
-
   if (!fragment.nodes.size) return
 
+  let { state } = change
+  let { document, selection } = state
   const { startText, endText } = state
   const lastText = fragment.getLastText()
   const lastInline = fragment.getClosestInline(lastText.key)
@@ -201,32 +132,25 @@ Changes.insertFragment = (change, fragment) => {
 
   const newTexts = document.getTexts().filter(n => !keys.includes(n.key))
   const newText = isAppending ? newTexts.last() : newTexts.takeLast(2).first()
-  let after
 
   if (newText && lastInline) {
-    after = selection.collapseToEndOf(newText)
+    change.select(selection.collapseToEndOf(newText))
   }
 
   else if (newText) {
-    after = selection
-      .collapseToStartOf(newText)
-      .move(lastText.text.length)
+    change.select(selection.collapseToStartOf(newText).move(lastText.text.length))
   }
 
   else {
-    after = selection
-      .collapseToStart()
-      .move(lastText.text.length)
+    change.select(selection.collapseToStart().move(lastText.text.length))
   }
-
-  change.select(after)
 }
 
 /**
- * Insert a `inline` at the current selection.
+ * Insert an `inline` at the current selection.
  *
  * @param {Change} change
- * @param {String|Object|Block} inline
+ * @param {String|Object|Inline} inline
  */
 
 Changes.insertInline = (change, inline) => {
@@ -241,7 +165,7 @@ Changes.insertInline = (change, inline) => {
 }
 
 /**
- * Insert a `text` string at the current selection.
+ * Insert a string of `text` with optional `marks` at the current selection.
  *
  * @param {Change} change
  * @param {String} text
@@ -252,7 +176,6 @@ Changes.insertText = (change, text, marks) => {
   const { state } = change
   const { document, selection } = state
   marks = marks || selection.marks
-
   change.insertTextAtRange(selection, text, marks)
 
   // If the text was successfully inserted, and the selection had marks on it,
@@ -260,32 +183,6 @@ Changes.insertText = (change, text, marks) => {
   if (selection.marks && document != change.state.document) {
     change.select({ marks: null })
   }
-}
-
-/**
- * Set `properties` of the block nodes in the current selection.
- *
- * @param {Change} change
- * @param {Object} properties
- */
-
-Changes.setBlock = (change, properties) => {
-  const { state } = change
-  const { selection } = state
-  change.setBlockAtRange(selection, properties)
-}
-
-/**
- * Set `properties` of the inline nodes in the current selection.
- *
- * @param {Change} change
- * @param {Object} properties
- */
-
-Changes.setInline = (change, properties) => {
-  const { state } = change
-  const { selection } = state
-  change.setInlineAtRange(selection, properties)
 }
 
 /**
@@ -304,20 +201,6 @@ Changes.splitBlock = (change, depth = 1) => {
 }
 
 /**
- * Split the inline nodes at the current selection, to optional `depth`.
- *
- * @param {Change} change
- * @param {Number} depth (optional)
- */
-
-Changes.splitInline = (change, depth = Infinity) => {
-  const { state } = change
-  const { selection } = state
-  change
-    .splitInlineAtRange(selection, depth)
-}
-
-/**
  * Remove a `mark` from the characters in the current selection.
  *
  * @param {Change} change
@@ -331,19 +214,19 @@ Changes.removeMark = (change, mark) => {
 
   if (selection.isExpanded) {
     change.removeMarkAtRange(selection, mark)
-    return
   }
 
-  if (selection.marks) {
+  else if (selection.marks) {
     const marks = selection.marks.remove(mark)
     const sel = selection.set('marks', marks)
     change.select(sel)
-    return
   }
 
-  const marks = document.getActiveMarksAtRange(selection).remove(mark)
-  const sel = selection.set('marks', marks)
-  change.select(sel)
+  else {
+    const marks = document.getActiveMarksAtRange(selection).remove(mark)
+    const sel = selection.set('marks', marks)
+    change.select(sel)
+  }
 }
 
 /**
@@ -357,66 +240,13 @@ Changes.removeMark = (change, mark) => {
 Changes.toggleMark = (change, mark) => {
   mark = Normalize.mark(mark)
   const { state } = change
-  const exists = state.activeMarks.some(m => m.equals(mark))
+  const exists = state.activeMarks.has(mark)
 
   if (exists) {
     change.removeMark(mark)
   } else {
     change.addMark(mark)
   }
-}
-
-/**
- * Unwrap the current selection from a block parent with `properties`.
- *
- * @param {Change} change
- * @param {Object|String} properties
- */
-
-Changes.unwrapBlock = (change, properties) => {
-  const { state } = change
-  const { selection } = state
-  change.unwrapBlockAtRange(selection, properties)
-}
-
-/**
- * Unwrap the current selection from an inline parent with `properties`.
- *
- * @param {Change} change
- * @param {Object|String} properties
- */
-
-Changes.unwrapInline = (change, properties) => {
-  const { state } = change
-  const { selection } = state
-  change.unwrapInlineAtRange(selection, properties)
-}
-
-/**
- * Wrap the block nodes in the current selection with a new block node with
- * `properties`.
- *
- * @param {Change} change
- * @param {Object|String} properties
- */
-
-Changes.wrapBlock = (change, properties) => {
-  const { state } = change
-  const { selection } = state
-  change.wrapBlockAtRange(selection, properties)
-}
-
-/**
- * Wrap the current selection in new inline nodes with `properties`.
- *
- * @param {Change} change
- * @param {Object|String} properties
- */
-
-Changes.wrapInline = (change, properties) => {
-  const { state } = change
-  const { selection } = state
-  change.wrapInlineAtRange(selection, properties)
 }
 
 /**
