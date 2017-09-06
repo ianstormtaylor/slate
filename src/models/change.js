@@ -126,7 +126,32 @@ class Change {
   }
 
   /**
-   * Noop.
+   * Set an operation flag by `key` to `value`.
+   *
+   * @param {String} key
+   * @param {Any} value
+   * @return {Change}
+   */
+
+  setOperationFlag(key, value) {
+    this.flags[key] = value
+    return this
+  }
+
+  /**
+   * Unset an operation flag by `key`.
+   *
+   * @param {String} key
+   * @return {Change}
+   */
+
+  unsetOperationFlag(key) {
+    delete this.flags[key]
+    return this
+  }
+
+  /**
+   * Deprecated.
    *
    * @return {State}
    */

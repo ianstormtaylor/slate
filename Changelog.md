@@ -41,7 +41,7 @@ function onKeyDown(e, data, change) {
 
 - **The `onChange` and `on[Before]Change` handlers now receive `Change` objects.** Previously they would also receive a `state` object, but now they receive `change` objects like the rest of the plugin API.
 
-- **The `.apply({ save })` option is now `state.change({ save })` instead.** This is the easiest way to use it, but requires that you know whether to save or not up front. If you want to use it inline after already saving some changes, you can use the `change.setSave(save)` flag instead. This shouldn't be necessary for 99% of use cases though.
+- **The `.apply({ save })` option is now `state.change({ save })` instead.** This is the easiest way to use it, but requires that you know whether to save or not up front. If you want to use it inline after already saving some changes, you can use the `change.setOperationFlag('save', true)` flag instead. This shouldn't be necessary for 99% of use cases though.
 
 - **The `.undo()` and `.redo()` transforms don't save by default.** Previously you had to specifically tell these transforms not to save into the history, which was awkward. Now they won't save the operations they're undoing/redoing by default.
 
