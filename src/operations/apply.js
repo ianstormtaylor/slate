@@ -1,6 +1,7 @@
 
 import Debug from 'debug'
-import Normalize from '../utils/normalize'
+import Node from '../models/node'
+import Mark from '../models/mark'
 import logger from '../utils/logger'
 
 /**
@@ -29,7 +30,7 @@ const APPLIERS = {
 
   add_mark(state, operation) {
     const { path, offset, length } = operation
-    const mark = Normalize.mark(operation.mark)
+    const mark = Mark.create(operation.mark)
     let { document } = state
     let node = document.assertPath(path)
     node = node.addMark(offset, length, mark)
@@ -48,7 +49,7 @@ const APPLIERS = {
 
   insert_node(state, operation) {
     const { path } = operation
-    const node = Normalize.node(operation.node)
+    const node = Node.create(operation.node)
     const index = path[path.length - 1]
     const rest = path.slice(0, -1)
     let { document } = state
@@ -71,7 +72,7 @@ const APPLIERS = {
     const { path, offset, text } = operation
 
     let { marks } = operation
-    if (Array.isArray(marks)) marks = Normalize.marks(marks)
+    if (Array.isArray(marks)) marks = Mark.createSet(marks)
 
     let { document, selection } = state
     const { anchorKey, focusKey, anchorOffset, focusOffset } = selection
@@ -207,7 +208,7 @@ const APPLIERS = {
 
   remove_mark(state, operation) {
     const { path, offset, length } = operation
-    const mark = Normalize.mark(operation.mark)
+    const mark = Mark.create(operation.mark)
     let { document } = state
     let node = document.assertPath(path)
     node = node.removeMark(offset, length, mark)
@@ -341,7 +342,7 @@ const APPLIERS = {
 
   set_mark(state, operation) {
     const { path, offset, length, properties } = operation
-    const mark = Normalize.mark(operation.mark)
+    const mark = Mark.create(operation.mark)
     let { document } = state
     let node = document.assertPath(path)
     node = node.updateMark(offset, length, mark, properties)
@@ -393,8 +394,8 @@ const APPLIERS = {
     const properties = { ...operation.properties }
     let { document, selection } = state
 
-    if (properties.marks !== undefined) {
-      properties.marks = Normalize.marks(properties.marks)
+    if (properties.marks != null) {
+      properties.marks = Mark.createSet(properties.marks)
     }
 
     if (properties.anchorPath !== undefined) {

@@ -2,6 +2,7 @@
 import MODEL_TYPES from '../constants/model-types'
 import React from 'react'
 import find from 'lodash/find'
+import isPlainObject from 'is-plain-object'
 import isReactComponent from '../utils/is-react-component'
 import logger from '../utils/logger'
 import typeOf from 'type-of'
@@ -23,7 +24,7 @@ const DEFAULTS = {
  * @type {Schema}
  */
 
-class Schema extends new Record(DEFAULTS) {
+class Schema extends Record(DEFAULTS) {
 
   /**
    * Create a new `Schema` with `attrs`.
@@ -33,9 +34,16 @@ class Schema extends new Record(DEFAULTS) {
    */
 
   static create(attrs = {}) {
-    if (Schema.isSchema(attrs)) return attrs
-    const schema = new Schema(normalizeProperties(attrs))
-    return schema
+    if (Schema.isSchema(attrs)) {
+      return attrs
+    }
+
+    if (isPlainObject(attrs)) {
+      const schema = new Schema(normalizeProperties(attrs))
+      return schema
+    }
+
+    throw new Error(`\`Schema.create\` only accepts objects or schemas, but you passed it: ${attrs}`)
   }
 
   /**

@@ -1,5 +1,5 @@
 
-import Normalize from '../utils/normalize'
+import Selection from '../models/selection'
 import isEmpty from 'is-empty'
 import logger from '../utils/logger'
 import pick from 'lodash/pick'
@@ -20,7 +20,7 @@ const Changes = {}
  */
 
 Changes.select = (change, properties, options = {}) => {
-  properties = Normalize.selectionProperties(properties)
+  properties = Selection.createProperties(properties)
 
   const { snapshot = false } = options
   const { state } = change

@@ -5,6 +5,7 @@ import Change from './change'
 import Document from './document'
 import History from './history'
 import Selection from './selection'
+import isPlainObject from 'is-plain-object'
 import logger from '../utils/logger'
 import { Record, Set, List, Map } from 'immutable'
 
@@ -15,11 +16,11 @@ import { Record, Set, List, Map } from 'immutable'
  */
 
 const DEFAULTS = {
-  document: new Document(),
-  selection: new Selection(),
-  history: new History(),
+  document: Document.create(),
+  selection: Selection.create(),
+  history: History.create(),
   data: new Map(),
-  isNative: false
+  isNative: false,
 }
 
 /**
@@ -28,7 +29,7 @@ const DEFAULTS = {
  * @type {State}
  */
 
-class State extends new Record(DEFAULTS) {
+class State extends Record(DEFAULTS) {
 
   /**
    * Create a new `State` with `attrs`.
@@ -40,37 +41,43 @@ class State extends new Record(DEFAULTS) {
    */
 
   static create(attrs = {}, options = {}) {
-    if (State.isState(attrs)) return attrs
-
-    const document = Document.create(attrs.document)
-    let selection = Selection.create(attrs.selection)
-    let data = new Map()
-
-    if (selection.isUnset) {
-      const text = document.getFirstText()
-      if (text) selection = selection.collapseToStartOf(text)
+    if (State.isState(attrs)) {
+      return attrs
     }
 
-    // Set default value for `data`.
-    if (options.plugins) {
-      for (const plugin of options.plugins) {
-        if (plugin.data) data = data.merge(plugin.data)
+    if (isPlainObject(attrs)) {
+      const document = Document.create(attrs.document)
+      let selection = Selection.create(attrs.selection)
+      let data = new Map()
+
+      if (selection.isUnset) {
+        const text = document.getFirstText()
+        if (text) selection = selection.collapseToStartOf(text)
       }
+
+      // Set default value for `data`.
+      if (options.plugins) {
+        for (const plugin of options.plugins) {
+          if (plugin.data) data = data.merge(plugin.data)
+        }
+      }
+
+      // Then add data provided in `attrs`.
+      if (attrs.data) data = data.merge(attrs.data)
+
+      let state = new State({ document, selection, data })
+
+      if (options.normalize !== false) {
+        state = state
+          .change({ save: false })
+          .normalize(SCHEMA)
+          .state
+      }
+
+      return state
     }
 
-    // Then add data provided in `attrs`.
-    if (attrs.data) data = data.merge(attrs.data)
-
-    let state = new State({ document, selection, data })
-
-    if (options.normalize !== false) {
-      state = state
-        .change({ save: false })
-        .normalize(SCHEMA)
-        .state
-    }
-
-    return state
+    throw new Error(`\`State.create\` only accepts objects or states, but you passed it: ${attrs}`)
   }
 
   /**

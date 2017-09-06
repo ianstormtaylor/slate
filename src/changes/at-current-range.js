@@ -1,5 +1,7 @@
 
-import Normalize from '../utils/normalize'
+import Block from '../models/block'
+import Inline from '../models/inline'
+import Mark from '../models/mark'
 
 /**
  * Changes.
@@ -49,7 +51,7 @@ PROXY_TRANSFORMS.forEach((method) => {
  */
 
 Changes.addMark = (change, mark) => {
-  mark = Normalize.mark(mark)
+  mark = Mark.create(mark)
   const { state } = change
   const { document, selection } = state
 
@@ -95,7 +97,7 @@ Changes.delete = (change) => {
  */
 
 Changes.insertBlock = (change, block) => {
-  block = Normalize.block(block)
+  block = Block.create(block)
   const { state } = change
   const { selection } = state
   change.insertBlockAtRange(selection, block)
@@ -155,7 +157,7 @@ Changes.insertFragment = (change, fragment) => {
  */
 
 Changes.insertInline = (change, inline) => {
-  inline = Normalize.inline(inline)
+  inline = Inline.create(inline)
   const { state } = change
   const { selection } = state
   change.insertInlineAtRange(selection, inline)
@@ -209,7 +211,7 @@ Changes.splitBlock = (change, depth = 1) => {
  */
 
 Changes.removeMark = (change, mark) => {
-  mark = Normalize.mark(mark)
+  mark = Mark.create(mark)
   const { state } = change
   const { document, selection } = state
 
@@ -239,7 +241,7 @@ Changes.removeMark = (change, mark) => {
  */
 
 Changes.toggleMark = (change, mark) => {
-  mark = Normalize.mark(mark)
+  mark = Mark.create(mark)
   const { state } = change
   const exists = state.activeMarks.has(mark)
 

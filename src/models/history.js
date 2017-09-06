@@ -2,6 +2,7 @@
 import MODEL_TYPES from '../constants/model-types'
 import Debug from 'debug'
 import isEqual from 'lodash/isEqual'
+import isPlainObject from 'is-plain-object'
 import { Record, Stack } from 'immutable'
 
 /**
@@ -29,24 +30,30 @@ const DEFAULTS = {
  * @type {History}
  */
 
-class History extends new Record(DEFAULTS) {
+class History extends Record(DEFAULTS) {
 
   /**
    * Create a new `History` with `attrs`.
    *
-   * @param {Object} attrs
+   * @param {Object|History} attrs
    * @return {History}
    */
 
   static create(attrs = {}) {
-    if (History.isHistory(attrs)) return attrs
+    if (History.isHistory(attrs)) {
+      return attrs
+    }
 
-    const history = new History({
-      undos: attrs.undos || new Stack(),
-      redos: attrs.redos || new Stack(),
-    })
+    if (isPlainObject(attrs)) {
+      const history = new History({
+        undos: attrs.undos || new Stack(),
+        redos: attrs.redos || new Stack(),
+      })
 
-    return history
+      return history
+    }
+
+    throw new Error(`\`History.create\` only accepts objects or histories, but you passed it: ${attrs}`)
   }
 
   /**

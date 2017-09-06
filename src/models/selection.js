@@ -1,6 +1,7 @@
 
-import logger from '../utils/logger'
 import MODEL_TYPES from '../constants/model-types'
+import isPlainObject from 'is-plain-object'
+import logger from '../utils/logger'
 import { Record } from 'immutable'
 
 /**
@@ -25,7 +26,7 @@ const DEFAULTS = {
  * @type {Selection}
  */
 
-class Selection extends new Record(DEFAULTS) {
+class Selection extends Record(DEFAULTS) {
 
   /**
    * Create a new `Selection` with `attrs`.
@@ -35,9 +36,51 @@ class Selection extends new Record(DEFAULTS) {
    */
 
   static create(attrs = {}) {
-    if (Selection.isSelection(attrs)) return attrs
-    const selection = new Selection(attrs)
-    return selection
+    if (Selection.isSelection(attrs)) {
+      return attrs
+    }
+
+    if (isPlainObject(attrs)) {
+      const selection = new Selection(attrs)
+      return selection
+    }
+
+    throw new Error(`\`Selection.create\` only accepts objects or selections, but you passed it: ${attrs}`)
+  }
+
+  /**
+   * Create a dictionary of settable selection properties from `attrs`.
+   *
+   * @param {Object|String|Selection} attrs
+   * @return {Object}
+   */
+
+  static createProperties(attrs = {}) {
+    if (Selection.isSelection(attrs)) {
+      return {
+        anchorKey: attrs.anchorKey,
+        anchorOffset: attrs.anchorOffset,
+        focusKey: attrs.focusKey,
+        focusOffset: attrs.focusOffset,
+        isBackward: attrs.isBackward,
+        isFocused: attrs.isFocused,
+        marks: attrs.marks,
+      }
+    }
+
+    if (isPlainObject(attrs)) {
+      const props = {}
+      if ('anchorKey' in attrs) props.anchorKey = attrs.anchorKey
+      if ('anchorOffset' in attrs) props.anchorOffset = attrs.anchorOffset
+      if ('focusKey' in attrs) props.focusKey = attrs.focusKey
+      if ('focusOffset' in attrs) props.focusOffset = attrs.focusOffset
+      if ('isBackward' in attrs) props.isBackward = attrs.isBackward
+      if ('isFocused' in attrs) props.isFocused = attrs.isFocused
+      if ('marks' in attrs) props.marks = attrs.marks
+      return props
+    }
+
+    throw new Error(`\`Selection.createProperties\` only accepts objects or selections, but you passed it: ${attrs}`)
   }
 
   /**

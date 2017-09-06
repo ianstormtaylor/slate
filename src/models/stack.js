@@ -51,7 +51,7 @@ const DEFAULTS = {
  * @type {Stack}
  */
 
-class Stack extends new Record(DEFAULTS) {
+class Stack extends Record(DEFAULTS) {
 
   /**
    * Constructor.

@@ -1,7 +1,8 @@
 
-import Data from './data'
-import memoize from '../utils/memoize'
 import MODEL_TYPES from '../constants/model-types'
+import Data from './data'
+import isPlainObject from 'is-plain-object'
+import memoize from '../utils/memoize'
 import { Map, Record, Set } from 'immutable'
 
 /**
@@ -12,7 +13,7 @@ import { Map, Record, Set } from 'immutable'
 
 const DEFAULTS = {
   data: new Map(),
-  type: null
+  type: undefined,
 }
 
 /**
@@ -21,7 +22,7 @@ const DEFAULTS = {
  * @type {Mark}
  */
 
-class Mark extends new Record(DEFAULTS) {
+class Mark extends Record(DEFAULTS) {
 
   /**
    * Create a new `Mark` with `attrs`.
@@ -31,18 +32,30 @@ class Mark extends new Record(DEFAULTS) {
    */
 
   static create(attrs = {}) {
-    if (Mark.isMark(attrs)) return attrs
-
-    if (!attrs.type) {
-      throw new Error(`You must provide \`attrs.type\` to \`Mark.create(attrs)\`.`)
+    if (Mark.isMark(attrs)) {
+      return attrs
     }
 
-    const mark = new Mark({
-      type: attrs.type,
-      data: Data.create(attrs.data),
-    })
+    if (typeof attrs == 'string') {
+      attrs = { type: attrs }
+    }
 
-    return mark
+    if (isPlainObject(attrs)) {
+      const { data, type } = attrs
+
+      if (typeof type != 'string') {
+        throw new Error('`Mark.create` requires a mark `type` string.')
+      }
+
+      const mark = new Mark({
+        type,
+        data: Data.create(data),
+      })
+
+      return mark
+    }
+
+    throw new Error(`\`Mark.create\` only accepts objects, strings or marks, but you passed it: ${attrs}`)
   }
 
   /**
@@ -53,11 +66,7 @@ class Mark extends new Record(DEFAULTS) {
    */
 
   static createSet(elements) {
-    if (Set.isSet(elements)) {
-      return elements
-    }
-
-    if (Array.isArray(elements)) {
+    if (Set.isSet(elements) || Array.isArray(elements)) {
       const marks = new Set(elements.map(Mark.create))
       return marks
     }
@@ -66,7 +75,36 @@ class Mark extends new Record(DEFAULTS) {
       return new Set()
     }
 
-    throw new Error(`Mark.createSet() must be passed an \`Array\`, a \`List\` or \`null\`. You passed: ${elements}`)
+    throw new Error(`\`Mark.createSet\` only accepts sets, arrays or null, but you passed it: ${elements}`)
+  }
+
+  /**
+   * Create a dictionary of settable mark properties from `attrs`.
+   *
+   * @param {Object|String|Mark} attrs
+   * @return {Object}
+   */
+
+  static createProperties(attrs = {}) {
+    if (Mark.isMark(attrs)) {
+      return {
+        data: attrs.data,
+        type: attrs.type,
+      }
+    }
+
+    if (typeof attrs == 'string') {
+      return { type: attrs }
+    }
+
+    if (isPlainObject(attrs)) {
+      const props = {}
+      if ('type' in attrs) props.type = attrs.type
+      if ('data' in attrs) props.data = Data.create(attrs.data)
+      return props
+    }
+
+    throw new Error(`\`Mark.createProperties\` only accepts objects, strings or marks, but you passed it: ${attrs}`)
   }
 
   /**

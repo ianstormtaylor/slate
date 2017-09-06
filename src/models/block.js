@@ -11,11 +11,11 @@ import './document'
 
 import Data from './data'
 import Node from './node'
-import Inline from './inline'
 import Text from './text'
 import MODEL_TYPES from '../constants/model-types'
 import generateKey from '../utils/generate-key'
-import { Map, List, Record } from 'immutable'
+import isPlainObject from 'is-plain-object'
+import { List, Map, Record } from 'immutable'
 
 /**
  * Default properties.
@@ -26,9 +26,9 @@ import { Map, List, Record } from 'immutable'
 const DEFAULTS = {
   data: new Map(),
   isVoid: false,
-  key: null,
+  key: undefined,
   nodes: new List(),
-  type: null
+  type: undefined,
 }
 
 /**
@@ -37,55 +37,64 @@ const DEFAULTS = {
  * @type {Block}
  */
 
-class Block extends new Record(DEFAULTS) {
+class Block extends Record(DEFAULTS) {
 
   /**
    * Create a new `Block` with `attrs`.
    *
-   * @param {Object|Block} attrs
+   * @param {Object|String|Block} attrs
    * @return {Block}
    */
 
   static create(attrs = {}) {
-    if (Block.isBlock(attrs)) return attrs
-    if (Inline.isInline(attrs)) return attrs
-    if (Text.isText(attrs)) return attrs
-
-    if (!attrs.type) {
-      throw new Error('You must pass a block `type`.')
+    if (Block.isBlock(attrs)) {
+      return attrs
     }
 
-    const { nodes } = attrs
-    const empty = !nodes || nodes.size == 0 || nodes.length == 0
-    const block = new Block({
-      type: attrs.type,
-      key: attrs.key || generateKey(),
-      data: Data.create(attrs.data),
-      isVoid: !!attrs.isVoid,
-      nodes: Node.createList(empty ? [Text.create()] : nodes),
-    })
+    if (typeof attrs == 'string') {
+      attrs = { type: attrs }
+    }
 
-    return block
+    if (isPlainObject(attrs)) {
+      const { data, isVoid, key, type } = attrs
+      let { nodes } = attrs
+
+      if (typeof type != 'string') {
+        throw new Error('`Block.create` requires a block `type` string.')
+      }
+
+      if (nodes == null || nodes.length == 0) {
+        nodes = [Text.create()]
+      }
+
+      const block = new Block({
+        data: Data.create(data),
+        isVoid: !!isVoid,
+        key: key || generateKey(),
+        nodes: Node.createList(nodes),
+        type,
+      })
+
+      return block
+    }
+
+    throw new Error(`\`Block.create\` only accepts objects, strings or blocks, but you passed it: ${attrs}`)
   }
 
   /**
    * Create a list of `Blocks` from `elements`.
    *
-   * @param {Array<Object|Block>|List<Block>} elements
+   * @param {Array<Block|Object>|List<Block|Object>} elements
    * @return {List<Block>}
    */
 
   static createList(elements = []) {
-    if (List.isList(elements)) {
-      return elements
-    }
-
-    if (Array.isArray(elements)) {
+    if (List.isList(elements) || Array.isArray(elements)) {
       const list = new List(elements.map(Block.create))
       return list
     }
 
-    throw new Error(`Block.createList() must be passed an \`Array\` or a \`List\`. You passed: ${elements}`)
+    throw new Error(`\`Block.createList\` only accepts arrays or lists, but you passed it: ${elements}`)
   }
 
   /**
@@ -110,7 +119,7 @@ class Block extends new Record(DEFAULTS) {
   }
 
   /**
-   * Is the node empty?
+   * Check if the block is empty.
    *
    * @return {Boolean}
    */
@@ -120,7 +129,7 @@ class Block extends new Record(DEFAULTS) {
   }
 
   /**
-   * Get the concatenated text `string` of all child nodes.
+   * Get the concatenated text of all the block's children.
    *
    * @return {String}
    */

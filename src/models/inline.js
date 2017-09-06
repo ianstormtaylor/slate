@@ -9,12 +9,12 @@ import './document'
  * Dependencies.
  */
 
-import Block from './block'
 import Data from './data'
 import Node from './node'
 import Text from './text'
 import MODEL_TYPES from '../constants/model-types'
 import generateKey from '../utils/generate-key'
+import isPlainObject from 'is-plain-object'
 import { List, Map, Record } from 'immutable'
 
 /**
@@ -26,9 +26,9 @@ import { List, Map, Record } from 'immutable'
 const DEFAULTS = {
   data: new Map(),
   isVoid: false,
-  key: null,
+  key: undefined,
   nodes: new List(),
-  type: null
+  type: undefined,
 }
 
 /**
@@ -37,47 +37,64 @@ const DEFAULTS = {
  * @type {Inline}
  */
 
-class Inline extends new Record(DEFAULTS) {
+class Inline extends Record(DEFAULTS) {
 
   /**
    * Create a new `Inline` with `attrs`.
    *
-   * @param {Object|Inline} attrs
+   * @param {Object|String|Inline} attrs
    * @return {Inline}
    */
 
   static create(attrs = {}) {
-    if (Block.isBlock(attrs)) return attrs
-    if (Inline.isInline(attrs)) return attrs
-    if (Text.isText(attrs)) return attrs
-
-    if (!attrs.type) {
-      throw new Error('You must pass an inline `type`.')
+    if (Inline.isInline(attrs)) {
+      return attrs
     }
 
-    const { nodes } = attrs
-    const empty = !nodes || nodes.size == 0 || nodes.length == 0
-    const inline = new Inline({
-      type: attrs.type,
-      key: attrs.key || generateKey(),
-      data: Data.create(attrs.data),
-      isVoid: !!attrs.isVoid,
-      nodes: Node.createList(empty ? [Text.create()] : nodes),
-    })
+    if (typeof attrs == 'string') {
+      attrs = { type: attrs }
+    }
 
-    return inline
+    if (isPlainObject(attrs)) {
+      const { data, isVoid, key, type } = attrs
+      let { nodes } = attrs
+
+      if (typeof type != 'string') {
+        throw new Error('`Inline.create` requires a block `type` string.')
+      }
+
+      if (nodes == null || nodes.length == 0) {
+        nodes = [Text.create()]
+      }
+
+      const inline = new Inline({
+        data: Data.create(data),
+        isVoid: !!isVoid,
+        key: key || generateKey(),
+        nodes: Node.createList(nodes),
+        type,
+      })
+
+      return inline
+    }
+
+    throw new Error(`\`Inline.create\` only accepts objects, strings or inlines, but you passed it: ${attrs}`)
   }
 
   /**
    * Create a list of `Inlines` from an array.
    *
-   * @param {Array<Object|Inline>} elements
+   * @param {Array<Inline|Object>|List<Inline|Object>} elements
    * @return {List<Inline>}
    */
 
   static createList(elements = []) {
-    if (List.isList(elements)) return elements
-    return new List(elements.map(Inline.create))
+    if (List.isList(elements) || Array.isArray(elements)) {
+      const list = new List(elements.map(Inline.create))
+      return list
+    }
+
+    throw new Error(`\`Inline.createList\` only accepts arrays or lists, but you passed it: ${elements}`)
   }
 
   /**
@@ -102,7 +119,7 @@ class Inline extends new Record(DEFAULTS) {
   }
 
   /**
-   * Is the node empty?
+   * Check if the inline is empty.
    *
    * @return {Boolean}
    */
@@ -112,7 +129,7 @@ class Inline extends new Record(DEFAULTS) {
   }
 
   /**
-   * Get the concatenated text `string` of all child nodes.
+   * Get the concatenated text of all the inline's children.
    *
    * @return {String}
    */
