@@ -28,7 +28,7 @@ const schema = {
   nodes: {
     image: (props) => {
       const { node, state } = props
-      const active = state.isFocused && state.selection.hasEdgeIn(node)
+      const active = state.isFocused && state.blocks.includes(node)
       const src = node.data.get('src')
       const className = active ? 'active' : null
       return (

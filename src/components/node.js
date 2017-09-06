@@ -111,14 +111,18 @@ class Node extends React.Component {
     if (nextProps.node != props.node) return true
 
     // If the node is a block or inline, which can have custom renderers, we
-    // include an extra check to re-render if the node's focus changes, to make
-    // it simple for users to show a node's "selected" state.
+    // include an extra check to re-render if the node either becomes part of,
+    // or leaves, a selection. This is to make it simple for users to show a
+    // node's "selected" state.
     if (nextProps.node.kind != 'text') {
-      const hasEdgeIn = props.state.selection.hasEdgeIn(props.node)
-      const nextHasEdgeIn = nextProps.state.selection.hasEdgeIn(nextProps.node)
-      const hasFocus = props.state.isFocused || nextProps.state.isFocused
-      const hasEdge = hasEdgeIn || nextHasEdgeIn
-      if (hasFocus && hasEdge) return true
+      const nodes = `${props.node.kind}s`
+      const isInSelection = props.state[nodes].includes(props.node)
+      const nextIsInSelection = nextProps.state[nodes].includes(nextProps.node)
+      const hasFocus = props.state.isFocused
+      const nextHasFocus = nextProps.state.isFocused
+      const selectionChanged = isInSelection != nextIsInSelection
+      const focusChanged = hasFocus != nextHasFocus
+      if (selectionChanged || focusChanged) return true
     }
 
     // If the node is a text node, re-render if the current decorations have
