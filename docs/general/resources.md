@@ -1,7 +1,7 @@
 
 # Resources
 
-A few resources that are helpful when using Slate.
+A few resources that are helpful for building with Slate.
 
 
 ## Tooling
