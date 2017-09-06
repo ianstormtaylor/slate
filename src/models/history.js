@@ -80,7 +80,7 @@ class History extends new Record(DEFAULTS) {
 
   save(operation, options = {}) {
     let history = this
-    let { undos } = history
+    let { undos, redos } = history
     let { merge, skip } = options
     const prevBatch = undos.peek()
     const prevOperation = prevBatch && prevBatch[prevBatch.length - 1]
@@ -118,7 +118,11 @@ class History extends new Record(DEFAULTS) {
       undos = undos.take(100)
     }
 
+    // Clear the redos
+    redos = redos.size > 0 ? new Stack() : redos
+
     history = history.set('undos', undos)
+    history = history.set('redos', redos)
     return history
   }
 
