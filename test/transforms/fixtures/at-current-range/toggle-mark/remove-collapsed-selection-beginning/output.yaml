@@ -4,4 +4,4 @@ nodes:
     type: paragraph
     nodes:
       - kind: text
-        text: words
+        text: aword

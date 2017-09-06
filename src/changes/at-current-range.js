@@ -34,7 +34,7 @@ Changes.addMark = (change, mark) => {
     return
   }
 
-  const marks = document.getMarksAtRange(selection).add(mark)
+  const marks = document.getActiveMarksAtRange(selection).add(mark)
   const sel = selection.set('marks', marks)
   change.select(sel)
 }
@@ -341,7 +341,7 @@ Changes.removeMark = (change, mark) => {
     return
   }
 
-  const marks = document.getMarksAtRange(selection).remove(mark)
+  const marks = document.getActiveMarksAtRange(selection).remove(mark)
   const sel = selection.set('marks', marks)
   change.select(sel)
 }
@@ -357,7 +357,7 @@ Changes.removeMark = (change, mark) => {
 Changes.toggleMark = (change, mark) => {
   mark = Normalize.mark(mark)
   const { state } = change
-  const exists = state.marks.some(m => m.equals(mark))
+  const exists = state.activeMarks.some(m => m.equals(mark))
 
   if (exists) {
     change.removeMark(mark)

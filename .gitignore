@@ -15,3 +15,6 @@ _book
 node_modules
 npm-debug.log
 yarn-error.log
+
+# OS files.
+.DS_Store

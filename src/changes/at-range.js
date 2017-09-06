@@ -983,7 +983,7 @@ Changes.toggleMarkAtRange = (change, range, mark, options = {}) => {
   const { normalize = true } = options
   const { state } = change
   const { document } = state
-  const marks = document.getMarksAtRange(range)
+  const marks = document.getActiveMarksAtRange(range)
   const exists = marks.some(m => m.equals(mark))
 
   if (exists) {
