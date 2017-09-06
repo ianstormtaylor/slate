@@ -596,18 +596,35 @@ const Node = {
     node.assertDescendant(startKey)
     node.assertDescendant(endKey)
 
+    const originalFurthestAncestor = node.getFurthestAncestor(startKey)
+
     // Split at the start and end.
     const start = range.collapseToStart()
     node = node.splitBlockAtRange(start, Infinity)
 
-    const next = node.getNextText(startKey)
+    const furthestAncestor = node.getFurthestAncestor(startKey)
+
+    let isSameAncestor = true
+    let next
+
+    if (originalFurthestAncestor.key !== furthestAncestor.key) {
+      isSameAncestor = false
+      next = node.getNode(startKey)
+    } else {
+      next = node.getNextText(startKey)
+    }
+
     const end = startKey == endKey
       ? range.collapseToStartOf(next).move(endOffset - startOffset)
       : range.collapseToEnd()
+
     node = node.splitBlockAtRange(end, Infinity)
 
     // Get the start and end nodes.
-    const startNode = node.getNextSibling(node.getFurthestAncestor(startKey).key)
+    const startNode = isSameAncestor
+      ? node.getNextSibling(node.getFurthestAncestor(startKey).key)
+      : node.getFurthestAncestor(startKey)
+
     const endNode = startKey == endKey
       ? node.getFurthestAncestor(next.key)
       : node.getFurthestAncestor(endKey)
