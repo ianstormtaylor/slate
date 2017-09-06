@@ -5,7 +5,7 @@ Plugins can be attached to an editor to alter its behavior in different ways. Pl
 
 Each editor has a "middleware stack" of plugins, which has a specific order.
 
-When the editor needs to resolve a plugin-related handler, it will loop through its plugin stack, searching for the first plugin that successfully returns a value. After receiving that value, the editor will **not** continue to search the remaining plugins; it returns early.
+When the editor needs to resolve a plugin-related handler, it will loop through its plugin stack, searching for the first plugin that successfully returns a value. After receiving that value, the editor will **not** continue to search the remaining plugins; it returns early. If you'd like for the stack to continue, a plugin handler should return `undefined`.
 
 - [Conventions](#conventions)
 - [Event Handler Properties](#event-handle-properties)
@@ -65,21 +65,17 @@ Each event handler can choose to return a new `state` object, in which case the 
 
 This handler is called right before a string of text is inserted into the `contenteditable` element.
 
-Make sure to `event.preventDefault()` (and return `state`) if you do not want the default insertion behavior to occur! If no other plugin handles this event, it will be handled by the [Core plugin](./core.md).
+Make sure to `event.preventDefault()` if you do not want the default insertion behavior to occur! If no other plugin handles this event, it will be handled by the [Core plugin](./core.md).
 
 ### `onBlur`
 `Function onBlur(event: Event, data: Object, state: State, editor: Editor) => State || Void`
 
-This handler is called when the editor's `contenteditable` element is blurred.
-
-If no other plugin handles this event, it will be handled by the [Core plugin](./core.md).
+This handler is called when the editor's `contenteditable` element is blurred. If no other plugin handles this event, it will be handled by the [Core plugin](./core.md).
 
 ### `onFocus`
 `Function onFocus(event: Event, data: Object, state: State, editor: Editor) => State || Void`
 
-This handler is called when the editor's `contenteditable` element is focused.
-
-If no other plugin handles this event, it will be handled by the [Core plugin](./core.md).
+This handler is called when the editor's `contenteditable` element is focused. If no other plugin handles this event, it will be handled by the [Core plugin](./core.md).
 
 ### `onCopy`
 `Function onCopy(event: Event, data: Object, state: State, editor: Editor) => State || Void`
@@ -100,9 +96,7 @@ If no other plugin handles this event, it will be handled by the [Core plugin](.
 ### `onCut`
 `Function onCut(event: Event, data: Object, state: State, editor: Editor) => State || Void`
 
-This handler is equivalent to the `onCopy` handler.
-
-If no other plugin handles this event, it will be handled by the [Core plugin](./core.md).
+This handler is equivalent to the `onCopy` handler. If no other plugin handles this event, it will be handled by the [Core plugin](./core.md).
 
 ### `onDrop`
 `Function onDrop(event: Event, data: Object, state: State, editor: Editor) => State || Void`
@@ -163,7 +157,7 @@ The `isModAlt` boolean is `true` if the `control` key was pressed on Windows or 
 
 The `isLine` and `isWord` booleans represent whether the "line modifier" or "word modifier" hotkeys are pressed when deleting or moving the cursor. For example, on a Mac `option + right` moves the cursor to the right one word at a time.
 
-Make sure to `event.preventDefault()` (and return `state`) if you do not want the default insertion behavior to occur! If no other plugin handles this event, it will be handled by the [Core plugin](./core.md).
+Make sure to `event.preventDefault()` if you do not want the default insertion behavior to occur! If no other plugin handles this event, it will be handled by the [Core plugin](./core.md).
 
 ### `onKeyUp`
 `Function onKeUp(event: Event, data: Object, state: State, editor: Editor) => State || Void`
@@ -208,7 +202,7 @@ The `data` object contains a State [`Selection`](../models/selection.md) object 
 
 If no other plugin handles this event, it will be handled by the [Core plugin](./core.md).
 
-_Note: This is **not** Slate's internal selection representation (although it mirrors it). If you want to get notified when Slate's selection changes, use the [`onSelectionChange`](../components/editor.md#onselectionchange) property of the `<Editor>`. This handler is instead meant to give you lower-level access to the DOM selection handling._
+_Note: This is **not** Slate's internal selection representation (although it mirrors it). If you want to get notified when Slate's selection changes, use the [`onSelectionChange`](../components/editor.md#onselectionchange) property of the `<Editor>`. This handler is instead meant to give you lower-level access to the DOM selection handling, which **is not always triggered** as you'd expect._
 
 
 ## Other Properties
@@ -220,20 +214,14 @@ _Note: This is **not** Slate's internal selection representation (although it mi
 ```
 
 ### `onChange`
-`Function onChange(state: State) => State || Void`
+`Function onChange(change: Change) => Any || Void`
 
-The `onChange` handler isn't a native browser event handler. Instead, it is invoked whenever the editor state changes. Returning a new state will update the editor's state, continuing down the plugin stack.
-
-Unlike the native event handlers, results from the `onChange` handler **are cumulative**! This means that every plugin in the stack that defines an `onChange` handler will have its handler resolved for every change the editor makes; the editor will not return early after the first plugin's handler is called.
-
-This allows you to stack up changes across the entire plugin stack.
+The `onChange` handler isn't a native browser event handler. Instead, it is invoked whenever the editor state changes. This allows plugins to augment a change however they want.
 
 ### `onBeforeChange`
 `Function onBeforeChange(state: State) => State || Void`
 
-The `onBeforeChange` handler isn't a native browser event handler. Instead, it is invoked whenever the editor receives a new state and before propagating a new state to `onChange`. Returning a new state will update the editor's state before rendering, continuing down the plugin stack.
-
-Like `onChange`, `onBeforeChange` is cumulative.
+The `onBeforeChange` handler isn't a native browser event handler. Instead, it is invoked whenever the editor receives a new state and before propagating a new state to `onChange`.
 
 ### `render`
 `Function render(props: Object, state: State, editor: Editor) => Object || Void`

@@ -28,7 +28,7 @@ class App extends React.Component {
     event.preventDefault()
 
     const newState = state
-      .transform()
+      .change()
       .insertText('and')
       .apply()
     
@@ -96,7 +96,7 @@ class App extends React.Component {
     event.preventDefault()
 
     const newState = state
-      .transform()
+      .change()
       .insertText('and')
       .apply()
     
@@ -149,7 +149,7 @@ class App extends React.Component {
 
     // Otherwise, set the currently selected blocks type to "code".
     return state
-      .transform()
+      .change()
       .setBlock('code')
       .apply()
   }
@@ -202,7 +202,7 @@ class App extends React.Component {
 
     // Toggle the block type depending on `isCode`.
     return state
-      .transform()
+      .change()
       .setBlock(isCode ? 'paragraph' : 'code')
       .apply()
     

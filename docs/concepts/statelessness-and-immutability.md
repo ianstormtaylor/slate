@@ -15,10 +15,10 @@ Instead, the new state is propagated to the Slate editor's parent component, who
 _To learn more, check out the [`<Editor>` component reference](../reference/components/editor.md)._
 
 
-### Transforms
+### Changes
 
-All of the changes in Slate are applied via [`Transforms`](../reference/models/transform.md). This makes it possible to enforce some of the constraints that Slate needs to enforce, like requiring that [all leaf nodes be text nodes](./the-document-model.md#leaf-text-nodes). This also makes it possible to implement collaborative editing, where information about changes must be serialized and sent over the network to other editors.
+All of the changes in Slate are applied via [`Changes`](../reference/models/change.md). This makes it possible to enforce some of the constraints that Slate needs to enforce, like requiring that [all leaf nodes be text nodes](./the-document-model.md#leaf-text-nodes). This also makes it possible to implement collaborative editing, where information about changes must be serialized and sent over the network to other editors.
 
-You should never update the `selection` or `document` of an editor other than by using the [`transform()`](../reference/models/state.md#transform) method of a `State`.
+You should never update the `selection` or `document` of an editor other than by using the [`change()`](../reference/models/state.md#change) method of a `State`.
 
-_To learn more, check out the [`Transform` model reference](../reference/models/transform.md)._
+_To learn more, check out the [`Change` model reference](../reference/models/change.md)._

@@ -78,18 +78,16 @@ class Void extends React.Component {
     this.debug('onClick', { event })
 
     const { node, editor } = this.props
-    const next = editor
-      .getState()
-      .transform()
-      // COMPAT: In Chrome & Safari, selections that are at the zero offset of
-      // an inline node will be automatically replaced to be at the last offset
-      // of a previous inline node, which screws us up, so we always want to set
-      // it to the end of the node. (2016/11/29)
-      .collapseToEndOf(node)
-      .focus()
-      .apply()
 
-    editor.onChange(next)
+    editor.change((change) => {
+      change
+        // COMPAT: In Chrome & Safari, selections that are at the zero offset of
+        // an inline node will be automatically replaced to be at the last
+        // offset of a previous inline node, which screws us up, so we always
+        // want to set it to the end of the node. (2016/11/29)
+        .collapseToEndOf(node)
+        .focus()
+    })
   }
 
   /**

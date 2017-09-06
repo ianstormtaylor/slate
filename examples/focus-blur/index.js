@@ -36,15 +36,15 @@ class FocusBlur extends React.Component {
   /**
    * On change.
    *
-   * @param {State} state
+   * @param {Change} change
    */
 
-  onChange = (state) => {
+  onChange = ({ state }) => {
     this.setState({ state })
   }
 
   /**
-   * Apply a focus or blur transform by `name` after a `timeout`.
+   * Apply a focus or blur change by `name` after a `timeout`.
    *
    * @param {String} name
    * @param {Number} timeout
@@ -54,12 +54,11 @@ class FocusBlur extends React.Component {
     e.preventDefault()
 
     setTimeout(() => {
-      const state = this.state.state
-        .transform()
+      const change = this.state.state
+        .change()
         [name]()
-        .apply()
 
-      this.setState({ state })
+      this.onChange(change)
     }, timeout)
   }
 

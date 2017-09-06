@@ -27,17 +27,22 @@ const DEFAULTS = {
 class Text extends new Record(DEFAULTS) {
 
   /**
-   * Create a new `Text` with `properties`.
+   * Create a new `Text` with `attrs`.
    *
-   * @param {Object|Text} properties
+   * @param {Object|Text} attrs
    * @return {Text}
    */
 
-  static create(properties = {}) {
-    if (Text.isText(properties)) return properties
-    properties.key = properties.key || generateKey()
-    properties.characters = Character.createList(properties.characters)
-    return new Text(properties)
+  static create(attrs = {}) {
+    if (Text.isText(attrs)) return attrs
+    if (attrs.ranges) return Text.createFromRanges(attrs.ranges)
+
+    const text = new Text({
+      characters: Character.createList(attrs.characters),
+      key: attrs.key || generateKey(),
+    })
+
+    return text
   }
 
   /**
@@ -48,10 +53,10 @@ class Text extends new Record(DEFAULTS) {
    * @return {Text}
    */
 
-  static createFromString(text, marks = Set()) {
-    return Text.createFromRanges([
-      Range.create({ text, marks })
-    ])
+  static createFromString(string, marks = Set()) {
+    const range = Range.create({ text: string, marks })
+    const text = Text.createFromRanges([range])
+    return text
   }
 
   /**
@@ -62,12 +67,14 @@ class Text extends new Record(DEFAULTS) {
    */
 
   static createFromRanges(ranges) {
-    return Text.create({
-      characters: ranges.reduce((characters, range) => {
-        range = Range.create(range)
-        return characters.concat(range.getCharacters())
+    const characters = ranges
+      .map(Range.create)
+      .reduce((list, range) => {
+        return list.concat(range.getCharacters())
       }, Character.createList())
-    })
+
+    const text = Text.create({ characters })
+    return text
   }
 
   /**
@@ -78,19 +85,23 @@ class Text extends new Record(DEFAULTS) {
    */
 
   static createList(elements = []) {
-    if (List.isList(elements)) return elements
-    return new List(elements.map(Text.create))
+    if (List.isList(elements)) {
+      return elements
+    }
+
+    const list = new List(elements.map(Text.create))
+    return list
   }
 
   /**
-   * Determines if the passed in paramter is a Slate Text or not
+   * Check if a `value` is a `Text`.
    *
-   * @param {*} maybeText
+   * @param {Any} value
    * @return {Boolean}
    */
 
-  static isText(maybeText) {
-    return !!(maybeText && maybeText[MODEL_TYPES.TEXT])
+  static isText(value) {
+    return !!(value && value[MODEL_TYPES.TEXT])
   }
 
   /**
@@ -111,16 +122,6 @@ class Text extends new Record(DEFAULTS) {
 
   get isEmpty() {
     return this.text == ''
-  }
-
-  /**
-   * Get the length of the concatenated text of the node.
-   *
-   * @return {Number}
-   */
-
-  get length() {
-    return this.text.length
   }
 
   /**
@@ -317,7 +318,6 @@ class Text extends new Record(DEFAULTS) {
    */
 
   insertText(index, text, marks) {
-    marks = marks || this.getMarksAtIndex(index)
     let { characters } = this
     const chars = Character.createListFromText(text, marks)
 
@@ -383,11 +383,13 @@ class Text extends new Record(DEFAULTS) {
    * @param {Number} index
    * @param {Number} length
    * @param {Mark} mark
-   * @param {Mark} newMark
+   * @param {Object} properties
    * @return {Text}
    */
 
-  updateMark(index, length, mark, newMark) {
+  updateMark(index, length, mark, properties) {
+    const newMark = mark.merge(properties)
+
     const characters = this.characters.map((char, i) => {
       if (i < index) return char
       if (i >= index + length) return char
@@ -416,7 +418,7 @@ class Text extends new Record(DEFAULTS) {
 }
 
 /**
- * Pseudo-symbol that shows this is a Slate Text
+ * Attach a pseudo-symbol for type checking.
  */
 
 Text.prototype[MODEL_TYPES.TEXT] = true

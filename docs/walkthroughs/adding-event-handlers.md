@@ -91,9 +91,9 @@ class App extends React.Component {
     // Prevent the ampersand character from being inserted.
     event.preventDefault()
 
-    // Transform the state by inserting "and" at the cursor's position.
+    // Change the state by inserting "and" at the cursor's position.
     const newState = state
-      .transform()
+      .change()
       .insertText('and')
       .apply()
     

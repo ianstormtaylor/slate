@@ -1,5 +1,5 @@
 
-import warn from '../utils/warn'
+import logger from '../utils/logger'
 import MODEL_TYPES from '../constants/model-types'
 import { Record } from 'immutable'
 
@@ -28,26 +28,27 @@ const DEFAULTS = {
 class Selection extends new Record(DEFAULTS) {
 
   /**
-   * Create a new `Selection` with `properties`.
+   * Create a new `Selection` with `attrs`.
    *
-   * @param {Object|Selection} properties
+   * @param {Object|Selection} attrs
    * @return {Selection}
    */
 
-  static create(properties = {}) {
-    if (Selection.isSelection(properties)) return properties
-    return new Selection(properties)
+  static create(attrs = {}) {
+    if (Selection.isSelection(attrs)) return attrs
+    const selection = new Selection(attrs)
+    return selection
   }
 
   /**
-   * Determines if the passed in paramter is a Slate Selection or not
+   * Check if a `value` is a `Selection`.
    *
-   * @param {*} maybeSelection
+   * @param {Any} value
    * @return {Boolean}
    */
 
-  static isSelection(maybeSelection) {
-    return !!(maybeSelection && maybeSelection[MODEL_TYPES.SELECTION])
+  static isSelection(value) {
+    return !!(value && value[MODEL_TYPES.SELECTION])
   }
 
   /**
@@ -186,7 +187,7 @@ class Selection extends new Record(DEFAULTS) {
 
   hasAnchorAtEndOf(node) {
     const last = getLast(node)
-    return this.anchorKey == last.key && this.anchorOffset == last.length
+    return this.anchorKey == last.key && this.anchorOffset == last.text.length
   }
 
   /**
@@ -217,7 +218,7 @@ class Selection extends new Record(DEFAULTS) {
   hasAnchorIn(node) {
     return node.kind == 'text'
       ? node.key == this.anchorKey
-      : node.hasDescendant(this.anchorKey)
+      : this.anchorKey != null && node.hasDescendant(this.anchorKey)
   }
 
   /**
@@ -229,7 +230,7 @@ class Selection extends new Record(DEFAULTS) {
 
   hasFocusAtEndOf(node) {
     const last = getLast(node)
-    return this.focusKey == last.key && this.focusOffset == last.length
+    return this.focusKey == last.key && this.focusOffset == last.text.length
   }
 
   /**
@@ -273,7 +274,7 @@ class Selection extends new Record(DEFAULTS) {
   hasFocusIn(node) {
     return node.kind == 'text'
       ? node.key == this.focusKey
-      : node.hasDescendant(this.focusKey)
+      : this.focusKey != null && node.hasDescendant(this.focusKey)
   }
 
   /**
@@ -516,7 +517,7 @@ class Selection extends new Record(DEFAULTS) {
 
   moveAnchorToEndOf(node) {
     node = getLast(node)
-    return this.moveAnchorTo(node.key, node.length)
+    return this.moveAnchorTo(node.key, node.text.length)
   }
 
   /**
@@ -540,7 +541,7 @@ class Selection extends new Record(DEFAULTS) {
 
   moveFocusToEndOf(node) {
     node = getLast(node)
-    return this.moveFocusTo(node.key, node.length)
+    return this.moveFocusTo(node.key, node.text.length)
   }
 
   /**
@@ -569,14 +570,8 @@ class Selection extends new Record(DEFAULTS) {
     const selection = this
     let { anchorKey, anchorOffset, focusKey, focusOffset, isBackward } = selection
 
-    // If the selection isn't formed yet or is malformed, ensure that it is
-    // properly zeroed out.
-    if (
-      anchorKey == null ||
-      focusKey == null ||
-      !node.hasDescendant(anchorKey) ||
-      !node.hasDescendant(focusKey)
-    ) {
+    // If the selection is unset, make sure it is properly zeroed out.
+    if (anchorKey == null || focusKey == null) {
       return selection.merge({
         anchorKey: null,
         anchorOffset: 0,
@@ -590,9 +585,22 @@ class Selection extends new Record(DEFAULTS) {
     let anchorNode = node.getDescendant(anchorKey)
     let focusNode = node.getDescendant(focusKey)
 
+    // If the selection is malformed, warn and zero it out.
+    if (!anchorNode || !focusNode) {
+      logger.warn('The selection was invalid and was reset. The selection in question was:', selection)
+      const first = node.getFirstText()
+      return selection.merge({
+        anchorKey: first ? first.key : null,
+        anchorOffset: 0,
+        focusKey: first ? first.key : null,
+        focusOffset: 0,
+        isBackward: false,
+      })
+    }
+
     // If the anchor node isn't a text node, match it to one.
     if (anchorNode.kind != 'text') {
-      warn('The selection anchor was set to a Node that is not a Text node. This should not happen and can degrade performance. The node in question was:', anchorNode)
+      logger.warn('The selection anchor was set to a Node that is not a Text node. This should not happen and can degrade performance. The node in question was:', anchorNode)
       const anchorText = anchorNode.getTextAtOffset(anchorOffset)
       const offset = anchorNode.getOffset(anchorText.key)
       anchorOffset = anchorOffset - offset
@@ -601,7 +609,7 @@ class Selection extends new Record(DEFAULTS) {
 
     // If the focus node isn't a text node, match it to one.
     if (focusNode.kind != 'text') {
-      warn('The selection focus was set to a Node that is not a Text node. This should not happen and can degrade performance. The node in question was:', focusNode)
+      logger.warn('The selection focus was set to a Node that is not a Text node. This should not happen and can degrade performance. The node in question was:', focusNode)
       const focusText = focusNode.getTextAtOffset(focusOffset)
       const offset = focusNode.getOffset(focusText.key)
       focusOffset = focusOffset - offset
@@ -634,7 +642,7 @@ class Selection extends new Record(DEFAULTS) {
    */
 
   unset() {
-    warn('The `Selection.unset` method is deprecated, please switch to using `Selection.deselect` instead.')
+    logger.deprecate('0.17.0', 'The `Selection.unset` method is deprecated, please switch to using `Selection.deselect` instead.')
     return this.deselect()
   }
 
@@ -646,7 +654,7 @@ class Selection extends new Record(DEFAULTS) {
    */
 
   moveForward(n = 1) {
-    warn('The `Selection.moveForward(n)` method is deprecated, please switch to using `Selection.move(n)` instead.')
+    logger.deprecate('0.17.0', 'The `Selection.moveForward(n)` method is deprecated, please switch to using `Selection.move(n)` instead.')
     return this.move(n)
   }
 
@@ -658,7 +666,7 @@ class Selection extends new Record(DEFAULTS) {
    */
 
   moveBackward(n = 1) {
-    warn('The `Selection.moveBackward(n)` method is deprecated, please switch to using `Selection.move(-n)` (with a negative number) instead.')
+    logger.deprecate('0.17.0', 'The `Selection.moveBackward(n)` method is deprecated, please switch to using `Selection.move(-n)` (with a negative number) instead.')
     return this.move(0 - n)
   }
 
@@ -670,7 +678,7 @@ class Selection extends new Record(DEFAULTS) {
    */
 
   moveAnchorOffset(n = 1) {
-    warn('The `Selection.moveAnchorOffset(n)` method is deprecated, please switch to using `Selection.moveAnchor(n)` instead.')
+    logger.deprecate('0.17.0', 'The `Selection.moveAnchorOffset(n)` method is deprecated, please switch to using `Selection.moveAnchor(n)` instead.')
     return this.moveAnchor(n)
   }
 
@@ -682,7 +690,7 @@ class Selection extends new Record(DEFAULTS) {
    */
 
   moveFocusOffset(n = 1) {
-    warn('The `Selection.moveFocusOffset(n)` method is deprecated, please switch to using `Selection.moveFocus(n)` instead.')
+    logger.deprecate('0.17.0', 'The `Selection.moveFocusOffset(n)` method is deprecated, please switch to using `Selection.moveFocus(n)` instead.')
     return this.moveFocus(n)
   }
 
@@ -694,7 +702,7 @@ class Selection extends new Record(DEFAULTS) {
    */
 
   moveStartOffset(n = 1) {
-    warn('The `Selection.moveStartOffset(n)` method is deprecated, please switch to using `Selection.moveStart(n)` instead.')
+    logger.deprecate('0.17.0', 'The `Selection.moveStartOffset(n)` method is deprecated, please switch to using `Selection.moveStart(n)` instead.')
     return this.moveStart(n)
   }
 
@@ -706,7 +714,7 @@ class Selection extends new Record(DEFAULTS) {
    */
 
   moveEndOffset(n = 1) {
-    warn('The `Selection.moveEndOffset(n)` method is deprecated, please switch to using `Selection.moveEnd(n)` instead.')
+    logger.deprecate('0.17.0', 'The `Selection.moveEndOffset(n)` method is deprecated, please switch to using `Selection.moveEnd(n)` instead.')
     return this.moveEnd(n)
   }
 
@@ -718,7 +726,7 @@ class Selection extends new Record(DEFAULTS) {
    */
 
   extendForward(n = 1) {
-    warn('The `Selection.extendForward(n)` method is deprecated, please switch to using `Selection.extend(n)` instead.')
+    logger.deprecate('0.17.0', 'The `Selection.extendForward(n)` method is deprecated, please switch to using `Selection.extend(n)` instead.')
     return this.extend(n)
   }
 
@@ -730,7 +738,7 @@ class Selection extends new Record(DEFAULTS) {
    */
 
   extendBackward(n = 1) {
-    warn('The `Selection.extendBackward(n)` method is deprecated, please switch to using `Selection.extend(-n)` (with a negative number) instead.')
+    logger.deprecate('0.17.0', 'The `Selection.extendBackward(n)` method is deprecated, please switch to using `Selection.extend(-n)` (with a negative number) instead.')
     return this.extend(0 - n)
   }
 
@@ -743,14 +751,14 @@ class Selection extends new Record(DEFAULTS) {
    */
 
   moveToOffsets(anchorOffset, focusOffset = anchorOffset) {
-    warn('The `Selection.moveToOffsets` method is deprecated, please switch to using `Selection.moveOffsetsTo` instead.')
+    logger.deprecate('0.17.0', 'The `Selection.moveToOffsets` method is deprecated, please switch to using `Selection.moveOffsetsTo` instead.')
     return this.moveOffsetsTo(anchorOffset, focusOffset)
   }
 
 }
 
 /**
- * Pseduo-symbol that shows this is a Slate Selection
+ * Attach a pseudo-symbol for type checking.
  */
 
 Selection.prototype[MODEL_TYPES.SELECTION] = true

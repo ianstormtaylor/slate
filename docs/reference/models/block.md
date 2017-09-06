@@ -17,7 +17,6 @@ Block nodes may contain nested block nodes, inline nodes, and text nodes—just 
   - [`type`](#type)
 - [Computed Properties](#computed-properties)
   - [`kind`](#kind)
-  - [`length`](#length)
   - [`text`](#text)
 - [Static Methods](#static-methods)
   - [`Block.create`](#blockcreate)
@@ -72,11 +71,6 @@ The custom type of the node (eg. `blockquote` or `list-item`).
 `String`
 
 An immutable string value of `'block'` for easily separating this node from [`Inline`](./inline.md) or [`Text`](./text.md) nodes.
-
-### `length`
-`Number`
-
-The sum of the lengths of all of the descendant [`Text`](./text.md) nodes of this node.
 
 ### `text`
 `String`

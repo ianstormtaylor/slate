@@ -46,11 +46,13 @@ EVENT_HANDLERS.forEach((handler) => {
   Simulate[method] = function (stack, state, e, data) {
     const editor = createEditor(stack, state)
     const event = createEvent(e || {})
+    const change = state.change()
 
-    let next = stack[handler](state, editor, event, data)
+    stack[handler](change, editor, event, data)
+    stack.onBeforeChange(change, editor)
+    stack.onChange(change, editor)
+    const next = change.state
     if (next == state) return state
-
-    next = stack.onChange(next, editor)
     return next
   }
 })
@@ -63,9 +65,10 @@ CHANGE_HANDLERS.forEach((handler) => {
   const method = getMethodName(handler)
 
   Simulate[method] = function (stack, state) {
-    const editor = createEditor(stack, state)
-    const next = stack[handler](state, editor)
-    return next
+    throw new Error('Unimplemented!')
+    // const editor = createEditor(stack, state)
+    // const next = stack[handler](state, editor)
+    // return next
   }
 })
 
@@ -102,7 +105,7 @@ function createEditor(stack, state) {
  */
 
 function createEvent(attributes) {
-  let event = {
+  const event = {
     preventDefault: () => event.isDefaultPrevented = true,
     stopPropagation: () => event.isPropagationStopped = true,
     isDefaultPrevented: false,

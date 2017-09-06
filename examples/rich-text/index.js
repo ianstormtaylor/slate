@@ -70,7 +70,7 @@ class RichText extends React.Component {
 
   hasMark = (type) => {
     const { state } = this.state
-    return state.marks.some(mark => mark.type == type)
+    return state.activeMarks.some(mark => mark.type == type)
   }
 
   /**
@@ -86,12 +86,12 @@ class RichText extends React.Component {
   }
 
   /**
-   * On change, save the new state.
+   * On change, save the new `state`.
    *
-   * @param {State} state
+   * @param {Change} change
    */
 
-  onChange = (state) => {
+  onChange = ({ state }) => {
     this.setState({ state })
   }
 
@@ -100,11 +100,11 @@ class RichText extends React.Component {
    *
    * @param {Event} e
    * @param {Object} data
-   * @param {State} state
-   * @return {State}
+   * @param {Change} change
+   * @return {Change}
    */
 
-  onKeyDown = (e, data, state) => {
+  onKeyDown = (e, data, change) => {
     if (!data.isMod) return
     let mark
 
@@ -125,13 +125,9 @@ class RichText extends React.Component {
         return
     }
 
-    state = state
-      .transform()
-      .toggleMark(mark)
-      .apply()
-
     e.preventDefault()
-    return state
+    change.toggleMark(mark)
+    return true
   }
 
   /**
@@ -143,14 +139,9 @@ class RichText extends React.Component {
 
   onClickMark = (e, type) => {
     e.preventDefault()
-    let { state } = this.state
-
-    state = state
-      .transform()
-      .toggleMark(type)
-      .apply()
-
-    this.setState({ state })
+    const { state } = this.state
+    const change = state.change().toggleMark(type)
+    this.onChange(change)
   }
 
   /**
@@ -162,8 +153,8 @@ class RichText extends React.Component {
 
   onClickBlock = (e, type) => {
     e.preventDefault()
-    let { state } = this.state
-    const transform = state.transform()
+    const { state } = this.state
+    const change = state.change()
     const { document } = state
 
     // Handle everything but list buttons.
@@ -172,14 +163,14 @@ class RichText extends React.Component {
       const isList = this.hasBlock('list-item')
 
       if (isList) {
-        transform
+        change
           .setBlock(isActive ? DEFAULT_NODE : type)
           .unwrapBlock('bulleted-list')
           .unwrapBlock('numbered-list')
       }
 
       else {
-        transform
+        change
           .setBlock(isActive ? DEFAULT_NODE : type)
       }
     }
@@ -192,23 +183,22 @@ class RichText extends React.Component {
       })
 
       if (isList && isType) {
-        transform
+        change
           .setBlock(DEFAULT_NODE)
           .unwrapBlock('bulleted-list')
           .unwrapBlock('numbered-list')
       } else if (isList) {
-        transform
+        change
           .unwrapBlock(type == 'bulleted-list' ? 'numbered-list' : 'bulleted-list')
           .wrapBlock(type)
       } else {
-        transform
+        change
           .setBlock('list-item')
           .wrapBlock(type)
       }
     }
 
-    state = transform.apply()
-    this.setState({ state })
+    this.onChange(change)
   }
 
   /**
@@ -296,12 +286,12 @@ class RichText extends React.Component {
     return (
       <div className="editor">
         <Editor
-          spellCheck
-          placeholder={'Enter some rich text...'}
-          schema={schema}
           state={this.state.state}
           onChange={this.onChange}
           onKeyDown={this.onKeyDown}
+          schema={schema}
+          placeholder={'Enter some rich text...'}
+          spellCheck
         />
       </div>
     )

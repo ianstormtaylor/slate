@@ -17,7 +17,7 @@ This is the full reference documentation for all of the pieces of Slate, broken 
   - [Selection](./models/selection.md)
   - [State](./models/state.md)
   - [Text](./models/text.md)
-  - [Transform](./models/transform.md)
+  - [Change](./models/change.md)
 - **Serializers**
   - [Html](./serializers/html.md)
   - [Plain](./serializers/plain.md)

@@ -40,51 +40,63 @@ const DEFAULTS = {
 class Block extends new Record(DEFAULTS) {
 
   /**
-   * Create a new `Block` with `properties`.
+   * Create a new `Block` with `attrs`.
    *
-   * @param {Object|Block} properties
+   * @param {Object|Block} attrs
    * @return {Block}
    */
 
-  static create(properties = {}) {
-    if (Block.isBlock(properties)) return properties
-    if (Inline.isInline(properties)) return properties
-    if (Text.isText(properties)) return properties
-    if (!properties.type) throw new Error('You must pass a block `type`.')
+  static create(attrs = {}) {
+    if (Block.isBlock(attrs)) return attrs
+    if (Inline.isInline(attrs)) return attrs
+    if (Text.isText(attrs)) return attrs
 
-    properties.key = properties.key || generateKey()
-    properties.data = Data.create(properties.data)
-    properties.isVoid = !!properties.isVoid
-    properties.nodes = Block.createList(properties.nodes)
-
-    if (properties.nodes.size == 0) {
-      properties.nodes = properties.nodes.push(Text.create())
+    if (!attrs.type) {
+      throw new Error('You must pass a block `type`.')
     }
 
-    return new Block(properties)
+    const { nodes } = attrs
+    const empty = !nodes || nodes.size == 0 || nodes.length == 0
+    const block = new Block({
+      type: attrs.type,
+      key: attrs.key || generateKey(),
+      data: Data.create(attrs.data),
+      isVoid: !!attrs.isVoid,
+      nodes: Node.createList(empty ? [Text.create()] : nodes),
+    })
+
+    return block
   }
 
   /**
-   * Create a list of `Blocks` from an array.
+   * Create a list of `Blocks` from `elements`.
    *
-   * @param {Array<Object|Block>} elements
+   * @param {Array<Object|Block>|List<Block>} elements
    * @return {List<Block>}
    */
 
   static createList(elements = []) {
-    if (List.isList(elements)) return elements
-    return new List(elements.map(Block.create))
+    if (List.isList(elements)) {
+      return elements
+    }
+
+    if (Array.isArray(elements)) {
+      const list = new List(elements.map(Block.create))
+      return list
+    }
+
+    throw new Error(`Block.createList() must be passed an \`Array\` or a \`List\`. You passed: ${elements}`)
   }
 
   /**
-   * Determines if the passed in paramter is a Slate Block or not
+   * Check if a `value` is a `Block`.
    *
-   * @param {*} maybeBlock
+   * @param {Any} value
    * @return {Boolean}
    */
 
-  static isBlock(maybeBlock) {
-    return !!(maybeBlock && maybeBlock[MODEL_TYPES.BLOCK])
+  static isBlock(value) {
+    return !!(value && value[MODEL_TYPES.BLOCK])
   }
 
   /**
@@ -108,16 +120,6 @@ class Block extends new Record(DEFAULTS) {
   }
 
   /**
-   * Get the length of the concatenated text of the node.
-   *
-   * @return {Number}
-   */
-
-  get length() {
-    return this.text.length
-  }
-
-  /**
    * Get the concatenated text `string` of all child nodes.
    *
    * @return {String}
@@ -130,7 +132,7 @@ class Block extends new Record(DEFAULTS) {
 }
 
 /**
- * Pseduo-symbol that shows this is a Slate Block
+ * Attach a pseudo-symbol for type checking.
  */
 
 Block.prototype[MODEL_TYPES.BLOCK] = true
@@ -139,9 +141,10 @@ Block.prototype[MODEL_TYPES.BLOCK] = true
  * Mix in `Node` methods.
  */
 
-for (const method in Node) {
-  Block.prototype[method] = Node[method]
-}
+Object.getOwnPropertyNames(Node.prototype).forEach((method) => {
+  if (method == 'constructor') return
+  Block.prototype[method] = Node.prototype[method]
+})
 
 /**
  * Export.

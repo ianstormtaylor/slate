@@ -48,9 +48,9 @@ const schema = {
       validate: (document) => {
         return document.nodes.size ? null : true
       },
-      normalize: (transform, document) => {
+      normalize: (change, document) => {
         const block = Block.create(defaultBlock)
-        transform.insertNodeByKey(document.key, 0, block)
+        change.insertNodeByKey(document.key, 0, block)
       }
     },
     // Rule to insert a paragraph below a void node (the image) if that node is
@@ -63,12 +63,32 @@ const schema = {
         const lastNode = document.nodes.last()
         return lastNode && lastNode.isVoid ? true : null
       },
-      normalize: (transform, document) => {
+      normalize: (change, document) => {
         const block = Block.create(defaultBlock)
-        transform.insertNodeByKey(document.key, document.nodes.size, block)
+        change.insertNodeByKey(document.key, document.nodes.size, block)
       }
     }
   ]
+}
+
+/**
+ * A change function to standardize inserting images.
+ *
+ * @param {Change} change
+ * @param {String} src
+ * @param {Selection} target
+ */
+
+function insertImage(change, src, target) {
+  if (target) {
+    change.select(target)
+  }
+
+  change.insertBlock({
+    type: 'image',
+    isVoid: true,
+    data: { src }
+  })
 }
 
 /**
@@ -143,10 +163,10 @@ class Images extends React.Component {
   /**
    * On change.
    *
-   * @param {State} state
+   * @param {Change} change
    */
 
-  onChange = (state) => {
+  onChange = ({ state }) => {
     this.setState({ state })
   }
 
@@ -160,9 +180,12 @@ class Images extends React.Component {
     e.preventDefault()
     const src = window.prompt('Enter the URL of the image:')
     if (!src) return
-    let { state } = this.state
-    state = this.insertImage(state, null, src)
-    this.onChange(state)
+
+    const change = this.state.state
+      .change()
+      .call(insertImage, src)
+
+    this.onChange(change)
   }
 
   /**
@@ -170,14 +193,13 @@ class Images extends React.Component {
    *
    * @param {Event} e
    * @param {Object} data
-   * @param {State} state
+   * @param {Change} change
    * @param {Editor} editor
-   * @return {State}
    */
 
-  onDrop = (e, data, state, editor) => {
+  onDrop = (e, data, change, editor) => {
     switch (data.type) {
-      case 'files': return this.onDropOrPasteFiles(e, data, state, editor)
+      case 'files': return this.onDropOrPasteFiles(e, data, change, editor)
     }
   }
 
@@ -186,21 +208,20 @@ class Images extends React.Component {
    *
    * @param {Event} e
    * @param {Object} data
-   * @param {State} state
+   * @param {Change} change
    * @param {Editor} editor
-   * @return {State}
    */
 
-  onDropOrPasteFiles = (e, data, state, editor) => {
+  onDropOrPasteFiles = (e, data, change, editor) => {
     for (const file of data.files) {
       const reader = new FileReader()
       const [ type ] = file.type.split('/')
       if (type != 'image') continue
 
       reader.addEventListener('load', () => {
-        state = editor.getState()
-        state = this.insertImage(state, data.target, reader.result)
-        editor.onChange(state)
+        editor.change((t) => {
+          t.call(insertImage, reader.result, data.target)
+        })
       })
 
       reader.readAsDataURL(file)
@@ -212,15 +233,14 @@ class Images extends React.Component {
    *
    * @param {Event} e
    * @param {Object} data
-   * @param {State} state
+   * @param {Change} change
    * @param {Editor} editor
-   * @return {State}
    */
 
-  onPaste = (e, data, state, editor) => {
+  onPaste = (e, data, change, editor) => {
     switch (data.type) {
-      case 'files': return this.onDropOrPasteFiles(e, data, state, editor)
-      case 'text': return this.onPasteText(e, data, state)
+      case 'files': return this.onDropOrPasteFiles(e, data, change, editor)
+      case 'text': return this.onPasteText(e, data, change)
     }
   }
 
@@ -229,36 +249,13 @@ class Images extends React.Component {
    *
    * @param {Event} e
    * @param {Object} data
-   * @param {State} state
-   * @return {State}
+   * @param {Change} change
    */
 
-  onPasteText = (e, data, state) => {
+  onPasteText = (e, data, change) => {
     if (!isUrl(data.text)) return
     if (!isImage(data.text)) return
-    return this.insertImage(state, data.target, data.text)
-  }
-
-  /**
-   * Insert an image with `src` at the current selection.
-   *
-   * @param {State} state
-   * @param {String} src
-   * @return {State}
-   */
-
-  insertImage = (state, target, src) => {
-    const transform = state.transform()
-
-    if (target) transform.select(target)
-
-    return transform
-      .insertBlock({
-        type: 'image',
-        isVoid: true,
-        data: { src }
-      })
-      .apply()
+    change.call(insertImage, data.text, data.target)
   }
 
 }

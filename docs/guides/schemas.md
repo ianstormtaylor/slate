@@ -19,7 +19,7 @@ Slate schemas are built up of a set of rules. Every rule has a few properties:
   render: Component || Function || Object || String,
   decorate: Function,
   validate: Function || Object,
-  transform: Function
+  change: Function
 }
 ```
 

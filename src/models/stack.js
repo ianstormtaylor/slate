@@ -1,8 +1,8 @@
 
+import MODEL_TYPES from '../constants/model-types'
 import CorePlugin from '../plugins/core'
 import Debug from 'debug'
 import Schema from './schema'
-import State from './state'
 import { Record } from 'immutable'
 
 /**
@@ -19,27 +19,18 @@ const debug = Debug('slate:stack')
  * @type {Array}
  */
 
-const EVENT_HANDLER_METHODS = [
+const METHODS = [
   'onBeforeInput',
+  'onBeforeChange',
   'onBlur',
-  'onFocus',
   'onCopy',
   'onCut',
   'onDrop',
+  'onFocus',
   'onKeyDown',
   'onKeyUp',
   'onPaste',
   'onSelect',
-]
-
-/**
- * Methods that accumulate an updated state.
- *
- * @type {Array}
- */
-
-const STATE_ACCUMULATOR_METHODS = [
-  'onBeforeChange',
   'onChange',
 ]
 
@@ -65,16 +56,28 @@ class Stack extends new Record(DEFAULTS) {
   /**
    * Constructor.
    *
-   * @param {Object} properties
+   * @param {Object} attrs
    *   @property {Array} plugins
    *   @property {Schema|Object} schema
    *   @property {Function} ...handlers
    */
 
-  static create(properties) {
-    const plugins = resolvePlugins(properties)
+  static create(attrs) {
+    const plugins = resolvePlugins(attrs)
     const schema = resolveSchema(plugins)
-    return new Stack({ plugins, schema })
+    const stack = new Stack({ plugins, schema })
+    return stack
+  }
+
+  /**
+   * Check if a `value` is a `Stack`.
+   *
+   * @param {Any} value
+   * @return {Boolean}
+   */
+
+  static isStack(value) {
+    return !!(value && value[MODEL_TYPES.STACK])
   }
 
   /**
@@ -98,7 +101,7 @@ class Stack extends new Record(DEFAULTS) {
    * @return {Component}
    */
 
-  render = (state, editor, props) => {
+  render(state, editor, props) {
     debug('render')
     const plugins = this.plugins.slice().reverse()
     let children
@@ -121,7 +124,7 @@ class Stack extends new Record(DEFAULTS) {
    * @return {Array}
    */
 
-  renderPortal = (state, editor) => {
+  renderPortal(state, editor) {
     debug('renderPortal')
     const portals = []
 
@@ -129,8 +132,7 @@ class Stack extends new Record(DEFAULTS) {
       const plugin = this.plugins[i]
       if (!plugin.renderPortal) continue
       const portal = plugin.renderPortal(state, editor)
-      if (portal == null) continue
-      portals.push(portal)
+      if (portal) portals.push(portal)
     }
 
     return portals
@@ -139,72 +141,31 @@ class Stack extends new Record(DEFAULTS) {
 }
 
 /**
- * Mix in the event handler methods.
- *
- * @param {State} state
- * @param {Editor} editor
- * @param {Mixed} ...args
- * @return {State|Null}
+ * Attach a pseudo-symbol for type checking.
  */
 
-for (let i = 0; i < EVENT_HANDLER_METHODS.length; i++) {
-  const method = EVENT_HANDLER_METHODS[i]
-  Stack.prototype[method] = function (state, editor, ...args) {
+Stack.prototype[MODEL_TYPES.STACK] = true
+
+/**
+ * Mix in the stack methods.
+ *
+ * @param {Change} change
+ * @param {Editor} editor
+ * @param {Mixed} ...args
+ */
+
+for (let i = 0; i < METHODS.length; i++) {
+  const method = METHODS[i]
+  Stack.prototype[method] = function (change, editor, ...args) {
     debug(method)
 
     for (let k = 0; k < this.plugins.length; k++) {
       const plugin = this.plugins[k]
       if (!plugin[method]) continue
-      const next = plugin[method](...args, state, editor)
-      if (next == null) continue
-      assertState(next)
-      return next
+      const next = plugin[method](...args, change, editor)
+      if (next != null) break
     }
-
-    return state
   }
-}
-
-/**
- * Mix in the state accumulator methods.
- *
- * @param {State} state
- * @param {Editor} editor
- * @param {Mixed} ...args
- * @return {State|Null}
- */
-
-for (let i = 0; i < STATE_ACCUMULATOR_METHODS.length; i++) {
-  const method = STATE_ACCUMULATOR_METHODS[i]
-  Stack.prototype[method] = function (state, editor, ...args) {
-    debug(method)
-
-    if (method == 'onChange') {
-      state = this.onBeforeChange(state, editor)
-    }
-
-    for (let k = 0; k < this.plugins.length; k++) {
-      const plugin = this.plugins[k]
-      if (!plugin[method]) continue
-      const next = plugin[method](...args, state, editor)
-      if (next == null) continue
-      assertState(next)
-      state = next
-    }
-
-    return state
-  }
-}
-
-/**
- * Assert that a `value` is a state object.
- *
- * @param {Mixed} value
- */
-
-function assertState(value) {
-  if (State.isState(value)) return
-  throw new Error(`A plugin returned an unexpected state value: ${value}`)
 }
 
 /**

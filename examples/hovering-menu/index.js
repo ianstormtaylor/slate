@@ -58,16 +58,16 @@ class HoveringMenu extends React.Component {
 
   hasMark = (type) => {
     const { state } = this.state
-    return state.marks.some(mark => mark.type == type)
+    return state.activeMarks.some(mark => mark.type == type)
   }
 
   /**
-   * On change, save the new state.
+   * On change.
    *
-   * @param {State} state
+   * @param {Change} change
    */
 
-  onChange = (state) => {
+  onChange = ({ state }) => {
     this.setState({ state })
   }
 
@@ -80,14 +80,10 @@ class HoveringMenu extends React.Component {
 
   onClickMark = (e, type) => {
     e.preventDefault()
-    let { state } = this.state
-
-    state = state
-      .transform()
+    const change = this.state.state
+      .change()
       .toggleMark(type)
-      .apply()
-
-    this.setState({ state })
+    this.onChange(change)
   }
 
   /**

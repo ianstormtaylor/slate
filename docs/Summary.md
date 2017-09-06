@@ -32,7 +32,7 @@
 - [Schema](./reference/models/schema.md)
 - [State](./reference/models/state.md)
 - [Text](./reference//models/text.md)
-- [Transform](./reference/models/transform.md)
+- [Change](./reference/models/change.md)
 
 
 ## Serializer Reference
