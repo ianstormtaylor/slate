@@ -101,7 +101,7 @@ class State extends new Record(DEFAULTS) {
    */
 
   get hasUndos() {
-    return this.history.undos.length > 0
+    return this.history.undos.size > 0
   }
 
   /**
@@ -111,7 +111,7 @@ class State extends new Record(DEFAULTS) {
    */
 
   get hasRedos() {
-    return this.history.redos.length > 0
+    return this.history.redos.size > 0
   }
 
   /**
@@ -261,7 +261,9 @@ class State extends new Record(DEFAULTS) {
    */
 
   get startBlock() {
-    return this.document.getClosestBlock(this.selection.startKey)
+    return this.selection.isUnset
+      ? null
+      : this.document.getClosestBlock(this.selection.startKey)
   }
 
   /**
@@ -271,7 +273,9 @@ class State extends new Record(DEFAULTS) {
    */
 
   get endBlock() {
-    return this.document.getClosestBlock(this.selection.endKey)
+    return this.selection.isUnset
+      ? null
+      : this.document.getClosestBlock(this.selection.endKey)
   }
 
   /**
@@ -281,7 +285,9 @@ class State extends new Record(DEFAULTS) {
    */
 
   get anchorBlock() {
-    return this.document.getClosestBlock(this.selection.anchorKey)
+    return this.selection.isUnset
+      ? null
+      : this.document.getClosestBlock(this.selection.anchorKey)
   }
 
   /**
@@ -291,7 +297,9 @@ class State extends new Record(DEFAULTS) {
    */
 
   get focusBlock() {
-    return this.document.getClosestBlock(this.selection.focusKey)
+    return this.selection.isUnset
+      ? null
+      : this.document.getClosestBlock(this.selection.focusKey)
   }
 
   /**
@@ -301,7 +309,9 @@ class State extends new Record(DEFAULTS) {
    */
 
   get startInline() {
-    return this.document.getClosestInline(this.selection.startKey)
+    return this.selection.isUnset
+      ? null
+      : this.document.getClosestInline(this.selection.startKey)
   }
 
   /**
@@ -311,7 +321,9 @@ class State extends new Record(DEFAULTS) {
    */
 
   get endInline() {
-    return this.document.getClosestInline(this.selection.endKey)
+    return this.selection.isUnset
+      ? null
+      : this.document.getClosestInline(this.selection.endKey)
   }
 
   /**
@@ -321,7 +333,9 @@ class State extends new Record(DEFAULTS) {
    */
 
   get anchorInline() {
-    return this.document.getClosestInline(this.selection.anchorKey)
+    return this.selection.isUnset
+      ? null
+      : this.document.getClosestInline(this.selection.anchorKey)
   }
 
   /**
@@ -331,7 +345,9 @@ class State extends new Record(DEFAULTS) {
    */
 
   get focusInline() {
-    return this.document.getClosestInline(this.selection.focusKey)
+    return this.selection.isUnset
+      ? null
+      : this.document.getClosestInline(this.selection.focusKey)
   }
 
   /**
@@ -341,7 +357,9 @@ class State extends new Record(DEFAULTS) {
    */
 
   get startText() {
-    return this.document.getDescendant(this.selection.startKey)
+    return this.selection.isUnset
+      ? null
+      : this.document.getDescendant(this.selection.startKey)
   }
 
   /**
@@ -351,7 +369,9 @@ class State extends new Record(DEFAULTS) {
    */
 
   get endText() {
-    return this.document.getDescendant(this.selection.endKey)
+    return this.selection.isUnset
+      ? null
+      : this.document.getDescendant(this.selection.endKey)
   }
 
   /**
@@ -361,7 +381,9 @@ class State extends new Record(DEFAULTS) {
    */
 
   get anchorText() {
-    return this.document.getDescendant(this.selection.anchorKey)
+    return this.selection.isUnset
+      ? null
+      : this.document.getDescendant(this.selection.anchorKey)
   }
 
   /**
@@ -371,7 +393,9 @@ class State extends new Record(DEFAULTS) {
    */
 
   get focusText() {
-    return this.document.getDescendant(this.selection.focusKey)
+    return this.selection.isUnset
+      ? null
+      : this.document.getDescendant(this.selection.focusKey)
   }
 
   /**
@@ -381,7 +405,9 @@ class State extends new Record(DEFAULTS) {
    */
 
   get characters() {
-    return this.document.getCharactersAtRange(this.selection)
+    return this.selection.isUnset
+      ? new List()
+      : this.document.getCharactersAtRange(this.selection)
   }
 
   /**
