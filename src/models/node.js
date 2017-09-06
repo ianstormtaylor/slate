@@ -973,7 +973,7 @@ class Node {
   getActiveMarksAtRange(range) {
     const array = this.getActiveMarksAtRangeAsArray(range)
     return new Set(array)
-  },
+  }
 
   /**
    * Get a set of the marks in a `range`.
@@ -1038,7 +1038,7 @@ class Node {
       return memo.size != 0
     })
     return memo.toArray()
-  },
+  }
 
   /**
    * Get all of the marks that match a `type`.
