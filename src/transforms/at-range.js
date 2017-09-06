@@ -186,14 +186,23 @@ Transforms.deleteAtRange = (transform, range, options = {}) => {
   // If the start and end block are different, move all of the nodes from the
   // end block into the start block
   if (startBlock.key !== endBlock.key) {
-    endBlock.nodes.forEach((child, i) => {
-      const newKey = startBlock.key
-      const newIndex = startBlock.nodes.size + i
+    let blockToRemove = endBlock
+    let blockToKeep = startBlock
+
+    // We keep the style of the blockToKeep. endBlock should keep style if deleting empty line.
+    if (startBlock.isEmpty) {
+      blockToRemove = startBlock
+      blockToKeep = endBlock
+    }
+
+    blockToRemove.nodes.forEach((child, i) => {
+      const newKey = blockToKeep.key
+      const newIndex = blockToKeep.nodes.size + i
       transform.moveNodeByKey(child.key, newKey, newIndex, OPTS)
     })
 
-    // Remove parents of endBlock as long as they have a single child
-    const lonely = document.getFurthestOnlyChildAncestor(endBlock.key) || endBlock
+    // Remove parents of blockToRemove as long as they have a single child
+    const lonely = document.getFurthestOnlyChildAncestor(blockToRemove.key) || blockToRemove
     transform.removeNodeByKey(lonely.key, OPTS)
   }
 
