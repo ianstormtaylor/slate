@@ -111,6 +111,10 @@ class Node extends React.Component {
     // for simplicity we just let them through.
     if (nextProps.node != props.node) return true
 
+    // If the Node has more Nodes inside of it that aren't Texts, allow
+    // them to decide if they should render or not.
+    if (nextProps.node.nodes.size === nextProps.node.getTexts().size) return true
+
     // If the node is a block or inline, which can have custom renderers, we
     // include an extra check to re-render if the node either becomes part of,
     // or leaves, a selection. This is to make it simple for users to show a
