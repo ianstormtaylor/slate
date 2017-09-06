@@ -118,11 +118,9 @@ class History extends new Record(DEFAULTS) {
       undos = undos.take(100)
     }
 
-    // Clear the redos
-    redos = redos.size > 0 ? new Stack() : redos
-
-    history = history.set('undos', undos)
-    history = history.set('redos', redos)
+    // Clear the redos and update the history.
+    redos = redos.clear()
+    history = history.set('undos', undos).set('redos', redos)
     return history
   }
 
