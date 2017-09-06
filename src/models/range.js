@@ -1,7 +1,8 @@
 
+import MODEL_TYPES from '../constants/model-types'
 import Character from './character'
 import Mark from './mark'
-import MODEL_TYPES from '../constants/model-types'
+import isPlainObject from 'is-plain-object'
 import { Record, Set } from 'immutable'
 
 /**
@@ -21,7 +22,7 @@ const DEFAULTS = {
  * @type {Range}
  */
 
-class Range extends new Record(DEFAULTS) {
+class Range extends Record(DEFAULTS) {
 
   /**
    * Create a new `Range` with `attrs`.
@@ -31,14 +32,25 @@ class Range extends new Record(DEFAULTS) {
    */
 
   static create(attrs = {}) {
-    if (Range.isRange(attrs)) return attrs
+    if (Range.isRange(attrs)) {
+      return attrs
+    }
 
-    const range = new Range({
-      text: attrs.text,
-      marks: Mark.createSet(attrs.marks),
-    })
+    if (typeof attrs == 'string') {
+      attrs = { text: attrs }
+    }
 
-    return range
+    if (isPlainObject(attrs)) {
+      const { marks, text } = attrs
+      const range = new Range({
+        text,
+        marks: Mark.createSet(marks),
+      })
+
+      return range
+    }
+
+    throw new Error(`\`Range.create\` only accepts objects, strings or ranges, but you passed it: ${attrs}`)
   }
 
   /**

@@ -3,9 +3,11 @@ import Character from './character'
 import Mark from './mark'
 import Range from './range'
 import MODEL_TYPES from '../constants/model-types'
-import memoize from '../utils/memoize'
 import generateKey from '../utils/generate-key'
-import { List, Record, OrderedSet, Set, is } from 'immutable'
+import isPlainObject from 'is-plain-object'
+import logger from '../utils/logger'
+import memoize from '../utils/memoize'
+import { List, Record, OrderedSet, is } from 'immutable'
 
 /**
  * Default properties.
@@ -15,7 +17,7 @@ import { List, Record, OrderedSet, Set, is } from 'immutable'
 
 const DEFAULTS = {
   characters: new List(),
-  key: null
+  key: undefined,
 }
 
 /**
@@ -24,57 +26,45 @@ const DEFAULTS = {
  * @type {Text}
  */
 
-class Text extends new Record(DEFAULTS) {
+class Text extends Record(DEFAULTS) {
 
   /**
    * Create a new `Text` with `attrs`.
    *
-   * @param {Object|Text} attrs
+   * @param {Object|Array|List|String|Text} attrs
    * @return {Text}
    */
 
   static create(attrs = {}) {
-    if (Text.isText(attrs)) return attrs
-    if (attrs.ranges) return Text.createFromRanges(attrs.ranges)
+    if (Text.isText(attrs)) {
+      return attrs
+    }
 
-    const text = new Text({
-      characters: Character.createList(attrs.characters),
-      key: attrs.key || generateKey(),
-    })
+    if (List.isList(attrs) || Array.isArray(attrs)) {
+      attrs = { ranges: attrs }
+    }
 
-    return text
-  }
+    if (typeof attrs == 'string') {
+      attrs = { ranges: [{ text: attrs }] }
+    }
 
-  /**
-   * Create a new `Text` from a string
-   *
-   * @param {String} text
-   * @param {Set<Mark>} marks (optional)
-   * @return {Text}
-   */
+    if (isPlainObject(attrs)) {
+      const { characters, ranges, key } = attrs
+      const chars = ranges
+        ? ranges
+            .map(Range.create)
+            .reduce((l, r) => l.concat(r.getCharacters()), Character.createList())
+        : Character.createList(characters)
 
-  static createFromString(string, marks = Set()) {
-    const range = Range.create({ text: string, marks })
-    const text = Text.createFromRanges([range])
-    return text
-  }
+      const text = new Text({
+        characters: chars,
+        key: key || generateKey(),
+      })
 
-  /**
-   * Create a new `Text` from a list of ranges
-   *
-   * @param {List<Range>|Array<Range>} ranges
-   * @return {Text}
-   */
+      return text
+    }
 
-  static createFromRanges(ranges) {
-    const characters = ranges
-      .map(Range.create)
-      .reduce((list, range) => {
-        return list.concat(range.getCharacters())
-      }, Character.createList())
-
-    const text = Text.create({ characters })
-    return text
+    throw new Error(`\`Text.create\` only accepts objects, arrays, strings or texts, but you passed it: ${attrs}`)
   }
 
   /**
@@ -102,6 +92,24 @@ class Text extends new Record(DEFAULTS) {
 
   static isText(value) {
     return !!(value && value[MODEL_TYPES.TEXT])
+  }
+
+  /**
+   * Deprecated.
+   */
+
+  static createFromString(string) {
+    logger.deprecate('0.22.0', 'The `Text.createFromString(string)` method is deprecated, use `Text.create(string)` instead.')
+    return Text.create(string)
+  }
+
+  /**
+   * Deprecated.
+   */
+
+  static createFromRanges(ranges) {
+    logger.deprecate('0.22.0', 'The `Text.createFromRanges(ranges)` method is deprecated, use `Text.create(ranges)` instead.')
+    return Text.create(ranges)
   }
 
   /**
@@ -319,7 +327,7 @@ class Text extends new Record(DEFAULTS) {
 
   insertText(index, text, marks) {
     let { characters } = this
-    const chars = Character.createListFromText(text, marks)
+    const chars = Character.createList(text.split('').map(char => ({ text: char, marks })))
 
     characters = characters.slice(0, index)
       .concat(chars)

@@ -1,4 +1,5 @@
 
+import isPlainObject from 'is-plain-object'
 import { Map } from 'immutable'
 
 /**
@@ -15,14 +16,20 @@ const Data = {
   /**
    * Create a new `Data` with `attrs`.
    *
-   * @param {Object} attrs
+   * @param {Object|Data|Map} attrs
    * @return {Data} data
    */
 
   create(attrs = {}) {
-    return Map.isMap(attrs)
-      ? attrs
-      : new Map(attrs)
+    if (Map.isMap(attrs)) {
+      return attrs
+    }
+
+    if (isPlainObject(attrs)) {
+      return new Map(attrs)
+    }
+
+    throw new Error(`\`Data.create\` only accepts objects or maps, but you passed it: ${attrs}`)
   }
 
 }

@@ -1,5 +1,8 @@
 
-import Normalize from '../utils/normalize'
+import Block from '../models/block'
+import Inline from '../models/inline'
+import Mark from '../models/mark'
+import Node from '../models/node'
 import SCHEMA from '../schemas/core'
 
 /**
@@ -23,7 +26,7 @@ const Changes = {}
  */
 
 Changes.addMarkByKey = (change, key, offset, length, mark, options = {}) => {
-  mark = Normalize.mark(mark)
+  mark = Mark.create(mark)
   const { normalize = true } = options
   const { state } = change
   const { document } = state
@@ -232,7 +235,7 @@ Changes.moveNodeByKey = (change, key, newKey, newIndex, options = {}) => {
  */
 
 Changes.removeMarkByKey = (change, key, offset, length, mark, options = {}) => {
-  mark = Normalize.mark(mark)
+  mark = Mark.create(mark)
   const { normalize = true } = options
   const { state } = change
   const { document } = state
@@ -376,8 +379,8 @@ Changes.removeTextByKey = (change, key, offset, length, options = {}) => {
  */
 
 Changes.setMarkByKey = (change, key, offset, length, mark, properties, options = {}) => {
-  mark = Normalize.mark(mark)
-  properties = Normalize.markProperties(properties)
+  mark = Mark.create(mark)
+  properties = Mark.createProperties(properties)
   const { normalize = true } = options
   const { state } = change
   const { document } = state
@@ -409,7 +412,7 @@ Changes.setMarkByKey = (change, key, offset, length, mark, properties, options =
  */
 
 Changes.setNodeByKey = (change, key, properties, options = {}) => {
-  properties = Normalize.nodeProperties(properties)
+  properties = Node.createProperties(properties)
   const { normalize = true } = options
   const { state } = change
   const { document } = state
@@ -599,7 +602,7 @@ Changes.unwrapNodeByKey = (change, key, options = {}) => {
  */
 
 Changes.wrapInlineByKey = (change, key, inline, options) => {
-  inline = Normalize.inline(inline)
+  inline = Inline.create(inline)
   inline = inline.set('nodes', inline.nodes.clear())
 
   const { document } = change.state
@@ -622,7 +625,7 @@ Changes.wrapInlineByKey = (change, key, inline, options) => {
  */
 
 Changes.wrapBlockByKey = (change, key, block, options) => {
-  block = Normalize.block(block)
+  block = Block.create(block)
   block = block.set('nodes', block.nodes.clear())
 
   const { document } = change.state

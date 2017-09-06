@@ -1,12 +1,13 @@
 
 import Block from './block'
+import Data from './data'
 import Document from './document'
 import Inline from './inline'
-import Normalize from '../utils/normalize'
 import Text from './text'
 import direction from 'direction'
 import generateKey from '../utils/generate-key'
 import isInRange from '../utils/is-in-range'
+import isPlainObject from 'is-plain-object'
 import logger from '../utils/logger'
 import memoize from '../utils/memoize'
 import { List, OrderedSet, Set } from 'immutable'
@@ -30,20 +31,23 @@ class Node {
    */
 
   static create(attrs = {}) {
-    if (Block.isBlock(attrs)) return attrs
-    if (Document.isDocument(attrs)) return attrs
-    if (Inline.isInline(attrs)) return attrs
-    if (Text.isText(attrs)) return attrs
+    if (Node.isNode(attrs)) {
+      return attrs
+    }
 
-    switch (attrs.kind) {
-      case 'block': return Block.create(attrs)
-      case 'document': return Document.create(attrs)
-      case 'inline': return Inline.create(attrs)
-      case 'text': return Text.create(attrs)
-      default: {
-        throw new Error(`You must pass a \`kind\` attribute to create a \`Node\`.`)
+    if (isPlainObject(attrs)) {
+      switch (attrs.kind) {
+        case 'block': return Block.create(attrs)
+        case 'document': return Document.create(attrs)
+        case 'inline': return Inline.create(attrs)
+        case 'text': return Text.create(attrs)
+        default: {
+          throw new Error('`Node.create` requires a `kind` string.')
+        }
       }
     }
+
+    throw new Error(`\`Node.create\` only accepts objects or nodes but you passed it: ${attrs}`)
   }
 
   /**
@@ -54,16 +58,43 @@ class Node {
    */
 
   static createList(elements = []) {
-    if (List.isList(elements)) {
-      return elements
-    }
-
-    if (Array.isArray(elements)) {
+    if (List.isList(elements) || Array.isArray(elements)) {
       const list = new List(elements.map(Node.create))
       return list
     }
 
-    throw new Error(`Node.createList() must be passed an \`Array\` or a \`List\`. You passed: ${elements}`)
+    throw new Error(`\`Node.createList\` only accepts lists or arrays, but you passed it: ${elements}`)
+  }
+
+  /**
+   * Create a dictionary of settable node properties from `attrs`.
+   *
+   * @param {Object|String|Node} attrs
+   * @return {Object}
+   */
+
+  static createProperties(attrs = {}) {
+    if (Block.isBlock(attrs) || Inline.isInline(attrs)) {
+      return {
+        data: attrs.data,
+        isVoid: attrs.isVoid,
+        type: attrs.type,
+      }
+    }
+
+    if (typeof attrs == 'string') {
+      return { type: attrs }
+    }
+
+    if (isPlainObject(attrs)) {
+      const props = {}
+      if ('type' in attrs) props.type = attrs.type
+      if ('data' in attrs) props.data = Data.create(attrs.data)
+      if ('isVoid' in attrs) props.isVoid = attrs.isVoid
+      return props
+    }
+
+    throw new Error(`\`Node.createProperties\` only accepts objects, strings, blocks or inlines, but you passed it: ${attrs}`)
   }
 
   /**
@@ -92,8 +123,8 @@ class Node {
    */
 
   areDescendantsSorted(first, second) {
-    first = Normalize.key(first)
-    second = Normalize.key(second)
+    first = normalizeKey(first)
+    second = normalizeKey(second)
 
     let sorted
 
@@ -121,7 +152,7 @@ class Node {
     const child = this.getChild(key)
 
     if (!child) {
-      key = Normalize.key(key)
+      key = normalizeKey(key)
       throw new Error(`Could not find a child node with key "${key}".`)
     }
 
@@ -139,7 +170,7 @@ class Node {
     const descendant = this.getDescendant(key)
 
     if (!descendant) {
-      key = Normalize.key(key)
+      key = normalizeKey(key)
       throw new Error(`Could not find a descendant node with key "${key}".`)
     }
 
@@ -157,7 +188,7 @@ class Node {
     const node = this.getNode(key)
 
     if (!node) {
-      key = Normalize.key(key)
+      key = normalizeKey(key)
       throw new Error(`Could not find a node with key "${key}".`)
     }
 
@@ -251,7 +282,7 @@ class Node {
    */
 
   getAncestors(key) {
-    key = Normalize.key(key)
+    key = normalizeKey(key)
 
     if (key == this.key) return List()
     if (this.hasChild(key)) return List([this])
@@ -428,7 +459,7 @@ class Node {
    */
 
   getChild(key) {
-    key = Normalize.key(key)
+    key = normalizeKey(key)
     return this.nodes.find(node => node.key == key)
   }
 
@@ -441,7 +472,7 @@ class Node {
    */
 
   getClosest(key, iterator) {
-    key = Normalize.key(key)
+    key = normalizeKey(key)
     const ancestors = this.getAncestors(key)
     if (!ancestors) {
       throw new Error(`Could not find a descendant node with key "${key}".`)
@@ -493,8 +524,8 @@ class Node {
    */
 
   getCommonAncestor(one, two) {
-    one = Normalize.key(one)
-    two = Normalize.key(two)
+    one = normalizeKey(one)
+    two = normalizeKey(two)
 
     if (one == this.key) return this
     if (two == this.key) return this
@@ -562,7 +593,7 @@ class Node {
    */
 
   getDescendant(key) {
-    key = Normalize.key(key)
+    key = normalizeKey(key)
     let descendantFound = null
 
     const found = this.nodes.find((node) => {
@@ -710,7 +741,7 @@ class Node {
   getFurthest(key, iterator) {
     const ancestors = this.getAncestors(key)
     if (!ancestors) {
-      key = Normalize.key(key)
+      key = normalizeKey(key)
       throw new Error(`Could not find a descendant node with key "${key}".`)
     }
 
@@ -748,7 +779,7 @@ class Node {
    */
 
   getFurthestAncestor(key) {
-    key = Normalize.key(key)
+    key = normalizeKey(key)
     return this.nodes.find((node) => {
       if (node.key == key) return true
       if (node.kind == 'text') return false
@@ -767,7 +798,7 @@ class Node {
     const ancestors = this.getAncestors(key)
 
     if (!ancestors) {
-      key = Normalize.key(key)
+      key = normalizeKey(key)
       throw new Error(`Could not find a descendant node with key "${key}".`)
     }
 
@@ -1111,7 +1142,7 @@ class Node {
    */
 
   getNextSibling(key) {
-    key = Normalize.key(key)
+    key = normalizeKey(key)
 
     const parent = this.getParent(key)
     const after = parent.nodes
@@ -1131,7 +1162,7 @@ class Node {
    */
 
   getNextText(key) {
-    key = Normalize.key(key)
+    key = normalizeKey(key)
     return this.getTexts()
       .skipUntil(text => text.key == key)
       .get(1)
@@ -1145,7 +1176,7 @@ class Node {
    */
 
   getNode(key) {
-    key = Normalize.key(key)
+    key = normalizeKey(key)
     return this.key == key ? this : this.getDescendant(key)
   }
 
@@ -1277,7 +1308,7 @@ class Node {
    */
 
   getPreviousSibling(key) {
-    key = Normalize.key(key)
+    key = normalizeKey(key)
     const parent = this.getParent(key)
     const before = parent.nodes
       .takeUntil(child => child.key == key)
@@ -1297,7 +1328,7 @@ class Node {
    */
 
   getPreviousText(key) {
-    key = Normalize.key(key)
+    key = normalizeKey(key)
     return this.getTexts()
       .takeUntil(text => text.key == key)
       .last()
@@ -1611,7 +1642,7 @@ class Node {
    */
 
   removeDescendant(key) {
-    key = Normalize.key(key)
+    key = normalizeKey(key)
 
     let node = this
     let parent = node.getParent(key)
@@ -1870,6 +1901,25 @@ class Node {
     return range.isAtStartOf(start) || range.isAtEndOf(start)
   }
 
+}
+
+/**
+ * Normalize a key argument `value`.
+ *
+ * @param {String|Node} value
+ * @return {String}
+ */
+
+function normalizeKey(value) {
+  if (typeof value == 'string') return value
+
+  logger.deprecate('0.14.0', 'An object was passed to a Node method instead of a `key` string. This was previously supported, but is being deprecated because it can have a negative impact on performance. The object in question was:', value)
+
+  if (Node.isNode(value)) {
+    return value.key
+  }
+
+  throw new Error(`Invalid \`key\` argument! It must be either a block, an inline, a text, or a string. You passed: ${value}`)
 }
 
 /**

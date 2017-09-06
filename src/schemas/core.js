@@ -125,7 +125,7 @@ const rules = [
       return node.text !== ' ' || node.nodes.size !== 1
     },
     normalize: (change, node, result) => {
-      const text = Text.createFromString(' ')
+      const text = Text.create(' ')
       const index = node.nodes.size
 
       change.insertNodeByKey(node.key, index, text, OPTS)

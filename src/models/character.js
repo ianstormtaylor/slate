@@ -1,6 +1,8 @@
 
-import Mark from './mark'
 import MODEL_TYPES from '../constants/model-types'
+import Mark from './mark'
+import isPlainObject from 'is-plain-object'
+import logger from '../utils/logger'
 import { List, Record, Set } from 'immutable'
 
 /**
@@ -11,7 +13,7 @@ import { List, Record, Set } from 'immutable'
 
 const DEFAULTS = {
   marks: new Set(),
-  text: ''
+  text: '',
 }
 
 /**
@@ -20,58 +22,56 @@ const DEFAULTS = {
  * @type {Character}
  */
 
-class Character extends new Record(DEFAULTS) {
+class Character extends Record(DEFAULTS) {
 
   /**
    * Create a `Character` with `attrs`.
    *
-   * @param {Object|Character} attrs
+   * @param {Object|String|Character} attrs
    * @return {Character}
    */
 
   static create(attrs = {}) {
-    if (Character.isCharacter(attrs)) return attrs
+    if (Character.isCharacter(attrs)) {
+      return attrs
+    }
 
-    const character = new Character({
-      text: attrs.text,
-      marks: Mark.createSet(attrs.marks),
-    })
+    if (typeof attrs == 'string') {
+      attrs = { text: attrs }
+    }
 
-    return character
+    if (isPlainObject(attrs)) {
+      const { marks, text } = attrs
+
+      const character = new Character({
+        text,
+        marks: Mark.createSet(marks),
+      })
+
+      return character
+    }
+
+    throw new Error(`\`Character.create\` only accepts objects, strings or characters, but you passed it: ${attrs}`)
   }
 
   /**
    * Create a list of `Characters` from `elements`.
    *
-   * @param {Array<Object|Character>|List<Character>} elements
+   * @param {String|Array<Object|Character|String>|List<Object|Character|String>} elements
    * @return {List<Character>}
    */
 
   static createList(elements = []) {
-    if (List.isList(elements)) {
-      return elements
+    if (typeof elements == 'string') {
+      elements = elements.split('')
     }
 
-    if (Array.isArray(elements)) {
+    if (List.isList(elements) || Array.isArray(elements)) {
       const list = new List(elements.map(Character.create))
       return list
     }
 
-    throw new Error(`Character.createList() must be passed an \`Array\` or a \`List\`. You passed: ${elements}`)
-  }
-
-  /**
-   * Create a characters list from a `string` and optional `marks`.
-   *
-   * @param {String} string
-   * @param {Set<Mark>} marks (optional)
-   * @return {List<Character>}
-   */
-
-  static createListFromText(string, marks) {
-    const chars = string.split('').map(text => ({ text, marks }))
-    const list = Character.createList(chars)
-    return list
+    throw new Error(`\`Block.createList\` only accepts strings, arrays or lists, but you passed it: ${elements}`)
   }
 
   /**
@@ -83,6 +83,15 @@ class Character extends new Record(DEFAULTS) {
 
   static isCharacter(value) {
     return !!(value && value[MODEL_TYPES.CHARACTER])
+  }
+
+  /**
+   * Deprecated.
+   */
+
+  static createListFromText(string) {
+    logger.deprecate('0.22.0', 'The `Character.createListFromText(string)` method is deprecated, use `Character.createList(string)` instead.')
+    return this.createList(string)
   }
 
   /**

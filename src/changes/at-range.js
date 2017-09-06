@@ -1,5 +1,8 @@
 
-import Normalize from '../utils/normalize'
+import Block from '../models/block'
+import Inline from '../models/inline'
+import Mark from '../models/mark'
+import Node from '../models/node'
 import String from '../utils/string'
 import SCHEMA from '../schemas/core'
 import { List } from 'immutable'
@@ -597,7 +600,7 @@ Changes.deleteForwardAtRange = (change, range, n = 1, options = {}) => {
  */
 
 Changes.insertBlockAtRange = (change, range, block, options = {}) => {
-  block = Normalize.block(block)
+  block = Block.create(block)
   const { normalize = true } = options
 
   if (range.isExpanded) {
@@ -766,7 +769,7 @@ Changes.insertFragmentAtRange = (change, range, fragment, options = {}) => {
 
 Changes.insertInlineAtRange = (change, range, inline, options = {}) => {
   const { normalize = true } = options
-  inline = Normalize.inline(inline)
+  inline = Inline.create(inline)
 
   if (range.isExpanded) {
     change.deleteAtRange(range, OPTS)
@@ -978,7 +981,7 @@ Changes.splitInlineAtRange = (change, range, height = Infinity, options = {}) =>
 Changes.toggleMarkAtRange = (change, range, mark, options = {}) => {
   if (range.isCollapsed) return
 
-  mark = Normalize.mark(mark)
+  mark = Mark.create(mark)
 
   const { normalize = true } = options
   const { state } = change
@@ -1004,7 +1007,7 @@ Changes.toggleMarkAtRange = (change, range, mark, options = {}) => {
  */
 
 Changes.unwrapBlockAtRange = (change, range, properties, options = {}) => {
-  properties = Normalize.nodeProperties(properties)
+  properties = Node.createProperties(properties)
 
   const { normalize = true } = options
   let { state } = change
@@ -1097,7 +1100,7 @@ Changes.unwrapBlockAtRange = (change, range, properties, options = {}) => {
  */
 
 Changes.unwrapInlineAtRange = (change, range, properties, options = {}) => {
-  properties = Normalize.nodeProperties(properties)
+  properties = Node.createProperties(properties)
 
   const { normalize = true } = options
   const { state } = change
@@ -1143,7 +1146,7 @@ Changes.unwrapInlineAtRange = (change, range, properties, options = {}) => {
  */
 
 Changes.wrapBlockAtRange = (change, range, block, options = {}) => {
-  block = Normalize.block(block)
+  block = Block.create(block)
   block = block.set('nodes', block.nodes.clear())
 
   const { normalize = true } = options
@@ -1229,7 +1232,7 @@ Changes.wrapInlineAtRange = (change, range, inline, options = {}) => {
     return change.wrapInlineByKey(inlineParent.key, inline, options)
   }
 
-  inline = Normalize.inline(inline)
+  inline = Inline.create(inline)
   inline = inline.set('nodes', inline.nodes.clear())
 
   const blocks = document.getBlocksAtRange(range)

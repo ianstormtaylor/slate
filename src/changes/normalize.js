@@ -1,5 +1,4 @@
 
-import Normalize from '../utils/normalize'
 import Schema from '../models/schema'
 import { Set } from 'immutable'
 
@@ -49,11 +48,9 @@ Changes.normalizeNodeByKey = (change, key, schema) => {
   // If the schema has no validation rules, there's nothing to normalize.
   if (!schema.hasValidators) return
 
-  key = Normalize.key(key)
   const { state } = change
   const { document } = state
   const node = document.assertNode(key)
-
   normalizeNodeAndChildren(change, node, schema)
 }
 
