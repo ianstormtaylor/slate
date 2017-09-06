@@ -17,7 +17,7 @@ class Video extends React.Component {
 
   isSelected = () => {
     const { node, state } = this.props
-    const isSelected = state.selection.hasEdgeIn(node)
+    const isSelected = state.isFocused && state.blocks.includes(node)
     return isSelected
   }
 
