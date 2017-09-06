@@ -402,6 +402,18 @@ class State extends new Record(DEFAULTS) {
   }
 
   /**
+   * Get the active marks of the current selection.
+   *
+   * @return {Set<Mark>}
+   */
+
+  get activeMarks() {
+    return this.selection.isUnset
+      ? new Set()
+      : this.selection.marks || this.document.getActiveMarksAtRange(this.selection)
+  }
+
+  /**
    * Get the block nodes in the current selection.
    *
    * @return {List<Block>}

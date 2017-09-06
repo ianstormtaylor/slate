@@ -7,9 +7,9 @@ export default function (state) {
   const first = texts.first()
   const range = selection.merge({
     anchorKey: first.key,
-    anchorOffset: 0,
+    anchorOffset: 4,
     focusKey: first.key,
-    focusOffset: 0
+    focusOffset: 4
   })
 
   const next = state
@@ -17,7 +17,7 @@ export default function (state) {
     .select(range)
     .toggleMark('bold')
     .toggleMark('bold')
-    .insertText('a')
+    .insertText('s')
     .apply()
 
   assert.deepEqual(next.selection.toJS(), range.move(1).toJS())

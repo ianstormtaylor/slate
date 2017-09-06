@@ -886,6 +886,18 @@ const Node = {
   },
 
   /**
+   * Get a set of the active marks in a `range`.
+   *
+   * @param {Selection} range
+   * @return {Set<Mark>}
+   */
+
+  getActiveMarksAtRange(range) {
+    const array = this.getActiveMarksAtRangeAsArray(range)
+    return new Set(array)
+  },
+
+  /**
    * Get a set of the marks in a `range`.
    *
    * @param {Selection} range
@@ -918,6 +930,36 @@ const Node = {
         char.marks.toArray().forEach(c => memo.push(c))
         return memo
       }, [])
+  },
+
+  getActiveMarksAtRangeAsArray(range) {
+    range = range.normalize(this)
+    const { startKey, startOffset } = range
+
+    // If the range is collapsed at the start of the node, check the previous.
+    if (range.isCollapsed && startOffset == 0) {
+      const previous = this.getPreviousText(startKey)
+      if (!previous || !previous.length) return []
+      const char = previous.characters.get(previous.length - 1)
+      return char.marks.toArray()
+    }
+
+    // If the range is collapsed, check the character before the start.
+    if (range.isCollapsed) {
+      const text = this.getDescendant(startKey)
+      const char = text.characters.get(range.startOffset - 1)
+      return char.marks.toArray()
+    }
+
+    // Otherwise, get a set of the marks for each character in the range.
+    const chars = this.getCharactersAtRange(range)
+    const first = chars.first()
+    let memo = first.marks
+    chars.slice(1).forEach((char) => {
+      memo = memo.intersect(char.marks)
+      return memo.size != 0
+    })
+    return memo.toArray()
   },
 
   /**
@@ -1852,6 +1894,8 @@ memoize(Node, [
 
 memoize(Node, [
   'areDescendantsSorted',
+  'getActiveMarksAtRange',
+  'getActiveMarksAtRangeAsArray',
   'getAncestors',
   'getBlocksAtRange',
   'getBlocksAtRangeAsArray',

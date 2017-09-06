@@ -18,6 +18,7 @@ For convenience, in addition to transforms, many of the [`Selection`](./selectio
   - [`{edge}Text`](#edgetext)
   - [`{edge}Block`](#edgeblock)
   - [`marks`](#marks)
+  - [`activeMarks`](#activeMarks)
   - [`blocks`](#blocks)
   - [`fragment`](#fragment)
   - [`inlines`](#inlines)
@@ -79,7 +80,12 @@ Get the leaf [`Block`](./block.md) node at `{edge}`. Where `{edge}` is one of: `
 ### `marks`
 `Set`
 
-Get a  set of the [`Marks`](./mark.md) in the current selection.
+Get a set of the [`Marks`](./mark.md) in the current selection.
+
+### `activeMarks`
+`Set`
+
+Get a subset of the [`Marks`](./mark.md) that are present in _all_ the characters in the current selection. It can be used to determine the active/inactive state of toolbar buttons corresponding to marks, based on the usual rich text editing conventions.
 
 ### `blocks`
 `List`

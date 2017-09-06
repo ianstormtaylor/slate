@@ -1,4 +1,3 @@
-
 import assert from 'assert'
 
 export default function (state) {
@@ -7,19 +6,18 @@ export default function (state) {
   const first = texts.first()
   const range = selection.merge({
     anchorKey: first.key,
-    anchorOffset: 4,
+    anchorOffset: 0,
     focusKey: first.key,
-    focusOffset: 4
+    focusOffset: 5
   })
 
   const next = state
     .transform()
     .select(range)
     .toggleMark('bold')
-    .insertText('s')
     .apply()
 
-  assert.deepEqual(next.selection.toJS(), range.move(1).toJS())
+  assert.deepEqual(next.selection.toJS(), range.toJS())
 
   return next
 }
