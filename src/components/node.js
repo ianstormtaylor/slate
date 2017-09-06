@@ -7,6 +7,7 @@ import Types from 'prop-types'
 import TRANSFER_TYPES from '../constants/transfer-types'
 import Base64 from '../serializers/base-64'
 import Leaf from './leaf'
+import SlateTypes from '../utils/prop-types'
 import Void from './void'
 import getWindow from 'get-window'
 import scrollToSelection from '../utils/scroll-to-selection'
@@ -35,13 +36,13 @@ class Node extends React.Component {
    */
 
   static propTypes = {
-    block: Types.object,
+    block: SlateTypes.block,
     editor: Types.object.isRequired,
-    node: Types.object.isRequired,
-    parent: Types.object.isRequired,
+    node: SlateTypes.node.isRequired,
+    parent: SlateTypes.node.isRequired,
     readOnly: Types.bool.isRequired,
-    schema: Types.object.isRequired,
-    state: Types.object.isRequired
+    schema: SlateTypes.schema.isRequired,
+    state: SlateTypes.state.isRequired,
   }
 
   /**

@@ -5,6 +5,7 @@ import ReactDOM from 'react-dom'
 import Types from 'prop-types'
 
 import OffsetKey from '../utils/offset-key'
+import SlateTypes from '../utils/prop-types'
 import findDeepestNode from '../utils/find-deepest-node'
 import { IS_FIREFOX } from '../constants/environment'
 
@@ -31,17 +32,17 @@ class Leaf extends React.Component {
    */
 
   static propTypes = {
-    block: Types.object.isRequired,
+    block: SlateTypes.block.isRequired,
     editor: Types.object.isRequired,
     index: Types.number.isRequired,
-    marks: Types.object.isRequired,
-    node: Types.object.isRequired,
+    marks: SlateTypes.marks.isRequired,
+    node: SlateTypes.node.isRequired,
     offset: Types.number.isRequired,
-    parent: Types.object.isRequired,
-    ranges: Types.object.isRequired,
-    schema: Types.object.isRequired,
-    state: Types.object.isRequired,
-    text: Types.string.isRequired
+    parent: SlateTypes.node.isRequired,
+    ranges: SlateTypes.ranges.isRequired,
+    schema: SlateTypes.schema.isRequired,
+    state: SlateTypes.state.isRequired,
+    text: Types.string.isRequired,
   }
 
   /**

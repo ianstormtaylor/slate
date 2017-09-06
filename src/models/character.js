@@ -86,6 +86,17 @@ class Character extends Record(DEFAULTS) {
   }
 
   /**
+   * Check if a `value` is a character list.
+   *
+   * @param {Any} value
+   * @return {Boolean}
+   */
+
+  static isCharacterList(value) {
+    return List.isList(value) && value.size > 0 && Character.isCharacter(value.first())
+  }
+
+  /**
    * Deprecated.
    */
 

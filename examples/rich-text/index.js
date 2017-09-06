@@ -59,7 +59,7 @@ class RichText extends React.Component {
 
   state = {
     state: Raw.deserialize(initialState, { terse: true })
-  };
+  }
 
   /**
    * Check if the current selection has a mark with `type` in it.

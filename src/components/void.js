@@ -6,6 +6,7 @@ import Types from 'prop-types'
 import Leaf from './leaf'
 import Mark from '../models/mark'
 import OffsetKey from '../utils/offset-key'
+import SlateTypes from '../utils/prop-types'
 import { IS_FIREFOX } from '../constants/environment'
 
 /**
@@ -31,14 +32,14 @@ class Void extends React.Component {
    */
 
   static propTypes = {
-    block: Types.object,
+    block: SlateTypes.block,
     children: Types.any.isRequired,
     editor: Types.object.isRequired,
-    node: Types.object.isRequired,
-    parent: Types.object.isRequired,
+    node: SlateTypes.node.isRequired,
+    parent: SlateTypes.node.isRequired,
     readOnly: Types.bool.isRequired,
-    schema: Types.object.isRequired,
-    state: Types.object.isRequired,
+    schema: SlateTypes.schema.isRequired,
+    state: SlateTypes.state.isRequired,
   }
 
   /**
@@ -49,7 +50,7 @@ class Void extends React.Component {
 
   state = {
     dragCounter: 0,
-    editable: false
+    editable: false,
   }
 
   /**

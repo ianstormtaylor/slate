@@ -1,172 +1,84 @@
+
+import { Set } from 'immutable'
+
 import Block from '../models/block'
+import Change from '../models/change'
 import Character from '../models/character'
+import Data from '../models/data'
 import Document from '../models/document'
+import History from '../models/history'
 import Inline from '../models/inline'
 import Mark from '../models/mark'
+import Node from '../models/node'
 import Range from '../models/range'
 import Schema from '../models/schema'
 import Selection from '../models/selection'
+import Stack from '../models/stack'
 import State from '../models/state'
 import Text from '../models/text'
 
 /**
- * HOC Function that takes in a predicate prop type function, and allows an isRequired chain
+ * Create a prop type checker for Slate objects with `name` and `validate`.
  *
- * @param {Function} predicate
+ * @param {String} name
+ * @param {Function} validate
  * @return {Function}
  */
 
-function createChainablePropType(predicate) {
-  function propType(props, propName, componentName) {
-    if (props[propName] == null) return
-
-    return predicate(props, propName, componentName)
+function create(name, validate) {
+  function check(isRequired, props, propName, componentName, location) {
+    const value = props[propName]
+    if (value == null && !isRequired) return null
+    if (value == null && isRequired) return new Error(`The ${location} \`${propName}\` is marked as required in \`${componentName}\`, but it was not supplied.`)
+    if (validate(value)) return null
+    return new Error(`Invalid ${location} \`${propName}\` supplied to \`${componentName}\`, expected a Slate \`${name}\` but received: ${value}`)
   }
 
-  propType.isRequired = (props, propName, componentName) => {
-    if (props[propName] == null) return new Error(`Required prop \`${propName}\` was not specified in \`${componentName}\`.`)
+  function propType(...args) {
+    return check(false, ...args)
+  }
 
-    return predicate(props, propName, componentName)
+  propType.isRequired = function (...args) {
+    return check(true, ...args)
   }
 
   return propType
 }
 
 /**
- * Exported Slate proptype that checks if a prop is a Slate Block
- *
- * @type {Function}
- */
-
-const block = createChainablePropType(
-  (props, propName, componentName) => {
-    return !Block.isBlock(props[propName]) ? new Error(`${propName} in ${componentName} is not a Slate Block`) : null
-  }
-)
-
-/**
- * Exported Slate proptype that checks if a prop is a Slate Character
- *
- * @type {Function}
- */
-
-const character = createChainablePropType(
-  (props, propName, componentName) => {
-    return !Character.isCharacter(props[propName]) ? new Error(`${propName} in ${componentName} is not a Slate Character`) : null
-  }
-)
-
-/**
- * Exported Slate proptype that checks if a prop is a Slate Document
- *
- * @type {Function}
- */
-
-const document = createChainablePropType(
-  (props, propName, componentName) => {
-    return !Document.isDocument(props[propName]) ? new Error(`${propName} in ${componentName} is not a Slate Document`) : null
-  }
-)
-
-/**
- * Exported Slate proptype that checks if a prop is a Slate Inline
- *
- * @type {Function}
- */
-
-const inline = createChainablePropType(
-  (props, propName, componentName) => {
-    return !Inline.isInline(props[propName]) ? new Error(`${propName} in ${componentName} is not a Slate Inline`) : null
-  }
-)
-
-/**
- * Exported Slate proptype that checks if a prop is a Slate Mark
- *
- * @type {Function}
- */
-
-const mark = createChainablePropType(
-  (props, propName, componentName) => {
-    return !Mark.isMark(props[propName]) ? new Error(`${propName} in ${componentName} is not a Slate Mark`) : null
-  }
-)
-
-/**
- * Exported Slate proptype that checks if a prop is a Slate Range
- *
- * @type {Function}
- */
-
-const range = createChainablePropType(
-  (props, propName, componentName) => {
-    return !Range.isRange(props[propName]) ? new Error(`${propName} in ${componentName} is not a Slate Range`) : null
-  }
-)
-
-/**
- * Exported Slate proptype that checks if a prop is a Slate Schema
- *
- * @type {Function}
- */
-
-const schema = createChainablePropType(
-  (props, propName, componentName) => {
-    return !Schema.isSchema(props[propName]) ? new Error(`${propName} in ${componentName} is not a Slate Schema`) : null
-  }
-)
-
-/**
- * Exported Slate proptype that checks if a prop is a Slate Selection
- *
- * @type {Function}
- */
-
-const selection = createChainablePropType(
-  (props, propName, componentName) => {
-    return !Selection.isSelection(props[propName]) ? new Error(`${propName} in ${componentName} is not a Slate Selection`) : null
-  }
-)
-
-/**
- * Exported Slate proptype that checks if a prop is a Slate State
- *
- * @type {Function}
- */
-
-const state = createChainablePropType(
-  (props, propName, componentName) => {
-    return !State.isState(props[propName]) ? new Error(`${propName} in ${componentName} is not a Slate State ${props[propName]}`) : null
-  }
-)
-
-/**
- * Exported Slate proptype that checks if a prop is a Slate Text
- *
- * @type {Function}
- */
-
-const text = createChainablePropType(
-  (props, propName, componentName) => {
-    return !Text.isText(props[propName]) ? new Error(`${propName} in ${componentName} is not a Slate Text`) : null
-  }
-)
-
-/**
- * Exported Slate proptypes
+ * Prop type checkers.
  *
  * @type {Object}
  */
 
-export default {
-  block,
-  character,
-  document,
-  inline,
-  mark,
-  range,
-  schema,
-  selection,
-  state,
-  text,
+const Types = {
+  block: create('Block', v => Block.isBlock(v)),
+  blocks: create('List<Block>', v => Block.isBlockList(v)),
+  change: create('Change', v => Change.isChange(v)),
+  character: create('Character', v => Character.isCharacter(v)),
+  characters: create('List<Character>', v => Character.isCharacterList(v)),
+  data: create('Data', v => Data.isData(v)),
+  document: create('Document', v => Document.isDocument(v)),
+  history: create('History', v => History.isHistory(v)),
+  inline: create('Inline', v => Inline.isInline(v)),
+  mark: create('Mark', v => Mark.isMark(v)),
+  marks: create('Set<Mark>', v => (Set.isSet(v) && v.size === 0) || Mark.isMarkSet(v)),
+  node: create('Node', v => Node.isNode(v)),
+  nodes: create('List<Node>', v => Node.isNodeList(v)),
+  range: create('Range', v => Range.isRange(v)),
+  ranges: create('List<Range>', v => Range.isRangeList(v)),
+  schema: create('Schema', v => Schema.isSchema(v)),
+  selection: create('Selection', v => Selection.isSelection(v)),
+  stack: create('Stack', v => Stack.isStack(v)),
+  state: create('State', v => State.isState(v)),
+  text: create('Text', v => Text.isText(v)),
+  texts: create('List<Text>', v => Text.isTextList(v)),
 }
+
+/**
+ * Export.
+ *
+ * @type {Object}
+ */
+
+export default Types

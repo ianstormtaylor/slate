@@ -119,6 +119,17 @@ class Mark extends Record(DEFAULTS) {
   }
 
   /**
+   * Check if a `value` is a set of marks.
+   *
+   * @param {Any} value
+   * @return {Boolean}
+   */
+
+  static isMarkSet(value) {
+    return Set.isSet(value) && value.size > 0 && Mark.isMark(value.first())
+  }
+
+  /**
    * Get the kind.
    */
 

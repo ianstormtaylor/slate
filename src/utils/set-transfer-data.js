@@ -1,5 +1,7 @@
+
 /**
- * Set data on dataTransfer
+ * Set data with `type` and `content` on a `dataTransfer` object.
+ *
  * COMPAT: In Edge, custom types throw errors, so embed all non-standard
  * types in text/plain compound object. (2017/7/12)
  *
@@ -13,23 +15,26 @@ function setTransferData(dataTransfer, type, content) {
     dataTransfer.setData(type, content)
   } catch (err) {
     const prefix = 'SLATE-DATA-EMBED::'
-    let obj = {}
     const text = dataTransfer.getData('text/plain')
+    let obj = {}
 
-    // If prefixed, assume embedded drag data
+    // If the existing plain text data is prefixed, it's Slate JSON data.
     if (text.substring(0, prefix.length) === prefix) {
       try {
         obj = JSON.parse(text.substring(prefix.length))
-      } catch (err2) {
-        throw new Error('Unable to parse custom embedded drag data')
+      } catch (e) {
+        throw new Error('Failed to parse Slate data from `DataTransfer` object.')
       }
-    } else {
+    }
+
+    // Otherwise, it's just set it as is.
+    else {
       obj['text/plain'] = text
     }
 
     obj[type] = content
-
-    dataTransfer.setData('text/plain', `${prefix}${JSON.stringify(obj)}`)
+    const string = `${prefix}${JSON.stringify(obj)}`
+    dataTransfer.setData('text/plain', string)
   }
 }
 

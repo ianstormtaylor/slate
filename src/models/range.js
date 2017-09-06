@@ -3,7 +3,7 @@ import MODEL_TYPES from '../constants/model-types'
 import Character from './character'
 import Mark from './mark'
 import isPlainObject from 'is-plain-object'
-import { Record, Set } from 'immutable'
+import { List, Record, Set } from 'immutable'
 
 /**
  * Default properties.
@@ -62,6 +62,17 @@ class Range extends Record(DEFAULTS) {
 
   static isRange(value) {
     return !!(value && value[MODEL_TYPES.RANGE])
+  }
+
+  /**
+   * Check if a `value` is a list of ranges.
+   *
+   * @param {Any} value
+   * @return {Boolean}
+   */
+
+  static isRangeList(value) {
+    return List.isList(value) && value.size > 0 && Range.isRange(value.first())
   }
 
   /**

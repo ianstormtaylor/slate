@@ -109,6 +109,17 @@ class Inline extends Record(DEFAULTS) {
   }
 
   /**
+   * Check if a `value` is a list of inlines.
+   *
+   * @param {Any} value
+   * @return {Boolean}
+   */
+
+  static isInlineList(value) {
+    return List.isList(value) && value.size > 0 && Inline.isInline(value.first())
+  }
+
+  /**
    * Get the node's kind.
    *
    * @return {String}
