@@ -17,25 +17,19 @@ This document maintains a list of changes to Slate with each new version. Until 
 
 - **The `.length` property of nodes has been removed.** This property caused issues with code like in Lodash that checked for "array-likeness" by simply looking for a `.length` property that was a number.
 
-- **`onChange` now receives a `Change` object (previously named `Transform`) instead of a `State`.** Plugins and users will need to now use:
+- **`onChange` now receives a `Change` object (previously named `Transform`) instead of a `State`.** This is needed because it enforces that all changes are represented by a single set of operations. Otherwise right now it's possible to do things like `state.transform()....apply({ save: false }).transform()....apply()` and result in losing the operation information in the history. With OT, we need all transforms that may happen to be exposed and emitted by the editor. The new syntax looks like:
 
 ```js
 onChange(change) {
   this.setState({ state: change.state })
 }
-```
 
-Or more tersely:
-
-```js
 onChange({ state }) {
   this.setState({ state })
 }
 ```
 
-Which achieves the same behavior as before. This is needed because it enforces that all changes are represented by a single set of operations. Otherwise right now it's possible to do things like `state.transform()....apply({ save: false }).transform()....apply()` and result in losing the operation information in the history. With OT, we need all transforms that may happen to be exposed and emitted by the editor.
-
-- **Similarly, handlers now receive `e, data, change` instead of `e, data, state`.** Instead of doing `return state.transform()....apply()` the plugins can now act on the change object directly.
+- **Similarly, handlers now receive `e, data, change` instead of `e, data, state`.** Instead of doing `return state.transform()....apply()` the plugins can now act on the change object directly. Plugins can still `return change...` if they want to break the stack from continuing on to other plugins. (Any `!= null` value will break out.) But they can also now not return anything, and the stack will apply their changes and continue onwards. This was previously impossible. The new syntax looks like:
 
 ```js
 function onKeyDown(e, data, change) {
@@ -44,8 +38,6 @@ function onKeyDown(e, data, change) {
   }
 }
 ```
-
-Plugins can still `return change...` if they want to break the stack from continuing on to other plugins. (Any `!= null` value will break out.) But they can also now not return anything, and the stack will apply their changes and continue onwards. This was previously impossible.
 
 - **The `onChange` and `on[Before]Change` handlers now receive `Change` objects.** Previously they would also receive a `state` object, but now they receive `change` objects like the rest of the plugin API.
 
