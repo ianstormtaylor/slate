@@ -201,7 +201,7 @@ function marks(values) {
       return null
     }
     default: {
-      throw new Error(`Invalid \`marks\` argument! It must be a set of marks or an array. You passed: ${value}`)
+      throw new Error(`Invalid \`marks\` argument! It must be a set of marks or an array. You passed: ${values}`)
     }
   }
 }
