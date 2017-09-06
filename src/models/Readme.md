@@ -2,6 +2,7 @@
 This directory contains all of the immutable models that contain the data that powers Slate. They are built using [Immutable.js](https://facebook.github.io/immutable-js/). Here's what each of them does:
 
 - [Block](#block)
+- [Change](#change)
 - [Character](#character)
 - [Data](#data)
 - [Document](#document)
@@ -11,12 +12,16 @@ This directory contains all of the immutable models that contain the data that p
 - [Selection](#selection)
 - [State](#state)
 - [Text](#text)
-- [Transform](#transform)
 
 
 #### Block
 
 Just like in the DOM, `Block` nodes are one that contain other inline content. They can be split apart, and wrapped in other blocks, but they will always contain at least a single [`Text`](#text) node of inline content. They can also contain associated [`Data`](#data)
+
+
+#### Change
+
+`Change` is not publicly exposed; you access it by calling the `.change()` method on a [`State`](#state) model. It's simply a wrapper around the somewhat-complex change tracking logic that allows for a state's history to be populated correctly.
 
 
 #### Character
@@ -60,14 +65,9 @@ The `State` is the highest-level model. It is really just a convenient wrapper a
 
 Since `State` has knowledge of both the [`Document`](#document) and the [`Selection`](#selection), it provides a handful of convenience methods for updating the both at the same time. For example, when inserting a new content fragment, it inserts the fragment and then moves the selection to the end of the newly inserted content.
 
-The `State` is the object that lets you apply "transforms" that change the current document or selection. By having them all be applied through the top-level state, it can keep track of changes in the `History`, allowing for undoing and redoing changes.
+The `State` is the object that lets you apply "changes" that change the current document or selection. By having them all be applied through the top-level state, it can keep track of changes in the `History`, allowing for undoing and redoing changes.
 
 
 #### Text
 
 `Text` is the lowest-level [`Node`](#node) in the tree. Each `Text` node contains a list of [`Characters`](#characters), which can optionally be dynamically decorated.
-
-
-#### Transform
-
-`Transform` is not publicly exposed; you access it by calling the `transform()` method on a [`State`](#state) model. It's simply a wrapper around the somewhat-complex transformation logic that allows for a state's history to be populated correctly.

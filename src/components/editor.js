@@ -5,6 +5,7 @@ import React from 'react'
 import Types from 'prop-types'
 
 import Stack from '../models/stack'
+import State from '../models/state'
 import SlatePropTypes from '../utils/prop-types'
 import noop from '../utils/noop'
 
@@ -116,12 +117,11 @@ class Editor extends React.Component {
 
     // Create a new `Stack`, omitting the `onChange` property since that has
     // special significance on the editor itself.
-    const { onChange, ...rest } = props // eslint-disable-line no-unused-vars
+    const { state, onChange, ...rest } = props // eslint-disable-line no-unused-vars
     const stack = Stack.create(rest)
     this.state.stack = stack
 
-    // Resolve the state, running `onBeforeChange` first.
-    const state = stack.onBeforeChange(props.state, this)
+    // Cache and set the state.
     this.cacheState(state)
     this.state.state = state
 
@@ -129,33 +129,35 @@ class Editor extends React.Component {
     for (let i = 0; i < EVENT_HANDLERS.length; i++) {
       const method = EVENT_HANDLERS[i]
       this[method] = (...args) => {
-        const next = this.state.stack[method](this.state.state, this, ...args)
-        this.onChange(next)
+        const stk = this.state.stack
+        const change = this.state.state.change()
+        stk[method](change, this, ...args)
+        stk.onBeforeChange(change, this)
+        stk.onChange(change, this)
+        this.onChange(change)
       }
     }
   }
 
   /**
-   * When the `props` are updated, create a new `Stack` if necessary, and
-   * run `onBeforeChange`.
+   * When the `props` are updated, create a new `Stack` if necessary.
    *
    * @param {Object} props
    */
 
   componentWillReceiveProps = (props) => {
-    let { stack } = this.state
+    const { state } = props
 
     // If any plugin-related properties will change, create a new `Stack`.
     for (let i = 0; i < PLUGINS_PROPS.length; i++) {
       const prop = PLUGINS_PROPS[i]
       if (props[prop] == this.props[prop]) continue
       const { onChange, ...rest } = props // eslint-disable-line no-unused-vars
-      stack = Stack.create(rest)
+      const stack = Stack.create(rest)
       this.setState({ stack })
     }
 
-    // Resolve the state, running the before change handler of the stack.
-    const state = stack.onBeforeChange(props.state, this)
+    // Cache and save the state.
     this.cacheState(state)
     this.setState({ state })
   }
@@ -177,12 +179,7 @@ class Editor extends React.Component {
    */
 
   blur = () => {
-    const state = this.state.state
-      .transform()
-      .blur()
-      .apply()
-
-    this.onChange(state)
+    this.change(t => t.blur())
   }
 
   /**
@@ -190,12 +187,7 @@ class Editor extends React.Component {
    */
 
   focus = () => {
-    const state = this.state.state
-      .transform()
-      .focus()
-      .apply()
-
-    this.onChange(state)
+    this.change(t => t.focus())
   }
 
   /**
@@ -219,22 +211,36 @@ class Editor extends React.Component {
   }
 
   /**
-   * When the `state` changes, pass through plugins, then bubble up.
+   * Perform a change `fn` on the editor's current state.
    *
-   * @param {State} state
+   * @param {Function} fn
    */
 
-  onChange = (state) => {
-    if (state == this.state.state) return
-    const { tmp, props } = this
-    const { stack } = this.state
-    const { onChange, onDocumentChange, onSelectionChange } = props
-    const { document, selection } = tmp
+  change = (fn) => {
+    const change = this.state.state.change()
+    fn(change)
+    this.onChange(change)
+  }
 
-    state = stack.onChange(state, this)
-    onChange(state)
-    if (state.document != document) onDocumentChange(state.document, state)
-    if (state.selection != selection) onSelectionChange(state.selection, state)
+  /**
+   * On change.
+   *
+   * @param {Change} change
+   */
+
+  onChange = (change) => {
+    if (State.isState(change)) {
+      throw new Error('As of slate@0.22.0 the `editor.onChange` method must be passed a `Change` object not a `State` object.')
+    }
+
+    const { onChange, onDocumentChange, onSelectionChange } = this.props
+    const { document, selection } = this.tmp
+    const { state } = change
+    if (state == this.state.state) return
+
+    onChange(change)
+    if (state.document != document) onDocumentChange(state.document, change)
+    if (state.selection != selection) onSelectionChange(state.selection, change)
   }
 
   /**

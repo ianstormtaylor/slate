@@ -13,16 +13,16 @@ import { Map } from 'immutable'
 const Data = {
 
   /**
-   * Create a new `Data` with `properties`.
+   * Create a new `Data` with `attrs`.
    *
-   * @param {Object} properties
+   * @param {Object} attrs
    * @return {Data} data
    */
 
-  create(properties = {}) {
-    return Map.isMap(properties)
-      ? properties
-      : new Map(properties)
+  create(attrs = {}) {
+    return Map.isMap(attrs)
+      ? attrs
+      : new Map(attrs)
   }
 
 }

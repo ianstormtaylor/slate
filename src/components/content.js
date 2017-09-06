@@ -48,7 +48,6 @@ class Content extends React.Component {
     editor: Types.object.isRequired,
     onBeforeInput: Types.func.isRequired,
     onBlur: Types.func.isRequired,
-    onChange: Types.func.isRequired,
     onCopy: Types.func.isRequired,
     onCut: Types.func.isRequired,
     onDrop: Types.func.isRequired,
@@ -104,8 +103,8 @@ class Content extends React.Component {
     // the cursor will be added or removed again.
     if (props.readOnly != this.props.readOnly) return true
 
-    // If the state has been transformed natively, never re-render, or else we
-    // will end up duplicating content.
+    // If the state has been changed natively, never re-render, or else we'll
+    // end up duplicating content.
     if (props.state.isNative) return false
 
     return (
@@ -323,17 +322,6 @@ class Content extends React.Component {
 
     debug('onFocus', { event, data })
     this.props.onFocus(event, data)
-  }
-
-  /**
-   * On change, bubble up.
-   *
-   * @param {State} state
-   */
-
-  onChange = (state) => {
-    debug('onChange', state)
-    this.props.onChange(state)
   }
 
   /**
@@ -595,22 +583,19 @@ class Content extends React.Component {
     const delta = textContent.length - text.length
     const after = selection.collapseToEnd().move(delta)
 
-    // Create an updated state with the text replaced.
-    const next = state
-      .transform()
-      .select({
-        anchorKey: key,
-        anchorOffset: start,
-        focusKey: key,
-        focusOffset: end
-      })
-      .delete()
-      .insertText(textContent, marks)
-      .select(after)
-      .apply()
-
-    // Change the current state.
-    this.onChange(next)
+    // Change the current state to have the text replaced.
+    editor.change((change) => {
+      change
+        .select({
+          anchorKey: key,
+          anchorOffset: start,
+          focusKey: key,
+          focusOffset: end
+        })
+        .delete()
+        .insertText(textContent, marks)
+        .select(after)
+    })
   }
 
   /**
@@ -806,7 +791,7 @@ class Content extends React.Component {
       const anchorInline = document.getClosestInline(anchor.key)
       const focusInline = document.getClosestInline(focus.key)
 
-      if (anchorInline && !anchorInline.isVoid && anchor.offset == anchorText.length) {
+      if (anchorInline && !anchorInline.isVoid && anchor.offset == anchorText.text.length) {
         const block = document.getClosestBlock(anchor.key)
         const next = block.getNextText(anchor.key)
         if (next) {
@@ -815,7 +800,7 @@ class Content extends React.Component {
         }
       }
 
-      if (focusInline && !focusInline.isVoid && focus.offset == focusText.length) {
+      if (focusInline && !focusInline.isVoid && focus.offset == focusText.text.length) {
         const block = document.getClosestBlock(focus.key)
         const next = block.getNextText(focus.key)
         if (next) {

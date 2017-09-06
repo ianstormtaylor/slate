@@ -136,21 +136,21 @@ The `match` property is the only required property of a rule. It determines whic
 The `decorate` property allows you define a function that will apply extra marks to all of the ranges of text inside a node. It is called with a [`Text`](./text.md) node and the matched node. It should return a list of characters with the desired marks, which will then be added to the text before rendering.
 
 ### `normalize`
-`Function normalize(transform: Transform, object: Node, failure: Any) => Transform`
+`Function normalize(change: Change, object: Node, failure: Any) => Change`
 
 ```js
 {
-  normalize: (transform, node, invalidChildren) => {
+  normalize: (change, node, invalidChildren) => {
     invalidChildren.forEach((child) => {
-      transform.removeNodeByKey(child.key)
+      change.removeNodeByKey(child.key)
     })
 
-    return transform
+    return change
   }
 }
 ```
 
-The `normalize` property is a function to run that recovers the editor's state after the `validate` property of a rule has determined that an object is invalid. It is passed a [`Transform`](./transform.md) that it can use to make modifications. It is also passed the return value of the `validate` function, which makes it easy to quickly determine the failure reason from the validation.
+The `normalize` property is a function to run that recovers the editor's state after the `validate` property of a rule has determined that an object is invalid. It is passed a [`Change`](./change.md) that it can use to make modifications. It is also passed the return value of the `validate` function, which makes it easy to quickly determine the failure reason from the validation.
 
 ### `render`
 `Component` <br/>

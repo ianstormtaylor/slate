@@ -24,40 +24,60 @@ const DEFAULTS = {
 class Mark extends new Record(DEFAULTS) {
 
   /**
-   * Create a new `Mark` with `properties`.
+   * Create a new `Mark` with `attrs`.
    *
-   * @param {Object|Mark} properties
+   * @param {Object|Mark} attrs
    * @return {Mark}
    */
 
-  static create(properties = {}) {
-    if (Mark.isMark(properties)) return properties
-    if (!properties.type) throw new Error('You must provide a `type` for the mark.')
-    properties.data = Data.create(properties.data)
-    return new Mark(properties)
+  static create(attrs = {}) {
+    if (Mark.isMark(attrs)) return attrs
+
+    if (!attrs.type) {
+      throw new Error(`You must provide \`attrs.type\` to \`Mark.create(attrs)\`.`)
+    }
+
+    const mark = new Mark({
+      type: attrs.type,
+      data: Data.create(attrs.data),
+    })
+
+    return mark
   }
 
   /**
-   * Create a marks set from an array of marks.
+   * Create a set of marks.
    *
-   * @param {Array<Object|Mark>} array
+   * @param {Array<Object|Mark>} elements
    * @return {Set<Mark>}
    */
 
-  static createSet(array = []) {
-    if (Set.isSet(array)) return array
-    return new Set(array.map(Mark.create))
+  static createSet(elements) {
+    if (Set.isSet(elements)) {
+      return elements
+    }
+
+    if (Array.isArray(elements)) {
+      const marks = new Set(elements.map(Mark.create))
+      return marks
+    }
+
+    if (elements == null) {
+      return new Set()
+    }
+
+    throw new Error(`Mark.createSet() must be passed an \`Array\`, a \`List\` or \`null\`. You passed: ${elements}`)
   }
 
   /**
-   * Determines if the passed in paramter is a Slate Mark or not
+   * Check if a `value` is a `Mark`.
    *
-   * @param {*} maybeMark
+   * @param {Any} value
    * @return {Boolean}
    */
 
-  static isMark(maybeMark) {
-    return !!(maybeMark && maybeMark[MODEL_TYPES.MARK])
+  static isMark(value) {
+    return !!(value && value[MODEL_TYPES.MARK])
   }
 
   /**
@@ -82,7 +102,7 @@ class Mark extends new Record(DEFAULTS) {
 }
 
 /**
- * Pseduo-symbol that shows this is a Slate Mark
+ * Attach a pseudo-symbol for type checking.
  */
 
 Mark.prototype[MODEL_TYPES.MARK] = true

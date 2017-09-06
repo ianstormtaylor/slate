@@ -1,22 +1,12 @@
 
-
-import Document from './document'
-import SCHEMA from '../schemas/core'
-import Selection from './selection'
-import Transform from './transform'
 import MODEL_TYPES from '../constants/model-types'
-import { Record, Set, Stack, List, Map } from 'immutable'
-
-/**
- * History.
- *
- * @type {History}
- */
-
-const History = new Record({
-  undos: new Stack(),
-  redos: new Stack()
-})
+import SCHEMA from '../schemas/core'
+import Change from './change'
+import Document from './document'
+import History from './history'
+import Selection from './selection'
+import logger from '../utils/logger'
+import { Record, Set, List, Map } from 'immutable'
 
 /**
  * Default properties.
@@ -41,24 +31,24 @@ const DEFAULTS = {
 class State extends new Record(DEFAULTS) {
 
   /**
-   * Create a new `State` with `properties`.
+   * Create a new `State` with `attrs`.
    *
-   * @param {Object|State} properties
+   * @param {Object|State} attrs
    * @param {Object} options
    *   @property {Boolean} normalize
    * @return {State}
    */
 
-  static create(properties = {}, options = {}) {
-    if (State.isState(properties)) return properties
+  static create(attrs = {}, options = {}) {
+    if (State.isState(attrs)) return attrs
 
-    const document = Document.create(properties.document)
-    let selection = Selection.create(properties.selection)
+    const document = Document.create(attrs.document)
+    let selection = Selection.create(attrs.selection)
     let data = new Map()
 
     if (selection.isUnset) {
       const text = document.getFirstText()
-      selection = selection.collapseToStartOf(text)
+      if (text) selection = selection.collapseToStartOf(text)
     }
 
     // Set default value for `data`.
@@ -68,25 +58,30 @@ class State extends new Record(DEFAULTS) {
       }
     }
 
-    // Then add data provided in `properties`.
-    if (properties.data) data = data.merge(properties.data)
+    // Then add data provided in `attrs`.
+    if (attrs.data) data = data.merge(attrs.data)
 
-    const state = new State({ document, selection, data })
+    let state = new State({ document, selection, data })
 
-    return options.normalize === false
-      ? state
-      : state.transform().normalize(SCHEMA).apply({ save: false })
+    if (options.normalize !== false) {
+      state = state
+        .change({ save: false })
+        .normalize(SCHEMA)
+        .state
+    }
+
+    return state
   }
 
   /**
-   * Determines if the passed in paramter is a Slate State or not
+   * Check if a `value` is a `State`.
    *
-   * @param {*} maybeState
+   * @param {Any} value
    * @return {Boolean}
    */
 
-  static isState(maybeState) {
-    return !!(maybeState && maybeState[MODEL_TYPES.STATE])
+  static isState(value) {
+    return !!(value && value[MODEL_TYPES.STATE])
   }
 
   /**
@@ -106,7 +101,7 @@ class State extends new Record(DEFAULTS) {
    */
 
   get hasUndos() {
-    return this.history.undos.size > 0
+    return this.history.undos.length > 0
   }
 
   /**
@@ -116,7 +111,7 @@ class State extends new Record(DEFAULTS) {
    */
 
   get hasRedos() {
-    return this.history.redos.size > 0
+    return this.history.redos.length > 0
   }
 
   /**
@@ -482,24 +477,31 @@ class State extends new Record(DEFAULTS) {
   }
 
   /**
-   * Return a new `Transform` with the current state as a starting point.
+   * Create a new `Change` with the current state as a starting point.
    *
-   * @param {Object} properties
-   * @return {Transform}
+   * @param {Object} attrs
+   * @return {Change}
    */
 
-  transform(properties = {}) {
-    const state = this
-    return new Transform({
-      ...properties,
-      state
-    })
+  change(attrs = {}) {
+    return new Change({ ...attrs, state: this })
+  }
+
+  /**
+   * Deprecated.
+   *
+   * @return {Change}
+   */
+
+  transform(...args) {
+    logger.deprecate('0.22.0', 'The `state.transform()` method has been deprecated in favor of `state.change()`.')
+    return this.change(...args)
   }
 
 }
 
 /**
- * Pseduo-symbol that shows this is a Slate State
+ * Attach a pseudo-symbol for type checking.
  */
 
 State.prototype[MODEL_TYPES.STATE] = true

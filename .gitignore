@@ -11,9 +11,10 @@ tmp
 # Gitbook files.
 _book
 
-# NPM files.
+# Package files.
 node_modules
 npm-debug.log
+yarn-error.log
 
-# Mac stuff.
+# OS files.
 .DS_Store

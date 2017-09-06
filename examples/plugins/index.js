@@ -72,10 +72,10 @@ The fourth is an example of using the plugin.render property to create a higher-
   /**
    * On change.
    *
-   * @param {State} state
+   * @param {Change} change
    */
 
-  onChange = (state) => {
+  onChange = ({ state }) => {
     this.setState({ state })
   }
 

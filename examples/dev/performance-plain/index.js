@@ -24,10 +24,10 @@ class PlainText extends React.Component {
   /**
    * On change.
    *
-   * @param {State} state
+   * @param {Change} change
    */
 
-  onChange = (state) => {
+  onChange = ({ state }) => {
     this.setState({ state })
   }
 

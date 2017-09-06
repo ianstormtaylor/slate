@@ -7,9 +7,9 @@ import { State } from 'slate'
 
 A `State` is the top-level representation of data in Slate, containing both a [`Document`](./document.md) and a [`Selection`](./selection.md). It's what you need to paste into the Slate [`<Editor>`](../components/editor.md) to render something onto the page.
 
-All transforms to the document and selection are also performed through the state object, so that they can stay in sync, and be propagated to its internal history of undo/redo state.
+All changes to the document and selection are also performed through the state object, so that they can stay in sync, and be propagated to its internal history of undo/redo state.
 
-For convenience, in addition to transforms, many of the [`Selection`](./selection.md) and [`Document`](./document.md) properties are exposed as proxies on the `State` object.
+For convenience, in addition to changes, many of the [`Selection`](./selection.md) and [`Document`](./document.md) properties are exposed as proxies on the `State` object.
 
 - [Properties](#properties)
   - [`document`](#document)
@@ -39,7 +39,7 @@ For convenience, in addition to transforms, many of the [`Selection`](./selectio
   - [`State.create`](#statecreate)
   - [`State.isState`](#stateisstate)
 - [Methods](#methods)
-  - [`transform`](#transform)
+  - [`change`](#change)
 
 
 ## Properties
@@ -186,7 +186,7 @@ Returns a boolean if the passed in argument is a `State`.
 
 ## Methods
 
-### `transform`
-`transform() => Transform`
+### `change`
+`change() => Change`
 
-Create a new [`Transform`](./transform.md) that acts on the current state.
+Create a new [`Change`](./change.md) that acts on the current state.

@@ -24,28 +24,32 @@ const DEFAULTS = {
 class Range extends new Record(DEFAULTS) {
 
   /**
-   * Create a new `Range` with `properties`.
+   * Create a new `Range` with `attrs`.
    *
-   * @param {Object|Range} properties
+   * @param {Object|Range} attrs
    * @return {Range}
    */
 
-  static create(properties = {}) {
-    if (Range.isRange(properties)) return properties
-    properties.text = properties.text
-    properties.marks = Mark.createSet(properties.marks)
-    return new Range(properties)
+  static create(attrs = {}) {
+    if (Range.isRange(attrs)) return attrs
+
+    const range = new Range({
+      text: attrs.text,
+      marks: Mark.createSet(attrs.marks),
+    })
+
+    return range
   }
 
   /**
-   * Determines if the passed in paramter is a Slate Range or not
+   * Check if a `value` is a `Range`.
    *
-   * @param {*} maybeRange
+   * @param {Any} value
    * @return {Boolean}
    */
 
-  static isRange(maybeRange) {
-    return !!(maybeRange && maybeRange[MODEL_TYPES.RANGE])
+  static isRange(value) {
+    return !!(value && value[MODEL_TYPES.RANGE])
   }
 
   /**
@@ -66,8 +70,7 @@ class Range extends new Record(DEFAULTS) {
 
   getCharacters() {
     const { marks } = this
-
-    return Character.createList(this.text
+    const characters = Character.createList(this.text
       .split('')
       .map((char) => {
         return Character.create({
@@ -75,12 +78,14 @@ class Range extends new Record(DEFAULTS) {
           marks
         })
       }))
+
+    return characters
   }
 
 }
 
 /**
- * Pseduo-symbol that shows this is a Slate Range
+ * Attach a pseudo-symbol for type checking.
  */
 
 Range.prototype[MODEL_TYPES.RANGE] = true

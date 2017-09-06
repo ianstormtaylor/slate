@@ -33,7 +33,7 @@ class App extends React.Component {
     const isCode = state.blocks.some(block => block.type == 'code')
 
     return state
-      .transform()
+      .change()
       .setBlock(isCode ? 'paragraph' : 'code')
       .apply()
   }
@@ -79,7 +79,7 @@ class App extends React.Component {
       case 66: {
         event.preventDefault()
         return state
-          .transform()
+          .change()
           .addMark('bold')
           .apply()
       }
@@ -89,7 +89,7 @@ class App extends React.Component {
         const isCode = state.blocks.some(block => block.type == 'code')
         event.preventDefault()
         return state
-          .transform()
+          .change()
           .setBlock(isCode ? 'paragraph' : 'code')
           .apply()
       }
@@ -158,7 +158,7 @@ class App extends React.Component {
       case 66: {
         event.preventDefault()
         return state
-          .transform()
+          .change()
           .toggleMark('bold')
           .apply()
       }
@@ -167,7 +167,7 @@ class App extends React.Component {
         const isCode = state.blocks.some(block => block.type == 'code')
         event.preventDefault()
         return state
-          .transform()
+          .change()
           .setBlock(isCode ? 'paragraph' : 'code')
           .apply()
       }

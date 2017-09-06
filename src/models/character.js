@@ -23,28 +23,41 @@ const DEFAULTS = {
 class Character extends new Record(DEFAULTS) {
 
   /**
-   * Create a character record with `properties`.
+   * Create a `Character` with `attrs`.
    *
-   * @param {Object|Character} properties
+   * @param {Object|Character} attrs
    * @return {Character}
    */
 
-  static create(properties = {}) {
-    if (Character.isCharacter(properties)) return properties
-    properties.marks = Mark.createSet(properties.marks)
-    return new Character(properties)
+  static create(attrs = {}) {
+    if (Character.isCharacter(attrs)) return attrs
+
+    const character = new Character({
+      text: attrs.text,
+      marks: Mark.createSet(attrs.marks),
+    })
+
+    return character
   }
 
   /**
-   * Create a characters list from an array of characters.
+   * Create a list of `Characters` from `elements`.
    *
-   * @param {Array<Object|Character>} array
+   * @param {Array<Object|Character>|List<Character>} elements
    * @return {List<Character>}
    */
 
-  static createList(array = []) {
-    if (List.isList(array)) return array
-    return new List(array.map(Character.create))
+  static createList(elements = []) {
+    if (List.isList(elements)) {
+      return elements
+    }
+
+    if (Array.isArray(elements)) {
+      const list = new List(elements.map(Character.create))
+      return list
+    }
+
+    throw new Error(`Character.createList() must be passed an \`Array\` or a \`List\`. You passed: ${elements}`)
   }
 
   /**
@@ -56,20 +69,20 @@ class Character extends new Record(DEFAULTS) {
    */
 
   static createListFromText(string, marks) {
-    const chars = string.split('').map((text) => { return { text, marks } })
+    const chars = string.split('').map(text => ({ text, marks }))
     const list = Character.createList(chars)
     return list
   }
 
   /**
-   * Determines if the passed in paramter is a Slate Character or not
+   * Check if a `value` is a `Character`.
    *
-   * @param {*} maybeCharacter
+   * @param {Any} value
    * @return {Boolean}
    */
 
-  static isCharacter(maybeCharacter) {
-    return !!(maybeCharacter && maybeCharacter[MODEL_TYPES.CHARACTER])
+  static isCharacter(value) {
+    return !!(value && value[MODEL_TYPES.CHARACTER])
   }
 
   /**
@@ -85,7 +98,7 @@ class Character extends new Record(DEFAULTS) {
 }
 
 /**
- * Pseduo-symbol that shows this is a Slate Character
+ * Attach a pseudo-symbol for type checking.
  */
 
 Character.prototype[MODEL_TYPES.CHARACTER] = true

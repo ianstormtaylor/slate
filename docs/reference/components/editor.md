@@ -42,7 +42,8 @@ The top-level React component that renders the Slate editor itself.
   - [`focus`](#focus)
   - [`getSchema()`](#getschema)
   - [`getState()`](#getstate)
-  - [`onChange(state)`](#onchange)
+  - [`onChange(change)`](#onchange)
+  - [`change`](#change)
 
 ## Properties
 
@@ -80,19 +81,19 @@ An optional attribute that, when set to true, attempts to give the content edita
 An optional class name to apply to the content editable element.
 
 ### `onChange`
-`Function onChange(state: State)`
+`Function onChange(change: Change)`
 
-A change handler that will be called with the newly-changed editor `state`. You should usually pass the newly changed `state` back into the editor through its `state` property. This hook allows you to add persistence logic to your editor.
+A change handler that will be called with the `change` that applied the change. You should usually pass the newly changed `change.state` back into the editor through its `state` property. This hook allows you to add persistence logic to your editor.
 
 ### `onDocumentChange`
-`Function onDocumentChange(document: Document, state: State)`
+`Function onDocumentChange(document: Document, change: Change)`
 
-A convenience handler property that will only be called for changes in state where the document has changed. It is called with the changed `document` and `state`.
+A convenience handler property that will only be called for changes in state where the document has changed. It is called with the changed `document` and `change`.
 
 ### `onSelectionChange`
-`Function onSelectionChange(selection: Selection, state: State)`
+`Function onSelectionChange(selection: Selection, change: Change)`
 
-A convenience handler property that will only be called for changes in state where the selection has changed. It is called with the changed `selection` and `state`.
+A convenience handler property that will only be called for changes in state where the selection has changed. It is called with the changed `selection` and `change`.
 
 ### `plugins`
 `Array`
@@ -229,6 +230,6 @@ Return the editor's current schema.
 Return the editor's current state.
 
 ### `onChange`
-`onChange(state: State) => Void`
+`onChange(change: Change) => Void`
 
-Effectively the same as `setState`. Invoking this method will update the state of the editor, running it through all of it's plugins, and passing it the parent component, before it cycles back down as the new `state` property of the editor.
+Invoking this method will update the state of the editor with the `change`, running it through all of it's plugins, and passing it the parent component, before it cycles back down as the new `state` property of the editor.
