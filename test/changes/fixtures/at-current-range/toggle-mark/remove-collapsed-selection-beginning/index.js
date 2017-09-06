@@ -1,3 +1,4 @@
+
 import assert from 'assert'
 
 export default function (state) {
@@ -8,16 +9,18 @@ export default function (state) {
     anchorKey: first.key,
     anchorOffset: 0,
     focusKey: first.key,
-    focusOffset: 5
+    focusOffset: 0
   })
 
   const next = state
-    .transform()
+    .change()
     .select(range)
     .toggleMark('bold')
-    .apply()
+    .toggleMark('bold')
+    .insertText('a')
+    .state
 
-  assert.deepEqual(next.selection.toJS(), range.toJS())
+  assert.deepEqual(next.selection.toJS(), range.move(1).toJS())
 
   return next
 }

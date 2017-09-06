@@ -28,14 +28,40 @@ Changes.addMarkByKey = (change, key, offset, length, mark, options = {}) => {
   const { state } = change
   const { document } = state
   const path = document.getPath(key)
+  const node = document.getNode(key)
+  const ranges = node.getRanges()
 
-  change.applyOperation({
-    type: 'add_mark',
-    path,
-    offset,
-    length,
-    mark,
+  const operations = []
+  const bx = offset
+  const by = offset + length
+  let o = 0
+
+  ranges.forEach((range) => {
+    const ax = o
+    const ay = ax + range.text.length
+
+    o += range.text.length
+
+    // If the range doesn't overlap with the operation, continue on.
+    if (ay < bx || by < ax) return
+
+    // If the range already has the mark, continue on.
+    if (range.marks.has(mark)) return
+
+    // Otherwise, determine which offset and characters overlap.
+    const start = Math.max(ax, bx)
+    const end = Math.min(ay, by)
+
+    operations.push({
+      type: 'add_mark',
+      path,
+      offset: start,
+      length: end - start,
+      mark,
+    })
   })
+
+  change.applyOperations(operations)
 
   if (normalize) {
     const parent = document.getParent(key)
@@ -211,14 +237,40 @@ Changes.removeMarkByKey = (change, key, offset, length, mark, options = {}) => {
   const { state } = change
   const { document } = state
   const path = document.getPath(key)
+  const node = document.getNode(key)
+  const ranges = node.getRanges()
 
-  change.applyOperation({
-    type: 'remove_mark',
-    path,
-    offset,
-    length,
-    mark,
+  const operations = []
+  const bx = offset
+  const by = offset + length
+  let o = 0
+
+  ranges.forEach((range) => {
+    const ax = o
+    const ay = ax + range.text.length
+
+    o += range.text.length
+
+    // If the range doesn't overlap with the operation, continue on.
+    if (ay < bx || by < ax) return
+
+    // If the range already has the mark, continue on.
+    if (!range.marks.has(mark)) return
+
+    // Otherwise, determine which offset and characters overlap.
+    const start = Math.max(ax, bx)
+    const end = Math.min(ay, by)
+
+    operations.push({
+      type: 'remove_mark',
+      path,
+      offset: start,
+      length: end - start,
+      mark,
+    })
   })
+
+  change.applyOperations(operations)
 
   if (normalize) {
     const parent = document.getParent(key)
@@ -280,7 +332,6 @@ Changes.removeTextByKey = (change, key, offset, length, options = {}) => {
   let o = 0
 
   ranges.forEach((range) => {
-    const { marks } = range
     const ax = o
     const ay = ax + range.text.length
 
@@ -299,15 +350,12 @@ Changes.removeTextByKey = (change, key, offset, length, options = {}) => {
       path,
       offset: start,
       text: string,
-      marks,
+      marks: range.marks,
     })
   })
 
-  // Apply the removals in reverse order, so that subsequent removals aren't
-  // impacted by previous ones.
-  removals.reverse().forEach((op) => {
-    change.applyOperation(op)
-  })
+  // Apply in reverse order, so subsequent removals don't impact previous ones.
+  change.applyOperations(removals.reverse())
 
   if (normalize) {
     const block = document.getClosestBlock(key)

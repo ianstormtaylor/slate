@@ -4,5 +4,10 @@ nodes:
     type: paragraph
     nodes:
       - kind: text
-        key: 'key1'
-        text: The text
+        key: a
+        ranges:
+          - text: te
+            marks: []
+          - text: xt
+            marks:
+              - type: bold
