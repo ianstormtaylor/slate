@@ -39,6 +39,21 @@ function deserialize(string, options = {}) {
 }
 
 /**
+ * Checks if the block has other blocks nested within
+ * @param  {Node}     node
+ * @return {Boolean}
+*/
+
+function hasNestedBlocks(node) {
+  return node &&
+    node.nodes &&
+    node.nodes.first() &&
+    node.nodes.first().kind &&
+    node.nodes.first().kind == 'block'
+}
+
+
+/**
  * Serialize a `state` to plain text.
  *
  * @param {State} state
@@ -46,9 +61,28 @@ function deserialize(string, options = {}) {
  */
 
 function serialize(state) {
-  return state.document.nodes
-    .map(block => block.text)
-    .join('\n')
+  return serializeNode(state.document)
+}
+
+/**
+ * Serialize a `node` to plain text.
+ * For blocks, or document, it recursively calls itself
+ * to aggregate the text.
+ * For other types of nodes, it uses the .text property
+ *
+ * @param {Node} node
+ * @return {String}
+ */
+
+function serializeNode(node) {
+  if (node.kind == 'document' || (node.kind == 'block' && hasNestedBlocks(node))) {
+    return node.nodes
+      .map(childNode => serializeNode(childNode))
+      .filter(text => text != '')
+      .join('\n')
+  } else {
+    return node.text
+  }
 }
 
 /**

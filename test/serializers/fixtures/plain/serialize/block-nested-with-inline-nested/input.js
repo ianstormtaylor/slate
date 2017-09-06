@@ -1,5 +1,5 @@
 
-import { Block, Character, Document, Inline, Mark, State, Text } from '../../../../../..'
+import { Block, Character, Document, Inline, State, Text } from '../../../../../..'
 
 export default State.create({
   document: Document.create({
@@ -24,12 +24,22 @@ export default State.create({
             nodes: Block.createList([
               {
                 type: 'paragraph',
-                nodes: Text.createList([
+                nodes: Inline.createList([
                   {
-                    characters: Character.createList([
-                      { text: 't' },
-                      { text: 'w' },
-                      { text: 'o' }
+                    type: 'link',
+                    nodes: Inline.createList([
+                      {
+                        type: 'hashtag',
+                        nodes: Text.createList([
+                          {
+                            characters: Character.createList([
+                              { text: 't' },
+                              { text: 'w' },
+                              { text: 'o' }
+                            ])
+                          }
+                        ])
+                      }
                     ])
                   }
                 ])
