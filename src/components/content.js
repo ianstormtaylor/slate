@@ -9,13 +9,14 @@ import TRANSFER_TYPES from '../constants/transfer-types'
 import Base64 from '../serializers/base-64'
 import Node from './node'
 import Selection from '../models/selection'
+import SlateTypes from '../utils/prop-types'
 import extendSelection from '../utils/extend-selection'
 import findClosestNode from '../utils/find-closest-node'
 import findDeepestNode from '../utils/find-deepest-node'
+import getHtmlFromNativePaste from '../utils/get-html-from-native-paste'
 import getPoint from '../utils/get-point'
 import getTransferData from '../utils/get-transfer-data'
 import setTransferData from '../utils/set-transfer-data'
-import getHtmlFromNativePaste from '../utils/get-html-from-native-paste'
 import { IS_FIREFOX, IS_MAC, IS_IE } from '../constants/environment'
 
 /**
@@ -58,12 +59,12 @@ class Content extends React.Component {
     onSelect: Types.func.isRequired,
     readOnly: Types.bool.isRequired,
     role: Types.string,
-    schema: Types.object,
+    schema: SlateTypes.schema.isRequired,
     spellCheck: Types.bool.isRequired,
-    state: Types.object.isRequired,
+    state: SlateTypes.state.isRequired,
     style: Types.object,
     tabIndex: Types.number,
-    tagName: Types.string
+    tagName: Types.string,
   }
 
   /**
@@ -74,7 +75,7 @@ class Content extends React.Component {
 
   static defaultProps = {
     style: {},
-    tagName: 'div'
+    tagName: 'div',
   }
 
   /**

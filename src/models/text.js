@@ -95,6 +95,17 @@ class Text extends Record(DEFAULTS) {
   }
 
   /**
+   * Check if a `value` is a list of texts.
+   *
+   * @param {Any} value
+   * @return {Boolean}
+   */
+
+  static isTextList(value) {
+    return List.isList(value) && value.size > 0 && Text.isText(value.first())
+  }
+
+  /**
    * Deprecated.
    */
 

@@ -114,6 +114,17 @@ class Node {
   }
 
   /**
+   * Check if a `value` is a list of nodes.
+   *
+   * @param {Any} value
+   * @return {Boolean}
+   */
+
+  static isNodeList(value) {
+    return List.isList(value) && value.size > 0 && Node.isNode(value.first())
+  }
+
+  /**
    * True if the node has both descendants in that order, false otherwise. The
    * order is depth-first, post-order.
    *

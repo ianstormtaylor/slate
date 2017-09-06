@@ -109,6 +109,17 @@ class Block extends Record(DEFAULTS) {
   }
 
   /**
+   * Check if a `value` is a block list.
+   *
+   * @param {Any} value
+   * @return {Boolean}
+   */
+
+  static isBlockList(value) {
+    return List.isList(value) && value.size > 0 && Block.isBlock(value.first())
+  }
+
+  /**
    * Get the node's kind.
    *
    * @return {String}
