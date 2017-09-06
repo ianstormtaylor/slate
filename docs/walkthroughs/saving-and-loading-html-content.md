@@ -20,7 +20,7 @@ class App extends React.Component {
     state: Plain.deserialize('')
   }
 
-  onChange(state) {
+  onChange({ state }) {
     this.setState({ state })
   }
 
@@ -238,12 +238,12 @@ class App extends React.Component {
     }
   }
 
-  onChange = (state) => {
+  onChange = ({ state }) => {
     this.setState({ state })
   }
 
   // When the document changes, save the serialized HTML to Local Storage.
-  onDocumentChange = (document, state) => {
+  onDocumentChange = (document, { state }) => {
     const string = html.serialize(state)
     localStorage.setItem('content', string)
   }
