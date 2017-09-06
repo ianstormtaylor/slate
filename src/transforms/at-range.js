@@ -673,21 +673,28 @@ Transforms.insertFragmentAtRange = (transform, range, fragment, options = {}) =>
   const blocks = fragment.getBlocks()
   const firstBlock = blocks.first()
   const lastBlock = blocks.last()
+  const multipleLeafBlocks = firstBlock != lastBlock
+  const firstParent = fragment.getFurthest(firstBlock.key, p => p.nodes.size === 1)
+  const lastParent = fragment.getFurthest(lastBlock.key, p => p.nodes.size === 1)
+  const commonParent = firstParent && lastParent && firstParent == lastParent
 
   // If the fragment only contains a void block, use `insertBlock` instead.
-  if (firstBlock == lastBlock && firstBlock.isVoid) {
+  if (!multipleLeafBlocks && firstBlock.isVoid) {
     transform.insertBlockAtRange(range, firstBlock, options)
     return
   }
 
-  // If the first and last block aren't the same, we need to insert all of the
-  // nodes after the fragment's first block at the index.
-  if (firstBlock != lastBlock) {
-    const lonelyParent = fragment.getFurthest(firstBlock.key, p => p.nodes.size == 1)
-    const lonelyChild = lonelyParent || firstBlock
-    const startIndex = parent.nodes.indexOf(startBlock)
-    fragment = fragment.removeDescendant(lonelyChild.key)
+  if (multipleLeafBlocks) {
+    // If there are multiple leaf blocks, and they do not share a common parent,
+    // we need to remove the first leaf block to re-insert after the split (if a
+    // split occurs).
+    if (!commonParent) {
+      const lonelyChild = firstParent || firstBlock
+      fragment = fragment.removeDescendant(lonelyChild.key)
+    }
 
+    // Insert all remaining fragment nodes at the index.
+    const startIndex = parent.nodes.indexOf(startBlock)
     fragment.nodes.forEach((node, i) => {
       const newIndex = startIndex + i + 1
       transform.insertNodeByKey(parent.key, newIndex, node, OPTS)
@@ -706,10 +713,10 @@ Transforms.insertFragmentAtRange = (transform, range, fragment, options = {}) =>
   startBlock = document.getClosestBlock(startKey)
   startChild = startBlock.getFurthestAncestor(startText.key)
 
-  // If the first and last block aren't the same, we need to move any of the
-  // starting block's children after the split into the last block of the
-  // fragment, which has already been inserted.
-  if (firstBlock != lastBlock) {
+  // If there are multiple leaf blocks and they do not share a common parent, we
+  // need to move any of the starting block's children into the last block of
+  // the fragment, which has already been inserted after the split.
+  if (multipleLeafBlocks && !commonParent) {
     const nextChild = isAtStart ? startChild : startBlock.getNextSibling(startChild.key)
     const nextNodes = nextChild ? startBlock.nodes.skipUntil(n => n.key == nextChild.key) : List()
     const lastIndex = lastBlock.nodes.size
@@ -720,11 +727,14 @@ Transforms.insertFragmentAtRange = (transform, range, fragment, options = {}) =>
     })
   }
 
-  // If the starting block is empty, we replace it entirely with the first block
-  // of the fragment, since this leads to a more expected behavior for the user.
+  // If the starting block is empty, remove it entirely.
   if (startBlock.isEmpty) {
     transform.removeNodeByKey(startBlock.key, OPTS)
-    transform.insertNodeByKey(parent.key, index, firstBlock, OPTS)
+
+    if (multipleLeafBlocks && !commonParent) {
+      // Re-insert first leaf block that was removed prior to potential split
+      transform.insertNodeByKey(parent.key, index, firstParent || firstBlock, OPTS)
+    }
   }
 
   // Otherwise, we maintain the starting block, and insert all of the first
