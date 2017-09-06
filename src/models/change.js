@@ -126,6 +126,17 @@ class Change {
   }
 
   /**
+   * Set the `save` flag on the current change.
+   *
+   * @param {Boolean} value
+   */
+
+  setSave(value) {
+    this.flags.save = value
+    return this
+  }
+
+  /**
    * Noop.
    *
    * @return {State}
