@@ -1,8 +1,73 @@
 
+# Changelog
+
 This document maintains a list of changes to Slate with each new version. Until `1.0.0` is released, breaking changes will be added as minor version bumps, and non-breaking changes won't be accounted for since the library is moving quickly.
 
 
 ---
+
+
+### `0.22.0` — September 5, 2017
+
+###### BREAKING CHANGES
+
+- **The `Plain` serializer now adds line breaks between blocks.** Previously between blocks the text would be joined without any space whatsoever, but this wasn't really that useful or what you'd expect.
+
+- **The `toggleMark` transform now checks the intersection of marks.** Previously, toggling would remove the mark from the range if any of the characters in a range didn't have it. However, this wasn't what all other rich-text editors did, so the behavior has changed to mimic the standard behavior. Now, if any characters in the selection have the mark applied, it will first be added when toggling.
+
+- **The `.length` property of nodes has been removed.** This property caused issues with code like in Lodash that checked for "array-likeness" by simply looking for a `.length` property that was a number.
+
+- **`onChange` now receives a `Change` object (previously named `Transform`) instead of a `State`.** Plugins and users will need to now use:
+
+```js
+onChange(change) {
+  this.setState({ state: change.state })
+}
+```
+
+Or more tersely:
+
+```js
+onChange({ state }) {
+  this.setState({ state })
+}
+```
+
+Which achieves the same behavior as before. This is needed because it enforces that all changes are represented by a single set of operations. Otherwise right now it's possible to do things like `state.transform()....apply({ save: false }).transform()....apply()` and result in losing the operation information in the history. With OT, we need all transforms that may happen to be exposed and emitted by the editor.
+
+- **Similarly, handlers now receive `e, data, change` instead of `e, data, state`.** Instead of doing `return state.transform()....apply()` the plugins can now act on the change object directly.
+
+```js
+function onKeyDown(e, data, change) {
+  if (data.key == 'enter') {
+    return change.splitBlock()
+  }
+}
+```
+
+Plugins can still `return change...` if they want to break the stack from continuing on to other plugins. (Any `!= null` value will break out.) But they can also now not return anything, and the stack will apply their changes and continue onwards. This was previously impossible.
+
+- **The `onChange` and `on[Before]Change` handlers now receive `Change` objects.** Previously they would also receive a `state` object, but now they receive `change` objects like the rest of the plugin API.
+
+- **The `.apply({ save })` option is now `state.change({ save })` instead.** This is the easiest way to use it, but requires that you know whether to save or not up front. If you want to use it inline after already saving some changes, you can use the `change.setSave(save)` flag instead. This shouldn't be necessary for 99% of use cases though.
+
+- **The `.undo()` and `.redo()` transforms don't save by default.** Previously you had to specifically tell these transforms not to save into the history, which was awkward. Now they won't save the operations they're undoing/redoing by default.
+
+- **`onBeforeChange` is no longer called from `componentWillReceiveProps`,** when a new `state` is passed in as props to the `<Editor>` component. This caused lots of state-management issues and was weird in the first place because passing in props would result in changes firing. **It is now the parent component's responsibility to not pass in improperly formatted `State` objects**.
+
+- **The `splitNodeByKey` change method has changed to be shallow.** Previously, it would deeply split to an offset. But now it is shallow and another `splitDescendantsByKey` change method has been added (with a different signature) for the deep splitting behavior. This is needed because splitting and joining operations have been changed to all be shallow, which is required so that operational transforms can be written against them.
+
+- **The shape of many operations has changed.** This was needed to make operations completely invertible without any extra context. The operations were never really exposed in a consumable way, so I won't detail all of the changes here, but feel free to look at the source to see the details.
+
+- **All references to "joining" nodes is now called "merging".** This is to be slightly clearer, since merging can only happen with adjacent nodes already, and to have a nicer parallel with "splitting", as in cells. The operation is now called `merge_node`, and the transforms are now `merge*`.
+
+###### DEPRECATION CHANGES
+
+- **The `transform.apply()` method is deprecated.** Previously this is where the saving into the history would happen, but it created an awkward convention that wasn't necessary. Now operations are saved into the history as they are created with change methods, instead of waiting until the end. You can access the new `State` of a change at any time via `change.state`.
+
+
+---
+
 
 ### `0.21.0` — July 20, 2017
 
