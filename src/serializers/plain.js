@@ -7,25 +7,32 @@ import Raw from '../serializers/raw'
  * @param {String} string
  * @param {Object} options
  *   @property {Boolean} toRaw
+ *   @property {String|Object} defaultBlock
+ *   @property {Array} defaultMarks
  * @return {State}
  */
 
 function deserialize(string, options = {}) {
+  const {
+    defaultBlock = { type: 'line' },
+    defaultMarks = [],
+  } = options
+
   const raw = {
     kind: 'state',
     document: {
       kind: 'document',
       nodes: string.split('\n').map((line) => {
         return {
+          ...defaultBlock,
           kind: 'block',
-          type: 'line',
           nodes: [
             {
               kind: 'text',
               ranges: [
                 {
                   text: line,
-                  marks: [],
+                  marks: defaultMarks,
                 }
               ]
             }
@@ -37,21 +44,6 @@ function deserialize(string, options = {}) {
 
   return options.toRaw ? raw : Raw.deserialize(raw)
 }
-
-/**
- * Checks if the block has other blocks nested within
- * @param  {Node}     node
- * @return {Boolean}
-*/
-
-function hasNestedBlocks(node) {
-  return node &&
-    node.nodes &&
-    node.nodes.first() &&
-    node.nodes.first().kind &&
-    node.nodes.first().kind == 'block'
-}
-
 
 /**
  * Serialize a `state` to plain text.
@@ -75,9 +67,12 @@ function serialize(state) {
  */
 
 function serializeNode(node) {
-  if (node.kind == 'document' || (node.kind == 'block' && hasNestedBlocks(node))) {
+  if (
+    (node.kind == 'document') ||
+    (node.kind == 'block' && node.nodes.size > 0 && node.nodes.first().kind == 'block')
+  ) {
     return node.nodes
-      .map(childNode => serializeNode(childNode))
+      .map(n => serializeNode(n))
       .filter(text => text != '')
       .join('\n')
   } else {

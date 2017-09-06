@@ -117,13 +117,14 @@ Changes.insertFragment = (change, fragment) => {
 
   let { state } = change
   let { document, selection } = state
-  const { startText, endText } = state
+  const { startText, endText, startInline } = state
   const lastText = fragment.getLastText()
   const lastInline = fragment.getClosestInline(lastText.key)
   const keys = document.getTexts().map(text => text.key)
   const isAppending = (
-    selection.hasEdgeAtEndOf(endText) ||
-    selection.hasEdgeAtStartOf(startText)
+    !startInline ||
+    selection.hasEdgeAtStartOf(startText) ||
+    selection.hasEdgeAtEndOf(endText)
   )
 
   change.insertFragmentAtRange(selection, fragment)

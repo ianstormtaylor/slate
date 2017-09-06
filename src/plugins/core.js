@@ -1,13 +1,14 @@
 
 import Base64 from '../serializers/base-64'
-import Content from '../components/content'
 import Block from '../models/block'
 import Character from '../models/character'
-import Inline from '../models/inline'
+import Content from '../components/content'
 import Debug from 'debug'
-import getPoint from '../utils/get-point'
+import Inline from '../models/inline'
+import Plain from '../serializers/plain'
 import Placeholder from '../components/placeholder'
 import React from 'react'
+import getPoint from '../utils/get-point'
 import getWindow from 'get-window'
 import findDOMNode from '../utils/find-dom-node'
 import { IS_CHROME, IS_MAC, IS_SAFARI } from '../constants/environment'
@@ -840,10 +841,16 @@ function Plugin(options = {}) {
 
   function onPasteText(e, data, change) {
     debug('onPasteText', { data })
-    data.text.split('\n').forEach((line, i) => {
-      if (i > 0) change.splitBlock()
-      change.insertText(line)
-    })
+
+    const { state } = change
+    const { document, selection, startBlock } = state
+    if (startBlock.isVoid) return
+
+    const { text } = data
+    const defaultBlock = { type: startBlock.type, data: startBlock.data }
+    const defaultMarks = document.getMarksAtRange(selection.collapseToStart())
+    const fragment = Plain.deserialize(text, { defaultBlock, defaultMarks }).document
+    change.insertFragment(fragment)
   }
 
   /**
