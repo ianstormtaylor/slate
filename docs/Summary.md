@@ -15,6 +15,7 @@
 
 ## Component Reference
 
+- [Custom](./reference/components/custom.md)
 - [Editor](./reference/components/editor.md)
 - [Placeholder](./reference/components/placeholder.md)
 

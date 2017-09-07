@@ -4,6 +4,7 @@
 This is the full reference documentation for all of the pieces of Slate, broken up into sections by type:
 
 - **Components**
+  - [Custom](./components/custom.md)
   - [Editor](./components/editor.md)
   - [Placeholder](./components/placeholder.md)
 - **Models**

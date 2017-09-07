@@ -39,6 +39,7 @@ class Node extends React.Component {
   static propTypes = {
     block: SlateTypes.block,
     editor: Types.object.isRequired,
+    isSelected: Types.bool.isRequired,
     node: SlateTypes.node.isRequired,
     parent: SlateTypes.node.isRequired,
     readOnly: Types.bool.isRequired,
@@ -97,6 +98,8 @@ class Node extends React.Component {
   shouldComponentUpdate = (nextProps) => {
     const { props } = this
     const { Component } = this.state
+    const n = nextProps
+    const p = props
 
     // If the `Component` has enabled suppression of update checking, always
     // return true so that it can deal with update checking itself.
@@ -104,49 +107,34 @@ class Node extends React.Component {
 
     // If the `readOnly` status has changed, re-render in case there is any
     // user-land logic that depends on it, like nested editable contents.
-    if (nextProps.readOnly != props.readOnly) return true
+    if (n.readOnly != p.readOnly) return true
 
     // If the node has changed, update. PERF: There are cases where it will have
     // changed, but it's properties will be exactly the same (eg. copy-paste)
     // which this won't catch. But that's rare and not a drag on performance, so
     // for simplicity we just let them through.
-    if (nextProps.node != props.node) return true
+    if (n.node != p.node) return true
 
-    // If the Node has children that aren't just Text's then allow them to decide
-    // If they should update it or not.
-    if (nextProps.node.kind != 'text' && Text.isTextList(nextProps.node.nodes) == false) return true
-
-    // If the node is a block or inline, which can have custom renderers, we
-    // include an extra check to re-render if the node either becomes part of,
-    // or leaves, a selection. This is to make it simple for users to show a
-    // node's "selected" state.
-    if (nextProps.node.kind != 'text') {
-      const nodes = `${props.node.kind}s`
-      const isInSelection = props.state[nodes].includes(props.node)
-      const nextIsInSelection = nextProps.state[nodes].includes(nextProps.node)
-      const hasFocus = props.state.isFocused
-      const nextHasFocus = nextProps.state.isFocused
-      const selectionChanged = isInSelection != nextIsInSelection
-      const focusChanged = hasFocus != nextHasFocus
-      if (selectionChanged || focusChanged) return true
-    }
+    // If the node's selection state has changed, re-render in case there is any
+    // user-land logic depends on it to render.
+    if (n.isSelected != p.isSelected) return true
 
     // If the node is a text node, re-render if the current decorations have
     // changed, even if the content of the text node itself hasn't.
-    if (nextProps.node.kind == 'text' && nextProps.schema.hasDecorators) {
-      const nextDecorators = nextProps.state.document.getDescendantDecorators(nextProps.node.key, nextProps.schema)
-      const decorators = props.state.document.getDescendantDecorators(props.node.key, props.schema)
-      const nextRanges = nextProps.node.getRanges(nextDecorators)
-      const ranges = props.node.getRanges(decorators)
-      if (!nextRanges.equals(ranges)) return true
+    if (n.node.kind == 'text' && n.schema.hasDecorators) {
+      const nDecorators = n.state.document.getDescendantDecorators(n.node.key, n.schema)
+      const pDecorators = p.state.document.getDescendantDecorators(p.node.key, p.schema)
+      const nRanges = n.node.getRanges(nDecorators)
+      const pRanges = p.node.getRanges(pDecorators)
+      if (!nRanges.equals(pRanges)) return true
     }
 
     // If the node is a text node, and its parent is a block node, and it was
     // the last child of the block, re-render to cleanup extra `<br/>` or `\n`.
-    if (nextProps.node.kind == 'text' && nextProps.parent.kind == 'block') {
-      const last = props.parent.nodes.last()
-      const nextLast = nextProps.parent.nodes.last()
-      if (props.node == last && nextProps.node != nextLast) return true
+    if (n.node.kind == 'text' && n.parent.kind == 'block') {
+      const pLast = p.parent.nodes.last()
+      const nLast = n.parent.nodes.last()
+      if (p.node == pLast && n.node != nLast) return true
     }
 
     // Otherwise, don't update.
@@ -261,14 +249,35 @@ class Node extends React.Component {
    */
 
   renderNode = (child) => {
-    const { block, editor, node, readOnly, schema, state } = this.props
+    const { block, editor, isSelected, node, readOnly, schema, state } = this.props
+    const { selection } = state
+    const { startKey, endKey } = selection
+    let isChildSelected
+
+    if (!isSelected) {
+      isChildSelected = false
+    }
+
+    else if (node.kind == 'text') {
+      isChildSelected = node.key == startKey || node.key == endKey
+    }
+
+    else {
+      isChildSelected = node.nodes
+        .skipUntil(n => n.kind == 'text' ? n.key == startKey : n.hasDescendant(startKey))
+        .reverse()
+        .skipUntil(n => n.kind == 'text' ? n.key == endKey : n.hasDescendant(endKey))
+        .includes(child)
+    }
+
     return (
       <Node
+        block={node.kind == 'block' ? node : block}
+        editor={editor}
+        isSelected={isChildSelected}
         key={child.key}
         node={child}
-        block={node.kind == 'block' ? node : block}
         parent={node}
-        editor={editor}
         readOnly={readOnly}
         schema={schema}
         state={state}
@@ -283,7 +292,7 @@ class Node extends React.Component {
    */
 
   renderElement = () => {
-    const { editor, node, parent, readOnly, state } = this.props
+    const { editor, isSelected, node, parent, readOnly, state } = this.props
     const { Component } = this.state
     const children = node.nodes.map(this.renderNode).toArray()
 
@@ -304,10 +313,11 @@ class Node extends React.Component {
     const element = (
       <Component
         attributes={attributes}
-        key={node.key}
         editor={editor}
-        parent={parent}
+        isSelected={isSelected}
+        key={node.key}
         node={node}
+        parent={parent}
         readOnly={readOnly}
         state={state}
       >
