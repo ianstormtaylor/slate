@@ -135,6 +135,16 @@ Changes.deleteAtRange = (change, range, options = {}) => {
     }
   }
 
+  // If the selection starts at an inline void, remove that void inline first
+  const startInline = document.getClosestInline(startKey)
+  if (startInline && startInline.isVoid &&
+      startInline.getTexts().first().key == startKey) {
+    const nextText = document.getNextText(startInline.getTexts().first().key)
+    change.removeNodeByKey(startInline.key, OPTS)
+    startKey = nextText.key
+    startOffset = 0
+  }
+
   // If the start and end key are the same, we can just remove it.
   if (startKey == endKey) {
     // If it is a void node, remove the whole node
@@ -178,10 +188,12 @@ Changes.deleteAtRange = (change, range, options = {}) => {
   ancestor = document.getCommonAncestor(startKey, endKey)
   startChild = ancestor.getFurthestAncestor(startKey)
   endChild = ancestor.getFurthestAncestor(endKey)
+
+
+  const nextText = document.getNextText(endKey)
   const startIndex = ancestor.nodes.indexOf(startChild)
   const endIndex = ancestor.nodes.indexOf(endChild)
   const middles = ancestor.nodes.slice(startIndex + 1, endIndex + 1)
-  const next = document.getNextText(endKey)
 
   // Remove all of the middle nodes, between the splits.
   if (middles.size) {
@@ -190,16 +202,25 @@ Changes.deleteAtRange = (change, range, options = {}) => {
     })
   }
 
-  // If the start and end block are different, move all of the nodes from the
-  // end block into the start block.
+  // Refresh variables
   state = change.state
   document = state.document
-  const startBlock = document.getClosestBlock(startKey)
-  const endBlock = document.getClosestBlock(next.key)
 
-  // If the endBlock is void, just remove the startBlock
-  if (endBlock.isVoid) {
-    change.removeNodeByKey(startBlock.key)
+  const startBlock = document.getClosestBlock(startKey)
+  const endBlock = document.getClosestBlock(nextText.key)
+
+  // If the whole startBlock is selected but the endBlock is different, just remove the startBlock
+  if (startBlock.key !== endBlock.key && startChild.text.length === endOffset && startOffset === 0) {
+    document = change.removeNodeByKey(startBlock.key, OPTS).state.document
+    return
+  }
+
+  // If the endBlock is void, remove what is selected of the start block
+  if (endBlock.isVoid && endOffset === 0) {
+    // If part of the startBlock is selected, split it and remove the unwanted part
+    document = change.splitNodeByKey(startChild.key, startOffset, OPTS).state.document
+    const toBeRemoved = document.nodes.get(startIndex + 1)
+    change.removeNodeByKey(toBeRemoved.key, OPTS)
     return
   }
 
