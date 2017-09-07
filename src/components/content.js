@@ -166,8 +166,8 @@ class Content extends React.Component {
 
     const { anchorKey, focusKey } = selection
 
-    // If the selection has no anchorKey and focusKey (deselected) do nothing
-    if (!selection.anchorKey && !selection.focusKey) return
+    // If the selection isn't set, do nothing.
+    if (selection.isUnset) return
 
     // Otherwise, figure out which DOM nodes should be selected...
     const { anchorText, focusText } = state
