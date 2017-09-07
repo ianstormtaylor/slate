@@ -653,9 +653,7 @@ function Plugin(options = {}) {
   }
 
   /**
-   * On `up` key down. If the previous block is void, make sure it is collapsed
-   * or extended (if shift) to start.
-   * For Macs, move the selection to start of the block if `alt` key is pressed.
+   * On `up` key down, for Macs, move the selection to start of the block.
    *
    * COMPAT: Certain browsers don't handle the selection updates properly. In
    * Chrome, option-shift-up doesn't properly extend the selection. And in
@@ -667,21 +665,13 @@ function Plugin(options = {}) {
    */
 
   function onKeyDownUp(e, data, change) {
-    const { state } = change
-    const { selection, document, focusKey, focusBlock } = state
-    const previousBlock = document.getPreviousBlock(focusKey)
-
-    if (previousBlock && previousBlock.isVoid && !data.isAlt) {
-      const transform = data.isShift ? 'extendToStartOf' : 'collapseToStartOf'
-      e.preventDefault()
-      return change[transform](previousBlock)
-    }
-
     if (!IS_MAC || data.isCtrl || !data.isAlt) return
 
+    const { state } = change
+    const { selection, document, focusKey, focusBlock } = state
     const transform = data.isShift ? 'extendToStartOf' : 'collapseToStartOf'
     const block = selection.hasFocusAtStartOf(focusBlock)
-      ? previousBlock
+      ? document.getPreviousBlock(focusKey)
       : focusBlock
 
     if (!block) return
@@ -692,9 +682,7 @@ function Plugin(options = {}) {
   }
 
   /**
-   * On `down` key down. If the next block is void, make sure it is collapsed
-   * or extended (if shift) to start.
-   * For Macs, move the selection to end of the block if `alt` key is pressed.
+   * On `down` key down, for Macs, move the selection to end of the block.
    *
    * COMPAT: Certain browsers don't handle the selection updates properly. In
    * Chrome, option-shift-down doesn't properly extend the selection. And in
@@ -706,21 +694,13 @@ function Plugin(options = {}) {
    */
 
   function onKeyDownDown(e, data, change) {
-    const { state } = change
-    const { selection, document, focusKey, focusBlock } = state
-    const nextBlock = document.getNextBlock(focusKey)
-
-    if (nextBlock && nextBlock.isVoid && !data.isAlt) {
-      const transform = data.isShift ? 'extendToStartOf' : 'collapseToStartOf'
-      e.preventDefault()
-      return change[transform](nextBlock)
-    }
-
     if (!IS_MAC || data.isCtrl || !data.isAlt) return
 
+    const { state } = change
+    const { selection, document, focusKey, focusBlock } = state
     const transform = data.isShift ? 'extendToEndOf' : 'collapseToEndOf'
     const block = selection.hasFocusAtEndOf(focusBlock)
-      ? nextBlock
+      ? document.getNextBlock(focusKey)
       : focusBlock
 
     if (!block) return
