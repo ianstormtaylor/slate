@@ -803,12 +803,6 @@ class Content extends React.Component {
         properties.focusOffset = 0
       }
 
-      // If anchor and focus block is the same void block make sure it is anchored to start
-      // so we are able to select and delete it
-      if (anchorBlock && anchorBlock.isVoid && focusBlock && focusBlock.key == anchorBlock.key) {
-        properties.anchorOffset = 0
-      }
-
       // If the selection is at the end of a non-void inline node, and there is
       // a node after it, put it in the node after instead.
       if (anchorInline && !anchorInline.isVoid && anchor.offset == anchorText.text.length) {
