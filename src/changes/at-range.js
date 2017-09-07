@@ -16,16 +16,6 @@ import { List } from 'immutable'
 const Changes = {}
 
 /**
- * An options object with normalize set to `false`.
- *
- * @type {Object}
- */
-
-const OPTS = {
-  normalize: false
-}
-
-/**
  * Add a new `mark` to the characters at `range`.
  *
  * @param {Change} change
@@ -69,173 +59,137 @@ Changes.addMarkAtRange = (change, range, mark, options = {}) => {
 Changes.deleteAtRange = (change, range, options = {}) => {
   if (range.isCollapsed) return
 
+  // Snapshot the selection, which creates an extra undo save point, so that
+  // when you undo a delete, the expanded selection will be retained.
   change.snapshotSelection()
 
   const { normalize = true } = options
+  const { state } = change
   let { startKey, startOffset, endKey, endOffset } = range
-
-  // Split at the range edges within a common ancestor, without normalizing.
-  let { state } = change
   let { document } = state
-  let ancestor = document.getCommonAncestor(startKey, endKey)
-  let startChild = ancestor.getFurthestAncestor(startKey)
-  let endChild = ancestor.getFurthestAncestor(endKey)
+  let isStartVoid = document.hasVoidParent(startKey)
+  let isEndVoid = document.hasVoidParent(endKey)
+  let startBlock = document.getClosestBlock(startKey)
+  let endBlock = document.getClosestBlock(endKey)
 
-  // If the start child is a void node, and the range begins or
-  // ends (when range is backward) at the start of it, remove it
-  // and set nextSibling as startChild until there is no startChild
-  // that is a void node and included in the selection range
-  let startChildIncludesVoid = startChild.isVoid && (
-    range.anchorOffset === 0 && !range.isBackward ||
-    range.focusOffset === 0 && range.isBackward
+  // Check if we have a "hanging" selection case where the even though the
+  // selection extends into the start of the end node, we actually want to
+  // ignore that for UX reasons.
+  const isHanging = (
+    startOffset == 0 &&
+    endOffset == 0 &&
+    isStartVoid == false &&
+    startKey == startBlock.getFirstText().key &&
+    endKey == endBlock.getFirstText().key
   )
 
-  while (startChildIncludesVoid) {
-    const nextSibling = document.getNextSibling(startChild.key)
-    change.removeNodeByKey(startChild.key, OPTS)
-    // Abort if no nextSibling or we are about to process the endChild which is aslo a void node
-    if (!nextSibling || endChild.key === nextSibling.key && nextSibling.isVoid) {
-      startChildIncludesVoid = false
-      return
-    }
-    // Process the next void
-    if (nextSibling.isVoid) {
-      startChild = nextSibling
-    }
-    // Set the startChild, startKey and startOffset in the beginning of the next non void sibling
-    if (!nextSibling.isVoid) {
-      startChild = nextSibling
-      if (startChild.getTexts) {
-        startKey = startChild.getTexts().first().key
-      } else {
-        startKey = startChild.key
-      }
-      startOffset = 0
-      startChildIncludesVoid = false
-    }
+  // If it's a hanging selection, nudge it back to end in the previous text.
+  if (isHanging) {
+    const prevText = document.getPreviousText(endKey)
+    endKey = prevText.key
+    endOffset = prevText.text.length
+    isEndVoid = document.hasVoidParent(endKey)
   }
 
-  // If the start child is a void node, and the range ends or
-  // begins (when range is backward) at the end of it move to nextSibling
-  const startChildEndOfVoid = startChild.isVoid && (
-    range.anchorOffset === 1 && !range.isBackward ||
-    range.focusOffset === 1 && range.isBackward
-  )
+  // If the start node is inside a void node, remove the void node and update
+  // the starting point to be right after it, continuously until the start point
+  // is not a void, or until the entire range is handled.
+  while (isStartVoid) {
+    const startVoid = document.getClosestVoid(startKey)
+    const nextText = document.getNextText(startKey)
+    change.removeNodeByKey(startVoid.key, { normalize: false })
 
-  if (startChildEndOfVoid) {
-    const nextSibling = document.getNextSibling(startChild.key)
-    if (nextSibling) {
-      startChild = nextSibling
-      if (startChild.getTexts) {
-        startKey = startChild.getTexts().first().key
-      } else {
-        startKey = startChild.key
-      }
-      startOffset = 0
-    }
-  }
+    // If the start and end keys are the same, we're done.
+    if (startKey == endKey) return
 
-  // If the selection starts at an inline void, remove that void inline first
-  const startInline = document.getClosestInline(startKey)
-  if (startInline && startInline.isVoid &&
-      startInline.getTexts().first().key == startKey) {
-    const nextText = document.getNextText(startInline.getTexts().first().key)
-    change.removeNodeByKey(startInline.key, OPTS)
+    // If there is no next text node, we're done.
+    if (!nextText) return
+
+    // Continue...
+    document = change.state.document
     startKey = nextText.key
     startOffset = 0
+    isStartVoid = document.hasVoidParent(startKey)
   }
 
-  // If the start and end key are the same, we can just remove it.
-  if (startKey == endKey) {
-    // If it is a void node, remove the whole node
-    if (ancestor.isVoid) {
-      // Deselect if this is the only node left in document
-      if (document.nodes.size === 1) {
-        change.deselect()
-      }
-      change.removeNodeByKey(ancestor.key, OPTS)
-      return
-    }
-    // Remove the text
+  // If the end node is inside a void node, do the same thing but backwards. But
+  // we don't need any aborting checks because if we've gotten this far there
+  // must be a non-void node that will exit the loop.
+  while (isEndVoid) {
+    const endVoid = document.getClosestVoid(endKey)
+    const prevText = document.getPreviousText(endKey)
+    change.removeNodeByKey(endVoid.key, { normalize: false })
+
+    // Continue...
+    document = change.state.document
+    endKey = prevText.key
+    endOffset = prevText.text.length
+    isEndVoid = document.hasVoidParent(endKey)
+  }
+
+  // If the start and end key are the same, and it was a hanging selection, we
+  // can just remove the entire block.
+  if (startKey == endKey && isHanging) {
+    change.removeNodeByKey(startBlock.key)
+    return
+  }
+
+  // Otherwise, if it wasn't hanging, we're inside a single text node, so we can
+  // simply remove the text in the range.
+  else if (startKey == endKey) {
     const index = startOffset
     const length = endOffset - startOffset
     change.removeTextByKey(startKey, index, length, { normalize })
     return
   }
 
-  // Split at the range edges within a common ancestor, without normalizing.
-  state = change.state
-  document = state.document
+  // Otherwise, we need to remove more than one node, so first split at the
+  // range edges within a common ancestor, without normalizing. This makes it
+  // easy, because we can then just remove every node inside the split.
+  document = change.state.document
+  let ancestor = document.getCommonAncestor(startKey, endKey)
+  let startChild = ancestor.getFurthestAncestor(startKey)
+  let endChild = ancestor.getFurthestAncestor(endKey)
+  change.splitDescendantsByKey(startChild.key, startKey, startOffset, { normalize: false })
+  change.splitDescendantsByKey(endChild.key, endKey, endOffset, { normalize: false })
+
+  // Refresh the variables after the split.
+  document = change.state.document
   ancestor = document.getCommonAncestor(startKey, endKey)
   startChild = ancestor.getFurthestAncestor(startKey)
   endChild = ancestor.getFurthestAncestor(endKey)
 
-  if (startChild.kind == 'text') {
-    change.splitNodeByKey(startChild.key, startOffset, OPTS)
-  } else {
-    change.splitDescendantsByKey(startChild.key, startKey, startOffset, OPTS)
-  }
-
-  if (endChild.kind == 'text') {
-    change.splitNodeByKey(endChild.key, endOffset, OPTS)
-  } else {
-    change.splitDescendantsByKey(endChild.key, endKey, endOffset, OPTS)
-  }
-
-  // Refresh variables.
-  state = change.state
-  document = state.document
-  ancestor = document.getCommonAncestor(startKey, endKey)
-  startChild = ancestor.getFurthestAncestor(startKey)
-  endChild = ancestor.getFurthestAncestor(endKey)
-
-
+  // Determine which are the middle nodes.
   const nextText = document.getNextText(endKey)
   const startIndex = ancestor.nodes.indexOf(startChild)
   const endIndex = ancestor.nodes.indexOf(endChild)
   const middles = ancestor.nodes.slice(startIndex + 1, endIndex + 1)
+  startBlock = document.getClosestBlock(startKey)
+  endBlock = document.getClosestBlock(nextText.key)
 
   // Remove all of the middle nodes, between the splits.
-  if (middles.size) {
-    middles.forEach((child) => {
-      change.removeNodeByKey(child.key, OPTS)
-    })
+  middles.forEach((child) => {
+    change.removeNodeByKey(child.key, { normalize: false })
+  })
+
+  // If the start and end blocks are different, and the selection was hanging,
+  // remove the start block and the orphaned end block.
+  if (startBlock.key != endBlock.key && isHanging) {
+    change.removeNodeByKey(startBlock.key, { normalize: false })
+    change.removeNodeByKey(endBlock.key, { normalize: false })
   }
 
-  // Refresh variables
-  state = change.state
-  document = state.document
-
-  const startBlock = document.getClosestBlock(startKey)
-  const endBlock = document.getClosestBlock(nextText.key)
-
-  // If the whole startBlock is selected but the endBlock is different, just remove the startBlock
-  if (startBlock.key !== endBlock.key && startChild.text.length === endOffset && startOffset === 0) {
-    document = change.removeNodeByKey(startBlock.key, OPTS).state.document
-    return
-  }
-
-  // If the endBlock is void, remove what is selected of the start block
-  if (endBlock.isVoid && endOffset === 0) {
-    // If part of the startBlock is selected, split it and remove the unwanted part
-    document = change.splitNodeByKey(startChild.key, startOffset, OPTS).state.document
-    const toBeRemoved = document.nodes.get(startIndex + 1)
-    change.removeNodeByKey(toBeRemoved.key, OPTS)
-    return
-  }
-
-  // If the start and end block are different, move all of the nodes from the
-  // end block into the start block
-  if (startBlock.key !== endBlock.key) {
+  // Otherwise, move all of the nodes from the end block into the start block.
+  else if (startBlock.key != endBlock.key) {
     endBlock.nodes.forEach((child, i) => {
       const newKey = startBlock.key
       const newIndex = startBlock.nodes.size + i
-      change.moveNodeByKey(child.key, newKey, newIndex, OPTS)
+      change.moveNodeByKey(child.key, newKey, newIndex, { normalize: false })
     })
 
-    // Remove parents of endBlock as long as they have a single child
+    // Remove parents of endBlock as long as they have a single child.
     const lonely = document.getFurthestOnlyChildAncestor(endBlock.key) || endBlock
-    change.removeNodeByKey(lonely.key, OPTS)
+    change.removeNodeByKey(lonely.key, { normalize: false })
   }
 
   if (normalize) {
@@ -327,11 +281,13 @@ Changes.deleteBackwardAtRange = (change, range, n = 1, options = {}) => {
   }
 
   const block = document.getClosestBlock(startKey)
+
   // If the closest block is void, delete it.
   if (block && block.isVoid) {
     change.removeNodeByKey(block.key, { normalize })
     return
   }
+
   // If the closest is not void, but empty, remove it
   if (block && !block.isVoid && block.isEmpty && document.nodes.size !== 1) {
     change.removeNodeByKey(block.key, { normalize })
@@ -511,11 +467,13 @@ Changes.deleteForwardAtRange = (change, range, n = 1, options = {}) => {
   }
 
   const block = document.getClosestBlock(startKey)
+
   // If the closest block is void, delete it.
   if (block && block.isVoid) {
     change.removeNodeByKey(block.key, { normalize })
     return
   }
+
   // If the closest is not void, but empty, remove it
   if (block && !block.isVoid && block.isEmpty && document.nodes.size !== 1) {
     change.removeNodeByKey(block.key, { normalize })
@@ -655,7 +613,7 @@ Changes.insertBlockAtRange = (change, range, block, options = {}) => {
   }
 
   else {
-    change.splitDescendantsByKey(startBlock.key, startKey, startOffset, OPTS)
+    change.splitDescendantsByKey(startBlock.key, startKey, startOffset, { normalize: false })
     change.insertNodeByKey(parent.key, index + 1, block, { normalize })
   }
 
@@ -679,7 +637,7 @@ Changes.insertFragmentAtRange = (change, range, fragment, options = {}) => {
 
   // If the range is expanded, delete it first.
   if (range.isExpanded) {
-    change.deleteAtRange(range, OPTS)
+    change.deleteAtRange(range, { normalize: false })
     range = range.collapseToStart()
   }
 
@@ -694,7 +652,7 @@ Changes.insertFragmentAtRange = (change, range, fragment, options = {}) => {
 
   // Calculate a few things...
   const { startKey, startOffset } = range
-  let { state } = change
+  const { state } = change
   let { document } = state
   let startText = document.getDescendant(startKey)
   let startBlock = document.getClosestBlock(startText.key)
@@ -722,18 +680,17 @@ Changes.insertFragmentAtRange = (change, range, fragment, options = {}) => {
 
     fragment.nodes.forEach((node, i) => {
       const newIndex = startIndex + i + 1
-      change.insertNodeByKey(parent.key, newIndex, node, OPTS)
+      change.insertNodeByKey(parent.key, newIndex, node, { normalize: false })
     })
   }
 
   // Check if we need to split the node.
   if (startOffset != 0) {
-    change.splitDescendantsByKey(startChild.key, startKey, startOffset, OPTS)
+    change.splitDescendantsByKey(startChild.key, startKey, startOffset, { normalize: false })
   }
 
   // Update our variables with the new state.
-  state = change.state
-  document = state.document
+  document = change.state.document
   startText = document.getDescendant(startKey)
   startBlock = document.getClosestBlock(startKey)
   startChild = startBlock.getFurthestAncestor(startText.key)
@@ -748,15 +705,15 @@ Changes.insertFragmentAtRange = (change, range, fragment, options = {}) => {
 
     nextNodes.forEach((node, i) => {
       const newIndex = lastIndex + i
-      change.moveNodeByKey(node.key, lastBlock.key, newIndex, OPTS)
+      change.moveNodeByKey(node.key, lastBlock.key, newIndex, { normalize: false })
     })
   }
 
   // If the starting block is empty, we replace it entirely with the first block
   // of the fragment, since this leads to a more expected behavior for the user.
   if (startBlock.isEmpty) {
-    change.removeNodeByKey(startBlock.key, OPTS)
-    change.insertNodeByKey(parent.key, index, firstBlock, OPTS)
+    change.removeNodeByKey(startBlock.key, { normalize: false })
+    change.insertNodeByKey(parent.key, index, firstBlock, { normalize: false })
   }
 
   // Otherwise, we maintain the starting block, and insert all of the first
@@ -768,7 +725,7 @@ Changes.insertFragmentAtRange = (change, range, fragment, options = {}) => {
     firstBlock.nodes.forEach((inline, i) => {
       const o = startOffset == 0 ? 0 : 1
       const newIndex = inlineIndex + i + o
-      change.insertNodeByKey(startBlock.key, newIndex, inline, OPTS)
+      change.insertNodeByKey(startBlock.key, newIndex, inline, { normalize: false })
     })
   }
 
@@ -793,7 +750,7 @@ Changes.insertInlineAtRange = (change, range, inline, options = {}) => {
   inline = Inline.create(inline)
 
   if (range.isExpanded) {
-    change.deleteAtRange(range, OPTS)
+    change.deleteAtRange(range, { normalize: false })
     range = range.collapseToStart()
   }
 
@@ -806,8 +763,8 @@ Changes.insertInlineAtRange = (change, range, inline, options = {}) => {
 
   if (parent.isVoid) return
 
-  change.splitNodeByKey(startKey, startOffset, OPTS)
-  change.insertNodeByKey(parent.key, index + 1, inline, OPTS)
+  change.splitNodeByKey(startKey, startOffset, { normalize: false })
+  change.insertNodeByKey(parent.key, index + 1, inline, { normalize: false })
 
   if (normalize) {
     change.normalizeNodeByKey(parent.key, SCHEMA)
@@ -835,7 +792,7 @@ Changes.insertTextAtRange = (change, range, text, marks, options = {}) => {
   if (parent.isVoid) return
 
   if (range.isExpanded) {
-    change.deleteAtRange(range, OPTS)
+    change.deleteAtRange(range, { normalize: false })
   }
 
   // PERF: Unless specified, don't normalize if only inserting text.
@@ -1031,7 +988,7 @@ Changes.unwrapBlockAtRange = (change, range, properties, options = {}) => {
   properties = Node.createProperties(properties)
 
   const { normalize = true } = options
-  let { state } = change
+  const { state } = change
   let { document } = state
   const blocks = document.getBlocksAtRange(range)
   const wrappers = blocks
@@ -1063,17 +1020,17 @@ Changes.unwrapBlockAtRange = (change, range, properties, options = {}) => {
 
     if (first == firstMatch && last == lastMatch) {
       block.nodes.forEach((child, i) => {
-        change.moveNodeByKey(child.key, parent.key, index + i, OPTS)
+        change.moveNodeByKey(child.key, parent.key, index + i, { normalize: false })
       })
 
-      change.removeNodeByKey(block.key, OPTS)
+      change.removeNodeByKey(block.key, { normalize: false })
     }
 
     else if (last == lastMatch) {
       block.nodes
         .skipUntil(n => n == firstMatch)
         .forEach((child, i) => {
-          change.moveNodeByKey(child.key, parent.key, index + 1 + i, OPTS)
+          change.moveNodeByKey(child.key, parent.key, index + 1 + i, { normalize: false })
         })
     }
 
@@ -1082,24 +1039,23 @@ Changes.unwrapBlockAtRange = (change, range, properties, options = {}) => {
         .takeUntil(n => n == lastMatch)
         .push(lastMatch)
         .forEach((child, i) => {
-          change.moveNodeByKey(child.key, parent.key, index + i, OPTS)
+          change.moveNodeByKey(child.key, parent.key, index + i, { normalize: false })
         })
     }
 
     else {
       const firstText = firstMatch.getFirstText()
-      change.splitDescendantsByKey(block.key, firstText.key, 0, OPTS)
-      state = change.state
-      document = state.document
+      change.splitDescendantsByKey(block.key, firstText.key, 0, { normalize: false })
+      document = change.state.document
 
       children.forEach((child, i) => {
         if (i == 0) {
           const extra = child
           child = document.getNextBlock(child.key)
-          change.removeNodeByKey(extra.key, OPTS)
+          change.removeNodeByKey(extra.key, { normalize: false })
         }
 
-        change.moveNodeByKey(child.key, parent.key, index + 1 + i, OPTS)
+        change.moveNodeByKey(child.key, parent.key, index + 1 + i, { normalize: false })
       })
     }
   })
@@ -1146,7 +1102,7 @@ Changes.unwrapInlineAtRange = (change, range, properties, options = {}) => {
     const index = parent.nodes.indexOf(inline)
 
     inline.nodes.forEach((child, i) => {
-      change.moveNodeByKey(child.key, parent.key, index + i, OPTS)
+      change.moveNodeByKey(child.key, parent.key, index + i, { normalize: false })
     })
   })
 
@@ -1215,11 +1171,11 @@ Changes.wrapBlockAtRange = (change, range, block, options = {}) => {
   }
 
   // Inject the new block node into the parent.
-  change.insertNodeByKey(parent.key, index, block, OPTS)
+  change.insertNodeByKey(parent.key, index, block, { normalize: false })
 
   // Move the sibling nodes into the new block node.
   siblings.forEach((node, i) => {
-    change.moveNodeByKey(node.key, block.key, i, OPTS)
+    change.moveNodeByKey(node.key, block.key, i, { normalize: false })
   })
 
   if (normalize) {
@@ -1238,7 +1194,7 @@ Changes.wrapBlockAtRange = (change, range, block, options = {}) => {
  */
 
 Changes.wrapInlineAtRange = (change, range, inline, options = {}) => {
-  let { state } = change
+  const { state } = change
   let { document } = state
   const { normalize = true } = options
   const { startKey, startOffset, endKey, endOffset } = range
@@ -1262,11 +1218,10 @@ Changes.wrapInlineAtRange = (change, range, inline, options = {}) => {
   let startChild = startBlock.getFurthestAncestor(startKey)
   let endChild = endBlock.getFurthestAncestor(endKey)
 
-  change.splitDescendantsByKey(endChild.key, endKey, endOffset, OPTS)
-  change.splitDescendantsByKey(startChild.key, startKey, startOffset, OPTS)
+  change.splitDescendantsByKey(endChild.key, endKey, endOffset, { normalize: false })
+  change.splitDescendantsByKey(startChild.key, startKey, startOffset, { normalize: false })
 
-  state = change.state
-  document = state.document
+  document = change.state.document
   startBlock = document.getDescendant(startBlock.key)
   endBlock = document.getDescendant(endBlock.key)
   startChild = startBlock.getFurthestAncestor(startKey)
@@ -1275,8 +1230,7 @@ Changes.wrapInlineAtRange = (change, range, inline, options = {}) => {
   const endIndex = endBlock.nodes.indexOf(endChild)
 
   if (startBlock == endBlock) {
-    state = change.state
-    document = state.document
+    document = change.state.document
     startBlock = document.getClosestBlock(startKey)
     startChild = startBlock.getFurthestAncestor(startKey)
 
@@ -1290,10 +1244,10 @@ Changes.wrapInlineAtRange = (change, range, inline, options = {}) => {
 
     const node = inline.regenerateKey()
 
-    change.insertNodeByKey(startBlock.key, startInnerIndex, node, OPTS)
+    change.insertNodeByKey(startBlock.key, startInnerIndex, node, { normalize: false })
 
     inlines.forEach((child, i) => {
-      change.moveNodeByKey(child.key, node.key, i, OPTS)
+      change.moveNodeByKey(child.key, node.key, i, { normalize: false })
     })
 
     if (normalize) {
@@ -1307,15 +1261,15 @@ Changes.wrapInlineAtRange = (change, range, inline, options = {}) => {
     const startNode = inline.regenerateKey()
     const endNode = inline.regenerateKey()
 
-    change.insertNodeByKey(startBlock.key, startIndex - 1, startNode, OPTS)
-    change.insertNodeByKey(endBlock.key, endIndex, endNode, OPTS)
+    change.insertNodeByKey(startBlock.key, startIndex - 1, startNode, { normalize: false })
+    change.insertNodeByKey(endBlock.key, endIndex, endNode, { normalize: false })
 
     startInlines.forEach((child, i) => {
-      change.moveNodeByKey(child.key, startNode.key, i, OPTS)
+      change.moveNodeByKey(child.key, startNode.key, i, { normalize: false })
     })
 
     endInlines.forEach((child, i) => {
-      change.moveNodeByKey(child.key, endNode.key, i, OPTS)
+      change.moveNodeByKey(child.key, endNode.key, i, { normalize: false })
     })
 
     if (normalize) {
@@ -1326,10 +1280,10 @@ Changes.wrapInlineAtRange = (change, range, inline, options = {}) => {
 
     blocks.slice(1, -1).forEach((block) => {
       const node = inline.regenerateKey()
-      change.insertNodeByKey(block.key, 0, node, OPTS)
+      change.insertNodeByKey(block.key, 0, node, { normalize: false })
 
       block.nodes.forEach((child, i) => {
-        change.moveNodeByKey(child.key, node.key, i, OPTS)
+        change.moveNodeByKey(child.key, node.key, i, { normalize: false })
       })
 
       if (normalize) {

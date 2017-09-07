@@ -8,9 +8,6 @@ nodes:
       - kind: inline
         type: image
         isVoid: true
-        nodes:
-          - kind: text
-            text: ""
       - kind: text
         text: two
   - kind: block
