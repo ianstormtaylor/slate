@@ -164,9 +164,14 @@ class Content extends React.Component {
       return
     }
 
+    const { anchorKey, focusKey } = selection
+
+    // If the selection has no anchorKey and focusKey (deselected) do nothing
+    if (!selection.anchorKey && !selection.focusKey) return
+
     // Otherwise, figure out which DOM nodes should be selected...
     const { anchorText, focusText } = state
-    const { anchorKey, anchorOffset, focusKey, focusOffset } = selection
+    const { anchorOffset, focusOffset } = selection
     const schema = editor.getSchema()
     const anchorDecorators = document.getDescendantDecorators(anchorKey, schema)
     const focusDecorators = document.getDescendantDecorators(focusKey, schema)
