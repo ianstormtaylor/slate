@@ -6,7 +6,6 @@ import Document from './document'
 import History from './history'
 import Selection from './selection'
 import isPlainObject from 'is-plain-object'
-import logger from '../utils/logger'
 import { Record, Set, List, Map } from 'immutable'
 
 /**
@@ -518,17 +517,6 @@ class State extends Record(DEFAULTS) {
 
   change(attrs = {}) {
     return new Change({ ...attrs, state: this })
-  }
-
-  /**
-   * Deprecated.
-   *
-   * @return {Change}
-   */
-
-  transform(...args) {
-    logger.deprecate('0.22.0', 'The `state.transform()` method has been deprecated in favor of `state.change()`.')
-    return this.change(...args)
   }
 
 }

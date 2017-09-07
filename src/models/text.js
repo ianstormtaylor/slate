@@ -5,7 +5,6 @@ import Range from './range'
 import MODEL_TYPES from '../constants/model-types'
 import generateKey from '../utils/generate-key'
 import isPlainObject from 'is-plain-object'
-import logger from '../utils/logger'
 import memoize from '../utils/memoize'
 import { List, Record, OrderedSet, is } from 'immutable'
 
@@ -103,24 +102,6 @@ class Text extends Record(DEFAULTS) {
 
   static isTextList(value) {
     return List.isList(value) && value.size > 0 && Text.isText(value.first())
-  }
-
-  /**
-   * Deprecated.
-   */
-
-  static createFromString(string) {
-    logger.deprecate('0.22.0', 'The `Text.createFromString(string)` method is deprecated, use `Text.create(string)` instead.')
-    return Text.create(string)
-  }
-
-  /**
-   * Deprecated.
-   */
-
-  static createFromRanges(ranges) {
-    logger.deprecate('0.22.0', 'The `Text.createFromRanges(ranges)` method is deprecated, use `Text.create(ranges)` instead.')
-    return Text.create(ranges)
   }
 
   /**

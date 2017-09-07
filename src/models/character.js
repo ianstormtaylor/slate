@@ -2,7 +2,6 @@
 import MODEL_TYPES from '../constants/model-types'
 import Mark from './mark'
 import isPlainObject from 'is-plain-object'
-import logger from '../utils/logger'
 import { List, Record, Set } from 'immutable'
 
 /**
@@ -94,15 +93,6 @@ class Character extends Record(DEFAULTS) {
 
   static isCharacterList(value) {
     return List.isList(value) && value.size > 0 && Character.isCharacter(value.first())
-  }
-
-  /**
-   * Deprecated.
-   */
-
-  static createListFromText(string) {
-    logger.deprecate('0.22.0', 'The `Character.createListFromText(string)` method is deprecated, use `Character.createList(string)` instead.')
-    return this.createList(string)
   }
 
   /**
