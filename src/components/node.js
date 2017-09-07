@@ -119,10 +119,6 @@ class Node extends React.Component {
     // user-land logic depends on it to render.
     if (n.isSelected != p.isSelected) return true
 
-    // If the Node has children that aren't just Text's then allow them to decide
-    // If they should update it or not.
-    if (n.node.kind != 'text' && !Text.isTextList(n.node.nodes)) return true
-
     // If the node is a text node, re-render if the current decorations have
     // changed, even if the content of the text node itself hasn't.
     if (n.node.kind == 'text' && n.schema.hasDecorators) {
