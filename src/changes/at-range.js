@@ -209,13 +209,14 @@ Changes.deleteAtRange = (change, range, options = {}) => {
   const startBlock = document.getClosestBlock(startKey)
   const endBlock = document.getClosestBlock(nextText.key)
 
+  // If the whole startBlock is selected but the endBlock is different, just remove the startBlock
+  if (startBlock.key !== endBlock.key && startChild.text.length === endOffset && startOffset === 0) {
+    document = change.removeNodeByKey(startBlock.key, OPTS).state.document
+    return
+  }
+
   // If the endBlock is void, remove what is selected of the start block
   if (endBlock.isVoid && endOffset === 0) {
-    // If the whole startBlock is selected, just remove it
-    if (startChild.text.length === endOffset && startOffset === 0) {
-      change.removeNodeByKey(startBlock.key, OPTS)
-      return
-    }
     // If part of the startBlock is selected, split it and remove the unwanted part
     document = change.splitNodeByKey(startChild.key, startOffset, OPTS).state.document
     const toBeRemoved = document.nodes.get(startIndex + 1)
