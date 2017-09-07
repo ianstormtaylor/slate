@@ -7,6 +7,7 @@ import Types from 'prop-types'
 import Stack from '../models/stack'
 import State from '../models/state'
 import SlateTypes from '../utils/prop-types'
+import logger from '../utils/logger'
 import noop from '../utils/noop'
 
 /**
@@ -71,8 +72,6 @@ class Editor extends React.Component {
     className: Types.string,
     onBeforeChange: Types.func,
     onChange: Types.func,
-    onDocumentChange: Types.func,
-    onSelectionChange: Types.func,
     placeholder: Types.any,
     placeholderClassName: Types.string,
     placeholderStyle: Types.object,
@@ -96,8 +95,6 @@ class Editor extends React.Component {
     autoFocus: false,
     autoCorrect: true,
     onChange: noop,
-    onDocumentChange: noop,
-    onSelectionChange: noop,
     plugins: [],
     readOnly: false,
     schema: {},
@@ -136,6 +133,14 @@ class Editor extends React.Component {
         stk.onChange(change, this)
         this.onChange(change)
       }
+    }
+
+    if (props.onDocumentChange) {
+      logger.deprecate('0.22.10', 'The `onDocumentChange` prop is deprecated because it led to confusing UX issues, see https://github.com/ianstormtaylor/slate/issues/614#issuecomment-327868679')
+    }
+
+    if (props.onSelectionChange) {
+      logger.deprecate('0.22.10', 'The `onSelectionChange` prop is deprecated because it led to confusing UX issues, see https://github.com/ianstormtaylor/slate/issues/614#issuecomment-327868679')
     }
   }
 
@@ -239,8 +244,8 @@ class Editor extends React.Component {
     if (state == this.state.state) return
 
     onChange(change)
-    if (state.document != document) onDocumentChange(state.document, change)
-    if (state.selection != selection) onSelectionChange(state.selection, change)
+    if (onDocumentChange && state.document != document) onDocumentChange(state.document, change)
+    if (onSelectionChange && state.selection != selection) onSelectionChange(state.selection, change)
   }
 
   /**

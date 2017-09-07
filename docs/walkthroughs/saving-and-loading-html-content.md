@@ -239,23 +239,21 @@ class App extends React.Component {
   }
 
   onChange = ({ state }) => {
+    // When the document changes, save the serialized HTML to Local Storage.
+    if (state.document != this.state.state.document) {
+      const string = html.serialize(state)
+      localStorage.setItem('content', string)
+    }
+
     this.setState({ state })
   }
 
-  // When the document changes, save the serialized HTML to Local Storage.
-  onDocumentChange = (document, { state }) => {
-    const string = html.serialize(state)
-    localStorage.setItem('content', string)
-  }
-
   render() {
-    // Add the `onDocumentChange` handler.
     return (
       <Editor
         schema={this.state.schema}
         state={this.state.state}
         onChange={this.onChange}
-        onDocumentChange={this.onDocumentChange}
       />
     )
   }
