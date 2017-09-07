@@ -116,7 +116,7 @@ class Block extends Record(DEFAULTS) {
    */
 
   static isBlockList(value) {
-    return List.isList(value) && value.size > 0 && Block.isBlock(value.first())
+    return List.isList(value) && value.every(item => Block.isBlock(item))
   }
 
   /**

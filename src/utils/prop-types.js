@@ -1,6 +1,4 @@
 
-import { Set } from 'immutable'
-
 import Block from '../models/block'
 import Change from '../models/change'
 import Character from '../models/character'
@@ -62,7 +60,7 @@ const Types = {
   history: create('History', v => History.isHistory(v)),
   inline: create('Inline', v => Inline.isInline(v)),
   mark: create('Mark', v => Mark.isMark(v)),
-  marks: create('Set<Mark>', v => (Set.isSet(v) && v.size === 0) || Mark.isMarkSet(v)),
+  marks: create('Set<Mark>', v => Mark.isMarkSet(v)),
   node: create('Node', v => Node.isNode(v)),
   nodes: create('List<Node>', v => Node.isNodeList(v)),
   range: create('Range', v => Range.isRange(v)),

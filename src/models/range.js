@@ -72,7 +72,7 @@ class Range extends Record(DEFAULTS) {
    */
 
   static isRangeList(value) {
-    return List.isList(value) && value.size > 0 && Range.isRange(value.first())
+    return List.isList(value) && value.every(item => Range.isRange(item))
   }
 
   /**

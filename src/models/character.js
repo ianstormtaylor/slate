@@ -93,7 +93,7 @@ class Character extends Record(DEFAULTS) {
    */
 
   static isCharacterList(value) {
-    return List.isList(value) && value.size > 0 && Character.isCharacter(value.first())
+    return List.isList(value) && value.every(item => Character.isCharacter(item))
   }
 
   /**

@@ -116,7 +116,7 @@ class Inline extends Record(DEFAULTS) {
    */
 
   static isInlineList(value) {
-    return List.isList(value) && value.size > 0 && Inline.isInline(value.first())
+    return List.isList(value) && value.every(item => Inline.isInline(item))
   }
 
   /**

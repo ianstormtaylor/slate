@@ -121,7 +121,7 @@ class Node {
    */
 
   static isNodeList(value) {
-    return List.isList(value) && value.size > 0 && Node.isNode(value.first())
+    return List.isList(value) && value.every(item => Node.isNode(item))
   }
 
   /**
