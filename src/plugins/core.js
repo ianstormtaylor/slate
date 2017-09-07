@@ -155,7 +155,7 @@ function Plugin(options = {}) {
       // COMPAT: In Chrome & Safari, it isn't possible to have a selection at
       // the starting edge of a text node after another inline node. It will
       // have been automatically changed. So we can't render natively because
-      // the cursor isn't technique in the right spot. (2016/12/01)
+      // the cursor isn't technically in the right spot. (2016/12/01)
       (!(pInline && !pInline.isVoid && startOffset == 0)) &&
       (!(nInline && !nInline.isVoid && startOffset == startText.text.length)) &&
       // COMPAT: When inserting a Space character, Chrome will sometimes

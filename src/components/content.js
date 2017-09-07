@@ -792,19 +792,9 @@ class Content extends React.Component {
       const focusText = document.getNode(focus.key)
       const anchorInline = document.getClosestInline(anchor.key)
       const focusInline = document.getClosestInline(focus.key)
-      const focusBlock = document.getClosestBlock(focus.key)
-      const anchorBlock = document.getClosestBlock(anchor.key)
 
-      // When going from a non-void block to the start of a void-block
-      // the focus is most of the time collpased to the end of the void block.
-      // This is getting the void-block selected as well when it shouldn't.
-      // Make sure it is collapsed to the start in those cases.
-      if (anchorBlock && !anchorBlock.isVoid && focusBlock && focusBlock.isVoid && focus.offset == 1) {
-        properties.focusOffset = 0
-      }
-
-      // If the selection is at the end of a non-void inline node, and there is
-      // a node after it, put it in the node after instead.
+      // If the selection is at the end of a non-void inline node, and
+      // there is a node after it, put it in the node after instead.
       if (anchorInline && !anchorInline.isVoid && anchor.offset == anchorText.text.length) {
         const block = document.getClosestBlock(anchor.key)
         const next = block.getNextText(anchor.key)
