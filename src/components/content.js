@@ -164,14 +164,12 @@ class Content extends React.Component {
       return
     }
 
-    const { anchorKey, focusKey } = selection
-
     // If the selection isn't set, do nothing.
     if (selection.isUnset) return
 
     // Otherwise, figure out which DOM nodes should be selected...
     const { anchorText, focusText } = state
-    const { anchorOffset, focusOffset } = selection
+    const { anchorKey, anchorOffset, focusKey, focusOffset } = selection
     const schema = editor.getSchema()
     const anchorDecorators = document.getDescendantDecorators(anchorKey, schema)
     const focusDecorators = document.getDescendantDecorators(focusKey, schema)
