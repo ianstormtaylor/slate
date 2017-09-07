@@ -800,7 +800,7 @@ class Content extends React.Component {
       // the focus offset to `0`. This is due to void nodes <span>'s being
       // positioned off screen, resulting in the offset always being greater
       // than `0`. Since we can't know what it really should be, and since an
-      // offset of `0` is less destructive, since it creates a hanging
+      // offset of `0` is less destructive because it creates a hanging
       // selection, go with `0`. (2017/09/07)
       if (
         anchorBlock &&
