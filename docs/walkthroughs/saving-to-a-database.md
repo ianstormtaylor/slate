@@ -56,11 +56,11 @@ class App extends React.Component {
   }
 
   onChange = ({ state }) => {
-    this.setState({ state })
-
     // Save the state to Local Storage.
     const content = Plain.serialize(state)
     localStorage.setItem('content', content)
+
+    this.setState({ state })
   }
 
   render() {
@@ -93,10 +93,10 @@ class App extends React.Component {
   }
 
   onChange = ({ state }) => {
-    this.setState({ state })
-
     const content = Plain.serialize(state)
     localStorage.setItem('content', content)
+
+    this.setState({ state })
   }
 
   render() {
@@ -113,9 +113,7 @@ class App extends React.Component {
 
 Now you should be able to save changes across refreshes!
 
-However, if you inspect the change handler, you'll notice that it's actually saving the Local Storage value on _every_ change to the editor, even when only the selection changes! This is because `onChange` is called for _every_ change. For Local Storage this doesn't really matter, but if you're saving things to a database via HTTP request this would result in a lot of unnecessary requests.
-
-Instead of using `onChange`, Slate's editor also accepts an `onDocumentChange` convenience handler that you can use to isolate saving logic to only happen when the document itself has changed, like so:
+However, if you inspect the change handler, you'll notice that it's actually saving the Local Storage value on _every_ change to the editor, even when only the selection changes! This is because `onChange` is called for _every_ change. For Local Storage this doesn't really matter, but if you're saving things to a database via HTTP request this would result in a lot of unnecessary requests. You can fix this by checking against the previous `document` value.
 
 ```js
 const initialContent = (
@@ -129,22 +127,20 @@ class App extends React.Component {
   }
 
   onChange = ({ state }) => {
+    // Check to see if the document has changed before saving.
+    if (state.document != this.state.state.document) {
+      const content = Plain.serialize(state)
+      localStorage.setItem('content', content)
+    }
+
     this.setState({ state })
   }
 
-  // Pull the saving logic out into the `onDocumentChange` handler.
-  onDocumentChange = (document, { state }) => {
-    const content = Plain.serialize(state)
-    localStorage.setItem('content', content)
-  }
-
   render() {
-    // Add the `onDocumentChange` handler to the editor.
     return (
       <Editor
         state={this.state.state}
         onChange={this.onChange}
-        onDocumentChange={this.onDocumentChange}
       />
     )
   }
@@ -177,13 +173,13 @@ class App extends React.Component {
   }
 
   onChange = ({ state }) => {
-    this.setState({ state })
-  }
+    if (state.document != this.state.state.document) {
+      // Switch to using the Raw serializer.
+      const content = JSON.stringify(Raw.serialize(state))
+      localStorage.setItem('content', content)
+    }
 
-  onDocumentChange = (document, { state }) => {
-    // Switch to using the Raw serializer.
-    const content = JSON.stringify(Raw.serialize(state))
-    localStorage.setItem('content', content)
+    this.setState({ state })
   }
 
   render() {
@@ -191,7 +187,6 @@ class App extends React.Component {
       <Editor
         state={this.state.state}
         onChange={this.onChange}
-        onDocumentChange={this.onDocumentChange}
       />
     )
   }

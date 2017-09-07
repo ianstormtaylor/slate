@@ -12,8 +12,6 @@ The top-level React component that renders the Slate editor itself.
   - [`autoFocus`](#autofocus)
   - [`className`](#classname)
   - [`onChange`](#onchange)
-  - [`onDocumentChange`](#ondocumentchange)
-  - [`onSelectionChange`](#onselectionchange)
   - [`plugins`](#plugins)
   - [`readOnly`](#readonly)
   - [`role`](#role)
@@ -53,8 +51,6 @@ The top-level React component that renders the Slate editor itself.
   autoFocus={Boolean}
   className={String}
   onChange={Function}
-  onDocumentChange={Function}
-  onSelectionChange={Function}
   plugins={Array}
   readOnly={Boolean}
   role={String}
@@ -84,16 +80,6 @@ An optional class name to apply to the content editable element.
 `Function onChange(change: Change)`
 
 A change handler that will be called with the `change` that applied the change. You should usually pass the newly changed `change.state` back into the editor through its `state` property. This hook allows you to add persistence logic to your editor.
-
-### `onDocumentChange`
-`Function onDocumentChange(document: Document, change: Change)`
-
-A convenience handler property that will only be called for changes in state where the document has changed. It is called with the changed `document` and `change`.
-
-### `onSelectionChange`
-`Function onSelectionChange(selection: Selection, change: Change)`
-
-A convenience handler property that will only be called for changes in state where the selection has changed. It is called with the changed `selection` and `change`.
 
 ### `plugins`
 `Array`

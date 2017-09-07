@@ -202,7 +202,7 @@ The `data` object contains a State [`Selection`](../models/selection.md) object 
 
 If no other plugin handles this event, it will be handled by the [Core plugin](./core.md).
 
-_Note: This is **not** Slate's internal selection representation (although it mirrors it). If you want to get notified when Slate's selection changes, use the [`onSelectionChange`](../components/editor.md#onselectionchange) property of the `<Editor>`. This handler is instead meant to give you lower-level access to the DOM selection handling, which **is not always triggered** as you'd expect._
+_Note: This is **not** Slate's internal selection representation (although it mirrors it). If you want to get notified when Slate's selection changes, use the [`onChange`](../components/editor.md#onchange) property of the `<Editor>`. This handler is instead meant to give you lower-level access to the DOM selection handling, which **is not always triggered** as you'd expect._
 
 
 ## Other Properties
