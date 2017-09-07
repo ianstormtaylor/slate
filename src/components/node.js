@@ -111,6 +111,10 @@ class Node extends React.Component {
     // for simplicity we just let them through.
     if (nextProps.node != props.node) return true
 
+    // If the Node has children that aren't just Text's then allow them to decide
+    // If they should update it or not.
+    if (nextProps.node.kind != 'text' && Text.isTextList(nextProps.node.nodes) == false) return true
+
     // If the node is a block or inline, which can have custom renderers, we
     // include an extra check to re-render if the node either becomes part of,
     // or leaves, a selection. This is to make it simple for users to show a
