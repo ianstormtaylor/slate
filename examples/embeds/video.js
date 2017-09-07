@@ -30,7 +30,7 @@ class Video extends React.Component {
   onChange = (e) => {
     const video = e.target.value
     const { node, editor } = this.props
-    editor.transform(t => t.setNodeByKey(node.key, { data: { video }}))
+    editor.change(c => c.setNodeByKey(node.key, { data: { video }}))
   }
 
   /**
