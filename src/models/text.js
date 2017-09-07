@@ -102,7 +102,7 @@ class Text extends Record(DEFAULTS) {
    */
 
   static isTextList(value) {
-    return List.isList(value) && value.size > 0 && Text.isText(value.first())
+    return List.isList(value) && value.every(item => Text.isText(item))
   }
 
   /**

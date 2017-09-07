@@ -126,7 +126,7 @@ class Mark extends Record(DEFAULTS) {
    */
 
   static isMarkSet(value) {
-    return Set.isSet(value) && value.size > 0 && Mark.isMark(value.first())
+    return Set.isSet(value) && value.every(item => Mark.isMark(item))
   }
 
   /**
