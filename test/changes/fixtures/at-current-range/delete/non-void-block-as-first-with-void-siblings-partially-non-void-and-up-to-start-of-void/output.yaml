@@ -6,9 +6,6 @@ nodes:
       - kind: text
         text: "one "
   - kind: block
-    type: image
-    isVoid: true
-  - kind: block
     type: paragraph
     nodes:
       - kind: text
