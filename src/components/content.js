@@ -792,6 +792,18 @@ class Content extends React.Component {
       const focusText = document.getNode(focus.key)
       const anchorInline = document.getClosestInline(anchor.key)
       const focusInline = document.getClosestInline(focus.key)
+      const focusBlock = document.getClosestBlock(focus.key)
+      const anchorBlock = document.getClosestBlock(anchor.key)
+
+      // COMPAT: If the anchor point is outside a void, and the focus point is
+      // inside one, with an offset of `1`, we need to nudge the offset back to
+      // `0`. This is because of how void nodes <span>'s are positioned,
+      // resulting in the offset always being `1`. Since we can't know which,
+      // and since an offset of `0` is less destructive, since it creates a
+      // hanging selection, we choose `0` instead. (2017/09/07)
+      if (anchorBlock && !anchorBlock.isVoid && focusBlock && focusBlock.isVoid && focus.offset == 1) {
+        properties.focusOffset = 0
+      }
 
       // If the selection is at the end of a non-void inline node, and
       // there is a node after it, put it in the node after instead.
