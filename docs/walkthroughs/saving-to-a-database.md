@@ -21,8 +21,8 @@ class App extends React.Component {
   state = {
     state: Plain.deserialize(initialContent)
   }
-  
-  onChange = (state) => {
+
+  onChange = ({ state }) => {
     this.setState({ state })
   }
 
@@ -55,7 +55,7 @@ class App extends React.Component {
     state: Plain.deserialize(initialContent)
   }
 
-  onChange = (state) => {
+  onChange = ({ state }) => {
     this.setState({ state })
 
     // Save the state to Local Storage.
@@ -92,7 +92,7 @@ class App extends React.Component {
     state: Plain.deserialize(initialContent)
   }
 
-  onChange = (state) => {
+  onChange = ({ state }) => {
     this.setState({ state })
 
     const content = Plain.serialize(state)
@@ -128,12 +128,12 @@ class App extends React.Component {
     state: Plain.deserialize(initialContent)
   }
 
-  onChange = (state) => {
+  onChange = ({ state }) => {
     this.setState({ state })
   }
 
   // Pull the saving logic out into the `onDocumentChange` handler.
-  onDocumentChange = (document, state) => {
+  onDocumentChange = (document, { state }) => {
     const content = Plain.serialize(state)
     localStorage.setItem('content', content)
   }
@@ -176,11 +176,11 @@ class App extends React.Component {
     state: Raw.deserialize(initialContent, {terse: true})
   }
 
-  onChange = (state) => {
+  onChange = ({ state }) => {
     this.setState({ state })
   }
 
-  onDocumentChange = (document, state) => {
+  onDocumentChange = (document, { state }) => {
     // Switch to using the Raw serializer.
     const content = JSON.stringify(Raw.serialize(state))
     localStorage.setItem('content', content)
