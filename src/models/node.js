@@ -360,6 +360,8 @@ class Node {
 
   getBlocksAtRangeAsArray(range) {
     range = range.normalize(this)
+    if (range.isUnset) return []
+
     const { startKey, endKey } = range
     const startBlock = this.getClosestBlock(startKey)
 
@@ -451,6 +453,9 @@ class Node {
    */
 
   getCharactersAtRangeAsArray(range) {
+    range = range.normalize(this)
+    if (range.isUnset) return []
+
     return this
       .getTextsAtRange(range)
       .reduce((arr, text) => {
@@ -689,10 +694,13 @@ class Node {
    * Get a fragment of the node at a `range`.
    *
    * @param {Selection} range
-   * @return {List<Node>}
+   * @return {Document}
    */
 
   getFragmentAtRange(range) {
+    range = range.normalize(this)
+    if (range.isUnset) return Document.create()
+
     let node = this
 
     // Make sure the children exist.
@@ -875,6 +883,9 @@ class Node {
    */
 
   getInlinesAtRangeAsArray(range) {
+    range = range.normalize(this)
+    if (range.isUnset) return []
+
     return this
       .getTextsAtRangeAsArray(range)
       .map(text => this.getClosestInline(text.key))
@@ -1026,6 +1037,8 @@ class Node {
 
   getMarksAtRangeAsArray(range) {
     range = range.normalize(this)
+    if (range.isUnset) return []
+
     const { startKey, startOffset } = range
 
     // If the range is collapsed at the start of the node, check the previous.
@@ -1054,6 +1067,8 @@ class Node {
 
   getActiveMarksAtRangeAsArray(range) {
     range = range.normalize(this)
+    if (range.isUnset) return []
+
     const { startKey, startOffset } = range
 
     // If the range is collapsed at the start of the node, check the previous.
@@ -1233,6 +1248,10 @@ class Node {
 
   getOffsetAtRange(range) {
     range = range.normalize(this)
+
+    if (range.isUnset) {
+      throw new Error('The range cannot be unset to calculcate its offset.')
+    }
 
     if (range.isExpanded) {
       throw new Error('The range must be collapsed to calculcate its offset.')
@@ -1443,6 +1462,8 @@ class Node {
 
   getTextsAtRangeAsArray(range) {
     range = range.normalize(this)
+    if (range.isUnset) return []
+
     const { startKey, endKey } = range
     const startText = this.getDescendant(startKey)
 
