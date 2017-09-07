@@ -25,7 +25,7 @@ function extendSelection(selection, el, offset) {
   anchor.setStart(selection.anchorNode, selection.anchorOffset)
   focus.setStart(el, offset)
 
-  const v = focus.compareBoundaryPoints(Range.START_TO_START, anchor)
+  const v = focus.compareBoundaryPoints(window.Range.START_TO_START, anchor)
 
   // If the focus is after the anchor...
   if (v >= 0) {
