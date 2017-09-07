@@ -135,6 +135,16 @@ Changes.deleteAtRange = (change, range, options = {}) => {
     }
   }
 
+  // If the selection starts at an inline void, remove that void inline first
+  const startInline = document.getClosestInline(startKey)
+  if (startInline && startInline.isVoid &&
+      startInline.getTexts().first().key == startKey) {
+    const nextText = document.getNextText(startInline.getTexts().first().key)
+    change.removeNodeByKey(startInline.key, OPTS)
+    startKey = nextText.key
+    startOffset = 0
+  }
+
   // If the start and end key are the same, we can just remove it.
   if (startKey == endKey) {
     // If it is a void node, remove the whole node
