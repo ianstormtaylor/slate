@@ -1029,7 +1029,7 @@ class Node {
   }
 
   /**
-   * Get a set of the marks in a `range`.
+   * Get a set of the marks in a `range`, by unioning.
    *
    * @param {Selection} range
    * @return {Array}
@@ -1065,6 +1065,13 @@ class Node {
       }, [])
   }
 
+  /**
+   * Get a set of marks in a `range`, by intersecting.
+   *
+   * @param {Selection} range
+   * @return {Array}
+   */
+
   getActiveMarksAtRangeAsArray(range) {
     range = range.normalize(this)
     if (range.isUnset) return []
@@ -1089,11 +1096,15 @@ class Node {
     // Otherwise, get a set of the marks for each character in the range.
     const chars = this.getCharactersAtRange(range)
     const first = chars.first()
+    if (!first) return []
+
     let memo = first.marks
+
     chars.slice(1).forEach((char) => {
       memo = memo.intersect(char.marks)
       return memo.size != 0
     })
+
     return memo.toArray()
   }
 
