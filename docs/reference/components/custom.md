@@ -38,15 +38,24 @@ return (
   <p {...props.attributes}>{props.children}</p>
 )
 ```
+```js
+return (
+  <figure {...props.attributes}>
+    <img src={...} />
+  </figure>
+)
+```
 
 ### `children`
 `Object`
 
-A set of React children elements that are composed of internal Slate components that handle all of the editing logic of the editor for you. You must render these as the children of your node. For example:
+A set of React children elements that are composed of internal Slate components that handle all of the editing logic of the editor for you. You must render these as the children of your non-void nodes. For example:
 
 ```js
 return (
-  <p {...props.attributes}>{props.children}</p>
+  <p {...props.attributes}>
+    {props.children}
+  </p>
 )
 ```
 
