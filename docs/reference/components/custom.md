@@ -18,13 +18,13 @@ Slate will render custom nodes for `Block` and `Inline` models, based on what yo
 ```js
 <{Custom}
   attributes={Object}
-  children={children}
+  children={Object}
   editor={Editor}
   isSelected={Boolean}
   node={Node}
   parent={Node}
   readOnly={Boolean}
-  state={state}
+  state={State}
 />
 ```
 
