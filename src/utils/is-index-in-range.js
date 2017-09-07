@@ -8,7 +8,7 @@
  * @return {Boolean}
  */
 
-function isInRange(index, text, range) {
+function isIndexInRange(index, text, range) {
   const { startKey, startOffset, endKey, endOffset } = range
 
   if (text.key == startKey && text.key == endKey) {
@@ -28,4 +28,4 @@ function isInRange(index, text, range) {
  * @type {Function}
  */
 
-export default isInRange
+export default isIndexInRange

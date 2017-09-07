@@ -25,10 +25,9 @@ const schema = {
   nodes: {
     paragraph: props => <p>{props.children}</p>,
     emoji: (props) => {
-      const { state, node } = props
+      const { isSelected, node } = props
       const { data } = node
       const code = data.get('code')
-      const isSelected = state.selection.hasFocusIn(node)
       return <span className={`emoji ${isSelected ? 'selected' : ''}`} {...props.attributes} contentEditable={false}>{code}</span>
     }
   }

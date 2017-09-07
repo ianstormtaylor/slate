@@ -917,25 +917,41 @@ class Content extends React.Component {
   }
 
   /**
-   * Render a `node`.
+   * Render a `child` node of the document.
    *
-   * @param {Node} node
+   * @param {Node} child
    * @return {Element}
    */
 
-  renderNode = (node) => {
+  renderNode = (child) => {
     const { editor, readOnly, schema, state } = this.props
+    const { document, selection } = state
+    const { startKey, endKey, isBlurred } = selection
+    let isSelected
+
+    if (isBlurred) {
+      isSelected = false
+    }
+
+    else {
+      isSelected = document.nodes
+        .skipUntil(n => n.kind == 'text' ? n.key == startKey : n.hasDescendant(startKey))
+        .reverse()
+        .skipUntil(n => n.kind == 'text' ? n.key == endKey : n.hasDescendant(endKey))
+        .includes(child)
+    }
 
     return (
       <Node
-        key={node.key}
         block={null}
-        node={node}
-        parent={state.document}
+        editor={editor}
+        isSelected={isSelected}
+        key={child.key}
+        node={child}
+        parent={document}
+        readOnly={readOnly}
         schema={schema}
         state={state}
-        editor={editor}
-        readOnly={readOnly}
       />
     )
   }

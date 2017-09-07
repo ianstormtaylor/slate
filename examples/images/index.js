@@ -27,10 +27,9 @@ const defaultBlock = {
 const schema = {
   nodes: {
     image: (props) => {
-      const { node, state } = props
-      const active = state.isFocused && state.blocks.includes(node)
+      const { node, isSelected } = props
       const src = node.data.get('src')
-      const className = active ? 'active' : null
+      const className = isSelected ? 'active' : null
       return (
         <img src={src} className={className} {...props.attributes} />
       )

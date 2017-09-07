@@ -6,7 +6,7 @@ import Inline from './inline'
 import Text from './text'
 import direction from 'direction'
 import generateKey from '../utils/generate-key'
-import isInRange from '../utils/is-in-range'
+import isIndexInRange from '../utils/is-index-in-range'
 import isPlainObject from 'is-plain-object'
 import logger from '../utils/logger'
 import memoize from '../utils/memoize'
@@ -460,7 +460,7 @@ class Node {
       .getTextsAtRange(range)
       .reduce((arr, text) => {
         const chars = text.characters
-          .filter((char, i) => isInRange(i, text, range))
+          .filter((char, i) => isIndexInRange(i, text, range))
           .toArray()
 
         return arr.concat(chars)
@@ -1558,6 +1558,49 @@ class Node {
 
     const nodes = this.nodes.insert(index, node)
     return this.set('nodes', nodes)
+  }
+
+  /**
+   * Check whether the node is in a `range`.
+   *
+   * @param {Selection} range
+   * @return {Boolean}
+   */
+
+  isInRange(range) {
+    range = range.normalize(this)
+
+    const node = this
+    const { startKey, endKey, isCollapsed } = range
+
+    // PERF: solve the most common cast where the start or end key are inside
+    // the node, for collapsed selections.
+    if (
+      node.key == startKey ||
+      node.key == endKey ||
+      node.hasDescendant(startKey) ||
+      node.hasDescendant(endKey)
+    ) {
+      return true
+    }
+
+    // PERF: if the selection is collapsed and the previous check didn't return
+    // true, then it must be false.
+    if (isCollapsed) {
+      return false
+    }
+
+    // Otherwise, look through all of the leaf text nodes in the range, to see
+    // if any of them are inside the node.
+    const texts = node.getTextsAtRange(range)
+    let memo = false
+
+    texts.forEach((text) => {
+      if (node.hasDescendant(text.key)) memo = true
+      return memo
+    })
+
+    return memo
   }
 
   /**

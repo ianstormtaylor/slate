@@ -10,18 +10,6 @@ import React from 'react'
 class Video extends React.Component {
 
   /**
-   * Check if the node is selected.
-   *
-   * @return {Boolean}
-   */
-
-  isSelected = () => {
-    const { node, state } = this.props
-    const isSelected = state.isFocused && state.blocks.includes(node)
-    return isSelected
-  }
-
-  /**
    * When the input text changes, update the `video` data on the node.
    *
    * @param {Event} e
@@ -66,8 +54,8 @@ class Video extends React.Component {
    */
 
   renderVideo = () => {
-    const video = this.props.node.data.get('video')
-    const isSelected = this.isSelected()
+    const { node, isSelected } = this.props
+    const video = node.data.get('video')
 
     const wrapperStyle = {
       position: 'relative',
@@ -120,7 +108,8 @@ class Video extends React.Component {
    */
 
   renderInput = () => {
-    const video = this.props.node.data.get('video')
+    const { node } = this.props
+    const video = node.data.get('video')
     return (
       <input
         value={video}
