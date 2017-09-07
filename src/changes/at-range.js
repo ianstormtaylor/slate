@@ -178,10 +178,12 @@ Changes.deleteAtRange = (change, range, options = {}) => {
   ancestor = document.getCommonAncestor(startKey, endKey)
   startChild = ancestor.getFurthestAncestor(startKey)
   endChild = ancestor.getFurthestAncestor(endKey)
+
+
+  const nextText = document.getNextText(endKey)
   const startIndex = ancestor.nodes.indexOf(startChild)
   const endIndex = ancestor.nodes.indexOf(endChild)
   const middles = ancestor.nodes.slice(startIndex + 1, endIndex + 1)
-  const next = document.getNextText(endKey)
 
   // Remove all of the middle nodes, between the splits.
   if (middles.size) {
@@ -190,16 +192,24 @@ Changes.deleteAtRange = (change, range, options = {}) => {
     })
   }
 
-  // If the start and end block are different, move all of the nodes from the
-  // end block into the start block.
+  // Refresh variables
   state = change.state
   document = state.document
-  const startBlock = document.getClosestBlock(startKey)
-  const endBlock = document.getClosestBlock(next.key)
 
-  // If the endBlock is void, just remove the startBlock
-  if (endBlock.isVoid) {
-    change.removeNodeByKey(startBlock.key)
+  const startBlock = document.getClosestBlock(startKey)
+  const endBlock = document.getClosestBlock(nextText.key)
+
+  // If the endBlock is void, remove what is selected of the start block
+  if (endBlock.isVoid && endOffset === 0) {
+    // If the whole startBlock is selected, just remove it
+    if (startChild.text.length === endOffset && startOffset === 0) {
+      change.removeNodeByKey(startBlock.key, OPTS)
+      return
+    }
+    // If part of the startBlock is selected, split it and remove the unwanted part
+    document = change.splitNodeByKey(startChild.key, startOffset, OPTS).state.document
+    const toBeRemoved = document.nodes.get(startIndex + 1)
+    change.removeNodeByKey(toBeRemoved.key, OPTS)
     return
   }
 
