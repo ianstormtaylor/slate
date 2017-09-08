@@ -276,7 +276,6 @@ class Node extends React.Component {
     const { Component } = this.state
     const { selection } = state
     const indexes = node.getSelectionIndexes(selection, isSelected)
-
     const children = node.nodes.toArray().map((child, i) => {
       const isChildSelected = !!indexes && indexes.start <= i && i < indexes.end
       return this.renderNode(child, isChildSelected)
