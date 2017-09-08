@@ -1,4 +1,5 @@
 
+import Block from '../models/block'
 import Raw from '../serializers/raw'
 
 /**
@@ -66,7 +67,7 @@ function serialize(state) {
 function serializeNode(node) {
   if (
     (node.kind == 'document') ||
-    (node.kind == 'block' && node.nodes.size > 0 && node.nodes.first().kind == 'block')
+    (node.kind == 'block' && Block.isBlockList(node.nodes))
   ) {
     return node.nodes.map(serializeNode).join('\n')
   } else {
