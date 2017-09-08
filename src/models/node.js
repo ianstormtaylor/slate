@@ -1376,6 +1376,54 @@ class Node {
   }
 
   /**
+   * Get the indexes of the selection for a `range`, given an extra flag for
+   * whether the node `isSelected`, to determine whether not finding matches
+   * means everything is selected or nothing is.
+   *
+   * @param {Selection} range
+   * @param {Boolean} isSelected
+   * @return {Object|Null}
+   */
+
+  getSelectionIndexes(range, isSelected = false) {
+    const { startKey, endKey } = range
+
+    // PERF: if we're not selected, or the range is blurred, we can exit early.
+    if (!isSelected || range.isBlurred) {
+      return null
+    }
+
+    // PERF: if the start and end keys are the same, just check for the child
+    // that contains that single key.
+    if (startKey == endKey) {
+      const child = this.getFurthestAncestor(startKey)
+      const index = child ? this.nodes.indexOf(child) : null
+      return { start: index, end: index + 1 }
+    }
+
+    // Otherwise, check all of the children...
+    let start = null
+    let end = null
+
+    this.nodes.forEach((child, i) => {
+      if (child.kind == 'text') {
+        if (start == null && child.key == startKey) start = i
+        if (end == null && child.key == endKey) end = i + 1
+      } else {
+        if (start == null && child.hasDescendant(startKey)) start = i
+        if (end == null && child.hasDescendant(endKey)) end = i + 1
+      }
+
+      // PERF: exit early if both start and end have been found.
+      return start != null && end != null
+    })
+
+    if (isSelected && start == null) start = 0
+    if (isSelected && end == null) end = this.nodes.size
+    return start == null ? null : { start, end }
+  }
+
+  /**
    * Get the concatenated text string of all child nodes.
    *
    * @return {String}
