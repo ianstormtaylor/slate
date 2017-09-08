@@ -1,0 +1,37 @@
+{
+  "name": "slate-base64-serializer",
+  "description": "A Base64 serializer for Slate documents.",
+  "version": "0.0.0",
+  "license": "MIT",
+  "repository": "git://github.com/ianstormtaylor/slate.git",
+  "main": "./lib/index.js",
+  "dependencies": {
+    "slate-raw-serializer": "*"
+  },
+  "peerDependencies": {
+    "slate": "^0.15.0"
+  },
+  "devDependencies": {
+    "slate": "*",
+  },
+  "scripts": {
+    "build": "mkdir -p ./dist && yarn-run-all build:src build:max build:min",
+    "build:max": "NODE_ENV=production browserify ./src/index.js --transform babelify --transform envify --transform [ browserify-global-shim --global ] --standalone SlateBase64Serializer > ./dist/slate-base64-serializer.js",
+    "build:min": "NODE_ENV=production browserify ./src/index.js --transform babelify --transform envify --transform [ browserify-global-shim --global ] --transform uglifyify --standalone SlateBase64Serializer | uglifyjs > ./dist/slate-base64-serializer.min.js",
+    "build:src": "babel --out-dir ./lib ./src",
+    "build:test": "babel --out-dir ./lib ./src --source-maps inline",
+    "clean": "rm -rf ./dist ./lib ./node_modules",
+    "lint": "eslint ./src",
+    "prepublish": "yarn run build",
+    "test": "yarn-run-all build:test tests lint",
+    "tests": "mocha --compilers js:babel-core/register ./test/index.js",
+    "watch": "babel --watch --out-dir ./lib ./src --source-maps inline"
+  },
+  "keywords": [
+    "base64",
+    "editor",
+    "rich-text",
+    "serializer",
+    "slate"
+  ]
+}

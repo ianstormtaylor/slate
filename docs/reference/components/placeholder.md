@@ -2,7 +2,7 @@
 # `<Placeholder>`
 
 ```js
-import { Placeholder } from 'slate'
+import { Placeholder } from 'slate-react'
 ```
 
 A simple component that adds a placeholder to a node. It encapsulates all of the Slate-related logic that determines when to render the placeholder, so you don't have to think about it.

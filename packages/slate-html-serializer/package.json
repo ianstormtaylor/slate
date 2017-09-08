@@ -1,0 +1,43 @@
+{
+  "name": "slate-html-serializer",
+  "description": "An HTML serializer for Slate documents.",
+  "version": "0.0.0",
+  "license": "MIT",
+  "repository": "git://github.com/ianstormtaylor/slate.git",
+  "main": "./lib/index.js",
+  "dependencies": {
+    "immutable": "^3.8.1",
+    "slate-raw-serializer": "*",
+    "type-of": "^2.0.1"
+  },
+  "peerDependencies": {
+    "react": "^0.14.0 || ^15.0.0",
+    "react-dom": "^0.14.0 || ^15.0.0",
+    "slate": "^0.15.0"
+  },
+  "devDependencies": {
+    "react": "^15.4.2",
+    "react-dom": "^15.4.2",
+    "slate": "*"
+  },
+  "scripts": {
+    "build": "mkdir -p ./dist && yarn-run-all build:src build:max build:min",
+    "build:max": "NODE_ENV=production browserify ./src/index.js --transform babelify --transform envify --transform [ browserify-global-shim --global ] --standalone SlateHtmlSerializer > ./dist/slate-html-serializer.js",
+    "build:min": "NODE_ENV=production browserify ./src/index.js --transform babelify --transform envify --transform [ browserify-global-shim --global ] --transform uglifyify --standalone SlateHtmlSerializer | uglifyjs > ./dist/slate-html-serializer.min.js",
+    "build:src": "babel --out-dir ./lib ./src",
+    "build:test": "babel --out-dir ./lib ./src --source-maps inline",
+    "clean": "rm -rf ./dist ./lib ./node_modules",
+    "lint": "eslint ./src",
+    "prepublish": "yarn run build",
+    "test": "yarn-run-all build:test tests lint",
+    "tests": "mocha --compilers js:babel-core/register ./test/index.js",
+    "watch": "babel --watch --out-dir ./lib ./src --source-maps inline"
+  },
+  "keywords": [
+    "editor",
+    "html",
+    "rich-text",
+    "serializer",
+    "slate"
+  ]
+}

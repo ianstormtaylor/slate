@@ -1,5 +1,5 @@
 
-import Raw from './raw'
+import Raw from 'slate-raw-serializer'
 
 /**
  * Encode a JSON `object` as base-64 `string`.

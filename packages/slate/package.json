@@ -1,0 +1,68 @@
+{
+  "name": "slate",
+  "description": "A completely customizable framework for building rich text editors.",
+  "version": "0.22.14",
+  "license": "MIT",
+  "repository": "git://github.com/ianstormtaylor/slate.git",
+  "main": "./lib/index.js",
+  "dependencies": {
+    "debug": "^2.3.2",
+    "direction": "^0.1.5",
+    "es6-map": "^0.1.4",
+    "esrever": "^0.2.0",
+    "immutable": "^3.8.1",
+    "is-empty": "^1.0.0",
+    "is-plain-object": "^2.0.4",
+    "lodash": "^4.17.4",
+    "type-of": "^2.0.1"
+  },
+  "peerDependencies": {
+    "react": "^0.14.0 || ^15.0.0",
+    "react-dom": "^0.14.0 || ^15.0.0"
+  },
+  "devDependencies": {
+    "react": "^15.4.2",
+    "react-dom": "^15.4.2"
+  },
+  "scripts": {
+    "build": "mkdir -p ./dist && yarn-run-all build:src build:max build:min",
+    "build:max": "NODE_ENV=production browserify ./src/index.js --transform babelify --transform envify --transform [ browserify-global-shim --global ] --standalone Slate > ./dist/slate.js",
+    "build:min": "NODE_ENV=production browserify ./src/index.js --transform babelify --transform envify --transform [ browserify-global-shim --global ] --transform uglifyify --standalone Slate | uglifyjs > ./dist/slate.min.js",
+    "build:src": "babel --out-dir ./lib ./src",
+    "build:test": "babel --out-dir ./lib ./src --source-maps inline",
+    "clean": "rm -rf ./dist ./lib ./node_modules",
+    "lint": "eslint ./src",
+    "prepublish": "yarn run build",
+    "test": "yarn-run-all build:test tests lint",
+    "tests": "mocha --compilers js:babel-core/register ./test/index.js",
+    "watch": "babel --watch --out-dir ./lib ./src --source-maps inline"
+  },
+  "browserify-global-shim": {
+    "immutable": "Immutable",
+    "react": "React",
+    "react-dom": "ReactDOM",
+    "react-dom/server": "ReactDOMServer"
+  },
+  "keywords": [
+    "canvas",
+    "contenteditable",
+    "doc",
+    "docs",
+    "document",
+    "edit",
+    "editor",
+    "html",
+    "immutable",
+    "markdown",
+    "medium",
+    "paper",
+    "react",
+    "rich",
+    "rich-text",
+    "richtext",
+    "slate",
+    "text",
+    "wysiwyg",
+    "wysiwym"
+  ]
+}

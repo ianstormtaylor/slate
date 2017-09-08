@@ -1,6 +1,6 @@
 
-import Block from '../models/block'
-import Raw from '../serializers/raw'
+import { Block } from 'slate'
+import Raw from 'slate-raw-serializer'
 
 /**
  * Deserialize a plain text `string` to a state.

@@ -1,5 +1,5 @@
 
-import Raw from './raw'
+import Raw from 'slate-raw-serializer'
 import React from 'react'
 import ReactDOMServer from 'react-dom/server'
 import typeOf from 'type-of'

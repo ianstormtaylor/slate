@@ -1,14 +1,17 @@
 
-import Block from '../models/block'
-import Character from '../models/character'
-import Document from '../models/document'
-import Inline from '../models/inline'
-import Mark from '../models/mark'
-import Node from '../models/node'
-import Selection from '../models/selection'
-import State from '../models/state'
-import Text from '../models/text'
 import isEmpty from 'is-empty'
+
+import {
+  Block,
+  Character,
+  Document,
+  Inline,
+  Mark,
+  Node,
+  Selection,
+  State,
+  Text,
+} from 'slate'
 
 /**
  * Raw.
