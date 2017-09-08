@@ -58,9 +58,6 @@ function serialize(state) {
 
 /**
  * Serialize a `node` to plain text.
- * For blocks, or document, it recursively calls itself
- * to aggregate the text.
- * For other types of nodes, it uses the .text property
  *
  * @param {Node} node
  * @return {String}
@@ -71,10 +68,7 @@ function serializeNode(node) {
     (node.kind == 'document') ||
     (node.kind == 'block' && node.nodes.size > 0 && node.nodes.first().kind == 'block')
   ) {
-    return node.nodes
-      .map(n => serializeNode(n))
-      .filter(text => text != '')
-      .join('\n')
+    return node.nodes.map(serializeNode).join('\n')
   } else {
     return node.text
   }
