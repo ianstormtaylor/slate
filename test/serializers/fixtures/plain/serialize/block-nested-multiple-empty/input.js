@@ -1,5 +1,5 @@
 
-import { Block, Character, Document, Inline, Mark, State, Text } from '../../../../../..'
+import { Block, Character, Document, State, Text } from '../../../../../..'
 
 export default State.create({
   document: Document.create({
@@ -30,6 +30,37 @@ export default State.create({
                       { text: 't' },
                       { text: 'w' },
                       { text: 'o' }
+                    ])
+                  }
+                ])
+              }
+            ])
+          }
+        ])
+      },
+      {
+        type: 'quote',
+        nodes: Block.createList([
+          {
+            type: 'paragraph',
+            nodes: Text.createList([
+              {
+                characters: Character.createList()
+              }
+            ])
+          },
+          {
+            type: 'paragraph',
+            nodes: Block.createList([
+              {
+                type: 'paragraph',
+                nodes: Text.createList([
+                  {
+                    characters: Character.createList([
+                      { text: 'f' },
+                      { text: 'o' },
+                      { text: 'u' },
+                      { text: 'r' },
                     ])
                   }
                 ])
