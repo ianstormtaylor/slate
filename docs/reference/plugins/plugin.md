@@ -80,7 +80,7 @@ This handler is called when the editor's `contenteditable` element is focused. I
 ### `onCopy`
 `Function onCopy(event: Event, data: Object, change: Change, editor: Editor) => Change || Void`
 
-This handler is called when the editor's `contenteditable` element is blurred.
+This handler is called when there is a copy event in the editor's `contenteditable` element.
 
 The `data` object contains a `type` string and associated data for that type. Right now the only type supported is `"fragment"`:
 
