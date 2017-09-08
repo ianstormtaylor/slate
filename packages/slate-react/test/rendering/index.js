@@ -2,12 +2,13 @@
 import React from 'react'
 import ReactDOM from 'react-dom/server'
 import assert from 'assert'
-import parse5 from 'parse5'
-import fs from 'fs-promise'
-import readYaml from 'read-yaml-promise'
-import { Editor, Raw } from '../..'
-import { resolve } from 'path'
 import clean from '../helpers/clean'
+import fs from 'fs-promise'
+import parse5 from 'parse5'
+import readYaml from 'read-yaml-promise'
+import { Editor } from '../..'
+import { Raw } from 'slate'
+import { resolve } from 'path'
 
 /**
  * Tests.

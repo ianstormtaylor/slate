@@ -1,0 +1,38 @@
+{
+  "name": "slate-raw-serializer",
+  "description": "A raw JSON serializer for Slate documents.",
+  "version": "0.0.0",
+  "license": "MIT",
+  "repository": "git://github.com/ianstormtaylor/slate.git",
+  "main": "./lib/index.js",
+  "dependencies": {
+    "is-empty": "^1.0.0"
+  },
+  "peerDependencies": {
+    "slate": "^0.15.0"
+  },
+  "devDependencies": {
+    "slate": "*"
+  },
+  "scripts": {
+    "build": "mkdir -p ./dist && yarn-run-all build:src build:max build:min",,
+    "build:max": "NODE_ENV=production browserify ./src/index.js --transform babelify --transform envify --transform [ browserify-global-shim --global ] --standalone SlateRawSerializer > ./dist/slate-raw-serializer.js",
+    "build:min": "NODE_ENV=production browserify ./src/index.js --transform babelify --transform envify --transform [ browserify-global-shim --global ] --transform uglifyify --standalone SlateRawSerializer | uglifyjs > ./dist/slate-raw-serializer.min.js",
+    "build:src": "babel --out-dir ./lib ./src",
+    "build:test": "babel --out-dir ./lib ./src --source-maps inline",
+    "clean": "rm -rf ./dist ./lib ./node_modules",
+    "lint": "eslint ./src",
+    "prepublish": "yarn run build",
+    "test": "yarn-run-all build:src tests lint",
+    "tests": "mocha --compilers js:babel-core/register ./test/index.js",
+    "watch": "babel --watch --out-dir ./lib ./src --source-maps inline"
+  },
+  "keywords": [
+    "editor",
+    "json",
+    "raw",
+    "rich-text",
+    "serializer",
+    "slate"
+  ]
+}
