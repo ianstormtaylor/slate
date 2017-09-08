@@ -1,7 +1,6 @@
 
 import Base64 from '../serializers/base-64'
 import Block from '../models/block'
-import Character from '../models/character'
 import Content from '../components/content'
 import Debug from 'debug'
 import Inline from '../models/inline'
