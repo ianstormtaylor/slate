@@ -244,36 +244,17 @@ class Node extends React.Component {
    * Render a `child` node.
    *
    * @param {Node} child
+   * @param {Boolean} isSelected
    * @return {Element}
    */
 
-  renderNode = (child) => {
-    const { block, editor, isSelected, node, readOnly, schema, state } = this.props
-    const { selection } = state
-    const { startKey, endKey } = selection
-    let isChildSelected
-
-    if (!isSelected) {
-      isChildSelected = false
-    }
-
-    else if (node.kind == 'text') {
-      isChildSelected = node.key == startKey || node.key == endKey
-    }
-
-    else {
-      isChildSelected = node.nodes
-        .skipUntil(n => n.kind == 'text' ? n.key == startKey : n.hasDescendant(startKey))
-        .reverse()
-        .skipUntil(n => n.kind == 'text' ? n.key == endKey : n.hasDescendant(endKey))
-        .includes(child)
-    }
-
+  renderNode = (child, isSelected) => {
+    const { block, editor, node, readOnly, schema, state } = this.props
     return (
       <Node
         block={node.kind == 'block' ? node : block}
         editor={editor}
-        isSelected={isChildSelected}
+        isSelected={isSelected}
         key={child.key}
         node={child}
         parent={node}
@@ -293,7 +274,12 @@ class Node extends React.Component {
   renderElement = () => {
     const { editor, isSelected, node, parent, readOnly, state } = this.props
     const { Component } = this.state
-    const children = node.nodes.map(this.renderNode).toArray()
+    const { selection } = state
+    const indexes = node.getSelectionIndexes(selection, isSelected)
+    const children = node.nodes.toArray().map((child, i) => {
+      const isChildSelected = !!indexes && indexes.start <= i && i < indexes.end
+      return this.renderNode(child, isChildSelected)
+    })
 
     // Attributes that the developer must to mix into the element in their
     // custom node renderer component.
