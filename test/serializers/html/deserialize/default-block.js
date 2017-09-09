@@ -1,7 +1,7 @@
 
-/** @jsx sugar */
+/** @jsx h */
 
-import sugar from '../../../helpers/sugar'
+import h from '../../../helpers/h'
 
 export const config = {
   rules: [
@@ -38,9 +38,9 @@ export const output = (
       <paragraph>
         one
       </paragraph>
-      <default kind="block" data={{ thing: 'value' }}>
+      <block type="default" data={{ thing: 'value' }}>
         two
-      </default>
+      </block>
     </document>
   </state>
 )

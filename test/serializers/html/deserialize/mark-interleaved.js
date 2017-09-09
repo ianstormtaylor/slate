@@ -1,7 +1,7 @@
 
-/** @jsx sugar */
+/** @jsx h */
 
-import sugar from '../../../helpers/sugar'
+import h from '../../../helpers/h'
 
 export const config = {
   rules: [
@@ -43,7 +43,7 @@ export const output = (
   <state>
     <document>
       <paragraph>
-        o<i>n</i><i><b>e</b></i>
+        o<i>n<b>e</b></i>
       </paragraph>
     </document>
   </state>

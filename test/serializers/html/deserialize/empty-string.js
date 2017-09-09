@@ -1,7 +1,7 @@
 
-/** @jsx sugar */
+/** @jsx h */
 
-import sugar from '../../../helpers/sugar'
+import h from '../../../helpers/h'
 
 export const config = {}
 

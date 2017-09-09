@@ -1,8 +1,8 @@
 
-/** @jsx sugar */
+/** @jsx h */
 
 import React from 'react'
-import sugar from '../../../helpers/sugar'
+import h from '../../../helpers/h'
 
 export const rules = [
   {},
