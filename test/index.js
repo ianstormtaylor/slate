@@ -12,7 +12,7 @@ import 'babel-polyfill'
  */
 
 import './rendering'
-import './schema'
+import './schemas'
 import './serializers'
 import './changes'
 import './behavior'
