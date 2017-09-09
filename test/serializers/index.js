@@ -7,7 +7,7 @@ import parse5 from 'parse5'
 import readYaml from 'read-yaml-promise'
 import { Html, Plain, Raw } from '../..'
 import { Iterable } from 'immutable'
-import { resolve } from 'path'
+import { basename, extname, resolve } from 'path'
 
 /**
  * Tests.
@@ -146,38 +146,30 @@ describe('serializers', () => {
   })
 
   describe('raw', () => {
+    const dir = resolve(__dirname, './raw')
+    const tests = fs
+      .readdirSync(dir)
+      .filter(t => t[0] != '.')
+      .map(t => basename(t, extname(t)))
+
     describe('deserialize()', () => {
-      const dir = resolve(__dirname, './fixtures/raw/deserialize')
-      const tests = fs.readdirSync(dir)
-
       for (const test of tests) {
-        if (test[0] === '.') continue
-        if (!~test.indexOf('.js')) continue
-
         it(test, async () => {
-          const file = resolve(dir, test)
-          const { input, output } = require(file)
-          const state = Raw.deserialize(input)
-          const actual = state.toJSON()
-          const expected = output.toJSON()
+          const { json, state } = require(resolve(dir, test))
+          const actual = Raw.deserialize(json).toJSON()
+          const expected = state.toJSON()
           assert.deepEqual(actual, expected)
         })
       }
     })
 
     describe('serialize()', () => {
-      const dir = resolve(__dirname, './fixtures/raw/serialize')
-      const tests = fs.readdirSync(dir)
-
       for (const test of tests) {
-        if (test[0] === '.') continue
         it(test, async () => {
-          const innerDir = resolve(dir, test)
-          const input = await readYaml(resolve(innerDir, 'input.yaml'))
-          const expected = await readYaml(resolve(innerDir, 'output.yaml'))
-          const state = Raw.deserialize(input)
-          const serialized = Raw.serialize(state)
-          assert.deepEqual(serialized, expected)
+          const { json, state } = require(resolve(dir, test))
+          const actual = Raw.serialize(state)
+          const expected = json
+          assert.deepEqual(actual, expected)
         })
       }
     })

@@ -1,18 +1,28 @@
 /** @jsx sugar */
 
-import sugar from '../../../../helpers/sugar'
+import sugar from '../../helpers/sugar'
 
-export const input = {
+export const state = (
+  <state>
+    <document>
+      <paragraph>
+        one
+      </paragraph>
+    </document>
+  </state>
+)
+
+export const json = {
   kind: 'state',
   document: {
     kind: 'document',
+    data: {},
     nodes: [
       {
         kind: 'block',
         type: 'paragraph',
-        data: {
-          thing: 'value'
-        },
+        data: {},
+        isVoid: false,
         nodes: [
           {
             kind: 'text',
@@ -20,7 +30,7 @@ export const input = {
               {
                 kind: 'range',
                 text: 'one',
-                marks: []
+                marks: [],
               }
             ]
           }
@@ -29,13 +39,3 @@ export const input = {
     ]
   }
 }
-
-export const output = (
-  <state>
-    <document>
-      <paragraph thing="value">
-        one
-      </paragraph>
-    </document>
-  </state>
-)
