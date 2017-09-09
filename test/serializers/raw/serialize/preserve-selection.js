@@ -16,19 +16,16 @@ export const output = {
   kind: 'state',
   document: {
     kind: 'document',
-    key: '2',
     data: {},
     nodes: [
       {
         kind: 'block',
-        key: '1',
         type: 'paragraph',
         data: {},
         isVoid: false,
         nodes: [
           {
             kind: 'text',
-            key: '0',
             ranges: [
               {
                 text: 'one',
@@ -40,9 +37,19 @@ export const output = {
         ]
       }
     ]
+  },
+  selection: {
+    kind: 'selection',
+    anchorKey: '0',
+    anchorOffset: 0,
+    focusKey: '0',
+    focusOffset: 0,
+    isBackward: false,
+    isFocused: false,
+    marks: null,
   }
 }
 
 export const options = {
-  preserveKeys: true,
+  preserveSelection: true,
 }

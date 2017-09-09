@@ -152,12 +152,8 @@ describe('serializers', () => {
 
       for (const test of tests) {
         it(test, async () => {
-          const {
-            input,
-            output,
-            options = {},
-          } = require(resolve(dir, test))
-
+          const module = require(resolve(dir, test))
+          const { input, output, options } = module
           const actual = Raw.deserialize(input, options).toJSON()
           const expected = output.toJSON()
           assert.deepEqual(actual, expected)
@@ -171,12 +167,8 @@ describe('serializers', () => {
 
       for (const test of tests) {
         it(test, async () => {
-          const {
-            input,
-            output,
-            options = {},
-          } = require(resolve(dir, test))
-
+          const module = require(resolve(dir, test))
+          const { input, output, options } = module
           const actual = Raw.serialize(input, options)
           const expected = output
           assert.deepEqual(actual, expected)

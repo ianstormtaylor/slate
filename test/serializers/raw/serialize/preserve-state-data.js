@@ -14,21 +14,19 @@ export const input = (
 
 export const output = {
   kind: 'state',
+  data: {},
   document: {
     kind: 'document',
-    key: '2',
     data: {},
     nodes: [
       {
         kind: 'block',
-        key: '1',
         type: 'paragraph',
         data: {},
         isVoid: false,
         nodes: [
           {
             kind: 'text',
-            key: '0',
             ranges: [
               {
                 text: 'one',
@@ -44,5 +42,5 @@ export const output = {
 }
 
 export const options = {
-  preserveKeys: true,
+  preserveStateData: true,
 }
