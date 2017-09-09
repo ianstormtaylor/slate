@@ -17,7 +17,7 @@ describe('serializers', () => {
   describe('html', () => {
     describe('deserialize()', () => {
       const dir = resolve(__dirname, './html/deserialize')
-      const tests = fs.readdirSync(dir).filter(t => t[0] != '.' && !!~t.indexOf('.js')).map(t => basename(t, extname(t)))
+      const tests = fs.readdirSync(dir).filter(t => t[0] != '.').map(t => basename(t, extname(t)))
 
       for (const test of tests) {
         it(test, async () => {

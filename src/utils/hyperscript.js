@@ -56,6 +56,13 @@ const DEFAULT_CREATORS = {
     })
   },
 
+  text(tagName, attributes, children) {
+    return Text.create({
+      ...attributes,
+      ranges: [{ text: children }],
+    })
+  },
+
 }
 
 /**
@@ -78,14 +85,15 @@ function createHyperscript(options = {}) {
       attributes = {}
     }
 
-    children = children.reduce((memo, child) => memo.concat(child), [])
-    const creator = creators[tagName]
+    children = children
+      .filter(child => !!child)
+      .reduce((memo, child) => memo.concat(child), [])
 
-    if (!creator) {
+    if (!creators[tagName]) {
       throw new Error(`No hyperscript creator found for tag "${tagName}"`)
     }
 
-    const element = creator(tagName, attributes, children)
+    const element = creators[tagName](tagName, attributes, children)
     return element
   }
 
