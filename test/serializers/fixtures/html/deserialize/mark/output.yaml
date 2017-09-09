@@ -1,20 +1,19 @@
 
-data: {}
-nodes:
-  - type: paragraph
-    isVoid: false
-    data: {}
-    nodes:
-      - characters:
-          - text: o
-            marks:
-              - type: italic
-                data: {}
-          - text: n
-            marks:
-              - type: italic
-                data: {}
-          - text: e
-            marks:
-              - type: italic
-                data: {}
+kind: state
+document:
+  kind: document
+  data: {}
+  nodes:
+    - kind: block
+      type: paragraph
+      data: {}
+      isVoid: false
+      nodes:
+        - kind: text
+          ranges:
+            - kind: range
+              text: one
+              marks:
+                - kind: mark
+                  type: italic
+                  data: {}

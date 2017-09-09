@@ -1,14 +1,14 @@
 
 import Block from '../models/block'
-import Character from '../models/character'
 import Document from '../models/document'
 import Inline from '../models/inline'
 import Mark from '../models/mark'
 import Node from '../models/node'
+import Range from '../models/range'
 import Selection from '../models/selection'
 import State from '../models/state'
 import Text from '../models/text'
-import isEmpty from 'is-empty'
+import logger from '../utils/logger'
 
 /**
  * Raw.
@@ -26,9 +26,12 @@ const Raw = {
    * @return {State}
    */
 
-  deserialize(object, options) {
-    const state = Raw.deserializeState(object, options)
-    return state
+  deserialize(object, options = {}) {
+    if (options.terse) {
+      logger.deprecate('0.23.0', 'The `terse` option for raw serialization is no longer supported.')
+    }
+
+    return State.fromJSON(object)
   },
 
   /**
@@ -40,18 +43,11 @@ const Raw = {
    */
 
   deserializeBlock(object, options = {}) {
-    if (options.terse) object = Raw.untersifyBlock(object)
+    if (options.terse) {
+      logger.deprecate('0.23.0', 'The `terse` option for raw serialization is no longer supported.')
+    }
 
-    const nodes = Node.createList(object.nodes.map(node => Raw.deserializeNode(node, options)))
-    const block = Block.create({
-      key: object.key,
-      type: object.type,
-      data: object.data,
-      isVoid: object.isVoid,
-      nodes,
-    })
-
-    return block
+    return Block.fromJSON(object)
   },
 
   /**
@@ -62,15 +58,12 @@ const Raw = {
    * @return {Document}
    */
 
-  deserializeDocument(object, options) {
-    const nodes = object.nodes.map(node => Raw.deserializeNode(node, options))
-    const document = Document.create({
-      key: object.key,
-      data: object.data,
-      nodes,
-    })
+  deserializeDocument(object, options = {}) {
+    if (options.terse) {
+      logger.deprecate('0.23.0', 'The `terse` option for raw serialization is no longer supported.')
+    }
 
-    return document
+    return Document.fromJSON(object)
   },
 
   /**
@@ -82,18 +75,11 @@ const Raw = {
    */
 
   deserializeInline(object, options = {}) {
-    if (options.terse) object = Raw.untersifyInline(object)
+    if (options.terse) {
+      logger.deprecate('0.23.0', 'The `terse` option for raw serialization is no longer supported.')
+    }
 
-    const nodes = object.nodes.map(node => Raw.deserializeNode(node, options))
-    const inline = Inline.create({
-      key: object.key,
-      type: object.type,
-      data: object.data,
-      isVoid: object.isVoid,
-      nodes,
-    })
-
-    return inline
+    return Inline.fromJSON(object)
   },
 
   /**
@@ -104,9 +90,12 @@ const Raw = {
    * @return {Mark}
    */
 
-  deserializeMark(object, options) {
-    const mark = Mark.create(object)
-    return mark
+  deserializeMark(object, options = {}) {
+    if (options.terse) {
+      logger.deprecate('0.23.0', 'The `terse` option for raw serialization is no longer supported.')
+    }
+
+    return Mark.fromJSON(object)
   },
 
   /**
@@ -117,16 +106,12 @@ const Raw = {
    * @return {Node}
    */
 
-  deserializeNode(object, options) {
-    switch (object.kind) {
-      case 'block': return Raw.deserializeBlock(object, options)
-      case 'document': return Raw.deserializeDocument(object, options)
-      case 'inline': return Raw.deserializeInline(object, options)
-      case 'text': return Raw.deserializeText(object, options)
-      default: {
-        throw new Error(`Unrecognized node kind "${object.kind}".`)
-      }
+  deserializeNode(object, options = {}) {
+    if (options.terse) {
+      logger.deprecate('0.23.0', 'The `terse` option for raw serialization is no longer supported.')
     }
+
+    return Node.fromJSON(object)
   },
 
   /**
@@ -138,11 +123,11 @@ const Raw = {
    */
 
   deserializeRange(object, options = {}) {
-    if (options.terse) object = Raw.untersifyRange(object)
-    const marks = Mark.createSet(object.marks.map(mark => Raw.deserializeMark(mark, options)))
-    const chars = object.text.split('')
-    const characters = Character.createList(chars.map(text => ({ text, marks })))
-    return characters
+    if (options.terse) {
+      logger.deprecate('0.23.0', 'The `terse` option for raw serialization is no longer supported.')
+    }
+
+    return Range.fromJSON(object)
   },
 
   /**
@@ -154,15 +139,11 @@ const Raw = {
    */
 
   deserializeSelection(object, options = {}) {
-    const selection = Selection.create({
-      anchorKey: object.anchorKey,
-      anchorOffset: object.anchorOffset,
-      focusKey: object.focusKey,
-      focusOffset: object.focusOffset,
-      isFocused: object.isFocused,
-    })
+    if (options.terse) {
+      logger.deprecate('0.23.0', 'The `terse` option for raw serialization is no longer supported.')
+    }
 
-    return selection
+    return Selection.fromJSON(object)
   },
 
   /**
@@ -174,16 +155,11 @@ const Raw = {
    */
 
   deserializeState(object, options = {}) {
-    if (options.terse) object = Raw.untersifyState(object)
-
-    const document = Raw.deserializeDocument(object.document, options)
-    let selection
-
-    if (object.selection != null) {
-      selection = Raw.deserializeSelection(object.selection, options)
+    if (options.terse) {
+      logger.deprecate('0.23.0', 'The `terse` option for raw serialization is no longer supported.')
     }
 
-    return State.create({ data: object.data, document, selection }, options)
+    return State.fromJSON(object)
   },
 
   /**
@@ -195,18 +171,11 @@ const Raw = {
    */
 
   deserializeText(object, options = {}) {
-    if (options.terse) object = Raw.untersifyText(object)
+    if (options.terse) {
+      logger.deprecate('0.23.0', 'The `terse` option for raw serialization is no longer supported.')
+    }
 
-    const characters = object.ranges.reduce((list, range) => {
-      return list.concat(Raw.deserializeRange(range, options))
-    }, Character.createList())
-
-    const text = Text.create({
-      key: object.key,
-      characters,
-    })
-
-    return text
+    return Text.fromJSON(object)
   },
 
   /**
@@ -217,9 +186,12 @@ const Raw = {
    * @return {Object}
    */
 
-  serialize(model, options) {
-    const raw = Raw.serializeState(model, options)
-    return raw
+  serialize(model, options = {}) {
+    if (options.terse) {
+      logger.deprecate('0.23.0', 'The `terse` option for raw serialization is no longer supported.')
+    }
+
+    return model.toJSON(options)
   },
 
   /**
@@ -231,24 +203,11 @@ const Raw = {
    */
 
   serializeBlock(block, options = {}) {
-    const object = {
-      data: block.data.toJSON(),
-      key: block.key,
-      kind: block.kind,
-      isVoid: block.isVoid,
-      type: block.type,
-      nodes: block.nodes
-        .toArray()
-        .map(node => Raw.serializeNode(node, options))
+    if (options.terse) {
+      logger.deprecate('0.23.0', 'The `terse` option for raw serialization is no longer supported.')
     }
 
-    if (!options.preserveKeys) {
-      delete object.key
-    }
-
-    return options.terse
-      ? Raw.tersifyBlock(object)
-      : object
+    return block.toJSON(options)
   },
 
   /**
@@ -260,22 +219,11 @@ const Raw = {
    */
 
   serializeDocument(document, options = {}) {
-    const object = {
-      data: document.data.toJSON(),
-      key: document.key,
-      kind: document.kind,
-      nodes: document.nodes
-        .toArray()
-        .map(node => Raw.serializeNode(node, options))
+    if (options.terse) {
+      logger.deprecate('0.23.0', 'The `terse` option for raw serialization is no longer supported.')
     }
 
-    if (!options.preserveKeys) {
-      delete object.key
-    }
-
-    return options.terse
-      ? Raw.tersifyDocument(object)
-      : object
+    return document.toJSON(options)
   },
 
   /**
@@ -287,24 +235,11 @@ const Raw = {
    */
 
   serializeInline(inline, options = {}) {
-    const object = {
-      data: inline.data.toJSON(),
-      key: inline.key,
-      kind: inline.kind,
-      isVoid: inline.isVoid,
-      type: inline.type,
-      nodes: inline.nodes
-        .toArray()
-        .map(node => Raw.serializeNode(node, options))
+    if (options.terse) {
+      logger.deprecate('0.23.0', 'The `terse` option for raw serialization is no longer supported.')
     }
 
-    if (!options.preserveKeys) {
-      delete object.key
-    }
-
-    return options.terse
-      ? Raw.tersifyInline(object)
-      : object
+    return inline.toJSON(options)
   },
 
   /**
@@ -316,15 +251,11 @@ const Raw = {
    */
 
   serializeMark(mark, options = {}) {
-    const object = {
-      data: mark.data.toJSON(),
-      kind: mark.kind,
-      type: mark.type
+    if (options.terse) {
+      logger.deprecate('0.23.0', 'The `terse` option for raw serialization is no longer supported.')
     }
 
-    return options.terse
-      ? Raw.tersifyMark(object)
-      : object
+    return mark.toJSON()
   },
 
   /**
@@ -335,16 +266,12 @@ const Raw = {
    * @return {Object}
    */
 
-  serializeNode(node, options) {
-    switch (node.kind) {
-      case 'block': return Raw.serializeBlock(node, options)
-      case 'document': return Raw.serializeDocument(node, options)
-      case 'inline': return Raw.serializeInline(node, options)
-      case 'text': return Raw.serializeText(node, options)
-      default: {
-        throw new Error(`Unrecognized node kind "${node.kind}".`)
-      }
+  serializeNode(node, options = {}) {
+    if (options.terse) {
+      logger.deprecate('0.23.0', 'The `terse` option for raw serialization is no longer supported.')
     }
+
+    return node.toJSON(options)
   },
 
   /**
@@ -356,17 +283,11 @@ const Raw = {
    */
 
   serializeRange(range, options = {}) {
-    const object = {
-      kind: range.kind,
-      text: range.text,
-      marks: range.marks
-        .toArray()
-        .map(mark => Raw.serializeMark(mark, options))
+    if (options.terse) {
+      logger.deprecate('0.23.0', 'The `terse` option for raw serialization is no longer supported.')
     }
 
-    return options.terse
-      ? Raw.tersifyRange(object)
-      : object
+    return range.toJSON()
   },
 
   /**
@@ -378,19 +299,11 @@ const Raw = {
    */
 
   serializeSelection(selection, options = {}) {
-    const object = {
-      kind: selection.kind,
-      anchorKey: selection.anchorKey,
-      anchorOffset: selection.anchorOffset,
-      focusKey: selection.focusKey,
-      focusOffset: selection.focusOffset,
-      isBackward: selection.isBackward,
-      isFocused: selection.isFocused,
+    if (options.terse) {
+      logger.deprecate('0.23.0', 'The `terse` option for raw serialization is no longer supported.')
     }
 
-    return options.terse
-      ? Raw.tersifySelection(object)
-      : object
+    return selection.toJSON(options)
   },
 
   /**
@@ -402,24 +315,11 @@ const Raw = {
    */
 
   serializeState(state, options = {}) {
-    const object = {
-      document: Raw.serializeDocument(state.document, options),
-      kind: state.kind
+    if (options.terse) {
+      logger.deprecate('0.23.0', 'The `terse` option for raw serialization is no longer supported.')
     }
 
-    if (options.preserveSelection) {
-      object.selection = Raw.serializeSelection(state.selection, options)
-    }
-
-    if (options.preserveStateData) {
-      object.data = state.data.toJSON()
-    }
-
-    const ret = options.terse
-      ? Raw.tersifyState(object)
-      : object
-
-    return ret
+    return state.toJSON(options)
   },
 
   /**
@@ -431,297 +331,13 @@ const Raw = {
    */
 
   serializeText(text, options = {}) {
-    const object = {
-      key: text.key,
-      kind: text.kind,
-      ranges: text
-        .getRanges()
-        .toArray()
-        .map(range => Raw.serializeRange(range, options))
+    if (options.terse) {
+      logger.deprecate('0.23.0', 'The `terse` option for raw serialization is no longer supported.')
     }
 
-    if (!options.preserveKeys) {
-      delete object.key
-    }
-
-    return options.terse
-      ? Raw.tersifyText(object)
-      : object
+    return text.toJSON(options)
   },
 
-  /**
-   * Create a terse representation of a block `object`.
-   *
-   * @param {Object} object
-   * @return {Object}
-   */
-
-  tersifyBlock(object) {
-    const ret = {}
-    ret.kind = object.kind
-    ret.type = object.type
-    if (object.key) ret.key = object.key
-    if (!object.isVoid) ret.nodes = object.nodes
-    if (object.isVoid) ret.isVoid = object.isVoid
-    if (!isEmpty(object.data)) ret.data = object.data
-    return ret
-  },
-
-  /**
-   * Create a terse representation of a document `object.
-   *
-   * @param {Object} object
-   * @return {Object}
-   */
-
-  tersifyDocument(object) {
-    const ret = {}
-    ret.nodes = object.nodes
-    if (object.key) ret.key = object.key
-    if (!isEmpty(object.data)) ret.data = object.data
-    return ret
-  },
-
-  /**
-   * Create a terse representation of a inline `object`.
-   *
-   * @param {Object} object
-   * @return {Object}
-   */
-
-  tersifyInline(object) {
-    const ret = {}
-    ret.kind = object.kind
-    ret.type = object.type
-    if (object.key) ret.key = object.key
-    if (!object.isVoid) ret.nodes = object.nodes
-    if (object.isVoid) ret.isVoid = object.isVoid
-    if (!isEmpty(object.data)) ret.data = object.data
-    return ret
-  },
-
-  /**
-   * Create a terse representation of a mark `object`.
-   *
-   * @param {Object} object
-   * @return {Object}
-   */
-
-  tersifyMark(object) {
-    const ret = {}
-    ret.type = object.type
-    if (!isEmpty(object.data)) ret.data = object.data
-    return ret
-  },
-
-  /**
-   * Create a terse representation of a range `object`.
-   *
-   * @param {Object} object
-   * @return {Object}
-   */
-
-  tersifyRange(object) {
-    const ret = {}
-    ret.text = object.text
-    if (!isEmpty(object.marks)) ret.marks = object.marks
-    return ret
-  },
-
-  /**
-   * Create a terse representation of a selection `object.`
-   *
-   * @param {Object} object
-   * @return {Object}
-   */
-
-  tersifySelection(object) {
-    return {
-      anchorKey: object.anchorKey,
-      anchorOffset: object.anchorOffset,
-      focusKey: object.focusKey,
-      focusOffset: object.focusOffset,
-      isFocused: object.isFocused,
-    }
-  },
-
-  /**
-   * Create a terse representation of a state `object`.
-   *
-   * @param {Object} object
-   * @return {Object}
-   */
-
-  tersifyState(object) {
-    const { data, document, selection } = object
-    const emptyData = isEmpty(data)
-
-    if (!selection && emptyData) {
-      return document
-    }
-
-    const ret = { document }
-    if (!emptyData) ret.data = data
-    if (selection) ret.selection = selection
-    return ret
-  },
-
-  /**
-   * Create a terse representation of a text `object`.
-   *
-   * @param {Object} object
-   * @return {Object}
-   */
-
-  tersifyText(object) {
-    const ret = {}
-    ret.kind = object.kind
-    if (object.key) ret.key = object.key
-
-    if (object.ranges.length == 1 && object.ranges[0].marks == null) {
-      ret.text = object.ranges[0].text
-    } else {
-      ret.ranges = object.ranges
-    }
-
-    return ret
-  },
-
-  /**
-   * Convert a terse representation of a block `object` into a non-terse one.
-   *
-   * @param {Object} object
-   * @return {Object}
-   */
-
-  untersifyBlock(object) {
-    if (object.isVoid || !object.nodes || !object.nodes.length) {
-      return {
-        key: object.key,
-        data: object.data,
-        kind: object.kind,
-        type: object.type,
-        isVoid: object.isVoid,
-        nodes: [
-          {
-            kind: 'text',
-            text: ''
-          }
-        ]
-      }
-    }
-
-    return object
-  },
-
-  /**
-   * Convert a terse representation of a inline `object` into a non-terse one.
-   *
-   * @param {Object} object
-   * @return {Object}
-   */
-
-  untersifyInline(object) {
-    if (object.isVoid || !object.nodes || !object.nodes.length) {
-      return {
-        key: object.key,
-        data: object.data,
-        kind: object.kind,
-        type: object.type,
-        isVoid: object.isVoid,
-        nodes: [
-          {
-            kind: 'text',
-            text: ''
-          }
-        ]
-      }
-    }
-
-    return object
-  },
-
-  /**
-   * Convert a terse representation of a range `object` into a non-terse one.
-   *
-   * @param {Object} object
-   * @return {Object}
-   */
-
-  untersifyRange(object) {
-    return {
-      kind: 'range',
-      text: object.text,
-      marks: object.marks || []
-    }
-  },
-
-  /**
-   * Convert a terse representation of a selection `object` into a non-terse one.
-   *
-   * @param {Object} object
-   * @return {Object}
-   */
-
-  untersifySelection(object) {
-    return {
-      kind: 'selection',
-      anchorKey: object.anchorKey,
-      anchorOffset: object.anchorOffset,
-      focusKey: object.focusKey,
-      focusOffset: object.focusOffset,
-      isBackward: null,
-      isFocused: false
-    }
-  },
-
-  /**
-   * Convert a terse representation of a state `object` into a non-terse one.
-   *
-   * @param {Object} object
-   * @return {Object}
-   */
-
-  untersifyState(object) {
-    if (object.document) {
-      return {
-        kind: 'state',
-        data: object.data,
-        document: object.document,
-        selection: object.selection,
-      }
-    }
-
-    return {
-      kind: 'state',
-      document: {
-        data: object.data,
-        key: object.key,
-        kind: 'document',
-        nodes: object.nodes
-      }
-    }
-  },
-
-  /**
-   * Convert a terse representation of a text `object` into a non-terse one.
-   *
-   * @param {Object} object
-   * @return {Object}
-   */
-
-  untersifyText(object) {
-    if (object.ranges) return object
-
-    return {
-      key: object.key,
-      kind: object.kind,
-      ranges: [{
-        text: object.text,
-        marks: object.marks || []
-      }]
-    }
-  }
 }
 
 /**

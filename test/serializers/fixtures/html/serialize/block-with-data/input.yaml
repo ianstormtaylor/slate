@@ -1,0 +1,11 @@
+
+document:
+  nodes:
+    - kind: block
+      type: paragraph
+      data:
+        key: value
+      nodes:
+        - kind: text
+          ranges:
+            - text: one

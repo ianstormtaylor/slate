@@ -14,7 +14,7 @@ export default {
           case 'a': {
             return {
               kind: 'inline',
-              type: 'link',
+              type: 'emoji',
               isVoid: true
             }
           }

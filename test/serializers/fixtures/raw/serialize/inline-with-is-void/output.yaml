@@ -15,7 +15,7 @@ document:
               text: ""
               marks: []
         - kind: inline
-          type: link
+          type: emoji
           isVoid: true
           data: {}
           nodes:

@@ -1,14 +1,16 @@
 
-data: {}
-nodes:
-  - type: line
-    isVoid: false
-    data: {}
-    nodes:
-      - characters:
-          - text: o
-            marks: []
-          - text: n
-            marks: []
-          - text: e
-            marks: []
+kind: state
+document:
+  kind: document
+  data: {}
+  nodes:
+    - kind: block
+      type: line
+      data: {}
+      isVoid: false
+      nodes:
+        - kind: text
+          ranges:
+            - kind: range
+              text: one
+              marks: []

@@ -1,10 +1,16 @@
 
-data: {}
-nodes:
-  - type: paragraph
-    isVoid: true
-    data: {}
-    nodes:
-      - characters:
-          - text: " "
-            marks: []
+kind: state
+document:
+  kind: document
+  data: {}
+  nodes:
+    - kind: block
+      type: paragraph
+      data: {}
+      isVoid: true
+      nodes:
+        - kind: text
+          ranges:
+            - kind: range
+              text: " "
+              marks: []

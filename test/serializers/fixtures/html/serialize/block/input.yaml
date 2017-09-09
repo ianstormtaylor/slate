@@ -1,0 +1,9 @@
+
+document:
+  nodes:
+    - kind: block
+      type: paragraph
+      nodes:
+        - kind: text
+          ranges:
+            - text: one

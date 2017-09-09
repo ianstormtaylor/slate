@@ -26,11 +26,33 @@ const Data = {
     }
 
     if (isPlainObject(attrs)) {
-      return new Map(attrs)
+      return Data.fromJSON(attrs)
     }
 
     throw new Error(`\`Data.create\` only accepts objects or maps, but you passed it: ${attrs}`)
-  }
+  },
+
+  /**
+   * Create a `Data` from an `object`.
+   *
+   * @param {Object} object
+   * @return {Data}
+   */
+
+  fromJS(object) {
+    return Map.fromJS(object)
+  },
+
+  /**
+   * Create a `Data` from `json`.
+   *
+   * @param {Object} json
+   * @return {Data}
+   */
+
+  fromJSON(json) {
+    return Data.fromJS(json)
+  },
 
 }
 

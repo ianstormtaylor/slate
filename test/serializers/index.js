@@ -1,13 +1,13 @@
 
+import React from 'react'
 import assert from 'assert'
 import fs from 'fs'
-import readYaml from 'read-yaml-promise'
-import strip from '../helpers/strip-dynamic'
-import { Html, Plain, Raw } from '../..'
-import { resolve } from 'path'
-import React from 'react'
-import { Iterable } from 'immutable'
+import isPlainObject from 'is-plain-object'
 import parse5 from 'parse5'
+import readYaml from 'read-yaml-promise'
+import { Html, Plain, Raw } from '../..'
+import { Iterable } from 'immutable'
+import { resolve } from 'path'
 
 /**
  * Tests.
@@ -25,11 +25,11 @@ describe('serializers', () => {
           const innerDir = resolve(dir, test)
           const htmlOpts = Object.assign({}, require(innerDir).default, { parseHtml: parse5.parseFragment })
           const html = new Html(htmlOpts)
-          const expected = await readYaml(resolve(innerDir, 'output.yaml'))
           const input = fs.readFileSync(resolve(innerDir, 'input.html'), 'utf8')
+          const expected = await readYaml(resolve(innerDir, 'output.yaml'))
           const state = html.deserialize(input)
-          const json = state.document.toJS()
-          assert.deepEqual(strip(json), expected)
+          const json = state.toJSON()
+          assert.deepEqual(json, expected)
         })
       }
 
@@ -39,24 +39,7 @@ describe('serializers', () => {
         const html = new Html(htmlOpts)
         const input = fs.readFileSync(resolve(__dirname, './fixtures/html/deserialize/block/input.html'), 'utf8')
         const serialized = html.deserialize(input, { toRaw: true })
-        assert.deepEqual(serialized, {
-          kind: 'state',
-          document: {
-            kind: 'document',
-            nodes: [
-              {
-                kind: 'block',
-                type: 'paragraph',
-                nodes: [
-                  {
-                    kind: 'text',
-                    text: 'one'
-                  }
-                ]
-              }
-            ]
-          }
-        })
+        assert(isPlainObject(serialized))
       })
 
       it('optionally does not normalize', () => {
@@ -69,6 +52,7 @@ describe('serializers', () => {
           kind: 'state',
           document: {
             kind: 'document',
+            data: {},
             nodes: [
               {
                 kind: 'block',
@@ -76,7 +60,7 @@ describe('serializers', () => {
                 nodes: [
                   {
                     kind: 'inline',
-                    type: 'link',
+                    type: 'emoji',
                     isVoid: true,
                   }
                 ]
@@ -97,19 +81,21 @@ describe('serializers', () => {
           const innerDir = resolve(dir, test)
           const htmlOpts = Object.assign({}, require(innerDir).default, { parseHtml: parse5.parseFragment })
           const html = new Html(htmlOpts)
-          const input = require(resolve(innerDir, 'input.js')).default
+          const input = await readYaml(resolve(innerDir, 'input.yaml'))
           const expected = fs.readFileSync(resolve(innerDir, 'output.html'), 'utf8')
-          const serialized = html.serialize(input)
+          const state = Raw.deserialize(input)
+          const serialized = html.serialize(state)
           assert.deepEqual(serialized, expected.trim())
         })
       }
 
-      it('optionally returns an iterable list of React elements', () => {
+      it('optionally returns an iterable list of React elements', async () => {
         const fixture = require('./fixtures/html/serialize/block-nested').default
         const htmlOpts = Object.assign({}, fixture, { parseHtml: parse5.parseFragment })
         const html = new Html(htmlOpts)
-        const input = require('./fixtures/html/serialize/block-nested/input.js').default
-        const serialized = html.serialize(input, { render: false })
+        const input = await readYaml(resolve(__dirname, './fixtures/html/serialize/block-nested/input.yaml'))
+        const state = Raw.deserialize(input)
+        const serialized = html.serialize(state, { render: false })
         assert(Iterable.isIterable(serialized), 'did not return an interable list')
         assert(React.isValidElement(serialized.first()), 'did not return valid React elements')
       })
@@ -127,38 +113,16 @@ describe('serializers', () => {
           const innerDir = resolve(dir, test)
           const expected = await readYaml(resolve(innerDir, 'output.yaml'))
           const input = fs.readFileSync(resolve(innerDir, 'input.txt'), 'utf8')
-          const state = Plain.deserialize(input.replace(/\n$/m, ''))
-          const json = state.document.toJS()
-          assert.deepEqual(strip(json), expected)
+          const state = Plain.deserialize(input)
+          const json = state.toJS()
+          assert.deepEqual(json, expected)
         })
       }
 
       it('optionally returns a raw representation', () => {
         const input = fs.readFileSync(resolve(__dirname, './fixtures/plain/deserialize/line/input.txt'), 'utf8')
-        const serialized = Plain.deserialize(input.replace(/\n$/m, ''), { toRaw: true })
-        assert.deepEqual(serialized, {
-          kind: 'state',
-          document: {
-            kind: 'document',
-            nodes: [
-              {
-                kind: 'block',
-                type: 'line',
-                nodes: [
-                  {
-                    kind: 'text',
-                    ranges: [
-                      {
-                        marks: [],
-                        text: 'one',
-                      }
-                    ]
-                  }
-                ]
-              }
-            ]
-          }
-        })
+        const serialized = Plain.deserialize(input, { toRaw: true })
+        assert(isPlainObject(serialized))
       })
     })
 
@@ -170,9 +134,10 @@ describe('serializers', () => {
         if (test[0] === '.') continue
         it(test, async () => {
           const innerDir = resolve(dir, test)
-          const input = require(resolve(innerDir, 'input.js')).default
+          const input = await readYaml(resolve(innerDir, 'input.yaml'))
           const expected = fs.readFileSync(resolve(innerDir, 'output.txt'), 'utf8')
-          const serialized = Plain.serialize(input)
+          const state = Raw.deserialize(input)
+          const serialized = Plain.serialize(state)
           assert.deepEqual(serialized, expected)
         })
       }
@@ -188,11 +153,11 @@ describe('serializers', () => {
         if (test[0] === '.') continue
         it(test, async () => {
           const innerDir = resolve(dir, test)
-          const expected = await readYaml(resolve(innerDir, 'output.yaml'))
           const input = await readYaml(resolve(innerDir, 'input.yaml'))
+          const expected = await readYaml(resolve(innerDir, 'output.yaml'))
           const state = Raw.deserialize(input)
-          const json = state.document.toJS()
-          assert.deepEqual(strip(json), expected)
+          const json = state.toJS()
+          assert.deepEqual(json, expected)
         })
       }
     })
@@ -205,44 +170,11 @@ describe('serializers', () => {
         if (test[0] === '.') continue
         it(test, async () => {
           const innerDir = resolve(dir, test)
-          const input = require(resolve(innerDir, 'input.js')).default
-          const expected = await readYaml(resolve(innerDir, 'output.yaml'))
-          const serialized = Raw.serialize(input)
-          serialized.document = strip(serialized.document)
-          assert.deepEqual(serialized, expected)
-        })
-      }
-    })
-
-    describe('deserialize({ terse: true })', () => {
-      const dir = resolve(__dirname, './fixtures/raw/deserialize-terse')
-      const tests = fs.readdirSync(dir)
-
-      for (const test of tests) {
-        if (test[0] === '.') continue
-        it(test, async () => {
-          const innerDir = resolve(dir, test)
-          const expected = await readYaml(resolve(innerDir, 'output.yaml'))
           const input = await readYaml(resolve(innerDir, 'input.yaml'))
-          const state = Raw.deserialize(input, { terse: true })
-          const json = state.document.toJS()
-          assert.deepEqual(strip(json), expected)
-        })
-      }
-    })
-
-    describe('serialize({ terse: true })', () => {
-      const dir = resolve(__dirname, './fixtures/raw/serialize-terse')
-      const tests = fs.readdirSync(dir)
-
-      for (const test of tests) {
-        if (test[0] === '.') continue
-        it(test, async () => {
-          const innerDir = resolve(dir, test)
-          const input = require(resolve(innerDir, 'input.js')).default
           const expected = await readYaml(resolve(innerDir, 'output.yaml'))
-          const serialized = Raw.serialize(input, { terse: true })
-          assert.deepEqual(strip(serialized), expected)
+          const state = Raw.deserialize(input)
+          const serialized = Raw.serialize(state)
+          assert.deepEqual(serialized, expected)
         })
       }
     })

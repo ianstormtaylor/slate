@@ -29,7 +29,7 @@ const TEXT_RULE = {
     if (el.tagName == 'br') {
       return {
         kind: 'text',
-        text: '\n'
+        ranges: [{ text: '\n' }],
       }
     }
 
@@ -38,7 +38,7 @@ const TEXT_RULE = {
 
       return {
         kind: 'text',
-        text: el.value || el.nodeValue
+        ranges: [{ text: el.value || el.nodeValue }],
       }
     }
   },
@@ -131,8 +131,10 @@ class Html {
 
       const block = {
         kind: 'block',
+        data: {},
+        isVoid: false,
+        ...defaults,
         nodes: [node],
-        ...defaults
       }
 
       memo.push(block)
@@ -142,8 +144,21 @@ class Html {
     if (nodes.length === 0) {
       nodes = [{
         kind: 'block',
-        nodes: [],
-        ...defaults
+        data: {},
+        isVoid: false,
+        ...defaults,
+        nodes: [
+          {
+            kind: 'text',
+            ranges: [
+              {
+                kind: 'range',
+                text: '',
+                marks: [],
+              }
+            ]
+          }
+        ],
       }]
     }
 
@@ -151,6 +166,7 @@ class Html {
       kind: 'state',
       document: {
         kind: 'document',
+        data: {},
         nodes,
       }
     }
@@ -159,7 +175,7 @@ class Html {
       return raw
     }
 
-    const state = Raw.deserialize(raw, { terse: true })
+    const state = Raw.deserialize(raw)
     return state
   }
 
@@ -229,10 +245,16 @@ class Html {
         throw new Error(`A rule returned an invalid deserialized representation: "${node}".`)
       }
 
-      if (ret === undefined) continue
-      if (ret === null) return null
+      if (ret === undefined) {
+        continue
+      } else if (ret === null) {
+        return null
+      } else if (ret.kind == 'mark') {
+        node = this.deserializeMark(ret)
+      } else {
+        node = ret
+      }
 
-      node = ret.kind == 'mark' ? this.deserializeMark(ret) : ret
       break
     }
 
@@ -255,7 +277,6 @@ class Html {
       }
 
       else if (node.kind == 'text') {
-        if (!node.ranges) node.ranges = [{ text: node.text }]
         node.ranges = node.ranges.map((range) => {
           range.marks = range.marks || []
           range.marks.push({ type, data })

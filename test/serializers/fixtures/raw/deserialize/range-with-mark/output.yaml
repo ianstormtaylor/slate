@@ -1,16 +1,25 @@
 
-data: {}
-nodes:
-  - type: paragraph
-    isVoid: false
-    data: {}
-    nodes:
-      - characters:
-          - text: o
-            marks: []
-          - text: n
-            marks:
-              - type: bold
-                data: {}
-          - text: e
-            marks: []
+kind: state
+document:
+  kind: document
+  data: {}
+  nodes:
+    - kind: block
+      type: paragraph
+      isVoid: false
+      data: {}
+      nodes:
+        - kind: text
+          ranges:
+            - kind: range
+              text: o
+              marks: []
+            - kind: range
+              text: "n"
+              marks:
+                - kind: mark
+                  type: bold
+                  data: {}
+            - kind: range
+              text: e
+              marks: []

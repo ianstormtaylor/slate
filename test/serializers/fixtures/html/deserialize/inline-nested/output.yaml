@@ -1,26 +1,46 @@
 
-data: {}
-nodes:
-  - type: paragraph
-    isVoid: false
-    data: {}
-    nodes:
-    - characters: []
-    - type: link
-      isVoid: false
+kind: state
+document:
+  kind: document
+  data: {}
+  nodes:
+    - kind: block
+      type: paragraph
       data: {}
+      isVoid: false
       nodes:
-        - characters: []
-        - type: hashtag
-          isVoid: false
+        - kind: text
+          ranges:
+            - kind: range
+              text: ""
+              marks: []
+        - kind: inline
+          type: link
           data: {}
+          isVoid: false
           nodes:
-            - characters:
-                - text: o
+            - kind: text
+              ranges:
+                - kind: range
+                  text: ""
                   marks: []
-                - text: n
+            - kind: inline
+              type: hashtag
+              data: {}
+              isVoid: false
+              nodes:
+                - kind: text
+                  ranges:
+                    - kind: range
+                      text: one
+                      marks: []
+            - kind: text
+              ranges:
+                - kind: range
+                  text: ""
                   marks: []
-                - text: e
-                  marks: []
-        - characters: []
-    - characters: []
+        - kind: text
+          ranges:
+            - kind: range
+              text: ""
+              marks: []

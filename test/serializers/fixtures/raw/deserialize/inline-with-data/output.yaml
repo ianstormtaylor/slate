@@ -1,21 +1,32 @@
 
-data: {}
-nodes:
-  - type: paragraph
-    isVoid: false
-    data: {}
-    nodes:
-    - characters: []
-    - type: link
+kind: state
+document:
+  kind: document
+  data: {}
+  nodes:
+    - kind: block
+      type: paragraph
+      data: {}
       isVoid: false
-      data:
-        key: value
       nodes:
-        - characters:
-            - text: o
+        - kind: text
+          ranges:
+            - kind: range
+              text: ""
               marks: []
-            - text: n
+        - kind: inline
+          type: link
+          data:
+            key: value
+          isVoid: false
+          nodes:
+            - kind: text
+              ranges:
+                - kind: range
+                  text: one
+                  marks: []
+        - kind: text
+          ranges:
+            - kind: range
+              text: ""
               marks: []
-            - text: e
-              marks: []
-    - characters: []

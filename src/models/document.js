@@ -54,17 +54,44 @@ class Document extends Record(DEFAULTS) {
     }
 
     if (isPlainObject(attrs)) {
-      const { data, key, nodes } = attrs
-      const document = new Document({
-        key: key || generateKey(),
-        data: Data.create(data),
-        nodes: Node.createList(nodes),
-      })
-
-      return document
+      return Document.fromJSON(attrs)
     }
 
     throw new Error(`\`Document.create\` only accepts objects, arrays, lists or documents, but you passed it: ${attrs}`)
+  }
+
+  /**
+   * Create a `Document` from an `object`.
+   *
+   * @param {Object} object
+   * @return {Document}
+   */
+
+  static fromJS(object) {
+    const {
+      data = {},
+      key = generateKey(),
+      nodes = [],
+    } = object
+
+    const document = new Document({
+      key,
+      data: new Map(data),
+      nodes: new List(nodes.map(Node.fromJS)),
+    })
+
+    return document
+  }
+
+  /**
+   * Create a `Document` from JSON.
+   *
+   * @param {Object} json
+   * @return {Document}
+   */
+
+  static fromJSON(json) {
+    return Document.fromJS(json)
   }
 
   /**
@@ -106,6 +133,39 @@ class Document extends Record(DEFAULTS) {
 
   get text() {
     return this.getText()
+  }
+
+  /**
+   * Return a JSON representation of the document.
+   *
+   * @param {Object} options
+   * @return {Object}
+   */
+
+  toJSON(options = {}) {
+    const object = {
+      data: this.data.toJSON(),
+      key: this.key,
+      kind: this.kind,
+      nodes: this.nodes.toArray().map(n => n.toJSON(options)),
+    }
+
+    if (!options.preserveKeys) {
+      delete object.key
+    }
+
+    return object
+  }
+
+  /**
+   * Return a Javascript representation of the document.
+   *
+   * @param {Object} options
+   * @return {Object}
+   */
+
+  toJS(options) {
+    return this.toJSON(options)
   }
 
 }

@@ -1,6 +1,6 @@
 
 import Block from '../models/block'
-import Raw from '../serializers/raw'
+import State from '../models/state'
 
 /**
  * Deserialize a plain text `string` to a state.
@@ -32,6 +32,7 @@ function deserialize(string, options = {}) {
               kind: 'text',
               ranges: [
                 {
+                  kind: 'range',
                   text: line,
                   marks: defaultMarks,
                 }
@@ -43,7 +44,7 @@ function deserialize(string, options = {}) {
     }
   }
 
-  return options.toRaw ? raw : Raw.deserialize(raw)
+  return options.toRaw ? raw : State.fromJSON(raw)
 }
 
 /**

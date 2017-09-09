@@ -49,38 +49,62 @@ class Text extends Record(DEFAULTS) {
     }
 
     if (isPlainObject(attrs)) {
-      const { characters, ranges, key } = attrs
-      const chars = ranges
-        ? ranges
-            .map(Range.create)
-            .reduce((l, r) => l.concat(r.getCharacters()), Character.createList())
-        : Character.createList(characters)
-
-      const text = new Text({
-        characters: chars,
-        key: key || generateKey(),
-      })
-
-      return text
+      return Text.fromJSON(attrs)
     }
 
     throw new Error(`\`Text.create\` only accepts objects, arrays, strings or texts, but you passed it: ${attrs}`)
   }
 
   /**
-   * Create a list of `Texts` from an array.
+   * Create a list of `Texts` from a `value`.
    *
-   * @param {Array} elements
+   * @param {Array<Text|Object>|List<Text|Object>} value
    * @return {List<Text>}
    */
 
-  static createList(elements = []) {
-    if (List.isList(elements)) {
-      return elements
+  static createList(value = []) {
+    if (List.isList(value) || Array.isArray(value)) {
+      const list = new List(value.map(Text.create))
+      return list
     }
 
-    const list = new List(elements.map(Text.create))
-    return list
+    throw new Error(`\`Text.createList\` only accepts arrays or lists, but you passed it: ${value}`)
+  }
+
+  /**
+   * Create a `Text` from an `object`.
+   *
+   * @param {Object} object
+   * @return {Text}
+   */
+
+  static fromJS(object) {
+    const {
+      ranges = [],
+      key = generateKey(),
+    } = object
+
+    const characters = ranges
+      .map(Range.fromJS)
+      .reduce((l, r) => l.concat(r.getCharacters()), new List())
+
+    const node = new Text({
+      characters,
+      key,
+    })
+
+    return node
+  }
+
+  /**
+   * Create a `Text` from JSON.
+   *
+   * @param {Object} json
+   * @return {Text}
+   */
+
+  static fromJSON(json) {
+    return Text.fromJS(json)
   }
 
   /**
@@ -394,6 +418,38 @@ class Text extends Record(DEFAULTS) {
     const end = index + length
     characters = characters.filterNot((char, i) => start <= i && i < end)
     return this.set('characters', characters)
+  }
+
+  /**
+   * Return a JSON representation of the text.
+   *
+   * @param {Object} options
+   * @return {Object}
+   */
+
+  toJSON(options = {}) {
+    const object = {
+      key: this.key,
+      kind: this.kind,
+      ranges: this.getRanges().toArray().map(r => r.toJSON()),
+    }
+
+    if (!options.preserveKeys) {
+      delete object.key
+    }
+
+    return object
+  }
+
+  /**
+   * Return a Javascript representation of the text.
+   *
+   * @param {Object} options
+   * @return {Object}
+   */
+
+  toJS(options) {
+    return this.toJSON(options)
   }
 
   /**

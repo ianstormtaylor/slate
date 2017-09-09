@@ -1,0 +1,11 @@
+
+kind: state
+document:
+  kind: document
+  nodes:
+    - kind: block
+      type: paragraph
+      nodes:
+        - kind: inline
+          type: emoji
+          isVoid: true

@@ -45,15 +45,42 @@ class History extends Record(DEFAULTS) {
     }
 
     if (isPlainObject(attrs)) {
-      const history = new History({
-        undos: attrs.undos || new Stack(),
-        redos: attrs.redos || new Stack(),
-      })
-
-      return history
+      return History.fromJSON(attrs)
     }
 
     throw new Error(`\`History.create\` only accepts objects or histories, but you passed it: ${attrs}`)
+  }
+
+  /**
+   * Create a `History` from an `object`.
+   *
+   * @param {Object} object
+   * @return {History}
+   */
+
+  static fromJS(object) {
+    const {
+      redos = [],
+      undos = [],
+    } = object
+
+    const history = new History({
+      redos: new Stack(redos),
+      undos: new Stack(undos),
+    })
+
+    return history
+  }
+
+  /**
+   * Create a `History` from JSON.
+   *
+   * @param {Object} json
+   * @return {History}
+   */
+
+  static fromJSON(json) {
+    return History.fromJS(json)
   }
 
   /**
@@ -129,6 +156,32 @@ class History extends Record(DEFAULTS) {
     redos = redos.clear()
     history = history.set('undos', undos).set('redos', redos)
     return history
+  }
+
+  /**
+   * Return a JSON representation of the history.
+   *
+   * @return {Object}
+   */
+
+  toJSON() {
+    const object = {
+      kind: this.kind,
+      redos: this.redos.toJSON(),
+      undos: this.undos.toJSON(),
+    }
+
+    return object
+  }
+
+  /**
+   * Return a Javascript representation of the history.
+   *
+   * @return {Object}
+   */
+
+  toJS() {
+    return this.toJSON()
   }
 
 }

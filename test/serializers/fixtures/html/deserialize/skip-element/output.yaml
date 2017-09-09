@@ -1,20 +1,36 @@
 
-data: {}
-nodes:
-  - type: paragraph
-    isVoid: false
-    data: {}
-    nodes:
-    - characters: []
-  - type: divider
-    isVoid: true
-    data: {}
-    nodes:
-    - characters:
-        - text: " "
-          marks: []
-  - type: paragraph
-    isVoid: false
-    data: {}
-    nodes:
-    - characters: []
+kind: state
+document:
+  kind: document
+  data: {}
+  nodes:
+    - kind: block
+      type: paragraph
+      data: {}
+      isVoid: false
+      nodes:
+        - kind: text
+          ranges:
+            - kind: range
+              text: ""
+              marks: []
+    - kind: block
+      type: divider
+      data: {}
+      isVoid: true
+      nodes:
+        - kind: text
+          ranges:
+            - kind: range
+              text: " "
+              marks: []
+    - kind: block
+      type: paragraph
+      data: {}
+      isVoid: false
+      nodes:
+        - kind: text
+          ranges:
+            - kind: range
+              text: ""
+              marks: []

@@ -1,0 +1,14 @@
+
+kind: state
+document:
+  kind: document
+  nodes:
+    - kind: block
+      type: paragraph
+      isVoid: true
+      nodes:
+        - kind: text
+          ranges:
+            - kind: range
+              text: one
+              marks: []

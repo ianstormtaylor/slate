@@ -1,0 +1,10 @@
+
+document:
+  nodes:
+    - kind: block
+      type: paragraph
+      nodes:
+        - kind: inline
+          type: image
+          isVoid: true
+
