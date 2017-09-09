@@ -64,7 +64,15 @@ const DEFAULT_CREATORS = {
   mark(tagName, attributes, children) {
     const mark = Mark.create(attributes)
     let nodes = createChildren(children)
-    nodes = nodes.map(node => node.addMark(0, node.text.length, mark))
+
+    nodes = nodes.map((node) => {
+      if (node.kind != 'text') {
+        throw new Error(`Slate hyperscript marks can only contain text children, but you passed: ${node.kind}`)
+      }
+
+      node.addMark(0, node.text.length, mark)
+    })
+
     return nodes
   },
 
@@ -82,6 +90,8 @@ const DEFAULT_CREATORS = {
     let { selection } = state
     const props = {}
 
+    // Search the document's texts to see if any of them have the anchor or
+    // focus information saved, so we can set the selection.
     document.getTexts().forEach((text) => {
       if (text.__anchor != null) {
         props.anchorKey = text.key
@@ -100,7 +110,7 @@ const DEFAULT_CREATORS = {
       (props.anchorKey && !props.focusKey) ||
       (!props.anchorKey && props.focusKey)
     ) {
-      throw new Error(`Hyperscript must have both \`<anchor/>\` and \`<focus/>\` if one is used. For collapsed selections, use \`<cursor/>\`.`)
+      throw new Error(`Slate hyperscript must have both \`<anchor/>\` and \`<focus/>\` if one is used. For collapsed selections, use \`<cursor/>\`.`)
     }
 
     if (!isEmpty(props)) {
@@ -145,7 +155,7 @@ function createHyperscript(options = {}) {
       .reduce((memo, child) => memo.concat(child), [])
 
     if (!creators[tagName]) {
-      throw new Error(`No hyperscript creator found for tag "${tagName}"`)
+      throw new Error(`No hyperscript creator found for tag: "${tagName}"`)
     }
 
     const element = creators[tagName](tagName, attributes, children)
@@ -290,7 +300,7 @@ function normalizeNode(key, value, kind) {
     }
   }
 
-  throw new Error(`Hyperscript ${kind} creators can be either functions, objects or strings, but you passed: ${value}`)
+  throw new Error(`Slate hyperscript ${kind} creators can be either functions, objects or strings, but you passed: ${value}`)
 }
 
 /**
@@ -326,7 +336,7 @@ function normalizeMark(key, value) {
     }
   }
 
-  throw new Error(`Hyperscript mark creators can be either functions, objects or strings, but you passed: ${value}`)
+  throw new Error(`Slate hyperscript mark creators can be either functions, objects or strings, but you passed: ${value}`)
 }
 
 /**
