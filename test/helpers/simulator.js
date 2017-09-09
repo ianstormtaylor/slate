@@ -29,12 +29,25 @@ const CHANGE_HANDLERS = [
 ]
 
 /**
- * Simulate utility.
+ * Simulator.
  *
- * @type {Object}
+ * @type {Simulator}
  */
 
-const Simulate = {}
+class Simulator {
+
+  /**
+   * Create a new `Simulator` for a `stack`.
+   *
+   * @param {Object} attrs
+   */
+
+  constructor({ stack, state }) {
+    this.stack = stack
+    this.state = state
+  }
+
+}
 
 /**
  * Generate the event simulators.
@@ -43,7 +56,8 @@ const Simulate = {}
 EVENT_HANDLERS.forEach((handler) => {
   const method = getMethodName(handler)
 
-  Simulate[method] = function (stack, state, e, data) {
+  Simulator.prototype[method] = function (e, data) {
+    const { stack, state } = this
     const editor = createEditor(stack, state)
     const event = createEvent(e || {})
     const change = state.change()
@@ -51,9 +65,8 @@ EVENT_HANDLERS.forEach((handler) => {
     stack[handler](change, editor, event, data)
     stack.onBeforeChange(change, editor)
     stack.onChange(change, editor)
-    const next = change.state
-    if (next == state) return state
-    return next
+
+    this.state = change.state
   }
 })
 
@@ -64,7 +77,7 @@ EVENT_HANDLERS.forEach((handler) => {
 CHANGE_HANDLERS.forEach((handler) => {
   const method = getMethodName(handler)
 
-  Simulate[method] = function (stack, state) {
+  Simulator.prototype[method] = function () {
     throw new Error('Unimplemented!')
     // const editor = createEditor(stack, state)
     // const next = stack[handler](state, editor)
@@ -122,4 +135,4 @@ function createEvent(attributes) {
  * @type {Object}
  */
 
-export default Simulate
+export default Simulator

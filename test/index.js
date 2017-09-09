@@ -11,12 +11,11 @@ import 'babel-polyfill'
  * Tests.
  */
 
-import './rendering'
-import './schemas'
 import './serializers'
-import './changes'
-import './behavior'
+import './schemas'
 import './plugins'
+import './rendering'
+import './changes'
 
 /**
  * Reset Slate's internal state before each text.

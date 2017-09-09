@@ -1,10 +1,9 @@
 
-import React from 'react'
-import ReactDOM from 'react-dom/server'
+import Simulator from '../helpers/simulator'
 import assert from 'assert'
-import clean from '../helpers/clean'
-import fs from 'fs-promise'
-import { Editor } from '../..'
+import fs from 'fs'
+import toCamel from 'to-camel-case'
+import { Stack } from '../..'
 import { basename, extname, resolve } from 'path'
 
 /**
@@ -12,26 +11,30 @@ import { basename, extname, resolve } from 'path'
  */
 
 describe('plugins', () => {
-  const dir = resolve(__dirname, './fixtures')
-  const tests = fs.readdirSync(dir).filter(t => t[0] != '.').map(t => basename(t, extname(t)))
+  describe('core', () => {
+    const dir = resolve(__dirname, 'core')
+    const events = fs.readdirSync(dir).filter(e => e[0] != '.' && e != 'index.js')
 
-  for (const test of tests) {
-    it(test, async () => {
-      const module = require(resolve(dir, test))
-      const { state, output, plugins } = module
-      const props = {
-        state,
-        plugins,
-        onChange: () => {},
-      }
+    for (const event of events) {
+      describe(`${toCamel(event)}`, () => {
+        const testDir = resolve(dir, event)
+        const tests = fs.readdirSync(testDir).filter(t => t[0] != '.' && !!~t.indexOf('.js')).map(t => basename(t, extname(t)))
 
-      const string = ReactDOM.renderToStaticMarkup(<Editor {...props} />)
-      const expected = output
-        .trim()
-        .replace(/\n/gm, '')
-        .replace(/>\s*</g, '><')
+        for (const test of tests) {
+          it(test, async () => {
+            const module = require(resolve(testDir, test))
+            const { input, output } = module
+            const fn = module.default
+            const stack = Stack.create()
+            const simulator = new Simulator({ stack, state: input })
+            fn(simulator)
 
-      assert.equal(clean(string), expected)
-    })
-  }
+            const actual = simulator.state.toJSON({ preserveSelection: true })
+            const expected = output.toJSON({ preserveSelection: true })
+            assert.deepEqual(actual, expected)
+          })
+        }
+      })
+    }
+  })
 })

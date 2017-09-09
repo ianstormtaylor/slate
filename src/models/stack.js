@@ -62,7 +62,7 @@ class Stack extends Record(DEFAULTS) {
    *   @property {Function} ...handlers
    */
 
-  static create(attrs) {
+  static create(attrs = {}) {
     const plugins = resolvePlugins(attrs)
     const schema = resolveSchema(plugins)
     const stack = new Stack({ plugins, schema })
