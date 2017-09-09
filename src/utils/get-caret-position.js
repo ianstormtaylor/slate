@@ -7,11 +7,11 @@ import findDeepestNode from './find-deepest-node'
  * @param {Number} offset
  * @param {State} state
  * @param {Editor} editor
- * @param {Element} contentElement
+ * @param {Element} el
  * @return {Object}
  */
 
-function getCaretPosition(key, offset, state, editor, contentElement) {
+function getCaretPosition(key, offset, state, editor, el) {
   const { document } = state
   const text = document.getDescendant(key)
   const schema = editor.getSchema()
@@ -31,7 +31,7 @@ function getCaretPosition(key, offset, state, editor, contentElement) {
     return false
   })
 
-  const span = contentElement.querySelector(`[data-offset-key="${key}-${index}"]`)
+  const span = el.querySelector(`[data-offset-key="${key}-${index}"]`)
   const node = findDeepestNode(span)
   return { node, offset: off }
 }
