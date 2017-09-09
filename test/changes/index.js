@@ -13,14 +13,14 @@ import { resolve } from 'path'
 
 describe('changes', async () => {
   describe('by-key', () => {
-    const dir = resolve(__dirname, './fixtures/by-key')
+    const dir = resolve(__dirname, './by-key')
     const changes = fs.readdirSync(dir)
 
     for (const change of changes) {
       if (change[0] == '.') continue
 
       describe(`${toCamel(change)}()`, () => {
-        const changeDir = resolve(__dirname, './fixtures/by-key', change)
+        const changeDir = resolve(__dirname, './by-key', change)
         const tests = fs.readdirSync(changeDir)
 
         for (const test of tests) {
@@ -43,14 +43,14 @@ describe('changes', async () => {
   })
 
   describe('on-selection', () => {
-    const dir = resolve(__dirname, './fixtures/on-selection')
+    const dir = resolve(__dirname, './on-selection')
     const changes = fs.readdirSync(dir)
 
     for (const change of changes) {
       if (change[0] == '.') continue
 
       describe(`${toCamel(change)}()`, () => {
-        const changeDir = resolve(__dirname, './fixtures/on-selection', change)
+        const changeDir = resolve(__dirname, './on-selection', change)
         const tests = fs.readdirSync(changeDir)
 
         for (const test of tests) {
@@ -69,14 +69,14 @@ describe('changes', async () => {
   })
 
   describe('at-range', () => {
-    const dir = resolve(__dirname, './fixtures/at-range')
+    const dir = resolve(__dirname, './at-range')
     const changes = fs.readdirSync(dir)
 
     for (const change of changes) {
       if (change[0] == '.') continue
 
       describe(`${toCamel(change)}()`, () => {
-        const changeDir = resolve(__dirname, './fixtures/at-range', change)
+        const changeDir = resolve(__dirname, './at-range', change)
         const tests = fs.readdirSync(changeDir)
 
         for (const test of tests) {
@@ -99,14 +99,14 @@ describe('changes', async () => {
   })
 
   describe('at-current-range', () => {
-    const dir = resolve(__dirname, './fixtures/at-current-range')
+    const dir = resolve(__dirname, './at-current-range')
     const changes = fs.readdirSync(dir)
 
     for (const change of changes) {
       if (change[0] == '.') continue
 
       describe(`${toCamel(change)}()`, () => {
-        const changeDir = resolve(__dirname, './fixtures/at-current-range', change)
+        const changeDir = resolve(__dirname, './at-current-range', change)
         const tests = fs.readdirSync(changeDir)
 
         for (const test of tests) {
@@ -129,14 +129,14 @@ describe('changes', async () => {
   })
 
   describe('on-history', () => {
-    const dir = resolve(__dirname, './fixtures/on-history')
+    const dir = resolve(__dirname, './on-history')
     const changes = fs.readdirSync(dir)
 
     for (const change of changes) {
       if (change[0] == '.') continue
 
       describe(`${toCamel(change)}()`, () => {
-        const changeDir = resolve(__dirname, './fixtures/on-history', change)
+        const changeDir = resolve(__dirname, './on-history', change)
         const tests = fs.readdirSync(changeDir)
 
         for (const test of tests) {
@@ -159,7 +159,7 @@ describe('changes', async () => {
   })
 
   describe('call', () => {
-    const dir = resolve(__dirname, './fixtures/call')
+    const dir = resolve(__dirname, './call')
     const tests = fs.readdirSync(dir)
     for (const test of tests) {
       if (test[0] == '.') continue
@@ -179,7 +179,7 @@ describe('changes', async () => {
   })
 
   describe('general', () => {
-    const dir = resolve(__dirname, './fixtures/general')
+    const dir = resolve(__dirname, './general')
     const tests = fs.readdirSync(dir)
 
     for (const test of tests) {
