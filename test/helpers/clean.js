@@ -13,26 +13,29 @@ const UNWANTED_TOP_LEVEL_ATTRS = [
 ]
 
 /**
- * Clean an element of unwanted attributes
+ * Clean an `element` of unwanted attributes.
  *
  * @param {Element} element
  * @return {Element}
  */
 
 function stripUnwantedAttrs(element) {
-  if(Array.isArray(element.attrs)) {
+  if (Array.isArray(element.attrs)) {
     element.attrs = element.attrs.filter(({ name }) => { return !UNWANTED_ATTRS.includes(name) })
 
-    if(element.parentNode.nodeName === '#document-fragment') {
-      element.attrs = element.attrs.filter(({ name }) => { return !UNWANTED_TOP_LEVEL_ATTRS.includes(name) })      
+    if (element.parentNode.nodeName === '#document-fragment') {
+      element.attrs = element.attrs.filter(({ name }) => { return !UNWANTED_TOP_LEVEL_ATTRS.includes(name) })
     }
   }
-  if(Array.isArray(element.childNodes)) {
+
+  if (Array.isArray(element.childNodes)) {
     element.childNodes.forEach(stripUnwantedAttrs)
   }
-  if(element.nodeName === '#text') {
+
+  if (element.nodeName === '#text') {
     element.value = element.value.trim()
   }
+
   return element
 }
 

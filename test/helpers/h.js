@@ -12,6 +12,7 @@ const h = createHyperscript({
     line: 'line',
     paragraph: 'paragraph',
     quote: 'quote',
+    code: 'code',
     image: {
       type: 'image',
       isVoid: true,
