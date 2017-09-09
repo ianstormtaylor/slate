@@ -502,7 +502,7 @@ class State extends Record(DEFAULTS) {
       return true
     }
 
-    if (endOffset != 0 && startOffset != 0) {
+    if (startOffset < endOffset) {
       return false
     }
 
