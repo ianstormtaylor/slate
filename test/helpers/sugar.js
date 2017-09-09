@@ -9,6 +9,7 @@ import createHyperscript from './slate-sugar'
 
 const sugar = createHyperscript({
   blocks: {
+    line: 'line',
     paragraph: 'paragraph',
     quote: 'quote',
   },

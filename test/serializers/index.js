@@ -5,7 +5,7 @@ import fs from 'fs'
 import isPlainObject from 'is-plain-object'
 import parse5 from 'parse5'
 import readYaml from 'read-yaml-promise'
-import { Html, Plain, Raw } from '../..'
+import { Html, Plain, Raw, State } from '../..'
 import { Iterable } from 'immutable'
 import { basename, extname, resolve } from 'path'
 
@@ -106,40 +106,32 @@ describe('serializers', () => {
   describe('plain', () => {
     describe('deserialize()', () => {
       const dir = resolve(__dirname, './plain/deserialize')
-      const tests = fs.readdirSync(dir)
+      const tests = fs.readdirSync(dir).filter(t => t[0] != '.').map(t => basename(t, extname(t)))
 
       for (const test of tests) {
-        if (test[0] === '.') continue
         it(test, async () => {
-          const innerDir = resolve(dir, test)
-          const expected = await readYaml(resolve(innerDir, 'output.yaml'))
-          const input = fs.readFileSync(resolve(innerDir, 'input.txt'), 'utf8')
-          const state = Plain.deserialize(input)
-          const json = state.toJS()
-          assert.deepEqual(json, expected)
+          const module = require(resolve(dir, test))
+          const { input, output, options } = module
+          const state = Plain.deserialize(input, options)
+          const actual = State.isState(state) ? state.toJSON() : state
+          const expected = State.isState(output) ? output.toJSON() : output
+          assert.deepEqual(actual, expected)
         })
       }
-
-      it('optionally returns a raw representation', () => {
-        const input = fs.readFileSync(resolve(__dirname, './plain/deserialize/line/input.txt'), 'utf8')
-        const serialized = Plain.deserialize(input, { toRaw: true })
-        assert(isPlainObject(serialized))
-      })
     })
 
     describe('serialize()', () => {
       const dir = resolve(__dirname, './plain/serialize')
-      const tests = fs.readdirSync(dir)
+      const tests = fs.readdirSync(dir).filter(t => t[0] != '.').map(t => basename(t, extname(t)))
 
       for (const test of tests) {
-        if (test[0] === '.') continue
         it(test, async () => {
-          const innerDir = resolve(dir, test)
-          const input = await readYaml(resolve(innerDir, 'input.yaml'))
-          const expected = fs.readFileSync(resolve(innerDir, 'output.txt'), 'utf8')
-          const state = Raw.deserialize(input)
-          const serialized = Plain.serialize(state)
-          assert.deepEqual(serialized, expected)
+          const module = require(resolve(dir, test))
+          const { input, output, options } = module
+          const string = Plain.serialize(input, options)
+          const actual = string
+          const expected = output
+          assert.deepEqual(actual, expected)
         })
       }
     })

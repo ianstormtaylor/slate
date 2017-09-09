@@ -23,10 +23,13 @@ function deserialize(string, options = {}) {
     kind: 'state',
     document: {
       kind: 'document',
+      data: {},
       nodes: string.split('\n').map((line) => {
         return {
           ...defaultBlock,
           kind: 'block',
+          isVoid: false,
+          data: {},
           nodes: [
             {
               kind: 'text',
