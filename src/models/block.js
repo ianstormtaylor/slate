@@ -79,11 +79,15 @@ class Block extends Record(DEFAULTS) {
   /**
    * Create a `Block` from a JSON `object`.
    *
-   * @param {Object} object
+   * @param {Object|Block} object
    * @return {Block}
    */
 
   static fromJSON(object) {
+    if (Block.isBlock(object)) {
+      return object
+    }
+
     const {
       data = {},
       isVoid = false,

@@ -63,11 +63,15 @@ class Document extends Record(DEFAULTS) {
   /**
    * Create a `Document` from an `object`.
    *
-   * @param {Object} object
+   * @param {Object|Document} object
    * @return {Document}
    */
 
   static fromJS(object) {
+    if (Document.isDocument(object)) {
+      return object
+    }
+
     const {
       data = {},
       key = generateKey(),

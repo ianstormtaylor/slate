@@ -21,6 +21,7 @@ describe('serializers', () => {
 
       for (const test of tests) {
         if (test[0] === '.') continue
+
         it(test, async () => {
           const innerDir = resolve(dir, test)
           const htmlOpts = Object.assign({}, require(innerDir).default, { parseHtml: parse5.parseFragment })
@@ -151,13 +152,15 @@ describe('serializers', () => {
 
       for (const test of tests) {
         if (test[0] === '.') continue
+        if (!~test.indexOf('.js')) continue
+
         it(test, async () => {
-          const innerDir = resolve(dir, test)
-          const input = await readYaml(resolve(innerDir, 'input.yaml'))
-          const expected = await readYaml(resolve(innerDir, 'output.yaml'))
+          const file = resolve(dir, test)
+          const { input, output } = require(file)
           const state = Raw.deserialize(input)
-          const json = state.toJS()
-          assert.deepEqual(json, expected)
+          const actual = state.toJSON()
+          const expected = output.toJSON()
+          assert.deepEqual(actual, expected)
         })
       }
     })

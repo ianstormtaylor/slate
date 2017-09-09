@@ -81,11 +81,15 @@ class Inline extends Record(DEFAULTS) {
   /**
    * Create a `Inline` from an `object`.
    *
-   * @param {Object} object
+   * @param {Object|Inline} object
    * @return {Inline}
    */
 
   static fromJS(object) {
+    if (Inline.isInline(object)) {
+      return object
+    }
+
     const {
       data = {},
       isVoid = false,

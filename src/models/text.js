@@ -74,11 +74,15 @@ class Text extends Record(DEFAULTS) {
   /**
    * Create a `Text` from an `object`.
    *
-   * @param {Object} object
+   * @param {Object|Text} object
    * @return {Text}
    */
 
   static fromJS(object) {
+    if (Text.isText(object)) {
+      return object
+    }
+
     const {
       ranges = [],
       key = generateKey(),
