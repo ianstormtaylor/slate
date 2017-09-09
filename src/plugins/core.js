@@ -109,7 +109,11 @@ function Plugin(options = {}) {
     const { anchorNode, anchorOffset, focusNode, focusOffset } = native
     const anchorPoint = getPoint(anchorNode, anchorOffset, state, editor)
     const focusPoint = getPoint(focusNode, focusOffset, state, editor)
-    if (anchorPoint && focusPoint) {
+
+    // The IME will delete preview characters in the editor when user commits input words,
+    // so need not to update selection during composing, or the words after will be replaced.
+    const isComposing = data.isComposing
+    if (anchorPoint && focusPoint && !isComposing) {
       const { selection } = state
       if (
         selection.anchorKey !== anchorPoint.key ||
