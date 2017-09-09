@@ -1,7 +1,6 @@
 
 import Selection from '../models/selection'
 import isEmpty from 'is-empty'
-import logger from '../utils/logger'
 import pick from 'lodash/pick'
 
 /**
@@ -104,47 +103,6 @@ Changes.snapshotSelection = (change) => {
   const { state } = change
   const { selection } = state
   change.select(selection, { snapshot: true })
-}
-
-/**
- * Set `properties` on the selection.
- *
- * @param {Mixed} ...args
- * @param {Change} change
- */
-
-Changes.moveTo = (change, properties) => {
-  logger.deprecate('0.17.0', 'The `moveTo()` change is deprecated, please use `select()` instead.')
-  change.select(properties)
-}
-
-/**
- * Unset the selection's marks.
- *
- * @param {Change} change
- */
-
-Changes.unsetMarks = (change) => {
-  logger.deprecate('0.17.0', 'The `unsetMarks()` change is deprecated.')
-  change.select({ marks: null })
-}
-
-/**
- * Unset the selection, removing an association to a node.
- *
- * @param {Change} change
- */
-
-Changes.unsetSelection = (change) => {
-  logger.deprecate('0.17.0', 'The `unsetSelection()` change is deprecated, please use `deselect()` instead.')
-  change.select({
-    anchorKey: null,
-    anchorOffset: 0,
-    focusKey: null,
-    focusOffset: 0,
-    isFocused: false,
-    isBackward: false
-  })
 }
 
 /**
@@ -257,31 +215,6 @@ PREFIXES.forEach((prefix) => {
       })
     })
   })
-})
-
-/**
- * Mix in deprecated changes with a warning.
- */
-
-const DEPRECATED_TRANSFORMS = [
-  ['extendBackward', 'extend', 'The `extendBackward(n)` change is deprecated, please use `extend(n)` instead with a negative offset.'],
-  ['extendForward', 'extend', 'The `extendForward(n)` change is deprecated, please use `extend(n)` instead.'],
-  ['moveBackward', 'move', 'The `moveBackward(n)` change is deprecated, please use `move(n)` instead with a negative offset.'],
-  ['moveForward', 'move', 'The `moveForward(n)` change is deprecated, please use `move(n)` instead.'],
-  ['moveStartOffset', 'moveStart', 'The `moveStartOffset(n)` change is deprecated, please use `moveStart(n)` instead.'],
-  ['moveEndOffset', 'moveEnd', 'The `moveEndOffset(n)` change is deprecated, please use `moveEnd()` instead.'],
-  ['moveToOffsets', 'moveOffsetsTo', 'The `moveToOffsets()` change is deprecated, please use `moveOffsetsTo()` instead.'],
-  ['flipSelection', 'flip', 'The `flipSelection()` change is deprecated, please use `flip()` instead.'],
-]
-
-DEPRECATED_TRANSFORMS.forEach(([ old, current, warning ]) => {
-  Changes[old] = (change, ...args) => {
-    logger.deprecate('0.17.0', warning)
-    const { state } = change
-    const { document, selection } = state
-    const sel = selection[current](...args).normalize(document)
-    change.select(sel)
-  }
 })
 
 /**
