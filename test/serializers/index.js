@@ -16,7 +16,7 @@ import { basename, extname, resolve } from 'path'
 describe('serializers', () => {
   describe('html', () => {
     describe('deserialize()', () => {
-      const dir = resolve(__dirname, './fixtures/html/deserialize')
+      const dir = resolve(__dirname, './html/deserialize')
       const tests = fs.readdirSync(dir)
 
       for (const test of tests) {
@@ -35,19 +35,19 @@ describe('serializers', () => {
       }
 
       it('optionally returns a raw representation', () => {
-        const fixture = require('./fixtures/html/deserialize/block').default
+        const fixture = require('./html/deserialize/block').default
         const htmlOpts = Object.assign({}, fixture, { parseHtml: parse5.parseFragment })
         const html = new Html(htmlOpts)
-        const input = fs.readFileSync(resolve(__dirname, './fixtures/html/deserialize/block/input.html'), 'utf8')
+        const input = fs.readFileSync(resolve(__dirname, './html/deserialize/block/input.html'), 'utf8')
         const serialized = html.deserialize(input, { toRaw: true })
         assert(isPlainObject(serialized))
       })
 
       it('optionally does not normalize', () => {
-        const fixture = require('./fixtures/html/deserialize/inline-with-is-void').default
+        const fixture = require('./html/deserialize/inline-with-is-void').default
         const htmlOpts = Object.assign({}, fixture, { parseHtml: parse5.parseFragment })
         const html = new Html(htmlOpts)
-        const input = fs.readFileSync(resolve(__dirname, './fixtures/html/deserialize/inline-with-is-void/input.html'), 'utf8')
+        const input = fs.readFileSync(resolve(__dirname, './html/deserialize/inline-with-is-void/input.html'), 'utf8')
         const serialized = html.deserialize(input, { toRaw: true, normalize: false })
         assert.deepEqual(serialized, {
           kind: 'state',
@@ -73,7 +73,7 @@ describe('serializers', () => {
     })
 
     describe('serialize()', () => {
-      const dir = resolve(__dirname, './fixtures/html/serialize')
+      const dir = resolve(__dirname, './html/serialize')
       const tests = fs.readdirSync(dir)
 
       for (const test of tests) {
@@ -91,10 +91,10 @@ describe('serializers', () => {
       }
 
       it('optionally returns an iterable list of React elements', async () => {
-        const fixture = require('./fixtures/html/serialize/block-nested').default
+        const fixture = require('./html/serialize/block-nested').default
         const htmlOpts = Object.assign({}, fixture, { parseHtml: parse5.parseFragment })
         const html = new Html(htmlOpts)
-        const input = await readYaml(resolve(__dirname, './fixtures/html/serialize/block-nested/input.yaml'))
+        const input = await readYaml(resolve(__dirname, './html/serialize/block-nested/input.yaml'))
         const state = Raw.deserialize(input)
         const serialized = html.serialize(state, { render: false })
         assert(Iterable.isIterable(serialized), 'did not return an interable list')
@@ -105,7 +105,7 @@ describe('serializers', () => {
 
   describe('plain', () => {
     describe('deserialize()', () => {
-      const dir = resolve(__dirname, './fixtures/plain/deserialize')
+      const dir = resolve(__dirname, './plain/deserialize')
       const tests = fs.readdirSync(dir)
 
       for (const test of tests) {
@@ -121,14 +121,14 @@ describe('serializers', () => {
       }
 
       it('optionally returns a raw representation', () => {
-        const input = fs.readFileSync(resolve(__dirname, './fixtures/plain/deserialize/line/input.txt'), 'utf8')
+        const input = fs.readFileSync(resolve(__dirname, './plain/deserialize/line/input.txt'), 'utf8')
         const serialized = Plain.deserialize(input, { toRaw: true })
         assert(isPlainObject(serialized))
       })
     })
 
     describe('serialize()', () => {
-      const dir = resolve(__dirname, './fixtures/plain/serialize')
+      const dir = resolve(__dirname, './plain/serialize')
       const tests = fs.readdirSync(dir)
 
       for (const test of tests) {
@@ -146,46 +146,42 @@ describe('serializers', () => {
   })
 
   describe('raw', () => {
-    const dir = resolve(__dirname, './raw')
-    const tests = fs
-      .readdirSync(dir)
-      .filter(t => t[0] != '.')
-      .map(t => basename(t, extname(t)))
-
     describe('deserialize()', () => {
+      const dir = resolve(__dirname, './raw/deserialize')
+      const tests = fs.readdirSync(dir).filter(t => t[0] != '.').map(t => basename(t, extname(t)))
+
       for (const test of tests) {
         it(test, async () => {
-          const { json, state } = require(resolve(dir, test))
-          const actual = Raw.deserialize(json).toJSON()
-          const expected = state.toJSON()
+          const {
+            input,
+            output,
+            options = {},
+          } = require(resolve(dir, test))
+
+          const actual = Raw.deserialize(input, options).toJSON()
+          const expected = output.toJSON()
           assert.deepEqual(actual, expected)
         })
       }
     })
 
     describe('serialize()', () => {
+      const dir = resolve(__dirname, './raw/serialize')
+      const tests = fs.readdirSync(dir).filter(t => t[0] != '.').map(t => basename(t, extname(t)))
+
       for (const test of tests) {
         it(test, async () => {
-          const { json, state } = require(resolve(dir, test))
-          const actual = Raw.serialize(state)
-          const expected = json
+          const {
+            input,
+            output,
+            options = {},
+          } = require(resolve(dir, test))
+
+          const actual = Raw.serialize(input, options)
+          const expected = output
           assert.deepEqual(actual, expected)
         })
       }
-    })
-
-    describe('serialize({ preserveKeys: true })', () => {
-      it('should omit keys by default', () => {
-        const state = Plain.deserialize('string')
-        const serialized = Raw.serialize(state)
-        assert(typeof serialized.document.key === 'undefined')
-      })
-
-      it('should preserve keys', () => {
-        const state = Plain.deserialize('string')
-        const serialized = Raw.serialize(state, { preserveKeys: true })
-        assert(typeof serialized.document.key === 'string')
-      })
     })
   })
 })

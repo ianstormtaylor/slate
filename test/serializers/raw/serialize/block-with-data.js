@@ -1,8 +1,8 @@
 /** @jsx sugar */
 
-import sugar from '../../helpers/sugar'
+import sugar from '../../../helpers/sugar'
 
-export const state = (
+export const input = (
   <state>
     <document>
       <paragraph thing="value">
@@ -12,7 +12,7 @@ export const state = (
   </state>
 )
 
-export const json = {
+export const output = {
   kind: 'state',
   document: {
     kind: 'document',

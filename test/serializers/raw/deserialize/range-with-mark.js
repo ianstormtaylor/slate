@@ -1,18 +1,8 @@
 /** @jsx sugar */
 
-import sugar from '../../helpers/sugar'
+import sugar from '../../../helpers/sugar'
 
-export const state = (
-  <state>
-    <document>
-      <paragraph>
-        o<b>n</b>e
-      </paragraph>
-    </document>
-  </state>
-)
-
-export const json = {
+export const input = {
   kind: 'state',
   document: {
     kind: 'document',
@@ -55,3 +45,13 @@ export const json = {
     ]
   }
 }
+
+export const output = (
+  <state>
+    <document>
+      <paragraph>
+        o<b>n</b>e
+      </paragraph>
+    </document>
+  </state>
+)

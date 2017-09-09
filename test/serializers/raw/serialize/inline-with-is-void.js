@@ -1,20 +1,18 @@
 /** @jsx sugar */
 
-import sugar from '../../helpers/sugar'
+import sugar from '../../../helpers/sugar'
 
-export const state = (
+export const input = (
   <state>
     <document>
       <paragraph>
-        <link>
-          one
-        </link>
+        <emoji />
       </paragraph>
     </document>
   </state>
 )
 
-export const json = {
+export const output = {
   kind: 'state',
   document: {
     kind: 'document',
@@ -38,8 +36,8 @@ export const json = {
           },
           {
             kind: 'inline',
-            type: 'link',
-            isVoid: false,
+            type: 'emoji',
+            isVoid: true,
             data: {},
             nodes: [
               {
@@ -47,7 +45,7 @@ export const json = {
                 ranges: [
                   {
                     kind: 'range',
-                    text: 'one',
+                    text: ' ',
                     marks: [],
                   }
                 ]
