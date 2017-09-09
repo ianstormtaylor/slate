@@ -12,7 +12,7 @@ import Selection from '../models/selection'
 import SlateTypes from '../utils/prop-types'
 import extendSelection from '../utils/extend-selection'
 import findClosestNode from '../utils/find-closest-node'
-import findDeepestNode from '../utils/find-deepest-node'
+import getCaretPosition from '../utils/get-caret-position'
 import getHtmlFromNativePaste from '../utils/get-html-from-native-paste'
 import getPoint from '../utils/get-point'
 import getTransferData from '../utils/get-transfer-data'
@@ -147,7 +147,7 @@ class Content extends React.Component {
 
   updateSelection = () => {
     const { editor, state } = this.props
-    const { document, selection } = state
+    const { selection } = state
     const window = getWindow(this.element)
     const native = window.getSelection()
 
@@ -168,49 +168,18 @@ class Content extends React.Component {
     if (selection.isUnset) return
 
     // Otherwise, figure out which DOM nodes should be selected...
-    const { anchorText, focusText } = state
-    const { anchorKey, anchorOffset, focusKey, focusOffset } = selection
-    const schema = editor.getSchema()
-    const anchorDecorators = document.getDescendantDecorators(anchorKey, schema)
-    const focusDecorators = document.getDescendantDecorators(focusKey, schema)
-    const anchorRanges = anchorText.getRanges(anchorDecorators)
-    const focusRanges = focusText.getRanges(focusDecorators)
-    let a = 0
-    let f = 0
-    let anchorIndex
-    let focusIndex
-    let anchorOff
-    let focusOff
-
-    anchorRanges.forEach((range, i, ranges) => {
-      const { length } = range.text
-      a += length
-      if (a < anchorOffset) return
-      anchorIndex = i
-      anchorOff = anchorOffset - (a - length)
-      return false
-    })
-
-    focusRanges.forEach((range, i, ranges) => {
-      const { length } = range.text
-      f += length
-      if (f < focusOffset) return
-      focusIndex = i
-      focusOff = focusOffset - (f - length)
-      return false
-    })
-
-    const anchorSpan = this.element.querySelector(`[data-offset-key="${anchorKey}-${anchorIndex}"]`)
-    const focusSpan = this.element.querySelector(`[data-offset-key="${focusKey}-${focusIndex}"]`)
-    const anchorEl = findDeepestNode(anchorSpan)
-    const focusEl = findDeepestNode(focusSpan)
+    const { anchorKey, anchorOffset, focusKey, focusOffset, isCollapsed } = selection
+    const anchor = getCaretPosition(anchorKey, anchorOffset, state, editor, this.element)
+    const focus = isCollapsed 
+      ? anchor 
+      : getCaretPosition(focusKey, focusOffset, state, editor, this.element)
 
     // If they are already selected, do nothing.
     if (
-      anchorEl == native.anchorNode &&
-      anchorOff == native.anchorOffset &&
-      focusEl == native.focusNode &&
-      focusOff == native.focusOffset
+      anchor.node == native.anchorNode &&
+      anchor.offset == native.anchorOffset &&
+      focus.node == native.focusNode &&
+      focus.offset == native.focusOffset
     ) {
       return
     }
@@ -219,9 +188,9 @@ class Content extends React.Component {
     this.tmp.isSelecting = true
     native.removeAllRanges()
     const range = window.document.createRange()
-    range.setStart(anchorEl, anchorOff)
+    range.setStart(anchor.node, anchor.offset)
     native.addRange(range)
-    extendSelection(native, focusEl, focusOff)
+    if (!isCollapsed) extendSelection(native, focus.node, focus.offset)
 
     // Then unset the `isSelecting` flag after a delay.
     setTimeout(() => {
