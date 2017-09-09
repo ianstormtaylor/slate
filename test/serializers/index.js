@@ -74,23 +74,21 @@ describe('serializers', () => {
 
     describe('serialize()', () => {
       const dir = resolve(__dirname, './html/serialize')
-      const tests = fs.readdirSync(dir)
+      const tests = fs.readdirSync(dir).filter(t => t[0] != '.' && !!~t.indexOf('.js')).map(t => basename(t, extname(t)))
 
       for (const test of tests) {
-        if (test[0] === '.') continue
         it(test, async () => {
-          const innerDir = resolve(dir, test)
-          const htmlOpts = Object.assign({}, require(innerDir).default, { parseHtml: parse5.parseFragment })
-          const html = new Html(htmlOpts)
-          const input = await readYaml(resolve(innerDir, 'input.yaml'))
-          const expected = fs.readFileSync(resolve(innerDir, 'output.html'), 'utf8')
-          const state = Raw.deserialize(input)
-          const serialized = html.serialize(state)
-          assert.deepEqual(serialized, expected.trim())
+          const module = require(resolve(dir, test))
+          const { input, output, rules, options } = module
+          const html = new Html({ rules, parseHtml: parse5.parseFragment })
+          const string = html.serialize(input, options)
+          const actual = string
+          const expected = output
+          assert.deepEqual(actual, expected)
         })
       }
 
-      it('optionally returns an iterable list of React elements', async () => {
+      it.skip('optionally returns an iterable list of React elements', async () => {
         const fixture = require('./html/serialize/block-nested').default
         const htmlOpts = Object.assign({}, fixture, { parseHtml: parse5.parseFragment })
         const html = new Html(htmlOpts)

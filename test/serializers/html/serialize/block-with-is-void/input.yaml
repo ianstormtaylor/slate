@@ -1,6 +1,0 @@
-
-document:
-  nodes:
-    - kind: block
-      type: image
-      isVoid: true
