@@ -170,8 +170,8 @@ class Content extends React.Component {
     // Otherwise, figure out which DOM nodes should be selected...
     const { anchorKey, anchorOffset, focusKey, focusOffset, isCollapsed } = selection
     const anchor = getCaretPosition(anchorKey, anchorOffset, state, editor, this.element)
-    const focus = isCollapsed 
-      ? anchor 
+    const focus = isCollapsed
+      ? anchor
       : getCaretPosition(focusKey, focusOffset, state, editor, this.element)
 
     // If they are already selected, do nothing.
@@ -206,7 +206,7 @@ class Content extends React.Component {
   /**
    * The React ref method to set the root content element locally.
    *
-   * @param {Element} n
+   * @param {Element} element
    */
 
   ref = (element) => {
