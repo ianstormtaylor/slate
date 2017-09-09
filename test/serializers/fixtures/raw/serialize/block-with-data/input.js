@@ -1,5 +1,5 @@
 
-import { Block, Character, Document, Inline, Mark, State, Text } from '../../../../../..'
+import { Block, Character, Document, State, Text } from '../../../../../..'
 
 export default State.create({
   document: Document.create({

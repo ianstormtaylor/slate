@@ -65,7 +65,7 @@ class Iframes extends React.Component {
 
   hasMark = (type) => {
     const { state } = this.state
-    return state.marks.some(mark => mark.type == type)
+    return state.activeMarks.some(mark => mark.type == type)
   }
 
   /**
@@ -81,12 +81,12 @@ class Iframes extends React.Component {
   }
 
   /**
-   * On change, save the new state.
+   * On change.
    *
-   * @param {State} state
+   * @param {Change} change
    */
 
-  onChange = (state) => {
+  onChange = ({ state }) => {
     this.setState({ state })
   }
 
@@ -95,11 +95,11 @@ class Iframes extends React.Component {
    *
    * @param {Event} e
    * @param {Object} data
-   * @param {State} state
+   * @param {Change} change
    * @return {State}
    */
 
-  onKeyDown = (e, data, state) => {
+  onKeyDown = (e, data, change) => {
     if (!data.isMod) return
     let mark
 
@@ -114,13 +114,8 @@ class Iframes extends React.Component {
         return
     }
 
-    state = state
-      .transform()
-      .toggleMark(mark)
-      .apply()
-
     e.preventDefault()
-    return state
+    return change.toggleMark(mark)
   }
 
   /**
@@ -132,14 +127,10 @@ class Iframes extends React.Component {
 
   onClickMark = (e, type) => {
     e.preventDefault()
-    let { state } = this.state
-
-    state = state
-      .transform()
+    const change = this.state.state
+      .change()
       .toggleMark(type)
-      .apply()
-
-    this.setState({ state })
+    this.onChange(change)
   }
 
   /**
@@ -151,15 +142,11 @@ class Iframes extends React.Component {
 
   onClickBlock = (e, type) => {
     e.preventDefault()
-    let { state } = this.state
     const isActive = this.hasBlock(type)
-
-    state = state
-      .transform()
+    const change = this.state.state
+      .change()
       .setBlock(isActive ? DEFAULT_NODE : type)
-      .apply()
-
-    this.setState({ state })
+    this.onChange(change)
   }
 
   /**

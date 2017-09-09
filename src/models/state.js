@@ -1,22 +1,13 @@
 
-
-import Document from './document'
-import SCHEMA from '../schemas/core'
-import Selection from './selection'
-import Transform from './transform'
 import MODEL_TYPES from '../constants/model-types'
-import { Record, Set, Stack, List, Map } from 'immutable'
-
-/**
- * History.
- *
- * @type {History}
- */
-
-const History = new Record({
-  undos: new Stack(),
-  redos: new Stack()
-})
+import SCHEMA from '../schemas/core'
+import Change from './change'
+import Document from './document'
+import History from './history'
+import Selection from './selection'
+import isPlainObject from 'is-plain-object'
+import logger from '../utils/logger'
+import { Record, Set, List, Map } from 'immutable'
 
 /**
  * Default properties.
@@ -25,11 +16,11 @@ const History = new Record({
  */
 
 const DEFAULTS = {
-  document: new Document(),
-  selection: new Selection(),
-  history: new History(),
+  document: Document.create(),
+  selection: Selection.create(),
+  history: History.create(),
   data: new Map(),
-  isNative: false
+  isNative: false,
 }
 
 /**
@@ -38,55 +29,66 @@ const DEFAULTS = {
  * @type {State}
  */
 
-class State extends new Record(DEFAULTS) {
+class State extends Record(DEFAULTS) {
 
   /**
-   * Create a new `State` with `properties`.
+   * Create a new `State` with `attrs`.
    *
-   * @param {Object|State} properties
+   * @param {Object|State} attrs
    * @param {Object} options
    *   @property {Boolean} normalize
    * @return {State}
    */
 
-  static create(properties = {}, options = {}) {
-    if (State.isState(properties)) return properties
-
-    const document = Document.create(properties.document)
-    let selection = Selection.create(properties.selection)
-    let data = new Map()
-
-    if (selection.isUnset) {
-      const text = document.getFirstText()
-      selection = selection.collapseToStartOf(text)
+  static create(attrs = {}, options = {}) {
+    if (State.isState(attrs)) {
+      return attrs
     }
 
-    // Set default value for `data`.
-    if (options.plugins) {
-      for (const plugin of options.plugins) {
-        if (plugin.data) data = data.merge(plugin.data)
+    if (isPlainObject(attrs)) {
+      const document = Document.create(attrs.document)
+      let selection = Selection.create(attrs.selection)
+      let data = new Map()
+
+      if (selection.isUnset) {
+        const text = document.getFirstText()
+        if (text) selection = selection.collapseToStartOf(text)
       }
+
+      // Set default value for `data`.
+      if (options.plugins) {
+        for (const plugin of options.plugins) {
+          if (plugin.data) data = data.merge(plugin.data)
+        }
+      }
+
+      // Then add data provided in `attrs`.
+      if (attrs.data) data = data.merge(attrs.data)
+
+      let state = new State({ document, selection, data })
+
+      if (options.normalize !== false) {
+        state = state
+          .change({ save: false })
+          .normalize(SCHEMA)
+          .state
+      }
+
+      return state
     }
 
-    // Then add data provided in `properties`.
-    if (properties.data) data = data.merge(properties.data)
-
-    const state = new State({ document, selection, data })
-
-    return options.normalize === false
-      ? state
-      : state.transform().normalize(SCHEMA).apply({ save: false })
+    throw new Error(`\`State.create\` only accepts objects or states, but you passed it: ${attrs}`)
   }
 
   /**
-   * Determines if the passed in paramter is a Slate State or not
+   * Check if a `value` is a `State`.
    *
-   * @param {*} maybeState
+   * @param {Any} value
    * @return {Boolean}
    */
 
-  static isState(maybeState) {
-    return !!(maybeState && maybeState[MODEL_TYPES.STATE])
+  static isState(value) {
+    return !!(value && value[MODEL_TYPES.STATE])
   }
 
   /**
@@ -266,7 +268,9 @@ class State extends new Record(DEFAULTS) {
    */
 
   get startBlock() {
-    return this.document.getClosestBlock(this.selection.startKey)
+    return this.selection.isUnset
+      ? null
+      : this.document.getClosestBlock(this.selection.startKey)
   }
 
   /**
@@ -276,7 +280,9 @@ class State extends new Record(DEFAULTS) {
    */
 
   get endBlock() {
-    return this.document.getClosestBlock(this.selection.endKey)
+    return this.selection.isUnset
+      ? null
+      : this.document.getClosestBlock(this.selection.endKey)
   }
 
   /**
@@ -286,7 +292,9 @@ class State extends new Record(DEFAULTS) {
    */
 
   get anchorBlock() {
-    return this.document.getClosestBlock(this.selection.anchorKey)
+    return this.selection.isUnset
+      ? null
+      : this.document.getClosestBlock(this.selection.anchorKey)
   }
 
   /**
@@ -296,7 +304,9 @@ class State extends new Record(DEFAULTS) {
    */
 
   get focusBlock() {
-    return this.document.getClosestBlock(this.selection.focusKey)
+    return this.selection.isUnset
+      ? null
+      : this.document.getClosestBlock(this.selection.focusKey)
   }
 
   /**
@@ -306,7 +316,9 @@ class State extends new Record(DEFAULTS) {
    */
 
   get startInline() {
-    return this.document.getClosestInline(this.selection.startKey)
+    return this.selection.isUnset
+      ? null
+      : this.document.getClosestInline(this.selection.startKey)
   }
 
   /**
@@ -316,7 +328,9 @@ class State extends new Record(DEFAULTS) {
    */
 
   get endInline() {
-    return this.document.getClosestInline(this.selection.endKey)
+    return this.selection.isUnset
+      ? null
+      : this.document.getClosestInline(this.selection.endKey)
   }
 
   /**
@@ -326,7 +340,9 @@ class State extends new Record(DEFAULTS) {
    */
 
   get anchorInline() {
-    return this.document.getClosestInline(this.selection.anchorKey)
+    return this.selection.isUnset
+      ? null
+      : this.document.getClosestInline(this.selection.anchorKey)
   }
 
   /**
@@ -336,7 +352,9 @@ class State extends new Record(DEFAULTS) {
    */
 
   get focusInline() {
-    return this.document.getClosestInline(this.selection.focusKey)
+    return this.selection.isUnset
+      ? null
+      : this.document.getClosestInline(this.selection.focusKey)
   }
 
   /**
@@ -346,7 +364,9 @@ class State extends new Record(DEFAULTS) {
    */
 
   get startText() {
-    return this.document.getDescendant(this.selection.startKey)
+    return this.selection.isUnset
+      ? null
+      : this.document.getDescendant(this.selection.startKey)
   }
 
   /**
@@ -356,7 +376,9 @@ class State extends new Record(DEFAULTS) {
    */
 
   get endText() {
-    return this.document.getDescendant(this.selection.endKey)
+    return this.selection.isUnset
+      ? null
+      : this.document.getDescendant(this.selection.endKey)
   }
 
   /**
@@ -366,7 +388,9 @@ class State extends new Record(DEFAULTS) {
    */
 
   get anchorText() {
-    return this.document.getDescendant(this.selection.anchorKey)
+    return this.selection.isUnset
+      ? null
+      : this.document.getDescendant(this.selection.anchorKey)
   }
 
   /**
@@ -376,7 +400,9 @@ class State extends new Record(DEFAULTS) {
    */
 
   get focusText() {
-    return this.document.getDescendant(this.selection.focusKey)
+    return this.selection.isUnset
+      ? null
+      : this.document.getDescendant(this.selection.focusKey)
   }
 
   /**
@@ -386,7 +412,9 @@ class State extends new Record(DEFAULTS) {
    */
 
   get characters() {
-    return this.document.getCharactersAtRange(this.selection)
+    return this.selection.isUnset
+      ? new List()
+      : this.document.getCharactersAtRange(this.selection)
   }
 
   /**
@@ -399,6 +427,18 @@ class State extends new Record(DEFAULTS) {
     return this.selection.isUnset
       ? new Set()
       : this.selection.marks || this.document.getMarksAtRange(this.selection)
+  }
+
+  /**
+   * Get the active marks of the current selection.
+   *
+   * @return {Set<Mark>}
+   */
+
+  get activeMarks() {
+    return this.selection.isUnset
+      ? new Set()
+      : this.selection.marks || this.document.getActiveMarksAtRange(this.selection)
   }
 
   /**
@@ -470,24 +510,31 @@ class State extends new Record(DEFAULTS) {
   }
 
   /**
-   * Return a new `Transform` with the current state as a starting point.
+   * Create a new `Change` with the current state as a starting point.
    *
-   * @param {Object} properties
-   * @return {Transform}
+   * @param {Object} attrs
+   * @return {Change}
    */
 
-  transform(properties = {}) {
-    const state = this
-    return new Transform({
-      ...properties,
-      state
-    })
+  change(attrs = {}) {
+    return new Change({ ...attrs, state: this })
+  }
+
+  /**
+   * Deprecated.
+   *
+   * @return {Change}
+   */
+
+  transform(...args) {
+    logger.deprecate('0.22.0', 'The `state.transform()` method has been deprecated in favor of `state.change()`.')
+    return this.change(...args)
   }
 
 }
 
 /**
- * Pseduo-symbol that shows this is a Slate State
+ * Attach a pseudo-symbol for type checking.
  */
 
 State.prototype[MODEL_TYPES.STATE] = true

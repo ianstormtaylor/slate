@@ -9,13 +9,14 @@ import TRANSFER_TYPES from '../constants/transfer-types'
 import Base64 from '../serializers/base-64'
 import Node from './node'
 import Selection from '../models/selection'
+import SlateTypes from '../utils/prop-types'
 import extendSelection from '../utils/extend-selection'
 import findClosestNode from '../utils/find-closest-node'
 import findDeepestNode from '../utils/find-deepest-node'
+import getHtmlFromNativePaste from '../utils/get-html-from-native-paste'
 import getPoint from '../utils/get-point'
 import getTransferData from '../utils/get-transfer-data'
 import setTransferData from '../utils/set-transfer-data'
-import getHtmlFromNativePaste from '../utils/get-html-from-native-paste'
 import { IS_FIREFOX, IS_MAC, IS_IE } from '../constants/environment'
 
 /**
@@ -48,7 +49,6 @@ class Content extends React.Component {
     editor: Types.object.isRequired,
     onBeforeInput: Types.func.isRequired,
     onBlur: Types.func.isRequired,
-    onChange: Types.func.isRequired,
     onCopy: Types.func.isRequired,
     onCut: Types.func.isRequired,
     onDrop: Types.func.isRequired,
@@ -59,12 +59,12 @@ class Content extends React.Component {
     onSelect: Types.func.isRequired,
     readOnly: Types.bool.isRequired,
     role: Types.string,
-    schema: Types.object,
+    schema: SlateTypes.schema.isRequired,
     spellCheck: Types.bool.isRequired,
-    state: Types.object.isRequired,
+    state: SlateTypes.state.isRequired,
     style: Types.object,
     tabIndex: Types.number,
-    tagName: Types.string
+    tagName: Types.string,
   }
 
   /**
@@ -75,7 +75,7 @@ class Content extends React.Component {
 
   static defaultProps = {
     style: {},
-    tagName: 'div'
+    tagName: 'div',
   }
 
   /**
@@ -104,8 +104,8 @@ class Content extends React.Component {
     // the cursor will be added or removed again.
     if (props.readOnly != this.props.readOnly) return true
 
-    // If the state has been transformed natively, never re-render, or else we
-    // will end up duplicating content.
+    // If the state has been changed natively, never re-render, or else we'll
+    // end up duplicating content.
     if (props.state.isNative) return false
 
     return (
@@ -163,6 +163,9 @@ class Content extends React.Component {
       debug('updateSelection', { selection, native })
       return
     }
+
+    // If the selection isn't set, do nothing.
+    if (selection.isUnset) return
 
     // Otherwise, figure out which DOM nodes should be selected...
     const { anchorText, focusText } = state
@@ -326,17 +329,6 @@ class Content extends React.Component {
   }
 
   /**
-   * On change, bubble up.
-   *
-   * @param {State} state
-   */
-
-  onChange = (state) => {
-    debug('onChange', state)
-    this.props.onChange(state)
-  }
-
-  /**
    * On composition start, set the `isComposing` flag.
    *
    * @param {Event} event
@@ -448,9 +440,6 @@ class Content extends React.Component {
 
   onDragOver = (event) => {
     if (!this.isInEditor(event.target)) return
-
-    event.preventDefault()
-
     if (this.tmp.isDragging) return
     this.tmp.isDragging = true
     this.tmp.isInternalDrag = false
@@ -491,10 +480,10 @@ class Content extends React.Component {
    */
 
   onDrop = (event) => {
+    event.preventDefault()
+
     if (this.props.readOnly) return
     if (!this.isInEditor(event.target)) return
-
-    event.preventDefault()
 
     const window = getWindow(event.target)
     const { state, editor } = this.props
@@ -598,22 +587,19 @@ class Content extends React.Component {
     const delta = textContent.length - text.length
     const after = selection.collapseToEnd().move(delta)
 
-    // Create an updated state with the text replaced.
-    const next = state
-      .transform()
-      .select({
-        anchorKey: key,
-        anchorOffset: start,
-        focusKey: key,
-        focusOffset: end
-      })
-      .delete()
-      .insertText(textContent, marks)
-      .select(after)
-      .apply()
-
-    // Change the current state.
-    this.onChange(next)
+    // Change the current state to have the text replaced.
+    editor.change((change) => {
+      change
+        .select({
+          anchorKey: key,
+          anchorOffset: start,
+          focusKey: key,
+          focusOffset: end
+        })
+        .delete()
+        .insertText(textContent, marks)
+        .select(after)
+    })
   }
 
   /**
@@ -802,14 +788,39 @@ class Content extends React.Component {
         isBackward: null
       }
 
-      // If the selection is at the end of a non-void inline node, and there is
-      // a node after it, put it in the node after instead.
       const anchorText = document.getNode(anchor.key)
       const focusText = document.getNode(focus.key)
       const anchorInline = document.getClosestInline(anchor.key)
       const focusInline = document.getClosestInline(focus.key)
+      const focusBlock = document.getClosestBlock(focus.key)
+      const anchorBlock = document.getClosestBlock(anchor.key)
 
-      if (anchorInline && !anchorInline.isVoid && anchor.offset == anchorText.length) {
+      // COMPAT: If the anchor point is at the start of a non-void, and the
+      // focus point is inside a void node with an offset that isn't `0`, set
+      // the focus offset to `0`. This is due to void nodes <span>'s being
+      // positioned off screen, resulting in the offset always being greater
+      // than `0`. Since we can't know what it really should be, and since an
+      // offset of `0` is less destructive because it creates a hanging
+      // selection, go with `0`. (2017/09/07)
+      if (
+        anchorBlock &&
+        !anchorBlock.isVoid &&
+        anchor.offset == 0 &&
+        focusBlock &&
+        focusBlock.isVoid &&
+        focus.offset != 0
+      ) {
+        properties.focusOffset = 0
+      }
+
+      // COMPAT: If the selection is at the end of a non-void inline node, and
+      // there is a node after it, put it in the node after instead. This
+      // standardizes the behavior, since it's indistinguishable to the user.
+      if (
+        anchorInline &&
+        !anchorInline.isVoid &&
+        anchor.offset == anchorText.text.length
+      ) {
         const block = document.getClosestBlock(anchor.key)
         const next = block.getNextText(anchor.key)
         if (next) {
@@ -818,7 +829,11 @@ class Content extends React.Component {
         }
       }
 
-      if (focusInline && !focusInline.isVoid && focus.offset == focusText.length) {
+      if (
+        focusInline &&
+        !focusInline.isVoid &&
+        focus.offset == focusText.text.length
+      ) {
         const block = document.getClosestBlock(focus.key)
         const next = block.getNextText(focus.key)
         if (next) {
@@ -846,10 +861,12 @@ class Content extends React.Component {
     const { props } = this
     const { className, readOnly, state, tabIndex, role, tagName } = props
     const Container = tagName
-    const { document } = state
-    const children = document.nodes
-      .map(node => this.renderNode(node))
-      .toArray()
+    const { document, selection } = state
+    const indexes = document.getSelectionIndexes(selection, selection.isFocused)
+    const children = document.nodes.toArray().map((child, i) => {
+      const isSelected = !!indexes && indexes.start <= i && i < indexes.end
+      return this.renderNode(child, isSelected)
+    })
 
     const style = {
       // Prevent the default outline styles.
@@ -915,25 +932,27 @@ class Content extends React.Component {
   }
 
   /**
-   * Render a `node`.
+   * Render a `child` node of the document.
    *
-   * @param {Node} node
+   * @param {Node} child
+   * @param {Boolean} isSelected
    * @return {Element}
    */
 
-  renderNode = (node) => {
+  renderNode = (child, isSelected) => {
     const { editor, readOnly, schema, state } = this.props
-
+    const { document } = state
     return (
       <Node
-        key={node.key}
         block={null}
-        node={node}
-        parent={state.document}
+        editor={editor}
+        isSelected={isSelected}
+        key={child.key}
+        node={child}
+        parent={document}
+        readOnly={readOnly}
         schema={schema}
         state={state}
-        editor={editor}
-        readOnly={readOnly}
       />
     )
   }

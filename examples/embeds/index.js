@@ -32,15 +32,15 @@ class Embeds extends React.Component {
 
   state = {
     state: Raw.deserialize(initialState, { terse: true })
-  };
+  }
 
   /**
    * On change.
    *
-   * @param {State} state
+   * @param {Change} change
    */
 
-  onChange = (state) => {
+  onChange = ({ state }) => {
     this.setState({ state })
   }
 

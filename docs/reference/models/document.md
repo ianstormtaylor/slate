@@ -16,7 +16,6 @@ In some places, you'll see mention of "fragments", which are also `Document` obj
   - [`nodes`](#nodes)
 - [Computed Properties](#computed-properties)
   - [`kind`](#kind)
-  - [`length`](#length)
   - [`text`](#text)
 - [Static Methods](#static-methods)
   - [`Document.create`](#documentcreate)
@@ -49,11 +48,6 @@ A list of child nodes.
 `String`
 
 An immutable string value of `'document'` for easily separating this node from [`Block`](./block.md), [`Inline`](./inline.md) or [`Text`](./text.md) nodes.
-
-### `length`
-`Number`
-
-The sum of the lengths of all of the descendant [`Text`](./text.md) nodes of this node.
 
 ### `text`
 `String`

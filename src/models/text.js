@@ -3,9 +3,11 @@ import Character from './character'
 import Mark from './mark'
 import Range from './range'
 import MODEL_TYPES from '../constants/model-types'
-import memoize from '../utils/memoize'
 import generateKey from '../utils/generate-key'
-import { List, Record, OrderedSet, Set, is } from 'immutable'
+import isPlainObject from 'is-plain-object'
+import logger from '../utils/logger'
+import memoize from '../utils/memoize'
+import { List, Record, OrderedSet, is } from 'immutable'
 
 /**
  * Default properties.
@@ -15,7 +17,7 @@ import { List, Record, OrderedSet, Set, is } from 'immutable'
 
 const DEFAULTS = {
   characters: new List(),
-  key: null
+  key: undefined,
 }
 
 /**
@@ -24,50 +26,45 @@ const DEFAULTS = {
  * @type {Text}
  */
 
-class Text extends new Record(DEFAULTS) {
+class Text extends Record(DEFAULTS) {
 
   /**
-   * Create a new `Text` with `properties`.
+   * Create a new `Text` with `attrs`.
    *
-   * @param {Object|Text} properties
+   * @param {Object|Array|List|String|Text} attrs
    * @return {Text}
    */
 
-  static create(properties = {}) {
-    if (Text.isText(properties)) return properties
-    properties.key = properties.key || generateKey()
-    properties.characters = Character.createList(properties.characters)
-    return new Text(properties)
-  }
+  static create(attrs = {}) {
+    if (Text.isText(attrs)) {
+      return attrs
+    }
 
-  /**
-   * Create a new `Text` from a string
-   *
-   * @param {String} text
-   * @param {Set<Mark>} marks (optional)
-   * @return {Text}
-   */
+    if (List.isList(attrs) || Array.isArray(attrs)) {
+      attrs = { ranges: attrs }
+    }
 
-  static createFromString(text, marks = Set()) {
-    return Text.createFromRanges([
-      Range.create({ text, marks })
-    ])
-  }
+    if (typeof attrs == 'string') {
+      attrs = { ranges: [{ text: attrs }] }
+    }
 
-  /**
-   * Create a new `Text` from a list of ranges
-   *
-   * @param {List<Range>|Array<Range>} ranges
-   * @return {Text}
-   */
+    if (isPlainObject(attrs)) {
+      const { characters, ranges, key } = attrs
+      const chars = ranges
+        ? ranges
+            .map(Range.create)
+            .reduce((l, r) => l.concat(r.getCharacters()), Character.createList())
+        : Character.createList(characters)
 
-  static createFromRanges(ranges) {
-    return Text.create({
-      characters: ranges.reduce((characters, range) => {
-        range = Range.create(range)
-        return characters.concat(range.getCharacters())
-      }, Character.createList())
-    })
+      const text = new Text({
+        characters: chars,
+        key: key || generateKey(),
+      })
+
+      return text
+    }
+
+    throw new Error(`\`Text.create\` only accepts objects, arrays, strings or texts, but you passed it: ${attrs}`)
   }
 
   /**
@@ -78,19 +75,52 @@ class Text extends new Record(DEFAULTS) {
    */
 
   static createList(elements = []) {
-    if (List.isList(elements)) return elements
-    return new List(elements.map(Text.create))
+    if (List.isList(elements)) {
+      return elements
+    }
+
+    const list = new List(elements.map(Text.create))
+    return list
   }
 
   /**
-   * Determines if the passed in paramter is a Slate Text or not
+   * Check if a `value` is a `Text`.
    *
-   * @param {*} maybeText
+   * @param {Any} value
    * @return {Boolean}
    */
 
-  static isText(maybeText) {
-    return !!(maybeText && maybeText[MODEL_TYPES.TEXT])
+  static isText(value) {
+    return !!(value && value[MODEL_TYPES.TEXT])
+  }
+
+  /**
+   * Check if a `value` is a list of texts.
+   *
+   * @param {Any} value
+   * @return {Boolean}
+   */
+
+  static isTextList(value) {
+    return List.isList(value) && value.every(item => Text.isText(item))
+  }
+
+  /**
+   * Deprecated.
+   */
+
+  static createFromString(string) {
+    logger.deprecate('0.22.0', 'The `Text.createFromString(string)` method is deprecated, use `Text.create(string)` instead.')
+    return Text.create(string)
+  }
+
+  /**
+   * Deprecated.
+   */
+
+  static createFromRanges(ranges) {
+    logger.deprecate('0.22.0', 'The `Text.createFromRanges(ranges)` method is deprecated, use `Text.create(ranges)` instead.')
+    return Text.create(ranges)
   }
 
   /**
@@ -111,16 +141,6 @@ class Text extends new Record(DEFAULTS) {
 
   get isEmpty() {
     return this.text == ''
-  }
-
-  /**
-   * Get the length of the concatenated text of the node.
-   *
-   * @return {Number}
-   */
-
-  get length() {
-    return this.text.length
   }
 
   /**
@@ -317,9 +337,8 @@ class Text extends new Record(DEFAULTS) {
    */
 
   insertText(index, text, marks) {
-    marks = marks || this.getMarksAtIndex(index)
     let { characters } = this
-    const chars = Character.createListFromText(text, marks)
+    const chars = Character.createList(text.split('').map(char => ({ text: char, marks })))
 
     characters = characters.slice(0, index)
       .concat(chars)
@@ -383,11 +402,13 @@ class Text extends new Record(DEFAULTS) {
    * @param {Number} index
    * @param {Number} length
    * @param {Mark} mark
-   * @param {Mark} newMark
+   * @param {Object} properties
    * @return {Text}
    */
 
-  updateMark(index, length, mark, newMark) {
+  updateMark(index, length, mark, properties) {
+    const newMark = mark.merge(properties)
+
     const characters = this.characters.map((char, i) => {
       if (i < index) return char
       if (i >= index + length) return char
@@ -416,7 +437,7 @@ class Text extends new Record(DEFAULTS) {
 }
 
 /**
- * Pseudo-symbol that shows this is a Slate Text
+ * Attach a pseudo-symbol for type checking.
  */
 
 Text.prototype[MODEL_TYPES.TEXT] = true

@@ -7,7 +7,7 @@
 
 In our previous example, we started with a paragraph, but we never actually told Slate anything about the `paragraph` block type. We just let it use its internal default renderer, which uses a plain old `<div>`.
 
-But that's not all you can do. Slate lets you define any type of custom blocks you want, like block quotes, code blocks, list items, etc. 
+But that's not all you can do. Slate lets you define any type of custom blocks you want, like block quotes, code blocks, list items, etc.
 
 We'll show you how. Let's start with our app from earlier:
 
@@ -17,22 +17,18 @@ class App extends React.Component {
   state = {
     state: initialState
   }
-  
-  onChange = (state) => {
+
+  onChange = ({ state }) => {
     this.setState({ state })
   }
 
-  onKeyDown = (event, data, state) => {
+  onKeyDown = (event, data, change) => {
     if (event.which != 55 || !event.shiftKey) return
-      
+
     event.preventDefault()
 
-    const newState = state
-      .transform()
-      .insertText('and')
-      .apply()
-    
-    return newState
+    change.insertText('and');
+    return true
   }
 
   render() {
@@ -61,7 +57,7 @@ function CodeNode(props) {
 }
 ```
 
-Pretty simple. 
+Pretty simple.
 
 See the `props.attributes` reference? Slate passes attributes that should be rendered on the top-most element of your blocks, so that you don't have to build them up yourself. You **must** mix the attributes into your component.
 
@@ -85,22 +81,18 @@ class App extends React.Component {
       }
     }
   }
-  
-  onChange = (state) => {
+
+  onChange = ({ state }) => {
     this.setState({ state })
   }
 
-  onKeyDown = (event, data, state) => {
+  onKeyDown = (event, data, change) => {
     if (event.which != 55 || !event.shiftKey) return
-      
+
     event.preventDefault()
 
-    const newState = state
-      .transform()
-      .insertText('and')
-      .apply()
-    
-    return newState
+    change.insertText('and')
+    return true
   }
 
   render() {
@@ -135,23 +127,21 @@ class App extends React.Component {
       }
     }
   }
-  
-  onChange = (state) => {
+
+  onChange = ({ state }) => {
     this.setState({ state })
   }
 
-  onKeyDown = (event, data, state) => {
+  onKeyDown = (event, data, change) => {
     // Return with no changes if it's not the "`" key with cmd/ctrl pressed.
     if (event.which != 67 || !event.metaKey || !event.altKey) return
-    
+
     // Prevent the "`" from being inserted by default.
     event.preventDefault()
 
     // Otherwise, set the currently selected blocks type to "code".
-    return state
-      .transform()
-      .setBlock('code')
-      .apply()
+    change.setBlock('code')
+    return true
   }
 
   render() {
@@ -187,25 +177,22 @@ class App extends React.Component {
       }
     }
   }
-  
-  onChange = (state) => {
+
+  onChange = ({ state }) => {
     this.setState({ state })
   }
 
-  onKeyDown = (event, data, state) => {
+  onKeyDown = (event, data, change) => {
     if (event.which != 67 || !event.metaKey || !event.altKey) return
-    
+
     event.preventDefault()
 
     // Determine whether any of the currently selected blocks are code blocks.
-    const isCode = state.blocks.some(block => block.type == 'code')
+    const isCode = change.state.blocks.some(block => block.type == 'code')
 
     // Toggle the block type depending on `isCode`.
-    return state
-      .transform()
-      .setBlock(isCode ? 'paragraph' : 'code')
-      .apply()
-    
+    change.setBlock(isCode ? 'paragraph' : 'code')
+    return true
   }
 
   render() {

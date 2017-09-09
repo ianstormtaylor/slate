@@ -14,7 +14,7 @@ import 'babel-polyfill'
 import './rendering'
 import './schema'
 import './serializers'
-import './transforms'
+import './changes'
 import './behavior'
 import './plugins'
 

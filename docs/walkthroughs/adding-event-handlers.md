@@ -20,7 +20,7 @@ class App extends React.Component {
     state: initialState
   }
 
-  onChange = (state) => {
+  onChange = ({ state }) => {
     this.setState({ state })
   }
 
@@ -44,13 +44,13 @@ class App extends React.Component {
   state = {
     state: initialState
   }
-  
-  onChange = (state) => {
+
+  onChange = ({ state }) => {
     this.setState({ state })
   }
 
   // Define a new handler which prints the key code that was pressed.
-  onKeyDown = (event, data, state) => {
+  onKeyDown = (event, data, change) => {
     console.log(event.which)
   }
 
@@ -67,9 +67,9 @@ class App extends React.Component {
 }
 ```
 
-Okay cool, so now when you press a key in the editor, you'll see the key's code printed to the console. Not very useful, but at least we know it's working. 
+Okay cool, so now when you press a key in the editor, you'll see the key's code printed to the console. Not very useful, but at least we know it's working.
 
-Now we want to make it actually change the content. For the purposes of our example, let's say we want to make it so that whenever a user types `&` we actually add `and` to the content. 
+Now we want to make it actually change the content. For the purposes of our example, let's say we want to make it so that whenever a user types `&` we actually add `and` to the content.
 
 Our `onKeyDown` handler might look like this:
 
@@ -79,26 +79,21 @@ class App extends React.Component {
   state = {
     state: initialState
   }
-  
-  onChange = (state) => {
+
+  onChange = ({ state }) => {
     this.setState({ state })
   }
 
-  onKeyDown = (event, data, state) => {
+  onKeyDown = (event, data, change) => {
     // Return with no changes if it's not the "7" key with shift pressed.
     if (event.which != 55 || !event.shiftKey) return
-      
+
     // Prevent the ampersand character from being inserted.
     event.preventDefault()
 
-    // Transform the state by inserting "and" at the cursor's position.
-    const newState = state
-      .transform()
-      .insertText('and')
-      .apply()
-    
-    // Return the new state, which will cause the editor to update it.
-    return newState
+    // Change the state by inserting "and" at the cursor's position.
+    change.insertText('and')
+    return true
   }
 
   render() {

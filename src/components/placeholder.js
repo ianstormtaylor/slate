@@ -2,6 +2,8 @@
 import React from 'react'
 import Types from 'prop-types'
 
+import SlateTypes from '../utils/prop-types'
+
 /**
  * Placeholder.
  *
@@ -20,10 +22,10 @@ class Placeholder extends React.Component {
     children: Types.any.isRequired,
     className: Types.string,
     firstOnly: Types.bool,
-    node: Types.object.isRequired,
-    parent: Types.object,
-    state: Types.object.isRequired,
-    style: Types.object
+    node: SlateTypes.node.isRequired,
+    parent: SlateTypes.node,
+    state: SlateTypes.state.isRequired,
+    style: Types.object,
   }
 
   /**
@@ -33,7 +35,7 @@ class Placeholder extends React.Component {
    */
 
   static defaultProps = {
-    firstOnly: true
+    firstOnly: true,
   }
 
   /**

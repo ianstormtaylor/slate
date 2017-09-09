@@ -22,20 +22,18 @@ class App extends React.Component {
       }
     }
   }
-  
-  onChange = (state) => {
+
+  onChange = ({ state }) => {
     this.setState({ state })
   }
 
-  onKeyDown = (event, data, state) => {
+  onKeyDown = (event, data, change) => {
     if (event.which != 67 || !event.metaKey || !event.altKey) return
     event.preventDefault()
-    const isCode = state.blocks.some(block => block.type == 'code')
+    const isCode = change.state.blocks.some(block => block.type == 'code')
 
-    return state
-      .transform()
-      .setBlock(isCode ? 'paragraph' : 'code')
-      .apply()
+    change.setBlock(isCode ? 'paragraph' : 'code')
+    return true
   }
 
   render() {
@@ -65,12 +63,12 @@ class App extends React.Component {
       }
     }
   }
-  
-  onChange = (state) => {
+
+  onChange = ({ state }) => {
     this.setState({ state })
   }
 
-  onKeyDown = (event, data, state) => {
+  onKeyDown = (event, data, change) => {
     if (!event.metaKey) return
 
     // Decide what to do based on the key code...
@@ -78,20 +76,16 @@ class App extends React.Component {
       // When "B" is pressed, add a "bold" mark to the text.
       case 66: {
         event.preventDefault()
-        return state
-          .transform()
-          .addMark('bold')
-          .apply()
+        change.addMark('bold')
+        return true
       }
       // When "`" is pressed, keep our existing code block logic.
       case 67: {
         if (!event.altKey) return
-        const isCode = state.blocks.some(block => block.type == 'code')
+        const isCode = change.state.blocks.some(block => block.type == 'code')
         event.preventDefault()
-        return state
-          .transform()
-          .setBlock(isCode ? 'paragraph' : 'code')
-          .apply()
+        change.setBlock(isCode ? 'paragraph' : 'code')
+        return true
       }
     }
   }
@@ -146,30 +140,26 @@ class App extends React.Component {
       }
     }
   }
-  
-  onChange = (state) => {
+
+  onChange = ({ state }) => {
     this.setState({ state })
   }
 
-  onKeyDown = (event, data, state) => {
+  onKeyDown = (event, data, change) => {
     if (!event.metaKey) return
 
     switch (event.which) {
       case 66: {
         event.preventDefault()
-        return state
-          .transform()
-          .toggleMark('bold')
-          .apply()
+        change.toggleMark('bold')
+        return true
       }
       case 67: {
         if (!event.altKey) return
-        const isCode = state.blocks.some(block => block.type == 'code')
+        const isCode = change.state.blocks.some(block => block.type == 'code')
         event.preventDefault()
-        return state
-          .transform()
-          .setBlock(isCode ? 'paragraph' : 'code')
-          .apply()
+        state.setBlock(isCode ? 'paragraph' : 'code')
+        return true
       }
     }
   }

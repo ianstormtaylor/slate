@@ -30,13 +30,13 @@ class ForcedLayout extends React.Component {
         {
           match: node => node.kind === 'document',
           validate: document => !document.nodes.size || document.nodes.first().type !== 'title' ? document.nodes : null,
-          normalize: (transform, document, nodes) => {
+          normalize: (change, document, nodes) => {
             if (!nodes.size) {
               const title = Block.create({ type: 'title', data: {}})
-              return transform.insertNodeByKey(document.key, 0, title)
+              return change.insertNodeByKey(document.key, 0, title)
             }
 
-            return transform.setNodeByKey(nodes.first().key, 'title')
+            return change.setNodeByKey(nodes.first().key, 'title')
           }
         },
 
@@ -48,10 +48,10 @@ class ForcedLayout extends React.Component {
             const invalidChildren = document.nodes.filter((child, index) => child.type === 'title' && index !== 0)
             return invalidChildren.size ? invalidChildren : null
           },
-          normalize: (transform, document, invalidChildren) => {
-            let updatedTransform = transform
+          normalize: (change, document, invalidChildren) => {
+            let updatedTransform = change
             invalidChildren.forEach((child) => {
-              updatedTransform = transform.setNodeByKey(child.key, 'paragraph')
+              updatedTransform = change.setNodeByKey(child.key, 'paragraph')
             })
 
             return updatedTransform
@@ -63,9 +63,9 @@ class ForcedLayout extends React.Component {
         {
           match: node => node.kind === 'document',
           validate: document => document.nodes.size < 2 ? true : null,
-          normalize: (transform, document) => {
+          normalize: (change, document) => {
             const paragraph = Block.create({ type: 'paragraph', data: {}})
-            return transform.insertNodeByKey(document.key, 1, paragraph)
+            return change.insertNodeByKey(document.key, 1, paragraph)
           }
         }
       ]
@@ -75,10 +75,10 @@ class ForcedLayout extends React.Component {
   /**
    * On change.
    *
-   * @param {State} state
+   * @param {Change} change
    */
 
-  onChange = (state) => {
+  onChange = ({ state }) => {
     this.setState({ state })
   }
 

@@ -1,10 +1,12 @@
 
-import React from 'react'
-import isReactComponent from '../utils/is-react-component'
-import typeOf from 'type-of'
 import MODEL_TYPES from '../constants/model-types'
-import { Record } from 'immutable'
+import React from 'react'
 import find from 'lodash/find'
+import isPlainObject from 'is-plain-object'
+import isReactComponent from '../utils/is-react-component'
+import logger from '../utils/logger'
+import typeOf from 'type-of'
+import { Record } from 'immutable'
 
 /**
  * Default properties.
@@ -22,29 +24,37 @@ const DEFAULTS = {
  * @type {Schema}
  */
 
-class Schema extends new Record(DEFAULTS) {
+class Schema extends Record(DEFAULTS) {
 
   /**
-   * Create a new `Schema` with `properties`.
+   * Create a new `Schema` with `attrs`.
    *
-   * @param {Object|Schema} properties
+   * @param {Object|Schema} attrs
    * @return {Schema}
    */
 
-  static create(properties = {}) {
-    if (Schema.isSchema(properties)) return properties
-    return new Schema(normalizeProperties(properties))
+  static create(attrs = {}) {
+    if (Schema.isSchema(attrs)) {
+      return attrs
+    }
+
+    if (isPlainObject(attrs)) {
+      const schema = new Schema(normalizeProperties(attrs))
+      return schema
+    }
+
+    throw new Error(`\`Schema.create\` only accepts objects or schemas, but you passed it: ${attrs}`)
   }
 
   /**
-   * Determines if the passed in paramter is a Slate Schema or not
+   * Check if a `value` is a `Schema`.
    *
-   * @param {*} maybeSchema
+   * @param {Any} value
    * @return {Boolean}
    */
 
-  static isSchema(maybeSchema) {
-    return !!(maybeSchema && maybeSchema[MODEL_TYPES.SCHEMA])
+  static isSchema(value) {
+    return !!(value && value[MODEL_TYPES.SCHEMA])
   }
 
   /**
@@ -170,6 +180,12 @@ function normalizeProperties(properties) {
     rules = rules.concat(array)
   }
 
+  if (properties.transform) {
+    logger.deprecate('0.22.0', 'The `schema.transform` property has been deprecated in favor of `schema.change`.')
+    properties.change = properties.transform
+    delete properties.transform
+  }
+
   return { rules }
 }
 
@@ -249,7 +265,7 @@ function normalizeMarkComponent(render) {
 }
 
 /**
- * Pseduo-symbol that shows this is a Slate Schema
+ * Attach a pseudo-symbol for type checking.
  */
 
 Schema.prototype[MODEL_TYPES.SCHEMA] = true

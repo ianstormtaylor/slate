@@ -11,11 +11,11 @@ import './document'
 
 import Data from './data'
 import Node from './node'
-import Inline from './inline'
 import Text from './text'
 import MODEL_TYPES from '../constants/model-types'
 import generateKey from '../utils/generate-key'
-import { Map, List, Record } from 'immutable'
+import isPlainObject from 'is-plain-object'
+import { List, Map, Record } from 'immutable'
 
 /**
  * Default properties.
@@ -26,9 +26,9 @@ import { Map, List, Record } from 'immutable'
 const DEFAULTS = {
   data: new Map(),
   isVoid: false,
-  key: null,
+  key: undefined,
   nodes: new List(),
-  type: null
+  type: undefined,
 }
 
 /**
@@ -37,54 +37,86 @@ const DEFAULTS = {
  * @type {Block}
  */
 
-class Block extends new Record(DEFAULTS) {
+class Block extends Record(DEFAULTS) {
 
   /**
-   * Create a new `Block` with `properties`.
+   * Create a new `Block` with `attrs`.
    *
-   * @param {Object|Block} properties
+   * @param {Object|String|Block} attrs
    * @return {Block}
    */
 
-  static create(properties = {}) {
-    if (Block.isBlock(properties)) return properties
-    if (Inline.isInline(properties)) return properties
-    if (Text.isText(properties)) return properties
-    if (!properties.type) throw new Error('You must pass a block `type`.')
-
-    properties.key = properties.key || generateKey()
-    properties.data = Data.create(properties.data)
-    properties.isVoid = !!properties.isVoid
-    properties.nodes = Block.createList(properties.nodes)
-
-    if (properties.nodes.size == 0) {
-      properties.nodes = properties.nodes.push(Text.create())
+  static create(attrs = {}) {
+    if (Block.isBlock(attrs)) {
+      return attrs
     }
 
-    return new Block(properties)
+    if (typeof attrs == 'string') {
+      attrs = { type: attrs }
+    }
+
+    if (isPlainObject(attrs)) {
+      const { data, isVoid, key, type } = attrs
+      let { nodes } = attrs
+
+      if (typeof type != 'string') {
+        throw new Error('`Block.create` requires a block `type` string.')
+      }
+
+      if (nodes == null || nodes.length == 0) {
+        nodes = [Text.create()]
+      }
+
+      const block = new Block({
+        data: Data.create(data),
+        isVoid: !!isVoid,
+        key: key || generateKey(),
+        nodes: Node.createList(nodes),
+        type,
+      })
+
+      return block
+    }
+
+    throw new Error(`\`Block.create\` only accepts objects, strings or blocks, but you passed it: ${attrs}`)
   }
 
   /**
-   * Create a list of `Blocks` from an array.
+   * Create a list of `Blocks` from `elements`.
    *
-   * @param {Array<Object|Block>} elements
+   * @param {Array<Block|Object>|List<Block|Object>} elements
    * @return {List<Block>}
    */
 
   static createList(elements = []) {
-    if (List.isList(elements)) return elements
-    return new List(elements.map(Block.create))
+    if (List.isList(elements) || Array.isArray(elements)) {
+      const list = new List(elements.map(Block.create))
+      return list
+    }
+
+    throw new Error(`\`Block.createList\` only accepts arrays or lists, but you passed it: ${elements}`)
   }
 
   /**
-   * Determines if the passed in paramter is a Slate Block or not
+   * Check if a `value` is a `Block`.
    *
-   * @param {*} maybeBlock
+   * @param {Any} value
    * @return {Boolean}
    */
 
-  static isBlock(maybeBlock) {
-    return !!(maybeBlock && maybeBlock[MODEL_TYPES.BLOCK])
+  static isBlock(value) {
+    return !!(value && value[MODEL_TYPES.BLOCK])
+  }
+
+  /**
+   * Check if a `value` is a block list.
+   *
+   * @param {Any} value
+   * @return {Boolean}
+   */
+
+  static isBlockList(value) {
+    return List.isList(value) && value.every(item => Block.isBlock(item))
   }
 
   /**
@@ -98,7 +130,7 @@ class Block extends new Record(DEFAULTS) {
   }
 
   /**
-   * Is the node empty?
+   * Check if the block is empty.
    *
    * @return {Boolean}
    */
@@ -108,17 +140,7 @@ class Block extends new Record(DEFAULTS) {
   }
 
   /**
-   * Get the length of the concatenated text of the node.
-   *
-   * @return {Number}
-   */
-
-  get length() {
-    return this.text.length
-  }
-
-  /**
-   * Get the concatenated text `string` of all child nodes.
+   * Get the concatenated text of all the block's children.
    *
    * @return {String}
    */
@@ -130,7 +152,7 @@ class Block extends new Record(DEFAULTS) {
 }
 
 /**
- * Pseduo-symbol that shows this is a Slate Block
+ * Attach a pseudo-symbol for type checking.
  */
 
 Block.prototype[MODEL_TYPES.BLOCK] = true
@@ -139,9 +161,10 @@ Block.prototype[MODEL_TYPES.BLOCK] = true
  * Mix in `Node` methods.
  */
 
-for (const method in Node) {
-  Block.prototype[method] = Node[method]
-}
+Object.getOwnPropertyNames(Node.prototype).forEach((method) => {
+  if (method == 'constructor') return
+  Block.prototype[method] = Node.prototype[method]
+})
 
 /**
  * Export.

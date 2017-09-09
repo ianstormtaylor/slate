@@ -3,10 +3,17 @@ import { Editor, Raw } from '../..'
 import React from 'react'
 import initialState from './state.json'
 
-const EMOJIS = [
-  '😃', '😬', '😂', '😅', '😆', '😍', '😱', '👋', '👏', '👍', '🙌', '👌', '🙏', '👻', '🍔', '🍑', '🍆', '🔑'
-]
+/**
+ * Emojis.
+ *
+ * @type {Array}
+ */
 
+const EMOJIS = [
+  '😃', '😬', '😂', '😅', '😆', '😍',
+  '😱', '👋', '👏', '👍', '🙌', '👌',
+  '🙏', '👻', '🍔', '🍑', '🍆', '🔑',
+]
 
 /**
  * Define a schema.
@@ -18,10 +25,9 @@ const schema = {
   nodes: {
     paragraph: props => <p>{props.children}</p>,
     emoji: (props) => {
-      const { state, node } = props
+      const { isSelected, node } = props
       const { data } = node
       const code = data.get('code')
-      const isSelected = state.selection.hasFocusIn(node)
       return <span className={`emoji ${isSelected ? 'selected' : ''}`} {...props.attributes} contentEditable={false}>{code}</span>
     }
   }
@@ -43,15 +49,15 @@ class Emojis extends React.Component {
 
   state = {
     state: Raw.deserialize(initialState, { terse: true })
-  };
+  }
 
   /**
    * On change.
    *
-   * @param {State} state
+   * @param {Change} change
    */
 
-  onChange = (state) => {
+  onChange = ({ state }) => {
     this.setState({ state })
   }
 
@@ -63,18 +69,15 @@ class Emojis extends React.Component {
 
   onClickEmoji = (e, code) => {
     e.preventDefault()
-    let { state } = this.state
-
-    state = state
-      .transform()
+    const change = this.state.state
+      .change()
       .insertInline({
         type: 'emoji',
         isVoid: true,
         data: { code }
       })
-      .apply()
 
-    this.setState({ state })
+    this.onChange(change)
   }
 
   /**

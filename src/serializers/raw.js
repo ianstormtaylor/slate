@@ -4,6 +4,7 @@ import Character from '../models/character'
 import Document from '../models/document'
 import Inline from '../models/inline'
 import Mark from '../models/mark'
+import Node from '../models/node'
 import Selection from '../models/selection'
 import State from '../models/state'
 import Text from '../models/text'
@@ -22,11 +23,12 @@ const Raw = {
    *
    * @param {Object} object
    * @param {Object} options (optional)
-   * @return {Block}
+   * @return {State}
    */
 
   deserialize(object, options) {
-    return Raw.deserializeState(object, options)
+    const state = Raw.deserializeState(object, options)
+    return state
   },
 
   /**
@@ -40,15 +42,16 @@ const Raw = {
   deserializeBlock(object, options = {}) {
     if (options.terse) object = Raw.untersifyBlock(object)
 
-    return Block.create({
+    const nodes = Node.createList(object.nodes.map(node => Raw.deserializeNode(node, options)))
+    const block = Block.create({
       key: object.key,
       type: object.type,
       data: object.data,
       isVoid: object.isVoid,
-      nodes: Block.createList(object.nodes.map((node) => {
-        return Raw.deserializeNode(node, options)
-      }))
+      nodes,
     })
+
+    return block
   },
 
   /**
@@ -60,13 +63,14 @@ const Raw = {
    */
 
   deserializeDocument(object, options) {
-    return Document.create({
+    const nodes = object.nodes.map(node => Raw.deserializeNode(node, options))
+    const document = Document.create({
       key: object.key,
       data: object.data,
-      nodes: Block.createList(object.nodes.map((node) => {
-        return Raw.deserializeNode(node, options)
-      }))
+      nodes,
     })
+
+    return document
   },
 
   /**
@@ -80,15 +84,16 @@ const Raw = {
   deserializeInline(object, options = {}) {
     if (options.terse) object = Raw.untersifyInline(object)
 
-    return Inline.create({
+    const nodes = object.nodes.map(node => Raw.deserializeNode(node, options))
+    const inline = Inline.create({
       key: object.key,
       type: object.type,
       data: object.data,
       isVoid: object.isVoid,
-      nodes: Inline.createList(object.nodes.map((node) => {
-        return Raw.deserializeNode(node, options)
-      }))
+      nodes,
     })
+
+    return inline
   },
 
   /**
@@ -100,7 +105,8 @@ const Raw = {
    */
 
   deserializeMark(object, options) {
-    return Mark.create(object)
+    const mark = Mark.create(object)
+    return mark
   },
 
   /**
@@ -133,19 +139,10 @@ const Raw = {
 
   deserializeRange(object, options = {}) {
     if (options.terse) object = Raw.untersifyRange(object)
-
-    const marks = Mark.createSet(object.marks.map((mark) => {
-      return Raw.deserializeMark(mark, options)
-    }))
-
-    return Character.createList(object.text
-      .split('')
-      .map((char) => {
-        return Character.create({
-          text: char,
-          marks,
-        })
-      }))
+    const marks = Mark.createSet(object.marks.map(mark => Raw.deserializeMark(mark, options)))
+    const chars = object.text.split('')
+    const characters = Character.createList(chars.map(text => ({ text, marks })))
+    return characters
   },
 
   /**
@@ -157,13 +154,15 @@ const Raw = {
    */
 
   deserializeSelection(object, options = {}) {
-    return Selection.create({
+    const selection = Selection.create({
       anchorKey: object.anchorKey,
       anchorOffset: object.anchorOffset,
       focusKey: object.focusKey,
       focusOffset: object.focusOffset,
       isFocused: object.isFocused,
     })
+
+    return selection
   },
 
   /**
@@ -198,12 +197,16 @@ const Raw = {
   deserializeText(object, options = {}) {
     if (options.terse) object = Raw.untersifyText(object)
 
-    return Text.create({
+    const characters = object.ranges.reduce((list, range) => {
+      return list.concat(Raw.deserializeRange(range, options))
+    }, Character.createList())
+
+    const text = Text.create({
       key: object.key,
-      characters: object.ranges.reduce((characters, range) => {
-        return characters.concat(Raw.deserializeRange(range, options))
-      }, Character.createList())
+      characters,
     })
+
+    return text
   },
 
   /**
@@ -215,7 +218,8 @@ const Raw = {
    */
 
   serialize(model, options) {
-    return Raw.serializeState(model, options)
+    const raw = Raw.serializeState(model, options)
+    return raw
   },
 
   /**

@@ -16,6 +16,7 @@ For this most part, this leads to increased flexbility without many downsides, b
 
 Since Slate knows nothing about your schema, it can't know how to parse pasted HTML content (or other content). So, by default whenever a user pastes content into a Slate editor, it will parse it as plain text. If you want it to be smarter about pasted content, you need to define an [`onPaste`](../reference/components/editor.md#onpaste) handler that parses the content as you wish.
 
+
 ### What can a `Block` node have as its children?
 
 With Slate, you can use `Block` node to created complex nested structures. Block nodes may contain nested block nodes (both void and non-void), inline nodes, text nodes and just regular DOM elements (with `contentEditable = {false}`).

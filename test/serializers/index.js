@@ -173,7 +173,7 @@ describe('serializers', () => {
           const input = require(resolve(innerDir, 'input.js')).default
           const expected = fs.readFileSync(resolve(innerDir, 'output.txt'), 'utf8')
           const serialized = Plain.serialize(input)
-          assert.deepEqual(serialized, expected.replace(/\n$/m, ''))
+          assert.deepEqual(serialized, expected)
         })
       }
     })

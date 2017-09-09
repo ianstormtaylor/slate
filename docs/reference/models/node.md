@@ -7,7 +7,6 @@
   - [`nodes`](#nodes)
 - [Computed Properties](#computed-properties)
   - [`kind`](#kind)
-  - [`length`](#length)
   - [`text`](#text)
 - [Methods](#methods)
   - [`filterDescendants`](#filterdescendants)
@@ -67,11 +66,6 @@ A list of child nodes. Defaults to a list with a single text node child.
 `String`
 
 An immutable string value of `'block'` for easily separating this node from [`Inline`](./inline.md) or [`Text`](./text.md) nodes.
-
-### `length`
-`Number`
-
-The sum of the lengths of all of the descendant [`Text`](./text.md) nodes of this node.
 
 ### `text`
 `String`

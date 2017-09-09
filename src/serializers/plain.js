@@ -1,4 +1,5 @@
 
+import Block from '../models/block'
 import Raw from '../serializers/raw'
 
 /**
@@ -7,25 +8,32 @@ import Raw from '../serializers/raw'
  * @param {String} string
  * @param {Object} options
  *   @property {Boolean} toRaw
+ *   @property {String|Object} defaultBlock
+ *   @property {Array} defaultMarks
  * @return {State}
  */
 
 function deserialize(string, options = {}) {
+  const {
+    defaultBlock = { type: 'line' },
+    defaultMarks = [],
+  } = options
+
   const raw = {
     kind: 'state',
     document: {
       kind: 'document',
       nodes: string.split('\n').map((line) => {
         return {
+          ...defaultBlock,
           kind: 'block',
-          type: 'line',
           nodes: [
             {
               kind: 'text',
               ranges: [
                 {
                   text: line,
-                  marks: [],
+                  marks: defaultMarks,
                 }
               ]
             }
@@ -46,9 +54,25 @@ function deserialize(string, options = {}) {
  */
 
 function serialize(state) {
-  return state.document.nodes
-    .map(block => block.text)
-    .join('\n')
+  return serializeNode(state.document)
+}
+
+/**
+ * Serialize a `node` to plain text.
+ *
+ * @param {Node} node
+ * @return {String}
+ */
+
+function serializeNode(node) {
+  if (
+    (node.kind == 'document') ||
+    (node.kind == 'block' && Block.isBlockList(node.nodes))
+  ) {
+    return node.nodes.map(serializeNode).join('\n')
+  } else {
+    return node.text
+  }
 }
 
 /**

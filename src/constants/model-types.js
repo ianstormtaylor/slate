@@ -1,20 +1,24 @@
+
 /**
- * Slate-specific item types.
+ * Slate-specific model types.
  *
  * @type {Object}
  */
 
 const MODEL_TYPES = {
-  STATE: '@@__SLATE_STATE__@@',
-  DOCUMENT: '@@__SLATE_DOCUMENT__@@',
   BLOCK: '@@__SLATE_BLOCK__@@',
-  INLINE: '@@__SLATE_INLINE__@@',
-  TEXT: '@@__SLATE_TEXT__@@',
+  CHANGE: '@@__SLATE_CHANGE__@@',
   CHARACTER: '@@__SLATE_CHARACTER__@@',
+  DOCUMENT: '@@__SLATE_DOCUMENT__@@',
+  HISTORY: '@@__SLATE_HISTORY__@@',
+  INLINE: '@@__SLATE_INLINE__@@',
   MARK: '@@__SLATE_MARK__@@',
   RANGE: '@@__SLATE_RANGE__@@',
-  SELECTION: '@@__SLATE_SELECTION__@@',
   SCHEMA: '@@__SLATE_SCHEMA__@@',
+  SELECTION: '@@__SLATE_SELECTION__@@',
+  STACK: '@@__SLATE_STACK__@@',
+  STATE: '@@__SLATE_STATE__@@',
+  TEXT: '@@__SLATE_TEXT__@@',
 }
 
 /**

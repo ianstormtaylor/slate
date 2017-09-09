@@ -6,6 +6,7 @@ import Types from 'prop-types'
 import Leaf from './leaf'
 import Mark from '../models/mark'
 import OffsetKey from '../utils/offset-key'
+import SlateTypes from '../utils/prop-types'
 import { IS_FIREFOX } from '../constants/environment'
 
 /**
@@ -31,14 +32,14 @@ class Void extends React.Component {
    */
 
   static propTypes = {
-    block: Types.object,
+    block: SlateTypes.block,
     children: Types.any.isRequired,
     editor: Types.object.isRequired,
-    node: Types.object.isRequired,
-    parent: Types.object.isRequired,
+    node: SlateTypes.node.isRequired,
+    parent: SlateTypes.node.isRequired,
     readOnly: Types.bool.isRequired,
-    schema: Types.object.isRequired,
-    state: Types.object.isRequired,
+    schema: SlateTypes.schema.isRequired,
+    state: SlateTypes.state.isRequired,
   }
 
   /**
@@ -49,7 +50,7 @@ class Void extends React.Component {
 
   state = {
     dragCounter: 0,
-    editable: false
+    editable: false,
   }
 
   /**
@@ -78,18 +79,16 @@ class Void extends React.Component {
     this.debug('onClick', { event })
 
     const { node, editor } = this.props
-    const next = editor
-      .getState()
-      .transform()
-      // COMPAT: In Chrome & Safari, selections that are at the zero offset of
-      // an inline node will be automatically replaced to be at the last offset
-      // of a previous inline node, which screws us up, so we always want to set
-      // it to the end of the node. (2016/11/29)
-      .collapseToEndOf(node)
-      .focus()
-      .apply()
 
-    editor.onChange(next)
+    editor.change((change) => {
+      change
+        // COMPAT: In Chrome & Safari, selections that are at the zero offset of
+        // an inline node will be automatically replaced to be at the last
+        // offset of a previous inline node, which screws us up, so we always
+        // want to set it to the end of the node. (2016/11/29)
+        .collapseToEndOf(node)
+        .focus()
+    })
   }
 
   /**
@@ -115,7 +114,7 @@ class Void extends React.Component {
 
   onDragLeave = () => {
     this.setState((prevState) => {
-      const dragCounter = prevState.dragCounter + 1
+      const dragCounter = prevState.dragCounter - 1
       const editable = dragCounter === 0 ? false : undefined
       return { dragCounter, editable }
     })

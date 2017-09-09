@@ -1,8 +1,9 @@
 
+import MODEL_TYPES from '../constants/model-types'
 import Character from './character'
 import Mark from './mark'
-import MODEL_TYPES from '../constants/model-types'
-import { Record, Set } from 'immutable'
+import isPlainObject from 'is-plain-object'
+import { List, Record, Set } from 'immutable'
 
 /**
  * Default properties.
@@ -21,31 +22,57 @@ const DEFAULTS = {
  * @type {Range}
  */
 
-class Range extends new Record(DEFAULTS) {
+class Range extends Record(DEFAULTS) {
 
   /**
-   * Create a new `Range` with `properties`.
+   * Create a new `Range` with `attrs`.
    *
-   * @param {Object|Range} properties
+   * @param {Object|Range} attrs
    * @return {Range}
    */
 
-  static create(properties = {}) {
-    if (Range.isRange(properties)) return properties
-    properties.text = properties.text
-    properties.marks = Mark.createSet(properties.marks)
-    return new Range(properties)
+  static create(attrs = {}) {
+    if (Range.isRange(attrs)) {
+      return attrs
+    }
+
+    if (typeof attrs == 'string') {
+      attrs = { text: attrs }
+    }
+
+    if (isPlainObject(attrs)) {
+      const { marks, text } = attrs
+      const range = new Range({
+        text,
+        marks: Mark.createSet(marks),
+      })
+
+      return range
+    }
+
+    throw new Error(`\`Range.create\` only accepts objects, strings or ranges, but you passed it: ${attrs}`)
   }
 
   /**
-   * Determines if the passed in paramter is a Slate Range or not
+   * Check if a `value` is a `Range`.
    *
-   * @param {*} maybeRange
+   * @param {Any} value
    * @return {Boolean}
    */
 
-  static isRange(maybeRange) {
-    return !!(maybeRange && maybeRange[MODEL_TYPES.RANGE])
+  static isRange(value) {
+    return !!(value && value[MODEL_TYPES.RANGE])
+  }
+
+  /**
+   * Check if a `value` is a list of ranges.
+   *
+   * @param {Any} value
+   * @return {Boolean}
+   */
+
+  static isRangeList(value) {
+    return List.isList(value) && value.every(item => Range.isRange(item))
   }
 
   /**
@@ -66,8 +93,7 @@ class Range extends new Record(DEFAULTS) {
 
   getCharacters() {
     const { marks } = this
-
-    return Character.createList(this.text
+    const characters = Character.createList(this.text
       .split('')
       .map((char) => {
         return Character.create({
@@ -75,12 +101,14 @@ class Range extends new Record(DEFAULTS) {
           marks
         })
       }))
+
+    return characters
   }
 
 }
 
 /**
- * Pseduo-symbol that shows this is a Slate Range
+ * Attach a pseudo-symbol for type checking.
  */
 
 Range.prototype[MODEL_TYPES.RANGE] = true

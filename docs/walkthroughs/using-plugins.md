@@ -25,17 +25,15 @@ class App extends React.Component {
     }
   }
 
-  onChange = (state) => {
+  onChange = ({ state }) => {
     this.setState({ state })
   }
 
-  onKeyDown = (event, data, state) => {
+  onKeyDown = (event, data, change) => {
     if (!event.metaKey || event.which != 66) return
     event.preventDefault()
-    return state
-      .transform()
-      .toggleMark('bold')
-      .apply()
+    change.toggleMark('bold')
+    return true
   }
 
   render() {
@@ -73,7 +71,7 @@ function MarkHotkey(options) {
 
   // Return our "plugin" object, containing the `onKeyDown` handler.
   return {
-    onKeyDown(event, data, state) {
+    onKeyDown(event, data, change) {
       // Check that the key pressed matches our `code` option.
       if (!event.metaKey || event.which != code || event.altKey != isAltKey) return
 
@@ -81,10 +79,8 @@ function MarkHotkey(options) {
       event.preventDefault()
 
       // Toggle the mark `type`.
-      return state
-        .transform()
-        .toggleMark(type)
-        .apply()
+      change.toggleMark(type)
+      return true
     }
   }
 }
@@ -101,7 +97,7 @@ function BoldMark(props) {
 
 // Initialize our bold-mark-adding plugin.
 const boldPlugin = MarkHotkey({
-  type: 'bold', 
+  type: 'bold',
   code: 66
 })
 
@@ -120,8 +116,8 @@ class App extends React.Component {
       }
     }
   }
-  
-  onChange = (state) => {
+
+  onChange = ({ state }) => {
     this.setState({ state })
   }
 
@@ -169,8 +165,8 @@ class App extends React.Component {
       }
     }
   }
-  
-  onChange = (state) => {
+
+  onChange = ({ state }) => {
     this.setState({ state })
   }
 
@@ -215,14 +211,12 @@ function MarkHotkey(options) {
   const { type, key, isAltKey = false } = options
 
   return {
-    onKeyDown(event, data, state) {
+    onKeyDown(event, data, change) {
       // Change the comparison to use the key name.
       if (!event.metaKey || keycode(event.which) != key || event.altKey != isAltKey) return
       event.preventDefault()
-      return state
-        .transform()
-        .toggleMark(type)
-        .apply()
+      change.toggleMark(type)
+      return true
     }
   }
 }
@@ -254,8 +248,8 @@ class App extends React.Component {
       }
     }
   }
-  
-  onChange = (state) => {
+
+  onChange = ({ state }) => {
     this.setState({ state })
   }
 

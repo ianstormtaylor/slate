@@ -1,9 +1,0 @@
-
-nodes:
-  - kind: block
-    key: 'key'
-    type: paragraph
-    nodes:
-      - kind: text
-        key: 'anchor'
-        text: Thetext
