@@ -209,7 +209,7 @@ function createChildren(children) {
     if (Text.isText(child)) {
       let i = node.text.length
 
-      child.ranges.forEach((range) => {
+      child.getRanges().forEach((range) => {
         setNode(node.insertText(i, range.text, range.marks))
         i += range.text.length
       })
