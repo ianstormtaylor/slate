@@ -14,9 +14,9 @@ This document maintains a list of changes to Slate with each new version. Until 
 
 ###### DEPRECATED
 
-- **The `Raw` serializer is now deprecated.** Instead, use the `fromJSON` and `toJSON` models directly.
+- **The `Raw` serializer is now deprecated.** The entire "raw" concept is being removed, in favor of allowing all models to be able to serialize and deserialize to JSON themselves. Instead of using the `Raw` serializer, you can now use the `fromJSON` and `toJSON` on the models directly.
 
-- **The `toRaw` options for the `Plain` and `Html` serializers are now called `toJSON`.** To stay symmetrical with the removal of the "raw" concept everywhere.
+- **The `toRaw` options for the `Plain` and `Html` serializers are now called `toJSON`.** This is to stay symmetrical with the removal of the "raw" concept everywhere.
 
 - **The `terse` option for JSON serialization has been deprecated!** This option causes lots of abstraction leakiness because it means there is no one canonical JSON representation of objects. You had to work with either terse or not terse data.
 
