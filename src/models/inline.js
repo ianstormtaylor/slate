@@ -9,9 +9,7 @@ import './document'
  * Dependencies.
  */
 
-import Data from './data'
 import Node from './node'
-import Text from './text'
 import MODEL_TYPES from '../constants/model-types'
 import generateKey from '../utils/generate-key'
 import isPlainObject from 'is-plain-object'

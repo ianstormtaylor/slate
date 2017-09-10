@@ -3,27 +3,14 @@
 import h from '../../../helpers/h'
 
 export default function (change) {
-  const texts = document.getTexts()
-  const first = texts.first()
-  const range = selection.merge({
-    anchorKey: first.key,
-    anchorOffset: 0,
-    focusKey: first.key,
-    focusOffset: first.text.length
-  })
-
-  change
-    .select(range)
-    .toggleMark('bold')
-
-  assert.deepEqual(next.selection.toJS(), range.toJS())
+  change.toggleMark('bold')
 }
 
 export const input = (
   <state>
     <document>
       <paragraph>
-        <b>word</b>
+        <anchor /><b>word</b><focus />
       </paragraph>
     </document>
   </state>
@@ -32,7 +19,9 @@ export const input = (
 export const output = (
   <state>
     <document>
-      <paragraph>word</paragraph>
+      <paragraph>
+        <anchor />word<focus />
+      </paragraph>
     </document>
   </state>
 )

@@ -33,7 +33,6 @@ const CREATORS = {
   },
 
   block(tagName, attributes, children) {
-    debugger
     return Block.create({
       ...attributes,
       nodes: createChildren(children),
@@ -95,17 +94,16 @@ const CREATORS = {
       })
     }
 
-    debugger
+    if (props.anchorKey && !props.focusKey) {
+      throw new Error(`Slate hyperscript must have both \`<anchor/>\` and \`<focus/>\` defined if one is defined, but you only defined \`<anchor/>\`. For collapsed selections, use \`<cursor/>\`.`)
+    }
 
-    if (
-      (props.anchorKey && !props.focusKey) ||
-      (!props.anchorKey && props.focusKey)
-    ) {
-      throw new Error(`Slate hyperscript must have both \`<anchor/>\` and \`<focus/>\` if one is used. For collapsed selections, use \`<cursor/>\`.`)
+    if (!props.anchorKey && props.focusKey) {
+      throw new Error(`Slate hyperscript must have both \`<anchor/>\` and \`<focus/>\` defined if one is defined, but you only defined \`<focus/>\`. For collapsed selections, use \`<cursor/>\`.`)
     }
 
     if (!isEmpty(props)) {
-      selection = selection.merge(props)
+      selection = selection.merge(props).normalize(document)
     }
 
     const state = State.create({ document, selection })
@@ -184,7 +182,8 @@ function createChildren(children, options = {}) {
     // If the child is a non-text node, push the current node and the new child
     // onto the array, then creating a new node for future selection tracking.
     if (Node.isNode(child) && !Text.isText(child)) {
-      if (node.text.length) array.push(node)
+      // TODO: maybe always just push instead of checking
+      if (node.text.length || node.__anchor != null || node.__focus != null) array.push(node)
       array.push(child)
       node = Text.create()
       length = 0

@@ -3,32 +3,16 @@
 import h from '../../../helpers/h'
 
 export default function (change) {
-  const texts = document.getTexts()
-  const second = texts.get(1)
-  const range = selection.merge({
-    anchorKey: second.key,
-    anchorOffset: 0,
-    focusKey: second.key,
-    focusOffset: 0
+  change.wrapInline({
+    type: 'link'
   })
-
-  change
-    .select(range)
-    .wrapInline({
-      type: 'link'
-    })
-
-  assert.deepEqual(
-    next.selection.toJS(),
-    range.toJS()
-  )
 }
 
 export const input = (
   <state>
     <document>
       <paragraph>
-        <image></image>
+        <emoji><cursor />{' '}</emoji>
       </paragraph>
     </document>
   </state>
@@ -39,7 +23,7 @@ export const output = (
     <document>
       <paragraph>
         <link>
-          <image></image>
+          <emoji><cursor />{' '}</emoji>
         </link>
       </paragraph>
     </document>

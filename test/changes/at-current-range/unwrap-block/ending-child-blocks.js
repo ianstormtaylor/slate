@@ -3,36 +3,31 @@
 import h from '../../../helpers/h'
 
 export default function (change) {
-  const texts = document.getTexts()
-  const fifth = texts.get(4)
-  const sixth = texts.get(5)
-  const range = selection.merge({
-    anchorKey: fifth.key,
-    anchorOffset: 0,
-    focusKey: sixth.key,
-    focusOffset: 0
-  })
-
-  change
-    .select(range)
-    .unwrapBlock('quote')
-
-  assert.deepEqual(
-    next.selection.toJS(),
-    range.toJS()
-  )
+  change.unwrapBlock('quote')
 }
 
 export const input = (
   <state>
     <document>
       <quote>
-        <paragraph>one</paragraph>
-        <paragraph>two</paragraph>
-        <paragraph>three</paragraph>
-        <paragraph>four</paragraph>
-        <paragraph>five</paragraph>
-        <paragraph>six</paragraph>
+        <paragraph>
+          one
+        </paragraph>
+        <paragraph>
+          two
+        </paragraph>
+        <paragraph>
+          three
+        </paragraph>
+        <paragraph>
+          four
+        </paragraph>
+        <paragraph>
+          <anchor />five
+        </paragraph>
+        <paragraph>
+          <focus />six
+        </paragraph>
       </quote>
     </document>
   </state>
@@ -42,13 +37,25 @@ export const output = (
   <state>
     <document>
       <quote>
-        <paragraph>one</paragraph>
-        <paragraph>two</paragraph>
-        <paragraph>three</paragraph>
-        <paragraph>four</paragraph>
+        <paragraph>
+          one
+        </paragraph>
+        <paragraph>
+          two
+        </paragraph>
+        <paragraph>
+          three
+        </paragraph>
+        <paragraph>
+          four
+        </paragraph>
       </quote>
-      <paragraph>five</paragraph>
-      <paragraph>six</paragraph>
+      <paragraph>
+        <anchor />five
+      </paragraph>
+      <paragraph>
+        <focus />six
+      </paragraph>
     </document>
   </state>
 )
