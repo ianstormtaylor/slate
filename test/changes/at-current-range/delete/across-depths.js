@@ -13,18 +13,10 @@ export const input = (
         <paragraph>
           one<anchor />
         </paragraph>
-        <paragraph>
-          two
-        </paragraph>
       </quote>
-      <quote>
-        <paragraph>
-          <focus />three
-        </paragraph>
-        <paragraph>
-          four
-        </paragraph>
-      </quote>
+      <paragraph>
+        <focus />two
+      </paragraph>
     </document>
   </state>
 )
@@ -34,12 +26,7 @@ export const output = (
     <document>
       <quote>
         <paragraph>
-          one<cursor />three
-        </paragraph>
-      </quote>
-      <quote>
-        <paragraph>
-          four
+          onetwo
         </paragraph>
       </quote>
     </document>

@@ -3,7 +3,18 @@
 import h from '../../../helpers/h'
 
 export default function (change) {
-  change.delete()
+  change.insertFragment((
+    <document>
+      <quote>
+        <quote>
+          one
+        </quote>
+        <quote>
+          two
+        </quote>
+      </quote>
+    </document>
+  ))
 }
 
 export const input = (
@@ -11,18 +22,7 @@ export const input = (
     <document>
       <quote>
         <paragraph>
-          one<anchor />
-        </paragraph>
-        <paragraph>
-          two
-        </paragraph>
-      </quote>
-      <quote>
-        <paragraph>
-          <focus />three
-        </paragraph>
-        <paragraph>
-          four
+          wo<cursor />rd
         </paragraph>
       </quote>
     </document>
@@ -34,13 +34,13 @@ export const output = (
     <document>
       <quote>
         <paragraph>
-          one<cursor />three
+          woone
         </paragraph>
-      </quote>
-      <quote>
-        <paragraph>
-          four
-        </paragraph>
+        <quote>
+          <quote>
+            tword
+          </quote>
+        </quote>
       </quote>
     </document>
   </state>

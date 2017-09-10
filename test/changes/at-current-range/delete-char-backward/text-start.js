@@ -3,14 +3,14 @@
 import h from '../../../helpers/h'
 
 export default function (change) {
-  change.deleteBackward()
+  change.deleteCharBackward()
 }
 
 export const input = (
   <state>
     <document>
       <paragraph>
-        one<link>two</link>a<cursor />
+        w<cursor />ord
       </paragraph>
     </document>
   </state>
@@ -20,7 +20,7 @@ export const output = (
   <state>
     <document>
       <paragraph>
-        one<link>two</link>
+        <cursor />ord
       </paragraph>
     </document>
   </state>
