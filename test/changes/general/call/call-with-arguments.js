@@ -2,24 +2,26 @@
 
 import h from '../../../helpers/h'
 
-import { Block } from '../../../../..'
+function insertVoid(change, blockType) {
+  change.insertBlock({
+    type: blockType,
+    isVoid: true,
+  })
+}
 
 export default function (change) {
-
-  function insertCustomBlock(change, blockType) {
-    change.insertBlock(blockType)
-  }
-
-  return state
-    .change()
-    .call(insertCustomBlock, 'crystal')
+  change.call(insertVoid, 'image')
 }
 
 export const input = (
   <state>
     <document>
-      <paragraph>one</paragraph>
-      <paragraph>two</paragraph>
+      <paragraph>
+        <cursor />one
+      </paragraph>
+      <paragraph>
+        two
+      </paragraph>
     </document>
   </state>
 )
@@ -27,9 +29,15 @@ export const input = (
 export const output = (
   <state>
     <document>
-      <crystal></crystal>
-      <paragraph>one</paragraph>
-      <paragraph>two</paragraph>
+      <image>
+        <cursor />{' '}
+      </image>
+      <paragraph>
+        one
+      </paragraph>
+      <paragraph>
+        two
+      </paragraph>
     </document>
   </state>
 )

@@ -72,6 +72,7 @@ const CREATORS = {
   },
 
   state(tagName, attributes, children) {
+    const { data } = attributes
     const document = children.find(Document.isDocument)
     let selection = children.find(Selection.isSelection) || Selection.create()
     const props = {}
@@ -106,7 +107,7 @@ const CREATORS = {
       selection = selection.merge(props).normalize(document)
     }
 
-    const state = State.create({ document, selection })
+    const state = State.create({ data, document, selection })
     return state
   },
 
