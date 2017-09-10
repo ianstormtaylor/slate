@@ -1,6 +1,17 @@
 
 import Map from 'es6-map'
-import IS_DEV from '../constants/is-dev'
+
+/**
+ * Is in development?
+ *
+ * @type {Boolean}
+ */
+
+const IS_DEV = (
+  typeof process !== 'undefined' &&
+  process.env &&
+  process.env.NODE_ENV !== 'production'
+)
 
 /**
  * GLOBAL: True if memoization should is enabled. Only effective when `IS_DEV`.

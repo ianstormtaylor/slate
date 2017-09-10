@@ -1,0 +1,7 @@
+benchmark
+docs
+examples
+src
+test
+tmp
+.babelrc

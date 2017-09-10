@@ -1,6 +1,16 @@
 /* eslint-disable no-console */
 
-import IS_DEV from '../constants/is-dev'
+/**
+ * Is in development?
+ *
+ * @type {Boolean}
+ */
+
+const IS_DEV = (
+  typeof process !== 'undefined' &&
+  process.env &&
+  process.env.NODE_ENV !== 'production'
+)
 
 /**
  * Log a `message` at `level`.
