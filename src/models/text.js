@@ -83,15 +83,10 @@ class Text extends Record(DEFAULTS) {
       return object
     }
 
-    let {
+    const {
       ranges = [],
       key = generateKey(),
     } = object
-
-    // TODO: remove this! too leaky
-    if (object.text) {
-      ranges = [{ text: object.text }]
-    }
 
     const characters = ranges
       .map(Range.fromJSON)
