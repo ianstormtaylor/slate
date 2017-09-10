@@ -3,24 +3,15 @@
 import h from '../../../helpers/h'
 
 export default function (change) {
-  const { startText, selection } = state
-
-  change
-    .focus()
-    .blur()
-
-  assert.deepEqual(
-    next.selection.toJS(),
-    selection.toJS()
-  )
+  change.blur()
 }
 
 export const input = (
   <state>
     <document>
-      <paragraph>one</paragraph>
-      <paragraph>two</paragraph>
-      <paragraph>three</paragraph>
+      <paragraph>
+        <cursor />one
+      </paragraph>
     </document>
   </state>
 )
@@ -28,9 +19,9 @@ export const input = (
 export const output = (
   <state>
     <document>
-      <paragraph>one</paragraph>
-      <paragraph>two</paragraph>
-      <paragraph>three</paragraph>
+      <paragraph>
+        one
+      </paragraph>
     </document>
   </state>
 )

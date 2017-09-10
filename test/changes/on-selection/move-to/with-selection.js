@@ -3,29 +3,24 @@
 import h from '../../../helpers/h'
 
 export default function (change) {
-  const { startText, selection } = state
-  const sel = selection.merge({
+  const { state } = change
+  const { selection, startText } = state
+  const range = selection.merge({
     anchorKey: startText.key,
     anchorOffset: 0,
     focusKey: startText.key,
     focusOffset: startText.text.length,
   })
 
-  change
-    .select(sel)
-
-  assert.deepEqual(
-    next.selection.toJS(),
-    sel.toJS()
-  )
+  change.select(range)
 }
 
 export const input = (
   <state>
     <document>
-      <paragraph>one</paragraph>
-      <paragraph>two</paragraph>
-      <paragraph>three</paragraph>
+      <paragraph>
+        <cursor />one
+      </paragraph>
     </document>
   </state>
 )
@@ -33,9 +28,9 @@ export const input = (
 export const output = (
   <state>
     <document>
-      <paragraph>one</paragraph>
-      <paragraph>two</paragraph>
-      <paragraph>three</paragraph>
+      <paragraph>
+        <anchor />one<focus />
+      </paragraph>
     </document>
   </state>
 )
