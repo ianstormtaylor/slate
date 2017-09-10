@@ -3,17 +3,18 @@
 import h from '../../../helpers/h'
 
 export default function (change) {
-  const first = document.nodes.get(0)
-
-  return state
-    .change()
-    .setNodeByKey(first.key, 'code')
+  change.setNodeByKey('a', {
+    type: 'emoji',
+    isVoid: true
+  })
 }
 
 export const input = (
   <state>
     <document>
-      <paragraph>word</paragraph>
+      <paragraph>
+        <link key="a">word</link>
+      </paragraph>
     </document>
   </state>
 )
@@ -21,7 +22,9 @@ export const input = (
 export const output = (
   <state>
     <document>
-      <code>word</code>
+      <paragraph>
+        <emoji />
+      </paragraph>
     </document>
   </state>
 )

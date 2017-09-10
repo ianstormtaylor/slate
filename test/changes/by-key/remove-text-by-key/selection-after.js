@@ -3,33 +3,15 @@
 import h from '../../../helpers/h'
 
 export default function (change) {
-  const texts = document.getTexts()
-  const firstText = texts.first()
-
-  const nextSelection = selection.merge({
-    anchorKey: firstText.key,
-    focusKey: firstText.key,
-    anchorOffset: 2,
-    focusOffset: 2
-  })
-
-  change
-    .select(nextSelection)
-    .removeTextByKey(firstText.key, 0, 1)
-
-  assert.deepEqual(
-    next.selection.toJS(),
-    nextSelection.merge({
-      anchorOffset: 1,
-      focusOffset: 1
-    }).toJS()
-  )
+  change.removeTextByKey('a', 3, 1)
 }
 
 export const input = (
   <state>
     <document>
-      <paragraph>hello</paragraph>
+      <paragraph>
+        <text key="a">w<anchor />or<focus />d</text>
+      </paragraph>
     </document>
   </state>
 )
@@ -37,7 +19,9 @@ export const input = (
 export const output = (
   <state>
     <document>
-      <paragraph>ello</paragraph>
+      <paragraph>
+        w<anchor />or<focus />
+      </paragraph>
     </document>
   </state>
 )

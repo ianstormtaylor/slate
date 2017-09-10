@@ -3,17 +3,18 @@
 import h from '../../../helpers/h'
 
 export default function (change) {
-  const first = document.nodes.get(0)
-
-  return state
-    .change()
-    .setNodeByKey(first.key, { data: {key: 'bar'} })
+  change.setNodeByKey('a', {
+    type: 'quote',
+    data: { thing: false },
+  })
 }
 
 export const input = (
   <state>
     <document>
-      <paragraph>word</paragraph>
+      <paragraph key="a">
+        word
+      </paragraph>
     </document>
   </state>
 )
@@ -21,7 +22,9 @@ export const input = (
 export const output = (
   <state>
     <document>
-      <paragraph>word</paragraph>
+      <quote thing={false}>
+        word
+      </quote>
     </document>
   </state>
 )

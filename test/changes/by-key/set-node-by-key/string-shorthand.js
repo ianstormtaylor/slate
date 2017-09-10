@@ -3,14 +3,14 @@
 import h from '../../../helpers/h'
 
 export default function (change) {
-  change.removeTextByKey('a', 3, 1)
+  change.setNodeByKey('a', 'quote')
 }
 
 export const input = (
   <state>
     <document>
-      <paragraph>
-        <link><text key="a">word</text></link>
+      <paragraph key="a">
+        word
       </paragraph>
     </document>
   </state>
@@ -19,9 +19,9 @@ export const input = (
 export const output = (
   <state>
     <document>
-      <paragraph>
-        <link>wor</link>
-      </paragraph>
+      <quote>
+        word
+      </quote>
     </document>
   </state>
 )

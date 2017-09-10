@@ -3,17 +3,15 @@
 import h from '../../../helpers/h'
 
 export default function (change) {
-  const first = document.getTexts().first()
-
-  return state
-    .change()
-    .removeTextByKey(first.key, 3, 1)
+  change.removeTextByKey('a', 3, 1)
 }
 
 export const input = (
   <state>
     <document>
-      <paragraph>word</paragraph>
+      <paragraph>
+        <text key="a">word</text>
+      </paragraph>
     </document>
   </state>
 )
@@ -21,7 +19,9 @@ export const input = (
 export const output = (
   <state>
     <document>
-      <paragraph>wor</paragraph>
+      <paragraph>
+        wor
+      </paragraph>
     </document>
   </state>
 )

@@ -3,18 +3,16 @@
 import h from '../../../helpers/h'
 
 export default function (change) {
-  const last = document.getTexts().last()
-
-  return state
-    .change()
-    .removeTextByKey(last.key, 0, 4)
+  change.removeTextByKey('a', 0, 1)
 }
 
 export const input = (
   <state>
     <document>
       <paragraph>
-        <image></image>word
+        <emoji>
+          <text key="a">{' '}</text>
+        </emoji>
       </paragraph>
     </document>
   </state>
@@ -24,7 +22,7 @@ export const output = (
   <state>
     <document>
       <paragraph>
-        <image></image>
+        <emoji />
       </paragraph>
     </document>
   </state>

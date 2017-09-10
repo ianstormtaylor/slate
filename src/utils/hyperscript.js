@@ -165,15 +165,11 @@ function createHyperscript(options = {}) {
  */
 
 function createChildren(children, options = {}) {
+  const firstText = children.find(c => Text.isText(c))
   const array = []
+  const key = firstText ? firstText.key : options.key
   let length = 0
-  let node = Text.create({ key: options.key })
-
-  // Use the first text child instead if it is one, to preserve keys.
-  if (Text.isText(children[0])) {
-    node = children[0]
-    children = children.slice(1)
-  }
+  let node = Text.create({ key })
 
   // Create a helper to update the current node while preserving any stored
   // anchor or focus information.
@@ -201,22 +197,28 @@ function createChildren(children, options = {}) {
       length += child.length
     }
 
-    // If the node is a `Text` add its text and marks to the existing node.
+    // If the node is a `Text` add its text and marks to the existing node. If
+    // the existing node is empty, replace it with the child to preserve keys.
     if (Text.isText(child)) {
-      const { __anchor, __focus } = child
-      let i = node.text.length
+      if (node.text.length == 0) {
+        if (options.key) child = child.set('key', options.key)
+        setNode(child)
+      } else {
+        const { __anchor, __focus } = child
+        let i = node.text.length
 
-      child.getRanges().forEach((range) => {
-        let { marks } = range
-        if (options.marks) marks = marks.union(options.marks)
-        setNode(node.insertText(i, range.text, marks))
-        i += range.text.length
-      })
+        child.getRanges().forEach((range) => {
+          let { marks } = range
+          if (options.marks) marks = marks.union(options.marks)
+          setNode(node.insertText(i, range.text, marks))
+          i += range.text.length
+        })
 
-      if (__anchor != null) node.__anchor = __anchor + length
-      if (__focus != null) node.__focus = __focus + length
+        if (__anchor != null) node.__anchor = __anchor + length
+        if (__focus != null) node.__focus = __focus + length
 
-      length += child.text.length
+        length += child.text.length
+      }
     }
 
     // If the child is a selection object store the current position.

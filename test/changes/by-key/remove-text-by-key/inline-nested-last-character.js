@@ -3,21 +3,14 @@
 import h from '../../../helpers/h'
 
 export default function (change) {
-  const first = document.getInlines().first()
-
-  return state
-    .change()
-    .setNodeByKey(first.key, {
-      type: 'image',
-      isVoid: true
-    })
+  change.removeTextByKey('a', 0, 1)
 }
 
 export const input = (
   <state>
     <document>
       <paragraph>
-        <link>word</link>
+        <link><hashtag><text key="a">a</text></hashtag></link>
       </paragraph>
     </document>
   </state>
@@ -26,9 +19,7 @@ export const input = (
 export const output = (
   <state>
     <document>
-      <paragraph>
-        <image></image>
-      </paragraph>
+      <paragraph />
     </document>
   </state>
 )
