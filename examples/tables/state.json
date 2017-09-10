@@ -1,241 +1,251 @@
 {
-  "nodes": [
-    {
-      "kind": "block",
-      "type": "paragraph",
-      "nodes": [
-        {
-          "kind": "text",
-          "text": "Since the editor is based on a recursive tree model, similar to an HTML document, you can create complex nested structures, like tables:"
-        }
-      ]
-    },
-    {
-      "kind": "block",
-      "type": "table",
-      "nodes": [
-        {
-          "kind": "block",
-          "type": "table-row",
-          "nodes": [
-            {
-              "kind": "block",
-              "type": "table-cell",
-              "nodes": [
-                {
-                  "kind": "text",
-                  "ranges": [
-                    {
-                      "text": ""
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "kind": "block",
-              "type": "table-cell",
-              "nodes": [
-                {
-                  "kind": "text",
-                  "ranges": [
-                    {
-                      "text": "Human",
-                      "marks": [
-                        {
-                          "type": "bold"
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "kind": "block",
-              "type": "table-cell",
-              "nodes": [
-                {
-                  "kind": "text",
-                  "ranges": [
-                    {
-                      "text": "Dog",
-                      "marks": [
-                        {
-                          "type": "bold"
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "kind": "block",
-              "type": "table-cell",
-              "nodes": [
-                {
-                  "kind": "text",
-                  "ranges": [
-                    {
-                      "text": "Cat",
-                      "marks": [
-                        {
-                          "type": "bold"
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "kind": "block",
-          "type": "table-row",
-          "nodes": [
-            {
-              "kind": "block",
-              "type": "table-cell",
-              "nodes": [
-                {
-                  "kind": "text",
-                  "ranges": [
-                    {
-                      "text": "# of Feet",
-                      "marks": [
-                        {
-                          "type": "bold"
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "kind": "block",
-              "type": "table-cell",
-              "nodes": [
-                {
-                  "kind": "text",
-                  "ranges": [
-                    {
-                      "text": "1"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "kind": "block",
-              "type": "table-cell",
-              "nodes": [
-                {
-                  "kind": "text",
-                  "ranges": [
-                    {
-                      "text": "4"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "kind": "block",
-              "type": "table-cell",
-              "nodes": [
-                {
-                  "kind": "text",
-                  "ranges": [
-                    {
-                      "text": "4"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "kind": "block",
-          "type": "table-row",
-          "nodes": [
-            {
-              "kind": "block",
-              "type": "table-cell",
-              "nodes": [
-                {
-                  "kind": "text",
-                  "ranges": [
-                    {
-                      "text": "# of Lives",
-                      "marks": [
-                        {
-                          "type": "bold"
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "kind": "block",
-              "type": "table-cell",
-              "nodes": [
-                {
-                  "kind": "text",
-                  "ranges": [
-                    {
-                      "text": "1"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "kind": "block",
-              "type": "table-cell",
-              "nodes": [
-                {
-                  "kind": "text",
-                  "ranges": [
-                    {
-                      "text": "1"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "kind": "block",
-              "type": "table-cell",
-              "nodes": [
-                {
-                  "kind": "text",
-                  "ranges": [
-                    {
-                      "text": "9"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "kind": "block",
-      "type": "paragraph",
-      "nodes": [
-        {
-          "kind": "text",
-          "text": "This table is just a basic example of rendering a table, and it doesn\'t have fancy functionality. But you could augment it to add support for navigating with arrow keys, displaying table headers, adding column and rows, or even formulas if you wanted to get really crazy!"
-        }
-      ]
-    }
-  ]
+  "document": {
+    "nodes": [
+      {
+        "kind": "block",
+        "type": "paragraph",
+        "nodes": [
+          {
+            "kind": "text",
+            "ranges": [
+              {
+                "text": "Since the editor is based on a recursive tree model, similar to an HTML document, you can create complex nested structures, like tables:"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "kind": "block",
+        "type": "table",
+        "nodes": [
+          {
+            "kind": "block",
+            "type": "table-row",
+            "nodes": [
+              {
+                "kind": "block",
+                "type": "table-cell",
+                "nodes": [
+                  {
+                    "kind": "text",
+                    "ranges": [
+                      {
+                        "text": ""
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "kind": "block",
+                "type": "table-cell",
+                "nodes": [
+                  {
+                    "kind": "text",
+                    "ranges": [
+                      {
+                        "text": "Human",
+                        "marks": [
+                          {
+                            "type": "bold"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "kind": "block",
+                "type": "table-cell",
+                "nodes": [
+                  {
+                    "kind": "text",
+                    "ranges": [
+                      {
+                        "text": "Dog",
+                        "marks": [
+                          {
+                            "type": "bold"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "kind": "block",
+                "type": "table-cell",
+                "nodes": [
+                  {
+                    "kind": "text",
+                    "ranges": [
+                      {
+                        "text": "Cat",
+                        "marks": [
+                          {
+                            "type": "bold"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "kind": "block",
+            "type": "table-row",
+            "nodes": [
+              {
+                "kind": "block",
+                "type": "table-cell",
+                "nodes": [
+                  {
+                    "kind": "text",
+                    "ranges": [
+                      {
+                        "text": "# of Feet",
+                        "marks": [
+                          {
+                            "type": "bold"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "kind": "block",
+                "type": "table-cell",
+                "nodes": [
+                  {
+                    "kind": "text",
+                    "ranges": [
+                      {
+                        "text": "1"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "kind": "block",
+                "type": "table-cell",
+                "nodes": [
+                  {
+                    "kind": "text",
+                    "ranges": [
+                      {
+                        "text": "4"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "kind": "block",
+                "type": "table-cell",
+                "nodes": [
+                  {
+                    "kind": "text",
+                    "ranges": [
+                      {
+                        "text": "4"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "kind": "block",
+            "type": "table-row",
+            "nodes": [
+              {
+                "kind": "block",
+                "type": "table-cell",
+                "nodes": [
+                  {
+                    "kind": "text",
+                    "ranges": [
+                      {
+                        "text": "# of Lives",
+                        "marks": [
+                          {
+                            "type": "bold"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "kind": "block",
+                "type": "table-cell",
+                "nodes": [
+                  {
+                    "kind": "text",
+                    "ranges": [
+                      {
+                        "text": "1"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "kind": "block",
+                "type": "table-cell",
+                "nodes": [
+                  {
+                    "kind": "text",
+                    "ranges": [
+                      {
+                        "text": "1"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "kind": "block",
+                "type": "table-cell",
+                "nodes": [
+                  {
+                    "kind": "text",
+                    "ranges": [
+                      {
+                        "text": "9"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "kind": "block",
+        "type": "paragraph",
+        "nodes": [
+          {
+            "kind": "text",
+            "ranges": [
+              {
+                "text": "This table is just a basic example of rendering a table, and it doesn\'t have fancy functionality. But you could augment it to add support for navigating with arrow keys, displaying table headers, adding column and rows, or even formulas if you wanted to get really crazy!"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
 }

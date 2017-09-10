@@ -1,5 +1,5 @@
 
-import { Editor, Raw } from '../..'
+import { Editor, State } from '../..'
 import React from 'react'
 import initialState from './state.json'
 import isUrl from 'is-url'
@@ -62,7 +62,7 @@ class Links extends React.Component {
    */
 
   state = {
-    state: Raw.deserialize(initialState, { terse: true })
+    state: State.fromJSON(initialState)
   };
 
   /**

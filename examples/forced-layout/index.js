@@ -1,5 +1,5 @@
 
-import { Editor, Raw, Block } from '../..'
+import { Block, Editor, State } from '../..'
 import React from 'react'
 import initialState from './state.json'
 
@@ -18,10 +18,10 @@ class ForcedLayout extends React.Component {
    */
 
   state = {
-    state: Raw.deserialize(initialState, { terse: true }),
+    state: State.fromJSON(initialState),
     schema: {
       nodes: {
-        'title': props => <h1 {...props.attrs}>{props.children}</h1>,
+        'title': props => <h2 {...props.attrs}>{props.children}</h2>,
         'paragraph': props => <p {...props.attrs}>{props.children}</p>
       },
       rules: [
@@ -70,7 +70,7 @@ class ForcedLayout extends React.Component {
         }
       ]
     }
-  };
+  }
 
   /**
    * On change.

@@ -41,17 +41,54 @@ class Range extends Record(DEFAULTS) {
     }
 
     if (isPlainObject(attrs)) {
-      const { marks, text } = attrs
-      const range = new Range({
-        text,
-        marks: Mark.createSet(marks),
-      })
-
-      return range
+      return Range.fromJSON(attrs)
     }
 
     throw new Error(`\`Range.create\` only accepts objects, strings or ranges, but you passed it: ${attrs}`)
   }
+
+  /**
+   * Create a list of `Ranges` from `value`.
+   *
+   * @param {Array<Range|Object>|List<Range|Object>} value
+   * @return {List<Range>}
+   */
+
+  static createList(value = []) {
+    if (List.isList(value) || Array.isArray(value)) {
+      const list = new List(value.map(Range.create))
+      return list
+    }
+
+    throw new Error(`\`Range.createList\` only accepts arrays or lists, but you passed it: ${value}`)
+  }
+
+  /**
+   * Create a `Range` from a JSON `object`.
+   *
+   * @param {Object} object
+   * @return {Range}
+   */
+
+  static fromJSON(object) {
+    const {
+      text = '',
+      marks = [],
+    } = object
+
+    const range = new Range({
+      text,
+      marks: new Set(marks.map(Mark.fromJSON)),
+    })
+
+    return range
+  }
+
+  /**
+   * Alias `fromJS`.
+   */
+
+  static fromJS = Range.fromJSON
 
   /**
    * Check if a `value` is a `Range`.
@@ -103,6 +140,30 @@ class Range extends Record(DEFAULTS) {
       }))
 
     return characters
+  }
+
+  /**
+   * Return a JSON representation of the range.
+   *
+   * @return {Object}
+   */
+
+  toJSON() {
+    const object = {
+      kind: this.kind,
+      marks: this.marks.toArray().map(m => m.toJSON()),
+      text: this.text,
+    }
+
+    return object
+  }
+
+  /**
+   * Alias `toJS`.
+   */
+
+  toJS() {
+    return this.toJSON()
   }
 
 }

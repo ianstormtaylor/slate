@@ -2,31 +2,28 @@
 import React from 'react'
 import ReactDOM from 'react-dom/server'
 import assert from 'assert'
-import parse5 from 'parse5'
-import fs from 'fs-promise'
-import readYaml from 'read-yaml-promise'
-import { Editor, Raw } from '../..'
-import { resolve } from 'path'
 import clean from '../helpers/clean'
+import fs from 'fs-promise'
+import parse5 from 'parse5'
+import { Editor } from '../..'
+import { basename, extname, resolve } from 'path'
 
 /**
  * Tests.
  */
 
 describe('rendering', () => {
-  const tests = fs.readdirSync(resolve(__dirname, './fixtures'))
+  const dir = resolve(__dirname, './fixtures')
+  const tests = fs.readdirSync(dir).filter(t => t[0] != '.' && !!~t.indexOf('.js')).map(t => basename(t, extname(t)))
 
   for (const test of tests) {
-    if (test[0] === '.') continue
-
     it(test, async () => {
-      const dir = resolve(__dirname, './fixtures', test)
-      const input = await readYaml(resolve(dir, 'input.yaml'))
-      const output = await fs.readFile(resolve(dir, 'output.html'), 'utf8')
+      const module = require(resolve(dir, test))
+      const { state, schema, output } = module
       const props = {
-        state: Raw.deserialize(input, { terse: true }),
-        onChange: () => {},
-        ...require(dir)
+        state,
+        schema,
+        onChange() {},
       }
 
       const string = ReactDOM.renderToStaticMarkup(<Editor {...props} />)

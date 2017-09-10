@@ -1,37 +1,58 @@
 
 import Block from '../models/block'
-import Raw from '../serializers/raw'
+import Mark from '../models/mark'
+import Node from '../models/node'
+import State from '../models/state'
+import logger from '../utils/logger'
+import { Set } from 'immutable'
 
 /**
  * Deserialize a plain text `string` to a state.
  *
  * @param {String} string
  * @param {Object} options
- *   @property {Boolean} toRaw
- *   @property {String|Object} defaultBlock
- *   @property {Array} defaultMarks
+ *   @property {Boolean} toJSON
+ *   @property {String|Object|Block} defaultBlock
+ *   @property {Array|Set} defaultMarks
  * @return {State}
  */
 
 function deserialize(string, options = {}) {
-  const {
-    defaultBlock = { type: 'line' },
+  let {
+    defaultBlock = 'line',
     defaultMarks = [],
+    toJSON = false,
   } = options
 
-  const raw = {
+  if (options.toRaw) {
+    logger.deprecate('0.23.0', 'The `options.toRaw` argument of the `Plain` serializer is deprecated, use `options.toJSON` instead.')
+    toJSON = options.toRaw
+  }
+
+  if (Set.isSet(defaultMarks)) {
+    defaultMarks = defaultMarks.toArray()
+  }
+
+  defaultBlock = Node.createProperties(defaultBlock)
+  defaultMarks = defaultMarks.map(Mark.createProperties)
+
+  const json = {
     kind: 'state',
     document: {
       kind: 'document',
+      data: {},
       nodes: string.split('\n').map((line) => {
         return {
           ...defaultBlock,
           kind: 'block',
+          isVoid: false,
+          data: {},
           nodes: [
             {
               kind: 'text',
               ranges: [
                 {
+                  kind: 'range',
                   text: line,
                   marks: defaultMarks,
                 }
@@ -43,7 +64,8 @@ function deserialize(string, options = {}) {
     }
   }
 
-  return options.toRaw ? raw : Raw.deserialize(raw)
+  const ret = toJSON ? json : State.fromJSON(json)
+  return ret
 }
 
 /**

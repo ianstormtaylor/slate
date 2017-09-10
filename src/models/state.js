@@ -36,7 +36,6 @@ class State extends Record(DEFAULTS) {
    *
    * @param {Object|State} attrs
    * @param {Object} options
-   *   @property {Boolean} normalize
    * @return {State}
    */
 
@@ -46,39 +45,72 @@ class State extends Record(DEFAULTS) {
     }
 
     if (isPlainObject(attrs)) {
-      const document = Document.create(attrs.document)
-      let selection = Selection.create(attrs.selection)
-      let data = new Map()
-
-      if (selection.isUnset) {
-        const text = document.getFirstText()
-        if (text) selection = selection.collapseToStartOf(text)
-      }
-
-      // Set default value for `data`.
-      if (options.plugins) {
-        for (const plugin of options.plugins) {
-          if (plugin.data) data = data.merge(plugin.data)
-        }
-      }
-
-      // Then add data provided in `attrs`.
-      if (attrs.data) data = data.merge(attrs.data)
-
-      let state = new State({ document, selection, data })
-
-      if (options.normalize !== false) {
-        state = state
-          .change({ save: false })
-          .normalize(SCHEMA)
-          .state
-      }
-
-      return state
+      return State.fromJSON(attrs)
     }
 
     throw new Error(`\`State.create\` only accepts objects or states, but you passed it: ${attrs}`)
   }
+
+  /**
+   * Create a `State` from a JSON `object`.
+   *
+   * @param {Object} object
+   * @param {Object} options
+   *   @property {Boolean} normalize
+   *   @property {Array} plugins
+   * @return {State}
+   */
+
+  static fromJSON(object, options = {}) {
+    let {
+      document = {},
+      selection = {},
+    } = object
+
+    let data = new Map()
+
+    document = Document.fromJSON(document)
+    selection = Selection.fromJSON(selection)
+
+    // Allow plugins to set a default value for `data`.
+    if (options.plugins) {
+      for (const plugin of options.plugins) {
+        if (plugin.data) data = data.merge(plugin.data)
+      }
+    }
+
+    // Then merge in the `data` provided.
+    if ('data' in object) {
+      data = data.merge(object.data)
+    }
+
+    if (selection.isUnset) {
+      const text = document.getFirstText()
+      if (text) selection = selection.collapseToStartOf(text)
+    }
+
+    let state = new State({
+      data,
+      document,
+      selection,
+    })
+
+
+    if (options.normalize !== false) {
+      state = state
+        .change({ save: false })
+        .normalize(SCHEMA)
+        .state
+    }
+
+    return state
+  }
+
+  /**
+   * Alias `fromJS`.
+   */
+
+  static fromJS = State.fromJSON
 
   /**
    * Check if a `value` is a `State`.
@@ -529,6 +561,53 @@ class State extends Record(DEFAULTS) {
   transform(...args) {
     logger.deprecate('0.22.0', 'The `state.transform()` method has been deprecated in favor of `state.change()`.')
     return this.change(...args)
+  }
+
+  /**
+   * Return a JSON representation of the state.
+   *
+   * @param {Object} options
+   * @return {Object}
+   */
+
+  toJSON(options = {}) {
+    const object = {
+      data: this.data.toJSON(),
+      document: this.document.toJSON(options),
+      kind: this.kind,
+      history: this.history.toJSON(),
+      selection: this.selection.toJSON(),
+    }
+
+    if (!options.preserveHistory) {
+      delete object.history
+    }
+
+    if (!options.preserveSelection) {
+      delete object.selection
+    }
+
+    if (!options.preserveStateData) {
+      delete object.data
+    }
+
+    if (options.preserveSelection && !options.preserveKeys) {
+      const { document, selection } = this
+      object.selection.anchorPath = document.getPath(selection.anchorKey)
+      object.selection.focusPath = document.getPath(selection.focusKey)
+      delete object.selection.anchorKey
+      delete object.selection.focusKey
+    }
+
+    return object
+  }
+
+  /**
+   * Alias `toJS`.
+   */
+
+  toJS(options) {
+    return this.toJSON(options)
   }
 
 }

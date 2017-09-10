@@ -19,7 +19,7 @@ class PlainText extends React.Component {
 
   state = {
     state: Plain.deserialize(initialState)
-  };
+  }
 
   /**
    * On change.

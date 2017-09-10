@@ -1,5 +1,5 @@
 
-import Raw from './raw'
+import State from '../models/state'
 
 /**
  * Encode a JSON `object` as base-64 `string`.
@@ -36,7 +36,7 @@ function decode(string) {
 
 function deserialize(string, options) {
   const raw = decode(string)
-  const state = Raw.deserialize(raw, options)
+  const state = State.fromJSON(raw, options)
   return state
 }
 
@@ -48,8 +48,9 @@ function deserialize(string, options) {
  */
 
 function deserializeNode(string, options) {
+  const Node = require('../models/node')
   const raw = decode(string)
-  const node = Raw.deserializeNode(raw, options)
+  const node = Node.fromJSON(raw, options)
   return node
 }
 
@@ -61,7 +62,7 @@ function deserializeNode(string, options) {
  */
 
 function serialize(state, options) {
-  const raw = Raw.serialize(state, options)
+  const raw = state.toJSON(options)
   const encoded = encode(raw)
   return encoded
 }
@@ -74,7 +75,7 @@ function serialize(state, options) {
  */
 
 function serializeNode(node, options) {
-  const raw = Raw.serializeNode(node, options)
+  const raw = node.toJSON(options)
   const encoded = encode(raw)
   return encoded
 }

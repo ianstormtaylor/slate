@@ -1,5 +1,5 @@
 
-import { Editor, Raw } from '../..'
+import { Editor, State } from '../..'
 import Portal from 'react-portal'
 import React from 'react'
 import initialState from './state.json'
@@ -34,8 +34,8 @@ class HoveringMenu extends React.Component {
    */
 
   state = {
-    state: Raw.deserialize(initialState, { terse: true })
-  };
+    state: State.fromJSON(initialState)
+  }
 
   /**
    * On update, update the menu.

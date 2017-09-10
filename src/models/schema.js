@@ -39,8 +39,7 @@ class Schema extends Record(DEFAULTS) {
     }
 
     if (isPlainObject(attrs)) {
-      const schema = new Schema(normalizeProperties(attrs))
-      return schema
+      return Schema.fromJSON(attrs)
     }
 
     throw new Error(`\`Schema.create\` only accepts objects or schemas, but you passed it: ${attrs}`)
@@ -56,6 +55,25 @@ class Schema extends Record(DEFAULTS) {
   static isSchema(value) {
     return !!(value && value[MODEL_TYPES.SCHEMA])
   }
+
+  /**
+   * Create a `Schema` from a JSON `object`.
+   *
+   * @param {Object} object
+   * @return {Schema}
+   */
+
+  static fromJSON(object) {
+    object = normalizeProperties(object)
+    const schema = new Schema(object)
+    return schema
+  }
+
+  /**
+   * Alias `fromJS`.
+   */
+
+  static fromJS = Schema.fromJSON
 
   /**
    * Get the kind.

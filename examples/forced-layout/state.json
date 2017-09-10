@@ -1,32 +1,34 @@
 {
-  "nodes": [
-    {
-      "kind": "block",
-      "type": "title",
-      "nodes": [
-        {
-          "kind": "text",
-          "ranges": [
-            {
-              "text": "This example shows how to enforce your layout with rules."
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "kind": "block",
-      "type": "paragraph",
-      "nodes": [
-        {
-          "kind": "text",
-          "ranges": [
-            {
-              "text": "This document will always have one title at the top, and at least one paragraph"
-            }
-          ]
-        }
-      ]
-    }
-  ]
+  "document": {
+    "nodes": [
+      {
+        "kind": "block",
+        "type": "title",
+        "nodes": [
+          {
+            "kind": "text",
+            "ranges": [
+              {
+                "text": "Enforce Your Layout!"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "kind": "block",
+        "type": "paragraph",
+        "nodes": [
+          {
+            "kind": "text",
+            "ranges": [
+              {
+                "text": "This example shows how to enforce your layout with schema-specific rules. This document will always have a title block at the top and at least one paragraph in the body. Try deleting them and see what happens!"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
 }

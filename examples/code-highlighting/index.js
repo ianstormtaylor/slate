@@ -1,5 +1,5 @@
 
-import { Editor, Mark, Raw } from '../..'
+import { Editor, Mark, State } from '../..'
 import Prism from 'prismjs'
 import React from 'react'
 import initialState from './state.json'
@@ -118,7 +118,7 @@ class CodeHighlighting extends React.Component {
    */
 
   state = {
-    state: Raw.deserialize(initialState, { terse: true })
+    state: State.fromJSON(initialState)
   }
 
   /**

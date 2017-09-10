@@ -1,6 +1,5 @@
 
 import MODEL_TYPES from '../constants/model-types'
-import Mark from './mark'
 import isPlainObject from 'is-plain-object'
 import logger from '../utils/logger'
 import { List, Record, Set } from 'immutable'
@@ -41,14 +40,7 @@ class Character extends Record(DEFAULTS) {
     }
 
     if (isPlainObject(attrs)) {
-      const { marks, text } = attrs
-
-      const character = new Character({
-        text,
-        marks: Mark.createSet(marks),
-      })
-
-      return character
+      return Character.fromJSON(attrs)
     }
 
     throw new Error(`\`Character.create\` only accepts objects, strings or characters, but you passed it: ${attrs}`)
@@ -73,6 +65,37 @@ class Character extends Record(DEFAULTS) {
 
     throw new Error(`\`Block.createList\` only accepts strings, arrays or lists, but you passed it: ${elements}`)
   }
+
+  /**
+   * Create a `Character` from a JSON `object`.
+   *
+   * @param {Object} object
+   * @return {Character}
+   */
+
+  static fromJSON(object) {
+    const {
+      text,
+      marks = [],
+    } = object
+
+    if (typeof text != 'string') {
+      throw new Error('`Character.fromJSON` requires a block `text` string.')
+    }
+
+    const character = new Character({
+      text,
+      marks: new Set(marks),
+    })
+
+    return character
+  }
+
+  /**
+   * Alias `fromJS`.
+   */
+
+  static fromJS = Character.fromJSON
 
   /**
    * Check if a `value` is a `Character`.
@@ -113,6 +136,30 @@ class Character extends Record(DEFAULTS) {
 
   get kind() {
     return 'character'
+  }
+
+  /**
+   * Return a JSON representation of the character.
+   *
+   * @return {Object}
+   */
+
+  toJSON() {
+    const object = {
+      kind: this.kind,
+      marks: this.marks.toArray().map(m => m.toJSON()),
+      text: this.text,
+    }
+
+    return object
+  }
+
+  /**
+   * Alias `toJS`.
+   */
+
+  toJS() {
+    return this.toJSON()
   }
 
 }

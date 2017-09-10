@@ -40,48 +40,77 @@ class Text extends Record(DEFAULTS) {
       return attrs
     }
 
-    if (List.isList(attrs) || Array.isArray(attrs)) {
-      attrs = { ranges: attrs }
-    }
-
     if (typeof attrs == 'string') {
       attrs = { ranges: [{ text: attrs }] }
     }
 
     if (isPlainObject(attrs)) {
-      const { characters, ranges, key } = attrs
-      const chars = ranges
-        ? ranges
-            .map(Range.create)
-            .reduce((l, r) => l.concat(r.getCharacters()), Character.createList())
-        : Character.createList(characters)
+      if (attrs.text) {
+        const { text, marks, key } = attrs
+        attrs = { key, ranges: [{ text, marks }] }
+      }
 
-      const text = new Text({
-        characters: chars,
-        key: key || generateKey(),
-      })
-
-      return text
+      return Text.fromJSON(attrs)
     }
 
     throw new Error(`\`Text.create\` only accepts objects, arrays, strings or texts, but you passed it: ${attrs}`)
   }
 
   /**
-   * Create a list of `Texts` from an array.
+   * Create a list of `Texts` from a `value`.
    *
-   * @param {Array} elements
+   * @param {Array<Text|Object>|List<Text|Object>} value
    * @return {List<Text>}
    */
 
-  static createList(elements = []) {
-    if (List.isList(elements)) {
-      return elements
+  static createList(value = []) {
+    if (List.isList(value) || Array.isArray(value)) {
+      const list = new List(value.map(Text.create))
+      return list
     }
 
-    const list = new List(elements.map(Text.create))
-    return list
+    throw new Error(`\`Text.createList\` only accepts arrays or lists, but you passed it: ${value}`)
   }
+
+  /**
+   * Create a `Text` from a JSON `object`.
+   *
+   * @param {Object|Text} object
+   * @return {Text}
+   */
+
+  static fromJSON(object) {
+    if (Text.isText(object)) {
+      return object
+    }
+
+    let {
+      ranges = [],
+      key = generateKey(),
+    } = object
+
+    if (object.text) {
+      logger.deprecate('0.23.0', 'Passing `object.text` to `Text.fromJSON` has been deprecated, please use `object.ranges` instead.')
+      ranges = [{ text: object.text }]
+    }
+
+    const characters = ranges
+      .map(Range.fromJSON)
+      .reduce((l, r) => l.concat(r.getCharacters()), new List())
+
+    const node = new Text({
+      characters,
+      key,
+    })
+
+    return node
+  }
+
+  /**
+   * Alias `fromJS`.
+   */
+
+  static fromJS = Text.fromJSON
 
   /**
    * Check if a `value` is a `Text`.
@@ -394,6 +423,35 @@ class Text extends Record(DEFAULTS) {
     const end = index + length
     characters = characters.filterNot((char, i) => start <= i && i < end)
     return this.set('characters', characters)
+  }
+
+  /**
+   * Return a JSON representation of the text.
+   *
+   * @param {Object} options
+   * @return {Object}
+   */
+
+  toJSON(options = {}) {
+    const object = {
+      key: this.key,
+      kind: this.kind,
+      ranges: this.getRanges().toArray().map(r => r.toJSON()),
+    }
+
+    if (!options.preserveKeys) {
+      delete object.key
+    }
+
+    return object
+  }
+
+  /**
+   * Alias `toJS`.
+   */
+
+  toJS(options) {
+    return this.toJSON(options)
   }
 
   /**

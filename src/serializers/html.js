@@ -1,7 +1,9 @@
 
-import Raw from './raw'
+import Node from '../models/node'
 import React from 'react'
 import ReactDOMServer from 'react-dom/server'
+import State from '../models/state'
+import logger from '../utils/logger'
 import typeOf from 'type-of'
 import { Record } from 'immutable'
 
@@ -29,7 +31,7 @@ const TEXT_RULE = {
     if (el.tagName == 'br') {
       return {
         kind: 'text',
-        text: '\n'
+        ranges: [{ text: '\n' }],
       }
     }
 
@@ -38,7 +40,7 @@ const TEXT_RULE = {
 
       return {
         kind: 'text',
-        text: el.value || el.nodeValue
+        ranges: [{ text: el.value || el.nodeValue }],
       }
     }
   },
@@ -58,6 +60,24 @@ const TEXT_RULE = {
 }
 
 /**
+ * A default `parseHtml` option using the native `DOMParser`.
+ *
+ * @param {String} html
+ * @return {Object}
+ */
+
+function defaultParseHtml(html) {
+  if (typeof DOMParser == 'undefined') {
+    throw new Error('The native `DOMParser` global which the `Html` serializer uses by default is not present in this environment. You must supply the `options.parseHtml` function instead.')
+  }
+
+  const parsed = new DOMParser().parseFromString(html, 'text/html')
+  // Unwrap from <html> and <body>.
+  const fragment = parsed.childNodes[0].childNodes[1]
+  return fragment
+}
+
+/**
  * HTML serializer.
  *
  * @type {Html}
@@ -70,32 +90,27 @@ class Html {
    *
    * @param {Object} options
    *   @property {Array} rules
-   *   @property {String|Object} defaultBlockType
+   *   @property {String|Object|Block} defaultBlock
    *   @property {Function} parseHtml
    */
 
   constructor(options = {}) {
-    this.rules = [
-      ...(options.rules || []),
-      TEXT_RULE
-    ]
+    let {
+      defaultBlock = 'paragraph',
+      parseHtml = defaultParseHtml,
+      rules = [],
+    } = options
 
-    this.defaultBlockType = options.defaultBlockType || 'paragraph'
-
-    // Set DOM parser function or fallback to native DOMParser if present.
-    if (typeof options.parseHtml === 'function') {
-      this.parseHtml = options.parseHtml
-    } else if (typeof DOMParser !== 'undefined') {
-      this.parseHtml = (html) => {
-        const parsed = new DOMParser().parseFromString(html, 'text/html')
-        // Unwrap from <html> and <body>
-        return parsed.childNodes[0].childNodes[1]
-      }
-    } else {
-      throw new Error(
-        'Native DOMParser is not present in this environment; you must supply a parse function via options.parseHtml'
-      )
+    if (options.defaultBlockType) {
+      logger.deprecate('0.23.0', 'The `options.defaultBlockType` argument of the `Html` serializer is deprecated, use `options.defaultBlock` instead.')
+      defaultBlock = options.defaultBlockType
     }
+
+    defaultBlock = Node.createProperties(defaultBlock)
+
+    this.rules = [ ...rules, TEXT_RULE ]
+    this.defaultBlock = defaultBlock
+    this.parseHtml = parseHtml
   }
 
   /**
@@ -108,15 +123,19 @@ class Html {
    */
 
   deserialize = (html, options = {}) => {
-    const children = Array.from(this.parseHtml(html).childNodes)
+    let { toJSON = false } = options
+
+    if (options.toRaw) {
+      logger.deprecate('0.23.0', 'The `options.toRaw` argument of the `Html` serializer is deprecated, use `options.toJSON` instead.')
+      toJSON = options.toRaw
+    }
+
+    const { defaultBlock, parseHtml } = this
+    const fragment = parseHtml(html)
+    const children = Array.from(fragment.childNodes)
     let nodes = this.deserializeElements(children)
 
-    const { defaultBlockType } = this
-    const defaults = typeof defaultBlockType == 'string'
-      ? { type: defaultBlockType }
-      : defaultBlockType
-
-    // HACK: ensure for now that all top-level inline are wrapped into a block.
+    // COMPAT: ensure that all top-level inline nodes are wrapped into a block.
     nodes = nodes.reduce((memo, node, i, original) => {
       if (node.kind == 'block') {
         memo.push(node)
@@ -131,36 +150,49 @@ class Html {
 
       const block = {
         kind: 'block',
+        data: {},
+        isVoid: false,
+        ...defaultBlock,
         nodes: [node],
-        ...defaults
       }
 
       memo.push(block)
       return memo
     }, [])
 
-    if (nodes.length === 0) {
+    // TODO: pretty sure this is no longer needed.
+    if (nodes.length == 0) {
       nodes = [{
         kind: 'block',
-        nodes: [],
-        ...defaults
+        data: {},
+        isVoid: false,
+        ...defaultBlock,
+        nodes: [
+          {
+            kind: 'text',
+            ranges: [
+              {
+                kind: 'range',
+                text: '',
+                marks: [],
+              }
+            ]
+          }
+        ],
       }]
     }
 
-    const raw = {
+    const json = {
       kind: 'state',
       document: {
         kind: 'document',
+        data: {},
         nodes,
       }
     }
 
-    if (options.toRaw) {
-      return raw
-    }
-
-    const state = Raw.deserialize(raw, { terse: true })
-    return state
+    const ret = toJSON ? json : State.fromJSON(json)
+    return ret
   }
 
   /**
@@ -229,10 +261,16 @@ class Html {
         throw new Error(`A rule returned an invalid deserialized representation: "${node}".`)
       }
 
-      if (ret === undefined) continue
-      if (ret === null) return null
+      if (ret === undefined) {
+        continue
+      } else if (ret === null) {
+        return null
+      } else if (ret.kind == 'mark') {
+        node = this.deserializeMark(ret)
+      } else {
+        node = ret
+      }
 
-      node = ret.kind == 'mark' ? this.deserializeMark(ret) : ret
       break
     }
 
@@ -255,7 +293,6 @@ class Html {
       }
 
       else if (node.kind == 'text') {
-        if (!node.ranges) node.ranges = [{ text: node.text }]
         node.ranges = node.ranges.map((range) => {
           range.marks = range.marks || []
           range.marks.push({ type, data })
