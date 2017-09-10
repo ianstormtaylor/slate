@@ -45,6 +45,11 @@ class Text extends Record(DEFAULTS) {
     }
 
     if (isPlainObject(attrs)) {
+      if (attrs.text) {
+        const { text, marks, key } = attrs
+        attrs = { key, ranges: [{ text, marks }] }
+      }
+
       return Text.fromJSON(attrs)
     }
 
@@ -79,10 +84,15 @@ class Text extends Record(DEFAULTS) {
       return object
     }
 
-    const {
+    let {
       ranges = [],
       key = generateKey(),
     } = object
+
+    if (object.text) {
+      logger.deprecate('0.23.0', 'Passing `object.text` to `Text.fromJSON` has been deprecated, please use `object.ranges` instead.')
+      ranges = [{ text: object.text }]
+    }
 
     const characters = ranges
       .map(Range.fromJSON)
