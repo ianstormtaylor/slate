@@ -827,7 +827,7 @@ function Plugin(options = {}) {
     if (startBlock.isVoid) return
 
     const { text } = data
-    const defaultBlock = { type: startBlock.type, data: startBlock.data }
+    const defaultBlock = startBlock
     const defaultMarks = document.getMarksAtRange(selection.collapseToStart())
     const fragment = Plain.deserialize(text, { defaultBlock, defaultMarks }).document
     change.insertFragment(fragment)

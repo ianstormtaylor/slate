@@ -19,7 +19,7 @@ export const config = {
       }
     }
   ],
-  defaultBlockType: {
+  defaultBlock: {
     type: 'default',
     data: {
       thing: 'value'

@@ -1,6 +1,24 @@
 
+export const config = {
+  rules: [
+    {
+      deserialize(el, next) {
+        switch (el.tagName.toLowerCase()) {
+          case 'p': {
+            return {
+              kind: 'block',
+              type: 'paragraph',
+              nodes: next(el.childNodes),
+            }
+          }
+        }
+      }
+    }
+  ]
+}
+
 export const input = `
-one
+<p>one</p>
 `.trim()
 
 export const output = {
@@ -11,17 +29,13 @@ export const output = {
     nodes: [
       {
         kind: 'block',
-        type: 'line',
-        isVoid: false,
-        data: {},
+        type: 'paragraph',
         nodes: [
           {
             kind: 'text',
             ranges: [
               {
-                kind: 'range',
                 text: 'one',
-                marks: [],
               }
             ]
           }
@@ -32,5 +46,5 @@ export const output = {
 }
 
 export const options = {
-  toRaw: true
+  toJSON: true,
 }
