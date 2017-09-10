@@ -155,7 +155,6 @@ class Void extends React.Component {
     return (
       <Tag
         data-slate-void
-        style={style}
         onClick={this.onClick}
         onDragEnter={this.onDragEnter}
         onDragLeave={this.onDragLeave}
