@@ -1,36 +1,19 @@
 /** @jsx h */
 
 import h from '../../../helpers/h'
-
 import { Block } from '../../../..'
 
 
 export default function (change) {
-  const texts = document.getTexts()
-  const first = texts.first()
-  const range = selection.merge({
-    anchorKey: first.key,
-    anchorOffset: 0,
-    focusKey: first.key,
-    focusOffset: 0
-  })
-
-  change
-    .select(range)
-    .insertBlock(Block.create({ type: 'image' }))
-
-  const updated = next.document.getTexts().first()
-
-  assert.deepEqual(
-    next.selection.toJS(),
-    range.collapseToStartOf(updated).toJS()
-  )
+  change.insertBlock(Block.create({ type: 'quote' }))
 }
 
 export const input = (
   <state>
     <document>
-      <paragraph>word</paragraph>
+      <paragraph>
+        <cursor />word
+      </paragraph>
     </document>
   </state>
 )
@@ -38,8 +21,12 @@ export const input = (
 export const output = (
   <state>
     <document>
-      <image></image>
-      <paragraph>word</paragraph>
+      <quote>
+        <cursor />
+      </quote>
+      <paragraph>
+        word
+      </paragraph>
     </document>
   </state>
 )

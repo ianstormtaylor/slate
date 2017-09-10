@@ -3,34 +3,16 @@
 import h from '../../../helpers/h'
 
 export default function (change) {
-  const texts = document.getTexts()
-  const first = texts.first()
-  const range = selection.merge({
-    anchorKey: first.key,
-    anchorOffset: 2,
-    focusKey: first.key,
-    focusOffset: 2
+  change.insertInline({
+    type: 'emoji',
+    isVoid: true
   })
-
-  change
-    .select(range)
-    .insertInline({
-      type: 'hashtag',
-      isVoid: true
-    })
-
-  const updated = next.document.getTexts().get(1)
-
-  assert.deepEqual(
-    next.selection.toJS(),
-    range.collapseToEndOf(updated).toJS()
-  )
 }
 
 export const input = (
   <state>
     <document>
-      <paragraph>word</paragraph>
+      <paragraph>wo<cursor />rd</paragraph>
     </document>
   </state>
 )
@@ -38,8 +20,8 @@ export const input = (
 export const output = (
   <state>
     <document>
-      <paragraph>wo
-        <hashtag></hashtag>rd
+      <paragraph>
+        wo<emoji><cursor />{' '}</emoji>rd
       </paragraph>
     </document>
   </state>

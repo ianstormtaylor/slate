@@ -2,59 +2,32 @@
 
 import h from '../../../helpers/h'
 
-import path from 'path'
-import readMetadata from 'read-metadata'
-import { Raw } from '../../../..'
-
 export default function (change) {
-  const file = path.resolve(__dirname, 'fragment.yaml')
-  const raw = readMetadata.sync(file)
-  const fragment = Raw.deserialize(raw, { terse: true }).document
-
-  const texts = document.getTexts()
-  const second = texts.get(1)
-  const range = selection.merge({
-    anchorKey: second.key,
-    anchorOffset: 2,
-    focusKey: second.key,
-    focusOffset: 2
-  })
-
-  change
-    .select(range)
-    .insertFragment(fragment)
-
-  const updated = next.document.getTexts().get(4)
-
-  // TODO: this seems wrong.
-  assert.deepEqual(
-    next.selection.toJS(),
-    range.merge({
-      anchorKey: updated.key,
-      anchorOffset: 0,
-      focusKey: updated.key,
-      focusOffset: 0
-    }).toJS()
-  )
+  change.insertFragment((
+    <document>
+      <quote>
+        <hashtag>fragment</hashtag>
+      </quote>
+    </document>
+  ))
 }
 
 export const input = (
   <state>
     <document>
       <paragraph>
-        <link>word</link>
+        <link>wo<cursor />rd</link>
       </paragraph>
     </document>
   </state>
 )
 
+// TODO: the cursor placement needs to be fixed
 export const output = (
   <state>
     <document>
       <paragraph>
-        <link>wo</link>
-        <hashtag>fragment</hashtag>
-        <link>rd</link>
+        <link>wo</link><hashtag><cursor />fragment</hashtag><link>rd</link>
       </paragraph>
     </document>
   </state>

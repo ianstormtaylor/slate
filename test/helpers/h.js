@@ -21,6 +21,7 @@ const h = createHyperscript({
   inlines: {
     link: 'link',
     hashtag: 'hashtag',
+    comment: 'comment',
     emoji: {
       type: 'emoji',
       isVoid: true,

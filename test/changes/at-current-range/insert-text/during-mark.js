@@ -3,30 +3,14 @@
 import h from '../../../helpers/h'
 
 export default function (change) {
-  const texts = document.getTexts()
-  const first = texts.first()
-  const range = selection.merge({
-    anchorKey: first.key,
-    anchorOffset: 2,
-    focusKey: first.key,
-    focusOffset: 2
-  })
-
-  change
-    .select(range)
-    .insertText('a')
-
-  assert.deepEqual(
-    next.selection.toJS(),
-    range.move(1).toJS()
-  )
+  change.insertText('a')
 }
 
 export const input = (
   <state>
     <document>
-      <paragraph>w
-        <b>or</b>d
+      <paragraph>
+        w<b>o<cursor />r</b>d
       </paragraph>
     </document>
   </state>
@@ -35,8 +19,8 @@ export const input = (
 export const output = (
   <state>
     <document>
-      <paragraph>w
-        <b>oar</b>d
+      <paragraph>
+        w<b>oa<cursor />r</b>d
       </paragraph>
     </document>
   </state>

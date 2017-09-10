@@ -208,8 +208,8 @@ function createChildren(children, options = {}) {
         i += range.text.length
       })
 
-      if (__anchor != null) node.__anchor = __anchor
-      if (__focus != null) node.__focus = __focus
+      if (__anchor != null) node.__anchor = __anchor + length
+      if (__focus != null) node.__focus = __focus + length
 
       length += child.text.length
     }
