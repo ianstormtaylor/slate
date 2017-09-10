@@ -4,8 +4,34 @@ import { Editor, State } from '../../..'
 import React from 'react'
 import faker from 'faker'
 
+/**
+ * Create a huge JSON document.
+ *
+ * @type {Object}
+ */
+
 const HEADINGS = 100
 const PARAGRAPHS = 8 // Paragraphs per heading
+const nodes = []
+const json = {
+  document: { nodes }
+}
+
+for (let h = 0; h < HEADINGS; h++) {
+  nodes.push({
+    kind: 'block',
+    type: 'heading',
+    nodes: [{ kind: 'text', ranges: [{ text: faker.lorem.sentence() }] }]
+  })
+
+  for (let p = 0; p < PARAGRAPHS; p++) {
+    nodes.push({
+      kind: 'block',
+      type: 'paragraph',
+      nodes: [{ kind: 'text', ranges: [{ text: faker.lorem.paragraph() }] }]
+    })
+  }
+}
 
 /**
  * Define a schema.
@@ -37,35 +63,13 @@ const schema = {
   }
 }
 
-const nodes = []
-
-for (let h = 0; h < HEADINGS; h++) {
-  nodes.push({
-    kind: 'block',
-    type: 'heading',
-    nodes: [{ kind: 'text', ranges: [{ text: faker.lorem.sentence() }] }]
-  })
-
-  for (let p = 0; p < PARAGRAPHS; p++) {
-    nodes.push({
-      kind: 'block',
-      type: 'paragraph',
-      nodes: [{ kind: 'text', ranges: [{ text: faker.lorem.paragraph() }] }]
-    })
-  }
-}
-
-const json = {
-  document: { nodes }
-}
-
 /**
- * The large text example.
+ * The huge document example.
  *
  * @type {Component}
  */
 
-class LargeDocument extends React.Component {
+class HugeDocument extends React.Component {
 
   /**
    * Deserialize the initial editor state.
@@ -75,9 +79,9 @@ class LargeDocument extends React.Component {
 
   constructor() {
     super()
-    console.time('deserializeLargeDocument')
+    console.time('deserializeHugeDocument')
     this.state = { state: State.fromJSON(json, { normalize: false }) }
-    console.timeEnd('deserializeLargeDocument')
+    console.timeEnd('deserializeHugeDocument')
   }
 
   /**
@@ -133,7 +137,7 @@ class LargeDocument extends React.Component {
   render() {
     return (
       <Editor
-        placeholder={'Enter some plain text...'}
+        placeholder={'Enter some text...'}
         schema={schema}
         spellCheck={false}
         state={this.state.state}
@@ -149,4 +153,4 @@ class LargeDocument extends React.Component {
  * Export.
  */
 
-export default LargeDocument
+export default HugeDocument
