@@ -8,9 +8,9 @@ nodes:
         key: b
         text: wo
   - kind: block
-    key: 1
+    key: "1"
     type: paragraph
     nodes:
       - kind: text
-        key: 2
+        key: "2"
         text: rd

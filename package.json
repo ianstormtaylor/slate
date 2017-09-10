@@ -61,6 +61,9 @@
     "np": "^2.9.0",
     "npm-run-all": "^2.3.0",
     "parse5": "^3.0.2",
+    "prettify-xml": "^1.2.0",
+    "pretty": "^2.0.0",
+    "pretty-data": "^0.40.0",
     "prismjs": "^1.5.1",
     "react": "^15.4.2",
     "react-addons-perf": "^15.4.2",
@@ -80,7 +83,8 @@
     "to-title-case": "^1.0.0",
     "uglify-js": "^2.7.0",
     "uglifyify": "^3.0.2",
-    "watchify": "^3.7.0"
+    "watchify": "^3.7.0",
+    "yaml-js": "^0.2.0"
   },
   "scripts": {
     "bench": "npm-run-all build:npm benchs",

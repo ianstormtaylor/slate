@@ -79,14 +79,20 @@ class Text extends Record(DEFAULTS) {
    */
 
   static fromJS(object) {
+    debugger
+
     if (Text.isText(object)) {
       return object
     }
 
-    const {
+    let {
       ranges = [],
       key = generateKey(),
     } = object
+
+    if (object.text) {
+      ranges = [{ text: object.text }]
+    }
 
     const characters = ranges
       .map(Range.fromJS)
