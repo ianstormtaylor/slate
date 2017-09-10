@@ -33,6 +33,7 @@ const CREATORS = {
   },
 
   block(tagName, attributes, children) {
+    debugger
     return Block.create({
       ...attributes,
       nodes: createChildren(children),
@@ -72,30 +73,29 @@ const CREATORS = {
   },
 
   state(tagName, attributes, children) {
-    let state = State.create({
-      document: children.find(c => Document.isDocument(c)),
-      selection: children.find(c => Selection.isSelection(c)),
-    })
-
-    const { document } = state
-    let { selection } = state
+    const document = children.find(Document.isDocument)
+    let selection = children.find(Selection.isSelection) || Selection.create()
     const props = {}
 
     // Search the document's texts to see if any of them have the anchor or
     // focus information saved, so we can set the selection.
-    document.getTexts().forEach((text) => {
-      if (text.__anchor != null) {
-        props.anchorKey = text.key
-        props.anchorOffset = text.__anchor
-        props.isFocused = true
-      }
+    if (document) {
+      document.getTexts().forEach((text) => {
+        if (text.__anchor != null) {
+          props.anchorKey = text.key
+          props.anchorOffset = text.__anchor
+          props.isFocused = true
+        }
 
-      if (text.__focus != null) {
-        props.focusKey = text.key
-        props.focusOffset = text.__focus
-        props.isFocused = true
-      }
-    })
+        if (text.__focus != null) {
+          props.focusKey = text.key
+          props.focusOffset = text.__focus
+          props.isFocused = true
+        }
+      })
+    }
+
+    debugger
 
     if (
       (props.anchorKey && !props.focusKey) ||
@@ -105,10 +105,10 @@ const CREATORS = {
     }
 
     if (!isEmpty(props)) {
-      selection = selection.merge(props).normalize(document)
-      state = state.set('selection', selection)
+      selection = selection.merge(props)
     }
 
+    const state = State.create({ document, selection })
     return state
   },
 
@@ -140,14 +140,6 @@ function createHyperscript(options = {}) {
 
     if (attributes == null) {
       attributes = {}
-    }
-
-    if (children == null) {
-      children = []
-    }
-
-    if (!Array.isArray(children)) {
-      children = [children]
     }
 
     if (!isPlainObject(attributes)) {
@@ -192,9 +184,10 @@ function createChildren(children, options = {}) {
     // If the child is a non-text node, push the current node and the new child
     // onto the array, then creating a new node for future selection tracking.
     if (Node.isNode(child) && !Text.isText(child)) {
-      array.push(node)
+      if (node.text.length) array.push(node)
       array.push(child)
       node = Text.create()
+      length = 0
     }
 
     // If the child is a string insert it into the node.
@@ -226,11 +219,8 @@ function createChildren(children, options = {}) {
     if (child == FOCUS || child == CURSOR) node.__focus = length
   })
 
-  // If there were no children added, push the existing one on, in case there
-  // were any selection points processed.
-  if (array.length == 0) {
-    array.push(node)
-  }
+  // Make sure the most recent node is added.
+  array.push(node)
 
   return array
 }
