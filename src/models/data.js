@@ -40,7 +40,7 @@ const Data = {
    */
 
   fromJS(object) {
-    return Map.fromJS(object)
+    return new Map(object)
   },
 
   /**

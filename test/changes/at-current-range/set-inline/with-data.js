@@ -1,38 +1,20 @@
 /** @jsx h */
 
 import h from '../../../helpers/h'
-
 import { Data } from '../../../..'
 
-
 export default function (change) {
-  const texts = document.getTexts()
-  const second = texts.get(1)
-  const range = selection.merge({
-    anchorKey: second.key,
-    anchorOffset: 0,
-    focusKey: second.key,
-    focusOffset: 0
+  change.setInline({
+    type: 'hashtag',
+    data: Data.create({ thing: 'value' })
   })
-
-  change
-    .select(range)
-    .setInline({
-      type: 'code',
-      data: Data.create({ thing: 'value' })
-    })
-
-  assert.deepEqual(
-    next.selection.toJS(),
-    range.toJS()
-  )
 }
 
 export const input = (
   <state>
     <document>
       <paragraph>
-        <link>word</link>
+        <link><cursor />word</link>
       </paragraph>
     </document>
   </state>
@@ -42,7 +24,7 @@ export const output = (
   <state>
     <document>
       <paragraph>
-        <code>word</code>
+        <hashtag thing="value"><cursor />word</hashtag>
       </paragraph>
     </document>
   </state>

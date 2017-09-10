@@ -3,32 +3,14 @@
 import h from '../../../helpers/h'
 
 export default function (change) {
-  const texts = document.getTexts()
-  const second = texts.get(1)
-  const range = selection.merge({
-    anchorKey: second.key,
-    anchorOffset: 2,
-    focusKey: second.key,
-    focusOffset: 2
-  })
-
-  change
-    .select(range)
-    .splitBlock()
-
-  const updated = next.document.getTexts().get(4)
-
-  assert.deepEqual(
-    next.selection.toJS(),
-    range.collapseToStartOf(updated).toJS()
-  )
+  change.splitBlock()
 }
 
 export const input = (
   <state>
     <document>
       <paragraph>
-        <link>word</link>
+        <link>wo<cursor />rd</link>
       </paragraph>
     </document>
   </state>
@@ -41,7 +23,7 @@ export const output = (
         <link>wo</link>
       </paragraph>
       <paragraph>
-        <link>rd</link>
+        <link><cursor />rd</link>
       </paragraph>
     </document>
   </state>

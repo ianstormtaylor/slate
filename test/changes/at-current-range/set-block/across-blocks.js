@@ -3,31 +3,18 @@
 import h from '../../../helpers/h'
 
 export default function (change) {
-  const texts = document.getTexts()
-  const first = texts.first()
-  const second = texts.last()
-  const range = selection.merge({
-    anchorKey: first.key,
-    anchorOffset: 2,
-    focusKey: second.key,
-    focusOffset: 2
-  })
-
-  change
-    .select(range)
-    .setBlock({ type: 'code' })
-
-  assert.deepEqual(
-    next.selection.toJS(),
-    range.toJS()
-  )
+  change.setBlock({ type: 'code' })
 }
 
 export const input = (
   <state>
     <document>
-      <paragraph>word</paragraph>
-      <paragraph>another</paragraph>
+      <paragraph>
+        <anchor />word
+      </paragraph>
+      <paragraph>
+        <focus />another
+      </paragraph>
     </document>
   </state>
 )
@@ -35,8 +22,12 @@ export const input = (
 export const output = (
   <state>
     <document>
-      <code>word</code>
-      <code>another</code>
+      <code>
+        <anchor />word
+      </code>
+      <code>
+        <focus />another
+      </code>
     </document>
   </state>
 )

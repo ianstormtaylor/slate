@@ -3,23 +3,7 @@
 import h from '../../../helpers/h'
 
 export default function (change) {
-  const texts = document.getTexts()
-  const third = texts.get(2)
-  const range = selection.merge({
-    anchorKey: third.key,
-    anchorOffset: 0,
-    focusKey: third.key,
-    focusOffset: 0
-  })
-
-  change
-    .select(range)
-    .setInline({ type: 'code' })
-
-  assert.deepEqual(
-    next.selection.toJS(),
-    range.toJS()
-  )
+  change.setInline({ type: 'comment' })
 }
 
 export const input = (
@@ -27,7 +11,7 @@ export const input = (
     <document>
       <paragraph>
         <hashtag>
-          <link>word</link>
+          <link><cursor />word</link>
         </hashtag>
       </paragraph>
     </document>
@@ -39,7 +23,7 @@ export const output = (
     <document>
       <paragraph>
         <hashtag>
-          <code>word</code>
+          <comment><cursor />word</comment>
         </hashtag>
       </paragraph>
     </document>
