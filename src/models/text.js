@@ -40,10 +40,6 @@ class Text extends Record(DEFAULTS) {
       return attrs
     }
 
-    if (List.isList(attrs) || Array.isArray(attrs)) {
-      attrs = { ranges: attrs }
-    }
-
     if (typeof attrs == 'string') {
       attrs = { ranges: [{ text: attrs }] }
     }

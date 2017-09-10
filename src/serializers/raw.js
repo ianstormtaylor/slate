@@ -11,6 +11,18 @@ import Text from '../models/text'
 import logger from '../utils/logger'
 
 /**
+ * Deprecation helper.
+ */
+
+function deprecate(options) {
+  if (options.terse) {
+    logger.deprecate('0.23.0', 'The `terse` option for raw serialization is no longer supported.')
+  }
+
+  logger.deprecate('0.23.0', 'The `Raw` serializer is deprecated, please use `Model.fromJSON` and `model.toJSON` instead.')
+}
+
+/**
  * Raw.
  *
  * @type {Object}
@@ -27,10 +39,7 @@ const Raw = {
    */
 
   deserialize(object, options = {}) {
-    if (options.terse) {
-      logger.deprecate('0.23.0', 'The `terse` option for raw serialization is no longer supported.')
-    }
-
+    deprecate(options)
     return State.fromJSON(object)
   },
 
@@ -43,10 +52,7 @@ const Raw = {
    */
 
   deserializeBlock(object, options = {}) {
-    if (options.terse) {
-      logger.deprecate('0.23.0', 'The `terse` option for raw serialization is no longer supported.')
-    }
-
+    deprecate(options)
     return Block.fromJSON(object)
   },
 
@@ -59,10 +65,7 @@ const Raw = {
    */
 
   deserializeDocument(object, options = {}) {
-    if (options.terse) {
-      logger.deprecate('0.23.0', 'The `terse` option for raw serialization is no longer supported.')
-    }
-
+    deprecate(options)
     return Document.fromJSON(object)
   },
 
@@ -75,10 +78,7 @@ const Raw = {
    */
 
   deserializeInline(object, options = {}) {
-    if (options.terse) {
-      logger.deprecate('0.23.0', 'The `terse` option for raw serialization is no longer supported.')
-    }
-
+    deprecate(options)
     return Inline.fromJSON(object)
   },
 
@@ -91,10 +91,7 @@ const Raw = {
    */
 
   deserializeMark(object, options = {}) {
-    if (options.terse) {
-      logger.deprecate('0.23.0', 'The `terse` option for raw serialization is no longer supported.')
-    }
-
+    deprecate(options)
     return Mark.fromJSON(object)
   },
 
@@ -107,10 +104,7 @@ const Raw = {
    */
 
   deserializeNode(object, options = {}) {
-    if (options.terse) {
-      logger.deprecate('0.23.0', 'The `terse` option for raw serialization is no longer supported.')
-    }
-
+    deprecate(options)
     return Node.fromJSON(object)
   },
 
@@ -123,10 +117,7 @@ const Raw = {
    */
 
   deserializeRange(object, options = {}) {
-    if (options.terse) {
-      logger.deprecate('0.23.0', 'The `terse` option for raw serialization is no longer supported.')
-    }
-
+    deprecate(options)
     return Range.fromJSON(object)
   },
 
@@ -139,10 +130,7 @@ const Raw = {
    */
 
   deserializeSelection(object, options = {}) {
-    if (options.terse) {
-      logger.deprecate('0.23.0', 'The `terse` option for raw serialization is no longer supported.')
-    }
-
+    deprecate(options)
     return Selection.fromJSON(object)
   },
 
@@ -155,10 +143,7 @@ const Raw = {
    */
 
   deserializeState(object, options = {}) {
-    if (options.terse) {
-      logger.deprecate('0.23.0', 'The `terse` option for raw serialization is no longer supported.')
-    }
-
+    deprecate(options)
     return State.fromJSON(object)
   },
 
@@ -171,10 +156,7 @@ const Raw = {
    */
 
   deserializeText(object, options = {}) {
-    if (options.terse) {
-      logger.deprecate('0.23.0', 'The `terse` option for raw serialization is no longer supported.')
-    }
-
+    deprecate(options)
     return Text.fromJSON(object)
   },
 
@@ -187,10 +169,7 @@ const Raw = {
    */
 
   serialize(model, options = {}) {
-    if (options.terse) {
-      logger.deprecate('0.23.0', 'The `terse` option for raw serialization is no longer supported.')
-    }
-
+    deprecate(options)
     return model.toJSON(options)
   },
 
@@ -203,10 +182,7 @@ const Raw = {
    */
 
   serializeBlock(block, options = {}) {
-    if (options.terse) {
-      logger.deprecate('0.23.0', 'The `terse` option for raw serialization is no longer supported.')
-    }
-
+    deprecate(options)
     return block.toJSON(options)
   },
 
@@ -219,10 +195,7 @@ const Raw = {
    */
 
   serializeDocument(document, options = {}) {
-    if (options.terse) {
-      logger.deprecate('0.23.0', 'The `terse` option for raw serialization is no longer supported.')
-    }
-
+    deprecate(options)
     return document.toJSON(options)
   },
 
@@ -235,10 +208,7 @@ const Raw = {
    */
 
   serializeInline(inline, options = {}) {
-    if (options.terse) {
-      logger.deprecate('0.23.0', 'The `terse` option for raw serialization is no longer supported.')
-    }
-
+    deprecate(options)
     return inline.toJSON(options)
   },
 
@@ -251,10 +221,7 @@ const Raw = {
    */
 
   serializeMark(mark, options = {}) {
-    if (options.terse) {
-      logger.deprecate('0.23.0', 'The `terse` option for raw serialization is no longer supported.')
-    }
-
+    deprecate(options)
     return mark.toJSON()
   },
 
@@ -267,10 +234,7 @@ const Raw = {
    */
 
   serializeNode(node, options = {}) {
-    if (options.terse) {
-      logger.deprecate('0.23.0', 'The `terse` option for raw serialization is no longer supported.')
-    }
-
+    deprecate(options)
     return node.toJSON(options)
   },
 
@@ -283,10 +247,7 @@ const Raw = {
    */
 
   serializeRange(range, options = {}) {
-    if (options.terse) {
-      logger.deprecate('0.23.0', 'The `terse` option for raw serialization is no longer supported.')
-    }
-
+    deprecate(options)
     return range.toJSON()
   },
 
@@ -299,10 +260,7 @@ const Raw = {
    */
 
   serializeSelection(selection, options = {}) {
-    if (options.terse) {
-      logger.deprecate('0.23.0', 'The `terse` option for raw serialization is no longer supported.')
-    }
-
+    deprecate(options)
     return selection.toJSON(options)
   },
 
@@ -315,10 +273,7 @@ const Raw = {
    */
 
   serializeState(state, options = {}) {
-    if (options.terse) {
-      logger.deprecate('0.23.0', 'The `terse` option for raw serialization is no longer supported.')
-    }
-
+    deprecate(options)
     return state.toJSON(options)
   },
 
@@ -331,10 +286,7 @@ const Raw = {
    */
 
   serializeText(text, options = {}) {
-    if (options.terse) {
-      logger.deprecate('0.23.0', 'The `terse` option for raw serialization is no longer supported.')
-    }
-
+    deprecate(options)
     return text.toJSON(options)
   },
 

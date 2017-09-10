@@ -1,7 +1,7 @@
 
-import Raw from './raw'
 import React from 'react'
 import ReactDOMServer from 'react-dom/server'
+import State from '../models/state'
 import typeOf from 'type-of'
 import { Record } from 'immutable'
 
@@ -175,7 +175,7 @@ class Html {
       return raw
     }
 
-    const state = Raw.deserialize(raw)
+    const state = State.fromJSON(raw)
     return state
   }
 
