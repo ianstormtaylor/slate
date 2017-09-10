@@ -16,7 +16,7 @@ export const output = {
   kind: 'state',
   document: {
     kind: 'document',
-    key: '2',
+    key: '4',
     data: {},
     nodes: [
       {
