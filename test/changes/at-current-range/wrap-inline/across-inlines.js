@@ -34,10 +34,10 @@ export default function (change) {
 export const input = (
   <state>
     <document>
-      <x-paragraph>
-        <x-link>word</x-link>
-        <x-link>another</x-link>
-      </x-paragraph>
+      <paragraph>
+        <link>word</link>
+        <link>another</link>
+      </paragraph>
     </document>
   </state>
 )
@@ -45,14 +45,14 @@ export const input = (
 export const output = (
   <state>
     <document>
-      <x-paragraph>
-        <x-link>wo</x-link>
-        <x-hashtag>
-          <x-link>rd</x-link>
-          <x-link>an</x-link>
-        </x-hashtag>
-        <x-link>other</x-link>
-      </x-paragraph>
+      <paragraph>
+        <link>wo</link>
+        <hashtag>
+          <link>rd</link>
+          <link>an</link>
+        </hashtag>
+        <link>other</link>
+      </paragraph>
     </document>
   </state>
 )

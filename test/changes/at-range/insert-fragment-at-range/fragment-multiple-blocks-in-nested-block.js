@@ -28,10 +28,10 @@ export default function (change) {
 export const input = (
   <state>
     <document>
-      <x-list-item>
-        <x-paragraph>first</x-paragraph>
-        <x-paragraph>second</x-paragraph>
-      </x-list-item>
+      <list-item>
+        <paragraph>first</paragraph>
+        <paragraph>second</paragraph>
+      </list-item>
     </document>
   </state>
 )
@@ -39,11 +39,11 @@ export const input = (
 export const output = (
   <state>
     <document>
-      <x-list-item>
-        <x-paragraph>fifragment one</x-paragraph>
-        <x-paragraph>fragment tworst</x-paragraph>
-        <x-paragraph>second</x-paragraph>
-      </x-list-item>
+      <list-item>
+        <paragraph>fifragment one</paragraph>
+        <paragraph>fragment tworst</paragraph>
+        <paragraph>second</paragraph>
+      </list-item>
     </document>
   </state>
 )

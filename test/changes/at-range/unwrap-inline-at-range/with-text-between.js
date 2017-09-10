@@ -21,10 +21,10 @@ export default function (change) {
 export const input = (
   <state>
     <document>
-      <x-paragraph>
-        <x-link>Hello</x-link>
-        <x-link>world!</x-link>
-      </x-paragraph>
+      <paragraph>
+        <link>Hello</link>
+        <link>world!</link>
+      </paragraph>
     </document>
   </state>
 )
@@ -32,7 +32,7 @@ export const input = (
 export const output = (
   <state>
     <document>
-      <x-paragraph>Hello world!</x-paragraph>
+      <paragraph>Hello world!</paragraph>
     </document>
   </state>
 )

@@ -27,9 +27,9 @@ export default function (change) {
 export const input = (
   <state>
     <document>
-      <x-paragraph>one
-        <x-link>two</x-link>a
-      </x-paragraph>
+      <paragraph>one
+        <link>two</link>a
+      </paragraph>
     </document>
   </state>
 )
@@ -37,9 +37,9 @@ export const input = (
 export const output = (
   <state>
     <document>
-      <x-paragraph>one
-        <x-link>two</x-link>
-      </x-paragraph>
+      <paragraph>one
+        <link>two</link>
+      </paragraph>
     </document>
   </state>
 )

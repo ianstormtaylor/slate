@@ -20,10 +20,10 @@ export default function (change) {
 export const input = (
   <state>
     <document>
-      <x-paragraph>
-        <x-emoji></x-emoji>
-      </x-paragraph>
-      <x-paragraph></x-paragraph>
+      <paragraph>
+        <emoji></emoji>
+      </paragraph>
+      <paragraph></paragraph>
     </document>
   </state>
 )
@@ -31,9 +31,9 @@ export const input = (
 export const output = (
   <state>
     <document>
-      <x-paragraph>
-        <x-emoji></x-emoji>
-      </x-paragraph>
+      <paragraph>
+        <emoji></emoji>
+      </paragraph>
     </document>
   </state>
 )

@@ -18,8 +18,8 @@ export default function (change) {
 export const input = (
   <state>
     <document>
-      <x-paragraph>one</x-paragraph>
-      <x-paragraph>two</x-paragraph>
+      <paragraph>one</paragraph>
+      <paragraph>two</paragraph>
     </document>
   </state>
 )
@@ -27,9 +27,9 @@ export const input = (
 export const output = (
   <state>
     <document>
-      <x-crystal></x-crystal>
-      <x-paragraph>one</x-paragraph>
-      <x-paragraph>two</x-paragraph>
+      <crystal></crystal>
+      <paragraph>one</paragraph>
+      <paragraph>two</paragraph>
     </document>
   </state>
 )

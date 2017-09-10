@@ -25,9 +25,9 @@ export default function (change) {
 export const input = (
   <state>
     <document>
-      <x-paragraph>
-        <x-paragraph>word</x-paragraph>
-      </x-paragraph>
+      <paragraph>
+        <paragraph>word</paragraph>
+      </paragraph>
     </document>
   </state>
 )
@@ -35,9 +35,9 @@ export const input = (
 export const output = (
   <state>
     <document>
-      <x-paragraph>
-        <x-code>word</x-code>
-      </x-paragraph>
+      <paragraph>
+        <code>word</code>
+      </paragraph>
     </document>
   </state>
 )

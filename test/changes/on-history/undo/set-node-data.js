@@ -17,7 +17,7 @@ export default function (change) {
 export const input = (
   <state>
     <document>
-      <x-image src="hello.png"></x-image>
+      <image src="hello.png"></image>
     </document>
   </state>
 )
@@ -25,7 +25,7 @@ export const input = (
 export const output = (
   <state>
     <document>
-      <x-image src="hello.png"></x-image>
+      <image src="hello.png"></image>
     </document>
   </state>
 )

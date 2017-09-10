@@ -15,12 +15,12 @@ export default function (change) {
 export const input = (
   <state>
     <document>
-      <x-list-item>
-        <x-paragraph>word1</x-paragraph>
-      </x-list-item>
-      <x-list-item>
-        <x-paragraph>word2</x-paragraph>
-      </x-list-item>
+      <list-item>
+        <paragraph>word1</paragraph>
+      </list-item>
+      <list-item>
+        <paragraph>word2</paragraph>
+      </list-item>
     </document>
   </state>
 )
@@ -28,14 +28,14 @@ export const input = (
 export const output = (
   <state>
     <document>
-      <x-bulleted-list>
-        <x-list-item>
-          <x-paragraph>word1</x-paragraph>
-        </x-list-item>
-        <x-list-item>
-          <x-paragraph>word2</x-paragraph>
-        </x-list-item>
-      </x-bulleted-list>
+      <bulleted-list>
+        <list-item>
+          <paragraph>word1</paragraph>
+        </list-item>
+        <list-item>
+          <paragraph>word2</paragraph>
+        </list-item>
+      </bulleted-list>
     </document>
   </state>
 )

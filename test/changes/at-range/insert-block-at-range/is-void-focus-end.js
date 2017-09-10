@@ -20,7 +20,7 @@ export default function (change) {
 export const input = (
   <state>
     <document>
-      <x-video></x-video>
+      <video></video>
     </document>
   </state>
 )
@@ -28,8 +28,8 @@ export const input = (
 export const output = (
   <state>
     <document>
-      <x-video></x-video>
-      <x-image></x-image>
+      <video></video>
+      <image></image>
     </document>
   </state>
 )

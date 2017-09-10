@@ -22,11 +22,11 @@ export default function (change) {
 export const input = (
   <state>
     <document>
-      <x-list>
-        <x-item>one</x-item>
-        <x-item>two</x-item>
-        <x-item>three</x-item>
-      </x-list>
+      <list>
+        <item>one</item>
+        <item>two</item>
+        <item>three</item>
+      </list>
     </document>
   </state>
 )
@@ -34,10 +34,10 @@ export const input = (
 export const output = (
   <state>
     <document>
-      <x-list>
-        <x-item>onetwo</x-item>
-        <x-item>three</x-item>
-      </x-list>
+      <list>
+        <item>onetwo</item>
+        <item>three</item>
+      </list>
     </document>
   </state>
 )

@@ -27,9 +27,9 @@ export default function (change) {
 export const input = (
   <state>
     <document>
-      <x-paragraph>word
-        <x-link href="website.com">hyperlink</x-link>word
-      </x-paragraph>
+      <paragraph>word
+        <link href="website.com">hyperlink</link>word
+      </paragraph>
     </document>
   </state>
 )
@@ -37,10 +37,10 @@ export const input = (
 export const output = (
   <state>
     <document>
-      <x-paragraph>word
-        <x-link href="website.com">hyperlink</x-link>
-      </x-paragraph>
-      <x-paragraph>word</x-paragraph>
+      <paragraph>word
+        <link href="website.com">hyperlink</link>
+      </paragraph>
+      <paragraph>word</paragraph>
     </document>
   </state>
 )

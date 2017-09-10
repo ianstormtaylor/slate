@@ -33,9 +33,9 @@ export default function (change) {
 export const input = (
   <state>
     <document>
-      <x-image></x-image>
-      <x-paragraph>some words</x-paragraph>
-      <x-paragraph>other words</x-paragraph>
+      <image></image>
+      <paragraph>some words</paragraph>
+      <paragraph>other words</paragraph>
     </document>
   </state>
 )
@@ -43,8 +43,8 @@ export const input = (
 export const output = (
   <state>
     <document>
-      <x-paragraph>words</x-paragraph>
-      <x-paragraph>other words</x-paragraph>
+      <paragraph>words</paragraph>
+      <paragraph>other words</paragraph>
     </document>
   </state>
 )

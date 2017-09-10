@@ -21,10 +21,10 @@ export default function (change) {
 export const input = (
   <state>
     <document>
-      <x-paragraph>
-        <x-link>word</x-link>
-        <x-link>another</x-link>
-      </x-paragraph>
+      <paragraph>
+        <link>word</link>
+        <link>another</link>
+      </paragraph>
     </document>
   </state>
 )
@@ -32,10 +32,10 @@ export const input = (
 export const output = (
   <state>
     <document>
-      <x-paragraph>
-        <x-link>wo[[rd</x-link>
-        <x-link>an]]other</x-link>
-      </x-paragraph>
+      <paragraph>
+        <link>wo[[rd</link>
+        <link>an]]other</link>
+      </paragraph>
     </document>
   </state>
 )

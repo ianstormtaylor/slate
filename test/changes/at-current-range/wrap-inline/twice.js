@@ -34,7 +34,7 @@ export default function (change) {
 export const input = (
   <state>
     <document>
-      <x-paragraph>before word after</x-paragraph>
+      <paragraph>before word after</paragraph>
     </document>
   </state>
 )
@@ -42,11 +42,11 @@ export const input = (
 export const output = (
   <state>
     <document>
-      <x-paragraph>before 
-        <x-outer>
-          <x-inner>word</x-inner>
-        </x-outer> after
-      </x-paragraph>
+      <paragraph>before
+        <outer>
+          <inner>word</inner>
+        </outer> after
+      </paragraph>
     </document>
   </state>
 )

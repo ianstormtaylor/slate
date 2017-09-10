@@ -36,12 +36,12 @@ export default function (change) {
 export const input = (
   <state>
     <document>
-      <x-paragraph>paragraph one</x-paragraph>
-      <x-paragraph>
-        <x-list>list one</x-list>
-        <x-list>list two</x-list>
-      </x-paragraph>
-      <x-paragraph>paragraph three</x-paragraph>
+      <paragraph>paragraph one</paragraph>
+      <paragraph>
+        <list>list one</list>
+        <list>list two</list>
+      </paragraph>
+      <paragraph>paragraph three</paragraph>
     </document>
   </state>
 )
@@ -49,12 +49,12 @@ export const input = (
 export const output = (
   <state>
     <document>
-      <x-paragraph>textparagraph one</x-paragraph>
-      <x-paragraph>
-        <x-list>textlist one</x-list>
-        <x-list>textlist two</x-list>
-      </x-paragraph>
-      <x-paragraph>paragraph three</x-paragraph>
+      <paragraph>textparagraph one</paragraph>
+      <paragraph>
+        <list>textlist one</list>
+        <list>textlist two</list>
+      </paragraph>
+      <paragraph>paragraph three</paragraph>
     </document>
   </state>
 )

@@ -21,12 +21,12 @@ export default function (change) {
 export const input = (
   <state>
     <document>
-      <x-paragraph>
-        <x-one>word</x-one>
-      </x-paragraph>
-      <x-paragraph>
-        <x-two>another</x-two>
-      </x-paragraph>
+      <paragraph>
+        <one>word</one>
+      </paragraph>
+      <paragraph>
+        <two>another</two>
+      </paragraph>
     </document>
   </state>
 )
@@ -34,12 +34,12 @@ export const input = (
 export const output = (
   <state>
     <document>
-      <x-paragraph>
-        <x-one>wo</x-one>
-      </x-paragraph>
-      <x-paragraph>
-        <x-two>other</x-two>
-      </x-paragraph>
+      <paragraph>
+        <one>wo</one>
+      </paragraph>
+      <paragraph>
+        <two>other</two>
+      </paragraph>
     </document>
   </state>
 )

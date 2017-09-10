@@ -27,8 +27,8 @@ export default function (change) {
 export const input = (
   <state>
     <document>
-      <x-image></x-image>
-      <x-paragraph>text</x-paragraph>
+      <image></image>
+      <paragraph>text</paragraph>
     </document>
   </state>
 )
@@ -36,9 +36,9 @@ export const input = (
 export const output = (
   <state>
     <document>
-      <x-quote></x-quote>
-      <x-image></x-image>
-      <x-paragraph>text</x-paragraph>
+      <quote></quote>
+      <image></image>
+      <paragraph>text</paragraph>
     </document>
   </state>
 )

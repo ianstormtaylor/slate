@@ -16,15 +16,15 @@ export default function (change) {
 export const input = (
   <state>
     <document>
-      <x-figure>
-        <x-image></x-image>
-      </x-figure>
-      <x-figure>
-        <x-image></x-image>
-      </x-figure>
-      <x-figure>
-        <x-image></x-image>
-      </x-figure>
+      <figure>
+        <image></image>
+      </figure>
+      <figure>
+        <image></image>
+      </figure>
+      <figure>
+        <image></image>
+      </figure>
     </document>
   </state>
 )
@@ -32,15 +32,15 @@ export const input = (
 export const output = (
   <state>
     <document>
-      <x-figure>
-        <x-image></x-image>
-      </x-figure>
-      <x-figure>
-        <x-image></x-image>
-      </x-figure>
-      <x-figure>
-        <x-image></x-image>
-      </x-figure>
+      <figure>
+        <image></image>
+      </figure>
+      <figure>
+        <image></image>
+      </figure>
+      <figure>
+        <image></image>
+      </figure>
     </document>
   </state>
 )

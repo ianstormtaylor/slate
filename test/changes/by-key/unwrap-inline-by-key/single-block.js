@@ -12,10 +12,10 @@ export default function (change) {
 export const input = (
   <state>
     <document>
-      <x-paragraph>w
-        <x-hashtag>or</x-hashtag>d
-        <x-hashtag>another</x-hashtag>
-      </x-paragraph>
+      <paragraph>w
+        <hashtag>or</hashtag>d
+        <hashtag>another</hashtag>
+      </paragraph>
     </document>
   </state>
 )
@@ -23,9 +23,9 @@ export const input = (
 export const output = (
   <state>
     <document>
-      <x-paragraph>word
-        <x-hashtag>another</x-hashtag>
-      </x-paragraph>
+      <paragraph>word
+        <hashtag>another</hashtag>
+      </paragraph>
     </document>
   </state>
 )
