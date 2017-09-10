@@ -1,5 +1,5 @@
 
-import { Editor, Raw } from '../..'
+import { Editor, State } from '../..'
 import React from 'react'
 import Video from './video'
 import initialState from './state.json'
@@ -31,7 +31,7 @@ class Embeds extends React.Component {
    */
 
   state = {
-    state: Raw.deserialize(initialState, { terse: true })
+    state: State.fromJSON(initialState)
   }
 
   /**

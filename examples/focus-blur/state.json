@@ -1,24 +1,34 @@
 {
-  "nodes": [
-    {
-      "kind": "block",
-      "type": "paragraph",
-      "nodes": [
-        {
-          "kind": "text",
-          "text": "This is a testing ground for focusing and blurring in Slate."
-        }
-      ]
-    },
-    {
-      "kind": "block",
-      "type": "paragraph",
-      "nodes": [
-        {
-          "kind": "text",
-          "text": "You can use the toolbar buttons above to focus and blur immediately, or after a short delay."
-        }
-      ]
-    }
-  ]
+  "document": {
+    "nodes": [
+      {
+        "kind": "block",
+        "type": "paragraph",
+        "nodes": [
+          {
+            "kind": "text",
+            "ranges": [
+              {
+                "text": "This is a testing ground for focusing and blurring in Slate."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "kind": "block",
+        "type": "paragraph",
+        "nodes": [
+          {
+            "kind": "text",
+            "ranges": [
+              {
+                "text": "You can use the toolbar buttons above to focus and blur immediately, or after a short delay."
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
 }

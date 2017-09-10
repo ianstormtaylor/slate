@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 
-import { Editor, Raw } from '../../..'
+import { Editor, State } from '../../..'
 import React from 'react'
 import faker from 'faker'
 
@@ -43,16 +43,20 @@ for (let h = 0; h < HEADINGS; h++) {
   nodes.push({
     kind: 'block',
     type: 'heading',
-    nodes: [{ kind: 'text', text: faker.lorem.sentence() }]
+    nodes: [{ kind: 'text', ranges: [{ text: faker.lorem.sentence() }] }]
   })
 
   for (let p = 0; p < PARAGRAPHS; p++) {
     nodes.push({
       kind: 'block',
       type: 'paragraph',
-      nodes: [{ kind: 'text', text: faker.lorem.paragraph() }]
+      nodes: [{ kind: 'text', ranges: [{ text: faker.lorem.paragraph() }] }]
     })
   }
+}
+
+const json = {
+  document: { nodes }
 }
 
 /**
@@ -72,7 +76,7 @@ class LargeDocument extends React.Component {
   constructor() {
     super()
     console.time('deserializeLargeDocument')
-    this.state = { state: Raw.deserialize({ nodes }, { normalize: false, terse: true }) }
+    this.state = { state: State.fromJSON(json, { normalize: false }) }
     console.timeEnd('deserializeLargeDocument')
   }
 
