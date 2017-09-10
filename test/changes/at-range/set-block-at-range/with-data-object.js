@@ -16,7 +16,7 @@ export default function (change) {
     .change()
     .setBlockAtRange(range, {
       type: 'code',
-      data: { key: 'value' }
+      data: { thing: 'value' }
     })
 }
 

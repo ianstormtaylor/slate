@@ -1,5 +1,6 @@
 
-import { Mark } from '../../../../../..'
+
+import { Mark } from '../../../..'
 import assert from 'assert'
 
 export default function (state) {
@@ -18,7 +19,7 @@ export default function (state) {
     .select(range)
     .addMark(Mark.create({
       type: 'bold',
-      data: { key: 'value' }
+      data: { thing: 'value' }
     }))
     .state
 

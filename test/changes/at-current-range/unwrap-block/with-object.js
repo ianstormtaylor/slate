@@ -16,7 +16,7 @@ export default function (change) {
     .select(range)
     .unwrapBlock({
       type: 'quote',
-      data: { key: 'value' }
+      data: { thing: 'value' }
     })
 
   assert.deepEqual(

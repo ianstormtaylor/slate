@@ -17,7 +17,7 @@ export default function (state) {
     .select(range)
     .unwrapBlock({
       type: 'quote',
-      data: { key: 'value' }
+      data: { thing: 'value' }
     })
     .state
 

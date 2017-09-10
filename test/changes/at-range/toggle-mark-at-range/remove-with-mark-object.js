@@ -2,7 +2,7 @@
 
 import h from '../../../helpers/h'
 
-import { Mark } from '../../../../../..'
+import { Mark } from '../../../..'
 
 export default function (change) {
   const texts = document.getTexts()
@@ -18,7 +18,7 @@ export default function (change) {
     .change()
     .toggleMarkAtRange(range, Mark.create({
       type: 'bold',
-      data: { key: 'value' }
+      data: { thing: 'value' }
     }))
 }
 

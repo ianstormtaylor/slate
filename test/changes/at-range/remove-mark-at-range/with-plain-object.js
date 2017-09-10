@@ -16,7 +16,7 @@ export default function (change) {
     .change()
     .removeMarkAtRange(range, {
       type: 'bold',
-      data: { key: 'value' }
+      data: { thing: 'value' }
     })
 }
 

@@ -2,7 +2,7 @@
 
 import h from '../../../helpers/h'
 
-import { Data } from '../../../../../..'
+import { Data } from '../../../..'
 
 
 export default function (change) {
@@ -17,7 +17,7 @@ export default function (change) {
 
   change
     .select(range)
-    .setBlock({ data: Data.create({ key: 'value' }) })
+    .setBlock({ data: Data.create({ thing: 'value' }) })
 
   assert.deepEqual(
     next.selection.toJS(),

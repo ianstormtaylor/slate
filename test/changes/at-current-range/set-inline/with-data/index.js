@@ -1,5 +1,5 @@
 
-import { Data } from '../../../../../..'
+import { Data } from '../../../..'
 import assert from 'assert'
 
 export default function (state) {
@@ -18,7 +18,7 @@ export default function (state) {
     .select(range)
     .setInline({
       type: 'code',
-      data: Data.create({ key: 'value' })
+      data: Data.create({ thing: 'value' })
     })
     .state
 

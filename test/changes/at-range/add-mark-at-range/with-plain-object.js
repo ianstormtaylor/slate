@@ -16,7 +16,7 @@ export default function (change) {
     .change()
     .addMarkAtRange(range, {
       type: 'bold',
-      data: { key: 'value' }
+      data: { thing: 'value' }
     })
 }
 

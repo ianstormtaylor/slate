@@ -1,5 +1,5 @@
 
-import { Mark } from '../../../../../..'
+import { Mark } from '../../../..'
 
 export default function (state) {
   const { document, selection } = state
@@ -16,7 +16,7 @@ export default function (state) {
     .change()
     .addMarkAtRange(range, Mark.create({
       type: 'bold',
-      data: { key: 'value' }
+      data: { thing: 'value' }
     }))
     .state
 }

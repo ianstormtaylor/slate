@@ -14,7 +14,7 @@ export default function (state) {
     .change()
     .wrapInlineAtRange(range, {
       type: 'hashtag',
-      data: { key: 'value' }
+      data: { thing: 'value' }
     })
     .state
 }

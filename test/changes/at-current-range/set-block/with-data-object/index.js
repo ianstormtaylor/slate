@@ -17,7 +17,7 @@ export default function (state) {
     .select(range)
     .setBlock({
       type: 'code',
-      data: { key: 'value' }
+      data: { thing: 'value' }
     })
     .state
 

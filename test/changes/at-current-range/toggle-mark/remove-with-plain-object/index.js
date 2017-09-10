@@ -17,7 +17,7 @@ export default function (state) {
     .select(range)
     .toggleMark({
       type: 'bold',
-      data: { key: 'value' }
+      data: { thing: 'value' }
     })
     .state
 

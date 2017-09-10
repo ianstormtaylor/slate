@@ -1,6 +1,6 @@
 
 import assert from 'assert'
-import { Block } from '../../../../../..'
+import { Block } from '../../../..'
 
 export default function (state) {
   const { document, selection } = state

@@ -1,6 +1,6 @@
 
 import assert from 'assert'
-import { Mark } from '../../../../../..'
+import { Mark } from '../../../..'
 
 export default function (state) {
   const { startText, selection } = state

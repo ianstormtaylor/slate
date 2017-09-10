@@ -1,5 +1,5 @@
 
-import { Data } from '../../../../../..'
+import { Data } from '../../../..'
 
 export default function (state) {
   const { document, selection } = state
@@ -14,6 +14,6 @@ export default function (state) {
 
   return state
     .change()
-    .setInlineAtRange(range, { data: Data.create({ key: 'value' }) })
+    .setInlineAtRange(range, { data: Data.create({ thing: 'value' }) })
     .state
 }

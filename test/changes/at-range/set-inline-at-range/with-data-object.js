@@ -16,7 +16,7 @@ export default function (change) {
     .change()
     .setInlineAtRange(range, {
       type: 'code',
-      data: { key: 'value' }
+      data: { thing: 'value' }
     })
 }
 

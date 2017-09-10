@@ -2,7 +2,7 @@
 
 import h from '../../../helpers/h'
 
-import { Inline } from '../../../../../..'
+import { Inline } from '../../../..'
 
 export default function (change) {
   const first = document.getBlocks().first()

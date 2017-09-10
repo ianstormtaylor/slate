@@ -16,7 +16,7 @@ export default function (change) {
     .select(range)
     .wrapInline({
       type: 'hashtag',
-      data: { key: 'value' }
+      data: { thing: 'value' }
     })
 
   const nexts = next.document.getTexts()

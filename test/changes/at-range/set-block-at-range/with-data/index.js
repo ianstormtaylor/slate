@@ -1,5 +1,5 @@
 
-import { Data } from '../../../../../..'
+import { Data } from '../../../..'
 
 export default function (state) {
   const { document, selection } = state
@@ -16,7 +16,7 @@ export default function (state) {
     .change()
     .setBlockAtRange(range, {
       type: 'code',
-      data: Data.create({ key: 'value' })
+      data: Data.create({ thing: 'value' })
     })
     .state
 }

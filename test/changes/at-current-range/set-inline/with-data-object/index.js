@@ -17,7 +17,7 @@ export default function (state) {
     .select(range)
     .setInline({
       type: 'code',
-      data: { key: 'value' }
+      data: { thing: 'value' }
     })
     .state
 

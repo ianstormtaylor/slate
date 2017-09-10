@@ -2,7 +2,7 @@
 
 import h from '../../../helpers/h'
 
-import { Mark } from '../../../../../..'
+import { Mark } from '../../../..'
 
 
 export default function (change) {
@@ -19,7 +19,7 @@ export default function (change) {
     .select(range)
     .toggleMark(Mark.create({
       type: 'bold',
-      data: { key: 'value' }
+      data: { thing: 'value' }
     }))
 
   assert.deepEqual(next.selection.toJS(), range.toJS())

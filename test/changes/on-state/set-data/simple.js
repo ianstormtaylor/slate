@@ -5,7 +5,7 @@ import h from '../../../helpers/h'
 export default function (change) {
   return state
     .change()
-    .setData({ key: 'value' })
+    .setData({ thing: 'value' })
 }
 
 export const input = (

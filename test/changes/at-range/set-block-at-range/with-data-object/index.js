@@ -14,7 +14,7 @@ export default function (state) {
     .change()
     .setBlockAtRange(range, {
       type: 'code',
-      data: { key: 'value' }
+      data: { thing: 'value' }
     })
     .state
 }

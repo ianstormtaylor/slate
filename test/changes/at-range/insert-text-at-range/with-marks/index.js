@@ -1,5 +1,5 @@
 
-import { Mark } from '../../../../../..'
+import { Mark } from '../../../..'
 
 export default function (state) {
   const { document, selection } = state

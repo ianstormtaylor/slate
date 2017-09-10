@@ -17,7 +17,7 @@ export default function (state) {
     .select(range)
     .wrapInline({
       type: 'hashtag',
-      data: { key: 'value' }
+      data: { thing: 'value' }
     })
     .state
 

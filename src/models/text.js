@@ -79,8 +79,6 @@ class Text extends Record(DEFAULTS) {
    */
 
   static fromJS(object) {
-    debugger
-
     if (Text.isText(object)) {
       return object
     }

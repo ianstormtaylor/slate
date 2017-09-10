@@ -16,7 +16,7 @@ export default function (change) {
     .select(range)
     .removeMark({
       type: 'bold',
-      data: { key: 'value' }
+      data: { thing: 'value' }
     })
 
   assert.deepEqual(next.selection.toJS(), range.toJS())

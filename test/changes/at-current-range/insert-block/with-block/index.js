@@ -1,5 +1,5 @@
 
-import { Block } from '../../../../../..'
+import { Block } from '../../../..'
 import assert from 'assert'
 
 export default function (state) {

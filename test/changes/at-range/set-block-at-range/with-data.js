@@ -2,7 +2,7 @@
 
 import h from '../../../helpers/h'
 
-import { Data } from '../../../../../..'
+import { Data } from '../../../..'
 
 export default function (change) {
   const texts = document.getTexts()
@@ -18,7 +18,7 @@ export default function (change) {
     .change()
     .setBlockAtRange(range, {
       type: 'code',
-      data: Data.create({ key: 'value' })
+      data: Data.create({ thing: 'value' })
     })
 }
 

@@ -26,7 +26,7 @@ const FOCUS = {}
  * @type {Object}
  */
 
-const DEFAULT_CREATORS = {
+const CREATORS = {
 
   anchor(tagName, attributes, children) {
     return ANCHOR
@@ -62,17 +62,8 @@ const DEFAULT_CREATORS = {
   },
 
   mark(tagName, attributes, children) {
-    const mark = Mark.create(attributes)
-    let nodes = createChildren(children)
-
-    nodes = nodes.map((node) => {
-      if (node.kind != 'text') {
-        throw new Error(`Slate hyperscript marks can only contain text children, but you passed: ${node.kind}`)
-      }
-
-      node.addMark(0, node.text.length, mark)
-    })
-
+    const marks = Mark.createSet([attributes])
+    const nodes = createChildren(children, { marks })
     return nodes
   },
 
@@ -131,7 +122,7 @@ const DEFAULT_CREATORS = {
 }
 
 /**
- * Create a Slate hyperscript function.
+ * Create a Slate hyperscript function with `options`.
  *
  * @param {Object} options
  * @return {Function}
@@ -141,8 +132,22 @@ function createHyperscript(options = {}) {
   const creators = resolveCreators(options)
 
   function create(tagName, attributes, ...children) {
+    const creator = creators[tagName]
+
+    if (!creator) {
+      throw new Error(`No hyperscript creator found for tag: "${tagName}"`)
+    }
+
     if (attributes == null) {
       attributes = {}
+    }
+
+    if (children == null) {
+      children = []
+    }
+
+    if (!Array.isArray(children)) {
+      children = [children]
     }
 
     if (!isPlainObject(attributes)) {
@@ -151,14 +156,10 @@ function createHyperscript(options = {}) {
     }
 
     children = children
-      .filter(child => !!child)
+      .filter(child => Boolean(child))
       .reduce((memo, child) => memo.concat(child), [])
 
-    if (!creators[tagName]) {
-      throw new Error(`No hyperscript creator found for tag: "${tagName}"`)
-    }
-
-    const element = creators[tagName](tagName, attributes, children)
+    const element = creator(tagName, attributes, children)
     return element
   }
 
@@ -169,27 +170,23 @@ function createHyperscript(options = {}) {
  * Create an array of `children`, storing selection anchor and focus.
  *
  * @param {Array} children
+ * @param {Object} options
  * @return {Array}
  */
 
-function createChildren(children) {
+function createChildren(children, options = {}) {
   const array = []
   let length = 0
-  let node
+  let node = Text.create()
 
   // Create a helper to update the current node while preserving any stored
   // anchor or focus information.
   function setNode(next) {
-    if (next == null) next = Text.create()
-    const prev = node
-    if (prev && prev.__anchor) next.__anchor = prev.__anchor
-    if (prev && prev.__focus) next.__focus = prev.__focus
+    const { __anchor, __focus } = node
+    if (__anchor != null) next.__anchor = __anchor
+    if (__focus != null) next.__focus = __focus
     node = next
   }
-
-  // Create an initial node, so that we're always able to attack anchor and
-  // focus logic to something.
-  setNode()
 
   children.forEach((child) => {
     // If the child is a non-text node, push the current node and the new child
@@ -197,30 +194,36 @@ function createChildren(children) {
     if (Node.isNode(child) && !Text.isText(child)) {
       array.push(node)
       array.push(child)
-      setNode(null)
+      node = Text.create()
     }
 
     // If the child is a string insert it into the node.
     if (typeof child == 'string') {
-      setNode(node.insertText(node.text.length, child))
+      setNode(node.insertText(node.text.length, child, options.marks))
+      length += child.length
     }
 
     // If the node is a `Text` add its text and marks to the existing node.
     if (Text.isText(child)) {
+      const { __anchor, __focus } = child
       let i = node.text.length
 
       child.getRanges().forEach((range) => {
-        setNode(node.insertText(i, range.text, range.marks))
+        let { marks } = range
+        if (options.marks) marks = marks.union(options.marks)
+        setNode(node.insertText(i, range.text, marks))
         i += range.text.length
       })
+
+      if (__anchor != null) node.__anchor = __anchor
+      if (__focus != null) node.__focus = __focus
+
+      length += child.text.length
     }
 
     // If the child is a selection object store the current position.
     if (child == ANCHOR || child == CURSOR) node.__anchor = length
     if (child == FOCUS || child == CURSOR) node.__focus = length
-
-    // Increment the `length` for future selection tracking.
-    length += node.text.length
   })
 
   // If there were no children added, push the existing one on, in case there
@@ -247,7 +250,7 @@ function resolveCreators(options) {
   } = options
 
   const creators = {
-    ...DEFAULT_CREATORS,
+    ...CREATORS,
     ...(options.creators || {}),
   }
 
@@ -287,16 +290,17 @@ function normalizeNode(key, value, kind) {
   if (isPlainObject(value)) {
     return (tagName, attributes, children) => {
       const { key: attrKey, ...rest } = attributes
-      return Node.create({
+      const attrs = {
         ...value,
         kind,
         key: attrKey,
-        nodes: createChildren(children),
         data: {
           ...(value.data || {}),
           ...rest,
         }
-      })
+      }
+
+      return CREATORS[kind](tagName, attrs, children)
     }
   }
 
@@ -322,17 +326,15 @@ function normalizeMark(key, value) {
 
   if (isPlainObject(value)) {
     return (tagName, attributes, children) => {
-      const mark = Mark.create({
+      const attrs = {
         ...value,
         data: {
           ...(value.data || {}),
           ...attributes,
         }
-      })
+      }
 
-      let nodes = createChildren(children)
-      nodes = nodes.map(node => node.addMark(0, node.text.length, mark))
-      return nodes
+      return CREATORS.mark(tagName, attrs, children)
     }
   }
 

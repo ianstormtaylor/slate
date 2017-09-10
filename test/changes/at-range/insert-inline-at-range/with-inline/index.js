@@ -1,5 +1,5 @@
 
-import { Inline } from '../../../../../..'
+import { Inline } from '../../../..'
 
 export default function (state) {
   const { document, selection } = state

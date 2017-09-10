@@ -14,7 +14,7 @@ export default function (state) {
     .change()
     .toggleMarkAtRange(range, {
       type: 'bold',
-      data: { key: 'value' }
+      data: { thing: 'value' }
     })
     .state
 }

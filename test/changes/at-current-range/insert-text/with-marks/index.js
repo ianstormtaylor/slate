@@ -1,5 +1,5 @@
 
-import { Mark } from '../../../../../..'
+import { Mark } from '../../../..'
 import assert from 'assert'
 
 export default function (state) {

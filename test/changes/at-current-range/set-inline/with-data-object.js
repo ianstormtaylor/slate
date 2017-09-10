@@ -16,7 +16,7 @@ export default function (change) {
     .select(range)
     .setInline({
       type: 'code',
-      data: { key: 'value' }
+      data: { thing: 'value' }
     })
 
   assert.deepEqual(

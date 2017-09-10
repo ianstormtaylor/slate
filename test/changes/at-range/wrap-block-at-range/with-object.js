@@ -16,7 +16,7 @@ export default function (change) {
     .change()
     .wrapBlockAtRange(range, {
       type: 'quote',
-      data: { key: 'value' }
+      data: { thing: 'value' }
     })
 }
 

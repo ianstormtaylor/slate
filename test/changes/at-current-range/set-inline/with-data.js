@@ -2,7 +2,7 @@
 
 import h from '../../../helpers/h'
 
-import { Data } from '../../../../../..'
+import { Data } from '../../../..'
 
 
 export default function (change) {
@@ -19,7 +19,7 @@ export default function (change) {
     .select(range)
     .setInline({
       type: 'code',
-      data: Data.create({ key: 'value' })
+      data: Data.create({ thing: 'value' })
     })
 
   assert.deepEqual(

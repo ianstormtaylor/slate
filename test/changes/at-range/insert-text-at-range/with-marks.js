@@ -2,7 +2,7 @@
 
 import h from '../../../helpers/h'
 
-import { Mark } from '../../../../../..'
+import { Mark } from '../../../..'
 
 export default function (change) {
   const texts = document.getTexts()

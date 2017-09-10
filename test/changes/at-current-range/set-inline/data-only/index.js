@@ -1,5 +1,5 @@
 
-import { Data } from '../../../../../..'
+import { Data } from '../../../..'
 import assert from 'assert'
 
 export default function (state) {
@@ -16,7 +16,7 @@ export default function (state) {
   const next = state
     .change()
     .select(range)
-    .setInline({ data: Data.create({ key: 'value' }) })
+    .setInline({ data: Data.create({ thing: 'value' }) })
     .state
 
   assert.deepEqual(

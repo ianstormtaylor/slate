@@ -2,7 +2,7 @@
 
 import h from '../../../helpers/h'
 
-import { Block } from '../../../../../..'
+import { Block } from '../../../..'
 
 export default function (change) {
   const texts = document.getTexts()

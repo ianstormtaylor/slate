@@ -2,7 +2,7 @@
 
 import h from '../../../helpers/h'
 
-import { Data } from '../../../../../..'
+import { Data } from '../../../..'
 
 export default function (change) {
   const texts = document.getTexts()
@@ -16,7 +16,7 @@ export default function (change) {
 
   return state
     .change()
-    .setInlineAtRange(range, { data: Data.create({ key: 'value' }) })
+    .setInlineAtRange(range, { data: Data.create({ thing: 'value' }) })
 }
 
 export const input = (

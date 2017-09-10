@@ -17,7 +17,7 @@ export default function (state) {
     .select(range)
     .removeMark({
       type: 'bold',
-      data: { key: 'value' }
+      data: { thing: 'value' }
     })
     .state
 
