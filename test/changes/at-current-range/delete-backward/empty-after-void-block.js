@@ -3,18 +3,16 @@
 import h from '../../../helpers/h'
 
 export default function (change) {
-  const nodeToBeFocused = document.nodes.last()
-  return state
-    .change()
-    .collapseToStartOf(nodeToBeFocused)
-    .deleteBackward()
+  change.deleteBackward()
 }
 
 export const input = (
   <state>
     <document>
-      <image></image>
-      <paragraph></paragraph>
+      <image />
+      <paragraph>
+        <cursor />
+      </paragraph>
     </document>
   </state>
 )
@@ -22,7 +20,9 @@ export const input = (
 export const output = (
   <state>
     <document>
-      <image></image>
+      <image>
+        <cursor />{' '}
+      </image>
     </document>
   </state>
 )

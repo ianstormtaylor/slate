@@ -3,17 +3,15 @@
 import h from '../../../helpers/h'
 
 export default function (change) {
-  const nodeToBeFocused = document.nodes.first()
-  return state
-    .change()
-    .collapseToEndOf(nodeToBeFocused)
-    .deleteBackward()
+  change.deleteBackward()
 }
 
 export const input = (
   <state>
     <document>
-      <paragraph></paragraph>
+      <paragraph>
+        <cursor />
+      </paragraph>
     </document>
   </state>
 )
@@ -21,7 +19,9 @@ export const input = (
 export const output = (
   <state>
     <document>
-      <paragraph></paragraph>
+      <paragraph>
+        <cursor />
+      </paragraph>
     </document>
   </state>
 )

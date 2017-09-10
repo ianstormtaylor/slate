@@ -3,29 +3,13 @@
 import h from '../../../helpers/h'
 
 export default function (change) {
-  const texts = document.getTexts()
-  const first = texts.first()
-  const range = selection.merge({
-    anchorKey: first.key,
-    anchorOffset: first.text.length,
-    focusKey: first.key,
-    focusOffset: first.text.length
-  })
-
-  change
-    .select(range)
-    .deleteBackward(3)
-
-  assert.deepEqual(
-    next.selection.toJS(),
-    range.move(-3).toJS()
-  )
+  change.deleteBackward(3)
 }
 
 export const input = (
   <state>
     <document>
-      <paragraph>word</paragraph>
+      <paragraph>word<cursor /></paragraph>
     </document>
   </state>
 )
@@ -33,7 +17,7 @@ export const input = (
 export const output = (
   <state>
     <document>
-      <paragraph>w</paragraph>
+      <paragraph>w<cursor /></paragraph>
     </document>
   </state>
 )
