@@ -10,7 +10,6 @@ import './inline'
  * Dependencies.
  */
 
-import Data from './data'
 import Node from './node'
 import MODEL_TYPES from '../constants/model-types'
 import generateKey from '../utils/generate-key'
