@@ -11,6 +11,7 @@ A data object can have any properties associated with it.
 
 - [Static Methods](#static-methods)
   - [`Data.create`](#datacreate)
+  - [`Data.fromJSON`](#datafromjson)
 
 
 ## Static Methods
@@ -19,3 +20,8 @@ A data object can have any properties associated with it.
 `Data.create(properties: Object) => Data`
 
 Create a data object from a plain Javascript object of `properties`.
+
+### `Data.fromJSON`
+`Data.fromJSON(object: Object) => Data`
+
+Create a data object from a JSON `object`.

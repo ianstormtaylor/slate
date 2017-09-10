@@ -19,8 +19,11 @@ In some places, you'll see mention of "fragments", which are also `Document` obj
   - [`text`](#text)
 - [Static Methods](#static-methods)
   - [`Document.create`](#documentcreate)
+  - [`Document.fromJSON`](#documentfromjson)
   - [`Document.isDocument`](#documentisdocument)
 - [Node Methods](#node-methods)
+- [Instance Methods](#instance-methods)
+  - [`toJSON`](#tojson)
 
 
 ## Properties
@@ -62,6 +65,11 @@ A concatenated string of all of the descendant [`Text`](./text.md) nodes of this
 
 Create a block from a plain Javascript object of `properties`.
 
+### `Document.fromJSON`
+`Document.fromJSON(object: Object) => Document`
+
+Create a document from a JSON `object`.
+
 ### `Document.isDocument`
 `Document.isDocument(maybeDocument: Any) => Boolean`
 
@@ -71,3 +79,11 @@ Returns a boolean if the passed in argument is a `Document`.
 ## Node Methods
 
 Documents implement the [`Node`](./node.md) interface. For information about all of the node methods, see the [`Node` reference](./node.md).
+
+
+## Instance Methods
+
+### `toJSON`
+`toJSON() => Object`
+
+Returns a JSON representation of the document.

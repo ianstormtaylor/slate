@@ -15,7 +15,10 @@ Characters are how Slate associates [`Marks`](./mark.md) with a range of text, f
 - [Static Methods](#static-methods)
   - [`Character.create`](#charactercreate)
   - [`Character.createList`](#charactercreatelist)
+  - [`Character.fromJSON`](#characterfromjson)
   - [`Character.isCharacter`](#characterischaracter)
+- [Instance Methods](#instance-methods)
+  - [`toJSON`](#tojson)
 
 
 ## Properties
@@ -50,7 +53,20 @@ Create a character from a plain Javascript object of `properties`.
 
 Create a list of characters from a plain Javascript `array`.
 
+### `Character.fromJSON`
+`Character.fromJSON(object: Object) => Character`
+
+Create a character from a JSON `object`.
+
 ### `Character.isCharacter`
 `Character.isCharacter(maybeCharacter: Any) => Boolean`
 
 Returns a boolean if the passed in argument is a `Character`.
+
+
+## Instance Methods
+
+### `toJSON`
+`toJSON() => Object`
+
+Returns a JSON representation of the character.

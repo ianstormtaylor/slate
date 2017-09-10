@@ -40,7 +40,6 @@
 
 - [Html](./reference/serializers/html.md)
 - [Plain](./reference/serializers/plain.md)
-- [Raw](./reference/serializers/raw.md)
 
 
 ## Plugin Reference

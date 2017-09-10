@@ -5,9 +5,7 @@
 
 # Saving and Loading HTML Content
 
-In the previous guide, we looked at how to serialize the Slate editor's content and save it for later. But we only covered the [`Plain`](../reference/serializers/plain.md) and [`Raw`](../reference/serializers/raw.md) serialization techniques.
-
-What if you want to save the content as HTML? It's a slightly more involved process, but this guide will show you how to do it.
+In the previous guide, we looked at how to serialize the Slate editor's content and save it for later. What if you want to save the content as HTML? It's a slightly more involved process, but this guide will show you how to do it.
 
 Let's start with a basic editor:
 
@@ -65,8 +63,6 @@ const rules = [
   }
 ]
 ```
-
-If you've worked with the [`Raw`](../reference/serializers/raw.md) serializer before, the return value of the `deserialize` should look familiar! It's just the same raw JSON format.
 
 The `el` argument that the `deserialize` function receives is just a DOM element. And the `next` argument is a function that will deserialize any element(s) we pass it, which is how you recurse through each node's children.
 

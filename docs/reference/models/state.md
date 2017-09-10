@@ -37,9 +37,11 @@ For convenience, in addition to changes, many of the [`Selection`](./selection.m
   - [`isEmpty`](#isEmpty)
 - [Static Methods](#static-methods)
   - [`State.create`](#statecreate)
+  - [`State.fromJSON`](#statefromjson)
   - [`State.isState`](#stateisstate)
-- [Methods](#methods)
+- [Instance Methods](#instance-methods)
   - [`change`](#change)
+  - [`toJSON`](#tojson)
 
 
 ## Properties
@@ -178,15 +180,25 @@ Whether the current selection is empty.
 
 Create a new `State` instance with `properties`.
 
+### `State.fromJSON`
+`State.fromJSON(object: Object) => State`
+
+Create a state from a JSON `object`.
+
 ### `State.isState`
 `State.isState(maybeState: Any) => Boolean`
 
 Returns a boolean if the passed in argument is a `State`.
 
 
-## Methods
+## Instance Methods
 
 ### `change`
 `change() => Change`
 
 Create a new [`Change`](./change.md) that acts on the current state.
+
+### `toJSON`
+`toJSON() => Object`
+
+Returns a JSON representation of the state.

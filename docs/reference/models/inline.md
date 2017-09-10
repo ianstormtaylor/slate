@@ -21,8 +21,11 @@ Inline nodes may contain nested inline nodes and text nodes—just like in the D
 - [Static Methods](#static-methods)
   - [`Inline.create`](#inlinecreate)
   - [`Inline.createList`](#inlinecreatelist)
+  - [`Inline.fromJSON`](#inlinefromjson)
   - [`Inline.isInline`](#inlineisinline)
 - [Node Methods](#node-methods)
+- [Instance Methods](#instance-methods)
+  - [`toJSON`](#tojson)
 
 
 ## Properties
@@ -90,6 +93,11 @@ Create a block from a plain Javascript object of `properties`.
 
 Create a list of inline nodes from a plain Javascript `array`.
 
+### `Inline.fromJSON`
+`Inline.fromJSON(object: Object) => Inline`
+
+Create an inline from a JSON `object`.
+
 ### `Inline.isInline`
 `Inline.isInline(maybeInline: Any) => Boolean`
 
@@ -99,3 +107,11 @@ Returns a boolean if the passed in argument is a `Inline`.
 ## Node Methods
 
 Inlines implement the [`Node`](./node.md) interface. For information about all of the node methods, see the [`Node` reference](./node.md).
+
+
+## Instance Methods
+
+### `toJSON`
+`toJSON() => Object`
+
+Returns a JSON representation of the inline.

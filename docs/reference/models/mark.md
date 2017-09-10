@@ -5,7 +5,7 @@
 import { Mark } from 'slate'
 ```
 
-A formatting mark that can be associated with [`Characters`](./character.md). Marks are how Slate represents rich formatting like **bold** or _italic_.
+A formatting mark that can be associated with [`Characters`](./mark.md). Marks are how Slate represents rich formatting like **bold** or _italic_.
 
 - [Properties](#properties)
   - [`data`](#data)
@@ -13,7 +13,10 @@ A formatting mark that can be associated with [`Characters`](./character.md). Ma
 - [Static Methods](#static-methods)
   - [`Mark.create`](#markcreate)
   - [`Mark.createSet`](#markcreateset)
+  - [`Mark.fromJSON`](#markfromjson)
   - [`Mark.isMark`](#markismark)
+- [Instance Methods](#instance-methods)
+  - [`toJSON`](#tojson)
 
 
 ## Properties
@@ -48,7 +51,20 @@ Create a mark from a plain Javascript object of `properties`.
 
 Create a set of marks from a plain Javascript `array`.
 
+### `Mark.fromJSON`
+`Mark.fromJSON(object: Object) => Mark`
+
+Create a mark from a JSON `object`.
+
 ### `Mark.isMark`
 `Mark.isMark(maybeMark: Any) => Boolean`
 
 Returns a boolean if the passed in argument is a `Mark`.
+
+
+## Instance Methods
+
+### `toJSON`
+`toJSON() => Object`
+
+Returns a JSON representation of the mark.
