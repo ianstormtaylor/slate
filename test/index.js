@@ -16,6 +16,7 @@ import './schemas'
 import './plugins'
 import './rendering'
 import './changes'
+import './history'
 
 /**
  * Reset Slate's internal state before each text.
