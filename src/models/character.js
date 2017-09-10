@@ -80,7 +80,7 @@ class Character extends Record(DEFAULTS) {
     } = object
 
     if (typeof text != 'string') {
-      throw new Error('`Character.fromJS` requires a block `text` string.')
+      throw new Error('`Character.fromJSON` requires a block `text` string.')
     }
 
     const character = new Character({
@@ -92,10 +92,7 @@ class Character extends Record(DEFAULTS) {
   }
 
   /**
-   * Create a `Character` from a Javascript `object`.
-   *
-   * @param {Object} object
-   * @return {Character}
+   * Alias `fromJS`.
    */
 
   static fromJS = Character.fromJSON
@@ -158,9 +155,7 @@ class Character extends Record(DEFAULTS) {
   }
 
   /**
-   * Return a Javascript representation of the character.
-   *
-   * @return {Object}
+   * Alias `toJS`.
    */
 
   toJS() {

@@ -83,13 +83,13 @@ class Selection extends Record(DEFAULTS) {
   }
 
   /**
-   * Create a `Selection` from an `object`.
+   * Create a `Selection` from a JSON `object`.
    *
    * @param {Object} object
    * @return {Selection}
    */
 
-  static fromJS(object) {
+  static fromJSON(object) {
     const {
       anchorKey = null,
       anchorOffset = 0,
@@ -114,15 +114,10 @@ class Selection extends Record(DEFAULTS) {
   }
 
   /**
-   * Create a `Selection` from JSON.
-   *
-   * @param {Object} json
-   * @return {Selection}
+   * Alias `fromJS`.
    */
 
-  static fromJSON(json) {
-    return Selection.fromJS(json)
-  }
+  static fromJS = Selection.fromJSON
 
   /**
    * Check if a `value` is a `Selection`.
@@ -741,9 +736,7 @@ class Selection extends Record(DEFAULTS) {
   }
 
   /**
-   * Return a Javascript representation of the selection.
-   *
-   * @return {Object}
+   * Alias `toJS`.
    */
 
   toJS() {

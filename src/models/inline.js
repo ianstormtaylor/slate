@@ -77,13 +77,13 @@ class Inline extends Record(DEFAULTS) {
   }
 
   /**
-   * Create a `Inline` from an `object`.
+   * Create a `Inline` from a JSON `object`.
    *
    * @param {Object|Inline} object
    * @return {Inline}
    */
 
-  static fromJS(object) {
+  static fromJSON(object) {
     if (Inline.isInline(object)) {
       return object
     }
@@ -112,22 +112,17 @@ class Inline extends Record(DEFAULTS) {
       type,
       isVoid: !!isVoid,
       data: new Map(data),
-      nodes: new List(nodes.map(Node.fromJS)),
+      nodes: new List(nodes.map(Node.fromJSON)),
     })
 
     return inline
   }
 
   /**
-   * Create a `Inline` from JSON.
-   *
-   * @param {Object} json
-   * @return {Inline}
+   * Alias `fromJS`.
    */
 
-  static fromJSON(json) {
-    return Inline.fromJS(json)
-  }
+  static fromJS = Inline.fromJSON
 
   /**
    * Check if a `value` is a `Inline`.
@@ -206,10 +201,7 @@ class Inline extends Record(DEFAULTS) {
   }
 
   /**
-   * Return a Javascript representation of the inline.
-   *
-   * @param {Object} options
-   * @return {Object}
+   * Alias `toJS`.
    */
 
   toJS(options) {

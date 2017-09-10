@@ -52,13 +52,13 @@ class History extends Record(DEFAULTS) {
   }
 
   /**
-   * Create a `History` from an `object`.
+   * Create a `History` from a JSON `object`.
    *
    * @param {Object} object
    * @return {History}
    */
 
-  static fromJS(object) {
+  static fromJSON(object) {
     const {
       redos = [],
       undos = [],
@@ -73,15 +73,10 @@ class History extends Record(DEFAULTS) {
   }
 
   /**
-   * Create a `History` from JSON.
-   *
-   * @param {Object} json
-   * @return {History}
+   * Alias `fromJS`.
    */
 
-  static fromJSON(json) {
-    return History.fromJS(json)
-  }
+  static fromJS = History.fromJSON
 
   /**
    * Check if a `value` is a `History`.
@@ -175,9 +170,7 @@ class History extends Record(DEFAULTS) {
   }
 
   /**
-   * Return a Javascript representation of the history.
-   *
-   * @return {Object}
+   * Alias `toJS`.
    */
 
   toJS() {

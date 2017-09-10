@@ -64,13 +64,13 @@ class Range extends Record(DEFAULTS) {
   }
 
   /**
-   * Create a `Range` from an `object`.
+   * Create a `Range` from a JSON `object`.
    *
    * @param {Object} object
    * @return {Range}
    */
 
-  static fromJS(object) {
+  static fromJSON(object) {
     const {
       text = '',
       marks = [],
@@ -78,22 +78,17 @@ class Range extends Record(DEFAULTS) {
 
     const range = new Range({
       text,
-      marks: new Set(marks.map(Mark.fromJS)),
+      marks: new Set(marks.map(Mark.fromJSON)),
     })
 
     return range
   }
 
   /**
-   * Create a `Range` from JSON.
-   *
-   * @param {Object} json
-   * @return {Range}
+   * Alias `fromJS`.
    */
 
-  static fromJSON(json) {
-    return Range.fromJS(json)
-  }
+  static fromJS = Range.fromJSON
 
   /**
    * Check if a `value` is a `Range`.
@@ -164,9 +159,7 @@ class Range extends Record(DEFAULTS) {
   }
 
   /**
-   * Return a Javascript representation of the range.
-   *
-   * @return {Object}
+   * Alias `toJS`.
    */
 
   toJS() {

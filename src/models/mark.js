@@ -97,13 +97,13 @@ class Mark extends Record(DEFAULTS) {
   }
 
   /**
-   * Create a `Mark` from an `object`.
+   * Create a `Mark` from a JSON `object`.
    *
    * @param {Object} object
    * @return {Mark}
    */
 
-  static fromJS(object) {
+  static fromJSON(object) {
     const {
       data = {},
       type,
@@ -122,15 +122,10 @@ class Mark extends Record(DEFAULTS) {
   }
 
   /**
-   * Create a `Mark` from JSON.
-   *
-   * @param {Object} json
-   * @return {Mark}
+   * Alias `fromJS`.
    */
 
-  static fromJSON(json) {
-    return Mark.fromJS(json)
-  }
+  static fromJS = Mark.fromJSON
 
   /**
    * Check if a `value` is a `Mark`.
@@ -190,9 +185,7 @@ class Mark extends Record(DEFAULTS) {
   }
 
   /**
-   * Return a Javascript representation of the mark.
-   *
-   * @return {Object}
+   * Alias `toJS`.
    */
 
   toJS() {

@@ -52,7 +52,7 @@ class State extends Record(DEFAULTS) {
   }
 
   /**
-   * Create a `State` from an `object`.
+   * Create a `State` from a JSON `object`.
    *
    * @param {Object} object
    * @param {Object} options
@@ -61,7 +61,7 @@ class State extends Record(DEFAULTS) {
    * @return {State}
    */
 
-  static fromJS(object, options = {}) {
+  static fromJSON(object, options = {}) {
     let {
       document = {},
       selection = {},
@@ -69,8 +69,8 @@ class State extends Record(DEFAULTS) {
 
     let data = new Map()
 
-    document = Document.fromJS(document)
-    selection = Selection.fromJS(selection)
+    document = Document.fromJSON(document)
+    selection = Selection.fromJSON(selection)
 
     // Allow plugins to set a default value for `data`.
     if (options.plugins) {
@@ -107,15 +107,10 @@ class State extends Record(DEFAULTS) {
   }
 
   /**
-   * Create a `State` from JSON.
-   *
-   * @param {Object} json
-   * @return {State}
+   * Alias `fromJS`.
    */
 
-  static fromJSON(json) {
-    return State.fromJS(json)
-  }
+  static fromJS = State.fromJSON
 
   /**
    * Check if a `value` is a `State`.
@@ -608,10 +603,7 @@ class State extends Record(DEFAULTS) {
   }
 
   /**
-   * Return a Javascript representation of the state.
-   *
-   * @param {Object} options
-   * @return {Object}
+   * Alias `toJS`.
    */
 
   toJS(options) {

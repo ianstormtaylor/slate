@@ -60,13 +60,13 @@ class Document extends Record(DEFAULTS) {
   }
 
   /**
-   * Create a `Document` from an `object`.
+   * Create a `Document` from a JSON `object`.
    *
    * @param {Object|Document} object
    * @return {Document}
    */
 
-  static fromJS(object) {
+  static fromJSON(object) {
     if (Document.isDocument(object)) {
       return object
     }
@@ -80,22 +80,17 @@ class Document extends Record(DEFAULTS) {
     const document = new Document({
       key,
       data: new Map(data),
-      nodes: new List(nodes.map(Node.fromJS)),
+      nodes: new List(nodes.map(Node.fromJSON)),
     })
 
     return document
   }
 
   /**
-   * Create a `Document` from JSON.
-   *
-   * @param {Object} json
-   * @return {Document}
+   * Alias `fromJS`.
    */
 
-  static fromJSON(json) {
-    return Document.fromJS(json)
-  }
+  static fromJS = Document.fromJSON
 
   /**
    * Check if a `value` is a `Document`.
@@ -161,10 +156,7 @@ class Document extends Record(DEFAULTS) {
   }
 
   /**
-   * Return a Javascript representation of the document.
-   *
-   * @param {Object} options
-   * @return {Object}
+   * Alias `toJS`.
    */
 
   toJS(options) {

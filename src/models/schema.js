@@ -57,28 +57,23 @@ class Schema extends Record(DEFAULTS) {
   }
 
   /**
-   * Create a `Schema` from an `object`.
+   * Create a `Schema` from a JSON `object`.
    *
    * @param {Object} object
    * @return {Schema}
    */
 
-  static fromJS(object) {
+  static fromJSON(object) {
     object = normalizeProperties(object)
     const schema = new Schema(object)
     return schema
   }
 
   /**
-   * Create a `Schema` from JSON.
-   *
-   * @param {Object} json
-   * @return {Schema}
+   * Alias `fromJS`.
    */
 
-  static fromJSON(json) {
-    return Schema.fromJS(json)
-  }
+  static fromJS = Schema.fromJSON
 
   /**
    * Get the kind.

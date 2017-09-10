@@ -54,7 +54,7 @@ class Block extends Record(DEFAULTS) {
     }
 
     if (isPlainObject(value)) {
-      return Block.fromJS(value)
+      return Block.fromJSON(value)
     }
 
     throw new Error(`\`Block.create\` only accepts objects, strings or blocks, but you passed it: ${value}`)
@@ -100,7 +100,7 @@ class Block extends Record(DEFAULTS) {
     } = object
 
     if (typeof type != 'string') {
-      throw new Error('`Block.fromJS` requires a `type` string.')
+      throw new Error('`Block.fromJSON` requires a `type` string.')
     }
 
     if (nodes.length == 0) {
@@ -112,17 +112,14 @@ class Block extends Record(DEFAULTS) {
       type,
       isVoid: !!isVoid,
       data: new Map(data),
-      nodes: new List(nodes.map(Node.fromJS)),
+      nodes: new List(nodes.map(Node.fromJSON)),
     })
 
     return block
   }
 
   /**
-   * Create a `Block` from a Javascript `object`.
-   *
-   * @param {Object} object
-   * @return {Block}
+   * Alias `fromJS`.
    */
 
   static fromJS = Block.fromJSON
@@ -204,10 +201,7 @@ class Block extends Record(DEFAULTS) {
   }
 
   /**
-   * Return a Javascript representation of the block.
-   *
-   * @param {Object} options
-   * @return {Object}
+   * Alias `toJS`.
    */
 
   toJS(options) {

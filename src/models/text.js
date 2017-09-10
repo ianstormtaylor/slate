@@ -72,13 +72,13 @@ class Text extends Record(DEFAULTS) {
   }
 
   /**
-   * Create a `Text` from an `object`.
+   * Create a `Text` from a JSON `object`.
    *
    * @param {Object|Text} object
    * @return {Text}
    */
 
-  static fromJS(object) {
+  static fromJSON(object) {
     if (Text.isText(object)) {
       return object
     }
@@ -94,7 +94,7 @@ class Text extends Record(DEFAULTS) {
     }
 
     const characters = ranges
-      .map(Range.fromJS)
+      .map(Range.fromJSON)
       .reduce((l, r) => l.concat(r.getCharacters()), new List())
 
     const node = new Text({
@@ -106,15 +106,10 @@ class Text extends Record(DEFAULTS) {
   }
 
   /**
-   * Create a `Text` from JSON.
-   *
-   * @param {Object} json
-   * @return {Text}
+   * Alias `fromJS`.
    */
 
-  static fromJSON(json) {
-    return Text.fromJS(json)
-  }
+  static fromJS = Text.fromJSON
 
   /**
    * Check if a `value` is a `Text`.
@@ -451,10 +446,7 @@ class Text extends Record(DEFAULTS) {
   }
 
   /**
-   * Return a Javascript representation of the text.
-   *
-   * @param {Object} options
-   * @return {Object}
+   * Alias `toJS`.
    */
 
   toJS(options) {
