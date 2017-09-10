@@ -1,12 +1,5 @@
 
 /**
- * Components.
- */
-
-import Editor from './components/editor'
-import Placeholder from './components/placeholder'
-
-/**
  * Models.
  */
 
@@ -32,14 +25,6 @@ import Range from './models/range'
 import Operations from './operations'
 
 /**
- * Serializers.
- */
-
-import Html from './serializers/html'
-import Plain from './serializers/plain'
-import Raw from './serializers/raw'
-
-/**
  * Changes.
  */
 
@@ -49,7 +34,6 @@ import Changes from './changes'
  * Utils.
  */
 
-import findDOMNode from './utils/find-dom-node'
 import { resetKeyGenerator, setKeyGenerator } from './utils/generate-key'
 
 /**
@@ -63,26 +47,20 @@ export {
   Character,
   Data,
   Document,
-  Editor,
   History,
-  Html,
   Inline,
   Mark,
   Node,
   Operations,
-  Placeholder,
-  Plain,
   Range,
-  Raw,
   Schema,
   Selection,
   Stack,
   State,
   Text,
   Changes,
-  findDOMNode,
   resetKeyGenerator,
-  setKeyGenerator
+  setKeyGenerator,
 }
 
 export default {
@@ -90,24 +68,18 @@ export default {
   Character,
   Data,
   Document,
-  Editor,
   History,
-  Html,
   Inline,
   Mark,
   Node,
   Operations,
-  Placeholder,
-  Plain,
   Range,
-  Raw,
   Schema,
   Selection,
   Stack,
   State,
   Text,
   Changes,
-  findDOMNode,
   resetKeyGenerator,
-  setKeyGenerator
+  setKeyGenerator,
 }
