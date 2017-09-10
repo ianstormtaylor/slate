@@ -20,7 +20,6 @@ const DEFAULTS = {
   selection: Selection.create(),
   history: History.create(),
   data: new Map(),
-  isNative: false,
 }
 
 /**

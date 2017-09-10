@@ -45,7 +45,6 @@ class Change {
     this.state = state
     this.operations = []
     this.flags = pick(attrs, ['merge', 'save'])
-    this.setIsNative(attrs.isNative === undefined ? false : attrs.isNative)
   }
 
   /**

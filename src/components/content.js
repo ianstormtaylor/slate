@@ -92,33 +92,6 @@ class Content extends React.Component {
   }
 
   /**
-   * Should the component update?
-   *
-   * @param {Object} props
-   * @param {Object} state
-   * @return {Boolean}
-   */
-
-  shouldComponentUpdate = (props, state) => {
-    // If the readOnly state has changed, we need to re-render so that
-    // the cursor will be added or removed again.
-    if (props.readOnly != this.props.readOnly) return true
-
-    // If the state has been changed natively, never re-render, or else we'll
-    // end up duplicating content.
-    if (props.state.isNative) return false
-
-    return (
-      props.className != this.props.className ||
-      props.schema != this.props.schema ||
-      props.autoCorrect != this.props.autoCorrect ||
-      props.spellCheck != this.props.spellCheck ||
-      props.state != this.props.state ||
-      props.style != this.props.style
-    )
-  }
-
-  /**
    * When the editor first mounts in the DOM we need to:
    *
    *   - Update the selection, in case it starts focused.
@@ -722,7 +695,6 @@ class Content extends React.Component {
     // If there are no ranges, the editor was blurred natively.
     if (!native.rangeCount) {
       data.selection = selection.set('isFocused', false)
-      data.isNative = true
     }
 
     // Otherwise, determine the Slate selection from the native one.

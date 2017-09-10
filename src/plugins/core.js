@@ -1,7 +1,6 @@
 
 import Base64 from '../serializers/base-64'
 import Block from '../models/block'
-import Character from '../models/character'
 import Content from '../components/content'
 import Debug from 'debug'
 import Inline from '../models/inline'
@@ -50,10 +49,6 @@ function Plugin(options = {}) {
     const schema = editor.getSchema()
     const prevState = editor.getState()
 
-    // PERF: Skip normalizing if the change is native, since we know that it
-    // can't have changed anything that requires a core schema fix.
-    if (state.isNative) return
-
     // PERF: Skip normalizing if the document hasn't changed, since the core
     // schema only normalizes changes to the document, not selection.
     if (prevState && state.document == prevState.document) return
@@ -63,8 +58,7 @@ function Plugin(options = {}) {
   }
 
   /**
-   * On before input, see if we can let the browser continue with it's native
-   * input behavior, to avoid a re-render for performance.
+   * On before input, correct any browser inconsistencies.
    *
    * @param {Event} e
    * @param {Object} data
@@ -73,110 +67,39 @@ function Plugin(options = {}) {
    */
 
   function onBeforeInput(e, data, change, editor) {
+    debug('onBeforeInput', { data })
+    e.preventDefault()
+
     const { state } = change
-    const { document, startKey, startBlock, startOffset, startInline, startText } = state
-    const pText = startBlock.getPreviousText(startKey)
-    const pInline = pText && startBlock.getClosestInline(pText.key)
-    const nText = startBlock.getNextText(startKey)
-    const nInline = nText && startBlock.getClosestInline(nText.key)
+    const { selection } = state
+    const { anchorKey, anchorOffset, focusKey, focusOffset } = selection
 
-    // Determine what the characters would be if natively inserted.
-    const schema = editor.getSchema()
-    const decorators = document.getDescendantDecorators(startKey, schema)
-    const initialChars = startText.getDecorations(decorators)
-    const prevChar = startOffset === 0 ? null : initialChars.get(startOffset - 1)
-    const nextChar = startOffset === initialChars.size ? null : initialChars.get(startOffset)
-    const char = Character.create({
-      text: e.data,
-      // When cursor is at start of a range of marks, without preceding text,
-      // the native behavior is to insert inside the range of marks.
-      marks: (
-        (prevChar && prevChar.marks) ||
-        (nextChar && nextChar.marks) ||
-        []
-      )
-    })
-
-    const chars = initialChars.insert(startOffset, char)
-
-    // COMPAT: In iOS, when choosing from the predictive text suggestions, the
-    // native selection will be changed to span the existing word, so that the word
-    // is replaced. But the `select` event for this change doesn't fire until after
-    // the `beforeInput` event, even though the native selection is updated. So we
-    // need to manually adjust the selection to be in sync. (03/18/2017)
+    // COMPAT: In iOS, when using predictive text suggestions, the native
+    // selection will be changed to span the existing word, so that the word is
+    // replaced. But the `select` fires after the `beforeInput` event, even
+    // though the native selection is updated. So we need to manually check if
+    // the selection has gotten out of sync, and adjust it if so. (03/18/2017)
     const window = getWindow(e.target)
     const native = window.getSelection()
-    const { anchorNode, anchorOffset, focusNode, focusOffset } = native
-    const anchorPoint = getPoint(anchorNode, anchorOffset, state, editor)
-    const focusPoint = getPoint(focusNode, focusOffset, state, editor)
-    if (anchorPoint && focusPoint) {
-      const { selection } = state
-      if (
-        selection.anchorKey !== anchorPoint.key ||
-        selection.anchorOffset !== anchorPoint.offset ||
-        selection.focusKey !== focusPoint.key ||
-        selection.focusOffset !== focusPoint.offset
-      ) {
-        change = change
-          .select({
-            anchorKey: anchorPoint.key,
-            anchorOffset: anchorPoint.offset,
-            focusKey: focusPoint.key,
-            focusOffset: focusPoint.offset
-          })
-      }
-    }
-
-    // Determine what the characters should be, if not natively inserted.
-    change.insertText(e.data)
-    const next = change.state
-    const nextText = next.startText
-    const nextChars = nextText.getDecorations(decorators)
-
-    // We do not have to re-render if the current selection is collapsed, the
-    // current node is not empty, there are no marks on the cursor, the cursor
-    // is not at the edge of an inline node, the cursor isn't at the starting
-    // edge of a text node after an inline node, and the natively inserted
-    // characters would be the same as the non-native.
-    const isNative = (
-      // If the selection is expanded, we don't know what the edit will look
-      // like so we can't let it happen natively.
-      (state.isCollapsed) &&
-      // If the selection has marks, then we need to render it non-natively
-      // because we need to create the new marks as well.
-      (state.selection.marks == null) &&
-      // If the text node in question has no content, browsers might do weird
-      // things so we need to insert it normally instead.
-      (state.startText.text != '') &&
-      // COMPAT: Browsers do weird things when typing at the edges of inline
-      // nodes, so we can't let them render natively. (?)
-      (!startInline || !state.selection.isAtStartOf(startInline)) &&
-      (!startInline || !state.selection.isAtEndOf(startInline)) &&
-      // COMPAT: In Chrome & Safari, it isn't possible to have a selection at
-      // the starting edge of a text node after another inline node. It will
-      // have been automatically changed. So we can't render natively because
-      // the cursor isn't technically in the right spot. (2016/12/01)
-      (!(pInline && !pInline.isVoid && startOffset == 0)) &&
-      (!(nInline && !nInline.isVoid && startOffset == startText.text.length)) &&
-      // COMPAT: When inserting a Space character, Chrome will sometimes
-      // split the text node into two adjacent text nodes. See:
-      // https://github.com/ianstormtaylor/slate/issues/938
-      (!(e.data === ' ' && IS_CHROME)) &&
-      // If the
-      (chars.equals(nextChars))
+    const a = getPoint(native.anchorNode, native.anchorOffset, state, editor)
+    const f = getPoint(native.focusNode, native.focusOffset, state, editor)
+    const hasMismatch = a && f && (
+      anchorKey != a.key ||
+      anchorOffset != a.offset ||
+      focusKey != f.key ||
+      focusOffset != f.offset
     )
 
-    // If `isNative`, set the flag on the change.
-    if (isNative) {
-      change.setIsNative(true)
+    if (hasMismatch) {
+      change.select({
+        anchorKey: a.key,
+        anchorOffset: a.offset,
+        focusKey: f.key,
+        focusOffset: f.offset
+      })
     }
 
-    // Otherwise, prevent default so that the DOM remains untouched.
-    else {
-      e.preventDefault()
-    }
-
-    debug('onBeforeInput', { data, isNative })
+    change.insertText(e.data)
   }
 
   /**

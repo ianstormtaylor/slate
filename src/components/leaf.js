@@ -1,12 +1,10 @@
 
 import Debug from 'debug'
 import React from 'react'
-import ReactDOM from 'react-dom'
 import Types from 'prop-types'
 
 import OffsetKey from '../utils/offset-key'
 import SlateTypes from '../utils/prop-types'
-import findDeepestNode from '../utils/find-deepest-node'
 import { IS_FIREFOX } from '../constants/environment'
 
 /**
@@ -46,18 +44,6 @@ class Leaf extends React.Component {
   }
 
   /**
-   * Constructor.
-   *
-   * @param {Object} props
-   */
-
-  constructor(props) {
-    super(props)
-    this.tmp = {}
-    this.tmp.renders = 0
-  }
-
-  /**
    * Debug.
    *
    * @param {String} message
@@ -86,12 +72,6 @@ class Leaf extends React.Component {
       return true
     }
 
-    // If the DOM text does not equal the `text` property, re-render, this can
-    // happen because React gets out of sync when previously natively rendered.
-    const el = findDeepestNode(ReactDOM.findDOMNode(this))
-    const text = this.renderText(props)
-    if (el.textContent != text) return true
-
     // Otherwise, don't update.
     return false
   }
@@ -110,16 +90,10 @@ class Leaf extends React.Component {
       index
     })
 
-    // Increment the renders key, which forces a re-render whenever this
-    // component is told it should update. This is required because "native"
-    // renders where we don't update the leaves cause React's internal state to
-    // get out of sync, causing it to not realize the DOM needs updating.
-    this.tmp.renders++
-
     this.debug('render', { props })
 
     return (
-      <span key={this.tmp.renders} data-offset-key={offsetKey}>
+      <span data-offset-key={offsetKey}>
         {this.renderMarks(props)}
       </span>
     )
