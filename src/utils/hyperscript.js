@@ -112,10 +112,9 @@ const CREATORS = {
   },
 
   text(tagName, attributes, children) {
-    return Text.create({
-      ...attributes,
-      ranges: [{ text: children }],
-    })
+    debugger
+    const nodes = createChildren(children, { key: attributes.key })
+    return nodes
   },
 
 }
@@ -168,7 +167,13 @@ function createHyperscript(options = {}) {
 function createChildren(children, options = {}) {
   const array = []
   let length = 0
-  let node = Text.create()
+  let node = Text.create({ key: options.key })
+
+  // Use the first text child instead if it is one, to preserve keys.
+  if (Text.isText(children[0])) {
+    node = children[0]
+    children = children.slice(1)
+  }
 
   // Create a helper to update the current node while preserving any stored
   // anchor or focus information.

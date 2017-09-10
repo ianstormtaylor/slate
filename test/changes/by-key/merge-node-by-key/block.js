@@ -3,14 +3,17 @@
 import h from '../../../helpers/h'
 
 export default function (change) {
-  change.insertTextByKey('a', 0, 'a')
+  change.mergeNodeByKey('a')
 }
 
 export const input = (
   <state>
     <document>
       <paragraph>
-        <text key="a">wo<cursor />rd</text>
+        one
+      </paragraph>
+      <paragraph key="a">
+        two
       </paragraph>
     </document>
   </state>
@@ -20,7 +23,7 @@ export const output = (
   <state>
     <document>
       <paragraph>
-        awo<cursor />rd
+        onetwo
       </paragraph>
     </document>
   </state>

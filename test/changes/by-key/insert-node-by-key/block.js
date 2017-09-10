@@ -1,21 +1,18 @@
 /** @jsx h */
 
 import h from '../../../helpers/h'
-
 import { Block } from '../../../..'
 
 export default function (change) {
-
-  return state
-    .change()
-    .insertNodeByKey(document.key, 0, Block.create({ type: 'paragraph' }))
+  change.insertNodeByKey('a', 0, Block.create('paragraph'))
 }
 
 export const input = (
   <state>
-    <document>
-      <paragraph>one</paragraph>
-      <paragraph>two</paragraph>
+    <document key="a">
+      <paragraph>
+        one
+      </paragraph>
     </document>
   </state>
 )
@@ -23,9 +20,10 @@ export const input = (
 export const output = (
   <state>
     <document>
-      <paragraph></paragraph>
-      <paragraph>one</paragraph>
-      <paragraph>two</paragraph>
+      <paragraph />
+      <paragraph>
+        one
+      </paragraph>
     </document>
   </state>
 )

@@ -88,6 +88,7 @@ class Text extends Record(DEFAULTS) {
       key = generateKey(),
     } = object
 
+    // TODO: remove this! too leaky
     if (object.text) {
       ranges = [{ text: object.text }]
     }

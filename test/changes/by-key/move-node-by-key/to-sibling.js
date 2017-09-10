@@ -3,21 +3,20 @@
 import h from '../../../helpers/h'
 
 export default function (change) {
-  const first = document.getBlocks().first()
-  const container = document.nodes.last()
-
-  return state
-    .change()
-    .moveNodeByKey(first.key, container.key, 1)
+  change.moveNodeByKey('a', 'b', 1)
 }
 
 export const input = (
   <state>
     <document>
-      <paragraph>one</paragraph>
-      <container>
-        <paragraph>two</paragraph>
-      </container>
+      <paragraph key="a">
+        one
+      </paragraph>
+      <quote key="b">
+        <paragraph>
+          two
+        </paragraph>
+      </quote>
     </document>
   </state>
 )
@@ -25,10 +24,14 @@ export const input = (
 export const output = (
   <state>
     <document>
-      <container>
-        <paragraph>two</paragraph>
-        <paragraph>one</paragraph>
-      </container>
+      <quote>
+        <paragraph>
+          two
+        </paragraph>
+        <paragraph>
+          one
+        </paragraph>
+      </quote>
     </document>
   </state>
 )
