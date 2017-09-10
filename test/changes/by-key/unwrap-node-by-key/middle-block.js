@@ -3,20 +3,21 @@
 import h from '../../../helpers/h'
 
 export default function (change) {
-  change.unwrapBlockByKey('a', 'quote')
+  change.unwrapNodeByKey('a')
 }
 
 export const input = (
   <state>
     <document>
       <quote>
-        <paragraph key="a">
-          word
-        </paragraph>
-      </quote>
-      <quote>
         <paragraph>
-          word
+          one
+        </paragraph>
+        <paragraph key="a">
+          two
+        </paragraph>
+        <paragraph>
+          three
         </paragraph>
       </quote>
     </document>
@@ -26,12 +27,17 @@ export const input = (
 export const output = (
   <state>
     <document>
+      <quote>
+        <paragraph>
+          one
+        </paragraph>
+      </quote>
       <paragraph>
-        word
+        two
       </paragraph>
       <quote>
         <paragraph>
-          word
+          three
         </paragraph>
       </quote>
     </document>

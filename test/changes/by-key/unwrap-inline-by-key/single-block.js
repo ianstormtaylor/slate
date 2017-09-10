@@ -3,18 +3,14 @@
 import h from '../../../helpers/h'
 
 export default function (change) {
-  const inline = document.assertPath([0, 1])
-
-  change
-    .unwrapInlineByKey(inline.key, 'hashtag')
+  change.unwrapInlineByKey('a', 'link')
 }
 
 export const input = (
   <state>
     <document>
-      <paragraph>w
-        <hashtag>or</hashtag>d
-        <hashtag>another</hashtag>
+      <paragraph>
+        w<link key="a">or</link>d<link>another</link>
       </paragraph>
     </document>
   </state>
@@ -23,8 +19,8 @@ export const input = (
 export const output = (
   <state>
     <document>
-      <paragraph>word
-        <hashtag>another</hashtag>
+      <paragraph>
+        word<link>another</link>
       </paragraph>
     </document>
   </state>

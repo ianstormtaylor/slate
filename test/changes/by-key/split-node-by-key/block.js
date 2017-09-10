@@ -3,14 +3,15 @@
 import h from '../../../helpers/h'
 
 export default function (change) {
-  change
-    .splitNodeByKey('a', 0)
+  change.splitNodeByKey('a', 2)
 }
 
 export const input = (
   <state>
     <document>
-      <paragraph>word</paragraph>
+      <paragraph key="a">
+        <link>one</link><link>two</link>
+      </paragraph>
     </document>
   </state>
 )
@@ -18,8 +19,12 @@ export const input = (
 export const output = (
   <state>
     <document>
-      <paragraph></paragraph>
-      <paragraph>word</paragraph>
+      <paragraph>
+        <link>one</link>
+      </paragraph>
+      <paragraph>
+        <link>two</link>
+      </paragraph>
     </document>
   </state>
 )

@@ -3,35 +3,15 @@
 import h from '../../../helpers/h'
 
 export default function (change) {
-  const { selection } = state
-
-  const range = selection.merge({
-    anchorKey: 'b',
-    anchorOffset: 0,
-    focusKey: 'b',
-    focusOffset: 3
-  })
-
-  change
-    .select(range)
-    .splitDescendantsByKey('a', 'b', 2)
-
-
-  const second = next.document.getTexts().last()
-
-  assert.deepEqual(
-    next.selection.toJS(),
-    range.merge({
-      focusKey: second.key,
-      focusOffset: 1
-    }).toJS()
-  )
+  change.splitDescendantsByKey('a', 'b', 2)
 }
 
 export const input = (
   <state>
     <document>
-      <paragraph>word</paragraph>
+      <paragraph key="a">
+        <text key="b">w<anchor />or<focus />d</text>
+      </paragraph>
     </document>
   </state>
 )
@@ -39,8 +19,12 @@ export const input = (
 export const output = (
   <state>
     <document>
-      <paragraph>wo</paragraph>
-      <paragraph>rd</paragraph>
+      <paragraph>
+        w<anchor />o
+      </paragraph>
+      <paragraph>
+        r<focus />d
+      </paragraph>
     </document>
   </state>
 )
