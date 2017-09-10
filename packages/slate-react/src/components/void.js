@@ -7,7 +7,6 @@ import { Mark } from 'slate'
 
 import Leaf from './leaf'
 import OffsetKey from '../utils/offset-key'
-import { IS_FIREFOX } from '../constants/environment'
 
 /**
  * Debug.
@@ -141,10 +140,12 @@ class Void extends React.Component {
     const { children, node } = props
     let Tag, style
 
-    // Make the outer wrapper relative, so the spacer can overlay it.
     if (node.kind === 'block') {
       Tag = 'div'
-      style = { position: 'relative' }
+      style = {
+        display: 'inline-block',
+        verticalAlign: 'top'
+      }
     } else {
       Tag = 'span'
     }
@@ -161,7 +162,7 @@ class Void extends React.Component {
         onDrop={this.onDrop}
       >
         {this.renderSpacer()}
-        <Tag contentEditable={this.state.editable}>
+        <Tag contentEditable={this.state.editable} style={style}>
           {children}
         </Tag>
       </Tag>
@@ -182,20 +183,11 @@ class Void extends React.Component {
     let style
 
     if (node.kind == 'block') {
-      style = IS_FIREFOX
-        ? {
-          pointerEvents: 'none',
-          width: '0px',
-          height: '0px',
-          lineHeight: '0px',
-          visibility: 'hidden'
-        }
-        : {
-          position: 'absolute',
-          top: '0px',
-          left: '-9999px',
-          textIndent: '-9999px'
-        }
+      style = {
+        display: 'inline-block',
+        verticalAlign: 'top',
+        color: 'transparent'
+      }
     } else {
       style = {
         color: 'transparent'
