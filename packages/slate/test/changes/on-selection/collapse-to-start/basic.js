@@ -10,7 +10,7 @@ export const input = (
   <state>
     <document>
       <paragraph>
-        <anchor />one<focus/>
+        <anchor />one<focus />
       </paragraph>
     </document>
   </state>

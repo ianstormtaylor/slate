@@ -42,6 +42,7 @@
     "react-dom": "^15.4.2",
     "react-frame-aware-selection-plugin": "^1.0.0",
     "react-frame-component": "^1.1.1",
+    "react-portal": "^3.1.0",
     "react-router": "^2.5.1",
     "react-router-dom": "^4.1.1",
     "read-metadata": "^1.0.0",
@@ -58,6 +59,12 @@
     "watchify": "^3.7.0",
     "yaml-js": "^0.2.0"
   },
+  "peerDependencies": {
+    "slate": "*",
+    "slate-html-serializer": "*",
+    "slate-plain-serializer": "*",
+    "slate-react": "*"
+  },
   "scripts": {
     "bench": "npm-run-all build benchs",
     "benchs": "babel-node ./node_modules/.bin/_matcha --reporter ./benchmark/reporter ./benchmark/index.js > ./tmp/benchmark-comparison.json && babel-node ./benchmark/compare",
@@ -70,7 +77,7 @@
     "examples:dev": "browserify --debug --transform babelify ./examples/index.js > ./examples/build.dev.js",
     "examples:prod": "NODE_ENV=production browserify --transform babelify ./examples/index.js > ./examples/build.prod.js",
     "gh-pages": "yarn run build && yarn run examples && gh-pages --dist ./examples",
-    "lint": "eslint packages/*/src packages/*/test",
+    "lint": "eslint packages/*/src packages/*/test examples/*/*.js",
     "open": "open http://localhost:8080/dev.html",
     "release": "lerna run test && lerna publish",
     "start": "http-server ./examples",

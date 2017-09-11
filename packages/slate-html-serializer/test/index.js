@@ -1,9 +1,28 @@
 
+/**
+ * Polyfills.
+ */
+
+import 'babel-polyfill' // eslint-disable-line import/no-extraneous-dependencies
+
+/**
+ * Dependencies.
+ */
+
+import Html from '..'
 import assert from 'assert'
 import fs from 'fs'
-import parse5 from 'parse5'
-import { Html, State } from '../..'
+import parse5 from 'parse5' // eslint-disable-line import/no-extraneous-dependencies
+import { State, resetKeyGenerator } from 'slate'
 import { basename, extname, resolve } from 'path'
+
+/**
+ * Reset Slate's internal state before each text.
+ */
+
+beforeEach(() => {
+  resetKeyGenerator()
+})
 
 /**
  * Tests.

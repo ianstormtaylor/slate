@@ -5,7 +5,7 @@ import { resetKeyGenerator } from '..'
  * Polyfills.
  */
 
-import 'babel-polyfill'
+import 'babel-polyfill' // eslint-disable-line import/no-extraneous-dependencies
 
 /**
  * Tests.

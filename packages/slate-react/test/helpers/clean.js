@@ -1,4 +1,5 @@
-import parse5 from 'parse5'
+
+import parse5 from 'parse5' // eslint-disable-line import/no-extraneous-dependencies
 
 const UNWANTED_ATTRS = [
   'data-key',

@@ -1,7 +1,6 @@
 
 import assert from 'assert'
 import fs from 'fs'
-import parse5 from 'parse5'
 import { State } from '../..'
 import { basename, extname, resolve } from 'path'
 

@@ -2,8 +2,8 @@
 import Simulator from '../helpers/simulator'
 import assert from 'assert'
 import fs from 'fs'
-import toCamel from 'to-camel-case'
-import { Stack } from '../..'
+import toCamel from 'to-camel-case' // eslint-disable-line import/no-extraneous-dependencies
+import { Stack } from 'slate'
 import { basename, extname, resolve } from 'path'
 
 /**

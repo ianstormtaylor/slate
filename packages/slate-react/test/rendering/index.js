@@ -3,8 +3,8 @@ import React from 'react'
 import ReactDOM from 'react-dom/server'
 import assert from 'assert'
 import clean from '../helpers/clean'
-import fs from 'fs-promise'
-import parse5 from 'parse5'
+import fs from 'fs-promise' // eslint-disable-line import/no-extraneous-dependencies
+import parse5 from 'parse5' // eslint-disable-line import/no-extraneous-dependencies
 import { Editor } from '../..'
 import { basename, extname, resolve } from 'path'
 
