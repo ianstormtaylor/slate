@@ -48,7 +48,7 @@ function deserialize(string, options) {
  */
 
 function deserializeNode(string, options) {
-  const Node = require('../models/node')
+  const Node = require('../models/node').default
   const raw = decode(string)
   const node = Node.fromJSON(raw, options)
   return node
