@@ -17,6 +17,7 @@
     "browserify": "^13.0.1",
     "mocha": "^2.5.3",
     "slate": "^0.23.0",
+    "slate-hyperscript": "^0.0.0",
     "uglify-js": "^2.7.0"
   },
   "scripts": {

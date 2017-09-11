@@ -1,5 +1,6 @@
 {
   "private": true,
+  "name": "slate-packages",
   "workspaces": [
     "packages/*"
   ],
@@ -68,7 +69,7 @@
   "scripts": {
     "bench": "babel-node ./node_modules/.bin/_matcha --reporter ./benchmark/reporter ./benchmark/index.js > ./tmp/benchmark-comparison.json && babel-node ./benchmark/compare",
     "bench:save": "babel-node ./node_modules/.bin/_matcha --reporter ./benchmark/reporter ./benchmark/index.js > ./tmp/benchmark-baseline.json",
-    "bootstrap": "lerna bootstrap",
+    "bootstrap": "lerna bootstrap && yarn run build",
     "build": "yarn run build:packages",
     "build:examples": "yarn run build:examples:dev && yarn run build:examples:prod",
     "build:examples:dev": "browserify --debug --transform babelify ./examples/index.js > ./examples/build.dev.js",

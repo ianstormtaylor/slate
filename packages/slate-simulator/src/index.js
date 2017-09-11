@@ -1,4 +1,6 @@
 
+import { Stack } from 'slate'
+
 /**
  * Event handlers that can be simulated.
  *
@@ -18,17 +20,6 @@ const EVENT_HANDLERS = [
 ]
 
 /**
- * Change handlers that can be simulated.
- *
- * @type {Array}
- */
-
-const CHANGE_HANDLERS = [
-  'onBeforeChange',
-  'onChange'
-]
-
-/**
  * Simulator.
  *
  * @type {Simulator}
@@ -37,12 +28,13 @@ const CHANGE_HANDLERS = [
 class Simulator {
 
   /**
-   * Create a new `Simulator` for a `stack`.
+   * Create a new `Simulator` with `plugins` and an initial `state`.
    *
    * @param {Object} attrs
    */
 
-  constructor({ stack, state }) {
+  constructor({ plugins, state }) {
+    const stack = new Stack({ plugins })
     this.stack = stack
     this.state = state
   }
@@ -67,21 +59,6 @@ EVENT_HANDLERS.forEach((handler) => {
     stack.onChange(change, editor)
 
     this.state = change.state
-  }
-})
-
-/**
- * Generate the change simulators.
- */
-
-CHANGE_HANDLERS.forEach((handler) => {
-  const method = getMethodName(handler)
-
-  Simulator.prototype[method] = function () {
-    throw new Error('Unimplemented!')
-    // const editor = createEditor(stack, state)
-    // const next = stack[handler](state, editor)
-    // return next
   }
 })
 

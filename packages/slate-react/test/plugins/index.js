@@ -1,10 +1,9 @@
 
 import CorePlugin from '../../src/plugins/core'
-import Simulator from '../helpers/simulator'
+import Simulator from 'slate-simulator'
 import assert from 'assert'
 import fs from 'fs'
 import toCamel from 'to-camel-case' // eslint-disable-line import/no-extraneous-dependencies
-import { Stack } from 'slate'
 import { basename, extname, resolve } from 'path'
 
 /**
@@ -27,8 +26,7 @@ describe('plugins', () => {
             const { input, output, props = {}} = module
             const fn = module.default
             const plugins = [CorePlugin(props)]
-            const stack = Stack.create({ plugins })
-            const simulator = new Simulator({ stack, state: input })
+            const simulator = new Simulator({ plugins, state: input })
             fn(simulator)
 
             const actual = simulator.state.toJSON({ preserveSelection: true })
