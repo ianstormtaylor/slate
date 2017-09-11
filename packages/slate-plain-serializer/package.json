@@ -21,15 +21,11 @@
     "uglify-js": "^2.7.0"
   },
   "scripts": {
-    "build": "mkdir -p ./dist && yarn run build:lib && yarn run build:max && yarn run build:min",
-    "build:lib": "babel --out-dir ./lib ./src",
-    "build:max": "NODE_ENV=production browserify ./src/index.js --transform babelify --transform envify --transform [ browserify-global-shim --global ] --standalone SlatePlainSerializer > ./dist/slate-plain-serializer.js",
-    "build:min": "NODE_ENV=production browserify ./src/index.js --transform babelify --transform envify --transform [ browserify-global-shim --global ] --transform uglifyify --standalone SlatePlainSerializer | uglifyjs > ./dist/slate-plain-serializer.min.js",
-    "build:test": "babel --out-dir ./lib ./src --source-maps inline",
+    "build": "babel --out-dir ./lib ./src",
+    "build:max": "mkdir -p ./dist && NODE_ENV=production browserify ./src/index.js --transform babelify --transform envify --transform [ browserify-global-shim --global ] --standalone SlatePlainSerializer > ./dist/slate-plain-serializer.js",
+    "build:min": "mkdir -p ./dist && NODE_ENV=production browserify ./src/index.js --transform babelify --transform envify --transform [ browserify-global-shim --global ] --transform uglifyify --standalone SlatePlainSerializer | uglifyjs > ./dist/slate-plain-serializer.min.js",
     "clean": "rm -rf ./dist ./lib ./node_modules",
-    "prepublish": "yarn run build",
-    "test": "yarn run build:test && yarn run tests",
-    "tests": "mocha --compilers js:babel-core/register ./test/index.js",
+    "prepublish": "yarn run build:max && yarn run build:min",
     "watch": "babel --watch --out-dir ./lib ./src --source-maps inline"
   },
   "browserify-global-shim": {

@@ -13,11 +13,8 @@
     "slate-hyperscript": "^0.0.0"
   },
   "scripts": {
-    "build": "yarn run build:lib",
-    "build:lib": "babel --out-dir ./lib ./src",
+    "build": "babel --out-dir ./lib ./src",
     "clean": "rm -rf ./lib ./node_modules",
-    "test": "",
-    "tests": "",
     "watch": "babel --watch --out-dir ./lib ./src --source-maps inline"
   }
 }
