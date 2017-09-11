@@ -1,34 +1,39 @@
 
 language: node_js
+
 node_js:
   - node
 
-# Configure yarn.
+# Turn off sudo?
 sudo: false
+
 before_install:
+  # Download and export yarn.
   - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.0.1
   - export PATH=$HOME/.yarn/bin:$PATH
+  # Export the C++11 compiler.
+  - if [[ $TRAVIS_OS_NAME == "linux" ]]; then export CXX=g++-4.8; fi
+
 cache:
+  # Cache yarn packages.
   yarn: true
 
-# Do two runs, one for testing and one for linting.
 env:
+  # Do two runs, one for testing and one for linting.
   matrix:
     - TEST_TYPE=test
     - TEST_TYPE=lint
 
-# Run testing or linting depending on the environment.
 script:
   - yarn run bootstrap
+  # Run testing or linting depending on the environment.
   - yarn run $TEST_TYPE
 
-# Compiling the `microtime` npm package requires C++11 compiler. The benchmarks
-# will automatically use `microtime` if installed.
 addons:
+  # Compiling the `microtime` npm package requires C++11 compiler. The
+  # benchmarks will automatically use `microtime` if installed.
   apt:
     sources:
       - ubuntu-toolchain-r-test
     packages:
       - g++-4.8
-before_install:
-  - if [[ $TRAVIS_OS_NAME == "linux" ]]; then export CXX=g++-4.8; fi
