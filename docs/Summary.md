@@ -13,47 +13,47 @@
 - [Saving and Loading HTML Content](./walkthroughs/saving-and-loading-html-content.md)
 
 
-## Component Reference
-
-- [Custom](./reference/components/custom.md)
-- [Editor](./reference/components/editor.md)
-- [Placeholder](./reference/components/placeholder.md)
-
-
-## Model Reference
-
-- [Block](./reference/models/block.md)
-- [Character](./reference/models/character.md)
-- [Data](./reference//models/data.md)
-- [Document](./reference/models/document.md)
-- [Inline](./reference/models/inline.md)
-- [Mark](./reference//models/mark.md)
-- [Node](./reference/models/node.md)
-- [Selection](./reference/models/selection.md)
-- [Schema](./reference/models/schema.md)
-- [State](./reference/models/state.md)
-- [Text](./reference//models/text.md)
-- [Change](./reference/models/change.md)
-
-
-## Serializer Reference
-
-- [Html](./reference/serializers/html.md)
-- [Plain](./reference/serializers/plain.md)
-
-
-## Plugin Reference
-
-- [Plugin](./reference/plugins/plugin.md)
-- [Core](./reference/plugins/core.md)
-
-
-## Utils Reference
-
-- [Utils](./reference/utils/utils.md)
-
-
 ## General
 
 - [FAQ](./general/faq.md)
 - [Resources](./general/resources.md)
+
+
+## `slate`
+
+- [Block](./reference/slate/block.md)
+- [Change](./reference/slate/change.md)
+- [Character](./reference/slate/character.md)
+- [Data](./reference//slate/data.md)
+- [Document](./reference/slate/document.md)
+- [Inline](./reference/slate/inline.md)
+- [Mark](./reference//slate/mark.md)
+- [Node](./reference/slate/node.md)
+- [Schema](./reference/slate/schema.md)
+- [Selection](./reference/slate/selection.md)
+- [State](./reference/slate/state.md)
+- [Text](./reference/slate/text.md)
+- [setKeyGenerator](./reference/slate/utils.md)
+- [resetKeyGenerator](./reference/slate/utils.md)
+- [unsetKeyGenerator](./reference/slate/utils.md)
+
+
+## `slate-react`
+
+- [<Editor>](./reference/slate-react/editor.md)
+- [<Placeholder>](./reference/slate-react/placeholder.md)
+- [Custom Nodes](./reference/slate-react/custom-nodes.md)
+- [Plugins](./reference/slate-react/plugins.md)
+- [Core Plugin](./reference/slate-react/core-plugin.md)
+- [findDOMNode](./reference/slate-react/utils.md)
+
+
+## `slate-html-serializer`
+
+- [HtmlSerializer](./reference/slate-html-serializer/index.md)
+
+
+## `slate-plain-serializer`
+
+- [PlainSerializer](./reference/slate-plain-serializer/index.md)
+

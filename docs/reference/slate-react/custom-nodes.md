@@ -1,5 +1,5 @@
 
-# `<{Custom}>`
+# Custom Nodes
 
 Slate will render custom nodes for `Block` and `Inline` models, based on what you pass in as your schema. This allows you to completely customize the rendering behavior of your Slate editor.
 
