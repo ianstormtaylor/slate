@@ -7,7 +7,7 @@ import Html from 'slate-html-serializer'
 
 The HTML serializer lets you parse and stringify arbitrary HTML content, based on your specific schema's use case. You must pass a series of `rules` to define how your Slate schema should be serialized to and from HTML.
 
-For an example of the HTML serializer in action, check out the [`paste-html` example](../../examples/paste-html).
+For an example of the HTML serializer in action, check out the [`paste-html` example](../../../examples/paste-html).
 
 - [Example](#example)
 - [Properties](#properties)
@@ -47,7 +47,7 @@ An array of rules to initialize the HTML serializer with, defining your schema.
 ### `defaultBlock`
 `String|Object|Block`
 
-A set of properties to use for blocks which do not match any rule. Can be a string such as `'paragraph'` or an object with a `type` attribute such as `{ type: 'paragraph' }`, or even a [`Block`](../models/block.md).
+A set of properties to use for blocks which do not match any rule. Can be a string such as `'paragraph'` or an object with a `type` attribute such as `{ type: 'paragraph' }`, or even a [`Block`](../slate/block.md).
 
 ### `parseHtml`
 `Function`
@@ -59,9 +59,9 @@ A function to parse an HTML string and return a DOM object. Defaults to using th
 ### `Html.deserialize`
 `Html.deserialize(html: String, [options: Object]) => State`
 
-Deserialize an HTML `string` into a [`State`](../models/state.md). How the string is deserialized will be determined by the rules that the HTML serializer was constructed with.
+Deserialize an HTML `string` into a [`State`](../slate/state.md). How the string is deserialized will be determined by the rules that the HTML serializer was constructed with.
 
-If you pass `toJSON: true` as an option, the return value will be a JSON object instead of a [`State`](../models/state.md) object.
+If you pass `toJSON: true` as an option, the return value will be a JSON object instead of a [`State`](../slate/state.md) object.
 
 ### `Html.serialize`
 `Html.serialize(state: State, [options: Object]) => String || Array`

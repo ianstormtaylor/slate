@@ -5,7 +5,7 @@
 import Plain from 'slate-plain-serializer'
 ```
 
-A serializer that converts a Slate [`State`](../models/state.md) to and from a plain text string.
+A serializer that converts a Slate [`State`](../slate/state.md) to and from a plain text string.
 
 - [Example](#example)
 - [Static Methods](#methods)
@@ -27,9 +27,9 @@ Check out http://slatejs.org for examples!
 ### `Plain.deserialize`
 `Plain.deserialize(string: String, [options: Object]) => State`
 
-Deserialize a plain text `string` into a [`State`](../models/state.md). A series of blocks will be created by splitting the input string on `\n` characters. Each block is given a type of `'line'`.
+Deserialize a plain text `string` into a [`State`](../slate/state.md). A series of blocks will be created by splitting the input string on `\n` characters. Each block is given a type of `'line'`.
 
-If you pass `toJSON: true` as an option, the return value will be a JSON object instead of a [`State`](../models/state.md) object.
+If you pass `toJSON: true` as an option, the return value will be a JSON object instead of a [`State`](../slate/state.md) object.
 
 ### `Plain.serialize`
 `Plain.serialize(state: State) => String`

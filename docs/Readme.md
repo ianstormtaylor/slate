@@ -35,7 +35,6 @@
 - [Text](./reference/slate/text.md)
 - [setKeyGenerator](./reference/slate/utils.md)
 - [resetKeyGenerator](./reference/slate/utils.md)
-- [unsetKeyGenerator](./reference/slate/utils.md)
 
 
 ## React

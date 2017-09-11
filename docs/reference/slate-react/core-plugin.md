@@ -55,7 +55,7 @@ Renders all of the default contents of the editor!
 
 The core plugin defines a schema that enforces a few constraints on the content and defines default block and inline node renderer components—wrapping in a `<div>` and `<span>`, respectively. Each of these components contains `shouldComponentUpdate` logic that prevents unnecessary re-renders.
 
-The default block component also controls its own placeholder logic, which is controlled via the [`<Editor>`](../components/editor.md)'s placeholder options.
+The default block component also controls its own placeholder logic, which is controlled via the [`<Editor>`](../slate-react/editor.md)'s placeholder options.
 
 
 ## Overriding Defaults

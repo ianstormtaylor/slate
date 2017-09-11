@@ -10,10 +10,10 @@ import { Stack } from 'slate'
 const EVENT_HANDLERS = [
   'onBeforeInput',
   'onBlur',
-  'onFocus',
   'onCopy',
   'onCut',
   'onDrop',
+  'onFocus',
   'onKeyDown',
   'onPaste',
   'onSelect',

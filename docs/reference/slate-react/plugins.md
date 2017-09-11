@@ -103,7 +103,7 @@ This handler is equivalent to the `onCopy` handler. If no other plugin handles t
 
 This handler is called when the user drops content into the `contenteditable` element. The event is already prevented by default, so you must define a state change to have any affect occur.
 
-The `data` object is a convenience object created to standardize the drop metadata across browsers. Every data object has a `type` property, which can be one of `text`, `html` or `files`, and a `target` property which is a [`Selection`](../models/selection.md) indicating where the drop occurred. Depending on the type, its structure will be:
+The `data` object is a convenience object created to standardize the drop metadata across browsers. Every data object has a `type` property, which can be one of `text`, `html` or `files`, and a `target` property which is a [`Selection`](../slate/selection.md) indicating where the drop occurred. Depending on the type, its structure will be:
 
 ```js
 {
@@ -198,11 +198,11 @@ If no other plugin handles this event, it will be handled by the [Core plugin](.
 
 This handler is called whenever the native DOM selection changes.
 
-The `data` object contains a [`Selection`](../models/selection.md) object representing the new selection.
+The `data` object contains a [`Selection`](../slate/selection.md) object representing the new selection.
 
 If no other plugin handles this event, it will be handled by the [Core plugin](./core.md).
 
-_Note: This is **not** Slate's internal selection representation (although it mirrors it). If you want to get notified when Slate's selection changes, use the [`onChange`](../components/editor.md#onchange) property of the `<Editor>`. This handler is instead meant to give you lower-level access to the DOM selection handling, which **is not always triggered** as you'd expect._
+_Note: This is **not** Slate's internal selection representation (although it mirrors it). If you want to get notified when Slate's selection changes, use the [`onChange`](../slate-react/editor.md#onchange) property of the `<Editor>`. This handler is instead meant to give you lower-level access to the DOM selection handling, which **is not always triggered** as you'd expect._
 
 
 ## Other Properties

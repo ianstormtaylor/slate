@@ -3,24 +3,18 @@
 
 ```js
 import {
-  findDOMNode,
-  setKeyGenerator
+  resetKeyGenerator,
+  setKeyGenerator,
 } from 'slate'
 ```
 
 Utility functions that ship with Slate that may be useful for certain use cases.
 
-- [`findDOMNode`](#finddomnode)
 - [`resetKeyGenerator`](#resetkeygenerator)
 - [`setKeyGenerator`](#setkeygenerator)
 
 
 ## Functions
-
-### `findDOMNode`
-`findDOMNode(node : Node) => DOMElement`
-
-Allows you to find the DOM node for a Slate [`Node`](../models/node.md). Modelled after React's built-in `findDOMNode` helper.
 
 ### `resetKeyGenerator`
 `resetkeygenerator() => Void`

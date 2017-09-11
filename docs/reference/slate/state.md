@@ -5,7 +5,7 @@
 import { State } from 'slate'
 ```
 
-A `State` is the top-level representation of data in Slate, containing both a [`Document`](./document.md) and a [`Selection`](./selection.md). It's what you need to paste into the Slate [`<Editor>`](../components/editor.md) to render something onto the page.
+A `State` is the top-level representation of data in Slate, containing both a [`Document`](./document.md) and a [`Selection`](./selection.md). It's what you need to paste into the Slate [`<Editor>`](../slate-react/editor.md) to render something onto the page.
 
 All changes to the document and selection are also performed through the state object, so that they can stay in sync, and be propagated to its internal history of undo/redo state.
 

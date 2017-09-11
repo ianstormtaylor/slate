@@ -61,7 +61,7 @@ Ensure that a value is a Slate `Block`.
 
 ### `blocks`
 
-Ensure that a value is an immutable `List` of Slate `Block` objects.
+Ensure that a value is an immutable `List` of Slate [`Block`](../slate/block.md) objects.
 
 ### `change`
 
@@ -93,7 +93,7 @@ Ensure that a value is a Slate `Inline`.
 
 ### `inlines`
 
-Ensure that a value is an immutable `List` of Slate `Inline` objects.
+Ensure that a value is an immutable `List` of Slate [`Inline`](../slate/inline.md) objects.
 
 ### `mark`
 

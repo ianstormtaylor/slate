@@ -1,7 +1,7 @@
 
 # Custom Nodes
 
-Slate will render custom nodes for `Block` and `Inline` models, based on what you pass in as your schema. This allows you to completely customize the rendering behavior of your Slate editor.
+Slate will render custom nodes for [`Block`](../slate/block.md) and [`Inline`](../slate/inline.md) models, based on what you pass in as your schema. This allows you to completely customize the rendering behavior of your Slate editor.
 
 - [Properties](#properties)
   - [`attributes`](#attributes)
@@ -81,12 +81,12 @@ A boolean representing whether the node you are rendering is currently selected.
 ### `node`
 `Node`
 
-A reference to the [`Node`](../models/node.md) being rendered.
+A reference to the [`Node`](../slate/node.md) being rendered.
 
 ### `parent`
 `Node`
 
-A reference to the parent of the current [`Node`](../models/node.md) being rendered.
+A reference to the parent of the current [`Node`](../slate/node.md) being rendered.
 
 ### `readOnly`
 `Boolean`
@@ -96,4 +96,4 @@ Whether the editor is in "read-only" mode, where all of the rendering is the sam
 ### `state`
 `State`
 
-A reference to the current [`State`](../models/state.md) of the editor.
+A reference to the current [`State`](../slate/state.md) of the editor.
