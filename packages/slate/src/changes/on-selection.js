@@ -1,8 +1,9 @@
 
-import Selection from '../models/selection'
 import isEmpty from 'is-empty'
-import logger from '../utils/logger'
+import logger from 'slate-logger'
 import pick from 'lodash/pick'
+
+import Selection from '../models/selection'
 
 /**
  * Changes.

@@ -1,9 +1,10 @@
 
-import MODEL_TYPES from '../constants/model-types'
 import Debug from 'debug'
 import isEqual from 'lodash/isEqual'
 import isPlainObject from 'is-plain-object'
 import { Record, Stack } from 'immutable'
+
+import MODEL_TYPES from '../constants/model-types'
 
 /**
  * Debug.

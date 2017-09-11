@@ -1,6 +1,7 @@
 
-import Schema from '../models/schema'
 import { Set } from 'immutable'
+
+import Schema from '../models/schema'
 
 /**
  * Changes.

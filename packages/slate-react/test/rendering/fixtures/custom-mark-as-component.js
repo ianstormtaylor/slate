@@ -1,7 +1,7 @@
 /** @jsx h */
 
 import React from 'react'
-import { h } from 'slate-test-helpers'
+import { h } from 'slate-core-test-helpers'
 
 class Bold extends React.Component {
 

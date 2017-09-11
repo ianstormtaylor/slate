@@ -1,5 +1,5 @@
 
-import { Editor, Plain } from '../..'
+import { Editor, Plain } from 'slate'
 import React from 'react'
 import AutoReplaceText from 'slate-auto-replace-text'
 import CollapseOnEscape from 'slate-collapse-on-escape'

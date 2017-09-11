@@ -9,11 +9,12 @@ import './document'
  * Dependencies.
  */
 
-import Node from './node'
-import MODEL_TYPES from '../constants/model-types'
-import generateKey from '../utils/generate-key'
 import isPlainObject from 'is-plain-object'
 import { List, Map, Record } from 'immutable'
+
+import MODEL_TYPES from '../constants/model-types'
+import Node from './node'
+import generateKey from '../utils/generate-key'
 
 /**
  * Default properties.

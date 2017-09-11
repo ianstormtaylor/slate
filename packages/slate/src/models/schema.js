@@ -1,12 +1,13 @@
 
-import MODEL_TYPES from '../constants/model-types'
 import React from 'react'
 import find from 'lodash/find'
 import isPlainObject from 'is-plain-object'
-import isReactComponent from '../utils/is-react-component'
-import logger from '../utils/logger'
+import logger from 'slate-logger'
 import typeOf from 'type-of'
 import { Record } from 'immutable'
+
+import MODEL_TYPES from '../constants/model-types'
+import isReactComponent from '../utils/is-react-component'
 
 /**
  * Default properties.

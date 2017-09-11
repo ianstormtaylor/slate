@@ -1,5 +1,5 @@
 
-import { Block, Editor, State } from '../..'
+import { Block, Editor, State } from 'slate'
 import React from 'react'
 import initialState from './state.json'
 

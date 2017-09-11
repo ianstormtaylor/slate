@@ -10,11 +10,12 @@ import './inline'
  * Dependencies.
  */
 
+import isPlainObject from 'is-plain-object'
+import { List, Map, Record } from 'immutable'
+
 import Node from './node'
 import MODEL_TYPES from '../constants/model-types'
 import generateKey from '../utils/generate-key'
-import isPlainObject from 'is-plain-object'
-import { List, Map, Record } from 'immutable'
 
 /**
  * Default properties.

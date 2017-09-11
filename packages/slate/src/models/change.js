@@ -1,10 +1,11 @@
 
-import MODEL_TYPES from '../constants/model-types'
 import Debug from 'debug'
+import logger from 'slate-logger'
+import pick from 'lodash/pick'
+
+import MODEL_TYPES from '../constants/model-types'
 import Changes from '../changes'
 import apply from '../operations/apply'
-import logger from '../utils/logger'
-import pick from 'lodash/pick'
 
 /**
  * Debug.

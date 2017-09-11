@@ -1,11 +1,12 @@
 
+import { List } from 'immutable'
+
 import Block from '../models/block'
 import Inline from '../models/inline'
 import Mark from '../models/mark'
 import Node from '../models/node'
 import String from '../utils/string'
 import SCHEMA from '../schemas/core'
-import { List } from 'immutable'
 
 /**
  * Changes.

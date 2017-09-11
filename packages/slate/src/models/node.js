@@ -1,16 +1,17 @@
 
+import direction from 'direction'
+import isPlainObject from 'is-plain-object'
+import logger from 'slate-logger'
+import { List, OrderedSet, Set } from 'immutable'
+
 import Block from './block'
 import Data from './data'
 import Document from './document'
 import Inline from './inline'
 import Text from './text'
-import direction from 'direction'
 import generateKey from '../utils/generate-key'
 import isIndexInRange from '../utils/is-index-in-range'
-import isPlainObject from 'is-plain-object'
-import logger from '../utils/logger'
 import memoize from '../utils/memoize'
-import { List, OrderedSet, Set } from 'immutable'
 
 /**
  * Node.

@@ -1,0 +1,23 @@
+{
+  "name": "slate-core-test-helpers",
+  "description": "A set of private test helpers for Slate core.",
+  "version": "0.0.0",
+  "license": "MIT",
+  "repository": "git://github.com/ianstormtaylor/slate.git",
+  "main": "./lib/index.js",
+  "peerDependencies": {
+    "slate": "^0.23.0"
+  },
+  "devDependencies": {
+    "slate": "^0.23.0",
+    "slate-hyperscript": "^0.0.0"
+  },
+  "scripts": {
+    "build": "yarn run build:lib",
+    "build:lib": "babel --out-dir ./lib ./src",
+    "clean": "rm -rf ./lib ./node_modules",
+    "test": "",
+    "tests": "",
+    "watch": "babel --watch --out-dir ./lib ./src --source-maps inline"
+  }
+}

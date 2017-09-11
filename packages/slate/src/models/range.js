@@ -1,9 +1,10 @@
 
+import isPlainObject from 'is-plain-object'
+import { List, Record, Set } from 'immutable'
+
 import MODEL_TYPES from '../constants/model-types'
 import Character from './character'
 import Mark from './mark'
-import isPlainObject from 'is-plain-object'
-import { List, Record, Set } from 'immutable'
 
 /**
  * Default properties.

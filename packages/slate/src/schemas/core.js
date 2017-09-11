@@ -1,7 +1,8 @@
 
+import { List } from 'immutable'
+
 import Schema from '../models/schema'
 import Text from '../models/text'
-import { List } from 'immutable'
 
 /**
  * Options object with normalize set to `false`.

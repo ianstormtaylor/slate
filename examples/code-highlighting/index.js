@@ -1,5 +1,5 @@
 
-import { Editor, Mark, State } from '../..'
+import { Editor, Mark, State } from 'slate'
 import Prism from 'prismjs'
 import React from 'react'
 import initialState from './state.json'

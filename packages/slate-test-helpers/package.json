@@ -1,7 +1,0 @@
-{
-  "name": "slate-test-helpers",
-  "private": true,
-  "dependencies": {
-    "slate-hyperscript": "*"
-  }
-}

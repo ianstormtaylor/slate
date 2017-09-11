@@ -1,5 +1,5 @@
 
-import { Editor, Plain } from '../..'
+import { Editor, Plain } from 'slate'
 import React from 'react'
 
 /**

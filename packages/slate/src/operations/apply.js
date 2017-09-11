@@ -1,8 +1,9 @@
 
 import Debug from 'debug'
+import logger from 'slate-logger'
+
 import Node from '../models/node'
 import Mark from '../models/mark'
-import logger from '../utils/logger'
 
 /**
  * Debug.

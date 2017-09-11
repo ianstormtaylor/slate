@@ -1,9 +1,9 @@
 
-import MODEL_TYPES from '../constants/model-types'
-import CorePlugin from '../plugins/core'
 import Debug from 'debug'
-import Schema from './schema'
 import { Record } from 'immutable'
+
+import MODEL_TYPES from '../constants/model-types'
+import Schema from './schema'
 
 /**
  * Debug.
@@ -63,7 +63,7 @@ class Stack extends Record(DEFAULTS) {
    */
 
   static create(attrs = {}) {
-    const plugins = resolvePlugins(attrs)
+    const { plugins } = attrs
     const schema = resolveSchema(plugins)
     const stack = new Stack({ plugins, schema })
     return stack
@@ -187,33 +187,6 @@ function resolveSchema(plugins) {
 
   const schema = Schema.create({ rules })
   return schema
-}
-
-/**
- * Resolve an array of plugins from `properties`.
- *
- * In addition to the plugins provided in `properties.plugins`, this will
- * create two other plugins:
- *
- * - A plugin made from the top-level `properties` themselves, which are
- * placed at the beginning of the stack. That way, you can add a `onKeyDown`
- * handler, and it will override all of the existing plugins.
- *
- * - A "core" functionality plugin that handles the most basic events in Slate,
- * like deleting characters, splitting blocks, etc.
- *
- * @param {Object} props
- * @return {Array}
- */
-
-function resolvePlugins(props) {
-  const { plugins = [], ...overridePlugin } = props
-  const corePlugin = CorePlugin(props)
-  return [
-    overridePlugin,
-    ...plugins,
-    corePlugin
-  ]
 }
 
 /**

@@ -14,10 +14,10 @@
     "prop-types": "^15.5.8",
     "react-portal": "^3.1.0",
     "selection-is-backward": "^1.0.0",
-    "slate-base64-serializer": "*",
-    "slate-plain-serializer": "*",
-    "slate-prop-types": "*",
-    "slate-logger": "*"
+    "slate-base64-serializer": "^0.0.0",
+    "slate-plain-serializer": "^0.0.0",
+    "slate-prop-types": "^0.0.0",
+    "slate-logger": "^0.0.0"
   },
   "peerDependencies": {
     "react": "^0.14.0 || ^15.0.0",
@@ -28,8 +28,8 @@
     "babel-cli": "^6.10.1",
     "browserify": "^13.0.1",
     "mocha": "^2.5.3",
-    "slate": "*",
-    "slate-test-helpers": "*",
+    "slate": "^0.23.0",
+    "slate-core-test-helpers": "^0.0.0",
     "uglify-js": "^2.7.0"
   },
   "scripts": {

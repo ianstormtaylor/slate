@@ -1,5 +1,5 @@
 
-import { Editor, State } from '../..'
+import { Editor, State } from 'slate'
 import Portal from 'react-portal'
 import React from 'react'
 import initialState from './state.json'

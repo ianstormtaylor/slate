@@ -1,13 +1,14 @@
 
+import isPlainObject from 'is-plain-object'
+import logger from 'slate-logger'
+import { Record, Set, List, Map } from 'immutable'
+
 import MODEL_TYPES from '../constants/model-types'
 import SCHEMA from '../schemas/core'
 import Change from './change'
 import Document from './document'
 import History from './history'
 import Selection from './selection'
-import isPlainObject from 'is-plain-object'
-import logger from '../utils/logger'
-import { Record, Set, List, Map } from 'immutable'
 
 /**
  * Default properties.

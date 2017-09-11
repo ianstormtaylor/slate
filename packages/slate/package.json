@@ -12,16 +12,19 @@
     "esrever": "^0.2.0",
     "is-empty": "^1.0.0",
     "is-plain-object": "^2.0.4",
-    "type-of": "^2.0.1"
+    "lodash": "^4.17.4",
+    "type-of": "^2.0.1",
+    "slate-logger": "^0.0.0"
   },
   "peerDependencies": {
+    "react": "^0.14.0 || ^15.0.0",
     "immutable": "^3.8.1"
   },
   "devDependencies": {
     "babel-cli": "^6.10.1",
     "browserify": "^13.0.1",
     "mocha": "^2.5.3",
-    "slate-test-helpers": "*",
+    "slate-core-test-helpers": "^0.0.0",
     "uglify-js": "^2.7.0"
   },
   "scripts": {
@@ -37,6 +40,7 @@
     "watch": "babel --watch --out-dir ./lib ./src --source-maps inline"
   },
   "browserify-global-shim": {
+    "react": "React",
     "immutable": "Immutable"
   },
   "keywords": [

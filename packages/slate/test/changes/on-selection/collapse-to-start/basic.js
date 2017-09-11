@@ -1,6 +1,6 @@
 /** @jsx h */
 
-import { h } from 'slate-test-helpers'
+import { h } from 'slate-core-test-helpers'
 
 export default function (change) {
   change.collapseToStart()

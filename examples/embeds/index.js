@@ -1,5 +1,5 @@
 
-import { Editor, State } from '../..'
+import { Editor, State } from 'slate'
 import React from 'react'
 import Video from './video'
 import initialState from './state.json'

@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 
-import { Editor, State } from '../../..'
+import { Editor, State } from 'slate'
 import React from 'react'
 import faker from 'faker'
 

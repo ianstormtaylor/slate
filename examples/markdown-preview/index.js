@@ -1,5 +1,5 @@
 
-import { Editor, Mark, Plain } from '../..'
+import { Editor, Mark, Plain } from 'slate'
 import Prism from 'prismjs'
 import React from 'react'
 

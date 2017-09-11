@@ -1,6 +1,6 @@
 /** @jsx h */
 
-import { h } from 'slate-test-helpers'
+import { h } from 'slate-core-test-helpers'
 
 function insertVoid(change, blockType) {
   change.insertBlock({

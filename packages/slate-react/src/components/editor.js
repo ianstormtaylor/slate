@@ -7,6 +7,7 @@ import Types from 'prop-types'
 import logger from 'slate-logger'
 import { Stack, State } from 'slate'
 
+import CorePlugin from '../plugins/core'
 import noop from '../utils/noop'
 
 /**
@@ -113,8 +114,9 @@ class Editor extends React.Component {
 
     // Create a new `Stack`, omitting the `onChange` property since that has
     // special significance on the editor itself.
-    const { state, onChange, ...rest } = props // eslint-disable-line no-unused-vars
-    const stack = Stack.create(rest)
+    const { state } = props
+    const plugins = resolvePlugins(props)
+    const stack = Stack.create({ plugins })
     this.state.stack = stack
 
     // Cache and set the state.
@@ -156,8 +158,8 @@ class Editor extends React.Component {
     for (let i = 0; i < PLUGINS_PROPS.length; i++) {
       const prop = PLUGINS_PROPS[i]
       if (props[prop] == this.props[prop]) continue
-      const { onChange, ...rest } = props // eslint-disable-line no-unused-vars
-      const stack = Stack.create(rest)
+      const plugins = resolvePlugins(props)
+      const stack = Stack.create({ plugins })
       this.setState({ stack })
     }
 
@@ -266,6 +268,34 @@ class Editor extends React.Component {
     return tree
   }
 
+}
+
+/**
+ * Resolve an array of plugins from `props`.
+ *
+ * In addition to the plugins provided in `props.plugins`, this will create
+ * two other plugins:
+ *
+ * - A plugin made from the top-level `props` themselves, which are placed at
+ * the beginning of the stack. That way, you can add a `onKeyDown` handler,
+ * and it will override all of the existing plugins.
+ *
+ * - A "core" functionality plugin that handles the most basic events in
+ * Slate, like deleting characters, splitting blocks, etc.
+ *
+ * @param {Object} props
+ * @return {Array}
+ */
+
+function resolvePlugins(props) {
+  // eslint-disable-next-line no-unused-vars
+  const { state, onChange, plugins = [], ...overridePlugin } = props
+  const corePlugin = CorePlugin(props)
+  return [
+    overridePlugin,
+    ...plugins,
+    corePlugin
+  ]
 }
 
 /**

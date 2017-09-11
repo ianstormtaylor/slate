@@ -1,9 +1,10 @@
 
+import isPlainObject from 'is-plain-object'
+import { Map, Record, Set } from 'immutable'
+
 import MODEL_TYPES from '../constants/model-types'
 import Data from './data'
-import isPlainObject from 'is-plain-object'
 import memoize from '../utils/memoize'
-import { Map, Record, Set } from 'immutable'
 
 /**
  * Default properties.

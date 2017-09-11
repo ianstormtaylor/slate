@@ -1,8 +1,9 @@
 
-import MODEL_TYPES from '../constants/model-types'
 import isPlainObject from 'is-plain-object'
-import logger from '../utils/logger'
+import logger from 'slate-logger'
 import { List, Record, Set } from 'immutable'
+
+import MODEL_TYPES from '../constants/model-types'
 
 /**
  * Default properties.

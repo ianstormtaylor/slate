@@ -1,13 +1,14 @@
 
+import isPlainObject from 'is-plain-object'
+import logger from 'slate-logger'
+import { List, Record, OrderedSet, is } from 'immutable'
+
 import Character from './character'
 import Mark from './mark'
 import Range from './range'
 import MODEL_TYPES from '../constants/model-types'
 import generateKey from '../utils/generate-key'
-import isPlainObject from 'is-plain-object'
-import logger from '../utils/logger'
 import memoize from '../utils/memoize'
-import { List, Record, OrderedSet, is } from 'immutable'
 
 /**
  * Default properties.

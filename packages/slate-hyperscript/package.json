@@ -16,7 +16,7 @@
     "babel-cli": "^6.10.1",
     "browserify": "^13.0.1",
     "mocha": "^2.5.3",
-    "slate": "*",
+    "slate": "^0.23.0",
     "uglify-js": "^2.7.0"
   },
   "scripts": {
