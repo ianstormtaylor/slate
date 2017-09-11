@@ -7,6 +7,15 @@ node_js:
 # Turn off sudo?
 sudo: false
 
+addons:
+  # Compiling the `microtime` npm package requires C++11 compiler. The
+  # benchmarks will automatically use `microtime` if installed.
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-4.8
+
 before_install:
   # Download and export yarn.
   - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.0.1
@@ -25,15 +34,7 @@ env:
     - TEST_TYPE=lint
 
 script:
+  # Run bootstrap first so that the proper workspaces links are created.
   - yarn run bootstrap
   # Run testing or linting depending on the environment.
   - yarn run $TEST_TYPE
-
-addons:
-  # Compiling the `microtime` npm package requires C++11 compiler. The
-  # benchmarks will automatically use `microtime` if installed.
-  apt:
-    sources:
-      - ubuntu-toolchain-r-test
-    packages:
-      - g++-4.8
