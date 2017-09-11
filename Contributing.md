@@ -45,10 +45,11 @@ Please include tests and docs with every pull request!
 
 ## Running Tests
 
-To run the examples, you need to have the Slate repository cloned to your computer. After that, you need to `cd` into the directory where you cloned it, and install the dependencies with `yarn`.
+To run the examples, you need to have the Slate repository cloned to your computer. After that, you need to `cd` into the directory where you cloned it, and install the dependencies with `yarn` and bootstrap the monorepo.
 
 ```
 yarn install
+yarn run bootstrap
 ```
 
 Then run the tests with:
@@ -57,15 +58,15 @@ Then run the tests with:
 yarn run test
 ```
 
-To keep the source rebuilding on every file change, you need to run an additional watching command:
+To keep the source rebuilding on every file change, you need to run an additional watching command in a separate process:
 
 ```
 yarn run watch
 ```
 
-Once you've got the watcher running, you no longer need to do the longer `yarn run test` (which builds the source before each run)—you can instead use `yarn run tests` which skips that.
+If you need to debug something, you can add a `debugger` line to the source, and then run `yarn run test debug`. 
 
-If you need to debug something, you can add a `debugger` line to the source, and then run `yarn run tests debug`. Or, if you only want to run a specific test or tests, you can run `yarn run tests --fgrep="slate-react"` flag which will filter the tests being run.
+If you only want to run a specific test or tests, you can run `yarn run test --fgrep="slate-react rendering"` flag which will filter the tests being run by grepping for the string in each test.
 
 
 ## Running Examples
