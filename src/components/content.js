@@ -87,7 +87,6 @@ class Content extends React.Component {
   constructor(props) {
     super(props)
     this.tmp = {}
-    this.tmp.compositions = 0
     this.tmp.forces = 0
   }
 
@@ -119,6 +118,7 @@ class Content extends React.Component {
    */
 
   updateSelection = () => {
+    if (this.tmp.isComposing) return
     const { editor, state } = this.props
     const { selection } = state
     const window = getWindow(this.element)
@@ -278,10 +278,7 @@ class Content extends React.Component {
 
   onCompositionStart = (event) => {
     if (!this.isInEditor(event.target)) return
-
     this.tmp.isComposing = true
-    this.tmp.compositions++
-
     debug('onCompositionStart', { event })
   }
 
@@ -295,17 +292,9 @@ class Content extends React.Component {
 
   onCompositionEnd = (event) => {
     if (!this.isInEditor(event.target)) return
-
+    this.tmp.isComposing = false
     this.tmp.forces++
-    const count = this.tmp.compositions
-
-    // The `count` check here ensures that if another composition starts
-    // before the timeout has closed out this one, we will abort unsetting the
-    // `isComposing` flag, since a composition in still in affect.
-    setTimeout(() => {
-      if (this.tmp.compositions > count) return
-      this.tmp.isComposing = false
-    })
+    this.forceUpdate()
 
     debug('onCompositionEnd', { event })
   }
