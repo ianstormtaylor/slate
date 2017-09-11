@@ -1,6 +1,4 @@
 
-import { resetKeyGenerator } from '..'
-
 /**
  * Polyfills.
  */
@@ -8,11 +6,19 @@ import { resetKeyGenerator } from '..'
 import 'babel-polyfill' // eslint-disable-line import/no-extraneous-dependencies
 
 /**
+ * Dependencies.
+ */
+
+import { resetKeyGenerator } from 'slate'
+
+/**
  * Tests.
  */
 
-import './plugins'
-import './rendering'
+describe('slate-react', () => {
+  require('./plugins')
+  require('./rendering')
+})
 
 /**
  * Reset Slate's internal state before each text.

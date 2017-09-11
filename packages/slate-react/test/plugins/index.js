@@ -1,4 +1,5 @@
 
+import CorePlugin from '../../src/plugins/core'
 import Simulator from '../helpers/simulator'
 import assert from 'assert'
 import fs from 'fs'
@@ -23,9 +24,10 @@ describe('plugins', () => {
         for (const test of tests) {
           it(test, async () => {
             const module = require(resolve(testDir, test))
-            const { input, output } = module
+            const { input, output, props = {}} = module
             const fn = module.default
-            const stack = Stack.create()
+            const plugins = [CorePlugin(props)]
+            const stack = Stack.create({ plugins })
             const simulator = new Simulator({ stack, state: input })
             fn(simulator)
 

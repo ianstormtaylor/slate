@@ -65,7 +65,7 @@ yarn run watch
 
 Once you've got the watcher running, you no longer need to do the longer `yarn run test` (which builds the source before each run)—you can instead use `yarn run tests` which skips that.
 
-If you need to debug something, you can add a `debugger` line to the source, and then run `yarn run tests debug`. Or, if you only want to run a specific test or tests, you can run `yarn run tests -- --fgrep="match this string"` flag which will filter the tests being run.
+If you need to debug something, you can add a `debugger` line to the source, and then run `yarn run tests debug`. Or, if you only want to run a specific test or tests, you can run `yarn run tests --fgrep="slate-react"` flag which will filter the tests being run.
 
 
 ## Running Examples

@@ -1,7 +1,7 @@
 /** @jsx h */
 
 import { h } from 'slate-core-test-helpers'
-import { Selection } from '../../../..'
+import { Selection } from 'slate'
 
 export default function (simulator) {
   const { state } = simulator

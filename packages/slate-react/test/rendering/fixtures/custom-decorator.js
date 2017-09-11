@@ -1,7 +1,7 @@
 /** @jsx h */
 
 import { h } from 'slate-core-test-helpers'
-import { Mark } from '../../..'
+import { Mark } from 'slate'
 
 export const schema = {
   nodes: {
