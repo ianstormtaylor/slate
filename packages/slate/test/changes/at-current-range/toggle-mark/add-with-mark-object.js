@@ -1,6 +1,6 @@
 /** @jsx h */
 
-import { h } from 'slate-core-test-helpers'
+import h from '../../../helpers/h'
 import { Mark } from '../../../..'
 
 export default function (change) {

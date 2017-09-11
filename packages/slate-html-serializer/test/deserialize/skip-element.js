@@ -1,7 +1,7 @@
 
 /** @jsx h */
 
-import { h } from 'slate-core-test-helpers'
+import h from '../helpers/h'
 
 export const config = {
   rules: [

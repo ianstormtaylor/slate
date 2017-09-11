@@ -1,6 +1,6 @@
 /** @jsx h */
 
-import { h } from 'slate-core-test-helpers'
+import h from '../../../helpers/h'
 
 function insertImageBlock(change, blockType) {
   change.insertBlock({

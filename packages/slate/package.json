@@ -23,7 +23,6 @@
   "devDependencies": {
     "babel-cli": "^6.10.1",
     "browserify": "^13.0.1",
-    "slate-core-test-helpers": "^0.0.0",
     "uglify-js": "^2.7.0"
   },
   "scripts": {
