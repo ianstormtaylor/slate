@@ -79,11 +79,18 @@ function Plugin(options = {}) {
     // replaced. But the `select` fires after the `beforeInput` event, even
     // though the native selection is updated. So we need to manually check if
     // the selection has gotten out of sync, and adjust it if so. (03/18/2017)
+
+    // COMPAT: With desktop IME, onBeforeInput triggers when user presses space
+    // or click on a word, which happens before onCompositonEnd. In this case
+    // `isComposing` is true, and we don't need to manually sync selection since
+    // it only happens in desktop.
+    const isDesktopIME = data.isComposing
+
     const window = getWindow(e.target)
     const native = window.getSelection()
     const a = getPoint(native.anchorNode, native.anchorOffset, state, editor)
     const f = getPoint(native.focusNode, native.focusOffset, state, editor)
-    const hasMismatch = a && f && (
+    const hasMismatch = !isDesktopIME && a && f && (
       anchorKey != a.key ||
       anchorOffset != a.offset ||
       focusKey != f.key ||

@@ -217,6 +217,10 @@ class Content extends React.Component {
     if (!this.isInEditor(event.target)) return
 
     const data = {}
+    // COMPAT: passing `isComposing` to plugin's onBeforeInput through `data`
+    // so as to identify whether we need to fix additional state change
+    // caused by IME's native behaviour.
+    data.isComposing = this.tmp.isComposing
 
     debug('onBeforeInput', { event, data })
     this.props.onBeforeInput(event, data)
