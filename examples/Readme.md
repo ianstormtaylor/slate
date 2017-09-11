@@ -21,22 +21,24 @@ If you have an idea for an example that shows a common use case, pull request it
 
 ## Running the Examples
 
-To get the examples running on your machine, you need to have the Slate repository cloned to your computer. After that, you need to `cd` into the directory where you cloned it, and install the dependencies from `npm`.
+To get the examples running on your machine, you need to have the Slate repository cloned to your computer. After that, you need to `cd` into the directory where you cloned it, and install the dependencies with `yarn`.
 
 ```
-npm install
+yarn install
 ```
 
-Which will also build the source. Then build the examples:
+Then bootstrap the monorepo's packages and build the examples:
 
 ```
-npm run examples
+yarn run bootstrap
+yarn run build
+yarn run examples
 ```
 
 And then run the examples server:
 
 ```
-npm start
+yarn run start
 ```
 
 Now you can open up `http://localhost:8080/dev.html` in your browser and you'll see the examples site.
@@ -44,10 +46,10 @@ Now you can open up `http://localhost:8080/dev.html` in your browser and you'll 
 If you want to edit the source while running the examples and have those changes immediately reflected, you can use the `watch` command instead, which will watch the source files for changes while running the server:
 
 ```
-npm run watch
+yarn run watch
 ```
 
 
 ## Development Examples
 
-There are also a series of examples that are for development only, for things like checking performance, in the `./development` directory. You can safely ignore those!
+There are also a set of examples that are for development only, for things like checking performance, in the `./development` directory. You can safely ignore those!
