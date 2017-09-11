@@ -21,6 +21,7 @@
     "babel-cli": "^6.10.1",
     "browserify": "^13.0.1",
     "mocha": "^2.5.3",
+    "slate-test-helpers": "*",
     "uglify-js": "^2.7.0"
   },
   "scripts": {
@@ -36,7 +37,7 @@
     "watch": "babel --watch --out-dir ./lib ./src --source-maps inline"
   },
   "browserify-global-shim": {
-    "immutable": "Immutable",
+    "immutable": "Immutable"
   },
   "keywords": [
     "canvas",

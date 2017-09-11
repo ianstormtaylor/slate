@@ -1,9 +1,6 @@
 
-import Block from '../models/block'
-import Mark from '../models/mark'
-import Node from '../models/node'
-import State from '../models/state'
-import logger from '../utils/logger'
+import logger from 'slate-logger'
+import { Block, Mark, Node, State } from 'slate'
 import { Set } from 'immutable'
 
 /**

@@ -1,10 +1,9 @@
 
-import Node from '../models/node'
 import React from 'react'
 import ReactDOMServer from 'react-dom/server'
-import State from '../models/state'
-import logger from '../utils/logger'
+import logger from 'slate-logger'
 import typeOf from 'type-of'
+import { Node, State } from 'slate'
 import { Record } from 'immutable'
 
 /**

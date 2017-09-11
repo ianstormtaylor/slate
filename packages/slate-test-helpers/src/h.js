@@ -1,5 +1,5 @@
 
-import { createHyperscript } from '../../lib/utils/hyperscript'
+import { createHyperscript } from 'slate-hyperscript'
 
 /**
  * Define a hyperscript.

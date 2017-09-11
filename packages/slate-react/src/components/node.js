@@ -1,15 +1,15 @@
 
+import Base64 from 'slate-base64-serializer'
 import Debug from 'debug'
 import React from 'react'
 import ReactDOM from 'react-dom'
+import SlateTypes from 'slate-prop-types'
 import Types from 'prop-types'
+import getWindow from 'get-window'
 
 import TRANSFER_TYPES from '../constants/transfer-types'
-import Base64 from '../serializers/base-64'
 import Leaf from './leaf'
-import SlateTypes from '../utils/prop-types'
 import Void from './void'
-import getWindow from 'get-window'
 import scrollToSelection from '../utils/scroll-to-selection'
 import setTransferData from '../utils/set-transfer-data'
 

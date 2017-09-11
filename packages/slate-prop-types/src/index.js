@@ -1,19 +1,21 @@
 
-import Block from '../models/block'
-import Change from '../models/change'
-import Character from '../models/character'
-import Data from '../models/data'
-import Document from '../models/document'
-import History from '../models/history'
-import Inline from '../models/inline'
-import Mark from '../models/mark'
-import Node from '../models/node'
-import Range from '../models/range'
-import Schema from '../models/schema'
-import Selection from '../models/selection'
-import Stack from '../models/stack'
-import State from '../models/state'
-import Text from '../models/text'
+import {
+  Block,
+  Change,
+  Character,
+  Data,
+  Document,
+  History,
+  Inline,
+  Mark,
+  Node,
+  Range,
+  Schema,
+  Selection,
+  Stack,
+  State,
+  Text,
+} from 'slate'
 
 /**
  * Create a prop type checker for Slate objects with `name` and `validate`.

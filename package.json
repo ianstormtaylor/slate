@@ -68,6 +68,7 @@
     "bench": "yarn-run-all build benchs",
     "benchs": "babel-node ./node_modules/.bin/_matcha --reporter ./benchmark/reporter ./benchmark/index.js > ./tmp/benchmark-comparison.json && babel-node ./benchmark/compare",
     "benchs:save": "babel-node ./node_modules/.bin/_matcha --reporter ./benchmark/reporter ./benchmark/index.js > ./tmp/benchmark-baseline.json",
+    "bootstrap": "lerna bootstrap",
     "build": "lerna run build",
     "clean": "lerna run clean && lerna clean",
     "examples": "yarn-run-all examples:dev examples:prod",

@@ -1,8 +1,7 @@
 
 import React from 'react'
+import SlateTypes from 'slate-prop-types'
 import Types from 'prop-types'
-
-import SlateTypes from '../utils/prop-types'
 
 /**
  * Placeholder.

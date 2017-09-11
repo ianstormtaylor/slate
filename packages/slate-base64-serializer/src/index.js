@@ -1,5 +1,5 @@
 
-import State from '../models/state'
+import { State } from 'slate'
 
 /**
  * Encode a JSON `object` as base-64 `string`.

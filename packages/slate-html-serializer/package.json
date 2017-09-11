@@ -6,6 +6,7 @@
   "repository": "git://github.com/ianstormtaylor/slate.git",
   "main": "./lib/index.js",
   "dependencies": {
+    "slate-logger": "*",
     "type-of": "^2.0.1"
   },
   "peerDependencies": {
@@ -19,6 +20,7 @@
     "browserify": "^13.0.1",
     "mocha": "^2.5.3",
     "slate": "*",
+    "slate-test-helpers": "*",
     "uglify-js": "^2.7.0"
   },
   "scripts": {

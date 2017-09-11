@@ -1,12 +1,12 @@
 
 import Debug from 'debug'
 import React from 'react'
+import SlateTypes from 'slate-prop-types'
 import Types from 'prop-types'
+import { Mark } from 'slate'
 
 import Leaf from './leaf'
-import Mark from '../models/mark'
 import OffsetKey from '../utils/offset-key'
-import SlateTypes from '../utils/prop-types'
 import { IS_FIREFOX } from '../constants/environment'
 
 /**

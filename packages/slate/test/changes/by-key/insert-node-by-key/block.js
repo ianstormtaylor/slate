@@ -1,6 +1,6 @@
 /** @jsx h */
 
-import h from '../../../helpers/h'
+import { h } from 'slate-test-helpers'
 import { Block } from '../../../..'
 
 export default function (change) {

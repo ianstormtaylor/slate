@@ -1,5 +1,6 @@
 
-import Base64 from '../serializers/base-64'
+import Base64 from 'slate-base64-serializer'
+
 import TRANSFER_TYPES from '../constants/transfer-types'
 
 /**

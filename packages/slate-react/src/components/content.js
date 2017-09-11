@@ -1,15 +1,15 @@
 
+import Base64 from 'slate-base64-serializer'
 import Debug from 'debug'
 import React from 'react'
+import SlateTypes from 'slate-prop-types'
 import Types from 'prop-types'
 import getWindow from 'get-window'
 import keycode from 'keycode'
+import { Selection } from 'slate'
 
 import TRANSFER_TYPES from '../constants/transfer-types'
-import Base64 from '../serializers/base-64'
 import Node from './node'
-import Selection from '../models/selection'
-import SlateTypes from '../utils/prop-types'
 import extendSelection from '../utils/extend-selection'
 import findClosestNode from '../utils/find-closest-node'
 import getCaretPosition from '../utils/get-caret-position'

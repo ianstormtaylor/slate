@@ -2,12 +2,11 @@
 import Debug from 'debug'
 import Portal from 'react-portal'
 import React from 'react'
+import SlateTypes from 'slate-prop-types'
 import Types from 'prop-types'
+import logger from 'slate-logger'
+import { Stack, State } from 'slate'
 
-import Stack from '../models/stack'
-import State from '../models/state'
-import SlateTypes from '../utils/prop-types'
-import logger from '../utils/logger'
 import noop from '../utils/noop'
 
 /**
