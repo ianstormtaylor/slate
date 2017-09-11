@@ -3,6 +3,14 @@ language: node_js
 node_js:
   - node
 
+# Configure yarn.
+sudo: false
+before_install:
+  - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.0.1
+  - export PATH=$HOME/.yarn/bin:$PATH
+cache:
+  yarn: true
+
 # Do two runs, one for testing and one for linting.
 env:
   matrix:
