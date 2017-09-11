@@ -7,7 +7,7 @@
  */
 
 function findDeepestNode(element) {
-  return element.firstChild
+  return element && element.firstChild
     ? findDeepestNode(element.firstChild)
     : element
 }
