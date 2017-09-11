@@ -185,6 +185,7 @@ class Void extends React.Component {
       style = {
         display: 'inline-block',
         verticalAlign: 'top',
+        width: '0',
         color: 'transparent'
       }
     } else {
