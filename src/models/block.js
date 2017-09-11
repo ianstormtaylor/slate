@@ -9,9 +9,7 @@ import './document'
  * Dependencies.
  */
 
-import Data from './data'
 import Node from './node'
-import Text from './text'
 import MODEL_TYPES from '../constants/model-types'
 import generateKey from '../utils/generate-key'
 import isPlainObject from 'is-plain-object'
@@ -40,62 +38,91 @@ const DEFAULTS = {
 class Block extends Record(DEFAULTS) {
 
   /**
-   * Create a new `Block` with `attrs`.
+   * Create a new `Block` from `value`.
    *
-   * @param {Object|String|Block} attrs
+   * @param {Object|String|Block} value
    * @return {Block}
    */
 
-  static create(attrs = {}) {
-    if (Block.isBlock(attrs)) {
-      return attrs
+  static create(value = {}) {
+    if (Block.isBlock(value)) {
+      return value
     }
 
-    if (typeof attrs == 'string') {
-      attrs = { type: attrs }
+    if (typeof value == 'string') {
+      value = { type: value }
     }
 
-    if (isPlainObject(attrs)) {
-      const { data, isVoid, key, type } = attrs
-      let { nodes } = attrs
-
-      if (typeof type != 'string') {
-        throw new Error('`Block.create` requires a block `type` string.')
-      }
-
-      if (nodes == null || nodes.length == 0) {
-        nodes = [Text.create()]
-      }
-
-      const block = new Block({
-        data: Data.create(data),
-        isVoid: !!isVoid,
-        key: key || generateKey(),
-        nodes: Node.createList(nodes),
-        type,
-      })
-
-      return block
+    if (isPlainObject(value)) {
+      return Block.fromJSON(value)
     }
 
-    throw new Error(`\`Block.create\` only accepts objects, strings or blocks, but you passed it: ${attrs}`)
+    throw new Error(`\`Block.create\` only accepts objects, strings or blocks, but you passed it: ${value}`)
   }
 
   /**
-   * Create a list of `Blocks` from `elements`.
+   * Create a list of `Blocks` from `value`.
    *
-   * @param {Array<Block|Object>|List<Block|Object>} elements
+   * @param {Array<Block|Object>|List<Block|Object>} value
    * @return {List<Block>}
    */
 
-  static createList(elements = []) {
-    if (List.isList(elements) || Array.isArray(elements)) {
-      const list = new List(elements.map(Block.create))
+  static createList(value = []) {
+    if (List.isList(value) || Array.isArray(value)) {
+      const list = new List(value.map(Block.create))
       return list
     }
 
-    throw new Error(`\`Block.createList\` only accepts arrays or lists, but you passed it: ${elements}`)
+    throw new Error(`\`Block.createList\` only accepts arrays or lists, but you passed it: ${value}`)
   }
+
+  /**
+   * Create a `Block` from a JSON `object`.
+   *
+   * @param {Object|Block} object
+   * @return {Block}
+   */
+
+  static fromJSON(object) {
+    if (Block.isBlock(object)) {
+      return object
+    }
+
+    const {
+      data = {},
+      isVoid = false,
+      key = generateKey(),
+      type,
+    } = object
+
+    let {
+      nodes = [],
+    } = object
+
+    if (typeof type != 'string') {
+      throw new Error('`Block.fromJSON` requires a `type` string.')
+    }
+
+    if (nodes.length == 0) {
+      nodes = [{ kind: 'text', text: '' }]
+    }
+
+    const block = new Block({
+      key,
+      type,
+      isVoid: !!isVoid,
+      data: new Map(data),
+      nodes: new List(nodes.map(Node.fromJSON)),
+    })
+
+    return block
+  }
+
+  /**
+   * Alias `fromJS`.
+   */
+
+  static fromJS = Block.fromJSON
 
   /**
    * Check if a `value` is a `Block`.
@@ -147,6 +174,38 @@ class Block extends Record(DEFAULTS) {
 
   get text() {
     return this.getText()
+  }
+
+  /**
+   * Return a JSON representation of the block.
+   *
+   * @param {Object} options
+   * @return {Object}
+   */
+
+  toJSON(options = {}) {
+    const object = {
+      data: this.data.toJSON(),
+      key: this.key,
+      kind: this.kind,
+      isVoid: this.isVoid,
+      type: this.type,
+      nodes: this.nodes.toArray().map(n => n.toJSON(options)),
+    }
+
+    if (!options.preserveKeys) {
+      delete object.key
+    }
+
+    return object
+  }
+
+  /**
+   * Alias `toJS`.
+   */
+
+  toJS(options) {
+    return this.toJSON(options)
   }
 
 }

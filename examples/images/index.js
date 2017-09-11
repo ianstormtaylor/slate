@@ -1,5 +1,5 @@
 
-import { Editor, Block, Raw } from '../..'
+import { Editor, Block, State } from '../..'
 import React from 'react'
 import initialState from './state.json'
 import isImage from 'is-image'
@@ -105,8 +105,8 @@ class Images extends React.Component {
    */
 
   state = {
-    state: Raw.deserialize(initialState, { terse: true })
-  };
+    state: State.fromJSON(initialState)
+  }
 
   /**
    * Render the app.

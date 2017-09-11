@@ -21,8 +21,11 @@ Block nodes may contain nested block nodes, inline nodes, and text nodes—just 
 - [Static Methods](#static-methods)
   - [`Block.create`](#blockcreate)
   - [`Block.createList`](#blockcreatelist)
+  - [`Block.fromJSON`](#blockfromjson)
   - [`Block.isBlock`](#blockisblock)
 - [Node Methods](#node-methods)
+- [Instance Methods](#instance-methods)
+  - [`toJSON`](#tojson)
 
 
 ## Properties
@@ -90,11 +93,25 @@ Create a block from a plain Javascript object of `properties`.
 
 Create a list of block nodes from a plain Javascript `array`.
 
-### `Block.isBlock`
-`Block.isBlock(maybeBlock: Any) => Boolean`
+### `Block.fromJSON`
+`Block.fromJSON(object: Object) => Block`
 
-Returns a boolean if the passed in argument is a `Block`.
+Create a block from a JSON `object`.
+
+### `Block.isBlock`
+`Block.isBlock(value: Any) => Boolean`
+
+Returns a boolean if the passed in `value` is a `Block`.
+
 
 ## Node Methods
 
 Blocks implement the [`Node`](./node.md) interface. For information about all of the node methods, see the [`Node` reference](./node.md).
+
+
+## Instance Methods
+
+### `toJSON`
+`toJSON() => Object`
+
+Returns a JSON representation of the block.

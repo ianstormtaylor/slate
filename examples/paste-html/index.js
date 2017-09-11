@@ -1,5 +1,5 @@
 
-import { Editor, Html, Raw } from '../..'
+import { Editor, Html, State } from '../..'
 import React from 'react'
 import initialState from './state.json'
 
@@ -155,8 +155,8 @@ class PasteHtml extends React.Component {
    */
 
   state = {
-    state: Raw.deserialize(initialState, { terse: true })
-  };
+    state: State.fromJSON(initialState)
+  }
 
   /**
    * On change, save the new state.

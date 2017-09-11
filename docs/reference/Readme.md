@@ -22,7 +22,6 @@ This is the full reference documentation for all of the pieces of Slate, broken 
 - **Serializers**
   - [Html](./serializers/html.md)
   - [Plain](./serializers/plain.md)
-  - [Raw](./serializers/raw.md) 
 - **Plugins**
   - [Plugins](./plugins/plugin.md)
   - [Core](./plugins/core.md)

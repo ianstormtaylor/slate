@@ -1,5 +1,5 @@
 
-import { Editor, Raw } from '../..'
+import { Editor, State } from '../..'
 import React from 'react'
 import initialState from './state.json'
 
@@ -82,7 +82,7 @@ class CheckLists extends React.Component {
    */
 
   state = {
-    state: Raw.deserialize(initialState, { terse: true })
+    state: State.fromJSON(initialState)
   }
 
   /**

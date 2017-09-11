@@ -11,7 +11,7 @@ import { Map } from 'immutable'
  * @type {Object}
  */
 
-const Data = {
+class Data {
 
   /**
    * Create a new `Data` with `attrs`.
@@ -20,17 +20,34 @@ const Data = {
    * @return {Data} data
    */
 
-  create(attrs = {}) {
+  static create(attrs = {}) {
     if (Map.isMap(attrs)) {
       return attrs
     }
 
     if (isPlainObject(attrs)) {
-      return new Map(attrs)
+      return Data.fromJSON(attrs)
     }
 
     throw new Error(`\`Data.create\` only accepts objects or maps, but you passed it: ${attrs}`)
   }
+
+  /**
+   * Create a `Data` from a JSON `object`.
+   *
+   * @param {Object} object
+   * @return {Data}
+   */
+
+  static fromJSON(object) {
+    return new Map(object)
+  }
+
+  /**
+   * Alias `fromJS`.
+   */
+
+  static fromJS = Data.fromJSON
 
 }
 

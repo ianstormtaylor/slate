@@ -98,6 +98,33 @@ class Node {
   }
 
   /**
+   * Create a `Node` from a JSON `object`.
+   *
+   * @param {Object} object
+   * @return {Node}
+   */
+
+  static fromJSON(object) {
+    const { kind } = object
+
+    switch (kind) {
+      case 'block': return Block.fromJSON(object)
+      case 'document': return Document.fromJSON(object)
+      case 'inline': return Inline.fromJSON(object)
+      case 'text': return Text.fromJSON(object)
+      default: {
+        throw new Error(`\`Node.fromJSON\` requires a \`kind\` of either 'block', 'document', 'inline' or 'text', but you passed: ${kind}`)
+      }
+    }
+  }
+
+  /**
+   * Alias `fromJS`.
+   */
+
+  static fromJS = Node.fromJSON
+
+  /**
    * Check if a `value` is a `Node`.
    *
    * @param {Any} value

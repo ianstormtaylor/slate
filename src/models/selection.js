@@ -41,8 +41,7 @@ class Selection extends Record(DEFAULTS) {
     }
 
     if (isPlainObject(attrs)) {
-      const selection = new Selection(attrs)
-      return selection
+      return Selection.fromJSON(attrs)
     }
 
     throw new Error(`\`Selection.create\` only accepts objects or selections, but you passed it: ${attrs}`)
@@ -82,6 +81,43 @@ class Selection extends Record(DEFAULTS) {
 
     throw new Error(`\`Selection.createProperties\` only accepts objects or selections, but you passed it: ${attrs}`)
   }
+
+  /**
+   * Create a `Selection` from a JSON `object`.
+   *
+   * @param {Object} object
+   * @return {Selection}
+   */
+
+  static fromJSON(object) {
+    const {
+      anchorKey = null,
+      anchorOffset = 0,
+      focusKey = null,
+      focusOffset = 0,
+      isBackward = null,
+      isFocused = false,
+      marks = null,
+    } = object
+
+    const selection = new Selection({
+      anchorKey,
+      anchorOffset,
+      focusKey,
+      focusOffset,
+      isBackward,
+      isFocused,
+      marks,
+    })
+
+    return selection
+  }
+
+  /**
+   * Alias `fromJS`.
+   */
+
+  static fromJS = Selection.fromJSON
 
   /**
    * Check if a `value` is a `Selection`.
@@ -676,6 +712,35 @@ class Selection extends Record(DEFAULTS) {
       focusOffset,
       isBackward
     })
+  }
+
+  /**
+   * Return a JSON representation of the selection.
+   *
+   * @return {Object}
+   */
+
+  toJSON() {
+    const object = {
+      anchorKey: this.anchorKey,
+      anchorOffset: this.anchorOffset,
+      focusKey: this.focusKey,
+      focusOffset: this.focusOffset,
+      isBackward: this.isBackward,
+      isFocused: this.isFocused,
+      kind: this.kind,
+      marks: this.marks == null ? null : this.marks.toArray().map(m => m.toJSON()),
+    }
+
+    return object
+  }
+
+  /**
+   * Alias `toJS`.
+   */
+
+  toJS() {
+    return this.toJSON()
   }
 
   /**

@@ -29,7 +29,7 @@ Check out http://slatejs.org for examples!
 
 Deserialize a plain text `string` into a [`State`](../models/state.md). A series of blocks will be created by splitting the input string on `\n` characters. Each block is given a type of `'line'`.
 
-If you pass `toRaw: true` as an option, the return value will be a [`Raw`](./raw.md) JSON object instead of a [`State`](../models/state.md) object.
+If you pass `toJSON: true` as an option, the return value will be a JSON object instead of a [`State`](../models/state.md) object.
 
 ### `Plain.serialize`
 `Plain.serialize(state: State) => String`

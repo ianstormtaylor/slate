@@ -9,9 +9,7 @@ import './document'
  * Dependencies.
  */
 
-import Data from './data'
 import Node from './node'
-import Text from './text'
 import MODEL_TYPES from '../constants/model-types'
 import generateKey from '../utils/generate-key'
 import isPlainObject from 'is-plain-object'
@@ -56,26 +54,7 @@ class Inline extends Record(DEFAULTS) {
     }
 
     if (isPlainObject(attrs)) {
-      const { data, isVoid, key, type } = attrs
-      let { nodes } = attrs
-
-      if (typeof type != 'string') {
-        throw new Error('`Inline.create` requires a block `type` string.')
-      }
-
-      if (nodes == null || nodes.length == 0) {
-        nodes = [Text.create()]
-      }
-
-      const inline = new Inline({
-        data: Data.create(data),
-        isVoid: !!isVoid,
-        key: key || generateKey(),
-        nodes: Node.createList(nodes),
-        type,
-      })
-
-      return inline
+      return Inline.fromJSON(attrs)
     }
 
     throw new Error(`\`Inline.create\` only accepts objects, strings or inlines, but you passed it: ${attrs}`)
@@ -96,6 +75,54 @@ class Inline extends Record(DEFAULTS) {
 
     throw new Error(`\`Inline.createList\` only accepts arrays or lists, but you passed it: ${elements}`)
   }
+
+  /**
+   * Create a `Inline` from a JSON `object`.
+   *
+   * @param {Object|Inline} object
+   * @return {Inline}
+   */
+
+  static fromJSON(object) {
+    if (Inline.isInline(object)) {
+      return object
+    }
+
+    const {
+      data = {},
+      isVoid = false,
+      key = generateKey(),
+      type,
+    } = object
+
+    let {
+      nodes = [],
+    } = object
+
+    if (typeof type != 'string') {
+      throw new Error('`Inline.fromJS` requires a `type` string.')
+    }
+
+    if (nodes.length == 0) {
+      nodes = [{ kind: 'text', text: '' }]
+    }
+
+    const inline = new Inline({
+      key,
+      type,
+      isVoid: !!isVoid,
+      data: new Map(data),
+      nodes: new List(nodes.map(Node.fromJSON)),
+    })
+
+    return inline
+  }
+
+  /**
+   * Alias `fromJS`.
+   */
+
+  static fromJS = Inline.fromJSON
 
   /**
    * Check if a `value` is a `Inline`.
@@ -147,6 +174,38 @@ class Inline extends Record(DEFAULTS) {
 
   get text() {
     return this.getText()
+  }
+
+  /**
+   * Return a JSON representation of the inline.
+   *
+   * @param {Object} options
+   * @return {Object}
+   */
+
+  toJSON(options = {}) {
+    const object = {
+      data: this.data.toJSON(),
+      key: this.key,
+      kind: this.kind,
+      isVoid: this.isVoid,
+      type: this.type,
+      nodes: this.nodes.toArray().map(n => n.toJSON(options)),
+    }
+
+    if (!options.preserveKeys) {
+      delete object.key
+    }
+
+    return object
+  }
+
+  /**
+   * Alias `toJS`.
+   */
+
+  toJS(options) {
+    return this.toJSON(options)
   }
 
 }

@@ -29,7 +29,10 @@ Often times, you don't need to specifically know which point is the "anchor" and
   - [`startOffset`](#startoffset)
 - [Static Methods](#static-methods)
   - [`Selection.create`](#selectioncreate)
+  - [`Selection.fromJSON`](#selectionfromjson)
   - [`Selection.isSelection`](#selectionisselection)
+- [Instance Methods](#instance-methods)
+  - [`toJSON`](#tojson)
 - [Checking Methods](#checking-methods)
   - [`has{Edge}AtEndOf`](#hasedgeatendof)
   - [`has{Edge}AtStartOf`](#hasedgeatstartof)
@@ -122,10 +125,23 @@ A few convenience properties for accessing the first and last point of the selec
 
 Create a new `Selection` instance with `properties`.
 
+### `Selection.fromJSON`
+`Selection.fromJSON(object: Object) => Selection`
+
+Create a selection from a JSON `object`.
+
 ### `Selection.isSelection`
 `Selection.isSelection(maybeSelection: Any) => Boolean`
 
 Returns a boolean if the passed in argument is a `Selection`.
+
+
+## Instance Methods
+
+### `toJSON`
+`toJSON() => Object`
+
+Returns a JSON representation of the selection.
 
 
 ## Checking Methods

@@ -41,18 +41,7 @@ class Mark extends Record(DEFAULTS) {
     }
 
     if (isPlainObject(attrs)) {
-      const { data, type } = attrs
-
-      if (typeof type != 'string') {
-        throw new Error('`Mark.create` requires a mark `type` string.')
-      }
-
-      const mark = new Mark({
-        type,
-        data: Data.create(data),
-      })
-
-      return mark
+      return Mark.fromJSON(attrs)
     }
 
     throw new Error(`\`Mark.create\` only accepts objects, strings or marks, but you passed it: ${attrs}`)
@@ -108,6 +97,37 @@ class Mark extends Record(DEFAULTS) {
   }
 
   /**
+   * Create a `Mark` from a JSON `object`.
+   *
+   * @param {Object} object
+   * @return {Mark}
+   */
+
+  static fromJSON(object) {
+    const {
+      data = {},
+      type,
+    } = object
+
+    if (typeof type != 'string') {
+      throw new Error('`Mark.fromJS` requires a `type` string.')
+    }
+
+    const mark = new Mark({
+      type,
+      data: new Map(data),
+    })
+
+    return mark
+  }
+
+  /**
+   * Alias `fromJS`.
+   */
+
+  static fromJS = Mark.fromJSON
+
+  /**
    * Check if a `value` is a `Mark`.
    *
    * @param {Any} value
@@ -146,6 +166,30 @@ class Mark extends Record(DEFAULTS) {
 
   getComponent(schema) {
     return schema.__getComponent(this)
+  }
+
+  /**
+   * Return a JSON representation of the mark.
+   *
+   * @return {Object}
+   */
+
+  toJSON() {
+    const object = {
+      data: this.data.toJSON(),
+      kind: this.kind,
+      type: this.type,
+    }
+
+    return object
+  }
+
+  /**
+   * Alias `toJS`.
+   */
+
+  toJS() {
+    return this.toJSON()
   }
 
 }
