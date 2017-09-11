@@ -45,25 +45,27 @@ Please include tests and docs with every pull request!
 
 ## Running Tests
 
-To run the examples, you need to have the Slate repository cloned to your computer. After that, you need to `cd` into the directory where you cloned it, and install the dependencies from `npm`.
+To run the examples, you need to have the Slate repository cloned to your computer. After that, you need to `cd` into the directory where you cloned it, and install the dependencies with `yarn`.
 
 ```
-npm install
+yarn install
 ```
 
-Which will also compile the source files. Then run the tests with:
+Then run the tests with:
 
 ```
-npm run tests
+yarn run test
 ```
-
-If you need to debug something, you can add a `debugger` line to the source, and then run `npm run tests debug`. Or, if you only want to run a specific test or tests, you can run `npm run tests -- --fgrep "match this string"` flag which will filter the tests being run.
 
 To keep the source rebuilding on every file change, you need to run an additional watching command:
 
 ```
-npm run watch
+yarn run watch
 ```
+
+Once you've got the watcher running, you no longer need to do the longer `yarn run test` (which builds the source before each run)—you can instead use `yarn run tests` which skips that.
+
+If you need to debug something, you can add a `debugger` line to the source, and then run `yarn run tests debug`. Or, if you only want to run a specific test or tests, you can run `yarn run tests -- --fgrep="match this string"` flag which will filter the tests being run.
 
 
 ## Running Examples
@@ -79,6 +81,7 @@ Slate aims to targeted all of the modern browsers, and eventually the modern mob
 ## Testing Input Methods
 
 [Here's a helpful page](https://github.com/Microsoft/vscode/wiki/IME-Test) detailing how to test various input scenarios on Windows, Mac and Linux.
+
 
 ## Debugging Slate methods
 
