@@ -1,25 +1,26 @@
+
 language: node_js
+node_js:
+  - node
+
+# Do two runs, one for testing and one for linting.
 env:
   matrix:
-  - TEST_TYPE=test
-  - TEST_TYPE=lint
+    - TEST_TYPE=test
+    - TEST_TYPE=lint
+
+# Run testing or linting depending on the environment.
 script:
-  - |
-    if [ "$TEST_TYPE" = test ]; then
-      npm run test
-    elif [ "$TEST_TYPE" = lint ]; then
-      npm run lint
-    fi
-# Slate is compiled with babel and run in the browser
-node_js:
-  - "node"
-# Compiling package microtime requires C++11 compiler. Benchmarks will
-# automatically use microtime if installed.
+  - yarn run bootstrap
+  - yarn run $TEST_TYPE
+
+# Compiling the `microtime` npm package requires C++11 compiler. The benchmarks
+# will automatically use `microtime` if installed.
 addons:
   apt:
     sources:
-    - ubuntu-toolchain-r-test
+      - ubuntu-toolchain-r-test
     packages:
-    - g++-4.8
+      - g++-4.8
 before_install:
   - if [[ $TRAVIS_OS_NAME == "linux" ]]; then export CXX=g++-4.8; fi
