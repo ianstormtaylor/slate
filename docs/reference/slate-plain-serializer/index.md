@@ -1,8 +1,8 @@
 
-# `Plain`
+# `slate-plain-serializer`
 
 ```js
-import { Plain } from 'slate'
+import Plain from 'slate-plain-serializer'
 ```
 
 A serializer that converts a Slate [`State`](../models/state.md) to and from a plain text string.

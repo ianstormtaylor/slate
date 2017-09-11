@@ -61,6 +61,7 @@ const Types = {
   document: create('Document', v => Document.isDocument(v)),
   history: create('History', v => History.isHistory(v)),
   inline: create('Inline', v => Inline.isInline(v)),
+  inlines: create('Inline', v => Inline.isInlineList(v)),
   mark: create('Mark', v => Mark.isMark(v)),
   marks: create('Set<Mark>', v => Mark.isMarkSet(v)),
   node: create('Node', v => Node.isNode(v)),

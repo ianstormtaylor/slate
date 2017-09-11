@@ -49,9 +49,12 @@ EVENT_HANDLERS.forEach((handler) => {
   const method = getMethodName(handler)
 
   Simulator.prototype[method] = function (e, data) {
+    if (e == null) e = {}
+    if (data == null) data = {}
+
     const { stack, state } = this
     const editor = createEditor(stack, state)
-    const event = createEvent(e || {})
+    const event = createEvent(e)
     const change = state.change()
 
     stack[handler](change, editor, event, data)
@@ -59,6 +62,7 @@ EVENT_HANDLERS.forEach((handler) => {
     stack.onChange(change, editor)
 
     this.state = change.state
+    return this
   }
 })
 

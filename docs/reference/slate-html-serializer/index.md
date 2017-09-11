@@ -1,13 +1,13 @@
 
-# `Html`
+# `slate-html-serializer`
 
 ```js
-import { Html } from 'slate'
+import Html from 'slate-html-serializer'
 ```
 
-The `Html` serializer lets you parse and stringify arbitrary HTML content, based on your specific schema's use case. You must pass a series of `rules` to define how your Slate schema should be serialized to and from HTML.
+The HTML serializer lets you parse and stringify arbitrary HTML content, based on your specific schema's use case. You must pass a series of `rules` to define how your Slate schema should be serialized to and from HTML.
 
-For an example of the `Html` serializer in action, check out the [`paste-html` example](../../examples/paste-html).
+For an example of the HTML serializer in action, check out the [`paste-html` example](../../examples/paste-html).
 
 - [Example](#example)
 - [Properties](#properties)
@@ -42,7 +42,7 @@ new Html({
 ### `rules`
 `Array`
 
-An array of rules to initialize the `Html` serializer with, defining your schema.
+An array of rules to initialize the HTML serializer with, defining your schema.
 
 ### `defaultBlock`
 `String|Object|Block`
@@ -59,21 +59,21 @@ A function to parse an HTML string and return a DOM object. Defaults to using th
 ### `Html.deserialize`
 `Html.deserialize(html: String, [options: Object]) => State`
 
-Deserialize an HTML `string` into a [`State`](../models/state.md). How the string is deserialized will be determined by the rules that the `Html` serializer was constructed with.
+Deserialize an HTML `string` into a [`State`](../models/state.md). How the string is deserialized will be determined by the rules that the HTML serializer was constructed with.
 
 If you pass `toJSON: true` as an option, the return value will be a JSON object instead of a [`State`](../models/state.md) object.
 
 ### `Html.serialize`
 `Html.serialize(state: State, [options: Object]) => String || Array`
 
-Serialize a `state` into an HTML string. How the string is serialized will be determined by the rules that the `Html` serializer was constructed with. 
+Serialize a `state` into an HTML string. How the string is serialized will be determined by the rules that the HTML serializer was constructed with. 
 
 If you pass `render: false` as an option, the return value will instead be an iterable list of the top-level React elements, to be rendered as children in your own React component.
 
 
 ## Rules
 
-To initialize an `Html` serialize, you must pass it an array of rules, defining your schema. Each rule defines how to deserialize and serialize a node or mark, by implementing two functions.
+To initialize an HTML serializer, you must pass it an array of rules, defining your schema. Each rule defines how to deserialize and serialize a node or mark, by implementing two functions.
 
 Each rule must define two properties:
 
