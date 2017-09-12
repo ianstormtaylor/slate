@@ -1,7 +1,7 @@
 
 import direction from 'direction'
 import isPlainObject from 'is-plain-object'
-import logger from 'slate-logger'
+import logger from 'slate-dev-logger'
 import { List, OrderedSet, Set } from 'immutable'
 
 import Block from './block'

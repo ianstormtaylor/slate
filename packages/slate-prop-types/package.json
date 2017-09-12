@@ -6,7 +6,7 @@
   "repository": "git://github.com/ianstormtaylor/slate.git",
   "main": "./lib/index.js",
   "dependencies": {
-    "slate-logger": "^0.0.0"
+    "slate-dev-logger": "^0.0.0"
   },
   "peerDependencies": {
     "immutable": "^3.8.0",

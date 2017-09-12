@@ -14,7 +14,7 @@
     "is-plain-object": "^2.0.4",
     "lodash": "^4.17.4",
     "type-of": "^2.0.1",
-    "slate-logger": "^0.0.0"
+    "slate-dev-logger": "^0.0.0"
   },
   "peerDependencies": {
     "react": "^0.14.0 || ^15.0.0",

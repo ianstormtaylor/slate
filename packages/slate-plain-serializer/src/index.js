@@ -1,5 +1,5 @@
 
-import logger from 'slate-logger'
+import logger from 'slate-dev-logger'
 import { Block, Mark, Node, State } from 'slate'
 import { Set } from 'immutable'
 

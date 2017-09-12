@@ -1,7 +1,7 @@
 
 import React from 'react'
 import ReactDOMServer from 'react-dom/server'
-import logger from 'slate-logger'
+import logger from 'slate-dev-logger'
 import typeOf from 'type-of'
 import { Node, State } from 'slate'
 import { Record } from 'immutable'

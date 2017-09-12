@@ -4,7 +4,7 @@ import Portal from 'react-portal'
 import React from 'react'
 import SlateTypes from 'slate-prop-types'
 import Types from 'prop-types'
-import logger from 'slate-logger'
+import logger from 'slate-dev-logger'
 import { Stack, State } from 'slate'
 
 import CorePlugin from '../plugins/core'

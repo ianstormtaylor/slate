@@ -1,6 +1,6 @@
 
 import isEmpty from 'is-empty'
-import logger from 'slate-logger'
+import logger from 'slate-dev-logger'
 import pick from 'lodash/pick'
 
 import Selection from '../models/selection'

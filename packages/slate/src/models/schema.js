@@ -2,7 +2,7 @@
 import React from 'react'
 import find from 'lodash/find'
 import isPlainObject from 'is-plain-object'
-import logger from 'slate-logger'
+import logger from 'slate-dev-logger'
 import typeOf from 'type-of'
 import { Record } from 'immutable'
 

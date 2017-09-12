@@ -1,6 +1,6 @@
 
 import isPlainObject from 'is-plain-object'
-import logger from 'slate-logger'
+import logger from 'slate-dev-logger'
 import { List, Record, OrderedSet, is } from 'immutable'
 
 import Character from './character'

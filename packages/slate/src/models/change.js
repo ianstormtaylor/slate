@@ -1,6 +1,6 @@
 
 import Debug from 'debug'
-import logger from 'slate-logger'
+import logger from 'slate-dev-logger'
 import pick from 'lodash/pick'
 
 import MODEL_TYPES from '../constants/model-types'
