@@ -87,7 +87,6 @@ class Content extends React.Component {
   constructor(props) {
     super(props)
     this.tmp = {}
-    this.tmp.compositions = 0
     this.tmp.forces = 0
   }
 
@@ -215,11 +214,8 @@ class Content extends React.Component {
   onBeforeInput = (event) => {
     if (this.props.readOnly) return
     if (!this.isInEditor(event.target)) return
-
-    const data = {}
-
-    debug('onBeforeInput', { event, data })
-    this.props.onBeforeInput(event, data)
+    debug('onBeforeInput', { event })
+    this.props.stack.onBeforeInput(event, {})
   }
 
   /**
@@ -230,7 +226,6 @@ class Content extends React.Component {
 
   onBlur = (event) => {
     if (this.props.readOnly) return
-    if (this.tmp.isCopying) return
     if (!this.isInEditor(event.target)) return
 
     // If the active element is still the editor, the blur event is due to the
@@ -239,10 +234,8 @@ class Content extends React.Component {
     const window = getWindow(this.element)
     if (window.document.activeElement == this.element) return
 
-    const data = {}
-
-    debug('onBlur', { event, data })
-    this.props.onBlur(event, data)
+    debug('onBlur', { event })
+    this.props.stack.onBlur(event, {})
   }
 
   /**
@@ -253,7 +246,6 @@ class Content extends React.Component {
 
   onFocus = (event) => {
     if (this.props.readOnly) return
-    if (this.tmp.isCopying) return
     if (!this.isInEditor(event.target)) return
 
     // COMPAT: If the editor has nested editable elements, the focus can go to
@@ -264,31 +256,24 @@ class Content extends React.Component {
       return
     }
 
-    const data = {}
-
-    debug('onFocus', { event, data })
-    this.props.onFocus(event, data)
+    debug('onFocus', { event })
+    this.props.stack.onFocus(event, {})
   }
 
   /**
-   * On composition start, set the `isComposing` flag.
+   * On composition start.
    *
    * @param {Event} event
    */
 
   onCompositionStart = (event) => {
     if (!this.isInEditor(event.target)) return
-
-    this.tmp.isComposing = true
-    this.tmp.compositions++
-
     debug('onCompositionStart', { event })
+    this.props.stack.onCompositionStart({ event })
   }
 
   /**
-   * On composition end, remove the `isComposing` flag on the next tick. Also
-   * increment the `forces` key, which will force the contenteditable element
-   * to completely re-render, since IME puts React in an unreconcilable state.
+   * On composition end.
    *
    * @param {Event} event
    */
@@ -296,18 +281,12 @@ class Content extends React.Component {
   onCompositionEnd = (event) => {
     if (!this.isInEditor(event.target)) return
 
+    // Increment the `forces` key, which will force the contenteditable element
+    // to completely re-render, since IME puts React in an unreconcilable state.
     this.tmp.forces++
-    const count = this.tmp.compositions
-
-    // The `count` check here ensures that if another composition starts
-    // before the timeout has closed out this one, we will abort unsetting the
-    // `isComposing` flag, since a composition in still in affect.
-    setTimeout(() => {
-      if (this.tmp.compositions > count) return
-      this.tmp.isComposing = false
-    })
 
     debug('onCompositionEnd', { event })
+    this.props.stack.onCompositionEnd(event, {})
   }
 
   /**
@@ -318,20 +297,8 @@ class Content extends React.Component {
 
   onCopy = (event) => {
     if (!this.isInEditor(event.target)) return
-    const window = getWindow(event.target)
-
-    this.tmp.isCopying = true
-    window.requestAnimationFrame(() => {
-      this.tmp.isCopying = false
-    })
-
-    const { state } = this.props
-    const data = {}
-    data.type = 'fragment'
-    data.fragment = state.fragment
-
-    debug('onCopy', { event, data })
-    this.props.onCopy(event, data)
+    debug('onCopy', { event })
+    this.props.stack.onCopy(event, {})
   }
 
   /**
@@ -343,20 +310,8 @@ class Content extends React.Component {
   onCut = (event) => {
     if (this.props.readOnly) return
     if (!this.isInEditor(event.target)) return
-    const window = getWindow(event.target)
-
-    this.tmp.isCopying = true
-    window.requestAnimationFrame(() => {
-      this.tmp.isCopying = false
-    })
-
-    const { state } = this.props
-    const data = {}
-    data.type = 'fragment'
-    data.fragment = state.fragment
-
-    debug('onCut', { event, data })
-    this.props.onCut(event, data)
+    debug('onCut', { event })
+    this.props.stack.onCut(event, {})
   }
 
   /**
@@ -367,11 +322,8 @@ class Content extends React.Component {
 
   onDragEnd = (event) => {
     if (!this.isInEditor(event.target)) return
-
-    this.tmp.isDragging = false
-    this.tmp.isInternalDrag = null
-
     debug('onDragEnd', { event })
+    this.props.stack.onDragEnd(event, {})
   }
 
   /**
@@ -382,11 +334,8 @@ class Content extends React.Component {
 
   onDragOver = (event) => {
     if (!this.isInEditor(event.target)) return
-    if (this.tmp.isDragging) return
-    this.tmp.isDragging = true
-    this.tmp.isInternalDrag = false
-
     debug('onDragOver', { event })
+    this.props.stack.onDragEnd(event, {})
   }
 
   /**
@@ -397,22 +346,8 @@ class Content extends React.Component {
 
   onDragStart = (event) => {
     if (!this.isInEditor(event.target)) return
-
-    this.tmp.isDragging = true
-    this.tmp.isInternalDrag = true
-    const { dataTransfer } = event.nativeEvent
-    const data = getTransferData(dataTransfer)
-
-    // If it's a node being dragged, the data type is already set.
-    if (data.type == 'node') return
-
-    const { state } = this.props
-    const { fragment } = state
-    const encoded = Base64.serializeNode(fragment)
-
-    setTransferData(dataTransfer, TRANSFER_TYPES.FRAGMENT, encoded)
-
     debug('onDragStart', { event })
+    this.props.stack.onDragStart(event, {})
   }
 
   /**
@@ -545,8 +480,7 @@ class Content extends React.Component {
   }
 
   /**
-   * On key down, prevent the default behavior of certain commands that will
-   * leave the editor in an out-of-sync state, then bubble up.
+   * On key down.
    *
    * @param {Event} event
    */
@@ -554,90 +488,21 @@ class Content extends React.Component {
   onKeyDown = (event) => {
     if (this.props.readOnly) return
     if (!this.isInEditor(event.target)) return
-
-    const { altKey, ctrlKey, metaKey, shiftKey, which } = event
-    const key = keycode(which)
-    const data = {}
-
-    // Keep track of an `isShifting` flag, because it's often used to trigger
-    // "Paste and Match Style" commands, but isn't available on the event in a
-    // normal paste event.
-    if (key == 'shift') {
-      this.tmp.isShifting = true
-    }
-
-    // When composing, these characters commit the composition but also move the
-    // selection before we're able to handle it, so prevent their default,
-    // selection-moving behavior.
-    if (
-      this.tmp.isComposing &&
-      (key == 'left' || key == 'right' || key == 'up' || key == 'down')
-    ) {
-      event.preventDefault()
-      return
-    }
-
-    // Add helpful properties for handling hotkeys to the data object.
-    data.code = which
-    data.key = key
-    data.isAlt = altKey
-    data.isCmd = IS_MAC ? metaKey && !altKey : false
-    data.isCtrl = ctrlKey && !altKey
-    data.isLine = IS_MAC ? metaKey : false
-    data.isMeta = metaKey
-    data.isMod = IS_MAC ? metaKey && !altKey : ctrlKey && !altKey
-    data.isModAlt = IS_MAC ? metaKey && altKey : ctrlKey && altKey
-    data.isShift = shiftKey
-    data.isWord = IS_MAC ? altKey : ctrlKey
-
-    // These key commands have native behavior in contenteditable elements which
-    // will cause our state to be out of sync, so prevent them.
-    if (
-      (key == 'enter') ||
-      (key == 'backspace') ||
-      (key == 'delete') ||
-      (key == 'b' && data.isMod) ||
-      (key == 'i' && data.isMod) ||
-      (key == 'y' && data.isMod) ||
-      (key == 'z' && data.isMod)
-    ) {
-      event.preventDefault()
-    }
-
-    debug('onKeyDown', { event, data })
-    this.props.onKeyDown(event, data)
+    debug('onKeyDown', { event })
+    this.props.stack.onKeyDown(event, {})
   }
 
   /**
-   * On key up, unset the `isShifting` flag.
+   * On key up.
    *
    * @param {Event} event
    */
 
   onKeyUp = (event) => {
-    const { altKey, ctrlKey, metaKey, shiftKey, which } = event
-    const key = keycode(which)
-    const data = {}
-
-    if (key == 'shift') {
-      this.tmp.isShifting = false
-    }
-
-    // Add helpful properties for handling hotkeys to the data object.
-    data.code = which
-    data.key = key
-    data.isAlt = altKey
-    data.isCmd = IS_MAC ? metaKey && !altKey : false
-    data.isCtrl = ctrlKey && !altKey
-    data.isLine = IS_MAC ? metaKey : false
-    data.isMeta = metaKey
-    data.isMod = IS_MAC ? metaKey && !altKey : ctrlKey && !altKey
-    data.isModAlt = IS_MAC ? metaKey && altKey : ctrlKey && altKey
-    data.isShift = shiftKey
-    data.isWord = IS_MAC ? altKey : ctrlKey
-
-    debug('onKeyUp', { event, data })
-    this.props.onKeyUp(event, data)
+    if (this.props.readOnly) return
+    if (!this.isInEditor(event.target)) return
+    debug('onKeyUp', { event })
+    this.props.stack.onKeyUp(event, {})
   }
 
   /**
@@ -649,28 +514,8 @@ class Content extends React.Component {
   onPaste = (event) => {
     if (this.props.readOnly) return
     if (!this.isInEditor(event.target)) return
-
-    const data = getTransferData(event.clipboardData)
-
-    // Attach the `isShift` flag, so that people can use it to trigger "Paste
-    // and Match Style" logic.
-    data.isShift = !!this.tmp.isShifting
-    debug('onPaste', { event, data })
-
-    // COMPAT: In IE 11, only plain text can be retrieved from the event's
-    // `clipboardData`. To get HTML, use the browser's native paste action which
-    // can only be handled synchronously. (2017/06/23)
-    if (IS_IE) {
-      // Do not use `event.preventDefault()` as we need the native paste action.
-      getHtmlFromNativePaste(event.target, (html) => {
-        // If pasted HTML can be retreived, it is added to the `data` object,
-        // setting the `type` to `html`.
-        this.props.onPaste(event, html === undefined ? data : { ...data, html, type: 'html' })
-      })
-    } else {
-      event.preventDefault()
-      this.props.onPaste(event, data)
-    }
+    debug('onPaste', { event })
+    this.props.stack.onPaste(event, {})
   }
 
   /**
