@@ -39,7 +39,7 @@
     "import/namespace": "error",
     "import/newline-after-import": "error",
     "import/no-deprecated": "error",
-    "import/no-extraneous-dependencies": "error",
+    "import/no-extraneous-dependencies": ["error", { "peerDependencies": true }],
     "import/no-mutable-exports": "error",
     "import/no-named-as-default": "error",
     "import/no-named-as-default-member": "error",

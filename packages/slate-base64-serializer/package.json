@@ -1,0 +1,37 @@
+{
+  "name": "slate-base64-serializer",
+  "description": "A Base64 serializer for Slate editors.",
+  "version": "0.0.0",
+  "license": "MIT",
+  "repository": "git://github.com/ianstormtaylor/slate.git",
+  "main": "./lib/index.js",
+  "peerDependencies": {
+    "slate": "^0.23.0"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.10.1",
+    "browserify": "^13.0.1",
+    "mocha": "^2.5.3",
+    "slate": "^0.23.0",
+    "uglify-js": "^2.7.0"
+  },
+  "scripts": {
+    "build": "babel --out-dir ./lib ./src",
+    "build:max": "mkdir -p ./dist && NODE_ENV=production browserify ./src/index.js --transform babelify --transform envify --transform [ browserify-global-shim --global ] --standalone SlateBase64Serializer > ./dist/slate-base64-serializer.js",
+    "build:min": "mkdir -p ./dist && NODE_ENV=production browserify ./src/index.js --transform babelify --transform envify --transform [ browserify-global-shim --global ] --transform uglifyify --standalone SlateBase64Serializer | uglifyjs > ./dist/slate-base64-serializer.min.js",
+    "clean": "rm -rf ./dist ./lib ./node_modules",
+    "prepublish": "yarn run build:max && yarn run build:min",
+    "watch": "babel --watch --out-dir ./lib ./src --source-maps inline"
+  },
+  "browserify-global-shim": {
+    "slate": "Slate"
+  },
+  "keywords": [
+    "deserialize",
+    "base64",
+    "editor",
+    "serialize",
+    "serializer",
+    "slate"
+  ]
+}

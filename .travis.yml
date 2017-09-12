@@ -1,25 +1,28 @@
+
 language: node_js
-env:
-  matrix:
-  - TEST_TYPE=test
-  - TEST_TYPE=lint
-script:
-  - |
-    if [ "$TEST_TYPE" = test ]; then
-      npm run test
-    elif [ "$TEST_TYPE" = lint ]; then
-      npm run lint
-    fi
-# Slate is compiled with babel and run in the browser
-node_js:
-  - "node"
-# Compiling package microtime requires C++11 compiler. Benchmarks will
-# automatically use microtime if installed.
-addons:
-  apt:
-    sources:
-    - ubuntu-toolchain-r-test
-    packages:
-    - g++-4.8
+node_js: [node]
+
 before_install:
+  # Download and export yarn.
+  - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.0.1
+  - export PATH=$HOME/.yarn/bin:$PATH
+  # Export the C++11 compiler.
   - if [[ $TRAVIS_OS_NAME == "linux" ]]; then export CXX=g++-4.8; fi
+
+cache:
+  # Cache yarn packages.
+  yarn: true
+
+env:
+  # Do two runs, one for testing and one for linting.
+  matrix:
+    - TEST_TYPE=test
+    - TEST_TYPE=lint
+
+script:
+  # Run bootstrap first so that the proper workspaces links are created.
+  - yarn run bootstrap
+  # Build all of the packages so they are resolvable by each other.
+  - yarn run build
+  # Run testing or linting depending on the environment.
+  - yarn run $TEST_TYPE

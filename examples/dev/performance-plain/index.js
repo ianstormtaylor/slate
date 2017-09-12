@@ -1,5 +1,7 @@
 
-import { Editor, Plain } from '../../..'
+import { Editor } from 'slate-react'
+import { Plain } from 'slate'
+
 import React from 'react'
 import initialState from './state.json'
 

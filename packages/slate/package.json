@@ -1,0 +1,63 @@
+{
+  "name": "slate",
+  "description": "A completely customizable framework for building rich text editors.",
+  "version": "0.23.0",
+  "license": "MIT",
+  "repository": "git://github.com/ianstormtaylor/slate.git",
+  "main": "./lib/index.js",
+  "dependencies": {
+    "debug": "^2.3.2",
+    "direction": "^0.1.5",
+    "es6-map": "^0.1.4",
+    "esrever": "^0.2.0",
+    "is-empty": "^1.0.0",
+    "is-plain-object": "^2.0.4",
+    "lodash": "^4.17.4",
+    "type-of": "^2.0.1",
+    "slate-logger": "^0.0.0"
+  },
+  "peerDependencies": {
+    "react": "^0.14.0 || ^15.0.0",
+    "immutable": "^3.8.1"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.10.1",
+    "browserify": "^13.0.1",
+    "slate-hyperscript": "^0.0.0",
+    "uglify-js": "^2.7.0"
+  },
+  "scripts": {
+    "build": "babel --out-dir ./lib ./src",
+    "build:max": "mkdir -p ./dist && NODE_ENV=production browserify ./src/index.js --transform babelify --transform envify --transform [ browserify-global-shim --global ] --standalone Slate > ./dist/slate.js",
+    "build:min": "mkdir -p ./dist && NODE_ENV=production browserify ./src/index.js --transform babelify --transform envify --transform [ browserify-global-shim --global ] --transform uglifyify --standalone Slate | uglifyjs > ./dist/slate.min.js",
+    "clean": "rm -rf ./dist ./lib ./node_modules",
+    "prepublish": "yarn run build:max && yarn run build:min",
+    "watch": "babel --watch --out-dir ./lib ./src --source-maps inline"
+  },
+  "browserify-global-shim": {
+    "react": "React",
+    "immutable": "Immutable"
+  },
+  "keywords": [
+    "canvas",
+    "contenteditable",
+    "doc",
+    "docs",
+    "document",
+    "edit",
+    "editor",
+    "html",
+    "immutable",
+    "markdown",
+    "medium",
+    "paper",
+    "react",
+    "rich",
+    "rich-text",
+    "richtext",
+    "slate",
+    "text",
+    "wysiwyg",
+    "wysiwym"
+  ]
+}

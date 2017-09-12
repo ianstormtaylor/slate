@@ -1,0 +1,41 @@
+{
+  "name": "slate-hyperscript",
+  "description": "A hyperscript helper for creating Slate documents.",
+  "version": "0.0.0",
+  "license": "MIT",
+  "repository": "git://github.com/ianstormtaylor/slate.git",
+  "main": "./lib/index.js",
+  "dependencies": {
+    "is-empty": "^1.0.0",
+    "is-plain-object": "^2.0.4"
+  },
+  "peerDependencies": {
+    "slate": "^0.23.0"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.10.1",
+    "browserify": "^13.0.1",
+    "mocha": "^2.5.3",
+    "slate": "^0.23.0",
+    "uglify-js": "^2.7.0"
+  },
+  "scripts": {
+    "build": "babel --out-dir ./lib ./src",
+    "build:max": "mkdir -p ./dist && NODE_ENV=production browserify ./src/index.js --transform babelify --transform envify --transform [ browserify-global-shim --global ] --standalone SlateHyperscript > ./dist/slate-hyperscript.js",
+    "build:min": "mkdir -p ./dist && NODE_ENV=production browserify ./src/index.js --transform babelify --transform envify --transform [ browserify-global-shim --global ] --transform uglifyify --standalone SlateHyperscript | uglifyjs > ./dist/slate-hyperscript.min.js",
+    "clean": "rm -rf ./dist ./lib ./node_modules",
+    "prepublish": "yarn run build:max && yarn run build:min",
+    "watch": "babel --watch --out-dir ./lib ./src --source-maps inline"
+  },
+  "browserify-global-shim": {
+    "slate": "Slate"
+  },
+  "keywords": [
+    "hyperscript",
+    "jsx",
+    "html",
+    "slate",
+    "sugar",
+    "xml"
+  ]
+}

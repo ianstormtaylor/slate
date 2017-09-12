@@ -1,5 +1,7 @@
 
-import { Editor, Block, State } from '../..'
+import { Editor } from 'slate-react'
+import { Block, State } from 'slate'
+
 import React from 'react'
 import initialState from './state.json'
 import isImage from 'is-image'

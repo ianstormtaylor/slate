@@ -1,5 +1,8 @@
 
-import { Editor, Html, State } from '../..'
+import Html from 'slate-html-serializer'
+import { Editor } from 'slate-react'
+import { State } from 'slate'
+
 import React from 'react'
 import initialState from './state.json'
 

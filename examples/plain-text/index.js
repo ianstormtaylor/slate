@@ -1,5 +1,7 @@
 
-import { Editor, Plain } from '../..'
+import Plain from 'slate-plain-serializer'
+import { Editor } from 'slate-react'
+
 import React from 'react'
 
 /**

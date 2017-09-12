@@ -6,8 +6,9 @@ Want to contribute to Slate? That would be awesome!
 - [Reporting Bugs](#reporting-bugs)
 - [Asking Questions](#asking-questions)
 - [Submitting Pull Requests](#submitting-pull-requests)
-- [Running Tests](#running-tests)
 - [Running Examples](#running-examples)
+- [Running Tests](#running-tests)
+- [Running Benchmarks](#running-benchmarks)
 - [Adding Browser Support](#adding-browser-support)
 - [Testing Input Methods](#testing-input-methods)
 
@@ -43,32 +44,56 @@ All pull requests are super welcomed and greatly appreciated! Easy issues are ma
 Please include tests and docs with every pull request!
 
 
-## Running Tests
-
-To run the examples, you need to have the Slate repository cloned to your computer. After that, you need to `cd` into the directory where you cloned it, and install the dependencies from `npm`.
-
-```
-npm install
-```
-
-Which will also compile the source files. Then run the tests with:
-
-```
-npm run tests
-```
-
-If you need to debug something, you can add a `debugger` line to the source, and then run `npm run tests debug`. Or, if you only want to run a specific test or tests, you can run `npm run tests -- --fgrep "match this string"` flag which will filter the tests being run.
-
-To keep the source rebuilding on every file change, you need to run an additional watching command:
-
-```
-npm run watch
-```
-
-
 ## Running Examples
 
 Check out the [Examples readme](./examples) to see how to get the examples running locally!
+
+
+## Running Tests
+
+To run the tests, you need to have the Slate repository cloned to your computer. After that, you need to `cd` into the directory where you cloned it, and install the dependencies with `yarn` and bootstrap the monorepo:
+
+```
+yarn install
+yarn run bootstrap
+```
+
+Then run the tests with:
+
+```
+yarn run test
+```
+
+To keep the source rebuilding on every file change, you need to run an additional watching command in a separate process:
+
+```
+yarn run watch
+```
+
+If you need to debug something, you can add a `debugger` line to the source, and then run `yarn run test debug`. 
+
+If you only want to run a specific test or tests, you can run `yarn run test --fgrep="slate-react rendering"` flag which will filter the tests being run by grepping for the string in each test.
+
+
+## Running Benchmarks
+
+To run the benchmarks, first make some changes to the source that you want to benchmark. Now that you're ready, you need to save a "baseline" for what the performance was before you made you change.
+
+To do that, stash your changes and save the benchmarks:
+
+```
+git stash
+yarn run benchmark:save
+```
+
+Then once the reference has been saved, unstash your changes and run the benchmarks to see a comparison:
+
+```
+git stash pop
+yarn run benchmark
+```
+
+There will be some subtle changes in iteration speed always, but the comparison reporter will highlight any changes that seem meaningful. You can run `benchmark` multiple times to ensure the speed up persists.
 
 
 ## Adding Browser Support
@@ -79,6 +104,7 @@ Slate aims to targeted all of the modern browsers, and eventually the modern mob
 ## Testing Input Methods
 
 [Here's a helpful page](https://github.com/Microsoft/vscode/wiki/IME-Test) detailing how to test various input scenarios on Windows, Mac and Linux.
+
 
 ## Debugging Slate methods
 

@@ -1,5 +1,8 @@
 
-import { Editor, Mark, Plain } from '../..'
+import Plain from 'slate-plain-serializer'
+import { Editor } from 'slate-react'
+import { Mark } from 'slate'
+
 import Prism from 'prismjs'
 import React from 'react'
 
