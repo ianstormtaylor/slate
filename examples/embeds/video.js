@@ -59,30 +59,22 @@ class Video extends React.Component {
 
     const wrapperStyle = {
       position: 'relative',
-      paddingBottom: '66.66%',
-      paddingTop: '25px',
-      height: '0',
       outline: isSelected ? '2px solid blue' : 'none',
     }
 
     const maskStyle = {
       display: isSelected ? 'none' : 'block',
       position: 'absolute',
-      top: '0px',
-      left: '0px',
-      right: '0px',
-      bottom: '0px',
+      top: '0',
+      left: '0',
       height: '100%',
+      width: '100%',
       cursor: 'cell',
       zIndex: 1,
     }
 
     const iframeStyle = {
-      position: 'absolute',
-      top: '0px',
-      left: '0px',
-      width: '100%',
-      height: '100%',
+      display: 'block'
     }
 
     return (
@@ -92,7 +84,7 @@ class Video extends React.Component {
           id="ytplayer"
           type="text/html"
           width="640"
-          height="390"
+          height="476"
           src={video}
           frameBorder="0"
           style={iframeStyle}
@@ -110,12 +102,17 @@ class Video extends React.Component {
   renderInput = () => {
     const { node } = this.props
     const video = node.data.get('video')
+    const style = {
+      marginTop: '5px',
+      boxSizing: 'border-box'
+    }
+
     return (
       <input
         value={video}
         onChange={this.onChange}
         onClick={this.onClick}
-        style={{ marginTop: '5px' }}
+        style={style}
       />
     )
   }
