@@ -11,6 +11,8 @@ Want to contribute to Slate? That would be awesome!
 - [Running Benchmarks](#running-benchmarks)
 - [Adding Browser Support](#adding-browser-support)
 - [Testing Input Methods](#testing-input-methods)
+- [Debugging Slate Methods](#debugging-slate-methods)
+- [Publishing Releases](#publishing-releases)
 
 
 ## Reporting Bugs
@@ -106,6 +108,17 @@ Slate aims to targeted all of the modern browsers, and eventually the modern mob
 [Here's a helpful page](https://github.com/Microsoft/vscode/wiki/IME-Test) detailing how to test various input scenarios on Windows, Mac and Linux.
 
 
-## Debugging Slate methods
+## Debugging Slate Methods
 
 Slate makes use of [debug](https://github.com/visionmedia/debug) to log information about various methods. You can [enable the logger in the browser](https://github.com/visionmedia/debug#browser-support) by setting `localStorage.debug = "*"` (to log methods on all modules) or to a single namespace (e.g. `slate:editor`). Look for `const debug = Debug('<namespace>')` to get the namespace of various modules.
+
+
+## Publishing Releases
+
+Since we use [Lerna](https://lernajs.io) to manage the Slate packages this is fairly easy, **but** you must make sure you are using `npm` to run the release script, because using `yarn` results in failures. So just run:
+
+```js
+npm run release 
+```
+
+And follow the prompts Lerna gives you.
