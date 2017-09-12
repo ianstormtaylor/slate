@@ -92,9 +92,9 @@ const rules = [
 ]
 ```
 
-The `serialize` function should also feel familiar. It's just taking [Slate models](../reference/models) and turning them into React elements, which will then be rendered to an HTML string.
+The `serialize` function should also feel familiar. It's just taking [Slate models](../reference/slate) and turning them into React elements, which will then be rendered to an HTML string.
 
-The `object` argument of the `serialize` function will either be a [`Node`](../reference/models/node.md), a [`Mark`](../reference/models/mark.md) or a special immutable [`String`](../reference/serializers/html.md#ruleserialize) object. And the `children` argument is a React element describing the nested children of the object in question, for recursing.
+The `object` argument of the `serialize` function will either be a [`Node`](../reference/slate/node.md), a [`Mark`](../reference/slate/mark.md) or a special immutable [`String`](../reference/serializers/html.md#ruleserialize) object. And the `children` argument is a React element describing the nested children of the object in question, for recursing.
 
 Okay, so now our serializer can handle `paragraph` nodes.
 

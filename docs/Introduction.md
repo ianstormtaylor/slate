@@ -89,10 +89,10 @@ Slate encourages you to write small, reusable modules. Check out the public ones
 
 ### Documentation
 
-If you're using Slate for the first time, check out the [Getting Started](http://docs.slatejs.org/walkthroughs/installing-slate.html) walkthroughs to familiarize yourself with Slate's architecture and mental models. Once you've gotten familiar with those, you'll probably want to check out the full [API Reference](http://docs.slatejs.org/reference/components/editor.html).
+If you're using Slate for the first time, check out the [Getting Started](http://docs.slatejs.org/walkthroughs/installing-slate.html) walkthroughs to familiarize yourself with Slate's architecture and mental models. Once you've gotten familiar with those, you'll probably want to check out the full [API Reference](http://docs.slatejs.org/reference/slate-react/editor.html).
 
 - [**Walkthroughs**](http://docs.slatejs.org/walkthroughs/installing-slate.html)
-- [**Reference**](http://docs.slatejs.org/reference/components/editor.html)
+- [**Reference**](http://docs.slatejs.org/reference/slate-react/editor.html)
 - [**FAQ**](http://docs.slatejs.org/general/faq.html)
 - [**Resources**](http://docs.slatejs.org/general/resources.html)
 
