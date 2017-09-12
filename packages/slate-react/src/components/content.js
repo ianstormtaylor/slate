@@ -1,23 +1,16 @@
 
-import Base64 from 'slate-base64-serializer'
 import Debug from 'debug'
 import React from 'react'
 import SlateTypes from 'slate-prop-types'
 import Types from 'prop-types'
 import getWindow from 'get-window'
-import keycode from 'keycode'
-import { Selection } from 'slate'
 
-import TRANSFER_TYPES from '../constants/transfer-types'
 import Node from './node'
 import extendSelection from '../utils/extend-selection'
 import findClosestNode from '../utils/find-closest-node'
 import getCaretPosition from '../utils/get-caret-position'
-import getHtmlFromNativePaste from '../utils/get-html-from-native-paste'
 import getPoint from '../utils/get-point'
-import getTransferData from '../utils/get-transfer-data'
-import setTransferData from '../utils/set-transfer-data'
-import { IS_FIREFOX, IS_MAC, IS_IE } from '../constants/environment'
+import { IS_FIREFOX } from '../constants/environment'
 
 /**
  * Debug.
@@ -49,10 +42,16 @@ class Content extends React.Component {
     editor: Types.object.isRequired,
     onBeforeInput: Types.func.isRequired,
     onBlur: Types.func.isRequired,
+    onCompositionEnd: Types.func.isRequired,
+    onCompositionStart: Types.func.isRequired,
     onCopy: Types.func.isRequired,
     onCut: Types.func.isRequired,
+    onDragEnd: Types.func.isRequired,
+    onDragOver: Types.func.isRequired,
+    onDragStart: Types.func.isRequired,
     onDrop: Types.func.isRequired,
     onFocus: Types.func.isRequired,
+    onInput: Types.func.isRequired,
     onKeyDown: Types.func.isRequired,
     onKeyUp: Types.func.isRequired,
     onPaste: Types.func.isRequired,
@@ -156,20 +155,20 @@ class Content extends React.Component {
       return
     }
 
-    // Otherwise, set the `isSelecting` flag and update the selection.
-    this.tmp.isSelecting = true
+    // Otherwise, set the `isUpdatingSelection` flag and update the selection.
+    this.tmp.isUpdatingSelection = true
     native.removeAllRanges()
     const range = window.document.createRange()
     range.setStart(anchor.node, anchor.offset)
     native.addRange(range)
     if (!isCollapsed) extendSelection(native, focus.node, focus.offset)
 
-    // Then unset the `isSelecting` flag after a delay.
+    // Then unset the `isUpdatingSelection` flag after a delay.
     setTimeout(() => {
       // COMPAT: In Firefox, it's not enough to create a range, you also need to
       // focus the contenteditable element too. (2016/11/16)
       if (IS_FIREFOX) this.element.focus()
-      this.tmp.isSelecting = false
+      this.tmp.isUpdatingSelection = false
     })
 
     debug('updateSelection', { selection, native })
@@ -206,7 +205,21 @@ class Content extends React.Component {
   }
 
   /**
-   * On before input, bubble up.
+   * Call a `handler` with an `event` and `data`.
+   *
+   * @param {String} handler
+   * @param {Event} event
+   * @param {Object} data
+   */
+
+  handle = (handler, event, data = {}) => {
+    const fn = this.props[handler]
+    debug(handler, { event })
+    fn(event, data)
+  }
+
+  /**
+   * On before input.
    *
    * @param {Event} event
    */
@@ -214,12 +227,11 @@ class Content extends React.Component {
   onBeforeInput = (event) => {
     if (this.props.readOnly) return
     if (!this.isInEditor(event.target)) return
-    debug('onBeforeInput', { event })
-    this.props.stack.onBeforeInput(event, {})
+    this.handle('onBeforeInput', event)
   }
 
   /**
-   * On blur, update the selection to be not focused.
+   * On blur.
    *
    * @param {Event} event
    */
@@ -234,12 +246,110 @@ class Content extends React.Component {
     const window = getWindow(this.element)
     if (window.document.activeElement == this.element) return
 
-    debug('onBlur', { event })
-    this.props.stack.onBlur(event, {})
+    this.handle('onBlur', event)
   }
 
   /**
-   * On focus, update the selection to be focused.
+   * On composition start.
+   *
+   * @param {Event} event
+   */
+
+  onCompositionStart = (event) => {
+    if (this.props.readOnly) return
+    if (!this.isInEditor(event.target)) return
+    this.handle('onCompositionStart', event)
+  }
+
+  /**
+   * On composition end.
+   *
+   * @param {Event} event
+   */
+
+  onCompositionEnd = (event) => {
+    if (this.props.readOnly) return
+    if (!this.isInEditor(event.target)) return
+
+    // Increment the `forces` key, which will force the contenteditable element
+    // to completely re-render, since IME puts React in an unreconcilable state.
+    this.tmp.forces++
+
+    this.handle('onCompositionEnd', event)
+  }
+
+  /**
+   * On copy.
+   *
+   * @param {Event} event
+   */
+
+  onCopy = (event) => {
+    if (!this.isInEditor(event.target)) return
+    this.handle('onCopy', event)
+  }
+
+  /**
+   * On cut.
+   *
+   * @param {Event} event
+   */
+
+  onCut = (event) => {
+    if (this.props.readOnly) return
+    if (!this.isInEditor(event.target)) return
+    this.handle('onCut', event)
+  }
+
+  /**
+   * On drag end.
+   *
+   * @param {Event} event
+   */
+
+  onDragEnd = (event) => {
+    if (!this.isInEditor(event.target)) return
+    this.handle('onDragEnd', event)
+  }
+
+  /**
+   * On drag over.
+   *
+   * @param {Event} event
+   */
+
+  onDragOver = (event) => {
+    if (!this.isInEditor(event.target)) return
+    this.handle('onDragOver', event)
+  }
+
+  /**
+   * On drag start.
+   *
+   * @param {Event} event
+   */
+
+  onDragStart = (event) => {
+    if (!this.isInEditor(event.target)) return
+    this.handle('onDragStart', event)
+  }
+
+  /**
+   * On drop.
+   *
+   * @param {Event} event
+   */
+
+  onDrop = (event) => {
+    // TODO: why does this need to be here and not in the before plugin?
+    event.preventDefault()
+    if (this.props.readOnly) return
+    if (!this.isInEditor(event.target)) return
+    this.handle('onDrop', event)
+  }
+
+  /**
+   * On focus.
    *
    * @param {Event} event
    */
@@ -256,227 +366,19 @@ class Content extends React.Component {
       return
     }
 
-    debug('onFocus', { event })
-    this.props.stack.onFocus(event, {})
+    this.handle('onFocus', event)
   }
 
   /**
-   * On composition start.
-   *
-   * @param {Event} event
-   */
-
-  onCompositionStart = (event) => {
-    if (!this.isInEditor(event.target)) return
-    debug('onCompositionStart', { event })
-    this.props.stack.onCompositionStart({ event })
-  }
-
-  /**
-   * On composition end.
-   *
-   * @param {Event} event
-   */
-
-  onCompositionEnd = (event) => {
-    if (!this.isInEditor(event.target)) return
-
-    // Increment the `forces` key, which will force the contenteditable element
-    // to completely re-render, since IME puts React in an unreconcilable state.
-    this.tmp.forces++
-
-    debug('onCompositionEnd', { event })
-    this.props.stack.onCompositionEnd(event, {})
-  }
-
-  /**
-   * On copy, defer to `onCutCopy`, then bubble up.
-   *
-   * @param {Event} event
-   */
-
-  onCopy = (event) => {
-    if (!this.isInEditor(event.target)) return
-    debug('onCopy', { event })
-    this.props.stack.onCopy(event, {})
-  }
-
-  /**
-   * On cut, defer to `onCutCopy`, then bubble up.
-   *
-   * @param {Event} event
-   */
-
-  onCut = (event) => {
-    if (this.props.readOnly) return
-    if (!this.isInEditor(event.target)) return
-    debug('onCut', { event })
-    this.props.stack.onCut(event, {})
-  }
-
-  /**
-   * On drag end, unset the `isDragging` flag.
-   *
-   * @param {Event} event
-   */
-
-  onDragEnd = (event) => {
-    if (!this.isInEditor(event.target)) return
-    debug('onDragEnd', { event })
-    this.props.stack.onDragEnd(event, {})
-  }
-
-  /**
-   * On drag over, set the `isDragging` flag and the `isInternalDrag` flag.
-   *
-   * @param {Event} event
-   */
-
-  onDragOver = (event) => {
-    if (!this.isInEditor(event.target)) return
-    debug('onDragOver', { event })
-    this.props.stack.onDragEnd(event, {})
-  }
-
-  /**
-   * On drag start, set the `isDragging` flag and the `isInternalDrag` flag.
-   *
-   * @param {Event} event
-   */
-
-  onDragStart = (event) => {
-    if (!this.isInEditor(event.target)) return
-    debug('onDragStart', { event })
-    this.props.stack.onDragStart(event, {})
-  }
-
-  /**
-   * On drop.
-   *
-   * @param {Event} event
-   */
-
-  onDrop = (event) => {
-    event.preventDefault()
-
-    if (this.props.readOnly) return
-    if (!this.isInEditor(event.target)) return
-
-    const window = getWindow(event.target)
-    const { state, editor } = this.props
-    const { nativeEvent } = event
-    const { dataTransfer, x, y } = nativeEvent
-    const data = getTransferData(dataTransfer)
-
-    // Resolve the point where the drop occured.
-    let range
-
-    // COMPAT: In Firefox, `caretRangeFromPoint` doesn't exist. (2016/07/25)
-    if (window.document.caretRangeFromPoint) {
-      range = window.document.caretRangeFromPoint(x, y)
-    } else {
-      range = window.document.createRange()
-      range.setStart(nativeEvent.rangeParent, nativeEvent.rangeOffset)
-    }
-
-    const { startContainer, startOffset } = range
-    const point = getPoint(startContainer, startOffset, state, editor)
-    if (!point) return
-
-    const target = Selection.create({
-      anchorKey: point.key,
-      anchorOffset: point.offset,
-      focusKey: point.key,
-      focusOffset: point.offset,
-      isFocused: true
-    })
-
-    // Add drop-specific information to the data.
-    data.target = target
-
-    // COMPAT: Edge throws "Permission denied" errors when
-    // accessing `dropEffect` or `effectAllowed` (2017/7/12)
-    try {
-      data.effect = dataTransfer.dropEffect
-    } catch (err) {
-      data.effect = null
-    }
-
-    if (data.type == 'fragment' || data.type == 'node') {
-      data.isInternal = this.tmp.isInternalDrag
-    }
-
-    debug('onDrop', { event, data })
-    this.props.onDrop(event, data)
-  }
-
-  /**
-   * On input, handle spellcheck and other similar edits that don't go trigger
-   * the `onBeforeInput` and instead update the DOM directly.
+   * On input.
    *
    * @param {Event} event
    */
 
   onInput = (event) => {
-    if (this.tmp.isComposing) return
-    if (this.props.state.isBlurred) return
+    if (this.props.readOnly) return
     if (!this.isInEditor(event.target)) return
-    debug('onInput', { event })
-
-    const window = getWindow(event.target)
-    const { state, editor } = this.props
-
-    // Get the selection point.
-    const native = window.getSelection()
-    const { anchorNode, anchorOffset } = native
-    const point = getPoint(anchorNode, anchorOffset, state, editor)
-    if (!point) return
-
-    // Get the range in question.
-    const { key, index, start, end } = point
-    const { document, selection } = state
-    const schema = editor.getSchema()
-    const decorators = document.getDescendantDecorators(key, schema)
-    const node = document.getDescendant(key)
-    const block = document.getClosestBlock(node.key)
-    const ranges = node.getRanges(decorators)
-    const lastText = block.getLastText()
-
-    // Get the text information.
-    let { textContent } = anchorNode
-    const lastChar = textContent.charAt(textContent.length - 1)
-    const isLastText = node == lastText
-    const isLastRange = index == ranges.size - 1
-
-    // If we're dealing with the last leaf, and the DOM text ends in a new line,
-    // we will have added another new line in <Leaf>'s render method to account
-    // for browsers collapsing a single trailing new lines, so remove it.
-    if (isLastText && isLastRange && lastChar == '\n') {
-      textContent = textContent.slice(0, -1)
-    }
-
-    // If the text is no different, abort.
-    const range = ranges.get(index)
-    const { text, marks } = range
-    if (textContent == text) return
-
-    // Determine what the selection should be after changing the text.
-    const delta = textContent.length - text.length
-    const after = selection.collapseToEnd().move(delta)
-
-    // Change the current state to have the text replaced.
-    editor.change((change) => {
-      change
-        .select({
-          anchorKey: key,
-          anchorOffset: start,
-          focusKey: key,
-          focusOffset: end
-        })
-        .delete()
-        .insertText(textContent, marks)
-        .select(after)
-    })
+    this.handle('onInput', event)
   }
 
   /**
@@ -488,8 +390,7 @@ class Content extends React.Component {
   onKeyDown = (event) => {
     if (this.props.readOnly) return
     if (!this.isInEditor(event.target)) return
-    debug('onKeyDown', { event })
-    this.props.stack.onKeyDown(event, {})
+    this.handle('onKeyDown', event)
   }
 
   /**
@@ -501,12 +402,11 @@ class Content extends React.Component {
   onKeyUp = (event) => {
     if (this.props.readOnly) return
     if (!this.isInEditor(event.target)) return
-    debug('onKeyUp', { event })
-    this.props.stack.onKeyUp(event, {})
+    this.handle('onKeyUp', event)
   }
 
   /**
-   * On paste, determine the type and bubble up.
+   * On paste.
    *
    * @param {Event} event
    */
@@ -514,39 +414,32 @@ class Content extends React.Component {
   onPaste = (event) => {
     if (this.props.readOnly) return
     if (!this.isInEditor(event.target)) return
-    debug('onPaste', { event })
-    this.props.stack.onPaste(event, {})
+    this.handle('onPaste', event)
   }
 
   /**
-   * On select, update the current state's selection.
+   * On select.
    *
    * @param {Event} event
    */
 
   onSelect = (event) => {
     if (this.props.readOnly) return
-    if (this.tmp.isCopying) return
-    if (this.tmp.isComposing) return
-    if (this.tmp.isSelecting) return
+    if (this.tmp.isUpdatingSelection) return
     if (!this.isInEditor(event.target)) return
 
     const window = getWindow(event.target)
-    const { state, editor } = this.props
-    const { document, selection } = state
     const native = window.getSelection()
-    const data = {}
+    const { state, editor } = this.props
+    const { selection } = state
 
-    // If there are no ranges, the editor was blurred natively.
-    if (!native.rangeCount) {
-      data.selection = selection.set('isFocused', false)
-    }
-
-    // Otherwise, determine the Slate selection from the native one.
-    else {
+    // If there is a native selection range, check if we should abort...
+    if (native.rangeCount) {
       const { anchorNode, anchorOffset, focusNode, focusOffset } = native
       const anchor = getPoint(anchorNode, anchorOffset, state, editor)
       const focus = getPoint(focusNode, focusOffset, state, editor)
+
+      // If we're unable to resolve the anchor or focus, abort.
       if (!anchor || !focus) return
 
       // There are situations where a select event will fire with a new native
@@ -555,6 +448,8 @@ class Content extends React.Component {
       // already up to date, but we do want to update the native selection again
       // to make sure it is in sync.
       if (
+        anchor &&
+        focus &&
         anchor.key == selection.anchorKey &&
         anchor.offset == selection.anchorOffset &&
         focus.key == selection.focusKey &&
@@ -564,77 +459,9 @@ class Content extends React.Component {
         this.updateSelection()
         return
       }
-
-      const properties = {
-        anchorKey: anchor.key,
-        anchorOffset: anchor.offset,
-        focusKey: focus.key,
-        focusOffset: focus.offset,
-        isFocused: true,
-        isBackward: null
-      }
-
-      const anchorText = document.getNode(anchor.key)
-      const focusText = document.getNode(focus.key)
-      const anchorInline = document.getClosestInline(anchor.key)
-      const focusInline = document.getClosestInline(focus.key)
-      const focusBlock = document.getClosestBlock(focus.key)
-      const anchorBlock = document.getClosestBlock(anchor.key)
-
-      // COMPAT: If the anchor point is at the start of a non-void, and the
-      // focus point is inside a void node with an offset that isn't `0`, set
-      // the focus offset to `0`. This is due to void nodes <span>'s being
-      // positioned off screen, resulting in the offset always being greater
-      // than `0`. Since we can't know what it really should be, and since an
-      // offset of `0` is less destructive because it creates a hanging
-      // selection, go with `0`. (2017/09/07)
-      if (
-        anchorBlock &&
-        !anchorBlock.isVoid &&
-        anchor.offset == 0 &&
-        focusBlock &&
-        focusBlock.isVoid &&
-        focus.offset != 0
-      ) {
-        properties.focusOffset = 0
-      }
-
-      // COMPAT: If the selection is at the end of a non-void inline node, and
-      // there is a node after it, put it in the node after instead. This
-      // standardizes the behavior, since it's indistinguishable to the user.
-      if (
-        anchorInline &&
-        !anchorInline.isVoid &&
-        anchor.offset == anchorText.text.length
-      ) {
-        const block = document.getClosestBlock(anchor.key)
-        const next = block.getNextText(anchor.key)
-        if (next) {
-          properties.anchorKey = next.key
-          properties.anchorOffset = 0
-        }
-      }
-
-      if (
-        focusInline &&
-        !focusInline.isVoid &&
-        focus.offset == focusText.text.length
-      ) {
-        const block = document.getClosestBlock(focus.key)
-        const next = block.getNextText(focus.key)
-        if (next) {
-          properties.focusKey = next.key
-          properties.focusOffset = 0
-        }
-      }
-
-      data.selection = selection
-        .merge(properties)
-        .normalize(document)
     }
 
-    debug('onSelect', { event, data })
-    this.props.onSelect(event, data)
+    this.handle('onSelect', event)
   }
 
   /**

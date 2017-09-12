@@ -3,6 +3,7 @@ import Base64 from 'slate-base64-serializer'
 import Debug from 'debug'
 import getWindow from 'get-window'
 import keycode from 'keycode'
+import { Selection } from 'slate'
 
 import TRANSFER_TYPES from '../constants/transfer-types'
 import getHtmlFromNativePaste from '../utils/get-html-from-native-paste'
@@ -45,7 +46,7 @@ function BeforePlugin(options = {}) {
    */
 
   function onBeforeInput(event, data, change, editor) {
-    debug('onBeforeInput', { data })
+    debug('onBeforeInput', { event, data })
 
     const { state } = change
     const { selection } = state
@@ -90,6 +91,8 @@ function BeforePlugin(options = {}) {
    */
 
   function onBlur(event, data, change) {
+    debug('onBlur', { event, data })
+
     // If we're currently copying, the blur is actually from the after plugin's
     // copy logic blurring the editor as it focus the cloned node, so ignore it.
     if (isCopying) {
@@ -105,6 +108,8 @@ function BeforePlugin(options = {}) {
    */
 
   function onChange(change, editor) {
+    debug('onChange', { change })
+
     const { state } = change
     const schema = editor.getSchema()
     const prevState = editor.getState()
@@ -112,8 +117,6 @@ function BeforePlugin(options = {}) {
     // PERF: Skip normalizing if the document hasn't changed, since the core
     // schema only normalizes changes to the document, not selection.
     if (prevState && state.document == prevState.document) return
-
-    debug('onChange')
 
     // Normalize the state against the user-land schema before any other
     // plugins interact with it.
@@ -129,6 +132,8 @@ function BeforePlugin(options = {}) {
    */
 
   function onCompositionEnd(event, data, change) {
+    debug('onCompositionEnd', { event, data })
+
     const count = composingCount
 
     // After a timeout, unset the composing flag if no new compositions have
@@ -148,6 +153,8 @@ function BeforePlugin(options = {}) {
    */
 
   function onCompositionStart(event, data, change) {
+    debug('onCompositionStart', { event, data })
+
     // Set the is composing state.
     isComposing = true
 
@@ -165,7 +172,7 @@ function BeforePlugin(options = {}) {
    */
 
   function onCopy(event, data, change) {
-    debug('onCopy', data)
+    debug('onCopy', { event, data })
     onCutOrCopy(event, data, change)
   }
 
@@ -178,7 +185,7 @@ function BeforePlugin(options = {}) {
    */
 
   function onCut(event, data, change) {
-    debug('onCut', data)
+    debug('onCut', { event, data })
     onCutOrCopy(event, data, change)
   }
 
@@ -191,6 +198,8 @@ function BeforePlugin(options = {}) {
    */
 
   function onCutOrCopy(event, data, change) {
+    debug('onCutOrCopy', { event, data })
+
     const window = getWindow(event.target)
 
     // Set the copying state.
@@ -216,6 +225,8 @@ function BeforePlugin(options = {}) {
    */
 
   function onDragEnd(event, data, change) {
+    debug('onDragEnd', { event, data })
+
     // Reset the dragging state.
     isDragging = false
     isInternalDrag = null
@@ -230,6 +241,8 @@ function BeforePlugin(options = {}) {
    */
 
   function onDragOver(event, data, change) {
+    debug('onDragOver', { event, data })
+
     // If the dragging state hasn't already been set, then set it, and that
     // means that this is not an internal drag since it didn't start here.
     if (!isDragging) {
@@ -247,6 +260,8 @@ function BeforePlugin(options = {}) {
    */
 
   function onDragStart(event, data, change) {
+    debug('onDragStart', { event, data })
+
     // Set the dragging state.
     isDragging = true
     isInternalDrag = true
@@ -268,6 +283,69 @@ function BeforePlugin(options = {}) {
   }
 
   /**
+   * On drop.
+   *
+   * @param {Event} event
+   * @param {Object} data
+   * @param {Change} change
+   */
+
+  function onDrop(event, data, change) {
+    debug('onDrop', { event, data })
+
+    // Add the native event's drop data to the `data` object.
+    const { nativeEvent } = event
+    const { dataTransfer, x, y } = nativeEvent
+    const transfer = getTransferData(dataTransfer)
+    Object.keys(transfer).forEach((key) => {
+      data[key] = transfer[key]
+    })
+
+    // Resolve the point where the drop occured.
+    const window = getWindow(event.target)
+    const { state, editor } = this.props
+    let range
+
+    // COMPAT: In Firefox, `caretRangeFromPoint` doesn't exist. (2016/07/25)
+    if (window.document.caretRangeFromPoint) {
+      range = window.document.caretRangeFromPoint(x, y)
+    } else {
+      range = window.document.createRange()
+      range.setStart(nativeEvent.rangeParent, nativeEvent.rangeOffset)
+    }
+
+    const { startContainer, startOffset } = range
+    const point = getPoint(startContainer, startOffset, state, editor)
+    if (!point) return
+
+    const target = Selection.create({
+      anchorKey: point.key,
+      anchorOffset: point.offset,
+      focusKey: point.key,
+      focusOffset: point.offset,
+      isFocused: true,
+      isBackward: false,
+    })
+
+    // Add drop-specific information to the data.
+    data.target = target
+
+    // COMPAT: Edge throws "Permission denied" errors when
+    // accessing `dropEffect` or `effectAllowed` (2017/7/12)
+    try {
+      data.effect = dataTransfer.dropEffect
+    } catch (err) {
+      data.effect = null
+    }
+
+    // Set an `isInternal` flag on the data if the drag is internal, for other
+    // plugins to use when making decisions.
+    if (data.type == 'fragment' || data.type == 'node') {
+      data.isInternal = isInternalDrag
+    }
+  }
+
+  /**
    * On focus.
    *
    * @param {Event} event
@@ -276,11 +354,57 @@ function BeforePlugin(options = {}) {
    */
 
   function onFocus(event, data, change) {
+    debug('onFocus', { event, data })
+
     // If we're currently copying, the focus is actually from the after plugin's
     // copy logic focusing the editor again after the cloned node, so ignore it.
     if (isCopying) {
       return true
     }
+  }
+
+  /**
+   * On input.
+   *
+   * @param {Event} event
+   * @param {Object} data
+   * @param {Change} change
+   * @param {Editor} editor
+   */
+
+  function onInput(event, data, change, editor) {
+    debug('onInput', { event, data })
+
+    const { state } = change
+
+    // If we're currently composing, abort.
+    if (isComposing) {
+      return true
+    }
+
+    // Or if the editor isn't focus, abort.
+    if (state.isBlurred) {
+      return true
+    }
+
+    // Get the native selection point.
+    const window = getWindow(event.target)
+    const native = window.getSelection()
+    const { anchorNode, anchorOffset } = native
+    const point = getPoint(anchorNode, anchorOffset, state, editor)
+
+    // If we're not able to resolve a native point, abort.
+    if (!point) {
+      return true
+    }
+
+    // Get the range in question.
+    const { key, start, end } = point
+    const { selection } = state
+    const target = selection.moveAnchorTo(key, start).moveFocusTo(key, end)
+
+    // Add the `target` to the `data` for other plugins to use.
+    data.target = target
   }
 
   /**
@@ -292,6 +416,8 @@ function BeforePlugin(options = {}) {
    */
 
   function onKeyDown(event, data, change) {
+    debug('onKeyDown', { event, data })
+
     const { altKey, ctrlKey, metaKey, shiftKey, which } = event
     const key = keycode(which)
 
@@ -350,6 +476,8 @@ function BeforePlugin(options = {}) {
    */
 
   function onKeyUp(event, data, change) {
+    debug('onKeyUp', { event, data })
+
     const key = keycode(which)
 
     // If it's the shift key, reset the shift state.
@@ -382,6 +510,8 @@ function BeforePlugin(options = {}) {
    */
 
   function onPaste(event, data, change, editor) {
+    debug('onPaste', { event, data })
+
     // Attach the `isShift` flag, so that people can use it to trigger "Paste
     // and Match Style" logic.
     data.isShift = isShifting
@@ -415,6 +545,118 @@ function BeforePlugin(options = {}) {
   }
 
   /**
+   * On select.
+   *
+   * @param {Event} event
+   * @param {Object} data
+   * @param {Change} change
+   * @param {Editor} editor
+   */
+
+  function onSelect(event, data, change, editor) {
+    debug('onSelect', { event, data })
+
+    // If we're currently copying or composing, ignore it because these result
+    // in temporary selection updates.
+    if (isCopying || isComposing) {
+      return true
+    }
+
+    // Try to resolve a new `selection` object for plugins to use...
+    const window = getWindow(event.target)
+    const native = window.getSelection()
+    const { state } = change
+    let { document, selection } = state
+
+    // If there are no ranges, the editor was blurred natively.
+    if (!native.rangeCount) {
+      selection = selection.set('isFocused', false)
+    }
+
+    // Otherwise, determine the selection from the native one.
+    else {
+      const { anchorNode, anchorOffset, focusNode, focusOffset } = native
+      const anchor = getPoint(anchorNode, anchorOffset, state, editor)
+      const focus = getPoint(focusNode, focusOffset, state, editor)
+
+      // If we're not able to resolve the anchor or focus, abort.
+      if (!anchor || !focus) {
+        return true
+      }
+
+      const properties = {
+        anchorKey: anchor.key,
+        anchorOffset: anchor.offset,
+        focusKey: focus.key,
+        focusOffset: focus.offset,
+        isFocused: true,
+        isBackward: null,
+      }
+
+      const anchorText = document.getNode(anchor.key)
+      const focusText = document.getNode(focus.key)
+      const anchorInline = document.getClosestInline(anchor.key)
+      const focusInline = document.getClosestInline(focus.key)
+      const focusBlock = document.getClosestBlock(focus.key)
+      const anchorBlock = document.getClosestBlock(anchor.key)
+
+      // COMPAT: If the anchor point is at the start of a non-void, and the
+      // focus point is inside a void node with an offset that isn't `0`, set
+      // the focus offset to `0`. This is due to void nodes <span>'s being
+      // positioned off screen, resulting in the offset always being greater
+      // than `0`. Since we can't know what it really should be, and since an
+      // offset of `0` is less destructive because it creates a hanging
+      // selection, go with `0`. (2017/09/07)
+      if (
+        anchorBlock &&
+        !anchorBlock.isVoid &&
+        anchor.offset == 0 &&
+        focusBlock &&
+        focusBlock.isVoid &&
+        focus.offset != 0
+      ) {
+        properties.focusOffset = 0
+      }
+
+      // COMPAT: If the selection is at the end of a non-void inline node, and
+      // there is a node after it, put it in the node after instead. This
+      // standardizes the behavior, since it's indistinguishable to the user.
+      if (
+        anchorInline &&
+        !anchorInline.isVoid &&
+        anchor.offset == anchorText.text.length
+      ) {
+        const block = document.getClosestBlock(anchor.key)
+        const next = block.getNextText(anchor.key)
+        if (next) {
+          properties.anchorKey = next.key
+          properties.anchorOffset = 0
+        }
+      }
+
+      if (
+        focusInline &&
+        !focusInline.isVoid &&
+        focus.offset == focusText.text.length
+      ) {
+        const block = document.getClosestBlock(focus.key)
+        const next = block.getNextText(focus.key)
+        if (next) {
+          properties.focusKey = next.key
+          properties.focusOffset = 0
+        }
+      }
+
+      selection = selection
+        .merge(properties)
+        .normalize(document)
+    }
+
+    // Add the `selection` to the `data` object for plugins to use.
+    data.selection = selection
+  }
+
+  /**
    * Return the core plugin.
    *
    * @type {Object}
@@ -431,10 +673,13 @@ function BeforePlugin(options = {}) {
     onDragEnd,
     onDragOver,
     onDragStart,
+    onDrop,
     onFocus,
+    onInput,
     onKeyDown,
     onKeyUp,
     onPaste,
+    onSelect,
   }
 }
 

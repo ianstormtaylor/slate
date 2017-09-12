@@ -21,12 +21,17 @@ const debug = Debug('slate:stack')
 
 const METHODS = [
   'onBeforeInput',
-  'onBeforeChange',
   'onBlur',
+  'onCompositionEnd',
+  'onCompositionStart',
   'onCopy',
   'onCut',
+  'onDragEnd',
+  'onDragOver',
+  'onDragStart',
   'onDrop',
   'onFocus',
+  'onInput',
   'onKeyDown',
   'onKeyUp',
   'onPaste',
