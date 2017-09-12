@@ -67,8 +67,8 @@
     "slate-react": "*"
   },
   "scripts": {
-    "bench": "babel-node ./node_modules/.bin/_matcha --reporter ./benchmark/reporter ./benchmark/index.js > ./tmp/benchmark-comparison.json && babel-node ./benchmark/compare",
-    "bench:save": "babel-node ./node_modules/.bin/_matcha --reporter ./benchmark/reporter ./benchmark/index.js > ./tmp/benchmark-baseline.json",
+    "benchmark": "mkdir -p ./tmp && babel-node ./node_modules/.bin/_matcha --reporter ./support/benchmark-reporter ./packages/*/benchmark/index.js > ./tmp/benchmark-comparison.json && babel-node ./support/benchmark-compare",
+    "benchmark:save": "mkdir -p ./tmp && babel-node ./node_modules/.bin/_matcha --reporter ./support/benchmark-reporter ./packages/*/benchmark/index.js > ./tmp/benchmark-baseline.json",
     "bootstrap": "lerna bootstrap && yarn run build",
     "build": "yarn run build:packages",
     "build:examples": "yarn run build:examples:dev && yarn run build:examples:prod",
