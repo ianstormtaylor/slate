@@ -49,6 +49,12 @@ This document maintains a list of changes to the `slate` package with each new v
 
 - **The `defaultBlockType` of the `Html` serializer is now called `defaultBlock`.** This is just to make it more clear that it supports not only setting the default `type` but also `data` and `isVoid`.
 
+###### NEW
+
+- **Slate models now have `Model.fromJSON(object)` and `model.toJSON()` methods.** These methods operate with the canonical JSON form (which used to be called "raw"). This way you don't need to `import` a serializer to retrieve JSON, if you have the model you can serialize/deserialize.
+
+- **Models also have `toJS` and `fromJS` aliases.** This is just to match Immutable.js objects, which have both methods. For Slate though, the methods are equivalent.
+
 
 ---
 
@@ -102,6 +108,10 @@ function onKeyDown(e, data, change) {
 ###### DEPRECATED
 
 - **The `transform.apply()` method is deprecated.** Previously this is where the saving into the history would happen, but it created an awkward convention that wasn't necessary. Now operations are saved into the history as they are created with change methods, instead of waiting until the end. You can access the new `State` of a change at any time via `change.state`.
+
+###### NEW
+
+- **The `state.activeMarks` returns the intersection of marks in the selection.** Previously there was only `state.marks` which returns marks that appeared on _any_ character in the selection. But `state.activeMarks` returns marks that appear on _every_ character in the selection, which is often more useful for implementing standard rich-text editor behaviors.
 
 
 ---
