@@ -56,7 +56,6 @@
     "jsdom": "9.6.0",
     "jsdom-global": "2.1.0",
     "matcha": "^0.7.0",
-    "microtime": "2.1.1",
     "mocha": "^2.5.3",
     "np": "^2.9.0",
     "npm-run-all": "^2.3.0",
