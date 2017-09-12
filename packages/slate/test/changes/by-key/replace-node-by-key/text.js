@@ -3,18 +3,20 @@
 import h from '../../../helpers/h'
 
 export default function (change) {
-  change.insertBlock('quote')
+  const key = change.state.document.getTexts().first().key
+  const text = { kind: 'text', text: 'three' }
+  change.replaceNodeByKey(key, text)
 }
 
 export const input = (
   <state>
     <document>
       <paragraph>
-        <cursor />
+        one
       </paragraph>
       <paragraph>
-        not empty
-      </paragraph>
+        two
+    </paragraph>
     </document>
   </state>
 )
@@ -22,12 +24,11 @@ export const input = (
 export const output = (
   <state>
     <document>
-      <paragraph />
-      <quote>
-        <cursor />
-      </quote>
       <paragraph>
-        not empty
+        three
+      </paragraph>
+      <paragraph>
+        two
       </paragraph>
     </document>
   </state>
