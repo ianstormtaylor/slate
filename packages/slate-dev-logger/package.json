@@ -14,10 +14,13 @@
   },
   "scripts": {
     "build": "babel --out-dir ./lib ./src",
-    "build:max": "mkdir -p ./dist && NODE_ENV=production browserify ./src/index.js --transform babelify --transform envify --transform [ browserify-global-shim --global ] --standalone SlateLogger > ./dist/slate-logger.js",
-    "build:min": "mkdir -p ./dist && NODE_ENV=production browserify ./src/index.js --transform babelify --transform envify --transform [ browserify-global-shim --global ] --transform uglifyify --standalone SlateLogger | uglifyjs > ./dist/slate-logger.min.js",
+    "build:max": "mkdir -p ./dist && NODE_ENV=production browserify ./src/index.js --transform babelify --transform envify --transform [ browserify-global-shim --global ] --standalone SlateDevLogger > ./dist/slate-dev-logger.js",
+    "build:min": "mkdir -p ./dist && NODE_ENV=production browserify ./src/index.js --transform babelify --transform envify --transform [ browserify-global-shim --global ] --transform uglifyify --standalone SlateDevLogger | uglifyjs > ./dist/slate-dev-logger.min.js",
     "clean": "rm -rf ./dist ./lib ./node_modules",
     "prepublish": "yarn run build:max && yarn run build:min",
     "watch": "babel --watch --out-dir ./lib ./src --source-maps inline"
-  }
+  },
+  "keywords": [
+    "slate"
+  ]
 }
