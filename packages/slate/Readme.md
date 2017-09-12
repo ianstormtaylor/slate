@@ -1,6 +1,4 @@
 
-# `slate`
-
 This package contains the core logic of Slate. It's separated further into a series of directories:
 
 - [**Changes**](./src/changes) — containing the changes that are used to alter a Slate document.

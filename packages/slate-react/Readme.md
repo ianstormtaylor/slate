@@ -1,6 +1,4 @@
 
-# `slate-react`
-
 This package contains the React-specific logic for Slate. It's separated further into a series of directories:
 
 - [**Components**](./src/components) — containing the React components for rendering Slate editors.

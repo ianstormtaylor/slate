@@ -19,7 +19,7 @@
 - [Resources](./general/resources.md)
 
 
-## Core
+## Slate Core
 
 - [Block](./reference/slate/block.md)
 - [Change](./reference/slate/change.md)
@@ -37,10 +37,10 @@
 - [resetKeyGenerator](./reference/slate/utils.md)
 
 
-## React
+## Slate React
 
-- [<Editor>](./reference/slate-react/editor.md)
-- [<Placeholder>](./reference/slate-react/placeholder.md)
+- [Editor](./reference/slate-react/editor.md)
+- [Placeholder](./reference/slate-react/placeholder.md)
 - [Custom Nodes](./reference/slate-react/custom-nodes.md)
 - [Plugins](./reference/slate-react/plugins.md)
 - [Core Plugin](./reference/slate-react/core-plugin.md)
