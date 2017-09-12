@@ -7,6 +7,30 @@ This document maintains a list of changes to Slate with each new version. Until 
 ---
 
 
+### `0.24.0` — September 11, 2017
+
+###### BREAKING
+
+- **`immutable` is now a _peer_ dependency of Slate.** Previously it was a regular dependency, but this prevented you from bringing your own version, or you'd have duplication. You'll need to ensure you install it!
+
+- **The `Html`, `Plain` and `Raw` serializers are broken into new packages.** Previously you'd import them from `slate`. But now you'll import them from `slate-html-serializer` and `slate-plain-serializer`. And the `Raw` serializer that was deprecated is now removed.
+
+- **The `Editor` and `Placeholder` components are broken into a new React-specific package.** Previously you'd import them from `slate`. But now you `import { Editor } from 'slate-react'` instead.
+
+###### NEW
+
+- **Slate is now a "monorepo".** Instead of a single package, Slate has been divided up into individual packages so that you can only require what you need, cutting down on file size. In the process, some helpful modules that used to be internal-only are now exposed.
+
+- **There's a new `slate-hyperscript` helper.** This was possible thanks to the work on [`slate-sugar`](https://github.com/GitbookIO/slate-sugar), which paved the way.
+
+- **The `slate-prop-types` package is now exposed.** Previously this was an internal module, but now you can use it for adding prop types to any components or plugins you create.
+
+- **The `slate-simulator` package is now exposed.** Previously this was an internal testing utility, but now you can use it in your own tests as well. It's currently pretty bare bones, but we can add to it over time.
+
+
+---
+
+
 ### `0.23.0` — September 10, 2017
 
 ###### BREAKING
