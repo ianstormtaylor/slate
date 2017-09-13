@@ -20,7 +20,7 @@ If you don't include these, there's a very good chance your issue will be closed
 
 We need to keep the issues actionable, or else maintaining Slate becomes overwhelming. Thank you for understanding!
 
-https://jsfiddle.net/2zokvrvt/7/
+https://jsfiddle.net/2zokvrvt/179/
 http://recordit.co/
 -->
 
