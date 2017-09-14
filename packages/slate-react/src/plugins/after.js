@@ -18,7 +18,7 @@ import { IS_CHROME, IS_MAC, IS_SAFARI } from '../constants/environment'
  * @type {Function}
  */
 
-const debug = Debug('slate:core')
+const debug = Debug('slate:plugins:after')
 
 /**
  * The default plugin.
@@ -38,37 +38,18 @@ function Plugin(options = {}) {
   } = options
 
   /**
-   * On before change, enforce the editor's schema.
-   *
-   * @param {Change} change
-   * @param {Editor} schema
-   */
-
-  function onBeforeChange(change, editor) {
-    const { state } = change
-    const schema = editor.getSchema()
-    const prevState = editor.getState()
-
-    // PERF: Skip normalizing if the document hasn't changed, since the core
-    // schema only normalizes changes to the document, not selection.
-    if (prevState && state.document == prevState.document) return
-
-    change.normalize(schema)
-    debug('onBeforeChange')
-  }
-
-  /**
    * On before input, correct any browser inconsistencies.
    *
-   * @param {Event} e
+   * @param {Event} event
    * @param {Object} data
    * @param {Change} change
    * @param {Editor} editor
    */
 
-  function onBeforeInput(e, data, change, editor) {
-    debug('onBeforeInput', { data })
-    e.preventDefault()
+  function onBeforeInput(event, data, change, editor) {
+    debug('onBeforeInput', { event, data })
+
+    event.preventDefault()
 
     const { state } = change
     const { selection } = state
@@ -79,7 +60,7 @@ function Plugin(options = {}) {
     // replaced. But the `select` fires after the `beforeInput` event, even
     // though the native selection is updated. So we need to manually check if
     // the selection has gotten out of sync, and adjust it if so. (03/18/2017)
-    const window = getWindow(e.target)
+    const window = getWindow(event.target)
     const native = window.getSelection()
     const a = getPoint(native.anchorNode, native.anchorOffset, state, editor)
     const f = getPoint(native.focusNode, native.focusOffset, state, editor)
@@ -99,51 +80,51 @@ function Plugin(options = {}) {
       })
     }
 
-    change.insertText(e.data)
+    change.insertText(event.data)
   }
 
   /**
    * On blur.
    *
-   * @param {Event} e
+   * @param {Event} event
    * @param {Object} data
    * @param {Change} change
    */
 
-  function onBlur(e, data, change) {
-    debug('onBlur', { data })
+  function onBlur(event, data, change) {
+    debug('onBlur', { event, data })
     change.blur()
   }
 
   /**
    * On copy.
    *
-   * @param {Event} e
+   * @param {Event} event
    * @param {Object} data
    * @param {Change} change
    */
 
-  function onCopy(e, data, change) {
-    debug('onCopy', data)
-    onCutOrCopy(e, data, change)
+  function onCopy(event, data, change) {
+    debug('onCopy', { event, data })
+    onCutOrCopy(event, data, change)
   }
 
   /**
    * On cut.
    *
-   * @param {Event} e
+   * @param {Event} event
    * @param {Object} data
    * @param {Change} change
    * @param {Editor} editor
    */
 
-  function onCut(e, data, change, editor) {
-    debug('onCut', data)
-    onCutOrCopy(e, data, change)
-    const window = getWindow(e.target)
+  function onCut(event, data, change, editor) {
+    debug('onCut', { event, data })
+    onCutOrCopy(event, data, change)
 
     // Once the fake cut content has successfully been added to the clipboard,
     // delete the content in the current selection.
+    const window = getWindow(event.target)
     window.requestAnimationFrame(() => {
       editor.change(t => t.delete())
     })
@@ -153,13 +134,13 @@ function Plugin(options = {}) {
    * On cut or copy, create a fake selection so that we can add a Base 64
    * encoded copy of the fragment to the HTML, to decode on future pastes.
    *
-   * @param {Event} e
+   * @param {Event} event
    * @param {Object} data
    * @param {Change} change
    */
 
-  function onCutOrCopy(e, data, change) {
-    const window = getWindow(e.target)
+  function onCutOrCopy(event, data, change) {
+    const window = getWindow(event.target)
     const native = window.getSelection()
     const { state } = change
     const { endBlock, endInline } = state
@@ -238,36 +219,34 @@ function Plugin(options = {}) {
   /**
    * On drop.
    *
-   * @param {Event} e
+   * @param {Event} event
    * @param {Object} data
    * @param {Change} change
    */
 
-  function onDrop(e, data, change) {
-    debug('onDrop', { data })
+  function onDrop(event, data, change) {
+    debug('onDrop', { event, data })
 
     switch (data.type) {
       case 'text':
       case 'html':
-        return onDropText(e, data, change)
+        return onDropText(event, data, change)
       case 'fragment':
-        return onDropFragment(e, data, change)
+        return onDropFragment(event, data, change)
       case 'node':
-        return onDropNode(e, data, change)
+        return onDropNode(event, data, change)
     }
   }
 
   /**
    * On drop node, insert the node wherever it is dropped.
    *
-   * @param {Event} e
+   * @param {Event} event
    * @param {Object} data
    * @param {Change} change
    */
 
-  function onDropNode(e, data, change) {
-    debug('onDropNode', { data })
-
+  function onDropNode(event, data, change) {
     const { state } = change
     const { selection } = state
     let { node, target, isInternal } = data
@@ -306,14 +285,12 @@ function Plugin(options = {}) {
   /**
    * On drop fragment.
    *
-   * @param {Event} e
+   * @param {Event} event
    * @param {Object} data
    * @param {Change} change
    */
 
-  function onDropFragment(e, data, change) {
-    debug('onDropFragment', { data })
-
+  function onDropFragment(event, data, change) {
     const { state } = change
     const { selection } = state
     let { fragment, target, isInternal } = data
@@ -342,14 +319,12 @@ function Plugin(options = {}) {
   /**
    * On drop text, split the blocks at new lines.
    *
-   * @param {Event} e
+   * @param {Event} event
    * @param {Object} data
    * @param {Change} change
    */
 
-  function onDropText(e, data, change) {
-    debug('onDropText', { data })
-
+  function onDropText(event, data, change) {
     const { state } = change
     const { document } = state
     const { text, target } = data
@@ -381,41 +356,103 @@ function Plugin(options = {}) {
   }
 
   /**
+   * On input.
+   *
+   * @param {Event} event
+   * @param {Object} data
+   * @param {Change} change
+   * @param {Editor} editor
+   */
+
+  function onInput(event, data, change, editor) {
+    debug('onInput', { event, data })
+
+    // Get the native selection point.
+    const window = getWindow(event.target)
+    const native = window.getSelection()
+    const { anchorNode, anchorOffset } = native
+    const point = getPoint(anchorNode, anchorOffset, state, editor)
+    const { key, index } = point
+
+    const { target } = data
+    const { state } = change
+    const { document, selection } = state
+    const schema = editor.getSchema()
+    const decorators = document.getDescendantDecorators(key, schema)
+    const node = document.getDescendant(key)
+    const block = document.getClosestBlock(node.key)
+    const ranges = node.getRanges(decorators)
+    const lastText = block.getLastText()
+
+    // Get the text information.
+    let { textContent } = anchorNode
+    const lastChar = textContent.charAt(textContent.length - 1)
+    const isLastText = node == lastText
+    const isLastRange = index == ranges.size - 1
+
+    // If we're dealing with the last leaf, and the DOM text ends in a new line,
+    // we will have added another new line in <Leaf>'s render method to account
+    // for browsers collapsing a single trailing new lines, so remove it.
+    if (isLastText && isLastRange && lastChar == '\n') {
+      textContent = textContent.slice(0, -1)
+    }
+
+    // If the text is no different, abort.
+    const range = ranges.get(index)
+    const { text, marks } = range
+
+    if (textContent == text) {
+      return true
+    }
+
+    // Determine what the selection should be after changing the text.
+    const delta = textContent.length - text.length
+    const after = selection.collapseToEnd().move(delta)
+
+    // Change the current state to have the text replaced.
+    change
+      .select(target)
+      .delete()
+      .insertText(textContent, marks)
+      .select(after)
+  }
+
+  /**
    * On key down.
    *
-   * @param {Event} e
+   * @param {Event} event
    * @param {Object} data
    * @param {Change} change
    */
 
-  function onKeyDown(e, data, change) {
-    debug('onKeyDown', { data })
+  function onKeyDown(event, data, change) {
+    debug('onKeyDown', { event, data })
 
     switch (data.key) {
-      case 'enter': return onKeyDownEnter(e, data, change)
-      case 'backspace': return onKeyDownBackspace(e, data, change)
-      case 'delete': return onKeyDownDelete(e, data, change)
-      case 'left': return onKeyDownLeft(e, data, change)
-      case 'right': return onKeyDownRight(e, data, change)
-      case 'up': return onKeyDownUp(e, data, change)
-      case 'down': return onKeyDownDown(e, data, change)
-      case 'd': return onKeyDownD(e, data, change)
-      case 'h': return onKeyDownH(e, data, change)
-      case 'k': return onKeyDownK(e, data, change)
-      case 'y': return onKeyDownY(e, data, change)
-      case 'z': return onKeyDownZ(e, data, change)
+      case 'enter': return onKeyDownEnter(event, data, change)
+      case 'backspace': return onKeyDownBackspace(event, data, change)
+      case 'delete': return onKeyDownDelete(event, data, change)
+      case 'left': return onKeyDownLeft(event, data, change)
+      case 'right': return onKeyDownRight(event, data, change)
+      case 'up': return onKeyDownUp(event, data, change)
+      case 'down': return onKeyDownDown(event, data, change)
+      case 'd': return onKeyDownD(event, data, change)
+      case 'h': return onKeyDownH(event, data, change)
+      case 'k': return onKeyDownK(event, data, change)
+      case 'y': return onKeyDownY(event, data, change)
+      case 'z': return onKeyDownZ(event, data, change)
     }
   }
 
   /**
    * On `enter` key down, split the current block in half.
    *
-   * @param {Event} e
+   * @param {Event} event
    * @param {Object} data
    * @param {Change} change
    */
 
-  function onKeyDownEnter(e, data, change) {
+  function onKeyDownEnter(event, data, change) {
     const { state } = change
     const { document, startKey } = state
     const hasVoidParent = document.hasVoidParent(startKey)
@@ -435,12 +472,12 @@ function Plugin(options = {}) {
   /**
    * On `backspace` key down, delete backwards.
    *
-   * @param {Event} e
+   * @param {Event} event
    * @param {Object} data
    * @param {Change} change
    */
 
-  function onKeyDownBackspace(e, data, change) {
+  function onKeyDownBackspace(event, data, change) {
     let boundary = 'Char'
     if (data.isWord) boundary = 'Word'
     if (data.isLine) boundary = 'Line'
@@ -450,12 +487,12 @@ function Plugin(options = {}) {
   /**
    * On `delete` key down, delete forwards.
    *
-   * @param {Event} e
+   * @param {Event} event
    * @param {Object} data
    * @param {Change} change
    */
 
-  function onKeyDownDelete(e, data, change) {
+  function onKeyDownDelete(event, data, change) {
     let boundary = 'Char'
     if (data.isWord) boundary = 'Word'
     if (data.isLine) boundary = 'Line'
@@ -472,12 +509,12 @@ function Plugin(options = {}) {
    * surrounded by empty text nodes with zero-width spaces in them. Without this
    * the zero-width spaces will cause two arrow keys to jump to the next text.
    *
-   * @param {Event} e
+   * @param {Event} event
    * @param {Object} data
    * @param {Change} change
    */
 
-  function onKeyDownLeft(e, data, change) {
+  function onKeyDownLeft(event, data, change) {
     const { state } = change
 
     if (data.isCtrl) return
@@ -490,7 +527,7 @@ function Plugin(options = {}) {
     // If the current text node is empty, or we're inside a void parent, we're
     // going to need to handle the selection behavior.
     if (startText.text == '' || hasVoidParent) {
-      e.preventDefault()
+      event.preventDefault()
       const previous = document.getPreviousText(startKey)
 
       // If there's no previous text node in the document, abort.
@@ -528,12 +565,12 @@ function Plugin(options = {}) {
    * of a previous inline node, which screws us up, so we never want to set the
    * selection to the very start of an inline node here. (2016/11/29)
    *
-   * @param {Event} e
+   * @param {Event} event
    * @param {Object} data
    * @param {Change} change
    */
 
-  function onKeyDownRight(e, data, change) {
+  function onKeyDownRight(event, data, change) {
     const { state } = change
 
     if (data.isCtrl) return
@@ -546,7 +583,7 @@ function Plugin(options = {}) {
     // If the current text node is empty, or we're inside a void parent, we're
     // going to need to handle the selection behavior.
     if (startText.text == '' || hasVoidParent) {
-      e.preventDefault()
+      event.preventDefault()
       const next = document.getNextText(startKey)
 
       // If there's no next text node in the document, abort.
@@ -582,12 +619,12 @@ function Plugin(options = {}) {
    * Chrome, option-shift-up doesn't properly extend the selection. And in
    * Firefox, option-up doesn't properly move the selection.
    *
-   * @param {Event} e
+   * @param {Event} event
    * @param {Object} data
    * @param {Change} change
    */
 
-  function onKeyDownUp(e, data, change) {
+  function onKeyDownUp(event, data, change) {
     if (!IS_MAC || data.isCtrl || !data.isAlt) return
 
     const { state } = change
@@ -600,7 +637,7 @@ function Plugin(options = {}) {
     if (!block) return
     const text = block.getFirstText()
 
-    e.preventDefault()
+    event.preventDefault()
     change[transform](text)
   }
 
@@ -611,12 +648,12 @@ function Plugin(options = {}) {
    * Chrome, option-shift-down doesn't properly extend the selection. And in
    * Firefox, option-down doesn't properly move the selection.
    *
-   * @param {Event} e
+   * @param {Event} event
    * @param {Object} data
    * @param {Change} change
    */
 
-  function onKeyDownDown(e, data, change) {
+  function onKeyDownDown(event, data, change) {
     if (!IS_MAC || data.isCtrl || !data.isAlt) return
 
     const { state } = change
@@ -629,61 +666,61 @@ function Plugin(options = {}) {
     if (!block) return
     const text = block.getLastText()
 
-    e.preventDefault()
+    event.preventDefault()
     change[transform](text)
   }
 
   /**
    * On `d` key down, for Macs, delete one character forward.
    *
-   * @param {Event} e
+   * @param {Event} event
    * @param {Object} data
    * @param {Change} change
    */
 
-  function onKeyDownD(e, data, change) {
+  function onKeyDownD(event, data, change) {
     if (!IS_MAC || !data.isCtrl) return
-    e.preventDefault()
+    event.preventDefault()
     change.deleteCharForward()
   }
 
   /**
    * On `h` key down, for Macs, delete until the end of the line.
    *
-   * @param {Event} e
+   * @param {Event} event
    * @param {Object} data
    * @param {Change} change
    */
 
-  function onKeyDownH(e, data, change) {
+  function onKeyDownH(event, data, change) {
     if (!IS_MAC || !data.isCtrl) return
-    e.preventDefault()
+    event.preventDefault()
     change.deleteCharBackward()
   }
 
   /**
    * On `k` key down, for Macs, delete until the end of the line.
    *
-   * @param {Event} e
+   * @param {Event} event
    * @param {Object} data
    * @param {Change} change
    */
 
-  function onKeyDownK(e, data, change) {
+  function onKeyDownK(event, data, change) {
     if (!IS_MAC || !data.isCtrl) return
-    e.preventDefault()
+    event.preventDefault()
     change.deleteLineForward()
   }
 
   /**
    * On `y` key down, redo.
    *
-   * @param {Event} e
+   * @param {Event} event
    * @param {Object} data
    * @param {Change} change
    */
 
-  function onKeyDownY(e, data, change) {
+  function onKeyDownY(event, data, change) {
     if (!data.isMod) return
     change.redo()
   }
@@ -691,12 +728,12 @@ function Plugin(options = {}) {
   /**
    * On `z` key down, undo or redo.
    *
-   * @param {Event} e
+   * @param {Event} event
    * @param {Object} data
    * @param {Change} change
    */
 
-  function onKeyDownZ(e, data, change) {
+  function onKeyDownZ(event, data, change) {
     if (!data.isMod) return
     change[data.isShift ? 'redo' : 'undo']()
   }
@@ -704,47 +741,44 @@ function Plugin(options = {}) {
   /**
    * On paste.
    *
-   * @param {Event} e
+   * @param {Event} event
    * @param {Object} data
    * @param {Change} change
    */
 
-  function onPaste(e, data, change) {
-    debug('onPaste', { data })
+  function onPaste(event, data, change) {
+    debug('onPaste', { event, data })
 
     switch (data.type) {
       case 'fragment':
-        return onPasteFragment(e, data, change)
+        return onPasteFragment(event, data, change)
       case 'text':
       case 'html':
-        return onPasteText(e, data, change)
+        return onPasteText(event, data, change)
     }
   }
 
   /**
    * On paste fragment.
    *
-   * @param {Event} e
+   * @param {Event} event
    * @param {Object} data
    * @param {Change} change
    */
 
-  function onPasteFragment(e, data, change) {
-    debug('onPasteFragment', { data })
+  function onPasteFragment(event, data, change) {
     change.insertFragment(data.fragment)
   }
 
   /**
    * On paste text, split blocks at new lines.
    *
-   * @param {Event} e
+   * @param {Event} event
    * @param {Object} data
    * @param {Change} change
    */
 
-  function onPasteText(e, data, change) {
-    debug('onPasteText', { data })
-
+  function onPasteText(event, data, change) {
     const { state } = change
     const { document, selection, startBlock } = state
     if (startBlock.isVoid) return
@@ -759,13 +793,13 @@ function Plugin(options = {}) {
   /**
    * On select.
    *
-   * @param {Event} e
+   * @param {Event} event
    * @param {Object} data
    * @param {Change} change
    */
 
-  function onSelect(e, data, change) {
-    debug('onSelect', { data })
+  function onSelect(event, data, change) {
+    debug('onSelect', { event, data })
     change.select(data.selection)
   }
 
@@ -788,10 +822,16 @@ function Plugin(options = {}) {
         editor={editor}
         onBeforeInput={editor.onBeforeInput}
         onBlur={editor.onBlur}
-        onFocus={editor.onFocus}
+        onCompositionEnd={editor.onCompositionEnd}
+        onCompositionStart={editor.onCompositionStart}
         onCopy={editor.onCopy}
         onCut={editor.onCut}
+        onDragEnd={editor.onDragEnd}
+        onDragOver={editor.onDragOver}
+        onDragStart={editor.onDragStart}
         onDrop={editor.onDrop}
+        onFocus={editor.onFocus}
+        onInput={editor.onInput}
         onKeyDown={editor.onKeyDown}
         onKeyUp={editor.onKeyUp}
         onPaste={editor.onPaste}
@@ -877,12 +917,12 @@ function Plugin(options = {}) {
    */
 
   return {
-    onBeforeChange,
     onBeforeInput,
     onBlur,
     onCopy,
     onCut,
     onDrop,
+    onInput,
     onKeyDown,
     onPaste,
     onSelect,
