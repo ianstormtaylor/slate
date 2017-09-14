@@ -104,6 +104,10 @@ class Node extends React.Component {
     // return true so that it can deal with update checking itself.
     if (Component && Component.suppressShouldComponentUpdate) return true
 
+    // If the `Component` has more child nodes, let them determine if they should
+    // or shouldn't re-render;
+    if (n.node.nodes.size !== 0) return true
+
     // If the `readOnly` status has changed, re-render in case there is any
     // user-land logic that depends on it, like nested editable contents.
     if (n.readOnly != p.readOnly) return true
