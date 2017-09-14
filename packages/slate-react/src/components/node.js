@@ -3,6 +3,7 @@ import Base64 from 'slate-base64-serializer'
 import Debug from 'debug'
 import React from 'react'
 import ReactDOM from 'react-dom'
+import Slate from 'slate'
 import SlateTypes from 'slate-prop-types'
 import Types from 'prop-types'
 import getWindow from 'get-window'
@@ -120,7 +121,7 @@ class Node extends React.Component {
 
     // If the node's selection state has changed, re-render in case there is any
     // user-land logic depends on it to render.
-    if (n.isSelected != p.isSelected) return true
+    if (n.node.kind != 'text' && n.node.nodes.size != 0 && !Slate.Text.isTextList(n.node.nodes)) return true
 
     // If the node is a text node, re-render if the current decorations have
     // changed, even if the content of the text node itself hasn't.
