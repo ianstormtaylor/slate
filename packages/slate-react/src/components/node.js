@@ -114,9 +114,12 @@ class Node extends React.Component {
     // for simplicity we just let them through.
     if (n.node != p.node) return true
 
-    // If the node's selection state has changed, re-render in case there is any
-    // user-land logic depends on it to render.
-    if (n.isSelected != p.isSelected) return true
+    // If the selection state of the node or of some of its children has changed,
+    // re-render in case there is any user-land logic depends on it to render.
+    // if the node is selected update it, even if it was already selected: the
+    // selection state of some of its children could have been changed and they
+    // need to be rendered again.
+    if (n.isSelected || p.isSelected) return true
 
     // If the node is a text node, re-render if the current decorations have
     // changed, even if the content of the text node itself hasn't.
