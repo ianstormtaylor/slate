@@ -762,7 +762,7 @@ class Node {
     }
 
     // Get the start and end nodes.
-    const next = node.getNextText(startKey)
+    const next = node.getNextText(node.getNextText(startKey).key)
     const startNode = node.getNextSibling(node.getFurthestAncestor(startKey).key)
     const endNode = startKey == endKey
       ? node.getFurthestAncestor(next.key)
