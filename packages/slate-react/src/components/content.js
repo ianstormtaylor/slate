@@ -17,6 +17,7 @@ import getHtmlFromNativePaste from '../utils/get-html-from-native-paste'
 import getPoint from '../utils/get-point'
 import getTransferData from '../utils/get-transfer-data'
 import setTransferData from '../utils/set-transfer-data'
+import scrollToSelection from '../utils/scroll-to-selection'
 import { IS_FIREFOX, IS_MAC, IS_IE } from '../constants/environment'
 
 /**
@@ -164,6 +165,8 @@ class Content extends React.Component {
     range.setStart(anchor.node, anchor.offset)
     native.addRange(range)
     if (!isCollapsed) extendSelection(native, focus.node, focus.offset)
+
+    scrollToSelection(native)
 
     // Then unset the `isSelecting` flag after a delay.
     setTimeout(() => {
