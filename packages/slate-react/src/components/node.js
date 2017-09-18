@@ -7,8 +7,8 @@ import logger from 'slate-dev-logger'
 import Types from 'prop-types'
 
 import TRANSFER_TYPES from '../constants/transfer-types'
-import Leaf from './leaf'
 import Void from './void'
+import Text from './text'
 import setTransferData from '../utils/set-transfer-data'
 
 /**
@@ -54,7 +54,7 @@ class Node extends React.Component {
     super(props)
     const { node, schema } = props
     this.state = {}
-    this.state.Component = node.kind == 'text' ? null : node.getComponent(schema)
+    this.state.Component = node.getComponent(schema)
   }
 
   /**
@@ -66,9 +66,8 @@ class Node extends React.Component {
 
   debug = (message, ...args) => {
     const { node } = this.props
-    const { key, kind, type } = node
-    const id = kind == 'text' ? `${key} (${kind})` : `${key} (${type})`
-    debug(message, `${id}`, ...args)
+    const { key, type } = node
+    debug(message, `${key} (${type})`, ...args)
   }
 
   /**
@@ -78,7 +77,6 @@ class Node extends React.Component {
    */
 
   componentWillReceiveProps = (props) => {
-    if (props.node.kind == 'text') return
     if (props.node == this.props.node) return
     const Component = props.node.getComponent(props.schema)
     this.setState({ Component })
@@ -138,24 +136,6 @@ class Node extends React.Component {
     // need to be rendered again.
     if (n.isSelected || p.isSelected) return true
 
-    // If the node is a text node, re-render if the current decorations have
-    // changed, even if the content of the text node itself hasn't.
-    if (n.node.kind == 'text' && n.schema.hasDecorators) {
-      const nDecorators = n.state.document.getDescendantDecorators(n.node.key, n.schema)
-      const pDecorators = p.state.document.getDescendantDecorators(p.node.key, p.schema)
-      const nRanges = n.node.getRanges(nDecorators)
-      const pRanges = p.node.getRanges(pDecorators)
-      if (!nRanges.equals(pRanges)) return true
-    }
-
-    // If the node is a text node, and its parent is a block node, and it was
-    // the last child of the block, re-render to cleanup extra `<br/>` or `\n`.
-    if (n.node.kind == 'text' && n.parent.kind == 'block') {
-      const pLast = p.parent.nodes.last()
-      const nLast = n.parent.nodes.last()
-      if (p.node == pLast && n.node != nLast) return true
-    }
-
     // Otherwise, don't update.
     return false
   }
@@ -190,48 +170,10 @@ class Node extends React.Component {
 
   render() {
     const { props } = this
-    const { node } = this.props
 
     this.debug('render', { props })
 
-    return node.kind == 'text'
-      ? this.renderText()
-      : this.renderElement()
-  }
-
-  /**
-   * Render a `child` node.
-   *
-   * @param {Node} child
-   * @param {Boolean} isSelected
-   * @return {Element}
-   */
-
-  renderNode = (child, isSelected) => {
-    const { block, editor, node, readOnly, schema, state } = this.props
-    return (
-      <Node
-        block={node.kind == 'block' ? node : block}
-        editor={editor}
-        isSelected={isSelected}
-        key={child.key}
-        node={child}
-        parent={node}
-        readOnly={readOnly}
-        schema={schema}
-        state={state}
-      />
-    )
-  }
-
-  /**
-   * Render an element `node`.
-   *
-   * @return {Element}
-   */
-
-  renderElement = () => {
-    const { editor, isSelected, node, parent, readOnly, state } = this.props
+    const { editor, isSelected, node, parent, readOnly, state } = props
     const { Component } = this.state
     const { selection } = state
     const indexes = node.getSelectionIndexes(selection, isSelected)
@@ -275,59 +217,27 @@ class Node extends React.Component {
   }
 
   /**
-   * Render a text node.
+   * Render a `child` node.
    *
+   * @param {Node} child
+   * @param {Boolean} isSelected
    * @return {Element}
    */
 
-  renderText = () => {
-    const { node, schema, state } = this.props
-    const { document } = state
-    const decorators = schema.hasDecorators ? document.getDescendantDecorators(node.key, schema) : []
-    const ranges = node.getRanges(decorators)
-    let offset = 0
-
-    const leaves = ranges.map((range, i) => {
-      const leaf = this.renderLeaf(ranges, range, i, offset)
-      offset += range.text.length
-      return leaf
-    })
-
+  renderNode = (child, isSelected) => {
+    const { block, editor, node, readOnly, schema, state } = this.props
+    const Component = child.kind === 'text' ? Text : Node
     return (
-      <span data-key={node.key}>
-        {leaves}
-      </span>
-    )
-  }
-
-  /**
-   * Render a single leaf node given a `range` and `offset`.
-   *
-   * @param {List<Range>} ranges
-   * @param {Range} range
-   * @param {Number} index
-   * @param {Number} offset
-   * @return {Element} leaf
-   */
-
-  renderLeaf = (ranges, range, index, offset) => {
-    const { block, node, parent, schema, state, editor } = this.props
-    const { text, marks } = range
-
-    return (
-      <Leaf
-        key={`${node.key}-${index}`}
-        block={block}
+      <Component
+        block={node.kind == 'block' ? node : block}
         editor={editor}
-        index={index}
-        marks={marks}
-        node={node}
-        offset={offset}
-        parent={parent}
-        ranges={ranges}
+        isSelected={isSelected}
+        key={child.key}
+        node={child}
+        parent={node}
+        readOnly={readOnly}
         schema={schema}
         state={state}
-        text={text}
       />
     )
   }
