@@ -442,7 +442,7 @@ Changes.setNodeByKey = (change, key, properties, options = {}) => {
  */
 
 Changes.splitNodeByKey = (change, key, position, options = {}) => {
-  const { normalize = true } = options
+  const { normalize = true, target = null } = options
   const { state } = change
   const { document } = state
   const path = document.getPath(key)
@@ -451,6 +451,7 @@ Changes.splitNodeByKey = (change, key, position, options = {}) => {
     type: 'split_node',
     path,
     position,
+    target,
   })
 
   if (normalize) {
@@ -483,11 +484,13 @@ Changes.splitDescendantsByKey = (change, key, textKey, textOffset, options = {})
   const ancestors = document.getAncestors(textKey)
   const nodes = ancestors.skipUntil(a => a.key == key).reverse().unshift(text)
   let previous
+  let index
 
   nodes.forEach((node) => {
-    const index = previous ? node.nodes.indexOf(previous) + 1 : textOffset
+    const prevIndex = index == null ? null : index
+    index = previous ? node.nodes.indexOf(previous) + 1 : textOffset
     previous = node
-    change.splitNodeByKey(node.key, index, { normalize: false })
+    change.splitNodeByKey(node.key, index, { normalize: false, target: prevIndex })
   })
 
   if (normalize) {
