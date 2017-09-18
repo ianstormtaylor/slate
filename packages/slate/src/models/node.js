@@ -743,18 +743,24 @@ class Node {
 
     while (parent = node.getParent(child.key)) {
       const index = parent.nodes.indexOf(child)
-      const position = child.kind == 'text' ? startOffset : child.nodes.indexOf(previous)
+      const position = child.kind == 'text'
+        ? startOffset
+        : child.nodes.indexOf(previous)
+
       parent = parent.splitNode(index, position)
       node = node.updateNode(parent)
       previous = parent.nodes.get(index + 1)
       child = parent
     }
 
-    child = endText
+    child = startKey == endKey ? node.getNextText(startKey) : endText
 
     while (parent = node.getParent(child.key)) {
       const index = parent.nodes.indexOf(child)
-      const position = child.kind == 'text' ? endOffset : child.nodes.indexOf(previous)
+      const position = child.kind == 'text'
+        ? startKey == endKey ? endOffset - startOffset : endOffset
+        : child.nodes.indexOf(previous)
+
       parent = parent.splitNode(index, position)
       node = node.updateNode(parent)
       previous = parent.nodes.get(index + 1)
@@ -762,16 +768,15 @@ class Node {
     }
 
     // Get the start and end nodes.
-    const next = node.getNextText(node.getNextText(startKey).key)
     const startNode = node.getNextSibling(node.getFurthestAncestor(startKey).key)
     const endNode = startKey == endKey
-      ? node.getFurthestAncestor(next.key)
-      : node.getFurthestAncestor(endKey)
+      ? node.getNextSibling(node.getNextSibling(node.getFurthestAncestor(endKey).key).key)
+      : node.getNextSibling(node.getFurthestAncestor(endKey).key)
 
     // Get children range of nodes from start to end nodes
     const startIndex = node.nodes.indexOf(startNode)
     const endIndex = node.nodes.indexOf(endNode)
-    const nodes = node.nodes.slice(startIndex, endIndex + 1)
+    const nodes = node.nodes.slice(startIndex, endIndex)
 
     // Return a new document fragment.
     return Document.create({ nodes })
