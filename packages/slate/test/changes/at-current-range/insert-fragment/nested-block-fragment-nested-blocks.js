@@ -38,7 +38,7 @@ export const output = (
         </paragraph>
         <quote>
           <quote>
-            tword
+            <cursor />tword
           </quote>
         </quote>
       </quote>

@@ -23,7 +23,7 @@ export const output = (
         word
       </paragraph>
       <paragraph>
-        <cursor /><link href="website.com">hyperlink</link>word
+        <link href="website.com"><cursor />hyperlink</link>word
       </paragraph>
     </document>
   </state>

@@ -26,7 +26,7 @@ export const output = (
   <state>
     <document>
       <paragraph>
-        wordfragment<cursor />
+        word<cursor />fragment
       </paragraph>
     </document>
   </state>

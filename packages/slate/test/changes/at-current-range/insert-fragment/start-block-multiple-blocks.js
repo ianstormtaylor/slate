@@ -38,7 +38,7 @@ export const output = (
         two
       </quote>
       <quote>
-        threeword
+        <cursor />threeword
       </quote>
     </document>
   </state>

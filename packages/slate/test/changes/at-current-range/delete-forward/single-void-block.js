@@ -19,5 +19,11 @@ export const input = (
 export const output = (
   <state>
     <document />
+    <selection
+      anchorKey={null}
+      anchorOffset={0}
+      focusKey={null}
+      focusOffset={0}
+    />
   </state>
 )

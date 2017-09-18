@@ -20,7 +20,7 @@ export const output = (
   <state>
     <document>
       <paragraph>
-        <link>w</link><cursor /><link>d</link>
+        <link>w</link><link><cursor />d</link>
       </paragraph>
     </document>
   </state>

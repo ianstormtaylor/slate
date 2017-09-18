@@ -23,7 +23,7 @@ export const output = (
   <state>
     <document>
       <paragraph>
-        word<emoji><cursor />{' '}</emoji>
+        word<emoji>{' '}<cursor /></emoji>
       </paragraph>
     </document>
   </state>

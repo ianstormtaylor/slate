@@ -16,11 +16,12 @@ export const input = (
   </state>
 )
 
+// TODO: this output selection state seems bad
 export const output = (
   <state>
     <document>
       <paragraph>
-        <cursor /><link>wo</link>
+        <anchor /><link><focus />wo</link>
       </paragraph>
     </document>
   </state>

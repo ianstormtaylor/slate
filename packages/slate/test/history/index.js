@@ -22,7 +22,7 @@ describe('history', async () => {
           const { input, output } = module
           const fn = module.default
           const next = fn(input)
-          const opts = { preseveSelection: true, preserveStateData: true }
+          const opts = { preserveSelection: true, preserveStateData: true }
           const actual = next.toJSON(opts)
           const expected = output.toJSON(opts)
           assert.deepEqual(actual, expected)

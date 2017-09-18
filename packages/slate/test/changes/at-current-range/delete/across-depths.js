@@ -26,7 +26,7 @@ export const output = (
     <document>
       <quote>
         <paragraph>
-          onetwo
+          one<cursor />two
         </paragraph>
       </quote>
     </document>

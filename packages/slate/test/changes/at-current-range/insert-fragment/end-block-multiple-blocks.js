@@ -28,6 +28,7 @@ export const input = (
   </state>
 )
 
+// TODO: this output selection should be at the end of the block
 export const output = (
   <state>
     <document>
@@ -38,7 +39,7 @@ export const output = (
         two
       </quote>
       <quote>
-        three
+        <cursor />three
       </quote>
     </document>
   </state>

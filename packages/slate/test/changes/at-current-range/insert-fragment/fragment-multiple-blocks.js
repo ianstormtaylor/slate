@@ -32,7 +32,7 @@ export const output = (
         woone
       </paragraph>
       <quote>
-        two<cursor />rd
+        <cursor />tword
       </quote>
     </document>
   </state>

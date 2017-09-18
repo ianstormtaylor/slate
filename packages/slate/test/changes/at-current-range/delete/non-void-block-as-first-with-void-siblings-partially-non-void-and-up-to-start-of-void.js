@@ -26,7 +26,7 @@ export const output = (
   <state>
     <document>
       <paragraph>
-        on
+        on<cursor />
       </paragraph>
       <paragraph>
         three

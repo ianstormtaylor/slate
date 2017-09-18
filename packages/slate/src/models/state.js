@@ -593,8 +593,8 @@ class State extends Record(DEFAULTS) {
 
     if (options.preserveSelection && !options.preserveKeys) {
       const { document, selection } = this
-      object.selection.anchorPath = document.getPath(selection.anchorKey)
-      object.selection.focusPath = document.getPath(selection.focusKey)
+      object.selection.anchorPath = selection.isSet ? document.getPath(selection.anchorKey) : null
+      object.selection.focusPath = selection.isSet ? document.getPath(selection.focusKey) : null
       delete object.selection.anchorKey
       delete object.selection.focusKey
     }

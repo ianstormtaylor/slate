@@ -10,7 +10,7 @@ export const input = (
   <state>
     <document>
       <paragraph>
-        w<b>or</b><cursor />d
+        w<b>or<cursor /></b>d
       </paragraph>
     </document>
   </state>
@@ -20,7 +20,7 @@ export const output = (
   <state>
     <document>
       <paragraph>
-        w<b>ora</b>d
+        w<b>ora<cursor /></b>d
       </paragraph>
     </document>
   </state>
