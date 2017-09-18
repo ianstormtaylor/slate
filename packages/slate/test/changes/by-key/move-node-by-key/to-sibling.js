@@ -10,7 +10,7 @@ export const input = (
   <state>
     <document>
       <paragraph key="a">
-        one
+        <cursor />one
       </paragraph>
       <quote key="b">
         <paragraph>
@@ -29,7 +29,7 @@ export const output = (
           two
         </paragraph>
         <paragraph>
-          one
+          <cursor />one
         </paragraph>
       </quote>
     </document>

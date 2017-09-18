@@ -13,7 +13,7 @@ export const input = (
   <state>
     <document>
       <paragraph>
-        <link key="a">word</link>
+        <link key="a"><cursor />word</link>
       </paragraph>
     </document>
   </state>
@@ -23,7 +23,7 @@ export const output = (
   <state>
     <document>
       <paragraph>
-        <emoji />
+        <cursor /><emoji />
       </paragraph>
     </document>
   </state>

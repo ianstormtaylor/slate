@@ -10,7 +10,7 @@ export const input = (
   <state>
     <document>
       <paragraph>
-        <link><hashtag><text key="a">a</text></hashtag></link>
+        <link><hashtag><text key="a"><cursor />a</text></hashtag></link>
       </paragraph>
     </document>
   </state>
@@ -19,7 +19,9 @@ export const input = (
 export const output = (
   <state>
     <document>
-      <paragraph />
+      <paragraph>
+        <cursor />
+      </paragraph>
     </document>
   </state>
 )

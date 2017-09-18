@@ -31,7 +31,7 @@ export const input = (
 export const output = (
   <state>
     <document>
-      <paragraph>one<cursor />wt</paragraph>
+      <paragraph>onew<cursor />t</paragraph>
     </document>
   </state>
 )

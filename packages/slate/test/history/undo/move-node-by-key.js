@@ -15,8 +15,12 @@ export default function (state) {
 export const input = (
   <state>
     <document key="a">
-      <paragraph key="b">one</paragraph>
-      <paragraph key="c">two</paragraph>
+      <paragraph key="b">
+        one
+      </paragraph>
+      <paragraph key="c">
+        two
+      </paragraph>
     </document>
   </state>
 )

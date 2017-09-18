@@ -11,7 +11,7 @@ export const input = (
     <document>
       <paragraph>
         <emoji>
-          <text key="a">{' '}</text>
+          <text key="a"><cursor />{' '}</text>
         </emoji>
       </paragraph>
     </document>
@@ -22,7 +22,7 @@ export const output = (
   <state>
     <document>
       <paragraph>
-        <emoji />
+        <cursor /><emoji />
       </paragraph>
     </document>
   </state>

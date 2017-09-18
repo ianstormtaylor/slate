@@ -243,7 +243,9 @@ const rules = [
     normalize: (change, node, invalids) => {
       // Reverse the list to handle consecutive merges, since the earlier nodes
       // will always exist after each merge.
-      invalids.reverse().forEach(n => change.mergeNodeByKey(n.key, OPTS))
+      invalids.reverse().forEach((n) => {
+        change.mergeNodeByKey(n.key, OPTS)
+      })
     }
   },
 

@@ -11,7 +11,7 @@ export const input = (
   <state>
     <document key="a">
       <paragraph>
-        one
+        <cursor />one
       </paragraph>
     </document>
   </state>
@@ -24,7 +24,7 @@ export const output = (
         one
       </paragraph>
       <paragraph>
-        one
+        <cursor />one
       </paragraph>
     </document>
   </state>

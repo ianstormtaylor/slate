@@ -30,7 +30,7 @@ export const output = (
   <state>
     <document>
       <image>
-        <cursor />{' '}
+        {' '}<cursor />
       </image>
       <paragraph>
         one

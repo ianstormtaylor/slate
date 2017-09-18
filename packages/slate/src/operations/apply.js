@@ -231,45 +231,39 @@ const APPLIERS = {
     let { document, selection } = state
     const { startKey, endKey } = selection
     const node = document.assertPath(path)
-
     // If the selection is set, check to see if it needs to be updated.
     if (selection.isSet) {
       const hasStartNode = node.hasNode(startKey)
       const hasEndNode = node.hasNode(endKey)
-      let normalize = false
+      const first = node.kind == 'text' ? node : node.getFirstText() || node
+      const last = node.kind == 'text' ? node : node.getLastText() || node
+      const prev = document.getPreviousText(first.key)
+      const next = document.getNextText(last.key)
 
-      // If one of the selection's nodes is being removed, we need to update it.
+      // If the start point was in this node, update it to be just before/after.
       if (hasStartNode) {
-        const prev = document.getPreviousText(startKey)
-        const next = document.getNextText(startKey)
-
         if (prev) {
           selection = selection.moveStartTo(prev.key, prev.text.length)
-          normalize = true
         } else if (next) {
           selection = selection.moveStartTo(next.key, 0)
-          normalize = true
         } else {
           selection = selection.deselect()
         }
       }
 
-      if (hasEndNode) {
-        const prev = document.getPreviousText(endKey)
-        const next = document.getNextText(endKey)
-
+      // If the end point was in this node, update it to be just before/after.
+      if (selection.isSet && hasEndNode) {
         if (prev) {
           selection = selection.moveEndTo(prev.key, prev.text.length)
-          normalize = true
         } else if (next) {
           selection = selection.moveEndTo(next.key, 0)
-          normalize = true
         } else {
           selection = selection.deselect()
         }
       }
 
-      if (normalize) {
+      // If the selection wasn't deselected, normalize it.
+      if (selection.isSet) {
         selection = selection.normalize(document)
       }
     }
