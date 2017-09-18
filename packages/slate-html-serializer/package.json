@@ -13,7 +13,7 @@
     "immutable": "^3.8.1",
     "react": "^0.14.0 || ^15.0.0",
     "react-dom": "^0.14.0 || ^15.0.0",
-    "slate": "^0.24.2"
+    "slate": ">=0.24.0"
   },
   "devDependencies": {
     "babel-cli": "^6.10.1",

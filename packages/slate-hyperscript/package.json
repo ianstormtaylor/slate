@@ -10,7 +10,7 @@
     "is-plain-object": "^2.0.4"
   },
   "peerDependencies": {
-    "slate": "^0.24.2"
+    "slate": ">=0.24.0"
   },
   "devDependencies": {
     "babel-cli": "^6.10.1",

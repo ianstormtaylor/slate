@@ -10,7 +10,7 @@
   },
   "peerDependencies": {
     "immutable": "^3.8.0",
-    "slate": "^0.24.2"
+    "slate": ">=0.24.0"
   },
   "devDependencies": {
     "babel-cli": "^6.10.1",
