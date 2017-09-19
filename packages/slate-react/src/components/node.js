@@ -112,10 +112,7 @@ class Node extends React.Component {
     // needs to be updated or not, return true if it returns true.
     // If it returns false, we still want to benefit from the
     // performance gain of the rest of the logic.
-    if (
-      Component &&
-      Component.shouldNodeComponentUpdate
-    ) {
+    if (Component && Component.shouldNodeComponentUpdate) {
       const shouldUpdate = Component.shouldNodeComponentUpdate(p, n)
 
       if (shouldUpdate) {
