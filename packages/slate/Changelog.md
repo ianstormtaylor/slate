@@ -101,6 +101,8 @@ function onKeyDown(e, data, change) {
 
 - **The `splitNodeByKey` change method has changed to be shallow.** Previously, it would deeply split to an offset. But now it is shallow and another `splitDescendantsByKey` change method has been added (with a different signature) for the deep splitting behavior. This is needed because splitting and joining operations have been changed to all be shallow, which is required so that operational transforms can be written against them.
 
+- **Blocks cannot have mixed "inline" and "block" children anymore.** Blocks were implicitly expected to either contain "text" and "inline" nodes only, or to contain "block" nodes only. Invalid case are now normalized by the core schema.
+
 - **The shape of many operations has changed.** This was needed to make operations completely invertible without any extra context. The operations were never really exposed in a consumable way, so I won't detail all of the changes here, but feel free to look at the source to see the details.
 
 - **All references to "joining" nodes is now called "merging".** This is to be slightly clearer, since merging can only happen with adjacent nodes already, and to have a nicer parallel with "splitting", as in cells. The operation is now called `merge_node`, and the transforms are now `merge*`.
