@@ -112,7 +112,13 @@ class Node extends React.Component {
     // needs to be updated or not, return true if it returns true.
     // If it returns false, we still want to benefit from the
     // performance gain of the rest of the logic.
-    if (Component && Component.shouldNodeComponentUpdate && Component.shouldNodeComponentUpdate(p, n)) return true
+    if (
+      Component &&
+      Component.shouldNodeComponentUpdate &&
+      Component.shouldNodeComponentUpdate(p, n)
+    ) {
+      return true
+    }
 
     // If the `readOnly` status has changed, re-render in case there is any
     // user-land logic that depends on it, like nested editable contents.
