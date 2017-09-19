@@ -144,7 +144,8 @@ class Void extends React.Component {
       Tag = 'div'
       style = {
         display: 'inline-block',
-        verticalAlign: 'top'
+        verticalAlign: 'top',
+        width: '100%'
       }
     } else {
       Tag = 'span'
