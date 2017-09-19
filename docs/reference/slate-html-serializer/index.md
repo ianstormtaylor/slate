@@ -36,8 +36,8 @@ For an example of the HTML serializer in action, check out the [`paste-html` exa
 ```js
 new Html({
   rules: Array,
-  defaultBlock: 'paragraph',
-  parseHtml: DOMParser
+  defaultBlock: String|Object|Block,
+  parseHtml: Function,
 })
 ```
 
@@ -89,7 +89,7 @@ Each rule must define two properties:
 ```
 
 
-#### `rule.deserialize`
+### `rule.deserialize`
 `rule.deserialize(el: Element, next: Function) => Object || Void`
 
 The `deserialize` function receives a DOM element and should return a plain Javascript object representing the deserialized state, or nothing if the rule in question doesn't know how to deserialize the object, in which case the next rule in the stack will be attempted.
@@ -125,7 +125,7 @@ The object should be one of:
 ```
 
 
-#### `rule.serialize`
+### `rule.serialize`
 `rule.serialize(object: Node || Mark || String, children: String || Element || Array) => Element || Void`
 
 The `serialize` function should return a React element representing the serialized HTML, or nothing if the rule in question doesn't know how to serialize the object, in which case the next rule in the stack will be attempted.
