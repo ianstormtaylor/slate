@@ -114,10 +114,17 @@ class Node extends React.Component {
     // performance gain of the rest of the logic.
     if (
       Component &&
-      Component.shouldNodeComponentUpdate &&
-      Component.shouldNodeComponentUpdate(p, n)
+      Component.shouldNodeComponentUpdate
     ) {
-      return true
+      const shouldUpdate = Component.shouldNodeComponentUpdate(p, n)
+
+      if (shouldUpdate) {
+        return true
+      }
+
+      if (shouldUpdate === false) {
+        logger.warn('Returning false in `shouldNodeComponentUpdate` does not disable Slate\'s internal `shouldComponentUpdate` logic. If you want to prevent updates, use React\'s `shouldComponentUpdate` instead.')
+      }
     }
 
     // If the `readOnly` status has changed, re-render in case there is any
