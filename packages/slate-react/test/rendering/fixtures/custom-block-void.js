@@ -29,7 +29,7 @@ export const output = `
         <span data-slate-zero-width="true">&#x200A;</span>
       </span>
     </span>
-    <div contenteditable="false" style="display:inline-block;vertical-align:top;">
+    <div contenteditable="false" style="display:inline-block;vertical-align:top;width:100%;">
       <img src="https://example.com/image.png">
     </div>
   </div>
