@@ -3,6 +3,7 @@ import Base64 from 'slate-base64-serializer'
 import Debug from 'debug'
 import React from 'react'
 import SlateTypes from 'slate-prop-types'
+import logger from 'slate-dev-logger'
 import Types from 'prop-types'
 
 import TRANSFER_TYPES from '../constants/transfer-types'
@@ -99,7 +100,26 @@ class Node extends React.Component {
 
     // If the `Component` has enabled suppression of update checking, always
     // return true so that it can deal with update checking itself.
-    if (Component && Component.suppressShouldComponentUpdate) return true
+    if (Component && Component.suppressShouldComponentUpdate) {
+      logger.deprecate('2.2.0', 'The `suppressShouldComponentUpdate` property is deprecated because it led to an important performance loss, use `shouldNodeComponentUpdate` instead.')
+      return true
+    }
+
+    // If the `Component` has a custom logic to determine whether the component
+    // needs to be updated or not, return true if it returns true.
+    // If it returns false, we still want to benefit from the
+    // performance gain of the rest of the logic.
+    if (Component && Component.shouldNodeComponentUpdate) {
+      const shouldUpdate = Component.shouldNodeComponentUpdate(p, n)
+
+      if (shouldUpdate) {
+        return true
+      }
+
+      if (shouldUpdate === false) {
+        logger.warn('Returning false in `shouldNodeComponentUpdate` does not disable Slate\'s internal `shouldComponentUpdate` logic. If you want to prevent updates, use React\'s `shouldComponentUpdate` instead.')
+      }
+    }
 
     // If the `readOnly` status has changed, re-render in case there is any
     // user-land logic that depends on it, like nested editable contents.
