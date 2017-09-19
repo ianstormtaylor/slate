@@ -12,6 +12,7 @@ Slate will render custom nodes for [`Block`](../slate/block.md) and [`Inline`](.
   - [`parent`](#parent)
   - [`readOnly`](#readonly)
   - [`state`](#state)
+- [`shouldNodeComponentUpdate`](#shouldnodecomponentupdate)
 
 ## Properties
 
@@ -97,3 +98,17 @@ Whether the editor is in "read-only" mode, where all of the rendering is the sam
 `State`
 
 A reference to the current [`State`](../slate/state.md) of the editor.
+
+## `shouldNodeComponentUpdate`
+
+By default, Slate implements a `shouldComponentUpdate` preventing useless re-renders for node components. While the default implementation covers most use cases, you can customize the logic to fit your needs. For example:
+
+```js
+class CustomNode extends React.Component {
+  static shouldNodeComponentUpdate(previousProps, nextProps) {
+    // return true here to trigger a re-render
+  }
+}
+```
+
+If `shouldNodeComponentUpdate` returns false, Slate will still figure out whether a re-render is needed or not.
