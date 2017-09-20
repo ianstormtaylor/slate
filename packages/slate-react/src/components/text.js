@@ -63,8 +63,8 @@ class Text extends React.Component {
     // for simplicity we just let them through.
     if (n.node != p.node) return true
 
-    // If the node is a text node, re-render if the current decorations have
-    // changed, even if the content of the text node itself hasn't.
+    // Re-render if the current decorations have changed, even if the content of
+    // the text node itself hasn't.
     if (n.schema.hasDecorators) {
       const nDecorators = n.state.document.getDescendantDecorators(n.node.key, n.schema)
       const pDecorators = p.state.document.getDescendantDecorators(p.node.key, p.schema)
@@ -73,8 +73,8 @@ class Text extends React.Component {
       if (!nRanges.equals(pRanges)) return true
     }
 
-    // If the node is a text node, and its parent is a block node, and it was
-    // the last child of the block, re-render to cleanup extra `<br/>` or `\n`.
+    // If the node parent is a block node, and it was the last child of the
+    // block, re-render to cleanup extra `<br/>` or `\n`.
     if (n.parent.kind == 'block') {
       const pLast = p.parent.nodes.last()
       const nLast = n.parent.nodes.last()
