@@ -859,7 +859,7 @@ class Content extends React.Component {
         onKeyUp={this.onKeyUp}
         onPaste={this.onPaste}
         onSelect={this.onSelect}
-        autoCorrect={props.autoCorrect}
+        autoCorrect={props.autoCorrect ? 'on' : 'off'}
         spellCheck={spellCheck}
         style={style}
         role={readOnly ? null : (role || 'textbox')}
