@@ -160,7 +160,7 @@ The `isLine` and `isWord` booleans represent whether the "line modifier" or "wor
 Make sure to `event.preventDefault()` if you do not want the default insertion behavior to occur! If no other plugin handles this event, it will be handled by the [Core plugin](./core.md).
 
 ### `onKeyUp`
-`Function onKeUp(event: Event, data: Object, change: Change, editor: Editor) => Change || Void`
+`Function onKeyUp(event: Event, data: Object, change: Change, editor: Editor) => Change || Void`
 
 This handler is called when any key is released in the `contenteditable` element.
 
