@@ -85,7 +85,7 @@ Changes.deleteAtRange = (change, range, options = {}) => {
   )
 
   // If it's a hanging selection, nudge it back to end in the previous text.
-  if (isHanging) {
+  if (isHanging && isEndVoid) {
     const prevText = document.getPreviousText(endKey)
     endKey = prevText.key
     endOffset = prevText.text.length
@@ -131,7 +131,7 @@ Changes.deleteAtRange = (change, range, options = {}) => {
   // If the start and end key are the same, and it was a hanging selection, we
   // can just remove the entire block.
   if (startKey == endKey && isHanging) {
-    change.removeNodeByKey(startBlock.key)
+    change.removeNodeByKey(startBlock.key, { normalize })
     return
   }
 
@@ -144,57 +144,97 @@ Changes.deleteAtRange = (change, range, options = {}) => {
     return
   }
 
-  // Otherwise, we need to remove more than one node, so first split at the
-  // range edges within a common ancestor, without normalizing. This makes it
-  // easy, because we can then just remove every node inside the split.
-  document = change.state.document
-  let ancestor = document.getCommonAncestor(startKey, endKey)
-  let startChild = ancestor.getFurthestAncestor(startKey)
-  let endChild = ancestor.getFurthestAncestor(endKey)
-  change.splitDescendantsByKey(startChild.key, startKey, startOffset, { normalize: false })
-  change.splitDescendantsByKey(endChild.key, endKey, endOffset, { normalize: false })
+  // Otherwise, we need to recursively remove text and nodes inside the start
+  // block after the start offset and inside the end block before the end
+  // offset. Then remove any blocks that are in between the start and end
+  // blocks. Then finally merge the start and end nodes.
+  else {
+    startBlock = document.getClosestBlock(startKey)
+    endBlock = document.getClosestBlock(endKey)
+    const startText = document.getNode(startKey)
+    const endText = document.getNode(endKey)
+    const startLength = startText.text.length - startOffset
 
-  // Refresh the variables after the split.
-  document = change.state.document
-  ancestor = document.getCommonAncestor(startKey, endKey)
-  startChild = ancestor.getFurthestAncestor(startKey)
-  endChild = ancestor.getFurthestAncestor(endKey)
+    const ancestor = document.getCommonAncestor(startKey, endKey)
+    const startChild = ancestor.getFurthestAncestor(startKey)
+    const endChild = ancestor.getFurthestAncestor(endKey)
 
-  // Determine which are the middle nodes.
-  const nextText = document.getNextText(endKey)
-  const startIndex = ancestor.nodes.indexOf(startChild)
-  const endIndex = ancestor.nodes.indexOf(endChild)
-  const middles = ancestor.nodes.slice(startIndex + 1, endIndex + 1)
-  startBlock = document.getClosestBlock(startKey)
-  endBlock = document.getClosestBlock(nextText.key)
+    const startParent = document.getParent(startBlock.key)
+    const startParentIndex = startParent.nodes.indexOf(startBlock)
 
-  // Remove all of the middle nodes, between the splits.
-  middles.forEach((child) => {
-    change.removeNodeByKey(child.key, { normalize: false })
-  })
+    let child
 
-  // If the start and end blocks are different, and the selection was hanging,
-  // remove the start block and the orphaned end block.
-  if (startBlock.key != endBlock.key && isHanging) {
-    change.removeNodeByKey(startBlock.key, { normalize: false })
-    change.removeNodeByKey(endBlock.key, { normalize: false })
-  }
+    // Iterate through all of the nodes in the tree after the start text node
+    // but inside the end child, and remove them.
+    child = startText
 
-  // Otherwise, move all of the nodes from the end block into the start block.
-  else if (startBlock.key != endBlock.key) {
-    endBlock.nodes.forEach((child, i) => {
-      const newKey = startBlock.key
-      const newIndex = startBlock.nodes.size + i
-      change.moveNodeByKey(child.key, newKey, newIndex, { normalize: false })
+    while (child.key != startChild.key) {
+      const parent = document.getParent(child.key)
+      const index = parent.nodes.indexOf(child)
+      const afters = parent.nodes.slice(index + 1)
+
+      afters.reverse().forEach((node) => {
+        change.removeNodeByKey(node.key, { normalize: false })
+      })
+
+      child = parent
+    }
+
+    // Remove all of the middle children.
+    const startChildIndex = ancestor.nodes.indexOf(startChild)
+    const endChildIndex = ancestor.nodes.indexOf(endChild)
+    const middles = ancestor.nodes.slice(startChildIndex + 1, endChildIndex)
+
+    middles.reverse().forEach((node) => {
+      change.removeNodeByKey(node.key, { normalize: false })
     })
 
-    // Remove parents of endBlock as long as they have a single child.
-    const lonely = document.getFurthestOnlyChildAncestor(endBlock.key) || endBlock
-    change.removeNodeByKey(lonely.key, { normalize: false })
-  }
+    // Remove the nodes before the end text node in the tree.
+    child = endText
 
-  if (normalize) {
-    change.normalizeNodeByKey(ancestor.key, SCHEMA)
+    while (child.key != endChild.key) {
+      const parent = document.getParent(child.key)
+      const index = parent.nodes.indexOf(child)
+      const befores = parent.nodes.slice(0, index)
+
+      befores.reverse().forEach((node) => {
+        change.removeNodeByKey(node.key, { normalize: false })
+      })
+
+      child = parent
+    }
+
+    // Remove any overlapping text content from the leaf text nodes.
+    change.removeTextByKey(startKey, startOffset, startLength, { normalize: false })
+    change.removeTextByKey(endKey, 0, endOffset, { normalize: false })
+
+    // If the start and end blocks aren't the same, move and merge the end block
+    // into the start block.
+    if (startBlock.key != endBlock.key) {
+      document = change.state.document
+      const lonely = document.getFurthestOnlyChildAncestor(endBlock.key)
+
+      // Move the end block to be right after the start block.
+      change.moveNodeByKey(endBlock.key, startParent.key, startParentIndex + 1)
+
+      // If the selection is hanging, just remove the start block, otherwise
+      // merge the end block into it.
+      if (isHanging) {
+        change.removeNodeByKey(startBlock.key, { normalize: false })
+      } else {
+        change.mergeNodeByKey(endBlock.key, { normalize: false })
+      }
+
+      // If nested empty blocks are left over above the end block, remove them.
+      if (lonely) {
+        change.removeNodeByKey(lonely.key, { normalize: false })
+      }
+    }
+
+    // If we should normalize, do it now after everything.
+    if (normalize) {
+      change.normalizeNodeByKey(ancestor.key, SCHEMA)
+    }
   }
 }
 
