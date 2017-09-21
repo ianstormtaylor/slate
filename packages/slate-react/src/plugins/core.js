@@ -203,7 +203,6 @@ function Plugin(options = {}) {
     // in the HTML, and can be used for intra-Slate pasting. If it's a text
     // node, wrap it in a `<span>` so we have something to set an attribute on.
     if (attach.nodeType == 3) {
-      contents.removeChild(attach)
       const span = window.document.createElement('span')
 
       // COMPAT: In Chrome and Safari, if we don't add the `white-space` style
