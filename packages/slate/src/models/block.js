@@ -93,19 +93,12 @@ class Block extends Record(DEFAULTS) {
       data = {},
       isVoid = false,
       key = generateKey(),
-      type,
-    } = object
-
-    let {
       nodes = [],
+      type,
     } = object
 
     if (typeof type != 'string') {
       throw new Error('`Block.fromJSON` requires a `type` string.')
-    }
-
-    if (nodes.length == 0) {
-      nodes = [{ kind: 'text', text: '' }]
     }
 
     const block = new Block({
