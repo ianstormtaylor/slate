@@ -7,6 +7,18 @@ This document maintains a list of changes to the `slate` package with each new v
 ---
 
 
+### `0.25.0` — September 21, 2017
+
+###### BREAKING
+
+- **The `insertBlock` change method no longer replaces empty blocks.** Previously if you used `insertBlock` and the selection was in an empty block, it would replace it. Now you'll need to perform that check yourself and use the new `replaceNodeByKey` method instead.
+
+- **The `Block.create` and `Inline.create` methods no longer normalize.** Previously if you used one of them to create a block or inline with zero nodes in it, they would automatically add a single empty text node as the only child. This was unexpected in certain situations, and if you were relying on this you'll need to handle it manually instead now.
+
+
+---
+
+
 ### `0.24.0` — September 11, 2017
 
 ###### BREAKING
