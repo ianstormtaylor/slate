@@ -72,8 +72,7 @@ function defaultParseHtml(html) {
 
   const parsed = new DOMParser().parseFromString(html, 'text/html')
   // Unwrap from <html> and <body>.
-  const fragment = parsed.childNodes[0].childNodes[1]
-  return fragment
+  return parsed.body
 }
 
 /**
