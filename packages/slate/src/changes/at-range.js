@@ -154,6 +154,7 @@ Changes.deleteAtRange = (change, range, options = {}) => {
     const startText = document.getNode(startKey)
     const endText = document.getNode(endKey)
     const startLength = startText.text.length - startOffset
+    const endLength = endOffset
 
     const ancestor = document.getCommonAncestor(startKey, endKey)
     const startChild = ancestor.getFurthestAncestor(startKey)
@@ -161,6 +162,7 @@ Changes.deleteAtRange = (change, range, options = {}) => {
 
     const startParent = document.getParent(startBlock.key)
     const startParentIndex = startParent.nodes.indexOf(startBlock)
+    const endParentIndex = startParent.nodes.indexOf(endBlock)
 
     let child
 
@@ -205,8 +207,13 @@ Changes.deleteAtRange = (change, range, options = {}) => {
     }
 
     // Remove any overlapping text content from the leaf text nodes.
-    change.removeTextByKey(startKey, startOffset, startLength, { normalize: false })
-    change.removeTextByKey(endKey, 0, endOffset, { normalize: false })
+    if (startLength != 0) {
+      change.removeTextByKey(startKey, startOffset, startLength, { normalize: false })
+    }
+
+    if (endLength != 0) {
+      change.removeTextByKey(endKey, 0, endOffset, { normalize: false })
+    }
 
     // If the start and end blocks aren't the same, move and merge the end block
     // into the start block.
@@ -215,7 +222,9 @@ Changes.deleteAtRange = (change, range, options = {}) => {
       const lonely = document.getFurthestOnlyChildAncestor(endBlock.key)
 
       // Move the end block to be right after the start block.
-      change.moveNodeByKey(endBlock.key, startParent.key, startParentIndex + 1)
+      if (endParentIndex != startParentIndex + 1) {
+        change.moveNodeByKey(endBlock.key, startParent.key, startParentIndex + 1)
+      }
 
       // If the selection is hanging, just remove the start block, otherwise
       // merge the end block into it.
