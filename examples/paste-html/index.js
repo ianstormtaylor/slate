@@ -128,7 +128,7 @@ const RULES = [
         type: 'link',
         nodes: next(el.childNodes),
         data: {
-          href: el.href
+          href: el.getAttribute('href')
         }
       }
     }
