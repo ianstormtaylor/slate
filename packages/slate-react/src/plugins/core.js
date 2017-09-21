@@ -199,14 +199,17 @@ function Plugin(options = {}) {
       els.forEach(el => el.removeAttribute('contenteditable'))
     }
 
+    let plainText
+
     // Set a `data-slate-fragment` attribute on a non-empty node, so it shows up
     // in the HTML, and can be used for intra-Slate pasting. If it's a text
     // node, wrap it in a `<span>` so we have something to set an attribute on.
     if (attach.nodeType == 3) {
       const span = window.document.createElement('span')
-      span.appendChild(attach)
+      span.textContent = attach.textContent.toString()
       contents.appendChild(span)
       attach = span
+      plainText = span
     }
 
     attach.setAttribute('data-slate-fragment', encoded)
@@ -218,14 +221,19 @@ function Plugin(options = {}) {
     div.style.position = 'absolute'
     div.style.left = '-9999px'
     div.appendChild(contents)
+    const richText = div
     body.appendChild(div)
 
-    // COMPAT: In Firefox, trying to use the terser `native.selectAllChildren`
-    // throws an error, so we use the older `range` equivalent. (2016/06/21)
-    const r = window.document.createRange()
-    r.selectNodeContents(div)
-    native.removeAllRanges()
-    native.addRange(r)
+    // If the copied element is plain text, just select the span containing the text.
+    const nodeContents = plainText || richText
+    if (nodeContents) {
+      // COMPAT: In Firefox, trying to use the terser `native.selectAllChildren`
+      // throws an error, so we use the older `range` equivalent. (2016/06/21)
+      const r = window.document.createRange()
+      r.selectNodeContents(nodeContents)
+      native.removeAllRanges()
+      native.addRange(r)
+    }
 
     // Revert to the previous selection right after copying.
     window.requestAnimationFrame(() => {
