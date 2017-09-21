@@ -367,6 +367,31 @@ Changes.removeTextByKey = (change, key, offset, length, options = {}) => {
 }
 
 /**
+`* Replace a `node` with another `node`
+ *
+ * @param {Change} change
+ * @param {String} key
+ * @param {Object|Node} node
+ * @param {Object} options
+ *   @property {Boolean} normalize
+ */
+
+Changes.replaceNodeByKey = (change, key, newNode, options = {}) => {
+  newNode = Node.create(newNode)
+  const { normalize = true } = options
+  const { state } = change
+  const { document } = state
+  const node = document.getNode(key)
+  const parent = document.getParent(key)
+  const index = parent.nodes.indexOf(node)
+  change.removeNodeByKey(key, { normalize: false })
+  change.insertNodeByKey(parent.key, index, newNode, options)
+  if (normalize) {
+    change.normalizeNodeByKey(parent.key, SCHEMA)
+  }
+}
+
+/**
  * Set `properties` on mark on text at `offset` and `length` in node by `key`.
  *
  * @param {Change} change

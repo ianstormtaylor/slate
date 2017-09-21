@@ -641,8 +641,7 @@ Changes.insertBlockAtRange = (change, range, block, options = {}) => {
   }
 
   else if (startBlock.isEmpty) {
-    change.removeNodeByKey(startBlock.key)
-    change.insertNodeByKey(parent.key, index, block, { normalize })
+    change.insertNodeByKey(parent.key, index + 1, block, { normalize })
   }
 
   else if (range.isAtStartOf(startBlock)) {
