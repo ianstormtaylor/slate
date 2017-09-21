@@ -59,8 +59,7 @@ const TEXT_RULE = {
 }
 
 /**
- * A default `parseHtml` function that returns the `<body>` using the 
- * native `DOMParser`.
+ * A default `parseHtml` function that returns the `<body>` using `DOMParser`.
  *
  * @param {String} html
  * @return {Object}
