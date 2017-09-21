@@ -3,8 +3,7 @@
 import h from '../../../helpers/h'
 
 export default function (change) {
-  const quote = { kind: 'block', type: 'quote' }
-  change.replaceNodeByKey('a', quote)
+  change.replaceNodeByKey('a', { kind: 'inline', type: 'emoji', isVoid: true })
 }
 
 export const input = (
@@ -21,7 +20,7 @@ export const output = (
   <state>
     <document>
       <paragraph>
-        one <quote />
+        one <emoji />
       </paragraph>
     </document>
   </state>
