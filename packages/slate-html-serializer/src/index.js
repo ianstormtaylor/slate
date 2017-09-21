@@ -59,7 +59,8 @@ const TEXT_RULE = {
 }
 
 /**
- * A default `parseHtml` option using the native `DOMParser`.
+ * A default `parseHtml` function that returns the `<body>` using the 
+ * native `DOMParser`.
  *
  * @param {String} html
  * @return {Object}
@@ -71,9 +72,8 @@ function defaultParseHtml(html) {
   }
 
   const parsed = new DOMParser().parseFromString(html, 'text/html')
-  // Unwrap from <html> and <body>.
-  const fragment = parsed.childNodes[0].childNodes[1]
-  return fragment
+  const { body } = parsed
+  return body
 }
 
 /**
