@@ -67,7 +67,8 @@ class Leaf extends React.Component {
       props.index != this.props.index ||
       props.marks != this.props.marks ||
       props.schema != this.props.schema ||
-      props.text != this.props.text
+      props.text != this.props.text ||
+      props.parent != this.props.parent
     ) {
       return true
     }
