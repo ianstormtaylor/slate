@@ -1,10 +1,13 @@
 
+import Base64 from 'slate-base64-serializer'
 import Debug from 'debug'
 import React from 'react'
 import SlateTypes from 'slate-prop-types'
 import Types from 'prop-types'
 
+import setTransferData from '../utils/set-transfer-data'
 import Text from './text'
+import TRANSFER_TYPES from '../constants/transfer-types'
 
 /**
  * Debug.
@@ -98,6 +101,22 @@ class Void extends React.Component {
   }
 
   /**
+   * On drag start, add a serialized representation of the node to the data.
+   *
+   * @param {Event} event
+   */
+
+  onDragStart = (event) => {
+    const { node } = this.props
+    const encoded = Base64.serializeNode(node, { preserveKeys: true })
+    const { dataTransfer } = event.nativeEvent
+
+    setTransferData(dataTransfer, TRANSFER_TYPES.NODE, encoded)
+
+    this.debug('onDragStart', event)
+  }
+
+  /**
    * Render.
    *
    * @return {Element}
@@ -117,6 +136,7 @@ class Void extends React.Component {
         onClick={this.onClick}
         onDragOver={this.onDragOver}
         onDragEnter={this.onDragEnter}
+        onDragStart={this.onDragStart}
       >
         {this.renderSpacer()}
         <Tag contentEditable={false}>
