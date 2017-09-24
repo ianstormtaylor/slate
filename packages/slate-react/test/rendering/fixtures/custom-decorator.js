@@ -36,10 +36,10 @@ export const state = (
 
 export const output = `
 <div data-slate-editor="true" contenteditable="true" role="textbox">
-  <div style="position:relative;">
+  <div style="position:relative">
     <span>
       <span>o</span>
-      <span><span style="font-weight:bold;">n</span></span>
+      <span><span style="font-weight:bold">n</span></span>
       <span>e</span>
     </span>
   </div>

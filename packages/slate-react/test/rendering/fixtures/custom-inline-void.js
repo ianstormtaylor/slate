@@ -25,14 +25,14 @@ export const state = (
 
 export const output = `
 <div data-slate-editor="true" contenteditable="true" role="textbox">
-  <div style="position:relative;">
+  <div style="position:relative">
     <span>
       <span>
         <span data-slate-zero-width="true">&#x200A;</span>
       </span>
     </span>
     <span data-slate-void="true">
-      <span style="color:transparent;">
+      <span style="color:transparent">
         <span>
           <span data-slate-zero-width="true">&#x200A;</span>
         </span>
