@@ -7,18 +7,6 @@ import Simulator from 'slate-simulator'
 
 A simulator to help writing tests for Slate editors and plugins.
 
-- [Example](#example)
-- [Methods](#methods)
-  - [`beforeInput`](#beforeinput)
-  - [`blur`](#blur)
-  - [`copy`](#copy)
-  - [`cut`](#cut)
-  - [`drop`](#drop)
-  - [`focus`](#focus)
-  - [`keyDown`](#keydown)
-  - [`paste`](#paste)
-  - [`select`](#select)
-
 
 ## Example
 

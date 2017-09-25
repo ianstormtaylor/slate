@@ -9,17 +9,6 @@ A character in a [`Text`](./text.md) node.
 
 Characters are how Slate associates [`Marks`](./mark.md) with a range of text, for formatting.
 
-- [Properties](#properties)
-  - [`marks`](#marks)
-  - [`text`](#text)
-- [Static Methods](#static-methods)
-  - [`Character.create`](#charactercreate)
-  - [`Character.createList`](#charactercreatelist)
-  - [`Character.fromJSON`](#characterfromjson)
-  - [`Character.isCharacter`](#characterischaracter)
-- [Instance Methods](#instance-methods)
-  - [`toJSON`](#tojson)
-
 
 ## Properties
 

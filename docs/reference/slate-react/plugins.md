@@ -7,24 +7,6 @@ Each editor has a "middleware stack" of plugins, which has a specific order.
 
 When the editor needs to resolve a plugin-related handler, it will loop through its plugin stack, searching for the first plugin that successfully returns a value. After receiving that value, the editor will **not** continue to search the remaining plugins; it returns early. If you'd like for the stack to continue, a plugin handler should return `undefined`.
 
-- [Conventions](#conventions)
-- [Event Handler Properties](#event-handle-properties)
-  - [`onBeforeInput`](#onbeforeinput)
-  - [`onBlur`](#onblur)
-  - [`onFocus`](#onfocus)
-  - [`onCopy`](#oncopy)
-  - [`onCut`](#oncut)
-  - [`onDrop`](#ondrop)
-  - [`onKeyDown`](#onkeydown)
-  - [`onKeyUp`](#onkeyup)
-  - [`onPaste`](#onpaste)
-  - [`onSelect`](#onselect)
-- [Other Properties](#other-properties)
-  - [`onChange`](#onchange)
-  - [`onBeforeChange`](#onbeforechange)
-  - [`render`](#render)
-  - [`schema`](#schema)
-
 
 ## Conventions
 

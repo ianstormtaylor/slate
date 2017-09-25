@@ -7,8 +7,6 @@ import { findDOMNode } from 'slate-react'
 
 React-specific utility functions for Slate that may be useful in certain use cases.
 
-- [`findDOMNode`](#finddomnode)
-
 
 ## Functions
 

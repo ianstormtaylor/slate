@@ -8,11 +8,6 @@ import { createHyperscript } from 'slate-hyperscript'
 
 A hyperscript helper for writing Slate documents with JSX!
 
-- [Example](#example)
-- [Exports](#methods)
-  - [`h`](#h)
-  - [`createHyperscript`](#createhyperscript)
-
 
 ## Example
 

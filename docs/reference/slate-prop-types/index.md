@@ -7,31 +7,6 @@ import Types from 'slate-prop-types'
 
 A set of React prop types for Slate editors and plugins.
 
-- [Example](#example)
-- [Exports](#exports)
-  - [`block`](#block)
-  - [`blocks`](#blocks)
-  - [`change`](#change)
-  - [`character`](#character)
-  - [`characters`](#characters)
-  - [`data`](#data)
-  - [`document`](#document)
-  - [`history`](#history)
-  - [`inline`](#inline)
-  - [`inlines`](#inlines)
-  - [`mark`](#mark)
-  - [`marks`](#marks)
-  - [`node`](#node)
-  - [`nodes`](#nodes)
-  - [`range`](#range)
-  - [`ranges`](#ranges)
-  - [`schema`](#schema)
-  - [`selection`](#selection)
-  - [`stack`](#stack)
-  - [`state`](#state)
-  - [`text`](#text)
-  - [`texts`](#texts)
-
 
 ## Example
 
@@ -73,7 +48,7 @@ Ensure that a value is a Slate `Character`.
 
 ### `characters`
 
-Ensure that a value is an immutable `List` of Slate `Character` objects.
+Ensure that a value is an immutable `List` of Slate [`Character`](../slate/character.md) objects.
 
 ### `data`
 
@@ -101,7 +76,7 @@ Ensure that a value is a Slate `Mark`.
 
 ### `marks`
 
-Ensure that a value is an immutable `Set` of Slate `Mark` objects.
+Ensure that a value is an immutable `Set` of Slate [`Mark`](../slate/mark.md) objects.
 
 ### `node`
 
@@ -109,7 +84,7 @@ Ensure that a value is a Slate `Node`.
 
 ### `nodes`
 
-Ensure that a value is an immutable `List` of Slate `Node` objects.
+Ensure that a value is an immutable `List` of Slate [`Node`](../slate/mark.md) objects.
 
 ### `range`
 
@@ -117,7 +92,7 @@ Ensure that a value is a Slate `Range`.
 
 ### `ranges`
 
-Ensure that a value is an immutable `List` of Slate `Range` objects.
+Ensure that a value is an immutable `List` of Slate [`Range`](../slate/range.md) objects.
 
 ### `schema`
 
@@ -137,8 +112,8 @@ Ensure that a value is a Slate `State`.
 
 ### `text`
 
-Ensure that a value is a Slate `Text`.
+Ensure that a value is a Slate [`Text`](../slate/text.md).
 
 ### `texts`
 
-Ensure that a value is a Slate `Texts`.
+Ensure that a value is an immutable `List` of Slate [`Text`](../slate/text.md) objects.

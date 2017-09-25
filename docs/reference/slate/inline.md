@@ -9,24 +9,6 @@ A inline node in a Slate [`Document`](./document.md). Inline nodes implement the
 
 Inline nodes may contain nested inline nodes and text nodes—just like in the DOM. They always contain at least one text node child.
 
-- [Properties](#properties)
-  - [`data`](#data)
-  - [`isVoid`](#isvoid)
-  - [`key`](#key)
-  - [`nodes`](#nodes)
-  - [`type`](#type)
-- [Computed Properties](#computed-properties)
-  - [`kind`](#kind)
-  - [`text`](#text)
-- [Static Methods](#static-methods)
-  - [`Inline.create`](#inlinecreate)
-  - [`Inline.createList`](#inlinecreatelist)
-  - [`Inline.fromJSON`](#inlinefromjson)
-  - [`Inline.isInline`](#inlineisinline)
-- [Node Methods](#node-methods)
-- [Instance Methods](#instance-methods)
-  - [`toJSON`](#tojson)
-
 
 ## Properties
 

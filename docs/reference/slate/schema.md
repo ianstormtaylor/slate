@@ -1,20 +1,7 @@
 
-# Schemas
+# `Schema`
 
 Every Slate editor has a "schema" associated with it, which contains information about the structure of its content. It lets you specify how to render each different type of node. And for more advanced use cases it lets you enforce rules about what the content of the editor can and cannot be.
-
-- [Properties](#properties)
-  - [`marks`](#marks)
-  - [`nodes`](#nodes)
-  - [`rules`](#rules)
-- [Rule Properties](#rule-properties)
-  - [`decorate`](#decorate)
-  - [`match`](#match)
-  - [`normalize`](#normalize)
-  - [`render`](#render)
-  - [`validate`](#validate)
-- [Static Methods](#static-methods)
-  - [`Schema.isSchema`](#schemaisschema)
 
 
 ## Properties

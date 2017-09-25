@@ -11,20 +11,6 @@ Documents are made up of block nodes, inline nodes, and text nodes—just like i
 
 In some places, you'll see mention of "fragments", which are also `Document` objects, just that aren't attached to the main `State`. For example, when cutting-and-pasting a selection of content, that content will be referred to as a document "fragment".
 
-- [Properties](#properties)
-  - [`data`](#data)
-  - [`nodes`](#nodes)
-- [Computed Properties](#computed-properties)
-  - [`kind`](#kind)
-  - [`text`](#text)
-- [Static Methods](#static-methods)
-  - [`Document.create`](#documentcreate)
-  - [`Document.fromJSON`](#documentfromjson)
-  - [`Document.isDocument`](#documentisdocument)
-- [Node Methods](#node-methods)
-- [Instance Methods](#instance-methods)
-  - [`toJSON`](#tojson)
-
 
 ## Properties
 

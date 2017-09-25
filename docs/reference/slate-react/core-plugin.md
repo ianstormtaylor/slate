@@ -3,9 +3,6 @@
 
 Slate's editor is very unopinionated. The only logic it handles by default is logic associated with the `contenteditable` functionality itself—managing text, selections, etc. That logic in contained in a single plugin, called the "core" plugin.
 
-- [Default Behavior](#behavior)
-- [Overriding Defaults](#overriding-defaults)
-
 
 ## Default Behavior
 
