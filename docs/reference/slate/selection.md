@@ -11,36 +11,6 @@ The "anchor" is the fixed point in a selection, and the "focus" is the non-fixed
 
 Often times, you don't need to specifically know which point is the "anchor" and which is the "focus", and you just need to know which comes first and last in the document. For these cases, there are many convenience equivalent properties and methods referring to the "start" and "end" points.
 
-- [Properties](#properties)
-  - [`anchorKey`](#anchorkey)
-  - [`anchorOffset`](#anchoroffset)
-  - [`focusKey`](#focuskey)
-  - [`focusOffset`](#focusoffset)
-  - [`isBackward`](#isbackward)
-  - [`isFocused`](#isfocused)
-- [Computed Properties](#computed-properties)
-  - [`endKey`](#endkey)
-  - [`endOffset`](#endoffset)
-  - [`isBlurred`](#isblurred)
-  - [`isCollapsed`](#iscollapsed)
-  - [`isExpanded`](#isExpanded)
-  - [`isForward`](#isForward)
-  - [`startKey`](#startkey)
-  - [`startOffset`](#startoffset)
-- [Static Methods](#static-methods)
-  - [`Selection.create`](#selectioncreate)
-  - [`Selection.fromJSON`](#selectionfromjson)
-  - [`Selection.isSelection`](#selectionisselection)
-- [Instance Methods](#instance-methods)
-  - [`toJSON`](#tojson)
-- [Checking Methods](#checking-methods)
-  - [`has{Edge}AtEndOf`](#hasedgeatendof)
-  - [`has{Edge}AtStartOf`](#hasedgeatstartof)
-  - [`has{Edge}Between`](#hasedgebetween)
-  - [`has{Edge}In`](#hasedgein)
-  - [`isAtEndOf`](#isatendof)
-  - [`isAtStartOf`](#isatstartof)
-
 
 ## Properties
 

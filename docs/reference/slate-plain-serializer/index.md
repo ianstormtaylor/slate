@@ -7,11 +7,6 @@ import Plain from 'slate-plain-serializer'
 
 A serializer that converts a Slate [`State`](../slate/state.md) to and from a plain text string.
 
-- [Example](#example)
-- [Static Methods](#methods)
-  - [`Plain.deserialize`](#plaindeserialize)
-  - [`Plain.serialize`](#plainserialize)
-
 
 ## Example
 

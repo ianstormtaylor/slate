@@ -9,24 +9,6 @@ A block node in a Slate [`Document`](./document.md). Block nodes implement the [
 
 Block nodes may contain nested block nodes, inline nodes, and text nodes—just like in the DOM. They always contain at least one text node child.
 
-- [Properties](#properties)
-  - [`data`](#data)
-  - [`isVoid`](#isvoid)
-  - [`key`](#key)
-  - [`nodes`](#nodes)
-  - [`type`](#type)
-- [Computed Properties](#computed-properties)
-  - [`kind`](#kind)
-  - [`text`](#text)
-- [Static Methods](#static-methods)
-  - [`Block.create`](#blockcreate)
-  - [`Block.createList`](#blockcreatelist)
-  - [`Block.fromJSON`](#blockfromjson)
-  - [`Block.isBlock`](#blockisblock)
-- [Node Methods](#node-methods)
-- [Instance Methods](#instance-methods)
-  - [`toJSON`](#tojson)
-
 
 ## Properties
 

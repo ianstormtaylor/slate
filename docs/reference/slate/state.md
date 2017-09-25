@@ -11,38 +11,6 @@ All changes to the document and selection are also performed through the state o
 
 For convenience, in addition to changes, many of the [`Selection`](./selection.md) and [`Document`](./document.md) properties are exposed as proxies on the `State` object.
 
-- [Properties](#properties)
-  - [`document`](#document)
-  - [`selection`](#selection)
-- [Computed Properties](#computed-properties)
-  - [`{edge}Text`](#edgetext)
-  - [`{edge}Block`](#edgeblock)
-  - [`marks`](#marks)
-  - [`activeMarks`](#activeMarks)
-  - [`blocks`](#blocks)
-  - [`fragment`](#fragment)
-  - [`inlines`](#inlines)
-  - [`texts`](#texts)
-  - [`hasUndos`](#hasundos)
-  - [`hasRedos`](#hasredos)
-- [Selection-like Properties](#selection-like-properties)
-  - [`{edge}Key`](#edgekey)
-  - [`{edge}Offset`](#edgeoffset)
-  - [`isBackward`](#isbackward)
-  - [`isBlurred`](#isblurred)
-  - [`isCollapsed`](#iscollapsed)
-  - [`isExpanded`](#isExpanded)
-  - [`isFocused`](#isfocused)
-  - [`isForward`](#isForward)
-  - [`isEmpty`](#isEmpty)
-- [Static Methods](#static-methods)
-  - [`State.create`](#statecreate)
-  - [`State.fromJSON`](#statefromjson)
-  - [`State.isState`](#stateisstate)
-- [Instance Methods](#instance-methods)
-  - [`change`](#change)
-  - [`toJSON`](#tojson)
-
 
 ## Properties
 

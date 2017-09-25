@@ -10,9 +10,6 @@ import {
 
 Utility functions that ship with Slate that may be useful for certain use cases.
 
-- [`resetKeyGenerator`](#resetkeygenerator)
-- [`setKeyGenerator`](#setkeygenerator)
-
 
 ## Functions
 

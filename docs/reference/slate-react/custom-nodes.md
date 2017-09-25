@@ -3,16 +3,6 @@
 
 Slate will render custom nodes for [`Block`](../slate/block.md) and [`Inline`](../slate/inline.md) models, based on what you pass in as your schema. This allows you to completely customize the rendering behavior of your Slate editor.
 
-- [Properties](#properties)
-  - [`attributes`](#attributes)
-  - [`children`](#children)
-  - [`editor`](#editor)
-  - [`isSelected`](#isselected)
-  - [`node`](#node)
-  - [`parent`](#parent)
-  - [`readOnly`](#readonly)
-  - [`state`](#state)
-- [`shouldNodeComponentUpdate`](#shouldnodecomponentupdate)
 
 ## Properties
 

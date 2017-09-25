@@ -9,10 +9,6 @@ Data is simply a thin wrapper around [`Immutable.Map`](https://facebook.github.i
 
 A data object can have any properties associated with it.
 
-- [Static Methods](#static-methods)
-  - [`Data.create`](#datacreate)
-  - [`Data.fromJSON`](#datafromjson)
-
 
 ## Static Methods
 

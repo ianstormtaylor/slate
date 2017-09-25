@@ -9,18 +9,6 @@ The HTML serializer lets you parse and stringify arbitrary HTML content, based o
 
 For an example of the HTML serializer in action, check out the [`paste-html` example](../../../examples/paste-html).
 
-- [Example](#example)
-- [Properties](#properties)
-  - [`rules`](#rules)
-  - [`defaultBlock`](#defaultblock)
-  - [`parseHtml`](#parsehtml)
-- [Methods](#methods)
-  - [`deserialize`](#deserialize)
-  - [`serialize`](#serialize)
-- [Rules](#rules)
-  - [`rule.deserialize`](#ruledeserialize)
-  - [`rule.serialize`](#ruleserialize)
-
 
 ## Example
 
