@@ -3,11 +3,6 @@
 
 Every Slate editor has a "schema" associated with it, which contains information about the structure of its content. It lets you specify how to render each different type of node. And for more advanced use cases it lets you enforce rules about what the content of the editor can and cannot be.
 
-- [Rules](#rules)
-- [Components](#components)
-- [Decorators](#decorators)
-- [Validations](#validations)
-
 
 ## Rules
 
