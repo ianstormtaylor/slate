@@ -91,7 +91,6 @@ class Text extends Record(DEFAULTS) {
     } = object
 
     if (object.text) {
-      logger.deprecate('0.23.0', 'Passing `object.text` to `Text.fromJSON` has been deprecated, please use `object.ranges` instead.')
       ranges = [{ text: object.text }]
     }
 
