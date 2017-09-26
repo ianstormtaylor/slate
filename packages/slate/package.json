@@ -31,7 +31,7 @@
     "build:max": "mkdir -p ./dist && NODE_ENV=production browserify ./src/index.js --transform babelify --transform envify --transform [ browserify-global-shim --global ] --standalone Slate > ./dist/slate.js",
     "build:min": "mkdir -p ./dist && NODE_ENV=production browserify ./src/index.js --transform babelify --transform envify --transform [ browserify-global-shim --global ] --transform uglifyify --standalone Slate | uglifyjs > ./dist/slate.min.js",
     "clean": "rm -rf ./dist ./lib ./node_modules",
-    "prepublish": "yarn run build:max && yarn run build:min",
+    "prepublish": "yarn run build && yarn run build:max && yarn run build:min",
     "watch": "babel --watch --out-dir ./lib ./src --source-maps inline"
   },
   "browserify-global-shim": {
