@@ -130,8 +130,6 @@ class Editor extends React.Component {
         const stk = this.state.stack
         const change = this.state.state.change()
         stk[method](change, this, ...args)
-        stk.onBeforeChange(change, this)
-        stk.onChange(change, this)
         this.onChange(change)
       }
     }
@@ -240,9 +238,13 @@ class Editor extends React.Component {
     }
 
     const { onChange, onDocumentChange, onSelectionChange } = this.props
+    const { stack } = this.state
     const { document, selection } = this.tmp
     const { state } = change
     if (state == this.state.state) return
+
+    stack.onBeforeChange(change, this)
+    stack.onChange(change, this)
 
     onChange(change)
     if (onDocumentChange && state.document != document) onDocumentChange(state.document, change)
