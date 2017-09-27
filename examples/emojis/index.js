@@ -25,7 +25,7 @@ const EMOJIS = [
 
 const schema = {
   nodes: {
-    paragraph: props => <p>{props.children}</p>,
+    paragraph: props => <p {...props.attributes}>{props.children}</p>,
     emoji: (props) => {
       const { isSelected, node } = props
       const { data } = node
