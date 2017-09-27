@@ -12,8 +12,8 @@ import Mark from '../models/mark'
 const Changes = {}
 
 /**
- * Mix in the changes that just pass through to their at-range equivalents
- * because they don't have any effect on the selection.
+ * Mix in the changes that pass through to their at-range equivalents because
+ * they don't have any effect on the selection.
  */
 
 const PROXY_TRANSFORMS = [
