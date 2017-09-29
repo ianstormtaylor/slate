@@ -114,12 +114,12 @@ class Editor extends React.Component {
 
     // Create a new `Stack`, omitting the `onChange` property since that has
     // special significance on the editor itself.
-    const { state } = props
     const plugins = resolvePlugins(props)
     const stack = Stack.create({ plugins })
     this.state.stack = stack
 
-    // Cache and set the state.
+    // Resolve the state, running `onBeforeChange` first.
+    const state = stack.onBeforeChange(props.state, this)
     this.cacheState(state)
     this.state.state = state
 
@@ -144,24 +144,26 @@ class Editor extends React.Component {
   }
 
   /**
-   * When the `props` are updated, create a new `Stack` if necessary.
+   * When the `props` are updated, create a new `Stack` if necessary and run
+   * `onBeforeChange` to ensure the state is normalized.
    *
    * @param {Object} props
    */
 
   componentWillReceiveProps = (props) => {
-    const { state } = props
+    let { stack } = this.state
 
     // If any plugin-related properties will change, create a new `Stack`.
     for (let i = 0; i < PLUGINS_PROPS.length; i++) {
       const prop = PLUGINS_PROPS[i]
       if (props[prop] == this.props[prop]) continue
       const plugins = resolvePlugins(props)
-      const stack = Stack.create({ plugins })
+      stack = Stack.create({ plugins })
       this.setState({ stack })
     }
 
-    // Cache and save the state.
+    // Resolve the state, running the `onBeforeChange` handler of the stack.
+    const state = stack.onBeforeChange(props.state, this)
     this.cacheState(state)
     this.setState({ state })
   }
