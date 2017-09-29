@@ -119,7 +119,9 @@ class Editor extends React.Component {
     this.state.stack = stack
 
     // Resolve the state, running `onBeforeChange` first.
-    const state = stack.onBeforeChange(props.state, this)
+    const change = props.state.change()
+    stack.onBeforeChange(change, this)
+    const { state } = change
     this.cacheState(state)
     this.state.state = state
 
@@ -163,7 +165,9 @@ class Editor extends React.Component {
     }
 
     // Resolve the state, running the `onBeforeChange` handler of the stack.
-    const state = stack.onBeforeChange(props.state, this)
+    const change = props.state.change()
+    stack.onBeforeChange(change, this)
+    const { state } = change
     this.cacheState(state)
     this.setState({ state })
   }
