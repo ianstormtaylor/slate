@@ -233,9 +233,10 @@ class Html {
     }
 
     const next = (elements) => {
-      if (typeof NodeList !== 'undefined' && elements instanceof NodeList) {
+      if (Object.prototype.toString.call(elements) == '[object NodeList]') {
         elements = Array.from(elements)
       }
+
       switch (typeOf(elements)) {
         case 'array':
           return this.deserializeElements(elements)
