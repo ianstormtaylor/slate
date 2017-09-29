@@ -1,9 +1,6 @@
 
-/**
- * Models.
- */
-
 import Block from './models/block'
+import Changes from './changes'
 import Character from './models/character'
 import Data from './models/data'
 import Document from './models/document'
@@ -11,29 +8,14 @@ import History from './models/history'
 import Inline from './models/inline'
 import Mark from './models/mark'
 import Node from './models/node'
+import Operations from './operations'
+import Range from './models/range'
 import Schema from './models/schema'
 import Selection from './models/selection'
 import Stack from './models/stack'
 import State from './models/state'
 import Text from './models/text'
-import Range from './models/range'
-
-/**
- * Operations.
- */
-
-import Operations from './operations'
-
-/**
- * Changes.
- */
-
-import Changes from './changes'
-
-/**
- * Utils.
- */
-
+import coreSchema from './schemas/core'
 import { resetKeyGenerator, setKeyGenerator } from './utils/generate-key'
 
 /**
@@ -44,6 +26,7 @@ import { resetKeyGenerator, setKeyGenerator } from './utils/generate-key'
 
 export {
   Block,
+  Changes,
   Character,
   Data,
   Document,
@@ -58,13 +41,14 @@ export {
   Stack,
   State,
   Text,
-  Changes,
+  coreSchema,
   resetKeyGenerator,
   setKeyGenerator,
 }
 
 export default {
   Block,
+  Changes,
   Character,
   Data,
   Document,
@@ -79,7 +63,7 @@ export default {
   Stack,
   State,
   Text,
-  Changes,
+  coreSchema,
   resetKeyGenerator,
   setKeyGenerator,
 }

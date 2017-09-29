@@ -114,12 +114,14 @@ class Editor extends React.Component {
 
     // Create a new `Stack`, omitting the `onChange` property since that has
     // special significance on the editor itself.
-    const { state } = props
     const plugins = resolvePlugins(props)
     const stack = Stack.create({ plugins })
     this.state.stack = stack
 
-    // Cache and set the state.
+    // Resolve the state, running `onBeforeChange` first.
+    const change = props.state.change()
+    stack.onBeforeChange(change, this)
+    const { state } = change
     this.cacheState(state)
     this.state.state = state
 
@@ -128,9 +130,9 @@ class Editor extends React.Component {
       const method = EVENT_HANDLERS[i]
       this[method] = (...args) => {
         const stk = this.state.stack
-        const change = this.state.state.change()
-        stk[method](change, this, ...args)
-        this.onChange(change)
+        const c = this.state.state.change()
+        stk[method](c, this, ...args)
+        this.onChange(c)
       }
     }
 
@@ -144,24 +146,28 @@ class Editor extends React.Component {
   }
 
   /**
-   * When the `props` are updated, create a new `Stack` if necessary.
+   * When the `props` are updated, create a new `Stack` if necessary and run
+   * `onBeforeChange` to ensure the state is normalized.
    *
    * @param {Object} props
    */
 
   componentWillReceiveProps = (props) => {
-    const { state } = props
+    let { stack } = this.state
 
     // If any plugin-related properties will change, create a new `Stack`.
     for (let i = 0; i < PLUGINS_PROPS.length; i++) {
       const prop = PLUGINS_PROPS[i]
       if (props[prop] == this.props[prop]) continue
       const plugins = resolvePlugins(props)
-      const stack = Stack.create({ plugins })
+      stack = Stack.create({ plugins })
       this.setState({ stack })
     }
 
-    // Cache and save the state.
+    // Resolve the state, running the `onBeforeChange` handler of the stack.
+    const change = props.state.change()
+    stack.onBeforeChange(change, this)
+    const { state } = change
     this.cacheState(state)
     this.setState({ state })
   }
