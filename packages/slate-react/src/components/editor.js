@@ -130,9 +130,9 @@ class Editor extends React.Component {
       const method = EVENT_HANDLERS[i]
       this[method] = (...args) => {
         const stk = this.state.stack
-        const change = this.state.state.change()
-        stk[method](change, this, ...args)
-        this.onChange(change)
+        const c = this.state.state.change()
+        stk[method](c, this, ...args)
+        this.onChange(c)
       }
     }
 
