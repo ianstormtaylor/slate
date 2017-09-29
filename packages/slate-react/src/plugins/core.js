@@ -4,7 +4,7 @@ import Debug from 'debug'
 import Plain from 'slate-plain-serializer'
 import React from 'react'
 import getWindow from 'get-window'
-import { Block, Inline } from 'slate'
+import { Block, Inline, coreSchema } from 'slate'
 
 import Content from '../components/content'
 import Placeholder from '../components/placeholder'
@@ -49,10 +49,11 @@ function Plugin(options = {}) {
     const schema = editor.getSchema()
     const prevState = editor.getState()
 
-    // PERF: Skip normalizing if the document hasn't changed, since the core
-    // schema only normalizes changes to the document, not selection.
+    // PERF: Skip normalizing if the document hasn't changed, since schemas only
+    // normalize changes to the document, not selection.
     if (prevState && state.document == prevState.document) return
 
+    change.normalize(coreSchema)
     change.normalize(schema)
     debug('onBeforeChange')
   }
