@@ -274,7 +274,7 @@ Remove a `mark` from `length` characters starting at an `offset` in a [`Node`](.
 Remove a [`Node`](./node.md) from the document by its `key`.
 
 ### `replaceNodeByKey`
-`removeNodeByKey(key: String, node: Node) => Change`
+`replaceNodeByKey(key: String, node: Node) => Change`
 
 Replace a [`Node`](./node.md) in the document with a new [`Node`](./node.md) by its `key`.
 
