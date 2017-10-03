@@ -17,7 +17,23 @@ function getDropPoint(event, state, editor) {
   const { document } = state
   const { nativeEvent, target } = event
   const { x, y } = nativeEvent
-  const nodeEl = findClosestNode(target, '[data-key]')
+
+  // Resolve the caret position where the drop occured.
+  const window = getWindow(target)
+  let n, o
+
+  // COMPAT: In Firefox, `caretRangeFromPoint` doesn't exist. (2016/07/25)
+  if (window.document.caretRangeFromPoint) {
+    const range = window.document.caretRangeFromPoint(x, y)
+    n = range.startContainer
+    o = range.startOffset
+  } else {
+    const position = window.document.caretPositionFromPoint(x, y)
+    n = position.offsetNode
+    o = position.offset
+  }
+
+  const nodeEl = findClosestNode(n, '[data-key]')
   const nodeKey = nodeEl.getAttribute('data-key')
   const node = document.key === nodeKey ? document : document.getDescendant(nodeKey)
 
@@ -59,22 +75,7 @@ function getDropPoint(event, state, editor) {
     return { key, offset }
   }
 
-  // Otherwise, resolve the caret position where the drop occured.
-  const window = getWindow(event.target)
-  let offsetNode, offset
-
-  // COMPAT: In Firefox, `caretRangeFromPoint` doesn't exist. (2016/07/25)
-  if (window.document.caretRangeFromPoint) {
-    const range = window.document.caretRangeFromPoint(x, y)
-    offsetNode = range.startContainer
-    offset = range.startOffset
-  } else {
-    const position = window.document.caretPositionFromPoint(x, y)
-    offsetNode = position.offsetNode
-    offset = position.offset
-  }
-
-  const point = getPoint(offsetNode, offset, state, editor)
+  const point = getPoint(n, o, state, editor)
 
   return point
 }
