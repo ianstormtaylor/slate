@@ -370,10 +370,37 @@ Changes.deleteBackwardAtRange = (change, range, n = 1, options = {}) => {
       return
     }
 
-    // If the previous inline is void, remove it.
-    if (prevInline && prevInline.isVoid) {
-      change.removeNodeByKey(prevInline.key, { normalize })
-      return
+    // Handle edge cases when the previous node is inline.
+    if (prevInline) {
+      // If the previous inline is void, remove it.
+      if (prevInline.isVoid) {
+        change.removeNodeByKey(prevInline.key, { normalize })
+        return
+      }
+
+      // If the previous inline's last child node is a void inline, remove it.
+      // We want either the last text node with a truthy value or the last void
+      // inline node, whichever is closest to being the last child. If a void
+      // inline is found, we'll remove it, but if a text node is found first, we
+      // should do nothing, as it will be handled further down as standard text.
+      const lastGrandchild = prevInline.nodes.findLast(child => (
+        (child.kind === 'text' && child.text) || (child.kind === 'inline' && child.isVoid)
+      ))
+
+      if (lastGrandchild && lastGrandchild.kind === 'inline') {
+        change.removeNodeByKey(lastGrandchild.key, { normalize })
+
+        // If after removing the void inline grandchild, it's inline parent
+        // contains no further void nodes and has a falsy (empty) computed text
+        // value, remove it as well.
+        const changedPrevInline = change.state.document.getDescendant(prevInline.key)
+
+        if (changedPrevInline.nodes.every(child => !child.isVoid) && !changedPrevInline.text) {
+          change.removeNodeByKey(prevInline.key)
+        }
+
+        return
+      }
     }
 
     // If we're deleting by one character and the previous text node is not
