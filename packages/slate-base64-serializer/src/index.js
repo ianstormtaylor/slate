@@ -2,6 +2,14 @@
 import { State } from 'slate'
 import { Buffer } from 'buffer';
 
+function newBuffer(data, encoding, len) {
+  return new Buffer(data, encoding, len);
+}
+
+if (!Buffer.from) {
+  Buffer.from = newBuffer;
+}
+
 /**
  * encode string `str` to base64
  * @param  {String} str
