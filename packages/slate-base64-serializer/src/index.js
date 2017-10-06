@@ -1,5 +1,37 @@
 
 import { State } from 'slate'
+import { Buffer } from 'buffer';
+
+/**
+ * encode string `str` to base64
+ * @param  {String} str
+ * @return {String}
+ */
+function btoa(str) {
+  let buffer;
+  if (window && window.btoa) {
+    return window.btoa(str)
+  }
+
+  if (str instanceof Buffer) {
+    buffer = str
+  } else {
+    buffer = Buffer.from(str)
+  }
+  return buffer.toString('base64')
+}
+
+/**
+ * decode back base64-encoded string `str`
+ * @param  {String} str
+ * @return {String}
+ */
+function atob(str) {
+  if (window && window.atob) {
+    return window.atob(str)
+  }
+  return Buffer.from(str, 'base64').toString('binary')
+}
 
 /**
  * Encode a JSON `object` as base-64 `string`.
@@ -10,7 +42,7 @@ import { State } from 'slate'
 
 function encode(object) {
   const string = JSON.stringify(object)
-  const encoded = window.btoa(window.encodeURIComponent(string))
+  const encoded = btoa(window.encodeURIComponent(string))
   return encoded
 }
 
@@ -22,7 +54,7 @@ function encode(object) {
  */
 
 function decode(string) {
-  const decoded = window.decodeURIComponent(window.atob(string))
+  const decoded = window.decodeURIComponent(atob(string))
   const object = JSON.parse(decoded)
   return object
 }
