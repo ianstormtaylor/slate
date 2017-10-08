@@ -54,7 +54,7 @@ function atob(str) {
 
 function encode(object) {
   const string = JSON.stringify(object)
-  const encoded = btoa(window.encodeURIComponent(string))
+  const encoded = btoa(encodeURIComponent(string))
   return encoded
 }
 
@@ -66,7 +66,7 @@ function encode(object) {
  */
 
 function decode(string) {
-  const decoded = window.decodeURIComponent(atob(string))
+  const decoded = decodeURIComponent(atob(string))
   const object = JSON.parse(decoded)
   return object
 }
