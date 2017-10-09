@@ -1,13 +1,11 @@
 
 import { State } from 'slate'
-import { Buffer } from 'buffer'
 
-function newBuffer(data, encoding, len) {
+function bufferFrom(data, encoding, len) {
+  if (Buffer.from) {
+    return Buffer.from(data, encoding, len)
+  }
   return new Buffer(data, encoding, len)
-}
-
-if (!Buffer.from) {
-  Buffer.from = newBuffer
 }
 
 /**
@@ -19,14 +17,14 @@ if (!Buffer.from) {
 
 function btoa(str) {
   let buffer
-  if (window && window.btoa) {
+  if (typeof window !== 'undefined' && window.btoa) {
     return window.btoa(str)
   }
 
   if (str instanceof Buffer) {
     buffer = str
   } else {
-    buffer = Buffer.from(str)
+    buffer = bufferFrom(str)
   }
   return buffer.toString('base64')
 }
@@ -39,10 +37,11 @@ function btoa(str) {
  */
 
 function atob(str) {
-  if (window && window.atob) {
+  let buffer
+  if (typeof window !== 'undefined'  && window.atob) {
     return window.atob(str)
   }
-  return Buffer.from(str, 'base64').toString('binary')
+  return bufferFrom(str, 'base64').toString('binary')
 }
 
 /**
