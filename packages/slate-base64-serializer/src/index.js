@@ -37,8 +37,7 @@ function btoa(str) {
  */
 
 function atob(str) {
-  let buffer
-  if (typeof window !== 'undefined'  && window.atob) {
+  if (typeof window !== 'undefined' && window.atob) {
     return window.atob(str)
   }
   return bufferFrom(str, 'base64').toString('binary')
