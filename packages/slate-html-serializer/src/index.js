@@ -27,7 +27,7 @@ const String = new Record({
 const TEXT_RULE = {
 
   deserialize(el) {
-    if (el.tagName == 'br') {
+    if (el.tagName.toLowerCase() == 'br') {
       return {
         kind: 'text',
         ranges: [{ text: '\n' }],
