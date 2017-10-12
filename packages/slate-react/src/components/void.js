@@ -143,7 +143,6 @@ class Void extends React.Component {
     if (node.kind === 'block') {
       Tag = 'div'
       style = {
-        display: 'inline-block',
         verticalAlign: 'top',
         width: '100%'
       }
