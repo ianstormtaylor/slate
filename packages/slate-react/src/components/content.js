@@ -499,13 +499,9 @@ class Content extends React.Component {
     const point = findPoint(anchorNode, anchorOffset, state)
     if (!point) return
 
-    // Get the text node in question.
+    // Get the text node and range in question.
     const { document, selection } = state
     const node = document.getDescendant(point.key)
-    const block = document.getClosestBlock(node.key)
-    const lastText = block.getLastText()
-
-    // Get the range in question.
     const ranges = node.getRanges()
     let start = 0
     let end = 0
@@ -519,11 +515,14 @@ class Content extends React.Component {
     // Get the text information.
     const { text } = range
     let { textContent } = anchorNode
+    const block = document.getClosestBlock(node.key)
+    const lastText = block.getLastText()
+    const lastRange = ranges.last()
     const lastChar = textContent.charAt(textContent.length - 1)
     const isLastText = node == lastText
-    const isLastRange = ranges.indexOf(range) == ranges.size - 1
+    const isLastRange = range == lastRange
 
-    // If we're dealing with the last leaf, and the DOM text ends in a new line,
+    // COMPAT: If this is the last range, and the DOM text ends in a new line,
     // we will have added another new line in <Leaf>'s render method to account
     // for browsers collapsing a single trailing new lines, so remove it.
     if (isLastText && isLastRange && lastChar == '\n') {
