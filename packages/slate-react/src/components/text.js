@@ -90,8 +90,19 @@ class Text extends React.Component {
     const { props } = this
     this.debug('render', { props })
 
-    const { decorations, node } = props
-    const ranges = node.getRanges(decorations)
+    const { decorations, node, state } = props
+    const { document } = state
+    const { key } = node
+
+    const decs = decorations.filter((d) => {
+      const { startKey, endKey } = d
+      if (startKey == key || endKey == key) return true
+      const startsBefore = document.areDescendantsSorted(startKey, key)
+      const endsAfter = document.areDescendantsSorted(key, endKey)
+      return startsBefore && endsAfter
+    })
+
+    const ranges = node.getRanges(decs)
     let offset = 0
 
     const leaves = ranges.map((range, i) => {
@@ -101,7 +112,7 @@ class Text extends React.Component {
     })
 
     return (
-      <span data-key={node.key}>
+      <span data-key={key}>
         {leaves}
       </span>
     )

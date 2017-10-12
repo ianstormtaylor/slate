@@ -7,7 +7,7 @@ import React from 'react'
 import initialState from './state.json'
 
 /**
- * Define a code block component.
+ * Define our code components.
  *
  * @param {Object} props
  * @return {Element}
@@ -40,6 +40,12 @@ function CodeBlock(props) {
   )
 }
 
+function CodeBlockLine(props) {
+  return (
+    <div {...props.attributes}>{props.children}</div>
+  )
+}
+
 /**
  * Define a Prism.js decorator for code blocks.
  *
@@ -49,8 +55,8 @@ function CodeBlock(props) {
 
 function codeBlockDecorator(block) {
   const language = block.data.get('language')
-  const string = block.text
   const texts = block.getTexts().toArray()
+  const string = texts.map(t => t.text).join('\n')
   const grammar = Prism.languages[language]
   const tokens = Prism.tokenize(string, grammar)
   const decorations = []
@@ -64,7 +70,9 @@ function codeBlockDecorator(block) {
     startText = endText
     startOffset = endOffset
 
-    const length = typeof token == 'string' ? token.length : token.content.length
+    const content = typeof token == 'string' ? token : token.content
+    const newlines = content.split('\n').length - 1
+    const length = content.length - newlines
     const end = start + length
 
     let available = startText.text.length - startOffset
@@ -108,7 +116,10 @@ const schema = {
     code: {
       render: CodeBlock,
       decorate: codeBlockDecorator,
-    }
+    },
+    code_line: {
+      render: CodeBlockLine,
+    },
   },
   marks: {
     'highlight-comment': {

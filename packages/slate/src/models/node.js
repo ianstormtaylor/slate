@@ -165,19 +165,12 @@ class Node {
     first = normalizeKey(first)
     second = normalizeKey(second)
 
-    let sorted
+    const keys = this.getKeysAsArray()
+    const firstIndex = keys.indexOf(first)
+    const secondIndex = keys.indexOf(second)
+    if (firstIndex == -1 || secondIndex == -1) return null
 
-    this.forEachDescendant((n) => {
-      if (n.key === first) {
-        sorted = true
-        return false
-      } else if (n.key === second) {
-        sorted = false
-        return false
-      }
-    })
-
-    return sorted
+    return firstIndex < secondIndex
   }
 
   /**
@@ -932,18 +925,29 @@ class Node {
   }
 
   /**
-   * Return a set of all keys in the node.
+   * Return a set of all keys in the node as an array.
    *
-   * @return {Set<String>}
+   * @return {Array<String>}
    */
 
-  getKeys() {
+  getKeysAsArray() {
     const keys = []
 
     this.forEachDescendant((desc) => {
       keys.push(desc.key)
     })
 
+    return keys
+  }
+
+  /**
+   * Return a set of all keys in the node.
+   *
+   * @return {Set<String>}
+   */
+
+  getKeys() {
+    const keys = this.getKeysAsArray()
     return new Set(keys)
   }
 
@@ -2076,6 +2080,7 @@ memoize(Node.prototype, [
   'getInlines',
   'getInlinesAsArray',
   'getKeys',
+  'getKeysAsArray',
   'getLastText',
   'getMarks',
   'getOrderedMarks',
