@@ -150,9 +150,11 @@ class Range extends Record(DEFAULTS) {
    */
 
   toJSON() {
+    debugger
+
     const object = {
       kind: this.kind,
-      marks: this.marks.toArray().map(m => m.toJSON()),
+      marks: this.marks.map(m => m.toJSON()).toArray(),
       text: this.text,
     }
 

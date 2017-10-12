@@ -4,7 +4,7 @@ import find from 'lodash/find'
 import isPlainObject from 'is-plain-object'
 import logger from 'slate-dev-logger'
 import typeOf from 'type-of'
-import { List, Record } from 'immutable'
+import { Record } from 'immutable'
 
 import MODEL_TYPES from '../constants/model-types'
 import Selection from '../models/selection'

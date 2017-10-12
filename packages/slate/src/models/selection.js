@@ -125,7 +125,7 @@ class Selection extends Record(DEFAULTS) {
       focusOffset,
       isBackward,
       isFocused,
-      marks: marks == null ? marks : new Set(marks.map(Mark.fromJSON)),
+      marks: marks == null ? null : new Set(marks.map(Mark.fromJSON)),
     })
 
     return selection
