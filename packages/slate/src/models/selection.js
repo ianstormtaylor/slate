@@ -1,7 +1,7 @@
 
 import isPlainObject from 'is-plain-object'
 import logger from 'slate-dev-logger'
-import { Record, Set } from 'immutable'
+import { List, Record, Set } from 'immutable'
 
 import MODEL_TYPES from '../constants/model-types'
 import Mark from './mark'
@@ -47,6 +47,22 @@ class Selection extends Record(DEFAULTS) {
     }
 
     throw new Error(`\`Selection.create\` only accepts objects or selections, but you passed it: ${attrs}`)
+  }
+
+  /**
+   * Create a list of `Selections` from a `value`.
+   *
+   * @param {Array<Selection|Object>|List<Selection|Object>} value
+   * @return {List<Selection>}
+   */
+
+  static createList(value = []) {
+    if (List.isList(value) || Array.isArray(value)) {
+      const list = new List(value.map(Selection.create))
+      return list
+    }
+
+    throw new Error(`\`Selection.createList\` only accepts arrays or lists, but you passed it: ${value}`)
   }
 
   /**

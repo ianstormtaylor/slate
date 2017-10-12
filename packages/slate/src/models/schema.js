@@ -148,12 +148,11 @@ class Schema extends Record(DEFAULTS) {
       if (!decorations.length) return
 
       decorations.forEach((dec) => {
-        const d = Selection.create(dec)
-        array.push(d)
+        array.push(dec)
       })
     })
 
-    const list = new List(array)
+    const list = Selection.createList(array)
     return list
   }
 
