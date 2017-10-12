@@ -1,6 +1,7 @@
 
 import Base64 from 'slate-base64-serializer'
 import Debug from 'debug'
+import ImmutableTypes from 'react-immutable-proptypes'
 import React from 'react'
 import SlateTypes from 'slate-prop-types'
 import logger from 'slate-dev-logger'
@@ -35,6 +36,7 @@ class Node extends React.Component {
 
   static propTypes = {
     block: SlateTypes.block,
+    decorations: ImmutableTypes.list.isRequired,
     editor: Types.object.isRequired,
     isSelected: Types.bool.isRequired,
     node: SlateTypes.node.isRequired,
@@ -136,6 +138,9 @@ class Node extends React.Component {
     // need to be rendered again.
     if (n.isSelected || p.isSelected) return true
 
+    // If the decorations have changed, update.
+    if (!n.decorations.equals(p.decorations)) return true
+
     // Otherwise, don't update.
     return false
   }
@@ -225,11 +230,13 @@ class Node extends React.Component {
    */
 
   renderNode = (child, isSelected) => {
-    const { block, editor, node, readOnly, schema, state } = this.props
+    const { block, decorations, editor, node, readOnly, schema, state } = this.props
     const Component = child.kind === 'text' ? Text : Node
+    const decs = decorations.concat(node.getDecorations(schema))
     return (
       <Component
         block={node.kind == 'block' ? node : block}
+        decorations={decs}
         editor={editor}
         isSelected={isSelected}
         key={child.key}

@@ -1,9 +1,10 @@
 
 import isPlainObject from 'is-plain-object'
 import logger from 'slate-dev-logger'
-import { Record } from 'immutable'
+import { Record, Set } from 'immutable'
 
 import MODEL_TYPES from '../constants/model-types'
+import Mark from './mark'
 
 /**
  * Default properties.
@@ -108,7 +109,7 @@ class Selection extends Record(DEFAULTS) {
       focusOffset,
       isBackward,
       isFocused,
-      marks,
+      marks: marks == null ? marks : new Set(marks.map(Mark.fromJSON)),
     })
 
     return selection

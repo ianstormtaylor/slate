@@ -101,6 +101,37 @@ class Leaf extends React.Component {
   }
 
   /**
+   * Render all of the leaf's mark components.
+   *
+   * @param {Object} props
+   * @return {Element}
+   */
+
+  renderMarks(props) {
+    const { marks, schema, node, offset, text, state, editor } = props
+    const children = this.renderText(props)
+
+    return marks.reduce((memo, mark) => {
+      const Component = mark.getComponent(schema)
+      if (!Component) return memo
+      return (
+        <Component
+          editor={editor}
+          mark={mark}
+          marks={marks}
+          node={node}
+          offset={offset}
+          schema={schema}
+          state={state}
+          text={text}
+        >
+          {memo}
+        </Component>
+      )
+    }, children)
+  }
+
+  /**
    * Render the text content of the leaf, accounting for browsers.
    *
    * @param {Object} props
@@ -134,37 +165,6 @@ class Leaf extends React.Component {
 
     // Otherwise, just return the text.
     return text
-  }
-
-  /**
-   * Render all of the leaf's mark components.
-   *
-   * @param {Object} props
-   * @return {Element}
-   */
-
-  renderMarks(props) {
-    const { marks, schema, node, offset, text, state, editor } = props
-    const children = this.renderText(props)
-
-    return marks.reduce((memo, mark) => {
-      const Component = mark.getComponent(schema)
-      if (!Component) return memo
-      return (
-        <Component
-          editor={editor}
-          mark={mark}
-          marks={marks}
-          node={node}
-          offset={offset}
-          schema={schema}
-          state={state}
-          text={text}
-        >
-          {memo}
-        </Component>
-      )
-    }, children)
   }
 
 }

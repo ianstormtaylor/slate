@@ -4,9 +4,10 @@ import find from 'lodash/find'
 import isPlainObject from 'is-plain-object'
 import logger from 'slate-dev-logger'
 import typeOf from 'type-of'
-import { Record } from 'immutable'
+import { List, Record } from 'immutable'
 
 import MODEL_TYPES from '../constants/model-types'
+import Selection from '../models/selection'
 import isReactComponent from '../utils/is-react-component'
 
 /**
@@ -126,24 +127,34 @@ class Schema extends Record(DEFAULTS) {
   }
 
   /**
-   * Return the decorators for an `object`.
+   * Return the decorations for an `object`.
    *
    * This method is private, because it should always be called on one of the
    * often-changing immutable objects instead, since it will be memoized for
    * much better performance.
    *
    * @param {Mixed} object
-   * @return {Array}
+   * @return {List<Selection>}
    */
 
-  __getDecorators(object) {
-    return this.rules
-      .filter(rule => rule.decorate && rule.match(object))
-      .map((rule) => {
-        return (text) => {
-          return rule.decorate(text, object)
-        }
+  __getDecorations(object) {
+    const array = []
+
+    this.rules.forEach((rule) => {
+      if (!rule.decorate) return
+      if (!rule.match(object)) return
+
+      const decorations = rule.decorate(object)
+      if (!decorations.length) return
+
+      decorations.forEach((dec) => {
+        const d = Selection.create(dec)
+        array.push(d)
       })
+    })
+
+    const list = new List(array)
+    return list
   }
 
   /**

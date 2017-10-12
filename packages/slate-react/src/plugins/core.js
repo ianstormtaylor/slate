@@ -8,8 +8,8 @@ import { Block, Inline, coreSchema } from 'slate'
 
 import Content from '../components/content'
 import Placeholder from '../components/placeholder'
-import getPoint from '../utils/get-point'
 import findDOMNode from '../utils/find-dom-node'
+import findPoint from '../utils/find-point'
 import { IS_CHROME, IS_MAC, IS_SAFARI } from '../constants/environment'
 
 /**
@@ -64,10 +64,9 @@ function Plugin(options = {}) {
    * @param {Event} e
    * @param {Object} data
    * @param {Change} change
-   * @param {Editor} editor
    */
 
-  function onBeforeInput(e, data, change, editor) {
+  function onBeforeInput(e, data, change) {
     debug('onBeforeInput', { data })
     e.preventDefault()
 
@@ -82,8 +81,8 @@ function Plugin(options = {}) {
     // the selection has gotten out of sync, and adjust it if so. (03/18/2017)
     const window = getWindow(e.target)
     const native = window.getSelection()
-    const a = getPoint(native.anchorNode, native.anchorOffset, state, editor)
-    const f = getPoint(native.focusNode, native.focusOffset, state, editor)
+    const a = findPoint(native.anchorNode, native.anchorOffset, state)
+    const f = findPoint(native.focusNode, native.focusOffset, state)
     const hasMismatch = a && f && (
       anchorKey != a.key ||
       anchorOffset != a.offset ||
