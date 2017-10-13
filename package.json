@@ -39,7 +39,6 @@
     "parse5": "^3.0.2",
     "prismjs": "^1.5.1",
     "react": "^16.0.0",
-    "react-addons-perf": "^16.0.0-alpha",
     "react-dom": "^16.0.0",
     "react-frame-aware-selection-plugin": "^1.0.0",
     "react-frame-component": "^1.1.1",

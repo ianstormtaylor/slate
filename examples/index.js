@@ -117,14 +117,6 @@ class App extends React.Component {
 const router = <HashRouter><App /></HashRouter>
 
 /**
- * Attach `Perf` when not in production.
- */
-
-if (NODE_ENV != 'production') {
-  window.Perf = require('react-addons-perf')
-}
-
-/**
  * Mount the router.
  */
 
