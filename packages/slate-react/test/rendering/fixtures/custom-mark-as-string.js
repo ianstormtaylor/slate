@@ -20,7 +20,7 @@ export const state = (
 
 export const output = `
 <div data-slate-editor="true" contenteditable="true" role="textbox">
-  <div style="position:relative;">
+  <div style="position:relative">
     <span>
       <span>one</span>
       <span><span class="bold">two</span></span>
