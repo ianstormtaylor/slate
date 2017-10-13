@@ -1,5 +1,4 @@
 
-import Base64 from 'slate-base64-serializer'
 import Debug from 'debug'
 import ImmutableTypes from 'react-immutable-proptypes'
 import React from 'react'
@@ -7,10 +6,8 @@ import SlateTypes from 'slate-prop-types'
 import logger from 'slate-dev-logger'
 import Types from 'prop-types'
 
-import TRANSFER_TYPES from '../constants/transfer-types'
 import Void from './void'
 import Text from './text'
-import setTransferData from '../utils/set-transfer-data'
 
 /**
  * Debug.
@@ -146,28 +143,6 @@ class Node extends React.Component {
   }
 
   /**
-   * On drag start, add a serialized representation of the node to the data.
-   *
-   * @param {Event} e
-   */
-
-  onDragStart = (e) => {
-    const { node } = this.props
-
-    // Only void node are draggable
-    if (!node.isVoid) {
-      return
-    }
-
-    const encoded = Base64.serializeNode(node, { preserveKeys: true })
-    const { dataTransfer } = e.nativeEvent
-
-    setTransferData(dataTransfer, TRANSFER_TYPES.NODE, encoded)
-
-    this.debug('onDragStart', e)
-  }
-
-  /**
    * Render.
    *
    * @return {Element}
@@ -189,10 +164,7 @@ class Node extends React.Component {
 
     // Attributes that the developer must to mix into the element in their
     // custom node renderer component.
-    const attributes = {
-      'data-key': node.key,
-      'onDragStart': this.onDragStart
-    }
+    const attributes = { 'data-key': node.key }
 
     // If it's a block node with inline children, add the proper `dir` attribute
     // for text direction.
