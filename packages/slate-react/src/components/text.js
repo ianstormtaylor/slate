@@ -15,6 +15,12 @@ import Leaf from './leaf'
 
 const debug = Debug('slate:node')
 
+/**
+ * Text.
+ *
+ * @type {Component}
+ */
+
 class Text extends React.Component {
 
   /**
@@ -31,6 +37,17 @@ class Text extends React.Component {
     parent: SlateTypes.node.isRequired,
     schema: SlateTypes.schema.isRequired,
     state: SlateTypes.state.isRequired,
+    style: Types.object,
+  }
+
+  /**
+   * Default prop types.
+   *
+   * @type {Object}
+   */
+
+  static defaultProps = {
+    style: null,
   }
 
   /**
@@ -90,7 +107,7 @@ class Text extends React.Component {
     const { props } = this
     this.debug('render', { props })
 
-    const { decorations, node, state } = props
+    const { decorations, node, state, style } = props
     const { document } = state
     const { key } = node
 
@@ -112,7 +129,7 @@ class Text extends React.Component {
     })
 
     return (
-      <span data-key={key}>
+      <span data-key={key} style={style}>
         {leaves}
       </span>
     )

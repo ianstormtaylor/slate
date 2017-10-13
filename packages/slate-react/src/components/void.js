@@ -3,10 +3,8 @@ import Debug from 'debug'
 import React from 'react'
 import SlateTypes from 'slate-prop-types'
 import Types from 'prop-types'
-import { Mark } from 'slate'
 
-import Leaf from './leaf'
-import OffsetKey from '../utils/offset-key'
+import Text from './text'
 
 /**
  * Debug.
@@ -79,9 +77,25 @@ class Void extends React.Component {
     })
   }
 
-  onDragOver = event => event.preventDefault()
+  /**
+   * On drag enter, prevent default to allow drops.
+   *
+   * @type {Event} event
+   */
 
-  onDragEnter = event => event.preventDefault()
+  onDragEnter = (event) => {
+    event.preventDefault()
+  }
+
+  /**
+   * On drag over, prevent default to allow drops.
+   *
+   * @type {Event} event
+   */
+
+  onDragOver = (event) => {
+    event.preventDefault()
+  }
 
   /**
    * Render.
@@ -113,7 +127,7 @@ class Void extends React.Component {
   }
 
   /**
-   * Render a fake spacer leaf, which will catch the cursor when it the void
+   * Render a fake spacer text, which will catch the cursor when it the void
    * node is navigated to with the arrow keys. Having this spacer there means
    * the browser continues to manage the selection natively, so it keeps track
    * of the right offset when moving across the block.
@@ -122,7 +136,8 @@ class Void extends React.Component {
    */
 
   renderSpacer = () => {
-    const { node } = this.props
+    const { block, decorations, isSelected, node, readOnly, schema, state, editor } = this.props
+    const child = node.getFirstText()
     let style
 
     if (node.kind == 'block') {
@@ -140,43 +155,18 @@ class Void extends React.Component {
     }
 
     return (
-      <span style={style}>{this.renderLeaf()}</span>
-    )
-  }
-
-  /**
-   * Render a fake leaf.
-   *
-   * @return {Element}
-   */
-
-  renderLeaf = () => {
-    const { block, node, schema, state, editor } = this.props
-    const child = node.getFirstText()
-    const ranges = child.getRanges()
-    const text = ''
-    const offset = 0
-    const marks = Mark.createSet()
-    const index = 0
-    const offsetKey = OffsetKey.stringify({
-      key: child.key,
-      index
-    })
-
-    return (
-      <Leaf
-        key={offsetKey}
+      <Text
         block={node.kind == 'block' ? node : block}
+        decorations={decorations}
         editor={editor}
-        index={index}
-        marks={marks}
+        isSelected={isSelected}
+        key={child.key}
         node={child}
-        offset={offset}
         parent={node}
-        ranges={ranges}
+        readOnly={readOnly}
         schema={schema}
         state={state}
-        text={text}
+        style={style}
       />
     )
   }

@@ -71,13 +71,14 @@ class Emojis extends React.Component {
 
   onClickEmoji = (e, code) => {
     e.preventDefault()
-    const change = this.state.state
-      .change()
-      .insertInline({
-        type: 'emoji',
-        isVoid: true,
-        data: { code }
-      })
+    const { state } = this.state
+    const change = state.change()
+
+    change.insertInline({
+      type: 'emoji',
+      isVoid: true,
+      data: { code }
+    })
 
     this.onChange(change)
   }

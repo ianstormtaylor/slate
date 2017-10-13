@@ -97,7 +97,7 @@ const schema = {
   },
   rules: [
     {
-      match: () => true,
+      match: object => object.kind == 'block',
       decorate: markdownDecorator,
     }
   ]
