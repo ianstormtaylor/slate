@@ -15,6 +15,7 @@ import findClosestNode from '../utils/find-closest-node'
 import getCaretPosition from '../utils/get-caret-position'
 import getHtmlFromNativePaste from '../utils/get-html-from-native-paste'
 import getPoint from '../utils/get-point'
+import getDropPoint from '../utils/get-drop-point'
 import getTransferData from '../utils/get-transfer-data'
 import setTransferData from '../utils/set-transfer-data'
 import scrollToSelection from '../utils/scroll-to-selection'
@@ -369,7 +370,7 @@ class Content extends React.Component {
    */
 
   onDragEnd = (event) => {
-    if (!this.isInEditor(event.target)) return
+    event.stopPropagation()
 
     this.tmp.isDragging = false
     this.tmp.isInternalDrag = null
@@ -384,7 +385,8 @@ class Content extends React.Component {
    */
 
   onDragOver = (event) => {
-    if (!this.isInEditor(event.target)) return
+    event.stopPropagation()
+
     if (this.tmp.isDragging) return
     this.tmp.isDragging = true
     this.tmp.isInternalDrag = false
@@ -425,42 +427,27 @@ class Content extends React.Component {
    */
 
   onDrop = (event) => {
+    event.stopPropagation()
     event.preventDefault()
 
     if (this.props.readOnly) return
-    if (!this.isInEditor(event.target)) return
 
-    const window = getWindow(event.target)
-    const { state, editor } = this.props
+    const { editor, state } = this.props
     const { nativeEvent } = event
-    const { dataTransfer, x, y } = nativeEvent
+    const { dataTransfer } = nativeEvent
     const data = getTransferData(dataTransfer)
+    const point = getDropPoint(event, state, editor)
 
-    // Resolve the point where the drop occured.
-    let range
-
-    // COMPAT: In Firefox, `caretRangeFromPoint` doesn't exist. (2016/07/25)
-    if (window.document.caretRangeFromPoint) {
-      range = window.document.caretRangeFromPoint(x, y)
-    } else {
-      range = window.document.createRange()
-      range.setStart(nativeEvent.rangeParent, nativeEvent.rangeOffset)
-    }
-
-    const { startContainer, startOffset } = range
-    const point = getPoint(startContainer, startOffset, state, editor)
     if (!point) return
 
-    const target = Selection.create({
+    // Add drop-specific information to the data.
+    data.target = Selection.create({
       anchorKey: point.key,
       anchorOffset: point.offset,
       focusKey: point.key,
       focusOffset: point.offset,
       isFocused: true
     })
-
-    // Add drop-specific information to the data.
-    data.target = target
 
     // COMPAT: Edge throws "Permission denied" errors when
     // accessing `dropEffect` or `effectAllowed` (2017/7/12)
