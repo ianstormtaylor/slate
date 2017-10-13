@@ -152,7 +152,7 @@ class Range extends Record(DEFAULTS) {
   toJSON() {
     const object = {
       kind: this.kind,
-      marks: this.marks.map(m => m.toJSON()).toArray(),
+      marks: this.marks.toArray().map(m => m.toJSON()),
       text: this.text,
     }
 
