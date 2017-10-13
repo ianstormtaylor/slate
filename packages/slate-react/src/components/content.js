@@ -12,13 +12,13 @@ import TRANSFER_TYPES from '../constants/transfer-types'
 import Node from './node'
 import extendSelection from '../utils/extend-selection'
 import findClosestNode from '../utils/find-closest-node'
-import getCaretPosition from '../utils/get-caret-position'
+import findDropPoint from '../utils/find-drop-point'
+import findNativePoint from '../utils/find-native-point'
+import findPoint from '../utils/find-point'
 import getHtmlFromNativePaste from '../utils/get-html-from-native-paste'
-import getPoint from '../utils/get-point'
-import getDropPoint from '../utils/get-drop-point'
 import getTransferData from '../utils/get-transfer-data'
-import setTransferData from '../utils/set-transfer-data'
 import scrollToSelection from '../utils/scroll-to-selection'
+import setTransferData from '../utils/set-transfer-data'
 import { IS_FIREFOX, IS_MAC, IS_IE } from '../constants/environment'
 
 /**
@@ -121,7 +121,7 @@ class Content extends React.Component {
    */
 
   updateSelection = () => {
-    const { editor, state } = this.props
+    const { state } = this.props
     const { selection } = state
     const window = getWindow(this.element)
     const native = window.getSelection()
@@ -144,10 +144,8 @@ class Content extends React.Component {
 
     // Otherwise, figure out which DOM nodes should be selected...
     const { anchorKey, anchorOffset, focusKey, focusOffset, isCollapsed } = selection
-    const anchor = getCaretPosition(anchorKey, anchorOffset, state, editor, this.element)
-    const focus = isCollapsed
-      ? anchor
-      : getCaretPosition(focusKey, focusOffset, state, editor, this.element)
+    const anchor = findNativePoint(anchorKey, anchorOffset)
+    const focus = isCollapsed ? anchor : findNativePoint(focusKey, focusOffset)
 
     // If they are already selected, do nothing.
     if (
@@ -432,12 +430,11 @@ class Content extends React.Component {
 
     if (this.props.readOnly) return
 
-    const { editor, state } = this.props
+    const { state } = this.props
     const { nativeEvent } = event
     const { dataTransfer } = nativeEvent
     const data = getTransferData(dataTransfer)
-    const point = getDropPoint(event, state, editor)
-
+    const point = findDropPoint(event, state)
     if (!point) return
 
     // Add drop-specific information to the data.
@@ -484,26 +481,33 @@ class Content extends React.Component {
     // Get the selection point.
     const native = window.getSelection()
     const { anchorNode, anchorOffset } = native
-    const point = getPoint(anchorNode, anchorOffset, state, editor)
+    const point = findPoint(anchorNode, anchorOffset, state)
     if (!point) return
 
-    // Get the range in question.
-    const { key, index, start, end } = point
+    // Get the text node and range in question.
     const { document, selection } = state
-    const schema = editor.getSchema()
-    const decorators = document.getDescendantDecorators(key, schema)
-    const node = document.getDescendant(key)
-    const block = document.getClosestBlock(node.key)
-    const ranges = node.getRanges(decorators)
-    const lastText = block.getLastText()
+    const node = document.getDescendant(point.key)
+    const ranges = node.getRanges()
+    let start = 0
+    let end = 0
+
+    const range = ranges.find((r) => {
+      end += r.text.length
+      if (end >= point.offset) return true
+      start = end
+    })
 
     // Get the text information.
+    const { text } = range
     let { textContent } = anchorNode
+    const block = document.getClosestBlock(node.key)
+    const lastText = block.getLastText()
+    const lastRange = ranges.last()
     const lastChar = textContent.charAt(textContent.length - 1)
     const isLastText = node == lastText
-    const isLastRange = index == ranges.size - 1
+    const isLastRange = range == lastRange
 
-    // If we're dealing with the last leaf, and the DOM text ends in a new line,
+    // COMPAT: If this is the last range, and the DOM text ends in a new line,
     // we will have added another new line in <Leaf>'s render method to account
     // for browsers collapsing a single trailing new lines, so remove it.
     if (isLastText && isLastRange && lastChar == '\n') {
@@ -511,26 +515,20 @@ class Content extends React.Component {
     }
 
     // If the text is no different, abort.
-    const range = ranges.get(index)
-    const { text, marks } = range
     if (textContent == text) return
 
     // Determine what the selection should be after changing the text.
     const delta = textContent.length - text.length
-    const after = selection.collapseToEnd().move(delta)
+    const corrected = selection.collapseToEnd().move(delta)
+    const entire = selection.moveAnchorTo(point.key, start).moveFocusTo(point.key, end)
 
-    // Change the current state to have the text replaced.
+    // Change the current state to have the range's text replaced.
     editor.change((change) => {
       change
-        .select({
-          anchorKey: key,
-          anchorOffset: start,
-          focusKey: key,
-          focusOffset: end
-        })
+        .select(entire)
         .delete()
-        .insertText(textContent, marks)
-        .select(after)
+        .insertText(textContent, range.marks)
+        .select(corrected)
     })
   }
 
@@ -677,7 +675,7 @@ class Content extends React.Component {
     if (!this.isInEditor(event.target)) return
 
     const window = getWindow(event.target)
-    const { state, editor } = this.props
+    const { state } = this.props
     const { document, selection } = state
     const native = window.getSelection()
     const data = {}
@@ -690,8 +688,8 @@ class Content extends React.Component {
     // Otherwise, determine the Slate selection from the native one.
     else {
       const { anchorNode, anchorOffset, focusNode, focusOffset } = native
-      const anchor = getPoint(anchorNode, anchorOffset, state, editor)
-      const focus = getPoint(focusNode, focusOffset, state, editor)
+      const anchor = findPoint(anchorNode, anchorOffset, state)
+      const focus = findPoint(focusNode, focusOffset, state)
       if (!anchor || !focus) return
 
       // There are situations where a select event will fire with a new native
@@ -872,11 +870,14 @@ class Content extends React.Component {
 
   renderNode = (child, isSelected) => {
     const { editor, readOnly, schema, state } = this.props
-    const { document } = state
+    const { document, decorations } = state
+    let decs = document.getDecorations(schema)
+    if (decorations) decs = decorations.concat(decs)
     return (
       <Node
         block={null}
         editor={editor}
+        decorations={decs}
         isSelected={isSelected}
         key={child.key}
         node={child}

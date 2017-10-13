@@ -311,23 +311,6 @@ const APPLIERS = {
   },
 
   /**
-   * Set `data` on `state`.
-   *
-   * @param {State} state
-   * @param {Object} operation
-   * @return {State}
-   */
-
-  set_data(state, operation) {
-    const { properties } = operation
-    let { data } = state
-
-    data = data.merge(properties)
-    state = state.set('data', data)
-    return state
-  },
-
-  /**
    * Set `properties` on mark on text at `offset` and `length` in node by `path`.
    *
    * @param {State} state
@@ -359,15 +342,13 @@ const APPLIERS = {
     let { document } = state
     let node = document.assertPath(path)
 
-    // Warn when trying to overwite a node's children.
-    if (properties.nodes && properties.nodes != node.nodes) {
-      logger.warn('Updating a Node\'s `nodes` property via `setNode()` is not allowed. Use the appropriate insertion and removal operations instead. The opeartion in question was:', operation)
+    if ('nodes' in properties) {
+      logger.warn('Updating a Node\'s `nodes` property via `setNode()` is not allowed. Use the appropriate insertion and removal methods instead. The operation in question was:', operation)
       delete properties.nodes
     }
 
-    // Warn when trying to change a node's key.
-    if (properties.key && properties.key != node.key) {
-      logger.warn('Updating a Node\'s `key` property via `setNode()` is not allowed. There should be no reason to do this. The opeartion in question was:', operation)
+    if ('key' in properties) {
+      logger.warn('Updating a Node\'s `key` property via `setNode()` is not allowed. There should be no reason to do this. The operation in question was:', operation)
       delete properties.key
     }
 
@@ -410,6 +391,36 @@ const APPLIERS = {
     selection = selection.merge(properties)
     selection = selection.normalize(document)
     state = state.set('selection', selection)
+    return state
+  },
+
+  /**
+   * Set `properties` on `state`.
+   *
+   * @param {State} state
+   * @param {Object} operation
+   * @return {State}
+   */
+
+  set_state(state, operation) {
+    const { properties } = operation
+
+    if ('document' in properties) {
+      logger.warn('Updating `state.document` property via `setState()` is not allowed. Use the appropriate document updating methods instead. The operation in question was:', operation)
+      delete properties.document
+    }
+
+    if ('selection' in properties) {
+      logger.warn('Updating `state.selection` property via `setState()` is not allowed. Use the appropriate selection updating methods instead. The operation in question was:', operation)
+      delete properties.selection
+    }
+
+    if ('history' in properties) {
+      logger.warn('Updating `state.history` property via `setState()` is not allowed. Use the appropriate history updating methods instead. The operation in question was:', operation)
+      delete properties.history
+    }
+
+    state = state.merge(properties)
     return state
   },
 

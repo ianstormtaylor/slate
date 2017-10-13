@@ -1,13 +1,13 @@
 
 import { Editor } from 'slate-react'
-import { Mark, State } from 'slate'
+import { State } from 'slate'
 
 import Prism from 'prismjs'
 import React from 'react'
 import initialState from './state.json'
 
 /**
- * Define a code block component.
+ * Define our code components.
  *
  * @param {Object} props
  * @return {Element}
@@ -40,43 +40,69 @@ function CodeBlock(props) {
   )
 }
 
+function CodeBlockLine(props) {
+  return (
+    <div {...props.attributes}>{props.children}</div>
+  )
+}
+
 /**
  * Define a Prism.js decorator for code blocks.
  *
- * @param {Text} text
  * @param {Block} block
+ * @return {Array}
  */
 
-function codeBlockDecorator(text, block) {
-  const characters = text.characters.asMutable()
+function codeBlockDecorator(block) {
   const language = block.data.get('language')
-  const string = text.text
+  const texts = block.getTexts().toArray()
+  const string = texts.map(t => t.text).join('\n')
   const grammar = Prism.languages[language]
   const tokens = Prism.tokenize(string, grammar)
-  let offset = 0
+  const decorations = []
+  let startText = texts.shift()
+  let endText = startText
+  let startOffset = 0
+  let endOffset = 0
+  let start = 0
 
   for (const token of tokens) {
-    if (typeof token == 'string') {
-      offset += token.length
-      continue
+    startText = endText
+    startOffset = endOffset
+
+    const content = typeof token == 'string' ? token : token.content
+    const newlines = content.split('\n').length - 1
+    const length = content.length - newlines
+    const end = start + length
+
+    let available = startText.text.length - startOffset
+    let remaining = length
+
+    endOffset = startOffset + remaining
+
+    while (available < remaining) {
+      endText = texts.shift()
+      remaining = length - available
+      available = endText.text.length
+      endOffset = remaining
     }
 
-    const length = offset + token.content.length
-    const type = `highlight-${token.type}`
-    const mark = Mark.create({ type })
+    if (typeof token != 'string') {
+      const range = {
+        anchorKey: startText.key,
+        anchorOffset: startOffset,
+        focusKey: endText.key,
+        focusOffset: endOffset,
+        marks: [{ type: `highlight-${token.type}` }],
+      }
 
-    for (let i = offset; i < length; i++) {
-      let char = characters.get(i)
-      let { marks } = char
-      marks = marks.add(mark)
-      char = char.set('marks', marks)
-      characters.set(i, char)
+      decorations.push(range)
     }
 
-    offset = length
+    start = end
   }
 
-  return characters.asImmutable()
+  return decorations
 }
 
 /**
@@ -90,7 +116,10 @@ const schema = {
     code: {
       render: CodeBlock,
       decorate: codeBlockDecorator,
-    }
+    },
+    code_line: {
+      render: CodeBlockLine,
+    },
   },
   marks: {
     'highlight-comment': {

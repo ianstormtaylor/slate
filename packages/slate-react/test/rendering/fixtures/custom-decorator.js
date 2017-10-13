@@ -1,19 +1,19 @@
 /** @jsx h */
 
 import h from '../../helpers/h'
-import { Mark } from 'slate'
 
 export const schema = {
   nodes: {
     paragraph: {
-      decorate(text, block) {
-        let { characters } = text
-        let second = characters.get(1)
-        const mark = Mark.create({ type: 'bold' })
-        const marks = second.marks.add(mark)
-        second = second.merge({ marks })
-        characters = characters.set(1, second)
-        return characters
+      decorate(block) {
+        const text = block.getFirstText()
+        return [{
+          anchorKey: text.key,
+          anchorOffset: 1,
+          focusKey: text.key,
+          focusOffset: 2,
+          marks: [{ type: 'bold' }]
+        }]
       }
     }
   },

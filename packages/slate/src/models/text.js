@@ -1,7 +1,7 @@
 
 import isPlainObject from 'is-plain-object'
 import logger from 'slate-dev-logger'
-import { List, Record, OrderedSet, is } from 'immutable'
+import { List, OrderedSet, Record, Set, is } from 'immutable'
 
 import Character from './character'
 import Mark from './mark'
@@ -193,11 +193,25 @@ class Text extends Record(DEFAULTS) {
    */
 
   addMark(index, length, mark) {
+    const marks = new Set([mark])
+    return this.addMarks(index, length, marks)
+  }
+
+  /**
+   * Add a `set` of marks at `index` and `length`.
+   *
+   * @param {Number} index
+   * @param {Number} length
+   * @param {Set<Mark>} set
+   * @return {Text}
+   */
+
+  addMarks(index, length, set) {
     const characters = this.characters.map((char, i) => {
       if (i < index) return char
       if (i >= index + length) return char
       let { marks } = char
-      marks = marks.add(mark)
+      marks = marks.union(set)
       char = char.set('marks', marks)
       return char
     })
@@ -206,24 +220,29 @@ class Text extends Record(DEFAULTS) {
   }
 
   /**
-   * Derive a set of decorated characters with `decorators`.
+   * Derive a set of decorated characters with `decorations`.
    *
-   * @param {Array} decorators
+   * @param {List<Decoration>} decorations
    * @return {List<Character>}
    */
 
-  getDecorations(decorators) {
-    const node = this
-    let { characters } = node
+  getDecoratedCharacters(decorations) {
+    let node = this
+    const { key, characters } = node
+
+    // PERF: Exit early if there are no characters to be decorated.
     if (characters.size == 0) return characters
 
-    for (let i = 0; i < decorators.length; i++) {
-      const decorator = decorators[i]
-      const decorateds = decorator(node)
-      characters = characters.merge(decorateds)
-    }
+    decorations.forEach((range) => {
+      const { startKey, endKey, startOffset, endOffset, marks } = range
+      const hasStart = startKey == key
+      const hasEnd = endKey == key
+      const index = hasStart ? startOffset : 0
+      const length = hasEnd ? endOffset - index : characters.size
+      node = node.addMarks(index, length, marks)
+    })
 
-    return characters
+    return node.characters
   }
 
   /**
@@ -233,8 +252,8 @@ class Text extends Record(DEFAULTS) {
    * @return {Array}
    */
 
-  getDecorators(schema) {
-    return schema.__getDecorators(this)
+  getDecorations(schema) {
+    return schema.__getDecorations(this)
   }
 
   /**
@@ -291,12 +310,12 @@ class Text extends Record(DEFAULTS) {
   /**
    * Derive the ranges for a list of `characters`.
    *
-   * @param {Array|Void} decorators (optional)
+   * @param {Array|Void} decorations (optional)
    * @return {List<Range>}
    */
 
-  getRanges(decorators = []) {
-    const characters = this.getDecorations(decorators)
+  getRanges(decorations = []) {
+    const characters = this.getDecoratedCharacters(decorations)
     let ranges = []
 
     // PERF: cache previous values for faster lookup.
@@ -513,8 +532,8 @@ memoize(Text.prototype, [
 })
 
 memoize(Text.prototype, [
+  'getDecoratedCharacters',
   'getDecorations',
-  'getDecorators',
   'getMarksAtIndex',
   'getRanges',
   'validate'

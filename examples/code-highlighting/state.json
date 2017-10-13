@@ -23,10 +23,170 @@
         },
         "nodes": [
           {
-            "kind": "text",
-            "ranges": [
+            "kind": "block",
+            "type": "code_line",
+            "nodes": [
               {
-                "text": "// A simple FizzBuzz implementation.\nfor (var i = 1; i <= 100; i++) {\n  if (i % 15 == 0) {\n    console.log('Fizz Buzz');\n  } else if (i % 5 == 0) {\n    console.log('Buzz');\n  } else if (i % 3 == 0) {\n    console.log('Fizz');\n  } else {\n    console.log(i);\n  }\n}"
+                "kind": "text",
+                "ranges": [
+                  {
+                    "text": "// A simple FizzBuzz implementation."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "kind": "block",
+            "type": "code_line",
+            "nodes": [
+              {
+                "kind": "text",
+                "ranges": [
+                  {
+                    "text": "for (var i = 1; i <= 100; i++) {"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "kind": "block",
+            "type": "code_line",
+            "nodes": [
+              {
+                "kind": "text",
+                "ranges": [
+                  {
+                    "text": "  if (i % 15 == 0) {"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "kind": "block",
+            "type": "code_line",
+            "nodes": [
+              {
+                "kind": "text",
+                "ranges": [
+                  {
+                    "text": "    console.log('Fizz Buzz');"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "kind": "block",
+            "type": "code_line",
+            "nodes": [
+              {
+                "kind": "text",
+                "ranges": [
+                  {
+                    "text": "  } else if (i % 5 == 0) {"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "kind": "block",
+            "type": "code_line",
+            "nodes": [
+              {
+                "kind": "text",
+                "ranges": [
+                  {
+                    "text": "    console.log('Buzz');"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "kind": "block",
+            "type": "code_line",
+            "nodes": [
+              {
+                "kind": "text",
+                "ranges": [
+                  {
+                    "text": "  } else if (i % 3 == 0) {"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "kind": "block",
+            "type": "code_line",
+            "nodes": [
+              {
+                "kind": "text",
+                "ranges": [
+                  {
+                    "text": "    console.log('Fizz');"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "kind": "block",
+            "type": "code_line",
+            "nodes": [
+              {
+                "kind": "text",
+                "ranges": [
+                  {
+                    "text": "  } else {"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "kind": "block",
+            "type": "code_line",
+            "nodes": [
+              {
+                "kind": "text",
+                "ranges": [
+                  {
+                    "text": "    console.log(i);"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "kind": "block",
+            "type": "code_line",
+            "nodes": [
+              {
+                "kind": "text",
+                "ranges": [
+                  {
+                    "text": "  }"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "kind": "block",
+            "type": "code_line",
+            "nodes": [
+              {
+                "kind": "text",
+                "ranges": [
+                  {
+                    "text": "}"
+                  }
+                ]
               }
             ]
           }

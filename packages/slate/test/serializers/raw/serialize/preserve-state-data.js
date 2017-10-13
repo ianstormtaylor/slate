@@ -42,5 +42,5 @@ export const output = {
 }
 
 export const options = {
-  preserveStateData: true,
+  preserveData: true,
 }

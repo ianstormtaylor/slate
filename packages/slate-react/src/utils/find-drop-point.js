@@ -2,18 +2,17 @@
 import getWindow from 'get-window'
 
 import findClosestNode from './find-closest-node'
-import getPoint from './get-point'
+import findPoint from './find-point'
 
 /**
- * Get the target point for a drop event.
+ * Find the target point for a drop `event`.
  *
  * @param {Event} event
  * @param {State} state
- * @param {Editor} editor
  * @return {Object}
  */
 
-function getDropPoint(event, state, editor) {
+function findDropPoint(event, state) {
   const { document } = state
   const { nativeEvent, target } = event
   const { x, y } = nativeEvent
@@ -48,7 +47,6 @@ function getDropPoint(event, state, editor) {
       document.getNextSibling(nodeKey)
     const key = text.key
     const offset = previous ? text.characters.size : 0
-
     return { key, offset }
   }
 
@@ -71,12 +69,10 @@ function getDropPoint(event, state, editor) {
     const text = block.getLastText()
     const { key } = text
     const offset = 0
-
     return { key, offset }
   }
 
-  const point = getPoint(n, o, state, editor)
-
+  const point = findPoint(n, o, state)
   return point
 }
 
@@ -86,4 +82,4 @@ function getDropPoint(event, state, editor) {
  * @type {Function}
  */
 
-export default getDropPoint
+export default findDropPoint

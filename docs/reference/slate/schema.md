@@ -103,24 +103,25 @@ Slate schemas are built up of a set of rules. Each of the properties will add ce
 The `match` property is the only required property of a rule. It determines which objects the rule applies to. 
 
 ### `decorate`
-`Function decorate(text: Node, object: Node) => List<Characters>`
+`Function decorate(node: Node) => List<Selection>|Array<Object>`
 
 ```js
 {
-  decorate: (text, node) => {
-    let { characters } = text
-    let first = characters.get(0)
-    let { marks } = first
-    let mark = Mark.create({ type: 'bold' })
-    marks = marks.add(mark)
-    first = first.merge({ marks })
-    characters = characters.set(0, first)
-    return characters
+  decorate: (node) => {
+    const text = node.getFirstText()
+
+    return [{
+      anchorKey: text.key,
+      anchorOffset: 0,
+      focusKey: text.key,
+      focusOffset: 1,
+      marks: [{ type: 'bold' }]
+    }]
   }
 }
 ```
 
-The `decorate` property allows you define a function that will apply extra marks to all of the ranges of text inside a node. It is called with a [`Text`](./text.md) node and the matched node. It should return a list of characters with the desired marks, which will then be added to the text before rendering.
+The `decorate` property allows you define a function that will apply extra marks to ranges of text inside a node. It is called with a [`Node`](./node.md). It should return a list of [`Selection`](./selection.md) objects with the desired marks, which will then be added to the text before rendering.
 
 ### `normalize`
 `Function normalize(change: Change, object: Node, failure: Any) => Change`

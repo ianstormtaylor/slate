@@ -61,6 +61,7 @@ td {
 }
 
 input {
+  box-sizing: border-box;
   font-size: .85em;
   width: 100%;
   padding: .5em;
@@ -173,10 +174,27 @@ input:focus {
 }
 
 .toolbar-menu {
-  padding: 1px 0 17px 18px;
+  position: relative;
+  padding: 1px 18px 17px;
   margin: 0 -20px;
   border-bottom: 2px solid #eee;
   margin-bottom: 20px;
+}
+
+.toolbar-menu .search {
+  position: relative;
+}
+
+.toolbar-menu .search-icon {
+  position: absolute;
+  top: 0.5em;
+  left: 0.5em;
+  color: #ccc;
+}
+
+.toolbar-menu .search-box {
+  padding-left: 2em;
+  width: 100%;
 }
 
 .hover-menu {

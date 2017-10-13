@@ -1,5 +1,6 @@
 
 import Debug from 'debug'
+import ImmutableTypes from 'react-immutable-proptypes'
 import React from 'react'
 import SlateTypes from 'slate-prop-types'
 import Types from 'prop-types'
@@ -24,6 +25,7 @@ class Text extends React.Component {
 
   static propTypes = {
     block: SlateTypes.block,
+    decorations: ImmutableTypes.list.isRequired,
     editor: Types.object.isRequired,
     node: SlateTypes.node.isRequired,
     parent: SlateTypes.node.isRequired,
@@ -63,16 +65,6 @@ class Text extends React.Component {
     // for simplicity we just let them through.
     if (n.node != p.node) return true
 
-    // Re-render if the current decorations have changed, even if the content of
-    // the text node itself hasn't.
-    if (n.schema.hasDecorators) {
-      const nDecorators = n.state.document.getDescendantDecorators(n.node.key, n.schema)
-      const pDecorators = p.state.document.getDescendantDecorators(p.node.key, p.schema)
-      const nRanges = n.node.getRanges(nDecorators)
-      const pRanges = p.node.getRanges(pDecorators)
-      if (!nRanges.equals(pRanges)) return true
-    }
-
     // If the node parent is a block node, and it was the last child of the
     // block, re-render to cleanup extra `<br/>` or `\n`.
     if (n.parent.kind == 'block') {
@@ -80,6 +72,9 @@ class Text extends React.Component {
       const nLast = n.parent.nodes.last()
       if (p.node == pLast && n.node != nLast) return true
     }
+
+    // Re-render if the current decorations have changed.
+    if (!n.decorations.equals(p.decorations)) return true
 
     // Otherwise, don't update.
     return false
@@ -95,10 +90,19 @@ class Text extends React.Component {
     const { props } = this
     this.debug('render', { props })
 
-    const { node, schema, state } = props
+    const { decorations, node, state } = props
     const { document } = state
-    const decorators = schema.hasDecorators ? document.getDescendantDecorators(node.key, schema) : []
-    const ranges = node.getRanges(decorators)
+    const { key } = node
+
+    const decs = decorations.filter((d) => {
+      const { startKey, endKey } = d
+      if (startKey == key || endKey == key) return true
+      const startsBefore = document.areDescendantsSorted(startKey, key)
+      const endsAfter = document.areDescendantsSorted(key, endKey)
+      return startsBefore && endsAfter
+    })
+
+    const ranges = node.getRanges(decs)
     let offset = 0
 
     const leaves = ranges.map((range, i) => {
@@ -108,7 +112,7 @@ class Text extends React.Component {
     })
 
     return (
-      <span data-key={node.key}>
+      <span data-key={key}>
         {leaves}
       </span>
     )

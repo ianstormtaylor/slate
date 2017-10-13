@@ -165,19 +165,12 @@ class Node {
     first = normalizeKey(first)
     second = normalizeKey(second)
 
-    let sorted
+    const keys = this.getKeysAsArray()
+    const firstIndex = keys.indexOf(first)
+    const secondIndex = keys.indexOf(second)
+    if (firstIndex == -1 || secondIndex == -1) return null
 
-    this.forEachDescendant((n) => {
-      if (n.key === first) {
-        sorted = true
-        return false
-      } else if (n.key === second) {
-        sorted = false
-        return false
-      }
-    })
-
-    return sorted
+    return firstIndex < secondIndex
   }
 
   /**
@@ -609,8 +602,8 @@ class Node {
    * @return {Array}
    */
 
-  getDecorators(schema) {
-    return schema.__getDecorators(this)
+  getDecorations(schema) {
+    return schema.__getDecorations(this)
   }
 
   /**
@@ -672,32 +665,6 @@ class Node {
     }
 
     return descendant
-  }
-
-  /**
-   * Get the decorators for a descendant by `key` given a `schema`.
-   *
-   * @param {String} key
-   * @param {Schema} schema
-   * @return {Array}
-   */
-
-  getDescendantDecorators(key, schema) {
-    if (!schema.hasDecorators) {
-      return []
-    }
-
-    const descendant = this.assertDescendant(key)
-    let child = this.getFurthestAncestor(key)
-    let decorators = []
-
-    while (child != descendant) {
-      decorators = decorators.concat(child.getDecorators(schema))
-      child = child.getFurthestAncestor(key)
-    }
-
-    decorators = decorators.concat(descendant.getDecorators(schema))
-    return decorators
   }
 
   /**
@@ -958,18 +925,29 @@ class Node {
   }
 
   /**
-   * Return a set of all keys in the node.
+   * Return a set of all keys in the node as an array.
    *
-   * @return {Set<String>}
+   * @return {Array<String>}
    */
 
-  getKeys() {
+  getKeysAsArray() {
     const keys = []
 
     this.forEachDescendant((desc) => {
       keys.push(desc.key)
     })
 
+    return keys
+  }
+
+  /**
+   * Return a set of all keys in the node.
+   *
+   * @return {Set<String>}
+   */
+
+  getKeys() {
+    const keys = this.getKeysAsArray()
     return new Set(keys)
   }
 
@@ -2102,6 +2080,7 @@ memoize(Node.prototype, [
   'getInlines',
   'getInlinesAsArray',
   'getKeys',
+  'getKeysAsArray',
   'getLastText',
   'getMarks',
   'getOrderedMarks',
@@ -2135,11 +2114,10 @@ memoize(Node.prototype, [
   'getClosestVoid',
   'getCommonAncestor',
   'getComponent',
-  'getDecorators',
+  'getDecorations',
   'getDepth',
   'getDescendant',
   'getDescendantAtPath',
-  'getDescendantDecorators',
   'getFragmentAtRange',
   'getFurthestBlock',
   'getFurthestInline',

@@ -20,6 +20,7 @@ import Plugins from './plugins'
 import RTL from './rtl'
 import ReadOnly from './read-only'
 import RichText from './rich-text'
+import SearchHighlighting from './search-highlighting'
 import Tables from './tables'
 
 import DevHugeDocument from './dev/huge-document'
@@ -54,6 +55,7 @@ const EXAMPLES = [
   ['Code Highlighting', CodeHighlighting, '/code-highlighting'],
   ['Tables', Tables, '/tables'],
   ['Paste HTML', PasteHtml, '/paste-html'],
+  ['Search Highlighting', SearchHighlighting, '/search-highlighting'],
   ['Read-only', ReadOnly, '/read-only'],
   ['RTL', RTL, '/rtl'],
   ['Plugins', Plugins, '/plugins'],
