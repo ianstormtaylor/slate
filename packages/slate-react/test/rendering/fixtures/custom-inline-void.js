@@ -33,9 +33,7 @@ export const output = `
     </span>
     <span data-slate-void="true">
       <span style="color:transparent">
-        <span>
-          <span data-slate-zero-width="true">&#x200A;</span>
-        </span>
+        <span></span>
       </span>
       <span contenteditable="false">
         <img>
