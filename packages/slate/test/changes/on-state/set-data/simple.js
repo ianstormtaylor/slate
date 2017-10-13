@@ -3,7 +3,7 @@
 import h from '../../../helpers/h'
 
 export default function (change) {
-  change.setData({ thing: 'value' })
+  change.setState({ data: { thing: 'value' }})
 }
 
 export const input = (

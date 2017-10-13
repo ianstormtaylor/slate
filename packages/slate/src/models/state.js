@@ -5,7 +5,7 @@ import { Record, Set, List, Map } from 'immutable'
 
 import MODEL_TYPES from '../constants/model-types'
 import SCHEMA from '../schemas/core'
-import Change from './change'
+import Data from './data'
 import Document from './document'
 import History from './history'
 import Selection from './selection'
@@ -21,6 +21,7 @@ const DEFAULTS = {
   selection: Selection.create(),
   history: History.create(),
   data: new Map(),
+  decorations: null,
 }
 
 /**
@@ -49,6 +50,31 @@ class State extends Record(DEFAULTS) {
     }
 
     throw new Error(`\`State.create\` only accepts objects or states, but you passed it: ${attrs}`)
+  }
+
+  /**
+   * Create a dictionary of settable state properties from `attrs`.
+   *
+   * @param {Object|State} attrs
+   * @return {Object}
+   */
+
+  static createProperties(attrs = {}) {
+    if (State.isState(attrs)) {
+      return {
+        data: attrs.data,
+        decorations: attrs.decorations,
+      }
+    }
+
+    if (isPlainObject(attrs)) {
+      const props = {}
+      if ('data' in attrs) props.data = Data.create(attrs.data)
+      if ('decorations' in attrs) props.decorations = Selection.createList(attrs.decorations)
+      return props
+    }
+
+    throw new Error(`\`State.createProperties\` only accepts objects or states, but you passed it: ${attrs}`)
   }
 
   /**
@@ -549,6 +575,7 @@ class State extends Record(DEFAULTS) {
    */
 
   change(attrs = {}) {
+    const Change = require('./change').default
     return new Change({ ...attrs, state: this })
   }
 
@@ -572,11 +599,20 @@ class State extends Record(DEFAULTS) {
 
   toJSON(options = {}) {
     const object = {
+      kind: this.kind,
       data: this.data.toJSON(),
       document: this.document.toJSON(options),
-      kind: this.kind,
-      history: this.history.toJSON(),
       selection: this.selection.toJSON(),
+      decorations: this.decorations ? this.decorations.toArray().map(d => d.toJSON()) : null,
+      history: this.history.toJSON(),
+    }
+
+    if (!options.preserveData) {
+      delete object.data
+    }
+
+    if (!options.preserveDecorations) {
+      delete object.decorations
     }
 
     if (!options.preserveHistory) {
@@ -585,10 +621,6 @@ class State extends Record(DEFAULTS) {
 
     if (!options.preserveSelection) {
       delete object.selection
-    }
-
-    if (!options.preserveStateData) {
-      delete object.data
     }
 
     if (options.preserveSelection && !options.preserveKeys) {

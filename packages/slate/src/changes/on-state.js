@@ -1,4 +1,6 @@
 
+import State from '../models/state'
+
 /**
  * Changes.
  *
@@ -8,20 +10,20 @@
 const Changes = {}
 
 /**
- * Set `properties` on the top-level state's data.
+ * Set `properties` on the state.
  *
  * @param {Change} change
- * @param {Object} properties
+ * @param {Object|State} properties
  */
 
-Changes.setData = (change, properties) => {
+Changes.setState = (change, properties) => {
+  properties = State.createProperties(properties)
   const { state } = change
-  const { data } = state
 
   change.applyOperation({
-    type: 'set_data',
+    type: 'set_state',
     properties,
-    data,
+    state,
   })
 }
 
