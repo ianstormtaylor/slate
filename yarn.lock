@@ -5012,13 +5012,6 @@ rc@^1.1.7:
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
 
-react-addons-perf@^16.0.0-alpha:
-  version "16.0.0-alpha.3"
-  resolved "https://registry.yarnpkg.com/react-addons-perf/-/react-addons-perf-16.0.0-alpha.3.tgz#10a980395e78ad851404368c40670c97d82dafd4"
-  dependencies:
-    fbjs "^0.8.9"
-    object-assign "^4.1.0"
-
 react-dom@^16.0.0:
   version "16.0.0"
   resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-16.0.0.tgz#9cc3079c3dcd70d4c6e01b84aab2a7e34c303f58"
