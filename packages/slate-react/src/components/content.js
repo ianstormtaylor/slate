@@ -12,17 +12,13 @@ import TRANSFER_TYPES from '../constants/transfer-types'
 import Node from './node'
 import extendSelection from '../utils/extend-selection'
 import findClosestNode from '../utils/find-closest-node'
-import findPoint from '../utils/find-point'
+import findDropPoint from '../utils/find-drop-point'
 import findNativePoint from '../utils/find-native-point'
+import findPoint from '../utils/find-point'
 import getHtmlFromNativePaste from '../utils/get-html-from-native-paste'
-<<<<<<< HEAD
-=======
-import getPoint from '../utils/get-point'
-import getDropPoint from '../utils/get-drop-point'
->>>>>>> master
 import getTransferData from '../utils/get-transfer-data'
-import setTransferData from '../utils/set-transfer-data'
 import scrollToSelection from '../utils/scroll-to-selection'
+import setTransferData from '../utils/set-transfer-data'
 import { IS_FIREFOX, IS_MAC, IS_IE } from '../constants/environment'
 
 /**
@@ -434,12 +430,11 @@ class Content extends React.Component {
 
     if (this.props.readOnly) return
 
-    const window = getWindow(event.target)
-    const { editor, state } = this.props
+    const { state } = this.props
     const { nativeEvent } = event
     const { dataTransfer } = nativeEvent
     const data = getTransferData(dataTransfer)
-    const point = getDropPoint(event, state)
+    const point = findDropPoint(event, state)
     if (!point) return
 
     // Add drop-specific information to the data.
