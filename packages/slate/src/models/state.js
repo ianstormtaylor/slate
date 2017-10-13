@@ -607,6 +607,11 @@ class State extends Record(DEFAULTS) {
       history: this.history.toJSON(),
     }
 
+    if ('preserveStateData' in options) {
+      logger.deprecate('0.26.0', 'The `preserveStateData` option to `state.toJSON` has been deprecated in favor of `options.preserveData`.')
+      options.preserveData = options.preserveStateData
+    }
+
     if (!options.preserveData) {
       delete object.data
     }

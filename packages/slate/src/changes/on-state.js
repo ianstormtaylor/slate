@@ -1,4 +1,6 @@
 
+import logger from 'slate-dev-logger'
+
 import State from '../models/state'
 
 /**
@@ -25,6 +27,15 @@ Changes.setState = (change, properties) => {
     properties,
     state,
   })
+}
+
+/**
+ * Deprecated.
+ */
+
+Changes.setData = (change, data) => {
+  logger.deprecate('0.26.0', 'The `change.setData` method is deprecated, use `change.setState` instead.')
+  change.setState({ data })
 }
 
 /**
