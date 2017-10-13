@@ -36,8 +36,3 @@ yarn run watch
 ```
 
 Now you can open up `http://localhost:8080/dev.html` in your browser and you'll see the examples site. Any changes you make to the source code will be immediately reflected when you refresh the page.
-
-
-## Development Examples
-
-There are also a set of examples that are for development only, for things like checking performance, in the `./dev` directory. You can safely ignore those!
