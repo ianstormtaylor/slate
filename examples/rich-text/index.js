@@ -51,7 +51,7 @@ const schema = {
  * @type {Component}
  */
 
-class RichText extends React.Component {
+class RichTextExample extends React.Component {
 
   /**
    * Deserialize the initial editor state.
@@ -305,4 +305,4 @@ class RichText extends React.Component {
  * Export.
  */
 
-export default RichText
+export default RichTextExample

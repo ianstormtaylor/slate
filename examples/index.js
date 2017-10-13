@@ -21,6 +21,7 @@ import RTL from './rtl'
 import ReadOnly from './read-only'
 import RichText from './rich-text'
 import SearchHighlighting from './search-highlighting'
+import SyncingOperations from './syncing-operations'
 import Tables from './tables'
 
 /**
@@ -44,11 +45,12 @@ const EXAMPLES = [
   ['Tables', Tables, '/tables'],
   ['Paste HTML', PasteHtml, '/paste-html'],
   ['Search Highlighting', SearchHighlighting, '/search-highlighting'],
+  ['Syncing Operations', SyncingOperations, '/syncing-operations'],
   ['Read-only', ReadOnly, '/read-only'],
   ['RTL', RTL, '/rtl'],
   ['Plugins', Plugins, '/plugins'],
   ['Forced Layout', ForcedLayout, '/forced-layout'],
-  ['Huge', HugeDocument, '/huge-document'],
+  ['Huge Document', HugeDocument, '/huge-document'],
 ]
 
 /**

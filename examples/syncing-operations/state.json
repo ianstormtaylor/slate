@@ -1,0 +1,78 @@
+{
+  "document": {
+    "nodes": [
+      {
+        "kind": "block",
+        "type": "paragraph",
+        "nodes": [
+          {
+            "kind": "text",
+            "ranges": [
+              {
+                "text": "These two editors are kept "
+              },
+              {
+                "text": "in sync",
+                "marks": [
+                  {
+                    "type": "bold"
+                  }
+                ]
+              },
+              {
+                "text": " with one another as you type!"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "kind": "block",
+        "type": "paragraph",
+        "nodes": [
+          {
+            "kind": "text",
+            "ranges": [
+              {
+                "text": "They achieve this by sending any document-altering operations to each other whenever a change occurs, and then applying them locally with "
+              },
+              {
+                "text": "change.applyOperations()",
+                "marks": [
+                  {
+                    "type": "code"
+                  }
+                ]
+              },
+              {
+                "text": "."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "kind": "block",
+        "type": "paragraph",
+        "nodes": [
+          {
+            "kind": "text",
+            "ranges": [
+              {
+                "text": "Note: ",
+                "marks": [
+                  {
+                    "type": "italic"
+                  }
+                ]
+              },
+              {
+                "text": "this example doesn't showcase operational transforms or network communication, which are required for realtime editing with multiple people at once."
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
