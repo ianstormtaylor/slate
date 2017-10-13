@@ -24,7 +24,7 @@ describe('history', async () => {
 
         t(test, async () => {
           const next = fn(input)
-          const opts = { preserveSelection: true, preserveStateData: true }
+          const opts = { preserveSelection: true, preserveData: true }
           const actual = next.toJSON(opts)
           const expected = output.toJSON(opts)
           assert.deepEqual(actual, expected)
