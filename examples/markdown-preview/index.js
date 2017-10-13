@@ -1,7 +1,6 @@
 
 import Plain from 'slate-plain-serializer'
 import { Editor } from 'slate-react'
-import { Mark } from 'slate'
 
 import Prism from 'prismjs'
 import React from 'react'
@@ -16,44 +15,68 @@ Prism.languages.markdown=Prism.languages.extend("markup",{}),Prism.languages.ins
 /**
  * Define a decorator for markdown styles.
  *
- * @param {Text} text
  * @param {Block} block
+ * @return {Array}
  */
 
-function markdownDecorator(text, block) {
-  const characters = text.characters.asMutable()
-  const language = 'markdown'
-  const string = text.text
-  const grammar = Prism.languages[language]
+function markdownDecorator(block) {
+  const string = block.text
+  const texts = block.getTexts().toArray()
+  const grammar = Prism.languages.markdown
   const tokens = Prism.tokenize(string, grammar)
-  addMarks(characters, tokens, 0)
-  return characters.asImmutable()
-}
+  const decorations = []
+  let startText = texts.shift()
+  let endText = startText
+  let startOffset = 0
+  let endOffset = 0
+  let start = 0
 
-function addMarks(characters, tokens, offset) {
-  for (const token of tokens) {
+  function getLength(token) {
     if (typeof token == 'string') {
-      offset += token.length
-      continue
+      return token.length
+    } else if (typeof token.content == 'string') {
+      return token.content.length
+    } else {
+      return token.content.reduce((l, t) => l + getLength(t), 0)
     }
-
-    const { content, length, type } = token
-    const mark = Mark.create({ type })
-
-    for (let i = offset; i < offset + length; i++) {
-      let char = characters.get(i)
-      let { marks } = char
-      marks = marks.add(mark)
-      char = char.set('marks', marks)
-      characters.set(i, char)
-    }
-
-    if (Array.isArray(content)) {
-      addMarks(characters, content, offset)
-    }
-
-    offset += length
   }
+
+  for (const token of tokens) {
+    startText = endText
+    startOffset = endOffset
+
+    const length = getLength(token)
+    const end = start + length
+
+    let available = startText.text.length - startOffset
+    let remaining = length
+
+    endOffset = startOffset + remaining
+
+    while (available < remaining) {
+      endText = texts.shift()
+      remaining = length - available
+      available = endText.text.length
+      endOffset = remaining
+    }
+
+    if (typeof token != 'string') {
+      const range = {
+        anchorKey: startText.key,
+        anchorOffset: startOffset,
+        focusKey: endText.key,
+        focusOffset: endOffset,
+        marks: [{ type: token.type }],
+      }
+
+      decorations.push(range)
+    }
+
+
+    start = end
+  }
+
+  return decorations
 }
 
 /**
