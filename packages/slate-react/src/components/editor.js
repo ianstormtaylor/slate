@@ -109,17 +109,21 @@ class Editor extends React.Component {
 
   constructor(props) {
     super(props)
-    this.tmp = {}
     this.state = {}
+    this.tmp = {}
 
     // Create a new `Stack`, omitting the `onChange` property since that has
     // special significance on the editor itself.
-    const { state } = props
     const plugins = resolvePlugins(props)
     const stack = Stack.create({ plugins })
     this.state.stack = stack
 
-    // Cache and set the state.
+    // Run `onBeforeChange` on the passed-in state because we need to ensure
+    // that it is normalized, and queue the resulting change.
+    const change = props.state.change()
+    stack.onBeforeChange(change, this)
+    const { state } = change
+    this.queueChange(change)
     this.cacheState(state)
     this.state.state = state
 
@@ -128,9 +132,9 @@ class Editor extends React.Component {
       const method = EVENT_HANDLERS[i]
       this[method] = (...args) => {
         const stk = this.state.stack
-        const change = this.state.state.change()
-        stk[method](change, this, ...args)
-        this.onChange(change)
+        const c = this.state.state.change()
+        stk[method](c, this, ...args)
+        this.onChange(c)
       }
     }
 
@@ -144,31 +148,52 @@ class Editor extends React.Component {
   }
 
   /**
-   * When the `props` are updated, create a new `Stack` if necessary.
+   * When the `props` are updated, create a new `Stack` if necessary and run
+   * `onBeforeChange` to ensure the state is normalized.
    *
    * @param {Object} props
    */
 
   componentWillReceiveProps = (props) => {
-    const { state } = props
+    let { stack } = this.state
 
     // If any plugin-related properties will change, create a new `Stack`.
     for (let i = 0; i < PLUGINS_PROPS.length; i++) {
       const prop = PLUGINS_PROPS[i]
       if (props[prop] == this.props[prop]) continue
       const plugins = resolvePlugins(props)
-      const stack = Stack.create({ plugins })
+      stack = Stack.create({ plugins })
       this.setState({ stack })
     }
 
-    // Cache and save the state.
+    // Run `onBeforeChange` on the passed-in state because we need to ensure
+    // that it is normalized, and queue the resulting change.
+    const change = props.state.change()
+    stack.onBeforeChange(change, this)
+    const { state } = change
+    this.queueChange(change)
     this.cacheState(state)
     this.setState({ state })
   }
 
   /**
-   * Cache a `state` in memory to be able to compare against it later, for
-   * things like `onDocumentChange`.
+   * When the component first mounts, flush any temporary changes.
+   */
+
+  componentDidMount = () => {
+    this.flushChange()
+  }
+
+  /**
+   * When the component updates, flush any temporary change.
+   */
+
+  componentDidUpdate = () => {
+    this.flushChange()
+  }
+
+  /**
+   * Cache a `state` object to be able to compare against it later.
    *
    * @param {State} state
    */
@@ -176,6 +201,37 @@ class Editor extends React.Component {
   cacheState = (state) => {
     this.tmp.document = state.document
     this.tmp.selection = state.selection
+  }
+
+  /**
+   * Queue a `change` object, to be able to flush it later. This is required for
+   * when a change needs to be applied to the state, but because of the React
+   * lifecycle we can't apply that change immediately. So we cache it here and
+   * later can call `this.flushChange()` to flush it.
+   *
+   * @param {Change} change
+   */
+
+  queueChange = (change) => {
+    if (change.operations.length) {
+      debug('queueChange', { change })
+      this.tmp.change = change
+    }
+  }
+
+  /**
+   * Flush a temporarily stored `change` object, for when a change needed to be
+   * made but couldn't because of React's lifecycle.
+   */
+
+  flushChange = () => {
+    const { change } = this.tmp
+
+    if (change) {
+      debug('flushChange', { change })
+      this.props.onChange(change)
+      delete this.tmp.change
+    }
   }
 
   /**
@@ -223,6 +279,7 @@ class Editor extends React.Component {
   change = (fn) => {
     const change = this.state.state.change()
     fn(change)
+    debug('change', { change })
     this.onChange(change)
   }
 
@@ -237,15 +294,18 @@ class Editor extends React.Component {
       throw new Error('As of slate@0.22.0 the `editor.onChange` method must be passed a `Change` object not a `State` object.')
     }
 
-    const { onChange, onDocumentChange, onSelectionChange } = this.props
     const { stack } = this.state
-    const { document, selection } = this.tmp
-    const { state } = change
-    if (state == this.state.state) return
 
     stack.onBeforeChange(change, this)
     stack.onChange(change, this)
 
+    const { state } = change
+    const { document, selection } = this.tmp
+    const { onChange, onDocumentChange, onSelectionChange } = this.props
+
+    if (state == this.state.state) return
+
+    debug('onChange', { change })
     onChange(change)
     if (onDocumentChange && state.document != document) onDocumentChange(state.document, change)
     if (onSelectionChange && state.selection != selection) onSelectionChange(state.selection, change)

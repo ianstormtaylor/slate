@@ -1448,7 +1448,7 @@ class Node {
       }
 
       // PERF: exit early if both start and end have been found.
-      return start != null && end != null
+      return start == null || end == null
     })
 
     if (isSelected && start == null) start = 0

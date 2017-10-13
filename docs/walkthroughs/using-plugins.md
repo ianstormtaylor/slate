@@ -91,10 +91,6 @@ Boom! Now we're getting somewhere. That code is reusable for any type of mark.
 Now that we have our plugin, let's remove the hard-coded logic from our app, and replace it with our brand new `MarkHotkey` plugin instead, passing in the same options that will keep our **bold** functionality intact:
 
 ```js
-function BoldMark(props) {
-  return <strong>{props.children}</strong>
-}
-
 // Initialize our bold-mark-adding plugin.
 const boldPlugin = MarkHotkey({
   type: 'bold',
