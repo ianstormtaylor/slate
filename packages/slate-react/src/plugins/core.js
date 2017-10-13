@@ -163,7 +163,7 @@ function Plugin(options = {}) {
     const window = getWindow(e.target)
     const native = window.getSelection()
     const { state } = change
-    const { endBlock, endInline } = state
+    const { startKey, endKey, startText, endBlock, endInline } = state
     const isVoidBlock = endBlock && endBlock.isVoid
     const isVoidInline = endInline && endInline.isVoid
     const isVoid = isVoidBlock || isVoidInline
@@ -185,6 +185,25 @@ function Plugin(options = {}) {
       r.setEndAfter(node)
       contents = r.cloneContents()
       attach = contents.childNodes[contents.childNodes.length - 1].firstChild
+    }
+
+    // COMPAT: in Safari and Chrome when selecting a single marked word,
+    // marks are not preserved when copying.
+    // If the attatched is not void, and the startKey and endKey is the same,
+    // check if there is marks involved. If so, set the range start just before the
+    // startText node
+    if ((IS_CHROME || IS_SAFARI) && !isVoid && startKey === endKey) {
+      const hasMarks = startText.characters
+        .slice(state.selection.anchorOffset, state.selection.focusOffset)
+        .filter(char => char.marks.size !== 0)
+        .size !== 0
+      if (hasMarks) {
+        const r = range.cloneRange()
+        const node = findDOMNode(startText)
+        r.setStartBefore(node)
+        contents = r.cloneContents()
+        attach = contents.childNodes[contents.childNodes.length - 1].firstChild
+      }
     }
 
     // Remove any zero-width space spans from the cloned DOM so that they don't
