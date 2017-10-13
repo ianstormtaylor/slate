@@ -27,7 +27,7 @@ const String = new Record({
 const TEXT_RULE = {
 
   deserialize(el) {
-    if (el.tagName.toLowerCase() == 'br') {
+    if (el.tagName && el.tagName.toLowerCase() === 'br') {
       return {
         kind: 'text',
         ranges: [{ text: '\n' }],
@@ -45,7 +45,7 @@ const TEXT_RULE = {
   },
 
   serialize(obj, children) {
-    if (obj.kind == 'string') {
+    if (obj.kind === 'string') {
       return children
         .split('\n')
         .reduce((array, text, i) => {
@@ -66,7 +66,7 @@ const TEXT_RULE = {
  */
 
 function defaultParseHtml(html) {
-  if (typeof DOMParser == 'undefined') {
+  if (typeof DOMParser === 'undefined') {
     throw new Error('The native `DOMParser` global which the `Html` serializer uses by default is not present in this environment. You must supply the `options.parseHtml` function instead.')
   }
 
@@ -341,7 +341,7 @@ class Html {
    */
 
   serializeNode = (node) => {
-    if (node.kind == 'text') {
+    if (node.kind === 'text') {
       const ranges = node.getRanges()
       return ranges.map(this.serializeRange)
     }
@@ -405,7 +405,7 @@ class Html {
    */
 
   cruftNewline = (element) => {
-    return !(element.nodeName == '#text' && element.value == '\n')
+    return !(element.nodeName === '#text' && element.value == '\n')
   }
 
 }
