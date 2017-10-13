@@ -24,12 +24,12 @@ export const state = (
 export const output = `
 <div data-slate-editor="true" contenteditable="true" role="textbox">
   <div data-slate-void="true">
-    <span style="display:inline-block;vertical-align:top;width:0px;color:transparent;">
+    <span style="display:inline-block;vertical-align:top;width:0px;height:0px;color:transparent;">
       <span>
         <span data-slate-zero-width="true">&#x200A;</span>
       </span>
     </span>
-    <div contenteditable="false" style="display:inline-block;vertical-align:top;width:100%;">
+    <div contenteditable="false">
       <img src="https://example.com/image.png">
     </div>
   </div>

@@ -138,18 +138,7 @@ class Void extends React.Component {
   render() {
     const { props } = this
     const { children, node } = props
-    let Tag, style
-
-    if (node.kind === 'block') {
-      Tag = 'div'
-      style = {
-        display: 'inline-block',
-        verticalAlign: 'top',
-        width: '100%'
-      }
-    } else {
-      Tag = 'span'
-    }
+    const Tag = node.kind == 'block' ? 'div' : 'span'
 
     this.debug('render', { props })
 
@@ -162,7 +151,7 @@ class Void extends React.Component {
         onDrop={this.onDrop}
       >
         {this.renderSpacer()}
-        <Tag contentEditable={this.state.editable} style={style}>
+        <Tag contentEditable={this.state.editable}>
           {children}
         </Tag>
       </Tag>
@@ -187,6 +176,7 @@ class Void extends React.Component {
         display: 'inline-block',
         verticalAlign: 'top',
         width: '0',
+        height: '0',
         color: 'transparent'
       }
     } else {
