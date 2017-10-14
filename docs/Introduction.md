@@ -120,6 +120,17 @@ If even that's not enough, you can always [read the source itself](./src), which
 
 <br/>
 
+### Translations
+
+There are also translations of the documentation into other languages:
+
+- [中文](https://doodlewind.github.io/slate-doc-cn/)
+
+If you've written a translation, feel free to pull request it here!
+
+
+<br/>
+
 ### Contributing!
 
 All contributions are super welcome! Check out the [Contributing instructions](./Contributing.md) for more info!
