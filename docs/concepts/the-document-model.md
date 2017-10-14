@@ -31,4 +31,4 @@ Note that even though the node is "void", it will still have an empty text node 
 
 One constraint of Slate documents is that the leaf nodes are always `Text` nodes. No `Block` or `Inline` node will ever have no children. It will always have at least an empty text node. (However, you can _render_ text-less nodes, see the [Void Nodes](#void-nodes) section above!)
 
-This constraint means that [`Selections`](../reference/slate/selection.md) can always refer to text nodes, and many text-node-level operations are always "safe" regardless of the tree's structure.
+This constraint means that [`Ranges`](../reference/slate/range.md) can always refer to text nodes, and many text-node-level operations are always "safe" regardless of the tree's structure.

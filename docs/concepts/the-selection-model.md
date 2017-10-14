@@ -1,7 +1,7 @@
 
 # The Selection Model
 
-Slate keeps track of the user's selection in the editor in an immutable data store called a [`Selection`](../reference/slate/selection.md). By doing this, it lets Slate manipulate the selection with changes, but still update it in the DOM on `render`.
+Slate keeps track of the user's selection in the editor in an immutable data store called a [`Range`](../reference/slate/range.md). By doing this, it lets Slate manipulate the selection with changes, but still update it in the DOM on `render`.
 
 
 ### Always References Text

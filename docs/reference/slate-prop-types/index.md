@@ -70,6 +70,14 @@ Ensure that a value is a Slate `Inline`.
 
 Ensure that a value is an immutable `List` of Slate [`Inline`](../slate/inline.md) objects.
 
+### `leaf`
+
+Ensure that a value is a Slate `Leaf`.
+
+### `leaves`
+
+Ensure that a value is an immutable `List` of Slate [`Leaf`](../slate/leaf.md) objects.
+
 ### `mark`
 
 Ensure that a value is a Slate `Mark`.
@@ -97,10 +105,6 @@ Ensure that a value is an immutable `List` of Slate [`Range`](../slate/range.md)
 ### `schema`
 
 Ensure that a value is a Slate `Schema`.
-
-### `selection`
-
-Ensure that a value is a Slate `Selection`.
 
 ### `stack`
 
