@@ -16,14 +16,14 @@ export const input = {
         nodes: [
           {
             kind: 'text',
-            ranges: [
+            leaves: [
               {
-                kind: 'range',
+                kind: 'leaves',
                 text: 'o',
                 marks: [],
               },
               {
-                kind: 'range',
+                kind: 'leaves',
                 text: 'n',
                 marks: [
                   {
@@ -34,7 +34,7 @@ export const input = {
                 ]
               },
               {
-                kind: 'range',
+                kind: 'leaves',
                 text: 'e',
                 marks: [],
               }

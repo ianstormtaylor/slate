@@ -9,7 +9,7 @@ This directory contains all of the immutable models that contain the data that p
 - [Inline](#inline)
 - [Mark](#mark)
 - [Node](#node)
-- [Selection](#selection)
+- [Range](#range)
 - [State](#state)
 - [Text](#text)
 
@@ -54,18 +54,18 @@ Marks are the pieces of "formatting" that can be applied to strings of text in t
 `Node` isn't actually a model that is exposed, but instead it's an interface full of convenience methods that [`Document`](#document), [`Block`](#block), [`Inline`](#inline) all implement.
 
 
-#### Selection
+#### Range
 
-The `Selection` keeps track of where the user's cursor is. It's modeled after the [DOM Selection API](https://developer.mozilla.org/en-US/docs/Web/API/Selection), using terms like "anchor", "focus" and "collapsed".
+The `Range` represents a fragment of a [`Document`](#document). It's modeled after a combination of the [DOM Selection API](https://developer.mozilla.org/en-US/docs/Web/API/Selection) and the [DOM Range API](https://developer.mozilla.org/en-US/docs/Web/API/Range), using terms like "anchor", "focus" and "collapsed".
 
 
 #### State
 
-The `State` is the highest-level model. It is really just a convenient wrapper around a few other models: [`Document`](#document), [`Selection`](#selection), and a `History` which is not publicly exposed.
+The `State` is the highest-level model. It is really just a convenient wrapper around a few other models: [`Document`](#document), [`Range`](#range), and a `History` which is not publicly exposed.
 
-Since `State` has knowledge of both the [`Document`](#document) and the [`Selection`](#selection), it provides a handful of convenience methods for updating the both at the same time. For example, when inserting a new content fragment, it inserts the fragment and then moves the selection to the end of the newly inserted content.
+Since `State` has knowledge of both the [`Document`](#document) and a selection [`Range`](#range), it provides a handful of convenience methods for updating the both at the same time. For example, when inserting a new content fragment, it inserts the fragment and then moves the range to the end of the newly inserted content.
 
-The `State` is the object that lets you apply "changes" that change the current document or selection. By having them all be applied through the top-level state, it can keep track of changes in the `History`, allowing for undoing and redoing changes.
+The `State` is the object that lets you apply "changes" that change the current document or range. By having them all be applied through the top-level state, it can keep track of changes in the `History`, allowing for undoing and redoing changes.
 
 
 #### Text

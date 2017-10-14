@@ -29,10 +29,10 @@ export const output = {
           {
             kind: 'text',
             key: '0',
-            ranges: [
+            leaves: [
               {
                 text: 'one',
-                kind: 'range',
+                kind: 'leaf',
                 marks: []
               }
             ]
@@ -42,7 +42,7 @@ export const output = {
     ]
   },
   selection: {
-    kind: 'selection',
+    kind: 'range',
     anchorKey: '0',
     anchorOffset: 0,
     focusKey: '0',

@@ -8,7 +8,7 @@ import SCHEMA from '../schemas/core'
 import Data from './data'
 import Document from './document'
 import History from './history'
-import Selection from './selection'
+import Range from './range'
 
 /**
  * Default properties.
@@ -18,7 +18,7 @@ import Selection from './selection'
 
 const DEFAULTS = {
   document: Document.create(),
-  selection: Selection.create(),
+  selection: Range.create(),
   history: History.create(),
   data: new Map(),
   decorations: null,
@@ -70,7 +70,7 @@ class State extends Record(DEFAULTS) {
     if (isPlainObject(attrs)) {
       const props = {}
       if ('data' in attrs) props.data = Data.create(attrs.data)
-      if ('decorations' in attrs) props.decorations = Selection.createList(attrs.decorations)
+      if ('decorations' in attrs) props.decorations = Range.createList(attrs.decorations)
       return props
     }
 
@@ -96,7 +96,7 @@ class State extends Record(DEFAULTS) {
     let data = new Map()
 
     document = Document.fromJSON(document)
-    selection = Selection.fromJSON(selection)
+    selection = Range.fromJSON(selection)
 
     // Allow plugins to set a default value for `data`.
     if (options.plugins) {

@@ -17,9 +17,9 @@ export const output = {
         nodes: [
           {
             kind: 'text',
-            ranges: [
+            leaves: [
               {
-                kind: 'range',
+                kind: 'leaf',
                 text: 'one',
                 marks: [],
               }

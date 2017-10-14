@@ -47,7 +47,7 @@ function deserialize(string, options = {}) {
           nodes: [
             {
               kind: 'text',
-              ranges: [
+              leaves: [
                 {
                   kind: 'leaf',
                   text: line,

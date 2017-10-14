@@ -30,7 +30,10 @@ const TEXT_RULE = {
     if (el.tagName && el.tagName.toLowerCase() === 'br') {
       return {
         kind: 'text',
-        leaves: [{ text: '\n' }],
+        leaves: [{
+          kind: 'leaf',
+          text: '\n'
+        }]
       }
     }
 
@@ -39,7 +42,10 @@ const TEXT_RULE = {
 
       return {
         kind: 'text',
-        leaves: [{ text: el.value || el.nodeValue }],
+        leaves: [{
+          kind: 'leaf',
+          text: el.value || el.nodeValue
+        }]
       }
     }
   },

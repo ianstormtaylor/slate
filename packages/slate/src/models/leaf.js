@@ -99,7 +99,7 @@ class Leaf extends Record(DEFAULTS) {
    */
 
   static isLeaf(value) {
-    return !!(value && value[MODEL_TYPES.RANGE])
+    return !!(value && value[MODEL_TYPES.LEAF])
   }
 
   /**

@@ -16,9 +16,9 @@ export const input = {
         nodes: [
           {
             kind: 'text',
-            ranges: [
+            leaves: [
               {
-                kind: 'range',
+                kind: 'leaf',
                 text: '',
                 marks: [],
               }
@@ -32,9 +32,9 @@ export const input = {
             nodes: [
               {
                 kind: 'text',
-                ranges: [
+                leaves: [
                   {
-                    kind: 'range',
+                    kind: 'leaf',
                     text: '',
                     marks: [],
                   }
@@ -48,9 +48,9 @@ export const input = {
                 nodes: [
                   {
                     kind: 'text',
-                    ranges: [
+                    leaves: [
                       {
-                        kind: 'range',
+                        kind: 'leaf',
                         text: 'one',
                         marks: [],
                       }
@@ -60,9 +60,9 @@ export const input = {
               },
               {
                 kind: 'text',
-                ranges: [
+                leaves: [
                   {
-                    kind: 'range',
+                    kind: 'leaf',
                     text: '',
                     marks: [],
                   }
@@ -72,9 +72,9 @@ export const input = {
           },
           {
             kind: 'text',
-            ranges: [
+            leaves: [
               {
-                kind: 'range',
+                kind: 'leaf',
                 text: '',
                 marks: [],
               }

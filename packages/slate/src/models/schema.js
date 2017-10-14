@@ -7,7 +7,7 @@ import typeOf from 'type-of'
 import { Record } from 'immutable'
 
 import MODEL_TYPES from '../constants/model-types'
-import Selection from '../models/selection'
+import Range from '../models/range'
 import isReactComponent from '../utils/is-react-component'
 
 /**
@@ -134,7 +134,7 @@ class Schema extends Record(DEFAULTS) {
    * much better performance.
    *
    * @param {Mixed} object
-   * @return {List<Selection>}
+   * @return {List<Range>}
    */
 
   __getDecorations(object) {
@@ -152,7 +152,7 @@ class Schema extends Record(DEFAULTS) {
       })
     })
 
-    const list = Selection.createList(array)
+    const list = Range.createList(array)
     return list
   }
 

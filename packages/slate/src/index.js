@@ -12,6 +12,7 @@ import Node from './models/node'
 import Operations from './operations'
 import Range from './models/range'
 import Schema from './models/schema'
+import Selection from './models/selection'
 import Stack from './models/stack'
 import State from './models/state'
 import Text from './models/text'
@@ -38,6 +39,7 @@ export {
   Operations,
   Range,
   Schema,
+  Selection,
   Stack,
   State,
   Text,
@@ -60,6 +62,7 @@ export default {
   Operations,
   Range,
   Schema,
+  Selection,
   Stack,
   State,
   Text,

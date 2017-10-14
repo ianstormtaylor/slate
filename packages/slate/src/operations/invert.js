@@ -171,15 +171,15 @@ function invertOperation(op) {
   }
 
   /**
-   * Set data.
+   * Set state.
    */
 
-  if (type == 'set_data') {
-    const { properties, data } = op
+  if (type == 'set_state') {
+    const { properties, state } = op
     return {
       ...op,
-      data: data.merge(properties),
-      properties: pick(data, Object.keys(properties)),
+      state: state.merge(properties),
+      properties: pick(state, Object.keys(properties)),
     }
   }
 
