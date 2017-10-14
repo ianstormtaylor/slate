@@ -30,7 +30,10 @@ const TEXT_RULE = {
     if (el.tagName && el.tagName.toLowerCase() === 'br') {
       return {
         kind: 'text',
-        ranges: [{ text: '\n' }],
+        leaves: [{
+          kind: 'leaf',
+          text: '\n'
+        }]
       }
     }
 
@@ -39,7 +42,10 @@ const TEXT_RULE = {
 
       return {
         kind: 'text',
-        ranges: [{ text: el.value || el.nodeValue }],
+        leaves: [{
+          kind: 'leaf',
+          text: el.value || el.nodeValue
+        }]
       }
     }
   },
@@ -168,9 +174,9 @@ class Html {
         nodes: [
           {
             kind: 'text',
-            ranges: [
+            leaves: [
               {
-                kind: 'range',
+                kind: 'leaf',
                 text: '',
                 marks: [],
               }
@@ -292,10 +298,10 @@ class Html {
       }
 
       else if (node.kind == 'text') {
-        node.ranges = node.ranges.map((range) => {
-          range.marks = range.marks || []
-          range.marks.push({ type, data })
-          return range
+        node.leaves = node.leaves.map((leaf) => {
+          leaf.marks = leaf.marks || []
+          leaf.marks.push({ type, data })
+          return leaf
         })
       }
 
@@ -342,8 +348,8 @@ class Html {
 
   serializeNode = (node) => {
     if (node.kind === 'text') {
-      const ranges = node.getRanges()
-      return ranges.map(this.serializeRange)
+      const leaves = node.getLeaves()
+      return leaves.map(this.serializeLeaf)
     }
 
     const children = node.nodes.map(this.serializeNode)
@@ -359,17 +365,17 @@ class Html {
   }
 
   /**
-   * Serialize a `range`.
+   * Serialize a `leaf`.
    *
-   * @param {Range} range
+   * @param {Leaf} leaf
    * @return {String}
    */
 
-  serializeRange = (range) => {
-    const string = new String({ text: range.text })
+  serializeLeaf = (leaf) => {
+    const string = new String({ text: leaf.text })
     const text = this.serializeString(string)
 
-    return range.marks.reduce((children, mark) => {
+    return leaf.marks.reduce((children, mark) => {
       for (let i = 0; i < this.rules.length; i++) {
         const rule = this.rules[i]
         if (!rule.serialize) continue

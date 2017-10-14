@@ -3,7 +3,7 @@
 import h from '../../../helpers/h'
 
 export default function (change) {
-  change.replaceNodeByKey('a', { kind: 'text', ranges: [{ text: 'three' }] })
+  change.replaceNodeByKey('a', { kind: 'text', leaves: [{ text: 'three' }] })
 }
 
 export const input = (

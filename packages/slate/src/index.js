@@ -6,6 +6,7 @@ import Data from './models/data'
 import Document from './models/document'
 import History from './models/history'
 import Inline from './models/inline'
+import Leaf from './models/leaf'
 import Mark from './models/mark'
 import Node from './models/node'
 import Operations from './operations'
@@ -32,6 +33,7 @@ export {
   Document,
   History,
   Inline,
+  Leaf,
   Mark,
   Node,
   Operations,
@@ -54,6 +56,7 @@ export default {
   Document,
   History,
   Inline,
+  Leaf,
   Mark,
   Node,
   Operations,

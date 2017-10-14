@@ -13,7 +13,7 @@ import { IS_FIREFOX } from '../constants/environment'
  * @type {Function}
  */
 
-const debug = Debug('slate:leaf')
+const debug = Debug('slate:leaves')
 
 /**
  * Leaf.
@@ -33,11 +33,11 @@ class Leaf extends React.Component {
     block: SlateTypes.block.isRequired,
     editor: Types.object.isRequired,
     index: Types.number.isRequired,
+    leaves: SlateTypes.leaves.isRequired,
     marks: SlateTypes.marks.isRequired,
     node: SlateTypes.node.isRequired,
     offset: Types.number.isRequired,
     parent: SlateTypes.node.isRequired,
-    ranges: SlateTypes.ranges.isRequired,
     schema: SlateTypes.schema.isRequired,
     state: SlateTypes.state.isRequired,
     text: Types.string.isRequired,
@@ -139,7 +139,7 @@ class Leaf extends React.Component {
    */
 
   renderText(props) {
-    const { block, node, parent, text, index, ranges } = props
+    const { block, node, parent, text, index, leaves } = props
 
     // COMPAT: If the text is empty and it's the only child, we need to render a
     // <br/> to get the block to have the proper height.
@@ -160,8 +160,8 @@ class Leaf extends React.Component {
     const lastText = block.getLastText()
     const lastChar = text.charAt(text.length - 1)
     const isLastText = node == lastText
-    const isLastRange = index == ranges.size - 1
-    if (isLastText && isLastRange && lastChar == '\n') return `${text}\n`
+    const isLastLeaf = index == leaves.size - 1
+    if (isLastText && isLastLeaf && lastChar == '\n') return `${text}\n`
 
     // Otherwise, just return the text.
     return text

@@ -13,6 +13,19 @@ const IS_DEV = (
 )
 
 /**
+ * Has console?
+ *
+ * @type {Boolean}
+ */
+
+const HAS_CONSOLE = (
+  typeof console != 'undefined' &&
+  typeof console.log == 'function' &&
+  typeof console.warn == 'function' &&
+  typeof console.error == 'function'
+)
+
+/**
  * Log a `message` at `level`.
  *
  * @param {String} level
@@ -25,13 +38,27 @@ function log(level, message, ...args) {
     return
   }
 
-  if (typeof console != 'undefined' && typeof console[level] == 'function') {
+  if (HAS_CONSOLE) {
     console[level](message, ...args)
   }
 }
 
 /**
- * Log a development warning `message`.
+ * Log an error `message`.
+ *
+ * @param {String} message
+ * @param {Any} ...args
+ */
+
+
+function error(message, ...args) {
+  if (HAS_CONSOLE) {
+    console.error(message, ...args)
+  }
+}
+
+/**
+ * Log a warning `message` in development only.
  *
  * @param {String} message
  * @param {Any} ...args
@@ -42,7 +69,8 @@ function warn(message, ...args) {
 }
 
 /**
- * Log a deprecation warning `message`, with helpful `version` number.
+ * Log a deprecation warning `message`, with helpful `version` number in
+ * development only.
  *
  * @param {String} version
  * @param {String} message
@@ -61,5 +89,6 @@ function deprecate(version, message, ...args) {
 
 export default {
   deprecate,
+  error,
   warn,
 }

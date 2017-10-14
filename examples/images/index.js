@@ -78,7 +78,7 @@ const schema = {
  *
  * @param {Change} change
  * @param {String} src
- * @param {Selection} target
+ * @param {Range} target
  */
 
 function insertImage(change, src, target) {

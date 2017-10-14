@@ -5,11 +5,11 @@
 import { State } from 'slate'
 ```
 
-A `State` is the top-level representation of data in Slate, containing both a [`Document`](./document.md) and a [`Selection`](./selection.md). It's what you need to paste into the Slate [`<Editor>`](../slate-react/editor.md) to render something onto the page.
+A `State` is the top-level representation of data in Slate, containing both a [`Document`](./document.md) and a selection [`Range`](./range.md). It's what you need to pass into the Slate [`<Editor>`](../slate-react/editor.md) to render something onto the page.
 
 All changes to the document and selection are also performed through the state object, so that they can stay in sync, and be propagated to its internal history of undo/redo state.
 
-For convenience, in addition to changes, many of the [`Selection`](./selection.md) and [`Document`](./document.md) properties are exposed as proxies on the `State` object.
+For convenience, in addition to changes, many of the selection and document properties are exposed as proxies on the `State` object.
 
 
 ## Properties
@@ -17,7 +17,7 @@ For convenience, in addition to changes, many of the [`Selection`](./selection.m
 ```js
 State({
   document: Document,
-  selection: Selection
+  selection: Range
 })
 ```
 
@@ -27,7 +27,7 @@ State({
 The current document of the state.
 
 ### `selection`
-`Selection`
+`Range`
 
 The current selection of the state.
 
@@ -92,9 +92,9 @@ Whether there are undoable snapshots to revert to in the history.
 
 Whether there are redoable snapshots to revert to in the history.
 
-## Selection-like Properties
+## Range-like Properties
 
-These properties are exact proxies of their [`Selection`](./selection) equivalents.
+These properties are exact proxies of the selection [`Range`](./range.md) equivalents.
 
 ### `{edge}Key`
 `String`

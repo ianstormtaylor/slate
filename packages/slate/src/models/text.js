@@ -5,7 +5,7 @@ import { List, OrderedSet, Record, Set, is } from 'immutable'
 
 import Character from './character'
 import Mark from './mark'
-import Range from './range'
+import Leaf from './leaf'
 import MODEL_TYPES from '../constants/model-types'
 import generateKey from '../utils/generate-key'
 import memoize from '../utils/memoize'
@@ -42,13 +42,13 @@ class Text extends Record(DEFAULTS) {
     }
 
     if (typeof attrs == 'string') {
-      attrs = { ranges: [{ text: attrs }] }
+      attrs = { leaves: [{ text: attrs }] }
     }
 
     if (isPlainObject(attrs)) {
       if (attrs.text) {
         const { text, marks, key } = attrs
-        attrs = { key, ranges: [{ text, marks }] }
+        attrs = { key, leaves: [{ text, marks }] }
       }
 
       return Text.fromJSON(attrs)
@@ -86,17 +86,22 @@ class Text extends Record(DEFAULTS) {
     }
 
     let {
-      ranges = [],
+      leaves = [],
       key = generateKey(),
     } = object
 
-    if (object.text) {
-      logger.deprecate('0.23.0', 'Passing `object.text` to `Text.fromJSON` has been deprecated, please use `object.ranges` instead.')
-      ranges = [{ text: object.text }]
+    if (object.ranges) {
+      logger.deprecate('0.27.0', 'Passing `object.ranges` to `Text.fromJSON` has been renamed to `object.leaves`.')
+      leaves = object.ranges
     }
 
-    const characters = ranges
-      .map(Range.fromJSON)
+    if (object.text) {
+      logger.deprecate('0.23.0', 'Passing `object.text` to `Text.fromJSON` has been deprecated, please use `object.leaves` instead.')
+      leaves = [{ text: object.text }]
+    }
+
+    const characters = leaves
+      .map(Leaf.fromJSON)
       .reduce((l, r) => l.concat(r.getCharacters()), new List())
 
     const node = new Text({
@@ -257,6 +262,64 @@ class Text extends Record(DEFAULTS) {
   }
 
   /**
+   * Derive the leaves for a list of `characters`.
+   *
+   * @param {Array|Void} decorations (optional)
+   * @return {List<Leaf>}
+   */
+
+  getLeaves(decorations = []) {
+    const characters = this.getDecoratedCharacters(decorations)
+    let leaves = []
+
+    // PERF: cache previous values for faster lookup.
+    let prevChar
+    let prevLeaf
+
+    // If there are no characters, return one empty range.
+    if (characters.size == 0) {
+      leaves.push({})
+    }
+
+    // Otherwise, loop the characters and build the leaves...
+    else {
+      characters.forEach((char, i) => {
+        const { marks, text } = char
+
+        // The first one can always just be created.
+        if (i == 0) {
+          prevChar = char
+          prevLeaf = { text, marks }
+          leaves.push(prevLeaf)
+          return
+        }
+
+        // Otherwise, compare the current and previous marks.
+        const prevMarks = prevChar.marks
+        const isSame = is(marks, prevMarks)
+
+        // If the marks are the same, add the text to the previous range.
+        if (isSame) {
+          prevChar = char
+          prevLeaf.text += text
+          return
+        }
+
+        // Otherwise, create a new range.
+        prevChar = char
+        prevLeaf = { text, marks }
+        leaves.push(prevLeaf)
+      }, [])
+    }
+
+    // PERF: convert the leaves to immutable objects after iterating.
+    leaves = new List(leaves.map(object => new Leaf(object)))
+
+    // Return the leaves.
+    return leaves
+  }
+
+  /**
    * Get all of the marks on the text.
    *
    * @return {OrderedSet<Mark>}
@@ -305,64 +368,6 @@ class Text extends Record(DEFAULTS) {
     return this.key == key
       ? this
       : null
-  }
-
-  /**
-   * Derive the ranges for a list of `characters`.
-   *
-   * @param {Array|Void} decorations (optional)
-   * @return {List<Range>}
-   */
-
-  getRanges(decorations = []) {
-    const characters = this.getDecoratedCharacters(decorations)
-    let ranges = []
-
-    // PERF: cache previous values for faster lookup.
-    let prevChar
-    let prevRange
-
-    // If there are no characters, return one empty range.
-    if (characters.size == 0) {
-      ranges.push({})
-    }
-
-    // Otherwise, loop the characters and build the ranges...
-    else {
-      characters.forEach((char, i) => {
-        const { marks, text } = char
-
-        // The first one can always just be created.
-        if (i == 0) {
-          prevChar = char
-          prevRange = { text, marks }
-          ranges.push(prevRange)
-          return
-        }
-
-        // Otherwise, compare the current and previous marks.
-        const prevMarks = prevChar.marks
-        const isSame = is(marks, prevMarks)
-
-        // If the marks are the same, add the text to the previous range.
-        if (isSame) {
-          prevChar = char
-          prevRange.text += text
-          return
-        }
-
-        // Otherwise, create a new range.
-        prevChar = char
-        prevRange = { text, marks }
-        ranges.push(prevRange)
-      }, [])
-    }
-
-    // PERF: convert the ranges to immutable objects after iterating.
-    ranges = new List(ranges.map(object => new Range(object)))
-
-    // Return the ranges.
-    return ranges
   }
 
   /**
@@ -456,7 +461,7 @@ class Text extends Record(DEFAULTS) {
     const object = {
       key: this.key,
       kind: this.kind,
-      ranges: this.getRanges().toArray().map(r => r.toJSON()),
+      leaves: this.getLeaves().toArray().map(r => r.toJSON()),
     }
 
     if (!options.preserveKeys) {
@@ -512,6 +517,15 @@ class Text extends Record(DEFAULTS) {
     return schema.__validate(this)
   }
 
+  /**
+   * Deprecated.
+   */
+
+  getRanges(...args) {
+    logger.deprecate('0.27.0', 'The `Text.getRanges()` method was renamed to `Text.getLeaves`.')
+    return this.getLeaves(...args)
+  }
+
 }
 
 /**
@@ -534,8 +548,8 @@ memoize(Text.prototype, [
 memoize(Text.prototype, [
   'getDecoratedCharacters',
   'getDecorations',
+  'getLeaves',
   'getMarksAtIndex',
-  'getRanges',
   'validate'
 ], {
   takesArguments: true,

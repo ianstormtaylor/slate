@@ -7,7 +7,7 @@
         "nodes": [
           {
             "kind": "text",
-            "ranges": [
+            "leaves": [
               {
                 "text": "There are certain behaviors that require rendering dynamic marks on string of text, like rendering code highlighting. For example:"
               }
@@ -28,7 +28,7 @@
             "nodes": [
               {
                 "kind": "text",
-                "ranges": [
+                "leaves": [
                   {
                     "text": "// A simple FizzBuzz implementation."
                   }
@@ -42,7 +42,7 @@
             "nodes": [
               {
                 "kind": "text",
-                "ranges": [
+                "leaves": [
                   {
                     "text": "for (var i = 1; i <= 100; i++) {"
                   }
@@ -56,7 +56,7 @@
             "nodes": [
               {
                 "kind": "text",
-                "ranges": [
+                "leaves": [
                   {
                     "text": "  if (i % 15 == 0) {"
                   }
@@ -70,7 +70,7 @@
             "nodes": [
               {
                 "kind": "text",
-                "ranges": [
+                "leaves": [
                   {
                     "text": "    console.log('Fizz Buzz');"
                   }
@@ -84,7 +84,7 @@
             "nodes": [
               {
                 "kind": "text",
-                "ranges": [
+                "leaves": [
                   {
                     "text": "  } else if (i % 5 == 0) {"
                   }
@@ -98,7 +98,7 @@
             "nodes": [
               {
                 "kind": "text",
-                "ranges": [
+                "leaves": [
                   {
                     "text": "    console.log('Buzz');"
                   }
@@ -112,7 +112,7 @@
             "nodes": [
               {
                 "kind": "text",
-                "ranges": [
+                "leaves": [
                   {
                     "text": "  } else if (i % 3 == 0) {"
                   }
@@ -126,7 +126,7 @@
             "nodes": [
               {
                 "kind": "text",
-                "ranges": [
+                "leaves": [
                   {
                     "text": "    console.log('Fizz');"
                   }
@@ -140,7 +140,7 @@
             "nodes": [
               {
                 "kind": "text",
-                "ranges": [
+                "leaves": [
                   {
                     "text": "  } else {"
                   }
@@ -154,7 +154,7 @@
             "nodes": [
               {
                 "kind": "text",
-                "ranges": [
+                "leaves": [
                   {
                     "text": "    console.log(i);"
                   }
@@ -168,7 +168,7 @@
             "nodes": [
               {
                 "kind": "text",
-                "ranges": [
+                "leaves": [
                   {
                     "text": "  }"
                   }
@@ -182,7 +182,7 @@
             "nodes": [
               {
                 "kind": "text",
-                "ranges": [
+                "leaves": [
                   {
                     "text": "}"
                   }
@@ -198,7 +198,7 @@
         "nodes": [
           {
             "kind": "text",
-            "ranges": [
+            "leaves": [
               {
                 "text": "Try it out for yourself!"
               }

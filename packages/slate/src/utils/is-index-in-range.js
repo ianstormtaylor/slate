@@ -4,7 +4,7 @@
  *
  * @param {Number} index
  * @param {Text} text
- * @param {Selection} range
+ * @param {Range} range
  * @return {Boolean}
  */
 

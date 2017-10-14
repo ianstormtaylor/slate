@@ -6,15 +6,15 @@ import SlateTypes from 'slate-prop-types'
 import Types from 'prop-types'
 import getWindow from 'get-window'
 import keycode from 'keycode'
-import { Selection } from 'slate'
+import logger from 'slate-dev-logger'
 
 import TRANSFER_TYPES from '../constants/transfer-types'
 import Node from './node'
-import extendSelection from '../utils/extend-selection'
 import findClosestNode from '../utils/find-closest-node'
-import findDropPoint from '../utils/find-drop-point'
-import findNativePoint from '../utils/find-native-point'
+import findDOMNode from '../utils/find-dom-node'
+import findDOMRange from '../utils/find-dom-range'
 import findPoint from '../utils/find-point'
+import findRange from '../utils/find-range'
 import getHtmlFromNativePaste from '../utils/get-html-from-native-paste'
 import getTransferData from '../utils/get-transfer-data'
 import scrollToSelection from '../utils/scroll-to-selection'
@@ -143,16 +143,20 @@ class Content extends React.Component {
     if (selection.isUnset) return
 
     // Otherwise, figure out which DOM nodes should be selected...
-    const { anchorKey, anchorOffset, focusKey, focusOffset, isCollapsed } = selection
-    const anchor = findNativePoint(anchorKey, anchorOffset)
-    const focus = isCollapsed ? anchor : findNativePoint(focusKey, focusOffset)
+    const current = native.getRangeAt(0)
+    const range = findDOMRange(selection)
 
-    // If they are already selected, do nothing.
+    if (!range) {
+      logger.error('Unable to find a native DOM range from the current selection.', { selection })
+      return
+    }
+
+    // If the new range matches the current selection, do nothing.
     if (
-      anchor.node == native.anchorNode &&
-      anchor.offset == native.anchorOffset &&
-      focus.node == native.focusNode &&
-      focus.offset == native.focusOffset
+      range.startContainer == current.startContainer &&
+      range.startOffset == current.startOffset &&
+      range.endContainer == current.endContainer &&
+      range.endOffset == current.endOffset
     ) {
       return
     }
@@ -160,11 +164,7 @@ class Content extends React.Component {
     // Otherwise, set the `isSelecting` flag and update the selection.
     this.tmp.isSelecting = true
     native.removeAllRanges()
-    const range = window.document.createRange()
-    range.setStart(anchor.node, anchor.offset)
     native.addRange(range)
-    if (!isCollapsed) extendSelection(native, focus.node, focus.offset)
-
     scrollToSelection(native)
 
     // Then unset the `isSelecting` flag after a delay.
@@ -432,19 +432,48 @@ class Content extends React.Component {
 
     const { state } = this.props
     const { nativeEvent } = event
-    const { dataTransfer } = nativeEvent
+    const { dataTransfer, x, y } = nativeEvent
     const data = getTransferData(dataTransfer)
-    const point = findDropPoint(event, state)
-    if (!point) return
+
+    // Resolve a range from the caret position where the drop occured.
+    const window = getWindow(event.target)
+    let range
+
+    // COMPAT: In Firefox, `caretRangeFromPoint` doesn't exist. (2016/07/25)
+    if (window.document.caretRangeFromPoint) {
+      range = window.document.caretRangeFromPoint(x, y)
+    } else {
+      const position = window.document.caretPositionFromPoint(x, y)
+      range = window.document.createRange()
+      range.setStart(position.offsetNode, position.offset)
+      range.setEnd(position.offsetNode, position.offset)
+    }
+
+    // Resolve a Slate range from the DOM range.
+    let selection = findRange(range, state)
+    if (!selection) return
+
+    const { document } = state
+    const node = document.getNode(selection.anchorKey)
+    const parent = document.getParent(node.key)
+    const el = findDOMNode(parent)
+
+    // If the drop target is inside a void node, move it into either the next or
+    // previous node, depending on which side the `x` and `y` coordinates are
+    // closest to.
+    if (parent.isVoid) {
+      const rect = el.getBoundingClientRect()
+      const isPrevious = parent.kind == 'inline'
+        ? x - rect.left < rect.left + rect.width - x
+        : y - rect.top < rect.top + rect.height - y
+
+      selection = isPrevious
+        ? selection.moveToEndOf(document.getPreviousText(node.key))
+        : selection.moveToStartOf(document.getNextText(node.key))
+    }
 
     // Add drop-specific information to the data.
-    data.target = Selection.create({
-      anchorKey: point.key,
-      anchorOffset: point.offset,
-      focusKey: point.key,
-      focusOffset: point.offset,
-      isFocused: true
-    })
+    data.target = selection
 
     // COMPAT: Edge throws "Permission denied" errors when
     // accessing `dropEffect` or `effectAllowed` (2017/7/12)
@@ -484,33 +513,33 @@ class Content extends React.Component {
     const point = findPoint(anchorNode, anchorOffset, state)
     if (!point) return
 
-    // Get the text node and range in question.
+    // Get the text node and leaf in question.
     const { document, selection } = state
     const node = document.getDescendant(point.key)
-    const ranges = node.getRanges()
+    const leaves = node.getLeaves()
     let start = 0
     let end = 0
 
-    const range = ranges.find((r) => {
+    const leaf = leaves.find((r) => {
       end += r.text.length
       if (end >= point.offset) return true
       start = end
     })
 
     // Get the text information.
-    const { text } = range
+    const { text } = leaf
     let { textContent } = anchorNode
     const block = document.getClosestBlock(node.key)
     const lastText = block.getLastText()
-    const lastRange = ranges.last()
+    const lastLeaf = leaves.last()
     const lastChar = textContent.charAt(textContent.length - 1)
     const isLastText = node == lastText
-    const isLastRange = range == lastRange
+    const isLastLeaf = leaf == lastLeaf
 
-    // COMPAT: If this is the last range, and the DOM text ends in a new line,
+    // COMPAT: If this is the last leaf, and the DOM text ends in a new line,
     // we will have added another new line in <Leaf>'s render method to account
     // for browsers collapsing a single trailing new lines, so remove it.
-    if (isLastText && isLastRange && lastChar == '\n') {
+    if (isLastText && isLastLeaf && lastChar == '\n') {
       textContent = textContent.slice(0, -1)
     }
 
@@ -522,12 +551,12 @@ class Content extends React.Component {
     const corrected = selection.collapseToEnd().move(delta)
     const entire = selection.moveAnchorTo(point.key, start).moveFocusTo(point.key, end)
 
-    // Change the current state to have the range's text replaced.
+    // Change the current state to have the leaf's text replaced.
     editor.change((change) => {
       change
         .select(entire)
         .delete()
-        .insertText(textContent, range.marks)
+        .insertText(textContent, leaf.marks)
         .select(corrected)
     })
   }
@@ -687,42 +716,26 @@ class Content extends React.Component {
 
     // Otherwise, determine the Slate selection from the native one.
     else {
-      const { anchorNode, anchorOffset, focusNode, focusOffset } = native
-      const anchor = findPoint(anchorNode, anchorOffset, state)
-      const focus = findPoint(focusNode, focusOffset, state)
-      if (!anchor || !focus) return
+      let range = findRange(native, state)
+      if (!range) return
 
       // There are situations where a select event will fire with a new native
       // selection that resolves to the same internal position. In those cases
       // we don't need to trigger any changes, since our internal model is
       // already up to date, but we do want to update the native selection again
       // to make sure it is in sync.
-      if (
-        anchor.key == selection.anchorKey &&
-        anchor.offset == selection.anchorOffset &&
-        focus.key == selection.focusKey &&
-        focus.offset == selection.focusOffset &&
-        selection.isFocused
-      ) {
+      if (range.equals(selection)) {
         this.updateSelection()
         return
       }
 
-      const properties = {
-        anchorKey: anchor.key,
-        anchorOffset: anchor.offset,
-        focusKey: focus.key,
-        focusOffset: focus.offset,
-        isFocused: true,
-        isBackward: null
-      }
-
-      const anchorText = document.getNode(anchor.key)
-      const focusText = document.getNode(focus.key)
-      const anchorInline = document.getClosestInline(anchor.key)
-      const focusInline = document.getClosestInline(focus.key)
-      const focusBlock = document.getClosestBlock(focus.key)
-      const anchorBlock = document.getClosestBlock(anchor.key)
+      const { anchorKey, anchorOffset, focusKey, focusOffset } = range
+      const anchorText = document.getNode(anchorKey)
+      const focusText = document.getNode(focusKey)
+      const anchorInline = document.getClosestInline(anchorKey)
+      const focusInline = document.getClosestInline(focusKey)
+      const focusBlock = document.getClosestBlock(focusKey)
+      const anchorBlock = document.getClosestBlock(anchorKey)
 
       // COMPAT: If the anchor point is at the start of a non-void, and the
       // focus point is inside a void node with an offset that isn't `0`, set
@@ -734,12 +747,12 @@ class Content extends React.Component {
       if (
         anchorBlock &&
         !anchorBlock.isVoid &&
-        anchor.offset == 0 &&
+        anchorOffset == 0 &&
         focusBlock &&
         focusBlock.isVoid &&
-        focus.offset != 0
+        focusOffset != 0
       ) {
-        properties.focusOffset = 0
+        range = range.set('focusOffset', 0)
       }
 
       // COMPAT: If the selection is at the end of a non-void inline node, and
@@ -748,32 +761,25 @@ class Content extends React.Component {
       if (
         anchorInline &&
         !anchorInline.isVoid &&
-        anchor.offset == anchorText.text.length
+        anchorOffset == anchorText.text.length
       ) {
-        const block = document.getClosestBlock(anchor.key)
-        const next = block.getNextText(anchor.key)
-        if (next) {
-          properties.anchorKey = next.key
-          properties.anchorOffset = 0
-        }
+        const block = document.getClosestBlock(anchorKey)
+        const next = block.getNextText(anchorKey)
+        if (next) range = range.moveAnchorTo(next.key, 0)
       }
 
       if (
         focusInline &&
         !focusInline.isVoid &&
-        focus.offset == focusText.text.length
+        focusOffset == focusText.text.length
       ) {
-        const block = document.getClosestBlock(focus.key)
-        const next = block.getNextText(focus.key)
-        if (next) {
-          properties.focusKey = next.key
-          properties.focusOffset = 0
-        }
+        const block = document.getClosestBlock(focusKey)
+        const next = block.getNextText(focusKey)
+        if (next) range = range.moveFocusTo(next.key, 0)
       }
 
-      data.selection = selection
-        .merge(properties)
-        .normalize(document)
+      range = range.normalize(document)
+      data.selection = range
     }
 
     debug('onSelect', { event, data })

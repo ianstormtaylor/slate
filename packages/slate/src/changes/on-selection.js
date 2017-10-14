@@ -3,7 +3,7 @@ import isEmpty from 'is-empty'
 import logger from 'slate-dev-logger'
 import pick from 'lodash/pick'
 
-import Selection from '../models/selection'
+import Range from '../models/range'
 
 /**
  * Changes.
@@ -21,7 +21,7 @@ const Changes = {}
  */
 
 Changes.select = (change, properties, options = {}) => {
-  properties = Selection.createProperties(properties)
+  properties = Range.createProperties(properties)
 
   const { snapshot = false } = options
   const { state } = change

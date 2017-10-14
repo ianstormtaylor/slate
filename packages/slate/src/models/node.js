@@ -362,7 +362,7 @@ class Node {
   /**
    * Get the leaf block descendants in a `range`.
    *
-   * @param {Selection} range
+   * @param {Range} range
    * @return {List<Node>}
    */
 
@@ -375,7 +375,7 @@ class Node {
   /**
    * Get the leaf block descendants in a `range` as an array
    *
-   * @param {Selection} range
+   * @param {Range} range
    * @return {Array}
    */
 
@@ -457,7 +457,7 @@ class Node {
   /**
    * Get a list of the characters in a `range`.
    *
-   * @param {Selection} range
+   * @param {Range} range
    * @return {List<Character>}
    */
 
@@ -469,7 +469,7 @@ class Node {
   /**
    * Get a list of the characters in a `range` as an array.
    *
-   * @param {Selection} range
+   * @param {Range} range
    * @return {Array}
    */
 
@@ -688,7 +688,7 @@ class Node {
   /**
    * Get a fragment of the node at a `range`.
    *
-   * @param {Selection} range
+   * @param {Range} range
    * @return {Document}
    */
 
@@ -865,7 +865,7 @@ class Node {
   /**
    * Get the closest inline nodes for each text node in a `range`.
    *
-   * @param {Selection} range
+   * @param {Range} range
    * @return {List<Node>}
    */
 
@@ -878,7 +878,7 @@ class Node {
   /**
    * Get the closest inline nodes for each text node in a `range` as an array.
    *
-   * @param {Selection} range
+   * @param {Range} range
    * @return {Array}
    */
 
@@ -1006,7 +1006,7 @@ class Node {
   /**
    * Get a set of the marks in a `range`.
    *
-   * @param {Selection} range
+   * @param {Range} range
    * @return {Set<Mark>}
    */
 
@@ -1018,7 +1018,7 @@ class Node {
   /**
    * Get a set of the marks in a `range`.
    *
-   * @param {Selection} range
+   * @param {Range} range
    * @return {OrderedSet<Mark>}
    */
 
@@ -1030,7 +1030,7 @@ class Node {
   /**
    * Get a set of the active marks in a `range`.
    *
-   * @param {Selection} range
+   * @param {Range} range
    * @return {Set<Mark>}
    */
 
@@ -1042,7 +1042,7 @@ class Node {
   /**
    * Get a set of the marks in a `range`, by unioning.
    *
-   * @param {Selection} range
+   * @param {Range} range
    * @return {Array}
    */
 
@@ -1079,7 +1079,7 @@ class Node {
   /**
    * Get a set of marks in a `range`, by intersecting.
    *
-   * @param {Selection} range
+   * @param {Range} range
    * @return {Array}
    */
 
@@ -1264,7 +1264,7 @@ class Node {
   /**
    * Get the offset from a `range`.
    *
-   * @param {Selection} range
+   * @param {Range} range
    * @return {Number}
    */
 
@@ -1391,7 +1391,7 @@ class Node {
    * whether the node `isSelected`, to determine whether not finding matches
    * means everything is selected or nothing is.
    *
-   * @param {Selection} range
+   * @param {Range} range
    * @param {Boolean} isSelected
    * @return {Object|Null}
    */
@@ -1514,7 +1514,7 @@ class Node {
   /**
    * Get all of the text nodes in a `range`.
    *
-   * @param {Selection} range
+   * @param {Range} range
    * @return {List<Node>}
    */
 
@@ -1526,7 +1526,7 @@ class Node {
   /**
    * Get all of the text nodes in a `range` as an array.
    *
-   * @param {Selection} range
+   * @param {Range} range
    * @return {Array}
    */
 
@@ -1622,7 +1622,7 @@ class Node {
   /**
    * Check whether the node is in a `range`.
    *
-   * @param {Selection} range
+   * @param {Range} range
    * @return {Boolean}
    */
 
@@ -2032,7 +2032,7 @@ class Node {
   /**
    * Check if the inline nodes are split at a `range`.
    *
-   * @param {Selection} range
+   * @param {Range} range
    * @return {Boolean}
    */
 

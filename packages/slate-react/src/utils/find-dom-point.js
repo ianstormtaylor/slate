@@ -12,10 +12,8 @@ import findDOMNode from './find-dom-node'
  * @return {Object}
  */
 
-function findNativePoint(key, offset) {
+function findDOMPoint(key, offset) {
   const el = findDOMNode(key)
-  if (!el) return null
-
   const window = getWindow(el)
   const iterator = window.document.createNodeIterator(el, NodeFilter.SHOW_TEXT)
   let start = 0
@@ -52,4 +50,4 @@ function findNativePoint(key, offset) {
  * @type {Function}
  */
 
-export default findNativePoint
+export default findDOMPoint

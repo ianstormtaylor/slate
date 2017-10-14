@@ -1,12 +1,12 @@
 /** @jsx h */
 
 import h from '../../../helpers/h'
-import { Selection } from 'slate'
+import { Range } from 'slate'
 
 export default function (simulator) {
   const { state } = simulator
   const text = state.document.getTexts().first()
-  const selection = Selection.create().collapseToStartOf(text).move(1).focus()
+  const selection = Range.create().collapseToStartOf(text).move(1).focus()
   simulator.select(null, { selection })
 }
 

@@ -20,7 +20,7 @@ const Changes = {}
  * Add a new `mark` to the characters at `range`.
  *
  * @param {Change} change
- * @param {Selection} range
+ * @param {Range} range
  * @param {Mixed} mark
  * @param {Object} options
  *   @property {Boolean} normalize
@@ -52,7 +52,7 @@ Changes.addMarkAtRange = (change, range, mark, options = {}) => {
  * Delete everything in a `range`.
  *
  * @param {Change} change
- * @param {Selection} range
+ * @param {Range} range
  * @param {Object} options
  *   @property {Boolean} normalize
  */
@@ -251,7 +251,7 @@ Changes.deleteAtRange = (change, range, options = {}) => {
  * Delete backward until the character boundary at a `range`.
  *
  * @param {Change} change
- * @param {Selection} range
+ * @param {Range} range
  * @param {Object} options
  *   @property {Boolean} normalize
  */
@@ -272,7 +272,7 @@ Changes.deleteCharBackwardAtRange = (change, range, options) => {
  * Delete backward until the line boundary at a `range`.
  *
  * @param {Change} change
- * @param {Selection} range
+ * @param {Range} range
  * @param {Object} options
  *   @property {Boolean} normalize
  */
@@ -291,7 +291,7 @@ Changes.deleteLineBackwardAtRange = (change, range, options) => {
  * Delete backward until the word boundary at a `range`.
  *
  * @param {Change} change
- * @param {Selection} range
+ * @param {Range} range
  * @param {Object} options
  *   @property {Boolean} normalize
  */
@@ -312,7 +312,7 @@ Changes.deleteWordBackwardAtRange = (change, range, options) => {
  * Delete backward `n` characters at a `range`.
  *
  * @param {Change} change
- * @param {Selection} range
+ * @param {Range} range
  * @param {Number} n (optional)
  * @param {Object} options
  *   @property {Boolean} normalize
@@ -437,7 +437,7 @@ Changes.deleteBackwardAtRange = (change, range, n = 1, options = {}) => {
  * Delete forward until the character boundary at a `range`.
  *
  * @param {Change} change
- * @param {Selection} range
+ * @param {Range} range
  * @param {Object} options
  *   @property {Boolean} normalize
  */
@@ -458,7 +458,7 @@ Changes.deleteCharForwardAtRange = (change, range, options) => {
  * Delete forward until the line boundary at a `range`.
  *
  * @param {Change} change
- * @param {Selection} range
+ * @param {Range} range
  * @param {Object} options
  *   @property {Boolean} normalize
  */
@@ -477,7 +477,7 @@ Changes.deleteLineForwardAtRange = (change, range, options) => {
  * Delete forward until the word boundary at a `range`.
  *
  * @param {Change} change
- * @param {Selection} range
+ * @param {Range} range
  * @param {Object} options
  *   @property {Boolean} normalize
  */
@@ -498,7 +498,7 @@ Changes.deleteWordForwardAtRange = (change, range, options) => {
  * Delete forward `n` characters at a `range`.
  *
  * @param {Change} change
- * @param {Selection} range
+ * @param {Range} range
  * @param {Number} n (optional)
  * @param {Object} options
  *   @property {Boolean} normalize
@@ -622,7 +622,7 @@ Changes.deleteForwardAtRange = (change, range, n = 1, options = {}) => {
  * Insert a `block` node at `range`.
  *
  * @param {Change} change
- * @param {Selection} range
+ * @param {Range} range
  * @param {Block|String|Object} block
  * @param {Object} options
  *   @property {Boolean} normalize
@@ -675,7 +675,7 @@ Changes.insertBlockAtRange = (change, range, block, options = {}) => {
  * Insert a `fragment` at a `range`.
  *
  * @param {Change} change
- * @param {Selection} range
+ * @param {Range} range
  * @param {Document} fragment
  * @param {Object} options
  *   @property {Boolean} normalize
@@ -788,7 +788,7 @@ Changes.insertFragmentAtRange = (change, range, fragment, options = {}) => {
  * Insert an `inline` node at `range`.
  *
  * @param {Change} change
- * @param {Selection} range
+ * @param {Range} range
  * @param {Inline|String|Object} inline
  * @param {Object} options
  *   @property {Boolean} normalize
@@ -824,7 +824,7 @@ Changes.insertInlineAtRange = (change, range, inline, options = {}) => {
  * Insert `text` at a `range`, with optional `marks`.
  *
  * @param {Change} change
- * @param {Selection} range
+ * @param {Range} range
  * @param {String} text
  * @param {Set<Mark>} marks (optional)
  * @param {Object} options
@@ -856,7 +856,7 @@ Changes.insertTextAtRange = (change, range, text, marks, options = {}) => {
  * Remove an existing `mark` to the characters at `range`.
  *
  * @param {Change} change
- * @param {Selection} range
+ * @param {Range} range
  * @param {Mark|String} mark (optional)
  * @param {Object} options
  *   @property {Boolean} normalize
@@ -888,7 +888,7 @@ Changes.removeMarkAtRange = (change, range, mark, options = {}) => {
  * Set the `properties` of block nodes in a `range`.
  *
  * @param {Change} change
- * @param {Selection} range
+ * @param {Range} range
  * @param {Object|String} properties
  * @param {Object} options
  *   @property {Boolean} normalize
@@ -909,7 +909,7 @@ Changes.setBlockAtRange = (change, range, properties, options = {}) => {
  * Set the `properties` of inline nodes in a `range`.
  *
  * @param {Change} change
- * @param {Selection} range
+ * @param {Range} range
  * @param {Object|String} properties
  * @param {Object} options
  *   @property {Boolean} normalize
@@ -930,7 +930,7 @@ Changes.setInlineAtRange = (change, range, properties, options = {}) => {
  * Split the block nodes at a `range`, to optional `height`.
  *
  * @param {Change} change
- * @param {Selection} range
+ * @param {Range} range
  * @param {Number} height (optional)
  * @param {Object} options
  *   @property {Boolean} normalize
@@ -964,7 +964,7 @@ Changes.splitBlockAtRange = (change, range, height = 1, options = {}) => {
  * Split the inline nodes at a `range`, to optional `height`.
  *
  * @param {Change} change
- * @param {Selection} range
+ * @param {Range} range
  * @param {Number} height (optional)
  * @param {Object} options
  *   @property {Boolean} normalize
@@ -999,7 +999,7 @@ Changes.splitInlineAtRange = (change, range, height = Infinity, options = {}) =>
  * it's already there.
  *
  * @param {Change} change
- * @param {Selection} range
+ * @param {Range} range
  * @param {Mixed} mark
  * @param {Object} options
  *   @property {Boolean} normalize
@@ -1027,7 +1027,7 @@ Changes.toggleMarkAtRange = (change, range, mark, options = {}) => {
  * Unwrap all of the block nodes in a `range` from a block with `properties`.
  *
  * @param {Change} change
- * @param {Selection} range
+ * @param {Range} range
  * @param {String|Object} properties
  * @param {Object} options
  *   @property {Boolean} normalize
@@ -1119,7 +1119,7 @@ Changes.unwrapBlockAtRange = (change, range, properties, options = {}) => {
  * Unwrap the inline nodes in a `range` from an inline with `properties`.
  *
  * @param {Change} change
- * @param {Selection} range
+ * @param {Range} range
  * @param {String|Object} properties
  * @param {Object} options
  *   @property {Boolean} normalize
@@ -1165,7 +1165,7 @@ Changes.unwrapInlineAtRange = (change, range, properties, options = {}) => {
  * Wrap all of the blocks in a `range` in a new `block`.
  *
  * @param {Change} change
- * @param {Selection} range
+ * @param {Range} range
  * @param {Block|Object|String} block
  * @param {Object} options
  *   @property {Boolean} normalize
@@ -1236,7 +1236,7 @@ Changes.wrapBlockAtRange = (change, range, block, options = {}) => {
  * Wrap the text and inlines in a `range` in a new `inline`.
  *
  * @param {Change} change
- * @param {Selection} range
+ * @param {Range} range
  * @param {Inline|Object|String} inline
  * @param {Object} options
  *   @property {Boolean} normalize
@@ -1346,7 +1346,7 @@ Changes.wrapInlineAtRange = (change, range, inline, options = {}) => {
  * Wrap the text in a `range` in a prefix/suffix.
  *
  * @param {Change} change
- * @param {Selection} range
+ * @param {Range} range
  * @param {String} prefix
  * @param {String} suffix (optional)
  * @param {Object} options

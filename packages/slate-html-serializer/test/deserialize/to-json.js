@@ -33,8 +33,9 @@ export const output = {
         nodes: [
           {
             kind: 'text',
-            ranges: [
+            leaves: [
               {
+                kind: 'leaf',
                 text: 'one',
               }
             ]

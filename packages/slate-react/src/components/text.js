@@ -119,35 +119,35 @@ class Text extends React.Component {
       return startsBefore && endsAfter
     })
 
-    const ranges = node.getRanges(decs)
+    const leaves = node.getLeaves(decs)
     let offset = 0
 
-    const leaves = ranges.map((range, i) => {
-      const leaf = this.renderLeaf(ranges, range, i, offset)
-      offset += range.text.length
-      return leaf
+    const children = leaves.map((leaf, i) => {
+      const child = this.renderLeaf(leaves, leaf, i, offset)
+      offset += leaf.text.length
+      return child
     })
 
     return (
       <span data-key={key} style={style}>
-        {leaves}
+        {children}
       </span>
     )
   }
 
   /**
-   * Render a single leaf node given a `range` and `offset`.
+   * Render a single leaf given a `leaf` and `offset`.
    *
-   * @param {List<Range>} ranges
-   * @param {Range} range
+   * @param {List<Leaf>} leaves
+   * @param {Leaf} leaf
    * @param {Number} index
    * @param {Number} offset
    * @return {Element} leaf
    */
 
-  renderLeaf = (ranges, range, index, offset) => {
+  renderLeaf = (leaves, leaf, index, offset) => {
     const { block, node, parent, schema, state, editor } = this.props
-    const { text, marks } = range
+    const { text, marks } = leaf
 
     return (
       <Leaf
@@ -159,7 +159,7 @@ class Text extends React.Component {
         node={node}
         offset={offset}
         parent={parent}
-        ranges={ranges}
+        leaves={leaves}
         schema={schema}
         state={state}
         text={text}

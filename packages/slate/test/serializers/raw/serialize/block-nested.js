@@ -34,10 +34,10 @@ export const output = {
             nodes: [
               {
                 kind: 'text',
-                ranges: [
+                leaves: [
                   {
                     text: 'one',
-                    kind: 'range',
+                    kind: 'leaf',
                     marks: []
                   }
                 ]

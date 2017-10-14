@@ -13,9 +13,8 @@ import { findDOMNode } from 'react-dom'
  */
 
 function getHtmlFromNativePaste(component, callback) {
-  const el = findDOMNode(component)
-
   // Create an off-screen clone of the element and give it focus.
+  const el = findDOMNode(component)
   const clone = el.cloneNode()
   clone.setAttribute('class', '')
   clone.setAttribute('style', 'position: fixed; left: -9999px')

@@ -7,7 +7,7 @@
         "nodes": [
           {
             "kind": "text",
-            "ranges": [
+            "leaves": [
               {
                 "text": "In addition to block nodes, you can create inline void nodes, like "
               }
@@ -23,7 +23,7 @@
           },
           {
             "kind": "text",
-            "ranges": [
+            "leaves": [
               {
                 "text": "!"
               }
@@ -51,7 +51,7 @@
         "nodes": [
           {
             "kind": "text",
-            "ranges": [
+            "leaves": [
               {
                 "text": "This example shows emojis in action."
               }

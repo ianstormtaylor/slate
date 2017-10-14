@@ -8,7 +8,7 @@ import {
   Inline,
   Mark,
   Node,
-  Selection,
+  Range,
   State,
   Text
 } from 'slate'
@@ -71,13 +71,13 @@ const CREATORS = {
   },
 
   selection(tagName, attributes, children) {
-    return Selection.create(attributes)
+    return Range.create(attributes)
   },
 
   state(tagName, attributes, children) {
     const { data } = attributes
     const document = children.find(Document.isDocument)
-    let selection = children.find(Selection.isSelection) || Selection.create()
+    let selection = children.find(Range.isRange) || Range.create()
     const props = {}
 
     // Search the document's texts to see if any of them have the anchor or
@@ -211,11 +211,11 @@ function createChildren(children, options = {}) {
         setNode(node.set('key', child.key))
       }
 
-      child.getRanges().forEach((range) => {
-        let { marks } = range
+      child.getLeaves().forEach((leaf) => {
+        let { marks } = leaf
         if (options.marks) marks = marks.union(options.marks)
-        setNode(node.insertText(i, range.text, marks))
-        i += range.text.length
+        setNode(node.insertText(i, leaf.text, marks))
+        i += leaf.text.length
       })
 
       if (__anchor != null) node.__anchor = __anchor + length

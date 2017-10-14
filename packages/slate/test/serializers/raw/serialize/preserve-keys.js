@@ -29,10 +29,10 @@ export const output = {
           {
             kind: 'text',
             key: '0',
-            ranges: [
+            leaves: [
               {
                 text: 'one',
-                kind: 'range',
+                kind: 'leaf',
                 marks: []
               }
             ]
