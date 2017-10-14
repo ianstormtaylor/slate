@@ -32,8 +32,10 @@ export const output = `
       </span>
     </span>
     <span data-slate-void="true">
-      <span style="color:transparent">
-        <span></span>
+      <span style="height:0;color:transparent">
+        <span>
+          <span></span>
+        </span>
       </span>
       <span contenteditable="false">
         <img>

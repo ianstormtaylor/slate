@@ -128,16 +128,9 @@ class Void extends React.Component {
     const Tag = node.kind == 'block' ? 'div' : 'span'
     let style
 
-    if (!readOnly && node.kind == 'block') {
+    if (!readOnly) {
       style = {
-        display: 'block',
         height: '0',
-        color: 'transparent'
-      }
-    }
-
-    if (!readOnly && node.kind == 'inline') {
-      style = {
         color: 'transparent'
       }
     }
