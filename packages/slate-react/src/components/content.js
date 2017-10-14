@@ -7,13 +7,12 @@ import Types from 'prop-types'
 import getWindow from 'get-window'
 import keycode from 'keycode'
 import logger from 'slate-dev-logger'
-import { Selection } from 'slate'
 
 import TRANSFER_TYPES from '../constants/transfer-types'
 import Node from './node'
 import findClosestNode from '../utils/find-closest-node'
+import findDOMNode from '../utils/find-dom-node'
 import findDOMRange from '../utils/find-dom-range'
-import findDropPoint from '../utils/find-drop-point'
 import findPoint from '../utils/find-point'
 import findRange from '../utils/find-range'
 import getHtmlFromNativePaste from '../utils/get-html-from-native-paste'
@@ -433,19 +432,49 @@ class Content extends React.Component {
 
     const { state } = this.props
     const { nativeEvent } = event
-    const { dataTransfer } = nativeEvent
+    const { dataTransfer, x, y } = nativeEvent
     const data = getTransferData(dataTransfer)
-    const point = findDropPoint(event, state)
-    if (!point) return
+
+    // Resolve a range from the caret position where the drop occured.
+    const window = getWindow(event.target)
+    let range
+
+    // COMPAT: In Firefox, `caretRangeFromPoint` doesn't exist. (2016/07/25)
+    if (window.document.caretRangeFromPoint) {
+      range = window.document.caretRangeFromPoint(x, y)
+    } else {
+      const position = window.document.caretPositionFromPoint(x, y)
+      range = window.document.createRange()
+      range.setStart(position.offsetNode, position.offset)
+      range.setEnd(position.offsetNode, position.offset)
+    }
+
+    // Resolve a Slate range from the DOM range.
+    let selection = findRange(range, state)
+    if (!selection) return
+
+    const { document } = state
+    const node = document.getNode(selection.anchorKey)
+    const parent = document.getParent(node.key)
+    const el = findDOMNode(parent)
+    if (!el) return
+
+    // If the drop target is inside a void node, move it into either the next or
+    // previous node, depending on which side the `x` and `y` coordinates are
+    // closest to.
+    if (parent.isVoid) {
+      const rect = el.getBoundingClientRect()
+      const isPrevious = parent.kind == 'inline'
+        ? x - rect.left < rect.left + rect.width - x
+        : y - rect.top < rect.top + rect.height - y
+
+      selection = isPrevious
+        ? selection.moveToEndOf(document.getPreviousText(node.key))
+        : selection.moveToStartOf(document.getNextText(node.key))
+    }
 
     // Add drop-specific information to the data.
-    data.target = Selection.create({
-      anchorKey: point.key,
-      anchorOffset: point.offset,
-      focusKey: point.key,
-      focusOffset: point.offset,
-      isFocused: true
-    })
+    data.target = selection
 
     // COMPAT: Edge throws "Permission denied" errors when
     // accessing `dropEffect` or `effectAllowed` (2017/7/12)

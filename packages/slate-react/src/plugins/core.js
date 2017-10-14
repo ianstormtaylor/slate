@@ -317,6 +317,7 @@ function Plugin(options = {}) {
     if (Block.isBlock(node)) {
       change
         .select(target)
+        .focus()
         .insertBlock(node)
         .removeNodeByKey(node.key)
     }
@@ -324,6 +325,7 @@ function Plugin(options = {}) {
     if (Inline.isInline(node)) {
       change
         .select(target)
+        .focus()
         .insertInline(node)
         .removeNodeByKey(node.key)
     }
@@ -362,6 +364,7 @@ function Plugin(options = {}) {
 
     change
       .select(target)
+      .focus()
       .insertFragment(fragment)
   }
 
@@ -381,7 +384,7 @@ function Plugin(options = {}) {
     const { text, target } = data
     const { anchorKey } = target
 
-    change.select(target)
+    change.select(target).focus()
 
     let hasVoidParent = document.hasVoidParent(anchorKey)
 
