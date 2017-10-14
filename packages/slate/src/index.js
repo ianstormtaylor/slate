@@ -6,12 +6,12 @@ import Data from './models/data'
 import Document from './models/document'
 import History from './models/history'
 import Inline from './models/inline'
+import Leaf from './models/leaf'
 import Mark from './models/mark'
 import Node from './models/node'
 import Operations from './operations'
 import Range from './models/range'
 import Schema from './models/schema'
-import Selection from './models/selection'
 import Stack from './models/stack'
 import State from './models/state'
 import Text from './models/text'
@@ -32,12 +32,12 @@ export {
   Document,
   History,
   Inline,
+  Leaf,
   Mark,
   Node,
   Operations,
   Range,
   Schema,
-  Selection,
   Stack,
   State,
   Text,
@@ -54,12 +54,12 @@ export default {
   Document,
   History,
   Inline,
+  Leaf,
   Mark,
   Node,
   Operations,
   Range,
   Schema,
-  Selection,
   Stack,
   State,
   Text,

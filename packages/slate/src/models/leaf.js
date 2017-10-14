@@ -18,22 +18,22 @@ const DEFAULTS = {
 }
 
 /**
- * Range.
+ * Leaf.
  *
- * @type {Range}
+ * @type {Leaf}
  */
 
-class Range extends Record(DEFAULTS) {
+class Leaf extends Record(DEFAULTS) {
 
   /**
-   * Create a new `Range` with `attrs`.
+   * Create a new `Leaf` with `attrs`.
    *
-   * @param {Object|Range} attrs
-   * @return {Range}
+   * @param {Object|Leaf} attrs
+   * @return {Leaf}
    */
 
   static create(attrs = {}) {
-    if (Range.isRange(attrs)) {
+    if (Leaf.isLeaf(attrs)) {
       return attrs
     }
 
@@ -42,33 +42,33 @@ class Range extends Record(DEFAULTS) {
     }
 
     if (isPlainObject(attrs)) {
-      return Range.fromJSON(attrs)
+      return Leaf.fromJSON(attrs)
     }
 
-    throw new Error(`\`Range.create\` only accepts objects, strings or ranges, but you passed it: ${attrs}`)
+    throw new Error(`\`Leaf.create\` only accepts objects, strings or leaves, but you passed it: ${attrs}`)
   }
 
   /**
-   * Create a list of `Ranges` from `value`.
+   * Create a `Leaf` list from `value`.
    *
-   * @param {Array<Range|Object>|List<Range|Object>} value
-   * @return {List<Range>}
+   * @param {Array<Leaf|Object>|List<Leaf|Object>} value
+   * @return {List<Leaf>}
    */
 
   static createList(value = []) {
     if (List.isList(value) || Array.isArray(value)) {
-      const list = new List(value.map(Range.create))
+      const list = new List(value.map(Leaf.create))
       return list
     }
 
-    throw new Error(`\`Range.createList\` only accepts arrays or lists, but you passed it: ${value}`)
+    throw new Error(`\`Leaf.createList\` only accepts arrays or lists, but you passed it: ${value}`)
   }
 
   /**
-   * Create a `Range` from a JSON `object`.
+   * Create a `Leaf` from a JSON `object`.
    *
    * @param {Object} object
-   * @return {Range}
+   * @return {Leaf}
    */
 
   static fromJSON(object) {
@@ -77,40 +77,40 @@ class Range extends Record(DEFAULTS) {
       marks = [],
     } = object
 
-    const range = new Range({
+    const leaf = new Leaf({
       text,
       marks: new Set(marks.map(Mark.fromJSON)),
     })
 
-    return range
+    return leaf
   }
 
   /**
    * Alias `fromJS`.
    */
 
-  static fromJS = Range.fromJSON
+  static fromJS = Leaf.fromJSON
 
   /**
-   * Check if a `value` is a `Range`.
+   * Check if a `value` is a `Leaf`.
    *
    * @param {Any} value
    * @return {Boolean}
    */
 
-  static isRange(value) {
+  static isLeaf(value) {
     return !!(value && value[MODEL_TYPES.RANGE])
   }
 
   /**
-   * Check if a `value` is a list of ranges.
+   * Check if a `value` is a list of leaves.
    *
    * @param {Any} value
    * @return {Boolean}
    */
 
-  static isRangeList(value) {
-    return List.isList(value) && value.every(item => Range.isRange(item))
+  static isLeafList(value) {
+    return List.isList(value) && value.every(item => Leaf.isLeaf(item))
   }
 
   /**
@@ -120,11 +120,11 @@ class Range extends Record(DEFAULTS) {
    */
 
   get kind() {
-    return 'range'
+    return 'leaf'
   }
 
   /**
-   * Return range as a list of characters
+   * Return leaf as a list of characters
    *
    * @return {List<Character>}
    */
@@ -144,7 +144,7 @@ class Range extends Record(DEFAULTS) {
   }
 
   /**
-   * Return a JSON representation of the range.
+   * Return a JSON representation of the leaf.
    *
    * @return {Object}
    */
@@ -173,12 +173,12 @@ class Range extends Record(DEFAULTS) {
  * Attach a pseudo-symbol for type checking.
  */
 
-Range.prototype[MODEL_TYPES.RANGE] = true
+Leaf.prototype[MODEL_TYPES.LEAF] = true
 
 /**
  * Export.
  *
- * @type {Range}
+ * @type {Leaf}
  */
 
-export default Range
+export default Leaf

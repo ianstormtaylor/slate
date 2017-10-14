@@ -49,7 +49,7 @@ function deserialize(string, options = {}) {
               kind: 'text',
               ranges: [
                 {
-                  kind: 'range',
+                  kind: 'leaf',
                   text: line,
                   marks: defaultMarks,
                 }

@@ -484,33 +484,33 @@ class Content extends React.Component {
     const point = findPoint(anchorNode, anchorOffset, state)
     if (!point) return
 
-    // Get the text node and range in question.
+    // Get the text node and leaf in question.
     const { document, selection } = state
     const node = document.getDescendant(point.key)
-    const ranges = node.getRanges()
+    const leaves = node.getLeaves()
     let start = 0
     let end = 0
 
-    const range = ranges.find((r) => {
+    const leaf = leaves.find((r) => {
       end += r.text.length
       if (end >= point.offset) return true
       start = end
     })
 
     // Get the text information.
-    const { text } = range
+    const { text } = leaf
     let { textContent } = anchorNode
     const block = document.getClosestBlock(node.key)
     const lastText = block.getLastText()
-    const lastRange = ranges.last()
+    const lastLeaf = leaves.last()
     const lastChar = textContent.charAt(textContent.length - 1)
     const isLastText = node == lastText
-    const isLastRange = range == lastRange
+    const isLastLeaf = leaf == lastLeaf
 
-    // COMPAT: If this is the last range, and the DOM text ends in a new line,
+    // COMPAT: If this is the last leaf, and the DOM text ends in a new line,
     // we will have added another new line in <Leaf>'s render method to account
     // for browsers collapsing a single trailing new lines, so remove it.
-    if (isLastText && isLastRange && lastChar == '\n') {
+    if (isLastText && isLastLeaf && lastChar == '\n') {
       textContent = textContent.slice(0, -1)
     }
 
@@ -522,12 +522,12 @@ class Content extends React.Component {
     const corrected = selection.collapseToEnd().move(delta)
     const entire = selection.moveAnchorTo(point.key, start).moveFocusTo(point.key, end)
 
-    // Change the current state to have the range's text replaced.
+    // Change the current state to have the leaf's text replaced.
     editor.change((change) => {
       change
         .select(entire)
         .delete()
-        .insertText(textContent, range.marks)
+        .insertText(textContent, leaf.marks)
         .select(corrected)
     })
   }

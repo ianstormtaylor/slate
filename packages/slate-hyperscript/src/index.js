@@ -211,11 +211,11 @@ function createChildren(children, options = {}) {
         setNode(node.set('key', child.key))
       }
 
-      child.getRanges().forEach((range) => {
-        let { marks } = range
+      child.getLeaves().forEach((leaf) => {
+        let { marks } = leaf
         if (options.marks) marks = marks.union(options.marks)
-        setNode(node.insertText(i, range.text, marks))
-        i += range.text.length
+        setNode(node.insertText(i, leaf.text, marks))
+        i += leaf.text.length
       })
 
       if (__anchor != null) node.__anchor = __anchor + length

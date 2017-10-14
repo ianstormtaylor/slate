@@ -39,7 +39,7 @@ A `Placeholder` component is just a convenience for rendering placeholders on to
 
 #### Text
 
-A `Text` component is rendered for each [`Text`](../models#text) model in the document tree. This component handles grouping the characters of the text node into ranges that have the same set of [`Marks`](../models#mark), and then delegates rendering each range to...
+A `Text` component is rendered for each [`Text`](../models#text) model in the document tree. This component handles grouping the characters of the text node into leaves that have the same set of [`Marks`](../models#mark), and then delegates rendering each leaf to...
 
 
 #### Void

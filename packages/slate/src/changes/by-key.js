@@ -32,24 +32,24 @@ Changes.addMarkByKey = (change, key, offset, length, mark, options = {}) => {
   const { document } = state
   const path = document.getPath(key)
   const node = document.getNode(key)
-  const ranges = node.getRanges()
+  const leaves = node.getLeaves()
 
   const operations = []
   const bx = offset
   const by = offset + length
   let o = 0
 
-  ranges.forEach((range) => {
+  leaves.forEach((leaf) => {
     const ax = o
-    const ay = ax + range.text.length
+    const ay = ax + leaf.text.length
 
-    o += range.text.length
+    o += leaf.text.length
 
-    // If the range doesn't overlap with the operation, continue on.
+    // If the leaf doesn't overlap with the operation, continue on.
     if (ay < bx || by < ax) return
 
-    // If the range already has the mark, continue on.
-    if (range.marks.has(mark)) return
+    // If the leaf already has the mark, continue on.
+    if (leaf.marks.has(mark)) return
 
     // Otherwise, determine which offset and characters overlap.
     const start = Math.max(ax, bx)
@@ -241,24 +241,24 @@ Changes.removeMarkByKey = (change, key, offset, length, mark, options = {}) => {
   const { document } = state
   const path = document.getPath(key)
   const node = document.getNode(key)
-  const ranges = node.getRanges()
+  const leaves = node.getLeaves()
 
   const operations = []
   const bx = offset
   const by = offset + length
   let o = 0
 
-  ranges.forEach((range) => {
+  leaves.forEach((leaf) => {
     const ax = o
-    const ay = ax + range.text.length
+    const ay = ax + leaf.text.length
 
-    o += range.text.length
+    o += leaf.text.length
 
-    // If the range doesn't overlap with the operation, continue on.
+    // If the leaf doesn't overlap with the operation, continue on.
     if (ay < bx || by < ax) return
 
-    // If the range already has the mark, continue on.
-    if (!range.marks.has(mark)) return
+    // If the leaf already has the mark, continue on.
+    if (!leaf.marks.has(mark)) return
 
     // Otherwise, determine which offset and characters overlap.
     const start = Math.max(ax, bx)
@@ -326,7 +326,7 @@ Changes.removeTextByKey = (change, key, offset, length, options = {}) => {
   const { document } = state
   const path = document.getPath(key)
   const node = document.getNode(key)
-  const ranges = node.getRanges()
+  const leaves = node.getLeaves()
   const { text } = node
 
   const removals = []
@@ -334,13 +334,13 @@ Changes.removeTextByKey = (change, key, offset, length, options = {}) => {
   const by = offset + length
   let o = 0
 
-  ranges.forEach((range) => {
+  leaves.forEach((leaf) => {
     const ax = o
-    const ay = ax + range.text.length
+    const ay = ax + leaf.text.length
 
-    o += range.text.length
+    o += leaf.text.length
 
-    // If the range doesn't overlap with the removal, continue on.
+    // If the leaf doesn't overlap with the removal, continue on.
     if (ay < bx || by < ax) return
 
     // Otherwise, determine which offset and characters overlap.
@@ -353,7 +353,7 @@ Changes.removeTextByKey = (change, key, offset, length, options = {}) => {
       path,
       offset: start,
       text: string,
-      marks: range.marks,
+      marks: leaf.marks,
     })
   })
 
