@@ -23,8 +23,7 @@ const schema = {
   }
 }
 
-const Menu = ({ menuRef, onChange, state }) => {
-
+function Menu({ menuRef, onChange, state }) {
   /**
    * Check if the current selection has a mark with `type` in it.
    *
@@ -61,7 +60,9 @@ const Menu = ({ menuRef, onChange, state }) => {
 
   function renderMarkButton(type, icon) {
     const isActive = hasMark(type)
-    const onMouseDown = e => onClickMark(e, type)
+    function onMouseDown(e) {
+      onClickMark(e, type)
+    }
 
     return (
       <span className="button" onMouseDown={onMouseDown} data-active={isActive}>
@@ -124,6 +125,13 @@ class HoveringMenu extends React.Component {
   }
 
   /**
+   * Set menu ref
+   *
+   */
+
+  menuRef = el => this.menu = el
+
+  /**
    * Render.
    *
    * @return {Element}
@@ -133,7 +141,7 @@ class HoveringMenu extends React.Component {
     return (
       <div>
         <Menu
-          menuRef={el => this.menu = el}
+          menuRef={this.menuRef}
           state={this.state.state}
           onChange={this.onChange}
         />
