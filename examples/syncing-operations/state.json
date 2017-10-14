@@ -7,7 +7,7 @@
         "nodes": [
           {
             "kind": "text",
-            "ranges": [
+            "leaves": [
               {
                 "text": "These two editors are kept "
               },
@@ -32,7 +32,7 @@
         "nodes": [
           {
             "kind": "text",
-            "ranges": [
+            "leaves": [
               {
                 "text": "They achieve this by sending any document-altering operations to each other whenever a change occurs, and then applying them locally with "
               },
@@ -57,7 +57,7 @@
         "nodes": [
           {
             "kind": "text",
-            "ranges": [
+            "leaves": [
               {
                 "text": "Note: ",
                 "marks": [

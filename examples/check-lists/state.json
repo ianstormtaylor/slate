@@ -7,7 +7,7 @@
         "nodes": [
           {
             "kind": "text",
-            "ranges": [
+            "leaves": [
               {
                 "text": "With Slate you can build complex block types that have their own embedded content and behaviors, like rendering checkboxes inside check list items!"
               }
@@ -24,7 +24,7 @@
         "nodes": [
           {
             "kind": "text",
-            "ranges": [
+            "leaves": [
               {
                 "text": "Slide to the left."
               }
@@ -41,7 +41,7 @@
         "nodes": [
           {
             "kind": "text",
-            "ranges": [
+            "leaves": [
               {
                 "text": "Slide to the right."
               }
@@ -58,7 +58,7 @@
         "nodes": [
           {
             "kind": "text",
-            "ranges": [
+            "leaves": [
               {
                 "text": "Criss-cross."
               }
@@ -75,7 +75,7 @@
         "nodes": [
           {
             "kind": "text",
-            "ranges": [
+            "leaves": [
               {
                 "text": "Criss-cross!"
               }
@@ -92,7 +92,7 @@
         "nodes": [
           {
             "kind": "text",
-            "ranges": [
+            "leaves": [
               {
                 "text": "Cha cha real smooth…"
               }
@@ -109,7 +109,7 @@
         "nodes": [
           {
             "kind": "text",
-            "ranges": [
+            "leaves": [
               {
                 "text": "Let's go to work!"
               }
@@ -123,7 +123,7 @@
         "nodes": [
           {
             "kind": "text",
-            "ranges": [
+            "leaves": [
               {
                 "text": "Try it out for yourself!"
               }
