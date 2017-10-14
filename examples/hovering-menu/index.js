@@ -25,7 +25,7 @@ const schema = {
 
 const Menu = ({ menuRef, onChange, state }) => {
 
-   /**
+  /**
    * Check if the current selection has a mark with `type` in it.
    *
    * @param {String} type
@@ -36,7 +36,7 @@ const Menu = ({ menuRef, onChange, state }) => {
     return state.activeMarks.some(mark => mark.type == type)
   }
 
-   /**
+  /**
    * When a mark button is clicked, toggle the current mark.
    *
    * @param {Event} e
@@ -50,6 +50,7 @@ const Menu = ({ menuRef, onChange, state }) => {
       .toggleMark(type)
     onChange(change)
   }
+
   /**
    * Render a mark-toggling toolbar button.
    *
