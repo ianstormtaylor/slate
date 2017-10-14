@@ -6,15 +6,16 @@ import SlateTypes from 'slate-prop-types'
 import Types from 'prop-types'
 import getWindow from 'get-window'
 import keycode from 'keycode'
+import logger from 'slate-dev-logger'
 import { Selection } from 'slate'
 
 import TRANSFER_TYPES from '../constants/transfer-types'
 import Node from './node'
-import extendSelection from '../utils/extend-selection'
 import findClosestNode from '../utils/find-closest-node'
+import findDOMRange from '../utils/find-dom-range'
 import findDropPoint from '../utils/find-drop-point'
-import findNativePoint from '../utils/find-native-point'
 import findPoint from '../utils/find-point'
+import findRange from '../utils/find-range'
 import getHtmlFromNativePaste from '../utils/get-html-from-native-paste'
 import getTransferData from '../utils/get-transfer-data'
 import scrollToSelection from '../utils/scroll-to-selection'
@@ -143,16 +144,20 @@ class Content extends React.Component {
     if (selection.isUnset) return
 
     // Otherwise, figure out which DOM nodes should be selected...
-    const { anchorKey, anchorOffset, focusKey, focusOffset, isCollapsed } = selection
-    const anchor = findNativePoint(anchorKey, anchorOffset)
-    const focus = isCollapsed ? anchor : findNativePoint(focusKey, focusOffset)
+    const current = native.getRangeAt(0)
+    const range = findDOMRange(selection)
 
-    // If they are already selected, do nothing.
+    if (!range) {
+      logger.error('Unable to find a native DOM range from the current selection.', { selection })
+      return
+    }
+
+    // If the new range matches the current selection, do nothing.
     if (
-      anchor.node == native.anchorNode &&
-      anchor.offset == native.anchorOffset &&
-      focus.node == native.focusNode &&
-      focus.offset == native.focusOffset
+      range.startContainer == current.startContainer &&
+      range.startOffset == current.startOffset &&
+      range.endContainer == current.endContainer &&
+      range.endOffset == current.endOffset
     ) {
       return
     }
@@ -160,11 +165,7 @@ class Content extends React.Component {
     // Otherwise, set the `isSelecting` flag and update the selection.
     this.tmp.isSelecting = true
     native.removeAllRanges()
-    const range = window.document.createRange()
-    range.setStart(anchor.node, anchor.offset)
     native.addRange(range)
-    if (!isCollapsed) extendSelection(native, focus.node, focus.offset)
-
     scrollToSelection(native)
 
     // Then unset the `isSelecting` flag after a delay.
@@ -687,42 +688,26 @@ class Content extends React.Component {
 
     // Otherwise, determine the Slate selection from the native one.
     else {
-      const { anchorNode, anchorOffset, focusNode, focusOffset } = native
-      const anchor = findPoint(anchorNode, anchorOffset, state)
-      const focus = findPoint(focusNode, focusOffset, state)
-      if (!anchor || !focus) return
+      let range = findRange(native, state)
+      if (!range) return
 
       // There are situations where a select event will fire with a new native
       // selection that resolves to the same internal position. In those cases
       // we don't need to trigger any changes, since our internal model is
       // already up to date, but we do want to update the native selection again
       // to make sure it is in sync.
-      if (
-        anchor.key == selection.anchorKey &&
-        anchor.offset == selection.anchorOffset &&
-        focus.key == selection.focusKey &&
-        focus.offset == selection.focusOffset &&
-        selection.isFocused
-      ) {
+      if (range.equals(selection)) {
         this.updateSelection()
         return
       }
 
-      const properties = {
-        anchorKey: anchor.key,
-        anchorOffset: anchor.offset,
-        focusKey: focus.key,
-        focusOffset: focus.offset,
-        isFocused: true,
-        isBackward: null
-      }
-
-      const anchorText = document.getNode(anchor.key)
-      const focusText = document.getNode(focus.key)
-      const anchorInline = document.getClosestInline(anchor.key)
-      const focusInline = document.getClosestInline(focus.key)
-      const focusBlock = document.getClosestBlock(focus.key)
-      const anchorBlock = document.getClosestBlock(anchor.key)
+      const { anchorKey, anchorOffset, focusKey, focusOffset } = range
+      const anchorText = document.getNode(anchorKey)
+      const focusText = document.getNode(focusKey)
+      const anchorInline = document.getClosestInline(anchorKey)
+      const focusInline = document.getClosestInline(focusKey)
+      const focusBlock = document.getClosestBlock(focusKey)
+      const anchorBlock = document.getClosestBlock(anchorKey)
 
       // COMPAT: If the anchor point is at the start of a non-void, and the
       // focus point is inside a void node with an offset that isn't `0`, set
@@ -734,12 +719,12 @@ class Content extends React.Component {
       if (
         anchorBlock &&
         !anchorBlock.isVoid &&
-        anchor.offset == 0 &&
+        anchorOffset == 0 &&
         focusBlock &&
         focusBlock.isVoid &&
-        focus.offset != 0
+        focusOffset != 0
       ) {
-        properties.focusOffset = 0
+        range = range.set('focusOffset', 0)
       }
 
       // COMPAT: If the selection is at the end of a non-void inline node, and
@@ -748,32 +733,25 @@ class Content extends React.Component {
       if (
         anchorInline &&
         !anchorInline.isVoid &&
-        anchor.offset == anchorText.text.length
+        anchorOffset == anchorText.text.length
       ) {
-        const block = document.getClosestBlock(anchor.key)
-        const next = block.getNextText(anchor.key)
-        if (next) {
-          properties.anchorKey = next.key
-          properties.anchorOffset = 0
-        }
+        const block = document.getClosestBlock(anchorKey)
+        const next = block.getNextText(anchorKey)
+        if (next) range = range.moveAnchorTo(next.key, 0)
       }
 
       if (
         focusInline &&
         !focusInline.isVoid &&
-        focus.offset == focusText.text.length
+        focusOffset == focusText.text.length
       ) {
-        const block = document.getClosestBlock(focus.key)
-        const next = block.getNextText(focus.key)
-        if (next) {
-          properties.focusKey = next.key
-          properties.focusOffset = 0
-        }
+        const block = document.getClosestBlock(focusKey)
+        const next = block.getNextText(focusKey)
+        if (next) range = range.moveFocusTo(next.key, 0)
       }
 
-      data.selection = selection
-        .merge(properties)
-        .normalize(document)
+      range = range.normalize(document)
+      data.selection = range
     }
 
     debug('onSelect', { event, data })

@@ -14,11 +14,6 @@ function findDOMNode(key) {
   }
 
   const el = window.document.querySelector(`[data-key="${key}"]`)
-
-  if (!el) {
-    throw new Error(`Unable to find a DOM node for "${key}". This is often because of forgetting to add \`props.attributes\` to a component returned from \`renderNode\`.`)
-  }
-
   return el
 }
 

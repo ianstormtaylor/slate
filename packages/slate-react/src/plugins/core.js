@@ -4,12 +4,13 @@ import Debug from 'debug'
 import Plain from 'slate-plain-serializer'
 import React from 'react'
 import getWindow from 'get-window'
+import logger from 'slate-dev-logger'
 import { Block, Inline, coreSchema } from 'slate'
 
 import Content from '../components/content'
 import Placeholder from '../components/placeholder'
 import findDOMNode from '../utils/find-dom-node'
-import findPoint from '../utils/find-point'
+import findRange from '../utils/find-range'
 import { IS_CHROME, IS_MAC, IS_SAFARI } from '../constants/environment'
 
 /**
@@ -72,7 +73,6 @@ function Plugin(options = {}) {
 
     const { state } = change
     const { selection } = state
-    const { anchorKey, anchorOffset, focusKey, focusOffset } = selection
 
     // COMPAT: In iOS, when using predictive text suggestions, the native
     // selection will be changed to span the existing word, so that the word is
@@ -81,22 +81,11 @@ function Plugin(options = {}) {
     // the selection has gotten out of sync, and adjust it if so. (03/18/2017)
     const window = getWindow(e.target)
     const native = window.getSelection()
-    const a = findPoint(native.anchorNode, native.anchorOffset, state)
-    const f = findPoint(native.focusNode, native.focusOffset, state)
-    const hasMismatch = a && f && (
-      anchorKey != a.key ||
-      anchorOffset != a.offset ||
-      focusKey != f.key ||
-      focusOffset != f.offset
-    )
+    const range = findRange(native, state)
+    const hasMismatch = range && !range.equals(selection)
 
     if (hasMismatch) {
-      change.select({
-        anchorKey: a.key,
-        anchorOffset: a.offset,
-        focusKey: f.key,
-        focusOffset: f.offset
-      })
+      change.select(range)
     }
 
     change.insertText(e.data)
@@ -180,7 +169,14 @@ function Plugin(options = {}) {
     // the void node's spacer span, to the end of the void node's content.
     if (isVoid) {
       const r = range.cloneRange()
-      const node = findDOMNode(isVoidBlock ? endBlock : endInline)
+      const n = isVoidBlock ? endBlock : endInline
+      const node = findDOMNode(n)
+
+      if (!node) {
+        logger.error('Unable to find a DOM node for Slate node', { node: n })
+        return
+      }
+
       r.setEndAfter(node)
       contents = r.cloneContents()
       attach = contents.childNodes[contents.childNodes.length - 1].firstChild
@@ -199,6 +195,12 @@ function Plugin(options = {}) {
       if (hasMarks) {
         const r = range.cloneRange()
         const node = findDOMNode(startText)
+
+        if (!node) {
+          logger.error('Unable to find a DOM node for Slate node', { node: startText })
+          return
+        }
+
         r.setStartBefore(node)
         contents = r.cloneContents()
         attach = contents.childNodes[contents.childNodes.length - 1].firstChild
