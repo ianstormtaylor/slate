@@ -7,6 +7,24 @@ This document maintains a list of changes to the `slate-react` package with each
 ---
 
 
+### `0.4.0` — October 14, 2017
+
+###### BREAKING
+
+- **Updated work with `slate@0.27.0`.** The new version of Slate renames the old `Range` model to `Leaf`, and the old `Selection` model to `Range`.
+
+###### NEW
+
+- **Added a new `findDOMRange` helper.** Give a Slate `Range` object, it will return a DOM `Range` object with the correct start and end points, making it easier to work with lower-level DOM selections.
+
+- **Added a new `findRange` helper.** Given either a DOM `Selection` or DOM `Range` object and a Slate `State`, it will return a Slate `Range` representing the same part of the document, making it easier to work with DOM selection changes.
+
+- **Added a new `findNode` helper.** Given a DOM `Element`, it will find the closest Slate `Node` that it represents, making 
+
+
+---
+
+
 ### `0.3.0` — October 13, 2017
 
 ###### BREAKING

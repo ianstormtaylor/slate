@@ -6,6 +6,23 @@ This document maintains a list of changes to the `slate` package with each new v
 
 ---
 
+### `0.27.0` — October 14, 2017
+
+###### BREAKING
+
+- **The `Range` model is now called `Leaf`.** This is to disambiguate with the concept of "ranges" that is used throughout the codebase to be synonymous to selections. For example in methods like `getBlocksAtRange(selection)`.
+
+###### DEPRECATED
+
+- **The `Selection` model is now called `Range`.** This is to make it more clear what a "selection" really is, to make many of the other methods that act on "ranges" make sense, and to more closely parallel the native DOM API for selections and ranges. A mock `Selection` object is still exported with deprecated `static` methods, to make the transition to the new API easier.
+
+- **The `text.ranges` property in the JSON representation is now `text.leaves`.** When passing in JSON with `text.ranges` you'll now receive a deprecation warning in the console in development.
+
+- **The `Text.getRanges()` method is now `Text.getLeaves()`.** It will still work, and it will return a list of leaves, but you will see a deprecation warning in the console in development.
+
+
+---
+
 
 ### `0.26.0` — October 13, 2017
 

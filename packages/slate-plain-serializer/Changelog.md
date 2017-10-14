@@ -7,6 +7,16 @@ This document maintains a list of changes to the `slate-plain-serializer` packag
 ---
 
 
+### `0.2.0` — October 14, 2017
+
+###### BREAKING
+
+- **Updated work with `slate@0.27.0`.** The new version of Slate renames the old `Range` model to `Leaf`, and the old `Selection` model to `Range`.
+
+
+---
+
+
 ### `0.1.0` — September 17, 2017
 
 :tada:
