@@ -4,7 +4,6 @@ import Debug from 'debug'
 import Plain from 'slate-plain-serializer'
 import React from 'react'
 import getWindow from 'get-window'
-import logger from 'slate-dev-logger'
 import { Block, Inline, coreSchema } from 'slate'
 
 import Content from '../components/content'
