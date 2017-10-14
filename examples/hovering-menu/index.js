@@ -2,9 +2,11 @@
 import { Editor } from 'slate-react'
 import { State } from 'slate'
 
-import Portal from 'react-portal'
 import React from 'react'
+import ReactDOM from 'react-dom'
 import initialState from './state.json'
+
+const root = document.querySelector('main')
 
 /**
  * Define a schema.
@@ -20,6 +22,67 @@ const schema = {
     underlined: props => <u>{props.children}</u>,
   }
 }
+
+function Menu({ menuRef, onChange, state }) {
+  /**
+   * Check if the current selection has a mark with `type` in it.
+   *
+   * @param {String} type
+   * @return {Boolean}
+   */
+
+  function hasMark(type) {
+    return state.activeMarks.some(mark => mark.type == type)
+  }
+
+  /**
+   * When a mark button is clicked, toggle the current mark.
+   *
+   * @param {Event} e
+   * @param {String} type
+   */
+
+  function onClickMark(e, type) {
+    e.preventDefault()
+    const change = state
+      .change()
+      .toggleMark(type)
+    onChange(change)
+  }
+
+  /**
+   * Render a mark-toggling toolbar button.
+   *
+   * @param {String} type
+   * @param {String} icon
+   * @return {Element}
+   */
+
+  function renderMarkButton(type, icon) {
+    const isActive = hasMark(type)
+    function onMouseDown(e) {
+      onClickMark(e, type)
+    }
+
+    return (
+      <span className="button" onMouseDown={onMouseDown} data-active={isActive}>
+        <span className="material-icons">{icon}</span>
+      </span>
+    )
+  }
+
+  return (
+    ReactDOM.createPortal(
+      <div className="menu hover-menu" ref={menuRef}>
+        {renderMarkButton('bold', 'format_bold')}
+        {renderMarkButton('italic', 'format_italic')}
+        {renderMarkButton('underlined', 'format_underlined')}
+        {renderMarkButton('code', 'code')}
+      </div>, root
+    )
+  )
+}
+
 
 /**
  * The hovering menu example.
@@ -52,18 +115,6 @@ class HoveringMenu extends React.Component {
   }
 
   /**
-   * Check if the current selection has a mark with `type` in it.
-   *
-   * @param {String} type
-   * @return {Boolean}
-   */
-
-  hasMark = (type) => {
-    const { state } = this.state
-    return state.activeMarks.some(mark => mark.type == type)
-  }
-
-  /**
    * On change.
    *
    * @param {Change} change
@@ -74,29 +125,11 @@ class HoveringMenu extends React.Component {
   }
 
   /**
-   * When a mark button is clicked, toggle the current mark.
+   * Set menu ref
    *
-   * @param {Event} e
-   * @param {String} type
    */
 
-  onClickMark = (e, type) => {
-    e.preventDefault()
-    const change = this.state.state
-      .change()
-      .toggleMark(type)
-    this.onChange(change)
-  }
-
-  /**
-   * When the portal opens, cache the menu element.
-   *
-   * @param {Element} portal
-   */
-
-  onOpen = (portal) => {
-    this.setState({ menu: portal.firstChild })
-  }
+  menuRef = el => this.menu = el
 
   /**
    * Render.
@@ -107,64 +140,18 @@ class HoveringMenu extends React.Component {
   render() {
     return (
       <div>
-        {this.renderMenu()}
-        {this.renderEditor()}
-      </div>
-    )
-  }
-
-  /**
-   * Render the hovering menu.
-   *
-   * @return {Element}
-   */
-
-  renderMenu = () => {
-    return (
-      <Portal isOpened onOpen={this.onOpen}>
-        <div className="menu hover-menu">
-          {this.renderMarkButton('bold', 'format_bold')}
-          {this.renderMarkButton('italic', 'format_italic')}
-          {this.renderMarkButton('underlined', 'format_underlined')}
-          {this.renderMarkButton('code', 'code')}
-        </div>
-      </Portal>
-    )
-  }
-
-  /**
-   * Render a mark-toggling toolbar button.
-   *
-   * @param {String} type
-   * @param {String} icon
-   * @return {Element}
-   */
-
-  renderMarkButton = (type, icon) => {
-    const isActive = this.hasMark(type)
-    const onMouseDown = e => this.onClickMark(e, type)
-
-    return (
-      <span className="button" onMouseDown={onMouseDown} data-active={isActive}>
-        <span className="material-icons">{icon}</span>
-      </span>
-    )
-  }
-
-  /**
-   * Render the Slate editor.
-   *
-   * @return {Element}
-   */
-
-  renderEditor = () => {
-    return (
-      <div className="editor">
-        <Editor
-          schema={schema}
+        <Menu
+          menuRef={this.menuRef}
           state={this.state.state}
           onChange={this.onChange}
         />
+        <div className="editor">
+          <Editor
+            schema={schema}
+            state={this.state.state}
+            onChange={this.onChange}
+          />
+        </div>
       </div>
     )
   }
@@ -174,7 +161,8 @@ class HoveringMenu extends React.Component {
    */
 
   updateMenu = () => {
-    const { menu, state } = this.state
+    const { state } = this.state
+    const menu = this.menu
     if (!menu) return
 
     if (state.isBlurred || state.isEmpty) {
