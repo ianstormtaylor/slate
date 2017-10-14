@@ -19,14 +19,15 @@ describe('rendering', () => {
   for (const test of tests) {
     it(test, async () => {
       const module = require(resolve(dir, test))
-      const { state, schema, output } = module
-      const props = {
+      const { state, schema, output, props } = module
+      const p = {
         state,
         schema,
         onChange() {},
+        ...(props || {}),
       }
 
-      const string = ReactDOM.renderToStaticMarkup(<Editor {...props} />)
+      const string = ReactDOM.renderToStaticMarkup(<Editor {...p} />)
       const expected = parse5.serialize(parse5.parseFragment(output))
         .trim()
         .replace(/\n/gm, '')

@@ -87,6 +87,7 @@ class Void extends React.Component {
    */
 
   onDragEnter = (event) => {
+    if (this.props.readOnly) return
     event.preventDefault()
   }
 
@@ -97,6 +98,7 @@ class Void extends React.Component {
    */
 
   onDragOver = (event) => {
+    if (this.props.readOnly) return
     event.preventDefault()
   }
 
@@ -126,13 +128,9 @@ class Void extends React.Component {
     const { props } = this
     const { children, node, readOnly } = props
     const Tag = node.kind == 'block' ? 'div' : 'span'
-    let style
-
-    if (!readOnly) {
-      style = {
-        height: '0',
-        color: 'transparent'
-      }
+    const style = {
+      height: '0',
+      color: 'transparent'
     }
 
     this.debug('render', { props })
@@ -146,10 +144,10 @@ class Void extends React.Component {
         onDragEnter={this.onDragEnter}
         onDragStart={this.onDragStart}
       >
-        <Tag style={style}>
+        {!readOnly && <Tag style={style}>
           {this.renderText()}
-        </Tag>
-        <Tag contentEditable={false}>
+        </Tag>}
+        <Tag contentEditable={readOnly ? null : false}>
           {children}
         </Tag>
       </Tag>
