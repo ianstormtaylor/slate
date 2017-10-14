@@ -1,3 +1,4 @@
+<!doctype html>
 <html>
   <head>
     <meta charset="utf-8" />
@@ -8,12 +9,11 @@
   <body>
     <main></main>
     <script>
+      /* eslint-disable */
       // Dynamically creates the script and link tag and adds the current time
       // in ms as a query on the URL. This ensures the script and the link is
-      // always reloaded.
-      //
-      // Useful during debugging because we want to see changes to the
-      // JavaScript and CSS code immediately.
+      // always reloaded. Useful during debugging because we want to see changes
+      // to the JavaScript and CSS code immediately.
       var head = document.getElementsByTagName('head')[0]
       var script = document.createElement('script')
       var time = new Date().getTime()

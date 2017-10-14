@@ -72,7 +72,7 @@
     "build": "yarn run build:packages",
     "build:examples": "yarn run build:examples:dev && yarn run build:examples:prod",
     "build:examples:dev": "browserify --debug --transform babelify ./examples/index.js > ./examples/build.dev.js",
-    "build:examples:prod": "NODE_ENV=production browserify --transform babelify ./examples/index.js > ./examples/build.prod.js",
+    "build:examples:prod": "NODE_ENV=production browserify --global-transform envify --global-transform uglifyify --transform babelify ./examples/index.js > ./examples/build.prod.js",
     "build:packages": "lerna run build",
     "clean": "lerna run clean && lerna clean",
     "gh-pages": "yarn run build && yarn run build:examples && gh-pages --dist ./examples",

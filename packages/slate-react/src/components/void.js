@@ -124,8 +124,23 @@ class Void extends React.Component {
 
   render() {
     const { props } = this
-    const { children, node } = props
+    const { children, node, readOnly } = props
     const Tag = node.kind == 'block' ? 'div' : 'span'
+    let style
+
+    if (!readOnly && node.kind == 'block') {
+      style = {
+        display: 'block',
+        height: '0',
+        color: 'transparent'
+      }
+    }
+
+    if (!readOnly && node.kind == 'inline') {
+      style = {
+        color: 'transparent'
+      }
+    }
 
     this.debug('render', { props })
 
@@ -138,7 +153,9 @@ class Void extends React.Component {
         onDragEnter={this.onDragEnter}
         onDragStart={this.onDragStart}
       >
-        {this.renderSpacer()}
+        <Tag style={style}>
+          {this.renderText()}
+        </Tag>
         <Tag contentEditable={false}>
           {children}
         </Tag>
@@ -147,33 +164,19 @@ class Void extends React.Component {
   }
 
   /**
-   * Render a fake spacer text, which will catch the cursor when it the void
-   * node is navigated to with the arrow keys. Having this spacer there means
-   * the browser continues to manage the selection natively, so it keeps track
-   * of the right offset when moving across the block.
+   * Render the void node's text node, which will catch the cursor when it the
+   * void node is navigated to with the arrow keys.
+   *
+   * Having this text node there means the browser continues to manage the
+   * selection natively, so it keeps track of the right offset when moving
+   * across the block.
    *
    * @return {Element}
    */
 
-  renderSpacer = () => {
+  renderText = () => {
     const { block, decorations, isSelected, node, readOnly, schema, state, editor } = this.props
     const child = node.getFirstText()
-    let style
-
-    if (node.kind == 'block') {
-      style = {
-        display: 'inline-block',
-        verticalAlign: 'top',
-        width: '0',
-        height: '0',
-        color: 'transparent'
-      }
-    } else {
-      style = {
-        color: 'transparent'
-      }
-    }
-
     return (
       <Text
         block={node.kind == 'block' ? node : block}
@@ -186,7 +189,6 @@ class Void extends React.Component {
         readOnly={readOnly}
         schema={schema}
         state={state}
-        style={style}
       />
     )
   }

@@ -32,8 +32,9 @@ const schema = {
       const { node, isSelected } = props
       const src = node.data.get('src')
       const className = isSelected ? 'active' : null
+      const style = { display: 'block' }
       return (
-        <img src={src} className={className} {...props.attributes} />
+        <img src={src} className={className} style={style} {...props.attributes} />
       )
     },
     paragraph: (props) => {
