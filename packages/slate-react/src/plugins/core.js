@@ -171,12 +171,6 @@ function Plugin(options = {}) {
       const r = range.cloneRange()
       const n = isVoidBlock ? endBlock : endInline
       const node = findDOMNode(n)
-
-      if (!node) {
-        logger.error('Unable to find a DOM node for Slate node', { node: n })
-        return
-      }
-
       r.setEndAfter(node)
       contents = r.cloneContents()
       attach = contents.childNodes[contents.childNodes.length - 1].firstChild
@@ -195,12 +189,6 @@ function Plugin(options = {}) {
       if (hasMarks) {
         const r = range.cloneRange()
         const node = findDOMNode(startText)
-
-        if (!node) {
-          logger.error('Unable to find a DOM node for Slate node', { node: startText })
-          return
-        }
-
         r.setStartBefore(node)
         contents = r.cloneContents()
         attach = contents.childNodes[contents.childNodes.length - 1].firstChild

@@ -457,7 +457,6 @@ class Content extends React.Component {
     const node = document.getNode(selection.anchorKey)
     const parent = document.getParent(node.key)
     const el = findDOMNode(parent)
-    if (!el) return
 
     // If the drop target is inside a void node, move it into either the next or
     // previous node, depending on which side the `x` and `y` coordinates are
