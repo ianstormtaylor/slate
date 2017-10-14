@@ -33,6 +33,16 @@ function findNativePoint(key, offset) {
     start = end
   }
 
+  // COMPAT: For empty blocks with only a single empty text node, we will have
+  // rendered a `<br/>` instead of a text node.
+  if (
+    el.childNodes.length == 1 &&
+    el.childNodes[0].childNodes.length == 1 &&
+    el.childNodes[0].childNodes[0].tagName == 'BR'
+  ) {
+    return { node: el.childNodes[0], offset: 0 }
+  }
+
   return null
 }
 

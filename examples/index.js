@@ -61,6 +61,15 @@ const EXAMPLES = [
 
 class App extends React.Component {
 
+  state = {
+    error: null,
+    info: null,
+  }
+
+  componentDidCatch(error, info) {
+    this.setState({ error, info })
+  }
+
   render() {
     return (
       <div className="app">
@@ -78,14 +87,39 @@ class App extends React.Component {
             </NavLink>
           ))}
         </div>
-        <div className="example">
-          <Switch>
-            {EXAMPLES.map(([ name, Component, path ]) => (
-              <Route key={path} path={path} component={Component} />
-            ))}
-            <Redirect from="/" to="/rich-text" />
-          </Switch>
-        </div>
+        {this.state.error
+          ? this.renderError()
+          : this.renderExample()}
+      </div>
+    )
+  }
+
+  renderExample() {
+    return (
+      <div className="example">
+        <Switch>
+          {EXAMPLES.map(([ name, Component, path ]) => (
+            <Route key={path} path={path} component={Component} />
+          ))}
+          <Redirect from="/" to="/rich-text" />
+        </Switch>
+      </div>
+    )
+  }
+
+  renderError() {
+    return (
+      <div className="error">
+        <p>
+          An error was thrown by one of the example's React components!
+        </p>
+        <pre className="info">
+          <code>
+            {this.state.error.stack}
+            {'\n'}
+            {this.state.info.componentStack}
+          </code>
+        </pre>
       </div>
     )
   }
