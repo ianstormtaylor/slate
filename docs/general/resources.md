@@ -4,6 +4,11 @@
 A few resources that are helpful for building with Slate.
 
 
+## Libraries
+
+- [`react-broadcast`] works well when you need to have your custom node components re-render based on state that lives outside the `document`. It's the same pattern that `react-router` uses to update `<Link>` components.
+
+
 ## Tooling
 
 - [Immutable.js Console Extension](https://github.com/mattzeunert/immutable-object-formatter-extension) — this greatly improves the `console.log` output when working with [Immutable.js](https://facebook.github.io/immutable-js/) objects, which Slate's data model is based on.
