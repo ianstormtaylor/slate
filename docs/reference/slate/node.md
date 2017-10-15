@@ -26,7 +26,7 @@ A list of child nodes. Defaults to a list with a single text node child.
 ### `kind`
 `String`
 
-An immutable string value of `'block'` for easily separating this node from [`Inline`](./inline.md) or [`Text`](./text.md) nodes.
+An immutable string value of `'document'`, `'block'`, `'inline'` or `'text'` for easily separating this node from [`Inline`](./inline.md) or [`Text`](./text.md) nodes.
 
 ### `text`
 `String`

@@ -81,9 +81,9 @@ Create a list of block nodes from a plain Javascript `array`.
 Create a block from a JSON `object`.
 
 ### `Block.isBlock`
-`Block.isBlock(value: Any) => Boolean`
+`Block.isBlock(maybeBlock: Any) => Boolean`
 
-Returns a boolean if the passed in `value` is a `Block`.
+Returns a boolean if the passed in argument is a `Block`.
 
 
 ## Node Methods

@@ -24,7 +24,7 @@
 - [Block](./reference/slate/block.md)
 - [Change](./reference/slate/change.md)
 - [Character](./reference/slate/character.md)
-- [Data](./reference//slate/data.md)
+- [Data](./reference/slate/data.md)
 - [Document](./reference/slate/document.md)
 - [Inline](./reference/slate/inline.md)
 - [Mark](./reference//slate/mark.md)
