@@ -115,7 +115,7 @@ If no other plugin handles this event, it will be handled by the [Core plugin](.
 
 This handler is called when any key is pressed in the `contenteditable` element, before any action is taken.
 
-The `data` object contains the `key` which is a string name of the key that was pressed, as well as it's `code`. It also contains a series of helpful utility properties for determining hotkey logic. For example, `isCtrl` which is true if the `control` key was pressed, or
+The `data` object contains the `key` which is a string name of the key that was pressed, as well as it's `code`. It also contains a series of helpful utility properties for determining hotkey logic. For example, `isCtrl` is true if the `control` key was pressed before.
 
 ```js
 {

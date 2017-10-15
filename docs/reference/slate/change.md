@@ -171,12 +171,12 @@ Collapse the current selection to the `{Edge}` of `node`. Where `{Edge}` is eith
 ### `collapseTo{Edge}Of{Direction}Block`
 `collapseTo{Edge}Of{Direction}Block() => Change`
 
-Collapse the current selection to the `{Edge}` of the next [`Block`](./block.md) node in `{Direction}`. Where `{Edge}` is either `{Start}` or `{End}` and `{Direction}` is either `Next` or `Previous`.
+Collapse the current selection to the `{Edge}` of the next [`Block`](./block.md) node in `{Direction}`. Where `{Edge}` is either `Start` or `End` and `{Direction}` is either `Next` or `Previous`.
 
 ### `collapseTo{Edge}Of{Direction}Text`
 `collapseTo{Edge}Of{Direction}Text() => Change`
 
-Collapse the current selection to the `{Edge}` of the next [`Text`](./text.md) node in `{Direction}`. Where `{Edge}` is either `{Start}` or `{End}` and `{Direction}` is either `Next` or `Previous`.
+Collapse the current selection to the `{Edge}` of the next [`Text`](./text.md) node in `{Direction}`. Where `{Edge}` is either `Start` or `End` and `{Direction}` is either `Next` or `Previous`.
 
 ### `extend`
 `extend(n: Number) => Change`
@@ -206,7 +206,7 @@ Move the current selection's offsets by  `n`.
 ### `move{Edge}`
 `move{Edge}(n: Number) => Change`
 
-Move the current selection's `edge` offset by  `n`. `edge` can be one of `Start`, `End`.
+Move the current selection's `{Edge}` offset by  `n`. `{Edge}` can be one of `Start`, `End`.
 
 ### `moveOffsetsTo`
 `moveOffsetsTo(anchorOffset: Number, focusOffset: Number) => Change`
@@ -254,7 +254,7 @@ Insert a [`Fragment`](./fragment.md) at `index` inside a parent [`Node`](./node.
 ### `insertTextByKey`
 `insertTextByKey(key: String, offset: Number, text: String, [marks: Set]) => Change`
 
-Insert `text` at an `offset` in a [`Text Node`](./text.md) with optional `marks`.
+Insert `text` at an `offset` in a [`Text Node`](./text.md) by its `key` with optional `marks`.
 
 ### `moveNodeByKey`
 `moveNodeByKey(key: String, newKey: String, newIndex: Number) => Change`
@@ -301,13 +301,13 @@ Split a node by its `key` at an `offset`.
 `unwrapInlineByKey(key: String, properties: Object) => Change` <br/>
 `unwrapInlineByKey(key: String, type: String) => Change`
 
-Unwrap all inner content of an [`Inline`](./inline.md) node that match `properties`. For convenience, you can pass a `type` string or `properties` object.
+Unwrap all inner content of an [`Inline`](./inline.md) node by its `key` that match `properties`. For convenience, you can pass a `type` string or `properties` object.
 
 ### `unwrapBlockByKey`
 `unwrapBlockByKey(key: String, properties: Object) => Change` <br/>
 `unwrapBlockByKey(key: String, type: String) => Change`
 
-Unwrap all inner content of a [`Block`](./block.md) node that match `properties`. For convenience, you can pass a `type` string or `properties` object.
+Unwrap all inner content of a [`Block`](./block.md) node by its `key` that match `properties`. For convenience, you can pass a `type` string or `properties` object.
 
 ### `unwrapNodeByKey`
 `unwrapNodeByKey(key: String) => Change`
