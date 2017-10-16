@@ -42,7 +42,7 @@ function AfterPlugin(options = {}) {
    * On before change, enforce the editor's schema.
    *
    * @param {Change} change
-   * @param {Editor} schema
+   * @param {Editor} editor
    */
 
   function onBeforeChange(change, editor) {
@@ -121,8 +121,7 @@ function AfterPlugin(options = {}) {
   }
 
   /**
-   * On cut or copy, create a fake selection so that we can add a Base 64
-   * encoded copy of the fragment to the HTML, to decode on future pastes.
+   * On cut or copy.
    *
    * @param {Event} event
    * @param {Object} data
@@ -141,6 +140,8 @@ function AfterPlugin(options = {}) {
     // If the selection is collapsed, and it isn't inside a void node, abort.
     if (native.isCollapsed && !isVoid) return
 
+    // Create a fake selection so that we can add a Base64-encoded copy of the
+    // fragment to the HTML, to decode on future pastes.
     const { fragment } = data
     const encoded = Base64.serializeNode(fragment)
     const range = native.getRangeAt(0)
@@ -254,7 +255,7 @@ function AfterPlugin(options = {}) {
   }
 
   /**
-   * On drop node, insert the node wherever it is dropped.
+   * On drop node.
    *
    * @param {Event} event
    * @param {Object} data
@@ -339,7 +340,7 @@ function AfterPlugin(options = {}) {
   }
 
   /**
-   * On drop text, split the blocks at new lines.
+   * On drop text.
    *
    * @param {Event} event
    * @param {Object} data

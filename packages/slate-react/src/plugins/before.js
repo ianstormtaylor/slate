@@ -24,14 +24,10 @@ const debug = Debug('slate:core:before')
 /**
  * The core before plugin.
  *
- * @param {Object} options
- *   @property {Element} placeholder
- *   @property {String} placeholderClassName
- *   @property {Object} placeholderStyle
  * @return {Object}
  */
 
-function BeforePlugin(options = {}) {
+function BeforePlugin() {
   let compositionCount = 0
   let isComposing = false
   let isCopying = false
@@ -50,7 +46,7 @@ function BeforePlugin(options = {}) {
 
   function onBeforeInput(event, data, change, editor) {
     if (editor.props.readOnly) return true
-    if (!isInEditor(event.target, editor)) return true
+    if (isNotEditable(event.target, editor)) return true
 
     // COMPAT: React's `onBeforeInput` synthetic event is based on the native
     // `keypress` and `textInput` events. In browsers that support the native
@@ -75,7 +71,7 @@ function BeforePlugin(options = {}) {
   function onBlur(event, data, change, editor) {
     if (isCopying) return true
     if (editor.props.readOnly) return true
-    if (!isInEditor(event.target, editor)) return true
+    if (isNotEditable(event.target, editor)) return true
 
     // If the active element is still the editor, the blur event is due to the
     // window itself being blurred (eg. when changing tabs) so we should ignore
@@ -97,7 +93,7 @@ function BeforePlugin(options = {}) {
    */
 
   function onCompositionEnd(event, data, change, editor) {
-    if (!isInEditor(event.target, editor)) return true
+    if (isNotEditable(event.target, editor)) return true
 
     const n = compositionCount
 
@@ -122,7 +118,7 @@ function BeforePlugin(options = {}) {
    */
 
   function onCompositionStart(event, data, change, editor) {
-    if (!isInEditor(event.target, editor)) return true
+    if (isNotEditable(event.target, editor)) return true
     isComposing = true
     compositionCount++
 
@@ -139,7 +135,7 @@ function BeforePlugin(options = {}) {
    */
 
   function onCopy(event, data, change, editor) {
-    if (!isInEditor(event.target, editor)) return true
+    if (isNotEditable(event.target, editor)) return true
 
     const window = getWindow(event.target)
     isCopying = true
@@ -163,7 +159,7 @@ function BeforePlugin(options = {}) {
 
   function onCut(event, data, change, editor) {
     if (editor.props.readOnly) return true
-    if (!isInEditor(event.target, editor)) return true
+    if (isNotEditable(event.target, editor)) return true
 
     const window = getWindow(event.target)
     isCopying = true
@@ -221,7 +217,7 @@ function BeforePlugin(options = {}) {
    */
 
   function onDragStart(event, data, change, editor) {
-    if (!isInEditor(event.target, editor)) return true
+    if (isNotEditable(event.target, editor)) return true
 
     isDragging = true
     isInternalDrag = true
@@ -328,7 +324,7 @@ function BeforePlugin(options = {}) {
   function onFocus(event, data, change, editor) {
     if (isCopying) return true
     if (editor.props.readOnly) return true
-    if (!isInEditor(event.target, editor)) return true
+    if (isNotEditable(event.target, editor)) return true
 
     const el = findDOMNode(editor)
 
@@ -355,7 +351,7 @@ function BeforePlugin(options = {}) {
   function onInput(event, data, change, editor) {
     if (isComposing) return true
     if (change.state.isBlurred) return true
-    if (!isInEditor(event.target, editor)) return true
+    if (isNotEditable(event.target, editor)) return true
 
     debug('onInput', { event })
   }
@@ -371,7 +367,7 @@ function BeforePlugin(options = {}) {
 
   function onKeyDown(event, data, change, editor) {
     if (editor.props.readOnly) return
-    if (!isInEditor(event.target, editor)) return
+    if (isNotEditable(event.target, editor)) return
 
     // When composing, these characters commit the composition but also move the
     // selection before we're able to handle it, so prevent their default,
@@ -446,7 +442,7 @@ function BeforePlugin(options = {}) {
 
   function onPaste(event, data, change, editor) {
     if (editor.props.readOnly) return
-    if (!isInEditor(event.target, editor)) return
+    if (isNotEditable(event.target, editor)) return
 
     event.preventDefault()
     const d = getTransferData(event.clipboardData)
@@ -478,7 +474,7 @@ function BeforePlugin(options = {}) {
     if (isCopying) return
     if (isComposing) return
     if (editor.props.readOnly) return
-    if (!isInEditor(event.target, editor)) return
+    if (isNotEditable(event.target, editor)) return
 
     const window = getWindow(event.target)
     const { state } = change
@@ -587,15 +583,15 @@ function BeforePlugin(options = {}) {
  * @return {Boolean}
  */
 
-function isInEditor(element, editor) {
-  const editorEl = findDOMNode(editor)
+function isNotEditable(element, editor) {
   // COMPAT: Text nodes don't have `isContentEditable` property. So, when
   // `element` is a text node use its parent node for check.
   const el = element.nodeType == 3 ? element.parentNode : element
-  return (
-    (el.isContentEditable) &&
-    (el == editorEl || findClosestNode(el, '[data-slate-editor]') == editorEl)
-  )
+  if (!el.isContentEditable) return true
+
+  const editorEl = findDOMNode(editor)
+  if (el != editorEl && findClosestNode(el, '[data-slate-editor]') != editorEl) return true
+  return false
 }
 
 /**
