@@ -7,6 +7,16 @@ This document maintains a list of changes to the `slate-react` package with each
 ---
 
 
+### `0.5.0` — October 15, 2017
+
+###### DEPRECATED
+
+- **The `data.*` properties that relate to keyboard events have been deprecated.** There were a few different issues with these "helpers": `data.key` didn't account for international keyboards, many properties awkwardly duplicated information that was available on `event.*`, but not completely, and many properties were confusing as to when they applied. If you were using these, you'll now need to use the native `event.*` properties instead. There's also a helpful [`is-hotkey`](https://github.com/ianstormtaylor/is-hotkey) package for more complex hotkey matching.
+
+
+---
+
+
 ### `0.4.0` — October 14, 2017
 
 ###### BREAKING

@@ -97,40 +97,6 @@ class HugeDocument extends React.Component {
   }
 
   /**
-   * On key down, if it's a formatting command toggle a mark.
-   *
-   * @param {Event} e
-   * @param {Object} data
-   * @param {Change} change
-   */
-
-  onKeyDown = (e, data, change) => {
-    if (!data.isMod) return
-    let mark
-
-    switch (data.key) {
-      case 'b':
-        mark = 'bold'
-        break
-      case 'i':
-        mark = 'italic'
-        break
-      case 'u':
-        mark = 'underlined'
-        break
-      case '`':
-        mark = 'code'
-        break
-      default:
-        return
-    }
-
-    e.preventDefault()
-    change.toggleMark(mark)
-    return true
-  }
-
-  /**
    * Render the editor.
    *
    * @return {Component} component

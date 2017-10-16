@@ -3,13 +3,27 @@ import { Editor } from 'slate-react'
 import { State } from 'slate'
 
 import React from 'react'
+import isHotkey from 'is-hotkey'
 import initialState from './state.json'
 
 /**
  * Define the default node type.
+ *
+ * @type {String}
  */
 
 const DEFAULT_NODE = 'paragraph'
+
+/**
+ * Hotkey matchers.
+ *
+ * @type {Function}
+ */
+
+const isBoldHotkey = isHotkey('mod+b')
+const isItalicHotkey = isHotkey('mod+i')
+const isUnderlinedHotkey = isHotkey('mod+u')
+const isCodeHotkey = isHotkey('mod+`')
 
 /**
  * Define a schema.
@@ -107,24 +121,18 @@ class RichTextExample extends React.Component {
    */
 
   onKeyDown = (e, data, change) => {
-    if (!data.isMod) return
     let mark
 
-    switch (data.key) {
-      case 'b':
-        mark = 'bold'
-        break
-      case 'i':
-        mark = 'italic'
-        break
-      case 'u':
-        mark = 'underlined'
-        break
-      case '`':
-        mark = 'code'
-        break
-      default:
-        return
+    if (isBoldHotkey(e)) {
+      mark = 'bold'
+    } else if (isItalicHotkey(e)) {
+      mark = 'italic'
+    } else if (isUnderlinedHotkey(e)) {
+      mark = 'underlined'
+    } else if (isCodeHotkey(e)) {
+      mark = 'code'
+    } else {
+      return
     }
 
     e.preventDefault()

@@ -66,9 +66,9 @@ A concatenated string of all of the descendant [`Text`](./text.md) nodes of this
 ## Static Methods
 
 ### `Inline.create`
-`Inline.create(properties: Object) => Block`
+`Inline.create(properties: Object) => Inline`
 
-Create a block from a plain Javascript object of `properties`.
+Create an inline from a plain Javascript object of `properties`.
 
 ### `Inline.createList`
 `Inline.createList(array: Array) => List`
