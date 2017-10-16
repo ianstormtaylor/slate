@@ -19,7 +19,7 @@ import getHtmlFromNativePaste from '../utils/get-html-from-native-paste'
 import getTransferData from '../utils/get-transfer-data'
 import scrollToSelection from '../utils/scroll-to-selection'
 import setTransferData from '../utils/set-transfer-data'
-import { IS_FIREFOX, IS_MAC, IS_IE } from '../constants/environment'
+import { IS_FIREFOX, IS_MAC, IS_IE, SUPPORTED_EVENTS } from '../constants/environment'
 
 /**
  * Debug.
@@ -96,15 +96,30 @@ class Content extends React.Component {
   /**
    * When the editor first mounts in the DOM we need to:
    *
+   *   - Add native DOM event listeners.
    *   - Update the selection, in case it starts focused.
    *   - Focus the editor if `autoFocus` is set.
    */
 
   componentDidMount = () => {
+    if (SUPPORTED_EVENTS.beforeinput) {
+      this.element.addEventListener('beforeinput', this.onNativeBeforeInput)
+    }
+
     this.updateSelection()
 
     if (this.props.autoFocus) {
       this.element.focus()
+    }
+  }
+
+  /**
+   * When unmounting, remove DOM event listeners.
+   */
+
+  componentWillUnmount() {
+    if (SUPPORTED_EVENTS.beforeinput) {
+      this.element.removeEventListener('beforeinput', this.onNativeBeforeInput)
     }
   }
 
@@ -224,6 +239,44 @@ class Content extends React.Component {
 
     debug('onBeforeInput', { event, data })
     this.props.onBeforeInput(event, data)
+  }
+
+  /**
+   * On a native `beforeinput` event, use the additional range information
+   * provided by the event to insert text exactly as the browser would.
+   *
+   * @param {InputEvent} event
+   */
+
+  onNativeBeforeInput = (event) => {
+    if (this.props.readOnly) return
+    if (!this.isInEditor(event.target)) return
+
+    const { inputType } = event
+    if (inputType !== 'insertText' && inputType !== 'insertReplacementText') return
+
+    const [ targetRange ] = event.getTargetRanges()
+    if (!targetRange) return
+
+    // `data` should have the text for the `insertText` input type and
+    // `dataTransfer` should have the text for the `insertReplacementText` input
+    // type, but Safari uses `insertText` for spell check replacements and sets
+    // `data` to `null`.
+    const text = event.data == null
+      ? event.dataTransfer.getData('text/plain')
+      : event.data
+
+    if (text == null) return
+
+    debug('onNativeBeforeInput', { event, text })
+    event.preventDefault()
+
+    const { editor, state } = this.props
+    const range = findRange(targetRange, state)
+
+    editor.change((change) => {
+      change.insertTextAtRange(range, text)
+    })
   }
 
   /**

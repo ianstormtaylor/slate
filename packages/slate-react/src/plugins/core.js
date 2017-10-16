@@ -9,8 +9,7 @@ import { Block, Inline, coreSchema } from 'slate'
 import Content from '../components/content'
 import Placeholder from '../components/placeholder'
 import findDOMNode from '../utils/find-dom-node'
-import findRange from '../utils/find-range'
-import { IS_CHROME, IS_IOS, IS_MAC, IS_SAFARI } from '../constants/environment'
+import { IS_CHROME, IS_MAC, IS_SAFARI, SUPPORTED_EVENTS } from '../constants/environment'
 
 /**
  * Debug.
@@ -68,27 +67,16 @@ function Plugin(options = {}) {
 
   function onBeforeInput(e, data, change) {
     debug('onBeforeInput', { data })
+
+    // React's `onBeforeInput` synthetic event is based on the native `keypress`
+    // and `textInput` events. In browsers that support the native `beforeinput`
+    // event, we instead use that event to trigger text insertion, since it
+    // provides more useful information about the range being affected and also
+    // preserves compatibility with iOS autocorrect, which would be broken if we
+    // called `preventDefault()` on React's synthetic event here.
+    if (SUPPORTED_EVENTS.beforeinput) return
+
     e.preventDefault()
-
-    const { state } = change
-    const { selection } = state
-
-    // COMPAT: In iOS, when using predictive text suggestions, the native
-    // selection will be changed to span the existing word, so that the word is
-    // replaced. But the `select` fires after the `beforeInput` event, even
-    // though the native selection is updated. So we need to manually check if
-    // the selection has gotten out of sync, and adjust it if so. (10/16/2017)
-    if (IS_IOS) {
-      const window = getWindow(e.target)
-      const native = window.getSelection()
-      const range = findRange(native, state)
-      const hasMismatch = range && !range.equals(selection)
-
-      if (hasMismatch) {
-        change.select(range)
-      }
-    }
-
     change.insertText(e.data)
   }
 

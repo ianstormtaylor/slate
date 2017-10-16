@@ -21,6 +21,16 @@ const BROWSER_RULES = [
 ]
 
 /**
+ * DOM event matching rules.
+ *
+ * @type {Array}
+ */
+
+const EVENT_RULES = [
+  ['beforeinput', el => 'onbeforeinput' in el]
+]
+
+/**
  * Operating system matching rules.
  *
  * @type {Array}
@@ -39,6 +49,7 @@ const OS_RULES = [
  */
 
 let BROWSER
+const EVENTS = {}
 let OS
 
 /**
@@ -63,6 +74,14 @@ if (browser) {
       break
     }
   }
+
+  const testEl = document.createElement('div')
+  testEl.contentEditable = true
+
+  for (let i = 0; i < EVENT_RULES.length; i++) {
+    const [ name, testFn ] = EVENT_RULES[i]
+    EVENTS[name] = testFn(testEl)
+  }
 }
 
 /**
@@ -79,3 +98,5 @@ export const IS_IE = BROWSER === 'ie'
 export const IS_IOS = OS === 'ios'
 export const IS_MAC = OS === 'macos'
 export const IS_WINDOWS = OS === 'windows'
+
+export const SUPPORTED_EVENTS = EVENTS
