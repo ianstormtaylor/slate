@@ -29,7 +29,6 @@
   <a href="https://unpkg.com/slate/dist/slate.min.js"><img src="http://img.badgesize.io/https://unpkg.com/slate/dist/slate.min.js?compression=gzip&amp;label=gzip%20size" alt="gzip size"></a>
   <a href="https://travis-ci.org/ianstormtaylor/slate"><img src="https://travis-ci.org/ianstormtaylor/slate.svg?branch=master"></a> 
   <a href="https://slate-slack.herokuapp.com"><img src="https://slate-slack.herokuapp.com/badge.svg"><a/> 
-  <a href="https://github.com/ianstormtaylor/slate/releases"><img src="https://img.shields.io/github/release/ianstormtaylor/slate.svg?maxAge=2592000"></a> 
   <a href="./License.md"><img src="https://img.shields.io/npm/l/slate.svg?maxAge=2592000"></a> 
 </p>
 <br/>
