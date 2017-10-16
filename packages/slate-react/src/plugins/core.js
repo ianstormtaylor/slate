@@ -9,7 +9,6 @@ import { Block, Inline, coreSchema } from 'slate'
 import Content from '../components/content'
 import Placeholder from '../components/placeholder'
 import findDOMNode from '../utils/find-dom-node'
-import findRange from '../utils/find-range'
 import { IS_CHROME, IS_MAC, IS_SAFARI, SUPPORTED_EVENTS } from '../constants/environment'
 
 /**
