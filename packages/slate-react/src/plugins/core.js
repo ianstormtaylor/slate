@@ -10,7 +10,7 @@ import Content from '../components/content'
 import Placeholder from '../components/placeholder'
 import findDOMNode from '../utils/find-dom-node'
 import findRange from '../utils/find-range'
-import { IS_CHROME, IS_MAC, IS_SAFARI } from '../constants/environment'
+import { IS_CHROME, IS_IOS, IS_MAC, IS_SAFARI } from '../constants/environment'
 
 /**
  * Debug.
@@ -77,14 +77,16 @@ function Plugin(options = {}) {
     // selection will be changed to span the existing word, so that the word is
     // replaced. But the `select` fires after the `beforeInput` event, even
     // though the native selection is updated. So we need to manually check if
-    // the selection has gotten out of sync, and adjust it if so. (03/18/2017)
-    const window = getWindow(e.target)
-    const native = window.getSelection()
-    const range = findRange(native, state)
-    const hasMismatch = range && !range.equals(selection)
+    // the selection has gotten out of sync, and adjust it if so. (10/16/2017)
+    if (IS_IOS) {
+      const window = getWindow(e.target)
+      const native = window.getSelection()
+      const range = findRange(native, state)
+      const hasMismatch = range && !range.equals(selection)
 
-    if (hasMismatch) {
-      change.select(range)
+      if (hasMismatch) {
+        change.select(range)
+      }
     }
 
     change.insertText(e.data)
