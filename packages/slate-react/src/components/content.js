@@ -30,6 +30,16 @@ import { IS_FIREFOX, IS_MAC, IS_IE, SUPPORTED_EVENTS } from '../constants/enviro
 const debug = Debug('slate:content')
 
 /**
+ * Handlers.
+ *
+ * @type {Array}
+ */
+
+const HANDLERS = [
+  'onBeforeInput',
+]
+
+/**
  * Content.
  *
  * @type {Component}
@@ -91,6 +101,12 @@ class Content extends React.Component {
     this.tmp = {}
     this.tmp.compositions = 0
     this.tmp.forces = 0
+
+    HANDLERS.forEach((handler) => {
+      this[handler] = (event) => {
+        this.props[handler](event, {})
+      }
+    })
   }
 
   /**
@@ -223,22 +239,6 @@ class Content extends React.Component {
       (el.isContentEditable) &&
       (el === element || findClosestNode(el, '[data-slate-editor]') === element)
     )
-  }
-
-  /**
-   * On before input, bubble up.
-   *
-   * @param {Event} event
-   */
-
-  onBeforeInput = (event) => {
-    if (this.props.readOnly) return
-    if (!this.isInEditor(event.target)) return
-
-    const data = {}
-
-    debug('onBeforeInput', { event, data })
-    this.props.onBeforeInput(event, data)
   }
 
   /**
@@ -844,6 +844,11 @@ class Content extends React.Component {
       return this.renderNode(child, isSelected)
     })
 
+    const handlers = HANDLERS.reduce((obj, handler) => {
+      obj[handler] = this[handler]
+      return obj
+    }, {})
+
     const style = {
       // Prevent the default outline styles.
       outline: 'none',
@@ -868,6 +873,7 @@ class Content extends React.Component {
 
     return (
       <Container
+        {...handlers}
         data-slate-editor
         key={this.tmp.forces}
         ref={this.ref}
@@ -875,7 +881,6 @@ class Content extends React.Component {
         contentEditable={readOnly ? null : true}
         suppressContentEditableWarning
         className={className}
-        onBeforeInput={this.onBeforeInput}
         onBlur={this.onBlur}
         onFocus={this.onFocus}
         onCompositionEnd={this.onCompositionEnd}

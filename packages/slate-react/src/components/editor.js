@@ -7,7 +7,8 @@ import Types from 'prop-types'
 import logger from 'slate-dev-logger'
 import { Stack, State } from 'slate'
 
-import CorePlugin from '../plugins/core'
+import AfterPlugin from '../plugins/after'
+import BeforePlugin from '../plugins/before'
 import noop from '../utils/noop'
 
 /**
@@ -352,11 +353,13 @@ class Editor extends React.Component {
 function resolvePlugins(props) {
   // eslint-disable-next-line no-unused-vars
   const { state, onChange, plugins = [], ...overridePlugin } = props
-  const corePlugin = CorePlugin(props)
+  const beforePlugin = BeforePlugin(props)
+  const afterPlugin = AfterPlugin(props)
   return [
+    beforePlugin,
     overridePlugin,
     ...plugins,
-    corePlugin
+    afterPlugin
   ]
 }
 

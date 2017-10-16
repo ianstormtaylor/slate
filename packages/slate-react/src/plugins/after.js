@@ -9,7 +9,7 @@ import { Block, Inline, coreSchema } from 'slate'
 import Content from '../components/content'
 import Placeholder from '../components/placeholder'
 import findDOMNode from '../utils/find-dom-node'
-import { IS_CHROME, IS_MAC, IS_SAFARI, SUPPORTED_EVENTS } from '../constants/environment'
+import { IS_CHROME, IS_MAC, IS_SAFARI } from '../constants/environment'
 
 /**
  * Debug.
@@ -20,7 +20,7 @@ import { IS_CHROME, IS_MAC, IS_SAFARI, SUPPORTED_EVENTS } from '../constants/env
 const debug = Debug('slate:core')
 
 /**
- * The default plugin.
+ * The after plugin.
  *
  * @param {Object} options
  *   @property {Element} placeholder
@@ -29,7 +29,7 @@ const debug = Debug('slate:core')
  * @return {Object}
  */
 
-function Plugin(options = {}) {
+function AfterPlugin(options = {}) {
   const {
     placeholder,
     placeholderClassName,
@@ -67,14 +67,6 @@ function Plugin(options = {}) {
 
   function onBeforeInput(e, data, change) {
     debug('onBeforeInput', { data })
-
-    // React's `onBeforeInput` synthetic event is based on the native `keypress`
-    // and `textInput` events. In browsers that support the native `beforeinput`
-    // event, we instead use that event to trigger text insertion, since it
-    // provides more useful information about the range being affected and also
-    // preserves compatibility with iOS autocorrect, which would be broken if we
-    // called `preventDefault()` on React's synthetic event here.
-    if (SUPPORTED_EVENTS.beforeinput) return
 
     e.preventDefault()
     change.insertText(e.data)
@@ -914,4 +906,4 @@ function Plugin(options = {}) {
  * @type {Object}
  */
 
-export default Plugin
+export default AfterPlugin
