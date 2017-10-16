@@ -125,9 +125,10 @@ class Content extends React.Component {
     const { selection } = state
     const window = getWindow(this.element)
     const native = window.getSelection()
+    const { rangeCount } = native
 
     // If both selections are blurred, do nothing.
-    if (!native.rangeCount && selection.isBlurred) return
+    if (!rangeCount && selection.isBlurred) return
 
     // If the selection has been blurred, but is still inside the editor in the
     // DOM, blur it manually.
@@ -143,7 +144,7 @@ class Content extends React.Component {
     if (selection.isUnset) return
 
     // Otherwise, figure out which DOM nodes should be selected...
-    const current = native.getRangeAt(0)
+    const current = !!rangeCount && native.getRangeAt(0)
     const range = findDOMRange(selection)
 
     if (!range) {
@@ -153,6 +154,7 @@ class Content extends React.Component {
 
     // If the new range matches the current selection, do nothing.
     if (
+      current &&
       range.startContainer == current.startContainer &&
       range.startOffset == current.startOffset &&
       range.endContainer == current.endContainer &&
