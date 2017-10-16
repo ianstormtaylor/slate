@@ -572,14 +572,17 @@ class Content extends React.Component {
     if (this.props.readOnly) return
     if (!this.isInEditor(event.target)) return
 
-    const { altKey, ctrlKey, metaKey, shiftKey, which } = event
-    const key = keycode(which)
+    const { key, metaKey, ctrlKey } = event
     const data = {}
+    const modKey = IS_MAC ? metaKey : ctrlKey
+
+    // COMPAT: add the deprecated keyboard event properties.
+    addDeprecatedKeyProperties(data, event)
 
     // Keep track of an `isShifting` flag, because it's often used to trigger
     // "Paste and Match Style" commands, but isn't available on the event in a
     // normal paste event.
-    if (key == 'shift') {
+    if (key == 'Shift') {
       this.tmp.isShifting = true
     }
 
@@ -588,35 +591,23 @@ class Content extends React.Component {
     // selection-moving behavior.
     if (
       this.tmp.isComposing &&
-      (key == 'left' || key == 'right' || key == 'up' || key == 'down')
+      (key == 'ArrowLeft' || key == 'ArrowRight' || key == 'ArrowUp' || key == 'ArrowDown')
     ) {
       event.preventDefault()
       return
     }
 
-    // Add helpful properties for handling hotkeys to the data object.
-    data.code = which
-    data.key = key
-    data.isAlt = altKey
-    data.isCmd = IS_MAC ? metaKey && !altKey : false
-    data.isCtrl = ctrlKey && !altKey
-    data.isLine = IS_MAC ? metaKey : false
-    data.isMeta = metaKey
-    data.isMod = IS_MAC ? metaKey && !altKey : ctrlKey && !altKey
-    data.isModAlt = IS_MAC ? metaKey && altKey : ctrlKey && altKey
-    data.isShift = shiftKey
-    data.isWord = IS_MAC ? altKey : ctrlKey
-
     // These key commands have native behavior in contenteditable elements which
     // will cause our state to be out of sync, so prevent them.
     if (
-      (key == 'enter') ||
-      (key == 'backspace') ||
-      (key == 'delete') ||
-      (key == 'b' && data.isMod) ||
-      (key == 'i' && data.isMod) ||
-      (key == 'y' && data.isMod) ||
-      (key == 'z' && data.isMod)
+      (key == 'Enter') ||
+      (key == 'Backspace') ||
+      (key == 'Delete') ||
+      (key == 'b' && modKey) ||
+      (key == 'i' && modKey) ||
+      (key == 'y' && modKey) ||
+      (key == 'z' && modKey) ||
+      (key == 'Z' && modKey)
     ) {
       event.preventDefault()
     }
@@ -632,26 +623,14 @@ class Content extends React.Component {
    */
 
   onKeyUp = (event) => {
-    const { altKey, ctrlKey, metaKey, shiftKey, which } = event
-    const key = keycode(which)
     const data = {}
 
-    if (key == 'shift') {
+    // COMPAT: add the deprecated keyboard event properties.
+    addDeprecatedKeyProperties(data, event)
+
+    if (event.key == 'Shift') {
       this.tmp.isShifting = false
     }
-
-    // Add helpful properties for handling hotkeys to the data object.
-    data.code = which
-    data.key = key
-    data.isAlt = altKey
-    data.isCmd = IS_MAC ? metaKey && !altKey : false
-    data.isCtrl = ctrlKey && !altKey
-    data.isLine = IS_MAC ? metaKey : false
-    data.isMeta = metaKey
-    data.isMod = IS_MAC ? metaKey && !altKey : ctrlKey && !altKey
-    data.isModAlt = IS_MAC ? metaKey && altKey : ctrlKey && altKey
-    data.isShift = shiftKey
-    data.isWord = IS_MAC ? altKey : ctrlKey
 
     debug('onKeyUp', { event, data })
     this.props.onKeyUp(event, data)
@@ -669,9 +648,16 @@ class Content extends React.Component {
 
     const data = getTransferData(event.clipboardData)
 
-    // Attach the `isShift` flag, so that people can use it to trigger "Paste
-    // and Match Style" logic.
-    data.isShift = !!this.tmp.isShifting
+    // COMPAT: Attach the `isShift` flag, so that people can use it to trigger
+    // "Paste and Match Style" logic.
+    Object.defineProperty(data, 'isShift', {
+      enumerable: true,
+      get() {
+        logger.deprecate('0.28.0', 'The `data.isShift` property of paste events has been deprecated. If you need this functionality, you\'ll need to keep track of that state with `onKeyDown` and `onKeyUp` events instead')
+        return !!this.tmp.isShifting
+      }
+    })
+
     debug('onPaste', { event, data })
 
     // COMPAT: In IE 11, only plain text can be retrieved from the event's
@@ -895,6 +881,40 @@ class Content extends React.Component {
     )
   }
 
+}
+
+/**
+ * Add deprecated `data` fields from a key `event`.
+ *
+ * @param {Object} data
+ * @param {Object} event
+ */
+
+function addDeprecatedKeyProperties(data, event) {
+  const { altKey, ctrlKey, metaKey, shiftKey, which } = event
+  const name = keycode(which)
+
+  function define(key, value) {
+    Object.defineProperty(data, key, {
+      enumerable: true,
+      get() {
+        logger.deprecate('0.28.0', `The \`data.${key}\` property of keyboard events is deprecated, please use the native \`event\` properties instead.`)
+        return value
+      }
+    })
+  }
+
+  define('code', which)
+  define('key', name)
+  define('isAlt', altKey)
+  define('isCmd', IS_MAC ? metaKey && !altKey : false)
+  define('isCtrl', ctrlKey && !altKey)
+  define('isLine', IS_MAC ? metaKey : false)
+  define('isMeta', metaKey)
+  define('isMod', IS_MAC ? metaKey && !altKey : ctrlKey && !altKey)
+  define('isModAlt', IS_MAC ? metaKey && altKey : ctrlKey && altKey)
+  define('isShift', shiftKey)
+  define('isWord', IS_MAC ? altKey : ctrlKey)
 }
 
 /**

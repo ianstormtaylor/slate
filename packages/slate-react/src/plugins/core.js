@@ -407,19 +407,20 @@ function Plugin(options = {}) {
   function onKeyDown(e, data, change) {
     debug('onKeyDown', { data })
 
-    switch (data.key) {
-      case 'enter': return onKeyDownEnter(e, data, change)
-      case 'backspace': return onKeyDownBackspace(e, data, change)
-      case 'delete': return onKeyDownDelete(e, data, change)
-      case 'left': return onKeyDownLeft(e, data, change)
-      case 'right': return onKeyDownRight(e, data, change)
-      case 'up': return onKeyDownUp(e, data, change)
-      case 'down': return onKeyDownDown(e, data, change)
+    switch (e.key) {
+      case 'Enter': return onKeyDownEnter(e, data, change)
+      case 'Backspace': return onKeyDownBackspace(e, data, change)
+      case 'Delete': return onKeyDownDelete(e, data, change)
+      case 'ArrowLeft': return onKeyDownLeft(e, data, change)
+      case 'ArrowRight': return onKeyDownRight(e, data, change)
+      case 'ArrowUp': return onKeyDownUp(e, data, change)
+      case 'ArrowDown': return onKeyDownDown(e, data, change)
       case 'd': return onKeyDownD(e, data, change)
       case 'h': return onKeyDownH(e, data, change)
       case 'k': return onKeyDownK(e, data, change)
       case 'y': return onKeyDownY(e, data, change)
-      case 'z': return onKeyDownZ(e, data, change)
+      case 'z':
+      case 'Z': return onKeyDownZ(e, data, change)
     }
   }
 
@@ -457,9 +458,13 @@ function Plugin(options = {}) {
    */
 
   function onKeyDownBackspace(e, data, change) {
+    const isWord = IS_MAC ? e.altKey : e.ctrlKey
+    const isLine = IS_MAC ? e.metaKey : false
+
     let boundary = 'Char'
-    if (data.isWord) boundary = 'Word'
-    if (data.isLine) boundary = 'Line'
+    if (isWord) boundary = 'Word'
+    if (isLine) boundary = 'Line'
+
     change[`delete${boundary}Backward`]()
   }
 
@@ -472,9 +477,13 @@ function Plugin(options = {}) {
    */
 
   function onKeyDownDelete(e, data, change) {
+    const isWord = IS_MAC ? e.altKey : e.ctrlKey
+    const isLine = IS_MAC ? e.metaKey : false
+
     let boundary = 'Char'
-    if (data.isWord) boundary = 'Word'
-    if (data.isLine) boundary = 'Line'
+    if (isWord) boundary = 'Word'
+    if (isLine) boundary = 'Line'
+
     change[`delete${boundary}Forward`]()
   }
 
@@ -496,8 +505,8 @@ function Plugin(options = {}) {
   function onKeyDownLeft(e, data, change) {
     const { state } = change
 
-    if (data.isCtrl) return
-    if (data.isAlt) return
+    if (e.ctrlKey) return
+    if (e.altKey) return
     if (state.isExpanded) return
 
     const { document, startKey, startText } = state
@@ -519,7 +528,7 @@ function Plugin(options = {}) {
       const previousInline = document.getClosestInline(previous.key)
 
       if (previousBlock === startBlock && previousInline && !previousInline.isVoid) {
-        const extendOrMove = data.isShift ? 'extend' : 'move'
+        const extendOrMove = e.shiftKey ? 'extend' : 'move'
         change.collapseToEndOf(previous)[extendOrMove](-1)
         return
       }
@@ -552,8 +561,8 @@ function Plugin(options = {}) {
   function onKeyDownRight(e, data, change) {
     const { state } = change
 
-    if (data.isCtrl) return
-    if (data.isAlt) return
+    if (e.ctrlKey) return
+    if (e.altKey) return
     if (state.isExpanded) return
 
     const { document, startKey, startText } = state
@@ -581,7 +590,7 @@ function Plugin(options = {}) {
       const nextInline = document.getClosestInline(next.key)
 
       if (nextBlock == startBlock && nextInline) {
-        const extendOrMove = data.isShift ? 'extend' : 'move'
+        const extendOrMove = e.shiftKey ? 'extend' : 'move'
         change.collapseToStartOf(next)[extendOrMove](1)
         return
       }
@@ -604,11 +613,11 @@ function Plugin(options = {}) {
    */
 
   function onKeyDownUp(e, data, change) {
-    if (!IS_MAC || data.isCtrl || !data.isAlt) return
+    if (!IS_MAC || e.ctrlKey || !e.altKey) return
 
     const { state } = change
     const { selection, document, focusKey, focusBlock } = state
-    const transform = data.isShift ? 'extendToStartOf' : 'collapseToStartOf'
+    const transform = e.shiftKey ? 'extendToStartOf' : 'collapseToStartOf'
     const block = selection.hasFocusAtStartOf(focusBlock)
       ? document.getPreviousBlock(focusKey)
       : focusBlock
@@ -633,11 +642,11 @@ function Plugin(options = {}) {
    */
 
   function onKeyDownDown(e, data, change) {
-    if (!IS_MAC || data.isCtrl || !data.isAlt) return
+    if (!IS_MAC || e.ctrlKey || !e.altKey) return
 
     const { state } = change
     const { selection, document, focusKey, focusBlock } = state
-    const transform = data.isShift ? 'extendToEndOf' : 'collapseToEndOf'
+    const transform = e.shiftKey ? 'extendToEndOf' : 'collapseToEndOf'
     const block = selection.hasFocusAtEndOf(focusBlock)
       ? document.getNextBlock(focusKey)
       : focusBlock
@@ -658,7 +667,7 @@ function Plugin(options = {}) {
    */
 
   function onKeyDownD(e, data, change) {
-    if (!IS_MAC || !data.isCtrl) return
+    if (!IS_MAC || !e.ctrlKey || e.altKey) return
     e.preventDefault()
     change.deleteCharForward()
   }
@@ -672,7 +681,7 @@ function Plugin(options = {}) {
    */
 
   function onKeyDownH(e, data, change) {
-    if (!IS_MAC || !data.isCtrl) return
+    if (!IS_MAC || !e.ctrlKey || e.altKey) return
     e.preventDefault()
     change.deleteCharBackward()
   }
@@ -686,7 +695,7 @@ function Plugin(options = {}) {
    */
 
   function onKeyDownK(e, data, change) {
-    if (!IS_MAC || !data.isCtrl) return
+    if (!IS_MAC || !e.ctrlKey || e.altKey) return
     e.preventDefault()
     change.deleteLineForward()
   }
@@ -700,7 +709,8 @@ function Plugin(options = {}) {
    */
 
   function onKeyDownY(e, data, change) {
-    if (!data.isMod) return
+    const modKey = IS_MAC ? e.metaKey : e.ctrlKey
+    if (!modKey) return
     change.redo()
   }
 
@@ -713,8 +723,9 @@ function Plugin(options = {}) {
    */
 
   function onKeyDownZ(e, data, change) {
-    if (!data.isMod) return
-    change[data.isShift ? 'redo' : 'undo']()
+    const modKey = IS_MAC ? e.metaKey : e.ctrlKey
+    if (!modKey) return
+    change[e.shiftKey ? 'redo' : 'undo']()
   }
 
   /**
