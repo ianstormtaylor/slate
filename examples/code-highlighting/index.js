@@ -174,7 +174,7 @@ class CodeHighlighting extends React.Component {
   onKeyDown = (e, data, change) => {
     const { state } = change
     const { startBlock } = state
-    if (data.key != 'enter') return
+    if (e.key != 'Enter') return
     if (startBlock.type != 'code') return
     if (state.isExpanded) change.delete()
     return change.insertText('\n')

@@ -116,7 +116,7 @@ class CheckLists extends React.Component {
     const { state } = change
 
     if (
-      data.key == 'enter' &&
+      e.key == 'Enter' &&
       state.startBlock.type == 'check-list-item'
     ) {
       return change
@@ -125,7 +125,7 @@ class CheckLists extends React.Component {
     }
 
     if (
-      data.key == 'backspace' &&
+      e.key == 'Backspace' &&
       state.isCollapsed &&
       state.startBlock.type == 'check-list-item' &&
       state.selection.startOffset == 0

@@ -110,7 +110,7 @@ class RichTextExample extends React.Component {
     if (!data.isMod) return
     let mark
 
-    switch (data.key) {
+    switch (e.key) {
       case 'b':
         mark = 'bold'
         break

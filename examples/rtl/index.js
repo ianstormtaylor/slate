@@ -54,7 +54,7 @@ class PlainText extends React.Component {
    */
 
   onKeyDown = (e, data, change) => {
-    if (data.key == 'enter' && data.isShift) {
+    if (e.key == 'Enter' && e.shiftKey) {
       e.preventDefault()
       change.insertText('\n')
       return true

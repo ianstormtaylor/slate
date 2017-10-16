@@ -105,10 +105,10 @@ class MarkdownShortcuts extends React.Component {
    */
 
   onKeyDown = (e, data, change) => {
-    switch (data.key) {
-      case 'space': return this.onSpace(e, change)
-      case 'backspace': return this.onBackspace(e, change)
-      case 'enter': return this.onEnter(e, change)
+    switch (e.key) {
+      case ' ': return this.onSpace(e, change)
+      case 'Backspace': return this.onBackspace(e, change)
+      case 'Enter': return this.onEnter(e, change)
     }
   }
 
