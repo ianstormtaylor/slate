@@ -14,27 +14,6 @@ import Schema from './schema'
 const debug = Debug('slate:stack')
 
 /**
- * Methods that are triggered on events and can change the state.
- *
- * @type {Array}
- */
-
-const METHODS = [
-  'onBeforeInput',
-  'onBeforeChange',
-  'onBlur',
-  'onCopy',
-  'onCut',
-  'onDrop',
-  'onFocus',
-  'onKeyDown',
-  'onKeyUp',
-  'onPaste',
-  'onSelect',
-  'onChange',
-]
-
-/**
  * Default properties.
  *
  * @type {Object}
@@ -88,6 +67,27 @@ class Stack extends Record(DEFAULTS) {
 
   get kind() {
     return 'stack'
+  }
+
+  /**
+   * Invoke an event `handler` on all of the plugins, until one of them decides
+   * to stop propagation.
+   *
+   * @param {String} handler
+   * @param {Change} change
+   * @param {Editor} editor
+   * @param {Mixed} ...args
+   */
+
+  handle(handler, change, editor, ...args) {
+    debug(handler)
+
+    for (let k = 0; k < this.plugins.length; k++) {
+      const plugin = this.plugins[k]
+      if (!plugin[handler]) continue
+      const next = plugin[handler](...args, change, editor)
+      if (next != null) break
+    }
   }
 
   /**
@@ -145,28 +145,6 @@ class Stack extends Record(DEFAULTS) {
  */
 
 Stack.prototype[MODEL_TYPES.STACK] = true
-
-/**
- * Mix in the stack methods.
- *
- * @param {Change} change
- * @param {Editor} editor
- * @param {Mixed} ...args
- */
-
-for (let i = 0; i < METHODS.length; i++) {
-  const method = METHODS[i]
-  Stack.prototype[method] = function (change, editor, ...args) {
-    debug(method)
-
-    for (let k = 0; k < this.plugins.length; k++) {
-      const plugin = this.plugins[k]
-      if (!plugin[method]) continue
-      const next = plugin[method](...args, change, editor)
-      if (next != null) break
-    }
-  }
-}
 
 /**
  * Resolve a schema from a set of `plugins`.
