@@ -3,7 +3,7 @@
 import h from '../../../helpers/h'
 
 export default function (simulator) {
-  simulator.keyDown(null, { key: 'enter' })
+  simulator.keyDown({ key: 'Enter' })
 }
 
 export const input = (
