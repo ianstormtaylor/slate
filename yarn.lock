@@ -3360,6 +3360,10 @@ is-glob@^3.1.0:
   dependencies:
     is-extglob "^2.1.0"
 
+is-hotkey@^0.0.1:
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/is-hotkey/-/is-hotkey-0.0.1.tgz#d8d817209b34292551a85357e65cdbfcfa763443"
+
 is-image@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/is-image/-/is-image-1.0.1.tgz#6fd51a752a1a111506d060d952118b0b989b426e"
