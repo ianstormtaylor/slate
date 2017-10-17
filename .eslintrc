@@ -31,7 +31,6 @@
     "dot-notation": ["error", { "allowKeywords": true }],
     "eol-last": "error",
     "func-call-spacing": ["error", "never"],
-    "func-style": ["error", "declaration"],
     "import/default": "error",
     "import/export": "error",
     "import/first": "error",

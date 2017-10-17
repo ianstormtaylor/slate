@@ -33,8 +33,10 @@ class Simulator {
    * @param {Object} attrs
    */
 
-  constructor({ plugins, state }) {
+  constructor(props) {
+    const { plugins, state } = props
     const stack = new Stack({ plugins })
+    this.props = props
     this.stack = stack
     this.state = state
   }
@@ -53,13 +55,13 @@ EVENT_HANDLERS.forEach((handler) => {
     if (data == null) data = {}
 
     const { stack, state } = this
-    const editor = createEditor(stack, state)
+    const editor = createEditor(this)
     const event = createEvent(e)
     const change = state.change()
 
-    stack[handler](change, editor, event, data)
-    stack.onBeforeChange(change, editor)
-    stack.onChange(change, editor)
+    stack.handle(handler, change, editor, event, data)
+    stack.handle('onBeforeChange', change, editor)
+    stack.handle('onChange', change, editor)
 
     this.state = change.state
     return this
@@ -84,11 +86,22 @@ function getMethodName(handler) {
  * @param {State} state
  */
 
-function createEditor(stack, state) {
-  return {
+function createEditor({ stack, state, props }) {
+  const editor = {
     getSchema: () => stack.schema,
     getState: () => state,
+    props: {
+      autoCorrect: true,
+      autoFocus: false,
+      onChange: () => {},
+      readOnly: false,
+      spellCheck: true,
+      ...props,
+
+    },
   }
+
+  return editor
 }
 
 /**

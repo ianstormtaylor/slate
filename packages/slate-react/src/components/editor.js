@@ -7,7 +7,9 @@ import Types from 'prop-types'
 import logger from 'slate-dev-logger'
 import { Stack, State } from 'slate'
 
-import CorePlugin from '../plugins/core'
+import EVENT_HANDLERS from '../constants/event-handlers'
+import AfterPlugin from '../plugins/after'
+import BeforePlugin from '../plugins/before'
 import noop from '../utils/noop'
 
 /**
@@ -17,25 +19,6 @@ import noop from '../utils/noop'
  */
 
 const debug = Debug('slate:editor')
-
-/**
- * Event handlers to mix in to the editor.
- *
- * @type {Array}
- */
-
-const EVENT_HANDLERS = [
-  'onBeforeInput',
-  'onBlur',
-  'onFocus',
-  'onCopy',
-  'onCut',
-  'onDrop',
-  'onKeyDown',
-  'onKeyUp',
-  'onPaste',
-  'onSelect',
-]
 
 /**
  * Plugin-related properties of the editor.
@@ -121,22 +104,18 @@ class Editor extends React.Component {
     // Run `onBeforeChange` on the passed-in state because we need to ensure
     // that it is normalized, and queue the resulting change.
     const change = props.state.change()
-    stack.onBeforeChange(change, this)
+    stack.handle('onBeforeChange', change, this)
     const { state } = change
     this.queueChange(change)
     this.cacheState(state)
     this.state.state = state
 
     // Create a bound event handler for each event.
-    for (let i = 0; i < EVENT_HANDLERS.length; i++) {
-      const method = EVENT_HANDLERS[i]
-      this[method] = (...args) => {
-        const stk = this.state.stack
-        const c = this.state.state.change()
-        stk[method](c, this, ...args)
-        this.onChange(c)
+    EVENT_HANDLERS.forEach((handler) => {
+      this[handler] = (...args) => {
+        this.onEvent(handler, ...args)
       }
-    }
+    })
 
     if (props.onDocumentChange) {
       logger.deprecate('0.22.10', 'The `onDocumentChange` prop is deprecated because it led to confusing UX issues, see https://github.com/ianstormtaylor/slate/issues/614#issuecomment-327868679')
@@ -169,7 +148,7 @@ class Editor extends React.Component {
     // Run `onBeforeChange` on the passed-in state because we need to ensure
     // that it is normalized, and queue the resulting change.
     const change = props.state.change()
-    stack.onBeforeChange(change, this)
+    stack.handle('onBeforeChange', change, this)
     const { state } = change
     this.queueChange(change)
     this.cacheState(state)
@@ -239,7 +218,7 @@ class Editor extends React.Component {
    */
 
   blur = () => {
-    this.change(t => t.blur())
+    this.change(c => c.blur())
   }
 
   /**
@@ -247,7 +226,7 @@ class Editor extends React.Component {
    */
 
   focus = () => {
-    this.change(t => t.focus())
+    this.change(c => c.focus())
   }
 
   /**
@@ -277,9 +256,24 @@ class Editor extends React.Component {
    */
 
   change = (fn) => {
-    const change = this.state.state.change()
+    const { state } = this.state
+    const change = state.change()
     fn(change)
     debug('change', { change })
+    this.onChange(change)
+  }
+
+  /**
+   * On event.
+   *
+   * @param {String} handler
+   * @param {Mixed} ...args
+   */
+
+  onEvent = (handler, ...args) => {
+    const { stack, state } = this.state
+    const change = state.change()
+    stack.handle(handler, change, this, ...args)
     this.onChange(change)
   }
 
@@ -296,8 +290,8 @@ class Editor extends React.Component {
 
     const { stack } = this.state
 
-    stack.onBeforeChange(change, this)
-    stack.onChange(change, this)
+    stack.handle('onBeforeChange', change, this)
+    stack.handle('onChange', change, this)
 
     const { state } = change
     const { document, selection } = this.tmp
@@ -326,7 +320,11 @@ class Editor extends React.Component {
 
     debug('render', { props, state })
 
-    const tree = stack.render(state.state, this, { ...props, children })
+    const tree = stack.render(state.state, this, {
+      ...props,
+      children,
+    })
+
     return tree
   }
 
@@ -352,11 +350,13 @@ class Editor extends React.Component {
 function resolvePlugins(props) {
   // eslint-disable-next-line no-unused-vars
   const { state, onChange, plugins = [], ...overridePlugin } = props
-  const corePlugin = CorePlugin(props)
+  const beforePlugin = BeforePlugin(props)
+  const afterPlugin = AfterPlugin(props)
   return [
+    beforePlugin,
     overridePlugin,
     ...plugins,
-    corePlugin
+    afterPlugin
   ]
 }
 
