@@ -1,4 +1,14 @@
 
+import TRANSFER_TYPES from '../constants/transfer-types'
+
+/**
+ * The default plain text transfer type.
+ *
+ * @type {String}
+ */
+
+const { TEXT } = TRANSFER_TYPES
+
 /**
  * Set data with `type` and `content` on an `event`.
  *
@@ -11,6 +21,12 @@
  */
 
 function setEventTransfer(event, type, content) {
+  type = type.toUpperCase()
+
+  if (!(type in TRANSFER_TYPES)) {
+    throw new Error(`Cannot set unknown transfer type "${type}"`)
+  }
+
   if (event.nativeEvent) {
     event = event.nativeEvent
   }
@@ -21,7 +37,7 @@ function setEventTransfer(event, type, content) {
     transfer.setData(type, content)
   } catch (err) {
     const prefix = 'SLATE-DATA-EMBED::'
-    const text = transfer.getData('text/plain')
+    const text = transfer.getData(TEXT)
     let obj = {}
 
     // If the existing plain text data is prefixed, it's Slate JSON data.
@@ -35,12 +51,12 @@ function setEventTransfer(event, type, content) {
 
     // Otherwise, it's just set it as is.
     else {
-      obj['text/plain'] = text
+      obj[TEXT] = text
     }
 
     obj[type] = content
     const string = `${prefix}${JSON.stringify(obj)}`
-    transfer.setData('text/plain', string)
+    transfer.setData(TEXT, string)
   }
 }
 

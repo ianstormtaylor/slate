@@ -279,11 +279,11 @@ function BeforePlugin() {
 
     if (isVoid) {
       const encoded = Base64.serializeNode(node, { preserveKeys: true })
-      setEventTransfer(event, TRANSFER_TYPES.NODE, encoded)
+      setEventTransfer(event, 'node', encoded)
     } else {
       const { fragment } = state
       const encoded = Base64.serializeNode(fragment)
-      setEventTransfer(event, TRANSFER_TYPES.FRAGMENT, encoded)
+      setEventTransfer(event, 'fragment', encoded)
     }
 
     debug('onDragStart', { event })
