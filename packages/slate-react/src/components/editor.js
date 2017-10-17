@@ -172,6 +172,16 @@ class Editor extends React.Component {
   }
 
   /**
+   * When vDOM and DOM are out of sync, recover from current state.
+   */
+
+  componentDidCatch = () => {
+    requestAnimationFrame(() => {
+      this.componentWillReceiveProps(this.props)
+    })
+  }
+
+  /**
    * Cache a `state` object to be able to compare against it later.
    *
    * @param {State} state
