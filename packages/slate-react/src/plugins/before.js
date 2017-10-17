@@ -244,7 +244,7 @@ function BeforePlugin() {
     event.stopPropagation()
     event.preventDefault()
 
-    if (editor.props.readOnly) return
+    if (editor.props.readOnly) return true
 
     const { state } = change
     const { nativeEvent } = event
@@ -328,7 +328,7 @@ function BeforePlugin() {
    */
 
   function onKeyDown(event, data, change, editor) {
-    if (editor.props.readOnly) return
+    if (editor.props.readOnly) return true
 
     const { key } = event
 
@@ -392,7 +392,7 @@ function BeforePlugin() {
    */
 
   function onPaste(event, data, change, editor) {
-    if (editor.props.readOnly) return
+    if (editor.props.readOnly) return true
 
     event.preventDefault()
     const d = getEventTransfer(event)
@@ -416,9 +416,9 @@ function BeforePlugin() {
    */
 
   function onSelect(event, data, change, editor) {
-    if (isCopying) return
-    if (isComposing) return
-    if (editor.props.readOnly) return
+    if (isCopying) return true
+    if (isComposing) return true
+    if (editor.props.readOnly) return true
 
     const window = getWindow(event.target)
     const { state } = change
@@ -433,7 +433,7 @@ function BeforePlugin() {
     // Otherwise, determine the Slate selection from the native one.
     else {
       let range = findRange(native, state)
-      if (!range) return
+      if (!range) return true
 
       const { anchorKey, anchorOffset, focusKey, focusOffset } = range
       const anchorText = document.getNode(anchorKey)
