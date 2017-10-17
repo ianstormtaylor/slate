@@ -22,7 +22,7 @@ class App extends React.Component {
     this.setState({ state })
   }
 
-  onKeyDown = (event, data, change) => {
+  onKeyDown = (event, change) => {
     if (event.key != '&') return
     event.preventDefault()
     change.insertText('and');
@@ -84,7 +84,7 @@ class App extends React.Component {
     this.setState({ state })
   }
 
-  onKeyDown = (event, data, change) => {
+  onKeyDown = (event, change) => {
     if (event.key != '&') return
     event.preventDefault()
     change.insertText('and')
@@ -128,7 +128,7 @@ class App extends React.Component {
     this.setState({ state })
   }
 
-  onKeyDown = (event, data, change) => {
+  onKeyDown = (event, change) => {
     // Return with no changes if it's not the "`" key with cmd/ctrl pressed.
     if (event.key != '`' || !event.metaKey) return
 
@@ -178,7 +178,7 @@ class App extends React.Component {
     this.setState({ state })
   }
 
-  onKeyDown = (event, data, change) => {
+  onKeyDown = (event, change) => {
     if (event.key != '`' || !event.metaKey) return
 
     event.preventDefault()

@@ -25,7 +25,7 @@ simulator
   .beforeInput({ data: 'l' })
   .beforeInput({ data: 'o' })
   .beforeInput({ data: '!' })
-  .keyDown({}, { key: 'enter' })
+  .keyDown({ key: 'Enter' })
 
 const nextState = simulator.state
 ```
@@ -34,42 +34,42 @@ const nextState = simulator.state
 ## Methods
 
 ### `beforeInput`
-`beforeInput(event: Object, data: Object) => Simulator`
+`beforeInput(event: Object) => Simulator`
 
-Simulator a `beforeinput` event with an `event` object and `data` object.
+Simulator a `beforeinput` event with an `event` object.
 
 ### `blur`
-`blur(event: Object, data: Object) => Simulator`
+`blur(event: Object) => Simulator`
 
-Simulator a `blur` event with an `event` object and `data` object.
+Simulator a `blur` event with an `event` object.
 
 ### `copy`
-`copy(event: Object, data: Object) => Simulator`
+`copy(event: Object) => Simulator`
 
-Simulator a `copy` event with an `event` object and `data` object.
+Simulator a `copy` event with an `event` object.
 
 ### `cut`
-`cut(event: Object, data: Object) => Simulator`
+`cut(event: Object) => Simulator`
 
-Simulator a `cut` event with an `event` object and `data` object.
+Simulator a `cut` event with an `event` object.
 
 ### `drop`
-`drop(event: Object, data: Object) => Simulator`
+`drop(event: Object) => Simulator`
 
-Simulator a `drop` event with an `event` object and `data` object.
+Simulator a `drop` event with an `event` object.
 
 ### `focus`
-`focus(event: Object, data: Object) => Simulator`
+`focus(event: Object) => Simulator`
 
-Simulator a `focus` event with an `event` object and `data` object.
+Simulator a `focus` event with an `event` object.
 
 ### `keyDown`
-`keyDown(event: Object, data: Object) => Simulator`
+`keyDown(event: Object) => Simulator`
 
-Simulator a `keyDown` event with an `event` object and `data` object.
+Simulator a `keyDown` event with an `event` object.
 
 ### `select`
-`select(event: Object, data: Object) => Simulator`
+`select(event: Object) => Simulator`
 
-Simulator a `select` event with an `event` object and `data` object.
+Simulator a `select` event with an `event` object.
 

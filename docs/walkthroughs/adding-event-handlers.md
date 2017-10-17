@@ -50,7 +50,7 @@ class App extends React.Component {
   }
 
   // Define a new handler which prints the key that was pressed.
-  onKeyDown = (event, data, change) => {
+  onKeyDown = (event, change) => {
     console.log(event.key)
   }
 
@@ -84,7 +84,7 @@ class App extends React.Component {
     this.setState({ state })
   }
 
-  onKeyDown = (event, data, change) => {
+  onKeyDown = (event, change) => {
     // Return with no changes if it's not the "&" key.
     if (event.key != '&') return
 

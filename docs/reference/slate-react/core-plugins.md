@@ -1,7 +1,7 @@
 
 # Core Plugin
 
-Slate's editor is very unopinionated. The only logic it handles by default is logic associated with the `contenteditable` functionality itself—managing text, selections, etc. That logic in contained in a single plugin, called the "core" plugin.
+Slate's editor is very unopinionated. The only logic it handles by default is logic associated with the `contenteditable` functionality itself—managing text, selections, etc. That logic in contained in two plugin, called the "core" plugins. One runs before all other plugins, and one runs after.
 
 
 ## Default Behavior
@@ -64,7 +64,7 @@ However, sometimes you might want to disable the logic of the core plugin withou
 A noop `onBeforeInput` handler looks like:
 
 ```js
-function onBeforeInput(event, data, state) {
+function onBeforeInput(event, state) {
   event.preventDefault()
   return state
 }

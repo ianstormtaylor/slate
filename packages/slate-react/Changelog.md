@@ -7,6 +7,22 @@ This document maintains a list of changes to the `slate-react` package with each
 ---
 
 
+### `0.6.0` — October 16, 2017
+
+###### BREAKING
+
+- **The `data` argument to event handlers has been removed.** Previously event handlers had a signature of `(event, data, change, editor)`, but now they have a signature of just `(event, change, editor)`. This leads to simpler internal Slate logic, and less complex relationship dependencies between plugins. All of the information inside the old `data` argument can be accessed via the similar properties on the `event` argument, or via the `getEventRange`, `getEventTransfer` and `setEventTransfer` helpers.
+
+###### NEW
+
+- **Added a new `setEventTransfer` helper.** This is useful if you're working with `onDrop` or `onPaste` event and you want to set custom data in the event, to retrieve later or for others to consume. It takes a data `type` and a `value` to set the type do.
+
+- **Event handlers now have access to new events.** The `onClick`, `onCompositionEnd`, `onCompositionStart`, `onDragEnd`, `onDragEnter`, `onDragExit`, `onDragLeave`, `onDragOver`, `onDragStart`, and `onInput` events are all now newly exposed. Your plugin logic can use them to solve some more advanced use cases, and even override the internal Slate logic when necessary. 99% of use cases won't require them still, but they can be useful to have when needed.
+
+
+---
+
+
 ### `0.5.0` — October 15, 2017
 
 ###### DEPRECATED

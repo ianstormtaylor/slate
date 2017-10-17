@@ -38,125 +38,65 @@ export default function MySlatePlugin(options) {
 }
 ```
 
-All of the event handler properties are passed the same React `event` object you are used to from React's event handlers. They are also passed a `data` object with Slate-specific information relating to the event, the current `change` of the editor, and the `editor` instance itself.
+All of the event handler properties are passed the same React `event` object you are used to from React's event handlers. They are also passed a `change` object representing any changes that have resulted from the event, and the `editor` instance itself.
 
-Each event handler can choose to return a new `change` object, in which case the editor's state will be updated. If nothing is returned, the editor will simply continue resolving the plugin stack.
+Each event handler can choose to call methods on the `change` object, in which case the editor's state will be updated. 
+
+If the return value of a plugin handler is `null`, the editor will simply continue resolving the plugin stack. However, if you return a non-null value, the editor will break out of the loop.
 
 ### `onBeforeInput`
-`Function onBeforeInput(event: Event, data: Object, change: Change, editor: Editor) => Change || Void`
+`Function onBeforeInput(event: Event, change: Change, editor: Editor) => Change || Void`
 
 This handler is called right before a string of text is inserted into the `contenteditable` element.
 
-Make sure to `event.preventDefault()` if you do not want the default insertion behavior to occur! If no other plugin handles this event, it will be handled by the [Core plugin](./core.md).
+Make sure to `event.preventDefault()` if you do not want the default insertion behavior to occur!
 
 ### `onBlur`
-`Function onBlur(event: Event, data: Object, change: Change, editor: Editor) => Change || Void`
+`Function onBlur(event: Event, change: Change, editor: Editor) => Change || Void`
 
-This handler is called when the editor's `contenteditable` element is blurred. If no other plugin handles this event, it will be handled by the [Core plugin](./core.md).
+This handler is called when the editor's `contenteditable` element is blurred. 
 
 ### `onFocus`
-`Function onFocus(event: Event, data: Object, change: Change, editor: Editor) => Change || Void`
+`Function onFocus(event: Event, change: Change, editor: Editor) => Change || Void`
 
-This handler is called when the editor's `contenteditable` element is focused. If no other plugin handles this event, it will be handled by the [Core plugin](./core.md).
+This handler is called when the editor's `contenteditable` element is focused.
 
 ### `onCopy`
-`Function onCopy(event: Event, data: Object, change: Change, editor: Editor) => Change || Void`
+`Function onCopy(event: Event, change: Change, editor: Editor) => Change || Void`
 
 This handler is called when there is a copy event in the editor's `contenteditable` element.
 
-The `data` object contains a `type` string and associated data for that type. Right now the only type supported is `"fragment"`:
-
-```js
-{
-  type: 'fragment',
-  fragment: Document
-}
-```
-
-If no other plugin handles this event, it will be handled by the [Core plugin](./core.md).
-
 ### `onCut`
-`Function onCut(event: Event, data: Object, change: Change, editor: Editor) => Change || Void`
+`Function onCut(event: Event, change: Change, editor: Editor) => Change || Void`
 
-This handler is equivalent to the `onCopy` handler. If no other plugin handles this event, it will be handled by the [Core plugin](./core.md).
+This handler is equivalent to the `onCopy` handler.
 
 ### `onDrop`
-`Function onDrop(event: Event, data: Object, change: Change, editor: Editor) => Change || Void`
+`Function onDrop(event: Event, change: Change, editor: Editor) => Change || Void`
 
 This handler is called when the user drops content into the `contenteditable` element. The event is already prevented by default, so you must define a state change to have any affect occur.
 
-The `data` object is a convenience object created to standardize the drop metadata across browsers. Every data object has a `type` property, which can be one of `text`, `html` or `files`, and a `target` property which is a [`Range`](../slate/range.md) indicating where the drop occurred. Depending on the type, its structure will be:
-
-```js
-{
-  type: 'text',
-  target: Range,
-  text: String
-}
-
-{
-  type: 'html',
-  target: Range,
-  text: String,
-  html: String
-}
-
-{
-  type: 'files',
-  target: Range,
-  files: FileList
-}
-```
-
-If no other plugin handles this event, it will be handled by the [Core plugin](./core.md).
-
 ### `onKeyDown`
-`Function onKeyDown(event: Event, data: Object, change: Change, editor: Editor) => Change || Void`
+`Function onKeyDown(event: Event, change: Change, editor: Editor) => Change || Void`
 
 This handler is called when any key is pressed in the `contenteditable` element, before any action is taken.
 
-Make sure to `event.preventDefault()` if you do not want the default insertion behavior to occur! If no other plugin handles this event, it will be handled by the [Core plugin](./core.md).
+Make sure to `event.preventDefault()` if you do not want the default insertion behavior to occur!
 
 ### `onKeyUp`
-`Function onKeyUp(event: Event, data: Object, change: Change, editor: Editor) => Change || Void`
+`Function onKeyUp(event: Event, change: Change, editor: Editor) => Change || Void`
 
 This handler is called when any key is released in the `contenteditable` element.
 
 ### `onPaste`
-`Function onPaste(event: Event, data: Object, change: Change, editor: Editor) => Change || Void`
+`Function onPaste(event: Event, change: Change, editor: Editor) => Change || Void`
 
 This handler is called when the user pastes content into the `contenteditable` element. The event is already prevented by default, so you must define a state change to have any affect occur.
 
-The `data` object is a convenience object created to standardize the paste metadata across browsers. Every data object has a `type` property, which can be one of `text`, `html` or `files`. Depending on the type, it's structure will be:
-
-```js
-{
-  type: 'text',
-  text: String
-}
-
-{
-  type: 'html',
-  text: String,
-  html: String
-}
-
-{
-  type: 'files',
-  files: FileList
-}
-```
-
-If no other plugin handles this event, it will be handled by the [Core plugin](./core.md).
-
 ### `onSelect`
-`Function onSelect(event: Event, data: Object, change: Change, editor: Editor) => Change || Void`
+`Function onSelect(event: Event, change: Change, editor: Editor) => Change || Void`
 
-This handler is called whenever the native DOM selection changes.
-
-The `data` object contains a [`Range`](../slate/range.md) object representing the new selection.
-
-If no other plugin handles this event, it will be handled by the [Core plugin](./core.md).
+This handler is called whenever the native DOM selection changes. 
 
 _Note: This is **not** Slate's internal selection representation (although it mirrors it). If you want to get notified when Slate's selection changes, use the [`onChange`](../slate-react/editor.md#onchange) property of the `<Editor>`. This handler is instead meant to give you lower-level access to the DOM selection handling, which **is not always triggered** as you'd expect._
 

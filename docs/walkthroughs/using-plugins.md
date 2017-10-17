@@ -29,7 +29,7 @@ class App extends React.Component {
     this.setState({ state })
   }
 
-  onKeyDown = (event, data, change) => {
+  onKeyDown = (event, change) => {
     if (event.key != 'b' || !event.metaKey) return
     event.preventDefault()
     change.toggleMark('bold')
@@ -71,7 +71,7 @@ function MarkHotkey(options) {
 
   // Return our "plugin" object, containing the `onKeyDown` handler.
   return {
-    onKeyDown(event, data, change) {
+    onKeyDown(event, change) {
       // Check that the key pressed matches our `key` option.
       if (!event.metaKey || event.key != key) return
 
