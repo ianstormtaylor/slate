@@ -276,7 +276,18 @@ class RichTextExample extends React.Component {
    */
 
   renderBlockButton = (type, icon) => {
-    const isActive = this.hasBlock(type)
+    let isActive = false
+    if (type != 'bulleted-list' && type != 'numbered-list') {
+      isActive = this.hasBlock(type)
+    } else {
+      const { blocks, document } = this.state.state
+      const isType = blocks.some((block) => {
+        return !!document.getClosest(block.key, parent => parent.type == type)
+      })
+      if (isType) {
+        isActive = true
+      }
+    }
     const onMouseDown = e => this.onClickBlock(e, type)
 
     return (
