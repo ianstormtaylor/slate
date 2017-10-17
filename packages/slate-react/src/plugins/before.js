@@ -8,7 +8,6 @@ import { findDOMNode } from 'react-dom'
 
 import HOTKEYS from '../constants/hotkeys'
 import TRANSFER_TYPES from '../constants/transfer-types'
-import findClosestNode from '../utils/find-closest-node'
 import findRange from '../utils/find-range'
 import getTransferData from '../utils/get-transfer-data'
 import setTransferData from '../utils/set-transfer-data'
@@ -210,7 +209,6 @@ function BeforePlugin() {
    */
 
   function onDragStart(event, data, change, editor) {
-
     isDragging = true
     isInternalDrag = true
 
