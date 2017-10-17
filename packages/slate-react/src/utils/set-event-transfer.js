@@ -1,21 +1,27 @@
 
 /**
- * Set data with `type` and `content` on a `dataTransfer` object.
+ * Set data with `type` and `content` on an `event`.
  *
  * COMPAT: In Edge, custom types throw errors, so embed all non-standard
  * types in text/plain compound object. (2017/7/12)
  *
- * @param {DataTransfer} dataTransfer
+ * @param {Event} event
  * @param {String} type
  * @param {String} content
  */
 
-function setTransferData(dataTransfer, type, content) {
+function setEventTransfer(event, type, content) {
+  if (event.nativeEvent) {
+    event = event.nativeEvent
+  }
+
+  const transfer = event.dataTransfer || event.clipboardData
+
   try {
-    dataTransfer.setData(type, content)
+    transfer.setData(type, content)
   } catch (err) {
     const prefix = 'SLATE-DATA-EMBED::'
-    const text = dataTransfer.getData('text/plain')
+    const text = transfer.getData('text/plain')
     let obj = {}
 
     // If the existing plain text data is prefixed, it's Slate JSON data.
@@ -34,7 +40,7 @@ function setTransferData(dataTransfer, type, content) {
 
     obj[type] = content
     const string = `${prefix}${JSON.stringify(obj)}`
-    dataTransfer.setData('text/plain', string)
+    transfer.setData('text/plain', string)
   }
 }
 
@@ -44,4 +50,4 @@ function setTransferData(dataTransfer, type, content) {
  * @type {Function}
  */
 
-export default setTransferData
+export default setEventTransfer

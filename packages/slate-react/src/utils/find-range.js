@@ -15,6 +15,8 @@ import findPoint from './find-point'
 
 function findRange(native, state) {
   const el = native.anchorNode || native.startContainer
+  if (!el) return null
+
   const window = getWindow(el)
 
   // If the `native` object is a DOM `Range` or `StaticRange` object, change it

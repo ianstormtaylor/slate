@@ -38,6 +38,13 @@ const CONTENTEDITABLE = e => (
   UNDO(e)
 )
 
+const COMPOSING = e => (
+  e.key == 'ArrowDown' ||
+  e.key == 'ArrowLeft' ||
+  e.key == 'ArrowRight' ||
+  e.key == 'ArrowUp'
+)
+
 /**
  * Export.
  *
@@ -46,6 +53,7 @@ const CONTENTEDITABLE = e => (
 
 export default {
   BOLD,
+  COMPOSING,
   CONTENTEDITABLE,
   DELETE_CHAR_BACKWARD,
   DELETE_CHAR_FORWARD,
