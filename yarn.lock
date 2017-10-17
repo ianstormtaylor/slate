@@ -1601,10 +1601,6 @@ compare-func@^1.3.1:
     array-ify "^1.0.0"
     dot-prop "^3.0.0"
 
-component-type@^1.2.1:
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/component-type/-/component-type-1.2.1.tgz#8a47901700238e4fc32269771230226f24b415a9"
-
 concat-map@0.0.1:
   version "0.0.1"
   resolved "https://registry.yarnpkg.com/concat-map/-/concat-map-0.0.1.tgz#d8a96bd77fd68df7793a73036a3ba0d5405d477b"
@@ -2242,10 +2238,6 @@ es6-weak-map@^2.0.1:
     es5-ext "^0.10.14"
     es6-iterator "^2.0.1"
     es6-symbol "^3.1.1"
-
-escape-regex-string@^1.0.4:
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/escape-regex-string/-/escape-regex-string-1.0.4.tgz#3a35d77e209d26b6724bc1e8dcd4120b175b88dd"
 
 escape-regexp-component@^1.0.2:
   version "1.0.2"
@@ -5504,22 +5496,15 @@ slash@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/slash/-/slash-1.0.0.tgz#c41f2f6c39fc16d1cd17ad4b5d896114ae470d55"
 
-slate-auto-replace-text@^0.3.0:
-  version "0.3.1"
-  resolved "https://registry.yarnpkg.com/slate-auto-replace-text/-/slate-auto-replace-text-0.3.1.tgz#3e5ed40e2fc36e84f090a75a47377028a588bec8"
-  dependencies:
-    component-type "^1.2.1"
-    escape-regex-string "^1.0.4"
-
-slate-collapse-on-escape@^0.2.0:
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/slate-collapse-on-escape/-/slate-collapse-on-escape-0.2.1.tgz#988f474439f0a21f94cc0016da52ea3c1a061100"
+slate-collapse-on-escape@^0.5.0:
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/slate-collapse-on-escape/-/slate-collapse-on-escape-0.5.0.tgz#4eee1d8e7d065dc2eed5bbcf78d5fa3dba5b1c95"
   dependencies:
     to-pascal-case "^1.0.0"
 
-slate-soft-break@^0.2.0:
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/slate-soft-break/-/slate-soft-break-0.2.1.tgz#88a37cb6832afee2d6d9b55af213ea37bbaec586"
+slate-soft-break@^0.5.0:
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/slate-soft-break/-/slate-soft-break-0.5.0.tgz#f1c14f4bcf01ba534f285c59d5a9be52b42c3c5e"
 
 slate-sugar@^0.6.1:
   version "0.6.1"

@@ -43,7 +43,7 @@
 - [Placeholder](./reference/slate-react/placeholder.md)
 - [Custom Nodes](./reference/slate-react/custom-nodes.md)
 - [Plugins](./reference/slate-react/plugins.md)
-- [Core Plugin](./reference/slate-react/core-plugin.md)
+- [Core Plugins](./reference/slate-react/core-plugins.md)
 - [findDOMNode](./reference/slate-react/utils.md)
 
 
