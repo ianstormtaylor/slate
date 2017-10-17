@@ -7,6 +7,7 @@ import getWindow from 'get-window'
 import { Block, Inline, coreSchema } from 'slate'
 
 import EVENT_HANDLERS from '../constants/event-handlers'
+import HOTKEYS from '../constants/hotkeys'
 import Content from '../components/content'
 import Placeholder from '../components/placeholder'
 import findDOMNode from '../utils/find-dom-node'
@@ -464,12 +465,26 @@ function AfterPlugin(options = {}) {
       case 'ArrowRight': return onKeyDownRight(event, data, change)
       case 'ArrowUp': return onKeyDownUp(event, data, change)
       case 'ArrowDown': return onKeyDownDown(event, data, change)
-      case 'd': return onKeyDownD(event, data, change)
-      case 'h': return onKeyDownH(event, data, change)
-      case 'k': return onKeyDownK(event, data, change)
-      case 'y': return onKeyDownY(event, data, change)
-      case 'z':
-      case 'Z': return onKeyDownZ(event, data, change)
+    }
+
+    if (HOTKEYS.DELETE_CHAR_BACKWARD(event)) {
+      change.deleteCharBackward()
+    }
+
+    if (HOTKEYS.DELETE_CHAR_FORWARD(event)) {
+      change.deleteCharForward()
+    }
+
+    if (HOTKEYS.DELETE_LINE_FORWARD(event)) {
+      change.deleteLineForward()
+    }
+
+    if (HOTKEYS.REDO(event)) {
+      change.redo()
+    }
+
+    if (HOTKEYS.UNDO(event)) {
+      change.undo()
     }
   }
 
@@ -705,76 +720,6 @@ function AfterPlugin(options = {}) {
 
     event.preventDefault()
     change[transform](text)
-  }
-
-  /**
-   * On `d` key down, for Macs, delete one character forward.
-   *
-   * @param {Event} event
-   * @param {Object} data
-   * @param {Change} change
-   */
-
-  function onKeyDownD(event, data, change) {
-    if (!IS_MAC || !event.ctrlKey || event.altKey) return
-    event.preventDefault()
-    change.deleteCharForward()
-  }
-
-  /**
-   * On `h` key down, for Macs, delete until the end of the line.
-   *
-   * @param {Event} event
-   * @param {Object} data
-   * @param {Change} change
-   */
-
-  function onKeyDownH(event, data, change) {
-    if (!IS_MAC || !event.ctrlKey || event.altKey) return
-    event.preventDefault()
-    change.deleteCharBackward()
-  }
-
-  /**
-   * On `k` key down, for Macs, delete until the end of the line.
-   *
-   * @param {Event} event
-   * @param {Object} data
-   * @param {Change} change
-   */
-
-  function onKeyDownK(event, data, change) {
-    if (!IS_MAC || !event.ctrlKey || event.altKey) return
-    event.preventDefault()
-    change.deleteLineForward()
-  }
-
-  /**
-   * On `y` key down, redo.
-   *
-   * @param {Event} event
-   * @param {Object} data
-   * @param {Change} change
-   */
-
-  function onKeyDownY(event, data, change) {
-    const modKey = IS_MAC ? event.metaKey : event.ctrlKey
-    if (!modKey) return
-    change.redo()
-  }
-
-  /**
-   * On `z` key down, undo or redo.
-   *
-   * @param {Event} event
-   * @param {Object} data
-   * @param {Change} change
-   */
-
-  function onKeyDownZ(event, data, change) {
-    const modKey = IS_MAC ? event.metaKey : event.ctrlKey
-    if (!modKey) return
-    change[event.shiftKey ? 'redo' : 'undo']()
   }
 
   /**

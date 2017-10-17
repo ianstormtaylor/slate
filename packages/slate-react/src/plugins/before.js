@@ -6,6 +6,7 @@ import keycode from 'keycode'
 import logger from 'slate-dev-logger'
 import { findDOMNode } from 'react-dom'
 
+import HOTKEYS from '../constants/hotkeys'
 import TRANSFER_TYPES from '../constants/transfer-types'
 import findClosestNode from '../utils/find-closest-node'
 import findRange from '../utils/find-range'
@@ -369,6 +370,8 @@ function BeforePlugin() {
     if (editor.props.readOnly) return
     if (isNotEditable(event.target, editor)) return
 
+    const { key } = event
+
     // When composing, these characters commit the composition but also move the
     // selection before we're able to handle it, so prevent their default,
     // selection-moving behavior.
@@ -380,11 +383,11 @@ function BeforePlugin() {
       return true
     }
 
-    const { key, metaKey, ctrlKey } = event
-    const modKey = IS_MAC ? metaKey : ctrlKey
-
-    // COMPAT: add the deprecated keyboard event properties.
-    addDeprecatedKeyProperties(data, event)
+    // Certain hotkeys have native behavior in contenteditable elements which
+    // will cause our state to be out of sync, so prevent them.
+    if (HOTKEYS.CONTENTEDITABLE(event)) {
+      event.preventDefault()
+    }
 
     // Keep track of an `isShifting` flag, because it's often used to trigger
     // "Paste and Match Style" commands, but isn't available on the event in a
@@ -393,20 +396,8 @@ function BeforePlugin() {
       isShifting = true
     }
 
-    // These key commands have native behavior in contenteditable elements which
-    // will cause our state to be out of sync, so prevent them.
-    if (
-      (key == 'Enter') ||
-      (key == 'Backspace') ||
-      (key == 'Delete') ||
-      (key == 'b' && modKey) ||
-      (key == 'i' && modKey) ||
-      (key == 'y' && modKey) ||
-      (key == 'z' && modKey) ||
-      (key == 'Z' && modKey)
-    ) {
-      event.preventDefault()
-    }
+    // COMPAT: add the deprecated keyboard event properties.
+    addDeprecatedKeyProperties(data, event)
 
     debug('onKeyDown', { event })
   }
