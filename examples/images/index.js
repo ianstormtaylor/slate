@@ -175,11 +175,11 @@ class Images extends React.Component {
   /**
    * On clicking the image button, prompt for an image and insert it.
    *
-   * @param {Event} e
+   * @param {Event} event
    */
 
-  onClickImage = (e) => {
-    e.preventDefault()
+  onClickImage = (event) => {
+    event.preventDefault()
     const src = window.prompt('Enter the URL of the image:')
     if (!src) return
 
@@ -193,17 +193,16 @@ class Images extends React.Component {
   /**
    * On drop, insert the image wherever it is dropped.
    *
-   * @param {Event} e
-   * @param {Object} data
+   * @param {Event} event
    * @param {Change} change
    * @param {Editor} editor
    */
 
-  onDropOrPaste = (e, data, change, editor) => {
-    const target = getEventRange(e)
+  onDropOrPaste = (event, change, editor) => {
+    const target = getEventRange(event)
     if (!target) return
 
-    const transfer = getEventTransfer(e)
+    const transfer = getEventTransfer(event)
     const { type, text, files } = transfer
 
     if (type == 'files') {

@@ -174,13 +174,12 @@ class PasteHtml extends React.Component {
   /**
    * On paste, deserialize the HTML and then insert the fragment.
    *
-   * @param {Event} e
-   * @param {Object} data
+   * @param {Event} event
    * @param {Change} change
    */
 
-  onPaste = (e, data, change) => {
-    const transfer = getEventTransfer(e)
+  onPaste = (event, change) => {
+    const transfer = getEventTransfer(event)
     if (transfer.type != 'html') return
     const { document } = serializer.deserialize(transfer.html)
     change.insertFragment(document)

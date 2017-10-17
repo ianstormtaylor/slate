@@ -48,14 +48,13 @@ class PlainText extends React.Component {
   /**
    * On key down, if it's <shift-enter> add a soft break.
    *
-   * @param {Event} e
-   * @param {Object} data
+   * @param {Event} event
    * @param {Change} change
    */
 
-  onKeyDown = (e, data, change) => {
-    if (e.key == 'Enter' && e.shiftKey) {
-      e.preventDefault()
+  onKeyDown = (event, change) => {
+    if (event.key == 'Enter' && event.shiftKey) {
+      event.preventDefault()
       change.insertText('\n')
       return true
     }

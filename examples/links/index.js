@@ -92,11 +92,11 @@ class Links extends React.Component {
    * When clicking a link, if the selection has a link in it, remove the link.
    * Otherwise, add a new link with an href and text.
    *
-   * @param {Event} e
+   * @param {Event} event
    */
 
-  onClickLink = (e) => {
-    e.preventDefault()
+  onClickLink = (event) => {
+    event.preventDefault()
     const { state } = this.state
     const hasLinks = this.hasLinks()
     const change = state.change()
@@ -125,15 +125,14 @@ class Links extends React.Component {
   /**
    * On paste, if the text is a link, wrap the selection in a link.
    *
-   * @param {Event} e
-   * @param {Object} data
+   * @param {Event} event
    * @param {Change} change
    */
 
-  onPaste = (e, data, change) => {
+  onPaste = (event, change) => {
     if (change.state.isCollapsed) return
 
-    const transfer = getEventTransfer(e)
+    const transfer = getEventTransfer(event)
     const { type, text } = transfer
     if (type != 'text' && type != 'html') return
     if (!isUrl(text)) return

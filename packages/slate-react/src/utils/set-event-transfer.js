@@ -21,10 +21,10 @@ const { TEXT } = TRANSFER_TYPES
  */
 
 function setEventTransfer(event, type, content) {
-  type = type.toUpperCase()
+  const mime = TRANSFER_TYPES[type.toUpperCase()]
 
-  if (!(type in TRANSFER_TYPES)) {
-    throw new Error(`Cannot set unknown transfer type "${type}"`)
+  if (!mime) {
+    throw new Error(`Cannot set unknown transfer type "${mime}"`)
   }
 
   if (event.nativeEvent) {
@@ -34,7 +34,7 @@ function setEventTransfer(event, type, content) {
   const transfer = event.dataTransfer || event.clipboardData
 
   try {
-    transfer.setData(type, content)
+    transfer.setData(mime, content)
   } catch (err) {
     const prefix = 'SLATE-DATA-EMBED::'
     const text = transfer.getData(TEXT)
@@ -54,7 +54,7 @@ function setEventTransfer(event, type, content) {
       obj[TEXT] = text
     }
 
-    obj[type] = content
+    obj[mime] = content
     const string = `${prefix}${JSON.stringify(obj)}`
     transfer.setData(TEXT, string)
   }

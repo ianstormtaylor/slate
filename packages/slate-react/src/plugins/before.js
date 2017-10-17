@@ -88,7 +88,7 @@ function BeforePlugin() {
     const { state } = change
     const { document } = state
     const node = findNode(event.target, state)
-    const isVoid = node && (node.isVoid || document.hasParentVoid(node.key))
+    const isVoid = node && (node.isVoid || document.hasVoidParent(node.key))
 
     if (isVoid) {
       // COMPAT: In Chrome & Safari, selections that are at the zero offset of
@@ -275,7 +275,7 @@ function BeforePlugin() {
     const { state } = change
     const { document } = state
     const node = findNode(event.target, state)
-    const isVoid = node && (node.isVoid || document.hasParentVoid(node.key))
+    const isVoid = node && (node.isVoid || document.hasVoidParent(node.key))
 
     if (isVoid) {
       const encoded = Base64.serializeNode(node, { preserveKeys: true })

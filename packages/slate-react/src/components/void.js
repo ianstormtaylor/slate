@@ -71,7 +71,7 @@ class Void extends React.Component {
     this.debug('render', { props })
 
     return (
-      <Tag data-slate-void data-key={node.key}>
+      <Tag data-slate-void data-key={node.key} draggable>
         {!readOnly && <Tag style={style}>
           {this.renderText()}
         </Tag>}

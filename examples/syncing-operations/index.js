@@ -105,28 +105,27 @@ class SyncingEditor extends React.Component {
   /**
    * On key down, if it's a formatting command toggle a mark.
    *
-   * @param {Event} e
-   * @param {Object} data
+   * @param {Event} event
    * @param {Change} change
    * @return {Change}
    */
 
-  onKeyDown = (e, data, change) => {
+  onKeyDown = (event, change) => {
     let mark
 
-    if (isBoldHotkey(e)) {
+    if (isBoldHotkey(event)) {
       mark = 'bold'
-    } else if (isItalicHotkey(e)) {
+    } else if (isItalicHotkey(event)) {
       mark = 'italic'
-    } else if (isUnderlinedHotkey(e)) {
+    } else if (isUnderlinedHotkey(event)) {
       mark = 'underlined'
-    } else if (isCodeHotkey(e)) {
+    } else if (isCodeHotkey(event)) {
       mark = 'code'
     } else {
       return
     }
 
-    e.preventDefault()
+    event.preventDefault()
     change.toggleMark(mark)
     return true
   }
@@ -134,12 +133,12 @@ class SyncingEditor extends React.Component {
   /**
    * When a mark button is clicked, toggle the current mark.
    *
-   * @param {Event} e
+   * @param {Event} event
    * @param {String} type
    */
 
-  onClickMark = (e, type) => {
-    e.preventDefault()
+  onClickMark = (event, type) => {
+    event.preventDefault()
     const { state } = this.state
     const change = state.change().toggleMark(type)
     this.onChange(change)
@@ -187,7 +186,7 @@ class SyncingEditor extends React.Component {
 
   renderButton = (type, icon) => {
     const isActive = this.hasMark(type)
-    const onMouseDown = e => this.onClickMark(e, type)
+    const onMouseDown = event => this.onClickMark(event, type)
 
     return (
       <span className="button" onMouseDown={onMouseDown} data-active={isActive}>
