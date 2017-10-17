@@ -295,7 +295,7 @@ function AfterPlugin(options = {}) {
     debug('onDrop', { event })
 
     const { state } = change
-    const { selection } = state
+    const { document, selection } = state
     let target = getEventRange(event, state)
     if (!target) return
 
