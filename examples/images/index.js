@@ -1,5 +1,5 @@
 
-import { Editor } from 'slate-react'
+import { Editor, getEventRange, getEventTransfer } from 'slate-react'
 import { Block, State } from 'slate'
 
 import React from 'react'
@@ -199,65 +199,34 @@ class Images extends React.Component {
    * @param {Editor} editor
    */
 
-  onDrop = (e, data, change, editor) => {
-    switch (data.type) {
-      case 'files': return this.onDropOrPasteFiles(e, data, change, editor)
-    }
-  }
+  onDropOrPaste = (e, data, change, editor) => {
+    const target = getEventRange(e)
+    if (!target) return
 
-  /**
-   * On drop or paste files, read and insert the image files.
-   *
-   * @param {Event} e
-   * @param {Object} data
-   * @param {Change} change
-   * @param {Editor} editor
-   */
+    const transfer = getEventTransfer(e)
+    const { type, text, files } = transfer
 
-  onDropOrPasteFiles = (e, data, change, editor) => {
-    for (const file of data.files) {
-      const reader = new FileReader()
-      const [ type ] = file.type.split('/')
-      if (type != 'image') continue
+    if (type == 'files') {
+      for (const file of files) {
+        const reader = new FileReader()
+        const [ mime ] = file.type.split('/')
+        if (mime != 'image') continue
 
-      reader.addEventListener('load', () => {
-        editor.change((t) => {
-          t.call(insertImage, reader.result, data.target)
+        reader.addEventListener('load', () => {
+          editor.change((c) => {
+            c.call(insertImage, reader.result, target)
+          })
         })
-      })
 
-      reader.readAsDataURL(file)
+        reader.readAsDataURL(file)
+      }
     }
-  }
 
-  /**
-   * On paste, if the pasted content is an image URL, insert it.
-   *
-   * @param {Event} e
-   * @param {Object} data
-   * @param {Change} change
-   * @param {Editor} editor
-   */
-
-  onPaste = (e, data, change, editor) => {
-    switch (data.type) {
-      case 'files': return this.onDropOrPasteFiles(e, data, change, editor)
-      case 'text': return this.onPasteText(e, data, change)
+    if (type == 'text') {
+      if (!isUrl(text)) return
+      if (!isImage(text)) return
+      change.call(insertImage, text, target)
     }
-  }
-
-  /**
-   * On paste text, if the pasted content is an image URL, insert it.
-   *
-   * @param {Event} e
-   * @param {Object} data
-   * @param {Change} change
-   */
-
-  onPasteText = (e, data, change) => {
-    if (!isUrl(data.text)) return
-    if (!isImage(data.text)) return
-    change.call(insertImage, data.text, data.target)
   }
 
 }

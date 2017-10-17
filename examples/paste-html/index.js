@@ -1,6 +1,6 @@
 
 import Html from 'slate-html-serializer'
-import { Editor } from 'slate-react'
+import { Editor, getEventTransfer } from 'slate-react'
 import { State } from 'slate'
 
 import React from 'react'
@@ -180,9 +180,9 @@ class PasteHtml extends React.Component {
    */
 
   onPaste = (e, data, change) => {
-    if (data.type != 'html') return
-    if (data.isShift) return
-    const { document } = serializer.deserialize(data.html)
+    const transfer = getEventTransfer(e)
+    if (transfer.type != 'html') return
+    const { document } = serializer.deserialize(transfer.html)
     change.insertFragment(document)
     return true
   }

@@ -12,13 +12,18 @@ import TRANSFER_TYPES from '../constants/transfer-types'
 const FRAGMENT_MATCHER = / data-slate-fragment="([^\s"]+)"/
 
 /**
- * Get the data and type from a native data `transfer`.
+ * Get the transfer data from an `event`.
  *
- * @param {DataTransfer} transfer
+ * @param {Event} event
  * @return {Object}
  */
 
-function getTransferData(transfer) {
+function getEventTransfer(event) {
+  if (event.nativeEvent) {
+    event = event.nativeEvent
+  }
+
+  const transfer = event.dataTransfer || event.clipboardData
   let fragment = getType(transfer, TRANSFER_TYPES.FRAGMENT)
   let node = getType(transfer, TRANSFER_TYPES.NODE)
   const html = getType(transfer, 'text/html')
@@ -148,4 +153,4 @@ function getType(transfer, type) {
  * @type {Function}
  */
 
-export default getTransferData
+export default getEventTransfer
