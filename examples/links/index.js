@@ -1,5 +1,5 @@
 
-import { Editor } from 'slate-react'
+import { Editor, getEventTransfer } from 'slate-react'
 import { State } from 'slate'
 
 import React from 'react'
@@ -132,14 +132,17 @@ class Links extends React.Component {
 
   onPaste = (e, data, change) => {
     if (change.state.isCollapsed) return
-    if (data.type != 'text' && data.type != 'html') return
-    if (!isUrl(data.text)) return
+
+    const transfer = getEventTransfer(e)
+    const { type, text } = transfer
+    if (type != 'text' && type != 'html') return
+    if (!isUrl(text)) return
 
     if (this.hasLinks()) {
       change.call(unwrapLink)
     }
 
-    change.call(wrapLink, data.text)
+    change.call(wrapLink, text)
     return true
   }
 

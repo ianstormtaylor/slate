@@ -12,6 +12,9 @@ import Content from '../components/content'
 import Placeholder from '../components/placeholder'
 import findDOMNode from '../utils/find-dom-node'
 import findPoint from '../utils/find-point'
+import findRange from '../utils/find-range'
+import getEventRange from '../utils/get-event-range'
+import getEventTransfer from '../utils/get-event-transfer'
 import { IS_CHROME, IS_MAC, IS_SAFARI } from '../constants/environment'
 
 /**
@@ -38,6 +41,8 @@ function AfterPlugin(options = {}) {
     placeholderClassName,
     placeholderStyle,
   } = options
+
+  let isDraggingInternally = null
 
   /**
    * On before change, enforce the editor's schema.
@@ -143,7 +148,7 @@ function AfterPlugin(options = {}) {
 
     // Create a fake selection so that we can add a Base64-encoded copy of the
     // fragment to the HTML, to decode on future pastes.
-    const { fragment } = data
+    const { fragment } = state
     const encoded = Base64.serializeNode(fragment)
     const range = native.getRangeAt(0)
     let contents = range.cloneContents()
@@ -234,6 +239,51 @@ function AfterPlugin(options = {}) {
   }
 
   /**
+   * On drag end.
+   *
+   * @param {Event} event
+   * @param {Object} data
+   * @param {Change} change
+   * @param {Editor} editor
+   */
+
+  function onDragEnd(event, data, change, editor) {
+    debug('onDragEnd', { event })
+
+    isDraggingInternally = null
+  }
+
+  /**
+   * On drag over.
+   *
+   * @param {Event} event
+   * @param {Object} data
+   * @param {Change} change
+   * @param {Editor} editor
+   */
+
+  function onDragOver(event, data, change, editor) {
+    debug('onDragOver', { event })
+
+    isDraggingInternally = false
+  }
+
+  /**
+   * On drag start.
+   *
+   * @param {Event} event
+   * @param {Object} data
+   * @param {Change} change
+   * @param {Editor} editor
+   */
+
+  function onDragStart(event, data, change, editor) {
+    debug('onDragStart', { event })
+
+    isDraggingInternally = true
+  }
+
+  /**
    * On drop.
    *
    * @param {Event} event
@@ -241,39 +291,23 @@ function AfterPlugin(options = {}) {
    * @param {Change} change
    */
 
-  function onDrop(event, data, change) {
-    debug('onDrop', { data })
-
-    switch (data.type) {
-      case 'text':
-      case 'html':
-        return onDropText(event, data, change)
-      case 'fragment':
-        return onDropFragment(event, data, change)
-      case 'node':
-        return onDropNode(event, data, change)
-    }
-  }
-
-  /**
-   * On drop node.
-   *
-   * @param {Event} event
-   * @param {Object} data
-   * @param {Change} change
-   */
-
-  function onDropNode(event, data, change) {
-    debug('onDropNode', { data })
+  function onDrop(event, data, change, editor) {
+    debug('onDrop', { event })
 
     const { state } = change
     const { selection } = state
-    let { node, target, isInternal } = data
+    let target = getEventRange(event, state)
+    if (!target) return
+
+    const transfer = getEventTransfer(event)
+    const { type, fragment, node, text } = transfer
+
+    change.focus()
 
     // If the drag is internal and the target is after the selection, it
     // needs to account for the selection's content being deleted.
     if (
-      isInternal &&
+      isDraggingInternally &&
       selection.endKey == target.endKey &&
       selection.endOffset < target.endOffset
     ) {
@@ -282,103 +316,47 @@ function AfterPlugin(options = {}) {
         : 0 - selection.endOffset)
     }
 
-    if (isInternal) {
+    if (isDraggingInternally) {
       change.delete()
     }
 
-    if (Block.isBlock(node)) {
-      change
-        .select(target)
-        .focus()
-        .insertBlock(node)
-        .removeNodeByKey(node.key)
-    }
+    change.select(target)
 
-    if (Inline.isInline(node)) {
-      change
-        .select(target)
-        .focus()
-        .insertInline(node)
-        .removeNodeByKey(node.key)
-    }
-  }
+    if (type == 'text' || type == 'html') {
+      const { anchorKey } = target
+      let hasVoidParent = document.hasVoidParent(anchorKey)
 
-  /**
-   * On drop fragment.
-   *
-   * @param {Event} event
-   * @param {Object} data
-   * @param {Change} change
-   */
+      if (hasVoidParent) {
+        let n = document.getNode(anchorKey)
 
-  function onDropFragment(event, data, change) {
-    debug('onDropFragment', { data })
+        while (hasVoidParent) {
+          n = document.getNextText(n.key)
+          if (!n) break
+          hasVoidParent = document.hasVoidParent(n.key)
+        }
 
-    const { state } = change
-    const { selection } = state
-    let { fragment, target, isInternal } = data
-
-    // If the drag is internal and the target is after the selection, it
-    // needs to account for the selection's content being deleted.
-    if (
-      isInternal &&
-      selection.endKey == target.endKey &&
-      selection.endOffset < target.endOffset
-    ) {
-      target = target.move(selection.startKey == selection.endKey
-        ? 0 - selection.endOffset + selection.startOffset
-        : 0 - selection.endOffset)
-    }
-
-    if (isInternal) {
-      change.delete()
-    }
-
-    change
-      .select(target)
-      .focus()
-      .insertFragment(fragment)
-  }
-
-  /**
-   * On drop text.
-   *
-   * @param {Event} event
-   * @param {Object} data
-   * @param {Change} change
-   */
-
-  function onDropText(event, data, change) {
-    debug('onDropText', { data })
-
-    const { state } = change
-    const { document } = state
-    const { text, target } = data
-    const { anchorKey } = target
-
-    change.select(target).focus()
-
-    let hasVoidParent = document.hasVoidParent(anchorKey)
-
-    // Insert text into nearest text node
-    if (hasVoidParent) {
-      let node = document.getNode(anchorKey)
-
-      while (hasVoidParent) {
-        node = document.getNextText(node.key)
-        if (!node) break
-        hasVoidParent = document.hasVoidParent(node.key)
+        if (n) change.collapseToStartOf(n)
       }
 
-      if (node) change.collapseToStartOf(node)
+      text
+        .split('\n')
+        .forEach((line, i) => {
+          if (i > 0) change.splitBlock()
+          change.insertText(line)
+        })
     }
 
-    text
-      .split('\n')
-      .forEach((line, i) => {
-        if (i > 0) change.splitBlock()
-        change.insertText(line)
-      })
+    if (type == 'fragment') {
+      change.insertFragment(fragment)
+    }
+
+    if (type == 'node' && Block.isBlock(node)) {
+      change.insertBlock(node).removeNodeByKey(node.key)
+    }
+
+    if (type == 'node' && Inline.isInline(node)) {
+      change.insertInline(node).removeNodeByKey(node.key)
+    }
   }
 
   /**
@@ -733,48 +711,23 @@ function AfterPlugin(options = {}) {
   function onPaste(event, data, change) {
     debug('onPaste', { data })
 
-    switch (data.type) {
-      case 'fragment':
-        return onPasteFragment(event, data, change)
-      case 'text':
-      case 'html':
-        return onPasteText(event, data, change)
+    const transfer = getEventTransfer(event)
+    const { type, fragment, text } = transfer
+
+    if (type == 'fragment') {
+      change.insertFragment(fragment)
     }
-  }
 
-  /**
-   * On paste fragment.
-   *
-   * @param {Event} event
-   * @param {Object} data
-   * @param {Change} change
-   */
+    if (type == 'text' || type == 'html') {
+      const { state } = change
+      const { document, selection, startBlock } = state
+      if (startBlock.isVoid) return
 
-  function onPasteFragment(event, data, change) {
-    debug('onPasteFragment', { data })
-    change.insertFragment(data.fragment)
-  }
-
-  /**
-   * On paste text, split blocks at new lines.
-   *
-   * @param {Event} event
-   * @param {Object} data
-   * @param {Change} change
-   */
-
-  function onPasteText(event, data, change) {
-    debug('onPasteText', { data })
-
-    const { state } = change
-    const { document, selection, startBlock } = state
-    if (startBlock.isVoid) return
-
-    const { text } = data
-    const defaultBlock = startBlock
-    const defaultMarks = document.getMarksAtRange(selection.collapseToStart())
-    const fragment = Plain.deserialize(text, { defaultBlock, defaultMarks }).document
-    change.insertFragment(fragment)
+      const defaultBlock = startBlock
+      const defaultMarks = document.getMarksAtRange(selection.collapseToStart())
+      const frag = Plain.deserialize(text, { defaultBlock, defaultMarks }).document
+      change.insertFragment(frag)
+    }
   }
 
   /**
@@ -787,7 +740,73 @@ function AfterPlugin(options = {}) {
 
   function onSelect(event, data, change) {
     debug('onSelect', { data })
-    change.select(data.selection)
+
+    const window = getWindow(event.target)
+    const { state } = change
+    const { document } = state
+    const native = window.getSelection()
+
+    // If there are no ranges, the editor was blurred natively.
+    if (!native.rangeCount) {
+      change.blur()
+      return
+    }
+
+    // Otherwise, determine the Slate selection from the native one.
+    let range = findRange(native, state)
+    if (!range) return
+
+    const { anchorKey, anchorOffset, focusKey, focusOffset } = range
+    const anchorText = document.getNode(anchorKey)
+    const focusText = document.getNode(focusKey)
+    const anchorInline = document.getClosestInline(anchorKey)
+    const focusInline = document.getClosestInline(focusKey)
+    const focusBlock = document.getClosestBlock(focusKey)
+    const anchorBlock = document.getClosestBlock(anchorKey)
+
+    // COMPAT: If the anchor point is at the start of a non-void, and the
+    // focus point is inside a void node with an offset that isn't `0`, set
+    // the focus offset to `0`. This is due to void nodes <span>'s being
+    // positioned off screen, resulting in the offset always being greater
+    // than `0`. Since we can't know what it really should be, and since an
+    // offset of `0` is less destructive because it creates a hanging
+    // selection, go with `0`. (2017/09/07)
+    if (
+      anchorBlock &&
+      !anchorBlock.isVoid &&
+      anchorOffset == 0 &&
+      focusBlock &&
+      focusBlock.isVoid &&
+      focusOffset != 0
+    ) {
+      range = range.set('focusOffset', 0)
+    }
+
+    // COMPAT: If the selection is at the end of a non-void inline node, and
+    // there is a node after it, put it in the node after instead. This
+    // standardizes the behavior, since it's indistinguishable to the user.
+    if (
+      anchorInline &&
+      !anchorInline.isVoid &&
+      anchorOffset == anchorText.text.length
+    ) {
+      const block = document.getClosestBlock(anchorKey)
+      const next = block.getNextText(anchorKey)
+      if (next) range = range.moveAnchorTo(next.key, 0)
+    }
+
+    if (
+      focusInline &&
+      !focusInline.isVoid &&
+      focusOffset == focusText.text.length
+    ) {
+      const block = document.getClosestBlock(focusKey)
+      const next = block.getNextText(focusKey)
+      if (next) range = range.moveFocusTo(next.key, 0)
+    }
+
+    range = range.normalize(document)
+    change.select(range)
   }
 
   /**
@@ -899,6 +918,9 @@ function AfterPlugin(options = {}) {
     onBlur,
     onCopy,
     onCut,
+    onDragEnd,
+    onDragOver,
+    onDragStart,
     onDrop,
     onInput,
     onKeyDown,

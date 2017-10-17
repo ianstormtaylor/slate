@@ -78,7 +78,7 @@ function warn(message, ...args) {
  */
 
 function deprecate(version, message, ...args) {
-  log('warn', `Deprecation (v${version}): ${message}`, ...args)
+  log('warn', `Deprecation (${version}): ${message}`, ...args)
 }
 
 /**

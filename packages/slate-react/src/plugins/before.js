@@ -9,7 +9,8 @@ import { findDOMNode } from 'react-dom'
 import HOTKEYS from '../constants/hotkeys'
 import TRANSFER_TYPES from '../constants/transfer-types'
 import findRange from '../utils/find-range'
-import getTransferData from '../utils/get-transfer-data'
+import getEventRange from '../utils/get-event-range'
+import getEventTransfer from '../utils/get-event-transfer'
 import setTransferData from '../utils/set-transfer-data'
 import { IS_FIREFOX, IS_MAC, SUPPORTED_EVENTS } from '../constants/environment'
 
@@ -135,8 +136,8 @@ function BeforePlugin() {
     window.requestAnimationFrame(() => isCopying = false)
 
     const { state } = change
-    data.type = 'fragment'
-    data.fragment = state.fragment
+    defineDeprecatedData(data, 'type', 'fragment')
+    defineDeprecatedData(data, 'fragment', state.fragment)
 
     debug('onCopy', { event })
   }
@@ -158,8 +159,8 @@ function BeforePlugin() {
     window.requestAnimationFrame(() => isCopying = false)
 
     const { state } = change
-    data.type = 'fragment'
-    data.fragment = state.fragment
+    defineDeprecatedData(data, 'type', 'fragment')
+    defineDeprecatedData(data, 'fragment', state.fragment)
 
     debug('onCut', { event })
   }
@@ -212,12 +213,16 @@ function BeforePlugin() {
     isDragging = true
     isInternalDrag = true
 
-    const { dataTransfer } = event.nativeEvent
-    const d = getTransferData(dataTransfer)
-    Object.assign(data, d)
+    const d = getEventTransfer(event)
+    const { nativeEvent } = event
+    const { dataTransfer } = nativeEvent
 
-    if (data.type != 'node') {
-      const { state } = this.props
+    Object.keys(d).forEach((key) => {
+      defineDeprecatedData(data, key, d[key])
+    })
+
+    if (d.type != 'node') {
+      const { state } = change
       const { fragment } = state
       const encoded = Base64.serializeNode(fragment)
       setTransferData(dataTransfer, TRANSFER_TYPES.FRAGMENT, encoded)
@@ -243,60 +248,29 @@ function BeforePlugin() {
 
     const { state } = change
     const { nativeEvent } = event
-    const { dataTransfer, x, y } = nativeEvent
-    const d = getTransferData(dataTransfer)
-    Object.assign(data, d)
+    const { dataTransfer } = nativeEvent
+    const d = getEventTransfer(event)
 
-    // Resolve a range from the caret position where the drop occured.
-    const window = getWindow(event.target)
-    let range
+    Object.keys(d).forEach((key) => {
+      defineDeprecatedData(data, key, d[key])
+    })
 
-    // COMPAT: In Firefox, `caretRangeFromPoint` doesn't exist. (2016/07/25)
-    if (window.document.caretRangeFromPoint) {
-      range = window.document.caretRangeFromPoint(x, y)
-    } else {
-      const position = window.document.caretPositionFromPoint(x, y)
-      range = window.document.createRange()
-      range.setStart(position.offsetNode, position.offset)
-      range.setEnd(position.offsetNode, position.offset)
-    }
-
-    // Resolve a Slate range from the DOM range.
-    let selection = findRange(range, state)
-    if (!selection) return true
-
-    const { document } = state
-    const node = document.getNode(selection.anchorKey)
-    const parent = document.getParent(node.key)
-    const el = findDOMNode(parent)
-
-    // If the drop target is inside a void node, move it into either the next or
-    // previous node, depending on which side the `x` and `y` coordinates are
-    // closest to.
-    if (parent.isVoid) {
-      const rect = el.getBoundingClientRect()
-      const isPrevious = parent.kind == 'inline'
-        ? x - rect.left < rect.left + rect.width - x
-        : y - rect.top < rect.top + rect.height - y
-
-      selection = isPrevious
-        ? selection.moveToEndOf(document.getPreviousText(node.key))
-        : selection.moveToStartOf(document.getNextText(node.key))
-    }
+    const range = getEventRange(event, state)
+    if (!range) return true
 
     // Add drop-specific information to the data.
-    data.target = selection
+    defineDeprecatedData(data, 'target', range)
 
     // COMPAT: Edge throws "Permission denied" errors when
     // accessing `dropEffect` or `effectAllowed` (2017/7/12)
     try {
-      data.effect = dataTransfer.dropEffect
+      defineDeprecatedData(data, 'effect', dataTransfer.dropEffect)
     } catch (err) {
-      data.effect = null
+      defineDeprecatedData(data, 'effect', null)
     }
 
     if (d.type == 'fragment' || d.type == 'node') {
-      data.isInternal = isInternalDrag
+      defineDeprecatedData(data, 'isInternal', isInternalDrag)
     }
 
     debug('onDrop', { event })
@@ -421,18 +395,13 @@ function BeforePlugin() {
     if (editor.props.readOnly) return
 
     event.preventDefault()
-    const d = getTransferData(event.clipboardData)
-    Object.assign(data, d)
+    const d = getEventTransfer(event)
 
-    // COMPAT: Attach the `isShift` flag, so that people can use it to trigger
-    // "Paste and Match Style" logic.
-    Object.defineProperty(data, 'isShift', {
-      enumerable: true,
-      get() {
-        logger.deprecate('0.28.0', 'The `data.isShift` property of paste events has been deprecated. If you need this functionality, you\'ll need to keep track of that state with `onKeyDown` and `onKeyUp` events instead')
-        return isShifting
-      }
+    Object.keys(d).forEach((key) => {
+      defineDeprecatedData(data, key, d[key])
     })
+
+    defineDeprecatedData(data, 'isShift', isShifting)
 
     debug('onPaste', { event })
   }
@@ -458,7 +427,7 @@ function BeforePlugin() {
 
     // If there are no ranges, the editor was blurred natively.
     if (!native.rangeCount) {
-      data.selection = selection.blur()
+      defineDeprecatedData(data, 'selection', selection.blur())
     }
 
     // Otherwise, determine the Slate selection from the native one.
@@ -516,7 +485,7 @@ function BeforePlugin() {
       }
 
       range = range.normalize(document)
-      data.selection = range
+      defineDeprecatedData(data, 'selection', range)
     }
 
     debug('onSelect', { event })
@@ -549,37 +518,33 @@ function BeforePlugin() {
 }
 
 /**
- * Add deprecated `data` fields from a key `event`.
- *
- * @param {Object} data
- * @param {Object} event
+ * Deprecated.
  */
+
+function defineDeprecatedData(data, key, value) {
+  Object.defineProperty(data, key, {
+    enumerable: true,
+    get() {
+      logger.deprecate('slate-react@0.5.0', `Accessing the \`data.${key}\` property is deprecated, please use the native \`event\` properties instead, or one of the newly exposed helper utilities.`)
+      return value
+    }
+  })
+}
 
 function addDeprecatedKeyProperties(data, event) {
   const { altKey, ctrlKey, metaKey, shiftKey, which } = event
   const name = keycode(which)
-
-  function define(key, value) {
-    Object.defineProperty(data, key, {
-      enumerable: true,
-      get() {
-        logger.deprecate('0.28.0', `The \`data.${key}\` property of keyboard events is deprecated, please use the native \`event\` properties instead.`)
-        return value
-      }
-    })
-  }
-
-  define('code', which)
-  define('key', name)
-  define('isAlt', altKey)
-  define('isCmd', IS_MAC ? metaKey && !altKey : false)
-  define('isCtrl', ctrlKey && !altKey)
-  define('isLine', IS_MAC ? metaKey : false)
-  define('isMeta', metaKey)
-  define('isMod', IS_MAC ? metaKey && !altKey : ctrlKey && !altKey)
-  define('isModAlt', IS_MAC ? metaKey && altKey : ctrlKey && altKey)
-  define('isShift', shiftKey)
-  define('isWord', IS_MAC ? altKey : ctrlKey)
+  defineDeprecatedData(data, 'code', which)
+  defineDeprecatedData(data, 'key', name)
+  defineDeprecatedData(data, 'isAlt', altKey)
+  defineDeprecatedData(data, 'isCmd', IS_MAC ? metaKey && !altKey : false)
+  defineDeprecatedData(data, 'isCtrl', ctrlKey && !altKey)
+  defineDeprecatedData(data, 'isLine', IS_MAC ? metaKey : false)
+  defineDeprecatedData(data, 'isMeta', metaKey)
+  defineDeprecatedData(data, 'isMod', IS_MAC ? metaKey && !altKey : ctrlKey && !altKey)
+  defineDeprecatedData(data, 'isModAlt', IS_MAC ? metaKey && altKey : ctrlKey && altKey)
+  defineDeprecatedData(data, 'isShift', shiftKey)
+  defineDeprecatedData(data, 'isWord', IS_MAC ? altKey : ctrlKey)
 }
 
 /**
