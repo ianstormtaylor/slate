@@ -4,6 +4,20 @@ import Base64 from 'slate-base64-serializer'
 import TRANSFER_TYPES from '../constants/transfer-types'
 
 /**
+ * Trasnfer types.
+ *
+ * @type {String}
+ */
+
+const {
+  FRAGMENT,
+  HTML,
+  NODE,
+  RICH,
+  TEXT
+} = TRANSFER_TYPES
+
+/**
  * Fragment matching regexp for HTML nodes.
  *
  * @type {RegExp}
@@ -24,11 +38,11 @@ function getEventTransfer(event) {
   }
 
   const transfer = event.dataTransfer || event.clipboardData
-  let fragment = getType(transfer, TRANSFER_TYPES.FRAGMENT)
-  let node = getType(transfer, TRANSFER_TYPES.NODE)
-  const html = getType(transfer, 'text/html')
-  const rich = getType(transfer, 'text/rtf')
-  let text = getType(transfer, 'text/plain')
+  let fragment = getType(transfer, FRAGMENT)
+  let node = getType(transfer, NODE)
+  const html = getType(transfer, HTML)
+  const rich = getType(transfer, RICH)
+  let text = getType(transfer, TEXT)
   let files
 
   // If there isn't a fragment, but there is HTML, check to see if the HTML is
@@ -48,9 +62,9 @@ function getEventTransfer(event) {
   if (text) {
     const embeddedTypes = getEmbeddedTypes(text)
 
-    if (embeddedTypes[TRANSFER_TYPES.FRAGMENT]) fragment = embeddedTypes[TRANSFER_TYPES.FRAGMENT]
-    if (embeddedTypes[TRANSFER_TYPES.NODE]) node = embeddedTypes[TRANSFER_TYPES.NODE]
-    if (embeddedTypes['text/plain']) text = embeddedTypes['text/plain']
+    if (embeddedTypes[FRAGMENT]) fragment = embeddedTypes[FRAGMENT]
+    if (embeddedTypes[NODE]) node = embeddedTypes[NODE]
+    if (embeddedTypes[TEXT]) text = embeddedTypes[TEXT]
   }
 
   // Decode a fragment or node if they exist.
@@ -91,8 +105,8 @@ function getEventTransfer(event) {
 function getEmbeddedTypes(text) {
   const prefix = 'SLATE-DATA-EMBED::'
 
-  if (text.substring(0, prefix.length) !== prefix) {
-    return { 'text/plain': text }
+  if (text.substring(0, prefix.length) != prefix) {
+    return { TEXT: text }
   }
 
   // Attempt to parse, if fails then just standard text/plain
@@ -141,7 +155,7 @@ function getType(transfer, type) {
   if (!transfer.types || !transfer.types.length) {
     // COMPAT: In IE 11, there is no `types` field but `getData('Text')`
     // is supported`. (2017/06/23)
-    return type === 'text/plain' ? transfer.getData('Text') || null : null
+    return type == TEXT ? transfer.getData('Text') || null : null
   }
 
   return transfer.types.indexOf(type) !== -1 ? transfer.getData(type) || null : null

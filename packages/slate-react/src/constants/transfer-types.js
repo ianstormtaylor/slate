@@ -1,12 +1,16 @@
+
 /**
- * Slate-specific data transfer types.
+ * The transfer types that Slate recognizes.
  *
  * @type {Object}
  */
 
-const TYPES = {
+const TRANSFER_TYPES = {
   FRAGMENT: 'application/x-slate-fragment',
+  HTML: 'text/html',
   NODE: 'application/x-slate-node',
+  RICH: 'text/rtf',
+  TEXT: 'text/plain',
 }
 
 /**
@@ -15,4 +19,4 @@ const TYPES = {
  * @type {Object}
  */
 
-export default TYPES
+export default TRANSFER_TYPES

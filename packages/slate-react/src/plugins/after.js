@@ -11,10 +11,12 @@ import HOTKEYS from '../constants/hotkeys'
 import Content from '../components/content'
 import Placeholder from '../components/placeholder'
 import findDOMNode from '../utils/find-dom-node'
+import findNode from '../utils/find-node'
 import findPoint from '../utils/find-point'
 import findRange from '../utils/find-range'
 import getEventRange from '../utils/get-event-range'
 import getEventTransfer from '../utils/get-event-transfer'
+import setEventTransfer from '../utils/set-event-transfer'
 import { IS_CHROME, IS_MAC, IS_SAFARI } from '../constants/environment'
 
 /**
@@ -60,21 +62,23 @@ function AfterPlugin(options = {}) {
     // normalize changes to the document, not selection.
     if (prevState && state.document == prevState.document) return
 
+    debug('onBeforeChange')
+
     change.normalize(coreSchema)
     change.normalize(schema)
-    debug('onBeforeChange')
   }
 
   /**
    * On before input, correct any browser inconsistencies.
    *
    * @param {Event} event
-   * @param {Object} data
    * @param {Change} change
+   * @param {Editor} editor
    */
 
-  function onBeforeInput(event, data, change) {
-    debug('onBeforeInput', { data })
+  function onBeforeInput(event, change, editor) {
+    debug('onBeforeInput', { event })
+
     event.preventDefault()
     change.insertText(event.data)
   }
@@ -83,40 +87,69 @@ function AfterPlugin(options = {}) {
    * On blur.
    *
    * @param {Event} event
-   * @param {Object} data
    * @param {Change} change
+   * @param {Editor} editor
    */
 
-  function onBlur(event, data, change) {
-    debug('onBlur', { data })
+  function onBlur(event, change, editor) {
+    debug('onBlur', { event })
+
     change.blur()
+  }
+
+  /**
+   * On click.
+   *
+   * @param {Event} event
+   * @param {Change} change
+   * @param {Editor} editor
+   */
+
+  function onClick(event, change, editor) {
+    if (editor.props.readOnly) return true
+
+    const { state } = change
+    const { document } = state
+    const node = findNode(event.target, state)
+    const isVoid = node && (node.isVoid || document.hasVoidParent(node.key))
+
+    if (isVoid) {
+      // COMPAT: In Chrome & Safari, selections that are at the zero offset of
+      // an inline node will be automatically replaced to be at the last offset
+      // of a previous inline node, which screws us up, so we always want to set
+      // it to the end of the node. (2016/11/29)
+      change.focus().collapseToEndOf(node)
+    }
+
+    debug('onClick', { event })
   }
 
   /**
    * On copy.
    *
    * @param {Event} event
-   * @param {Object} data
    * @param {Change} change
+   * @param {Editor} editor
    */
 
-  function onCopy(event, data, change) {
-    debug('onCopy', data)
-    onCutOrCopy(event, data, change)
+  function onCopy(event, change, editor) {
+    debug('onCopy', { event })
+
+    onCutOrCopy(event, change)
   }
 
   /**
    * On cut.
    *
    * @param {Event} event
-   * @param {Object} data
    * @param {Change} change
    * @param {Editor} editor
    */
 
-  function onCut(event, data, change, editor) {
-    debug('onCut', data)
-    onCutOrCopy(event, data, change)
+  function onCut(event, change, editor) {
+    debug('onCut', { event })
+
+    onCutOrCopy(event, change)
     const window = getWindow(event.target)
 
     // Once the fake cut content has successfully been added to the clipboard,
@@ -130,11 +163,11 @@ function AfterPlugin(options = {}) {
    * On cut or copy.
    *
    * @param {Event} event
-   * @param {Object} data
    * @param {Change} change
+   * @param {Editor} editor
    */
 
-  function onCutOrCopy(event, data, change) {
+  function onCutOrCopy(event, change, editor) {
     const window = getWindow(event.target)
     const native = window.getSelection()
     const { state } = change
@@ -242,12 +275,11 @@ function AfterPlugin(options = {}) {
    * On drag end.
    *
    * @param {Event} event
-   * @param {Object} data
    * @param {Change} change
    * @param {Editor} editor
    */
 
-  function onDragEnd(event, data, change, editor) {
+  function onDragEnd(event, change, editor) {
     debug('onDragEnd', { event })
 
     isDraggingInternally = null
@@ -257,12 +289,11 @@ function AfterPlugin(options = {}) {
    * On drag over.
    *
    * @param {Event} event
-   * @param {Object} data
    * @param {Change} change
    * @param {Editor} editor
    */
 
-  function onDragOver(event, data, change, editor) {
+  function onDragOver(event, change, editor) {
     debug('onDragOver', { event })
 
     isDraggingInternally = false
@@ -272,26 +303,39 @@ function AfterPlugin(options = {}) {
    * On drag start.
    *
    * @param {Event} event
-   * @param {Object} data
    * @param {Change} change
    * @param {Editor} editor
    */
 
-  function onDragStart(event, data, change, editor) {
+  function onDragStart(event, change, editor) {
     debug('onDragStart', { event })
 
     isDraggingInternally = true
+
+    const { state } = change
+    const { document } = state
+    const node = findNode(event.target, state)
+    const isVoid = node && (node.isVoid || document.hasVoidParent(node.key))
+
+    if (isVoid) {
+      const encoded = Base64.serializeNode(node, { preserveKeys: true })
+      setEventTransfer(event, 'node', encoded)
+    } else {
+      const { fragment } = state
+      const encoded = Base64.serializeNode(fragment)
+      setEventTransfer(event, 'fragment', encoded)
+    }
   }
 
   /**
    * On drop.
    *
    * @param {Event} event
-   * @param {Object} data
    * @param {Change} change
+   * @param {Editor} editor
    */
 
-  function onDrop(event, data, change, editor) {
+  function onDrop(event, change, editor) {
     debug('onDrop', { event })
 
     const { state } = change
@@ -363,12 +407,12 @@ function AfterPlugin(options = {}) {
    * On input.
    *
    * @param {Event} eventvent
-   * @param {Object} data
    * @param {Change} change
-   * @param {Editor} editor
    */
 
-  function onInput(event, data, change, editor) {
+  function onInput(event, change, editor) {
+    debug('onInput', { event })
+
     const window = getWindow(event.target)
     const { state } = change
 
@@ -428,21 +472,21 @@ function AfterPlugin(options = {}) {
    * On key down.
    *
    * @param {Event} event
-   * @param {Object} data
    * @param {Change} change
+   * @param {Editor} editor
    */
 
-  function onKeyDown(event, data, change) {
-    debug('onKeyDown', { data })
+  function onKeyDown(event, change, editor) {
+    debug('onKeyDown', { event })
 
     switch (event.key) {
-      case 'Enter': return onKeyDownEnter(event, data, change)
-      case 'Backspace': return onKeyDownBackspace(event, data, change)
-      case 'Delete': return onKeyDownDelete(event, data, change)
-      case 'ArrowLeft': return onKeyDownLeft(event, data, change)
-      case 'ArrowRight': return onKeyDownRight(event, data, change)
-      case 'ArrowUp': return onKeyDownUp(event, data, change)
-      case 'ArrowDown': return onKeyDownDown(event, data, change)
+      case 'Enter': return onKeyDownEnter(event, change)
+      case 'Backspace': return onKeyDownBackspace(event, change)
+      case 'Delete': return onKeyDownDelete(event, change)
+      case 'ArrowLeft': return onKeyDownLeft(event, change)
+      case 'ArrowRight': return onKeyDownRight(event, change)
+      case 'ArrowUp': return onKeyDownUp(event, change)
+      case 'ArrowDown': return onKeyDownDown(event, change)
     }
 
     if (HOTKEYS.DELETE_CHAR_BACKWARD(event)) {
@@ -470,11 +514,11 @@ function AfterPlugin(options = {}) {
    * On `enter` key down, split the current block in half.
    *
    * @param {Event} event
-   * @param {Object} data
    * @param {Change} change
+   * @param {Editor} editor
    */
 
-  function onKeyDownEnter(event, data, change) {
+  function onKeyDownEnter(event, change, editor) {
     const { state } = change
     const { document, startKey } = state
     const hasVoidParent = document.hasVoidParent(startKey)
@@ -495,11 +539,11 @@ function AfterPlugin(options = {}) {
    * On `backspace` key down, delete backwards.
    *
    * @param {Event} event
-   * @param {Object} data
    * @param {Change} change
+   * @param {Editor} editor
    */
 
-  function onKeyDownBackspace(event, data, change) {
+  function onKeyDownBackspace(event, change, editor) {
     const isWord = IS_MAC ? event.altKey : event.ctrlKey
     const isLine = IS_MAC ? event.metaKey : false
 
@@ -514,11 +558,11 @@ function AfterPlugin(options = {}) {
    * On `delete` key down, delete forwards.
    *
    * @param {Event} event
-   * @param {Object} data
    * @param {Change} change
+   * @param {Editor} editor
    */
 
-  function onKeyDownDelete(event, data, change) {
+  function onKeyDownDelete(event, change, editor) {
     const isWord = IS_MAC ? event.altKey : event.ctrlKey
     const isLine = IS_MAC ? event.metaKey : false
 
@@ -540,11 +584,11 @@ function AfterPlugin(options = {}) {
    * the zero-width spaces will cause two arrow keys to jump to the next text.
    *
    * @param {Event} event
-   * @param {Object} data
    * @param {Change} change
+   * @param {Editor} editor
    */
 
-  function onKeyDownLeft(event, data, change) {
+  function onKeyDownLeft(event, change, editor) {
     const { state } = change
 
     if (event.ctrlKey) return
@@ -596,11 +640,11 @@ function AfterPlugin(options = {}) {
    * selection to the very start of an inline node here. (2016/11/29)
    *
    * @param {Event} event
-   * @param {Object} data
    * @param {Change} change
+   * @param {Editor} editor
    */
 
-  function onKeyDownRight(event, data, change) {
+  function onKeyDownRight(event, change, editor) {
     const { state } = change
 
     if (event.ctrlKey) return
@@ -650,11 +694,11 @@ function AfterPlugin(options = {}) {
    * Firefox, option-up doesn't properly move the selection.
    *
    * @param {Event} event
-   * @param {Object} data
    * @param {Change} change
+   * @param {Editor} editor
    */
 
-  function onKeyDownUp(event, data, change) {
+  function onKeyDownUp(event, change, editor) {
     if (!IS_MAC || event.ctrlKey || !event.altKey) return
 
     const { state } = change
@@ -679,11 +723,11 @@ function AfterPlugin(options = {}) {
    * Firefox, option-down doesn't properly move the selection.
    *
    * @param {Event} event
-   * @param {Object} data
    * @param {Change} change
+   * @param {Editor} editor
    */
 
-  function onKeyDownDown(event, data, change) {
+  function onKeyDownDown(event, change, editor) {
     if (!IS_MAC || event.ctrlKey || !event.altKey) return
 
     const { state } = change
@@ -704,12 +748,12 @@ function AfterPlugin(options = {}) {
    * On paste.
    *
    * @param {Event} event
-   * @param {Object} data
    * @param {Change} change
+   * @param {Editor} editor
    */
 
-  function onPaste(event, data, change) {
-    debug('onPaste', { data })
+  function onPaste(event, change, editor) {
+    debug('onPaste', { event })
 
     const transfer = getEventTransfer(event)
     const { type, fragment, text } = transfer
@@ -734,12 +778,12 @@ function AfterPlugin(options = {}) {
    * On select.
    *
    * @param {Event} event
-   * @param {Object} data
    * @param {Change} change
+   * @param {Editor} editor
    */
 
-  function onSelect(event, data, change) {
-    debug('onSelect', { data })
+  function onSelect(event, change, editor) {
+    debug('onSelect', { event })
 
     const window = getWindow(event.target)
     const { state } = change
@@ -916,6 +960,7 @@ function AfterPlugin(options = {}) {
     onBeforeChange,
     onBeforeInput,
     onBlur,
+    onClick,
     onCopy,
     onCut,
     onDragEnd,

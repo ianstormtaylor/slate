@@ -16,11 +16,11 @@ class CheckListItem extends React.Component {
   /**
    * On change, set the new checked value on the block.
    *
-   * @param {Event} e
+   * @param {Event} event
    */
 
-  onChange = (e) => {
-    const checked = e.target.checked
+  onChange = (event) => {
+    const checked = event.target.checked
     const { editor, node } = this.props
     editor.change(c => c.setNodeByKey(node.key, { data: { checked }}))
   }
@@ -106,32 +106,30 @@ class CheckLists extends React.Component {
    * If backspace is pressed when collapsed at the start of a check list item,
    * then turn it back into a paragraph.
    *
-   * @param {Event} e
-   * @param {Object} data
+   * @param {Event} event
    * @param {Change} change
    * @return {State|Void}
    */
 
-  onKeyDown = (e, data, change) => {
+  onKeyDown = (event, change) => {
     const { state } = change
 
     if (
-      e.key == 'Enter' &&
+      event.key == 'Enter' &&
       state.startBlock.type == 'check-list-item'
     ) {
-      return change
-        .splitBlock()
-        .setBlock({ data: { checked: false }})
+      change.splitBlock().setBlock({ data: { checked: false }})
+      return true
     }
 
     if (
-      e.key == 'Backspace' &&
+      event.key == 'Backspace' &&
       state.isCollapsed &&
       state.startBlock.type == 'check-list-item' &&
       state.selection.startOffset == 0
     ) {
-      return change
-        .setBlock('paragraph')
+      change.setBlock('paragraph')
+      return true
     }
   }
 

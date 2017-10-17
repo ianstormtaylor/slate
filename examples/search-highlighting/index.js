@@ -50,12 +50,12 @@ class SearchHighlighting extends React.Component {
   /**
    * On input change, update the decorations.
    *
-   * @param {Event} e
+   * @param {Event} event
    */
 
-  onInputChange = (e) => {
+  onInputChange = (event) => {
     const { state } = this.state
-    const string = e.target.value
+    const string = event.target.value
     const texts = state.document.getTexts()
     const decorations = []
 

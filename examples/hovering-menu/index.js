@@ -23,7 +23,14 @@ const schema = {
   }
 }
 
-function Menu({ menuRef, onChange, state }) {
+/**
+ * The menu.
+ *
+ * @type {Component}
+ */
+
+class Menu extends React.Component {
+
   /**
    * Check if the current selection has a mark with `type` in it.
    *
@@ -31,22 +38,22 @@ function Menu({ menuRef, onChange, state }) {
    * @return {Boolean}
    */
 
-  function hasMark(type) {
+  hasMark(type) {
+    const { state } = this.props
     return state.activeMarks.some(mark => mark.type == type)
   }
 
   /**
    * When a mark button is clicked, toggle the current mark.
    *
-   * @param {Event} e
+   * @param {Event} event
    * @param {String} type
    */
 
-  function onClickMark(e, type) {
-    e.preventDefault()
-    const change = state
-      .change()
-      .toggleMark(type)
+  onClickMark(event, type) {
+    const { state, onChange } = this.props
+    event.preventDefault()
+    const change = state.change().toggleMark(type)
     onChange(change)
   }
 
@@ -58,11 +65,9 @@ function Menu({ menuRef, onChange, state }) {
    * @return {Element}
    */
 
-  function renderMarkButton(type, icon) {
-    const isActive = hasMark(type)
-    function onMouseDown(e) {
-      onClickMark(e, type)
-    }
+  renderMarkButton(type, icon) {
+    const isActive = this.hasMark(type)
+    const onMouseDown = event => this.onClickMark(event, type)
 
     return (
       <span className="button" onMouseDown={onMouseDown} data-active={isActive}>
@@ -71,16 +76,26 @@ function Menu({ menuRef, onChange, state }) {
     )
   }
 
-  return (
-    ReactDOM.createPortal(
-      <div className="menu hover-menu" ref={menuRef}>
-        {renderMarkButton('bold', 'format_bold')}
-        {renderMarkButton('italic', 'format_italic')}
-        {renderMarkButton('underlined', 'format_underlined')}
-        {renderMarkButton('code', 'code')}
-      </div>, root
+  /**
+   * Render.
+   *
+   * @return {Element}
+   */
+
+  render() {
+    return (
+      ReactDOM.createPortal(
+        <div className="menu hover-menu" ref={this.props.menuRef}>
+          {this.renderMarkButton('bold', 'format_bold')}
+          {this.renderMarkButton('italic', 'format_italic')}
+          {this.renderMarkButton('underlined', 'format_underlined')}
+          {this.renderMarkButton('code', 'code')}
+        </div>,
+        root
+      )
     )
-  )
+  }
+
 }
 
 
@@ -125,11 +140,14 @@ class HoveringMenu extends React.Component {
   }
 
   /**
-   * Set menu ref
+   * Save the `menu` ref.
    *
+   * @param {Menu} menu
    */
 
-  menuRef = el => this.menu = el
+  menuRef = (menu) => {
+    this.menu = menu
+  }
 
   /**
    * Render.

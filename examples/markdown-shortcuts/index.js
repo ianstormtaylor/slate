@@ -99,16 +99,15 @@ class MarkdownShortcuts extends React.Component {
   /**
    * On key down, check for our specific key shortcuts.
    *
-   * @param {Event} e
-   * @param {Data} data
+   * @param {Event} event
    * @param {Change} change
    */
 
-  onKeyDown = (e, data, change) => {
-    switch (e.key) {
-      case ' ': return this.onSpace(e, change)
-      case 'Backspace': return this.onBackspace(e, change)
-      case 'Enter': return this.onEnter(e, change)
+  onKeyDown = (event, change) => {
+    switch (event.key) {
+      case ' ': return this.onSpace(event, change)
+      case 'Backspace': return this.onBackspace(event, change)
+      case 'Enter': return this.onEnter(event, change)
     }
   }
 
@@ -116,12 +115,12 @@ class MarkdownShortcuts extends React.Component {
    * On space, if it was after an auto-markdown shortcut, convert the current
    * node into the shortcut's corresponding type.
    *
-   * @param {Event} e
+   * @param {Event} event
    * @param {State} change
    * @return {State or Null} state
    */
 
-  onSpace = (e, change) => {
+  onSpace = (event, change) => {
     const { state } = change
     if (state.isExpanded) return
 
@@ -131,7 +130,7 @@ class MarkdownShortcuts extends React.Component {
 
     if (!type) return
     if (type == 'list-item' && startBlock.type == 'list-item') return
-    e.preventDefault()
+    event.preventDefault()
 
     change.setBlock(type)
 
@@ -139,10 +138,7 @@ class MarkdownShortcuts extends React.Component {
       change.wrapBlock('bulleted-list')
     }
 
-    change
-      .extendToStartOf(startBlock)
-      .delete()
-
+    change.extendToStartOf(startBlock).delete()
     return true
   }
 
@@ -150,12 +146,12 @@ class MarkdownShortcuts extends React.Component {
    * On backspace, if at the start of a non-paragraph, convert it back into a
    * paragraph node.
    *
-   * @param {Event} e
+   * @param {Event} event
    * @param {State} change
    * @return {State or Null} state
    */
 
-  onBackspace = (e, change) => {
+  onBackspace = (event, change) => {
     const { state } = change
     if (state.isExpanded) return
     if (state.startOffset != 0) return
@@ -163,7 +159,7 @@ class MarkdownShortcuts extends React.Component {
     const { startBlock } = state
     if (startBlock.type == 'paragraph') return
 
-    e.preventDefault()
+    event.preventDefault()
     change.setBlock('paragraph')
 
     if (startBlock.type == 'list-item') {
@@ -177,17 +173,17 @@ class MarkdownShortcuts extends React.Component {
    * On return, if at the end of a node type that should not be extended,
    * create a new paragraph below it.
    *
-   * @param {Event} e
+   * @param {Event} event
    * @param {State} change
    * @return {State or Null} state
    */
 
-  onEnter = (e, change) => {
+  onEnter = (event, change) => {
     const { state } = change
     if (state.isExpanded) return
 
     const { startBlock, startOffset, endOffset } = state
-    if (startOffset == 0 && startBlock.text.length == 0) return this.onBackspace(e, change)
+    if (startOffset == 0 && startBlock.text.length == 0) return this.onBackspace(event, change)
     if (endOffset != startBlock.text.length) return
 
     if (
@@ -202,12 +198,8 @@ class MarkdownShortcuts extends React.Component {
       return
     }
 
-    e.preventDefault()
-
-    change
-      .splitBlock()
-      .setBlock('paragraph')
-
+    event.preventDefault()
+    change.splitBlock().setBlock('paragraph')
     return true
   }
 

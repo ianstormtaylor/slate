@@ -43,14 +43,14 @@ class Tables extends React.Component {
   /**
    * On backspace, do nothing if at the start of a table cell.
    *
-   * @param {Event} e
+   * @param {Event} event
    * @param {Change} change
    */
 
-  onBackspace = (e, change) => {
+  onBackspace = (event, change) => {
     const { state } = change
     if (state.startOffset != 0) return
-    e.preventDefault()
+    event.preventDefault()
     return true
   }
 
@@ -67,38 +67,37 @@ class Tables extends React.Component {
   /**
    * On delete, do nothing if at the end of a table cell.
    *
-   * @param {Event} e
+   * @param {Event} event
    * @param {Change} change
    */
 
-  onDelete = (e, change) => {
+  onDelete = (event, change) => {
     const { state } = change
     if (state.endOffset != state.startText.text.length) return
-    e.preventDefault()
+    event.preventDefault()
     return true
   }
 
   /**
    * On return, do nothing if inside a table cell.
    *
-   * @param {Event} e
+   * @param {Event} event
    * @param {Change} change
    */
 
-  onEnter = (e, change) => {
-    e.preventDefault()
+  onEnter = (event, change) => {
+    event.preventDefault()
     return true
   }
 
   /**
    * On key down, check for our specific key shortcuts.
    *
-   * @param {Event} e
-   * @param {Object} data
+   * @param {Event} event
    * @param {Change} change
    */
 
-  onKeyDown = (e, data, change) => {
+  onKeyDown = (event, change) => {
     const { state } = change
     const { document, selection } = state
     const { startKey } = selection
@@ -109,7 +108,7 @@ class Tables extends React.Component {
       const prevBlock = document.getClosestBlock(previous.key)
 
       if (prevBlock.type == 'table-cell') {
-        e.preventDefault()
+        event.preventDefault()
         return true
       }
     }
@@ -118,10 +117,10 @@ class Tables extends React.Component {
       return
     }
 
-    switch (e.key) {
-      case 'Backspace': return this.onBackspace(e, state)
-      case 'Delete': return this.onDelete(e, state)
-      case 'Enter': return this.onEnter(e, state)
+    switch (event.key) {
+      case 'Backspace': return this.onBackspace(event, state)
+      case 'Delete': return this.onDelete(event, state)
+      case 'Enter': return this.onEnter(event, state)
     }
   }
 

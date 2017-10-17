@@ -11,9 +11,8 @@ import Node from './node'
 import findClosestNode from '../utils/find-closest-node'
 import findDOMRange from '../utils/find-dom-range'
 import findRange from '../utils/find-range'
-import getHtmlFromNativePaste from '../utils/get-html-from-native-paste'
 import scrollToSelection from '../utils/scroll-to-selection'
-import { IS_FIREFOX, IS_IE, SUPPORTED_EVENTS } from '../constants/environment'
+import { IS_FIREFOX, SUPPORTED_EVENTS } from '../constants/environment'
 
 /**
  * Debug.
@@ -229,18 +228,6 @@ class Content extends React.Component {
       this.tmp.key++
     }
 
-    // COMPAT: In IE 11, only plain text can be retrieved from the event's
-    // `clipboardData`. To get HTML, use the browser's native paste action which
-    // can only be handled synchronously. (2017/06/23)
-    if (handler == 'onPaste' && IS_IE) {
-      getHtmlFromNativePaste(event.target, (html) => {
-        const data = html ? { html, type: 'html' } : {}
-        this.props.onPaste(event, data)
-      })
-
-      return
-    }
-
     // If the `onSelect` handler fires while the `isUpdatingSelection` flag is
     // set it's a result of updating the selection manually, so skip it.
     if (handler == 'onSelect' && this.tmp.isUpdatingSelection) {
@@ -274,7 +261,6 @@ class Content extends React.Component {
       handler == 'onCompositionStart' ||
       handler == 'onCopy' ||
       handler == 'onCut' ||
-      handler == 'onDragStart' ||
       handler == 'onFocus' ||
       handler == 'onInput' ||
       handler == 'onKeyDown' ||
@@ -285,7 +271,7 @@ class Content extends React.Component {
       if (!this.isInEditor(event.target)) return
     }
 
-    this.props[handler](event, {})
+    this.props[handler](event)
   }
 
   /**
@@ -315,7 +301,6 @@ class Content extends React.Component {
 
     if (text == null) return
 
-    debug('onNativeBeforeInput', { event, text })
     event.preventDefault()
 
     const { editor, state } = this.props

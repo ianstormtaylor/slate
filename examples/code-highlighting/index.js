@@ -17,8 +17,8 @@ function CodeBlock(props) {
   const { editor, node } = props
   const language = node.data.get('language')
 
-  function onChange(e) {
-    editor.change(c => c.setNodeByKey(node.key, { data: { language: e.target.value }}))
+  function onChange(event) {
+    editor.change(c => c.setNodeByKey(node.key, { data: { language: event.target.value }}))
   }
 
   return (
@@ -165,19 +165,19 @@ class CodeHighlighting extends React.Component {
   /**
    * On key down inside code blocks, insert soft new lines.
    *
-   * @param {Event} e
-   * @param {Object} data
+   * @param {Event} event
    * @param {Change} change
    * @return {Change}
    */
 
-  onKeyDown = (e, data, change) => {
+  onKeyDown = (event, change) => {
     const { state } = change
     const { startBlock } = state
-    if (e.key != 'Enter') return
+    if (event.key != 'Enter') return
     if (startBlock.type != 'code') return
     if (state.isExpanded) change.delete()
-    return change.insertText('\n')
+    change.insertText('\n')
+    return true
   }
 
   /**
