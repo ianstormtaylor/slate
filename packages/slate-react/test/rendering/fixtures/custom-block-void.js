@@ -23,7 +23,7 @@ export const state = (
 
 export const output = `
 <div data-slate-editor="true" contenteditable="true" role="textbox">
-  <div data-slate-void="true">
+  <div data-slate-void="true" draggable="true">
     <div style="height:0;color:transparent">
       <span>
         <span></span>

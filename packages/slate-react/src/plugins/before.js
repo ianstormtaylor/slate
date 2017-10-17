@@ -5,7 +5,6 @@ import getWindow from 'get-window'
 import { findDOMNode } from 'react-dom'
 
 import HOTKEYS from '../constants/hotkeys'
-import TRANSFER_TYPES from '../constants/transfer-types'
 import findNode from '../utils/find-node'
 import setEventTransfer from '../utils/set-event-transfer'
 import { IS_FIREFOX, SUPPORTED_EVENTS } from '../constants/environment'
