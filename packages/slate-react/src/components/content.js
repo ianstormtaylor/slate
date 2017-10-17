@@ -265,6 +265,26 @@ class Content extends React.Component {
       }
     }
 
+    // Some events require being in editable in the editor, so if the event
+    // target isn't, ignore them.
+    if (
+      handler == 'onBeforeInput' ||
+      handler == 'onBlur' ||
+      handler == 'onCompositionEnd' ||
+      handler == 'onCompositionStart' ||
+      handler == 'onCopy' ||
+      handler == 'onCut' ||
+      handler == 'onDragStart' ||
+      handler == 'onFocus' ||
+      handler == 'onInput' ||
+      handler == 'onKeyDown' ||
+      handler == 'onKeyUp' ||
+      handler == 'onPaste' ||
+      handler == 'onSelect'
+    ) {
+      if (!this.isInEditor(event.target)) return
+    }
+
     this.props[handler](event, {})
   }
 
