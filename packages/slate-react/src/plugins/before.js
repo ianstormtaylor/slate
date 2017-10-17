@@ -1,12 +1,9 @@
 
-import Base64 from 'slate-base64-serializer'
 import Debug from 'debug'
 import getWindow from 'get-window'
 import { findDOMNode } from 'react-dom'
 
 import HOTKEYS from '../constants/hotkeys'
-import findNode from '../utils/find-node'
-import setEventTransfer from '../utils/set-event-transfer'
 import { IS_FIREFOX, SUPPORTED_EVENTS } from '../constants/environment'
 
 /**
@@ -71,33 +68,6 @@ function BeforePlugin() {
     if (window.document.activeElement == el) return true
 
     debug('onBlur', { event })
-  }
-
-  /**
-   * On click.
-   *
-   * @param {Event} event
-   * @param {Change} change
-   * @param {Editor} editor
-   */
-
-  function onClick(event, change, editor) {
-    if (editor.props.readOnly) return true
-
-    const { state } = change
-    const { document } = state
-    const node = findNode(event.target, state)
-    const isVoid = node && (node.isVoid || document.hasVoidParent(node.key))
-
-    if (isVoid) {
-      // COMPAT: In Chrome & Safari, selections that are at the zero offset of
-      // an inline node will be automatically replaced to be at the last offset
-      // of a previous inline node, which screws us up, so we always want to set
-      // it to the end of the node. (2016/11/29)
-      change.focus().collapseToEndOf(node)
-    }
-
-    debug('onClick', { event })
   }
 
   /**
@@ -271,20 +241,6 @@ function BeforePlugin() {
 
     isDragging = true
 
-    const { state } = change
-    const { document } = state
-    const node = findNode(event.target, state)
-    const isVoid = node && (node.isVoid || document.hasVoidParent(node.key))
-
-    if (isVoid) {
-      const encoded = Base64.serializeNode(node, { preserveKeys: true })
-      setEventTransfer(event, 'node', encoded)
-    } else {
-      const { fragment } = state
-      const encoded = Base64.serializeNode(fragment)
-      setEventTransfer(event, 'fragment', encoded)
-    }
-
     debug('onDragStart', { event })
   }
 
@@ -419,7 +375,6 @@ function BeforePlugin() {
   return {
     onBeforeInput,
     onBlur,
-    onClick,
     onCompositionEnd,
     onCompositionStart,
     onCopy,

@@ -11,10 +11,12 @@ import HOTKEYS from '../constants/hotkeys'
 import Content from '../components/content'
 import Placeholder from '../components/placeholder'
 import findDOMNode from '../utils/find-dom-node'
+import findNode from '../utils/find-node'
 import findPoint from '../utils/find-point'
 import findRange from '../utils/find-range'
 import getEventRange from '../utils/get-event-range'
 import getEventTransfer from '../utils/get-event-transfer'
+import setEventTransfer from '../utils/set-event-transfer'
 import { IS_CHROME, IS_MAC, IS_SAFARI } from '../constants/environment'
 
 /**
@@ -93,6 +95,33 @@ function AfterPlugin(options = {}) {
     debug('onBlur', { event })
 
     change.blur()
+  }
+
+  /**
+   * On click.
+   *
+   * @param {Event} event
+   * @param {Change} change
+   * @param {Editor} editor
+   */
+
+  function onClick(event, change, editor) {
+    if (editor.props.readOnly) return true
+
+    const { state } = change
+    const { document } = state
+    const node = findNode(event.target, state)
+    const isVoid = node && (node.isVoid || document.hasVoidParent(node.key))
+
+    if (isVoid) {
+      // COMPAT: In Chrome & Safari, selections that are at the zero offset of
+      // an inline node will be automatically replaced to be at the last offset
+      // of a previous inline node, which screws us up, so we always want to set
+      // it to the end of the node. (2016/11/29)
+      change.focus().collapseToEndOf(node)
+    }
+
+    debug('onClick', { event })
   }
 
   /**
@@ -282,6 +311,20 @@ function AfterPlugin(options = {}) {
     debug('onDragStart', { event })
 
     isDraggingInternally = true
+
+    const { state } = change
+    const { document } = state
+    const node = findNode(event.target, state)
+    const isVoid = node && (node.isVoid || document.hasVoidParent(node.key))
+
+    if (isVoid) {
+      const encoded = Base64.serializeNode(node, { preserveKeys: true })
+      setEventTransfer(event, 'node', encoded)
+    } else {
+      const { fragment } = state
+      const encoded = Base64.serializeNode(fragment)
+      setEventTransfer(event, 'fragment', encoded)
+    }
   }
 
   /**
@@ -917,6 +960,7 @@ function AfterPlugin(options = {}) {
     onBeforeChange,
     onBeforeInput,
     onBlur,
+    onClick,
     onCopy,
     onCut,
     onDragEnd,
