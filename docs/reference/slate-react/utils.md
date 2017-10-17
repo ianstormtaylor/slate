@@ -9,6 +9,7 @@ import {
   findRange,
   getEventRange,
   getEventTransfer,
+  setEventTransfer,
 } from 'slate-react'
 ```
 
@@ -41,9 +42,33 @@ Find the Slate range from a DOM `range` or `selection` and a Slate `state`.
 ### `getEventRange`
 `getEventRange(event: DOMEvent, state: State) => Range`
 
-Find the affected Slate range from a DOM `event` and Slate `state`.
+Get the affected Slate range from a DOM `event` and Slate `state`.
 
 ### `getEventTransfer`
 `getEventTransfer(event: DOMEvent) => Object`
 
-Find the Slate-related data from a DOM `event` and Slate `state`.
+Get the Slate-related data from a DOM `event` and Slate `state`.
+
+```js
+function onDrop(event, change, editor) {
+  const transfer = getEventTransfer(event)
+  const { type, node } = transfer
+
+  if (type == 'node') {
+    // Do something with `node`...
+  }
+}
+```
+
+### `setEventTransfer`
+`setEventTransfer(event: DOMEvent, type: String, data: Any)`
+
+Sets the Slate-related `data` with `type` on an `event`. The `type` must be one of the types Slate recognizes: `'fragment'`, `'html'`, `'node'`, `'rich'`, or `'text'`.
+
+```js
+function onDragStart(event, change, editor) {
+  const { state } = change
+  const { startNode } = state
+  setEventTransfer(event, 'node', startNode)
+}
+```
