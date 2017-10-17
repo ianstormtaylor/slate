@@ -78,7 +78,7 @@
     "no-path-concat": "error",
     "no-redeclare": "error",
     "no-regex-spaces": "error",
-    "no-restricted-globals": ["error", "Debug", "document", "Document" "event", "history", "History", "length", "Map", "Node", "parent", "Range", "Selection", "Set", "Text"],
+    "no-restricted-globals": ["error", "Debug", "document", "Document", "event", "history", "History", "length", "Map", "Node", "parent", "Range", "Selection", "Set", "Text"],
     "no-sequences": "error",
     "no-shadow": "error",
     "no-shadow-restricted-names": "error",

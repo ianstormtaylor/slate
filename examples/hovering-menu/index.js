@@ -6,7 +6,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import initialState from './state.json'
 
-const root = document.querySelector('main')
+const root = window.document.querySelector('main')
 
 /**
  * Define a schema.

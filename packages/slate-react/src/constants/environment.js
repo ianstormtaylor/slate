@@ -75,7 +75,7 @@ if (browser) {
     }
   }
 
-  const testEl = document.createElement('div')
+  const testEl = window.document.createElement('div')
   testEl.contentEditable = true
 
   for (let i = 0; i < EVENT_RULES.length; i++) {
