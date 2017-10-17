@@ -11,7 +11,13 @@ This document maintains a list of changes to the `slate-react` package with each
 
 ###### DEPRECATED
 
-- **The `data.*` properties that relate to keyboard events have been deprecated.** There were a few different issues with these "helpers": `data.key` didn't account for international keyboards, many properties awkwardly duplicated information that was available on `event.*`, but not completely, and many properties were confusing as to when they applied. If you were using these, you'll now need to use the native `event.*` properties instead. There's also a helpful [`is-hotkey`](https://github.com/ianstormtaylor/is-hotkey) package for more complex hotkey matching.
+- **The `data` objects in event handlers have been deprecated.** There were a few different issues with these "helpers": `data.key` didn't account for international keyboards, many properties awkwardly duplicated information that was available on `event.*`, but not completely, and many properties were confusing as to when they applied. If you were using these, you'll now need to use the native `event.*` properties instead. There's also a helpful [`is-hotkey`](https://github.com/ianstormtaylor/is-hotkey) package for more complex hotkey matching.
+
+###### NEW
+
+- **Added a new `getEventRange` helper.** This gets the affected `Range` of Slate document given a DOM `event`. This is useful in the `onDrop` or `onPaste` handlers to retrieve the range in the document where the drop or paste will occur.
+
+- **Added a new `getEventTransfer` helper.** This gets any Slate-related data from an `event`. It is modelled after the DOM's [`DataTransfer`](https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer) API, and is useful for retrieve the data being dropped or pasted in `onDrop` or `onPaste` events.
 
 
 ---
