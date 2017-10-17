@@ -45,6 +45,12 @@
 - [Plugins](./reference/slate-react/plugins.md)
 - [Core Plugins](./reference/slate-react/core-plugins.md)
 - [findDOMNode](./reference/slate-react/utils.md)
+- [findDOMRange](./reference/slate-react/utils.md)
+- [findNode](./reference/slate-react/utils.md)
+- [findRange](./reference/slate-react/utils.md)
+- [getEventRange](./reference/slate-react/utils.md)
+- [getEventTransfer](./reference/slate-react/utils.md)
+- [setEventTransfer](./reference/slate-react/utils.md)
 
 
 ## Other Packages
