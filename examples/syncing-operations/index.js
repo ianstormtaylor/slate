@@ -3,8 +3,8 @@ import { Editor } from 'slate-react'
 import { State } from 'slate'
 
 import React from 'react'
-import isHotkey from 'is-hotkey'
 import initialState from './state.json'
+import { isKeyHotkey } from 'is-hotkey'
 
 /**
  * Hotkey matchers.
@@ -12,10 +12,10 @@ import initialState from './state.json'
  * @type {Function}
  */
 
-const isBoldHotkey = isHotkey('mod+b')
-const isItalicHotkey = isHotkey('mod+i')
-const isUnderlinedHotkey = isHotkey('mod+u')
-const isCodeHotkey = isHotkey('mod+`')
+const isBoldHotkey = isKeyHotkey('mod+b')
+const isItalicHotkey = isKeyHotkey('mod+i')
+const isUnderlinedHotkey = isKeyHotkey('mod+u')
+const isCodeHotkey = isKeyHotkey('mod+`')
 
 /**
  * Define a schema.

@@ -8,7 +8,7 @@
   "dependencies": {
     "debug": "^2.3.2",
     "get-window": "^1.1.1",
-    "is-hotkey": "^0.0.3",
+    "is-hotkey": "^0.1.1",
     "is-in-browser": "^1.1.3",
     "is-window": "^1.0.2",
     "keycode": "^2.1.2",

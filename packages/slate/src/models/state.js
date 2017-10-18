@@ -326,9 +326,7 @@ class State extends Record(DEFAULTS) {
    */
 
   get startBlock() {
-    return this.selection.isUnset
-      ? null
-      : this.document.getClosestBlock(this.selection.startKey)
+    return this.startKey && this.document.getClosestBlock(this.startKey)
   }
 
   /**
@@ -338,9 +336,7 @@ class State extends Record(DEFAULTS) {
    */
 
   get endBlock() {
-    return this.selection.isUnset
-      ? null
-      : this.document.getClosestBlock(this.selection.endKey)
+    return this.endKey && this.document.getClosestBlock(this.endKey)
   }
 
   /**
@@ -350,9 +346,7 @@ class State extends Record(DEFAULTS) {
    */
 
   get anchorBlock() {
-    return this.selection.isUnset
-      ? null
-      : this.document.getClosestBlock(this.selection.anchorKey)
+    return this.anchorKey && this.document.getClosestBlock(this.anchorKey)
   }
 
   /**
@@ -362,9 +356,7 @@ class State extends Record(DEFAULTS) {
    */
 
   get focusBlock() {
-    return this.selection.isUnset
-      ? null
-      : this.document.getClosestBlock(this.selection.focusKey)
+    return this.focusKey && this.document.getClosestBlock(this.focusKey)
   }
 
   /**
@@ -374,9 +366,7 @@ class State extends Record(DEFAULTS) {
    */
 
   get startInline() {
-    return this.selection.isUnset
-      ? null
-      : this.document.getClosestInline(this.selection.startKey)
+    return this.startKey && this.document.getClosestInline(this.startKey)
   }
 
   /**
@@ -386,9 +376,7 @@ class State extends Record(DEFAULTS) {
    */
 
   get endInline() {
-    return this.selection.isUnset
-      ? null
-      : this.document.getClosestInline(this.selection.endKey)
+    return this.endKey && this.document.getClosestInline(this.endKey)
   }
 
   /**
@@ -398,9 +386,7 @@ class State extends Record(DEFAULTS) {
    */
 
   get anchorInline() {
-    return this.selection.isUnset
-      ? null
-      : this.document.getClosestInline(this.selection.anchorKey)
+    return this.anchorKey && this.document.getClosestInline(this.anchorKey)
   }
 
   /**
@@ -410,9 +396,7 @@ class State extends Record(DEFAULTS) {
    */
 
   get focusInline() {
-    return this.selection.isUnset
-      ? null
-      : this.document.getClosestInline(this.selection.focusKey)
+    return this.focusKey && this.document.getClosestInline(this.focusKey)
   }
 
   /**
@@ -422,9 +406,7 @@ class State extends Record(DEFAULTS) {
    */
 
   get startText() {
-    return this.selection.isUnset
-      ? null
-      : this.document.getDescendant(this.selection.startKey)
+    return this.startKey && this.document.getDescendant(this.startKey)
   }
 
   /**
@@ -434,9 +416,7 @@ class State extends Record(DEFAULTS) {
    */
 
   get endText() {
-    return this.selection.isUnset
-      ? null
-      : this.document.getDescendant(this.selection.endKey)
+    return this.endKey && this.document.getDescendant(this.endKey)
   }
 
   /**
@@ -446,9 +426,7 @@ class State extends Record(DEFAULTS) {
    */
 
   get anchorText() {
-    return this.selection.isUnset
-      ? null
-      : this.document.getDescendant(this.selection.anchorKey)
+    return this.anchorKey && this.document.getDescendant(this.anchorKey)
   }
 
   /**
@@ -458,9 +436,67 @@ class State extends Record(DEFAULTS) {
    */
 
   get focusText() {
-    return this.selection.isUnset
-      ? null
-      : this.document.getDescendant(this.selection.focusKey)
+    return this.focusKey && this.document.getDescendant(this.focusKey)
+  }
+
+  /**
+   * Get the next block node.
+   *
+   * @return {Block}
+   */
+
+  get nextBlock() {
+    return this.endKey && this.document.getNextBlock(this.endKey)
+  }
+
+  /**
+   * Get the previous block node.
+   *
+   * @return {Block}
+   */
+
+  get previousBlock() {
+    return this.startKey && this.document.getPreviousBlock(this.startKey)
+  }
+
+  /**
+   * Get the next inline node.
+   *
+   * @return {Inline}
+   */
+
+  get nextInline() {
+    return this.endKey && this.document.getNextInline(this.endKey)
+  }
+
+  /**
+   * Get the previous inline node.
+   *
+   * @return {Inline}
+   */
+
+  get previousInline() {
+    return this.startKey && this.document.getPreviousInline(this.startKey)
+  }
+
+  /**
+   * Get the next text node.
+   *
+   * @return {Text}
+   */
+
+  get nextText() {
+    return this.endKey && this.document.getNextText(this.endKey)
+  }
+
+  /**
+   * Get the previous text node.
+   *
+   * @return {Text}
+   */
+
+  get previousText() {
+    return this.startKey && this.document.getPreviousText(this.startKey)
   }
 
   /**
@@ -554,17 +590,20 @@ class State extends Record(DEFAULTS) {
    */
 
   get isEmpty() {
-    const { startOffset, endOffset } = this
-
-    if (this.isCollapsed) {
-      return true
-    }
-
-    if (endOffset != 0 && startOffset != 0) {
-      return false
-    }
-
+    if (this.isCollapsed) return true
+    if (this.endOffset != 0 && this.startOffset != 0) return false
     return this.fragment.text.length == 0
+  }
+
+  /**
+   * Check whether the selection is collapsed in a void node.
+   *
+   * @return {Boolean}
+   */
+
+  get isInVoid() {
+    if (this.isExpanded) return false
+    return this.document.hasVoidParent(this.startKey)
   }
 
   /**
