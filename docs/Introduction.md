@@ -110,12 +110,13 @@ Slate encourages you to write small, reusable modules. Check out the public ones
 
 ### Documentation
 
-If you're using Slate for the first time, check out the [Getting Started](http://docs.slatejs.org/walkthroughs/installing-slate.html) walkthroughs to familiarize yourself with Slate's architecture and mental models. Once you've gotten familiar with those, you'll probably want to check out the full [API Reference](http://docs.slatejs.org/reference/slate-react/editor.html).
+If you're using Slate for the first time, check out the [Getting Started](http://docs.slatejs.org/walkthroughs/installing-slate) walkthroughs and the [Guides](http://docs.slatejs.org/guides) to familiarize yourself with Slate's architecture and mental models. Once you've gotten familiar with those, you'll probably want to check out the full [API Reference](http://docs.slatejs.org/slate-core).
 
-- [**Walkthroughs**](http://docs.slatejs.org/walkthroughs/installing-slate.html)
-- [**Reference**](http://docs.slatejs.org/reference/slate-react/editor.html)
-- [**FAQ**](http://docs.slatejs.org/general/faq.html)
-- [**Resources**](http://docs.slatejs.org/general/resources.html)
+- [**Walkthroughs**](http://docs.slatejs.org/walkthroughs/installing-slate)
+- [**Guides**](http://docs.slatejs.org/guides)
+- [**Reference**](http://docs.slatejs.org/slate-core)
+- [**FAQ**](http://docs.slatejs.org/general/faq)
+- [**Resources**](http://docs.slatejs.org/general/resources)
 
 If even that's not enough, you can always [read the source itself](./src), which is explained along with a handful of readme's and is heavily commented.
 

@@ -6,25 +6,59 @@ All changes to a Slate editor's state, whether it's the `selection`, `document`,
 This is important because the `Change` model is responsible for ensuring that every change to a Slate state can be expressed in terms of low-level [operations](./operation.md).
 
 
-## Categories of Changes
+## Expressiveness is Key
 
-There are a handled of different categories of changes that ship with Slate by default, and understanding them may help you understand which methods to reach for when trying to write your editor's logic...
+Changes in Slate are designed to prioritize expressiveness above almost all else.
+
+If you're building a powerful editor, it's going to be somewhat complex, and you're going to be writing code to perform all different kinds of programmatic changes. You'll be remove nodes, inserting fragments, moving the selection around, etc.
+
+And if the API for changes was verbose, or if required lots of in between steps to be continually performed, your code would balloon to be impossible to understand very quickly.
+
+To solve this, Slate has very expressive, chainable changes. Like this:
+
+```js
+change
+  .focus()
+  .selectAll()
+  .delete()
+  .insertText('A bit of rich text, followed by...')
+  .moveToOffsets(10, 14)
+  .addMark('bold')
+  .collapseToEndOfBlock()
+  .insertBlock({ type: 'image', isVoid: true })
+  .insertBlock('paragraph')
+```
+
+Hopefully from reading that it's pretty clear that those changes resulting in... the entire document's content being deleted, some text bring written, a word being bolded, and then an image and another paragraph being inserted.
+
+Of course you're not normally going to be chaining quite that much. 
+
+Point is, you can do some pretty complex things in just a few lines of code. That way, when you're scanning to see what behaviors are being triggered, you can understand your code easily. You don't have to sit there and try to parse out a bunch of interim variables to figure out what you're trying to achieve.
+
+To that end, Slate defines _lots_ of change methods.
+
+The change methods are the one place in Slate where overlap and near-duplication isn't stomped out. Because sometimes the exact-right change method is the difference between one line of code and ten. And not just ten once, but ten repeated everywhere throughout your codebase.
+
+
+## Change Categories 
+
+There are a handful of different categories of changes that ship with Slate by default, and understanding them may help you understand which methods to reach for when trying to write your editor's logic...
 
 ### On the Selection
 
-These are changes like `blur()`, `collapseToStart()`, etc. that change the `state.selection` model and update the user's cursor without affecting the content of the document.
+These are changes like `blur()`, `collapseToStart()`, `moveToRangeOf()`, etc. that change the `state.selection` model and update the user's cursor without affecting the content of the document.
 
 ### On the Document at a Specific Range
 
-These are changes like `deleteAtRange()`, `addMarkAtArange()`, etc. that take in a [`Range`](./range.md) argument and apply a change to the document for all of the content in that range.
+These are changes like `deleteAtRange()`, `addMarkAtArange()`, `unwrapBlockAtRange()`, etc. that take in a [`Range`](./range.md) argument and apply a change to the document for all of the content in that range.
 
 ### On the Document at the Current Selection
 
-These are changes like `delete()`, `addMark()`, etc. that don't need to take in a range argument, because they apply make their edits based on where the user's current selection is. These are often what you want to use when programmatically editing "like a user".
+These are changes like `delete()`, `addMark()`, `insertBlock()`, etc. that don't need to take in a range argument, because they apply make their edits based on where the user's current selection is. These are often what you want to use when programmatically editing "like a user".
 
 ### On a Specific Node
 
-These are changes like `removeNodeByKey()`, `setNodeByKey()`, etc. that take a `key` string referring to a specific node, and then change that node in different ways. These are often what you use when making programmatic changes from inside your custom node components, where you already have a reference to `props.node.key`.
+These are changes like `removeNodeByKey()`, `setNodeByKey()`, `removeMarkByKey()`, etc. that take a `key` string referring to a specific node, and then change that node in different ways. These are often what you use when making programmatic changes from inside your custom node components, where you already have a reference to `props.node.key`.
 
 ### On the Top-level State
 
@@ -32,7 +66,7 @@ These are changes like `setData()`, `setDecorations()`, etc. that act on the oth
 
 ### On the History
 
-These are changes like `undo()` and `redo()` that use the operation history and redo or undo changes that have already happened. You generally don't need to worry about these, because they're already bound to the keyboard shortcuts you'd expect, and the user can use them.
+These are changes like `undo()`, `redo()`, etc. that use the operation history and redo or undo changes that have already happened. You generally don't need to worry about these, because they're already bound to the keyboard shortcuts you'd expect, and the user can use them.
 
 
 ## Making Changes
