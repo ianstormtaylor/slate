@@ -17,7 +17,7 @@ import findRange from '../utils/find-range'
 import getEventRange from '../utils/get-event-range'
 import getEventTransfer from '../utils/get-event-transfer'
 import setEventTransfer from '../utils/set-event-transfer'
-import { IS_CHROME, IS_MAC, IS_SAFARI } from '../constants/environment'
+import { IS_CHROME, IS_SAFARI } from '../constants/environment'
 
 /**
  * Debug.
@@ -479,269 +479,107 @@ function AfterPlugin(options = {}) {
   function onKeyDown(event, change, editor) {
     debug('onKeyDown', { event })
 
-    switch (event.key) {
-      case 'Enter': return onKeyDownEnter(event, change)
-      case 'Backspace': return onKeyDownBackspace(event, change)
-      case 'Delete': return onKeyDownDelete(event, change)
-      case 'ArrowLeft': return onKeyDownLeft(event, change)
-      case 'ArrowRight': return onKeyDownRight(event, change)
-      case 'ArrowUp': return onKeyDownUp(event, change)
-      case 'ArrowDown': return onKeyDownDown(event, change)
+    const { state } = change
+
+    if (HOTKEYS.SPLIT_BLOCK(event)) {
+      return state.isInVoid
+        ? change.collapseToStartOfNextText()
+        : change.splitBlock()
     }
 
     if (HOTKEYS.DELETE_CHAR_BACKWARD(event)) {
-      change.deleteCharBackward()
+      return change.deleteCharBackward()
     }
 
     if (HOTKEYS.DELETE_CHAR_FORWARD(event)) {
-      change.deleteCharForward()
+      return change.deleteCharForward()
+    }
+
+    if (HOTKEYS.DELETE_LINE_BACKWARD(event)) {
+      return change.deleteLineBackward()
     }
 
     if (HOTKEYS.DELETE_LINE_FORWARD(event)) {
-      change.deleteLineForward()
+      return change.deleteLineForward()
+    }
+
+    if (HOTKEYS.DELETE_WORD_BACKWARD(event)) {
+      return change.deleteWordBackward()
+    }
+
+    if (HOTKEYS.DELETE_WORD_FORWARD(event)) {
+      return change.deleteWordForward()
     }
 
     if (HOTKEYS.REDO(event)) {
-      change.redo()
+      return change.redo()
     }
 
     if (HOTKEYS.UNDO(event)) {
-      change.undo()
-    }
-  }
-
-  /**
-   * On `enter` key down, split the current block in half.
-   *
-   * @param {Event} event
-   * @param {Change} change
-   * @param {Editor} editor
-   */
-
-  function onKeyDownEnter(event, change, editor) {
-    const { state } = change
-    const { document, startKey } = state
-    const hasVoidParent = document.hasVoidParent(startKey)
-
-    // For void nodes, we don't want to split. Instead we just move to the start
-    // of the next text node if one exists.
-    if (hasVoidParent) {
-      const text = document.getNextText(startKey)
-      if (!text) return
-      change.collapseToStartOf(text)
-      return
+      return change.undo()
     }
 
-    change.splitBlock()
-  }
-
-  /**
-   * On `backspace` key down, delete backwards.
-   *
-   * @param {Event} event
-   * @param {Change} change
-   * @param {Editor} editor
-   */
-
-  function onKeyDownBackspace(event, change, editor) {
-    const isWord = IS_MAC ? event.altKey : event.ctrlKey
-    const isLine = IS_MAC ? event.metaKey : false
-
-    let boundary = 'Char'
-    if (isWord) boundary = 'Word'
-    if (isLine) boundary = 'Line'
-
-    change[`delete${boundary}Backward`]()
-  }
-
-  /**
-   * On `delete` key down, delete forwards.
-   *
-   * @param {Event} event
-   * @param {Change} change
-   * @param {Editor} editor
-   */
-
-  function onKeyDownDelete(event, change, editor) {
-    const isWord = IS_MAC ? event.altKey : event.ctrlKey
-    const isLine = IS_MAC ? event.metaKey : false
-
-    let boundary = 'Char'
-    if (isWord) boundary = 'Word'
-    if (isLine) boundary = 'Line'
-
-    change[`delete${boundary}Forward`]()
-  }
-
-  /**
-   * On `left` key down, move backward.
-   *
-   * COMPAT: This is required to make navigating with the left arrow work when
-   * a void node is selected.
-   *
-   * COMPAT: This is also required to solve for the case where an inline node is
-   * surrounded by empty text nodes with zero-width spaces in them. Without this
-   * the zero-width spaces will cause two arrow keys to jump to the next text.
-   *
-   * @param {Event} event
-   * @param {Change} change
-   * @param {Editor} editor
-   */
-
-  function onKeyDownLeft(event, change, editor) {
-    const { state } = change
-
-    if (event.ctrlKey) return
-    if (event.altKey) return
-    if (state.isExpanded) return
-
-    const { document, startKey, startText } = state
-    const hasVoidParent = document.hasVoidParent(startKey)
-
-    // If the current text node is empty, or we're inside a void parent, we're
-    // going to need to handle the selection behavior.
-    if (startText.text == '' || hasVoidParent) {
+    // COMPAT: Certain browsers don't handle the selection updates properly. In
+    // Chrome, the selection isn't properly extended. And in Firefox, the
+    // selection isn't properly collapsed. (2017/10/17)
+    if (HOTKEYS.COLLAPSE_LINE_BACKWARD(event)) {
       event.preventDefault()
-      const previous = document.getPreviousText(startKey)
-
-      // If there's no previous text node in the document, abort.
-      if (!previous) return
-
-      // If the previous text is in the current block, and inside a non-void
-      // inline node, move one character into the inline node.
-      const { startBlock } = state
-      const previousBlock = document.getClosestBlock(previous.key)
-      const previousInline = document.getClosestInline(previous.key)
-
-      if (previousBlock === startBlock && previousInline && !previousInline.isVoid) {
-        const extendOrMove = event.shiftKey ? 'extend' : 'move'
-        change.collapseToEndOf(previous)[extendOrMove](-1)
-        return
-      }
-
-      // Otherwise, move to the end of the previous node.
-      change.collapseToEndOf(previous)
+      return change.collapseLineBackward()
     }
-  }
 
-  /**
-   * On `right` key down, move forward.
-   *
-   * COMPAT: This is required to make navigating with the right arrow work when
-   * a void node is selected.
-   *
-   * COMPAT: This is also required to solve for the case where an inline node is
-   * surrounded by empty text nodes with zero-width spaces in them. Without this
-   * the zero-width spaces will cause two arrow keys to jump to the next text.
-   *
-   * COMPAT: In Chrome & Safari, selections that are at the zero offset of
-   * an inline node will be automatically replaced to be at the last offset
-   * of a previous inline node, which screws us up, so we never want to set the
-   * selection to the very start of an inline node here. (2016/11/29)
-   *
-   * @param {Event} event
-   * @param {Change} change
-   * @param {Editor} editor
-   */
-
-  function onKeyDownRight(event, change, editor) {
-    const { state } = change
-
-    if (event.ctrlKey) return
-    if (event.altKey) return
-    if (state.isExpanded) return
-
-    const { document, startKey, startText } = state
-    const hasVoidParent = document.hasVoidParent(startKey)
-
-    // If the current text node is empty, or we're inside a void parent, we're
-    // going to need to handle the selection behavior.
-    if (startText.text == '' || hasVoidParent) {
+    if (HOTKEYS.COLLAPSE_LINE_FORWARD(event)) {
       event.preventDefault()
-      const next = document.getNextText(startKey)
-
-      // If there's no next text node in the document, abort.
-      if (!next) return
-
-      // If the next text is inside a void node, move to the end of it.
-      if (document.hasVoidParent(next.key)) {
-        change.collapseToEndOf(next)
-        return
-      }
-
-      // If the next text is in the current block, and inside an inline node,
-      // move one character into the inline node.
-      const { startBlock } = state
-      const nextBlock = document.getClosestBlock(next.key)
-      const nextInline = document.getClosestInline(next.key)
-
-      if (nextBlock == startBlock && nextInline) {
-        const extendOrMove = event.shiftKey ? 'extend' : 'move'
-        change.collapseToStartOf(next)[extendOrMove](1)
-        return
-      }
-
-      // Otherwise, move to the start of the next text node.
-      change.collapseToStartOf(next)
+      return change.collapseLineForward()
     }
-  }
 
-  /**
-   * On `up` key down, for Macs, move the selection to start of the block.
-   *
-   * COMPAT: Certain browsers don't handle the selection updates properly. In
-   * Chrome, option-shift-up doesn't properly extend the selection. And in
-   * Firefox, option-up doesn't properly move the selection.
-   *
-   * @param {Event} event
-   * @param {Change} change
-   * @param {Editor} editor
-   */
+    if (HOTKEYS.EXTEND_LINE_BACKWARD(event)) {
+      event.preventDefault()
+      return change.extendLineBackward()
+    }
 
-  function onKeyDownUp(event, change, editor) {
-    if (!IS_MAC || event.ctrlKey || !event.altKey) return
+    if (HOTKEYS.EXTEND_LINE_FORWARD(event)) {
+      event.preventDefault()
+      return change.extendLineForward()
+    }
 
-    const { state } = change
-    const { selection, document, focusKey, focusBlock } = state
-    const transform = event.shiftKey ? 'extendToStartOf' : 'collapseToStartOf'
-    const block = selection.hasFocusAtStartOf(focusBlock)
-      ? document.getPreviousBlock(focusKey)
-      : focusBlock
+    // COMPAT: If a void node is selected, or a zero-width text node adjacent to
+    // an inline is selected, we need to handle these hotkeys manually because
+    // browsers won't know what to do.
+    if (HOTKEYS.COLLAPSE_CHAR_BACKWARD(event)) {
+      const { isInVoid, previousText, document } = state
+      const isPreviousInVoid = previousText && document.hasVoidParent(previousText.key)
+      if (isInVoid || isPreviousInVoid) {
+        event.preventDefault()
+        return change.collapseCharBackward()
+      }
+    }
 
-    if (!block) return
-    const text = block.getFirstText()
+    if (HOTKEYS.COLLAPSE_CHAR_FORWARD(event)) {
+      const { isInVoid, nextText, document } = state
+      const isNextInVoid = nextText && document.hasVoidParent(nextText.key)
+      if (isInVoid || isNextInVoid) {
+        event.preventDefault()
+        return change.collapseCharForward()
+      }
+    }
 
-    event.preventDefault()
-    change[transform](text)
-  }
+    if (HOTKEYS.EXTEND_CHAR_BACKWARD(event)) {
+      const { isInVoid, previousText, document } = state
+      const isPreviousInVoid = previousText && document.hasVoidParent(previousText.key)
+      if (isInVoid || isPreviousInVoid) {
+        event.preventDefault()
+        return change.extendCharBackward()
+      }
+    }
 
-  /**
-   * On `down` key down, for Macs, move the selection to end of the block.
-   *
-   * COMPAT: Certain browsers don't handle the selection updates properly. In
-   * Chrome, option-shift-down doesn't properly extend the selection. And in
-   * Firefox, option-down doesn't properly move the selection.
-   *
-   * @param {Event} event
-   * @param {Change} change
-   * @param {Editor} editor
-   */
-
-  function onKeyDownDown(event, change, editor) {
-    if (!IS_MAC || event.ctrlKey || !event.altKey) return
-
-    const { state } = change
-    const { selection, document, focusKey, focusBlock } = state
-    const transform = event.shiftKey ? 'extendToEndOf' : 'collapseToEndOf'
-    const block = selection.hasFocusAtEndOf(focusBlock)
-      ? document.getNextBlock(focusKey)
-      : focusBlock
-
-    if (!block) return
-    const text = block.getLastText()
-
-    event.preventDefault()
-    change[transform](text)
+    if (HOTKEYS.EXTEND_CHAR_FORWARD(event)) {
+      const { isInVoid, nextText, document } = state
+      const isNextInVoid = nextText && document.hasVoidParent(nextText.key)
+      if (isInVoid || isNextInVoid) {
+        event.preventDefault()
+        return change.extendCharForward()
+      }
+    }
   }
 
   /**
