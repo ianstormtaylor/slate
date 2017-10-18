@@ -1,17 +1,17 @@
 {
   "name": "slate-simulator",
   "description": "A simulator for testing Slate editors and plugins.",
-  "version": "0.1.17",
+  "version": "0.1.18",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
   "main": "./lib/index.js",
   "peerDependencies": {
-    "slate": "^0.27.3"
+    "slate": "^0.27.4"
   },
   "devDependencies": {
     "babel-cli": "^6.10.1",
     "browserify": "^13.0.1",
-    "slate": "^0.27.3",
+    "slate": "^0.27.4",
     "uglify-js": "^2.7.0"
   },
   "scripts": {
