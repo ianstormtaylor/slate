@@ -7,6 +7,16 @@ This document maintains a list of changes to the `slate-react` package with each
 ---
 
 
+### `0.7.0` — October 18, 2017
+
+###### BREAKING
+
+- **The `<Placeholder>` component no longer exists!** Previously there was a `Placeholder` component exported from `slate-react`, but it had lots of problems and a confusing API. Instead, placeholder logic can now be defined via the `schema` by providing a `placeholder` component to render what a node is matched.
+
+
+---
+
+
 ### `0.6.0` — October 16, 2017
 
 ###### BREAKING
