@@ -13,6 +13,11 @@
 - [Saving and Loading HTML Content](./walkthroughs/saving-and-loading-html-content.md)
 
 
+## Guides
+
+- [Changes](./guides/changes.md)
+
+
 ## General
 
 - [Resources](./general/resources.md)
