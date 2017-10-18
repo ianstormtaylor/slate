@@ -42,7 +42,7 @@ class ReadOnly extends React.Component {
     return (
       <Editor
         readOnly
-        placeholder={'Enter some text...'}
+        placeholder="Enter some text..."
         state={this.state.state}
         onChange={this.onChange}
       />

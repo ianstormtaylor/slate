@@ -155,6 +155,7 @@ class MarkdownPreview extends React.Component {
     return (
       <div className="editor">
         <Editor
+          placeholder="Write some markdown..."
           schema={schema}
           state={this.state.state}
           onChange={this.onChange}

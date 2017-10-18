@@ -83,7 +83,7 @@ The third is an example of using the plugin.render property to create a higher-o
   render() {
     return (
       <Editor
-        placeholder={'Enter some text...'}
+        placeholder="Enter some text..."
         plugins={plugins}
         state={this.state.state}
         onChange={this.onChange}

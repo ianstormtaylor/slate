@@ -209,7 +209,7 @@ class SyncingEditor extends React.Component {
           onChange={this.onChange}
           onKeyDown={this.onKeyDown}
           schema={schema}
-          placeholder={'Enter some rich text...'}
+          placeholder="Enter some text..."
           spellCheck
         />
       </div>

@@ -145,7 +145,7 @@ class CheckLists extends React.Component {
         <div className="editor">
           <Editor
             spellCheck
-            placeholder={'Enter some text...'}
+            placeholder="Get to work..."
             schema={schema}
             state={this.state.state}
             onChange={this.onChange}

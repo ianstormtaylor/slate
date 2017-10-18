@@ -134,6 +134,7 @@ class Tables extends React.Component {
     return (
       <div className="editor">
         <Editor
+          placeholder="Enter some text..."
           schema={schema}
           state={this.state.state}
           onKeyDown={this.onKeyDown}

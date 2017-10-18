@@ -110,20 +110,37 @@ class Schema extends Record(DEFAULTS) {
   }
 
   /**
-   * Return the renderer for an `object`.
+   * Return the component for an `object`.
    *
    * This method is private, because it should always be called on one of the
    * often-changing immutable objects instead, since it will be memoized for
    * much better performance.
    *
    * @param {Mixed} object
-   * @return {Component|Void}
+   * @return {Component|Null}
    */
 
   __getComponent(object) {
     const match = find(this.rules, rule => rule.render && rule.match(object))
-    if (!match) return
+    if (!match) return null
     return match.render
+  }
+
+  /**
+   * Return the placeholder for an `object`.
+   *
+   * This method is private, because it should always be called on one of the
+   * often-changing immutable objects instead, since it will be memoized for
+   * much better performance.
+   *
+   * @param {Mixed} object
+   * @return {Component|Null}
+   */
+
+  __getPlaceholder(object) {
+    const match = find(this.rules, rule => rule.placeholder && rule.match(object))
+    if (!match) return null
+    return match.placeholder
   }
 
   /**

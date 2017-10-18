@@ -129,6 +129,7 @@ class Emojis extends React.Component {
     return (
       <div className="editor">
         <Editor
+          placeholder="Write some 😍👋🎉..."
           schema={schema}
           state={this.state.state}
           onChange={this.onChange}

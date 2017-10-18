@@ -4,12 +4,13 @@ import Debug from 'debug'
 import Plain from 'slate-plain-serializer'
 import React from 'react'
 import getWindow from 'get-window'
-import { Block, Inline, coreSchema } from 'slate'
+import { Block, Inline, Text, coreSchema } from 'slate'
 
 import EVENT_HANDLERS from '../constants/event-handlers'
 import HOTKEYS from '../constants/hotkeys'
 import Content from '../components/content'
-import Placeholder from '../components/placeholder'
+import DefaultNode from '../components/default-node'
+import DefaultPlaceholder from '../components/default-placeholder'
 import findDOMNode from '../utils/find-dom-node'
 import findNode from '../utils/find-node'
 import findPoint from '../utils/find-point'
@@ -31,19 +32,10 @@ const debug = Debug('slate:core:after')
  * The after plugin.
  *
  * @param {Object} options
- *   @property {Element} placeholder
- *   @property {String} placeholderClassName
- *   @property {Object} placeholderStyle
  * @return {Object}
  */
 
 function AfterPlugin(options = {}) {
-  const {
-    placeholder,
-    placeholderClassName,
-    placeholderStyle,
-  } = options
-
   let isDraggingInternally = null
 
   /**
@@ -727,55 +719,6 @@ function AfterPlugin(options = {}) {
   }
 
   /**
-   * A default schema rule to render block nodes.
-   *
-   * @type {Object}
-   */
-
-  const BLOCK_RENDER_RULE = {
-    match: (node) => {
-      return node.kind == 'block'
-    },
-    render: (props) => {
-      return (
-        <div {...props.attributes} style={{ position: 'relative' }}>
-          {props.children}
-          {placeholder
-            ? <Placeholder
-                className={placeholderClassName}
-                node={props.node}
-                parent={props.state.document}
-                state={props.state}
-                style={placeholderStyle}
-              >
-                {placeholder}
-              </Placeholder>
-            : null}
-        </div>
-      )
-    }
-  }
-
-  /**
-   * A default schema rule to render inline nodes.
-   *
-   * @type {Object}
-   */
-
-  const INLINE_RENDER_RULE = {
-    match: (node) => {
-      return node.kind == 'inline'
-    },
-    render: (props) => {
-      return (
-        <span {...props.attributes} style={{ position: 'relative' }}>
-          {props.children}
-        </span>
-      )
-    }
-  }
-
-  /**
    * Add default rendering rules to the schema.
    *
    * @type {Object}
@@ -783,8 +726,14 @@ function AfterPlugin(options = {}) {
 
   const schema = {
     rules: [
-      BLOCK_RENDER_RULE,
-      INLINE_RENDER_RULE
+      {
+        match: obj => obj.kind == 'block' || obj.kind == 'inline',
+        render: DefaultNode,
+      },
+      {
+        match: obj => obj.kind == 'block' && Text.isTextList(obj.nodes) && obj.text == '',
+        placeholder: DefaultPlaceholder,
+      },
     ]
   }
 

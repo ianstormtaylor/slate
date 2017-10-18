@@ -190,6 +190,7 @@ class CodeHighlighting extends React.Component {
     return (
       <div className="editor">
         <Editor
+          placeholder="Write some code..."
           schema={schema}
           state={this.state.state}
           onKeyDown={this.onKeyDown}
