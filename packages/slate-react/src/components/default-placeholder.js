@@ -41,6 +41,7 @@ class DefaultPlaceholder extends React.Component {
       pointerEvents: 'none',
       display: 'inline-block',
       width: '0',
+      maxWidth: '100%',
       whiteSpace: 'nowrap',
       opacity: '0.333',
     }
