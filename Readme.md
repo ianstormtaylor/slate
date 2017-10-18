@@ -40,22 +40,19 @@ It can do this because all of its logic is implemented with a series of plugins,
 _**Slate is currently in beta**. It's useable now, but you might need to pull request a fix or two for advanced use cases._
 
 
-<br/>
-
-### Why?
-
+## Why?
 
 Why create Slate? Well... _(Beware: this section has a few of [my](https://github.com/ianstormtaylor) opinions!)_
 
-Before creating Slate, I tried a lot of the other rich text libraries out there—[**Draft.js**](https://facebook.github.io/draft-js/), [**Prosemirror**](http://prosemirror.net/), [**Quill**](http://quilljs.com/), etc. What I found was that while getting simple examples to work was easy enough, once you started trying to build something like [Medium](https://medium.com/), [Dropbox Paper](https://www.dropbox.com/paper) or [Google Docs](https://www.google.com/docs/about/), you ran into deeper issues...
+Before creating Slate, I tried a lot of the other rich text libraries out there—[**Draft.js**](https://facebook.github.io/draft-js/), [**Prosemirror**](http://prosemirror.net/), [**Quill**](http://quilljs.com/), etc. What I found was that while getting simple examples to work was easy enough, once you started trying to build something like [Medium](https://medium.com/), [Dropbox Paper](https://www.dropbox.com/paper) or [Google Docs](https://www.google.com/docs/about/), you ran into deeper issues, like...
 
 - **The editor's "schema" was hardcoded and hard to customize.** Things like bold and italic were supported out of the box, but what about comments, or embeds, or even more domain-specific needs?
 
-- **Transforming the documents programmatically was very convoluted.** Writing as a user may have worked, but making programmatic changes, which is critical for building advanced behaviors, was needlessly complex.
+- **Transforming the documents programmatically was very convoluted.** Writing as a user may have been nice, but performing programmatic changes, which is critical for building advanced behaviors, was needlessly complex.
 
 - **Serializing to HTML, Markdown, etc. seemed like an afterthought.** Simple things like transforming a document to HTML or Markdown involved writing lots of boilerplate code, for what seemed like very common use cases.
 
-- **Re-inventing the view layer seemed inefficient and limiting.** Most editors rolled their own views, instead of using existing technologies like React, so you have to learn a whole new system with new "gotchas".
+- **Relearning a new view layer seemed inefficient and limiting.** Editors were re-implementing view layers instead of using existing technologies like React, which forced you to learn a whole new system with it's own restrictions and gotchas.
 
 - **Collaborative editing wasn't designed for in advance.** Often the editor's internal representation of data made it impossible to use to for a realtime, collaborative editing use case without basically rewriting the editor.
 
@@ -70,39 +67,31 @@ If that sounds familiar, you might like Slate.
 Which brings me to how Slate solves all of that...
 
 
-<br/>
-
-### Principles
+## Principles
 
 Slate tries to solve the question of "[Why?](#why)" with a few principles:
 
-1. **First-class plugins.** The most important part of Slate is that plugins are first-class entities—the core editor logic is even implemented as its own plugin. That means you can _completely_ customize the editing experience, to build complex editors like Medium's or Dropbox's, without having to fight against the library's assumptions.
+1. **First-class plugins.** The most important part of Slate is that plugins are first-class entities—the core editor logic is even implemented as its own plugin. That means you can _completely_ customize the editing experience, to build complex editors like Medium's or Canvas's without having to fight against the library's assumptions.
 
-2. **Schema-less core.** Slate's core logic doesn't assume anything about the schema of the data you'll be editing, which means that there are no assumptions baked into the library that'll trip you up when you need to go beyond the most basic use cases.
+2. **Schema-less core.** Slate's core logic doesn't assume anything about the schema of the data you'll be editing, which means that there are no assumptions baked into the library that'll trip you up when you need to go beyond basic usage.
 
 3. **Nested document model.** The document model used for Slate is a nested, recursive tree, just like the DOM itself. This means that creating complex components like tables or nested block quotes are possible for advanced use cases. But it's also easy to keep it simple by only using a single level of hierarchy.
 
-3. **Parallel to the DOM.** Slate's data model is based on the DOM—the document is a nested tree, it uses selections and ranges, and it exposes all the standard event handlers. This means that advanced behaviors like tables or nested block quotes are possible. Pretty much anything you can do in the DOM, you can do in Slate.
+4. **Stateless and immutable data.** By using React and Immutable.js, the Slate editor is built in a stateless fashion using immutable data structures, which leads to much easier to reason about code, and a much easier time writing plugins.
 
-4. **Stateless views and immutable data.** By using React and Immutable.js, the Slate editor is built in a stateless fashion using immutable data structures, which leads to much easier to reason about code, and a much easier time writing plugins.
+5. **Intuitive changes.** Slate's content is edited using "changes", that are designed to be high level and extremely intuitive to use, so that writing plugins and custom functionality is as simple as possible.
 
-5. **Intuitive changes.** Slate documents are edited using "changes", that are designed to be high-level and extremely intuitive to write and read, so that  custom functionality is as expressive as possible. This greatly increases your ability to reason about your code.
-
-6. **Collaboration-ready data model.** The data model Slate uses—specifically how changes are applied to the document—has been designed to allow for collaborative editing to be layered on top, so you won't need to rethink everything if you decide to make your editor collaborative.
+6. **Collaboration-ready data model.** The data model Slate uses—specifically how changes are applied to the document—has been designed to allow for collaborative editing to be layered on top, so you won't need to rethink everything if you decide to make your editor collaborative. (More work is required on this!)
 
 7. **Clear "core" boundaries.** With a plugin-first architecture, and a schema-less core, it becomes a lot clearer where the boundary is between "core" and "custom", which means that the core experience doesn't get bogged down in edge cases.
 
 
-<br/>
-
-### Demo
+## Demo
 
 Check out the [**live demo**](http://slatejs.org) of all of the examples!
 
 
-<br/>
-
-### Examples
+## Examples
 
 To get a sense for how you might use Slate, check out a few of the examples:
 
@@ -120,9 +109,7 @@ To get a sense for how you might use Slate, check out a few of the examples:
 If you have an idea for an example that shows a common use case, pull request it!
 
 
-<br/>
-
-### Plugins
+## Plugins
 
 Slate encourages you to write small, reusable modules. Check out the public ones you can use in your project!
 
@@ -138,9 +125,7 @@ Slate encourages you to write small, reusable modules. Check out the public ones
 - [**See all the plugins...**](https://yarnpkg.com/en/packages?q=slate)
 
 
-<br/>
-
-### Documentation
+## Documentation
 
 If you're using Slate for the first time, check out the [Getting Started](http://docs.slatejs.org/walkthroughs/installing-slate.html) walkthroughs to familiarize yourself with Slate's architecture and mental models. Once you've gotten familiar with those, you'll probably want to check out the full [API Reference](http://docs.slatejs.org/reference/components/editor.html).
 
@@ -152,9 +137,7 @@ If you're using Slate for the first time, check out the [Getting Started](http:/
 If even that's not enough, you can always [read the source itself](./src), which is explained along with a handful of readme's and is heavily commented.
 
 
-<br/>
-
-### Translations
+## Translations
 
 There are also translations of the documentation into other languages:
 
@@ -163,9 +146,7 @@ There are also translations of the documentation into other languages:
 If you're maintaining a translation, feel free to pull request it here!
 
 
-<br/>
-
-### Contributing!
+## Contributing!
 
 All contributions are super welcome! Check out the [Contributing instructions](./Contributing.md) for more info!
 
