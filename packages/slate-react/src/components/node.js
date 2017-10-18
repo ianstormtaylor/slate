@@ -54,6 +54,7 @@ class Node extends React.Component {
     const { node, schema } = props
     this.state = {}
     this.state.Component = node.getComponent(schema)
+    this.state.Placeholder = node.getPlaceholder(schema)
   }
 
   /**
@@ -78,7 +79,8 @@ class Node extends React.Component {
   componentWillReceiveProps = (props) => {
     if (props.node == this.props.node) return
     const Component = props.node.getComponent(props.schema)
-    this.setState({ Component })
+    const Placeholder = props.node.getPlaceholder(props.schema)
+    this.setState({ Component, Placeholder })
   }
 
   /**
@@ -154,7 +156,7 @@ class Node extends React.Component {
     this.debug('render', { props })
 
     const { editor, isSelected, node, parent, readOnly, state } = props
-    const { Component } = this.state
+    const { Component, Placeholder } = this.state
     const { selection } = state
     const indexes = node.getSelectionIndexes(selection, isSelected)
     const children = node.nodes.toArray().map((child, i) => {
@@ -173,17 +175,19 @@ class Node extends React.Component {
       if (direction == 'rtl') attributes.dir = 'rtl'
     }
 
+    const p = {
+      editor,
+      isSelected,
+      key: node.key,
+      node,
+      parent,
+      readOnly,
+      state
+    }
+
     const element = (
-      <Component
-        attributes={attributes}
-        editor={editor}
-        isSelected={isSelected}
-        key={node.key}
-        node={node}
-        parent={parent}
-        readOnly={readOnly}
-        state={state}
-      >
+      <Component {...p} attributes={attributes}>
+        {Placeholder && <Placeholder {...p} />}
         {children}
       </Component>
     )

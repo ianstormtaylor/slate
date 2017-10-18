@@ -56,6 +56,7 @@ class Embeds extends React.Component {
     return (
       <div className="editor">
         <Editor
+          placeholder="Enter some text..."
           schema={schema}
           state={this.state.state}
           onChange={this.onChange}

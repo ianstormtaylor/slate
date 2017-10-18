@@ -295,12 +295,12 @@ class RichTextExample extends React.Component {
     return (
       <div className="editor">
         <Editor
+          placeholder="Enter some rich text..."
+          schema={schema}
+          spellCheck
           state={this.state.state}
           onChange={this.onChange}
           onKeyDown={this.onKeyDown}
-          schema={schema}
-          placeholder={'Enter some rich text...'}
-          spellCheck
         />
       </div>
     )

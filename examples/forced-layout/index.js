@@ -101,6 +101,7 @@ class ForcedLayout extends React.Component {
   render() {
     return (
       <Editor
+        placeholder="Enter a title..."
         state={this.state.state}
         schema={this.state.schema}
         onChange={this.onChange}

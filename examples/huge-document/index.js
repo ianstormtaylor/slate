@@ -105,7 +105,7 @@ class HugeDocument extends React.Component {
   render() {
     return (
       <Editor
-        placeholder={'Enter some text...'}
+        placeholder="Enter some text..."
         schema={schema}
         spellCheck={false}
         state={this.state.state}

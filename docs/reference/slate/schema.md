@@ -84,6 +84,7 @@ Internally, the `marks` and `nodes` properties of a schema are simply converted 
   match: Function,
   decorate: Function,
   normalize: Function,
+  placeholder: Component || Function,
   render: Component || Function || Object || String,
   validate: Function
 }
@@ -139,6 +140,18 @@ The `decorate` property allows you define a function that will apply extra marks
 ```
 
 The `normalize` property is a function to run that recovers the editor's state after the `validate` property of a rule has determined that an object is invalid. It is passed a [`Change`](./change.md) that it can use to make modifications. It is also passed the return value of the `validate` function, which makes it easy to quickly determine the failure reason from the validation.
+
+### `placeholder`
+`Component` <br/>
+`Function`
+
+```js
+{
+  placeholder: (props) => <span>{props.editor.props.placeholder}</span>
+}
+```
+
+The `placeholder` property determines which React component Slate will use to render a placeholder for the editor.
 
 ### `render`
 `Component` <br/>

@@ -133,7 +133,7 @@ class SearchHighlighting extends React.Component {
           state={this.state.state}
           onChange={this.onChange}
           schema={schema}
-          placeholder={'Enter some rich text...'}
+          placeholder="Enter some rich text..."
           spellCheck
         />
       </div>

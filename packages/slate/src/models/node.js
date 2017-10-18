@@ -1329,6 +1329,17 @@ class Node {
   }
 
   /**
+   * Get the placeholder for the node from a `schema`.
+   *
+   * @param {Schema} schema
+   * @return {Component|Void}
+   */
+
+  getPlaceholder(schema) {
+    return schema.__getPlaceholder(this)
+  }
+
+  /**
    * Get the block node before a descendant text node by `key`.
    *
    * @param {String} key
@@ -2142,6 +2153,7 @@ memoize(Node.prototype, [
   'getOffsetAtRange',
   'getParent',
   'getPath',
+  'getPlaceholder',
   'getPreviousBlock',
   'getPreviousSibling',
   'getPreviousText',

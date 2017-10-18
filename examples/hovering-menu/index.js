@@ -165,6 +165,7 @@ class HoveringMenu extends React.Component {
         />
         <div className="editor">
           <Editor
+            placeholder="Enter some text..."
             schema={schema}
             state={this.state.state}
             onChange={this.onChange}
