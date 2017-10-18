@@ -48,7 +48,6 @@
 ## Slate React
 
 - [Editor](./reference/slate-react/editor.md)
-- [Placeholder](./reference/slate-react/placeholder.md)
 - [Plugins](./reference/slate-react/plugins.md)
 - [Custom Nodes](./reference/slate-react/custom-nodes.md)
 - [Core Plugins](./reference/slate-react/core-plugins.md)
