@@ -54,7 +54,7 @@ These are changes like `deleteAtRange()`, `addMarkAtArange()`, `unwrapBlockAtRan
 
 ### At the Current Selection
 
-These are changes like `delete()`, `addMark()`, `insertBlock()`, etc. that are the same as the `*AtRange` equivalents, but don't need to take in a range argument, because they apply make their edits based on where the user's current selection is. These are often what you want to use when programmatically editing "like a user".
+These are changes like `delete()`, `addMark()`, `insertBlock()`, etc. that are the same as the `*AtRange` equivalents, but don't need to take in a range argument, because they apply their edits based on where the user's current selection is. These are often what you want to use when programmatically editing "like a user".
 
 ### On the Selection
 
@@ -93,7 +93,7 @@ Any change methods you call will be applied, and when the event handler stack is
 
 ### 2. From Custom Node Components
 
-The second place you is inside a custom node component. For example, you might have an `<Image>` component and you want to make a change when the image is clicked.
+The second place is inside a custom node component. For example, you might have an `<Image>` component and you want to make a change when the image is clicked.
 
 In that case, you'll need to use the `change()` method on the Slate [`<Editor>`](../reference/slate-react/editor.md) which you have available as `props.editor`. For example...
 
