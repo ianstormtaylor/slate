@@ -19,30 +19,36 @@ A [`State`](./state.md) with the change's current operations applied. Each time 
 
 ## Methods
 
-### `apply`
-`apply(options: Object) => Change`
-
-Applies current change steps, saving them to the history if needed.
-
 ### `call`
-`call(customChange: Function, ...arguments) => Change`
+`call(customChange: Function, ...args) => Change`
 
-This method calls the provided function argument `customChange` with the current instance of the `Change` object as the first argument and passes through the remaining arguments.
-
-The function signature for `customChange` is:
-
-`customChange(change: Change, ...arguments)`
+This method calls the provided `customChange` function with the current instance of the `Change` object as the first argument and passes through the remaining `args`.
 
 The purpose of `call` is to enable custom change methods to exist and called in a chain. For example:
 
-```
-return state.change()
-  .call(myCustomInsertTableChange, columns, rows)
-  .focus()
-  .apply()
+```js
+function addBoldMark(change) {
+  change.addMark('bold_mark')
+}
+
+function insertParagraph(change) {
+  change.insertBlock('paragraph_block')
+}
+
+function onSomeEvent(event, change) {
+  change
+    .call(insertParagraph)
+    .insertText('Some text...')
+    .extendToStartOfBlock()
+    .call(addBoldMark)
+    .collapseToEnd()
+}
 ```
 
+
 ## Current State Changes
+
+These changes act on the `document` based on the current `selection`. They are equivalent to calling the [Document Changes](#document-changes) with the current selection as the `range` argument, but they are there for convenience, since you often want to act with the current selection, as a user would.
 
 ### `deleteBackward`
 `deleteBackward(n: Number) => Change`
@@ -153,6 +159,8 @@ Surround the text in the current selection with `prefix` and `suffix` strings. I
 
 ## Selection Changes
 
+These changes change the current `selection`, without touching the `document`.
+
 ### `blur`
 `blur() => Change`
 
@@ -234,99 +242,9 @@ Select the entire document and focus the selection.
 Unset the selection.
 
 
-## Node Changes
-
-### `addMarkByKey`
-`addMarkByKey(key: String, offset: Number, length: Number, mark: Mark) => Change`
-
-Add a `mark` to `length` characters starting at an `offset` in a [`Node`](./node.md) by its `key`.
-
-### `insertNodeByKey`
-`insertNodeByKey(key: String, index: Number, node: Node) => Change`
-
-Insert a `node` at `index` inside a parent [`Node`](./node.md) by its `key`.
-
-### `insertFragmentByKey`
-`insertFragmentByKey(key: String, index: Number, fragment: Fragment) => Transform`
-
-Insert a [`Fragment`](./fragment.md) at `index` inside a parent [`Node`](./node.md) by its `key`.
-
-### `insertTextByKey`
-`insertTextByKey(key: String, offset: Number, text: String, [marks: Set]) => Change`
-
-Insert `text` at an `offset` in a [`Text Node`](./text.md) by its `key` with optional `marks`.
-
-### `moveNodeByKey`
-`moveNodeByKey(key: String, newKey: String, newIndex: Number) => Change`
-
-Move a [`Node`](./node.md) by its `key` to a new parent node with its `newKey` and at a `newIndex`.
-
-### `removeMarkByKey`
-`removeMarkByKey(key: String, offset: Number, length: Number, mark: Mark) => Change`
-
-Remove a `mark` from `length` characters starting at an `offset` in a [`Node`](./node.md) by its `key`.
-
-### `removeNodeByKey`
-`removeNodeByKey(key: String) => Change`
-
-Remove a [`Node`](./node.md) from the document by its `key`.
-
-### `replaceNodeByKey`
-`replaceNodeByKey(key: String, node: Node) => Change`
-
-Replace a [`Node`](./node.md) in the document with a new [`Node`](./node.md) by its `key`.
-
-### `removeTextByKey`
-`removeTextByKey(key: String, offset: Number, length: Number) => Change`
-
-Remove `length` characters of text starting at an `offset` in a [`Node`](./node.md) by its `key`.
-
-### `setMarkByKey`
-`setMarkByKey(key: String, offset: Number, length: Number, mark: Mark, properties: Object) => Change`
-
-Set a dictionary of `properties` on a [`mark`](./mark.md) on a [`Node`](./node.md) by its `key`.
-
-### `setNodeByKey`
-`setNodeByKey(key: String, properties: Object) => Change` <br/>
-`setNodeByKey(key: String, type: String) => Change`
-
-Set a dictionary of `properties` on a [`Node`](./node.md) by its `key`. For convenience, you can pass a `type` string or `properties` object.
-
-### `splitNodeByKey`
-`splitNodeByKey(key: String, offset: Number) => Change`
-
-Split a node by its `key` at an `offset`.
-
-### `unwrapInlineByKey`
-`unwrapInlineByKey(key: String, properties: Object) => Change` <br/>
-`unwrapInlineByKey(key: String, type: String) => Change`
-
-Unwrap all inner content of an [`Inline`](./inline.md) node by its `key` that match `properties`. For convenience, you can pass a `type` string or `properties` object.
-
-### `unwrapBlockByKey`
-`unwrapBlockByKey(key: String, properties: Object) => Change` <br/>
-`unwrapBlockByKey(key: String, type: String) => Change`
-
-Unwrap all inner content of a [`Block`](./block.md) node by its `key` that match `properties`. For convenience, you can pass a `type` string or `properties` object.
-
-### `unwrapNodeByKey`
-`unwrapNodeByKey(key: String) => Change`
-
-Unwrap a single node from its parent. If the node is surrounded with siblings, its parent will be split. If the node is the only child, the parent is removed, and simply replaced by the node itself. Cannot unwrap a root node.
-
-### `wrapBlockByKey`
-`wrapBlockByKey(key: String, properties: Object) => Change` <br/>
-`wrapBlockByKey(key: String, type: String) => Change`
-
-Wrap the given node in a [`Block`](./block.md) node that match `properties`. For convenience, you can pass a `type` string or `properties` object.
-
-### `wrapInlineByKey`
-`wrapInlineByKey(key: String, properties: Object) => Change` <br/>
-`wrapInlineByKey(key: String, type: String) => Change`
-
-Wrap the given node in a [`Inline`](./inline.md) node that match `properties`. For convenience, you can pass a `type` string or `properties` object.
-
 ## Document Changes
+
+These changes act on a specific [`Range`](./range.md) of the document.
 
 ### `deleteBackwardAtRange`
 `deleteBackwardAtRange(range: Range, n: Number) => Change`
@@ -439,7 +357,104 @@ Wrap the [`Inline`](./inline.md) nodes in a `range` with a new [`Inline`](./inli
 Surround the text in a `range` with `prefix` and `suffix` strings. If the `suffix` is ommitted, the `prefix` will be used instead.
 
 
+## Node Changes
+
+These changes are lower-level, and act on a specific node by its `key`. They're often used in your custom components because you'll have access to `props.node`.
+
+### `addMarkByKey`
+`addMarkByKey(key: String, offset: Number, length: Number, mark: Mark) => Change`
+
+Add a `mark` to `length` characters starting at an `offset` in a [`Node`](./node.md) by its `key`.
+
+### `insertNodeByKey`
+`insertNodeByKey(key: String, index: Number, node: Node) => Change`
+
+Insert a `node` at `index` inside a parent [`Node`](./node.md) by its `key`.
+
+### `insertFragmentByKey`
+`insertFragmentByKey(key: String, index: Number, fragment: Fragment) => Transform`
+
+Insert a [`Fragment`](./fragment.md) at `index` inside a parent [`Node`](./node.md) by its `key`.
+
+### `insertTextByKey`
+`insertTextByKey(key: String, offset: Number, text: String, [marks: Set]) => Change`
+
+Insert `text` at an `offset` in a [`Text Node`](./text.md) by its `key` with optional `marks`.
+
+### `moveNodeByKey`
+`moveNodeByKey(key: String, newKey: String, newIndex: Number) => Change`
+
+Move a [`Node`](./node.md) by its `key` to a new parent node with its `newKey` and at a `newIndex`.
+
+### `removeMarkByKey`
+`removeMarkByKey(key: String, offset: Number, length: Number, mark: Mark) => Change`
+
+Remove a `mark` from `length` characters starting at an `offset` in a [`Node`](./node.md) by its `key`.
+
+### `removeNodeByKey`
+`removeNodeByKey(key: String) => Change`
+
+Remove a [`Node`](./node.md) from the document by its `key`.
+
+### `replaceNodeByKey`
+`replaceNodeByKey(key: String, node: Node) => Change`
+
+Replace a [`Node`](./node.md) in the document with a new [`Node`](./node.md) by its `key`.
+
+### `removeTextByKey`
+`removeTextByKey(key: String, offset: Number, length: Number) => Change`
+
+Remove `length` characters of text starting at an `offset` in a [`Node`](./node.md) by its `key`.
+
+### `setMarkByKey`
+`setMarkByKey(key: String, offset: Number, length: Number, mark: Mark, properties: Object) => Change`
+
+Set a dictionary of `properties` on a [`mark`](./mark.md) on a [`Node`](./node.md) by its `key`.
+
+### `setNodeByKey`
+`setNodeByKey(key: String, properties: Object) => Change` <br/>
+`setNodeByKey(key: String, type: String) => Change`
+
+Set a dictionary of `properties` on a [`Node`](./node.md) by its `key`. For convenience, you can pass a `type` string or `properties` object.
+
+### `splitNodeByKey`
+`splitNodeByKey(key: String, offset: Number) => Change`
+
+Split a node by its `key` at an `offset`.
+
+### `unwrapInlineByKey`
+`unwrapInlineByKey(key: String, properties: Object) => Change` <br/>
+`unwrapInlineByKey(key: String, type: String) => Change`
+
+Unwrap all inner content of an [`Inline`](./inline.md) node by its `key` that match `properties`. For convenience, you can pass a `type` string or `properties` object.
+
+### `unwrapBlockByKey`
+`unwrapBlockByKey(key: String, properties: Object) => Change` <br/>
+`unwrapBlockByKey(key: String, type: String) => Change`
+
+Unwrap all inner content of a [`Block`](./block.md) node by its `key` that match `properties`. For convenience, you can pass a `type` string or `properties` object.
+
+### `unwrapNodeByKey`
+`unwrapNodeByKey(key: String) => Change`
+
+Unwrap a single node from its parent. If the node is surrounded with siblings, its parent will be split. If the node is the only child, the parent is removed, and simply replaced by the node itself. Cannot unwrap a root node.
+
+### `wrapBlockByKey`
+`wrapBlockByKey(key: String, properties: Object) => Change` <br/>
+`wrapBlockByKey(key: String, type: String) => Change`
+
+Wrap the given node in a [`Block`](./block.md) node that match `properties`. For convenience, you can pass a `type` string or `properties` object.
+
+### `wrapInlineByKey`
+`wrapInlineByKey(key: String, properties: Object) => Change` <br/>
+`wrapInlineByKey(key: String, type: String) => Change`
+
+Wrap the given node in a [`Inline`](./inline.md) node that match `properties`. For convenience, you can pass a `type` string or `properties` object.
+
+
 ## History Changes
+
+These changes use the history to undo/redo previously made changes.
 
 ### `redo`
 `redo() => Change`

@@ -51,7 +51,7 @@ Find the Slate node from a DOM `element` and Slate `state`.
 
 ```js
 function onSomeNativeEvent(event) {
-  const node = fidnNode(event.target)
+  const node = findNode(event.target)
   // Do something with `node`...
 }
 ```
