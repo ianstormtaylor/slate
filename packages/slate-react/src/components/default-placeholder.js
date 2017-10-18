@@ -34,8 +34,8 @@ class DefaultPlaceholder extends React.Component {
 
   render() {
     const { editor, state } = this.props
-    if (state.document.nodes.size > 1) return null
     if (!editor.props.placeholder) return null
+    if (state.document.getBlocks().size > 1) return null
 
     const style = {
       pointerEvents: 'none',
