@@ -8,39 +8,6 @@ All of the [`Change`](./change.md) methods result in operations being created an
 There are a handful of Slate operation types. The goal is to have the fewest possible types, while still maintaining the necessary semantics for collaborative editing to work.
 
 
-## Properties
-
-### `mark`
-`Array`
-
-A mark that is being added or removed by the operation, or being used as a comparison point when updating an existing mark.
-
-### `marks`
-`Array`
-
-A set of marks that are being added by the operation.
-
-### `offset`
-`Number`
-
-The offset inside a [`Text`](./text.md) node that the operation acts on.
-
-### `path`
-`Array`
-
-The path to the node the operation acts on. The array contains a list of indexes, representing where the node is in the `document` hierarchy.
-
-### `text`
-`String`
-
-The text that is being inserted or removed by the operation.
-
-### `type`
-`String`
-
-The `type` of the operation.
-
-
 ## Text Operations
 
 ### `insert_text`

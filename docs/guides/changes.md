@@ -10,17 +10,29 @@ This is important because the `Change` model is responsible for ensuring that ev
 
 There are a handled of different categories of changes that ship with Slate by default, and understanding them may help you understand which methods to reach for when trying to write your editor's logic...
 
-- **Selection changes** are changes like `blur()`, `collapseToStart()`, etc. that change the `state.selection` model and update the user's cursor without affecting the content of the document.
+### On the Selection
 
-- **Document at range changes** are changes like `deleteAtRange()`, `addMarkAtArange()`, etc. that take in a [`Range`](./range.md) argument and apply a change to the document for all of the content in that range.
+These are changes like `blur()`, `collapseToStart()`, etc. that change the `state.selection` model and update the user's cursor without affecting the content of the document.
 
-- **Document at current selection changes** are changes like `delete()`, `addMark()`, etc. that don't need to take in a range argument, because they apply make their edits based on where the user's current selection is. These are often what you want to use when programmatically editing "like a user".
+### On the Document at a Specific Range
 
-- **Node changes** are changes like `removeNodeByKey()`, `setNodeByKey()`, etc. that take a `key` string referring to a specific node, and then change that node in different ways. These are often what you use when making programmatic changes from inside your custom node components, where you already have a reference to `props.node.key`.
+These are changes like `deleteAtRange()`, `addMarkAtArange()`, etc. that take in a [`Range`](./range.md) argument and apply a change to the document for all of the content in that range.
 
-- **State changes** are changes like `setData()`, `setDecorations()`, etc. that act on the other top-level properties of the [`State`](../reference/slate/state.md) object. These are more advanced.
+### On the Document at the Current Selection
 
-- **History changes** are changes like `undo()` and `redo()` that use the operation history and redo or undo changes that have already happened. You generally don't need to worry about these, because they're already bound to the keyboard shortcuts you'd expect, and the user can use them.
+These are changes like `delete()`, `addMark()`, etc. that don't need to take in a range argument, because they apply make their edits based on where the user's current selection is. These are often what you want to use when programmatically editing "like a user".
+
+### On a Specific Node
+
+These are changes like `removeNodeByKey()`, `setNodeByKey()`, etc. that take a `key` string referring to a specific node, and then change that node in different ways. These are often what you use when making programmatic changes from inside your custom node components, where you already have a reference to `props.node.key`.
+
+### On the Top-level State
+
+These are changes like `setData()`, `setDecorations()`, etc. that act on the other top-level properties of the [`State`](../reference/slate/state.md) object. These are more advanced.
+
+### On the History
+
+These are changes like `undo()` and `redo()` that use the operation history and redo or undo changes that have already happened. You generally don't need to worry about these, because they're already bound to the keyboard shortcuts you'd expect, and the user can use them.
 
 
 ## Making Changes
@@ -39,11 +51,11 @@ function onKeyDown(event, change, editor) {
 }
 ```
 
-Any change methods you call will be applied, and when the event handler stack is finished resolving, the editor will automatically update with those changes.
+Any change methods you call will be applied, and when the event handler stack is finished resolving, the editor will automatically update with those changes. 
 
 ### 2. From Custom Node Components
 
-The second place you might want to make changes is from an event handler inside a custom node component. For example, you might have an `<Image>` component and you want to make a change when the image is clicked.
+The second place you is inside a custom node component. For example, you might have an `<Image>` component and you want to make a change when the image is clicked.
 
 In that case, you'll need to use the `change()` method on the Slate [`<Editor>`](../reference/slate-react/editor.md) which you have available as `props.editor`. For example...
 
@@ -51,17 +63,14 @@ In that case, you'll need to use the `change()` method on the Slate [`<Editor>`]
 class Image extends React.Component {
 
   onClick = (event) => {
-    const { editor, node } = this.props
-
-    editor.change((change) => {
-      change.removeNodeByKey(node.key)
+    this.props.editor.change((change) => {
+      change.removeNodeByKey(this.props.node.key)
     })
   }
 
   render() {
     <img 
-      {...props.attributes} 
-      src={props.node.data.get('src')} 
+      {...this.props.attributes} 
       onClick={this.onClick}
     />
   }
@@ -69,7 +78,7 @@ class Image extends React.Component {
 }
 ```
 
-The `editor.change()` method will create a new [`Change`](../reference/slate/change.md) object for you, based on the editor's current state. You can then call any change methods you want, and they the new state will be applied to the editor.
+The `editor.change()` method will create a new [`Change`](../reference/slate/change.md) object for you, based on the editor's current state. You can then call any change methods you want, and the new state will be applied to the editor.
 
 ### 3. From Outside Slate
 
