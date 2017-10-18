@@ -37,6 +37,7 @@
 - [Mark](./reference//slate/mark.md)
 - [Node](./reference/slate/node.md)
 - [Range](./reference/slate/range.md)
+- [Operation](./reference/slate/operation.md)
 - [Schema](./reference/slate/schema.md)
 - [State](./reference/slate/state.md)
 - [Text](./reference/slate/text.md)
