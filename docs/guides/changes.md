@@ -3,7 +3,7 @@
 
 All changes to a Slate editor's state, whether it's the `selection`, `document`, `history`, etc. happen via "changes"—specifically, via the [`Change`](../reference/slate/change.md) model.
 
-This is important because the `Change` model is responsible for ensuring that every change to a Slate state can be expressed in terms of low-level [operations](./operation.md). But you don't have to worry about that, because it happens automatically.
+This is important because the `Change` model is responsible for ensuring that every change to a Slate state can be expressed in terms of low-level [operations](../reference/slate/operation.md). But you don't have to worry about that, because it happens automatically.
 
 You just need to understand changes...
 
