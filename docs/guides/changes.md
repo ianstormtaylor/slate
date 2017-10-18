@@ -44,17 +44,17 @@ The change methods are the one place in Slate where overlap and near-duplication
 
 There are a handful of different categories of changes that ship with Slate by default, and understanding them may help you understand which methods to reach for when trying to write your editor's logic...
 
+### At a Specific Range
+
+These are changes like `deleteAtRange()`, `addMarkAtArange()`, `unwrapBlockAtRange()`, etc. that take in a [`Range`](./range.md) argument and apply a change to the document for all of the content in that range. These aren't used that often, because you'll usually be able to get away with using the next category of changes instead...
+
+### At the Current Selection
+
+These are changes like `delete()`, `addMark()`, `insertBlock()`, etc. that are the same as the `*AtRange` equivalents, but don't need to take in a range argument, because they apply make their edits based on where the user's current selection is. These are often what you want to use when programmatically editing "like a user".
+
 ### On the Selection
 
 These are changes like `blur()`, `collapseToStart()`, `moveToRangeOf()`, etc. that change the `state.selection` model and update the user's cursor without affecting the content of the document.
-
-### On the Document at a Specific Range
-
-These are changes like `deleteAtRange()`, `addMarkAtArange()`, `unwrapBlockAtRange()`, etc. that take in a [`Range`](./range.md) argument and apply a change to the document for all of the content in that range.
-
-### On the Document at the Current Selection
-
-These are changes like `delete()`, `addMark()`, `insertBlock()`, etc. that don't need to take in a range argument, because they apply make their edits based on where the user's current selection is. These are often what you want to use when programmatically editing "like a user".
 
 ### On a Specific Node
 
