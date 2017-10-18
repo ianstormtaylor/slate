@@ -3,14 +3,16 @@
 
 All changes to a Slate editor's state, whether it's the `selection`, `document`, `history`, etc. happen via "changes"—specifically, via the [`Change`](../reference/slate/change.md) model.
 
-This is important because the `Change` model is responsible for ensuring that every change to a Slate state can be expressed in terms of low-level [operations](./operation.md).
+This is important because the `Change` model is responsible for ensuring that every change to a Slate state can be expressed in terms of low-level [operations](./operation.md). But you don't have to worry about that, because it happens automatically.
+
+You just need to understand changes...
 
 
 ## Expressiveness is Key
 
 Changes in Slate are designed to prioritize expressiveness above almost all else.
 
-If you're building a powerful editor, it's going to be somewhat complex, and you're going to be writing code to perform all different kinds of programmatic changes. You'll be remove nodes, inserting fragments, moving the selection around, etc.
+If you're building a powerful editor, it's going to be somewhat complex, and you're going to be writing code to perform all different kinds of programmatic changes. You'll be removing nodes, inserting fragments, moving the selection around, etc.
 
 And if the API for changes was verbose, or if required lots of in between steps to be continually performed, your code would balloon to be impossible to understand very quickly.
 
@@ -29,18 +31,20 @@ change
   .insertBlock('paragraph')
 ```
 
-Hopefully from reading that it's pretty clear that those changes resulting in... the entire document's content being deleted, some text bring written, a word being bolded, and then an image and another paragraph being inserted.
+Hopefully from reading that you can discern that those changes result in... the entire document's content being selected and deleted, some text bring written, a word being bolded, and finally an image block and a paragraph block being added.
 
-Of course you're not normally going to be chaining quite that much. 
+Of course you're not usually going to chain that much. 
 
-Point is, you can do some pretty complex things in just a few lines of code. That way, when you're scanning to see what behaviors are being triggered, you can understand your code easily. You don't have to sit there and try to parse out a bunch of interim variables to figure out what you're trying to achieve.
+Point is, you can get pretty expressive in just a few lines of code. 
+
+That way, when you're scanning to see what behaviors are being triggered, you can understand your code easily. You don't have to sit there and try to parse out a bunch of interim variables to figure out what you're trying to achieve.
 
 To that end, Slate defines _lots_ of change methods.
 
 The change methods are the one place in Slate where overlap and near-duplication isn't stomped out. Because sometimes the exact-right change method is the difference between one line of code and ten. And not just ten once, but ten repeated everywhere throughout your codebase.
 
 
-## Change Categories 
+## Change Categories
 
 There are a handful of different categories of changes that ship with Slate by default, and understanding them may help you understand which methods to reach for when trying to write your editor's logic...
 
@@ -129,3 +133,44 @@ const newState = change.state
 ```
 
 Note that you'll need to then grab the new state value by accessing the `change.state` property directly.
+
+
+## Reusing Changes
+
+In addition to using the built-in changes, if your editor is of any complexity you'll want to write your own reusable changes. That way, you can reuse a single `insertImage` change instead of constantly writing `insertBlock(...args)`.
+
+To do that, you should define change functions just like Slate's core does—as functions that take `(change, ...args)` arguments. Where `change` is the current mutable change object, and `...args` is anything else you want to accept to perform your change.
+
+For example, here are two simple block inserting changes...
+
+```js
+function insertParagraph(change) {
+  change.insertBlock('paragraph')
+}
+
+function insertImage(change, src) {
+  change.insertBlock({
+    type: 'image',
+    isVoid: true,
+    data: { src },
+  })
+}
+```
+
+Notice how rewriting that image inserting logic multiple times without having it encapsulated in a single function would get tedious. Now with those change functions define, you can reuse them!
+
+But sadly you can't chain with those functions directly, since `change` objects don't actually know about them. Instead, you use the `.call()` method:
+
+```js
+change
+  .call(insertParagraph)
+  .call(insertImage, 'https://google.com/logo')
+```
+
+Not only can you use them with `.call()`, but if you're making one-off changes to the `editor`, you can use them with `editor.change()` as well. For example:
+
+```js
+editor.change(insertImage, 'https://google.com/logo')
+```
+
+That's the benefit of standardizing a function signature!

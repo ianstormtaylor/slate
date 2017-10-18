@@ -250,15 +250,14 @@ class Editor extends React.Component {
   }
 
   /**
-   * Perform a change `fn` on the editor's current state.
+   * Perform a change on the editor, passing `...args` to `change.call`.
    *
-   * @param {Function} fn
+   * @param {Mixed} ...args
    */
 
-  change = (fn) => {
+  change = (...args) => {
     const { state } = this.state
-    const change = state.change()
-    fn(change)
+    const change = state.change().call(...args)
     debug('change', { change })
     this.onChange(change)
   }
