@@ -54,7 +54,7 @@ These are changes like `deleteAtRange()`, `addMarkAtArange()`, `unwrapBlockAtRan
 
 ### At the Current Selection
 
-These are changes like `delete()`, `addMark()`, `insertBlock()`, etc. that are the same as the `*AtRange` equivalents, but don't need to take in a range argument, because they apply make their edits based on where the user's current selection is. These are often what you want to use when programmatically editing "like a user".
+These are changes like `delete()`, `addMark()`, `insertBlock()`, etc. that are the same as the `*AtRange` equivalents, but don't need to take in a range argument, because they apply their edits based on where the user's current selection is. These are often what you want to use when programmatically editing "like a user".
 
 ### On the Selection
 
@@ -75,7 +75,7 @@ These are changes like `undo()`, `redo()`, etc. that use the operation history a
 
 ## Making Changes
 
-When you decide you want to make a change to the Slate state, you're almost always in one of three places...
+When you decide you want to make a change to the Slate state, you're almost always in one of four places...
 
 ### 1. In Slate Handlers
 
@@ -93,7 +93,7 @@ Any change methods you call will be applied, and when the event handler stack is
 
 ### 2. From Custom Node Components
 
-The second place you is inside a custom node component. For example, you might have an `<Image>` component and you want to make a change when the image is clicked.
+The second place is inside a custom node component. For example, you might have an `<Image>` component and you want to make a change when the image is clicked.
 
 In that case, you'll need to use the `change()` method on the Slate [`<Editor>`](../reference/slate-react/editor.md) which you have available as `props.editor`. For example...
 
@@ -118,9 +118,29 @@ class Image extends React.Component {
 
 The `editor.change()` method will create a new [`Change`](../reference/slate/change.md) object for you, based on the editor's current state. You can then call any change methods you want, and the new state will be applied to the editor.
 
-### 3. From Outside Slate
+### 3. From Schema Rules
 
-This is the third place you might want to make changes, and also the most dangerous. You should know that any changes you make outside of the Slate editor might not be seen by your plugins, might interact with the history in weird ways, and may not work with collaborative editing implements.
+The third place you may perform change operations — for more complex use cases — is from inside a custom [rule](../references/slate/schema.md#rules) in your editor's [`Schema`](../references/slate/schema.md). For example...
+
+```js
+{
+  match: (object) => object.kind === 'block' && object.type === 'quote',
+  validate: (node) => {
+    const invalidChildren = node.filterDescendants(child => child.kind === 'block');
+    return invalidChildren.size ? invalidChildren : null;
+  },
+  normalize (change, node, invalidChildren) {
+    invalidChildren.forEach(child => {
+      change.removeNodeByKey(child.key);
+    });
+  },
+```
+
+When a rule's validation fails, Slate passes a [`Change`](../reference/slate/change.md) object to the `normalize()` method on the rule. You can use this object to apply the changes necessary to make your document valid on the next normalization pass.
+
+### 4. From Outside Slate
+
+This is the fourth place you might want to make changes, and also the most dangerous. You should know that any changes you make outside of the Slate editor might not be seen by your plugins, might interact with the history in weird ways, and may not work with collaborative editing implements.
 
 That said, if that's okay with you, you can make changes manually by using the `change()` method on a Slate [`State`](../reference/slate/state.md). For example:
 
