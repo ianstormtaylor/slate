@@ -120,20 +120,24 @@ The `editor.change()` method will create a new [`Change`](../reference/slate/cha
 
 ### 3. From Schema Rules
 
-The third place you may perform change operations — for more complex use cases — is from inside a custom [rule](../references/slate/schema.md#rules) in your editor's [`Schema`](../references/slate/schema.md). For example...
+The third place you may perform change operations—for more complex use cases—is from inside a custom [rule](../references/slate/schema.md#rules) in your editor's [`Schema`](../references/slate/schema.md). For example...
 
 ```js
 {
-  match: (object) => object.kind === 'block' && object.type === 'quote',
-  validate: (node) => {
-    const invalidChildren = node.filterDescendants(child => child.kind === 'block');
-    return invalidChildren.size ? invalidChildren : null;
+  match(obj) {
+    return obj.kind == 'block' && obj.type == 'quote',
   },
-  normalize (change, node, invalidChildren) {
-    invalidChildren.forEach(child => {
-      change.removeNodeByKey(child.key);
-    });
+  validate(quote) {
+    const invalidChildren = quote.nodes.filter(n => n.kind != 'block')
+    if (!invalidChildren.size) return
+    return invalidChildren
   },
+  normalize(change, quote, invalidChildren) {
+    invalidChildren.forEach((node) => {
+      change.removeNodeByKey(node.key)
+    })
+  },
+}
 ```
 
 When a rule's validation fails, Slate passes a [`Change`](../reference/slate/change.md) object to the `normalize()` method on the rule. You can use this object to apply the changes necessary to make your document valid on the next normalization pass.
