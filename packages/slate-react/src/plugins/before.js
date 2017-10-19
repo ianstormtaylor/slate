@@ -5,6 +5,7 @@ import { findDOMNode } from 'react-dom'
 
 import HOTKEYS from '../constants/hotkeys'
 import { IS_FIREFOX, SUPPORTED_EVENTS } from '../constants/environment'
+import findNode from '../utils/find-node'
 
 /**
  * Debug.
@@ -60,12 +61,31 @@ function BeforePlugin() {
     if (isCopying) return true
     if (editor.props.readOnly) return true
 
-    // If the active element is still the editor, the blur event is due to the
-    // window itself being blurred (eg. when changing tabs) so we should ignore
-    // the event, since we want to maintain focus when returning.
+    const { state } = change
+    const focusTarget = event.relatedTarget
+
+    // If focusTarget is null, the blur event is due to the window itself being
+    // blurred (eg. when changing tabs) so we should ignore the event, since we
+    // want to maintain focus when returning.
+    if (!focusTarget) return true
+
     const el = findDOMNode(editor)
-    const window = getWindow(el)
-    if (window.document.activeElement == el) return true
+
+    // The event should also be ignored if the focus returns to the editor from
+    // an embedded editable element (eg. an input element inside a void node),
+    if (focusTarget == el) return true
+
+    // when the focus moved from the editor to a void node spacer...
+    if (focusTarget.hasAttribute('data-slate-spacer')) return true
+
+    // or to an editable element inside the editor but not into a void node
+    // (eg. a list item of the check list example).
+    if (
+      el.contains(focusTarget) &&
+      !findNode(focusTarget, state).isVoid
+    ) {
+      return true
+    }
 
     debug('onBlur', { event })
   }

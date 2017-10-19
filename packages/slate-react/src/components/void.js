@@ -65,17 +65,31 @@ class Void extends React.Component {
     const Tag = node.kind == 'block' ? 'div' : 'span'
     const style = {
       height: '0',
-      color: 'transparent'
+      color: 'transparent',
+      outline: 'none'
     }
+    const spacer = (
+      <Tag
+        contentEditable
+        data-slate-spacer
+        suppressContentEditableWarning
+        style={style}
+      >
+        {this.renderText()}
+      </Tag>
+    )
 
     this.debug('render', { props })
 
     return (
-      <Tag data-slate-void data-key={node.key} draggable={readOnly ? null : true}>
-        {!readOnly && <Tag style={style}>
-          {this.renderText()}
-        </Tag>}
-        <Tag contentEditable={readOnly ? null : false}>
+      <Tag
+        data-slate-void
+        data-key={node.key}
+        draggable={readOnly ? null : true}
+        contentEditable={readOnly ? null : false}
+      >
+        {readOnly ? null : spacer }
+        <Tag>
           {children}
         </Tag>
       </Tag>
