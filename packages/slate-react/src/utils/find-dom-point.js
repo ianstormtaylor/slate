@@ -15,7 +15,12 @@ import findDOMNode from './find-dom-node'
 function findDOMPoint(key, offset) {
   const el = findDOMNode(key)
   const window = getWindow(el)
-  const iterator = window.document.createNodeIterator(el, NodeFilter.SHOW_TEXT)
+  const iterator = window.document.createNodeIterator(
+    el,
+    NodeFilter.SHOW_TEXT,
+    () => NodeFilter.FILTER_ACCEPT,
+    false
+  )
   let start = 0
   let n
 
