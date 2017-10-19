@@ -5,7 +5,7 @@ import React from 'react'
 import SlateTypes from 'slate-prop-types'
 import Types from 'prop-types'
 import logger from 'slate-dev-logger'
-import { Stack, State } from 'slate'
+import { Schema, Stack, State } from 'slate'
 
 import EVENT_HANDLERS from '../constants/event-handlers'
 import AfterPlugin from '../plugins/after'
@@ -98,13 +98,15 @@ class Editor extends React.Component {
     // Create a new `Stack`, omitting the `onChange` property since that has
     // special significance on the editor itself.
     const plugins = resolvePlugins(props)
+    const schema = Schema.createFromPlugins(plugins)
     const stack = Stack.create({ plugins })
+    this.state.schema = schema
     this.state.stack = stack
 
     // Run `onBeforeChange` on the passed-in state because we need to ensure
     // that it is normalized, and queue the resulting change.
     const change = props.state.change()
-    stack.handle('onBeforeChange', change, this)
+    stack.run('onBeforeChange', change, this)
     const { state } = change
     this.queueChange(change)
     this.cacheState(state)
@@ -134,7 +136,7 @@ class Editor extends React.Component {
    */
 
   componentWillReceiveProps = (props) => {
-    let { stack } = this.state
+    let { schema, stack } = this.state
 
     // If any plugin-related properties will change, create a new `Stack`.
     for (let i = 0; i < PLUGINS_PROPS.length; i++) {
@@ -142,13 +144,14 @@ class Editor extends React.Component {
       if (props[prop] == this.props[prop]) continue
       const plugins = resolvePlugins(props)
       stack = Stack.create({ plugins })
-      this.setState({ stack })
+      schema = Schema.createFromPlugins(plugins)
+      this.setState({ schema, stack })
     }
 
     // Run `onBeforeChange` on the passed-in state because we need to ensure
     // that it is normalized, and queue the resulting change.
     const change = props.state.change()
-    stack.handle('onBeforeChange', change, this)
+    stack.run('onBeforeChange', change, this)
     const { state } = change
     this.queueChange(change)
     this.cacheState(state)
@@ -236,7 +239,17 @@ class Editor extends React.Component {
    */
 
   getSchema = () => {
-    return this.state.stack.schema
+    return this.state.schema
+  }
+
+  /**
+   * Get the editor's current stack.
+   *
+   * @return {Stack}
+   */
+
+  getStack = () => {
+    return this.state.stack
   }
 
   /**
@@ -266,13 +279,13 @@ class Editor extends React.Component {
    * On event.
    *
    * @param {String} handler
-   * @param {Mixed} ...args
+   * @param {Event} event
    */
 
-  onEvent = (handler, ...args) => {
+  onEvent = (handler, event) => {
     const { stack, state } = this.state
     const change = state.change()
-    stack.handle(handler, change, this, ...args)
+    stack.run(handler, event, change, this)
     this.onChange(change)
   }
 
@@ -289,8 +302,8 @@ class Editor extends React.Component {
 
     const { stack } = this.state
 
-    stack.handle('onBeforeChange', change, this)
-    stack.handle('onChange', change, this)
+    stack.run('onBeforeChange', change, this)
+    stack.run('onChange', change, this)
 
     const { state } = change
     const { document, selection } = this.tmp
@@ -314,16 +327,13 @@ class Editor extends React.Component {
     const { props, state } = this
     const { stack } = state
     const children = stack
-      .renderPortal(state.state, this)
+      .map('renderPortal', state.state, this)
       .map((child, i) => <Portal key={i} isOpened>{child}</Portal>)
 
     debug('render', { props, state })
 
-    const tree = stack.render(state.state, this, {
-      ...props,
-      children,
-    })
-
+    const p = { ...props, children }
+    const tree = stack.render('renderEditor', p, state.state, this)
     return tree
   }
 

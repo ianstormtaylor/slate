@@ -22,6 +22,7 @@ pre {
 }
 
 :not(pre) > code {
+  font-family: monospace;
   background-color: #eee;
   padding: 3px;
 }

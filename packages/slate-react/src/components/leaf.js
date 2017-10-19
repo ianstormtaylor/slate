@@ -84,18 +84,17 @@ class Leaf extends React.Component {
    */
 
   render() {
-    const { props } = this
-    const { node, index } = props
+    this.debug('render', this)
+
+    const { node, index } = this.props
     const offsetKey = OffsetKey.stringify({
       key: node.key,
       index
     })
 
-    this.debug('render', { props })
-
     return (
       <span data-offset-key={offsetKey}>
-        {this.renderMarks(props)}
+        {this.renderMarks()}
       </span>
     )
   }
@@ -103,43 +102,29 @@ class Leaf extends React.Component {
   /**
    * Render all of the leaf's mark components.
    *
-   * @param {Object} props
    * @return {Element}
    */
 
-  renderMarks(props) {
-    const { marks, schema, node, offset, text, state, editor } = props
-    const children = this.renderText(props)
+  renderMarks() {
+    const { marks, schema, node, offset, text, state, editor } = this.props
+    const stack = editor.getStack()
+    const leaf = this.renderText()
 
-    return marks.reduce((memo, mark) => {
-      const Component = mark.getComponent(schema)
-      if (!Component) return memo
-      return (
-        <Component
-          editor={editor}
-          mark={mark}
-          marks={marks}
-          node={node}
-          offset={offset}
-          schema={schema}
-          state={state}
-          text={text}
-        >
-          {memo}
-        </Component>
-      )
-    }, children)
+    return marks.reduce((children, mark) => {
+      const props = { editor, mark, marks, node, offset, schema, state, text, children }
+      const element = stack.find('renderMark', props)
+      return element || children
+    }, leaf)
   }
 
   /**
    * Render the text content of the leaf, accounting for browsers.
    *
-   * @param {Object} props
    * @return {Element}
    */
 
-  renderText(props) {
-    const { block, node, parent, text, index, leaves } = props
+  renderText() {
+    const { block, node, parent, text, index, leaves } = this.props
 
     // COMPAT: If the text is empty and it's the only child, we need to render a
     // <br/> to get the block to have the proper height.

@@ -48,6 +48,27 @@ class Schema extends Record(DEFAULTS) {
   }
 
   /**
+   * Create a schema from a list of `plugins`.
+   *
+   * @param {Array} plugins
+   * @return {Schema}
+   */
+
+  static createFromPlugins(plugins) {
+    let rules = []
+
+    for (let i = 0; i < plugins.length; i++) {
+      const plugin = plugins[i]
+      if (plugin.schema == null) continue
+      const schema = Schema.create(plugin.schema)
+      rules = rules.concat(schema.rules)
+    }
+
+    const schema = Schema.create({ rules })
+    return schema
+  }
+
+  /**
    * Check if a `value` is a `Schema`.
    *
    * @param {Any} value
