@@ -28,28 +28,13 @@ class ForcedLayout extends React.Component {
           { type: 'paragraph', min: 1 },
         ],
         defaults: {
-          nodes: ['title', 'paragraph'],
+          nodes: [
+            { kind: 'block', type: 'title' },
+            { kind: 'block', type: 'paragraph' },
+          ]
         },
-      },
-      nodes: {
-        title: {},
-        paragraph: {},
       }
     }
-    // schema: {
-    //   document: {
-    //     nodes: [
-    //       { type: 'title', min: 1, max: 1 },
-    //       { type: 'paragraph', min: 1 },
-    //     ],
-    //     defaults: {
-    //       nodes: [
-    //         { kind: 'block', type: 'title' },
-    //         { kind: 'block', type: 'paragraph' },
-    //       ]
-    //     },
-    //   }
-    // }
   }
 
   /**
