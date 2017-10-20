@@ -98,8 +98,8 @@ class Editor extends React.Component {
     // Create a new `Stack`, omitting the `onChange` property since that has
     // special significance on the editor itself.
     const plugins = resolvePlugins(props)
-    const schema = Schema.createFromPlugins(plugins)
     const stack = Stack.create({ plugins })
+    const schema = Schema.create({ plugins })
     this.state.schema = schema
     this.state.stack = stack
 
@@ -136,23 +136,31 @@ class Editor extends React.Component {
    */
 
   componentWillReceiveProps = (props) => {
+    let { state } = props
     let { schema, stack } = this.state
+    let isNew = false
 
-    // If any plugin-related properties will change, create a new `Stack`.
+    // Check to see if any plugin-related properties have changed.
     for (let i = 0; i < PLUGINS_PROPS.length; i++) {
       const prop = PLUGINS_PROPS[i]
       if (props[prop] == this.props[prop]) continue
+      isNew = true
+      break
+    }
+
+    // If any plugin-related properties will change, create a new `Stack`.
+    if (isNew) {
       const plugins = resolvePlugins(props)
       stack = Stack.create({ plugins })
-      schema = Schema.createFromPlugins(plugins)
+      schema = Schema.create({ plugins })
       this.setState({ schema, stack })
     }
 
     // Run `onBeforeChange` on the passed-in state because we need to ensure
     // that it is normalized, and queue the resulting change.
-    const change = props.state.change()
+    const change = state.change()
     stack.run('onBeforeChange', change, this)
-    const { state } = change
+    state = change.state
     this.queueChange(change)
     this.cacheState(state)
     this.setState({ state })

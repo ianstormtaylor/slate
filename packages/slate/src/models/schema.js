@@ -1,14 +1,29 @@
 
-import React from 'react'
-import find from 'lodash/find'
 import isPlainObject from 'is-plain-object'
 import logger from 'slate-dev-logger'
-import typeOf from 'type-of'
 import { Record } from 'immutable'
 
+import CORE_SCHEMA_RULES from '../constants/core-schema-rules'
 import MODEL_TYPES from '../constants/model-types'
-import Range from '../models/range'
-import isReactComponent from '../utils/is-react-component'
+import Node from './node'
+import Stack from './stack'
+
+/**
+ * Validation failure reasons.
+ *
+ * @type {Object}
+ */
+
+const REASONS = {
+  NODE: {
+    CHILD_INVALID: 'node_child_invalid',
+    CHILD_REQUIRED: 'node_child_required',
+    DATA_INVALID: 'node_data_invalid',
+    DATA_REQUIRED: 'node_data_required',
+    DATA_UNKNOWN: 'node_data_unknown',
+    IS_VOID_INVALID: 'node_is_void_invalid',
+  }
+}
 
 /**
  * Default properties.
@@ -17,7 +32,9 @@ import isReactComponent from '../utils/is-react-component'
  */
 
 const DEFAULTS = {
-  rules: [],
+  stack: Stack.create(),
+  document: {},
+  nodes: {},
 }
 
 /**
@@ -41,31 +58,23 @@ class Schema extends Record(DEFAULTS) {
     }
 
     if (isPlainObject(attrs)) {
-      return Schema.fromJSON(attrs)
+      let { plugins } = attrs
+
+      if (attrs.rules) {
+        throw new Error('Schemas in Slate have changed! They are no longer accept a `rules` property.')
+      }
+
+      if (!plugins) {
+        plugins = [{ schema: attrs }]
+      }
+
+      const rules = resolveRules(plugins)
+      const stack = Stack.create({ plugins: [ ...CORE_SCHEMA_RULES, ...plugins ] })
+      const schema = new Schema({ ...rules, stack })
+      return schema
     }
 
     throw new Error(`\`Schema.create\` only accepts objects or schemas, but you passed it: ${attrs}`)
-  }
-
-  /**
-   * Create a schema from a list of `plugins`.
-   *
-   * @param {Array} plugins
-   * @return {Schema}
-   */
-
-  static createFromPlugins(plugins) {
-    let rules = []
-
-    for (let i = 0; i < plugins.length; i++) {
-      const plugin = plugins[i]
-      if (plugin.schema == null) continue
-      const schema = Schema.create(plugin.schema)
-      rules = rules.concat(schema.rules)
-    }
-
-    const schema = Schema.create({ rules })
-    return schema
   }
 
   /**
@@ -80,25 +89,6 @@ class Schema extends Record(DEFAULTS) {
   }
 
   /**
-   * Create a `Schema` from a JSON `object`.
-   *
-   * @param {Object} object
-   * @return {Schema}
-   */
-
-  static fromJSON(object) {
-    object = normalizeProperties(object)
-    const schema = new Schema(object)
-    return schema
-  }
-
-  /**
-   * Alias `fromJS`.
-   */
-
-  static fromJS = Schema.fromJSON
-
-  /**
    * Get the kind.
    *
    * @return {String}
@@ -109,225 +99,295 @@ class Schema extends Record(DEFAULTS) {
   }
 
   /**
-   * Return true if one rule can normalize the document
+   * Get the rule for a `node`.
    *
-   * @return {Boolean}
+   * @param {Node} node
+   * @return {Object}
    */
 
-  get hasValidators() {
-    const { rules } = this
-    return rules.some(rule => rule.validate)
+  getRuleForNode(node) {
+    return node.kind == 'document' ? this.document : this.nodes[node.type]
   }
 
   /**
-   * Return true if one rule can decorate text nodes
+   * Validate a `node` with the schema, returning a function that will fix the
+   * invalid node, or void if the node is valid.
    *
-   * @return {Boolean}
+   * @param {Node} node
+   * @return {Function|Void}
    */
 
-  get hasDecorators() {
-    const { rules } = this
-    return rules.some(rule => rule.decorate)
+  validateNode(node) {
+    const ret = this.stack.find('validateNode', node)
+    if (ret) return ret
+
+    const rule = this.getRuleForNode(node)
+    if (!rule) return
+
+    const fail = (reason, ...args) => {
+      return (change) => {
+        logger.debug(`Normalizing an invalid node...`, { reason, args })
+
+        const count = change.operations.length
+        if (rule.normalize) rule.normalize(change, node, ...args)
+        if (change.operations.length > count) return
+
+        this.normalizeNode(change, node, reason, ...args)
+      }
+    }
+
+    const { kind, isVoid, nodes, data } = rule
+
+    if (kind != null && kind != node.kind) {
+      return fail(REASONS.NODE.KIND_INVALID)
+    }
+
+    if (isVoid != null && node.isVoid != isVoid) {
+      return fail(REASONS.NODE.IS_VOID_INVALID)
+    }
+
+    if (data) {
+      const d = node.data.toJSON()
+
+      for (const key in data) {
+        const v = d[key]
+        const dataDef = typeof data[key] == 'function' ? { value: data[key] } : data[key]
+        const { validate, required } = dataDef
+
+        if (required && v == null) {
+          return fail(REASONS.NODE.DATA_REQUIRED, key)
+        }
+
+        if (validate && !validate(v)) {
+          return fail(REASONS.NODE.DATA_INVALID, key, v)
+        }
+      }
+
+      for (const k in d) {
+        if (!(k in data)) return fail(REASONS.NODE.DATA_UNKNOWN, k, d[k])
+      }
+    }
+
+    if (nodes) {
+      const children = node.nodes.toArray()
+      let index = 0
+      let start = 0
+      let n
+
+      for (let i = 0; i < nodes.length; i++) {
+        const def = nodes[i]
+        const { min = 0, max = Infinity } = def
+        n = index - start
+        start += min
+
+        while (n < min && n < max) {
+          const child = children[index]
+
+          if (!child) {
+            return fail(REASONS.NODE.CHILD_REQUIRED, index)
+          }
+
+          if (
+            (def.kind != null && !def.kind.includes(child.kind)) ||
+            (def.type != null && !def.type.includes(child.type))
+          ) {
+            if (n >= min) break
+            return fail(REASONS.NODE.CHILD_INVALID, child, index)
+          }
+
+          n++
+          index++
+        }
+      }
+    }
   }
 
   /**
-   * Return the component for an `object`.
+   * Normalize a `node` with `reason` and `rule`.
    *
-   * This method is private, because it should always be called on one of the
-   * often-changing immutable objects instead, since it will be memoized for
-   * much better performance.
-   *
-   * @param {Mixed} object
-   * @return {Component|Null}
+   * @param {Change} change
+   * @param {Node} node
+   * @param {Object} rule
+   * @param {String} reason
+   * @param {Mixed} ...args
    */
 
-  __getComponent(object) {
-    const match = find(this.rules, rule => rule.render && rule.match(object))
-    if (!match) return null
-    return match.render
-  }
+  normalizeNode(change, node, reason, ...args) {
+    const rule = this.getRuleForNode(node)
+    if (!rule) return
 
-  /**
-   * Return the placeholder for an `object`.
-   *
-   * This method is private, because it should always be called on one of the
-   * often-changing immutable objects instead, since it will be memoized for
-   * much better performance.
-   *
-   * @param {Mixed} object
-   * @return {Component|Null}
-   */
+    function insertDefaults() {
+      const defaults = Node.createList(rule.defaults.nodes || [])
+      node.nodes.forEach(child => change.removeNodeByKey(child.key, { normalize: false }))
+      defaults.forEach((child, i) => change.insertNodeByKey(node.key, i, child))
+      logger.debug('Normalized by replacing with defaults.', { node, defaults })
+    }
 
-  __getPlaceholder(object) {
-    const match = find(this.rules, rule => rule.placeholder && rule.match(object))
-    if (!match) return null
-    return match.placeholder
-  }
+    function removeNode() {
+      if (node.kind == 'document') return insertDefaults()
+      change.removeNodeByKey(node.key)
+      logger.debug('Normalized by removing the node entirely.', { node })
+    }
 
-  /**
-   * Return the decorations for an `object`.
-   *
-   * This method is private, because it should always be called on one of the
-   * often-changing immutable objects instead, since it will be memoized for
-   * much better performance.
-   *
-   * @param {Mixed} object
-   * @return {List<Range>}
-   */
+    function removeChild(child, opts) {
+      change.removeNodeByKey(child.key, opts)
+      logger.debug('Normalized by removing the child.', { node, child })
+    }
 
-  __getDecorations(object) {
-    const array = []
+    function setData(data) {
+      change.setNodeByKey(node.key, { data })
+      logger.debug('Normalized by setting data.', { node, data })
+    }
 
-    this.rules.forEach((rule) => {
-      if (!rule.decorate) return
-      if (!rule.match(object)) return
+    function setIsVoid(isVoid) {
+      change.setNodeByKey(node.key, { isVoid })
+      logger.debug('Normalized by setting is void.', { node, isVoid })
+    }
 
-      const decorations = rule.decorate(object)
-      if (!decorations.length) return
+    switch (reason) {
+      case REASONS.NODE.IS_VOID_INVALID: {
+        return setIsVoid(rule.isVoid)
+      }
 
-      decorations.forEach((dec) => {
-        array.push(dec)
-      })
-    })
+      case REASONS.NODE.DATA_INVALID:
+      case REASONS.NODE.DATA_UNKNOWN: {
+        const [ key ] = args
+        const newData = node.data.delete(key)
+        return setData(newData)
+      }
 
-    const list = Range.createList(array)
-    return list
-  }
+      case REASONS.NODE.DATA_REQUIRED: {
+        const [ key ] = args
+        const defValue = rule.defaults.data[key]
+        const newData = node.data.set(key, defValue)
+        return defValue == null ? removeNode() : setData(newData)
+      }
 
-  /**
-   * Validate an `object` against the schema, returning the failing rule and
-   * value if the object is invalid, or void if it's valid.
-   *
-   * This method is private, because it should always be called on one of the
-   * often-changing immutable objects instead, since it will be memoized for
-   * much better performance.
-   *
-   * @param {Mixed} object
-   * @return {Object|Void}
-   */
+      case REASONS.NODE.CHILD_INVALID: {
+        const [ child ] = args
+        return node.nodes.size > 1 ? removeChild(child) : insertDefaults()
+      }
 
-  __validate(object) {
-    let value
+      case REASONS.NODE.CHILD_REQUIRED: {
+        return rule.defaults.nodes == null ? removeNode() : insertDefaults()
+      }
 
-    const match = find(this.rules, (rule) => {
-      if (!rule.validate) return
-      if (!rule.match(object)) return
-
-      value = rule.validate(object)
-      return value
-    })
-
-    if (!value) return
-
-    return {
-      rule: match,
-      value,
+      case REASONS.NODE.CHILD_UNKNOWN: {
+        const [ child ] = args
+        return removeChild(child)
+      }
     }
   }
 
 }
 
 /**
- * Normalize the `properties` of a schema.
+ * Resolve a set of schema rules from an array of `plugins`.
  *
- * @param {Object} properties
+ * @param {Array} plugins
  * @return {Object}
  */
 
-function normalizeProperties(properties) {
-  let { rules = [], nodes, marks } = properties
-
-  if (nodes) {
-    const array = normalizeNodes(nodes)
-    rules = rules.concat(array)
+function resolveRules(plugins = []) {
+  const schema = {
+    document: {},
+    nodes: {},
   }
 
-  if (marks) {
-    const array = normalizeMarks(marks)
-    rules = rules.concat(array)
-  }
+  plugins.forEach((plugin) => {
+    if (!plugin.schema) return
 
-  if (properties.transform) {
-    logger.deprecate('0.22.0', 'The `schema.transform` property has been deprecated in favor of `schema.change`.')
-    properties.change = properties.transform
-    delete properties.transform
-  }
+    if (plugin.schema.rules) {
+      throw new Error('Schemas in Slate have changed! They are no longer accept a `rules` property.')
+    }
 
-  return { rules }
+    const document = resolveDocumentRule(plugin.schema.document || {})
+
+    const nodes = Object.keys(plugin.schema.nodes || {}).reduce((memo, type) => {
+      const obj = plugin.schema.nodes[type]
+      memo[type] = resolveNodeRule(type, obj)
+    }, {})
+
+    Object.assign(schema.document, document)
+    Object.assign(schema.nodes, nodes)
+  })
+
+  return schema
 }
 
 /**
- * Normalize a `nodes` shorthand argument.
+ * Resolve a document rule `obj`.
  *
- * @param {Object} nodes
- * @return {Array}
+ * @param {Object} obj
+ * @return {Object}
  */
 
-function normalizeNodes(nodes) {
-  const rules = []
+function resolveDocumentRule(obj) {
+  const { data } = obj
+  const defaults = { ...(obj.defaults || {}) }
+  let nodes
 
-  for (const key in nodes) {
-    let rule = nodes[key]
-
-    if (typeOf(rule) == 'function' || isReactComponent(rule)) {
-      rule = { render: rule }
-    }
-
-    rule.match = (object) => {
-      return (
-        (object.kind == 'block' || object.kind == 'inline') &&
-        object.type == key
-      )
-    }
-
-    rules.push(rule)
+  if (!defaults.data) {
+    defaults.data = {}
   }
 
-  return rules
+  if (obj.nodes) {
+    nodes = typeof obj.nodes[0] == 'string'
+      ? [{ type: obj.nodes }]
+      : obj.nodes
+  }
+
+  return {
+    nodes,
+    data,
+    defaults,
+  }
 }
 
 /**
- * Normalize a `marks` shorthand argument.
+ * Resolve a node rule `obj` with `type`.
  *
- * @param {Object} marks
- * @return {Array}
+ * @param {String} type
+ * @param {Object} obj
+ * @return {Object}
  */
 
-function normalizeMarks(marks) {
-  const rules = []
-
-  for (const key in marks) {
-    let rule = marks[key]
-
-    if (!rule.render && !rule.decorator && !rule.validate) {
-      rule = { render: rule }
-    }
-
-    rule.render = normalizeMarkComponent(rule.render)
-    rule.match = object => object.kind == 'mark' && object.type == key
-    rules.push(rule)
+function resolveNodeRule(type, obj) {
+  if (typeof obj == 'function') {
+    throw new Error('Schemas in Slate have changed! They are no longer used for rendering.')
   }
 
-  return rules
-}
+  const { data, kind, isVoid = false } = obj
+  const defaults = { data: {}}
+  let nodes
 
-/**
- * Normalize a mark `render` property.
- *
- * @param {Component|Function|Object|String} render
- * @return {Component}
- */
+  if (!kind) {
+    throw new Error('You must provide a `kind` property in node schema rules.')
+  }
 
-function normalizeMarkComponent(render) {
-  if (isReactComponent(render)) return render
+  if (obj.nodes) {
+    nodes = typeof obj.nodes[0] == 'string'
+      ? [{ type: obj.nodes }]
+      : obj.nodes
+  }
 
-  switch (typeOf(render)) {
-    case 'function':
-      return render
-    case 'object':
-      return props => <span style={render}>{props.children}</span>
-    case 'string':
-      return props => <span className={render}>{props.children}</span>
+  else if (kind == 'block') {
+    defaults.nodes = [{ kind: 'text' }]
+    nodes = [{ kind: ['text', 'inline'], min: 1, max: Infinity }]
+  }
+
+  else if (kind == 'inline') {
+    defaults.nodes = [{ kind: 'text' }]
+    nodes = [{ kind: ['text'], min: 1, max: Infinity }]
+  }
+
+  return {
+    kind,
+    type,
+    isVoid,
+    nodes,
+    data,
+    defaults,
   }
 }
 

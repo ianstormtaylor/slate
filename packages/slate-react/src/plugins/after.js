@@ -4,7 +4,7 @@ import Debug from 'debug'
 import Plain from 'slate-plain-serializer'
 import React from 'react'
 import getWindow from 'get-window'
-import { Block, Inline, Text, coreSchema } from 'slate'
+import { Block, Inline, Text } from 'slate'
 
 import EVENT_HANDLERS from '../constants/event-handlers'
 import HOTKEYS from '../constants/hotkeys'
@@ -54,7 +54,6 @@ function AfterPlugin(options = {}) {
 
     debug('onBeforeChange')
 
-    change.normalize(coreSchema)
     change.normalize(schema)
   }
 

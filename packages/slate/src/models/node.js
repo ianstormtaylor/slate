@@ -1886,11 +1886,11 @@ class Node {
    * Validate the node against a `schema`.
    *
    * @param {Schema} schema
-   * @return {Object|Null}
+   * @return {Function|Null}
    */
 
   validate(schema) {
-    return schema.__validate(this)
+    return schema.validateNode(this)
   }
 
   /**

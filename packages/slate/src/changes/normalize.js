@@ -45,10 +45,6 @@ Changes.normalizeDocument = (change, schema) => {
 
 Changes.normalizeNodeByKey = (change, key, schema) => {
   assertSchema(schema)
-
-  // If the schema has no validation rules, there's nothing to normalize.
-  if (!schema.hasValidators) return
-
   const { state } = change
   const { document } = state
   const node = document.assertNode(key)
@@ -139,20 +135,19 @@ function refindNode(change, node) {
  */
 
 function normalizeNode(change, node, schema) {
-  const max = schema.rules.length
+  const max = schema.stack.plugins.length + 1
   let iterations = 0
 
-  function iterate(t, n) {
-    const failure = n.validate(schema)
-    if (!failure) return
+  function iterate(c, n) {
+    const normalize = n.validate(schema)
+    if (!normalize) return
 
-    // Run the `normalize` function for the rule with the invalid value.
-    const { value, rule } = failure
-    rule.normalize(t, n, value)
+    // Run the `normalize` function to fix the node.
+    normalize(c)
 
     // Re-find the node reference, in case it was updated. If the node no longer
     // exists, we're done for this branch.
-    n = refindNode(t, n)
+    n = refindNode(c, n)
     if (!n) return
 
     // Increment the iterations counter, and check to make sure that we haven't
@@ -166,7 +161,7 @@ function normalizeNode(change, node, schema) {
     }
 
     // Otherwise, iterate again.
-    iterate(t, n)
+    iterate(c, n)
   }
 
   iterate(change, node)

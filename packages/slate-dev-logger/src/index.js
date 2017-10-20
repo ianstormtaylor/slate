@@ -58,6 +58,17 @@ function error(message, ...args) {
 }
 
 /**
+ * Log a debugging `message` in development only.
+ *
+ * @param {String} message
+ * @param {Any} ...args
+ */
+
+function debug(message, ...args) {
+  log('debug', `%c [slate] ${message}`, 'color: #777', ...args)
+}
+
+/**
  * Log a warning `message` in development only.
  *
  * @param {String} message
@@ -88,6 +99,7 @@ function deprecate(version, message, ...args) {
  */
 
 export default {
+  debug,
   deprecate,
   error,
   warn,

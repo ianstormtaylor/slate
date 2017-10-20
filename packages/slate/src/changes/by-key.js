@@ -1,9 +1,9 @@
 
+import CORE_SCHEMA from '../constants/core-schema'
 import Block from '../models/block'
 import Inline from '../models/inline'
 import Mark from '../models/mark'
 import Node from '../models/node'
-import SCHEMA from '../schemas/core'
 
 /**
  * Changes.
@@ -68,7 +68,7 @@ Changes.addMarkByKey = (change, key, offset, length, mark, options = {}) => {
 
   if (normalize) {
     const parent = document.getParent(key)
-    change.normalizeNodeByKey(parent.key, SCHEMA)
+    change.normalizeNodeByKey(parent.key, CORE_SCHEMA)
   }
 }
 
@@ -91,7 +91,7 @@ Changes.insertFragmentByKey = (change, key, index, fragment, options = {}) => {
   })
 
   if (normalize) {
-    change.normalizeNodeByKey(key, SCHEMA)
+    change.normalizeNodeByKey(key, CORE_SCHEMA)
   }
 }
 
@@ -119,7 +119,7 @@ Changes.insertNodeByKey = (change, key, index, node, options = {}) => {
   })
 
   if (normalize) {
-    change.normalizeNodeByKey(key, SCHEMA)
+    change.normalizeNodeByKey(key, CORE_SCHEMA)
   }
 }
 
@@ -153,7 +153,7 @@ Changes.insertTextByKey = (change, key, offset, text, marks, options = {}) => {
 
   if (normalize) {
     const parent = document.getParent(key)
-    change.normalizeNodeByKey(parent.key, SCHEMA)
+    change.normalizeNodeByKey(parent.key, CORE_SCHEMA)
   }
 }
 
@@ -187,7 +187,7 @@ Changes.mergeNodeByKey = (change, key, options = {}) => {
 
   if (normalize) {
     const parent = document.getParent(key)
-    change.normalizeNodeByKey(parent.key, SCHEMA)
+    change.normalizeNodeByKey(parent.key, CORE_SCHEMA)
   }
 }
 
@@ -218,7 +218,7 @@ Changes.moveNodeByKey = (change, key, newKey, newIndex, options = {}) => {
 
   if (normalize) {
     const parent = document.getCommonAncestor(key, newKey)
-    change.normalizeNodeByKey(parent.key, SCHEMA)
+    change.normalizeNodeByKey(parent.key, CORE_SCHEMA)
   }
 }
 
@@ -277,7 +277,7 @@ Changes.removeMarkByKey = (change, key, offset, length, mark, options = {}) => {
 
   if (normalize) {
     const parent = document.getParent(key)
-    change.normalizeNodeByKey(parent.key, SCHEMA)
+    change.normalizeNodeByKey(parent.key, CORE_SCHEMA)
   }
 }
 
@@ -305,7 +305,7 @@ Changes.removeNodeByKey = (change, key, options = {}) => {
 
   if (normalize) {
     const parent = document.getParent(key)
-    change.normalizeNodeByKey(parent.key, SCHEMA)
+    change.normalizeNodeByKey(parent.key, CORE_SCHEMA)
   }
 }
 
@@ -362,7 +362,7 @@ Changes.removeTextByKey = (change, key, offset, length, options = {}) => {
 
   if (normalize) {
     const block = document.getClosestBlock(key)
-    change.normalizeNodeByKey(block.key, SCHEMA)
+    change.normalizeNodeByKey(block.key, CORE_SCHEMA)
   }
 }
 
@@ -387,7 +387,7 @@ Changes.replaceNodeByKey = (change, key, newNode, options = {}) => {
   change.removeNodeByKey(key, { normalize: false })
   change.insertNodeByKey(parent.key, index, newNode, options)
   if (normalize) {
-    change.normalizeNodeByKey(parent.key, SCHEMA)
+    change.normalizeNodeByKey(parent.key, CORE_SCHEMA)
   }
 }
 
@@ -422,7 +422,7 @@ Changes.setMarkByKey = (change, key, offset, length, mark, properties, options =
 
   if (normalize) {
     const parent = document.getParent(key)
-    change.normalizeNodeByKey(parent.key, SCHEMA)
+    change.normalizeNodeByKey(parent.key, CORE_SCHEMA)
   }
 }
 
@@ -452,7 +452,7 @@ Changes.setNodeByKey = (change, key, properties, options = {}) => {
   })
 
   if (normalize) {
-    change.normalizeNodeByKey(node.key, SCHEMA)
+    change.normalizeNodeByKey(node.key, CORE_SCHEMA)
   }
 }
 
@@ -481,7 +481,7 @@ Changes.splitNodeByKey = (change, key, position, options = {}) => {
 
   if (normalize) {
     const parent = document.getParent(key)
-    change.normalizeNodeByKey(parent.key, SCHEMA)
+    change.normalizeNodeByKey(parent.key, CORE_SCHEMA)
   }
 }
 
@@ -520,7 +520,7 @@ Changes.splitDescendantsByKey = (change, key, textKey, textOffset, options = {})
 
   if (normalize) {
     const parent = document.getParent(key)
-    change.normalizeNodeByKey(parent.key, SCHEMA)
+    change.normalizeNodeByKey(parent.key, CORE_SCHEMA)
   }
 }
 
@@ -614,7 +614,7 @@ Changes.unwrapNodeByKey = (change, key, options = {}) => {
     change.moveNodeByKey(key, parentParent.key, parentIndex + 1, { normalize: false })
 
     if (normalize) {
-      change.normalizeNodeByKey(parentParent.key, SCHEMA)
+      change.normalizeNodeByKey(parentParent.key, CORE_SCHEMA)
     }
   }
 }

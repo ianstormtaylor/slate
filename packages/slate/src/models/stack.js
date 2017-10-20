@@ -26,8 +26,6 @@ class Stack extends Record(DEFAULTS) {
    * Constructor.
    *
    * @param {Object} attrs
-   *   @property {Array} plugins
-   *   @property {Function} ...handlers
    */
 
   static create(attrs = {}) {

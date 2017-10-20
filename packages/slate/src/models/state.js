@@ -3,8 +3,8 @@ import isPlainObject from 'is-plain-object'
 import logger from 'slate-dev-logger'
 import { Record, Set, List, Map } from 'immutable'
 
+import CORE_SCHEMA from '../constants/core-schema'
 import MODEL_TYPES from '../constants/model-types'
-import SCHEMA from '../schemas/core'
 import Data from './data'
 import Document from './document'
 import History from './history'
@@ -125,7 +125,7 @@ class State extends Record(DEFAULTS) {
     if (options.normalize !== false) {
       state = state
         .change({ save: false })
-        .normalize(SCHEMA)
+        .normalize(CORE_SCHEMA)
         .state
     }
 
