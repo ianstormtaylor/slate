@@ -307,7 +307,7 @@ class Content extends React.Component {
     const range = findRange(targetRange, state)
 
     editor.change((change) => {
-      change.insertTextAtRange(range, text)
+      change.insertTextAtRange(range, text, range.marks)
     })
   }
 
