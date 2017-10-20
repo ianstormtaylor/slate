@@ -14,16 +14,15 @@ import Stack from './stack'
  * @type {Object}
  */
 
-const REASONS = {
-  NODE: {
-    CHILD_INVALID: 'node_child_invalid',
-    CHILD_REQUIRED: 'node_child_required',
-    DATA_INVALID: 'node_data_invalid',
-    DATA_REQUIRED: 'node_data_required',
-    DATA_UNKNOWN: 'node_data_unknown',
-    IS_VOID_INVALID: 'node_is_void_invalid',
-  }
-}
+const NODE_CHILD_KIND_INVALID = 'node_child_kind_invalid'
+const NODE_CHILD_TYPE_INVALID = 'node_child_type_invalid'
+const NODE_CHILD_REQUIRED = 'node_child_required'
+const NODE_CHILD_UNKNOWN = 'node_child_unknown'
+const NODE_DATA_INVALID = 'node_data_invalid'
+const NODE_DATA_REQUIRED = 'node_data_required'
+const NODE_DATA_UNKNOWN = 'node_data_unknown'
+const NODE_IS_VOID_INVALID = 'node_is_void_invalid'
+const NODE_KIND_INVALID = 'node_kind_invalid'
 
 /**
  * Default properties.
@@ -139,11 +138,11 @@ class Schema extends Record(DEFAULTS) {
     const { kind, isVoid, nodes, data } = rule
 
     if (kind != null && kind != node.kind) {
-      return fail(REASONS.NODE.KIND_INVALID)
+      return fail(NODE_KIND_INVALID)
     }
 
     if (isVoid != null && node.isVoid != isVoid) {
-      return fail(REASONS.NODE.IS_VOID_INVALID)
+      return fail(NODE_IS_VOID_INVALID)
     }
 
     if (data) {
@@ -155,16 +154,16 @@ class Schema extends Record(DEFAULTS) {
         const { validate, required } = dataDef
 
         if (required && v == null) {
-          return fail(REASONS.NODE.DATA_REQUIRED, key)
+          return fail(NODE_DATA_REQUIRED, key)
         }
 
         if (validate && !validate(v)) {
-          return fail(REASONS.NODE.DATA_INVALID, key, v)
+          return fail(NODE_DATA_INVALID, key, v)
         }
       }
 
       for (const k in d) {
-        if (!(k in data)) return fail(REASONS.NODE.DATA_UNKNOWN, k, d[k])
+        if (!(k in data)) return fail(NODE_DATA_UNKNOWN, k, d[k])
       }
     }
 
@@ -184,17 +183,17 @@ class Schema extends Record(DEFAULTS) {
           const child = children[index]
 
           if (!child) {
-            return fail(REASONS.NODE.CHILD_REQUIRED, index)
+            return fail(NODE_CHILD_REQUIRED, index)
           }
 
           if (def.kind != null && !def.kind.includes(child.kind)) {
             if (n >= min) break
-            return fail(REASONS.NODE.CHILD_KIND_INVALID, child, index)
+            return fail(NODE_CHILD_KIND_INVALID, child, index)
           }
 
           if (def.type != null && !def.type.includes(child.type)) {
             if (n >= min) break
-            return fail(REASONS.NODE.CHILD_TYPE_INVALID, child, index)
+            return fail(NODE_CHILD_TYPE_INVALID, child, index)
           }
 
           n++
@@ -279,45 +278,45 @@ class Schema extends Record(DEFAULTS) {
     }
 
     switch (reason) {
-      case REASONS.NODE.CHILD_KIND_INVALID: {
+      case NODE_CHILD_KIND_INVALID: {
         const [ child, index ] = args
         return fixChildKind(child, index)
       }
 
-      case REASONS.NODE.CHILD_TYPE_INVALID: {
+      case NODE_CHILD_TYPE_INVALID: {
         const [ child, index ] = args
         return fixChildType(child, index)
       }
-      case REASONS.NODE.CHILD_REQUIRED: {
+      case NODE_CHILD_REQUIRED: {
         const [ index ] = args
         return insertDefaultChild(index)
       }
 
-      case REASONS.NODE.CHILD_UNKNOWN: {
+      case NODE_CHILD_UNKNOWN: {
         const [ child ] = args
         return removeChild(child)
       }
 
-      case REASONS.NODE.DATA_INVALID: {
+      case NODE_DATA_INVALID: {
         const [ key ] = args
         const newData = node.data.delete(key)
         return setNodeData(newData)
       }
 
-      case REASONS.NODE.DATA_UNKNOWN: {
+      case NODE_DATA_UNKNOWN: {
         const [ key ] = args
         const newData = node.data.delete(key)
         return setNodeData(newData)
       }
 
-      case REASONS.NODE.DATA_REQUIRED: {
+      case NODE_DATA_REQUIRED: {
         const [ key ] = args
         const defValue = rule.defaults.data[key]
         const newData = node.data.set(key, defValue)
         return defValue === undefined ? removeNode() : setNodeData(newData)
       }
 
-      case REASONS.NODE.IS_VOID_INVALID: {
+      case NODE_IS_VOID_INVALID: {
         return setNodeIsVoid(rule.isVoid)
       }
     }
