@@ -187,12 +187,14 @@ class Schema extends Record(DEFAULTS) {
             return fail(REASONS.NODE.CHILD_REQUIRED, index)
           }
 
-          if (
-            (def.kind != null && !def.kind.includes(child.kind)) ||
-            (def.type != null && !def.type.includes(child.type))
-          ) {
+          if (def.kind != null && !def.kind.includes(child.kind)) {
             if (n >= min) break
-            return fail(REASONS.NODE.CHILD_INVALID, child, index)
+            return fail(REASONS.NODE.CHILD_KIND_INVALID, child, index)
+          }
+
+          if (def.type != null && !def.type.includes(child.type)) {
+            if (n >= min) break
+            return fail(REASONS.NODE.CHILD_TYPE_INVALID, child, index)
           }
 
           n++
@@ -216,11 +218,14 @@ class Schema extends Record(DEFAULTS) {
     const rule = this.getRuleForNode(node)
     if (!rule) return
 
-    function insertDefaults() {
-      const defaults = Node.createList(rule.defaults.nodes || [])
-      node.nodes.forEach(child => change.removeNodeByKey(child.key, { normalize: false }))
-      defaults.forEach((child, i) => change.insertNodeByKey(node.key, i, child))
-      logger.debug('Normalized by replacing with defaults.', { node, defaults })
+    function setNodeData(data) {
+      change.setNodeByKey(node.key, { data })
+      logger.debug('Normalized by setting `data`.', { node, data })
+    }
+
+    function setNodeIsVoid(isVoid) {
+      change.setNodeByKey(node.key, { isVoid })
+      logger.debug('Normalized by setting `isVoid`.', { node, isVoid })
     }
 
     function removeNode() {
@@ -229,52 +234,91 @@ class Schema extends Record(DEFAULTS) {
       logger.debug('Normalized by removing the node entirely.', { node })
     }
 
+    function insertDefaults() {
+      const { nodes } = rule.defaults
+      if (!nodes) return removeNode()
+      const children = Node.createList(nodes || [])
+      node.nodes.forEach(child => change.removeNodeByKey(child.key, { normalize: false }))
+      children.forEach((child, i) => change.insertNodeByKey(node.key, i, child))
+      logger.debug('Normalized by replacing with default children.', { node, children })
+    }
+
+    function insertDefaultChild(index) {
+      const { nodes } = rule.defaults
+      if (!nodes) return removeNode()
+      const def = nodes[index]
+      if (!def) return removeNode()
+      const child = Node.create(def)
+      change.insertNodeByKey(node.key, index, child)
+      logger.debug('Normalized by insert a default child.', { node, index, child })
+    }
+
+    function fixChildKind(child, index) {
+      const { nodes } = rule.defaults
+      if (!nodes) return removeChild(child)
+      const def = nodes[index]
+      if (!def) return removeChild(child)
+      const { kind } = def
+      change.setNodeByKey(child.key, { kind })
+      logger.debug('Normalized by changing child `kind`.', { node, child, kind })
+    }
+
+    function fixChildType(child, index) {
+      const { nodes } = rule.defaults
+      if (!nodes) return removeChild(child)
+      const def = nodes[index]
+      if (!def) return removeChild(child)
+      const { type } = def
+      change.setNodeByKey(child.key, { type })
+      logger.debug('Normalized by changing child `type`.', { node, child, type })
+    }
+
     function removeChild(child, opts) {
       change.removeNodeByKey(child.key, opts)
       logger.debug('Normalized by removing the child.', { node, child })
     }
 
-    function setData(data) {
-      change.setNodeByKey(node.key, { data })
-      logger.debug('Normalized by setting data.', { node, data })
-    }
-
-    function setIsVoid(isVoid) {
-      change.setNodeByKey(node.key, { isVoid })
-      logger.debug('Normalized by setting is void.', { node, isVoid })
-    }
-
     switch (reason) {
-      case REASONS.NODE.IS_VOID_INVALID: {
-        return setIsVoid(rule.isVoid)
+      case REASONS.NODE.CHILD_KIND_INVALID: {
+        const [ child, index ] = args
+        return fixChildKind(child, index)
       }
 
-      case REASONS.NODE.DATA_INVALID:
+      case REASONS.NODE.CHILD_TYPE_INVALID: {
+        const [ child, index ] = args
+        return fixChildType(child, index)
+      }
+      case REASONS.NODE.CHILD_REQUIRED: {
+        const [ index ] = args
+        return insertDefaultChild(index)
+      }
+
+      case REASONS.NODE.CHILD_UNKNOWN: {
+        const [ child ] = args
+        return removeChild(child)
+      }
+
+      case REASONS.NODE.DATA_INVALID: {
+        const [ key ] = args
+        const newData = node.data.delete(key)
+        return setNodeData(newData)
+      }
+
       case REASONS.NODE.DATA_UNKNOWN: {
         const [ key ] = args
         const newData = node.data.delete(key)
-        return setData(newData)
+        return setNodeData(newData)
       }
 
       case REASONS.NODE.DATA_REQUIRED: {
         const [ key ] = args
         const defValue = rule.defaults.data[key]
         const newData = node.data.set(key, defValue)
-        return defValue == null ? removeNode() : setData(newData)
+        return defValue === undefined ? removeNode() : setNodeData(newData)
       }
 
-      case REASONS.NODE.CHILD_INVALID: {
-        const [ child ] = args
-        return node.nodes.size > 1 ? removeChild(child) : insertDefaults()
-      }
-
-      case REASONS.NODE.CHILD_REQUIRED: {
-        return rule.defaults.nodes == null ? removeNode() : insertDefaults()
-      }
-
-      case REASONS.NODE.CHILD_UNKNOWN: {
-        const [ child ] = args
-        return removeChild(child)
+      case REASONS.NODE.IS_VOID_INVALID: {
+        return setNodeIsVoid(rule.isVoid)
       }
     }
   }
@@ -294,18 +338,23 @@ function resolveRules(plugins = []) {
     nodes: {},
   }
 
-  plugins.forEach((plugin) => {
-    if (!plugin.schema) return
+  plugins.forEach((p) => {
+    const s = p.schema
+    if (!s) return
 
-    if (plugin.schema.rules) {
+    if (s.rules) {
       throw new Error('Schemas in Slate have changed! They are no longer accept a `rules` property.')
     }
 
-    const document = resolveDocumentRule(plugin.schema.document || {})
+    const document = resolveDocumentRule(s.document || {})
 
-    const nodes = Object.keys(plugin.schema.nodes || {}).reduce((memo, type) => {
-      const obj = plugin.schema.nodes[type]
-      memo[type] = resolveNodeRule(type, obj)
+    const nodes = Object.keys(s.nodes || {}).reduce((memo, type) => {
+      if (typeof s.nodes[type] == 'function') {
+        throw new Error('Schemas in Slate have changed! They are no longer used for rendering.')
+      }
+
+      memo[type] = resolveNodeRule(type, s.nodes[type])
+      return memo
     }, {})
 
     Object.assign(schema.document, document)
@@ -323,29 +372,30 @@ function resolveRules(plugins = []) {
  */
 
 function resolveDocumentRule(obj) {
-  const { data } = obj
-  const defaults = { ...(obj.defaults || {}) }
-  let nodes
-
-  if (!defaults.data) {
-    defaults.data = {}
+  let { data, nodes } = obj
+  const kind = 'document'
+  const defaults = {
+    data: (obj.defaults && obj.defaults.data) || {},
+    nodes: obj.defaults && obj.defaults.nodes,
   }
 
-  if (obj.nodes) {
-    nodes = typeof obj.nodes[0] == 'string'
-      ? [{ type: obj.nodes }]
-      : obj.nodes
+  if (nodes != null && typeof nodes[0] == 'string') {
+    nodes = [{ type: nodes }]
   }
 
-  return {
-    nodes,
+  const rule = {
+    kind,
     data,
     defaults,
+    nodes,
   }
+
+  assertNodeRule(rule)
+  return rule
 }
 
 /**
- * Resolve a node rule `obj` with `type`.
+ * Resolve a node rule with `type` from `obj`.
  *
  * @param {String} type
  * @param {Object} obj
@@ -353,41 +403,64 @@ function resolveDocumentRule(obj) {
  */
 
 function resolveNodeRule(type, obj) {
-  if (typeof obj == 'function') {
-    throw new Error('Schemas in Slate have changed! They are no longer used for rendering.')
+  let { data, kind, nodes, isVoid } = obj
+  const defaults = {
+    data: (obj.defaults && obj.defaults.data) || {},
+    isVoid: (obj.defaults && obj.defaults.isVoid) || false,
+    nodes: obj.defaults && obj.defaults.nodes,
   }
 
-  const { data, kind, isVoid = false } = obj
-  const defaults = { data: {}}
-  let nodes
+  if (nodes != null && typeof nodes[0] == 'string') {
+    nodes = [{ type: nodes }]
+  }
 
-  if (!kind) {
+  if (data != null) {
+    for (const key in data) {
+      data[key].required = !!data[key].required
+      if (typeof data[key] == 'function') data[key] = { validate: data[key] }
+    }
+  }
+
+  const rule = {
+    data,
+    defaults,
+    isVoid,
+    kind,
+    nodes,
+    type,
+  }
+
+  assertNodeRule(rule)
+  return rule
+}
+
+/**
+ * Assert that a node `rule` is correctly formed.
+ *
+ * @param {Object} rule
+ */
+
+function assertNodeRule(rule) {
+  const { data, defaults, kind, nodes, type } = rule
+
+  if (kind == null) {
     throw new Error('You must provide a `kind` property in node schema rules.')
   }
 
-  if (obj.nodes) {
-    nodes = typeof obj.nodes[0] == 'string'
-      ? [{ type: obj.nodes }]
-      : obj.nodes
+  if (kind != 'document' && type == null) {
+    throw new Error('You must provide a `type` property in node schema rules.')
   }
 
-  else if (kind == 'block') {
-    defaults.nodes = [{ kind: 'text' }]
-    nodes = [{ kind: ['text', 'inline'], min: 1, max: Infinity }]
+  if (nodes != null && defaults.nodes == null) {
+    throw new Error('Schema rules that define validation for `nodes` must also include `defaults.nodes` to normalize with.')
   }
 
-  else if (kind == 'inline') {
-    defaults.nodes = [{ kind: 'text' }]
-    nodes = [{ kind: ['text'], min: 1, max: Infinity }]
-  }
-
-  return {
-    kind,
-    type,
-    isVoid,
-    nodes,
-    data,
-    defaults,
+  if (data != null) {
+    for (const key in data) {
+      if (data[key].required == true && defaults.data[key] == null) {
+        throw new Error('Schema rules that define required `data[key]` properties must also include a non-null `defaults.data[key]` for those properties to normalize with.')
+      }
+    }
   }
 }
 
