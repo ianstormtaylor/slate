@@ -104,8 +104,25 @@ class Schema extends Record(DEFAULTS) {
    * @return {Object}
    */
 
-  getRuleForNode(node) {
-    return node.kind == 'document' ? this.document : this.nodes[node.type]
+  getRule(obj) {
+    switch (obj.kind) {
+      case 'document': return this.document
+      case 'block':
+      case 'inline': return this.nodes[obj.type]
+    }
+  }
+
+  /**
+   * Get the rule defaults for a `node`.
+   *
+   * @param {Node} node
+   * @return {Object}
+   */
+
+  getDefaults(obj) {
+    const rule = this.getRule(obj)
+    if (!rule) return null
+    return rule.defaults
   }
 
   /**
@@ -120,7 +137,7 @@ class Schema extends Record(DEFAULTS) {
     const ret = this.stack.find('validateNode', node)
     if (ret) return ret
 
-    const rule = this.getRuleForNode(node)
+    const rule = this.getRule(node)
     if (!rule) return
 
     const fail = (reason, ...args) => {
@@ -214,7 +231,7 @@ class Schema extends Record(DEFAULTS) {
    */
 
   normalizeNode(change, node, reason, ...args) {
-    const rule = this.getRuleForNode(node)
+    const rule = this.getRule(node)
     if (!rule) return
 
     function setNodeData(data) {
@@ -334,32 +351,47 @@ class Schema extends Record(DEFAULTS) {
 function resolveRules(plugins = []) {
   const schema = {
     document: {},
-    nodes: {},
+    blocks: {},
+    inlines: {},
   }
 
-  plugins.forEach((p) => {
-    const s = p.schema
-    if (!s) return
+  plugins.slice().reverse().forEach((plugin) => {
+    if (!plugin.schema) return
 
-    if (s.rules) {
+    const {
+      document = {},
+      blocks = {},
+      inlines = {},
+      rules,
+      nodes
+    } = plugin.schema
+
+    if (rules) {
       throw new Error('Schemas in Slate have changed! They are no longer accept a `rules` property.')
     }
 
-    const document = resolveDocumentRule(s.document || {})
+    if (nodes) {
+      throw new Error('Schemas in Slate have changed! They are no longer accept a `rules` property.')
+    }
 
-    const nodes = Object.keys(s.nodes || {}).reduce((memo, type) => {
-      if (typeof s.nodes[type] == 'function') {
-        throw new Error('Schemas in Slate have changed! They are no longer used for rendering.')
-      }
+    const d = resolveDocumentRule(document)
+    const bs = {}
+    const is = {}
 
-      memo[type] = resolveNodeRule(type, s.nodes[type])
-      return memo
-    }, {})
+    for (const key in blocks) {
+      bs[key] = resolveNodeRule('block', key, blocks[key])
+    }
 
-    Object.assign(schema.document, document)
-    Object.assign(schema.nodes, nodes)
+    for (const key in inlines) {
+      is[key] = resolveNodeRule('inline', key, inlines[key])
+    }
+
+    Object.assign(schema.document, d)
+    Object.assign(schema.blocks, bs)
+    Object.assign(schema.inlines, is)
   })
 
+  expandReferences(schema)
   return schema
 }
 
@@ -396,13 +428,14 @@ function resolveDocumentRule(obj) {
 /**
  * Resolve a node rule with `type` from `obj`.
  *
+ * @param {String} kind
  * @param {String} type
  * @param {Object} obj
  * @return {Object}
  */
 
-function resolveNodeRule(type, obj) {
-  let { data, kind, nodes, isVoid } = obj
+function resolveNodeRule(kind, type, obj) {
+  let { data, nodes, isVoid } = obj
   const defaults = {
     data: (obj.defaults && obj.defaults.data) || {},
     isVoid: (obj.defaults && obj.defaults.isVoid) || false,
@@ -431,6 +464,49 @@ function resolveNodeRule(type, obj) {
 
   assertNodeRule(rule)
   return rule
+}
+
+/**
+ * Expand the references in a schema by type, for convenience.
+ *
+ * @param {Object} schema
+ */
+
+function expandReferences(schema) {
+  const { document, blocks, inlines } = schema
+  const nodes = []
+    .concat(document)
+    .concat(Object.keys(blocks).map(k => blocks[k]))
+    .concat(Object.keys(inlines).map(k => inlines[k]))
+
+  nodes.forEach((rule) => {
+    const { defaults, kind, type } = rule
+
+    if (kind != 'document') {
+      if (blocks[type] && inlines[type]) {
+        throw new Error(`A schema cannot have a block and an inline defined with the same type, in this case "${type}".`)
+      }
+    }
+
+    if (defaults.nodes != null) {
+      defaults.nodes = defaults.nodes.map((ref) => {
+        if (typeof ref != 'string') return ref
+        const node = blocks[ref] || inlines[ref]
+
+        if (!node) {
+          throw new Error(`A schema rule referenced a node with type "${ref}", but no node was defined.`)
+        }
+
+        return {
+          kind: node.kind,
+          type: node.type,
+          isVoid: node.isVoid,
+          data: node.defaults.data,
+          nodes: node.defaults.nodes || [],
+        }
+      })
+    }
+  })
 }
 
 /**
