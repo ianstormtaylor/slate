@@ -308,6 +308,12 @@ class Content extends React.Component {
 
     editor.change((change) => {
       change.insertTextAtRange(range, text, range.marks)
+
+      // If the text was successfully inserted, and the selection had marks on it,
+      // unset the selection's marks.
+      if (range.marks && state.document != change.state.document) {
+        change.select({ marks: null })
+      }
     })
   }
 
