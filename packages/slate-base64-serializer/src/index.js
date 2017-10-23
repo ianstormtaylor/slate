@@ -1,47 +1,6 @@
 
 import { State } from 'slate'
-
-function bufferFrom(data, encoding, len) {
-  if (Buffer.from) {
-    return Buffer.from(data, encoding, len)
-  }
-  return new Buffer(data, encoding, len)
-}
-
-/**
- * encode string `str` to base64
- *
- * @param  {String} str
- * @return {String}
- */
-
-function btoa(str) {
-  let buffer
-  if (typeof window !== 'undefined' && window.btoa) {
-    return window.btoa(str)
-  }
-
-  if (str instanceof Buffer) {
-    buffer = str
-  } else {
-    buffer = bufferFrom(str)
-  }
-  return buffer.toString('base64')
-}
-
-/**
- * decode back base64-encoded string `str`
- *
- * @param  {String} str
- * @return {String}
- */
-
-function atob(str) {
-  if (typeof window !== 'undefined' && window.atob) {
-    return window.atob(str)
-  }
-  return bufferFrom(str, 'base64').toString('binary')
-}
+import { atob, btoa } from 'isomorphic-base64'
 
 /**
  * Encode a JSON `object` as base-64 `string`.
