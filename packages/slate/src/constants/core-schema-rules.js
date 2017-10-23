@@ -101,7 +101,8 @@ const CORE_SCHEMA_RULES = [
   {
     validateNode(node) {
       if (!node.isVoid) return
-      if (node.nodes.text == ' ' && node.nodes.size == 1) return
+      if (node.kind != 'block' && node.kind != 'inline') return
+      if (node.text == ' ' && node.nodes.size == 1) return
 
       return (change) => {
         const text = Text.create(' ')

@@ -19,10 +19,9 @@ describe('rendering', () => {
   for (const test of tests) {
     it(test, async () => {
       const module = require(resolve(dir, test))
-      const { state, schema, output, props } = module
+      const { state, output, props } = module
       const p = {
         state,
-        schema,
         onChange() {},
         ...(props || {}),
       }

@@ -620,6 +620,29 @@ Changes.unwrapNodeByKey = (change, key, options = {}) => {
 }
 
 /**
+ * Wrap a node in a block with `properties`.
+ *
+ * @param {Change} change
+ * @param {String} key The node to wrap
+ * @param {Block|Object|String} block The wrapping block (its children are discarded)
+ * @param {Object} options
+ *   @property {Boolean} normalize
+ */
+
+Changes.wrapBlockByKey = (change, key, block, options) => {
+  block = Block.create(block)
+  block = block.set('nodes', block.nodes.clear())
+
+  const { document } = change.state
+  const node = document.assertDescendant(key)
+  const parent = document.getParent(node.key)
+  const index = parent.nodes.indexOf(node)
+
+  change.insertNodeByKey(parent.key, index, block, { normalize: false })
+  change.moveNodeByKey(node.key, block.key, 0, options)
+}
+
+/**
  * Wrap a node in an inline with `properties`.
  *
  * @param {Change} change
@@ -643,26 +666,27 @@ Changes.wrapInlineByKey = (change, key, inline, options) => {
 }
 
 /**
- * Wrap a node in a block with `properties`.
+ * Wrap a node by `key` with `parent`.
  *
  * @param {Change} change
- * @param {String} key The node to wrap
- * @param {Block|Object|String} block The wrapping block (its children are discarded)
+ * @param {String} key
+ * @param {Node|Object} parent
  * @param {Object} options
- *   @property {Boolean} normalize
  */
 
-Changes.wrapBlockByKey = (change, key, block, options) => {
-  block = Block.create(block)
-  block = block.set('nodes', block.nodes.clear())
+Changes.wrapNodeByKey = (change, key, parent) => {
+  parent = Node.create(parent)
+  parent = parent.set('nodes', parent.nodes.clear())
 
-  const { document } = change.state
-  const node = document.assertDescendant(key)
-  const parent = document.getParent(node.key)
-  const index = parent.nodes.indexOf(node)
+  if (parent.kind == 'block') {
+    change.wrapBlockByKey(key, parent)
+    return
+  }
 
-  change.insertNodeByKey(parent.key, index, block, { normalize: false })
-  change.moveNodeByKey(node.key, block.key, 0, options)
+  if (parent.kind == 'inline') {
+    change.wrapInlineByKey(key, parent)
+    return
+  }
 }
 
 /**

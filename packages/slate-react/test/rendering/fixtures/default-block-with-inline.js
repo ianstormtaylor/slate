@@ -2,7 +2,7 @@
 
 import h from '../../helpers/h'
 
-export const schema = {}
+export const props = {}
 
 export const state = (
   <state>

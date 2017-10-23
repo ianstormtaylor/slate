@@ -119,8 +119,9 @@ class Node extends React.Component {
 
     const { editor, isSelected, node, parent, readOnly, state } = this.props
     const { selection } = state
+    const stack = editor.getStack()
     const indexes = node.getSelectionIndexes(selection, isSelected)
-    const children = node.nodes.toArray().map((child, i) => {
+    let children = node.nodes.toArray().map((child, i) => {
       const isChildSelected = !!indexes && indexes.start <= i && i < indexes.end
       return this.renderNode(child, isChildSelected)
     })
@@ -146,13 +147,14 @@ class Node extends React.Component {
       state
     }
 
-    const stack = editor.getStack()
-    const placeholder = stack.find('renderPlaceholder', props)
-    const element = stack.find('renderNode', {
-      ...props,
-      attributes,
-      children: [placeholder, ...children]
-    })
+    let placeholder = stack.find('renderPlaceholder', props)
+
+    if (placeholder) {
+      placeholder = React.cloneElement(placeholder, { key: `${node.key}-placeholder` })
+      children = [placeholder, ...children]
+    }
+
+    const element = stack.find('renderNode', { ...props, attributes, children })
 
     return node.isVoid
       ? <Void {...this.props}>{element}</Void>
