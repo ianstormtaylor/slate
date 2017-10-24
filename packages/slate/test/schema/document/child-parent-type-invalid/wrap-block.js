@@ -11,9 +11,9 @@ export const schema = {
       }
     },
     item: {
-      parent: ['list'],
+      parent: 'list',
       defaults: {
-        parent: { kind: 'block', type: 'list' },
+        parent: 'list',
       }
     }
   }

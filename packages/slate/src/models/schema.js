@@ -25,8 +25,8 @@ const NODE_DATA_INVALID = 'node_data_invalid'
 const NODE_IS_VOID_INVALID = 'node_is_void_invalid'
 const NODE_KIND_INVALID = 'node_kind_invalid'
 const NODE_MARK_INVALID = 'node_mark_invalid'
-const NODE_CHILD_PARENT_KIND_INVALID = 'node_child_parent_kind_invalid'
-const NODE_CHILD_PARENT_TYPE_INVALID = 'node_child_parent_type_invalid'
+const NODE_PARENT_KIND_INVALID = 'node_parent_kind_invalid'
+const NODE_PARENT_TYPE_INVALID = 'node_parent_type_invalid'
 const NODE_TEXT_INVALID = 'node_text_invalid'
 
 /**
@@ -169,6 +169,41 @@ class Schema extends Record(DEFAULTS) {
   }
 
   /**
+   * Fail validation by returning a normalizing change function.
+   *
+   * @param {String} reason
+   * @param {Object} context
+   * @return {Function}
+   */
+
+  fail(reason, context) {
+    return (change) => {
+      debug(`normalizing`, { reason, context })
+
+      const { rule } = context
+      const count = change.operations.length
+      if (rule.normalize) rule.normalize(change, reason, context)
+      if (change.operations.length > count) return
+
+      switch (reason) {
+        case NODE_CHILD_KIND_INVALID:
+        case NODE_CHILD_TYPE_INVALID:
+        case NODE_CHILD_REQUIRED:
+        case NODE_CHILD_UNKNOWN:
+        case NODE_DATA_INVALID:
+        case NODE_IS_VOID_INVALID:
+        case NODE_KIND_INVALID:
+        case NODE_MARK_INVALID:
+        case NODE_PARENT_KIND_INVALID:
+        case NODE_PARENT_TYPE_INVALID:
+        case NODE_TEXT_INVALID: {
+          this.normalizeNode(change, reason, context)
+        }
+      }
+    }
+  }
+
+  /**
    * Validate a `node` with the schema, returning a function that will fix the
    * invalid node, or void if the node is valid.
    *
@@ -180,29 +215,18 @@ class Schema extends Record(DEFAULTS) {
     const ret = this.stack.find('validateNode', node)
     if (ret) return ret
 
-    const rule = this.getRule(node)
-    if (!rule) return
+    if (node.kind == 'text') return
 
+    const rule = this.getRule(node) || {}
     const parents = this.getParentRules()
-    const fail = (reason, context) => {
-      return (change) => {
-        debug(`normalizing node`, { reason, context })
-
-        const count = change.operations.length
-        const ctx = { rule, ...context }
-        if (rule.normalize) rule.normalize(change, node, reason, ctx)
-        if (change.operations.length > count) return
-
-        this.normalizeNode(change, node, reason, ctx)
-      }
-    }
+    const ctx = { node, rule }
 
     if (rule.kind != null && node.kind != rule.kind) {
-      return fail(NODE_KIND_INVALID)
+      return this.fail(NODE_KIND_INVALID, ctx)
     }
 
     if (rule.isVoid != null && node.isVoid != rule.isVoid) {
-      return fail(NODE_IS_VOID_INVALID)
+      return this.fail(NODE_IS_VOID_INVALID, ctx)
     }
 
     if (rule.data != null) {
@@ -211,7 +235,7 @@ class Schema extends Record(DEFAULTS) {
         const value = node.data.get(key)
 
         if (!fn(value)) {
-          return fail(NODE_DATA_INVALID, { key, value })
+          return this.fail(NODE_DATA_INVALID, { ...ctx, key, value })
         }
       }
     }
@@ -222,7 +246,7 @@ class Schema extends Record(DEFAULTS) {
       for (const mark of marks) {
         for (const def of rule.marks) {
           if (def.type != mark.type) {
-            return fail(NODE_MARK_INVALID, { mark })
+            return this.fail(NODE_MARK_INVALID, { ...ctx, mark })
           }
         }
       }
@@ -232,15 +256,13 @@ class Schema extends Record(DEFAULTS) {
       const { text } = node
 
       if (typeof rule.text == 'string' && text != rule.text) {
-        return fail(NODE_TEXT_INVALID, { text })
+        return this.fail(NODE_TEXT_INVALID, { ...ctx, text })
       }
 
       if (rule.text instanceof RegExp && !rule.text.test(text)) {
-        return fail(NODE_TEXT_INVALID, { text })
+        return this.fail(NODE_TEXT_INVALID, { ...ctx, text })
       }
     }
-
-    if (parents != null) debugger
 
     if (rule.nodes != null || parents != null) {
       const nodes = node.nodes.toArray()
@@ -256,11 +278,11 @@ class Schema extends Record(DEFAULTS) {
           const r = parents[child.type]
 
           if (r.parent.kind != null && !r.parent.kind.includes(node.kind)) {
-            return fail(NODE_CHILD_PARENT_KIND_INVALID, { child, parent: node, rule: r })
+            return this.fail(NODE_PARENT_KIND_INVALID, { node: child, parent: node, rule: r })
           }
 
           if (r.parent.type != null && !r.parent.type.includes(node.type)) {
-            return fail(NODE_CHILD_PARENT_TYPE_INVALID, { child, parent: node, rule: r })
+            return this.fail(NODE_PARENT_TYPE_INVALID, { node: child, parent: node, rule: r })
           }
         }
 
@@ -278,7 +300,7 @@ class Schema extends Record(DEFAULTS) {
           }
 
           if (!def) {
-            return fail(NODE_CHILD_UNKNOWN, { child, index })
+            return this.fail(NODE_CHILD_UNKNOWN, { ...ctx, child, index })
           }
 
           if (def.kind != null && !def.kind.includes(child.kind)) {
@@ -289,7 +311,7 @@ class Schema extends Record(DEFAULTS) {
               break
             }
 
-            return fail(NODE_CHILD_KIND_INVALID, { child, index })
+            return this.fail(NODE_CHILD_KIND_INVALID, { ...ctx, child, index })
           }
 
           if (def.type != null && !def.type.includes(child.type)) {
@@ -300,7 +322,7 @@ class Schema extends Record(DEFAULTS) {
               break
             }
 
-            return fail(NODE_CHILD_TYPE_INVALID, { child, index })
+            return this.fail(NODE_CHILD_TYPE_INVALID, { ...ctx, child, index })
           }
         }
       }
@@ -309,26 +331,25 @@ class Schema extends Record(DEFAULTS) {
         const { min = 0 } = def
 
         if (n < min) {
-          return fail(NODE_CHILD_REQUIRED, { index: n })
+          return this.fail(NODE_CHILD_REQUIRED, { ...ctx, index: n })
         }
       }
     }
   }
 
   /**
-   * Normalize a `node` with `reason` and `rule`.
+   * Normalize a node with `reason` and `context`.
    *
    * @param {Change} change
-   * @param {Node} node
    * @param {String} reason
    * @param {Mixed} context
    */
 
-  normalizeNode(change, node, reason, context) {
+  normalizeNode(change, reason, context) {
     const { state } = change
     const { document } = state
 
-    const { rule } = context
+    const { node, rule } = context
     const { data, nodes, parent, text } = rule.defaults
     const defaultNode = (
       nodes != null &&
@@ -390,18 +411,6 @@ class Schema extends Record(DEFAULTS) {
         return change.removeNodeByKey(child.key)
       }
 
-      case NODE_CHILD_PARENT_KIND_INVALID: {
-        const { child } = context
-        const p = Node.create(parent)
-        return change.wrapNodeByKey(child.key, p)
-      }
-
-      case NODE_CHILD_PARENT_TYPE_INVALID: {
-        const { child } = context
-        const p = Node.create(parent)
-        return change.wrapNodeByKey(child.key, p)
-      }
-
       case NODE_DATA_INVALID: {
         const { key } = context
         const current = node.data.get(key)
@@ -426,10 +435,20 @@ class Schema extends Record(DEFAULTS) {
         return
       }
 
+      case NODE_PARENT_KIND_INVALID: {
+        const p = Node.create(parent)
+        return change.wrapNodeByKey(node.key, p)
+      }
+
+      case NODE_PARENT_TYPE_INVALID: {
+        const p = Node.create(parent)
+        return change.wrapNodeByKey(node.key, p)
+      }
+
       case NODE_TEXT_INVALID: {
         const child = Text.create(text)
+        change.insertTextByKey(node.key, 0, child, { normalize: false })
         node.nodes.forEach(c => change.removeNodeByKey(c.key, { normalize: false }))
-        change.insertTextByKey(child.key, 0, text)
         return
       }
     }
@@ -514,14 +533,9 @@ function resolveDocumentRule(obj) {
     nodes: obj.defaults && obj.defaults.nodes,
   }
 
-  if (nodes != null && typeof nodes == 'string') {
-    nodes = [nodes]
-  }
-
-  if (nodes != null && typeof nodes[0] == 'string') {
-    nodes = [{ type: nodes }]
-    if (!defaults.nodes) defaults.nodes = nodes
-  }
+  // Resolve `nodes` and `defaults.nodes`.
+  if (nodes != null) nodes = resolveNodesRef(nodes)
+  if (defaults.nodes != null) defaults.nodes = resolveDefaultsNodesRef(defaults.nodes)
 
   const rule = {
     kind,
@@ -560,21 +574,13 @@ function resolveNodeRule(kind, type, obj) {
     parent: obj.defaults && obj.defaults.parent,
   }
 
-  if (nodes != null && typeof nodes == 'string') {
-    nodes = [nodes]
-  }
+  // Resolve `nodes` and `defaults.nodes`.
+  if (nodes != null) nodes = resolveNodesRef(nodes)
+  if (defaults.nodes != null) defaults.nodes = resolveDefaultsNodesRef(defaults.nodes)
 
-  if (nodes != null && typeof nodes[0] == 'string') {
-    nodes = [{ type: nodes }]
-  }
-
-  if (parent != null && typeof parent == 'string') {
-    parent = [parent]
-  }
-
-  if (parent != null && typeof parent[0] == 'string') {
-    parent = { type: parent }
-  }
+  // Resolve `parent` and `defaults.parent`.
+  if (parent != null) parent = resolveParentRef(parent)
+  if (defaults.parent != null) defaults.parent = resolveDefaultsParentRef(defaults.parent)
 
   const rule = {
     data,
@@ -588,6 +594,35 @@ function resolveNodeRule(kind, type, obj) {
   }
 
   return rule
+}
+
+function resolveNodesRef(ref) {
+  if (ref == null) return null
+  if (Array.isArray(ref) && ref.every(r => typeof r == 'string')) return [{ type: ref }]
+  if (Array.isArray(ref) && ref.every(r => isPlainObject(r))) return ref
+  throw new Error(`Unable to resolve \`nodes\` reference: "${ref}"`)
+}
+
+function resolveDefaultsNodesRef(ref) {
+  if (ref == null) return null
+  if (Array.isArray(ref) && ref.every(r => typeof r == 'string')) return ref
+  if (Array.isArray(ref) && ref.every(r => isPlainObject(r))) return ref
+  throw new Error(`Unable to resolve \`defaults.nodes\` reference: "${ref}"`)
+}
+
+function resolveParentRef(ref) {
+  if (ref == null) return null
+  if (typeof ref == 'string') return { type: [ref] }
+  if (Array.isArray(ref) && ref.every(r => typeof r == 'string')) return { type: ref }
+  if (isPlainObject(ref)) return ref
+  throw new Error(`Unable to resolve \`parent\` reference: "${ref}"`)
+}
+
+function resolveDefaultsParentRef(ref) {
+  if (ref == null) return null
+  if (typeof ref == 'string') return ref
+  if (isPlainObject(ref)) return ref
+  throw new Error(`Unable to resolve \`defaults.parent\` reference: "${ref}"`)
 }
 
 /**
@@ -634,6 +669,13 @@ function linkSchema(schema) {
         const node = findNodeRule(ref, schema)
         return node.defaults
       })
+    }
+
+    // Expand any parent string default reference to its full properties.
+    if (rule.defaults.parent && typeof rule.defaults.parent == 'string') {
+      const ref = rule.defaults.parent
+      const node = findNodeRule(ref, schema)
+      rule.defaults.parent = node.defaults
     }
   })
 }
