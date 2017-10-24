@@ -4,9 +4,7 @@ import h from '../../helpers/h'
 
 export const schema = {
   blocks: {
-    list: {
-      nodes: [{ types: ['item'] }],
-    },
+    list: {},
     item: {
       parent: { types: ['list'] },
     }

@@ -6,6 +6,32 @@ import React from 'react'
 import initialState from './state.json'
 
 /**
+ * A simple schema to enforce the nodes in the Slate document.
+ *
+ * @type {Object}
+ */
+
+const schema = {
+  document: {
+    nodes: [
+      { types: ['title'], min: 1, max: 1 },
+      { types: ['paragraph'], min: 1 },
+    ],
+    normalize: (change, reason, { node, child, index }) => {
+      switch (reason) {
+        case 'child_type_invalid': {
+          return change.setNodeByKey(child.key, index == 0 ? 'title' : 'paragraph')
+        }
+        case 'child_required': {
+          const block = Block.create(index == 0 ? 'title' : 'paragraph')
+          return change.insertNodeByKey(node.key, index, block)
+        }
+      }
+    }
+  }
+}
+
+/**
  * The Forced Layout example.
  *
  * @type {Component}
@@ -21,21 +47,6 @@ class ForcedLayout extends React.Component {
 
   state = {
     state: State.fromJSON(initialState),
-    schema: {
-      document: {
-        nodes: [
-          { type: 'title', min: 1, max: 1 },
-          { type: 'paragraph', min: 1 },
-        ],
-        defaults: {
-          nodes: ['title', 'paragraph'],
-        },
-      },
-      blocks: {
-        title: {},
-        paragraph: {},
-      }
-    }
   }
 
   /**
@@ -60,7 +71,7 @@ class ForcedLayout extends React.Component {
         <Editor
           placeholder="Enter a title..."
           state={this.state.state}
-          schema={this.state.schema}
+          schema={schema}
           onChange={this.onChange}
           renderNode={this.renderNode}
           validateNode={this.validateNode}
@@ -82,47 +93,6 @@ class ForcedLayout extends React.Component {
       case 'paragraph': return <p {...props.attributes}>{props.children}</p>
     }
   }
-
-  /**
-   * Validate a `node`, forcing the layout.
-   *
-   * @param {Node} node
-   * @return {Function|Void}
-   */
-
-  // validateNode = (node) => {
-  //   const { kind, nodes } = node
-  //   if (kind != 'document') return
-
-  //   const first = nodes.first()
-
-  //   if (!first) {
-  //     return (change) => {
-  //       change.insertNodeByKey(node.key, 0, Block.create('title'))
-  //     }
-  //   }
-
-  //   if (first.type != 'title') {
-  //     return (change) => {
-  //       change.setNodeByKey(first.key, 'title')
-  //     }
-  //   }
-
-  //   const second = nodes.get(1)
-
-  //   if (!second) {
-  //     return (change) => {
-  //       change.insertNodeByKey(node.key, 1, Block.create('paragraph'))
-  //     }
-  //   }
-
-  //   const invalids = nodes.rest().filter(n => n.type != 'paragraph')
-  //   if (!invalids.size) return
-
-  //   return (change) => {
-  //     invalids.forEach(n => change.setNodeByKey(n.key, 'paragraph'))
-  //   }
-  // }
 
 }
 

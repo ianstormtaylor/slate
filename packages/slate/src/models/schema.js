@@ -164,13 +164,10 @@ class Schema extends Record(DEFAULTS) {
   fail(reason, context) {
     return (change) => {
       debug(`normalizing`, { reason, context })
-
       const { rule } = context
       const count = change.operations.length
-      debugger
       if (rule.normalize) rule.normalize(change, reason, context)
       if (change.operations.length > count) return
-
       this.normalize(change, reason, context)
     }
   }
@@ -184,8 +181,6 @@ class Schema extends Record(DEFAULTS) {
    */
 
   normalize(change, reason, context) {
-    debugger
-
     switch (reason) {
       case CHILD_KIND_INVALID:
       case CHILD_TYPE_INVALID:
@@ -286,15 +281,39 @@ class Schema extends Record(DEFAULTS) {
     }
 
     if (rule.nodes != null || parents != null) {
-      const nodes = node.nodes.toArray()
-      let offset = 0
-      let d = 0
+      const children = node.nodes.toArray()
+      const defs = rule.nodes != null ? rule.nodes.slice() : []
+
+      let offset
+      let min
+      let index
       let n
       let def
+      let max
+      let child
 
-      for (let index = 0; index < nodes.length; index++) {
-        const child = nodes[index]
+      function nextDef() {
+        offset = offset == null ? 0 : offset + min
+        n = index - offset
+        def = defs.shift()
+        min = def && (def.min == null ? 0 : def.min)
+        max = def && (def.max == null ? Infinity : def.max)
+        return !!def
+      }
 
+      function nextChild() {
+        index = index == null ? 0 : index + 1
+        n = index - offset
+        child = children[index]
+        if (max != null && n == max) nextDef()
+        return !!child
+      }
+
+      if (rule.nodes != null) {
+        nextDef()
+      }
+
+      while (nextChild()) {
         if (parents != null && child.kind != 'text' && child.type in parents) {
           const r = parents[child.type]
 
@@ -308,51 +327,25 @@ class Schema extends Record(DEFAULTS) {
         }
 
         if (rule.nodes != null) {
-          n = index - offset
-          def = rule.nodes[d]
-          const nextDef = rule.nodes[d + 1]
-          const { min = 0, max = Infinity } = def
-
-          if (n >= max) {
-            index--
-            d++
-            offset += min
-            break
-          }
-
           if (!def) {
             return this.fail(CHILD_UNKNOWN, { ...ctx, child, index })
           }
 
           if (def.kinds != null && !def.kinds.includes(child.kind)) {
-            if (n >= min && nextDef) {
-              index--
-              d++
-              offset += min
-              break
-            }
-
+            if (n >= min && nextDef()) continue
             return this.fail(CHILD_KIND_INVALID, { ...ctx, child, index })
           }
 
           if (def.types != null && !def.types.includes(child.type)) {
-            if (n >= min && nextDef) {
-              index--
-              d++
-              offset += min
-              break
-            }
-
+            if (n >= min && nextDef()) continue
             return this.fail(CHILD_TYPE_INVALID, { ...ctx, child, index })
           }
         }
       }
 
       if (rule.nodes != null) {
-        const { min = 0 } = def
-
-        if (n < min) {
-          return this.fail(CHILD_REQUIRED, { ...ctx, index: n })
+        if (min != null && index <= min) {
+          return this.fail(CHILD_REQUIRED, { ...ctx, index })
         }
       }
     }
