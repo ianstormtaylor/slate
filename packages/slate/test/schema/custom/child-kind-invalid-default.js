@@ -1,15 +1,14 @@
 /** @jsx h */
 
-import h from '../../../helpers/h'
+import h from '../../helpers/h'
 
 export const schema = {
   blocks: {
     paragraph: {},
     quote: {
-      nodes: ['paragraph'],
-      defaults: {
-        nodes: ['paragraph'],
-      }
+      nodes: [
+        { kinds: ['text'] },
+      ]
     }
   }
 }
@@ -18,7 +17,7 @@ export const input = (
   <state>
     <document>
       <quote>
-        text
+        <link>text</link>
       </quote>
     </document>
   </state>
@@ -27,11 +26,7 @@ export const input = (
 export const output = (
   <state>
     <document>
-      <quote>
-        <paragraph>
-          text
-        </paragraph>
-      </quote>
+      <quote />
     </document>
   </state>
 )

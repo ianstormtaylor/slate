@@ -6,9 +6,7 @@ import { Record } from 'immutable'
 
 import CORE_SCHEMA_RULES from '../constants/core-schema-rules'
 import MODEL_TYPES from '../constants/model-types'
-import Node from './node'
 import Stack from './stack'
-import Text from './text'
 import memoize from '../utils/memoize'
 
 /**
@@ -17,17 +15,17 @@ import memoize from '../utils/memoize'
  * @type {Object}
  */
 
-const NODE_CHILD_KIND_INVALID = 'node_child_kind_invalid'
-const NODE_CHILD_TYPE_INVALID = 'node_child_type_invalid'
-const NODE_CHILD_REQUIRED = 'node_child_required'
-const NODE_CHILD_UNKNOWN = 'node_child_unknown'
+const CHILD_KIND_INVALID = 'child_kind_invalid'
+const CHILD_REQUIRED = 'child_required'
+const CHILD_TYPE_INVALID = 'child_type_invalid'
+const CHILD_UNKNOWN = 'child_unknown'
 const NODE_DATA_INVALID = 'node_data_invalid'
 const NODE_IS_VOID_INVALID = 'node_is_void_invalid'
 const NODE_KIND_INVALID = 'node_kind_invalid'
 const NODE_MARK_INVALID = 'node_mark_invalid'
-const NODE_PARENT_KIND_INVALID = 'node_parent_kind_invalid'
-const NODE_PARENT_TYPE_INVALID = 'node_parent_type_invalid'
 const NODE_TEXT_INVALID = 'node_text_invalid'
+const PARENT_KIND_INVALID = 'parent_kind_invalid'
+const PARENT_TYPE_INVALID = 'parent_type_invalid'
 
 /**
  * Debug.
@@ -131,19 +129,6 @@ class Schema extends Record(DEFAULTS) {
   }
 
   /**
-   * Get the rule defaults for an `object`.
-   *
-   * @param {Object} object
-   * @return {Object}
-   */
-
-  getDefaults(object) {
-    const rule = this.getRule(object)
-    if (!rule) return null
-    return rule.defaults
-  }
-
-  /**
    * Get a dictionary of the parent rule validations by child type.
    *
    * @return {Object|Null}
@@ -182,23 +167,59 @@ class Schema extends Record(DEFAULTS) {
 
       const { rule } = context
       const count = change.operations.length
+      debugger
       if (rule.normalize) rule.normalize(change, reason, context)
       if (change.operations.length > count) return
 
-      switch (reason) {
-        case NODE_CHILD_KIND_INVALID:
-        case NODE_CHILD_TYPE_INVALID:
-        case NODE_CHILD_REQUIRED:
-        case NODE_CHILD_UNKNOWN:
-        case NODE_DATA_INVALID:
-        case NODE_IS_VOID_INVALID:
-        case NODE_KIND_INVALID:
-        case NODE_MARK_INVALID:
-        case NODE_PARENT_KIND_INVALID:
-        case NODE_PARENT_TYPE_INVALID:
-        case NODE_TEXT_INVALID: {
-          this.normalizeNode(change, reason, context)
-        }
+      this.normalize(change, reason, context)
+    }
+  }
+
+  /**
+   * Normalize an invalid state with `reason` and `context`.
+   *
+   * @param {Change} change
+   * @param {String} reason
+   * @param {Mixed} context
+   */
+
+  normalize(change, reason, context) {
+    debugger
+
+    switch (reason) {
+      case CHILD_KIND_INVALID:
+      case CHILD_TYPE_INVALID:
+      case CHILD_UNKNOWN: {
+        const { child } = context
+        return change.removeNodeByKey(child.key)
+      }
+
+      case CHILD_REQUIRED:
+      case NODE_KIND_INVALID:
+      case NODE_TEXT_INVALID:
+      case PARENT_KIND_INVALID:
+      case PARENT_TYPE_INVALID: {
+        const { node } = context
+        return node.kind == 'document'
+          ? node.nodes.forEach(child => change.removeNodeByKey(child.key))
+          : change.removeNodeByKey(node.key)
+      }
+
+      case NODE_DATA_INVALID: {
+        const { node, key } = context
+        return node.data.get(key) === undefined && node.kind != 'document'
+          ? change.removeNodeByKey(node.key)
+          : change.setNodeByKey(node.key, { data: node.data.delete(key) })
+      }
+
+      case NODE_IS_VOID_INVALID: {
+        const { node } = context
+        return change.setNodeByKey(node.key, { isVoid: !node.isVoid })
+      }
+
+      case NODE_MARK_INVALID: {
+        const { node, mark } = context
+        return node.getTexts().forEach(t => node.removeMarkByKey(t.key, 0, t.text.length, mark))
       }
     }
   }
@@ -221,12 +242,16 @@ class Schema extends Record(DEFAULTS) {
     const parents = this.getParentRules()
     const ctx = { node, rule }
 
-    if (rule.kind != null && node.kind != rule.kind) {
-      return this.fail(NODE_KIND_INVALID, ctx)
+    if (rule.kind != null) {
+      if (node.kind != rule.kind) {
+        return this.fail(NODE_KIND_INVALID, ctx)
+      }
     }
 
-    if (rule.isVoid != null && node.isVoid != rule.isVoid) {
-      return this.fail(NODE_IS_VOID_INVALID, ctx)
+    if (rule.isVoid != null) {
+      if (node.isVoid != rule.isVoid) {
+        return this.fail(NODE_IS_VOID_INVALID, ctx)
+      }
     }
 
     if (rule.data != null) {
@@ -255,11 +280,7 @@ class Schema extends Record(DEFAULTS) {
     if (rule.text != null) {
       const { text } = node
 
-      if (typeof rule.text == 'string' && text != rule.text) {
-        return this.fail(NODE_TEXT_INVALID, { ...ctx, text })
-      }
-
-      if (rule.text instanceof RegExp && !rule.text.test(text)) {
+      if (!rule.text.test(text)) {
         return this.fail(NODE_TEXT_INVALID, { ...ctx, text })
       }
     }
@@ -277,12 +298,12 @@ class Schema extends Record(DEFAULTS) {
         if (parents != null && child.kind != 'text' && child.type in parents) {
           const r = parents[child.type]
 
-          if (r.parent.kind != null && !r.parent.kind.includes(node.kind)) {
-            return this.fail(NODE_PARENT_KIND_INVALID, { node: child, parent: node, rule: r })
+          if (r.parent.kinds != null && !r.parent.kinds.includes(node.kind)) {
+            return this.fail(PARENT_KIND_INVALID, { node: child, parent: node, rule: r })
           }
 
-          if (r.parent.type != null && !r.parent.type.includes(node.type)) {
-            return this.fail(NODE_PARENT_TYPE_INVALID, { node: child, parent: node, rule: r })
+          if (r.parent.types != null && !r.parent.types.includes(node.type)) {
+            return this.fail(PARENT_TYPE_INVALID, { node: child, parent: node, rule: r })
           }
         }
 
@@ -300,10 +321,10 @@ class Schema extends Record(DEFAULTS) {
           }
 
           if (!def) {
-            return this.fail(NODE_CHILD_UNKNOWN, { ...ctx, child, index })
+            return this.fail(CHILD_UNKNOWN, { ...ctx, child, index })
           }
 
-          if (def.kind != null && !def.kind.includes(child.kind)) {
+          if (def.kinds != null && !def.kinds.includes(child.kind)) {
             if (n >= min && nextDef) {
               index--
               d++
@@ -311,10 +332,10 @@ class Schema extends Record(DEFAULTS) {
               break
             }
 
-            return this.fail(NODE_CHILD_KIND_INVALID, { ...ctx, child, index })
+            return this.fail(CHILD_KIND_INVALID, { ...ctx, child, index })
           }
 
-          if (def.type != null && !def.type.includes(child.type)) {
+          if (def.types != null && !def.types.includes(child.type)) {
             if (n >= min && nextDef) {
               index--
               d++
@@ -322,7 +343,7 @@ class Schema extends Record(DEFAULTS) {
               break
             }
 
-            return this.fail(NODE_CHILD_TYPE_INVALID, { ...ctx, child, index })
+            return this.fail(CHILD_TYPE_INVALID, { ...ctx, child, index })
           }
         }
       }
@@ -331,125 +352,8 @@ class Schema extends Record(DEFAULTS) {
         const { min = 0 } = def
 
         if (n < min) {
-          return this.fail(NODE_CHILD_REQUIRED, { ...ctx, index: n })
+          return this.fail(CHILD_REQUIRED, { ...ctx, index: n })
         }
-      }
-    }
-  }
-
-  /**
-   * Normalize a node with `reason` and `context`.
-   *
-   * @param {Change} change
-   * @param {String} reason
-   * @param {Mixed} context
-   */
-
-  normalizeNode(change, reason, context) {
-    const { state } = change
-    const { document } = state
-
-    const { node, rule } = context
-    const { data, nodes, parent, text } = rule.defaults
-    const defaultNode = (
-      nodes != null &&
-      context.index != null &&
-      nodes[Math.max(nodes.length - 1, context.index)]
-    )
-
-    const remove = (c, n) => {
-      if (n.kind == 'document') {
-        n.nodes.forEach(child => c.removeNodeByKey(child.key))
-      } else {
-        c.removeNodeByKey(n.key)
-      }
-    }
-
-    switch (reason) {
-      case NODE_CHILD_KIND_INVALID: {
-        const { child } = context
-        if (!defaultNode) return change.removeNodeByKey(child.key)
-        const { kind } = child
-        const defKind = defaultNode.kind
-
-        // If the current kind is a block, the only thing it could be is that
-        // it was expecting inline/text nodes, so unwrap it.
-        if (kind == 'block') return change.unwrapNodeByKey(child.key)
-
-        // If the current kind is inline, and it needs text, unwrap it.
-        if (kind == 'inline' && defKind == 'text') return change.unwrapNodeByKey(child.key)
-
-        // If current kind is a text, and the default is an inline, we can
-        // just directly wrap it.
-        if (kind == 'text' && defKind == 'inline') return change.wrapNodeByKey(child.key, defaultNode)
-
-        // Otherwise, we need to wrap in a block. But we have to make sure we
-        // wrap all of the inline children.
-        const block = document.getClosestBlock(child.key)
-        const wrapper = Node.create(defaultNode)
-        change.insertNodeByKey(block.key, 0, wrapper, { normalize: false })
-        block.nodes.forEach((c, i) => change.moveNodeByKey(c.key, wrapper.key, i, { normalize: false }))
-        return
-      }
-
-      case NODE_CHILD_TYPE_INVALID: {
-        const { child } = context
-        if (!defaultNode) return change.removeNodeByKey(child.key)
-        const { type } = defaultNode
-        change.setNodeByKey(child.key, { type })
-      }
-
-      case NODE_CHILD_REQUIRED: {
-        if (!defaultNode) return change.call(remove, node)
-        const { index } = context
-        const child = Node.create(defaultNode)
-        return change.insertNodeByKey(node.key, index, child)
-      }
-
-      case NODE_CHILD_UNKNOWN: {
-        const { child } = context
-        return change.removeNodeByKey(child.key)
-      }
-
-      case NODE_DATA_INVALID: {
-        const { key } = context
-        const current = node.data.get(key)
-        const value = data[key]
-        if (value === undefined && current === undefined) return change.call(remove, node)
-        if (value === undefined) return change.setNodeByKey(node.key, { data: data.delete(key) })
-        return change.setNodeByKey(node.key, { data: data.set(key, value) })
-      }
-
-      case NODE_IS_VOID_INVALID: {
-        return change.setNodeByKey(node.key, { isVoid: !node.isVoid })
-      }
-
-      case NODE_KIND_INVALID: {
-        return change.call(remove, node)
-      }
-
-      case NODE_MARK_INVALID: {
-        const { mark } = context
-        const texts = node.getTexts()
-        texts.forEach(t => node.removeMarkByKey(t.key, 0, t.text.length, mark))
-        return
-      }
-
-      case NODE_PARENT_KIND_INVALID: {
-        const p = Node.create(parent)
-        return change.wrapNodeByKey(node.key, p)
-      }
-
-      case NODE_PARENT_TYPE_INVALID: {
-        const p = Node.create(parent)
-        return change.wrapNodeByKey(node.key, p)
-      }
-
-      case NODE_TEXT_INVALID: {
-        const child = Text.create(text)
-        change.insertTextByKey(node.key, 0, child, { normalize: false })
-        node.nodes.forEach(c => change.removeNodeByKey(c.key, { normalize: false }))
-        return
       }
     }
   }
@@ -470,46 +374,35 @@ function resolveSchema(plugins = []) {
     inlines: {},
   }
 
-  plugins
-    .slice()
-    .reverse()
-    .filter(p => !!p.schema)
-    .forEach((plugin) => {
-      const {
-        document = {},
-        blocks = {},
-        inlines = {},
-        rules,
-        nodes
-      } = plugin.schema
+  plugins.slice().reverse().forEach((plugin) => {
+    if (!plugin.schema) return
 
-      if (rules) {
-        throw new Error('Schemas in Slate have changed! They are no longer accept a `rules` property.')
-      }
+    if (plugin.schema.rules) {
+      throw new Error('Schemas in Slate have changed! They are no longer accept a `rules` property.')
+    }
 
-      if (nodes) {
-        throw new Error('Schemas in Slate have changed! They are no longer accept a `rules` property.')
-      }
+    if (plugin.schema.nodes) {
+      throw new Error('Schemas in Slate have changed! They are no longer accept a `nodes` property.')
+    }
 
-      const d = resolveDocumentRule(document)
-      const bs = {}
-      const is = {}
+    const { document = {}, blocks = {}, inlines = {}} = plugin.schema
+    const d = resolveDocumentRule(document)
+    const bs = {}
+    const is = {}
 
-      for (const key in blocks) {
-        bs[key] = resolveNodeRule('block', key, blocks[key])
-      }
+    for (const key in blocks) {
+      bs[key] = resolveNodeRule('block', key, blocks[key])
+    }
 
-      for (const key in inlines) {
-        is[key] = resolveNodeRule('inline', key, inlines[key])
-      }
+    for (const key in inlines) {
+      is[key] = resolveNodeRule('inline', key, inlines[key])
+    }
 
-      mergeWith(schema.document, d, customizer)
-      mergeWith(schema.blocks, bs, customizer)
-      mergeWith(schema.inlines, is, customizer)
-    })
+    mergeWith(schema.document, d, customizer)
+    mergeWith(schema.blocks, bs, customizer)
+    mergeWith(schema.inlines, is, customizer)
+  })
 
-  linkSchema(schema)
-  assertSchema(schema)
   return schema
 }
 
@@ -521,30 +414,12 @@ function resolveSchema(plugins = []) {
  */
 
 function resolveDocumentRule(obj) {
-  let {
-    data = {},
-    nodes = null
-  } = obj
-
-  const kind = 'document'
-  const defaults = {
-    kind,
-    data: (obj.defaults && obj.defaults.data) || {},
-    nodes: obj.defaults && obj.defaults.nodes,
+  return {
+    data: {},
+    nodes: null,
+    ...obj,
+    kind: 'document',
   }
-
-  // Resolve `nodes` and `defaults.nodes`.
-  if (nodes != null) nodes = resolveNodesRef(nodes)
-  if (defaults.nodes != null) defaults.nodes = resolveDefaultsNodesRef(defaults.nodes)
-
-  const rule = {
-    kind,
-    data,
-    defaults,
-    nodes,
-  }
-
-  return rule
 }
 
 /**
@@ -557,185 +432,29 @@ function resolveDocumentRule(obj) {
  */
 
 function resolveNodeRule(kind, type, obj) {
-  let {
-    data = {},
-    nodes = null,
-    isVoid = null,
-    parent = null,
-    text = null
-  } = obj
-
-  const defaults = {
+  return {
+    data: {},
+    isVoid: null,
+    nodes: null,
+    parent: null,
+    text: null,
+    ...obj,
     kind,
     type,
-    data: (obj.defaults && obj.defaults.data) || {},
-    isVoid: (obj.defaults && obj.defaults.isVoid) || false,
-    nodes: obj.defaults && obj.defaults.nodes,
-    parent: obj.defaults && obj.defaults.parent,
   }
-
-  // Resolve `nodes` and `defaults.nodes`.
-  if (nodes != null) nodes = resolveNodesRef(nodes)
-  if (defaults.nodes != null) defaults.nodes = resolveDefaultsNodesRef(defaults.nodes)
-
-  // Resolve `parent` and `defaults.parent`.
-  if (parent != null) parent = resolveParentRef(parent)
-  if (defaults.parent != null) defaults.parent = resolveDefaultsParentRef(defaults.parent)
-
-  const rule = {
-    data,
-    defaults,
-    isVoid,
-    kind,
-    nodes,
-    parent,
-    text,
-    type,
-  }
-
-  return rule
-}
-
-function resolveNodesRef(ref) {
-  if (ref == null) return null
-  if (Array.isArray(ref) && ref.every(r => typeof r == 'string')) return [{ type: ref }]
-  if (Array.isArray(ref) && ref.every(r => isPlainObject(r))) return ref
-  throw new Error(`Unable to resolve \`nodes\` reference: "${ref}"`)
-}
-
-function resolveDefaultsNodesRef(ref) {
-  if (ref == null) return null
-  if (Array.isArray(ref) && ref.every(r => typeof r == 'string')) return ref
-  if (Array.isArray(ref) && ref.every(r => isPlainObject(r))) return ref
-  throw new Error(`Unable to resolve \`defaults.nodes\` reference: "${ref}"`)
-}
-
-function resolveParentRef(ref) {
-  if (ref == null) return null
-  if (typeof ref == 'string') return { type: [ref] }
-  if (Array.isArray(ref) && ref.every(r => typeof r == 'string')) return { type: ref }
-  if (isPlainObject(ref)) return ref
-  throw new Error(`Unable to resolve \`parent\` reference: "${ref}"`)
-}
-
-function resolveDefaultsParentRef(ref) {
-  if (ref == null) return null
-  if (typeof ref == 'string') return ref
-  if (isPlainObject(ref)) return ref
-  throw new Error(`Unable to resolve \`defaults.parent\` reference: "${ref}"`)
 }
 
 /**
- * Link any string references in a schema by type, for convenience.
- *
- * @param {Object} schema
- */
-
-function linkSchema(schema) {
-  const { document, blocks, inlines } = schema
-  const rules = []
-    .concat(document)
-    .concat(Object.keys(blocks).map(k => blocks[k]))
-    .concat(Object.keys(inlines).map(k => inlines[k]))
-
-  rules.forEach((rule) => {
-    // Ensure that each node rule that defines a `type` has the corresponding
-    // `kind` filled in as well, for validation specificity.
-    if (rule.nodes) {
-      rule.nodes.forEach((def) => {
-        if (!def.type) return
-        def.type.forEach((type) => {
-          const node = findNodeRule(type, schema)
-          def.kind = def.kind || []
-          def.kind.push(node.kind)
-        })
-      })
-    }
-
-    // Ensure the same thing for parent definitions as well.
-    if (rule.parent && rule.parent.type) {
-      const def = rule.parent
-      def.type.forEach((type) => {
-        const node = findNodeRule(type, schema)
-        def.kind = def.kind || []
-        def.kind.push(node.kind)
-      })
-    }
-
-    // Expand any node string default references to their full properties.
-    if (rule.defaults.nodes) {
-      rule.defaults.nodes = rule.defaults.nodes.map((ref) => {
-        if (typeof ref != 'string') return ref
-        const node = findNodeRule(ref, schema)
-        return node.defaults
-      })
-    }
-
-    // Expand any parent string default reference to its full properties.
-    if (rule.defaults.parent && typeof rule.defaults.parent == 'string') {
-      const ref = rule.defaults.parent
-      const node = findNodeRule(ref, schema)
-      rule.defaults.parent = node.defaults
-    }
-  })
-}
-
-function assertSchema(schema) {
-  const { document, blocks, inlines } = schema
-  const rules = []
-    .concat(document)
-    .concat(Object.keys(blocks).map(k => blocks[k]))
-    .concat(Object.keys(inlines).map(k => inlines[k]))
-
-  rules.forEach((rule) => {
-    const { defaults, kind, nodes, text, type } = rule
-
-    if (kind == null) {
-      throw new Error('You must provide a `kind` property in node schema rules.')
-    }
-
-    if (kind != 'document' && type == null) {
-      throw new Error('You must provide a `type` property in node schema rules.')
-    }
-
-    if (nodes != null && defaults.nodes == null) {
-      throw new Error('Schema rules that define validation for `nodes` must also include `defaults.nodes` to normalize with.')
-    }
-
-    if (text != null && defaults.text == null) {
-      throw new Error('Schema rules that define validation for `text` must also include `defaults.text` to normalize with.')
-    }
-
-    if (
-      (kind == 'block' || kind == 'inline') &&
-      (blocks[type] && inlines[type])
-    ) {
-      throw new Error(`A schema cannot have a block and an inline defined with the same type, in this case "${type}".`)
-    }
-  })
-}
-
-function findNodeRule(type, schema) {
-  const node = schema.blocks[type] || schema.inlines[type]
-
-  if (!node) {
-    throw new Error(`A schema rule referenced a node with type "${type}", but no node was defined.`)
-  }
-
-  return node
-}
-
-/**
- * A Lodash customizer for merging arrays by concatenation.
+ * A Lodash customizer for merging `kinds` and `types` arrays.
  *
  * @param {Mixed} target
  * @param {Mixed} source
  * @return {Array|Void}
  */
 
-function customizer(target, source) {
-  if (Array.isArray(target)) {
-    return target.concat(source)
+function customizer(target, source, key) {
+  if (key == 'kinds' || key == 'types') {
+    return target == null ? source : target.concat(source)
   }
 }
 

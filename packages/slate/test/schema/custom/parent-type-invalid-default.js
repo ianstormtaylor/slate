@@ -1,20 +1,14 @@
 /** @jsx h */
 
-import h from '../../../helpers/h'
+import h from '../../helpers/h'
 
 export const schema = {
   blocks: {
     list: {
-      nodes: ['item'],
-      defaults: {
-        nodes: ['item'],
-      }
+      nodes: [{ types: ['item'] }],
     },
     item: {
-      parent: 'list',
-      defaults: {
-        parent: 'list',
-      }
+      parent: { types: ['list'] },
     }
   }
 }
@@ -22,7 +16,9 @@ export const schema = {
 export const input = (
   <state>
     <document>
-      <item />
+      <paragraph>
+        <item />
+      </paragraph>
     </document>
   </state>
 )
@@ -30,9 +26,7 @@ export const input = (
 export const output = (
   <state>
     <document>
-      <list>
-        <item />
-      </list>
+      <paragraph />
     </document>
   </state>
 )

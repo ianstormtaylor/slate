@@ -1,14 +1,18 @@
 /** @jsx h */
 
-import h from '../../../helpers/h'
+import h from '../../helpers/h'
 
 export const schema = {
   blocks: {
     paragraph: {},
     quote: {
-      nodes: ['paragraph'],
-      defaults: {
-        nodes: ['paragraph'],
+      nodes: [
+        { kinds: ['block'] },
+      ],
+      normalize(change, reason, { child }) {
+        if (reason == 'child_kind_invalid') {
+          change.wrapBlockByKey(child.key, 'paragraph')
+        }
       }
     }
   }
