@@ -25,8 +25,8 @@ const NODE_DATA_INVALID = 'node_data_invalid'
 const NODE_IS_VOID_INVALID = 'node_is_void_invalid'
 const NODE_KIND_INVALID = 'node_kind_invalid'
 const NODE_MARK_INVALID = 'node_mark_invalid'
-const NODE_PARENT_KIND_INVALID = 'node_parent_kind_invalid'
-const NODE_PARENT_TYPE_INVALID = 'node_parent_type_invalid'
+const NODE_CHILD_PARENT_KIND_INVALID = 'node_child_parent_kind_invalid'
+const NODE_CHILD_PARENT_TYPE_INVALID = 'node_child_parent_type_invalid'
 const NODE_TEXT_INVALID = 'node_text_invalid'
 
 /**
@@ -155,17 +155,17 @@ class Schema extends Record(DEFAULTS) {
 
     for (const key in blocks) {
       const rule = blocks[key]
-      if (rule.parent == null) return
+      if (rule.parent == null) continue
       parents[key] = rule
     }
 
     for (const key in inlines) {
       const rule = inlines[key]
-      if (rule.parent == null) return
+      if (rule.parent == null) continue
       parents[key] = rule
     }
 
-    return Object.keys(parents) == 0 ? null : parents
+    return Object.keys(parents).length == 0 ? null : parents
   }
 
   /**
@@ -240,6 +240,8 @@ class Schema extends Record(DEFAULTS) {
       }
     }
 
+    if (parents != null) debugger
+
     if (rule.nodes != null || parents != null) {
       const nodes = node.nodes.toArray()
       let offset = 0
@@ -250,15 +252,15 @@ class Schema extends Record(DEFAULTS) {
       for (let index = 0; index < nodes.length; index++) {
         const child = nodes[index]
 
-        if (parents != null && child.type in parents) {
+        if (parents != null && child.kind != 'text' && child.type in parents) {
           const r = parents[child.type]
 
           if (r.parent.kind != null && !r.parent.kind.includes(node.kind)) {
-            return fail(NODE_PARENT_KIND_INVALID, { node: child, parent: node, rule: r })
+            return fail(NODE_CHILD_PARENT_KIND_INVALID, { child, parent: node, rule: r })
           }
 
           if (r.parent.type != null && !r.parent.type.includes(node.type)) {
-            return fail(NODE_PARENT_TYPE_INVALID, { node: child, parent: node, rule: r })
+            return fail(NODE_CHILD_PARENT_TYPE_INVALID, { child, parent: node, rule: r })
           }
         }
 
@@ -303,10 +305,12 @@ class Schema extends Record(DEFAULTS) {
         }
       }
 
-      const { min = 0 } = def
+      if (rule.nodes != null) {
+        const { min = 0 } = def
 
-      if (n < min) {
-        return fail(NODE_CHILD_REQUIRED, { index: n })
+        if (n < min) {
+          return fail(NODE_CHILD_REQUIRED, { index: n })
+        }
       }
     }
   }
@@ -386,6 +390,18 @@ class Schema extends Record(DEFAULTS) {
         return change.removeNodeByKey(child.key)
       }
 
+      case NODE_CHILD_PARENT_KIND_INVALID: {
+        const { child } = context
+        const p = Node.create(parent)
+        return change.wrapNodeByKey(child.key, p)
+      }
+
+      case NODE_CHILD_PARENT_TYPE_INVALID: {
+        const { child } = context
+        const p = Node.create(parent)
+        return change.wrapNodeByKey(child.key, p)
+      }
+
       case NODE_DATA_INVALID: {
         const { key } = context
         const current = node.data.get(key)
@@ -408,18 +424,6 @@ class Schema extends Record(DEFAULTS) {
         const texts = node.getTexts()
         texts.forEach(t => node.removeMarkByKey(t.key, 0, t.text.length, mark))
         return
-      }
-
-      case NODE_PARENT_KIND_INVALID: {
-        const { child } = context
-        const p = Node.create(parent)
-        return change.wrapNodeByKey(child.key, p)
-      }
-
-      case NODE_PARENT_TYPE_INVALID: {
-        const { child } = context
-        const p = Node.create(parent)
-        return change.wrapNodeByKey(child.key, p)
       }
 
       case NODE_TEXT_INVALID: {
@@ -498,7 +502,11 @@ function resolveSchema(plugins = []) {
  */
 
 function resolveDocumentRule(obj) {
-  let { data = {}, nodes = null } = obj
+  let {
+    data = {},
+    nodes = null
+  } = obj
+
   const kind = 'document'
   const defaults = {
     kind,
@@ -506,8 +514,13 @@ function resolveDocumentRule(obj) {
     nodes: obj.defaults && obj.defaults.nodes,
   }
 
+  if (nodes != null && typeof nodes == 'string') {
+    nodes = [nodes]
+  }
+
   if (nodes != null && typeof nodes[0] == 'string') {
     nodes = [{ type: nodes }]
+    if (!defaults.nodes) defaults.nodes = nodes
   }
 
   const rule = {
@@ -530,17 +543,37 @@ function resolveDocumentRule(obj) {
  */
 
 function resolveNodeRule(kind, type, obj) {
-  let { data = {}, nodes = null, isVoid = null, text = null } = obj
+  let {
+    data = {},
+    nodes = null,
+    isVoid = null,
+    parent = null,
+    text = null
+  } = obj
+
   const defaults = {
     kind,
     type,
     data: (obj.defaults && obj.defaults.data) || {},
     isVoid: (obj.defaults && obj.defaults.isVoid) || false,
     nodes: obj.defaults && obj.defaults.nodes,
+    parent: obj.defaults && obj.defaults.parent,
+  }
+
+  if (nodes != null && typeof nodes == 'string') {
+    nodes = [nodes]
   }
 
   if (nodes != null && typeof nodes[0] == 'string') {
     nodes = [{ type: nodes }]
+  }
+
+  if (parent != null && typeof parent == 'string') {
+    parent = [parent]
+  }
+
+  if (parent != null && typeof parent[0] == 'string') {
+    parent = { type: parent }
   }
 
   const rule = {
@@ -549,6 +582,7 @@ function resolveNodeRule(kind, type, obj) {
     isVoid,
     kind,
     nodes,
+    parent,
     text,
     type,
   }
@@ -580,6 +614,16 @@ function linkSchema(schema) {
           def.kind = def.kind || []
           def.kind.push(node.kind)
         })
+      })
+    }
+
+    // Ensure the same thing for parent definitions as well.
+    if (rule.parent && rule.parent.type) {
+      const def = rule.parent
+      def.type.forEach((type) => {
+        const node = findNodeRule(type, schema)
+        def.kind = def.kind || []
+        def.kind.push(node.kind)
       })
     }
 
