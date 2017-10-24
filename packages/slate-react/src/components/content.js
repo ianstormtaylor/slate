@@ -252,6 +252,20 @@ class Content extends React.Component {
       }
     }
 
+    // Don't handle drag events coming from embedded editors.
+    if (
+      handler == 'onDragEnd' ||
+      handler == 'onDragEnter' ||
+      handler == 'onDragExit' ||
+      handler == 'onDragLeave' ||
+      handler == 'onDragOver' ||
+      handler == 'onDragStart'
+    ) {
+      const { target } = event
+      const targetEditorNode = findClosestNode(target, '[data-slate-editor]')
+      if (targetEditorNode !== this.element) return
+    }
+
     // Some events require being in editable in the editor, so if the event
     // target isn't, ignore them.
     if (

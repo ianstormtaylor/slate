@@ -150,9 +150,6 @@ function BeforePlugin() {
    */
 
   function onDragEnd(event, change, editor) {
-    // Stop propagation so the event isn't visible to parent editors.
-    event.stopPropagation()
-
     isDragging = false
 
     debug('onDragEnd', { event })
@@ -167,9 +164,6 @@ function BeforePlugin() {
    */
 
   function onDragEnter(event, change, editor) {
-    // Stop propagation so the event isn't visible to parent editors.
-    event.stopPropagation()
-
     debug('onDragEnter', { event })
   }
 
@@ -182,9 +176,6 @@ function BeforePlugin() {
    */
 
   function onDragExit(event, change, editor) {
-    // Stop propagation so the event isn't visible to parent editors.
-    event.stopPropagation()
-
     debug('onDragExit', { event })
   }
 
@@ -197,9 +188,6 @@ function BeforePlugin() {
    */
 
   function onDragLeave(event, change, editor) {
-    // Stop propagation so the event isn't visible to parent editors.
-    event.stopPropagation()
-
     debug('onDragLeave', { event })
   }
 
@@ -212,11 +200,8 @@ function BeforePlugin() {
    */
 
   function onDragOver(event, change, editor) {
-    // Stop propagation so the event isn't visible to parent editors.
-    event.stopPropagation()
-
     // If a drag is already in progress, don't do this again.
-    if (!isDragging) return true
+    if (isDragging) return true
 
     isDragging = true
     event.nativeEvent.dataTransfer.dropEffect = 'move'
@@ -236,9 +221,6 @@ function BeforePlugin() {
    */
 
   function onDragStart(event, change, editor) {
-    // Stop propagation so the event isn't visible to parent editors.
-    event.stopPropagation()
-
     isDragging = true
 
     debug('onDragStart', { event })
