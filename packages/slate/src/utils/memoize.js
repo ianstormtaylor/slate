@@ -1,6 +1,4 @@
 
-import Map from 'es6-map'
-
 /**
  * Is in development?
  *
@@ -83,12 +81,12 @@ function memoize(object, properties, options = {}) {
         // If the cache key is different, previous caches must be cleared.
         if (CACHE_KEY !== this.__cache_key) {
           this.__cache_key = CACHE_KEY
-          this.__cache = new Map()
+          this.__cache = new Map() // eslint-disable-line no-undef,no-restricted-globals
         }
       }
 
       if (!this.__cache) {
-        this.__cache = new Map()
+        this.__cache = new Map() // eslint-disable-line no-undef,no-restricted-globals
       }
 
       let cachedValue
@@ -161,7 +159,7 @@ function setIn(map, keys, value) {
 
     // If the path was not created yet...
     if (child === UNSET) {
-      child = new Map()
+      child = new Map() // eslint-disable-line no-undef,no-restricted-globals
       parent.set(key, child)
     }
 

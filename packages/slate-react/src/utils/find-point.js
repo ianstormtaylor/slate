@@ -2,7 +2,6 @@
 import getWindow from 'get-window'
 
 import OffsetKey from './offset-key'
-import findClosestNode from './find-closest-node'
 
 /**
  * Constants.
@@ -32,7 +31,7 @@ function findPoint(nativeNode, nativeOffset, state) {
 
   const window = getWindow(nativeNode)
   const { parentNode } = nearestNode
-  let rangeNode = findClosestNode(parentNode, RANGE_SELECTOR)
+  let rangeNode = parentNode.closest(RANGE_SELECTOR)
   let offset
   let node
 
@@ -40,7 +39,7 @@ function findPoint(nativeNode, nativeOffset, state) {
   // determine what the offset relative to the text node is.
   if (rangeNode) {
     const range = window.document.createRange()
-    const textNode = findClosestNode(rangeNode, TEXT_SELECTOR)
+    const textNode = rangeNode.closest(TEXT_SELECTOR)
     range.setStart(textNode, 0)
     range.setEnd(nearestNode, nearestOffset)
     node = textNode
@@ -50,7 +49,7 @@ function findPoint(nativeNode, nativeOffset, state) {
   // For void nodes, the element with the offset key will be a cousin, not an
   // ancestor, so find it by going down from the nearest void parent.
   else {
-    const voidNode = findClosestNode(parentNode, VOID_SELECTOR)
+    const voidNode = parentNode.closest(VOID_SELECTOR)
     if (!voidNode) return null
     rangeNode = voidNode.querySelector(RANGE_SELECTOR)
     node = rangeNode
