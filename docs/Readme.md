@@ -16,6 +16,7 @@
 ## Guides
 
 - [Changes](./guides/changes.md)
+- [Plugins](./guides/plugins.md)
 
 
 ## General
