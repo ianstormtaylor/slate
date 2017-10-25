@@ -158,7 +158,10 @@ function getType(transfer, type) {
     return type == TEXT ? transfer.getData('Text') || null : null
   }
 
-  return transfer.types.indexOf(type) !== -1 ? transfer.getData(type) || null : null
+  // COMPAT: In Edge, transfer.types doesn't respond to `indexOf`. (2017/10/25)
+  const types = Array.from(transfer.types)
+
+  return types.indexOf(type) !== -1 ? transfer.getData(type) || null : null
 }
 
 /**
