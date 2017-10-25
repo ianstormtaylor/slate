@@ -44,7 +44,6 @@ function findRange(native, state) {
     focusOffset: focus.offset,
     isBackward: isCollapsed ? false : isBackward(native),
     isFocused: true,
-    marks: selection.marks
   })
 
   return range
