@@ -23,13 +23,13 @@ export const state = (
 
 export const output = `
 <div data-slate-editor="true" contenteditable="true" role="textbox">
-  <div data-slate-void="true" draggable="true" contenteditable="false">
+  <div data-slate-void="true" contenteditable="false">
     <div contenteditable="true" data-slate-spacer="true" style="height:0;color:transparent;outline:none">
       <span>
         <span></span>
       </span>
     </div>
-    <div>
+    <div draggable="true">
       <img src="https://example.com/image.png">
     </div>
   </div>
