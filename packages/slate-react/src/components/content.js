@@ -228,9 +228,16 @@ class Content extends React.Component {
       this.tmp.key++
     }
 
-    // If the `onSelect` handler fires while the `isUpdatingSelection` flag is
-    // set it's a result of updating the selection manually, so skip it.
-    if (handler == 'onSelect' && this.tmp.isUpdatingSelection) {
+    // Ignore `onBlur`, `onFocus` and `onSelect` events generated
+    // programmatically while updating selection.
+    if (
+      this.tmp.isUpdatingSelection &&
+      (
+        handler == 'onSelect' ||
+        handler == 'onBlur' ||
+        handler == 'onFocus'
+      )
+    ) {
       return
     }
 
