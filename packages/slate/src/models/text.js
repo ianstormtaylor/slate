@@ -36,7 +36,7 @@ class Text extends Record(DEFAULTS) {
    * @return {Text}
    */
 
-  static create(attrs = {}) {
+  static create(attrs = '') {
     if (Text.isText(attrs)) {
       return attrs
     }

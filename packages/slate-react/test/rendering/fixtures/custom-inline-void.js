@@ -37,13 +37,13 @@ export const output = `
         <span data-slate-zero-width="true">&#x200A;</span>
       </span>
     </span>
-    <span data-slate-void="true" draggable="true">
-      <span style="height:0;color:transparent">
+    <span data-slate-void="true" contenteditable="false">
+      <span contenteditable="true" data-slate-spacer="true" style="height:0;color:transparent;outline:none">
         <span>
           <span></span>
         </span>
       </span>
-      <span contenteditable="false">
+      <span draggable="true">
         <img>
       </span>
     </span>

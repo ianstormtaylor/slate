@@ -1,5 +1,6 @@
 
 import { State } from 'slate'
+import { atob, btoa } from 'isomorphic-base64'
 
 /**
  * Encode a JSON `object` as base-64 `string`.
@@ -10,7 +11,7 @@ import { State } from 'slate'
 
 function encode(object) {
   const string = JSON.stringify(object)
-  const encoded = window.btoa(window.encodeURIComponent(string))
+  const encoded = btoa(encodeURIComponent(string))
   return encoded
 }
 
@@ -22,7 +23,7 @@ function encode(object) {
  */
 
 function decode(string) {
-  const decoded = window.decodeURIComponent(window.atob(string))
+  const decoded = decodeURIComponent(atob(string))
   const object = JSON.parse(decoded)
   return object
 }

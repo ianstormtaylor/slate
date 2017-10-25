@@ -228,9 +228,16 @@ class Content extends React.Component {
       this.tmp.key++
     }
 
-    // If the `onSelect` handler fires while the `isUpdatingSelection` flag is
-    // set it's a result of updating the selection manually, so skip it.
-    if (handler == 'onSelect' && this.tmp.isUpdatingSelection) {
+    // Ignore `onBlur`, `onFocus` and `onSelect` events generated
+    // programmatically while updating selection.
+    if (
+      this.tmp.isUpdatingSelection &&
+      (
+        handler == 'onSelect' ||
+        handler == 'onBlur' ||
+        handler == 'onFocus'
+      )
+    ) {
       return
     }
 
@@ -250,6 +257,20 @@ class Content extends React.Component {
         this.updateSelection()
         return
       }
+    }
+
+    // Don't handle drag events coming from embedded editors.
+    if (
+      handler == 'onDragEnd' ||
+      handler == 'onDragEnter' ||
+      handler == 'onDragExit' ||
+      handler == 'onDragLeave' ||
+      handler == 'onDragOver' ||
+      handler == 'onDragStart'
+    ) {
+      const { target } = event
+      const targetEditorNode = findClosestNode(target, '[data-slate-editor]')
+      if (targetEditorNode !== this.element) return
     }
 
     // Some events require being in editable in the editor, so if the event
@@ -304,10 +325,17 @@ class Content extends React.Component {
     event.preventDefault()
 
     const { editor, state } = this.props
+    const { selection } = state
     const range = findRange(targetRange, state)
 
     editor.change((change) => {
-      change.insertTextAtRange(range, text)
+      change.insertTextAtRange(range, text, selection.marks)
+
+      // If the text was successfully inserted, and the selection had marks on it,
+      // unset the selection's marks.
+      if (selection.marks && state.document != change.state.document) {
+        change.select({ marks: null })
+      }
     })
   }
 
