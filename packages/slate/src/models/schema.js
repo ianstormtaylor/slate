@@ -93,6 +93,39 @@ class Schema extends Record(DEFAULTS) {
   }
 
   /**
+   * Create a `Schema` from a JSON `object`.
+   *
+   * @param {Object} object
+   * @return {Schema}
+   */
+
+  static fromJSON(object) {
+    if (Schema.isSchema(object)) {
+      return object
+    }
+
+    const {
+      document = {},
+      blocks = {},
+      inlines = {},
+    } = object
+
+    const schema = new Schema({
+      document,
+      blocks,
+      inlines,
+    })
+
+    return schema
+  }
+
+  /**
+   * Alias `fromJS`.
+   */
+
+  static fromJS = Schema.fromJSON
+
+  /**
    * Check if a `value` is a `Schema`.
    *
    * @param {Any} value
@@ -349,6 +382,31 @@ class Schema extends Record(DEFAULTS) {
         }
       }
     }
+  }
+
+  /**
+   * Return a JSON representation of the schema.
+   *
+   * @return {Object}
+   */
+
+  toJSON() {
+    const object = {
+      kind: this.kind,
+      document: this.document,
+      blocks: this.blocks,
+      inlines: this.inlines,
+    }
+
+    return object
+  }
+
+  /**
+   * Alias `toJS`.
+   */
+
+  toJS() {
+    return this.toJSON()
   }
 
 }

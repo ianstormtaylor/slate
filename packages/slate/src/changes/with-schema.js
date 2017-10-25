@@ -1,8 +1,6 @@
 
 import { Set } from 'immutable'
 
-import Schema from '../models/schema'
-
 /**
  * Changes.
  *
@@ -12,41 +10,37 @@ import Schema from '../models/schema'
 const Changes = {}
 
 /**
- * Normalize the document and selection with a `schema`.
+ * Normalize the state with its schema.
  *
  * @param {Change} change
- * @param {Schema} schema
  */
 
-Changes.normalize = (change, schema) => {
-  change.normalizeDocument(schema)
+Changes.normalize = (change) => {
+  change.normalizeDocument()
 }
 
 /**
- * Normalize the document with a `schema`.
+ * Normalize the document with the state's schema.
  *
  * @param {Change} change
- * @param {Schema} schema
  */
 
-Changes.normalizeDocument = (change, schema) => {
+Changes.normalizeDocument = (change) => {
   const { state } = change
   const { document } = state
-  change.normalizeNodeByKey(document.key, schema)
+  change.normalizeNodeByKey(document.key)
 }
 
 /**
- * Normalize a `node` and its children with a `schema`.
+ * Normalize a `node` and its children with the state's schema.
  *
  * @param {Change} change
  * @param {Node|String} key
- * @param {Schema} schema
  */
 
-Changes.normalizeNodeByKey = (change, key, schema) => {
-  assertSchema(schema)
+Changes.normalizeNodeByKey = (change, key) => {
   const { state } = change
-  const { document } = state
+  const { document, schema } = state
   const node = document.assertNode(key)
   normalizeNodeAndChildren(change, node, schema)
 }
@@ -165,22 +159,6 @@ function normalizeNode(change, node, schema) {
   }
 
   iterate(change, node)
-}
-
-/**
- * Assert that a `schema` exists.
- *
- * @param {Schema} schema
- */
-
-function assertSchema(schema) {
-  if (Schema.isSchema(schema)) {
-    return
-  } else if (schema == null) {
-    throw new Error('You must pass a `schema` object.')
-  } else {
-    throw new Error(`You passed an invalid \`schema\` object: ${schema}.`)
-  }
 }
 
 /**

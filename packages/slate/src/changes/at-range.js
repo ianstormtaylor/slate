@@ -1,7 +1,6 @@
 
 import { List } from 'immutable'
 
-import CORE_SCHEMA from '../constants/core-schema'
 import Block from '../models/block'
 import Inline from '../models/inline'
 import Mark from '../models/mark'
@@ -242,7 +241,7 @@ Changes.deleteAtRange = (change, range, options = {}) => {
 
     // If we should normalize, do it now after everything.
     if (normalize) {
-      change.normalizeNodeByKey(ancestor.key, CORE_SCHEMA)
+      change.normalizeNodeByKey(ancestor.key)
     }
   }
 }
@@ -667,7 +666,7 @@ Changes.insertBlockAtRange = (change, range, block, options = {}) => {
   }
 
   if (normalize) {
-    change.normalizeNodeByKey(parent.key, CORE_SCHEMA)
+    change.normalizeNodeByKey(parent.key)
   }
 }
 
@@ -780,7 +779,7 @@ Changes.insertFragmentAtRange = (change, range, fragment, options = {}) => {
 
   // Normalize if requested.
   if (normalize) {
-    change.normalizeNodeByKey(parent.key, CORE_SCHEMA)
+    change.normalizeNodeByKey(parent.key)
   }
 }
 
@@ -816,7 +815,7 @@ Changes.insertInlineAtRange = (change, range, inline, options = {}) => {
   change.insertNodeByKey(parent.key, index + 1, inline, { normalize: false })
 
   if (normalize) {
-    change.normalizeNodeByKey(parent.key, CORE_SCHEMA)
+    change.normalizeNodeByKey(parent.key)
   }
 }
 
@@ -1111,7 +1110,7 @@ Changes.unwrapBlockAtRange = (change, range, properties, options = {}) => {
 
   // TODO: optmize to only normalize the right block
   if (normalize) {
-    change.normalizeDocument(CORE_SCHEMA)
+    change.normalizeDocument()
   }
 }
 
@@ -1157,7 +1156,7 @@ Changes.unwrapInlineAtRange = (change, range, properties, options = {}) => {
 
   // TODO: optmize to only normalize the right block
   if (normalize) {
-    change.normalizeDocument(CORE_SCHEMA)
+    change.normalizeDocument()
   }
 }
 
@@ -1228,7 +1227,7 @@ Changes.wrapBlockAtRange = (change, range, block, options = {}) => {
   })
 
   if (normalize) {
-    change.normalizeNodeByKey(parent.key, CORE_SCHEMA)
+    change.normalizeNodeByKey(parent.key)
   }
 }
 
@@ -1300,7 +1299,7 @@ Changes.wrapInlineAtRange = (change, range, inline, options = {}) => {
     })
 
     if (normalize) {
-      change.normalizeNodeByKey(startBlock.key, CORE_SCHEMA)
+      change.normalizeNodeByKey(startBlock.key)
     }
   }
 
@@ -1323,8 +1322,8 @@ Changes.wrapInlineAtRange = (change, range, inline, options = {}) => {
 
     if (normalize) {
       change
-        .normalizeNodeByKey(startBlock.key, CORE_SCHEMA)
-        .normalizeNodeByKey(endBlock.key, CORE_SCHEMA)
+        .normalizeNodeByKey(startBlock.key)
+        .normalizeNodeByKey(endBlock.key)
     }
 
     blocks.slice(1, -1).forEach((block) => {
@@ -1336,7 +1335,7 @@ Changes.wrapInlineAtRange = (change, range, inline, options = {}) => {
       })
 
       if (normalize) {
-        change.normalizeNodeByKey(block.key, CORE_SCHEMA)
+        change.normalizeNodeByKey(block.key)
       }
     })
   }

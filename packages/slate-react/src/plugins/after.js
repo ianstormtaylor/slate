@@ -37,27 +37,6 @@ function AfterPlugin(options = {}) {
   let isDraggingInternally = null
 
   /**
-   * On before change, enforce the editor's schema.
-   *
-   * @param {Change} change
-   * @param {Editor} editor
-   */
-
-  function onBeforeChange(change, editor) {
-    const { state } = change
-    const schema = editor.getSchema()
-    const prevState = editor.getState()
-
-    // PERF: Skip normalizing if the document hasn't changed, since schemas only
-    // normalize changes to the document, not selection.
-    if (prevState && state.document == prevState.document) return
-
-    debug('onBeforeChange')
-
-    change.normalize(schema)
-  }
-
-  /**
    * On before input, correct any browser inconsistencies.
    *
    * @param {Event} event
@@ -767,7 +746,6 @@ function AfterPlugin(options = {}) {
    */
 
   return {
-    onBeforeChange,
     onBeforeInput,
     onBlur,
     onClick,
