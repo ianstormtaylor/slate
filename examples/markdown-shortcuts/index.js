@@ -6,26 +6,6 @@ import React from 'react'
 import initialState from './state.json'
 
 /**
- * Define a schema.
- *
- * @type {Object}
- */
-
-const schema = {
-  nodes: {
-    'block-quote': props => <blockquote>{props.children}</blockquote>,
-    'bulleted-list': props => <ul>{props.children}</ul>,
-    'heading-one': props => <h1>{props.children}</h1>,
-    'heading-two': props => <h2>{props.children}</h2>,
-    'heading-three': props => <h3>{props.children}</h3>,
-    'heading-four': props => <h4>{props.children}</h4>,
-    'heading-five': props => <h5>{props.children}</h5>,
-    'heading-six': props => <h6>{props.children}</h6>,
-    'list-item': props => <li>{props.children}</li>,
-  }
-}
-
-/**
  * The auto-markdown example.
  *
  * @type {Component}
@@ -78,13 +58,35 @@ class MarkdownShortcuts extends React.Component {
       <div className="editor">
         <Editor
           placeholder="Write some markdown..."
-          schema={schema}
           state={this.state.state}
           onChange={this.onChange}
           onKeyDown={this.onKeyDown}
+          renderNode={this.renderNode}
         />
       </div>
     )
+  }
+
+  /**
+   * Render a Slate node.
+   *
+   * @param {Object} props
+   * @return {Element}
+   */
+
+  renderNode = (props) => {
+    const { attributes, children, node } = props
+    switch (node.type) {
+      case 'block-quote': return <blockquote {...attributes}>{children}</blockquote>
+      case 'bulleted-list': return <ul {...attributes}>{children}</ul>
+      case 'heading-one': return <h1 {...attributes}>{children}</h1>
+      case 'heading-two': return <h2 {...attributes}>{children}</h2>
+      case 'heading-three': return <h3 {...attributes}>{children}</h3>
+      case 'heading-four': return <h4 {...attributes}>{children}</h4>
+      case 'heading-five': return <h5 {...attributes}>{children}</h5>
+      case 'heading-six': return <h6 {...attributes}>{children}</h6>
+      case 'list-item': return <li {...attributes}>{children}</li>
+    }
   }
 
   /**

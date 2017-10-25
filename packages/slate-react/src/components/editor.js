@@ -218,8 +218,10 @@ class Editor extends React.Component {
 
     if (change) {
       debug('flushChange', { change })
-      this.props.onChange(change)
-      delete this.tmp.change
+      window.requestAnimationFrame(() => {
+        delete this.tmp.change
+        this.props.onChange(change)
+      })
     }
   }
 

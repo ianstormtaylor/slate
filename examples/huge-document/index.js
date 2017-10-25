@@ -36,36 +36,6 @@ for (let h = 0; h < HEADINGS; h++) {
 }
 
 /**
- * Define a schema.
- *
- * @type {Object}
- */
-
-const schema = {
-  nodes: {
-    'heading': props => <h1 {...props.attributes}>{props.children}</h1>,
-    'paragraph': props => <p {...props.attributes} style={{ marginBottom: 20 }}>{props.children}</p>,
-  },
-  marks: {
-    bold: {
-      fontWeight: 'bold'
-    },
-    code: {
-      fontFamily: 'monospace',
-      backgroundColor: '#eee',
-      padding: '3px',
-      borderRadius: '4px'
-    },
-    italic: {
-      fontStyle: 'italic'
-    },
-    underlined: {
-      textDecoration: 'underline'
-    }
-  }
-}
-
-/**
  * The huge document example.
  *
  * @type {Component}
@@ -104,15 +74,49 @@ class HugeDocument extends React.Component {
 
   render() {
     return (
-      <Editor
-        placeholder="Enter some text..."
-        schema={schema}
-        spellCheck={false}
-        state={this.state.state}
-        onChange={this.onChange}
-        onKeyDown={this.onKeyDown}
-      />
+      <div className="editor">
+        <Editor
+          placeholder="Enter some text..."
+          spellCheck={false}
+          state={this.state.state}
+          onChange={this.onChange}
+          onKeyDown={this.onKeyDown}
+          renderNode={this.renderNode}
+          renderMark={this.renderMark}
+        />
+      </div>
     )
+  }
+
+  /**
+   * Render a Slate node.
+   *
+   * @param {Object} props
+   * @return {Element}
+   */
+
+  renderNode = (props) => {
+    const { attributes, children, node } = props
+    switch (node.type) {
+      case 'heading': return <h1 {...attributes}>{children}</h1>
+    }
+  }
+
+  /**
+   * Render a Slate mark.
+   *
+   * @param {Object} props
+   * @return {Element}
+   */
+
+  renderMark = (props) => {
+    const { children, mark } = props
+    switch (mark.type) {
+      case 'bold': return <strong>{children}</strong>
+      case 'code': return <code>{children}</code>
+      case 'italic': return <em>{children}</em>
+      case 'underlined': return <u>{children}</u>
+    }
   }
 
 }

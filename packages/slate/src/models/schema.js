@@ -308,14 +308,12 @@ class Schema extends Record(DEFAULTS) {
       let offset
       let min
       let index
-      let n
       let def
       let max
       let child
 
       function nextDef() {
-        offset = offset == null ? 0 : offset + min
-        n = index - offset
+        offset = offset == null ? null : 0
         def = defs.shift()
         min = def && (def.min == null ? 0 : def.min)
         max = def && (def.max == null ? Infinity : def.max)
@@ -324,9 +322,9 @@ class Schema extends Record(DEFAULTS) {
 
       function nextChild() {
         index = index == null ? 0 : index + 1
-        n = index - offset
+        offset = offset == null ? 0 : offset + 1
         child = children[index]
-        if (max != null && n == max) nextDef()
+        if (max != null && offset == max) nextDef()
         return !!child
       }
 
@@ -353,20 +351,24 @@ class Schema extends Record(DEFAULTS) {
           }
 
           if (def.kinds != null && !def.kinds.includes(child.kind)) {
-            if (n >= min && nextDef()) continue
+            if (offset >= min && nextDef()) continue
             return this.fail(CHILD_KIND_INVALID, { ...ctx, child, index })
           }
 
           if (def.types != null && !def.types.includes(child.type)) {
-            if (n >= min && nextDef()) continue
+            if (offset >= min && nextDef()) continue
             return this.fail(CHILD_TYPE_INVALID, { ...ctx, child, index })
           }
         }
       }
 
       if (rule.nodes != null) {
-        if (min != null && index <= min) {
-          return this.fail(CHILD_REQUIRED, { ...ctx, index })
+        while (min != null) {
+          if (offset < min) {
+            return this.fail(CHILD_REQUIRED, { ...ctx, index })
+          }
+
+          nextDef()
         }
       }
     }

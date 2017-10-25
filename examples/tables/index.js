@@ -6,23 +6,6 @@ import React from 'react'
 import initialState from './state.json'
 
 /**
- * Define a schema.
- *
- * @type {Object}
- */
-
-const schema = {
-  nodes: {
-    'table': props => <table><tbody {...props.attributes}>{props.children}</tbody></table>,
-    'table-row': props => <tr {...props.attributes}>{props.children}</tr>,
-    'table-cell': props => <td {...props.attributes}>{props.children}</td>,
-  },
-  marks: {
-    'bold': props => <strong>{props.children}</strong>
-  }
-}
-
-/**
  * The tables example.
  *
  * @type {Component}
@@ -38,7 +21,7 @@ class Tables extends React.Component {
 
   state = {
     state: State.fromJSON(initialState)
-  };
+  }
 
   /**
    * On backspace, do nothing if at the start of a table cell.
@@ -135,13 +118,44 @@ class Tables extends React.Component {
       <div className="editor">
         <Editor
           placeholder="Enter some text..."
-          schema={schema}
           state={this.state.state}
-          onKeyDown={this.onKeyDown}
           onChange={this.onChange}
+          onKeyDown={this.onKeyDown}
+          renderNode={this.renderNode}
+          renderMark={this.renderMark}
         />
       </div>
     )
+  }
+
+  /**
+   * Render a Slate node.
+   *
+   * @param {Object} props
+   * @return {Element}
+   */
+
+  renderNode = (props) => {
+    const { attributes, children, node } = props
+    switch (node.type) {
+      case 'table': return <table><tbody {...attributes}>{children}</tbody></table>
+      case 'table-row': return <tr {...attributes}>{children}</tr>
+      case 'table-cell': return <td {...attributes}>{children}</td>
+    }
+  }
+
+  /**
+   * Render a Slate mark.
+   *
+   * @param {Object} props
+   * @return {Element}
+   */
+
+  renderMark = (props) => {
+    const { children, mark } = props
+    switch (mark.type) {
+      case 'bold': return <strong>{children}</strong>
+    }
   }
 
 }

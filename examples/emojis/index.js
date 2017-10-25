@@ -18,24 +18,6 @@ const EMOJIS = [
 ]
 
 /**
- * Define a schema.
- *
- * @type {Object}
- */
-
-const schema = {
-  nodes: {
-    paragraph: props => <p {...props.attributes}>{props.children}</p>,
-    emoji: (props) => {
-      const { isSelected, node } = props
-      const { data } = node
-      const code = data.get('code')
-      return <span className={`emoji ${isSelected ? 'selected' : ''}`} {...props.attributes} contentEditable={false}>{code}</span>
-    }
-  }
-}
-
-/**
  * The links example.
  *
  * @type {Component}
@@ -130,12 +112,33 @@ class Emojis extends React.Component {
       <div className="editor">
         <Editor
           placeholder="Write some 😍👋🎉..."
-          schema={schema}
           state={this.state.state}
           onChange={this.onChange}
+          renderNode={this.renderNode}
         />
       </div>
     )
+  }
+
+  /**
+   * Render a Slate node.
+   *
+   * @param {Object} props
+   * @return {Element}
+   */
+
+  renderNode = (props) => {
+    const { attributes, children, node, isSelected } = props
+    switch (node.type) {
+      case 'paragraph': {
+        return <p {...attributes}>{children}</p>
+      }
+      case 'emoji': {
+        const { data } = node
+        const code = data.get('code')
+        return <span className={`emoji ${isSelected ? 'selected' : ''}`} {...props.attributes} contentEditable={false}>{code}</span>
+      }
+    }
   }
 
 }

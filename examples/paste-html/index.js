@@ -7,39 +7,6 @@ import React from 'react'
 import initialState from './state.json'
 
 /**
- * Define a schema.
- *
- * @type {Object}
- */
-
-const schema = {
-  nodes: {
-    'bulleted-list': props => <ul {...props.attributes}>{props.children}</ul>,
-    'code': props => <pre><code {...props.attributes}>{props.children}</code></pre>,
-    'heading-one': props => <h1 {...props.attributes}>{props.children}</h1>,
-    'heading-two': props => <h2 {...props.attributes}>{props.children}</h2>,
-    'heading-three': props => <h3 {...props.attributes}>{props.children}</h3>,
-    'heading-four': props => <h4 {...props.attributes}>{props.children}</h4>,
-    'heading-five': props => <h5 {...props.attributes}>{props.children}</h5>,
-    'heading-six': props => <h6 {...props.attributes}>{props.children}</h6>,
-    'list-item': props => <li {...props.attributes}>{props.children}</li>,
-    'numbered-list': props => <ol {...props.attributes}>{props.children}</ol>,
-    'quote': props => <blockquote {...props.attributes}>{props.children}</blockquote>,
-    'link': (props) => {
-      const { data } = props.node
-      const href = data.get('href')
-      return <a href={href} {...props.attributes}>{props.children}</a>
-    }
-  },
-  marks: {
-    bold: props => <strong>{props.children}</strong>,
-    code: props => <code>{props.children}</code>,
-    italic: props => <em>{props.children}</em>,
-    underlined: props => <u>{props.children}</u>,
-  }
-}
-
-/**
  * Tags to blocks.
  *
  * @type {Object}
@@ -197,13 +164,60 @@ class PasteHtml extends React.Component {
       <div className="editor">
         <Editor
           placeholder="Paste in some HTML..."
-          schema={schema}
           state={this.state.state}
           onPaste={this.onPaste}
           onChange={this.onChange}
+          renderNode={this.renderNode}
+          renderMark={this.renderMark}
         />
       </div>
     )
+  }
+
+  /**
+   * Render a Slate node.
+   *
+   * @param {Object} props
+   * @return {Element}
+   */
+
+  renderNode = (props) => {
+    const { attributes, children, node } = props
+    switch (node.type) {
+      case 'quote': return <blockquote {...attributes}>{children}</blockquote>
+      case 'code': return <pre><code {...attributes}>{children}</code></pre>
+      case 'bulleted-list': return <ul {...attributes}>{children}</ul>
+      case 'heading-one': return <h1 {...attributes}>{children}</h1>
+      case 'heading-two': return <h2 {...attributes}>{children}</h2>
+      case 'heading-three': return <h3 {...attributes}>{children}</h3>
+      case 'heading-four': return <h4 {...attributes}>{children}</h4>
+      case 'heading-five': return <h5 {...attributes}>{children}</h5>
+      case 'heading-six': return <h6 {...attributes}>{children}</h6>
+      case 'list-item': return <li {...attributes}>{children}</li>
+      case 'numbered-list': return <ol {...attributes}>{children}</ol>
+      case 'link': {
+        const { data } = node
+        const href = data.get('href')
+        return <a href={href} {...attributes}>{children}</a>
+      }
+    }
+  }
+
+  /**
+   * Render a Slate mark.
+   *
+   * @param {Object} props
+   * @return {Element}
+   */
+
+  renderMark = (props) => {
+    const { children, mark } = props
+    switch (mark.type) {
+      case 'bold': return <strong>{children}</strong>
+      case 'code': return <code>{children}</code>
+      case 'italic': return <em>{children}</em>
+      case 'underlined': return <u>{children}</u>
+    }
   }
 
 }

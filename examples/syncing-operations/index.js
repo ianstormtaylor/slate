@@ -18,32 +18,6 @@ const isUnderlinedHotkey = isKeyHotkey('mod+u')
 const isCodeHotkey = isKeyHotkey('mod+`')
 
 /**
- * Define a schema.
- *
- * @type {Object}
- */
-
-const schema = {
-  marks: {
-    bold: {
-      fontWeight: 'bold'
-    },
-    code: {
-      fontFamily: 'monospace',
-      backgroundColor: '#eee',
-      padding: '3px',
-      borderRadius: '4px'
-    },
-    italic: {
-      fontStyle: 'italic'
-    },
-    underlined: {
-      textDecoration: 'underline'
-    }
-  }
-}
-
-/**
  * A simple editor component to demo syncing with.
  *
  * @type {Component}
@@ -205,15 +179,32 @@ class SyncingEditor extends React.Component {
     return (
       <div className="editor">
         <Editor
+          placeholder="Enter some text..."
           state={this.state.state}
           onChange={this.onChange}
           onKeyDown={this.onKeyDown}
-          schema={schema}
-          placeholder="Enter some text..."
+          renderMark={this.renderMark}
           spellCheck
         />
       </div>
     )
+  }
+
+  /**
+   * Render a Slate mark.
+   *
+   * @param {Object} props
+   * @return {Element}
+   */
+
+  renderMark = (props) => {
+    const { children, mark } = props
+    switch (mark.type) {
+      case 'bold': return <strong>{children}</strong>
+      case 'code': return <code>{children}</code>
+      case 'italic': return <em>{children}</em>
+      case 'underlined': return <u>{children}</u>
+    }
   }
 
 }

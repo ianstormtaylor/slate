@@ -58,18 +58,6 @@ class CheckListItem extends React.Component {
 }
 
 /**
- * Define a schema.
- *
- * @type {Object}
- */
-
-const schema = {
-  nodes: {
-    'check-list-item': CheckListItem,
-  },
-}
-
-/**
  * The rich text example.
  *
  * @type {Component}
@@ -146,14 +134,27 @@ class CheckLists extends React.Component {
           <Editor
             spellCheck
             placeholder="Get to work..."
-            schema={schema}
             state={this.state.state}
             onChange={this.onChange}
             onKeyDown={this.onKeyDown}
+            renderNode={this.renderNode}
           />
         </div>
       </div>
     )
+  }
+
+  /**
+   * Render a Slate node.
+   *
+   * @param {Object} props
+   * @return {Element}
+   */
+
+  renderNode = (props) => {
+    switch (props.node.type) {
+      case 'check-list-item': return <CheckListItem {...props} />
+    }
   }
 
 }
