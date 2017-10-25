@@ -10,7 +10,7 @@ Slate encourages you to break up code into small, reusable modules that can be s
 
 ## What Are Plugins?
 
-Slate's plugins are simply a collection of functions that all contribute to a shared behavior—each with a specific name and set of arguments. For a full list of the arguments, check out the [`Plugins` reference](../reference/slate-react/plugins).
+Slate's plugins are simply a collection of functions that all contribute to a shared behavior—each with a specific name and set of arguments. For a full list of the arguments, check out the [`Plugins` reference](../reference/slate-react/plugins.md).
 
 Here's a really simple plugin:
 
@@ -31,12 +31,23 @@ Here's a really simple plugin:
 
 It focuses the editor and selects everything when it is clicked, and it blurs the editor what <kbd>esc</kbd> is pressed.
 
-Notice how it's able to define a set of behaviors that work together to form a single "feature" in the editor. That's what makes Slate's plugins a powerful for of encapsulation, so that your codebase doesn't become mired in complexity.
+Notice how it's able to define a set of behaviors that work together to form a single "feature" in the editor. That's what makes Slate's plugins a powerful form of encapsulation.
 
 
 ## The Plugins "Stack"
 
 Slate's editor takes a list of plugins as one of its arguments. We refer to this list as the plugins "stack". It is very similar to "middleware" from Express or Koa. 
+
+```js
+const plugins = [
+  ...
+]
+
+<Editor
+  plugins={plugins}
+  ...
+/>
+```
 
 When the editor needs to handle a DOM event, or to decide what to render, it will loop through the plugins stack, invoking each plugin in turn. Plugins can choose to handle the request, in which case the editor will break out of the loop. Or they can ignore it, and they will be skipped as the editor proceeds to the next plugin in the stack.
 
@@ -47,13 +58,49 @@ Because of this looping, plugins are **order-sensitive**! This is very important
 
 If you put Slate on the page without adding any of your own plugins, it will still behave like you'd expect a rich-text editor to. That's because it has its own "core" logic. And that core logic is implemented with its own core plugins.
 
-The core plugins define the common editing behaviors like splitting the current block when <kbd>enter</kbd> is pressed, or inserting a string of text when the user pastes from their clipboard. These are behaviors that all rich-text editors exhibit, and that don't make sense for userland to have to re-invent for every new editor.
+The core plugins doesn't have any assumptions about your schema, or what types of formatting you want to allow. But they do define the common editing behaviors like splitting the current block when <kbd>enter</kbd> is pressed, or inserting a string of text when the user pastes from their clipboard.
+
+These are behaviors that all rich-text editors exhibit, and that don't make sense for userland to have to re-invent for every new editor.
 
 There are two core plugins: the "before plugin" and the "after plugin". They get their names because one of them is before all other plugins in the stack, and the other is after them.
 
 For the most part you don't need to worry about the core plugins. The before plugin helps to pave over editing inconsistencies, and the after plugin serves as a fallback, to implement the default behavior in the event that your own plugins choose not to handle a specific event.
 
 _To learn more, check out the [Core Plugin reference](../reference/slate-react/core-plugin.md)._
+
+
+## The "Editor" Plugin
+
+If you've read through the [`<Editor>` reference](../reference/slate-react/editor.md) you'll notice that the editor itself has handler like `onKeyDown`, `onClick`, etc. just like plugins.
+
+```js
+const plugins = [
+  ...
+]
+
+<Editor
+  onClick={...}
+  onKeyDown={...}
+  plugins={plugins}
+/>
+```
+
+This is nice because it makes simple cases easier, and nicely mimics the native DOM API of `<input>` and `<textarea>`.
+
+But under the covers, those editor handlers are actually just a convenient way of writing a plugin. Internally, the editor grabs all of those plugin-like properties, and turns them into an "editor" plugin that it places first in the plugins stack. So that example above is actually equivalent to...
+
+```js
+const plugins = [
+  { onClick: ..., onKeyDown: ... },
+  ...
+]
+
+<Editor
+  plugins={plugins}
+/>
+```
+
+This isn't something you need to remember, but it's helpful to know that even the top-level editor props are just another plugin!
 
 
 ## Helper Plugins vs. Feature Plugins
@@ -87,13 +134,13 @@ That pseudo-code allows you to encapsulate the hotkey-binding logic in one place
 ```js
 const plugins = [
   ...,
-  Hotkey('cmd+b', (change) => {
-    change.addMark('bold')
-  })
+  Hotkey('cmd+b', change => change.addMark('bold')),
 ]
 ```
 
-These types of plugins are critical to keeping your code maintainable. And they're good candidates for open-sourcing for others to use. A few examples of plugins like this in the wild are [`slate-auto-replace`](https://github.com/ianstormtaylor/slate-auto-replace), [`slate-prism`](https://github.com/GitbookIO/slate-prism), [`slate-collapse-on-escape`](https://github.com/ianstormtaylor/slate-collapse-on-escape), etc. There's almost no piece of logic too small to abstract out and share, as long as it's reusable.
+These types of plugins are critical to keeping your code maintainable. And they're good candidates for open-sourcing for others to use. A few examples of plugins like this in the wild are [`slate-auto-replace`](https://github.com/ianstormtaylor/slate-auto-replace), [`slate-prism`](https://github.com/GitbookIO/slate-prism), [`slate-collapse-on-escape`](https://github.com/ianstormtaylor/slate-collapse-on-escape), etc. 
+
+There's almost no piece of logic too small to abstract out and share, as long as it's reusable.
 
 But hotkey binding logic by itself isn't a "feature". It's just a small helper that makes building more complex features a lot more expressive.
 
@@ -131,6 +178,10 @@ function Bold(options) {
       addBoldMark,
       removeBoldMark,
       toggleBoldMark,
+    },
+    components: {
+      BoldMark,
+      BoldButton,
     },
     helpers: {
       hasBoldMark,
