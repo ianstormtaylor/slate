@@ -18,8 +18,13 @@ describe('schema', () => {
         const module = require(resolve(testsDir, test))
         const { input, output, schema } = module
         const s = Schema.create(schema)
-        const actual = input.change().normalize(s).state.toJSON()
         const expected = output
+        const actual = input
+          .change()
+          .setState({ schema: s })
+          .normalize()
+          .state.toJSON()
+
         assert.deepEqual(actual, expected)
       })
     }
@@ -34,8 +39,13 @@ describe('schema', () => {
         const module = require(resolve(testsDir, test))
         const { input, output, schema } = module
         const s = Schema.create(schema)
-        const actual = input.change().normalize(s).state.toJSON()
         const expected = output.toJSON()
+        const actual = input
+          .change()
+          .setState({ schema: s })
+          .normalize()
+          .state.toJSON()
+
         assert.deepEqual(actual, expected)
       })
     }

@@ -69,24 +69,7 @@ class Schema extends Record(DEFAULTS) {
     }
 
     if (isPlainObject(attrs)) {
-      let { plugins } = attrs
-
-      if (attrs.rules) {
-        throw new Error('Schemas in Slate have changed! They are no longer accept a `rules` property.')
-      }
-
-      if (attrs.nodes) {
-        throw new Error('Schemas in Slate have changed! They are no longer accept a `nodes` property.')
-      }
-
-      if (!plugins) {
-        plugins = [{ schema: attrs }]
-      }
-
-      const schema = resolveSchema(plugins)
-      const stack = Stack.create({ plugins: [ ...CORE_SCHEMA_RULES, ...plugins ] })
-      const ret = new Schema({ ...schema, stack })
-      return ret
+      return Schema.fromJSON(attrs)
     }
 
     throw new Error(`\`Schema.create\` only accepts objects or schemas, but you passed it: ${attrs}`)
@@ -104,19 +87,24 @@ class Schema extends Record(DEFAULTS) {
       return object
     }
 
-    const {
-      document = {},
-      blocks = {},
-      inlines = {},
-    } = object
+    let { plugins } = object
 
-    const schema = new Schema({
-      document,
-      blocks,
-      inlines,
-    })
+    if (object.rules) {
+      throw new Error('Schemas in Slate have changed! They are no longer accept a `rules` property.')
+    }
 
-    return schema
+    if (object.nodes) {
+      throw new Error('Schemas in Slate have changed! They are no longer accept a `nodes` property.')
+    }
+
+    if (!plugins) {
+      plugins = [{ schema: object }]
+    }
+
+    const schema = resolveSchema(plugins)
+    const stack = Stack.create({ plugins: [ ...CORE_SCHEMA_RULES, ...plugins ] })
+    const ret = new Schema({ ...schema, stack })
+    return ret
   }
 
   /**
