@@ -459,7 +459,6 @@ function resolveDocumentRule(obj) {
     data: {},
     nodes: null,
     ...obj,
-    kind: 'document',
   }
 }
 
@@ -480,8 +479,6 @@ function resolveNodeRule(kind, type, obj) {
     parent: null,
     text: null,
     ...obj,
-    kind,
-    type,
   }
 }
 
