@@ -15,6 +15,9 @@
     "slate": "^0.27.4",
     "uglify-js": "^2.7.0"
   },
+  "dependencies": {
+    "isomorphic-base64": "^1.0.2"
+  },
   "scripts": {
     "build": "babel --out-dir ./lib ./src",
     "build:max": "mkdir -p ./dist && NODE_ENV=production browserify ./src/index.js --transform babelify --transform envify --transform [ browserify-global-shim --global ] --standalone SlateBase64Serializer > ./dist/slate-base64-serializer.js",
