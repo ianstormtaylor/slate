@@ -1,4 +1,3 @@
-
 import { Stack } from 'slate'
 
 /**
@@ -50,16 +49,15 @@ class Simulator {
 EVENT_HANDLERS.forEach((handler) => {
   const method = getMethodName(handler)
 
-  Simulator.prototype[method] = function (e, data) {
+  Simulator.prototype[method] = function (e) {
     if (e == null) e = {}
-    if (data == null) data = {}
 
     const { stack, state } = this
     const editor = createEditor(this)
     const event = createEvent(e)
     const change = state.change()
 
-    stack.handle(handler, change, editor, event, data)
+    stack.handle(handler, change, editor, event)
     stack.handle('onBeforeChange', change, editor)
     stack.handle('onChange', change, editor)
 
