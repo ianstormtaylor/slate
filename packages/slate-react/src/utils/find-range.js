@@ -35,8 +35,6 @@ function findRange(native, state) {
   const focus = isCollapsed ? anchor : findPoint(focusNode, focusOffset, state)
   if (!anchor || !focus) return null
 
-  const { selection } = state
-
   const range = Range.create({
     anchorKey: anchor.key,
     anchorOffset: anchor.offset,
