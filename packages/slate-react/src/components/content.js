@@ -304,10 +304,17 @@ class Content extends React.Component {
     event.preventDefault()
 
     const { editor, state } = this.props
+    const { selection } = state
     const range = findRange(targetRange, state)
 
     editor.change((change) => {
-      change.insertTextAtRange(range, text)
+      change.insertTextAtRange(range, text, selection.marks)
+
+      // If the text was successfully inserted, and the selection had marks on it,
+      // unset the selection's marks.
+      if (selection.marks && state.document != change.state.document) {
+        change.select({ marks: null })
+      }
     })
   }
 
