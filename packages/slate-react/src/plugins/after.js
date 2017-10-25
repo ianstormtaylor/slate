@@ -474,9 +474,15 @@ function AfterPlugin(options = {}) {
     const { state } = change
 
     if (HOTKEYS.SPLIT_BLOCK(event)) {
-      return state.isInVoid
-        ? change.collapseToStartOfNextText()
-        : change.splitBlock()
+      if (state.isInVoid) {
+        return change.collapseToStartOfNextText()
+      } else {
+        change = change.splitBlock()
+        state.activeMarks.forEach((mark) => {
+          change = change.addMark(mark)
+        })
+        return change
+      }
     }
 
     if (HOTKEYS.DELETE_CHAR_BACKWARD(event)) {
