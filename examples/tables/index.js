@@ -101,9 +101,9 @@ class Tables extends React.Component {
     }
 
     switch (event.key) {
-      case 'Backspace': return this.onBackspace(event, state)
-      case 'Delete': return this.onDelete(event, state)
-      case 'Enter': return this.onEnter(event, state)
+      case 'Backspace': return this.onBackspace(event, change)
+      case 'Delete': return this.onDelete(event, change)
+      case 'Enter': return this.onEnter(event, change)
     }
   }
 
