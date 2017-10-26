@@ -76,8 +76,7 @@ class Stack extends Record(DEFAULTS) {
   find(property, ...args) {
     const plugins = this.getPluginsWith(property)
 
-    for (let i = 0; i < plugins.length; i++) {
-      const plugin = plugins[i]
+    for (const plugin of plugins) {
       const ret = plugin[property](...args)
       if (ret != null) return ret
     }
@@ -95,8 +94,7 @@ class Stack extends Record(DEFAULTS) {
     const plugins = this.getPluginsWith(property)
     const array = []
 
-    for (let i = 0; i < plugins.length; i++) {
-      const plugin = plugins[i]
+    for (const plugin of plugins) {
       const value = plugin[property](...args)
       if (value != null) array.push(value)
     }
@@ -114,8 +112,7 @@ class Stack extends Record(DEFAULTS) {
   run(property, ...args) {
     const plugins = this.getPluginsWith(property)
 
-    for (let i = 0; i < plugins.length; i++) {
-      const plugin = plugins[i]
+    for (const plugin of plugins) {
       const ret = plugin[property](...args)
       if (ret != null) return
     }
@@ -133,8 +130,7 @@ class Stack extends Record(DEFAULTS) {
     const plugins = this.getPluginsWith(property).reverse()
     let { children = null } = props
 
-    for (let i = 0; i < plugins.length; i++) {
-      const plugin = plugins[i]
+    for (const plugin of plugins) {
       const value = plugin[property](props, ...args)
       if (value == null) continue
       props.children = children = value

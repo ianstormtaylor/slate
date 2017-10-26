@@ -59,16 +59,14 @@ let OS
 if (browser) {
   const { userAgent } = window.navigator
 
-  for (let i = 0; i < BROWSER_RULES.length; i++) {
-    const [ name, regexp ] = BROWSER_RULES[i]
+  for (const [ name, regexp ] of BROWSER_RULES) {
     if (regexp.test(userAgent)) {
       BROWSER = name
       break
     }
   }
 
-  for (let i = 0; i < OS_RULES.length; i++) {
-    const [ name, regexp ] = OS_RULES[i]
+  for (const [ name, regexp ] of OS_RULES) {
     if (regexp.test(userAgent)) {
       OS = name
       break
@@ -78,8 +76,7 @@ if (browser) {
   const testEl = window.document.createElement('div')
   testEl.contentEditable = true
 
-  for (let i = 0; i < EVENT_RULES.length; i++) {
-    const [ name, testFn ] = EVENT_RULES[i]
+  for (const [ name, testFn ] of EVENT_RULES) {
     EVENTS[name] = testFn(testEl)
   }
 }

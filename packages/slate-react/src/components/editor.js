@@ -140,8 +140,7 @@ class Editor extends React.Component {
     let isNew = false
 
     // Check to see if any plugin-related properœties have changed.
-    for (let i = 0; i < PLUGINS_PROPS.length; i++) {
-      const prop = PLUGINS_PROPS[i]
+    for (const prop of PLUGINS_PROPS) {
       if (props[prop] == this.props[prop]) continue
       isNew = true
       break
@@ -377,9 +376,8 @@ function resolvePlugins(props) {
  * Mix in the property types for the event handlers.
  */
 
-for (let i = 0; i < EVENT_HANDLERS.length; i++) {
-  const property = EVENT_HANDLERS[i]
-  Editor.propTypes[property] = Types.func
+for (const prop of EVENT_HANDLERS) {
+  Editor.propTypes[prop] = Types.func
 }
 
 /**
