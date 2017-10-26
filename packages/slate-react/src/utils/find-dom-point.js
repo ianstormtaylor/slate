@@ -15,14 +15,17 @@ import findDOMNode from './find-dom-node'
 function findDOMPoint(key, offset) {
   const el = findDOMNode(key)
   const window = getWindow(el)
+  let start = 0
+  let n
+  
+  // COMPAT: In IE, this method's arguments are not optional, so we have to 
+  // pass in all four even though the last two are defaults. (2017/10/25)
   const iterator = window.document.createNodeIterator(
     el,
     NodeFilter.SHOW_TEXT,
     () => NodeFilter.FILTER_ACCEPT,
     false
   )
-  let start = 0
-  let n
 
   while (n = iterator.nextNode()) {
     const { length } = n.textContent
