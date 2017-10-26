@@ -5,7 +5,6 @@ import Types from 'prop-types'
 import SlateTypes from 'slate-prop-types'
 
 import OffsetKey from '../utils/offset-key'
-import { IS_FIREFOX } from '../constants/environment'
 
 /**
  * Debugger.
