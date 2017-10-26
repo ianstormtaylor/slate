@@ -57,9 +57,8 @@ EVENT_HANDLERS.forEach((handler) => {
     const event = createEvent(e)
     const change = state.change()
 
-    stack.handle(handler, change, editor, event)
-    stack.handle('onBeforeChange', change, editor)
-    stack.handle('onChange', change, editor)
+    stack.run(handler, change, editor, event)
+    stack.run('onChange', change, editor)
 
     this.state = change.state
     return this
