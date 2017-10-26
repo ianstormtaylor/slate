@@ -8,7 +8,7 @@ Slate is based on an immutable data model that closely resembles the DOM. When y
 
 One of the main principles of Slate is that it tries to mirror the native DOM API's as much as possible. 
 
-If you think about it, this makes sense. Slate is kind of like a nicer implementation of `contenteditable`, which itself is based on the DOM. And people use the DOM to represent document with rich-text-like structures all the time. Mirroring the DOM helps make the library familiar for new users, and it lets us reuse battle-tested patterns without having to reinvent them ourselves.
+If you think about it, this makes sense. Slate is kind of like a nicer implementation of `contenteditable`, which itself is built with the DOM. And people use the DOM to represent documents with rich-text-like structures all the time. Mirroring the DOM helps make the library familiar for new users, and it lets us reuse battle-tested patterns without having to reinvent them ourselves.
 
 Because it mirrors the DOM, Slate's data model features a [`Document`](../reference/slate/document.md) with [`Block`](../reference/slate/block.md), [`Inline`](../reference/slate/inline.md) and [`Text`](../reference/slate/text.md) nodes. You can reference parts of the document with a [`Range`](../reference/slate/range.md). And there is a special range called a "selection" that represents the user's current cursor selection.
 
@@ -28,9 +28,9 @@ block.type // "paragraph"
 
 But for updating values, you'll need to use the [`Immutable.Record` API](https://facebook.github.io/immutable-js/docs/#/Record/set).
 
-And collections of Slate objects are represented as immutable `Lists`, `Sets`, `Stacks`, etc. Which means we get nice support for expressive methods like `filter`, `includes`, `take`, `skip`, `rest`, `last`, etc.
+Collections of Slate objects are represented as immutable `Lists`, `Sets`, `Stacks`, etc. Which means we get nice support for expressive methods like `filter`, `includes`, `take`, `skip`, `rest`, `last`, etc.
 
-If you haven't used Immutable.js before, there is definitely a learning curve. Before you give into Slate, you should check out the [Immutable.js documentation](https://facebook.github.io/immutable-js/docs/#/). Once you get the hang of it you won't think twice about it, but it will take a few days to get used to, and you might write things a little "un-performantly" to start.
+If you haven't used Immutable.js before, there is definitely a learning curve. Before you give into Slate, you should check out the [Immutable.js docs](https://facebook.github.io/immutable-js/docs/#/). Once you get the hang of it won't slow you down at all, but it will take a few days to get used to, and you might write things a little "un-performantly" to start.
 
 
 ## The "State"
@@ -38,6 +38,8 @@ If you haven't used Immutable.js before, there is definitely a learning curve. B
 The top-level object in Slate—the object encapsulates the entire value of an Slate editor—is called a [`State`](../reference/slate/state.md). 
 
 It is made up of a document filled with content, and a selection representing the user's current cursor selection. It also has a history, to keep track of changes, and a few other more advanced properties like `decorations` and `data`.
+
+> 📋 For more info, check out the [`State` reference](../reference/slate/state.md).
 
 
 ## Documents and Nodes
@@ -60,7 +62,7 @@ Unlike the DOM though, Slate enforces a few more restrictions on its documents, 
 
 Slate enforces all of these restrictions for you automatically. Any time you [perform changes](./changes.md) to the document, Slate will check if the document is invalid, and if so it will return it to a "normalized" state. 
 
-> 🙃 Fun fact: normalizing the document like this is actually based on the DOM's [`Node.normalize()`](https://developer.mozilla.org/en-US/docs/Web/API/Node/normalize)!
+> 🙃 Fun fact: normalizing is actually based on the DOM's [`Node.normalize()`](https://developer.mozilla.org/en-US/docs/Web/API/Node/normalize)!
 
 In addition to documents, blocks and inlines, Slate introduces one other type of markup that the DOM doesn't have natively:  the [`Mark`](../reference/slate/mark.md).
 
