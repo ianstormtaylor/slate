@@ -459,13 +459,12 @@ class Text extends Record(DEFAULTS) {
 
   toJSON(options = {}) {
     const object = {
-      key: this.key,
       kind: this.kind,
       leaves: this.getLeaves().toArray().map(r => r.toJSON()),
     }
 
-    if (!options.preserveKeys) {
-      delete object.key
+    if (options.preserveKeys) {
+      object.key = this.key
     }
 
     return object

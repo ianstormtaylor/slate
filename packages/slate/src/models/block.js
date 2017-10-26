@@ -179,16 +179,15 @@ class Block extends Record(DEFAULTS) {
 
   toJSON(options = {}) {
     const object = {
-      data: this.data.toJSON(),
-      key: this.key,
       kind: this.kind,
-      isVoid: this.isVoid,
       type: this.type,
+      isVoid: this.isVoid,
+      data: this.data.toJSON(),
       nodes: this.nodes.toArray().map(n => n.toJSON(options)),
     }
 
-    if (!options.preserveKeys) {
-      delete object.key
+    if (options.preserveKeys) {
+      object.key = this.key
     }
 
     return object

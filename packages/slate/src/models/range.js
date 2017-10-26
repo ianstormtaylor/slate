@@ -740,13 +740,13 @@ class Range extends Record(DEFAULTS) {
 
   toJSON() {
     const object = {
+      kind: this.kind,
       anchorKey: this.anchorKey,
       anchorOffset: this.anchorOffset,
       focusKey: this.focusKey,
       focusOffset: this.focusOffset,
       isBackward: this.isBackward,
       isFocused: this.isFocused,
-      kind: this.kind,
       marks: this.marks == null ? null : this.marks.toArray().map(m => m.toJSON()),
     }
 
