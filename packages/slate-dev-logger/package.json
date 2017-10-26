@@ -1,7 +1,7 @@
 {
   "name": "slate-dev-logger",
   "description": "A simple, development-only logger for Slate.",
-  "version": "0.1.21",
+  "version": "0.1.22",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
   "main": "./lib/index.js",
@@ -9,7 +9,7 @@
     "babel-cli": "^6.10.1",
     "browserify": "^13.0.1",
     "mocha": "^2.5.3",
-    "slate": "^0.28.0",
+    "slate": "^0.28.1",
     "uglify-js": "^2.7.0"
   },
   "scripts": {
