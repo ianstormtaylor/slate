@@ -17,8 +17,8 @@ function findDOMPoint(key, offset) {
   const window = getWindow(el)
   let start = 0
   let n
-  
-  // COMPAT: In IE, this method's arguments are not optional, so we have to 
+
+  // COMPAT: In IE, this method's arguments are not optional, so we have to
   // pass in all four even though the last two are defaults. (2017/10/25)
   const iterator = window.document.createNodeIterator(
     el,
