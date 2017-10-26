@@ -10,10 +10,7 @@ It can do this because all of its logic is implemented with a series of plugins,
 _**Slate is currently in beta**. It's useable now, but you might need to pull request a fix or two for advanced use cases._
 
 
-<br/>
-
-### Why?
-
+## Why?
 
 Why create Slate? Well... _(Beware: this section has a few of [my](https://github.com/ianstormtaylor) opinions!)_
 
@@ -40,9 +37,7 @@ If that sounds familiar, you might like Slate.
 Which brings me to how Slate solves all of that...
 
 
-<br/>
-
-### Principles
+## Principles
 
 Slate tries to solve the question of "[Why?](#why)" with a few principles:
 
@@ -63,16 +58,12 @@ Slate tries to solve the question of "[Why?](#why)" with a few principles:
 7. **Clear "core" boundaries.** With a plugin-first architecture, and a schema-less core, it becomes a lot clearer where the boundary is between "core" and "custom", which means that the core experience doesn't get bogged down in edge cases.
 
 
-<br/>
-
-### Demo
+## Demo
 
 Check out the [**live demo**](http://slatejs.org) of all of the examples!
 
 
-<br/>
-
-### Examples
+## Examples
 
 To get a sense for how you might use Slate, check out a few of the examples:
 
@@ -89,9 +80,7 @@ To get a sense for how you might use Slate, check out a few of the examples:
 If you have an idea for an example that shows a common use case, pull request it!
 
 
-<br/>
-
-### Plugins
+## Plugins
 
 Slate encourages you to write small, reusable modules. Check out the public ones you can use in your project!
 
@@ -106,9 +95,8 @@ Slate encourages you to write small, reusable modules. Check out the public ones
 - [`slate-drop-or-paste-images`](https://github.com/ianstormtaylor/slate-drop-or-paste-images) lets users drop or paste images to insert them!
 - [**View all plugins on `npm`...**](https://www.npmjs.com/browse/keyword/slate)
 
-<br/>
 
-### Documentation
+## Documentation
 
 If you're using Slate for the first time, check out the [Getting Started](http://docs.slatejs.org/walkthroughs/installing-slate) walkthroughs and the [Guides](http://docs.slatejs.org/guides) to familiarize yourself with Slate's architecture and mental models. Once you've gotten familiar with those, you'll probably want to check out the full [API Reference](http://docs.slatejs.org/slate-core).
 
@@ -121,9 +109,7 @@ If you're using Slate for the first time, check out the [Getting Started](http:/
 If even that's not enough, you can always [read the source itself](./src), which is explained along with a handful of readme's and is heavily commented.
 
 
-<br/>
-
-### Translations
+## Translations
 
 There are also translations of the documentation into other languages:
 
@@ -132,9 +118,7 @@ There are also translations of the documentation into other languages:
 If you're maintaining a translation, feel free to pull request it here!
 
 
-<br/>
-
-### Contributing!
+## Contributing!
 
 All contributions are super welcome! Check out the [Contributing instructions](./Contributing.md) for more info!
 
