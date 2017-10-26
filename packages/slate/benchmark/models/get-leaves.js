@@ -5,7 +5,7 @@ import h from '../../test/helpers/h'
 import { __clear } from '../../lib/utils/memoize'
 
 export default function (text) {
-  text.getRanges()
+  text.getLeaves()
 }
 
 export function before(state) {
