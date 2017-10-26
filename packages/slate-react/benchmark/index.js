@@ -12,8 +12,8 @@ const categories = fs.readdirSync(categoryDir).filter(c => c[0] != '.' && c != '
 
 categories.forEach((category) => {
   suite(category, () => {
-    set('iterations', 100)
-    set('mintime', 2000)
+    set('iterations', 50)
+    set('mintime', 1000)
 
     const benchmarkDir = resolve(categoryDir, category)
     const benchmarks = fs.readdirSync(benchmarkDir).filter(b => b[0] != '.' && !!~b.indexOf('.js')).map(b => basename(b, extname(b)))

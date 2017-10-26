@@ -3,10 +3,13 @@
 
 import h from '../../test/helpers/h'
 
-export default function (state) {
-  state
-    .change()
-    .deleteBackward()
+export default function (change) {
+  change.deleteBackward()
+}
+
+export function before(state) {
+  const change = state.change()
+  return change
 }
 
 export const input = (

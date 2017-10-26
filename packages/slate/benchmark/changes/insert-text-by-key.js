@@ -2,14 +2,17 @@
 /* eslint-disable react/jsx-key */
 
 import h from '../../test/helpers/h'
+import { __clear } from '../../lib/utils/memoize'
 
-export default function (change) {
-  change.splitBlock()
+export default function ({ change, text }) {
+  change.insertTextByKey(text.key, 0, 'a')
 }
 
 export function before(state) {
   const change = state.change()
-  return change
+  const text = state.document.getLastText()
+  __clear()
+  return { change, text }
 }
 
 export const input = (

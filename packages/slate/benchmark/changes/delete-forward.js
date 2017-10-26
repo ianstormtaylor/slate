@@ -4,7 +4,7 @@
 import h from '../../test/helpers/h'
 
 export default function (change) {
-  change.splitBlock()
+  change.deleteForward()
 }
 
 export function before(state) {

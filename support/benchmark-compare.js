@@ -8,7 +8,7 @@ import comparison from '../tmp/benchmark-comparison'
  * Constants.
  */
 
-const THRESHOLD = 0.2
+const THRESHOLD = 0.333
 
 /**
  * Print.
@@ -24,14 +24,14 @@ baseline.forEach((suite, i) => {
     const comp = comparison[i].benchmarks[j]
     if (!comp) return
 
-    const b = base.iterations / base.elapsed * 100
-    const c = comp.iterations / comp.elapsed * 100
+    const b = base.iterations / base.elapsed * 1000
+    const c = comp.iterations / comp.elapsed * 1000
     const threshold = b * THRESHOLD
     const slower = (b - c) > threshold
     const faster = (b - c) < (0 - threshold)
     const percent = Math.round(Math.abs(b - c) / b * 100)
 
-    let output = `${b.toFixed(2)} → ${c.toFixed(2)} iterations/sec`
+    let output = `${b.toFixed(2)} → ${c.toFixed(2)} ops/sec`
     if (slower) output = chalk.red(`${output} (${percent}% slower)`)
     else if (faster) output = chalk.green(`${output} (${percent}% faster)`)
     else output = chalk.gray(output)

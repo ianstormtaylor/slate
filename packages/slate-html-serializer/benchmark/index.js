@@ -13,8 +13,8 @@ const categories = fs.readdirSync(categoryDir).filter(c => c[0] != '.' && c != '
 
 categories.forEach((category) => {
   suite(category, () => {
-    set('iterations', 100)
-    set('mintime', 2000)
+    set('iterations', 50)
+    set('mintime', 1000)
 
     if (category == 'models') {
       after(() => {
