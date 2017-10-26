@@ -1091,6 +1091,7 @@ class Node {
     // If the range is collapsed, check the character before the start.
     if (range.isCollapsed) {
       const text = this.getDescendant(startKey)
+      if (text.characters.size === 0) return []
       const char = text.characters.get(range.startOffset - 1)
       return char.marks.toArray()
     }
