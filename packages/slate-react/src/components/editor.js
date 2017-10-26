@@ -8,6 +8,7 @@ import logger from 'slate-dev-logger'
 import { Schema, Stack, State } from 'slate'
 
 import EVENT_HANDLERS from '../constants/event-handlers'
+import PLUGINS_PROPS from '../constants/plugin-props'
 import AfterPlugin from '../plugins/after'
 import BeforePlugin from '../plugins/before'
 import noop from '../utils/noop'
@@ -19,21 +20,6 @@ import noop from '../utils/noop'
  */
 
 const debug = Debug('slate:editor')
-
-/**
- * Plugin-related properties of the editor.
- *
- * @type {Array}
- */
-
-const PLUGINS_PROPS = [
-  ...EVENT_HANDLERS,
-  'placeholder',
-  'placeholderClassName',
-  'placeholderStyle',
-  'plugins',
-  'schema',
-]
 
 /**
  * Editor.
@@ -93,10 +79,11 @@ class Editor extends React.Component {
     super(props)
     this.state = {}
     this.tmp = {}
+    this.tmp.updates = 0
+    this.tmp.resolves = 0
 
-    // Create a new `Stack`, omitting the `onChange` property since that has
-    // special significance on the editor itself.
-    const plugins = resolvePlugins(props)
+    // Resolve the plugins and create a stack and schema from them.
+    const plugins = this.resolvePlugins(props.plugins, props.schema)
     const stack = Stack.create({ plugins })
     const schema = Schema.create({ plugins })
     this.state.schema = schema
@@ -137,21 +124,26 @@ class Editor extends React.Component {
   componentWillReceiveProps = (props) => {
     let { state } = props
     let { schema, stack } = this.state
-    let isNew = false
 
-    // Check to see if any plugin-related properœties have changed.
-    for (const prop of PLUGINS_PROPS) {
-      if (props[prop] == this.props[prop]) continue
-      isNew = true
-      break
-    }
+    // Increment the updates counter as a baseline.
+    this.tmp.updates++
 
-    // If any plugin-related properties will change, create a new `Stack`.
-    if (isNew) {
-      const plugins = resolvePlugins(props)
+    // If the plugins or the schema have changed, we need to re-resolve the
+    // plugins, since it will result in a new stack and new validations.
+    if (props.plugins != this.props.plugins || props.schema != this.props.schema) {
+      const plugins = this.resolvePlugins(props.plugins, props.schema)
       stack = Stack.create({ plugins })
       schema = Schema.create({ plugins })
       this.setState({ schema, stack })
+
+      // Increment the resolves counter.
+      this.tmp.resolves++
+
+      // If we've resolved a few times already, and it's exactly in line with
+      // the updates, then warn the user that they may be doing something wrong.
+      if (this.tmp.resolves > 5 && this.tmp.resolves == this.tmp.updates) {
+        logger.warn('A Slate <Editor> is re-resolving its `plugins` or `schema` on each update, which leads to poor performance. This is often due to passing in a new `schema` or `plugins` prop with each render, by declaring them inline in your render function. Do not do this!')
+      }
     }
 
     // Run `onChange` on the passed-in state because we need to ensure that it
@@ -340,37 +332,51 @@ class Editor extends React.Component {
     return tree
   }
 
+  /**
+   * Resolve an array of plugins from `plugins` and `schema` props.
+   *
+   * In addition to the plugins provided in props, this will initialize three
+   * other plugins:
+   *
+   * - The top-level editor plugin, which allows for top-level handlers, etc.
+   * - The two "core" plugins, one before all the other and one after.
+   *
+   * @param {Array|Void} plugins
+   * @param {Schema|Object|Void} schema
+   * @return {Array}
+   */
+
+  resolvePlugins = (plugins, schema) => {
+    const beforePlugin = BeforePlugin()
+    const afterPlugin = AfterPlugin()
+    const editorPlugin = {
+      schema: schema || {}
+    }
+
+    for (const prop of PLUGINS_PROPS) {
+      // Skip `onChange` because the editor's `onChange` is special.
+      if (prop == 'onChange') continue
+
+      // Skip `schema` because it can't be proxied easily, so it must be
+      // passed in as an argument to this function instead.
+      if (prop == 'schema') continue
+
+      // Define a function that will just proxies into `props`.
+      editorPlugin[prop] = (...args) => {
+        return this.props[prop] && this.props[prop](...args)
+      }
+    }
+
+    return [
+      beforePlugin,
+      editorPlugin,
+      ...(plugins || []),
+      afterPlugin
+    ]
+  }
+
 }
 
-/**
- * Resolve an array of plugins from `props`.
- *
- * In addition to the plugins provided in `props.plugins`, this will create
- * two other plugins:
- *
- * - A plugin made from the top-level `props` themselves, which are placed at
- * the beginning of the stack. That way, you can add a `onKeyDown` handler,
- * and it will override all of the existing plugins.
- *
- * - A "core" functionality plugin that handles the most basic events in
- * Slate, like deleting characters, splitting blocks, etc.
- *
- * @param {Object} props
- * @return {Array}
- */
-
-function resolvePlugins(props) {
-  // eslint-disable-next-line no-unused-vars
-  const { state, onChange, plugins = [], ...overridePlugin } = props
-  const beforePlugin = BeforePlugin(props)
-  const afterPlugin = AfterPlugin(props)
-  return [
-    beforePlugin,
-    overridePlugin,
-    ...plugins,
-    afterPlugin
-  ]
-}
 
 /**
  * Mix in the property types for the event handlers.

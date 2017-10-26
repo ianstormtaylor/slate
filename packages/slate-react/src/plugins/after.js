@@ -29,11 +29,10 @@ const debug = Debug('slate:core:after')
 /**
  * The after plugin.
  *
- * @param {Object} options
  * @return {Object}
  */
 
-function AfterPlugin(options = {}) {
+function AfterPlugin() {
   let isDraggingInternally = null
 
   /**
