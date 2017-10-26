@@ -125,3 +125,5 @@ Here's how MDN explains it:
 To make dealing with ranges easier though, they also provide "start" and "end" properties that take whether the range is forward or backward into account. The `startKey` and `startOffset` will always before the `endKey` and `endOffset` in the document.
 
 One important thing to note is that the anchor and focus points of ranges **always reference the "leaf-most" text nodes**. They never reference blocks or inlines, always their child text nodes. This makes dealing with ranges a _lot_ easier.
+
+> 📋 For more info, check out the [`Range` reference](../reference/slate/range.md).
