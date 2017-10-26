@@ -20,7 +20,7 @@ export const input = {
           nodes: [
             {
               kind: 'text',
-              ranges: [
+              leaves: [
                 {
                   text: 'This is editable ',
                 },
