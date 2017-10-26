@@ -21,7 +21,6 @@ const CHILD_TYPE_INVALID = 'child_type_invalid'
 const CHILD_UNKNOWN = 'child_unknown'
 const NODE_DATA_INVALID = 'node_data_invalid'
 const NODE_IS_VOID_INVALID = 'node_is_void_invalid'
-const NODE_KIND_INVALID = 'node_kind_invalid'
 const NODE_MARK_INVALID = 'node_mark_invalid'
 const NODE_TEXT_INVALID = 'node_text_invalid'
 const PARENT_KIND_INVALID = 'parent_kind_invalid'
@@ -206,12 +205,13 @@ class Schema extends Record(DEFAULTS) {
       case CHILD_KIND_INVALID:
       case CHILD_TYPE_INVALID:
       case CHILD_UNKNOWN: {
-        const { child } = context
-        return change.removeNodeByKey(child.key)
+        const { child, node } = context
+        return child.kind == 'text' && node.kind == 'block' && node.nodes.size == 1
+          ? change.removeNodeByKey(node.key)
+          : change.removeNodeByKey(child.key)
       }
 
       case CHILD_REQUIRED:
-      case NODE_KIND_INVALID:
       case NODE_TEXT_INVALID:
       case PARENT_KIND_INVALID:
       case PARENT_TYPE_INVALID: {
@@ -235,7 +235,7 @@ class Schema extends Record(DEFAULTS) {
 
       case NODE_MARK_INVALID: {
         const { node, mark } = context
-        return node.getTexts().forEach(t => node.removeMarkByKey(t.key, 0, t.text.length, mark))
+        return node.getTexts().forEach(t => change.removeMarkByKey(t.key, 0, t.text.length, mark))
       }
     }
   }
@@ -257,12 +257,6 @@ class Schema extends Record(DEFAULTS) {
     const rule = this.getRule(node) || {}
     const parents = this.getParentRules()
     const ctx = { node, rule }
-
-    if (rule.kind != null) {
-      if (node.kind != rule.kind) {
-        return this.fail(NODE_KIND_INVALID, ctx)
-      }
-    }
 
     if (rule.isVoid != null) {
       if (node.isVoid != rule.isVoid) {
