@@ -82,8 +82,7 @@ class Editor extends React.Component {
     this.tmp.updates = 0
     this.tmp.resolves = 0
 
-    // Create a new `Stack`, omitting the `onChange` property since that has
-    // special significance on the editor itself.
+    // Resolve the plugins and create a stack and schema from them.
     const plugins = this.resolvePlugins(props.plugins, props.schema)
     const stack = Stack.create({ plugins })
     const schema = Schema.create({ plugins })
@@ -334,19 +333,16 @@ class Editor extends React.Component {
   }
 
   /**
-   * Resolve an array of plugins from `props`.
+   * Resolve an array of plugins from `plugins` and `schema` props.
    *
-   * In addition to the plugins provided in `props.plugins`, this will create
-   * two other plugins:
+   * In addition to the plugins provided in props, this will initialize three
+   * other plugins:
    *
-   * - A plugin made from the top-level `props` themselves, which are placed at
-   * the beginning of the stack. That way, you can add a `onKeyDown` handler,
-   * and it will override all of the existing plugins.
-   *
-   * - A "core" functionality plugin that handles the most basic events in
-   * Slate, like deleting characters, splitting blocks, etc.
+   * - The top-level editor plugin, which allows for top-level handlers, etc.
+   * - The two "core" plugins, one before all the other and one after.
    *
    * @param {Array|Void} plugins
+   * @param {Schema|Object|Void} schema
    * @return {Array}
    */
 
