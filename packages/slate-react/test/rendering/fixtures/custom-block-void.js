@@ -3,14 +3,20 @@
 import React from 'react'
 import h from '../../helpers/h'
 
-export const schema = {
-  nodes: {
-    image: (props) => {
-      return (
-        React.createElement('img', { src: props.node.data.get('src'), ...props.attributes })
-      )
-    }
+function Image(props) {
+  return (
+    React.createElement('img', { src: props.node.data.get('src'), ...props.attributes })
+  )
+}
+
+function renderNode(props) {
+  switch (props.node.type) {
+    case 'image': return Image(props)
   }
+}
+
+export const props = {
+  renderNode,
 }
 
 export const state = (

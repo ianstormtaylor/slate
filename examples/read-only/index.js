@@ -40,12 +40,14 @@ class ReadOnly extends React.Component {
 
   render() {
     return (
-      <Editor
-        readOnly
-        placeholder="Enter some text..."
-        state={this.state.state}
-        onChange={this.onChange}
-      />
+      <div className="editor">
+        <Editor
+          readOnly
+          placeholder="Enter some text..."
+          state={this.state.state}
+          onChange={this.onChange}
+        />
+      </div>
     )
   }
 

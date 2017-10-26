@@ -44,20 +44,6 @@ class Node extends React.Component {
   }
 
   /**
-   * Constructor.
-   *
-   * @param {Object} props
-   */
-
-  constructor(props) {
-    super(props)
-    const { node, schema } = props
-    this.state = {}
-    this.state.Component = node.getComponent(schema)
-    this.state.Placeholder = node.getPlaceholder(schema)
-  }
-
-  /**
    * Debug.
    *
    * @param {String} message
@@ -71,19 +57,6 @@ class Node extends React.Component {
   }
 
   /**
-   * On receiving new props, update the `Component` renderer.
-   *
-   * @param {Object} props
-   */
-
-  componentWillReceiveProps = (props) => {
-    if (props.node == this.props.node) return
-    const Component = props.node.getComponent(props.schema)
-    const Placeholder = props.node.getPlaceholder(props.schema)
-    this.setState({ Component, Placeholder })
-  }
-
-  /**
    * Should the node update?
    *
    * @param {Object} nextProps
@@ -93,24 +66,15 @@ class Node extends React.Component {
 
   shouldComponentUpdate = (nextProps) => {
     const { props } = this
-    const { Component } = this.state
+    const stack = props.editor.getStack()
+    const shouldUpdate = stack.find('shouldNodeComponentUpdate', props, nextProps)
     const n = nextProps
     const p = props
 
-    // If the `Component` has enabled suppression of update checking, always
-    // return true so that it can deal with update checking itself.
-    if (Component && Component.suppressShouldComponentUpdate) {
-      logger.deprecate('2.2.0', 'The `suppressShouldComponentUpdate` property is deprecated because it led to an important performance loss, use `shouldNodeComponentUpdate` instead.')
-      return true
-    }
-
     // If the `Component` has a custom logic to determine whether the component
-    // needs to be updated or not, return true if it returns true.
-    // If it returns false, we still want to benefit from the
-    // performance gain of the rest of the logic.
-    if (Component && Component.shouldNodeComponentUpdate) {
-      const shouldUpdate = Component.shouldNodeComponentUpdate(p, n)
-
+    // needs to be updated or not, return true if it returns true. If it returns
+    // false, we need to ignore it, because it shouldn't be allowed it.
+    if (shouldUpdate != null) {
       if (shouldUpdate) {
         return true
       }
@@ -151,15 +115,13 @@ class Node extends React.Component {
    */
 
   render() {
-    const { props } = this
+    this.debug('render', this)
 
-    this.debug('render', { props })
-
-    const { editor, isSelected, node, parent, readOnly, state } = props
-    const { Component, Placeholder } = this.state
+    const { editor, isSelected, node, parent, readOnly, state } = this.props
     const { selection } = state
+    const stack = editor.getStack()
     const indexes = node.getSelectionIndexes(selection, isSelected)
-    const children = node.nodes.toArray().map((child, i) => {
+    let children = node.nodes.toArray().map((child, i) => {
       const isChildSelected = !!indexes && indexes.start <= i && i < indexes.end
       return this.renderNode(child, isChildSelected)
     })
@@ -175,22 +137,24 @@ class Node extends React.Component {
       if (direction == 'rtl') attributes.dir = 'rtl'
     }
 
-    const p = {
+    const props = {
+      key: node.key,
       editor,
       isSelected,
-      key: node.key,
       node,
       parent,
       readOnly,
       state
     }
 
-    const element = (
-      <Component {...p} attributes={attributes}>
-        {Placeholder && <Placeholder {...p} />}
-        {children}
-      </Component>
-    )
+    let placeholder = stack.find('renderPlaceholder', props)
+
+    if (placeholder) {
+      placeholder = React.cloneElement(placeholder, { key: `${node.key}-placeholder` })
+      children = [placeholder, ...children]
+    }
+
+    const element = stack.find('renderNode', { ...props, attributes, children })
 
     return node.isVoid
       ? <Void {...this.props}>{element}</Void>
@@ -207,8 +171,9 @@ class Node extends React.Component {
 
   renderNode = (child, isSelected) => {
     const { block, decorations, editor, node, readOnly, schema, state } = this.props
-    const Component = child.kind === 'text' ? Text : Node
-    const decs = decorations.concat(node.getDecorations(schema))
+    const Component = child.kind == 'text' ? Text : Node
+    const stack = editor.getStack()
+    const decs = decorations.concat(node.getDecorations(stack))
     return (
       <Component
         block={node.kind == 'block' ? node : block}

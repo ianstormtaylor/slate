@@ -6,20 +6,6 @@ import React from 'react'
 import initialState from './state.json'
 
 /**
- * Define a schema.
- *
- * @type {Object}
- */
-
-const schema = {
-  marks: {
-    highlight: {
-      backgroundColor: '#ffeeba'
-    }
-  }
-}
-
-/**
  * The rich text example.
  *
  * @type {Component}
@@ -130,14 +116,28 @@ class SearchHighlighting extends React.Component {
     return (
       <div className="editor">
         <Editor
+          placeholder="Enter some rich text..."
           state={this.state.state}
           onChange={this.onChange}
-          schema={schema}
-          placeholder="Enter some rich text..."
+          renderMark={this.renderMark}
           spellCheck
         />
       </div>
     )
+  }
+
+  /**
+   * Render a Slate mark.
+   *
+   * @param {Object} props
+   * @return {Element}
+   */
+
+  renderMark = (props) => {
+    const { children, mark } = props
+    switch (mark.type) {
+      case 'highlight': return <span style={{ backgroundColor: '#ffeeba' }}>{children}</span>
+    }
   }
 
 }

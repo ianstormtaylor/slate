@@ -8,72 +8,6 @@ import isImage from 'is-image'
 import isUrl from 'is-url'
 
 /**
- * Default block to be inserted when the document is empty,
- * and after an image is the last node in the document.
- *
- * @type {Object}
- */
-
-const defaultBlock = {
-  type: 'paragraph',
-  isVoid: false,
-  data: {}
-}
-
-/**
- * Define a schema.
- *
- * @type {Object}
- */
-
-const schema = {
-  nodes: {
-    image: (props) => {
-      const { node, isSelected } = props
-      const src = node.data.get('src')
-      const className = isSelected ? 'active' : null
-      const style = { display: 'block' }
-      return (
-        <img src={src} className={className} style={style} {...props.attributes} />
-      )
-    },
-    paragraph: (props) => {
-      return <p {...props.attributes}>{props.children}</p>
-    }
-  },
-  rules: [
-    // Rule to insert a paragraph block if the document is empty.
-    {
-      match: (node) => {
-        return node.kind == 'document'
-      },
-      validate: (document) => {
-        return document.nodes.size ? null : true
-      },
-      normalize: (change, document) => {
-        const block = Block.create(defaultBlock)
-        change.insertNodeByKey(document.key, 0, block)
-      }
-    },
-    // Rule to insert a paragraph below a void node (the image) if that node is
-    // the last one in the document.
-    {
-      match: (node) => {
-        return node.kind == 'document'
-      },
-      validate: (document) => {
-        const lastNode = document.nodes.last()
-        return lastNode && lastNode.isVoid ? true : null
-      },
-      normalize: (change, document) => {
-        const block = Block.create(defaultBlock)
-        change.insertNodeByKey(document.key, document.nodes.size, block)
-      }
-    }
-  ]
-}
-
-/**
  * A change function to standardize inserting images.
  *
  * @param {Change} change
@@ -153,14 +87,54 @@ class Images extends React.Component {
       <div className="editor">
         <Editor
           placeholder="Enter some text..."
-          schema={schema}
           state={this.state.state}
           onChange={this.onChange}
           onDrop={this.onDrop}
           onPaste={this.onPaste}
+          renderNode={this.renderNode}
+          validateNode={this.validateNode}
         />
       </div>
     )
+  }
+
+  /**
+   * Render a Slate node.
+   *
+   * @param {Object} props
+   * @return {Element}
+   */
+
+  renderNode = (props) => {
+    const { attributes, node, isSelected } = props
+    switch (node.type) {
+      case 'image': {
+        const src = node.data.get('src')
+        const className = isSelected ? 'active' : null
+        const style = { display: 'block' }
+        return (
+          <img src={src} className={className} style={style} {...attributes} />
+        )
+      }
+    }
+  }
+
+  /**
+   * Perform node validation on the document.
+   *
+   * @param {Node} node
+   * @return {Function|Void}
+   */
+
+  validateNode = (node) => {
+    if (node.kind != 'document') return
+    const last = node.nodes.last()
+
+    if (!last || last.type != 'paragraph') {
+      const index = node.nodes.size
+      const paragraph = Block.create('paragraph')
+      return change => change.insertNodeByKey(node.key, index, paragraph)
+    }
   }
 
   /**

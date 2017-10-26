@@ -9,21 +9,6 @@ import initialState from './state.json'
 const root = window.document.querySelector('main')
 
 /**
- * Define a schema.
- *
- * @type {Object}
- */
-
-const schema = {
-  marks: {
-    bold: props => <strong>{props.children}</strong>,
-    code: props => <code>{props.children}</code>,
-    italic: props => <em>{props.children}</em>,
-    underlined: props => <u>{props.children}</u>,
-  }
-}
-
-/**
  * The menu.
  *
  * @type {Component}
@@ -130,6 +115,28 @@ class HoveringMenu extends React.Component {
   }
 
   /**
+   * Update the menu's absolute position.
+   */
+
+  updateMenu = () => {
+    const { state } = this.state
+    const menu = this.menu
+    if (!menu) return
+
+    if (state.isBlurred || state.isEmpty) {
+      menu.removeAttribute('style')
+      return
+    }
+
+    const selection = window.getSelection()
+    const range = selection.getRangeAt(0)
+    const rect = range.getBoundingClientRect()
+    menu.style.opacity = 1
+    menu.style.top = `${rect.top + window.scrollY - menu.offsetHeight}px`
+    menu.style.left = `${rect.left + window.scrollX - menu.offsetWidth / 2 + rect.width / 2}px`
+  }
+
+  /**
    * On change.
    *
    * @param {Change} change
@@ -166,9 +173,9 @@ class HoveringMenu extends React.Component {
         <div className="editor">
           <Editor
             placeholder="Enter some text..."
-            schema={schema}
             state={this.state.state}
             onChange={this.onChange}
+            renderMark={this.renderMark}
           />
         </div>
       </div>
@@ -176,25 +183,20 @@ class HoveringMenu extends React.Component {
   }
 
   /**
-   * Update the menu's absolute position.
+   * Render a Slate mark.
+   *
+   * @param {Object} props
+   * @return {Element}
    */
 
-  updateMenu = () => {
-    const { state } = this.state
-    const menu = this.menu
-    if (!menu) return
-
-    if (state.isBlurred || state.isEmpty) {
-      menu.removeAttribute('style')
-      return
+  renderMark = (props) => {
+    const { children, mark } = props
+    switch (mark.type) {
+      case 'bold': return <strong>{children}</strong>
+      case 'code': return <code>{children}</code>
+      case 'italic': return <em>{children}</em>
+      case 'underlined': return <u>{children}</u>
     }
-
-    const selection = window.getSelection()
-    const range = selection.getRangeAt(0)
-    const rect = range.getBoundingClientRect()
-    menu.style.opacity = 1
-    menu.style.top = `${rect.top + window.scrollY - menu.offsetHeight}px`
-    menu.style.left = `${rect.left + window.scrollX - menu.offsetWidth / 2 + rect.width / 2}px`
   }
 
 }

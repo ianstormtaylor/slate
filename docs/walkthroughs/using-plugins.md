@@ -18,11 +18,6 @@ class App extends React.Component {
 
   state = {
     state: initialState,
-    schema: {
-      marks: {
-        bold: props => <strong>{props.children}</strong>
-      }
-    }
   }
 
   onChange = ({ state }) => {
@@ -39,12 +34,18 @@ class App extends React.Component {
   render() {
     return (
       <Editor
-        schema={this.state.schema}
         state={this.state.state}
         onChange={this.onChange}
         onKeyDown={this.onKeyDown}
+        renderMark={this.renderMark}
       />
     )
+  }
+
+  renderMark = (props) => {
+    switch (props.mark.type) {
+      case 'bold': return <strong>{props.children}</strong>
+    }
   }
 
 }
@@ -106,11 +107,6 @@ class App extends React.Component {
 
   state = {
     state: initialState,
-    schema: {
-      marks: {
-        bold: props => <strong>{props.children}</strong>
-      }
-    }
   }
 
   onChange = ({ state }) => {
@@ -122,11 +118,17 @@ class App extends React.Component {
       // Add the `plugins` property to the editor, and remove `onKeyDown`.
       <Editor
         plugins={plugins}
-        schema={this.state.schema}
         state={this.state.state}
         onChange={this.onChange}
+        renderMark={this.renderMark}
       />
     )
+  }
+  
+  renderMark = (props) => {
+    switch (props.mark.type) {
+      case 'bold': return <strong>{props.children}</strong>
+    }
   }
 
 }
@@ -150,16 +152,6 @@ class App extends React.Component {
 
   state = {
     state: initialState,
-    schema: {
-      marks: {
-        bold: props => <strong>{props.children}</strong>,
-        // Add our new mark renderers...
-        code: props => <code>{props.children}</code>,
-        italic: props => <em>{props.children}</em>,
-        strikethrough: props => <del>{props.children}</del>,
-        underline: props => <u>{props.children}</u>,
-      }
-    }
   }
 
   onChange = ({ state }) => {
@@ -170,11 +162,22 @@ class App extends React.Component {
     return (
       <Editor
         plugins={plugins}
-        schema={this.state.schema}
         state={this.state.state}
         onChange={this.onChange}
+        renderMark={this.renderMark}
       />
     )
+  }
+  
+  renderMark = (props) => {
+    switch (props.mark.type) {
+      case 'bold': return <strong>{props.children}</strong>
+      // Add our new mark renderers...
+      case 'code': return <code>{props.children}</code>
+      case 'italic': return <em>{props.children}</em>
+      case 'strikethrough': return <del>{props.children}</del>
+      case 'underline': return <u>{props.children}</u>
+    }
   }
 
 }

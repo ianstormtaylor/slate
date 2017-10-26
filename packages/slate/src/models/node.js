@@ -8,6 +8,7 @@ import Block from './block'
 import Data from './data'
 import Document from './document'
 import Inline from './inline'
+import Range from './range'
 import Text from './text'
 import generateKey from '../utils/generate-key'
 import isIndexInRange from '../utils/is-index-in-range'
@@ -585,25 +586,16 @@ class Node {
   }
 
   /**
-   * Get the component for the node from a `schema`.
+   * Get the decorations for the node from a `stack`.
    *
-   * @param {Schema} schema
-   * @return {Component|Void}
+   * @param {Stack} stack
+   * @return {List}
    */
 
-  getComponent(schema) {
-    return schema.__getComponent(this)
-  }
-
-  /**
-   * Get the decorations for the node from a `schema`.
-   *
-   * @param {Schema} schema
-   * @return {Array}
-   */
-
-  getDecorations(schema) {
-    return schema.__getDecorations(this)
+  getDecorations(stack) {
+    const decorations = stack.find('decorateNode', this)
+    const list = Range.createList(decorations || [])
+    return list
   }
 
   /**
@@ -1894,11 +1886,11 @@ class Node {
    * Validate the node against a `schema`.
    *
    * @param {Schema} schema
-   * @return {Object|Null}
+   * @return {Function|Null}
    */
 
   validate(schema) {
-    return schema.__validate(this)
+    return schema.validateNode(this)
   }
 
   /**
@@ -2124,7 +2116,6 @@ memoize(Node.prototype, [
   'getClosestInline',
   'getClosestVoid',
   'getCommonAncestor',
-  'getComponent',
   'getDecorations',
   'getDepth',
   'getDescendant',

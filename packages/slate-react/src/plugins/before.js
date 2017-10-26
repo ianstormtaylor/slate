@@ -91,6 +91,27 @@ function BeforePlugin() {
   }
 
   /**
+   * On change.
+   *
+   * @param {Change} change
+   * @param {Editor} editor
+   */
+
+  function onChange(change, editor) {
+    const { state } = change
+    const schema = editor.getSchema()
+
+    // If the state's schema isn't the editor's schema, update it.
+    if (state.schema != schema) {
+      change
+        .setState({ schema })
+        .normalize()
+    }
+
+    debug('onChange')
+  }
+
+  /**
    * On composition end.
    *
    * @param {Event} event
@@ -377,6 +398,7 @@ function BeforePlugin() {
   return {
     onBeforeInput,
     onBlur,
+    onChange,
     onCompositionEnd,
     onCompositionStart,
     onCopy,

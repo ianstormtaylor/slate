@@ -1,27 +1,32 @@
 /** @jsx h */
 
+import React from 'react'
 import h from '../../helpers/h'
 
-export const schema = {
-  nodes: {
-    paragraph: {
-      decorate(block) {
-        const text = block.getFirstText()
-        return [{
-          anchorKey: text.key,
-          anchorOffset: 1,
-          focusKey: text.key,
-          focusOffset: 2,
-          marks: [{ type: 'bold' }]
-        }]
-      }
-    }
-  },
-  marks: {
-    bold: {
-      fontWeight: 'bold',
-    }
+function decorateNode(block) {
+  const text = block.getFirstText()
+  return [{
+    anchorKey: text.key,
+    anchorOffset: 1,
+    focusKey: text.key,
+    focusOffset: 2,
+    marks: [{ type: 'bold' }]
+  }]
+}
+
+function Bold(props) {
+  return React.createElement('strong', null, props.children)
+}
+
+function renderMark(props) {
+  switch (props.mark.type) {
+    case 'bold': return Bold(props)
   }
+}
+
+export const props = {
+  decorateNode,
+  renderMark,
 }
 
 export const state = (
@@ -39,7 +44,7 @@ export const output = `
   <div style="position:relative">
     <span>
       <span>o</span>
-      <span><span style="font-weight:bold">n</span></span>
+      <span><strong>n</strong></span>
       <span>e</span>
     </span>
   </div>

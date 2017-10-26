@@ -4,13 +4,11 @@ import Debug from 'debug'
 import Plain from 'slate-plain-serializer'
 import React from 'react'
 import getWindow from 'get-window'
-import { Block, Inline, Text, coreSchema } from 'slate'
+import { Block, Inline, Text } from 'slate'
 
 import EVENT_HANDLERS from '../constants/event-handlers'
 import HOTKEYS from '../constants/hotkeys'
 import Content from '../components/content'
-import DefaultNode from '../components/default-node'
-import DefaultPlaceholder from '../components/default-placeholder'
 import findDOMNode from '../utils/find-dom-node'
 import findNode from '../utils/find-node'
 import findPoint from '../utils/find-point'
@@ -37,28 +35,6 @@ const debug = Debug('slate:core:after')
 
 function AfterPlugin(options = {}) {
   let isDraggingInternally = null
-
-  /**
-   * On before change, enforce the editor's schema.
-   *
-   * @param {Change} change
-   * @param {Editor} editor
-   */
-
-  function onBeforeChange(change, editor) {
-    const { state } = change
-    const schema = editor.getSchema()
-    const prevState = editor.getState()
-
-    // PERF: Skip normalizing if the document hasn't changed, since schemas only
-    // normalize changes to the document, not selection.
-    if (prevState && state.document == prevState.document) return
-
-    debug('onBeforeChange')
-
-    change.normalize(coreSchema)
-    change.normalize(schema)
-  }
 
   /**
    * On before input, correct any browser inconsistencies.
@@ -684,7 +660,7 @@ function AfterPlugin(options = {}) {
   }
 
   /**
-   * Render.
+   * Render editor.
    *
    * @param {Object} props
    * @param {State} state
@@ -692,7 +668,7 @@ function AfterPlugin(options = {}) {
    * @return {Object}
    */
 
-  function render(props, state, editor) {
+  function renderEditor(props, state, editor) {
     const handlers = EVENT_HANDLERS.reduce((obj, handler) => {
       obj[handler] = editor[handler]
       return obj
@@ -719,22 +695,48 @@ function AfterPlugin(options = {}) {
   }
 
   /**
-   * Add default rendering rules to the schema.
+   * Render node.
    *
-   * @type {Object}
+   * @param {Object} props
+   * @return {Element}
    */
 
-  const schema = {
-    rules: [
-      {
-        match: obj => obj.kind == 'block' || obj.kind == 'inline',
-        render: DefaultNode,
-      },
-      {
-        match: obj => obj.kind == 'block' && Text.isTextList(obj.nodes) && obj.text == '',
-        placeholder: DefaultPlaceholder,
-      },
-    ]
+  function renderNode(props) {
+    const { attributes, children, node } = props
+    if (node.kind != 'block' && node.kind != 'inline') return
+    const Tag = node.kind == 'block' ? 'div' : 'span'
+    const style = { position: 'relative' }
+    return <Tag {...attributes} style={style}>{children}</Tag>
+  }
+
+  /**
+   * Render placeholder.
+   *
+   * @param {Object} props
+   * @return {Element}
+   */
+
+  function renderPlaceholder(props) {
+    const { editor, node, state } = props
+    if (node.kind != 'block') return
+    if (!Text.isTextList(node.nodes)) return
+    if (node.text != '') return
+    if (state.document.getBlocks().size > 1) return
+
+    const style = {
+      pointerEvents: 'none',
+      display: 'inline-block',
+      width: '0',
+      maxWidth: '100%',
+      whiteSpace: 'nowrap',
+      opacity: '0.333',
+    }
+
+    return (
+      <span contentEditable={false} style={style}>
+        {editor.props.placeholder}
+      </span>
+    )
   }
 
   /**
@@ -744,7 +746,6 @@ function AfterPlugin(options = {}) {
    */
 
   return {
-    onBeforeChange,
     onBeforeInput,
     onBlur,
     onClick,
@@ -758,8 +759,9 @@ function AfterPlugin(options = {}) {
     onKeyDown,
     onPaste,
     onSelect,
-    render,
-    schema,
+    renderEditor,
+    renderNode,
+    renderPlaceholder,
   }
 }
 

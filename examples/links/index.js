@@ -7,23 +7,6 @@ import initialState from './state.json'
 import isUrl from 'is-url'
 
 /**
- * Define a schema.
- *
- * @type {Object}
- */
-
-const schema = {
-  nodes: {
-    paragraph: props => <p>{props.children}</p>,
-    link: (props) => {
-      const { data } = props.node
-      const href = data.get('href')
-      return <a {...props.attributes} href={href}>{props.children}</a>
-    }
-  }
-}
-
-/**
  * A change helper to standardize wrapping links.
  *
  * @param {Change} change
@@ -65,7 +48,7 @@ class Links extends React.Component {
 
   state = {
     state: State.fromJSON(initialState)
-  };
+  }
 
   /**
    * Check whether the current selection has a link in it.
@@ -188,13 +171,31 @@ class Links extends React.Component {
       <div className="editor">
         <Editor
           placeholder="Enter some text..."
-          schema={schema}
           state={this.state.state}
           onChange={this.onChange}
           onPaste={this.onPaste}
+          renderNode={this.renderNode}
         />
       </div>
     )
+  }
+
+  /**
+   * Render a Slate node.
+   *
+   * @param {Object} props
+   * @return {Element}
+   */
+
+  renderNode = (props) => {
+    const { attributes, children, node } = props
+    switch (node.type) {
+      case 'link': {
+        const { data } = node
+        const href = data.get('href')
+        return <a {...attributes} href={href}>{children}</a>
+      }
+    }
   }
 
 }
