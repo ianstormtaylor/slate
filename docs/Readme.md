@@ -17,6 +17,7 @@
 
 - [Changes](./guides/changes.md)
 - [Plugins](./guides/plugins.md)
+- [Data Model](./guides/data-model.md)
 
 
 ## General

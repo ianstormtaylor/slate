@@ -17,14 +17,38 @@ For convenience, in addition to changes, many of the selection and document prop
 ```js
 State({
   document: Document,
-  selection: Range
+  selection: Range,
+  history: History,
+  schema: Schema,
+  data: Data,
+  decorations: List<Ranges>|Null,
 })
 ```
+
+### `data`
+`Data`
+
+An object containing arbitrary data for the state.
+
+### `decorations`
+`List<Ranges>|Null`
+
+A list of ranges in the document with marks that aren't part of the content itself—like matches for the current search string.
 
 ### `document`
 `Document`
 
 The current document of the state.
+
+### `history`
+`History`
+
+An object that stores the history of changes.
+
+### `schema`
+`Schema`
+
+An object representing the schema of the state's document.
 
 ### `selection`
 `Range`

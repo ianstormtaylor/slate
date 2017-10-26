@@ -211,3 +211,89 @@ Framework plugins will often expose objects with `changes`, `helpers` and `plugi
 You'll often want to encapsulate framework plugins in your own feature plugins, but they can go a long way in terms of reducing your codebase size.
 
 
+## Best Practices
+
+When you're writing plugins, there are a few patterns to follow that will make your plugins more flexible, and more familiar for others.
+
+If you think of another good pattern, feel free to pull request it!
+
+### Write Plugins as Functions
+
+You should always write plugins as functions that take `options`. 
+
+```js
+function YourPlugin(options) {
+  return {
+    ...
+  }
+}
+```
+
+This is easy to do, and it means that even if you don't have any options now you won't have to break the API to add them in the future. It also makes it easier to use plugins because you just always assume they're functions.
+
+### Expose Helpers, Changes, etc.
+
+This was alluded to in the previous section, but if your plugin defines helpers like `hasBoldMark` or change functions like `addBoldMark`, based on an option the user passed it, it can be helpful to expose those to the user so they can use the same functions in their own code. The way to do this is to return an object instead of an array from your plugin function:
+
+```js
+function YourBoldPlugin(options) {
+  return {
+    helpers: {
+      hasBoldMark,
+      ...
+    },
+    changes: {
+      addBoldMark,
+      ...
+    },
+    plugins: [
+      ...
+    ],
+  }
+}
+```
+
+### Accept Change Functions
+
+It's common for a helper plugins to want to make some change based on an event that is triggered by the user. For example, when you want to write a plugin that adds a mark when a hotkey is pressed. 
+
+If you write this in the naive way as taking a mark `type` string, users won't be able to add data associated with the mark in more complex cases. And if you accept a string or an object, what happens if the user wants to actually add two marks at once, or perform some other piece of logic. You'll have to keep adding esoteric options which make the plugin hard to maintain.
+
+Instead, let the user pass in a "change function", like so:
+
+```js
+const plugins = [
+  AddMark({
+    hotkey: 'cmd+b',
+    change: change => change.addMark('bold'),
+  })
+]
+```
+
+Notice how it's still very terse for the simple case. But it means you can do more complex things easily, without having to accept tons of crazy options:
+
+```js
+const plugins = [
+  AddMark({
+    hotkey: 'cmd+opt+c',
+    change: change => {
+      change
+        .addMark({ type: 'comment', data: { id: userId }})
+        .selectAll()
+    }
+  })
+]
+```
+
+And what's even better, since it's a common practice to write change function helpers in your codebase to reuse, users can usually just pass in one of the functions they've already defined:
+
+```js
+
+const plugins = [
+  AddMark({
+    hotkey: 'cmd+b',
+    change: addBoldMark,
+  })
+]
+```
+
