@@ -7,6 +7,16 @@ This document maintains a list of changes to the `slate-simulator` package with 
 ---
 
 
+### `0.2.0` — October 25, 2017
+
+###### BREAKING
+
+- **Updated to work with `slate@0.28.0`.** Along with the new Schema, the `Stack` which is used internally by the simulator has changed slightly.
+
+
+---
+
+
 ### `0.1.0` — September 17, 2017
 
 :tada:

@@ -7,6 +7,30 @@ This document maintains a list of changes to the `slate-react` package with each
 ---
 
 
+### `0.8.0` — October 25, 2017
+
+###### BREAKING
+
+- **The `Schema` objects in Slate have changed!** Previously, they used to be where you could define normalization rules, define rendering rules, and define decoration rules. This was overloaded, and made other improvements hard. Now, rendering and decorating is done via the newly added plugin functions (`renderNode`, `renderMark`, `decorateNode`). And validation is done either via the lower-level `validateNode` plugin function, or via the new `schema` objects.
+
+- **The `plugin.onBeforeChange` function was removed.** Previously there was both an `onBeforeChange` handler and an `onChange` handler. Now there is just an `onChange` handler, and the core plugin adds it's own logic before others.
+
+###### NEW
+
+- **`State` objects now have an embedded `state.schema` property.** This new schema property is used to automatically normalize the state as it changes, according to the editor's current schema. This makes normalization much easier.
+
+- **A new `renderNode` plugin function was added.** This is the new way to render nodes, instead of using the schema. Any plugin can define a `renderNode(props)` function which is passed the props to render the custom node component with. This is similar to `react-router`'s `render={...}` prop if you are familiar with that.
+
+- **A new `renderPlaceholder` plugin function was added.** This is similar to the `renderNode` helper, except for rendering placeholders.
+
+- **A new `decorateNode` plugin function was added.** This is similar to the old `rule.decorate` function from schemas. Any plugin can define a `decorateNode(node)` function and that can return extra decoration ranges of marks to apply to the document.
+
+- **A new `validateNode` plugin function was added.** This is the new way to do specific, custom validations. (There's also the new schema, which is the easier way to do most common validations.) Any plugin can define a `validateNode(node)` function that will be called to ensure nodes are valid. If they are valid, the function should return nothing. Otherwise, it should return a change function that normalizes the node to make it valid again.
+
+
+---
+
+
 ### `0.7.0` — October 18, 2017
 
 ###### BREAKING

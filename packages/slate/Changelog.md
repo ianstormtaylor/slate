@@ -6,6 +6,23 @@ This document maintains a list of changes to the `slate` package with each new v
 
 ---
 
+
+### `0.28.0` — October 25, 2017
+
+###### BREAKING
+
+- **The `Schema` objects in Slate have changed!** Previously, they used to be where you could define normalization rules, define rendering rules, and define decoration rules. This was overloaded, and made other improvements hard. Now, rendering and decorating is done via the newly added plugin functions (`renderNode`, `renderMark`, `decorateNode`). And validation is done either via the lower-level `validateNode` plugin function, or via the new `schema` objects.
+
+- **The `normalize*` change methods no longer take a `schema` argument.** Previously you had to maintain a reference to your schema, and pass it into the normalize methods when you called them. Since `State` objects now have an embedded `state.schema` property, this is no longer needed.
+
+###### NEW
+
+- **`State` objects now have an embedded `state.schema` property.** This new schema property is used to automatically normalize the state as it changes, according to the editor's current schema. This makes normalization much easier.
+
+
+---
+
+
 ### `0.27.0` — October 14, 2017
 
 ###### BREAKING
