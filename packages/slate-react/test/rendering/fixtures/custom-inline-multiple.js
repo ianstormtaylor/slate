@@ -42,7 +42,7 @@ export const output = `
   <div style="position:relative">
     <span>
       <span>
-        <span data-slate-zero-width="true">&#x200A;</span>
+        <span data-slate-zero-width="true">&#x200B;</span>
       </span>
     </span>
     <a href="https://google.com">
@@ -52,7 +52,7 @@ export const output = `
     </a>
     <span>
       <span>
-        <span data-slate-zero-width="true">&#x200A;</span>
+        <span data-slate-zero-width="true">&#x200B;</span>
       </span>
     </span>
     <a href="https://google.com">
@@ -62,7 +62,7 @@ export const output = `
     </a>
     <span>
       <span>
-        <span data-slate-zero-width="true">&#x200A;</span>
+        <span data-slate-zero-width="true">&#x200B;</span>
       </span>
     </span>
     <a href="https://google.com">
@@ -72,7 +72,7 @@ export const output = `
     </a>
     <span>
       <span>
-        <span data-slate-zero-width="true">&#x200A;</span>
+        <span data-slate-zero-width="true">&#x200B;</span>
       </span>
     </span>
   </div>
