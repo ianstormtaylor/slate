@@ -132,22 +132,26 @@ Remove a [`mark`](./mark.md) from the characters in the current selection. For c
 Add or remove a [`mark`](./mark.md) from the characters in the current selection, depending on it already exists on any or not. For convenience, you can pass a `type` string or `properties` object to implicitly create a [`Mark`](./mark.md) of that type.
 
 ### `unwrapBlock`
-`unwrapBlock([type: String], [data: Data]) => Change`
+`unwrapBlock(type: String) => Change` <br/>
+`unwrapBlock(properties: Object) => Change` <br />
 
 Unwrap all [`Block`](./block.md) nodes in the current selection that match a `type` and/or `data`.
 
 ### `unwrapInline`
-`unwrapInline([type: String], [data: Data]) => Change`
+`unwrapInline(type: String) => Change` <br/>
+`unwrapInline(properties: Object) => Change` <br/>
 
 Unwrap all [`Inline`](./inline.md) nodes in the current selection that match a `type` and/or `data`.
 
 ### `wrapBlock`
-`wrapBlock(type: String, [data: Data]) => Change`
+`wrapBlock(type: String) => Change` <br/>
+`wrapBlock(properties: Object) => Change` <br/>
 
 Wrap the [`Block`](./block.md) nodes in the current selection with a new [`Block`](./block.md) node of `type`, with optional `data`.
 
 ### `wrapInline`
-`wrapInline(type: String, [data: Data]) => Change`
+`wrapInline(type: String) => Change` <br />
+`wrapInline(properties: Object) => Change` <br />
 
 Wrap the [`Inline`](./inline.md) nodes in the current selection with a new [`Inline`](./inline.md) node of `type`, with optional `data`.
 
