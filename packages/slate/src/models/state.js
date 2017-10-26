@@ -641,12 +641,7 @@ class State extends Record(DEFAULTS) {
   toJSON(options = {}) {
     const object = {
       kind: this.kind,
-      data: this.data.toJSON(),
-      decorations: this.decorations ? this.decorations.toArray().map(d => d.toJSON()) : null,
       document: this.document.toJSON(options),
-      history: this.history.toJSON(),
-      selection: this.selection.toJSON(),
-      schema: this.schema.toJSON(),
     }
 
     if ('preserveStateData' in options) {
@@ -654,24 +649,24 @@ class State extends Record(DEFAULTS) {
       options.preserveData = options.preserveStateData
     }
 
-    if (!options.preserveData) {
-      delete object.data
+    if (options.preserveData) {
+      object.data = this.data.toJSON()
     }
 
-    if (!options.preserveDecorations) {
-      delete object.decorations
+    if (options.preserveDecorations) {
+      object.decorations = this.decorations ? this.decorations.toArray().map(d => d.toJSON()) : null
     }
 
-    if (!options.preserveHistory) {
-      delete object.history
+    if (options.preserveHistory) {
+      object.history = this.history.toJSON()
     }
 
-    if (!options.preserveSelection) {
-      delete object.selection
+    if (options.preserveSelection) {
+      object.selection = this.selection.toJSON()
     }
 
-    if (!options.preserveSchema) {
-      delete object.schema
+    if (options.preserveSchema) {
+      object.schema = this.schema.toJSON()
     }
 
     if (options.preserveSelection && !options.preserveKeys) {

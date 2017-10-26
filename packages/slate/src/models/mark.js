@@ -177,9 +177,9 @@ class Mark extends Record(DEFAULTS) {
 
   toJSON() {
     const object = {
-      data: this.data.toJSON(),
       kind: this.kind,
       type: this.type,
+      data: this.data.toJSON(),
     }
 
     return object

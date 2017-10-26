@@ -148,8 +148,8 @@ class Character extends Record(DEFAULTS) {
   toJSON() {
     const object = {
       kind: this.kind,
-      marks: this.marks.toArray().map(m => m.toJSON()),
       text: this.text,
+      marks: this.marks.toArray().map(m => m.toJSON()),
     }
 
     return object
