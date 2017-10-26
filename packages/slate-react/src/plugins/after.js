@@ -514,36 +514,36 @@ function AfterPlugin(options = {}) {
     // an inline is selected, we need to handle these hotkeys manually because
     // browsers won't know what to do.
     if (HOTKEYS.COLLAPSE_CHAR_BACKWARD(event)) {
-      const { isInVoid, previousText, document } = state
+      const { document, isInVoid, previousText, startText } = state
       const isPreviousInVoid = previousText && document.hasVoidParent(previousText.key)
-      if (isInVoid || isPreviousInVoid) {
+      if (isInVoid || isPreviousInVoid || startText.text == '') {
         event.preventDefault()
         return change.collapseCharBackward()
       }
     }
 
     if (HOTKEYS.COLLAPSE_CHAR_FORWARD(event)) {
-      const { isInVoid, nextText, document } = state
+      const { document, isInVoid, nextText, startText } = state
       const isNextInVoid = nextText && document.hasVoidParent(nextText.key)
-      if (isInVoid || isNextInVoid) {
+      if (isInVoid || isNextInVoid || startText.text == '') {
         event.preventDefault()
         return change.collapseCharForward()
       }
     }
 
     if (HOTKEYS.EXTEND_CHAR_BACKWARD(event)) {
-      const { isInVoid, previousText, document } = state
+      const { document, isInVoid, previousText, startText } = state
       const isPreviousInVoid = previousText && document.hasVoidParent(previousText.key)
-      if (isInVoid || isPreviousInVoid) {
+      if (isInVoid || isPreviousInVoid || startText.text == '') {
         event.preventDefault()
         return change.extendCharBackward()
       }
     }
 
     if (HOTKEYS.EXTEND_CHAR_FORWARD(event)) {
-      const { isInVoid, nextText, document } = state
+      const { document, isInVoid, nextText, startText } = state
       const isNextInVoid = nextText && document.hasVoidParent(nextText.key)
-      if (isInVoid || isNextInVoid) {
+      if (isInVoid || isNextInVoid || startText.text == '') {
         event.preventDefault()
         return change.extendCharForward()
       }
