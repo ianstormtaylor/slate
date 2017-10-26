@@ -8,7 +8,6 @@
   "dependencies": {
     "debug": "^2.3.2",
     "direction": "^0.1.5",
-    "es6-map": "^0.1.4",
     "esrever": "^0.2.0",
     "is-empty": "^1.0.0",
     "is-plain-object": "^2.0.4",

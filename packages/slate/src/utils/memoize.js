@@ -1,6 +1,4 @@
 
-import Map from 'es6-map'
-
 /**
  * Is in development?
  *
@@ -67,8 +65,7 @@ const UNSET = undefined
 function memoize(object, properties, options = {}) {
   const { takesArguments = true } = options
 
-  for (let i = 0; i < properties.length; i++) {
-    const property = properties[i]
+  for (const property of properties) {
     const original = object[property]
 
     if (!original) {
@@ -83,12 +80,12 @@ function memoize(object, properties, options = {}) {
         // If the cache key is different, previous caches must be cleared.
         if (CACHE_KEY !== this.__cache_key) {
           this.__cache_key = CACHE_KEY
-          this.__cache = new Map()
+          this.__cache = new Map() // eslint-disable-line no-undef,no-restricted-globals
         }
       }
 
       if (!this.__cache) {
-        this.__cache = new Map()
+        this.__cache = new Map() // eslint-disable-line no-undef,no-restricted-globals
       }
 
       let cachedValue
@@ -133,8 +130,7 @@ function memoize(object, properties, options = {}) {
  */
 
 function getIn(map, keys) {
-  for (let i = 0; i < keys.length; i++) {
-    const key = keys[i]
+  for (const key of keys) {
     map = map.get(key)
     if (map === UNSET) return UNSET
   }
@@ -155,13 +151,12 @@ function setIn(map, keys, value) {
   let parent = map
   let child
 
-  for (let i = 0; i < keys.length; i++) {
-    const key = keys[i]
+  for (const key of keys) {
     child = parent.get(key)
 
     // If the path was not created yet...
     if (child === UNSET) {
-      child = new Map()
+      child = new Map() // eslint-disable-line no-undef,no-restricted-globals
       parent.set(key, child)
     }
 

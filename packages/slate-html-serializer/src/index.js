@@ -256,8 +256,7 @@ class Html {
       }
     }
 
-    for (let i = 0; i < this.rules.length; i++) {
-      const rule = this.rules[i]
+    for (const rule of this.rules) {
       if (!rule.deserialize) continue
       const ret = rule.deserialize(element, next)
       const type = typeOf(ret)
@@ -354,8 +353,7 @@ class Html {
 
     const children = node.nodes.map(this.serializeNode)
 
-    for (let i = 0; i < this.rules.length; i++) {
-      const rule = this.rules[i]
+    for (const rule of this.rules) {
       if (!rule.serialize) continue
       const ret = rule.serialize(node, children)
       if (ret) return addKey(ret)
@@ -376,8 +374,7 @@ class Html {
     const text = this.serializeString(string)
 
     return leaf.marks.reduce((children, mark) => {
-      for (let i = 0; i < this.rules.length; i++) {
-        const rule = this.rules[i]
+      for (const rule of this.rules) {
         if (!rule.serialize) continue
         const ret = rule.serialize(mark, children)
         if (ret) return addKey(ret)
@@ -395,8 +392,7 @@ class Html {
    */
 
   serializeString = (string) => {
-    for (let i = 0; i < this.rules.length; i++) {
-      const rule = this.rules[i]
+    for (const rule of this.rules) {
       if (!rule.serialize) continue
       const ret = rule.serialize(string, string.text)
       if (ret) return ret
