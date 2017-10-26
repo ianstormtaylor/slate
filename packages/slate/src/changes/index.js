@@ -2,10 +2,10 @@
 import AtCurrentRange from './at-current-range'
 import AtRange from './at-range'
 import ByKey from './by-key'
-import Normalize from './normalize'
 import OnHistory from './on-history'
 import OnSelection from './on-selection'
 import OnState from './on-state'
+import WithSchema from './with-schema'
 
 /**
  * Export.
@@ -17,8 +17,8 @@ export default {
   ...AtCurrentRange,
   ...AtRange,
   ...ByKey,
-  ...Normalize,
   ...OnHistory,
   ...OnSelection,
   ...OnState,
+  ...WithSchema,
 }

@@ -5,7 +5,7 @@ import React from 'react'
 import SlateTypes from 'slate-prop-types'
 import Types from 'prop-types'
 import logger from 'slate-dev-logger'
-import { Stack, State } from 'slate'
+import { Schema, Stack, State } from 'slate'
 
 import EVENT_HANDLERS from '../constants/event-handlers'
 import AfterPlugin from '../plugins/after'
@@ -53,7 +53,6 @@ class Editor extends React.Component {
     autoCorrect: Types.bool,
     autoFocus: Types.bool,
     className: Types.string,
-    onBeforeChange: Types.func,
     onChange: Types.func,
     placeholder: Types.any,
     placeholderClassName: Types.string,
@@ -85,7 +84,7 @@ class Editor extends React.Component {
   }
 
   /**
-   * When constructed, create a new `Stack` and run `onBeforeChange`.
+   * Constructor.
    *
    * @param {Object} props
    */
@@ -99,12 +98,14 @@ class Editor extends React.Component {
     // special significance on the editor itself.
     const plugins = resolvePlugins(props)
     const stack = Stack.create({ plugins })
+    const schema = Schema.create({ plugins })
+    this.state.schema = schema
     this.state.stack = stack
 
-    // Run `onBeforeChange` on the passed-in state because we need to ensure
-    // that it is normalized, and queue the resulting change.
+    // Run `onChange` on the passed-in state because we need to ensure that it
+    // is normalized, and queue the resulting change.
     const change = props.state.change()
-    stack.handle('onBeforeChange', change, this)
+    stack.run('onChange', change, this)
     const { state } = change
     this.queueChange(change)
     this.cacheState(state)
@@ -128,28 +129,37 @@ class Editor extends React.Component {
 
   /**
    * When the `props` are updated, create a new `Stack` if necessary and run
-   * `onBeforeChange` to ensure the state is normalized.
+   * `onChange` to ensure the state is normalized.
    *
    * @param {Object} props
    */
 
   componentWillReceiveProps = (props) => {
-    let { stack } = this.state
+    let { state } = props
+    let { schema, stack } = this.state
+    let isNew = false
 
-    // If any plugin-related properties will change, create a new `Stack`.
+    // Check to see if any plugin-related properœties have changed.
     for (let i = 0; i < PLUGINS_PROPS.length; i++) {
       const prop = PLUGINS_PROPS[i]
       if (props[prop] == this.props[prop]) continue
-      const plugins = resolvePlugins(props)
-      stack = Stack.create({ plugins })
-      this.setState({ stack })
+      isNew = true
+      break
     }
 
-    // Run `onBeforeChange` on the passed-in state because we need to ensure
-    // that it is normalized, and queue the resulting change.
-    const change = props.state.change()
-    stack.handle('onBeforeChange', change, this)
-    const { state } = change
+    // If any plugin-related properties will change, create a new `Stack`.
+    if (isNew) {
+      const plugins = resolvePlugins(props)
+      stack = Stack.create({ plugins })
+      schema = Schema.create({ plugins })
+      this.setState({ schema, stack })
+    }
+
+    // Run `onChange` on the passed-in state because we need to ensure that it
+    // is normalized, and queue the resulting change.
+    const change = state.change()
+    stack.run('onChange', change, this)
+    state = change.state
     this.queueChange(change)
     this.cacheState(state)
     this.setState({ state })
@@ -208,8 +218,10 @@ class Editor extends React.Component {
 
     if (change) {
       debug('flushChange', { change })
-      this.props.onChange(change)
-      delete this.tmp.change
+      window.requestAnimationFrame(() => {
+        delete this.tmp.change
+        this.props.onChange(change)
+      })
     }
   }
 
@@ -236,7 +248,17 @@ class Editor extends React.Component {
    */
 
   getSchema = () => {
-    return this.state.stack.schema
+    return this.state.schema
+  }
+
+  /**
+   * Get the editor's current stack.
+   *
+   * @return {Stack}
+   */
+
+  getStack = () => {
+    return this.state.stack
   }
 
   /**
@@ -258,7 +280,6 @@ class Editor extends React.Component {
   change = (...args) => {
     const { state } = this.state
     const change = state.change().call(...args)
-    debug('change', { change })
     this.onChange(change)
   }
 
@@ -266,13 +287,13 @@ class Editor extends React.Component {
    * On event.
    *
    * @param {String} handler
-   * @param {Mixed} ...args
+   * @param {Event} event
    */
 
-  onEvent = (handler, ...args) => {
+  onEvent = (handler, event) => {
     const { stack, state } = this.state
     const change = state.change()
-    stack.handle(handler, change, this, ...args)
+    stack.run(handler, event, change, this)
     this.onChange(change)
   }
 
@@ -283,22 +304,19 @@ class Editor extends React.Component {
    */
 
   onChange = (change) => {
+    debug('onChange', { change })
+
     if (State.isState(change)) {
       throw new Error('As of slate@0.22.0 the `editor.onChange` method must be passed a `Change` object not a `State` object.')
     }
 
     const { stack } = this.state
-
-    stack.handle('onBeforeChange', change, this)
-    stack.handle('onChange', change, this)
-
+    stack.run('onChange', change, this)
     const { state } = change
     const { document, selection } = this.tmp
     const { onChange, onDocumentChange, onSelectionChange } = this.props
 
     if (state == this.state.state) return
-
-    debug('onChange', { change })
     onChange(change)
     if (onDocumentChange && state.document != document) onDocumentChange(state.document, change)
     if (onSelectionChange && state.selection != selection) onSelectionChange(state.selection, change)
@@ -311,19 +329,15 @@ class Editor extends React.Component {
    */
 
   render() {
-    const { props, state } = this
-    const { stack } = state
+    debug('render', this)
+
+    const { stack, state } = this.state
     const children = stack
-      .renderPortal(state.state, this)
+      .map('renderPortal', state, this)
       .map((child, i) => <Portal key={i} isOpened>{child}</Portal>)
 
-    debug('render', { props, state })
-
-    const tree = stack.render(state.state, this, {
-      ...props,
-      children,
-    })
-
+    const props = { ...this.props, children }
+    const tree = stack.render('renderEditor', props, state, this)
     return tree
   }
 

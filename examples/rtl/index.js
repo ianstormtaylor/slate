@@ -6,24 +6,12 @@ import React from 'react'
 import initialState from './state.json'
 
 /**
- * Define a schema.
- *
- * @type {Object}
- */
-
-const schema = {
-  nodes: {
-    'block-quote': props => <blockquote {...props.attributes}>{props.children}</blockquote>,
-  }
-}
-
-/**
  * The plain text example.
  *
  * @type {Component}
  */
 
-class PlainText extends React.Component {
+class RTL extends React.Component {
 
   /**
    * Deserialize the initial editor state.
@@ -68,14 +56,30 @@ class PlainText extends React.Component {
 
   render() {
     return (
-      <Editor
-        placeholder="Enter some plain text..."
-        schema={schema}
-        state={this.state.state}
-        onChange={this.onChange}
-        onKeyDown={this.onKeyDown}
-      />
+      <div className="editor">
+        <Editor
+          placeholder="Enter some plain text..."
+          state={this.state.state}
+          onChange={this.onChange}
+          onKeyDown={this.onKeyDown}
+          renderNode={this.renderNode}
+        />
+      </div>
     )
+  }
+
+  /**
+   * Render a Slate node.
+   *
+   * @param {Object} props
+   * @return {Element}
+   */
+
+  renderNode = (props) => {
+    const { attributes, children, node } = props
+    switch (node.type) {
+      case 'block-quote': return <blockquote {...attributes}>{children}</blockquote>
+    }
   }
 
 }
@@ -84,4 +88,4 @@ class PlainText extends React.Component {
  * Export.
  */
 
-export default PlainText
+export default RTL

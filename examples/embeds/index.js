@@ -7,18 +7,6 @@ import Video from './video'
 import initialState from './state.json'
 
 /**
- * Define a schema.
- *
- * @type {Object}
- */
-
-const schema = {
-  nodes: {
-    video: Video
-  }
-}
-
-/**
  * The images example.
  *
  * @type {Component}
@@ -57,12 +45,25 @@ class Embeds extends React.Component {
       <div className="editor">
         <Editor
           placeholder="Enter some text..."
-          schema={schema}
           state={this.state.state}
           onChange={this.onChange}
+          renderNode={this.renderNode}
         />
       </div>
     )
+  }
+
+  /**
+   * Render a Slate node.
+   *
+   * @param {Object} props
+   * @return {Element}
+   */
+
+  renderNode = (props) => {
+    switch (props.node.type) {
+      case 'video': return <Video {...props} />
+    }
   }
 
 }

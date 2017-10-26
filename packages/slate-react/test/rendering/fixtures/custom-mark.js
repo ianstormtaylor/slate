@@ -3,14 +3,18 @@
 import React from 'react'
 import h from '../../helpers/h'
 
-export const schema = {
-  marks: {
-    bold: (props) => {
-      return (
-        React.createElement('strong', {}, props.children)
-      )
-    }
+function Bold(props) {
+  return React.createElement('strong', null, props.children)
+}
+
+function renderMark(props) {
+  switch (props.mark.type) {
+    case 'bold': return Bold(props)
   }
+}
+
+export const props = {
+  renderMark,
 }
 
 export const state = (

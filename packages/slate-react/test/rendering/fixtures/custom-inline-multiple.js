@@ -3,14 +3,20 @@
 import React from 'react'
 import h from '../../helpers/h'
 
-export const schema = {
-  nodes: {
-    link: (props) => {
-      return (
-        React.createElement('a', { href: props.node.data.get('href'), ...props.attributes }, props.children)
-      )
-    }
+function Link(props) {
+  return (
+    React.createElement('a', { href: props.node.data.get('href'), ...props.attributes }, props.children)
+  )
+}
+
+function renderNode(props) {
+  switch (props.node.type) {
+    case 'link': return Link(props)
   }
+}
+
+export const props = {
+  renderNode,
 }
 
 export const state = (

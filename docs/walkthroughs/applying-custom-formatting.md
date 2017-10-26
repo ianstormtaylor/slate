@@ -16,11 +16,6 @@ class App extends React.Component {
 
   state = {
     state: initialState,
-    schema: {
-      nodes: {
-        code: CodeNode
-      }
-    }
   }
 
   onChange = ({ state }) => {
@@ -40,11 +35,17 @@ class App extends React.Component {
     return (
       <Editor
         state={this.state.state}
-        schema={this.state.schema}
         onChange={this.onChange}
         onKeyDown={this.onKeyDown}
+        renderNode={this.renderNode}
       />
     )
+  }
+  
+  renderNode = (props) => {
+    switch (props.node.type) {
+      case 'code': return <CodeNode {...props} />
+    }
   }
 
 }
@@ -57,11 +58,6 @@ class App extends React.Component {
 
   state = {
     state: initialState,
-    schema: {
-      nodes: {
-        code: CodeNode
-      }
-    }
   }
 
   onChange = ({ state }) => {
@@ -92,12 +88,18 @@ class App extends React.Component {
   render() {
     return (
       <Editor
-        schema={this.state.schema}
         state={this.state.state}
         onChange={this.onChange}
         onKeyDown={this.onKeyDown}
+        renderNode={this.renderNode}
       />
     )
+  }
+  
+  renderNode = (props) => {
+    switch (props.node.type) {
+      case 'code': return <CodeNode {...props} />
+    }
   }
 
 }
@@ -116,9 +118,7 @@ function BoldMark(props) {
 
 Pretty simple, right?
 
-And now, let's tell Slate about that mark.
-To do that, we'll add it to the `schema` object under a `marks` property.
-Also, let's allow our mark to be toggled by changing `addMark` to `toggleMark`.
+And now, let's tell Slate about that mark. To do that, we'll pass in the `renderMark` prop to our editor. Also, let's allow our mark to be toggled by changing `addMark` to `toggleMark`.
 
 ```js
 function BoldMark(props) {
@@ -129,15 +129,6 @@ class App extends React.Component {
 
   state = {
     state: initialState,
-    schema: {
-      nodes: {
-        code: CodeNode
-      },
-      // Add our "bold" mark to the schema...
-      marks: {
-        bold: BoldMark
-      }
-    }
   }
 
   onChange = ({ state }) => {
@@ -165,12 +156,27 @@ class App extends React.Component {
   render() {
     return (
       <Editor
-        schema={this.state.schema}
         state={this.state.state}
         onChange={this.onChange}
         onKeyDown={this.onKeyDown}
+        renderNode={this.renderNode}
+        // Add the `renderMark` prop...
+        renderMark={this.renderMark}
       />
     )
+  }
+  
+  renderNode = (props) => {
+    switch (props.node.type) {
+      case 'code': return <CodeNode {...props} />
+    }
+  }
+
+  // Add a `renderMark` method to render marks.
+  renderMark = (props) => {
+    switch (props.mark.type) {
+      case 'bold': return <BoldMark {...props} />
+    }
   }
 
 }

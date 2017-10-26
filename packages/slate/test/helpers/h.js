@@ -13,6 +13,8 @@ const h = createHyperscript({
     paragraph: 'paragraph',
     quote: 'quote',
     code: 'code',
+    list: 'list',
+    item: 'item',
     image: {
       type: 'image',
       isVoid: true,

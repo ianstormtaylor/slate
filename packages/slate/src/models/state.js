@@ -4,11 +4,11 @@ import logger from 'slate-dev-logger'
 import { Record, Set, List, Map } from 'immutable'
 
 import MODEL_TYPES from '../constants/model-types'
-import SCHEMA from '../schemas/core'
 import Data from './data'
 import Document from './document'
 import History from './history'
 import Range from './range'
+import Schema from './schema'
 
 /**
  * Default properties.
@@ -17,11 +17,12 @@ import Range from './range'
  */
 
 const DEFAULTS = {
-  document: Document.create(),
-  selection: Range.create(),
-  history: History.create(),
   data: new Map(),
   decorations: null,
+  document: Document.create(),
+  history: History.create(),
+  schema: Schema.create(),
+  selection: Range.create(),
 }
 
 /**
@@ -64,6 +65,7 @@ class State extends Record(DEFAULTS) {
       return {
         data: attrs.data,
         decorations: attrs.decorations,
+        schema: attrs.schema,
       }
     }
 
@@ -71,6 +73,7 @@ class State extends Record(DEFAULTS) {
       const props = {}
       if ('data' in attrs) props.data = Data.create(attrs.data)
       if ('decorations' in attrs) props.decorations = Range.createList(attrs.decorations)
+      if ('schema' in attrs) props.schema = Schema.create(attrs.schema)
       return props
     }
 
@@ -91,12 +94,14 @@ class State extends Record(DEFAULTS) {
     let {
       document = {},
       selection = {},
+      schema = {},
     } = object
 
     let data = new Map()
 
     document = Document.fromJSON(document)
     selection = Range.fromJSON(selection)
+    schema = Schema.fromJSON(schema)
 
     // Allow plugins to set a default value for `data`.
     if (options.plugins) {
@@ -119,14 +124,11 @@ class State extends Record(DEFAULTS) {
       data,
       document,
       selection,
+      schema,
     })
 
-
     if (options.normalize !== false) {
-      state = state
-        .change({ save: false })
-        .normalize(SCHEMA)
-        .state
+      state = state.change({ save: false }).normalize().state
     }
 
     return state
@@ -640,10 +642,11 @@ class State extends Record(DEFAULTS) {
     const object = {
       kind: this.kind,
       data: this.data.toJSON(),
-      document: this.document.toJSON(options),
-      selection: this.selection.toJSON(),
       decorations: this.decorations ? this.decorations.toArray().map(d => d.toJSON()) : null,
+      document: this.document.toJSON(options),
       history: this.history.toJSON(),
+      selection: this.selection.toJSON(),
+      schema: this.schema.toJSON(),
     }
 
     if ('preserveStateData' in options) {
@@ -665,6 +668,10 @@ class State extends Record(DEFAULTS) {
 
     if (!options.preserveSelection) {
       delete object.selection
+    }
+
+    if (!options.preserveSchema) {
+      delete object.schema
     }
 
     if (options.preserveSelection && !options.preserveKeys) {

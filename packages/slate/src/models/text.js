@@ -514,7 +514,7 @@ class Text extends Record(DEFAULTS) {
    */
 
   validate(schema) {
-    return schema.__validate(this)
+    return schema.validateNode(this)
   }
 
   /**

@@ -3,14 +3,20 @@
 import React from 'react'
 import h from '../../helpers/h'
 
-export const schema = {
-  nodes: {
-    emoji: (props) => {
-      return (
-        React.createElement('img', props.attributes)
-      )
-    }
+function Emoji(props) {
+  return (
+    React.createElement('img', props.attributes)
+  )
+}
+
+function renderNode(props) {
+  switch (props.node.type) {
+    case 'emoji': return Emoji(props)
   }
+}
+
+export const props = {
+  renderNode,
 }
 
 export const state = (
@@ -31,13 +37,13 @@ export const output = `
         <span data-slate-zero-width="true">&#x200A;</span>
       </span>
     </span>
-    <span data-slate-void="true" draggable="true">
-      <span style="height:0;color:transparent">
+    <span data-slate-void="true" contenteditable="false">
+      <span contenteditable="true" data-slate-spacer="true" style="height:0;color:transparent;outline:none">
         <span>
           <span></span>
         </span>
       </span>
-      <span contenteditable="false">
+      <span draggable="true">
         <img>
       </span>
     </span>

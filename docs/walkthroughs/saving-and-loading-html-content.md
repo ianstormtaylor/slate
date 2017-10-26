@@ -219,19 +219,6 @@ class App extends React.Component {
 
   state = {
     state: html.deserialize(initialState),
-    // Add a schema with our nodes and marks...
-    schema: {
-      nodes: {
-        code: props => <pre {...props.attributes}>{props.children}</pre>,
-        paragraph: props => <p {...props.attributes}>{props.children}</p>,
-        quote: props => <blockquote {...props.attributes}>{props.children}</blockquote>,
-      },
-      marks: {
-        bold: props => <strong>{props.children}</strong>,
-        italic: props => <em>{props.children}</em>,
-        underline: props => <u>{props.children}</u>,
-      }
-    }
   }
 
   onChange = ({ state }) => {
@@ -247,11 +234,30 @@ class App extends React.Component {
   render() {
     return (
       <Editor
-        schema={this.state.schema}
         state={this.state.state}
         onChange={this.onChange}
+        // Add the ability to render our nodes and marks...
+        renderNode={this.renderNode}
+        renderMark={this.renderMark}
       />
     )
+  }
+  
+  renderNode = (props) => {
+    switch (props.node.type) {
+      case 'code': return <pre {...props.attributes}><code>{props.children}</code></pre>
+      case 'code': return <p {...props.attributes}>{props.children}</p>
+      case 'quote': return <blockquote {...props.attributes}>{props.children}</blockquote>
+    }
+  }
+
+  // Add a `renderMark` method to render marks.
+  renderMark = (props) => {
+    switch (props.mark.type) {
+      case 'bold': return <strong>{props.children}</strong>
+      case 'italic': return <em>{props.children}</em>
+      case 'underline': return <u>{props.children}</u>
+    }
   }
 
 }

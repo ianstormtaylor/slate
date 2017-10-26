@@ -2,12 +2,11 @@
 /* eslint-disable react/jsx-key */
 
 import h from '../../test/helpers/h'
-import SCHEMA from '../../lib/schemas/core'
 
 export default function (state) {
   state
     .change()
-    .normalize(SCHEMA)
+    .normalize()
 }
 
 export const input = (

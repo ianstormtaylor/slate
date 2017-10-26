@@ -127,4 +127,4 @@ The `render` property allows you to define higher-order-component-like behavior.
 ### `schema`
 `Object`
 
-The `schema` property allows you to define a set of rules that will be added to the editor's schema. The rules from each of the schemas returned by the plugins are collected into a single schema for the editor, and the rules are applied in the same order as the plugin stack.
+The `schema` property allows you to define a set of rules that will be added to the editor's schema. The rules from each of the schemas returned by the plugins are collected into a single schema for the editor.

@@ -72,12 +72,6 @@ class App extends React.Component {
 
   state = {
     state: initialState,
-    // Add a "schema" to our app's state that we can pass to the Editor.
-    schema: {
-      nodes: {
-        code: CodeNode
-      }
-    }
   }
 
   onChange = ({ state }) => {
@@ -93,14 +87,21 @@ class App extends React.Component {
 
   render() {
     return (
-      // Pass in the `schema` property...
+      // Pass in the `renderNode` prop...
       <Editor
-        schema={this.state.schema}
         state={this.state.state}
         onChange={this.onChange}
         onKeyDown={this.onKeyDown}
+        renderNode={this.renderNode}
       />
     )
+  }
+
+  // Add a `renderNode` method to render a `CodeNode` for code blocks.
+  renderNode = (props) => {
+    switch (props.node.type) {
+      case 'code': return <CodeNode {...props} />
+    }
   }
 
 }
@@ -117,11 +118,6 @@ class App extends React.Component {
 
   state = {
     state: initialState,
-    schema: {
-      nodes: {
-        code: CodeNode
-      }
-    }
   }
 
   onChange = ({ state }) => {
@@ -143,12 +139,18 @@ class App extends React.Component {
   render() {
     return (
       <Editor
-        schema={this.state.schema}
         state={this.state.state}
         onChange={this.onChange}
         onKeyDown={this.onKeyDown}
+        renderNode={this.renderNode}
       />
     )
+  }
+
+  renderNode = (props) => {
+    switch (props.node.type) {
+      case 'code': return <CodeNode {...props} />
+    }
   }
 
 }
@@ -167,11 +169,6 @@ class App extends React.Component {
 
   state = {
     state: initialState,
-    schema: {
-      nodes: {
-        code: CodeNode
-      }
-    }
   }
 
   onChange = ({ state }) => {
@@ -194,12 +191,18 @@ class App extends React.Component {
   render() {
     return (
       <Editor
-        schema={this.state.schema}
         state={this.state.state}
         onChange={this.onChange}
         onKeyDown={this.onKeyDown}
+        renderNode={this.renderNode}
       />
     )
+  }
+  
+  renderNode = (props) => {
+    switch (props.node.type) {
+      case 'code': return <CodeNode {...props} />
+    }
   }
 
 }

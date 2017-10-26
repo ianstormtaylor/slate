@@ -3,16 +3,22 @@
 import React from 'react'
 import h from '../../helpers/h'
 
-export const schema = {
-  nodes: {
-    code: (props) => {
-      return (
-        React.createElement('pre', props.attributes,
-          React.createElement('code', {}, props.children)
-        )
-      )
-    }
+function Code(props) {
+  return (
+    React.createElement('pre', props.attributes,
+      React.createElement('code', {}, props.children)
+    )
+  )
+}
+
+function renderNode(props) {
+  switch (props.node.type) {
+    case 'code': return Code(props)
   }
+}
+
+export const props = {
+  renderNode,
 }
 
 export const state = (

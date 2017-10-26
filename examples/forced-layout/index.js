@@ -6,6 +6,32 @@ import React from 'react'
 import initialState from './state.json'
 
 /**
+ * A simple schema to enforce the nodes in the Slate document.
+ *
+ * @type {Object}
+ */
+
+const schema = {
+  document: {
+    nodes: [
+      { types: ['title'], min: 1, max: 1 },
+      { types: ['paragraph'], min: 1 },
+    ],
+    normalize: (change, reason, { node, child, index }) => {
+      switch (reason) {
+        case 'child_type_invalid': {
+          return change.setNodeByKey(child.key, index == 0 ? 'title' : 'paragraph')
+        }
+        case 'child_required': {
+          const block = Block.create(index == 0 ? 'title' : 'paragraph')
+          return change.insertNodeByKey(node.key, index, block)
+        }
+      }
+    }
+  }
+}
+
+/**
  * The Forced Layout example.
  *
  * @type {Component}
@@ -21,65 +47,6 @@ class ForcedLayout extends React.Component {
 
   state = {
     state: State.fromJSON(initialState),
-    schema: {
-      nodes: {
-        title: props => <h2 {...props.attrs}>{props.children}</h2>,
-        paragraph: props => <p {...props.attrs}>{props.children}</p>,
-      },
-      rules: [
-        /* Rule that always makes the first block a title, normalizes by inserting one if no children, or setting the top to be a title */
-
-        {
-          match: (object) => {
-            return object.kind == 'document'
-          },
-          validate: (document) => {
-            return !document.nodes.size || document.nodes.first().type != 'title' ? document.nodes : null
-          },
-          normalize: (change, document, nodes) => {
-            if (!nodes.size) {
-              const title = Block.create({ type: 'title', data: {}})
-              change.insertNodeByKey(document.key, 0, title)
-              return
-            }
-
-            change.setNodeByKey(nodes.first().key, 'title')
-          }
-        },
-
-        /* Rule that only allows for one title, normalizes by making titles paragraphs */
-
-        {
-          match: (object) => {
-            return object.kind == 'document'
-          },
-          validate: (document) => {
-            const invalidChildren = document.nodes.filter((child, index) => child.type == 'title' && index != 0)
-            return invalidChildren.size ? invalidChildren : null
-          },
-          normalize: (change, document, invalidChildren) => {
-            invalidChildren.forEach((child) => {
-              change.setNodeByKey(child.key, 'paragraph')
-            })
-          }
-        },
-
-        /* Rule that forces at least one paragraph, normalizes by inserting an empty paragraph */
-
-        {
-          match: (object) => {
-            return object.kind == 'document'
-          },
-          validate: (document) => {
-            return document.nodes.size < 2 ? true : null
-          },
-          normalize: (change, document) => {
-            const paragraph = Block.create({ type: 'paragraph', data: {}})
-            change.insertNodeByKey(document.key, 1, paragraph)
-          }
-        }
-      ]
-    }
   }
 
   /**
@@ -100,13 +67,32 @@ class ForcedLayout extends React.Component {
 
   render() {
     return (
-      <Editor
-        placeholder="Enter a title..."
-        state={this.state.state}
-        schema={this.state.schema}
-        onChange={this.onChange}
-      />
+      <div className="editor">
+        <Editor
+          placeholder="Enter a title..."
+          state={this.state.state}
+          schema={schema}
+          onChange={this.onChange}
+          renderNode={this.renderNode}
+          validateNode={this.validateNode}
+        />
+      </div>
     )
+  }
+
+  /**
+   * Render a Slate node.
+   *
+   * @param {Object} props
+   * @return {Element}
+   */
+
+  renderNode = (props) => {
+    const { attributes, children, node } = props
+    switch (node.type) {
+      case 'title': return <h2 {...attributes}>{children}</h2>
+      case 'paragraph': return <p {...attributes}>{children}</p>
+    }
   }
 
 }

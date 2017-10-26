@@ -15,7 +15,7 @@ import { isKeyHotkey } from 'is-hotkey'
 const DEFAULT_NODE = 'paragraph'
 
 /**
- * Hotkey matchers.
+ * Define hotkey matchers.
  *
  * @type {Function}
  */
@@ -24,40 +24,6 @@ const isBoldHotkey = isKeyHotkey('mod+b')
 const isItalicHotkey = isKeyHotkey('mod+i')
 const isUnderlinedHotkey = isKeyHotkey('mod+u')
 const isCodeHotkey = isKeyHotkey('mod+`')
-
-/**
- * Define a schema.
- *
- * @type {Object}
- */
-
-const schema = {
-  nodes: {
-    'block-quote': props => <blockquote {...props.attributes}>{props.children}</blockquote>,
-    'bulleted-list': props => <ul {...props.attributes}>{props.children}</ul>,
-    'heading-one': props => <h1 {...props.attributes}>{props.children}</h1>,
-    'heading-two': props => <h2 {...props.attributes}>{props.children}</h2>,
-    'list-item': props => <li {...props.attributes}>{props.children}</li>,
-    'numbered-list': props => <ol {...props.attributes}>{props.children}</ol>,
-  },
-  marks: {
-    bold: {
-      fontWeight: 'bold'
-    },
-    code: {
-      fontFamily: 'monospace',
-      backgroundColor: '#eee',
-      padding: '3px',
-      borderRadius: '4px'
-    },
-    italic: {
-      fontStyle: 'italic'
-    },
-    underlined: {
-      textDecoration: 'underline'
-    }
-  }
-}
 
 /**
  * The rich text example.
@@ -296,14 +262,51 @@ class RichTextExample extends React.Component {
       <div className="editor">
         <Editor
           placeholder="Enter some rich text..."
-          schema={schema}
-          spellCheck
           state={this.state.state}
           onChange={this.onChange}
           onKeyDown={this.onKeyDown}
+          renderNode={this.renderNode}
+          renderMark={this.renderMark}
+          spellCheck
         />
       </div>
     )
+  }
+
+  /**
+   * Render a Slate node.
+   *
+   * @param {Object} props
+   * @return {Element}
+   */
+
+  renderNode = (props) => {
+    const { attributes, children, node } = props
+    switch (node.type) {
+      case 'block-quote': return <blockquote {...attributes}>{children}</blockquote>
+      case 'bulleted-list': return <ul {...attributes}>{children}</ul>
+      case 'heading-one': return <h1 {...attributes}>{children}</h1>
+      case 'heading-two': return <h2 {...attributes}>{children}</h2>
+      case 'list-item': return <li {...attributes}>{children}</li>
+      case 'numbered-list': return <ol {...attributes}>{children}</ol>
+    }
+  }
+
+  /**
+   * Render a Slate mark.
+   *
+   * @param {Object} props
+   * @return {Element}
+   */
+
+  renderMark = (props) => {
+    const { children, mark } = props
+    switch (mark.type) {
+      case 'bold': return <strong>{children}</strong>
+      case 'code': return <code>{children}</code>
+      case 'italic': return <em>{children}</em>
+      case 'underlined': return <u>{children}</u>
+    }
   }
 
 }

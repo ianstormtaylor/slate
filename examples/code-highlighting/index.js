@@ -47,94 +47,6 @@ function CodeBlockLine(props) {
 }
 
 /**
- * Define a Prism.js decorator for code blocks.
- *
- * @param {Block} block
- * @return {Array}
- */
-
-function codeBlockDecorator(block) {
-  const language = block.data.get('language')
-  const texts = block.getTexts().toArray()
-  const string = texts.map(t => t.text).join('\n')
-  const grammar = Prism.languages[language]
-  const tokens = Prism.tokenize(string, grammar)
-  const decorations = []
-  let startText = texts.shift()
-  let endText = startText
-  let startOffset = 0
-  let endOffset = 0
-  let start = 0
-
-  for (const token of tokens) {
-    startText = endText
-    startOffset = endOffset
-
-    const content = typeof token == 'string' ? token : token.content
-    const newlines = content.split('\n').length - 1
-    const length = content.length - newlines
-    const end = start + length
-
-    let available = startText.text.length - startOffset
-    let remaining = length
-
-    endOffset = startOffset + remaining
-
-    while (available < remaining) {
-      endText = texts.shift()
-      remaining = length - available
-      available = endText.text.length
-      endOffset = remaining
-    }
-
-    if (typeof token != 'string') {
-      const range = {
-        anchorKey: startText.key,
-        anchorOffset: startOffset,
-        focusKey: endText.key,
-        focusOffset: endOffset,
-        marks: [{ type: `highlight-${token.type}` }],
-      }
-
-      decorations.push(range)
-    }
-
-    start = end
-  }
-
-  return decorations
-}
-
-/**
- * Define a schema.
- *
- * @type {Object}
- */
-
-const schema = {
-  nodes: {
-    code: {
-      render: CodeBlock,
-      decorate: codeBlockDecorator,
-    },
-    code_line: {
-      render: CodeBlockLine,
-    },
-  },
-  marks: {
-    'highlight-comment': {
-      opacity: '0.33'
-    },
-    'highlight-keyword': {
-      fontWeight: 'bold'
-    },
-    'highlight-punctuation': {
-      opacity: '0.75'
-    }
-  }
-}
-
-/**
  * The code highlighting example.
  *
  * @type {Component}
@@ -186,18 +98,111 @@ class CodeHighlighting extends React.Component {
    * @return {Component}
    */
 
-  render() {
+  render = () => {
     return (
       <div className="editor">
         <Editor
           placeholder="Write some code..."
-          schema={schema}
           state={this.state.state}
-          onKeyDown={this.onKeyDown}
           onChange={this.onChange}
+          onKeyDown={this.onKeyDown}
+          renderNode={this.renderNode}
+          renderMark={this.renderMark}
+          decorateNode={this.decorateNode}
         />
       </div>
     )
+  }
+
+  /**
+   * Render a Slate node.
+   *
+   * @param {Object} props
+   * @return {Element}
+   */
+
+  renderNode = (props) => {
+    switch (props.node.type) {
+      case 'code': return <CodeBlock {...props} />
+      case 'code_line': return <CodeBlockLine {...props} />
+    }
+  }
+
+  /**
+   * Render a Slate mark.
+   *
+   * @param {Object} props
+   * @return {Element}
+   */
+
+  renderMark = (props) => {
+    const { children, mark } = props
+    switch (mark.type) {
+      case 'comment': return <span style={{ opacity: '0.33' }}>{children}</span>
+      case 'keyword': return <span style={{ fontWeight: 'bold' }}>{children}</span>
+      case 'punctuation': return <span style={{ opacity: '0.75' }}>{children}</span>
+    }
+  }
+
+  /**
+   * Decorate code blocks with Prism.js highlighting.
+   *
+   * @param {Node} node
+   * @return {Array}
+   */
+
+  decorateNode = (node) => {
+    if (node.type != 'code') return
+
+    const language = node.data.get('language')
+    const texts = node.getTexts().toArray()
+    const string = texts.map(t => t.text).join('\n')
+    const grammar = Prism.languages[language]
+    const tokens = Prism.tokenize(string, grammar)
+    const decorations = []
+    let startText = texts.shift()
+    let endText = startText
+    let startOffset = 0
+    let endOffset = 0
+    let start = 0
+
+    for (const token of tokens) {
+      startText = endText
+      startOffset = endOffset
+
+      const content = typeof token == 'string' ? token : token.content
+      const newlines = content.split('\n').length - 1
+      const length = content.length - newlines
+      const end = start + length
+
+      let available = startText.text.length - startOffset
+      let remaining = length
+
+      endOffset = startOffset + remaining
+
+      while (available < remaining) {
+        endText = texts.shift()
+        remaining = length - available
+        available = endText.text.length
+        endOffset = remaining
+      }
+
+      if (typeof token != 'string') {
+        const range = {
+          anchorKey: startText.key,
+          anchorOffset: startOffset,
+          focusKey: endText.key,
+          focusOffset: endOffset,
+          marks: [{ type: token.type }],
+        }
+
+        decorations.push(range)
+      }
+
+      start = end
+    }
+
+    return decorations
   }
 
 }

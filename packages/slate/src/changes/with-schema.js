@@ -1,8 +1,6 @@
 
 import { Set } from 'immutable'
 
-import Schema from '../models/schema'
-
 /**
  * Changes.
  *
@@ -12,45 +10,37 @@ import Schema from '../models/schema'
 const Changes = {}
 
 /**
- * Normalize the document and selection with a `schema`.
+ * Normalize the state with its schema.
  *
  * @param {Change} change
- * @param {Schema} schema
  */
 
-Changes.normalize = (change, schema) => {
-  change.normalizeDocument(schema)
+Changes.normalize = (change) => {
+  change.normalizeDocument()
 }
 
 /**
- * Normalize the document with a `schema`.
+ * Normalize the document with the state's schema.
  *
  * @param {Change} change
- * @param {Schema} schema
  */
 
-Changes.normalizeDocument = (change, schema) => {
+Changes.normalizeDocument = (change) => {
   const { state } = change
   const { document } = state
-  change.normalizeNodeByKey(document.key, schema)
+  change.normalizeNodeByKey(document.key)
 }
 
 /**
- * Normalize a `node` and its children with a `schema`.
+ * Normalize a `node` and its children with the state's schema.
  *
  * @param {Change} change
  * @param {Node|String} key
- * @param {Schema} schema
  */
 
-Changes.normalizeNodeByKey = (change, key, schema) => {
-  assertSchema(schema)
-
-  // If the schema has no validation rules, there's nothing to normalize.
-  if (!schema.hasValidators) return
-
+Changes.normalizeNodeByKey = (change, key) => {
   const { state } = change
-  const { document } = state
+  const { document, schema } = state
   const node = document.assertNode(key)
   normalizeNodeAndChildren(change, node, schema)
 }
@@ -139,20 +129,19 @@ function refindNode(change, node) {
  */
 
 function normalizeNode(change, node, schema) {
-  const max = schema.rules.length
+  const max = schema.stack.plugins.length + 1
   let iterations = 0
 
-  function iterate(t, n) {
-    const failure = n.validate(schema)
-    if (!failure) return
+  function iterate(c, n) {
+    const normalize = n.validate(schema)
+    if (!normalize) return
 
-    // Run the `normalize` function for the rule with the invalid value.
-    const { value, rule } = failure
-    rule.normalize(t, n, value)
+    // Run the `normalize` function to fix the node.
+    normalize(c)
 
     // Re-find the node reference, in case it was updated. If the node no longer
     // exists, we're done for this branch.
-    n = refindNode(t, n)
+    n = refindNode(c, n)
     if (!n) return
 
     // Increment the iterations counter, and check to make sure that we haven't
@@ -166,26 +155,10 @@ function normalizeNode(change, node, schema) {
     }
 
     // Otherwise, iterate again.
-    iterate(t, n)
+    iterate(c, n)
   }
 
   iterate(change, node)
-}
-
-/**
- * Assert that a `schema` exists.
- *
- * @param {Schema} schema
- */
-
-function assertSchema(schema) {
-  if (Schema.isSchema(schema)) {
-    return
-  } else if (schema == null) {
-    throw new Error('You must pass a `schema` object.')
-  } else {
-    throw new Error(`You passed an invalid \`schema\` object: ${schema}.`)
-  }
 }
 
 /**

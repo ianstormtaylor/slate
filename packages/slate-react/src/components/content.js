@@ -227,9 +227,16 @@ class Content extends React.Component {
       this.tmp.key++
     }
 
-    // If the `onSelect` handler fires while the `isUpdatingSelection` flag is
-    // set it's a result of updating the selection manually, so skip it.
-    if (handler == 'onSelect' && this.tmp.isUpdatingSelection) {
+    // Ignore `onBlur`, `onFocus` and `onSelect` events generated
+    // programmatically while updating selection.
+    if (
+      this.tmp.isUpdatingSelection &&
+      (
+        handler == 'onSelect' ||
+        handler == 'onBlur' ||
+        handler == 'onFocus'
+      )
+    ) {
       return
     }
 
@@ -427,7 +434,8 @@ class Content extends React.Component {
   renderNode = (child, isSelected) => {
     const { editor, readOnly, schema, state } = this.props
     const { document, decorations } = state
-    let decs = document.getDecorations(schema)
+    const stack = editor.getStack()
+    let decs = document.getDecorations(stack)
     if (decorations) decs = decorations.concat(decs)
     return (
       <Node
