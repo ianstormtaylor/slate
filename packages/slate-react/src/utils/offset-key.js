@@ -5,7 +5,7 @@
  * @type {RegExp}
  */
 
-const PARSER = /^(\w+)(?:-(\d+))?$/
+const PARSER = /^(\w+)(?::(\d+))?$/
 
 /**
  * Parse an offset key `string`.
@@ -34,7 +34,7 @@ function parse(string) {
  */
 
 function stringify(object) {
-  return `${object.key}-${object.index}`
+  return `${object.key}:${object.index}`
 }
 
 /**
