@@ -40,9 +40,18 @@ Changes.normalizeDocument = (change) => {
 
 Changes.normalizeNodeByKey = (change, key) => {
   const { state } = change
-  const { document, schema } = state
+  let { document, schema } = state
   const node = document.assertNode(key)
+
   normalizeNodeAndChildren(change, node, schema)
+
+  document = change.state.document
+  const ancestors = document.getAncestors(key)
+  if (!ancestors) return
+
+  ancestors.forEach((ancestor) => {
+    normalizeNode(change, ancestor, schema)
+  })
 }
 
 /**
