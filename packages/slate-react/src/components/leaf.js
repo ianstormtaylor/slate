@@ -123,7 +123,8 @@ class Leaf extends React.Component {
     const { block, node, parent, text, index, leaves } = this.props
 
     // COMPAT: If the text is empty and it's the only child, we need to render
-    // an invisible unicode char to get the block to have the proper height.
+    // a word-joiner character which will prevent line break on its either side
+    // and is invisible to get the block to have the proper height.
     if (text == '' && parent.kind == 'block' && parent.text == '') {
       return '\u2060'
     }
