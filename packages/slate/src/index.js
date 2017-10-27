@@ -16,6 +16,7 @@ import Selection from './models/selection'
 import Stack from './models/stack'
 import State from './models/state'
 import Text from './models/text'
+import Value from './models/value'
 import { resetKeyGenerator, setKeyGenerator } from './utils/generate-key'
 
 /**
@@ -42,6 +43,7 @@ export {
   Stack,
   State,
   Text,
+  Value,
   resetKeyGenerator,
   setKeyGenerator,
 }
@@ -64,6 +66,7 @@ export default {
   Stack,
   State,
   Text,
+  Value,
   resetKeyGenerator,
   setKeyGenerator,
 }

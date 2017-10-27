@@ -58,19 +58,19 @@ class Text extends Record(DEFAULTS) {
   }
 
   /**
-   * Create a list of `Texts` from a `value`.
+   * Create a list of `Texts` from `elements`.
    *
-   * @param {Array<Text|Object>|List<Text|Object>} value
+   * @param {Array<Text|Object>|List<Text|Object>} elements
    * @return {List<Text>}
    */
 
-  static createList(value = []) {
-    if (List.isList(value) || Array.isArray(value)) {
-      const list = new List(value.map(Text.create))
+  static createList(elements = []) {
+    if (List.isList(elements) || Array.isArray(elements)) {
+      const list = new List(elements.map(Text.create))
       return list
     }
 
-    throw new Error(`\`Text.createList\` only accepts arrays or lists, but you passed it: ${value}`)
+    throw new Error(`\`Text.createList\` only accepts arrays or lists, but you passed it: ${elements}`)
   }
 
   /**
@@ -119,25 +119,25 @@ class Text extends Record(DEFAULTS) {
   static fromJS = Text.fromJSON
 
   /**
-   * Check if a `value` is a `Text`.
+   * Check if `any` is a `Text`.
    *
-   * @param {Any} value
+   * @param {Any} any
    * @return {Boolean}
    */
 
-  static isText(value) {
-    return !!(value && value[MODEL_TYPES.TEXT])
+  static isText(any) {
+    return !!(any && any[MODEL_TYPES.TEXT])
   }
 
   /**
-   * Check if a `value` is a list of texts.
+   * Check if `any` is a list of texts.
    *
-   * @param {Any} value
+   * @param {Any} any
    * @return {Boolean}
    */
 
-  static isTextList(value) {
-    return List.isList(value) && value.every(item => Text.isText(item))
+  static isTextList(any) {
+    return List.isList(any) && any.every(item => Text.isText(item))
   }
 
   /**

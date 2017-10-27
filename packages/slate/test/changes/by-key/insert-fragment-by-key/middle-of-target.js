@@ -16,7 +16,7 @@ export default function (change) {
 }
 
 export const input = (
-  <state>
+  <value>
     <document key="a">
       <paragraph>
         word
@@ -25,11 +25,11 @@ export const input = (
         another
       </paragraph>
     </document>
-  </state>
+  </value>
 )
 
 export const output = (
-  <state>
+  <value>
     <document>
       <paragraph>
         word
@@ -44,5 +44,5 @@ export const output = (
         another
       </paragraph>
     </document>
-  </state>
+  </value>
 )

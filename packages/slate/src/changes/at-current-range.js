@@ -36,8 +36,8 @@ const PROXY_TRANSFORMS = [
 
 PROXY_TRANSFORMS.forEach((method) => {
   Changes[method] = (change, ...args) => {
-    const { state } = change
-    const { selection } = state
+    const { value } = change
+    const { selection } = value
     const methodAtRange = `${method}AtRange`
     change[methodAtRange](selection, ...args)
   }
@@ -52,8 +52,8 @@ PROXY_TRANSFORMS.forEach((method) => {
 
 Changes.addMark = (change, mark) => {
   mark = Mark.create(mark)
-  const { state } = change
-  const { document, selection } = state
+  const { value } = change
+  const { document, selection } = value
 
   if (selection.isExpanded) {
     change.addMarkAtRange(selection, mark)
@@ -79,8 +79,8 @@ Changes.addMark = (change, mark) => {
  */
 
 Changes.delete = (change) => {
-  const { state } = change
-  const { selection } = state
+  const { value } = change
+  const { selection } = value
   change.deleteAtRange(selection)
 
   // Ensure that the selection is collapsed to the start, because in certain
@@ -98,12 +98,12 @@ Changes.delete = (change) => {
 
 Changes.insertBlock = (change, block) => {
   block = Block.create(block)
-  const { state } = change
-  const { selection } = state
+  const { value } = change
+  const { selection } = value
   change.insertBlockAtRange(selection, block)
 
   // If the node was successfully inserted, update the selection.
-  const node = change.state.document.getNode(block.key)
+  const node = change.value.document.getNode(block.key)
   if (node) change.collapseToEndOf(node)
 }
 
@@ -117,9 +117,9 @@ Changes.insertBlock = (change, block) => {
 Changes.insertFragment = (change, fragment) => {
   if (!fragment.nodes.size) return
 
-  let { state } = change
-  let { document, selection } = state
-  const { startText, endText, startInline } = state
+  let { value } = change
+  let { document, selection } = value
+  const { startText, endText, startInline } = value
   const lastText = fragment.getLastText()
   const lastInline = fragment.getClosestInline(lastText.key)
   const keys = document.getTexts().map(text => text.key)
@@ -130,8 +130,8 @@ Changes.insertFragment = (change, fragment) => {
   )
 
   change.insertFragmentAtRange(selection, fragment)
-  state = change.state
-  document = state.document
+  value = change.value
+  document = value.document
 
   const newTexts = document.getTexts().filter(n => !keys.includes(n.key))
   const newText = isAppending ? newTexts.last() : newTexts.takeLast(2).first()
@@ -158,12 +158,12 @@ Changes.insertFragment = (change, fragment) => {
 
 Changes.insertInline = (change, inline) => {
   inline = Inline.create(inline)
-  const { state } = change
-  const { selection } = state
+  const { value } = change
+  const { selection } = value
   change.insertInlineAtRange(selection, inline)
 
   // If the node was successfully inserted, update the selection.
-  const node = change.state.document.getNode(inline.key)
+  const node = change.value.document.getNode(inline.key)
   if (node) change.collapseToEndOf(node)
 }
 
@@ -176,14 +176,14 @@ Changes.insertInline = (change, inline) => {
  */
 
 Changes.insertText = (change, text, marks) => {
-  const { state } = change
-  const { document, selection } = state
+  const { value } = change
+  const { document, selection } = value
   marks = marks || selection.marks
   change.insertTextAtRange(selection, text, marks)
 
   // If the text was successfully inserted, and the selection had marks on it,
   // unset the selection's marks.
-  if (selection.marks && document != change.state.document) {
+  if (selection.marks && document != change.value.document) {
     change.select({ marks: null })
   }
 }
@@ -196,8 +196,8 @@ Changes.insertText = (change, text, marks) => {
  */
 
 Changes.splitBlock = (change, depth = 1) => {
-  const { state } = change
-  const { selection } = state
+  const { value } = change
+  const { selection } = value
   change
     .splitBlockAtRange(selection, depth)
     .collapseToEnd()
@@ -212,8 +212,8 @@ Changes.splitBlock = (change, depth = 1) => {
 
 Changes.removeMark = (change, mark) => {
   mark = Mark.create(mark)
-  const { state } = change
-  const { document, selection } = state
+  const { value } = change
+  const { document, selection } = value
 
   if (selection.isExpanded) {
     change.removeMarkAtRange(selection, mark)
@@ -242,8 +242,8 @@ Changes.removeMark = (change, mark) => {
 
 Changes.toggleMark = (change, mark) => {
   mark = Mark.create(mark)
-  const { state } = change
-  const exists = state.activeMarks.has(mark)
+  const { value } = change
+  const exists = value.activeMarks.has(mark)
 
   if (exists) {
     change.removeMark(mark)
@@ -261,8 +261,8 @@ Changes.toggleMark = (change, mark) => {
  */
 
 Changes.wrapText = (change, prefix, suffix = prefix) => {
-  const { state } = change
-  const { selection } = state
+  const { value } = change
+  const { selection } = value
   change.wrapTextAtRange(selection, prefix, suffix)
 
   // If the selection was collapsed, it will have moved the start offset too.
@@ -276,7 +276,7 @@ Changes.wrapText = (change, prefix, suffix = prefix) => {
 
   // There's a chance that the selection points moved "through" each other,
   // resulting in a now-incorrect selection direction.
-  if (selection.isForward != change.state.selection.isForward) {
+  if (selection.isForward != change.value.selection.isForward) {
     change.flip()
   }
 }

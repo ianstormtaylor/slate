@@ -15,17 +15,17 @@ import { Editor } from 'slate-react'
 class App extends React.Component {
 
   state = {
-    state: Plain.deserialize('')
+    value: Plain.deserialize('')
   }
 
-  onChange({ state }) {
-    this.setState({ state })
+  onChange({ value }) {
+    this.setState({ value })
   }
 
   render() {
     return (
       <Editor
-        state={this.state.state}
+        value={this.state.value}
         onChange={this.onChange}
       />
     )
@@ -209,8 +209,8 @@ const html = new Html({ rules })
 And finally, now that we have our serializer initialized, we can update our app to use it to save and load content, like so:
 
 ```js
-// Load the initial state from Local Storage or a default.
-const initialState = (
+// Load the initial value from Local Storage or a default.
+const initialValue = (
   localStorage.getItem('content') ||
   '<p></p>'
 )
@@ -218,23 +218,23 @@ const initialState = (
 class App extends React.Component {
 
   state = {
-    state: html.deserialize(initialState),
+    value: html.deserialize(initialValue),
   }
 
-  onChange = ({ state }) => {
+  onChange = ({ value }) => {
     // When the document changes, save the serialized HTML to Local Storage.
-    if (state.document != this.state.state.document) {
-      const string = html.serialize(state)
+    if (value.document != this.state.value.document) {
+      const string = html.serialize(value)
       localStorage.setItem('content', string)
     }
 
-    this.setState({ state })
+    this.setState({ value })
   }
 
   render() {
     return (
       <Editor
-        state={this.state.state}
+        value={this.state.value}
         onChange={this.onChange}
         // Add the ability to render our nodes and marks...
         renderNode={this.renderNode}

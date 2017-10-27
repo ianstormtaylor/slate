@@ -2,24 +2,24 @@
 
 import h from '../../helpers/h'
 
-export default function (state) {
-  return state
+export default function (value) {
+  return value
     .change()
     .removeNodeByKey('a')
-    .state
+    .value
     .change()
     .undo()
-    .state
+    .value
 }
 
 export const input = (
-  <state>
+  <value>
     <document>
       <paragraph key="a">
         one
       </paragraph>
     </document>
-  </state>
+  </value>
 )
 
 export const output = input

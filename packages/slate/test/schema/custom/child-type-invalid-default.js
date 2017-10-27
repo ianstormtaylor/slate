@@ -14,17 +14,17 @@ export const schema = {
 }
 
 export const input = (
-  <state>
+  <value>
     <document>
       <quote>
         <image />
       </quote>
     </document>
-  </state>
+  </value>
 )
 
 export const output = (
-  <state>
+  <value>
     <document />
-  </state>
+  </value>
 )

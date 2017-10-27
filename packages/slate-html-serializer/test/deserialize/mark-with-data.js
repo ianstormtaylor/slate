@@ -34,11 +34,11 @@ export const input = `
 `.trim()
 
 export const output = (
-  <state>
+  <value>
     <document>
       <paragraph>
         on<b thing="value">e</b>
       </paragraph>
     </document>
-  </state>
+  </value>
 )

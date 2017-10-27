@@ -1,7 +1,6 @@
 
 import Debug from 'debug'
 import React from 'react'
-import SlateTypes from 'slate-prop-types'
 import Types from 'prop-types'
 import getWindow from 'get-window'
 import logger from 'slate-dev-logger'
@@ -43,9 +42,7 @@ class Content extends React.Component {
     editor: Types.object.isRequired,
     readOnly: Types.bool.isRequired,
     role: Types.string,
-    schema: SlateTypes.schema.isRequired,
     spellCheck: Types.bool.isRequired,
-    state: SlateTypes.state.isRequired,
     style: Types.object,
     tabIndex: Types.number,
     tagName: Types.string,
@@ -124,8 +121,9 @@ class Content extends React.Component {
    */
 
   updateSelection = () => {
-    const { state } = this.props
-    const { selection } = state
+    const { editor } = this.props
+    const { value } = editor
+    const { selection } = value
     const window = getWindow(this.element)
     const native = window.getSelection()
     const { rangeCount } = native
@@ -246,11 +244,12 @@ class Content extends React.Component {
     // already up to date, but we do want to update the native selection again
     // to make sure it is in sync. (2017/10/16)
     if (handler == 'onSelect') {
-      const { state } = this.props
-      const { selection } = state
+      const { editor } = this.props
+      const { value } = editor
+      const { selection } = value
       const window = getWindow(event.target)
       const native = window.getSelection()
-      const range = findRange(native, state)
+      const range = findRange(native, value)
 
       if (range && range.equals(selection)) {
         this.updateSelection()
@@ -323,16 +322,17 @@ class Content extends React.Component {
 
     event.preventDefault()
 
-    const { editor, state } = this.props
-    const { selection } = state
-    const range = findRange(targetRange, state)
+    const { editor } = this.props
+    const { value } = editor
+    const { selection } = value
+    const range = findRange(targetRange, value)
 
     editor.change((change) => {
       change.insertTextAtRange(range, text, selection.marks)
 
       // If the text was successfully inserted, and the selection had marks on it,
       // unset the selection's marks.
-      if (selection.marks && state.document != change.state.document) {
+      if (selection.marks && value.document != change.value.document) {
         change.select({ marks: null })
       }
     })
@@ -346,9 +346,10 @@ class Content extends React.Component {
 
   render() {
     const { props } = this
-    const { className, readOnly, state, tabIndex, role, tagName } = props
+    const { className, readOnly, editor, tabIndex, role, tagName } = props
+    const { value } = editor
     const Container = tagName
-    const { document, selection } = state
+    const { document, selection } = value
     const indexes = document.getSelectionIndexes(selection, selection.isFocused)
     const children = document.nodes.toArray().map((child, i) => {
       const isSelected = !!indexes && indexes.start <= i && i < indexes.end
@@ -368,7 +369,7 @@ class Content extends React.Component {
       // Allow words to break if they are too long.
       wordWrap: 'break-word',
       // COMPAT: In iOS, a formatting menu with bold, italic and underline
-      // buttons is shown which causes our internal state to get out of sync in
+      // buttons is shown which causes our internal value to get out of sync in
       // weird ways. This hides that. (2016/06/21)
       ...(readOnly ? {} : { WebkitUserModify: 'read-write-plaintext-only' }),
       // Allow for passed-in styles to override anything.
@@ -377,7 +378,7 @@ class Content extends React.Component {
 
     // COMPAT: In Firefox, spellchecking can remove entire wrapping elements
     // including inline ones like `<a>`, which is jarring for the user but also
-    // causes the DOM to get into an irreconcilable state. (2016/09/01)
+    // causes the DOM to get into an irreconcilable value. (2016/09/01)
     const spellCheck = IS_FIREFOX ? false : props.spellCheck
 
     debug('render', { props })
@@ -432,9 +433,10 @@ class Content extends React.Component {
    */
 
   renderNode = (child, isSelected) => {
-    const { editor, readOnly, schema, state } = this.props
-    const { document, decorations } = state
-    const stack = editor.getStack()
+    const { editor, readOnly } = this.props
+    const { value } = editor
+    const { document, decorations } = value
+    const { stack } = editor
     let decs = document.getDecorations(stack)
     if (decorations) decs = decorations.concat(decs)
     return (
@@ -447,8 +449,6 @@ class Content extends React.Component {
         node={child}
         parent={document}
         readOnly={readOnly}
-        schema={schema}
-        state={state}
       />
     )
   }

@@ -5,17 +5,17 @@ import h from '../../helpers/h'
 export const schema = {}
 
 export const input = (
-  <state>
+  <value>
     <document>
       <paragraph>
         <link />
       </paragraph>
     </document>
-  </state>
+  </value>
 )
 
 export const output = {
-  kind: 'state',
+  kind: 'value',
   document: {
     kind: 'document',
     data: {},

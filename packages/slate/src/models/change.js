@@ -24,26 +24,26 @@ const debug = Debug('slate:change')
 class Change {
 
   /**
-   * Check if a `value` is a `Change`.
+   * Check if `any` is a `Change`.
    *
-   * @param {Any} value
+   * @param {Any} any
    * @return {Boolean}
    */
 
-  static isChange(value) {
-    return !!(value && value[MODEL_TYPES.CHANGE])
+  static isChange(any) {
+    return !!(any && any[MODEL_TYPES.CHANGE])
   }
 
   /**
    * Create a new `Change` with `attrs`.
    *
    * @param {Object} attrs
-   *   @property {State} state
+   *   @property {Value} value
    */
 
   constructor(attrs) {
-    const { state } = attrs
-    this.state = state
+    const { value } = attrs
+    this.value = value
     this.operations = []
     this.flags = pick(attrs, ['merge', 'save'])
   }
@@ -59,7 +59,7 @@ class Change {
   }
 
   /**
-   * Apply an `operation` to the current state, saving the operation to the
+   * Apply an `operation` to the current value, saving the operation to the
    * history if needed.
    *
    * @param {Object} operation
@@ -69,8 +69,8 @@ class Change {
 
   applyOperation(operation, options = {}) {
     const { operations, flags } = this
-    let { state } = this
-    let { history } = state
+    let { value } = this
+    let { history } = value
 
     // Default options to the change-level flags, this allows for setting
     // specific options for all of the operations of a given change.
@@ -83,24 +83,24 @@ class Change {
       skip = null,
     } = options
 
-    // Apply the operation to the state.
+    // Apply the operation to the value.
     debug('apply', { operation, save, merge })
-    state = apply(state, operation)
+    value = apply(value, operation)
 
     // If needed, save the operation to the history.
     if (history && save) {
       history = history.save(operation, { merge, skip })
-      state = state.set('history', history)
+      value = value.set('history', history)
     }
 
     // Update the mutable change object.
-    this.state = state
+    this.value = value
     this.operations.push(operation)
     return this
   }
 
   /**
-   * Apply a series of `operations` to the current state.
+   * Apply a series of `operations` to the current value.
    *
    * @param {Array} operations
    * @param {Object} options
@@ -152,13 +152,16 @@ class Change {
 
   /**
    * Deprecated.
-   *
-   * @return {State}
    */
 
+  get state() {
+    logger.deprecate('0.29.0', 'The `change.state` property has been renamed to `change.value`.')
+    return this.value
+  }
+
   apply(options = {}) {
-    logger.deprecate('0.22.0', 'The `change.apply()` method is deprecrated and no longer necessary, as all operations are applied immediately when invoked. You can access the change\'s state, which is already pre-computed, directly via `change.state` instead.')
-    return this.state
+    logger.deprecate('0.22.0', 'The `change.apply()` method is deprecrated and no longer necessary, as all operations are applied immediately when invoked. You can access the change\'s value, which is already pre-computed, directly via `change.value` instead.')
+    return this.value
   }
 
 }
@@ -182,7 +185,7 @@ Object.keys(Changes).forEach((type) => {
 })
 
 /**
- * Add deprecation warnings in case people try to access a change as a state.
+ * Add deprecation warnings in case people try to access a change as a value.
  */
 
 ;[
@@ -224,14 +227,14 @@ Object.keys(Changes).forEach((type) => {
 ].forEach((getter) => {
   Object.defineProperty(Change.prototype, getter, {
     get() {
-      logger.deprecate('0.22.0', `You attempted to access the \`${getter}\` property of what was previously a \`state\` object but is now a \`change\` object. This syntax has been deprecated as plugins are now passed \`change\` objects instead of \`state\` objects.`)
-      return this.state[getter]
+      logger.deprecate('0.22.0', `You attempted to access the \`${getter}\` property of what was previously a \`value\` object but is now a \`change\` object. This syntax has been deprecated as plugins are now passed \`change\` objects instead of \`value\` objects.`)
+      return this.value[getter]
     }
   })
 })
 
 Change.prototype.transform = function () {
-  logger.deprecate('0.22.0', 'You attempted to call `.transform()` on what was previously a `state` object but is now already a `change` object. This syntax has been deprecated as plugins are now passed `change` objects instead of `state` objects.')
+  logger.deprecate('0.22.0', 'You attempted to call `.transform()` on what was previously a `value` object but is now already a `change` object. This syntax has been deprecated as plugins are now passed `change` objects instead of `value` objects.')
   return this
 }
 

@@ -5,16 +5,16 @@
 import { Change } from 'slate'
 ```
 
-A change allows you to define a series of changes you'd like to make to the current [`State`](./state.md).
+A change allows you to define a series of changes you'd like to make to the current [`Value`](./value.md).
 
 All changes are performed through `Change` objects, so that a history of changes can be preserved for use in undo/redo operations, and to make collaborative editing possible.
 
 
 ## Properties
 
-### `state`
+### `value`
 
-A [`State`](./state.md) with the change's current operations applied. Each time you run a new change function this property will be updated.
+A [`Value`](./value.md) with the change's current operations applied. Each time you run a new change function this property will be updated.
 
 
 ## Methods
@@ -46,7 +46,7 @@ function onSomeEvent(event, change) {
 ```
 
 
-## Current State Changes
+## Current Value Changes
 
 These changes act on the `document` based on the current `selection`. They are equivalent to calling the [Document Changes](#document-changes) with the current selection as the `range` argument, but they are there for convenience, since you often want to act with the current selection, as a user would.
 

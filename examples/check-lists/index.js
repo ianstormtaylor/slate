@@ -1,9 +1,9 @@
 
 import { Editor } from 'slate-react'
-import { State } from 'slate'
+import { Value } from 'slate'
 
 import React from 'react'
-import initialState from './state.json'
+import initialValue from './value.json'
 
 /**
  * Check list item.
@@ -66,23 +66,23 @@ class CheckListItem extends React.Component {
 class CheckLists extends React.Component {
 
   /**
-   * Deserialize the initial editor state.
+   * Deserialize the initial editor value.
    *
    * @type {Object}
    */
 
   state = {
-    state: State.fromJSON(initialState)
+    value: Value.fromJSON(initialValue)
   }
 
   /**
-   * On change, save the new state.
+   * On change, save the new value.
    *
    * @param {Change} change
    */
 
-  onChange = ({ state }) => {
-    this.setState({ state })
+  onChange = ({ value }) => {
+    this.setState({ value })
   }
 
   /**
@@ -96,15 +96,15 @@ class CheckLists extends React.Component {
    *
    * @param {Event} event
    * @param {Change} change
-   * @return {State|Void}
+   * @return {Value|Void}
    */
 
   onKeyDown = (event, change) => {
-    const { state } = change
+    const { value } = change
 
     if (
       event.key == 'Enter' &&
-      state.startBlock.type == 'check-list-item'
+      value.startBlock.type == 'check-list-item'
     ) {
       change.splitBlock().setBlock({ data: { checked: false }})
       return true
@@ -112,9 +112,9 @@ class CheckLists extends React.Component {
 
     if (
       event.key == 'Backspace' &&
-      state.isCollapsed &&
-      state.startBlock.type == 'check-list-item' &&
-      state.selection.startOffset == 0
+      value.isCollapsed &&
+      value.startBlock.type == 'check-list-item' &&
+      value.selection.startOffset == 0
     ) {
       change.setBlock('paragraph')
       return true
@@ -134,7 +134,7 @@ class CheckLists extends React.Component {
           <Editor
             spellCheck
             placeholder="Get to work..."
-            state={this.state.state}
+            value={this.state.value}
             onChange={this.onChange}
             onKeyDown={this.onKeyDown}
             renderNode={this.renderNode}

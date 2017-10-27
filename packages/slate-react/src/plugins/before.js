@@ -61,7 +61,7 @@ function BeforePlugin() {
     if (isCopying) return true
     if (editor.props.readOnly) return true
 
-    const { state } = change
+    const { value } = change
     const focusTarget = event.relatedTarget
 
     // If focusTarget is null, the blur event is due to the window itself being
@@ -82,7 +82,7 @@ function BeforePlugin() {
     // (eg. a list item of the check list example).
     if (
       el.contains(focusTarget) &&
-      !findNode(focusTarget, state).isVoid
+      !findNode(focusTarget, value).isVoid
     ) {
       return true
     }
@@ -98,13 +98,13 @@ function BeforePlugin() {
    */
 
   function onChange(change, editor) {
-    const { state } = change
-    const schema = editor.getSchema()
+    const { value } = change
 
-    // If the state's schema isn't the editor's schema, update it.
-    if (state.schema != schema) {
+    // If the value's schema isn't the editor's schema, update it. This can
+    // happen on the initialization of the editor, or if the schema changes.
+    if (value.schema != editor.schema) {
       change
-        .setState({ schema })
+        .setValue({ schema: editor.schema })
         .normalize()
     }
 
@@ -282,7 +282,7 @@ function BeforePlugin() {
     // Nothing happens in read-only mode.
     if (editor.props.readOnly) return true
 
-    // Prevent default so the DOM's state isn't corrupted.
+    // Prevent default so the DOM's value isn't corrupted.
     event.preventDefault()
 
     debug('onDrop', { event })
@@ -323,7 +323,7 @@ function BeforePlugin() {
 
   function onInput(event, change, editor) {
     if (isComposing) return true
-    if (change.state.isBlurred) return true
+    if (change.value.isBlurred) return true
 
     debug('onInput', { event })
   }
@@ -348,7 +348,7 @@ function BeforePlugin() {
     }
 
     // Certain hotkeys have native behavior in contenteditable elements which
-    // will cause our state to be out of sync, so prevent them.
+    // will cause our value to be out of sync, so prevent them.
     if (HOTKEYS.CONTENTEDITABLE(event)) {
       event.preventDefault()
     }

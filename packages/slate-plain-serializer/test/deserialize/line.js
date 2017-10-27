@@ -7,11 +7,11 @@ one
 `.trim()
 
 export const output = (
-  <state>
+  <value>
     <document>
       <line>
         one
       </line>
     </document>
-  </state>
+  </value>
 )

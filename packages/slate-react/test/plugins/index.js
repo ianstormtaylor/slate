@@ -27,10 +27,10 @@ describe('plugins', () => {
             const { input, output, props = {}} = module
             const fn = module.default
             const plugins = [BeforePlugin(props), AfterPlugin(props)]
-            const simulator = new Simulator({ plugins, state: input })
+            const simulator = new Simulator({ plugins, value: input })
             fn(simulator)
 
-            const actual = simulator.state.toJSON({ preserveSelection: true })
+            const actual = simulator.value.toJSON({ preserveSelection: true })
             const expected = output.toJSON({ preserveSelection: true })
             assert.deepEqual(actual, expected)
           })

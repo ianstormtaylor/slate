@@ -2,18 +2,18 @@
 
 import h from '../../helpers/h'
 
-export default function (state) {
-  return state
+export default function (value) {
+  return value
     .change()
     .moveNodeByKey('b', 'a', 1)
-    .state
+    .value
     .change()
     .undo()
-    .state
+    .value
 }
 
 export const input = (
-  <state>
+  <value>
     <document key="a">
       <paragraph key="b">
         one
@@ -22,7 +22,7 @@ export const input = (
         two
       </paragraph>
     </document>
-  </state>
+  </value>
 )
 
 export const output = input

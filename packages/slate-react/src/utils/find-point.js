@@ -19,11 +19,11 @@ const VOID_SELECTOR = '[data-slate-void]'
  *
  * @param {Element} nativeNode
  * @param {Number} nativeOffset
- * @param {State} state
+ * @param {Value} value
  * @return {Object}
  */
 
-function findPoint(nativeNode, nativeOffset, state) {
+function findPoint(nativeNode, nativeOffset, value) {
   const {
     node: nearestNode,
     offset: nearestOffset,
@@ -71,7 +71,7 @@ function findPoint(nativeNode, nativeOffset, state) {
   // COMPAT: If someone is clicking from one Slate editor into another, the
   // select event fires twice, once for the old editor's `element` first, and
   // then afterwards for the correct `element`. (2017/03/03)
-  if (!state.document.hasDescendant(key)) return null
+  if (!value.document.hasDescendant(key)) return null
 
   return {
     key,

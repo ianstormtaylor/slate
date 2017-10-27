@@ -29,14 +29,14 @@ export const props = {
   renderMark,
 }
 
-export const state = (
-  <state>
+export const value = (
+  <value>
     <document>
       <paragraph>
         one
       </paragraph>
     </document>
-  </state>
+  </value>
 )
 
 export const output = `

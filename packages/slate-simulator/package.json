@@ -6,7 +6,8 @@
   "repository": "git://github.com/ianstormtaylor/slate.git",
   "main": "./lib/index.js",
   "peerDependencies": {
-    "slate": "^0.28.2"
+    "slate": "^0.28.2",
+    "slate-dev-logger": "^0.1.23"
   },
   "devDependencies": {
     "babel-cli": "^6.10.1",

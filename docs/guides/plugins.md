@@ -22,7 +22,7 @@ Here's a really simple plugin:
     }
   },
   onClick(event, change, editor) {
-    if (change.state.isBlurred) {
+    if (change.value.isBlurred) {
       change.selectAll().focus()
     }
   }  

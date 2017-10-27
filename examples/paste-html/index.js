@@ -1,10 +1,10 @@
 
 import Html from 'slate-html-serializer'
 import { Editor, getEventTransfer } from 'slate-react'
-import { State } from 'slate'
+import { Value } from 'slate'
 
 import React from 'react'
-import initialState from './state.json'
+import initialValue from './value.json'
 
 /**
  * Tags to blocks.
@@ -119,23 +119,23 @@ const serializer = new Html({ rules: RULES })
 class PasteHtml extends React.Component {
 
   /**
-   * Deserialize the raw initial state.
+   * Deserialize the raw initial value.
    *
    * @type {Object}
    */
 
   state = {
-    state: State.fromJSON(initialState)
+    value: Value.fromJSON(initialValue)
   }
 
   /**
-   * On change, save the new state.
+   * On change, save the new value.
    *
    * @param {Change} change
    */
 
-  onChange = ({ state }) => {
-    this.setState({ state })
+  onChange = ({ value }) => {
+    this.setState({ value })
   }
 
   /**
@@ -164,7 +164,7 @@ class PasteHtml extends React.Component {
       <div className="editor">
         <Editor
           placeholder="Paste in some HTML..."
-          state={this.state.state}
+          value={this.state.value}
           onPaste={this.onPaste}
           onChange={this.onChange}
           renderNode={this.renderNode}

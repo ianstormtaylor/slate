@@ -7,7 +7,7 @@ export default function (change) {
 }
 
 export const input = (
-  <state>
+  <value>
     <document>
       <paragraph>
         on<anchor />e<focus />
@@ -17,11 +17,11 @@ export const input = (
         three
       </paragraph>
     </document>
-  </state>
+  </value>
 )
 
 export const output = (
-  <state>
+  <value>
     <document>
       <paragraph>
         on<cursor />
@@ -31,5 +31,5 @@ export const output = (
         three
       </paragraph>
     </document>
-  </state>
+  </value>
 )

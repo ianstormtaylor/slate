@@ -13,13 +13,13 @@ import React from 'react'
 class ReadOnly extends React.Component {
 
   /**
-   * Deserialize the initial editor state.
+   * Deserialize the initial editor value.
    *
    * @type {Object}
    */
 
   state = {
-    state: Plain.deserialize('This is read-only text. You should not be able to edit it, which is useful for scenarios where you want to render via Slate, without giving the user editing permissions.')
+    value: Plain.deserialize('This is read-only text. You should not be able to edit it, which is useful for scenarios where you want to render via Slate, without giving the user editing permissions.')
   }
 
   /**
@@ -28,8 +28,8 @@ class ReadOnly extends React.Component {
    * @param {Change} change
    */
 
-  onChange = ({ state }) => {
-    this.setState({ state })
+  onChange = ({ value }) => {
+    this.setState({ value })
   }
 
   /**
@@ -44,7 +44,7 @@ class ReadOnly extends React.Component {
         <Editor
           readOnly
           placeholder="Enter some text..."
-          state={this.state.state}
+          value={this.state.value}
           onChange={this.onChange}
         />
       </div>

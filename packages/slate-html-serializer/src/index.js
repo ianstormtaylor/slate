@@ -3,7 +3,7 @@ import React from 'react'
 import ReactDOMServer from 'react-dom/server'
 import logger from 'slate-dev-logger'
 import typeOf from 'type-of'
-import { Node, State } from 'slate'
+import { Node, Value } from 'slate'
 import { Record } from 'immutable'
 
 /**
@@ -123,7 +123,7 @@ class Html {
    * @param {String} html
    * @param {Object} options
    *   @property {Boolean} toRaw
-   * @return {State}
+   * @return {Value}
    */
 
   deserialize = (html, options = {}) => {
@@ -187,7 +187,7 @@ class Html {
     }
 
     const json = {
-      kind: 'state',
+      kind: 'value',
       document: {
         kind: 'document',
         data: {},
@@ -195,7 +195,7 @@ class Html {
       }
     }
 
-    const ret = toJSON ? json : State.fromJSON(json)
+    const ret = toJSON ? json : Value.fromJSON(json)
     return ret
   }
 
@@ -320,16 +320,16 @@ class Html {
   }
 
   /**
-   * Serialize a `state` object into an HTML string.
+   * Serialize a `value` object into an HTML string.
    *
-   * @param {State} state
+   * @param {Value} value
    * @param {Object} options
    *   @property {Boolean} render
    * @return {String|Array}
    */
 
-  serialize = (state, options = {}) => {
-    const { document } = state
+  serialize = (value, options = {}) => {
+    const { document } = value
     const elements = document.nodes.map(this.serializeNode)
     if (options.render === false) return elements
 

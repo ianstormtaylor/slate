@@ -3,7 +3,7 @@
 import h from '../../../helpers/h'
 
 export const input = {
-  kind: 'state',
+  kind: 'value',
   document: {
     kind: 'document',
     data: {},
@@ -31,11 +31,11 @@ export const input = {
 }
 
 export const output = (
-  <state>
+  <value>
     <document>
       <paragraph>
         one
       </paragraph>
     </document>
-  </state>
+  </value>
 )

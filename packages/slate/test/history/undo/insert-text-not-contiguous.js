@@ -2,36 +2,36 @@
 
 import h from '../../helpers/h'
 
-export default function (state) {
-  return state
+export default function (value) {
+  return value
     .change()
     .insertText('t')
-    .state
+    .value
     .change()
     .move(-1)
     .insertText('w')
-    .state
+    .value
     .change()
     .move(-1)
     .insertText('o')
-    .state
+    .value
     .change()
     .undo()
-    .state
+    .value
 }
 
 export const input = (
-  <state>
+  <value>
     <document>
       <paragraph>one<cursor /></paragraph>
     </document>
-  </state>
+  </value>
 )
 
 export const output = (
-  <state>
+  <value>
     <document>
       <paragraph>onew<cursor />t</paragraph>
     </document>
-  </state>
+  </value>
 )

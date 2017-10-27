@@ -20,14 +20,14 @@ export const props = {
   renderNode,
 }
 
-export const state = (
-  <state>
+export const value = (
+  <value>
     <document>
       <paragraph>
         <emoji />
       </paragraph>
     </document>
-  </state>
+  </value>
 )
 
 export const output = `

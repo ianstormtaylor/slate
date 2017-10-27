@@ -8,22 +8,22 @@ export default function (change) {
 }
 
 export const input = (
-  <state>
+  <value>
     <document key="a">
       <paragraph>
         <cursor />one
       </paragraph>
     </document>
-  </state>
+  </value>
 )
 
 export const output = (
-  <state>
+  <value>
     <document>
       <paragraph />
       <paragraph>
         <cursor />one
       </paragraph>
     </document>
-  </state>
+  </value>
 )

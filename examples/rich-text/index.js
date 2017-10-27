@@ -1,9 +1,9 @@
 
 import { Editor } from 'slate-react'
-import { State } from 'slate'
+import { Value } from 'slate'
 
 import React from 'react'
-import initialState from './state.json'
+import initialValue from './value.json'
 import { isKeyHotkey } from 'is-hotkey'
 
 /**
@@ -34,13 +34,13 @@ const isCodeHotkey = isKeyHotkey('mod+`')
 class RichTextExample extends React.Component {
 
   /**
-   * Deserialize the initial editor state.
+   * Deserialize the initial editor value.
    *
    * @type {Object}
    */
 
   state = {
-    state: State.fromJSON(initialState),
+    value: Value.fromJSON(initialValue),
   }
 
   /**
@@ -51,8 +51,8 @@ class RichTextExample extends React.Component {
    */
 
   hasMark = (type) => {
-    const { state } = this.state
-    return state.activeMarks.some(mark => mark.type == type)
+    const { value } = this.state
+    return value.activeMarks.some(mark => mark.type == type)
   }
 
   /**
@@ -63,18 +63,18 @@ class RichTextExample extends React.Component {
    */
 
   hasBlock = (type) => {
-    const { state } = this.state
-    return state.blocks.some(node => node.type == type)
+    const { value } = this.state
+    return value.blocks.some(node => node.type == type)
   }
 
   /**
-   * On change, save the new `state`.
+   * On change, save the new `value`.
    *
    * @param {Change} change
    */
 
-  onChange = ({ state }) => {
-    this.setState({ state })
+  onChange = ({ value }) => {
+    this.setState({ value })
   }
 
   /**
@@ -114,8 +114,8 @@ class RichTextExample extends React.Component {
 
   onClickMark = (event, type) => {
     event.preventDefault()
-    const { state } = this.state
-    const change = state.change().toggleMark(type)
+    const { value } = this.state
+    const change = value.change().toggleMark(type)
     this.onChange(change)
   }
 
@@ -128,9 +128,9 @@ class RichTextExample extends React.Component {
 
   onClickBlock = (event, type) => {
     event.preventDefault()
-    const { state } = this.state
-    const change = state.change()
-    const { document } = state
+    const { value } = this.state
+    const change = value.change()
+    const { document } = value
 
     // Handle everything but list buttons.
     if (type != 'bulleted-list' && type != 'numbered-list') {
@@ -153,7 +153,7 @@ class RichTextExample extends React.Component {
     // Handle the extra wrapping required for list buttons.
     else {
       const isList = this.hasBlock('list-item')
-      const isType = state.blocks.some((block) => {
+      const isType = value.blocks.some((block) => {
         return !!document.getClosest(block.key, parent => parent.type == type)
       })
 
@@ -262,7 +262,7 @@ class RichTextExample extends React.Component {
       <div className="editor">
         <Editor
           placeholder="Enter some rich text..."
-          state={this.state.state}
+          value={this.state.value}
           onChange={this.onChange}
           onKeyDown={this.onKeyDown}
           renderNode={this.renderNode}

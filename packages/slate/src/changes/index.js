@@ -4,7 +4,7 @@ import AtRange from './at-range'
 import ByKey from './by-key'
 import OnHistory from './on-history'
 import OnSelection from './on-selection'
-import OnState from './on-state'
+import OnValue from './on-value'
 import WithSchema from './with-schema'
 
 /**
@@ -19,6 +19,6 @@ export default {
   ...ByKey,
   ...OnHistory,
   ...OnSelection,
-  ...OnState,
+  ...OnValue,
   ...WithSchema,
 }

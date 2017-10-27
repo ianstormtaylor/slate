@@ -35,8 +35,6 @@ class Void extends React.Component {
     node: SlateTypes.node.isRequired,
     parent: SlateTypes.node.isRequired,
     readOnly: Types.bool.isRequired,
-    schema: SlateTypes.schema.isRequired,
-    state: SlateTypes.state.isRequired,
   }
 
   /**
@@ -112,7 +110,7 @@ class Void extends React.Component {
    */
 
   renderText = () => {
-    const { block, decorations, isSelected, node, readOnly, schema, state, editor } = this.props
+    const { block, decorations, isSelected, node, readOnly, editor } = this.props
     const child = node.getFirstText()
     return (
       <Text
@@ -124,8 +122,6 @@ class Void extends React.Component {
         node={child}
         parent={node}
         readOnly={readOnly}
-        schema={schema}
-        state={state}
       />
     )
   }

@@ -8,11 +8,11 @@ import findRange from './find-range'
  * Get the target range from a DOM `event`.
  *
  * @param {Event} event
- * @param {State} state
+ * @param {Value} value
  * @return {Range}
  */
 
-function getEventRange(event, state) {
+function getEventRange(event, value) {
   if (event.nativeEvent) {
     event = event.nativeEvent
   }
@@ -35,10 +35,10 @@ function getEventRange(event, state) {
   }
 
   // Resolve a Slate range from the DOM range.
-  let range = findRange(r, state)
+  let range = findRange(r, value)
   if (!range) return null
 
-  const { document } = state
+  const { document } = value
   const node = document.getNode(range.anchorKey)
   const parent = document.getParent(node.key)
   const el = findDOMNode(parent)

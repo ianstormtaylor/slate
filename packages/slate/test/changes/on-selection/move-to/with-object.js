@@ -3,8 +3,8 @@
 import h from '../../../helpers/h'
 
 export default function (change) {
-  const { state } = change
-  const { startText } = state
+  const { value } = change
+  const { startText } = value
   change.select({
     anchorKey: startText.key,
     anchorOffset: 0,
@@ -14,21 +14,21 @@ export default function (change) {
 }
 
 export const input = (
-  <state>
+  <value>
     <document>
       <paragraph>
         <cursor />one
       </paragraph>
     </document>
-  </state>
+  </value>
 )
 
 export const output = (
-  <state>
+  <value>
     <document>
       <paragraph>
         <anchor />one<focus />
       </paragraph>
     </document>
-  </state>
+  </value>
 )

@@ -75,9 +75,9 @@ function AfterPlugin() {
   function onClick(event, change, editor) {
     if (editor.props.readOnly) return true
 
-    const { state } = change
-    const { document } = state
-    const node = findNode(event.target, state)
+    const { value } = change
+    const { document } = value
+    const node = findNode(event.target, value)
     const isVoid = node && (node.isVoid || document.hasVoidParent(node.key))
 
     if (isVoid) {
@@ -137,8 +137,8 @@ function AfterPlugin() {
   function onCutOrCopy(event, change, editor) {
     const window = getWindow(event.target)
     const native = window.getSelection()
-    const { state } = change
-    const { startKey, endKey, startText, endBlock, endInline } = state
+    const { value } = change
+    const { startKey, endKey, startText, endBlock, endInline } = value
     const isVoidBlock = endBlock && endBlock.isVoid
     const isVoidInline = endInline && endInline.isVoid
     const isVoid = isVoidBlock || isVoidInline
@@ -148,7 +148,7 @@ function AfterPlugin() {
 
     // Create a fake selection so that we can add a Base64-encoded copy of the
     // fragment to the HTML, to decode on future pastes.
-    const { fragment } = state
+    const { fragment } = value
     const encoded = Base64.serializeNode(fragment)
     const range = native.getRangeAt(0)
     let contents = range.cloneContents()
@@ -172,7 +172,7 @@ function AfterPlugin() {
     // startText node
     if ((IS_CHROME || IS_SAFARI) && !isVoid && startKey === endKey) {
       const hasMarks = startText.characters
-        .slice(state.selection.anchorOffset, state.selection.focusOffset)
+        .slice(value.selection.anchorOffset, value.selection.focusOffset)
         .filter(char => char.marks.size !== 0)
         .size !== 0
       if (hasMarks) {
@@ -279,16 +279,16 @@ function AfterPlugin() {
 
     isDraggingInternally = true
 
-    const { state } = change
-    const { document } = state
-    const node = findNode(event.target, state)
+    const { value } = change
+    const { document } = value
+    const node = findNode(event.target, value)
     const isVoid = node && (node.isVoid || document.hasVoidParent(node.key))
 
     if (isVoid) {
       const encoded = Base64.serializeNode(node, { preserveKeys: true })
       setEventTransfer(event, 'node', encoded)
     } else {
-      const { fragment } = state
+      const { fragment } = value
       const encoded = Base64.serializeNode(fragment)
       setEventTransfer(event, 'fragment', encoded)
     }
@@ -305,9 +305,9 @@ function AfterPlugin() {
   function onDrop(event, change, editor) {
     debug('onDrop', { event })
 
-    const { state } = change
-    const { document, selection } = state
-    let target = getEventRange(event, state)
+    const { value } = change
+    const { document, selection } = value
+    let target = getEventRange(event, value)
     if (!target) return
 
     const transfer = getEventTransfer(event)
@@ -395,16 +395,16 @@ function AfterPlugin() {
     debug('onInput', { event })
 
     const window = getWindow(event.target)
-    const { state } = change
+    const { value } = change
 
     // Get the selection point.
     const native = window.getSelection()
     const { anchorNode, anchorOffset } = native
-    const point = findPoint(anchorNode, anchorOffset, state)
+    const point = findPoint(anchorNode, anchorOffset, value)
     if (!point) return
 
     // Get the text node and leaf in question.
-    const { document, selection } = state
+    const { document, selection } = value
     const node = document.getDescendant(point.key)
     const leaves = node.getLeaves()
     let start = 0
@@ -441,7 +441,7 @@ function AfterPlugin() {
     const corrected = selection.collapseToEnd().move(delta)
     const entire = selection.moveAnchorTo(point.key, start).moveFocusTo(point.key, end)
 
-    // Change the current state to have the leaf's text replaced.
+    // Change the current value to have the leaf's text replaced.
     change
       .select(entire)
       .delete()
@@ -460,10 +460,10 @@ function AfterPlugin() {
   function onKeyDown(event, change, editor) {
     debug('onKeyDown', { event })
 
-    const { state } = change
+    const { value } = change
 
     if (HOTKEYS.SPLIT_BLOCK(event)) {
-      return state.isInVoid
+      return value.isInVoid
         ? change.collapseToStartOfNextText()
         : change.splitBlock()
     }
@@ -527,7 +527,7 @@ function AfterPlugin() {
     // an inline is selected, we need to handle these hotkeys manually because
     // browsers won't know what to do.
     if (HOTKEYS.COLLAPSE_CHAR_BACKWARD(event)) {
-      const { document, isInVoid, previousText, startText } = state
+      const { document, isInVoid, previousText, startText } = value
       const isPreviousInVoid = previousText && document.hasVoidParent(previousText.key)
       if (isInVoid || isPreviousInVoid || startText.text == '') {
         event.preventDefault()
@@ -536,7 +536,7 @@ function AfterPlugin() {
     }
 
     if (HOTKEYS.COLLAPSE_CHAR_FORWARD(event)) {
-      const { document, isInVoid, nextText, startText } = state
+      const { document, isInVoid, nextText, startText } = value
       const isNextInVoid = nextText && document.hasVoidParent(nextText.key)
       if (isInVoid || isNextInVoid || startText.text == '') {
         event.preventDefault()
@@ -545,7 +545,7 @@ function AfterPlugin() {
     }
 
     if (HOTKEYS.EXTEND_CHAR_BACKWARD(event)) {
-      const { document, isInVoid, previousText, startText } = state
+      const { document, isInVoid, previousText, startText } = value
       const isPreviousInVoid = previousText && document.hasVoidParent(previousText.key)
       if (isInVoid || isPreviousInVoid || startText.text == '') {
         event.preventDefault()
@@ -554,7 +554,7 @@ function AfterPlugin() {
     }
 
     if (HOTKEYS.EXTEND_CHAR_FORWARD(event)) {
-      const { document, isInVoid, nextText, startText } = state
+      const { document, isInVoid, nextText, startText } = value
       const isNextInVoid = nextText && document.hasVoidParent(nextText.key)
       if (isInVoid || isNextInVoid || startText.text == '') {
         event.preventDefault()
@@ -582,8 +582,8 @@ function AfterPlugin() {
     }
 
     if (type == 'text' || type == 'html') {
-      const { state } = change
-      const { document, selection, startBlock } = state
+      const { value } = change
+      const { document, selection, startBlock } = value
       if (startBlock.isVoid) return
 
       const defaultBlock = startBlock
@@ -605,8 +605,8 @@ function AfterPlugin() {
     debug('onSelect', { event })
 
     const window = getWindow(event.target)
-    const { state } = change
-    const { document } = state
+    const { value } = change
+    const { document } = value
     const native = window.getSelection()
 
     // If there are no ranges, the editor was blurred natively.
@@ -616,7 +616,7 @@ function AfterPlugin() {
     }
 
     // Otherwise, determine the Slate selection from the native one.
-    let range = findRange(native, state)
+    let range = findRange(native, value)
     if (!range) return
 
     const { anchorKey, anchorOffset, focusKey, focusOffset } = range
@@ -676,12 +676,11 @@ function AfterPlugin() {
    * Render editor.
    *
    * @param {Object} props
-   * @param {State} state
    * @param {Editor} editor
    * @return {Object}
    */
 
-  function renderEditor(props, state, editor) {
+  function renderEditor(props, editor) {
     const handlers = EVENT_HANDLERS.reduce((obj, handler) => {
       obj[handler] = editor[handler]
       return obj
@@ -697,9 +696,7 @@ function AfterPlugin() {
         editor={editor}
         readOnly={props.readOnly}
         role={props.role}
-        schema={editor.getSchema()}
         spellCheck={props.spellCheck}
-        state={state}
         style={props.style}
         tabIndex={props.tabIndex}
         tagName={props.tagName}
@@ -730,11 +727,11 @@ function AfterPlugin() {
    */
 
   function renderPlaceholder(props) {
-    const { editor, node, state } = props
+    const { editor, node } = props
     if (node.kind != 'block') return
     if (!Text.isTextList(node.nodes)) return
     if (node.text != '') return
-    if (state.document.getBlocks().size > 1) return
+    if (editor.value.document.getBlocks().size > 1) return
 
     const style = {
       pointerEvents: 'none',

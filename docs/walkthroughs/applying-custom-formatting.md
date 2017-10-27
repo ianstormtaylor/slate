@@ -15,17 +15,17 @@ So we start with our app from earlier:
 class App extends React.Component {
 
   state = {
-    state: initialState,
+    value: initialValue,
   }
 
-  onChange = ({ state }) => {
-    this.setState({ state })
+  onChange = ({ value }) => {
+    this.setState({ value })
   }
 
   onKeyDown = (event, change) => {
     if (event.key != '`' || !event.metaKey) return
     event.preventDefault()
-    const isCode = change.state.blocks.some(block => block.type == 'code')
+    const isCode = change.value.blocks.some(block => block.type == 'code')
 
     change.setBlock(isCode ? 'paragraph' : 'code')
     return true
@@ -34,7 +34,7 @@ class App extends React.Component {
   render() {
     return (
       <Editor
-        state={this.state.state}
+        value={this.state.value}
         onChange={this.onChange}
         onKeyDown={this.onKeyDown}
         renderNode={this.renderNode}
@@ -57,11 +57,11 @@ And now, we'll edit the `onKeyDown` handler to make it so that when you press `â
 class App extends React.Component {
 
   state = {
-    state: initialState,
+    value: initialValue,
   }
 
-  onChange = ({ state }) => {
-    this.setState({ state })
+  onChange = ({ value }) => {
+    this.setState({ value })
   }
 
   onKeyDown = (event, change) => {
@@ -77,7 +77,7 @@ class App extends React.Component {
       }
       // When "`" is pressed, keep our existing code block logic.
       case '`': {
-        const isCode = change.state.blocks.some(block => block.type == 'code')
+        const isCode = change.value.blocks.some(block => block.type == 'code')
         event.preventDefault()
         change.setBlock(isCode ? 'paragraph' : 'code')
         return true
@@ -88,7 +88,7 @@ class App extends React.Component {
   render() {
     return (
       <Editor
-        state={this.state.state}
+        value={this.state.value}
         onChange={this.onChange}
         onKeyDown={this.onKeyDown}
         renderNode={this.renderNode}
@@ -128,11 +128,11 @@ function BoldMark(props) {
 class App extends React.Component {
 
   state = {
-    state: initialState,
+    value: initialValue,
   }
 
-  onChange = ({ state }) => {
-    this.setState({ state })
+  onChange = ({ value }) => {
+    this.setState({ value })
   }
 
   onKeyDown = (event, change) => {
@@ -145,9 +145,9 @@ class App extends React.Component {
         return true
       }
       case '`': {
-        const isCode = change.state.blocks.some(block => block.type == 'code')
+        const isCode = change.value.blocks.some(block => block.type == 'code')
         event.preventDefault()
-        state.setBlock(isCode ? 'paragraph' : 'code')
+        value.setBlock(isCode ? 'paragraph' : 'code')
         return true
       }
     }
@@ -156,7 +156,7 @@ class App extends React.Component {
   render() {
     return (
       <Editor
-        state={this.state.state}
+        value={this.state.value}
         onChange={this.onChange}
         onKeyDown={this.onKeyDown}
         renderNode={this.renderNode}

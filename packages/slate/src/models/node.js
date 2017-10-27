@@ -127,30 +127,30 @@ class Node {
   static fromJS = Node.fromJSON
 
   /**
-   * Check if a `value` is a `Node`.
+   * Check if `any` is a `Node`.
    *
-   * @param {Any} value
+   * @param {Any} any
    * @return {Boolean}
    */
 
-  static isNode(value) {
+  static isNode(any) {
     return (
-      Block.isBlock(value) ||
-      Document.isDocument(value) ||
-      Inline.isInline(value) ||
-      Text.isText(value)
+      Block.isBlock(any) ||
+      Document.isDocument(any) ||
+      Inline.isInline(any) ||
+      Text.isText(any)
     )
   }
 
   /**
-   * Check if a `value` is a list of nodes.
+   * Check if `any` is a list of nodes.
    *
-   * @param {Any} value
+   * @param {Any} any
    * @return {Boolean}
    */
 
-  static isNodeList(value) {
-    return List.isList(value) && value.every(item => Node.isNode(item))
+  static isNodeList(any) {
+    return List.isList(any) && any.every(item => Node.isNode(item))
   }
 
   /**
@@ -2051,22 +2051,22 @@ class Node {
 }
 
 /**
- * Normalize a key argument `value`.
+ * Normalize a key `arg`.
  *
- * @param {String|Node} value
+ * @param {String|Node} arg
  * @return {String}
  */
 
-function normalizeKey(value) {
-  if (typeof value == 'string') return value
+function normalizeKey(arg) {
+  if (typeof arg == 'string') return arg
 
-  logger.deprecate('0.14.0', 'An object was passed to a Node method instead of a `key` string. This was previously supported, but is being deprecated because it can have a negative impact on performance. The object in question was:', value)
+  logger.deprecate('0.14.0', 'An object was passed to a Node method instead of a `key` string. This was previously supported, but is being deprecated because it can have a negative impact on performance. The object in question was:', arg)
 
-  if (Node.isNode(value)) {
-    return value.key
+  if (Node.isNode(arg)) {
+    return arg.key
   }
 
-  throw new Error(`Invalid \`key\` argument! It must be either a block, an inline, a text, or a string. You passed: ${value}`)
+  throw new Error(`Invalid \`key\` argument! It must be either a block, an inline, a text, or a string. You passed: ${arg}`)
 }
 
 /**

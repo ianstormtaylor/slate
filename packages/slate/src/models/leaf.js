@@ -49,19 +49,19 @@ class Leaf extends Record(DEFAULTS) {
   }
 
   /**
-   * Create a `Leaf` list from `value`.
+   * Create a `Leaf` list from `attrs`.
    *
-   * @param {Array<Leaf|Object>|List<Leaf|Object>} value
+   * @param {Array<Leaf|Object>|List<Leaf|Object>} attrs
    * @return {List<Leaf>}
    */
 
-  static createList(value = []) {
-    if (List.isList(value) || Array.isArray(value)) {
-      const list = new List(value.map(Leaf.create))
+  static createList(attrs = []) {
+    if (List.isList(attrs) || Array.isArray(attrs)) {
+      const list = new List(attrs.map(Leaf.create))
       return list
     }
 
-    throw new Error(`\`Leaf.createList\` only accepts arrays or lists, but you passed it: ${value}`)
+    throw new Error(`\`Leaf.createList\` only accepts arrays or lists, but you passed it: ${attrs}`)
   }
 
   /**
@@ -92,25 +92,25 @@ class Leaf extends Record(DEFAULTS) {
   static fromJS = Leaf.fromJSON
 
   /**
-   * Check if a `value` is a `Leaf`.
+   * Check if `any` is a `Leaf`.
    *
-   * @param {Any} value
+   * @param {Any} any
    * @return {Boolean}
    */
 
-  static isLeaf(value) {
-    return !!(value && value[MODEL_TYPES.LEAF])
+  static isLeaf(any) {
+    return !!(any && any[MODEL_TYPES.LEAF])
   }
 
   /**
-   * Check if a `value` is a list of leaves.
+   * Check if `any` is a list of leaves.
    *
-   * @param {Any} value
+   * @param {Any} any
    * @return {Boolean}
    */
 
-  static isLeafList(value) {
-    return List.isList(value) && value.every(item => Leaf.isLeaf(item))
+  static isLeafList(any) {
+    return List.isList(any) && any.every(item => Leaf.isLeaf(item))
   }
 
   /**

@@ -27,8 +27,8 @@ const Changes = {}
 Changes.addMarkByKey = (change, key, offset, length, mark, options = {}) => {
   mark = Mark.create(mark)
   const { normalize = true } = options
-  const { state } = change
-  const { document } = state
+  const { value } = change
+  const { document } = value
   const path = document.getPath(key)
   const node = document.getNode(key)
   const leaves = node.getLeaves()
@@ -107,8 +107,8 @@ Changes.insertFragmentByKey = (change, key, index, fragment, options = {}) => {
 
 Changes.insertNodeByKey = (change, key, index, node, options = {}) => {
   const { normalize = true } = options
-  const { state } = change
-  const { document } = state
+  const { value } = change
+  const { document } = value
   const path = document.getPath(key)
 
   change.applyOperation({
@@ -136,8 +136,8 @@ Changes.insertNodeByKey = (change, key, index, node, options = {}) => {
 
 Changes.insertTextByKey = (change, key, offset, text, marks, options = {}) => {
   const { normalize = true } = options
-  const { state } = change
-  const { document } = state
+  const { value } = change
+  const { document } = value
   const path = document.getPath(key)
   const node = document.getNode(key)
   marks = marks || node.getMarksAtIndex(offset)
@@ -167,8 +167,8 @@ Changes.insertTextByKey = (change, key, offset, text, marks, options = {}) => {
 
 Changes.mergeNodeByKey = (change, key, options = {}) => {
   const { normalize = true } = options
-  const { state } = change
-  const { document } = state
+  const { value } = change
+  const { document } = value
   const path = document.getPath(key)
   const previous = document.getPreviousSibling(key)
 
@@ -204,8 +204,8 @@ Changes.mergeNodeByKey = (change, key, options = {}) => {
 
 Changes.moveNodeByKey = (change, key, newKey, newIndex, options = {}) => {
   const { normalize = true } = options
-  const { state } = change
-  const { document } = state
+  const { value } = change
+  const { document } = value
   const path = document.getPath(key)
   const newPath = document.getPath(newKey)
 
@@ -236,8 +236,8 @@ Changes.moveNodeByKey = (change, key, newKey, newIndex, options = {}) => {
 Changes.removeMarkByKey = (change, key, offset, length, mark, options = {}) => {
   mark = Mark.create(mark)
   const { normalize = true } = options
-  const { state } = change
-  const { document } = state
+  const { value } = change
+  const { document } = value
   const path = document.getPath(key)
   const node = document.getNode(key)
   const leaves = node.getLeaves()
@@ -291,8 +291,8 @@ Changes.removeMarkByKey = (change, key, offset, length, mark, options = {}) => {
 
 Changes.removeNodeByKey = (change, key, options = {}) => {
   const { normalize = true } = options
-  const { state } = change
-  const { document } = state
+  const { value } = change
+  const { document } = value
   const path = document.getPath(key)
   const node = document.getNode(key)
 
@@ -321,8 +321,8 @@ Changes.removeNodeByKey = (change, key, options = {}) => {
 
 Changes.removeTextByKey = (change, key, offset, length, options = {}) => {
   const { normalize = true } = options
-  const { state } = change
-  const { document } = state
+  const { value } = change
+  const { document } = value
   const path = document.getPath(key)
   const node = document.getNode(key)
   const leaves = node.getLeaves()
@@ -378,8 +378,8 @@ Changes.removeTextByKey = (change, key, offset, length, options = {}) => {
 Changes.replaceNodeByKey = (change, key, newNode, options = {}) => {
   newNode = Node.create(newNode)
   const { normalize = true } = options
-  const { state } = change
-  const { document } = state
+  const { value } = change
+  const { document } = value
   const node = document.getNode(key)
   const parent = document.getParent(key)
   const index = parent.nodes.indexOf(node)
@@ -406,8 +406,8 @@ Changes.setMarkByKey = (change, key, offset, length, mark, properties, options =
   mark = Mark.create(mark)
   properties = Mark.createProperties(properties)
   const { normalize = true } = options
-  const { state } = change
-  const { document } = state
+  const { value } = change
+  const { document } = value
   const path = document.getPath(key)
 
   change.applyOperation({
@@ -438,8 +438,8 @@ Changes.setMarkByKey = (change, key, offset, length, mark, properties, options =
 Changes.setNodeByKey = (change, key, properties, options = {}) => {
   properties = Node.createProperties(properties)
   const { normalize = true } = options
-  const { state } = change
-  const { document } = state
+  const { value } = change
+  const { document } = value
   const path = document.getPath(key)
   const node = document.getNode(key)
 
@@ -467,8 +467,8 @@ Changes.setNodeByKey = (change, key, properties, options = {}) => {
 
 Changes.splitNodeByKey = (change, key, position, options = {}) => {
   const { normalize = true, target = null } = options
-  const { state } = change
-  const { document } = state
+  const { value } = change
+  const { document } = value
   const path = document.getPath(key)
 
   change.applyOperation({
@@ -501,8 +501,8 @@ Changes.splitDescendantsByKey = (change, key, textKey, textOffset, options = {})
   }
 
   const { normalize = true } = options
-  const { state } = change
-  const { document } = state
+  const { value } = change
+  const { document } = value
 
   const text = document.getNode(textKey)
   const ancestors = document.getAncestors(textKey)
@@ -534,8 +534,8 @@ Changes.splitDescendantsByKey = (change, key, textKey, textOffset, options = {})
  */
 
 Changes.unwrapInlineByKey = (change, key, properties, options) => {
-  const { state } = change
-  const { document, selection } = state
+  const { value } = change
+  const { document, selection } = value
   const node = document.assertDescendant(key)
   const first = node.getFirstText()
   const last = node.getLastText()
@@ -554,8 +554,8 @@ Changes.unwrapInlineByKey = (change, key, properties, options) => {
  */
 
 Changes.unwrapBlockByKey = (change, key, properties, options) => {
-  const { state } = change
-  const { document, selection } = state
+  const { value } = change
+  const { document, selection } = value
   const node = document.assertDescendant(key)
   const first = node.getFirstText()
   const last = node.getLastText()
@@ -578,8 +578,8 @@ Changes.unwrapBlockByKey = (change, key, properties, options) => {
 
 Changes.unwrapNodeByKey = (change, key, options = {}) => {
   const { normalize = true } = options
-  const { state } = change
-  const { document } = state
+  const { value } = change
+  const { document } = value
   const parent = document.getParent(key)
   const node = parent.getChild(key)
 
@@ -632,7 +632,7 @@ Changes.wrapBlockByKey = (change, key, block, options) => {
   block = Block.create(block)
   block = block.set('nodes', block.nodes.clear())
 
-  const { document } = change.state
+  const { document } = change.value
   const node = document.assertDescendant(key)
   const parent = document.getParent(node.key)
   const index = parent.nodes.indexOf(node)
@@ -655,7 +655,7 @@ Changes.wrapInlineByKey = (change, key, inline, options) => {
   inline = Inline.create(inline)
   inline = inline.set('nodes', inline.nodes.clear())
 
-  const { document } = change.state
+  const { document } = change.value
   const node = document.assertDescendant(key)
   const parent = document.getParent(node.key)
   const index = parent.nodes.indexOf(node)

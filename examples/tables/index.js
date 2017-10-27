@@ -1,9 +1,9 @@
 
 import { Editor } from 'slate-react'
-import { State } from 'slate'
+import { Value } from 'slate'
 
 import React from 'react'
-import initialState from './state.json'
+import initialValue from './value.json'
 
 /**
  * The tables example.
@@ -14,13 +14,13 @@ import initialState from './state.json'
 class Tables extends React.Component {
 
   /**
-   * Deserialize the raw initial state.
+   * Deserialize the raw initial value.
    *
    * @type {Object}
    */
 
   state = {
-    state: State.fromJSON(initialState)
+    value: Value.fromJSON(initialValue)
   }
 
   /**
@@ -31,8 +31,8 @@ class Tables extends React.Component {
    */
 
   onBackspace = (event, change) => {
-    const { state } = change
-    if (state.startOffset != 0) return
+    const { value } = change
+    if (value.startOffset != 0) return
     event.preventDefault()
     return true
   }
@@ -43,8 +43,8 @@ class Tables extends React.Component {
    * @param {Change} change
    */
 
-  onChange = ({ state }) => {
-    this.setState({ state })
+  onChange = ({ value }) => {
+    this.setState({ value })
   }
 
   /**
@@ -55,8 +55,8 @@ class Tables extends React.Component {
    */
 
   onDelete = (event, change) => {
-    const { state } = change
-    if (state.endOffset != state.startText.text.length) return
+    const { value } = change
+    if (value.endOffset != value.startText.text.length) return
     event.preventDefault()
     return true
   }
@@ -81,8 +81,8 @@ class Tables extends React.Component {
    */
 
   onKeyDown = (event, change) => {
-    const { state } = change
-    const { document, selection } = state
+    const { value } = change
+    const { document, selection } = value
     const { startKey } = selection
     const startNode = document.getDescendant(startKey)
 
@@ -96,7 +96,7 @@ class Tables extends React.Component {
       }
     }
 
-    if (state.startBlock.type != 'table-cell') {
+    if (value.startBlock.type != 'table-cell') {
       return
     }
 
@@ -118,7 +118,7 @@ class Tables extends React.Component {
       <div className="editor">
         <Editor
           placeholder="Enter some text..."
-          state={this.state.state}
+          value={this.state.value}
           onChange={this.onChange}
           onKeyDown={this.onKeyDown}
           renderNode={this.renderNode}

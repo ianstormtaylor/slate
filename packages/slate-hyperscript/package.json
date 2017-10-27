@@ -7,7 +7,8 @@
   "main": "./lib/index.js",
   "dependencies": {
     "is-empty": "^1.0.0",
-    "is-plain-object": "^2.0.4"
+    "is-plain-object": "^2.0.4",
+    "slate-dev-logger": "^0.1.23"
   },
   "peerDependencies": {
     "slate": "^0.28.2"

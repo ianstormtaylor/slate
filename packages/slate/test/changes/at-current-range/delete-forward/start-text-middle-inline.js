@@ -7,22 +7,22 @@ export default function (change) {
 }
 
 export const input = (
-  <state>
+  <value>
     <document>
       <paragraph>
         <anchor />one<link>t<focus />wo</link>
       </paragraph>
     </document>
-  </state>
+  </value>
 )
 
-// TODO: this output selection state seems bad
+// TODO: this output selection seems bad
 export const output = (
-  <state>
+  <value>
     <document>
       <paragraph>
         <anchor /><link><focus />wo</link>
       </paragraph>
     </document>
-  </state>
+  </value>
 )

@@ -41,8 +41,8 @@
 - [Operation](./reference/slate/operation.md)
 - [Range](./reference/slate/range.md)
 - [Schema](./reference/slate/schema.md)
-- [State](./reference/slate/state.md)
 - [Text](./reference/slate/text.md)
+- [Value](./reference/slate/value.md)
 - [setKeyGenerator](./reference/slate/utils.md)
 - [resetKeyGenerator](./reference/slate/utils.md)
 

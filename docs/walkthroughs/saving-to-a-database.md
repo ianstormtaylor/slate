@@ -13,9 +13,9 @@ Let's start with a basic editor:
 
 ```js
 import { Editor } from 'slate-react'
-import { State } from 'slate'
+import { Value } from 'slate'
 
-const initialState = State.fromJSON({
+const initialValue = Value.fromJSON({
   document: {
     nodes: [
       {
@@ -39,17 +39,17 @@ const initialState = State.fromJSON({
 class App extends React.Component {
 
   state = {
-    state: initialState
+    value: initialValue
   }
 
-  onChange = ({ state }) => {
-    this.setState({ state })
+  onChange = ({ value }) => {
+    this.setState({ value })
   }
 
   render() {
     return (
       <Editor
-        state={this.state.state}
+        value={this.state.value}
         onChange={this.onChange}
       />
     )
@@ -58,14 +58,14 @@ class App extends React.Component {
 }
 ```
 
-That will render a basic Slate editor on your page, and when you type things will change. But if you refresh the page, everything will be reverted back to its original state—nothing saves!
+That will render a basic Slate editor on your page, and when you type things will change. But if you refresh the page, everything will be reverted back to its original value—nothing saves!
 
 What we need to do is save the changes you make somewhere. For this example, we'll just be using [Local Storage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage), but it will give you an idea for where you'd need to add your own database hooks.
 
-So, in our `onChange` handler, we need to save the `state`. But the `state` argument that `onChange` receives is an immutable object, so we can't just save it as-is. We need to serialize it to a format we understand first, like JSON!
+So, in our `onChange` handler, we need to save the `value`. But the `value` argument that `onChange` receives is an immutable object, so we can't just save it as-is. We need to serialize it to a format we understand first, like JSON!
 
 ```js
-const initialState = State.fromJSON({
+const initialValue = Value.fromJSON({
   document: {
     nodes: [
       {
@@ -89,21 +89,21 @@ const initialState = State.fromJSON({
 class App extends React.Component {
 
   state = {
-    state: initialState
+    value: initialValue
   }
 
-  onChange = ({ state }) => {
-    // Save the state to Local Storage.
-    const content = JSON.stringify(state.toJSON())
+  onChange = ({ value }) => {
+    // Save the value to Local Storage.
+    const content = JSON.stringify(value.toJSON())
     localStorage.setItem('content', content)
 
-    this.setState({ state })
+    this.setState({ value })
   }
 
   render() {
     return (
       <Editor
-        state={this.state.state}
+        value={this.state.value}
         onChange={this.onChange}
       />
     )
@@ -114,12 +114,12 @@ class App extends React.Component {
 
 Now whenever you edit the page, if you look in Local Storage, you should see the `content` value changing.
 
-But... if you refresh the page, everything is still reset. That's because we need to make sure the initial state is pulled from that same Local Storage location, like so:
+But... if you refresh the page, everything is still reset. That's because we need to make sure the initial value is pulled from that same Local Storage location, like so:
 
 ```js
 // Update the initial content to be pulled from Local Storage if it exists.
-const existingState = JSON.parse(localStorage.getItem('content'))
-const initialState = State.fromJSON(existingState || {
+const existingValue = JSON.parse(localStorage.getItem('content'))
+const initialValue = Value.fromJSON(existingValue || {
   document: {
     nodes: [
       {
@@ -143,20 +143,20 @@ const initialState = State.fromJSON(existingState || {
 class App extends React.Component {
 
   state = {
-    state: initialState
+    value: initialValue
   }
 
-  onChange = ({ state }) => {
-    const content = JSON.stringify(state.toJSON())
+  onChange = ({ value }) => {
+    const content = JSON.stringify(value.toJSON())
     localStorage.setItem('content', content)
 
-    this.setState({ state })
+    this.setState({ value })
   }
 
   render() {
     return (
       <Editor
-        state={this.state.state}
+        value={this.state.value}
         onChange={this.onChange}
       />
     )
@@ -170,8 +170,8 @@ Now you should be able to save changes across refreshes!
 However, if you inspect the change handler, you'll notice that it's actually saving the Local Storage value on _every_ change to the editor, even when only the selection changes! This is because `onChange` is called for _every_ change. For Local Storage this doesn't really matter, but if you're saving things to a database via HTTP request this would result in a lot of unnecessary requests. You can fix this by checking against the previous `document` value.
 
 ```js
-const existingState = JSON.parse(localStorage.getItem('content'))
-const initialState = State.fromJSON(existingState || {
+const existingValue = JSON.parse(localStorage.getItem('content'))
+const initialValue = Value.fromJSON(existingValue || {
   document: {
     nodes: [
       {
@@ -195,23 +195,23 @@ const initialState = State.fromJSON(existingState || {
 class App extends React.Component {
 
   state = {
-    state: initialState
+    value: initialValue
   }
 
-  onChange = ({ state }) => {
+  onChange = ({ value }) => {
     // Check to see if the document has changed before saving.
-    if (state.document != this.state.state.document) {
-      const content = JSON.stringify(state.toJSON())
+    if (value.document != this.state.value.document) {
+      const content = JSON.stringify(value.toJSON())
       localStorage.setItem('content', content)
     }
 
-    this.setState({ state })
+    this.setState({ value })
   }
 
   render() {
     return (
       <Editor
-        state={this.state.state}
+        value={this.state.value}
         onChange={this.onChange}
       />
     )
@@ -224,35 +224,35 @@ Now you're content will be saved only when the content itself changes!
 
 Success—you've got JSON in your database.
 
-But what if you want something other than JSON? Well, you'd need to serialize your state differently. For example, if you want to save your content as plain text instead of JSON, you can use the `Plain` serializer that ships with Slate, like so:
+But what if you want something other than JSON? Well, you'd need to serialize your value differently. For example, if you want to save your content as plain text instead of JSON, you can use the `Plain` serializer that ships with Slate, like so:
 
 ```js
 // Switch to using the Plain serializer.
 import { Editor } from 'slate-react'
 import Plain from 'slate-plain-serializer'
 
-const existingState = localStorage.getItem('content')
-const initialState = Plain.deserialize(existingState || 'A string of plain text.')
+const existingValue = localStorage.getItem('content')
+const initialValue = Plain.deserialize(existingValue || 'A string of plain text.')
 
 class App extends React.Component {
 
   state = {
-    state: initialState
+    value: initialValue
   }
 
-  onChange = ({ state }) => {
-    if (state.document != this.state.state.document) {
-      const content = Plain.serialize(state)
+  onChange = ({ value }) => {
+    if (value.document != this.state.value.document) {
+      const content = Plain.serialize(value)
       localStorage.setItem('content', content)
     }
 
-    this.setState({ state })
+    this.setState({ value })
   }
 
   render() {
     return (
       <Editor
-        state={this.state.state}
+        value={this.state.value}
         onChange={this.onChange}
       />
     )

@@ -24,58 +24,58 @@ const APPLIERS = {
   /**
    * Add mark to text at `offset` and `length` in node by `path`.
    *
-   * @param {State} state
+   * @param {Value} value
    * @param {Object} operation
-   * @return {State}
+   * @return {Value}
    */
 
-  add_mark(state, operation) {
+  add_mark(value, operation) {
     const { path, offset, length } = operation
     const mark = Mark.create(operation.mark)
-    let { document } = state
+    let { document } = value
     let node = document.assertPath(path)
     node = node.addMark(offset, length, mark)
     document = document.updateNode(node)
-    state = state.set('document', document)
-    return state
+    value = value.set('document', document)
+    return value
   },
 
   /**
    * Insert a `node` at `index` in a node by `path`.
    *
-   * @param {State} state
+   * @param {Value} value
    * @param {Object} operation
-   * @return {State}
+   * @return {Value}
    */
 
-  insert_node(state, operation) {
+  insert_node(value, operation) {
     const { path } = operation
     const node = Node.create(operation.node)
     const index = path[path.length - 1]
     const rest = path.slice(0, -1)
-    let { document } = state
+    let { document } = value
     let parent = document.assertPath(rest)
     parent = parent.insertNode(index, node)
     document = document.updateNode(parent)
-    state = state.set('document', document)
-    return state
+    value = value.set('document', document)
+    return value
   },
 
   /**
    * Insert `text` at `offset` in node by `path`.
    *
-   * @param {State} state
+   * @param {Value} value
    * @param {Object} operation
-   * @return {State}
+   * @return {Value}
    */
 
-  insert_text(state, operation) {
+  insert_text(value, operation) {
     const { path, offset, text } = operation
 
     let { marks } = operation
     if (Array.isArray(marks)) marks = Mark.createSet(marks)
 
-    let { document, selection } = state
+    let { document, selection } = value
     const { anchorKey, focusKey, anchorOffset, focusOffset } = selection
     let node = document.assertPath(path)
 
@@ -91,22 +91,22 @@ const APPLIERS = {
       selection = selection.moveFocus(text.length)
     }
 
-    state = state.set('document', document).set('selection', selection)
-    return state
+    value = value.set('document', document).set('selection', selection)
+    return value
   },
 
   /**
    * Merge a node at `path` with the previous node.
    *
-   * @param {State} state
+   * @param {Value} value
    * @param {Object} operation
-   * @return {State}
+   * @return {Value}
    */
 
-  merge_node(state, operation) {
+  merge_node(value, operation) {
     const { path } = operation
     const withPath = path.slice(0, path.length - 1).concat([path[path.length - 1] - 1])
-    let { document, selection } = state
+    let { document, selection } = value
     const one = document.assertPath(withPath)
     const two = document.assertPath(path)
     let parent = document.getParent(one.key)
@@ -139,25 +139,25 @@ const APPLIERS = {
     }
 
     // Update the document and selection.
-    state = state.set('document', document).set('selection', selection)
-    return state
+    value = value.set('document', document).set('selection', selection)
+    return value
   },
 
   /**
    * Move a node by `path` to `newPath`.
    *
-   * @param {State} state
+   * @param {Value} value
    * @param {Object} operation
-   * @return {State}
+   * @return {Value}
    */
 
-  move_node(state, operation) {
+  move_node(value, operation) {
     const { path, newPath } = operation
     const newIndex = newPath[newPath.length - 1]
     const newParentPath = newPath.slice(0, -1)
     const oldParentPath = path.slice(0, -1)
     const oldIndex = path[path.length - 1]
-    let { document } = state
+    let { document } = value
     const node = document.assertPath(path)
 
     // Remove the node from its current parent.
@@ -195,40 +195,40 @@ const APPLIERS = {
     // Insert the new node to its new parent.
     target = target.insertNode(newIndex, node)
     document = document.updateNode(target)
-    state = state.set('document', document)
-    return state
+    value = value.set('document', document)
+    return value
   },
 
   /**
    * Remove mark from text at `offset` and `length` in node by `path`.
    *
-   * @param {State} state
+   * @param {Value} value
    * @param {Object} operation
-   * @return {State}
+   * @return {Value}
    */
 
-  remove_mark(state, operation) {
+  remove_mark(value, operation) {
     const { path, offset, length } = operation
     const mark = Mark.create(operation.mark)
-    let { document } = state
+    let { document } = value
     let node = document.assertPath(path)
     node = node.removeMark(offset, length, mark)
     document = document.updateNode(node)
-    state = state.set('document', document)
-    return state
+    value = value.set('document', document)
+    return value
   },
 
   /**
    * Remove a node by `path`.
    *
-   * @param {State} state
+   * @param {Value} value
    * @param {Object} operation
-   * @return {State}
+   * @return {Value}
    */
 
-  remove_node(state, operation) {
+  remove_node(value, operation) {
     const { path } = operation
-    let { document, selection } = state
+    let { document, selection } = value
     const { startKey, endKey } = selection
     const node = document.assertPath(path)
     // If the selection is set, check to see if it needs to be updated.
@@ -275,23 +275,23 @@ const APPLIERS = {
     document = document.updateNode(parent)
 
     // Update the document and selection.
-    state = state.set('document', document).set('selection', selection)
-    return state
+    value = value.set('document', document).set('selection', selection)
+    return value
   },
 
   /**
    * Remove `text` at `offset` in node by `path`.
    *
-   * @param {State} state
+   * @param {Value} value
    * @param {Object} operation
-   * @return {State}
+   * @return {Value}
    */
 
-  remove_text(state, operation) {
+  remove_text(value, operation) {
     const { path, offset, text } = operation
     const { length } = text
     const rangeOffset = offset + length
-    let { document, selection } = state
+    let { document, selection } = value
     const { anchorKey, focusKey, anchorOffset, focusOffset } = selection
     let node = document.assertPath(path)
 
@@ -306,40 +306,40 @@ const APPLIERS = {
 
     node = node.removeText(offset, length)
     document = document.updateNode(node)
-    state = state.set('document', document).set('selection', selection)
-    return state
+    value = value.set('document', document).set('selection', selection)
+    return value
   },
 
   /**
    * Set `properties` on mark on text at `offset` and `length` in node by `path`.
    *
-   * @param {State} state
+   * @param {Value} value
    * @param {Object} operation
-   * @return {State}
+   * @return {Value}
    */
 
-  set_mark(state, operation) {
+  set_mark(value, operation) {
     const { path, offset, length, properties } = operation
     const mark = Mark.create(operation.mark)
-    let { document } = state
+    let { document } = value
     let node = document.assertPath(path)
     node = node.updateMark(offset, length, mark, properties)
     document = document.updateNode(node)
-    state = state.set('document', document)
-    return state
+    value = value.set('document', document)
+    return value
   },
 
   /**
    * Set `properties` on a node by `path`.
    *
-   * @param {State} state
+   * @param {Value} value
    * @param {Object} operation
-   * @return {State}
+   * @return {Value}
    */
 
-  set_node(state, operation) {
+  set_node(value, operation) {
     const { path, properties } = operation
-    let { document } = state
+    let { document } = value
     let node = document.assertPath(path)
 
     if ('nodes' in properties) {
@@ -354,21 +354,21 @@ const APPLIERS = {
 
     node = node.merge(properties)
     document = document.updateNode(node)
-    state = state.set('document', document)
-    return state
+    value = value.set('document', document)
+    return value
   },
 
   /**
    * Set `properties` on the selection.
    *
-   * @param {State} state
+   * @param {Value} value
    * @param {Object} operation
-   * @return {State}
+   * @return {Value}
    */
 
-  set_selection(state, operation) {
+  set_selection(value, operation) {
     const properties = { ...operation.properties }
-    let { document, selection } = state
+    let { document, selection } = value
 
     if (properties.marks != null) {
       properties.marks = Mark.createSet(properties.marks)
@@ -390,51 +390,51 @@ const APPLIERS = {
 
     selection = selection.merge(properties)
     selection = selection.normalize(document)
-    state = state.set('selection', selection)
-    return state
+    value = value.set('selection', selection)
+    return value
   },
 
   /**
-   * Set `properties` on `state`.
+   * Set `properties` on `value`.
    *
-   * @param {State} state
+   * @param {Value} value
    * @param {Object} operation
-   * @return {State}
+   * @return {Value}
    */
 
-  set_state(state, operation) {
+  set_value(value, operation) {
     const { properties } = operation
 
     if ('document' in properties) {
-      logger.warn('Updating `state.document` property via `setState()` is not allowed. Use the appropriate document updating methods instead. The operation in question was:', operation)
+      logger.warn('Updating `value.document` property via `setValue()` is not allowed. Use the appropriate document updating methods instead. The operation in question was:', operation)
       delete properties.document
     }
 
     if ('selection' in properties) {
-      logger.warn('Updating `state.selection` property via `setState()` is not allowed. Use the appropriate selection updating methods instead. The operation in question was:', operation)
+      logger.warn('Updating `value.selection` property via `setValue()` is not allowed. Use the appropriate selection updating methods instead. The operation in question was:', operation)
       delete properties.selection
     }
 
     if ('history' in properties) {
-      logger.warn('Updating `state.history` property via `setState()` is not allowed. Use the appropriate history updating methods instead. The operation in question was:', operation)
+      logger.warn('Updating `value.history` property via `setValue()` is not allowed. Use the appropriate history updating methods instead. The operation in question was:', operation)
       delete properties.history
     }
 
-    state = state.merge(properties)
-    return state
+    value = value.merge(properties)
+    return value
   },
 
   /**
    * Split a node by `path` at `offset`.
    *
-   * @param {State} state
+   * @param {Value} value
    * @param {Object} operation
-   * @return {State}
+   * @return {Value}
    */
 
-  split_node(state, operation) {
+  split_node(value, operation) {
     const { path, position } = operation
-    let { document, selection } = state
+    let { document, selection } = value
 
     // Calculate a few things...
     const node = document.assertPath(path)
@@ -463,27 +463,27 @@ const APPLIERS = {
     }
 
     // Normalize the selection if we changed it, since the methods we use might
-    // leave it in a non-normalized state.
+    // leave it in a non-normalized value.
     if (normalize) {
       selection = selection.normalize(document)
     }
 
-    // Return the updated state.
-    state = state.set('document', document).set('selection', selection)
-    return state
+    // Return the updated value.
+    value = value.set('document', document).set('selection', selection)
+    return value
   },
 
 }
 
 /**
- * Apply an `operation` to a `state`.
+ * Apply an `operation` to a `value`.
  *
- * @param {State} state
+ * @param {Value} value
  * @param {Object} operation
- * @return {State} state
+ * @return {Value} value
  */
 
-function applyOperation(state, operation) {
+function applyOperation(value, operation) {
   const { type } = operation
   const apply = APPLIERS[type]
 
@@ -492,8 +492,8 @@ function applyOperation(state, operation) {
   }
 
   debug(type, operation)
-  state = apply(state, operation)
-  return state
+  value = apply(value, operation)
+  return value
 }
 
 /**

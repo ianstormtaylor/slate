@@ -17,11 +17,11 @@ Starting with our app from earlier:
 class App extends React.Component {
 
   state = {
-    state: initialState,
+    value: initialValue,
   }
 
-  onChange = ({ state }) => {
-    this.setState({ state })
+  onChange = ({ value }) => {
+    this.setState({ value })
   }
 
   onKeyDown = (event, change) => {
@@ -34,7 +34,7 @@ class App extends React.Component {
   render() {
     return (
       <Editor
-        state={this.state.state}
+        value={this.state.value}
         onChange={this.onChange}
         onKeyDown={this.onKeyDown}
         renderMark={this.renderMark}
@@ -106,11 +106,11 @@ const plugins = [
 class App extends React.Component {
 
   state = {
-    state: initialState,
+    value: initialValue,
   }
 
-  onChange = ({ state }) => {
-    this.setState({ state })
+  onChange = ({ value }) => {
+    this.setState({ value })
   }
 
   render() {
@@ -118,7 +118,7 @@ class App extends React.Component {
       // Add the `plugins` property to the editor, and remove `onKeyDown`.
       <Editor
         plugins={plugins}
-        state={this.state.state}
+        value={this.state.value}
         onChange={this.onChange}
         renderMark={this.renderMark}
       />
@@ -151,18 +151,18 @@ const plugins = [
 class App extends React.Component {
 
   state = {
-    state: initialState,
+    value: initialValue,
   }
 
-  onChange = ({ state }) => {
-    this.setState({ state })
+  onChange = ({ value }) => {
+    this.setState({ value })
   }
 
   render() {
     return (
       <Editor
         plugins={plugins}
-        state={this.state.state}
+        value={this.state.value}
         onChange={this.onChange}
         renderMark={this.renderMark}
       />

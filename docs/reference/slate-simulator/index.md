@@ -13,9 +13,9 @@ A simulator to help writing tests for Slate editors and plugins.
 ```js
 import Simulator from 'slate-simulator'
 
-const state = ...
+const value = ...
 const plugins = [ ... ]
-const simulator = new Simulator({ state, plugins })
+const simulator = new Simulator({ value, plugins })
 
 simulator
   .focus()
@@ -27,7 +27,7 @@ simulator
   .beforeInput({ data: '!' })
   .keyDown({ key: 'Enter' })
 
-const nextState = simulator.state
+const newValue = simulator.value
 ```
 
 
