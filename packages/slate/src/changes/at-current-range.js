@@ -80,7 +80,7 @@ Changes.addMark = (change, mark) => {
  */
 
 Changes.addMarks = (change, marks) => {
-  marks = Mark.createSet(marks);
+  marks = Mark.createSet(marks)
   const { state } = change
   const { document, selection } = state
 
