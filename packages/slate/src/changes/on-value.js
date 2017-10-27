@@ -33,7 +33,7 @@ Changes.setValue = (change, properties) => {
  * Deprecated.
  */
 
-Changes.setState = (...args) => {
+Changes.setState = (change, ...args) => {
   logger.deprecate('0.29.0', 'The `change.setState` method has been renamed to `change.setValue`.')
   change.setValue(...args)
 }
