@@ -3,25 +3,42 @@ import getWindow from 'get-window'
 import isBackward from 'selection-is-backward'
 
 /**
- * Find the nearest container which has scrolling
- * Fallback to window
- * @param {elm} HTML Element
+ * CSS overflow values that would cause scrolling.
+ *
+ * @type {Array}
  */
 
-function findScrollContainer(elm) {
-  let scrollContainerElement
-  let scrollContainer = elm.parentNode
-  while (!scrollContainerElement) {
-    if (!scrollContainer.parentNode) {
+const OVERFLOWS = [
+  'auto',
+  'overlay',
+  'scroll',
+]
+
+/**
+ * Find the nearest parent with scrolling, or window.
+ *
+ * @param {el} Element
+ */
+
+function findScrollContainer(el) {
+  const window = getWindow(el)
+  let parent = el.parentNode
+  let scroller = window
+  
+  while (!scroller) {
+    if (!parent.parentNode) break
+    const style = window.getComputedStyle(parent)
+    const { overflowY } = style
+
+    if (OVERFLOWS.includes(overflowY)) {
+      scroller = parent
       break
     }
-    if (['overlay', 'auto', 'scroll'].includes(window.getComputedStyle(scrollContainer).overflowY)) {
-      scrollContainerElement = scrollContainer
-      break
-    }
-    scrollContainer = scrollContainer.parentNode
+    
+    parent = parent.parentNode
   }
-  return scrollContainerElement || getWindow(elm)
+  
+  return scroller
 }
 
 /**
@@ -33,8 +50,8 @@ function findScrollContainer(elm) {
 function scrollToSelection(selection) {
   if (!selection.anchorNode) return
 
-  const scrollContainer = findScrollContainer(selection.anchorNode)
-  const scrollContainerIsWindow = scrollContainer == scrollContainer.window
+  const scroller = findScrollContainer(selection.anchorNode)
+  const isWindow = scroller == scroller.window
   const backward = isBackward(selection)
   const range = selection.getRangeAt(0)
   const rect = range.getBoundingClientRect()
@@ -42,22 +59,24 @@ function scrollToSelection(selection) {
   let height
   let yOffset
   let xOffset
-  if (scrollContainerIsWindow) {
-    const { innerWidth, innerHeight, pageYOffset, pageXOffset } = scrollContainer
+  
+  if (isWindow) {
+    const { innerWidth, innerHeight, pageYOffset, pageXOffset } = scroller
     width = innerWidth
     height = innerHeight
     yOffset = pageYOffset
     xOffset = pageXOffset
   } else {
-    const { offsetWidth, offsetHeight, scrollTop, scrollLeft } = scrollContainer
+    const { offsetWidth, offsetHeight, scrollTop, scrollLeft } = scroller
     width = offsetWidth
     height = offsetHeight
     yOffset = scrollTop
     xOffset = scrollLeft
   }
+  
   const top = (backward ? rect.top : rect.bottom) + yOffset
   const left = (backward ? rect.left : rect.right) + xOffset
-
+  
   const x = left < yOffset || innerWidth + xOffset < left
     ? left - width / 2
     : xOffset
@@ -66,11 +85,11 @@ function scrollToSelection(selection) {
     ? top - height / 2
     : yOffset
 
-  if (scrollContainerIsWindow) {
+  if (isWindow) {
     window.scrollTo(x, y)
   } else {
-    scrollContainer.scrollTop = scrollContainer.scrollTop + y
-    scrollContainer.scrollLeft = scrollContainer.scrollLeft + x
+    scroller.scrollTop = scroller.scrollTop + y
+    scroller.scrollLeft = scroller.scrollLeft + x
   }
 }
 
