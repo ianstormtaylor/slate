@@ -373,15 +373,15 @@ function AfterPlugin() {
     // has fired in a node: https://github.com/facebook/react/issues/11379.
     // Until this is fixed in React, we dispatch a mouseup event on that
     // DOM node, since that will make it go back to normal.
-    const focusNode = document.getNode(target.focusKey)
-    const domNode = findDOMNode(focusNode)
-    if (!domNode) return
-    const mouseUpEvent = new MouseEvent('mouseup', {
+    const node = document.getNode(target.focusKey)
+    const el = findDOMNode(node)
+    if (!el) return
+    
+    el.dispatchEvent(new MouseEvent('mouseup', {
       view: window,
       bubbles: true,
       cancelable: true
-    })
-    domNode.dispatchEvent(mouseUpEvent)
+    }))
   }
 
   /**
