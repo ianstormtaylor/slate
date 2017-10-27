@@ -36,8 +36,8 @@ class Text extends React.Component {
     node: SlateTypes.node.isRequired,
     parent: SlateTypes.node.isRequired,
     schema: SlateTypes.schema.isRequired,
-    state: SlateTypes.state.isRequired,
     style: Types.object,
+    value: SlateTypes.value.isRequired,
   }
 
   /**
@@ -67,7 +67,7 @@ class Text extends React.Component {
    * Should the node update?
    *
    * @param {Object} nextProps
-   * @param {Object} state
+   * @param {Object} value
    * @return {Boolean}
    */
 
@@ -107,8 +107,8 @@ class Text extends React.Component {
     const { props } = this
     this.debug('render', { props })
 
-    const { decorations, node, state, style } = props
-    const { document } = state
+    const { decorations, node, value, style } = props
+    const { document } = value
     const { key } = node
 
     const decs = decorations.filter((d) => {
@@ -146,7 +146,7 @@ class Text extends React.Component {
    */
 
   renderLeaf = (leaves, leaf, index, offset) => {
-    const { block, node, parent, schema, state, editor } = this.props
+    const { block, node, parent, schema, value, editor } = this.props
     const { text, marks } = leaf
 
     return (
@@ -161,7 +161,7 @@ class Text extends React.Component {
         parent={parent}
         leaves={leaves}
         schema={schema}
-        state={state}
+        value={value}
         text={text}
       />
     )

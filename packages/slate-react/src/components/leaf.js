@@ -38,8 +38,8 @@ class Leaf extends React.Component {
     offset: Types.number.isRequired,
     parent: SlateTypes.node.isRequired,
     schema: SlateTypes.schema.isRequired,
-    state: SlateTypes.state.isRequired,
     text: Types.string.isRequired,
+    value: SlateTypes.value.isRequired,
   }
 
   /**
@@ -105,12 +105,12 @@ class Leaf extends React.Component {
    */
 
   renderMarks() {
-    const { marks, schema, node, offset, text, state, editor } = this.props
+    const { marks, schema, node, offset, text, value, editor } = this.props
     const stack = editor.getStack()
     const leaf = this.renderText()
 
     return marks.reduce((children, mark) => {
-      const props = { editor, mark, marks, node, offset, schema, state, text, children }
+      const props = { editor, mark, marks, node, offset, schema, value, text, children }
       const element = stack.find('renderMark', props)
       return element || children
     }, leaf)

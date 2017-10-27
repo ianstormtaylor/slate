@@ -48,9 +48,9 @@ class Editor extends React.Component {
     role: Types.string,
     schema: Types.object,
     spellCheck: Types.bool,
-    state: SlateTypes.state.isRequired,
     style: Types.object,
     tabIndex: Types.number,
+    value: SlateTypes.value.isRequired,
   }
 
   /**
@@ -82,6 +82,13 @@ class Editor extends React.Component {
     this.tmp.updates = 0
     this.tmp.resolves = 0
 
+    let { value } = props
+
+    if (!value && props.state) {
+      logger.deprecate('slate-react@0.9.0', 'The `props.state` prop has been renamed to `props.value`.')
+      value = props.state
+    }
+
     // Resolve the plugins and create a stack and schema from them.
     const plugins = this.resolvePlugins(props.plugins, props.schema)
     const stack = Stack.create({ plugins })
@@ -91,12 +98,11 @@ class Editor extends React.Component {
 
     // Run `onChange` on the passed-in state because we need to ensure that it
     // is normalized, and queue the resulting change.
-    const change = props.state.change()
+    const change = value.change()
     stack.run('onChange', change, this)
-    const { state } = change
     this.queueChange(change)
-    this.cacheState(state)
-    this.state.state = state
+    this.cacheValue(change.value)
+    this.state.value = change.value
 
     // Create a bound event handler for each event.
     EVENT_HANDLERS.forEach((handler) => {
@@ -122,8 +128,13 @@ class Editor extends React.Component {
    */
 
   componentWillReceiveProps = (props) => {
-    let { state } = props
+    let { value } = props
     let { schema, stack } = this.state
+
+    if (!value && props.state) {
+      logger.deprecate('slate-react@0.9.0', 'The `props.state` prop has been renamed to `props.value`.')
+      value = props.state
+    }
 
     // Increment the updates counter as a baseline.
     this.tmp.updates++
@@ -148,12 +159,11 @@ class Editor extends React.Component {
 
     // Run `onChange` on the passed-in state because we need to ensure that it
     // is normalized, and queue the resulting change.
-    const change = state.change()
+    const change = value.change()
     stack.run('onChange', change, this)
-    state = change.state
     this.queueChange(change)
-    this.cacheState(state)
-    this.setState({ state })
+    this.cacheValue(change.value)
+    this.setState({ value: change.value })
   }
 
   /**
@@ -173,19 +183,19 @@ class Editor extends React.Component {
   }
 
   /**
-   * Cache a `state` object to be able to compare against it later.
+   * Cache a `value` object to be able to compare against it later.
    *
-   * @param {State} state
+   * @param {Value} value
    */
 
-  cacheState = (state) => {
-    this.tmp.document = state.document
-    this.tmp.selection = state.selection
+  cacheValue = (value) => {
+    this.tmp.document = value.document
+    this.tmp.selection = value.selection
   }
 
   /**
    * Queue a `change` object, to be able to flush it later. This is required for
-   * when a change needs to be applied to the state, but because of the React
+   * when a change needs to be applied to the value, but because of the React
    * lifecycle we can't apply that change immediately. So we cache it here and
    * later can call `this.flushChange()` to flush it.
    *
@@ -217,6 +227,18 @@ class Editor extends React.Component {
   }
 
   /**
+   * Perform a change on the editor, passing `...args` to `change.call`.
+   *
+   * @param {Mixed} ...args
+   */
+
+  change = (...args) => {
+    const { state } = this.state
+    const change = state.change().call(...args)
+    this.onChange(change)
+  }
+
+  /**
    * Programmatically blur the editor.
    */
 
@@ -233,13 +255,30 @@ class Editor extends React.Component {
   }
 
   /**
+   * Getters for exposing public properties of the editor's state.
+   */
+
+  get schema() {
+    return this.state.schema
+  }
+
+  get stack() {
+    return this.state.stack
+  }
+
+  get value() {
+    return this.state.value
+  }
+
+  /**
    * Get the editor's current schema.
    *
    * @return {Schema}
    */
 
   getSchema = () => {
-    return this.state.schema
+    logger.deprecate('slate-react@0.9.0', 'The `editor.getSchema()` method has been deprecated, use the `editor.schema` property getter instead.')
+    return this.schema
   }
 
   /**
@@ -249,29 +288,19 @@ class Editor extends React.Component {
    */
 
   getStack = () => {
-    return this.state.stack
+    logger.deprecate('slate-react@0.9.0', 'The `editor.getStack()` method has been deprecated, use the `editor.stack` property getter instead.')
+    return this.stack
   }
 
   /**
    * Get the editor's current state.
    *
-   * @return {State}
+   * @return {Value}
    */
 
   getState = () => {
-    return this.state.state
-  }
-
-  /**
-   * Perform a change on the editor, passing `...args` to `change.call`.
-   *
-   * @param {Mixed} ...args
-   */
-
-  change = (...args) => {
-    const { state } = this.state
-    const change = state.change().call(...args)
-    this.onChange(change)
+    logger.deprecate('slate-react@0.9.0', 'The `editor.getState()` method has been deprecated, use the `editor.value` property getter instead.')
+    return this.value
   }
 
   /**
@@ -282,8 +311,8 @@ class Editor extends React.Component {
    */
 
   onEvent = (handler, event) => {
-    const { stack, state } = this.state
-    const change = state.change()
+    const { stack, value } = this.state
+    const change = value.change()
     stack.run(handler, event, change, this)
     this.onChange(change)
   }
@@ -307,7 +336,7 @@ class Editor extends React.Component {
     const { document, selection } = this.tmp
     const { onChange, onDocumentChange, onSelectionChange } = this.props
 
-    if (state == this.state.state) return
+    if (state == this.state.value) return
     onChange(change)
     if (onDocumentChange && state.document != document) onDocumentChange(state.document, change)
     if (onSelectionChange && state.selection != selection) onSelectionChange(state.selection, change)
@@ -322,13 +351,13 @@ class Editor extends React.Component {
   render() {
     debug('render', this)
 
-    const { stack, state } = this.state
+    const { stack, value } = this.state
     const children = stack
-      .map('renderPortal', state, this)
+      .map('renderPortal', value, this)
       .map((child, i) => <Portal key={i} isOpened>{child}</Portal>)
 
     const props = { ...this.props, children }
-    const tree = stack.render('renderEditor', props, state, this)
+    const tree = stack.render('renderEditor', props, value, this)
     return tree
   }
 
