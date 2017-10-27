@@ -92,8 +92,12 @@ export const IS_FIREFOX = BROWSER === 'firefox'
 export const IS_SAFARI = BROWSER === 'safari'
 export const IS_IE = BROWSER === 'ie'
 
+export const IS_ANDROID = OS === 'android'
 export const IS_IOS = OS === 'ios'
 export const IS_MAC = OS === 'macos'
 export const IS_WINDOWS = OS === 'windows'
+
+export const IS_MOBILE = IS_ANDROID || IS_IOS
+export const IS_DESKTOP = !IS_MOBILE
 
 export const SUPPORTED_EVENTS = EVENTS
