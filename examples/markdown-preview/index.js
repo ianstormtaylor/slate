@@ -21,13 +21,13 @@ Prism.languages.markdown=Prism.languages.extend("markup",{}),Prism.languages.ins
 class MarkdownPreview extends React.Component {
 
   /**
-   * Deserialize the initial editor state.
+   * Deserialize the initial editor value.
    *
    * @type {Object}
    */
 
   state = {
-    state: Plain.deserialize('Slate is flexible enough to add **decorators** that can format text based on its content. For example, this editor has **Markdown** preview decorators on it, to make it _dead_ simple to make an editor with built-in Markdown previewing.\n## Try it out!\nTry it out for yourself!')
+    value: Plain.deserialize('Slate is flexible enough to add **decorators** that can format text based on its content. For example, this editor has **Markdown** preview decorators on it, to make it _dead_ simple to make an editor with built-in Markdown previewing.\n## Try it out!\nTry it out for yourself!')
   }
 
   /**
@@ -36,8 +36,8 @@ class MarkdownPreview extends React.Component {
    * @param {Change} change
    */
 
-  onChange = ({ state }) => {
-    this.setState({ state })
+  onChange = ({ value }) => {
+    this.setState({ value })
   }
 
   /**
@@ -52,7 +52,7 @@ class MarkdownPreview extends React.Component {
       <div className="editor">
         <Editor
           placeholder="Write some markdown..."
-          state={this.state.state}
+          value={this.state.value}
           onChange={this.onChange}
           renderMark={this.renderMark}
           decorateNode={this.decorateNode}

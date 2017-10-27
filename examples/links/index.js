@@ -1,9 +1,9 @@
 
 import { Editor, getEventTransfer } from 'slate-react'
-import { State } from 'slate'
+import { Value } from 'slate'
 
 import React from 'react'
-import initialState from './state.json'
+import initialValue from './value.json'
 import isUrl from 'is-url'
 
 /**
@@ -41,13 +41,13 @@ function unwrapLink(change) {
 class Links extends React.Component {
 
   /**
-   * Deserialize the raw initial state.
+   * Deserialize the raw initial value.
    *
    * @type {Object}
    */
 
   state = {
-    state: State.fromJSON(initialState)
+    value: Value.fromJSON(initialValue)
   }
 
   /**
@@ -57,8 +57,8 @@ class Links extends React.Component {
    */
 
   hasLinks = () => {
-    const { state } = this.state
-    return state.inlines.some(inline => inline.type == 'link')
+    const { value } = this.state
+    return value.inlines.some(inline => inline.type == 'link')
   }
 
   /**
@@ -67,8 +67,8 @@ class Links extends React.Component {
    * @param {Change} change
    */
 
-  onChange = ({ state }) => {
-    this.setState({ state })
+  onChange = ({ value }) => {
+    this.setState({ value })
   }
 
   /**
@@ -80,15 +80,15 @@ class Links extends React.Component {
 
   onClickLink = (event) => {
     event.preventDefault()
-    const { state } = this.state
+    const { value } = this.state
     const hasLinks = this.hasLinks()
-    const change = state.change()
+    const change = value.change()
 
     if (hasLinks) {
       change.call(unwrapLink)
     }
 
-    else if (state.isExpanded) {
+    else if (value.isExpanded) {
       const href = window.prompt('Enter the URL of the link:')
       change.call(wrapLink, href)
     }
@@ -113,7 +113,7 @@ class Links extends React.Component {
    */
 
   onPaste = (event, change) => {
-    if (change.state.isCollapsed) return
+    if (change.value.isCollapsed) return
 
     const transfer = getEventTransfer(event)
     const { type, text } = transfer
@@ -171,7 +171,7 @@ class Links extends React.Component {
       <div className="editor">
         <Editor
           placeholder="Enter some text..."
-          state={this.state.state}
+          value={this.state.value}
           onChange={this.onChange}
           onPaste={this.onPaste}
           renderNode={this.renderNode}
