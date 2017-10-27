@@ -713,11 +713,11 @@ function AfterPlugin() {
    */
 
   function renderPlaceholder(props) {
-    const { editor, node, value } = props
+    const { editor, node } = props
     if (node.kind != 'block') return
     if (!Text.isTextList(node.nodes)) return
     if (node.text != '') return
-    if (value.document.getBlocks().size > 1) return
+    if (editor.value.document.getBlocks().size > 1) return
 
     const style = {
       pointerEvents: 'none',
