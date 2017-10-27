@@ -5,7 +5,7 @@ import React from 'react'
 import SlateTypes from 'slate-prop-types'
 import Types from 'prop-types'
 import logger from 'slate-dev-logger'
-import { Schema, Stack, State } from 'slate'
+import { Schema, Stack, Value } from 'slate'
 
 import EVENT_HANDLERS from '../constants/event-handlers'
 import PLUGINS_PROPS from '../constants/plugin-props'
@@ -96,7 +96,7 @@ class Editor extends React.Component {
     this.state.schema = schema
     this.state.stack = stack
 
-    // Run `onChange` on the passed-in state because we need to ensure that it
+    // Run `onChange` on the passed-in value because we need to ensure that it
     // is normalized, and queue the resulting change.
     const change = value.change()
     stack.run('onChange', change, this)
@@ -122,7 +122,7 @@ class Editor extends React.Component {
 
   /**
    * When the `props` are updated, create a new `Stack` if necessary and run
-   * `onChange` to ensure the state is normalized.
+   * `onChange` to ensure the value is normalized.
    *
    * @param {Object} props
    */
@@ -157,7 +157,7 @@ class Editor extends React.Component {
       }
     }
 
-    // Run `onChange` on the passed-in state because we need to ensure that it
+    // Run `onChange` on the passed-in value because we need to ensure that it
     // is normalized, and queue the resulting change.
     const change = value.change()
     stack.run('onChange', change, this)
@@ -233,8 +233,7 @@ class Editor extends React.Component {
    */
 
   change = (...args) => {
-    const { state } = this.state
-    const change = state.change().call(...args)
+    const change = this.value.change().call(...args)
     this.onChange(change)
   }
 
@@ -293,7 +292,7 @@ class Editor extends React.Component {
   }
 
   /**
-   * Get the editor's current state.
+   * Get the editor's current value.
    *
    * @return {Value}
    */
@@ -311,10 +310,9 @@ class Editor extends React.Component {
    */
 
   onEvent = (handler, event) => {
-    const { stack, value } = this.state
-    const change = value.change()
-    stack.run(handler, event, change, this)
-    this.onChange(change)
+    this.change((change) => {
+      this.stack.run(handler, event, change, this)
+    })
   }
 
   /**
@@ -326,20 +324,20 @@ class Editor extends React.Component {
   onChange = (change) => {
     debug('onChange', { change })
 
-    if (State.isState(change)) {
-      throw new Error('As of slate@0.22.0 the `editor.onChange` method must be passed a `Change` object not a `State` object.')
+    if (Value.isValue(change)) {
+      throw new Error('As of slate@0.22.0 the `editor.onChange` method must be passed a `Change` object not a `Value` object.')
     }
 
-    const { stack } = this.state
-    stack.run('onChange', change, this)
-    const { state } = change
+    this.stack.run('onChange', change, this)
+
+    const { value } = change
     const { document, selection } = this.tmp
     const { onChange, onDocumentChange, onSelectionChange } = this.props
+    if (value == this.value) return
 
-    if (state == this.state.value) return
     onChange(change)
-    if (onDocumentChange && state.document != document) onDocumentChange(state.document, change)
-    if (onSelectionChange && state.selection != selection) onSelectionChange(state.selection, change)
+    if (onDocumentChange && value.document != document) onDocumentChange(value.document, change)
+    if (onSelectionChange && value.selection != selection) onSelectionChange(value.selection, change)
   }
 
   /**
@@ -351,13 +349,12 @@ class Editor extends React.Component {
   render() {
     debug('render', this)
 
-    const { stack, value } = this.state
-    const children = stack
-      .map('renderPortal', value, this)
+    const children = this.stack
+      .map('renderPortal', this.value, this)
       .map((child, i) => <Portal key={i} isOpened>{child}</Portal>)
 
     const props = { ...this.props, children }
-    const tree = stack.render('renderEditor', props, value, this)
+    const tree = this.stack.render('renderEditor', props, this.value, this)
     return tree
   }
 

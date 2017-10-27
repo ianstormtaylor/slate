@@ -683,7 +683,7 @@ function AfterPlugin() {
         editor={editor}
         readOnly={props.readOnly}
         role={props.role}
-        schema={editor.getSchema()}
+        schema={editor.schema}
         spellCheck={props.spellCheck}
         value={value}
         style={props.style}

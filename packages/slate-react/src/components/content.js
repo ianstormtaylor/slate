@@ -434,7 +434,7 @@ class Content extends React.Component {
   renderNode = (child, isSelected) => {
     const { editor, readOnly, schema, value } = this.props
     const { document, decorations } = value
-    const stack = editor.getStack()
+    const { stack } = editor
     let decs = document.getDecorations(stack)
     if (decorations) decs = decorations.concat(decs)
     return (

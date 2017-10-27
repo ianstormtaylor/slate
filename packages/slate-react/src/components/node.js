@@ -66,7 +66,7 @@ class Node extends React.Component {
 
   shouldComponentUpdate = (nextProps) => {
     const { props } = this
-    const stack = props.editor.getStack()
+    const { stack } = props.editor
     const shouldUpdate = stack.find('shouldNodeComponentUpdate', props, nextProps)
     const n = nextProps
     const p = props
@@ -119,7 +119,7 @@ class Node extends React.Component {
 
     const { editor, isSelected, node, parent, readOnly, value } = this.props
     const { selection } = value
-    const stack = editor.getStack()
+    const { stack } = editor
     const indexes = node.getSelectionIndexes(selection, isSelected)
     let children = node.nodes.toArray().map((child, i) => {
       const isChildSelected = !!indexes && indexes.start <= i && i < indexes.end
@@ -172,7 +172,7 @@ class Node extends React.Component {
   renderNode = (child, isSelected) => {
     const { block, decorations, editor, node, readOnly, schema, value } = this.props
     const Component = child.kind == 'text' ? Text : Node
-    const stack = editor.getStack()
+    const { stack } = editor
     const decs = decorations.concat(node.getDecorations(stack))
     return (
       <Component

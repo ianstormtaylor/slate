@@ -99,12 +99,12 @@ function BeforePlugin() {
 
   function onChange(change, editor) {
     const { value } = change
-    const schema = editor.getSchema()
 
-    // If the value's schema isn't the editor's schema, update it.
-    if (value.schema != schema) {
+    // If the value's schema isn't the editor's schema, update it. This can
+    // happen on the initialization of the editor, or if the schema changes.
+    if (value.schema != editor.schema) {
       change
-        .setValue({ schema })
+        .setValue({ schema: editor.schema })
         .normalize()
     }
 

@@ -106,7 +106,7 @@ class Leaf extends React.Component {
 
   renderMarks() {
     const { marks, schema, node, offset, text, value, editor } = this.props
-    const stack = editor.getStack()
+    const { stack } = editor
     const leaf = this.renderText()
 
     return marks.reduce((children, mark) => {
