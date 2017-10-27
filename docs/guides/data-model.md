@@ -33,13 +33,13 @@ Collections of Slate objects are represented as immutable `Lists`, `Sets`, `Stac
 If you haven't used Immutable.js before, there is definitely a learning curve. Before you give into Slate, you should check out the [Immutable.js docs](https://facebook.github.io/immutable-js/docs/#/). Once you get the hang of it won't slow you down at all, but it will take a few days to get used to, and you might write things a little "un-performantly" to start.
 
 
-## The "State"
+## The "Value"
 
-The top-level object in Slate—the object encapsulates the entire value of an Slate editor—is called a [`State`](../reference/slate/state.md). 
+The top-level object in Slate—the object encapsulates the entire value of an Slate editor—is called a [`Value`](../reference/slate/value.md). 
 
 It is made up of a document filled with content, and a selection representing the user's current cursor selection. It also has a history, to keep track of changes, and a few other more advanced properties like `decorations` and `data`.
 
-> 📋 For more info, check out the [`State` reference](../reference/slate/state.md).
+> 📋 For more info, check out the [`Value` reference](../reference/slate/value.md).
 
 
 ## Documents and Nodes
@@ -60,7 +60,7 @@ Unlike the DOM though, Slate enforces a few more restrictions on its documents, 
 
 - **Blocks and inlines must always contain at least one text node.** This is to ensure that the user's cursor can always "enter" the nodes, and to make sure that ranges can be created referencing them.
 
-Slate enforces all of these restrictions for you automatically. Any time you [perform changes](./changes.md) to the document, Slate will check if the document is invalid, and if so it will return it to a "normalized" state. 
+Slate enforces all of these restrictions for you automatically. Any time you [perform changes](./changes.md) to the document, Slate will check if the document is invalid, and if so it will return it to a "normalized" value. 
 
 > 🙃 Fun fact: normalizing is actually based on the DOM's [`Node.normalize()`](https://developer.mozilla.org/en-US/docs/Web/API/Node/normalize)!
 
