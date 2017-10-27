@@ -368,6 +368,20 @@ function AfterPlugin() {
     if (type == 'node' && Inline.isInline(node)) {
       change.insertInline(node).removeNodeByKey(node.key)
     }
+
+    // COMPAT: React's onSelect event breaks after an onDrop event
+    // has fired in a node: https://github.com/facebook/react/issues/11379.
+    // Until this is fixed in React, we dispatch a mouseup event on that
+    // DOM node, since that will make it go back to normal.
+    const node = document.getNode(target.focusKey)
+    const el = findDOMNode(node)
+    if (!el) return
+    
+    el.dispatchEvent(new MouseEvent('mouseup', {
+      view: window,
+      bubbles: true,
+      cancelable: true
+    }))
   }
 
   /**
