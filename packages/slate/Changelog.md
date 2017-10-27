@@ -7,6 +7,16 @@ This document maintains a list of changes to the `slate` package with each new v
 ---
 
 
+### `0.30.0` — October 27, 2017
+
+###### BREAKING
+
+- **Remove all previously deprecated code paths.** This helps to reduce some of the complexity in Slate by not having to handle these code paths anymore. And it helps to reduce file size. When upgrading, it's _highly_ recommended that you upgrade to the previous version first and ensure there are no deprecation warnings being logged, then upgrade to this version.
+
+
+---
+
+
 ### `0.29.0` — October 27, 2017
 
 ###### BREAKING
