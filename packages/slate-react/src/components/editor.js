@@ -354,7 +354,7 @@ class Editor extends React.Component {
       .map((child, i) => <Portal key={i} isOpened>{child}</Portal>)
 
     const props = { ...this.props, children }
-    const tree = this.stack.render('renderEditor', props, this.value, this)
+    const tree = this.stack.render('renderEditor', props, this)
     return tree
   }
 

@@ -39,8 +39,6 @@ class Node extends React.Component {
     node: SlateTypes.node.isRequired,
     parent: SlateTypes.node.isRequired,
     readOnly: Types.bool.isRequired,
-    schema: SlateTypes.schema.isRequired,
-    value: SlateTypes.value.isRequired,
   }
 
   /**
@@ -117,7 +115,8 @@ class Node extends React.Component {
   render() {
     this.debug('render', this)
 
-    const { editor, isSelected, node, parent, readOnly, value } = this.props
+    const { editor, isSelected, node, parent, readOnly } = this.props
+    const { value } = editor
     const { selection } = value
     const { stack } = editor
     const indexes = node.getSelectionIndexes(selection, isSelected)
@@ -144,7 +143,6 @@ class Node extends React.Component {
       node,
       parent,
       readOnly,
-      value
     }
 
     let placeholder = stack.find('renderPlaceholder', props)
@@ -170,9 +168,9 @@ class Node extends React.Component {
    */
 
   renderNode = (child, isSelected) => {
-    const { block, decorations, editor, node, readOnly, schema, value } = this.props
-    const Component = child.kind == 'text' ? Text : Node
+    const { block, decorations, editor, node, readOnly } = this.props
     const { stack } = editor
+    const Component = child.kind == 'text' ? Text : Node
     const decs = decorations.concat(node.getDecorations(stack))
     return (
       <Component
@@ -184,8 +182,6 @@ class Node extends React.Component {
         node={child}
         parent={node}
         readOnly={readOnly}
-        schema={schema}
-        value={value}
       />
     )
   }

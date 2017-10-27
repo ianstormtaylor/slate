@@ -662,12 +662,11 @@ function AfterPlugin() {
    * Render editor.
    *
    * @param {Object} props
-   * @param {Value} value
    * @param {Editor} editor
    * @return {Object}
    */
 
-  function renderEditor(props, value, editor) {
+  function renderEditor(props, editor) {
     const handlers = EVENT_HANDLERS.reduce((obj, handler) => {
       obj[handler] = editor[handler]
       return obj
@@ -683,9 +682,7 @@ function AfterPlugin() {
         editor={editor}
         readOnly={props.readOnly}
         role={props.role}
-        schema={editor.schema}
         spellCheck={props.spellCheck}
-        value={value}
         style={props.style}
         tabIndex={props.tabIndex}
         tagName={props.tagName}

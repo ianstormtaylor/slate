@@ -35,9 +35,7 @@ class Text extends React.Component {
     editor: Types.object.isRequired,
     node: SlateTypes.node.isRequired,
     parent: SlateTypes.node.isRequired,
-    schema: SlateTypes.schema.isRequired,
     style: Types.object,
-    value: SlateTypes.value.isRequired,
   }
 
   /**
@@ -104,10 +102,10 @@ class Text extends React.Component {
    */
 
   render() {
-    const { props } = this
-    this.debug('render', { props })
+    this.debug('render', this)
 
-    const { decorations, node, value, style } = props
+    const { decorations, editor, node, style } = this.props
+    const { value } = editor
     const { document } = value
     const { key } = node
 
@@ -146,7 +144,7 @@ class Text extends React.Component {
    */
 
   renderLeaf = (leaves, leaf, index, offset) => {
-    const { block, node, parent, schema, value, editor } = this.props
+    const { block, node, parent, editor } = this.props
     const { text, marks } = leaf
 
     return (
@@ -160,8 +158,6 @@ class Text extends React.Component {
         offset={offset}
         parent={parent}
         leaves={leaves}
-        schema={schema}
-        value={value}
         text={text}
       />
     )

@@ -1,7 +1,6 @@
 
 import Debug from 'debug'
 import React from 'react'
-import SlateTypes from 'slate-prop-types'
 import Types from 'prop-types'
 import getWindow from 'get-window'
 import logger from 'slate-dev-logger'
@@ -43,12 +42,10 @@ class Content extends React.Component {
     editor: Types.object.isRequired,
     readOnly: Types.bool.isRequired,
     role: Types.string,
-    schema: SlateTypes.schema.isRequired,
     spellCheck: Types.bool.isRequired,
     style: Types.object,
     tabIndex: Types.number,
     tagName: Types.string,
-    value: SlateTypes.value.isRequired,
   }
 
   /**
@@ -124,7 +121,8 @@ class Content extends React.Component {
    */
 
   updateSelection = () => {
-    const { value } = this.props
+    const { editor } = this.props
+    const { value } = editor
     const { selection } = value
     const window = getWindow(this.element)
     const native = window.getSelection()
@@ -246,7 +244,8 @@ class Content extends React.Component {
     // already up to date, but we do want to update the native selection again
     // to make sure it is in sync. (2017/10/16)
     if (handler == 'onSelect') {
-      const { value } = this.props
+      const { editor } = this.props
+      const { value } = editor
       const { selection } = value
       const window = getWindow(event.target)
       const native = window.getSelection()
@@ -323,7 +322,8 @@ class Content extends React.Component {
 
     event.preventDefault()
 
-    const { editor, value } = this.props
+    const { editor } = this.props
+    const { value } = editor
     const { selection } = value
     const range = findRange(targetRange, value)
 
@@ -346,7 +346,8 @@ class Content extends React.Component {
 
   render() {
     const { props } = this
-    const { className, readOnly, value, tabIndex, role, tagName } = props
+    const { className, readOnly, editor, tabIndex, role, tagName } = props
+    const { value } = editor
     const Container = tagName
     const { document, selection } = value
     const indexes = document.getSelectionIndexes(selection, selection.isFocused)
@@ -432,7 +433,8 @@ class Content extends React.Component {
    */
 
   renderNode = (child, isSelected) => {
-    const { editor, readOnly, schema, value } = this.props
+    const { editor, readOnly } = this.props
+    const { value } = editor
     const { document, decorations } = value
     const { stack } = editor
     let decs = document.getDecorations(stack)
@@ -447,8 +449,6 @@ class Content extends React.Component {
         node={child}
         parent={document}
         readOnly={readOnly}
-        schema={schema}
-        value={value}
       />
     )
   }
