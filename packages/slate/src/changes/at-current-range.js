@@ -73,6 +73,40 @@ Changes.addMark = (change, mark) => {
 }
 
 /**
+ * Add a list of `marks` to the characters in the current selection.
+ *
+ * @param {Change} change
+ * @param {Mark} mark
+ */
+
+Changes.addMarks = (change, marks) => {
+  marks = Mark.createSet(marks);
+  const { state } = change
+  const { document, selection } = state
+
+  if (selection.isExpanded) {
+    change.addMarksAtRange(selection, marks)
+  }
+
+  else if (selection.marks) {
+    marks = selection.marks.union(marks)
+    const sel = selection.set('marks', marks)
+    change.select(sel)
+  }
+
+  else {
+    if (selection.isSet) {
+      marks = document
+        .getActiveMarksAtRange(selection)
+        .union(marks)
+    }
+
+    const sel = selection.set('marks', marks)
+    change.select(sel)
+  }
+}
+
+/**
  * Delete at the current selection.
  *
  * @param {Change} change

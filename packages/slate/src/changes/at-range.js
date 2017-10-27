@@ -48,6 +48,20 @@ Changes.addMarkAtRange = (change, range, mark, options = {}) => {
 }
 
 /**
+ * Add a list of `marks` to the characters at `range`.
+ *
+ * @param {Change} change
+ * @param {Range} range
+ * @param {Array<Mixed>} mark
+ * @param {Object} options
+ *   @property {Boolean} normalize
+ */
+
+Changes.addMarksAtRange = (change, range, marks, options = {}) => {
+  marks.forEach(mark => change.addMarkAtRange(range, mark, options))
+}
+
+/**
  * Delete everything in a `range`.
  *
  * @param {Change} change
