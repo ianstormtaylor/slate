@@ -1,7 +1,6 @@
 
 import isEmpty from 'is-empty'
 import isPlainObject from 'is-plain-object'
-import logger from 'slate-dev-logger'
 
 import {
   Block,
@@ -73,11 +72,6 @@ const CREATORS = {
 
   selection(tagName, attributes, children) {
     return Range.create(attributes)
-  },
-
-  state(...args) {
-    logger.deprecate('slate-hyperscript@0.3.0', 'The `<state>` tag has been renamed to `<value>`.')
-    return CREATORS.value(...args)
   },
 
   value(tagName, attributes, children) {

@@ -1,5 +1,4 @@
 
-import logger from 'slate-dev-logger'
 import { Stack } from 'slate'
 
 /**
@@ -40,18 +39,6 @@ class Simulator {
     this.props = props
     this.stack = stack
     this.value = value
-
-    if (props.state) {
-      logger.deprecate('slate-simulator@0.3.0', 'The `state` prop has been renamed to `value`.')
-      this.value = props.state
-    }
-
-    Object.defineProperty(this, 'state', {
-      get() {
-        logger.deprecate('slate-simulator@0.3.0', 'The `simulator.state` property has been renamed to `simulator.value`.')
-        return this.value
-      }
-    })
   }
 
 }

@@ -1,5 +1,4 @@
 
-import logger from 'slate-dev-logger'
 import { Block, Mark, Node, Value } from 'slate'
 import { Set } from 'immutable'
 
@@ -20,11 +19,6 @@ function deserialize(string, options = {}) {
     defaultMarks = [],
     toJSON = false,
   } = options
-
-  if (options.toRaw) {
-    logger.deprecate('0.23.0', 'The `options.toRaw` argument of the `Plain` serializer is deprecated, use `options.toJSON` instead.')
-    toJSON = options.toRaw
-  }
 
   if (Set.isSet(defaultMarks)) {
     defaultMarks = defaultMarks.toArray()

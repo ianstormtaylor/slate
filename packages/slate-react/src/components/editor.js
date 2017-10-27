@@ -5,7 +5,7 @@ import React from 'react'
 import SlateTypes from 'slate-prop-types'
 import Types from 'prop-types'
 import logger from 'slate-dev-logger'
-import { Schema, Stack, Value } from 'slate'
+import { Schema, Stack } from 'slate'
 
 import EVENT_HANDLERS from '../constants/event-handlers'
 import PLUGINS_PROPS from '../constants/plugin-props'
@@ -41,8 +41,6 @@ class Editor extends React.Component {
     className: Types.string,
     onChange: Types.func,
     placeholder: Types.any,
-    placeholderClassName: Types.string,
-    placeholderStyle: Types.object,
     plugins: Types.array,
     readOnly: Types.bool,
     role: Types.string,
@@ -82,13 +80,6 @@ class Editor extends React.Component {
     this.tmp.updates = 0
     this.tmp.resolves = 0
 
-    let { value } = props
-
-    if (!value && props.state) {
-      logger.deprecate('slate-react@0.9.0', 'The `props.state` prop has been renamed to `props.value`.')
-      value = props.state
-    }
-
     // Resolve the plugins and create a stack and schema from them.
     const plugins = this.resolvePlugins(props.plugins, props.schema)
     const stack = Stack.create({ plugins })
@@ -98,10 +89,9 @@ class Editor extends React.Component {
 
     // Run `onChange` on the passed-in value because we need to ensure that it
     // is normalized, and queue the resulting change.
-    const change = value.change()
+    const change = props.value.change()
     stack.run('onChange', change, this)
     this.queueChange(change)
-    this.cacheValue(change.value)
     this.state.value = change.value
 
     // Create a bound event handler for each event.
@@ -110,14 +100,6 @@ class Editor extends React.Component {
         this.onEvent(handler, ...args)
       }
     })
-
-    if (props.onDocumentChange) {
-      logger.deprecate('0.22.10', 'The `onDocumentChange` prop is deprecated because it led to confusing UX issues, see https://github.com/ianstormtaylor/slate/issues/614#issuecomment-327868679')
-    }
-
-    if (props.onSelectionChange) {
-      logger.deprecate('0.22.10', 'The `onSelectionChange` prop is deprecated because it led to confusing UX issues, see https://github.com/ianstormtaylor/slate/issues/614#issuecomment-327868679')
-    }
   }
 
   /**
@@ -128,13 +110,7 @@ class Editor extends React.Component {
    */
 
   componentWillReceiveProps = (props) => {
-    let { value } = props
-    let { schema, stack } = this.state
-
-    if (!value && props.state) {
-      logger.deprecate('slate-react@0.9.0', 'The `props.state` prop has been renamed to `props.value`.')
-      value = props.state
-    }
+    let { schema, stack } = this
 
     // Increment the updates counter as a baseline.
     this.tmp.updates++
@@ -153,16 +129,15 @@ class Editor extends React.Component {
       // If we've resolved a few times already, and it's exactly in line with
       // the updates, then warn the user that they may be doing something wrong.
       if (this.tmp.resolves > 5 && this.tmp.resolves == this.tmp.updates) {
-        logger.warn('A Slate <Editor> is re-resolving its `plugins` or `schema` on each update, which leads to poor performance. This is often due to passing in a new `schema` or `plugins` prop with each render, by declaring them inline in your render function. Do not do this!')
+        logger.warn('A Slate <Editor> is re-resolving `props.plugins` or `props.schema` on each update, which leads to poor performance. This is often due to passing in a new `schema` or `plugins` prop with each render by declaring them inline in your render function. Do not do this!')
       }
     }
 
     // Run `onChange` on the passed-in value because we need to ensure that it
     // is normalized, and queue the resulting change.
-    const change = value.change()
+    const change = props.value.change()
     stack.run('onChange', change, this)
     this.queueChange(change)
-    this.cacheValue(change.value)
     this.setState({ value: change.value })
   }
 
@@ -180,17 +155,6 @@ class Editor extends React.Component {
 
   componentDidUpdate = () => {
     this.flushChange()
-  }
-
-  /**
-   * Cache a `value` object to be able to compare against it later.
-   *
-   * @param {Value} value
-   */
-
-  cacheValue = (value) => {
-    this.tmp.document = value.document
-    this.tmp.selection = value.selection
   }
 
   /**
@@ -270,39 +234,6 @@ class Editor extends React.Component {
   }
 
   /**
-   * Get the editor's current schema.
-   *
-   * @return {Schema}
-   */
-
-  getSchema = () => {
-    logger.deprecate('slate-react@0.9.0', 'The `editor.getSchema()` method has been deprecated, use the `editor.schema` property getter instead.')
-    return this.schema
-  }
-
-  /**
-   * Get the editor's current stack.
-   *
-   * @return {Stack}
-   */
-
-  getStack = () => {
-    logger.deprecate('slate-react@0.9.0', 'The `editor.getStack()` method has been deprecated, use the `editor.stack` property getter instead.')
-    return this.stack
-  }
-
-  /**
-   * Get the editor's current value.
-   *
-   * @return {Value}
-   */
-
-  getState = () => {
-    logger.deprecate('slate-react@0.9.0', 'The `editor.getState()` method has been deprecated, use the `editor.value` property getter instead.')
-    return this.value
-  }
-
-  /**
    * On event.
    *
    * @param {String} handler
@@ -324,20 +255,11 @@ class Editor extends React.Component {
   onChange = (change) => {
     debug('onChange', { change })
 
-    if (Value.isValue(change)) {
-      throw new Error('As of slate@0.22.0 the `editor.onChange` method must be passed a `Change` object not a `Value` object.')
-    }
-
     this.stack.run('onChange', change, this)
-
     const { value } = change
-    const { document, selection } = this.tmp
-    const { onChange, onDocumentChange, onSelectionChange } = this.props
+    const { onChange } = this.props
     if (value == this.value) return
-
     onChange(change)
-    if (onDocumentChange && value.document != document) onDocumentChange(value.document, change)
-    if (onSelectionChange && value.selection != selection) onSelectionChange(value.selection, change)
   }
 
   /**

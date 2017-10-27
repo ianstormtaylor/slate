@@ -1,7 +1,6 @@
 
 import direction from 'direction'
 import isPlainObject from 'is-plain-object'
-import logger from 'slate-dev-logger'
 import { List, OrderedSet, Set } from 'immutable'
 
 import Block from './block'
@@ -163,8 +162,8 @@ class Node {
    */
 
   areDescendantsSorted(first, second) {
-    first = normalizeKey(first)
-    second = normalizeKey(second)
+    first = assertKey(first)
+    second = assertKey(second)
 
     const keys = this.getKeysAsArray()
     const firstIndex = keys.indexOf(first)
@@ -185,7 +184,7 @@ class Node {
     const child = this.getChild(key)
 
     if (!child) {
-      key = normalizeKey(key)
+      key = assertKey(key)
       throw new Error(`Could not find a child node with key "${key}".`)
     }
 
@@ -203,7 +202,7 @@ class Node {
     const descendant = this.getDescendant(key)
 
     if (!descendant) {
-      key = normalizeKey(key)
+      key = assertKey(key)
       throw new Error(`Could not find a descendant node with key "${key}".`)
     }
 
@@ -221,7 +220,7 @@ class Node {
     const node = this.getNode(key)
 
     if (!node) {
-      key = normalizeKey(key)
+      key = assertKey(key)
       throw new Error(`Could not find a node with key "${key}".`)
     }
 
@@ -315,7 +314,7 @@ class Node {
    */
 
   getAncestors(key) {
-    key = normalizeKey(key)
+    key = assertKey(key)
 
     if (key == this.key) return List()
     if (this.hasChild(key)) return List([this])
@@ -497,7 +496,7 @@ class Node {
    */
 
   getChild(key) {
-    key = normalizeKey(key)
+    key = assertKey(key)
     return this.nodes.find(node => node.key == key)
   }
 
@@ -510,7 +509,7 @@ class Node {
    */
 
   getClosest(key, iterator) {
-    key = normalizeKey(key)
+    key = assertKey(key)
     const ancestors = this.getAncestors(key)
     if (!ancestors) {
       throw new Error(`Could not find a descendant node with key "${key}".`)
@@ -562,8 +561,8 @@ class Node {
    */
 
   getCommonAncestor(one, two) {
-    one = normalizeKey(one)
-    two = normalizeKey(two)
+    one = assertKey(one)
+    two = assertKey(two)
 
     if (one == this.key) return this
     if (two == this.key) return this
@@ -622,7 +621,7 @@ class Node {
    */
 
   getDescendant(key) {
-    key = normalizeKey(key)
+    key = assertKey(key)
     let descendantFound = null
 
     const found = this.nodes.find((node) => {
@@ -751,7 +750,7 @@ class Node {
   getFurthest(key, iterator) {
     const ancestors = this.getAncestors(key)
     if (!ancestors) {
-      key = normalizeKey(key)
+      key = assertKey(key)
       throw new Error(`Could not find a descendant node with key "${key}".`)
     }
 
@@ -789,7 +788,7 @@ class Node {
    */
 
   getFurthestAncestor(key) {
-    key = normalizeKey(key)
+    key = assertKey(key)
     return this.nodes.find((node) => {
       if (node.key == key) return true
       if (node.kind == 'text') return false
@@ -808,7 +807,7 @@ class Node {
     const ancestors = this.getAncestors(key)
 
     if (!ancestors) {
-      key = normalizeKey(key)
+      key = assertKey(key)
       throw new Error(`Could not find a descendant node with key "${key}".`)
     }
 
@@ -1181,7 +1180,7 @@ class Node {
    */
 
   getNextSibling(key) {
-    key = normalizeKey(key)
+    key = assertKey(key)
 
     const parent = this.getParent(key)
     const after = parent.nodes
@@ -1201,7 +1200,7 @@ class Node {
    */
 
   getNextText(key) {
-    key = normalizeKey(key)
+    key = assertKey(key)
     return this.getTexts()
       .skipUntil(text => text.key == key)
       .get(1)
@@ -1215,7 +1214,7 @@ class Node {
    */
 
   getNode(key) {
-    key = normalizeKey(key)
+    key = assertKey(key)
     return this.key == key ? this : this.getDescendant(key)
   }
 
@@ -1362,7 +1361,7 @@ class Node {
    */
 
   getPreviousSibling(key) {
-    key = normalizeKey(key)
+    key = assertKey(key)
     const parent = this.getParent(key)
     const before = parent.nodes
       .takeUntil(child => child.key == key)
@@ -1382,7 +1381,7 @@ class Node {
    */
 
   getPreviousText(key) {
-    key = normalizeKey(key)
+    key = assertKey(key)
     return this.getTexts()
       .takeUntil(text => text.key == key)
       .last()
@@ -1789,7 +1788,7 @@ class Node {
    */
 
   removeDescendant(key) {
-    key = normalizeKey(key)
+    key = assertKey(key)
 
     let node = this
     let parent = node.getParent(key)
@@ -1892,181 +1891,18 @@ class Node {
     return schema.validateNode(this)
   }
 
-  /**
-   * True if the node has both descendants in that order, false otherwise. The
-   * order is depth-first, post-order.
-   *
-   * @param {String} first
-   * @param {String} second
-   * @return {Boolean}
-   */
-
-  areDescendantSorted(first, second) {
-    logger.deprecate('0.19.0', 'The Node.areDescendantSorted(first, second) method is deprecated, please use `Node.areDescendantsSorted(first, second) instead.')
-    return this.areDescendantsSorted(first, second)
-  }
-
-  /**
-   * Concat children `nodes` on to the end of the node.
-   *
-   * @param {List<Node>} nodes
-   * @return {Node}
-   */
-
-  concatChildren(nodes) {
-    logger.deprecate('0.19.0', 'The `Node.concatChildren(nodes)` method is deprecated.')
-    nodes = this.nodes.concat(nodes)
-    return this.set('nodes', nodes)
-  }
-
-  /**
-   * Decorate all of the text nodes with a `decorator` function.
-   *
-   * @param {Function} decorator
-   * @return {Node}
-   */
-
-  decorateTexts(decorator) {
-    logger.deprecate('0.19.0', 'The `Node.decorateTexts(decorator) method is deprecated.')
-    return this.mapDescendants((child) => {
-      return child.kind == 'text'
-        ? child.decorateCharacters(decorator)
-        : child
-    })
-  }
-
-  /**
-   * Recursively filter all descendant nodes with `iterator`, depth-first.
-   * It is different from `filterDescendants` in regard of the order of results.
-   *
-   * @param {Function} iterator
-   * @return {List<Node>}
-   */
-
-  filterDescendantsDeep(iterator) {
-    logger.deprecate('0.19.0', 'The Node.filterDescendantsDeep(iterator) method is deprecated.')
-    return this.nodes.reduce((matches, child, i, nodes) => {
-      if (child.kind != 'text') matches = matches.concat(child.filterDescendantsDeep(iterator))
-      if (iterator(child, i, nodes)) matches = matches.push(child)
-      return matches
-    }, new List())
-  }
-
-  /**
-   * Recursively find all descendant nodes by `iterator`. Depth first.
-   *
-   * @param {Function} iterator
-   * @return {Node|Null}
-   */
-
-  findDescendantDeep(iterator) {
-    logger.deprecate('0.19.0', 'The Node.findDescendantDeep(iterator) method is deprecated.')
-    let found
-
-    this.forEachDescendant((node) => {
-      if (iterator(node)) {
-        found = node
-        return false
-      }
-    })
-
-    return found
-  }
-
-  /**
-   * Get children between two child keys.
-   *
-   * @param {String} start
-   * @param {String} end
-   * @return {Node}
-   */
-
-  getChildrenBetween(start, end) {
-    logger.deprecate('0.19.0', 'The `Node.getChildrenBetween(start, end)` method is deprecated.')
-    start = this.assertChild(start)
-    start = this.nodes.indexOf(start)
-    end = this.assertChild(end)
-    end = this.nodes.indexOf(end)
-    return this.nodes.slice(start + 1, end)
-  }
-
-  /**
-   * Get children between two child keys, including the two children.
-   *
-   * @param {String} start
-   * @param {String} end
-   * @return {Node}
-   */
-
-  getChildrenBetweenIncluding(start, end) {
-    logger.deprecate('0.19.0', 'The `Node.getChildrenBetweenIncluding(start, end)` method is deprecated.')
-    start = this.assertChild(start)
-    start = this.nodes.indexOf(start)
-    end = this.assertChild(end)
-    end = this.nodes.indexOf(end)
-    return this.nodes.slice(start, end + 1)
-  }
-
-  /**
-   * Get the highest child ancestor of a node by `key`.
-   *
-   * @param {String} key
-   * @return {Node|Null}
-   */
-
-  getHighestChild(key) {
-    logger.deprecate('0.19.0', 'The `Node.getHighestChild(key) method is deprecated, please use `Node.getFurthestAncestor(key) instead.')
-    return this.getFurthestAncestor(key)
-  }
-
-  /**
-   * Get the highest parent of a node by `key` which has an only child.
-   *
-   * @param {String} key
-   * @return {Node|Null}
-   */
-
-  getHighestOnlyChildParent(key) {
-    logger.deprecate('0.19.0', 'The `Node.getHighestOnlyChildParent(key)` method is deprecated, please use `Node.getFurthestOnlyChildAncestor` instead.')
-    return this.getFurthestOnlyChildAncestor(key)
-  }
-
-  /**
-   * Check if the inline nodes are split at a `range`.
-   *
-   * @param {Range} range
-   * @return {Boolean}
-   */
-
-  isInlineSplitAtRange(range) {
-    logger.deprecate('0.19.0', 'The `Node.isInlineSplitAtRange(range)` method is deprecated.')
-    range = range.normalize(this)
-    if (range.isExpanded) throw new Error()
-
-    const { startKey } = range
-    const start = this.getFurthestInline(startKey) || this.getDescendant(startKey)
-    return range.isAtStartOf(start) || range.isAtEndOf(start)
-  }
-
 }
 
 /**
- * Normalize a key `arg`.
+ * Assert a key `arg`.
  *
- * @param {String|Node} arg
+ * @param {String} arg
  * @return {String}
  */
 
-function normalizeKey(arg) {
+function assertKey(arg) {
   if (typeof arg == 'string') return arg
-
-  logger.deprecate('0.14.0', 'An object was passed to a Node method instead of a `key` string. This was previously supported, but is being deprecated because it can have a negative impact on performance. The object in question was:', arg)
-
-  if (Node.isNode(arg)) {
-    return arg.key
-  }
-
-  throw new Error(`Invalid \`key\` argument! It must be either a block, an inline, a text, or a string. You passed: ${arg}`)
+  throw new Error(`Invalid \`key\` argument! It must be a key string, but you passed: ${arg}`)
 }
 
 /**
@@ -2109,8 +1945,6 @@ memoize(Node.prototype, [
   'getCharactersAtRange',
   'getCharactersAtRangeAsArray',
   'getChild',
-  'getChildrenBetween',
-  'getChildrenBetweenIncluding',
   'getClosestBlock',
   'getClosestInline',
   'getClosestVoid',
@@ -2154,7 +1988,6 @@ memoize(Node.prototype, [
   'hasDescendant',
   'hasNode',
   'hasVoidParent',
-  'isInlineSplitAtRange',
   'validate',
 ], {
   takesArguments: true

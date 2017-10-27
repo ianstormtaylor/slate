@@ -24,7 +24,7 @@ function setEventTransfer(event, type, content) {
   const mime = TRANSFER_TYPES[type.toUpperCase()]
 
   if (!mime) {
-    throw new Error(`Cannot set unknown transfer type "${mime}"`)
+    throw new Error(`Cannot set unknown transfer type "${mime}".`)
   }
 
   if (event.nativeEvent) {

@@ -1,6 +1,5 @@
 
 import Debug from 'debug'
-import logger from 'slate-dev-logger'
 
 import Node from '../models/node'
 import Mark from '../models/mark'
@@ -342,15 +341,9 @@ const APPLIERS = {
     let { document } = value
     let node = document.assertPath(path)
 
-    if ('nodes' in properties) {
-      logger.warn('Updating a Node\'s `nodes` property via `setNode()` is not allowed. Use the appropriate insertion and removal methods instead. The operation in question was:', operation)
-      delete properties.nodes
-    }
-
-    if ('key' in properties) {
-      logger.warn('Updating a Node\'s `key` property via `setNode()` is not allowed. There should be no reason to do this. The operation in question was:', operation)
-      delete properties.key
-    }
+    // Delete properties that are not allowed to be updated.
+    delete properties.nodes
+    delete properties.key
 
     node = node.merge(properties)
     document = document.updateNode(node)
@@ -405,20 +398,10 @@ const APPLIERS = {
   set_value(value, operation) {
     const { properties } = operation
 
-    if ('document' in properties) {
-      logger.warn('Updating `value.document` property via `setValue()` is not allowed. Use the appropriate document updating methods instead. The operation in question was:', operation)
-      delete properties.document
-    }
-
-    if ('selection' in properties) {
-      logger.warn('Updating `value.selection` property via `setValue()` is not allowed. Use the appropriate selection updating methods instead. The operation in question was:', operation)
-      delete properties.selection
-    }
-
-    if ('history' in properties) {
-      logger.warn('Updating `value.history` property via `setValue()` is not allowed. Use the appropriate history updating methods instead. The operation in question was:', operation)
-      delete properties.history
-    }
+    // Delete properties that are not allowed to be updated.
+    delete properties.document
+    delete properties.selection
+    delete properties.history
 
     value = value.merge(properties)
     return value

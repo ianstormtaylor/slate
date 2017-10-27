@@ -1,7 +1,6 @@
 
 import React from 'react'
 import ReactDOMServer from 'react-dom/server'
-import logger from 'slate-dev-logger'
 import typeOf from 'type-of'
 import { Node, Value } from 'slate'
 import { Record } from 'immutable'
@@ -105,11 +104,6 @@ class Html {
       rules = [],
     } = options
 
-    if (options.defaultBlockType) {
-      logger.deprecate('0.23.0', 'The `options.defaultBlockType` argument of the `Html` serializer is deprecated, use `options.defaultBlock` instead.')
-      defaultBlock = options.defaultBlockType
-    }
-
     defaultBlock = Node.createProperties(defaultBlock)
 
     this.rules = [ ...rules, TEXT_RULE ]
@@ -127,13 +121,7 @@ class Html {
    */
 
   deserialize = (html, options = {}) => {
-    let { toJSON = false } = options
-
-    if (options.toRaw) {
-      logger.deprecate('0.23.0', 'The `options.toRaw` argument of the `Html` serializer is deprecated, use `options.toJSON` instead.')
-      toJSON = options.toRaw
-    }
-
+    const { toJSON = false } = options
     const { defaultBlock, parseHtml } = this
     const fragment = parseHtml(html)
     const children = Array.from(fragment.childNodes)
