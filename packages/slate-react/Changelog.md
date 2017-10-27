@@ -15,6 +15,8 @@ This document maintains a list of changes to the `slate-react` package with each
 
 - **The `plugin.onBeforeChange` function was removed.** Previously there was both an `onBeforeChange` handler and an `onChange` handler. Now there is just an `onChange` handler, and the core plugin adds it's own logic before others.
 
+- **The `plugin.render` function was renamed to `plugin.renderEditor`.** It performs the same function, but has been renamed to disambiguate between all of the other new rendering functions available to plugins.
+
 ###### NEW
 
 - **`State` objects now have an embedded `state.schema` property.** This new schema property is used to automatically normalize the state as it changes, according to the editor's current schema. This makes normalization much easier.
