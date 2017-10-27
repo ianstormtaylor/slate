@@ -493,11 +493,15 @@ function AfterPlugin() {
     }
 
     if (HOTKEYS.REDO(event)) {
-      return change.redo()
+      // Keeps focus after redo triggered by hotkeys, such that user can always
+      // perform redo without being disturbed if any change blurred the editor.
+      return change.redo().focus()
     }
 
     if (HOTKEYS.UNDO(event)) {
-      return change.undo()
+      // Keeps focus after undo triggered by hotkeys, such that user can always
+      // perform undo without being disturbed if any change blurred the editor.
+      return change.undo().focus()
     }
 
     // COMPAT: Certain browsers don't handle the selection updates properly. In
