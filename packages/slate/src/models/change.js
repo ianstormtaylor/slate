@@ -42,7 +42,13 @@ class Change {
    */
 
   constructor(attrs) {
-    const { value } = attrs
+    let { value } = attrs
+
+    if (!value && attrs.state) {
+      logger.deprecate('0.29.0', 'The `state` attribute to change objects has been renamed to `value`.')
+      value = attrs.state
+    }
+
     this.value = value
     this.operations = []
     this.flags = pick(attrs, ['merge', 'save'])
