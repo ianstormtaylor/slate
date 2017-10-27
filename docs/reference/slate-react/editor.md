@@ -16,6 +16,7 @@ The top-level React component that renders the Slate editor itself.
   autoFocus={Boolean}
   className={String}
   onChange={Function}
+  placeholder={String || Element}
   plugins={Array}
   readOnly={Boolean}
   role={String}
@@ -46,6 +47,11 @@ An optional class name to apply to the content editable element.
 
 A change handler that will be called with the `change` that applied the change. You should usually pass the newly changed `change.value` back into the editor through its `value` property. This hook allows you to add persistence logic to your editor.
 
+### `placeholder`
+`String || Element`
+
+A placeholder string (or React element) that will be rendered as the default block type's placeholder.
+
 ### `plugins`
 `Array`
 
@@ -56,20 +62,15 @@ An array of [`Plugins`](./plugins.md) that define the editor's behavior.
 
 Whether the editor should be in "read-only" mode, where all of the rendering is the same, but the user is prevented from editing the editor's content.
 
-### `spellCheck`
-`Boolean`
-
-Whether spellcheck is turned on for the editor.
-
 ### `role`
 `String`
 
 ARIA property to define the role of the editor, it defaults to `textbox` when editable.
 
-### `value`
-`Value`
+### `spellCheck`
+`Boolean`
 
-A [`Value`](../slate/value.md) object representing the current value of the editor.
+Whether spellcheck is turned on for the editor.
 
 ### `style`
 `Object`
@@ -81,18 +82,10 @@ An optional dictionary of styles to apply to the content editable element.
 
 Indicates if it should participate to [sequential keyboard navigation](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/tabindex).
 
-## Placeholder Props
+### `value`
+`Value`
 
-```js
-<Editor
-  placeholder={String || Element}
-/>
-```
-
-### `placeholder`
-`String || Element`
-
-A placeholder string (or React element) that will be rendered as the default block type's placeholder.
+A [`Value`](../slate/value.md) object representing the current value of the editor.
 
 
 ## Plugin-like Props
