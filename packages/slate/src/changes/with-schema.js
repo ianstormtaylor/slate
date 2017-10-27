@@ -45,7 +45,7 @@ Changes.normalizeNodeByKey = (change, key) => {
 
   normalizeNodeAndChildren(change, node, schema)
 
-  document = change.state.document
+  document = change.value.document
   const ancestors = document.getAncestors(key)
   if (!ancestors) return
 
