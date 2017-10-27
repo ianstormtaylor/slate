@@ -38,7 +38,7 @@ class Content extends React.Component {
   static propTypes = {
     autoCorrect: Types.bool.isRequired,
     autoFocus: Types.bool.isRequired,
-    children: Types.array.isRequired,
+    children: Types.any.isRequired,
     className: Types.string,
     editor: Types.object.isRequired,
     readOnly: Types.bool.isRequired,
