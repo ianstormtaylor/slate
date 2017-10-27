@@ -1,6 +1,5 @@
 
 import Debug from 'debug'
-import logger from 'slate-dev-logger'
 import pick from 'lodash/pick'
 
 import MODEL_TYPES from '../constants/model-types'
@@ -42,13 +41,7 @@ class Change {
    */
 
   constructor(attrs) {
-    let { value } = attrs
-
-    if (!value && attrs.state) {
-      logger.deprecate('0.29.0', 'The `state` attribute to change objects has been renamed to `value`.')
-      value = attrs.state
-    }
-
+    const { value } = attrs
     this.value = value
     this.operations = []
     this.flags = pick(attrs, ['merge', 'save'])
@@ -156,20 +149,6 @@ class Change {
     return this
   }
 
-  /**
-   * Deprecated.
-   */
-
-  get state() {
-    logger.deprecate('0.29.0', 'The `change.state` property has been renamed to `change.value`.')
-    return this.value
-  }
-
-  apply(options = {}) {
-    logger.deprecate('0.22.0', 'The `change.apply()` method is deprecrated and no longer necessary, as all operations are applied immediately when invoked. You can access the change\'s value, which is already pre-computed, directly via `change.value` instead.')
-    return this.value
-  }
-
 }
 
 /**
@@ -189,60 +168,6 @@ Object.keys(Changes).forEach((type) => {
     return this
   }
 })
-
-/**
- * Add deprecation warnings in case people try to access a change as a value.
- */
-
-;[
-  'hasUndos',
-  'hasRedos',
-  'isBlurred',
-  'isFocused',
-  'isCollapsed',
-  'isExpanded',
-  'isBackward',
-  'isForward',
-  'startKey',
-  'endKey',
-  'startOffset',
-  'endOffset',
-  'anchorKey',
-  'focusKey',
-  'anchorOffset',
-  'focusOffset',
-  'startBlock',
-  'endBlock',
-  'anchorBlock',
-  'focusBlock',
-  'startInline',
-  'endInline',
-  'anchorInline',
-  'focusInline',
-  'startText',
-  'endText',
-  'anchorText',
-  'focusText',
-  'characters',
-  'marks',
-  'blocks',
-  'fragment',
-  'inlines',
-  'texts',
-  'isEmpty',
-].forEach((getter) => {
-  Object.defineProperty(Change.prototype, getter, {
-    get() {
-      logger.deprecate('0.22.0', `You attempted to access the \`${getter}\` property of what was previously a \`value\` object but is now a \`change\` object. This syntax has been deprecated as plugins are now passed \`change\` objects instead of \`value\` objects.`)
-      return this.value[getter]
-    }
-  })
-})
-
-Change.prototype.transform = function () {
-  logger.deprecate('0.22.0', 'You attempted to call `.transform()` on what was previously a `value` object but is now already a `change` object. This syntax has been deprecated as plugins are now passed `change` objects instead of `value` objects.')
-  return this
-}
 
 /**
  * Export.

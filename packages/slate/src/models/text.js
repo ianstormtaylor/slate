@@ -1,6 +1,5 @@
 
 import isPlainObject from 'is-plain-object'
-import logger from 'slate-dev-logger'
 import { List, OrderedSet, Record, Set, is } from 'immutable'
 
 import Character from './character'
@@ -85,20 +84,10 @@ class Text extends Record(DEFAULTS) {
       return object
     }
 
-    let {
+    const {
       leaves = [],
       key = generateKey(),
     } = object
-
-    if (object.ranges) {
-      logger.deprecate('0.27.0', 'Passing `object.ranges` to `Text.fromJSON` has been renamed to `object.leaves`.')
-      leaves = object.ranges
-    }
-
-    if (object.text) {
-      logger.deprecate('0.23.0', 'Passing `object.text` to `Text.fromJSON` has been deprecated, please use `object.leaves` instead.')
-      leaves = [{ text: object.text }]
-    }
 
     const characters = leaves
       .map(Leaf.fromJSON)
@@ -138,24 +127,6 @@ class Text extends Record(DEFAULTS) {
 
   static isTextList(any) {
     return List.isList(any) && any.every(item => Text.isText(item))
-  }
-
-  /**
-   * Deprecated.
-   */
-
-  static createFromString(string) {
-    logger.deprecate('0.22.0', 'The `Text.createFromString(string)` method is deprecated, use `Text.create(string)` instead.')
-    return Text.create(string)
-  }
-
-  /**
-   * Deprecated.
-   */
-
-  static createFromRanges(ranges) {
-    logger.deprecate('0.22.0', 'The `Text.createFromRanges(ranges)` method is deprecated, use `Text.create(ranges)` instead.')
-    return Text.create(ranges)
   }
 
   /**
@@ -514,15 +485,6 @@ class Text extends Record(DEFAULTS) {
 
   validate(schema) {
     return schema.validateNode(this)
-  }
-
-  /**
-   * Deprecated.
-   */
-
-  getRanges(...args) {
-    logger.deprecate('0.27.0', 'The `Text.getRanges()` method was renamed to `Text.getLeaves`.')
-    return this.getLeaves(...args)
   }
 
 }

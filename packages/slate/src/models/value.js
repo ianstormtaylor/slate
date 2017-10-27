@@ -1,6 +1,5 @@
 
 import isPlainObject from 'is-plain-object'
-import logger from 'slate-dev-logger'
 import { Record, Set, List, Map } from 'immutable'
 
 import MODEL_TYPES from '../constants/model-types'
@@ -621,17 +620,6 @@ class Value extends Record(DEFAULTS) {
   }
 
   /**
-   * Deprecated.
-   *
-   * @return {Change}
-   */
-
-  transform(...args) {
-    logger.deprecate('0.22.0', 'The `value.transform()` method has been deprecated in favor of `value.change()`.')
-    return this.change(...args)
-  }
-
-  /**
    * Return a JSON representation of the value.
    *
    * @param {Object} options
@@ -642,11 +630,6 @@ class Value extends Record(DEFAULTS) {
     const object = {
       kind: this.kind,
       document: this.document.toJSON(options),
-    }
-
-    if ('preserveStateData' in options) {
-      logger.deprecate('0.26.0', 'The `preserveStateData` option to `value.toJSON` has been deprecated in favor of `options.preserveData`.')
-      options.preserveData = options.preserveStateData
     }
 
     if (options.preserveData) {
