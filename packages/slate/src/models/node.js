@@ -1945,8 +1945,6 @@ memoize(Node.prototype, [
   'getCharactersAtRange',
   'getCharactersAtRangeAsArray',
   'getChild',
-  'getChildrenBetween',
-  'getChildrenBetweenIncluding',
   'getClosestBlock',
   'getClosestInline',
   'getClosestVoid',
@@ -1990,7 +1988,6 @@ memoize(Node.prototype, [
   'hasDescendant',
   'hasNode',
   'hasVoidParent',
-  'isInlineSplitAtRange',
   'validate',
 ], {
   takesArguments: true

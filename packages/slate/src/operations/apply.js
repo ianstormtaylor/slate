@@ -1,6 +1,5 @@
 
 import Debug from 'debug'
-import logger from 'slate-dev-logger'
 
 import Node from '../models/node'
 import Mark from '../models/mark'
