@@ -93,7 +93,7 @@ class Content extends React.Component {
 
   componentDidMount = () => {
     // Restrict scoped of `beforeinput` to mobile.
-    if ((IS_IOS && IS_ANDROID) && SUPPORTED_EVENTS.beforeinput) {
+    if ((IS_IOS || IS_ANDROID) && SUPPORTED_EVENTS.beforeinput) {
       this.element.addEventListener('beforeinput', this.onNativeBeforeInput)
     }
 
@@ -110,7 +110,7 @@ class Content extends React.Component {
 
   componentWillUnmount() {
     // Restrict scoped of `beforeinput` to mobile.
-    if ((IS_IOS && IS_ANDROID) && SUPPORTED_EVENTS.beforeinput) {
+    if ((IS_IOS || IS_ANDROID) && SUPPORTED_EVENTS.beforeinput) {
       this.element.removeEventListener('beforeinput', this.onNativeBeforeInput)
     }
   }
