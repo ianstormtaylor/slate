@@ -7,6 +7,32 @@ This document maintains a list of changes to the `slate-react` package with each
 ---
 
 
+### `0.9.0` — October 27, 2017
+
+###### BREAKING
+
+- **Updated to use `slate@0.29.0`.** This is to gain access to the new `Value` model introduced in the newest version of Slate.
+
+- **Custom components no longer receive `props.state` or `props.schema`.** These are now exposed directly on the `props.editor` instance itself as `editor.value` and `editor.schema`. This helps eliminate a common issue where because of `shouldComponentUpdate` returning `false`, the `props.state` value was actually outdated, and transforming from it would cause incorrect behaviors.
+
+- **The `plugin.renderEditor` function's signature has changed.** Previously it received `(props, state, editor)` but it now receives just `(props, editor)`. If you need access to the editor's current value, use the new `editor.value` property. This is simply to clean up the API, since the value is already accessible on `editor`.
+
+###### DEPRECATED
+
+- **The "state" has been renamed to "value" everywhere.** All of the current references are maintained as deprecations, so you should be able to upgrade and see warnings logged instead of being greeted with a broken editor. This is to reduce the confusion between React's "state" and Slate's editor value, and in an effort to further mimic the native DOM APIs.
+
+- **The editor `getSchema()`, `getStack()` and `getState()` methods are deprecated.** These have been replaced by property getters on the editor instance itself—`editor.schema`, `editor.stack` and `editor.value`, respectively. This is to reduce confusion with React's own `setState`, and to make accessing these commonly used properties more convenient.
+
+###### NEW
+
+- **Added a new `editor.value` getter property.** This now mimics the DOM for things like `input.value` and `textarea.value`, and is the new way to access the editor's current value.
+
+- **Added new `editor.schema` and `editor.stack` getters.** Similarly to the new `value` getter, these two new getters give you access to the editor's current schema and stack.
+
+
+---
+
+
 ### `0.8.0` — October 25, 2017
 
 ###### BREAKING

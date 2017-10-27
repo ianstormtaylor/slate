@@ -7,6 +7,16 @@ This document maintains a list of changes to the `slate-html-serializer` package
 ---
 
 
+### `0.3.0` — October 27, 2017
+
+###### BREAKING
+
+- **Updated to work with `slate@0.29.0`.** This is required because `slate-html-serializer` needs access to the new `Value` model.
+
+
+---
+
+
 ### `0.2.0` — October 14, 2017
 
 ###### BREAKING

@@ -7,6 +7,24 @@ This document maintains a list of changes to the `slate` package with each new v
 ---
 
 
+### `0.29.0` — October 27, 2017
+
+###### BREAKING
+
+- **The `set_state` operation has been renamed `set_value`**. This shouldn't affect almost anyone, but in the event that you were relying on the low-level operation types you'll need to update this.
+
+###### DEPRECATED
+
+- **The "state" has been renamed to "value" everywhere.** All of the current references are maintained as deprecations, so you should be able to upgrade and see warnings logged instead of being greeted with a broken editor. This is to reduce the confusion between React's "state" and Slate's editor value, and in an effort to further mimic the native DOM APIs.
+
+###### NEW
+
+- **Added the new `Value` model to replace `State`.** The new model is exactly the same, but with a new name. There is also a shimmed `State` model exported that warns when used, to ease migration.
+
+
+---
+
+
 ### `0.28.0` — October 25, 2017
 
 ###### BREAKING

@@ -7,6 +7,20 @@ This document maintains a list of changes to the `slate-prop-types` package with
 ---
 
 
+### `0.3.0` — October 27, 2017
+
+###### BREAKING
+
+- **Updated to work with `slate@0.29.0`.** This is required because `slate-prop-types` needs access to the new `Value` model.
+
+###### DEPRECATED
+
+- **The `state` prop type has been renamed to `value`.** This is to stay in line with `slate-react@0.29.0` where the `State` object was renamed.
+
+
+---
+
+
 ### `0.2.0` — October 14, 2017
 
 ###### BREAKING
