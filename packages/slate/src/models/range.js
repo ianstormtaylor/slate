@@ -50,19 +50,19 @@ class Range extends Record(DEFAULTS) {
   }
 
   /**
-   * Create a list of `Ranges` from a `value`.
+   * Create a list of `Ranges` from `elements`.
    *
-   * @param {Array<Range|Object>|List<Range|Object>} value
+   * @param {Array<Range|Object>|List<Range|Object>} elements
    * @return {List<Range>}
    */
 
-  static createList(value = []) {
-    if (List.isList(value) || Array.isArray(value)) {
-      const list = new List(value.map(Range.create))
+  static createList(elements = []) {
+    if (List.isList(elements) || Array.isArray(elements)) {
+      const list = new List(elements.map(Range.create))
       return list
     }
 
-    throw new Error(`\`Range.createList\` only accepts arrays or lists, but you passed it: ${value}`)
+    throw new Error(`\`Range.createList\` only accepts arrays or lists, but you passed it: ${elements}`)
   }
 
   /**
@@ -138,14 +138,14 @@ class Range extends Record(DEFAULTS) {
   static fromJS = Range.fromJSON
 
   /**
-   * Check if a `value` is a `Range`.
+   * Check if an `obj` is a `Range`.
    *
-   * @param {Any} value
+   * @param {Any} obj
    * @return {Boolean}
    */
 
-  static isRange(value) {
-    return !!(value && value[MODEL_TYPES.RANGE])
+  static isRange(obj) {
+    return !!(obj && obj[MODEL_TYPES.RANGE])
   }
 
   /**

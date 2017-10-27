@@ -39,42 +39,42 @@ const DEFAULTS = {
 class Block extends Record(DEFAULTS) {
 
   /**
-   * Create a new `Block` from `value`.
+   * Create a new `Block` from `attrs`.
    *
-   * @param {Object|String|Block} value
+   * @param {Object|String|Block} attrs
    * @return {Block}
    */
 
-  static create(value = {}) {
-    if (Block.isBlock(value)) {
-      return value
+  static create(attrs = {}) {
+    if (Block.isBlock(attrs)) {
+      return attrs
     }
 
-    if (typeof value == 'string') {
-      value = { type: value }
+    if (typeof attrs == 'string') {
+      attrs = { type: attrs }
     }
 
-    if (isPlainObject(value)) {
-      return Block.fromJSON(value)
+    if (isPlainObject(attrs)) {
+      return Block.fromJSON(attrs)
     }
 
-    throw new Error(`\`Block.create\` only accepts objects, strings or blocks, but you passed it: ${value}`)
+    throw new Error(`\`Block.create\` only accepts objects, strings or blocks, but you passed it: ${attrs}`)
   }
 
   /**
-   * Create a list of `Blocks` from `value`.
+   * Create a list of `Blocks` from `attrs`.
    *
-   * @param {Array<Block|Object>|List<Block|Object>} value
+   * @param {Array<Block|Object>|List<Block|Object>} attrs
    * @return {List<Block>}
    */
 
-  static createList(value = []) {
-    if (List.isList(value) || Array.isArray(value)) {
-      const list = new List(value.map(Block.create))
+  static createList(attrs = []) {
+    if (List.isList(attrs) || Array.isArray(attrs)) {
+      const list = new List(attrs.map(Block.create))
       return list
     }
 
-    throw new Error(`\`Block.createList\` only accepts arrays or lists, but you passed it: ${value}`)
+    throw new Error(`\`Block.createList\` only accepts arrays or lists, but you passed it: ${attrs}`)
   }
 
   /**
@@ -119,25 +119,25 @@ class Block extends Record(DEFAULTS) {
   static fromJS = Block.fromJSON
 
   /**
-   * Check if a `value` is a `Block`.
+   * Check if `any` is a `Block`.
    *
-   * @param {Any} value
+   * @param {Any} any
    * @return {Boolean}
    */
 
-  static isBlock(value) {
-    return !!(value && value[MODEL_TYPES.BLOCK])
+  static isBlock(any) {
+    return !!(any && any[MODEL_TYPES.BLOCK])
   }
 
   /**
-   * Check if a `value` is a block list.
+   * Check if `any` is a block list.
    *
-   * @param {Any} value
+   * @param {Any} any
    * @return {Boolean}
    */
 
-  static isBlockList(value) {
-    return List.isList(value) && value.every(item => Block.isBlock(item))
+  static isBlockList(any) {
+    return List.isList(any) && any.every(item => Block.isBlock(item))
   }
 
   /**

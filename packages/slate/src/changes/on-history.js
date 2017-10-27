@@ -10,21 +10,21 @@ import invert from '../operations/invert'
 const Changes = {}
 
 /**
- * Redo to the next state in the history.
+ * Redo to the next value in the history.
  *
  * @param {Change} change
  */
 
 Changes.redo = (change) => {
-  let { state } = change
-  let { history } = state
+  let { value } = change
+  let { history } = value
   if (!history) return
 
   let { undos, redos } = history
   const next = redos.peek()
   if (!next) return
 
-  // Shift the next state into the undo stack.
+  // Shift the next value into the undo stack.
   redos = redos.pop()
   undos = undos.push(next)
 
@@ -34,10 +34,10 @@ Changes.redo = (change) => {
   })
 
   // Update the history.
-  state = change.state
+  value = change.value
   history = history.set('undos', undos).set('redos', redos)
-  state = state.set('history', history)
-  change.state = state
+  value = value.set('history', history)
+  change.value = value
 }
 
 /**
@@ -47,8 +47,8 @@ Changes.redo = (change) => {
  */
 
 Changes.undo = (change) => {
-  let { state } = change
-  let { history } = state
+  let { value } = change
+  let { history } = value
   if (!history) return
 
   let { undos, redos } = history
@@ -65,10 +65,10 @@ Changes.undo = (change) => {
   })
 
   // Update the history.
-  state = change.state
+  value = change.value
   history = history.set('undos', undos).set('redos', redos)
-  state = state.set('history', history)
-  change.state = state
+  value = value.set('history', history)
+  change.value = value
 }
 
 /**

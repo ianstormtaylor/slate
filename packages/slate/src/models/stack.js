@@ -35,14 +35,14 @@ class Stack extends Record(DEFAULTS) {
   }
 
   /**
-   * Check if a `value` is a `Stack`.
+   * Check if `any` is a `Stack`.
    *
-   * @param {Any} value
+   * @param {Any} any
    * @return {Boolean}
    */
 
-  static isStack(value) {
-    return !!(value && value[MODEL_TYPES.STACK])
+  static isStack(any) {
+    return !!(any && any[MODEL_TYPES.STACK])
   }
 
   /**
@@ -95,8 +95,8 @@ class Stack extends Record(DEFAULTS) {
     const array = []
 
     for (const plugin of plugins) {
-      const value = plugin[property](...args)
-      if (value != null) array.push(value)
+      const ret = plugin[property](...args)
+      if (ret != null) array.push(ret)
     }
 
     return array
@@ -131,9 +131,9 @@ class Stack extends Record(DEFAULTS) {
     let { children = null } = props
 
     for (const plugin of plugins) {
-      const value = plugin[property](props, ...args)
-      if (value == null) continue
-      props.children = children = value
+      const ret = plugin[property](props, ...args)
+      if (ret == null) continue
+      props.children = children = ret
     }
 
     return children
