@@ -196,7 +196,24 @@ function Bold(options) {
 }
 ```
 
-With things like `changes` and `helpers`, you can define your bold logic in a single place, and allow other parts of your codebase to use the exposed API to keep consistent.
+With things like `changes` and `helpers`, you can define your bold logic in a single place, and allow other parts of your codebase to use the exposed API to keep consistent. Then you can use them like so:
+
+```js
+const bold = Bold()
+const italic = Italic()
+...
+
+const plugins = [
+  ...bold.plugins,
+  ...italic.plugins,
+  ...
+]
+
+<Editor
+  plugins={plugins}
+  ...
+/>
+```
 
 Feature plugins like that are almost always made up of many smaller helper plugins. And they are usually app-specific, so they don't make great open-source candidates.
 
