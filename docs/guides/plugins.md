@@ -223,7 +223,7 @@ That said, there might be another type of plugins that kind of straddle the line
 
 These are plugins that bundle up a set of logic, similar to how a feature might, but in a way that is re-usable across codebases. Some examples of these would be [`slate-edit-code`](https://github.com/GitbookIO/slate-edit-code), [`slate-edit-list`](https://github.com/GitbookIO/slate-edit-list), [`slate-edit-table`](https://github.com/GitbookIO/slate-edit-table), etc.
 
-Framework plugins will often expose objects with `changes`, `helpers` and `plugins` instead of simple array.
+Framework plugins will often expose objects with `changes`, `helpers` and `plugins` instead of simple array. Or, they may choose to just augment a single returned plugin object with some of the other exports.
 
 You'll often want to encapsulate framework plugins in your own feature plugins, but they can go a long way in terms of reducing your codebase size.
 
