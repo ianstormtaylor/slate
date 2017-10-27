@@ -1,6 +1,4 @@
 
-import logger from 'slate-dev-logger'
-
 import {
   Block,
   Change,
@@ -77,11 +75,6 @@ const Types = {
   value: create('Value', v => Value.isValue(v)),
   text: create('Text', v => Text.isText(v)),
   texts: create('List<Text>', v => Text.isTextList(v)),
-
-  state: create('State', (v) => {
-    logger.deprecate('slate-prop-types@0.3.0', 'The `state` prop type has been renamed to `value`.')
-    return Value.isValue(v)
-  })
 }
 
 /**
