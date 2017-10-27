@@ -21,9 +21,9 @@ describe('schema', () => {
         const expected = output
         const actual = input
           .change()
-          .setState({ schema: s })
+          .setValue({ schema: s })
           .normalize()
-          .state.toJSON()
+          .value.toJSON()
 
         assert.deepEqual(actual, expected)
       })
@@ -42,9 +42,9 @@ describe('schema', () => {
         const expected = output.toJSON()
         const actual = input
           .change()
-          .setState({ schema: s })
+          .setValue({ schema: s })
           .normalize()
-          .state.toJSON()
+          .value.toJSON()
 
         assert.deepEqual(actual, expected)
       })

@@ -12,21 +12,21 @@ export default function (change) {
 }
 
 export const input = (
-  <state>
+  <value>
     <document>
       <paragraph>
         <text key="a"><b thing="value">word</b></text>
       </paragraph>
     </document>
-  </state>
+  </value>
 )
 
 export const output = (
-  <state>
+  <value>
     <document>
       <paragraph>
         <b thing={false}>wo</b><b thing="value">rd</b>
       </paragraph>
     </document>
-  </state>
+  </value>
 )

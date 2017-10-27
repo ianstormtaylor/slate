@@ -41,6 +41,13 @@ class Simulator {
     this.stack = stack
     this.value = value
 
+    Object.defineProperty(this, 'state', {
+      get() {
+        logger.deprecate('slate-simulator@0.3.0', 'The `simulator.state` property has been renamed to `simulator.value`.')
+        return this.value
+      }
+    })
+
     if (props.state) {
       logger.deprecate('slate-simulator@0.3.0', 'The `state` prop has been renamed to `value`.')
       this.value = props.state

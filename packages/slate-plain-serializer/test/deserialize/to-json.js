@@ -4,7 +4,7 @@ one
 `.trim()
 
 export const output = {
-  kind: 'state',
+  kind: 'value',
   document: {
     kind: 'document',
     data: {},

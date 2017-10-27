@@ -3,22 +3,22 @@
 import h from '../../../helpers/h'
 
 export default function (change) {
-  const node = change.state.document.getBlocks().first()
+  const node = change.value.document.getBlocks().first()
   change.insertNodeByKey('a', 0, node)
 }
 
 export const input = (
-  <state>
+  <value>
     <document key="a">
       <paragraph>
         <cursor />one
       </paragraph>
     </document>
-  </state>
+  </value>
 )
 
 export const output = (
-  <state>
+  <value>
     <document key="a">
       <paragraph>
         one
@@ -27,5 +27,5 @@ export const output = (
         <cursor />one
       </paragraph>
     </document>
-  </state>
+  </value>
 )

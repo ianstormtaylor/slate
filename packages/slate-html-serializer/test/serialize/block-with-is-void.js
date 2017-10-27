@@ -15,11 +15,11 @@ export const rules = [
 ]
 
 export const input = (
-  <state>
+  <value>
     <document>
       <image />
     </document>
-  </state>
+  </value>
 )
 
 export const output = `

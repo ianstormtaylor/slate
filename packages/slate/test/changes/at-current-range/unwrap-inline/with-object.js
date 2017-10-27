@@ -10,21 +10,21 @@ export default function (change) {
 }
 
 export const input = (
-  <state>
+  <value>
     <document>
       <paragraph>
         w<hashtag thing="value"><hashtag><cursor />or</hashtag></hashtag>d
       </paragraph>
     </document>
-  </state>
+  </value>
 )
 
 export const output = (
-  <state>
+  <value>
     <document>
       <paragraph>
         w<hashtag><cursor />or</hashtag>d
       </paragraph>
     </document>
-  </state>
+  </value>
 )

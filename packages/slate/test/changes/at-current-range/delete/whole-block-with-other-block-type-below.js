@@ -7,18 +7,18 @@ export default function (change) {
 }
 
 export const input = (
-  <state>
+  <value>
     <document>
       <quote><anchor />one</quote>
       <paragraph><focus />two</paragraph>
     </document>
-  </state>
+  </value>
 )
 
 export const output = (
-  <state>
+  <value>
     <document>
       <paragraph><cursor />two</paragraph>
     </document>
-  </state>
+  </value>
 )

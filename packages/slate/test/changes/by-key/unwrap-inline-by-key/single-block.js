@@ -7,21 +7,21 @@ export default function (change) {
 }
 
 export const input = (
-  <state>
+  <value>
     <document>
       <paragraph>
         w<link key="a">or</link>d<link>another</link>
       </paragraph>
     </document>
-  </state>
+  </value>
 )
 
 export const output = (
-  <state>
+  <value>
     <document>
       <paragraph>
         word<link>another</link>
       </paragraph>
     </document>
-  </state>
+  </value>
 )

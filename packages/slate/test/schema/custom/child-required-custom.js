@@ -19,22 +19,22 @@ export const schema = {
 }
 
 export const input = (
-  <state>
+  <value>
     <document>
       <quote>
         <paragraph />
       </quote>
     </document>
-  </state>
+  </value>
 )
 
 export const output = (
-  <state>
+  <value>
     <document>
       <quote>
         <paragraph />
         <paragraph />
       </quote>
     </document>
-  </state>
+  </value>
 )

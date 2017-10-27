@@ -16,21 +16,21 @@ export const schema = {
 }
 
 export const input = (
-  <state>
+  <value>
     <document>
       <paragraph>
         <link><link>one</link></link>
       </paragraph>
     </document>
-  </state>
+  </value>
 )
 
 export const output = (
-  <state>
+  <value>
     <document>
       <paragraph>
         <link>one</link>
       </paragraph>
     </document>
-  </state>
+  </value>
 )

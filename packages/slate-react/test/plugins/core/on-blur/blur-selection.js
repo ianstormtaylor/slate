@@ -7,19 +7,19 @@ export default function (simulator) {
 }
 
 export const input = (
-  <state>
+  <value>
     <document>
       <paragraph />
     </document>
     <selection isFocused />
-  </state>
+  </value>
 )
 
 export const output = (
-  <state>
+  <value>
     <document>
       <paragraph />
     </document>
     <selection isFocused={false} />
-  </state>
+  </value>
 )

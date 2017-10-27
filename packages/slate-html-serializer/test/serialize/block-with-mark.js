@@ -19,13 +19,13 @@ export const rules = [
 ]
 
 export const input = (
-  <state>
+  <value>
     <document>
       <paragraph>
         on<b>e</b>
       </paragraph>
     </document>
-  </state>
+  </value>
 )
 
 export const output = `

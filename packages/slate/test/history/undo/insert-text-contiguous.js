@@ -2,28 +2,28 @@
 
 import h from '../../helpers/h'
 
-export default function (state) {
-  return state
+export default function (value) {
+  return value
     .change()
     .insertText('t')
-    .state
+    .value
     .change()
     .insertText('w')
-    .state
+    .value
     .change()
     .insertText('o')
-    .state
+    .value
     .change()
     .undo()
-    .state
+    .value
 }
 
 export const input = (
-  <state>
+  <value>
     <document>
       <paragraph>one<cursor /></paragraph>
     </document>
-  </state>
+  </value>
 )
 
 export const output = input

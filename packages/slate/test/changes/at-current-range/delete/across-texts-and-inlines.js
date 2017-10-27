@@ -7,21 +7,21 @@ export default function (change) {
 }
 
 export const input = (
-  <state>
+  <value>
     <document>
       <paragraph>
         o<anchor />ne<link>two</link>thre<focus />e
       </paragraph>
     </document>
-  </state>
+  </value>
 )
 
 export const output = (
-  <state>
+  <value>
     <document>
       <paragraph>
         o<cursor />e
       </paragraph>
     </document>
-  </state>
+  </value>
 )
