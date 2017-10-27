@@ -34,7 +34,7 @@ When the user drops content into the editor, the core plugin handles drops of ty
 
 ### `onKeyDown`
 
-When a key is pressed, the core plugin handles performing some of the "native" behavior that `contenteditable` elements must do. For example it splits blocks on `enter`, removes characters `backspace`, triggers an undo state from the history on `cmd-z`, etc.
+When a key is pressed, the core plugin handles performing some of the "native" behavior that `contenteditable` elements must do. For example it splits blocks on `enter`, removes characters `backspace`, triggers an undo from the history on `cmd-z`, etc.
 
 ### `onPaste`
 
@@ -64,10 +64,10 @@ However, sometimes you might want to disable the logic of the core plugin withou
 A noop `onBeforeInput` handler looks like:
 
 ```js
-function onBeforeInput(event, state) {
+function onBeforeInput(event, change, editor) {
   event.preventDefault()
-  return state
+  return false
 }
 ```
 
-Notice that is calls `event.preventDefault()` to prevent the default browser behavior, and it returns the current `state` to prevent the editor from continuing to resolve its plugins stack.
+Notice that is calls `event.preventDefault()` to prevent the default browser behavior, and it returns `false` to prevent the editor from continuing to resolve its plugins stack.

@@ -118,8 +118,8 @@ But... if you refresh the page, everything is still reset. That's because we nee
 
 ```js
 // Update the initial content to be pulled from Local Storage if it exists.
-const existingState = JSON.parse(localStorage.getItem('content'))
-const initialValue = Value.fromJSON(existingState || {
+const existingValue = JSON.parse(localStorage.getItem('content'))
+const initialValue = Value.fromJSON(existingValue || {
   document: {
     nodes: [
       {
@@ -170,8 +170,8 @@ Now you should be able to save changes across refreshes!
 However, if you inspect the change handler, you'll notice that it's actually saving the Local Storage value on _every_ change to the editor, even when only the selection changes! This is because `onChange` is called for _every_ change. For Local Storage this doesn't really matter, but if you're saving things to a database via HTTP request this would result in a lot of unnecessary requests. You can fix this by checking against the previous `document` value.
 
 ```js
-const existingState = JSON.parse(localStorage.getItem('content'))
-const initialValue = Value.fromJSON(existingState || {
+const existingValue = JSON.parse(localStorage.getItem('content'))
+const initialValue = Value.fromJSON(existingValue || {
   document: {
     nodes: [
       {
@@ -231,8 +231,8 @@ But what if you want something other than JSON? Well, you'd need to serialize yo
 import { Editor } from 'slate-react'
 import Plain from 'slate-plain-serializer'
 
-const existingState = localStorage.getItem('content')
-const initialValue = Plain.deserialize(existingState || 'A string of plain text.')
+const existingValue = localStorage.getItem('content')
+const initialValue = Plain.deserialize(existingValue || 'A string of plain text.')
 
 class App extends React.Component {
 

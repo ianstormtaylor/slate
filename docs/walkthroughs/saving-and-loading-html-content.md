@@ -210,7 +210,7 @@ And finally, now that we have our serializer initialized, we can update our app 
 
 ```js
 // Load the initial value from Local Storage or a default.
-const initialState = (
+const initialValue = (
   localStorage.getItem('content') ||
   '<p></p>'
 )
@@ -218,7 +218,7 @@ const initialState = (
 class App extends React.Component {
 
   state = {
-    value: html.deserialize(initialState),
+    value: html.deserialize(initialValue),
   }
 
   onChange = ({ value }) => {

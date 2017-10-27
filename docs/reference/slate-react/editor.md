@@ -8,7 +8,7 @@ import { Editor } from 'slate-react'
 The top-level React component that renders the Slate editor itself.
 
 
-## Properties
+## Props
 
 ```js
 <Editor
@@ -20,7 +20,7 @@ The top-level React component that renders the Slate editor itself.
   readOnly={Boolean}
   role={String}
   spellCheck={Boolean}
-  state={State}
+  value={Value}
   style={Object}
   tabIndex={Number}
 />
@@ -44,7 +44,7 @@ An optional class name to apply to the content editable element.
 ### `onChange`
 `Function onChange(change: Change)`
 
-A change handler that will be called with the `change` that applied the change. You should usually pass the newly changed `change.state` back into the editor through its `state` property. This hook allows you to add persistence logic to your editor.
+A change handler that will be called with the `change` that applied the change. You should usually pass the newly changed `change.value` back into the editor through its `value` property. This hook allows you to add persistence logic to your editor.
 
 ### `plugins`
 `Array`
@@ -66,10 +66,10 @@ Whether spellcheck is turned on for the editor.
 
 ARIA property to define the role of the editor, it defaults to `textbox` when editable.
 
-### `state`
-`State`
+### `value`
+`Value`
 
-A [`State`](../slate/state.md) object representing the current state of the editor.
+A [`Value`](../slate/value.md) object representing the current value of the editor.
 
 ### `style`
 `Object`
@@ -81,13 +81,11 @@ An optional dictionary of styles to apply to the content editable element.
 
 Indicates if it should participate to [sequential keyboard navigation](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/tabindex).
 
-## Placeholder Properties
+## Placeholder Props
 
 ```js
 <Editor
   placeholder={String || Element}
-  placeholderClassName={String}
-  placeholderStyle={Object}
 />
 ```
 
@@ -96,18 +94,8 @@ Indicates if it should participate to [sequential keyboard navigation](https://d
 
 A placeholder string (or React element) that will be rendered as the default block type's placeholder.
 
-### `placeholderClassName`
-`String`
 
-An optional class name to apply to the default block type's placeholder.
-
-### `placeholderStyle`
-`Object`
-
-An optional dictionary of styles to apply to the default block type's placeholder. If `placeholder` is a string, and no class name or style dictionary is passed, this property will default to `{ opacity: '0.333' }`.
-
-
-## Plugin-like Properties
+## Plugin-like Props
 
 In addition to its own properties, the editor allows passing any of the properties that a [plugin](./plugins.md) defines as well.
 
@@ -123,7 +111,7 @@ const plugins = [
 <Editor
   onKeyDown={myKeyHandler}
   plugins={plugins}
-  state={state}
+  value={value}
 />
 ```
 
@@ -139,7 +127,7 @@ const plugins = [
 
 <Editor
   plugins={plugins}
-  state={state}
+  value={value}
 />
 ```
 
@@ -158,29 +146,40 @@ const plugins = [
 To see how these properties behave, check out the [Plugins reference](./plugins.md).
 
 
-## Methods
+## Instance Methods
 
 ### `blur`
 `blur() => Void`
 
 Programmatically blur the editor.
 
+### `change`
+`change(fn) => Void`
+`change(fn, ...args) => Void`
+
+Programmatically invoke a change `fn` on the editor. The function will be invokved with a new `change` object representing the editor's current value.
+
+If extra `...args` are passed in, the change `fn` will be invoked with `(change, ...args)`, so you can use this as a shorthand for performing single-function changes.
+
 ### `focus`
 `focus() => Void`
 
 Programmatically focus the editor.
 
-### `getSchema`
-`getSchema() => Schema`
 
-Return the editor's current schema.
+## Instance Properties
 
-### `getState`
-`getState() => State`
+### `schema`
+`Schema`
 
-Return the editor's current state.
+The editor's current schema.
 
-### `onChange`
-`onChange(change: Change) => Void`
+### `stack`
+`Stack`
 
-Invoking this method will update the state of the editor with the `change`, running it through all of it's plugins, and passing it the parent component, before it cycles back down as the new `state` property of the editor.
+The editor's current stack.
+
+### `value`
+`Value`
+
+The editor's current value.

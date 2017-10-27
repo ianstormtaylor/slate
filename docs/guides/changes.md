@@ -150,7 +150,7 @@ const change = value.change()
   .selectAll()
   .delete()
 
-const newState = change.value
+const newValue = change.value
 ```
 
 Note that you'll need to then grab the new value by accessing the `change.value` property directly.
