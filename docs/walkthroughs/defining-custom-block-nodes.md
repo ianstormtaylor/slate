@@ -15,11 +15,11 @@ We'll show you how. Let's start with our app from earlier:
 class App extends React.Component {
 
   state = {
-    state: initialState
+    value: initialValue
   }
 
-  onChange = ({ state }) => {
-    this.setState({ state })
+  onChange = ({ value }) => {
+    this.setState({ value })
   }
 
   onKeyDown = (event, change) => {
@@ -32,7 +32,7 @@ class App extends React.Component {
   render() {
     return (
       <Editor
-        state={this.state.state}
+        value={this.state.value}
         onChange={this.onChange}
         onKeyDown={this.onKeyDown}
       />
@@ -71,11 +71,11 @@ function CodeNode(props) {
 class App extends React.Component {
 
   state = {
-    state: initialState,
+    value: initialValue,
   }
 
-  onChange = ({ state }) => {
-    this.setState({ state })
+  onChange = ({ value }) => {
+    this.setState({ value })
   }
 
   onKeyDown = (event, change) => {
@@ -89,7 +89,7 @@ class App extends React.Component {
     return (
       // Pass in the `renderNode` prop...
       <Editor
-        state={this.state.state}
+        value={this.state.value}
         onChange={this.onChange}
         onKeyDown={this.onKeyDown}
         renderNode={this.renderNode}
@@ -117,11 +117,11 @@ function CodeNode(props) {
 class App extends React.Component {
 
   state = {
-    state: initialState,
+    value: initialValue,
   }
 
-  onChange = ({ state }) => {
-    this.setState({ state })
+  onChange = ({ value }) => {
+    this.setState({ value })
   }
 
   onKeyDown = (event, change) => {
@@ -139,7 +139,7 @@ class App extends React.Component {
   render() {
     return (
       <Editor
-        state={this.state.state}
+        value={this.state.value}
         onChange={this.onChange}
         onKeyDown={this.onKeyDown}
         renderNode={this.renderNode}
@@ -168,11 +168,11 @@ function CodeNode(props) {
 class App extends React.Component {
 
   state = {
-    state: initialState,
+    value: initialValue,
   }
 
-  onChange = ({ state }) => {
-    this.setState({ state })
+  onChange = ({ value }) => {
+    this.setState({ value })
   }
 
   onKeyDown = (event, change) => {
@@ -181,7 +181,7 @@ class App extends React.Component {
     event.preventDefault()
 
     // Determine whether any of the currently selected blocks are code blocks.
-    const isCode = change.state.blocks.some(block => block.type == 'code')
+    const isCode = change.value.blocks.some(block => block.type == 'code')
 
     // Toggle the block type depending on `isCode`.
     change.setBlock(isCode ? 'paragraph' : 'code')
@@ -191,7 +191,7 @@ class App extends React.Component {
   render() {
     return (
       <Editor
-        state={this.state.state}
+        value={this.state.value}
         onChange={this.onChange}
         onKeyDown={this.onKeyDown}
         renderNode={this.renderNode}
