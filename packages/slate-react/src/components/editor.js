@@ -181,10 +181,11 @@ class Editor extends React.Component {
   flushChange = () => {
     const { change } = this.tmp
 
-    if (change) {
+    if (change && !this.tmp.flushTimeout) {
       debug('flushChange', { change })
-      window.requestAnimationFrame(() => {
+      this.tmp.flushTimeout = setTimeout(() => {
         delete this.tmp.change
+        delete this.tmp.flushTimeout
         this.props.onChange(change)
       })
     }
