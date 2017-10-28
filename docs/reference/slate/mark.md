@@ -22,6 +22,11 @@ Mark({
 
 A map of [`Data`](./data.md).
 
+### `kind`
+`String`
+
+A string with a value of `'mark'`.
+
 ### `type`
 `String`
 

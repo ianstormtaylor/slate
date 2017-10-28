@@ -23,6 +23,11 @@ Document({
 ### `data`
 `Immutable.Map`
 
+### `kind`
+`String`
+
+An immutable string value of `'document'` for easily separating this node from [`Block`](./block.md), [`Inline`](./inline.md) or [`Text`](./text.md) nodes.
+
 Arbitrary data associated with the document. Defaults to an empty `Map`.
 
 ### `nodes`
@@ -32,11 +37,6 @@ A list of child nodes.
 
 
 ## Computed Properties
-
-### `kind`
-`String`
-
-An immutable string value of `'document'` for easily separating this node from [`Block`](./block.md), [`Inline`](./inline.md) or [`Text`](./text.md) nodes.
 
 ### `text`
 `String`

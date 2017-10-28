@@ -12,6 +12,11 @@ All changes are performed through `Change` objects, so that a history of changes
 
 ## Properties
 
+### `kind`
+`String`
+
+A string with a value of `'change'`.
+
 ### `value`
 
 A [`Value`](./value.md) with the change's current operations applied. Each time you run a new change function this property will be updated.

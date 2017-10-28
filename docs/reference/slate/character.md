@@ -19,6 +19,11 @@ Character({
 })
 ```
 
+### `kind`
+`String`
+
+A string with a value of `'character'`.
+
 ### `marks`
 `Immutable.Set`
 
