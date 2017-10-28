@@ -127,7 +127,7 @@ class Stack extends Record(DEFAULTS) {
    */
 
   render(property, props, ...args) {
-    const plugins = this.getPluginsWith(property).reverse()
+    const plugins = this.getPluginsWith(property).slice().reverse()
     let { children = null } = props
 
     for (const plugin of plugins) {
