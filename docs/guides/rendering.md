@@ -1,7 +1,7 @@
 
 # Rendering
 
-One of the best parts of Slate is that it is built with React, so it fits right into your existing application. It doesn't re-invent its own view layer that you have to learn. It tries to keep everything as React-y as possible.
+One of the best parts of Slate is that it's built with React, so it fits right into your existing application. It doesn't re-invent its own view layer that you have to learn. It tries to keep everything as React-y as possible.
 
 To that end, Slate gives you control over the rendering behavior of every node and mark in your document, any placeholders you want to render, and even the top-level editor itself. 
 
