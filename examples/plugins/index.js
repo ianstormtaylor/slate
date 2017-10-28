@@ -22,7 +22,7 @@ function WordCount(options) {
             {props.children}
           </div>
           <span className="word-counter">
-            Word Count: {props.state.document.text.split(' ').length}
+            Word Count: {props.value.document.text.split(' ').length}
           </span>
         </div>
       )
