@@ -122,12 +122,9 @@ class Leaf extends React.Component {
   renderText() {
     const { block, node, parent, text, index, leaves } = this.props
 
-    // COMPAT: If the text is empty and it's the only child, we need to render
-    // a word-joiner character which will prevent line break on its either side
-    // and is invisible to get the block to have the proper height.
-    if (text == '' && parent.kind == 'block' && parent.text == '') {
-      return '\u2060'
-    }
+    // COMPAT: If the text is empty and it's the only child, we need to render a
+    // <br/> to get the block to have the proper height.
+    if (text == '' && parent.kind == 'block' && parent.text == '') return <br />
 
     // COMPAT: If the text is empty otherwise, it's because it's on the edge of
     // an inline void node, so we render a zero-width space so that the
