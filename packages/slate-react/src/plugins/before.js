@@ -241,14 +241,17 @@ function BeforePlugin() {
    */
 
   function onDragOver(event, change, editor) {
+    // If the target is inside a void node, and only in this case,
+    // call `preventDefault` to signal that drops are allowed.
+    // When the target is editable, drop is allowed by default.
+    const node = findNode(event.target, editor.value)
+    if (node.isVoid) event.preventDefault()
+
     // If a drag is already in progress, don't do this again.
     if (isDragging) return true
 
     isDragging = true
     event.nativeEvent.dataTransfer.dropEffect = 'move'
-
-    // You must call `preventDefault` to signal that drops are allowed.
-    event.preventDefault()
 
     debug('onDragOver', { event })
   }
