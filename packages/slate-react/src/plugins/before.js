@@ -4,7 +4,12 @@ import getWindow from 'get-window'
 import { findDOMNode } from 'react-dom'
 
 import HOTKEYS from '../constants/hotkeys'
-import { IS_FIREFOX, SUPPORTED_EVENTS } from '../constants/environment'
+import {
+  IS_FIREFOX,
+  IS_IOS,
+  IS_ANDROID,
+  SUPPORTED_EVENTS
+} from '../constants/environment'
 import findNode from '../utils/find-node'
 
 /**
@@ -44,7 +49,9 @@ function BeforePlugin() {
     // since it provides more useful information about the range being affected
     // and also preserves compatibility with iOS autocorrect, which would be
     // broken if we called `preventDefault()` on React's synthetic event here.
-    if (SUPPORTED_EVENTS.beforeinput) return true
+    // Since native `onbeforeinput` mainly benefits autocorrect and spellcheck
+    // for mobile, on desktop it brings IME issue, limit its scope for now.
+    if ((IS_IOS || IS_ANDROID) && SUPPORTED_EVENTS.beforeinput) return true
 
     debug('onBeforeInput', { event })
   }

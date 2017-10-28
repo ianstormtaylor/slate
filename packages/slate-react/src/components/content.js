@@ -10,7 +10,12 @@ import Node from './node'
 import findDOMRange from '../utils/find-dom-range'
 import findRange from '../utils/find-range'
 import scrollToSelection from '../utils/scroll-to-selection'
-import { IS_FIREFOX, SUPPORTED_EVENTS } from '../constants/environment'
+import {
+  IS_FIREFOX,
+  IS_IOS,
+  IS_ANDROID,
+  SUPPORTED_EVENTS
+} from '../constants/environment'
 
 /**
  * Debug.
@@ -87,7 +92,8 @@ class Content extends React.Component {
    */
 
   componentDidMount = () => {
-    if (SUPPORTED_EVENTS.beforeinput) {
+    // Restrict scoped of `beforeinput` to mobile.
+    if ((IS_IOS || IS_ANDROID) && SUPPORTED_EVENTS.beforeinput) {
       this.element.addEventListener('beforeinput', this.onNativeBeforeInput)
     }
 
@@ -103,7 +109,8 @@ class Content extends React.Component {
    */
 
   componentWillUnmount() {
-    if (SUPPORTED_EVENTS.beforeinput) {
+    // Restrict scoped of `beforeinput` to mobile.
+    if ((IS_IOS || IS_ANDROID) && SUPPORTED_EVENTS.beforeinput) {
       this.element.removeEventListener('beforeinput', this.onNativeBeforeInput)
     }
   }

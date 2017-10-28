@@ -83,7 +83,9 @@ const COMPOSING = e => (
   e.key == 'ArrowDown' ||
   e.key == 'ArrowLeft' ||
   e.key == 'ArrowRight' ||
-  e.key == 'ArrowUp'
+  e.key == 'ArrowUp' ||
+  e.key == 'Backspace' ||
+  e.key == 'Enter'
 )
 
 /**
