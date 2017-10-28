@@ -16,8 +16,10 @@
 ## Guides
 
 - [Changes](./guides/changes.md)
-- [Plugins](./guides/plugins.md)
 - [Data Model](./guides/data-model.md)
+- [Plugins](./guides/plugins.md)
+- [Rendering](./guides/rendering.md)
+- [Schemas](./guides/schemas.md)
 
 
 ## General
