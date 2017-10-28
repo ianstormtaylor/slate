@@ -123,8 +123,10 @@ class Leaf extends React.Component {
     const { block, node, parent, text, index, leaves } = this.props
 
     // COMPAT: If the text is empty and it's the only child, we need to render a
-    // <br/> to get the block to have the proper height.
-    if (text == '' && parent.kind == 'block' && parent.text == '') return <br />
+    // line break to get the block to have the proper height.
+    if (text == '' && parent.kind == 'block' && parent.text == '') {
+      return <span data-slate-empty-block>{'\n'}</span>
+    }
 
     // COMPAT: If the text is empty otherwise, it's because it's on the edge of
     // an inline void node, so we render a zero-width space so that the

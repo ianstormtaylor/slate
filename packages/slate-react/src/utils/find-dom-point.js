@@ -40,11 +40,11 @@ function findDOMPoint(key, offset) {
   }
 
   // COMPAT: For empty blocks with only a single empty text node, we will have
-  // rendered a `<br/>` instead of a text node.
+  // rendered a `<span>` with `\n` inside, instead of a text node.
   if (
     el.childNodes.length == 1 &&
     el.childNodes[0].childNodes.length == 1 &&
-    el.childNodes[0].childNodes[0].tagName == 'BR'
+    el.childNodes[0].childNodes[0].hasAttributes('data-slate-empty-block')
   ) {
     return { node: el.childNodes[0], offset: 0 }
   }
