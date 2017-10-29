@@ -581,7 +581,7 @@ function AfterPlugin() {
       change.insertFragment(fragment)
     }
 
-    if (type == 'text' || type == 'html') {
+    if ((type == 'text' || type == 'html') && text) {
       const { value } = change
       const { document, selection, startBlock } = value
       if (startBlock.isVoid) return
