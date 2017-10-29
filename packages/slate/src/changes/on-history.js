@@ -1,5 +1,6 @@
 
 import invert from '../operations/invert'
+import omit from 'lodash/omit'
 
 /**
  * Changes.
@@ -32,11 +33,11 @@ Changes.redo = (change) => {
   next.forEach((op) => {
     // When the operation mutates selection, omit its `isFocused` props to
     // prevent editor focus changing during continuously redoing.
-    const { type, properties } = op
-    if (type === 'set_selection') {
-      delete properties.isFocused
-    }
-    change.applyOperation(op, { save: false })
+    const { type } = op
+    const properties = (type === 'set_selection')
+      ? omit(op.properties, 'isFocused')
+      : op.properties
+    change.applyOperation({ ...op, properties }, { save: false })
   })
 
   // Update the history.
@@ -69,11 +70,11 @@ Changes.undo = (change) => {
   previous.slice().reverse().map(invert).forEach((inverseOp) => {
     // When the operation mutates selection, omit its `isFocused` props to
     // prevent editor focus changing during continuously undoing.
-    const { type, properties } = inverseOp
-    if (type === 'set_selection') {
-      delete properties.isFocused
-    }
-    change.applyOperation(inverseOp, { save: false })
+    const { type } = inverseOp
+    const properties = (type === 'set_selection')
+      ? omit(inverseOp.properties, 'isFocused')
+      : inverseOp.properties
+    change.applyOperation({ ...inverseOp, properties }, { save: false })
   })
 
   // Update the history.
