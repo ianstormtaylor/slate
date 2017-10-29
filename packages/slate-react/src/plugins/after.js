@@ -122,7 +122,20 @@ function AfterPlugin() {
     // Once the fake cut content has successfully been added to the clipboard,
     // delete the content in the current selection.
     window.requestAnimationFrame(() => {
-      editor.change(c => c.delete())
+      // If user cuts a void block or a void inline,
+      // manually removes them since selection is collapsed in this case.
+      const { value } = change
+      const { endBlock, endInline } = value
+      const isVoidBlock = endBlock && endBlock.isVoid
+      const isVoidInline = endInline && endInline.isVoid
+
+      if (isVoidBlock) {
+        editor.change(c => c.removeNodeByKey(endBlock.key))
+      } else if (isVoidInline) {
+        editor.change(c => c.removeNodeByKey(endInline.key))
+      } else {
+        editor.change(c => c.delete())
+      }
     })
   }
 
