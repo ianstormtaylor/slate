@@ -125,9 +125,9 @@ function AfterPlugin() {
       // If user cuts a void block or a void inline,
       // manually removes them since selection is collapsed in this case.
       const { value } = change
-      const { endBlock, endInline } = value
-      const isVoidBlock = endBlock && endBlock.isVoid
-      const isVoidInline = endInline && endInline.isVoid
+      const { endBlock, endInline, isCollapsed } = value
+      const isVoidBlock = endBlock && endBlock.isVoid && isCollapsed
+      const isVoidInline = endInline && endInline.isVoid && isCollapsed
 
       if (isVoidBlock) {
         editor.change(c => c.removeNodeByKey(endBlock.key))
