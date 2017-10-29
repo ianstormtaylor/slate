@@ -42,7 +42,7 @@ function getEventTransfer(event) {
   let node = getType(transfer, NODE)
   const html = getType(transfer, HTML)
   const rich = getType(transfer, RICH)
-  let text = getType(transfer, TEXT)
+  let text = getType(transfer, TEXT) || ''
   let files
 
   // If there isn't a fragment, but there is HTML, check to see if the HTML is
