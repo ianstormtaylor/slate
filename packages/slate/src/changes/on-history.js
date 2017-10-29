@@ -30,6 +30,12 @@ Changes.redo = (change) => {
 
   // Replay the next operations.
   next.forEach((op) => {
+    // When the operation mutates selection, omit its `isFocused` props to
+    // prevent editor focus changing during continuously redoing.
+    const { type, properties } = op
+    if (type === 'set_selection') {
+      delete properties.isFocused
+    }
     change.applyOperation(op, { save: false })
   })
 
@@ -60,8 +66,14 @@ Changes.undo = (change) => {
   redos = redos.push(previous)
 
   // Replay the inverse of the previous operations.
-  previous.slice().reverse().map(invert).forEach((inverse) => {
-    change.applyOperation(inverse, { save: false })
+  previous.slice().reverse().map(invert).forEach((inverseOp) => {
+    // When the operation mutates selection, omit its `isFocused` props to
+    // prevent editor focus changing during continuously undoing.
+    const { type, properties } = inverseOp
+    if (type === 'set_selection') {
+      delete properties.isFocused
+    }
+    change.applyOperation(inverseOp, { save: false })
   })
 
   // Update the history.
