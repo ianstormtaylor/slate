@@ -87,6 +87,21 @@ const RULES = [
     }
   },
   {
+    // Special case for images, to grab their src.
+    deserialize(el, next) {
+      if (el.tagName.toLowerCase() != 'img') return
+      return {
+        kind: 'block',
+        type: 'image',
+        isVoid: true,
+        nodes: next(el.childNodes),
+        data: {
+          src: el.getAttribute('src')
+        }
+      }
+    }
+  },
+  {
     // Special case for links, to grab their href.
     deserialize(el, next) {
       if (el.tagName.toLowerCase() != 'a') return
@@ -182,7 +197,7 @@ class PasteHtml extends React.Component {
    */
 
   renderNode = (props) => {
-    const { attributes, children, node } = props
+    const { attributes, children, node, isSelected } = props
     switch (node.type) {
       case 'quote': return <blockquote {...attributes}>{children}</blockquote>
       case 'code': return <pre><code {...attributes}>{children}</code></pre>
@@ -199,6 +214,14 @@ class PasteHtml extends React.Component {
         const { data } = node
         const href = data.get('href')
         return <a href={href} {...attributes}>{children}</a>
+      }
+      case 'image': {
+        const src = node.data.get('src')
+        const className = isSelected ? 'active' : null
+        const style = { display: 'block' }
+        return (
+          <img src={src} className={className} style={style} {...attributes} />
+        )
       }
     }
   }
