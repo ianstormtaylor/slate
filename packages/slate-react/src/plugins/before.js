@@ -250,7 +250,7 @@ function BeforePlugin() {
   function onDragOver(event, change, editor) {
     // If the target is inside a void node, and only in this case,
     // call `preventDefault` to signal that drops are allowed.
-    // When the target is editable, dropping is already allowed by 
+    // When the target is editable, dropping is already allowed by
     // default, and calling `preventDefault` hides the cursor.
     const node = findNode(event.target, editor.value)
     if (node.isVoid) event.preventDefault()
