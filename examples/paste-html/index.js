@@ -87,7 +87,7 @@ const RULES = [
     }
   },
   {
-    // Special case for images, to grab their srs.
+    // Special case for images, to grab their src.
     deserialize(el, next) {
       if (el.tagName.toLowerCase() != 'img') return
       return {
