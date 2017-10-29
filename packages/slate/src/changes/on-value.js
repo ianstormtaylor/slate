@@ -14,9 +14,10 @@ const Changes = {}
  *
  * @param {Change} change
  * @param {Object|Value} properties
+ * @param {Object} options
  */
 
-Changes.setValue = (change, properties) => {
+Changes.setValue = (change, properties, options = {}) => {
   properties = Value.createProperties(properties)
   const { value } = change
 
@@ -24,7 +25,7 @@ Changes.setValue = (change, properties) => {
     type: 'set_value',
     properties,
     value,
-  })
+  }, options)
 }
 
 /**
