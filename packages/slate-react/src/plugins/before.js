@@ -102,15 +102,10 @@ function BeforePlugin() {
 
     // If the value's schema isn't the editor's schema, update it. This can
     // happen on the initialization of the editor, or if the schema changes.
+    // Since only schema is updated, don't save this change into history.
     if (value.schema != editor.schema) {
-      // When change on initialization, don't save change into history, making
-      // this schema as default and history clean after initialization ends.
-      const isInit = (
-        value.history.undos.size === 0 &&
-        value.history.redos.size === 0
-      )
       change
-        .setValue({ schema: editor.schema }, { save: !isInit })
+        .setValue({ schema: editor.schema }, { save: false })
         .normalize()
     }
 
