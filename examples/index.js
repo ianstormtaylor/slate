@@ -8,6 +8,7 @@ import CodeHighlighting from './code-highlighting'
 import Embeds from './embeds'
 import Emojis from './emojis'
 import ForcedLayout from './forced-layout'
+import History from './history'
 import HoveringMenu from './hovering-menu'
 import HugeDocument from './huge-document'
 import Images from './images'
@@ -51,6 +52,7 @@ const EXAMPLES = [
   ['Plugins', Plugins, '/plugins'],
   ['Forced Layout', ForcedLayout, '/forced-layout'],
   ['Huge Document', HugeDocument, '/huge-document'],
+  ['History', History, '/history'],
 ]
 
 /**
