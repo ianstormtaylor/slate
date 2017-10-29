@@ -46,18 +46,6 @@ class History extends React.Component {
   }
 
   /**
-   * On delete selected text.
-   *
-   */
-
-  onClickDelete = (event) => {
-    event.preventDefault()
-    const { value } = this.state
-    const change = value.change().delete()
-    this.onChange(change)
-  }
-
-  /**
    * On redo in history.
    *
    */
@@ -106,7 +94,6 @@ class History extends React.Component {
     const { value } = this.state
     return (
       <div className="menu toolbar-menu">
-        <ToolbarButton icon="delete" onMouseDown={this.onClickDelete} />
         <ToolbarButton icon="undo" onMouseDown={this.onClickUndo} />
         <ToolbarButton icon="redo" onMouseDown={this.onClickRedo} />
         <span className="button">
