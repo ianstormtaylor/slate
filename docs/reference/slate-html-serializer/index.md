@@ -108,7 +108,7 @@ The object should be one of:
 
 {
   kind: 'text',
-  ranges: Array
+  leaves: Array
 }
 ```
 
