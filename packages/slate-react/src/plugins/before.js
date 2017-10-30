@@ -109,9 +109,10 @@ function BeforePlugin() {
 
     // If the value's schema isn't the editor's schema, update it. This can
     // happen on the initialization of the editor, or if the schema changes.
+    // This change isn't save into history since only schema is updated.
     if (value.schema != editor.schema) {
       change
-        .setValue({ schema: editor.schema })
+        .setValue({ schema: editor.schema }, { save: false })
         .normalize()
     }
 
