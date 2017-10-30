@@ -71,27 +71,26 @@ function BeforePlugin() {
     const { value } = change
     const focusTarget = event.relatedTarget
 
-    // If focusTarget is null, the blur event is due to the window itself being
-    // blurred (eg. when changing tabs) so we should ignore the event, since we
-    // want to maintain focus when returning.
-    if (!focusTarget) return true
+    // focusTarget may be null when window itself being blurred
+    // (eg. when changing tabs), or when user clicks on elements
+    // without`tabindex` attribute.
+    if (focusTarget) {
+      const el = findDOMNode(editor)
+      // The event should be ignored if the focus returns to the editor from an
+      // embedded editable element (eg. an input element inside a void node).
+      if (focusTarget == el) return true
 
-    const el = findDOMNode(editor)
+      // when the focus moved from the editor to a void node spacer...
+      if (focusTarget.hasAttribute('data-slate-spacer')) return true
 
-    // The event should also be ignored if the focus returns to the editor from
-    // an embedded editable element (eg. an input element inside a void node),
-    if (focusTarget == el) return true
-
-    // when the focus moved from the editor to a void node spacer...
-    if (focusTarget.hasAttribute('data-slate-spacer')) return true
-
-    // or to an editable element inside the editor but not into a void node
-    // (eg. a list item of the check list example).
-    if (
-      el.contains(focusTarget) &&
-      !findNode(focusTarget, value).isVoid
-    ) {
-      return true
+      // or to an editable element inside the editor but not into a void node
+      // (eg. a list item of the check list example).
+      if (
+        el.contains(focusTarget) &&
+        !findNode(focusTarget, value).isVoid
+      ) {
+        return true
+      }
     }
 
     debug('onBlur', { event })
