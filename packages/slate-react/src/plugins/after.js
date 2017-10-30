@@ -1,4 +1,3 @@
-
 import Base64 from 'slate-base64-serializer'
 import Debug from 'debug'
 import Plain from 'slate-plain-serializer'
@@ -245,6 +244,20 @@ function AfterPlugin(options = {}) {
     div.setAttribute('contenteditable', true)
     div.style.position = 'absolute'
     div.style.left = '-9999px'
+
+    // The snippet below is from `clipboard.js`
+    // Prevent zooming on iOS
+    div.style.fontSize = '12pt'
+    // Reset box model
+    div.style.border = '0'
+    div.style.padding = '0'
+    div.style.margin = '0'
+    // Creating the phony div at the same level as the real div so that
+    // the viewport doesn't jump (in Firefox)
+    const yPosition = window.pageYOffset ||
+                      window.document.documentElement.scrollTop
+    div.style.top = `${yPosition}px`
+
     div.appendChild(contents)
     body.appendChild(div)
 
