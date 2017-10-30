@@ -281,6 +281,28 @@ Changes.removeMarkByKey = (change, key, offset, length, mark, options = {}) => {
 }
 
 /**
+ * Remove all `marks` from node by `key`.
+ *
+ * @param {Change} change
+ * @param {String} key
+ * @param {Object} options
+ *   @property {Boolean} normalize
+ */
+
+Changes.removeAllMarksByKey = (change, key, options = {}) => {
+  const { state } = change
+  const { document } = state
+  const node = document.getNode(key)
+  const texts = node.kind === 'text' ? [node] : node.getTextsAsArray()
+
+  texts.forEach((text) => {
+    text.getMarksAsArray().forEach((mark) => {
+      change.removeMarkByKey(text.key, 0, text.text.length, mark, options)
+    })
+  })
+}
+
+/**
  * Remove a node by `key`.
  *
  * @param {Change} change
