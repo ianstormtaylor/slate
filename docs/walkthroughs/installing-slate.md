@@ -41,7 +41,7 @@ const initialValue = Value.fromJSON({
         nodes: [
           {
             kind: 'text',
-            ranges: [
+            leaves: [
               {
                 text: 'A line of text in a paragraph.'
               }
@@ -71,7 +71,7 @@ const initialValue = Value.fromJSON({
         nodes: [
           {
             kind: 'text',
-            ranges: [
+            leaves: [
               {
                 text: 'A line of text in a paragraph.'
               }
