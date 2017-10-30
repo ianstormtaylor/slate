@@ -18,7 +18,7 @@ const ToolbarButton = props => (
 )
 
 /**
- * The history stack example.
+ * The history example.
  *
  * @type {Component}
  */
@@ -97,10 +97,10 @@ class History extends React.Component {
         <ToolbarButton icon="undo" onMouseDown={this.onClickUndo} />
         <ToolbarButton icon="redo" onMouseDown={this.onClickRedo} />
         <span className="button">
-          Redos: {value.history.redos.size}
+          Undos: {value.history.undos.size}
         </span>
         <span className="button">
-          Undos: {value.history.undos.size}
+          Redos: {value.history.redos.size}
         </span>
       </div>
     )
