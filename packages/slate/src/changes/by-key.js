@@ -293,7 +293,7 @@ Changes.removeAllMarksByKey = (change, key, options = {}) => {
   const { state } = change
   const { document } = state
   const node = document.getNode(key)
-  const texts = node.getTextsAsArray()
+  const texts = node.kind === 'text' ? [node] : node.getTextsAsArray()
 
   texts.forEach((text) => {
     text.getMarksAsArray().forEach((mark) => {
