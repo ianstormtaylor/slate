@@ -226,6 +226,8 @@ class Content extends React.Component {
    */
 
   onEvent(handler, event) {
+    debug('onEvent', handler)
+
     // COMPAT: Composition events can change the DOM out of under React, so we
     // increment this key to ensure that a full re-render happens. (2017/10/16)
     if (handler == 'onCompositionEnd') {

@@ -18,7 +18,7 @@ import findNode from '../utils/find-node'
  * @type {Function}
  */
 
-const debug = Debug('slate:core:before')
+const debug = Debug('slate:before')
 
 /**
  * The core before plugin.
@@ -136,6 +136,11 @@ function BeforePlugin() {
     setTimeout(() => {
       if (compositionCount > n) return
       isComposing = false
+
+      // HACK: we need to re-render the editor here so that it will update its
+      // placeholder in case one is currently rendered. This should be handled
+      // differently ideally, in a less invasive way?
+      editor.setState({ isComposing: false })
     })
 
     debug('onCompositionEnd', { event })
@@ -152,6 +157,11 @@ function BeforePlugin() {
   function onCompositionStart(event, change, editor) {
     isComposing = true
     compositionCount++
+
+    // HACK: we need to re-render the editor here so that it will update its
+    // placeholder in case one is currently rendered. This should be handled
+    // differently ideally, in a less invasive way?
+    editor.setState({ isComposing: true })
 
     debug('onCompositionStart', { event })
   }
