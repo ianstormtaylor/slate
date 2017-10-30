@@ -245,15 +245,13 @@ function AfterPlugin(options = {}) {
     div.style.position = 'absolute'
     div.style.left = '-9999px'
 
-    // The snippet below is from `clipboard.js`
-    // Prevent zooming on iOS
-    div.style.fontSize = '12pt'
-    // Reset box model
+    // COMPAT: In Firefox, the viewport jumps to find the phony div. Hence it
+    // should be created at the current window scroll offset (setting
+    // 'style.top'). The box model attributes which can interact with 'top' are
+    // also reset.
     div.style.border = '0'
     div.style.padding = '0'
     div.style.margin = '0'
-    // Creating the phony div at the same level as the real div so that
-    // the viewport doesn't jump (in Firefox)
     const yPosition = window.pageYOffset ||
                       window.document.documentElement.scrollTop
     div.style.top = `${yPosition}px`
