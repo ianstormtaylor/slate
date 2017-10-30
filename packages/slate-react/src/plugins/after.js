@@ -581,8 +581,8 @@ function AfterPlugin() {
       change.insertFragment(fragment)
     }
 
-    // Only allows pasting plain text or html, with valid text
-    if ((type == 'text' || type == 'html') && text) {
+    if (type == 'text' || type == 'html') {
+      if (!text) return
       const { value } = change
       const { document, selection, startBlock } = value
       if (startBlock.isVoid) return
