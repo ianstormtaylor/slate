@@ -245,16 +245,13 @@ function AfterPlugin(options = {}) {
     div.style.position = 'absolute'
     div.style.left = '-9999px'
 
-    // COMPAT: In Firefox, the viewport jumps to find the phony div. Hence it
-    // should be created at the current window scroll offset (setting
-    // 'style.top'). The box model attributes which can interact with 'top' are
-    // also reset.
-    div.style.border = '0'
-    div.style.padding = '0'
-    div.style.margin = '0'
-    const yPosition = window.pageYOffset ||
-                      window.document.documentElement.scrollTop
-    div.style.top = `${yPosition}px`
+    // COMPAT: In Firefox, the viewport jumps to find the phony div, so it
+    // should be created at the current scroll offset with `style.top`.
+    // The box model attributes which can interact with 'top' are also reset.
+    div.style.border = '0px'
+    div.style.padding = '0px'
+    div.style.margin = '0px'
+    div.style.top = `${window.pageYOffset || window.document.documentElement.scrollTop}px`
 
     div.appendChild(contents)
     body.appendChild(div)
