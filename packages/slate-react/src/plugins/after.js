@@ -595,6 +595,7 @@ function AfterPlugin() {
     }
 
     if (type == 'text' || type == 'html') {
+      if (!text) return
       const { value } = change
       const { document, selection, startBlock } = value
       if (startBlock.isVoid) return
