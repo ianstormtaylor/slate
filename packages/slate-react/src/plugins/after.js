@@ -24,7 +24,7 @@ import { IS_CHROME, IS_SAFARI } from '../constants/environment'
  * @type {Function}
  */
 
-const debug = Debug('slate:core:after')
+const debug = Debug('slate:after')
 
 /**
  * The after plugin.
@@ -728,6 +728,7 @@ function AfterPlugin() {
 
   function renderPlaceholder(props) {
     const { editor, node } = props
+    if (editor.state.isComposing) return
     if (node.kind != 'block') return
     if (!Text.isTextList(node.nodes)) return
     if (node.text != '') return
