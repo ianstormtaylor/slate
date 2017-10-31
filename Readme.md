@@ -32,7 +32,7 @@
     <img src="http://img.badgesize.io/https://unpkg.com/slate/dist/slate.min.js?compression=gzip&amp;label=slate">
   </a>
   <a href="https://unpkg.com/slate-react/dist/slate-react.min.js">
-    <img src="http://img.badgesize.io/https://unpkg.com/slate-react/dist/slate-react.min.js?compression=gzip&amp;label=slate-react">
+    <img src="http://img.badgesize.io/https://unpkg.com/slate-react/dist/slate-react.min.js?compression=gzip&amp;label=slate--react">
   </a>
   <a href="https://travis-ci.org/ianstormtaylor/slate">
     <img src="https://travis-ci.org/ianstormtaylor/slate.svg?branch=master">
