@@ -751,6 +751,7 @@ function AfterPlugin() {
 
   function renderPlaceholder(props) {
     const { editor, node } = props
+    if (!editor.props.placeholder) return
     if (editor.state.isComposing) return
     if (node.kind != 'block') return
     if (!Text.isTextList(node.nodes)) return
