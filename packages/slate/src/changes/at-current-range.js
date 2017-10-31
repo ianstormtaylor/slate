@@ -80,30 +80,7 @@ Changes.addMark = (change, mark) => {
  */
 
 Changes.addMarks = (change, marks) => {
-  marks = Mark.createSet(marks)
-  const { state } = change
-  const { document, selection } = state
-
-  if (selection.isExpanded) {
-    change.addMarksAtRange(selection, marks)
-  }
-
-  else if (selection.marks) {
-    marks = selection.marks.union(marks)
-    const sel = selection.set('marks', marks)
-    change.select(sel)
-  }
-
-  else {
-    if (selection.isSet) {
-      marks = document
-        .getActiveMarksAtRange(selection)
-        .union(marks)
-    }
-
-    const sel = selection.set('marks', marks)
-    change.select(sel)
-  }
+  marks.forEach(mark => change.addMark(mark))
 }
 
 /**
