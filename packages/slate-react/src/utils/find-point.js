@@ -57,9 +57,14 @@ function findPoint(nativeNode, nativeOffset, value) {
   }
 
   // COMPAT: If the parent node is a Slate zero-width space, this is because the
-  // text node has no characters, so the offset can only be zero.
-  if (offset != 0 && parentNode.getAttribute('data-slate-zero-width')) {
-    offset = 0
+  // text node should have no characters. However, during IME composition the
+  // ASCII characters will be prepended to the zero-width space, so subtract 1
+  // from the offset to account for the zero-width space character.
+  if (
+    offset == node.textContent.length &&
+    parentNode.hasAttribute('data-slate-zero-width')
+  ) {
+    offset--
   }
 
   // Get the string value of the offset key attribute.

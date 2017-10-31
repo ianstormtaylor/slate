@@ -18,7 +18,7 @@ export const output = `
     <span contenteditable="false" style="pointer-events:none;display:inline-block;width:0;max-width:100%;white-space:nowrap;opacity:0.333"></span>
     <span>
       <span>
-        <span data-slate-empty-block="true">\n</span>
+        <span data-slate-zero-width="true">\u200B</span>
       </span>
     </span>
   </div>
