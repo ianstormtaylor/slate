@@ -40,6 +40,12 @@
   <a href="https://slate-slack.herokuapp.com">
     <img src="https://slate-slack.herokuapp.com/badge.svg">
   <a/> 
+  <a href="./packages/slate/package.json">
+    <img src="https://img.shields.io/npm/v/slate.svg?maxAge=2592000&label=slate&colorB=007ec6">
+  </a> 
+  <a href="./packages/slate-react/package.json">
+    <img src="https://img.shields.io/npm/v/slate-react.svg?maxAge=2592000&label=slate-react&colorB=007ec6">
+  </a> 
   <a href="./License.md">
     <img src="https://img.shields.io/npm/l/slate.svg?maxAge=2592000">
   </a> 
