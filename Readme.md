@@ -25,11 +25,24 @@
 </p>
 
 <p align="center">
-  <a href="https://www.npmjs.com/package/slate"><img src="https://img.shields.io/npm/dt/localeval.svg?maxAge=2592000"></a> 
-  <a href="https://unpkg.com/slate/dist/slate.min.js"><img src="http://img.badgesize.io/https://unpkg.com/slate/dist/slate.min.js?compression=gzip&amp;label=gzip%20size" alt="gzip size"></a>
-  <a href="https://travis-ci.org/ianstormtaylor/slate"><img src="https://travis-ci.org/ianstormtaylor/slate.svg?branch=master"></a> 
-  <a href="https://slate-slack.herokuapp.com"><img src="https://slate-slack.herokuapp.com/badge.svg"><a/> 
-  <a href="./License.md"><img src="https://img.shields.io/npm/l/slate.svg?maxAge=2592000"></a> 
+  <a href="https://www.npmjs.com/package/slate">
+    <img src="https://img.shields.io/npm/dt/localeval.svg?maxAge=2592000">
+  </a> 
+  <a href="https://unpkg.com/slate/dist/slate.min.js">
+    <img src="http://img.badgesize.io/https://unpkg.com/slate/dist/slate.min.js?compression=gzip&label=slate">
+  </a>
+  <a href="https://unpkg.com/slate-react/dist/slate-react.min.js">
+    <img src="http://img.badgesize.io/https://unpkg.com/slate-react/dist/slate-react.min.js?compression=gzip&label=slate-react">
+  </a>
+  <a href="https://travis-ci.org/ianstormtaylor/slate">
+    <img src="https://travis-ci.org/ianstormtaylor/slate.svg?branch=master">
+  </a> 
+  <a href="https://slate-slack.herokuapp.com">
+    <img src="https://slate-slack.herokuapp.com/badge.svg">
+  <a/> 
+  <a href="./License.md">
+    <img src="https://img.shields.io/npm/l/slate.svg?maxAge=2592000">
+  </a> 
 </p>
 <br/>
 
