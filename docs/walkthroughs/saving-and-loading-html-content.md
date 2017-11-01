@@ -246,7 +246,7 @@ class App extends React.Component {
   renderNode = (props) => {
     switch (props.node.type) {
       case 'code': return <pre {...props.attributes}><code>{props.children}</code></pre>
-      case 'code': return <p {...props.attributes}>{props.children}</p>
+      case 'paragraph': return <p {...props.attributes}>{props.children}</p>
       case 'quote': return <blockquote {...props.attributes}>{props.children}</blockquote>
     }
   }
