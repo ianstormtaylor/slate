@@ -513,7 +513,8 @@ function resolveNodeRule(kind, type, obj) {
 }
 
 /**
- * A Lodash customizer for merging `kinds` and `types` arrays.
+ * A Lodash customizer for merging schema definitions. Special cases `kinds`
+ * and `types` arrays to be unioned, and ignores new `null` values.
  *
  * @param {Mixed} target
  * @param {Mixed} source
@@ -523,6 +524,8 @@ function resolveNodeRule(kind, type, obj) {
 function customizer(target, source, key) {
   if (key == 'kinds' || key == 'types') {
     return target == null ? source : target.concat(source)
+  } else {
+    return source == null ? target : source
   }
 }
 
