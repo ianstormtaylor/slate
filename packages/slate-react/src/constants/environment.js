@@ -37,8 +37,8 @@ const EVENT_RULES = [
  */
 
 const OS_RULES = [
+  ['ios', /os ([\.\_\d]+) like mac os/i], // must be before the macos rule
   ['macos', /mac os x/i],
-  ['ios', /os ([\.\_\d]+) like mac os/i],
   ['android', /android/i],
   ['firefoxos', /mozilla\/[a-z\.\_\d]+ \((?:mobile)|(?:tablet)/i],
   ['windows', /windows\s*(?:nt)?\s*([\.\_\d]+)/i],
