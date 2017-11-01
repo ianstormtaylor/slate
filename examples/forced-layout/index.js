@@ -74,7 +74,6 @@ class ForcedLayout extends React.Component {
           schema={schema}
           onChange={this.onChange}
           renderNode={this.renderNode}
-          validateNode={this.validateNode}
         />
       </div>
     )
