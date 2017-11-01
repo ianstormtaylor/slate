@@ -131,6 +131,7 @@ class Content extends React.Component {
     const { editor } = this.props
     const { value } = editor
     const { selection } = value
+    const { isBackward } = selection
     const window = getWindow(this.element)
     const native = window.getSelection()
     const { rangeCount } = native
@@ -161,20 +162,33 @@ class Content extends React.Component {
     }
 
     // If the new range matches the current selection, do nothing.
-    if (
-      current &&
-      range.startContainer == current.startContainer &&
-      range.startOffset == current.startOffset &&
-      range.endContainer == current.endContainer &&
-      range.endOffset == current.endOffset
-    ) {
-      return
+    if (current) {
+      if (
+        range.startContainer == current.startContainer &&
+        range.startOffset == current.startOffset &&
+        range.endContainer == current.endContainer &&
+        range.endOffset == current.endOffset
+      ) {
+        return
+      }
+      if (
+        range.startContainer == current.endContainer &&
+        range.startOffset == current.endOffset &&
+        range.endContainer == current.startContainer &&
+        range.endOffset == current.startOffset
+      ) {
+        return
+      }
     }
 
     // Otherwise, set the `isUpdatingSelection` flag and update the selection.
     this.tmp.isUpdatingSelection = true
     native.removeAllRanges()
-    native.addRange(range)
+    if (isBackward) {
+      native.setBaseAndExtent(range.endContainer, range.endOffset, range.startContainer, range.startOffset)
+    } else {
+      native.setBaseAndExtent(range.startContainer, range.startOffset, range.endContainer, range.endOffset)
+    }
     scrollToSelection(native)
 
     // Then unset the `isUpdatingSelection` flag after a delay.
