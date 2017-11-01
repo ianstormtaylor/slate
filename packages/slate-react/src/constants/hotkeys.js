@@ -1,10 +1,15 @@
 
 import { isKeyHotkey } from 'is-hotkey'
 
-import {
-  IS_IOS,
-  IS_MAC
-} from './environment'
+import { IS_IOS, IS_MAC } from './environment'
+
+/**
+ * Is Apple?
+ *
+ * @type {Boolean}
+ */
+
+const IS_APPLE = IS_IOS || IS_MAC
 
 /**
  * Hotkeys.
@@ -28,44 +33,44 @@ const DELETE_FORWARD = e => DELETE(e) || SHIFT_DELETE(e)
 
 const DELETE_CHAR_BACKWARD_MAC = isKeyHotkey('ctrl+h')
 const DELETE_CHAR_FORWARD_MAC = isKeyHotkey('ctrl+d')
-const DELETE_CHAR_BACKWARD = e => DELETE_BACKWARD(e) || ((IS_MAC || IS_IOS) && DELETE_CHAR_BACKWARD_MAC(e))
-const DELETE_CHAR_FORWARD = e => DELETE_FORWARD(e) || ((IS_MAC || IS_IOS) && DELETE_CHAR_FORWARD_MAC(e))
+const DELETE_CHAR_BACKWARD = e => DELETE_BACKWARD(e) || (IS_APPLE && DELETE_CHAR_BACKWARD_MAC(e))
+const DELETE_CHAR_FORWARD = e => DELETE_FORWARD(e) || (IS_APPLE && DELETE_CHAR_FORWARD_MAC(e))
 
 const DELETE_LINE_BACKWARD_MAC = isKeyHotkey('cmd+backspace')
 const DELETE_LINE_FORWARD_MAC = isKeyHotkey('ctrl+k')
-const DELETE_LINE_BACKWARD = e => (IS_MAC || IS_IOS) && DELETE_LINE_BACKWARD_MAC(e)
-const DELETE_LINE_FORWARD = e => (IS_MAC || IS_IOS) && DELETE_LINE_FORWARD_MAC(e)
+const DELETE_LINE_BACKWARD = e => IS_APPLE && DELETE_LINE_BACKWARD_MAC(e)
+const DELETE_LINE_FORWARD = e => IS_APPLE && DELETE_LINE_FORWARD_MAC(e)
 
 const DELETE_WORD_BACKWARD_MAC = isKeyHotkey('option+backspace')
 const DELETE_WORD_BACKWARD_PC = isKeyHotkey('ctrl+backspace')
 const DELETE_WORD_FORWARD_MAC = isKeyHotkey('option+delete')
 const DELETE_WORD_FORWARD_PC = isKeyHotkey('ctrl+delete')
-const DELETE_WORD_BACKWARD = e => IS_MAC || IS_IOS ? DELETE_WORD_BACKWARD_MAC(e) : DELETE_WORD_BACKWARD_PC(e)
-const DELETE_WORD_FORWARD = e => IS_MAC || IS_IOS ? DELETE_WORD_FORWARD_MAC(e) : DELETE_WORD_FORWARD_PC(e)
+const DELETE_WORD_BACKWARD = e => IS_APPLE ? DELETE_WORD_BACKWARD_MAC(e) : DELETE_WORD_BACKWARD_PC(e)
+const DELETE_WORD_FORWARD = e => IS_APPLE ? DELETE_WORD_FORWARD_MAC(e) : DELETE_WORD_FORWARD_PC(e)
 
 const COLLAPSE_CHAR_FORWARD = isKeyHotkey('right')
 const COLLAPSE_CHAR_BACKWARD = isKeyHotkey('left')
 
 const COLLAPSE_LINE_BACKWARD_MAC = isKeyHotkey('option+up')
 const COLLAPSE_LINE_FORWARD_MAC = isKeyHotkey('option+down')
-const COLLAPSE_LINE_BACKWARD = e => (IS_MAC || IS_IOS) && COLLAPSE_LINE_BACKWARD_MAC(e)
-const COLLAPSE_LINE_FORWARD = e => (IS_MAC || IS_IOS) && COLLAPSE_LINE_FORWARD_MAC(e)
+const COLLAPSE_LINE_BACKWARD = e => IS_APPLE && COLLAPSE_LINE_BACKWARD_MAC(e)
+const COLLAPSE_LINE_FORWARD = e => IS_APPLE && COLLAPSE_LINE_FORWARD_MAC(e)
 
 const EXTEND_CHAR_FORWARD = isKeyHotkey('shift+right')
 const EXTEND_CHAR_BACKWARD = isKeyHotkey('shift+left')
 
 const EXTEND_LINE_BACKWARD_MAC = isKeyHotkey('option+shift+up')
 const EXTEND_LINE_FORWARD_MAC = isKeyHotkey('option+shift+down')
-const EXTEND_LINE_BACKWARD = e => (IS_MAC || IS_IOS) && EXTEND_LINE_BACKWARD_MAC(e)
-const EXTEND_LINE_FORWARD = e => (IS_MAC || IS_IOS) && EXTEND_LINE_FORWARD_MAC(e)
+const EXTEND_LINE_BACKWARD = e => IS_APPLE && EXTEND_LINE_BACKWARD_MAC(e)
+const EXTEND_LINE_FORWARD = e => IS_APPLE && EXTEND_LINE_FORWARD_MAC(e)
 
 const UNDO = isKeyHotkey('mod+z')
 const REDO_MAC = isKeyHotkey('mod+shift+z')
 const REDO_PC = isKeyHotkey('mod+y')
-const REDO = e => IS_MAC || IS_IOS ? REDO_MAC(e) : REDO_PC(e)
+const REDO = e => IS_APPLE ? REDO_MAC(e) : REDO_PC(e)
 
 const TRANSPOSE_CHARACTER_MAC = isKeyHotkey('ctrl+t')
-const TRANSPOSE_CHARACTER = e => (IS_MAC || IS_IOS) && TRANSPOSE_CHARACTER_MAC(e)
+const TRANSPOSE_CHARACTER = e => IS_APPLE && TRANSPOSE_CHARACTER_MAC(e)
 
 const CONTENTEDITABLE = e => (
   BOLD(e) ||
