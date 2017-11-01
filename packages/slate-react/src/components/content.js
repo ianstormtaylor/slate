@@ -161,21 +161,30 @@ class Content extends React.Component {
       return
     }
 
-    // If the new range matches the current selection, do nothing.
+    const {
+      startContainer,
+      startOffset,
+      endContainer,
+      endOffset,
+    } = range
+
+    // If the new range matches the current selection, there is nothing to fix.
+    // COMPAT: The native `Range` object always has it's "start" first and "end"
+    // last in the DOM. It has no concept of "backwards/forwards", so we have
+    // to check both orientations here. (2017/10/31)
     if (current) {
       if (
-        range.startContainer == current.startContainer &&
-        range.startOffset == current.startOffset &&
-        range.endContainer == current.endContainer &&
-        range.endOffset == current.endOffset
-      ) {
-        return
-      }
-      if (
-        range.startContainer == current.endContainer &&
-        range.startOffset == current.endOffset &&
-        range.endContainer == current.startContainer &&
-        range.endOffset == current.startOffset
+        (
+          startContainer == current.startContainer &&
+          startOffset == current.startOffset &&
+          endContainer == current.endContainer &&
+          endOffset == current.endOffset
+        ) || (
+          startContainer == current.endContainer &&
+          startOffset == current.endOffset &&
+          endContainer == current.startContainer &&
+          endOffset == current.startOffset
+        )
       ) {
         return
       }
@@ -184,11 +193,16 @@ class Content extends React.Component {
     // Otherwise, set the `isUpdatingSelection` flag and update the selection.
     this.tmp.isUpdatingSelection = true
     native.removeAllRanges()
+
+    // COMPAT: Again, since the DOM range has no concept of backwards/forwards
+    // we need to check and do the right thing here.
     if (isBackward) {
-      native.setBaseAndExtent(range.endContainer, range.endOffset, range.startContainer, range.startOffset)
+      native.setBaseAndExtent(endContainer, endOffset, startContainer, startOffset)
     } else {
-      native.setBaseAndExtent(range.startContainer, range.startOffset, range.endContainer, range.endOffset)
+      native.setBaseAndExtent(startContainer, startOffset, endContainer, endOffset)
     }
+
+    // Scroll to the selection, in case it's out of view.
     scrollToSelection(native)
 
     // Then unset the `isUpdatingSelection` flag after a delay.
