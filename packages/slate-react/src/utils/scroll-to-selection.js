@@ -24,7 +24,7 @@ function findScrollContainer(el) {
   const window = getWindow(el)
   let parent = el.parentNode
   let scroller = window
-  
+
   while (!scroller) {
     if (!parent.parentNode) break
     const style = window.getComputedStyle(parent)
@@ -34,10 +34,10 @@ function findScrollContainer(el) {
       scroller = parent
       break
     }
-    
+
     parent = parent.parentNode
   }
-  
+
   return scroller
 }
 
@@ -60,7 +60,7 @@ function scrollToSelection(selection) {
   let height
   let yOffset
   let xOffset
-  
+
   if (isWindow) {
     const { innerWidth, innerHeight, pageYOffset, pageXOffset } = scroller
     width = innerWidth
@@ -74,10 +74,10 @@ function scrollToSelection(selection) {
     yOffset = scrollTop
     xOffset = scrollLeft
   }
-  
+
   const top = (backward ? rect.top : rect.bottom) + yOffset
   const left = (backward ? rect.left : rect.right) + xOffset
-  
+
   const x = left < yOffset || innerWidth + xOffset < left
     ? left - width / 2
     : xOffset
