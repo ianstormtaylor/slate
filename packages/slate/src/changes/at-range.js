@@ -732,6 +732,13 @@ Changes.insertFragmentAtRange = (change, range, fragment, options = {}) => {
     return
   }
 
+  // If the fragment contains a single nested block, (e.g., table),
+  // simply insert this block to prevent the melding behavior
+  if (firstBlock != lastBlock && fragment.nodes.size == 1) {
+    change.insertBlockAtRange(range, fragment.nodes.first(), options)
+    return
+  }
+
   // If the first and last block aren't the same, we need to insert all of the
   // nodes after the fragment's first block at the index.
   if (firstBlock != lastBlock) {
