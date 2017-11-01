@@ -28,6 +28,26 @@ function insertImage(change, src, target) {
 }
 
 /**
+ * A schema to enforce that there's always a paragraph as the last block.
+ *
+ * @type {Object}
+ */
+
+const schema = {
+  document: {
+    last: { types: ['paragraph'] },
+    normalize: (change, reason, { node, child }) => {
+      switch (reason) {
+        case 'last_child_type_invalid': {
+          const paragraph = Block.create('paragraph')
+          return change.insertNodeByKey(node.key, node.nodes.size, paragraph)
+        }
+      }
+    }
+  }
+}
+
+/**
  * The images example.
  *
  * @type {Component}
@@ -88,11 +108,11 @@ class Images extends React.Component {
         <Editor
           placeholder="Enter some text..."
           value={this.state.value}
+          schema={schema}
           onChange={this.onChange}
           onDrop={this.onDrop}
           onPaste={this.onPaste}
           renderNode={this.renderNode}
-          validateNode={this.validateNode}
         />
       </div>
     )
@@ -116,24 +136,6 @@ class Images extends React.Component {
           <img src={src} className={className} style={style} {...attributes} />
         )
       }
-    }
-  }
-
-  /**
-   * Perform node validation on the document.
-   *
-   * @param {Node} node
-   * @return {Function|Void}
-   */
-
-  validateNode = (node) => {
-    if (node.kind != 'document') return
-    const last = node.nodes.last()
-
-    if (!last || last.type != 'paragraph') {
-      const index = node.nodes.size
-      const paragraph = Block.create('paragraph')
-      return change => change.insertNodeByKey(node.key, index, paragraph)
     }
   }
 
