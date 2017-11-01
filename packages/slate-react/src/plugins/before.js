@@ -371,11 +371,11 @@ function BeforePlugin() {
   function onKeyDown(event, change, editor) {
     if (editor.props.readOnly) return true
 
-    // When composing, these characters commit the composition but also move the
-    // selection before we're able to handle it, so prevent their default,
-    // selection-moving behavior.
-    if (isComposing && HOTKEYS.COMPOSING(event)) {
-      event.preventDefault()
+    // When composing, we need to prevent all hotkeys from executing while
+    // typing. However, certain characters also move the selection before
+    // we're able to handle it, so prevent their default behavior.
+    if (isComposing) {
+      if (HOTKEYS.COMPOSING(event)) event.preventDefault()
       return true
     }
 
