@@ -10,22 +10,22 @@ export default function (change) {
 }
 
 export const input = (
-  <state>
+  <value>
     <document>
       <paragraph>
         <link><cursor />word</link>
       </paragraph>
     </document>
-  </state>
+  </value>
 )
 
 // TODO: fix cursor placement
 export const output = (
-  <state>
+  <value>
     <document>
       <paragraph>
         <cursor /><emoji>{' '}</emoji>
       </paragraph>
     </document>
-  </state>
+  </value>
 )

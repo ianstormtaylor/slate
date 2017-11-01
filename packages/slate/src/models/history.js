@@ -80,14 +80,14 @@ class History extends Record(DEFAULTS) {
   static fromJS = History.fromJSON
 
   /**
-   * Check if a `value` is a `History`.
+   * Check if `any` is a `History`.
    *
-   * @param {Any} value
+   * @param {Any} any
    * @return {Boolean}
    */
 
-  static isHistory(value) {
-    return !!(value && value[MODEL_TYPES.HISTORY])
+  static isHistory(any) {
+    return !!(any && any[MODEL_TYPES.HISTORY])
   }
 
   /**

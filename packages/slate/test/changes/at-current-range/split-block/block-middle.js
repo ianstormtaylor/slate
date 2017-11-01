@@ -7,17 +7,17 @@ export default function (change) {
 }
 
 export const input = (
-  <state>
+  <value>
     <document>
       <paragraph>
         wo<cursor />rd
       </paragraph>
     </document>
-  </state>
+  </value>
 )
 
 export const output = (
-  <state>
+  <value>
     <document>
       <paragraph>
         wo
@@ -26,5 +26,5 @@ export const output = (
         <cursor />rd
       </paragraph>
     </document>
-  </state>
+  </value>
 )

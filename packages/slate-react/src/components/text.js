@@ -35,8 +35,6 @@ class Text extends React.Component {
     editor: Types.object.isRequired,
     node: SlateTypes.node.isRequired,
     parent: SlateTypes.node.isRequired,
-    schema: SlateTypes.schema.isRequired,
-    state: SlateTypes.state.isRequired,
     style: Types.object,
   }
 
@@ -67,7 +65,7 @@ class Text extends React.Component {
    * Should the node update?
    *
    * @param {Object} nextProps
-   * @param {Object} state
+   * @param {Object} value
    * @return {Boolean}
    */
 
@@ -83,7 +81,7 @@ class Text extends React.Component {
     if (n.node != p.node) return true
 
     // If the node parent is a block node, and it was the last child of the
-    // block, re-render to cleanup extra `<br/>` or `\n`.
+    // block, re-render to cleanup extra `\n`.
     if (n.parent.kind == 'block') {
       const pLast = p.parent.nodes.last()
       const nLast = n.parent.nodes.last()
@@ -104,11 +102,11 @@ class Text extends React.Component {
    */
 
   render() {
-    const { props } = this
-    this.debug('render', { props })
+    this.debug('render', this)
 
-    const { decorations, node, state, style } = props
-    const { document } = state
+    const { decorations, editor, node, style } = this.props
+    const { value } = editor
+    const { document } = value
     const { key } = node
 
     const decs = decorations.filter((d) => {
@@ -146,7 +144,7 @@ class Text extends React.Component {
    */
 
   renderLeaf = (leaves, leaf, index, offset) => {
-    const { block, node, parent, schema, state, editor } = this.props
+    const { block, node, parent, editor } = this.props
     const { text, marks } = leaf
 
     return (
@@ -160,8 +158,6 @@ class Text extends React.Component {
         offset={offset}
         parent={parent}
         leaves={leaves}
-        schema={schema}
-        state={state}
         text={text}
       />
     )

@@ -7,17 +7,17 @@ export default function (change) {
 }
 
 export const input = (
-  <state>
+  <value>
     <document>
       <paragraph>
         word<link href="website.com">hyperlink</link><cursor />word
       </paragraph>
     </document>
-  </state>
+  </value>
 )
 
 export const output = (
-  <state>
+  <value>
     <document>
       <paragraph>
         word<link href="website.com">hyperlink</link>
@@ -26,5 +26,5 @@ export const output = (
         <cursor />word
       </paragraph>
     </document>
-  </state>
+  </value>
 )

@@ -114,7 +114,7 @@ function getEmbeddedTypes(text) {
   try {
     return JSON.parse(text.substring(prefix.length))
   } catch (err) {
-    throw new Error('Unable to parse custom embedded drag data')
+    throw new Error('Unable to parse custom Slate drag event data.')
   }
 }
 

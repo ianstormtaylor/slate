@@ -1,9 +1,9 @@
 
 import { Editor } from 'slate-react'
-import { State } from 'slate'
+import { Value } from 'slate'
 
 import React from 'react'
-import initialState from './state.json'
+import initialValue from './value.json'
 import { isKeyHotkey } from 'is-hotkey'
 
 /**
@@ -26,13 +26,13 @@ const isCodeHotkey = isKeyHotkey('mod+`')
 class SyncingEditor extends React.Component {
 
   /**
-   * Deserialize the initial editor state.
+   * Deserialize the initial editor value.
    *
    * @type {Object}
    */
 
   state = {
-    state: State.fromJSON(initialState),
+    value: Value.fromJSON(initialValue),
   }
 
   /**
@@ -43,8 +43,8 @@ class SyncingEditor extends React.Component {
    */
 
   applyOperations = (operations) => {
-    const { state } = this.state
-    const change = state.change().applyOperations(operations)
+    const { value } = this.state
+    const change = value.change().applyOperations(operations)
     this.onChange(change, { remote: true })
   }
 
@@ -56,12 +56,12 @@ class SyncingEditor extends React.Component {
    */
 
   hasMark = (type) => {
-    const { state } = this.state
-    return state.activeMarks.some(mark => mark.type == type)
+    const { value } = this.state
+    return value.activeMarks.some(mark => mark.type == type)
   }
 
   /**
-   * On change, save the new `state`. And if it's a local change, call the
+   * On change, save the new `value`. And if it's a local change, call the
    * passed-in `onChange` handler.
    *
    * @param {Change} change
@@ -69,7 +69,7 @@ class SyncingEditor extends React.Component {
    */
 
   onChange = (change, options = {}) => {
-    this.setState({ state: change.state })
+    this.setState({ value: change.value })
 
     if (!options.remote) {
       this.props.onChange(change)
@@ -113,8 +113,8 @@ class SyncingEditor extends React.Component {
 
   onClickMark = (event, type) => {
     event.preventDefault()
-    const { state } = this.state
-    const change = state.change().toggleMark(type)
+    const { value } = this.state
+    const change = value.change().toggleMark(type)
     this.onChange(change)
   }
 
@@ -180,7 +180,7 @@ class SyncingEditor extends React.Component {
       <div className="editor">
         <Editor
           placeholder="Enter some text..."
-          state={this.state.state}
+          value={this.state.value}
           onChange={this.onChange}
           onKeyDown={this.onKeyDown}
           renderMark={this.renderMark}
@@ -244,7 +244,7 @@ class SyncingOperationsExample extends React.Component {
    */
 
   onOneChange = (change) => {
-    const ops = change.operations.filter(o => o.type != 'set_selection' && o.type != 'set_state')
+    const ops = change.operations.filter(o => o.type != 'set_selection' && o.type != 'set_value')
     this.two.applyOperations(ops)
   }
 
@@ -255,7 +255,7 @@ class SyncingOperationsExample extends React.Component {
    */
 
   onTwoChange = (change) => {
-    const ops = change.operations.filter(o => o.type != 'set_selection' && o.type != 'set_state')
+    const ops = change.operations.filter(o => o.type != 'set_selection' && o.type != 'set_value')
     this.one.applyOperations(ops)
   }
 

@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 
 import { Editor } from 'slate-react'
-import { State } from 'slate'
+import { Value } from 'slate'
 
 import React from 'react'
 import faker from 'faker'
@@ -44,7 +44,7 @@ for (let h = 0; h < HEADINGS; h++) {
 class HugeDocument extends React.Component {
 
   /**
-   * Deserialize the initial editor state.
+   * Deserialize the initial editor value.
    *
    * @type {Object}
    */
@@ -52,7 +52,7 @@ class HugeDocument extends React.Component {
   constructor() {
     super()
     console.time('deserializeHugeDocument')
-    this.state = { state: State.fromJSON(json, { normalize: false }) }
+    this.state = { value: Value.fromJSON(json, { normalize: false }) }
     console.timeEnd('deserializeHugeDocument')
   }
 
@@ -62,8 +62,8 @@ class HugeDocument extends React.Component {
    * @param {Change} change
    */
 
-  onChange = ({ state }) => {
-    this.setState({ state })
+  onChange = ({ value }) => {
+    this.setState({ value })
   }
 
   /**
@@ -78,7 +78,7 @@ class HugeDocument extends React.Component {
         <Editor
           placeholder="Enter some text..."
           spellCheck={false}
-          state={this.state.state}
+          value={this.state.value}
           onChange={this.onChange}
           onKeyDown={this.onKeyDown}
           renderNode={this.renderNode}

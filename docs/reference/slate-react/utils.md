@@ -38,16 +38,16 @@ Find the DOM range from a Slate [`Range`](../slate/range.md).
 
 ```js 
 function onChange(change) {
-  const { state } = change
-  const range = findDOMRange(state.selection)
+  const { value } = change
+  const range = findDOMRange(value.selection)
   // Do something with the DOM `range`...
 }
 ```
 
 ### `findNode`
-`findNode(element: DOMElement, state: State) => Node`
+`findNode(element: DOMElement, value: Value) => Node`
 
-Find the Slate node from a DOM `element` and Slate `state`.
+Find the Slate node from a DOM `element` and Slate `value`.
 
 ```js
 function onSomeNativeEvent(event) {
@@ -57,27 +57,27 @@ function onSomeNativeEvent(event) {
 ```
 
 ### `findRange`
-`findRange(selection: DOMSelection, state: State) => Range`
-`findRange(range: DOMRange, state: State) => Range`
+`findRange(selection: DOMSelection, value: Value) => Range`
+`findRange(range: DOMRange, value: Value) => Range`
 
-Find the Slate range from a DOM `range` or `selection` and a Slate `state`.
+Find the Slate range from a DOM `range` or `selection` and a Slate `value`.
 
 ```js
 function onSomeNativeEvent() {
   // You can find a range from a native DOM selection...
   const nativeSelection = window.getSelection()
-  const range = findRange(nativeSelection, state)
+  const range = findRange(nativeSelection, value)
 
   // ...or from a native DOM range...
   const nativeRange = nativeSelection.getRangeAt(0)
-  const range = findRange(nativeRange, state)
+  const range = findRange(nativeRange, value)
 }
 ```
 
 ### `getEventRange`
-`getEventRange(event: DOMEvent|ReactEvent, state: State) => Range`
+`getEventRange(event: DOMEvent|ReactEvent, value: Value) => Range`
 
-Get the affected Slate range from a DOM `event` and Slate `state`.
+Get the affected Slate range from a DOM `event` and Slate `value`.
 
 ```js
 function onDrop(event, change, editor) {
@@ -89,7 +89,7 @@ function onDrop(event, change, editor) {
 ### `getEventTransfer`
 `getEventTransfer(event: DOMEvent|ReactEvent) => Object`
 
-Get the Slate-related data from a DOM `event` and Slate `state`.
+Get the Slate-related data from a DOM `event` and Slate `value`.
 
 ```js
 function onDrop(event, change, editor) {
@@ -109,8 +109,8 @@ Sets the Slate-related `data` with `type` on an `event`. The `type` must be one 
 
 ```js
 function onDragStart(event, change, editor) {
-  const { state } = change
-  const { startNode } = state
+  const { value } = change
+  const { startNode } = value
   setEventTransfer(event, 'node', startNode)
 }
 ```

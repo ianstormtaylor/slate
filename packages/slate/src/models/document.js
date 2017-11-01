@@ -94,14 +94,14 @@ class Document extends Record(DEFAULTS) {
   static fromJS = Document.fromJSON
 
   /**
-   * Check if a `value` is a `Document`.
+   * Check if `any` is a `Document`.
    *
-   * @param {Any} value
+   * @param {Any} any
    * @return {Boolean}
    */
 
-  static isDocument(value) {
-    return !!(value && value[MODEL_TYPES.DOCUMENT])
+  static isDocument(any) {
+    return !!(any && any[MODEL_TYPES.DOCUMENT])
   }
 
   /**

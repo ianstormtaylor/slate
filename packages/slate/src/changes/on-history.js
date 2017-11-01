@@ -1,5 +1,6 @@
 
 import invert from '../operations/invert'
+import omit from 'lodash/omit'
 
 /**
  * Changes.
@@ -10,34 +11,40 @@ import invert from '../operations/invert'
 const Changes = {}
 
 /**
- * Redo to the next state in the history.
+ * Redo to the next value in the history.
  *
  * @param {Change} change
  */
 
 Changes.redo = (change) => {
-  let { state } = change
-  let { history } = state
+  let { value } = change
+  let { history } = value
   if (!history) return
 
   let { undos, redos } = history
   const next = redos.peek()
   if (!next) return
 
-  // Shift the next state into the undo stack.
+  // Shift the next value into the undo stack.
   redos = redos.pop()
   undos = undos.push(next)
 
   // Replay the next operations.
   next.forEach((op) => {
-    change.applyOperation(op, { save: false })
+    // When the operation mutates selection, omit its `isFocused` props to
+    // prevent editor focus changing during continuously redoing.
+    let { type, properties } = op
+    if (type === 'set_selection') {
+      properties = omit(properties, 'isFocused')
+    }
+    change.applyOperation({ ...op, properties }, { save: false })
   })
 
   // Update the history.
-  state = change.state
+  value = change.value
   history = history.set('undos', undos).set('redos', redos)
-  state = state.set('history', history)
-  change.state = state
+  value = value.set('history', history)
+  change.value = value
 }
 
 /**
@@ -47,8 +54,8 @@ Changes.redo = (change) => {
  */
 
 Changes.undo = (change) => {
-  let { state } = change
-  let { history } = state
+  let { value } = change
+  let { history } = value
   if (!history) return
 
   let { undos, redos } = history
@@ -60,15 +67,21 @@ Changes.undo = (change) => {
   redos = redos.push(previous)
 
   // Replay the inverse of the previous operations.
-  previous.slice().reverse().map(invert).forEach((inverse) => {
-    change.applyOperation(inverse, { save: false })
+  previous.slice().reverse().map(invert).forEach((inverseOp) => {
+    // When the operation mutates selection, omit its `isFocused` props to
+    // prevent editor focus changing during continuously undoing.
+    let { type, properties } = inverseOp
+    if (type === 'set_selection') {
+      properties = omit(properties, 'isFocused')
+    }
+    change.applyOperation({ ...inverseOp, properties }, { save: false })
   })
 
   // Update the history.
-  state = change.state
+  value = change.value
   history = history.set('undos', undos).set('redos', redos)
-  state = state.set('history', history)
-  change.state = state
+  value = value.set('history', history)
+  change.value = value
 }
 
 /**

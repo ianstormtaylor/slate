@@ -7,7 +7,7 @@
 
 Okay, so you've got Slate installed and rendered on the page, and when you type in it, you can see the changes reflected. But you want to do more than just type a plaintext string.
 
-What makes Slate great is how easy it is to customize. Just like other React components you're used to, Slate allows you to pass in handlers that are triggered on certain events. You've already seen on the `onChange` handler can be used to store the changed editor state, but let's try add something more...
+What makes Slate great is how easy it is to customize. Just like other React components you're used to, Slate allows you to pass in handlers that are triggered on certain events. You've already seen on the `onChange` handler can be used to store the changed editor value, but let's try add something more...
 
 We'll show you how to use the `onKeyDown` handler to change the editor's content when the user presses a button.
 
@@ -17,17 +17,17 @@ So we start with our app from earlier:
 class App extends React.Component {
 
   state = {
-    state: initialState
+    value: initialValue
   }
 
-  onChange = ({ state }) => {
-    this.setState({ state })
+  onChange = ({ value }) => {
+    this.setState({ value })
   }
 
   render() {
     return (
       <Editor
-        state={this.state.state}
+        value={this.state.value}
         onChange={this.onChange}
       />
     )
@@ -42,11 +42,11 @@ And now we'll add an `onKeyDown` handler:
 class App extends React.Component {
 
   state = {
-    state: initialState
+    value: initialValue
   }
 
-  onChange = ({ state }) => {
-    this.setState({ state })
+  onChange = ({ value }) => {
+    this.setState({ value })
   }
 
   // Define a new handler which prints the key that was pressed.
@@ -57,7 +57,7 @@ class App extends React.Component {
   render() {
     return (
       <Editor
-        state={this.state.state}
+        value={this.state.value}
         onChange={this.onChange}
         onKeyDown={this.onKeyDown}
       />
@@ -77,11 +77,11 @@ Our `onKeyDown` handler might look like this:
 class App extends React.Component {
 
   state = {
-    state: initialState
+    value: initialValue
   }
 
-  onChange = ({ state }) => {
-    this.setState({ state })
+  onChange = ({ value }) => {
+    this.setState({ value })
   }
 
   onKeyDown = (event, change) => {
@@ -91,7 +91,7 @@ class App extends React.Component {
     // Prevent the ampersand character from being inserted.
     event.preventDefault()
 
-    // Change the state by inserting "and" at the cursor's position.
+    // Change the value by inserting "and" at the cursor's position.
     change.insertText('and')
     return true
   }
@@ -99,7 +99,7 @@ class App extends React.Component {
   render() {
     return (
       <Editor
-        state={this.state.state}
+        value={this.state.value}
         onChange={this.onChange}
         onKeyDown={this.onKeyDown}
       />
@@ -111,7 +111,7 @@ class App extends React.Component {
 
 With that added, try typing `&`, and you should see it automatically become `and` instead!
 
-That gives you a sense for what you can do with Slate's event handlers. Each one will be called with the `event` object, and the current `state` of the editor. And if you return a new `state`, the editor will be updated. Simple!
+That gives you a sense for what you can do with Slate's event handlers. Each one will be called with the `event` object, and a `change` object that lets you perform changes to the editor's value. Simple!
 
 <br/>
 <p align="center"><strong>Next:</strong><br/><a href="./defining-custom-block-nodes.md">Defining Custom Block Nodes</a></p>

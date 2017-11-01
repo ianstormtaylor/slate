@@ -39,6 +39,11 @@ Note that even though a node may be "void", it will still contain a single, empt
 
 A unique identifier for the node.
 
+### `kind`
+`String`
+
+An immutable string value of `'inline'` for easily separating this node from [`Block`](./block.md) or [`Text`](./text.md) nodes.
+
 ### `nodes`
 `Immutable.List`
 
@@ -51,11 +56,6 @@ The custom type of the node (eg. `link` or `hashtag`).
 
 
 ## Computed Properties
-
-### `kind`
-`String`
-
-An immutable string value of `'inline'` for easily separating this node from [`Block`](./block.md) or [`Text`](./text.md) nodes.
 
 ### `text`
 `String`

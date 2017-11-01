@@ -33,7 +33,7 @@ export const input = `
 `.trim()
 
 export const output = (
-  <state>
+  <value>
     <document>
       <paragraph>
         one
@@ -42,5 +42,5 @@ export const output = (
         two
       </block>
     </document>
-  </state>
+  </value>
 )

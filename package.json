@@ -74,7 +74,7 @@
     "build:examples:dev": "browserify --debug --transform babelify ./examples/index.js > ./examples/build.dev.js",
     "build:examples:prod": "NODE_ENV=production browserify --global-transform envify --global-transform uglifyify --transform babelify ./examples/index.js > ./examples/build.prod.js",
     "build:packages": "lerna run build",
-    "clean": "lerna run clean && lerna clean",
+    "clean": "lerna run clean && rm -rf ./node_modules ./dist ./examples/build.*.js",
     "gh-pages": "yarn run build && yarn run build:examples && gh-pages --dist ./examples",
     "lint": "eslint packages/*/src packages/*/test examples/*/*.js examples/dev/*/*.js",
     "open": "open http://localhost:8080/dev.html",

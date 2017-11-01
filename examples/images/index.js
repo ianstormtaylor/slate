@@ -1,9 +1,9 @@
 
 import { Editor, getEventRange, getEventTransfer } from 'slate-react'
-import { Block, State } from 'slate'
+import { Block, Value } from 'slate'
 
 import React from 'react'
-import initialState from './state.json'
+import initialValue from './value.json'
 import isImage from 'is-image'
 import isUrl from 'is-url'
 
@@ -36,13 +36,13 @@ function insertImage(change, src, target) {
 class Images extends React.Component {
 
   /**
-   * Deserialize the raw initial state.
+   * Deserialize the raw initial value.
    *
    * @type {Object}
    */
 
   state = {
-    state: State.fromJSON(initialState)
+    value: Value.fromJSON(initialValue)
   }
 
   /**
@@ -87,7 +87,7 @@ class Images extends React.Component {
       <div className="editor">
         <Editor
           placeholder="Enter some text..."
-          state={this.state.state}
+          value={this.state.value}
           onChange={this.onChange}
           onDrop={this.onDrop}
           onPaste={this.onPaste}
@@ -143,8 +143,8 @@ class Images extends React.Component {
    * @param {Change} change
    */
 
-  onChange = ({ state }) => {
-    this.setState({ state })
+  onChange = ({ value }) => {
+    this.setState({ value })
   }
 
   /**
@@ -158,7 +158,7 @@ class Images extends React.Component {
     const src = window.prompt('Enter the URL of the image:')
     if (!src) return
 
-    const change = this.state.state
+    const change = this.state.value
       .change()
       .call(insertImage, src)
 

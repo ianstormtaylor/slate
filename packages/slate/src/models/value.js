@@ -1,6 +1,5 @@
 
 import isPlainObject from 'is-plain-object'
-import logger from 'slate-dev-logger'
 import { Record, Set, List, Map } from 'immutable'
 
 import MODEL_TYPES from '../constants/model-types'
@@ -26,42 +25,42 @@ const DEFAULTS = {
 }
 
 /**
- * State.
+ * Value.
  *
- * @type {State}
+ * @type {Value}
  */
 
-class State extends Record(DEFAULTS) {
+class Value extends Record(DEFAULTS) {
 
   /**
-   * Create a new `State` with `attrs`.
+   * Create a new `Value` with `attrs`.
    *
-   * @param {Object|State} attrs
+   * @param {Object|Value} attrs
    * @param {Object} options
-   * @return {State}
+   * @return {Value}
    */
 
   static create(attrs = {}, options = {}) {
-    if (State.isState(attrs)) {
+    if (Value.isValue(attrs)) {
       return attrs
     }
 
     if (isPlainObject(attrs)) {
-      return State.fromJSON(attrs)
+      return Value.fromJSON(attrs)
     }
 
-    throw new Error(`\`State.create\` only accepts objects or states, but you passed it: ${attrs}`)
+    throw new Error(`\`Value.create\` only accepts objects or values, but you passed it: ${attrs}`)
   }
 
   /**
-   * Create a dictionary of settable state properties from `attrs`.
+   * Create a dictionary of settable value properties from `attrs`.
    *
-   * @param {Object|State} attrs
+   * @param {Object|Value} attrs
    * @return {Object}
    */
 
   static createProperties(attrs = {}) {
-    if (State.isState(attrs)) {
+    if (Value.isValue(attrs)) {
       return {
         data: attrs.data,
         decorations: attrs.decorations,
@@ -77,17 +76,17 @@ class State extends Record(DEFAULTS) {
       return props
     }
 
-    throw new Error(`\`State.createProperties\` only accepts objects or states, but you passed it: ${attrs}`)
+    throw new Error(`\`Value.createProperties\` only accepts objects or values, but you passed it: ${attrs}`)
   }
 
   /**
-   * Create a `State` from a JSON `object`.
+   * Create a `Value` from a JSON `object`.
    *
    * @param {Object} object
    * @param {Object} options
    *   @property {Boolean} normalize
    *   @property {Array} plugins
-   * @return {State}
+   * @return {Value}
    */
 
   static fromJSON(object, options = {}) {
@@ -120,7 +119,7 @@ class State extends Record(DEFAULTS) {
       if (text) selection = selection.collapseToStartOf(text)
     }
 
-    let state = new State({
+    let value = new Value({
       data,
       document,
       selection,
@@ -128,27 +127,27 @@ class State extends Record(DEFAULTS) {
     })
 
     if (options.normalize !== false) {
-      state = state.change({ save: false }).normalize().state
+      value = value.change({ save: false }).normalize().value
     }
 
-    return state
+    return value
   }
 
   /**
    * Alias `fromJS`.
    */
 
-  static fromJS = State.fromJSON
+  static fromJS = Value.fromJSON
 
   /**
-   * Check if a `value` is a `State`.
+   * Check if a `value` is a `Value`.
    *
    * @param {Any} value
    * @return {Boolean}
    */
 
-  static isState(value) {
-    return !!(value && value[MODEL_TYPES.STATE])
+  static isValue(value) {
+    return !!(value && value[MODEL_TYPES.VALUE])
   }
 
   /**
@@ -158,7 +157,7 @@ class State extends Record(DEFAULTS) {
    */
 
   get kind() {
-    return 'state'
+    return 'value'
   }
 
   /**
@@ -609,7 +608,7 @@ class State extends Record(DEFAULTS) {
   }
 
   /**
-   * Create a new `Change` with the current state as a starting point.
+   * Create a new `Change` with the current value as a starting point.
    *
    * @param {Object} attrs
    * @return {Change}
@@ -617,22 +616,11 @@ class State extends Record(DEFAULTS) {
 
   change(attrs = {}) {
     const Change = require('./change').default
-    return new Change({ ...attrs, state: this })
+    return new Change({ ...attrs, value: this })
   }
 
   /**
-   * Deprecated.
-   *
-   * @return {Change}
-   */
-
-  transform(...args) {
-    logger.deprecate('0.22.0', 'The `state.transform()` method has been deprecated in favor of `state.change()`.')
-    return this.change(...args)
-  }
-
-  /**
-   * Return a JSON representation of the state.
+   * Return a JSON representation of the value.
    *
    * @param {Object} options
    * @return {Object}
@@ -642,11 +630,6 @@ class State extends Record(DEFAULTS) {
     const object = {
       kind: this.kind,
       document: this.document.toJSON(options),
-    }
-
-    if ('preserveStateData' in options) {
-      logger.deprecate('0.26.0', 'The `preserveStateData` option to `state.toJSON` has been deprecated in favor of `options.preserveData`.')
-      options.preserveData = options.preserveStateData
     }
 
     if (options.preserveData) {
@@ -694,10 +677,10 @@ class State extends Record(DEFAULTS) {
  * Attach a pseudo-symbol for type checking.
  */
 
-State.prototype[MODEL_TYPES.STATE] = true
+Value.prototype[MODEL_TYPES.VALUE] = true
 
 /**
  * Export.
  */
 
-export default State
+export default Value

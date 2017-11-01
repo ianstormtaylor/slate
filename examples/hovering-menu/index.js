@@ -1,10 +1,10 @@
 
 import { Editor } from 'slate-react'
-import { State } from 'slate'
+import { Value } from 'slate'
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import initialState from './state.json'
+import initialValue from './value.json'
 
 const root = window.document.querySelector('main')
 
@@ -24,8 +24,8 @@ class Menu extends React.Component {
    */
 
   hasMark(type) {
-    const { state } = this.props
-    return state.activeMarks.some(mark => mark.type == type)
+    const { value } = this.props
+    return value.activeMarks.some(mark => mark.type == type)
   }
 
   /**
@@ -36,9 +36,9 @@ class Menu extends React.Component {
    */
 
   onClickMark(event, type) {
-    const { state, onChange } = this.props
+    const { value, onChange } = this.props
     event.preventDefault()
-    const change = state.change().toggleMark(type)
+    const change = value.change().toggleMark(type)
     onChange(change)
   }
 
@@ -93,13 +93,13 @@ class Menu extends React.Component {
 class HoveringMenu extends React.Component {
 
   /**
-   * Deserialize the raw initial state.
+   * Deserialize the raw initial value.
    *
    * @type {Object}
    */
 
   state = {
-    state: State.fromJSON(initialState)
+    value: Value.fromJSON(initialValue)
   }
 
   /**
@@ -119,11 +119,11 @@ class HoveringMenu extends React.Component {
    */
 
   updateMenu = () => {
-    const { state } = this.state
+    const { value } = this.state
     const menu = this.menu
     if (!menu) return
 
-    if (state.isBlurred || state.isEmpty) {
+    if (value.isBlurred || value.isEmpty) {
       menu.removeAttribute('style')
       return
     }
@@ -142,8 +142,8 @@ class HoveringMenu extends React.Component {
    * @param {Change} change
    */
 
-  onChange = ({ state }) => {
-    this.setState({ state })
+  onChange = ({ value }) => {
+    this.setState({ value })
   }
 
   /**
@@ -167,13 +167,13 @@ class HoveringMenu extends React.Component {
       <div>
         <Menu
           menuRef={this.menuRef}
-          state={this.state.state}
+          value={this.state.value}
           onChange={this.onChange}
         />
         <div className="editor">
           <Editor
             placeholder="Enter some text..."
-            state={this.state.state}
+            value={this.state.value}
             onChange={this.onChange}
             renderMark={this.renderMark}
           />

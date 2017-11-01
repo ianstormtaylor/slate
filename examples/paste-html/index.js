@@ -1,10 +1,10 @@
 
 import Html from 'slate-html-serializer'
 import { Editor, getEventTransfer } from 'slate-react'
-import { State } from 'slate'
+import { Value } from 'slate'
 
 import React from 'react'
-import initialState from './state.json'
+import initialValue from './value.json'
 
 /**
  * Tags to blocks.
@@ -87,6 +87,21 @@ const RULES = [
     }
   },
   {
+    // Special case for images, to grab their src.
+    deserialize(el, next) {
+      if (el.tagName.toLowerCase() != 'img') return
+      return {
+        kind: 'block',
+        type: 'image',
+        isVoid: true,
+        nodes: next(el.childNodes),
+        data: {
+          src: el.getAttribute('src')
+        }
+      }
+    }
+  },
+  {
     // Special case for links, to grab their href.
     deserialize(el, next) {
       if (el.tagName.toLowerCase() != 'a') return
@@ -119,23 +134,23 @@ const serializer = new Html({ rules: RULES })
 class PasteHtml extends React.Component {
 
   /**
-   * Deserialize the raw initial state.
+   * Deserialize the raw initial value.
    *
    * @type {Object}
    */
 
   state = {
-    state: State.fromJSON(initialState)
+    value: Value.fromJSON(initialValue)
   }
 
   /**
-   * On change, save the new state.
+   * On change, save the new value.
    *
    * @param {Change} change
    */
 
-  onChange = ({ state }) => {
-    this.setState({ state })
+  onChange = ({ value }) => {
+    this.setState({ value })
   }
 
   /**
@@ -164,7 +179,7 @@ class PasteHtml extends React.Component {
       <div className="editor">
         <Editor
           placeholder="Paste in some HTML..."
-          state={this.state.state}
+          value={this.state.value}
           onPaste={this.onPaste}
           onChange={this.onChange}
           renderNode={this.renderNode}
@@ -182,7 +197,7 @@ class PasteHtml extends React.Component {
    */
 
   renderNode = (props) => {
-    const { attributes, children, node } = props
+    const { attributes, children, node, isSelected } = props
     switch (node.type) {
       case 'quote': return <blockquote {...attributes}>{children}</blockquote>
       case 'code': return <pre><code {...attributes}>{children}</code></pre>
@@ -199,6 +214,14 @@ class PasteHtml extends React.Component {
         const { data } = node
         const href = data.get('href')
         return <a href={href} {...attributes}>{children}</a>
+      }
+      case 'image': {
+        const src = node.data.get('src')
+        const className = isSelected ? 'active' : null
+        const style = { display: 'block' }
+        return (
+          <img src={src} className={className} style={style} {...attributes} />
+        )
       }
     }
   }

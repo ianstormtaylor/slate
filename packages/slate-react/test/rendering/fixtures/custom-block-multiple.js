@@ -21,8 +21,8 @@ export const props = {
   renderNode,
 }
 
-export const state = (
-  <state>
+export const value = (
+  <value>
     <document>
       <code>
         word
@@ -34,7 +34,7 @@ export const state = (
         word
       </code>
     </document>
-  </state>
+  </value>
 )
 
 export const output = `

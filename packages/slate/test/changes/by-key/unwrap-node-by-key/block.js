@@ -7,7 +7,7 @@ export default function (change) {
 }
 
 export const input = (
-  <state>
+  <value>
     <document>
       <quote>
         <paragraph key="a">
@@ -15,15 +15,15 @@ export const input = (
         </paragraph>
       </quote>
     </document>
-  </state>
+  </value>
 )
 
 export const output = (
-  <state>
+  <value>
     <document>
       <paragraph>
         word
       </paragraph>
     </document>
-  </state>
+  </value>
 )

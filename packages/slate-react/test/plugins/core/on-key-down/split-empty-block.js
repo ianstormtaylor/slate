@@ -7,22 +7,22 @@ export default function (simulator) {
 }
 
 export const input = (
-  <state>
+  <value>
     <document>
       <paragraph>
         <cursor />
       </paragraph>
     </document>
-  </state>
+  </value>
 )
 
 export const output = (
-  <state>
+  <value>
     <document>
       <paragraph />
       <paragraph>
         <cursor />
       </paragraph>
     </document>
-  </state>
+  </value>
 )

@@ -7,17 +7,17 @@ export default function (change) {
 }
 
 export const input = (
-  <state>
+  <value>
     <document>
       <paragraph key="a">
         <link>one</link><link>two</link>
       </paragraph>
     </document>
-  </state>
+  </value>
 )
 
 export const output = (
-  <state>
+  <value>
     <document>
       <paragraph>
         <link>one</link>
@@ -26,5 +26,5 @@ export const output = (
         <link>two</link>
       </paragraph>
     </document>
-  </state>
+  </value>
 )

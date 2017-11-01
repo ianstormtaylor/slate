@@ -15,14 +15,14 @@ import SoftBreak from 'slate-soft-break'
 
 function WordCount(options) {
   return {
-    render(props) {
+    renderEditor(props) {
       return (
         <div>
           <div>
             {props.children}
           </div>
           <span className="word-counter">
-            Word Count: {props.state.document.text.split(' ').length}
+            Word Count: {props.value.document.text.split(' ').length}
           </span>
         </div>
       )
@@ -49,18 +49,15 @@ const plugins = [
 class Plugins extends React.Component {
 
   /**
-   * Deserialize the initial editor state.
+   * Deserialize the initial editor value.
    *
    * @type {Object}
    */
 
   state = {
-    state: Plain.deserialize(`This example shows how you can extend Slate with plugins! It uses four fairly simple plugins, but you can use any plugins you want, or write your own!
-
+    value: Plain.deserialize(`This example shows how you can extend Slate with plugins! It uses four fairly simple plugins, but you can use any plugins you want, or write your own!
 The first is a simple plugin to collapse the selection whenever the escape key is pressed. Try selecting some text and pressing escape.
-
 The second is another simple plugin that inserts a "soft" break when enter is pressed instead of creating a new block. Try pressing enter!
-
 The third is an example of using the plugin.render property to create a higher-order-component.`)
   }
 
@@ -70,8 +67,8 @@ The third is an example of using the plugin.render property to create a higher-o
    * @param {Change} change
    */
 
-  onChange = ({ state }) => {
-    this.setState({ state })
+  onChange = ({ value }) => {
+    this.setState({ value })
   }
 
   /**
@@ -86,7 +83,7 @@ The third is an example of using the plugin.render property to create a higher-o
         <Editor
           placeholder="Enter some text..."
           plugins={plugins}
-          state={this.state.state}
+          value={this.state.value}
           onChange={this.onChange}
         />
       </div>

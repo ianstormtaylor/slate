@@ -11,19 +11,19 @@ export const schema = {
 }
 
 export const input = (
-  <state>
+  <value>
     <document>
       <block type="paragraph" isVoid />
     </document>
-  </state>
+  </value>
 )
 
 export const output = (
-  <state>
+  <value>
     <document>
       <paragraph>
         {' '}
       </paragraph>
     </document>
-  </state>
+  </value>
 )

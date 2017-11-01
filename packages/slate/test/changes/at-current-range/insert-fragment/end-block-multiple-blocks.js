@@ -19,18 +19,18 @@ export default function (change) {
 }
 
 export const input = (
-  <state>
+  <value>
     <document>
       <paragraph>
         word<cursor />
       </paragraph>
     </document>
-  </state>
+  </value>
 )
 
 // TODO: this output selection should be at the end of the block
 export const output = (
-  <state>
+  <value>
     <document>
       <paragraph>
         wordone
@@ -42,5 +42,5 @@ export const output = (
         <cursor />three
       </quote>
     </document>
-  </state>
+  </value>
 )

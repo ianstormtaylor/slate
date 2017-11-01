@@ -1,6 +1,5 @@
 
 import isEmpty from 'is-empty'
-import logger from 'slate-dev-logger'
 import pick from 'lodash/pick'
 
 import Range from '../models/range'
@@ -24,8 +23,8 @@ Changes.select = (change, properties, options = {}) => {
   properties = Range.createProperties(properties)
 
   const { snapshot = false } = options
-  const { state } = change
-  const { document, selection } = state
+  const { value } = change
+  const { document, selection } = value
   const props = {}
   const sel = selection.toJSON()
   const next = selection.merge(properties).normalize(document)
@@ -89,8 +88,8 @@ Changes.select = (change, properties, options = {}) => {
  */
 
 Changes.selectAll = (change) => {
-  const { state } = change
-  const { document, selection } = state
+  const { value } = change
+  const { document, selection } = value
   const next = selection.moveToRangeOf(document)
   change.select(next)
 }
@@ -102,8 +101,8 @@ Changes.selectAll = (change) => {
  */
 
 Changes.snapshotSelection = (change) => {
-  const { state } = change
-  const { selection } = state
+  const { value } = change
+  const { selection } = value
   change.select(selection, { snapshot: true })
 }
 
@@ -114,8 +113,8 @@ Changes.snapshotSelection = (change) => {
  */
 
 Changes.moveAnchorCharBackward = (change) => {
-  const { state } = change
-  const { document, selection, anchorText, anchorBlock } = state
+  const { value } = change
+  const { document, selection, anchorText, anchorBlock } = value
   const { anchorOffset } = selection
   const previousText = document.getPreviousText(anchorText.key)
   const isInVoid = document.hasVoidParent(anchorText.key)
@@ -144,8 +143,8 @@ Changes.moveAnchorCharBackward = (change) => {
  */
 
 Changes.moveAnchorCharForward = (change) => {
-  const { state } = change
-  const { document, selection, anchorText, anchorBlock } = state
+  const { value } = change
+  const { document, selection, anchorText, anchorBlock } = value
   const { anchorOffset } = selection
   const nextText = document.getNextText(anchorText.key)
   const isInVoid = document.hasVoidParent(anchorText.key)
@@ -174,8 +173,8 @@ Changes.moveAnchorCharForward = (change) => {
  */
 
 Changes.moveFocusCharBackward = (change) => {
-  const { state } = change
-  const { document, selection, focusText, focusBlock } = state
+  const { value } = change
+  const { document, selection, focusText, focusBlock } = value
   const { focusOffset } = selection
   const previousText = document.getPreviousText(focusText.key)
   const isInVoid = document.hasVoidParent(focusText.key)
@@ -204,8 +203,8 @@ Changes.moveFocusCharBackward = (change) => {
  */
 
 Changes.moveFocusCharForward = (change) => {
-  const { state } = change
-  const { document, selection, focusText, focusBlock } = state
+  const { value } = change
+  const { document, selection, focusText, focusBlock } = value
   const { focusOffset } = selection
   const nextText = document.getNextText(focusText.key)
   const isInVoid = document.hasVoidParent(focusText.key)
@@ -245,7 +244,7 @@ MOVE_DIRECTIONS.forEach((direction) => {
   }
 
   Changes[`moveStartChar${direction}`] = (change) => {
-    if (change.state.isBackward) {
+    if (change.value.isBackward) {
       change[focus]()
     } else {
       change[anchor]()
@@ -253,7 +252,7 @@ MOVE_DIRECTIONS.forEach((direction) => {
   }
 
   Changes[`moveEndChar${direction}`] = (change) => {
-    if (change.state.isBackward) {
+    if (change.value.isBackward) {
       change[anchor]()
     } else {
       change[focus]()
@@ -324,7 +323,7 @@ const PROXY_TRANSFORMS = [
   'moveStart',
   'moveStartOffsetTo',
   'moveStartTo',
-  // 'moveTo', Commented out for now, since it conflicts with a deprecated one.
+  'moveTo',
   'moveToEnd',
   'moveToEndOf',
   'moveToRangeOf',
@@ -336,8 +335,8 @@ const PROXY_TRANSFORMS = [
 PROXY_TRANSFORMS.forEach((method) => {
   Changes[method] = (change, ...args) => {
     const normalize = method != 'deselect'
-    const { state } = change
-    const { document, selection } = state
+    const { value } = change
+    const { document, selection } = value
     let next = selection[method](...args)
     if (normalize) next = next.normalize(document)
     change.select(next)
@@ -386,8 +385,8 @@ PREFIXES.forEach((prefix) => {
       const getNode = kind == 'Text' ? 'getNode' : `getClosest${kind}`
 
       Changes[`${method}${kind}`] = (change) => {
-        const { state } = change
-        const { document, selection } = state
+        const { value } = change
+        const { document, selection } = value
         const node = document[getNode](selection.startKey)
         if (!node) return
         change[method](node)
@@ -398,8 +397,8 @@ PREFIXES.forEach((prefix) => {
         const directionKey = direction == 'Next' ? 'startKey' : 'endKey'
 
         Changes[`${method}${direction}${kind}`] = (change) => {
-          const { state } = change
-          const { document, selection } = state
+          const { value } = change
+          const { document, selection } = value
           const node = document[getNode](selection[directionKey])
           if (!node) return
           const target = document[getDirectionNode](node.key)
@@ -409,72 +408,6 @@ PREFIXES.forEach((prefix) => {
       })
     })
   })
-})
-
-/**
- * Set `properties` on the selection.
- *
- * @param {Mixed} ...args
- * @param {Change} change
- */
-
-Changes.moveTo = (change, properties) => {
-  logger.deprecate('0.17.0', 'The `moveTo()` change is deprecated, please use `select()` instead.')
-  change.select(properties)
-}
-
-/**
- * Unset the selection's marks.
- *
- * @param {Change} change
- */
-
-Changes.unsetMarks = (change) => {
-  logger.deprecate('0.17.0', 'The `unsetMarks()` change is deprecated.')
-  change.select({ marks: null })
-}
-
-/**
- * Unset the selection, removing an association to a node.
- *
- * @param {Change} change
- */
-
-Changes.unsetSelection = (change) => {
-  logger.deprecate('0.17.0', 'The `unsetSelection()` change is deprecated, please use `deselect()` instead.')
-  change.select({
-    anchorKey: null,
-    anchorOffset: 0,
-    focusKey: null,
-    focusOffset: 0,
-    isFocused: false,
-    isBackward: false
-  })
-}
-
-/**
- * Mix in deprecated changes with a warning.
- */
-
-const DEPRECATED_TRANSFORMS = [
-  ['extendBackward', 'extend', 'The `extendBackward(n)` change is deprecated, please use `extend(n)` instead with a negative offset.'],
-  ['extendForward', 'extend', 'The `extendForward(n)` change is deprecated, please use `extend(n)` instead.'],
-  ['moveBackward', 'move', 'The `moveBackward(n)` change is deprecated, please use `move(n)` instead with a negative offset.'],
-  ['moveForward', 'move', 'The `moveForward(n)` change is deprecated, please use `move(n)` instead.'],
-  ['moveStartOffset', 'moveStart', 'The `moveStartOffset(n)` change is deprecated, please use `moveStart(n)` instead.'],
-  ['moveEndOffset', 'moveEnd', 'The `moveEndOffset(n)` change is deprecated, please use `moveEnd()` instead.'],
-  ['moveToOffsets', 'moveOffsetsTo', 'The `moveToOffsets()` change is deprecated, please use `moveOffsetsTo()` instead.'],
-  ['flipSelection', 'flip', 'The `flipSelection()` change is deprecated, please use `flip()` instead.'],
-]
-
-DEPRECATED_TRANSFORMS.forEach(([ old, current, warning ]) => {
-  Changes[old] = (change, ...args) => {
-    logger.deprecate('0.17.0', warning)
-    const { state } = change
-    const { document, selection } = state
-    const sel = selection[current](...args).normalize(document)
-    change.select(sel)
-  }
 })
 
 /**

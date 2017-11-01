@@ -1,3 +1,4 @@
+
 import { Stack } from 'slate'
 
 /**
@@ -27,17 +28,17 @@ const EVENT_HANDLERS = [
 class Simulator {
 
   /**
-   * Create a new `Simulator` with `plugins` and an initial `state`.
+   * Create a new `Simulator` with `plugins` and an initial `value`.
    *
    * @param {Object} attrs
    */
 
   constructor(props) {
-    const { plugins, state } = props
+    const { plugins, value } = props
     const stack = new Stack({ plugins })
     this.props = props
     this.stack = stack
-    this.state = state
+    this.value = value
   }
 
 }
@@ -52,15 +53,15 @@ EVENT_HANDLERS.forEach((handler) => {
   Simulator.prototype[method] = function (e) {
     if (e == null) e = {}
 
-    const { stack, state } = this
+    const { stack, value } = this
     const editor = createEditor(this)
     const event = createEvent(e)
-    const change = state.change()
+    const change = value.change()
 
     stack.run(handler, change, editor, event)
     stack.run('onChange', change, editor)
 
-    this.state = change.state
+    this.value = change.value
     return this
   }
 })
@@ -77,16 +78,16 @@ function getMethodName(handler) {
 }
 
 /**
- * Create a fake editor from a `stack` and `state`.
+ * Create a fake editor from a `stack` and `value`.
  *
  * @param {Stack} stack
- * @param {State} state
+ * @param {Value} value
  */
 
-function createEditor({ stack, state, props }) {
+function createEditor({ stack, value, props }) {
   const editor = {
     getSchema: () => stack.schema,
-    getState: () => state,
+    getState: () => value,
     props: {
       autoCorrect: true,
       autoFocus: false,

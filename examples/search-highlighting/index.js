@@ -1,9 +1,9 @@
 
 import { Editor } from 'slate-react'
-import { State } from 'slate'
+import { Value } from 'slate'
 
 import React from 'react'
-import initialState from './state.json'
+import initialValue from './value.json'
 
 /**
  * The rich text example.
@@ -14,23 +14,23 @@ import initialState from './state.json'
 class SearchHighlighting extends React.Component {
 
   /**
-   * Deserialize the initial editor state.
+   * Deserialize the initial editor value.
    *
    * @type {Object}
    */
 
   state = {
-    state: State.fromJSON(initialState),
+    value: Value.fromJSON(initialValue),
   }
 
   /**
-   * On change, save the new `state`.
+   * On change, save the new `value`.
    *
    * @param {Change} change
    */
 
-  onChange = ({ state }) => {
-    this.setState({ state })
+  onChange = ({ value }) => {
+    this.setState({ value })
   }
 
   /**
@@ -40,9 +40,9 @@ class SearchHighlighting extends React.Component {
    */
 
   onInputChange = (event) => {
-    const { state } = this.state
+    const { value } = this.state
     const string = event.target.value
-    const texts = state.document.getTexts()
+    const texts = value.document.getTexts()
     const decorations = []
 
     texts.forEach((node) => {
@@ -65,7 +65,7 @@ class SearchHighlighting extends React.Component {
       })
     })
 
-    const change = state.change().setState({ decorations })
+    const change = value.change().setValue({ decorations })
     this.onChange(change)
   }
 
@@ -117,7 +117,7 @@ class SearchHighlighting extends React.Component {
       <div className="editor">
         <Editor
           placeholder="Enter some rich text..."
-          state={this.state.state}
+          value={this.state.value}
           onChange={this.onChange}
           renderMark={this.renderMark}
           spellCheck

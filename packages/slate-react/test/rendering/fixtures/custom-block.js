@@ -19,14 +19,14 @@ export const props = {
   }
 }
 
-export const state = (
-  <state>
+export const value = (
+  <value>
     <document>
       <code>
         word
       </code>
     </document>
-  </state>
+  </value>
 )
 
 export const output = `

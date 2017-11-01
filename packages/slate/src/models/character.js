@@ -1,6 +1,5 @@
 
 import isPlainObject from 'is-plain-object'
-import logger from 'slate-dev-logger'
 import { List, Record, Set } from 'immutable'
 
 import MODEL_TYPES from '../constants/model-types'
@@ -99,34 +98,25 @@ class Character extends Record(DEFAULTS) {
   static fromJS = Character.fromJSON
 
   /**
-   * Check if a `value` is a `Character`.
+   * Check if `any` is a `Character`.
    *
-   * @param {Any} value
+   * @param {Any} any
    * @return {Boolean}
    */
 
-  static isCharacter(value) {
-    return !!(value && value[MODEL_TYPES.CHARACTER])
+  static isCharacter(any) {
+    return !!(any && any[MODEL_TYPES.CHARACTER])
   }
 
   /**
-   * Check if a `value` is a character list.
+   * Check if `any` is a character list.
    *
-   * @param {Any} value
+   * @param {Any} any
    * @return {Boolean}
    */
 
-  static isCharacterList(value) {
-    return List.isList(value) && value.every(item => Character.isCharacter(item))
-  }
-
-  /**
-   * Deprecated.
-   */
-
-  static createListFromText(string) {
-    logger.deprecate('0.22.0', 'The `Character.createListFromText(string)` method is deprecated, use `Character.createList(string)` instead.')
-    return this.createList(string)
+  static isCharacterList(any) {
+    return List.isList(any) && any.every(item => Character.isCharacter(item))
   }
 
   /**

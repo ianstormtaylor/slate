@@ -113,14 +113,14 @@ class Schema extends Record(DEFAULTS) {
   static fromJS = Schema.fromJSON
 
   /**
-   * Check if a `value` is a `Schema`.
+   * Check if `any` is a `Schema`.
    *
-   * @param {Any} value
+   * @param {Any} any
    * @return {Boolean}
    */
 
-  static isSchema(value) {
-    return !!(value && value[MODEL_TYPES.SCHEMA])
+  static isSchema(any) {
+    return !!(any && any[MODEL_TYPES.SCHEMA])
   }
 
   /**
@@ -193,7 +193,7 @@ class Schema extends Record(DEFAULTS) {
   }
 
   /**
-   * Normalize an invalid state with `reason` and `context`.
+   * Normalize an invalid value with `reason` and `context`.
    *
    * @param {Change} change
    * @param {String} reason

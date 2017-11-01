@@ -7,6 +7,30 @@ This document maintains a list of changes to the `slate-hyperscript` package wit
 ---
 
 
+### `0.4.0` — October 27, 2017
+
+###### BREAKING
+
+- **Remove all previously deprecated code paths.** This helps to reduce some of the complexity in Slate by not having to handle these code paths anymore. And it helps to reduce file size. When upgrading, it's _highly_ recommended that you upgrade to the previous version first and ensure there are no deprecation warnings being logged, then upgrade to this version.
+
+
+---
+
+
+### `0.3.0` — October 27, 2017
+
+###### BREAKING
+
+- **Updated to work with `slate@0.29.0`.** This is required because `slate-hyperscript` needs access to the new `Value` model.
+
+###### DEPRECATED
+
+- **The `<state>` tag has been renamed to `<value>`.** This is to stay in line with the newest version of Slate where the `State` object was renamed to `Value`.
+
+
+---
+
+
 ### `0.2.0` — October 14, 2017
 
 ###### BREAKING

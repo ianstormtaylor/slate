@@ -7,20 +7,20 @@ export default function (change) {
 }
 
 export const input = (
-  <state>
+  <value>
     <document>
       <paragraph>
         he<hashtag>ll</hashtag>o <anchor />w<hashtag>or<focus /></hashtag>d
       </paragraph>
     </document>
-  </state>
+  </value>
 )
 
 export const output = (
-  <state>
+  <value>
     <document>
       <paragraph>
         he<hashtag>ll</hashtag>o <anchor />wor<focus />d</paragraph>
     </document>
-  </state>
+  </value>
 )

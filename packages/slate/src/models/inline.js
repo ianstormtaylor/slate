@@ -119,25 +119,25 @@ class Inline extends Record(DEFAULTS) {
   static fromJS = Inline.fromJSON
 
   /**
-   * Check if a `value` is a `Inline`.
+   * Check if `any` is a `Inline`.
    *
-   * @param {Any} value
+   * @param {Any} any
    * @return {Boolean}
    */
 
-  static isInline(value) {
-    return !!(value && value[MODEL_TYPES.INLINE])
+  static isInline(any) {
+    return !!(any && any[MODEL_TYPES.INLINE])
   }
 
   /**
-   * Check if a `value` is a list of inlines.
+   * Check if `any` is a list of inlines.
    *
-   * @param {Any} value
+   * @param {Any} any
    * @return {Boolean}
    */
 
-  static isInlineList(value) {
-    return List.isList(value) && value.every(item => Inline.isInline(item))
+  static isInlineList(any) {
+    return List.isList(any) && any.every(item => Inline.isInline(item))
   }
 
   /**

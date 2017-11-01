@@ -1,10 +1,10 @@
 
 import { Editor } from 'slate-react'
-import { State } from 'slate'
+import { Value } from 'slate'
 
 import Prism from 'prismjs'
 import React from 'react'
-import initialState from './state.json'
+import initialValue from './value.json'
 
 /**
  * Define our code components.
@@ -55,23 +55,23 @@ function CodeBlockLine(props) {
 class CodeHighlighting extends React.Component {
 
   /**
-   * Deserialize the raw initial state.
+   * Deserialize the raw initial value.
    *
    * @type {Object}
    */
 
   state = {
-    state: State.fromJSON(initialState)
+    value: Value.fromJSON(initialValue)
   }
 
   /**
-   * On change, save the new state.
+   * On change, save the new value.
    *
    * @param {Change} change
    */
 
-  onChange = ({ state }) => {
-    this.setState({ state })
+  onChange = ({ value }) => {
+    this.setState({ value })
   }
 
   /**
@@ -83,11 +83,11 @@ class CodeHighlighting extends React.Component {
    */
 
   onKeyDown = (event, change) => {
-    const { state } = change
-    const { startBlock } = state
+    const { value } = change
+    const { startBlock } = value
     if (event.key != 'Enter') return
     if (startBlock.type != 'code') return
-    if (state.isExpanded) change.delete()
+    if (value.isExpanded) change.delete()
     change.insertText('\n')
     return true
   }
@@ -103,7 +103,7 @@ class CodeHighlighting extends React.Component {
       <div className="editor">
         <Editor
           placeholder="Write some code..."
-          state={this.state.state}
+          value={this.state.value}
           onChange={this.onChange}
           onKeyDown={this.onKeyDown}
           renderNode={this.renderNode}

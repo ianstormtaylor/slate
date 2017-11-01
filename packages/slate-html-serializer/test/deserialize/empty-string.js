@@ -8,9 +8,9 @@ export const config = {}
 export const input = ''
 
 export const output = (
-  <state>
+  <value>
     <document>
       <paragraph />
     </document>
-  </state>
+  </value>
 )

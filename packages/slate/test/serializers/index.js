@@ -1,7 +1,7 @@
 
 import assert from 'assert'
 import fs from 'fs'
-import { State } from '../..'
+import { Value } from '../..'
 import { basename, extname, resolve } from 'path'
 
 /**
@@ -18,7 +18,7 @@ describe('serializers', () => {
         it(test, async () => {
           const module = require(resolve(dir, test))
           const { input, output, options } = module
-          const actual = State.fromJSON(input, options).toJSON()
+          const actual = Value.fromJSON(input, options).toJSON()
           const expected = output.toJSON()
           assert.deepEqual(actual, expected)
         })

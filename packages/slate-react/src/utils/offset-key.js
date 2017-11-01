@@ -16,7 +16,11 @@ const PARSER = /^(\w+)(?::(\d+))?$/
 
 function parse(string) {
   const matches = PARSER.exec(string)
-  if (!matches) throw new Error(`Invalid offset key string "${string}".`)
+
+  if (!matches) {
+    throw new Error(`Invalid offset key string "${string}".`)
+  }
+
   const [ original, key, index ] = matches // eslint-disable-line no-unused-vars
   return {
     key,

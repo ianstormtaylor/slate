@@ -3,7 +3,7 @@
 import h from '../helpers/h'
 
 export const input = (
-  <state>
+  <value>
     <document>
       <quote>
         <quote>
@@ -24,7 +24,7 @@ export const input = (
         </quote>
       </quote>
     </document>
-  </state>
+  </value>
 )
 
 export const output = `

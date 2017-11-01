@@ -5,7 +5,7 @@ import React from 'react'
 import SlateTypes from 'slate-prop-types'
 import Types from 'prop-types'
 import logger from 'slate-dev-logger'
-import { Schema, Stack, State } from 'slate'
+import { Schema, Stack } from 'slate'
 
 import EVENT_HANDLERS from '../constants/event-handlers'
 import PLUGINS_PROPS from '../constants/plugin-props'
@@ -41,16 +41,14 @@ class Editor extends React.Component {
     className: Types.string,
     onChange: Types.func,
     placeholder: Types.any,
-    placeholderClassName: Types.string,
-    placeholderStyle: Types.object,
     plugins: Types.array,
     readOnly: Types.bool,
     role: Types.string,
     schema: Types.object,
     spellCheck: Types.bool,
-    state: SlateTypes.state.isRequired,
     style: Types.object,
     tabIndex: Types.number,
+    value: SlateTypes.value.isRequired,
   }
 
   /**
@@ -89,14 +87,12 @@ class Editor extends React.Component {
     this.state.schema = schema
     this.state.stack = stack
 
-    // Run `onChange` on the passed-in state because we need to ensure that it
+    // Run `onChange` on the passed-in value because we need to ensure that it
     // is normalized, and queue the resulting change.
-    const change = props.state.change()
+    const change = props.value.change()
     stack.run('onChange', change, this)
-    const { state } = change
     this.queueChange(change)
-    this.cacheState(state)
-    this.state.state = state
+    this.state.value = change.value
 
     // Create a bound event handler for each event.
     EVENT_HANDLERS.forEach((handler) => {
@@ -104,26 +100,17 @@ class Editor extends React.Component {
         this.onEvent(handler, ...args)
       }
     })
-
-    if (props.onDocumentChange) {
-      logger.deprecate('0.22.10', 'The `onDocumentChange` prop is deprecated because it led to confusing UX issues, see https://github.com/ianstormtaylor/slate/issues/614#issuecomment-327868679')
-    }
-
-    if (props.onSelectionChange) {
-      logger.deprecate('0.22.10', 'The `onSelectionChange` prop is deprecated because it led to confusing UX issues, see https://github.com/ianstormtaylor/slate/issues/614#issuecomment-327868679')
-    }
   }
 
   /**
    * When the `props` are updated, create a new `Stack` if necessary and run
-   * `onChange` to ensure the state is normalized.
+   * `onChange` to ensure the value is normalized.
    *
    * @param {Object} props
    */
 
   componentWillReceiveProps = (props) => {
-    let { state } = props
-    let { schema, stack } = this.state
+    let { schema, stack } = this
 
     // Increment the updates counter as a baseline.
     this.tmp.updates++
@@ -142,18 +129,16 @@ class Editor extends React.Component {
       // If we've resolved a few times already, and it's exactly in line with
       // the updates, then warn the user that they may be doing something wrong.
       if (this.tmp.resolves > 5 && this.tmp.resolves == this.tmp.updates) {
-        logger.warn('A Slate <Editor> is re-resolving its `plugins` or `schema` on each update, which leads to poor performance. This is often due to passing in a new `schema` or `plugins` prop with each render, by declaring them inline in your render function. Do not do this!')
+        logger.warn('A Slate <Editor> is re-resolving `props.plugins` or `props.schema` on each update, which leads to poor performance. This is often due to passing in a new `schema` or `plugins` prop with each render by declaring them inline in your render function. Do not do this!')
       }
     }
 
-    // Run `onChange` on the passed-in state because we need to ensure that it
+    // Run `onChange` on the passed-in value because we need to ensure that it
     // is normalized, and queue the resulting change.
-    const change = state.change()
+    const change = props.value.change()
     stack.run('onChange', change, this)
-    state = change.state
     this.queueChange(change)
-    this.cacheState(state)
-    this.setState({ state })
+    this.setState({ value: change.value })
   }
 
   /**
@@ -173,19 +158,8 @@ class Editor extends React.Component {
   }
 
   /**
-   * Cache a `state` object to be able to compare against it later.
-   *
-   * @param {State} state
-   */
-
-  cacheState = (state) => {
-    this.tmp.document = state.document
-    this.tmp.selection = state.selection
-  }
-
-  /**
    * Queue a `change` object, to be able to flush it later. This is required for
-   * when a change needs to be applied to the state, but because of the React
+   * when a change needs to be applied to the value, but because of the React
    * lifecycle we can't apply that change immediately. So we cache it here and
    * later can call `this.flushChange()` to flush it.
    *
@@ -207,13 +181,25 @@ class Editor extends React.Component {
   flushChange = () => {
     const { change } = this.tmp
 
-    if (change) {
+    if (change && !this.tmp.flushTimeout) {
       debug('flushChange', { change })
-      window.requestAnimationFrame(() => {
+      this.tmp.flushTimeout = setTimeout(() => {
         delete this.tmp.change
+        delete this.tmp.flushTimeout
         this.props.onChange(change)
       })
     }
+  }
+
+  /**
+   * Perform a change on the editor, passing `...args` to `change.call`.
+   *
+   * @param {Mixed} ...args
+   */
+
+  change = (...args) => {
+    const change = this.value.change().call(...args)
+    this.onChange(change)
   }
 
   /**
@@ -233,45 +219,19 @@ class Editor extends React.Component {
   }
 
   /**
-   * Get the editor's current schema.
-   *
-   * @return {Schema}
+   * Getters for exposing public properties of the editor's state.
    */
 
-  getSchema = () => {
+  get schema() {
     return this.state.schema
   }
 
-  /**
-   * Get the editor's current stack.
-   *
-   * @return {Stack}
-   */
-
-  getStack = () => {
+  get stack() {
     return this.state.stack
   }
 
-  /**
-   * Get the editor's current state.
-   *
-   * @return {State}
-   */
-
-  getState = () => {
-    return this.state.state
-  }
-
-  /**
-   * Perform a change on the editor, passing `...args` to `change.call`.
-   *
-   * @param {Mixed} ...args
-   */
-
-  change = (...args) => {
-    const { state } = this.state
-    const change = state.change().call(...args)
-    this.onChange(change)
+  get value() {
+    return this.state.value
   }
 
   /**
@@ -282,10 +242,9 @@ class Editor extends React.Component {
    */
 
   onEvent = (handler, event) => {
-    const { stack, state } = this.state
-    const change = state.change()
-    stack.run(handler, event, change, this)
-    this.onChange(change)
+    this.change((change) => {
+      this.stack.run(handler, event, change, this)
+    })
   }
 
   /**
@@ -297,20 +256,11 @@ class Editor extends React.Component {
   onChange = (change) => {
     debug('onChange', { change })
 
-    if (State.isState(change)) {
-      throw new Error('As of slate@0.22.0 the `editor.onChange` method must be passed a `Change` object not a `State` object.')
-    }
-
-    const { stack } = this.state
-    stack.run('onChange', change, this)
-    const { state } = change
-    const { document, selection } = this.tmp
-    const { onChange, onDocumentChange, onSelectionChange } = this.props
-
-    if (state == this.state.state) return
+    this.stack.run('onChange', change, this)
+    const { value } = change
+    const { onChange } = this.props
+    if (value == this.value) return
     onChange(change)
-    if (onDocumentChange && state.document != document) onDocumentChange(state.document, change)
-    if (onSelectionChange && state.selection != selection) onSelectionChange(state.selection, change)
   }
 
   /**
@@ -322,13 +272,12 @@ class Editor extends React.Component {
   render() {
     debug('render', this)
 
-    const { stack, state } = this.state
-    const children = stack
-      .map('renderPortal', state, this)
+    const children = this.stack
+      .map('renderPortal', this.value, this)
       .map((child, i) => <Portal key={i} isOpened>{child}</Portal>)
 
     const props = { ...this.props, children }
-    const tree = stack.render('renderEditor', props, state, this)
+    const tree = this.stack.render('renderEditor', props, this)
     return tree
   }
 

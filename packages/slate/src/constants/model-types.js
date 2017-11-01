@@ -17,8 +17,8 @@ const MODEL_TYPES = {
   RANGE: '@@__SLATE_RANGE__@@',
   SCHEMA: '@@__SLATE_SCHEMA__@@',
   STACK: '@@__SLATE_STACK__@@',
-  STATE: '@@__SLATE_STATE__@@',
   TEXT: '@@__SLATE_TEXT__@@',
+  VALUE: '@@__SLATE_VALUE__@@',
 }
 
 /**
