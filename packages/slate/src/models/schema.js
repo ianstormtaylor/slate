@@ -19,6 +19,10 @@ const CHILD_KIND_INVALID = 'child_kind_invalid'
 const CHILD_REQUIRED = 'child_required'
 const CHILD_TYPE_INVALID = 'child_type_invalid'
 const CHILD_UNKNOWN = 'child_unknown'
+const FIRST_CHILD_KIND_INVALID = 'first_child_kind_invalid'
+const FIRST_CHILD_TYPE_INVALID = 'first_child_type_invalid'
+const LAST_CHILD_KIND_INVALID = 'last_child_kind_invalid'
+const LAST_CHILD_TYPE_INVALID = 'last_child_type_invalid'
 const NODE_DATA_INVALID = 'node_data_invalid'
 const NODE_IS_VOID_INVALID = 'node_is_void_invalid'
 const NODE_MARK_INVALID = 'node_mark_invalid'
@@ -204,7 +208,11 @@ class Schema extends Record(DEFAULTS) {
     switch (reason) {
       case CHILD_KIND_INVALID:
       case CHILD_TYPE_INVALID:
-      case CHILD_UNKNOWN: {
+      case CHILD_UNKNOWN:
+      case FIRST_CHILD_KIND_INVALID:
+      case FIRST_CHILD_TYPE_INVALID:
+      case LAST_CHILD_KIND_INVALID:
+      case LAST_CHILD_TYPE_INVALID: {
         const { child, node } = context
         return child.kind == 'text' && node.kind == 'block' && node.nodes.size == 1
           ? change.removeNodeByKey(node.key)
@@ -292,6 +300,30 @@ class Schema extends Record(DEFAULTS) {
 
       if (!rule.text.test(text)) {
         return this.fail(NODE_TEXT_INVALID, { ...ctx, text })
+      }
+    }
+
+    if (rule.first != null) {
+      const first = node.nodes.first()
+
+      if (rule.first.kinds != null && !rule.first.kinds.includes(first.kind)) {
+        return this.fail(FIRST_CHILD_KIND_INVALID, { ...ctx, child: first })
+      }
+
+      if (rule.first.types != null && !rule.first.types.includes(first.type)) {
+        return this.fail(FIRST_CHILD_TYPE_INVALID, { ...ctx, child: first })
+      }
+    }
+
+    if (rule.last != null) {
+      const last = node.nodes.last()
+
+      if (rule.last.kinds != null && !rule.last.kinds.includes(last.kind)) {
+        return this.fail(LAST_CHILD_KIND_INVALID, { ...ctx, child: last })
+      }
+
+      if (rule.last.types != null && !rule.last.types.includes(last.type)) {
+        return this.fail(LAST_CHILD_TYPE_INVALID, { ...ctx, child: last })
       }
     }
 
@@ -470,6 +502,8 @@ function resolveNodeRule(kind, type, obj) {
     data: {},
     isVoid: null,
     nodes: null,
+    first: null,
+    last: null,
     parent: null,
     text: null,
     ...obj,

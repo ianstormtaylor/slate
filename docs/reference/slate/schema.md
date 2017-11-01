@@ -69,7 +69,9 @@ A dictionary of inlines by type, each with its own set of validation rules.
 ```js
 {
   data: Object,
+  first: Object,
   isVoid: Boolean,
+  last: Object,
   nodes: Array,
   normalize: Function,
   parent: Object,
@@ -90,7 +92,18 @@ Slate schemas are built up of a set of validation rules. Each of the properties 
 }
 ```
 
-A dictionary of 
+A dictionary of data attributes and their corresponding validation functions. The functions should return a boolean indicating whether the data value is valid or not.
+
+### `first`
+`Object`
+
+```js
+{
+  first: { types: ['quote', 'paragraph'] },
+}
+```
+
+Will validate the first child node. The `first` definition can declare `kinds` and `types` properties.
 
 ### `isVoid`
 `Boolean`
@@ -102,6 +115,17 @@ A dictionary of
 ```
 
 Will validate a node's `isVoid` property.
+
+### `last`
+`Object`
+
+```js
+{
+  last: { types: ['quote', 'paragraph'] },
+}
+```
+
+Will validate the last child node. The `last` definition can declare `kinds` and `types` properties.
 
 ### `nodes`
 `Array`
@@ -115,7 +139,9 @@ Will validate a node's `isVoid` property.
 }
 ```
 
-Will validate a node's children. The node definitions can declare the `kinds`, `types`, `min` and `max` properties.
+Will validate a node's children. The `nodes` definitions can declare the `kinds`, `types`, `min` and `max` properties.
+
+> 🤖 The `nodes` array is order-sensitive! The example above will require that the first node be either an `image` or `video`, and that it be followed by one or more `paragraph` nodes.
 
 ### `normalize`
 `normalize(change: Change, reason: String, context: Object) => Void`
@@ -228,6 +254,46 @@ When supplying your own `normalize` property for a schema rule, it will be calle
 {
   child: Node,
   index: Number,
+  node: Node,
+  rule: Object,
+}
+```
+
+### `first_child_kind_invalid`
+
+```js
+{
+  child: Node,
+  node: Node,
+  rule: Object,
+}
+```
+
+### `first_child_type_invalid`
+
+```js
+{
+  child: Node,
+  node: Node,
+  rule: Object,
+}
+```
+
+### `last_child_kind_invalid`
+
+```js
+{
+  child: Node,
+  node: Node,
+  rule: Object,
+}
+```
+
+### `last_child_type_invalid`
+
+```js
+{
+  child: Node,
   node: Node,
   rule: Object,
 }
