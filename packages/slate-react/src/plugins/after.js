@@ -465,9 +465,7 @@ function AfterPlugin() {
 
     // Change the current value to have the leaf's text replaced.
     change
-      .select(entire)
-      .delete()
-      .insertText(textContent, leaf.marks)
+      .insertTextAtRange(entire, textContent, leaf.marks)
       .select(corrected)
   }
 
