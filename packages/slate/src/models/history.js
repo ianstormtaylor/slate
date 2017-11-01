@@ -130,7 +130,7 @@ class History extends Record(DEFAULTS) {
     debug('save', { operation, merge })
 
     // If the `merge` flag is true, add the operation to the previous batch.
-    if (merge) {
+    if (merge && prevBatch) {
       const batch = prevBatch.slice()
       batch.push(operation)
       undos = undos.pop()
