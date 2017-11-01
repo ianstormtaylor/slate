@@ -304,26 +304,28 @@ class Schema extends Record(DEFAULTS) {
     }
 
     if (rule.first != null) {
-      const first = node.nodes.first()
+      const { kinds, types } = rule.first
+      const child = node.nodes.first()
 
-      if (rule.first.kinds != null && !rule.first.kinds.includes(first.kind)) {
-        return this.fail(FIRST_CHILD_KIND_INVALID, { ...ctx, child: first })
+      if (child && kinds && !kinds.includes(child.kind)) {
+        return this.fail(FIRST_CHILD_KIND_INVALID, { ...ctx, child })
       }
 
-      if (rule.first.types != null && !rule.first.types.includes(first.type)) {
-        return this.fail(FIRST_CHILD_TYPE_INVALID, { ...ctx, child: first })
+      if (child && types && !types.includes(child.type)) {
+        return this.fail(FIRST_CHILD_TYPE_INVALID, { ...ctx, child })
       }
     }
 
     if (rule.last != null) {
-      const last = node.nodes.last()
+      const { kinds, types } = rule.last
+      const child = node.nodes.last()
 
-      if (rule.last.kinds != null && !rule.last.kinds.includes(last.kind)) {
-        return this.fail(LAST_CHILD_KIND_INVALID, { ...ctx, child: last })
+      if (child && kinds && !kinds.includes(child.kind)) {
+        return this.fail(LAST_CHILD_KIND_INVALID, { ...ctx, child })
       }
 
-      if (rule.last.types != null && !rule.last.types.includes(last.type)) {
-        return this.fail(LAST_CHILD_TYPE_INVALID, { ...ctx, child: last })
+      if (child && types && !types.includes(child.type)) {
+        return this.fail(LAST_CHILD_TYPE_INVALID, { ...ctx, child })
       }
     }
 
