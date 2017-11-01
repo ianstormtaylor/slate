@@ -50,8 +50,9 @@ function findScrollContainer(el) {
 function scrollToSelection(selection) {
   if (!selection.anchorNode) return
 
+  const window = getWindow(selection.anchorNode)
   const scroller = findScrollContainer(selection.anchorNode)
-  const isWindow = scroller == scroller.window
+  const isWindow = scroller == window
   const backward = isBackward(selection)
   const range = selection.getRangeAt(0)
   const rect = range.getBoundingClientRect()
