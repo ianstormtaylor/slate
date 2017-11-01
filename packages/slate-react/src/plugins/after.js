@@ -428,25 +428,25 @@ function AfterPlugin() {
     // Get the text node and leaf in question.
     const { document, selection } = value
     const node = document.getDescendant(point.key)
+    const block = document.getClosestBlock(node.key)
     const leaves = node.getLeaves()
+    const lastText = block.getLastText()
+    const lastLeaf = leaves.last()
     let start = 0
     let end = 0
 
     const leaf = leaves.find((r) => {
+      start = end
       end += r.text.length
       if (end >= point.offset) return true
-      start = end
-    })
+    }) || lastLeaf
 
     // Get the text information.
     const { text } = leaf
     let { textContent } = anchorNode
-    const block = document.getClosestBlock(node.key)
-    const lastText = block.getLastText()
-    const lastLeaf = leaves.last()
-    const lastChar = textContent.charAt(textContent.length - 1)
     const isLastText = node == lastText
     const isLastLeaf = leaf == lastLeaf
+    const lastChar = textContent.charAt(textContent.length - 1)
 
     // COMPAT: If this is the last leaf, and the DOM text ends in a new line,
     // we will have added another new line in <Leaf>'s render method to account
