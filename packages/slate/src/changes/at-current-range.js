@@ -73,6 +73,17 @@ Changes.addMark = (change, mark) => {
 }
 
 /**
+ * Add a list of `marks` to the characters in the current selection.
+ *
+ * @param {Change} change
+ * @param {Mark} mark
+ */
+
+Changes.addMarks = (change, marks) => {
+  marks.forEach(mark => change.addMark(mark))
+}
+
+/**
  * Delete at the current selection.
  *
  * @param {Change} change
