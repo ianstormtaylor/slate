@@ -7,21 +7,21 @@ export default function (change) {
 }
 
 export const input = (
-  <state>
+  <value>
     <document>
       <paragraph>
         <anchor /><i>wo<focus />rd</i>
       </paragraph>
     </document>
-  </state>
+  </value>
 )
 
 export const output = (
-  <state>
+  <value>
     <document>
       <paragraph>
         <anchor /><u><b><i>wo</i></b></u><focus /><i>rd</i>
       </paragraph>
     </document>
-  </state>
+  </value>
 )
