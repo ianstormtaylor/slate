@@ -23,7 +23,7 @@ const OVERFLOWS = [
 function findScrollContainer(el) {
   const window = getWindow(el)
   let parent = el.parentNode
-  let scroller = window
+  let scroller
 
   while (!scroller) {
     if (!parent.parentNode) break
@@ -37,6 +37,8 @@ function findScrollContainer(el) {
 
     parent = parent.parentNode
   }
+
+  if (!scroller) return window
 
   return scroller
 }
