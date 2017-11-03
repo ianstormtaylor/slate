@@ -110,7 +110,6 @@ class Images extends React.Component {
           value={this.state.value}
           schema={schema}
           onChange={this.onChange}
-          onDrop={this.onDrop}
           onPaste={this.onPaste}
           renderNode={this.renderNode}
         />
@@ -175,10 +174,7 @@ class Images extends React.Component {
    * @param {Editor} editor
    */
 
-  onDropOrPaste = (event, change, editor) => {
-    const target = getEventRange(event)
-    if (!target) return
-
+  onPaste = (event, change, editor) => {
     const transfer = getEventTransfer(event)
     const { type, text, files } = transfer
 
@@ -190,7 +186,7 @@ class Images extends React.Component {
 
         reader.addEventListener('load', () => {
           editor.change((c) => {
-            c.call(insertImage, reader.result, target)
+            c.call(insertImage, reader.result)
           })
         })
 
@@ -201,7 +197,7 @@ class Images extends React.Component {
     if (type == 'text') {
       if (!isUrl(text)) return
       if (!isImage(text)) return
-      change.call(insertImage, text, target)
+      change.call(insertImage, text)
     }
   }
 
