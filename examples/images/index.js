@@ -110,7 +110,8 @@ class Images extends React.Component {
           value={this.state.value}
           schema={schema}
           onChange={this.onChange}
-          onPaste={this.onPaste}
+          onDrop={this.onDropOrPaste}
+          onPaste={this.onDropOrPaste}
           renderNode={this.renderNode}
         />
       </div>
@@ -174,7 +175,7 @@ class Images extends React.Component {
    * @param {Editor} editor
    */
 
-  onPaste = (event, change, editor) => {
+  onDropOrPaste = (event, change, editor) => {
     const transfer = getEventTransfer(event)
     const { type, text, files } = transfer
 
