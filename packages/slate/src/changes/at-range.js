@@ -296,8 +296,26 @@ Changes.deleteLineBackwardAtRange = (change, range, options) => {
   const { startKey, startOffset } = range
   const startBlock = document.getClosestBlock(startKey)
   const offset = startBlock.getOffset(startKey)
-  const o = offset + startOffset
+  const startWithVoidInline = (
+    startBlock.nodes.size > 1 &&
+    startBlock.nodes.get(0).text == '' &&
+    startBlock.nodes.get(1).kind == 'inline'
+  )
+
+  let o = offset + startOffset
+
+  // If line starts with an void inline node, the text node inside this inline
+  // node disturbs the offset. Ignore this inline node and delete it afterwards.
+  if (startWithVoidInline) {
+    o -= 1
+  }
+
   change.deleteBackwardAtRange(range, o, options)
+
+  // Delete the remaining first inline node if needed.
+  if (startWithVoidInline) {
+    change.deleteBackward()
+  }
 }
 
 /**
