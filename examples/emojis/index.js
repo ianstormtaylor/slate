@@ -18,6 +18,14 @@ const EMOJIS = [
 ]
 
 /**
+ * No ops.
+ *
+ * @type {Function}
+ */
+
+const noop = e => e.preventDefault()
+
+/**
  * The links example.
  *
  * @type {Component}
@@ -136,7 +144,16 @@ class Emojis extends React.Component {
       case 'emoji': {
         const { data } = node
         const code = data.get('code')
-        return <span className={`emoji ${isSelected ? 'selected' : ''}`} {...props.attributes} contentEditable={false}>{code}</span>
+        return (
+          <span
+            className={`emoji ${isSelected ? 'selected' : ''}`}
+            {...props.attributes}
+            contentEditable={false}
+            onDrop={noop}
+          >
+            {code}
+          </span>
+        )
       }
     }
   }
