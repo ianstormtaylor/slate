@@ -75,7 +75,7 @@ const CREATORS = {
   },
 
   value(tagName, attributes, children) {
-    const { data } = attributes
+    const { data, normalize = true } = attributes
     const document = children.find(Document.isDocument)
     let selection = children.find(Range.isRange) || Range.create()
     const props = {}
@@ -110,7 +110,7 @@ const CREATORS = {
       selection = selection.merge(props).normalize(document)
     }
 
-    const value = Value.create({ data, document, selection })
+    const value = Value.fromJSON({ data, document, selection }, { normalize })
     return value
   },
 

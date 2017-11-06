@@ -2,7 +2,7 @@
 
 import h from '../'
 import assert from 'assert'
-import { Document, Block, Text } from 'slate'
+import { Value, Document, Block, Text } from 'slate'
 
 
 describe('slate-hyperscript', () => {
@@ -24,6 +24,65 @@ describe('slate-hyperscript', () => {
         })
       ]
     })
+
+    assert.deepEqual(output.toJSON(), expected.toJSON())
+  })
+
+  it('should normalize a value by default', () => {
+    const output = (
+      <value>
+        <document>
+          <block type="paragraph">
+            Valid block
+          </block>
+          <text>
+            Invalid text
+          </text>
+        </document>
+      </value>
+    )
+    const expected = Value.create({
+      document: Document.create({
+        nodes: [
+          Block.create({
+            type: 'paragraph',
+            nodes: [
+              Text.create('Valid block')
+            ]
+          })
+        ]
+      })
+    })
+
+    assert.deepEqual(output.toJSON(), expected.toJSON())
+  })
+
+  it('should not normalize a value, given the option', () => {
+    const output = (
+      <value normalize={false}>
+        <document>
+          <block type="paragraph">
+            Valid block
+          </block>
+          <text>
+            Invalid text
+          </text>
+        </document>
+      </value>
+    )
+    const expected = Value.fromJSON({
+      document: Document.create({
+        nodes: [
+          Block.create({
+            type: 'paragraph',
+            nodes: [
+              Text.create('Valid block')
+            ]
+          }),
+          Text.create('Invalid text')
+        ]
+      })
+    }, { normalize: false })
 
     assert.deepEqual(output.toJSON(), expected.toJSON())
   })
