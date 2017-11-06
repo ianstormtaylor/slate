@@ -32,7 +32,7 @@ export const output = (
         word
       </paragraph>
       <paragraph>
-        <cursor />fragmentanother
+        fragment<cursor />another
       </paragraph>
     </document>
   </value>

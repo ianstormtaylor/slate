@@ -28,7 +28,6 @@ export const input = (
   </value>
 )
 
-// TODO: this output selection should be at the end of the block
 export const output = (
   <value>
     <document>
@@ -39,7 +38,7 @@ export const output = (
         two
       </quote>
       <quote>
-        <cursor />three
+        three<cursor />
       </quote>
     </document>
   </value>

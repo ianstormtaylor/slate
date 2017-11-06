@@ -29,7 +29,7 @@ export const output = (
   <value>
     <document>
       <paragraph>
-        wo<cursor />fragmentother
+        wofragment<cursor />other
       </paragraph>
     </document>
   </value>
