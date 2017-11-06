@@ -19,7 +19,7 @@ describe('slate-hyperscript', () => {
         Block.create({
           type: 'paragraph',
           nodes: [
-            Text.createFromString('Single block')
+            Text.create('Single block')
           ]
         })
       ]
