@@ -197,7 +197,6 @@ class Content extends React.Component {
 
     // Otherwise, set the `isUpdatingSelection` flag and update the selection.
     this.tmp.isUpdatingSelection = true
-    // native.addRange(range)
 
     // COMPAT: IE 11 does not support Selection.extend
     if (native.extend) {
@@ -213,7 +212,6 @@ class Content extends React.Component {
       }
     } else if (selection.isCollapsed) {
       // COMPAT: IE 11, to follow the cursor while typing
-      // (the expanded selection works as expected)
       native.removeAllRanges()
       native.addRange(range)
     }
