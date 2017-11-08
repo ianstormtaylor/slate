@@ -193,13 +193,13 @@ class Content extends React.Component {
     // Otherwise, set the `isUpdatingSelection` flag and update the selection.
     this.tmp.isUpdatingSelection = true
     native.removeAllRanges()
+    native.addRange(range)
 
     // COMPAT: Again, since the DOM range has no concept of backwards/forwards
     // we need to check and do the right thing here.
     if (isBackward) {
-      native.setBaseAndExtent(endContainer, endOffset, startContainer, startOffset)
-    } else {
-      native.setBaseAndExtent(startContainer, startOffset, endContainer, endOffset)
+      native.collapse(range.endContainer, range.endOffset);
+      native.extend(range.startContainer, range.startOffset);
     }
 
     // Scroll to the selection, in case it's out of view.
@@ -344,7 +344,7 @@ class Content extends React.Component {
     const { inputType } = event
     if (inputType !== 'insertText' && inputType !== 'insertReplacementText') return
 
-    const [ targetRange ] = event.getTargetRanges()
+    const [targetRange] = event.getTargetRanges()
     if (!targetRange) return
 
     // `data` should have the text for the `insertText` input type and
