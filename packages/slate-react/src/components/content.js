@@ -193,13 +193,15 @@ class Content extends React.Component {
     // Otherwise, set the `isUpdatingSelection` flag and update the selection.
     this.tmp.isUpdatingSelection = true
     native.removeAllRanges()
-    native.addRange(range)
-
+    
     // COMPAT: Again, since the DOM range has no concept of backwards/forwards
     // we need to check and do the right thing here.
     if (isBackward) {
       native.collapse(range.endContainer, range.endOffset)
       native.extend(range.startContainer, range.startOffset)
+    } else {
+      native.collapse(range.startContainer, range.startOffset)
+      native.extend(range.endContainer, range.endOffset)
     }
 
     // Scroll to the selection, in case it's out of view.
