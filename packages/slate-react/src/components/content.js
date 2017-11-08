@@ -193,7 +193,7 @@ class Content extends React.Component {
     // Otherwise, set the `isUpdatingSelection` flag and update the selection.
     this.tmp.isUpdatingSelection = true
     native.removeAllRanges()
-    
+
     // COMPAT: Again, since the DOM range has no concept of backwards/forwards
     // we need to check and do the right thing here.
     if (isBackward) {
