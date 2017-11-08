@@ -211,6 +211,11 @@ class Content extends React.Component {
         native.collapse(range.startContainer, range.startOffset)
         native.extend(range.endContainer, range.endOffset)
       }
+    } else if (selection.isCollapsed) {
+      // COMPAT: IE 11, to follow the cursor while typing
+      // (the expanded selection works as expected)
+      native.removeAllRanges()
+      native.addRange(range)
     }
 
     // Scroll to the selection, in case it's out of view.
