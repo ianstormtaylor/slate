@@ -1,6 +1,4 @@
 
-import getWindow from 'get-window'
-
 import findDOMNode from './find-dom-node'
 
 /**

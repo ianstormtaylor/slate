@@ -1,6 +1,4 @@
 
-import getWindow from 'get-window'
-
 import findDOMPoint from './find-dom-point'
 
 /**
