@@ -12,9 +12,8 @@ import findDOMNode from './find-dom-node'
  * @return {Object}
  */
 
-function findDOMPoint(key, offset) {
-  const el = findDOMNode(key)
-  const window = getWindow(el)
+function findDOMPoint(key, offset, window) {
+  const el = findDOMNode(key, window)
   let start = 0
   let n
 
