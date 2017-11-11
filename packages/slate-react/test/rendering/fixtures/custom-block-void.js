@@ -32,7 +32,9 @@ export const output = `
   <div data-slate-void="true" contenteditable="false">
     <div contenteditable="true" data-slate-spacer="true" style="height:0;color:transparent;outline:none">
       <span>
-        <span></span>
+        <span>
+          <span data-slate-zero-width="true">&#x200B;</span>
+        </span>
       </span>
     </div>
     <div draggable="true">
