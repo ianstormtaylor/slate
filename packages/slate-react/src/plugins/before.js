@@ -139,7 +139,7 @@ function BeforePlugin() {
     // The `count` check here ensures that if another composition starts
     // before the timeout has closed out this one, we will abort unsetting the
     // `isComposing` flag, since a composition is still in affect.
-    setTimeout(() => {
+    window.requestAnimationFrame(() => {
       if (compositionCount > n) return
       isComposing = false
 
