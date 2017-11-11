@@ -52,6 +52,7 @@ function findPoint(nativeNode, nativeOffset, value) {
     const voidNode = parentNode.closest(VOID_SELECTOR)
     if (!voidNode) return null
     rangeNode = voidNode.querySelector(RANGE_SELECTOR)
+    if (!rangeNode) return null
     node = rangeNode
     offset = node.textContent.length
   }
