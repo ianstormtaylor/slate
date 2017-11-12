@@ -1,5 +1,5 @@
 
-import { Editor, getEventTransfer } from 'slate-react'
+import { Editor, getEventRange, getEventTransfer } from 'slate-react'
 import { Block, Value } from 'slate'
 
 import React from 'react'
@@ -176,6 +176,9 @@ class Images extends React.Component {
    */
 
   onDropOrPaste = (event, change, editor) => {
+    const target = getEventRange(event, change.value)
+    if (!target && event.type == 'drop') return
+
     const transfer = getEventTransfer(event)
     const { type, text, files } = transfer
 
@@ -187,7 +190,7 @@ class Images extends React.Component {
 
         reader.addEventListener('load', () => {
           editor.change((c) => {
-            c.call(insertImage, reader.result)
+            c.call(insertImage, reader.result, target)
           })
         })
 
@@ -198,7 +201,7 @@ class Images extends React.Component {
     if (type == 'text') {
       if (!isUrl(text)) return
       if (!isImage(text)) return
-      change.call(insertImage, text)
+      change.call(insertImage, text, target)
     }
   }
 
