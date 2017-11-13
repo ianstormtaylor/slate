@@ -134,7 +134,7 @@ class Content extends React.Component {
     const { isBackward } = selection
     const window = getWindow(this.element)
     const native = window.getSelection()
-    const { rangeCount, anchorNode, focusNode } = native
+    const { rangeCount, anchorNode } = native
 
     // If both selections are blurred, do nothing.
     if (!rangeCount && selection.isBlurred) return
@@ -175,16 +175,12 @@ class Content extends React.Component {
     if (current) {
       if (
         (
-          !isBackward &&
-          focusNode == current.startContainer &&
           startContainer == current.startContainer &&
           startOffset == current.startOffset &&
           endContainer == current.endContainer &&
           endOffset == current.endOffset
         ) ||
         (
-          isBackward &&
-          focusNode == current.endContainer &&
           startContainer == current.endContainer &&
           startOffset == current.endOffset &&
           endContainer == current.startContainer &&
@@ -197,10 +193,10 @@ class Content extends React.Component {
 
     // Otherwise, set the `isUpdatingSelection` flag and update the selection.
     this.tmp.isUpdatingSelection = true
+    native.removeAllRanges()
 
     // COMPAT: IE 11 does not support Selection.extend
     if (native.extend) {
-      native.removeAllRanges()
       // COMPAT: Since the DOM range has no concept of backwards/forwards
       // we need to check and do the right thing here.
       if (isBackward) {
@@ -210,9 +206,8 @@ class Content extends React.Component {
         native.collapse(range.startContainer, range.startOffset)
         native.extend(range.endContainer, range.endOffset)
       }
-    } else if (selection.isCollapsed) {
-      // COMPAT: IE 11, to follow the cursor while typing
-      native.removeAllRanges()
+    } else {
+      // COMPAT: IE 11 does not support Selection.extend, fallback to addRange
       native.addRange(range)
     }
 
