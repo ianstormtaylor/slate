@@ -239,13 +239,7 @@ Changes.deleteAtRange = (change, range, options = {}) => {
         change.moveNodeByKey(endBlock.key, startParent.key, startParentIndex + 1)
       }
 
-      // If the selection is hanging, just remove the start block, otherwise
-      // merge the end block into it.
-      if (isHanging) {
-        change.removeNodeByKey(startBlock.key, { normalize: false })
-      } else {
-        change.mergeNodeByKey(endBlock.key, { normalize: false })
-      }
+      change.mergeNodeByKey(endBlock.key, { normalize: false })
 
       // If nested empty blocks are left over above the end block, remove them.
       if (lonely) {
