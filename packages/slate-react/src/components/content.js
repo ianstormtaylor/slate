@@ -134,7 +134,7 @@ class Content extends React.Component {
     const { isBackward } = selection
     const window = getWindow(this.element)
     const native = window.getSelection()
-    const { rangeCount } = native
+    const { rangeCount, anchorNode } = native
 
     // If both selections are blurred, do nothing.
     if (!rangeCount && selection.isBlurred) return
@@ -142,7 +142,7 @@ class Content extends React.Component {
     // If the selection has been blurred, but is still inside the editor in the
     // DOM, blur it manually.
     if (selection.isBlurred) {
-      if (!this.isInEditor(native.anchorNode)) return
+      if (!this.isInEditor(anchorNode)) return
       native.removeAllRanges()
       this.element.blur()
       debug('updateSelection', { selection, native })
@@ -179,7 +179,8 @@ class Content extends React.Component {
           startOffset == current.startOffset &&
           endContainer == current.endContainer &&
           endOffset == current.endOffset
-        ) || (
+        ) ||
+        (
           startContainer == current.endContainer &&
           startOffset == current.endOffset &&
           endContainer == current.startContainer &&
@@ -194,12 +195,20 @@ class Content extends React.Component {
     this.tmp.isUpdatingSelection = true
     native.removeAllRanges()
 
-    // COMPAT: Again, since the DOM range has no concept of backwards/forwards
-    // we need to check and do the right thing here.
-    if (isBackward) {
-      native.setBaseAndExtent(endContainer, endOffset, startContainer, startOffset)
+    // COMPAT: IE 11 does not support Selection.extend
+    if (native.extend) {
+      // COMPAT: Since the DOM range has no concept of backwards/forwards
+      // we need to check and do the right thing here.
+      if (isBackward) {
+        native.collapse(range.endContainer, range.endOffset)
+        native.extend(range.startContainer, range.startOffset)
+      } else {
+        native.collapse(range.startContainer, range.startOffset)
+        native.extend(range.endContainer, range.endOffset)
+      }
     } else {
-      native.setBaseAndExtent(startContainer, startOffset, endContainer, endOffset)
+      // COMPAT: IE 11 does not support Selection.extend, fallback to addRange
+      native.addRange(range)
     }
 
     // Scroll to the selection, in case it's out of view.
