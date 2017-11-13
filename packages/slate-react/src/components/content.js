@@ -154,7 +154,7 @@ class Content extends React.Component {
 
     // Otherwise, figure out which DOM nodes should be selected...
     const current = !!rangeCount && native.getRangeAt(0)
-    const range = findDOMRange(selection)
+    const range = findDOMRange(selection, window)
 
     if (!range) {
       logger.error('Unable to find a native DOM range from the current selection.', { selection })

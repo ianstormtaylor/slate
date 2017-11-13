@@ -8,7 +8,7 @@ import { Node } from 'slate'
  * @return {Element}
  */
 
-function findDOMNode(key) {
+function findDOMNode(key, window) {
   if (Node.isNode(key)) {
     key = key.key
   }

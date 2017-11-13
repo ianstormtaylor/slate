@@ -172,7 +172,7 @@ function AfterPlugin() {
     if (isVoid) {
       const r = range.cloneRange()
       const n = isVoidBlock ? endBlock : endInline
-      const node = findDOMNode(n)
+      const node = findDOMNode(n, window)
       r.setEndAfter(node)
       contents = r.cloneContents()
       attach = contents.childNodes[contents.childNodes.length - 1].firstChild
@@ -190,7 +190,7 @@ function AfterPlugin() {
         .size !== 0
       if (hasMarks) {
         const r = range.cloneRange()
-        const node = findDOMNode(startText)
+        const node = findDOMNode(startText, window)
         r.setStartBefore(node)
         contents = r.cloneContents()
         attach = contents.childNodes[contents.childNodes.length - 1].firstChild
@@ -329,6 +329,7 @@ function AfterPlugin() {
 
     const { value } = change
     const { document, selection } = value
+    const window = getWindow(event.target)
     let target = getEventRange(event, value)
     if (!target) return
 
@@ -396,7 +397,7 @@ function AfterPlugin() {
     // Until this is fixed in React, we dispatch a mouseup event on that
     // DOM node, since that will make it go back to normal.
     const focusNode = document.getNode(target.focusKey)
-    const el = findDOMNode(focusNode)
+    const el = findDOMNode(focusNode, window)
     if (!el) return
 
     el.dispatchEvent(new MouseEvent('mouseup', {
