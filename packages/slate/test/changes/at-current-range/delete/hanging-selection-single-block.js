@@ -22,9 +22,9 @@ export const input = (
 export const output = (
   <value>
     <document>
-      <quote>
+      <paragraph>
         <cursor />two
-      </quote>
+      </paragraph>
     </document>
   </value>
 )

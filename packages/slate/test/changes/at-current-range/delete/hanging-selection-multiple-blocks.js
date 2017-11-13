@@ -25,9 +25,9 @@ export const input = (
 export const output = (
   <value>
     <document>
-      <quote>
+      <paragraph>
         <cursor />three
-      </quote>
+      </paragraph>
     </document>
   </value>
 )
