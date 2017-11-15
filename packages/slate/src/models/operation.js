@@ -88,7 +88,6 @@ class Operation extends Record(DEFAULTS) {
     }
 
     const { type, value } = object
-    const { document } = value
     const ATTRIBUTES = OPERATION_ATTRIBUTES[type]
     const attrs = { type }
 
@@ -100,6 +99,13 @@ class Operation extends Record(DEFAULTS) {
       let v = object[key]
 
       if (v === undefined) {
+        // Skip keys for objects that should not be serialized, and are only used
+        // for providing the local-only invert behavior for the history stack.
+        if (key == 'document') continue
+        if (key == 'selection') continue
+        if (key == 'node' && type != 'insert_node') continue
+        if (key == 'target' && type == 'split_node') continue
+
         throw new Error(`\`Operation.fromJSON\` was passed a "${type}" operation without the required "${key}" attribute.`)
       }
 
@@ -138,13 +144,13 @@ class Operation extends Record(DEFAULTS) {
         if (anchorKey !== undefined) {
           v.anchorPath = anchorKey === null
             ? null
-            : document.getPath(anchorKey)
+            : value.document.getPath(anchorKey)
         }
 
         if (focusKey !== undefined) {
           v.focusPath = focusKey === null
             ? null
-            : document.getPath(focusKey)
+            : value.document.getPath(focusKey)
         }
       }
 
@@ -218,6 +224,7 @@ class Operation extends Record(DEFAULTS) {
       if (key == 'selection') continue
       if (key == 'value') continue
       if (key == 'node' && type != 'insert_node') continue
+      if (key == 'target' && type == 'split_node') continue
 
       if (key == 'mark' || key == 'marks' || key == 'node') {
         value = value.toJSON()
