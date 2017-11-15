@@ -14,6 +14,7 @@ const MODEL_TYPES = {
   INLINE: '@@__SLATE_INLINE__@@',
   LEAF: '@@__SLATE_LEAF__@@',
   MARK: '@@__SLATE_MARK__@@',
+  OPERATION: '@@__SLATE_OPERATION__@@',
   RANGE: '@@__SLATE_RANGE__@@',
   SCHEMA: '@@__SLATE_SCHEMA__@@',
   STACK: '@@__SLATE_STACK__@@',

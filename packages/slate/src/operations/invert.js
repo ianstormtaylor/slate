@@ -2,6 +2,8 @@
 import Debug from 'debug'
 import pick from 'lodash/pick'
 
+import Operation from '../models/operation'
+
 /**
  * Debug.
  *
@@ -18,6 +20,7 @@ const debug = Debug('slate:operation:invert')
  */
 
 function invertOperation(op) {
+  op = Operation.create(op)
   const { type } = op
   debug(type, op)
 
@@ -26,10 +29,8 @@ function invertOperation(op) {
    */
 
   if (type == 'insert_node') {
-    return {
-      ...op,
-      type: 'remove_node',
-    }
+    const inverse = op.set('type', 'remove_node')
+    return inverse
   }
 
   /**
@@ -37,10 +38,8 @@ function invertOperation(op) {
    */
 
   if (type == 'remove_node') {
-    return {
-      ...op,
-      type: 'insert_node',
-    }
+    const inverse = op.set('type', 'insert_node')
+    return inverse
   }
 
   /**
@@ -48,11 +47,9 @@ function invertOperation(op) {
    */
 
   if (type == 'move_node') {
-    return {
-      ...op,
-      path: op.newPath,
-      newPath: op.path,
-    }
+    const { newPath, path } = op
+    const inverse = op.set('path', newPath).set('newPath', path)
+    return inverse
   }
 
   /**
@@ -63,11 +60,9 @@ function invertOperation(op) {
     const { path } = op
     const { length } = path
     const last = length - 1
-    return {
-      ...op,
-      type: 'split_node',
-      path: path.slice(0, last).concat([path[last] - 1]),
-    }
+    const inversePath = path.slice(0, last).concat([path[last] - 1])
+    const inverse = op.set('type', 'split_node').set('path', inversePath)
+    return inverse
   }
 
   /**
@@ -78,11 +73,9 @@ function invertOperation(op) {
     const { path } = op
     const { length } = path
     const last = length - 1
-    return {
-      ...op,
-      type: 'merge_node',
-      path: path.slice(0, last).concat([path[last] + 1]),
-    }
+    const inversePath = path.slice(0, last).concat([path[last] + 1])
+    const inverse = op.set('type', 'merge_node').set('path', inversePath)
+    return inverse
   }
 
   /**
@@ -91,11 +84,10 @@ function invertOperation(op) {
 
   if (type == 'set_node') {
     const { properties, node } = op
-    return {
-      ...op,
-      node: node.merge(properties),
-      properties: pick(node, Object.keys(properties)),
-    }
+    const inverseNode = node.merge(properties)
+    const inverseProperties = pick(node, Object.keys(properties))
+    const inverse = op.set('node', inverseNode).set('properties', inverseProperties)
+    return inverse
   }
 
   /**
@@ -103,10 +95,8 @@ function invertOperation(op) {
    */
 
   if (type == 'insert_text') {
-    return {
-      ...op,
-      type: 'remove_text',
-    }
+    const inverse = op.set('type', 'remove_text')
+    return inverse
   }
 
   /**
@@ -114,10 +104,8 @@ function invertOperation(op) {
    */
 
   if (type == 'remove_text') {
-    return {
-      ...op,
-      type: 'insert_text',
-    }
+    const inverse = op.set('type', 'insert_text')
+    return inverse
   }
 
   /**
@@ -125,10 +113,8 @@ function invertOperation(op) {
    */
 
   if (type == 'add_mark') {
-    return {
-      ...op,
-      type: 'remove_mark',
-    }
+    const inverse = op.set('type', 'remove_mark')
+    return inverse
   }
 
   /**
@@ -136,10 +122,8 @@ function invertOperation(op) {
    */
 
   if (type == 'remove_mark') {
-    return {
-      ...op,
-      type: 'add_mark',
-    }
+    const inverse = op.set('type', 'add_mark')
+    return inverse
   }
 
   /**
@@ -148,11 +132,10 @@ function invertOperation(op) {
 
   if (type == 'set_mark') {
     const { properties, mark } = op
-    return {
-      ...op,
-      mark: mark.merge(properties),
-      properties: pick(mark, Object.keys(properties)),
-    }
+    const inverseMark = mark.merge(properties)
+    const inverseProperties = pick(mark, Object.keys(properties))
+    const inverse = op.set('mark', inverseMark).set('properties', inverseProperties)
+    return inverse
   }
 
   /**
@@ -160,13 +143,40 @@ function invertOperation(op) {
    */
 
   if (type == 'set_selection') {
-    const { properties, selection } = op
-    const inverse = {
-      ...op,
-      selection: { ...selection, ...properties },
-      properties: pick(selection, Object.keys(properties)),
+    const { properties, selection, value } = op
+    const { anchorPath, focusPath, ...props } = properties
+    const { document } = value
+
+    if (anchorPath !== undefined) {
+      props.anchorKey = anchorPath === null
+        ? null
+        : document.assertPath(anchorPath).key
     }
 
+    if (focusPath !== undefined) {
+      props.focusKey = focusPath === null
+        ? null
+        : document.assertPath(focusPath).key
+    }
+
+    const inverseSelection = selection.merge(props)
+    const inverseProps = pick(selection, Object.keys(props))
+
+    if (anchorPath !== undefined) {
+      inverseProps.anchorPath = inverseProps.anchorKey === null
+        ? null
+        : document.getPath(inverseProps.anchorKey)
+      delete inverseProps.anchorKey
+    }
+
+    if (focusPath !== undefined) {
+      inverseProps.focusPath = inverseProps.focusKey === null
+        ? null
+        : document.getPath(inverseProps.focusKey)
+      delete inverseProps.focusKey
+    }
+
+    const inverse = op.set('selection', inverseSelection).set('properties', inverseProps)
     return inverse
   }
 
@@ -176,18 +186,11 @@ function invertOperation(op) {
 
   if (type == 'set_value') {
     const { properties, value } = op
-    return {
-      ...op,
-      value: value.merge(properties),
-      properties: pick(value, Object.keys(properties)),
-    }
+    const inverseValue = value.merge(properties)
+    const inverseProperties = pick(value, Object.keys(properties))
+    const inverse = op.set('value', inverseValue).set('properties', inverseProperties)
+    return inverse
   }
-
-  /**
-   * Unknown.
-   */
-
-  throw new Error(`Unknown op type: "${type}".`)
 }
 
 /**

@@ -244,7 +244,10 @@ class SyncingOperationsExample extends React.Component {
    */
 
   onOneChange = (change) => {
-    const ops = change.operations.filter(o => o.type != 'set_selection' && o.type != 'set_value')
+    const ops = change.operations
+      .filter(o => o.type != 'set_selection' && o.type != 'set_value')
+      .map(o => o.toJSON())
+
     this.two.applyOperations(ops)
   }
 
@@ -255,7 +258,10 @@ class SyncingOperationsExample extends React.Component {
    */
 
   onTwoChange = (change) => {
-    const ops = change.operations.filter(o => o.type != 'set_selection' && o.type != 'set_value')
+    const ops = change.operations
+      .filter(o => o.type != 'set_selection' && o.type != 'set_value')
+      .map(o => o.toJSON())
+
     this.one.applyOperations(ops)
   }
 

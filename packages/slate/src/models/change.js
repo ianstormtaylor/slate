@@ -4,6 +4,7 @@ import pick from 'lodash/pick'
 
 import MODEL_TYPES from '../constants/model-types'
 import Changes from '../changes'
+import Operation from './operation'
 import apply from '../operations/apply'
 
 /**
@@ -67,6 +68,7 @@ class Change {
    */
 
   applyOperation(operation, options = {}) {
+    operation = Operation.create(operation)
     const { operations, flags } = this
     let { value } = this
     let { history } = value
