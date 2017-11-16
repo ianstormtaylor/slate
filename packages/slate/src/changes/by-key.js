@@ -186,6 +186,7 @@ Changes.mergeNodeByKey = (change, key, options = {}) => {
     value,
     path,
     position,
+    target: null,
   })
 
   if (normalize) {

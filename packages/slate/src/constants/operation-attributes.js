@@ -29,6 +29,7 @@ const OPERATION_ATTRIBUTES = {
     'value',
     'path',
     'position',
+    'target',
   ],
   move_node: [
     'value',

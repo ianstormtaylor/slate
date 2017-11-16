@@ -104,7 +104,6 @@ class Operation extends Record(DEFAULTS) {
         if (key == 'document') continue
         if (key == 'selection') continue
         if (key == 'node' && type != 'insert_node') continue
-        if (key == 'target' && type == 'split_node') continue
 
         throw new Error(`\`Operation.fromJSON\` was passed a "${type}" operation without the required "${key}" attribute.`)
       }
@@ -224,7 +223,6 @@ class Operation extends Record(DEFAULTS) {
       if (key == 'selection') continue
       if (key == 'value') continue
       if (key == 'node' && type != 'insert_node') continue
-      if (key == 'target' && type == 'split_node') continue
 
       if (key == 'mark' || key == 'marks' || key == 'node') {
         value = value.toJSON()
