@@ -1,9 +1,9 @@
 
 # Plugins
 
-With Slate, _all_ of your editor's logic is controlled by "plugins". 
+With Slate, _all_ of your editor's logic is controlled by "plugins".
 
-Plugins have complete control over the schema, the behaviors, and the rendering of the editor—they can add any kind of functionality they want. So much so that even the core logic of Slate is provided via two "core" plugins. 
+Plugins have complete control over the schema, the behaviors, and the rendering of the editor—they can add any kind of functionality they want. So much so that even the core logic of Slate is provided via two "core" plugins.
 
 Slate encourages you to break up code into small, reusable modules that can be shared with others, and easily reasoned about.
 
@@ -29,14 +29,14 @@ Here's a really simple plugin:
 }
 ```
 
-It focuses the editor and selects everything when it is clicked, and it blurs the editor what <kbd>esc</kbd> is pressed.
+It focuses the editor and selects everything when it is clicked, and it blurs the editor when <kbd>esc</kbd> is pressed.
 
 Notice how it's able to define a set of behaviors that work together to form a single "feature" in the editor. That's what makes Slate's plugins a powerful form of encapsulation.
 
 
 ## The Plugins "Stack"
 
-Slate's editor takes a list of plugins as one of its arguments. We refer to this list as the plugins "stack". It is very similar to "middleware" from Express or Koa. 
+Slate's editor takes a list of plugins as one of its arguments. We refer to this list as the plugins "stack". It is very similar to "middleware" from Express or Koa.
 
 ```js
 const plugins = [
@@ -49,7 +49,7 @@ const plugins = [
 />
 ```
 
-When the editor needs to handle a DOM event, or to decide what to render, it will loop through the plugins stack, invoking each plugin in turn. Plugins can choose to handle the request, in which case the editor will break out of the loop. Or they can ignore it, and they will be skipped as the editor proceeds to the next plugin in the stack.
+When the editor needs to handle a DOM event, or decide what to render, it will loop through the plugins stack, invoking each plugin in turn. Plugins can choose to handle the request, in which case the editor will break out of the loop. Or they can ignore it, and they will be skipped as the editor proceeds to the next plugin in the stack.
 
 Because of this looping, plugins are **order-sensitive**! This is very important. The earlier in the stack, the more preference the plugin has, since it can react before the others after it. If two plugins both try to handle the same event, the earlier plugin will "win".
 
@@ -58,7 +58,7 @@ Because of this looping, plugins are **order-sensitive**! This is very important
 
 If you put Slate on the page without adding any of your own plugins, it will still behave like you'd expect a rich-text editor to. That's because it has its own "core" logic. And that core logic is implemented with its own core plugins.
 
-The core plugins doesn't have any assumptions about your schema, or what types of formatting you want to allow. But they do define the common editing behaviors like splitting the current block when <kbd>enter</kbd> is pressed, or inserting a string of text when the user pastes from their clipboard.
+The core plugins doesn't have any assumptions about your schema, or what types of formatting you want to allow. But they do define common editing behaviors like splitting the current block when <kbd>enter</kbd> is pressed, or inserting a string of text when the user pastes from their clipboard.
 
 These are behaviors that all rich-text editors exhibit, and that don't make sense for userland to have to re-invent for every new editor.
 
@@ -71,7 +71,7 @@ _To learn more, check out the [Core Plugin reference](../reference/slate-react/c
 
 ## The "Editor" Plugin
 
-If you've read through the [`<Editor>` reference](../reference/slate-react/editor.md) you'll notice that the editor itself has handler like `onKeyDown`, `onClick`, etc. just like plugins.
+If you've read through the [`<Editor>` reference](../reference/slate-react/editor.md) you'll notice that the editor itself has handlers like `onKeyDown`, `onClick`, etc. just like plugins.
 
 ```js
 const plugins = [
@@ -138,7 +138,7 @@ const plugins = [
 ]
 ```
 
-These types of plugins are critical to keeping your code maintainable. And they're good candidates for open-sourcing for others to use. A few examples of plugins like this in the wild are [`slate-auto-replace`](https://github.com/ianstormtaylor/slate-auto-replace), [`slate-prism`](https://github.com/GitbookIO/slate-prism), [`slate-collapse-on-escape`](https://github.com/ianstormtaylor/slate-collapse-on-escape), etc. 
+These types of plugins are critical to keeping your code maintainable. And they're good candidates for open-sourcing for others to use. A few examples of plugins like this in the wild are [`slate-auto-replace`](https://github.com/ianstormtaylor/slate-auto-replace), [`slate-prism`](https://github.com/GitbookIO/slate-prism), [`slate-collapse-on-escape`](https://github.com/ianstormtaylor/slate-collapse-on-escape), etc.
 
 There's almost no piece of logic too small to abstract out and share, as long as it's reusable.
 
@@ -146,11 +146,11 @@ But hotkey binding logic by itself isn't a "feature". It's just a small helper t
 
 ### Feature Plugins
 
-Feature plugins are much larger in scope, and serve to define an entire series of behaviors that make up a single "feature" in your editor. They're not as concrete as util plugins, but they make reasoning about complex editors much simple.
+Feature plugins are much larger in scope, and serve to define an entire series of behaviors that make up a single "feature" in your editor. They're not as concrete as util plugins, but they make reasoning about complex editors much simpler.
 
 For example, you maybe decide you want to allow **bold** formatting in your editor. To do that, you need a handful of different behaviors.
 
-You could just have a single, long `plugins.js` file that contained all of the plugins for all of the features in your editor. But figuring out what was going on in that file would get confusing very quickly. 
+You could just have a single, long `plugins.js` file that contained all of the plugins for all of the features in your editor. But figuring out what was going on in that file would get confusing very quickly.
 
 Instead, it can help to split up your plugins into features. So you might have a `bold.js`, `italic.js`, `images.js`, etc. Your bold plugin might look like...
 
@@ -223,7 +223,7 @@ That said, there might be another type of plugins that kind of straddle the line
 
 These are plugins that bundle up a set of logic, similar to how a feature might, but in a way that is re-usable across codebases. Some examples of these would be [`slate-edit-code`](https://github.com/GitbookIO/slate-edit-code), [`slate-edit-list`](https://github.com/GitbookIO/slate-edit-list), [`slate-edit-table`](https://github.com/GitbookIO/slate-edit-table), etc.
 
-Framework plugins will often expose objects with `changes`, `helpers` and `plugins` instead of simple array. Or, they may choose to just augment a single returned plugin object with some of the other exports.
+Framework plugins will often expose objects with `changes`, `helpers` and `plugins` instead of a simple array. Or, they may choose to just augment a single returned plugin object with some of the other exports.
 
 You'll often want to encapsulate framework plugins in your own feature plugins, but they can go a long way in terms of reducing your codebase size.
 
@@ -236,7 +236,7 @@ If you think of another good pattern, feel free to pull request it!
 
 ### Write Plugins as Functions
 
-You should always write plugins as functions that take `options`. 
+You should always write plugins as functions that take `options`.
 
 ```js
 function YourPlugin(options) {
@@ -272,7 +272,7 @@ function YourBoldPlugin(options) {
 
 ### Accept Change Functions
 
-It's common for a helper plugins to want to make some change based on an event that is triggered by the user. For example, when you want to write a plugin that adds a mark when a hotkey is pressed. 
+It's common for helper plugins to want to make some change based on an event that is triggered by the user. For example, when you want to write a plugin that adds a mark when a hotkey is pressed.
 
 If you write this in the naive way as taking a mark `type` string, users won't be able to add data associated with the mark in more complex cases. And if you accept a string or an object, what happens if the user wants to actually add two marks at once, or perform some other piece of logic. You'll have to keep adding esoteric options which make the plugin hard to maintain.
 
@@ -313,4 +313,3 @@ const plugins = [
   })
 ]
 ```
-

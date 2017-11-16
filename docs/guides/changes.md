@@ -14,7 +14,7 @@ Changes in Slate are designed to prioritize expressiveness above almost all else
 
 If you're building a powerful editor, it's going to be somewhat complex, and you're going to be writing code to perform all different kinds of programmatic changes. You'll be removing nodes, inserting fragments, moving the selection around, etc.
 
-And if the API for changes was verbose, or if required lots of in between steps to be continually performed, your code would balloon to be impossible to understand very quickly.
+And if the API for changes was verbose, or if it required lots of in between steps to be continually performed, your code would balloon to be impossible to understand very quickly.
 
 To solve this, Slate has very expressive, chainable changes. Like this:
 
@@ -33,9 +33,9 @@ change
 
 Hopefully from reading that you can discern that those changes result in... the entire document's content being selected and deleted, some text bring written, a word being bolded, and finally an image block and a paragraph block being added.
 
-Of course you're not usually going to chain that much. 
+Of course you're not usually going to chain that much.
 
-Point is, you can get pretty expressive in just a few lines of code. 
+Point is, you can get pretty expressive in just a few lines of code.
 
 That way, when you're scanning to see what behaviors are being triggered, you can understand your code easily. You don't have to sit there and try to parse out a bunch of interim variables to figure out what you're trying to achieve.
 
@@ -89,7 +89,7 @@ function onKeyDown(event, change, editor) {
 }
 ```
 
-Any change methods you call will be applied, and when the event handler stack is finished resolving, the editor will automatically update with those changes. 
+Any change methods you call will be applied, and when the event handler stack is finished resolving, the editor will automatically update with those changes.
 
 ### 2. From Custom Node Components
 
@@ -107,8 +107,8 @@ class Image extends React.Component {
   }
 
   render() {
-    <img 
-      {...this.props.attributes} 
+    <img
+      {...this.props.attributes}
       onClick={this.onClick}
     />
   }
@@ -178,7 +178,7 @@ function insertImage(change, src) {
 }
 ```
 
-Notice how rewriting that image inserting logic multiple times without having it encapsulated in a single function would get tedious. Now with those change functions define, you can reuse them!
+Notice how rewriting that image inserting logic multiple times without having it encapsulated in a single function would get tedious. Now with those change functions defined, you can reuse them!
 
 But sadly you can't chain with those functions directly, since `change` objects don't actually know about them. Instead, you use the `.call()` method:
 
