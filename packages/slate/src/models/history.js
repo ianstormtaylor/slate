@@ -2,7 +2,7 @@
 import Debug from 'debug'
 import isEqual from 'lodash/isEqual'
 import isPlainObject from 'is-plain-object'
-import { Record, Stack } from 'immutable'
+import { List, Record, Stack } from 'immutable'
 
 import MODEL_TYPES from '../constants/model-types'
 
@@ -113,7 +113,7 @@ class History extends Record(DEFAULTS) {
     let { undos, redos } = history
     let { merge, skip } = options
     const prevBatch = undos.peek()
-    const prevOperation = prevBatch && prevBatch[prevBatch.length - 1]
+    const prevOperation = prevBatch && prevBatch.last()
 
     if (skip == null) {
       skip = shouldSkip(operation, prevOperation)
@@ -131,15 +131,14 @@ class History extends Record(DEFAULTS) {
 
     // If the `merge` flag is true, add the operation to the previous batch.
     if (merge && prevBatch) {
-      const batch = prevBatch.slice()
-      batch.push(operation)
+      const batch = prevBatch.push(operation)
       undos = undos.pop()
       undos = undos.push(batch)
     }
 
     // Otherwise, create a new batch with the operation.
     else {
-      const batch = [operation]
+      const batch = new List([operation])
       undos = undos.push(batch)
     }
 

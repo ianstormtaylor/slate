@@ -2,6 +2,7 @@
 import Debug from 'debug'
 import isPlainObject from 'is-plain-object'
 import pick from 'lodash/pick'
+import { List } from 'immutable'
 
 import MODEL_TYPES from '../constants/model-types'
 import Changes from '../changes'
@@ -45,7 +46,7 @@ class Change {
   constructor(attrs) {
     const { value } = attrs
     this.value = value
-    this.operations = []
+    this.operations = new List()
     this.flags = pick(attrs, ['merge', 'save'])
   }
 
@@ -63,7 +64,7 @@ class Change {
    * Apply an `operation` to the current value, saving the operation to the
    * history if needed.
    *
-   * @param {Object} operation
+   * @param {Operation|Object} operation
    * @param {Object} options
    * @return {Change}
    */
@@ -86,7 +87,7 @@ class Change {
 
     // Derive the default option values.
     const {
-      merge = operations.length == 0 ? null : true,
+      merge = operations.size == 0 ? null : true,
       save = true,
       skip = null,
     } = options
@@ -103,14 +104,14 @@ class Change {
 
     // Update the mutable change object.
     this.value = value
-    this.operations.push(operation)
+    this.operations = operations.push(operation)
     return this
   }
 
   /**
    * Apply a series of `operations` to the current value.
    *
-   * @param {Array} operations
+   * @param {Array|List} operations
    * @param {Object} options
    * @return {Change}
    */

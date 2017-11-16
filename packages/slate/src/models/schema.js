@@ -189,9 +189,9 @@ class Schema extends Record(DEFAULTS) {
     return (change) => {
       debug(`normalizing`, { reason, context })
       const { rule } = context
-      const count = change.operations.length
+      const { size } = change.operations
       if (rule.normalize) rule.normalize(change, reason, context)
-      if (change.operations.length > count) return
+      if (change.operations.size > size) return
       this.normalize(change, reason, context)
     }
   }

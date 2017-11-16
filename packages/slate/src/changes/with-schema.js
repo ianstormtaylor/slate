@@ -76,7 +76,7 @@ function normalizeNodeAndChildren(change, node, schema) {
 
   // While there is still a child key that hasn't been normalized yet...
   while (keys.length) {
-    const ops = change.operations.length
+    const { size } = change.operations
     let key
 
     // PERF: use a mutable set here since we'll be add to it a lot.
@@ -95,7 +95,7 @@ function normalizeNodeAndChildren(change, node, schema) {
 
     // PERF: Only re-find the node and re-normalize any new children if
     // operations occured that might have changed it.
-    if (change.operations.length != ops) {
+    if (change.operations.size > size) {
       node = refindNode(change, node)
 
       // Add any new children back onto the stack.
