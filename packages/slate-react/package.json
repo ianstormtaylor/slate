@@ -1,7 +1,7 @@
 {
   "name": "slate-react",
   "description": "A set of React components for building completely customizable rich-text editors.",
-  "version": "0.10.13",
+  "version": "0.10.14",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
   "main": "./lib/index.js",
@@ -16,23 +16,23 @@
     "react-immutable-proptypes": "^2.1.0",
     "react-portal": "^3.1.0",
     "selection-is-backward": "^1.0.0",
-    "slate-base64-serializer": "^0.2.10",
-    "slate-dev-logger": "^0.1.34",
-    "slate-plain-serializer": "^0.4.8",
-    "slate-prop-types": "^0.4.8"
+    "slate-base64-serializer": "^0.2.11",
+    "slate-dev-logger": "^0.1.35",
+    "slate-plain-serializer": "^0.4.9",
+    "slate-prop-types": "^0.4.9"
   },
   "peerDependencies": {
     "react": "^0.14.0 || ^15.0.0 || ^16.0.0",
     "react-dom": "^0.14.0 || ^15.0.0 || ^16.0.0",
-    "slate": "^0.31.0"
+    "slate": "^0.31.1"
   },
   "devDependencies": {
     "babel-cli": "^6.10.1",
     "browserify": "^13.0.1",
     "mocha": "^2.5.3",
-    "slate": "^0.31.0",
-    "slate-hyperscript": "^0.4.8",
-    "slate-simulator": "^0.4.8",
+    "slate": "^0.31.1",
+    "slate-hyperscript": "^0.4.9",
+    "slate-simulator": "^0.4.9",
     "uglify-js": "^2.7.0"
   },
   "scripts": {
