@@ -39,7 +39,7 @@ const schema = {
 
 > 🤖 Internally, Slate instantiates schemas as immutable `Schema` models, but you don't have to worry about that. In user-land schemas can always be defined as plain Javascript objects, and you can let Slate handle the rest.
 
-Hopefully just by reading this definition you'll understand what kinds of blocks are allowed in the document and what properties they can have—schemas are designed to prioritize legibility. 
+Hopefully just by reading this definition you'll understand what kinds of blocks are allowed in the document and what properties they can have—schemas are designed to prioritize legibility.
 
 This schema defines a document that only allows `paragraph` and `image` blocks. In the case of `paragraph` blocks, they can only contain text nodes. And in the case of `image` blocks, they are always void nodes with a `data.src` property that is a URL. Simple enough, right?
 
@@ -76,7 +76,7 @@ const schema = {
 
 That's an example of defining your own custom `normalize` option for the document validation. If the invalid reason is `child_type_invalid`, it will set the child to be a `paragraph`.
 
-When Slate discovers and invalid child, it will first check to see if your custom normalizer handles that case, and if it does Slate won't do any of its default behavior. That way you can opt-in to customizing the normalization logic for specific cases, without having to re-implement all of the defaults yourself.
+When Slate discovers an invalid child, it will first check to see if your custom normalizer handles that case, and if it does Slate won't do any of its default behavior. That way you can opt-in to customizing the normalization logic for specific cases, without having to re-implement all of the defaults yourself.
 
 This gives you the best of both worlds. You can write simple, terse, declarative validation rules that can be highly optimized. But you can still define fine-grained, imperative normalization logic for when invalid states occur.
 
@@ -89,7 +89,7 @@ Sometimes though, the declarative validation syntax isn't fine-grained enough to
 
 > 🤖 Actually, under the covers the declarative schemas are all translated into `validateNode` functions too!
 
-When you define a `validateNode` function, you either return nothing if ths node's already valid, or you return a normalizer function that will make the node valid if it isn't. Here's an example:
+When you define a `validateNode` function, you either return nothing if the node's already valid, or you return a normalizer function that will make the node valid if it isn't. Here's an example:
 
 ```js
 function validateNode(node) {

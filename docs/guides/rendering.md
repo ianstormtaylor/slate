@@ -3,14 +3,14 @@
 
 One of the best parts of Slate is that it's built with React, so it fits right into your existing application. It doesn't re-invent its own view layer that you have to learn. It tries to keep everything as React-y as possible.
 
-To that end, Slate gives you control over the rendering behavior of every node and mark in your document, any placeholders you want to render, and even the top-level editor itself. 
+To that end, Slate gives you control over the rendering behavior of every node and mark in your document, any placeholders you want to render, and even the top-level editor itself.
 
 You can define these behaviors by passing `props` into the editor, or you can define them in Slate plugins.
 
 
 ## Nodes & Marks
 
-Using custom components for the nodes and marks is the most common rendering need. Slate makes this easy to do, you just define a `renderNode` function. 
+Using custom components for the nodes and marks is the most common rendering need. Slate makes this easy to do, you just define a `renderNode` function.
 
 The function is called with the node's props, including `props.node` which is the node itself. You can use these to determine what to render. For example, you can render nodes using simple HTML elements:
 
@@ -29,9 +29,9 @@ function renderNode(props) {
 }
 ```
 
-> 🤖 Be sure to mix in `props.attributes` and render `props.children` in your node components! The attributes required for utilities like Slate's `findDOMNode`, and the children are the actual text content of your nodes.
+> 🤖 Be sure to mix in `props.attributes` and render `props.children` in your node components! The attributes are required for utilities like Slate's `findDOMNode`, and the children are the actual text content of your nodes.
 
-Or course, you don't have to use simple HTML elements, you can use your own custom React components too:
+You don't have to use simple HTML elements, you can use your own custom React components too:
 
 ```js
 function renderNode(props) {
@@ -99,7 +99,7 @@ function renderPlaceholder(props) {
   if (node.text != '') return
 
   return (
-    <span 
+    <span
       contenteditable={false}
       style={{ display: 'inline-block', width: '0', whiteSpace: 'nowrap', opacity: '0' }}
     >
@@ -119,7 +119,7 @@ That will render a simple placeholder element inside all of the your `caption` b
 
 ## The Editor Itself
 
-Not only can you control the rendering behavior of the components inside the editor, but you can also control the rendering of the editor itself. 
+Not only can you control the rendering behavior of the components inside the editor, but you can also control the rendering of the editor itself.
 
 This sounds weird, but it can be pretty useful if you want to render additional top-level elements from inside a plugin. To do so, you use the `renderEditor` function:
 
@@ -143,6 +143,6 @@ function renderEditor(props) {
 
 Here we're rendering a small word count number underneath all of the content of the editor. Whenever you change the content of the editor, `renderEditor` will be called, and the word count will be updated.
 
-This is very similar to how higher-order components work! Except it allows each plugin in Slate's plugin stack to add to wrap the editor's children.
+This is very similar to how higher-order components work! Except it allows each plugin in Slate's plugin stack to wrap the editor's children.
 
 > 🤖 Be sure to remember to render `children` in your `renderEditor` functions, because that contains the editor's own elements!
