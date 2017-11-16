@@ -38,29 +38,12 @@ Changes.select = (change, properties, options = {}) => {
     props[k] = properties[k]
   }
 
-  // Resolve the selection keys into paths.
-  sel.anchorPath = sel.anchorKey == null ? null : document.getPath(sel.anchorKey)
-  delete sel.anchorKey
-
-  if (props.anchorKey) {
-    props.anchorPath = props.anchorKey == null ? null : document.getPath(props.anchorKey)
-    delete props.anchorKey
-  }
-
-  sel.focusPath = sel.focusKey == null ? null : document.getPath(sel.focusKey)
-  delete sel.focusKey
-
-  if (props.focusKey) {
-    props.focusPath = props.focusKey == null ? null : document.getPath(props.focusKey)
-    delete props.focusKey
-  }
-
   // If the selection moves, clear any marks, unless the new selection
   // properties change the marks in some way.
   const moved = [
-    'anchorPath',
+    'anchorKey',
     'anchorOffset',
-    'focusPath',
+    'focusKey',
     'focusOffset',
   ].some(p => props.hasOwnProperty(p))
 
@@ -76,6 +59,7 @@ Changes.select = (change, properties, options = {}) => {
   // Apply the operation.
   change.applyOperation({
     type: 'set_selection',
+    value,
     properties: props,
     selection: sel,
   }, snapshot ? { skip: false, merge: false } : {})

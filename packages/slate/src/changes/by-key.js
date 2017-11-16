@@ -56,6 +56,7 @@ Changes.addMarkByKey = (change, key, offset, length, mark, options = {}) => {
 
     operations.push({
       type: 'add_mark',
+      value,
       path,
       offset: start,
       length: end - start,
@@ -113,6 +114,7 @@ Changes.insertNodeByKey = (change, key, index, node, options = {}) => {
 
   change.applyOperation({
     type: 'insert_node',
+    value,
     path: [...path, index],
     node,
   })
@@ -144,6 +146,7 @@ Changes.insertTextByKey = (change, key, offset, text, marks, options = {}) => {
 
   change.applyOperation({
     type: 'insert_text',
+    value,
     path,
     offset,
     text,
@@ -180,6 +183,7 @@ Changes.mergeNodeByKey = (change, key, options = {}) => {
 
   change.applyOperation({
     type: 'merge_node',
+    value,
     path,
     position,
   })
@@ -211,6 +215,7 @@ Changes.moveNodeByKey = (change, key, newKey, newIndex, options = {}) => {
 
   change.applyOperation({
     type: 'move_node',
+    value,
     path,
     newPath: [...newPath, newIndex],
   })
@@ -265,6 +270,7 @@ Changes.removeMarkByKey = (change, key, offset, length, mark, options = {}) => {
 
     operations.push({
       type: 'remove_mark',
+      value,
       path,
       offset: start,
       length: end - start,
@@ -320,6 +326,7 @@ Changes.removeNodeByKey = (change, key, options = {}) => {
 
   change.applyOperation({
     type: 'remove_node',
+    value,
     path,
     node,
   })
@@ -371,6 +378,7 @@ Changes.removeTextByKey = (change, key, offset, length, options = {}) => {
 
     removals.push({
       type: 'remove_text',
+      value,
       path,
       offset: start,
       text: string,
@@ -434,6 +442,7 @@ Changes.setMarkByKey = (change, key, offset, length, mark, properties, options =
 
   change.applyOperation({
     type: 'set_mark',
+    value,
     path,
     offset,
     length,
@@ -467,6 +476,7 @@ Changes.setNodeByKey = (change, key, properties, options = {}) => {
 
   change.applyOperation({
     type: 'set_node',
+    value,
     path,
     node,
     properties,
@@ -495,6 +505,7 @@ Changes.splitNodeByKey = (change, key, position, options = {}) => {
 
   change.applyOperation({
     type: 'split_node',
+    value,
     path,
     position,
     target,

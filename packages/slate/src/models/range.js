@@ -89,11 +89,13 @@ class Range extends Record(DEFAULTS) {
       const props = {}
       if ('anchorKey' in attrs) props.anchorKey = attrs.anchorKey
       if ('anchorOffset' in attrs) props.anchorOffset = attrs.anchorOffset
+      if ('anchorPath' in attrs) props.anchorPath = attrs.anchorPath
       if ('focusKey' in attrs) props.focusKey = attrs.focusKey
       if ('focusOffset' in attrs) props.focusOffset = attrs.focusOffset
+      if ('focusPath' in attrs) props.focusPath = attrs.focusPath
       if ('isBackward' in attrs) props.isBackward = attrs.isBackward
       if ('isFocused' in attrs) props.isFocused = attrs.isFocused
-      if ('marks' in attrs) props.marks = attrs.marks
+      if ('marks' in attrs) props.marks = attrs.marks == null ? null : Mark.createSet(attrs.marks)
       return props
     }
 

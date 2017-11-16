@@ -1,8 +1,7 @@
 
 import Debug from 'debug'
 
-import Node from '../models/node'
-import Mark from '../models/mark'
+import Operation from '../models/operation'
 
 /**
  * Debug.
@@ -24,13 +23,12 @@ const APPLIERS = {
    * Add mark to text at `offset` and `length` in node by `path`.
    *
    * @param {Value} value
-   * @param {Object} operation
+   * @param {Operation} operation
    * @return {Value}
    */
 
   add_mark(value, operation) {
-    const { path, offset, length } = operation
-    const mark = Mark.create(operation.mark)
+    const { path, offset, length, mark } = operation
     let { document } = value
     let node = document.assertPath(path)
     node = node.addMark(offset, length, mark)
@@ -43,13 +41,12 @@ const APPLIERS = {
    * Insert a `node` at `index` in a node by `path`.
    *
    * @param {Value} value
-   * @param {Object} operation
+   * @param {Operation} operation
    * @return {Value}
    */
 
   insert_node(value, operation) {
-    const { path } = operation
-    const node = Node.create(operation.node)
+    const { path, node } = operation
     const index = path[path.length - 1]
     const rest = path.slice(0, -1)
     let { document } = value
@@ -64,16 +61,12 @@ const APPLIERS = {
    * Insert `text` at `offset` in node by `path`.
    *
    * @param {Value} value
-   * @param {Object} operation
+   * @param {Operation} operation
    * @return {Value}
    */
 
   insert_text(value, operation) {
-    const { path, offset, text } = operation
-
-    let { marks } = operation
-    if (Array.isArray(marks)) marks = Mark.createSet(marks)
-
+    const { path, offset, text, marks } = operation
     let { document, selection } = value
     const { anchorKey, focusKey, anchorOffset, focusOffset } = selection
     let node = document.assertPath(path)
@@ -98,7 +91,7 @@ const APPLIERS = {
    * Merge a node at `path` with the previous node.
    *
    * @param {Value} value
-   * @param {Object} operation
+   * @param {Operation} operation
    * @return {Value}
    */
 
@@ -146,7 +139,7 @@ const APPLIERS = {
    * Move a node by `path` to `newPath`.
    *
    * @param {Value} value
-   * @param {Object} operation
+   * @param {Operation} operation
    * @return {Value}
    */
 
@@ -202,13 +195,12 @@ const APPLIERS = {
    * Remove mark from text at `offset` and `length` in node by `path`.
    *
    * @param {Value} value
-   * @param {Object} operation
+   * @param {Operation} operation
    * @return {Value}
    */
 
   remove_mark(value, operation) {
-    const { path, offset, length } = operation
-    const mark = Mark.create(operation.mark)
+    const { path, offset, length, mark } = operation
     let { document } = value
     let node = document.assertPath(path)
     node = node.removeMark(offset, length, mark)
@@ -221,7 +213,7 @@ const APPLIERS = {
    * Remove a node by `path`.
    *
    * @param {Value} value
-   * @param {Object} operation
+   * @param {Operation} operation
    * @return {Value}
    */
 
@@ -230,6 +222,7 @@ const APPLIERS = {
     let { document, selection } = value
     const { startKey, endKey } = selection
     const node = document.assertPath(path)
+
     // If the selection is set, check to see if it needs to be updated.
     if (selection.isSet) {
       const hasStartNode = node.hasNode(startKey)
@@ -282,7 +275,7 @@ const APPLIERS = {
    * Remove `text` at `offset` in node by `path`.
    *
    * @param {Value} value
-   * @param {Object} operation
+   * @param {Operation} operation
    * @return {Value}
    */
 
@@ -294,7 +287,6 @@ const APPLIERS = {
     const { anchorKey, focusKey, anchorOffset, focusOffset } = selection
     let node = document.assertPath(path)
 
-    // Update the selection.
     if (anchorKey == node.key && anchorOffset >= rangeOffset) {
       selection = selection.moveAnchor(-length)
     }
@@ -313,13 +305,12 @@ const APPLIERS = {
    * Set `properties` on mark on text at `offset` and `length` in node by `path`.
    *
    * @param {Value} value
-   * @param {Object} operation
+   * @param {Operation} operation
    * @return {Value}
    */
 
   set_mark(value, operation) {
-    const { path, offset, length, properties } = operation
-    const mark = Mark.create(operation.mark)
+    const { path, offset, length, mark, properties } = operation
     let { document } = value
     let node = document.assertPath(path)
     node = node.updateMark(offset, length, mark, properties)
@@ -332,7 +323,7 @@ const APPLIERS = {
    * Set `properties` on a node by `path`.
    *
    * @param {Value} value
-   * @param {Object} operation
+   * @param {Operation} operation
    * @return {Value}
    */
 
@@ -340,11 +331,6 @@ const APPLIERS = {
     const { path, properties } = operation
     let { document } = value
     let node = document.assertPath(path)
-
-    // Delete properties that are not allowed to be updated.
-    delete properties.nodes
-    delete properties.key
-
     node = node.merge(properties)
     document = document.updateNode(node)
     value = value.set('document', document)
@@ -355,33 +341,24 @@ const APPLIERS = {
    * Set `properties` on the selection.
    *
    * @param {Value} value
-   * @param {Object} operation
+   * @param {Operation} operation
    * @return {Value}
    */
 
   set_selection(value, operation) {
-    const properties = { ...operation.properties }
+    const { properties } = operation
+    const { anchorPath, focusPath, ...props } = properties
     let { document, selection } = value
 
-    if (properties.marks != null) {
-      properties.marks = Mark.createSet(properties.marks)
+    if (anchorPath !== undefined) {
+      props.anchorKey = anchorPath === null ? null : document.assertPath(anchorPath).key
     }
 
-    if (properties.anchorPath !== undefined) {
-      properties.anchorKey = properties.anchorPath === null
-        ? null
-        : document.assertPath(properties.anchorPath).key
-      delete properties.anchorPath
+    if (focusPath !== undefined) {
+      props.focusKey = focusPath === null ? null : document.assertPath(focusPath).key
     }
 
-    if (properties.focusPath !== undefined) {
-      properties.focusKey = properties.focusPath === null
-        ? null
-        : document.assertPath(properties.focusPath).key
-      delete properties.focusPath
-    }
-
-    selection = selection.merge(properties)
+    selection = selection.merge(props)
     selection = selection.normalize(document)
     value = value.set('selection', selection)
     return value
@@ -391,18 +368,12 @@ const APPLIERS = {
    * Set `properties` on `value`.
    *
    * @param {Value} value
-   * @param {Object} operation
+   * @param {Operation} operation
    * @return {Value}
    */
 
   set_value(value, operation) {
     const { properties } = operation
-
-    // Delete properties that are not allowed to be updated.
-    delete properties.document
-    delete properties.selection
-    delete properties.history
-
     value = value.merge(properties)
     return value
   },
@@ -411,7 +382,7 @@ const APPLIERS = {
    * Split a node by `path` at `offset`.
    *
    * @param {Value} value
-   * @param {Object} operation
+   * @param {Operation} operation
    * @return {Value}
    */
 
@@ -462,11 +433,12 @@ const APPLIERS = {
  * Apply an `operation` to a `value`.
  *
  * @param {Value} value
- * @param {Object} operation
+ * @param {Object|Operation} operation
  * @return {Value} value
  */
 
 function applyOperation(value, operation) {
+  operation = Operation.create(operation)
   const { type } = operation
   const apply = APPLIERS[type]
 

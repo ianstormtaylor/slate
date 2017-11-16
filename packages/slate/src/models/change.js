@@ -1,9 +1,11 @@
 
 import Debug from 'debug'
+import isPlainObject from 'is-plain-object'
 import pick from 'lodash/pick'
 
 import MODEL_TYPES from '../constants/model-types'
 import Changes from '../changes'
+import Operation from './operation'
 import apply from '../operations/apply'
 
 /**
@@ -70,6 +72,13 @@ class Change {
     const { operations, flags } = this
     let { value } = this
     let { history } = value
+
+    // Add in the current `value` in case the operation was serialized.
+    if (isPlainObject(operation)) {
+      operation = { ...operation, value }
+    }
+
+    operation = Operation.create(operation)
 
     // Default options to the change-level flags, this allows for setting
     // specific options for all of the operations of a given change.

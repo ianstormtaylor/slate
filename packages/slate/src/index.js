@@ -9,6 +9,7 @@ import Inline from './models/inline'
 import Leaf from './models/leaf'
 import Mark from './models/mark'
 import Node from './models/node'
+import Operation from './models/operation'
 import Operations from './operations'
 import Range from './models/range'
 import Schema from './models/schema'
@@ -34,6 +35,7 @@ export {
   Leaf,
   Mark,
   Node,
+  Operation,
   Operations,
   Range,
   Schema,
@@ -55,6 +57,7 @@ export default {
   Leaf,
   Mark,
   Node,
+  Operation,
   Operations,
   Range,
   Schema,
