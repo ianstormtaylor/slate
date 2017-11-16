@@ -7,6 +7,20 @@ This document maintains a list of changes to the `slate` package with each new v
 ---
 
 
+### `0.31.0` — November 16, 2017
+
+###### BREAKING
+
+- **The operation objects in Slate are now immutable records.** Previously they were native, mutable Javascript objects. Now, there's a new immutable `Operation` model in Slate, ensuring that all of the data inside `Value` objects are immutable. And it allows for easy serialization of operations using `operation.toJSON()` for when sending them between editors. This should not affect most users, unless you are relying on changing the values of the low-level Slate operations (simply reading them is fine).
+
+###### NEW
+
+- **Added a new `Operation` model.** This model is used to store operations for the history stack, and (de)serializes them in a consistent way for collaborative editing use cases.
+
+
+---
+
+
 ### `0.30.0` — October 27, 2017
 
 ###### BREAKING
