@@ -71,11 +71,10 @@ function scrollToSelection(selection) {
     xOffset = pageXOffset
   } else {
     const { offsetWidth, offsetHeight, scrollTop, scrollLeft } = scroller
-    const scrollerRect = scroller.getBoundingClientRect()
     width = offsetWidth
     height = offsetHeight
-    yOffset = scrollTop - scrollerRect.top
-    xOffset = scrollLeft - scrollerRect.left
+    yOffset = scrollTop
+    xOffset = scrollLeft
   }
 
   const top = (backward ? rect.top : rect.bottom) + yOffset
