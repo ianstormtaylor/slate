@@ -143,7 +143,7 @@ class History extends Record(DEFAULTS) {
     }
 
     // Constrain the history to 100 entries for memory's sake.
-    if (undos.length > 100) {
+    if (undos.size > 100) {
       undos = undos.take(100)
     }
 
