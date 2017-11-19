@@ -4,21 +4,21 @@
 import h from '../../test/helpers/h'
 import { __clear } from '../../lib/utils/memoize'
 
-export default function ({ state, next }) {
-  state.document.updateNode(next)
+export default function ({ value, next }) {
+  value.document.updateNode(next)
 }
 
-export function before(state) {
-  const texts = state.document.getTexts()
+export function before(value) {
+  const texts = value.document.getTexts()
   const { size } = texts
   const text = texts.get(Math.round(size / 2))
   const next = text.insertText(0, 'some text')
   __clear()
-  return { state, next }
+  return { value, next }
 }
 
 export const input = (
-  <state>
+  <value>
     <document>
       {Array.from(Array(10)).map(() => (
         <quote>
@@ -30,5 +30,5 @@ export const input = (
         </quote>
       ))}
     </document>
-  </state>
+  </value>
 )

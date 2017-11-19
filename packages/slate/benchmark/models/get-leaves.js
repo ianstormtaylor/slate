@@ -8,14 +8,14 @@ export default function (text) {
   text.getLeaves()
 }
 
-export function before(state) {
-  const text = state.document.getFirstText()
+export function before(value) {
+  const text = value.document.getFirstText()
   __clear()
   return text
 }
 
 export const input = (
-  <state>
+  <value>
     <document>
       {Array.from(Array(10)).map(() => (
         <quote>
@@ -27,5 +27,5 @@ export const input = (
         </quote>
       ))}
     </document>
-  </state>
+  </value>
 )

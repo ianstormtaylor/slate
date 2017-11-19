@@ -6,13 +6,13 @@ import ReactDOM from 'react-dom/server'
 import h from '../../test/helpers/h'
 import { Editor } from '../..'
 
-export default function (state) {
-  const el = React.createElement(Editor, { state })
+export default function (value) {
+  const el = React.createElement(Editor, { value })
   ReactDOM.renderToStaticMarkup(el)
 }
 
 export const input = (
-  <state>
+  <value>
     <document>
       {Array.from(Array(10)).map(() => (
         <quote>
@@ -24,5 +24,5 @@ export const input = (
         </quote>
       ))}
     </document>
-  </state>
+  </value>
 )

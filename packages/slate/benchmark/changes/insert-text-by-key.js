@@ -8,15 +8,15 @@ export default function ({ change, text }) {
   change.insertTextByKey(text.key, 0, 'a')
 }
 
-export function before(state) {
-  const change = state.change()
-  const text = state.document.getLastText()
+export function before(value) {
+  const change = value.change()
+  const text = value.document.getLastText()
   __clear()
   return { change, text }
 }
 
 export const input = (
-  <state>
+  <value>
     <document>
       {Array.from(Array(10)).map((v, i) => (
         <quote>
@@ -29,5 +29,5 @@ export const input = (
         </quote>
       ))}
     </document>
-  </state>
+  </value>
 )
