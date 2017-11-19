@@ -18,8 +18,8 @@ function findDOMRange(range, win = window) {
   const r = win.document.createRange()
   const start = isBackward ? focus : anchor
   const end = isBackward ? anchor : focus
-  r.setStart(start.node, start.offset)
-  r.setEnd(end.node, end.offset)
+  r.setStart(start.node, start.offset >= 0 ? start.offset : 0)
+  r.setEnd(end.node, end.offset >= 0 ? end.offset : 0)
   return r
 }
 
