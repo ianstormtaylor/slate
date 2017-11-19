@@ -7,13 +7,13 @@ export default function (change) {
   change.splitBlock()
 }
 
-export function before(state) {
-  const change = state.change()
+export function before(value) {
+  const change = value.change()
   return change
 }
 
 export const input = (
-  <state>
+  <value>
     <document>
       {Array.from(Array(10)).map((v, i) => (
         <quote>
@@ -26,5 +26,5 @@ export const input = (
         </quote>
       ))}
     </document>
-  </state>
+  </value>
 )

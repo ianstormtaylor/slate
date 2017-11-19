@@ -1,11 +1,9 @@
-/** @jsx h */
 /* eslint-disable react/jsx-key */
 
-import h from '../../test/helpers/h'
-import { State } from '../..'
+import { Value } from '../..'
 
 export default function (json) {
-  State.fromJSON(json)
+  Value.fromJSON(json)
 }
 
 export const input = {

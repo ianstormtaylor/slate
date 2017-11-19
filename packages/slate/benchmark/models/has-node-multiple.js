@@ -4,20 +4,20 @@
 import h from '../../test/helpers/h'
 import { __clear } from '../../lib/utils/memoize'
 
-export default function ({ state, keys }) {
+export default function ({ value, keys }) {
   keys.forEach((key) => {
-    state.document.hasNode(key)
+    value.document.hasNode(key)
   })
 }
 
-export function before(state) {
-  const keys = state.document.getTexts().toArray().map(t => t.key)
+export function before(value) {
+  const keys = value.document.getTexts().toArray().map(t => t.key)
   __clear()
-  return { state, keys }
+  return { value, keys }
 }
 
 export const input = (
-  <state>
+  <value>
     <document>
       {Array.from(Array(10)).map(() => (
         <quote>
@@ -29,5 +29,5 @@ export const input = (
         </quote>
       ))}
     </document>
-  </state>
+  </value>
 )

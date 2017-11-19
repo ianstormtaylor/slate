@@ -3,12 +3,12 @@
 
 import h from '../../test/helpers/h'
 
-export default function (state) {
-  state.document.getMarks()
+export default function (value) {
+  value.document.getMarks()
 }
 
 export const input = (
-  <state>
+  <value>
     <document>
       {Array.from(Array(10)).map(() => (
         <quote>
@@ -20,5 +20,5 @@ export const input = (
         </quote>
       ))}
     </document>
-  </state>
+  </value>
 )

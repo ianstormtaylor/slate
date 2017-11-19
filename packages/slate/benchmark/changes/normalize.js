@@ -3,14 +3,16 @@
 
 import h from '../../test/helpers/h'
 
-export default function (state) {
-  state
-    .change()
-    .normalize()
+export default function (change) {
+  change.normalize()
+}
+
+export function before(value) {
+  return value.change()
 }
 
 export const input = (
-  <state>
+  <value>
     <document>
       {Array.from(Array(10)).map((v, i) => (
         <quote>
@@ -23,5 +25,5 @@ export const input = (
         </quote>
       ))}
     </document>
-  </state>
+  </value>
 )
