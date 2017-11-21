@@ -24,7 +24,9 @@ const CORE_SCHEMA_RULES = [
       if (!invalids.size) return
 
       return (change) => {
+        console.log('Only allow block nodes in documents:')
         invalids.forEach((child) => {
+          console.log(JSON.stringify(child))
           change.removeNodeByKey(child.key, { normalize: false })
         })
       }
@@ -47,7 +49,9 @@ const CORE_SCHEMA_RULES = [
       if (!invalids.size) return
 
       return (change) => {
+        console.log('Only allow block nodes or inline and text nodes in blocks:')
         invalids.forEach((child) => {
+          console.log(JSON.stringify(child))
           change.removeNodeByKey(child.key, { normalize: false })
         })
       }
@@ -67,7 +71,9 @@ const CORE_SCHEMA_RULES = [
       if (!invalids.size) return
 
       return (change) => {
+        console.log('Only allow inline and text nodes in inlines.')
         invalids.forEach((child) => {
+          console.log(JSON.stringify(child))
           change.removeNodeByKey(child.key, { normalize: false })
         })
       }
@@ -86,6 +92,7 @@ const CORE_SCHEMA_RULES = [
       if (node.nodes.size > 0) return
 
       return (change) => {
+        // console.log('Ensure that block and inline nodes have at least one text child.');
         const text = Text.create()
         change.insertNodeByKey(node.key, 0, text, { normalize: false })
       }
@@ -105,12 +112,14 @@ const CORE_SCHEMA_RULES = [
       if (node.text == ' ' && node.nodes.size == 1) return
 
       return (change) => {
+
         const text = Text.create(' ')
         const index = node.nodes.size
 
         change.insertNodeByKey(node.key, index, text, { normalize: false })
-
+        console.log('Ensure that void nodes contain a text node with a single space of text.')
         node.nodes.forEach((child) => {
+          console.log(JSON.stringify(child))
           change.removeNodeByKey(child.key, { normalize: false })
         })
       }
@@ -135,6 +144,7 @@ const CORE_SCHEMA_RULES = [
       if (!invalids.size) return
 
       return (change) => {
+
         // If all of the block's nodes are invalid, insert an empty text node so
         // that the selection will be preserved when they are all removed.
         if (node.nodes.size == invalids.size) {
@@ -142,7 +152,9 @@ const CORE_SCHEMA_RULES = [
           change.insertNodeByKey(node.key, 1, text, { normalize: false })
         }
 
+        console.log('Ensure that inline nodes are never empty.')
         invalids.forEach((child) => {
+          console.log(JSON.stringify(child))
           change.removeNodeByKey(child.key, { normalize: false })
         })
       }
@@ -179,9 +191,11 @@ const CORE_SCHEMA_RULES = [
       if (!invalids.size) return
 
       return (change) => {
+
         // Shift for every text node inserted previously.
         let shift = 0
 
+        // console.log('Ensure that inline void nodes are surrounded by text nodes, by adding extrablank text nodes if necessary.')
         invalids.forEach(({ index, insertAfter, insertBefore }) => {
           if (insertBefore) {
             change.insertNodeByKey(node.key, shift + index, Text.create(), { normalize: false })
@@ -219,6 +233,7 @@ const CORE_SCHEMA_RULES = [
       if (!invalids.size) return
 
       return (change) => {
+        // console.log('Merge adjacent text nodes.');
         // Reverse the list to handle consecutive merges, since the earlier nodes
         // will always exist after each merge.
         invalids.reverse().forEach((n) => {
@@ -263,7 +278,9 @@ const CORE_SCHEMA_RULES = [
       if (!invalids.size) return
 
       return (change) => {
+        console.log('Prevent extra empty text nodes, except when adjacent to inline void nodes:')
         invalids.forEach((text) => {
+          console.log(JSON.stringify(child))
           change.removeNodeByKey(text.key, { normalize: false })
         })
       }
