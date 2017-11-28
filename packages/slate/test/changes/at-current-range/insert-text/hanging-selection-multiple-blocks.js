@@ -3,14 +3,21 @@
 import h from '../../../helpers/h'
 
 export default function (change) {
-  change.delete()
+  change.insertText('a')
 }
 
 export const input = (
   <value>
     <document>
-      <quote><anchor />one</quote>
-      <paragraph><focus />two</paragraph>
+      <paragraph>
+        <anchor />one
+      </paragraph>
+      <paragraph>
+        two
+      </paragraph>
+      <quote>
+        <focus />three
+      </quote>
     </document>
   </value>
 )
@@ -18,7 +25,9 @@ export const input = (
 export const output = (
   <value>
     <document>
-      <paragraph><cursor />two</paragraph>
+      <quote>
+        a<cursor />three
+      </quote>
     </document>
   </value>
 )
