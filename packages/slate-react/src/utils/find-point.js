@@ -19,11 +19,11 @@ const VOID_SELECTOR = '[data-slate-void]'
  *
  * @param {Element} nativeNode
  * @param {Number} nativeOffset
- * @param {State} state
+ * @param {Value} value
  * @return {Object}
  */
 
-function findPoint(nativeNode, nativeOffset, state) {
+function findPoint(nativeNode, nativeOffset, value) {
   const {
     node: nearestNode,
     offset: nearestOffset,
@@ -52,14 +52,20 @@ function findPoint(nativeNode, nativeOffset, state) {
     const voidNode = parentNode.closest(VOID_SELECTOR)
     if (!voidNode) return null
     rangeNode = voidNode.querySelector(RANGE_SELECTOR)
+    if (!rangeNode) return null
     node = rangeNode
     offset = node.textContent.length
   }
 
   // COMPAT: If the parent node is a Slate zero-width space, this is because the
-  // text node has no characters, so the offset can only be zero.
-  if (offset != 0 && parentNode.getAttribute('data-slate-zero-width')) {
-    offset = 0
+  // text node should have no characters. However, during IME composition the
+  // ASCII characters will be prepended to the zero-width space, so subtract 1
+  // from the offset to account for the zero-width space character.
+  if (
+    offset == node.textContent.length &&
+    parentNode.hasAttribute('data-slate-zero-width')
+  ) {
+    offset--
   }
 
   // Get the string value of the offset key attribute.
@@ -71,7 +77,7 @@ function findPoint(nativeNode, nativeOffset, state) {
   // COMPAT: If someone is clicking from one Slate editor into another, the
   // select event fires twice, once for the old editor's `element` first, and
   // then afterwards for the correct `element`. (2017/03/03)
-  if (!state.document.hasDescendant(key)) return null
+  if (!value.document.hasDescendant(key)) return null
 
   return {
     key,

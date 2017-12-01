@@ -10,15 +10,15 @@ export default function ({ change, keys }) {
   }
 }
 
-export function before(state) {
-  const change = state.change()
-  const keys = state.document.getTexts().toArray().map(t => t.key)
+export function before(value) {
+  const change = value.change()
+  const keys = value.document.getTexts().toArray().map(t => t.key)
   __clear()
   return { change, keys }
 }
 
 export const input = (
-  <state>
+  <value>
     <document>
       {Array.from(Array(10)).map((v, i) => (
         <quote>
@@ -31,5 +31,5 @@ export const input = (
         </quote>
       ))}
     </document>
-  </state>
+  </value>
 )

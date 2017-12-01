@@ -7,6 +7,50 @@ This document maintains a list of changes to the `slate` package with each new v
 ---
 
 
+### `0.31.0` — November 16, 2017
+
+###### BREAKING
+
+- **Operation objects in Slate are now immutable records.** Previously they were native, mutable Javascript objects. Now, there's a new immutable `Operation` model in Slate, ensuring that all of the data inside `Value` objects are immutable. And it allows for easy serialization of operations using `operation.toJSON()` for when sending them between editors. This should not affect most users, unless you are relying on changing the values of the low-level Slate operations (simply reading them is fine).
+
+- **Operation lists in Slate are now immutable lists.** Previously they were native, mutable Javascript arrays. Now, to keep consistent with other immutable uses, they are immutable lists. This should not affect most users.
+
+###### NEW
+
+- **Added a new `Operation` model.** This model is used to store operations for the history stack, and (de)serializes them in a consistent way for collaborative editing use cases.
+
+
+---
+
+
+### `0.30.0` — October 27, 2017
+
+###### BREAKING
+
+- **Remove all previously deprecated code paths.** This helps to reduce some of the complexity in Slate by not having to handle these code paths anymore. And it helps to reduce file size. When upgrading, it's _highly_ recommended that you upgrade to the previous version first and ensure there are no deprecation warnings being logged, then upgrade to this version.
+
+
+---
+
+
+### `0.29.0` — October 27, 2017
+
+###### BREAKING
+
+- **The `set_state` operation has been renamed `set_value`**. This shouldn't affect almost anyone, but in the event that you were relying on the low-level operation types you'll need to update this.
+
+###### DEPRECATED
+
+- **The "state" has been renamed to "value" everywhere.** All of the current references are maintained as deprecations, so you should be able to upgrade and see warnings logged instead of being greeted with a broken editor. This is to reduce the confusion between React's "state" and Slate's editor value, and in an effort to further mimic the native DOM APIs.
+
+###### NEW
+
+- **Added the new `Value` model to replace `State`.** The new model is exactly the same, but with a new name. There is also a shimmed `State` model exported that warns when used, to ease migration.
+
+
+---
+
+
 ### `0.28.0` — October 25, 2017
 
 ###### BREAKING

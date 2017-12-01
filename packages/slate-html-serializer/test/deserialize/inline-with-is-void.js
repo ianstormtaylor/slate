@@ -34,11 +34,11 @@ export const input = `
 `.trim()
 
 export const output = (
-  <state>
+  <value>
     <document>
       <paragraph>
         <emoji />
       </paragraph>
     </document>
-  </state>
+  </value>
 )

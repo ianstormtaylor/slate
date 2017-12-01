@@ -19,8 +19,8 @@ export const props = {
   renderNode,
 }
 
-export const state = (
-  <state>
+export const value = (
+  <value>
     <document>
       <paragraph>
         <link href="https://google.com">
@@ -34,7 +34,7 @@ export const state = (
         </link>
       </paragraph>
     </document>
-  </state>
+  </value>
 )
 
 export const output = `

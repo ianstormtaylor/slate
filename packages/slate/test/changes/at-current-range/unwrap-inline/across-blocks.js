@@ -7,7 +7,7 @@ export default function (change) {
 }
 
 export const input = (
-  <state>
+  <value>
     <document>
       <paragraph>
         w<anchor />o<hashtag>rd</hashtag>
@@ -16,11 +16,11 @@ export const input = (
         <hashtag>an</hashtag>ot<focus />her
       </paragraph>
     </document>
-  </state>
+  </value>
 )
 
 export const output = (
-  <state>
+  <value>
     <document>
       <paragraph>
         w<anchor />ord
@@ -29,5 +29,5 @@ export const output = (
         anot<focus />her
       </paragraph>
     </document>
-  </state>
+  </value>
 )

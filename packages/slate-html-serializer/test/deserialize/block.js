@@ -26,11 +26,11 @@ export const input = `
 `.trim()
 
 export const output = (
-  <state>
+  <value>
     <document>
       <paragraph>
         one
       </paragraph>
     </document>
-  </state>
+  </value>
 )

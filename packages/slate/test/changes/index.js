@@ -30,7 +30,7 @@ describe('changes', async () => {
               const change = input.change()
               fn(change)
               const opts = { preserveSelection: true, preserveData: true }
-              const actual = change.state.toJSON(opts)
+              const actual = change.value.toJSON(opts)
               const expected = output.toJSON(opts)
               assert.deepEqual(actual, expected)
             })

@@ -13,7 +13,7 @@ import {
   Range,
   Schema,
   Stack,
-  State,
+  Value,
   Text,
 } from 'slate'
 
@@ -72,7 +72,7 @@ const Types = {
   ranges: create('List<Range>', v => Range.isRangeList(v)),
   schema: create('Schema', v => Schema.isSchema(v)),
   stack: create('Stack', v => Stack.isStack(v)),
-  state: create('State', v => State.isState(v)),
+  value: create('Value', v => Value.isValue(v)),
   text: create('Text', v => Text.isText(v)),
   texts: create('List<Text>', v => Text.isTextList(v)),
 }

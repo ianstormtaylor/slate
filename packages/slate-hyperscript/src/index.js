@@ -9,8 +9,8 @@ import {
   Mark,
   Node,
   Range,
-  State,
-  Text
+  Text,
+  Value,
 } from 'slate'
 
 /**
@@ -74,7 +74,7 @@ const CREATORS = {
     return Range.create(attributes)
   },
 
-  state(tagName, attributes, children) {
+  value(tagName, attributes, children) {
     const { data } = attributes
     const document = children.find(Document.isDocument)
     let selection = children.find(Range.isRange) || Range.create()
@@ -110,8 +110,8 @@ const CREATORS = {
       selection = selection.merge(props).normalize(document)
     }
 
-    const state = State.create({ data, document, selection })
-    return state
+    const value = Value.create({ data, document, selection })
+    return value
   },
 
   text(tagName, attributes, children) {

@@ -3,19 +3,19 @@
 
 import h from '../../test/helpers/h'
 
-export default function (state) {
-  state.document.getBlocksAtRange(state.selection)
+export default function (value) {
+  value.document.getBlocksAtRange(value.selection)
 }
 
-export function before(state) {
-  return state
+export function before(value) {
+  return value
     .change()
     .selectAll()
-    .state
+    .value
 }
 
 export const input = (
-  <state>
+  <value>
     <document>
       {Array.from(Array(10)).map(() => (
         <quote>
@@ -27,5 +27,5 @@ export const input = (
         </quote>
       ))}
     </document>
-  </state>
+  </value>
 )

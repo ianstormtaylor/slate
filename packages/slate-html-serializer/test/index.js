@@ -13,11 +13,11 @@ import Html from '..'
 import assert from 'assert'
 import fs from 'fs'
 import parse5 from 'parse5' // eslint-disable-line import/no-extraneous-dependencies
-import { State, resetKeyGenerator } from 'slate'
+import { Value, resetKeyGenerator } from 'slate'
 import { basename, extname, resolve } from 'path'
 
 /**
- * Reset Slate's internal state before each text.
+ * Reset Slate's internal key generator state before each text.
  */
 
 beforeEach(() => {
@@ -38,9 +38,9 @@ describe('slate-html-serializer', () => {
         const module = require(resolve(dir, test))
         const { input, output, config, options } = module
         const html = new Html({ parseHtml: parse5.parseFragment, ...config })
-        const state = html.deserialize(input, options)
-        const actual = State.isState(state) ? state.toJSON() : state
-        const expected = State.isState(output) ? output.toJSON() : output
+        const value = html.deserialize(input, options)
+        const actual = Value.isValue(value) ? value.toJSON() : value
+        const expected = Value.isValue(output) ? output.toJSON() : output
         assert.deepEqual(actual, expected)
       })
     }

@@ -24,7 +24,7 @@ import { IS_CHROME, IS_SAFARI } from '../constants/environment'
  * @type {Function}
  */
 
-const debug = Debug('slate:core:after')
+const debug = Debug('slate:after')
 
 /**
  * The after plugin.
@@ -75,9 +75,9 @@ function AfterPlugin() {
   function onClick(event, change, editor) {
     if (editor.props.readOnly) return true
 
-    const { state } = change
-    const { document } = state
-    const node = findNode(event.target, state)
+    const { value } = change
+    const { document } = value
+    const node = findNode(event.target, value)
     const isVoid = node && (node.isVoid || document.hasVoidParent(node.key))
 
     if (isVoid) {
@@ -122,7 +122,20 @@ function AfterPlugin() {
     // Once the fake cut content has successfully been added to the clipboard,
     // delete the content in the current selection.
     window.requestAnimationFrame(() => {
-      editor.change(c => c.delete())
+      // If user cuts a void block node or a void inline node,
+      // manually removes it since selection is collapsed in this case.
+      const { value } = change
+      const { endBlock, endInline, isCollapsed } = value
+      const isVoidBlock = endBlock && endBlock.isVoid && isCollapsed
+      const isVoidInline = endInline && endInline.isVoid && isCollapsed
+
+      if (isVoidBlock) {
+        editor.change(c => c.removeNodeByKey(endBlock.key))
+      } else if (isVoidInline) {
+        editor.change(c => c.removeNodeByKey(endInline.key))
+      } else {
+        editor.change(c => c.delete())
+      }
     })
   }
 
@@ -137,8 +150,8 @@ function AfterPlugin() {
   function onCutOrCopy(event, change, editor) {
     const window = getWindow(event.target)
     const native = window.getSelection()
-    const { state } = change
-    const { startKey, endKey, startText, endBlock, endInline } = state
+    const { value } = change
+    const { startKey, endKey, startText, endBlock, endInline } = value
     const isVoidBlock = endBlock && endBlock.isVoid
     const isVoidInline = endInline && endInline.isVoid
     const isVoid = isVoidBlock || isVoidInline
@@ -148,7 +161,7 @@ function AfterPlugin() {
 
     // Create a fake selection so that we can add a Base64-encoded copy of the
     // fragment to the HTML, to decode on future pastes.
-    const { fragment } = state
+    const { fragment } = value
     const encoded = Base64.serializeNode(fragment)
     const range = native.getRangeAt(0)
     let contents = range.cloneContents()
@@ -159,7 +172,7 @@ function AfterPlugin() {
     if (isVoid) {
       const r = range.cloneRange()
       const n = isVoidBlock ? endBlock : endInline
-      const node = findDOMNode(n)
+      const node = findDOMNode(n, window)
       r.setEndAfter(node)
       contents = r.cloneContents()
       attach = contents.childNodes[contents.childNodes.length - 1].firstChild
@@ -172,12 +185,12 @@ function AfterPlugin() {
     // startText node
     if ((IS_CHROME || IS_SAFARI) && !isVoid && startKey === endKey) {
       const hasMarks = startText.characters
-        .slice(state.selection.anchorOffset, state.selection.focusOffset)
+        .slice(value.selection.anchorOffset, value.selection.focusOffset)
         .filter(char => char.marks.size !== 0)
         .size !== 0
       if (hasMarks) {
         const r = range.cloneRange()
-        const node = findDOMNode(startText)
+        const node = findDOMNode(startText, window)
         r.setStartBefore(node)
         contents = r.cloneContents()
         attach = contents.childNodes[contents.childNodes.length - 1].firstChild
@@ -220,6 +233,15 @@ function AfterPlugin() {
     div.setAttribute('contenteditable', true)
     div.style.position = 'absolute'
     div.style.left = '-9999px'
+
+    // COMPAT: In Firefox, the viewport jumps to find the phony div, so it
+    // should be created at the current scroll offset with `style.top`.
+    // The box model attributes which can interact with 'top' are also reset.
+    div.style.border = '0px'
+    div.style.padding = '0px'
+    div.style.margin = '0px'
+    div.style.top = `${window.pageYOffset || window.document.documentElement.scrollTop}px`
+
     div.appendChild(contents)
     body.appendChild(div)
 
@@ -279,16 +301,16 @@ function AfterPlugin() {
 
     isDraggingInternally = true
 
-    const { state } = change
-    const { document } = state
-    const node = findNode(event.target, state)
+    const { value } = change
+    const { document } = value
+    const node = findNode(event.target, value)
     const isVoid = node && (node.isVoid || document.hasVoidParent(node.key))
 
     if (isVoid) {
       const encoded = Base64.serializeNode(node, { preserveKeys: true })
       setEventTransfer(event, 'node', encoded)
     } else {
-      const { fragment } = state
+      const { fragment } = value
       const encoded = Base64.serializeNode(fragment)
       setEventTransfer(event, 'fragment', encoded)
     }
@@ -305,9 +327,10 @@ function AfterPlugin() {
   function onDrop(event, change, editor) {
     debug('onDrop', { event })
 
-    const { state } = change
-    const { document, selection } = state
-    let target = getEventRange(event, state)
+    const { value } = change
+    const { document, selection } = value
+    const window = getWindow(event.target)
+    let target = getEventRange(event, value)
     if (!target) return
 
     const transfer = getEventTransfer(event)
@@ -368,6 +391,20 @@ function AfterPlugin() {
     if (type == 'node' && Inline.isInline(node)) {
       change.insertInline(node).removeNodeByKey(node.key)
     }
+
+    // COMPAT: React's onSelect event breaks after an onDrop event
+    // has fired in a node: https://github.com/facebook/react/issues/11379.
+    // Until this is fixed in React, we dispatch a mouseup event on that
+    // DOM node, since that will make it go back to normal.
+    const focusNode = document.getNode(target.focusKey)
+    const el = findDOMNode(focusNode, window)
+    if (!el) return
+
+    el.dispatchEvent(new MouseEvent('mouseup', {
+      view: window,
+      bubbles: true,
+      cancelable: true
+    }))
   }
 
   /**
@@ -381,36 +418,36 @@ function AfterPlugin() {
     debug('onInput', { event })
 
     const window = getWindow(event.target)
-    const { state } = change
+    const { value } = change
 
     // Get the selection point.
     const native = window.getSelection()
     const { anchorNode, anchorOffset } = native
-    const point = findPoint(anchorNode, anchorOffset, state)
+    const point = findPoint(anchorNode, anchorOffset, value)
     if (!point) return
 
     // Get the text node and leaf in question.
-    const { document, selection } = state
+    const { document, selection } = value
     const node = document.getDescendant(point.key)
+    const block = document.getClosestBlock(node.key)
     const leaves = node.getLeaves()
+    const lastText = block.getLastText()
+    const lastLeaf = leaves.last()
     let start = 0
     let end = 0
 
     const leaf = leaves.find((r) => {
+      start = end
       end += r.text.length
       if (end >= point.offset) return true
-      start = end
-    })
+    }) || lastLeaf
 
     // Get the text information.
     const { text } = leaf
     let { textContent } = anchorNode
-    const block = document.getClosestBlock(node.key)
-    const lastText = block.getLastText()
-    const lastLeaf = leaves.last()
-    const lastChar = textContent.charAt(textContent.length - 1)
     const isLastText = node == lastText
     const isLastLeaf = leaf == lastLeaf
+    const lastChar = textContent.charAt(textContent.length - 1)
 
     // COMPAT: If this is the last leaf, and the DOM text ends in a new line,
     // we will have added another new line in <Leaf>'s render method to account
@@ -427,11 +464,9 @@ function AfterPlugin() {
     const corrected = selection.collapseToEnd().move(delta)
     const entire = selection.moveAnchorTo(point.key, start).moveFocusTo(point.key, end)
 
-    // Change the current state to have the leaf's text replaced.
+    // Change the current value to have the leaf's text replaced.
     change
-      .select(entire)
-      .delete()
-      .insertText(textContent, leaf.marks)
+      .insertTextAtRange(entire, textContent, leaf.marks)
       .select(corrected)
   }
 
@@ -446,10 +481,10 @@ function AfterPlugin() {
   function onKeyDown(event, change, editor) {
     debug('onKeyDown', { event })
 
-    const { state } = change
+    const { value } = change
 
     if (HOTKEYS.SPLIT_BLOCK(event)) {
-      return state.isInVoid
+      return value.isInVoid
         ? change.collapseToStartOfNextText()
         : change.splitBlock()
     }
@@ -513,7 +548,7 @@ function AfterPlugin() {
     // an inline is selected, we need to handle these hotkeys manually because
     // browsers won't know what to do.
     if (HOTKEYS.COLLAPSE_CHAR_BACKWARD(event)) {
-      const { document, isInVoid, previousText, startText } = state
+      const { document, isInVoid, previousText, startText } = value
       const isPreviousInVoid = previousText && document.hasVoidParent(previousText.key)
       if (isInVoid || isPreviousInVoid || startText.text == '') {
         event.preventDefault()
@@ -522,7 +557,7 @@ function AfterPlugin() {
     }
 
     if (HOTKEYS.COLLAPSE_CHAR_FORWARD(event)) {
-      const { document, isInVoid, nextText, startText } = state
+      const { document, isInVoid, nextText, startText } = value
       const isNextInVoid = nextText && document.hasVoidParent(nextText.key)
       if (isInVoid || isNextInVoid || startText.text == '') {
         event.preventDefault()
@@ -531,7 +566,7 @@ function AfterPlugin() {
     }
 
     if (HOTKEYS.EXTEND_CHAR_BACKWARD(event)) {
-      const { document, isInVoid, previousText, startText } = state
+      const { document, isInVoid, previousText, startText } = value
       const isPreviousInVoid = previousText && document.hasVoidParent(previousText.key)
       if (isInVoid || isPreviousInVoid || startText.text == '') {
         event.preventDefault()
@@ -540,7 +575,7 @@ function AfterPlugin() {
     }
 
     if (HOTKEYS.EXTEND_CHAR_FORWARD(event)) {
-      const { document, isInVoid, nextText, startText } = state
+      const { document, isInVoid, nextText, startText } = value
       const isNextInVoid = nextText && document.hasVoidParent(nextText.key)
       if (isInVoid || isNextInVoid || startText.text == '') {
         event.preventDefault()
@@ -568,8 +603,9 @@ function AfterPlugin() {
     }
 
     if (type == 'text' || type == 'html') {
-      const { state } = change
-      const { document, selection, startBlock } = state
+      if (!text) return
+      const { value } = change
+      const { document, selection, startBlock } = value
       if (startBlock.isVoid) return
 
       const defaultBlock = startBlock
@@ -591,8 +627,8 @@ function AfterPlugin() {
     debug('onSelect', { event })
 
     const window = getWindow(event.target)
-    const { state } = change
-    const { document } = state
+    const { value } = change
+    const { document } = value
     const native = window.getSelection()
 
     // If there are no ranges, the editor was blurred natively.
@@ -602,7 +638,7 @@ function AfterPlugin() {
     }
 
     // Otherwise, determine the Slate selection from the native one.
-    let range = findRange(native, state)
+    let range = findRange(native, value)
     if (!range) return
 
     const { anchorKey, anchorOffset, focusKey, focusOffset } = range
@@ -662,12 +698,11 @@ function AfterPlugin() {
    * Render editor.
    *
    * @param {Object} props
-   * @param {State} state
    * @param {Editor} editor
    * @return {Object}
    */
 
-  function renderEditor(props, state, editor) {
+  function renderEditor(props, editor) {
     const handlers = EVENT_HANDLERS.reduce((obj, handler) => {
       obj[handler] = editor[handler]
       return obj
@@ -683,9 +718,7 @@ function AfterPlugin() {
         editor={editor}
         readOnly={props.readOnly}
         role={props.role}
-        schema={editor.getSchema()}
         spellCheck={props.spellCheck}
-        state={state}
         style={props.style}
         tabIndex={props.tabIndex}
         tagName={props.tagName}
@@ -716,11 +749,13 @@ function AfterPlugin() {
    */
 
   function renderPlaceholder(props) {
-    const { editor, node, state } = props
+    const { editor, node } = props
+    if (!editor.props.placeholder) return
+    if (editor.state.isComposing) return
     if (node.kind != 'block') return
     if (!Text.isTextList(node.nodes)) return
     if (node.text != '') return
-    if (state.document.getBlocks().size > 1) return
+    if (editor.value.document.getBlocks().size > 1) return
 
     const style = {
       pointerEvents: 'none',

@@ -2,18 +2,18 @@
 
 import h from '../../helpers/h'
 
-export default function (state) {
-  return state
+export default function (value) {
+  return value
     .change()
     .delete()
-    .state
+    .value
     .change()
     .undo()
-    .state
+    .value
 }
 
 export const input = (
-  <state>
+  <value>
     <document>
       <paragraph>
         <link>o<anchor />ne</link>
@@ -22,7 +22,7 @@ export const input = (
         <link>tw<focus />o</link>
       </paragraph>
     </document>
-  </state>
+  </value>
 )
 
 export const output = input

@@ -4,18 +4,18 @@
 import h from '../../test/helpers/h'
 import { __clear } from '../../lib/utils/memoize'
 
-export default function ({ state, text }) {
-  state.document.getPath(text.key)
+export default function ({ value, text }) {
+  value.document.getPath(text.key)
 }
 
-export function before(state) {
-  const text = state.document.getLastText()
+export function before(value) {
+  const text = value.document.getLastText()
   __clear()
-  return { state, text }
+  return { value, text }
 }
 
 export const input = (
-  <state>
+  <value>
     <document>
       {Array.from(Array(10)).map(() => (
         <quote>
@@ -27,5 +27,5 @@ export const input = (
         </quote>
       ))}
     </document>
-  </state>
+  </value>
 )

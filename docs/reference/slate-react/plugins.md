@@ -40,7 +40,7 @@ export default function MySlatePlugin(options) {
 
 All of the event handler properties are passed the same React `event` object you are used to from React's event handlers. They are also passed a `change` object representing any changes that have resulted from the event, and the `editor` instance itself.
 
-Each event handler can choose to call methods on the `change` object, in which case the editor's state will be updated. 
+Each event handler can choose to call methods on the `change` object, in which case the editor's value will be updated. 
 
 If the return value of a plugin handler is `null`, the editor will simply continue resolving the plugin stack. However, if you return a non-null value, the editor will break out of the loop.
 
@@ -74,7 +74,7 @@ This handler is equivalent to the `onCopy` handler.
 ### `onDrop`
 `Function onDrop(event: Event, change: Change, editor: Editor) => Change || Void`
 
-This handler is called when the user drops content into the `contenteditable` element. The event is already prevented by default, so you must define a state change to have any affect occur.
+This handler is called when the user drops content into the `contenteditable` element. The event is already prevented by default, so you must define a value change to have any affect occur.
 
 ### `onKeyDown`
 `Function onKeyDown(event: Event, change: Change, editor: Editor) => Change || Void`
@@ -91,7 +91,7 @@ This handler is called when any key is released in the `contenteditable` element
 ### `onPaste`
 `Function onPaste(event: Event, change: Change, editor: Editor) => Change || Void`
 
-This handler is called when the user pastes content into the `contenteditable` element. The event is already prevented by default, so you must define a state change to have any affect occur.
+This handler is called when the user pastes content into the `contenteditable` element. The event is already prevented by default, so you must define a value change to have any affect occur.
 
 ### `onSelect`
 `Function onSelect(event: Event, change: Change, editor: Editor) => Change || Void`
@@ -112,17 +112,12 @@ _Note: This is **not** Slate's internal selection representation (although it mi
 ### `onChange`
 `Function onChange(change: Change) => Any || Void`
 
-The `onChange` handler isn't a native browser event handler. Instead, it is invoked whenever the editor state changes. This allows plugins to augment a change however they want.
+The `onChange` handler isn't a native browser event handler. Instead, it is invoked whenever the editor value changes. This allows plugins to augment a change however they want.
 
-### `onBeforeChange`
-`Function onBeforeChange(change: Change) => Change || Void`
+### `renderEditor`
+`Function renderEditor(props: Object, editor: Editor) => Object || Void`
 
-The `onBeforeChange` handler isn't a native browser event handler. Instead, it is invoked whenever the editor receives a new state and before propagating a new change to `onChange`.
-
-### `render`
-`Function render(props: Object, state: State, editor: Editor) => Object || Void`
-
-The `render` property allows you to define higher-order-component-like behavior. It is passed all of the properties of the editor, including `props.children`. You can then choose to wrap the existing `children` in any custom elements or proxy the properties however you choose. This can be useful for rendering toolbars, styling the editor, rendering validation, etc. Remember that the `render` function has to render `props.children` for editor's children to render.
+The `renderEditor` property allows you to define higher-order-component-like behavior. It is passed all of the properties of the editor, including `props.children`. You can then choose to wrap the existing `children` in any custom elements or proxy the properties however you choose. This can be useful for rendering toolbars, styling the editor, rendering validation, etc. Remember that the `renderEditor` function has to render `props.children` for editor's children to render.
 
 ### `schema`
 `Object`

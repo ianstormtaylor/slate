@@ -37,11 +37,11 @@ export const input = `
 `.trim()
 
 export const output = (
-  <state>
+  <value>
     <document>
       <paragraph>
         <image />
       </paragraph>
     </document>
-  </state>
+  </value>
 )

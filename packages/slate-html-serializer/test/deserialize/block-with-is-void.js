@@ -26,9 +26,9 @@ export const input = `
 `.trim()
 
 export const output = (
-  <state>
+  <value>
     <document>
       <image />
     </document>
-  </state>
+  </value>
 )

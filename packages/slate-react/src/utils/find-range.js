@@ -9,11 +9,11 @@ import findPoint from './find-point'
  * Find a Slate range from a DOM `native` selection.
  *
  * @param {Selection} native
- * @param {State} state
+ * @param {Value} value
  * @return {Range}
  */
 
-function findRange(native, state) {
+function findRange(native, value) {
   const el = native.anchorNode || native.startContainer
   if (!el) return null
 
@@ -31,8 +31,8 @@ function findRange(native, state) {
   }
 
   const { anchorNode, anchorOffset, focusNode, focusOffset, isCollapsed } = native
-  const anchor = findPoint(anchorNode, anchorOffset, state)
-  const focus = isCollapsed ? anchor : findPoint(focusNode, focusOffset, state)
+  const anchor = findPoint(anchorNode, anchorOffset, value)
+  const focus = isCollapsed ? anchor : findPoint(focusNode, focusOffset, value)
   if (!anchor || !focus) return null
 
   const range = Range.create({

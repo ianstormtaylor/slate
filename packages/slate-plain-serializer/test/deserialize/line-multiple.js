@@ -8,7 +8,7 @@ two
 `.trim()
 
 export const output = (
-  <state>
+  <value>
     <document>
       <line>
         one
@@ -17,5 +17,5 @@ export const output = (
         two
       </line>
     </document>
-  </state>
+  </value>
 )

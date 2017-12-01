@@ -13,7 +13,7 @@ export default function (change) {
 }
 
 export const input = (
-  <state>
+  <value>
     <document>
       <paragraph>
         wo<anchor />rd
@@ -22,15 +22,15 @@ export const input = (
         an<focus />other
       </paragraph>
     </document>
-  </state>
+  </value>
 )
 
 export const output = (
-  <state>
+  <value>
     <document>
       <paragraph>
         wo<cursor />fragmentother
       </paragraph>
     </document>
-  </state>
+  </value>
 )

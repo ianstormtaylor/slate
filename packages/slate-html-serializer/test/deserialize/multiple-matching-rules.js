@@ -29,9 +29,9 @@ export const input = `
 `.trim()
 
 export const output = (
-  <state>
+  <value>
     <document>
       <paragraph />
     </document>
-  </state>
+  </value>
 )

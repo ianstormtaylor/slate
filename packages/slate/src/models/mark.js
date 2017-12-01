@@ -129,25 +129,25 @@ class Mark extends Record(DEFAULTS) {
   static fromJS = Mark.fromJSON
 
   /**
-   * Check if a `value` is a `Mark`.
+   * Check if `any` is a `Mark`.
    *
-   * @param {Any} value
+   * @param {Any} any
    * @return {Boolean}
    */
 
-  static isMark(value) {
-    return !!(value && value[MODEL_TYPES.MARK])
+  static isMark(any) {
+    return !!(any && any[MODEL_TYPES.MARK])
   }
 
   /**
-   * Check if a `value` is a set of marks.
+   * Check if `any` is a set of marks.
    *
-   * @param {Any} value
+   * @param {Any} any
    * @return {Boolean}
    */
 
-  static isMarkSet(value) {
-    return Set.isSet(value) && value.every(item => Mark.isMark(item))
+  static isMarkSet(any) {
+    return Set.isSet(any) && any.every(item => Mark.isMark(item))
   }
 
   /**

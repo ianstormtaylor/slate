@@ -2,24 +2,24 @@
 
 import h from '../../helpers/h'
 
-export default function (state) {
-  return state
+export default function (value) {
+  return value
     .change()
     .removeMark('bold')
-    .state
+    .value
     .change()
     .undo()
-    .state
+    .value
 }
 
 export const input = (
-  <state>
+  <value>
     <document>
       <paragraph>
         <anchor /><b>one</b><focus />
       </paragraph>
     </document>
-  </state>
+  </value>
 )
 
 export const output = input

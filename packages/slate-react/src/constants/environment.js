@@ -37,8 +37,8 @@ const EVENT_RULES = [
  */
 
 const OS_RULES = [
+  ['ios', /os ([\.\_\d]+) like mac os/i], // must be before the macos rule
   ['macos', /mac os x/i],
-  ['ios', /os ([\.\_\d]+) like mac os/i],
   ['android', /android/i],
   ['firefoxos', /mozilla\/[a-z\.\_\d]+ \((?:mobile)|(?:tablet)/i],
   ['windows', /windows\s*(?:nt)?\s*([\.\_\d]+)/i],
@@ -92,6 +92,7 @@ export const IS_FIREFOX = BROWSER === 'firefox'
 export const IS_SAFARI = BROWSER === 'safari'
 export const IS_IE = BROWSER === 'ie'
 
+export const IS_ANDROID = OS === 'android'
 export const IS_IOS = OS === 'ios'
 export const IS_MAC = OS === 'macos'
 export const IS_WINDOWS = OS === 'windows'

@@ -13,22 +13,22 @@ export default function (change) {
 }
 
 export const input = (
-  <state>
+  <value>
     <document>
       <paragraph>
         <link>wo<cursor />rd</link>
       </paragraph>
     </document>
-  </state>
+  </value>
 )
 
 // TODO: the cursor placement needs to be fixed
 export const output = (
-  <state>
+  <value>
     <document>
       <paragraph>
         <link>wo</link><hashtag>fragment</hashtag><cursor /><link>rd</link>
       </paragraph>
     </document>
-  </state>
+  </value>
 )

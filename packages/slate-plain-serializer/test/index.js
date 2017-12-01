@@ -12,11 +12,11 @@ import 'babel-polyfill' // eslint-disable-line import/no-extraneous-dependencies
 import Plain from '..'
 import assert from 'assert'
 import fs from 'fs'
-import { State, resetKeyGenerator } from 'slate'
+import { Value, resetKeyGenerator } from 'slate'
 import { basename, extname, resolve } from 'path'
 
 /**
- * Reset Slate's internal state before each text.
+ * Reset Slate's internal key generator state before each text.
  */
 
 beforeEach(() => {
@@ -36,9 +36,9 @@ describe('slate-plain-serializer', () => {
       it(test, async () => {
         const module = require(resolve(dir, test))
         const { input, output, options } = module
-        const state = Plain.deserialize(input, options)
-        const actual = State.isState(state) ? state.toJSON() : state
-        const expected = State.isState(output) ? output.toJSON() : output
+        const value = Plain.deserialize(input, options)
+        const actual = Value.isValue(value) ? value.toJSON() : value
+        const expected = Value.isValue(output) ? output.toJSON() : output
         assert.deepEqual(actual, expected)
       })
     }

@@ -7,7 +7,7 @@ export default function (change) {
 }
 
 export const input = (
-  <state>
+  <value>
     <document>
       <paragraph>
         <hashtag>
@@ -15,11 +15,11 @@ export const input = (
         </hashtag>
       </paragraph>
     </document>
-  </state>
+  </value>
 )
 
 export const output = (
-  <state>
+  <value>
     <document>
       <paragraph>
         <hashtag>
@@ -27,5 +27,5 @@ export const output = (
         </hashtag>
       </paragraph>
     </document>
-  </state>
+  </value>
 )

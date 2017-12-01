@@ -1,9 +1,9 @@
 
 # Operation
 
-An operation is the lowest-level description of a specific change to a part of Slate's state. They are designed to be collaborative-editing friendly.
+An operation is the lowest-level description of a specific change to a part of Slate's value. They are designed to be collaborative-editing friendly.
 
-All of the [`Change`](./change.md) methods result in operations being created and applied to a [`State`](./state.md) They're accessible via the `change.operations` property.
+All of the [`Change`](./change.md) methods result in operations being created and applied to a [`Value`](./value.md) They're accessible via the `change.operations` property.
 
 There are a handful of Slate operation types. The goal is to have the fewest possible types, while still maintaining the necessary semantics for collaborative editing to work.
 
@@ -160,7 +160,7 @@ Set new `properties` on the node at `path`.
 Split the node at `path` at `position`. The `position` refers to either the index in the child nodes in the case of [`Block`](./block.md) or [`Inline`](./inline.md) nodes, and the index in the characters in the case of [`Text`](./text.md) nodes. In the case of nested splits, `target` refers to the target path of the child split operation.
 
 
-## State Operations
+## Value Operations
 
 ### `set_selection`
 
@@ -172,27 +172,27 @@ Split the node at `path` at `position`. The `position` refers to either the inde
 }
 ```
 
-Set new `properties` on the state's selection.
+Set new `properties` on the selection.
 
-### `set_state`
+### `set_value`
 
 ```js
 {
-  type: 'set_state',
+  type: 'set_value',
   properties: Object,
-  state: Object,
+  value: Object,
 }
 ```
 
-Set new `properties` on a state. Properties can contain `data` and `decorations`.
+Set new `properties` on a value. Properties can contain `data` and `decorations`.
 
 
 ## Helpers
 
 ### `apply`
-`apply(state: State, operation: Object) => State`
+`apply(value: Value, operation: Object) => Value`
 
-Applies an `operation` to a `state` object.
+Applies an `operation` to a `value` object.
 
 ### `invert`
 `invert(operation: Object) => Object`

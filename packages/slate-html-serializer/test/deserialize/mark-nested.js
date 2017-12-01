@@ -40,11 +40,11 @@ export const input = `
 `.trim()
 
 export const output = (
-  <state>
+  <value>
     <document>
       <paragraph>
         o<i>n<b>e</b></i>
       </paragraph>
     </document>
-  </state>
+  </value>
 )

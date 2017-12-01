@@ -3,13 +3,13 @@
 import h from '../helpers/h'
 
 export const input = (
-  <state>
+  <value>
     <document>
       <paragraph thing="value">
         one
       </paragraph>
     </document>
-  </state>
+  </value>
 )
 
 export const output = `

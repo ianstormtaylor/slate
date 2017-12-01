@@ -3,17 +3,17 @@
 import h from '../../../helpers/h'
 
 export const input = (
-  <state>
+  <value>
     <document>
       <paragraph>
         o<b>n</b>e
       </paragraph>
     </document>
-  </state>
+  </value>
 )
 
 export const output = {
-  kind: 'state',
+  kind: 'value',
   document: {
     kind: 'document',
     data: {},

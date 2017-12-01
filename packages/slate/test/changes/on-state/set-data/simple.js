@@ -3,11 +3,11 @@
 import h from '../../../helpers/h'
 
 export default function (change) {
-  change.setState({ data: { thing: 'value' }})
+  change.setValue({ data: { thing: 'value' }})
 }
 
 export const input = (
-  <state>
+  <value>
     <document>
       <paragraph>
         word
@@ -16,11 +16,11 @@ export const input = (
         another
       </paragraph>
     </document>
-  </state>
+  </value>
 )
 
 export const output = (
-  <state data={{ thing: 'value' }}>
+  <value data={{ thing: 'value' }}>
     <document>
       <paragraph>
         word
@@ -29,5 +29,5 @@ export const output = (
         another
       </paragraph>
     </document>
-  </state>
+  </value>
 )

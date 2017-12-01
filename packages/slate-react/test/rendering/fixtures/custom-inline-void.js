@@ -19,14 +19,14 @@ export const props = {
   renderNode,
 }
 
-export const state = (
-  <state>
+export const value = (
+  <value>
     <document>
       <paragraph>
         <emoji />
       </paragraph>
     </document>
-  </state>
+  </value>
 )
 
 export const output = `
@@ -40,7 +40,9 @@ export const output = `
     <span data-slate-void="true" contenteditable="false">
       <span contenteditable="true" data-slate-spacer="true" style="height:0;color:transparent;outline:none">
         <span>
-          <span></span>
+          <span>
+            <span data-slate-zero-width="true">&#x200B;</span>
+          </span>
         </span>
       </span>
       <span draggable="true">

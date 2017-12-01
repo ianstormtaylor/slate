@@ -1,9 +1,9 @@
 
 import { Editor } from 'slate-react'
-import { State } from 'slate'
+import { Value } from 'slate'
 
 import React from 'react'
-import initialState from './state.json'
+import initialValue from './value.json'
 
 /**
  * Emojis.
@@ -18,6 +18,14 @@ const EMOJIS = [
 ]
 
 /**
+ * No ops.
+ *
+ * @type {Function}
+ */
+
+const noop = e => e.preventDefault()
+
+/**
  * The links example.
  *
  * @type {Component}
@@ -26,13 +34,13 @@ const EMOJIS = [
 class Emojis extends React.Component {
 
   /**
-   * Deserialize the raw initial state.
+   * Deserialize the raw initial value.
    *
    * @type {Object}
    */
 
   state = {
-    state: State.fromJSON(initialState)
+    value: Value.fromJSON(initialValue)
   }
 
   /**
@@ -41,8 +49,8 @@ class Emojis extends React.Component {
    * @param {Change} change
    */
 
-  onChange = ({ state }) => {
-    this.setState({ state })
+  onChange = ({ value }) => {
+    this.setState({ value })
   }
 
   /**
@@ -53,8 +61,8 @@ class Emojis extends React.Component {
 
   onClickEmoji = (e, code) => {
     e.preventDefault()
-    const { state } = this.state
-    const change = state.change()
+    const { value } = this.state
+    const change = value.change()
 
     change.insertInline({
       type: 'emoji',
@@ -112,7 +120,7 @@ class Emojis extends React.Component {
       <div className="editor">
         <Editor
           placeholder="Write some 😍👋🎉..."
-          state={this.state.state}
+          value={this.state.value}
           onChange={this.onChange}
           renderNode={this.renderNode}
         />
@@ -136,7 +144,16 @@ class Emojis extends React.Component {
       case 'emoji': {
         const { data } = node
         const code = data.get('code')
-        return <span className={`emoji ${isSelected ? 'selected' : ''}`} {...props.attributes} contentEditable={false}>{code}</span>
+        return (
+          <span
+            className={`emoji ${isSelected ? 'selected' : ''}`}
+            {...props.attributes}
+            contentEditable={false}
+            onDrop={noop}
+          >
+            {code}
+          </span>
+        )
       }
     }
   }

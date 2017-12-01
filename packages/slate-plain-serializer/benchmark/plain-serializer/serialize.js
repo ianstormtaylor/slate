@@ -9,7 +9,7 @@ export default function (state) {
 }
 
 export const input = (
-  <state>
+  <value>
     <document>
       {Array.from(Array(10)).map(() => (
         <quote>
@@ -21,5 +21,5 @@ export const input = (
         </quote>
       ))}
     </document>
-  </state>
+  </value>
 )

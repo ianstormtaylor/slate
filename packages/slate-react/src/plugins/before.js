@@ -4,7 +4,12 @@ import getWindow from 'get-window'
 import { findDOMNode } from 'react-dom'
 
 import HOTKEYS from '../constants/hotkeys'
-import { IS_FIREFOX, SUPPORTED_EVENTS } from '../constants/environment'
+import {
+  IS_FIREFOX,
+  IS_IOS,
+  IS_ANDROID,
+  SUPPORTED_EVENTS
+} from '../constants/environment'
 import findNode from '../utils/find-node'
 
 /**
@@ -13,7 +18,7 @@ import findNode from '../utils/find-node'
  * @type {Function}
  */
 
-const debug = Debug('slate:core:before')
+const debug = Debug('slate:before')
 
 /**
  * The core before plugin.
@@ -22,6 +27,7 @@ const debug = Debug('slate:core:before')
  */
 
 function BeforePlugin() {
+  let activeElement = null
   let compositionCount = 0
   let isComposing = false
   let isCopying = false
@@ -44,7 +50,9 @@ function BeforePlugin() {
     // since it provides more useful information about the range being affected
     // and also preserves compatibility with iOS autocorrect, which would be
     // broken if we called `preventDefault()` on React's synthetic event here.
-    if (SUPPORTED_EVENTS.beforeinput) return true
+    // Since native `onbeforeinput` mainly benefits autocorrect and spellcheck
+    // for mobile, on desktop it brings IME issue, limit its scope for now.
+    if ((IS_IOS || IS_ANDROID) && SUPPORTED_EVENTS.beforeinput) return true
 
     debug('onBeforeInput', { event })
   }
@@ -61,30 +69,35 @@ function BeforePlugin() {
     if (isCopying) return true
     if (editor.props.readOnly) return true
 
-    const { state } = change
-    const focusTarget = event.relatedTarget
+    const { value } = change
+    const { relatedTarget, target } = event
+    const window = getWindow(target)
 
-    // If focusTarget is null, the blur event is due to the window itself being
-    // blurred (eg. when changing tabs) so we should ignore the event, since we
-    // want to maintain focus when returning.
-    if (!focusTarget) return true
+    // COMPAT: If the current `activeElement` is still the previous one, this is
+    // due to the window being blurred when the tab itself becomes unfocused, so
+    // we want to abort early to allow to editor to stay focused when the tab
+    // becomes focused again.
+    if (activeElement == window.document.activeElement) return true
 
-    const el = findDOMNode(editor)
+    // COMPAT: The `relatedTarget` can be null when the new focus target is not
+    // a "focusable" element (eg. a `<div>` without `tabindex` set).
+    if (relatedTarget) {
+      const el = findDOMNode(editor)
 
-    // The event should also be ignored if the focus returns to the editor from
-    // an embedded editable element (eg. an input element inside a void node),
-    if (focusTarget == el) return true
+      // COMPAT: The event should be ignored if the focus is returning to the
+      // editor from an embedded editable element (eg. an <input> element inside
+      // a void node).
+      if (relatedTarget == el) return true
 
-    // when the focus moved from the editor to a void node spacer...
-    if (focusTarget.hasAttribute('data-slate-spacer')) return true
+      // COMPAT: The event should be ignored if the focus is moving from the
+      // editor to inside a void node's spacer element.
+      if (relatedTarget.hasAttribute('data-slate-spacer')) return true
 
-    // or to an editable element inside the editor but not into a void node
-    // (eg. a list item of the check list example).
-    if (
-      el.contains(focusTarget) &&
-      !findNode(focusTarget, state).isVoid
-    ) {
-      return true
+      // COMPAT: The event should be ignored if the focus is moving to a non-
+      // editable section of an element that isn't a void node (eg. a list item
+      // of the check list example).
+      const node = findNode(relatedTarget, value)
+      if (el.contains(relatedTarget) && node && !node.isVoid) return true
     }
 
     debug('onBlur', { event })
@@ -98,13 +111,14 @@ function BeforePlugin() {
    */
 
   function onChange(change, editor) {
-    const { state } = change
-    const schema = editor.getSchema()
+    const { value } = change
 
-    // If the state's schema isn't the editor's schema, update it.
-    if (state.schema != schema) {
+    // If the value's schema isn't the editor's schema, update it. This can
+    // happen on the initialization of the editor, or if the schema changes.
+    // This change isn't save into history since only schema is updated.
+    if (value.schema != editor.schema) {
       change
-        .setState({ schema })
+        .setValue({ schema: editor.schema }, { save: false })
         .normalize()
     }
 
@@ -125,9 +139,14 @@ function BeforePlugin() {
     // The `count` check here ensures that if another composition starts
     // before the timeout has closed out this one, we will abort unsetting the
     // `isComposing` flag, since a composition is still in affect.
-    setTimeout(() => {
+    window.requestAnimationFrame(() => {
       if (compositionCount > n) return
       isComposing = false
+
+      // HACK: we need to re-render the editor here so that it will update its
+      // placeholder in case one is currently rendered. This should be handled
+      // differently ideally, in a less invasive way?
+      editor.setState({ isComposing: false })
     })
 
     debug('onCompositionEnd', { event })
@@ -144,6 +163,11 @@ function BeforePlugin() {
   function onCompositionStart(event, change, editor) {
     isComposing = true
     compositionCount++
+
+    // HACK: we need to re-render the editor here so that it will update its
+    // placeholder in case one is currently rendered. This should be handled
+    // differently ideally, in a less invasive way?
+    editor.setState({ isComposing: true })
 
     debug('onCompositionStart', { event })
   }
@@ -241,14 +265,18 @@ function BeforePlugin() {
    */
 
   function onDragOver(event, change, editor) {
+    // If the target is inside a void node, and only in this case,
+    // call `preventDefault` to signal that drops are allowed.
+    // When the target is editable, dropping is already allowed by
+    // default, and calling `preventDefault` hides the cursor.
+    const node = findNode(event.target, editor.value)
+    if (node.isVoid) event.preventDefault()
+
     // If a drag is already in progress, don't do this again.
     if (isDragging) return true
 
     isDragging = true
     event.nativeEvent.dataTransfer.dropEffect = 'move'
-
-    // You must call `preventDefault` to signal that drops are allowed.
-    event.preventDefault()
 
     debug('onDragOver', { event })
   }
@@ -282,7 +310,7 @@ function BeforePlugin() {
     // Nothing happens in read-only mode.
     if (editor.props.readOnly) return true
 
-    // Prevent default so the DOM's state isn't corrupted.
+    // Prevent default so the DOM's value isn't corrupted.
     event.preventDefault()
 
     debug('onDrop', { event })
@@ -301,6 +329,10 @@ function BeforePlugin() {
     if (editor.props.readOnly) return true
 
     const el = findDOMNode(editor)
+
+    // Save the new `activeElement`.
+    const window = getWindow(event.target)
+    activeElement = window.document.activeElement
 
     // COMPAT: If the editor has nested editable elements, the focus can go to
     // those elements. In Firefox, this must be prevented because it results in
@@ -323,7 +355,7 @@ function BeforePlugin() {
 
   function onInput(event, change, editor) {
     if (isComposing) return true
-    if (change.state.isBlurred) return true
+    if (change.value.isBlurred) return true
 
     debug('onInput', { event })
   }
@@ -339,16 +371,16 @@ function BeforePlugin() {
   function onKeyDown(event, change, editor) {
     if (editor.props.readOnly) return true
 
-    // When composing, these characters commit the composition but also move the
-    // selection before we're able to handle it, so prevent their default,
-    // selection-moving behavior.
-    if (isComposing && HOTKEYS.COMPOSING(event)) {
-      event.preventDefault()
+    // When composing, we need to prevent all hotkeys from executing while
+    // typing. However, certain characters also move the selection before
+    // we're able to handle it, so prevent their default behavior.
+    if (isComposing) {
+      if (HOTKEYS.COMPOSING(event)) event.preventDefault()
       return true
     }
 
     // Certain hotkeys have native behavior in contenteditable elements which
-    // will cause our state to be out of sync, so prevent them.
+    // will cause our value to be out of sync, so prevent them.
     if (HOTKEYS.CONTENTEDITABLE(event)) {
       event.preventDefault()
     }
@@ -385,6 +417,10 @@ function BeforePlugin() {
     if (isCopying) return true
     if (isComposing) return true
     if (editor.props.readOnly) return true
+
+    // Save the new `activeElement`.
+    const window = getWindow(event.target)
+    activeElement = window.document.activeElement
 
     debug('onSelect', { event })
   }

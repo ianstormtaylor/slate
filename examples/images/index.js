@@ -1,9 +1,9 @@
 
 import { Editor, getEventRange, getEventTransfer } from 'slate-react'
-import { Block, State } from 'slate'
+import { Block, Value } from 'slate'
 
 import React from 'react'
-import initialState from './state.json'
+import initialValue from './value.json'
 import isImage from 'is-image'
 import isUrl from 'is-url'
 
@@ -28,6 +28,26 @@ function insertImage(change, src, target) {
 }
 
 /**
+ * A schema to enforce that there's always a paragraph as the last block.
+ *
+ * @type {Object}
+ */
+
+const schema = {
+  document: {
+    last: { types: ['paragraph'] },
+    normalize: (change, reason, { node, child }) => {
+      switch (reason) {
+        case 'last_child_type_invalid': {
+          const paragraph = Block.create('paragraph')
+          return change.insertNodeByKey(node.key, node.nodes.size, paragraph)
+        }
+      }
+    }
+  }
+}
+
+/**
  * The images example.
  *
  * @type {Component}
@@ -36,13 +56,13 @@ function insertImage(change, src, target) {
 class Images extends React.Component {
 
   /**
-   * Deserialize the raw initial state.
+   * Deserialize the raw initial value.
    *
    * @type {Object}
    */
 
   state = {
-    state: State.fromJSON(initialState)
+    value: Value.fromJSON(initialValue)
   }
 
   /**
@@ -87,12 +107,12 @@ class Images extends React.Component {
       <div className="editor">
         <Editor
           placeholder="Enter some text..."
-          state={this.state.state}
+          value={this.state.value}
+          schema={schema}
           onChange={this.onChange}
-          onDrop={this.onDrop}
-          onPaste={this.onPaste}
+          onDrop={this.onDropOrPaste}
+          onPaste={this.onDropOrPaste}
           renderNode={this.renderNode}
-          validateNode={this.validateNode}
         />
       </div>
     )
@@ -120,31 +140,13 @@ class Images extends React.Component {
   }
 
   /**
-   * Perform node validation on the document.
-   *
-   * @param {Node} node
-   * @return {Function|Void}
-   */
-
-  validateNode = (node) => {
-    if (node.kind != 'document') return
-    const last = node.nodes.last()
-
-    if (!last || last.type != 'paragraph') {
-      const index = node.nodes.size
-      const paragraph = Block.create('paragraph')
-      return change => change.insertNodeByKey(node.key, index, paragraph)
-    }
-  }
-
-  /**
    * On change.
    *
    * @param {Change} change
    */
 
-  onChange = ({ state }) => {
-    this.setState({ state })
+  onChange = ({ value }) => {
+    this.setState({ value })
   }
 
   /**
@@ -158,7 +160,7 @@ class Images extends React.Component {
     const src = window.prompt('Enter the URL of the image:')
     if (!src) return
 
-    const change = this.state.state
+    const change = this.state.value
       .change()
       .call(insertImage, src)
 
@@ -174,8 +176,8 @@ class Images extends React.Component {
    */
 
   onDropOrPaste = (event, change, editor) => {
-    const target = getEventRange(event)
-    if (!target) return
+    const target = getEventRange(event, change.value)
+    if (!target && event.type == 'drop') return
 
     const transfer = getEventTransfer(event)
     const { type, text, files } = transfer

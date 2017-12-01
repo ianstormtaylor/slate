@@ -4,8 +4,8 @@ import h from '../../helpers/h'
 
 export const props = {}
 
-export const state = (
-  <state>
+export const value = (
+  <value>
     <document>
       <paragraph>
         <link>
@@ -13,7 +13,7 @@ export const state = (
         </link>
       </paragraph>
     </document>
-  </state>
+  </value>
 )
 
 export const output = `

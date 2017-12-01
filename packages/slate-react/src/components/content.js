@@ -1,7 +1,6 @@
 
 import Debug from 'debug'
 import React from 'react'
-import SlateTypes from 'slate-prop-types'
 import Types from 'prop-types'
 import getWindow from 'get-window'
 import logger from 'slate-dev-logger'
@@ -11,7 +10,12 @@ import Node from './node'
 import findDOMRange from '../utils/find-dom-range'
 import findRange from '../utils/find-range'
 import scrollToSelection from '../utils/scroll-to-selection'
-import { IS_FIREFOX, SUPPORTED_EVENTS } from '../constants/environment'
+import {
+  IS_FIREFOX,
+  IS_IOS,
+  IS_ANDROID,
+  SUPPORTED_EVENTS
+} from '../constants/environment'
 
 /**
  * Debug.
@@ -38,14 +42,12 @@ class Content extends React.Component {
   static propTypes = {
     autoCorrect: Types.bool.isRequired,
     autoFocus: Types.bool.isRequired,
-    children: Types.array.isRequired,
+    children: Types.any.isRequired,
     className: Types.string,
     editor: Types.object.isRequired,
     readOnly: Types.bool.isRequired,
     role: Types.string,
-    schema: SlateTypes.schema.isRequired,
     spellCheck: Types.bool.isRequired,
-    state: SlateTypes.state.isRequired,
     style: Types.object,
     tabIndex: Types.number,
     tagName: Types.string,
@@ -92,7 +94,8 @@ class Content extends React.Component {
   componentDidMount = () => {
     const { editor } = this.props
 
-    if (SUPPORTED_EVENTS.beforeinput) {
+    // Restrict scoped of `beforeinput` to mobile.
+    if ((IS_IOS || IS_ANDROID) && SUPPORTED_EVENTS.beforeinput) {
       this.element.addEventListener('beforeinput', this.onNativeBeforeInput)
     }
 
@@ -108,7 +111,8 @@ class Content extends React.Component {
    */
 
   componentWillUnmount() {
-    if (SUPPORTED_EVENTS.beforeinput) {
+    // Restrict scoped of `beforeinput` to mobile.
+    if ((IS_IOS || IS_ANDROID) && SUPPORTED_EVENTS.beforeinput) {
       this.element.removeEventListener('beforeinput', this.onNativeBeforeInput)
     }
   }
@@ -126,11 +130,13 @@ class Content extends React.Component {
    */
 
   updateSelection = () => {
-    const { state } = this.props
-    const { selection } = state
+    const { editor } = this.props
+    const { value } = editor
+    const { selection } = value
+    const { isBackward } = selection
     const window = getWindow(this.element)
     const native = window.getSelection()
-    const { rangeCount } = native
+    const { rangeCount, anchorNode } = native
 
     // If both selections are blurred, do nothing.
     if (!rangeCount && selection.isBlurred) return
@@ -138,7 +144,7 @@ class Content extends React.Component {
     // If the selection has been blurred, but is still inside the editor in the
     // DOM, blur it manually.
     if (selection.isBlurred) {
-      if (!this.isInEditor(native.anchorNode)) return
+      if (!this.isInEditor(anchorNode)) return
       native.removeAllRanges()
       this.element.blur()
       debug('updateSelection', { selection, native })
@@ -150,28 +156,64 @@ class Content extends React.Component {
 
     // Otherwise, figure out which DOM nodes should be selected...
     const current = !!rangeCount && native.getRangeAt(0)
-    const range = findDOMRange(selection)
+    const range = findDOMRange(selection, window)
 
     if (!range) {
       logger.error('Unable to find a native DOM range from the current selection.', { selection })
       return
     }
 
-    // If the new range matches the current selection, do nothing.
-    if (
-      current &&
-      range.startContainer == current.startContainer &&
-      range.startOffset == current.startOffset &&
-      range.endContainer == current.endContainer &&
-      range.endOffset == current.endOffset
-    ) {
-      return
+    const {
+      startContainer,
+      startOffset,
+      endContainer,
+      endOffset,
+    } = range
+
+    // If the new range matches the current selection, there is nothing to fix.
+    // COMPAT: The native `Range` object always has it's "start" first and "end"
+    // last in the DOM. It has no concept of "backwards/forwards", so we have
+    // to check both orientations here. (2017/10/31)
+    if (current) {
+      if (
+        (
+          startContainer == current.startContainer &&
+          startOffset == current.startOffset &&
+          endContainer == current.endContainer &&
+          endOffset == current.endOffset
+        ) ||
+        (
+          startContainer == current.endContainer &&
+          startOffset == current.endOffset &&
+          endContainer == current.startContainer &&
+          endOffset == current.startOffset
+        )
+      ) {
+        return
+      }
     }
 
     // Otherwise, set the `isUpdatingSelection` flag and update the selection.
     this.tmp.isUpdatingSelection = true
     native.removeAllRanges()
-    native.addRange(range)
+
+    // COMPAT: IE 11 does not support Selection.extend
+    if (native.extend) {
+      // COMPAT: Since the DOM range has no concept of backwards/forwards
+      // we need to check and do the right thing here.
+      if (isBackward) {
+        native.collapse(range.endContainer, range.endOffset)
+        native.extend(range.startContainer, range.startOffset)
+      } else {
+        native.collapse(range.startContainer, range.startOffset)
+        native.extend(range.endContainer, range.endOffset)
+      }
+    } else {
+      // COMPAT: IE 11 does not support Selection.extend, fallback to addRange
+      native.addRange(range)
+    }
+
+    // Scroll to the selection, in case it's out of view.
     scrollToSelection(native)
 
     // Then unset the `isUpdatingSelection` flag after a delay.
@@ -223,6 +265,8 @@ class Content extends React.Component {
    */
 
   onEvent(handler, event) {
+    debug('onEvent', handler)
+
     // COMPAT: Composition events can change the DOM out of under React, so we
     // increment this key to ensure that a full re-render happens. (2017/10/16)
     if (handler == 'onCompositionEnd') {
@@ -248,11 +292,12 @@ class Content extends React.Component {
     // already up to date, but we do want to update the native selection again
     // to make sure it is in sync. (2017/10/16)
     if (handler == 'onSelect') {
-      const { state } = this.props
-      const { selection } = state
+      const { editor } = this.props
+      const { value } = editor
+      const { selection } = value
       const window = getWindow(event.target)
       const native = window.getSelection()
-      const range = findRange(native, state)
+      const range = findRange(native, value)
 
       if (range && range.equals(selection)) {
         this.updateSelection()
@@ -325,16 +370,17 @@ class Content extends React.Component {
 
     event.preventDefault()
 
-    const { editor, state } = this.props
-    const { selection } = state
-    const range = findRange(targetRange, state)
+    const { editor } = this.props
+    const { value } = editor
+    const { selection } = value
+    const range = findRange(targetRange, value)
 
     editor.change((change) => {
       change.insertTextAtRange(range, text, selection.marks)
 
       // If the text was successfully inserted, and the selection had marks on it,
       // unset the selection's marks.
-      if (selection.marks && state.document != change.state.document) {
+      if (selection.marks && value.document != change.value.document) {
         change.select({ marks: null })
       }
     })
@@ -348,9 +394,10 @@ class Content extends React.Component {
 
   render() {
     const { props } = this
-    const { className, readOnly, state, tabIndex, role, tagName } = props
+    const { className, readOnly, editor, tabIndex, role, tagName } = props
+    const { value } = editor
     const Container = tagName
-    const { document, selection } = state
+    const { document, selection } = value
     const indexes = document.getSelectionIndexes(selection, selection.isFocused)
     const children = document.nodes.toArray().map((child, i) => {
       const isSelected = !!indexes && indexes.start <= i && i < indexes.end
@@ -370,7 +417,7 @@ class Content extends React.Component {
       // Allow words to break if they are too long.
       wordWrap: 'break-word',
       // COMPAT: In iOS, a formatting menu with bold, italic and underline
-      // buttons is shown which causes our internal state to get out of sync in
+      // buttons is shown which causes our internal value to get out of sync in
       // weird ways. This hides that. (2016/06/21)
       ...(readOnly ? {} : { WebkitUserModify: 'read-write-plaintext-only' }),
       // Allow for passed-in styles to override anything.
@@ -379,7 +426,7 @@ class Content extends React.Component {
 
     // COMPAT: In Firefox, spellchecking can remove entire wrapping elements
     // including inline ones like `<a>`, which is jarring for the user but also
-    // causes the DOM to get into an irreconcilable state. (2016/09/01)
+    // causes the DOM to get into an irreconcilable value. (2016/09/01)
     const spellCheck = IS_FIREFOX ? false : props.spellCheck
 
     debug('render', { props })
@@ -434,9 +481,10 @@ class Content extends React.Component {
    */
 
   renderNode = (child, isSelected) => {
-    const { editor, readOnly, schema, state } = this.props
-    const { document, decorations } = state
-    const stack = editor.getStack()
+    const { editor, readOnly } = this.props
+    const { value } = editor
+    const { document, decorations } = value
+    const { stack } = editor
     let decs = document.getDecorations(stack)
     if (decorations) decs = decorations.concat(decs)
     return (
@@ -449,8 +497,6 @@ class Content extends React.Component {
         node={child}
         parent={document}
         readOnly={readOnly}
-        schema={schema}
-        state={state}
       />
     )
   }

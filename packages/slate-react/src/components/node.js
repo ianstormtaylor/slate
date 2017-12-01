@@ -39,8 +39,6 @@ class Node extends React.Component {
     node: SlateTypes.node.isRequired,
     parent: SlateTypes.node.isRequired,
     readOnly: Types.bool.isRequired,
-    schema: SlateTypes.schema.isRequired,
-    state: SlateTypes.state.isRequired,
   }
 
   /**
@@ -60,13 +58,13 @@ class Node extends React.Component {
    * Should the node update?
    *
    * @param {Object} nextProps
-   * @param {Object} state
+   * @param {Object} value
    * @return {Boolean}
    */
 
   shouldComponentUpdate = (nextProps) => {
     const { props } = this
-    const stack = props.editor.getStack()
+    const { stack } = props.editor
     const shouldUpdate = stack.find('shouldNodeComponentUpdate', props, nextProps)
     const n = nextProps
     const p = props
@@ -94,10 +92,10 @@ class Node extends React.Component {
     // for simplicity we just let them through.
     if (n.node != p.node) return true
 
-    // If the selection state of the node or of some of its children has changed,
+    // If the selection value of the node or of some of its children has changed,
     // re-render in case there is any user-land logic depends on it to render.
     // if the node is selected update it, even if it was already selected: the
-    // selection state of some of its children could have been changed and they
+    // selection value of some of its children could have been changed and they
     // need to be rendered again.
     if (n.isSelected || p.isSelected) return true
 
@@ -117,9 +115,10 @@ class Node extends React.Component {
   render() {
     this.debug('render', this)
 
-    const { editor, isSelected, node, parent, readOnly, state } = this.props
-    const { selection } = state
-    const stack = editor.getStack()
+    const { editor, isSelected, node, parent, readOnly } = this.props
+    const { value } = editor
+    const { selection } = value
+    const { stack } = editor
     const indexes = node.getSelectionIndexes(selection, isSelected)
     let children = node.nodes.toArray().map((child, i) => {
       const isChildSelected = !!indexes && indexes.start <= i && i < indexes.end
@@ -144,7 +143,6 @@ class Node extends React.Component {
       node,
       parent,
       readOnly,
-      state
     }
 
     let placeholder = stack.find('renderPlaceholder', props)
@@ -170,9 +168,9 @@ class Node extends React.Component {
    */
 
   renderNode = (child, isSelected) => {
-    const { block, decorations, editor, node, readOnly, schema, state } = this.props
+    const { block, decorations, editor, node, readOnly } = this.props
+    const { stack } = editor
     const Component = child.kind == 'text' ? Text : Node
-    const stack = editor.getStack()
     const decs = decorations.concat(node.getDecorations(stack))
     return (
       <Component
@@ -184,8 +182,6 @@ class Node extends React.Component {
         node={child}
         parent={node}
         readOnly={readOnly}
-        schema={schema}
-        state={state}
       />
     )
   }

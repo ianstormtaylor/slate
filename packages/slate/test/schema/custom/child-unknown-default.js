@@ -14,7 +14,7 @@ export const schema = {
 }
 
 export const input = (
-  <state>
+  <value>
     <document>
       <quote>
         <paragraph>
@@ -25,11 +25,11 @@ export const input = (
         </paragraph>
       </quote>
     </document>
-  </state>
+  </value>
 )
 
 export const output = (
-  <state>
+  <value>
     <document>
       <quote>
         <paragraph>
@@ -37,5 +37,5 @@ export const output = (
         </paragraph>
       </quote>
     </document>
-  </state>
+  </value>
 )

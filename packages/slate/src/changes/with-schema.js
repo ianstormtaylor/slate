@@ -10,7 +10,7 @@ import { Set } from 'immutable'
 const Changes = {}
 
 /**
- * Normalize the state with its schema.
+ * Normalize the value with its schema.
  *
  * @param {Change} change
  */
@@ -20,29 +20,38 @@ Changes.normalize = (change) => {
 }
 
 /**
- * Normalize the document with the state's schema.
+ * Normalize the document with the value's schema.
  *
  * @param {Change} change
  */
 
 Changes.normalizeDocument = (change) => {
-  const { state } = change
-  const { document } = state
+  const { value } = change
+  const { document } = value
   change.normalizeNodeByKey(document.key)
 }
 
 /**
- * Normalize a `node` and its children with the state's schema.
+ * Normalize a `node` and its children with the value's schema.
  *
  * @param {Change} change
  * @param {Node|String} key
  */
 
 Changes.normalizeNodeByKey = (change, key) => {
-  const { state } = change
-  const { document, schema } = state
+  const { value } = change
+  let { document, schema } = value
   const node = document.assertNode(key)
+
   normalizeNodeAndChildren(change, node, schema)
+
+  document = change.value.document
+  const ancestors = document.getAncestors(key)
+  if (!ancestors) return
+
+  ancestors.forEach((ancestor) => {
+    normalizeNode(change, ancestor, schema)
+  })
 }
 
 /**
@@ -67,7 +76,7 @@ function normalizeNodeAndChildren(change, node, schema) {
 
   // While there is still a child key that hasn't been normalized yet...
   while (keys.length) {
-    const ops = change.operations.length
+    const { size } = change.operations
     let key
 
     // PERF: use a mutable set here since we'll be add to it a lot.
@@ -86,7 +95,7 @@ function normalizeNodeAndChildren(change, node, schema) {
 
     // PERF: Only re-find the node and re-normalize any new children if
     // operations occured that might have changed it.
-    if (change.operations.length != ops) {
+    if (change.operations.size > size) {
       node = refindNode(change, node)
 
       // Add any new children back onto the stack.
@@ -113,8 +122,8 @@ function normalizeNodeAndChildren(change, node, schema) {
  */
 
 function refindNode(change, node) {
-  const { state } = change
-  const { document } = state
+  const { value } = change
+  const { document } = value
   return node.kind == 'document'
     ? document
     : document.getDescendant(node.key)

@@ -7,17 +7,17 @@ export default function (change) {
 }
 
 export const input = (
-  <state>
+  <value>
     <document>
       <image>
         <cursor />{' '}
       </image>
     </document>
-  </state>
+  </value>
 )
 
 export const output = (
-  <state>
+  <value>
     <document />
     <selection
       anchorKey={null}
@@ -25,5 +25,5 @@ export const output = (
       focusKey={null}
       focusOffset={0}
     />
-  </state>
+  </value>
 )

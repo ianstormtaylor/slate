@@ -37,8 +37,6 @@ class Leaf extends React.Component {
     node: SlateTypes.node.isRequired,
     offset: Types.number.isRequired,
     parent: SlateTypes.node.isRequired,
-    schema: SlateTypes.schema.isRequired,
-    state: SlateTypes.state.isRequired,
     text: Types.string.isRequired,
   }
 
@@ -65,7 +63,6 @@ class Leaf extends React.Component {
     if (
       props.index != this.props.index ||
       props.marks != this.props.marks ||
-      props.schema != this.props.schema ||
       props.text != this.props.text ||
       props.parent != this.props.parent
     ) {
@@ -105,12 +102,12 @@ class Leaf extends React.Component {
    */
 
   renderMarks() {
-    const { marks, schema, node, offset, text, state, editor } = this.props
-    const stack = editor.getStack()
+    const { marks, node, offset, text, editor } = this.props
+    const { stack } = editor
     const leaf = this.renderText()
 
     return marks.reduce((children, mark) => {
-      const props = { editor, mark, marks, node, offset, schema, state, text, children }
+      const props = { editor, mark, marks, node, offset, text, children }
       const element = stack.find('renderMark', props)
       return element || children
     }, leaf)
@@ -125,13 +122,13 @@ class Leaf extends React.Component {
   renderText() {
     const { block, node, parent, text, index, leaves } = this.props
 
-    // COMPAT: If the text is empty and it's the only child, we need to render a
-    // <br/> to get the block to have the proper height.
-    if (text == '' && parent.kind == 'block' && parent.text == '') return <br />
+    // COMPAT: Render text inside void nodes with a zero-width space.
+    // So the node can contain selection but the text is not visible.
+    if (parent.isVoid) return <span data-slate-zero-width>{'\u200B'}</span>
 
-    // COMPAT: If the text is empty otherwise, it's because it's on the edge of
-    // an inline void node, so we render a zero-width space so that the
-    // selection can be inserted next to it still.
+    // COMPAT: If the text is empty, it's because it's on the edge of an inline
+    // void node, so we render a zero-width space so that the selection can be
+    // inserted next to it still.
     if (text == '') return <span data-slate-zero-width>{'\u200B'}</span>
 
     // COMPAT: Browsers will collapse trailing new lines at the end of blocks,

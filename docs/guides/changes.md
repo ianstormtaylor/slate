@@ -1,9 +1,9 @@
 
 # Changes
 
-All changes to a Slate editor's state, whether it's the `selection`, `document`, `history`, etc. happen via "changes"—specifically, via the [`Change`](../reference/slate/change.md) model.
+All changes to a Slate editor's value, whether it's the `selection`, `document`, `history`, etc. happen via "changes"—specifically, via the [`Change`](../reference/slate/change.md) model.
 
-This is important because the `Change` model is responsible for ensuring that every change to a Slate state can be expressed in terms of low-level [operations](../reference/slate/operation.md). But you don't have to worry about that, because it happens automatically.
+This is important because the `Change` model is responsible for ensuring that every change to a Slate value can be expressed in terms of low-level [operations](../reference/slate/operation.md). But you don't have to worry about that, because it happens automatically.
 
 You just need to understand changes...
 
@@ -14,7 +14,7 @@ Changes in Slate are designed to prioritize expressiveness above almost all else
 
 If you're building a powerful editor, it's going to be somewhat complex, and you're going to be writing code to perform all different kinds of programmatic changes. You'll be removing nodes, inserting fragments, moving the selection around, etc.
 
-And if the API for changes was verbose, or if required lots of in between steps to be continually performed, your code would balloon to be impossible to understand very quickly.
+And if the API for changes was verbose, or if it required lots of in between steps to be continually performed, your code would balloon to be impossible to understand very quickly.
 
 To solve this, Slate has very expressive, chainable changes. Like this:
 
@@ -33,9 +33,9 @@ change
 
 Hopefully from reading that you can discern that those changes result in... the entire document's content being selected and deleted, some text bring written, a word being bolded, and finally an image block and a paragraph block being added.
 
-Of course you're not usually going to chain that much. 
+Of course you're not usually going to chain that much.
 
-Point is, you can get pretty expressive in just a few lines of code. 
+Point is, you can get pretty expressive in just a few lines of code.
 
 That way, when you're scanning to see what behaviors are being triggered, you can understand your code easily. You don't have to sit there and try to parse out a bunch of interim variables to figure out what you're trying to achieve.
 
@@ -58,15 +58,15 @@ These are changes like `delete()`, `addMark()`, `insertBlock()`, etc. that are t
 
 ### On the Selection
 
-These are changes like `blur()`, `collapseToStart()`, `moveToRangeOf()`, etc. that change the `state.selection` model and update the user's cursor without affecting the content of the document.
+These are changes like `blur()`, `collapseToStart()`, `moveToRangeOf()`, etc. that change the `value.selection` model and update the user's cursor without affecting the content of the document.
 
 ### On a Specific Node
 
 These are changes like `removeNodeByKey()`, `setNodeByKey()`, `removeMarkByKey()`, etc. that take a `key` string referring to a specific node, and then change that node in different ways. These are often what you use when making programmatic changes from inside your custom node components, where you already have a reference to `props.node.key`.
 
-### On the Top-level State
+### On the Top-level Value
 
-These are changes like `setData()`, `setDecorations()`, etc. that act on the other top-level properties of the [`State`](../reference/slate/state.md) object. These are more advanced.
+These are changes like `setData()`, `setDecorations()`, etc. that act on the other top-level properties of the [`Value`](../reference/slate/value.md) object. These are more advanced.
 
 ### On the History
 
@@ -75,7 +75,7 @@ These are changes like `undo()`, `redo()`, etc. that use the operation history a
 
 ## Making Changes
 
-When you decide you want to make a change to the Slate state, you're almost always in one of four places...
+When you decide you want to make a change to the Slate value, you're almost always in one of four places...
 
 ### 1. In Slate Handlers
 
@@ -89,7 +89,7 @@ function onKeyDown(event, change, editor) {
 }
 ```
 
-Any change methods you call will be applied, and when the event handler stack is finished resolving, the editor will automatically update with those changes. 
+Any change methods you call will be applied, and when the event handler stack is finished resolving, the editor will automatically update with those changes.
 
 ### 2. From Custom Node Components
 
@@ -107,8 +107,8 @@ class Image extends React.Component {
   }
 
   render() {
-    <img 
-      {...this.props.attributes} 
+    <img
+      {...this.props.attributes}
       onClick={this.onClick}
     />
   }
@@ -116,7 +116,7 @@ class Image extends React.Component {
 }
 ```
 
-The `editor.change()` method will create a new [`Change`](../reference/slate/change.md) object for you, based on the editor's current state. You can then call any change methods you want, and the new state will be applied to the editor.
+The `editor.change()` method will create a new [`Change`](../reference/slate/change.md) object for you, based on the editor's current value. You can then call any change methods you want, and the new value will be applied to the editor.
 
 ### 3. From Schema Rules
 
@@ -143,17 +143,17 @@ When a rule's validation fails, Slate passes a [`Change`](../reference/slate/cha
 
 This is the fourth place you might want to make changes, and also the most dangerous. You should know that any changes you make outside of the Slate editor might not be seen by your plugins, might interact with the history in weird ways, and may not work with collaborative editing implements.
 
-That said, if that's okay with you, you can make changes manually by using the `change()` method on a Slate [`State`](../reference/slate/state.md). For example:
+That said, if that's okay with you, you can make changes manually by using the `change()` method on a Slate [`Value`](../reference/slate/value.md). For example:
 
 ```js
-const change = state.change()
+const change = value.change()
   .selectAll()
   .delete()
 
-const newState = change.state
+const newValue = change.value
 ```
 
-Note that you'll need to then grab the new state value by accessing the `change.state` property directly.
+Note that you'll need to then grab the new value by accessing the `change.value` property directly.
 
 
 ## Reusing Changes
@@ -178,7 +178,7 @@ function insertImage(change, src) {
 }
 ```
 
-Notice how rewriting that image inserting logic multiple times without having it encapsulated in a single function would get tedious. Now with those change functions define, you can reuse them!
+Notice how rewriting that image inserting logic multiple times without having it encapsulated in a single function would get tedious. Now with those change functions defined, you can reuse them!
 
 But sadly you can't chain with those functions directly, since `change` objects don't actually know about them. Instead, you use the `.call()` method:
 

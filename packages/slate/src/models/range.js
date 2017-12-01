@@ -50,19 +50,19 @@ class Range extends Record(DEFAULTS) {
   }
 
   /**
-   * Create a list of `Ranges` from a `value`.
+   * Create a list of `Ranges` from `elements`.
    *
-   * @param {Array<Range|Object>|List<Range|Object>} value
+   * @param {Array<Range|Object>|List<Range|Object>} elements
    * @return {List<Range>}
    */
 
-  static createList(value = []) {
-    if (List.isList(value) || Array.isArray(value)) {
-      const list = new List(value.map(Range.create))
+  static createList(elements = []) {
+    if (List.isList(elements) || Array.isArray(elements)) {
+      const list = new List(elements.map(Range.create))
       return list
     }
 
-    throw new Error(`\`Range.createList\` only accepts arrays or lists, but you passed it: ${value}`)
+    throw new Error(`\`Range.createList\` only accepts arrays or lists, but you passed it: ${elements}`)
   }
 
   /**
@@ -89,11 +89,13 @@ class Range extends Record(DEFAULTS) {
       const props = {}
       if ('anchorKey' in attrs) props.anchorKey = attrs.anchorKey
       if ('anchorOffset' in attrs) props.anchorOffset = attrs.anchorOffset
+      if ('anchorPath' in attrs) props.anchorPath = attrs.anchorPath
       if ('focusKey' in attrs) props.focusKey = attrs.focusKey
       if ('focusOffset' in attrs) props.focusOffset = attrs.focusOffset
+      if ('focusPath' in attrs) props.focusPath = attrs.focusPath
       if ('isBackward' in attrs) props.isBackward = attrs.isBackward
       if ('isFocused' in attrs) props.isFocused = attrs.isFocused
-      if ('marks' in attrs) props.marks = attrs.marks
+      if ('marks' in attrs) props.marks = attrs.marks == null ? null : Mark.createSet(attrs.marks)
       return props
     }
 
@@ -138,14 +140,14 @@ class Range extends Record(DEFAULTS) {
   static fromJS = Range.fromJSON
 
   /**
-   * Check if a `value` is a `Range`.
+   * Check if an `obj` is a `Range`.
    *
-   * @param {Any} value
+   * @param {Any} obj
    * @return {Boolean}
    */
 
-  static isRange(value) {
-    return !!(value && value[MODEL_TYPES.RANGE])
+  static isRange(obj) {
+    return !!(obj && obj[MODEL_TYPES.RANGE])
   }
 
   /**
@@ -759,126 +761,6 @@ class Range extends Record(DEFAULTS) {
 
   toJS() {
     return this.toJSON()
-  }
-
-  /**
-   * Unset the range.
-   *
-   * @return {Range}
-   */
-
-  unset() {
-    logger.deprecate('0.17.0', 'The `Range.unset` method is deprecated, please switch to using `Range.deselect` instead.')
-    return this.deselect()
-  }
-
-  /**
-   * Move the range forward `n` characters.
-   *
-   * @param {Number} n (optional)
-   * @return {Range}
-   */
-
-  moveForward(n = 1) {
-    logger.deprecate('0.17.0', 'The `Range.moveForward(n)` method is deprecated, please switch to using `Range.move(n)` instead.')
-    return this.move(n)
-  }
-
-  /**
-   * Move the range backward `n` characters.
-   *
-   * @param {Number} n (optional)
-   * @return {Range}
-   */
-
-  moveBackward(n = 1) {
-    logger.deprecate('0.17.0', 'The `Range.moveBackward(n)` method is deprecated, please switch to using `Range.move(-n)` (with a negative number) instead.')
-    return this.move(0 - n)
-  }
-
-  /**
-   * Move the anchor offset `n` characters.
-   *
-   * @param {Number} n (optional)
-   * @return {Range}
-   */
-
-  moveAnchorOffset(n = 1) {
-    logger.deprecate('0.17.0', 'The `Range.moveAnchorOffset(n)` method is deprecated, please switch to using `Range.moveAnchor(n)` instead.')
-    return this.moveAnchor(n)
-  }
-
-  /**
-   * Move the focus offset `n` characters.
-   *
-   * @param {Number} n (optional)
-   * @return {Range}
-   */
-
-  moveFocusOffset(n = 1) {
-    logger.deprecate('0.17.0', 'The `Range.moveFocusOffset(n)` method is deprecated, please switch to using `Range.moveFocus(n)` instead.')
-    return this.moveFocus(n)
-  }
-
-  /**
-   * Move the start offset `n` characters.
-   *
-   * @param {Number} n (optional)
-   * @return {Range}
-   */
-
-  moveStartOffset(n = 1) {
-    logger.deprecate('0.17.0', 'The `Range.moveStartOffset(n)` method is deprecated, please switch to using `Range.moveStart(n)` instead.')
-    return this.moveStart(n)
-  }
-
-  /**
-   * Move the focus offset `n` characters.
-   *
-   * @param {Number} n (optional)
-   * @return {Range}
-   */
-
-  moveEndOffset(n = 1) {
-    logger.deprecate('0.17.0', 'The `Range.moveEndOffset(n)` method is deprecated, please switch to using `Range.moveEnd(n)` instead.')
-    return this.moveEnd(n)
-  }
-
-  /**
-   * Extend the focus point forward `n` characters.
-   *
-   * @param {Number} n (optional)
-   * @return {Range}
-   */
-
-  extendForward(n = 1) {
-    logger.deprecate('0.17.0', 'The `Range.extendForward(n)` method is deprecated, please switch to using `Range.extend(n)` instead.')
-    return this.extend(n)
-  }
-
-  /**
-   * Extend the focus point backward `n` characters.
-   *
-   * @param {Number} n (optional)
-   * @return {Range}
-   */
-
-  extendBackward(n = 1) {
-    logger.deprecate('0.17.0', 'The `Range.extendBackward(n)` method is deprecated, please switch to using `Range.extend(-n)` (with a negative number) instead.')
-    return this.extend(0 - n)
-  }
-
-  /**
-   * Move the range to `anchorOffset` and `focusOffset`.
-   *
-   * @param {Number} anchorOffset
-   * @param {Number} focusOffset (optional)
-   * @return {Range}
-   */
-
-  moveToOffsets(anchorOffset, focusOffset = anchorOffset) {
-    logger.deprecate('0.17.0', 'The `Range.moveToOffsets` method is deprecated, please switch to using `Range.moveOffsetsTo` instead.')
-    return this.moveOffsetsTo(anchorOffset, focusOffset)
   }
 
 }

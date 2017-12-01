@@ -1,5 +1,6 @@
 
 import invert from '../operations/invert'
+import omit from 'lodash/omit'
 
 /**
  * Changes.
@@ -10,34 +11,42 @@ import invert from '../operations/invert'
 const Changes = {}
 
 /**
- * Redo to the next state in the history.
+ * Redo to the next value in the history.
  *
  * @param {Change} change
  */
 
 Changes.redo = (change) => {
-  let { state } = change
-  let { history } = state
+  let { value } = change
+  let { history } = value
   if (!history) return
 
   let { undos, redos } = history
   const next = redos.peek()
   if (!next) return
 
-  // Shift the next state into the undo stack.
+  // Shift the next value into the undo stack.
   redos = redos.pop()
   undos = undos.push(next)
 
   // Replay the next operations.
   next.forEach((op) => {
+    const { type, properties } = op
+
+    // When the operation mutates the selection, omit its `isFocused` value to
+    // prevent the editor focus from changing during redoing.
+    if (type == 'set_selection') {
+      op = op.set('properties', omit(properties, 'isFocused'))
+    }
+
     change.applyOperation(op, { save: false })
   })
 
   // Update the history.
-  state = change.state
+  value = change.value
   history = history.set('undos', undos).set('redos', redos)
-  state = state.set('history', history)
-  change.state = state
+  value = value.set('history', history)
+  change.value = value
 }
 
 /**
@@ -47,8 +56,8 @@ Changes.redo = (change) => {
  */
 
 Changes.undo = (change) => {
-  let { state } = change
-  let { history } = state
+  let { value } = change
+  let { history } = value
   if (!history) return
 
   let { undos, redos } = history
@@ -61,14 +70,22 @@ Changes.undo = (change) => {
 
   // Replay the inverse of the previous operations.
   previous.slice().reverse().map(invert).forEach((inverse) => {
+    const { type, properties } = inverse
+
+    // When the operation mutates the selection, omit its `isFocused` value to
+    // prevent the editor focus from changing during undoing.
+    if (type == 'set_selection') {
+      inverse = inverse.set('properties', omit(properties, 'isFocused'))
+    }
+
     change.applyOperation(inverse, { save: false })
   })
 
   // Update the history.
-  state = change.state
+  value = change.value
   history = history.set('undos', undos).set('redos', redos)
-  state = state.set('history', history)
-  change.state = state
+  value = value.set('history', history)
+  change.value = value
 }
 
 /**

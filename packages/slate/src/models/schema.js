@@ -19,6 +19,10 @@ const CHILD_KIND_INVALID = 'child_kind_invalid'
 const CHILD_REQUIRED = 'child_required'
 const CHILD_TYPE_INVALID = 'child_type_invalid'
 const CHILD_UNKNOWN = 'child_unknown'
+const FIRST_CHILD_KIND_INVALID = 'first_child_kind_invalid'
+const FIRST_CHILD_TYPE_INVALID = 'first_child_type_invalid'
+const LAST_CHILD_KIND_INVALID = 'last_child_kind_invalid'
+const LAST_CHILD_TYPE_INVALID = 'last_child_type_invalid'
 const NODE_DATA_INVALID = 'node_data_invalid'
 const NODE_IS_VOID_INVALID = 'node_is_void_invalid'
 const NODE_MARK_INVALID = 'node_mark_invalid'
@@ -113,14 +117,14 @@ class Schema extends Record(DEFAULTS) {
   static fromJS = Schema.fromJSON
 
   /**
-   * Check if a `value` is a `Schema`.
+   * Check if `any` is a `Schema`.
    *
-   * @param {Any} value
+   * @param {Any} any
    * @return {Boolean}
    */
 
-  static isSchema(value) {
-    return !!(value && value[MODEL_TYPES.SCHEMA])
+  static isSchema(any) {
+    return !!(any && any[MODEL_TYPES.SCHEMA])
   }
 
   /**
@@ -185,15 +189,15 @@ class Schema extends Record(DEFAULTS) {
     return (change) => {
       debug(`normalizing`, { reason, context })
       const { rule } = context
-      const count = change.operations.length
+      const { size } = change.operations
       if (rule.normalize) rule.normalize(change, reason, context)
-      if (change.operations.length > count) return
+      if (change.operations.size > size) return
       this.normalize(change, reason, context)
     }
   }
 
   /**
-   * Normalize an invalid state with `reason` and `context`.
+   * Normalize an invalid value with `reason` and `context`.
    *
    * @param {Change} change
    * @param {String} reason
@@ -204,7 +208,11 @@ class Schema extends Record(DEFAULTS) {
     switch (reason) {
       case CHILD_KIND_INVALID:
       case CHILD_TYPE_INVALID:
-      case CHILD_UNKNOWN: {
+      case CHILD_UNKNOWN:
+      case FIRST_CHILD_KIND_INVALID:
+      case FIRST_CHILD_TYPE_INVALID:
+      case LAST_CHILD_KIND_INVALID:
+      case LAST_CHILD_TYPE_INVALID: {
         const { child, node } = context
         return child.kind == 'text' && node.kind == 'block' && node.nodes.size == 1
           ? change.removeNodeByKey(node.key)
@@ -292,6 +300,32 @@ class Schema extends Record(DEFAULTS) {
 
       if (!rule.text.test(text)) {
         return this.fail(NODE_TEXT_INVALID, { ...ctx, text })
+      }
+    }
+
+    if (rule.first != null) {
+      const { kinds, types } = rule.first
+      const child = node.nodes.first()
+
+      if (child && kinds && !kinds.includes(child.kind)) {
+        return this.fail(FIRST_CHILD_KIND_INVALID, { ...ctx, child })
+      }
+
+      if (child && types && !types.includes(child.type)) {
+        return this.fail(FIRST_CHILD_TYPE_INVALID, { ...ctx, child })
+      }
+    }
+
+    if (rule.last != null) {
+      const { kinds, types } = rule.last
+      const child = node.nodes.last()
+
+      if (child && kinds && !kinds.includes(child.kind)) {
+        return this.fail(LAST_CHILD_KIND_INVALID, { ...ctx, child })
+      }
+
+      if (child && types && !types.includes(child.type)) {
+        return this.fail(LAST_CHILD_TYPE_INVALID, { ...ctx, child })
       }
     }
 
@@ -470,6 +504,8 @@ function resolveNodeRule(kind, type, obj) {
     data: {},
     isVoid: null,
     nodes: null,
+    first: null,
+    last: null,
     parent: null,
     text: null,
     ...obj,
@@ -477,7 +513,8 @@ function resolveNodeRule(kind, type, obj) {
 }
 
 /**
- * A Lodash customizer for merging `kinds` and `types` arrays.
+ * A Lodash customizer for merging schema definitions. Special cases `kinds`
+ * and `types` arrays to be unioned, and ignores new `null` values.
  *
  * @param {Mixed} target
  * @param {Mixed} source
@@ -487,6 +524,8 @@ function resolveNodeRule(kind, type, obj) {
 function customizer(target, source, key) {
   if (key == 'kinds' || key == 'types') {
     return target == null ? source : target.concat(source)
+  } else {
+    return source == null ? target : source
   }
 }
 

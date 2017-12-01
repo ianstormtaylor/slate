@@ -1,17 +1,16 @@
 
-import logger from 'slate-dev-logger'
-import { Block, Mark, Node, State } from 'slate'
+import { Block, Mark, Node, Value } from 'slate'
 import { Set } from 'immutable'
 
 /**
- * Deserialize a plain text `string` to a state.
+ * Deserialize a plain text `string` to a Slate value.
  *
  * @param {String} string
  * @param {Object} options
  *   @property {Boolean} toJSON
  *   @property {String|Object|Block} defaultBlock
  *   @property {Array|Set} defaultMarks
- * @return {State}
+ * @return {Value}
  */
 
 function deserialize(string, options = {}) {
@@ -21,11 +20,6 @@ function deserialize(string, options = {}) {
     toJSON = false,
   } = options
 
-  if (options.toRaw) {
-    logger.deprecate('0.23.0', 'The `options.toRaw` argument of the `Plain` serializer is deprecated, use `options.toJSON` instead.')
-    toJSON = options.toRaw
-  }
-
   if (Set.isSet(defaultMarks)) {
     defaultMarks = defaultMarks.toArray()
   }
@@ -34,7 +28,7 @@ function deserialize(string, options = {}) {
   defaultMarks = defaultMarks.map(Mark.createProperties)
 
   const json = {
-    kind: 'state',
+    kind: 'value',
     document: {
       kind: 'document',
       data: {},
@@ -61,19 +55,19 @@ function deserialize(string, options = {}) {
     }
   }
 
-  const ret = toJSON ? json : State.fromJSON(json)
+  const ret = toJSON ? json : Value.fromJSON(json)
   return ret
 }
 
 /**
- * Serialize a `state` to plain text.
+ * Serialize a Slate `value` to a plain text string.
  *
- * @param {State} state
+ * @param {Value} value
  * @return {String}
  */
 
-function serialize(state) {
-  return serializeNode(state.document)
+function serialize(value) {
+  return serializeNode(value.document)
 }
 
 /**

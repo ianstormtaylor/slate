@@ -1,0 +1,34 @@
+{
+  "document": {
+    "nodes": [
+      {
+        "kind": "block",
+        "type": "paragraph",
+        "nodes": [
+          {
+            "kind": "text",
+            "leaves": [
+              {
+                "text": "Slate editors save all changes to an internal \"history\" automatically, so you don't need to implement undo/redo yourself. And the editor automatically binds to the browser's default undo/redo keyboard shortcuts."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "kind": "block",
+        "type": "paragraph",
+        "nodes": [
+          {
+            "kind": "text",
+            "leaves": [
+              {
+                "text": "Try it out for yourself! Make any changes you'd like then press \"cmd+z\"."
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

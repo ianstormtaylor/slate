@@ -16,15 +16,15 @@ A hyperscript helper for writing Slate documents with JSX!
 
 import h from 'slate-hyperscript'
 
-const state = (
-  <state>
+const value = (
+  <value>
     <document>
       <block type="paragraph">
         A string of <mark type="bold">bold</mark> in a <inline type="link" data={{ src: 'http://slatejs.org' }}>Slate</inline> editor!
       </block>
       <block type="image" data={{ src: 'https://...' }} isVoid />
     </document>
-  </state>
+  </value>
 )
 ```
 
@@ -49,15 +49,15 @@ const h = createHyperscript({
   },
 })
 
-const state = (
-  <state>
+const value = (
+  <value>
     <document>
       <paragraph>
         A string of <b>bold</b> in a <link src="http://slatejs.org">Slate</link> editor!
       </paragraph>
       <image src="https://..." />
     </document>
-  </state>
+  </value>
 )
 ```
 

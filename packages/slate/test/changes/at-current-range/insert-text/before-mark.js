@@ -7,21 +7,21 @@ export default function (change) {
 }
 
 export const input = (
-  <state>
+  <value>
     <document>
       <paragraph>
         w<cursor /><b>or</b>d
       </paragraph>
     </document>
-  </state>
+  </value>
 )
 
 export const output = (
-  <state>
+  <value>
     <document>
       <paragraph>
         wa<cursor /><b>or</b>d
       </paragraph>
     </document>
-  </state>
+  </value>
 )

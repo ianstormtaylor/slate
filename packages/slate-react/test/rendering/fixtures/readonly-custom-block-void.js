@@ -18,12 +18,12 @@ export const props = {
   renderNode,
 }
 
-export const state = (
-  <state>
+export const value = (
+  <value>
     <document>
       <image src="https://example.com/image.png" />
     </document>
-  </state>
+  </value>
 )
 
 export const output = `

@@ -16,8 +16,10 @@
 ## Guides
 
 - [Changes](./guides/changes.md)
-- [Plugins](./guides/plugins.md)
 - [Data Model](./guides/data-model.md)
+- [Plugins](./guides/plugins.md)
+- [Rendering](./guides/rendering.md)
+- [Schemas](./guides/schemas.md)
 
 
 ## General
@@ -41,8 +43,8 @@
 - [Operation](./reference/slate/operation.md)
 - [Range](./reference/slate/range.md)
 - [Schema](./reference/slate/schema.md)
-- [State](./reference/slate/state.md)
 - [Text](./reference/slate/text.md)
+- [Value](./reference/slate/value.md)
 - [setKeyGenerator](./reference/slate/utils.md)
 - [resetKeyGenerator](./reference/slate/utils.md)
 
