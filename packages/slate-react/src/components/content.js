@@ -90,6 +90,8 @@ class Content extends React.Component {
    */
 
   componentDidMount = () => {
+    const { editor } = this.props
+
     if (SUPPORTED_EVENTS.beforeinput) {
       this.element.addEventListener('beforeinput', this.onNativeBeforeInput)
     }
@@ -97,7 +99,7 @@ class Content extends React.Component {
     this.updateSelection()
 
     if (this.props.autoFocus) {
-      this.element.focus()
+      editor.focus()
     }
   }
 
