@@ -92,6 +92,8 @@ class Content extends React.Component {
    */
 
   componentDidMount = () => {
+    const { editor } = this.props
+
     // Restrict scoped of `beforeinput` to mobile.
     if ((IS_IOS || IS_ANDROID) && SUPPORTED_EVENTS.beforeinput) {
       this.element.addEventListener('beforeinput', this.onNativeBeforeInput)
@@ -100,7 +102,7 @@ class Content extends React.Component {
     this.updateSelection()
 
     if (this.props.autoFocus) {
-      this.element.focus()
+      editor.focus()
     }
   }
 
