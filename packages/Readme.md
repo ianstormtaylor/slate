@@ -4,6 +4,7 @@
 Slate's codebase is monorepo managed with [Lerna](https://lernajs.io/). It consists of a handful of packages—although you won't always use all of them. They are:
 
 |**Package**|**Version**|**Size**|**Description**|
+|---|---|---|---|
 |[`slate`](./slate)|[![](https://img.shields.io/npm/v/slate.svg?maxAge=2592000&label=version&colorB=007ec6)](./packages/slate/package.json)|[![](http://img.badgesize.io/https://unpkg.com/slate/dist/slate.min.js?compression=gzip&amp;label=size)](https://unpkg.com/slate/dist/slate.min.js)|Slate's core data model logic.|
 |[`slate-base64-serializer`](./slate-base64-serializer)|[![](https://img.shields.io/npm/v/slate-base64-serializer.svg?maxAge=2592000&label=version&colorB=007ec6)](./packages/slate-base64-serializer/package.json)|[![](http://img.badgesize.io/https://unpkg.com/slate-base64-serializer/dist/slate-base64-serializer.min.js?compression=gzip&amp;label=size)](https://unpkg.com/slate-base64-serializer/dist/slate-base64-serializer.min.js)|A Base64 string serializer for Slate documents.|
 |[`slate-html-serializer`](./slate-html-serializer)|[![](https://img.shields.io/npm/v/slate-html-serializer.svg?maxAge=2592000&label=version&colorB=007ec6)](./packages/slate-html-serializer/package.json)|[![](http://img.badgesize.io/https://unpkg.com/slate-html-serializer/dist/slate-html-serializer.min.js?compression=gzip&amp;label=size)](https://unpkg.com/slate-html-serializer/dist/slate-html-serializer.min.js)|An HTML serializer for Slate documents.|
