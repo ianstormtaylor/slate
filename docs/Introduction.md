@@ -106,10 +106,7 @@ If you're using Slate for the first time, check out the [Getting Started](http:/
 - [**FAQ**](http://docs.slatejs.org/general/faq)
 - [**Resources**](http://docs.slatejs.org/general/resources)
 
-If even that's not enough, you can always [read the source itself](./src), which is explained along with a handful of readme's and is heavily commented.
-
-
-## Translations
+If even that's not enough, you can always [read the source itself](./src), which is heavily commented.
 
 There are also translations of the documentation into other languages:
 
