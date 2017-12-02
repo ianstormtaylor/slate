@@ -867,12 +867,18 @@ Changes.insertTextAtRange = (change, range, text, marks, options = {}) => {
   const { value } = change
   const { document } = value
   const { startKey, startOffset } = range
+  let key = startKey
+  let offset = startOffset
   const parent = document.getParent(startKey)
 
   if (parent.isVoid) return
 
   if (range.isExpanded) {
     change.deleteAtRange(range, { normalize: false })
+
+    // Update range start after delete
+    key = change.value.startKey
+    offset = change.value.startOffset
   }
 
   // PERF: Unless specified, don't normalize if only inserting text.
@@ -880,7 +886,7 @@ Changes.insertTextAtRange = (change, range, text, marks, options = {}) => {
     normalize = range.isExpanded
   }
 
-  change.insertTextByKey(startKey, startOffset, text, marks, { normalize })
+  change.insertTextByKey(key, offset, text, marks, { normalize })
 }
 
 /**
