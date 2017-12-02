@@ -4,6 +4,7 @@ import React from 'react'
 import Types from 'prop-types'
 import getWindow from 'get-window'
 import logger from 'slate-dev-logger'
+import throttle from 'lodash.throttle'
 
 import EVENT_HANDLERS from '../constants/event-handlers'
 import Node from './node'
@@ -93,8 +94,11 @@ class Content extends React.Component {
 
   componentDidMount = () => {
     const { editor } = this.props
+    const window = getWindow(this.element)
 
-    // Restrict scoped of `beforeinput` to mobile.
+    window.document.addEventListener('selectionchange', this.onNativeSelectionChange)
+
+    // COMPAT: Restrict scope of `beforeinput` to mobile.
     if ((IS_IOS || IS_ANDROID) && SUPPORTED_EVENTS.beforeinput) {
       this.element.addEventListener('beforeinput', this.onNativeBeforeInput)
     }
@@ -111,7 +115,11 @@ class Content extends React.Component {
    */
 
   componentWillUnmount() {
-    // Restrict scoped of `beforeinput` to mobile.
+    const window = getWindow(this.element)
+
+    window.document.removeEventListener('selectionchange', this.onNativeSelectionChange)
+
+    // COMPAT: Restrict scope of `beforeinput` to mobile.
     if ((IS_IOS || IS_ANDROID) && SUPPORTED_EVENTS.beforeinput) {
       this.element.removeEventListener('beforeinput', this.onNativeBeforeInput)
     }
@@ -385,6 +393,25 @@ class Content extends React.Component {
       }
     })
   }
+
+  /**
+   * On native `selectionchange` event, trigger the `onSelect` handler. This is
+   * needed to account for React's `onSelect` being non-standard and not firing
+   * until after a selection has been released. This causes issues in situations
+   * where another change happens while a selection is being made.
+   *
+   * @param {Event} event
+   */
+
+  onNativeSelectionChange = throttle((event) => {
+    if (this.props.readOnly) return
+
+    const window = getWindow(event.target)
+    const { activeElement } = window.document
+    if (activeElement !== this.element) return
+
+    this.props.onSelect(event)
+  }, 100)
 
   /**
    * Render the editor content.
