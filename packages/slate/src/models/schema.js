@@ -355,6 +355,10 @@ class Schema extends Record(DEFAULTS) {
         if (max != null && offset == max) nextDef()
         return !!child
       }
+      function rewind() {
+        offset -= 1
+        index -= 1
+      }
 
       if (rule.nodes != null) {
         nextDef()
@@ -379,12 +383,18 @@ class Schema extends Record(DEFAULTS) {
           }
 
           if (def.kinds != null && !def.kinds.includes(child.kind)) {
-            if (offset >= min && nextDef()) continue
+            if (offset >= min && nextDef()) {
+              rewind()
+              continue
+            }
             return this.fail(CHILD_KIND_INVALID, { ...ctx, child, index })
           }
 
           if (def.types != null && !def.types.includes(child.type)) {
-            if (offset >= min && nextDef()) continue
+            if (offset >= min && nextDef()) {
+              rewind()
+              continue
+            }
             return this.fail(CHILD_TYPE_INVALID, { ...ctx, child, index })
           }
         }
