@@ -73,17 +73,17 @@ function scrollToSelection(selection) {
   // https://bugs.webkit.org/show_bug.cgi?id=138949
   // https://bugs.chromium.org/p/chromium/issues/detail?id=435438
   if (range.collapsed && selectionRect.top == 0 && selectionRect.height == 0) {
-  	if (range.startContainer.length === 1) {
-  		selectionRect = range.getClientRects()[0];
-  	} else if (range.startContainer.length > 1) {
-  		if (range.startOffset == 0) {
-  			range.setEnd(range.endContainer, 1);
-  		} else {
-  			range.setStart(range.startContainer, range.startOffset - 1);
-  		}
-
-  		selectionRect = range.getBoundingClientRect();
+  	if (range.startOffset == 0) {
+  		range.setEnd(range.endContainer, 1);
+  	} else {
+  		range.setStart(range.startContainer, range.startOffset - 1);
   	}
+
+  	selectionRect = range.getBoundingClientRect();
+
+    if (selectionRect.top == 0 && selectionRect.height == 0) {
+      selectionRect = range.getClientRects()[0];
+    }
   }
 
   let width
