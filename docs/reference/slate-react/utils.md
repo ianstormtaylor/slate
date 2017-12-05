@@ -3,7 +3,7 @@
 
 ```js
 import { 
-  copyFragment,
+  cloneFragment,
   findDOMNode,
   findDOMRange,
   findNode,
@@ -19,8 +19,8 @@ React-specific utility functions for Slate that may be useful in certain use cas
 
 ## Functions
 
-### `copyFragment`
-`copyFragment(event: DOMEvent|ReactEvent, value: Value, fragment: Document)`
+### `cloneFragment`
+`cloneFragment(event: DOMEvent|ReactEvent, value: Value, fragment: Document)`
 
 During a cut or copy event, sets `fragment` as the Slate document fragment to be copied.
 
@@ -30,13 +30,13 @@ function onCopy(event, change, editor) {
   const fragment = // ... create a fragment from a set of nodes ...
 
   if (fragment) {
-    copyFragment(event, value, fragment)
+    cloneFragment(event, value, fragment)
     return true
   }
 }
 ```
 
-Note that calling `copyFragment` should be the last thing you do in your event handler. If you change the window selection after calling `copyFragment`, the browser may copy the wrong content. If you need to perform an action after calling `copyFragment`, wrap it in `requestAnimationFrame`:
+Note that calling `cloneFragment` should be the last thing you do in your event handler. If you change the window selection after calling `cloneFragment`, the browser may copy the wrong content. If you need to perform an action after calling `cloneFragment`, wrap it in `requestAnimationFrame`:
 
 ```js
 function onCut(event, change, editor) {
@@ -44,7 +44,7 @@ function onCut(event, change, editor) {
   const fragment = // ... create a fragment from a set of nodes ...
 
   if (fragment) {
-    copyFragment(event, value, fragment)
+    cloneFragment(event, value, fragment)
     window.requestAnimationFrame(() => {
       editor.change(change => change.delete())
     })

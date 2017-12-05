@@ -1,6 +1,6 @@
 
 import Editor from './components/editor'
-import copyFragment from './utils/copy-fragment'
+import cloneFragment from './utils/copy-fragment'
 import findDOMNode from './utils/find-dom-node'
 import findDOMRange from './utils/find-dom-range'
 import findNode from './utils/find-node'
@@ -17,7 +17,7 @@ import setEventTransfer from './utils/set-event-transfer'
 
 export {
   Editor,
-  copyFragment,
+  cloneFragment,
   findDOMNode,
   findDOMRange,
   findNode,
@@ -29,7 +29,7 @@ export {
 
 export default {
   Editor,
-  copyFragment,
+  cloneFragment,
   findDOMNode,
   findDOMRange,
   findNode,

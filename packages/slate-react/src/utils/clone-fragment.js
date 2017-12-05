@@ -13,7 +13,7 @@ import { IS_CHROME, IS_SAFARI } from '../constants/environment'
  * @param {Document} [fragment]
  */
 
-function copyFragment(event, value, fragment = value.fragment) {
+function cloneFragment(event, value, fragment = value.fragment) {
   const window = getWindow(event.target)
   const native = window.getSelection()
   const { startKey, endKey, startText, endBlock, endInline } = value
@@ -124,4 +124,4 @@ function copyFragment(event, value, fragment = value.fragment) {
   })
 }
 
-export default copyFragment
+export default cloneFragment

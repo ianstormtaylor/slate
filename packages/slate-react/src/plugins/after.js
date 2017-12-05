@@ -9,7 +9,7 @@ import { Block, Inline, Text } from 'slate'
 import EVENT_HANDLERS from '../constants/event-handlers'
 import HOTKEYS from '../constants/hotkeys'
 import Content from '../components/content'
-import copyFragment from '../utils/copy-fragment'
+import cloneFragment from '../utils/clone-fragment'
 import findDOMNode from '../utils/find-dom-node'
 import findNode from '../utils/find-node'
 import findPoint from '../utils/find-point'
@@ -102,7 +102,7 @@ function AfterPlugin() {
   function onCopy(event, change, editor) {
     debug('onCopy', { event })
 
-    copyFragment(event, change.value)
+    cloneFragment(event, change.value)
   }
 
   /**
@@ -116,7 +116,7 @@ function AfterPlugin() {
   function onCut(event, change, editor) {
     debug('onCut', { event })
 
-    copyFragment(event, change.value)
+    cloneFragment(event, change.value)
     const window = getWindow(event.target)
 
     // Once the fake cut content has successfully been added to the clipboard,
