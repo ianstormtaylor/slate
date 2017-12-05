@@ -80,6 +80,10 @@ function scrollToSelection(selection) {
     }
 
     selectionRect = range.getBoundingClientRect()
+
+    if (selectionRect.top == 0 && selectionRect.height == 0) {
+      selectionRect = range.getClientRects()[0]
+    }
   }
 
   let width
