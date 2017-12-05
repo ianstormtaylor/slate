@@ -1082,8 +1082,8 @@ class Node {
     // If the range is collapsed at the start of the node, check the previous.
     if (range.isCollapsed && startOffset == 0) {
       const previous = this.getPreviousText(startKey)
-      if (!previous || !previous.length) return []
-      const char = previous.characters.get(previous.length - 1)
+      if (!previous || previous.text.length == 0) return []
+      const char = previous.characters.get(previous.text.length - 1)
       return char.marks.toArray()
     }
 

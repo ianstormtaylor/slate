@@ -100,8 +100,8 @@ function renderPlaceholder(props) {
 
   return (
     <span
-      contenteditable={false}
-      style={{ display: 'inline-block', width: '0', whiteSpace: 'nowrap', opacity: '0' }}
+      contentEditable={false}
+      style={{ display: 'inline-block', width: '0', whiteSpace: 'nowrap', opacity: '0.33' }}
     >
       {editor.props.placeholder}
     </span>
