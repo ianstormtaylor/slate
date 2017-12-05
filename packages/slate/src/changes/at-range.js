@@ -734,6 +734,13 @@ Changes.insertFragmentAtRange = (change, range, fragment, options = {}) => {
   const { startKey, startOffset } = range
   const { value } = change
   let { document } = value
+
+  // if we can't find getDescendant, we assume it's an empty block.
+  if (document.getDescendant(startKey) === undefined) {
+    fragment.nodes.forEach(n => change.insertBlock(n))
+    return
+  }
+
   let startText = document.getDescendant(startKey)
   let startBlock = document.getClosestBlock(startText.key)
   let startChild = startBlock.getFurthestAncestor(startText.key)
