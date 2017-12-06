@@ -984,7 +984,20 @@ Changes.splitBlockAtRange = (change, range, height = 1, options = {}) => {
   const { startKey, startOffset } = range
   const { value } = change
   const { document } = value
-  let node = document.assertDescendant(startKey)
+
+  let node = null
+
+  try {
+    node = document.assertDescendant(startKey)
+  } catch (err) {
+    // if we can't assertDescendant, we assume it's an empty block.
+    change.insertBlock({
+      kind: 'block',
+      type: 'PARAGRAPH',
+    })
+    return
+  }
+
   let parent = document.getClosestBlock(node.key)
   let h = 0
 
