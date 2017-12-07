@@ -564,7 +564,7 @@ Changes.deleteForwardAtRange = (change, range, n = 1, options = {}) => {
         focusKey: nextBlock.key,
         focusOffset: 0,
       })
-      change.select(range)
+      change.moveToRangeOf(nextBlock)
     }
     return
   }
