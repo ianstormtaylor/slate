@@ -560,11 +560,8 @@ Changes.deleteForwardAtRange = (change, range, n = 1, options = {}) => {
     const nextBlock = document.getNextBlock(block.key)
     change.removeNodeByKey(block.key, { normalize })
     if (nextBlock && nextBlock.key) {
-      range = range.merge({
-        focusKey: nextBlock.key,
-        focusOffset: 0,
-      })
       change.moveToRangeOf(nextBlock)
+      change.moveOffsetsTo(0, 0)
     }
     return
   }
