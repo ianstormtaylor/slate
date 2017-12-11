@@ -557,7 +557,11 @@ Changes.deleteForwardAtRange = (change, range, n = 1, options = {}) => {
 
   // If the closest is not void, but empty, remove it
   if (block && !block.isVoid && block.isEmpty && document.nodes.size !== 1) {
+    const nextBlock = document.getNextBlock(block.key)
     change.removeNodeByKey(block.key, { normalize })
+    if (nextBlock && nextBlock.key) {
+      change.moveToStartOf(nextBlock)
+    }
     return
   }
 
