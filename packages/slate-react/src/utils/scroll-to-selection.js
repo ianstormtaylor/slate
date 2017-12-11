@@ -65,8 +65,9 @@ function scrollToSelection(selection) {
   const isWindow = scroller == window.document.body || scroller == window.document.documentElement
   const backward = isBackward(selection)
 
-  const range = selection.getRangeAt(0)
-  let selectionRect = range.getBoundingClientRect()
+  const range = selection.getRangeAt(0).cloneRange()
+  range.collapse(backward)
+  let cursorRect = range.getBoundingClientRect()
 
   // COMPAT: range.getBoundingClientRect() returns 0s in Safari when range is
   // collapsed. Expanding the range by 1 is a relatively effective workaround
@@ -74,18 +75,18 @@ function scrollToSelection(selection) {
   // https://bugs.webkit.org/show_bug.cgi?id=138949
   // https://bugs.chromium.org/p/chromium/issues/detail?id=435438
   if (IS_SAFARI) {
-    if (range.collapsed && selectionRect.top == 0 && selectionRect.height == 0) {
+    if (range.collapsed && cursorRect.top == 0 && cursorRect.height == 0) {
       if (range.startOffset == 0) {
         range.setEnd(range.endContainer, 1)
       } else {
         range.setStart(range.startContainer, range.startOffset - 1)
       }
 
-      selectionRect = range.getBoundingClientRect()
+      cursorRect = range.getBoundingClientRect()
 
-      if (selectionRect.top == 0 && selectionRect.height == 0) {
+      if (cursorRect.top == 0 && cursorRect.height == 0) {
         if (range.getClientRects().length) {
-          selectionRect = range.getClientRects()[0]
+          cursorRect = range.getClientRects()[0]
         }
       }
     }
@@ -99,6 +100,10 @@ function scrollToSelection(selection) {
   let scrollerLeft = 0
   let scrollerBordersY = 0
   let scrollerBordersX = 0
+  let scrollerPaddingTop = 0
+  let scrollerPaddingBottom = 0
+  let scrollerPaddingLeft = 0
+  let scrollerPaddingRight = 0
 
   if (isWindow) {
     const { innerWidth, innerHeight, pageYOffset, pageXOffset } = window
@@ -113,6 +118,10 @@ function scrollToSelection(selection) {
       borderBottomWidth,
       borderLeftWidth,
       borderRightWidth,
+      paddingTop,
+      paddingBottom,
+      paddingLeft,
+      paddingRight,
     } = window.getComputedStyle(scroller)
 
     const scrollerRect = scroller.getBoundingClientRect()
@@ -122,33 +131,34 @@ function scrollToSelection(selection) {
     scrollerLeft = scrollerRect.left + parseInt(borderLeftWidth, 10)
     scrollerBordersY = parseInt(borderTopWidth, 10) + parseInt(borderBottomWidth, 10)
     scrollerBordersX = parseInt(borderLeftWidth, 10) + parseInt(borderRightWidth, 10)
+    scrollerPaddingTop = parseInt(paddingTop, 10)
+    scrollerPaddingBottom = parseInt(paddingBottom, 10)
+    scrollerPaddingLeft = parseInt(paddingLeft, 10)
+    scrollerPaddingRight = parseInt(paddingRight, 10)
     yOffset = scrollTop
     xOffset = scrollLeft
   }
 
-  const selectionFocusTop = backward ? selectionRect.top : selectionRect.bottom
-  const selectionTop = selectionFocusTop + yOffset - scrollerTop
-
-  const selectionFocusLeft = backward ? selectionRect.left : selectionRect.right
-  const selectionLeft = selectionFocusLeft + xOffset - scrollerLeft
+  const cursorTop = cursorRect.top + yOffset - scrollerTop
+  const cursorLeft = cursorRect.left + xOffset - scrollerLeft
 
   let x = xOffset
   let y = yOffset
 
-  if (selectionLeft < xOffset) {
+  if (cursorLeft < xOffset) {
     // selection to the left of viewport
-    x = selectionLeft
-  } else if (selectionLeft + selectionRect.width + scrollerBordersX > xOffset + width) {
+    x = cursorLeft - scrollerPaddingLeft
+  } else if (cursorLeft + cursorRect.width + scrollerBordersX > xOffset + width) {
     // selection to the right of viewport
-    x = selectionLeft + scrollerBordersX - width
+    x = cursorLeft + scrollerBordersX + scrollerPaddingRight - width
   }
 
-  if (selectionTop < yOffset) {
+  if (cursorTop < yOffset) {
     // selection above viewport
-    y = selectionTop
-  } else if (selectionTop + selectionRect.height + scrollerBordersY > yOffset + height) {
+    y = cursorTop - scrollerPaddingTop
+  } else if (cursorTop + cursorRect.height + scrollerBordersY > yOffset + height) {
     // selection below viewport
-    y = selectionTop + scrollerBordersY + selectionRect.height - height
+    y = cursorTop + scrollerBordersY + scrollerPaddingBottom + cursorRect.height - height
   }
 
 
