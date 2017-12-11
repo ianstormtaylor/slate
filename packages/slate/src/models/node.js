@@ -1405,6 +1405,11 @@ class Node {
       return null
     }
 
+    // if we've been given an invalid selection we can exit early.
+    if (range.isUnset) {
+      return null
+    }
+
     // PERF: if the start and end keys are the same, just check for the child
     // that contains that single key.
     if (startKey == endKey) {
