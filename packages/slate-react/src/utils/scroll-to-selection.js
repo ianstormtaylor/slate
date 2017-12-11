@@ -1,6 +1,7 @@
 
 import getWindow from 'get-window'
 import isBackward from 'selection-is-backward'
+import { IS_SAFARI } from '../constants/environment'
 
 /**
  * CSS overflow values that would cause scrolling.
@@ -72,14 +73,22 @@ function scrollToSelection(selection) {
   // for vertical scroll, although horizontal may be off by 1 character.
   // https://bugs.webkit.org/show_bug.cgi?id=138949
   // https://bugs.chromium.org/p/chromium/issues/detail?id=435438
-  if (range.collapsed && selectionRect.top == 0 && selectionRect.height == 0) {
-    if (range.startOffset == 0) {
-      range.setEnd(range.endContainer, 1)
-    } else {
-      range.setStart(range.startContainer, range.startOffset - 1)
-    }
+  if (IS_SAFARI) {
+    if (range.collapsed && selectionRect.top == 0 && selectionRect.height == 0) {
+      if (range.startOffset == 0) {
+        range.setEnd(range.endContainer, 1)
+      } else {
+        range.setStart(range.startContainer, range.startOffset - 1)
+      }
 
-    selectionRect = range.getBoundingClientRect()
+      selectionRect = range.getBoundingClientRect()
+
+      if (selectionRect.top == 0 && selectionRect.height == 0) {
+        if (range.getClientRects().length) {
+          selectionRect = range.getClientRects()[0]
+        }
+      }
+    }
   }
 
   let width
