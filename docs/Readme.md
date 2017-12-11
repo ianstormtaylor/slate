@@ -55,6 +55,7 @@
 - [Plugins](./reference/slate-react/plugins.md)
 - [Custom Nodes](./reference/slate-react/custom-nodes.md)
 - [Core Plugins](./reference/slate-react/core-plugins.md)
+- [cloneFragment](./reference/slate-react/utils.md)
 - [findDOMNode](./reference/slate-react/utils.md)
 - [findDOMRange](./reference/slate-react/utils.md)
 - [findNode](./reference/slate-react/utils.md)
