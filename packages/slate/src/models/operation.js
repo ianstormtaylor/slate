@@ -125,6 +125,10 @@ class Operation extends Record(DEFAULTS) {
         v = Range.create(v)
       }
 
+      if (key == 'value') {
+        v = Value.create(v)
+      }
+
       if (key == 'properties' && type == 'set_mark') {
         v = Mark.createProperties(v)
       }
