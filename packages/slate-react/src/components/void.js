@@ -69,7 +69,6 @@ class Void extends React.Component {
 
     const spacer = (
       <Tag
-        contentEditable
         data-slate-spacer
         suppressContentEditableWarning
         style={style}
@@ -79,7 +78,7 @@ class Void extends React.Component {
     )
 
     const content = (
-      <Tag draggable={readOnly ? null : true}>
+      <Tag draggable={readOnly ? null : true} contentEditable={readOnly ? null : false}>
         {children}
       </Tag>
     )
@@ -90,7 +89,6 @@ class Void extends React.Component {
       <Tag
         data-slate-void
         data-key={node.key}
-        contentEditable={readOnly ? null : false}
       >
         {readOnly ? null : spacer}
         {content}
