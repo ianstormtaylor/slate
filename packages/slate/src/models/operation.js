@@ -103,6 +103,7 @@ class Operation extends Record(DEFAULTS) {
         // for providing the local-only invert behavior for the history stack.
         if (key == 'document') continue
         if (key == 'selection') continue
+        if (key == 'value') continue
         if (key == 'node' && type != 'insert_node') continue
 
         throw new Error(`\`Operation.fromJSON\` was passed a "${type}" operation without the required "${key}" attribute.`)
