@@ -1053,17 +1053,12 @@ class Node {
     // If the range is collapsed, check the character before the start.
     if (range.isCollapsed) {
       const text = this.getDescendant(startKey)
-      const char = text.characters.get(range.startOffset - 1)
+      const char = text.characters.get(startOffset - 1)
       return char.marks.toArray()
     }
 
-    // Otherwise, get a set of the marks for each character in the range.
-    return this
-      .getCharactersAtRange(range)
-      .reduce((memo, char) => {
-        char.marks.toArray().forEach(c => memo.push(c))
-        return memo
-      }, [])
+    // Otherwise, return the marks of the first character in the range.
+    return this.getCharactersAtRange(range).first().marks.toArray()
   }
 
   /**
