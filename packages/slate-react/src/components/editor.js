@@ -178,7 +178,7 @@ class Editor extends React.Component {
    */
 
   queueChange = (change) => {
-    if (change.operations.length) {
+    if (change.operations.size) {
       debug('queueChange', { change })
       this.tmp.change = change
     }
