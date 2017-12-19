@@ -5,7 +5,7 @@ import h from '../../helpers/h'
 export const schema = {
   blocks: {
     paragraph: {
-      marks: ['bold'],
+      marks: [{ type: 'bold' }, { type: 'underline' }],
     }
   }
 }

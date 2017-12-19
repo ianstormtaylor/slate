@@ -287,10 +287,8 @@ class Schema extends Record(DEFAULTS) {
       const marks = node.getMarks().toArray()
 
       for (const mark of marks) {
-        for (const def of rule.marks) {
-          if (def.type != mark.type) {
-            return this.fail(NODE_MARK_INVALID, { ...ctx, mark })
-          }
+        if (!rule.marks.some(def => def.type === mark.type)) {
+          return this.fail(NODE_MARK_INVALID, { ...ctx, mark })
         }
       }
     }
