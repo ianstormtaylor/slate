@@ -379,15 +379,15 @@ class Content extends React.Component {
       case 'insertLineBreak': // intentional fallthru
       case 'insertParagraph': {
         event.preventDefault()
-        const range = findRange(targetRange, editor.value)
-
-        editor.change((change) => {
-          if (change.value.isInVoid) {
-            change.collapseToStartOfNextText()
-          } else {
-            change.splitBlockAtRange(range)
-          }
-        })
+        // const range = findRange(targetRange, editor.value)
+        //
+        // editor.change((change) => {
+        //   if (change.value.isInVoid) {
+        //     change.collapseToStartOfNextText()
+        //   } else {
+        //     change.splitBlockAtRange(range)
+        //   }
+        // })
         break
       }
 

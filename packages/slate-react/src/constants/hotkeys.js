@@ -22,7 +22,7 @@ const ITALIC = isKeyHotkey('mod+i')
 
 const ENTER = isKeyHotkey('enter')
 const SHIFT_ENTER = isKeyHotkey('shift+enter')
-const SPLIT_BLOCK = e => !IS_IOS && (ENTER(e) || SHIFT_ENTER(e))
+const SPLIT_BLOCK = e => (ENTER(e) || SHIFT_ENTER(e))
 
 const BACKSPACE = isKeyHotkey('backspace')
 const SHIFT_BACKSPACE = isKeyHotkey('shift+backspace')
