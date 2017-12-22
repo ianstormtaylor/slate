@@ -370,24 +370,12 @@ class Content extends React.Component {
     switch (event.inputType) {
       case 'deleteContentBackward': {
         event.preventDefault()
-
-        const range = findRange(targetRange, editor.value)
-        editor.change(change => change.deleteAtRange(range))
         break
       }
 
       case 'insertLineBreak': // intentional fallthru
       case 'insertParagraph': {
         event.preventDefault()
-        // const range = findRange(targetRange, editor.value)
-        //
-        // editor.change((change) => {
-        //   if (change.value.isInVoid) {
-        //     change.collapseToStartOfNextText()
-        //   } else {
-        //     change.splitBlockAtRange(range)
-        //   }
-        // })
         break
       }
 
