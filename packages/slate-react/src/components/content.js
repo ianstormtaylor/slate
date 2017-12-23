@@ -228,7 +228,7 @@ class Content extends React.Component {
     setTimeout(() => {
       // COMPAT: In Firefox, it's not enough to create a range, you also need to
       // focus the contenteditable element too. (2016/11/16)
-      if (IS_FIREFOX) this.element.focus()
+      if (IS_FIREFOX && this.element) this.element.focus()
       this.tmp.isUpdatingSelection = false
     })
 
