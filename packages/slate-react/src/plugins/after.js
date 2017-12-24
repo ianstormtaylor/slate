@@ -361,25 +361,11 @@ function AfterPlugin() {
     debug('onKeyDown', { event })
 
     const { value } = change
-    const toKeys = node => ({ key: node.key, nodes: node.nodes ? node.nodes.map(toKeys).toArray() : node.text ? node.text : null })
 
     if (HOTKEYS.SPLIT_BLOCK(event)) {
-      const ret = value.isInVoid
+      return value.isInVoid
         ? change.collapseToStartOfNextText()
         : change.splitBlock()
-      return ret
-      // console.log("split block")
-      // console.log(JSON.stringify(toKeys(value.document), null, 2))
-      // // console.log(value.selection.toJS())
-      // if (value.isInVoid) {
-      //   change.collapseToStartOfNextText()
-      // } else {
-      //   change.splitBlock()
-      // }
-      // // console.log(JSON.stringify(toKeys(change.value.document), null, 2))
-      // // console.log(change.value.selection.toJS())
-      // // console.log("-------------------")
-      // return true
     }
 
     if (HOTKEYS.DELETE_CHAR_BACKWARD(event)) {
