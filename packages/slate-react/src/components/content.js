@@ -12,6 +12,7 @@ import findDOMRange from '../utils/find-dom-range'
 import findRange from '../utils/find-range'
 import scrollToSelection from '../utils/scroll-to-selection'
 import {
+  IS_SAFARI,
   IS_FIREFOX,
   IS_IOS,
   IS_ANDROID,
@@ -146,6 +147,11 @@ class Content extends React.Component {
     const native = window.getSelection()
     const { rangeCount, anchorNode } = native
 
+    if (IS_SAFARI) {
+      if (native.anchorNode.textContent.endsWith(' ')) {
+        native.anchorNode.textContent = native.anchorNode.textContent.replace(' ', '\u00a0')
+      }
+    }
     // If both selections are blurred, do nothing.
     if (!rangeCount && selection.isBlurred) return
 
