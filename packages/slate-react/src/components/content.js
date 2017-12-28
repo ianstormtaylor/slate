@@ -117,7 +117,9 @@ class Content extends React.Component {
   componentWillUnmount() {
     const window = getWindow(this.element)
 
-    window.document.removeEventListener('selectionchange', this.onNativeSelectionChange)
+    if (window) {
+      window.document.removeEventListener('selectionchange', this.onNativeSelectionChange)
+    }
 
     // COMPAT: Restrict scope of `beforeinput` to mobile.
     if ((IS_IOS || IS_ANDROID) && SUPPORTED_EVENTS.beforeinput) {
