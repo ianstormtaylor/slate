@@ -5,12 +5,7 @@ import h from '../../helpers/h'
 export const schema = {
   blocks: {
     paragraph: {
-      marks: [{ type: 'bold' }],
-      normalize: (change, reason, { node }) => {
-        if (reason == 'node_mark_invalid') {
-          node.nodes.forEach(n => change.removeNodeByKey(n.key))
-        }
-      }
+      marks: [{ type: 'bold' }, { type: 'underline' }],
     }
   }
 }
@@ -19,7 +14,7 @@ export const input = (
   <value>
     <document>
       <paragraph>
-        one <i>two</i> three
+        one <b>two</b> three
       </paragraph>
     </document>
   </value>
@@ -28,7 +23,9 @@ export const input = (
 export const output = (
   <value>
     <document>
-      <paragraph />
+      <paragraph>
+        one <b>two</b> three
+      </paragraph>
     </document>
   </value>
 )
