@@ -14,7 +14,7 @@ Utility functions that ship with Slate that may be useful for certain use cases.
 ## Functions
 
 ### `resetKeyGenerator`
-`resetkeygenerator() => Void`
+`resetKeyGenerator() => Void`
 
 Resets Slate's internal key generating function to its default state. This is useful for server-side rendering, or anywhere you want to ensure fresh, deterministic creation of keys.
 
