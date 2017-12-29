@@ -158,17 +158,6 @@ class Editor extends React.Component {
   }
 
   /**
-   * When the component unmounts, clear flushTimeout if it has been set
-   * to avoid calling onChange after unmount.
-   */
-
-  componentWillUnmount = () => {
-    if (this.tmp.flushTimeout) {
-      clearTimeout(this.tmp.flushTimeout)
-    }
-  }
-
-  /**
    * Queue a `change` object, to be able to flush it later. This is required for
    * when a change needs to be applied to the value, but because of the React
    * lifecycle we can't apply that change immediately. So we cache it here and
@@ -192,13 +181,10 @@ class Editor extends React.Component {
   flushChange = () => {
     const { change } = this.tmp
 
-    if (change && !this.tmp.flushTimeout) {
+    if (change) {
       debug('flushChange', { change })
-      this.tmp.flushTimeout = setTimeout(() => {
-        delete this.tmp.change
-        delete this.tmp.flushTimeout
-        this.props.onChange(change)
-      })
+      delete this.tmp.change
+      this.props.onChange(change)
     }
   }
 
