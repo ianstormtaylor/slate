@@ -48,7 +48,34 @@ function invertOperation(op) {
 
   if (type == 'move_node') {
     const { newPath, path } = op
-    const inverse = op.set('path', newPath).set('newPath', path)
+    let inversePath = newPath
+    let inverseNewPath = path
+
+    const pathLast = path.length - 1
+    const newPathLast = newPath.length - 1
+
+    // If the node's old position was a left sibling of an ancestor of
+    // its new position, we need to adjust part of the path by -1.
+    if (path.length < inversePath.length &&
+        path.slice(0, pathLast).every((e, i) => e == inversePath[i]) &&
+        path[pathLast] < inversePath[pathLast]) {
+      inversePath = inversePath.slice(0, pathLast)
+        .concat([inversePath[pathLast] - 1])
+        .concat(inversePath.slice(pathLast + 1, inversePath.length))
+    }
+
+    // If the node's new position is an ancestor of the old position,
+    // or a left sibling of an ancestor of its old position, we need
+    // to adjust part of the path by 1.
+    if (newPath.length < inverseNewPath.length &&
+        newPath.slice(0, newPathLast).every((e, i) => e == inverseNewPath[i]) &&
+        newPath[newPathLast] <= inverseNewPath[newPathLast]) {
+      inverseNewPath = inverseNewPath.slice(0, newPathLast)
+        .concat([inverseNewPath[newPathLast] + 1])
+        .concat(inverseNewPath.slice(newPathLast + 1, inverseNewPath.length))
+    }
+
+    const inverse = op.set('path', inversePath).set('newPath', inverseNewPath)
     return inverse
   }
 
