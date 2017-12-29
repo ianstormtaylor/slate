@@ -1351,7 +1351,7 @@ Changes.wrapInlineAtRange = (change, range, inline, options = {}) => {
     const startNode = inline.regenerateKey()
     const endNode = inline.regenerateKey()
 
-    change.insertNodeByKey(startBlock.key, startIndex - 1, startNode, { normalize: false })
+    change.insertNodeByKey(startBlock.key, startIndex + 1, startNode, { normalize: false })
     change.insertNodeByKey(endBlock.key, endIndex, endNode, { normalize: false })
 
     startInlines.forEach((child, i) => {
