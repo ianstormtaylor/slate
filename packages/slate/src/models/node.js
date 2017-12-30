@@ -788,12 +788,7 @@ class Node {
    */
 
   getFurthestAncestor(key) {
-    key = assertKey(key)
-    return this.nodes.find((node) => {
-      if (node.key == key) return true
-      if (node.kind == 'text') return false
-      return node.hasDescendant(key)
-    })
+    return this.getFurthest(key, node => true)
   }
 
   /**
