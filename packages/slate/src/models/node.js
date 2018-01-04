@@ -1,6 +1,7 @@
 
 import direction from 'direction'
 import isPlainObject from 'is-plain-object'
+import logger from 'slate-dev-logger'
 import { List, OrderedSet, Set } from 'immutable'
 
 import Block from './block'
@@ -37,7 +38,14 @@ class Node {
     }
 
     if (isPlainObject(attrs)) {
-      switch (attrs.object) {
+      let { object } = attrs
+
+      if (!object && attrs.kind) {
+        logger.deprecate('slate@0.32.0', 'The `kind` property of Slate objects has been renamed to `object`.')
+        object = attrs.kind
+      }
+
+      switch (object) {
         case 'block': return Block.create(attrs)
         case 'document': return Document.create(attrs)
         case 'inline': return Inline.create(attrs)
@@ -99,20 +107,27 @@ class Node {
   }
 
   /**
-   * Create a `Node` from a JSON `object`.
+   * Create a `Node` from a JSON `value`.
    *
-   * @param {Object} object
+   * @param {Object} value
    * @return {Node}
    */
 
-  static fromJSON(object) {
-    switch (object.object) {
-      case 'block': return Block.fromJSON(object)
-      case 'document': return Document.fromJSON(object)
-      case 'inline': return Inline.fromJSON(object)
-      case 'text': return Text.fromJSON(object)
+  static fromJSON(value) {
+    let { object } = value
+
+    if (!object && value.kind) {
+      logger.deprecate('slate@0.32.0', 'The `kind` property of Slate objects has been renamed to `object`.')
+      object = value.kind
+    }
+
+    switch (object) {
+      case 'block': return Block.fromJSON(value)
+      case 'document': return Document.fromJSON(value)
+      case 'inline': return Inline.fromJSON(value)
+      case 'text': return Text.fromJSON(value)
       default: {
-        throw new Error(`\`Node.fromJSON\` requires an \`object\` of either 'block', 'document', 'inline' or 'text', but you passed: ${object}`)
+        throw new Error(`\`Node.fromJSON\` requires an \`object\` of either 'block', 'document', 'inline' or 'text', but you passed: ${value}`)
       }
     }
   }
