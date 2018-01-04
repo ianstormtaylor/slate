@@ -37,13 +37,13 @@ const TEXT_RULE = {
     }
 
     if (el.nodeName == '#text') {
-      if (el.value && el.value.match(/<!--.*?-->/)) return
+      if (el.nodeValue && el.nodeValue.match(/<!--.*?-->/)) return
 
       return {
         kind: 'text',
         leaves: [{
           kind: 'leaf',
-          text: el.value || el.nodeValue
+          text: el.nodeValue
         }]
       }
     }
@@ -395,7 +395,7 @@ class Html {
    */
 
   cruftNewline = (element) => {
-    return !(element.nodeName === '#text' && element.value == '\n')
+    return !(element.nodeName === '#text' && element.nodeValue == '\n')
   }
 
 }
