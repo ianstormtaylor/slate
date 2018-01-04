@@ -12,7 +12,7 @@ import 'babel-polyfill' // eslint-disable-line import/no-extraneous-dependencies
 import Html from '..'
 import assert from 'assert'
 import fs from 'fs'
-import parse5 from 'parse5' // eslint-disable-line import/no-extraneous-dependencies
+import { JSDOM } from 'jsdom' // eslint-disable-line import/no-extraneous-dependencies
 import { Value, resetKeyGenerator } from 'slate'
 import { basename, extname, resolve } from 'path'
 
@@ -37,7 +37,7 @@ describe('slate-html-serializer', () => {
       it(test, async () => {
         const module = require(resolve(dir, test))
         const { input, output, config, options } = module
-        const html = new Html({ parseHtml: parse5.parseFragment, ...config })
+        const html = new Html({ parseHtml: JSDOM.fragment, ...config })
         const value = html.deserialize(input, options)
         const actual = Value.isValue(value) ? value.toJSON() : value
         const expected = Value.isValue(output) ? output.toJSON() : output
@@ -54,7 +54,7 @@ describe('slate-html-serializer', () => {
       it(test, async () => {
         const module = require(resolve(dir, test))
         const { input, output, rules, options } = module
-        const html = new Html({ rules, parseHtml: parse5.parseFragment })
+        const html = new Html({ rules, parseHtml: JSDOM.fragment })
         const string = html.serialize(input, options)
         const actual = string
         const expected = output
