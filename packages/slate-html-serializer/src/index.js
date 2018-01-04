@@ -37,14 +37,13 @@ const TEXT_RULE = {
     }
 
     if (el.nodeName == '#text') {
-      const value = getValue(el)
-      if (value && value.match(/<!--.*?-->/)) return
+      if (el.nodeValue && el.nodeValue.match(/<!--.*?-->/)) return
 
       return {
         kind: 'text',
         leaves: [{
           kind: 'leaf',
-          text: value
+          text: el.nodeValue
         }]
       }
     }
@@ -396,7 +395,7 @@ class Html {
    */
 
   cruftNewline = (element) => {
-    return !(element.nodeName === '#text' && getValue(element) == '\n')
+    return !(element.nodeName === '#text' && element.nodeValue == '\n')
   }
 
 }
@@ -412,17 +411,6 @@ let key = 0
 
 function addKey(element) {
   return React.cloneElement(element, { key: key++ })
-}
-
-/**
- * Consistent value lookups on text nodes
- *
- * @param {Object} element
- * @return {String}
- */
-
-function getValue(element) {
-  return element.value || element.nodeValue || ''
 }
 
 /**
