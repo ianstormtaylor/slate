@@ -614,8 +614,8 @@ function AfterPlugin() {
 
   function renderNode(props) {
     const { attributes, children, node } = props
-    if (node.kind != 'block' && node.kind != 'inline') return
-    const Tag = node.kind == 'block' ? 'div' : 'span'
+    if (node.object != 'block' && node.object != 'inline') return
+    const Tag = node.object == 'block' ? 'div' : 'span'
     const style = { position: 'relative' }
     return <Tag {...attributes} style={style}>{children}</Tag>
   }
@@ -631,7 +631,7 @@ function AfterPlugin() {
     const { editor, node } = props
     if (!editor.props.placeholder) return
     if (editor.state.isComposing) return
-    if (node.kind != 'block') return
+    if (node.object != 'block') return
     if (!Text.isTextList(node.nodes)) return
     if (node.text != '') return
     if (editor.value.document.getBlocks().size > 1) return

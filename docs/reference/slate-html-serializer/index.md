@@ -86,28 +86,28 @@ The object should be one of:
 
 ```js
 {
-  kind: 'block',
+  object: 'block',
   type: String,
   data: Object,
   nodes: next(...)
 }
 
 {
-  kind: 'inline',
+  object: 'inline',
   type: String,
   data: Object,
   nodes: next(...)
 }
 
 {
-  kind: 'mark',
+  object: 'mark',
   type: String,
   data: Object,
   nodes: next(...)
 }
 
 {
-  kind: 'text',
+  object: 'text',
   leaves: Array
 }
 ```
@@ -118,8 +118,8 @@ The object should be one of:
 
 The `serialize` function should return a React element representing the serialized HTML, or nothing if the rule in question doesn't know how to serialize the object, in which case the next rule in the stack will be attempted.
 
-The function will be called with either a `Node`, a `Mark`, or a special `String` immutable object, with a `kind: 'string'` property and a `text` property containing the text string.
+The function will be called with either a `Node`, a `Mark`, or a special `String` immutable object, with a `object: 'string'` property and a `text` property containing the text string.
 
 ### Default Text Rule
 
-The HTML serializer includes a default rule to handle "normal text". That is, a final rule exists to serialize `kind: 'string'` text (replacing line feed characters with `<br>`), and to deserialize text inversely. To avoid this default handling simply provide your own `deserialize` and `serialize` rules for text.
+The HTML serializer includes a default rule to handle "normal text". That is, a final rule exists to serialize `object: 'string'` text (replacing line feed characters with `<br>`), and to deserialize text inversely. To avoid this default handling simply provide your own `deserialize` and `serialize` rules for text.

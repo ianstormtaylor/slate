@@ -23,7 +23,7 @@ Document({
 ### `data`
 `Immutable.Map`
 
-### `kind`
+### `object`
 `String`
 
 An immutable string value of `'document'` for easily separating this node from [`Block`](./block.md), [`Inline`](./inline.md) or [`Text`](./text.md) nodes.

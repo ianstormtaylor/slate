@@ -114,7 +114,7 @@ class MarkdownPreview extends React.Component {
    */
 
   decorateNode(node) {
-    if (node.kind != 'block') return
+    if (node.object != 'block') return
 
     const string = node.text
     const texts = node.getTexts().toArray()

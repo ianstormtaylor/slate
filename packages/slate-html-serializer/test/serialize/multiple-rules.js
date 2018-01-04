@@ -11,7 +11,7 @@ export const rules = [
   },
   {
     serialize(obj, children) {
-      if (obj.kind == 'block' && obj.type == 'paragraph') {
+      if (obj.object == 'block' && obj.type == 'paragraph') {
         return React.createElement('p', {}, children)
       }
     }

@@ -13,23 +13,23 @@ export const input = (
 )
 
 export const output = {
-  kind: 'value',
+  object: 'value',
   document: {
-    kind: 'document',
+    object: 'document',
     data: {},
     nodes: [
       {
-        kind: 'block',
+        object: 'block',
         type: 'paragraph',
         data: {},
         isVoid: false,
         nodes: [
           {
-            kind: 'text',
+            object: 'text',
             leaves: [
               {
                 text: 'one',
-                kind: 'leaf',
+                object: 'leaf',
                 marks: []
               }
             ]
@@ -39,7 +39,7 @@ export const output = {
     ]
   },
   selection: {
-    kind: 'range',
+    object: 'range',
     anchorPath: [0, 0],
     anchorOffset: 0,
     focusPath: [0, 0],

@@ -131,7 +131,7 @@ class Node extends React.Component {
 
     // If it's a block node with inline children, add the proper `dir` attribute
     // for text direction.
-    if (node.kind == 'block' && node.nodes.first().kind != 'block') {
+    if (node.object == 'block' && node.nodes.first().object != 'block') {
       const direction = node.getTextDirection()
       if (direction == 'rtl') attributes.dir = 'rtl'
     }
@@ -170,11 +170,11 @@ class Node extends React.Component {
   renderNode = (child, isSelected) => {
     const { block, decorations, editor, node, readOnly } = this.props
     const { stack } = editor
-    const Component = child.kind == 'text' ? Text : Node
+    const Component = child.object == 'text' ? Text : Node
     const decs = decorations.concat(node.getDecorations(stack))
     return (
       <Component
-        block={node.kind == 'block' ? node : block}
+        block={node.object == 'block' ? node : block}
         decorations={decs}
         editor={editor}
         isSelected={isSelected}

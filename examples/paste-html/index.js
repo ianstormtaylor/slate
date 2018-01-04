@@ -53,7 +53,7 @@ const RULES = [
       const block = BLOCK_TAGS[el.tagName.toLowerCase()]
       if (!block) return
       return {
-        kind: 'block',
+        object: 'block',
         type: block,
         nodes: next(el.childNodes)
       }
@@ -64,7 +64,7 @@ const RULES = [
       const mark = MARK_TAGS[el.tagName.toLowerCase()]
       if (!mark) return
       return {
-        kind: 'mark',
+        object: 'mark',
         type: mark,
         nodes: next(el.childNodes)
       }
@@ -80,7 +80,7 @@ const RULES = [
         : el.childNodes
 
       return {
-        kind: 'block',
+        object: 'block',
         type: 'code',
         nodes: next(childNodes)
       }
@@ -91,7 +91,7 @@ const RULES = [
     deserialize(el, next) {
       if (el.tagName.toLowerCase() != 'img') return
       return {
-        kind: 'block',
+        object: 'block',
         type: 'image',
         isVoid: true,
         nodes: next(el.childNodes),
@@ -106,7 +106,7 @@ const RULES = [
     deserialize(el, next) {
       if (el.tagName.toLowerCase() != 'a') return
       return {
-        kind: 'inline',
+        object: 'inline',
         type: 'link',
         nodes: next(el.childNodes),
         data: {

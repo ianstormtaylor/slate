@@ -9,15 +9,15 @@ export default function (json) {
 export const input = {
   document: {
     nodes: Array.from(Array(10)).map(() => ({
-      kind: 'block',
+      object: 'block',
       type: 'quote',
       nodes: [
         {
-          kind: 'block',
+          object: 'block',
           type: 'paragraph',
           nodes: [
             {
-              kind: 'text',
+              object: 'text',
               leaves: [
                 {
                   text: 'This is editable ',

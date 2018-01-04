@@ -21,16 +21,16 @@ const json = {
 
 for (let h = 0; h < HEADINGS; h++) {
   nodes.push({
-    kind: 'block',
+    object: 'block',
     type: 'heading',
-    nodes: [{ kind: 'text', leaves: [{ text: faker.lorem.sentence() }] }]
+    nodes: [{ object: 'text', leaves: [{ text: faker.lorem.sentence() }] }]
   })
 
   for (let p = 0; p < PARAGRAPHS; p++) {
     nodes.push({
-      kind: 'block',
+      object: 'block',
       type: 'paragraph',
-      nodes: [{ kind: 'text', leaves: [{ text: faker.lorem.paragraph() }] }]
+      nodes: [{ object: 'text', leaves: [{ text: faker.lorem.paragraph() }] }]
     })
   }
 }

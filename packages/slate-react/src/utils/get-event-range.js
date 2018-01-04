@@ -30,7 +30,7 @@ function getEventRange(event, value) {
   // closest to.
   if (node.isVoid) {
     const rect = target.getBoundingClientRect()
-    const isPrevious = node.kind == 'inline'
+    const isPrevious = node.object == 'inline'
       ? x - rect.left < rect.left + rect.width - x
       : y - rect.top < rect.top + rect.height - y
 

@@ -55,7 +55,7 @@ Whether the range is backward. A range is considered "backward" when its focus p
 
 Whether the range currently has focus.
 
-### `kind`
+### `object`
 `String`
 
 A string with a value of `'range'`.

@@ -1,5 +1,6 @@
 
 import isPlainObject from 'is-plain-object'
+import logger from 'slate-dev-logger'
 import { List, Record } from 'immutable'
 
 import MODEL_TYPES from '../constants/model-types'
@@ -194,13 +195,18 @@ class Operation extends Record(DEFAULTS) {
   }
 
   /**
-   * Get the node's kind.
+   * Object.
    *
    * @return {String}
    */
 
-  get kind() {
+  get object() {
     return 'operation'
+  }
+
+  get kind() {
+    logger.deprecate('slate@0.32.0', 'The `kind` property of Slate objects has been renamed to `object`.')
+    return this.object
   }
 
   /**
@@ -211,8 +217,8 @@ class Operation extends Record(DEFAULTS) {
    */
 
   toJSON(options = {}) {
-    const { kind, type } = this
-    const object = { kind, type }
+    const { object, type } = this
+    const json = { object, type }
     const ATTRIBUTES = OPERATION_ATTRIBUTES[type]
 
     for (const key of ATTRIBUTES) {
@@ -264,10 +270,10 @@ class Operation extends Record(DEFAULTS) {
         value = v
       }
 
-      object[key] = value
+      json[key] = value
     }
 
-    return object
+    return json
   }
 
   /**
