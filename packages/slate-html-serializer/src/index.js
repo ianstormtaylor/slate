@@ -417,11 +417,12 @@ function addKey(element) {
 /**
  * Consistent value lookups on text nodes
  *
- * @param {Element} element
- * @return {String} text
-*/
-function getValue(el) {
-  return el.value || el.nodeValue || ''
+ * @param {Object} element
+ * @return {String}
+ */
+
+function getValue(element) {
+  return element.value || element.nodeValue || ''
 }
 
 /**
