@@ -7,6 +7,16 @@ This document maintains a list of changes to the `slate-hyperscript` package wit
 ---
 
 
+### `0.5.0` — January 4, 2018
+
+###### BREAKING
+
+- **The `kind` property of Slate objects has been renamed to `object`.** This is to reduce the confusion over the difference between "kind" and "type" which are practically synonyms. The "object" name was chosen to match the Stripe API, since it seems like a sensible choice and reads much more nicely when looking through JSON.
+
+
+---
+
+
 ### `0.4.0` — October 27, 2017
 
 ###### BREAKING

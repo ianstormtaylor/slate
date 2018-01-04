@@ -7,6 +7,18 @@ This document maintains a list of changes to the `slate-html-serializer` package
 ---
 
 
+### `0.5.0` — January 4, 2018
+
+###### BREAKING
+
+- **The `kind` property of Slate objects has been renamed to `object`.** This is to reduce the confusion over the difference between "kind" and "type" which are practically synonyms. The "object" name was chosen to match the Stripe API, since it seems like a sensible choice and reads much more nicely when looking through JSON.
+
+- **Serializing with `parse5` is no longer possible.** The codebase previously made concessions to allow this, but it was never a good idea because `parse5` does not match the `DOMParser` behavior exactly. Instead, you should use `jsdom` to get a matching behavior, otherwise your serialization rules need to account for two slightly different syntax trees.
+
+
+---
+
+
 ### `0.4.0` — October 27, 2017
 
 ###### BREAKING
