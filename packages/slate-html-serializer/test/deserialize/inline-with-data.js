@@ -10,14 +10,14 @@ export const config = {
         switch (el.tagName.toLowerCase()) {
           case 'p': {
             return {
-              kind: 'block',
+              object: 'block',
               type: 'paragraph',
               nodes: next(el.childNodes),
             }
           }
           case 'a': {
             return {
-              kind: 'inline',
+              object: 'inline',
               type: 'link',
               data: { thing: 'value' },
               nodes: next(el.childNodes),

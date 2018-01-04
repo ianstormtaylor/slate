@@ -111,7 +111,7 @@ const APPLIERS = {
 
     // If the nodes are text nodes and the selection is inside the second node
     // update it to refer to the first node instead.
-    if (one.kind == 'text') {
+    if (one.object == 'text') {
       const { anchorKey, anchorOffset, focusKey, focusOffset } = selection
       let normalize = false
 
@@ -227,8 +227,8 @@ const APPLIERS = {
     if (selection.isSet) {
       const hasStartNode = node.hasNode(startKey)
       const hasEndNode = node.hasNode(endKey)
-      const first = node.kind == 'text' ? node : node.getFirstText() || node
-      const last = node.kind == 'text' ? node : node.getLastText() || node
+      const first = node.object == 'text' ? node : node.getFirstText() || node
+      const last = node.object == 'text' ? node : node.getLastText() || node
       const prev = document.getPreviousText(first.key)
       const next = document.getNextText(last.key)
 

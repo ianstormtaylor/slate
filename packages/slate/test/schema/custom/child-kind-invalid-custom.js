@@ -7,10 +7,10 @@ export const schema = {
     paragraph: {},
     quote: {
       nodes: [
-        { kinds: ['block'] },
+        { objects: ['block'] },
       ],
       normalize: (change, reason, { child }) => {
-        if (reason == 'child_kind_invalid') {
+        if (reason == 'child_object_invalid') {
           change.wrapBlockByKey(child.key, 'paragraph')
         }
       }

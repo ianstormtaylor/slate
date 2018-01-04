@@ -194,12 +194,12 @@ class Operation extends Record(DEFAULTS) {
   }
 
   /**
-   * Get the node's kind.
+   * Object.
    *
    * @return {String}
    */
 
-  get kind() {
+  get object() {
     return 'operation'
   }
 
@@ -211,8 +211,8 @@ class Operation extends Record(DEFAULTS) {
    */
 
   toJSON(options = {}) {
-    const { kind, type } = this
-    const object = { kind, type }
+    const { object, type } = this
+    const json = { object, type }
     const ATTRIBUTES = OPERATION_ATTRIBUTES[type]
 
     for (const key of ATTRIBUTES) {
@@ -264,10 +264,10 @@ class Operation extends Record(DEFAULTS) {
         value = v
       }
 
-      object[key] = value
+      json[key] = value
     }
 
-    return object
+    return json
   }
 
   /**

@@ -51,12 +51,12 @@ class Change {
   }
 
   /**
-   * Get the kind.
+   * Object.
    *
    * @return {String}
    */
 
-  get kind() {
+  get object() {
     return 'change'
   }
 

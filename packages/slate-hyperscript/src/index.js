@@ -270,15 +270,15 @@ function resolveCreators(options) {
 }
 
 /**
- * Normalize a node creator with `key` and `value`, of `kind`.
+ * Normalize a node creator with `key` and `value`, of `object`.
  *
  * @param {String} key
  * @param {Function|Object|String} value
- * @param {String} kind
+ * @param {String} object
  * @return {Function}
  */
 
-function normalizeNode(key, value, kind) {
+function normalizeNode(key, value, object) {
   if (typeof value == 'function') {
     return value
   }
@@ -292,7 +292,7 @@ function normalizeNode(key, value, kind) {
       const { key: attrKey, ...rest } = attributes
       const attrs = {
         ...value,
-        kind,
+        object,
         key: attrKey,
         data: {
           ...(value.data || {}),
@@ -300,11 +300,11 @@ function normalizeNode(key, value, kind) {
         }
       }
 
-      return CREATORS[kind](tagName, attrs, children)
+      return CREATORS[object](tagName, attrs, children)
     }
   }
 
-  throw new Error(`Slate hyperscript ${kind} creators can be either functions, objects or strings, but you passed: ${value}`)
+  throw new Error(`Slate hyperscript ${object} creators can be either functions, objects or strings, but you passed: ${value}`)
 }
 
 /**

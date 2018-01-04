@@ -3,7 +3,7 @@
 import h from '../../../helpers/h'
 
 export default function (change) {
-  change.replaceNodeByKey('a', { kind: 'block', type: 'quote' })
+  change.replaceNodeByKey('a', { object: 'block', type: 'quote' })
 }
 
 export const input = (

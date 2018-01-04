@@ -91,12 +91,12 @@ class History extends Record(DEFAULTS) {
   }
 
   /**
-   * Get the kind.
+   * Object.
    *
    * @return {String}
    */
 
-  get kind() {
+  get object() {
     return 'history'
   }
 
@@ -161,7 +161,7 @@ class History extends Record(DEFAULTS) {
 
   toJSON() {
     const object = {
-      kind: this.kind,
+      object: this.object,
       redos: this.redos.toJSON(),
       undos: this.undos.toJSON(),
     }

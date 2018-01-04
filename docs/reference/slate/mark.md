@@ -22,7 +22,7 @@ Mark({
 
 A map of [`Data`](./data.md).
 
-### `kind`
+### `object`
 `String`
 
 A string with a value of `'mark'`.

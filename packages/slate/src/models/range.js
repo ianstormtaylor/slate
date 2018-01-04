@@ -151,12 +151,12 @@ class Range extends Record(DEFAULTS) {
   }
 
   /**
-   * Get the kind.
+   * Object.
    *
    * @return {String}
    */
 
-  get kind() {
+  get object() {
     return 'range'
   }
 
@@ -315,7 +315,7 @@ class Range extends Record(DEFAULTS) {
    */
 
   hasAnchorIn(node) {
-    return node.kind == 'text'
+    return node.object == 'text'
       ? node.key == this.anchorKey
       : this.anchorKey != null && node.hasDescendant(this.anchorKey)
   }
@@ -371,7 +371,7 @@ class Range extends Record(DEFAULTS) {
    */
 
   hasFocusIn(node) {
-    return node.kind == 'text'
+    return node.object == 'text'
       ? node.key == this.focusKey
       : this.focusKey != null && node.hasDescendant(this.focusKey)
   }
@@ -698,7 +698,7 @@ class Range extends Record(DEFAULTS) {
     }
 
     // If the anchor node isn't a text node, match it to one.
-    if (anchorNode.kind != 'text') {
+    if (anchorNode.object != 'text') {
       logger.warn('The range anchor was set to a Node that is not a Text node. This should not happen and can degrade performance. The node in question was:', anchorNode)
       const anchorText = anchorNode.getTextAtOffset(anchorOffset)
       const offset = anchorNode.getOffset(anchorText.key)
@@ -707,7 +707,7 @@ class Range extends Record(DEFAULTS) {
     }
 
     // If the focus node isn't a text node, match it to one.
-    if (focusNode.kind != 'text') {
+    if (focusNode.object != 'text') {
       logger.warn('The range focus was set to a Node that is not a Text node. This should not happen and can degrade performance. The node in question was:', focusNode)
       const focusText = focusNode.getTextAtOffset(focusOffset)
       const offset = focusNode.getOffset(focusText.key)
@@ -742,7 +742,7 @@ class Range extends Record(DEFAULTS) {
 
   toJSON() {
     const object = {
-      kind: this.kind,
+      object: this.object,
       anchorKey: this.anchorKey,
       anchorOffset: this.anchorOffset,
       focusKey: this.focusKey,
@@ -861,7 +861,7 @@ ALIAS_METHODS.forEach(([ alias, method ]) => {
  */
 
 function getFirst(node) {
-  return node.kind == 'text' ? node : node.getFirstText()
+  return node.object == 'text' ? node : node.getFirstText()
 }
 
 /**
@@ -872,7 +872,7 @@ function getFirst(node) {
  */
 
 function getLast(node) {
-  return node.kind == 'text' ? node : node.getLastText()
+  return node.object == 'text' ? node : node.getLastText()
 }
 
 /**

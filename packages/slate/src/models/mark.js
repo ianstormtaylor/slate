@@ -151,10 +151,10 @@ class Mark extends Record(DEFAULTS) {
   }
 
   /**
-   * Get the kind.
+   * Object.
    */
 
-  get kind() {
+  get object() {
     return 'mark'
   }
 
@@ -177,7 +177,7 @@ class Mark extends Record(DEFAULTS) {
 
   toJSON() {
     const object = {
-      kind: this.kind,
+      object: this.object,
       type: this.type,
       data: this.data.toJSON(),
     }

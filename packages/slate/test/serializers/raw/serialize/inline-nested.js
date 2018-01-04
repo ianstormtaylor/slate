@@ -17,54 +17,54 @@ export const input = (
 )
 
 export const output = {
-  kind: 'value',
+  object: 'value',
   document: {
-    kind: 'document',
+    object: 'document',
     data: {},
     nodes: [
       {
-        kind: 'block',
+        object: 'block',
         type: 'paragraph',
         data: {},
         isVoid: false,
         nodes: [
           {
-            kind: 'text',
+            object: 'text',
             leaves: [
               {
-                kind: 'leaf',
+                object: 'leaf',
                 text: '',
                 marks: [],
               }
             ]
           },
           {
-            kind: 'inline',
+            object: 'inline',
             type: 'link',
             data: {},
             isVoid: false,
             nodes: [
               {
-                kind: 'text',
+                object: 'text',
                 leaves: [
                   {
-                    kind: 'leaf',
+                    object: 'leaf',
                     text: '',
                     marks: [],
                   }
                 ]
               },
               {
-                kind: 'inline',
+                object: 'inline',
                 type: 'hashtag',
                 data: {},
                 isVoid: false,
                 nodes: [
                   {
-                    kind: 'text',
+                    object: 'text',
                     leaves: [
                       {
-                        kind: 'leaf',
+                        object: 'leaf',
                         text: 'one',
                         marks: [],
                       }
@@ -73,10 +73,10 @@ export const output = {
                 ]
               },
               {
-                kind: 'text',
+                object: 'text',
                 leaves: [
                   {
-                    kind: 'leaf',
+                    object: 'leaf',
                     text: '',
                     marks: [],
                   }
@@ -85,10 +85,10 @@ export const output = {
             ]
           },
           {
-            kind: 'text',
+            object: 'text',
             leaves: [
               {
-                kind: 'leaf',
+                object: 'leaf',
                 text: '',
                 marks: [],
               }

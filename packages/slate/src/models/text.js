@@ -130,12 +130,12 @@ class Text extends Record(DEFAULTS) {
   }
 
   /**
-   * Get the node's kind.
+   * Object.
    *
    * @return {String}
    */
 
-  get kind() {
+  get object() {
     return 'text'
   }
 
@@ -430,7 +430,7 @@ class Text extends Record(DEFAULTS) {
 
   toJSON(options = {}) {
     const object = {
-      kind: this.kind,
+      object: this.object,
       leaves: this.getLeaves().toArray().map(r => r.toJSON()),
     }
 

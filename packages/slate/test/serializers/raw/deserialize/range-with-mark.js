@@ -3,38 +3,38 @@
 import h from '../../../helpers/h'
 
 export const input = {
-  kind: 'value',
+  object: 'value',
   document: {
-    kind: 'document',
+    object: 'document',
     data: {},
     nodes: [
       {
-        kind: 'block',
+        object: 'block',
         type: 'paragraph',
         isVoid: false,
         data: {},
         nodes: [
           {
-            kind: 'text',
+            object: 'text',
             leaves: [
               {
-                kind: 'leaves',
+                object: 'leaves',
                 text: 'o',
                 marks: [],
               },
               {
-                kind: 'leaves',
+                object: 'leaves',
                 text: 'n',
                 marks: [
                   {
-                    kind: 'mark',
+                    object: 'mark',
                     type: 'bold',
                     data: {},
                   }
                 ]
               },
               {
-                kind: 'leaves',
+                object: 'leaves',
                 text: 'e',
                 marks: [],
               }

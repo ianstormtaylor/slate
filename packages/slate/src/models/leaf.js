@@ -114,12 +114,12 @@ class Leaf extends Record(DEFAULTS) {
   }
 
   /**
-   * Get the node's kind.
+   * Object.
    *
    * @return {String}
    */
 
-  get kind() {
+  get object() {
     return 'leaf'
   }
 
@@ -151,7 +151,7 @@ class Leaf extends Record(DEFAULTS) {
 
   toJSON() {
     const object = {
-      kind: this.kind,
+      object: this.object,
       text: this.text,
       marks: this.marks.toArray().map(m => m.toJSON()),
     }

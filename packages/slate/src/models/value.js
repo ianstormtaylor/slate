@@ -151,12 +151,12 @@ class Value extends Record(DEFAULTS) {
   }
 
   /**
-   * Get the kind.
+   * Object.
    *
    * @return {String}
    */
 
-  get kind() {
+  get object() {
     return 'value'
   }
 
@@ -628,7 +628,7 @@ class Value extends Record(DEFAULTS) {
 
   toJSON(options = {}) {
     const object = {
-      kind: this.kind,
+      object: this.object,
       document: this.document.toJSON(options),
     }
 

@@ -12,7 +12,7 @@ All changes are performed through `Change` objects, so that a history of changes
 
 ## Properties
 
-### `kind`
+### `object`
 `String`
 
 A string with a value of `'change'`.

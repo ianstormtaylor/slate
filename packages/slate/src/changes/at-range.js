@@ -299,7 +299,7 @@ Changes.deleteLineBackwardAtRange = (change, range, options) => {
   const startWithVoidInline = (
     startBlock.nodes.size > 1 &&
     startBlock.nodes.get(0).text == '' &&
-    startBlock.nodes.get(1).kind == 'inline'
+    startBlock.nodes.get(1).object == 'inline'
   )
 
   let o = offset + startOffset
@@ -992,7 +992,7 @@ Changes.splitBlockAtRange = (change, range, height = 1, options = {}) => {
   let parent = document.getClosestBlock(node.key)
   let h = 0
 
-  while (parent && parent.kind == 'block' && h < height) {
+  while (parent && parent.object == 'block' && h < height) {
     node = parent
     parent = document.getClosestBlock(parent.key)
     h++
@@ -1026,7 +1026,7 @@ Changes.splitInlineAtRange = (change, range, height = Infinity, options = {}) =>
   let parent = document.getClosestInline(node.key)
   let h = 0
 
-  while (parent && parent.kind == 'inline' && h < height) {
+  while (parent && parent.object == 'inline' && h < height) {
     node = parent
     parent = document.getClosestInline(parent.key)
     h++
@@ -1084,7 +1084,7 @@ Changes.unwrapBlockAtRange = (change, range, properties, options = {}) => {
   const wrappers = blocks
     .map((block) => {
       return document.getClosest(block.key, (parent) => {
-        if (parent.kind != 'block') return false
+        if (parent.object != 'block') return false
         if (properties.type != null && parent.type != properties.type) return false
         if (properties.isVoid != null && parent.isVoid != properties.isVoid) return false
         if (properties.data != null && !parent.data.isSuperset(properties.data)) return false
@@ -1176,7 +1176,7 @@ Changes.unwrapInlineAtRange = (change, range, properties, options = {}) => {
   const inlines = texts
     .map((text) => {
       return document.getClosest(text.key, (parent) => {
-        if (parent.kind != 'inline') return false
+        if (parent.object != 'inline') return false
         if (properties.type != null && parent.type != properties.type) return false
         if (properties.isVoid != null && parent.isVoid != properties.isVoid) return false
         if (properties.data != null && !parent.data.isSuperset(properties.data)) return false

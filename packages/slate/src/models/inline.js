@@ -141,12 +141,12 @@ class Inline extends Record(DEFAULTS) {
   }
 
   /**
-   * Get the node's kind.
+   * Object.
    *
    * @return {String}
    */
 
-  get kind() {
+  get object() {
     return 'inline'
   }
 
@@ -179,7 +179,7 @@ class Inline extends Record(DEFAULTS) {
 
   toJSON(options = {}) {
     const object = {
-      kind: this.kind,
+      object: this.object,
       type: this.type,
       isVoid: this.isVoid,
       data: this.data.toJSON(),

@@ -10,7 +10,7 @@ export const config = {
         switch (el.tagName.toLowerCase()) {
           case 'img': {
             return {
-              kind: 'block',
+              object: 'block',
               type: 'image',
               isVoid: true,
             }

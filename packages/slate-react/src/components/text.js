@@ -82,7 +82,7 @@ class Text extends React.Component {
 
     // If the node parent is a block node, and it was the last child of the
     // block, re-render to cleanup extra `\n`.
-    if (n.parent.kind == 'block') {
+    if (n.parent.object == 'block') {
       const pLast = p.parent.nodes.last()
       const nLast = n.parent.nodes.last()
       if (p.node == pLast && n.node != nLast) return true

@@ -13,26 +13,26 @@ export const input = (
 )
 
 export const output = {
-  kind: 'value',
+  object: 'value',
   document: {
-    kind: 'document',
+    object: 'document',
     key: '4',
     data: {},
     nodes: [
       {
-        kind: 'block',
+        object: 'block',
         key: '1',
         type: 'paragraph',
         data: {},
         isVoid: false,
         nodes: [
           {
-            kind: 'text',
+            object: 'text',
             key: '0',
             leaves: [
               {
                 text: 'one',
-                kind: 'leaf',
+                object: 'leaf',
                 marks: []
               }
             ]

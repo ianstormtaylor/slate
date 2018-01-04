@@ -26,7 +26,7 @@ A list of [`Characters`](./character.md) with associated [`Marks`](./mark.md) th
 
 A unique identifier for the node.
 
-### `kind`
+### `object`
 `String`
 
 An immutable string value of `'text'` for easily separating this node from [`Inline`](./inline.md) or [`Block`](./block.md) nodes.

@@ -120,12 +120,12 @@ class Character extends Record(DEFAULTS) {
   }
 
   /**
-   * Get the kind.
+   * Object.
    *
    * @return {String}
    */
 
-  get kind() {
+  get object() {
     return 'character'
   }
 
@@ -137,7 +137,7 @@ class Character extends Record(DEFAULTS) {
 
   toJSON() {
     const object = {
-      kind: this.kind,
+      object: this.object,
       text: this.text,
       marks: this.marks.toArray().map(m => m.toJSON()),
     }
