@@ -1,6 +1,7 @@
 
 import Debug from 'debug'
 import isPlainObject from 'is-plain-object'
+import logger from 'slate-dev-logger'
 import mergeWith from 'lodash/mergeWith'
 import { Record } from 'immutable'
 
@@ -135,6 +136,11 @@ class Schema extends Record(DEFAULTS) {
 
   get object() {
     return 'schema'
+  }
+
+  get kind() {
+    logger.deprecate('slate@0.32.0', 'The `kind` property of Slate objects has been renamed to `object`.')
+    return this.object
   }
 
   /**

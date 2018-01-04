@@ -1,5 +1,6 @@
 
 import isPlainObject from 'is-plain-object'
+import logger from 'slate-dev-logger'
 import { List, OrderedSet, Record, Set, is } from 'immutable'
 
 import Character from './character'
@@ -137,6 +138,11 @@ class Text extends Record(DEFAULTS) {
 
   get object() {
     return 'text'
+  }
+
+  get kind() {
+    logger.deprecate('slate@0.32.0', 'The `kind` property of Slate objects has been renamed to `object`.')
+    return this.object
   }
 
   /**

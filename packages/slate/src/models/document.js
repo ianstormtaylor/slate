@@ -11,6 +11,7 @@ import './inline'
  */
 
 import isPlainObject from 'is-plain-object'
+import logger from 'slate-dev-logger'
 import { List, Map, Record } from 'immutable'
 
 import Node from './node'
@@ -112,6 +113,11 @@ class Document extends Record(DEFAULTS) {
 
   get object() {
     return 'document'
+  }
+
+  get kind() {
+    logger.deprecate('slate@0.32.0', 'The `kind` property of Slate objects has been renamed to `object`.')
+    return this.object
   }
 
   /**

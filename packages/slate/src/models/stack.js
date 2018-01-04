@@ -1,4 +1,5 @@
 
+import logger from 'slate-dev-logger'
 import { Record } from 'immutable'
 
 import MODEL_TYPES from '../constants/model-types'
@@ -53,6 +54,11 @@ class Stack extends Record(DEFAULTS) {
 
   get object() {
     return 'stack'
+  }
+
+  get kind() {
+    logger.deprecate('slate@0.32.0', 'The `kind` property of Slate objects has been renamed to `object`.')
+    return this.object
   }
 
   /**

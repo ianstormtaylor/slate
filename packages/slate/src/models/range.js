@@ -160,6 +160,11 @@ class Range extends Record(DEFAULTS) {
     return 'range'
   }
 
+  get kind() {
+    logger.deprecate('slate@0.32.0', 'The `kind` property of Slate objects has been renamed to `object`.')
+    return this.object
+  }
+
   /**
    * Check whether the range is blurred.
    *
