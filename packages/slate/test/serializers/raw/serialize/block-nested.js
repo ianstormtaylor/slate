@@ -15,29 +15,29 @@ export const input = (
 )
 
 export const output = {
-  kind: 'value',
+  object: 'value',
   document: {
-    kind: 'document',
+    object: 'document',
     data: {},
     nodes: [
       {
-        kind: 'block',
+        object: 'block',
         type: 'quote',
         data: {},
         isVoid: false,
         nodes: [
           {
-            kind: 'block',
+            object: 'block',
             type: 'paragraph',
             data: {},
             isVoid: false,
             nodes: [
               {
-                kind: 'text',
+                object: 'text',
                 leaves: [
                   {
                     text: 'one',
-                    kind: 'leaf',
+                    object: 'leaf',
                     marks: []
                   }
                 ]

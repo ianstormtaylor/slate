@@ -94,7 +94,7 @@ However sometimes you want to customize things. Or maybe you want to render plac
 ```js
 function renderPlaceholder(props) {
   const { node, editor } = props
-  if (node.kind != 'block') return
+  if (node.object != 'block') return
   if (node.type != 'caption') return
   if (node.text != '') return
 

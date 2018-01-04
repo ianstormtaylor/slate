@@ -22,8 +22,8 @@ Specifically, Slate's models are [`Immutable.Record`](https://facebook.github.io
 ```js
 const block = Block.create({ type: 'paragraph' })
 
-block.kind // "block"
-block.type // "paragraph"
+block.object // "block"
+block.type   // "paragraph"
 ```
 
 But for updating values, you'll need to use the [`Immutable.Record` API](https://facebook.github.io/immutable-js/docs/#/Record/set).

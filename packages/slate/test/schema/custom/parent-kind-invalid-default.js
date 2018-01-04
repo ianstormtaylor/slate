@@ -5,7 +5,7 @@ import h from '../../helpers/h'
 export const schema = {
   inlines: {
     link: {
-      parent: { kinds: ['block'] },
+      parent: { objects: ['block'] },
     }
   }
 }

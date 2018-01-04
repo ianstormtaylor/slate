@@ -7,7 +7,7 @@ import h from '../helpers/h'
 export const rules = [
   {
     serialize(obj, children) {
-      if (obj.kind != 'block') return
+      if (obj.object != 'block') return
       switch (obj.type) {
         case 'paragraph': return React.createElement('p', {}, children)
         case 'quote': return React.createElement('blockquote', {}, children)

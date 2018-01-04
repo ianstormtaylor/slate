@@ -1,5 +1,6 @@
 
 import isPlainObject from 'is-plain-object'
+import logger from 'slate-dev-logger'
 import { List, OrderedSet, Record, Set, is } from 'immutable'
 
 import Character from './character'
@@ -130,13 +131,18 @@ class Text extends Record(DEFAULTS) {
   }
 
   /**
-   * Get the node's kind.
+   * Object.
    *
    * @return {String}
    */
 
-  get kind() {
+  get object() {
     return 'text'
+  }
+
+  get kind() {
+    logger.deprecate('slate@0.32.0', 'The `kind` property of Slate objects has been renamed to `object`.')
+    return this.object
   }
 
   /**
@@ -430,7 +436,7 @@ class Text extends Record(DEFAULTS) {
 
   toJSON(options = {}) {
     const object = {
-      kind: this.kind,
+      object: this.object,
       leaves: this.getLeaves().toArray().map(r => r.toJSON()),
     }
 

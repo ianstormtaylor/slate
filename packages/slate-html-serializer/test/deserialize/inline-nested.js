@@ -10,21 +10,21 @@ export const config = {
         switch (el.tagName.toLowerCase()) {
           case 'p': {
             return {
-              kind: 'block',
+              object: 'block',
               type: 'paragraph',
               nodes: next(el.childNodes),
             }
           }
           case 'a': {
             return {
-              kind: 'inline',
+              object: 'inline',
               type: 'link',
               nodes: next(el.childNodes),
             }
           }
           case 'span': {
             return {
-              kind: 'inline',
+              object: 'inline',
               type: 'hashtag',
               nodes: next(el.childNodes),
             }

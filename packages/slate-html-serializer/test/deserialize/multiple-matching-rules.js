@@ -8,7 +8,7 @@ export const config = {
     {
       deserialize(el, next) {
         return {
-          kind: 'block',
+          object: 'block',
           type: 'paragraph',
         }
       }
@@ -16,7 +16,7 @@ export const config = {
     {
       deserialize(el, next) {
         return {
-          kind: 'block',
+          object: 'block',
           type: 'quote',
         }
       }

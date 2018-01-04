@@ -19,11 +19,11 @@ const initialValue = Value.fromJSON({
   document: {
     nodes: [
       {
-        kind: 'block',
+        object: 'block',
         type: 'paragraph',
         nodes: [
           {
-            kind: 'text',
+            object: 'text',
             leaves: [
               {
                 text: 'A line of text in a paragraph.'
@@ -69,11 +69,11 @@ const initialValue = Value.fromJSON({
   document: {
     nodes: [
       {
-        kind: 'block',
+        object: 'block',
         type: 'paragraph',
         nodes: [
           {
-            kind: 'text',
+            object: 'text',
             leaves: [
               {
                 text: 'A line of text in a paragraph.'
@@ -123,11 +123,11 @@ const initialValue = Value.fromJSON(existingValue || {
   document: {
     nodes: [
       {
-        kind: 'block',
+        object: 'block',
         type: 'paragraph',
         nodes: [
           {
-            kind: 'text',
+            object: 'text',
             leaves: [
               {
                 text: 'A line of text in a paragraph.'
@@ -175,11 +175,11 @@ const initialValue = Value.fromJSON(existingValue || {
   document: {
     nodes: [
       {
-        kind: 'block',
+        object: 'block',
         type: 'paragraph',
         nodes: [
           {
-            kind: 'text',
+            object: 'text',
             leaves: [
               {
                 text: 'A line of text in a paragraph.'

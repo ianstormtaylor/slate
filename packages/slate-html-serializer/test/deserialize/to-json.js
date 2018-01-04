@@ -6,7 +6,7 @@ export const config = {
         switch (el.tagName.toLowerCase()) {
           case 'p': {
             return {
-              kind: 'block',
+              object: 'block',
               type: 'paragraph',
               nodes: next(el.childNodes),
             }
@@ -22,20 +22,20 @@ export const input = `
 `.trim()
 
 export const output = {
-  kind: 'value',
+  object: 'value',
   document: {
-    kind: 'document',
+    object: 'document',
     data: {},
     nodes: [
       {
-        kind: 'block',
+        object: 'block',
         type: 'paragraph',
         nodes: [
           {
-            kind: 'text',
+            object: 'text',
             leaves: [
               {
-                kind: 'leaf',
+                object: 'leaf',
                 text: 'one',
               }
             ]

@@ -2,11 +2,11 @@
   "document": {
     "nodes": [
       {
-        "kind": "block",
+        "object": "block",
         "type": "paragraph",
         "nodes": [
           {
-            "kind": "text",
+            "object": "text",
             "leaves": [
               {
                 "text": "This is editable "
@@ -49,11 +49,11 @@
         ]
       },
       {
-        "kind": "block",
+        "object": "block",
         "type": "paragraph",
         "nodes": [
           {
-            "kind": "text",
+            "object": "text",
             "leaves": [
               {
                 "text": "Since it's rich text, you can do things like turn a selection of text "
@@ -73,11 +73,11 @@
         ]
       },
       {
-        "kind": "block",
+        "object": "block",
         "type": "block-quote",
         "nodes": [
           {
-            "kind": "text",
+            "object": "text",
             "leaves": [
               {
                 "text": "A wise quote."
@@ -87,11 +87,11 @@
         ]
       },
       {
-        "kind": "block",
+        "object": "block",
         "type": "paragraph",
         "nodes": [
           {
-            "kind": "text",
+            "object": "text",
             "leaves": [
               {
                 "text": "Try it out for yourself!"

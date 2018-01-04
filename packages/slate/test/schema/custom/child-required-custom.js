@@ -11,7 +11,7 @@ export const schema = {
       ],
       normalize: (change, reason, { node, index }) => {
         if (reason == 'child_required') {
-          change.insertNodeByKey(node.key, index, { kind: 'block', type: 'paragraph' })
+          change.insertNodeByKey(node.key, index, { object: 'block', type: 'paragraph' })
         }
       }
     }

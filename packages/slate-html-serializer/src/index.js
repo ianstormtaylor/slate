@@ -12,7 +12,7 @@ import { Record } from 'immutable'
  */
 
 const String = new Record({
-  kind: 'string',
+  object: 'string',
   text: ''
 })
 
@@ -28,9 +28,9 @@ const TEXT_RULE = {
   deserialize(el) {
     if (el.tagName && el.tagName.toLowerCase() === 'br') {
       return {
-        kind: 'text',
+        object: 'text',
         leaves: [{
-          kind: 'leaf',
+          object: 'leaf',
           text: '\n'
         }]
       }
@@ -40,9 +40,9 @@ const TEXT_RULE = {
       if (el.nodeValue && el.nodeValue.match(/<!--.*?-->/)) return
 
       return {
-        kind: 'text',
+        object: 'text',
         leaves: [{
-          kind: 'leaf',
+          object: 'leaf',
           text: el.nodeValue
         }]
       }
@@ -50,7 +50,7 @@ const TEXT_RULE = {
   },
 
   serialize(obj, children) {
-    if (obj.kind === 'string') {
+    if (obj.object === 'string') {
       return children
         .split('\n')
         .reduce((array, text, i) => {
@@ -129,19 +129,19 @@ class Html {
 
     // COMPAT: ensure that all top-level inline nodes are wrapped into a block.
     nodes = nodes.reduce((memo, node, i, original) => {
-      if (node.kind == 'block') {
+      if (node.object == 'block') {
         memo.push(node)
         return memo
       }
 
-      if (i > 0 && original[i - 1].kind != 'block') {
+      if (i > 0 && original[i - 1].object != 'block') {
         const block = memo[memo.length - 1]
         block.nodes.push(node)
         return memo
       }
 
       const block = {
-        kind: 'block',
+        object: 'block',
         data: {},
         isVoid: false,
         ...defaultBlock,
@@ -155,16 +155,16 @@ class Html {
     // TODO: pretty sure this is no longer needed.
     if (nodes.length == 0) {
       nodes = [{
-        kind: 'block',
+        object: 'block',
         data: {},
         isVoid: false,
         ...defaultBlock,
         nodes: [
           {
-            kind: 'text',
+            object: 'text',
             leaves: [
               {
-                kind: 'leaf',
+                object: 'leaf',
                 text: '',
                 marks: [],
               }
@@ -175,9 +175,9 @@ class Html {
     }
 
     const json = {
-      kind: 'value',
+      object: 'value',
       document: {
-        kind: 'document',
+        object: 'document',
         data: {},
         nodes,
       }
@@ -257,7 +257,7 @@ class Html {
         continue
       } else if (ret === null) {
         return null
-      } else if (ret.kind == 'mark') {
+      } else if (ret.object == 'mark') {
         node = this.deserializeMark(ret)
       } else {
         node = ret
@@ -280,11 +280,11 @@ class Html {
     const { type, data } = mark
 
     const applyMark = (node) => {
-      if (node.kind == 'mark') {
+      if (node.object == 'mark') {
         return this.deserializeMark(node)
       }
 
-      else if (node.kind == 'text') {
+      else if (node.object == 'text') {
         node.leaves = node.leaves.map((leaf) => {
           leaf.marks = leaf.marks || []
           leaf.marks.push({ type, data })
@@ -334,7 +334,7 @@ class Html {
    */
 
   serializeNode = (node) => {
-    if (node.kind === 'text') {
+    if (node.object === 'text') {
       const leaves = node.getLeaves()
       return leaves.map(this.serializeLeaf)
     }

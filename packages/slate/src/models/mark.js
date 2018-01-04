@@ -1,5 +1,6 @@
 
 import isPlainObject from 'is-plain-object'
+import logger from 'slate-dev-logger'
 import { Map, Record, Set } from 'immutable'
 
 import MODEL_TYPES from '../constants/model-types'
@@ -151,11 +152,16 @@ class Mark extends Record(DEFAULTS) {
   }
 
   /**
-   * Get the kind.
+   * Object.
    */
 
-  get kind() {
+  get object() {
     return 'mark'
+  }
+
+  get kind() {
+    logger.deprecate('slate@0.32.0', 'The `kind` property of Slate objects has been renamed to `object`.')
+    return this.object
   }
 
   /**
@@ -177,7 +183,7 @@ class Mark extends Record(DEFAULTS) {
 
   toJSON() {
     const object = {
-      kind: this.kind,
+      object: this.object,
       type: this.type,
       data: this.data.toJSON(),
     }

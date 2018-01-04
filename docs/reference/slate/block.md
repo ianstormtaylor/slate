@@ -39,7 +39,7 @@ Note that even though a node may be "void", it will still contain a single, empt
 
 A unique identifier for the node.
 
-### `kind`
+### `object`
 `String`
 
 An immutable string value of `'block'` for easily separating this node from [`Inline`](./inline.md) or [`Text`](./text.md) nodes.
