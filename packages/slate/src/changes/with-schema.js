@@ -63,7 +63,7 @@ Changes.normalizeNodeByKey = (change, key) => {
  */
 
 function normalizeNodeAndChildren(change, node, schema) {
-  if (node.kind == 'text') {
+  if (node.object == 'text') {
     normalizeNode(change, node, schema)
     return
   }
@@ -124,7 +124,7 @@ function normalizeNodeAndChildren(change, node, schema) {
 function refindNode(change, node) {
   const { value } = change
   const { document } = value
-  return node.kind == 'document'
+  return node.object == 'document'
     ? document
     : document.getDescendant(node.key)
 }

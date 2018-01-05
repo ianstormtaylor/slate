@@ -15,15 +15,15 @@ By default, keys are **not** meant to be long-lived unique identifiers for nodes
 
 If you want to make your keys uniqueness long-lived, you'll need to supply your own key generating function via the [`setKeyGenerator`](./utils.md#setkeygenerator) util.
 
-### `kind`
-`String`
-
-An immutable string value of `'document'`, `'block'`, `'inline'` or `'text'` for easily separating this node from [`Inline`](./inline.md) or [`Text`](./text.md) nodes.
-
 ### `nodes`
 `Immutable.List`
 
 A list of child nodes. Defaults to a list with a single text node child.
+
+### `object`
+`String`
+
+An immutable string value of `'document'`, `'block'`, `'inline'` or `'text'` for easily separating this node from [`Inline`](./inline.md) or [`Text`](./text.md) nodes.
 
 
 ## Computed Properties

@@ -54,7 +54,7 @@ const rules = [
     deserialize(el, next) {
       if (el.tagName.toLowerCase() == 'p') {
         return {
-          kind: 'block',
+          object: 'block',
           type: 'paragraph',
           nodes: next(el.childNodes)
         }
@@ -76,15 +76,15 @@ const rules = [
     deserialize(el, next) {
       if (el.tagName.toLowerCase() == 'p') {
         return {
-          kind: 'block',
+          object: 'block',
           type: 'paragraph',
           nodes: next(el.childNodes)
         }
       }
     },
     // Add a serializing function property to our rule...
-    serialize(object, children) {
-      if (object.kind == 'block' && object.type == 'paragraph') {
+    serialize(obj, children) {
+      if (obj.object == 'block' && obj.type == 'paragraph') {
         return <p>{children}</p>
       }
     }
@@ -115,15 +115,15 @@ const rules = [
       const type = BLOCK_TAGS[el.tagName.toLowerCase()]
       if (!type) return
       return {
-        kind: 'block',
+        object: 'block',
         type: type,
         nodes: next(el.childNodes)
       }
     },
     // Switch serialize to handle more blocks...
-    serialize(object, children) {
-      if (object.kind != 'block') return
-      switch (object.type) {
+    serialize(obj, children) {
+      if (obj.object != 'block') return
+      switch (obj.type) {
         case 'paragraph': return <p>{children}</p>
         case 'quote': return <blockquote>{children}</blockquote>
         case 'code': return <pre><code>{children}</code></pre>
@@ -160,14 +160,14 @@ const rules = [
       const type = BLOCK_TAGS[el.tagName.toLowerCase()]
       if (!type) return
       return {
-        kind: 'block',
+        object: 'block',
         type: type,
         nodes: next(el.childNodes)
       }
     },
-    serialize(object, children) {
-      if (object.kind != 'block') return
-      switch (object.type) {
+    serialize(obj, children) {
+      if (obj.object != 'block') return
+      switch (obj.type) {
         case 'code': return <pre><code>{children}</code></pre>
         case 'paragraph': return <p>{children}</p>
         case 'quote': return <blockquote>{children}</blockquote>
@@ -180,14 +180,14 @@ const rules = [
       const type = MARK_TAGS[el.tagName.toLowerCase()]
       if (!type) return
       return {
-        kind: 'mark',
+        object: 'mark',
         type: type,
         nodes: next(el.childNodes)
       }
     },
-    serialize(object, children) {
-      if (object.kind != 'mark') return
-      switch (object.type) {
+    serialize(obj, children) {
+      if (obj.object != 'mark') return
+      switch (obj.type) {
         case 'bold': return <strong>{children}</strong>
         case 'italic': return <em>{children}</em>
         case 'underline': return <u>{children}</u>

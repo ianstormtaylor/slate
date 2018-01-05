@@ -11,7 +11,7 @@ const html = new Html({
   rules: [
     {
       serialize(obj, children) {
-        switch (obj.kind) {
+        switch (obj.object) {
           case 'block': {
             switch (obj.type) {
               case 'paragraph': return React.createElement('p', {}, children)

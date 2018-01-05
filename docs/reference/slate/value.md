@@ -45,7 +45,7 @@ The current document of the value.
 
 An object that stores the history of changes.
 
-### `kind`
+### `object`
 `String`
 
 A string with a value of `'value'`.

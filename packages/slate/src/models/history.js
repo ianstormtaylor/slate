@@ -2,6 +2,7 @@
 import Debug from 'debug'
 import isEqual from 'lodash/isEqual'
 import isPlainObject from 'is-plain-object'
+import logger from 'slate-dev-logger'
 import { List, Record, Stack } from 'immutable'
 
 import MODEL_TYPES from '../constants/model-types'
@@ -91,13 +92,18 @@ class History extends Record(DEFAULTS) {
   }
 
   /**
-   * Get the kind.
+   * Object.
    *
    * @return {String}
    */
 
-  get kind() {
+  get object() {
     return 'history'
+  }
+
+  get kind() {
+    logger.deprecate('slate@0.32.0', 'The `kind` property of Slate objects has been renamed to `object`.')
+    return this.object
   }
 
   /**
@@ -161,7 +167,7 @@ class History extends Record(DEFAULTS) {
 
   toJSON() {
     const object = {
-      kind: this.kind,
+      object: this.object,
       redos: this.redos.toJSON(),
       undos: this.undos.toJSON(),
     }

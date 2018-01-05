@@ -346,7 +346,7 @@ const DIRECTIONS = [
   'Previous',
 ]
 
-const KINDS = [
+const OBJECTS = [
   'Block',
   'Inline',
   'Text',
@@ -365,10 +365,10 @@ PREFIXES.forEach((prefix) => {
   edges.forEach((edge) => {
     const method = `${prefix}${edge}Of`
 
-    KINDS.forEach((kind) => {
-      const getNode = kind == 'Text' ? 'getNode' : `getClosest${kind}`
+    OBJECTS.forEach((object) => {
+      const getNode = object == 'Text' ? 'getNode' : `getClosest${object}`
 
-      Changes[`${method}${kind}`] = (change) => {
+      Changes[`${method}${object}`] = (change) => {
         const { value } = change
         const { document, selection } = value
         const node = document[getNode](selection.startKey)
@@ -377,10 +377,10 @@ PREFIXES.forEach((prefix) => {
       }
 
       DIRECTIONS.forEach((direction) => {
-        const getDirectionNode = `get${direction}${kind}`
+        const getDirectionNode = `get${direction}${object}`
         const directionKey = direction == 'Next' ? 'startKey' : 'endKey'
 
-        Changes[`${method}${direction}${kind}`] = (change) => {
+        Changes[`${method}${direction}${object}`] = (change) => {
           const { value } = change
           const { document, selection } = value
           const node = document[getNode](selection[directionKey])

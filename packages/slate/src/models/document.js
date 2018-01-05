@@ -11,6 +11,7 @@ import './inline'
  */
 
 import isPlainObject from 'is-plain-object'
+import logger from 'slate-dev-logger'
 import { List, Map, Record } from 'immutable'
 
 import Node from './node'
@@ -105,13 +106,18 @@ class Document extends Record(DEFAULTS) {
   }
 
   /**
-   * Get the node's kind.
+   * Object.
    *
    * @return {String}
    */
 
-  get kind() {
+  get object() {
     return 'document'
+  }
+
+  get kind() {
+    logger.deprecate('slate@0.32.0', 'The `kind` property of Slate objects has been renamed to `object`.')
+    return this.object
   }
 
   /**
@@ -143,7 +149,7 @@ class Document extends Record(DEFAULTS) {
 
   toJSON(options = {}) {
     const object = {
-      kind: this.kind,
+      object: this.object,
       data: this.data.toJSON(),
       nodes: this.nodes.toArray().map(n => n.toJSON(options)),
     }

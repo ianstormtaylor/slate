@@ -2,11 +2,11 @@
   "document": {
     "nodes": [
       {
-        "kind": "block",
+        "object": "block",
         "type": "paragraph",
         "nodes": [
           {
-            "kind": "text",
+            "object": "text",
             "leaves": [
               {
                 "text": "With Slate you can build complex block types that have their own embedded content and behaviors, like rendering checkboxes inside check list items!"
@@ -16,14 +16,14 @@
         ]
       },
       {
-        "kind": "block",
+        "object": "block",
         "type": "check-list-item",
         "data": {
           "checked": true,
         },
         "nodes": [
           {
-            "kind": "text",
+            "object": "text",
             "leaves": [
               {
                 "text": "Slide to the left."
@@ -33,14 +33,14 @@
         ]
       },
       {
-        "kind": "block",
+        "object": "block",
         "type": "check-list-item",
         "data": {
           "checked": true,
         },
         "nodes": [
           {
-            "kind": "text",
+            "object": "text",
             "leaves": [
               {
                 "text": "Slide to the right."
@@ -50,14 +50,14 @@
         ]
       },
       {
-        "kind": "block",
+        "object": "block",
         "type": "check-list-item",
         "data": {
           "checked": false,
         },
         "nodes": [
           {
-            "kind": "text",
+            "object": "text",
             "leaves": [
               {
                 "text": "Criss-cross."
@@ -67,14 +67,14 @@
         ]
       },
       {
-        "kind": "block",
+        "object": "block",
         "type": "check-list-item",
         "data": {
           "checked": true,
         },
         "nodes": [
           {
-            "kind": "text",
+            "object": "text",
             "leaves": [
               {
                 "text": "Criss-cross!"
@@ -84,14 +84,14 @@
         ]
       },
       {
-        "kind": "block",
+        "object": "block",
         "type": "check-list-item",
         "data": {
           "checked": false,
         },
         "nodes": [
           {
-            "kind": "text",
+            "object": "text",
             "leaves": [
               {
                 "text": "Cha cha real smooth…"
@@ -101,14 +101,14 @@
         ]
       },
       {
-        "kind": "block",
+        "object": "block",
         "type": "check-list-item",
         "data": {
           "checked": false,
         },
         "nodes": [
           {
-            "kind": "text",
+            "object": "text",
             "leaves": [
               {
                 "text": "Let's go to work!"
@@ -118,11 +118,11 @@
         ]
       },
       {
-        "kind": "block",
+        "object": "block",
         "type": "paragraph",
         "nodes": [
           {
-            "kind": "text",
+            "object": "text",
             "leaves": [
               {
                 "text": "Try it out for yourself!"

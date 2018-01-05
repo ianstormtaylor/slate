@@ -179,7 +179,7 @@ Changes.mergeNodeByKey = (change, key, options = {}) => {
     throw new Error(`Unable to merge node with key "${key}", no previous key.`)
   }
 
-  const position = previous.kind == 'text' ? previous.text.length : previous.nodes.size
+  const position = previous.object == 'text' ? previous.text.length : previous.nodes.size
 
   change.applyOperation({
     type: 'merge_node',
@@ -300,7 +300,7 @@ Changes.removeAllMarksByKey = (change, key, options = {}) => {
   const { state } = change
   const { document } = state
   const node = document.getNode(key)
-  const texts = node.kind === 'text' ? [node] : node.getTextsAsArray()
+  const texts = node.object === 'text' ? [node] : node.getTextsAsArray()
 
   texts.forEach((text) => {
     text.getMarksAsArray().forEach((mark) => {
@@ -711,12 +711,12 @@ Changes.wrapNodeByKey = (change, key, parent) => {
   parent = Node.create(parent)
   parent = parent.set('nodes', parent.nodes.clear())
 
-  if (parent.kind == 'block') {
+  if (parent.object == 'block') {
     change.wrapBlockByKey(key, parent)
     return
   }
 
-  if (parent.kind == 'inline') {
+  if (parent.object == 'inline') {
     change.wrapInlineByKey(key, parent)
     return
   }

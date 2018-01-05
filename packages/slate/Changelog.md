@@ -7,6 +7,18 @@ This document maintains a list of changes to the `slate` package with each new v
 ---
 
 
+### `0.32.0` — January 4, 2018
+
+###### BREAKING
+
+- **The `kind` property of Slate objects has been renamed to `object`.** This is to reduce the confusion over the difference between "kind" and "type" which are practically synonyms. The "object" name was chosen to match the Stripe API, since it seems like a sensible choice and reads much more nicely when looking through JSON.
+
+- **All normalization reasons containing `kind` have been renamed too.** Previously there were normalization reason strings like `child_kind_invalid`. These types of strings have been renamed to `child_object_invalid` to stay consistent.
+
+
+---
+
+
 ### `0.31.0` — November 16, 2017
 
 ###### BREAKING

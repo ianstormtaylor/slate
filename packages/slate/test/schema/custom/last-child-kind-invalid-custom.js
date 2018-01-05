@@ -6,9 +6,9 @@ export const schema = {
   blocks: {
     paragraph: {},
     quote: {
-      last: { kinds: ['block'] },
+      last: { objects: ['block'] },
       normalize: (change, reason, { child }) => {
-        if (reason == 'last_child_kind_invalid') {
+        if (reason == 'last_child_object_invalid') {
           change.wrapBlockByKey(child.key, 'paragraph')
         }
       }

@@ -28,22 +28,22 @@ function deserialize(string, options = {}) {
   defaultMarks = defaultMarks.map(Mark.createProperties)
 
   const json = {
-    kind: 'value',
+    object: 'value',
     document: {
-      kind: 'document',
+      object: 'document',
       data: {},
       nodes: string.split('\n').map((line) => {
         return {
           ...defaultBlock,
-          kind: 'block',
+          object: 'block',
           isVoid: false,
           data: {},
           nodes: [
             {
-              kind: 'text',
+              object: 'text',
               leaves: [
                 {
-                  kind: 'leaf',
+                  object: 'leaf',
                   text: line,
                   marks: defaultMarks,
                 }
@@ -79,8 +79,8 @@ function serialize(value) {
 
 function serializeNode(node) {
   if (
-    (node.kind == 'document') ||
-    (node.kind == 'block' && Block.isBlockList(node.nodes))
+    (node.object == 'document') ||
+    (node.object == 'block' && Block.isBlockList(node.nodes))
   ) {
     return node.nodes.map(serializeNode).join('\n')
   } else {

@@ -248,7 +248,9 @@ class SyncingOperationsExample extends React.Component {
       .filter(o => o.type != 'set_selection' && o.type != 'set_value')
       .toJS()
 
-    this.two.applyOperations(ops)
+    setTimeout(() => {
+      this.two.applyOperations(ops)
+    })
   }
 
   /**
@@ -262,7 +264,9 @@ class SyncingOperationsExample extends React.Component {
       .filter(o => o.type != 'set_selection' && o.type != 'set_value')
       .toJS()
 
-    this.one.applyOperations(ops)
+    setTimeout(() => {
+      this.one.applyOperations(ops)
+    })
   }
 
   /**

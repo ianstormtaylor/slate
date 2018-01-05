@@ -55,7 +55,7 @@ A dictionary of blocks by type, each with its own set of validation rules.
   inlines: {
     emoji: {
       isVoid: true,
-      nodes: [{ kinds: ['text'] }]
+      nodes: [{ objects: ['text'] }]
     },
   }
 }
@@ -103,7 +103,7 @@ A dictionary of data attributes and their corresponding validation functions. Th
 }
 ```
 
-Will validate the first child node. The `first` definition can declare `kinds` and `types` properties.
+Will validate the first child node. The `first` definition can declare `objects` and `types` properties.
 
 ### `isVoid`
 `Boolean`
@@ -125,7 +125,7 @@ Will validate a node's `isVoid` property.
 }
 ```
 
-Will validate the last child node. The `last` definition can declare `kinds` and `types` properties.
+Will validate the last child node. The `last` definition can declare `objects` and `types` properties.
 
 ### `nodes`
 `Array`
@@ -139,7 +139,7 @@ Will validate the last child node. The `last` definition can declare `kinds` and
 }
 ```
 
-Will validate a node's children. The `nodes` definitions can declare the `kinds`, `types`, `min` and `max` properties.
+Will validate a node's children. The `nodes` definitions can declare the `objects`, `types`, `min` and `max` properties.
 
 > 🤖 The `nodes` array is order-sensitive! The example above will require that the first node be either an `image` or `video`, and that it be followed by one or more `paragraph` nodes.
 
@@ -149,7 +149,7 @@ Will validate a node's children. The `nodes` definitions can declare the `kinds`
 ```js
 {
   normalize: (change, reason, context) => {
-    case 'child_kind_invalid':
+    case 'child_object_invalid':
       change.wrapBlockByKey(context.child.key, 'paragraph')
       return
     case 'child_type_invalid':
@@ -172,7 +172,7 @@ For more information on the arguments passed to `normalize`, see the [Invalid Re
 }
 ```
 
-Will validate a node's parent. The parent definition can declare the `kinds` and/or `types` properties.
+Will validate a node's parent. The parent definition can declare the `objects` and/or `types` properties.
 
 ### `text`
 `Array`
@@ -216,7 +216,7 @@ Returns a JSON representation of the schema.
 
 When supplying your own `normalize` property for a schema rule, it will be called with `(change, reason, context)`. The `reason` will be one of a set of reasons, and `context` will vary depending on the reason. Here's the full set:
 
-### `child_kind_invalid`
+### `child_object_invalid`
 
 ```js
 {
@@ -259,7 +259,7 @@ When supplying your own `normalize` property for a schema rule, it will be calle
 }
 ```
 
-### `first_child_kind_invalid`
+### `first_child_object_invalid`
 
 ```js
 {
@@ -279,7 +279,7 @@ When supplying your own `normalize` property for a schema rule, it will be calle
 }
 ```
 
-### `last_child_kind_invalid`
+### `last_child_object_invalid`
 
 ```js
 {
@@ -319,7 +319,7 @@ When supplying your own `normalize` property for a schema rule, it will be calle
 }
 ```
 
-### `node_kind_invalid`
+### `node_object_invalid`
 
 ```js
 {
@@ -348,7 +348,7 @@ When supplying your own `normalize` property for a schema rule, it will be calle
 }
 ```
 
-### `parent_kind_invalid`
+### `parent_object_invalid`
 
 ```js
 {

@@ -13,14 +13,14 @@ export const config = {
           }
           case 'p': {
             return {
-              kind: 'block',
+              object: 'block',
               type: 'paragraph',
               nodes: next(el.childNodes),
             }
           }
           case 'img': {
             return {
-              kind: 'block',
+              object: 'block',
               type: 'image',
               isVoid: true,
             }

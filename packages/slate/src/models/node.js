@@ -1,6 +1,7 @@
 
 import direction from 'direction'
 import isPlainObject from 'is-plain-object'
+import logger from 'slate-dev-logger'
 import { List, OrderedSet, Set } from 'immutable'
 
 import Block from './block'
@@ -37,13 +38,20 @@ class Node {
     }
 
     if (isPlainObject(attrs)) {
-      switch (attrs.kind) {
+      let { object } = attrs
+
+      if (!object && attrs.kind) {
+        logger.deprecate('slate@0.32.0', 'The `kind` property of Slate objects has been renamed to `object`.')
+        object = attrs.kind
+      }
+
+      switch (object) {
         case 'block': return Block.create(attrs)
         case 'document': return Document.create(attrs)
         case 'inline': return Inline.create(attrs)
         case 'text': return Text.create(attrs)
         default: {
-          throw new Error('`Node.create` requires a `kind` string.')
+          throw new Error('`Node.create` requires a `object` string.')
         }
       }
     }
@@ -99,22 +107,27 @@ class Node {
   }
 
   /**
-   * Create a `Node` from a JSON `object`.
+   * Create a `Node` from a JSON `value`.
    *
-   * @param {Object} object
+   * @param {Object} value
    * @return {Node}
    */
 
-  static fromJSON(object) {
-    const { kind } = object
+  static fromJSON(value) {
+    let { object } = value
 
-    switch (kind) {
-      case 'block': return Block.fromJSON(object)
-      case 'document': return Document.fromJSON(object)
-      case 'inline': return Inline.fromJSON(object)
-      case 'text': return Text.fromJSON(object)
+    if (!object && value.kind) {
+      logger.deprecate('slate@0.32.0', 'The `kind` property of Slate objects has been renamed to `object`.')
+      object = value.kind
+    }
+
+    switch (object) {
+      case 'block': return Block.fromJSON(value)
+      case 'document': return Document.fromJSON(value)
+      case 'inline': return Inline.fromJSON(value)
+      case 'text': return Text.fromJSON(value)
       default: {
-        throw new Error(`\`Node.fromJSON\` requires a \`kind\` of either 'block', 'document', 'inline' or 'text', but you passed: ${kind}`)
+        throw new Error(`\`Node.fromJSON\` requires an \`object\` of either 'block', 'document', 'inline' or 'text', but you passed: ${value}`)
       }
     }
   }
@@ -297,7 +310,7 @@ class Node {
         return false
       }
 
-      if (child.kind != 'text') {
+      if (child.object != 'text') {
         ret = child.forEachDescendant(iterator)
         return ret
       }
@@ -321,7 +334,7 @@ class Node {
 
     let ancestors
     this.nodes.find((node) => {
-      if (node.kind == 'text') return false
+      if (node.object == 'text') return false
       ancestors = node.getAncestors(key)
       return ancestors
     })
@@ -352,7 +365,7 @@ class Node {
 
   getBlocksAsArray() {
     return this.nodes.reduce((array, child) => {
-      if (child.kind != 'block') return array
+      if (child.object != 'block') return array
       if (!child.isLeafBlock()) return array.concat(child.getBlocksAsArray())
       array.push(child)
       return array
@@ -418,7 +431,7 @@ class Node {
 
   getBlocksByTypeAsArray(type) {
     return this.nodes.reduce((array, node) => {
-      if (node.kind != 'block') {
+      if (node.object != 'block') {
         return array
       } else if (node.isLeafBlock() && node.type == type) {
         array.push(node)
@@ -448,7 +461,7 @@ class Node {
 
   getCharactersAsArray() {
     return this.nodes.reduce((arr, node) => {
-      return node.kind == 'text'
+      return node.object == 'text'
         ? arr.concat(node.characters.toArray())
         : arr.concat(node.getCharactersAsArray())
     }, [])
@@ -527,7 +540,7 @@ class Node {
    */
 
   getClosestBlock(key) {
-    return this.getClosest(key, parent => parent.kind == 'block')
+    return this.getClosest(key, parent => parent.object == 'block')
   }
 
   /**
@@ -538,7 +551,7 @@ class Node {
    */
 
   getClosestInline(key) {
-    return this.getClosest(key, parent => parent.kind == 'inline')
+    return this.getClosest(key, parent => parent.object == 'inline')
   }
 
   /**
@@ -627,7 +640,7 @@ class Node {
     const found = this.nodes.find((node) => {
       if (node.key === key) {
         return node
-      } else if (node.kind !== 'text') {
+      } else if (node.object !== 'text') {
         descendantFound = node.getDescendant(key)
         return descendantFound
       } else {
@@ -667,7 +680,7 @@ class Node {
     let descendantFound = null
 
     const found = this.nodes.find((node) => {
-      if (node.kind == 'text') return true
+      if (node.object == 'text') return true
       descendantFound = node.getFirstText()
       return descendantFound
     })
@@ -700,7 +713,7 @@ class Node {
 
     while (parent = node.getParent(child.key)) {
       const index = parent.nodes.indexOf(child)
-      const position = child.kind == 'text'
+      const position = child.object == 'text'
         ? startOffset
         : child.nodes.indexOf(previous)
 
@@ -714,7 +727,7 @@ class Node {
 
     while (parent = node.getParent(child.key)) {
       const index = parent.nodes.indexOf(child)
-      const position = child.kind == 'text'
+      const position = child.object == 'text'
         ? startKey == endKey ? endOffset - startOffset : endOffset
         : child.nodes.indexOf(previous)
 
@@ -766,7 +779,7 @@ class Node {
    */
 
   getFurthestBlock(key) {
-    return this.getFurthest(key, node => node.kind == 'block')
+    return this.getFurthest(key, node => node.object == 'block')
   }
 
   /**
@@ -777,7 +790,7 @@ class Node {
    */
 
   getFurthestInline(key) {
-    return this.getFurthest(key, node => node.kind == 'inline')
+    return this.getFurthest(key, node => node.object == 'inline')
   }
 
   /**
@@ -791,7 +804,7 @@ class Node {
     key = assertKey(key)
     return this.nodes.find((node) => {
       if (node.key == key) return true
-      if (node.kind == 'text') return false
+      if (node.object == 'text') return false
       return node.hasDescendant(key)
     })
   }
@@ -841,7 +854,7 @@ class Node {
     let array = []
 
     this.nodes.forEach((child) => {
-      if (child.kind == 'text') return
+      if (child.object == 'text') return
       if (child.isLeafInline()) {
         array.push(child)
       } else {
@@ -903,7 +916,7 @@ class Node {
 
   getInlinesByTypeAsArray(type) {
     return this.nodes.reduce((inlines, node) => {
-      if (node.kind == 'text') {
+      if (node.object == 'text') {
         return inlines
       } else if (node.isLeafInline() && node.type == type) {
         inlines.push(node)
@@ -951,7 +964,7 @@ class Node {
     let descendantFound = null
 
     const found = this.nodes.findLast((node) => {
-      if (node.kind == 'text') return true
+      if (node.object == 'text') return true
       descendantFound = node.getLastText()
       return descendantFound
     })
@@ -1142,7 +1155,7 @@ class Node {
 
   getMarksByTypeAsArray(type) {
     return this.nodes.reduce((array, node) => {
-      return node.kind == 'text'
+      return node.object == 'text'
         ? array.concat(node.getMarksAsArray().filter(m => m.type == type))
         : array.concat(node.getMarksByTypeAsArray(type))
     }, [])
@@ -1159,7 +1172,7 @@ class Node {
     const child = this.assertDescendant(key)
     let last
 
-    if (child.kind == 'block') {
+    if (child.object == 'block') {
       last = child.getLastText()
     } else {
       const block = this.getClosestBlock(key)
@@ -1286,7 +1299,7 @@ class Node {
     let node = null
 
     this.nodes.find((child) => {
-      if (child.kind == 'text') {
+      if (child.object == 'text') {
         return false
       } else {
         node = child.getParent(key)
@@ -1340,7 +1353,7 @@ class Node {
     const child = this.assertDescendant(key)
     let first
 
-    if (child.kind == 'block') {
+    if (child.object == 'block') {
       first = child.getFirstText()
     } else {
       const block = this.getClosestBlock(key)
@@ -1423,7 +1436,7 @@ class Node {
     let end = null
 
     this.nodes.forEach((child, i) => {
-      if (child.kind == 'text') {
+      if (child.object == 'text') {
         if (start == null && child.key == startKey) start = i
         if (end == null && child.key == endKey) end = i + 1
       } else {
@@ -1507,7 +1520,7 @@ class Node {
     let array = []
 
     this.nodes.forEach((node) => {
-      if (node.kind == 'text') {
+      if (node.object == 'text') {
         array.push(node)
       } else {
         array = array.concat(node.getTextsAsArray())
@@ -1613,7 +1626,7 @@ class Node {
       node = node.regenerateKey()
     }
 
-    if (node.kind != 'text') {
+    if (node.object != 'text') {
       node = node.mapDescendants((desc) => {
         return keys.contains(desc.key)
           ? desc.regenerateKey()
@@ -1676,8 +1689,8 @@ class Node {
 
   isLeafBlock() {
     return (
-      this.kind == 'block' &&
-      this.nodes.every(n => n.kind != 'block')
+      this.object == 'block' &&
+      this.nodes.every(n => n.object != 'block')
     )
   }
 
@@ -1689,8 +1702,8 @@ class Node {
 
   isLeafInline() {
     return (
-      this.kind == 'inline' &&
-      this.nodes.every(n => n.kind != 'inline')
+      this.object == 'inline' &&
+      this.nodes.every(n => n.object != 'inline')
     )
   }
 
@@ -1709,12 +1722,12 @@ class Node {
     let one = node.nodes.get(withIndex)
     const two = node.nodes.get(index)
 
-    if (one.kind != two.kind) {
-      throw new Error(`Tried to merge two nodes of different kinds: "${one.kind}" and "${two.kind}".`)
+    if (one.object != two.object) {
+      throw new Error(`Tried to merge two nodes of different objects: "${one.object}" and "${two.object}".`)
     }
 
     // If the nodes are text nodes, concatenate their characters together.
-    if (one.kind == 'text') {
+    if (one.object == 'text') {
       const characters = one.characters.concat(two.characters)
       one = one.set('characters', characters)
     }
@@ -1763,7 +1776,7 @@ class Node {
 
     nodes.forEach((node, i) => {
       let ret = node
-      if (ret.kind != 'text') ret = ret.mapDescendants(iterator)
+      if (ret.object != 'text') ret = ret.mapDescendants(iterator)
       ret = iterator(ret, i, this.nodes)
       if (ret == node) return
 
@@ -1835,7 +1848,7 @@ class Node {
 
     // If the child is a text node, the `position` refers to the text offset at
     // which to split it.
-    if (child.kind == 'text') {
+    if (child.object == 'text') {
       const befores = child.characters.take(position)
       const afters = child.characters.skip(position)
       one = child.set('characters', befores)

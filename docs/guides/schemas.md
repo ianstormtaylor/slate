@@ -24,7 +24,7 @@ const schema = {
   blocks: {
     paragraph: {
       nodes: [
-        { kinds: ['text'] }
+        { objects: ['text'] }
       ]
     },
     image: {
@@ -93,13 +93,13 @@ When you define a `validateNode` function, you either return nothing if the node
 
 ```js
 function validateNode(node) {
-  if (node.kind != 'block') return
+  if (node.object != 'block') return
   if (node.isVoid) return
 
   const { nodes } = node
   if (nodes.size != 3) return
-  if (nodes.first().kind != 'text') return
-  if (nodes.last().kind != 'text') return
+  if (nodes.first().object != 'text') return
+  if (nodes.last().object != 'text') return
 
   return (change) => {
     change.removeNodeByKey(node.key)

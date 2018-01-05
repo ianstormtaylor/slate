@@ -7,7 +7,7 @@ export const schema = {
     paragraph: {},
     quote: {
       nodes: [
-        { kinds: ['text'] },
+        { objects: ['text'] },
       ]
     }
   }
