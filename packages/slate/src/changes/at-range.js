@@ -236,7 +236,7 @@ Changes.deleteAtRange = (change, range, options = {}) => {
 
       // Move the end block to be right after the start block.
       if (endParentIndex != startParentIndex + 1) {
-        change.moveNodeByKey(endBlock.key, startParent.key, startParentIndex + 1)
+        change.moveNodeByKey(endBlock.key, startParent.key, startParentIndex + 1, { normalize: false })
       }
 
       // If the selection is hanging, just remove the start block, otherwise
