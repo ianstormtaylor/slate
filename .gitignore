@@ -20,3 +20,6 @@ packages/*/yarn.lock
 
 # OS files.
 .DS_Store
+
+# IDE
+.idea

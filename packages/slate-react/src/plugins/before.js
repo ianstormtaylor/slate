@@ -381,7 +381,9 @@ function BeforePlugin() {
 
     // Certain hotkeys have native behavior in contenteditable elements which
     // will cause our value to be out of sync, so prevent them.
-    if (HOTKEYS.CONTENTEDITABLE(event)) {
+    // However, in iOS, we need to allow these events to take place, so that
+    // the QuickType (autocorrect) buffer will be correctly updated.
+    if (HOTKEYS.CONTENTEDITABLE(event) && !IS_IOS) {
       event.preventDefault()
     }
 

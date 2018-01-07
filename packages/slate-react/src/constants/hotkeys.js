@@ -22,14 +22,14 @@ const ITALIC = isKeyHotkey('mod+i')
 
 const ENTER = isKeyHotkey('enter')
 const SHIFT_ENTER = isKeyHotkey('shift+enter')
-const SPLIT_BLOCK = e => ENTER(e) || SHIFT_ENTER(e)
+const SPLIT_BLOCK = e => (ENTER(e) || SHIFT_ENTER(e))
 
 const BACKSPACE = isKeyHotkey('backspace')
 const SHIFT_BACKSPACE = isKeyHotkey('shift+backspace')
 const DELETE = isKeyHotkey('delete')
 const SHIFT_DELETE = isKeyHotkey('shift+delete')
-const DELETE_BACKWARD = e => BACKSPACE(e) || SHIFT_BACKSPACE(e)
-const DELETE_FORWARD = e => DELETE(e) || SHIFT_DELETE(e)
+const DELETE_BACKWARD = e => (BACKSPACE(e) || SHIFT_BACKSPACE(e))
+const DELETE_FORWARD = e => (DELETE(e) || SHIFT_DELETE(e))
 
 const DELETE_CHAR_BACKWARD_MAC = isKeyHotkey('ctrl+h')
 const DELETE_CHAR_FORWARD_MAC = isKeyHotkey('ctrl+d')
