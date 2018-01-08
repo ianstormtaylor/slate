@@ -353,7 +353,9 @@ class Content extends React.Component {
 
   /**
    * On a native `beforeinput` event, use the additional range information
-   * provided by the event to insert text exactly as the browser would.
+   * provided by the event to manipulate text exactly as the browser would.
+   *
+   * This is currently only used on iOS and Android.
    *
    * @param {InputEvent} event
    */
@@ -362,38 +364,66 @@ class Content extends React.Component {
     if (this.props.readOnly) return
     if (!this.isInEditor(event.target)) return
 
-    const { inputType } = event
-    if (inputType !== 'insertText' && inputType !== 'insertReplacementText') return
-
     const [ targetRange ] = event.getTargetRanges()
     if (!targetRange) return
 
-    // `data` should have the text for the `insertText` input type and
-    // `dataTransfer` should have the text for the `insertReplacementText` input
-    // type, but Safari uses `insertText` for spell check replacements and sets
-    // `data` to `null`.
-    const text = event.data == null
-      ? event.dataTransfer.getData('text/plain')
-      : event.data
-
-    if (text == null) return
-
-    event.preventDefault()
-
     const { editor } = this.props
-    const { value } = editor
-    const { selection } = value
-    const range = findRange(targetRange, value)
 
-    editor.change((change) => {
-      change.insertTextAtRange(range, text, selection.marks)
+    switch (event.inputType) {
+      case 'deleteContentBackward': {
+        event.preventDefault()
 
-      // If the text was successfully inserted, and the selection had marks on it,
-      // unset the selection's marks.
-      if (selection.marks && value.document != change.value.document) {
-        change.select({ marks: null })
+        const range = findRange(targetRange, editor.value)
+        editor.change(change => change.deleteAtRange(range))
+        break
       }
-    })
+
+      case 'insertLineBreak': // intentional fallthru
+      case 'insertParagraph': {
+        event.preventDefault()
+        const range = findRange(targetRange, editor.value)
+
+        editor.change((change) => {
+          if (change.value.isInVoid) {
+            change.collapseToStartOfNextText()
+          } else {
+            change.splitBlockAtRange(range)
+          }
+        })
+        break
+      }
+
+      case 'insertReplacementText': // intentional fallthru
+      case 'insertText': {
+        // `data` should have the text for the `insertText` input type and
+        // `dataTransfer` should have the text for the `insertReplacementText`
+        // input type, but Safari uses `insertText` for spell check replacements
+        // and sets `data` to `null`.
+        const text = event.data == null
+          ? event.dataTransfer.getData('text/plain')
+          : event.data
+
+        if (text == null) return
+
+        event.preventDefault()
+
+        const { value } = editor
+        const { selection } = value
+        const range = findRange(targetRange, value)
+
+        editor.change((change) => {
+          change.insertTextAtRange(range, text, selection.marks)
+
+          // If the text was successfully inserted, and the selection had marks
+          // on it, unset the selection's marks.
+          if (selection.marks && value.document != change.value.document) {
+            change.select({ marks: null })
+          }
+        })
+
+        break
+      }
+    }
   }
 
   /**

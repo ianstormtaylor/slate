@@ -381,7 +381,7 @@ function BeforePlugin() {
 
     // Certain hotkeys have native behavior in contenteditable elements which
     // will cause our value to be out of sync, so prevent them.
-    if (HOTKEYS.CONTENTEDITABLE(event)) {
+    if (HOTKEYS.CONTENTEDITABLE(event) && !IS_IOS) {
       event.preventDefault()
     }
 
