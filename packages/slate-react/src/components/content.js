@@ -207,7 +207,7 @@ class Content extends React.Component {
     native.removeAllRanges()
 
     // COMPAT: IE 11 does not support Selection.extend
-    if ((native.extend && IS_IOS) && (native.extend && IS_SAFARI)) {
+    if ((native.extend && !IS_IOS) && (native.extend && !IS_SAFARI)) {
       // COMPAT: Since the DOM range has no concept of backwards/forwards
       // we need to check and do the right thing here.
       if (isBackward) {
