@@ -147,11 +147,6 @@ class Content extends React.Component {
     const native = window.getSelection()
     const { rangeCount, anchorNode } = native
 
-    if (IS_SAFARI) {
-      if (native.anchorNode.textContent.endsWith(' ')) {
-        native.anchorNode.textContent = native.anchorNode.textContent.replace(' ', '\u00a0')
-      }
-    }
     // If both selections are blurred, do nothing.
     if (!rangeCount && selection.isBlurred) return
 
@@ -212,7 +207,7 @@ class Content extends React.Component {
     native.removeAllRanges()
 
     // COMPAT: IE 11 does not support Selection.extend
-    if (native.extend) {
+    if ((native.extend && IS_IOS) && (native.extend && IS_SAFARI)) {
       // COMPAT: Since the DOM range has no concept of backwards/forwards
       // we need to check and do the right thing here.
       if (isBackward) {
