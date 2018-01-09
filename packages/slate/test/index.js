@@ -20,6 +20,7 @@ describe('slate', () => {
   require('./schema')
   require('./changes')
   require('./history')
+  require('./operations')
 })
 
 /**
