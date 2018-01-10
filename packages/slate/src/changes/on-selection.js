@@ -56,6 +56,13 @@ Changes.select = (change, properties, options = {}) => {
     return
   }
 
+  // If the only change is blowing away the current selection's marks, abort.
+  // To remove all marks, clear the set, don't set it to null.
+  const onlyMarks = Object.keys(props).length == 1 && props.hasOwnProperty('marks')
+  if (onlyMarks && props.marks == null) {
+    return
+  }
+
   // Apply the operation.
   change.applyOperation({
     type: 'set_selection',
