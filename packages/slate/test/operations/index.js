@@ -26,9 +26,9 @@ describe('operations', async () => {
             it(test, async () => {
               const module = require(resolve(testDir, test))
               const { input, output } = module
-              const fn = module.default
+              const operations = module.default
               const change = input.change()
-              fn(change)
+              change.applyOperations(operations)
               const opts = { preserveSelection: true, preserveData: true }
               const actual = change.value.toJSON(opts)
               const expected = output.toJSON(opts)
