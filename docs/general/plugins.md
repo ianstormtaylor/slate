@@ -56,12 +56,3 @@ Useful utilities when working with Slate documents and components.
 |[`slate-hyperprint`](https://yarnpkg.com/en/package/slate-hyperprint)|Prints Slate documents in their `slate-hyperscript` format.|![](https://img.shields.io/npm/dm/slate-hyperprint.svg?maxAge=3600&label=⬇)|
 |[`slate-hyperscript`](https://yarnpkg.com/en/package/slate-hyperscript)|Allows you to express Slate documents in JSX.|![](https://img.shields.io/npm/dm/slate-hyperscript.svg?maxAge=3600&label=⬇)|
 |[`slate-prop-types`](https://yarnpkg.com/en/package/slate-prop-types)|A set of prop types to use in your Slate components.|![](https://img.shields.io/npm/dm/slate-prop-types.svg?maxAge=3600&label=⬇)|
-
-
-### Editors
-
-Full-feature editors for Slate, in case you need a drop-in one.
-
-|**Plugin**|**Description**|**Downloads**|
-|---|---|---|
-|[`slate-hyperprint`](https://yarnpkg.com/en/package/slate-hyperprint)|Prints Slate documents in their `slate-hyperscript` format.|![](https://img.shields.io/npm/dm/slate-hyperprint.svg?maxAge=3600&label=⬇)|
