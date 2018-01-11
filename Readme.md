@@ -14,7 +14,7 @@
   <a href="#principles"><strong>Principles</strong></a> · 
   <a href="http://slatejs.org"><strong>Demo</strong></a> · 
   <a href="#examples"><strong>Examples</strong></a> · 
-  <a href="#plugins"><strong>Plugins</strong></a> · 
+  <a href="./docs/general/plugins.md"><strong>Plugins</strong></a> · 
   <a href="http://docs.slatejs.org"><strong>Documentation</strong></a> · 
   <a href="./Contributing.md"><strong>Contributing!</strong></a>
 </p>
@@ -26,7 +26,7 @@
 
 <p align="center">
   <a href="https://www.npmjs.com/package/slate">
-    <img src="https://img.shields.io/npm/dt/localeval.svg?maxAge=2592000">
+    <img src="https://img.shields.io/npm/dt/localeval.svg?maxAge=3600">
   </a> 
   <a href="https://unpkg.com/slate/dist/slate.min.js">
     <img src="http://img.badgesize.io/https://unpkg.com/slate/dist/slate.min.js?compression=gzip&amp;label=slate">
@@ -41,13 +41,13 @@
     <img src="https://slate-slack.herokuapp.com/badge.svg">
   <a/> 
   <a href="./packages/slate/package.json">
-    <img src="https://img.shields.io/npm/v/slate.svg?maxAge=2592000&label=slate&colorB=007ec6">
+    <img src="https://img.shields.io/npm/v/slate.svg?maxAge=3600&label=slate&colorB=007ec6">
   </a> 
   <a href="./packages/slate-react/package.json">
-    <img src="https://img.shields.io/npm/v/slate-react.svg?maxAge=2592000&label=slate-react&colorB=007ec6">
+    <img src="https://img.shields.io/npm/v/slate-react.svg?maxAge=3600&label=slate-react&colorB=007ec6">
   </a> 
   <a href="./License.md">
-    <img src="https://img.shields.io/npm/l/slate.svg?maxAge=2592000">
+    <img src="https://img.shields.io/npm/l/slate.svg?maxAge=3600">
   </a> 
 </p>
 <br/>
@@ -153,7 +153,7 @@ Slate encourages you to write small, reusable modules. Check out the public ones
 - [`slate-prism`](https://github.com/GitbookIO/slate-prism) highlights code blocks with [Prism.js](http://prismjs.com/)!
 - [`slate-soft-break`](https://github.com/ianstormtaylor/slate-soft-break) adds a soft break when `enter` is pressed.
 - [`slate-drop-or-paste-images`](https://github.com/ianstormtaylor/slate-drop-or-paste-images) lets users drop or paste images to insert them!
-- [**See all the plugins...**](https://yarnpkg.com/en/packages?q=slate)
+- [**See all the plugins...**](./docs/general/plugins.md)
 
 
 <br/>
