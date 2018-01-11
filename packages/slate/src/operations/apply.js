@@ -287,12 +287,20 @@ const APPLIERS = {
     const { anchorKey, focusKey, anchorOffset, focusOffset } = selection
     let node = document.assertPath(path)
 
-    if (anchorKey == node.key && anchorOffset >= rangeOffset) {
-      selection = selection.moveAnchor(-length)
+    if (anchorKey == node.key) {
+      if (anchorOffset >= rangeOffset) {
+        selection = selection.moveAnchor(-length)
+      } else if (anchorOffset > offset) {
+        selection = selection.moveAnchorTo(anchorKey, offset)
+      }
     }
 
-    if (focusKey == node.key && focusOffset >= rangeOffset) {
-      selection = selection.moveFocus(-length)
+    if (focusKey == node.key) {
+      if (focusOffset >= rangeOffset) {
+        selection = selection.moveFocus(-length)
+      } else if (focusOffset > offset) {
+        selection = selection.moveFocusTo(focusKey, offset)
+      }
     }
 
     node = node.removeText(offset, length)
