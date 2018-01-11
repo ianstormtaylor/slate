@@ -93,7 +93,7 @@ Slate encourages you to write small, reusable modules. Check out the public ones
 - [`slate-prism`](https://github.com/GitbookIO/slate-prism) highlights code blocks with [Prism.js](http://prismjs.com/)!
 - [`slate-soft-break`](https://github.com/ianstormtaylor/slate-soft-break) adds a soft break when `enter` is pressed.
 - [`slate-drop-or-paste-images`](https://github.com/ianstormtaylor/slate-drop-or-paste-images) lets users drop or paste images to insert them!
-- [**View all plugins on `npm`...**](https://www.npmjs.com/browse/keyword/slate)
+- [**View all plugins...**](https://github.com/ianstormtaylor/slate/blob/master/docs/general/plugins.md)
 
 
 ## Documentation
