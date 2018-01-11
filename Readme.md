@@ -14,7 +14,7 @@
   <a href="#principles"><strong>Principles</strong></a> · 
   <a href="http://slatejs.org"><strong>Demo</strong></a> · 
   <a href="#examples"><strong>Examples</strong></a> · 
-  <a href="#plugins"><strong>Plugins</strong></a> · 
+  <a href="./docs/general/plugins.md"><strong>Plugins</strong></a> · 
   <a href="http://docs.slatejs.org"><strong>Documentation</strong></a> · 
   <a href="./Contributing.md"><strong>Contributing!</strong></a>
 </p>
@@ -153,7 +153,7 @@ Slate encourages you to write small, reusable modules. Check out the public ones
 - [`slate-prism`](https://github.com/GitbookIO/slate-prism) highlights code blocks with [Prism.js](http://prismjs.com/)!
 - [`slate-soft-break`](https://github.com/ianstormtaylor/slate-soft-break) adds a soft break when `enter` is pressed.
 - [`slate-drop-or-paste-images`](https://github.com/ianstormtaylor/slate-drop-or-paste-images) lets users drop or paste images to insert them!
-- [**See all the plugins...**](https://github.com/ianstormtaylor/slate/blob/master/docs/general/plugins.md)
+- [**See all the plugins...**](./docs/general/plugins.md)
 
 
 <br/>
