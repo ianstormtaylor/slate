@@ -16,6 +16,12 @@ const OVERFLOWS = [
 ]
 
 /**
+ * Detect whether we are running IOS version 11
+ */
+
+const IS_IOS_11 = IS_IOS && !!window.navigator.userAgent.match(/os 11_/i)
+
+/**
  * Find the nearest parent with scrolling, or window.
  *
  * @param {el} Element
@@ -52,30 +58,13 @@ function findScrollContainer(el, window) {
 }
 
 /**
- * Get the current iOS version. Assumes that an IOS check was conducted
- * prior to calling.
- */
-
-const IOS_VERSION_REGEX = /OS (\d+)_/
-
-function getMajorIOSVersion() {
-  const { userAgent } = window.navigator
-  const matches = userAgent.match(IOS_VERSION_REGEX)
-  return matches ? parseInt(matches[1]) : null
-}
-
-/**
  * Scroll the current selection's focus point into view if needed.
  *
  * @param {Selection} selection
  */
 
 function scrollToSelection(selection) {
-  if (IS_IOS) {
-    const majorIOSVersion = getMajorIOSVersion()
-    if (majorIOSVersion && majorIOSVersion == 11) return
-  }
-
+  if (IS_IOS_11) return
   if (!selection.anchorNode) return
 
   const window = getWindow(selection.anchorNode)
