@@ -144,15 +144,15 @@ If you have an idea for an example that shows a common use case, pull request it
 
 Slate encourages you to write small, reusable modules. Check out the public ones you can use in your project!
 
-- [`slate-auto-replace`](https://github.com/ianstormtaylor/slate-auto-replace) auto-replaces text as the user types. Useful for "smart" typography!
-- [`slate-collapse-on-escape`](https://github.com/ianstormtaylor/slate-collapse-on-escape) simply collapses the selection when `escape` is pressed.
+- [`slate-auto-replace`](https://github.com/ianstormtaylor/slate-plugins/tree/master/packages/slate-auto-replace) auto-replaces text as the user types. Useful for "smart" typography!
+- [`slate-collapse-on-escape`](https://github.com/ianstormtaylor/slate-plugins/tree/master/packages/slate-collapse-on-escape) simply collapses the selection when `escape` is pressed.
 - [`slate-edit-code`](https://github.com/GitbookIO/slate-edit-code) adds code editing behavior like tab-to-indent, and enter-to-soft-break.
 - [`slate-edit-list`](https://github.com/GitbookIO/slate-edit-list) adds rich, nested list editing behavior.
 - [`slate-edit-table`](https://github.com/GitbookIO/slate-edit-table) adds complex table editing behavior!
-- [`slate-paste-linkify`](https://github.com/ianstormtaylor/slate-paste-linkify) wraps the selected text in a link when a URL is pasted from the clipboard.
+- [`slate-paste-linkify`](https://github.com/ianstormtaylor/slate-plugins/tree/master/packages/slate-paste-linkify) wraps the selected text in a link when a URL is pasted from the clipboard.
 - [`slate-prism`](https://github.com/GitbookIO/slate-prism) highlights code blocks with [Prism.js](http://prismjs.com/)!
-- [`slate-soft-break`](https://github.com/ianstormtaylor/slate-soft-break) adds a soft break when `enter` is pressed.
-- [`slate-drop-or-paste-images`](https://github.com/ianstormtaylor/slate-drop-or-paste-images) lets users drop or paste images to insert them!
+- [`slate-soft-break`](https://github.com/ianstormtaylor/slate-plugins/tree/master/packages/slate-soft-break) adds a soft break when `enter` is pressed.
+- [`slate-drop-or-paste-images`](https://github.com/ianstormtaylor/slate-plugins/tree/master/packages/slate-drop-or-paste-images) lets users drop or paste images to insert them!
 - [**See all the plugins...**](./docs/general/plugins.md)
 
 
