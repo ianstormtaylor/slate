@@ -8,6 +8,8 @@ import findRange from './utils/find-range'
 import getEventRange from './utils/get-event-range'
 import getEventTransfer from './utils/get-event-transfer'
 import setEventTransfer from './utils/set-event-transfer'
+import AfterPlugin from './plugins/after'
+import BeforePlugin from './plugins/before'
 
 /**
  * Export.
@@ -25,6 +27,8 @@ export {
   getEventRange,
   getEventTransfer,
   setEventTransfer,
+  AfterPlugin,
+  BeforePlugin,
 }
 
 export default {
@@ -37,4 +41,6 @@ export default {
   getEventRange,
   getEventTransfer,
   setEventTransfer,
+  AfterPlugin,
+  BeforePlugin,
 }
