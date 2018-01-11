@@ -6,6 +6,7 @@ import React from 'react'
 import getWindow from 'get-window'
 import { Block, Inline, Text } from 'slate'
 
+import { IS_IOS } from '../constants/environment'
 import EVENT_HANDLERS from '../constants/event-handlers'
 import HOTKEYS from '../constants/hotkeys'
 import Content from '../components/content'
@@ -362,17 +363,20 @@ function AfterPlugin() {
 
     const { value } = change
 
-    if (HOTKEYS.SPLIT_BLOCK(event)) {
+    // COMPAT: In iOS, some of these hotkeys are handled in the
+    // `onNativeBeforeInput` handler of the `<Content>` component in order to
+    // preserve native autocorrect behavior, so they shouldn't be handled here.
+    if (HOTKEYS.SPLIT_BLOCK(event) && !IS_IOS) {
       return value.isInVoid
         ? change.collapseToStartOfNextText()
         : change.splitBlock()
     }
 
-    if (HOTKEYS.DELETE_CHAR_BACKWARD(event)) {
+    if (HOTKEYS.DELETE_CHAR_BACKWARD(event) && !IS_IOS) {
       return change.deleteCharBackward()
     }
 
-    if (HOTKEYS.DELETE_CHAR_FORWARD(event)) {
+    if (HOTKEYS.DELETE_CHAR_FORWARD(event) && !IS_IOS) {
       return change.deleteCharForward()
     }
 
