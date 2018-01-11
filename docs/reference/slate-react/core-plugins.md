@@ -1,7 +1,7 @@
 
 # Core Plugin
 
-Slate's editor is very unopinionated. The only logic it handles by default is logic associated with the `contenteditable` functionality itself—managing text, selections, etc. That logic in contained in two plugin, called the "core" plugins. One runs before all other plugins, and one runs after.
+Slate's editor is very unopinionated. The only logic it handles by default is logic associated with the `contenteditable` functionality itself—managing text, selections, etc. That logic is contained in two plugins, called the "core" plugins. One runs before all other plugins, and one runs after.
 
 
 ## Default Behavior
