@@ -18,7 +18,6 @@ Plugins that add specific behaviors to your editor.
 |[`slate-edit-footnote`](https://yarnpkg.com/en/package/slate-edit-footnote)|Adds footnote editing behaviors to an editor.|![](https://img.shields.io/npm/dm/slate-edit-footnote.svg?maxAge=3600&label=⬇)|
 |[`slate-edit-list`](https://yarnpkg.com/en/package/slate-edit-list)|Adds list editing behaviors to an editor.|![](https://img.shields.io/npm/dm/slate-edit-list.svg?maxAge=3600&label=⬇)|
 |[`slate-edit-table`](https://yarnpkg.com/en/package/slate-edit-table)|Adds common table editing behaviors to an editor.|![](https://img.shields.io/npm/dm/slate-edit-table.svg?maxAge=3600&label=⬇)|
-|[`slate-mentions`](https://yarnpkg.com/en/package/slate-mentions)|Adds mentions like Facebook's to an editor.|![](https://img.shields.io/npm/dm/slate-mentions.svg?maxAge=3600&label=⬇)|
 |[`slate-no-empty`](https://yarnpkg.com/en/package/slate-no-empty)|Prevents documents from being empty.|![](https://img.shields.io/npm/dm/slate-no-empty.svg?maxAge=3600&label=⬇)|
 |[`slate-paste-linkify`](https://yarnpkg.com/en/package/slate-paste-linkify)|Automatically linkify URLs when they are pasted.|![](https://img.shields.io/npm/dm/slate-paste-linkify.svg?maxAge=3600&label=⬇)|
 |[`slate-soft-break`](https://yarnpkg.com/en/package/slate-soft-break)|Adds soft breaks when users hit <kbd>enter</kbd>.|![](https://img.shields.io/npm/dm/slate-soft-break.svg?maxAge=3600&label=⬇)|
