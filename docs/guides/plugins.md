@@ -66,7 +66,7 @@ There are two core plugins: the "before plugin" and the "after plugin". They get
 
 For the most part you don't need to worry about the core plugins. The before plugin helps to pave over editing inconsistencies, and the after plugin serves as a fallback, to implement the default behavior in the event that your own plugins choose not to handle a specific event.
 
-_To learn more, check out the [Core Plugin reference](../reference/slate-react/core-plugin.md)._
+_To learn more, check out the [Core Plugin reference](../reference/slate-react/core-plugins.md)._
 
 
 ## The "Editor" Plugin
@@ -138,7 +138,7 @@ const plugins = [
 ]
 ```
 
-These types of plugins are critical to keeping your code maintainable. And they're good candidates for open-sourcing for others to use. A few examples of plugins like this in the wild are [`slate-auto-replace`](https://github.com/ianstormtaylor/slate-auto-replace), [`slate-prism`](https://github.com/GitbookIO/slate-prism), [`slate-collapse-on-escape`](https://github.com/ianstormtaylor/slate-collapse-on-escape), etc.
+These types of plugins are critical to keeping your code maintainable. And they're good candidates for open-sourcing for others to use. A few examples of plugins like this in the wild are [`slate-auto-replace`](https://github.com/ianstormtaylor/slate-plugins/tree/master/packages/slate-auto-replace), [`slate-prism`](https://github.com/GitbookIO/slate-prism), [`slate-collapse-on-escape`](https://github.com/ianstormtaylor/slate-plugins/tree/master/packages/slate-collapse-on-escape), etc.
 
 There's almost no piece of logic too small to abstract out and share, as long as it's reusable.
 
