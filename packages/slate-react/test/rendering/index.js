@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom/server'
 import assert from 'assert'
 import clean from '../helpers/clean'
 import fs from 'fs-promise' // eslint-disable-line import/no-extraneous-dependencies
-import parse5 from 'parse5' // eslint-disable-line import/no-extraneous-dependencies
+import { JSDOM } from 'jsdom' // eslint-disable-line import/no-extraneous-dependencies
 import { Editor } from '../..'
 import { basename, extname, resolve } from 'path'
 
@@ -27,7 +27,8 @@ describe('rendering', () => {
       }
 
       const string = ReactDOM.renderToStaticMarkup(<Editor {...p} />)
-      const expected = parse5.serialize(parse5.parseFragment(output))
+      const dom = JSDOM.fragment(output)
+      const expected = dom.firstChild.outerHTML
         .trim()
         .replace(/\n/gm, '')
         .replace(/>\s*</g, '><')
