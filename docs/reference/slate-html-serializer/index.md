@@ -42,7 +42,7 @@ A set of properties to use for blocks which do not match any rule. Can be a stri
 ### `parseHtml`
 `Function`
 
-A function to parse an HTML string and return a DOM object. Defaults to using the native `DOMParser` in browser environments that support it. For older browsers or server-side rendering, you can include the [parse5](https://www.npmjs.com/package/parse5) package and pass `parse5.parseFragment` as the `parseHtml` option.
+A function to parse an HTML string and return a DOM object. Defaults to using the native `DOMParser` in browser environments that support it. For older browsers or server-side rendering, you can include the [jsdom](https://www.npmjs.com/package/jsdom) package and pass `JSDOM.fragment` as the `parseHtml` option.
 
 This parse function should return the `<body>` node of the DOM.
 

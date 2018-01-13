@@ -4,10 +4,10 @@
 import Html from '../..'
 import React from 'react'
 import h from '../../test/helpers/h'
-import parse5 from 'parse5' // eslint-disable-line import/no-extraneous-dependencies
+import { JSDOM } from 'jsdom' // eslint-disable-line import/no-extraneous-dependencies
 
 const html = new Html({
-  parseHtml: parse5.parseFragment,
+  parseHtml: JSDOM.fragment,
   rules: [
     {
       serialize(obj, children) {

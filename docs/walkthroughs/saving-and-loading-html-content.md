@@ -66,8 +66,6 @@ const rules = [
 
 The `el` argument that the `deserialize` function receives is just a DOM element. And the `next` argument is a function that will deserialize any element(s) we pass it, which is how you recurse through each node's children.
 
-A quick note on `el.tagName` -- in browser environments, Slate uses the native `DOMParser` to parse HTML, which returns uppercase tag names. In server-side or node environments, we recommend [providing parse5](https://docs.slatejs.org/reference/serializers/html.html#parsehtml) to parse HTML; however, parse5 returns lowercase tag names due to some subtle complexities in specifications. Consequentially, we recommend using case-insensitive tag comparisons, so your code just works everywhere without having to worry about the parser implementation.
-
 Okay, that's `deserialize`, now let's define the `serialize` property of the paragraph rule as well:
 
 ```js
