@@ -474,3 +474,8 @@ Move forward one step in the history.
 `undo() => Change`
 
 Move backward one step in the history.
+
+### `snapshotSelection`
+`snapshotSelection() => Change`
+
+Snapshot `value.selection` for `undo` purposes, useful with delete operations like `removeNodeByKey(focusBlock.key).undo()`
