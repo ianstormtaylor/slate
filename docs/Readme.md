@@ -27,7 +27,7 @@
 - [Plugins](./general/plugins.md)
 - [Resources](./general/resources.md)
 - [Contributing](../Contributing.md)
-- [Changelog](../Changelog.md)
+- [Changelog](./general/changelog.md)
 - [FAQ](./general/faq.md)
 
 
