@@ -92,7 +92,7 @@ function cloneFragment(event, value, fragment = value.fragment) {
   attach.setAttribute('data-slate-fragment', encoded)
 
   // Add the phony content to the DOM, and select it, so it will be copied.
-  const body = window.document.querySelector('body')
+  const editor = window.document.querySelector('[data-slate-editor]')
   const div = window.document.createElement('div')
   div.setAttribute('contenteditable', true)
   div.style.position = 'absolute'
@@ -107,7 +107,7 @@ function cloneFragment(event, value, fragment = value.fragment) {
   div.style.top = `${window.pageYOffset || window.document.documentElement.scrollTop}px`
 
   div.appendChild(contents)
-  body.appendChild(div)
+  editor.appendChild(div)
 
   // COMPAT: In Firefox, trying to use the terser `native.selectAllChildren`
   // throws an error, so we use the older `range` equivalent. (2016/06/21)
@@ -118,7 +118,7 @@ function cloneFragment(event, value, fragment = value.fragment) {
 
   // Revert to the previous selection right after copying.
   window.requestAnimationFrame(() => {
-    body.removeChild(div)
+    editor.removeChild(div)
     native.removeAllRanges()
     native.addRange(range)
   })
