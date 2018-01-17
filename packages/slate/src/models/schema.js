@@ -31,6 +31,23 @@ const NODE_TEXT_INVALID = 'node_text_invalid'
 const PARENT_OBJECT_INVALID = 'parent_object_invalid'
 const PARENT_TYPE_INVALID = 'parent_type_invalid'
 
+export const SchemaViolations = Object.freeze({
+  ChildObjectInvalid: CHILD_OBJECT_INVALID,
+  ChildRequired: CHILD_REQUIRED,
+  ChildTypeInvalid: CHILD_TYPE_INVALID,
+  ChildUnknown: CHILD_UNKNOWN,
+  FirstChildObjectInvalid: FIRST_CHILD_OBJECT_INVALID,
+  FirstChildTypeInvalid: FIRST_CHILD_TYPE_INVALID,
+  LastChildObjectInvalid: LAST_CHILD_OBJECT_INVALID,
+  LastChildTypeInvalid: LAST_CHILD_TYPE_INVALID,
+  NodeDataInvalid: NODE_DATA_INVALID,
+  NodeIsVoidInvalid: NODE_IS_VOID_INVALID,
+  NodeMarkInvalid: NODE_MARK_INVALID,
+  NodeTextInvalid: NODE_TEXT_INVALID,
+  ParentObjectInvalid: PARENT_OBJECT_INVALID,
+  ParentTypeInvalid: PARENT_TYPE_INVALID,
+})
+
 /**
  * Debug.
  *
