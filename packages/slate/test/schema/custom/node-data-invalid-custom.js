@@ -1,6 +1,6 @@
 /** @jsx h */
 
-import { SchemaViolations } from 'slate'
+import { SchemaViolations } from '../../..'
 import h from '../../helpers/h'
 
 export const schema = {
