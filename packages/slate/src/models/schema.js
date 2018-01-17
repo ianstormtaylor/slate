@@ -42,6 +42,7 @@ export const SchemaViolations = Object.freeze({
   LastChildTypeInvalid: LAST_CHILD_TYPE_INVALID,
   NodeDataInvalid: NODE_DATA_INVALID,
   NodeIsVoidInvalid: NODE_IS_VOID_INVALID,
+  NodeMarkInvalid: NODE_MARK_INVALID,
   NodeTextInvalid: NODE_TEXT_INVALID,
   ParentObjectInvalid: PARENT_OBJECT_INVALID,
   ParentTypeInvalid: PARENT_TYPE_INVALID,

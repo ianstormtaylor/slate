@@ -214,30 +214,13 @@ Returns a JSON representation of the schema.
 
 ## Invalid Reasons
 
-When supplying your own `normalize` property for a schema rule, it will be called with `(change, reason, context)`. The `reason` will be one of a set of reasons, and `context` will vary depending on the reason. Here's the full set:
+When supplying your own `normalize` property for a schema rule, it will be called with `(change, reason, context)`. The `reason` will be one of a set of reasons, and `context` will vary depending on the reason. Invalid reason constants are available through the`SchemaViolations` object.
 
-### `child_object_invalid`
+`import { SchemaViolations } from 'slate'`
 
-```js
-{
-  child: Node,
-  index: Number,
-  node: Node,
-  rule: Object,
-}
-```
+Here's the full set:
 
-### `child_required`
-
-```js
-{
-  index: Number,
-  node: Node,
-  rule: Object,
-}
-```
-
-### `child_type_invalid`
+### `SchemaViolations.ChildObjectInvalid`
 
 ```js
 {
@@ -248,7 +231,17 @@ When supplying your own `normalize` property for a schema rule, it will be calle
 }
 ```
 
-### `child_unknown`
+### `SchemaViolations.ChildRequired`
+
+```js
+{
+  index: Number,
+  node: Node,
+  rule: Object,
+}
+```
+
+### `SchemaViolations.ChildTypeInvalid`
 
 ```js
 {
@@ -259,7 +252,18 @@ When supplying your own `normalize` property for a schema rule, it will be calle
 }
 ```
 
-### `first_child_object_invalid`
+### `SchemaViolations.ChildUnknown`
+
+```js
+{
+  child: Node,
+  index: Number,
+  node: Node,
+  rule: Object,
+}
+```
+
+### `SchemaViolations.FirstChildObjectInvalid`
 
 ```js
 {
@@ -269,7 +273,7 @@ When supplying your own `normalize` property for a schema rule, it will be calle
 }
 ```
 
-### `first_child_type_invalid`
+### `SchemaViolations.FirstChildTypeInvalid`
 
 ```js
 {
@@ -279,7 +283,7 @@ When supplying your own `normalize` property for a schema rule, it will be calle
 }
 ```
 
-### `last_child_object_invalid`
+### `SchemaViolations.LastChildObjectInvalid`
 
 ```js
 {
@@ -289,7 +293,7 @@ When supplying your own `normalize` property for a schema rule, it will be calle
 }
 ```
 
-### `last_child_type_invalid`
+### `SchemaViolations.LastChildTypeInvalid`
 
 ```js
 {
@@ -299,7 +303,7 @@ When supplying your own `normalize` property for a schema rule, it will be calle
 }
 ```
 
-### `node_data_invalid`
+### `SchemaViolations.NodeDataInvalid`
 
 ```js
 {
@@ -310,7 +314,7 @@ When supplying your own `normalize` property for a schema rule, it will be calle
 }
 ```
 
-### `node_is_void_invalid`
+### `SchemaViolations.NodeIsVoidInvalid`
 
 ```js
 {
@@ -319,7 +323,7 @@ When supplying your own `normalize` property for a schema rule, it will be calle
 }
 ```
 
-### `node_object_invalid`
+### `SchemaViolations.NodeObjectInvalid`
 
 ```js
 {
@@ -328,7 +332,7 @@ When supplying your own `normalize` property for a schema rule, it will be calle
 }
 ```
 
-### `node_mark_invalid`
+### `SchemaViolations.NodeMarkInvalid`
 
 ```js
 {
@@ -338,7 +342,7 @@ When supplying your own `normalize` property for a schema rule, it will be calle
 }
 ```
 
-### `node_text_invalid`
+### `SchemaViolations.NodeTextInvalid`
 
 ```js
 {
@@ -348,7 +352,7 @@ When supplying your own `normalize` property for a schema rule, it will be calle
 }
 ```
 
-### `parent_object_invalid`
+### `SchemaViolations.ParentObjectInvalid`
 
 ```js
 {
@@ -358,7 +362,7 @@ When supplying your own `normalize` property for a schema rule, it will be calle
 }
 ```
 
-### `parent_type_invalid`
+### `SchemaViolations.ParentTypeInvalid`
 
 ```js
 {

@@ -1,5 +1,6 @@
 /** @jsx h */
 
+import { SchemaViolations } from 'slate'
 import h from '../../helpers/h'
 
 export const schema = {
@@ -7,7 +8,7 @@ export const schema = {
     link: {
       parent: { objects: ['block'] },
       normalize: (change, reason, { node }) => {
-        if (reason == 'parent_object_invalid') {
+        if (reason == SchemaViolations.ParentObjectInvalid) {
           change.unwrapNodeByKey(node.key)
         }
       }
