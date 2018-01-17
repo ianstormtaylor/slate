@@ -1,6 +1,6 @@
 
 import { Editor } from 'slate-react'
-import { Block, Value } from 'slate'
+import { Block, Value, SchemaViolations } from 'slate'
 
 import React from 'react'
 import initialValue from './value.json'
@@ -19,10 +19,10 @@ const schema = {
     ],
     normalize: (change, reason, { node, child, index }) => {
       switch (reason) {
-        case 'child_type_invalid': {
+        case SchemaViolations.ChildTypeInvalid: {
           return change.setNodeByKey(child.key, index == 0 ? 'title' : 'paragraph')
         }
-        case 'child_required': {
+        case SchemaViolations.ChildRequired: {
           const block = Block.create(index == 0 ? 'title' : 'paragraph')
           return change.insertNodeByKey(node.key, index, block)
         }

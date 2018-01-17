@@ -1,5 +1,6 @@
 /** @jsx h */
 
+import { SchemaViolations } from '../../..'
 import h from '../../helpers/h'
 
 export const schema = {
@@ -8,7 +9,7 @@ export const schema = {
     item: {
       parent: { types: ['list'] },
       normalize: (change, reason, { node }) => {
-        if (reason == 'parent_type_invalid') {
+        if (reason == SchemaViolations.ParentTypeInvalid) {
           change.wrapBlockByKey(node.key, 'list')
         }
       }

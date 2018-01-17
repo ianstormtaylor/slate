@@ -12,7 +12,7 @@ import Node from './models/node'
 import Operation from './models/operation'
 import Operations from './operations'
 import Range from './models/range'
-import Schema from './models/schema'
+import Schema, { SchemaViolations } from './models/schema'
 import Stack from './models/stack'
 import Text from './models/text'
 import Value from './models/value'
@@ -39,6 +39,7 @@ export {
   Operations,
   Range,
   Schema,
+  SchemaViolations,
   Stack,
   Text,
   Value,
@@ -61,6 +62,7 @@ export default {
   Operations,
   Range,
   Schema,
+  SchemaViolations,
   Stack,
   Text,
   Value,
