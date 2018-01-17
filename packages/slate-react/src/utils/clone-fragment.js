@@ -4,6 +4,9 @@ import getWindow from 'get-window'
 import findDOMNode from './find-dom-node'
 import { ZERO_WIDTH_SELECTOR, ZERO_WIDTH_ATTRIBUTE } from './find-point'
 import { IS_CHROME, IS_SAFARI } from '../constants/environment'
+import TRANSFER_TYPES from '../constants/transfer-types'
+
+const { FRAGMENT, HTML, TEXT } = TRANSFER_TYPES
 
 /**
  * Prepares a Slate document fragment to be copied to the clipboard.
@@ -95,38 +98,17 @@ function cloneFragment(event, value, fragment = value.fragment) {
 
   attach.setAttribute('data-slate-fragment', encoded)
 
-  // Add the phony content to the DOM, and select it, so it will be copied.
-  const editor = event.target.closest('[data-slate-editor]')
+  // In order to populate the HTML clipboard register, we need a string
+  // representation of the content. We can get this by adding the phony content
+  // to a div and then reading its innerHTML.
   const div = window.document.createElement('div')
-  div.setAttribute('contenteditable', true)
-  div.style.position = 'absolute'
-  div.style.left = '-9999px'
-
-  // COMPAT: In Firefox, the viewport jumps to find the phony div, so it
-  // should be created at the current scroll offset with `style.top`.
-  // The box model attributes which can interact with 'top' are also reset.
-  div.style.border = '0px'
-  div.style.padding = '0px'
-  div.style.margin = '0px'
-  div.style.top = `${window.pageYOffset ||
-    window.document.documentElement.scrollTop}px`
-
   div.appendChild(contents)
-  editor.appendChild(div)
 
-  // COMPAT: In Firefox, trying to use the terser `native.selectAllChildren`
-  // throws an error, so we use the older `range` equivalent. (2016/06/21)
-  const r = window.document.createRange()
-  r.selectNodeContents(div)
-  native.removeAllRanges()
-  native.addRange(r)
-
-  // Revert to the previous selection right after copying.
-  window.requestAnimationFrame(() => {
-    editor.removeChild(div)
-    native.removeAllRanges()
-    native.addRange(range)
-  })
+  // Add appropriate data to the clipboard registers.
+  event.preventDefault()
+  event.clipboardData.setData(TEXT, native.toString())
+  event.clipboardData.setData(FRAGMENT, encoded)
+  event.clipboardData.setData(HTML, div.innerHTML)
 }
 
 export default cloneFragment
