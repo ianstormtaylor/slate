@@ -13,7 +13,7 @@ import Node from '../models/node'
 const Changes = {}
 
 /**
- * Obtains the normalization setting to use for the change based on the 
+ * Obtains the normalization setting to use for the change based on the
  * change object flags and the change operation options.
  *
  * @param {Object} flags - flags object for the current change object

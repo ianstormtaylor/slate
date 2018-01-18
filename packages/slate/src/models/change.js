@@ -141,28 +141,32 @@ class Change {
   }
 
   /**
-   * Executes a function delegate containing document change code and defers
-   * normalization until the end.
+   * Applies a series of change mutations and defers normalzation until the end.
    *
-   * @param {Function} fn
+   * @param {Function} customChange - function that accepts a change object and executes change operations
    * @return {Change}
    */
 
-  execute(fn) {
-    let flagSet = false
+  withMutations(customChange) {
     let original = null
-    if (this.flags.normalize === undefined) {
-      flagSet = true
+    // if the flag exists, capture the original value so we can restore it later
+    if (this.flags.normalize !== undefined) {
       original = this.flags.normalize
     }
     this.setOperationFlag('normalize', false)
-    fn(this)
-    if (flagSet) {
-      this.setOperationFlag('normalize', original)
-    } else {
-      this.unsetOperationFlag('normalize')
+    try {
+      customChange(this)
+      // if the change function worked then run normalization
+      this.normalizeDocument()
+    } finally {
+      // if the flag was set previously, restore it to whatever it was
+      // otherwise unset the flag
+      if (original !== null) {
+        this.setOperationFlag('normalize', original)
+      } else {
+        this.unsetOperationFlag('normalize')
+      }
     }
-    this.normalizeDocument()
     return this
   }
 
