@@ -48,7 +48,7 @@ class Change {
     const { value } = attrs
     this.value = value
     this.operations = new List()
-    this.flags = pick(attrs, ['merge', 'save'])
+    this.flags = pick(attrs, ['merge', 'save', 'normalize'])
   }
 
   /**
@@ -137,6 +137,32 @@ class Change {
 
   call(fn, ...args) {
     fn(this, ...args)
+    return this
+  }
+
+  /**
+   * Executes a function delegate containing document change code and defers
+   * normalization until the end.
+   *
+   * @param {Function} fn
+   * @return {Change}
+   */
+
+  execute(fn) {
+    let flagSet = false
+    let original = null
+    if (this.flags.normalize === undefined) {
+      flagSet = true
+      original = this.flags.normalize
+    }
+    this.setOperationFlag('normalize', false)
+    fn(this)
+    if (flagSet) {
+      this.setOperationFlag('normalize', original)
+    } else {
+      this.unsetOperationFlag('normalize')
+    }
+    this.normalizeDocument()
     return this
   }
 
