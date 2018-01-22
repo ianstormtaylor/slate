@@ -18,7 +18,7 @@ const Changes = {}
  *
  * @param {Object} flags - flags object for the current change object
  * @param {Object} options - options for the change operation
- * @return {bool} - the normalization configuration to use. Defauls to true
+ * @return {bool} - the normalization configuration to use. Defaults to true
  *   if flags or options does not have a normalization configuration
  */
 

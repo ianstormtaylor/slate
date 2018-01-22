@@ -141,7 +141,7 @@ class Change {
   }
 
   /**
-   * Applies a series of change mutations and defers normalzation until the end.
+   * Applies a series of change mutations and defers normalization until the end.
    *
    * @param {Function} customChange - function that accepts a change object and executes change operations
    * @return {Change}
