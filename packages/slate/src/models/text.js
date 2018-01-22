@@ -379,6 +379,22 @@ class Text extends Record(DEFAULTS) {
   }
 
   /**
+   * Sets `text`.
+   *
+   * @param {String} text
+   * @return {Text}
+   */
+
+  setText(text) {
+    let { characters } = this
+    const chars = Character.createList(text.split('').map(char => ({ text: char, marks: [] })))
+
+    characters = chars
+
+    return this.set('characters', characters)
+  }
+
+  /**
    * Regenerate the node's key.
    *
    * @return {Text}

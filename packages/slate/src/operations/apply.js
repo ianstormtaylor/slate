@@ -88,6 +88,36 @@ const APPLIERS = {
   },
 
   /**
+   * Sets `text` in node.
+   *
+   * @param {Value} value
+   * @param {Operation} operation
+   * @return {Value}
+   */
+
+  set_text(value, operation) {
+    const { text } = operation
+    let { node } = operation
+    let { document, selection } = value
+    const { anchorKey, focusKey, anchorOffset, focusOffset } = selection
+
+    // Update the document
+    node = node.setText(text)
+    document = document.updateNode(node)
+
+    // Update the selection
+    if (anchorKey == node.key && anchorOffset >= text.length) {
+      selection = selection.moveAnchor(text.length)
+    }
+    if (focusKey == node.key && focusOffset >= text.length) {
+      selection = selection.moveFocus(text.length)
+    }
+
+    value = value.set('document', document).set('selection', selection)
+    return value
+  },
+
+  /**
    * Merge a node at `path` with the previous node.
    *
    * @param {Value} value
