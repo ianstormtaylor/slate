@@ -74,6 +74,11 @@ const OPERATION_ATTRIBUTES = {
     'selection',
     'properties',
   ],
+  set_text: [
+    'value',
+    'node',
+    'text',
+  ],
   set_value: [
     'value',
     'properties',

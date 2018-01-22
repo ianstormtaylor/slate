@@ -160,6 +160,34 @@ Changes.insertTextByKey = (change, key, offset, text, marks, options = {}) => {
 }
 
 /**
+ * Sets `text` in node by `key`.
+ *
+ * @param {Change} change
+ * @param {String} key
+ * @param {String} text
+ * @param {Object} options
+ *   @property {Boolean} normalize
+ */
+
+Changes.setTextByKey = (change, key, text, options = {}) => {
+  const { normalize = true } = options
+  const { value } = change
+  const { document } = value
+  const node = document.getNode(key)
+
+  change.applyOperation({
+    type: 'set_text',
+    value,
+    node,
+    text,
+  })
+
+  if (normalize) {
+    change.normalizeNodeByKey(key)
+  }
+}
+
+/**
  * Merge a node by `key` with the previous node.
  *
  * @param {Change} change
