@@ -1022,6 +1022,18 @@ class Node {
    * Get a set of the marks in a `range`.
    *
    * @param {Range} range
+   * @return {Set<Mark>}
+   */
+
+  getInsertMarksAtRange(range) {
+    const array = this.getInsertMarksAtRangeAsArray(range)
+    return new Set(array)
+  }
+
+  /**
+   * Get a set of the marks in a `range`.
+   *
+   * @param {Range} range
    * @return {OrderedSet<Mark>}
    */
 
@@ -1052,31 +1064,55 @@ class Node {
   getMarksAtRangeAsArray(range) {
     range = range.normalize(this)
     if (range.isUnset) return []
+    if (range.isCollapsed) return this.getMarksAtCollaspsedRangeAsArray(range)
 
-    const { startKey, startOffset } = range
-
-    // If the range is collapsed at the start of the node, check the previous.
-    if (range.isCollapsed && startOffset == 0) {
-      const previous = this.getPreviousText(startKey)
-      if (!previous || previous.text.length == 0) return []
-      const char = previous.characters.get(previous.text.length - 1)
-      return char.marks.toArray()
-    }
-
-    // If the range is collapsed, check the character before the start.
-    if (range.isCollapsed) {
-      const text = this.getDescendant(startKey)
-      const char = text.characters.get(range.startOffset - 1)
-      return char.marks.toArray()
-    }
-
-    // Otherwise, get a set of the marks for each character in the range.
     return this
       .getCharactersAtRange(range)
       .reduce((memo, char) => {
         char.marks.toArray().forEach(c => memo.push(c))
         return memo
       }, [])
+  }
+
+  /**
+   * Get a set of the marks in a `range` for insertion behavior.
+   *
+   * @param {Range} range
+   * @return {Array}
+   */
+
+  getInsertMarksAtRangeAsArray(range) {
+    range = range.normalize(this)
+    if (range.isUnset) return []
+    if (range.isCollapsed) return this.getMarksAtCollaspsedRangeAsArray(range)
+
+    const text = this.getDescendant(range.startKey)
+    const char = text.characters.get(range.startOffset)
+    return char.marks.toArray()
+  }
+
+  /**
+   * Get a set of marks in a `range`, by treating it as collapsed.
+   *
+   * @param {Range} range
+   * @return {Array}
+   */
+
+  getMarksAtCollaspsedRangeAsArray(range) {
+    if (range.isUnset) return []
+
+    const { startKey, startOffset } = range
+
+    if (startOffset == 0) {
+      const previous = this.getPreviousText(startKey)
+      if (!previous || previous.text.length == 0) return []
+      const char = previous.characters.get(previous.text.length - 1)
+      return char.marks.toArray()
+    }
+
+    const text = this.getDescendant(startKey)
+    const char = text.characters.get(startOffset - 1)
+    return char.marks.toArray()
   }
 
   /**
@@ -1089,23 +1125,7 @@ class Node {
   getActiveMarksAtRangeAsArray(range) {
     range = range.normalize(this)
     if (range.isUnset) return []
-
-    const { startKey, startOffset } = range
-
-    // If the range is collapsed at the start of the node, check the previous.
-    if (range.isCollapsed && startOffset == 0) {
-      const previous = this.getPreviousText(startKey)
-      if (!previous || previous.text.length == 0) return []
-      const char = previous.characters.get(previous.text.length - 1)
-      return char.marks.toArray()
-    }
-
-    // If the range is collapsed, check the character before the start.
-    if (range.isCollapsed) {
-      const text = this.getDescendant(startKey)
-      const char = text.characters.get(range.startOffset - 1)
-      return char.marks.toArray()
-    }
+    if (range.isCollapsed) return this.getMarksAtCollaspsedRangeAsArray(range)
 
     // Otherwise, get a set of the marks for each character in the range.
     const chars = this.getCharactersAtRange(range)
@@ -1981,8 +2001,10 @@ memoize(Node.prototype, [
   'getInlinesByType',
   'getInlinesByTypeAsArray',
   'getMarksAtRange',
+  'getInsertMarksAtRange',
   'getOrderedMarksAtRange',
   'getMarksAtRangeAsArray',
+  'getInsertMarksAtRangeAsArray',
   'getMarksByType',
   'getOrderedMarksByType',
   'getMarksByTypeAsArray',

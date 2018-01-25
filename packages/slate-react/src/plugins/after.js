@@ -492,7 +492,7 @@ function AfterPlugin() {
       if (startBlock.isVoid) return
 
       const defaultBlock = startBlock
-      const defaultMarks = document.getMarksAtRange(selection.collapseToStart())
+      const defaultMarks = document.getInsertMarksAtRange(selection)
       const frag = Plain.deserialize(text, { defaultBlock, defaultMarks }).document
       change.insertFragment(frag)
     }

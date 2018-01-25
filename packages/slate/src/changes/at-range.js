@@ -881,8 +881,10 @@ Changes.insertTextAtRange = (change, range, text, marks, options = {}) => {
     change.deleteAtRange(range, { normalize: false })
 
     // Update range start after delete
-    key = change.value.startKey
-    offset = change.value.startOffset
+    if (change.value.startKey !== key) {
+      key = change.value.startKey
+      offset = change.value.startOffset
+    }
   }
 
   // PERF: Unless specified, don't normalize if only inserting text.
