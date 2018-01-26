@@ -4,24 +4,26 @@
   "version": "0.1.37",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
-  "main": "./lib/index.js",
+  "main": "./dist/cjs/slate-dev-logger.js",
+  "module": "./dist/es/slate-dev-logger.js",
+  "browser": "./dist/umd/slate-dev-logger.js",
   "files": [
-    "dist/",
-    "lib/"
+    "dist/"
   ],
   "devDependencies": {
-    "babel-cli": "^6.10.1",
-    "browserify": "^13.0.1",
     "mocha": "^2.5.3",
-    "uglify-js": "^2.7.0"
+    "rollup": "^0.55.1",
+    "rollup-plugin-babel": "^3.0.3",
+    "rollup-plugin-commonjs": "^8.3.0",
+    "rollup-plugin-node-builtins": "^2.1.2",
+    "rollup-plugin-node-resolve": "^3.0.2",
+    "rollup-plugin-uglify": "^3.0.0"
   },
   "scripts": {
-    "build": "babel --out-dir ./lib ./src",
-    "build:max": "mkdir -p ./dist && NODE_ENV=production browserify ./src/index.js --transform babelify --transform envify --transform [ browserify-global-shim --global ] --standalone SlateDevLogger > ./dist/slate-dev-logger.js",
-    "build:min": "mkdir -p ./dist && NODE_ENV=production browserify ./src/index.js --transform babelify --transform envify --transform [ browserify-global-shim --global ] --transform uglifyify --standalone SlateDevLogger | uglifyjs > ./dist/slate-dev-logger.min.js",
-    "clean": "rm -rf ./dist ./lib ./node_modules",
-    "prepublish": "yarn run build && yarn run build:max && yarn run build:min",
-    "watch": "babel --watch --out-dir ./lib ./src --source-maps inline"
+    "build": "rollup -c",
+    "clean": "rm -rf ./dist ./node_modules",
+    "prepublish": "yarn build",
+    "watch": "rollup -c -w"
   },
   "keywords": [
     "slate"
