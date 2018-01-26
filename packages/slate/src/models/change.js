@@ -184,7 +184,8 @@ class Change {
   }
 
   /**
-   * Get the `value` of the specified flag by its `key`
+   * Get the `value` of the specified flag by its `key`. The flag is not defined, then
+   * falls back to the `value` in the `options` object.
    *
    * @param {String} key
    * @param {Object} options
@@ -192,13 +193,9 @@ class Change {
    */
 
   getFlag(key, options = {}) {
-    let value
-    if (this.flags[key] !== undefined) {
-      value = this.flags[key]
-    } else if (options[key] !== undefined) {
-      value = options[key]
-    }
-    return value
+    return this.flags[key] !== undefined ?
+      this.flags[key] :
+      options[key]
   }
 
   /**
