@@ -1,7 +1,7 @@
 {
   "name": "slate-schema-violations",
   "description": "A set of constants for the built-in violations in a Slate schema.",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
   "main": "./lib/index.js",
@@ -9,13 +9,11 @@
     "dist/",
     "lib/"
   ],
-  "dependencies": {},
-  "peerDependencies": {},
   "devDependencies": {
     "babel-cli": "^6.10.1",
     "browserify": "^13.0.1",
     "mocha": "^2.5.3",
-    "slate": "^0.32.1",
+    "slate": "^0.32.2",
     "uglify-js": "^2.7.0"
   },
   "scripts": {
