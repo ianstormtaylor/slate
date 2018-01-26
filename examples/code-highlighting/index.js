@@ -140,7 +140,18 @@ class CodeHighlighting extends React.Component {
     switch (mark.type) {
       case 'comment': return <span style={{ opacity: '0.33' }}>{children}</span>
       case 'keyword': return <span style={{ fontWeight: 'bold' }}>{children}</span>
+      case 'tag': return <span style={{ fontWeight: 'bold' }}>{children}</span>
       case 'punctuation': return <span style={{ opacity: '0.75' }}>{children}</span>
+    }
+  }
+
+  tokenToContent = (token) => {
+    if (typeof token == 'string') {
+      return token
+    } else if (typeof token.content == 'string') {
+      return token.content
+    } else {
+      return token.content.map(this.tokenToContent).join('')
     }
   }
 
@@ -170,7 +181,7 @@ class CodeHighlighting extends React.Component {
       startText = endText
       startOffset = endOffset
 
-      const content = typeof token == 'string' ? token : token.content
+      const content = this.tokenToContent(token)
       const newlines = content.split('\n').length - 1
       const length = content.length - newlines
       const end = start + length
@@ -180,7 +191,7 @@ class CodeHighlighting extends React.Component {
 
       endOffset = startOffset + remaining
 
-      while (available < remaining) {
+      while (available < remaining && texts.length > 0) {
         endText = texts.shift()
         remaining = length - available
         available = endText.text.length
