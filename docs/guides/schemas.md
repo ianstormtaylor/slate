@@ -115,7 +115,7 @@ However, only use it when you absolutely have to. And when you do, you need to b
 
 ## Multi-step Normalizations
 
-Some normalizations will require multiple `change` function calls in order to complete. 
+Some normalizations will require multiple `change` function calls in order to complete. But after calling the first change function, the resulting document will be normalized, changing it out from under you. This can cause unintended behaviors.
 
 Consider the following validation function that merges adjacent text nodes together. 
 
@@ -153,7 +153,7 @@ validateNode(node) {
 
 There is actually a problem with this code. Because each `change` function call will cause nodes impacted by the mutation to be normalized, this can cause interruptions to carefully implemented sequences of `change` functions and may create performance problems or errors. The normalization logic in the above example will merge the last node in the invalids list together, but then it'll trigger another normalization and start over!
 
-How can we deal with this? Well, normalization can be suppressed temporarily for multiple `change` function calls by using the `change.withMutations` function. `withMutations` accepts a function that takes a `change` object as a parameter, and executes the function while suppressing normalization. Once the function is done executing, the entire document is then normalized to pick up any unnnormalized transformations and ensure your document is in a normalized state.
+How can we deal with this? Well, normalization can be suppressed temporarily for multiple `change` function calls by using the `change.withoutNormalization` function. `withoutNormalization` accepts a function that takes a `change` object as a parameter, and executes the function while suppressing normalization. Once the function is done executing, the entire document is then normalized to pick up any unnnormalized transformations and ensure your document is in a normalized state.
 
 The above validation function can then be written as below
 
@@ -166,11 +166,11 @@ The above validation function can then be written as below
 validateNode(node) {
   ... 
   return (change) => {
-    change.withMutations((c) => {
+    change.withoutNormalization((c) => {
       // Reverse the list to handle consecutive merges, since the earlier nodes
       // will always exist after each merge.
       invalids.reverse().forEach((n) => {
-        change.mergeNodeByKey(n.key)
+        c.mergeNodeByKey(n.key)
       })
     });
   }

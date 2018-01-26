@@ -50,12 +50,12 @@ function onSomeEvent(event, change) {
 }
 ```
 
-### `withMutations`
-`withMutations(customChange: Function) => Change`
+### `withoutNormalization`
+`withoutNormalization(customChange: Function) => Change`
 
 This method calls the provided `customChange` function with the current instance of the `Change` object as the first argument. While `customChange` is executing, normalization is temporarily suppressed, but normalization will be executed once the `customChange` function completes execution.
 
-The purpose of `withMutations` is to allow a sequence of change operations that should not be interrupted by normalization. For example:
+The purpose of `withoutNormalization` is to allow a sequence of change operations that should not be interrupted by normalization. For example:
 
 ```js
 /**
@@ -69,9 +69,9 @@ validateNode(node) {
   if (!invalids.size) return
 
   return (change) => {
-    change.withMutations((c) => {
+    change.withoutNormalization((c) => {
       invalids.forEach((child) => {
-        change.removeNodeByKey(child.key)
+        c.removeNodeByKey(child.key)
       })
     })
   }

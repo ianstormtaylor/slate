@@ -16,12 +16,7 @@ import { resetKeyGenerator } from '..'
  */
 
 describe('slate', () => {
-  require('./serializers')
-  require('./schema')
   require('./models')
-  require('./changes')
-  require('./history')
-  require('./operations')
 })
 
 /**

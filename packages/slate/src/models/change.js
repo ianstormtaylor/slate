@@ -147,7 +147,7 @@ class Change {
    * @return {Change}
    */
 
-  withMutations(customChange) {
+  withoutNormalization(customChange) {
     let original = null
     // if the flag exists, capture the original value so we can restore it later
     if (this.flags.normalize !== undefined) {
@@ -181,6 +181,24 @@ class Change {
   setOperationFlag(key, value) {
     this.flags[key] = value
     return this
+  }
+
+  /**
+   * Get the `value` of the specified flag by its `key`
+   *
+   * @param {String} key
+   * @param {Object} options
+   * @return {Change}
+   */
+
+  getFlag(key, options = {}) {
+    let value
+    if (this.flags[key] !== undefined) {
+      value = this.flags[key]
+    } else if (options[key] !== undefined) {
+      value = options[key]
+    }
+    return value
   }
 
   /**
