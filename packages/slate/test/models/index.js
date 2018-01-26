@@ -17,13 +17,17 @@ describe('models', () => {
       for (const test of tests) {
         it(test, async () => {
           const module = require(resolve(testsDir, test))
-          const { input, output, schema, normalize, customChange } = module
+          const { input, output, schema, normalize, flags, customChange } = module
           const s = Schema.create(schema)
           const expected = output.toJSON()
-          const flags = normalize !== undefined ? { normalize } : {}
           const change = input
             .change(flags)
             .setValue({ schema: s })
+          if (normalize === undefined) {
+            // undefined is a special flag which causes the test to examine how the
+            // flag restoration behaves after the user has cleared the normalize flag
+            change.unsetOperationFlag('normalize')
+          }
           const actual = change
             .withoutNormalization(customChange)
             .value.toJSON()

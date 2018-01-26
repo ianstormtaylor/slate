@@ -48,7 +48,10 @@ class Change {
     const { value } = attrs
     this.value = value
     this.operations = new List()
-    this.flags = pick(attrs, ['merge', 'save', 'normalize'])
+    this.flags = {
+      normalize: true,
+      ...pick(attrs, ['merge', 'save', 'normalize'])
+    }
   }
 
   /**
@@ -148,24 +151,15 @@ class Change {
    */
 
   withoutNormalization(customChange) {
-    let original = null
-    // if the flag exists, capture the original value so we can restore it later
-    if (this.flags.normalize !== undefined) {
-      original = this.flags.normalize
-    }
+    const original = this.flags.normalize
     this.setOperationFlag('normalize', false)
     try {
       customChange(this)
       // if the change function worked then run normalization
       this.normalizeDocument()
     } finally {
-      // if the flag was set previously, restore it to whatever it was
-      // otherwise unset the flag
-      if (original !== null) {
-        this.setOperationFlag('normalize', original)
-      } else {
-        this.unsetOperationFlag('normalize')
-      }
+      // restore the flag to whatever it was
+      this.setOperationFlag('normalize', original)
     }
     return this
   }
@@ -184,8 +178,8 @@ class Change {
   }
 
   /**
-   * Get the `value` of the specified flag by its `key`. The flag is not defined, then
-   * falls back to the `value` in the `options` object.
+   * Get the `value` of the specified flag by its `key`. Optionally accepts an `options`
+   * object with override flags.
    *
    * @param {String} key
    * @param {Object} options
@@ -193,9 +187,9 @@ class Change {
    */
 
   getFlag(key, options = {}) {
-    return this.flags[key] !== undefined ?
-      this.flags[key] :
-      options[key]
+    return options[key] !== undefined ?
+      options[key] :
+      this.flags[key]
   }
 
   /**

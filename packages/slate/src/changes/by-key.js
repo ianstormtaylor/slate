@@ -26,7 +26,7 @@ const Changes = {}
 
 Changes.addMarkByKey = (change, key, offset, length, mark, options = {}) => {
   mark = Mark.create(mark)
-  const normalize = change.getFlag('normalize', { normalize: true, ...options })
+  const normalize = change.getFlag('normalize', options)
   const { value } = change
   const { document } = value
   const path = document.getPath(key)
@@ -84,7 +84,7 @@ Changes.addMarkByKey = (change, key, offset, length, mark, options = {}) => {
  */
 
 Changes.insertFragmentByKey = (change, key, index, fragment, options = {}) => {
-  const normalize = change.getFlag('normalize', { normalize: true, ...options })
+  const normalize = change.getFlag('normalize', options)
 
   fragment.nodes.forEach((node, i) => {
     change.insertNodeByKey(key, index + i, node)
@@ -107,7 +107,7 @@ Changes.insertFragmentByKey = (change, key, index, fragment, options = {}) => {
  */
 
 Changes.insertNodeByKey = (change, key, index, node, options = {}) => {
-  const normalize = change.getFlag('normalize', { normalize: true, ...options })
+  const normalize = change.getFlag('normalize', options)
   const { value } = change
   const { document } = value
   const path = document.getPath(key)
@@ -137,7 +137,7 @@ Changes.insertNodeByKey = (change, key, index, node, options = {}) => {
  */
 
 Changes.insertTextByKey = (change, key, offset, text, marks, options = {}) => {
-  const normalize = change.getFlag('normalize', { normalize: true, ...options })
+  const normalize = change.getFlag('normalize', options)
 
   const { value } = change
   const { document } = value
@@ -170,7 +170,7 @@ Changes.insertTextByKey = (change, key, offset, text, marks, options = {}) => {
  */
 
 Changes.mergeNodeByKey = (change, key, options = {}) => {
-  const normalize = change.getFlag('normalize', { normalize: true, ...options })
+  const normalize = change.getFlag('normalize', options)
   const { value } = change
   const { document } = value
   const path = document.getPath(key)
@@ -209,7 +209,7 @@ Changes.mergeNodeByKey = (change, key, options = {}) => {
  */
 
 Changes.moveNodeByKey = (change, key, newKey, newIndex, options = {}) => {
-  const normalize = change.getFlag('normalize', { normalize: true, ...options })
+  const normalize = change.getFlag('normalize', options)
   const { value } = change
   const { document } = value
   const path = document.getPath(key)
@@ -242,7 +242,7 @@ Changes.moveNodeByKey = (change, key, newKey, newIndex, options = {}) => {
 
 Changes.removeMarkByKey = (change, key, offset, length, mark, options = {}) => {
   mark = Mark.create(mark)
-  const normalize = change.getFlag('normalize', { normalize: true, ...options })
+  const normalize = change.getFlag('normalize', options)
   const { value } = change
   const { document } = value
   const path = document.getPath(key)
@@ -320,7 +320,7 @@ Changes.removeAllMarksByKey = (change, key, options = {}) => {
  */
 
 Changes.removeNodeByKey = (change, key, options = {}) => {
-  const normalize = change.getFlag('normalize', { normalize: true, ...options })
+  const normalize = change.getFlag('normalize', options)
   const { value } = change
   const { document } = value
   const path = document.getPath(key)
@@ -351,7 +351,7 @@ Changes.removeNodeByKey = (change, key, options = {}) => {
  */
 
 Changes.removeTextByKey = (change, key, offset, length, options = {}) => {
-  const normalize = change.getFlag('normalize', { normalize: true, ...options })
+  const normalize = change.getFlag('normalize', options)
   const { value } = change
   const { document } = value
   const path = document.getPath(key)
@@ -409,7 +409,7 @@ Changes.removeTextByKey = (change, key, offset, length, options = {}) => {
 
 Changes.replaceNodeByKey = (change, key, newNode, options = {}) => {
   newNode = Node.create(newNode)
-  const normalize = change.getFlag('normalize', { normalize: true, ...options })
+  const normalize = change.getFlag('normalize', options)
   const { value } = change
   const { document } = value
   const node = document.getNode(key)
@@ -437,7 +437,7 @@ Changes.replaceNodeByKey = (change, key, newNode, options = {}) => {
 Changes.setMarkByKey = (change, key, offset, length, mark, properties, options = {}) => {
   mark = Mark.create(mark)
   properties = Mark.createProperties(properties)
-  const normalize = change.getFlag('normalize', { normalize: true, ...options })
+  const normalize = change.getFlag('normalize', options)
   const { value } = change
   const { document } = value
   const path = document.getPath(key)
@@ -470,7 +470,7 @@ Changes.setMarkByKey = (change, key, offset, length, mark, properties, options =
 
 Changes.setNodeByKey = (change, key, properties, options = {}) => {
   properties = Node.createProperties(properties)
-  const normalize = change.getFlag('normalize', { normalize: true, ...options })
+  const normalize = change.getFlag('normalize', options)
   const { value } = change
   const { document } = value
   const path = document.getPath(key)
@@ -535,7 +535,7 @@ Changes.splitDescendantsByKey = (change, key, textKey, textOffset, options = {})
     return
   }
 
-  const normalize = change.getFlag('normalize', { normalize: true, ...options })
+  const normalize = change.getFlag('normalize', options)
   const { value } = change
   const { document } = value
 
@@ -612,7 +612,7 @@ Changes.unwrapBlockByKey = (change, key, properties, options) => {
  */
 
 Changes.unwrapNodeByKey = (change, key, options = {}) => {
-  const normalize = change.getFlag('normalize', { normalize: true, ...options })
+  const normalize = change.getFlag('normalize', options)
   const { value } = change
   const { document } = value
   const parent = document.getParent(key)

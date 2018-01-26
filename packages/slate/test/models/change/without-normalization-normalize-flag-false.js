@@ -2,6 +2,10 @@
 
 import h from '../../helpers/h'
 
+export const normalize = false
+
+export const flags = { normalize }
+
 export const schema = {
   blocks: {
     paragraph: {},
@@ -16,12 +20,14 @@ export const schema = {
 }
 
 export const customChange = (change) => {
-  // see if we can break the expected validation sequence by toggling
-  // the normalization option
+  // this change function and schema are designed such that if
+  // validation takes place before both wrapBlock calls complete
+  // the node gets deleted by the default schema
+  // and causes a test failure
   let target = change.value.document.nodes.get(0)
-  change.wrapBlockByKey(target.key, 'item', { normalize: true })
+  change.wrapBlockByKey(target.key, 'item')
   target = change.value.document.nodes.get(0)
-  change.wrapBlockByKey(target.key, 'list', { normalize: false })
+  change.wrapBlockByKey(target.key, 'list')
 }
 
 export const input = (
