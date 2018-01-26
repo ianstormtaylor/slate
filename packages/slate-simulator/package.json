@@ -5,6 +5,10 @@
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
   "main": "./lib/index.js",
+  "files": [
+    "dist/",
+    "lib/"
+  ],
   "peerDependencies": {
     "slate": "^0.32.1",
     "slate-dev-logger": "^0.1.23"
