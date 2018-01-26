@@ -28,7 +28,7 @@ const Changes = {}
 Changes.addMarkAtRange = (change, range, mark, options = {}) => {
   if (range.isCollapsed) return
 
-  const { normalize = true } = options
+  const normalize = change.getFlag('normalize', options)
   const { value } = change
   const { document } = value
   const { startKey, startOffset, endKey, endOffset } = range
@@ -77,7 +77,7 @@ Changes.deleteAtRange = (change, range, options = {}) => {
   // when you undo a delete, the expanded selection will be retained.
   change.snapshotSelection()
 
-  const { normalize = true } = options
+  const normalize = change.getFlag('normalize', options)
   const { value } = change
   let { startKey, startOffset, endKey, endOffset } = range
   let { document } = value
@@ -350,7 +350,7 @@ Changes.deleteWordBackwardAtRange = (change, range, options) => {
  */
 
 Changes.deleteBackwardAtRange = (change, range, n = 1, options = {}) => {
-  const { normalize = true } = options
+  const normalize = change.getFlag('normalize', options)
   const { value } = change
   const { document } = value
   const { startKey, focusOffset } = range
@@ -536,7 +536,7 @@ Changes.deleteWordForwardAtRange = (change, range, options) => {
  */
 
 Changes.deleteForwardAtRange = (change, range, n = 1, options = {}) => {
-  const { normalize = true } = options
+  const normalize = change.getFlag('normalize', options)
   const { value } = change
   const { document } = value
   const { startKey, focusOffset } = range
@@ -665,7 +665,7 @@ Changes.deleteForwardAtRange = (change, range, n = 1, options = {}) => {
 
 Changes.insertBlockAtRange = (change, range, block, options = {}) => {
   block = Block.create(block)
-  const { normalize = true } = options
+  const normalize = change.getFlag('normalize', options)
 
   if (range.isExpanded) {
     change.deleteAtRange(range)
@@ -717,7 +717,7 @@ Changes.insertBlockAtRange = (change, range, block, options = {}) => {
  */
 
 Changes.insertFragmentAtRange = (change, range, fragment, options = {}) => {
-  const { normalize = true } = options
+  const normalize = change.getFlag('normalize', options)
 
   // If the range is expanded, delete it first.
   if (range.isExpanded) {
@@ -830,7 +830,7 @@ Changes.insertFragmentAtRange = (change, range, fragment, options = {}) => {
  */
 
 Changes.insertInlineAtRange = (change, range, inline, options = {}) => {
-  const { normalize = true } = options
+  const normalize = change.getFlag('normalize', options)
   inline = Inline.create(inline)
 
   if (range.isExpanded) {
@@ -908,7 +908,7 @@ Changes.insertTextAtRange = (change, range, text, marks, options = {}) => {
 Changes.removeMarkAtRange = (change, range, mark, options = {}) => {
   if (range.isCollapsed) return
 
-  const { normalize = true } = options
+  const normalize = change.getFlag('normalize', options)
   const { value } = change
   const { document } = value
   const texts = document.getTextsAtRange(range)
@@ -938,7 +938,7 @@ Changes.removeMarkAtRange = (change, range, mark, options = {}) => {
  */
 
 Changes.setBlockAtRange = (change, range, properties, options = {}) => {
-  const { normalize = true } = options
+  const normalize = change.getFlag('normalize', options)
   const { value } = change
   const { document } = value
   const blocks = document.getBlocksAtRange(range)
@@ -959,7 +959,7 @@ Changes.setBlockAtRange = (change, range, properties, options = {}) => {
  */
 
 Changes.setInlineAtRange = (change, range, properties, options = {}) => {
-  const { normalize = true } = options
+  const normalize = change.getFlag('normalize', options)
   const { value } = change
   const { document } = value
   const inlines = document.getInlinesAtRange(range)
@@ -980,7 +980,7 @@ Changes.setInlineAtRange = (change, range, properties, options = {}) => {
  */
 
 Changes.splitBlockAtRange = (change, range, height = 1, options = {}) => {
-  const { normalize = true } = options
+  const normalize = change.getFlag('normalize', options)
 
   if (range.isExpanded) {
     change.deleteAtRange(range, { normalize })
@@ -1014,7 +1014,7 @@ Changes.splitBlockAtRange = (change, range, height = 1, options = {}) => {
  */
 
 Changes.splitInlineAtRange = (change, range, height = Infinity, options = {}) => {
-  const { normalize = true } = options
+  const normalize = change.getFlag('normalize', options)
 
   if (range.isExpanded) {
     change.deleteAtRange(range, { normalize })
@@ -1053,7 +1053,7 @@ Changes.toggleMarkAtRange = (change, range, mark, options = {}) => {
 
   mark = Mark.create(mark)
 
-  const { normalize = true } = options
+  const normalize = change.getFlag('normalize', options)
   const { value } = change
   const { document } = value
   const marks = document.getActiveMarksAtRange(range)
@@ -1079,7 +1079,7 @@ Changes.toggleMarkAtRange = (change, range, mark, options = {}) => {
 Changes.unwrapBlockAtRange = (change, range, properties, options = {}) => {
   properties = Node.createProperties(properties)
 
-  const { normalize = true } = options
+  const normalize = change.getFlag('normalize', options)
   const { value } = change
   let { document } = value
   const blocks = document.getBlocksAtRange(range)
@@ -1171,7 +1171,7 @@ Changes.unwrapBlockAtRange = (change, range, properties, options = {}) => {
 Changes.unwrapInlineAtRange = (change, range, properties, options = {}) => {
   properties = Node.createProperties(properties)
 
-  const { normalize = true } = options
+  const normalize = change.getFlag('normalize', options)
   const { value } = change
   const { document } = value
   const texts = document.getTextsAtRange(range)
@@ -1218,7 +1218,7 @@ Changes.wrapBlockAtRange = (change, range, block, options = {}) => {
   block = Block.create(block)
   block = block.set('nodes', block.nodes.clear())
 
-  const { normalize = true } = options
+  const normalize = change.getFlag('normalize', options)
   const { value } = change
   const { document } = value
 
@@ -1288,7 +1288,7 @@ Changes.wrapBlockAtRange = (change, range, block, options = {}) => {
 Changes.wrapInlineAtRange = (change, range, inline, options = {}) => {
   const { value } = change
   let { document } = value
-  const { normalize = true } = options
+  const normalize = change.getFlag('normalize', options)
   const { startKey, startOffset, endKey, endOffset } = range
 
   if (range.isCollapsed) {
@@ -1397,7 +1397,7 @@ Changes.wrapInlineAtRange = (change, range, inline, options = {}) => {
  */
 
 Changes.wrapTextAtRange = (change, range, prefix, suffix = prefix, options = {}) => {
-  const { normalize = true } = options
+  const normalize = change.getFlag('normalize', options)
   const { startKey, endKey } = range
   const start = range.collapseToStart()
   let end = range.collapseToEnd()

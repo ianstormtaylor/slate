@@ -50,6 +50,33 @@ function onSomeEvent(event, change) {
 }
 ```
 
+### `withoutNormalization`
+`withoutNormalization(customChange: Function) => Change`
+
+This method calls the provided `customChange` function with the current instance of the `Change` object as the first argument. While `customChange` is executing, normalization is temporarily suppressed, but normalization will be executed once the `customChange` function completes execution.
+
+The purpose of `withoutNormalization` is to allow a sequence of change operations that should not be interrupted by normalization. For example:
+
+```js
+/**
+ * Only allow block nodes in documents.
+ *
+ * @type {Object}
+ */
+validateNode(node) {
+  if (node.object != 'document') return
+  const invalids = node.nodes.filter(n => n.object != 'block')
+  if (!invalids.size) return
+
+  return (change) => {
+    change.withoutNormalization((c) => {
+      invalids.forEach((child) => {
+        c.removeNodeByKey(child.key)
+      })
+    })
+  }
+}
+```
 
 ## Current Value Changes
 
