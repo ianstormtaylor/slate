@@ -1,6 +1,6 @@
 /** @jsx h */
 
-import { SchemaViolations } from '../../..'
+import { NODE_DATA_INVALID } from 'slate-schema-violations'
 import h from '../../helpers/h'
 
 export const schema = {
@@ -10,7 +10,7 @@ export const schema = {
         thing: v => v == 'value'
       },
       normalize: (change, reason, { node, key }) => {
-        if (reason == SchemaViolations.NodeDataInvalid) {
+        if (reason == NODE_DATA_INVALID) {
           change.setNodeByKey(node.key, { data: { thing: 'value' }})
         }
       }

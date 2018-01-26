@@ -1,6 +1,6 @@
 /** @jsx h */
 
-import { SchemaViolations } from '../../..'
+import { CHILD_OBJECT_INVALID } from 'slate-schema-violations'
 import h from '../../helpers/h'
 
 export const schema = {
@@ -12,7 +12,7 @@ export const schema = {
         { objects: ['block'], types: ['paragraph'], min: 1 }
       ],
       normalize: (change, reason, { node, child }) => {
-        if (reason == SchemaViolations.ChildObjectInvalid) {
+        if (reason == CHILD_OBJECT_INVALID) {
           change.wrapBlockByKey(child.key, 'paragraph')
         }
       }

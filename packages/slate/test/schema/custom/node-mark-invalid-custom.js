@@ -1,6 +1,6 @@
 /** @jsx h */
 
-import { SchemaViolations } from '../../..'
+import { NODE_MARK_INVALID } from 'slate-schema-violations'
 import h from '../../helpers/h'
 
 export const schema = {
@@ -8,7 +8,7 @@ export const schema = {
     paragraph: {
       marks: [{ type: 'bold' }],
       normalize: (change, reason, { node }) => {
-        if (reason == SchemaViolations.NodeMarkInvalid) {
+        if (reason == NODE_MARK_INVALID) {
           node.nodes.forEach(n => change.removeNodeByKey(n.key))
         }
       }

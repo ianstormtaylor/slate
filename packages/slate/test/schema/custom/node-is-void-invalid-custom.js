@@ -1,6 +1,6 @@
 /** @jsx h */
 
-import { SchemaViolations } from '../../..'
+import { NODE_IS_VOID_INVALID } from 'slate-schema-violations'
 import h from '../../helpers/h'
 
 export const schema = {
@@ -8,7 +8,7 @@ export const schema = {
     paragraph: {
       isVoid: false,
       normalize: (change, reason, { node }) => {
-        if (reason == SchemaViolations.NodeIsVoidInvalid) {
+        if (reason == NODE_IS_VOID_INVALID) {
           change.removeNodeByKey(node.key, 'paragraph')
         }
       }

@@ -144,11 +144,11 @@ Will validate a node's children. The `nodes` definitions can declare the `object
 > 🤖 The `nodes` array is order-sensitive! The example above will require that the first node be either an `image` or `video`, and that it be followed by one or more `paragraph` nodes.
 
 ### `normalize`
-`normalize(change: Change, reason: String, context: Object) => Void`
+`normalize(change: Change, violation: String, context: Object) => Void`
 
 ```js
 {
-  normalize: (change, reason, context) => {
+  normalize: (change, violation, context) => {
     case 'child_object_invalid':
       change.wrapBlockByKey(context.child.key, 'paragraph')
       return
@@ -161,7 +161,7 @@ Will validate a node's children. The `nodes` definitions can declare the `object
 
 A function that can be provided to override the default behavior in the case of a rule being invalid. By default Slate will do what it can, but since it doesn't know much about your schema, it will often remove invalid nodes. If you want to override this behavior, and "fix" the node instead of removing it, pass a custom `normalize` function.
 
-For more information on the arguments passed to `normalize`, see the [Invalid Reasons](#invalid-reasons) reference.
+For more information on the arguments passed to `normalize`, see the [Violations](#violations) reference.
 
 ### `parent`
 `Array`
@@ -212,162 +212,9 @@ Returns a boolean if the passed in argument is a `Schema`.
 Returns a JSON representation of the schema.
 
 
-## Invalid Reasons
+## Violations
 
-When supplying your own `normalize` property for a schema rule, it will be called with `(change, reason, context)`. The `reason` will be one of a set of reasons, and `context` will vary depending on the reason. Invalid reason constants are available through the`SchemaViolations` object.
+When supplying your own `normalize` property for a schema rule, it will be called with `(change, violation, context)`. The `violation` will be one of a set of potential violation strings, and `context` will vary depending on the violation. 
 
-`import { SchemaViolations } from 'slate'`
+A set of the invalid violation strings are available as constants via the [`slate-schema-violations`](../slate-schema-violations) package.
 
-Here's the full set:
-
-### `SchemaViolations.ChildObjectInvalid`
-
-```js
-{
-  child: Node,
-  index: Number,
-  node: Node,
-  rule: Object,
-}
-```
-
-### `SchemaViolations.ChildRequired`
-
-```js
-{
-  index: Number,
-  node: Node,
-  rule: Object,
-}
-```
-
-### `SchemaViolations.ChildTypeInvalid`
-
-```js
-{
-  child: Node,
-  index: Number,
-  node: Node,
-  rule: Object,
-}
-```
-
-### `SchemaViolations.ChildUnknown`
-
-```js
-{
-  child: Node,
-  index: Number,
-  node: Node,
-  rule: Object,
-}
-```
-
-### `SchemaViolations.FirstChildObjectInvalid`
-
-```js
-{
-  child: Node,
-  node: Node,
-  rule: Object,
-}
-```
-
-### `SchemaViolations.FirstChildTypeInvalid`
-
-```js
-{
-  child: Node,
-  node: Node,
-  rule: Object,
-}
-```
-
-### `SchemaViolations.LastChildObjectInvalid`
-
-```js
-{
-  child: Node,
-  node: Node,
-  rule: Object,
-}
-```
-
-### `SchemaViolations.LastChildTypeInvalid`
-
-```js
-{
-  child: Node,
-  node: Node,
-  rule: Object,
-}
-```
-
-### `SchemaViolations.NodeDataInvalid`
-
-```js
-{
-  key: String,
-  node: Node,
-  rule: Object,
-  value: Mixed,
-}
-```
-
-### `SchemaViolations.NodeIsVoidInvalid`
-
-```js
-{
-  node: Node,
-  rule: Object,
-}
-```
-
-### `SchemaViolations.NodeObjectInvalid`
-
-```js
-{
-  node: Node,
-  rule: Object,
-}
-```
-
-### `SchemaViolations.NodeMarkInvalid`
-
-```js
-{
-  mark: Mark,
-  node: Node,
-  rule: Object,
-}
-```
-
-### `SchemaViolations.NodeTextInvalid`
-
-```js
-{
-  text: String,
-  node: Node,
-  rule: Object,
-}
-```
-
-### `SchemaViolations.ParentObjectInvalid`
-
-```js
-{
-  node: Node,
-  parent: Node,
-  rule: Object,
-}
-```
-
-### `SchemaViolations.ParentTypeInvalid`
-
-```js
-{
-  node: Node,
-  parent: Node,
-  rule: Object,
-}
-```

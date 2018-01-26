@@ -5,48 +5,27 @@ import logger from 'slate-dev-logger'
 import mergeWith from 'lodash/mergeWith'
 import { Record } from 'immutable'
 
+import {
+  CHILD_OBJECT_INVALID,
+  CHILD_REQUIRED,
+  CHILD_TYPE_INVALID,
+  CHILD_UNKNOWN,
+  FIRST_CHILD_OBJECT_INVALID,
+  FIRST_CHILD_TYPE_INVALID,
+  LAST_CHILD_OBJECT_INVALID,
+  LAST_CHILD_TYPE_INVALID,
+  NODE_DATA_INVALID,
+  NODE_IS_VOID_INVALID,
+  NODE_MARK_INVALID,
+  NODE_TEXT_INVALID,
+  PARENT_OBJECT_INVALID,
+  PARENT_TYPE_INVALID,
+} from 'slate-schema-violations'
+
 import CORE_SCHEMA_RULES from '../constants/core-schema-rules'
 import MODEL_TYPES from '../constants/model-types'
 import Stack from './stack'
 import memoize from '../utils/memoize'
-
-/**
- * Validation failure reasons.
- *
- * @type {Object}
- */
-
-const CHILD_OBJECT_INVALID = 'child_object_invalid'
-const CHILD_REQUIRED = 'child_required'
-const CHILD_TYPE_INVALID = 'child_type_invalid'
-const CHILD_UNKNOWN = 'child_unknown'
-const FIRST_CHILD_OBJECT_INVALID = 'first_child_object_invalid'
-const FIRST_CHILD_TYPE_INVALID = 'first_child_type_invalid'
-const LAST_CHILD_OBJECT_INVALID = 'last_child_object_invalid'
-const LAST_CHILD_TYPE_INVALID = 'last_child_type_invalid'
-const NODE_DATA_INVALID = 'node_data_invalid'
-const NODE_IS_VOID_INVALID = 'node_is_void_invalid'
-const NODE_MARK_INVALID = 'node_mark_invalid'
-const NODE_TEXT_INVALID = 'node_text_invalid'
-const PARENT_OBJECT_INVALID = 'parent_object_invalid'
-const PARENT_TYPE_INVALID = 'parent_type_invalid'
-
-export const SchemaViolations = Object.freeze({
-  ChildObjectInvalid: CHILD_OBJECT_INVALID,
-  ChildRequired: CHILD_REQUIRED,
-  ChildTypeInvalid: CHILD_TYPE_INVALID,
-  ChildUnknown: CHILD_UNKNOWN,
-  FirstChildObjectInvalid: FIRST_CHILD_OBJECT_INVALID,
-  FirstChildTypeInvalid: FIRST_CHILD_TYPE_INVALID,
-  LastChildObjectInvalid: LAST_CHILD_OBJECT_INVALID,
-  LastChildTypeInvalid: LAST_CHILD_TYPE_INVALID,
-  NodeDataInvalid: NODE_DATA_INVALID,
-  NodeIsVoidInvalid: NODE_IS_VOID_INVALID,
-  NodeMarkInvalid: NODE_MARK_INVALID,
-  NodeTextInvalid: NODE_TEXT_INVALID,
-  ParentObjectInvalid: PARENT_OBJECT_INVALID,
-  ParentTypeInvalid: PARENT_TYPE_INVALID,
-})
 
 /**
  * Debug.
@@ -203,32 +182,32 @@ class Schema extends Record(DEFAULTS) {
   /**
    * Fail validation by returning a normalizing change function.
    *
-   * @param {String} reason
+   * @param {String} violation
    * @param {Object} context
    * @return {Function}
    */
 
-  fail(reason, context) {
+  fail(violation, context) {
     return (change) => {
-      debug(`normalizing`, { reason, context })
+      debug(`normalizing`, { violation, context })
       const { rule } = context
       const { size } = change.operations
-      if (rule.normalize) rule.normalize(change, reason, context)
+      if (rule.normalize) rule.normalize(change, violation, context)
       if (change.operations.size > size) return
-      this.normalize(change, reason, context)
+      this.normalize(change, violation, context)
     }
   }
 
   /**
-   * Normalize an invalid value with `reason` and `context`.
+   * Normalize an invalid value with `violation` and `context`.
    *
    * @param {Change} change
-   * @param {String} reason
+   * @param {String} violation
    * @param {Mixed} context
    */
 
-  normalize(change, reason, context) {
-    switch (reason) {
+  normalize(change, violation, context) {
+    switch (violation) {
       case CHILD_OBJECT_INVALID:
       case CHILD_TYPE_INVALID:
       case CHILD_UNKNOWN:

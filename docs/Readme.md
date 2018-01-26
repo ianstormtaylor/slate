@@ -73,4 +73,5 @@
 - [`slate-plain-serializer`](./reference/slate-plain-serializer/index.md)
 - [`slate-prop-types`](./reference/slate-prop-types/index.md)
 - [`slate-simulator`](./reference/slate-simulator/index.md)
+- [`slate-schema-violations`](./reference/slate-schema-violations/index.md)
 
