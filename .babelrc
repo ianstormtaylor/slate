@@ -1,9 +1,12 @@
 {
   "presets": [
-    "env",
+    ["env", {
+      "modules": false
+    }],
     "react",
     "stage-0"
   ],
+  plugins: ["external-helpers"],
   "env": {
     "test": {
       "plugins": ["transform-runtime"]
