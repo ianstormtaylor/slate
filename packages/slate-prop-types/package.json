@@ -4,10 +4,12 @@
   "version": "0.4.19",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
-  "main": "./lib/index.js",
+  "main": "./dist/cjs/slate-prop-types.js",
+  "module": "./dist/es/slate-prop-types.js",
+  "browser": "./dist/umd/slate-prop-types.js",
+  "browserMin": "./dist/umd/slate-prop-types.min.js",
   "files": [
-    "dist/",
-    "lib/"
+    "dist/"
   ],
   "dependencies": {
     "slate-dev-logger": "^0.1.37"
@@ -17,23 +19,19 @@
     "slate": "^0.32.1"
   },
   "devDependencies": {
-    "babel-cli": "^6.10.1",
-    "browserify": "^13.0.1",
     "mocha": "^2.5.3",
-    "slate": "^0.32.2",
-    "uglify-js": "^2.7.0"
+    "rollup": "^0.55.1",
+    "rollup-plugin-babel": "^3.0.3",
+    "rollup-plugin-commonjs": "^8.3.0",
+    "rollup-plugin-node-resolve": "^3.0.2",
+    "rollup-plugin-uglify": "^3.0.0",
+    "slate": "^0.32.2"
   },
   "scripts": {
-    "build": "babel --out-dir ./lib ./src",
-    "build:max": "mkdir -p ./dist && NODE_ENV=production browserify ./src/index.js --transform babelify --transform envify --transform [ browserify-global-shim --global ] --standalone SlatePropTypes > ./dist/slate-prop-types.js",
-    "build:min": "mkdir -p ./dist && NODE_ENV=production browserify ./src/index.js --transform babelify --transform envify --transform [ browserify-global-shim --global ] --transform uglifyify --standalone SlatePropTypes | uglifyjs > ./dist/slate-prop-types.min.js",
-    "clean": "rm -rf ./dist ./lib ./node_modules",
-    "prepublish": "yarn run build && yarn run build:max && yarn run build:min",
-    "watch": "babel --watch --out-dir ./lib ./src --source-maps inline"
-  },
-  "browserify-global-shim": {
-    "immutable": "Immutable",
-    "slate": "Slate"
+    "build": "rollup -c",
+    "clean": "rm -rf ./dist ./node_modules",
+    "prepublish": "yarn build",
+    "watch": "rollup -c -w"
   },
   "keywords": [
     "editor",
