@@ -22,7 +22,7 @@ export const output = (
   <value>
     <document>
       <paragraph>
-      <i><b>a</b></i><cursor />word
+        <i><b>a</b></i><cursor />word
       </paragraph>
     </document>
   </value>
