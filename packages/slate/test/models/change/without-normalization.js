@@ -2,8 +2,6 @@
 
 import h from '../../helpers/h'
 
-export const normalize = true
-
 export const flags = { }
 
 export const schema = {

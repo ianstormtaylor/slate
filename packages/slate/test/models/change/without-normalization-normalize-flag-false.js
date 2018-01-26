@@ -2,9 +2,8 @@
 
 import h from '../../helpers/h'
 
-export const normalize = false
 
-export const flags = { normalize }
+export const flags = { normalize: false }
 
 export const schema = {
   blocks: {
