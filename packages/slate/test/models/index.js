@@ -20,10 +20,9 @@ describe('models', () => {
           const { input, output, schema, flags, customChange } = module
           const s = Schema.create(schema)
           const expected = output.toJSON()
-          const change = input
+          const actual = input
             .change(flags)
             .setValue({ schema: s })
-          const actual = change
             .withoutNormalization(customChange)
             .value.toJSON()
 
