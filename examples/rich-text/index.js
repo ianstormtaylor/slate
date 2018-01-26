@@ -226,6 +226,7 @@ class RichTextExample extends React.Component {
     const onMouseDown = event => this.onClickMark(event, type)
 
     return (
+      // eslint-disable-next-line react/jsx-no-bind
       <span className="button" onMouseDown={onMouseDown} data-active={isActive}>
         <span className="material-icons">{icon}</span>
       </span>
@@ -245,6 +246,7 @@ class RichTextExample extends React.Component {
     const onMouseDown = event => this.onClickBlock(event, type)
 
     return (
+      // eslint-disable-next-line react/jsx-no-bind
       <span className="button" onMouseDown={onMouseDown} data-active={isActive}>
         <span className="material-icons">{icon}</span>
       </span>

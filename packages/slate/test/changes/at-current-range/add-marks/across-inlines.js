@@ -29,7 +29,7 @@ export const output = (
       </paragraph>
       <paragraph>
         <link>
-        <i><b>an</b></i><focus />other
+          <i><b>an</b></i><focus />other
         </link>
       </paragraph>
     </document>

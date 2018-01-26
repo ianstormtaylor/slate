@@ -100,6 +100,7 @@ class Emojis extends React.Component {
         {EMOJIS.map((emoji, i) => {
           const onMouseDown = e => this.onClickEmoji(e, emoji)
           return (
+            // eslint-disable-next-line react/jsx-no-bind
             <span key={i} className="button" onMouseDown={onMouseDown}>
               <span className="material-icons">{emoji}</span>
             </span>

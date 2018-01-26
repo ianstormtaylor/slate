@@ -14,7 +14,7 @@ export const input = (
       </paragraph>
       <paragraph>
         <text key="a">one</text>
-    </paragraph>
+      </paragraph>
     </document>
   </value>
 )
