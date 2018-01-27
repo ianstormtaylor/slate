@@ -7,6 +7,7 @@
   "main": "./dist/cjs/slate-dev-logger.js",
   "module": "./dist/es/slate-dev-logger.js",
   "browser": "./dist/umd/slate-dev-logger.js",
+  "browserMin": "./dist/umd/slate-dev-logger.min.js",
   "files": [
     "dist/"
   ],

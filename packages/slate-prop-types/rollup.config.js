@@ -19,7 +19,6 @@ const umdConfig = {
   external: [
     'immutable',
     'slate',
-    'slate-dev-logger',
   ],
   plugins: [
     resolve(),
@@ -27,7 +26,7 @@ const umdConfig = {
       exclude: ['src/**'],
     }),
     babel({
-      exclude: ['node_modules/**']
+      include: ['src/**']
     }),
   ]
 }
@@ -56,7 +55,7 @@ export default [
     plugins: [
       resolve(),
       babel({
-        exclude: ['node_modules/**']
+        include: ['src/**']
       }),
     ]
   }

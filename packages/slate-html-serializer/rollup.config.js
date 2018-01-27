@@ -32,7 +32,7 @@ const umdConfig = {
       exclude: ['src/**'],
     }),
     babel({
-      exclude: ['node_modules/**']
+      include: ['src/**']
     }),
   ]
 }
@@ -65,7 +65,7 @@ export default [
     plugins: [
       resolve(),
       babel({
-        exclude: ['node_modules/**']
+        include: ['src/**']
       }),
     ]
   }

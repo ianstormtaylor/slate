@@ -13,6 +13,7 @@ const umdConfig = {
     format: 'umd',
     exports: 'named',
     globals: {
+      immutable: 'Immutable',
       react: 'React',
       'react-dom': 'ReactDOM',
       'react-dom/server': 'ReactDOMServer',
@@ -20,6 +21,7 @@ const umdConfig = {
     },
   },
   external: [
+    'immutable',
     'react',
     'react-dom',
     'react-dom/server',
@@ -54,6 +56,7 @@ export default [
     external: [
       'debug',
       'get-window',
+      'immutable',
       'is-hotkey',
       'is-in-browser',
       'is-window',
@@ -79,7 +82,7 @@ export default [
     plugins: [
       resolve(),
       babel({
-        exclude: ['node_modules/**']
+        include: ['src/**']
       }),
     ]
   }

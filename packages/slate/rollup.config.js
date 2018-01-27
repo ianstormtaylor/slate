@@ -31,7 +31,7 @@ const umdConfig = {
     }),
     builtins(),
     babel({
-      exclude: ['node_modules/**']
+      include: ['src/**']
     }),
   ]
 }
@@ -55,10 +55,12 @@ export default [
       'immutable',
       'is-empty',
       'is-plain-object',
+      'lodash',
       'lodash/isEqual',
       'lodash/mergeWith',
       'lodash/omit',
       'lodash/pick',
+      'react',
       'slate-dev-logger',
       'type-of',
     ],
@@ -69,7 +71,7 @@ export default [
     plugins: [
       resolve(),
       babel({
-        exclude: ['node_modules/**']
+        include: ['src/**']
       }),
     ]
   }

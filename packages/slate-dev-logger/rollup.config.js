@@ -1,6 +1,5 @@
 import resolve from 'rollup-plugin-node-resolve'
 import commonjs from 'rollup-plugin-commonjs'
-import builtins from 'rollup-plugin-node-builtins'
 import babel from 'rollup-plugin-babel'
 import uglify from 'rollup-plugin-uglify'
 import pkg from './package.json'
@@ -14,15 +13,12 @@ const umdConfig = {
     exports: 'named',
   },
   plugins: [
-    resolve({
-      preferBuiltins: false,
-    }),
+    resolve(),
     commonjs({
       exclude: ['src/**'],
     }),
-    builtins(),
     babel({
-      exclude: ['node_modules/**']
+      include: ['src/**']
     }),
   ]
 }
@@ -46,7 +42,7 @@ export default [
     plugins: [
       resolve(),
       babel({
-        exclude: ['node_modules/**']
+        include: ['src/**']
       }),
     ]
   }
