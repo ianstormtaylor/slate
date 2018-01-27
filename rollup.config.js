@@ -7,6 +7,8 @@ import babel from 'rollup-plugin-babel'
 import uglify from 'rollup-plugin-uglify'
 import pkg from './package.json'
 
+const configurations = []
+
 const umdConfig = {
   input: 'examples/index.js',
   output: {
@@ -34,18 +36,23 @@ const umdConfig = {
     babel({
       include: ['examples/**']
     }),
-  ]
+  ],
+  watch: {
+    include: ['examples/**'],
+  },
 }
 
-const umdConfigMin = Object.assign({}, umdConfig)
-umdConfigMin.output = Object.assign({}, umdConfig.output, { file: pkg.browserMin })
-const prodReplace = replace({ 'process.env.NODE_ENV': JSON.stringify('production') })
-umdConfigMin.plugins = umdConfig.plugins.slice(0).concat(prodReplace, uglify())
+configurations.push(umdConfig)
+
+if (!process.env.ROLLUP_WATCH) {
+  const umdConfigMin = Object.assign({}, umdConfig)
+  umdConfigMin.output = Object.assign({}, umdConfig.output, { file: pkg.browserMin })
+  const prodReplace = replace({ 'process.env.NODE_ENV': JSON.stringify('production') })
+  umdConfigMin.plugins = umdConfig.plugins.slice(0).concat(prodReplace, uglify())
+
+  configurations.push(umdConfigMin)
+}
 
 umdConfig.plugins.push(replace({ 'process.env.NODE_ENV': JSON.stringify('development') }))
 
-export default [
-  // UMD build for browsers
-  umdConfig,
-  umdConfigMin,
-]
+export default configurations

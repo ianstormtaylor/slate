@@ -5,6 +5,7 @@ import babel from 'rollup-plugin-babel'
 import uglify from 'rollup-plugin-uglify'
 import pkg from './package.json'
 
+// UMD build for browsers
 const umdConfig = {
   input: 'src/index.js',
   output: {
@@ -41,49 +42,51 @@ const umdConfig = {
   ]
 }
 
+// Additional UMD minified build based off of the unminified config
 const umdConfigMin = Object.assign({}, umdConfig)
 umdConfigMin.output = Object.assign({}, umdConfig.output, { file: pkg.browserMin })
 umdConfigMin.plugins = umdConfig.plugins.slice(0).concat(uglify())
 
-export default [
-  // UMD build for browsers
-  umdConfig,
-  umdConfigMin,
+// CommonJS (for Node) and ES module (for bundlers) build.
+const moduleConfig = {
+  input: 'src/index.js',
+  external: [
+    'debug',
+    'get-window',
+    'immutable',
+    'is-hotkey',
+    'is-in-browser',
+    'is-window',
+    'keycode',
+    'lodash.throttle',
+    'prop-types',
+    'react',
+    'react-dom',
+    'react-dom/server',
+    'react-immutable-proptypes',
+    'react-portal',
+    'selection-is-backward',
+    'slate',
+    'slate-base64-serializer',
+    'slate-dev-logger',
+    'slate-plain-serializer',
+    'slate-prop-types',
+  ],
+  output: [
+    { file: pkg.main, format: 'cjs', exports: 'named' },
+    { file: pkg.module, format: 'es' }
+  ],
+  plugins: [
+    resolve(),
+    babel({
+      include: ['src/**']
+    }),
+  ]
+}
 
-  // CommonJS (for Node) and ES module (for bundlers) build.
-  {
-    input: 'src/index.js',
-    external: [
-      'debug',
-      'get-window',
-      'immutable',
-      'is-hotkey',
-      'is-in-browser',
-      'is-window',
-      'keycode',
-      'lodash.throttle',
-      'prop-types',
-      'react',
-      'react-dom',
-      'react-dom/server',
-      'react-immutable-proptypes',
-      'react-portal',
-      'selection-is-backward',
-      'slate',
-      'slate-base64-serializer',
-      'slate-dev-logger',
-      'slate-plain-serializer',
-      'slate-prop-types',
-    ],
-    output: [
-      { file: pkg.main, format: 'cjs', exports: 'named' },
-      { file: pkg.module, format: 'es' }
-    ],
-    plugins: [
-      resolve(),
-      babel({
-        include: ['src/**']
-      }),
-    ]
-  }
-]
+const configurations = [moduleConfig]
+if (!process.env.ROLLUP_WATCH) {
+  configurations.push(umdConfig, umdConfigMin)
+}
+
+export default configurations
