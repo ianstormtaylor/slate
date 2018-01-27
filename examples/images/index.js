@@ -1,6 +1,7 @@
 
 import { Editor, getEventRange, getEventTransfer } from 'slate-react'
-import { Block, Value, SchemaViolations } from 'slate'
+import { Block, Value } from 'slate'
+import { LAST_CHILD_TYPE_INVALID } from 'slate-schema-violations'
 
 import React from 'react'
 import initialValue from './value.json'
@@ -38,7 +39,7 @@ const schema = {
     last: { types: ['paragraph'] },
     normalize: (change, reason, { node, child }) => {
       switch (reason) {
-        case SchemaViolations.LastChildTypeInvalid: {
+        case LAST_CHILD_TYPE_INVALID: {
           const paragraph = Block.create('paragraph')
           return change.insertNodeByKey(node.key, node.nodes.size, paragraph)
         }
