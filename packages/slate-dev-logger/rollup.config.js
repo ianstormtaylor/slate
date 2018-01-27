@@ -3,6 +3,7 @@ import commonjs from 'rollup-plugin-commonjs'
 import replace from 'rollup-plugin-replace'
 import babel from 'rollup-plugin-babel'
 import uglify from 'rollup-plugin-uglify'
+import sourcemaps from 'rollup-plugin-sourcemaps'
 import pkg from './package.json'
 
 // UMD build for browsers
@@ -37,8 +38,8 @@ umdConfigMin.plugins = umdConfig.plugins.slice(0).concat(uglify())
 const moduleConfig = {
   input: 'src/index.js',
   output: [
-    { file: pkg.main, format: 'cjs', exports: 'named' },
-    { file: pkg.module, format: 'es' }
+    { file: pkg.main, format: 'cjs', exports: 'named', sourcemap: process.env.ROLLUP_WATCH },
+    { file: pkg.module, format: 'es', sourcemap: process.env.ROLLUP_WATCH }
   ],
   plugins: [
     resolve(),
@@ -52,7 +53,9 @@ const moduleConfig = {
 }
 
 const configurations = [moduleConfig]
-if (!process.env.ROLLUP_WATCH) {
+if (process.env.ROLLUP_WATCH) {
+  moduleConfig.plugins.push(sourcemaps())
+} else {
   configurations.push(umdConfig, umdConfigMin)
 }
 

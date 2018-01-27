@@ -5,6 +5,7 @@ import builtins from 'rollup-plugin-node-builtins'
 import replace from 'rollup-plugin-replace'
 import babel from 'rollup-plugin-babel'
 import uglify from 'rollup-plugin-uglify'
+import sourcemaps from 'rollup-plugin-sourcemaps'
 import pkg from './package.json'
 
 const configurations = []
@@ -16,9 +17,8 @@ const umdConfig = {
     name: 'slate-examples',
     format: 'umd',
     exports: 'named',
+    sourcemap: process.env.ROLLUP_WATCH,
   },
-  external: [
-  ],
   plugins: [
     resolve({
       preferBuiltins: false,
@@ -44,7 +44,9 @@ const umdConfig = {
 
 configurations.push(umdConfig)
 
-if (!process.env.ROLLUP_WATCH) {
+if (process.env.ROLLUP_WATCH) {
+  umdConfig.plugins.push(sourcemaps())
+} else {
   const umdConfigMin = Object.assign({}, umdConfig)
   umdConfigMin.output = Object.assign({}, umdConfig.output, { file: pkg.browserMin })
   const prodReplace = replace({ 'process.env.NODE_ENV': JSON.stringify('production') })

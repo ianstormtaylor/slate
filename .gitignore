@@ -1,6 +1,7 @@
 # Build files.
 dist
 examples/build.dev.js
+examples/build.dev.js.map
 examples/build.prod.js
 lib
 
