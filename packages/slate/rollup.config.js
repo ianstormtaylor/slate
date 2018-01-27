@@ -1,6 +1,7 @@
+import path from 'path'
+import alias from 'rollup-plugin-alias'
 import resolve from 'rollup-plugin-node-resolve'
 import commonjs from 'rollup-plugin-commonjs'
-import builtins from 'rollup-plugin-node-builtins'
 import babel from 'rollup-plugin-babel'
 import replace from 'rollup-plugin-replace'
 import uglify from 'rollup-plugin-uglify'
@@ -23,6 +24,9 @@ const umdConfig = {
     'immutable',
   ],
   plugins: [
+    alias({
+      debug: path.resolve(__dirname, '..', '..', 'node_modules', 'debug', 'src', 'browser'),
+    }),
     resolve({
       preferBuiltins: false,
     }),
@@ -32,7 +36,6 @@ const umdConfig = {
         esrever: ['reverse'],
       },
     }),
-    builtins(),
     replace({
       'process.env.NODE_ENV': JSON.stringify('production')
     }),

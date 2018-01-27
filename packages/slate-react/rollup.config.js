@@ -1,6 +1,7 @@
+import path from 'path'
+import alias from 'rollup-plugin-alias'
 import resolve from 'rollup-plugin-node-resolve'
 import commonjs from 'rollup-plugin-commonjs'
-import builtins from 'rollup-plugin-node-builtins'
 import babel from 'rollup-plugin-babel'
 import uglify from 'rollup-plugin-uglify'
 import sourcemaps from 'rollup-plugin-sourcemaps'
@@ -18,7 +19,6 @@ const umdConfig = {
       immutable: 'Immutable',
       react: 'React',
       'react-dom': 'ReactDOM',
-      'react-dom/server': 'ReactDOMServer',
       slate: 'Slate',
     },
   },
@@ -26,17 +26,18 @@ const umdConfig = {
     'immutable',
     'react',
     'react-dom',
-    'react-dom/server',
     'slate',
   ],
   plugins: [
+    alias({
+      debug: path.resolve(__dirname, '..', '..', 'node_modules', 'debug', 'src', 'browser'),
+    }),
     resolve({
       preferBuiltins: false,
     }),
     commonjs({
       exclude: ['src/**'],
     }),
-    builtins(),
     babel({
       include: ['src/**']
     }),
@@ -63,7 +64,6 @@ const moduleConfig = {
     'prop-types',
     'react',
     'react-dom',
-    'react-dom/server',
     'react-immutable-proptypes',
     'react-portal',
     'selection-is-backward',

@@ -1,7 +1,8 @@
+import path from 'path'
+import alias from 'rollup-plugin-alias'
 import resolve from 'rollup-plugin-node-resolve'
 import commonjs from 'rollup-plugin-commonjs'
 import json from 'rollup-plugin-json'
-import builtins from 'rollup-plugin-node-builtins'
 import replace from 'rollup-plugin-replace'
 import babel from 'rollup-plugin-babel'
 import uglify from 'rollup-plugin-uglify'
@@ -20,6 +21,9 @@ const umdConfig = {
     sourcemap: process.env.ROLLUP_WATCH,
   },
   plugins: [
+    alias({
+      debug: path.resolve(__dirname, 'node_modules', 'debug', 'src', 'browser'),
+    }),
     resolve({
       preferBuiltins: false,
     }),
@@ -29,10 +33,10 @@ const umdConfig = {
         esrever: ['reverse'],
         'immutable': ['List', 'Map', 'Record', 'OrderedSet', 'Set', 'Stack', 'is'],
         'react-dom': ['findDOMNode'],
+        'react-dom/server': ['renderToStaticMarkup'],
       },
     }),
     json(),
-    builtins(),
     babel({
       include: ['examples/**']
     }),
