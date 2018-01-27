@@ -73,6 +73,7 @@
     "bootstrap": "lerna bootstrap && yarn run build",
     "build": "yarn run build:packages",
     "build:examples": "rollup -c",
+    "build:packages": "lerna run build",
     "clean": "lerna run clean && rm -rf ./node_modules ./dist ./examples/build.*.js",
     "gh-pages": "yarn run build && yarn run build:examples && gh-pages --dist ./examples",
     "lint": "eslint packages/*/src packages/*/test examples/*/*.js examples/dev/*/*.js",

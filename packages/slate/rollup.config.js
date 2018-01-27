@@ -2,6 +2,7 @@ import resolve from 'rollup-plugin-node-resolve'
 import commonjs from 'rollup-plugin-commonjs'
 import builtins from 'rollup-plugin-node-builtins'
 import babel from 'rollup-plugin-babel'
+import replace from 'rollup-plugin-replace'
 import uglify from 'rollup-plugin-uglify'
 import pkg from './package.json'
 
@@ -30,6 +31,9 @@ const umdConfig = {
       },
     }),
     builtins(),
+    replace({
+      'process.env.NODE_ENV': JSON.stringify('production')
+    }),
     babel({
       include: ['src/**']
     }),
@@ -70,6 +74,9 @@ export default [
     ],
     plugins: [
       resolve(),
+      replace({
+        'process.env.NODE_ENV': JSON.stringify('production')
+      }),
       babel({
         include: ['src/**']
       }),
