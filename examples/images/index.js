@@ -5,8 +5,19 @@ import { LAST_CHILD_TYPE_INVALID } from 'slate-schema-violations'
 
 import React from 'react'
 import initialValue from './value.json'
-import isImage from 'is-image'
+import imageExtensions from 'image-extensions'
 import isUrl from 'is-url'
+
+/*
+ * A function to determine whether a URL has an image extension.
+ *
+ * @param {String} url
+ * @return {Boolean}
+ */
+
+function isImage(url) {
+  return !!imageExtensions.find(url.endsWith)
+}
 
 /**
  * A change function to standardize inserting images.
