@@ -4,6 +4,7 @@ import logger from 'slate-dev-logger'
 import { Record, Set, List, Map } from 'immutable'
 
 import MODEL_TYPES from '../constants/model-types'
+import Change from './change'
 import Data from './data'
 import Document from './document'
 import History from './history'
@@ -621,7 +622,6 @@ class Value extends Record(DEFAULTS) {
    */
 
   change(attrs = {}) {
-    const Change = require('./change').default
     return new Change({ ...attrs, value: this })
   }
 
