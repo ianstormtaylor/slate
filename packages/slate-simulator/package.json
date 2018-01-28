@@ -9,7 +9,10 @@
   "browser": "./dist/umd/slate-simulator.js",
   "browserMin": "./dist/umd/slate-simulator.min.js",
   "files": [
-    "dist/"
+    "dist/cjs/slate-simulator.js",
+    "dist/es/slate-simulator.js",
+    "dist/umd/slate-simulator.js",
+    "dist/umd/slate-simulator.min.js"
   ],
   "peerDependencies": {
     "slate": "^0.32.1"

@@ -9,7 +9,10 @@
   "browser": "./dist/umd/slate-react.js",
   "browserMin": "./dist/umd/slate-react.min.js",
   "files": [
-    "dist/"
+    "dist/cjs/slate-react.js",
+    "dist/es/slate-react.js",
+    "dist/umd/slate-react.js",
+    "dist/umd/slate-react.min.js"
   ],
   "dependencies": {
     "debug": "^2.3.2",

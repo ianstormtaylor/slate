@@ -9,7 +9,10 @@
   "browser": "./dist/umd/slate-schema-violations.js",
   "browserMin": "./dist/umd/slate-schema-violations.min.js",
   "files": [
-    "dist/"
+    "dist/cjs/slate-schema-violations.js",
+    "dist/es/slate-schema-violations.js",
+    "dist/umd/slate-schema-violations.js",
+    "dist/umd/slate-schema-violations.min.js"
   ],
   "devDependencies": {
     "mocha": "^2.5.3",

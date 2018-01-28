@@ -9,7 +9,10 @@
   "browser": "./dist/umd/slate-base64-serializer.js",
   "browserMin": "./dist/umd/slate-base64-serializer.min.js",
   "files": [
-    "dist/"
+    "dist/cjs/slate-base64-serializer.js",
+    "dist/es/slate-base64-serializer.js",
+    "dist/umd/slate-base64-serializer.js",
+    "dist/umd/slate-base64-serializer.min.js"
   ],
   "peerDependencies": {
     "slate": "^0.32.1"

@@ -9,7 +9,10 @@
   "browser": "./dist/umd/slate-plain-serializer.js",
   "browserMin": "./dist/umd/slate-plain-serializer.min.js",
   "files": [
-    "dist/"
+    "dist/cjs/slate-plain-serializer.js",
+    "dist/es/slate-plain-serializer.js",
+    "dist/umd/slate-plain-serializer.js",
+    "dist/umd/slate-plain-serializer.min.js"
   ],
   "dependencies": {
     "slate-dev-logger": "^0.1.37"

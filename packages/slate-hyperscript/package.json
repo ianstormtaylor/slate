@@ -9,7 +9,10 @@
   "browser": "./dist/umd/slate-hyperscript.js",
   "browserMin": "./dist/umd/slate-hyperscript.min.js",
   "files": [
-    "dist/"
+    "dist/cjs/slate-hyperscript.js",
+    "dist/es/slate-hyperscript.js",
+    "dist/umd/slate-hyperscript.js",
+    "dist/umd/slate-hyperscript.min.js"
   ],
   "dependencies": {
     "is-empty": "^1.0.0",

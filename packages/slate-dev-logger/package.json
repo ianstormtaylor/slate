@@ -9,7 +9,10 @@
   "browser": "./dist/umd/slate-dev-logger.js",
   "browserMin": "./dist/umd/slate-dev-logger.min.js",
   "files": [
-    "dist/"
+    "dist/cjs/slate-dev-logger.js",
+    "dist/es/slate-dev-logger.js",
+    "dist/umd/slate-dev-logger.js",
+    "dist/umd/slate-dev-logger.min.js"
   ],
   "devDependencies": {
     "mocha": "^2.5.3",
