@@ -25,9 +25,7 @@ const umdConfig = {
       debug: path.resolve(__dirname, 'node_modules', 'debug', 'src', 'browser'),
       'react-dom/server': path.resolve(__dirname, 'node_modules', 'react-dom', 'cjs', 'react-dom-server.browser.production.min'),
     }),
-    resolve({
-      preferBuiltins: false,
-    }),
+    resolve(),
     commonjs({
       exclude: ['examples/**'],
       namedExports: {

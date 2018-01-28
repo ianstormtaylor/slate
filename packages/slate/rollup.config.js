@@ -27,9 +27,7 @@ const umdConfig = {
     alias({
       debug: path.resolve(__dirname, '..', '..', 'node_modules', 'debug', 'src', 'browser'),
     }),
-    resolve({
-      preferBuiltins: false,
-    }),
+    resolve(),
     commonjs({
       exclude: ['src/**'],
       namedExports: {
