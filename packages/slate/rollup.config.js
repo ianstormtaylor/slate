@@ -13,7 +13,7 @@ const umdConfig = {
   input: 'src/index.js',
   output: {
     file: pkg.browser,
-    name: 'slate',
+    name: 'Slate',
     format: 'umd',
     exports: 'named',
     globals: {

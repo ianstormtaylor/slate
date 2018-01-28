@@ -10,7 +10,7 @@ const umdConfig = {
   input: 'src/index.js',
   output: {
     file: pkg.browser,
-    name: 'slate-prop-types',
+    name: 'SlatePropTypes',
     format: 'umd',
     exports: 'named',
     globals: {

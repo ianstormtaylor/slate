@@ -3,6 +3,7 @@ import alias from 'rollup-plugin-alias'
 import resolve from 'rollup-plugin-node-resolve'
 import commonjs from 'rollup-plugin-commonjs'
 import babel from 'rollup-plugin-babel'
+import replace from 'rollup-plugin-replace'
 import uglify from 'rollup-plugin-uglify'
 import sourcemaps from 'rollup-plugin-sourcemaps'
 import pkg from './package.json'
@@ -12,7 +13,7 @@ const umdConfig = {
   input: 'src/index.js',
   output: {
     file: pkg.browser,
-    name: 'slate-react',
+    name: 'SlateReact',
     format: 'umd',
     exports: 'named',
     globals: {
@@ -35,6 +36,9 @@ const umdConfig = {
     resolve(),
     commonjs({
       exclude: ['src/**'],
+    }),
+    replace({
+      'process.env.NODE_ENV': JSON.stringify('production')
     }),
     babel({
       include: ['src/**']
@@ -77,6 +81,9 @@ const moduleConfig = {
   ],
   plugins: [
     resolve(),
+    replace({
+      'process.env.NODE_ENV': JSON.stringify('production')
+    }),
     babel({
       include: ['src/**']
     }),

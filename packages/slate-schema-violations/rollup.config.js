@@ -10,7 +10,7 @@ const umdConfig = {
   input: 'src/index.js',
   output: {
     file: pkg.browser,
-    name: 'slate-schema-violations',
+    name: 'SlateSchemaViolations',
     format: 'umd',
     exports: 'named',
   },

@@ -11,7 +11,7 @@ const umdConfig = {
   input: 'src/index.js',
   output: {
     file: pkg.browser,
-    name: 'slate-dev-logger',
+    name: 'SlateDevLogger',
     format: 'umd',
     exports: 'named',
   },

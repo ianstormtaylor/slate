@@ -10,7 +10,7 @@ const umdConfig = {
   input: 'src/index.js',
   output: {
     file: pkg.browser,
-    name: 'slate-simulator',
+    name: 'SlateSimulator',
     format: 'umd',
     exports: 'named',
     globals: {

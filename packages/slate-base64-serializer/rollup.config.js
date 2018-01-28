@@ -10,7 +10,7 @@ const umdConfig = {
   input: 'src/index.js',
   output: {
     file: pkg.browser,
-    name: 'slate-base64-serializer',
+    name: 'SlateBase64Serializer',
     format: 'umd',
     exports: 'named',
     globals: {

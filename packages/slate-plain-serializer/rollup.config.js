@@ -10,7 +10,7 @@ const umdConfig = {
   input: 'src/index.js',
   output: {
     file: pkg.browser,
-    name: 'slate-plain-serializer',
+    name: 'SlatePlainSerializer',
     format: 'umd',
     exports: 'named',
     globals: {
