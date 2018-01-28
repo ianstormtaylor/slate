@@ -58,7 +58,7 @@ const moduleConfig = {
     'is-in-browser',
     'is-window',
     'keycode',
-    'lodash.throttle',
+    'lodash/throttle',
     'prop-types',
     'react',
     'react-dom',

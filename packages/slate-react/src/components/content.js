@@ -4,7 +4,7 @@ import React from 'react'
 import Types from 'prop-types'
 import getWindow from 'get-window'
 import logger from 'slate-dev-logger'
-import throttle from 'lodash.throttle'
+import throttle from 'lodash/throttle'
 
 import EVENT_HANDLERS from '../constants/event-handlers'
 import Node from './node'
