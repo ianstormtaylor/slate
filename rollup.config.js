@@ -43,7 +43,10 @@ const umdConfig = {
     }),
   ],
   watch: {
-    include: ['examples/**'],
+    include: [
+      'examples/**',
+      'packages/*/dist/**',
+    ],
   },
 }
 
