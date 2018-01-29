@@ -460,7 +460,7 @@ function AfterPlugin() {
     }
 
     if (HOTKEYS.EXTEND_CHAR_FORWARD(event)) {
-      const { document, isInVoid, nextText, startText, endText } = value
+      const { document, isInVoid, nextText, startText } = value
       const isNextInVoid = nextText && document.hasVoidParent(nextText.key)
       if (isInVoid || isNextInVoid || startText.text == '') {
         event.preventDefault()
