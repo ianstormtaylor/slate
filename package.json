@@ -77,7 +77,7 @@
     "build:packages": "lerna run build",
     "clean": "lerna run clean && rm -rf ./node_modules ./dist ./examples/build.*.js",
     "gh-pages": "yarn run build && yarn run build:examples && gh-pages --dist ./examples",
-    "lint": "eslint packages/*/src packages/*/test examples/*/*.js examples/dev/*/*.js",
+    "lint": "eslint packages/*/src packages/*/test packages/*/rollup.config.js examples/*/*.js examples/dev/*/*.js",
     "open": "open http://localhost:8080/dev.html",
     "release": "yarn run test && yarn run lint && lerna publish && yarn run gh-pages",
     "start": "http-server ./examples",
