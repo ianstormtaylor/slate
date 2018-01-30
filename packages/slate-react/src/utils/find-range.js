@@ -52,7 +52,7 @@ function findRange(native, value) {
     }
   }
 
-  let range = Range.create({
+  const range = Range.create({
     anchorKey: anchor.key,
     anchorOffset: anchor.offset,
     focusKey: focus.key,
