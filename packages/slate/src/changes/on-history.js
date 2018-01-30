@@ -1,5 +1,6 @@
 
 import invert from '../operations/invert'
+import Operation from '../models/operation'
 import omit from 'lodash/omit'
 
 /**
@@ -30,7 +31,7 @@ Changes.redo = (change) => {
   undos = undos.push(next)
 
   // Replay the next operations.
-  next.forEach((op) => {
+  next.map(json => Operation.fromJSON(json)).forEach((op) => {
     const { type, properties } = op
 
     // When the operation mutates the selection, omit its `isFocused` value to
@@ -69,7 +70,7 @@ Changes.undo = (change) => {
   redos = redos.push(previous)
 
   // Replay the inverse of the previous operations.
-  previous.slice().reverse().map(invert).forEach((inverse) => {
+  previous.slice().reverse().map(json => invert(Operation.fromJSON(json))).forEach((inverse) => {
     const { type, properties } = inverse
 
     // When the operation mutates the selection, omit its `isFocused` value to

@@ -103,7 +103,7 @@ class Operation extends Record(DEFAULTS) {
         // Skip keys for objects that should not be serialized, and are only used
         // for providing the local-only invert behavior for the history stack.
         if (key == 'document') continue
-        if (key == 'selection') continue
+        if (key == 'selection' && type != 'set_selection') continue
         if (key == 'value') continue
         if (key == 'node' && type != 'insert_node') continue
 
@@ -139,20 +139,7 @@ class Operation extends Record(DEFAULTS) {
       }
 
       if (key == 'properties' && type == 'set_selection') {
-        const { anchorKey, focusKey, ...rest } = v
-        v = Range.createProperties(rest)
-
-        if (anchorKey !== undefined) {
-          v.anchorPath = anchorKey === null
-            ? null
-            : value.document.getPath(anchorKey)
-        }
-
-        if (focusKey !== undefined) {
-          v.focusPath = focusKey === null
-            ? null
-            : value.document.getPath(focusKey)
-        }
+        v = Range.createProperties(v)
       }
 
       if (key == 'properties' && type == 'set_value') {
@@ -227,11 +214,11 @@ class Operation extends Record(DEFAULTS) {
       // Skip keys for objects that should not be serialized, and are only used
       // for providing the local-only invert behavior for the history stack.
       if (key == 'document') continue
-      if (key == 'selection') continue
+      if (key == 'selection' && type != 'set_selection') continue
       if (key == 'value') continue
       if (key == 'node' && type != 'insert_node') continue
 
-      if (key == 'mark' || key == 'marks' || key == 'node') {
+      if (key == 'mark' || key == 'marks' || key == 'node' || key == 'selection') {
         value = value.toJSON()
       }
 
@@ -252,10 +239,10 @@ class Operation extends Record(DEFAULTS) {
 
       if (key == 'properties' && type == 'set_selection') {
         const v = {}
+        if ('anchorKey' in value) v.anchorKey = value.anchorKey
         if ('anchorOffset' in value) v.anchorOffset = value.anchorOffset
-        if ('anchorPath' in value) v.anchorPath = value.anchorPath
+        if ('focusKey' in value) v.focusKey = value.focusKey
         if ('focusOffset' in value) v.focusOffset = value.focusOffset
-        if ('focusPath' in value) v.focusPath = value.focusPath
         if ('isBackward' in value) v.isBackward = value.isBackward
         if ('isFocused' in value) v.isFocused = value.isFocused
         if ('marks' in value) v.marks = value.marks == null ? null : value.marks.toJSON()

@@ -170,39 +170,9 @@ function invertOperation(op) {
    */
 
   if (type == 'set_selection') {
-    const { properties, selection, value } = op
-    const { anchorPath, focusPath, ...props } = properties
-    const { document } = value
-
-    if (anchorPath !== undefined) {
-      props.anchorKey = anchorPath === null
-        ? null
-        : document.assertPath(anchorPath).key
-    }
-
-    if (focusPath !== undefined) {
-      props.focusKey = focusPath === null
-        ? null
-        : document.assertPath(focusPath).key
-    }
-
-    const inverseSelection = selection.merge(props)
-    const inverseProps = pick(selection, Object.keys(props))
-
-    if (anchorPath !== undefined) {
-      inverseProps.anchorPath = inverseProps.anchorKey === null
-        ? null
-        : document.getPath(inverseProps.anchorKey)
-      delete inverseProps.anchorKey
-    }
-
-    if (focusPath !== undefined) {
-      inverseProps.focusPath = inverseProps.focusKey === null
-        ? null
-        : document.getPath(inverseProps.focusKey)
-      delete inverseProps.focusKey
-    }
-
+    const { properties, selection } = op
+    const inverseSelection = selection.merge(properties)
+    const inverseProps = pick(selection, Object.keys(properties))
     const inverse = op.set('selection', inverseSelection).set('properties', inverseProps)
     return inverse
   }
