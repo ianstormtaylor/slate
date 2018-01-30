@@ -91,6 +91,7 @@ export const IS_CHROME = BROWSER === 'chrome'
 export const IS_FIREFOX = BROWSER === 'firefox'
 export const IS_SAFARI = BROWSER === 'safari'
 export const IS_IE = BROWSER === 'ie'
+export const IS_EDGE = BROWSER === 'edge'
 
 export const IS_ANDROID = OS === 'android'
 export const IS_IOS = OS === 'ios'
