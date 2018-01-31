@@ -66,9 +66,9 @@ function normalizeNodeAndChildren(change, node, schema) {
     normalizeNode(change, node, schema)
     return
   }
+
   const normalizedKeys = []
   let child = node.nodes.first()
-
   let path = change.value.document.getPath(node.key)
 
   // We can't just loop the children and normalize them, because in the process
@@ -79,15 +79,20 @@ function normalizeNodeAndChildren(change, node, schema) {
     normalizeNodeAndChildren(change, child, schema)
     normalizedKeys.push(child.key)
 
-    // PERF: if size is unchanged, then no operation happens and we can simply normalize the next child
+    // PERF: if size is unchanged, then no operation happens
+    // Therefore we can simply normalize the next child
     if (lastSize === change.operations.size) {
       const nextIndex = node.nodes.indexOf(child) + 1
       child = node.nodes.get(nextIndex)
     } else {
-      const result = refindNode(change, node, path)
-      path = result.path
-      node = result.node
-      child = node ? node.nodes.find(c => normalizedKeys.indexOf(c.key) === -1) : null
+      node = change.value.document.refindNode(path, node.key)
+      if (!node) {
+        path = []
+        child = null
+      } else {
+        path = change.value.document.refindPath(path, node.key)
+        child = node.nodes.find(c => normalizedKeys.indexOf(c.key) === -1)
+      }
     }
   }
 
@@ -95,36 +100,6 @@ function normalizeNodeAndChildren(change, node, schema) {
   if (node) {
     normalizeNode(change, node, schema)
   }
-}
-
-/**
- * Re-find a reference to a node that may have been modified or removed
- * entirely by a change.
- *
- * @param {Change} change
- * @param {Node} node
- * @return {Node}
- */
-
-function refindNode(change, node, previousPath) {
-  const { value } = change
-  const { document } = value
-
-  if (node.object === 'document') {
-    return { node: document, path: previousPath }
-  }
-
-  // PERF: if we find the right node by the old path, return it; otherwise find the right node by key
-  const tryNode = document.getDescendantAtPath(previousPath)
-  if (tryNode && tryNode.key === node.key) {
-    return { node: tryNode, path: previousPath }
-  }
-  node = document.getDescendant(node.key)
-  if (!node) {
-    return { node, path: [] }
-  }
-  const path = document.getPath(node.key)
-  return { node, path }
 }
 
 /**
@@ -149,10 +124,10 @@ function normalizeNode(change, node, schema) {
 
     // Re-find the node reference, in case it was updated. If the node no longer
     // exists, we're done for this branch.
-    const result = refindNode(c, n, path)
-    n = result.node
-    path = result.path
+    n = c.value.document.refindNode(path, n.key)
     if (!n) return
+
+    path = c.value.document.refindPath(path, n.key)
 
     // Increment the iterations counter, and check to make sure that we haven't
     // exceeded the max. Without this check, it's easy for the `validate` or
