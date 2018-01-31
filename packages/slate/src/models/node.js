@@ -1352,6 +1352,41 @@ class Node {
   }
 
   /**
+   * Refind the path of node if path is changed.
+   *
+   * @param {Array} path
+   * @param {String} key
+   * @return {Array}
+   */
+
+  refindPath(path, key) {
+    const node = this.getDescendantAtPath(path)
+    if (node && node.key === key) {
+      return path
+    }
+
+    return this.getPath(key)
+  }
+
+  /**
+   *
+   * Refind the node with the same node.key after change.
+   *
+   * @param {Array} path
+   * @param {String} key
+   * @return {Node|Void}
+   */
+
+  refindNode(path, key) {
+    const node = this.getDescendantAtPath(path)
+    if (node && node.key === key) {
+      return node
+    }
+
+    return this.getDescendant(key)
+  }
+
+  /**
    * Get the placeholder for the node from a `schema`.
    *
    * @param {Schema} schema
