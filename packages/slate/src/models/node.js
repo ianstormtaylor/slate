@@ -1970,8 +1970,8 @@ class Node {
    * @return {Function|Null}
    */
 
-  validate(schema) {
-    return schema.validateNode(this)
+  validate(schema, value) {
+    return schema.validateNode(this, value)
   }
 }
 
