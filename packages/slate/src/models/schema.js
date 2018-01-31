@@ -258,8 +258,8 @@ class Schema extends Record(DEFAULTS) {
    * @return {Function|Void}
    */
 
-  validateNode(node) {
-    const ret = this.stack.find('validateNode', node)
+  validateNode(node, value) {
+    const ret = this.stack.find('validateNode', node, value)
     if (ret) return ret
 
     if (node.object == 'text') return
