@@ -91,7 +91,7 @@ function normalizeNodeAndChildren(change, node, schema) {
         child = null
       } else {
         path = change.value.document.refindPath(path, node.key)
-        child = node.nodes.find(c => normalizedKeys.indexOf(c.key) === -1)
+        child = node.nodes.find(c => !normalizedKeys.includes(c.key))
       }
     }
   }
