@@ -1,5 +1,4 @@
 
-import { Set } from 'immutable'
 
 /**
  * Changes.
@@ -67,42 +66,28 @@ function normalizeNodeAndChildren(change, node, schema) {
     normalizeNode(change, node, schema)
     return
   }
+  const normalizedKeys = []
+  let child = node.nodes.first()
+
+  let path = change.value.document.getPath(node.key)
 
   // We can't just loop the children and normalize them, because in the process
   // of normalizing one child, we might end up creating another. Instead, we
   // have to normalize one at a time, and check for new children along the way.
-  // PERF: use a mutable array here instead of an immutable stack.
-  const keys = node.nodes.toArray().map(n => n.key)
+  while (node && child) {
+    const lastSize = change.operations.size
+    normalizeNodeAndChildren(change, child, schema)
+    normalizedKeys.push(child.key)
 
-  // While there is still a child key that hasn't been normalized yet...
-  while (keys.length) {
-    const { size } = change.operations
-    let key
-
-    // PERF: use a mutable set here since we'll be add to it a lot.
-    let set = new Set().asMutable()
-
-    // Unwind the stack, normalizing every child and adding it to the set.
-    while (key = keys[0]) {
-      const child = node.getChild(key)
-      normalizeNodeAndChildren(change, child, schema)
-      set.add(key)
-      keys.shift()
-    }
-
-    // Turn the set immutable to be able to compare against it.
-    set = set.asImmutable()
-
-    // PERF: Only re-find the node and re-normalize any new children if
-    // operations occured that might have changed it.
-    if (change.operations.size > size) {
-      node = refindNode(change, node)
-
-      // Add any new children back onto the stack.
-      node.nodes.forEach((n) => {
-        if (set.has(n.key)) return
-        keys.unshift(n.key)
-      })
+    // PERF: if size is unchanged, then no operation happens and we can simply normalize the next child
+    if (lastSize === change.operations.size) {
+      const nextIndex = node.nodes.indexOf(child) + 1
+      child = node.nodes.get(nextIndex)
+    } else {
+      const result = refindNode(change, node, path)
+      path = result.path
+      node = result.node
+      child = node ? node.nodes.find(c => normalizedKeys.indexOf(c.key) === -1) : null
     }
   }
 
@@ -121,12 +106,25 @@ function normalizeNodeAndChildren(change, node, schema) {
  * @return {Node}
  */
 
-function refindNode(change, node) {
+function refindNode(change, node, previousPath) {
   const { value } = change
   const { document } = value
-  return node.object == 'document'
-    ? document
-    : document.getDescendant(node.key)
+
+  if (node.object === 'document') {
+    return { node: document, path: previousPath }
+  }
+
+  // PERF: if we find the right node by the old path, return it; otherwise find the right node by key
+  const tryNode = document.getDescendantAtPath(previousPath)
+  if (tryNode && tryNode.key === node.key) {
+    return { node: tryNode, path: previousPath }
+  }
+  node = document.getDescendant(node.key)
+  if (!node) {
+    return { node, path: [] }
+  }
+  const path = document.getPath(node.key)
+  return { node, path }
 }
 
 /**
@@ -146,11 +144,14 @@ function normalizeNode(change, node, schema) {
     if (!normalize) return
 
     // Run the `normalize` function to fix the node.
+    let path = c.value.document.getPath(n.key)
     normalize(c)
 
     // Re-find the node reference, in case it was updated. If the node no longer
     // exists, we're done for this branch.
-    n = refindNode(c, n)
+    const result = refindNode(c, n, path)
+    n = result.node
+    path = result.path
     if (!n) return
 
     // Increment the iterations counter, and check to make sure that we haven't
