@@ -433,7 +433,7 @@ function AfterPlugin() {
     if (HOTKEYS.COLLAPSE_CHAR_BACKWARD(event)) {
       const { document, isInVoid, previousText, startText } = value
       // if the previous text has a void parent and is an empty string, then it is a zero width white space character slate inserted
-      const isPreviousInVoid = previousText && document.hasVoidParent(previousText.key)  && previousText.text !== ' '
+      const isPreviousInVoid = previousText && document.hasVoidParent(previousText.key) && previousText.text !== ' '
       if (isInVoid || isPreviousInVoid || startText.text == '') {
         event.preventDefault()
         return change.collapseCharBackward()
