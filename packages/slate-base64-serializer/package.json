@@ -31,10 +31,10 @@
     "isomorphic-base64": "^1.0.2"
   },
   "scripts": {
-    "build": "rollup -c",
+    "build": "rollup --config",
     "clean": "rm -rf ./dist ./node_modules",
     "prepublish": "yarn build",
-    "watch": "rollup -c -w"
+    "watch": "rollup --config --watch"
   },
   "keywords": [
     "deserialize",

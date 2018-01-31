@@ -51,10 +51,10 @@
     "slate-simulator": "^0.4.19"
   },
   "scripts": {
-    "build": "rollup -c",
+    "build": "rollup --config",
     "clean": "rm -rf ./dist ./node_modules",
     "prepublish": "yarn build",
-    "watch": "rollup -c -w"
+    "watch": "rollup --config --watch"
   },
   "keywords": [
     "canvas",
