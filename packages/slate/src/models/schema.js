@@ -255,6 +255,7 @@ class Schema extends Record(DEFAULTS) {
    * invalid node, or void if the node is valid.
    *
    * @param {Node} node
+   * @param {Value} value
    * @return {Function|Void}
    */
 
@@ -277,10 +278,10 @@ class Schema extends Record(DEFAULTS) {
     if (rule.data != null) {
       for (const key in rule.data) {
         const fn = rule.data[key]
-        const value = node.data.get(key)
+        const dataValue = node.data.get(key)
 
-        if (!fn(value)) {
-          return this.fail(NODE_DATA_INVALID, { ...ctx, key, value })
+        if (!fn(dataValue)) {
+          return this.fail(NODE_DATA_INVALID, { ...ctx, key, dataValue })
         }
       }
     }

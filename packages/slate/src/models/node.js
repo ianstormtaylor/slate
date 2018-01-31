@@ -1957,6 +1957,7 @@ class Node {
    * Validate the node against a `schema`.
    *
    * @param {Schema} schema
+   * @param {Value} value
    * @return {Function|Null}
    */
 
