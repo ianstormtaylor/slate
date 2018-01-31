@@ -1,3 +1,4 @@
+import autoExternal from 'rollup-plugin-auto-external'
 import resolve from 'rollup-plugin-node-resolve'
 import commonjs from 'rollup-plugin-commonjs'
 import babel from 'rollup-plugin-babel'
@@ -39,15 +40,12 @@ umdConfigMin.plugins = umdConfig.plugins.slice(0).concat(uglify())
 // CommonJS (for Node) and ES module (for bundlers) build.
 const moduleConfig = {
   input: 'src/index.js',
-  external: [
-    'isomorphic-base64',
-    'slate',
-  ],
   output: [
     { file: pkg.main, format: 'cjs', exports: 'named', sourcemap: process.env.ROLLUP_WATCH },
     { file: pkg.module, format: 'es', sourcemap: process.env.ROLLUP_WATCH }
   ],
   plugins: [
+    autoExternal(),
     resolve(),
     babel({
       include: ['src/**']

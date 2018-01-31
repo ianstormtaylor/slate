@@ -1,5 +1,6 @@
 import path from 'path'
 import alias from 'rollup-plugin-alias'
+import autoExternal from 'rollup-plugin-auto-external'
 import resolve from 'rollup-plugin-node-resolve'
 import commonjs from 'rollup-plugin-commonjs'
 import babel from 'rollup-plugin-babel'
@@ -54,32 +55,15 @@ umdConfigMin.plugins = umdConfig.plugins.slice(0).concat(uglify())
 // CommonJS (for Node) and ES module (for bundlers) build.
 const moduleConfig = {
   input: 'src/index.js',
-  external: [
-    'debug',
-    'get-window',
-    'immutable',
-    'is-hotkey',
-    'is-in-browser',
-    'is-window',
-    'keycode',
-    'lodash/throttle',
-    'prop-types',
-    'react',
-    'react-dom',
-    'react-immutable-proptypes',
-    'react-portal',
-    'selection-is-backward',
-    'slate',
-    'slate-base64-serializer',
-    'slate-dev-logger',
-    'slate-plain-serializer',
-    'slate-prop-types',
-  ],
   output: [
     { file: pkg.main, format: 'cjs', exports: 'named', sourcemap: process.env.ROLLUP_WATCH },
     { file: pkg.module, format: 'es', sourcemap: process.env.ROLLUP_WATCH }
   ],
+  external: [
+    'lodash/throttle',
+  ],
   plugins: [
+    autoExternal(),
     resolve(),
     replace({
       'process.env.NODE_ENV': JSON.stringify('production')

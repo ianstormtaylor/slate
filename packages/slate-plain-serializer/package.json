@@ -24,6 +24,7 @@
   "devDependencies": {
     "mocha": "^2.5.3",
     "rollup": "^0.55.1",
+    "rollup-plugin-auto-external": "^1.1.0",
     "rollup-plugin-babel": "^3.0.3",
     "rollup-plugin-commonjs": "^8.3.0",
     "rollup-plugin-node-resolve": "^3.0.2",
