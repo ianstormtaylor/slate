@@ -657,7 +657,8 @@ class Range extends Record(DEFAULTS) {
    */
 
   moveToRangeOf(start, end = start) {
-    return this
+    const range = this.isBackward ? this.flip() : this
+    return range
       .moveAnchorToStartOf(start)
       .moveFocusToEndOf(end)
   }
