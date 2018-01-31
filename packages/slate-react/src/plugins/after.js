@@ -432,8 +432,7 @@ function AfterPlugin() {
     // browsers won't know what to do.
     if (HOTKEYS.COLLAPSE_CHAR_BACKWARD(event)) {
       const { document, isInVoid, previousText, startText } = value
-      // if the previous text has a void parent and is an empty string, then it is a zero width white space character slate inserted
-      const isPreviousInVoid = previousText && document.hasVoidParent(previousText.key) && previousText.text !== ' '
+      const isPreviousInVoid = previousText && document.hasVoidParent(previousText.key)
       if (isInVoid || isPreviousInVoid || startText.text == '') {
         event.preventDefault()
         return change.collapseCharBackward()
@@ -442,8 +441,7 @@ function AfterPlugin() {
 
     if (HOTKEYS.COLLAPSE_CHAR_FORWARD(event)) {
       const { document, isInVoid, nextText, startText } = value
-      // if the next text has a void parent and is an empty string, then it is a zero width white space character slate inserted
-      const isNextInVoid = nextText && document.hasVoidParent(nextText.key) && nextText.text !== ' '
+      const isNextInVoid = nextText && document.hasVoidParent(nextText.key)
       if (isInVoid || isNextInVoid || startText.text == '') {
         event.preventDefault()
         return change.collapseCharForward()
