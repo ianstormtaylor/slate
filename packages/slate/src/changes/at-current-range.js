@@ -184,6 +184,10 @@ Changes.insertText = (change, text, marks) => {
   marks = marks || selection.marks || document.getInsertMarksAtRange(selection)
   change.insertTextAtRange(selection, text, marks)
 
+  if (selection.isExpanded) {
+    change.select(change.value.selection.collapseToStart(), { snapshot: false })
+  }
+
   // If the text was successfully inserted, and the selection had marks on it,
   // unset the selection's marks.
   if (selection.marks && document != change.value.document) {
