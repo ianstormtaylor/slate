@@ -158,6 +158,8 @@ class App extends React.Component {
 
 Now, if you press `control-\``  the block your cursor is in should turn into a code block! Magic!
 
+*Note: The Edge browser does not currently support `control-...` key events (see [issue](https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/742263/)), so this example won't work on it.*
+
 But we forgot one thing. When you hit `control-\`` again, it should change the code block back into a paragraph. To do that, we'll need to add a bit of logic to change the type we set based on whether any of the currently selected blocks are already a code block:
 
 ```js
