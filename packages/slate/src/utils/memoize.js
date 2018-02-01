@@ -1,15 +1,13 @@
-
 /**
  * Is in development?
  *
  * @type {Boolean}
  */
 
-const IS_DEV = (
+const IS_DEV =
   typeof process !== 'undefined' &&
   process.env &&
   process.env.NODE_ENV !== 'production'
-)
 
 /**
  * GLOBAL: True if memoization should is enabled. Only effective when `IS_DEV`.
@@ -72,7 +70,7 @@ function memoize(object, properties, options = {}) {
       throw new Error(`Object does not have a property named "${property}".`)
     }
 
-    object[property] = function (...args) {
+    object[property] = function(...args) {
       if (IS_DEV) {
         // If memoization is disabled, call into the original method.
         if (!ENABLED) return original.apply(this, args)
@@ -199,8 +197,4 @@ function __enable(enabled) {
  * @type {Object}
  */
 
-export {
-  memoize as default,
-  __clear,
-  __enable
-}
+export { memoize as default, __clear, __enable }

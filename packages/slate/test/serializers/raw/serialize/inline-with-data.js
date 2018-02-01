@@ -6,9 +6,7 @@ export const input = (
   <value>
     <document>
       <paragraph>
-        <link thing="value">
-          one
-        </link>
+        <link thing="value">one</link>
       </paragraph>
     </document>
   </value>
@@ -33,15 +31,15 @@ export const output = {
                 object: 'leaf',
                 text: '',
                 marks: [],
-              }
-            ]
+              },
+            ],
           },
           {
             object: 'inline',
             type: 'link',
             isVoid: false,
             data: {
-              thing: 'value'
+              thing: 'value',
             },
             nodes: [
               {
@@ -51,10 +49,10 @@ export const output = {
                     object: 'leaf',
                     text: 'one',
                     marks: [],
-                  }
-                ]
-              }
-            ]
+                  },
+                ],
+              },
+            ],
           },
           {
             object: 'text',
@@ -63,11 +61,11 @@ export const output = {
                 object: 'leaf',
                 text: '',
                 marks: [],
-              }
-            ]
+              },
+            ],
           },
-        ]
-      }
-    ]
-  }
+        ],
+      },
+    ],
+  },
 }

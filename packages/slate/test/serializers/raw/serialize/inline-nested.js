@@ -7,9 +7,7 @@ export const input = (
     <document>
       <paragraph>
         <link>
-          <hashtag>
-            one
-          </hashtag>
+          <hashtag>one</hashtag>
         </link>
       </paragraph>
     </document>
@@ -35,8 +33,8 @@ export const output = {
                 object: 'leaf',
                 text: '',
                 marks: [],
-              }
-            ]
+              },
+            ],
           },
           {
             object: 'inline',
@@ -51,8 +49,8 @@ export const output = {
                     object: 'leaf',
                     text: '',
                     marks: [],
-                  }
-                ]
+                  },
+                ],
               },
               {
                 object: 'inline',
@@ -67,10 +65,10 @@ export const output = {
                         object: 'leaf',
                         text: 'one',
                         marks: [],
-                      }
-                    ]
-                  }
-                ]
+                      },
+                    ],
+                  },
+                ],
               },
               {
                 object: 'text',
@@ -79,10 +77,10 @@ export const output = {
                     object: 'leaf',
                     text: '',
                     marks: [],
-                  }
-                ]
+                  },
+                ],
               },
-            ]
+            ],
           },
           {
             object: 'text',
@@ -91,11 +89,11 @@ export const output = {
                 object: 'leaf',
                 text: '',
                 marks: [],
-              }
-            ]
+              },
+            ],
           },
-        ]
-      }
-    ]
-  }
+        ],
+      },
+    ],
+  },
 }

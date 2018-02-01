@@ -11,16 +11,18 @@ export const schema = {
         if (reason == PARENT_OBJECT_INVALID) {
           change.unwrapNodeByKey(node.key)
         }
-      }
-    }
-  }
+      },
+    },
+  },
 }
 
 export const input = (
   <value>
     <document>
       <paragraph>
-        <link><link>one</link></link>
+        <link>
+          <link>one</link>
+        </link>
       </paragraph>
     </document>
   </value>

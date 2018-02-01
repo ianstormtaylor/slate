@@ -1,4 +1,3 @@
-
 import assert from 'assert'
 import fs from 'fs'
 import { Schema } from '../..'
@@ -12,7 +11,10 @@ describe('models', () => {
   describe('change', () => {
     describe('withoutNormalization', () => {
       const testsDir = resolve(__dirname, 'change')
-      const tests = fs.readdirSync(testsDir).filter(t => t[0] != '.').map(t => basename(t, extname(t)))
+      const tests = fs
+        .readdirSync(testsDir)
+        .filter(t => t[0] != '.')
+        .map(t => basename(t, extname(t)))
 
       for (const test of tests) {
         it(test, async () => {

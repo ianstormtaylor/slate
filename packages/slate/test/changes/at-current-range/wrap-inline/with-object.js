@@ -2,10 +2,10 @@
 
 import h from '../../../helpers/h'
 
-export default function (change) {
+export default function(change) {
   change.wrapInline({
     type: 'hashtag',
-    data: { thing: 'value' }
+    data: { thing: 'value' },
   })
 }
 
@@ -23,7 +23,10 @@ export const output = (
   <value>
     <document>
       <paragraph>
-        w<hashtag thing="value"><anchor />or</hashtag><focus />d
+        w<hashtag thing="value">
+          <anchor />or
+        </hashtag>
+        <focus />d
       </paragraph>
     </document>
   </value>

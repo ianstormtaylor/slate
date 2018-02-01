@@ -1,4 +1,3 @@
-
 /** @jsx h */
 
 import h from '../helpers/h'
@@ -16,15 +15,15 @@ export const config = {
             }
           }
         }
-      }
-    }
+      },
+    },
   ],
   defaultBlock: {
     type: 'default',
     data: {
-      thing: 'value'
-    }
-  }
+      thing: 'value',
+    },
+  },
 }
 
 export const input = `
@@ -35,9 +34,7 @@ export const input = `
 export const output = (
   <value>
     <document>
-      <paragraph>
-        one
-      </paragraph>
+      <paragraph>one</paragraph>
       <block type="default" data={{ thing: 'value' }}>
         two
       </block>

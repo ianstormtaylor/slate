@@ -1,4 +1,3 @@
-
 /**
  * Find a Slate node from a DOM `element`.
  *

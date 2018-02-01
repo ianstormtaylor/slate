@@ -1,4 +1,3 @@
-
 import Debug from 'debug'
 import isPlainObject from 'is-plain-object'
 import logger from 'slate-dev-logger'
@@ -25,7 +24,6 @@ const debug = Debug('slate:change')
  */
 
 class Change {
-
   /**
    * Check if `any` is a `Change`.
    *
@@ -50,7 +48,7 @@ class Change {
     this.operations = new List()
     this.flags = {
       normalize: true,
-      ...pick(attrs, ['merge', 'save', 'normalize'])
+      ...pick(attrs, ['merge', 'save', 'normalize']),
     }
   }
 
@@ -65,7 +63,10 @@ class Change {
   }
 
   get kind() {
-    logger.deprecate('slate@0.32.0', 'The `kind` property of Slate objects has been renamed to `object`.')
+    logger.deprecate(
+      'slate@0.32.0',
+      'The `kind` property of Slate objects has been renamed to `object`.'
+    )
     return this.object
   }
 
@@ -187,9 +188,7 @@ class Change {
    */
 
   getFlag(key, options = {}) {
-    return options[key] !== undefined ?
-      options[key] :
-      this.flags[key]
+    return options[key] !== undefined ? options[key] : this.flags[key]
   }
 
   /**
@@ -203,7 +202,6 @@ class Change {
     delete this.flags[key]
     return this
   }
-
 }
 
 /**
@@ -216,8 +214,8 @@ Change.prototype[MODEL_TYPES.CHANGE] = true
  * Add a change method for each of the changes.
  */
 
-Object.keys(Changes).forEach((type) => {
-  Change.prototype[type] = function (...args) {
+Object.keys(Changes).forEach(type => {
+  Change.prototype[type] = function(...args) {
     debug(type, { args })
     this.call(Changes[type], ...args)
     return this

@@ -1,4 +1,3 @@
-
 import Plain from 'slate-plain-serializer'
 import { Editor } from 'slate-react'
 
@@ -18,15 +17,13 @@ function WordCount(options) {
     renderEditor(props) {
       return (
         <div>
-          <div>
-            {props.children}
-          </div>
+          <div>{props.children}</div>
           <span className="word-counter">
             Word Count: {props.value.document.text.split(' ').length}
           </span>
         </div>
       )
-    }
+    },
   }
 }
 
@@ -34,11 +31,7 @@ function WordCount(options) {
  * Plugins.
  */
 
-const plugins = [
-  CollapseOnEscape(),
-  SoftBreak(),
-  WordCount()
-]
+const plugins = [CollapseOnEscape(), SoftBreak(), WordCount()]
 
 /**
  * The plugins example.
@@ -47,7 +40,6 @@ const plugins = [
  */
 
 class Plugins extends React.Component {
-
   /**
    * Deserialize the initial editor value.
    *
@@ -58,7 +50,7 @@ class Plugins extends React.Component {
     value: Plain.deserialize(`This example shows how you can extend Slate with plugins! It uses four fairly simple plugins, but you can use any plugins you want, or write your own!
 The first is a simple plugin to collapse the selection whenever the escape key is pressed. Try selecting some text and pressing escape.
 The second is another simple plugin that inserts a "soft" break when enter is pressed instead of creating a new block. Try pressing enter!
-The third is an example of using the plugin.render property to create a higher-order-component.`)
+The third is an example of using the plugin.render property to create a higher-order-component.`),
   }
 
   /**
@@ -89,7 +81,6 @@ The third is an example of using the plugin.render property to create a higher-o
       </div>
     )
   }
-
 }
 
 /**

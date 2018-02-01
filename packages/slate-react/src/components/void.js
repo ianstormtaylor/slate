@@ -1,4 +1,3 @@
-
 import Debug from 'debug'
 import React from 'react'
 import SlateTypes from 'slate-prop-types'
@@ -21,7 +20,6 @@ const debug = Debug('slate:void')
  */
 
 class Void extends React.Component {
-
   /**
    * Property types.
    *
@@ -78,11 +76,7 @@ class Void extends React.Component {
       </Tag>
     )
 
-    const content = (
-      <Tag draggable={readOnly ? null : true}>
-        {children}
-      </Tag>
-    )
+    const content = <Tag draggable={readOnly ? null : true}>{children}</Tag>
 
     this.debug('render', { props })
 
@@ -110,7 +104,14 @@ class Void extends React.Component {
    */
 
   renderText = () => {
-    const { block, decorations, isSelected, node, readOnly, editor } = this.props
+    const {
+      block,
+      decorations,
+      isSelected,
+      node,
+      readOnly,
+      editor,
+    } = this.props
     const child = node.getFirstText()
     return (
       <Text
@@ -125,7 +126,6 @@ class Void extends React.Component {
       />
     )
   }
-
 }
 
 /**

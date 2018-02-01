@@ -21,13 +21,13 @@ export const input = {
                 object: 'leaf',
                 text: ' ',
                 marks: [],
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  }
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
 }
 
 export const output = (

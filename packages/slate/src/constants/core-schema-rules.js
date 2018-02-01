@@ -1,4 +1,3 @@
-
 import { List } from 'immutable'
 
 import Text from '../models/text'
@@ -10,7 +9,6 @@ import Text from '../models/text'
  */
 
 const CORE_SCHEMA_RULES = [
-
   /**
    * Only allow block nodes in documents.
    *
@@ -23,12 +21,12 @@ const CORE_SCHEMA_RULES = [
       const invalids = node.nodes.filter(n => n.object != 'block')
       if (!invalids.size) return
 
-      return (change) => {
-        invalids.forEach((child) => {
+      return change => {
+        invalids.forEach(child => {
           change.removeNodeByKey(child.key, { normalize: false })
         })
       }
-    }
+    },
   },
 
   /**
@@ -46,12 +44,12 @@ const CORE_SCHEMA_RULES = [
       const invalids = node.nodes.filter(n => !objects.includes(n.object))
       if (!invalids.size) return
 
-      return (change) => {
-        invalids.forEach((child) => {
+      return change => {
+        invalids.forEach(child => {
           change.removeNodeByKey(child.key, { normalize: false })
         })
       }
-    }
+    },
   },
 
   /**
@@ -63,15 +61,17 @@ const CORE_SCHEMA_RULES = [
   {
     validateNode(node) {
       if (node.object != 'inline') return
-      const invalids = node.nodes.filter(n => n.object != 'inline' && n.object != 'text')
+      const invalids = node.nodes.filter(
+        n => n.object != 'inline' && n.object != 'text'
+      )
       if (!invalids.size) return
 
-      return (change) => {
-        invalids.forEach((child) => {
+      return change => {
+        invalids.forEach(child => {
           change.removeNodeByKey(child.key, { normalize: false })
         })
       }
-    }
+    },
   },
 
   /**
@@ -85,11 +85,11 @@ const CORE_SCHEMA_RULES = [
       if (node.object != 'block' && node.object != 'inline') return
       if (node.nodes.size > 0) return
 
-      return (change) => {
+      return change => {
         const text = Text.create()
         change.insertNodeByKey(node.key, 0, text, { normalize: false })
       }
-    }
+    },
   },
 
   /**
@@ -104,17 +104,17 @@ const CORE_SCHEMA_RULES = [
       if (node.object != 'block' && node.object != 'inline') return
       if (node.text == ' ' && node.nodes.size == 1) return
 
-      return (change) => {
+      return change => {
         const text = Text.create(' ')
         const index = node.nodes.size
 
         change.insertNodeByKey(node.key, index, text, { normalize: false })
 
-        node.nodes.forEach((child) => {
+        node.nodes.forEach(child => {
           change.removeNodeByKey(child.key, { normalize: false })
         })
       }
-    }
+    },
   },
 
   /**
@@ -131,10 +131,12 @@ const CORE_SCHEMA_RULES = [
   {
     validateNode(node) {
       if (node.object != 'block') return
-      const invalids = node.nodes.filter(n => n.object == 'inline' && n.text == '')
+      const invalids = node.nodes.filter(
+        n => n.object == 'inline' && n.text == ''
+      )
       if (!invalids.size) return
 
-      return (change) => {
+      return change => {
         // If all of the block's nodes are invalid, insert an empty text node so
         // that the selection will be preserved when they are all removed.
         if (node.nodes.size == invalids.size) {
@@ -142,11 +144,11 @@ const CORE_SCHEMA_RULES = [
           change.insertNodeByKey(node.key, 1, text, { normalize: false })
         }
 
-        invalids.forEach((child) => {
+        invalids.forEach(child => {
           change.removeNodeByKey(child.key, { normalize: false })
         })
       }
-    }
+    },
   },
 
   /**
@@ -167,7 +169,7 @@ const CORE_SCHEMA_RULES = [
         const next = node.nodes.get(index + 1)
         // We don't test if "prev" is inline, since it has already been processed in the loop
         const insertBefore = !prev
-        const insertAfter = !next || (next.object == 'inline')
+        const insertAfter = !next || next.object == 'inline'
 
         if (insertAfter || insertBefore) {
           list = list.push({ insertAfter, insertBefore, index })
@@ -178,23 +180,27 @@ const CORE_SCHEMA_RULES = [
 
       if (!invalids.size) return
 
-      return (change) => {
+      return change => {
         // Shift for every text node inserted previously.
         let shift = 0
 
         invalids.forEach(({ index, insertAfter, insertBefore }) => {
           if (insertBefore) {
-            change.insertNodeByKey(node.key, shift + index, Text.create(), { normalize: false })
+            change.insertNodeByKey(node.key, shift + index, Text.create(), {
+              normalize: false,
+            })
             shift++
           }
 
           if (insertAfter) {
-            change.insertNodeByKey(node.key, shift + index + 1, Text.create(), { normalize: false })
+            change.insertNodeByKey(node.key, shift + index + 1, Text.create(), {
+              normalize: false,
+            })
             shift++
           }
         })
       }
-    }
+    },
   },
 
   /**
@@ -218,14 +224,14 @@ const CORE_SCHEMA_RULES = [
 
       if (!invalids.size) return
 
-      return (change) => {
+      return change => {
         // Reverse the list to handle consecutive merges, since the earlier nodes
         // will always exist after each merge.
-        invalids.reverse().forEach((n) => {
+        invalids.reverse().forEach(n => {
           change.mergeNodeByKey(n.key, { normalize: false })
         })
       }
-    }
+    },
   },
 
   /**
@@ -254,7 +260,8 @@ const CORE_SCHEMA_RULES = [
         if (!next && prev.object == 'inline') return
 
         // If it's surrounded by inlines, preserve it.
-        if (next && prev && next.object == 'inline' && prev.object == 'inline') return
+        if (next && prev && next.object == 'inline' && prev.object == 'inline')
+          return
 
         // Otherwise, remove it.
         return true
@@ -262,14 +269,13 @@ const CORE_SCHEMA_RULES = [
 
       if (!invalids.size) return
 
-      return (change) => {
-        invalids.forEach((text) => {
+      return change => {
+        invalids.forEach(text => {
           change.removeNodeByKey(text.key, { normalize: false })
         })
       }
-    }
-  }
-
+    },
+  },
 ]
 
 /**

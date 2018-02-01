@@ -2,10 +2,10 @@
 
 import h from '../../../helpers/h'
 
-export default function (change) {
+export default function(change) {
   change.setNodeByKey('a', {
     type: 'emoji',
-    isVoid: true
+    isVoid: true,
   })
 }
 
@@ -13,7 +13,9 @@ export const input = (
   <value>
     <document>
       <paragraph>
-        <link key="a"><cursor />word</link>
+        <link key="a">
+          <cursor />word
+        </link>
       </paragraph>
     </document>
   </value>
@@ -23,7 +25,8 @@ export const output = (
   <value>
     <document>
       <paragraph>
-        <cursor /><emoji />
+        <cursor />
+        <emoji />
       </paragraph>
     </document>
   </value>

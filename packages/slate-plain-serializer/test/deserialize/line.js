@@ -9,9 +9,7 @@ one
 export const output = (
   <value>
     <document>
-      <line>
-        one
-      </line>
+      <line>one</line>
     </document>
   </value>
 )

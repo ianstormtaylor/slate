@@ -2,20 +2,20 @@
 
 import h from '../../helpers/h'
 
-export default function (value) {
+export default function(value) {
   return value
     .change()
     .insertBlock('quote')
-    .value
-    .change()
-    .undo()
-    .value
+    .value.change()
+    .undo().value
 }
 
 export const input = (
   <value>
     <document>
-      <paragraph><cursor />one</paragraph>
+      <paragraph>
+        <cursor />one
+      </paragraph>
     </document>
   </value>
 )

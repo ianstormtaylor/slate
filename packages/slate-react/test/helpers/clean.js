@@ -1,16 +1,12 @@
-
 import { JSDOM } from 'jsdom' // eslint-disable-line import/no-extraneous-dependencies
 
-const UNWANTED_ATTRS = [
-  'data-key',
-  'data-offset-key'
-]
+const UNWANTED_ATTRS = ['data-key', 'data-offset-key']
 
 const UNWANTED_TOP_LEVEL_ATTRS = [
   'autocorrect',
   'spellcheck',
   'style',
-  'data-gramm'
+  'data-gramm',
 ]
 
 /**

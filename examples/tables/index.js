@@ -1,4 +1,3 @@
-
 import { Editor } from 'slate-react'
 import { Value } from 'slate'
 
@@ -12,7 +11,6 @@ import initialValue from './value.json'
  */
 
 class Tables extends React.Component {
-
   /**
    * Deserialize the raw initial value.
    *
@@ -20,7 +18,7 @@ class Tables extends React.Component {
    */
 
   state = {
-    value: Value.fromJSON(initialValue)
+    value: Value.fromJSON(initialValue),
   }
 
   /**
@@ -101,9 +99,12 @@ class Tables extends React.Component {
     }
 
     switch (event.key) {
-      case 'Backspace': return this.onBackspace(event, change)
-      case 'Delete': return this.onDelete(event, change)
-      case 'Enter': return this.onEnter(event, change)
+      case 'Backspace':
+        return this.onBackspace(event, change)
+      case 'Delete':
+        return this.onDelete(event, change)
+      case 'Enter':
+        return this.onEnter(event, change)
     }
   }
 
@@ -135,12 +136,19 @@ class Tables extends React.Component {
    * @return {Element}
    */
 
-  renderNode = (props) => {
+  renderNode = props => {
     const { attributes, children, node } = props
     switch (node.type) {
-      case 'table': return <table><tbody {...attributes}>{children}</tbody></table>
-      case 'table-row': return <tr {...attributes}>{children}</tr>
-      case 'table-cell': return <td {...attributes}>{children}</td>
+      case 'table':
+        return (
+          <table>
+            <tbody {...attributes}>{children}</tbody>
+          </table>
+        )
+      case 'table-row':
+        return <tr {...attributes}>{children}</tr>
+      case 'table-cell':
+        return <td {...attributes}>{children}</td>
     }
   }
 
@@ -151,13 +159,13 @@ class Tables extends React.Component {
    * @return {Element}
    */
 
-  renderMark = (props) => {
+  renderMark = props => {
     const { children, mark } = props
     switch (mark.type) {
-      case 'bold': return <strong>{children}</strong>
+      case 'bold':
+        return <strong>{children}</strong>
     }
   }
-
 }
 
 /**

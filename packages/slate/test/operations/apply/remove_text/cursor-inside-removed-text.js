@@ -2,13 +2,15 @@
 
 import h from '../../../helpers/h'
 
-export default [{
-  type: 'remove_text',
-  path: [0, 0],
-  offset: 2,
-  text: 'is is some text inside ',
-  marks: []
-}]
+export default [
+  {
+    type: 'remove_text',
+    path: [0, 0],
+    offset: 2,
+    text: 'is is some text inside ',
+    marks: [],
+  },
+]
 
 export const input = (
   <value>

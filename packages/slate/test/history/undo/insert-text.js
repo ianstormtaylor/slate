@@ -2,14 +2,12 @@
 
 import h from '../../helpers/h'
 
-export default function (value) {
+export default function(value) {
   return value
     .change()
     .insertText('text')
-    .value
-    .change()
-    .undo()
-    .value
+    .value.change()
+    .undo().value
 }
 
 export const input = (

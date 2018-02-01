@@ -11,9 +11,9 @@ export const schema = {
         if (reason == NODE_MARK_INVALID) {
           node.nodes.forEach(n => change.removeNodeByKey(n.key))
         }
-      }
-    }
-  }
+      },
+    },
+  },
 }
 
 export const input = (

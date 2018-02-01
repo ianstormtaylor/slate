@@ -8,12 +8,8 @@ export const value = (
   <value>
     <document>
       <quote>
-        <paragraph>
-          مرحبا بالعالم
-        </paragraph>
-        <paragraph>
-          שלום עולם
-        </paragraph>
+        <paragraph>مرحبا بالعالم</paragraph>
+        <paragraph>שלום עולם</paragraph>
       </quote>
     </document>
   </value>

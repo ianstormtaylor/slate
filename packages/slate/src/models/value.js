@@ -1,4 +1,3 @@
-
 import isPlainObject from 'is-plain-object'
 import logger from 'slate-dev-logger'
 import { Record, Set, List, Map } from 'immutable'
@@ -33,7 +32,6 @@ const DEFAULTS = {
  */
 
 class Value extends Record(DEFAULTS) {
-
   /**
    * Create a new `Value` with `attrs`.
    *
@@ -51,7 +49,9 @@ class Value extends Record(DEFAULTS) {
       return Value.fromJSON(attrs)
     }
 
-    throw new Error(`\`Value.create\` only accepts objects or values, but you passed it: ${attrs}`)
+    throw new Error(
+      `\`Value.create\` only accepts objects or values, but you passed it: ${attrs}`
+    )
   }
 
   /**
@@ -73,12 +73,15 @@ class Value extends Record(DEFAULTS) {
     if (isPlainObject(attrs)) {
       const props = {}
       if ('data' in attrs) props.data = Data.create(attrs.data)
-      if ('decorations' in attrs) props.decorations = Range.createList(attrs.decorations)
+      if ('decorations' in attrs)
+        props.decorations = Range.createList(attrs.decorations)
       if ('schema' in attrs) props.schema = Schema.create(attrs.schema)
       return props
     }
 
-    throw new Error(`\`Value.createProperties\` only accepts objects or values, but you passed it: ${attrs}`)
+    throw new Error(
+      `\`Value.createProperties\` only accepts objects or values, but you passed it: ${attrs}`
+    )
   }
 
   /**
@@ -92,11 +95,7 @@ class Value extends Record(DEFAULTS) {
    */
 
   static fromJSON(object, options = {}) {
-    let {
-      document = {},
-      selection = {},
-      schema = {},
-    } = object
+    let { document = {}, selection = {}, schema = {} } = object
 
     let data = new Map()
 
@@ -163,7 +162,10 @@ class Value extends Record(DEFAULTS) {
   }
 
   get kind() {
-    logger.deprecate('slate@0.32.0', 'The `kind` property of Slate objects has been renamed to `object`.')
+    logger.deprecate(
+      'slate@0.32.0',
+      'The `kind` property of Slate objects has been renamed to `object`.'
+    )
     return this.object
   }
 
@@ -540,7 +542,8 @@ class Value extends Record(DEFAULTS) {
   get activeMarks() {
     return this.selection.isUnset
       ? new Set()
-      : this.selection.marks || this.document.getActiveMarksAtRange(this.selection)
+      : this.selection.marks ||
+          this.document.getActiveMarksAtRange(this.selection)
   }
 
   /**
@@ -643,7 +646,9 @@ class Value extends Record(DEFAULTS) {
     }
 
     if (options.preserveDecorations) {
-      object.decorations = this.decorations ? this.decorations.toArray().map(d => d.toJSON()) : null
+      object.decorations = this.decorations
+        ? this.decorations.toArray().map(d => d.toJSON())
+        : null
     }
 
     if (options.preserveHistory) {
@@ -660,8 +665,12 @@ class Value extends Record(DEFAULTS) {
 
     if (options.preserveSelection && !options.preserveKeys) {
       const { document, selection } = this
-      object.selection.anchorPath = selection.isSet ? document.getPath(selection.anchorKey) : null
-      object.selection.focusPath = selection.isSet ? document.getPath(selection.focusKey) : null
+      object.selection.anchorPath = selection.isSet
+        ? document.getPath(selection.anchorKey)
+        : null
+      object.selection.focusPath = selection.isSet
+        ? document.getPath(selection.focusKey)
+        : null
       delete object.selection.anchorKey
       delete object.selection.focusKey
     }
@@ -676,7 +685,6 @@ class Value extends Record(DEFAULTS) {
   toJS(options) {
     return this.toJSON(options)
   }
-
 }
 
 /**

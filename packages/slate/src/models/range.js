@@ -1,4 +1,3 @@
-
 import isPlainObject from 'is-plain-object'
 import logger from 'slate-dev-logger'
 import { List, Record, Set } from 'immutable'
@@ -29,7 +28,6 @@ const DEFAULTS = {
  */
 
 class Range extends Record(DEFAULTS) {
-
   /**
    * Create a new `Range` with `attrs`.
    *
@@ -46,7 +44,9 @@ class Range extends Record(DEFAULTS) {
       return Range.fromJSON(attrs)
     }
 
-    throw new Error(`\`Range.create\` only accepts objects or ranges, but you passed it: ${attrs}`)
+    throw new Error(
+      `\`Range.create\` only accepts objects or ranges, but you passed it: ${attrs}`
+    )
   }
 
   /**
@@ -62,7 +62,9 @@ class Range extends Record(DEFAULTS) {
       return list
     }
 
-    throw new Error(`\`Range.createList\` only accepts arrays or lists, but you passed it: ${elements}`)
+    throw new Error(
+      `\`Range.createList\` only accepts arrays or lists, but you passed it: ${elements}`
+    )
   }
 
   /**
@@ -95,11 +97,14 @@ class Range extends Record(DEFAULTS) {
       if ('focusPath' in attrs) props.focusPath = attrs.focusPath
       if ('isBackward' in attrs) props.isBackward = attrs.isBackward
       if ('isFocused' in attrs) props.isFocused = attrs.isFocused
-      if ('marks' in attrs) props.marks = attrs.marks == null ? null : Mark.createSet(attrs.marks)
+      if ('marks' in attrs)
+        props.marks = attrs.marks == null ? null : Mark.createSet(attrs.marks)
       return props
     }
 
-    throw new Error(`\`Range.createProperties\` only accepts objects or ranges, but you passed it: ${attrs}`)
+    throw new Error(
+      `\`Range.createProperties\` only accepts objects or ranges, but you passed it: ${attrs}`
+    )
   }
 
   /**
@@ -161,7 +166,10 @@ class Range extends Record(DEFAULTS) {
   }
 
   get kind() {
-    logger.deprecate('slate@0.32.0', 'The `kind` property of Slate objects has been renamed to `object`.')
+    logger.deprecate(
+      'slate@0.32.0',
+      'The `kind` property of Slate objects has been renamed to `object`.'
+    )
     return this.object
   }
 
@@ -183,8 +191,7 @@ class Range extends Record(DEFAULTS) {
 
   get isCollapsed() {
     return (
-      this.anchorKey == this.focusKey &&
-      this.anchorOffset == this.focusOffset
+      this.anchorKey == this.focusKey && this.anchorOffset == this.focusOffset
     )
   }
 
@@ -411,7 +418,7 @@ class Range extends Record(DEFAULTS) {
 
   focus() {
     return this.merge({
-      isFocused: true
+      isFocused: true,
     })
   }
 
@@ -423,7 +430,7 @@ class Range extends Record(DEFAULTS) {
 
   blur() {
     return this.merge({
-      isFocused: false
+      isFocused: false,
     })
   }
 
@@ -440,7 +447,7 @@ class Range extends Record(DEFAULTS) {
       focusKey: null,
       focusOffset: 0,
       isFocused: false,
-      isBackward: false
+      isBackward: false,
     })
   }
 
@@ -472,9 +479,8 @@ class Range extends Record(DEFAULTS) {
     const anchorOffset = this.anchorOffset + n
     return this.merge({
       anchorOffset,
-      isBackward: anchorKey == focusKey
-        ? anchorOffset > focusOffset
-        : isBackward
+      isBackward:
+        anchorKey == focusKey ? anchorOffset > focusOffset : isBackward,
     })
   }
 
@@ -490,9 +496,8 @@ class Range extends Record(DEFAULTS) {
     const focusOffset = this.focusOffset + n
     return this.merge({
       focusOffset,
-      isBackward: focusKey == anchorKey
-        ? anchorOffset > focusOffset
-        : isBackward
+      isBackward:
+        focusKey == anchorKey ? anchorOffset > focusOffset : isBackward,
     })
   }
 
@@ -509,9 +514,10 @@ class Range extends Record(DEFAULTS) {
     return this.merge({
       anchorKey: key,
       anchorOffset: offset,
-      isBackward: key == focusKey
-        ? offset > focusOffset
-        : key == anchorKey ? isBackward : null
+      isBackward:
+        key == focusKey
+          ? offset > focusOffset
+          : key == anchorKey ? isBackward : null,
     })
   }
 
@@ -528,9 +534,10 @@ class Range extends Record(DEFAULTS) {
     return this.merge({
       focusKey: key,
       focusOffset: offset,
-      isBackward: key == anchorKey
-        ? anchorOffset > offset
-        : key == focusKey ? isBackward : null
+      isBackward:
+        key == anchorKey
+          ? anchorOffset > offset
+          : key == focusKey ? isBackward : null,
     })
   }
 
@@ -544,9 +551,10 @@ class Range extends Record(DEFAULTS) {
   moveAnchorOffsetTo(anchorOffset) {
     return this.merge({
       anchorOffset,
-      isBackward: this.anchorKey == this.focusKey
-        ? anchorOffset > this.focusOffset
-        : this.isBackward
+      isBackward:
+        this.anchorKey == this.focusKey
+          ? anchorOffset > this.focusOffset
+          : this.isBackward,
     })
   }
 
@@ -560,9 +568,10 @@ class Range extends Record(DEFAULTS) {
   moveFocusOffsetTo(focusOffset) {
     return this.merge({
       focusOffset,
-      isBackward: this.anchorKey == this.focusKey
-        ? this.anchorOffset > focusOffset
-        : this.isBackward
+      isBackward:
+        this.anchorKey == this.focusKey
+          ? this.anchorOffset > focusOffset
+          : this.isBackward,
     })
   }
 
@@ -575,9 +584,7 @@ class Range extends Record(DEFAULTS) {
    */
 
   moveOffsetsTo(anchorOffset, focusOffset = anchorOffset) {
-    return this
-      .moveAnchorOffsetTo(anchorOffset)
-      .moveFocusOffsetTo(focusOffset)
+    return this.moveAnchorOffsetTo(anchorOffset).moveFocusOffsetTo(focusOffset)
   }
 
   /**
@@ -658,9 +665,7 @@ class Range extends Record(DEFAULTS) {
 
   moveToRangeOf(start, end = start) {
     const range = this.isBackward ? this.flip() : this
-    return range
-      .moveAnchorToStartOf(start)
-      .moveFocusToEndOf(end)
+    return range.moveAnchorToStartOf(start).moveFocusToEndOf(end)
   }
 
   /**
@@ -678,7 +683,9 @@ class Range extends Record(DEFAULTS) {
     const anchorOffsetType = typeof anchorOffset
     const focusOffsetType = typeof focusOffset
     if (anchorOffsetType != 'number' || focusOffsetType != 'number') {
-      logger.warn(`The range offsets should be numbers, but they were of type "${anchorOffsetType}" and "${focusOffsetType}".`)
+      logger.warn(
+        `The range offsets should be numbers, but they were of type "${anchorOffsetType}" and "${focusOffsetType}".`
+      )
     }
 
     // If the range is unset, make sure it is properly zeroed out.
@@ -698,7 +705,10 @@ class Range extends Record(DEFAULTS) {
 
     // If the range is malformed, warn and zero it out.
     if (!anchorNode || !focusNode) {
-      logger.warn('The range was invalid and was reset. The range in question was:', range)
+      logger.warn(
+        'The range was invalid and was reset. The range in question was:',
+        range
+      )
       const first = node.getFirstText()
       return range.merge({
         anchorKey: first ? first.key : null,
@@ -711,7 +721,10 @@ class Range extends Record(DEFAULTS) {
 
     // If the anchor node isn't a text node, match it to one.
     if (anchorNode.object != 'text') {
-      logger.warn('The range anchor was set to a Node that is not a Text node. This should not happen and can degrade performance. The node in question was:', anchorNode)
+      logger.warn(
+        'The range anchor was set to a Node that is not a Text node. This should not happen and can degrade performance. The node in question was:',
+        anchorNode
+      )
       const anchorText = anchorNode.getTextAtOffset(anchorOffset)
       const offset = anchorNode.getOffset(anchorText.key)
       anchorOffset = anchorOffset - offset
@@ -720,7 +733,10 @@ class Range extends Record(DEFAULTS) {
 
     // If the focus node isn't a text node, match it to one.
     if (focusNode.object != 'text') {
-      logger.warn('The range focus was set to a Node that is not a Text node. This should not happen and can degrade performance. The node in question was:', focusNode)
+      logger.warn(
+        'The range focus was set to a Node that is not a Text node. This should not happen and can degrade performance. The node in question was:',
+        focusNode
+      )
       const focusText = focusNode.getTextAtOffset(focusOffset)
       const offset = focusNode.getOffset(focusText.key)
       focusOffset = focusOffset - offset
@@ -742,7 +758,7 @@ class Range extends Record(DEFAULTS) {
       anchorOffset,
       focusKey: focusNode.key,
       focusOffset,
-      isBackward
+      isBackward,
     })
   }
 
@@ -761,7 +777,8 @@ class Range extends Record(DEFAULTS) {
       focusOffset: this.focusOffset,
       isBackward: this.isBackward,
       isFocused: this.isFocused,
-      marks: this.marks == null ? null : this.marks.toArray().map(m => m.toJSON()),
+      marks:
+        this.marks == null ? null : this.marks.toArray().map(m => m.toJSON()),
     }
 
     return object
@@ -774,7 +791,6 @@ class Range extends Record(DEFAULTS) {
   toJS() {
     return this.toJSON()
   }
-
 }
 
 /**
@@ -794,11 +810,9 @@ const MOVE_METHODS = [
   ['move', 'ToEndOf'],
 ]
 
-MOVE_METHODS.forEach(([ p, s ]) => {
-  Range.prototype[`${p}${s}`] = function (...args) {
-    return this
-      [`${p}Anchor${s}`](...args)
-      [`${p}Focus${s}`](...args)
+MOVE_METHODS.forEach(([p, s]) => {
+  Range.prototype[`${p}${s}`] = function(...args) {
+    return this[`${p}Anchor${s}`](...args)[`${p}Focus${s}`](...args)
   }
 })
 
@@ -818,24 +832,20 @@ const EDGE_METHODS = [
   ['move', 'OffsetTo'],
 ]
 
-EDGE_METHODS.forEach(([ p, s, hasEdge ]) => {
+EDGE_METHODS.forEach(([p, s, hasEdge]) => {
   const anchor = `${p}Anchor${s}`
   const focus = `${p}Focus${s}`
 
-  Range.prototype[`${p}Start${s}`] = function (...args) {
-    return this.isBackward
-      ? this[focus](...args)
-      : this[anchor](...args)
+  Range.prototype[`${p}Start${s}`] = function(...args) {
+    return this.isBackward ? this[focus](...args) : this[anchor](...args)
   }
 
-  Range.prototype[`${p}End${s}`] = function (...args) {
-    return this.isBackward
-      ? this[anchor](...args)
-      : this[focus](...args)
+  Range.prototype[`${p}End${s}`] = function(...args) {
+    return this.isBackward ? this[anchor](...args) : this[focus](...args)
   }
 
   if (hasEdge) {
-    Range.prototype[`${p}Edge${s}`] = function (...args) {
+    Range.prototype[`${p}Edge${s}`] = function(...args) {
       return this[anchor](...args) || this[focus](...args)
     }
   }
@@ -859,8 +869,8 @@ const ALIAS_METHODS = [
   ['extendToEndOf', 'moveFocusToEndOf'],
 ]
 
-ALIAS_METHODS.forEach(([ alias, method ]) => {
-  Range.prototype[alias] = function (...args) {
+ALIAS_METHODS.forEach(([alias, method]) => {
+  Range.prototype[alias] = function(...args) {
     return this[method](...args)
   }
 })

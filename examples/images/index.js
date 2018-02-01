@@ -1,4 +1,3 @@
-
 import { Editor, getEventRange, getEventTransfer } from 'slate-react'
 import { Block, Value } from 'slate'
 import { LAST_CHILD_TYPE_INVALID } from 'slate-schema-violations'
@@ -35,7 +34,7 @@ function insertImage(change, src, target) {
   change.insertBlock({
     type: 'image',
     isVoid: true,
-    data: { src }
+    data: { src },
   })
 }
 
@@ -55,8 +54,8 @@ const schema = {
           return change.insertNodeByKey(node.key, node.nodes.size, paragraph)
         }
       }
-    }
-  }
+    },
+  },
 }
 
 /**
@@ -66,7 +65,6 @@ const schema = {
  */
 
 class Images extends React.Component {
-
   /**
    * Deserialize the raw initial value.
    *
@@ -74,7 +72,7 @@ class Images extends React.Component {
    */
 
   state = {
-    value: Value.fromJSON(initialValue)
+    value: Value.fromJSON(initialValue),
   }
 
   /**
@@ -137,7 +135,7 @@ class Images extends React.Component {
    * @return {Element}
    */
 
-  renderNode = (props) => {
+  renderNode = props => {
     const { attributes, node, isSelected } = props
     switch (node.type) {
       case 'image': {
@@ -167,14 +165,12 @@ class Images extends React.Component {
    * @param {Event} event
    */
 
-  onClickImage = (event) => {
+  onClickImage = event => {
     event.preventDefault()
     const src = window.prompt('Enter the URL of the image:')
     if (!src) return
 
-    const change = this.state.value
-      .change()
-      .call(insertImage, src)
+    const change = this.state.value.change().call(insertImage, src)
 
     this.onChange(change)
   }
@@ -197,11 +193,11 @@ class Images extends React.Component {
     if (type == 'files') {
       for (const file of files) {
         const reader = new FileReader()
-        const [ mime ] = file.type.split('/')
+        const [mime] = file.type.split('/')
         if (mime != 'image') continue
 
         reader.addEventListener('load', () => {
-          editor.change((c) => {
+          editor.change(c => {
             c.call(insertImage, reader.result, target)
           })
         })
@@ -216,7 +212,6 @@ class Images extends React.Component {
       change.call(insertImage, text, target)
     }
   }
-
 }
 
 /**

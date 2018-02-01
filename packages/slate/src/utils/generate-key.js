@@ -1,4 +1,3 @@
-
 /**
  * An auto-incrementing index for generating keys.
  *
@@ -56,8 +55,4 @@ resetKeyGenerator()
  * @type {Object}
  */
 
-export {
-  generateKey as default,
-  setKeyGenerator,
-  resetKeyGenerator
-}
+export { generateKey as default, setKeyGenerator, resetKeyGenerator }

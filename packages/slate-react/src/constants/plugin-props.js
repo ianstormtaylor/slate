@@ -1,4 +1,3 @@
-
 import EVENT_HANDLERS from './event-handlers'
 
 /**

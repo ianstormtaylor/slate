@@ -7,14 +7,10 @@ export const input = (
     <document>
       <quote>
         <paragraph>
-          <link>
-            one
-          </link>
+          <link>one</link>
         </paragraph>
         <paragraph>
-          <link>
-            two
-          </link>
+          <link>two</link>
         </paragraph>
       </quote>
     </document>

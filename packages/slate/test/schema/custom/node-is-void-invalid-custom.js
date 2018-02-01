@@ -11,9 +11,9 @@ export const schema = {
         if (reason == NODE_IS_VOID_INVALID) {
           change.removeNodeByKey(node.key, 'paragraph')
         }
-      }
-    }
-  }
+      },
+    },
+  },
 }
 
 export const input = (

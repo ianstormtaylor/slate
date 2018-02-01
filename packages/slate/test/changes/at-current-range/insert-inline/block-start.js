@@ -2,10 +2,10 @@
 
 import h from '../../../helpers/h'
 
-export default function (change) {
+export default function(change) {
   change.insertInline({
     type: 'emoji',
-    isVoid: true
+    isVoid: true,
   })
 }
 
@@ -23,7 +23,10 @@ export const output = (
   <value>
     <document>
       <paragraph>
-        <emoji>{' '}<cursor /></emoji>word
+        <emoji>
+          {' '}
+          <cursor />
+        </emoji>word
       </paragraph>
     </document>
   </value>

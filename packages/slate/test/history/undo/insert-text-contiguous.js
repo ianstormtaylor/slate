@@ -2,26 +2,24 @@
 
 import h from '../../helpers/h'
 
-export default function (value) {
+export default function(value) {
   return value
     .change()
     .insertText('t')
-    .value
-    .change()
+    .value.change()
     .insertText('w')
-    .value
-    .change()
+    .value.change()
     .insertText('o')
-    .value
-    .change()
-    .undo()
-    .value
+    .value.change()
+    .undo().value
 }
 
 export const input = (
   <value>
     <document>
-      <paragraph>one<cursor /></paragraph>
+      <paragraph>
+        one<cursor />
+      </paragraph>
     </document>
   </value>
 )

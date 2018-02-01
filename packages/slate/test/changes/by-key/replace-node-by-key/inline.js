@@ -2,8 +2,12 @@
 
 import h from '../../../helpers/h'
 
-export default function (change) {
-  change.replaceNodeByKey('a', { object: 'inline', type: 'emoji', isVoid: true })
+export default function(change) {
+  change.replaceNodeByKey('a', {
+    object: 'inline',
+    type: 'emoji',
+    isVoid: true,
+  })
 }
 
 export const input = (

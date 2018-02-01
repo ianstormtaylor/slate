@@ -1,4 +1,3 @@
-
 /** @jsx h */
 
 import React from 'react'
@@ -18,8 +17,8 @@ export const rules = [
       if (obj.object == 'inline' && obj.type == 'hashtag') {
         return React.createElement('span', {}, children)
       }
-    }
-  }
+    },
+  },
 ]
 
 export const input = (
@@ -27,9 +26,7 @@ export const input = (
     <document>
       <paragraph>
         <link>
-          <hashtag>
-            one
-          </hashtag>
+          <hashtag>one</hashtag>
         </link>
       </paragraph>
     </document>

@@ -3,10 +3,13 @@
 import h from '../../../helpers/h'
 import { Range } from 'slate'
 
-export default function (simulator) {
+export default function(simulator) {
   const { value } = simulator
   const text = value.document.getTexts().first()
-  const selection = Range.create().collapseToStartOf(text).move(1).focus()
+  const selection = Range.create()
+    .collapseToStartOf(text)
+    .move(1)
+    .focus()
   simulator.select(null, { selection })
 }
 

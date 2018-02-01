@@ -1,4 +1,3 @@
-
 import getWindow from 'get-window'
 import isBackward from 'selection-is-backward'
 import { Range } from 'slate'
@@ -23,7 +22,10 @@ function findRange(native, value) {
 
   // If the `native` object is a DOM `Range` or `StaticRange` object, change it
   // into something that looks like a DOM `Selection` instead.
-  if (native instanceof window.Range || (window.StaticRange && native instanceof window.StaticRange)) {
+  if (
+    native instanceof window.Range ||
+    (window.StaticRange && native instanceof window.StaticRange)
+  ) {
     native = {
       anchorNode: native.startContainer,
       anchorOffset: native.startOffset,
@@ -32,7 +34,13 @@ function findRange(native, value) {
     }
   }
 
-  const { anchorNode, anchorOffset, focusNode, focusOffset, isCollapsed } = native
+  const {
+    anchorNode,
+    anchorOffset,
+    focusNode,
+    focusOffset,
+    isCollapsed,
+  } = native
   const anchor = findPoint(anchorNode, anchorOffset, value)
   const focus = isCollapsed ? anchor : findPoint(focusNode, focusOffset, value)
   if (!anchor || !focus) return null

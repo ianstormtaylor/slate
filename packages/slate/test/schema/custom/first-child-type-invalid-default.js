@@ -6,9 +6,9 @@ export const schema = {
   blocks: {
     paragraph: {},
     quote: {
-      first: { types: ['paragraph'] }
-    }
-  }
+      first: { types: ['paragraph'] },
+    },
+  },
 }
 
 export const input = (

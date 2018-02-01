@@ -7,8 +7,8 @@ export const schema = {
     paragraph: {},
     quote: {
       first: { objects: ['text'] },
-    }
-  }
+    },
+  },
 }
 
 export const input = (

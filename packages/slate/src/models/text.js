@@ -1,4 +1,3 @@
-
 import isPlainObject from 'is-plain-object'
 import logger from 'slate-dev-logger'
 import { List, OrderedSet, Record, Set, is } from 'immutable'
@@ -28,7 +27,6 @@ const DEFAULTS = {
  */
 
 class Text extends Record(DEFAULTS) {
-
   /**
    * Create a new `Text` with `attrs`.
    *
@@ -54,7 +52,9 @@ class Text extends Record(DEFAULTS) {
       return Text.fromJSON(attrs)
     }
 
-    throw new Error(`\`Text.create\` only accepts objects, arrays, strings or texts, but you passed it: ${attrs}`)
+    throw new Error(
+      `\`Text.create\` only accepts objects, arrays, strings or texts, but you passed it: ${attrs}`
+    )
   }
 
   /**
@@ -70,7 +70,9 @@ class Text extends Record(DEFAULTS) {
       return list
     }
 
-    throw new Error(`\`Text.createList\` only accepts arrays or lists, but you passed it: ${elements}`)
+    throw new Error(
+      `\`Text.createList\` only accepts arrays or lists, but you passed it: ${elements}`
+    )
   }
 
   /**
@@ -85,10 +87,7 @@ class Text extends Record(DEFAULTS) {
       return object
     }
 
-    const {
-      leaves = [],
-      key = generateKey(),
-    } = object
+    const { leaves = [], key = generateKey() } = object
 
     const characters = leaves
       .map(Leaf.fromJSON)
@@ -141,7 +140,10 @@ class Text extends Record(DEFAULTS) {
   }
 
   get kind() {
-    logger.deprecate('slate@0.32.0', 'The `kind` property of Slate objects has been renamed to `object`.')
+    logger.deprecate(
+      'slate@0.32.0',
+      'The `kind` property of Slate objects has been renamed to `object`.'
+    )
     return this.object
   }
 
@@ -215,7 +217,7 @@ class Text extends Record(DEFAULTS) {
     // PERF: Exit early if there are no characters to be decorated.
     if (characters.size == 0) return characters
 
-    decorations.forEach((range) => {
+    decorations.forEach(range => {
       const { startKey, endKey, startOffset, endOffset, marks } = range
       const hasStart = startKey == key
       const hasEnd = endKey == key
@@ -256,10 +258,8 @@ class Text extends Record(DEFAULTS) {
     // If there are no characters, return one empty range.
     if (characters.size == 0) {
       leaves.push({})
-    }
-
-    // Otherwise, loop the characters and build the leaves...
-    else {
+    } else {
+      // Otherwise, loop the characters and build the leaves...
       characters.forEach((char, i) => {
         const { marks, text } = char
 
@@ -342,9 +342,7 @@ class Text extends Record(DEFAULTS) {
    */
 
   getNode(key) {
-    return this.key == key
-      ? this
-      : null
+    return this.key == key ? this : null
   }
 
   /**
@@ -369,9 +367,12 @@ class Text extends Record(DEFAULTS) {
 
   insertText(index, text, marks) {
     let { characters } = this
-    const chars = Character.createList(text.split('').map(char => ({ text: char, marks })))
+    const chars = Character.createList(
+      text.split('').map(char => ({ text: char, marks }))
+    )
 
-    characters = characters.slice(0, index)
+    characters = characters
+      .slice(0, index)
       .concat(chars)
       .concat(characters.slice(index))
 
@@ -437,7 +438,9 @@ class Text extends Record(DEFAULTS) {
   toJSON(options = {}) {
     const object = {
       object: this.object,
-      leaves: this.getLeaves().toArray().map(r => r.toJSON()),
+      leaves: this.getLeaves()
+        .toArray()
+        .map(r => r.toJSON()),
     }
 
     if (options.preserveKeys) {
@@ -492,7 +495,6 @@ class Text extends Record(DEFAULTS) {
   validate(schema) {
     return schema.validateNode(this)
   }
-
 }
 
 /**
@@ -505,22 +507,23 @@ Text.prototype[MODEL_TYPES.TEXT] = true
  * Memoize read methods.
  */
 
-memoize(Text.prototype, [
-  'getMarks',
-  'getMarksAsArray',
-], {
+memoize(Text.prototype, ['getMarks', 'getMarksAsArray'], {
   takesArguments: false,
 })
 
-memoize(Text.prototype, [
-  'getDecoratedCharacters',
-  'getDecorations',
-  'getLeaves',
-  'getMarksAtIndex',
-  'validate'
-], {
-  takesArguments: true,
-})
+memoize(
+  Text.prototype,
+  [
+    'getDecoratedCharacters',
+    'getDecorations',
+    'getLeaves',
+    'getMarksAtIndex',
+    'validate',
+  ],
+  {
+    takesArguments: true,
+  }
+)
 
 /**
  * Export.
