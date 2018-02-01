@@ -4,10 +4,10 @@
   "version": "0.5.2",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
-  "main": "./dist/cjs/slate-hyperscript.js",
-  "module": "./dist/es/slate-hyperscript.js",
-  "browser": "./dist/umd/slate-hyperscript.js",
-  "browserMin": "./dist/umd/slate-hyperscript.min.js",
+  "main": "dist/cjs/slate-hyperscript.js",
+  "module": "dist/es/slate-hyperscript.js",
+  "browser": "dist/umd/slate-hyperscript.js",
+  "browserMin": "dist/umd/slate-hyperscript.min.js",
   "files": [
     "dist/cjs/slate-hyperscript.js",
     "dist/es/slate-hyperscript.js",
@@ -27,10 +27,10 @@
     "slate": "^0.32.2"
   },
   "scripts": {
-    "build": "rollup --config",
-    "clean": "rm -rf ./dist ./node_modules",
-    "prepublish": "yarn build",
-    "watch": "rollup --config --watch"
+    "clean": "rm -rf ./dist ./node_modules"
+  },
+  "umdGlobals": {
+    "slate": "Slate"
   },
   "keywords": [
     "hyperscript",

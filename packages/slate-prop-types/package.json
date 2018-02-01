@@ -4,10 +4,10 @@
   "version": "0.4.19",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
-  "main": "./dist/cjs/slate-prop-types.js",
-  "module": "./dist/es/slate-prop-types.js",
-  "browser": "./dist/umd/slate-prop-types.js",
-  "browserMin": "./dist/umd/slate-prop-types.min.js",
+  "main": "dist/cjs/slate-prop-types.js",
+  "module": "dist/es/slate-prop-types.js",
+  "browser": "dist/umd/slate-prop-types.js",
+  "browserMin": "dist/umd/slate-prop-types.min.js",
   "files": [
     "dist/cjs/slate-prop-types.js",
     "dist/es/slate-prop-types.js",
@@ -26,10 +26,11 @@
     "slate": "^0.32.2"
   },
   "scripts": {
-    "build": "rollup --config",
-    "clean": "rm -rf ./dist ./node_modules",
-    "prepublish": "yarn build",
-    "watch": "rollup --config --watch"
+    "clean": "rm -rf ./dist ./node_modules"
+  },
+  "umdGlobals": {
+    "immutable": "Immutable",
+    "slate": "slate"
   },
   "keywords": [
     "editor",

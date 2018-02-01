@@ -1101,12 +1101,6 @@ builtins@0.0.3:
   version "0.0.3"
   resolved "https://registry.yarnpkg.com/builtins/-/builtins-0.0.3.tgz#5d006166da71610bc2bcf73019f0f0cc43309755"
 
-builtins@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/builtins/-/builtins-2.0.0.tgz#018999641e11252188652dbb2db01ad386fcdc46"
-  dependencies:
-    semver "^5.4.1"
-
 byline@^5.0.0:
   version "5.0.0"
   resolved "https://registry.yarnpkg.com/byline/-/byline-5.0.0.tgz#741c5216468eadc457b03410118ad77de8c1ddb1"
@@ -4167,13 +4161,6 @@ rollup-plugin-alias@^1.4.0:
   dependencies:
     slash "^1.0.0"
 
-rollup-plugin-auto-external@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/rollup-plugin-auto-external/-/rollup-plugin-auto-external-1.1.0.tgz#beca50c5bed70c64849de388c9a623b3500ac9fd"
-  dependencies:
-    builtins "^2.0.0"
-    safe-resolve "^1.0.0"
-
 rollup-plugin-babel@^3.0.3:
   version "3.0.3"
   resolved "https://registry.yarnpkg.com/rollup-plugin-babel/-/rollup-plugin-babel-3.0.3.tgz#63adedc863130327512a4a9006efc2241c5b7c15"
@@ -4262,10 +4249,6 @@ rx-lite@*, rx-lite@^4.0.8:
 safe-buffer@^5.0.1, safe-buffer@^5.1.1, safe-buffer@~5.1.0, safe-buffer@~5.1.1:
   version "5.1.1"
   resolved "https://registry.yarnpkg.com/safe-buffer/-/safe-buffer-5.1.1.tgz#893312af69b2123def71f57889001671eeb2c853"
-
-safe-resolve@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/safe-resolve/-/safe-resolve-1.0.0.tgz#fe34f8d29d7a3becfd249d0aa8a799b5c3cf6559"
 
 sax@^1.2.1:
   version "1.2.2"

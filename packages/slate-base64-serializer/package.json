@@ -4,10 +4,10 @@
   "version": "0.2.21",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
-  "main": "./dist/cjs/slate-base64-serializer.js",
-  "module": "./dist/es/slate-base64-serializer.js",
-  "browser": "./dist/umd/slate-base64-serializer.js",
-  "browserMin": "./dist/umd/slate-base64-serializer.min.js",
+  "main": "dist/cjs/slate-base64-serializer.js",
+  "module": "dist/es/slate-base64-serializer.js",
+  "browser": "dist/umd/slate-base64-serializer.js",
+  "browserMin": "dist/umd/slate-base64-serializer.min.js",
   "files": [
     "dist/cjs/slate-base64-serializer.js",
     "dist/es/slate-base64-serializer.js",
@@ -25,10 +25,10 @@
     "isomorphic-base64": "^1.0.2"
   },
   "scripts": {
-    "build": "rollup --config",
-    "clean": "rm -rf ./dist ./node_modules",
-    "prepublish": "yarn build",
-    "watch": "rollup --config --watch"
+    "clean": "rm -rf ./dist ./node_modules"
+  },
+  "umdGlobals": {
+    "slate": "Slate"
   },
   "keywords": [
     "deserialize",

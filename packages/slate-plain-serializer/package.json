@@ -4,10 +4,10 @@
   "version": "0.5.2",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
-  "main": "./dist/cjs/slate-plain-serializer.js",
-  "module": "./dist/es/slate-plain-serializer.js",
-  "browser": "./dist/umd/slate-plain-serializer.js",
-  "browserMin": "./dist/umd/slate-plain-serializer.min.js",
+  "main": "dist/cjs/slate-plain-serializer.js",
+  "module": "dist/es/slate-plain-serializer.js",
+  "browser": "dist/umd/slate-plain-serializer.js",
+  "browserMin": "dist/umd/slate-plain-serializer.min.js",
   "files": [
     "dist/cjs/slate-plain-serializer.js",
     "dist/es/slate-plain-serializer.js",
@@ -27,10 +27,11 @@
     "slate-hyperscript": "^0.5.2"
   },
   "scripts": {
-    "build": "rollup --config",
-    "clean": "rm -rf ./dist ./node_modules",
-    "prepublish": "yarn build",
-    "watch": "rollup --config --watch"
+    "clean": "rm -rf ./dist ./node_modules"
+  },
+  "umdGlobals": {
+    "immutable": "Immutable",
+    "slate": "slate"
   },
   "keywords": [
     "deserialize",

@@ -4,10 +4,10 @@
   "version": "0.4.19",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
-  "main": "./dist/cjs/slate-simulator.js",
-  "module": "./dist/es/slate-simulator.js",
-  "browser": "./dist/umd/slate-simulator.js",
-  "browserMin": "./dist/umd/slate-simulator.min.js",
+  "main": "dist/cjs/slate-simulator.js",
+  "module": "dist/es/slate-simulator.js",
+  "browser": "dist/umd/slate-simulator.js",
+  "browserMin": "dist/umd/slate-simulator.min.js",
   "files": [
     "dist/cjs/slate-simulator.js",
     "dist/es/slate-simulator.js",
@@ -21,10 +21,10 @@
     "slate": "^0.32.2"
   },
   "scripts": {
-    "build": "rollup --config",
-    "clean": "rm -rf ./dist ./node_modules",
-    "prepublish": "yarn build",
-    "watch": "rollup --config --watch"
+    "clean": "rm -rf ./dist ./node_modules"
+  },
+  "umdGlobals": {
+    "slate": "Slate"
   },
   "keywords": [
     "ci",

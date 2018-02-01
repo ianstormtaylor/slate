@@ -4,10 +4,10 @@
   "version": "0.32.2",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
-  "main": "./dist/cjs/slate.js",
-  "module": "./dist/es/slate.js",
-  "browser": "./dist/umd/slate.js",
-  "browserMin": "./dist/umd/slate.min.js",
+  "main": "dist/cjs/slate.js",
+  "module": "dist/es/slate.js",
+  "browser": "dist/umd/slate.js",
+  "browserMin": "dist/umd/slate.min.js",
   "files": [
     "dist/cjs/slate.js",
     "dist/es/slate.js",
@@ -33,10 +33,10 @@
     "slate-hyperscript": "^0.5.2"
   },
   "scripts": {
-    "build": "rollup --config",
-    "clean": "rm -rf ./dist ./node_modules",
-    "prepublish": "yarn build",
-    "watch": "rollup --config --watch"
+    "clean": "rm -rf ./dist ./node_modules"
+  },
+  "umdGlobals": {
+    "immutable": "Immutable"
   },
   "keywords": [
     "canvas",
