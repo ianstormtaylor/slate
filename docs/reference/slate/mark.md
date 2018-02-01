@@ -5,7 +5,7 @@
 import { Mark } from 'slate'
 ```
 
-A formatting mark that can be associated with [`Characters`](./mark.md). Marks are how Slate represents rich formatting like **bold** or _italic_.
+A formatting mark that can be associated with [`Characters`](./character.md). Marks are how Slate represents rich formatting like **bold** or _italic_.
 
 
 ## Properties

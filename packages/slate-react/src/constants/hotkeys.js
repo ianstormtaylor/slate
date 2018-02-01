@@ -48,8 +48,10 @@ const DELETE_WORD_FORWARD_PC = isKeyHotkey('ctrl+delete')
 const DELETE_WORD_BACKWARD = e => IS_APPLE ? DELETE_WORD_BACKWARD_MAC(e) : DELETE_WORD_BACKWARD_PC(e)
 const DELETE_WORD_FORWARD = e => IS_APPLE ? DELETE_WORD_FORWARD_MAC(e) : DELETE_WORD_FORWARD_PC(e)
 
-const COLLAPSE_CHAR_FORWARD = isKeyHotkey('right')
-const COLLAPSE_CHAR_BACKWARD = isKeyHotkey('left')
+const RIGHT_ARROW = isKeyHotkey('right')
+const LEFT_ARROW = isKeyHotkey('left')
+const COLLAPSE_CHAR_FORWARD = e => RIGHT_ARROW(e) && !EXTEND_CHAR_FORWARD(e)
+const COLLAPSE_CHAR_BACKWARD = e => LEFT_ARROW(e) && !EXTEND_CHAR_BACKWARD(e)
 
 const COLLAPSE_LINE_BACKWARD_MAC = isKeyHotkey('option+up')
 const COLLAPSE_LINE_FORWARD_MAC = isKeyHotkey('option+down')
