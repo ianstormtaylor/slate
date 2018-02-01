@@ -126,7 +126,7 @@ class App extends React.Component {
 
   onKeyDown = (event, change) => {
     // Return with no changes if it's not the "`" key with ctrl pressed.
-    if (event.key != '`' || !event.ctrlKey) return
+    if (event.key != '`' && !event.ctrlKey) return
 
     // Prevent the "`" from being inserted by default.
     event.preventDefault()
@@ -176,7 +176,7 @@ class App extends React.Component {
   }
 
   onKeyDown = (event, change) => {
-    if (event.key != '`' || !event.ctrlKey) return
+    if (event.key != '`' && !event.ctrlKey) return
 
     event.preventDefault()
 
