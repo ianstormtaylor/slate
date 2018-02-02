@@ -19,7 +19,7 @@
         "object": "block",
         "type": "check-list-item",
         "data": {
-          "checked": true,
+          "checked": true
         },
         "nodes": [
           {
@@ -36,7 +36,7 @@
         "object": "block",
         "type": "check-list-item",
         "data": {
-          "checked": true,
+          "checked": true
         },
         "nodes": [
           {
@@ -53,7 +53,7 @@
         "object": "block",
         "type": "check-list-item",
         "data": {
-          "checked": false,
+          "checked": false
         },
         "nodes": [
           {
@@ -70,7 +70,7 @@
         "object": "block",
         "type": "check-list-item",
         "data": {
-          "checked": true,
+          "checked": true
         },
         "nodes": [
           {
@@ -87,7 +87,7 @@
         "object": "block",
         "type": "check-list-item",
         "data": {
-          "checked": false,
+          "checked": false
         },
         "nodes": [
           {
@@ -104,7 +104,7 @@
         "object": "block",
         "type": "check-list-item",
         "data": {
-          "checked": false,
+          "checked": false
         },
         "nodes": [
           {

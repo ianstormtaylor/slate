@@ -8,7 +8,7 @@ But, if you'd rather install Slate by simply adding a `<script>` tag to your app
 To get a copy of `slate.js`, download the version of slate you want from npm:
 
 ```
-npm install slate @0.11.12
+npm install slate@latest
 ```
 
 And then look in the `node_modules` folder for the bundled `slate.js` file:
@@ -43,9 +43,9 @@ Then you can add `slate.js` after those includes:
 To make things easier, for quick prototyping, you can also use the [`unpkg.com`](https://unpkg.com/#/) delivery network that makes working with bundled npm modules easier. In that case, your includes would look like:
 
 ```html
-<script src="https://unpkg.com/react/dist/react.js"></script>
-<script src="https://unpkg.com/react-dom/dist/react-dom.js"></script>
-<script src="https://unpkg.com/react-dom/dist/react-dom-server.js"></script>
+<script src="https://unpkg.com/react/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/react-dom/umd/react-dom-server.browser.production.min.js"></script>
 <script src="https://unpkg.com/immutable/dist/immutable.js"></script>
 <script src="https://unpkg.com/slate/dist/slate.js"></script>
 ```

@@ -1,6 +1,6 @@
 
 import React from 'react'
-import ReactDOMServer from 'react-dom/server'
+import { renderToStaticMarkup } from 'react-dom/server'
 import typeOf from 'type-of'
 import { Node, Value } from 'slate'
 import { Record } from 'immutable'
@@ -321,7 +321,7 @@ class Html {
     const elements = document.nodes.map(this.serializeNode)
     if (options.render === false) return elements
 
-    const html = ReactDOMServer.renderToStaticMarkup(<body>{elements}</body>)
+    const html = renderToStaticMarkup(<body>{elements}</body>)
     const inner = html.slice(6, -7)
     return inner
   }

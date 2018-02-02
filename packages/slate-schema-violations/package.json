@@ -4,25 +4,20 @@
   "version": "0.1.0",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
-  "main": "./lib/index.js",
+  "main": "lib/slate-schema-violations.js",
+  "module": "lib/slate-schema-violations.es.js",
+  "umd": "dist/slate-schema-violations.js",
+  "umdMin": "dist/slate-schema-violations.min.js",
   "files": [
     "dist/",
     "lib/"
   ],
   "devDependencies": {
-    "babel-cli": "^6.10.1",
-    "browserify": "^13.0.1",
     "mocha": "^2.5.3",
-    "slate": "^0.32.2",
-    "uglify-js": "^2.7.0"
+    "slate": "^0.32.2"
   },
   "scripts": {
-    "build": "babel --out-dir ./lib ./src",
-    "build:max": "mkdir -p ./dist && NODE_ENV=production browserify ./src/index.js --transform babelify --transform envify --transform [ browserify-global-shim --global ] --standalone SlateSchemaViolations > ./dist/slate-schema-violations.js",
-    "build:min": "mkdir -p ./dist && NODE_ENV=production browserify ./src/index.js --transform babelify --transform envify --transform [ browserify-global-shim --global ] --transform uglifyify --standalone SlateSchemaViolations | uglifyjs > ./dist/slate-schema-violations.min.js",
-    "clean": "rm -rf ./dist ./lib ./node_modules",
-    "prepublish": "yarn run build && yarn run build:max && yarn run build:min",
-    "watch": "babel --watch --out-dir ./lib ./src --source-maps inline"
+    "clean": "rm -rf ./dist ./lib ./node_modules"
   },
   "keywords": [
     "constants",

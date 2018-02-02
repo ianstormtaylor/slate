@@ -1,5 +1,6 @@
 
 import Block from './models/block'
+import Change from './models/change'
 import Changes from './changes'
 import Character from './models/character'
 import Data from './models/data'
@@ -26,6 +27,7 @@ import { resetKeyGenerator, setKeyGenerator } from './utils/generate-key'
 
 export {
   Block,
+  Change,
   Changes,
   Character,
   Data,

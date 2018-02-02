@@ -4,7 +4,10 @@
   "version": "0.5.2",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
-  "main": "./lib/index.js",
+  "main": "lib/slate-html-serializer.js",
+  "module": "lib/slate-html-serializer.es.js",
+  "umd": "dist/slate-html-serializer.js",
+  "umdMin": "dist/slate-html-serializer.min.js",
   "files": [
     "dist/",
     "lib/"
@@ -20,22 +23,14 @@
     "slate": "^0.32.1"
   },
   "devDependencies": {
-    "babel-cli": "^6.10.1",
-    "browserify": "^13.0.1",
     "mocha": "^2.5.3",
     "slate": "^0.32.2",
-    "slate-hyperscript": "^0.5.2",
-    "uglify-js": "^2.7.0"
+    "slate-hyperscript": "^0.5.2"
   },
   "scripts": {
-    "build": "babel --out-dir ./lib ./src",
-    "build:max": "mkdir -p ./dist && NODE_ENV=production browserify ./src/index.js --transform babelify --transform envify --transform [ browserify-global-shim --global ] --standalone SlateHtmlSerializer > ./dist/slate-html-serializer.js",
-    "build:min": "mkdir -p ./dist && NODE_ENV=production browserify ./src/index.js --transform babelify --transform envify --transform [ browserify-global-shim --global ] --transform uglifyify --standalone SlateHtmlSerializer | uglifyjs > ./dist/slate-html-serializer.min.js",
-    "clean": "rm -rf ./dist ./lib ./node_modules",
-    "prepublish": "yarn run build && yarn run build:max && yarn run build:min",
-    "watch": "babel --watch --out-dir ./lib ./src --source-maps inline"
+    "clean": "rm -rf ./dist ./lib ./node_modules"
   },
-  "browserify-global-shim": {
+  "umdGlobals": {
     "immutable": "Immutable",
     "react": "React",
     "react-dom": "ReactDOM",
