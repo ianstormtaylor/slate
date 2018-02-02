@@ -4,22 +4,21 @@
   "version": "0.1.0",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
-  "main": "dist/cjs/slate-schema-violations.js",
-  "module": "dist/es/slate-schema-violations.js",
-  "browser": "dist/umd/slate-schema-violations.js",
-  "browserMin": "dist/umd/slate-schema-violations.min.js",
+  "main": "lib/slate-schema-violations.js",
+  "module": "lib/slate-schema-violations.es.js",
+  "umd": "dist/slate-schema-violations.js",
+  "umdMin": "dist/slate-schema-violations.min.js",
   "files": [
-    "dist/cjs/slate-schema-violations.js",
-    "dist/es/slate-schema-violations.js",
-    "dist/umd/slate-schema-violations.js",
-    "dist/umd/slate-schema-violations.min.js"
+    "dist/slate-schema-violations.js",
+    "dist/slate-schema-violations.min.js",
+    "lib/"
   ],
   "devDependencies": {
     "mocha": "^2.5.3",
     "slate": "^0.32.2"
   },
   "scripts": {
-    "clean": "rm -rf ./dist ./node_modules"
+    "clean": "rm -rf ./dist ./lib ./node_modules"
   },
   "keywords": [
     "constants",

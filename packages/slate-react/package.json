@@ -4,15 +4,14 @@
   "version": "0.11.2",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
-  "main": "dist/cjs/slate-react.js",
-  "module": "dist/es/slate-react.js",
-  "browser": "dist/umd/slate-react.js",
-  "browserMin": "dist/umd/slate-react.min.js",
+  "main": "lib/slate-react.js",
+  "module": "lib/slate-react.es.js",
+  "umd": "dist/slate-react.js",
+  "umdMin": "dist/slate-react.min.js",
   "files": [
-    "dist/cjs/slate-react.js",
-    "dist/es/slate-react.js",
-    "dist/umd/slate-react.js",
-    "dist/umd/slate-react.min.js"
+    "dist/slate-react.js",
+    "dist/slate-react.min.js",
+    "lib/"
   ],
   "dependencies": {
     "debug": "^2.3.2",
@@ -43,13 +42,13 @@
     "slate-simulator": "^0.4.19"
   },
   "scripts": {
-    "clean": "rm -rf ./dist ./node_modules"
+    "clean": "rm -rf ./dist ./lib ./node_modules"
   },
   "umdGlobals": {
     "immutable": "Immutable",
     "react": "React",
     "react-dom": "ReactDOM",
-    "slate": "slate"
+    "slate": "Slate"
   },
   "keywords": [
     "canvas",

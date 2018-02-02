@@ -14,7 +14,7 @@ const configurations = []
 const umdConfig = {
   input: 'examples/index.js',
   output: {
-    file: pkg.browser,
+    file: pkg.umd,
     name: 'slate-examples',
     format: 'umd',
     exports: 'named',
@@ -43,7 +43,7 @@ const umdConfig = {
   watch: {
     include: [
       'examples/**',
-      'packages/*/dist/**',
+      'packages/*/lib/**',
     ],
   },
 }
@@ -54,7 +54,7 @@ if (process.env.ROLLUP_WATCH) {
   umdConfig.plugins.push(sourcemaps())
 } else {
   const umdConfigMin = Object.assign({}, umdConfig)
-  umdConfigMin.output = Object.assign({}, umdConfig.output, { file: pkg.browserMin })
+  umdConfigMin.output = Object.assign({}, umdConfig.output, { file: pkg.umdMin })
   const prodReplace = replace({ 'process.env.NODE_ENV': JSON.stringify('production') })
   umdConfigMin.plugins = umdConfig.plugins.slice(0).concat(prodReplace, uglify())
 

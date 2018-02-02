@@ -4,15 +4,14 @@
   "version": "0.4.19",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
-  "main": "dist/cjs/slate-simulator.js",
-  "module": "dist/es/slate-simulator.js",
-  "browser": "dist/umd/slate-simulator.js",
-  "browserMin": "dist/umd/slate-simulator.min.js",
+  "main": "lib/slate-simulator.js",
+  "module": "lib/slate-simulator.es.js",
+  "umd": "dist/slate-simulator.js",
+  "umdMin": "dist/slate-simulator.min.js",
   "files": [
-    "dist/cjs/slate-simulator.js",
-    "dist/es/slate-simulator.js",
-    "dist/umd/slate-simulator.js",
-    "dist/umd/slate-simulator.min.js"
+    "dist/slate-simulator.js",
+    "dist/slate-simulator.min.js",
+    "lib/"
   ],
   "peerDependencies": {
     "slate": "^0.32.1"
@@ -21,7 +20,7 @@
     "slate": "^0.32.2"
   },
   "scripts": {
-    "clean": "rm -rf ./dist ./node_modules"
+    "clean": "rm -rf ./dist ./lib ./node_modules"
   },
   "umdGlobals": {
     "slate": "Slate"

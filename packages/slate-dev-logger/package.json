@@ -4,21 +4,20 @@
   "version": "0.1.37",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
-  "main": "dist/cjs/slate-dev-logger.js",
-  "module": "dist/es/slate-dev-logger.js",
-  "browser": "dist/umd/slate-dev-logger.js",
-  "browserMin": "dist/umd/slate-dev-logger.min.js",
+  "main": "lib/slate-dev-logger.js",
+  "module": "lib/slate-dev-logger.es.js",
+  "umd": "dist/slate-dev-logger.js",
+  "umdMin": "dist/slate-dev-logger.min.js",
   "files": [
-    "dist/cjs/slate-dev-logger.js",
-    "dist/es/slate-dev-logger.js",
-    "dist/umd/slate-dev-logger.js",
-    "dist/umd/slate-dev-logger.min.js"
+    "dist/slate-dev-logger.js",
+    "dist/slate-dev-logger.min.js",
+    "lib/"
   ],
   "devDependencies": {
     "mocha": "^2.5.3"
   },
   "scripts": {
-    "clean": "rm -rf ./dist ./node_modules"
+    "clean": "rm -rf ./dist ./lib ./node_modules"
   },
   "keywords": [
     "slate"

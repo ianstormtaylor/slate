@@ -4,8 +4,8 @@
   "workspaces": [
     "packages/*"
   ],
-  "browser": "./examples/build.dev.js",
-  "browserMin": "./examples/build.prod.js",
+  "umd": "./examples/build.dev.js",
+  "umdMin": "./examples/build.prod.js",
   "devDependencies": {
     "babel-core": "^6.26.0",
     "babel-eslint": "^8.2.1",

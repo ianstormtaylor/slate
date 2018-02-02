@@ -13,7 +13,7 @@ export default (pkg) => {
   const umdConfig = {
     input: `packages/${pkg.name}/src/index.js`,
     output: {
-      file: `packages/${pkg.name}/${pkg.browser}`,
+      file: `packages/${pkg.name}/${pkg.umd}`,
       name: startCase(pkg.name).replace(/ /g, ''),
       format: 'umd',
       exports: 'named',
@@ -45,7 +45,7 @@ export default (pkg) => {
 
   // Additional UMD minified build based off of the unminified config
   const umdConfigMin = Object.assign({}, umdConfig)
-  umdConfigMin.output = Object.assign({}, umdConfig.output, { file: `packages/${pkg.name}/${pkg.browserMin}` })
+  umdConfigMin.output = Object.assign({}, umdConfig.output, { file: `packages/${pkg.name}/${pkg.umdMin}` })
   umdConfigMin.plugins = umdConfig.plugins.slice(0).concat(uglify())
 
   // Generate list of external dependencies from package.json

@@ -4,15 +4,14 @@
   "version": "0.32.2",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
-  "main": "dist/cjs/slate.js",
-  "module": "dist/es/slate.js",
-  "browser": "dist/umd/slate.js",
-  "browserMin": "dist/umd/slate.min.js",
+  "main": "lib/slate.js",
+  "module": "lib/slate.es.js",
+  "umd": "dist/slate.js",
+  "umdMin": "dist/slate.min.js",
   "files": [
-    "dist/cjs/slate.js",
-    "dist/es/slate.js",
-    "dist/umd/slate.js",
-    "dist/umd/slate.min.js"
+    "dist/slate.js",
+    "dist/slate.min.js",
+    "lib/"
   ],
   "dependencies": {
     "debug": "^2.3.2",
@@ -33,7 +32,7 @@
     "slate-hyperscript": "^0.5.2"
   },
   "scripts": {
-    "clean": "rm -rf ./dist ./node_modules"
+    "clean": "rm -rf ./dist ./lib ./node_modules"
   },
   "umdGlobals": {
     "immutable": "Immutable"
