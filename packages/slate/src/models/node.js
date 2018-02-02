@@ -347,6 +347,25 @@ class Node {
   }
 
   /**
+   * Get the path of ancestors of a descendant node by `path`.
+   *
+   * @param {Array<number>} path
+   * @return {List<Node>}
+   */
+
+  getAncestorsByPath(path) {
+    let parent = this
+    return List(path).map((childIndex) => {
+      if (!parent) {
+        throw new Error(`Cannot find a descendant by path as ${path}`)
+      }
+      const result = parent
+      parent = parent.nodes.get(childIndex)
+      return result
+    })
+  }
+
+  /**
    * Get the leaf block descendants of the node.
    *
    * @return {List<Node>}
@@ -1963,16 +1982,19 @@ class Node {
 
   updateNodeAtPath(path, node) {
     const nodeAtPath = this.getNodeAtPath(path)
+
     if (nodeAtPath.key !== node.key) {
       path = this.getPath(node)
     }
 
-    const setInPath = []
-    for (const childIndex of path) {
-      setInPath.push('nodes')
-      setInPath.push(childIndex)
-    }
-    return this.setIn(setInPath, node)
+    const ancestors = this.getAncestorsByPath(path)
+    let child = node
+    ancestors.findLast((parent, index) => {
+      const childIndex = path[index]
+      child = parent.setIn(['nodes', childIndex], child)
+      return false
+    })
+    return child
   }
 
 

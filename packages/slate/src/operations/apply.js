@@ -32,7 +32,7 @@ const APPLIERS = {
     let { document } = value
     let node = document.assertPath(path)
     node = node.addMark(offset, length, mark)
-    document = document.updateNode(node)
+    document = document.updateNodeAtPath(path, node)
     value = value.set('document', document)
     return value
   },
@@ -52,7 +52,7 @@ const APPLIERS = {
     let { document } = value
     let parent = document.assertPath(rest)
     parent = parent.insertNode(index, node)
-    document = document.updateNode(parent)
+    document = document.updateNodeAtPath(rest, parent)
     value = value.set('document', document)
     return value
   },
@@ -73,7 +73,7 @@ const APPLIERS = {
 
     // Update the document
     node = node.insertText(offset, text, marks)
-    document = document.updateNode(node)
+    document = document.updateNodeAtPath(path, node)
 
     // Update the selection
     if (anchorKey == node.key && anchorOffset >= offset) {
@@ -101,13 +101,14 @@ const APPLIERS = {
     let { document, selection } = value
     const one = document.assertPath(withPath)
     const two = document.assertPath(path)
-    let parent = document.getParent(one.key)
+    const rest = path.slice(0, -1)
+    let parent = document.assertPath(rest)
     const oneIndex = parent.nodes.indexOf(one)
     const twoIndex = parent.nodes.indexOf(two)
 
     // Perform the merge in the document.
     parent = parent.mergeNode(oneIndex, twoIndex)
-    document = document.updateNode(parent)
+    document = document.updateNodeAtPath(rest, parent)
 
     // If the nodes are text nodes and the selection is inside the second node
     // update it to refer to the first node instead.
@@ -153,9 +154,9 @@ const APPLIERS = {
     const node = document.assertPath(path)
 
     // Remove the node from its current parent.
-    let parent = document.getParent(node.key)
+    let parent = document.assertPath(oldParentPath)
     parent = parent.removeNode(oldIndex)
-    document = document.updateNode(parent)
+    document = document.updateNodeAtPath(oldParentPath, parent)
 
     // Find the new target...
     let target
@@ -186,7 +187,7 @@ const APPLIERS = {
 
     // Insert the new node to its new parent.
     target = target.insertNode(newIndex, node)
-    document = document.updateNode(target)
+    document = document.updateNodeAtPath(newParentPath, target)
     value = value.set('document', document)
     return value
   },
@@ -204,7 +205,7 @@ const APPLIERS = {
     let { document } = value
     let node = document.assertPath(path)
     node = node.removeMark(offset, length, mark)
-    document = document.updateNode(node)
+    document = document.updateNodeAtPath(path, node)
     value = value.set('document', document)
     return value
   },
