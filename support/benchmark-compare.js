@@ -27,8 +27,8 @@ baseline.forEach((suite, i) => {
     const b = base.iterations / base.elapsed * 1000
     const c = comp.iterations / comp.elapsed * 1000
     const threshold = b * THRESHOLD
-    const slower = (b - c) > threshold
-    const faster = (b - c) < (0 - threshold)
+    const slower = b - c > threshold
+    const faster = b - c < 0 - threshold
     const percent = Math.round(Math.abs(b - c) / b * 100)
 
     let output = `${b.toFixed(2)} → ${c.toFixed(2)} ops/sec`

@@ -9,7 +9,7 @@ import uglify from 'rollup-plugin-uglify'
 
 const environment = process.env.NODE_ENV || 'development'
 
-export default (pkg) => {
+export default pkg => {
   const pkgName = pkg.name
   const output = {
     cjs: pkg.main,
@@ -33,7 +33,8 @@ export default (pkg) => {
   // 2. It is part of a package.json dependency (e.g. `lodash/omit`)
   // External dependencies are expected to be present at runtime (rather than being bundled into
   // our built dist).
-  const isExternalDependency = id => !!dependencies.find(dep => dep === id || id.startsWith(`${dep}/`))
+  const isExternalDependency = id =>
+    !!dependencies.find(dep => dep === id || id.startsWith(`${dep}/`))
 
   // UMD build for browsers
   const umdConfig = {
@@ -79,8 +80,16 @@ export default (pkg) => {
         // hint that e.g. `import { List } from 'immutable'` is a reference
         // to a valid named export.
         namedExports: {
-          'esrever': ['reverse'],
-          'immutable': ['List', 'Map', 'Record', 'OrderedSet', 'Set', 'Stack', 'is'],
+          esrever: ['reverse'],
+          immutable: [
+            'List',
+            'Map',
+            'Record',
+            'OrderedSet',
+            'Set',
+            'Stack',
+            'is',
+          ],
           'react-dom': ['findDOMNode'],
           'react-dom/server': ['renderToStaticMarkup'],
         },
@@ -90,15 +99,15 @@ export default (pkg) => {
       // some modules like React to use their production variant (and
       // one place within Slate itself).
       replace({
-        'process.env.NODE_ENV': JSON.stringify('production')
+        'process.env.NODE_ENV': JSON.stringify('production'),
       }),
 
       // Use babel to transpile the result -- limit to package src
       // to prevent babel from trying to transpile npm dependencies.
       babel({
-        include: [`packages/${pkgName}/src/**`]
+        include: [`packages/${pkgName}/src/**`],
       }),
-    ]
+    ],
   }
 
   // Additional UMD minified build based off of the unminified config
@@ -137,15 +146,15 @@ export default (pkg) => {
       // some modules like React to use their production variant (and
       // one place within Slate itself).
       replace({
-        'process.env.NODE_ENV': JSON.stringify(environment)
+        'process.env.NODE_ENV': JSON.stringify(environment),
       }),
 
       // Use babel to transpile the result -- limit to package src
       // to prevent babel from trying to transpile npm dependencies.
       babel({
-        include: [`packages/${pkgName}/src/**`]
+        include: [`packages/${pkgName}/src/**`],
       }),
-    ]
+    ],
   }
 
   const configurations = [moduleConfig]

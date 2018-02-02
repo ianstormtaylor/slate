@@ -4,7 +4,7 @@
 import h from '../../test/helpers/h'
 import { __clear } from '../../lib/utils/memoize'
 
-export default function ({ value, next }) {
+export default function({ value, next }) {
   value.document.updateNode(next)
 }
 
@@ -24,7 +24,8 @@ export const input = (
         <quote>
           <paragraph>
             <paragraph>
-              This is editable <b>rich</b> text, <i>much</i> better than a textarea!
+              This is editable <b>rich</b> text, <i>much</i> better than a
+              textarea!
             </paragraph>
           </paragraph>
         </quote>

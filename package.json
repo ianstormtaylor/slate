@@ -80,7 +80,7 @@
     "build": "cross-env NODE_ENV=production rollup --config",
     "clean": "lerna run clean && rm -rf ./node_modules ./dist ./examples/build.*.js",
     "gh-pages": "yarn build && gh-pages --dist ./examples",
-    "lint": "eslint packages/*/src packages/*/test examples/*/*.js examples/dev/*/*.js",
+    "lint": "eslint packages/*/src packages/*/test examples/*/*.js examples/dev/*/*.js && prettier --list-different '**/*.{js,jsx}'",
     "open": "open http://localhost:8080/dev.html",
     "prettier": "prettier --write '**/*.{js,jsx}'",
     "release": "yarn test && yarn lint && lerna publish && yarn gh-pages",

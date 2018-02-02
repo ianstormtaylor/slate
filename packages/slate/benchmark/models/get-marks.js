@@ -3,7 +3,7 @@
 
 import h from '../../test/helpers/h'
 
-export default function (value) {
+export default function(value) {
   value.document.getMarks()
 }
 
@@ -14,7 +14,8 @@ export const input = (
         <quote>
           <paragraph>
             <paragraph>
-              This is editable <b>rich</b> text, <i>much</i> better than a textarea!
+              This is editable <b>rich</b> text, <i>much</i> better than a
+              textarea!
             </paragraph>
           </paragraph>
         </quote>

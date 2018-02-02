@@ -14,23 +14,27 @@ const html = new Html({
         switch (obj.object) {
           case 'block': {
             switch (obj.type) {
-              case 'paragraph': return React.createElement('p', {}, children)
-              case 'quote': return React.createElement('blockquote', {}, children)
+              case 'paragraph':
+                return React.createElement('p', {}, children)
+              case 'quote':
+                return React.createElement('blockquote', {}, children)
             }
           }
           case 'mark': {
             switch (obj.type) {
-              case 'bold': return React.createElement('strong', {}, children)
-              case 'italic': return React.createElement('em', {}, children)
+              case 'bold':
+                return React.createElement('strong', {}, children)
+              case 'italic':
+                return React.createElement('em', {}, children)
             }
           }
         }
-      }
-    }
-  ]
+      },
+    },
+  ],
 })
 
-export default function (state) {
+export default function(state) {
   html.serialize(state)
 }
 
@@ -40,7 +44,8 @@ export const input = (
       {Array.from(Array(10)).map(() => (
         <quote>
           <paragraph>
-            This is editable <b>rich</b> text, <i>much</i> better than a textarea!
+            This is editable <b>rich</b> text, <i>much</i> better than a
+            textarea!
           </paragraph>
         </quote>
       ))}
