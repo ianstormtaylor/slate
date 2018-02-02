@@ -36,9 +36,11 @@ const umdConfig = {
       debug: path.resolve(__dirname, 'node_modules/debug/src/browser'),
       'react-dom/server': path.resolve(__dirname, 'node_modules/react-dom/cjs/react-dom-server.browser.production.min'),
     }),
+
     // Allow rollup to resolve modules that are npm dependencies
     // (by default, it can only resolve local modules).
     resolve(),
+
     // Allow rollup to resolve npm dependencies that are CommonJS
     // (by default, it can only handle ES2015 syntax).
     commonjs({
@@ -54,14 +56,17 @@ const umdConfig = {
         'react-dom/server': ['renderToStaticMarkup'],
       },
     }),
+
     // Convert JSON imports to ES6 modules.
     json(),
+
     // Replace `process.env.NODE_ENV` with its value -- needed for
     // some modules like React to use their production variant (and
     // one place within Slate itself).
     replace({
       'process.env.NODE_ENV': JSON.stringify(environment)
     }),
+
     // Use babel to transpile the result -- limit to package src
     // to prevent babel from trying to transpile npm dependencies.
     babel({
