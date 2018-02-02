@@ -213,10 +213,16 @@ class Content extends React.Component {
       // we need to check and do the right thing here.
       if (isBackward) {
         native.collapse(range.endContainer, range.endOffset)
-        native.extend(range.startContainer, range.startOffset)
+
+        if (native.anchorNode) {
+          native.extend(range.startContainer, range.startOffset)
+        }
       } else {
         native.collapse(range.startContainer, range.startOffset)
-        native.extend(range.endContainer, range.endOffset)
+
+        if (native.anchorNode) {
+          native.extend(range.endContainer, range.endOffset)
+        }
       }
     } else {
       // COMPAT: IE 11 does not support Selection.extend, fallback to addRange
