@@ -73,7 +73,7 @@
     "benchmark": "mkdir -p ./tmp && babel-node ./node_modules/.bin/_matcha --reporter ./support/benchmark-reporter ./packages/*/benchmark/index.js > ./tmp/benchmark-comparison.json && babel-node ./support/benchmark-compare",
     "benchmark:save": "mkdir -p ./tmp && babel-node ./node_modules/.bin/_matcha --reporter ./support/benchmark-reporter ./packages/*/benchmark/index.js > ./tmp/benchmark-baseline.json",
     "bootstrap": "lerna bootstrap && yarn build",
-    "build": "rollup --config",
+    "build": "NODE_ENV=production rollup --config",
     "clean": "lerna run clean && rm -rf ./node_modules ./dist ./examples/build.*.js",
     "gh-pages": "yarn build && gh-pages --dist ./examples",
     "lint": "eslint packages/*/src packages/*/test examples/*/*.js examples/dev/*/*.js",

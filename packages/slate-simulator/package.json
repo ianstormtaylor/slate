@@ -9,8 +9,7 @@
   "umd": "dist/slate-simulator.js",
   "umdMin": "dist/slate-simulator.min.js",
   "files": [
-    "dist/slate-simulator.js",
-    "dist/slate-simulator.min.js",
+    "dist/",
     "lib/"
   ],
   "peerDependencies": {

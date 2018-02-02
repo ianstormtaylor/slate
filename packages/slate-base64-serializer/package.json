@@ -9,8 +9,7 @@
   "umd": "dist/slate-base64-serializer.js",
   "umdMin": "dist/slate-base64-serializer.min.js",
   "files": [
-    "dist/slate-base64-serializer.js",
-    "dist/slate-base64-serializer.min.js",
+    "dist/",
     "lib/"
   ],
   "peerDependencies": {

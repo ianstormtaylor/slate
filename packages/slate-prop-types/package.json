@@ -9,8 +9,7 @@
   "umd": "dist/slate-prop-types.js",
   "umdMin": "dist/slate-prop-types.min.js",
   "files": [
-    "dist/slate-prop-types.js",
-    "dist/slate-prop-types.min.js",
+    "dist/",
     "lib/"
   ],
   "dependencies": {

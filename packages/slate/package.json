@@ -9,8 +9,7 @@
   "umd": "dist/slate.js",
   "umdMin": "dist/slate.min.js",
   "files": [
-    "dist/slate.js",
-    "dist/slate.min.js",
+    "dist/",
     "lib/"
   ],
   "dependencies": {

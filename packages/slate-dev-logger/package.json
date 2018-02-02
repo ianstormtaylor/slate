@@ -9,8 +9,7 @@
   "umd": "dist/slate-dev-logger.js",
   "umdMin": "dist/slate-dev-logger.min.js",
   "files": [
-    "dist/slate-dev-logger.js",
-    "dist/slate-dev-logger.min.js",
+    "dist/",
     "lib/"
   ],
   "devDependencies": {

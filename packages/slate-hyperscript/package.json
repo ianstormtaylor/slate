@@ -9,8 +9,7 @@
   "umd": "dist/slate-hyperscript.js",
   "umdMin": "dist/slate-hyperscript.min.js",
   "files": [
-    "dist/slate-hyperscript.js",
-    "dist/slate-hyperscript.min.js",
+    "dist/",
     "lib/"
   ],
   "dependencies": {

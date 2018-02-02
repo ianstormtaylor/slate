@@ -9,8 +9,7 @@
   "umd": "dist/slate-schema-violations.js",
   "umdMin": "dist/slate-schema-violations.min.js",
   "files": [
-    "dist/slate-schema-violations.js",
-    "dist/slate-schema-violations.min.js",
+    "dist/",
     "lib/"
   ],
   "devDependencies": {

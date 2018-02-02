@@ -17,9 +17,8 @@ And then look in the `node_modules` folder for the bundled `slate.js` file:
 node_modules/
   slate/
     dist/
-      umd/
-        slate.js
-        slate.min.js
+      slate.js
+      slate.min.js
 ```
 
 A minified version called `slate.min.js` is also included for convenience.

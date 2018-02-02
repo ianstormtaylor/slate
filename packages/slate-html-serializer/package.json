@@ -9,8 +9,7 @@
   "umd": "dist/slate-html-serializer.js",
   "umdMin": "dist/slate-html-serializer.min.js",
   "files": [
-    "dist/slate-html-serializer.js",
-    "dist/slate-html-serializer.min.js",
+    "dist/",
     "lib/"
   ],
   "dependencies": {
