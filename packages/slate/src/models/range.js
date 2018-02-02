@@ -675,6 +675,12 @@ class Range extends Record(DEFAULTS) {
     const range = this
     let { anchorKey, anchorOffset, focusKey, focusOffset, isBackward } = range
 
+    const anchorOffsetType = typeof anchorOffset
+    const focusOffsetType = typeof focusOffset
+    if (anchorOffsetType != 'number' || focusOffsetType != 'number') {
+      logger.warn(`The range offsets should be numbers, but they were of type "${anchorOffsetType}" and "${focusOffsetType}".`)
+    }
+
     // If the range is unset, make sure it is properly zeroed out.
     if (anchorKey == null || focusKey == null) {
       return range.merge({
