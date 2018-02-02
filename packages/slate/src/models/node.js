@@ -1954,6 +1954,29 @@ class Node {
   }
 
   /**
+   * Set a new value for a child node by `key`
+   * A faster method by guessing path
+   * @param {Array<number>} path
+   * @param {Node} node
+   * @return {Node}
+   */
+
+  updateNodeAtPath(path, node) {
+    const nodeAtPath = this.getNodeAtPath(path)
+    if (nodeAtPath.key !== node.key) {
+      path = this.getPath(node)
+    }
+
+    const setInPath = []
+    for (const childIndex of path) {
+      setInPath.push('nodes')
+      setInPath.push(childIndex)
+    }
+    return this.setIn(setInPath, node)
+  }
+
+
+  /**
    * Validate the node against a `schema`.
    *
    * @param {Schema} schema

@@ -340,7 +340,7 @@ const APPLIERS = {
     let { document } = value
     let node = document.assertPath(path)
     node = node.merge(properties)
-    document = document.updateNode(node)
+    document = document.updateNodeAtPath(path, node)
     value = value.set('document', document)
     return value
   },
