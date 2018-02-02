@@ -38,21 +38,26 @@ export default (pkg) => {
   // UMD build for browsers
   const umdConfig = {
     input: `packages/${pkgName}/src/index.js`,
+
     output: {
       file: `packages/${pkgName}/${output.umd}`,
+      format: 'umd',
+      exports: 'named',
+
       // For a package name such as `slate-react`, the UMD name
       // should be SlateReact.
       name: startCase(pkgName).replace(/ /g, ''),
-      format: 'umd',
-      exports: 'named',
+
       // Some packages contain `umdGlobals` in their package.json, which
       // indicates external dependencies that should be treated as globals
       // rather than bundled into our dist, such as Immutable and React.
       globals: umdGlobals,
     },
+
     // `external` tells rollup to treat the umdGlobals as external (and
     // thus skip bundling them).
     external: Object.keys(umdGlobals || {}),
+
     plugins: [
       // Force rollup to use the browser variant of `debug`.
       // The main variant of `debug` relies on Node.js globals.
@@ -68,6 +73,7 @@ export default (pkg) => {
       // (by default, it can only handle ES2015 syntax).
       commonjs({
         exclude: [`packages/${pkgName}/src/**`],
+
         // The CommonJS plugin sometimes cannot correctly identify named
         // exports of CommonJS modules, so we manually specify here to
         // hint that e.g. `import { List } from 'immutable'` is a reference

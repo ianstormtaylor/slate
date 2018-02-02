@@ -45,6 +45,7 @@ const umdConfig = {
     // (by default, it can only handle ES2015 syntax).
     commonjs({
       exclude: ['examples/**'],
+
       // The CommonJS plugin sometimes cannot correctly identify named
       // exports of CommonJS modules, so we manually specify here to
       // hint that e.g. `import { List } from 'immutable'` is a reference
