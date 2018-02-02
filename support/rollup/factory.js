@@ -29,8 +29,8 @@ export default (pkg) => {
   }
 
   // Consider a dependency external if:
-  // 1. It is directly located in the package.json dependencies/peerDependencies (i.e. `react`), or
-  // 2. It is part of a package.json dependency (i.e. `lodash/omit`)
+  // 1. It is directly located in the package.json dependencies/peerDependencies (e.g. `react`), or
+  // 2. It is part of a package.json dependency (e.g. `lodash/omit`)
   // External dependencies are expected to be present at runtime (rather than being bundled into
   // our built dist).
   const isExternalDependency = id => !!dependencies.find(dep => dep === id || id.startsWith(`${dep}/`))
