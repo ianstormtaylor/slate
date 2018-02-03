@@ -395,7 +395,7 @@ const APPLIERS = {
    */
 
   split_node(value, operation) {
-    const { path, position, original } = operation
+    const { path, position, properties } = operation
     let { document, selection } = value
 
     // Calculate a few things...
@@ -405,18 +405,12 @@ const APPLIERS = {
 
     // Split the node by its parent.
     parent = parent.splitNode(index, position)
-    if (original) {
-      // if we have an original node in the operation, then we are probably undoing
-      // a merge node operation. We need to update the block we just split so that
-      // its type and data match the original block it used to be.
+    if (properties) {
       const splitNode = parent.nodes.get(index + 1)
-      // if original and split are blocks then update the properties of split
-      // to match original
-      if (original.object === 'block' && splitNode.object === 'block') {
-        parent = parent.updateNode(splitNode.merge({
-          type: original.type,
-          data: original.data,
-        }))
+      // if the split node is a block, then update the properties of split
+      // using the properties object
+      if (splitNode.object === 'block') {
+        parent = parent.updateNode(splitNode.merge(properties))
       }
     }
     document = document.updateNode(parent)

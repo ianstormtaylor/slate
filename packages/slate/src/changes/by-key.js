@@ -188,7 +188,12 @@ Changes.mergeNodeByKey = (change, key, options = {}) => {
     value,
     path,
     position,
-    original,
+    // for undos to succeed we only need the type and data because
+    // these are the only properties that get changed in the merge operation
+    properties: {
+      type: original.type,
+      data: original.data,
+    },
     target: null,
   })
 
@@ -512,7 +517,8 @@ Changes.splitNodeByKey = (change, key, position, options = {}) => {
     value,
     path,
     position,
-    original: null,
+    // null for now, could contain properties for the new node
+    properties: null,
     target,
   })
 

@@ -105,11 +105,11 @@ Insert a new `node` at `path`.
   type: 'merge_node',
   path: Array,
   position: Number,
-  original: Object,
+  properties: Object,
 }
 ```
 
-Merge the node at `path` with its previous sibling. The `position` refers to either the index in the child nodes of the previous sibling in the case of [`Block`](./block.md) or [`Inline`](./inline.md) nodes, and the index in the characters of the previous sibling in the case of [`Text`](./text.md) nodes. The `original` property is optional and contains the block that is to be merged.
+Merge the node at `path` with its previous sibling. The `position` refers to either the index in the child nodes of the previous sibling in the case of [`Block`](./block.md) or [`Inline`](./inline.md) nodes, and the index in the characters of the previous sibling in the case of [`Text`](./text.md) nodes. The `properties` object contains properties of the merged node in the event that the change is undone.
 
 ### `move_node`
 
@@ -155,12 +155,12 @@ Set new `properties` on the node at `path`.
   type: 'split_node',
   path: Array,
   position: Number,
-  original: Object,
   target: Number,
+  properties: Object,
 }
 ```
 
-Split the node at `path` at `position`. The `position` refers to either the index in the child nodes in the case of [`Block`](./block.md) or [`Inline`](./inline.md) nodes, and the index in the characters in the case of [`Text`](./text.md) nodes. In the case of nested splits, `target` refers to the target path of the child split operation. The `original` property contains the original block in the case that this `split_node` operation represents an inverted `merge_node` operation.
+Split the node at `path` at `position`. The `position` refers to either the index in the child nodes in the case of [`Block`](./block.md) or [`Inline`](./inline.md) nodes, and the index in the characters in the case of [`Text`](./text.md) nodes. In the case of nested splits, `target` refers to the target path of the child split operation. The `properties` object contains properties that should be assigned to the new node created after the split operation is complete.
 
 
 ## Value Operations
