@@ -406,7 +406,7 @@ const APPLIERS = {
     // Split the node by its parent.
     parent = parent.splitNode(index, position)
     if (original) {
-      // if we have an original node in the operation, then we are probably undoing 
+      // if we have an original node in the operation, then we are probably undoing
       // a merge node operation. We need to update the block we just split so that
       // its type and data match the original block it used to be.
       const splitNode = parent.nodes.get(index + 1)
