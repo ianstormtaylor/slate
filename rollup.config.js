@@ -11,7 +11,7 @@ import slateReact from './packages/slate-react/package.json'
 import slateSchemaViolations from './packages/slate-schema-violations/package.json'
 import slateSimulator from './packages/slate-simulator/package.json'
 
-export default [
+const configurations = [
   ...factory(slate),
   ...factory(slateBase64Serializer),
   ...factory(slateDevLogger),
@@ -22,5 +22,10 @@ export default [
   ...factory(slateReact),
   ...factory(slateSchemaViolations),
   ...factory(slateSimulator),
-  ...examplesConfig,
 ]
+
+if (!process.env.SKIP_EXAMPLES) {
+  configurations.push(...examplesConfig)
+}
+
+export default configurations
