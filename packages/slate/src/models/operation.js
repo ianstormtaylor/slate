@@ -130,6 +130,10 @@ class Operation extends Record(DEFAULTS) {
         v = Value.create(v)
       }
 
+      if (key == 'properties' && type == 'merge_node') {
+        v = Node.createProperties(v)
+      }
+
       if (key == 'properties' && type == 'set_mark') {
         v = Mark.createProperties(v)
       }
@@ -157,6 +161,10 @@ class Operation extends Record(DEFAULTS) {
 
       if (key == 'properties' && type == 'set_value') {
         v = Value.createProperties(v)
+      }
+
+      if (key == 'properties' && type == 'split_node') {
+        v = Node.createProperties(v)
       }
 
       attrs[key] = v
