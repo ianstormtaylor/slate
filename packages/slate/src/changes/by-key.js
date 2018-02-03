@@ -174,6 +174,7 @@ Changes.mergeNodeByKey = (change, key, options = {}) => {
   const { value } = change
   const { document } = value
   const path = document.getPath(key)
+  const original = document.getDescendant(key)
   const previous = document.getPreviousSibling(key)
 
   if (!previous) {
@@ -187,6 +188,7 @@ Changes.mergeNodeByKey = (change, key, options = {}) => {
     value,
     path,
     position,
+    original,
     target: null,
   })
 
@@ -510,6 +512,7 @@ Changes.splitNodeByKey = (change, key, position, options = {}) => {
     value,
     path,
     position,
+    original: null,
     target,
   })
 

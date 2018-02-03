@@ -18,9 +18,9 @@ export const input = (
       <paragraph>
         o<anchor />ne
       </paragraph>
-      <paragraph>
+      <code>
         tw<focus />o
-      </paragraph>
+      </code>
     </document>
   </value>
 )
