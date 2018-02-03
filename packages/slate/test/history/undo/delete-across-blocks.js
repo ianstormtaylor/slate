@@ -12,13 +12,15 @@ export default function (value) {
     .value
 }
 
+// the paragraph and code blocks have some random data
+// to verify that the data objects get restored to what they were after undo
 export const input = (
   <value>
     <document>
-      <paragraph>
+      <paragraph data={{ key: 'value' }}>
         o<anchor />ne
       </paragraph>
-      <code>
+      <code data={{ key2: 'value2' }}>
         tw<focus />o
       </code>
     </document>

@@ -105,7 +105,7 @@ Insert a new `node` at `path`.
   type: 'merge_node',
   path: Array,
   position: Number,
-  original: Node
+  original: Object,
 }
 ```
 
