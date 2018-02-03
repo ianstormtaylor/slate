@@ -109,7 +109,7 @@ Insert a new `node` at `path`.
 }
 ```
 
-Merge the node at `path` with its previous sibling. The `position` refers to either the index in the child nodes of the previous sibling in the case of [`Block`](./block.md) or [`Inline`](./inline.md) nodes, and the index in the characters of the previous sibling in the case of [`Text`](./text.md) nodes. The `original` property contains
+Merge the node at `path` with its previous sibling. The `position` refers to either the index in the child nodes of the previous sibling in the case of [`Block`](./block.md) or [`Inline`](./inline.md) nodes, and the index in the characters of the previous sibling in the case of [`Text`](./text.md) nodes. The `original` property is optional and contains the block that is to be merged.
 
 ### `move_node`
 
