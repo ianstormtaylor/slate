@@ -104,11 +104,12 @@ Insert a new `node` at `path`.
 {
   type: 'merge_node',
   path: Array,
-  position: Number
+  position: Number,
+  original: Node
 }
 ```
 
-Merge the node at `path` with its previous sibling. The `position` refers to either the index in the child nodes of the previous sibling in the case of [`Block`](./block.md) or [`Inline`](./inline.md) nodes, and the index in the characters of the previous sibling in the case of [`Text`](./text.md) nodes.
+Merge the node at `path` with its previous sibling. The `position` refers to either the index in the child nodes of the previous sibling in the case of [`Block`](./block.md) or [`Inline`](./inline.md) nodes, and the index in the characters of the previous sibling in the case of [`Text`](./text.md) nodes. The `original` property contains
 
 ### `move_node`
 
@@ -154,11 +155,12 @@ Set new `properties` on the node at `path`.
   type: 'split_node',
   path: Array,
   position: Number,
+  original: Object,
   target: Number,
 }
 ```
 
-Split the node at `path` at `position`. The `position` refers to either the index in the child nodes in the case of [`Block`](./block.md) or [`Inline`](./inline.md) nodes, and the index in the characters in the case of [`Text`](./text.md) nodes. In the case of nested splits, `target` refers to the target path of the child split operation.
+Split the node at `path` at `position`. The `position` refers to either the index in the child nodes in the case of [`Block`](./block.md) or [`Inline`](./inline.md) nodes, and the index in the characters in the case of [`Text`](./text.md) nodes. In the case of nested splits, `target` refers to the target path of the child split operation. The `original` property contains the original block in the case that this `split_node` operation represents an inverted `merge_node` operation.
 
 
 ## Value Operations
