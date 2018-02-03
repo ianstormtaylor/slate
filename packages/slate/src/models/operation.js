@@ -27,7 +27,6 @@ const DEFAULTS = {
   position: undefined,
   properties: undefined,
   selection: undefined,
-  original: undefined,
   target: undefined,
   text: undefined,
   type: undefined,
