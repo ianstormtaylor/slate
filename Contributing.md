@@ -72,6 +72,8 @@ To keep the source rebuilding on every file change, you need to run an additiona
 yarn run watch
 ```
 
+If you're not using the examples in-browser (and only running the tests against the watched source), you can instead run `yarn watch:packages` for faster rebuilds.
+
 If you need to debug something, you can add a `debugger` line to the source, and then run `yarn run test debug`. 
 
 If you only want to run a specific test or tests, you can run `yarn run test --fgrep="slate-react rendering"` flag which will filter the tests being run by grepping for the string in each test.
