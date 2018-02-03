@@ -284,7 +284,7 @@ class Operation extends Record(DEFAULTS) {
         if ('schema' in value) v.schema = value.schema.toJS()
         value = v
       }
-      
+
       if (key == 'properties' && type == 'split_node') {
         const v = {}
         if ('data' in value) v.data = value.data.toJS()
