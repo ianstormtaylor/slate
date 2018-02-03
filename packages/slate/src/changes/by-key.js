@@ -511,6 +511,7 @@ Changes.splitNodeByKey = (change, key, position, options = {}) => {
   const { value } = change
   const { document } = value
   const path = document.getPath(key)
+  const node = document.getDescendantAtPath(path)
 
   change.applyOperation({
     type: 'split_node',
@@ -518,7 +519,10 @@ Changes.splitNodeByKey = (change, key, position, options = {}) => {
     path,
     position,
     // null for now, could contain properties for the new node
-    properties: null,
+    properties: {
+      type: node.type,
+      data: node.data,
+    },
     target,
   })
 
