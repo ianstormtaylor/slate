@@ -112,6 +112,11 @@ class Editor extends React.Component {
   componentWillReceiveProps = (props) => {
     let { schema, stack } = this
 
+    // this.state is not immediately changed after this.setState so we will make
+    // a copy of "this" in order to mutate its state directly and pass it in to
+    // stack.run('onChange', change, thisCopy) below.
+    const thisCopy = this
+
     // Increment the updates counter as a baseline.
     this.tmp.updates++
 
@@ -121,6 +126,11 @@ class Editor extends React.Component {
       const plugins = this.resolvePlugins(props.plugins, props.schema)
       stack = Stack.create({ plugins })
       schema = Schema.create({ plugins })
+
+      // There may be a better alternative to the 2 lines below.
+      thisCopy.state.stack = stack
+      thisCopy.state.schema = schema
+
       this.setState({ schema, stack })
 
       // Increment the resolves counter.
@@ -136,7 +146,7 @@ class Editor extends React.Component {
     // Run `onChange` on the passed-in value because we need to ensure that it
     // is normalized, and queue the resulting change.
     const change = props.value.change()
-    stack.run('onChange', change, this)
+    stack.run('onChange', change, thisCopy)
     this.queueChange(change)
     this.setState({ value: change.value })
   }
@@ -312,7 +322,6 @@ class Editor extends React.Component {
         return this.props[prop] && this.props[prop](...args)
       }
     }
-
     return [
       beforePlugin,
       editorPlugin,
