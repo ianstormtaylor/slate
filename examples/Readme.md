@@ -26,13 +26,13 @@ To get the examples running on your machine, you need to have the Slate reposito
 
 ```
 yarn install
-yarn run bootstrap
+yarn bootstrap
 ```
 
 Then start the watcher and examples server:
 
 ```
-yarn run watch
+yarn watch
 ```
 
 Now you can open up `http://localhost:8080/dev.html` in your browser and you'll see the examples site. Any changes you make to the source code will be immediately reflected when you refresh the page.

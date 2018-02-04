@@ -57,26 +57,26 @@ To run the tests, you need to have the Slate repository cloned to your computer.
 
 ```
 yarn install
-yarn run bootstrap
+yarn bootstrap
 ```
 
 Then run the tests with:
 
 ```
-yarn run test
+yarn test
 ```
 
 To keep the source rebuilding on every file change, you need to run an additional watching command in a separate process:
 
 ```
-yarn run watch
+yarn watch
 ```
 
 If you're not using the examples in-browser (and only running the tests against the watched source), you can instead run `yarn watch:packages` for faster rebuilds.
 
-If you need to debug something, you can add a `debugger` line to the source, and then run `yarn run test debug`. 
+If you need to debug something, you can add a `debugger` line to the source, and then run `yarn test debug`. 
 
-If you only want to run a specific test or tests, you can run `yarn run test --fgrep="slate-react rendering"` flag which will filter the tests being run by grepping for the string in each test.
+If you only want to run a specific test or tests, you can run `yarn test --fgrep="slate-react rendering"` flag which will filter the tests being run by grepping for the string in each test.
 
 
 ## Running Benchmarks
@@ -87,14 +87,14 @@ To do that, stash your changes and save the benchmarks:
 
 ```
 git stash
-yarn run benchmark:save
+yarn benchmark:save
 ```
 
 Then once the reference has been saved, unstash your changes and run the benchmarks to see a comparison:
 
 ```
 git stash pop
-yarn run benchmark
+yarn benchmark
 ```
 
 There will be some subtle changes in iteration speed always, but the comparison reporter will highlight any changes that seem meaningful. You can run `benchmark` multiple times to ensure the speed up persists.
