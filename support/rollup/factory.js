@@ -115,6 +115,11 @@ export default (pkg) => {
         format: 'es',
         sourcemap: environment === 'development',
       },
+      {
+        file: `packages/${pkgName}/${output.cjs}`,
+        format: 'cjs',
+        exports: 'named',
+      },
     ],
     external: isExternalDependency,
     plugins: [
@@ -146,14 +151,9 @@ export default (pkg) => {
   const configurations = [moduleConfig]
 
   if (environment === 'production') {
-    // In development, we only build the ES version to
+    // In development, we only build the module version to
     // reduce rebuild times. In production, we add the
-    // configs for the other variants here.
-    moduleConfig.output.push({
-      file: `packages/${pkgName}/${output.cjs}`,
-      format: 'cjs',
-      exports: 'named',
-    })
+    // configs for the UMD variants here.
     configurations.push(umdConfig, umdConfigMin)
   }
 
