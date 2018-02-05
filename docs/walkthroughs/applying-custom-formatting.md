@@ -136,7 +136,7 @@ class App extends React.Component {
   }
 
   onKeyDown = (event, change) => {
-    if (!event.metaKey) return
+    if (!event.ctrlKey) return
 
     switch (event.key) {
       case 'b': {
