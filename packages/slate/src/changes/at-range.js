@@ -944,11 +944,10 @@ Changes.setBlockAtRange = (change, range, properties, options = {}) => {
   const blocks = document.getBlocksAtRange(range)
 
 
-  let { startKey, endKey, endOffset, isCollapsed } = range
-  let isStartVoid = document.hasVoidParent(startKey)
-  let isEndVoid = document.hasVoidParent(endKey)
-  let startBlock = document.getClosestBlock(startKey)
-  let endBlock = document.getClosestBlock(endKey)
+  const { startKey, endKey, endOffset, isCollapsed } = range
+  const isStartVoid = document.hasVoidParent(startKey)
+  const startBlock = document.getClosestBlock(startKey)
+  const endBlock = document.getClosestBlock(endKey)
 
   // Check if we have a "hanging" selection case where the even though the
   // selection extends into the start of the end node, we actually want to
@@ -970,7 +969,7 @@ Changes.setBlockAtRange = (change, range, properties, options = {}) => {
     blocks.forEach((block) => {
       change.setNodeByKey(block.key, properties, { normalize })
     })
-  }  
+  }
 }
 
 /**
