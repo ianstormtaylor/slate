@@ -407,9 +407,7 @@ const APPLIERS = {
     parent = parent.splitNode(index, position)
     if (properties) {
       const splitNode = parent.nodes.get(index + 1)
-      // if the split node is a block, then update the properties of split
-      // using the properties object
-      if (splitNode.object === 'block') {
+      if (splitNode.object !== 'text') {
         parent = parent.updateNode(splitNode.merge(properties))
       }
     }
