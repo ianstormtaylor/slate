@@ -944,7 +944,7 @@ Changes.setBlockAtRange = (change, range, properties, options = {}) => {
   const blocks = document.getBlocksAtRange(range)
 
 
-  let { startKey, startOffset, endKey, endOffset } = range
+  let { startKey, endKey, endOffset } = range
   let isStartVoid = document.hasVoidParent(startKey)
   let isEndVoid = document.hasVoidParent(endKey)
   let startBlock = document.getClosestBlock(startKey)
@@ -954,7 +954,6 @@ Changes.setBlockAtRange = (change, range, properties, options = {}) => {
   // selection extends into the start of the end node, we actually want to
   // ignore that for UX reasons.
   const isHanging = (
-    startOffset == 0 &&
     endOffset == 0 &&
     isStartVoid == false &&
     startKey == startBlock.getFirstText().key &&
