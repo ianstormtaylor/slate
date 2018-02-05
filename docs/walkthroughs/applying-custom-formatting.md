@@ -23,7 +23,7 @@ class App extends React.Component {
   }
 
   onKeyDown = (event, change) => {
-    if (event.key != '`' || !event.metaKey) return
+    if (event.key != '`' || !event.ctrlKey) return
     event.preventDefault()
     const isCode = change.value.blocks.some(block => block.type == 'code')
 
@@ -65,7 +65,7 @@ class App extends React.Component {
   }
 
   onKeyDown = (event, change) => {
-    if (!event.metaKey) return
+    if (!event.ctrlKey) return
 
     // Decide what to do based on the key code...
     switch (event.key) {
