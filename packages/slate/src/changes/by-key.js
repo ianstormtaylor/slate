@@ -174,6 +174,7 @@ Changes.mergeNodeByKey = (change, key, options = {}) => {
   const { value } = change
   const { document } = value
   const path = document.getPath(key)
+  const original = document.getDescendant(key)
   const previous = document.getPreviousSibling(key)
 
   if (!previous) {
@@ -187,6 +188,12 @@ Changes.mergeNodeByKey = (change, key, options = {}) => {
     value,
     path,
     position,
+    // for undos to succeed we only need the type and data because
+    // these are the only properties that get changed in the merge operation
+    properties: {
+      type: original.type,
+      data: original.data,
+    },
     target: null,
   })
 
@@ -504,12 +511,17 @@ Changes.splitNodeByKey = (change, key, position, options = {}) => {
   const { value } = change
   const { document } = value
   const path = document.getPath(key)
+  const node = document.getDescendantAtPath(path)
 
   change.applyOperation({
     type: 'split_node',
     value,
     path,
     position,
+    properties: {
+      type: node.type,
+      data: node.data,
+    },
     target,
   })
 

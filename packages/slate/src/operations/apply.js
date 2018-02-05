@@ -395,7 +395,7 @@ const APPLIERS = {
    */
 
   split_node(value, operation) {
-    const { path, position } = operation
+    const { path, position, properties } = operation
     let { document, selection } = value
 
     // Calculate a few things...
@@ -405,6 +405,12 @@ const APPLIERS = {
 
     // Split the node by its parent.
     parent = parent.splitNode(index, position)
+    if (properties) {
+      const splitNode = parent.nodes.get(index + 1)
+      if (splitNode.object !== 'text') {
+        parent = parent.updateNode(splitNode.merge(properties))
+      }
+    }
     document = document.updateNode(parent)
 
     // Determine whether we need to update the selection...

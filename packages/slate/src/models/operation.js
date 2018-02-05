@@ -130,6 +130,10 @@ class Operation extends Record(DEFAULTS) {
         v = Value.create(v)
       }
 
+      if (key == 'properties' && type == 'merge_node') {
+        v = Node.createProperties(v)
+      }
+
       if (key == 'properties' && type == 'set_mark') {
         v = Mark.createProperties(v)
       }
@@ -157,6 +161,10 @@ class Operation extends Record(DEFAULTS) {
 
       if (key == 'properties' && type == 'set_value') {
         v = Value.createProperties(v)
+      }
+
+      if (key == 'properties' && type == 'split_node') {
+        v = Node.createProperties(v)
       }
 
       attrs[key] = v
@@ -235,6 +243,13 @@ class Operation extends Record(DEFAULTS) {
         value = value.toJSON()
       }
 
+      if (key == 'properties' && type == 'merge_node') {
+        const v = {}
+        if ('data' in value) v.data = value.data.toJS()
+        if ('type' in value) v.type = value.type
+        value = v
+      }
+
       if (key == 'properties' && type == 'set_mark') {
         const v = {}
         if ('data' in value) v.data = value.data.toJS()
@@ -267,6 +282,13 @@ class Operation extends Record(DEFAULTS) {
         if ('data' in value) v.data = value.data.toJS()
         if ('decorations' in value) v.decorations = value.decorations.toJS()
         if ('schema' in value) v.schema = value.schema.toJS()
+        value = v
+      }
+
+      if (key == 'properties' && type == 'split_node') {
+        const v = {}
+        if ('data' in value) v.data = value.data.toJS()
+        if ('type' in value) v.type = value.type
         value = v
       }
 

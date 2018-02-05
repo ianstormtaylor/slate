@@ -16,10 +16,10 @@ export const input = (
   <value>
     <document>
       <paragraph>
-        <link>o<anchor />ne</link>
+        <link data={{ url: 'https://www.google.com' }}>o<anchor />ne</link>
       </paragraph>
       <paragraph>
-        <link>tw<focus />o</link>
+        <link data={{ url: 'https://www.github.com' }}>tw<focus />o</link>
       </paragraph>
     </document>
   </value>
