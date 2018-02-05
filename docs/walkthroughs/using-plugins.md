@@ -25,7 +25,7 @@ class App extends React.Component {
   }
 
   onKeyDown = (event, change) => {
-    if (event.key != 'b' || !event.metaKey) return
+    if (event.key != 'b' || !event.ctrlKey) return
     event.preventDefault()
     change.toggleMark('bold')
     return true
@@ -74,7 +74,7 @@ function MarkHotkey(options) {
   return {
     onKeyDown(event, change) {
       // Check that the key pressed matches our `key` option.
-      if (!event.metaKey || event.key != key) return
+      if (!event.ctrlKey || event.key != key) return
 
       // Prevent the default characters from being inserted.
       event.preventDefault()
