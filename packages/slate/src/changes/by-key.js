@@ -518,7 +518,6 @@ Changes.splitNodeByKey = (change, key, position, options = {}) => {
     value,
     path,
     position,
-    // null for now, could contain properties for the new node
     properties: {
       type: node.type,
       data: node.data,
