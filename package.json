@@ -71,8 +71,8 @@
     "slate-schema-violations": "*"
   },
   "scripts": {
-    "benchmark": "mkdir -p ./tmp && babel-node ./node_modules/.bin/_matcha --reporter ./support/benchmark-reporter ./packages/*/benchmark/index.js > ./tmp/benchmark-comparison.json && babel-node ./support/benchmark-compare",
-    "benchmark:save": "mkdir -p ./tmp && babel-node ./node_modules/.bin/_matcha --reporter ./support/benchmark-reporter ./packages/*/benchmark/index.js > ./tmp/benchmark-baseline.json",
+    "benchmark": "mkdir -p ./tmp && cross-env BABEL_ENV=test babel-node ./node_modules/.bin/_matcha --reporter ./support/benchmark-reporter ./packages/*/benchmark/index.js > ./tmp/benchmark-comparison.json && cross-env BABEL_ENV=test babel-node ./support/benchmark-compare",
+    "benchmark:save": "mkdir -p ./tmp && cross-env BABEL_ENV=test babel-node ./node_modules/.bin/_matcha --reporter ./support/benchmark-reporter ./packages/*/benchmark/index.js > ./tmp/benchmark-baseline.json",
     "bootstrap": "lerna bootstrap && yarn build",
     "build": "cross-env NODE_ENV=production rollup --config",
     "clean": "lerna run clean && rm -rf ./node_modules ./dist ./examples/build.*.js",
