@@ -1,4 +1,3 @@
-
 import Base64 from 'slate-base64-serializer'
 
 import findDOMNode from './find-dom-node'
@@ -48,10 +47,10 @@ function cloneFragment(event, value, fragment = value.fragment) {
   // check if there is marks involved. If so, set the range start just before the
   // startText node
   if ((IS_CHROME || IS_SAFARI) && !isVoid && startKey === endKey) {
-    const hasMarks = startText.characters
-      .slice(value.selection.anchorOffset, value.selection.focusOffset)
-      .filter(char => char.marks.size !== 0)
-      .size !== 0
+    const hasMarks =
+      startText.characters
+        .slice(value.selection.anchorOffset, value.selection.focusOffset)
+        .filter(char => char.marks.size !== 0).size !== 0
     if (hasMarks) {
       const r = range.cloneRange()
       const node = findDOMNode(startText, window)
@@ -63,14 +62,18 @@ function cloneFragment(event, value, fragment = value.fragment) {
 
   // Remove any zero-width space spans from the cloned DOM so that they don't
   // show up elsewhere when pasted.
-  const zws = [].slice.call(contents.querySelectorAll('[data-slate-zero-width]'))
+  const zws = [].slice.call(
+    contents.querySelectorAll('[data-slate-zero-width]')
+  )
   zws.forEach(zw => zw.parentNode.removeChild(zw))
 
   // COMPAT: In Chrome and Safari, if the last element in the selection to
   // copy has `contenteditable="false"` the copy will fail, and nothing will
   // be put in the clipboard. So we remove them all. (2017/05/04)
   if (IS_CHROME || IS_SAFARI) {
-    const els = [].slice.call(contents.querySelectorAll('[contenteditable="false"]'))
+    const els = [].slice.call(
+      contents.querySelectorAll('[contenteditable="false"]')
+    )
     els.forEach(el => el.removeAttribute('contenteditable'))
   }
 
@@ -104,7 +107,8 @@ function cloneFragment(event, value, fragment = value.fragment) {
   div.style.border = '0px'
   div.style.padding = '0px'
   div.style.margin = '0px'
-  div.style.top = `${window.pageYOffset || window.document.documentElement.scrollTop}px`
+  div.style.top = `${window.pageYOffset ||
+    window.document.documentElement.scrollTop}px`
 
   div.appendChild(contents)
   editor.appendChild(div)

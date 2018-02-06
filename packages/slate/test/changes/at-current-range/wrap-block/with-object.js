@@ -2,10 +2,10 @@
 
 import h from '../../../helpers/h'
 
-export default function (change) {
+export default function(change) {
   change.wrapBlock({
     type: 'quote',
-    data: { thing: 'value' }
+    data: { thing: 'value' },
   })
 }
 

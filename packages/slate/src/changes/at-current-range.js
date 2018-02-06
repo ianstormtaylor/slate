@@ -1,4 +1,3 @@
-
 import Block from '../models/block'
 import Inline from '../models/inline'
 import Mark from '../models/mark'
@@ -34,7 +33,7 @@ const PROXY_TRANSFORMS = [
   'wrapInline',
 ]
 
-PROXY_TRANSFORMS.forEach((method) => {
+PROXY_TRANSFORMS.forEach(method => {
   Changes[method] = (change, ...args) => {
     const { value } = change
     const { selection } = value
@@ -57,15 +56,11 @@ Changes.addMark = (change, mark) => {
 
   if (selection.isExpanded) {
     change.addMarkAtRange(selection, mark)
-  }
-
-  else if (selection.marks) {
+  } else if (selection.marks) {
     const marks = selection.marks.add(mark)
     const sel = selection.set('marks', marks)
     change.select(sel)
-  }
-
-  else {
+  } else {
     const marks = document.getActiveMarksAtRange(selection).add(mark)
     const sel = selection.set('marks', marks)
     change.select(sel)
@@ -89,7 +84,7 @@ Changes.addMarks = (change, marks) => {
  * @param {Change} change
  */
 
-Changes.delete = (change) => {
+Changes.delete = change => {
   const { value } = change
   const { selection } = value
   change.deleteAtRange(selection)
@@ -134,11 +129,10 @@ Changes.insertFragment = (change, fragment) => {
   const lastText = fragment.getLastText()
   const lastInline = fragment.getClosestInline(lastText.key)
   const keys = document.getTexts().map(text => text.key)
-  const isAppending = (
+  const isAppending =
     !startInline ||
     selection.hasEdgeAtStartOf(startText) ||
     selection.hasEdgeAtEndOf(endText)
-  )
 
   change.insertFragmentAtRange(selection, fragment)
   value = change.value
@@ -149,13 +143,11 @@ Changes.insertFragment = (change, fragment) => {
 
   if (newText && lastInline) {
     change.select(selection.collapseToEndOf(newText))
-  }
-
-  else if (newText) {
-    change.select(selection.collapseToStartOf(newText).move(lastText.text.length))
-  }
-
-  else {
+  } else if (newText) {
+    change.select(
+      selection.collapseToStartOf(newText).move(lastText.text.length)
+    )
+  } else {
     change.select(selection.collapseToStart().move(lastText.text.length))
   }
 }
@@ -209,9 +201,7 @@ Changes.insertText = (change, text, marks) => {
 Changes.splitBlock = (change, depth = 1) => {
   const { value } = change
   const { selection } = value
-  change
-    .splitBlockAtRange(selection, depth)
-    .collapseToEnd()
+  change.splitBlockAtRange(selection, depth).collapseToEnd()
 }
 
 /**
@@ -228,15 +218,11 @@ Changes.removeMark = (change, mark) => {
 
   if (selection.isExpanded) {
     change.removeMarkAtRange(selection, mark)
-  }
-
-  else if (selection.marks) {
+  } else if (selection.marks) {
     const marks = selection.marks.remove(mark)
     const sel = selection.set('marks', marks)
     change.select(sel)
-  }
-
-  else {
+  } else {
     const marks = document.getActiveMarksAtRange(selection).remove(mark)
     const sel = selection.set('marks', marks)
     change.select(sel)

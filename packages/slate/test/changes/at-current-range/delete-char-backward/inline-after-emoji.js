@@ -2,7 +2,7 @@
 
 import h from '../../../helpers/h'
 
-export default function (change) {
+export default function(change) {
   change.deleteCharBackward()
 }
 
@@ -20,7 +20,8 @@ export const output = (
   <value>
     <document>
       <paragraph>
-        <link>word</link><cursor />
+        <link>word</link>
+        <cursor />
       </paragraph>
     </document>
   </value>

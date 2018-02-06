@@ -2,7 +2,7 @@
 
 import h from '../../../helpers/h'
 
-export default function (change) {
+export default function(change) {
   change.insertText('a')
 }
 
@@ -12,9 +12,7 @@ export const input = (
       <paragraph>
         <anchor />one
       </paragraph>
-      <paragraph>
-        two
-      </paragraph>
+      <paragraph>two</paragraph>
       <quote>
         <focus />three
       </quote>

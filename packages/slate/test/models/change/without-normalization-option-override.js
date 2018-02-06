@@ -2,23 +2,20 @@
 
 import h from '../../helpers/h'
 
-
-export const flags = { }
+export const flags = {}
 
 export const schema = {
   blocks: {
     paragraph: {},
     item: {
       parent: { types: ['list'] },
-      nodes: [
-        { objects: ['text'] }
-      ]
+      nodes: [{ objects: ['text'] }],
     },
     list: {},
-  }
+  },
 }
 
-export const customChange = (change) => {
+export const customChange = change => {
   // see if we can break the expected validation sequence by toggling
   // the normalization option
   const target = change.value.document.nodes.get(0)

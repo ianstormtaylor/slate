@@ -1,4 +1,3 @@
-
 import logger from 'slate-dev-logger'
 import { Record } from 'immutable'
 
@@ -22,7 +21,6 @@ const DEFAULTS = {
  */
 
 class Stack extends Record(DEFAULTS) {
-
   /**
    * Constructor.
    *
@@ -57,7 +55,10 @@ class Stack extends Record(DEFAULTS) {
   }
 
   get kind() {
-    logger.deprecate('slate@0.32.0', 'The `kind` property of Slate objects has been renamed to `object`.')
+    logger.deprecate(
+      'slate@0.32.0',
+      'The `kind` property of Slate objects has been renamed to `object`.'
+    )
     return this.object
   }
 
@@ -133,7 +134,9 @@ class Stack extends Record(DEFAULTS) {
    */
 
   render(property, props, ...args) {
-    const plugins = this.getPluginsWith(property).slice().reverse()
+    const plugins = this.getPluginsWith(property)
+      .slice()
+      .reverse()
     let { children = null } = props
 
     for (const plugin of plugins) {
@@ -144,7 +147,6 @@ class Stack extends Record(DEFAULTS) {
 
     return children
   }
-
 }
 
 /**
@@ -157,9 +159,7 @@ Stack.prototype[MODEL_TYPES.STACK] = true
  * Memoize read methods.
  */
 
-memoize(Stack.prototype, [
-  'getPluginsWith',
-], {
+memoize(Stack.prototype, ['getPluginsWith'], {
   takesArguments: true,
 })
 

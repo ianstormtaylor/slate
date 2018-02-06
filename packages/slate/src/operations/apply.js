@@ -1,4 +1,3 @@
-
 import Debug from 'debug'
 
 import Operation from '../models/operation'
@@ -18,7 +17,6 @@ const debug = Debug('slate:operation:apply')
  */
 
 const APPLIERS = {
-
   /**
    * Add mark to text at `offset` and `length` in node by `path`.
    *
@@ -97,7 +95,9 @@ const APPLIERS = {
 
   merge_node(value, operation) {
     const { path } = operation
-    const withPath = path.slice(0, path.length - 1).concat([path[path.length - 1] - 1])
+    const withPath = path
+      .slice(0, path.length - 1)
+      .concat([path[path.length - 1] - 1])
     let { document, selection } = value
     const one = document.assertPath(withPath)
     const two = document.assertPath(path)
@@ -116,12 +116,18 @@ const APPLIERS = {
       let normalize = false
 
       if (anchorKey == two.key) {
-        selection = selection.moveAnchorTo(one.key, one.text.length + anchorOffset)
+        selection = selection.moveAnchorTo(
+          one.key,
+          one.text.length + anchorOffset
+        )
         normalize = true
       }
 
       if (focusKey == two.key) {
-        selection = selection.moveFocusTo(one.key, one.text.length + focusOffset)
+        selection = selection.moveFocusTo(
+          one.key,
+          one.text.length + focusOffset
+        )
         normalize = true
       }
 
@@ -163,24 +169,20 @@ const APPLIERS = {
     // If the old path and the rest of the new path are the same, then the new
     // target is the old parent.
     if (
-      (oldParentPath.every((x, i) => x === newParentPath[i])) &&
-      (oldParentPath.length === newParentPath.length)
+      oldParentPath.every((x, i) => x === newParentPath[i]) &&
+      oldParentPath.length === newParentPath.length
     ) {
       target = parent
-    }
-
-    // Otherwise, if the old path removal resulted in the new path being no longer
-    // correct, we need to decrement the new path at the old path's last index.
-    else if (
-      (oldParentPath.every((x, i) => x === newParentPath[i])) &&
-      (oldIndex < newParentPath[oldParentPath.length])
+    } else if (
+      oldParentPath.every((x, i) => x === newParentPath[i]) &&
+      oldIndex < newParentPath[oldParentPath.length]
     ) {
+      // Otherwise, if the old path removal resulted in the new path being no longer
+      // correct, we need to decrement the new path at the old path's last index.
       newParentPath[oldParentPath.length]--
       target = document.assertPath(newParentPath)
-    }
-
-    // Otherwise, we can just grab the target normally...
-    else {
+    } else {
+      // Otherwise, we can just grab the target normally...
       target = document.assertPath(newParentPath)
     }
 
@@ -359,11 +361,13 @@ const APPLIERS = {
     let { document, selection } = value
 
     if (anchorPath !== undefined) {
-      props.anchorKey = anchorPath === null ? null : document.assertPath(anchorPath).key
+      props.anchorKey =
+        anchorPath === null ? null : document.assertPath(anchorPath).key
     }
 
     if (focusPath !== undefined) {
-      props.focusKey = focusPath === null ? null : document.assertPath(focusPath).key
+      props.focusKey =
+        focusPath === null ? null : document.assertPath(focusPath).key
     }
 
     selection = selection.merge(props)
@@ -440,7 +444,6 @@ const APPLIERS = {
     value = value.set('document', document).set('selection', selection)
     return value
   },
-
 }
 
 /**

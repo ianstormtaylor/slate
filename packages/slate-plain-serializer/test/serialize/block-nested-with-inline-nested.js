@@ -6,14 +6,10 @@ export const input = (
   <value>
     <document>
       <quote>
-        <paragraph>
-          one
-        </paragraph>
+        <paragraph>one</paragraph>
         <paragraph>
           <link>
-            <hashtag>
-              two
-            </hashtag>
+            <hashtag>two</hashtag>
           </link>
         </paragraph>
       </quote>

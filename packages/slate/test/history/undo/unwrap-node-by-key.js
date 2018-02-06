@@ -2,14 +2,12 @@
 
 import h from '../../helpers/h'
 
-export default function (value) {
+export default function(value) {
   return value
     .change()
     .unwrapNodeByKey('a')
-    .value
-    .change()
-    .undo()
-    .value
+    .value.change()
+    .undo().value
 }
 
 export const input = (
@@ -19,12 +17,8 @@ export const input = (
         <paragraph key="a">
           <cursor />one
         </paragraph>
-        <paragraph>
-          two
-        </paragraph>
-        <paragraph>
-          three
-        </paragraph>
+        <paragraph>two</paragraph>
+        <paragraph>three</paragraph>
       </quote>
     </document>
   </value>

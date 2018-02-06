@@ -2,21 +2,21 @@
 
 import h from '../../helpers/h'
 
-export default function (value) {
+export default function(value) {
   return value
     .change()
     .addMark('bold')
-    .value
-    .change()
-    .undo()
-    .value
+    .value.change()
+    .undo().value
 }
 
 export const input = (
   <value>
     <document>
       <paragraph>
-        <b>w<anchor />o</b>r<focus />d
+        <b>
+          w<anchor />o
+        </b>r<focus />d
       </paragraph>
     </document>
   </value>

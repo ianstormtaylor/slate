@@ -7,9 +7,7 @@ export const input = (
     <document>
       <paragraph>
         <link>
-          <hashtag>
-            one
-          </hashtag>
+          <hashtag>one</hashtag>
         </link>
       </paragraph>
     </document>

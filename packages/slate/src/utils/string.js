@@ -1,4 +1,3 @@
-
 import { reverse } from 'esrever'
 
 /**
@@ -7,8 +6,8 @@ import { reverse } from 'esrever'
  * @type {Number}
  */
 
-const SURROGATE_START = 0xD800
-const SURROGATE_END = 0xDFFF
+const SURROGATE_START = 0xd800
+const SURROGATE_END = 0xdfff
 
 /**
  * A regex to match space characters.
@@ -78,9 +77,7 @@ function isWord(char, remaining) {
  */
 
 function getCharLength(char) {
-  return isSurrogate(char.charCodeAt(0))
-    ? 2
-    : 1
+  return isSurrogate(char.charCodeAt(0)) ? 2 : 1
 }
 
 /**
@@ -135,7 +132,7 @@ function getWordOffset(text) {
   let started = false
   let char
 
-  while (char = text.charAt(i)) {
+  while ((char = text.charAt(i))) {
     const l = getCharLength(char)
     char = text.slice(i, i + l)
     const rest = text.slice(i + l)
@@ -194,5 +191,5 @@ export default {
   getCharOffsetForward,
   getCharOffsetBackward,
   getWordOffsetBackward,
-  getWordOffsetForward
+  getWordOffsetForward,
 }

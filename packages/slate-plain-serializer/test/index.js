@@ -1,4 +1,3 @@
-
 /**
  * Dependencies.
  */
@@ -24,7 +23,10 @@ beforeEach(() => {
 describe('slate-plain-serializer', () => {
   describe('deserialize()', () => {
     const dir = resolve(__dirname, './deserialize')
-    const tests = fs.readdirSync(dir).filter(t => t[0] != '.').map(t => basename(t, extname(t)))
+    const tests = fs
+      .readdirSync(dir)
+      .filter(t => t[0] != '.')
+      .map(t => basename(t, extname(t)))
 
     for (const test of tests) {
       it(test, async () => {
@@ -40,7 +42,10 @@ describe('slate-plain-serializer', () => {
 
   describe('serialize()', () => {
     const dir = resolve(__dirname, './serialize')
-    const tests = fs.readdirSync(dir).filter(t => t[0] != '.').map(t => basename(t, extname(t)))
+    const tests = fs
+      .readdirSync(dir)
+      .filter(t => t[0] != '.')
+      .map(t => basename(t, extname(t)))
 
     for (const test of tests) {
       it(test, async () => {

@@ -1,4 +1,3 @@
-
 import Debug from 'debug'
 import Portal from 'react-portal'
 import React from 'react'
@@ -28,7 +27,6 @@ const debug = Debug('slate:editor')
  */
 
 class Editor extends React.Component {
-
   /**
    * Property types.
    *
@@ -95,7 +93,7 @@ class Editor extends React.Component {
     this.state.value = change.value
 
     // Create a bound event handler for each event.
-    EVENT_HANDLERS.forEach((handler) => {
+    EVENT_HANDLERS.forEach(handler => {
       this[handler] = (...args) => {
         this.onEvent(handler, ...args)
       }
@@ -109,7 +107,7 @@ class Editor extends React.Component {
    * @param {Object} props
    */
 
-  componentWillReceiveProps = (props) => {
+  componentWillReceiveProps = props => {
     let { schema, stack } = this
 
     // Increment the updates counter as a baseline.
@@ -117,7 +115,10 @@ class Editor extends React.Component {
 
     // If the plugins or the schema have changed, we need to re-resolve the
     // plugins, since it will result in a new stack and new validations.
-    if (props.plugins != this.props.plugins || props.schema != this.props.schema) {
+    if (
+      props.plugins != this.props.plugins ||
+      props.schema != this.props.schema
+    ) {
       const plugins = this.resolvePlugins(props.plugins, props.schema)
       stack = Stack.create({ plugins })
       schema = Schema.create({ plugins })
@@ -129,7 +130,9 @@ class Editor extends React.Component {
       // If we've resolved a few times already, and it's exactly in line with
       // the updates, then warn the user that they may be doing something wrong.
       if (this.tmp.resolves > 5 && this.tmp.resolves == this.tmp.updates) {
-        logger.warn('A Slate <Editor> is re-resolving `props.plugins` or `props.schema` on each update, which leads to poor performance. This is often due to passing in a new `schema` or `plugins` prop with each render by declaring them inline in your render function. Do not do this!')
+        logger.warn(
+          'A Slate <Editor> is re-resolving `props.plugins` or `props.schema` on each update, which leads to poor performance. This is often due to passing in a new `schema` or `plugins` prop with each render by declaring them inline in your render function. Do not do this!'
+        )
       }
     }
 
@@ -166,7 +169,7 @@ class Editor extends React.Component {
    * @param {Change} change
    */
 
-  queueChange = (change) => {
+  queueChange = change => {
     if (change.operations.size) {
       debug('queueChange', { change })
       this.tmp.change = change
@@ -239,7 +242,7 @@ class Editor extends React.Component {
    */
 
   onEvent = (handler, event) => {
-    this.change((change) => {
+    this.change(change => {
       this.stack.run(handler, event, change, this)
     })
   }
@@ -250,7 +253,7 @@ class Editor extends React.Component {
    * @param {Change} change
    */
 
-  onChange = (change) => {
+  onChange = change => {
     debug('onChange', { change })
 
     this.stack.run('onChange', change, this)
@@ -271,7 +274,11 @@ class Editor extends React.Component {
 
     const children = this.stack
       .map('renderPortal', this.value, this)
-      .map((child, i) => <Portal key={i} isOpened>{child}</Portal>)
+      .map((child, i) => (
+        <Portal key={i} isOpened>
+          {child}
+        </Portal>
+      ))
 
     const props = { ...this.props, children }
     const tree = this.stack.render('renderEditor', props, this)
@@ -296,7 +303,7 @@ class Editor extends React.Component {
     const beforePlugin = BeforePlugin()
     const afterPlugin = AfterPlugin()
     const editorPlugin = {
-      schema: schema || {}
+      schema: schema || {},
     }
 
     for (const prop of PLUGINS_PROPS) {
@@ -313,16 +320,9 @@ class Editor extends React.Component {
       }
     }
 
-    return [
-      beforePlugin,
-      editorPlugin,
-      ...(plugins || []),
-      afterPlugin
-    ]
+    return [beforePlugin, editorPlugin, ...(plugins || []), afterPlugin]
   }
-
 }
-
 
 /**
  * Mix in the property types for the event handlers.

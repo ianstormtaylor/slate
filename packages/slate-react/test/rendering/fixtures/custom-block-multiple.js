@@ -4,16 +4,17 @@ import React from 'react'
 import h from '../../helpers/h'
 
 function Code(props) {
-  return (
-    React.createElement('pre', props.attributes,
-      React.createElement('code', {}, props.children)
-    )
+  return React.createElement(
+    'pre',
+    props.attributes,
+    React.createElement('code', {}, props.children)
   )
 }
 
 function renderNode(props) {
   switch (props.node.type) {
-    case 'code': return Code(props)
+    case 'code':
+      return Code(props)
   }
 }
 
@@ -24,15 +25,9 @@ export const props = {
 export const value = (
   <value>
     <document>
-      <code>
-        word
-      </code>
-      <code>
-        word
-      </code>
-      <code>
-        word
-      </code>
+      <code>word</code>
+      <code>word</code>
+      <code>word</code>
     </document>
   </value>
 )

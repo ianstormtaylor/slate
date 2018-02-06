@@ -1,4 +1,3 @@
-
 import findDOMNode from './find-dom-node'
 
 /**
@@ -24,7 +23,7 @@ function findDOMPoint(key, offset, win = window) {
     false
   )
 
-  while (n = iterator.nextNode()) {
+  while ((n = iterator.nextNode())) {
     const { length } = n.textContent
     const end = start + length
 

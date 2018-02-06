@@ -5,9 +5,9 @@ import h from '../../helpers/h'
 export const schema = {
   blocks: {
     paragraph: {
-      marks: [{ type: 'bold' }, { type: 'underline' }],
-    }
-  }
+      marks: [{ type: 'bold' }, { type: 'underline' }],
+    },
+  },
 }
 
 export const input = (
@@ -23,9 +23,7 @@ export const input = (
 export const output = (
   <value>
     <document>
-      <paragraph>
-        one two three
-      </paragraph>
+      <paragraph>one two three</paragraph>
     </document>
   </value>
 )

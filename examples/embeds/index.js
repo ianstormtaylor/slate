@@ -1,4 +1,3 @@
-
 import { Editor } from 'slate-react'
 import { Value } from 'slate'
 
@@ -13,7 +12,6 @@ import initialValue from './value.json'
  */
 
 class Embeds extends React.Component {
-
   /**
    * Deserialize the raw initial value.
    *
@@ -21,7 +19,7 @@ class Embeds extends React.Component {
    */
 
   state = {
-    value: Value.fromJSON(initialValue)
+    value: Value.fromJSON(initialValue),
   }
 
   /**
@@ -60,12 +58,12 @@ class Embeds extends React.Component {
    * @return {Element}
    */
 
-  renderNode = (props) => {
+  renderNode = props => {
     switch (props.node.type) {
-      case 'video': return <Video {...props} />
+      case 'video':
+        return <Video {...props} />
     }
   }
-
 }
 
 /**

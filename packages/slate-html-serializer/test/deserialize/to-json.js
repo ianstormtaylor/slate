@@ -1,4 +1,3 @@
-
 export const config = {
   rules: [
     {
@@ -12,9 +11,9 @@ export const config = {
             }
           }
         }
-      }
-    }
-  ]
+      },
+    },
+  ],
 }
 
 export const input = `
@@ -37,13 +36,13 @@ export const output = {
               {
                 object: 'leaf',
                 text: 'one',
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  }
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
 }
 
 export const options = {

@@ -34,7 +34,10 @@ const umdConfig = {
     // variant of `react-dom/server` relies on Node.js's Stream.
     alias({
       debug: path.resolve(__dirname, 'node_modules/debug/src/browser'),
-      'react-dom/server': path.resolve(__dirname, 'node_modules/react-dom/cjs/react-dom-server.browser.production.min'),
+      'react-dom/server': path.resolve(
+        __dirname,
+        'node_modules/react-dom/cjs/react-dom-server.browser.production.min'
+      ),
     }),
 
     // Allow rollup to resolve modules that are npm dependencies
@@ -51,8 +54,16 @@ const umdConfig = {
       // hint that e.g. `import { List } from 'immutable'` is a reference
       // to a valid named export.
       namedExports: {
-        'esrever': ['reverse'],
-        'immutable': ['List', 'Map', 'Record', 'OrderedSet', 'Set', 'Stack', 'is'],
+        esrever: ['reverse'],
+        immutable: [
+          'List',
+          'Map',
+          'Record',
+          'OrderedSet',
+          'Set',
+          'Stack',
+          'is',
+        ],
         'react-dom': ['findDOMNode'],
         'react-dom/server': ['renderToStaticMarkup'],
       },
@@ -65,23 +76,20 @@ const umdConfig = {
     // some modules like React to use their production variant (and
     // one place within Slate itself).
     replace({
-      'process.env.NODE_ENV': JSON.stringify(environment)
+      'process.env.NODE_ENV': JSON.stringify(environment),
     }),
 
     // Use babel to transpile the result -- limit to package src
     // to prevent babel from trying to transpile npm dependencies.
     babel({
-      include: ['examples/**']
+      include: ['examples/**'],
     }),
   ],
   // Limit rollup's file watching to example src files and the
   // built output of packages -- helps keep it from watching
   // too much and choking.
   watch: {
-    include: [
-      'examples/**',
-      'packages/*/lib/*.es.js',
-    ],
+    include: ['examples/**', 'packages/*/lib/*.es.js'],
   },
 }
 

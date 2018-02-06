@@ -1,4 +1,3 @@
-
 /**
  * Prevent circular dependencies.
  */
@@ -38,7 +37,6 @@ const DEFAULTS = {
  */
 
 class Inline extends Record(DEFAULTS) {
-
   /**
    * Create a new `Inline` with `attrs`.
    *
@@ -59,7 +57,9 @@ class Inline extends Record(DEFAULTS) {
       return Inline.fromJSON(attrs)
     }
 
-    throw new Error(`\`Inline.create\` only accepts objects, strings or inlines, but you passed it: ${attrs}`)
+    throw new Error(
+      `\`Inline.create\` only accepts objects, strings or inlines, but you passed it: ${attrs}`
+    )
   }
 
   /**
@@ -75,7 +75,9 @@ class Inline extends Record(DEFAULTS) {
       return list
     }
 
-    throw new Error(`\`Inline.createList\` only accepts arrays or lists, but you passed it: ${elements}`)
+    throw new Error(
+      `\`Inline.createList\` only accepts arrays or lists, but you passed it: ${elements}`
+    )
   }
 
   /**
@@ -152,7 +154,10 @@ class Inline extends Record(DEFAULTS) {
   }
 
   get kind() {
-    logger.deprecate('slate@0.32.0', 'The `kind` property of Slate objects has been renamed to `object`.')
+    logger.deprecate(
+      'slate@0.32.0',
+      'The `kind` property of Slate objects has been renamed to `object`.'
+    )
     return this.object
   }
 
@@ -206,7 +211,6 @@ class Inline extends Record(DEFAULTS) {
   toJS(options) {
     return this.toJSON(options)
   }
-
 }
 
 /**
@@ -219,7 +223,7 @@ Inline.prototype[MODEL_TYPES.INLINE] = true
  * Mix in `Node` methods.
  */
 
-Object.getOwnPropertyNames(Node.prototype).forEach((method) => {
+Object.getOwnPropertyNames(Node.prototype).forEach(method => {
   if (method == 'constructor') return
   Inline.prototype[method] = Node.prototype[method]
 })

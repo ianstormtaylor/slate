@@ -2,7 +2,7 @@
 
 import h from '../../../helpers/h'
 
-export default function (change) {
+export default function(change) {
   change.deleteBackward()
 }
 
@@ -20,7 +20,8 @@ export const output = (
   <value>
     <document>
       <paragraph>
-        one<link>two</link><cursor />
+        one<link>two</link>
+        <cursor />
       </paragraph>
     </document>
   </value>

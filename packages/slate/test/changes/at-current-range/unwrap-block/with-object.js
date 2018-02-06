@@ -2,10 +2,10 @@
 
 import h from '../../../helpers/h'
 
-export default function (change) {
+export default function(change) {
   change.unwrapBlock({
     type: 'quote',
-    data: { thing: 'value' }
+    data: { thing: 'value' },
   })
 }
 
@@ -13,9 +13,7 @@ export const input = (
   <value>
     <document>
       <quote thing="value">
-        <paragraph>
-          word
-        </paragraph>
+        <paragraph>word</paragraph>
       </quote>
     </document>
   </value>
@@ -24,9 +22,7 @@ export const input = (
 export const output = (
   <value>
     <document>
-      <paragraph>
-        word
-      </paragraph>
+      <paragraph>word</paragraph>
     </document>
   </value>
 )

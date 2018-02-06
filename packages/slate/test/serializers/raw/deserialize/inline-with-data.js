@@ -21,15 +21,15 @@ export const input = {
                 object: 'leaf',
                 text: '',
                 marks: [],
-              }
-            ]
+              },
+            ],
           },
           {
             object: 'inline',
             type: 'link',
             isVoid: false,
             data: {
-              thing: 'value'
+              thing: 'value',
             },
             nodes: [
               {
@@ -39,10 +39,10 @@ export const input = {
                     object: 'leaf',
                     text: 'one',
                     marks: [],
-                  }
-                ]
-              }
-            ]
+                  },
+                ],
+              },
+            ],
           },
           {
             object: 'text',
@@ -51,22 +51,20 @@ export const input = {
                 object: 'leaf',
                 text: '',
                 marks: [],
-              }
-            ]
+              },
+            ],
           },
-        ]
-      }
-    ]
-  }
+        ],
+      },
+    ],
+  },
 }
 
 export const output = (
   <value>
     <document>
       <paragraph>
-        <link thing="value">
-          one
-        </link>
+        <link thing="value">one</link>
       </paragraph>
     </document>
   </value>

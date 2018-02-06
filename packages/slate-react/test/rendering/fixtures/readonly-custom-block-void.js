@@ -4,12 +4,16 @@ import React from 'react'
 import h from '../../helpers/h'
 
 function Image(props) {
-  return React.createElement('img', { src: props.node.data.get('src'), ...props.attributes })
+  return React.createElement('img', {
+    src: props.node.data.get('src'),
+    ...props.attributes,
+  })
 }
 
 function renderNode(props) {
   switch (props.node.type) {
-    case 'image': return Image(props)
+    case 'image':
+      return Image(props)
   }
 }
 

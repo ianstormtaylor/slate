@@ -12,9 +12,9 @@ export const schema = {
         if (reason == FIRST_CHILD_TYPE_INVALID) {
           change.wrapBlockByKey(child.key, 'paragraph')
         }
-      }
-    }
-  }
+      },
+    },
+  },
 }
 
 export const input = (

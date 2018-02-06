@@ -40,18 +40,18 @@ export const output = {
                     object: 'mark',
                     type: 'bold',
                     data: {},
-                  }
-                ]
+                  },
+                ],
               },
               {
                 object: 'leaf',
                 text: 'e',
                 marks: [],
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  }
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
 }

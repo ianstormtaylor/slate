@@ -1,4 +1,3 @@
-
 /** @jsx h */
 
 import React from 'react'
@@ -14,8 +13,8 @@ export const rules = [
       if (obj.object == 'inline' && obj.type == 'emoji') {
         return React.createElement('img')
       }
-    }
-  }
+    },
+  },
 ]
 
 export const input = (

@@ -3,15 +3,12 @@
 
 import h from '../../test/helpers/h'
 
-export default function (value) {
+export default function(value) {
   value.document.getMarksAtRange(value.selection)
 }
 
 export function before(value) {
-  return value
-    .change()
-    .selectAll()
-    .value
+  return value.change().selectAll().value
 }
 
 export const input = (
@@ -21,7 +18,8 @@ export const input = (
         <quote>
           <paragraph>
             <paragraph>
-              This is editable <b>rich</b> text, <i>much</i> better than a textarea!
+              This is editable <b>rich</b> text, <i>much</i> better than a
+              textarea!
             </paragraph>
           </paragraph>
         </quote>

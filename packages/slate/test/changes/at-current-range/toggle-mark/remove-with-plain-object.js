@@ -2,10 +2,10 @@
 
 import h from '../../../helpers/h'
 
-export default function (change) {
+export default function(change) {
   change.toggleMark({
     type: 'bold',
-    data: { thing: 'value' }
+    data: { thing: 'value' },
   })
 }
 
@@ -13,7 +13,9 @@ export const input = (
   <value>
     <document>
       <paragraph>
-        <anchor /><b thing="value">w</b><focus />ord
+        <anchor />
+        <b thing="value">w</b>
+        <focus />ord
       </paragraph>
     </document>
   </value>

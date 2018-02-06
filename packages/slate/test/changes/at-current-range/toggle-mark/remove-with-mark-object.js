@@ -3,18 +3,22 @@
 import h from '../../../helpers/h'
 import { Mark } from '../../../..'
 
-export default function (change) {
-  change.toggleMark(Mark.create({
-    type: 'bold',
-    data: { thing: 'value' }
-  }))
+export default function(change) {
+  change.toggleMark(
+    Mark.create({
+      type: 'bold',
+      data: { thing: 'value' },
+    })
+  )
 }
 
 export const input = (
   <value>
     <document>
       <paragraph>
-        <anchor /><b thing="value">w</b><focus />ord
+        <anchor />
+        <b thing="value">w</b>
+        <focus />ord
       </paragraph>
     </document>
   </value>

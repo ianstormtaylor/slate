@@ -1,4 +1,3 @@
-
 /**
  * Check if an `index` of a `text` node is in a `range`.
  *

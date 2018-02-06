@@ -4,7 +4,7 @@
 import h from '../../test/helpers/h'
 import { __clear } from '../../lib/utils/memoize'
 
-export default function ({ change, text }) {
+export default function({ change, text }) {
   change.insertTextByKey(text.key, 0, 'a')
 }
 
@@ -22,7 +22,8 @@ export const input = (
         <quote>
           <paragraph>
             <paragraph>
-              This is editable <b>rich</b> text, <i>much</i> better than a textarea!
+              This is editable <b>rich</b> text, <i>much</i> better than a
+              textarea!
               {i == 0 ? <cursor /> : ''}
             </paragraph>
           </paragraph>

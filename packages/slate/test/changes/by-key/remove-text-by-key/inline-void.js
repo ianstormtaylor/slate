@@ -2,7 +2,7 @@
 
 import h from '../../../helpers/h'
 
-export default function (change) {
+export default function(change) {
   change.removeTextByKey('a', 0, 1)
 }
 
@@ -11,7 +11,9 @@ export const input = (
     <document>
       <paragraph>
         <emoji>
-          <text key="a"><cursor />{' '}</text>
+          <text key="a">
+            <cursor />{' '}
+          </text>
         </emoji>
       </paragraph>
     </document>
@@ -22,7 +24,8 @@ export const output = (
   <value>
     <document>
       <paragraph>
-        <cursor /><emoji />
+        <cursor />
+        <emoji />
       </paragraph>
     </document>
   </value>

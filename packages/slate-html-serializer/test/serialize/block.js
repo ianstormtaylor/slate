@@ -1,4 +1,3 @@
-
 /** @jsx h */
 
 import React from 'react'
@@ -10,16 +9,14 @@ export const rules = [
       if (obj.object == 'block' && obj.type == 'paragraph') {
         return React.createElement('p', {}, children)
       }
-    }
-  }
+    },
+  },
 ]
 
 export const input = (
   <value>
     <document>
-      <paragraph>
-        one
-      </paragraph>
+      <paragraph>one</paragraph>
     </document>
   </value>
 )

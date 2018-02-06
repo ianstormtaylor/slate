@@ -31,8 +31,8 @@ export const output = {
                 object: 'leaf',
                 text: '',
                 marks: [],
-              }
-            ]
+              },
+            ],
           },
           {
             object: 'inline',
@@ -47,10 +47,10 @@ export const output = {
                     object: 'leaf',
                     text: ' ',
                     marks: [],
-                  }
-                ]
-              }
-            ]
+                  },
+                ],
+              },
+            ],
           },
           {
             object: 'text',
@@ -59,11 +59,11 @@ export const output = {
                 object: 'leaf',
                 text: '',
                 marks: [],
-              }
-            ]
+              },
+            ],
           },
-        ]
-      }
-    ]
-  }
+        ],
+      },
+    ],
+  },
 }

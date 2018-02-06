@@ -1,4 +1,3 @@
-
 import Debug from 'debug'
 import React from 'react'
 import Types from 'prop-types'
@@ -21,7 +20,6 @@ const debug = Debug('slate:leaves')
  */
 
 class Leaf extends React.Component {
-
   /**
    * Property types.
    *
@@ -85,14 +83,10 @@ class Leaf extends React.Component {
     const { node, index } = this.props
     const offsetKey = OffsetKey.stringify({
       key: node.key,
-      index
+      index,
     })
 
-    return (
-      <span data-offset-key={offsetKey}>
-        {this.renderMarks()}
-      </span>
-    )
+    return <span data-offset-key={offsetKey}>{this.renderMarks()}</span>
   }
 
   /**
@@ -142,7 +136,6 @@ class Leaf extends React.Component {
     // Otherwise, just return the text.
     return text
   }
-
 }
 
 /**

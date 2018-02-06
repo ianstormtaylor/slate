@@ -1,4 +1,3 @@
-
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { HashRouter, NavLink, Route, Redirect, Switch } from 'react-router-dom'
@@ -62,7 +61,6 @@ const EXAMPLES = [
  */
 
 class App extends React.Component {
-
   state = {
     error: null,
     info: null,
@@ -78,20 +76,30 @@ class App extends React.Component {
         <div className="nav">
           <span className="nav-title">Slate Examples</span>
           <div className="nav-links">
-            <a className="nav-link" href="https://github.com/ianstormtaylor/slate">GitHub</a>
-            <a className="nav-link" href="https://docs.slatejs.org/">Docs</a>
+            <a
+              className="nav-link"
+              href="https://github.com/ianstormtaylor/slate"
+            >
+              GitHub
+            </a>
+            <a className="nav-link" href="https://docs.slatejs.org/">
+              Docs
+            </a>
           </div>
         </div>
         <div className="tabs">
-          {EXAMPLES.map(([ name, Component, path ]) => (
-            <NavLink key={path} to={path} className="tab"activeClassName="active">
+          {EXAMPLES.map(([name, Component, path]) => (
+            <NavLink
+              key={path}
+              to={path}
+              className="tab"
+              activeClassName="active"
+            >
               {name}
             </NavLink>
           ))}
         </div>
-        {this.state.error
-          ? this.renderError()
-          : this.renderExample()}
+        {this.state.error ? this.renderError() : this.renderExample()}
       </div>
     )
   }
@@ -100,7 +108,7 @@ class App extends React.Component {
     return (
       <div className="example">
         <Switch>
-          {EXAMPLES.map(([ name, Component, path ]) => (
+          {EXAMPLES.map(([name, Component, path]) => (
             <Route key={path} path={path} component={Component} />
           ))}
           <Redirect from="/" to="/rich-text" />
@@ -112,9 +120,7 @@ class App extends React.Component {
   renderError() {
     return (
       <div className="error">
-        <p>
-          An error was thrown by one of the example's React components!
-        </p>
+        <p>An error was thrown by one of the example's React components!</p>
         <pre className="info">
           <code>
             {this.state.error.stack}
@@ -125,7 +131,6 @@ class App extends React.Component {
       </div>
     )
   }
-
 }
 
 /**
@@ -134,7 +139,11 @@ class App extends React.Component {
  * @type {Element} router
  */
 
-const router = <HashRouter><App /></HashRouter>
+const router = (
+  <HashRouter>
+    <App />
+  </HashRouter>
+)
 
 /**
  * Mount the router.

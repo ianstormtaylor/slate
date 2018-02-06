@@ -5,9 +5,7 @@ import h from '../../../helpers/h'
 export const input = (
   <value>
     <document>
-      <paragraph thing="value">
-        one
-      </paragraph>
+      <paragraph thing="value">one</paragraph>
     </document>
   </value>
 )
@@ -23,7 +21,7 @@ export const output = {
         type: 'paragraph',
         isVoid: false,
         data: {
-          thing: 'value'
+          thing: 'value',
         },
         nodes: [
           {
@@ -32,12 +30,12 @@ export const output = {
               {
                 object: 'leaf',
                 text: 'one',
-                marks: []
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  }
+                marks: [],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
 }

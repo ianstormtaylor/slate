@@ -1,4 +1,3 @@
-
 import Block from '../models/block'
 import Inline from '../models/inline'
 import Mark from '../models/mark'
@@ -38,7 +37,7 @@ Changes.addMarkByKey = (change, key, offset, length, mark, options = {}) => {
   const by = offset + length
   let o = 0
 
-  leaves.forEach((leaf) => {
+  leaves.forEach(leaf => {
     const ax = o
     const ay = ax + leaf.text.length
 
@@ -181,7 +180,8 @@ Changes.mergeNodeByKey = (change, key, options = {}) => {
     throw new Error(`Unable to merge node with key "${key}", no previous key.`)
   }
 
-  const position = previous.object == 'text' ? previous.text.length : previous.nodes.size
+  const position =
+    previous.object == 'text' ? previous.text.length : previous.nodes.size
 
   change.applyOperation({
     type: 'merge_node',
@@ -261,7 +261,7 @@ Changes.removeMarkByKey = (change, key, offset, length, mark, options = {}) => {
   const by = offset + length
   let o = 0
 
-  leaves.forEach((leaf) => {
+  leaves.forEach(leaf => {
     const ax = o
     const ay = ax + leaf.text.length
 
@@ -310,8 +310,8 @@ Changes.removeAllMarksByKey = (change, key, options = {}) => {
   const node = document.getNode(key)
   const texts = node.object === 'text' ? [node] : node.getTextsAsArray()
 
-  texts.forEach((text) => {
-    text.getMarksAsArray().forEach((mark) => {
+  texts.forEach(text => {
+    text.getMarksAsArray().forEach(mark => {
       change.removeMarkByKey(text.key, 0, text.text.length, mark, options)
     })
   })
@@ -371,7 +371,7 @@ Changes.removeTextByKey = (change, key, offset, length, options = {}) => {
   const by = offset + length
   let o = 0
 
-  leaves.forEach((leaf) => {
+  leaves.forEach(leaf => {
     const ax = o
     const ay = ax + leaf.text.length
 
@@ -441,7 +441,15 @@ Changes.replaceNodeByKey = (change, key, newNode, options = {}) => {
  *   @property {Boolean} normalize
  */
 
-Changes.setMarkByKey = (change, key, offset, length, mark, properties, options = {}) => {
+Changes.setMarkByKey = (
+  change,
+  key,
+  offset,
+  length,
+  mark,
+  properties,
+  options = {}
+) => {
   mark = Mark.create(mark)
   properties = Mark.createProperties(properties)
   const normalize = change.getFlag('normalize', options)
@@ -541,7 +549,13 @@ Changes.splitNodeByKey = (change, key, position, options = {}) => {
  *   @property {Boolean} normalize
  */
 
-Changes.splitDescendantsByKey = (change, key, textKey, textOffset, options = {}) => {
+Changes.splitDescendantsByKey = (
+  change,
+  key,
+  textKey,
+  textOffset,
+  options = {}
+) => {
   if (key == textKey) {
     change.splitNodeByKey(textKey, textOffset, options)
     return
@@ -553,15 +567,21 @@ Changes.splitDescendantsByKey = (change, key, textKey, textOffset, options = {})
 
   const text = document.getNode(textKey)
   const ancestors = document.getAncestors(textKey)
-  const nodes = ancestors.skipUntil(a => a.key == key).reverse().unshift(text)
+  const nodes = ancestors
+    .skipUntil(a => a.key == key)
+    .reverse()
+    .unshift(text)
   let previous
   let index
 
-  nodes.forEach((node) => {
+  nodes.forEach(node => {
     const prevIndex = index == null ? null : index
     index = previous ? node.nodes.indexOf(previous) + 1 : textOffset
     previous = node
-    change.splitNodeByKey(node.key, index, { normalize: false, target: prevIndex })
+    change.splitNodeByKey(node.key, index, {
+      normalize: false,
+      target: prevIndex,
+    })
   })
 
   if (normalize) {
@@ -638,26 +658,24 @@ Changes.unwrapNodeByKey = (change, key, options = {}) => {
   const parentIndex = parentParent.nodes.indexOf(parent)
 
   if (parent.nodes.size === 1) {
-    change.moveNodeByKey(key, parentParent.key, parentIndex, { normalize: false })
+    change.moveNodeByKey(key, parentParent.key, parentIndex, {
+      normalize: false,
+    })
     change.removeNodeByKey(parent.key, options)
-  }
-
-  else if (isFirst) {
+  } else if (isFirst) {
     // Just move the node before its parent.
     change.moveNodeByKey(key, parentParent.key, parentIndex, options)
-  }
-
-  else if (isLast) {
+  } else if (isLast) {
     // Just move the node after its parent.
     change.moveNodeByKey(key, parentParent.key, parentIndex + 1, options)
-  }
-
-  else {
+  } else {
     // Split the parent.
     change.splitNodeByKey(parent.key, index, { normalize: false })
 
     // Extract the node in between the splitted parent.
-    change.moveNodeByKey(key, parentParent.key, parentIndex + 1, { normalize: false })
+    change.moveNodeByKey(key, parentParent.key, parentIndex + 1, {
+      normalize: false,
+    })
 
     if (normalize) {
       change.normalizeNodeByKey(parentParent.key)
