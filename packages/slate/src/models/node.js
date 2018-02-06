@@ -635,20 +635,10 @@ class Node {
 
   getDescendant(key) {
     key = assertKey(key)
-    let descendantFound = null
-
-    const found = this.nodes.find((node) => {
-      if (node.key === key) {
-        return node
-      } else if (node.object !== 'text') {
-        descendantFound = node.getDescendant(key)
-        return descendantFound
-      } else {
-        return false
-      }
-    })
-
-    return descendantFound || found
+    // Use the cache by getAncestors
+    const ancestors = this.getAncestors(key)
+    if (!ancestors || ancestors.size === 0) return null
+    return ancestors.last().getChild(key)
   }
 
   /**
