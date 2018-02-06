@@ -207,16 +207,24 @@ class Content extends React.Component {
     this.tmp.isUpdatingSelection = true
     native.removeAllRanges()
 
-    // COMPAT: IE 11 does not support Selection.extend
-    if (native.extend) {
+    // COMPAT: IE 11 does not support Selection.setBaseAndExtent
+    if (native.setBaseAndExtent) {
       // COMPAT: Since the DOM range has no concept of backwards/forwards
       // we need to check and do the right thing here.
       if (isBackward) {
-        native.collapse(range.endContainer, range.endOffset)
-        native.extend(range.startContainer, range.startOffset)
+        native.setBaseAndExtent(
+          range.endContainer,
+          range.endOffset,
+          range.startContainer,
+          range.startOffset
+        )
       } else {
-        native.collapse(range.startContainer, range.startOffset)
-        native.extend(range.endContainer, range.endOffset)
+        native.setBaseAndExtent(
+          range.startContainer,
+          range.startOffset,
+          range.endContainer,
+          range.endOffset
+        )
       }
     } else {
       // COMPAT: IE 11 does not support Selection.extend, fallback to addRange
