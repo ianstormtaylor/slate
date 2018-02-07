@@ -1,4 +1,5 @@
 examples/build.prod.js
+node_modules/
 package.json
 packages/*/dist/
 packages/*/lib/

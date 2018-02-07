@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
 
 import chalk from 'chalk'
-import baseline from '../tmp/benchmark-baseline'
-import comparison from '../tmp/benchmark-comparison'
+import baseline from '../../tmp/benchmark-baseline'
+import comparison from '../../tmp/benchmark-comparison'
 
 /**
  * Constants.
