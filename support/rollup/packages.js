@@ -112,6 +112,7 @@ function configure(pkg, env, target) {
           file: `packages/${pkg.name}/${pkg.main}`,
           format: 'cjs',
           exports: 'named',
+          sourcemap: isDev,
         },
       ],
       // We need to explicitly state which modules are external, meaning that
