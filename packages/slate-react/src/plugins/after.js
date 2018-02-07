@@ -532,8 +532,9 @@ function AfterPlugin() {
     const { anchorKey, anchorOffset, focusKey, focusOffset } = range
     if (
       change.value.document.areTwoRangesVisiblyTheSame(value.selection, range)
-    )
+    ) {
       return
+    }
     const anchorText = document.getNode(anchorKey)
     const focusText = document.getNode(focusKey)
     const anchorInline = document.getClosestInline(anchorKey)

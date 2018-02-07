@@ -2,7 +2,7 @@
 
 import h from '../../../helpers/h'
 
-export default function (change) {
+export default function(change) {
   change.delete()
 }
 
@@ -31,4 +31,3 @@ export const output = (
     </document>
   </value>
 )
-

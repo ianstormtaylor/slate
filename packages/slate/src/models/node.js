@@ -232,11 +232,17 @@ class Node {
    * **/
 
   areTwoRangesVisiblyTheSame(range1, range2) {
-    const isSameAnchor = this.areTwoCollapsedRangeVisiblyTheSame(range1.collapseToAnchor(), range2.collapseToAnchor())
+    const isSameAnchor = this.areTwoCollapsedRangeVisiblyTheSame(
+      range1.collapseToAnchor(),
+      range2.collapseToAnchor()
+    )
     if (!isSameAnchor) {
       return false
     }
-    const isSameFocus = this.areTwoCollapsedRangeVisiblyTheSame(range1.collapseToFocus(), range2.collapseToFocus())
+    const isSameFocus = this.areTwoCollapsedRangeVisiblyTheSame(
+      range1.collapseToFocus(),
+      range2.collapseToFocus()
+    )
     return isSameFocus
   }
 

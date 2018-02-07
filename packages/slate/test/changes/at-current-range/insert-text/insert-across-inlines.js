@@ -2,7 +2,7 @@
 
 import h from '../../../helpers/h'
 
-export default function (change) {
+export default function(change) {
   change.insertText('a')
 }
 
@@ -24,7 +24,7 @@ export const output = (
     <document>
       <paragraph>
         <link>
-        a<cursor />
+          a<cursor />
         </link>
         two
       </paragraph>
