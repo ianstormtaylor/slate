@@ -956,14 +956,13 @@ Changes.setBlockAtRange = (change, range, properties, options = {}) => {
   // Check if we have a "hanging" selection case where the even though the
   // selection extends into the start of the end node, we actually want to
   // ignore that for UX reasons.
-  const isHanging = (
+  const isHanging =
     isCollapsed == false &&
     startOffset == 0 &&
     endOffset == 0 &&
     isStartVoid == false &&
     startKey == startBlock.getFirstText().key &&
     endKey == endBlock.getFirstText().key
-  )
 
   // If it's a hanging selection, ignore the last block.
   if (isHanging) {
