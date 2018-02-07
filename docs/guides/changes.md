@@ -1,4 +1,3 @@
-
 # Changes
 
 All changes to a Slate editor's value, whether it's the `selection`, `document`, `history`, etc. happen via "changes"—specifically, via the [`Change`](../reference/slate/change.md) model.
@@ -6,7 +5,6 @@ All changes to a Slate editor's value, whether it's the `selection`, `document`,
 This is important because the `Change` model is responsible for ensuring that every change to a Slate value can be expressed in terms of low-level [operations](../reference/slate/operation.md). But you don't have to worry about that, because it happens automatically.
 
 You just need to understand changes...
-
 
 ## Expressiveness is Key
 
@@ -43,7 +41,6 @@ To that end, Slate defines _lots_ of change methods.
 
 The change methods are the one place in Slate where overlap and near-duplication isn't stomped out. Because sometimes the exact-right change method is the difference between one line of code and ten. And not just ten once, but ten repeated everywhere throughout your codebase.
 
-
 ## Change Categories
 
 There are a handful of different categories of changes that ship with Slate by default, and understanding them may help you understand which methods to reach for when trying to write your editor's logic...
@@ -72,7 +69,6 @@ These are changes like `setData()`, `setDecorations()`, etc. that act on the oth
 
 These are changes like `undo()`, `redo()`, etc. that use the operation history and redo or undo changes that have already happened. You generally don't need to worry about these, because they're already bound to the keyboard shortcuts you'd expect, and the user can use them.
 
-
 ## Making Changes
 
 When you decide you want to make a change to the Slate value, you're almost always in one of four places...
@@ -99,20 +95,15 @@ In that case, you'll need to use the `change()` method on the Slate [`<Editor>`]
 
 ```js
 class Image extends React.Component {
-
-  onClick = (event) => {
-    this.props.editor.change((change) => {
+  onClick = event => {
+    this.props.editor.change(change => {
       change.removeNodeByKey(this.props.node.key)
     })
   }
 
   render() {
-    <img
-      {...this.props.attributes}
-      onClick={this.onClick}
-    />
+    ;<img {...this.props.attributes} onClick={this.onClick} />
   }
-
 }
 ```
 
@@ -146,7 +137,8 @@ This is the fourth place you might want to make changes, and also the most dange
 That said, if that's okay with you, you can make changes manually by using the `change()` method on a Slate [`Value`](../reference/slate/value.md). For example:
 
 ```js
-const change = value.change()
+const change = value
+  .change()
   .selectAll()
   .delete()
 
@@ -154,7 +146,6 @@ const newValue = change.value
 ```
 
 Note that you'll need to then grab the new value by accessing the `change.value` property directly.
-
 
 ## Reusing Changes
 
@@ -183,9 +174,7 @@ Notice how rewriting that image inserting logic multiple times without having it
 But sadly you can't chain with those functions directly, since `change` objects don't actually know about them. Instead, you use the `.call()` method:
 
 ```js
-change
-  .call(insertParagraph)
-  .call(insertImage, 'https://google.com/logo')
+change.call(insertParagraph).call(insertImage, 'https://google.com/logo')
 ```
 
 Not only can you use them with `.call()`, but if you're making one-off changes to the `editor`, you can use them with `editor.change()` as well. For example:

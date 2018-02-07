@@ -1,4 +1,3 @@
-
 # `slate-prop-types`
 
 ```js
@@ -6,7 +5,6 @@ import Types from 'slate-prop-types'
 ```
 
 A set of React prop types for Slate editors and plugins.
-
 
 ## Example
 
@@ -26,7 +24,6 @@ class Toolbar extends React.Component {
 
 }
 ```
-
 
 ## Exports
 
