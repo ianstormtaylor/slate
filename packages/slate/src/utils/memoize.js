@@ -144,11 +144,12 @@ function setCacheNullWithBatchKeys(node, property, batchKeys) {
 
   const propertyMap = node.__cache.get(property)
 
-  batchKeys.forEach(k => {
-    if (!propertyMap.has(k)) {
-      const nullValue = new Map([[LEAF, null]]) // eslint-disable-line no-undef,no-restricted-globals
-      propertyMap.set(k, nullValue)
+  batchKeys.find(k => {
+    if (propertyMap.has(k)) {
+      return true
     }
+    const nullValue = new Map([[LEAF, null]]) // eslint-disable-line no-undef,no-restricted-globals
+    propertyMap.set(k, nullValue)
   })
 
   node.__cache.set(property, propertyMap)
