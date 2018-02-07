@@ -37,6 +37,7 @@ function configure(env) {
       // resolves local modules by default.
       resolve({
         browser: true,
+        preferBuiltins: true,
       }),
 
       // Allow Rollup to resolve CommonJS modules, since it only resolves ES2015
