@@ -489,11 +489,12 @@ class Text extends Record(DEFAULTS) {
    * Validate the text node against a `schema`.
    *
    * @param {Schema} schema
+   * @param {Value} value
    * @return {Object|Void}
    */
 
-  validate(schema) {
-    return schema.validateNode(this)
+  validate(schema, value) {
+    return schema.validateNode(this, value)
   }
 }
 
