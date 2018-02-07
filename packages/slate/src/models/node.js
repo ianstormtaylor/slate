@@ -356,9 +356,6 @@ class Node {
     this.nodes.find(node => {
       if (node.object == 'text') return false
       ancestors = node.getAncestors(key)
-      if (!node.__cache.get('getAncestors')) {
-        throw new Error('Bad')
-      }
       return ancestors
     })
 
