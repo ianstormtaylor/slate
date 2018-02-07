@@ -117,6 +117,44 @@ function memoize(object, properties, options = {}) {
 }
 
 /**
+ *   Set expected cache values to null
+ * @param {Node} node
+ * @param {string} property
+ * @param {List<Array>} batchKeys
+ * @return {Promise}
+ **/
+
+function setCacheNullWithBatchKeys(node, property, batchKeys) {
+  if (IS_DEV) {
+    // If memoization is disabled, call into the original method.
+    if (!ENABLED) return null
+
+    // If the cache key is different, previous caches must be cleared.
+    if (CACHE_KEY !== node.__cache_key) {
+      node.__cache_key = CACHE_KEY
+      node.__cache = new Map([[property, new Map()]]) // eslint-disable-line no-undef,no-restricted-globals
+    }
+  }
+  if (!node.__cache) {
+    node.__cache = new Map([[property, new Map()]]) // eslint-disable-line no-undef,no-restricted-globals
+  }
+  if (!node.__cache.has(property)) {
+    node.__cache.set(property, new Map()) // eslint-disable-line no-undef,no-restricted-globals
+  }
+
+  const propertyMap = node.__cache.get(property)
+
+  batchKeys.forEach(k => {
+    if (!propertyMap.has(k)) {
+      const nullValue = new Map([[LEAF, null]]) // eslint-disable-line no-undef,no-restricted-globals
+      propertyMap.set(k, nullValue)
+    }
+  })
+
+  node.__cache.set(property, propertyMap)
+}
+
+/**
  * Get a value at a key path in a tree of Map.
  *
  * If not set, returns UNSET.
@@ -198,4 +236,4 @@ function useMemoization(enabled) {
  */
 
 export default memoize
-export { resetMemoization, useMemoization }
+export { resetMemoization, useMemoization, setCacheNullWithBatchKeys }
