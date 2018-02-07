@@ -172,7 +172,7 @@ function setIn(map, keys, value) {
  * @return {Void}
  */
 
-function __clear() {
+function resetMemoization() {
   CACHE_KEY++
 
   if (CACHE_KEY >= Number.MAX_SAFE_INTEGER) {
@@ -187,7 +187,7 @@ function __clear() {
  * @return {Void}
  */
 
-function __enable(enabled) {
+function useMemoization(enabled) {
   ENABLED = enabled
 }
 
@@ -197,4 +197,5 @@ function __enable(enabled) {
  * @type {Object}
  */
 
-export { memoize as default, __clear, __enable }
+export default memoize
+export { resetMemoization, useMemoization }

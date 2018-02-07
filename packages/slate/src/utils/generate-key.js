@@ -55,4 +55,5 @@ resetKeyGenerator()
  * @type {Object}
  */
 
-export { generateKey as default, setKeyGenerator, resetKeyGenerator }
+export default generateKey
+export { setKeyGenerator, resetKeyGenerator }

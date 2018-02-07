@@ -2,7 +2,7 @@
 /* eslint-disable react/jsx-key */
 
 import h from '../../test/helpers/h'
-import { __clear } from '../../lib/utils/memoize'
+import { resetMemoization } from '../..'
 
 export default function({ change, text }) {
   change.insertTextByKey(text.key, 0, 'a')
@@ -11,7 +11,7 @@ export default function({ change, text }) {
 export function before(value) {
   const change = value.change()
   const text = value.document.getLastText()
-  __clear()
+  resetMemoization()
   return { change, text }
 }
 
