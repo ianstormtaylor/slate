@@ -1,4 +1,3 @@
-
 # Operation
 
 An operation is the lowest-level description of a specific change to a part of Slate's value. They are designed to be collaborative-editing friendly.
@@ -6,7 +5,6 @@ An operation is the lowest-level description of a specific change to a part of S
 All of the [`Change`](./change.md) methods result in operations being created and applied to a [`Value`](./value.md) They're accessible via the `change.operations` property.
 
 There are a handful of Slate operation types. The goal is to have the fewest possible types, while still maintaining the necessary semantics for collaborative editing to work.
-
 
 ## Text Operations
 
@@ -36,7 +34,6 @@ Inserts a `text` string at `offset` into a text node at `path`, with optional `m
 ```
 
 Removes a string of `text` at `offset` into a text node at `path`.
-
 
 ## Mark Operations
 
@@ -82,7 +79,6 @@ Removes a `mark` from a text node at `path` starting at an `offset` and spanning
 ```
 
 Set new `properties` on any marks that match an existing `mark` in a text node at `path`, starting at an `offset` and spanning `length` characters.
-
 
 ## Node Operations
 
@@ -162,7 +158,6 @@ Set new `properties` on the node at `path`.
 
 Split the node at `path` at `position`. The `position` refers to either the index in the child nodes in the case of [`Block`](./block.md) or [`Inline`](./inline.md) nodes, and the index in the characters in the case of [`Text`](./text.md) nodes. In the case of nested splits, `target` refers to the target path of the child split operation. The `properties` object contains properties that should be assigned to the new node created after the split operation is complete.
 
-
 ## Value Operations
 
 ### `set_selection`
@@ -189,15 +184,16 @@ Set new `properties` on the selection.
 
 Set new `properties` on a value. Properties can contain `data` and `decorations`.
 
-
 ## Helpers
 
 ### `apply`
+
 `apply(value: Value, operation: Object) => Value`
 
 Applies an `operation` to a `value` object.
 
 ### `invert`
+
 `invert(operation: Object) => Object`
 
 Create an inverse operation that will undo the changes made by the original.

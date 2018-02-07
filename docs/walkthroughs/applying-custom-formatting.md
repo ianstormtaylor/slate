@@ -1,4 +1,3 @@
-
 <br/>
 <p align="center"><strong>Previous:</strong><br/><a href="./defining-custom-block-nodes.md">Defining Custom Block Nodes</a></p>
 <br/>
@@ -13,7 +12,6 @@ So we start with our app from earlier:
 
 ```js
 class App extends React.Component {
-
   state = {
     value: initialValue,
   }
@@ -41,13 +39,13 @@ class App extends React.Component {
       />
     )
   }
-  
-  renderNode = (props) => {
+
+  renderNode = props => {
     switch (props.node.type) {
-      case 'code': return <CodeNode {...props} />
+      case 'code':
+        return <CodeNode {...props} />
     }
   }
-
 }
 ```
 
@@ -55,7 +53,6 @@ And now, we'll edit the `onKeyDown` handler to make it so that when you press `c
 
 ```js
 class App extends React.Component {
-
   state = {
     value: initialValue,
   }
@@ -95,13 +92,13 @@ class App extends React.Component {
       />
     )
   }
-  
-  renderNode = (props) => {
+
+  renderNode = props => {
     switch (props.node.type) {
-      case 'code': return <CodeNode {...props} />
+      case 'code':
+        return <CodeNode {...props} />
     }
   }
-
 }
 ```
 
@@ -126,7 +123,6 @@ function BoldMark(props) {
 }
 
 class App extends React.Component {
-
   state = {
     value: initialValue,
   }
@@ -165,20 +161,21 @@ class App extends React.Component {
       />
     )
   }
-  
-  renderNode = (props) => {
+
+  renderNode = props => {
     switch (props.node.type) {
-      case 'code': return <CodeNode {...props} />
+      case 'code':
+        return <CodeNode {...props} />
     }
   }
 
   // Add a `renderMark` method to render marks.
-  renderMark = (props) => {
+  renderMark = props => {
     switch (props.mark.type) {
-      case 'bold': return <BoldMark {...props} />
+      case 'bold':
+        return <BoldMark {...props} />
     }
   }
-
 }
 ```
 

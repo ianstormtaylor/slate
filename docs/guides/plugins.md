@@ -1,4 +1,3 @@
-
 # Plugins
 
 With Slate, _all_ of your editor's logic is controlled by "plugins".
@@ -6,7 +5,6 @@ With Slate, _all_ of your editor's logic is controlled by "plugins".
 Plugins have complete control over the schema, the behaviors, and the rendering of the editor—they can add any kind of functionality they want. So much so that even the core logic of Slate is provided via two "core" plugins.
 
 Slate encourages you to break up code into small, reusable modules that can be shared with others, and easily reasoned about.
-
 
 ## What Are Plugins?
 
@@ -33,7 +31,6 @@ It focuses the editor and selects everything when it is clicked, and it blurs th
 
 Notice how it's able to define a set of behaviors that work together to form a single "feature" in the editor. That's what makes Slate's plugins a powerful form of encapsulation.
 
-
 ## The Plugins "Stack"
 
 Slate's editor takes a list of plugins as one of its arguments. We refer to this list as the plugins "stack". It is very similar to "middleware" from Express or Koa.
@@ -53,7 +50,6 @@ When the editor needs to handle a DOM event, or decide what to render, it will l
 
 Because of this looping, plugins are **order-sensitive**! This is very important. The earlier in the stack, the more preference the plugin has, since it can react before the others after it. If two plugins both try to handle the same event, the earlier plugin will "win".
 
-
 ## "Core" Plugins
 
 If you put Slate on the page without adding any of your own plugins, it will still behave like you'd expect a rich-text editor to. That's because it has its own "core" logic. And that core logic is implemented with its own core plugins.
@@ -67,7 +63,6 @@ There are two core plugins: the "before plugin" and the "after plugin". They get
 For the most part you don't need to worry about the core plugins. The before plugin helps to pave over editing inconsistencies, and the after plugin serves as a fallback, to implement the default behavior in the event that your own plugins choose not to handle a specific event.
 
 _To learn more, check out the [Core Plugin reference](../reference/slate-react/core-plugins.md)._
-
 
 ## The "Editor" Plugin
 
@@ -102,7 +97,6 @@ const plugins = [
 
 This isn't something you need to remember, but it's helpful to know that even the top-level editor props are just another plugin!
 
-
 ## Helper Plugins vs. Feature Plugins
 
 Plugins _can_ do anything and everything. But that doesn't mean you should build plugins that are thousands of lines long that implement every single feature in your editor—your codebase would become hell to maintain. Instead, just like all modules, you should split them up into pieces with separate concerns.
@@ -124,7 +118,7 @@ function Hotkey(hotkey, fn) {
       if (isHotkey(hotkey, event)) {
         change.call(fn)
       }
-    }
+    },
   }
 }
 ```
@@ -227,7 +221,6 @@ Framework plugins will often expose objects with `changes`, `helpers` and `plugi
 
 You'll often want to encapsulate framework plugins in your own feature plugins, but they can go a long way in terms of reducing your codebase size.
 
-
 ## Best Practices
 
 When you're writing plugins, there are a few patterns to follow that will make your plugins more flexible, and more familiar for others.
@@ -283,7 +276,7 @@ const plugins = [
   AddMark({
     hotkey: 'cmd+b',
     change: change => change.addMark('bold'),
-  })
+  }),
 ]
 ```
 
@@ -294,22 +287,19 @@ const plugins = [
   AddMark({
     hotkey: 'cmd+opt+c',
     change: change => {
-      change
-        .addMark({ type: 'comment', data: { id: userId }})
-        .selectAll()
-    }
-  })
+      change.addMark({ type: 'comment', data: { id: userId } }).selectAll()
+    },
+  }),
 ]
 ```
 
 And what's even better, since it's a common practice to write change function helpers in your codebase to reuse, users can usually just pass in one of the functions they've already defined:
 
 ```js
-
 const plugins = [
   AddMark({
     hotkey: 'cmd+b',
     change: addBoldMark,
-  })
+  }),
 ]
 ```

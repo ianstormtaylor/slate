@@ -1,4 +1,3 @@
-
 html,
 input,
 textarea {
@@ -45,7 +44,7 @@ blockquote {
   font-style: italic;
 }
 
-blockquote[dir="rtl"] {
+blockquote[dir='rtl'] {
   border-left: none;
   padding-left: 0;
   padding-right: 10px;
@@ -63,9 +62,9 @@ td {
 
 input {
   box-sizing: border-box;
-  font-size: .85em;
+  font-size: 0.85em;
   width: 100%;
-  padding: .5em;
+  padding: 0.5em;
   border: 2px solid #ddd;
   background: #fafafa;
 }
@@ -90,7 +89,7 @@ input:focus {
 
 .nav {
   padding: 10px 15px;
-  color: #AAA;
+  color: #aaa;
   background: #000;
 }
 
@@ -104,12 +103,12 @@ input:focus {
 
 .nav-link {
   margin-left: 1em;
-  color: #AAA;
+  color: #aaa;
   text-decoration: none;
 }
 
 .nav-link:hover {
-  color: #FFF;
+  color: #fff;
   text-decoration: underline;
 }
 
@@ -146,7 +145,8 @@ input:focus {
  * Example.
  */
 
-.example, .error {
+.example,
+.error {
   max-width: 42em;
   margin: 0 auto 20px;
   padding: 20px;
@@ -184,7 +184,7 @@ input:focus {
   cursor: pointer;
 }
 
-.button[data-active="true"] {
+.button[data-active='true'] {
   color: black;
 }
 
@@ -222,14 +222,14 @@ input:focus {
   opacity: 0;
   background-color: #222;
   border-radius: 4px;
-  transition: opacity .75s;
+  transition: opacity 0.75s;
 }
 
 .hover-menu .button {
   color: #aaa;
 }
 
-.hover-menu .button[data-active="true"] {
+.hover-menu .button[data-active='true'] {
   color: #fff;
 }
 
@@ -267,6 +267,6 @@ input:focus {
 .word-counter {
   margin-top: 10px;
   padding: 12px;
-  background-color: #EBEBEB;
+  background-color: #ebebeb;
   display: inline-block;
 }

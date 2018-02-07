@@ -1,4 +1,3 @@
-
 # `slate-schema-violations`
 
 ```js
@@ -22,7 +21,6 @@ import {
 
 A set of constants for the built-in violations in a Slate schema.
 
-
 ## Example
 
 ```js
@@ -41,7 +39,6 @@ class Toolbar extends React.Component {
 
 }
 ```
-
 
 ## Exports
 
