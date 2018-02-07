@@ -92,9 +92,11 @@ Sometimes though, the declarative validation syntax isn't fine-grained enough to
 When you define a `validateNode` function, you either return nothing if the node's already valid, or you return a normalizer function that will make the node valid if it isn't. Here's an example:
 
 ```js
-function validateNode(node) {
+function validateNode(node, value) {
   if (node.object != 'block') return
   if (node.isVoid) return
+  const parent = value.document.getParent(node)
+  if (parent.object === 'document') return
 
   const { nodes } = node
   if (nodes.size != 3) return
@@ -107,7 +109,7 @@ function validateNode(node) {
 }
 ```
 
-This validation defines a very specific (honestly, useless) behavior, where if a node is block, non-void and has three children, the first and last of which are text nodes, it is removed. I don't know why you'd ever do that, but the point is that you can get very specific with your validations this way. Any property of the node can be examined.
+This validation defines a very specific (honestly, useless) behavior, where if a node is block that is not a direct child of the document, non-void and has three children, the first and last of which are text nodes, it is removed. I don't know why you'd ever do that, but the point is that you can get very specific with your validations this way. Any property of the node can be examined.
 
 When you need this level of specificity, using the `validateNode` property of the editor or plugins is handy.
 
