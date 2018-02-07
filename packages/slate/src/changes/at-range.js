@@ -944,7 +944,7 @@ Changes.setBlockAtRange = (change, range, properties, options = {}) => {
   const blocks = document.getBlocksAtRange(range)
 
 
-  const { startKey, endKey, endOffset, isCollapsed } = range
+  const { startKey, startOffset, endKey, endOffset, isCollapsed } = range
   const isStartVoid = document.hasVoidParent(startKey)
   const startBlock = document.getClosestBlock(startKey)
   const endBlock = document.getClosestBlock(endKey)
@@ -954,6 +954,7 @@ Changes.setBlockAtRange = (change, range, properties, options = {}) => {
   // ignore that for UX reasons.
   const isHanging = (
     isCollapsed == false &&
+    startOffset == 0 &&
     endOffset == 0 &&
     isStartVoid == false &&
     startKey == startBlock.getFirstText().key &&
