@@ -2,7 +2,7 @@
 
 import h from '../../../helpers/h'
 
-export default function (change) {
+export default function(change) {
   change.splitBlock()
 }
 
@@ -12,9 +12,7 @@ export const input = (
       <paragraph>
         word<cursor />
       </paragraph>
-      <paragraph>
-        another
-      </paragraph>
+      <paragraph>another</paragraph>
     </document>
   </value>
 )
@@ -22,15 +20,11 @@ export const input = (
 export const output = (
   <value>
     <document>
-      <paragraph>
-        word
-      </paragraph>
+      <paragraph>word</paragraph>
       <paragraph>
         <cursor />
       </paragraph>
-      <paragraph>
-        another
-      </paragraph>
+      <paragraph>another</paragraph>
     </document>
   </value>
 )

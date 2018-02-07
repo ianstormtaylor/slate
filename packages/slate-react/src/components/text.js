@@ -1,4 +1,3 @@
-
 import Debug from 'debug'
 import ImmutableTypes from 'react-immutable-proptypes'
 import React from 'react'
@@ -22,7 +21,6 @@ const debug = Debug('slate:node')
  */
 
 class Text extends React.Component {
-
   /**
    * Property types.
    *
@@ -69,7 +67,7 @@ class Text extends React.Component {
    * @return {Boolean}
    */
 
-  shouldComponentUpdate = (nextProps) => {
+  shouldComponentUpdate = nextProps => {
     const { props } = this
     const n = nextProps
     const p = props
@@ -109,7 +107,7 @@ class Text extends React.Component {
     const { document } = value
     const { key } = node
 
-    const decs = decorations.filter((d) => {
+    const decs = decorations.filter(d => {
       const { startKey, endKey } = d
       if (startKey == key || endKey == key) return true
       const startsBefore = document.areDescendantsSorted(startKey, key)
@@ -162,7 +160,6 @@ class Text extends React.Component {
       />
     )
   }
-
 }
 
 /**

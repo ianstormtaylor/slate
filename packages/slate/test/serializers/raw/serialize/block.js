@@ -5,9 +5,7 @@ import h from '../../../helpers/h'
 export const input = (
   <value>
     <document>
-      <paragraph>
-        one
-      </paragraph>
+      <paragraph>one</paragraph>
     </document>
   </value>
 )
@@ -31,11 +29,11 @@ export const output = {
                 object: 'leaf',
                 text: 'one',
                 marks: [],
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  }
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
 }

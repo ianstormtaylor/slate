@@ -1,5 +1,5 @@
-import factory from './support/rollup/factory'
-import examplesConfig from './support/rollup/examples'
+import factory from './support/rollup/packages'
+import examples from './support/rollup/examples'
 import slate from './packages/slate/package.json'
 import slateBase64Serializer from './packages/slate-base64-serializer/package.json'
 import slateDevLogger from './packages/slate-dev-logger/package.json'
@@ -22,10 +22,7 @@ const configurations = [
   ...factory(slateReact),
   ...factory(slateSchemaViolations),
   ...factory(slateSimulator),
+  ...examples,
 ]
-
-if (!process.env.SKIP_EXAMPLES) {
-  configurations.push(...examplesConfig)
-}
 
 export default configurations

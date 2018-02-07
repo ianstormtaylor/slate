@@ -1,4 +1,3 @@
-
 /**
  * The transfer types that Slate recognizes.
  *

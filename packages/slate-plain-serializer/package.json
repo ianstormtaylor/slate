@@ -1,7 +1,7 @@
 {
   "name": "slate-plain-serializer",
   "description": "A plain text serializer for Slate editors.",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
   "main": "lib/slate-plain-serializer.js",
@@ -13,7 +13,7 @@
     "lib/"
   ],
   "dependencies": {
-    "slate-dev-logger": "^0.1.37"
+    "slate-dev-logger": "^0.1.38"
   },
   "peerDependencies": {
     "immutable": "^3.8.0",
@@ -21,8 +21,8 @@
   },
   "devDependencies": {
     "mocha": "^2.5.3",
-    "slate": "^0.32.2",
-    "slate-hyperscript": "^0.5.2"
+    "slate": "^0.32.3",
+    "slate-hyperscript": "^0.5.3"
   },
   "scripts": {
     "clean": "rm -rf ./dist ./lib ./node_modules"

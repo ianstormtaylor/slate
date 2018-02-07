@@ -1,4 +1,3 @@
-
 /** @jsx h */
 
 import React from 'react'
@@ -12,19 +11,21 @@ export const rules = [
       }
 
       if (obj.object == 'inline' && obj.type == 'link') {
-        return React.createElement('a', { href: obj.data.get('href') }, children)
+        return React.createElement(
+          'a',
+          { href: obj.data.get('href') },
+          children
+        )
       }
-    }
-  }
+    },
+  },
 ]
 
 export const input = (
   <value>
     <document>
       <paragraph>
-        <link href="https://google.com">
-          one
-        </link>
+        <link href="https://google.com">one</link>
       </paragraph>
     </document>
   </value>

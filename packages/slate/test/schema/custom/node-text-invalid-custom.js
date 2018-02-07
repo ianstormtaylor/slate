@@ -11,17 +11,15 @@ export const schema = {
         if (reason == NODE_TEXT_INVALID) {
           node.nodes.forEach(n => change.removeNodeByKey(n.key))
         }
-      }
-    }
-  }
+      },
+    },
+  },
 }
 
 export const input = (
   <value>
     <document>
-      <paragraph>
-        invalid
-      </paragraph>
+      <paragraph>invalid</paragraph>
     </document>
   </value>
 )

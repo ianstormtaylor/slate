@@ -1,4 +1,3 @@
-
 import { Value } from 'slate'
 import { atob, btoa } from 'isomorphic-base64'
 
@@ -91,5 +90,5 @@ export default {
   deserialize,
   deserializeNode,
   serialize,
-  serializeNode
+  serializeNode,
 }

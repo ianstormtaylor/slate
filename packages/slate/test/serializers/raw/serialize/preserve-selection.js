@@ -5,9 +5,7 @@ import h from '../../../helpers/h'
 export const input = (
   <value>
     <document>
-      <paragraph>
-        one
-      </paragraph>
+      <paragraph>one</paragraph>
     </document>
   </value>
 )
@@ -30,13 +28,13 @@ export const output = {
               {
                 text: 'one',
                 object: 'leaf',
-                marks: []
-              }
-            ]
-          }
-        ]
-      }
-    ]
+                marks: [],
+              },
+            ],
+          },
+        ],
+      },
+    ],
   },
   selection: {
     object: 'range',
@@ -47,7 +45,7 @@ export const output = {
     isBackward: false,
     isFocused: false,
     marks: null,
-  }
+  },
 }
 
 export const options = {

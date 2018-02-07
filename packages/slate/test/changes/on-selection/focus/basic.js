@@ -2,7 +2,7 @@
 
 import h from '../../../helpers/h'
 
-export default function (change) {
+export default function(change) {
   change.focus()
 }
 
@@ -17,7 +17,9 @@ export const input = (
 export const output = (
   <value>
     <document>
-      <paragraph><cursor />one</paragraph>
+      <paragraph>
+        <cursor />one
+      </paragraph>
     </document>
   </value>
 )

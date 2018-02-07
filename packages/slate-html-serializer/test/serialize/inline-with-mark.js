@@ -1,4 +1,3 @@
-
 /** @jsx h */
 
 import React from 'react'
@@ -18,8 +17,8 @@ export const rules = [
       if (obj.object == 'mark' && obj.type == 'bold') {
         return React.createElement('strong', {}, children)
       }
-    }
-  }
+    },
+  },
 ]
 
 export const input = (

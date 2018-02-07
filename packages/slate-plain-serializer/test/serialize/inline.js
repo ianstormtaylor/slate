@@ -6,9 +6,7 @@ export const input = (
   <value>
     <document>
       <paragraph>
-        <link>
-          one
-        </link>
+        <link>one</link>
       </paragraph>
     </document>
   </value>

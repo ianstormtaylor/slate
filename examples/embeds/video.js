@@ -1,4 +1,3 @@
-
 import React from 'react'
 
 /**
@@ -8,17 +7,16 @@ import React from 'react'
  */
 
 class Video extends React.Component {
-
   /**
    * When the input text changes, update the `video` data on the node.
    *
    * @param {Event} e
    */
 
-  onChange = (e) => {
+  onChange = e => {
     const video = e.target.value
     const { node, editor } = this.props
-    editor.change(c => c.setNodeByKey(node.key, { data: { video }}))
+    editor.change(c => c.setNodeByKey(node.key, { data: { video } }))
   }
 
   /**
@@ -28,7 +26,7 @@ class Video extends React.Component {
    * @type {Event} e
    */
 
-  onClick = (e) => {
+  onClick = e => {
     e.stopPropagation()
   }
 
@@ -74,7 +72,7 @@ class Video extends React.Component {
     }
 
     const iframeStyle = {
-      display: 'block'
+      display: 'block',
     }
 
     return (
@@ -104,7 +102,7 @@ class Video extends React.Component {
     const video = node.data.get('video')
     const style = {
       marginTop: '5px',
-      boxSizing: 'border-box'
+      boxSizing: 'border-box',
     }
 
     return (
@@ -116,7 +114,6 @@ class Video extends React.Component {
       />
     )
   }
-
 }
 
 /**

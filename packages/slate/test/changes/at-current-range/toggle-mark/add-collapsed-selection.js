@@ -2,10 +2,8 @@
 
 import h from '../../../helpers/h'
 
-export default function (change) {
-  change
-    .toggleMark('bold')
-    .insertText('s')
+export default function(change) {
+  change.toggleMark('bold').insertText('s')
 }
 
 export const input = (
@@ -22,7 +20,8 @@ export const output = (
   <value>
     <document>
       <paragraph>
-        word<b>s</b><cursor />
+        word<b>s</b>
+        <cursor />
       </paragraph>
     </document>
   </value>

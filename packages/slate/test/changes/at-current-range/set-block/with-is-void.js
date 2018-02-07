@@ -2,10 +2,10 @@
 
 import h from '../../../helpers/h'
 
-export default function (change) {
+export default function(change) {
   change.setBlock({
     type: 'image',
-    isVoid: true
+    isVoid: true,
   })
 }
 

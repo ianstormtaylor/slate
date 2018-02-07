@@ -3,7 +3,7 @@
 
 import h from '../../test/helpers/h'
 
-export default function (change) {
+export default function(change) {
   change.normalize()
 }
 
@@ -18,7 +18,8 @@ export const input = (
         <quote>
           <paragraph>
             <paragraph>
-              This is editable <b>rich</b> text, <i>much</i> better than a textarea!
+              This is editable <b>rich</b> text, <i>much</i> better than a
+              textarea!
               {i == 0 ? <cursor /> : ''}
             </paragraph>
           </paragraph>

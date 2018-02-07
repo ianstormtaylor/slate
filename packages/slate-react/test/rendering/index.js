@@ -1,4 +1,3 @@
-
 import React from 'react'
 import ReactDOM from 'react-dom/server'
 import assert from 'assert'
@@ -14,7 +13,10 @@ import { basename, extname, resolve } from 'path'
 
 describe('rendering', () => {
   const dir = resolve(__dirname, './fixtures')
-  const tests = fs.readdirSync(dir).filter(t => t[0] != '.' && !!~t.indexOf('.js')).map(t => basename(t, extname(t)))
+  const tests = fs
+    .readdirSync(dir)
+    .filter(t => t[0] != '.' && !!~t.indexOf('.js'))
+    .map(t => basename(t, extname(t)))
 
   for (const test of tests) {
     it(test, async () => {

@@ -30,20 +30,20 @@ export const input = {
                     object: 'mark',
                     type: 'bold',
                     data: {},
-                  }
-                ]
+                  },
+                ],
               },
               {
                 object: 'leaves',
                 text: 'e',
                 marks: [],
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  }
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
 }
 
 export const output = (

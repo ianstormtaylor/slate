@@ -10,12 +10,8 @@ two
 export const output = (
   <value>
     <document>
-      <line>
-        one
-      </line>
-      <line>
-        two
-      </line>
+      <line>one</line>
+      <line>two</line>
     </document>
   </value>
 )

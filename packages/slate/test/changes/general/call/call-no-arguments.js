@@ -9,7 +9,7 @@ function insertImageBlock(change, blockType) {
   })
 }
 
-export default function (change) {
+export default function(change) {
   change.call(insertImageBlock)
 }
 
@@ -19,9 +19,7 @@ export const input = (
       <paragraph>
         <cursor />one
       </paragraph>
-      <paragraph>
-        two
-      </paragraph>
+      <paragraph>two</paragraph>
     </document>
   </value>
 )
@@ -30,14 +28,11 @@ export const output = (
   <value>
     <document>
       <image>
-        {' '}<cursor />
+        {' '}
+        <cursor />
       </image>
-      <paragraph>
-        one
-      </paragraph>
-      <paragraph>
-        two
-      </paragraph>
+      <paragraph>one</paragraph>
+      <paragraph>two</paragraph>
     </document>
   </value>
 )

@@ -1,4 +1,3 @@
-
 import { Editor } from 'slate-react'
 import { Block, Value } from 'slate'
 import { CHILD_REQUIRED, CHILD_TYPE_INVALID } from 'slate-schema-violations'
@@ -21,15 +20,18 @@ const schema = {
     normalize: (change, violation, { node, child, index }) => {
       switch (violation) {
         case CHILD_TYPE_INVALID: {
-          return change.setNodeByKey(child.key, index == 0 ? 'title' : 'paragraph')
+          return change.setNodeByKey(
+            child.key,
+            index == 0 ? 'title' : 'paragraph'
+          )
         }
         case CHILD_REQUIRED: {
           const block = Block.create(index == 0 ? 'title' : 'paragraph')
           return change.insertNodeByKey(node.key, index, block)
         }
       }
-    }
-  }
+    },
+  },
 }
 
 /**
@@ -39,7 +41,6 @@ const schema = {
  */
 
 class ForcedLayout extends React.Component {
-
   /**
    * Deserialize the initial editor value.
    *
@@ -87,14 +88,15 @@ class ForcedLayout extends React.Component {
    * @return {Element}
    */
 
-  renderNode = (props) => {
+  renderNode = props => {
     const { attributes, children, node } = props
     switch (node.type) {
-      case 'title': return <h2 {...attributes}>{children}</h2>
-      case 'paragraph': return <p {...attributes}>{children}</p>
+      case 'title':
+        return <h2 {...attributes}>{children}</h2>
+      case 'paragraph':
+        return <p {...attributes}>{children}</p>
     }
   }
-
 }
 
 /**

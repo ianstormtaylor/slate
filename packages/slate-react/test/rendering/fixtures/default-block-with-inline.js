@@ -8,9 +8,7 @@ export const value = (
   <value>
     <document>
       <paragraph>
-        <link>
-          word
-        </link>
+        <link>word</link>
       </paragraph>
     </document>
   </value>

@@ -1,4 +1,3 @@
-
 import TRANSFER_TYPES from '../constants/transfer-types'
 
 /**
@@ -45,12 +44,12 @@ function setEventTransfer(event, type, content) {
       try {
         obj = JSON.parse(text.substring(prefix.length))
       } catch (e) {
-        throw new Error('Failed to parse Slate data from `DataTransfer` object.')
+        throw new Error(
+          'Failed to parse Slate data from `DataTransfer` object.'
+        )
       }
-    }
-
-    // Otherwise, it's just set it as is.
-    else {
+    } else {
+      // Otherwise, it's just set it as is.
       obj[TEXT] = text
     }
 

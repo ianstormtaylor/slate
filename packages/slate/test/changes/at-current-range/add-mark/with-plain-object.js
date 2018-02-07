@@ -2,10 +2,10 @@
 
 import h from '../../../helpers/h'
 
-export default function (change) {
+export default function(change) {
   change.addMark({
     type: 'bold',
-    data: { thing: 'value' }
+    data: { thing: 'value' },
   })
 }
 
@@ -23,7 +23,9 @@ export const output = (
   <value>
     <document>
       <paragraph>
-        <anchor /><b thing="value">w</b><focus />ord
+        <anchor />
+        <b thing="value">w</b>
+        <focus />ord
       </paragraph>
     </document>
   </value>

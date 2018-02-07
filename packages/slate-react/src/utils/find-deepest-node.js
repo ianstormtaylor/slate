@@ -1,4 +1,3 @@
-
 /**
  * Find the deepest descendant of a DOM `element`.
  *
@@ -7,9 +6,7 @@
  */
 
 function findDeepestNode(element) {
-  return element.firstChild
-    ? findDeepestNode(element.firstChild)
-    : element
+  return element.firstChild ? findDeepestNode(element.firstChild) : element
 }
 
 /**

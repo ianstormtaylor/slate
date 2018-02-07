@@ -1,4 +1,3 @@
-
 import { createHyperscript } from 'slate-hyperscript'
 
 /**
@@ -18,7 +17,7 @@ const h = createHyperscript({
     image: {
       type: 'image',
       isVoid: true,
-    }
+    },
   },
   inlines: {
     link: 'link',
@@ -27,7 +26,7 @@ const h = createHyperscript({
     emoji: {
       type: 'emoji',
       isVoid: true,
-    }
+    },
   },
   marks: {
     b: 'bold',

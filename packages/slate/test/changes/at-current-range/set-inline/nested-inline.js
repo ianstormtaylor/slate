@@ -2,7 +2,7 @@
 
 import h from '../../../helpers/h'
 
-export default function (change) {
+export default function(change) {
   change.setInline({ type: 'comment' })
 }
 
@@ -11,7 +11,9 @@ export const input = (
     <document>
       <paragraph>
         <hashtag>
-          <link><cursor />word</link>
+          <link>
+            <cursor />word
+          </link>
         </hashtag>
       </paragraph>
     </document>
@@ -23,7 +25,9 @@ export const output = (
     <document>
       <paragraph>
         <hashtag>
-          <comment><cursor />word</comment>
+          <comment>
+            <cursor />word
+          </comment>
         </hashtag>
       </paragraph>
     </document>

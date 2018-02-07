@@ -1,4 +1,3 @@
-
 /**
  * Offset key parser regex.
  *
@@ -21,10 +20,10 @@ function parse(string) {
     throw new Error(`Invalid offset key string "${string}".`)
   }
 
-  const [ original, key, index ] = matches // eslint-disable-line no-unused-vars
+  const [original, key, index] = matches // eslint-disable-line no-unused-vars
   return {
     key,
-    index: parseInt(index, 10)
+    index: parseInt(index, 10),
   }
 }
 
@@ -49,5 +48,5 @@ function stringify(object) {
 
 export default {
   parse,
-  stringify
+  stringify,
 }
