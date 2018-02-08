@@ -2,7 +2,7 @@
 
 import h from '../../../helpers/h'
 
-export default function (change) {
+export default function(change) {
   change.delete()
 }
 
@@ -13,17 +13,13 @@ export const input = (
         <paragraph>
           one<anchor />
         </paragraph>
-        <paragraph>
-          two
-        </paragraph>
+        <paragraph>two</paragraph>
       </quote>
       <quote>
         <paragraph>
           <focus />three
         </paragraph>
-        <paragraph>
-          four
-        </paragraph>
+        <paragraph>four</paragraph>
       </quote>
     </document>
   </value>
@@ -38,9 +34,7 @@ export const output = (
         </paragraph>
       </quote>
       <quote>
-        <paragraph>
-          four
-        </paragraph>
+        <paragraph>four</paragraph>
       </quote>
     </document>
   </value>

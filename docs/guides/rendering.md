@@ -1,4 +1,3 @@
-
 # Rendering
 
 One of the best parts of Slate is that it's built with React, so it fits right into your existing application. It doesn't re-invent its own view layer that you have to learn. It tries to keep everything as React-y as possible.
@@ -6,7 +5,6 @@ One of the best parts of Slate is that it's built with React, so it fits right i
 To that end, Slate gives you control over the rendering behavior of every node and mark in your document, any placeholders you want to render, and even the top-level editor itself.
 
 You can define these behaviors by passing `props` into the editor, or you can define them in Slate plugins.
-
 
 ## Nodes & Marks
 
@@ -19,8 +17,10 @@ function renderNode(props) {
   const { node, attributes, children } = props
 
   switch (node.type) {
-    case 'paragraph': return <p {...attributes}>{children}</p>
-    case 'quote': return <blockquote {...attributes}>{children}</blockquote>
+    case 'paragraph':
+      return <p {...attributes}>{children}</p>
+    case 'quote':
+      return <blockquote {...attributes}>{children}</blockquote>
     case 'image': {
       const src = node.data.get('src')
       return <img {...attributes} src={src} />
@@ -71,11 +71,16 @@ Marks work the same way, except they invoke the `renderMark` function. Like so:
 function renderMark(props) {
   const { children, mark } = props
   switch (mark.type) {
-    case 'bold': return <strong>{children}</strong>
-    case 'italic': return <em>{children}</em>
-    case 'code': return <code>{children}</code>
-    case 'underline': return <u>{children}</u>
-    case 'strikethrough': return <strike>{children}</strike>
+    case 'bold':
+      return <strong>{children}</strong>
+    case 'italic':
+      return <em>{children}</em>
+    case 'code':
+      return <code>{children}</code>
+    case 'underline':
+      return <u>{children}</u>
+    case 'strikethrough':
+      return <strike>{children}</strike>
   }
 }
 ```
@@ -83,7 +88,6 @@ function renderMark(props) {
 That way, if you happen to have a global stylesheet that defines `strong`, `em`, etc. styles then your editor's content will already be formatted!
 
 > 🤖 Be aware though that marks aren't guaranteed to be "contiguous". Which means even though a **word** is bolded, it's not guaranteed to render as a single `<strong>` element. If some of its characters are also italic, it might be split up into multiple elements—one `<strong>wo</strong>` and one `<em><strong>rd</strong></em>`.
-
 
 ## Placeholders
 
@@ -115,7 +119,6 @@ function renderPlaceholder(props) {
 ```
 
 That will render a simple placeholder element inside all of the your `caption` blocks until someone decides to write in a caption.
-
 
 ## The Editor Itself
 

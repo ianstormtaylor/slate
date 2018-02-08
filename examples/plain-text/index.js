@@ -1,4 +1,3 @@
-
 import Plain from 'slate-plain-serializer'
 import { Editor } from 'slate-react'
 
@@ -11,7 +10,6 @@ import React from 'react'
  */
 
 class PlainText extends React.Component {
-
   /**
    * Deserialize the initial editor value.
    *
@@ -19,7 +17,9 @@ class PlainText extends React.Component {
    */
 
   state = {
-    value: Plain.deserialize('This is editable plain text, just like a <textarea>!')
+    value: Plain.deserialize(
+      'This is editable plain text, just like a <textarea>!'
+    ),
   }
 
   /**
@@ -49,7 +49,6 @@ class PlainText extends React.Component {
       </div>
     )
   }
-
 }
 
 /**

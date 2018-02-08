@@ -12,17 +12,15 @@ export const schema = {
         if (reason == LAST_CHILD_OBJECT_INVALID) {
           change.wrapBlockByKey(child.key, 'paragraph')
         }
-      }
-    }
-  }
+      },
+    },
+  },
 }
 
 export const input = (
   <value>
     <document>
-      <quote>
-        text
-      </quote>
+      <quote>text</quote>
     </document>
   </value>
 )
@@ -31,9 +29,7 @@ export const output = (
   <value>
     <document>
       <quote>
-        <paragraph>
-          text
-        </paragraph>
+        <paragraph>text</paragraph>
       </quote>
     </document>
   </value>

@@ -1,4 +1,3 @@
-
 import {
   Block,
   Change,
@@ -29,16 +28,21 @@ function create(name, validate) {
   function check(isRequired, props, propName, componentName, location) {
     const value = props[propName]
     if (value == null && !isRequired) return null
-    if (value == null && isRequired) return new Error(`The ${location} \`${propName}\` is marked as required in \`${componentName}\`, but it was not supplied.`)
+    if (value == null && isRequired)
+      return new Error(
+        `The ${location} \`${propName}\` is marked as required in \`${componentName}\`, but it was not supplied.`
+      )
     if (validate(value)) return null
-    return new Error(`Invalid ${location} \`${propName}\` supplied to \`${componentName}\`, expected a Slate \`${name}\` but received: ${value}`)
+    return new Error(
+      `Invalid ${location} \`${propName}\` supplied to \`${componentName}\`, expected a Slate \`${name}\` but received: ${value}`
+    )
   }
 
   function propType(...args) {
     return check(false, ...args)
   }
 
-  propType.isRequired = function (...args) {
+  propType.isRequired = function(...args) {
     return check(true, ...args)
   }
 

@@ -2,7 +2,7 @@
 
 import h from '../../../helpers/h'
 
-export default function (change) {
+export default function(change) {
   change.selectAll()
 }
 
@@ -12,12 +12,8 @@ export const input = (
       <paragraph>
         <cursor />one
       </paragraph>
-      <paragraph>
-        two
-      </paragraph>
-      <paragraph>
-        three
-      </paragraph>
+      <paragraph>two</paragraph>
+      <paragraph>three</paragraph>
     </document>
   </value>
 )
@@ -28,9 +24,7 @@ export const output = (
       <paragraph>
         <anchor />one
       </paragraph>
-      <paragraph>
-        two
-      </paragraph>
+      <paragraph>two</paragraph>
       <paragraph>
         three<focus />
       </paragraph>

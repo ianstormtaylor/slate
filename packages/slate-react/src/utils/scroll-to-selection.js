@@ -1,4 +1,3 @@
-
 import getWindow from 'get-window'
 import isBackward from 'selection-is-backward'
 import { IS_SAFARI, IS_IOS } from '../constants/environment'
@@ -9,11 +8,7 @@ import { IS_SAFARI, IS_IOS } from '../constants/environment'
  * @type {Array}
  */
 
-const OVERFLOWS = [
-  'auto',
-  'overlay',
-  'scroll',
-]
+const OVERFLOWS = ['auto', 'overlay', 'scroll']
 
 /**
  * Detect whether we are running IOS version 11
@@ -69,7 +64,9 @@ function scrollToSelection(selection) {
 
   const window = getWindow(selection.anchorNode)
   const scroller = findScrollContainer(selection.anchorNode, window)
-  const isWindow = scroller == window.document.body || scroller == window.document.documentElement
+  const isWindow =
+    scroller == window.document.body ||
+    scroller == window.document.documentElement
   const backward = isBackward(selection)
 
   const range = selection.getRangeAt(0).cloneRange()
@@ -136,8 +133,10 @@ function scrollToSelection(selection) {
     height = offsetHeight
     scrollerTop = scrollerRect.top + parseInt(borderTopWidth, 10)
     scrollerLeft = scrollerRect.left + parseInt(borderLeftWidth, 10)
-    scrollerBordersY = parseInt(borderTopWidth, 10) + parseInt(borderBottomWidth, 10)
-    scrollerBordersX = parseInt(borderLeftWidth, 10) + parseInt(borderRightWidth, 10)
+    scrollerBordersY =
+      parseInt(borderTopWidth, 10) + parseInt(borderBottomWidth, 10)
+    scrollerBordersX =
+      parseInt(borderLeftWidth, 10) + parseInt(borderRightWidth, 10)
     scrollerPaddingTop = parseInt(paddingTop, 10)
     scrollerPaddingBottom = parseInt(paddingBottom, 10)
     scrollerPaddingLeft = parseInt(paddingLeft, 10)
@@ -155,7 +154,10 @@ function scrollToSelection(selection) {
   if (cursorLeft < xOffset) {
     // selection to the left of viewport
     x = cursorLeft - scrollerPaddingLeft
-  } else if (cursorLeft + cursorRect.width + scrollerBordersX > xOffset + width) {
+  } else if (
+    cursorLeft + cursorRect.width + scrollerBordersX >
+    xOffset + width
+  ) {
     // selection to the right of viewport
     x = cursorLeft + scrollerBordersX + scrollerPaddingRight - width
   }
@@ -163,11 +165,18 @@ function scrollToSelection(selection) {
   if (cursorTop < yOffset) {
     // selection above viewport
     y = cursorTop - scrollerPaddingTop
-  } else if (cursorTop + cursorRect.height + scrollerBordersY > yOffset + height) {
+  } else if (
+    cursorTop + cursorRect.height + scrollerBordersY >
+    yOffset + height
+  ) {
     // selection below viewport
-    y = cursorTop + scrollerBordersY + scrollerPaddingBottom + cursorRect.height - height
+    y =
+      cursorTop +
+      scrollerBordersY +
+      scrollerPaddingBottom +
+      cursorRect.height -
+      height
   }
-
 
   if (isWindow) {
     window.scrollTo(x, y)

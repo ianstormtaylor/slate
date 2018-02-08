@@ -7,20 +7,12 @@ export const input = (
     <document>
       <quote>
         <quote>
-          <paragraph>
-            one
-          </paragraph>
-          <paragraph>
-            two
-          </paragraph>
+          <paragraph>one</paragraph>
+          <paragraph>two</paragraph>
         </quote>
         <quote>
-          <paragraph>
-            three
-          </paragraph>
-          <paragraph>
-            four
-          </paragraph>
+          <paragraph>three</paragraph>
+          <paragraph>four</paragraph>
         </quote>
       </quote>
     </document>

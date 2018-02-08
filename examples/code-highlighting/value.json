@@ -9,7 +9,8 @@
             "object": "text",
             "leaves": [
               {
-                "text": "There are certain behaviors that require rendering dynamic marks on string of text, like rendering code highlighting. For example:"
+                "text":
+                  "There are certain behaviors that require rendering dynamic marks on string of text, like rendering code highlighting. For example:"
               }
             ]
           }

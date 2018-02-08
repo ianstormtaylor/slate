@@ -2,7 +2,7 @@
 
 import h from '../../../helpers/h'
 
-export default function (change) {
+export default function(change) {
   change.deleteForward()
 }
 
@@ -10,7 +10,9 @@ export const input = (
   <value>
     <document>
       <paragraph>
-        <anchor />one<link>t<focus />wo</link>
+        <anchor />one<link>
+          t<focus />wo
+        </link>
       </paragraph>
     </document>
   </value>
@@ -21,7 +23,10 @@ export const output = (
   <value>
     <document>
       <paragraph>
-        <anchor /><link><focus />wo</link>
+        <anchor />
+        <link>
+          <focus />wo
+        </link>
       </paragraph>
     </document>
   </value>

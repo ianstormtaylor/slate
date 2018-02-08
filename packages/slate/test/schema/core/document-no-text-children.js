@@ -8,9 +8,7 @@ export const input = (
   <value>
     <document>
       one
-      <paragraph>
-        two
-      </paragraph>
+      <paragraph>two</paragraph>
     </document>
   </value>
 )
@@ -34,11 +32,11 @@ export const output = {
                 object: 'leaf',
                 text: 'two',
                 marks: [],
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  }
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
 }

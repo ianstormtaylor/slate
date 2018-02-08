@@ -1,4 +1,3 @@
-
 import Editor from './components/editor'
 import cloneFragment from './utils/clone-fragment'
 import findDOMNode from './utils/find-dom-node'

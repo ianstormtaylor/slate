@@ -3,7 +3,7 @@
 import h from '../../../helpers/h'
 import { Block } from '../../../..'
 
-export default function (change) {
+export default function(change) {
   change.insertNodeByKey('a', 0, Block.create('paragraph'))
 }
 

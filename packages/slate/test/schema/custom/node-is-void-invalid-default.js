@@ -6,8 +6,8 @@ export const schema = {
   blocks: {
     paragraph: {
       isVoid: false,
-    }
-  }
+    },
+  },
 }
 
 export const input = (
@@ -21,9 +21,7 @@ export const input = (
 export const output = (
   <value>
     <document>
-      <paragraph>
-        {' '}
-      </paragraph>
+      <paragraph>{/* prettier-ignore */ ' '}</paragraph>
     </document>
   </value>
 )

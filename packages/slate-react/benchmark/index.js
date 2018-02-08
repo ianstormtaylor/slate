@@ -8,17 +8,22 @@ import { basename, extname, resolve } from 'path'
  */
 
 const categoryDir = resolve(__dirname)
-const categories = fs.readdirSync(categoryDir).filter(c => c[0] != '.' && c != 'index.js')
+const categories = fs
+  .readdirSync(categoryDir)
+  .filter(c => c[0] != '.' && c != 'index.js')
 
-categories.forEach((category) => {
+categories.forEach(category => {
   suite(category, () => {
     set('iterations', 50)
     set('mintime', 1000)
 
     const benchmarkDir = resolve(categoryDir, category)
-    const benchmarks = fs.readdirSync(benchmarkDir).filter(b => b[0] != '.' && !!~b.indexOf('.js')).map(b => basename(b, extname(b)))
+    const benchmarks = fs
+      .readdirSync(benchmarkDir)
+      .filter(b => b[0] != '.' && !!~b.indexOf('.js'))
+      .map(b => basename(b, extname(b)))
 
-    benchmarks.forEach((benchmark) => {
+    benchmarks.forEach(benchmark => {
       const dir = resolve(benchmarkDir, benchmark)
       const module = require(dir)
       const fn = module.default

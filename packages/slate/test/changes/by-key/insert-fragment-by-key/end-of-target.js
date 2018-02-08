@@ -2,25 +2,21 @@
 
 import h from '../../../helpers/h'
 
-export default function (change) {
-  change.insertFragmentByKey('a', 1, (
+export default function(change) {
+  change.insertFragmentByKey(
+    'a',
+    1,
     <document>
-      <paragraph>
-        one
-      </paragraph>
-      <paragraph>
-        two
-      </paragraph>
+      <paragraph>one</paragraph>
+      <paragraph>two</paragraph>
     </document>
-  ))
+  )
 }
 
 export const input = (
   <value>
     <document key="a">
-      <paragraph>
-        word
-      </paragraph>
+      <paragraph>word</paragraph>
     </document>
   </value>
 )
@@ -28,15 +24,9 @@ export const input = (
 export const output = (
   <value>
     <document>
-      <paragraph>
-        word
-      </paragraph>
-      <paragraph>
-        one
-      </paragraph>
-      <paragraph>
-        two
-      </paragraph>
+      <paragraph>word</paragraph>
+      <paragraph>one</paragraph>
+      <paragraph>two</paragraph>
     </document>
   </value>
 )

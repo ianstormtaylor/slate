@@ -2,10 +2,10 @@
 
 import h from '../../../helpers/h'
 
-export default function (change) {
+export default function(change) {
   change.setInline({
     type: 'hashtag',
-    data: { thing: 'value' }
+    data: { thing: 'value' },
   })
 }
 
@@ -13,7 +13,9 @@ export const input = (
   <value>
     <document>
       <paragraph>
-        <link><cursor />word</link>
+        <link>
+          <cursor />word
+        </link>
       </paragraph>
     </document>
   </value>
@@ -23,7 +25,9 @@ export const output = (
   <value>
     <document>
       <paragraph>
-        <hashtag thing="value"><cursor />word</hashtag>
+        <hashtag thing="value">
+          <cursor />word
+        </hashtag>
       </paragraph>
     </document>
   </value>

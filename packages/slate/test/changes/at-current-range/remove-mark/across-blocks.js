@@ -2,7 +2,7 @@
 
 import h from '../../../helpers/h'
 
-export default function (change) {
+export default function(change) {
   change.removeMark('bold')
 }
 
@@ -10,10 +10,12 @@ export const input = (
   <value>
     <document>
       <paragraph>
-        wo<anchor /><b>rd</b>
+        wo<anchor />
+        <b>rd</b>
       </paragraph>
       <paragraph>
-        <b>an</b><focus />other
+        <b>an</b>
+        <focus />other
       </paragraph>
     </document>
   </value>

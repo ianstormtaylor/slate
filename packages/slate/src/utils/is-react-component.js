@@ -1,4 +1,3 @@
-
 /**
  * Check if an `object` is a React component.
  *
@@ -7,11 +6,7 @@
  */
 
 function isReactComponent(object) {
-  return (
-    object &&
-    object.prototype &&
-    object.prototype.isReactComponent
-  )
+  return object && object.prototype && object.prototype.isReactComponent
 }
 
 /**

@@ -1,4 +1,3 @@
-
 export const input = `
 one
 `.trim()
@@ -22,15 +21,15 @@ export const output = {
                 object: 'leaf',
                 text: 'one',
                 marks: [],
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  }
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
 }
 
 export const options = {
-  toJSON: true
+  toJSON: true,
 }

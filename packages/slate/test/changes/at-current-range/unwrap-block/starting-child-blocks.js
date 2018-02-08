@@ -2,7 +2,7 @@
 
 import h from '../../../helpers/h'
 
-export default function (change) {
+export default function(change) {
   change.unwrapBlock('quote')
 }
 
@@ -16,18 +16,10 @@ export const input = (
         <paragraph>
           <focus />two
         </paragraph>
-        <paragraph>
-          three
-        </paragraph>
-        <paragraph>
-          four
-        </paragraph>
-        <paragraph>
-          five
-        </paragraph>
-        <paragraph>
-          six
-        </paragraph>
+        <paragraph>three</paragraph>
+        <paragraph>four</paragraph>
+        <paragraph>five</paragraph>
+        <paragraph>six</paragraph>
       </quote>
     </document>
   </value>
@@ -43,18 +35,10 @@ export const output = (
         <focus />two
       </paragraph>
       <quote>
-        <paragraph>
-          three
-        </paragraph>
-        <paragraph>
-          four
-        </paragraph>
-        <paragraph>
-          five
-        </paragraph>
-        <paragraph>
-          six
-        </paragraph>
+        <paragraph>three</paragraph>
+        <paragraph>four</paragraph>
+        <paragraph>five</paragraph>
+        <paragraph>six</paragraph>
       </quote>
     </document>
   </value>

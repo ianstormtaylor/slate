@@ -2,15 +2,15 @@
 /* eslint-disable react/jsx-key */
 
 import h from '../../test/helpers/h'
-import { __clear } from '../../lib/utils/memoize'
+import { resetMemoization } from '../..'
 
-export default function ({ value, text }) {
+export default function({ value, text }) {
   value.document.getPath(text.key)
 }
 
 export function before(value) {
   const text = value.document.getLastText()
-  __clear()
+  resetMemoization()
   return { value, text }
 }
 
@@ -21,7 +21,8 @@ export const input = (
         <quote>
           <paragraph>
             <paragraph>
-              This is editable <b>rich</b> text, <i>much</i> better than a textarea!
+              This is editable <b>rich</b> text, <i>much</i> better than a
+              textarea!
             </paragraph>
           </paragraph>
         </quote>

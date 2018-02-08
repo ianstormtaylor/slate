@@ -1,5 +1,5 @@
 {
-    "document": {
+  "document": {
     "nodes": [
       {
         "object": "block",
@@ -9,7 +9,8 @@
             "object": "text",
             "leaves": [
               {
-                "text": "In addition to block nodes, you can create inline void nodes, like "
+                "text":
+                  "In addition to block nodes, you can create inline void nodes, like "
               }
             ]
           },

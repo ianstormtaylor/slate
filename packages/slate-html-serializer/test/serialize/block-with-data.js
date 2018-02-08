@@ -1,4 +1,3 @@
-
 /** @jsx h */
 
 import React from 'react'
@@ -8,18 +7,20 @@ export const rules = [
   {
     serialize(obj, children) {
       if (obj.object == 'block' && obj.type == 'paragraph') {
-        return React.createElement('p', { 'data-thing': obj.data.get('thing') }, children)
+        return React.createElement(
+          'p',
+          { 'data-thing': obj.data.get('thing') },
+          children
+        )
       }
-    }
-  }
+    },
+  },
 ]
 
 export const input = (
   <value>
     <document>
-      <paragraph thing="value">
-        one
-      </paragraph>
+      <paragraph thing="value">one</paragraph>
     </document>
   </value>
 )

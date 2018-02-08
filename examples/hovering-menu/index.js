@@ -1,4 +1,3 @@
-
 import { Editor } from 'slate-react'
 import { Value } from 'slate'
 
@@ -15,7 +14,6 @@ const root = window.document.querySelector('main')
  */
 
 class Menu extends React.Component {
-
   /**
    * Check if the current selection has a mark with `type` in it.
    *
@@ -69,21 +67,17 @@ class Menu extends React.Component {
    */
 
   render() {
-    return (
-      ReactDOM.createPortal(
-        <div className="menu hover-menu" ref={this.props.menuRef}>
-          {this.renderMarkButton('bold', 'format_bold')}
-          {this.renderMarkButton('italic', 'format_italic')}
-          {this.renderMarkButton('underlined', 'format_underlined')}
-          {this.renderMarkButton('code', 'code')}
-        </div>,
-        root
-      )
+    return ReactDOM.createPortal(
+      <div className="menu hover-menu" ref={this.props.menuRef}>
+        {this.renderMarkButton('bold', 'format_bold')}
+        {this.renderMarkButton('italic', 'format_italic')}
+        {this.renderMarkButton('underlined', 'format_underlined')}
+        {this.renderMarkButton('code', 'code')}
+      </div>,
+      root
     )
   }
-
 }
-
 
 /**
  * The hovering menu example.
@@ -92,7 +86,6 @@ class Menu extends React.Component {
  */
 
 class HoveringMenu extends React.Component {
-
   /**
    * Deserialize the raw initial value.
    *
@@ -100,7 +93,7 @@ class HoveringMenu extends React.Component {
    */
 
   state = {
-    value: Value.fromJSON(initialValue)
+    value: Value.fromJSON(initialValue),
   }
 
   /**
@@ -134,7 +127,10 @@ class HoveringMenu extends React.Component {
     const rect = range.getBoundingClientRect()
     menu.style.opacity = 1
     menu.style.top = `${rect.top + window.scrollY - menu.offsetHeight}px`
-    menu.style.left = `${rect.left + window.scrollX - menu.offsetWidth / 2 + rect.width / 2}px`
+    menu.style.left = `${rect.left +
+      window.scrollX -
+      menu.offsetWidth / 2 +
+      rect.width / 2}px`
   }
 
   /**
@@ -153,7 +149,7 @@ class HoveringMenu extends React.Component {
    * @param {Menu} menu
    */
 
-  menuRef = (menu) => {
+  menuRef = menu => {
     this.menu = menu
   }
 
@@ -190,16 +186,19 @@ class HoveringMenu extends React.Component {
    * @return {Element}
    */
 
-  renderMark = (props) => {
+  renderMark = props => {
     const { children, mark } = props
     switch (mark.type) {
-      case 'bold': return <strong>{children}</strong>
-      case 'code': return <code>{children}</code>
-      case 'italic': return <em>{children}</em>
-      case 'underlined': return <u>{children}</u>
+      case 'bold':
+        return <strong>{children}</strong>
+      case 'code':
+        return <code>{children}</code>
+      case 'italic':
+        return <em>{children}</em>
+      case 'underlined':
+        return <u>{children}</u>
     }
   }
-
 }
 
 /**

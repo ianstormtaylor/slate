@@ -1,4 +1,3 @@
-
 import { Editor } from 'slate-react'
 import { Value } from 'slate'
 
@@ -12,9 +11,24 @@ import initialValue from './value.json'
  */
 
 const EMOJIS = [
-  '😃', '😬', '😂', '😅', '😆', '😍',
-  '😱', '👋', '👏', '👍', '🙌', '👌',
-  '🙏', '👻', '🍔', '🍑', '🍆', '🔑',
+  '😃',
+  '😬',
+  '😂',
+  '😅',
+  '😆',
+  '😍',
+  '😱',
+  '👋',
+  '👏',
+  '👍',
+  '🙌',
+  '👌',
+  '🙏',
+  '👻',
+  '🍔',
+  '🍑',
+  '🍆',
+  '🔑',
 ]
 
 /**
@@ -32,7 +46,6 @@ const noop = e => e.preventDefault()
  */
 
 class Emojis extends React.Component {
-
   /**
    * Deserialize the raw initial value.
    *
@@ -40,7 +53,7 @@ class Emojis extends React.Component {
    */
 
   state = {
-    value: Value.fromJSON(initialValue)
+    value: Value.fromJSON(initialValue),
   }
 
   /**
@@ -67,7 +80,7 @@ class Emojis extends React.Component {
     change.insertInline({
       type: 'emoji',
       isVoid: true,
-      data: { code }
+      data: { code },
     })
 
     this.onChange(change)
@@ -136,7 +149,7 @@ class Emojis extends React.Component {
    * @return {Element}
    */
 
-  renderNode = (props) => {
+  renderNode = props => {
     const { attributes, children, node, isSelected } = props
     switch (node.type) {
       case 'paragraph': {
@@ -158,7 +171,6 @@ class Emojis extends React.Component {
       }
     }
   }
-
 }
 
 /**

@@ -1,4 +1,3 @@
-
 import { Editor } from 'slate-react'
 import { Value } from 'slate'
 
@@ -18,7 +17,9 @@ function CodeBlock(props) {
   const language = node.data.get('language')
 
   function onChange(event) {
-    editor.change(c => c.setNodeByKey(node.key, { data: { language: event.target.value }}))
+    editor.change(c =>
+      c.setNodeByKey(node.key, { data: { language: event.target.value } })
+    )
   }
 
   return (
@@ -30,7 +31,7 @@ function CodeBlock(props) {
         contentEditable={false}
         style={{ position: 'absolute', top: '5px', right: '5px' }}
       >
-        <select value={language} onChange={onChange} >
+        <select value={language} onChange={onChange}>
           <option value="css">CSS</option>
           <option value="js">JavaScript</option>
           <option value="html">HTML</option>
@@ -41,9 +42,7 @@ function CodeBlock(props) {
 }
 
 function CodeBlockLine(props) {
-  return (
-    <div {...props.attributes}>{props.children}</div>
-  )
+  return <div {...props.attributes}>{props.children}</div>
 }
 
 /**
@@ -53,7 +52,6 @@ function CodeBlockLine(props) {
  */
 
 class CodeHighlighting extends React.Component {
-
   /**
    * Deserialize the raw initial value.
    *
@@ -61,7 +59,7 @@ class CodeHighlighting extends React.Component {
    */
 
   state = {
-    value: Value.fromJSON(initialValue)
+    value: Value.fromJSON(initialValue),
   }
 
   /**
@@ -121,10 +119,12 @@ class CodeHighlighting extends React.Component {
    * @return {Element}
    */
 
-  renderNode = (props) => {
+  renderNode = props => {
     switch (props.node.type) {
-      case 'code': return <CodeBlock {...props} />
-      case 'code_line': return <CodeBlockLine {...props} />
+      case 'code':
+        return <CodeBlock {...props} />
+      case 'code_line':
+        return <CodeBlockLine {...props} />
     }
   }
 
@@ -135,17 +135,21 @@ class CodeHighlighting extends React.Component {
    * @return {Element}
    */
 
-  renderMark = (props) => {
+  renderMark = props => {
     const { children, mark } = props
     switch (mark.type) {
-      case 'comment': return <span style={{ opacity: '0.33' }}>{children}</span>
-      case 'keyword': return <span style={{ fontWeight: 'bold' }}>{children}</span>
-      case 'tag': return <span style={{ fontWeight: 'bold' }}>{children}</span>
-      case 'punctuation': return <span style={{ opacity: '0.75' }}>{children}</span>
+      case 'comment':
+        return <span style={{ opacity: '0.33' }}>{children}</span>
+      case 'keyword':
+        return <span style={{ fontWeight: 'bold' }}>{children}</span>
+      case 'tag':
+        return <span style={{ fontWeight: 'bold' }}>{children}</span>
+      case 'punctuation':
+        return <span style={{ opacity: '0.75' }}>{children}</span>
     }
   }
 
-  tokenToContent = (token) => {
+  tokenToContent = token => {
     if (typeof token == 'string') {
       return token
     } else if (typeof token.content == 'string') {
@@ -162,7 +166,7 @@ class CodeHighlighting extends React.Component {
    * @return {Array}
    */
 
-  decorateNode = (node) => {
+  decorateNode = node => {
     if (node.type != 'code') return
 
     const language = node.data.get('language')
@@ -215,7 +219,6 @@ class CodeHighlighting extends React.Component {
 
     return decorations
   }
-
 }
 
 /**

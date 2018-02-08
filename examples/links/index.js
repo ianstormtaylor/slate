@@ -1,4 +1,3 @@
-
 import { Editor, getEventTransfer } from 'slate-react'
 import { Value } from 'slate'
 
@@ -16,7 +15,7 @@ import isUrl from 'is-url'
 function wrapLink(change, href) {
   change.wrapInline({
     type: 'link',
-    data: { href }
+    data: { href },
   })
 
   change.collapseToEnd()
@@ -39,7 +38,6 @@ function unwrapLink(change) {
  */
 
 class Links extends React.Component {
-
   /**
    * Deserialize the raw initial value.
    *
@@ -47,7 +45,7 @@ class Links extends React.Component {
    */
 
   state = {
-    value: Value.fromJSON(initialValue)
+    value: Value.fromJSON(initialValue),
   }
 
   /**
@@ -78,7 +76,7 @@ class Links extends React.Component {
    * @param {Event} event
    */
 
-  onClickLink = (event) => {
+  onClickLink = event => {
     event.preventDefault()
     const { value } = this.state
     const hasLinks = this.hasLinks()
@@ -86,14 +84,10 @@ class Links extends React.Component {
 
     if (hasLinks) {
       change.call(unwrapLink)
-    }
-
-    else if (value.isExpanded) {
+    } else if (value.isExpanded) {
       const href = window.prompt('Enter the URL of the link:')
       change.call(wrapLink, href)
-    }
-
-    else {
+    } else {
       const href = window.prompt('Enter the URL of the link:')
       const text = window.prompt('Enter the text for the link:')
       change
@@ -153,7 +147,11 @@ class Links extends React.Component {
     const hasLinks = this.hasLinks()
     return (
       <div className="menu toolbar-menu">
-        <span className="button" onMouseDown={this.onClickLink} data-active={hasLinks}>
+        <span
+          className="button"
+          onMouseDown={this.onClickLink}
+          data-active={hasLinks}
+        >
           <span className="material-icons">link</span>
         </span>
       </div>
@@ -187,17 +185,20 @@ class Links extends React.Component {
    * @return {Element}
    */
 
-  renderNode = (props) => {
+  renderNode = props => {
     const { attributes, children, node } = props
     switch (node.type) {
       case 'link': {
         const { data } = node
         const href = data.get('href')
-        return <a {...attributes} href={href}>{children}</a>
+        return (
+          <a {...attributes} href={href}>
+            {children}
+          </a>
+        )
       }
     }
   }
-
 }
 
 /**

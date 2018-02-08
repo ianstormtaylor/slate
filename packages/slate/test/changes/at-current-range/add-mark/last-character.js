@@ -2,7 +2,7 @@
 
 import h from '../../../helpers/h'
 
-export default function (change) {
+export default function(change) {
   change.addMark('bold')
 }
 
@@ -20,7 +20,9 @@ export const output = (
   <value>
     <document>
       <paragraph>
-        wor<anchor /><b>d</b><focus />
+        wor<anchor />
+        <b>d</b>
+        <focus />
       </paragraph>
     </document>
   </value>
