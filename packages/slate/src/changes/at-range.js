@@ -965,15 +965,11 @@ Changes.setBlockAtRange = (change, range, properties, options = {}) => {
     endKey == endBlock.getFirstText().key
 
   // If it's a hanging selection, ignore the last block.
-  if (isHanging) {
-    blocks.slice(0, -1).forEach(block => {
-      change.setNodeByKey(block.key, properties, { normalize })
-    })
-  } else {
-    blocks.forEach(block => {
-      change.setNodeByKey(block.key, properties, { normalize })
-    })
-  }
+  const sets = isHanging ? blocks.slice(0, -1) : blocks
+
+  sets.forEach(block => {
+    change.setNodeByKey(block.key, properties, { normalize })
+  })
 }
 
 /**
