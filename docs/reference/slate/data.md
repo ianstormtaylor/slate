@@ -1,4 +1,3 @@
-
 # `Data`
 
 ```js
@@ -9,15 +8,16 @@ Data is simply a thin wrapper around [`Immutable.Map`](https://facebook.github.i
 
 A data object can have any properties associated with it.
 
-
 ## Static Methods
 
 ### `Data.create`
+
 `Data.create(properties: Object) => Data`
 
 Create a data object from a plain Javascript object of `properties`.
 
 ### `Data.fromJSON`
+
 `Data.fromJSON(object: Object) => Data`
 
 Create a data object from a JSON `object`.

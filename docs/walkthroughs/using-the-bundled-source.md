@@ -1,7 +1,6 @@
-
 # Using the Bundled Source
 
-For most folks, you'll want to install Slate via `npm`, in which case you can follow the regular [Installing Slate](./installing-slate.md) guide. 
+For most folks, you'll want to install Slate via `npm`, in which case you can follow the regular [Installing Slate](./installing-slate.md) guide.
 
 But, if you'd rather install Slate by simply adding a `<script>` tag to your application, this guide will help you. To make the "bundled" use case simpler, each version of Slate ships with a bundled source file called `slate.js`.
 
@@ -55,4 +54,3 @@ That's it, you're ready to go!
 <br/>
 <p align="center"><strong>Next:</strong><br/><a href="./adding-event-handlers.md">Adding Event Handlers</a></p>
 <br/>
-

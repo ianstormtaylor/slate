@@ -1,8 +1,6 @@
-
 # `Schema`
 
 Every Slate editor has a "schema" associated with it, which contains information about the structure of its content. For the most basic cases, you'll just rely on Slate's default core schema. But for advanced use cases you can enforce rules about what the content of a Slate document can contain.
-
 
 ## Properties
 
@@ -17,6 +15,7 @@ Every Slate editor has a "schema" associated with it, which contains information
 The top-level properties of a schema all give you a way to define validation "rules" that the schema enforces.
 
 ### `document`
+
 `Object`
 
 ```js
@@ -30,6 +29,7 @@ The top-level properties of a schema all give you a way to define validation "ru
 A set of validation rules that apply to the top-level document.
 
 ### `blocks`
+
 `Object`
 
 ```js
@@ -48,6 +48,7 @@ A set of validation rules that apply to the top-level document.
 A dictionary of blocks by type, each with its own set of validation rules.
 
 ### `inlines`
+
 `Object`
 
 ```js
@@ -62,7 +63,6 @@ A dictionary of blocks by type, each with its own set of validation rules.
 ```
 
 A dictionary of inlines by type, each with its own set of validation rules.
-
 
 ## Rule Properties
 
@@ -79,9 +79,10 @@ A dictionary of inlines by type, each with its own set of validation rules.
 }
 ```
 
-Slate schemas are built up of a set of validation rules. Each of the properties will validate certain pieces of the document based on the properties it defines. 
+Slate schemas are built up of a set of validation rules. Each of the properties will validate certain pieces of the document based on the properties it defines.
 
 ### `data`
+
 `Object`
 
 ```js
@@ -95,6 +96,7 @@ Slate schemas are built up of a set of validation rules. Each of the properties 
 A dictionary of data attributes and their corresponding validation functions. The functions should return a boolean indicating whether the data value is valid or not.
 
 ### `first`
+
 `Object`
 
 ```js
@@ -106,6 +108,7 @@ A dictionary of data attributes and their corresponding validation functions. Th
 Will validate the first child node. The `first` definition can declare `objects` and `types` properties.
 
 ### `isVoid`
+
 `Boolean`
 
 ```js
@@ -117,6 +120,7 @@ Will validate the first child node. The `first` definition can declare `objects`
 Will validate a node's `isVoid` property.
 
 ### `last`
+
 `Object`
 
 ```js
@@ -128,6 +132,7 @@ Will validate a node's `isVoid` property.
 Will validate the last child node. The `last` definition can declare `objects` and `types` properties.
 
 ### `nodes`
+
 `Array`
 
 ```js
@@ -144,6 +149,7 @@ Will validate a node's children. The `nodes` definitions can declare the `object
 > 🤖 The `nodes` array is order-sensitive! The example above will require that the first node be either an `image` or `video`, and that it be followed by one or more `paragraph` nodes.
 
 ### `normalize`
+
 `normalize(change: Change, violation: String, context: Object) => Void`
 
 ```js
@@ -164,17 +170,21 @@ A function that can be provided to override the default behavior in the case of 
 For more information on the arguments passed to `normalize`, see the [Violations](#violations) reference.
 
 ### `parent`
+
 `Array`
 
 ```js
 {
-  parent: { types: ['list'] }
+  parent: {
+    types: ['list']
+  }
 }
 ```
 
 Will validate a node's parent. The parent definition can declare the `objects` and/or `types` properties.
 
 ### `text`
+
 `Array`
 
 ```js
@@ -185,36 +195,36 @@ Will validate a node's parent. The parent definition can declare the `objects` a
 
 Will validate a node's text.
 
-
 ## Static Methods
 
 ### `Schema.create`
+
 `Schema.create(properties: Object) => Schema`
 
 Create a new `Schema` instance with `properties`.
 
 ### `Schema.fromJSON`
+
 `Schema.fromJSON(object: Object) => Schema`
 
 Create a schema from a JSON `object`.
 
 ### `Schema.isSchema`
+
 `Schema.isSchema(maybeSchema: Any) => Boolean`
 
 Returns a boolean if the passed in argument is a `Schema`.
 
-
 ## Instance Methods
 
 ### `toJSON`
+
 `toJSON() => Object`
 
 Returns a JSON representation of the schema.
 
-
 ## Violations
 
-When supplying your own `normalize` property for a schema rule, it will be called with `(change, violation, context)`. The `violation` will be one of a set of potential violation strings, and `context` will vary depending on the violation. 
+When supplying your own `normalize` property for a schema rule, it will be called with `(change, violation, context)`. The `violation` will be one of a set of potential violation strings, and `context` will vary depending on the violation.
 
 A set of the invalid violation strings are available as constants via the [`slate-schema-violations`](../slate-schema-violations) package.
-

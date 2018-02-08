@@ -27,7 +27,7 @@ function configure(env) {
       name: 'slate-examples',
       format: 'umd',
       exports: 'named',
-      sourcemap: isDev,
+      sourcemap: isDev ? 'inline' : false,
     },
     watch: {
       include: ['examples/**', 'packages/*/lib/*.es.js'],
@@ -86,7 +86,7 @@ function configure(env) {
       // Only minify the output in production, since it is very slow.
       isProd && uglify(),
 
-      // Only add sourcemaps in development.
+      // Only parse sourcemaps of dependencies in development.
       isDev && sourcemaps(),
     ].filter(Boolean),
   }
