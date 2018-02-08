@@ -81,7 +81,7 @@ class Emojis extends React.Component {
       type: 'emoji',
       isVoid: true,
       data: { code },
-    })
+    }).collapseToStartOfNextText().focus()
 
     this.onChange(change)
   }
