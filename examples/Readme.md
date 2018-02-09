@@ -30,7 +30,11 @@ yarn bootstrap
 Then start the watcher and examples server:
 
 ```
-yarn watch
+yarn start
 ```
 
-Now you can open up `http://localhost:8080/dev.html` in your browser and you'll see the examples site. Any changes you make to the source code will be immediately reflected when you refresh the page.
+Now you can open up `http://localhost:8080/dev.html` in your browser and you'll see the examples site. Any changes you make to the source code will be immediately reflected when you refresh the page. You can open the examples URL quickly with:
+
+```
+yarn open
+```
