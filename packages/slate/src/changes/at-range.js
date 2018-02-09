@@ -948,7 +948,26 @@ Changes.setBlockAtRange = (change, range, properties, options = {}) => {
   const { document } = value
   const blocks = document.getBlocksAtRange(range)
 
-  blocks.forEach(block => {
+  const { startKey, startOffset, endKey, endOffset, isCollapsed } = range
+  const isStartVoid = document.hasVoidParent(startKey)
+  const startBlock = document.getClosestBlock(startKey)
+  const endBlock = document.getClosestBlock(endKey)
+
+  // Check if we have a "hanging" selection case where the even though the
+  // selection extends into the start of the end node, we actually want to
+  // ignore that for UX reasons.
+  const isHanging =
+    isCollapsed == false &&
+    startOffset == 0 &&
+    endOffset == 0 &&
+    isStartVoid == false &&
+    startKey == startBlock.getFirstText().key &&
+    endKey == endBlock.getFirstText().key
+
+  // If it's a hanging selection, ignore the last block.
+  const sets = isHanging ? blocks.slice(0, -1) : blocks
+
+  sets.forEach(block => {
     change.setNodeByKey(block.key, properties, { normalize })
   })
 }
