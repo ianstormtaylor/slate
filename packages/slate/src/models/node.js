@@ -1109,6 +1109,9 @@ class Node {
 
     const text = this.getDescendant(range.startKey)
     const char = text.characters.get(range.startOffset)
+    if (!char) {
+      return []
+    }
     return char.marks.toArray()
   }
 
