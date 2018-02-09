@@ -1693,15 +1693,15 @@ class Node {
    */
 
   insertNode(index, node) {
-    const keys = this.getKeys()
+    const keys = this.getKeysAsArray()
 
-    if (keys.contains(node.key)) {
+    if (keys.includes(node.key)) {
       node = node.regenerateKey()
     }
 
     if (node.object != 'text') {
       node = node.mapDescendants(desc => {
-        return keys.contains(desc.key) ? desc.regenerateKey() : desc
+        return keys.includes(desc.key) ? desc.regenerateKey() : desc
       })
     }
 
@@ -2006,7 +2006,6 @@ memoize(
     'getFirstText',
     'getInlines',
     'getInlinesAsArray',
-    'getKeys',
     'getKeysAsArray',
     'getLastText',
     'getMarks',
