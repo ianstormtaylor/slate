@@ -147,23 +147,22 @@ class Change {
   }
 
   get changesText() {
-    return this.insertsText ||
-           this.removesText
+    return this.insertsText || this.removesText
   }
 
   get changesMarks() {
-    return this.addsMarks ||
-           this.removesMarks ||
-           this.setsMarks
+    return this.addsMarks || this.removesMarks || this.setsMarks
   }
 
   get changesNodes() {
-    return this.insertsNodes ||
-           this.mergesNodes ||
-           this.movesNodes ||
-           this.removesNodes ||
-           this.setsNodes ||
-           this.splitsNodes
+    return (
+      this.insertsNodes ||
+      this.mergesNodes ||
+      this.movesNodes ||
+      this.removesNodes ||
+      this.setsNodes ||
+      this.splitsNodes
+    )
   }
 
   /**
