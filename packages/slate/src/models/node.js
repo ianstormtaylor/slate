@@ -705,6 +705,26 @@ class Node {
   }
 
   /**
+   * Get the first bottom-most block
+   *
+   * @return {Node|Null}
+   */
+
+  getFirstBlock() {
+    if (this.isLeafBlock()) {
+      return this
+    }
+
+    let descendantFound = null
+    this.nodes.find(node => {
+      if (node.object !== 'block') return false
+      descendantFound = node.getFirstBlock()
+      return descendantFound
+    })
+    return descendantFound
+  }
+
+  /**
    * Get a fragment of the node at a `range`.
    *
    * @param {Range} range
@@ -993,6 +1013,26 @@ class Node {
     })
 
     return descendantFound || found
+  }
+
+  /**
+   * Get the last bottom-most block node.
+   *
+   * @return {Node|Null}
+   */
+
+  getLastBlock() {
+    if (this.isLeafBlock()) {
+      return this
+    }
+
+    let descendantFound = null
+    this.nodes.findLast(node => {
+      if (node.object !== 'block') return false
+      descendantFound = node.getLastBlock()
+      return descendantFound
+    })
+    return descendantFound
   }
 
   /**
@@ -2004,11 +2044,13 @@ memoize(
     'getCharacters',
     'getCharactersAsArray',
     'getFirstText',
+    'getFirstBlock',
     'getInlines',
     'getInlinesAsArray',
     'getKeys',
     'getKeysAsArray',
     'getLastText',
+    'getLastBlock',
     'getMarks',
     'getOrderedMarks',
     'getMarksAsArray',

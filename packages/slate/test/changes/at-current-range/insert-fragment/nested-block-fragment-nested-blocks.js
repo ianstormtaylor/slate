@@ -5,8 +5,8 @@ import h from '../../../helpers/h'
 export default function(change) {
   change.insertFragment(
     <document>
+      <quote>one</quote>
       <quote>
-        <quote>one</quote>
         <quote>two</quote>
       </quote>
     </document>

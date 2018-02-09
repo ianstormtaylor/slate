@@ -5,10 +5,8 @@ import h from '../../../helpers/h'
 export default function(change) {
   change.insertFragment(
     <document>
-      <quote>
-        <quote>one</quote>
-        <quote>two</quote>
-      </quote>
+      <quote>one</quote>
+      <quote>two</quote>
     </document>
   )
 }
@@ -28,9 +26,7 @@ export const output = (
     <document>
       <paragraph>woone</paragraph>
       <quote>
-        <quote>
-          <cursor />tword
-        </quote>
+        <cursor />tword
       </quote>
     </document>
   </value>
