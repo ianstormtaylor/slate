@@ -44,12 +44,18 @@ class Change {
 
   constructor(attrs) {
     const { value } = attrs
-    this.value = value
-    this.operations = new List()
-    this.flags = {
-      normalize: true,
-      ...pick(attrs, ['merge', 'save', 'normalize']),
+
+    this.reset = () => {
+      this.original = value
+      this.value = value
+      this.operations = new List()
+      this.flags = {
+        normalize: true,
+        ...pick(attrs, ['merge', 'save', 'normalize']),
+      }
     }
+
+    this.reset()
   }
 
   /**
