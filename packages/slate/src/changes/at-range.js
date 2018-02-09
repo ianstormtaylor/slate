@@ -95,6 +95,9 @@ Changes.deleteAtRange = (change, range, options = {}) => {
     isStartVoid == false &&
     startKey == startBlock.getFirstText().key &&
     endKey == endBlock.getFirstText().key
+  const startTextAsHangingFix = change.value.startText
+    .set('key', startKey)
+    .set('characters', List())
 
   // If it's a hanging selection, nudge it back to end in the previous text.
   if (isHanging && isEndVoid) {
@@ -143,7 +146,23 @@ Changes.deleteAtRange = (change, range, options = {}) => {
   // If the start and end key are the same, and it was a hanging selection, we
   // can just remove the entire block.
   if (startKey == endKey && isHanging) {
+    const startParent = change.value.document.getParent(startBlock.key)
+    const nextBlock = change.value.document.getNextBlock(startBlock.key)
     change.removeNodeByKey(startBlock.key, { normalize })
+    if (
+      nextBlock &&
+      !change.value.document.getDescendant(startTextAsHangingFix.key)
+    ) {
+      change.insertNodeByKey(nextBlock.key, 0, startTextAsHangingFix, {
+        normalize: false,
+      })
+    }
+    if (normalize) {
+      change.normalizeNodeByKey(startParent.key)
+      if (change.value.document.getDescendant(nextBlock.key)) {
+        change.normalizeNodeByKey(nextBlock.key)
+      }
+    }
     return
   } else if (startKey == endKey) {
     // Otherwise, if it wasn't hanging, we're inside a single text node, so we can
@@ -244,7 +263,16 @@ Changes.deleteAtRange = (change, range, options = {}) => {
       // If the selection is hanging, just remove the start block, otherwise
       // merge the end block into it.
       if (isHanging) {
+        const nextBlock = change.value.document.getNextBlock(startBlock.key)
         change.removeNodeByKey(startBlock.key, { normalize: false })
+        if (
+          nextBlock &&
+          !change.value.document.getDescendant(startTextAsHangingFix.key)
+        ) {
+          change.insertNodeByKey(nextBlock.key, 0, startTextAsHangingFix, {
+            normalize: false,
+          })
+        }
       } else {
         change.mergeNodeByKey(endBlock.key, { normalize: false })
       }
