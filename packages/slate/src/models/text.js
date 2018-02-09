@@ -241,6 +241,17 @@ class Text extends Record(DEFAULTS) {
   }
 
   /**
+   * Whether this Text node is the one we are trying to find
+   *
+   * @param {String} key
+   * @return {Node|Null}
+   */
+
+  getDescendant(key) {
+    return this.key === key ? this : null
+  }
+
+  /**
    * Derive the leaves for a list of `characters`.
    *
    * @param {Array|Void} decorations (optional)
