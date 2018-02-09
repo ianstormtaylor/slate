@@ -720,6 +720,7 @@ Changes.insertFragmentAtRange = (change, range, fragment, options = {}) => {
     snapshot = true,
     firstNodeAsText = true,
     lastNodeAsText = true,
+    regenerate = true,
   } = options
 
   // If the range is expanded, delete it first.
@@ -737,12 +738,14 @@ Changes.insertFragmentAtRange = (change, range, fragment, options = {}) => {
   // guaranteed not to collide with the existing keys in the document. Otherwise
   // they will be rengerated automatically and we won't have an easy way to
   // reference them.
-  fragment = fragment.mapDescendants(child => child.regenerateKey())
+  if (regenerate) {
+    fragment = fragment.mapDescendants(child => child.regenerateKey())
+  }
 
-  let parent = (function() {
-    const startBlock = change.value.document.getClosestBlock(range.startKey)
-    return change.value.document.getParent(startBlock.key)
-  })()
+  const originalStartBlock = change.value.document.getClosestBlock(
+    range.startKey
+  )
+  let parent = change.value.document.getParent(originalStartBlock.key)
   const parentPath = change.value.document.getPath(parent.key)
 
   let shouldCheckTextAtFirst = true
@@ -779,19 +782,17 @@ Changes.insertFragmentAtRange = (change, range, fragment, options = {}) => {
 
     if (shouldInsertFirstParagraphAsText) {
       // PREF: If the range is at the end/middle of a void block or inline, adjust the range
-      if (range.startOffset !== 0) {
-        parent = refindParent(change, parentPath, parent.key)
-        const voidParent = parent.getClosest(range.startKey, n => n.isVoid)
-        if (voidParent) {
-          range = range.collapseToStartOf(voidParent)
-          // void inline and void blocks are different
-          // If void inline, insert text is still possible
-          // But we cannot insert text at void block
-          if (voidParent.object === 'block') {
-            shouldInsertFirstParagraphAsText = false
-            shouldInsertLastParagraphAsText = false
-            continue
-          }
+      parent = change.value.document.refindNode(parentPath, parent.key)
+      const voidParent = parent.getClosestVoid(range.startKey)
+      if (voidParent) {
+        range = range.collapseToStartOf(voidParent)
+        // void inline and void blocks are different
+        // If void inline, insert text is still possible
+        // But we cannot insert text at void block
+        if (voidParent.object === 'block') {
+          shouldInsertFirstParagraphAsText = false
+          shouldInsertLastParagraphAsText = false
+          continue
         }
       }
     }
@@ -827,14 +828,14 @@ Changes.insertFragmentAtRange = (change, range, fragment, options = {}) => {
         continue
       }
 
-      parent = refindParent(change, parentPath, parent.key)
+      parent = change.value.document.refindNode(parentPath, parent.key)
       let startBlock = parent.getClosestBlock(range.startKey)
       let splitNode = startBlock.getFurthestAncestor(range.startKey)
 
       // consider that inline have multiple texts
       if (!range.isAtStartOf(splitNode)) {
         splitBeforeInsert(change, range, splitNode)
-        parent = refindParent(change, parentPath, parent.key)
+        parent = change.value.document.refindNode(parentPath, parent.key)
         range = refindRangeAfterSplit(parent, range)
         startBlock = parent.getClosestBlock(range.startKey)
         splitNode = startBlock.getFurthestAncestor(range.startKey)
@@ -868,12 +869,12 @@ Changes.insertFragmentAtRange = (change, range, fragment, options = {}) => {
         continue
       }
       // ensure the first block and the last block cannot merge together
-      parent = refindParent(change, parentPath, parent.key)
+      parent = change.value.document.refindNode(parentPath, parent.key)
       const splitNode = parent.getFurthestAncestor(range.startKey)
 
       if (!range.isAtStartOf(splitNode)) {
         splitBeforeInsert(change, range, splitNode)
-        parent = refindParent(change, parentPath, parent.key)
+        parent = change.value.document.refindNode(parentPath, parent.key)
         range = refindRangeAfterSplit(parent, range)
       }
 
@@ -882,7 +883,7 @@ Changes.insertFragmentAtRange = (change, range, fragment, options = {}) => {
       change.insertNodeByKey(parent.key, insertIndex, lastNode, {
         normalize: false,
       })
-      parent = refindParent(change, parentPath, parent.key)
+      parent = change.value.document.refindNode(parentPath, parent.key)
       const childToRemove = parent.getClosestBlock(range.startKey)
 
       if (!childToRemove.isVoid) {
@@ -901,11 +902,11 @@ Changes.insertFragmentAtRange = (change, range, fragment, options = {}) => {
       continue
     }
 
-    parent = refindParent(change, parentPath, parent.key)
+    parent = change.value.document.refindNode(parentPath, parent.key)
     const splitNode = parent.getFurthestAncestor(range.startKey)
     if (!range.isAtStartOf(splitNode)) {
       splitBeforeInsert(change, range, splitNode)
-      parent = refindParent(change, parentPath, parent.key)
+      parent = change.value.document.refindNode(parentPath, parent.key)
       range = refindRangeAfterSplit(parent, range)
     }
 
@@ -935,14 +936,6 @@ function splitBeforeInsert(change, range, child) {
 function refindRangeAfterSplit(parent, range) {
   const startText = parent.getNextText(range.startKey)
   return range.collapseToStartOf(startText)
-}
-
-function refindParent(change, parentPath, key) {
-  const parent = change.value.document.getDescendantAtPath(parentPath)
-  if (parent && parent.key === key) {
-    return parent
-  }
-  return change.value.document.getDescendant(key)
 }
 
 /**
