@@ -53,6 +53,24 @@ class Change {
         normalize: true,
         ...pick(attrs, ['merge', 'save', 'normalize']),
       }
+
+      this.metadata = {
+        operations: {
+          insert_text: false,
+          remove_text: false,
+          add_mark: false,
+          remove_mark: false,
+          set_mark: false,
+          insert_node: false,
+          merge_node: false,
+          move_node: false,
+          remove_node: false,
+          set_node: false,
+          split_node: false,
+          set_selection: false,
+          set_value: false,
+        },
+      }
     }
 
     this.reset()
@@ -74,6 +92,78 @@ class Change {
       'The `kind` property of Slate objects has been renamed to `object`.'
     )
     return this.object
+  }
+
+  get insertsText() {
+    return this.metadata.operations.insert_text
+  }
+
+  get removesText() {
+    return this.metadata.operations.remove_text
+  }
+
+  get addsMarks() {
+    return this.metadata.operations.add_mark
+  }
+
+  get removesMarks() {
+    return this.metadata.operations.remove_mark
+  }
+
+  get setsMarks() {
+    return this.metadata.operations.set_mark
+  }
+
+  get insertsNodes() {
+    return this.metadata.operations.insert_node
+  }
+
+  get mergesNodes() {
+    return this.metadata.operations.merge_node
+  }
+
+  get movesNodes() {
+    return this.metadata.operations.move_node
+  }
+
+  get removesNodes() {
+    return this.metadata.operations.remove_node
+  }
+
+  get setsNodes() {
+    return this.metadata.operations.set_node
+  }
+
+  get splitsNodes() {
+    return this.metadata.operations.split_node
+  }
+
+  get setsSelection() {
+    return this.metadata.operations.set_selection
+  }
+
+  get setsValue() {
+    return this.metadata.operations.set_value
+  }
+
+  get changesText() {
+    return this.insertsText ||
+           this.removesText
+  }
+
+  get changesMarks() {
+    return this.addsMarks ||
+           this.removesMarks ||
+           this.setsMarks
+  }
+
+  get changesNodes() {
+    return this.insertsNodes ||
+           this.mergesNodes ||
+           this.movesNodes ||
+           this.removesNodes ||
+           this.setsNodes ||
+           this.splitsNodes
   }
 
   /**
@@ -121,6 +211,7 @@ class Change {
     // Update the mutable change object.
     this.value = value
     this.operations = operations.push(operation)
+    this.metadata.operations[operation.type] = true
     return this
   }
 
