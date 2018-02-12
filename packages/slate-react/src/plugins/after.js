@@ -264,11 +264,11 @@ function AfterPlugin() {
     }
 
     if (type == 'node' && Block.isBlock(node)) {
-      change.insertBlock(node).removeNodeByKey(node.key)
+      change.insertBlock(node.regenerateKey()).removeNodeByKey(node.key)
     }
 
     if (type == 'node' && Inline.isInline(node)) {
-      change.insertInline(node).removeNodeByKey(node.key)
+      change.insertInline(node.regenerateKey()).removeNodeByKey(node.key)
     }
 
     // COMPAT: React's onSelect event breaks after an onDrop event
