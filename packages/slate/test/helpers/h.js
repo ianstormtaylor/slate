@@ -18,6 +18,9 @@ const h = createHyperscript({
       type: 'image',
       isVoid: true,
     },
+    td: 'table-cell',
+    table: 'table',
+    tr: 'table-row',
   },
   inlines: {
     link: 'link',

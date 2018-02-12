@@ -1,5 +1,4 @@
 import { List } from 'immutable'
-
 import Block from '../models/block'
 import Inline from '../models/inline'
 import Mark from '../models/mark'
@@ -67,6 +66,7 @@ Changes.addMarksAtRange = (change, range, marks, options = {}) => {
  * @param {Range} range
  * @param {Object} options
  *   @property {Boolean} normalize
+ *   @property {Boolean} snapshot
  */
 
 Changes.deleteAtRange = (change, range, options = {}) => {
@@ -74,7 +74,10 @@ Changes.deleteAtRange = (change, range, options = {}) => {
 
   // Snapshot the selection, which creates an extra undo save point, so that
   // when you undo a delete, the expanded selection will be retained.
-  change.snapshotSelection()
+  const { snapshot = true } = options
+  if (snapshot) {
+    change.snapshotSelection()
+  }
 
   const normalize = change.getFlag('normalize', options)
   const { value } = change
@@ -708,15 +711,24 @@ Changes.insertBlockAtRange = (change, range, block, options = {}) => {
  * @param {Document} fragment
  * @param {Object} options
  *   @property {Boolean} normalize
+ *   @property {Boolean} snapshot
  */
 
 Changes.insertFragmentAtRange = (change, range, fragment, options = {}) => {
   const normalize = change.getFlag('normalize', options)
+  const {
+    snapshot = true,
+    firstNodeAsText = true,
+    lastNodeAsText = true,
+    regenerate = true,
+  } = options
 
   // If the range is expanded, delete it first.
   if (range.isExpanded) {
-    change.deleteAtRange(range, { normalize: false })
+    change.deleteAtRange(range, { normalize: false, snapshot })
     range = range.collapseToStart()
+  } else if (snapshot) {
+    change.snapshotSelection()
   }
 
   // If the fragment is empty, there's nothing to do after deleting.
@@ -726,102 +738,204 @@ Changes.insertFragmentAtRange = (change, range, fragment, options = {}) => {
   // guaranteed not to collide with the existing keys in the document. Otherwise
   // they will be rengerated automatically and we won't have an easy way to
   // reference them.
-  fragment = fragment.mapDescendants(child => child.regenerateKey())
-
-  // Calculate a few things...
-  const { startKey, startOffset } = range
-  const { value } = change
-  let { document } = value
-  let startText = document.getDescendant(startKey)
-  let startBlock = document.getClosestBlock(startText.key)
-  let startChild = startBlock.getFurthestAncestor(startText.key)
-  const isAtStart = range.isAtStartOf(startBlock)
-  const parent = document.getParent(startBlock.key)
-  const index = parent.nodes.indexOf(startBlock)
-  const blocks = fragment.getBlocks()
-  const firstBlock = blocks.first()
-  const lastBlock = blocks.last()
-
-  // If the fragment only contains a void block, use `insertBlock` instead.
-  if (firstBlock == lastBlock && firstBlock.isVoid) {
-    change.insertBlockAtRange(range, firstBlock, options)
-    return
+  if (regenerate) {
+    fragment = fragment.mapDescendants(child => child.regenerateKey())
   }
 
-  // If the first and last block aren't the same, we need to insert all of the
-  // nodes after the fragment's first block at the index.
-  if (firstBlock != lastBlock) {
-    const lonelyParent = fragment.getFurthest(
-      firstBlock.key,
-      p => p.nodes.size == 1
+  const originalStartBlock = change.value.document.getClosestBlock(
+    range.startKey
+  )
+  let parent = change.value.document.getParent(originalStartBlock.key)
+  const parentPath = change.value.document.getPath(parent.key)
+
+  let shouldCheckTextAtFirst = true
+  let shouldInsertFirstParagraphAsText = firstNodeAsText
+  let shouldInsertLastParagraphAsText = lastNodeAsText
+
+  while (fragment.nodes.size) {
+    if (shouldInsertFirstParagraphAsText) {
+      if (fragment.nodes.size && fragment.nodes.first().text === '') {
+        fragment = fragment.set(
+          'nodes',
+          fragment.nodes.skipWhile(node => {
+            if (node.text !== '') {
+              return false
+            }
+            return node.isVoid
+          })
+        )
+      }
+    }
+
+    if (shouldInsertLastParagraphAsText) {
+      if (fragment.nodes.size && fragment.nodes.last().text === '') {
+        const index = fragment.nodes.findLastIndex(node => {
+          return node.text !== '' || node.isVoid
+        })
+        fragment = fragment.set('nodes', fragment.nodes.take(1 + index))
+      }
+    }
+
+    if (!fragment.nodes.size) {
+      break
+    }
+
+    if (shouldInsertFirstParagraphAsText) {
+      // PREF: If the range is at the end/middle of a void block or inline, adjust the range
+      parent = change.value.document.refindNode(parentPath, parent.key)
+      const voidParent = parent.getClosestVoid(range.startKey)
+      if (voidParent) {
+        range = range.collapseToStartOf(voidParent)
+        // void inline and void blocks are different
+        // If void inline, insert text is still possible
+        // But we cannot insert text at void block
+        if (voidParent.object === 'block') {
+          shouldInsertFirstParagraphAsText = false
+          shouldInsertLastParagraphAsText = false
+          continue
+        }
+      }
+    }
+
+    if (shouldInsertFirstParagraphAsText) {
+      shouldInsertFirstParagraphAsText = false
+      const firstNode = fragment.nodes.first()
+      if (firstNode.object !== 'block') {
+        shouldCheckTextAtFirst = true
+        continue
+      }
+      const firstBlock = firstNode.getFirstBlock()
+      const lastBlock = firstNode.getLastBlock()
+      if (firstBlock !== lastBlock) {
+        continue
+      }
+      const insertBlock = firstBlock
+      if (!insertBlock || insertBlock.isVoid) {
+        continue
+      }
+      fragment = fragment.set(
+        'nodes',
+        insertBlock.nodes.concat(fragment.nodes.shift())
+      )
+      shouldCheckTextAtFirst = true
+      continue
+    }
+
+    if (shouldCheckTextAtFirst) {
+      shouldCheckTextAtFirst = false
+      const firstNode = fragment.nodes.first()
+      if (firstNode.object === 'block') {
+        continue
+      }
+
+      parent = change.value.document.refindNode(parentPath, parent.key)
+      let startBlock = parent.getClosestBlock(range.startKey)
+      let splitNode = startBlock.getFurthestAncestor(range.startKey)
+
+      // consider that inline have multiple texts
+      if (!range.isAtStartOf(splitNode)) {
+        splitBeforeInsert(change, range, splitNode)
+        parent = change.value.document.refindNode(parentPath, parent.key)
+        range = refindRangeAfterSplit(parent, range)
+        startBlock = parent.getClosestBlock(range.startKey)
+        splitNode = startBlock.getFurthestAncestor(range.startKey)
+      }
+
+      const insertIndex = startBlock.nodes.indexOf(splitNode)
+      const insertNodes = fragment.nodes.takeWhile(
+        block => block.object === 'text' || block.object === 'inline'
+      )
+      insertNodes.forEach((textNode, index) => {
+        change.insertNodeByKey(startBlock.key, insertIndex + index, textNode, {
+          normalize: false,
+        })
+      })
+
+      fragment = fragment.set('nodes', fragment.nodes.skip(insertNodes.size))
+      continue
+    }
+
+    if (shouldInsertLastParagraphAsText) {
+      shouldInsertLastParagraphAsText = false
+      const lastNode = fragment.nodes.last()
+      if (lastNode.object !== 'block') {
+        continue
+      }
+      const insertBlock = lastNode.getLastBlock()
+      if (insertBlock !== lastNode.getFirstBlock()) {
+        continue
+      }
+      if (insertBlock.isVoid) {
+        continue
+      }
+      // ensure the first block and the last block cannot merge together
+      parent = change.value.document.refindNode(parentPath, parent.key)
+      const splitNode = parent.getFurthestAncestor(range.startKey)
+
+      if (!range.isAtStartOf(splitNode)) {
+        splitBeforeInsert(change, range, splitNode)
+        parent = change.value.document.refindNode(parentPath, parent.key)
+        range = refindRangeAfterSplit(parent, range)
+      }
+
+      const startBlock = parent.getFurthestAncestor(range.startKey)
+      const insertIndex = parent.nodes.indexOf(startBlock)
+      change.insertNodeByKey(parent.key, insertIndex, lastNode, {
+        normalize: false,
+      })
+      parent = change.value.document.refindNode(parentPath, parent.key)
+      const childToRemove = parent.getClosestBlock(range.startKey)
+
+      if (!childToRemove.isVoid) {
+        childToRemove.nodes.forEach((n, index) =>
+          change.moveNodeByKey(
+            n.key,
+            insertBlock.key,
+            insertBlock.nodes.size + index,
+            { normalize: false }
+          )
+        )
+        change.removeNodeByKey(childToRemove.key, { normalize: false })
+      }
+      range = range.collapseToStartOf(insertBlock)
+      fragment = fragment.set('nodes', fragment.nodes.pop())
+      continue
+    }
+
+    parent = change.value.document.refindNode(parentPath, parent.key)
+    const splitNode = parent.getFurthestAncestor(range.startKey)
+    if (!range.isAtStartOf(splitNode)) {
+      splitBeforeInsert(change, range, splitNode)
+      parent = change.value.document.refindNode(parentPath, parent.key)
+      range = refindRangeAfterSplit(parent, range)
+    }
+
+    const startBlock = parent.getFurthestAncestor(range.startKey)
+    const insertIndex = parent.nodes.indexOf(startBlock)
+    fragment.nodes.forEach((block, index) =>
+      change.insertNodeByKey(parent.key, insertIndex + index, block, {
+        normalize: false,
+      })
     )
-    const lonelyChild = lonelyParent || firstBlock
-    const startIndex = parent.nodes.indexOf(startBlock)
-    fragment = fragment.removeDescendant(lonelyChild.key)
-
-    fragment.nodes.forEach((node, i) => {
-      const newIndex = startIndex + i + 1
-      change.insertNodeByKey(parent.key, newIndex, node, { normalize: false })
-    })
-  }
-
-  // Check if we need to split the node.
-  if (startOffset != 0) {
-    change.splitDescendantsByKey(startChild.key, startKey, startOffset, {
-      normalize: false,
-    })
-  }
-
-  // Update our variables with the new value.
-  document = change.value.document
-  startText = document.getDescendant(startKey)
-  startBlock = document.getClosestBlock(startKey)
-  startChild = startBlock.getFurthestAncestor(startText.key)
-
-  // If the first and last block aren't the same, we need to move any of the
-  // starting block's children after the split into the last block of the
-  // fragment, which has already been inserted.
-  if (firstBlock != lastBlock) {
-    const nextChild = isAtStart
-      ? startChild
-      : startBlock.getNextSibling(startChild.key)
-    const nextNodes = nextChild
-      ? startBlock.nodes.skipUntil(n => n.key == nextChild.key)
-      : List()
-    const lastIndex = lastBlock.nodes.size
-
-    nextNodes.forEach((node, i) => {
-      const newIndex = lastIndex + i
-      change.moveNodeByKey(node.key, lastBlock.key, newIndex, {
-        normalize: false,
-      })
-    })
-  }
-
-  // If the starting block is empty, we replace it entirely with the first block
-  // of the fragment, since this leads to a more expected behavior for the user.
-  if (startBlock.isEmpty) {
-    change.removeNodeByKey(startBlock.key, { normalize: false })
-    change.insertNodeByKey(parent.key, index, firstBlock, { normalize: false })
-  } else {
-    // Otherwise, we maintain the starting block, and insert all of the first
-    // block's inline nodes into it at the split point.
-    const inlineChild = startBlock.getFurthestAncestor(startText.key)
-    const inlineIndex = startBlock.nodes.indexOf(inlineChild)
-
-    firstBlock.nodes.forEach((inline, i) => {
-      const o = startOffset == 0 ? 0 : 1
-      const newIndex = inlineIndex + i + o
-      change.insertNodeByKey(startBlock.key, newIndex, inline, {
-        normalize: false,
-      })
-    })
+    fragment = fragment.set('nodes', List.of())
   }
 
   // Normalize if requested.
   if (normalize) {
     change.normalizeNodeByKey(parent.key)
   }
+  return
+}
+
+function splitBeforeInsert(change, range, child) {
+  change.splitDescendantsByKey(child.key, range.startKey, range.startOffset, {
+    normalize: false,
+  })
+}
+
+function refindRangeAfterSplit(parent, range) {
+  const startText = parent.getNextText(range.startKey)
+  return range.collapseToStartOf(startText)
 }
 
 /**
@@ -886,10 +1000,8 @@ Changes.insertTextAtRange = (change, range, text, marks, options = {}) => {
     change.deleteAtRange(range, { normalize: false })
 
     // Update range start after delete
-    if (change.value.startKey !== key) {
-      key = change.value.startKey
-      offset = change.value.startOffset
-    }
+    key = change.value.startKey
+    offset = change.value.startOffset
   }
 
   // PERF: Unless specified, don't normalize if only inserting text.
@@ -1044,9 +1156,10 @@ Changes.splitInlineAtRange = (
   options = {}
 ) => {
   const normalize = change.getFlag('normalize', options)
+  const { snapshot = true } = options
 
   if (range.isExpanded) {
-    change.deleteAtRange(range, { normalize })
+    change.deleteAtRange(range, { normalize, snapshot })
     range = range.collapseToStart()
   }
 
