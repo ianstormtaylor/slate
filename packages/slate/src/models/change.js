@@ -55,23 +55,28 @@ class Change {
 
       this.operations = new List()
       this.operationsByType = {
-        'insert_text': new List(),
-        'remove_text': new List(),
+        insert_text: new List(),
+        remove_text: new List(),
+
+        add_mark: new List(),
+        remove_mark: new List(),
+        set_mark: new List(),
+
+        insert_node: new List(),
+        merge_node: new List(),
+        move_node: new List(),
+        remove_node: new List(),
+        set_node: new List(),
+        split_node: new List(),
+
+        set_selection: new List(),
+
+        set_value: new List(),
+
         '*_text': new List(),
-        'add_mark': new List(),
-        'remove_mark': new List(),
-        'set_mark': new List(),
         '*_mark': new List(),
-        'insert_node': new List(),
-        'merge_node': new List(),
-        'move_node': new List(),
-        'remove_node': new List(),
-        'set_node': new List(),
-        'split_node': new List(),
         '*_node': new List(),
-        'set_selection': new List(),
         '*_selection': new List(),
-        'set_value': new List(),
         '*_value': new List(),
       }
     }
