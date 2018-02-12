@@ -48,28 +48,31 @@ class Change {
     this.reset = () => {
       this.original = value
       this.value = value
-      this.operations = new List()
       this.flags = {
         normalize: true,
         ...pick(attrs, ['merge', 'save', 'normalize']),
       }
 
-      this.metadata = {
-        operations: {
-          insert_text: false,
-          remove_text: false,
-          add_mark: false,
-          remove_mark: false,
-          set_mark: false,
-          insert_node: false,
-          merge_node: false,
-          move_node: false,
-          remove_node: false,
-          set_node: false,
-          split_node: false,
-          set_selection: false,
-          set_value: false,
-        },
+      this.operations = new List()
+      this.operationsByType = {
+        'insert_text': new List(),
+        'remove_text': new List(),
+        '*_text': new List(),
+        'add_mark': new List(),
+        'remove_mark': new List(),
+        'set_mark': new List(),
+        '*_mark': new List(),
+        'insert_node': new List(),
+        'merge_node': new List(),
+        'move_node': new List(),
+        'remove_node': new List(),
+        'set_node': new List(),
+        'split_node': new List(),
+        '*_node': new List(),
+        'set_selection': new List(),
+        '*_selection': new List(),
+        'set_value': new List(),
+        '*_value': new List(),
       }
     }
 
@@ -94,77 +97,6 @@ class Change {
     return this.object
   }
 
-  get insertsText() {
-    return this.metadata.operations.insert_text
-  }
-
-  get removesText() {
-    return this.metadata.operations.remove_text
-  }
-
-  get addsMarks() {
-    return this.metadata.operations.add_mark
-  }
-
-  get removesMarks() {
-    return this.metadata.operations.remove_mark
-  }
-
-  get setsMarks() {
-    return this.metadata.operations.set_mark
-  }
-
-  get insertsNodes() {
-    return this.metadata.operations.insert_node
-  }
-
-  get mergesNodes() {
-    return this.metadata.operations.merge_node
-  }
-
-  get movesNodes() {
-    return this.metadata.operations.move_node
-  }
-
-  get removesNodes() {
-    return this.metadata.operations.remove_node
-  }
-
-  get setsNodes() {
-    return this.metadata.operations.set_node
-  }
-
-  get splitsNodes() {
-    return this.metadata.operations.split_node
-  }
-
-  get setsSelection() {
-    return this.metadata.operations.set_selection
-  }
-
-  get setsValue() {
-    return this.metadata.operations.set_value
-  }
-
-  get changesText() {
-    return this.insertsText || this.removesText
-  }
-
-  get changesMarks() {
-    return this.addsMarks || this.removesMarks || this.setsMarks
-  }
-
-  get changesNodes() {
-    return (
-      this.insertsNodes ||
-      this.mergesNodes ||
-      this.movesNodes ||
-      this.removesNodes ||
-      this.setsNodes ||
-      this.splitsNodes
-    )
-  }
-
   /**
    * Apply an `operation` to the current value, saving the operation to the
    * history if needed.
@@ -175,7 +107,7 @@ class Change {
    */
 
   applyOperation(operation, options = {}) {
-    const { operations, flags } = this
+    const { operations, operationsByType, flags } = this
     let { value } = this
     let { history } = value
 
@@ -210,7 +142,14 @@ class Change {
     // Update the mutable change object.
     this.value = value
     this.operations = operations.push(operation)
-    this.metadata.operations[operation.type] = true
+
+    {
+      const { type } = operation
+      const glob = `*_${type.split('_')[1]}`
+      this.operationsByType[type] = operationsByType[type].push(operation)
+      this.operationsByType[glob] = operationsByType[glob].push(operation)
+    }
+
     return this
   }
 
