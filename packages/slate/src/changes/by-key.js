@@ -347,6 +347,129 @@ Changes.removeNodeByKey = (change, key, options = {}) => {
 }
 
 /**
+ * Delete Nodes between startKey and endKey, including nodes of startKey and endKey
+ *
+ * @param {Change} change
+ * @param {string} startKey
+ * @param {string} endKey
+ * @param {Object} options
+ *   @property {Boolean} normalize
+ */
+
+Changes.deleteNodesBetween = (change, startKey, endKey, options = {}) => {
+  const normalize = change.getFlag('normalize', options)
+  const { document } = change.value
+
+  const startText = document.getDescendant(startKey)
+  if (startText.object !== 'text') {
+    return change.deleteNodesBetween(
+      startText.getFirstText().key,
+      endKey,
+      options
+    )
+  }
+  const endText = document.getDescendant(endKey)
+  if (endText.object !== 'text') {
+    return change.deleteNodesBetween(
+      startKey,
+      endText.getLastText().key,
+      options
+    )
+  }
+
+  if (startKey === endKey) {
+    const lonely = document.getFurthestOnlyChildAncestor(startKey)
+    const removalKey =
+      lonely === document
+        ? document.getFurthestAncestor(startKey).key
+        : lonely ? lonely.key : startKey
+    return change.removeNodeByKey(removalKey, { normalize })
+  }
+
+  if (!document.areDescendantsSorted(startKey, endKey)) {
+    return change.deleteNodesBetween(endKey, startKey, options)
+  }
+
+  const commonAncestor = document.getCommonAncestor(startKey, endKey)
+  if (
+    commonAncestor.getFirstText() === startText &&
+    commonAncestor.getLastText() === endText
+  ) {
+    if (commonAncestor.object === 'document') {
+      document.nodes.forEach(n =>
+        change.removeNodeByKey(n.key, { normalize: false })
+      )
+      if (normalize) {
+        change.normalize()
+      }
+      return
+    }
+    return change.removeNodeByKey(commonAncestor.key, { normalize })
+  }
+
+  let startNode = startText
+  commonAncestor.getAncestors(startKey).findLast(n => {
+    if (n.nodes.first() !== startNode) {
+      return true
+    }
+    if (n.getDescendant(endKey)) {
+      return true
+    }
+    startNode = n
+    return false
+  })
+  let endNode = endText
+  commonAncestor.getAncestors(endKey).findLast(n => {
+    if (n.nodes.last() !== endNode) {
+      return true
+    }
+    if (n.getDescendant(startKey)) {
+      return true
+    }
+    endNode = n
+    return false
+  })
+
+  const startAncestors = commonAncestor.getAncestors(startNode.key)
+  // Delete Nodes at the start
+  change.removeNodeByKey(startNode.key, { normalize: false })
+  startAncestors.findLast((n, index) => {
+    if (index === 0) return true
+    const child =
+      index + 1 < startAncestors.size
+        ? startAncestors.get(index + 1)
+        : startNode
+    n.nodes
+      .skip(n.nodes.indexOf(child) + 1)
+      .forEach(c => change.removeNodeByKey(c.key, { normalize: false }))
+  })
+  // Delete Nodes in middle
+  const startChild = commonAncestor.getFurthestAncestor(startKey)
+  const endChild = commonAncestor.getFurthestAncestor(endKey)
+  const middleNodes = commonAncestor.nodes.slice(
+    commonAncestor.nodes.indexOf(startChild) + 1,
+    commonAncestor.nodes.indexOf(endChild)
+  )
+  middleNodes.forEach(c => change.removeNodeByKey(c.key, { normalize: false }))
+
+  // Delete Nodes at the end
+  const endAncestors = commonAncestor.getAncestors(endNode.key)
+  endAncestors.find((n, index) => {
+    if (index === 0) return false
+    const child =
+      index + 1 < endAncestors.size ? endAncestors.get(index + 1) : endNode
+    n.nodes
+      .take(n.nodes.indexOf(child))
+      .forEach(c => change.removeNodeByKey(c.key, { normalize: false }))
+  })
+  change.removeNodeByKey(endNode.key, { normalize: false })
+  if (normalize) {
+    change.normalizeNodeByKey(commonAncestor.key)
+  }
+  return
+}
+
+/**
  * Remove text at `offset` and `length` in node by `key`.
  *
  * @param {Change} change
