@@ -1775,6 +1775,50 @@ class Node {
   }
 
   /**
+   * Check whether the node is start by another node, considering the empty text before and after inlines
+   * @param {string} key
+   * @returns {Boolean}
+   */
+
+  isStartByKey(key) {
+    const child = this.getDescendant(key)
+    if (!child) return false
+    if (child.object !== 'text') {
+      return this.isStartByKey(child.getFirstText().key)
+    }
+    if (child === this.getFirstText()) return true
+    const firstValid = this.nodes.find(
+      n => n.object !== 'text' || n.text.length > 0 || n.key === key
+    )
+    if (!firstValid) return false
+    if (firstValid.key === key) return true
+    if (firstValid.object === 'text') return false
+    return firstValid.isStartByKey(key)
+  }
+
+  /**
+   * Check whether the node is end by another node, considering the empty text before and after inlines
+   * @param {string} key
+   * @returns {Boolean}
+   */
+
+  isEndByKey(key) {
+    const child = this.getDescendant(key)
+    if (!child) return false
+    if (child.object !== 'text') {
+      return this.isEndByKey(child.getLastText().key)
+    }
+    if (child === this.getLastText()) return true
+    const lastValid = this.nodes.findLast(
+      n => n.object !== 'text' || n.text.length > 0 || n.key === key
+    )
+    if (!lastValid) return false
+    if (lastValid.key === key) return true
+    if (lastValid.object === 'text') return false
+    return lastValid.isEndByKey(key)
+  }
+
+  /**
    * Merge a children node `first` with another children node `second`.
    * `first` and `second` will be concatenated in that order.
    * `first` and `second` must be two Nodes or two Text.
