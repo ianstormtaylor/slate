@@ -3,7 +3,12 @@
 import h from '../../../helpers/h'
 
 export default function(change) {
-  change.replaceNodeByKey('a', { object: 'block', type: 'quote' })
+  const { startBlock, startText } = change.value
+  const nextBlock = startBlock.merge({
+    type: 'quote',
+    nodes: startBlock.nodes.push(startText.regenerateKey()),
+  })
+  change.replaceNodeByKey(startBlock.key, nextBlock)
 }
 
 export const input = (
@@ -11,7 +16,7 @@ export const input = (
     <document>
       <paragraph>one</paragraph>
       <paragraph key="a">
-        two<cursor />
+        t<cursor />wo
       </paragraph>
     </document>
   </value>
@@ -21,8 +26,8 @@ export const output = (
   <value>
     <document>
       <paragraph>one</paragraph>
-      <quote>
-        <cursor />
+      <quote key="a">
+        t<cursor />wotwo
       </quote>
     </document>
   </value>

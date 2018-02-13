@@ -417,16 +417,70 @@ Changes.removeTextByKey = (change, key, offset, length, options = {}) => {
 Changes.replaceNodeByKey = (change, key, newNode, options = {}) => {
   newNode = Node.create(newNode)
   const normalize = change.getFlag('normalize', options)
+  const { cursorPerserve = ['key', 'path'] } = options
   const { value } = change
-  const { document } = value
+  const { document, selection } = value
   const node = document.getNode(key)
   const parent = document.getParent(key)
   const index = parent.nodes.indexOf(node)
   change.removeNodeByKey(key, { normalize: false })
   change.insertNodeByKey(parent.key, index, newNode, options)
+  newNode = change.value.document.getDescendant(newNode.key)
+
+  const { anchorKey, focusKey } = selection
+  if (newNode && anchorKey !== change.value.anchorKey) {
+    const { anchorOffset } = selection
+    const anchorText = refindEdgeTextAfterReplace(
+      anchorKey,
+      node,
+      newNode,
+      cursorPerserve
+    )
+    if (anchorText && anchorText.object === 'text') {
+      const nextAnchorOffset = Math.min(anchorText.text.length, anchorOffset)
+      change.moveAnchorTo(anchorText.key, nextAnchorOffset)
+    }
+  }
+  if (newNode && focusKey !== change.value.focusKey) {
+    const { focusOffset } = selection
+    const focusText = refindEdgeTextAfterReplace(
+      focusKey,
+      node,
+      newNode,
+      cursorPerserve
+    )
+    if (focusText && focusText.object === 'text') {
+      const nextFocusOffset = Math.min(focusText.text.length, focusOffset)
+      change.moveFocusTo(focusText.key, nextFocusOffset)
+    }
+  }
+
   if (normalize) {
     change.normalizeNodeByKey(parent.key)
   }
+}
+
+function refindEdgeTextAfterReplace(edgeKey, oldNode, newNode, methods) {
+  if (!oldNode.getDescendant(edgeKey)) return null
+  let result = null
+  for (const key of methods) {
+    if (result) {
+      return result.object === 'text' ? result : result.getFirstText()
+    }
+    switch (key) {
+      case 'key':
+        result = newNode.getDescendant(edgeKey)
+        break
+      case 'path':
+        if (oldNode.object === 'text') {
+          result = newNode
+        } else {
+          result = newNode.getDescendantAtPath(oldNode.getPath(edgeKey))
+        }
+        break
+    }
+  }
+  return result
 }
 
 /**
