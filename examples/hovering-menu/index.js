@@ -126,9 +126,9 @@ class HoveringMenu extends React.Component {
     const range = selection.getRangeAt(0)
     const rect = range.getBoundingClientRect()
     menu.style.opacity = 1
-    menu.style.top = `${rect.top + window.scrollY - menu.offsetHeight}px`
+    menu.style.top = `${rect.top + window.pageYOffset - menu.offsetHeight}px`
     menu.style.left = `${rect.left +
-      window.scrollX -
+      window.pageXOffset -
       menu.offsetWidth / 2 +
       rect.width / 2}px`
   }
