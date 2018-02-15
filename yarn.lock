@@ -4823,15 +4823,15 @@ slash@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/slash/-/slash-1.0.0.tgz#c41f2f6c39fc16d1cd17ad4b5d896114ae470d55"
 
-slate-collapse-on-escape@^0.5.0:
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/slate-collapse-on-escape/-/slate-collapse-on-escape-0.5.0.tgz#4eee1d8e7d065dc2eed5bbcf78d5fa3dba5b1c95"
+slate-collapse-on-escape@^0.6.0:
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/slate-collapse-on-escape/-/slate-collapse-on-escape-0.6.0.tgz#668f2318770608a09a25a95623f5fb4329a277bf"
   dependencies:
     to-pascal-case "^1.0.0"
 
-slate-soft-break@^0.5.0:
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/slate-soft-break/-/slate-soft-break-0.5.0.tgz#f1c14f4bcf01ba534f285c59d5a9be52b42c3c5e"
+slate-soft-break@^0.6.0:
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/slate-soft-break/-/slate-soft-break-0.6.0.tgz#1e44815b7ff4ddada055bba14cd0d2d4ef0fd463"
 
 slate-sugar@^0.6.1:
   version "0.6.1"
