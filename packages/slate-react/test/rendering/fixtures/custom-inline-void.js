@@ -33,14 +33,14 @@ export const output = `
   <div style="position:relative">
     <span>
       <span>
-        <span data-slate-zero-width="true">&#x200B;</span>
+        <span data-slate-zero-width="z">&#x200B;</span>
       </span>
     </span>
     <span data-slate-void="true" contenteditable="false">
       <span contenteditable="true" data-slate-spacer="true" style="height:0;color:transparent;outline:none">
         <span>
           <span>
-            <span data-slate-zero-width="true">&#x200B;</span>
+            <span data-slate-zero-width="z">&#x200B;</span>
           </span>
         </span>
       </span>
@@ -50,7 +50,7 @@ export const output = `
     </span>
     <span>
       <span>
-        <span data-slate-zero-width="true">&#x200B;</span>
+        <span data-slate-zero-width="z">&#x200B;</span>
       </span>
     </span>
   </div>
