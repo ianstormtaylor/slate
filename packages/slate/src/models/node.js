@@ -1087,7 +1087,7 @@ class Node {
   getMarksAtRangeAsArray(range) {
     range = range.normalize(this)
     if (range.isUnset) return []
-    if (range.isCollapsed) return this.getMarksAtCollaspsedRangeAsArray(range)
+    if (range.isCollapsed) return this.getMarksAtCollapsedRangeAsArray(range)
 
     return this.getCharactersAtRange(range).reduce((memo, char) => {
       char.marks.toArray().forEach(c => memo.push(c))
@@ -1105,7 +1105,7 @@ class Node {
   getInsertMarksAtRangeAsArray(range) {
     range = range.normalize(this)
     if (range.isUnset) return []
-    if (range.isCollapsed) return this.getMarksAtCollaspsedRangeAsArray(range)
+    if (range.isCollapsed) return this.getMarksAtCollapsedRangeAsArray(range)
 
     const text = this.getDescendant(range.startKey)
     const char = text.characters.get(range.startOffset)
@@ -1122,7 +1122,7 @@ class Node {
    * @return {Array}
    */
 
-  getMarksAtCollaspsedRangeAsArray(range) {
+  getMarksAtCollapsedRangeAsArray(range) {
     if (range.isUnset) return []
 
     const { startKey, startOffset } = range
@@ -1149,7 +1149,7 @@ class Node {
   getActiveMarksAtRangeAsArray(range) {
     range = range.normalize(this)
     if (range.isUnset) return []
-    if (range.isCollapsed) return this.getMarksAtCollaspsedRangeAsArray(range)
+    if (range.isCollapsed) return this.getMarksAtCollapsedRangeAsArray(range)
 
     // Otherwise, get a set of the marks for each character in the range.
     const chars = this.getCharactersAtRange(range)
