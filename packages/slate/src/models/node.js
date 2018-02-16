@@ -1090,7 +1090,9 @@ class Node {
     if (range.isCollapsed) return this.getMarksAtCollapsedRangeAsArray(range)
 
     return this.getCharactersAtRange(range).reduce((memo, char) => {
-      char.marks.toArray().forEach(c => memo.push(c))
+      if (char) {
+        char.marks.toArray().forEach(c => memo.push(c))
+      }
       return memo
     }, [])
   }
@@ -1109,9 +1111,8 @@ class Node {
 
     const text = this.getDescendant(range.startKey)
     const char = text.characters.get(range.startOffset)
-    if (!char) {
-      return []
-    }
+    if (!char) return []
+
     return char.marks.toArray()
   }
 
@@ -1131,11 +1132,15 @@ class Node {
       const previous = this.getPreviousText(startKey)
       if (!previous || previous.text.length == 0) return []
       const char = previous.characters.get(previous.text.length - 1)
+      if (!char) return []
+
       return char.marks.toArray()
     }
 
     const text = this.getDescendant(startKey)
     const char = text.characters.get(startOffset - 1)
+    if (!char) return []
+
     return char.marks.toArray()
   }
 
@@ -1159,7 +1164,8 @@ class Node {
     let memo = first.marks
 
     chars.slice(1).forEach(char => {
-      memo = memo.intersect(char.marks)
+      const marks = char ? char.marks : []
+      memo = memo.intersect(marks)
       return memo.size != 0
     })
 
