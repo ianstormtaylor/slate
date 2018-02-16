@@ -4,8 +4,6 @@
   "workspaces": [
     "packages/*"
   ],
-  "umd": "./examples/build.dev.js",
-  "umdMin": "./examples/build.prod.js",
   "devDependencies": {
     "babel-core": "^6.26.0",
     "babel-eslint": "^8.2.1",
@@ -91,9 +89,9 @@
     "benchmark:save": "mkdir -p ./tmp && cross-env BABEL_ENV=test babel-node ./node_modules/.bin/_matcha --reporter ./support/benchmark/reporter ./packages/*/benchmark/index.js > ./tmp/benchmark-baseline.json",
     "bootstrap": "lerna bootstrap && yarn build",
     "build": "rollup --config",
-    "build:gh": "cross-env NODE_ENV=production rollup --config && webpack",
-    "clean": "lerna run clean && rm -rf ./node_modules ./dist ./examples/build.*.js",
-    "gh-pages": "yarn build:gh && gh-pages --dist ./examples",
+    "build:gh": "cross-env NODE_ENV=production rollup --config && cross-env NODE_ENV=production webpack",
+    "clean": "lerna run clean && rm -rf ./node_modules ./dist ./examples/dist",
+    "gh-pages": "yarn build:gh && gh-pages --dist ./examples/dist",
     "lint": "eslint packages/*/src packages/*/test examples/*/*.js examples/dev/*/*.js && prettier --list-different '**/*.{js,jsx,md,json,css}'",
     "open": "open http://localhost:8080",
     "prettier": "prettier --write '**/*.{js,jsx,md,json,css}'",
