@@ -24,6 +24,8 @@ import SearchHighlighting from './search-highlighting'
 import SyncingOperations from './syncing-operations'
 import Tables from './tables'
 
+import './index.css'
+
 /**
  * Examples.
  *
@@ -149,5 +151,7 @@ const router = (
  * Mount the router.
  */
 
-const root = document.body.querySelector('main')
+const root = window.document.createElement('div')
+root.id = 'root'
+window.document.body.appendChild(root)
 ReactDOM.render(router, root)

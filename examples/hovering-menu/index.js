@@ -5,8 +5,6 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import initialValue from './value.json'
 
-const root = window.document.querySelector('main')
-
 /**
  * The menu.
  *
@@ -67,6 +65,8 @@ class Menu extends React.Component {
    */
 
   render() {
+    const root = window.document.getElementById('root')
+
     return ReactDOM.createPortal(
       <div className="menu hover-menu" ref={this.props.menuRef}>
         {this.renderMarkButton('bold', 'format_bold')}
