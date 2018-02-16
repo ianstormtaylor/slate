@@ -1,4 +1,5 @@
 const path = require('path')
+const webpack = require('webpack')
 const CleanWebpackPlugin = require('clean-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const HtmlWebpackTemplate = require('html-webpack-template')
@@ -7,16 +8,17 @@ const CopyWebpackPlugin = require('copy-webpack-plugin')
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
 
 const config = {
-  entry: './examples/index.js',
+  entry: ['react-hot-loader/patch', './examples/index.js'],
 
   output: {
     path: path.resolve(__dirname, 'examples/dist'),
-    filename: '[name].[chunkhash].js',
+    filename: '[name].[hash].js',
   },
 
   devServer: {
     contentBase: './examples',
     publicPath: '/',
+    hot: true,
   },
 
   module: {
@@ -70,6 +72,10 @@ if (process.env.NODE_ENV === 'production') {
   )
   config.devtool = 'source-map'
 } else {
+  config.plugins.push(
+    new webpack.NamedModulesPlugin(),
+    new webpack.HotModuleReplacementPlugin()
+  )
   config.devtool = 'inline-source-map'
 }
 
