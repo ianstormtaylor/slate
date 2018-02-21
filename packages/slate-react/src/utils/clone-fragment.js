@@ -1,7 +1,8 @@
 import Base64 from 'slate-base64-serializer'
 
-import findDOMNode from './find-dom-node'
 import getWindow from 'get-window'
+import findDOMNode from './find-dom-node'
+import { ZERO_WIDTH_SELECTOR, ZERO_WIDTH_ATTRIBUTE } from './find-point'
 import { IS_CHROME, IS_SAFARI } from '../constants/environment'
 
 /**
@@ -62,10 +63,10 @@ function cloneFragment(event, value, fragment = value.fragment) {
 
   // Remove any zero-width space spans from the cloned DOM so that they don't
   // show up elsewhere when pasted.
-  const zws = [].slice.call(
-    contents.querySelectorAll('[data-slate-zero-width]')
-  )
-  zws.forEach(zw => zw.parentNode.removeChild(zw))
+  ;[].slice.call(contents.querySelectorAll(ZERO_WIDTH_SELECTOR)).forEach(zw => {
+    const isNewline = zw.getAttribute(ZERO_WIDTH_ATTRIBUTE) === 'n'
+    zw.textContent = isNewline ? '\n' : ''
+  })
 
   // COMPAT: In Chrome and Safari, if the last element in the selection to
   // copy has `contenteditable="false"` the copy will fail, and nothing will

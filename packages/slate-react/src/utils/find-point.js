@@ -8,6 +8,8 @@ import OffsetKey from './offset-key'
  * @type {String}
  */
 
+export const ZERO_WIDTH_ATTRIBUTE = 'data-slate-zero-width'
+export const ZERO_WIDTH_SELECTOR = `[${ZERO_WIDTH_ATTRIBUTE}]`
 const OFFSET_KEY_ATTRIBUTE = 'data-offset-key'
 const RANGE_SELECTOR = `[${OFFSET_KEY_ATTRIBUTE}]`
 const TEXT_SELECTOR = `[data-key]`
@@ -60,7 +62,7 @@ function findPoint(nativeNode, nativeOffset, value) {
   // from the offset to account for the zero-width space character.
   if (
     offset == node.textContent.length &&
-    parentNode.hasAttribute('data-slate-zero-width')
+    parentNode.hasAttribute(ZERO_WIDTH_ATTRIBUTE)
   ) {
     offset--
   }
