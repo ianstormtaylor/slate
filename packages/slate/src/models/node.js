@@ -1130,6 +1130,11 @@ class Node {
     if (startOffset == 0) {
       const previous = this.getPreviousText(startKey)
       if (!previous || previous.text.length == 0) return []
+      if (
+        this.getClosestBlock(startKey) !== this.getClosestBlock(previous.key)
+      ) {
+        return []
+      }
       const char = previous.characters.get(previous.text.length - 1)
       return char.marks.toArray()
     }
