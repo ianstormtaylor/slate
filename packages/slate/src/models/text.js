@@ -495,6 +495,17 @@ class Text extends Record(DEFAULTS) {
   validate(schema) {
     return schema.validateNode(this)
   }
+
+  /**
+   * The first descendant key requiring validation
+   *
+   * @param {Schema} schema
+   * @returns {String|Null}
+   */
+
+  getFirstInvalidDescendantKey(schema) {
+    return this.validate(schema) ? this.key : null
+  }
 }
 
 /**

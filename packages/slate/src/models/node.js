@@ -1987,6 +1987,25 @@ class Node {
   validate(schema) {
     return schema.validateNode(this)
   }
+
+  /**
+   * The first descendant key requiring validation
+   *
+   * @param {Schema} schema
+   * @return {String|Null}
+   */
+
+  getFirstInvalidDescendantKey(schema) {
+    if (this.validate(schema)) {
+      return this.key
+    }
+    let result = null
+    this.nodes.find(n => {
+      result = n.getFirstInvalidDescendantKey(schema)
+      return typeof result === 'string'
+    })
+    return result
+  }
 }
 
 /**
@@ -2072,6 +2091,7 @@ memoize(
     'getTextAtOffset',
     'getTextsAtRangeAsArray',
     'validate',
+    'getFirstInvalidDescendantKey',
   ],
   {
     takesArguments: true,
