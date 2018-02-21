@@ -1693,15 +1693,15 @@ class Node {
    */
 
   insertNode(index, node) {
-    const keys = this.getKeys()
+    const keys = this.getKeysAsArray()
 
-    if (keys.contains(node.key)) {
+    if (keys.includes(node.key)) {
       node = node.regenerateKey()
     }
 
     if (node.object != 'text') {
       node = node.mapDescendants(desc => {
-        return keys.contains(desc.key) ? desc.regenerateKey() : desc
+        return keys.includes(desc.key) ? desc.regenerateKey() : desc
       })
     }
 
@@ -1999,22 +1999,15 @@ function assertKey(arg) {
 memoize(
   Node.prototype,
   [
-    'getBlocks',
     'getBlocksAsArray',
-    'getCharacters',
     'getCharactersAsArray',
     'getFirstText',
-    'getInlines',
     'getInlinesAsArray',
-    'getKeys',
     'getKeysAsArray',
     'getLastText',
-    'getMarks',
-    'getOrderedMarks',
     'getMarksAsArray',
     'getText',
     'getTextDirection',
-    'getTexts',
     'getTextsAsArray',
     'isLeafBlock',
     'isLeafInline',
@@ -2028,14 +2021,10 @@ memoize(
   Node.prototype,
   [
     'areDescendantsSorted',
-    'getActiveMarksAtRange',
     'getActiveMarksAtRangeAsArray',
     'getAncestors',
-    'getBlocksAtRange',
     'getBlocksAtRangeAsArray',
-    'getBlocksByType',
     'getBlocksByTypeAsArray',
-    'getCharactersAtRange',
     'getCharactersAtRangeAsArray',
     'getChild',
     'getClosestBlock',
@@ -2051,17 +2040,10 @@ memoize(
     'getFurthestInline',
     'getFurthestAncestor',
     'getFurthestOnlyChildAncestor',
-    'getInlinesAtRange',
     'getInlinesAtRangeAsArray',
-    'getInlinesByType',
     'getInlinesByTypeAsArray',
-    'getMarksAtRange',
-    'getInsertMarksAtRange',
-    'getOrderedMarksAtRange',
     'getMarksAtRangeAsArray',
     'getInsertMarksAtRangeAsArray',
-    'getMarksByType',
-    'getOrderedMarksByType',
     'getMarksByTypeAsArray',
     'getNextBlock',
     'getNextSibling',
@@ -2077,11 +2059,7 @@ memoize(
     'getPreviousSibling',
     'getPreviousText',
     'getTextAtOffset',
-    'getTextsAtRange',
     'getTextsAtRangeAsArray',
-    'hasChild',
-    'hasDescendant',
-    'hasNode',
     'hasVoidParent',
     'validate',
   ],
