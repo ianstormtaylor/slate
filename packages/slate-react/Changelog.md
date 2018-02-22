@@ -4,6 +4,14 @@ This document maintains a list of changes to the `slate-react` package with each
 
 ---
 
+### `0.12.0` — February 21, 2018
+
+###### BREAKING
+
+* **Update to use `slate@0.33.0`.** This is to match the changes to void node behavior where their content is no longer restricted.
+
+---
+
 ### `0.11.0` — January 4, 2018
 
 ###### BREAKING

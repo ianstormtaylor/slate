@@ -4,6 +4,20 @@ This document maintains a list of changes to the `slate` package with each new v
 
 ---
 
+### `0.33.0` — February 21, 2018
+
+###### BREAKING
+
+* **Void nodes no longer prescribe their text content.** Previously void nodes would automatically normalize their text content to be a single text node containing `' '` an empty string of content. This restriction was removed, so that void nodes can have arbitrary content. You can use this to store information in void nodes in a way that is more consistent with non-void nodes.
+
+###### DEPRECATED
+
+* **The `setBlock` method has been renamed to `setBlocks`.** This is to make it more clear that it operates on any of the current blocks in the selection, not just a single blocks.
+
+* **The `setInline` method has been renamed to `setInlines`.** For the same reason as `setBlocks`, to be clear and stay consistent.
+
+---
+
 ### `0.32.0` — January 4, 2018
 
 ###### BREAKING
