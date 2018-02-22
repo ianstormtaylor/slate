@@ -5,22 +5,24 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const HtmlWebpackTemplate = require('html-webpack-template')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
-const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
+
+const NamedModulesPlugin = webpack.NamedModulesPlugin
+const HotModuleReplacementPlugin = webpack.HotModuleReplacementPlugin
+const IS_PROD = process.env.NODE_ENV === 'production'
+const IS_DEV = !IS_PROD
 
 const config = {
   entry: ['react-hot-loader/patch', './examples/index.js'],
-
   output: {
-    path: path.resolve(__dirname, 'examples/dist'),
-    filename: '[name].[hash].js',
+    path: path.resolve(__dirname, '../../build'),
+    filename: '[name]-[hash].js',
   },
-
+  devtool: IS_PROD ? 'source-map' : 'inline-source-map',
   devServer: {
     contentBase: './examples',
     publicPath: '/',
     hot: true,
   },
-
   module: {
     rules: [
       {
@@ -49,7 +51,6 @@ const config = {
       },
     ],
   },
-
   plugins: [
     new ExtractTextPlugin('[name]-[contenthash].css'),
     new HtmlWebpackPlugin({
@@ -61,22 +62,11 @@ const config = {
         'https://fonts.googleapis.com/icon?family=Material+Icons',
       ],
     }),
-  ],
-}
-
-if (process.env.NODE_ENV === 'production') {
-  config.plugins.push(
-    new CleanWebpackPlugin(['examples/dist']),
-    new UglifyJSPlugin({ sourceMap: true }),
-    new CopyWebpackPlugin(['examples/CNAME'])
-  )
-  config.devtool = 'source-map'
-} else {
-  config.plugins.push(
-    new webpack.NamedModulesPlugin(),
-    new webpack.HotModuleReplacementPlugin()
-  )
-  config.devtool = 'inline-source-map'
+    IS_PROD && new CleanWebpackPlugin([path.resolve(__dirname, '../../build')]),
+    IS_PROD && new CopyWebpackPlugin(['examples/CNAME']),
+    IS_DEV && new NamedModulesPlugin(),
+    IS_DEV && new HotModuleReplacementPlugin(),
+  ].filter(Boolean),
 }
 
 module.exports = config
