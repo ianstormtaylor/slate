@@ -29,7 +29,6 @@ export const output = (
       <paragraph>
         one{' '}
         <emoji>
-          {' '}
           <cursor />
         </emoji>
       </paragraph>
