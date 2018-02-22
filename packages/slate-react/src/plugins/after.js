@@ -253,10 +253,12 @@ function AfterPlugin() {
         if (n) change.collapseToStartOf(n)
       }
 
-      text.split('\n').forEach((line, i) => {
-        if (i > 0) change.splitBlock()
-        change.insertText(line)
-      })
+      if (text) {
+        text.split('\n').forEach((line, i) => {
+          if (i > 0) change.splitBlock()
+          change.insertText(line)
+        })
+      }
     }
 
     if (type == 'fragment') {
