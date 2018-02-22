@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { AppContainer } from 'react-hot-loader'
-import App from './App'
+import App from './app'
 import './index.css'
 
 /**
@@ -25,5 +25,5 @@ render(App)
 
 // Webpack Hot Module Replacement API
 if (module.hot) {
-  module.hot.accept('./App', () => render(App))
+  module.hot.accept('./app', () => render(App))
 }
