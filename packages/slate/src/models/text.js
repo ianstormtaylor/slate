@@ -498,13 +498,14 @@ class Text extends Record(DEFAULTS) {
 
   /**
    * The first descendant key requiring validation
+   * PREF: Do not cache this method; because it can cause cycle reference
    *
    * @param {Schema} schema
-   * @returns {String|Null}
+   * @returns {Text|Null}
    */
 
-  getFirstInvalidDescendantKey(schema) {
-    return this.validate(schema) ? this.key : null
+  getFirstInvalidDescendant(schema) {
+    return this.validate(schema) ? this : null
   }
 }
 
