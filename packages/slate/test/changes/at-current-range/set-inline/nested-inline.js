@@ -3,7 +3,7 @@
 import h from '../../../helpers/h'
 
 export default function(change) {
-  change.setInline({ type: 'comment' })
+  change.setInlines({ type: 'comment' })
 }
 
 export const input = (

@@ -1,3 +1,4 @@
+import logger from 'slate-dev-logger'
 import Block from '../models/block'
 import Inline from '../models/inline'
 import Mark from '../models/mark'
@@ -24,8 +25,8 @@ const PROXY_TRANSFORMS = [
   'deleteCharForward',
   'deleteWordForward',
   'deleteLineForward',
-  'setBlock',
-  'setInline',
+  'setBlocks',
+  'setInlines',
   'splitInline',
   'unwrapBlock',
   'unwrapInline',
@@ -41,6 +42,22 @@ PROXY_TRANSFORMS.forEach(method => {
     change[methodAtRange](selection, ...args)
   }
 })
+
+Changes.setBlock = (...args) => {
+  logger.deprecate(
+    'slate@0.33.0',
+    'The `setBlock` method of Slate changes has been renamed to `setBlocks`.'
+  )
+  Changes.setBlocks(...args)
+}
+
+Changes.setInline = (...args) => {
+  logger.deprecate(
+    'slate@0.33.0',
+    'The `setInline` method of Slate changes has been renamed to `setInlines`.'
+  )
+  Changes.setInlines(...args)
+}
 
 /**
  * Add a `mark` to the characters in the current selection.

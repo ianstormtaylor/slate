@@ -3,7 +3,7 @@
 import h from '../../../helpers/h'
 
 export default function(change) {
-  change.setInline('hashtag')
+  change.setInlines('hashtag')
 }
 
 export const input = (

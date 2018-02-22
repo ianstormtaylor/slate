@@ -4,7 +4,7 @@ import h from '../../../helpers/h'
 import { Data } from '../../../..'
 
 export default function(change) {
-  change.setInline({ data: Data.create({ thing: 'value' }) })
+  change.setInlines({ data: Data.create({ thing: 'value' }) })
 }
 
 export const input = (

@@ -139,7 +139,7 @@ class App extends React.Component {
     event.preventDefault()
 
     // Otherwise, set the currently selected blocks type to "code".
-    change.setBlock('code')
+    change.setBlocks('code')
     return true
   }
 
@@ -196,7 +196,7 @@ class App extends React.Component {
     const isCode = change.value.blocks.some(block => block.type == 'code')
 
     // Toggle the block type depending on `isCode`.
-    change.setBlock(isCode ? 'paragraph' : 'code')
+    change.setBlocks(isCode ? 'paragraph' : 'code')
     return true
   }
 
