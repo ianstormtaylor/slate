@@ -18,7 +18,6 @@ import { startCase } from 'lodash'
  */
 
 function configure(pkg, env, target) {
-  const isDev = env === 'development'
   const isProd = env === 'production'
   const isUmd = target === 'umd'
   const isModule = target === 'module'
@@ -106,13 +105,13 @@ function configure(pkg, env, target) {
         {
           file: `packages/${pkg.name}/${pkg.module}`,
           format: 'es',
-          sourcemap: isDev,
+          sourcemap: true,
         },
         {
           file: `packages/${pkg.name}/${pkg.main}`,
           format: 'cjs',
           exports: 'named',
-          sourcemap: isDev,
+          sourcemap: true,
         },
       ],
       // We need to explicitly state which modules are external, meaning that

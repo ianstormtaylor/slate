@@ -27,6 +27,11 @@ const config = {
     rules: [
       {
         test: /\.js?$/,
+        use: 'source-map-loader',
+        enforce: 'pre',
+      },
+      {
+        test: /\.js?$/,
         use: {
           loader: 'babel-loader',
           options: {
