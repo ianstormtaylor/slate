@@ -34,8 +34,8 @@ describe('models', () => {
     })
   })
   describe('node', () => {
-    describe('by-key', () => {
-      const testsDir = resolve(__dirname, 'by-key')
+    describe('node', () => {
+      const testsDir = resolve(__dirname, 'node')
       const tests = fs
         .readdirSync(testsDir)
         .filter(t => t[0] != '.')
