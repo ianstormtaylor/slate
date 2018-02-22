@@ -146,22 +146,16 @@ Changes.deleteAtRange = (change, range, options = {}) => {
   // If the start and end key are the same, and it was a hanging selection, we
   // can just remove the entire block.
   if (startKey == endKey && isHanging) {
-    const startParent = change.value.document.getParent(startBlock.key)
     const nextBlock = change.value.document.getNextBlock(startBlock.key)
     change.removeNodeByKey(startBlock.key, { normalize })
     if (
       nextBlock &&
-      !change.value.document.getDescendant(startTextAsHangingFix.key)
+      !change.value.document.getDescendant(startTextAsHangingFix.key) &&
+      !normalize
     ) {
       change.insertNodeByKey(nextBlock.key, 0, startTextAsHangingFix, {
         normalize: false,
       })
-    }
-    if (normalize) {
-      change.normalizeNodeByKey(startParent.key)
-      if (change.value.document.getDescendant(nextBlock.key)) {
-        change.normalizeNodeByKey(nextBlock.key)
-      }
     }
     return
   } else if (startKey == endKey) {
@@ -267,7 +261,8 @@ Changes.deleteAtRange = (change, range, options = {}) => {
         change.removeNodeByKey(startBlock.key, { normalize: false })
         if (
           nextBlock &&
-          !change.value.document.getDescendant(startTextAsHangingFix.key)
+          !change.value.document.getDescendant(startTextAsHangingFix.key) &&
+          !normalize
         ) {
           change.insertNodeByKey(nextBlock.key, 0, startTextAsHangingFix, {
             normalize: false,
