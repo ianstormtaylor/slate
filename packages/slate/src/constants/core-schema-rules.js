@@ -93,32 +93,7 @@ const CORE_SCHEMA_RULES = [
   },
 
   /**
-   * Ensure that void nodes contain a text node with a single space of text.
-   *
-   * @type {Object}
-   */
-
-  {
-    validateNode(node) {
-      if (!node.isVoid) return
-      if (node.object != 'block' && node.object != 'inline') return
-      if (node.text == ' ' && node.nodes.size == 1) return
-
-      return change => {
-        const text = Text.create(' ')
-        const index = node.nodes.size
-
-        change.insertNodeByKey(node.key, index, text, { normalize: false })
-
-        node.nodes.forEach(child => {
-          change.removeNodeByKey(child.key, { normalize: false })
-        })
-      }
-    },
-  },
-
-  /**
-   * Ensure that inline nodes are never empty.
+   * Ensure that inline non-void nodes are never empty.
    *
    * This rule is applied to all blocks, because when they contain an empty
    * inline, we need to remove the inline from that parent block. If `validate`
@@ -131,9 +106,11 @@ const CORE_SCHEMA_RULES = [
   {
     validateNode(node) {
       if (node.object != 'block') return
+
       const invalids = node.nodes.filter(
-        n => n.object == 'inline' && n.text == ''
+        n => n.object === 'inline' && n.isVoid === false && n.text === ''
       )
+
       if (!invalids.size) return
 
       return change => {
@@ -167,7 +144,9 @@ const CORE_SCHEMA_RULES = [
 
         const prev = index > 0 ? node.nodes.get(index - 1) : null
         const next = node.nodes.get(index + 1)
-        // We don't test if "prev" is inline, since it has already been processed in the loop
+
+        // We don't test if "prev" is inline, since it has already been
+        // processed in the loop
         const insertBefore = !prev
         const insertAfter = !next || next.object == 'inline'
 

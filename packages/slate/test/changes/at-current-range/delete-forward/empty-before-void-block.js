@@ -21,7 +21,7 @@ export const output = (
   <value>
     <document>
       <image>
-        <cursor />{' '}
+        <cursor />
       </image>
     </document>
   </value>

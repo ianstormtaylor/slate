@@ -25,8 +25,9 @@ export const output = (
   <value>
     <document>
       <paragraph>
-        <cursor />
-        <emoji />
+        <emoji>
+          <cursor />word
+        </emoji>
       </paragraph>
     </document>
   </value>

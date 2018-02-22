@@ -10,10 +10,10 @@ export const input = (
   <value>
     <document>
       <image>
-        <anchor />{' '}
+        <anchor />
       </image>
       <image>
-        <focus />{' '}
+        <focus />
       </image>
       <paragraph>one</paragraph>
       <paragraph>two</paragraph>

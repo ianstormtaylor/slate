@@ -1692,7 +1692,7 @@ class Node {
    */
 
   hasVoidParent(key) {
-    return !!this.getClosest(key, parent => parent.isVoid)
+    return !!this.getClosestVoid(key)
   }
 
   /**
@@ -2071,7 +2071,6 @@ memoize(
     'getPreviousText',
     'getTextAtOffset',
     'getTextsAtRangeAsArray',
-    'hasVoidParent',
     'validate',
   ],
   {
