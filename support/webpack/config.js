@@ -1,6 +1,5 @@
 const path = require('path')
 const webpack = require('webpack')
-const CleanWebpackPlugin = require('clean-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const HtmlWebpackTemplate = require('html-webpack-template')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
@@ -62,7 +61,6 @@ const config = {
         'https://fonts.googleapis.com/icon?family=Material+Icons',
       ],
     }),
-    IS_PROD && new CleanWebpackPlugin([path.resolve(__dirname, '../../build')]),
     IS_PROD && new CopyWebpackPlugin(['examples/CNAME']),
     IS_DEV && new NamedModulesPlugin(),
     IS_DEV && new HotModuleReplacementPlugin(),
