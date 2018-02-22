@@ -1,6 +1,7 @@
 import { List } from 'immutable'
 
 import Block from '../models/block'
+import Text from '../models/text'
 import Inline from '../models/inline'
 import Mark from '../models/mark'
 import Node from '../models/node'
@@ -72,193 +73,343 @@ Changes.addMarksAtRange = (change, range, marks, options = {}) => {
 Changes.deleteAtRange = (change, range, options = {}) => {
   if (range.isCollapsed) return
 
+  const normalize = change.getFlag('normalize', options)
+  const { snapshot = true } = options
+
   // Snapshot the selection, which creates an extra undo save point, so that
   // when you undo a delete, the expanded selection will be retained.
-  change.snapshotSelection()
-
-  const normalize = change.getFlag('normalize', options)
-  const { value } = change
-  let { startKey, startOffset, endKey, endOffset } = range
-  let { document } = value
-  let isStartVoid = document.hasVoidParent(startKey)
-  let isEndVoid = document.hasVoidParent(endKey)
-  let startBlock = document.getClosestBlock(startKey)
-  let endBlock = document.getClosestBlock(endKey)
-
-  // Check if we have a "hanging" selection case where the even though the
-  // selection extends into the start of the end node, we actually want to
-  // ignore that for UX reasons.
-  const isHanging =
-    startOffset == 0 &&
-    endOffset == 0 &&
-    isStartVoid == false &&
-    startKey == startBlock.getFirstText().key &&
-    endKey == endBlock.getFirstText().key
-
-  // If it's a hanging selection, nudge it back to end in the previous text.
-  if (isHanging && isEndVoid) {
-    const prevText = document.getPreviousText(endKey)
-    endKey = prevText.key
-    endOffset = prevText.text.length
-    isEndVoid = document.hasVoidParent(endKey)
+  if (snapshot) {
+    change.snapshotSelection()
   }
 
-  // If the start node is inside a void node, remove the void node and update
-  // the starting point to be right after it, continuously until the start point
-  // is not a void, or until the entire range is handled.
-  while (isStartVoid) {
-    const startVoid = document.getClosestVoid(startKey)
-    const nextText = document.getNextText(startKey)
-    change.removeNodeByKey(startVoid.key, { normalize: false })
+  const { startKey, endKey } = range
+  const { document } = change.value
+  // Restore startKey in text block or in void block
+  const startTextPlaceHolder = normalize
+    ? null
+    : Text.create('').set('key', startKey)
+  const startTextPlaceHolderForVoid = normalize
+    ? null
+    : Text.create(' ').set('key', startKey)
 
-    // If the start and end keys are the same, we're done.
-    if (startKey == endKey) return
-
-    // If there is no next text node, we're done.
-    if (!nextText) return
-
-    // Continue...
-    document = change.value.document
-    startKey = nextText.key
-    startOffset = 0
-    isStartVoid = document.hasVoidParent(startKey)
+  // Normalize the Range;
+  // 1. backward
+  // 2. if in void nodes
+  if (range.isBackward) {
+    range = range.flip()
+  }
+  if (range.startOffset !== 0) {
+    const voidParent = document.getClosestVoid(startKey)
+    if (voidParent) {
+      range = range.moveAnchorToStartOf(voidParent)
+    }
+  }
+  if (range.endOffset !== 0) {
+    const voidParent = document.getClosestVoid(endKey)
+    if (voidParent) {
+      range = range.moveFocusToEndOf(voidParent)
+    }
   }
 
-  // If the end node is inside a void node, do the same thing but backwards. But
-  // we don't need any aborting checks because if we've gotten this far there
-  // must be a non-void node that will exit the loop.
-  while (isEndVoid) {
-    const endVoid = document.getClosestVoid(endKey)
-    const prevText = document.getPreviousText(endKey)
-    change.removeNodeByKey(endVoid.key, { normalize: false })
-
-    // Continue...
-    document = change.value.document
-    endKey = prevText.key
-    endOffset = prevText.text.length
-    isEndVoid = document.hasVoidParent(endKey)
+  const { startOffset, endOffset } = range
+  // Special rules for select all; Ensure nextText or beforeText exists for
+  // keep startText undeleted
+  if (startOffset === 0 && document.isStartByKey(startKey)) {
+    if (
+      document.isEndByKey(endKey) &&
+      document.getDescendant(endKey).text.length === endOffset
+    ) {
+      deleteAtRangeOfWholeDocument(change, options)
+      return
+    }
   }
 
-  // If the start and end key are the same, and it was a hanging selection, we
-  // can just remove the entire block.
-  if (startKey == endKey && isHanging) {
-    change.removeNodeByKey(startBlock.key, { normalize })
-    return
-  } else if (startKey == endKey) {
-    // Otherwise, if it wasn't hanging, we're inside a single text node, so we can
-    // simply remove the text in the range.
-    const index = startOffset
-    const length = endOffset - startOffset
-    change.removeTextByKey(startKey, index, length, { normalize })
-    return
-  } else {
-    // Otherwise, we need to recursively remove text and nodes inside the start
-    // block after the start offset and inside the end block before the end
-    // offset. Then remove any blocks that are in between the start and end
-    // blocks. Then finally merge the start and end nodes.
-    startBlock = document.getClosestBlock(startKey)
-    endBlock = document.getClosestBlock(endKey)
-    const startText = document.getNode(startKey)
-    const endText = document.getNode(endKey)
-    const startLength = startText.text.length - startOffset
-    const endLength = endOffset
-
-    const ancestor = document.getCommonAncestor(startKey, endKey)
-    const startChild = ancestor.getFurthestAncestor(startKey)
-    const endChild = ancestor.getFurthestAncestor(endKey)
-
-    const startParent = document.getParent(startBlock.key)
-    const startParentIndex = startParent.nodes.indexOf(startBlock)
-    const endParentIndex = startParent.nodes.indexOf(endBlock)
-
-    let child
-
-    // Iterate through all of the nodes in the tree after the start text node
-    // but inside the end child, and remove them.
-    child = startText
-
-    while (child.key != startChild.key) {
-      const parent = document.getParent(child.key)
-      const index = parent.nodes.indexOf(child)
-      const afters = parent.nodes.slice(index + 1)
-
-      afters.reverse().forEach(node => {
-        change.removeNodeByKey(node.key, { normalize: false })
+  // Rules for delete inside a text node
+  if (startKey === endKey) {
+    const voidParent = document.getClosestVoid(startKey)
+    if (!voidParent) {
+      // We are happy about the simplest case
+      change.removeTextByKey(startKey, startOffset, endOffset - startOffset, {
+        normalize,
       })
-
-      child = parent
+      return
     }
 
-    // Remove all of the middle children.
-    const startChildIndex = ancestor.nodes.indexOf(startChild)
-    const endChildIndex = ancestor.nodes.indexOf(endChild)
-    const middles = ancestor.nodes.slice(startChildIndex + 1, endChildIndex)
-
-    middles.reverse().forEach(node => {
-      change.removeNodeByKey(node.key, { normalize: false })
-    })
-
-    // Remove the nodes before the end text node in the tree.
-    child = endText
-
-    while (child.key != endChild.key) {
-      const parent = document.getParent(child.key)
-      const index = parent.nodes.indexOf(child)
-      const befores = parent.nodes.slice(0, index)
-
-      befores.reverse().forEach(node => {
-        change.removeNodeByKey(node.key, { normalize: false })
-      })
-
-      child = parent
+    const lonelyAncestor = wiserGetFurthestOnlyChildAncestor(
+      document,
+      voidParent.key
+    )
+    if (normalize) {
+      change.removeNodeByKey(lonelyAncestor.key, { normalize })
+      return
     }
 
-    // Remove any overlapping text content from the leaf text nodes.
-    if (startLength != 0) {
-      change.removeTextByKey(startKey, startOffset, startLength, {
+    // if normalize: false, then the startKey shall be restored
+    // If voidParent is a void inline, replace the inline with placeholder
+    // If voidParent is a void block, try to insert the startTextPlaceHolder to nearby
+    if (voidParent.object === 'inline') {
+      change.replaceNodeByKey(voidParent.key, startTextPlaceHolder, {
         normalize: false,
       })
+      return
+    }
+    change.removeNodeByKey(lonelyAncestor.key, { normalize })
+
+    // Restore startKey at blocks nearby
+    const nextBlock = document.getNextBlock(startKey)
+    if (nextBlock && !nextBlock.isVoid) {
+      change.insertNodeByKey(nextBlock.key, 0, startTextPlaceHolder, {
+        normalize,
+      })
+      return
+    }
+    const prevBlock = document.getPreviousBlock(startKey)
+    if (prevBlock && !prevBlock.isVoid) {
+      change.insertNodeByKey(
+        prevBlock.key,
+        prevBlock.nodes.size,
+        startTextPlaceHolder,
+        { normalize }
+      )
+      return
     }
 
-    if (endLength != 0) {
-      change.removeTextByKey(endKey, 0, endOffset, { normalize: false })
+    if (nextBlock) {
+      replaceVoidText(change, nextBlock, startTextPlaceHolderForVoid)
+      return
     }
+    replaceVoidText(change, prevBlock, startTextPlaceHolderForVoid)
+    return
+  }
 
-    // If the start and end blocks aren't the same, move and merge the end block
-    // into the start block.
-    if (startBlock.key != endBlock.key) {
-      document = change.value.document
-      const lonely = document.getFurthestOnlyChildAncestor(endBlock.key)
-
-      // Move the end block to be right after the start block.
-      if (endParentIndex != startParentIndex + 1) {
-        change.moveNodeByKey(
-          endBlock.key,
-          startParent.key,
-          startParentIndex + 1,
-          { normalize: false }
-        )
-      }
-
-      // If the selection is hanging, just remove the start block, otherwise
-      // merge the end block into it.
-      if (isHanging) {
-        change.removeNodeByKey(startBlock.key, { normalize: false })
-      } else {
-        change.mergeNodeByKey(endBlock.key, { normalize: false })
-      }
-
-      // If nested empty blocks are left over above the end block, remove them.
-      if (lonely) {
-        change.removeNodeByKey(lonely.key, { normalize: false })
-      }
-    }
-
-    // If we should normalize, do it now after everything.
-    if (normalize) {
-      change.normalizeNodeByKey(ancestor.key)
+  // Determine the first and the last completely removed text key
+  // as firstRemovedText and lastRemovedText
+  const startBlock = document.getClosestBlock(startKey)
+  const endBlock = document.getClosestBlock(endKey)
+  const startText = document.getDescendant(startKey)
+  let firstRemovedText = document.getNextText(startKey)
+  if (document.getClosestVoid(startKey)) {
+    firstRemovedText = startText
+  }
+  if (startOffset === 0) {
+    // when startBlock is deleted
+    if (startBlock !== endBlock && startBlock.isStartByKey(startKey)) {
+      firstRemovedText = startText
     }
   }
+  // Determine the last Removed Text as lastRemovedText
+  const endText = document.getDescendant(endKey)
+  let lastRemovedText = document.getPreviousText(endKey)
+  if (document.getClosestVoid(endKey)) {
+    if (endOffset !== 0) {
+      lastRemovedText = endText
+    }
+  }
+  if (endBlock.isVoid) {
+    // Delete the end void Block if the start is not hanging
+    if (startOffset !== 0 || !startBlock.isStartByKey(startKey)) {
+      lastRemovedText = endText
+    }
+    // Delete the end void Block if the start is also a void block
+    if (startBlock.isVoid) {
+      lastRemovedText = endText
+    }
+  }
+
+  if (
+    document.areDescendantsSorted(firstRemovedText.key, lastRemovedText.key) ||
+    firstRemovedText === lastRemovedText
+  ) {
+    change.deleteNodesBetween(firstRemovedText.key, lastRemovedText.key, {
+      normalize: false,
+    })
+  }
+
+  if (firstRemovedText !== startText) {
+    change.removeTextByKey(
+      startKey,
+      startOffset,
+      startText.text.length - startOffset,
+      { normalize: false }
+    )
+  }
+
+  if (lastRemovedText.key !== endKey) {
+    change.removeTextByKey(endKey, 0, endOffset, { normalize: false })
+  }
+
+  // If normalize: false, restore the startKey
+  while (!normalize && !change.value.document.getDescendant(startKey)) {
+    let newStartBlock = change.value.document.getDescendant(startBlock.key)
+    if (!newStartBlock) {
+      newStartBlock = document.getPreviousBlock(startBlock.key)
+    }
+    // Restore startKey at text blocks first; then try void block
+    if (newStartBlock && !newStartBlock.isVoid) {
+      change.insertNodeByKey(
+        newStartBlock,
+        newStartBlock.nodes.size,
+        startTextPlaceHolder,
+        { normalize: false }
+      )
+      break
+    }
+
+    let newEndBlock = change.value.document.getDescendant(endBlock.key)
+    if (!newEndBlock) {
+      newEndBlock = document.getNextBlock(endBlock.key)
+    }
+    if (newEndBlock && !newEndBlock.isVoid) {
+      change.insertNodeByKey(newEndBlock.key, 0, startTextPlaceHolder, {
+        normalize: false,
+      })
+      break
+    }
+
+    // OK, I hate void nodes...
+    if (newStartBlock) {
+      replaceVoidText(change, newStartBlock, startTextPlaceHolderForVoid)
+      break
+    }
+    replaceVoidText(change, newEndBlock, startTextPlaceHolderForVoid)
+    break
+  }
+
+  // Connect when and only when startBlock and endBlock are different
+  if (
+    startBlock !== endBlock &&
+    !startBlock.isVoid &&
+    !endBlock.isVoid &&
+    change.value.document.getDescendant(startBlock.key) &&
+    change.value.document.getDescendant(endBlock.key)
+  ) {
+    let isHanging = endOffset === 0 && endBlock.isStartByKey(endKey)
+    isHanging =
+      isHanging && startBlock.isStartByKey(startKey) && startOffset === 0
+    if (!isHanging) {
+      const newEndBlock = change.value.document.getDescendant(endBlock.key)
+      const newStartBlock = change.value.document.getDescendant(startBlock.key)
+      newEndBlock.nodes.forEach((c, index) =>
+        change.moveNodeByKey(
+          c.key,
+          newStartBlock.key,
+          newStartBlock.nodes.size + index,
+          { normalize: false }
+        )
+      )
+      const endBlockLonly = wiserGetFurthestOnlyChildAncestor(
+        change.value.document,
+        endBlock.key
+      )
+      change.removeNodeByKey(endBlockLonly.key, { normalize: false })
+    }
+  }
+
+  if (normalize) {
+    const commonAncestor = document.getCommonAncestor(startKey, endKey)
+    if (commonAncestor.object === 'document') {
+      change.normalize()
+      return
+    }
+    if (change.value.document.getDescendant(commonAncestor.key)) {
+      change.normalizeNodeByKey(commonAncestor.key)
+      return
+    }
+    if (document.hasChild(commonAncestor.key)) {
+      change.normalize()
+      return
+    }
+    const parent = change.value.document.getDescendant(
+      document.getParent(commonAncestor.key).key
+    )
+    change.normalizeNodeByKey(parent.key)
+  }
+  return
+}
+
+function replaceVoidText(change, voidNode, text) {
+  change.replaceNodeByKey(voidNode.key, voidNode.set('nodes', List.of(text)), {
+    normalize: false,
+  })
+}
+
+function deleteAtRangeOfWholeDocument(change, options) {
+  const normalize = change.getFlag('normalize', options)
+  const { document, selection } = change.value
+  const startText = document.getFirstText()
+  const startTextPlaceHolder = Text.create('').set('key', startText.key)
+  const startTextPlaceHolderForVoid = Text.create(' ').set('key', startText.key)
+  const lastUnvoidText = document
+    .getTexts()
+    .findLast(t => !document.getClosestBlock(t.key).isVoid)
+
+  if (!lastUnvoidText && normalize) {
+    document.nodes.forEach(n =>
+      change.removeNodeByKey(n.key, { normalize: false })
+    )
+    change.normalize()
+    return
+  }
+
+  const voidInline = lastUnvoidText
+    ? null
+    : document.getClosestVoid(lastUnvoidText.key)
+  const replacedAncestors = document.getAncestors(
+    !lastUnvoidText
+      ? document.getLastText().key
+      : voidInline ? voidInline.key : lastUnvoidText.key
+  )
+  const placeHolder = lastUnvoidText
+    ? startTextPlaceHolder
+    : startTextPlaceHolderForVoid
+  let replacedNode = placeHolder
+  replacedAncestors.findLast(n => {
+    if (n.object === 'document') return true
+    replacedNode = n.set('nodes', List.of(replacedNode))
+  })
+  document.nodes.forEach(n => {
+    if (n.key == replacedNode.key) {
+      change.replaceNodeByKey(replacedNode.key, replacedNode)
+      return
+    }
+    change.removeNodeByKey(n.key)
+  })
+  change.collapseToStartOf(change.value.document.getFirstText())
+  if (selection.isFocused) {
+    change.focus()
+  }
+  if (normalize) {
+    change.normalize()
+  }
+  return
+}
+
+function wiserGetFurthestOnlyChildAncestor(node, key) {
+  const child = node.getDescendant(key)
+  if (!child) return null
+  const ancestors = node.getAncestors(key)
+  let result = child
+  if (!child.getFirstText()) {
+    ancestors.shift().findLast(n => {
+      const valids = n.nodes.filter(
+        c => c.object !== 'text' || c.text.length > 0 || c === result
+      )
+      if (valids.size === 1 && valids.first() === result) {
+        result = n
+        return false
+      }
+      return true
+    })
+    return result
+  }
+  ancestors.shift().findLast(n => {
+    if (n.isStartByKey(key) && n.isEndByKey(key)) {
+      result = n
+      return false
+    }
+    return true
+  })
+  return result
 }
 
 /**
@@ -410,10 +561,7 @@ Changes.deleteBackwardAtRange = (change, range, n = 1, options = {}) => {
     // If we're deleting by one character and the previous text node is not
     // inside the current block, we need to merge the two blocks together.
     if (n == 1 && prevBlock != block) {
-      range = range.merge({
-        anchorKey: prev.key,
-        anchorOffset: prev.text.length,
-      })
+      range = range.moveAnchorToEndOf(prev)
 
       change.deleteAtRange(range, { normalize })
       return
