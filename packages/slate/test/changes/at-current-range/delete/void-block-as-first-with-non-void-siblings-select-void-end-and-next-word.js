@@ -10,7 +10,6 @@ export const input = (
   <value>
     <document>
       <image>
-        {' '}
         <anchor />
       </image>
       <paragraph>

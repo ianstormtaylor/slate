@@ -23,7 +23,7 @@ export const output = (
   <value>
     <document>
       <image>
-        <cursor />{' '}
+        <cursor />word
       </image>
     </document>
   </value>

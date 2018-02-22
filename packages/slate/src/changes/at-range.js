@@ -298,25 +298,8 @@ Changes.deleteLineBackwardAtRange = (change, range, options) => {
   const { startKey, startOffset } = range
   const startBlock = document.getClosestBlock(startKey)
   const offset = startBlock.getOffset(startKey)
-  const startWithVoidInline =
-    startBlock.nodes.size > 1 &&
-    startBlock.nodes.get(0).text == '' &&
-    startBlock.nodes.get(1).object == 'inline'
-
-  let o = offset + startOffset
-
-  // If line starts with an void inline node, the text node inside this inline
-  // node disturbs the offset. Ignore this inline node and delete it afterwards.
-  if (startWithVoidInline) {
-    o -= 1
-  }
-
+  const o = offset + startOffset
   change.deleteBackwardAtRange(range, o, options)
-
-  // Delete the remaining first inline node if needed.
-  if (startWithVoidInline) {
-    change.deleteBackward()
-  }
 }
 
 /**
@@ -362,24 +345,19 @@ Changes.deleteBackwardAtRange = (change, range, n = 1, options = {}) => {
     return
   }
 
+  const voidParent = document.getClosestVoid(startKey)
+
+  // If there is a void parent, delete it.
+  if (voidParent) {
+    change.removeNodeByKey(voidParent.key, { normalize })
+    return
+  }
+
   const block = document.getClosestBlock(startKey)
 
-  // If the closest block is void, delete it.
-  if (block && block.isVoid) {
-    change.removeNodeByKey(block.key, { normalize })
-    return
-  }
-
   // If the closest is not void, but empty, remove it
-  if (block && !block.isVoid && block.isEmpty && document.nodes.size !== 1) {
+  if (block && block.isEmpty && document.nodes.size !== 1) {
     change.removeNodeByKey(block.key, { normalize })
-    return
-  }
-
-  // If the closest inline is void, delete it.
-  const inline = document.getClosestInline(startKey)
-  if (inline && inline.isVoid) {
-    change.removeNodeByKey(inline.key, { normalize })
     return
   }
 
@@ -394,17 +372,11 @@ Changes.deleteBackwardAtRange = (change, range, n = 1, options = {}) => {
   if (range.isAtStartOf(text)) {
     const prev = document.getPreviousText(text.key)
     const prevBlock = document.getClosestBlock(prev.key)
-    const prevInline = document.getClosestInline(prev.key)
+    const prevVoid = document.getClosestVoid(prev.key)
 
-    // If the previous block is void, remove it.
-    if (prevBlock && prevBlock.isVoid) {
-      change.removeNodeByKey(prevBlock.key, { normalize })
-      return
-    }
-
-    // If the previous inline is void, remove it.
-    if (prevInline && prevInline.isVoid) {
-      change.removeNodeByKey(prevInline.key, { normalize })
+    // If the previous text node has a void parent, remove it.
+    if (prevVoid) {
+      change.removeNodeByKey(prevVoid.key, { normalize })
       return
     }
 
@@ -447,13 +419,6 @@ Changes.deleteBackwardAtRange = (change, range, n = 1, options = {}) => {
     } else {
       traversed = next
     }
-  }
-
-  // If the focus node is inside a void, go up until right after it.
-  if (document.hasVoidParent(node.key)) {
-    const parent = document.getClosestVoid(node.key)
-    node = document.getNextText(parent.key)
-    offset = 0
   }
 
   range = range.merge({
@@ -548,28 +513,23 @@ Changes.deleteForwardAtRange = (change, range, n = 1, options = {}) => {
     return
   }
 
-  const block = document.getClosestBlock(startKey)
+  const voidParent = document.getClosestVoid(startKey)
 
-  // If the closest block is void, delete it.
-  if (block && block.isVoid) {
-    change.removeNodeByKey(block.key, { normalize })
+  // If the node has a void parent, delete it.
+  if (voidParent) {
+    change.removeNodeByKey(voidParent.key, { normalize })
     return
   }
 
+  const block = document.getClosestBlock(startKey)
+
   // If the closest is not void, but empty, remove it
-  if (block && !block.isVoid && block.isEmpty && document.nodes.size !== 1) {
+  if (block && block.isEmpty && document.nodes.size !== 1) {
     const nextBlock = document.getNextBlock(block.key)
     change.removeNodeByKey(block.key, { normalize })
     if (nextBlock && nextBlock.key) {
       change.moveToStartOf(nextBlock)
     }
-    return
-  }
-
-  // If the closest inline is void, delete it.
-  const inline = document.getClosestInline(startKey)
-  if (inline && inline.isVoid) {
-    change.removeNodeByKey(inline.key, { normalize })
     return
   }
 
@@ -584,17 +544,11 @@ Changes.deleteForwardAtRange = (change, range, n = 1, options = {}) => {
   if (range.isAtEndOf(text)) {
     const next = document.getNextText(text.key)
     const nextBlock = document.getClosestBlock(next.key)
-    const nextInline = document.getClosestInline(next.key)
+    const nextVoid = document.getClosestVoid(next.key)
 
-    // If the previous block is void, remove it.
-    if (nextBlock && nextBlock.isVoid) {
-      change.removeNodeByKey(nextBlock.key, { normalize })
-      return
-    }
-
-    // If the previous inline is void, remove it.
-    if (nextInline && nextInline.isVoid) {
-      change.removeNodeByKey(nextInline.key, { normalize })
+    // If the next text node has a void parent, remove it.
+    if (nextVoid) {
+      change.removeNodeByKey(nextVoid.key, { normalize })
       return
     }
 

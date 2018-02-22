@@ -11,7 +11,7 @@ export const input = (
     <document>
       <paragraph>
         <emoji>
-          <anchor />{' '}
+          <anchor />
         </emoji>
         <focus />abc
       </paragraph>

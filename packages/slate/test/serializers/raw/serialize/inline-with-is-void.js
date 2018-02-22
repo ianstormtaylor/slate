@@ -45,7 +45,7 @@ export const output = {
                 leaves: [
                   {
                     object: 'leaf',
-                    text: ' ',
+                    text: '',
                     marks: [],
                   },
                 ],
