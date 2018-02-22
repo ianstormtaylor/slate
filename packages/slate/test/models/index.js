@@ -43,9 +43,8 @@ describe('models', () => {
 
       for (const test of tests) {
         it(test, async () => {
-          const module = require(resolve(testsDir, test))
-          const { actual, expected } = module
-          assert.deepEqual(actual, expected)
+          const { runTest } = require(resolve(testsDir, test))
+          runTest()
         })
       }
     })

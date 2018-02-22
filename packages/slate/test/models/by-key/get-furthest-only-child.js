@@ -1,20 +1,20 @@
 /** @jsx h */
 
 import h from '../../helpers/h'
+import assert from 'assert'
 
-const { document } = (
-  <value>
-    <document>
-      <paragraph>Some Text</paragraph>
-    </document>
-  </value>
-)
-const pNode = document.nodes.first()
-const textNode = pNode.getFirstText()
+export function runTest() {
+  const { document } = (
+    <value>
+      <document>
+        <paragraph>Some Text</paragraph>
+      </document>
+    </value>
+  )
+  const pNode = document.nodes.first()
+  const textNode = pNode.getFirstText()
 
-export const actual = [
-  document.getFurthestOnlyChildAncestor(pNode.key),
-  pNode.getFurthestOnlyChildAncestor(textNode.key),
-  document.getFurthestOnlyChildAncestor(textNode.key),
-]
-export const expected = [null, null, pNode]
+  assert.equal(document.getFurthestOnlyChildAncestor(pNode.key), null)
+  assert.equal(pNode.getFurthestOnlyChildAncestor(textNode.key), null)
+  assert.equal(document.getFurthestOnlyChildAncestor(textNode.key), pNode)
+}
