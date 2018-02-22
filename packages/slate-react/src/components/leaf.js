@@ -127,7 +127,7 @@ class Leaf extends React.Component {
     // to support expected plain text.
     if (
       text === '' &&
-      parent.kind === 'block' &&
+      parent.object === 'block' &&
       parent.text === '' &&
       parent.nodes.size === 1
     ) {
