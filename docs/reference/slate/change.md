@@ -135,19 +135,19 @@ Insert a string of `text` at the current selection. If the selection is expanded
 
 Add a [`mark`](./mark.md) to the characters in the current selection. For convenience, you can pass a `type` string or `properties` object to implicitly create a [`Mark`](./mark.md) of that type.
 
-### `setBlock`
+### `setBlocks`
 
-`setBlock(properties: Object) => Change` <br/>
-`setBlock(type: String) => Change`
+`setBlocks(properties: Object) => Change` <br/>
+`setBlocks(type: String) => Change`
 
-Set the `properties` of the [`Block`](./block.md) in the current selection. For convenience, you can pass a `type` string to set the blocks's type only.
+Set the `properties` of the [`Blocks`](./block.md) in the current selection. For convenience, you can pass a `type` string to set the blocks' type only.
 
-### `setInline`
+### `setInlines`
 
-`setInline(properties: Object) => Change` <br/>
-`setInline(type: String) => Change`
+`setInlines(properties: Object) => Change` <br/>
+`setInlines(type: String) => Change`
 
-Set the `properties` of the [`Inline`](./inline.md) nodes in the current selection. For convenience, you can pass a `type` string to set the inline's type only.
+Set the `properties` of the [`Inlines`](./inline.md) nodes in the current selection. For convenience, you can pass a `type` string to set the inline nodes' type only.
 
 ### `splitBlock`
 
@@ -368,19 +368,19 @@ Insert a string of `text` at a `range`. If the selection is expanded, it will be
 
 Add a [`mark`](./mark.md) to the characters in a `range`. For convenience, you can pass a `type` string or `properties` object to implicitly create a [`Mark`](./mark.md) of that type.
 
-### `setBlockAtRange`
+### `setBlocksAtRange`
 
-`setBlockAtRange(range: Range, properties: Object) => Change` <br/>
-`setBlock(range: Range, type: String) => Change`
+`setBlocksAtRange(range: Range, properties: Object) => Change` <br/>
+`setBlocks(range: Range, type: String) => Change`
 
-Set the `properties` of the [`Block`](./block.md) in a `range`. For convenience, you can pass a `type` string to set the blocks's type only.
+Set the `properties` of the [`Blocks`](./block.md) in a `range`. For convenience, you can pass a `type` string to set the blocks' type only.
 
-### `setInlineAtRange`
+### `setInlinesAtRange`
 
-`setInlineAtRange(range: Range, properties: Object) => Change` <br/>
-`setInline(range: Range, type: String) => Change`
+`setInlinesAtRange(range: Range, properties: Object) => Change` <br/>
+`setInlines(range: Range, type: String) => Change`
 
-Set the `properties` of the [`Inline`](./inline.md) nodes in a `range`. For convenience, you can pass a `type` string to set the inline's type only.
+Set the `properties` of the [`Inlines`](./inline.md) nodes in a `range`. For convenience, you can pass a `type` string to set the inline nodes' type only.
 
 ### `splitBlockAtRange`
 

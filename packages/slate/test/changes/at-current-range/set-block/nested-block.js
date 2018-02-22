@@ -3,7 +3,7 @@
 import h from '../../../helpers/h'
 
 export default function(change) {
-  change.setBlock({ type: 'code' })
+  change.setBlocks({ type: 'code' })
 }
 
 export const input = (

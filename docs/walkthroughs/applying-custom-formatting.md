@@ -25,7 +25,7 @@ class App extends React.Component {
     event.preventDefault()
     const isCode = change.value.blocks.some(block => block.type == 'code')
 
-    change.setBlock(isCode ? 'paragraph' : 'code')
+    change.setBlocks(isCode ? 'paragraph' : 'code')
     return true
   }
 
@@ -76,7 +76,7 @@ class App extends React.Component {
       case '`': {
         const isCode = change.value.blocks.some(block => block.type == 'code')
         event.preventDefault()
-        change.setBlock(isCode ? 'paragraph' : 'code')
+        change.setBlocks(isCode ? 'paragraph' : 'code')
         return true
       }
     }
@@ -143,7 +143,7 @@ class App extends React.Component {
       case '`': {
         const isCode = change.value.blocks.some(block => block.type == 'code')
         event.preventDefault()
-        value.setBlock(isCode ? 'paragraph' : 'code')
+        value.setBlocks(isCode ? 'paragraph' : 'code')
         return true
       }
     }
