@@ -1,4 +1,4 @@
-examples/build.*.js
+build/
 node_modules/
 package.json
 packages/*/dist/
