@@ -497,7 +497,7 @@ class Text extends Record(DEFAULTS) {
   }
 
   /**
-   * The first descendant key requiring validation
+   * Get the first invalid descendant
    * PREF: Do not cache this method; because it can cause cycle reference
    *
    * @param {Schema} schema

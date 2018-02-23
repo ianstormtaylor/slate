@@ -1989,7 +1989,7 @@ class Node {
   }
 
   /**
-   * The first descendant key requiring validation
+   * Get the first invalid descendant
    *
    * @param {Schema} schema
    * @return {Node|Text|Null}
