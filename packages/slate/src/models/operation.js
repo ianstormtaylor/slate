@@ -1,4 +1,3 @@
-
 import isPlainObject from 'is-plain-object'
 import logger from 'slate-dev-logger'
 import { List, Record } from 'immutable'
@@ -40,7 +39,6 @@ const DEFAULTS = {
  */
 
 class Operation extends Record(DEFAULTS) {
-
   /**
    * Create a new `Operation` with `attrs`.
    *
@@ -57,7 +55,9 @@ class Operation extends Record(DEFAULTS) {
       return Operation.fromJSON(attrs)
     }
 
-    throw new Error(`\`Operation.create\` only accepts objects or operations, but you passed it: ${attrs}`)
+    throw new Error(
+      `\`Operation.create\` only accepts objects or operations, but you passed it: ${attrs}`
+    )
   }
 
   /**
@@ -73,7 +73,9 @@ class Operation extends Record(DEFAULTS) {
       return list
     }
 
-    throw new Error(`\`Operation.createList\` only accepts arrays or lists, but you passed it: ${elements}`)
+    throw new Error(
+      `\`Operation.createList\` only accepts arrays or lists, but you passed it: ${elements}`
+    )
   }
 
   /**
@@ -93,7 +95,9 @@ class Operation extends Record(DEFAULTS) {
     const attrs = { type }
 
     if (!ATTRIBUTES) {
-      throw new Error(`\`Operation.fromJSON\` was passed an unrecognized operation type: "${type}"`)
+      throw new Error(
+        `\`Operation.fromJSON\` was passed an unrecognized operation type: "${type}"`
+      )
     }
 
     for (const key of ATTRIBUTES) {
@@ -107,7 +111,9 @@ class Operation extends Record(DEFAULTS) {
         if (key == 'value') continue
         if (key == 'node' && type != 'insert_node') continue
 
-        throw new Error(`\`Operation.fromJSON\` was passed a "${type}" operation without the required "${key}" attribute.`)
+        throw new Error(
+          `\`Operation.fromJSON\` was passed a "${type}" operation without the required "${key}" attribute.`
+        )
       }
 
       if (key == 'mark') {
@@ -130,6 +136,10 @@ class Operation extends Record(DEFAULTS) {
         v = Value.create(v)
       }
 
+      if (key == 'properties' && type == 'merge_node') {
+        v = Node.createProperties(v)
+      }
+
       if (key == 'properties' && type == 'set_mark') {
         v = Mark.createProperties(v)
       }
@@ -143,20 +153,22 @@ class Operation extends Record(DEFAULTS) {
         v = Range.createProperties(rest)
 
         if (anchorKey !== undefined) {
-          v.anchorPath = anchorKey === null
-            ? null
-            : value.document.getPath(anchorKey)
+          v.anchorPath =
+            anchorKey === null ? null : value.document.getPath(anchorKey)
         }
 
         if (focusKey !== undefined) {
-          v.focusPath = focusKey === null
-            ? null
-            : value.document.getPath(focusKey)
+          v.focusPath =
+            focusKey === null ? null : value.document.getPath(focusKey)
         }
       }
 
       if (key == 'properties' && type == 'set_value') {
         v = Value.createProperties(v)
+      }
+
+      if (key == 'properties' && type == 'split_node') {
+        v = Node.createProperties(v)
       }
 
       attrs[key] = v
@@ -205,7 +217,10 @@ class Operation extends Record(DEFAULTS) {
   }
 
   get kind() {
-    logger.deprecate('slate@0.32.0', 'The `kind` property of Slate objects has been renamed to `object`.')
+    logger.deprecate(
+      'slate@0.32.0',
+      'The `kind` property of Slate objects has been renamed to `object`.'
+    )
     return this.object
   }
 
@@ -235,6 +250,13 @@ class Operation extends Record(DEFAULTS) {
         value = value.toJSON()
       }
 
+      if (key == 'properties' && type == 'merge_node') {
+        const v = {}
+        if ('data' in value) v.data = value.data.toJS()
+        if ('type' in value) v.type = value.type
+        value = v
+      }
+
       if (key == 'properties' && type == 'set_mark') {
         const v = {}
         if ('data' in value) v.data = value.data.toJS()
@@ -258,7 +280,8 @@ class Operation extends Record(DEFAULTS) {
         if ('focusPath' in value) v.focusPath = value.focusPath
         if ('isBackward' in value) v.isBackward = value.isBackward
         if ('isFocused' in value) v.isFocused = value.isFocused
-        if ('marks' in value) v.marks = value.marks == null ? null : value.marks.toJSON()
+        if ('marks' in value)
+          v.marks = value.marks == null ? null : value.marks.toJSON()
         value = v
       }
 
@@ -267,6 +290,13 @@ class Operation extends Record(DEFAULTS) {
         if ('data' in value) v.data = value.data.toJS()
         if ('decorations' in value) v.decorations = value.decorations.toJS()
         if ('schema' in value) v.schema = value.schema.toJS()
+        value = v
+      }
+
+      if (key == 'properties' && type == 'split_node') {
+        const v = {}
+        if ('data' in value) v.data = value.data.toJS()
+        if ('type' in value) v.type = value.type
         value = v
       }
 
@@ -283,7 +313,6 @@ class Operation extends Record(DEFAULTS) {
   toJS(options) {
     return this.toJSON(options)
   }
-
 }
 
 /**

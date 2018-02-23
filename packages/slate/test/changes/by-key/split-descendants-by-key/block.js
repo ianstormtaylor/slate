@@ -2,7 +2,7 @@
 
 import h from '../../../helpers/h'
 
-export default function (change) {
+export default function(change) {
   change.splitDescendantsByKey('a', 'b', 2)
 }
 
@@ -19,12 +19,8 @@ export const input = (
 export const output = (
   <value>
     <document>
-      <paragraph>
-        wo
-      </paragraph>
-      <paragraph>
-        rd
-      </paragraph>
+      <paragraph>wo</paragraph>
+      <paragraph>rd</paragraph>
     </document>
   </value>
 )

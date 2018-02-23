@@ -6,10 +6,10 @@ export const schema = {
   blocks: {
     paragraph: {
       data: {
-        thing: v => v == 'value'
+        thing: v => v == 'value',
       },
-    }
-  }
+    },
+  },
 }
 
 export const input = (

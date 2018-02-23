@@ -6,16 +6,14 @@ export const schema = {
   blocks: {
     paragraph: {
       text: /^\d*$/,
-    }
-  }
+    },
+  },
 }
 
 export const input = (
   <value>
     <document>
-      <paragraph>
-        invalid
-      </paragraph>
+      <paragraph>invalid</paragraph>
     </document>
   </value>
 )

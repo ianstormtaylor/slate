@@ -1,4 +1,3 @@
-
 /** @jsx h */
 
 import h from '../helpers/h'
@@ -30,9 +29,9 @@ export const config = {
             }
           }
         }
-      }
-    }
-  ]
+      },
+    },
+  ],
 }
 
 export const input = `
@@ -43,7 +42,9 @@ export const output = (
   <value>
     <document>
       <paragraph>
-        o<i>n<b>e</b></i>
+        o<i>
+          n<b>e</b>
+        </i>
       </paragraph>
     </document>
   </value>

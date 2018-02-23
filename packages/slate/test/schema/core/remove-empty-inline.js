@@ -33,11 +33,11 @@ export const output = {
                 object: 'leaf',
                 text: '',
                 marks: [],
-              }
-            ]
+              },
+            ],
           },
-        ]
-      }
-    ]
-  }
+        ],
+      },
+    ],
+  },
 }

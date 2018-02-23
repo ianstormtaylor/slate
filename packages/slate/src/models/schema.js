@@ -1,4 +1,3 @@
-
 import Debug from 'debug'
 import isPlainObject from 'is-plain-object'
 import logger from 'slate-dev-logger'
@@ -55,7 +54,6 @@ const DEFAULTS = {
  */
 
 class Schema extends Record(DEFAULTS) {
-
   /**
    * Create a new `Schema` with `attrs`.
    *
@@ -72,7 +70,9 @@ class Schema extends Record(DEFAULTS) {
       return Schema.fromJSON(attrs)
     }
 
-    throw new Error(`\`Schema.create\` only accepts objects or schemas, but you passed it: ${attrs}`)
+    throw new Error(
+      `\`Schema.create\` only accepts objects or schemas, but you passed it: ${attrs}`
+    )
   }
 
   /**
@@ -90,11 +90,15 @@ class Schema extends Record(DEFAULTS) {
     let { plugins } = object
 
     if (object.rules) {
-      throw new Error('Schemas in Slate have changed! They are no longer accept a `rules` property.')
+      throw new Error(
+        'Schemas in Slate have changed! They are no longer accept a `rules` property.'
+      )
     }
 
     if (object.nodes) {
-      throw new Error('Schemas in Slate have changed! They are no longer accept a `nodes` property.')
+      throw new Error(
+        'Schemas in Slate have changed! They are no longer accept a `nodes` property.'
+      )
     }
 
     if (!plugins) {
@@ -102,7 +106,7 @@ class Schema extends Record(DEFAULTS) {
     }
 
     const schema = resolveSchema(plugins)
-    const stack = Stack.create({ plugins: [ ...CORE_SCHEMA_RULES, ...plugins ] })
+    const stack = Stack.create({ plugins: [...CORE_SCHEMA_RULES, ...plugins] })
     const ret = new Schema({ ...schema, stack })
     return ret
   }
@@ -135,7 +139,10 @@ class Schema extends Record(DEFAULTS) {
   }
 
   get kind() {
-    logger.deprecate('slate@0.32.0', 'The `kind` property of Slate objects has been renamed to `object`.')
+    logger.deprecate(
+      'slate@0.32.0',
+      'The `kind` property of Slate objects has been renamed to `object`.'
+    )
     return this.object
   }
 
@@ -148,9 +155,12 @@ class Schema extends Record(DEFAULTS) {
 
   getRule(object) {
     switch (object.object) {
-      case 'document': return this.document
-      case 'block': return this.blocks[object.type]
-      case 'inline': return this.inlines[object.type]
+      case 'document':
+        return this.document
+      case 'block':
+        return this.blocks[object.type]
+      case 'inline':
+        return this.inlines[object.type]
     }
   }
 
@@ -188,7 +198,7 @@ class Schema extends Record(DEFAULTS) {
    */
 
   fail(violation, context) {
-    return (change) => {
+    return change => {
       debug(`normalizing`, { violation, context })
       const { rule } = context
       const { size } = change.operations
@@ -216,7 +226,9 @@ class Schema extends Record(DEFAULTS) {
       case LAST_CHILD_OBJECT_INVALID:
       case LAST_CHILD_TYPE_INVALID: {
         const { child, node } = context
-        return child.object == 'text' && node.object == 'block' && node.nodes.size == 1
+        return child.object == 'text' &&
+          node.object == 'block' &&
+          node.nodes.size == 1
           ? change.removeNodeByKey(node.key)
           : change.removeNodeByKey(child.key)
       }
@@ -245,7 +257,9 @@ class Schema extends Record(DEFAULTS) {
 
       case NODE_MARK_INVALID: {
         const { node, mark } = context
-        return node.getTexts().forEach(t => change.removeMarkByKey(t.key, 0, t.text.length, mark))
+        return node
+          .getTexts()
+          .forEach(t => change.removeMarkByKey(t.key, 0, t.text.length, mark))
       }
     }
   }
@@ -365,15 +379,30 @@ class Schema extends Record(DEFAULTS) {
       }
 
       while (nextChild()) {
-        if (parents != null && child.object != 'text' && child.type in parents) {
+        if (
+          parents != null &&
+          child.object != 'text' &&
+          child.type in parents
+        ) {
           const r = parents[child.type]
 
-          if (r.parent.objects != null && !r.parent.objects.includes(node.object)) {
-            return this.fail(PARENT_OBJECT_INVALID, { node: child, parent: node, rule: r })
+          if (
+            r.parent.objects != null &&
+            !r.parent.objects.includes(node.object)
+          ) {
+            return this.fail(PARENT_OBJECT_INVALID, {
+              node: child,
+              parent: node,
+              rule: r,
+            })
           }
 
           if (r.parent.types != null && !r.parent.types.includes(node.type)) {
-            return this.fail(PARENT_TYPE_INVALID, { node: child, parent: node, rule: r })
+            return this.fail(PARENT_TYPE_INVALID, {
+              node: child,
+              parent: node,
+              rule: r,
+            })
           }
         }
 
@@ -436,7 +465,6 @@ class Schema extends Record(DEFAULTS) {
   toJS() {
     return this.toJSON()
   }
-
 }
 
 /**
@@ -453,34 +481,41 @@ function resolveSchema(plugins = []) {
     inlines: {},
   }
 
-  plugins.slice().reverse().forEach((plugin) => {
-    if (!plugin.schema) return
+  plugins
+    .slice()
+    .reverse()
+    .forEach(plugin => {
+      if (!plugin.schema) return
 
-    if (plugin.schema.rules) {
-      throw new Error('Schemas in Slate have changed! They are no longer accept a `rules` property.')
-    }
+      if (plugin.schema.rules) {
+        throw new Error(
+          'Schemas in Slate have changed! They are no longer accept a `rules` property.'
+        )
+      }
 
-    if (plugin.schema.nodes) {
-      throw new Error('Schemas in Slate have changed! They are no longer accept a `nodes` property.')
-    }
+      if (plugin.schema.nodes) {
+        throw new Error(
+          'Schemas in Slate have changed! They are no longer accept a `nodes` property.'
+        )
+      }
 
-    const { document = {}, blocks = {}, inlines = {}} = plugin.schema
-    const d = resolveDocumentRule(document)
-    const bs = {}
-    const is = {}
+      const { document = {}, blocks = {}, inlines = {} } = plugin.schema
+      const d = resolveDocumentRule(document)
+      const bs = {}
+      const is = {}
 
-    for (const key in blocks) {
-      bs[key] = resolveNodeRule('block', key, blocks[key])
-    }
+      for (const key in blocks) {
+        bs[key] = resolveNodeRule('block', key, blocks[key])
+      }
 
-    for (const key in inlines) {
-      is[key] = resolveNodeRule('inline', key, inlines[key])
-    }
+      for (const key in inlines) {
+        is[key] = resolveNodeRule('inline', key, inlines[key])
+      }
 
-    mergeWith(schema.document, d, customizer)
-    mergeWith(schema.blocks, bs, customizer)
-    mergeWith(schema.inlines, is, customizer)
-  })
+      mergeWith(schema.document, d, customizer)
+      mergeWith(schema.blocks, bs, customizer)
+      mergeWith(schema.inlines, is, customizer)
+    })
 
   return schema
 }
@@ -532,8 +567,8 @@ function resolveNodeRule(object, type, obj) {
  */
 
 function customizer(target, source, key) {
-  if (key == 'objects' || key == 'types') {
-    return target == null ? source : target.concat(source)
+  if (key == 'objects' || key == 'types') {
+    return target == null ? source : target.concat(source)
   } else {
     return source == null ? target : source
   }
@@ -549,9 +584,7 @@ Schema.prototype[MODEL_TYPES.SCHEMA] = true
  * Memoize read methods.
  */
 
-memoize(Schema.prototype, [
-  'getParentRules',
-], {
+memoize(Schema.prototype, ['getParentRules'], {
   takesArguments: true,
 })
 

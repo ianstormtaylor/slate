@@ -12,9 +12,9 @@ export const schema = {
         if (reason == PARENT_TYPE_INVALID) {
           change.wrapBlockByKey(node.key, 'list')
         }
-      }
-    }
-  }
+      },
+    },
+  },
 }
 
 export const input = (

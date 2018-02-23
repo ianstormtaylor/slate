@@ -2,22 +2,20 @@
 
 import h from '../../helpers/h'
 
-export const flags = { }
+export const flags = {}
 
 export const schema = {
   blocks: {
     paragraph: {},
     item: {
       parent: { types: ['list'] },
-      nodes: [
-        { objects: ['text'] }
-      ]
+      nodes: [{ objects: ['text'] }],
     },
     list: {},
-  }
+  },
 }
 
-export const customChange = (change) => {
+export const customChange = change => {
   // this change function and schema are designed such that if
   // validation takes place before both wrapBlock calls complete
   // the node gets deleted by the default schema

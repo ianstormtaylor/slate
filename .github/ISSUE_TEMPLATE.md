@@ -1,5 +1,4 @@
-
-#### Do you want to request a *feature* or report a *bug*?
+#### Do you want to request a _feature_ or report a _bug_?
 
 <!-- 
 If you have a question, ask it in our Slack channel instead:

@@ -4,14 +4,16 @@ import React from 'react'
 import h from '../../helpers/h'
 
 function Image(props) {
-  return (
-    React.createElement('img', { src: props.node.data.get('src'), ...props.attributes })
-  )
+  return React.createElement('img', {
+    src: props.node.data.get('src'),
+    ...props.attributes,
+  })
 }
 
 function renderNode(props) {
   switch (props.node.type) {
-    case 'image': return Image(props)
+    case 'image':
+      return Image(props)
   }
 }
 
@@ -33,7 +35,7 @@ export const output = `
     <div contenteditable="true" data-slate-spacer="true" style="height:0;color:transparent;outline:none">
       <span>
         <span>
-          <span data-slate-zero-width="true">&#x200B;</span>
+          <span data-slate-zero-width="z">&#x200B;</span>
         </span>
       </span>
     </div>

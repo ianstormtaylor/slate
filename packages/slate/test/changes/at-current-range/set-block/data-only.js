@@ -4,9 +4,8 @@ import h from '../../../helpers/h'
 
 import { Data } from '../../../..'
 
-
-export default function (change) {
-  change.setBlock({ data: Data.create({ thing: 'value' }) })
+export default function(change) {
+  change.setBlocks({ data: Data.create({ thing: 'value' }) })
 }
 
 export const input = (

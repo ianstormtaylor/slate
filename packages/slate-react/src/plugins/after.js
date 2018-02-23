@@ -1,4 +1,3 @@
-
 import Base64 from 'slate-base64-serializer'
 import Debug from 'debug'
 import Plain from 'slate-plain-serializer'
@@ -225,9 +224,11 @@ function AfterPlugin() {
       selection.endKey == target.endKey &&
       selection.endOffset < target.endOffset
     ) {
-      target = target.move(selection.startKey == selection.endKey
-        ? 0 - selection.endOffset + selection.startOffset
-        : 0 - selection.endOffset)
+      target = target.move(
+        selection.startKey == selection.endKey
+          ? 0 - selection.endOffset + selection.startOffset
+          : 0 - selection.endOffset
+      )
     }
 
     if (isDraggingInternally) {
@@ -252,12 +253,12 @@ function AfterPlugin() {
         if (n) change.collapseToStartOf(n)
       }
 
-      text
-        .split('\n')
-        .forEach((line, i) => {
+      if (text) {
+        text.split('\n').forEach((line, i) => {
           if (i > 0) change.splitBlock()
           change.insertText(line)
         })
+      }
     }
 
     if (type == 'fragment') {
@@ -265,11 +266,11 @@ function AfterPlugin() {
     }
 
     if (type == 'node' && Block.isBlock(node)) {
-      change.insertBlock(node).removeNodeByKey(node.key)
+      change.insertBlock(node.regenerateKey()).removeNodeByKey(node.key)
     }
 
     if (type == 'node' && Inline.isInline(node)) {
-      change.insertInline(node).removeNodeByKey(node.key)
+      change.insertInline(node.regenerateKey()).removeNodeByKey(node.key)
     }
 
     // COMPAT: React's onSelect event breaks after an onDrop event
@@ -280,11 +281,13 @@ function AfterPlugin() {
     const el = findDOMNode(focusNode, window)
     if (!el) return
 
-    el.dispatchEvent(new MouseEvent('mouseup', {
-      view: window,
-      bubbles: true,
-      cancelable: true
-    }))
+    el.dispatchEvent(
+      new MouseEvent('mouseup', {
+        view: window,
+        bubbles: true,
+        cancelable: true,
+      })
+    )
   }
 
   /**
@@ -316,11 +319,12 @@ function AfterPlugin() {
     let start = 0
     let end = 0
 
-    const leaf = leaves.find((r) => {
-      start = end
-      end += r.text.length
-      if (end >= point.offset) return true
-    }) || lastLeaf
+    const leaf =
+      leaves.find(r => {
+        start = end
+        end += r.text.length
+        if (end >= point.offset) return true
+      }) || lastLeaf
 
     // Get the text information.
     const { text } = leaf
@@ -342,12 +346,12 @@ function AfterPlugin() {
     // Determine what the selection should be after changing the text.
     const delta = textContent.length - text.length
     const corrected = selection.collapseToEnd().move(delta)
-    const entire = selection.moveAnchorTo(point.key, start).moveFocusTo(point.key, end)
+    const entire = selection
+      .moveAnchorTo(point.key, start)
+      .moveFocusTo(point.key, end)
 
     // Change the current value to have the leaf's text replaced.
-    change
-      .insertTextAtRange(entire, textContent, leaf.marks)
-      .select(corrected)
+    change.insertTextAtRange(entire, textContent, leaf.marks).select(corrected)
   }
 
   /**
@@ -432,7 +436,8 @@ function AfterPlugin() {
     // browsers won't know what to do.
     if (HOTKEYS.COLLAPSE_CHAR_BACKWARD(event)) {
       const { document, isInVoid, previousText, startText } = value
-      const isPreviousInVoid = previousText && document.hasVoidParent(previousText.key)
+      const isPreviousInVoid =
+        previousText && document.hasVoidParent(previousText.key)
       if (isInVoid || isPreviousInVoid || startText.text == '') {
         event.preventDefault()
         return change.collapseCharBackward()
@@ -450,7 +455,8 @@ function AfterPlugin() {
 
     if (HOTKEYS.EXTEND_CHAR_BACKWARD(event)) {
       const { document, isInVoid, previousText, startText } = value
-      const isPreviousInVoid = previousText && document.hasVoidParent(previousText.key)
+      const isPreviousInVoid =
+        previousText && document.hasVoidParent(previousText.key)
       if (isInVoid || isPreviousInVoid || startText.text == '') {
         event.preventDefault()
         return change.extendCharBackward()
@@ -493,7 +499,8 @@ function AfterPlugin() {
 
       const defaultBlock = startBlock
       const defaultMarks = document.getInsertMarksAtRange(selection)
-      const frag = Plain.deserialize(text, { defaultBlock, defaultMarks }).document
+      const frag = Plain.deserialize(text, { defaultBlock, defaultMarks })
+        .document
       change.insertFragment(frag)
     }
   }
@@ -621,7 +628,11 @@ function AfterPlugin() {
     if (node.object != 'block' && node.object != 'inline') return
     const Tag = node.object == 'block' ? 'div' : 'span'
     const style = { position: 'relative' }
-    return <Tag {...attributes} style={style}>{children}</Tag>
+    return (
+      <Tag {...attributes} style={style}>
+        {children}
+      </Tag>
+    )
   }
 
   /**

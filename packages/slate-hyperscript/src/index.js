@@ -1,17 +1,7 @@
-
 import isEmpty from 'is-empty'
 import isPlainObject from 'is-plain-object'
 
-import {
-  Block,
-  Document,
-  Inline,
-  Mark,
-  Node,
-  Range,
-  Text,
-  Value,
-} from 'slate'
+import { Block, Document, Inline, Mark, Node, Range, Text, Value } from 'slate'
 
 /**
  * Create selection point constants, for comparison by reference.
@@ -30,7 +20,6 @@ const FOCUS = {}
  */
 
 const CREATORS = {
-
   anchor(tagName, attributes, children) {
     return ANCHOR
   },
@@ -83,7 +72,7 @@ const CREATORS = {
     // Search the document's texts to see if any of them have the anchor or
     // focus information saved, so we can set the selection.
     if (document) {
-      document.getTexts().forEach((text) => {
+      document.getTexts().forEach(text => {
         if (text.__anchor != null) {
           props.anchorKey = text.key
           props.anchorOffset = text.__anchor
@@ -99,11 +88,15 @@ const CREATORS = {
     }
 
     if (props.anchorKey && !props.focusKey) {
-      throw new Error(`Slate hyperscript must have both \`<anchor/>\` and \`<focus/>\` defined if one is defined, but you only defined \`<anchor/>\`. For collapsed selections, use \`<cursor/>\`.`)
+      throw new Error(
+        `Slate hyperscript must have both \`<anchor/>\` and \`<focus/>\` defined if one is defined, but you only defined \`<anchor/>\`. For collapsed selections, use \`<cursor/>\`.`
+      )
     }
 
     if (!props.anchorKey && props.focusKey) {
-      throw new Error(`Slate hyperscript must have both \`<anchor/>\` and \`<focus/>\` defined if one is defined, but you only defined \`<focus/>\`. For collapsed selections, use \`<cursor/>\`.`)
+      throw new Error(
+        `Slate hyperscript must have both \`<anchor/>\` and \`<focus/>\` defined if one is defined, but you only defined \`<focus/>\`. For collapsed selections, use \`<cursor/>\`.`
+      )
     }
 
     if (!isEmpty(props)) {
@@ -118,7 +111,6 @@ const CREATORS = {
     const nodes = createChildren(children, { key: attributes.key })
     return nodes
   },
-
 }
 
 /**
@@ -184,11 +176,12 @@ function createChildren(children, options = {}) {
     node = next
   }
 
-  children.forEach((child) => {
+  children.forEach(child => {
     // If the child is a non-text node, push the current node and the new child
     // onto the array, then creating a new node for future selection tracking.
     if (Node.isNode(child) && !Text.isText(child)) {
-      if (node.text.length || node.__anchor != null || node.__focus != null) array.push(node)
+      if (node.text.length || node.__anchor != null || node.__focus != null)
+        array.push(node)
       array.push(child)
       node = Text.create()
       length = 0
@@ -211,7 +204,7 @@ function createChildren(children, options = {}) {
         setNode(node.set('key', child.key))
       }
 
-      child.getLeaves().forEach((leaf) => {
+      child.getLeaves().forEach(leaf => {
         let { marks } = leaf
         if (options.marks) marks = marks.union(options.marks)
         setNode(node.insertText(i, leaf.text, marks))
@@ -243,26 +236,22 @@ function createChildren(children, options = {}) {
  */
 
 function resolveCreators(options) {
-  const {
-    blocks = {},
-    inlines = {},
-    marks = {},
-  } = options
+  const { blocks = {}, inlines = {}, marks = {} } = options
 
   const creators = {
     ...CREATORS,
     ...(options.creators || {}),
   }
 
-  Object.keys(blocks).map((key) => {
+  Object.keys(blocks).map(key => {
     creators[key] = normalizeNode(key, blocks[key], 'block')
   })
 
-  Object.keys(inlines).map((key) => {
+  Object.keys(inlines).map(key => {
     creators[key] = normalizeNode(key, inlines[key], 'inline')
   })
 
-  Object.keys(marks).map((key) => {
+  Object.keys(marks).map(key => {
     creators[key] = normalizeMark(key, marks[key])
   })
 
@@ -297,14 +286,16 @@ function normalizeNode(key, value, object) {
         data: {
           ...(value.data || {}),
           ...rest,
-        }
+        },
       }
 
       return CREATORS[object](tagName, attrs, children)
     }
   }
 
-  throw new Error(`Slate hyperscript ${object} creators can be either functions, objects or strings, but you passed: ${value}`)
+  throw new Error(
+    `Slate hyperscript ${object} creators can be either functions, objects or strings, but you passed: ${value}`
+  )
 }
 
 /**
@@ -331,14 +322,16 @@ function normalizeMark(key, value) {
         data: {
           ...(value.data || {}),
           ...attributes,
-        }
+        },
       }
 
       return CREATORS.mark(tagName, attrs, children)
     }
   }
 
-  throw new Error(`Slate hyperscript mark creators can be either functions, objects or strings, but you passed: ${value}`)
+  throw new Error(
+    `Slate hyperscript mark creators can be either functions, objects or strings, but you passed: ${value}`
+  )
 }
 
 /**

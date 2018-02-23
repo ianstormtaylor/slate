@@ -2,7 +2,7 @@
 
 import h from '../../../helpers/h'
 
-export default function (change) {
+export default function(change) {
   const node = change.value.document.getBlocks().first()
   change.insertNodeByKey('a', 0, node)
 }
@@ -20,9 +20,7 @@ export const input = (
 export const output = (
   <value>
     <document key="a">
-      <paragraph>
-        one
-      </paragraph>
+      <paragraph>one</paragraph>
       <paragraph>
         <cursor />one
       </paragraph>

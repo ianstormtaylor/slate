@@ -2,9 +2,9 @@
 
 import h from '../../../helpers/h'
 
-export default function (change) {
+export default function(change) {
   change.wrapInline({
-    type: 'link'
+    type: 'link',
   })
 }
 
@@ -12,7 +12,9 @@ export const input = (
   <value>
     <document>
       <paragraph>
-        <emoji><cursor />{' '}</emoji>
+        <emoji>
+          <cursor />{' '}
+        </emoji>
       </paragraph>
     </document>
   </value>
@@ -23,7 +25,9 @@ export const output = (
     <document>
       <paragraph>
         <link>
-          <emoji><cursor />{' '}</emoji>
+          <emoji>
+            <cursor />{' '}
+          </emoji>
         </link>
       </paragraph>
     </document>

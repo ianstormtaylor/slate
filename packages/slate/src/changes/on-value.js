@@ -1,4 +1,3 @@
-
 import Value from '../models/value'
 
 /**
@@ -21,11 +20,14 @@ Changes.setValue = (change, properties, options = {}) => {
   properties = Value.createProperties(properties)
   const { value } = change
 
-  change.applyOperation({
-    type: 'set_value',
-    properties,
-    value,
-  }, options)
+  change.applyOperation(
+    {
+      type: 'set_value',
+      properties,
+      value,
+    },
+    options
+  )
 }
 
 /**

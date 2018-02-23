@@ -2,16 +2,14 @@
 
 import h from '../../../helpers/h'
 
-export default function (change) {
+export default function(change) {
   change.moveNodeByKey('a', 'b', 1)
 }
 
 export const input = (
   <value>
     <document>
-      <paragraph key="b">
-        one
-      </paragraph>
+      <paragraph key="b">one</paragraph>
       <paragraph>
         <text key="a">two</text>
       </paragraph>
@@ -22,9 +20,7 @@ export const input = (
 export const output = (
   <value>
     <document>
-      <paragraph>
-        onetwo
-      </paragraph>
+      <paragraph>onetwo</paragraph>
       <paragraph />
     </document>
   </value>

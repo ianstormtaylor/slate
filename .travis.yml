@@ -21,8 +21,8 @@ env:
 
 script:
   # Run bootstrap first so that the proper workspaces links are created.
-  - yarn run bootstrap
+  - yarn bootstrap
   # Build all of the packages so they are resolvable by each other.
-  - yarn run build
+  - yarn build
   # Run testing or linting depending on the environment.
-  - yarn run $TEST_TYPE
+  - yarn $TEST_TYPE

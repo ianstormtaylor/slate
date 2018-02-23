@@ -1,4 +1,3 @@
-
 import direction from 'direction'
 import isPlainObject from 'is-plain-object'
 import logger from 'slate-dev-logger'
@@ -24,7 +23,6 @@ import memoize from '../utils/memoize'
  */
 
 class Node {
-
   /**
    * Create a new `Node` with `attrs`.
    *
@@ -41,22 +39,31 @@ class Node {
       let { object } = attrs
 
       if (!object && attrs.kind) {
-        logger.deprecate('slate@0.32.0', 'The `kind` property of Slate objects has been renamed to `object`.')
+        logger.deprecate(
+          'slate@0.32.0',
+          'The `kind` property of Slate objects has been renamed to `object`.'
+        )
         object = attrs.kind
       }
 
       switch (object) {
-        case 'block': return Block.create(attrs)
-        case 'document': return Document.create(attrs)
-        case 'inline': return Inline.create(attrs)
-        case 'text': return Text.create(attrs)
+        case 'block':
+          return Block.create(attrs)
+        case 'document':
+          return Document.create(attrs)
+        case 'inline':
+          return Inline.create(attrs)
+        case 'text':
+          return Text.create(attrs)
         default: {
           throw new Error('`Node.create` requires a `object` string.')
         }
       }
     }
 
-    throw new Error(`\`Node.create\` only accepts objects or nodes but you passed it: ${attrs}`)
+    throw new Error(
+      `\`Node.create\` only accepts objects or nodes but you passed it: ${attrs}`
+    )
   }
 
   /**
@@ -72,7 +79,9 @@ class Node {
       return list
     }
 
-    throw new Error(`\`Node.createList\` only accepts lists or arrays, but you passed it: ${elements}`)
+    throw new Error(
+      `\`Node.createList\` only accepts lists or arrays, but you passed it: ${elements}`
+    )
   }
 
   /**
@@ -103,7 +112,9 @@ class Node {
       return props
     }
 
-    throw new Error(`\`Node.createProperties\` only accepts objects, strings, blocks or inlines, but you passed it: ${attrs}`)
+    throw new Error(
+      `\`Node.createProperties\` only accepts objects, strings, blocks or inlines, but you passed it: ${attrs}`
+    )
   }
 
   /**
@@ -117,17 +128,26 @@ class Node {
     let { object } = value
 
     if (!object && value.kind) {
-      logger.deprecate('slate@0.32.0', 'The `kind` property of Slate objects has been renamed to `object`.')
+      logger.deprecate(
+        'slate@0.32.0',
+        'The `kind` property of Slate objects has been renamed to `object`.'
+      )
       object = value.kind
     }
 
     switch (object) {
-      case 'block': return Block.fromJSON(value)
-      case 'document': return Document.fromJSON(value)
-      case 'inline': return Inline.fromJSON(value)
-      case 'text': return Text.fromJSON(value)
+      case 'block':
+        return Block.fromJSON(value)
+      case 'document':
+        return Document.fromJSON(value)
+      case 'inline':
+        return Inline.fromJSON(value)
+      case 'text':
+        return Text.fromJSON(value)
       default: {
-        throw new Error(`\`Node.fromJSON\` requires an \`object\` of either 'block', 'document', 'inline' or 'text', but you passed: ${value}`)
+        throw new Error(
+          `\`Node.fromJSON\` requires an \`object\` of either 'block', 'document', 'inline' or 'text', but you passed: ${value}`
+        )
       }
     }
   }
@@ -333,7 +353,7 @@ class Node {
     if (this.hasChild(key)) return List([this])
 
     let ancestors
-    this.nodes.find((node) => {
+    this.nodes.find(node => {
       if (node.object == 'text') return false
       ancestors = node.getAncestors(key)
       return ancestors
@@ -490,15 +510,13 @@ class Node {
     range = range.normalize(this)
     if (range.isUnset) return []
 
-    return this
-      .getTextsAtRange(range)
-      .reduce((arr, text) => {
-        const chars = text.characters
-          .filter((char, i) => isIndexInRange(i, text, range))
-          .toArray()
+    return this.getTextsAtRange(range).reduce((arr, text) => {
+      const chars = text.characters
+        .filter((char, i) => isIndexInRange(i, text, range))
+        .toArray()
 
-        return arr.concat(chars)
-      }, [])
+      return arr.concat(chars)
+    }, [])
   }
 
   /**
@@ -621,9 +639,7 @@ class Node {
   getDepth(key, startAt = 1) {
     this.assertDescendant(key)
     if (this.hasChild(key)) return startAt
-    return this
-      .getFurthestAncestor(key)
-      .getDepth(key, startAt + 1)
+    return this.getFurthestAncestor(key).getDepth(key, startAt + 1)
   }
 
   /**
@@ -637,7 +653,7 @@ class Node {
     key = assertKey(key)
     let descendantFound = null
 
-    const found = this.nodes.find((node) => {
+    const found = this.nodes.find(node => {
       if (node.key === key) {
         return node
       } else if (node.object !== 'text') {
@@ -679,7 +695,7 @@ class Node {
   getFirstText() {
     let descendantFound = null
 
-    const found = this.nodes.find((node) => {
+    const found = this.nodes.find(node => {
       if (node.object == 'text') return true
       descendantFound = node.getFirstText()
       return descendantFound
@@ -711,11 +727,10 @@ class Node {
     let previous
     let parent
 
-    while (parent = node.getParent(child.key)) {
+    while ((parent = node.getParent(child.key))) {
       const index = parent.nodes.indexOf(child)
-      const position = child.object == 'text'
-        ? startOffset
-        : child.nodes.indexOf(previous)
+      const position =
+        child.object == 'text' ? startOffset : child.nodes.indexOf(previous)
 
       parent = parent.splitNode(index, position)
       node = node.updateNode(parent)
@@ -725,11 +740,12 @@ class Node {
 
     child = startKey == endKey ? node.getNextText(startKey) : endText
 
-    while (parent = node.getParent(child.key)) {
+    while ((parent = node.getParent(child.key))) {
       const index = parent.nodes.indexOf(child)
-      const position = child.object == 'text'
-        ? startKey == endKey ? endOffset - startOffset : endOffset
-        : child.nodes.indexOf(previous)
+      const position =
+        child.object == 'text'
+          ? startKey == endKey ? endOffset - startOffset : endOffset
+          : child.nodes.indexOf(previous)
 
       parent = parent.splitNode(index, position)
       node = node.updateNode(parent)
@@ -738,10 +754,15 @@ class Node {
     }
 
     // Get the start and end nodes.
-    const startNode = node.getNextSibling(node.getFurthestAncestor(startKey).key)
-    const endNode = startKey == endKey
-      ? node.getNextSibling(node.getNextSibling(node.getFurthestAncestor(endKey).key).key)
-      : node.getNextSibling(node.getFurthestAncestor(endKey).key)
+    const startNode = node.getNextSibling(
+      node.getFurthestAncestor(startKey).key
+    )
+    const endNode =
+      startKey == endKey
+        ? node.getNextSibling(
+            node.getNextSibling(node.getFurthestAncestor(endKey).key).key
+          )
+        : node.getNextSibling(node.getFurthestAncestor(endKey).key)
 
     // Get children range of nodes from start to end nodes
     const startIndex = node.nodes.indexOf(startNode)
@@ -802,7 +823,7 @@ class Node {
 
   getFurthestAncestor(key) {
     key = assertKey(key)
-    return this.nodes.find((node) => {
+    return this.nodes.find(node => {
       if (node.key == key) return true
       if (node.object == 'text') return false
       return node.hasDescendant(key)
@@ -824,13 +845,16 @@ class Node {
       throw new Error(`Could not find a descendant node with key "${key}".`)
     }
 
-    return ancestors
-      // Skip this node...
-      .skipLast()
-      // Take parents until there are more than one child...
-      .reverse().takeUntil(p => p.nodes.size > 1)
-      // And pick the highest.
-      .last()
+    return (
+      ancestors
+        // Skip this node...
+        .skipLast()
+        // Take parents until there are more than one child...
+        .reverse()
+        .takeUntil(p => p.nodes.size > 1)
+        // And pick the highest.
+        .last()
+    )
   }
 
   /**
@@ -853,7 +877,7 @@ class Node {
   getInlinesAsArray() {
     let array = []
 
-    this.nodes.forEach((child) => {
+    this.nodes.forEach(child => {
       if (child.object == 'text') return
       if (child.isLeafInline()) {
         array.push(child)
@@ -889,8 +913,7 @@ class Node {
     range = range.normalize(this)
     if (range.isUnset) return []
 
-    return this
-      .getTextsAtRangeAsArray(range)
+    return this.getTextsAtRangeAsArray(range)
       .map(text => this.getClosestInline(text.key))
       .filter(exists => exists)
   }
@@ -936,7 +959,7 @@ class Node {
   getKeysAsArray() {
     const keys = []
 
-    this.forEachDescendant((desc) => {
+    this.forEachDescendant(desc => {
       keys.push(desc.key)
     })
 
@@ -963,7 +986,7 @@ class Node {
   getLastText() {
     let descendantFound = null
 
-    const found = this.nodes.findLast((node) => {
+    const found = this.nodes.findLast(node => {
       if (node.object == 'text') return true
       descendantFound = node.getLastText()
       return descendantFound
@@ -1064,14 +1087,14 @@ class Node {
   getMarksAtRangeAsArray(range) {
     range = range.normalize(this)
     if (range.isUnset) return []
-    if (range.isCollapsed) return this.getMarksAtCollaspsedRangeAsArray(range)
+    if (range.isCollapsed) return this.getMarksAtCollapsedRangeAsArray(range)
 
-    return this
-      .getCharactersAtRange(range)
-      .reduce((memo, char) => {
+    return this.getCharactersAtRange(range).reduce((memo, char) => {
+      if (char) {
         char.marks.toArray().forEach(c => memo.push(c))
-        return memo
-      }, [])
+      }
+      return memo
+    }, [])
   }
 
   /**
@@ -1084,10 +1107,12 @@ class Node {
   getInsertMarksAtRangeAsArray(range) {
     range = range.normalize(this)
     if (range.isUnset) return []
-    if (range.isCollapsed) return this.getMarksAtCollaspsedRangeAsArray(range)
+    if (range.isCollapsed) return this.getMarksAtCollapsedRangeAsArray(range)
 
     const text = this.getDescendant(range.startKey)
     const char = text.characters.get(range.startOffset)
+    if (!char) return []
+
     return char.marks.toArray()
   }
 
@@ -1098,7 +1123,7 @@ class Node {
    * @return {Array}
    */
 
-  getMarksAtCollaspsedRangeAsArray(range) {
+  getMarksAtCollapsedRangeAsArray(range) {
     if (range.isUnset) return []
 
     const { startKey, startOffset } = range
@@ -1106,12 +1131,21 @@ class Node {
     if (startOffset == 0) {
       const previous = this.getPreviousText(startKey)
       if (!previous || previous.text.length == 0) return []
+      if (
+        this.getClosestBlock(startKey) !== this.getClosestBlock(previous.key)
+      ) {
+        return []
+      }
       const char = previous.characters.get(previous.text.length - 1)
+      if (!char) return []
+
       return char.marks.toArray()
     }
 
     const text = this.getDescendant(startKey)
     const char = text.characters.get(startOffset - 1)
+    if (!char) return []
+
     return char.marks.toArray()
   }
 
@@ -1125,7 +1159,7 @@ class Node {
   getActiveMarksAtRangeAsArray(range) {
     range = range.normalize(this)
     if (range.isUnset) return []
-    if (range.isCollapsed) return this.getMarksAtCollaspsedRangeAsArray(range)
+    if (range.isCollapsed) return this.getMarksAtCollapsedRangeAsArray(range)
 
     // Otherwise, get a set of the marks for each character in the range.
     const chars = this.getCharactersAtRange(range)
@@ -1134,8 +1168,9 @@ class Node {
 
     let memo = first.marks
 
-    chars.slice(1).forEach((char) => {
-      memo = memo.intersect(char.marks)
+    chars.slice(1).forEach(char => {
+      const marks = char ? char.marks : []
+      memo = memo.intersect(marks)
       return memo.size != 0
     })
 
@@ -1216,8 +1251,7 @@ class Node {
     key = assertKey(key)
 
     const parent = this.getParent(key)
-    const after = parent.nodes
-      .skipUntil(child => child.key == key)
+    const after = parent.nodes.skipUntil(child => child.key == key)
 
     if (after.size == 0) {
       throw new Error(`Could not find a child node with key "${key}".`)
@@ -1279,9 +1313,7 @@ class Node {
       .reduce((memo, n) => memo + n.text.length, 0)
 
     // Recurse if need be.
-    return this.hasChild(key)
-      ? offset
-      : offset + child.getOffset(key)
+    return this.hasChild(key) ? offset : offset + child.getOffset(key)
   }
 
   /**
@@ -1318,7 +1350,7 @@ class Node {
 
     let node = null
 
-    this.nodes.find((child) => {
+    this.nodes.find(child => {
       if (child.object == 'text') {
         return false
       } else {
@@ -1342,7 +1374,7 @@ class Node {
     const ancestors = this.getAncestors(key)
     const path = []
 
-    ancestors.reverse().forEach((ancestor) => {
+    ancestors.reverse().forEach(ancestor => {
       const index = ancestor.nodes.indexOf(child)
       path.unshift(index)
       child = ancestor
@@ -1431,8 +1463,7 @@ class Node {
   getPreviousSibling(key) {
     key = assertKey(key)
     const parent = this.getParent(key)
-    const before = parent.nodes
-      .takeUntil(child => child.key == key)
+    const before = parent.nodes.takeUntil(child => child.key == key)
 
     if (before.size == parent.nodes.size) {
       throw new Error(`Could not find a child node with key "${key}".`)
@@ -1535,12 +1566,10 @@ class Node {
 
     let length = 0
 
-    return this
-      .getTexts()
-      .find((node, i, nodes) => {
-        length += node.text.length
-        return length > offset
-      })
+    return this.getTexts().find((node, i, nodes) => {
+      length += node.text.length
+      return length > offset
+    })
   }
 
   /**
@@ -1574,7 +1603,7 @@ class Node {
   getTextsAsArray() {
     let array = []
 
-    this.nodes.forEach((node) => {
+    this.nodes.forEach(node => {
       if (node.object == 'text') {
         array.push(node)
       } else {
@@ -1663,7 +1692,7 @@ class Node {
    */
 
   hasVoidParent(key) {
-    return !!this.getClosest(key, parent => parent.isVoid)
+    return !!this.getClosestVoid(key)
   }
 
   /**
@@ -1675,17 +1704,15 @@ class Node {
    */
 
   insertNode(index, node) {
-    const keys = this.getKeys()
+    const keys = this.getKeysAsArray()
 
-    if (keys.contains(node.key)) {
+    if (keys.includes(node.key)) {
       node = node.regenerateKey()
     }
 
     if (node.object != 'text') {
-      node = node.mapDescendants((desc) => {
-        return keys.contains(desc.key)
-          ? desc.regenerateKey()
-          : desc
+      node = node.mapDescendants(desc => {
+        return keys.includes(desc.key) ? desc.regenerateKey() : desc
       })
     }
 
@@ -1728,7 +1755,7 @@ class Node {
     const texts = node.getTextsAtRange(range)
     let memo = false
 
-    texts.forEach((text) => {
+    texts.forEach(text => {
       if (node.hasDescendant(text.key)) memo = true
       return memo
     })
@@ -1743,10 +1770,7 @@ class Node {
    */
 
   isLeafBlock() {
-    return (
-      this.object == 'block' &&
-      this.nodes.every(n => n.object != 'block')
-    )
+    return this.object == 'block' && this.nodes.every(n => n.object != 'block')
   }
 
   /**
@@ -1757,8 +1781,7 @@ class Node {
 
   isLeafInline() {
     return (
-      this.object == 'inline' &&
-      this.nodes.every(n => n.object != 'inline')
+      this.object == 'inline' && this.nodes.every(n => n.object != 'inline')
     )
   }
 
@@ -1778,17 +1801,19 @@ class Node {
     const two = node.nodes.get(index)
 
     if (one.object != two.object) {
-      throw new Error(`Tried to merge two nodes of different objects: "${one.object}" and "${two.object}".`)
+      throw new Error(
+        `Tried to merge two nodes of different objects: "${one.object}" and "${
+          two.object
+        }".`
+      )
     }
 
     // If the nodes are text nodes, concatenate their characters together.
     if (one.object == 'text') {
       const characters = one.characters.concat(two.characters)
       one = one.set('characters', characters)
-    }
-
-    // Otherwise, concatenate their child nodes together.
-    else {
+    } else {
+      // Otherwise, concatenate their child nodes together.
       const nodes = one.nodes.concat(two.nodes)
       one = one.set('nodes', nodes)
     }
@@ -1865,7 +1890,8 @@ class Node {
 
     let node = this
     let parent = node.getParent(key)
-    if (!parent) throw new Error(`Could not find a descendant node with key "${key}".`)
+    if (!parent)
+      throw new Error(`Could not find a descendant node with key "${key}".`)
 
     const index = parent.nodes.findIndex(n => n.key === key)
     const nodes = parent.nodes.splice(index, 1)
@@ -1908,11 +1934,9 @@ class Node {
       const afters = child.characters.skip(position)
       one = child.set('characters', befores)
       two = child.set('characters', afters).regenerateKey()
-    }
-
-    // Otherwise, if the child is not a text node, the `position` refers to the
-    // index at which to split its children.
-    else {
+    } else {
+      // Otherwise, if the child is not a text node, the `position` refers to the
+      // index at which to split its children.
       const befores = child.nodes.take(position)
       const afters = child.nodes.skip(position)
       one = child.set('nodes', befores)
@@ -1941,7 +1965,7 @@ class Node {
     let child = this.assertDescendant(node.key)
     const ancestors = this.getAncestors(node.key)
 
-    ancestors.reverse().forEach((parent) => {
+    ancestors.reverse().forEach(parent => {
       let { nodes } = parent
       const index = nodes.indexOf(child)
       child = parent
@@ -1963,7 +1987,6 @@ class Node {
   validate(schema) {
     return schema.validateNode(this)
   }
-
 }
 
 /**
@@ -1975,98 +1998,85 @@ class Node {
 
 function assertKey(arg) {
   if (typeof arg == 'string') return arg
-  throw new Error(`Invalid \`key\` argument! It must be a key string, but you passed: ${arg}`)
+  throw new Error(
+    `Invalid \`key\` argument! It must be a key string, but you passed: ${arg}`
+  )
 }
 
 /**
  * Memoize read methods.
  */
 
-memoize(Node.prototype, [
-  'getBlocks',
-  'getBlocksAsArray',
-  'getCharacters',
-  'getCharactersAsArray',
-  'getFirstText',
-  'getInlines',
-  'getInlinesAsArray',
-  'getKeys',
-  'getKeysAsArray',
-  'getLastText',
-  'getMarks',
-  'getOrderedMarks',
-  'getMarksAsArray',
-  'getText',
-  'getTextDirection',
-  'getTexts',
-  'getTextsAsArray',
-  'isLeafBlock',
-  'isLeafInline',
-], {
-  takesArguments: false
-})
+memoize(
+  Node.prototype,
+  [
+    'getBlocksAsArray',
+    'getCharactersAsArray',
+    'getFirstText',
+    'getInlinesAsArray',
+    'getKeysAsArray',
+    'getLastText',
+    'getMarksAsArray',
+    'getText',
+    'getTextDirection',
+    'getTextsAsArray',
+    'isLeafBlock',
+    'isLeafInline',
+  ],
+  {
+    takesArguments: false,
+  }
+)
 
-memoize(Node.prototype, [
-  'areDescendantsSorted',
-  'getActiveMarksAtRange',
-  'getActiveMarksAtRangeAsArray',
-  'getAncestors',
-  'getBlocksAtRange',
-  'getBlocksAtRangeAsArray',
-  'getBlocksByType',
-  'getBlocksByTypeAsArray',
-  'getCharactersAtRange',
-  'getCharactersAtRangeAsArray',
-  'getChild',
-  'getClosestBlock',
-  'getClosestInline',
-  'getClosestVoid',
-  'getCommonAncestor',
-  'getDecorations',
-  'getDepth',
-  'getDescendant',
-  'getDescendantAtPath',
-  'getFragmentAtRange',
-  'getFurthestBlock',
-  'getFurthestInline',
-  'getFurthestAncestor',
-  'getFurthestOnlyChildAncestor',
-  'getInlinesAtRange',
-  'getInlinesAtRangeAsArray',
-  'getInlinesByType',
-  'getInlinesByTypeAsArray',
-  'getMarksAtRange',
-  'getInsertMarksAtRange',
-  'getOrderedMarksAtRange',
-  'getMarksAtRangeAsArray',
-  'getInsertMarksAtRangeAsArray',
-  'getMarksByType',
-  'getOrderedMarksByType',
-  'getMarksByTypeAsArray',
-  'getNextBlock',
-  'getNextSibling',
-  'getNextText',
-  'getNode',
-  'getNodeAtPath',
-  'getOffset',
-  'getOffsetAtRange',
-  'getParent',
-  'getPath',
-  'getPlaceholder',
-  'getPreviousBlock',
-  'getPreviousSibling',
-  'getPreviousText',
-  'getTextAtOffset',
-  'getTextsAtRange',
-  'getTextsAtRangeAsArray',
-  'hasChild',
-  'hasDescendant',
-  'hasNode',
-  'hasVoidParent',
-  'validate',
-], {
-  takesArguments: true
-})
+memoize(
+  Node.prototype,
+  [
+    'areDescendantsSorted',
+    'getActiveMarksAtRangeAsArray',
+    'getAncestors',
+    'getBlocksAtRangeAsArray',
+    'getBlocksByTypeAsArray',
+    'getCharactersAtRangeAsArray',
+    'getChild',
+    'getClosestBlock',
+    'getClosestInline',
+    'getClosestVoid',
+    'getCommonAncestor',
+    'getDecorations',
+    'getDepth',
+    'getDescendant',
+    'getDescendantAtPath',
+    'getFragmentAtRange',
+    'getFurthestBlock',
+    'getFurthestInline',
+    'getFurthestAncestor',
+    'getFurthestOnlyChildAncestor',
+    'getInlinesAtRangeAsArray',
+    'getInlinesByTypeAsArray',
+    'getMarksAtRangeAsArray',
+    'getInsertMarksAtRangeAsArray',
+    'getMarksByTypeAsArray',
+    'getNextBlock',
+    'getNextSibling',
+    'getNextText',
+    'getNode',
+    'getNodeAtPath',
+    'getOffset',
+    'getOffsetAtRange',
+    'getParent',
+    'getPath',
+    'getPlaceholder',
+    'getPreviousBlock',
+    'getPreviousSibling',
+    'getPreviousText',
+    'getTextAtOffset',
+    'getTextsAtRangeAsArray',
+    'validate',
+  ],
+  {
+    takesArguments: true,
+  }
+)
 
 /**
  * Export.

@@ -2,14 +2,12 @@
 
 import h from '../../../helpers/h'
 
-export default function (change) {
-  change.insertFragment((
+export default function(change) {
+  change.insertFragment(
     <document>
-      <quote>
-        fragment
-      </quote>
+      <quote>fragment</quote>
     </document>
-  ))
+  )
 }
 
 export const input = (

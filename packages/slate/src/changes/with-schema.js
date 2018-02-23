@@ -1,5 +1,3 @@
-
-
 /**
  * Changes.
  *
@@ -14,7 +12,7 @@ const Changes = {}
  * @param {Change} change
  */
 
-Changes.normalize = (change) => {
+Changes.normalize = change => {
   change.normalizeDocument()
 }
 
@@ -24,7 +22,7 @@ Changes.normalize = (change) => {
  * @param {Change} change
  */
 
-Changes.normalizeDocument = (change) => {
+Changes.normalizeDocument = change => {
   const { value } = change
   const { document } = value
   change.normalizeNodeByKey(document.key)
@@ -48,7 +46,7 @@ Changes.normalizeNodeByKey = (change, key) => {
   const ancestors = document.getAncestors(key)
   if (!ancestors) return
 
-  ancestors.forEach((ancestor) => {
+  ancestors.forEach(ancestor => {
     normalizeNode(change, ancestor, schema)
   })
 }
@@ -136,7 +134,9 @@ function normalizeNode(change, node, schema) {
     iterations++
 
     if (iterations > max) {
-      throw new Error('A schema rule could not be validated after sufficient iterations. This is usually due to a `rule.validate` or `rule.normalize` function of a schema being incorrectly written, causing an infinite loop.')
+      throw new Error(
+        'A schema rule could not be validated after sufficient iterations. This is usually due to a `rule.validate` or `rule.normalize` function of a schema being incorrectly written, causing an infinite loop.'
+      )
     }
 
     // Otherwise, iterate again.

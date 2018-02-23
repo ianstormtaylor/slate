@@ -1,4 +1,3 @@
-
 <br/>
 <p align="center"><strong>Previous:</strong><br/><a href="./applying-custom-formatting.md">Applying Custom Formatting</a></p>
 <br/>
@@ -15,7 +14,6 @@ Starting with our app from earlier:
 
 ```js
 class App extends React.Component {
-
   state = {
     value: initialValue,
   }
@@ -25,7 +23,7 @@ class App extends React.Component {
   }
 
   onKeyDown = (event, change) => {
-    if (event.key != 'b' || !event.metaKey) return
+    if (event.key != 'b' || !event.ctrlKey) return
     event.preventDefault()
     change.toggleMark('bold')
     return true
@@ -42,12 +40,12 @@ class App extends React.Component {
     )
   }
 
-  renderMark = (props) => {
+  renderMark = props => {
     switch (props.mark.type) {
-      case 'bold': return <strong>{props.children}</strong>
+      case 'bold':
+        return <strong>{props.children}</strong>
     }
   }
-
 }
 ```
 
@@ -74,7 +72,7 @@ function MarkHotkey(options) {
   return {
     onKeyDown(event, change) {
       // Check that the key pressed matches our `key` option.
-      if (!event.metaKey || event.key != key) return
+      if (!event.ctrlKey || event.key != key) return
 
       // Prevent the default characters from being inserted.
       event.preventDefault()
@@ -82,7 +80,7 @@ function MarkHotkey(options) {
       // Toggle the mark `type`.
       change.toggleMark(type)
       return true
-    }
+    },
   }
 }
 ```
@@ -95,16 +93,13 @@ Now that we have our plugin, let's remove the hard-coded logic from our app, and
 // Initialize our bold-mark-adding plugin.
 const boldPlugin = MarkHotkey({
   type: 'bold',
-  key: 'b'
+  key: 'b',
 })
 
 // Create an array of plugins.
-const plugins = [
-  boldPlugin
-]
+const plugins = [boldPlugin]
 
 class App extends React.Component {
-
   state = {
     value: initialValue,
   }
@@ -124,13 +119,13 @@ class App extends React.Component {
       />
     )
   }
-  
-  renderMark = (props) => {
+
+  renderMark = props => {
     switch (props.mark.type) {
-      case 'bold': return <strong>{props.children}</strong>
+      case 'bold':
+        return <strong>{props.children}</strong>
     }
   }
-
 }
 ```
 
@@ -145,11 +140,10 @@ const plugins = [
   MarkHotkey({ key: '`', type: 'code' }),
   MarkHotkey({ key: 'i', type: 'italic' }),
   MarkHotkey({ key: '~', type: 'strikethrough' }),
-  MarkHotkey({ key: 'u', type: 'underline' })
+  MarkHotkey({ key: 'u', type: 'underline' }),
 ]
 
 class App extends React.Component {
-
   state = {
     value: initialValue,
   }
@@ -168,25 +162,28 @@ class App extends React.Component {
       />
     )
   }
-  
-  renderMark = (props) => {
+
+  renderMark = props => {
     switch (props.mark.type) {
-      case 'bold': return <strong>{props.children}</strong>
+      case 'bold':
+        return <strong>{props.children}</strong>
       // Add our new mark renderers...
-      case 'code': return <code>{props.children}</code>
-      case 'italic': return <em>{props.children}</em>
-      case 'strikethrough': return <del>{props.children}</del>
-      case 'underline': return <u>{props.children}</u>
+      case 'code':
+        return <code>{props.children}</code>
+      case 'italic':
+        return <em>{props.children}</em>
+      case 'strikethrough':
+        return <del>{props.children}</del>
+      case 'underline':
+        return <u>{props.children}</u>
     }
   }
-
 }
 ```
 
 And there you have it! We just added a ton of functionality to the editor with very little work. And we can keep all of our mark hotkey logic tested and isolated in a single place, making maintaining the code easier.
 
 That's why plugins are awesome. They let you get really expressive while also making your codebase easier to manage. And since Slate is built with plugins as a primary consideration, using them is dead simple!
-
 
 <br/>
 <p align="center"><strong>Next:</strong><br/><a href="./saving-to-a-database.md">Saving to a Database</a></p>

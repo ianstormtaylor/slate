@@ -1,4 +1,3 @@
-
 import Debug from 'debug'
 import pick from 'lodash/pick'
 
@@ -56,10 +55,13 @@ function invertOperation(op) {
 
     // If the node's old position was a left sibling of an ancestor of
     // its new position, we need to adjust part of the path by -1.
-    if (path.length < inversePath.length &&
-        path.slice(0, pathLast).every((e, i) => e == inversePath[i]) &&
-        path[pathLast] < inversePath[pathLast]) {
-      inversePath = inversePath.slice(0, pathLast)
+    if (
+      path.length < inversePath.length &&
+      path.slice(0, pathLast).every((e, i) => e == inversePath[i]) &&
+      path[pathLast] < inversePath[pathLast]
+    ) {
+      inversePath = inversePath
+        .slice(0, pathLast)
         .concat([inversePath[pathLast] - 1])
         .concat(inversePath.slice(pathLast + 1, inversePath.length))
     }
@@ -67,10 +69,13 @@ function invertOperation(op) {
     // If the node's new position is an ancestor of the old position,
     // or a left sibling of an ancestor of its old position, we need
     // to adjust part of the path by 1.
-    if (newPath.length < inverseNewPath.length &&
-        newPath.slice(0, newPathLast).every((e, i) => e == inverseNewPath[i]) &&
-        newPath[newPathLast] <= inverseNewPath[newPathLast]) {
-      inverseNewPath = inverseNewPath.slice(0, newPathLast)
+    if (
+      newPath.length < inverseNewPath.length &&
+      newPath.slice(0, newPathLast).every((e, i) => e == inverseNewPath[i]) &&
+      newPath[newPathLast] <= inverseNewPath[newPathLast]
+    ) {
+      inverseNewPath = inverseNewPath
+        .slice(0, newPathLast)
         .concat([inverseNewPath[newPathLast] + 1])
         .concat(inverseNewPath.slice(newPathLast + 1, inverseNewPath.length))
     }
@@ -113,7 +118,9 @@ function invertOperation(op) {
     const { properties, node } = op
     const inverseNode = node.merge(properties)
     const inverseProperties = pick(node, Object.keys(properties))
-    const inverse = op.set('node', inverseNode).set('properties', inverseProperties)
+    const inverse = op
+      .set('node', inverseNode)
+      .set('properties', inverseProperties)
     return inverse
   }
 
@@ -161,7 +168,9 @@ function invertOperation(op) {
     const { properties, mark } = op
     const inverseMark = mark.merge(properties)
     const inverseProperties = pick(mark, Object.keys(properties))
-    const inverse = op.set('mark', inverseMark).set('properties', inverseProperties)
+    const inverse = op
+      .set('mark', inverseMark)
+      .set('properties', inverseProperties)
     return inverse
   }
 
@@ -175,35 +184,37 @@ function invertOperation(op) {
     const { document } = value
 
     if (anchorPath !== undefined) {
-      props.anchorKey = anchorPath === null
-        ? null
-        : document.assertPath(anchorPath).key
+      props.anchorKey =
+        anchorPath === null ? null : document.assertPath(anchorPath).key
     }
 
     if (focusPath !== undefined) {
-      props.focusKey = focusPath === null
-        ? null
-        : document.assertPath(focusPath).key
+      props.focusKey =
+        focusPath === null ? null : document.assertPath(focusPath).key
     }
 
     const inverseSelection = selection.merge(props)
     const inverseProps = pick(selection, Object.keys(props))
 
     if (anchorPath !== undefined) {
-      inverseProps.anchorPath = inverseProps.anchorKey === null
-        ? null
-        : document.getPath(inverseProps.anchorKey)
+      inverseProps.anchorPath =
+        inverseProps.anchorKey === null
+          ? null
+          : document.getPath(inverseProps.anchorKey)
       delete inverseProps.anchorKey
     }
 
     if (focusPath !== undefined) {
-      inverseProps.focusPath = inverseProps.focusKey === null
-        ? null
-        : document.getPath(inverseProps.focusKey)
+      inverseProps.focusPath =
+        inverseProps.focusKey === null
+          ? null
+          : document.getPath(inverseProps.focusKey)
       delete inverseProps.focusKey
     }
 
-    const inverse = op.set('selection', inverseSelection).set('properties', inverseProps)
+    const inverse = op
+      .set('selection', inverseSelection)
+      .set('properties', inverseProps)
     return inverse
   }
 
@@ -215,7 +226,9 @@ function invertOperation(op) {
     const { properties, value } = op
     const inverseValue = value.merge(properties)
     const inverseProperties = pick(value, Object.keys(properties))
-    const inverse = op.set('value', inverseValue).set('properties', inverseProperties)
+    const inverse = op
+      .set('value', inverseValue)
+      .set('properties', inverseProperties)
     return inverse
   }
 }

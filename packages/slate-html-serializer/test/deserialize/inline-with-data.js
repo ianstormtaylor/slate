@@ -1,4 +1,3 @@
-
 /** @jsx h */
 
 import h from '../helpers/h'
@@ -24,9 +23,9 @@ export const config = {
             }
           }
         }
-      }
-    }
-  ]
+      },
+    },
+  ],
 }
 
 export const input = `
@@ -37,9 +36,7 @@ export const output = (
   <value>
     <document>
       <paragraph>
-        <link thing="value">
-          one
-        </link>
+        <link thing="value">one</link>
       </paragraph>
     </document>
   </value>

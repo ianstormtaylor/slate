@@ -1,4 +1,3 @@
-
 /** @jsx h */
 
 import React from 'react'
@@ -10,8 +9,8 @@ export const rules = [
       if (obj.object == 'block' && obj.type == 'image') {
         return React.createElement('img')
       }
-    }
-  }
+    },
+  },
 ]
 
 export const input = (

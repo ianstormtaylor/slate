@@ -2,8 +2,8 @@
 
 import h from '../../../helpers/h'
 
-export default function (change) {
-  change.setBlock({ type: 'code' })
+export default function(change) {
+  change.setBlocks({ type: 'code' })
 }
 
 export const input = (

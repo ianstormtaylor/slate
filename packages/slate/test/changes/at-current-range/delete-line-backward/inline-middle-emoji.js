@@ -2,7 +2,7 @@
 
 import h from '../../../helpers/h'
 
-export default function (change) {
+export default function(change) {
   change.deleteLineBackward()
 }
 
@@ -10,7 +10,8 @@ export const input = (
   <value>
     <document>
       <paragraph>
-        one <link>wo📛rd</link><cursor />
+        one <link>wo📛rd</link>
+        <cursor />
       </paragraph>
     </document>
   </value>

@@ -1,19 +1,18 @@
 # Build files.
-dist
-examples/build.dev.js
-examples/build.prod.js
-lib
+*.js.map
+build/
+dist/
+lib/
 
 # Temporary files.
-bench/output
-tmp
+tmp/
 
 # Gitbook files.
-_book
+_book/
 
 # Package files.
 lerna-debug.log
-node_modules
+node_modules/
 npm-debug.log
 yarn-error.log
 packages/*/yarn.lock

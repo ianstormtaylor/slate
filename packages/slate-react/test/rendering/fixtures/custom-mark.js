@@ -9,7 +9,8 @@ function Bold(props) {
 
 function renderMark(props) {
   switch (props.mark.type) {
-    case 'bold': return Bold(props)
+    case 'bold':
+      return Bold(props)
   }
 }
 

@@ -2,7 +2,7 @@
 
 import h from '../../../helpers/h'
 
-export default function (change) {
+export default function(change) {
   change.delete()
 }
 
@@ -16,9 +16,7 @@ export const input = (
       <paragraph>
         <focus />one
       </paragraph>
-      <paragraph>
-        two
-      </paragraph>
+      <paragraph>two</paragraph>
     </document>
   </value>
 )
@@ -29,9 +27,7 @@ export const output = (
       <paragraph>
         <cursor />one
       </paragraph>
-      <paragraph>
-        two
-      </paragraph>
+      <paragraph>two</paragraph>
     </document>
   </value>
 )

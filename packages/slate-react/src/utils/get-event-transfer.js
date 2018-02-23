@@ -1,4 +1,3 @@
-
 import Base64 from 'slate-base64-serializer'
 
 import TRANSFER_TYPES from '../constants/transfer-types'
@@ -9,13 +8,7 @@ import TRANSFER_TYPES from '../constants/transfer-types'
  * @type {String}
  */
 
-const {
-  FRAGMENT,
-  HTML,
-  NODE,
-  RICH,
-  TEXT
-} = TRANSFER_TYPES
+const { FRAGMENT, HTML, NODE, RICH, TEXT } = TRANSFER_TYPES
 
 /**
  * Fragment matching regexp for HTML nodes.
@@ -47,13 +40,9 @@ function getEventTransfer(event) {
 
   // If there isn't a fragment, but there is HTML, check to see if the HTML is
   // actually an encoded fragment.
-  if (
-    !fragment &&
-    html &&
-    ~html.indexOf(' data-slate-fragment="')
-  ) {
+  if (!fragment && html && ~html.indexOf(' data-slate-fragment="')) {
     const matches = FRAGMENT_MATCHER.exec(html)
-    const [ full, encoded ] = matches // eslint-disable-line no-unused-vars
+    const [full, encoded] = matches // eslint-disable-line no-unused-vars
     if (encoded) fragment = encoded
   }
 
@@ -77,7 +66,7 @@ function getEventTransfer(event) {
     // Get and normalize files if they exist.
     if (transfer.items && transfer.items.length) {
       files = Array.from(transfer.items)
-        .map(item => item.kind == 'file' ? item.getAsFile() : null)
+        .map(item => (item.kind == 'file' ? item.getAsFile() : null))
         .filter(exists => exists)
     } else if (transfer.files && transfer.files.length) {
       files = Array.from(transfer.files)

@@ -13,7 +13,7 @@ export const input = {
         type: 'paragraph',
         isVoid: false,
         data: {
-          thing: 'value'
+          thing: 'value',
         },
         nodes: [
           {
@@ -22,22 +22,20 @@ export const input = {
               {
                 object: 'leaf',
                 text: 'one',
-                marks: []
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  }
+                marks: [],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
 }
 
 export const output = (
   <value>
     <document>
-      <paragraph thing="value">
-        one
-      </paragraph>
+      <paragraph thing="value">one</paragraph>
     </document>
   </value>
 )

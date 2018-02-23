@@ -7,8 +7,8 @@ export const schema = {
     list: {},
     item: {
       parent: { types: ['list'] },
-    }
-  }
+    },
+  },
 }
 
 export const input = (

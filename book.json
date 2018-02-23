@@ -5,11 +5,7 @@
     "readme": "Introduction.md",
     "summary": "Readme.md"
   },
-  "plugins": [
-    "-highlight",
-    "prism",
-    "github"
-  ],
+  "plugins": ["-highlight", "prism", "github"],
   "pluginsConfig": {
     "github": {
       "url": "https://github.com/ianstormtaylor/slate"

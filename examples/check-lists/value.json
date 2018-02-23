@@ -9,7 +9,8 @@
             "object": "text",
             "leaves": [
               {
-                "text": "With Slate you can build complex block types that have their own embedded content and behaviors, like rendering checkboxes inside check list items!"
+                "text":
+                  "With Slate you can build complex block types that have their own embedded content and behaviors, like rendering checkboxes inside check list items!"
               }
             ]
           }
@@ -19,7 +20,7 @@
         "object": "block",
         "type": "check-list-item",
         "data": {
-          "checked": true,
+          "checked": true
         },
         "nodes": [
           {
@@ -36,7 +37,7 @@
         "object": "block",
         "type": "check-list-item",
         "data": {
-          "checked": true,
+          "checked": true
         },
         "nodes": [
           {
@@ -53,7 +54,7 @@
         "object": "block",
         "type": "check-list-item",
         "data": {
-          "checked": false,
+          "checked": false
         },
         "nodes": [
           {
@@ -70,7 +71,7 @@
         "object": "block",
         "type": "check-list-item",
         "data": {
-          "checked": true,
+          "checked": true
         },
         "nodes": [
           {
@@ -87,7 +88,7 @@
         "object": "block",
         "type": "check-list-item",
         "data": {
-          "checked": false,
+          "checked": false
         },
         "nodes": [
           {
@@ -104,7 +105,7 @@
         "object": "block",
         "type": "check-list-item",
         "data": {
-          "checked": false,
+          "checked": false
         },
         "nodes": [
           {

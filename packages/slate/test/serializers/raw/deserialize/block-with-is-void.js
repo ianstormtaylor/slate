@@ -19,15 +19,15 @@ export const input = {
             leaves: [
               {
                 object: 'leaf',
-                text: ' ',
+                text: '',
                 marks: [],
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  }
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
 }
 
 export const output = (

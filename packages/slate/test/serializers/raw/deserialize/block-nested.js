@@ -26,25 +26,23 @@ export const input = {
                   {
                     text: 'one',
                     object: 'leaf',
-                    marks: []
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  }
+                    marks: [],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
 }
 
 export const output = (
   <value>
     <document>
       <quote>
-        <paragraph>
-          one
-        </paragraph>
+        <paragraph>one</paragraph>
       </quote>
     </document>
   </value>
