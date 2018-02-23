@@ -149,6 +149,13 @@ Set the `properties` of the [`Blocks`](./block.md) in the current selection. For
 
 Set the `properties` of the [`Inlines`](./inline.md) nodes in the current selection. For convenience, you can pass a `type` string to set the inline nodes' type only.
 
+### `setValue`
+
+`setValue(properties: Object, [options: Object]) => Change` <br/>
+`setValue(value: Value, [options: Object]) => Change`
+
+Set the entire `value` using either a `properties` object or a `Value` object. Can be used to set `value.data` and other properties that cannot otherwise be easily set. Hint: If you don't provide the `{save: false}` option, this will break undo.
+
 ### `splitBlock`
 
 `splitBlock(depth: Number) => Change`
