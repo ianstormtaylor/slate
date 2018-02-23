@@ -3,6 +3,7 @@ import logger from 'slate-dev-logger'
 
 import Block from '../models/block'
 import Inline from '../models/inline'
+import Text from '../models/text'
 import Mark from '../models/mark'
 import Node from '../models/node'
 import String from '../utils/string'
@@ -95,9 +96,11 @@ Changes.deleteAtRange = (change, range, options = {}) => {
     isStartVoid == false &&
     startKey == startBlock.getFirstText().key &&
     endKey == endBlock.getFirstText().key
-  const startTextAsHangingFix = change.value.startText
-    .set('key', startKey)
-    .set('characters', List())
+
+  // If in insertFragment at range, a startKey must exists in the document;
+  // When the startBlock is removed and normalize is false, this text holder
+  // will be inserted to the document
+  const startKeyTextHolder = Text.create().set('key', startKey)
 
   // If it's a hanging selection, nudge it back to end in the previous text.
   if (isHanging && isEndVoid) {
@@ -113,7 +116,18 @@ Changes.deleteAtRange = (change, range, options = {}) => {
   while (isStartVoid) {
     const startVoid = document.getClosestVoid(startKey)
     const nextText = document.getNextText(startKey)
-    change.removeNodeByKey(startVoid.key, { normalize: false })
+
+    // Ensure startKey exists in document after removing the void key
+    // I have no good method to restore startKey here when the startBlock is void
+    if (
+      !normalize &&
+      startVoid.getDescendant(startKeyTextHolder.key) &&
+      startVoid.object === 'inline'
+    ) {
+      change.replaceNodeByKey(startVoid.key, { normalize: false })
+    } else {
+      change.removeNodeByKey(startVoid.key, { normalize: false })
+    }
 
     // If the start and end keys are the same, we're done.
     if (startKey == endKey) return
@@ -147,15 +161,15 @@ Changes.deleteAtRange = (change, range, options = {}) => {
   // can just remove the entire block.
   if (startKey == endKey && isHanging) {
     const nextBlock = change.value.document.getNextBlock(startBlock.key)
+    const prevBlock = change.value.document.getPreviousBlock(startBlock.key)
     change.removeNodeByKey(startBlock.key, { normalize })
+    // If normalize: false, a potential intention for insertFragmentAtRange, we
+    // shall ensure the startKey is restored
     if (
-      nextBlock &&
-      !change.value.document.getDescendant(startTextAsHangingFix.key) &&
+      !change.value.document.getDescendant(startKeyTextHolder.key) &&
       !normalize
     ) {
-      change.insertNodeByKey(nextBlock.key, 0, startTextAsHangingFix, {
-        normalize: false,
-      })
+      restoreStartKey(change, nextBlock, prevBlock, startKeyTextHolder)
     }
     return
   } else if (startKey == endKey) {
@@ -258,15 +272,14 @@ Changes.deleteAtRange = (change, range, options = {}) => {
       // merge the end block into it.
       if (isHanging) {
         const nextBlock = change.value.document.getNextBlock(startBlock.key)
+        const prevBlock = change.value.document.getPreviousBlock(startBlock.key)
         change.removeNodeByKey(startBlock.key, { normalize: false })
+        // If
         if (
-          nextBlock &&
-          !change.value.document.getDescendant(startTextAsHangingFix.key) &&
+          !change.value.document.getDescendant(startKeyTextHolder.key) &&
           !normalize
         ) {
-          change.insertNodeByKey(nextBlock.key, 0, startTextAsHangingFix, {
-            normalize: false,
-          })
+          restoreStartKey(change, nextBlock, prevBlock, startKeyTextHolder)
         }
       } else {
         change.mergeNodeByKey(endBlock.key, { normalize: false })
@@ -283,6 +296,42 @@ Changes.deleteAtRange = (change, range, options = {}) => {
       change.normalizeNodeByKey(ancestor.key)
     }
   }
+}
+
+// Restore the startKey at adjacent blocks when the startBlock is deleted;
+// Used in deleteAtRange for ensure startKey exists for insertFragmentAtRange
+function restoreStartKey(change, nextBlock, prevBlock, startKeyTextHolder) {
+  // Try to restore at non-void block to avoid potential problems
+  if (nextBlock && !nextBlock.isVoid) {
+    change.insertNodeByKey(nextBlock.key, 0, startKeyTextHolder, {
+      normalize: false,
+    })
+    return
+  }
+  if (prevBlock && !prevBlock.isVoid) {
+    change.insertNodeByKey(
+      prevBlock.key,
+      prevBlock.nodes.size,
+      startKeyTextHolder,
+      { normalize: false }
+    )
+    return
+  }
+  if (nextBlock) {
+    change.replaceNodeByKey(
+      nextBlock.key,
+      nextBlock.set('nodes', List.of(startKeyTextHolder)),
+      { normalize: false }
+    )
+  }
+  if (prevBlock) {
+    change.replaceNodeByKey(
+      prevBlock.key,
+      prevBlock.set('nodes', List.of(startKeyTextHolder)),
+      { normalize: false }
+    )
+  }
+  // If startBlock is whole document; I can do nothing
 }
 
 /**
