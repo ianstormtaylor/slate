@@ -97,7 +97,7 @@ Changes.deleteAtRange = (change, range, options = {}) => {
     startKey == startBlock.getFirstText().key &&
     endKey == endBlock.getFirstText().key
 
-  // If in insertFragment at range, a startKey must exists in the document;
+  // In insertFragmentAtRange, a startKey must exists in the document;
   // When the startBlock is removed and normalize is false, this text holder
   // will be inserted to the document
   const startKeyTextHolder = Text.create().set('key', startKey)
