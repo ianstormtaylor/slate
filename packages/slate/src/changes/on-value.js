@@ -19,6 +19,8 @@ const Changes = {}
 Changes.setValue = (change, properties, options = {}) => {
   properties = Value.createProperties(properties)
   const { value } = change
+  // By default, do not change history stacks
+  const { save = false } = options
 
   change.applyOperation(
     {
@@ -26,7 +28,7 @@ Changes.setValue = (change, properties, options = {}) => {
       properties,
       value,
     },
-    options
+    { save, ...options }
   )
 }
 
