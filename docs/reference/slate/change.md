@@ -78,6 +78,15 @@ validateNode(node) {
 }
 ```
 
+## Full Value Change
+
+### `setValue`
+
+`setValue(properties: Object, [options: Object]) => Change` <br/>
+`setValue(value: Value, [options: Object]) => Change`
+
+Set the entire `value` using either a `properties` object or a `Value` object. Can be used to set `value.data` and other properties that cannot otherwise be easily set using the available methods. Hint: You should provide the `{save: false}` option as failing to do so will break undo.
+
 ## Current Value Changes
 
 These changes act on the `document` based on the current `selection`. They are equivalent to calling the [Document Changes](#document-changes) with the current selection as the `range` argument, but they are there for convenience, since you often want to act with the current selection, as a user would.
@@ -148,13 +157,6 @@ Set the `properties` of the [`Blocks`](./block.md) in the current selection. For
 `setInlines(type: String) => Change`
 
 Set the `properties` of the [`Inlines`](./inline.md) nodes in the current selection. For convenience, you can pass a `type` string to set the inline nodes' type only.
-
-### `setValue`
-
-`setValue(properties: Object, [options: Object]) => Change` <br/>
-`setValue(value: Value, [options: Object]) => Change`
-
-Set the entire `value` using either a `properties` object or a `Value` object. Can be used to set `value.data` and other properties that cannot otherwise be easily set. Hint: If you don't provide the `{save: false}` option, this will break undo.
 
 ### `splitBlock`
 
