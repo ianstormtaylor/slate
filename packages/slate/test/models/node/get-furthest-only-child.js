@@ -3,7 +3,7 @@
 import h from '../../helpers/h'
 import assert from 'assert'
 
-export function runTest() {
+export default function () {
   const { document } = (
     <value>
       <document>
@@ -11,10 +11,11 @@ export function runTest() {
       </document>
     </value>
   )
-  const pNode = document.nodes.first()
-  const textNode = pNode.getFirstText()
+  
+  const paragraph = document.nodes.first()
+  const text = paragraph.getFirstText()
 
-  assert.equal(document.getFurthestOnlyChildAncestor(pNode.key), null)
-  assert.equal(pNode.getFurthestOnlyChildAncestor(textNode.key), null)
-  assert.equal(document.getFurthestOnlyChildAncestor(textNode.key), pNode)
+  assert.equal(document.getFurthestOnlyChildAncestor(paragraph.key), null)
+  assert.equal(paragraph.getFurthestOnlyChildAncestor(text.key), null)
+  assert.equal(document.getFurthestOnlyChildAncestor(text.key), paragraph)
 }
