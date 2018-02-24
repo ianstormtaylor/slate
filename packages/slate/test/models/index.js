@@ -33,6 +33,7 @@ describe('models', () => {
       }
     })
   })
+
   describe('node', () => {
     describe('node', () => {
       const testsDir = resolve(__dirname, 'node')
@@ -43,8 +44,8 @@ describe('models', () => {
 
       for (const test of tests) {
         it(test, async () => {
-          const { runTest } = require(resolve(testsDir, test))
-          runTest()
+          const run = require(resolve(testsDir, test)).default
+          run()
         })
       }
     })
