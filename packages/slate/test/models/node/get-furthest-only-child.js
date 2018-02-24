@@ -3,7 +3,7 @@
 import h from '../../helpers/h'
 import assert from 'assert'
 
-export default function () {
+export default function() {
   const { document } = (
     <value>
       <document>
@@ -11,7 +11,7 @@ export default function () {
       </document>
     </value>
   )
-  
+
   const paragraph = document.nodes.first()
   const text = paragraph.getFirstText()
 
