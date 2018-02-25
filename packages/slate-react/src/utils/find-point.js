@@ -21,10 +21,11 @@ const VOID_SELECTOR = '[data-slate-void]'
  * @param {Element} nativeNode
  * @param {Number} nativeOffset
  * @param {Value} value
+ * @param {Object} options
  * @return {Object}
  */
 
-function findPoint(nativeNode, nativeOffset, value) {
+function findPoint(nativeNode, nativeOffset, value, options = {}) {
   const { node: nearestNode, offset: nearestOffset } = normalizeNodeAndOffset(
     nativeNode,
     nativeOffset
@@ -60,7 +61,9 @@ function findPoint(nativeNode, nativeOffset, value) {
   // text node should have no characters. However, during IME composition the
   // ASCII characters will be prepended to the zero-width space, so subtract 1
   // from the offset to account for the zero-width space character.
+  const { isAnchor = true } = options
   if (
+    isAnchor &&
     offset == node.textContent.length &&
     parentNode.hasAttribute(ZERO_WIDTH_ATTRIBUTE)
   ) {
