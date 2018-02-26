@@ -89,7 +89,7 @@ Set the entire `value` using either a `properties` object or a `Value` object. C
 
 Warning: Calling `setValue` with a `Value` object has unpredictable behavior including the loss of the edit history. Only use with a `Value` object if you know what you are doing. For most use cases, we recommend passing `properties` as an `Object` (e.g. `change.setValue({data: myNewDataObject})`.
 
-Hint: The `{save: false}` option can be helpful if you want to update a value, like in the value's `data` but do not want to have another save point in the undo history.
+Hint: Wrapping the call to `setValue` can be helpful if you want to update a value, like in the value's `data` but do not want to have another save point in the undo history: `change.setOperationFlag({save: false}).change({data: myNewDataObject}).setOperationFlag({save: true}).
 
 ## Current Value Changes
 
