@@ -83,9 +83,13 @@ validateNode(node) {
 ### `setValue`
 
 `setValue(properties: Object, [options: Object]) => Change` <br/>
-`setValue(value: Value, [options: Object]) => Change`
+`setValue(value: Value, [options: Object]) => Change` (see warning below)
 
-Set the entire `value` using either a `properties` object or a `Value` object. Can be used to set `value.data` and other properties that cannot otherwise be easily set using the available methods. Hint: You should provide the `{save: false}` option as failing to do so will break undo.
+Set the entire `value` using either a `properties` object or a `Value` object. Can be used to set `value.data` and other properties that cannot otherwise be easily set using the available methods.
+
+Warning: Calling `setValue` with a `Value` object has unpredictable behavior including the loss of the edit history. Only use with a `Value` object if you know what you are doing. For most use cases, we recommend passing `properties` as an `Object` (e.g. `change.setValue({data: myNewDataObject})`.
+
+Hint: The `{save: false}` option can be helpful if you want to update a value, like in the value's `data` but do not want to have another save point in the undo history.
 
 ## Current Value Changes
 
