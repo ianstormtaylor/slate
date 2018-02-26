@@ -564,6 +564,7 @@ Changes.splitDescendantsByKey = (
   }
 
   const normalize = change.getFlag('normalize', options)
+  const { splitVoid = false } = options
   const { value } = change
   const { document } = value
 
@@ -583,6 +584,7 @@ Changes.splitDescendantsByKey = (
     change.splitNodeByKey(node.key, index, {
       normalize: false,
       target: prevIndex,
+      splitVoid,
     })
   })
 
