@@ -227,4 +227,4 @@ Returns a JSON representation of the schema.
 
 When supplying your own `normalize` property for a schema rule, it will be called with `(change, violation, context)`. The `violation` will be one of a set of potential violation strings, and `context` will vary depending on the violation.
 
-A set of the invalid violation strings are available as constants via the [`slate-schema-violations`](../slate-schema-violations) package.
+A set of the invalid violation strings are available as constants via the [`slate-schema-violations`](../slate-schema-violations/index.md) package.
