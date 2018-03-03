@@ -2,6 +2,7 @@ import assert from 'assert'
 import fs from 'fs'
 import { Schema } from '../..'
 import { basename, extname, resolve } from 'path'
+import printValueErrorMessage from '../../../../support/test/printValueErrorMessage'
 
 /**
  * Tests.
@@ -27,7 +28,11 @@ describe('schema', () => {
           .normalize()
           .value.toJSON()
 
-        assert.deepEqual(actual, expected)
+        assert.deepEqual(
+          actual,
+          expected,
+          printValueErrorMessage('deepEqual', actual, expected)
+        )
       })
     }
   })
@@ -51,7 +56,11 @@ describe('schema', () => {
           .normalize()
           .value.toJSON()
 
-        assert.deepEqual(actual, expected)
+        assert.deepEqual(
+          actual,
+          expected,
+          printValueErrorMessage('deepEqual', actual, expected)
+        )
       })
     }
   })

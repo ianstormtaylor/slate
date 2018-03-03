@@ -3,6 +3,8 @@ import fs from 'fs-promise' // eslint-disable-line import/no-extraneous-dependen
 import toCamel from 'to-camel-case' // eslint-disable-line import/no-extraneous-dependencies
 import { basename, extname, resolve } from 'path'
 
+import printValueErrorMessage from '../../../../support/test/printValueErrorMessage'
+
 /**
  * Tests.
  */
@@ -36,7 +38,11 @@ describe('operations', async () => {
               const opts = { preserveSelection: true, preserveData: true }
               const actual = change.value.toJSON(opts)
               const expected = output.toJSON(opts)
-              assert.deepEqual(actual, expected)
+              assert.deepEqual(
+                actual,
+                expected,
+                printValueErrorMessage('deepEqual', actual, expected)
+              )
             })
           }
         })

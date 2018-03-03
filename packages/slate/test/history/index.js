@@ -1,6 +1,7 @@
 import assert from 'assert'
 import fs from 'fs'
 import { basename, extname, resolve } from 'path'
+import printValueErrorMessage from '../../../../support/test/printValueErrorMessage'
 
 /**
  * Tests.
@@ -31,7 +32,11 @@ describe('history', async () => {
           const opts = { preserveSelection: true, preserveData: true }
           const actual = next.toJSON(opts)
           const expected = output.toJSON(opts)
-          assert.deepEqual(actual, expected)
+          assert.deepEqual(
+            actual,
+            expected,
+            printValueErrorMessage('deepEqual', actual, expected)
+          )
         })
       }
     })
