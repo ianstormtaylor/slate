@@ -11,7 +11,7 @@ import Range from './range'
 import Text from './text'
 import generateKey from '../utils/generate-key'
 import isIndexInRange from '../utils/is-index-in-range'
-import memoize from '../utils/memoize'
+import memoize, { setCacheNullWithBatchKeys } from '../utils/memoize'
 
 /**
  * Node.
@@ -359,11 +359,24 @@ class Node {
       return ancestors
     })
 
-    if (ancestors) {
-      return ancestors.unshift(this)
-    } else {
+    if (!ancestors) {
       return null
     }
+
+    const ancestorKeyArgs = ancestors.map(n => n.key)
+    const furthestAncestor = ancestors.first()
+
+    const asyncPromise = Promise.resolve() // eslint-disable-line no-undef,no-restricted-globals
+    asyncPromise.then(() => {
+      this.nodes.find(node => {
+        if (node.object === 'text') return false
+        if (node === furthestAncestor) return true
+        setCacheNullWithBatchKeys(node, 'getAncestors', ancestorKeyArgs)
+        return false
+      })
+    })
+
+    return ancestors.unshift(this)
   }
 
   /**
