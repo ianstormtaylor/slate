@@ -9,6 +9,7 @@ import getEventTransfer from './utils/get-event-transfer'
 import setEventTransfer from './utils/set-event-transfer'
 import AfterPlugin from './plugins/after'
 import BeforePlugin from './plugins/before'
+import HOTKEYS from './constants/hotkeys'
 
 /**
  * Export.
@@ -28,6 +29,7 @@ export {
   setEventTransfer,
   AfterPlugin,
   BeforePlugin,
+  HOTKEYS,
 }
 
 export default {
@@ -42,4 +44,5 @@ export default {
   setEventTransfer,
   AfterPlugin,
   BeforePlugin,
+  HOTKEYS,
 }
