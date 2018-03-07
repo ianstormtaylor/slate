@@ -9,6 +9,7 @@ import slatePropTypes from '../../packages/slate-prop-types/package.json'
 import slateReact from '../../packages/slate-react/package.json'
 import slateSchemaViolations from '../../packages/slate-schema-violations/package.json'
 import slateSimulator from '../../packages/slate-simulator/package.json'
+import slateHotkeys from '../../packages/slate-hotkeys/package.json'
 
 const configurations = [
   ...factory(slate),
@@ -21,6 +22,7 @@ const configurations = [
   ...factory(slateReact),
   ...factory(slateSchemaViolations),
   ...factory(slateSimulator),
+  ...factory(slateHotkeys),
 ]
 
 export default configurations

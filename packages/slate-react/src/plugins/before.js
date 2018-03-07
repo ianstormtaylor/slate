@@ -2,13 +2,12 @@ import Debug from 'debug'
 import getWindow from 'get-window'
 import { findDOMNode } from 'react-dom'
 
-import HOTKEYS from '../constants/hotkeys'
-import {
+import HOTKEYS, {
   IS_FIREFOX,
   IS_IOS,
   IS_ANDROID,
   SUPPORTED_EVENTS,
-} from '../constants/environment'
+} from 'slate-hotkeys'
 import findNode from '../utils/find-node'
 
 /**
