@@ -71,6 +71,10 @@ class Leaf extends React.Component {
     return false
   }
 
+  setRef = ref => {
+    this.spanRef = ref
+  }
+
   /**
    * Render the leaf.
    *
@@ -86,7 +90,11 @@ class Leaf extends React.Component {
       index,
     })
 
-    return <span data-offset-key={offsetKey}>{this.renderMarks()}</span>
+    return (
+      <span ref={this.setRef} data-offset-key={offsetKey}>
+        {this.renderMarks()}
+      </span>
+    )
   }
 
   /**
