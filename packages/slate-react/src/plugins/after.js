@@ -328,6 +328,7 @@ function AfterPlugin() {
 
     // Get the text information.
     const { text } = leaf
+
     let textContent = ''
 
     const { parentNode } = anchorNode
@@ -349,14 +350,8 @@ function AfterPlugin() {
     } else {
       textContent = parentNode.textContent
     }
-    if (!leaf.marks.size) {
-      if (parentNode.getAttribute('data-key')) {
-        parentNode.removeChild(anchorNode)
-      }
-      if (parentNode.getAttribute('data-offset-key')) {
-        parentNode.removeChild(anchorNode)
-        parentNode.removeChild(parentNode.firstChild)
-      }
+    if (leaf.marks.size) {
+      parentNode.removeChild(anchorNode)
     }
 
     // Determine what the selection should be after changing the text.

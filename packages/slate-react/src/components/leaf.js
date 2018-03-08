@@ -37,6 +37,12 @@ class Leaf extends React.Component {
     parent: SlateTypes.node.isRequired,
     text: Types.string.isRequired,
   }
+  constructor(props) {
+    super(props)
+    this.state = {
+      regenerateNum: 0,
+    }
+  }
 
   /**
    * Debug.
@@ -49,6 +55,44 @@ class Leaf extends React.Component {
     debug(message, `${this.props.node.key}-${this.props.index}`, ...args)
   }
 
+  forceRegeneration = () => {
+    this.setState(state => ({
+      regenerateNum: state.regenerateNum + 1,
+    }))
+  }
+
+  componentWillReceiveProps(props) {
+    const { ref, firstChild } = this.leafRefs
+    if (!ref || ref.firstChild !== firstChild) {
+      this.forceRegeneration()
+      return
+    }
+    const { childNodes } = ref
+    if (!childNodes) {
+      this.forceRegeneration()
+      return
+    }
+    for (let index = 0; index < childNodes.length; index++) {
+      const child = childNodes[index]
+      if (child.nodeName === '#text') {
+        this.forceRegeneration()
+        return
+      }
+    }
+    const { node, index } = this.props
+    const offsetKey = OffsetKey.stringify({
+      key: node.key,
+      index,
+    })
+    const queryString = `[data-offset-key="${offsetKey}"]`
+    if (!window.document.querySelector(queryString)) {
+      this.setState(state => ({
+        regenerateNum: state.regenerateNum + 1,
+      }))
+      return
+    }
+  }
+
   /**
    * Should component update?
    *
@@ -56,13 +100,14 @@ class Leaf extends React.Component {
    * @return {Boolean}
    */
 
-  shouldComponentUpdate(props) {
+  shouldComponentUpdate(props, state) {
     // If any of the regular properties have changed, re-render.
     if (
       props.index != this.props.index ||
       props.marks != this.props.marks ||
       props.text != this.props.text ||
-      props.parent != this.props.parent
+      props.parent != this.props.parent ||
+      state !== this.state
     ) {
       return true
     }
@@ -71,8 +116,15 @@ class Leaf extends React.Component {
     return false
   }
 
+  componentWillUnmount() {
+    this.leafRefs = null
+  }
+
   setRef = ref => {
-    this.spanRef = ref
+    this.leafRefs = {
+      ref,
+      firstChild: ref ? ref.firstChild : null,
+    }
   }
 
   /**
@@ -89,9 +141,10 @@ class Leaf extends React.Component {
       key: node.key,
       index,
     })
+    const key = `${offsetKey}:${this.state.regenerateNum}`
 
     return (
-      <span ref={this.setRef} data-offset-key={offsetKey}>
+      <span key={key} ref={this.setRef} data-offset-key={offsetKey}>
         {this.renderMarks()}
       </span>
     )

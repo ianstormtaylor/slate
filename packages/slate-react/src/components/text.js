@@ -59,6 +59,48 @@ class Text extends React.Component {
     debug(message, `${key} (text)`, ...args)
   }
 
+  constructor(props) {
+    super(props)
+    this.state = {
+      regenerateNum: 0,
+    }
+  }
+
+  forceRegeneration = () => {
+    this.setState(state => ({
+      regenerateNum: state.regenerateNum + 1,
+    }))
+  }
+
+  componentWillReceiveProps(props) {
+    const { ref, firstChild } = this.textRefs
+    if (!ref || ref.firstChild !== firstChild) {
+      this.forceRegeneration()
+      return
+    }
+    const { childNodes } = ref
+    if (!childNodes) {
+      this.forceRegeneration()
+      return
+    }
+    for (let index = 0; index < childNodes.length; index++) {
+      const child = childNodes[index]
+      if (child.nodeName === '#text') {
+        this.forceRegeneration()
+        return
+      }
+    }
+    const { node } = this.props
+    const { key } = node
+    const queryString = `[data-key="${key}"]`
+    if (!window.document.querySelector(queryString)) {
+      this.setState(state => ({
+        regenerateNum: state.regenerateNum + 1,
+      }))
+      return
+    }
+  }
+
   /**
    * Should the node update?
    *
@@ -67,10 +109,11 @@ class Text extends React.Component {
    * @return {Boolean}
    */
 
-  shouldComponentUpdate = nextProps => {
+  shouldComponentUpdate = (nextProps, nextState) => {
     const { props } = this
     const n = nextProps
     const p = props
+    if (nextState !== this.state) return true
 
     // If the node has changed, update. PERF: There are cases where it will have
     // changed, but it's properties will be exactly the same (eg. copy-paste)
@@ -91,6 +134,13 @@ class Text extends React.Component {
 
     // Otherwise, don't update.
     return false
+  }
+
+  setRef = ref => {
+    this.textRefs = {
+      ref,
+      firstChild: ref ? ref.firstChild : null,
+    }
   }
 
   /**
@@ -123,9 +173,10 @@ class Text extends React.Component {
       offset += leaf.text.length
       return child
     })
+    const reactKey = `text:${key}:${this.state.regenerateNum}`
 
     return (
-      <span data-key={key} style={style}>
+      <span ref={this.setRef} key={reactKey} data-key={key} style={style}>
         {children}
       </span>
     )
