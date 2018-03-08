@@ -329,7 +329,9 @@ function AfterPlugin() {
     // Get the text information.
     const { text } = leaf
     let textContent = ''
-    if (!leaf.marks.size) {
+
+    const { parentNode } = anchorNode
+    if (!leaf.marks.size || parentNode.getAttribute('data-key')) {
       textContent = anchorNode.textContent
       const isLastText = node == lastText
       const isLastLeaf = leaf == lastLeaf
@@ -345,19 +347,15 @@ function AfterPlugin() {
       // If the text is no different, abort.
       if (textContent == text) return
     } else {
-      const textContentNode = anchorNode.parentNode
-      textContent = textContentNode.textContent
-      const { length } = textContentNode.childNodes
-      // Remove textNode if
-      // <span/>"spellcheck"
-      // Remove first chold and textNode if
-      // <span/>"spellcheck"<span/>
-      // Leave at least one child to let React re-use for render
-      if (length > 1) {
-        textContentNode.removeChild(anchorNode)
-        if (length > 2) {
-          textContentNode.removeChild(textContentNode.firstChild)
-        }
+      textContent = parentNode.textContent
+    }
+    if (!leaf.marks.size) {
+      if (parentNode.getAttribute('data-key')) {
+        parentNode.removeChild(anchorNode)
+      }
+      if (parentNode.getAttribute('data-offset-key')) {
+        parentNode.removeChild(anchorNode)
+        parentNode.removeChild(parentNode.firstChild)
       }
     }
 
