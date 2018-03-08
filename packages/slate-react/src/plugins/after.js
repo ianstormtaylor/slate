@@ -306,8 +306,13 @@ function AfterPlugin() {
     // Get the selection point.
     const native = window.getSelection()
     const { anchorNode, anchorOffset } = native
-    const point = findPoint(anchorNode, anchorOffset, value)
-    if (!point) return
+    let point = findPoint(anchorNode, anchorOffset, value)
+    if (!point) {
+      const { parentNode } = anchorNode
+      const key = parentNode.getAttribute('data-key')
+      if (!key) return
+      point = { key, offset: undefined }
+    }
 
     // Get the text node and leaf in question.
     const { document, selection } = value
@@ -319,12 +324,32 @@ function AfterPlugin() {
     let start = 0
     let end = 0
 
-    const leaf =
+    let leaf = undefined
+    if (point.offset !== undefined) {
+      leaf =
+        leaves.find(r => {
+          start = end
+          end += r.text.length
+          if (end >= point.offset) return true
+        }) || lastLeaf
+    } else {
+      const { childNodes } = anchorNode.parentNode
+      let index = 0
+      for (; index < childNodes.length; index++) {
+        if (childNodes[index] === anchorNode) {
+          break
+        }
+      }
+      leaf = leaves.get(index)
+      if (!leaf) return
       leaves.find(r => {
-        start = end
-        end += r.text.length
-        if (end >= point.offset) return true
-      }) || lastLeaf
+        if (r !== leaf) {
+          start += r.text.length
+        }
+        return r === leaf
+      })
+      end = start + leaf.text.length
+    }
 
     // Get the text information.
     const { text } = leaf
@@ -349,9 +374,12 @@ function AfterPlugin() {
       if (textContent == text) return
     } else {
       textContent = parentNode.textContent
+      if (text === textContent) return
     }
     if (leaf.marks.size) {
-      parentNode.removeChild(anchorNode)
+      if (anchorNode.parentNode.getAttribute('data-offset-key')) {
+        parentNode.removeChild(anchorNode)
+      }
     }
 
     // Determine what the selection should be after changing the text.

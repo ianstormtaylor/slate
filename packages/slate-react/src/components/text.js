@@ -86,6 +86,7 @@ class Text extends React.Component {
     for (let index = 0; index < childNodes.length; index++) {
       const child = childNodes[index]
       if (child.nodeName === '#text') {
+        ref.removeChild(child)
         this.forceRegeneration()
         return
       }
