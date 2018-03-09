@@ -37,7 +37,7 @@ export const output = {
                 object: 'leaf',
                 text: '',
                 marks: [],
-              }
+              },
             ],
           },
           {
@@ -53,9 +53,9 @@ export const output = {
                     object: 'leaf',
                     text: 'onetwo',
                     marks: [],
-                  }
+                  },
                 ],
-              }
+              },
             ],
           },
           {
@@ -65,9 +65,9 @@ export const output = {
                 object: 'leaf',
                 text: '',
                 marks: [],
-              }
+              },
             ],
-          }
+          },
         ],
       },
     ],

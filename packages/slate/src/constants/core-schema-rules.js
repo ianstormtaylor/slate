@@ -92,7 +92,7 @@ const CORE_SCHEMA_RULES = [
     },
   },
 
- /**
+  /**
    * Ensure that inline non-void nodes are never empty.
    *
    * This rule is applied to all blocks and inlines, because when they contain an empty
@@ -106,17 +106,17 @@ const CORE_SCHEMA_RULES = [
     validateNode(node) {
       if (node.object != 'inline' && node.object != 'block') return
 
-      function isEmpty(node) {
-        // text node is empty when text is empty        
-        if (node.object === 'text') {
-          return node.text === ''
-        } 
+      function isEmpty(n) {
+        // text node is empty when text is empty
+        if (n.object === 'text') {
+          return n.text === ''
+        }
         // void is always considered non-empty regardless of actual content
-        if (node.isVoid) return false
+        if (n.isVoid) return false
         // otherwise node is empty if all children are empty
-        return !node.nodes.some(child => !isEmpty(child))                
-      }      
-            
+        return !n.nodes.some(child => !isEmpty(child))
+      }
+
       const invalids = node.nodes.filter(
         child => child.object === 'inline' && isEmpty(child)
       )

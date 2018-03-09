@@ -27,7 +27,7 @@ export const output = {
         type: 'paragraph',
         isVoid: false,
         data: {},
-        nodes: [          
+        nodes: [
           {
             object: 'text',
             leaves: [
@@ -35,15 +35,15 @@ export const output = {
                 object: 'leaf',
                 text: '',
                 marks: [],
-              }
+              },
             ],
-          },          
+          },
           {
             object: 'inline',
             type: 'link',
             isVoid: false,
             data: {},
-            nodes: [              
+            nodes: [
               {
                 object: 'text',
                 leaves: [
@@ -51,15 +51,15 @@ export const output = {
                     object: 'leaf',
                     text: '',
                     marks: [],
-                  }
+                  },
                 ],
-              },              
+              },
               {
                 object: 'inline',
                 type: '',
                 isVoid: true,
                 data: {},
-                nodes: [                  
+                nodes: [
                   {
                     object: 'text',
                     leaves: [
@@ -67,7 +67,7 @@ export const output = {
                         object: 'leaf',
                         text: '',
                         marks: [],
-                      }
+                      },
                     ],
                   },
                 ],
@@ -79,11 +79,11 @@ export const output = {
                     object: 'leaf',
                     text: '',
                     marks: [],
-                  }
+                  },
                 ],
-              }
+              },
             ],
-          },          
+          },
           {
             object: 'text',
             leaves: [
@@ -91,9 +91,9 @@ export const output = {
                 object: 'leaf',
                 text: '',
                 marks: [],
-              }
+              },
             ],
-          }
+          },
         ],
       },
     ],
