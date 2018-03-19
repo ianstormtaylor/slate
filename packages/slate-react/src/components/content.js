@@ -72,7 +72,6 @@ class Content extends React.Component {
   constructor(props) {
     super(props)
     this.tmp = {}
-    this.tmp.key = 0
     this.tmp.isUpdatingSelection = false
 
     EVENT_HANDLERS.forEach(handler => {
@@ -283,12 +282,6 @@ class Content extends React.Component {
   onEvent(handler, event) {
     debug('onEvent', handler)
 
-    // COMPAT: Composition events can change the DOM out of under React, so we
-    // increment this key to ensure that a full re-render happens. (2017/10/16)
-    if (handler == 'onCompositionEnd') {
-      this.tmp.key++
-    }
-
     // Ignore `onBlur`, `onFocus` and `onSelect` events generated
     // programmatically while updating selection.
     if (
@@ -497,7 +490,6 @@ class Content extends React.Component {
       <Container
         {...handlers}
         data-slate-editor
-        key={this.tmp.key}
         ref={this.ref}
         data-key={document.key}
         contentEditable={readOnly ? null : true}
