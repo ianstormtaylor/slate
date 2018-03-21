@@ -7,11 +7,9 @@ export const schema = {}
 export const input = (
   <value>
     <document>
-      <quote>
-        <paragraph>
-          <link />
-        </paragraph>
-      </quote>
+      <paragraph>
+        <link />
+      </paragraph>
     </document>
   </value>
 )
@@ -24,25 +22,17 @@ export const output = {
     nodes: [
       {
         object: 'block',
-        type: 'quote',
-        data: {},
+        type: 'paragraph',
         isVoid: false,
+        data: {},
         nodes: [
           {
-            object: 'block',
-            type: 'paragraph',
-            isVoid: false,
-            data: {},
-            nodes: [
+            object: 'text',
+            leaves: [
               {
-                object: 'text',
-                leaves: [
-                  {
-                    object: 'leaf',
-                    text: '',
-                    marks: [],
-                  },
-                ],
+                object: 'leaf',
+                text: '',
+                marks: [],
               },
             ],
           },
