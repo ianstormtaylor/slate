@@ -53,6 +53,11 @@ const UNDEFINED = {}
 const UNSET = undefined
 
 /**
+ * A set of methods to expose setIn, getIn, set and get
+ *
+ */
+
+/**
  * Memoize all of the `properties` on a `object`.
  *
  * @param {Object} object
@@ -60,9 +65,7 @@ const UNSET = undefined
  * @return {Record}
  */
 
-function memoize(object, properties, options = {}) {
-  const { takesArguments = true } = options
-
+function memoize(object, properties) {
   for (const property of properties) {
     const original = object[property]
 
@@ -70,7 +73,7 @@ function memoize(object, properties, options = {}) {
       throw new Error(`Object does not have a property named "${property}".`)
     }
 
-    object[property] = function(...args) {
+    const converted = function(...args) {
       if (IS_DEV) {
         // If memoization is disabled, call into the original method.
         if (!ENABLED) return original.apply(this, args)
@@ -79,11 +82,25 @@ function memoize(object, properties, options = {}) {
         if (CACHE_KEY !== this.__cache_key) {
           this.__cache_key = CACHE_KEY
           this.__cache = new Map() // eslint-disable-line no-undef,no-restricted-globals
+          this.__cache_no_args = {}
         }
       }
 
       if (!this.__cache) {
         this.__cache = new Map() // eslint-disable-line no-undef,no-restricted-globals
+      }
+      if (!this.__cache_no_args) {
+        this.__cache_no_args = {}
+      }
+
+      // The default parameter of text.getLeaves would have an arg with fn.length===0
+      const takesArguments = original.length !== 0 || args.length !== 0
+      if (IS_DEV && takesArguments) {
+        if (original.length > args.length) {
+          throw new Error(
+            `Not Enough arguments provided for function ${property}`
+          )
+        }
       }
 
       let cachedValue
@@ -93,7 +110,7 @@ function memoize(object, properties, options = {}) {
         keys = [property, ...args]
         cachedValue = getIn(this.__cache, keys)
       } else {
-        cachedValue = this.__cache.get(property)
+        cachedValue = this.__cache_no_args[property]
       }
 
       // If we've got a result already, return it.
@@ -108,10 +125,46 @@ function memoize(object, properties, options = {}) {
       if (takesArguments) {
         this.__cache = setIn(this.__cache, keys, v)
       } else {
-        this.__cache.set(property, v)
+        this.__cache_no_args[property] = v
       }
 
       return value
+    }
+
+    // Keep fn.length unchanged after cache binding
+    switch (original.length) {
+      case 0:
+        object[property] = function(...args) {
+          return converted.apply(this, args)
+        }
+        break
+      case 1:
+        object[property] = function(a1, ...args) {
+          return converted.call(this, a1, ...args)
+        }
+        break
+      case 2:
+        object[property] = function(a1, a2, ...args) {
+          return converted.call(this, a1, a2, ...args)
+        }
+        break
+      case 3:
+        object[property] = function(a1, a2, a3, ...args) {
+          return converted.call(this, a1, a2, a3, ...args)
+        }
+        break
+      case 4:
+        object[property] = function(a1, a2, a3, a4, ...args) {
+          return converted.call(this, a1, a2, a3, a4, ...args)
+        }
+        break
+      case 5:
+        object[property] = function(a1, a2, a3, a4, a5, ...args) {
+          return converted.call(this, a1, a2, a3, a4, a5, ...args)
+        }
+        break
+      default:
+        object[property] = converted
     }
   }
 }
