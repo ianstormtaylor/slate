@@ -845,16 +845,16 @@ class Node {
       throw new Error(`Could not find a descendant node with key "${key}".`)
     }
 
-    return (
-      ancestors
-        // Skip this node...
-        .skipLast()
-        // Take parents until there are more than one child...
-        .reverse()
-        .takeUntil(p => p.nodes.size > 1)
-        // And pick the highest.
-        .last()
-    )
+    const result = ancestors
+      // Skip this node...
+      .shift()
+      // Take parents until there are more than one child...
+      .reverse()
+      .takeUntil(p => p.nodes.size > 1)
+      // And pick the highest.
+      .last()
+    if (!result) return null
+    return result
   }
 
   /**

@@ -33,4 +33,21 @@ describe('models', () => {
       }
     })
   })
+
+  describe('node', () => {
+    describe('node', () => {
+      const testsDir = resolve(__dirname, 'node')
+      const tests = fs
+        .readdirSync(testsDir)
+        .filter(t => t[0] != '.')
+        .map(t => basename(t, extname(t)))
+
+      for (const test of tests) {
+        it(test, async () => {
+          const run = require(resolve(testsDir, test)).default
+          run()
+        })
+      }
+    })
+  })
 })
