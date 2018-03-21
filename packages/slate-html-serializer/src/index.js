@@ -54,7 +54,7 @@ const TEXT_RULE = {
   serialize(obj, children) {
     if (obj.object === 'string') {
       return children.split('\n').reduce((array, text, i) => {
-        if (i != 0) array.push(<br />)
+        if (i != 0) array.push(<br key={i} />)
         array.push(text)
         return array
       }, [])
