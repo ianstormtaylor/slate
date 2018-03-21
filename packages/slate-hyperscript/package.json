@@ -18,7 +18,7 @@
     "slate-dev-logger": "^0.1.39"
   },
   "peerDependencies": {
-    "slate": "^0.32.1"
+    "slate": ">=0.32.0"
   },
   "devDependencies": {
     "mocha": "^2.5.3",
