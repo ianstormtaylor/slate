@@ -163,12 +163,14 @@ class Block extends Record(DEFAULTS) {
 
   /**
    * Check if the block is empty.
+   * Returns true if block is not void and all it's children nodes are empty.
+   * Void node is never empty, regardless of it's content.
    *
    * @return {Boolean}
    */
 
   get isEmpty() {
-    return this.text == ''
+    return !this.isVoid && !this.nodes.some(child => !child.isEmpty)
   }
 
   /**

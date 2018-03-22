@@ -121,12 +121,13 @@ class Document extends Record(DEFAULTS) {
 
   /**
    * Check if the document is empty.
+   * Returns true if all it's children nodes are empty.
    *
    * @return {Boolean}
    */
 
   get isEmpty() {
-    return this.text == ''
+    return !this.nodes.some(child => !child.isEmpty)
   }
 
   /**

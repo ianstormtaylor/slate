@@ -106,19 +106,8 @@ const CORE_SCHEMA_RULES = [
     validateNode(node) {
       if (node.object != 'inline' && node.object != 'block') return
 
-      function isEmpty(n) {
-        // text node is empty when text is empty
-        if (n.object === 'text') {
-          return n.text === ''
-        }
-        // void is always considered non-empty regardless of actual content
-        if (n.isVoid) return false
-        // otherwise node is empty if all children are empty
-        return !n.nodes.some(child => !isEmpty(child))
-      }
-
       const invalids = node.nodes.filter(
-        child => child.object === 'inline' && isEmpty(child)
+        child => child.object === 'inline' && child.isEmpty
       )
 
       if (!invalids.size) return
