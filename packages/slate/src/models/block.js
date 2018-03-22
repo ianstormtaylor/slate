@@ -169,7 +169,7 @@ class Block extends Record(DEFAULTS) {
    * @return {Boolean}
    */
 
-  get isEmpty() {        
+  get isEmpty() {
     return !this.isVoid && !this.nodes.some(child => !child.isEmpty)
   }
 
