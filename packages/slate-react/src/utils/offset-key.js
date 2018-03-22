@@ -4,7 +4,7 @@
  * @type {RegExp}
  */
 
-const PARSER = /^(\w+)(?::(\d+))?$/
+const PARSER = /^([\w-]+)(?::(\d+))?$/
 
 /**
  * Parse an offset key `string`.

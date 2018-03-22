@@ -845,16 +845,16 @@ class Node {
       throw new Error(`Could not find a descendant node with key "${key}".`)
     }
 
-    return (
-      ancestors
-        // Skip this node...
-        .skipLast()
-        // Take parents until there are more than one child...
-        .reverse()
-        .takeUntil(p => p.nodes.size > 1)
-        // And pick the highest.
-        .last()
-    )
+    const result = ancestors
+      // Skip this node...
+      .shift()
+      // Take parents until there are more than one child...
+      .reverse()
+      .takeUntil(p => p.nodes.size > 1)
+      // And pick the highest.
+      .last()
+    if (!result) return null
+    return result
   }
 
   /**
@@ -1987,6 +1987,22 @@ class Node {
   validate(schema) {
     return schema.validateNode(this)
   }
+
+  /**
+   * Get the first invalid descendant
+   *
+   * @param {Schema} schema
+   * @return {Node|Text|Null}
+   */
+
+  getFirstInvalidDescendant(schema) {
+    let result = null
+    this.nodes.find(n => {
+      result = n.validate(schema) ? n : n.getFirstInvalidDescendant(schema)
+      return result
+    })
+    return result
+  }
 }
 
 /**
@@ -2072,6 +2088,7 @@ memoize(
     'getTextAtOffset',
     'getTextsAtRangeAsArray',
     'validate',
+    'getFirstInvalidDescendant',
   ],
   {
     takesArguments: true,
