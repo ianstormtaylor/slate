@@ -73,7 +73,7 @@ function memoize(object, properties) {
       throw new Error(`Object does not have a property named "${property}".`)
     }
 
-    const converted = function(...args) {
+    object[property] = function(...args) {
       if (IS_DEV) {
         // If memoization is disabled, call into the original method.
         if (!ENABLED) return original.apply(this, args)
@@ -129,42 +129,6 @@ function memoize(object, properties) {
       }
 
       return value
-    }
-
-    // Keep fn.length unchanged after cache binding
-    switch (original.length) {
-      case 0:
-        object[property] = function(...args) {
-          return converted.apply(this, args)
-        }
-        break
-      case 1:
-        object[property] = function(a1, ...args) {
-          return converted.call(this, a1, ...args)
-        }
-        break
-      case 2:
-        object[property] = function(a1, a2, ...args) {
-          return converted.call(this, a1, a2, ...args)
-        }
-        break
-      case 3:
-        object[property] = function(a1, a2, a3, ...args) {
-          return converted.call(this, a1, a2, a3, ...args)
-        }
-        break
-      case 4:
-        object[property] = function(a1, a2, a3, a4, ...args) {
-          return converted.call(this, a1, a2, a3, a4, ...args)
-        }
-        break
-      case 5:
-        object[property] = function(a1, a2, a3, a4, a5, ...args) {
-          return converted.call(this, a1, a2, a3, a4, a5, ...args)
-        }
-        break
-      default:
-        object[property] = converted
     }
   }
 }
