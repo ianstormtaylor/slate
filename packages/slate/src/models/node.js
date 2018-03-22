@@ -351,6 +351,7 @@ class Node {
 
     if (key == this.key) return List()
     if (this.hasChild(key)) return List([this])
+    if (!this.getDescendant(key)) return null
 
     let ancestors
     this.nodes.find(node => {
@@ -359,11 +360,7 @@ class Node {
       return ancestors
     })
 
-    if (ancestors) {
-      return ancestors.unshift(this)
-    } else {
-      return null
-    }
+    return ancestors.unshift(this)
   }
 
   /**
@@ -651,10 +648,20 @@ class Node {
 
   getDescendant(key) {
     key = assertKey(key)
-    // Use the cache by getAncestors
-    const ancestors = this.getAncestors(key)
-    if (!ancestors || ancestors.size === 0) return null
-    return ancestors.last().getChild(key)
+    let descendantFound = null
+
+    const found = this.nodes.find(node => {
+      if (node.key === key) {
+        return node
+      } else if (node.object !== 'text') {
+        descendantFound = node.getDescendant(key)
+        return descendantFound
+      } else {
+        return false
+      }
+    })
+
+    return descendantFound || found
   }
 
   /**
