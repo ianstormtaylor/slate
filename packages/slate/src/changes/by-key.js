@@ -424,11 +424,13 @@ Changes.replaceNodeByKey = (change, key, newNode, options = {}) => {
   const parent = document.getParent(key)
   const index = parent.nodes.indexOf(node)
   change.removeNodeByKey(key, { normalize: false })
-  change.insertNodeByKey(parent.key, index, newNode, options)
+  change.insertNodeByKey(parent.key, index, newNode, { normalize })
+
+  // Restore the selection after replaceNode
   const { anchorKey, focusKey } = selection
   newNode = change.value.document.getDescendant(newNode.key)
-
-  if (newNode && anchorKey !== change.value.anchorKey) {
+  if (!newNode) return undefined
+  if (anchorKey !== change.value.anchorKey) {
     const { anchorOffset } = selection
     const anchorText = refindByKey(anchorKey, node, newNode)
     if (anchorText) {
@@ -436,17 +438,13 @@ Changes.replaceNodeByKey = (change, key, newNode, options = {}) => {
       change.moveAnchorTo(anchorText.key, newOffset)
     }
   }
-  if (newNode && focusKey !== change.value.focusKey) {
+  if (focusKey !== change.value.focusKey) {
     const { focusOffset } = selection
     const focusText = refindByKey(focusKey, node, newNode)
     if (focusText) {
       const newOffset = Math.min(focusText.text.length, focusOffset)
       change.moveFocusTo(focusText.key, newOffset)
     }
-  }
-
-  if (normalize) {
-    change.normalizeNodeByKey(parent.key)
   }
 }
 
