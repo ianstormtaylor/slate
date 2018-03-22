@@ -350,8 +350,8 @@ class Node {
     key = assertKey(key)
 
     if (key == this.key) return List()
-    if (this.hasChild(key)) return List([this])
     if (!this.getDescendant(key)) return null
+    if (this.hasChild(key)) return List([this])
 
     let ancestors
     this.nodes.find(node => {
