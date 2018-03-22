@@ -163,12 +163,14 @@ class Inline extends Record(DEFAULTS) {
 
   /**
    * Check if the inline is empty.
+   * Returns true if inline is not void and all it's children nodes are empty.
+   * Void node is never empty, regardless of it's content.
    *
    * @return {Boolean}
    */
 
   get isEmpty() {
-    return this.text == ''
+    return !this.isVoid && !this.nodes.some(child => !child.isEmpty)
   }
 
   /**

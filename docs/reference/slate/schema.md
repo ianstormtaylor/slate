@@ -73,6 +73,7 @@ A dictionary of inlines by type, each with its own set of validation rules.
   isVoid: Boolean,
   last: Object,
   nodes: Array,
+  marks: Array,
   normalize: Function,
   parent: Object,
   text: RegExp,
@@ -147,6 +148,18 @@ Will validate the last child node. The `last` definition can declare `objects` a
 Will validate a node's children. The `nodes` definitions can declare the `objects`, `types`, `min` and `max` properties.
 
 > 🤖 The `nodes` array is order-sensitive! The example above will require that the first node be either an `image` or `video`, and that it be followed by one or more `paragraph` nodes.
+
+### `marks`
+
+`Array`
+
+```js
+{
+  marks: ['italic']
+}
+```
+
+Will validate a node's marks. The `marks` definitions can declare a list of marks type to be allowed. If declared, any marks that are not in the list will be removed.
 
 ### `normalize`
 

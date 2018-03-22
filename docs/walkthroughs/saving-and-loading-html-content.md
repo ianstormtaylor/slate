@@ -103,27 +103,29 @@ const rules = [
     // Switch deserialize to handle more blocks...
     deserialize(el, next) {
       const type = BLOCK_TAGS[el.tagName.toLowerCase()]
-      if (!type) return
-      return {
-        object: 'block',
-        type: type,
-        nodes: next(el.childNodes),
+      if (type) {
+        return {
+          object: 'block',
+          type: type,
+          nodes: next(el.childNodes),
+        }
       }
     },
     // Switch serialize to handle more blocks...
     serialize(obj, children) {
-      if (obj.object != 'block') return
-      switch (obj.type) {
-        case 'paragraph':
-          return <p>{children}</p>
-        case 'quote':
-          return <blockquote>{children}</blockquote>
-        case 'code':
-          return (
-            <pre>
-              <code>{children}</code>
-            </pre>
-          )
+      if (obj.object == 'block') {
+        switch (obj.type) {
+          case 'paragraph':
+            return <p>{children}</p>
+          case 'quote':
+            return <blockquote>{children}</blockquote>
+          case 'code':
+            return (
+              <pre>
+                <code>{children}</code>
+              </pre>
+            )
+        }
       }
     },
   },
@@ -154,26 +156,28 @@ const rules = [
   {
     deserialize(el, next) {
       const type = BLOCK_TAGS[el.tagName.toLowerCase()]
-      if (!type) return
-      return {
-        object: 'block',
-        type: type,
-        nodes: next(el.childNodes),
+      if (type) {
+        return {
+          object: 'block',
+          type: type,
+          nodes: next(el.childNodes),
+        }
       }
     },
     serialize(obj, children) {
-      if (obj.object != 'block') return
-      switch (obj.type) {
-        case 'code':
-          return (
-            <pre>
-              <code>{children}</code>
-            </pre>
-          )
-        case 'paragraph':
-          return <p>{children}</p>
-        case 'quote':
-          return <blockquote>{children}</blockquote>
+      if (obj.object == 'block') {
+        switch (obj.type) {
+          case 'code':
+            return (
+              <pre>
+                <code>{children}</code>
+              </pre>
+            )
+          case 'paragraph':
+            return <p>{children}</p>
+          case 'quote':
+            return <blockquote>{children}</blockquote>
+        }
       }
     },
   },
@@ -181,22 +185,24 @@ const rules = [
   {
     deserialize(el, next) {
       const type = MARK_TAGS[el.tagName.toLowerCase()]
-      if (!type) return
-      return {
-        object: 'mark',
-        type: type,
-        nodes: next(el.childNodes),
+      if (type) {
+        return {
+          object: 'mark',
+          type: type,
+          nodes: next(el.childNodes),
+        }
       }
     },
     serialize(obj, children) {
-      if (obj.object != 'mark') return
-      switch (obj.type) {
-        case 'bold':
-          return <strong>{children}</strong>
-        case 'italic':
-          return <em>{children}</em>
-        case 'underline':
-          return <u>{children}</u>
+      if (obj.object == 'mark') {
+        switch (obj.type) {
+          case 'bold':
+            return <strong>{children}</strong>
+          case 'italic':
+            return <em>{children}</em>
+          case 'underline':
+            return <u>{children}</u>
+        }
       }
     },
   },

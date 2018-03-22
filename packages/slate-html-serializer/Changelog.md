@@ -4,6 +4,14 @@ This document maintains a list of changes to the `slate-html-serializer` package
 
 ---
 
+### `0.6.0` — March 22, 2018
+
+###### BREAKING
+
+* **Returning `null` now ignores the node.** Previously it would be treated the same as `undefined`, which will move on to the next rule in the stack. Now it ignores the node and moves onto the next node instead.
+
+---
+
 ### `0.5.0` — January 4, 2018
 
 ###### BREAKING
