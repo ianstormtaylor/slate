@@ -301,9 +301,6 @@ function BeforePlugin() {
    */
 
   function onDrop(event, change, editor) {
-    // Stop propagation so the event isn't visible to parent editors.
-    event.stopPropagation()
-
     // Nothing happens in read-only mode.
     if (editor.props.readOnly) return true
 
