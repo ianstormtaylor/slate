@@ -2,6 +2,7 @@ import Block from '../models/block'
 import Inline from '../models/inline'
 import Mark from '../models/mark'
 import Node from '../models/node'
+import refindByKey from '../utils/refind-by-key'
 
 /**
  * Changes.
@@ -424,61 +425,29 @@ Changes.replaceNodeByKey = (change, key, newNode, options = {}) => {
   const index = parent.nodes.indexOf(node)
   change.removeNodeByKey(key, { normalize: false })
   change.insertNodeByKey(parent.key, index, newNode, options)
+  const { anchorKey, focusKey } = selection
   newNode = change.value.document.getDescendant(newNode.key)
 
-  const { anchorKey, focusKey } = selection
   if (newNode && anchorKey !== change.value.anchorKey) {
     const { anchorOffset } = selection
-    const anchorText = refindEdgeTextAfterReplace(anchorKey, node, newNode)
-    if (anchorText && anchorText.object === 'text') {
-      const nextAnchorOffset = Math.min(anchorText.text.length, anchorOffset)
-      change.moveAnchorTo(anchorText.key, nextAnchorOffset)
+    const anchorText = refindByKey(anchorKey, node, newNode)
+    if (anchorText) {
+      const newOffset = Math.min(anchorText.text.length, anchorOffset)
+      change.moveAnchorTo(anchorText.key, newOffset)
     }
   }
   if (newNode && focusKey !== change.value.focusKey) {
     const { focusOffset } = selection
-    const focusText = refindEdgeTextAfterReplace(focusKey, node, newNode)
-    if (focusText && focusText.object === 'text') {
-      const nextFocusOffset = Math.min(focusText.text.length, focusOffset)
-      change.moveFocusTo(focusText.key, nextFocusOffset)
+    const focusText = refindByKey(focusKey, node, newNode)
+    if (focusText) {
+      const newOffset = Math.min(focusText.text.length, focusOffset)
+      change.moveFocusTo(focusText.key, newOffset)
     }
   }
 
   if (normalize) {
     change.normalizeNodeByKey(parent.key)
   }
-}
-
-function refindEdgeTextAfterReplace(edgeKey, oldNode, newNode, methods) {
-  if (!oldNode.getDescendant(edgeKey)) return null
-  let result = newNode.getDescendant(edgeKey)
-  if (result) return result
-  result =
-    oldNode.object === 'text'
-      ? newNode
-      : newNode.getDescendantAtPath(oldNode.getPath(edgeKey))
-  if (!result || result.object === 'text') return result
-  if (result.getFirstText() === result.getLastText())
-    return result.getFirstText()
-
-  // If result includes only a inline with only one text
-  if (result.nodes.size === 3) {
-    return findOnlyTextNodeInInline(result)
-  }
-  return null
-}
-function findOnlyTextNodeInInline(node) {
-  if (node.nodes.size !== 3) {
-    return null
-  }
-  const firstNode = node.nodes.first()
-  if (firstNode.text !== '' || firstNode.object !== 'text') return null
-  const inlineNode = node.nodes.get(1)
-  if (inlineNode.object !== 'inline') return null
-  const lastNode = node.nodes.last()
-  if (lastNode.text !== '' || lastNode.object !== 'text') return null
-  if (inlineNode.nodes.size === 1) return inlineNode.nodes.first()
-  return findOnlyTextNodeInInline(inlineNode)
 }
 
 /**
