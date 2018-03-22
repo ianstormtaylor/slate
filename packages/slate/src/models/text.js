@@ -495,6 +495,18 @@ class Text extends Record(DEFAULTS) {
   validate(schema) {
     return schema.validateNode(this)
   }
+
+  /**
+   * Get the first invalid descendant
+   * PREF: Do not cache this method; because it can cause cycle reference
+   *
+   * @param {Schema} schema
+   * @returns {Text|Null}
+   */
+
+  getFirstInvalidDescendant(schema) {
+    return this.validate(schema) ? this : null
+  }
 }
 
 /**

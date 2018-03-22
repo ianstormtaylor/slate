@@ -65,32 +65,17 @@ function normalizeNodeAndChildren(change, node, schema) {
     return
   }
 
-  const normalizedKeys = []
-  let child = node.nodes.first()
+  let child = node.getFirstInvalidDescendant(schema)
   let path = change.value.document.getPath(node.key)
-
-  // We can't just loop the children and normalize them, because in the process
-  // of normalizing one child, we might end up creating another. Instead, we
-  // have to normalize one at a time, and check for new children along the way.
   while (node && child) {
-    const lastSize = change.operations.size
     normalizeNodeAndChildren(change, child, schema)
-    normalizedKeys.push(child.key)
-
-    // PERF: if size is unchanged, then no operation happens
-    // Therefore we can simply normalize the next child
-    if (lastSize === change.operations.size) {
-      const nextIndex = node.nodes.indexOf(child) + 1
-      child = node.nodes.get(nextIndex)
+    node = change.value.document.refindNode(path, node.key)
+    if (!node) {
+      path = []
+      child = null
     } else {
-      node = change.value.document.refindNode(path, node.key)
-      if (!node) {
-        path = []
-        child = null
-      } else {
-        path = change.value.document.refindPath(path, node.key)
-        child = node.nodes.find(c => !normalizedKeys.includes(c.key))
-      }
+      path = change.value.document.refindPath(path, node.key)
+      child = node.getFirstInvalidDescendant(schema)
     }
   }
 
