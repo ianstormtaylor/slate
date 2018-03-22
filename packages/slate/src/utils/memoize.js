@@ -53,11 +53,6 @@ const UNDEFINED = {}
 const UNSET = undefined
 
 /**
- * A set of methods to expose setIn, getIn, set and get
- *
- */
-
-/**
  * Memoize all of the `properties` on a `object`.
  *
  * @param {Object} object
@@ -94,14 +89,7 @@ function memoize(object, properties) {
       }
 
       // The default parameter of text.getLeaves would have an arg with fn.length===0
-      const takesArguments = original.length !== 0 || args.length !== 0
-      if (IS_DEV && takesArguments) {
-        if (original.length > args.length) {
-          throw new Error(
-            `Not Enough arguments provided for function ${property}`
-          )
-        }
-      }
+      const takesArguments = args.length !== 0
 
       let cachedValue
       let keys
