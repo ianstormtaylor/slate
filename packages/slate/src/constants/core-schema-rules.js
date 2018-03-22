@@ -95,20 +95,19 @@ const CORE_SCHEMA_RULES = [
   /**
    * Ensure that inline non-void nodes are never empty.
    *
-   * This rule is applied to all blocks, because when they contain an empty
-   * inline, we need to remove the inline from that parent block. If `validate`
-   * was to be memoized, it should be against the parent node, not the inline
-   * themselves.
+   * This rule is applied to all blocks and inlines, because when they contain an empty
+   * inline, we need to remove the empty inline from that parent node. If `validate`
+   * was to be memoized, it should be against the parent node, not the empty inline itself.
    *
    * @type {Object}
    */
 
   {
     validateNode(node) {
-      if (node.object != 'block') return
+      if (node.object != 'inline' && node.object != 'block') return
 
       const invalids = node.nodes.filter(
-        n => n.object === 'inline' && n.isVoid === false && n.text === ''
+        child => child.object === 'inline' && child.isEmpty
       )
 
       if (!invalids.size) return

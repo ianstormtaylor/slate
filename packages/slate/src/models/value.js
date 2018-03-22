@@ -603,7 +603,7 @@ class Value extends Record(DEFAULTS) {
   get isEmpty() {
     if (this.isCollapsed) return true
     if (this.endOffset != 0 && this.startOffset != 0) return false
-    return this.fragment.text.length == 0
+    return this.fragment.isEmpty
   }
 
   /**
