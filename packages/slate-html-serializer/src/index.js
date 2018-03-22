@@ -325,7 +325,7 @@ class Html {
 
   serialize = (value, options = {}) => {
     const { document } = value
-    const elements = document.nodes.map(this.serializeNode)
+    const elements = document.nodes.map(this.serializeNode).filter(el => el)
     if (options.render === false) return elements
 
     const html = renderToStaticMarkup(<body>{elements}</body>)
@@ -351,6 +351,7 @@ class Html {
     for (const rule of this.rules) {
       if (!rule.serialize) continue
       const ret = rule.serialize(node, children)
+      if (ret === null) return
       if (ret) return addKey(ret)
     }
 
@@ -372,6 +373,7 @@ class Html {
       for (const rule of this.rules) {
         if (!rule.serialize) continue
         const ret = rule.serialize(mark, children)
+        if (ret === null) return
         if (ret) return addKey(ret)
       }
 
