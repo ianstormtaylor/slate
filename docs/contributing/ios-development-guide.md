@@ -9,7 +9,7 @@ We do not currently have instructions on developing for iOS using Windows or Lin
 ## Outline of Steps
 
 * Installation
-  * Install Simulator
+  * Install Xcode
 * Development
   * Open Simulator
   * Disable Virtual Keyboard in Simulator
@@ -30,6 +30,8 @@ If you don't have Xcode installed already, install it now by following these ins
 * The word **GET** will change to **INSTALL APP**. Click this button.
 * You will need to enter your **Apple ID** and **Password** to continue with the installation.
 * The button will read **INSTALLING** during the installation process.
+
+![App Store with search results for &quot;xcode&quot; \(Xcode already installed here\)](../.gitbook/assets/image.png)
 
 
 
