@@ -1,16 +1,5 @@
 /**
- * Is in development?
- *
- * @type {Boolean}
- */
-
-const IS_DEV =
-  typeof process !== 'undefined' &&
-  process.env &&
-  process.env.NODE_ENV !== 'production'
-
-/**
- * GLOBAL: True if memoization should is enabled. Only effective when `IS_DEV`.
+ * GLOBAL: True if memoization should is enabled.
  *
  * @type {Boolean}
  */
@@ -19,7 +8,6 @@ let ENABLED = true
 
 /**
  * GLOBAL: Changing this cache key will clear all previous cached results.
- * Only effective when `IS_DEV`.
  *
  * @type {Number}
  */
@@ -69,16 +57,14 @@ function memoize(object, properties) {
     }
 
     object[property] = function(...args) {
-      if (IS_DEV) {
-        // If memoization is disabled, call into the original method.
-        if (!ENABLED) return original.apply(this, args)
+      // If memoization is disabled, call into the original method.
+      if (!ENABLED) return original.apply(this, args)
 
-        // If the cache key is different, previous caches must be cleared.
-        if (CACHE_KEY !== this.__cache_key) {
-          this.__cache_key = CACHE_KEY
-          this.__cache = new Map() // eslint-disable-line no-undef,no-restricted-globals
-          this.__cache_no_args = {}
-        }
+      // If the cache key is different, previous caches must be cleared.
+      if (CACHE_KEY !== this.__cache_key) {
+        this.__cache_key = CACHE_KEY
+        this.__cache = new Map() // eslint-disable-line no-undef,no-restricted-globals
+        this.__cache_no_args = {}
       }
 
       if (!this.__cache) {
