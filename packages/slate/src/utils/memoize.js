@@ -88,7 +88,6 @@ function memoize(object, properties) {
         this.__cache_no_args = {}
       }
 
-      // The default parameter of text.getLeaves would have an arg with fn.length===0
       const takesArguments = args.length !== 0
 
       let cachedValue
