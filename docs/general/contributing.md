@@ -25,7 +25,7 @@ Any issue you open must include:
 
 Here's a [JSFiddle template for Slate](https://jsfiddle.net/fj9dvhom/1/) to get you started:
 
-![](../.gitbook/assets/jsfiddle%20%281%29.png)
+![](../.gitbook/assets/jsfiddle.png)
 
 ## Asking Questions
 

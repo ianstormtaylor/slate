@@ -31,7 +31,32 @@ If you don't have Xcode installed already, install it now by following these ins
 * You will need to enter your **Apple ID** and **Password** to continue with the installation.
 * The button will read **INSTALLING** during the installation process.
 
-![App Store with search results for &quot;xcode&quot; \(Xcode already installed here\)](../.gitbook/assets/image.png)
+![App Store with search results for &quot;xcode&quot; \(Xcode already installed here\)](../.gitbook/assets/image%20%282%29.png)
+
+## Development
+
+### Open Simulator
+
+### Start a Device in Simulator
+
+To start a Device:
+
+* Click the **Hardware** menu
+* Select the **Device** sub-menu
+* Select the iOS version you wish to start \(try iOS 11.2 to start\)
+* Select the specific device \(try iPhone 8 to start\)
+
+![Opening a device in Simulator](../.gitbook/assets/image%20%281%29.png)
+
+After starting the device, you will see a working simulation of the device on the screen.
+
+![Simulator running iOS 11.2 on an iPhone 8](../.gitbook/assets/image%20%284%29.png)
+
+Open Safari on the device by clicking the Safari icon \(it's the one that looks like a compass\).
+
+Once Safari is open, enter the URL you wish to work on. For now, try entering `slatejs.org` to visite the Slate Examples page on the Internet.
+
+![slatejs.org on Safari for iOS](../.gitbook/assets/image.png)
 
 
 
