@@ -12,7 +12,7 @@ To that end, Slate provides a `Schema` model, which allows you to easily define 
 
 Slate schemas are defined as Javascript objects, with properties that describe the document, block nodes, and inlines nodes in your editor. Here's a simple schema:
 
-```js
+```javascript
 const schema = {
   document: {
     nodes: [{ types: ['paragraph', 'image'] }],
@@ -51,7 +51,7 @@ But you might want to preserve the node, and instead just convert it to a `parag
 
 Instead, Slate lets you define your own custom normalization logic.
 
-```js
+```javascript
 const schema = {
   document: {
     nodes: [
@@ -73,7 +73,7 @@ When Slate discovers an invalid child, it will first check to see if your custom
 
 This gives you the best of both worlds. You can write simple, terse, declarative validation rules that can be highly optimized. But you can still define fine-grained, imperative normalization logic for when invalid states occur.
 
-> 🤖 For a full list of validation `reason` arguments, check out the [`Schema` reference](../reference/slate/schema.md).
+> 🤖 For a full list of validation `reason` arguments, check out the [`Schema` reference](../slate-core/schema.md).
 
 ## Custom Validations
 
@@ -83,7 +83,7 @@ Sometimes though, the declarative validation syntax isn't fine-grained enough to
 
 When you define a `validateNode` function, you either return nothing if the node's already valid, or you return a normalizer function that will make the node valid if it isn't. Here's an example:
 
-```js
+```javascript
 function validateNode(node) {
   if (node.object != 'block') return
   if (node.isVoid) return
@@ -99,7 +99,7 @@ function validateNode(node) {
 }
 ```
 
-This validation defines a very specific (honestly, useless) behavior, where if a node is block, non-void and has three children, the first and last of which are text nodes, it is removed. I don't know why you'd ever do that, but the point is that you can get very specific with your validations this way. Any property of the node can be examined.
+This validation defines a very specific \(honestly, useless\) behavior, where if a node is block, non-void and has three children, the first and last of which are text nodes, it is removed. I don't know why you'd ever do that, but the point is that you can get very specific with your validations this way. Any property of the node can be examined.
 
 When you need this level of specificity, using the `validateNode` property of the editor or plugins is handy.
 
@@ -113,7 +113,7 @@ Consider the following validation function that merges adjacent text nodes toget
 
 Note: This functionality is already correctly implemented in slate-core so you don't need to put it in yourself!
 
-```
+```text
 /**
   * Merge adjacent text nodes.
   *
@@ -149,7 +149,7 @@ How can we deal with this? Well, normalization can be suppressed temporarily for
 
 The above validation function can then be written as below
 
-```
+```text
 /**
   * Merge adjacent text nodes.
   *
@@ -168,3 +168,4 @@ validateNode(node) {
   }
 }
 ```
+

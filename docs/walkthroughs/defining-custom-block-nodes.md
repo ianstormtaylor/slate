@@ -1,8 +1,11 @@
-<br/>
-<p align="center"><strong>Previous:</strong><br/><a href="./adding-event-handlers.md">Adding Event Handlers</a></p>
-<br/>
-
 # Defining Custom Block Nodes
+
+**Previous:**  
+[Adding Event Handlers](adding-event-handlers.md)  
+  
+
+
+## Defining Custom Block Nodes
 
 In our previous example, we started with a paragraph, but we never actually told Slate anything about the `paragraph` block type. We just let it use its internal default renderer, which uses a plain old `<div>`.
 
@@ -10,7 +13,7 @@ But that's not all you can do. Slate lets you define any type of custom blocks y
 
 We'll show you how. Let's start with our app from earlier:
 
-```js
+```javascript
 class App extends React.Component {
   state = {
     value: initialValue,
@@ -45,7 +48,7 @@ The problem is, code blocks won't just be rendered as a plain paragraph, they'll
 
 Node renderers are just simple React components, like so:
 
-```js
+```javascript
 // Define a React component renderer for our code blocks.
 function CodeNode(props) {
   return (
@@ -64,7 +67,7 @@ And see that `props.children` reference? Slate will automatically render all of 
 
 Now, let's add that renderer to our `Editor`:
 
-```js
+```javascript
 function CodeNode(props) {
   return (
     <pre {...props.attributes}>
@@ -111,9 +114,9 @@ class App extends React.Component {
 }
 ```
 
-Okay, but now we'll need a way for the user to actually turn a block into a code block. So let's change our `onKeyDown` function to add a `control-\`` shortcut that does just that:
+Okay, but now we'll need a way for the user to actually turn a block into a code block. So let's change our `onKeyDown` function to add a \`control-\`\` shortcut that does just that:
 
-```js
+```javascript
 function CodeNode(props) {
   return (
     <pre {...props.attributes}>
@@ -163,13 +166,13 @@ class App extends React.Component {
 }
 ```
 
-Now, if you press `control-\`` the block your cursor is in should turn into a code block! Magic!
+Now, if you press \`control-\`\` the block your cursor is in should turn into a code block! Magic!
 
-_Note: The Edge browser does not currently support `control-...` key events (see [issue](https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/742263/)), so this example won't work on it._
+_Note: The Edge browser does not currently support _`control-...`_ key events \(see _[_issue_](https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/742263/)_\), so this example won't work on it._
 
-But we forgot one thing. When you hit `control-\`` again, it should change the code block back into a paragraph. To do that, we'll need to add a bit of logic to change the type we set based on whether any of the currently selected blocks are already a code block:
+But we forgot one thing. When you hit \`control-\`\` again, it should change the code block back into a paragraph. To do that, we'll need to add a bit of logic to change the type we set based on whether any of the currently selected blocks are already a code block:
 
-```js
+```javascript
 function CodeNode(props) {
   return (
     <pre {...props.attributes}>
@@ -220,8 +223,10 @@ class App extends React.Component {
 }
 ```
 
-And there you have it! If you press `control-\`` while inside a code block, it should turn back into a paragraph!
+And there you have it! If you press \`control-\`\` while inside a code block, it should turn back into a paragraph!
 
-<br/>
-<p align="center"><strong>Next:</strong><br/><a href="./applying-custom-formatting.md">Applying Custom Formatting</a></p>
-<br/>
+**Next:**  
+[Applying Custom Formatting](applying-custom-formatting.md)  
+  
+
+

@@ -1,8 +1,8 @@
 # Changes
 
-All changes to a Slate editor's value, whether it's the `selection`, `document`, `history`, etc. happen via "changes"—specifically, via the [`Change`](../reference/slate/change.md) model.
+All changes to a Slate editor's value, whether it's the `selection`, `document`, `history`, etc. happen via "changes"—specifically, via the [`Change`](../slate-core/change.md) model.
 
-This is important because the `Change` model is responsible for ensuring that every change to a Slate value can be expressed in terms of low-level [operations](../reference/slate/operation.md). But you don't have to worry about that, because it happens automatically.
+This is important because the `Change` model is responsible for ensuring that every change to a Slate value can be expressed in terms of low-level [operations](../slate-core/operation.md). But you don't have to worry about that, because it happens automatically.
 
 You just need to understand changes...
 
@@ -16,7 +16,7 @@ And if the API for changes was verbose, or if it required lots of in between ste
 
 To solve this, Slate has very expressive, chainable changes. Like this:
 
-```js
+```javascript
 change
   .focus()
   .selectAll()
@@ -47,7 +47,7 @@ There are a handful of different categories of changes that ship with Slate by d
 
 ### At a Specific Range
 
-These are changes like `deleteAtRange()`, `addMarkAtArange()`, `unwrapBlockAtRange()`, etc. that take in a [`Range`](./range.md) argument and apply a change to the document for all of the content in that range. These aren't used that often, because you'll usually be able to get away with using the next category of changes instead...
+These are changes like `deleteAtRange()`, `addMarkAtArange()`, `unwrapBlockAtRange()`, etc. that take in a [`Range`](https://github.com/thesunny/slate/tree/28220e7007adc232fa5fefae52c970d7a3531d3d/docs/guides/range.md) argument and apply a change to the document for all of the content in that range. These aren't used that often, because you'll usually be able to get away with using the next category of changes instead...
 
 ### At the Current Selection
 
@@ -63,7 +63,7 @@ These are changes like `removeNodeByKey()`, `setNodeByKey()`, `removeMarkByKey()
 
 ### On the Top-level Value
 
-These are changes like `setData()`, `setDecorations()`, etc. that act on the other top-level properties of the [`Value`](../reference/slate/value.md) object. These are more advanced.
+These are changes like `setData()`, `setDecorations()`, etc. that act on the other top-level properties of the [`Value`](../slate-core/value.md) object. These are more advanced.
 
 ### On the History
 
@@ -75,9 +75,9 @@ When you decide you want to make a change to the Slate value, you're almost alwa
 
 ### 1. In Slate Handlers
 
-The first place, is inside a Slate-controlled event handler, like `onKeyDown` or `onPaste`. These handlers take a signature of `event, change, editor`. That `change` argument is a [`Change`](../reference/slate/change.md) object that you can manipulate. For example...
+The first place, is inside a Slate-controlled event handler, like `onKeyDown` or `onPaste`. These handlers take a signature of `event, change, editor`. That `change` argument is a [`Change`](../slate-core/change.md) object that you can manipulate. For example...
 
-```js
+```javascript
 function onKeyDown(event, change, editor) {
   if (event.key == 'Enter') {
     change.splitBlock()
@@ -91,9 +91,9 @@ Any change methods you call will be applied, and when the event handler stack is
 
 The second place is inside a custom node component. For example, you might have an `<Image>` component and you want to make a change when the image is clicked.
 
-In that case, you'll need to use the `change()` method on the Slate [`<Editor>`](../reference/slate-react/editor.md) which you have available as `props.editor`. For example...
+In that case, you'll need to use the `change()` method on the Slate [`<Editor>`](../slate-react/editor.md) which you have available as `props.editor`. For example...
 
-```js
+```javascript
 class Image extends React.Component {
   onClick = event => {
     this.props.editor.change(change => {
@@ -107,13 +107,13 @@ class Image extends React.Component {
 }
 ```
 
-The `editor.change()` method will create a new [`Change`](../reference/slate/change.md) object for you, based on the editor's current value. You can then call any change methods you want, and the new value will be applied to the editor.
+The `editor.change()` method will create a new [`Change`](../slate-core/change.md) object for you, based on the editor's current value. You can then call any change methods you want, and the new value will be applied to the editor.
 
 ### 3. From Schema Rules
 
-The third place you may perform change operations—for more complex use cases—is from inside a custom normalization rule in your editor's [`Schema`](../references/slate/schema.md). For example...
+The third place you may perform change operations—for more complex use cases—is from inside a custom normalization rule in your editor's [`Schema`](https://github.com/thesunny/slate/tree/28220e7007adc232fa5fefae52c970d7a3531d3d/docs/references/slate/schema.md). For example...
 
-```js
+```javascript
 {
   blocks: {
     list: {
@@ -128,15 +128,15 @@ The third place you may perform change operations—for more complex use cases�
 }
 ```
 
-When a rule's validation fails, Slate passes a [`Change`](../reference/slate/change.md) object to the `normalize` function of the rule, if one exists. You can use this object to apply the changes necessary to make your document valid on the next normalization pass.
+When a rule's validation fails, Slate passes a [`Change`](../slate-core/change.md) object to the `normalize` function of the rule, if one exists. You can use this object to apply the changes necessary to make your document valid on the next normalization pass.
 
 ### 4. From Outside Slate
 
 This is the fourth place you might want to make changes, and also the most dangerous. You should know that any changes you make outside of the Slate editor might not be seen by your plugins, might interact with the history in weird ways, and may not work with collaborative editing implements.
 
-That said, if that's okay with you, you can make changes manually by using the `change()` method on a Slate [`Value`](../reference/slate/value.md). For example:
+That said, if that's okay with you, you can make changes manually by using the `change()` method on a Slate [`Value`](../slate-core/value.md). For example:
 
-```js
+```javascript
 const change = value
   .change()
   .selectAll()
@@ -155,7 +155,7 @@ To do that, you should define change functions just like Slate's core does—as 
 
 For example, here are two simple block inserting changes...
 
-```js
+```javascript
 function insertParagraph(change) {
   change.insertBlock('paragraph')
 }
@@ -173,14 +173,15 @@ Notice how rewriting that image inserting logic multiple times without having it
 
 But sadly you can't chain with those functions directly, since `change` objects don't actually know about them. Instead, you use the `.call()` method:
 
-```js
+```javascript
 change.call(insertParagraph).call(insertImage, 'https://google.com/logo')
 ```
 
 Not only can you use them with `.call()`, but if you're making one-off changes to the `editor`, you can use them with `editor.change()` as well. For example:
 
-```js
+```javascript
 editor.change(insertImage, 'https://google.com/logo')
 ```
 
 That's the benefit of standardizing a function signature!
+

@@ -1,73 +1,77 @@
-* [Introduction](./Introduction.md)
+# Table of contents
+
+* [Introduction](Introduction.md)
 
 ## Walkthroughs
 
-* [Installing Slate](./walkthroughs/installing-slate.md)
-* [Adding Event Handlers](./walkthroughs/adding-event-handlers.md)
-* [Defining Custom Block Nodes](./walkthroughs/defining-custom-block-nodes.md)
-* [Applying Custom Formatting](./walkthroughs/applying-custom-formatting.md)
-* [Using Plugins](./walkthroughs/using-plugins.md)
-* [Saving to a Database](./walkthroughs/saving-to-a-database.md)
-* [Saving and Loading HTML Content](./walkthroughs/saving-and-loading-html-content.md)
+* [Installing Slate](walkthroughs/installing-slate.md)
+* [Adding Event Handlers](walkthroughs/adding-event-handlers.md)
+* [Defining Custom Block Nodes](walkthroughs/defining-custom-block-nodes.md)
+* [Applying Custom Formatting](walkthroughs/applying-custom-formatting.md)
+* [Using Plugins](walkthroughs/using-plugins.md)
+* [Saving to a Database](walkthroughs/saving-to-a-database.md)
+* [Saving and Loading HTML Content](walkthroughs/saving-and-loading-html-content.md)
 
 ## Guides
 
-* [Changes](./guides/changes.md)
-* [Data Model](./guides/data-model.md)
-* [Plugins](./guides/plugins.md)
-* [Rendering](./guides/rendering.md)
-* [Schemas](./guides/schemas.md)
+* [Changes](guides/changes.md)
+* [Data Model](guides/data-model.md)
+* [Plugins](guides/plugins.md)
+* [Rendering](guides/rendering.md)
+* [Schemas](guides/schemas.md)
 
 ## General
 
-* [Plugins](./general/plugins.md)
-* [Resources](./general/resources.md)
-* [Contributing](../Contributing.md)
-* [Changelog](./general/changelog.md)
-* [FAQ](./general/faq.md)
+* [Plugins](general/plugins.md)
+* [Resources](general/resources.md)
+* [Contributing](general/contributing.md)
+* [Changelog](general/changelog.md)
+* [FAQ](general/faq.md)
 
 ## Slate Core
 
-* [Block](./reference/slate/block.md)
-* [Change](./reference/slate/change.md)
-* [Character](./reference/slate/character.md)
-* [Data](./reference/slate/data.md)
-* [Document](./reference/slate/document.md)
-* [Inline](./reference/slate/inline.md)
-* [Mark](./reference//slate/mark.md)
-* [Node](./reference/slate/node.md)
-* [Operation](./reference/slate/operation.md)
-* [Range](./reference/slate/range.md)
-* [Schema](./reference/slate/schema.md)
-* [Text](./reference/slate/text.md)
-* [Value](./reference/slate/value.md)
-* [setKeyGenerator](./reference/slate/utils.md)
-* [resetKeyGenerator](./reference/slate/utils.md)
+* [Block](slate-core/block.md)
+* [Change](slate-core/change.md)
+* [Character](slate-core/character.md)
+* [Data](slate-core/data.md)
+* [Document](slate-core/document.md)
+* [Inline](slate-core/inline.md)
+* [Mark](slate-core/mark.md)
+* [Node](slate-core/node.md)
+* [Operation](slate-core/operation.md)
+* [Range](slate-core/range.md)
+* [Schema](slate-core/schema.md)
+* [Text](slate-core/text.md)
+* [Value](slate-core/value.md)
+* [setKeyGenerator](slate-core/setkeygenerator.md)
+* [resetKeyGenerator](slate-core/resetkeygenerator.md)
 
 ## Slate React
 
-* [Editor](./reference/slate-react/editor.md)
-* [Plugins](./reference/slate-react/plugins.md)
-* [Custom Nodes](./reference/slate-react/custom-nodes.md)
-* [Core Plugins](./reference/slate-react/core-plugins.md)
-* [cloneFragment](./reference/slate-react/utils.md)
-* [findDOMNode](./reference/slate-react/utils.md)
-* [findDOMRange](./reference/slate-react/utils.md)
-* [findNode](./reference/slate-react/utils.md)
-* [findRange](./reference/slate-react/utils.md)
-* [getEventRange](./reference/slate-react/utils.md)
-* [getEventTransfer](./reference/slate-react/utils.md)
-* [setEventTransfer](./reference/slate-react/utils.md)
+* [Editor](slate-react/editor.md)
+* [Plugins](slate-react/plugins.md)
+* [Custom Nodes](slate-react/custom-nodes.md)
+* [Core Plugins](slate-react/core-plugins.md)
+* [cloneFragment](slate-react/clonefragment.md)
+* [findDOMNode](slate-react/finddomnode.md)
+* [findDOMRange](slate-react/finddomrange.md)
+* [findNode](slate-react/findnode.md)
+* [findRange](slate-react/findrange.md)
+* [getEventRange](slate-react/geteventrange.md)
+* [getEventTransfer](slate-react/geteventtransfer.md)
+* [setEventTransfer](slate-react/seteventtransfer.md)
 
 ## Other Packages
 
-* [`slate-html-serializer`](./reference/slate-html-serializer/index.md)
-* [`slate-hyperscript`](./reference/slate-hyperscript/index.md)
-* [`slate-plain-serializer`](./reference/slate-plain-serializer/index.md)
-* [`slate-prop-types`](./reference/slate-prop-types/index.md)
-* [`slate-schema-violations`](./reference/slate-schema-violations/index.md)
-* [`slate-simulator`](./reference/slate-simulator/index.md)
+* [slate-html-serializer](other-packages/slate-html-serializer.md)
+* [slate-hyperscript](other-packages/slate-hyperscript.md)
+* [slate-plain-serializer](other-packages/slate-plain-serializer.md)
+* [slate-prop-types](other-packages/slate-prop-types.md)
+* [slate-schema-violations](other-packages/slate-schema-violations.md)
+* [slate-simulator](other-packages/slate-simulator.md)
 
 ## Contributing
-* *Placeholder for Contributing.md*
-* [iOS Development Guide](./contributing/ios-dev-guide.md)
+
+* Placeholder for Contributing.md
+* [iOS Development Guide](contributing/ios-development-guide.md)
+

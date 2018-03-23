@@ -1,8 +1,11 @@
-<br/>
-<p align="center"><strong>Previous:</strong><br/><a href="./applying-custom-formatting.md">Applying Custom Formatting</a></p>
-<br/>
-
 # Using Plugins
+
+**Previous:**  
+[Applying Custom Formatting](applying-custom-formatting.md)  
+  
+
+
+## Using Plugins
 
 Up to now, everything we've learned has been about how to write one-off logic for your specific Slate editor. But one of the most beautiful things about Slate is actually its plugin system, and how it lets you write less one-off code.
 
@@ -12,7 +15,7 @@ So let's break that logic out into it's a reusable plugin that can toggle _any_ 
 
 Starting with our app from earlier:
 
-```js
+```javascript
 class App extends React.Component {
   state = {
     value: initialValue,
@@ -51,7 +54,7 @@ class App extends React.Component {
 
 Let's write a new function, that takes a set of options: the mark `type` to toggle and the `key` to press.
 
-```js
+```javascript
 function MarkHotkey(options) {
   // Grab our options from the ones passed in.
   const { type, key } = options
@@ -64,7 +67,7 @@ To fix that, we need our plugin function to return a "plugin object" that Slate 
 
 In this case our plugin object will have one property: a `onKeyDown` handler, with its logic copied right from our current app's code:
 
-```js
+```javascript
 function MarkHotkey(options) {
   const { type, key } = options
 
@@ -89,7 +92,7 @@ Boom! Now we're getting somewhere. That code is reusable for any type of mark.
 
 Now that we have our plugin, let's remove the hard-coded logic from our app, and replace it with our brand new `MarkHotkey` plugin instead, passing in the same options that will keep our **bold** functionality intact:
 
-```js
+```javascript
 // Initialize our bold-mark-adding plugin.
 const boldPlugin = MarkHotkey({
   type: 'bold',
@@ -133,7 +136,7 @@ Awesome. If you test out the editor now, you'll notice that everything still wor
 
 Let's add _italic_, `code`, ~~strikethrough~~ and underline marks:
 
-```js
+```javascript
 // Initialize a plugin for each mark...
 const plugins = [
   MarkHotkey({ key: 'b', type: 'bold' }),
@@ -185,6 +188,8 @@ And there you have it! We just added a ton of functionality to the editor with v
 
 That's why plugins are awesome. They let you get really expressive while also making your codebase easier to manage. And since Slate is built with plugins as a primary consideration, using them is dead simple!
 
-<br/>
-<p align="center"><strong>Next:</strong><br/><a href="./saving-to-a-database.md">Saving to a Database</a></p>
-<br/>
+**Next:**  
+[Saving to a Database](saving-to-a-database.md)  
+  
+
+

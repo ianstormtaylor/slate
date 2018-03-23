@@ -12,3 +12,4 @@ Since Slate is a monorepo with many packages that are versioned separately, we m
 * [`slate-react`](https://github.com/ianstormtaylor/slate/tree/master/packages/slate-react/Changelog.md)
 * [`slate-schema-violations`](https://github.com/ianstormtaylor/slate/tree/master/packages/slate-schema-violations/Changelog.md)
 * [`slate-simulator`](https://github.com/ianstormtaylor/slate/tree/master/packages/slate-simulator/Changelog.md)
+
