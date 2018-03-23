@@ -67,3 +67,7 @@
 * [`slate-prop-types`](./reference/slate-prop-types/index.md)
 * [`slate-schema-violations`](./reference/slate-schema-violations/index.md)
 * [`slate-simulator`](./reference/slate-simulator/index.md)
+
+## Contributing
+* *Placeholder for Contributing.md*
+* [iOS Development Guide](./contributing/ios-dev-guide.md)
