@@ -523,19 +523,13 @@ memoize(Text.prototype, ['getMarks', 'getMarksAsArray'], {
   takesArguments: false,
 })
 
-memoize(
-  Text.prototype,
-  [
-    'getDecoratedCharacters',
-    'getDecorations',
-    'getLeaves',
-    'getMarksAtIndex',
-    'validate',
-  ],
-  {
-    takesArguments: true,
-  }
-)
+memoize(Text.prototype, [
+  'getDecoratedCharacters',
+  'getDecorations',
+  'getLeaves',
+  'getMarksAtIndex',
+  'validate',
+])
 
 /**
  * Export.

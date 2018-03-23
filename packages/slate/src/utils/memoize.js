@@ -60,9 +60,7 @@ const UNSET = undefined
  * @return {Record}
  */
 
-function memoize(object, properties, options = {}) {
-  const { takesArguments = true } = options
-
+function memoize(object, properties) {
   for (const property of properties) {
     const original = object[property]
 
@@ -79,12 +77,18 @@ function memoize(object, properties, options = {}) {
         if (CACHE_KEY !== this.__cache_key) {
           this.__cache_key = CACHE_KEY
           this.__cache = new Map() // eslint-disable-line no-undef,no-restricted-globals
+          this.__cache_no_args = {}
         }
       }
 
       if (!this.__cache) {
         this.__cache = new Map() // eslint-disable-line no-undef,no-restricted-globals
       }
+      if (!this.__cache_no_args) {
+        this.__cache_no_args = {}
+      }
+
+      const takesArguments = args.length !== 0
 
       let cachedValue
       let keys
@@ -93,7 +97,7 @@ function memoize(object, properties, options = {}) {
         keys = [property, ...args]
         cachedValue = getIn(this.__cache, keys)
       } else {
-        cachedValue = this.__cache.get(property)
+        cachedValue = this.__cache_no_args[property]
       }
 
       // If we've got a result already, return it.
@@ -108,7 +112,7 @@ function memoize(object, properties, options = {}) {
       if (takesArguments) {
         this.__cache = setIn(this.__cache, keys, v)
       } else {
-        this.__cache.set(property, v)
+        this.__cache_no_args[property] = v
       }
 
       return value
