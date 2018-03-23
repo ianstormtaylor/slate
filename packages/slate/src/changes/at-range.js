@@ -851,8 +851,19 @@ Changes.insertTextAtRange = (change, range, text, marks, options = {}) => {
   if (normalize !== undefined) {
     normalize = range.isExpanded
   }
+  change.insertTextByKey(key, offset, text, marks, { normalize: false })
 
-  change.insertTextByKey(key, offset, text, marks, { normalize })
+  if (normalize) {
+    // normalize in the narrowest existing block that originally contains startKey and endKey
+    const commonAncestor = document.getCommonAncestor(startKey, range.endKey)
+    const ancestors = document
+      .getAncestors(commonAncestor.key)
+      .push(commonAncestor)
+    const normalizeAncestor = ancestors.findLast(n =>
+      change.value.document.getDescendant(n.key)
+    )
+    change.normalizeNodeByKey(normalizeAncestor.key)
+  }
 }
 
 /**
