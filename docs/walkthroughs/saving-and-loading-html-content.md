@@ -1,14 +1,17 @@
-<br/>
-<p align="center"><strong>Previous:</strong><br/><a href="./saving-to-a-database.md">Saving to a Database</a></p>
-<br/>
-
 # Saving and Loading HTML Content
+
+**Previous:**  
+[Saving to a Database](saving-to-a-database.md)  
+  
+
+
+## Saving and Loading HTML Content
 
 In the previous guide, we looked at how to serialize the Slate editor's content and save it for later. What if you want to save the content as HTML? It's a slightly more involved process, but this guide will show you how to do it.
 
 Let's start with a basic editor:
 
-```js
+```javascript
 import { Editor } from 'slate-react'
 
 class App extends React.Component {
@@ -28,7 +31,7 @@ class App extends React.Component {
 
 That will render a basic Slate editor on your page.
 
-Now... we need to add the [`Html`](../reference/serializers/html.md) serializer. And to do that, we need to tell it a bit about the schema we plan on using. For this example, we'll work with a schema that has a few different parts:
+Now... we need to add the [`Html`](https://github.com/thesunny/slate/tree/28220e7007adc232fa5fefae52c970d7a3531d3d/docs/reference/serializers/html.md) serializer. And to do that, we need to tell it a bit about the schema we plan on using. For this example, we'll work with a schema that has a few different parts:
 
 * A `paragraph` block.
 * A `code` block for code samples.
@@ -39,7 +42,7 @@ By default, the `Html` serializer, knows nothing about our schema just like Slat
 
 To start, let's create a new rule with a `deserialize` function for paragraph blocks.
 
-```js
+```javascript
 const rules = [
   // Add our first rule with a deserializing function.
   {
@@ -56,11 +59,11 @@ const rules = [
 ]
 ```
 
-The `el` argument that the `deserialize` function receives is just a DOM element. And the `next` argument is a function that will deserialize any element(s) we pass it, which is how you recurse through each node's children.
+The `el` argument that the `deserialize` function receives is just a DOM element. And the `next` argument is a function that will deserialize any element\(s\) we pass it, which is how you recurse through each node's children.
 
 Okay, that's `deserialize`, now let's define the `serialize` property of the paragraph rule as well:
 
-```js
+```javascript
 const rules = [
   {
     deserialize(el, next) {
@@ -82,15 +85,15 @@ const rules = [
 ]
 ```
 
-The `serialize` function should also feel familiar. It's just taking [Slate models](../reference/slate) and turning them into React elements, which will then be rendered to an HTML string.
+The `serialize` function should also feel familiar. It's just taking [Slate models](https://github.com/thesunny/slate/tree/28220e7007adc232fa5fefae52c970d7a3531d3d/docs/reference/slate/README.md) and turning them into React elements, which will then be rendered to an HTML string.
 
-The `object` argument of the `serialize` function will either be a [`Node`](../reference/slate/node.md), a [`Mark`](../reference/slate/mark.md) or a special immutable [`String`](../reference/serializers/html.md#ruleserialize) object. And the `children` argument is a React element describing the nested children of the object in question, for recursing.
+The `object` argument of the `serialize` function will either be a [`Node`](../slate-core/node.md), a [`Mark`](../slate-core/mark.md) or a special immutable [`String`](https://github.com/thesunny/slate/tree/28220e7007adc232fa5fefae52c970d7a3531d3d/docs/reference/serializers/html.md#ruleserialize) object. And the `children` argument is a React element describing the nested children of the object in question, for recursing.
 
 Okay, so now our serializer can handle `paragraph` nodes.
 
 Let's add the other types of blocks we want:
 
-```js
+```javascript
 // Refactor block tags into a dictionary for cleanliness.
 const BLOCK_TAGS = {
   p: 'paragraph',
@@ -138,7 +141,7 @@ You'll notice that even though code blocks are nested in a `<pre>` and a `<code>
 
 Okay. So now our serializer can handle blocks, but we need to add our marks to it as well. Let's do that with a new rule...
 
-```js
+```javascript
 const BLOCK_TAGS = {
   blockquote: 'quote',
   p: 'paragraph',
@@ -211,7 +214,7 @@ const rules = [
 
 Great, that's all of the rules we need! Now let's create a new `Html` serializer and pass in those rules:
 
-```js
+```javascript
 import Html from 'slate-html-serializer'
 
 // Create a new serializer instance with our `rules` from above.
@@ -220,7 +223,7 @@ const html = new Html({ rules })
 
 And finally, now that we have our serializer initialized, we can update our app to use it to save and load content, like so:
 
-```js
+```javascript
 // Load the initial value from Local Storage or a default.
 const initialValue = localStorage.getItem('content') || '<p></p>'
 
@@ -281,3 +284,4 @@ class App extends React.Component {
 ```
 
 And that's it! When you make any changes in your editor, you should see the updated HTML being saved to Local Storage. And when you refresh the page, those changes should be carried over.
+

@@ -8,7 +8,7 @@ One of the main principles of Slate is that it tries to mirror the native DOM AP
 
 If you think about it, this makes sense. Slate is kind of like a nicer implementation of `contenteditable`, which itself is built with the DOM. And people use the DOM to represent documents with rich-text-like structures all the time. Mirroring the DOM helps make the library familiar for new users, and it lets us reuse battle-tested patterns without having to reinvent them ourselves.
 
-Because it mirrors the DOM, Slate's data model features a [`Document`](../reference/slate/document.md) with [`Block`](../reference/slate/block.md), [`Inline`](../reference/slate/inline.md) and [`Text`](../reference/slate/text.md) nodes. You can reference parts of the document with a [`Range`](../reference/slate/range.md). And there is a special range called a "selection" that represents the user's current cursor selection.
+Because it mirrors the DOM, Slate's data model features a [`Document`](../slate-core/document.md) with [`Block`](../slate-core/block.md), [`Inline`](../slate-core/inline.md) and [`Text`](../slate-core/text.md) nodes. You can reference parts of the document with a [`Range`](../slate-core/range.md). And there is a special range called a "selection" that represents the user's current cursor selection.
 
 ## Immutable Objects
 
@@ -16,7 +16,7 @@ Slate's data model is built out of [`Immutable.js`](https://facebook.github.io/i
 
 Specifically, Slate's models are [`Immutable.Record`](https://facebook.github.io/immutable-js/docs/#/Record) objects, which makes them very similar to Javascript objects for retrieiving values:
 
-```js
+```javascript
 const block = Block.create({ type: 'paragraph' })
 
 block.object // "block"
@@ -31,11 +31,11 @@ If you haven't used Immutable.js before, there is definitely a learning curve. B
 
 ## The "Value"
 
-The top-level object in Slate—the object encapsulates the entire value of an Slate editor—is called a [`Value`](../reference/slate/value.md).
+The top-level object in Slate—the object encapsulates the entire value of an Slate editor—is called a [`Value`](../slate-core/value.md).
 
 It is made up of a document filled with content, and a selection representing the user's current cursor selection. It also has a history, to keep track of changes, and a few other more advanced properties like `decorations` and `data`.
 
-> 📋 For more info, check out the [`Value` reference](../reference/slate/value.md).
+> 📋 For more info, check out the [`Value` reference](../slate-core/value.md).
 
 ## Documents and Nodes
 
@@ -43,23 +43,18 @@ Slate documents are nested and recursive. This means that a document has block n
 
 Unlike the DOM though, Slate enforces a few more restrictions on its documents, to reduce the complexity involved in manipulating them, and to prevent "impossible" situations from arising. These restrictions are:
 
-* **Documents can only contain block nodes as direct children.** This restriction mirrors how rich-text editors work, with the top-most elements being blocks that can be split when pressing <kbd>enter</kbd>.
-
+* **Documents can only contain block nodes as direct children.** This restriction mirrors how rich-text editors work, with the top-most elements being blocks that can be split when pressing enter.
 * **Blocks can only contain either other block nodes, or inlines and text nodes.** This is another "sane" restriction that allows you to avoid lots of boilerplate `if` statements in your code. Blocks either wrap other blocks, or contain actual content.
-
 * **Inlines can only contain inline or text nodes.** This one is also for sanity and avoiding boilerplate. Once you've descended into an "inline" context, you can't have block nodes inside them.
-
-* **Inlines can't contain no text.** Any inline node whose text is an empty string (`''`) will be automatically removed. This makes sense when you think about a user backspacing through an inline. When they delete that last character, they'd expect the inline to be removed. And when there are no characters, you can't really put your selection into the inline anymore. So Slate removes them from the document automatically, to simplify things.
-
+* **Inlines can't contain no text.** Any inline node whose text is an empty string \(`''`\) will be automatically removed. This makes sense when you think about a user backspacing through an inline. When they delete that last character, they'd expect the inline to be removed. And when there are no characters, you can't really put your selection into the inline anymore. So Slate removes them from the document automatically, to simplify things.
 * **Text nodes can't be adjacent to other text nodes.** Any two adjacent text nodes will automatically be merged into one. This prevents ambiguous cases where a cursor could be at the end of one text node or at the start of the next. However, you can have an inline node surrounded by two texts.
-
 * **Blocks and inlines must always contain at least one text node.** This is to ensure that the user's cursor can always "enter" the nodes, and to make sure that ranges can be created referencing them.
 
-Slate enforces all of these restrictions for you automatically. Any time you [perform changes](./changes.md) to the document, Slate will check if the document is invalid, and if so it will return it to a "normalized" value.
+Slate enforces all of these restrictions for you automatically. Any time you [perform changes](changes.md) to the document, Slate will check if the document is invalid, and if so it will return it to a "normalized" value.
 
 > 🙃 Fun fact: normalizing is actually based on the DOM's [`Node.normalize()`](https://developer.mozilla.org/en-US/docs/Web/API/Node/normalize)!
 
-In addition to documents, blocks and inlines, Slate introduces one other type of markup that the DOM doesn't have natively: the [`Mark`](../reference/slate/mark.md).
+In addition to documents, blocks and inlines, Slate introduces one other type of markup that the DOM doesn't have natively: the [`Mark`](../slate-core/mark.md).
 
 ## Marks
 
@@ -73,13 +68,13 @@ But this also has implications on how marks are rendered. When marks are rendere
 
 This is actually similar to the DOM, where this is invalid:
 
-```html
+```markup
 <em>t<strong>e</em>x</strong>t
 ```
 
 Because the elements don't properly close themselves. Instead you have to write it like this:
 
-```html
+```markup
 <em>t</em><strong><em>e</em>x</strong>t
 ```
 
@@ -96,7 +91,7 @@ Just like in the DOM, you can reference a part of the document using a `Range`. 
 
 Ranges are defined by an "anchor" and "focus" point. The anchor is where the range starts, and the focus is where it ends. And each point is a combination of a "key" referencing a specific node, and an "offset". This ends up looking like this:
 
-```js
+```javascript
 const range = Range.create({
   anchorKey: 'node-a',
   anchorOffset: 0,
@@ -112,11 +107,12 @@ The terms "anchor" and "focus" are borrowed from the DOM, where they mean the sa
 
 Here's how MDN explains it:
 
-> A user may make a selection from left to right (in document order) or right to left (reverse of document order). The anchor is where the user began the selection and the focus is where the user ends the selection. If you make a selection with a desktop mouse, the anchor is placed where you pressed the mouse button and the focus is placed where you released the mouse button. Anchor and focus should not be confused with the start and end positions of a selection, since anchor can be placed before the focus or vice versa, depending on the direction you made your selection.
+> A user may make a selection from left to right \(in document order\) or right to left \(reverse of document order\). The anchor is where the user began the selection and the focus is where the user ends the selection. If you make a selection with a desktop mouse, the anchor is placed where you pressed the mouse button and the focus is placed where you released the mouse button. Anchor and focus should not be confused with the start and end positions of a selection, since anchor can be placed before the focus or vice versa, depending on the direction you made your selection.  
 > — [`Selection`, MDN](https://developer.mozilla.org/en-US/docs/Web/API/Selection)
 
 To make dealing with ranges easier though, they also provide "start" and "end" properties that take whether the range is forward or backward into account. The `startKey` and `startOffset` will always be before the `endKey` and `endOffset` in the document.
 
 One important thing to note is that the anchor and focus points of ranges **always reference the "leaf-most" text nodes**. They never reference blocks or inlines, always their child text nodes. This makes dealing with ranges a _lot_ easier.
 
-> 📋 For more info, check out the [`Range` reference](../reference/slate/range.md).
+> 📋 For more info, check out the [`Range` reference](../slate-core/range.md).
+
