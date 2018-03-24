@@ -115,6 +115,12 @@ By default, Simulator doesn't install every iOS version. Follow these instructio
 
 ### Open Simulator
 
+When starting a development session on iOS, you must first open the Simulator.
+
+* If you followed the instructions in **Pin Simulator to Dock** above, then you can open Simulator by clicking the **Simulator** icon in your dock.
+* You may also be able to open simulator by clicking `CMD+SPACE` to open **Spotlight** and typing `simulator` and selecting it if it shows up. It may not be recognized in your system yet so this might not work immediately.
+* If you haven't pinned **Simulator** and it doesn't open using **Spotlight**, you will have to open it from **Xcode**. Follow the instructions under the heading **Open Simulator from Xcode **above in the **Setup** section.
+
 ### Start a Device in Simulator
 
 To start a Device:
