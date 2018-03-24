@@ -2,19 +2,22 @@
 
 ## Overview
 
+### Mac OSX
+
 To work on Slate with iOS, we recommend using a software program on the Mac by Apple called Simulator. Simulator allows you to emulate different iOS devices and different versions of iOS on a Mac.
+
+### Windows or Linux
 
 We do not currently have instructions on developing for iOS using Windows or Linux.
 
-## Outline of Steps
+## Steps for Developing on iOS with a Mac
 
 * Installation
   * Install Xcode
 * Development
   * Open Simulator
   * IMPORTANT! Disconnect Hardware Keyboard in Simulator
-  * Open Safari
-  * Enter Debug for Simulator
+  * Debug in Mac Safari with Simulator
 
 ## Installation
 
@@ -79,4 +82,17 @@ To disconnect the hardware keyboard in Simulator
 You can confirm that you have successfully disconnected the hardware keyboard by clicking in the editor from the SlateJS Examples site at http://slatejs.org. You should see the virtual keyboard appear as in the screenshot below.
 
 ![iOS Virtual Keyboard confirms hardware keyboard is disconnected](../.gitbook/assets/image%20%285%29.png)
+
+## Debugging in Mac Safari with Simulator
+
+By itself, the Simulator will not show you any debug information.
+
+To get access to the console and use other debugging tools, open Safari on your Mac. Note that this is not Safari on your iOS device which you have already opened.
+
+The easiest way to open Safari on your Mac is one of these two ways
+
+* Type `CMD+SPACE` to open **Spotlight** and type `safari`.
+* Click the **Safari** icon that is probably in your Dock which is probably at the bottom of your screen
+
+
 
