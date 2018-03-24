@@ -72,6 +72,5 @@
 
 ## Contributing
 
-* Placeholder for Contributing.md
 * [iOS Development Guide](contributing/ios-development-guide.md)
 
