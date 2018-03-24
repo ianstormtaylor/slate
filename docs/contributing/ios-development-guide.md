@@ -12,7 +12,7 @@ We do not currently have instructions on developing for iOS using Windows or Lin
   * Install Xcode
 * Development
   * Open Simulator
-  * Disable Virtual Keyboard in Simulator
+  * IMPORTANT! Disconnect Hardware Keyboard in Simulator
   * Open Safari
   * Enter Debug for Simulator
 
@@ -50,13 +50,33 @@ To start a Device:
 
 After starting the device, you will see a working simulation of the device on the screen.
 
-![Simulator running iOS 11.2 on an iPhone 8](../.gitbook/assets/image%20%284%29.png)
+![Simulator running iOS 11.2 on an iPhone 8](../.gitbook/assets/image%20%286%29.png)
 
-Open Safari on the device by clicking the Safari icon \(it's the one that looks like a compass\).
+Open the Safari app on the device by clicking the Safari icon \(it's the blue circle that looks like a compass in the lower left of the screen\).
 
 Once Safari is open, enter the URL you wish to work on. For now, try entering `slatejs.org` to visite the Slate Examples page on the Internet.
 
 ![slatejs.org on Safari for iOS](../.gitbook/assets/image.png)
 
+### IMPORTANT! Disconnect Hardware Keyboard
 
+In order to test iOS with Slate, you must disconnect the hardware keyboard.
+
+> If you do not do this, the virtual keyboard that usually appears on iOS when you are editing will not appear. iOS will behave as if a hardware keyboard has been attached to the device.
+>
+> It is important to display the virtual keyboard because some important bugs and edge cases do not present themselves when a hardware keyboard is attached.
+
+To disconnect the hardware keyboard in Simulator
+
+* Open the **Hardware** menu
+* Select **Keyboard** from the sub-menu
+* Make sure **Connect Hardware Keyboard** is unchecked
+* If it is checked \(like in the screenshot below\) then click it to toggle it off.
+* If it is already unchecked, then exit the menu.
+
+![](../.gitbook/assets/image%20%283%29.png)
+
+You can confirm that you have successfully disconnected the hardware keyboard by clicking in the editor from the SlateJS Examples site at http://slatejs.org. You should see the virtual keyboard appear as in the screenshot below.
+
+![iOS Virtual Keyboard confirms hardware keyboard is disconnected](../.gitbook/assets/image%20%285%29.png)
 
