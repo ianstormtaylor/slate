@@ -32,12 +32,13 @@ We do not currently have instructions on developing for iOS using Windows or Lin
 * Setup
   * Install Xcode
   * Open Xcode
-  * Open Simulator
+  * Open Simulator from Xcode
   * Pin Simulator to Dock \(recommended\)
   * Add more iOS versions
 * Development
   * Open Simulator
-  * IMPORTANT! Disconnect Hardware Keyboard in Simulator
+  * Start a Device in Simulator
+  * IMPORTANT! Disconnect Hardware Keyboard
   * Debugging in Mac Safari with Simulator
   * Tips and Tricks
 
