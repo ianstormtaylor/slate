@@ -113,7 +113,7 @@ Consider the following validation function that merges adjacent text nodes toget
 
 Note: This functionality is already correctly implemented in slate-core so you don't need to put it in yourself!
 
-```
+```js
 /**
   * Merge adjacent text nodes.
   *
@@ -149,7 +149,7 @@ How can we deal with this? Well, normalization can be suppressed temporarily for
 
 The above validation function can then be written as below
 
-```
+```js
 /**
   * Merge adjacent text nodes.
   *
