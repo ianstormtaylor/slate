@@ -62,13 +62,13 @@ class Text extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      regenerateNum: 0,
+      regenerateKey: 0,
     }
   }
 
   forceRegeneration = () => {
     this.setState(state => ({
-      regenerateNum: state.regenerateNum + 1,
+      regenerateKey: state.regenerateKey + 1,
     }))
   }
 
@@ -96,7 +96,7 @@ class Text extends React.Component {
     const queryString = `[data-key="${key}"]`
     if (!window.document.querySelector(queryString)) {
       this.setState(state => ({
-        regenerateNum: state.regenerateNum + 1,
+        regenerateKey: state.regenerateKey + 1,
       }))
       return
     }
@@ -174,7 +174,7 @@ class Text extends React.Component {
       offset += leaf.text.length
       return child
     })
-    const reactKey = `text:${key}:${this.state.regenerateNum}`
+    const reactKey = `text:${key}:${this.state.regenerateKey}`
 
     return (
       <span ref={this.setRef} key={reactKey} data-key={key} style={style}>

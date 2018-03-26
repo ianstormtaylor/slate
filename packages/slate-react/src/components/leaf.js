@@ -40,7 +40,7 @@ class Leaf extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      regenerateNum: 0,
+      regenerateKey: 0,
     }
   }
 
@@ -57,7 +57,7 @@ class Leaf extends React.Component {
 
   forceRegeneration = () => {
     this.setState(state => ({
-      regenerateNum: state.regenerateNum + 1,
+      regenerateKey: state.regenerateKey + 1,
     }))
   }
 
@@ -87,7 +87,7 @@ class Leaf extends React.Component {
     const queryString = `[data-offset-key="${offsetKey}"]`
     if (!window.document.querySelector(queryString)) {
       this.setState(state => ({
-        regenerateNum: state.regenerateNum + 1,
+        regenerateKey: state.regenerateKey + 1,
       }))
       return
     }
@@ -141,7 +141,7 @@ class Leaf extends React.Component {
       key: node.key,
       index,
     })
-    const key = `${offsetKey}:${this.state.regenerateNum}`
+    const key = `${offsetKey}:${this.state.regenerateKey}`
 
     return (
       <span key={key} ref={this.setRef} data-offset-key={offsetKey}>
