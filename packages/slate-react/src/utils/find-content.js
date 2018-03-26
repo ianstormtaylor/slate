@@ -8,6 +8,12 @@ function getContent(anchorNode, value) {
   const key = parentNode.getAttribute('data-key')
   if (!key) return {}
   const node = document.getDescendant(key)
+  if (node.object !== 'text') {
+    // PLease remind Jinxuan Zhu at https://github.com/ianstormtaylor/slate/pull/1695#issuecomment-376312742
+    // if you find this scenario is necessary
+    return undefined
+  }
+
   const leaves = node.getLeaves()
   if (!node || node.object !== 'text') return {}
 

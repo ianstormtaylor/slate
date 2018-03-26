@@ -350,6 +350,7 @@ function AfterPlugin() {
       if (textContent == text) return
     } else {
       const result = findContent(anchorNode, value)
+      if (!result) return
       leaf = result.leaf
       start = result.start
       end = result.end
