@@ -34,12 +34,13 @@ function getContent(anchorNode, value) {
   }
 
   // If anchorNode is at the end
-  if (!previousSibling) {
+  if (!nextSibling) {
     const leaf = leaves.last()
     const { start, end } = findStartAndEnd(leaf, node)
     let { textContent } = anchorNode
     const index = leaves.size - 1
     const offsetKey = previousSibling.getAttribute('data-offset-key')
+    // Check if the previousSibling is rendered by the last leaf
     if (offsetKey === `${key}:${index}`) {
       textContent = previousSibling.textContent + textContent
     }
