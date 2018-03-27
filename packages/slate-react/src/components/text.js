@@ -96,6 +96,7 @@ class Text extends React.Component {
       this.forceRegeneration()
       return
     }
+
     for (let index = 0; index < childNodes.length; index++) {
       const child = childNodes[index]
       if (child.nodeName === '#text') {
@@ -104,6 +105,7 @@ class Text extends React.Component {
         return
       }
     }
+
     const { node } = this.props
     const { key } = node
     const queryString = `[data-key="${key}"]`
