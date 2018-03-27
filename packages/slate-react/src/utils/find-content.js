@@ -1,3 +1,14 @@
+/* After Spell Check, find the content of leaf after spell correction
+ * @param {HTMLNode} anchorNode
+ * @param {Value} value
+ * @return {Object|void}
+ *   @property {number} start
+ *   @property {number} end
+ *   @property {string} textContent
+ *   @property {Leaf} leaf
+ *   @property {string} key
+ * */
+
 function getContent(anchorNode, value) {
   const { document } = value
   const { parentNode, previousSibling, nextSibling } = anchorNode
@@ -9,8 +20,7 @@ function getContent(anchorNode, value) {
   if (!key) return {}
   const node = document.getDescendant(key)
   if (node.object !== 'text') {
-    // PLease remind Jinxuan Zhu at https://github.com/ianstormtaylor/slate/pull/1695#issuecomment-376312742
-    // if you find this scenario is necessary
+    // See https://github.com/ianstormtaylor/slate/pull/1695#issuecomment-376312742
     return undefined
   }
 

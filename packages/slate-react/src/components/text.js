@@ -66,11 +66,19 @@ class Text extends React.Component {
     }
   }
 
+  /*
+   * Remount the node by regenerate the key
+   */
+
   forceRegeneration = () => {
     this.setState(state => ({
       regenerateKey: state.regenerateKey + 1,
     }))
   }
+
+  /*
+   * Regenerate Key when spell check renders uncontrolled dom
+   */
 
   componentWillReceiveProps(props) {
     const { ref, firstChild } = this.textRefs
