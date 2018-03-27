@@ -1,4 +1,4 @@
-/* After Spell Check, find the content of leaf after spell correction
+/* After Spell Check, find the corrected content of leaf
  * @param {HTMLNode} anchorNode
  * @param {Value} value
  * @return {Object|void}
@@ -9,12 +9,12 @@
  *   @property {string} key
  * */
 
-function getContent(anchorNode, value) {
+function findContent(anchorNode, value) {
   const { document } = value
   const { parentNode, previousSibling, nextSibling } = anchorNode
   if (!parentNode) return {}
   if (parentNode.getAttribute('data-offset-key')) {
-    return getContentInsideLeafSpan(anchorNode, value)
+    return findContentInsideLeafSpan(anchorNode, value)
   }
   const key = parentNode.getAttribute('data-key')
   if (!key) return {}
@@ -27,13 +27,13 @@ function getContent(anchorNode, value) {
   const leaves = node.getLeaves()
   if (!node || node.object !== 'text') return {}
 
-  // If anchorNode is at the start
+  // If anchorNode is at the start, the corrected leaf must be the first leaf
   if (!previousSibling) {
     const leaf = leaves.first()
     const start = 0
     const end = leaf.text.length
     let { textContent } = anchorNode
-    // check if nextSibling is rendered by the first leaf
+    // if nextSibling is rendered by the first leaf, append textCOntent
     if (nextSibling) {
       const offsetKey = nextSibling.getAttribute('data-offset-key')
       if (offsetKey === `${key}:0`) {
@@ -49,14 +49,14 @@ function getContent(anchorNode, value) {
     }
   }
 
-  // If anchorNode is at the end
+  // If anchorNode is at the end, the corrected leaf must be the last leaf
   if (!nextSibling) {
     const leaf = leaves.last()
     const { start, end } = findStartAndEnd(leaf, node)
     let { textContent } = anchorNode
     const index = leaves.size - 1
     const offsetKey = previousSibling.getAttribute('data-offset-key')
-    // Check if the previousSibling is rendered by the last leaf
+    // If previousSibling is rendered by the last leaf, prepand textCOntent
     if (offsetKey === `${key}:${index}`) {
       textContent = previousSibling.textContent + textContent
     }
@@ -69,15 +69,17 @@ function getContent(anchorNode, value) {
     }
   }
 
-  const prevOffsetKey = previousSibling.getAttribute('data-offset-key')
+  const previousOffsetKey = previousSibling.getAttribute('data-offset-key')
   const nextOffsetKey = nextSibling.getAttribute('data-offset-key')
-  const prevOffsetIndex = parseInt(prevOffsetKey.match(/[0-9]*$/)[0], 10)
-  if (prevOffsetIndex !== prevOffsetIndex) return {}
-  const nextOffsetIndex = parseInt(nextOffsetKey.match(/[0-9]*$/)[0], 10)
+  const previousSiblingLeafIndex = parseInt(
+    previousOffsetKey.match(/[0-9]*$/)[0],
+    10
+  )
+  const nextSiblingLeafIndex = parseInt(nextOffsetKey.match(/[0-9]*$/)[0], 10)
 
-  // If anchorNode splits a leaf
-  if (prevOffsetIndex === nextOffsetIndex) {
-    const leaf = leaves.get(prevOffsetIndex)
+  // If anchorNode is in middle of a leaf dom, prepand and append textContent
+  if (previousSiblingLeafIndex === nextSiblingLeafIndex) {
+    const leaf = leaves.get(previousSiblingLeafIndex)
     const { start, end } = findStartAndEnd(leaf, node)
     const textContent =
       previousSibling.textContent +
@@ -92,9 +94,9 @@ function getContent(anchorNode, value) {
     }
   }
 
-  // If anchorNode replace a leaf
-  if (nextOffsetIndex - prevOffsetIndex > 1) {
-    const leaf = leaves.get(prevOffsetIndex + 1)
+  // If anchorNode replace a leaf dom, then next leaf dom and previous leaf dom have an index difference bigger than 1
+  if (nextSiblingLeafIndex - previousSiblingLeafIndex > 1) {
+    const leaf = leaves.get(previousSiblingLeafIndex + 1)
     const { start, end } = findStartAndEnd(leaf, node)
     const { textContent } = anchorNode
     return {
@@ -106,10 +108,14 @@ function getContent(anchorNode, value) {
     }
   }
 
-  // If anchorNode changes a leaf at start or end
-  const nextLeaf = leaves.get(nextOffsetIndex)
+  // If next leaf dom and previous leaf dom have index difference as 1, then
+  // anchorNode can be
+  //   1. change of previous dom leaf
+  //   2. change of next dom leaf
+  //
+  const nextLeaf = leaves.get(nextSiblingLeafIndex)
 
-  // If anchorNode changes a leaf at the start of nextSibling
+  // If anchorNode changes the next leaf
   if (nextLeaf.text !== nextSibling.textContent) {
     const leaf = nextLeaf
     const { start, end } = findStartAndEnd(leaf, node)
@@ -123,8 +129,8 @@ function getContent(anchorNode, value) {
     }
   }
 
-  // If anchorNode changes a leaf at the end of previousSibling
-  const leaf = leaves.get(prevOffsetIndex)
+  // If anchorNode changes the previous leaf
+  const leaf = leaves.get(previousSiblingLeafIndex)
   const { start, end } = findStartAndEnd(leaf, node)
   const textContent = previousSibling.textContent + anchorNode.textContent
   return {
@@ -136,12 +142,19 @@ function getContent(anchorNode, value) {
   }
 }
 
-function getContentInsideLeafSpan(anchorNode, value) {
-  // After insert in masks, we can see:
-  // <b> Cat i cute </b>
-  // as
-  // <b> Cat </b>is <b>cute</b>
-  // The parentNode shall be rendered by text.js with data-offset-key
+/* When the anchorNode's parent is a leaf dom, identified by anchorNode.parentNode has
+ * attribute data-offset-key, this function gets the corrected content of leaf
+ * @param {HTMLNode} anchorNode
+ * @param {Value} value
+ * @return {Object|void}
+ *   @property {number} start
+ *   @property {number} end
+ *   @property {string} textContent
+ *   @property {Leaf} leaf
+ *   @property {string} key
+ */
+
+function findContentInsideLeafSpan(anchorNode, value) {
   const { parentNode } = anchorNode
   const { textContent } = parentNode
   const offsetKey = parentNode.getAttribute('data-offset-key')
@@ -165,6 +178,14 @@ function getContentInsideLeafSpan(anchorNode, value) {
   }
 }
 
+/* Given a leaf, find the startOffset and endOffset covering the leaf
+ * @param {Leaf} leaf
+ * @param {Node} node
+ * @return {Object}
+ *   @property {number} start
+ *   @property {number} end
+ */
+
 function findStartAndEnd(leaf, node) {
   const leaves = node.getLeaves()
   let start = 0
@@ -177,4 +198,4 @@ function findStartAndEnd(leaf, node) {
   return { start, end }
 }
 
-export default getContent
+export default findContent
