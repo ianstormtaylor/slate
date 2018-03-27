@@ -83,7 +83,8 @@
     "slate-html-serializer": "*",
     "slate-plain-serializer": "*",
     "slate-react": "*",
-    "slate-schema-violations": "*"
+    "slate-schema-violations": "*",
+    "slate-hotkeys": "*"
   },
   "scripts": {
     "benchmark": "mkdir -p ./tmp && cross-env BABEL_ENV=test babel-node ./node_modules/.bin/_matcha --reporter ./support/benchmark/reporter ./packages/*/benchmark/index.js > ./tmp/benchmark-comparison.json && cross-env BABEL_ENV=test babel-node ./support/benchmark/compare",

@@ -27,7 +27,8 @@
     "slate-base64-serializer": "^0.2.28",
     "slate-dev-logger": "^0.1.39",
     "slate-plain-serializer": "^0.5.9",
-    "slate-prop-types": "^0.4.26"
+    "slate-prop-types": "^0.4.26",
+    "slate-hotkeys": "0.0.1"
   },
   "peerDependencies": {
     "react": "^0.14.0 || ^15.0.0 || ^16.0.0",

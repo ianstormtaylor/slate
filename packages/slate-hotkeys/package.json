@@ -1,0 +1,34 @@
+{
+  "name": "slate-hotkeys",
+  "description": "A set of key defintions in Slate-React onKeyDown",
+  "version": "0.0.1",
+  "license": "MIT",
+  "repository": "git://github.com/ianstormtaylor/slate.git",
+  "main": "lib/slate-hotkeys.js",
+  "module": "lib/slate-hotkeys.es.js",
+  "umd": "dist/slate-hotkeys.js",
+  "umdMin": "dist/slate-hotkeys.min.js",
+  "files": [
+    "dist/",
+    "lib/"
+  ],
+  "devDependencies": {
+    "mocha": "^2.5.3",
+    "slate": "^0.33.0",
+    "slate-react": "0.12.0"
+  },
+
+  "dependencies": {
+    "is-hotkey": "^0.1.1",
+    "is-in-browser": "^1.1.3"
+  },
+  "scripts": {
+    "clean": "rm -rf ./dist ./lib ./node_modules"
+  },
+  "keywords": [
+    "constants",
+    "schema",
+    "slate",
+    "violation"
+  ]
+}
