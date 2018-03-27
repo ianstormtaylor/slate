@@ -84,6 +84,7 @@ class Leaf extends React.Component {
       this.forceRegeneration()
       return
     }
+
     for (let index = 0; index < childNodes.length; index++) {
       const child = childNodes[index]
       if (child.nodeName === '#text') {
@@ -91,6 +92,7 @@ class Leaf extends React.Component {
         return
       }
     }
+
     const { node, index } = this.props
     const offsetKey = OffsetKey.stringify({
       key: node.key,
