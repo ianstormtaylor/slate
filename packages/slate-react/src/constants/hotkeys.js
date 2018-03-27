@@ -42,9 +42,11 @@ const DELETE_LINE_FORWARD_MAC = isKeyHotkey('ctrl+k')
 const DELETE_LINE_BACKWARD = e => IS_APPLE && DELETE_LINE_BACKWARD_MAC(e)
 const DELETE_LINE_FORWARD = e => IS_APPLE && DELETE_LINE_FORWARD_MAC(e)
 
-const DELETE_WORD_BACKWARD_MAC = isKeyHotkey('option+backspace')
+const DELETE_WORD_BACKWARD_MAC = e =>
+  isKeyHotkey('shift+option+backspace', e) || isKeyHotkey('option+backspace', e)
 const DELETE_WORD_BACKWARD_PC = isKeyHotkey('ctrl+backspace')
-const DELETE_WORD_FORWARD_MAC = isKeyHotkey('option+delete')
+const DELETE_WORD_FORWARD_MAC = e =>
+  isKeyHotkey('shift+option+delete', e) || isKeyHotkey('option+delete', e)
 const DELETE_WORD_FORWARD_PC = isKeyHotkey('ctrl+delete')
 const DELETE_WORD_BACKWARD = e =>
   IS_APPLE ? DELETE_WORD_BACKWARD_MAC(e) : DELETE_WORD_BACKWARD_PC(e)
