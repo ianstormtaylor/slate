@@ -71,6 +71,7 @@ class Leaf extends React.Component {
 
   componentWillReceiveProps(props) {
     const { ref, firstChild } = this.leafRefs
+    // check if ref or its all contents are deleted by spell check
     if (!ref || ref.firstChild !== firstChild) {
       this.forceRegeneration()
       return

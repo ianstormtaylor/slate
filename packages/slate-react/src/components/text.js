@@ -82,6 +82,7 @@ class Text extends React.Component {
 
   componentWillReceiveProps(props) {
     const { ref, firstChild } = this.textRefs
+    // check if ref or its all contents are deleted by spell check
     if (!ref || ref.firstChild !== firstChild) {
       this.forceRegeneration()
       return
