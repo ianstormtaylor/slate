@@ -57,7 +57,7 @@ If you don't have Xcode installed already, install it now by following these ins
 * You will need to enter your **Apple ID** and **Password** to continue with the installation.
 * The button will read **INSTALLING** during the installation process.
 
-![App Store with search results for &quot;xcode&quot; \(Xcode already installed here\)](../.gitbook/assets/image%20%284%29.png)
+![App Store with search results for &quot;xcode&quot; \(Xcode already installed here\)](../images/contributing/ios-development-guide/image%20%284%29.png)
 
 ### Open Xcode
 
@@ -66,7 +66,7 @@ To start using simulator, first open Xcode:
 * Clicking the `OPEN` button from the Search Results in the app store \(as shown in the previous screenshot under **Install Xcode**\)
 * If you already had Xcode installed or have closed that window, you can type `CMD+SPACE` to open **Spotlight** and then type `xcode` and select it \(see screenshot below\)
 
-![Opening Xcode from Spotlight](../.gitbook/assets/image%20%2810%29.png)
+![Opening Xcode from Spotlight](../images/contributing/ios-development-guide/image%20%2810%29.png)
 
 NOTE: You will be required to enter your password the first time you use Xcode in order to continue.
 
@@ -78,11 +78,11 @@ To open Simulator from Xcode
 * Select the **Open Developer Tool** submenu
 * Select **Simulator**
 
-![](../.gitbook/assets/image%20%286%29.png)
+![](../images/contributing/ios-development-guide/image%20%286%29.png)
 
 Once you open **Simulator** from **Xcode** it will open a default device with a default iOS version. The device/version at time of writing is the iPhone X at iOS version 11.2.
 
-![](../.gitbook/assets/image%20%287%29.png)
+![](../images/contributing/ios-development-guide/image%20%287%29.png)
 
 ### Pin Simulator to Dock \(Recommended\)
 
@@ -94,7 +94,7 @@ To Pin Simulator
 * Select **Options**
 * Select **Keep in Dock**
 
-![](../.gitbook/assets/image%20%281%29.png)
+![](../images/contributing/ios-development-guide/image%20%281%29.png)
 
 ### Add More iOS Versions
 
@@ -103,14 +103,14 @@ By default, Simulator doesn't install every iOS version. Follow these instructio
 * Open **Xcode** \(follow the instructions under the heading Open Xcode earlier in this document if you are unsure how\)
 * From the **Xcode** menu select **Preferences...**
 
-![Select Preferences...](../.gitbook/assets/image%20%285%29.png)
+![Select Preferences...](../images/contributing/ios-development-guide/image%20%285%29.png)
 
 * Open the Components tab and select the iOS Simulator versions to install. Our current iOS targets are:
   * iOS 11.1 Simulator
   * iOS 10.3 Simulator \(shown as 10.3.1\)
   * iOS 9.3 Simulator
 
-![iOS 11 and 10.3 installed. Downloading iOS 9.3 Simulator.](../.gitbook/assets/image.png)
+![iOS 11 and 10.3 installed. Downloading iOS 9.3 Simulator.](../images/contributing/ios-development-guide/image.png)
 
 ## Development
 
@@ -131,17 +131,17 @@ To start a Device:
 * Select the iOS version you wish to start \(try iOS 11.2 to start\)
 * Select the specific device \(try iPhone 8 to start\)
 
-![Opening a device in Simulator](../.gitbook/assets/image%20%283%29.png)
+![Opening a device in Simulator](../images/contributing/ios-development-guide/image%20%283%29.png)
 
 After starting the device, you will see a working simulation of the device on the screen.
 
-![Simulator running iOS 11.2 on an iPhone 8](../.gitbook/assets/image%20%2815%29.png)
+![Simulator running iOS 11.2 on an iPhone 8](../images/contributing/ios-development-guide/image%20%2815%29.png)
 
 Open the Safari app on the device by clicking the Safari icon \(it's the blue circle that looks like a compass in the lower left of the screen\).
 
 Once Safari is open, enter the URL you wish to work on. For now, try entering `slatejs.org` to visite the Slate Examples page on the Internet.
 
-![slatejs.org on Safari for iOS](../.gitbook/assets/image%20%282%29.png)
+![slatejs.org on Safari for iOS](../images/contributing/ios-development-guide/image%20%282%29.png)
 
 ### IMPORTANT! Disconnect Hardware Keyboard
 
@@ -159,11 +159,11 @@ To disconnect the hardware keyboard in Simulator
 * If it is checked \(like in the screenshot below\) then click it to toggle it off.
 * If it is already unchecked, then exit the menu.
 
-![](../.gitbook/assets/image%20%289%29.png)
+![](../images/contributing/ios-development-guide/image%20%289%29.png)
 
 You can confirm that you have successfully disconnected the hardware keyboard by clicking in the editor from the SlateJS Examples site at http://slatejs.org. You should see the virtual keyboard appear as in the screenshot below.
 
-![iOS Virtual Keyboard confirms hardware keyboard is disconnected](../.gitbook/assets/image%20%2813%29.png)
+![iOS Virtual Keyboard confirms hardware keyboard is disconnected](../images/contributing/ios-development-guide/image%20%2813%29.png)
 
 ### Debugging in Mac Safari with Simulator
 
@@ -183,11 +183,11 @@ Once you have **Mac Safari** open, you can use it to debug **iOS Safari** in the
 * Select the iOS Safari session you want to debug. In the screenshot below, I've selected **slatejs.org**.
 * This will open up Web Inspector for that session which will give you many debugging tools.
 
-![Opening up Web Inspector for the Simulator&apos;s Safari Session](../.gitbook/assets/image%20%2812%29.png)
+![Opening up Web Inspector for the Simulator&apos;s Safari Session](../images/contributing/ios-development-guide/image%20%2812%29.png)
 
 Once you've opened up Web Inspector, you will see a screen like this
 
-![Web Inspector](../.gitbook/assets/image%20%2814%29.png)
+![Web Inspector](../images/contributing/ios-development-guide/image%20%2814%29.png)
 
 ### Tips and Tricks
 
@@ -196,5 +196,5 @@ There are a few tips and tricks that I've found useful.
 * Use `CMD+LEFT` and `CMD+RIGHT` to rotate the device in Simulator. Useful for testing in both horizontal and vertical orientation.
 * If you need to enter a URL into Safari in Simulator, you can `COPY` the URL from any Mac program. Click in the address bar in Safari in the Simulator and then select `PASTE`. This can save you time from typing long URLs using the virtual keyboard.
 
-![](../.gitbook/assets/image%20%288%29.png)
+![](../images/contributing/ios-development-guide/image%20%288%29.png)
 
