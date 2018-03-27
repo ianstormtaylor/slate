@@ -77,18 +77,22 @@ class Text extends React.Component {
   }
 
   /*
-   * Regenerate Key when spell check renders uncontrolled dom
+   * Regenerate Key to unmount and remount
+   * Because spell check puts an uncontrolled dom, we detect spell check condition by
+   * 1. chiildNodes are removed
+   * 2. has a textNode as a child
+   * 3. itself is removed
    */
 
   componentWillReceiveProps(props) {
-    const { ref, firstChild } = this.textRefs
+    const ref = this.textRef
     // check if ref or its all contents are deleted by spell check
-    if (!ref || ref.firstChild !== firstChild) {
-      this.forceRegeneration()
+    if (!ref) {
       return
     }
+
     const { childNodes } = ref
-    if (!childNodes) {
+    if (!childNodes || childNodes.length === 0) {
       this.forceRegeneration()
       return
     }
@@ -104,9 +108,7 @@ class Text extends React.Component {
     const { key } = node
     const queryString = `[data-key="${key}"]`
     if (!window.document.querySelector(queryString)) {
-      this.setState(state => ({
-        regenerateKey: state.regenerateKey + 1,
-      }))
+      this.forceRegeneration()
       return
     }
   }
@@ -147,10 +149,7 @@ class Text extends React.Component {
   }
 
   setRef = ref => {
-    this.textRefs = {
-      ref,
-      firstChild: ref ? ref.firstChild : null,
-    }
+    this.textRef = ref
   }
 
   /**
