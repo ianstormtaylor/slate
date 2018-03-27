@@ -96,7 +96,7 @@ function cloneFragment(event, value, fragment = value.fragment) {
   attach.setAttribute('data-slate-fragment', encoded)
 
   // Add the phony content to the DOM, and select it, so it will be copied.
-  const editor = window.document.querySelector('[data-slate-editor]')
+  const editor = event.target.closest('[data-slate-editor]')
   const div = window.document.createElement('div')
   div.setAttribute('contenteditable', true)
   div.style.position = 'absolute'
