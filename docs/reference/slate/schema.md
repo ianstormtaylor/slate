@@ -168,12 +168,14 @@ Will validate a node's marks. The `marks` definitions can declare a list of mark
 ```js
 {
   normalize: (change, violation, context) => {
-    case 'child_object_invalid':
-      change.wrapBlockByKey(context.child.key, 'paragraph')
-      return
-    case 'child_type_invalid':
-      change.setNodeByKey(context.child.key, 'paragraph')
-      return
+    switch (violation) {
+      case 'child_object_invalid':
+        change.wrapBlockByKey(context.child.key, 'paragraph')
+        return
+      case 'child_type_invalid':
+        change.setNodeByKey(context.child.key, 'paragraph')
+        return
+    }
   }
 }
 ```
