@@ -6,8 +6,8 @@ The goal is to have full coverage against all modern Android versions against al
 
 The following Android versions are targeted.
 
-*   Android 6.0
-*   Android 7.1
+* Android 6.0
+* Android 7.1
 
 ## Development Setup Overview
 
@@ -117,9 +117,9 @@ Click **\+ Create Virtual Device** from Android Virtual Device Manager to add mo
 
 For consistency, we are recommending installing virtual devices for:
 
-*   Nexus 5X with Android 8.1
-*   Nexus 5X with Android 7.1.1
-*   Nexus 4 with Android 6.0
+* Nexus 5X with Android 8.1
+* Nexus 5X with Android 7.1.1
+* Nexus 4 with Android 6.0
 
 ### Android Virtual Device Manager issues
 

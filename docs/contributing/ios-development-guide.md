@@ -50,14 +50,14 @@ Simulator is part of Xcode so you will need to install Xcode to get access to Si
 
 If you don't have Xcode installed already, install it now by following these instruction.
 
-* From your Mac, open the **App Store**. One way to do this is to type `CMD+SPACE` to open Spotlight then type `app store`. 
+* From your Mac, open the **App Store**. One way to do this is to type `CMD+SPACE` to open Spotlight then type `app store`.
 * From the **App Store** window, type `xcode` in the search box near the top of the window.
 * In the search results, you will see **Xcode**. Next to **Xcode**, there is a button that says **GET**. Click the button. Do not click the drop-down arrow.
 * The word **GET** will change to **INSTALL APP**. Click this button.
 * You will need to enter your **Apple ID** and **Password** to continue with the installation.
 * The button will read **INSTALLING** during the installation process.
 
-![App Store with search results for &quot;xcode&quot; \(Xcode already installed here\)](../images/contributing/ios-development-guide/image-4.png)
+![App Store with search results for "xcode" (Xcode already installed here)](../images/contributing/ios-development-guide/image-4.png)
 
 ### Open Xcode
 
@@ -183,7 +183,7 @@ Once you have **Mac Safari** open, you can use it to debug **iOS Safari** in the
 * Select the iOS Safari session you want to debug. In the screenshot below, I've selected **slatejs.org**.
 * This will open up Web Inspector for that session which will give you many debugging tools.
 
-![Opening up Web Inspector for the Simulator&apos;s Safari Session](../images/contributing/ios-development-guide/image-12.png)
+![Opening up Web Inspector for the Simulator's Safari Session](../images/contributing/ios-development-guide/image-12.png)
 
 Once you've opened up Web Inspector, you will see a screen like this
 
@@ -197,4 +197,3 @@ There are a few tips and tricks that I've found useful.
 * If you need to enter a URL into Safari in Simulator, you can `COPY` the URL from any Mac program. Click in the address bar in Safari in the Simulator and then select `PASTE`. This can save you time from typing long URLs using the virtual keyboard.
 
 ![](../images/contributing/ios-development-guide/image-8.png)
-
