@@ -33,17 +33,13 @@ After clicking you will be redirected to an instruction page on how to **Install
 
 **IMPORTANT!** During the installation process, do a custom install instead of the default installation.
 
-![](../images/contributing/android-development-guide/image-4.png)
-
-Select "Custom" when choosing the "Install Type"
+![Select "Custom" when choosing the "Install Type"](../images/contributing/android-development-guide/image-4.png)
 
 After selecting **Install Type** you will be asked to **Select UI Theme**. Choose the one you prefer.
 
 Next, at the SDK Components Setup, make sure to select **Android Virtual Device**. Also **Performance (Intel HAXM)** should be selected already but if not, make sure to select it.
 
-![](../images/contributing/android-development-guide/image-5.png)
-
-Make sure everything is checked here
+![Make sure everything is checked here](../images/contributing/android-development-guide/image-5.png)
 
 Complete the rest of the installation process. There are no other special changes required.
 
@@ -69,9 +65,7 @@ In order to access the emulator, we are going to setup an Android Studio project
 
 After the installation process completes, select **Start a new Android Studio project** from the **Welcome to Android Studio** window.
 
-![](../images/contributing/android-development-guide/image-9.png)
-
-Select "Start a new Android Studio project"
+![Select "Start a new Android Studio project"](../images/contributing/android-development-guide/image-9.png)
 
 A Create Android Project window pops up. The information about your project isn't that important. We've used for **Application name** the name `Android Emulator` but you can name it whatever you like. You should enter your own **Company domain**.
 
