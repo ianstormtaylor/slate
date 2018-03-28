@@ -37,7 +37,8 @@ const DELETE_CHAR_BACKWARD = e =>
 const DELETE_CHAR_FORWARD = e =>
   DELETE_FORWARD(e) || (IS_APPLE && DELETE_CHAR_FORWARD_MAC(e))
 
-const DELETE_LINE_BACKWARD_MAC = isKeyHotkey('cmd+backspace')
+const DELETE_LINE_BACKWARD_MAC = e =>
+  isKeyHotkey('cmd+shift+backspace', e) || isKeyHotkey('cmd+backspace', e)
 const DELETE_LINE_FORWARD_MAC = isKeyHotkey('ctrl+k')
 const DELETE_LINE_BACKWARD = e => IS_APPLE && DELETE_LINE_BACKWARD_MAC(e)
 const DELETE_LINE_FORWARD = e => IS_APPLE && DELETE_LINE_FORWARD_MAC(e)
