@@ -40,7 +40,6 @@ class Content extends React.Component {
 
   static propTypes = {
     autoCorrect: Types.bool.isRequired,
-    autoFocus: Types.bool.isRequired,
     children: Types.any.isRequired,
     className: Types.string,
     editor: Types.object.isRequired,
@@ -87,11 +86,9 @@ class Content extends React.Component {
    *
    *   - Add native DOM event listeners.
    *   - Update the selection, in case it starts focused.
-   *   - Focus the editor if `autoFocus` is set.
    */
 
   componentDidMount = () => {
-    const { editor } = this.props
     const window = getWindow(this.element)
 
     window.document.addEventListener(
@@ -105,10 +102,6 @@ class Content extends React.Component {
     }
 
     this.updateSelection()
-
-    if (this.props.autoFocus) {
-      editor.focus()
-    }
   }
 
   /**
