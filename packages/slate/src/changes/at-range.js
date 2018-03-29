@@ -990,7 +990,7 @@ Changes.splitBlockAtRange = (change, range, height = 1, options = {}) => {
 
   if (range.isExpanded) {
     change.deleteAtRange(range, { normalize })
-    range = range.collapseToStart()
+    range = change.value.selection
   }
 
   const { startKey, startOffset } = range
