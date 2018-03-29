@@ -9,6 +9,7 @@ export default function(change) {
 export const input = (
   <value>
     <document>
+      <paragraph>zero</paragraph>
       <paragraph>
         <anchor />one
       </paragraph>
@@ -23,6 +24,7 @@ export const input = (
 export const output = (
   <value>
     <document>
+      <paragraph>zero</paragraph>
       <quote>
         a<cursor />three
       </quote>
