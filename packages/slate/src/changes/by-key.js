@@ -2,6 +2,7 @@ import Block from '../models/block'
 import Inline from '../models/inline'
 import Mark from '../models/mark'
 import Node from '../models/node'
+import Text from '../models/text'
 
 /**
  * Changes.
@@ -344,6 +345,60 @@ Changes.removeNodeByKey = (change, key, options = {}) => {
     const parent = document.getParent(key)
     change.normalizeNodeByKey(parent.key)
   }
+}
+
+/**
+ * Replace a Text with key with another Text
+ * @param {Change} change
+ * @param {String} key
+ * @param {Text} text
+ * @param {Object} options
+ *   @property {Boolean} normalize
+ */
+
+Changes.setTextByKey = (change, key, text, options = {}) => {
+  const textKey = typeof text === 'string' ? key : text.key
+  text = Text.create(text).set('key', textKey)
+
+  const { anchorKey, focusKey, document } = change.value
+
+  const normalize = change.getFlag('normalize', options)
+  change.replaceNodeByKey(key, text, { normalize: false })
+  if (anchorKey === key) {
+    change.moveAnchorTo(text.key, text.text.length)
+  }
+  if (focusKey === key) {
+    change.moveFocusTo(text.key, text.text.length)
+  }
+  if (normalize) {
+    change.normalizeNodeByKey(document.getParent(key).key)
+  }
+}
+
+/**
+ * Replace A Length of Text with another string or text
+ * @param {Change} change
+ * @param {String} key
+ * @param {Number} offset
+ * @param {Number} length
+ * @param {string} text
+ * @param {Set<Mark>} marks (optional)
+ * @param {Object} options
+ *   @property {Boolean} normalize
+ *
+ */
+
+Changes.replaceTextByKey = (
+  change,
+  key,
+  offset,
+  length,
+  text,
+  marks,
+  options
+) => {
+  change.removeTextByKey(key, offset, length, { normalize: false })
+  change.insertTextByKey(key, offset, text, marks, options)
 }
 
 /**
