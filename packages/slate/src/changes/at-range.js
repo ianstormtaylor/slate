@@ -671,7 +671,11 @@ Changes.insertFragmentAtRange = (change, range, fragment, options = {}) => {
   // If the range is expanded, delete it first.
   if (range.isExpanded) {
     change.deleteAtRange(range, { normalize: false })
-    range = range.collapseToStart()
+    if (change.value.document.getDescendant(range.startKey)) {
+      range = range.collapseToStart()
+    } else {
+      range = range.collapseTo(range.endKey, 0)
+    }
   }
 
   // If the fragment is empty, there's nothing to do after deleting.
