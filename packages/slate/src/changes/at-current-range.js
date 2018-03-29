@@ -199,12 +199,34 @@ Changes.insertText = (change, text, marks) => {
   const { value } = change
   const { document, selection } = value
   marks = marks || selection.marks || document.getInsertMarksAtRange(selection)
-  change.insertTextAtRange(selection, text, marks)
+  change.insertTextAtRange(selection, text, marks, { normalize: false })
+
+  // Restore the cursor if startKey is deleted
+  if (!change.value.document.getDescendant(selection.startKey)) {
+    change.collapseTo(selection.endKey, text.length)
+  }
 
   // If the text was successfully inserted, and the selection had marks on it,
   // unset the selection's marks.
   if (selection.marks && document != change.value.document) {
     change.select({ marks: null })
+  }
+
+  // normalize in the narrowest existing block that originally contains startKey and endKey
+  const commonAncestor = document.getCommonAncestor(
+    selection.startKey,
+    selection.endKey
+  )
+  const ancestors = document
+    .getAncestors(commonAncestor.key)
+    .push(commonAncestor)
+  const normalizeAncestor = ancestors.findLast(n =>
+    change.value.document.getDescendant(n.key)
+  )
+  if (normalizeAncestor) {
+    change.normalizeNodeByKey(normalizeAncestor.key)
+  } else {
+    change.normalizeNodeByKey(change.value.document.key)
   }
 }
 
