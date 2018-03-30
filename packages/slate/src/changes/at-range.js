@@ -831,22 +831,19 @@ Changes.insertTextAtRange = (change, range, text, marks, options = {}) => {
   const { value } = change
   const { document } = value
   const { startKey, startOffset, endKey } = range
-  let key = startKey
-  let offset = startOffset
+  const key = startKey
+  const offset = startOffset
   const parent = document.getParent(startKey)
 
   if (parent.isVoid) return undefined
+  change.insertTextByKey(key, offset, text, marks, { normalize: false })
+  if (range.isBachward) range = range.flip()
+  if (endKey === startKey) range = range.moveFocus(text.length)
+  range = range.moveAnchor(text.length)
 
   if (range.isExpanded) {
     change.deleteAtRange(range, { normalize: false })
-    if (!change.value.document.getDescendant(key)) {
-      key = endKey
-      offset = 0
-      if (!change.value.document.getDescendant(key)) return
-    }
   }
-
-  change.insertTextByKey(key, offset, text, marks, { normalize: false })
 
   if (normalize) {
     // normalize in the narrowest existing block that originally contains startKey and endKey
