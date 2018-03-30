@@ -827,31 +827,23 @@ Changes.insertInlineAtRange = (change, range, inline, options = {}) => {
  */
 
 Changes.insertTextAtRange = (change, range, text, marks, options = {}) => {
-  let { normalize } = options
+  const { normalize } = options
   const { value } = change
   const { document } = value
-  const { startKey, startOffset } = range
-  let key = startKey
-  let offset = startOffset
+  const { startKey, startOffset, endKey } = range
+  const key = startKey
+  const offset = startOffset
   const parent = document.getParent(startKey)
 
-  if (parent.isVoid) return
+  if (parent.isVoid) return undefined
+  change.insertTextByKey(key, offset, text, marks, { normalize: false })
+  if (range.isBachward) range = range.flip()
+  if (endKey === startKey) range = range.moveFocus(text.length)
+  range = range.moveAnchor(text.length)
 
   if (range.isExpanded) {
     change.deleteAtRange(range, { normalize: false })
-
-    // Update range start after delete
-    if (change.value.startKey !== key) {
-      key = change.value.startKey
-      offset = change.value.startOffset
-    }
   }
-
-  // PERF: Unless specified, don't normalize if only inserting text.
-  if (normalize !== undefined) {
-    normalize = range.isExpanded
-  }
-  change.insertTextByKey(key, offset, text, marks, { normalize: false })
 
   if (normalize) {
     // normalize in the narrowest existing block that originally contains startKey and endKey
@@ -862,7 +854,11 @@ Changes.insertTextAtRange = (change, range, text, marks, options = {}) => {
     const normalizeAncestor = ancestors.findLast(n =>
       change.value.document.getDescendant(n.key)
     )
-    change.normalizeNodeByKey(normalizeAncestor.key)
+    if (normalizeAncestor) {
+      change.normalizeNodeByKey(normalizeAncestor.key)
+    } else {
+      change.normalizeNodeByKey(change.value.document.key)
+    }
   }
 }
 

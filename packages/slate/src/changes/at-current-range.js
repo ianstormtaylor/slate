@@ -199,7 +199,7 @@ Changes.insertText = (change, text, marks) => {
   const { value } = change
   const { document, selection } = value
   marks = marks || selection.marks || document.getInsertMarksAtRange(selection)
-  change.insertTextAtRange(selection, text, marks)
+  change.insertTextAtRange(selection, text, marks, { normalize: true })
 
   // If the text was successfully inserted, and the selection had marks on it,
   // unset the selection's marks.
