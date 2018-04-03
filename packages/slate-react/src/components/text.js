@@ -59,6 +59,62 @@ class Text extends React.Component {
     debug(message, `${key} (text)`, ...args)
   }
 
+  constructor(props) {
+    super(props)
+    this.state = {
+      regenerateKey: 0,
+    }
+  }
+
+  /*
+   * Remount the node by regenerate the key
+   */
+
+  forceRegeneration = () => {
+    this.setState(state => ({
+      regenerateKey: state.regenerateKey + 1,
+    }))
+  }
+
+  /*
+   * Regenerate Key to unmount and remount
+   * Because spell check puts an uncontrolled dom, we detect spell check condition by
+   * 1. chiildNodes are removed
+   * 2. has a textNode as a child
+   * 3. itself is removed
+   */
+
+  componentWillReceiveProps(props) {
+    const ref = this.textRef
+    // check if ref or its all contents are deleted by spell check
+    if (!ref) {
+      return
+    }
+
+    const { childNodes } = ref
+    if (!childNodes || childNodes.length === 0) {
+      this.forceRegeneration()
+      return
+    }
+
+    for (let index = 0; index < childNodes.length; index++) {
+      const child = childNodes[index]
+      if (child.nodeName === '#text') {
+        ref.removeChild(child)
+        this.forceRegeneration()
+        return
+      }
+    }
+
+    const { node } = this.props
+    const { key } = node
+    const queryString = `[data-key="${key}"]`
+    if (!window.document.querySelector(queryString)) {
+      this.forceRegeneration()
+      return
+    }
+  }
+
   /**
    * Should the node update?
    *
@@ -67,10 +123,11 @@ class Text extends React.Component {
    * @return {Boolean}
    */
 
-  shouldComponentUpdate = nextProps => {
+  shouldComponentUpdate = (nextProps, nextState) => {
     const { props } = this
     const n = nextProps
     const p = props
+    if (nextState !== this.state) return true
 
     // If the node has changed, update. PERF: There are cases where it will have
     // changed, but it's properties will be exactly the same (eg. copy-paste)
@@ -91,6 +148,10 @@ class Text extends React.Component {
 
     // Otherwise, don't update.
     return false
+  }
+
+  setRef = ref => {
+    this.textRef = ref
   }
 
   /**
@@ -123,9 +184,10 @@ class Text extends React.Component {
       offset += leaf.text.length
       return child
     })
+    const reactKey = `text:${key}:${this.state.regenerateKey}`
 
     return (
-      <span data-key={key} style={style}>
+      <span ref={this.setRef} key={reactKey} data-key={key} style={style}>
         {children}
       </span>
     )

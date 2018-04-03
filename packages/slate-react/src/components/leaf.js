@@ -37,6 +37,12 @@ class Leaf extends React.Component {
     parent: SlateTypes.node.isRequired,
     text: Types.string.isRequired,
   }
+  constructor(props) {
+    super(props)
+    this.state = {
+      regenerateKey: 0,
+    }
+  }
 
   /**
    * Debug.
@@ -49,6 +55,56 @@ class Leaf extends React.Component {
     debug(message, `${this.props.node.key}-${this.props.index}`, ...args)
   }
 
+  /*
+   * Remount the node by regenerate the key
+   */
+
+  forceRegeneration = () => {
+    this.setState(state => ({
+      regenerateKey: state.regenerateKey + 1,
+    }))
+  }
+
+  /*
+   * Regenerate Key to unmount and remount
+   * Because spell check puts an uncontrolled dom, we detect spell check condition by
+   * 1. chiildNodes are removed
+   * 2. has a textNode as a child
+   * 3. itself is removed
+   */
+
+  componentWillReceiveProps(props) {
+    const ref = this.leafRef
+    if (!ref) {
+      return
+    }
+
+    const { childNodes } = ref
+    if (!childNodes || childNodes.length === 0) {
+      this.forceRegeneration()
+      return
+    }
+
+    for (let index = 0; index < childNodes.length; index++) {
+      const child = childNodes[index]
+      if (child.nodeName === '#text') {
+        this.forceRegeneration()
+        return
+      }
+    }
+
+    const { node, index } = this.props
+    const offsetKey = OffsetKey.stringify({
+      key: node.key,
+      index,
+    })
+    const queryString = `[data-offset-key="${offsetKey}"]`
+    if (!window.document.querySelector(queryString)) {
+      this.forceRegeneration()
+      return
+    }
+  }
+
   /**
    * Should component update?
    *
@@ -56,19 +112,24 @@ class Leaf extends React.Component {
    * @return {Boolean}
    */
 
-  shouldComponentUpdate(props) {
+  shouldComponentUpdate(props, state) {
     // If any of the regular properties have changed, re-render.
     if (
       props.index != this.props.index ||
       props.marks != this.props.marks ||
       props.text != this.props.text ||
-      props.parent != this.props.parent
+      props.parent != this.props.parent ||
+      state !== this.state
     ) {
       return true
     }
 
     // Otherwise, don't update.
     return false
+  }
+
+  setRef = ref => {
+    this.leafRef = ref
   }
 
   /**
@@ -85,8 +146,13 @@ class Leaf extends React.Component {
       key: node.key,
       index,
     })
+    const key = `${offsetKey}:${this.state.regenerateKey}`
 
-    return <span data-offset-key={offsetKey}>{this.renderMarks()}</span>
+    return (
+      <span key={key} ref={this.setRef} data-offset-key={offsetKey}>
+        {this.renderMarks()}
+      </span>
+    )
   }
 
   /**

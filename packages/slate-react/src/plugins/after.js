@@ -14,6 +14,7 @@ import findDOMNode from '../utils/find-dom-node'
 import findNode from '../utils/find-node'
 import findPoint from '../utils/find-point'
 import findRange from '../utils/find-range'
+import findContent from '../utils/find-content'
 import getEventRange from '../utils/get-event-range'
 import getEventTransfer from '../utils/get-event-transfer'
 import setEventTransfer from '../utils/set-event-transfer'
@@ -307,48 +308,76 @@ function AfterPlugin() {
     const native = window.getSelection()
     const { anchorNode, anchorOffset } = native
     const point = findPoint(anchorNode, anchorOffset, value)
-    if (!point) return
 
-    // Get the text node and leaf in question.
-    const { document, selection } = value
-    const node = document.getDescendant(point.key)
-    const block = document.getClosestBlock(node.key)
-    const leaves = node.getLeaves()
-    const lastText = block.getLastText()
-    const lastLeaf = leaves.last()
+    let leaf
+    let textContent
     let start = 0
     let end = 0
+    let key
 
-    const leaf =
-      leaves.find(r => {
-        start = end
-        end += r.text.length
-        if (end >= point.offset) return true
-      }) || lastLeaf
+    if (anchorNode.nodeName !== '#text' && point) {
+      // Get the text node and leaf in question.
+      const { document } = value
+      const node = document.getDescendant(point.key)
+      key = node.key
+      const block = document.getClosestBlock(node.key)
+      const leaves = node.getLeaves()
+      const lastText = block.getLastText()
+      const lastLeaf = leaves.last()
 
-    // Get the text information.
-    const { text } = leaf
-    let { textContent } = anchorNode
-    const isLastText = node == lastText
-    const isLastLeaf = leaf == lastLeaf
-    const lastChar = textContent.charAt(textContent.length - 1)
+      if (point.offset !== undefined) {
+        leaf =
+          leaves.find(r => {
+            start = end
+            end += r.text.length
+            if (end >= point.offset) return true
+          }) || lastLeaf
+      }
+      const { text } = leaf
+      textContent = anchorNode.textContent
+      const isLastText = node == lastText
+      const isLastLeaf = leaf == lastLeaf
+      const lastChar = textContent.charAt(textContent.length - 1)
 
-    // COMPAT: If this is the last leaf, and the DOM text ends in a new line,
-    // we will have added another new line in <Leaf>'s render method to account
-    // for browsers collapsing a single trailing new lines, so remove it.
-    if (isLastText && isLastLeaf && lastChar == '\n') {
-      textContent = textContent.slice(0, -1)
+      // COMPAT: If this is the last leaf, and the DOM text ends in a new line,
+      // we will have added another new line in <Leaf>'s render method to account
+      // for browsers collapsing a single trailing new lines, so remove it.
+      if (isLastText && isLastLeaf && lastChar == '\n') {
+        textContent = textContent.slice(0, -1)
+      }
+
+      // If the text is no different, abort.
+      if (textContent == text) return
+    } else {
+      const result = findContent(anchorNode, value)
+      if (!result) return
+      leaf = result.leaf
+      start = result.start
+      end = result.end
+      textContent = result.textContent
+      key = result.key
     }
 
-    // If the text is no different, abort.
-    if (textContent == text) return
+    if (
+      !leaf ||
+      leaf.marks.size ||
+      anchorNode.nodeName === '#text' ||
+      !anchorNode.getAttribute('data-offset-key')
+    ) {
+      const { parentNode } = anchorNode
+      if (parentNode.getAttribute('data-offset-key')) {
+        // Becuase the anchorNode is not controlled by react; it would cause double anchorNode.textContent without removal
+        // If parentNode is data-key, we can remove it in components/text.js
+        parentNode.removeChild(anchorNode)
+      }
+    }
+    if (!leaf) return
 
+    const { selection } = value
     // Determine what the selection should be after changing the text.
-    const delta = textContent.length - text.length
+    const delta = textContent.length - leaf.text.length
     const corrected = selection.collapseToEnd().move(delta)
-    const entire = selection
-      .moveAnchorTo(point.key, start)
-      .moveFocusTo(point.key, end)
+    const entire = selection.moveAnchorTo(key, start).moveFocusTo(key, end)
 
     // Change the current value to have the leaf's text replaced.
     change.insertTextAtRange(entire, textContent, leaf.marks).select(corrected)
