@@ -5,6 +5,10 @@ import SlateTypes from 'slate-prop-types'
 
 import OffsetKey from '../utils/offset-key'
 
+const attributes = {
+  'data-text': true,
+}
+
 /**
  * Debugger.
  *
@@ -86,7 +90,11 @@ class Leaf extends React.Component {
       index,
     })
 
-    return <span data-offset-key={offsetKey}>{this.renderMarks()}</span>
+    return (
+      <span ref={this.setRef} data-offset-key={offsetKey}>
+        {this.renderMarks()}
+      </span>
+    )
   }
 
   /**
@@ -101,7 +109,16 @@ class Leaf extends React.Component {
     const leaf = this.renderText()
 
     return marks.reduce((children, mark) => {
-      const props = { editor, mark, marks, node, offset, text, children }
+      const props = {
+        editor,
+        mark,
+        marks,
+        node,
+        offset,
+        text,
+        children,
+        attributes,
+      }
       const element = stack.find('renderMark', props)
       return element || children
     }, leaf)
