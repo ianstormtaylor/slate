@@ -624,7 +624,7 @@ Changes.insertBlockAtRange = (change, range, block, options = {}) => {
 
   if (range.isExpanded) {
     change.deleteAtRange(range)
-    range = range.collapseToStart()
+    range = change.value.selection
   }
 
   const { value } = change
@@ -671,7 +671,7 @@ Changes.insertFragmentAtRange = (change, range, fragment, options = {}) => {
   // If the range is expanded, delete it first.
   if (range.isExpanded) {
     change.deleteAtRange(range, { normalize: false })
-    range = range.collapseToStart()
+    range = change.value.selection
   }
 
   // If the fragment is empty, there's nothing to do after deleting.
@@ -795,7 +795,7 @@ Changes.insertInlineAtRange = (change, range, inline, options = {}) => {
 
   if (range.isExpanded) {
     change.deleteAtRange(range, { normalize: false })
-    range = range.collapseToStart()
+    range = change.value.selection
   }
 
   const { value } = change
@@ -990,7 +990,7 @@ Changes.splitBlockAtRange = (change, range, height = 1, options = {}) => {
 
   if (range.isExpanded) {
     change.deleteAtRange(range, { normalize })
-    range = range.collapseToStart()
+    range = change.value.selection
   }
 
   const { startKey, startOffset } = range
@@ -1029,7 +1029,7 @@ Changes.splitInlineAtRange = (
 
   if (range.isExpanded) {
     change.deleteAtRange(range, { normalize })
-    range = range.collapseToStart()
+    range = change.value.selection
   }
 
   const { startKey, startOffset } = range
