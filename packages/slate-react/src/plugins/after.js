@@ -10,6 +10,7 @@ import EVENT_HANDLERS from '../constants/event-handlers'
 import HOTKEYS from '../constants/hotkeys'
 import Content from '../components/content'
 import cloneFragment from '../utils/clone-fragment'
+import copyVoidNode from '../utils/copy-void-node'
 import findDOMNode from '../utils/find-dom-node'
 import findNode from '../utils/find-node'
 import findPoint from '../utils/find-point'
@@ -103,6 +104,7 @@ function AfterPlugin() {
     debug('onCopy', { event })
 
     cloneFragment(event, change.value)
+    copyVoidNode(event, change.value)
   }
 
   /**
@@ -117,6 +119,8 @@ function AfterPlugin() {
     debug('onCut', { event })
 
     cloneFragment(event, change.value)
+    copyVoidNode(event, change.value)
+
     const window = getWindow(event.target)
 
     // Once the fake cut content has successfully been added to the clipboard,
