@@ -124,9 +124,10 @@ class Text extends React.Component {
       return child
     })
 
+    // Converts List to Array to support IE 11.
     return (
       <span data-key={key} style={style}>
-        {children}
+        {children.toArray()}
       </span>
     )
   }
