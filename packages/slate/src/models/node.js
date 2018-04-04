@@ -350,6 +350,7 @@ class Node {
     key = assertKey(key)
 
     if (key == this.key) return List()
+    if (!this.getDescendant(key)) return null
     if (this.hasChild(key)) return List([this])
 
     let ancestors
@@ -359,11 +360,7 @@ class Node {
       return ancestors
     })
 
-    if (ancestors) {
-      return ancestors.unshift(this)
-    } else {
-      return null
-    }
+    return ancestors.unshift(this)
   }
 
   /**
