@@ -6,68 +6,66 @@ export const input = (
   <value>
     <document>
       <paragraph>
-        <link thing="value">
-          one
-        </link>
+        <link thing="value">one</link>
       </paragraph>
     </document>
   </value>
 )
 
 export const output = {
-  kind: 'value',
+  object: 'value',
   document: {
-    kind: 'document',
+    object: 'document',
     data: {},
     nodes: [
       {
-        kind: 'block',
+        object: 'block',
         type: 'paragraph',
         data: {},
         isVoid: false,
         nodes: [
           {
-            kind: 'text',
+            object: 'text',
             leaves: [
               {
-                kind: 'leaf',
+                object: 'leaf',
                 text: '',
                 marks: [],
-              }
-            ]
+              },
+            ],
           },
           {
-            kind: 'inline',
+            object: 'inline',
             type: 'link',
             isVoid: false,
             data: {
-              thing: 'value'
+              thing: 'value',
             },
             nodes: [
               {
-                kind: 'text',
+                object: 'text',
                 leaves: [
                   {
-                    kind: 'leaf',
+                    object: 'leaf',
                     text: 'one',
                     marks: [],
-                  }
-                ]
-              }
-            ]
+                  },
+                ],
+              },
+            ],
           },
           {
-            kind: 'text',
+            object: 'text',
             leaves: [
               {
-                kind: 'leaf',
+                object: 'leaf',
                 text: '',
                 marks: [],
-              }
-            ]
+              },
+            ],
           },
-        ]
-      }
-    ]
-  }
+        ],
+      },
+    ],
+  },
 }

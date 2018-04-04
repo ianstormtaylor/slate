@@ -1,4 +1,3 @@
-
 import { Editor } from 'slate-react'
 import { Value } from 'slate'
 
@@ -12,7 +11,6 @@ import initialValue from './value.json'
  */
 
 class SearchHighlighting extends React.Component {
-
   /**
    * Deserialize the initial editor value.
    *
@@ -39,13 +37,13 @@ class SearchHighlighting extends React.Component {
    * @param {Event} event
    */
 
-  onInputChange = (event) => {
+  onInputChange = event => {
     const { value } = this.state
     const string = event.target.value
     const texts = value.document.getTexts()
     const decorations = []
 
-    texts.forEach((node) => {
+    texts.forEach(node => {
       const { key, text } = node
       const parts = text.split(string)
       let offset = 0
@@ -65,7 +63,15 @@ class SearchHighlighting extends React.Component {
       })
     })
 
-    const change = value.change().setValue({ decorations })
+    // setting the `save` option to false prevents this change from being added
+    // to the undo/redo stack and clearing the redo stack if the user has undone
+    // changes.
+
+    const change = value
+      .change()
+      .setOperationFlag('save', false)
+      .setValue({ decorations })
+      .setOperationFlag('save', true)
     this.onChange(change)
   }
 
@@ -133,13 +139,13 @@ class SearchHighlighting extends React.Component {
    * @return {Element}
    */
 
-  renderMark = (props) => {
+  renderMark = props => {
     const { children, mark } = props
     switch (mark.type) {
-      case 'highlight': return <span style={{ backgroundColor: '#ffeeba' }}>{children}</span>
+      case 'highlight':
+        return <span style={{ backgroundColor: '#ffeeba' }}>{children}</span>
     }
   }
-
 }
 
 /**

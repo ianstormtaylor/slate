@@ -1,6 +1,5 @@
-
 import React from 'react'
-import ReactDOMServer from 'react-dom/server'
+import { renderToStaticMarkup } from 'react-dom/server'
 import typeOf from 'type-of'
 import { Node, Value } from 'slate'
 import { Record } from 'immutable'
@@ -12,8 +11,8 @@ import { Record } from 'immutable'
  */
 
 const String = new Record({
-  kind: 'string',
-  text: ''
+  object: 'string',
+  text: '',
 })
 
 /**
@@ -24,43 +23,43 @@ const String = new Record({
  */
 
 const TEXT_RULE = {
-
   deserialize(el) {
     if (el.tagName && el.tagName.toLowerCase() === 'br') {
       return {
-        kind: 'text',
-        leaves: [{
-          kind: 'leaf',
-          text: '\n'
-        }]
+        object: 'text',
+        leaves: [
+          {
+            object: 'leaf',
+            text: '\n',
+          },
+        ],
       }
     }
 
     if (el.nodeName == '#text') {
-      if (el.value && el.value.match(/<!--.*?-->/)) return
+      if (el.nodeValue && el.nodeValue.match(/<!--.*?-->/)) return
 
       return {
-        kind: 'text',
-        leaves: [{
-          kind: 'leaf',
-          text: el.value || el.nodeValue
-        }]
+        object: 'text',
+        leaves: [
+          {
+            object: 'leaf',
+            text: el.nodeValue,
+          },
+        ],
       }
     }
   },
 
   serialize(obj, children) {
-    if (obj.kind === 'string') {
-      return children
-        .split('\n')
-        .reduce((array, text, i) => {
-          if (i != 0) array.push(<br />)
-          array.push(text)
-          return array
-        }, [])
+    if (obj.object === 'string') {
+      return children.split('\n').reduce((array, text, i) => {
+        if (i != 0) array.push(<br key={i} />)
+        array.push(text)
+        return array
+      }, [])
     }
-  }
-
+  },
 }
 
 /**
@@ -72,7 +71,9 @@ const TEXT_RULE = {
 
 function defaultParseHtml(html) {
   if (typeof DOMParser === 'undefined') {
-    throw new Error('The native `DOMParser` global which the `Html` serializer uses by default is not present in this environment. You must supply the `options.parseHtml` function instead.')
+    throw new Error(
+      'The native `DOMParser` global which the `Html` serializer uses by default is not present in this environment. You must supply the `options.parseHtml` function instead.'
+    )
   }
 
   const parsed = new DOMParser().parseFromString(html, 'text/html')
@@ -87,7 +88,6 @@ function defaultParseHtml(html) {
  */
 
 class Html {
-
   /**
    * Create a new serializer with `rules`.
    *
@@ -106,7 +106,7 @@ class Html {
 
     defaultBlock = Node.createProperties(defaultBlock)
 
-    this.rules = [ ...rules, TEXT_RULE ]
+    this.rules = [...rules, TEXT_RULE]
     this.defaultBlock = defaultBlock
     this.parseHtml = parseHtml
   }
@@ -129,19 +129,19 @@ class Html {
 
     // COMPAT: ensure that all top-level inline nodes are wrapped into a block.
     nodes = nodes.reduce((memo, node, i, original) => {
-      if (node.kind == 'block') {
+      if (node.object == 'block') {
         memo.push(node)
         return memo
       }
 
-      if (i > 0 && original[i - 1].kind != 'block') {
+      if (i > 0 && original[i - 1].object != 'block') {
         const block = memo[memo.length - 1]
         block.nodes.push(node)
         return memo
       }
 
       const block = {
-        kind: 'block',
+        object: 'block',
         data: {},
         isVoid: false,
         ...defaultBlock,
@@ -154,33 +154,35 @@ class Html {
 
     // TODO: pretty sure this is no longer needed.
     if (nodes.length == 0) {
-      nodes = [{
-        kind: 'block',
-        data: {},
-        isVoid: false,
-        ...defaultBlock,
-        nodes: [
-          {
-            kind: 'text',
-            leaves: [
-              {
-                kind: 'leaf',
-                text: '',
-                marks: [],
-              }
-            ]
-          }
-        ],
-      }]
+      nodes = [
+        {
+          object: 'block',
+          data: {},
+          isVoid: false,
+          ...defaultBlock,
+          nodes: [
+            {
+              object: 'text',
+              leaves: [
+                {
+                  object: 'leaf',
+                  text: '',
+                  marks: [],
+                },
+              ],
+            },
+          ],
+        },
+      ]
     }
 
     const json = {
-      kind: 'value',
+      object: 'value',
       document: {
-        kind: 'document',
+        object: 'document',
         data: {},
         nodes,
-      }
+      },
     }
 
     const ret = toJSON ? json : Value.fromJSON(json)
@@ -197,7 +199,7 @@ class Html {
   deserializeElements = (elements = []) => {
     let nodes = []
 
-    elements.filter(this.cruftNewline).forEach((element) => {
+    elements.filter(this.cruftNewline).forEach(element => {
       const node = this.deserializeElement(element)
       switch (typeOf(node)) {
         case 'array':
@@ -219,14 +221,14 @@ class Html {
    * @return {Any}
    */
 
-  deserializeElement = (element) => {
+  deserializeElement = element => {
     let node
 
     if (!element.tagName) {
       element.tagName = ''
     }
 
-    const next = (elements) => {
+    const next = elements => {
       if (Object.prototype.toString.call(elements) == '[object NodeList]') {
         elements = Array.from(elements)
       }
@@ -240,7 +242,9 @@ class Html {
         case 'undefined':
           return
         default:
-          throw new Error(`The \`next\` argument was called with invalid children: "${elements}".`)
+          throw new Error(
+            `The \`next\` argument was called with invalid children: "${elements}".`
+          )
       }
     }
 
@@ -249,15 +253,22 @@ class Html {
       const ret = rule.deserialize(element, next)
       const type = typeOf(ret)
 
-      if (type != 'array' && type != 'object' && type != 'null' && type != 'undefined') {
-        throw new Error(`A rule returned an invalid deserialized representation: "${node}".`)
+      if (
+        type != 'array' &&
+        type != 'object' &&
+        type != 'null' &&
+        type != 'undefined'
+      ) {
+        throw new Error(
+          `A rule returned an invalid deserialized representation: "${node}".`
+        )
       }
 
       if (ret === undefined) {
         continue
       } else if (ret === null) {
         return null
-      } else if (ret.kind == 'mark') {
+      } else if (ret.object == 'mark') {
         node = this.deserializeMark(ret)
       } else {
         node = ret
@@ -276,23 +287,19 @@ class Html {
    * @return {Array}
    */
 
-  deserializeMark = (mark) => {
+  deserializeMark = mark => {
     const { type, data } = mark
 
-    const applyMark = (node) => {
-      if (node.kind == 'mark') {
+    const applyMark = node => {
+      if (node.object == 'mark') {
         return this.deserializeMark(node)
-      }
-
-      else if (node.kind == 'text') {
-        node.leaves = node.leaves.map((leaf) => {
+      } else if (node.object == 'text') {
+        node.leaves = node.leaves.map(leaf => {
           leaf.marks = leaf.marks || []
           leaf.marks.push({ type, data })
           return leaf
         })
-      }
-
-      else {
+      } else {
         node.nodes = node.nodes.map(applyMark)
       }
 
@@ -318,10 +325,10 @@ class Html {
 
   serialize = (value, options = {}) => {
     const { document } = value
-    const elements = document.nodes.map(this.serializeNode)
+    const elements = document.nodes.map(this.serializeNode).filter(el => el)
     if (options.render === false) return elements
 
-    const html = ReactDOMServer.renderToStaticMarkup(<body>{elements}</body>)
+    const html = renderToStaticMarkup(<body>{elements}</body>)
     const inner = html.slice(6, -7)
     return inner
   }
@@ -333,8 +340,8 @@ class Html {
    * @return {String}
    */
 
-  serializeNode = (node) => {
-    if (node.kind === 'text') {
+  serializeNode = node => {
+    if (node.object === 'text') {
       const leaves = node.getLeaves()
       return leaves.map(this.serializeLeaf)
     }
@@ -344,6 +351,7 @@ class Html {
     for (const rule of this.rules) {
       if (!rule.serialize) continue
       const ret = rule.serialize(node, children)
+      if (ret === null) return
       if (ret) return addKey(ret)
     }
 
@@ -357,7 +365,7 @@ class Html {
    * @return {String}
    */
 
-  serializeLeaf = (leaf) => {
+  serializeLeaf = leaf => {
     const string = new String({ text: leaf.text })
     const text = this.serializeString(string)
 
@@ -365,6 +373,7 @@ class Html {
       for (const rule of this.rules) {
         if (!rule.serialize) continue
         const ret = rule.serialize(mark, children)
+        if (ret === null) return
         if (ret) return addKey(ret)
       }
 
@@ -379,7 +388,7 @@ class Html {
    * @return {String}
    */
 
-  serializeString = (string) => {
+  serializeString = string => {
     for (const rule of this.rules) {
       if (!rule.serialize) continue
       const ret = rule.serialize(string, string.text)
@@ -394,10 +403,9 @@ class Html {
    * @return {Boolean}
    */
 
-  cruftNewline = (element) => {
-    return !(element.nodeName === '#text' && element.value == '\n')
+  cruftNewline = element => {
+    return !(element.nodeName === '#text' && element.nodeValue == '\n')
   }
-
 }
 
 /**

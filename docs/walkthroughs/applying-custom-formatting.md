@@ -1,4 +1,3 @@
-
 <br/>
 <p align="center"><strong>Previous:</strong><br/><a href="./defining-custom-block-nodes.md">Defining Custom Block Nodes</a></p>
 <br/>
@@ -13,7 +12,6 @@ So we start with our app from earlier:
 
 ```js
 class App extends React.Component {
-
   state = {
     value: initialValue,
   }
@@ -23,11 +21,11 @@ class App extends React.Component {
   }
 
   onKeyDown = (event, change) => {
-    if (event.key != '`' || !event.metaKey) return
+    if (event.key != '`' || !event.ctrlKey) return
     event.preventDefault()
     const isCode = change.value.blocks.some(block => block.type == 'code')
 
-    change.setBlock(isCode ? 'paragraph' : 'code')
+    change.setBlocks(isCode ? 'paragraph' : 'code')
     return true
   }
 
@@ -41,21 +39,20 @@ class App extends React.Component {
       />
     )
   }
-  
-  renderNode = (props) => {
+
+  renderNode = props => {
     switch (props.node.type) {
-      case 'code': return <CodeNode {...props} />
+      case 'code':
+        return <CodeNode {...props} />
     }
   }
-
 }
 ```
 
-And now, we'll edit the `onKeyDown` handler to make it so that when you press `⌘-B`, it will add a "bold" mark to the currently selected text:
+And now, we'll edit the `onKeyDown` handler to make it so that when you press `control-B`, it will add a "bold" mark to the currently selected text:
 
 ```js
 class App extends React.Component {
-
   state = {
     value: initialValue,
   }
@@ -65,7 +62,7 @@ class App extends React.Component {
   }
 
   onKeyDown = (event, change) => {
-    if (!event.metaKey) return
+    if (!event.ctrlKey) return
 
     // Decide what to do based on the key code...
     switch (event.key) {
@@ -79,7 +76,7 @@ class App extends React.Component {
       case '`': {
         const isCode = change.value.blocks.some(block => block.type == 'code')
         event.preventDefault()
-        change.setBlock(isCode ? 'paragraph' : 'code')
+        change.setBlocks(isCode ? 'paragraph' : 'code')
         return true
       }
     }
@@ -95,17 +92,17 @@ class App extends React.Component {
       />
     )
   }
-  
-  renderNode = (props) => {
+
+  renderNode = props => {
     switch (props.node.type) {
-      case 'code': return <CodeNode {...props} />
+      case 'code':
+        return <CodeNode {...props} />
     }
   }
-
 }
 ```
 
-Okay, so we've got the hotkey handler setup... but! If you happen to now try selecting text and hitting `⌘-B`, you'll get an error in your console. That's because we haven't told Slate how to render a "bold" mark.
+Okay, so we've got the hotkey handler setup... but! If you happen to now try selecting text and hitting `control-B`, you won't notice any change. That's because we haven't told Slate how to render a "bold" mark.
 
 For every mark type you want to add to your schema, you need to give Slate a "renderer" for that mark, just like nodes. So let's define our `bold` mark:
 
@@ -126,7 +123,6 @@ function BoldMark(props) {
 }
 
 class App extends React.Component {
-
   state = {
     value: initialValue,
   }
@@ -136,7 +132,7 @@ class App extends React.Component {
   }
 
   onKeyDown = (event, change) => {
-    if (!event.metaKey) return
+    if (!event.ctrlKey) return
 
     switch (event.key) {
       case 'b': {
@@ -147,7 +143,7 @@ class App extends React.Component {
       case '`': {
         const isCode = change.value.blocks.some(block => block.type == 'code')
         event.preventDefault()
-        value.setBlock(isCode ? 'paragraph' : 'code')
+        change.setBlocks(isCode ? 'paragraph' : 'code')
         return true
       }
     }
@@ -165,24 +161,25 @@ class App extends React.Component {
       />
     )
   }
-  
-  renderNode = (props) => {
+
+  renderNode = props => {
     switch (props.node.type) {
-      case 'code': return <CodeNode {...props} />
+      case 'code':
+        return <CodeNode {...props} />
     }
   }
 
   // Add a `renderMark` method to render marks.
-  renderMark = (props) => {
+  renderMark = props => {
     switch (props.mark.type) {
-      case 'bold': return <BoldMark {...props} />
+      case 'bold':
+        return <BoldMark {...props} />
     }
   }
-
 }
 ```
 
-Now, if you try selecting a piece of text and hitting `⌘-B` you should see it turn bold! Magic!
+Now, if you try selecting a piece of text and hitting `control-B` you should see it turn bold! Magic!
 
 <br/>
 <p align="center"><strong>Next:</strong><br/><a href="./using-plugins.md">Using Plugins</a></p>

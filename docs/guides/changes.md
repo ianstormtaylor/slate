@@ -1,4 +1,3 @@
-
 # Changes
 
 All changes to a Slate editor's value, whether it's the `selection`, `document`, `history`, etc. happen via "changes"—specifically, via the [`Change`](../reference/slate/change.md) model.
@@ -7,14 +6,13 @@ This is important because the `Change` model is responsible for ensuring that ev
 
 You just need to understand changes...
 
-
 ## Expressiveness is Key
 
 Changes in Slate are designed to prioritize expressiveness above almost all else.
 
 If you're building a powerful editor, it's going to be somewhat complex, and you're going to be writing code to perform all different kinds of programmatic changes. You'll be removing nodes, inserting fragments, moving the selection around, etc.
 
-And if the API for changes was verbose, or if required lots of in between steps to be continually performed, your code would balloon to be impossible to understand very quickly.
+And if the API for changes was verbose, or if it required lots of in between steps to be continually performed, your code would balloon to be impossible to understand very quickly.
 
 To solve this, Slate has very expressive, chainable changes. Like this:
 
@@ -33,16 +31,15 @@ change
 
 Hopefully from reading that you can discern that those changes result in... the entire document's content being selected and deleted, some text bring written, a word being bolded, and finally an image block and a paragraph block being added.
 
-Of course you're not usually going to chain that much. 
+Of course you're not usually going to chain that much.
 
-Point is, you can get pretty expressive in just a few lines of code. 
+Point is, you can get pretty expressive in just a few lines of code.
 
 That way, when you're scanning to see what behaviors are being triggered, you can understand your code easily. You don't have to sit there and try to parse out a bunch of interim variables to figure out what you're trying to achieve.
 
 To that end, Slate defines _lots_ of change methods.
 
 The change methods are the one place in Slate where overlap and near-duplication isn't stomped out. Because sometimes the exact-right change method is the difference between one line of code and ten. And not just ten once, but ten repeated everywhere throughout your codebase.
-
 
 ## Change Categories
 
@@ -72,7 +69,6 @@ These are changes like `setData()`, `setDecorations()`, etc. that act on the oth
 
 These are changes like `undo()`, `redo()`, etc. that use the operation history and redo or undo changes that have already happened. You generally don't need to worry about these, because they're already bound to the keyboard shortcuts you'd expect, and the user can use them.
 
-
 ## Making Changes
 
 When you decide you want to make a change to the Slate value, you're almost always in one of four places...
@@ -89,7 +85,7 @@ function onKeyDown(event, change, editor) {
 }
 ```
 
-Any change methods you call will be applied, and when the event handler stack is finished resolving, the editor will automatically update with those changes. 
+Any change methods you call will be applied, and when the event handler stack is finished resolving, the editor will automatically update with those changes.
 
 ### 2. From Custom Node Components
 
@@ -99,20 +95,15 @@ In that case, you'll need to use the `change()` method on the Slate [`<Editor>`]
 
 ```js
 class Image extends React.Component {
-
-  onClick = (event) => {
-    this.props.editor.change((change) => {
+  onClick = event => {
+    this.props.editor.change(change => {
       change.removeNodeByKey(this.props.node.key)
     })
   }
 
   render() {
-    <img 
-      {...this.props.attributes} 
-      onClick={this.onClick}
-    />
+    ;<img {...this.props.attributes} onClick={this.onClick} />
   }
-
 }
 ```
 
@@ -146,7 +137,8 @@ This is the fourth place you might want to make changes, and also the most dange
 That said, if that's okay with you, you can make changes manually by using the `change()` method on a Slate [`Value`](../reference/slate/value.md). For example:
 
 ```js
-const change = value.change()
+const change = value
+  .change()
   .selectAll()
   .delete()
 
@@ -154,7 +146,6 @@ const newValue = change.value
 ```
 
 Note that you'll need to then grab the new value by accessing the `change.value` property directly.
-
 
 ## Reusing Changes
 
@@ -178,14 +169,12 @@ function insertImage(change, src) {
 }
 ```
 
-Notice how rewriting that image inserting logic multiple times without having it encapsulated in a single function would get tedious. Now with those change functions define, you can reuse them!
+Notice how rewriting that image inserting logic multiple times without having it encapsulated in a single function would get tedious. Now with those change functions defined, you can reuse them!
 
 But sadly you can't chain with those functions directly, since `change` objects don't actually know about them. Instead, you use the `.call()` method:
 
 ```js
-change
-  .call(insertParagraph)
-  .call(insertImage, 'https://google.com/logo')
+change.call(insertParagraph).call(insertImage, 'https://google.com/logo')
 ```
 
 Not only can you use them with `.call()`, but if you're making one-off changes to the `editor`, you can use them with `editor.change()` as well. For example:

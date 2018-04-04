@@ -1,18 +1,5 @@
-
 /**
- * Is in development?
- *
- * @type {Boolean}
- */
-
-const IS_DEV = (
-  typeof process !== 'undefined' &&
-  process.env &&
-  process.env.NODE_ENV !== 'production'
-)
-
-/**
- * GLOBAL: True if memoization should is enabled. Only effective when `IS_DEV`.
+ * GLOBAL: True if memoization should is enabled.
  *
  * @type {Boolean}
  */
@@ -21,7 +8,6 @@ let ENABLED = true
 
 /**
  * GLOBAL: Changing this cache key will clear all previous cached results.
- * Only effective when `IS_DEV`.
  *
  * @type {Number}
  */
@@ -62,9 +48,7 @@ const UNSET = undefined
  * @return {Record}
  */
 
-function memoize(object, properties, options = {}) {
-  const { takesArguments = true } = options
-
+function memoize(object, properties) {
   for (const property of properties) {
     const original = object[property]
 
@@ -72,21 +56,25 @@ function memoize(object, properties, options = {}) {
       throw new Error(`Object does not have a property named "${property}".`)
     }
 
-    object[property] = function (...args) {
-      if (IS_DEV) {
-        // If memoization is disabled, call into the original method.
-        if (!ENABLED) return original.apply(this, args)
+    object[property] = function(...args) {
+      // If memoization is disabled, call into the original method.
+      if (!ENABLED) return original.apply(this, args)
 
-        // If the cache key is different, previous caches must be cleared.
-        if (CACHE_KEY !== this.__cache_key) {
-          this.__cache_key = CACHE_KEY
-          this.__cache = new Map() // eslint-disable-line no-undef,no-restricted-globals
-        }
+      // If the cache key is different, previous caches must be cleared.
+      if (CACHE_KEY !== this.__cache_key) {
+        this.__cache_key = CACHE_KEY
+        this.__cache = new Map() // eslint-disable-line no-undef,no-restricted-globals
+        this.__cache_no_args = {}
       }
 
       if (!this.__cache) {
         this.__cache = new Map() // eslint-disable-line no-undef,no-restricted-globals
       }
+      if (!this.__cache_no_args) {
+        this.__cache_no_args = {}
+      }
+
+      const takesArguments = args.length !== 0
 
       let cachedValue
       let keys
@@ -95,7 +83,7 @@ function memoize(object, properties, options = {}) {
         keys = [property, ...args]
         cachedValue = getIn(this.__cache, keys)
       } else {
-        cachedValue = this.__cache.get(property)
+        cachedValue = this.__cache_no_args[property]
       }
 
       // If we've got a result already, return it.
@@ -110,7 +98,7 @@ function memoize(object, properties, options = {}) {
       if (takesArguments) {
         this.__cache = setIn(this.__cache, keys, v)
       } else {
-        this.__cache.set(property, v)
+        this.__cache_no_args[property] = v
       }
 
       return value
@@ -174,7 +162,7 @@ function setIn(map, keys, value) {
  * @return {Void}
  */
 
-function __clear() {
+function resetMemoization() {
   CACHE_KEY++
 
   if (CACHE_KEY >= Number.MAX_SAFE_INTEGER) {
@@ -189,7 +177,7 @@ function __clear() {
  * @return {Void}
  */
 
-function __enable(enabled) {
+function useMemoization(enabled) {
   ENABLED = enabled
 }
 
@@ -199,8 +187,5 @@ function __enable(enabled) {
  * @type {Object}
  */
 
-export {
-  memoize as default,
-  __clear,
-  __enable
-}
+export default memoize
+export { resetMemoization, useMemoization }

@@ -1,4 +1,3 @@
-
 import browser from 'is-in-browser'
 
 /**
@@ -26,9 +25,7 @@ const BROWSER_RULES = [
  * @type {Array}
  */
 
-const EVENT_RULES = [
-  ['beforeinput', el => 'onbeforeinput' in el]
-]
+const EVENT_RULES = [['beforeinput', el => 'onbeforeinput' in el]]
 
 /**
  * Operating system matching rules.
@@ -59,14 +56,14 @@ let OS
 if (browser) {
   const { userAgent } = window.navigator
 
-  for (const [ name, regexp ] of BROWSER_RULES) {
+  for (const [name, regexp] of BROWSER_RULES) {
     if (regexp.test(userAgent)) {
       BROWSER = name
       break
     }
   }
 
-  for (const [ name, regexp ] of OS_RULES) {
+  for (const [name, regexp] of OS_RULES) {
     if (regexp.test(userAgent)) {
       OS = name
       break
@@ -76,7 +73,7 @@ if (browser) {
   const testEl = window.document.createElement('div')
   testEl.contentEditable = true
 
-  for (const [ name, testFn ] of EVENT_RULES) {
+  for (const [name, testFn] of EVENT_RULES) {
     EVENTS[name] = testFn(testEl)
   }
 }
@@ -91,6 +88,7 @@ export const IS_CHROME = BROWSER === 'chrome'
 export const IS_FIREFOX = BROWSER === 'firefox'
 export const IS_SAFARI = BROWSER === 'safari'
 export const IS_IE = BROWSER === 'ie'
+export const IS_EDGE = BROWSER === 'edge'
 
 export const IS_ANDROID = OS === 'android'
 export const IS_IOS = OS === 'ios'

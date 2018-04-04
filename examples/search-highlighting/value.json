@@ -2,28 +2,30 @@
   "document": {
     "nodes": [
       {
-        "kind": "block",
+        "object": "block",
         "type": "paragraph",
         "nodes": [
           {
-            "kind": "text",
+            "object": "text",
             "leaves": [
               {
-                "text": "This is editable text that you can search. As you search, it looks for matching strings of text, and adds \"decoration\" marks to them in realtime."
+                "text":
+                  "This is editable text that you can search. As you search, it looks for matching strings of text, and adds \"decoration\" marks to them in realtime."
               }
             ]
           }
         ]
       },
       {
-        "kind": "block",
+        "object": "block",
         "type": "paragraph",
         "nodes": [
           {
-            "kind": "text",
+            "object": "text",
             "leaves": [
               {
-                "text": "Try it out for yourself by typing in the search box above!"
+                "text":
+                  "Try it out for yourself by typing in the search box above!"
               }
             ]
           }

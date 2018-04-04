@@ -2,26 +2,27 @@
   "document": {
     "nodes": [
       {
-        "kind": "block",
+        "object": "block",
         "type": "paragraph",
         "nodes": [
           {
-            "kind": "text",
+            "object": "text",
             "leaves": [
               {
-                "text": "In addition to block nodes, you can create inline nodes, like "
+                "text":
+                  "In addition to block nodes, you can create inline nodes, like "
               }
             ]
           },
           {
-            "kind": "inline",
+            "object": "inline",
             "type": "link",
             "data": {
               "href": "https://en.wikipedia.org/wiki/Hypertext"
             },
             "nodes": [
               {
-                "kind": "text",
+                "object": "text",
                 "leaves": [
                   {
                     "text": "hyperlinks"
@@ -31,7 +32,7 @@
             ]
           },
           {
-            "kind": "text",
+            "object": "text",
             "leaves": [
               {
                 "text": "!"
@@ -41,14 +42,15 @@
         ]
       },
       {
-        "kind": "block",
+        "object": "block",
         "type": "paragraph",
         "nodes": [
           {
-            "kind": "text",
+            "object": "text",
             "leaves": [
               {
-                "text": "This example shows hyperlinks in action. It features two ways to add links. You can either add a link via the toolbar icon above, or if you want in on a little secret, copy a URL to your keyboard and paste it while a range of text is selected."
+                "text":
+                  "This example shows hyperlinks in action. It features two ways to add links. You can either add a link via the toolbar icon above, or if you want in on a little secret, copy a URL to your keyboard and paste it while a range of text is selected."
               }
             ]
           }

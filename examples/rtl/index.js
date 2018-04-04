@@ -1,4 +1,3 @@
-
 import { Editor } from 'slate-react'
 import { Value } from 'slate'
 
@@ -12,7 +11,6 @@ import initialValue from './value.json'
  */
 
 class RTL extends React.Component {
-
   /**
    * Deserialize the initial editor value.
    *
@@ -20,7 +18,7 @@ class RTL extends React.Component {
    */
 
   state = {
-    value: Value.fromJSON(initialValue)
+    value: Value.fromJSON(initialValue),
   }
 
   /**
@@ -75,13 +73,13 @@ class RTL extends React.Component {
    * @return {Element}
    */
 
-  renderNode = (props) => {
+  renderNode = props => {
     const { attributes, children, node } = props
     switch (node.type) {
-      case 'block-quote': return <blockquote {...attributes}>{children}</blockquote>
+      case 'block-quote':
+        return <blockquote {...attributes}>{children}</blockquote>
     }
   }
-
 }
 
 /**

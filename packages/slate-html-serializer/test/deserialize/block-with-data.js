@@ -1,4 +1,3 @@
-
 /** @jsx h */
 
 import h from '../helpers/h'
@@ -10,16 +9,16 @@ export const config = {
         switch (el.tagName.toLowerCase()) {
           case 'p': {
             return {
-              kind: 'block',
+              object: 'block',
               type: 'paragraph',
               data: { thing: 'value' },
               nodes: next(el.childNodes),
             }
           }
         }
-      }
-    }
-  ]
+      },
+    },
+  ],
 }
 
 export const input = `
@@ -29,9 +28,7 @@ export const input = `
 export const output = (
   <value>
     <document>
-      <paragraph thing="value">
-        one
-      </paragraph>
+      <paragraph thing="value">one</paragraph>
     </document>
   </value>
 )

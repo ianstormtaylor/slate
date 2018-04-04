@@ -9,9 +9,7 @@ export const input = (
     <document>
       <paragraph>
         <link>
-          <paragraph>
-            one
-          </paragraph>
+          <paragraph>one</paragraph>
           two
         </link>
       </paragraph>
@@ -20,57 +18,57 @@ export const input = (
 )
 
 export const output = {
-  kind: 'value',
+  object: 'value',
   document: {
-    kind: 'document',
+    object: 'document',
     data: {},
     nodes: [
       {
-        kind: 'block',
+        object: 'block',
         type: 'paragraph',
         isVoid: false,
         data: {},
         nodes: [
           {
-            kind: 'text',
+            object: 'text',
             leaves: [
               {
-                kind: 'leaf',
+                object: 'leaf',
                 text: '',
                 marks: [],
-              }
-            ]
+              },
+            ],
           },
           {
-            kind: 'inline',
+            object: 'inline',
             type: 'link',
             isVoid: false,
             data: {},
             nodes: [
               {
-                kind: 'text',
+                object: 'text',
                 leaves: [
                   {
-                    kind: 'leaf',
+                    object: 'leaf',
                     text: 'two',
                     marks: [],
-                  }
-                ]
-              }
-            ]
+                  },
+                ],
+              },
+            ],
           },
           {
-            kind: 'text',
+            object: 'text',
             leaves: [
               {
-                kind: 'leaf',
+                object: 'leaf',
                 text: '',
                 marks: [],
-              }
-            ]
+              },
+            ],
           },
-        ]
-      }
-    ]
-  }
+        ],
+      },
+    ],
+  },
 }

@@ -1,8 +1,8 @@
-
 import Debug from 'debug'
 import isEqual from 'lodash/isEqual'
 import isPlainObject from 'is-plain-object'
-import { Record, Stack } from 'immutable'
+import logger from 'slate-dev-logger'
+import { List, Record, Stack } from 'immutable'
 
 import MODEL_TYPES from '../constants/model-types'
 
@@ -32,7 +32,6 @@ const DEFAULTS = {
  */
 
 class History extends Record(DEFAULTS) {
-
   /**
    * Create a new `History` with `attrs`.
    *
@@ -49,7 +48,9 @@ class History extends Record(DEFAULTS) {
       return History.fromJSON(attrs)
     }
 
-    throw new Error(`\`History.create\` only accepts objects or histories, but you passed it: ${attrs}`)
+    throw new Error(
+      `\`History.create\` only accepts objects or histories, but you passed it: ${attrs}`
+    )
   }
 
   /**
@@ -60,10 +61,7 @@ class History extends Record(DEFAULTS) {
    */
 
   static fromJSON(object) {
-    const {
-      redos = [],
-      undos = [],
-    } = object
+    const { redos = [], undos = [] } = object
 
     const history = new History({
       redos: new Stack(redos),
@@ -91,13 +89,21 @@ class History extends Record(DEFAULTS) {
   }
 
   /**
-   * Get the kind.
+   * Object.
    *
    * @return {String}
    */
 
-  get kind() {
+  get object() {
     return 'history'
+  }
+
+  get kind() {
+    logger.deprecate(
+      'slate@0.32.0',
+      'The `kind` property of Slate objects has been renamed to `object`.'
+    )
+    return this.object
   }
 
   /**
@@ -113,7 +119,7 @@ class History extends Record(DEFAULTS) {
     let { undos, redos } = history
     let { merge, skip } = options
     const prevBatch = undos.peek()
-    const prevOperation = prevBatch && prevBatch[prevBatch.length - 1]
+    const prevOperation = prevBatch && prevBatch.last()
 
     if (skip == null) {
       skip = shouldSkip(operation, prevOperation)
@@ -131,20 +137,17 @@ class History extends Record(DEFAULTS) {
 
     // If the `merge` flag is true, add the operation to the previous batch.
     if (merge && prevBatch) {
-      const batch = prevBatch.slice()
-      batch.push(operation)
+      const batch = prevBatch.push(operation)
       undos = undos.pop()
       undos = undos.push(batch)
-    }
-
-    // Otherwise, create a new batch with the operation.
-    else {
-      const batch = [operation]
+    } else {
+      // Otherwise, create a new batch with the operation.
+      const batch = new List([operation])
       undos = undos.push(batch)
     }
 
     // Constrain the history to 100 entries for memory's sake.
-    if (undos.length > 100) {
+    if (undos.size > 100) {
       undos = undos.take(100)
     }
 
@@ -162,7 +165,7 @@ class History extends Record(DEFAULTS) {
 
   toJSON() {
     const object = {
-      kind: this.kind,
+      object: this.object,
       redos: this.redos.toJSON(),
       undos: this.undos.toJSON(),
     }
@@ -177,7 +180,6 @@ class History extends Record(DEFAULTS) {
   toJS() {
     return this.toJSON()
   }
-
 }
 
 /**
@@ -197,22 +199,16 @@ History.prototype[MODEL_TYPES.HISTORY] = true
 function shouldMerge(o, p) {
   if (!p) return false
 
-  const merge = (
-    (
-      o.type == 'set_selection' &&
-      p.type == 'set_selection'
-    ) || (
-      o.type == 'insert_text' &&
+  const merge =
+    (o.type == 'set_selection' && p.type == 'set_selection') ||
+    (o.type == 'insert_text' &&
       p.type == 'insert_text' &&
       o.offset == p.offset + p.text.length &&
-      isEqual(o.path, p.path)
-    ) || (
-      o.type == 'remove_text' &&
+      isEqual(o.path, p.path)) ||
+    (o.type == 'remove_text' &&
       p.type == 'remove_text' &&
       o.offset + o.text.length == p.offset &&
-      isEqual(o.path, p.path)
-    )
-  )
+      isEqual(o.path, p.path))
 
   return merge
 }
@@ -228,10 +224,7 @@ function shouldMerge(o, p) {
 function shouldSkip(o, p) {
   if (!p) return false
 
-  const skip = (
-    o.type == 'set_selection' &&
-    p.type == 'set_selection'
-  )
+  const skip = o.type == 'set_selection' && p.type == 'set_selection'
 
   return skip
 }

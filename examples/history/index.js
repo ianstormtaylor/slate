@@ -1,4 +1,3 @@
-
 import { Value } from 'slate'
 import { Editor } from 'slate-react'
 
@@ -24,7 +23,6 @@ const ToolbarButton = props => (
  */
 
 class History extends React.Component {
-
   /**
    * Deserialize the initial editor value.
    *
@@ -32,7 +30,7 @@ class History extends React.Component {
    */
 
   state = {
-    value: Value.fromJSON(initialValue)
+    value: Value.fromJSON(initialValue),
   }
 
   /**
@@ -50,7 +48,7 @@ class History extends React.Component {
    *
    */
 
-  onClickRedo = (event) => {
+  onClickRedo = event => {
     event.preventDefault()
     const { value } = this.state
     const change = value.change().redo()
@@ -62,7 +60,7 @@ class History extends React.Component {
    *
    */
 
-  onClickUndo = (event) => {
+  onClickUndo = event => {
     event.preventDefault()
     const { value } = this.state
     const change = value.change().undo()
@@ -96,12 +94,8 @@ class History extends React.Component {
       <div className="menu toolbar-menu">
         <ToolbarButton icon="undo" onMouseDown={this.onClickUndo} />
         <ToolbarButton icon="redo" onMouseDown={this.onClickRedo} />
-        <span className="button">
-          Undos: {value.history.undos.size}
-        </span>
-        <span className="button">
-          Redos: {value.history.redos.size}
-        </span>
+        <span className="button">Undos: {value.history.undos.size}</span>
+        <span className="button">Redos: {value.history.redos.size}</span>
       </div>
     )
   }
@@ -123,7 +117,6 @@ class History extends React.Component {
       </div>
     )
   }
-
 }
 
 /**

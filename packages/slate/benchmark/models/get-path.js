@@ -2,30 +2,31 @@
 /* eslint-disable react/jsx-key */
 
 import h from '../../test/helpers/h'
-import { __clear } from '../../lib/utils/memoize'
+import { resetMemoization } from '../..'
 
-export default function ({ state, text }) {
-  state.document.getPath(text.key)
+export default function({ value, text }) {
+  value.document.getPath(text.key)
 }
 
-export function before(state) {
-  const text = state.document.getLastText()
-  __clear()
-  return { state, text }
+export function before(value) {
+  const text = value.document.getLastText()
+  resetMemoization()
+  return { value, text }
 }
 
 export const input = (
-  <state>
+  <value>
     <document>
       {Array.from(Array(10)).map(() => (
         <quote>
           <paragraph>
             <paragraph>
-              This is editable <b>rich</b> text, <i>much</i> better than a textarea!
+              This is editable <b>rich</b> text, <i>much</i> better than a
+              textarea!
             </paragraph>
           </paragraph>
         </quote>
       ))}
     </document>
-  </state>
+  </value>
 )

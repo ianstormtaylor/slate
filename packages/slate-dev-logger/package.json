@@ -1,24 +1,22 @@
 {
   "name": "slate-dev-logger",
   "description": "A simple, development-only logger for Slate.",
-  "version": "0.1.32",
+  "version": "0.1.39",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
-  "main": "./lib/index.js",
+  "main": "lib/slate-dev-logger.js",
+  "module": "lib/slate-dev-logger.es.js",
+  "umd": "dist/slate-dev-logger.js",
+  "umdMin": "dist/slate-dev-logger.min.js",
+  "files": [
+    "dist/",
+    "lib/"
+  ],
   "devDependencies": {
-    "babel-cli": "^6.10.1",
-    "browserify": "^13.0.1",
-    "mocha": "^2.5.3",
-    "slate": "^0.30.6",
-    "uglify-js": "^2.7.0"
+    "mocha": "^2.5.3"
   },
   "scripts": {
-    "build": "babel --out-dir ./lib ./src",
-    "build:max": "mkdir -p ./dist && NODE_ENV=production browserify ./src/index.js --transform babelify --transform envify --transform [ browserify-global-shim --global ] --standalone SlateDevLogger > ./dist/slate-dev-logger.js",
-    "build:min": "mkdir -p ./dist && NODE_ENV=production browserify ./src/index.js --transform babelify --transform envify --transform [ browserify-global-shim --global ] --transform uglifyify --standalone SlateDevLogger | uglifyjs > ./dist/slate-dev-logger.min.js",
-    "clean": "rm -rf ./dist ./lib ./node_modules",
-    "prepublish": "yarn run build && yarn run build:max && yarn run build:min",
-    "watch": "babel --watch --out-dir ./lib ./src --source-maps inline"
+    "clean": "rm -rf ./dist ./lib ./node_modules"
   },
   "keywords": [
     "slate"

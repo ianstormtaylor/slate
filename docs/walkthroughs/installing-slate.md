@@ -1,4 +1,3 @@
-
 # Installing Slate
 
 Slate is a monorepo divided up into multi npm packages, so to install it you do:
@@ -36,21 +35,21 @@ const initialValue = Value.fromJSON({
   document: {
     nodes: [
       {
-        kind: 'block',
+        object: 'block',
         type: 'paragraph',
         nodes: [
           {
-            kind: 'text',
+            object: 'text',
             leaves: [
               {
-                text: 'A line of text in a paragraph.'
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  }
+                text: 'A line of text in a paragraph.',
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
 })
 ```
 
@@ -66,29 +65,28 @@ const initialValue = Value.fromJSON({
   document: {
     nodes: [
       {
-        kind: 'block',
+        object: 'block',
         type: 'paragraph',
         nodes: [
           {
-            kind: 'text',
+            object: 'text',
             leaves: [
               {
-                text: 'A line of text in a paragraph.'
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  }
+                text: 'A line of text in a paragraph.',
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
 })
 
 // Define our app...
 class App extends React.Component {
-
   // Set the initial value when the app is first constructed.
   state = {
-    value: initialValue
+    value: initialValue,
   }
 
   // On change, update the app's React state with the new editor value.
@@ -98,24 +96,17 @@ class App extends React.Component {
 
   // Render the editor.
   render() {
-    return (
-      <Editor
-        value={this.state.value}
-        onChange={this.onChange}
-      />
-    )
+    return <Editor value={this.state.value} onChange={this.onChange} />
   }
-
 }
 ```
 
 You'll notice that the `onChange` handler passed into the `Editor` component just updates the app's state with the newest changed value. That way, when it re-renders the editor, the new value is reflected with your changes.
 
-And that's it! 
+And that's it!
 
 That's the most basic example of Slate. If you render that onto the page, you should see a paragraph with the text `A line of text in a paragraph.`. And when you type, you should see the text change!
 
 <br/>
 <p align="center"><strong>Next:</strong><br/><a href="./adding-event-handlers.md">Adding Event Handlers</a></p>
 <br/>
-

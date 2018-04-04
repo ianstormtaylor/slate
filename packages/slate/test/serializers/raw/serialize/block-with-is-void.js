@@ -11,29 +11,29 @@ export const input = (
 )
 
 export const output = {
-  kind: 'value',
+  object: 'value',
   document: {
-    kind: 'document',
+    object: 'document',
     data: {},
     nodes: [
       {
-        kind: 'block',
+        object: 'block',
         type: 'image',
         isVoid: true,
         data: {},
         nodes: [
           {
-            kind: 'text',
+            object: 'text',
             leaves: [
               {
-                kind: 'leaf',
-                text: ' ',
+                object: 'leaf',
+                text: '',
                 marks: [],
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  }
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
 }

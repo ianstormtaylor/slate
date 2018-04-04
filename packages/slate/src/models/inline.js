@@ -1,4 +1,3 @@
-
 /**
  * Prevent circular dependencies.
  */
@@ -10,6 +9,7 @@ import './document'
  */
 
 import isPlainObject from 'is-plain-object'
+import logger from 'slate-dev-logger'
 import { List, Map, Record } from 'immutable'
 
 import Node from './node'
@@ -37,7 +37,6 @@ const DEFAULTS = {
  */
 
 class Inline extends Record(DEFAULTS) {
-
   /**
    * Create a new `Inline` with `attrs`.
    *
@@ -58,7 +57,9 @@ class Inline extends Record(DEFAULTS) {
       return Inline.fromJSON(attrs)
     }
 
-    throw new Error(`\`Inline.create\` only accepts objects, strings or inlines, but you passed it: ${attrs}`)
+    throw new Error(
+      `\`Inline.create\` only accepts objects, strings or inlines, but you passed it: ${attrs}`
+    )
   }
 
   /**
@@ -74,7 +75,9 @@ class Inline extends Record(DEFAULTS) {
       return list
     }
 
-    throw new Error(`\`Inline.createList\` only accepts arrays or lists, but you passed it: ${elements}`)
+    throw new Error(
+      `\`Inline.createList\` only accepts arrays or lists, but you passed it: ${elements}`
+    )
   }
 
   /**
@@ -141,23 +144,33 @@ class Inline extends Record(DEFAULTS) {
   }
 
   /**
-   * Get the node's kind.
+   * Object.
    *
    * @return {String}
    */
 
-  get kind() {
+  get object() {
     return 'inline'
+  }
+
+  get kind() {
+    logger.deprecate(
+      'slate@0.32.0',
+      'The `kind` property of Slate objects has been renamed to `object`.'
+    )
+    return this.object
   }
 
   /**
    * Check if the inline is empty.
+   * Returns true if inline is not void and all it's children nodes are empty.
+   * Void node is never empty, regardless of it's content.
    *
    * @return {Boolean}
    */
 
   get isEmpty() {
-    return this.text == ''
+    return !this.isVoid && !this.nodes.some(child => !child.isEmpty)
   }
 
   /**
@@ -179,7 +192,7 @@ class Inline extends Record(DEFAULTS) {
 
   toJSON(options = {}) {
     const object = {
-      kind: this.kind,
+      object: this.object,
       type: this.type,
       isVoid: this.isVoid,
       data: this.data.toJSON(),
@@ -200,7 +213,6 @@ class Inline extends Record(DEFAULTS) {
   toJS(options) {
     return this.toJSON(options)
   }
-
 }
 
 /**
@@ -213,7 +225,7 @@ Inline.prototype[MODEL_TYPES.INLINE] = true
  * Mix in `Node` methods.
  */
 
-Object.getOwnPropertyNames(Node.prototype).forEach((method) => {
+Object.getOwnPropertyNames(Node.prototype).forEach(method => {
   if (method == 'constructor') return
   Inline.prototype[method] = Node.prototype[method]
 })

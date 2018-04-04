@@ -7,9 +7,7 @@ export const input = (
     <document>
       <paragraph>
         <link>
-          <hashtag>
-            one
-          </hashtag>
+          <hashtag>one</hashtag>
         </link>
       </paragraph>
     </document>
@@ -17,85 +15,85 @@ export const input = (
 )
 
 export const output = {
-  kind: 'value',
+  object: 'value',
   document: {
-    kind: 'document',
+    object: 'document',
     data: {},
     nodes: [
       {
-        kind: 'block',
+        object: 'block',
         type: 'paragraph',
         data: {},
         isVoid: false,
         nodes: [
           {
-            kind: 'text',
+            object: 'text',
             leaves: [
               {
-                kind: 'leaf',
+                object: 'leaf',
                 text: '',
                 marks: [],
-              }
-            ]
+              },
+            ],
           },
           {
-            kind: 'inline',
+            object: 'inline',
             type: 'link',
             data: {},
             isVoid: false,
             nodes: [
               {
-                kind: 'text',
+                object: 'text',
                 leaves: [
                   {
-                    kind: 'leaf',
+                    object: 'leaf',
                     text: '',
                     marks: [],
-                  }
-                ]
+                  },
+                ],
               },
               {
-                kind: 'inline',
+                object: 'inline',
                 type: 'hashtag',
                 data: {},
                 isVoid: false,
                 nodes: [
                   {
-                    kind: 'text',
+                    object: 'text',
                     leaves: [
                       {
-                        kind: 'leaf',
+                        object: 'leaf',
                         text: 'one',
                         marks: [],
-                      }
-                    ]
-                  }
-                ]
+                      },
+                    ],
+                  },
+                ],
               },
               {
-                kind: 'text',
+                object: 'text',
                 leaves: [
                   {
-                    kind: 'leaf',
+                    object: 'leaf',
                     text: '',
                     marks: [],
-                  }
-                ]
+                  },
+                ],
               },
-            ]
+            ],
           },
           {
-            kind: 'text',
+            object: 'text',
             leaves: [
               {
-                kind: 'leaf',
+                object: 'leaf',
                 text: '',
                 marks: [],
-              }
-            ]
+              },
+            ],
           },
-        ]
-      }
-    ]
-  }
+        ],
+      },
+    ],
+  },
 }

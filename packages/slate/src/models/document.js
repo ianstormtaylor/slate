@@ -1,4 +1,3 @@
-
 /**
  * Prevent circular dependencies.
  */
@@ -11,6 +10,7 @@ import './inline'
  */
 
 import isPlainObject from 'is-plain-object'
+import logger from 'slate-dev-logger'
 import { List, Map, Record } from 'immutable'
 
 import Node from './node'
@@ -36,7 +36,6 @@ const DEFAULTS = {
  */
 
 class Document extends Record(DEFAULTS) {
-
   /**
    * Create a new `Document` with `attrs`.
    *
@@ -57,7 +56,9 @@ class Document extends Record(DEFAULTS) {
       return Document.fromJSON(attrs)
     }
 
-    throw new Error(`\`Document.create\` only accepts objects, arrays, lists or documents, but you passed it: ${attrs}`)
+    throw new Error(
+      `\`Document.create\` only accepts objects, arrays, lists or documents, but you passed it: ${attrs}`
+    )
   }
 
   /**
@@ -72,11 +73,7 @@ class Document extends Record(DEFAULTS) {
       return object
     }
 
-    const {
-      data = {},
-      key = generateKey(),
-      nodes = [],
-    } = object
+    const { data = {}, key = generateKey(), nodes = [] } = object
 
     const document = new Document({
       key,
@@ -105,23 +102,32 @@ class Document extends Record(DEFAULTS) {
   }
 
   /**
-   * Get the node's kind.
+   * Object.
    *
    * @return {String}
    */
 
-  get kind() {
+  get object() {
     return 'document'
+  }
+
+  get kind() {
+    logger.deprecate(
+      'slate@0.32.0',
+      'The `kind` property of Slate objects has been renamed to `object`.'
+    )
+    return this.object
   }
 
   /**
    * Check if the document is empty.
+   * Returns true if all it's children nodes are empty.
    *
    * @return {Boolean}
    */
 
   get isEmpty() {
-    return this.text == ''
+    return !this.nodes.some(child => !child.isEmpty)
   }
 
   /**
@@ -143,7 +149,7 @@ class Document extends Record(DEFAULTS) {
 
   toJSON(options = {}) {
     const object = {
-      kind: this.kind,
+      object: this.object,
       data: this.data.toJSON(),
       nodes: this.nodes.toArray().map(n => n.toJSON(options)),
     }
@@ -162,7 +168,6 @@ class Document extends Record(DEFAULTS) {
   toJS(options) {
     return this.toJSON(options)
   }
-
 }
 
 /**
@@ -175,7 +180,7 @@ Document.prototype[MODEL_TYPES.DOCUMENT] = true
  * Mix in `Node` methods.
  */
 
-Object.getOwnPropertyNames(Node.prototype).forEach((method) => {
+Object.getOwnPropertyNames(Node.prototype).forEach(method => {
   if (method == 'constructor') return
   Document.prototype[method] = Node.prototype[method]
 })

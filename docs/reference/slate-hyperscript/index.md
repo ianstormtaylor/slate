@@ -1,4 +1,3 @@
-
 # `slate-hyperscript`
 
 ```js
@@ -7,7 +6,6 @@ import { createHyperscript } from 'slate-hyperscript'
 ```
 
 A hyperscript helper for writing Slate documents with JSX!
-
 
 ## Example
 
@@ -20,7 +18,11 @@ const value = (
   <value>
     <document>
       <block type="paragraph">
-        A string of <mark type="bold">bold</mark> in a <inline type="link" data={{ src: 'http://slatejs.org' }}>Slate</inline> editor!
+        A string of <mark type="bold">bold</mark> in a{' '}
+        <inline type="link" data={{ src: 'http://slatejs.org' }}>
+          Slate
+        </inline>{' '}
+        editor!
       </block>
       <block type="image" data={{ src: 'https://...' }} isVoid />
     </document>
@@ -39,7 +41,7 @@ const h = createHyperscript({
     image: {
       type: 'image',
       isVoid: true,
-    }
+    },
   },
   inlines: {
     link: 'link',
@@ -53,7 +55,8 @@ const value = (
   <value>
     <document>
       <paragraph>
-        A string of <b>bold</b> in a <link src="http://slatejs.org">Slate</link> editor!
+        A string of <b>bold</b> in a <link src="http://slatejs.org">Slate</link>{' '}
+        editor!
       </paragraph>
       <image src="https://..." />
     </document>
@@ -61,15 +64,16 @@ const value = (
 )
 ```
 
-
 ## Exports
 
 ### `h`
+
 `Function`
 
 The default export of `slate-hyperscript` is a barebones hyperscript helper that you can immediately start using to create Slate objects.
 
 ### `createHyperscript`
+
 `createHyperscript(options: Object) => Function`
 
 The other export is a `createHyperscript` helper that you can use to create your own, smarter, schema-aware hyperscript helper. You can pass it `options` that tell it about your schema to make creating objects much terser.
@@ -82,4 +86,3 @@ The other export is a `createHyperscript` helper that you can use to create your
   creators: Object,
 }
 ```
-

@@ -1,4 +1,3 @@
-
 /** @jsx h */
 
 import React from 'react'
@@ -7,15 +6,15 @@ import h from '../helpers/h'
 export const rules = [
   {
     serialize(obj, children) {
-      if (obj.kind == 'block' && obj.type == 'paragraph') {
+      if (obj.object == 'block' && obj.type == 'paragraph') {
         return React.createElement('p', {}, children)
       }
 
-      if (obj.kind == 'mark' && obj.type == 'bold') {
+      if (obj.object == 'mark' && obj.type == 'bold') {
         return React.createElement('strong', {}, children)
       }
-    }
-  }
+    },
+  },
 ]
 
 export const input = (

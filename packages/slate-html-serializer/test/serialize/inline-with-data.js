@@ -1,4 +1,3 @@
-
 /** @jsx h */
 
 import React from 'react'
@@ -7,24 +6,26 @@ import h from '../helpers/h'
 export const rules = [
   {
     serialize(obj, children) {
-      if (obj.kind == 'block' && obj.type == 'paragraph') {
+      if (obj.object == 'block' && obj.type == 'paragraph') {
         return React.createElement('p', {}, children)
       }
 
-      if (obj.kind == 'inline' && obj.type == 'link') {
-        return React.createElement('a', { href: obj.data.get('href') }, children)
+      if (obj.object == 'inline' && obj.type == 'link') {
+        return React.createElement(
+          'a',
+          { href: obj.data.get('href') },
+          children
+        )
       }
-    }
-  }
+    },
+  },
 ]
 
 export const input = (
   <value>
     <document>
       <paragraph>
-        <link href="https://google.com">
-          one
-        </link>
+        <link href="https://google.com">one</link>
       </paragraph>
     </document>
   </value>

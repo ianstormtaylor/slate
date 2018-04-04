@@ -2,7 +2,7 @@
 
 import h from '../../../helpers/h'
 
-export default function (change) {
+export default function(change) {
   change.wrapInline('hashtag')
 }
 
@@ -23,10 +23,13 @@ export const output = (
   <value>
     <document>
       <paragraph>
-        wo<hashtag><anchor />rd</hashtag>
+        wo<hashtag>
+          <anchor />rd
+        </hashtag>
       </paragraph>
       <paragraph>
-        <hashtag>an</hashtag><focus />other
+        <hashtag>an</hashtag>
+        <focus />other
       </paragraph>
     </document>
   </value>

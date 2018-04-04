@@ -1,4 +1,3 @@
-
 import { Editor } from 'slate-react'
 import { Value } from 'slate'
 
@@ -24,7 +23,6 @@ const isCodeHotkey = isKeyHotkey('mod+`')
  */
 
 class SyncingEditor extends React.Component {
-
   /**
    * Deserialize the initial editor value.
    *
@@ -42,7 +40,7 @@ class SyncingEditor extends React.Component {
    * @param {Array} operations
    */
 
-  applyOperations = (operations) => {
+  applyOperations = operations => {
     const { value } = this.state
     const change = value.change().applyOperations(operations)
     this.onChange(change, { remote: true })
@@ -55,7 +53,7 @@ class SyncingEditor extends React.Component {
    * @return {Boolean}
    */
 
-  hasMark = (type) => {
+  hasMark = type => {
     const { value } = this.state
     return value.activeMarks.some(mark => mark.type == type)
   }
@@ -163,6 +161,7 @@ class SyncingEditor extends React.Component {
     const onMouseDown = event => this.onClickMark(event, type)
 
     return (
+      // eslint-disable-next-line react/jsx-no-bind
       <span className="button" onMouseDown={onMouseDown} data-active={isActive}>
         <span className="material-icons">{icon}</span>
       </span>
@@ -197,16 +196,19 @@ class SyncingEditor extends React.Component {
    * @return {Element}
    */
 
-  renderMark = (props) => {
+  renderMark = props => {
     const { children, mark } = props
     switch (mark.type) {
-      case 'bold': return <strong>{children}</strong>
-      case 'code': return <code>{children}</code>
-      case 'italic': return <em>{children}</em>
-      case 'underlined': return <u>{children}</u>
+      case 'bold':
+        return <strong>{children}</strong>
+      case 'code':
+        return <code>{children}</code>
+      case 'italic':
+        return <em>{children}</em>
+      case 'underlined':
+        return <u>{children}</u>
     }
   }
-
 }
 
 /**
@@ -216,14 +218,13 @@ class SyncingEditor extends React.Component {
  */
 
 class SyncingOperationsExample extends React.Component {
-
   /**
    * Save a reference to editor `one`.
    *
    * @param {SyncingEditor} one
    */
 
-  oneRef = (one) => {
+  oneRef = one => {
     this.one = one
   }
 
@@ -233,7 +234,7 @@ class SyncingOperationsExample extends React.Component {
    * @param {SyncingEditor} two
    */
 
-  twoRef = (two) => {
+  twoRef = two => {
     this.two = two
   }
 
@@ -243,9 +244,14 @@ class SyncingOperationsExample extends React.Component {
    * @param {Array} operations
    */
 
-  onOneChange = (change) => {
-    const ops = change.operations.filter(o => o.type != 'set_selection' && o.type != 'set_value')
-    this.two.applyOperations(ops)
+  onOneChange = change => {
+    const ops = change.operations
+      .filter(o => o.type != 'set_selection' && o.type != 'set_value')
+      .toJS()
+
+    setTimeout(() => {
+      this.two.applyOperations(ops)
+    })
   }
 
   /**
@@ -254,9 +260,14 @@ class SyncingOperationsExample extends React.Component {
    * @param {Array} operations
    */
 
-  onTwoChange = (change) => {
-    const ops = change.operations.filter(o => o.type != 'set_selection' && o.type != 'set_value')
-    this.one.applyOperations(ops)
+  onTwoChange = change => {
+    const ops = change.operations
+      .filter(o => o.type != 'set_selection' && o.type != 'set_value')
+      .toJS()
+
+    setTimeout(() => {
+      this.one.applyOperations(ops)
+    })
   }
 
   /**
@@ -268,10 +279,7 @@ class SyncingOperationsExample extends React.Component {
   render() {
     return (
       <div>
-        <SyncingEditor
-          ref={this.oneRef}
-          onChange={this.onOneChange}
-        />
+        <SyncingEditor ref={this.oneRef} onChange={this.onOneChange} />
         <div
           style={{
             height: '20px',
@@ -279,14 +287,10 @@ class SyncingOperationsExample extends React.Component {
             margin: '20px -20px',
           }}
         />
-        <SyncingEditor
-          ref={this.twoRef}
-          onChange={this.onTwoChange}
-        />
+        <SyncingEditor ref={this.twoRef} onChange={this.onTwoChange} />
       </div>
     )
   }
-
 }
 
 /**

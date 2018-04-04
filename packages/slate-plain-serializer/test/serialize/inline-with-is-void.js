@@ -12,4 +12,4 @@ export const input = (
   </value>
 )
 
-export const output = ' '
+export const output = ''

@@ -5,13 +5,9 @@ import h from '../helpers/h'
 export const input = (
   <value>
     <document>
-      <paragraph>
-        one
-      </paragraph>
+      <paragraph>one</paragraph>
       <paragraph />
-      <paragraph>
-        three
-      </paragraph>
+      <paragraph>three</paragraph>
     </document>
   </value>
 )

@@ -1,4 +1,4 @@
-
+import logger from 'slate-dev-logger'
 import Block from '../models/block'
 import Inline from '../models/inline'
 import Mark from '../models/mark'
@@ -25,8 +25,8 @@ const PROXY_TRANSFORMS = [
   'deleteCharForward',
   'deleteWordForward',
   'deleteLineForward',
-  'setBlock',
-  'setInline',
+  'setBlocks',
+  'setInlines',
   'splitInline',
   'unwrapBlock',
   'unwrapInline',
@@ -34,7 +34,7 @@ const PROXY_TRANSFORMS = [
   'wrapInline',
 ]
 
-PROXY_TRANSFORMS.forEach((method) => {
+PROXY_TRANSFORMS.forEach(method => {
   Changes[method] = (change, ...args) => {
     const { value } = change
     const { selection } = value
@@ -42,6 +42,22 @@ PROXY_TRANSFORMS.forEach((method) => {
     change[methodAtRange](selection, ...args)
   }
 })
+
+Changes.setBlock = (...args) => {
+  logger.deprecate(
+    'slate@0.33.0',
+    'The `setBlock` method of Slate changes has been renamed to `setBlocks`.'
+  )
+  Changes.setBlocks(...args)
+}
+
+Changes.setInline = (...args) => {
+  logger.deprecate(
+    'slate@0.33.0',
+    'The `setInline` method of Slate changes has been renamed to `setInlines`.'
+  )
+  Changes.setInlines(...args)
+}
 
 /**
  * Add a `mark` to the characters in the current selection.
@@ -57,15 +73,11 @@ Changes.addMark = (change, mark) => {
 
   if (selection.isExpanded) {
     change.addMarkAtRange(selection, mark)
-  }
-
-  else if (selection.marks) {
+  } else if (selection.marks) {
     const marks = selection.marks.add(mark)
     const sel = selection.set('marks', marks)
     change.select(sel)
-  }
-
-  else {
+  } else {
     const marks = document.getActiveMarksAtRange(selection).add(mark)
     const sel = selection.set('marks', marks)
     change.select(sel)
@@ -89,7 +101,7 @@ Changes.addMarks = (change, marks) => {
  * @param {Change} change
  */
 
-Changes.delete = (change) => {
+Changes.delete = change => {
   const { value } = change
   const { selection } = value
   change.deleteAtRange(selection)
@@ -134,11 +146,10 @@ Changes.insertFragment = (change, fragment) => {
   const lastText = fragment.getLastText()
   const lastInline = fragment.getClosestInline(lastText.key)
   const keys = document.getTexts().map(text => text.key)
-  const isAppending = (
+  const isAppending =
     !startInline ||
     selection.hasEdgeAtStartOf(startText) ||
     selection.hasEdgeAtEndOf(endText)
-  )
 
   change.insertFragmentAtRange(selection, fragment)
   value = change.value
@@ -149,13 +160,11 @@ Changes.insertFragment = (change, fragment) => {
 
   if (newText && lastInline) {
     change.select(selection.collapseToEndOf(newText))
-  }
-
-  else if (newText) {
-    change.select(selection.collapseToStartOf(newText).move(lastText.text.length))
-  }
-
-  else {
+  } else if (newText) {
+    change.select(
+      selection.collapseToStartOf(newText).move(lastText.text.length)
+    )
+  } else {
     change.select(selection.collapseToStart().move(lastText.text.length))
   }
 }
@@ -189,7 +198,7 @@ Changes.insertInline = (change, inline) => {
 Changes.insertText = (change, text, marks) => {
   const { value } = change
   const { document, selection } = value
-  marks = marks || value.marks
+  marks = marks || selection.marks || document.getInsertMarksAtRange(selection)
   change.insertTextAtRange(selection, text, marks)
 
   // If the text was successfully inserted, and the selection had marks on it,
@@ -209,9 +218,7 @@ Changes.insertText = (change, text, marks) => {
 Changes.splitBlock = (change, depth = 1) => {
   const { value } = change
   const { selection } = value
-  change
-    .splitBlockAtRange(selection, depth)
-    .collapseToEnd()
+  change.splitBlockAtRange(selection, depth).collapseToEnd()
 }
 
 /**
@@ -228,15 +235,11 @@ Changes.removeMark = (change, mark) => {
 
   if (selection.isExpanded) {
     change.removeMarkAtRange(selection, mark)
-  }
-
-  else if (selection.marks) {
+  } else if (selection.marks) {
     const marks = selection.marks.remove(mark)
     const sel = selection.set('marks', marks)
     change.select(sel)
-  }
-
-  else {
+  } else {
     const marks = document.getActiveMarksAtRange(selection).remove(mark)
     const sel = selection.set('marks', marks)
     change.select(sel)

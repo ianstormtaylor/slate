@@ -2,7 +2,7 @@
 
 import h from '../../../helpers/h'
 
-export default function (change) {
+export default function(change) {
   change.insertTextByKey('a', 2, 'x')
 }
 
@@ -19,9 +19,7 @@ export const input = (
 export const output = (
   <value>
     <document>
-      <paragraph>
-        woxrd
-      </paragraph>
+      <paragraph>woxrd</paragraph>
     </document>
   </value>
 )

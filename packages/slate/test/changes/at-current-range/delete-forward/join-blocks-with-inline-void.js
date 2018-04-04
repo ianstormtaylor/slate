@@ -2,7 +2,7 @@
 
 import h from '../../../helpers/h'
 
-export default function (change) {
+export default function(change) {
   change.deleteForward()
 }
 
@@ -23,7 +23,8 @@ export const output = (
   <value>
     <document>
       <paragraph>
-        word<cursor /><emoji />
+        word<cursor />
+        <emoji />
       </paragraph>
     </document>
   </value>

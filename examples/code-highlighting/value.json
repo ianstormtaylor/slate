@@ -2,32 +2,33 @@
   "document": {
     "nodes": [
       {
-        "kind": "block",
+        "object": "block",
         "type": "paragraph",
         "nodes": [
           {
-            "kind": "text",
+            "object": "text",
             "leaves": [
               {
-                "text": "There are certain behaviors that require rendering dynamic marks on string of text, like rendering code highlighting. For example:"
+                "text":
+                  "There are certain behaviors that require rendering dynamic marks on string of text, like rendering code highlighting. For example:"
               }
             ]
           }
         ]
       },
       {
-        "kind": "block",
+        "object": "block",
         "type": "code",
         "data": {
           "language": "js"
         },
         "nodes": [
           {
-            "kind": "block",
+            "object": "block",
             "type": "code_line",
             "nodes": [
               {
-                "kind": "text",
+                "object": "text",
                 "leaves": [
                   {
                     "text": "// A simple FizzBuzz implementation."
@@ -37,11 +38,11 @@
             ]
           },
           {
-            "kind": "block",
+            "object": "block",
             "type": "code_line",
             "nodes": [
               {
-                "kind": "text",
+                "object": "text",
                 "leaves": [
                   {
                     "text": "for (var i = 1; i <= 100; i++) {"
@@ -51,11 +52,11 @@
             ]
           },
           {
-            "kind": "block",
+            "object": "block",
             "type": "code_line",
             "nodes": [
               {
-                "kind": "text",
+                "object": "text",
                 "leaves": [
                   {
                     "text": "  if (i % 15 == 0) {"
@@ -65,11 +66,11 @@
             ]
           },
           {
-            "kind": "block",
+            "object": "block",
             "type": "code_line",
             "nodes": [
               {
-                "kind": "text",
+                "object": "text",
                 "leaves": [
                   {
                     "text": "    console.log('Fizz Buzz');"
@@ -79,11 +80,11 @@
             ]
           },
           {
-            "kind": "block",
+            "object": "block",
             "type": "code_line",
             "nodes": [
               {
-                "kind": "text",
+                "object": "text",
                 "leaves": [
                   {
                     "text": "  } else if (i % 5 == 0) {"
@@ -93,11 +94,11 @@
             ]
           },
           {
-            "kind": "block",
+            "object": "block",
             "type": "code_line",
             "nodes": [
               {
-                "kind": "text",
+                "object": "text",
                 "leaves": [
                   {
                     "text": "    console.log('Buzz');"
@@ -107,11 +108,11 @@
             ]
           },
           {
-            "kind": "block",
+            "object": "block",
             "type": "code_line",
             "nodes": [
               {
-                "kind": "text",
+                "object": "text",
                 "leaves": [
                   {
                     "text": "  } else if (i % 3 == 0) {"
@@ -121,11 +122,11 @@
             ]
           },
           {
-            "kind": "block",
+            "object": "block",
             "type": "code_line",
             "nodes": [
               {
-                "kind": "text",
+                "object": "text",
                 "leaves": [
                   {
                     "text": "    console.log('Fizz');"
@@ -135,11 +136,11 @@
             ]
           },
           {
-            "kind": "block",
+            "object": "block",
             "type": "code_line",
             "nodes": [
               {
-                "kind": "text",
+                "object": "text",
                 "leaves": [
                   {
                     "text": "  } else {"
@@ -149,11 +150,11 @@
             ]
           },
           {
-            "kind": "block",
+            "object": "block",
             "type": "code_line",
             "nodes": [
               {
-                "kind": "text",
+                "object": "text",
                 "leaves": [
                   {
                     "text": "    console.log(i);"
@@ -163,11 +164,11 @@
             ]
           },
           {
-            "kind": "block",
+            "object": "block",
             "type": "code_line",
             "nodes": [
               {
-                "kind": "text",
+                "object": "text",
                 "leaves": [
                   {
                     "text": "  }"
@@ -177,11 +178,11 @@
             ]
           },
           {
-            "kind": "block",
+            "object": "block",
             "type": "code_line",
             "nodes": [
               {
-                "kind": "text",
+                "object": "text",
                 "leaves": [
                   {
                     "text": "}"
@@ -193,11 +194,11 @@
         ]
       },
       {
-        "kind": "block",
+        "object": "block",
         "type": "paragraph",
         "nodes": [
           {
-            "kind": "text",
+            "object": "text",
             "leaves": [
               {
                 "text": "Try it out for yourself!"

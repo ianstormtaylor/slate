@@ -1,9 +1,9 @@
-
 import Debug from 'debug'
 import React from 'react'
 import Types from 'prop-types'
 import getWindow from 'get-window'
 import logger from 'slate-dev-logger'
+import throttle from 'lodash/throttle'
 
 import EVENT_HANDLERS from '../constants/event-handlers'
 import Node from './node'
@@ -14,7 +14,7 @@ import {
   IS_FIREFOX,
   IS_IOS,
   IS_ANDROID,
-  SUPPORTED_EVENTS
+  SUPPORTED_EVENTS,
 } from '../constants/environment'
 
 /**
@@ -32,7 +32,6 @@ const debug = Debug('slate:content')
  */
 
 class Content extends React.Component {
-
   /**
    * Property types.
    *
@@ -41,7 +40,6 @@ class Content extends React.Component {
 
   static propTypes = {
     autoCorrect: Types.bool.isRequired,
-    autoFocus: Types.bool.isRequired,
     children: Types.any.isRequired,
     className: Types.string,
     editor: Types.object.isRequired,
@@ -76,8 +74,8 @@ class Content extends React.Component {
     this.tmp.key = 0
     this.tmp.isUpdatingSelection = false
 
-    EVENT_HANDLERS.forEach((handler) => {
-      this[handler] = (event) => {
+    EVENT_HANDLERS.forEach(handler => {
+      this[handler] = event => {
         this.onEvent(handler, event)
       }
     })
@@ -88,20 +86,22 @@ class Content extends React.Component {
    *
    *   - Add native DOM event listeners.
    *   - Update the selection, in case it starts focused.
-   *   - Focus the editor if `autoFocus` is set.
    */
 
   componentDidMount = () => {
-    // Restrict scoped of `beforeinput` to mobile.
+    const window = getWindow(this.element)
+
+    window.document.addEventListener(
+      'selectionchange',
+      this.onNativeSelectionChange
+    )
+
+    // COMPAT: Restrict scope of `beforeinput` to mobile.
     if ((IS_IOS || IS_ANDROID) && SUPPORTED_EVENTS.beforeinput) {
       this.element.addEventListener('beforeinput', this.onNativeBeforeInput)
     }
 
     this.updateSelection()
-
-    if (this.props.autoFocus) {
-      this.element.focus()
-    }
   }
 
   /**
@@ -109,7 +109,16 @@ class Content extends React.Component {
    */
 
   componentWillUnmount() {
-    // Restrict scoped of `beforeinput` to mobile.
+    const window = getWindow(this.element)
+
+    if (window) {
+      window.document.removeEventListener(
+        'selectionchange',
+        this.onNativeSelectionChange
+      )
+    }
+
+    // COMPAT: Restrict scope of `beforeinput` to mobile.
     if ((IS_IOS || IS_ANDROID) && SUPPORTED_EVENTS.beforeinput) {
       this.element.removeEventListener('beforeinput', this.onNativeBeforeInput)
     }
@@ -134,7 +143,7 @@ class Content extends React.Component {
     const { isBackward } = selection
     const window = getWindow(this.element)
     const native = window.getSelection()
-    const { rangeCount } = native
+    const { rangeCount, anchorNode } = native
 
     // If both selections are blurred, do nothing.
     if (!rangeCount && selection.isBlurred) return
@@ -142,7 +151,7 @@ class Content extends React.Component {
     // If the selection has been blurred, but is still inside the editor in the
     // DOM, blur it manually.
     if (selection.isBlurred) {
-      if (!this.isInEditor(native.anchorNode)) return
+      if (!this.isInEditor(anchorNode)) return
       native.removeAllRanges()
       this.element.blur()
       debug('updateSelection', { selection, native })
@@ -154,19 +163,17 @@ class Content extends React.Component {
 
     // Otherwise, figure out which DOM nodes should be selected...
     const current = !!rangeCount && native.getRangeAt(0)
-    const range = findDOMRange(selection)
+    const range = findDOMRange(selection, window)
 
     if (!range) {
-      logger.error('Unable to find a native DOM range from the current selection.', { selection })
+      logger.error(
+        'Unable to find a native DOM range from the current selection.',
+        { selection }
+      )
       return
     }
 
-    const {
-      startContainer,
-      startOffset,
-      endContainer,
-      endOffset,
-    } = range
+    const { startContainer, startOffset, endContainer, endOffset } = range
 
     // If the new range matches the current selection, there is nothing to fix.
     // COMPAT: The native `Range` object always has it's "start" first and "end"
@@ -174,17 +181,14 @@ class Content extends React.Component {
     // to check both orientations here. (2017/10/31)
     if (current) {
       if (
-        (
-          startContainer == current.startContainer &&
+        (startContainer == current.startContainer &&
           startOffset == current.startOffset &&
           endContainer == current.endContainer &&
-          endOffset == current.endOffset
-        ) || (
-          startContainer == current.endContainer &&
+          endOffset == current.endOffset) ||
+        (startContainer == current.endContainer &&
           startOffset == current.endOffset &&
           endContainer == current.startContainer &&
-          endOffset == current.startOffset
-        )
+          endOffset == current.startOffset)
       ) {
         return
       }
@@ -194,12 +198,28 @@ class Content extends React.Component {
     this.tmp.isUpdatingSelection = true
     native.removeAllRanges()
 
-    // COMPAT: Again, since the DOM range has no concept of backwards/forwards
-    // we need to check and do the right thing here.
-    if (isBackward) {
-      native.setBaseAndExtent(endContainer, endOffset, startContainer, startOffset)
+    // COMPAT: IE 11 does not support Selection.setBaseAndExtent
+    if (native.setBaseAndExtent) {
+      // COMPAT: Since the DOM range has no concept of backwards/forwards
+      // we need to check and do the right thing here.
+      if (isBackward) {
+        native.setBaseAndExtent(
+          range.endContainer,
+          range.endOffset,
+          range.startContainer,
+          range.startOffset
+        )
+      } else {
+        native.setBaseAndExtent(
+          range.startContainer,
+          range.startOffset,
+          range.endContainer,
+          range.endOffset
+        )
+      }
     } else {
-      native.setBaseAndExtent(startContainer, startOffset, endContainer, endOffset)
+      // COMPAT: IE 11 does not support Selection.extend, fallback to addRange
+      native.addRange(range)
     }
 
     // Scroll to the selection, in case it's out of view.
@@ -209,7 +229,7 @@ class Content extends React.Component {
     setTimeout(() => {
       // COMPAT: In Firefox, it's not enough to create a range, you also need to
       // focus the contenteditable element too. (2016/11/16)
-      if (IS_FIREFOX) this.element.focus()
+      if (IS_FIREFOX && this.element) this.element.focus()
       this.tmp.isUpdatingSelection = false
     })
 
@@ -222,7 +242,7 @@ class Content extends React.Component {
    * @param {Element} element
    */
 
-  ref = (element) => {
+  ref = element => {
     this.element = element
   }
 
@@ -235,13 +255,13 @@ class Content extends React.Component {
    * @return {Boolean}
    */
 
-  isInEditor = (target) => {
+  isInEditor = target => {
     const { element } = this
     // COMPAT: Text nodes don't have `isContentEditable` property. So, when
     // `target` is a text node use its parent node for check.
     const el = target.nodeType === 3 ? target.parentNode : target
     return (
-      (el.isContentEditable) &&
+      el.isContentEditable &&
       (el === element || el.closest('[data-slate-editor]') === element)
     )
   }
@@ -266,11 +286,7 @@ class Content extends React.Component {
     // programmatically while updating selection.
     if (
       this.tmp.isUpdatingSelection &&
-      (
-        handler == 'onSelect' ||
-        handler == 'onBlur' ||
-        handler == 'onFocus'
-      )
+      (handler == 'onSelect' || handler == 'onBlur' || handler == 'onFocus')
     ) {
       return
     }
@@ -294,14 +310,15 @@ class Content extends React.Component {
       }
     }
 
-    // Don't handle drag events coming from embedded editors.
+    // Don't handle drag and drop events coming from embedded editors.
     if (
       handler == 'onDragEnd' ||
       handler == 'onDragEnter' ||
       handler == 'onDragExit' ||
       handler == 'onDragLeave' ||
       handler == 'onDragOver' ||
-      handler == 'onDragStart'
+      handler == 'onDragStart' ||
+      handler == 'onDrop'
     ) {
       const { target } = event
       const targetEditorNode = target.closest('[data-slate-editor]')
@@ -332,48 +349,98 @@ class Content extends React.Component {
 
   /**
    * On a native `beforeinput` event, use the additional range information
-   * provided by the event to insert text exactly as the browser would.
+   * provided by the event to manipulate text exactly as the browser would.
+   *
+   * This is currently only used on iOS and Android.
    *
    * @param {InputEvent} event
    */
 
-  onNativeBeforeInput = (event) => {
+  onNativeBeforeInput = event => {
     if (this.props.readOnly) return
     if (!this.isInEditor(event.target)) return
 
-    const { inputType } = event
-    if (inputType !== 'insertText' && inputType !== 'insertReplacementText') return
-
-    const [ targetRange ] = event.getTargetRanges()
+    const [targetRange] = event.getTargetRanges()
     if (!targetRange) return
 
-    // `data` should have the text for the `insertText` input type and
-    // `dataTransfer` should have the text for the `insertReplacementText` input
-    // type, but Safari uses `insertText` for spell check replacements and sets
-    // `data` to `null`.
-    const text = event.data == null
-      ? event.dataTransfer.getData('text/plain')
-      : event.data
-
-    if (text == null) return
-
-    event.preventDefault()
-
     const { editor } = this.props
-    const { value } = editor
-    const { selection } = value
-    const range = findRange(targetRange, value)
 
-    editor.change((change) => {
-      change.insertTextAtRange(range, text, selection.marks)
+    switch (event.inputType) {
+      case 'deleteContentBackward': {
+        event.preventDefault()
 
-      // If the text was successfully inserted, and the selection had marks on it,
-      // unset the selection's marks.
-      if (selection.marks && value.document != change.value.document) {
-        change.select({ marks: null })
+        const range = findRange(targetRange, editor.value)
+        editor.change(change => change.deleteAtRange(range))
+        break
       }
-    })
+
+      case 'insertLineBreak': // intentional fallthru
+      case 'insertParagraph': {
+        event.preventDefault()
+        const range = findRange(targetRange, editor.value)
+
+        editor.change(change => {
+          if (change.value.isInVoid) {
+            change.collapseToStartOfNextText()
+          } else {
+            change.splitBlockAtRange(range)
+          }
+        })
+        break
+      }
+
+      case 'insertReplacementText': // intentional fallthru
+      case 'insertText': {
+        // `data` should have the text for the `insertText` input type and
+        // `dataTransfer` should have the text for the `insertReplacementText`
+        // input type, but Safari uses `insertText` for spell check replacements
+        // and sets `data` to `null`.
+        const text =
+          event.data == null
+            ? event.dataTransfer.getData('text/plain')
+            : event.data
+
+        if (text == null) return
+
+        event.preventDefault()
+
+        const { value } = editor
+        const { selection } = value
+        const range = findRange(targetRange, value)
+
+        editor.change(change => {
+          change.insertTextAtRange(range, text, selection.marks)
+
+          // If the text was successfully inserted, and the selection had marks
+          // on it, unset the selection's marks.
+          if (selection.marks && value.document != change.value.document) {
+            change.select({ marks: null })
+          }
+        })
+
+        break
+      }
+    }
   }
+
+  /**
+   * On native `selectionchange` event, trigger the `onSelect` handler. This is
+   * needed to account for React's `onSelect` being non-standard and not firing
+   * until after a selection has been released. This causes issues in situations
+   * where another change happens while a selection is being made.
+   *
+   * @param {Event} event
+   */
+
+  onNativeSelectionChange = throttle(event => {
+    if (this.props.readOnly) return
+
+    const window = getWindow(event.target)
+    const { activeElement } = window.document
+    if (activeElement !== this.element) return
+
+    this.props.onSelect(event)
+  }, 100)
 
   /**
    * Render the editor content.
@@ -448,7 +515,7 @@ class Content extends React.Component {
         autoCorrect={props.autoCorrect ? 'on' : 'off'}
         spellCheck={spellCheck}
         style={style}
-        role={readOnly ? null : (role || 'textbox')}
+        role={readOnly ? null : role || 'textbox'}
         tabIndex={tabIndex}
         // COMPAT: The Grammarly Chrome extension works by changing the DOM out
         // from under `contenteditable` elements, which leads to weird behaviors
@@ -489,14 +556,13 @@ class Content extends React.Component {
       />
     )
   }
-
 }
 
 /**
  * Mix in handler prop types.
  */
 
-EVENT_HANDLERS.forEach((handler) => {
+EVENT_HANDLERS.forEach(handler => {
   Content.propTypes[handler] = Types.func.isRequired
 })
 

@@ -1,29 +1,27 @@
 {
   "name": "slate-simulator",
   "description": "A simulator for testing Slate editors and plugins.",
-  "version": "0.4.6",
+  "version": "0.4.27",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
-  "main": "./lib/index.js",
+  "main": "lib/slate-simulator.js",
+  "module": "lib/slate-simulator.es.js",
+  "umd": "dist/slate-simulator.js",
+  "umdMin": "dist/slate-simulator.min.js",
+  "files": [
+    "dist/",
+    "lib/"
+  ],
   "peerDependencies": {
-    "slate": "^0.30.6",
-    "slate-dev-logger": "^0.1.23"
+    "slate": ">=0.32.0"
   },
   "devDependencies": {
-    "babel-cli": "^6.10.1",
-    "browserify": "^13.0.1",
-    "slate": "^0.30.6",
-    "uglify-js": "^2.7.0"
+    "slate": "^0.33.4"
   },
   "scripts": {
-    "build": "babel --out-dir ./lib ./src",
-    "build:max": "mkdir -p ./dist && NODE_ENV=production browserify ./src/index.js --transform babelify --transform envify --transform [ browserify-global-shim --global ] --standalone SlateSimulator > ./dist/slate-simulator.js",
-    "build:min": "mkdir -p ./dist && NODE_ENV=production browserify ./src/index.js --transform babelify --transform envify --transform [ browserify-global-shim --global ] --transform uglifyify --standalone SlateSimulator | uglifyjs > ./dist/slate-simulator.min.js",
-    "clean": "rm -rf ./dist ./lib ./node_modules",
-    "prepublish": "yarn run build && yarn run build:max && yarn run build:min",
-    "watch": "babel --watch --out-dir ./lib ./src --source-maps inline"
+    "clean": "rm -rf ./dist ./lib ./node_modules"
   },
-  "browserify-global-shim": {
+  "umdGlobals": {
     "slate": "Slate"
   },
   "keywords": [

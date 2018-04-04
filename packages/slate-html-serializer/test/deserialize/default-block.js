@@ -1,4 +1,3 @@
-
 /** @jsx h */
 
 import h from '../helpers/h'
@@ -10,21 +9,21 @@ export const config = {
         switch (el.tagName.toLowerCase()) {
           case 'p': {
             return {
-              kind: 'block',
+              object: 'block',
               type: 'paragraph',
               nodes: next(el.childNodes),
             }
           }
         }
-      }
-    }
+      },
+    },
   ],
   defaultBlock: {
     type: 'default',
     data: {
-      thing: 'value'
-    }
-  }
+      thing: 'value',
+    },
+  },
 }
 
 export const input = `
@@ -35,9 +34,7 @@ export const input = `
 export const output = (
   <value>
     <document>
-      <paragraph>
-        one
-      </paragraph>
+      <paragraph>one</paragraph>
       <block type="default" data={{ thing: 'value' }}>
         two
       </block>

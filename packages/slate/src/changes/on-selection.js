@@ -1,4 +1,3 @@
-
 import isEmpty from 'is-empty'
 import pick from 'lodash/pick'
 
@@ -38,31 +37,11 @@ Changes.select = (change, properties, options = {}) => {
     props[k] = properties[k]
   }
 
-  // Resolve the selection keys into paths.
-  sel.anchorPath = sel.anchorKey == null ? null : document.getPath(sel.anchorKey)
-  delete sel.anchorKey
-
-  if (props.anchorKey) {
-    props.anchorPath = props.anchorKey == null ? null : document.getPath(props.anchorKey)
-    delete props.anchorKey
-  }
-
-  sel.focusPath = sel.focusKey == null ? null : document.getPath(sel.focusKey)
-  delete sel.focusKey
-
-  if (props.focusKey) {
-    props.focusPath = props.focusKey == null ? null : document.getPath(props.focusKey)
-    delete props.focusKey
-  }
-
   // If the selection moves, clear any marks, unless the new selection
   // properties change the marks in some way.
-  const moved = [
-    'anchorPath',
-    'anchorOffset',
-    'focusPath',
-    'focusOffset',
-  ].some(p => props.hasOwnProperty(p))
+  const moved = ['anchorKey', 'anchorOffset', 'focusKey', 'focusOffset'].some(
+    p => props.hasOwnProperty(p)
+  )
 
   if (sel.marks && properties.marks == sel.marks && moved) {
     props.marks = null
@@ -74,11 +53,15 @@ Changes.select = (change, properties, options = {}) => {
   }
 
   // Apply the operation.
-  change.applyOperation({
-    type: 'set_selection',
-    properties: props,
-    selection: sel,
-  }, snapshot ? { skip: false, merge: false } : {})
+  change.applyOperation(
+    {
+      type: 'set_selection',
+      value,
+      properties: props,
+      selection: sel,
+    },
+    snapshot ? { skip: false, merge: false } : {}
+  )
 }
 
 /**
@@ -87,7 +70,7 @@ Changes.select = (change, properties, options = {}) => {
  * @param {Change} change
  */
 
-Changes.selectAll = (change) => {
+Changes.selectAll = change => {
   const { value } = change
   const { document, selection } = value
   const next = selection.moveToRangeOf(document)
@@ -100,7 +83,7 @@ Changes.selectAll = (change) => {
  * @param {Change} change
  */
 
-Changes.snapshotSelection = (change) => {
+Changes.snapshotSelection = change => {
   const { value } = change
   const { selection } = value
   change.select(selection, { snapshot: true })
@@ -112,13 +95,14 @@ Changes.snapshotSelection = (change) => {
  * @param {Change} change
  */
 
-Changes.moveAnchorCharBackward = (change) => {
+Changes.moveAnchorCharBackward = change => {
   const { value } = change
   const { document, selection, anchorText, anchorBlock } = value
   const { anchorOffset } = selection
   const previousText = document.getPreviousText(anchorText.key)
   const isInVoid = document.hasVoidParent(anchorText.key)
-  const isPreviousInVoid = previousText && document.hasVoidParent(previousText.key)
+  const isPreviousInVoid =
+    previousText && document.hasVoidParent(previousText.key)
 
   if (!isInVoid && anchorOffset > 0) {
     change.moveAnchor(-1)
@@ -142,7 +126,7 @@ Changes.moveAnchorCharBackward = (change) => {
  * @param {Change} change
  */
 
-Changes.moveAnchorCharForward = (change) => {
+Changes.moveAnchorCharForward = change => {
   const { value } = change
   const { document, selection, anchorText, anchorBlock } = value
   const { anchorOffset } = selection
@@ -172,13 +156,14 @@ Changes.moveAnchorCharForward = (change) => {
  * @param {Change} change
  */
 
-Changes.moveFocusCharBackward = (change) => {
+Changes.moveFocusCharBackward = change => {
   const { value } = change
   const { document, selection, focusText, focusBlock } = value
   const { focusOffset } = selection
   const previousText = document.getPreviousText(focusText.key)
   const isInVoid = document.hasVoidParent(focusText.key)
-  const isPreviousInVoid = previousText && document.hasVoidParent(previousText.key)
+  const isPreviousInVoid =
+    previousText && document.hasVoidParent(previousText.key)
 
   if (!isInVoid && focusOffset > 0) {
     change.moveFocus(-1)
@@ -202,7 +187,7 @@ Changes.moveFocusCharBackward = (change) => {
  * @param {Change} change
  */
 
-Changes.moveFocusCharForward = (change) => {
+Changes.moveFocusCharForward = change => {
   const { value } = change
   const { document, selection, focusText, focusBlock } = value
   const { focusOffset } = selection
@@ -230,20 +215,17 @@ Changes.moveFocusCharForward = (change) => {
  * Mix in move methods.
  */
 
-const MOVE_DIRECTIONS = [
-  'Forward',
-  'Backward',
-]
+const MOVE_DIRECTIONS = ['Forward', 'Backward']
 
-MOVE_DIRECTIONS.forEach((direction) => {
+MOVE_DIRECTIONS.forEach(direction => {
   const anchor = `moveAnchorChar${direction}`
   const focus = `moveFocusChar${direction}`
 
-  Changes[`moveChar${direction}`] = (change) => {
+  Changes[`moveChar${direction}`] = change => {
     change[anchor]()[focus]()
   }
 
-  Changes[`moveStartChar${direction}`] = (change) => {
+  Changes[`moveStartChar${direction}`] = change => {
     if (change.value.isBackward) {
       change[focus]()
     } else {
@@ -251,7 +233,7 @@ MOVE_DIRECTIONS.forEach((direction) => {
     }
   }
 
-  Changes[`moveEndChar${direction}`] = (change) => {
+  Changes[`moveEndChar${direction}`] = change => {
     if (change.value.isBackward) {
       change[anchor]()
     } else {
@@ -259,12 +241,13 @@ MOVE_DIRECTIONS.forEach((direction) => {
     }
   }
 
-  Changes[`extendChar${direction}`] = (change) => {
+  Changes[`extendChar${direction}`] = change => {
     change[`moveFocusChar${direction}`]()
   }
 
-  Changes[`collapseChar${direction}`] = (change) => {
-    const collapse = direction == 'Forward' ? 'collapseToEnd' : 'collapseToStart'
+  Changes[`collapseChar${direction}`] = change => {
+    const collapse =
+      direction == 'Forward' ? 'collapseToEnd' : 'collapseToStart'
     change[collapse]()[`moveChar${direction}`]()
   }
 })
@@ -280,8 +263,8 @@ const ALIAS_METHODS = [
   ['extendLineForward', 'extendToEndOfBlock'],
 ]
 
-ALIAS_METHODS.forEach(([ alias, method ]) => {
-  Changes[alias] = function (change, ...args) {
+ALIAS_METHODS.forEach(([alias, method]) => {
+  Changes[alias] = function(change, ...args) {
     change[method](change, ...args)
   }
 })
@@ -332,7 +315,7 @@ const PROXY_TRANSFORMS = [
   'deselect',
 ]
 
-PROXY_TRANSFORMS.forEach((method) => {
+PROXY_TRANSFORMS.forEach(method => {
   Changes[method] = (change, ...args) => {
     const normalize = method != 'deselect'
     const { value } = change
@@ -357,34 +340,24 @@ const PREFIXES = [
   'extendTo',
 ]
 
-const DIRECTIONS = [
-  'Next',
-  'Previous',
-]
+const DIRECTIONS = ['Next', 'Previous']
 
-const KINDS = [
-  'Block',
-  'Inline',
-  'Text',
-]
+const OBJECTS = ['Block', 'Inline', 'Text']
 
-PREFIXES.forEach((prefix) => {
-  const edges = [
-    'Start',
-    'End',
-  ]
+PREFIXES.forEach(prefix => {
+  const edges = ['Start', 'End']
 
   if (prefix == 'moveTo') {
     edges.push('Range')
   }
 
-  edges.forEach((edge) => {
+  edges.forEach(edge => {
     const method = `${prefix}${edge}Of`
 
-    KINDS.forEach((kind) => {
-      const getNode = kind == 'Text' ? 'getNode' : `getClosest${kind}`
+    OBJECTS.forEach(object => {
+      const getNode = object == 'Text' ? 'getNode' : `getClosest${object}`
 
-      Changes[`${method}${kind}`] = (change) => {
+      Changes[`${method}${object}`] = change => {
         const { value } = change
         const { document, selection } = value
         const node = document[getNode](selection.startKey)
@@ -392,11 +365,11 @@ PREFIXES.forEach((prefix) => {
         change[method](node)
       }
 
-      DIRECTIONS.forEach((direction) => {
-        const getDirectionNode = `get${direction}${kind}`
+      DIRECTIONS.forEach(direction => {
+        const getDirectionNode = `get${direction}${object}`
         const directionKey = direction == 'Next' ? 'startKey' : 'endKey'
 
-        Changes[`${method}${direction}${kind}`] = (change) => {
+        Changes[`${method}${direction}${object}`] = change => {
           const { value } = change
           const { document, selection } = value
           const node = document[getNode](selection[directionKey])

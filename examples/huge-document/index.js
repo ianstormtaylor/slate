@@ -16,21 +16,21 @@ const HEADINGS = 100
 const PARAGRAPHS = 8 // Paragraphs per heading
 const nodes = []
 const json = {
-  document: { nodes }
+  document: { nodes },
 }
 
 for (let h = 0; h < HEADINGS; h++) {
   nodes.push({
-    kind: 'block',
+    object: 'block',
     type: 'heading',
-    nodes: [{ kind: 'text', leaves: [{ text: faker.lorem.sentence() }] }]
+    nodes: [{ object: 'text', leaves: [{ text: faker.lorem.sentence() }] }],
   })
 
   for (let p = 0; p < PARAGRAPHS; p++) {
     nodes.push({
-      kind: 'block',
+      object: 'block',
       type: 'paragraph',
-      nodes: [{ kind: 'text', leaves: [{ text: faker.lorem.paragraph() }] }]
+      nodes: [{ object: 'text', leaves: [{ text: faker.lorem.paragraph() }] }],
     })
   }
 }
@@ -42,7 +42,6 @@ for (let h = 0; h < HEADINGS; h++) {
  */
 
 class HugeDocument extends React.Component {
-
   /**
    * Deserialize the initial editor value.
    *
@@ -95,10 +94,11 @@ class HugeDocument extends React.Component {
    * @return {Element}
    */
 
-  renderNode = (props) => {
+  renderNode = props => {
     const { attributes, children, node } = props
     switch (node.type) {
-      case 'heading': return <h1 {...attributes}>{children}</h1>
+      case 'heading':
+        return <h1 {...attributes}>{children}</h1>
     }
   }
 
@@ -109,16 +109,19 @@ class HugeDocument extends React.Component {
    * @return {Element}
    */
 
-  renderMark = (props) => {
+  renderMark = props => {
     const { children, mark } = props
     switch (mark.type) {
-      case 'bold': return <strong>{children}</strong>
-      case 'code': return <code>{children}</code>
-      case 'italic': return <em>{children}</em>
-      case 'underlined': return <u>{children}</u>
+      case 'bold':
+        return <strong>{children}</strong>
+      case 'code':
+        return <code>{children}</code>
+      case 'italic':
+        return <em>{children}</em>
+      case 'underlined':
+        return <u>{children}</u>
     }
   }
-
 }
 
 /**

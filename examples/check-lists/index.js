@@ -1,4 +1,3 @@
-
 import { Editor } from 'slate-react'
 import { Value } from 'slate'
 
@@ -12,17 +11,16 @@ import initialValue from './value.json'
  */
 
 class CheckListItem extends React.Component {
-
   /**
    * On change, set the new checked value on the block.
    *
    * @param {Event} event
    */
 
-  onChange = (event) => {
+  onChange = event => {
     const checked = event.target.checked
     const { editor, node } = this.props
-    editor.change(c => c.setNodeByKey(node.key, { data: { checked }}))
+    editor.change(c => c.setNodeByKey(node.key, { data: { checked } }))
   }
 
   /**
@@ -33,7 +31,7 @@ class CheckListItem extends React.Component {
    */
 
   render() {
-    const { attributes, children, node } = this.props
+    const { attributes, children, node, readOnly } = this.props
     const checked = node.data.get('checked')
     return (
       <div
@@ -42,19 +40,14 @@ class CheckListItem extends React.Component {
         {...attributes}
       >
         <span>
-          <input
-            type="checkbox"
-            checked={checked}
-            onChange={this.onChange}
-          />
+          <input type="checkbox" checked={checked} onChange={this.onChange} />
         </span>
-        <span contentEditable suppressContentEditableWarning>
+        <span contentEditable={!readOnly} suppressContentEditableWarning>
           {children}
         </span>
       </div>
     )
   }
-
 }
 
 /**
@@ -64,7 +57,6 @@ class CheckListItem extends React.Component {
  */
 
 class CheckLists extends React.Component {
-
   /**
    * Deserialize the initial editor value.
    *
@@ -72,7 +64,7 @@ class CheckLists extends React.Component {
    */
 
   state = {
-    value: Value.fromJSON(initialValue)
+    value: Value.fromJSON(initialValue),
   }
 
   /**
@@ -102,11 +94,8 @@ class CheckLists extends React.Component {
   onKeyDown = (event, change) => {
     const { value } = change
 
-    if (
-      event.key == 'Enter' &&
-      value.startBlock.type == 'check-list-item'
-    ) {
-      change.splitBlock().setBlock({ data: { checked: false }})
+    if (event.key == 'Enter' && value.startBlock.type == 'check-list-item') {
+      change.splitBlock().setBlocks({ data: { checked: false } })
       return true
     }
 
@@ -116,7 +105,7 @@ class CheckLists extends React.Component {
       value.startBlock.type == 'check-list-item' &&
       value.selection.startOffset == 0
     ) {
-      change.setBlock('paragraph')
+      change.setBlocks('paragraph')
       return true
     }
   }
@@ -151,12 +140,12 @@ class CheckLists extends React.Component {
    * @return {Element}
    */
 
-  renderNode = (props) => {
+  renderNode = props => {
     switch (props.node.type) {
-      case 'check-list-item': return <CheckListItem {...props} />
+      case 'check-list-item':
+        return <CheckListItem {...props} />
     }
   }
-
 }
 
 /**

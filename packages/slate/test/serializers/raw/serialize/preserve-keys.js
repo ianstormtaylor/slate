@@ -5,42 +5,40 @@ import h from '../../../helpers/h'
 export const input = (
   <value>
     <document>
-      <paragraph>
-        one
-      </paragraph>
+      <paragraph>one</paragraph>
     </document>
   </value>
 )
 
 export const output = {
-  kind: 'value',
+  object: 'value',
   document: {
     kind: 'document',
     key: '3',
     data: {},
     nodes: [
       {
-        kind: 'block',
+        object: 'block',
         key: '1',
         type: 'paragraph',
         data: {},
         isVoid: false,
         nodes: [
           {
-            kind: 'text',
+            object: 'text',
             key: '0',
             leaves: [
               {
                 text: 'one',
-                kind: 'leaf',
-                marks: []
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  }
+                object: 'leaf',
+                marks: [],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
 }
 
 export const options = {

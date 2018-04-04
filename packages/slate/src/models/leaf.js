@@ -1,5 +1,5 @@
-
 import isPlainObject from 'is-plain-object'
+import logger from 'slate-dev-logger'
 import { List, Record, Set } from 'immutable'
 
 import MODEL_TYPES from '../constants/model-types'
@@ -24,7 +24,6 @@ const DEFAULTS = {
  */
 
 class Leaf extends Record(DEFAULTS) {
-
   /**
    * Create a new `Leaf` with `attrs`.
    *
@@ -45,7 +44,9 @@ class Leaf extends Record(DEFAULTS) {
       return Leaf.fromJSON(attrs)
     }
 
-    throw new Error(`\`Leaf.create\` only accepts objects, strings or leaves, but you passed it: ${attrs}`)
+    throw new Error(
+      `\`Leaf.create\` only accepts objects, strings or leaves, but you passed it: ${attrs}`
+    )
   }
 
   /**
@@ -61,7 +62,9 @@ class Leaf extends Record(DEFAULTS) {
       return list
     }
 
-    throw new Error(`\`Leaf.createList\` only accepts arrays or lists, but you passed it: ${attrs}`)
+    throw new Error(
+      `\`Leaf.createList\` only accepts arrays or lists, but you passed it: ${attrs}`
+    )
   }
 
   /**
@@ -72,10 +75,7 @@ class Leaf extends Record(DEFAULTS) {
    */
 
   static fromJSON(object) {
-    const {
-      text = '',
-      marks = [],
-    } = object
+    const { text = '', marks = [] } = object
 
     const leaf = new Leaf({
       text,
@@ -114,13 +114,21 @@ class Leaf extends Record(DEFAULTS) {
   }
 
   /**
-   * Get the node's kind.
+   * Object.
    *
    * @return {String}
    */
 
-  get kind() {
+  get object() {
     return 'leaf'
+  }
+
+  get kind() {
+    logger.deprecate(
+      'slate@0.32.0',
+      'The `kind` property of Slate objects has been renamed to `object`.'
+    )
+    return this.object
   }
 
   /**
@@ -131,14 +139,14 @@ class Leaf extends Record(DEFAULTS) {
 
   getCharacters() {
     const { marks } = this
-    const characters = Character.createList(this.text
-      .split('')
-      .map((char) => {
+    const characters = Character.createList(
+      this.text.split('').map(char => {
         return Character.create({
           text: char,
-          marks
+          marks,
         })
-      }))
+      })
+    )
 
     return characters
   }
@@ -151,7 +159,7 @@ class Leaf extends Record(DEFAULTS) {
 
   toJSON() {
     const object = {
-      kind: this.kind,
+      object: this.object,
       text: this.text,
       marks: this.marks.toArray().map(m => m.toJSON()),
     }
@@ -166,7 +174,6 @@ class Leaf extends Record(DEFAULTS) {
   toJS() {
     return this.toJSON()
   }
-
 }
 
 /**

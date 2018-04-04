@@ -1,5 +1,5 @@
-
 import Block from './models/block'
+import Change from './models/change'
 import Changes from './changes'
 import Character from './models/character'
 import Data from './models/data'
@@ -9,6 +9,7 @@ import Inline from './models/inline'
 import Leaf from './models/leaf'
 import Mark from './models/mark'
 import Node from './models/node'
+import Operation from './models/operation'
 import Operations from './operations'
 import Range from './models/range'
 import Schema from './models/schema'
@@ -16,6 +17,7 @@ import Stack from './models/stack'
 import Text from './models/text'
 import Value from './models/value'
 import { resetKeyGenerator, setKeyGenerator } from './utils/generate-key'
+import { resetMemoization, useMemoization } from './utils/memoize'
 
 /**
  * Export.
@@ -25,6 +27,7 @@ import { resetKeyGenerator, setKeyGenerator } from './utils/generate-key'
 
 export {
   Block,
+  Change,
   Changes,
   Character,
   Data,
@@ -34,6 +37,7 @@ export {
   Leaf,
   Mark,
   Node,
+  Operation,
   Operations,
   Range,
   Schema,
@@ -42,6 +46,8 @@ export {
   Value,
   resetKeyGenerator,
   setKeyGenerator,
+  resetMemoization,
+  useMemoization,
 }
 
 export default {
@@ -55,6 +61,7 @@ export default {
   Leaf,
   Mark,
   Node,
+  Operation,
   Operations,
   Range,
   Schema,
@@ -63,4 +70,6 @@ export default {
   Value,
   resetKeyGenerator,
   setKeyGenerator,
+  resetMemoization,
+  useMemoization,
 }

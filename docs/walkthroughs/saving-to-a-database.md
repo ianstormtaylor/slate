@@ -1,4 +1,3 @@
-
 <br/>
 <p align="center"><strong>Previous:</strong><br/><a href="./using-plugins.md">Using Plugins</a></p>
 <br/>
@@ -19,27 +18,26 @@ const initialValue = Value.fromJSON({
   document: {
     nodes: [
       {
-        kind: 'block',
+        object: 'block',
         type: 'paragraph',
         nodes: [
           {
-            kind: 'text',
+            object: 'text',
             leaves: [
               {
-                text: 'A line of text in a paragraph.'
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  }
+                text: 'A line of text in a paragraph.',
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
 })
 
 class App extends React.Component {
-
   state = {
-    value: initialValue
+    value: initialValue,
   }
 
   onChange = ({ value }) => {
@@ -47,14 +45,8 @@ class App extends React.Component {
   }
 
   render() {
-    return (
-      <Editor
-        value={this.state.value}
-        onChange={this.onChange}
-      />
-    )
+    return <Editor value={this.state.value} onChange={this.onChange} />
   }
-
 }
 ```
 
@@ -69,27 +61,26 @@ const initialValue = Value.fromJSON({
   document: {
     nodes: [
       {
-        kind: 'block',
+        object: 'block',
         type: 'paragraph',
         nodes: [
           {
-            kind: 'text',
+            object: 'text',
             leaves: [
               {
-                text: 'A line of text in a paragraph.'
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  }
+                text: 'A line of text in a paragraph.',
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
 })
 
 class App extends React.Component {
-
   state = {
-    value: initialValue
+    value: initialValue,
   }
 
   onChange = ({ value }) => {
@@ -101,14 +92,8 @@ class App extends React.Component {
   }
 
   render() {
-    return (
-      <Editor
-        value={this.state.value}
-        onChange={this.onChange}
-      />
-    )
+    return <Editor value={this.state.value} onChange={this.onChange} />
   }
-
 }
 ```
 
@@ -119,31 +104,32 @@ But... if you refresh the page, everything is still reset. That's because we nee
 ```js
 // Update the initial content to be pulled from Local Storage if it exists.
 const existingValue = JSON.parse(localStorage.getItem('content'))
-const initialValue = Value.fromJSON(existingValue || {
-  document: {
-    nodes: [
-      {
-        kind: 'block',
-        type: 'paragraph',
-        nodes: [
-          {
-            kind: 'text',
-            leaves: [
-              {
-                text: 'A line of text in a paragraph.'
-              }
-            ]
-          }
-        ]
-      }
-    ]
+const initialValue = Value.fromJSON(
+  existingValue || {
+    document: {
+      nodes: [
+        {
+          object: 'block',
+          type: 'paragraph',
+          nodes: [
+            {
+              object: 'text',
+              leaves: [
+                {
+                  text: 'A line of text in a paragraph.',
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
   }
-})
+)
 
 class App extends React.Component {
-
   state = {
-    value: initialValue
+    value: initialValue,
   }
 
   onChange = ({ value }) => {
@@ -154,14 +140,8 @@ class App extends React.Component {
   }
 
   render() {
-    return (
-      <Editor
-        value={this.state.value}
-        onChange={this.onChange}
-      />
-    )
+    return <Editor value={this.state.value} onChange={this.onChange} />
   }
-
 }
 ```
 
@@ -171,31 +151,32 @@ However, if you inspect the change handler, you'll notice that it's actually sav
 
 ```js
 const existingValue = JSON.parse(localStorage.getItem('content'))
-const initialValue = Value.fromJSON(existingValue || {
-  document: {
-    nodes: [
-      {
-        kind: 'block',
-        type: 'paragraph',
-        nodes: [
-          {
-            kind: 'text',
-            leaves: [
-              {
-                text: 'A line of text in a paragraph.'
-              }
-            ]
-          }
-        ]
-      }
-    ]
+const initialValue = Value.fromJSON(
+  existingValue || {
+    document: {
+      nodes: [
+        {
+          object: 'block',
+          type: 'paragraph',
+          nodes: [
+            {
+              object: 'text',
+              leaves: [
+                {
+                  text: 'A line of text in a paragraph.',
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
   }
-})
+)
 
 class App extends React.Component {
-
   state = {
-    value: initialValue
+    value: initialValue,
   }
 
   onChange = ({ value }) => {
@@ -209,14 +190,8 @@ class App extends React.Component {
   }
 
   render() {
-    return (
-      <Editor
-        value={this.state.value}
-        onChange={this.onChange}
-      />
-    )
+    return <Editor value={this.state.value} onChange={this.onChange} />
   }
-
 }
 ```
 
@@ -232,12 +207,13 @@ import { Editor } from 'slate-react'
 import Plain from 'slate-plain-serializer'
 
 const existingValue = localStorage.getItem('content')
-const initialValue = Plain.deserialize(existingValue || 'A string of plain text.')
+const initialValue = Plain.deserialize(
+  existingValue || 'A string of plain text.'
+)
 
 class App extends React.Component {
-
   state = {
-    value: initialValue
+    value: initialValue,
   }
 
   onChange = ({ value }) => {
@@ -250,21 +226,14 @@ class App extends React.Component {
   }
 
   render() {
-    return (
-      <Editor
-        value={this.state.value}
-        onChange={this.onChange}
-      />
-    )
+    return <Editor value={this.state.value} onChange={this.onChange} />
   }
-
 }
 ```
 
 That works! Now you're working with plain text.
 
 However, sometimes you may want something a bit more custom, and a bit more complex... good old fashioned HTML. In that case, check out the next guide...
-
 
 <br/>
 <p align="center"><strong>Next:</strong><br/><a href="./saving-and-loading-html-content.md">Saving and Loading HTML Content</a></p>

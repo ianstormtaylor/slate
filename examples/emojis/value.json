@@ -1,20 +1,21 @@
 {
-    "document": {
+  "document": {
     "nodes": [
       {
-        "kind": "block",
+        "object": "block",
         "type": "paragraph",
         "nodes": [
           {
-            "kind": "text",
+            "object": "text",
             "leaves": [
               {
-                "text": "In addition to block nodes, you can create inline void nodes, like "
+                "text":
+                  "In addition to block nodes, you can create inline void nodes, like "
               }
             ]
           },
           {
-            "kind": "inline",
+            "object": "inline",
             "type": "emoji",
             "isVoid": true,
             "data": {
@@ -22,7 +23,7 @@
             }
           },
           {
-            "kind": "text",
+            "object": "text",
             "leaves": [
               {
                 "text": "!"
@@ -32,11 +33,11 @@
         ]
       },
       {
-        "kind": "block",
+        "object": "block",
         "type": "paragraph",
         "nodes": [
           {
-            "kind": "inline",
+            "object": "inline",
             "type": "emoji",
             "isVoid": true,
             "data": {
@@ -46,11 +47,11 @@
         ]
       },
       {
-        "kind": "block",
+        "object": "block",
         "type": "paragraph",
         "nodes": [
           {
-            "kind": "text",
+            "object": "text",
             "leaves": [
               {
                 "text": "This example shows emojis in action."

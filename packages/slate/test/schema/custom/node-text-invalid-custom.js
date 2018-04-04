@@ -1,5 +1,6 @@
 /** @jsx h */
 
+import { NODE_TEXT_INVALID } from 'slate-schema-violations'
 import h from '../../helpers/h'
 
 export const schema = {
@@ -7,20 +8,18 @@ export const schema = {
     paragraph: {
       text: /^\d*$/,
       normalize: (change, reason, { node }) => {
-        if (reason == 'node_text_invalid') {
+        if (reason == NODE_TEXT_INVALID) {
           node.nodes.forEach(n => change.removeNodeByKey(n.key))
         }
-      }
-    }
-  }
+      },
+    },
+  },
 }
 
 export const input = (
   <value>
     <document>
-      <paragraph>
-        invalid
-      </paragraph>
+      <paragraph>invalid</paragraph>
     </document>
   </value>
 )

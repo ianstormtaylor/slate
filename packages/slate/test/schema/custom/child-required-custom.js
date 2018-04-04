@@ -1,21 +1,23 @@
 /** @jsx h */
 
+import { CHILD_REQUIRED } from 'slate-schema-violations'
 import h from '../../helpers/h'
 
 export const schema = {
   blocks: {
     paragraph: {},
     quote: {
-      nodes: [
-        { types: ['paragraph'], min: 2 },
-      ],
+      nodes: [{ types: ['paragraph'], min: 2 }],
       normalize: (change, reason, { node, index }) => {
-        if (reason == 'child_required') {
-          change.insertNodeByKey(node.key, index, { kind: 'block', type: 'paragraph' })
+        if (reason == CHILD_REQUIRED) {
+          change.insertNodeByKey(node.key, index, {
+            object: 'block',
+            type: 'paragraph',
+          })
         }
-      }
-    }
-  }
+      },
+    },
+  },
 }
 
 export const input = (

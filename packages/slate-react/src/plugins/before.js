@@ -1,4 +1,3 @@
-
 import Debug from 'debug'
 import getWindow from 'get-window'
 import { findDOMNode } from 'react-dom'
@@ -8,7 +7,7 @@ import {
   IS_FIREFOX,
   IS_IOS,
   IS_ANDROID,
-  SUPPORTED_EVENTS
+  SUPPORTED_EVENTS,
 } from '../constants/environment'
 import findNode from '../utils/find-node'
 
@@ -117,9 +116,7 @@ function BeforePlugin() {
     // happen on the initialization of the editor, or if the schema changes.
     // This change isn't save into history since only schema is updated.
     if (value.schema != editor.schema) {
-      change
-        .setValue({ schema: editor.schema }, { save: false })
-        .normalize()
+      change.setValue({ schema: editor.schema }, { save: false }).normalize()
     }
 
     debug('onChange')
@@ -139,7 +136,7 @@ function BeforePlugin() {
     // The `count` check here ensures that if another composition starts
     // before the timeout has closed out this one, we will abort unsetting the
     // `isComposing` flag, since a composition is still in affect.
-    setTimeout(() => {
+    window.requestAnimationFrame(() => {
       if (compositionCount > n) return
       isComposing = false
 
@@ -183,7 +180,7 @@ function BeforePlugin() {
   function onCopy(event, change, editor) {
     const window = getWindow(event.target)
     isCopying = true
-    window.requestAnimationFrame(() => isCopying = false)
+    window.requestAnimationFrame(() => (isCopying = false))
 
     debug('onCopy', { event })
   }
@@ -201,7 +198,7 @@ function BeforePlugin() {
 
     const window = getWindow(event.target)
     isCopying = true
-    window.requestAnimationFrame(() => isCopying = false)
+    window.requestAnimationFrame(() => (isCopying = false))
 
     debug('onCut', { event })
   }
@@ -304,9 +301,6 @@ function BeforePlugin() {
    */
 
   function onDrop(event, change, editor) {
-    // Stop propagation so the event isn't visible to parent editors.
-    event.stopPropagation()
-
     // Nothing happens in read-only mode.
     if (editor.props.readOnly) return true
 
@@ -381,7 +375,7 @@ function BeforePlugin() {
 
     // Certain hotkeys have native behavior in contenteditable elements which
     // will cause our value to be out of sync, so prevent them.
-    if (HOTKEYS.CONTENTEDITABLE(event)) {
+    if (HOTKEYS.CONTENTEDITABLE(event) && !IS_IOS) {
       event.preventDefault()
     }
 

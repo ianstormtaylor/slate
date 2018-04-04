@@ -1,4 +1,3 @@
-
 /** @jsx h */
 
 import h from '../helpers/h'
@@ -8,20 +7,20 @@ export const config = {
     {
       deserialize(el, next) {
         return {
-          kind: 'block',
+          object: 'block',
           type: 'paragraph',
         }
-      }
+      },
     },
     {
       deserialize(el, next) {
         return {
-          kind: 'block',
+          object: 'block',
           type: 'quote',
         }
-      }
+      },
     },
-  ]
+  ],
 }
 
 export const input = `

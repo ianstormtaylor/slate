@@ -1,4 +1,3 @@
-
 import getWindow from 'get-window'
 
 import { Range } from 'slate'
@@ -30,9 +29,10 @@ function getEventRange(event, value) {
   // closest to.
   if (node.isVoid) {
     const rect = target.getBoundingClientRect()
-    const isPrevious = node.kind == 'inline'
-      ? x - rect.left < rect.left + rect.width - x
-      : y - rect.top < rect.top + rect.height - y
+    const isPrevious =
+      node.object == 'inline'
+        ? x - rect.left < rect.left + rect.width - x
+        : y - rect.top < rect.top + rect.height - y
 
     const text = node.getFirstText()
     const range = Range.create()

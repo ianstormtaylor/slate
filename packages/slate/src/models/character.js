@@ -1,5 +1,5 @@
-
 import isPlainObject from 'is-plain-object'
+import logger from 'slate-dev-logger'
 import { List, Record, Set } from 'immutable'
 
 import MODEL_TYPES from '../constants/model-types'
@@ -22,7 +22,6 @@ const DEFAULTS = {
  */
 
 class Character extends Record(DEFAULTS) {
-
   /**
    * Create a `Character` with `attrs`.
    *
@@ -43,7 +42,9 @@ class Character extends Record(DEFAULTS) {
       return Character.fromJSON(attrs)
     }
 
-    throw new Error(`\`Character.create\` only accepts objects, strings or characters, but you passed it: ${attrs}`)
+    throw new Error(
+      `\`Character.create\` only accepts objects, strings or characters, but you passed it: ${attrs}`
+    )
   }
 
   /**
@@ -63,7 +64,9 @@ class Character extends Record(DEFAULTS) {
       return list
     }
 
-    throw new Error(`\`Block.createList\` only accepts strings, arrays or lists, but you passed it: ${elements}`)
+    throw new Error(
+      `\`Block.createList\` only accepts strings, arrays or lists, but you passed it: ${elements}`
+    )
   }
 
   /**
@@ -74,10 +77,7 @@ class Character extends Record(DEFAULTS) {
    */
 
   static fromJSON(object) {
-    const {
-      text,
-      marks = [],
-    } = object
+    const { text, marks = [] } = object
 
     if (typeof text != 'string') {
       throw new Error('`Character.fromJSON` requires a block `text` string.')
@@ -120,13 +120,21 @@ class Character extends Record(DEFAULTS) {
   }
 
   /**
-   * Get the kind.
+   * Object.
    *
    * @return {String}
    */
 
-  get kind() {
+  get object() {
     return 'character'
+  }
+
+  get kind() {
+    logger.deprecate(
+      'slate@0.32.0',
+      'The `kind` property of Slate objects has been renamed to `object`.'
+    )
+    return this.object
   }
 
   /**
@@ -137,7 +145,7 @@ class Character extends Record(DEFAULTS) {
 
   toJSON() {
     const object = {
-      kind: this.kind,
+      object: this.object,
       text: this.text,
       marks: this.marks.toArray().map(m => m.toJSON()),
     }
@@ -152,7 +160,6 @@ class Character extends Record(DEFAULTS) {
   toJS() {
     return this.toJSON()
   }
-
 }
 
 /**

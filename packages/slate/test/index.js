@@ -1,10 +1,3 @@
-
-/**
- * Polyfills.
- */
-
-import 'babel-polyfill' // eslint-disable-line import/no-extraneous-dependencies
-
 /**
  * Dependencies.
  */
@@ -20,6 +13,8 @@ describe('slate', () => {
   require('./schema')
   require('./changes')
   require('./history')
+  require('./operations')
+  require('./models')
 })
 
 /**

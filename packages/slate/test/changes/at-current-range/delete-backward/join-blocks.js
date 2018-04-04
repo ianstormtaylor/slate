@@ -2,16 +2,14 @@
 
 import h from '../../../helpers/h'
 
-export default function (change) {
+export default function(change) {
   change.deleteBackward()
 }
 
 export const input = (
   <value>
     <document>
-      <paragraph>
-        word
-      </paragraph>
+      <paragraph>word</paragraph>
       <paragraph>
         <cursor />another
       </paragraph>

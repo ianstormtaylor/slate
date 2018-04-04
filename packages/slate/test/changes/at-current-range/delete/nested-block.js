@@ -2,7 +2,7 @@
 
 import h from '../../../helpers/h'
 
-export default function (change) {
+export default function(change) {
   change.delete()
 }
 
@@ -13,9 +13,7 @@ export const input = (
         wo<anchor />rd
       </paragraph>
       <paragraph>
-        <paragraph>
-          middle
-        </paragraph>
+        <paragraph>middle</paragraph>
         <paragraph>
           an<focus />other
         </paragraph>

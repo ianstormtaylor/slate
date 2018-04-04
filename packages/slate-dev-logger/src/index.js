@@ -6,11 +6,10 @@
  * @type {Boolean}
  */
 
-const IS_DEV = (
+const IS_DEV =
   typeof process !== 'undefined' &&
   process.env &&
   process.env.NODE_ENV !== 'production'
-)
 
 /**
  * Has console?
@@ -18,12 +17,11 @@ const IS_DEV = (
  * @type {Boolean}
  */
 
-const HAS_CONSOLE = (
+const HAS_CONSOLE =
   typeof console != 'undefined' &&
   typeof console.log == 'function' &&
   typeof console.warn == 'function' &&
   typeof console.error == 'function'
-)
 
 /**
  * Log a `message` at `level`.
@@ -49,7 +47,6 @@ function log(level, message, ...args) {
  * @param {String} message
  * @param {Any} ...args
  */
-
 
 function error(message, ...args) {
   if (HAS_CONSOLE) {

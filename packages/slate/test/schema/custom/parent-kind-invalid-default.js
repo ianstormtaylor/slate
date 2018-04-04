@@ -5,16 +5,18 @@ import h from '../../helpers/h'
 export const schema = {
   inlines: {
     link: {
-      parent: { kinds: ['block'] },
-    }
-  }
+      parent: { objects: ['block'] },
+    },
+  },
 }
 
 export const input = (
   <value>
     <document>
       <paragraph>
-        <link><link>one</link></link>
+        <link>
+          <link>one</link>
+        </link>
       </paragraph>
     </document>
   </value>

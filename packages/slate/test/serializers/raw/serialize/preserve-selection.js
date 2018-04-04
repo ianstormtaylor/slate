@@ -5,41 +5,39 @@ import h from '../../../helpers/h'
 export const input = (
   <value>
     <document>
-      <paragraph>
-        one
-      </paragraph>
+      <paragraph>one</paragraph>
     </document>
   </value>
 )
 
 export const output = {
-  kind: 'value',
+  object: 'value',
   document: {
-    kind: 'document',
+    object: 'document',
     data: {},
     nodes: [
       {
-        kind: 'block',
+        object: 'block',
         type: 'paragraph',
         data: {},
         isVoid: false,
         nodes: [
           {
-            kind: 'text',
+            object: 'text',
             leaves: [
               {
                 text: 'one',
-                kind: 'leaf',
-                marks: []
-              }
-            ]
-          }
-        ]
-      }
-    ]
+                object: 'leaf',
+                marks: [],
+              },
+            ],
+          },
+        ],
+      },
+    ],
   },
   selection: {
-    kind: 'range',
+    object: 'range',
     anchorPath: [0, 0],
     anchorOffset: 0,
     focusPath: [0, 0],
@@ -47,7 +45,7 @@ export const output = {
     isBackward: false,
     isFocused: false,
     marks: null,
-  }
+  },
 }
 
 export const options = {

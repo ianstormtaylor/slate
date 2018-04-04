@@ -1,4 +1,3 @@
-
 <br/>
 <p align="center"><strong>Previous:</strong><br/><a href="./installing-slate.md">Installing Slate</a></p>
 <br/>
@@ -15,9 +14,8 @@ So we start with our app from earlier:
 
 ```js
 class App extends React.Component {
-
   state = {
-    value: initialValue
+    value: initialValue,
   }
 
   onChange = ({ value }) => {
@@ -25,14 +23,8 @@ class App extends React.Component {
   }
 
   render() {
-    return (
-      <Editor
-        value={this.state.value}
-        onChange={this.onChange}
-      />
-    )
+    return <Editor value={this.state.value} onChange={this.onChange} />
   }
-
 }
 ```
 
@@ -40,9 +32,8 @@ And now we'll add an `onKeyDown` handler:
 
 ```js
 class App extends React.Component {
-
   state = {
-    value: initialValue
+    value: initialValue,
   }
 
   onChange = ({ value }) => {
@@ -63,7 +54,6 @@ class App extends React.Component {
       />
     )
   }
-
 }
 ```
 
@@ -75,9 +65,8 @@ Our `onKeyDown` handler might look like this:
 
 ```js
 class App extends React.Component {
-
   state = {
-    value: initialValue
+    value: initialValue,
   }
 
   onChange = ({ value }) => {
@@ -105,7 +94,6 @@ class App extends React.Component {
       />
     )
   }
-
 }
 ```
 

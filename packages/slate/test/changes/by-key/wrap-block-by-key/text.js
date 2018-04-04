@@ -2,7 +2,7 @@
 
 import h from '../../../helpers/h'
 
-export default function (change) {
+export default function(change) {
   change.wrapBlockByKey('a', 'quote')
 }
 
@@ -20,9 +20,7 @@ export const output = (
   <value>
     <document>
       <paragraph>
-        <quote>
-          word
-        </quote>
+        <quote>word</quote>
       </paragraph>
     </document>
   </value>

@@ -1,4 +1,3 @@
-
 import getWindow from 'get-window'
 
 import OffsetKey from './offset-key'
@@ -9,6 +8,8 @@ import OffsetKey from './offset-key'
  * @type {String}
  */
 
+export const ZERO_WIDTH_ATTRIBUTE = 'data-slate-zero-width'
+export const ZERO_WIDTH_SELECTOR = `[${ZERO_WIDTH_ATTRIBUTE}]`
 const OFFSET_KEY_ATTRIBUTE = 'data-offset-key'
 const RANGE_SELECTOR = `[${OFFSET_KEY_ATTRIBUTE}]`
 const TEXT_SELECTOR = `[data-key]`
@@ -24,10 +25,10 @@ const VOID_SELECTOR = '[data-slate-void]'
  */
 
 function findPoint(nativeNode, nativeOffset, value) {
-  const {
-    node: nearestNode,
-    offset: nearestOffset,
-  } = normalizeNodeAndOffset(nativeNode, nativeOffset)
+  const { node: nearestNode, offset: nearestOffset } = normalizeNodeAndOffset(
+    nativeNode,
+    nativeOffset
+  )
 
   const window = getWindow(nativeNode)
   const { parentNode } = nearestNode
@@ -44,14 +45,13 @@ function findPoint(nativeNode, nativeOffset, value) {
     range.setEnd(nearestNode, nearestOffset)
     node = textNode
     offset = range.toString().length
-  }
-
-  // For void nodes, the element with the offset key will be a cousin, not an
-  // ancestor, so find it by going down from the nearest void parent.
-  else {
+  } else {
+    // For void nodes, the element with the offset key will be a cousin, not an
+    // ancestor, so find it by going down from the nearest void parent.
     const voidNode = parentNode.closest(VOID_SELECTOR)
     if (!voidNode) return null
     rangeNode = voidNode.querySelector(RANGE_SELECTOR)
+    if (!rangeNode) return null
     node = rangeNode
     offset = node.textContent.length
   }
@@ -62,7 +62,7 @@ function findPoint(nativeNode, nativeOffset, value) {
   // from the offset to account for the zero-width space character.
   if (
     offset == node.textContent.length &&
-    parentNode.hasAttribute('data-slate-zero-width')
+    parentNode.hasAttribute(ZERO_WIDTH_ATTRIBUTE)
   ) {
     offset--
   }
@@ -137,7 +137,7 @@ function getEditableChild(parent, index, direction) {
   // While the child is a comment node, or an element node with no children,
   // keep iterating to find a sibling non-void, non-comment node.
   while (
-    (child.nodeType == 8) ||
+    child.nodeType == 8 ||
     (child.nodeType == 1 && child.childNodes.length == 0) ||
     (child.nodeType == 1 && child.getAttribute('contenteditable') == 'false')
   ) {

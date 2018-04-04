@@ -1,5 +1,5 @@
-
 import isPlainObject from 'is-plain-object'
+import logger from 'slate-dev-logger'
 import { Map, Record, Set } from 'immutable'
 
 import MODEL_TYPES from '../constants/model-types'
@@ -24,7 +24,6 @@ const DEFAULTS = {
  */
 
 class Mark extends Record(DEFAULTS) {
-
   /**
    * Create a new `Mark` with `attrs`.
    *
@@ -45,7 +44,9 @@ class Mark extends Record(DEFAULTS) {
       return Mark.fromJSON(attrs)
     }
 
-    throw new Error(`\`Mark.create\` only accepts objects, strings or marks, but you passed it: ${attrs}`)
+    throw new Error(
+      `\`Mark.create\` only accepts objects, strings or marks, but you passed it: ${attrs}`
+    )
   }
 
   /**
@@ -65,7 +66,9 @@ class Mark extends Record(DEFAULTS) {
       return new Set()
     }
 
-    throw new Error(`\`Mark.createSet\` only accepts sets, arrays or null, but you passed it: ${elements}`)
+    throw new Error(
+      `\`Mark.createSet\` only accepts sets, arrays or null, but you passed it: ${elements}`
+    )
   }
 
   /**
@@ -94,7 +97,9 @@ class Mark extends Record(DEFAULTS) {
       return props
     }
 
-    throw new Error(`\`Mark.createProperties\` only accepts objects, strings or marks, but you passed it: ${attrs}`)
+    throw new Error(
+      `\`Mark.createProperties\` only accepts objects, strings or marks, but you passed it: ${attrs}`
+    )
   }
 
   /**
@@ -105,10 +110,7 @@ class Mark extends Record(DEFAULTS) {
    */
 
   static fromJSON(object) {
-    const {
-      data = {},
-      type,
-    } = object
+    const { data = {}, type } = object
 
     if (typeof type != 'string') {
       throw new Error('`Mark.fromJS` requires a `type` string.')
@@ -151,11 +153,19 @@ class Mark extends Record(DEFAULTS) {
   }
 
   /**
-   * Get the kind.
+   * Object.
    */
 
-  get kind() {
+  get object() {
     return 'mark'
+  }
+
+  get kind() {
+    logger.deprecate(
+      'slate@0.32.0',
+      'The `kind` property of Slate objects has been renamed to `object`.'
+    )
+    return this.object
   }
 
   /**
@@ -177,7 +187,7 @@ class Mark extends Record(DEFAULTS) {
 
   toJSON() {
     const object = {
-      kind: this.kind,
+      object: this.object,
       type: this.type,
       data: this.data.toJSON(),
     }
@@ -192,7 +202,6 @@ class Mark extends Record(DEFAULTS) {
   toJS() {
     return this.toJSON()
   }
-
 }
 
 /**
@@ -205,11 +214,7 @@ Mark.prototype[MODEL_TYPES.MARK] = true
  * Memoize read methods.
  */
 
-memoize(Mark.prototype, [
-  'getComponent',
-], {
-  takesArguments: true,
-})
+memoize(Mark.prototype, ['getComponent'])
 
 /**
  * Export.

@@ -2,7 +2,7 @@
 
 import h from '../../../helpers/h'
 
-export default function (change) {
+export default function(change) {
   change.insertBlock('quote')
 }
 
@@ -10,11 +10,9 @@ export const input = (
   <value>
     <document>
       <image>
-        {' '}<cursor />
+        text<cursor />
       </image>
-      <paragraph>
-        text
-      </paragraph>
+      <paragraph>text</paragraph>
     </document>
   </value>
 )
@@ -22,13 +20,11 @@ export const input = (
 export const output = (
   <value>
     <document>
-      <image />
+      <image>text</image>
       <quote>
         <cursor />
       </quote>
-      <paragraph>
-        text
-      </paragraph>
+      <paragraph>text</paragraph>
     </document>
   </value>
 )

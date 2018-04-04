@@ -1,4 +1,3 @@
-
 import { Stack } from 'slate'
 
 /**
@@ -26,7 +25,6 @@ const EVENT_HANDLERS = [
  */
 
 class Simulator {
-
   /**
    * Create a new `Simulator` with `plugins` and an initial `value`.
    *
@@ -40,17 +38,16 @@ class Simulator {
     this.stack = stack
     this.value = value
   }
-
 }
 
 /**
  * Generate the event simulators.
  */
 
-EVENT_HANDLERS.forEach((handler) => {
+EVENT_HANDLERS.forEach(handler => {
   const method = getMethodName(handler)
 
-  Simulator.prototype[method] = function (e) {
+  Simulator.prototype[method] = function(e) {
     if (e == null) e = {}
 
     const { stack, value } = this
@@ -58,7 +55,7 @@ EVENT_HANDLERS.forEach((handler) => {
     const event = createEvent(e)
     const change = value.change()
 
-    stack.run(handler, change, editor, event)
+    stack.run(handler, event, change, editor)
     stack.run('onChange', change, editor)
 
     this.value = change.value
@@ -95,7 +92,6 @@ function createEditor({ stack, value, props }) {
       readOnly: false,
       spellCheck: true,
       ...props,
-
     },
   }
 
@@ -111,8 +107,8 @@ function createEditor({ stack, value, props }) {
 
 function createEvent(attributes) {
   const event = {
-    preventDefault: () => event.isDefaultPrevented = true,
-    stopPropagation: () => event.isPropagationStopped = true,
+    preventDefault: () => (event.isDefaultPrevented = true),
+    stopPropagation: () => (event.isPropagationStopped = true),
     isDefaultPrevented: false,
     isPropagationStopped: false,
     ...attributes,

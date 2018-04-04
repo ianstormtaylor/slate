@@ -1,4 +1,3 @@
-
 import Debug from 'debug'
 import ImmutableTypes from 'react-immutable-proptypes'
 import React from 'react'
@@ -24,7 +23,6 @@ const debug = Debug('slate:node')
  */
 
 class Node extends React.Component {
-
   /**
    * Property types.
    *
@@ -62,10 +60,14 @@ class Node extends React.Component {
    * @return {Boolean}
    */
 
-  shouldComponentUpdate = (nextProps) => {
+  shouldComponentUpdate = nextProps => {
     const { props } = this
     const { stack } = props.editor
-    const shouldUpdate = stack.find('shouldNodeComponentUpdate', props, nextProps)
+    const shouldUpdate = stack.find(
+      'shouldNodeComponentUpdate',
+      props,
+      nextProps
+    )
     const n = nextProps
     const p = props
 
@@ -78,7 +80,9 @@ class Node extends React.Component {
       }
 
       if (shouldUpdate === false) {
-        logger.warn('Returning false in `shouldNodeComponentUpdate` does not disable Slate\'s internal `shouldComponentUpdate` logic. If you want to prevent updates, use React\'s `shouldComponentUpdate` instead.')
+        logger.warn(
+          "Returning false in `shouldNodeComponentUpdate` does not disable Slate's internal `shouldComponentUpdate` logic. If you want to prevent updates, use React's `shouldComponentUpdate` instead."
+        )
       }
     }
 
@@ -131,7 +135,7 @@ class Node extends React.Component {
 
     // If it's a block node with inline children, add the proper `dir` attribute
     // for text direction.
-    if (node.kind == 'block' && node.nodes.first().kind != 'block') {
+    if (node.object == 'block' && node.nodes.first().object != 'block') {
       const direction = node.getTextDirection()
       if (direction == 'rtl') attributes.dir = 'rtl'
     }
@@ -148,15 +152,19 @@ class Node extends React.Component {
     let placeholder = stack.find('renderPlaceholder', props)
 
     if (placeholder) {
-      placeholder = React.cloneElement(placeholder, { key: `${node.key}-placeholder` })
+      placeholder = React.cloneElement(placeholder, {
+        key: `${node.key}-placeholder`,
+      })
       children = [placeholder, ...children]
     }
 
-    const element = stack.find('renderNode', { ...props, attributes, children })
+    const element = stack.find('renderNode', {
+      ...props,
+      attributes,
+      children,
+    })
 
-    return node.isVoid
-      ? <Void {...this.props}>{element}</Void>
-      : element
+    return node.isVoid ? <Void {...this.props}>{element}</Void> : element
   }
 
   /**
@@ -170,11 +178,11 @@ class Node extends React.Component {
   renderNode = (child, isSelected) => {
     const { block, decorations, editor, node, readOnly } = this.props
     const { stack } = editor
-    const Component = child.kind == 'text' ? Text : Node
+    const Component = child.object == 'text' ? Text : Node
     const decs = decorations.concat(node.getDecorations(stack))
     return (
       <Component
-        block={node.kind == 'block' ? node : block}
+        block={node.object == 'block' ? node : block}
         decorations={decs}
         editor={editor}
         isSelected={isSelected}
@@ -185,7 +193,6 @@ class Node extends React.Component {
       />
     )
   }
-
 }
 
 /**

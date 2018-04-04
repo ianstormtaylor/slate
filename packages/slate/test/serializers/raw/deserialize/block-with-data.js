@@ -3,41 +3,39 @@
 import h from '../../../helpers/h'
 
 export const input = {
-  kind: 'value',
+  object: 'value',
   document: {
-    kind: 'document',
+    object: 'document',
     data: {},
     nodes: [
       {
-        kind: 'block',
+        object: 'block',
         type: 'paragraph',
         isVoid: false,
         data: {
-          thing: 'value'
+          thing: 'value',
         },
         nodes: [
           {
-            kind: 'text',
+            object: 'text',
             leaves: [
               {
-                kind: 'leaf',
+                object: 'leaf',
                 text: 'one',
-                marks: []
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  }
+                marks: [],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
 }
 
 export const output = (
   <value>
     <document>
-      <paragraph thing="value">
-        one
-      </paragraph>
+      <paragraph thing="value">one</paragraph>
     </document>
   </value>
 )

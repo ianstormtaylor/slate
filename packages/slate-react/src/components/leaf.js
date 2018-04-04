@@ -1,4 +1,3 @@
-
 import Debug from 'debug'
 import React from 'react'
 import Types from 'prop-types'
@@ -21,7 +20,6 @@ const debug = Debug('slate:leaves')
  */
 
 class Leaf extends React.Component {
-
   /**
    * Property types.
    *
@@ -85,14 +83,10 @@ class Leaf extends React.Component {
     const { node, index } = this.props
     const offsetKey = OffsetKey.stringify({
       key: node.key,
-      index
+      index,
     })
 
-    return (
-      <span data-offset-key={offsetKey}>
-        {this.renderMarks()}
-      </span>
-    )
+    return <span data-offset-key={offsetKey}>{this.renderMarks()}</span>
   }
 
   /**
@@ -120,25 +114,44 @@ class Leaf extends React.Component {
    */
 
   renderText() {
-    const { block, node, text, index, leaves } = this.props
+    const { block, node, parent, text, index, leaves } = this.props
 
-    // COMPAT: If the text is empty otherwise, it's because it's on the edge of
-    // an inline void node, so we render a zero-width space so that the
-    // selection can be inserted next to it still.
-    if (text == '') return <span data-slate-zero-width>{'\u200B'}</span>
+    // COMPAT: Render text inside void nodes with a zero-width space.
+    // So the node can contain selection but the text is not visible.
+    if (parent.isVoid) {
+      return <span data-slate-zero-width="z">{'\u200B'}</span>
+    }
+
+    // COMPAT: If this is the last text node in an empty block, render a zero-
+    // width space that will convert into a line break when copying and pasting
+    // to support expected plain text.
+    if (
+      text === '' &&
+      parent.object === 'block' &&
+      parent.text === '' &&
+      parent.nodes.size === 1
+    ) {
+      return <span data-slate-zero-width="n">{'\u200B'}</span>
+    }
+
+    // COMPAT: If the text is empty, it's because it's on the edge of an inline
+    // void node, so we render a zero-width space so that the selection can be
+    // inserted next to it still.
+    if (text === '') {
+      return <span data-slate-zero-width="z">{'\u200B'}</span>
+    }
 
     // COMPAT: Browsers will collapse trailing new lines at the end of blocks,
     // so we need to add an extra trailing new lines to prevent that.
     const lastText = block.getLastText()
     const lastChar = text.charAt(text.length - 1)
-    const isLastText = node == lastText
-    const isLastLeaf = index == leaves.size - 1
-    if (isLastText && isLastLeaf && lastChar == '\n') return `${text}\n`
+    const isLastText = node === lastText
+    const isLastLeaf = index === leaves.size - 1
+    if (isLastText && isLastLeaf && lastChar === '\n') return `${text}\n`
 
     // Otherwise, just return the text.
     return text
   }
-
 }
 
 /**

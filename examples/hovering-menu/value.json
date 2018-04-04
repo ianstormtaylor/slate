@@ -2,14 +2,15 @@
   "document": {
     "nodes": [
       {
-        "kind": "block",
+        "object": "block",
         "type": "paragraph",
         "nodes": [
           {
-            "kind": "text",
+            "object": "text",
             "leaves": [
               {
-                "text": "This example shows how you can make a hovering menu appear above your content, which you can use to make text "
+                "text":
+                  "This example shows how you can make a hovering menu appear above your content, which you can use to make text "
               },
               {
                 "text": "bold",
@@ -38,11 +39,11 @@
         ]
       },
       {
-        "kind": "block",
+        "object": "block",
         "type": "paragraph",
         "nodes": [
           {
-            "kind": "text",
+            "object": "text",
             "leaves": [
               {
                 "text": "Try it out yourself! Just "
