@@ -4,25 +4,20 @@ import h from '../'
 import assert from 'assert'
 import { Value, Document, Block, Text } from 'slate'
 
-
 describe('slate-hyperscript', () => {
   it('should create a document with a single block', () => {
     const output = (
-        <document>
-            <block type="paragraph">
-                Single block
-            </block>
-        </document>
+      <document>
+        <block type="paragraph">Single block</block>
+      </document>
     )
     const expected = Document.create({
       nodes: [
         Block.create({
           type: 'paragraph',
-          nodes: [
-            Text.create('Single block')
-          ]
-        })
-      ]
+          nodes: [Text.create('Single block')],
+        }),
+      ],
     })
 
     assert.deepEqual(output.toJSON(), expected.toJSON())
@@ -32,12 +27,8 @@ describe('slate-hyperscript', () => {
     const output = (
       <value>
         <document>
-          <block type="paragraph">
-            Valid block
-          </block>
-          <text>
-            Invalid text
-          </text>
+          <block type="paragraph">Valid block</block>
+          <text>Invalid text</text>
         </document>
       </value>
     )
@@ -46,12 +37,10 @@ describe('slate-hyperscript', () => {
         nodes: [
           Block.create({
             type: 'paragraph',
-            nodes: [
-              Text.create('Valid block')
-            ]
-          })
-        ]
-      })
+            nodes: [Text.create('Valid block')],
+          }),
+        ],
+      }),
     })
 
     assert.deepEqual(output.toJSON(), expected.toJSON())
@@ -61,28 +50,25 @@ describe('slate-hyperscript', () => {
     const output = (
       <value normalize={false}>
         <document>
-          <block type="paragraph">
-            Valid block
-          </block>
-          <text>
-            Invalid text
-          </text>
+          <block type="paragraph">Valid block</block>
+          <text>Invalid text</text>
         </document>
       </value>
     )
-    const expected = Value.fromJSON({
-      document: Document.create({
-        nodes: [
-          Block.create({
-            type: 'paragraph',
-            nodes: [
-              Text.create('Valid block')
-            ]
-          }),
-          Text.create('Invalid text')
-        ]
-      })
-    }, { normalize: false })
+    const expected = Value.fromJSON(
+      {
+        document: Document.create({
+          nodes: [
+            Block.create({
+              type: 'paragraph',
+              nodes: [Text.create('Valid block')],
+            }),
+            Text.create('Invalid text'),
+          ],
+        }),
+      },
+      { normalize: false }
+    )
 
     assert.deepEqual(output.toJSON(), expected.toJSON())
   })
