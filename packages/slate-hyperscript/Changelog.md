@@ -4,7 +4,7 @@ This document maintains a list of changes to the `slate-hyperscript` package wit
 
 ---
 
-### `0.5.11`
+### Unreleased
 
 - Accept `normalize` option for `<value>` tag. This allows to write
   invalid values, on purpose, for example to test validation logic.
