@@ -13,7 +13,7 @@ export const input = (
 export const output = {
   object: 'value',
   document: {
-    kind: 'document',
+    object: 'document',
     key: '3',
     data: {},
     nodes: [
