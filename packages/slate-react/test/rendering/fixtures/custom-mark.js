@@ -33,7 +33,7 @@ export const output = `
   <div style="position:relative">
     <span>
       <span>one</span>
-      <span><strong data-text="true">two</strong></span>
+      <span><strong data-slate-leaf="true">two</strong></span>
       <span>three</span>
     </span>
   </div>

@@ -45,7 +45,7 @@ export const output = `
   <div style="position:relative">
     <span>
       <span>o</span>
-      <span><strong data-text="true">n</strong></span>
+      <span><strong data-slate-leaf="true">n</strong></span>
       <span>e</span>
     </span>
   </div>
