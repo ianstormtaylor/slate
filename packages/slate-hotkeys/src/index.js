@@ -15,85 +15,85 @@ const IS_APPLE = IS_IOS || IS_MAC
  * @type {Function}
  */
 
-const bold = isKeyHotkey('mod+b')
-const italic = isKeyHotkey('mod+i')
+const isBold = isKeyHotkey('mod+b')
+const isItalic = isKeyHotkey('mod+i')
 
-const enter = isKeyHotkey('enter')
-const shiftEnter = isKeyHotkey('shift+enter')
-const splitBlock = e => enter(e) || shiftEnter(e)
+const isEnter = isKeyHotkey('enter')
+const isShiftEnter = isKeyHotkey('shift+enter')
+const isSplitBlock = e => isEnter(e) || isShiftEnter(e)
 
-const backspace = isKeyHotkey('backspace')
-const shiftBackspace = isKeyHotkey('shift+backspace')
-const del = isKeyHotkey('delete')
-const shiftDel = isKeyHotkey('shift+delete')
-const deleteBackward = e => backspace(e) || shiftBackspace(e)
-const deleteForward = e => del(e) || shiftDel(e)
+const isBackspace = isKeyHotkey('backspace')
+const isShiftBackspace = isKeyHotkey('shift+backspace')
+const isDelete = isKeyHotkey('delete')
+const isShiftDelete = isKeyHotkey('shift+delete')
+const isDeleteBackward = e => isBackspace(e) || isShiftBackspace(e)
+const isDeleteForward = e => isDelete(e) || isShiftDelete(e)
 
-const deleteCharBackwardMac = isKeyHotkey('ctrl+h')
-const deleteCharForwardMac = isKeyHotkey('ctrl+d')
-const deleteCharBackward = e =>
-  deleteBackward(e) || (IS_APPLE && deleteCharBackwardMac(e))
-const deleteCharForward = e =>
-  deleteForward(e) || (IS_APPLE && deleteCharForwardMac(e))
+const isDeleteCharBackwardMac = isKeyHotkey('ctrl+h')
+const isDeleteCharForwardMac = isKeyHotkey('ctrl+d')
+const isDeleteCharBackward = e =>
+  isDeleteBackward(e) || (IS_APPLE && isDeleteCharBackwardMac(e))
+const isDeleteCharForward = e =>
+  isDeleteForward(e) || (IS_APPLE && isDeleteCharForwardMac(e))
 
-const deleteLineBackwardMac = e =>
+const isDeleteLineBackwardMac = e =>
   isKeyHotkey('cmd+shift+backspace', e) || isKeyHotkey('cmd+backspace', e)
-const deleteLineForwardMac = isKeyHotkey('ctrl+k')
-const deleteLineBackward = e => IS_APPLE && deleteLineBackwardMac(e)
-const deleteLineForward = e => IS_APPLE && deleteLineForwardMac(e)
+const isDeleteLineForwardMac = isKeyHotkey('ctrl+k')
+const isDeleteLineBackward = e => IS_APPLE && isDeleteLineBackwardMac(e)
+const isDeleteLineForward = e => IS_APPLE && isDeleteLineForwardMac(e)
 
-const deleteWordBackwardMac = e =>
+const isDeleteWordBackwardMac = e =>
   isKeyHotkey('shift+option+backspace', e) || isKeyHotkey('option+backspace', e)
-const deleteWordBackwardPC = isKeyHotkey('ctrl+backspace')
-const deleteWordForwardMac = e =>
+const isDeleteWordBackwardPC = isKeyHotkey('ctrl+backspace')
+const isDeleteWordForwardMac = e =>
   isKeyHotkey('shift+option+delete', e) || isKeyHotkey('option+delete', e)
-const deleteWordForwardPC = isKeyHotkey('ctrl+delete')
-const deleteWordBackward = e =>
-  IS_APPLE ? deleteWordBackwardMac(e) : deleteWordBackwardPC(e)
-const deleteWordForward = e =>
-  IS_APPLE ? deleteWordForwardMac(e) : deleteWordForwardPC(e)
+const isDeleteWordForwardPC = isKeyHotkey('ctrl+delete')
+const isDeleteWordBackward = e =>
+  IS_APPLE ? isDeleteWordBackwardMac(e) : isDeleteWordBackwardPC(e)
+const isDeleteWordForward = e =>
+  IS_APPLE ? isDeleteWordForwardMac(e) : isDeleteWordForwardPC(e)
 
-const extendCharForward = isKeyHotkey('shift+right')
-const extendCharBackward = isKeyHotkey('shift+left')
+const isExtendCharForward = isKeyHotkey('shift+right')
+const isExtendCharBackward = isKeyHotkey('shift+left')
 
-const rightArrow = isKeyHotkey('right')
-const leftArrow = isKeyHotkey('left')
-const collapseCharForward = e => rightArrow(e) && !extendCharForward(e)
-const collapseCharBackward = e => leftArrow(e) && !extendCharBackward(e)
+const isRightArrow = isKeyHotkey('right')
+const isLeftArrow = isKeyHotkey('left')
+const isCollapseCharForward = e => isRightArrow(e) && !isExtendCharForward(e)
+const isCollapseCharBackward = e => isLeftArrow(e) && !isExtendCharBackward(e)
 
-const collapseLineBackwardMac = isKeyHotkey('option+up')
-const collapseLineForwardMac = isKeyHotkey('option+down')
-const collapseLineBackward = e => IS_APPLE && collapseLineBackwardMac(e)
-const collapseLineForward = e => IS_APPLE && collapseLineForwardMac(e)
+const isCollapseLineBackwardMac = isKeyHotkey('option+up')
+const isCollapseLineForwardMac = isKeyHotkey('option+down')
+const isCollapseLineBackward = e => IS_APPLE && isCollapseLineBackwardMac(e)
+const isCollapseLineForward = e => IS_APPLE && isCollapseLineForwardMac(e)
 
-const extendLineBackwardMac = isKeyHotkey('option+shift+up')
-const extendLineForwardMac = isKeyHotkey('option+shift+down')
-const extendLineBackward = e => IS_APPLE && extendLineBackwardMac(e)
-const extendLineForward = e => IS_APPLE && extendLineForwardMac(e)
+const isExtendLineBackwardMac = isKeyHotkey('option+shift+up')
+const isExtendLineForwardMac = isKeyHotkey('option+shift+down')
+const isExtendLineBackward = e => IS_APPLE && isExtendLineBackwardMac(e)
+const isExtendLineForward = e => IS_APPLE && isExtendLineForwardMac(e)
 
-const undo = isKeyHotkey('mod+z')
-const redoMac = isKeyHotkey('mod+shift+z')
-const redoPC = isKeyHotkey('mod+y')
-const redo = e => (IS_APPLE ? redoMac(e) : redoPC(e))
+const isUndo = isKeyHotkey('mod+z')
+const isRedoMac = isKeyHotkey('mod+shift+z')
+const isRedoPC = isKeyHotkey('mod+y')
+const isRedo = e => (IS_APPLE ? isRedoMac(e) : isRedoPC(e))
 
-const transposeCharacterMac = isKeyHotkey('ctrl+t')
-const transposeCharacter = e => IS_APPLE && transposeCharacterMac(e)
+const isTransposeCharacterMac = isKeyHotkey('ctrl+t')
+const isTransposeCharacter = e => IS_APPLE && isTransposeCharacterMac(e)
 
-const contenteditable = e =>
-  bold(e) ||
-  deleteCharBackward(e) ||
-  deleteCharForward(e) ||
-  deleteLineBackward(e) ||
-  deleteLineForward(e) ||
-  deleteWordBackward(e) ||
-  deleteWordForward(e) ||
-  italic(e) ||
-  redo(e) ||
-  splitBlock(e) ||
-  transposeCharacter(e) ||
-  undo(e)
+const isContentEditable = e =>
+  isBold(e) ||
+  isDeleteCharBackward(e) ||
+  isDeleteCharForward(e) ||
+  isDeleteLineBackward(e) ||
+  isDeleteLineForward(e) ||
+  isDeleteWordBackward(e) ||
+  isDeleteWordForward(e) ||
+  isItalic(e) ||
+  isRedo(e) ||
+  isSplitBlock(e) ||
+  isTransposeCharacter(e) ||
+  isUndo(e)
 
-const composing = e =>
+const isComposing = e =>
   e.key == 'ArrowDown' ||
   e.key == 'ArrowLeft' ||
   e.key == 'ArrowRight' ||
@@ -108,25 +108,25 @@ const composing = e =>
  */
 
 export default {
-  bold,
-  collapseCharBackward,
-  collapseCharForward,
-  collapseLineBackward,
-  collapseLineForward,
-  composing,
-  contenteditable,
-  deleteCharBackward,
-  deleteCharForward,
-  deleteLineBackward,
-  deleteLineForward,
-  deleteWordBackward,
-  deleteWordForward,
-  extendCharBackward,
-  extendCharForward,
-  extendLineBackward,
-  extendLineForward,
-  italic,
-  redo,
-  splitBlock,
-  undo,
+  isBold,
+  isCollapseCharBackward,
+  isCollapseCharForward,
+  isCollapseLineBackward,
+  isCollapseLineForward,
+  isComposing,
+  isContentEditable,
+  isDeleteCharBackward,
+  isDeleteCharForward,
+  isDeleteLineBackward,
+  isDeleteLineForward,
+  isDeleteWordBackward,
+  isDeleteWordForward,
+  isExtendCharBackward,
+  isExtendCharForward,
+  isExtendLineBackward,
+  isExtendLineForward,
+  isItalic,
+  isRedo,
+  isSplitBlock,
+  isUndo,
 }
