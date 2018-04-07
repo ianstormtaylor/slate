@@ -1,7 +1,7 @@
 import direction from 'direction'
 import isPlainObject from 'is-plain-object'
 import logger from 'slate-dev-logger'
-import { List, OrderedSet, Set, Map } from 'immutable'
+import { List, OrderedSet, Set, OrderedMap } from 'immutable'
 
 import Block from './block'
 import Data from './data'
@@ -198,7 +198,6 @@ class Node {
     first = assertKey(first)
     second = assertKey(second)
 
-    // TODO optimize getKeysAsArray
     const keys = this.getKeysAsArray()
     const firstIndex = keys.indexOf(first)
     const secondIndex = keys.indexOf(second)
@@ -944,13 +943,9 @@ class Node {
    */
 
   getKeysAsArray() {
-    const keys = []
-
-    this.forEachDescendant(desc => {
-      keys.push(desc.key)
-    })
-
-    return keys
+    return this.getParentMap()
+      .keySeq()
+      .toArray()
   }
 
   /**
@@ -960,7 +955,7 @@ class Node {
    */
 
   getKeys() {
-    const keys = this.getKeysAsArray()
+    const keys = this.getParentMap().keySeq()
     return new Set(keys)
   }
 
@@ -1339,18 +1334,16 @@ class Node {
 
   /**
    * Get the parent map of this node
-   * @return {Map<String, Node>} Map<key, parentNode>
+   * @return {OrderedMap<String, Node>} OrderedMap<key, parentNode>
+   *   the order is the same than the order of forEachDescendant
    */
 
   getParentMap() {
     if (this.object === 'text') {
-      return Map()
+      return OrderedMap()
     }
 
-    return Map().withMutations(map => {
-      if (!this.nodes) {
-        console.log(this.toObject())
-      }
+    return OrderedMap().withMutations(map => {
       this.nodes.forEach(child => {
         map.set(child.key, this)
         if (child.object !== 'text') {
