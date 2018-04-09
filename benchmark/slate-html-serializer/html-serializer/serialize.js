@@ -1,9 +1,9 @@
 /** @jsx h */
 /* eslint-disable react/jsx-key */
 
-import Html from '../..'
+import Html from 'slate-html-serializer'
 import React from 'react'
-import h from '../../test/helpers/h'
+import h from '../../helpers/h'
 import { JSDOM } from 'jsdom' // eslint-disable-line import/no-extraneous-dependencies
 
 const html = new Html({

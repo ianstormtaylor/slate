@@ -1,8 +1,8 @@
 /** @jsx h */
 /* eslint-disable react/jsx-key */
 
-import Plain from '../..'
-import h from '../../test/helpers/h'
+import Plain from 'slate-plain-serializer'
+import h from '../../helpers/h'
 
 export default function(state) {
   Plain.serialize(state)

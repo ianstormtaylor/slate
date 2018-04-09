@@ -1,7 +1,7 @@
 /** @jsx h */
 /* eslint-disable react/jsx-key */
 
-import h from '../../test/helpers/h'
+import h from '../../helpers/h'
 
 export default function(value) {
   value.document.getTexts()

@@ -3,8 +3,8 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom/server'
-import h from '../../test/helpers/h'
-import { Editor } from '../..'
+import h from '../../helpers/h'
+import { Editor } from 'slate-react'
 
 export default function(value) {
   const el = React.createElement(Editor, { value })

@@ -1,7 +1,7 @@
 /** @jsx h */
 /* eslint-disable react/jsx-key */
 
-import Plain from '../..'
+import Plain from 'slate-plain-serializer'
 
 export default function(string) {
   Plain.deserialize(string)

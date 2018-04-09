@@ -1,7 +1,7 @@
 /** @jsx h */
 /* eslint-disable react/jsx-key */
 
-import h from '../../test/helpers/h'
+import h from '../../helpers/h'
 import { resetMemoization } from 'slate'
 
 export default function({ value, text }) {

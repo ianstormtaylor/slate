@@ -1,8 +1,8 @@
 /** @jsx h */
 /* eslint-disable react/jsx-key */
 
-import h from '../../test/helpers/h'
-import { resetMemoization } from '../..'
+import h from '../../helpers/h'
+import { resetMemoization } from 'slate'
 
 export default function({ change, text }) {
   change.insertTextByKey(text.key, 0, 'a')
