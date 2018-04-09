@@ -2,7 +2,7 @@
 /* eslint-disable react/jsx-key */
 
 import h from '../../test/helpers/h'
-import { resetMemoization } from '../..'
+import { resetMemoization } from 'slate'
 
 export default function({ value, text }) {
   value.document.getPath(text.key)

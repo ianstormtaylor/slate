@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-key */
 
-import { Value } from '../..'
+import { Value } from 'slate'
 
 export default function(json) {
   Value.fromJSON(json)

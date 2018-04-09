@@ -2,7 +2,7 @@
 
 import fs from 'fs'
 import { basename, extname, resolve } from 'path'
-import { resetMemoization } from '..'
+import { resetMemoization } from 'slate'
 
 /**
  * Benchmarks.
@@ -17,12 +17,11 @@ categories.forEach(category => {
   suite(category, () => {
     set('iterations', 100)
     set('mintime', 1000)
+    set('type', 'adaptive')
 
-    if (category == 'models') {
-      after(() => {
-        resetMemoization()
-      })
-    }
+    after(() => {
+      resetMemoization()
+    })
 
     const benchmarkDir = resolve(categoryDir, category)
     const benchmarks = fs
@@ -34,12 +33,11 @@ categories.forEach(category => {
       const dir = resolve(benchmarkDir, benchmark)
       const module = require(dir)
       const fn = module.default
-      let { input, before, after } = module
+      let { input, before } = module
       if (before) input = before(input)
 
       bench(benchmark, () => {
         fn(input)
-        if (after) after()
       })
     })
   })
