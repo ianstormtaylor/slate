@@ -5,5 +5,5 @@ if (process) {
     module.exports = require('./hrtimer')
   }
 } else {
- module.exports =  require('./date')
+  module.exports = require('./date')
 }

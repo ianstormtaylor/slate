@@ -1,14 +1,14 @@
-/*!
+/* !
  * Matcha - High-res timer for Node.js
  * Copyright(c) 2012 Jake Luer <jake@alogicalparadox.com>
  * MIT Licensed
  */
 
-/*!
+/* !
  * Primary Export
  */
 
-module.exports = Timer;
+module.exports = Timer
 
 /**
  * Timer (constructor)
@@ -19,9 +19,9 @@ module.exports = Timer;
  * @api public
  */
 
-function Timer () {
-  this._start = null;
-  this._elapsed = null;
+function Timer() {
+  this._start = null
+  this._elapsed = null
 }
 
 /**
@@ -33,13 +33,13 @@ function Timer () {
  * @returns Number ms elapsed since start
  */
 
-Object.defineProperty(Timer.prototype, 'elapsed',
-  { get: function () {
-      if (!this._elapsed) return null;
-      var {user, system} = this._elapsed;
-      return (user+system)/1000
-    }
-});
+Object.defineProperty(Timer.prototype, 'elapsed', {
+  get() {
+    if (!this._elapsed) return null
+    const { user, system } = this._elapsed
+    return (user + system) / 1000
+  },
+})
 
 /**
  * .start ()
@@ -49,10 +49,10 @@ Object.defineProperty(Timer.prototype, 'elapsed',
  * @api public
  */
 
-Timer.prototype.start = function () {
-  this._start = process.cpuUsage();
-  return this;
-};
+Timer.prototype.start = function() {
+  this._start = process.cpuUsage()
+  return this
+}
 
 /**
  * .stop ()
@@ -63,7 +63,7 @@ Timer.prototype.start = function () {
  * @api public
  */
 
-Timer.prototype.stop = function () {
-  this._elapsed = process.cpuUsage(this._start);
-  return this;
-};
+Timer.prototype.stop = function() {
+  this._elapsed = process.cpuUsage(this._start)
+  return this
+}
