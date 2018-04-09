@@ -19,10 +19,6 @@ categories.forEach(category => {
     set('mintime', 1000)
     set('type', 'adaptive')
 
-    after(() => {
-      resetMemoization()
-    })
-
     const benchmarkDir = resolve(categoryDir, category)
     const benchmarks = fs
       .readdirSync(benchmarkDir)
@@ -33,11 +29,18 @@ categories.forEach(category => {
       const dir = resolve(benchmarkDir, benchmark)
       const module = require(dir)
       const fn = module.default
-      let { input, before } = module
-      if (before) input = before(input)
+      let { input } = module
+      before(() => {
+        if (module.before) {
+          input = module.before(input)
+        }
+      })
 
       bench(benchmark, () => {
         fn(input)
+      })
+      after(() => {
+        resetMemoization()
       })
     })
   })
