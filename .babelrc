@@ -28,6 +28,19 @@
         "stage-0"
       ],
       "plugins": ["transform-runtime"]
+    },
+    "benchmark": {
+      "presets": [
+        ["env", {
+          "targets" : {
+            "node": "current",
+            "browsers": []
+          }
+        }],
+        "react",
+        "stage-0"
+      ],
+      "plugins": ["transform-runtime"]
     }
   }
 }

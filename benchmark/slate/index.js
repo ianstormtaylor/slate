@@ -38,6 +38,7 @@ categories.forEach(category => {
 
       bench(benchmark, () => {
         fn(input)
+        resetMemoization()
       })
       after(() => {
         resetMemoization()
