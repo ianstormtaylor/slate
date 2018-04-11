@@ -533,14 +533,12 @@ Text.prototype[MODEL_TYPES.TEXT] = true
  * Memoize read methods.
  */
 
-memoize(Text.prototype, ['getMarks', 'getMarksAsArray'], {
-  takesArguments: false,
-})
-
 memoize(Text.prototype, [
   'getDecoratedCharacters',
   'getDecorations',
   'getLeaves',
+  'getMarks',
+  'getMarksAsArray',
   'getMarksAtIndex',
   'validate',
 ])
