@@ -197,11 +197,20 @@ class Node {
     first = assertKey(first)
     second = assertKey(second)
 
-    const keys = this.getKeysAsArray()
-    const firstIndex = keys.indexOf(first)
-    const secondIndex = keys.indexOf(second)
-    if (firstIndex == -1 || secondIndex == -1) return null
+    const firstAncestor = this.getFurthestAncestor(first)
+    const secondAncestor = this.getFurthestAncestor(second)
+    if (first === second) return false
+    if (!firstAncestor || !secondAncestor) {
+      return null
+    }
+    if (firstAncestor === secondAncestor) {
+      if (firstAncestor.key === first) return true
+      if (firstAncestor.key === second) return false
+      return firstAncestor.areDescendantsSorted(first, second)
+    }
 
+    const firstIndex = this.nodes.indexOf(firstAncestor)
+    const secondIndex = this.nodes.indexOf(secondAncestor)
     return firstIndex < secondIndex
   }
 
@@ -887,33 +896,6 @@ class Node {
         return inlines.concat(node.getInlinesByTypeAsArray(type))
       }
     }, [])
-  }
-
-  /**
-   * Return a set of all keys in the node as an array.
-   *
-   * @return {Array<String>}
-   */
-
-  getKeysAsArray() {
-    const keys = []
-
-    this.forEachDescendant(desc => {
-      keys.push(desc.key)
-    })
-
-    return keys
-  }
-
-  /**
-   * Return a set of all keys in the node.
-   *
-   * @return {Set<String>}
-   */
-
-  getKeys() {
-    const keys = this.getKeysAsArray()
-    return new Set(keys)
   }
 
   /**
@@ -1606,15 +1588,16 @@ class Node {
    */
 
   insertNode(index, node) {
-    const keys = this.getKeysAsArray()
-
-    if (keys.includes(node.key)) {
+    if (this.key === node.key || this.hasDescendant(node.key)) {
       node = node.regenerateKey()
     }
 
     if (node.object != 'text') {
       node = node.mapDescendants(desc => {
-        return keys.includes(desc.key) ? desc.regenerateKey() : desc
+        if (this.key === node.key || this.hasDescendant(desc.key)) {
+          return desc.regenerateKey()
+        }
+        return desc
       })
     }
 
@@ -1951,7 +1934,6 @@ memoize(Node.prototype, [
   'getInlinesByTypeAsArray',
   'getMarksAsArray',
   'getMarksAtPosition',
-  'getKeysAsArray',
   'getLastText',
   'getMarksByTypeAsArray',
   'getNextBlock',
