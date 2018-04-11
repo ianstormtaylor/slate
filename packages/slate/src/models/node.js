@@ -373,23 +373,16 @@ class Node {
    */
 
   getBlocks() {
-    const array = this.getBlocksAsArray()
-    return new List(array)
-  }
-
-  /**
-   * Get the leaf block descendants of the node.
-   *
-   * @return {List<Node>}
-   */
-
-  getBlocksAsArray() {
-    return this.nodes.reduce((array, child) => {
-      if (child.object != 'block') return array
-      if (!child.isLeafBlock()) return array.concat(child.getBlocksAsArray())
-      array.push(child)
-      return array
-    }, [])
+    const empty = new List()
+    const { nodes } = this
+    return empty.withMutations(result => {
+      nodes.forEach(child => {
+        if (child.object != 'block') return result
+        if (child.isLeafBlock()) return result.push(child)
+        // PREF: We shall use concat here when upgrade to immutable v4
+        child.getBlocks().forEach(b => result.push(b))
+      })
+    })
   }
 
   /**
@@ -400,31 +393,19 @@ class Node {
    */
 
   getBlocksAtRange(range) {
-    const array = this.getBlocksAtRangeAsArray(range)
-    // Eliminate duplicates by converting to an `OrderedSet` first.
-    return new List(new OrderedSet(array))
-  }
-
-  /**
-   * Get the leaf block descendants in a `range` as an array
-   *
-   * @param {Range} range
-   * @return {Array}
-   */
-
-  getBlocksAtRangeAsArray(range) {
     range = range.normalize(this)
-    if (range.isUnset) return []
+    if (range.isUnset) return new List()
 
     const { startKey, endKey } = range
     const startBlock = this.getClosestBlock(startKey)
 
     // PERF: the most common case is when the range is in a single block node,
     // where we can avoid a lot of iterating of the tree.
-    if (startKey == endKey) return [startBlock]
 
     const endBlock = this.getClosestBlock(endKey)
-    const blocks = this.getBlocksAsArray()
+    if (startBlock === endBlock) return List.of(startBlock)
+
+    const blocks = this.getBlocks()
     const start = blocks.indexOf(startBlock)
     const end = blocks.indexOf(endBlock)
     return blocks.slice(start, end + 1)
@@ -1074,9 +1055,9 @@ class Node {
     if (range.isCollapsed) {
       return this.getMarksAtPosition(range.startKey, range.startOffset)
     }
-
+    const chars = this.getCharactersAtRange(range)
     return new OrderedSet().withMutations(result => {
-      this.getCharactersAtRange(range).forEach(char => {
+      chars.forEach(char => {
         if (char) {
           result.union(char.marks)
         }
@@ -1100,12 +1081,11 @@ class Node {
     // Otherwise, get a set of the marks for each character in the range.
     const chars = this.getCharactersAtRange(range)
     const first = chars.first()
-    if (!first) return new Set()
+    if (!first || !first.marks) return new Set()
 
-    const memo = first.marks
     const empty = new Set()
 
-    return memo.withMutations(result => {
+    return first.marks.withMutations(result => {
       chars.slice(1).find(char => {
         const marks = char ? char.marks : empty
         result.intersect(marks)
@@ -1990,8 +1970,8 @@ function assertKey(arg) {
 memoize(Node.prototype, [
   'areDescendantsSorted',
   'getAncestors',
-  'getBlocksAsArray',
-  'getBlocksAtRangeAsArray',
+  'getBlocks',
+  'getBlocksAtRange',
   'getBlocksByTypeAsArray',
   'getCharactersAtRangeAsArray',
   'getCharactersAsArray',
