@@ -429,22 +429,7 @@ class Node {
    */
 
   getCharacters() {
-    const array = this.getCharactersAsArray()
-    return new List(array)
-  }
-
-  /**
-   * Get all of the characters for every text node as an array
-   *
-   * @return {Array}
-   */
-
-  getCharactersAsArray() {
-    return this.nodes.reduce((arr, node) => {
-      return node.object == 'text'
-        ? arr.concat(node.characters.toArray())
-        : arr.concat(node.getCharactersAsArray())
-    }, [])
+    return this.getTexts().flatMap(t => t.characters)
   }
 
   /**
@@ -1952,8 +1937,6 @@ memoize(Node.prototype, [
   'getBlocks',
   'getBlocksAtRange',
   'getBlocksByType',
-  'getCharactersAtRangeAsArray',
-  'getCharactersAsArray',
   'getChild',
   'getClosestBlock',
   'getClosestInline',
