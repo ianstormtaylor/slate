@@ -827,7 +827,7 @@ Changes.insertInlineAtRange = (change, range, inline, options = {}) => {
  */
 
 Changes.insertTextAtRange = (change, range, text, marks, options = {}) => {
-  const { normalize } = options
+  let { normalize } = options
   const { value } = change
   const { document } = value
   const { startKey, startOffset, endKey } = range
@@ -842,6 +842,10 @@ Changes.insertTextAtRange = (change, range, text, marks, options = {}) => {
   range = range.moveAnchor(text.length)
 
   if (range.isExpanded) {
+    // PERF: Unless specified, don't normalize if only inserting text.
+    if (normalize === undefined) {
+      normalize = range.isExpanded
+    }
     change.deleteAtRange(range, { normalize: false })
   }
 
@@ -851,14 +855,10 @@ Changes.insertTextAtRange = (change, range, text, marks, options = {}) => {
     const ancestors = document
       .getAncestors(commonAncestor.key)
       .push(commonAncestor)
-    const normalizeAncestor = ancestors.findLast(n =>
-      change.value.document.getDescendant(n.key)
+    const normalizeAncestor = ancestors.findLast(
+      n => change.value.document.getDescendant(n.key) || n.object === 'document'
     )
-    if (normalizeAncestor) {
-      change.normalizeNodeByKey(normalizeAncestor.key)
-    } else {
-      change.normalizeNodeByKey(change.value.document.key)
-    }
+    change.normalizeNodeByKey(normalizeAncestor.key)
   }
 }
 
