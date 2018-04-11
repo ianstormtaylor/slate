@@ -995,11 +995,48 @@ class Node {
     if (range.isCollapsed) {
       return this.getMarksAtPosition(range.startKey, range.startOffset)
     }
-    const chars = this.getCharactersAtRange(range)
+    const { startKey, startOffset, endKey, endOffset } = range
+    return this.getOrderedMarksBetweenPositions(
+      startKey,
+      startOffset,
+      endKey,
+      endOffset
+    )
+  }
+
+  /**
+   * Get a set of the marks in a `range`.
+   *
+   * @param {string} startKey
+   * @param {number} startOffset
+   * @param {string} endKey
+   * @param {number} endOffset
+   * @returns {OrderedSet<Mark>}
+   */
+
+  getOrderedMarksBetweenPositions(startKey, startOffset, endKey, endOffset) {
+    if (startKey === endKey) {
+      const startText = this.getDescendant(startKey)
+      return startText.getMarksBetweenOffsets(startOffset, endOffset)
+    }
+
+    const texts = this.getTextsBetweenPositionsAsArray(
+      startKey,
+      startOffset,
+      endKey,
+      endOffset
+    )
+
     return new OrderedSet().withMutations(result => {
-      chars.forEach(char => {
-        if (char) {
-          result.union(char.marks)
+      texts.forEach(text => {
+        if (text.key === startKey) {
+          result.union(
+            text.getMarksBetweenOffsets(startOffset, text.text.length)
+          )
+        } else if (text.key === endKey) {
+          result.union(text.getMarksBetweenOffsets(0, endOffset))
+        } else {
+          result.union(text.getMarks())
         }
       })
     })
@@ -1520,8 +1557,23 @@ class Node {
   getTextsAtRangeAsArray(range) {
     range = range.normalize(this)
     if (range.isUnset) return []
+    const { startKey, startOffset, endKey, endOffset } = range
+    return this.getTextsBetweenPositionsAsArray(
+      startKey,
+      startOffset,
+      endKey,
+      endOffset
+    )
+  }
 
-    const { startKey, endKey } = range
+  /**
+   * Get all of the text nodes in a `range` as an array.
+   *
+   * @param {Range} range
+   * @returns {Array}
+   */
+
+  getTextsBetweenPositionsAsArray(startKey, startOffset, endKey, endOffset) {
     const startText = this.getDescendant(startKey)
 
     // PERF: the most common case is when the range is in a single text node,
@@ -1934,8 +1986,9 @@ memoize(Node.prototype, [
   'getInlinesByTypeAsArray',
   'getMarksAsArray',
   'getMarksAtPosition',
-  'getLastText',
   'getMarksByTypeAsArray',
+  'getOrderedMarksBetweenPositions',
+  'getLastText',
   'getNextBlock',
   'getNextSibling',
   'getNextText',
@@ -1953,7 +2006,7 @@ memoize(Node.prototype, [
   'getTextAtOffset',
   'getTextDirection',
   'getTextsAsArray',
-  'getTextsAtRangeAsArray',
+  'getTextsBetweenPositionsAsArray',
   'isLeafBlock',
   'isLeafInline',
   'validate',

@@ -297,6 +297,20 @@ class Text extends Record(DEFAULTS) {
   }
 
   /**
+   * Get all of the marks on between two offsets
+   *
+   * @return {OrderedSet<Mark>}
+   */
+
+  getMarksBetweenOffsets(startOffset, endOffset) {
+    return new OrderedSet().withMutations(result => {
+      this.characters.slice(startOffset, endOffset).forEach(c => {
+        if (c && c.marks) result.union(c.marks)
+      })
+    })
+  }
+
+  /**
    * Get all of the marks on the text.
    *
    * @return {OrderedSet<Mark>}
