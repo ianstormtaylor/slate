@@ -662,11 +662,29 @@ class Node {
   getFragmentAtRange(range) {
     range = range.normalize(this)
     if (range.isUnset) return Document.create()
+    const { startKey, startOffset, endKey, endOffset } = range
+    return this.getFragmentBetweenPositions(
+      startKey,
+      startOffset,
+      endKey,
+      endOffset
+    )
+  }
 
+  /**
+   * Get a fragment of the node between positions; re-argument for cache
+   *
+   * @param {string} startKey
+   * @param {number} startOffset
+   * @param {string} endKey
+   * @param {number} endOffset
+   * @return {Document}
+   */
+
+  getFragmentBetweenPositions(startKey, startOffset, endKey, endOffset) {
     let node = this
 
     // Make sure the children exist.
-    const { startKey, startOffset, endKey, endOffset } = range
     const startText = node.assertDescendant(startKey)
     const endText = node.assertDescendant(endKey)
 
@@ -1976,7 +1994,7 @@ memoize(Node.prototype, [
   'getDescendant',
   'getDescendantAtPath',
   'getFirstText',
-  'getFragmentAtRange',
+  'getFragmentBetweenPositions',
   'getFurthestBlock',
   'getFurthestInline',
   'getFurthestAncestor',
