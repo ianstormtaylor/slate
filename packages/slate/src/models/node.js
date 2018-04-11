@@ -419,28 +419,7 @@ class Node {
    */
 
   getBlocksByType(type) {
-    const array = this.getBlocksByTypeAsArray(type)
-    return new List(array)
-  }
-
-  /**
-   * Get all of the leaf blocks that match a `type` as an array
-   *
-   * @param {String} type
-   * @return {Array}
-   */
-
-  getBlocksByTypeAsArray(type) {
-    return this.nodes.reduce((array, node) => {
-      if (node.object != 'block') {
-        return array
-      } else if (node.isLeafBlock() && node.type == type) {
-        array.push(node)
-        return array
-      } else {
-        return array.concat(node.getBlocksByTypeAsArray(type))
-      }
-    }, [])
+    return this.getBlocks().filter(b => b.type === type)
   }
 
   /**
@@ -1972,7 +1951,7 @@ memoize(Node.prototype, [
   'getAncestors',
   'getBlocks',
   'getBlocksAtRange',
-  'getBlocksByTypeAsArray',
+  'getBlocksByType',
   'getCharactersAtRangeAsArray',
   'getCharactersAsArray',
   'getChild',
