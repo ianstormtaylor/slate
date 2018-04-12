@@ -4,4 +4,3 @@ import Bench from './components/Bench'
 
 export { Repository, Suite, Bench }
 export default { Repository, Suite, Bench }
-
