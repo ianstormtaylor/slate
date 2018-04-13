@@ -1,24 +1,19 @@
 {
   "name": "slate-dev-benchmark",
-  "description": "A simple, development-only benchmark for Slate.",
-  "version": "0.1.39",
+  "description": "A simple, development-only benchmark for Slate",
+  "version": "0.0.1",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
   "main": "lib/slate-dev-benchmark.js",
   "module": "lib/slate-dev-benchmark.es.js",
   "umd": "dist/slate-dev-benchmark.js",
   "umdMin": "dist/slate-dev-benchmark.min.js",
-  "files": [
-    "dist/",
-    "lib/"
-  ],
+  "files": ["dist/", "lib/"],
   "devDependencies": {
     "mocha": "^2.5.3"
   },
   "scripts": {
     "clean": "rm -rf ./dist ./lib ./node_modules"
   },
-  "keywords": [
-    "slate"
-  ]
+  "keywords": ["slate"]
 }
