@@ -555,7 +555,6 @@ Wrap the given node in a [`Block`](./block.md) node that match `properties`. For
 
 Wrap the given node in a [`Inline`](./inline.md) node that match `properties`. For convenience, you can pass a `type` string or `properties` object.
 
-
 ### `wrapNodeByKey`
 
 `wraNodeByKey(key: String, parent: Node) => Change` <br/>
