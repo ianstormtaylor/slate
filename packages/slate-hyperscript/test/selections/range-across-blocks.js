@@ -15,49 +15,49 @@ export const input = (
 )
 
 export const output = {
-  object: "value",
+  object: 'value',
   document: {
-    object: "document",
+    object: 'document',
     data: {},
     nodes: [
       {
-        object: "block",
-        type: "paragraph",
+        object: 'block',
+        type: 'paragraph',
         isVoid: false,
         data: {},
         nodes: [
           {
-            object: "text",
+            object: 'text',
             leaves: [
               {
-                object: "leaf",
-                text: "This is one block.",
-                marks: []
-              }
-            ]
-          }
-        ]
+                object: 'leaf',
+                text: 'This is one block.',
+                marks: [],
+              },
+            ],
+          },
+        ],
       },
       {
-        object: "block",
-        type: "paragraph",
+        object: 'block',
+        type: 'paragraph',
         isVoid: false,
         data: {},
         nodes: [
           {
-            object: "text",
+            object: 'text',
             leaves: [
               {
-                object: "leaf",
-                text: "This is block two.",
-                marks: []
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  }
+                object: 'leaf',
+                text: 'This is block two.',
+                marks: [],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
 }
 
 export const expectSelection = {

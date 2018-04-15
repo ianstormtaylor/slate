@@ -12,31 +12,31 @@ export const input = (
 )
 
 export const output = {
-  object: "value",
+  object: 'value',
   document: {
-    object: "document",
+    object: 'document',
     data: {},
     nodes: [
       {
-        object: "block",
-        type: "paragraph",
+        object: 'block',
+        type: 'paragraph',
         isVoid: false,
         data: {},
         nodes: [
           {
-            object: "text",
+            object: 'text',
             leaves: [
               {
-                object: "leaf",
-                text: "This is a paragraph with an open selection.",
-                marks: []
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  }
+                object: 'leaf',
+                text: 'This is a paragraph with an open selection.',
+                marks: [],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
 }
 
 export const expectSelection = {

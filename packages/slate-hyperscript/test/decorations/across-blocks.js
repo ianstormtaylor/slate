@@ -14,59 +14,59 @@ export const input = (
   <value>
     <document>
       <paragraph>
-        This is one <highlightAnchor key="a"/>block.
+        This is one <highlightAnchor key="a" />block.
       </paragraph>
       <paragraph>
-        This is block<highlightFocus key="a"/> two.
+        This is block<highlightFocus key="a" /> two.
       </paragraph>
     </document>
   </value>
 )
 
 export const output = {
-  object: "value",
+  object: 'value',
   document: {
-    object: "document",
+    object: 'document',
     data: {},
     nodes: [
       {
-        object: "block",
-        type: "paragraph",
+        object: 'block',
+        type: 'paragraph',
         isVoid: false,
         data: {},
         nodes: [
           {
-            object: "text",
+            object: 'text',
             leaves: [
               {
-                object: "leaf",
-                text: "This is one block.",
-                marks: []
-              }
-            ]
-          }
-        ]
+                object: 'leaf',
+                text: 'This is one block.',
+                marks: [],
+              },
+            ],
+          },
+        ],
       },
       {
-        object: "block",
-        type: "paragraph",
+        object: 'block',
+        type: 'paragraph',
         isVoid: false,
         data: {},
         nodes: [
           {
-            object: "text",
+            object: 'text',
             leaves: [
               {
-                object: "leaf",
-                text: "This is block two.",
-                marks: []
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  }
+                object: 'leaf',
+                text: 'This is block two.',
+                marks: [],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
 }
 
 export const expectDecorations = [
@@ -75,10 +75,12 @@ export const expectDecorations = [
     focusOffset: 13,
     anchorKey: input.document.nodes.get(0).getFirstText().key,
     focusKey: input.document.nodes.get(1).getFirstText().key,
-    marks: [{
-      object: "mark",
-      type: "highlight",
-      data: {},
-    }]
+    marks: [
+      {
+        object: 'mark',
+        type: 'highlight',
+        data: {},
+      },
+    ],
   },
 ]

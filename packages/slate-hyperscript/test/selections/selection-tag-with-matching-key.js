@@ -7,7 +7,7 @@ export const input = (
       <block type="paragraph">
         <text>
           This is{' '}
-            <text key="100">
+          <text key="100">
             a paragraph with a cursor position (closed selection).
           </text>
         </text>
@@ -23,31 +23,32 @@ export const input = (
 )
 
 export const output = {
-  object: "value",
+  object: 'value',
   document: {
-    object: "document",
+    object: 'document',
     data: {},
     nodes: [
       {
-        object: "block",
-        type: "paragraph",
+        object: 'block',
+        type: 'paragraph',
         isVoid: false,
         data: {},
         nodes: [
           {
-            object: "text",
+            object: 'text',
             leaves: [
               {
-                object: "leaf",
-                text: "This is a paragraph with a cursor position (closed selection).",
-                marks: []
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  }
+                object: 'leaf',
+                text:
+                  'This is a paragraph with a cursor position (closed selection).',
+                marks: [],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
 }
 
 export const expectSelection = {

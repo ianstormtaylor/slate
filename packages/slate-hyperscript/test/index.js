@@ -6,7 +6,7 @@ import assert from 'assert'
 import fs from 'fs'
 import { Value } from 'slate'
 import { basename, extname, resolve } from 'path'
-import { ENGINE_METHOD_PKEY_METHS } from 'constants';
+import { ENGINE_METHOD_PKEY_METHS } from 'constants'
 
 /**
  * Tests.
@@ -72,7 +72,6 @@ describe('slate-hyperscript', () => {
         Object.keys(expectSelection).forEach(prop => {
           assert.equal(input.selection[prop], expectSelection[prop])
         })
-
       })
     }
   })
@@ -88,7 +87,7 @@ describe('slate-hyperscript', () => {
       it(test, async () => {
         const module = require(resolve(dir, test))
         const { input, output, expectDecorations } = module
-        
+
         // ensure deserialization was okay
         const actual = Value.isValue(input) ? input.toJSON() : input
         const expected = Value.isValue(output) ? output.toJSON() : output
@@ -99,7 +98,7 @@ describe('slate-hyperscript', () => {
         expectDecorations.forEach((decoration, i) => {
           Object.keys(decoration).forEach(prop => {
             assert.deepEqual(
-              decoration[prop], 
+              decoration[prop],
               input.decorations.toJS()[i][prop],
               `decoration ${i} had incorrect prop: ${prop}`
             )
@@ -108,5 +107,4 @@ describe('slate-hyperscript', () => {
       })
     }
   })
-
 })

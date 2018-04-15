@@ -17,54 +17,58 @@ export const input = (
   <value>
     <document>
       <block type="paragraph">
-        This is a <highlight>paragraph <b>with</b></highlight> a cursor position <cursor/>(closed selection).
+        This is a{' '}
+        <highlight>
+          paragraph <b>with</b>
+        </highlight>{' '}
+        a cursor position <cursor />(closed selection).
       </block>
     </document>
   </value>
 )
 
 export const output = {
-  object: "value",
+  object: 'value',
   document: {
-    object: "document",
+    object: 'document',
     data: {},
     nodes: [
       {
-        object: "block",
-        type: "paragraph",
+        object: 'block',
+        type: 'paragraph',
         isVoid: false,
         data: {},
         nodes: [
           {
-            object: "text",
+            object: 'text',
             leaves: [
               {
-                object: "leaf",
-                text: "This is a paragraph ",
-                marks: []
+                object: 'leaf',
+                text: 'This is a paragraph ',
+                marks: [],
               },
               {
-                object: "leaf",
-                text: "with",
+                object: 'leaf',
+                text: 'with',
                 marks: [
                   {
-                    object: "mark",
-                    type: "bold",
-                    data: {}
-                  }
-                ]
+                    object: 'mark',
+                    type: 'bold',
+                    data: {},
+                  },
+                ],
               },
               {
-                object: "leaf",
-                text: " a cursor position (closed selection).",
-                marks: []
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  }
+                object: 'leaf',
+                text: ' a cursor position (closed selection).',
+                marks: [],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
 }
 
 export const expectDecorations = [
@@ -73,10 +77,12 @@ export const expectDecorations = [
     focusOffset: 24,
     anchorKey: input.texts.get(0).key,
     focusKey: input.texts.get(0).key,
-    marks: [{
-      object: "mark",
-      type: "highlight",
-      data: {},
-    }]
+    marks: [
+      {
+        object: 'mark',
+        type: 'highlight',
+        data: {},
+      },
+    ],
   },
 ]

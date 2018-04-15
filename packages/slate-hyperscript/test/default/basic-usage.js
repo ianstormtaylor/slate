@@ -17,95 +17,95 @@ export const input = (
 )
 
 export const output = {
-  object: "value",
+  object: 'value',
   document: {
-    object: "document",
+    object: 'document',
     data: {},
     nodes: [
       {
-        object: "block",
-        type: "paragraph",
+        object: 'block',
+        type: 'paragraph',
         isVoid: false,
         data: {},
         nodes: [
           {
-            object: "text",
+            object: 'text',
             leaves: [
               {
-                object: "leaf",
-                text: "A string of ",
-                marks: []
+                object: 'leaf',
+                text: 'A string of ',
+                marks: [],
               },
               {
-                object: "leaf",
-                text: "bold",
+                object: 'leaf',
+                text: 'bold',
                 marks: [
                   {
-                    object: "mark",
-                    type: "bold",
-                    data: {}
-                  }
-                ]
+                    object: 'mark',
+                    type: 'bold',
+                    data: {},
+                  },
+                ],
               },
               {
-                object: "leaf",
-                text: " in a ",
-                marks: []
-              }
-            ]
+                object: 'leaf',
+                text: ' in a ',
+                marks: [],
+              },
+            ],
           },
           {
-            object: "inline",
-            type: "link",
+            object: 'inline',
+            type: 'link',
             isVoid: false,
             data: {
-              src: "http://slatejs.org"
+              src: 'http://slatejs.org',
             },
             nodes: [
               {
-                object: "text",
+                object: 'text',
                 leaves: [
                   {
-                    object: "leaf",
-                    text: "Slate",
-                    marks: []
-                  }
-                ]
-              }
-            ]
+                    object: 'leaf',
+                    text: 'Slate',
+                    marks: [],
+                  },
+                ],
+              },
+            ],
           },
           {
-            object: "text",
+            object: 'text',
             leaves: [
               {
-                object: "leaf",
-                text: " editor!",
-                marks: []
-              }
-            ]
-          }
-        ]
+                object: 'leaf',
+                text: ' editor!',
+                marks: [],
+              },
+            ],
+          },
+        ],
       },
       {
-        object: "block",
-        type: "image",
+        object: 'block',
+        type: 'image',
         isVoid: true,
         data: {
-          src: "https://..."
+          src: 'https://...',
         },
         nodes: [
           {
-            object: "text",
+            object: 'text',
             leaves: [
               {
-                object: "leaf",
-                text: "",
-                marks: []
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  }
+                object: 'leaf',
+                text: '',
+                marks: [],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
 }

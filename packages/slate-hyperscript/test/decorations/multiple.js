@@ -11,43 +11,43 @@ const h = createHyperscript({
   },
 })
 
-
 export const input = (
   <value>
     <document>
       <block type="paragraph">
-        This is a <highlight>paragraph with</highlight> two <lowlight>decorations</lowlight>.
+        This is a <highlight>paragraph with</highlight> two{' '}
+        <lowlight>decorations</lowlight>.
       </block>
     </document>
   </value>
 )
 
 export const output = {
-  object: "value",
+  object: 'value',
   document: {
-    object: "document",
+    object: 'document',
     data: {},
     nodes: [
       {
-        object: "block",
-        type: "paragraph",
+        object: 'block',
+        type: 'paragraph',
         isVoid: false,
         data: {},
         nodes: [
           {
-            object: "text",
+            object: 'text',
             leaves: [
               {
-                object: "leaf",
-                text: "This is a paragraph with two decorations.",
-                marks: []
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  }
+                object: 'leaf',
+                text: 'This is a paragraph with two decorations.',
+                marks: [],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
 }
 
 export const expectDecorations = [
@@ -56,21 +56,25 @@ export const expectDecorations = [
     focusOffset: 24,
     anchorKey: input.texts.get(0).key,
     focusKey: input.texts.get(0).key,
-    marks: [{
-      object: "mark",
-      type: "highlight",
-      data: {},
-    }]
+    marks: [
+      {
+        object: 'mark',
+        type: 'highlight',
+        data: {},
+      },
+    ],
   },
   {
     anchorOffset: 29,
     focusOffset: 40,
     anchorKey: input.texts.get(0).key,
     focusKey: input.texts.get(0).key,
-    marks: [{
-      object: "mark",
-      type: "lowlight",
-      data: {},
-    }]
+    marks: [
+      {
+        object: 'mark',
+        type: 'lowlight',
+        data: {},
+      },
+    ],
   },
 ]

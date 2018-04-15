@@ -17,12 +17,13 @@ const FOCUS = {}
  *  wrappers for decorator points, for comparison by instanceof
  */
 
-class DecoratorAnchor { 
-  constructor(key, marks) { 
-    if (key === null || key === undefined) throw new Error('decorator anchor requires key')
+class DecoratorAnchor {
+  constructor(key, marks) {
+    if (key === null || key === undefined)
+      throw new Error('decorator anchor requires key')
     this._key = key
     this.marks = marks
-    return this 
+    return this
   }
   withPosition = offset => {
     this.anchorOffset = offset
@@ -37,7 +38,8 @@ class DecoratorAnchor {
     return this
   }
   combine = focus => {
-    if (!(focus instanceof DecoratorFocus)) throw new Error('misaligned decorations')
+    if (!(focus instanceof DecoratorFocus))
+      throw new Error('misaligned decorations')
     return Range.create({
       anchorKey: this.anchorKey,
       focusKey: focus.focusKey,
@@ -48,9 +50,10 @@ class DecoratorAnchor {
   }
 }
 
-class DecoratorFocus { 
-  constructor(key, marks) { 
-    if (key === null || key === undefined) throw new Error('decorator focus requires key')
+class DecoratorFocus {
+  constructor(key, marks) {
+    if (key === null || key === undefined)
+      throw new Error('decorator focus requires key')
     this._key = key
     this.marks = marks
     return this
@@ -68,7 +71,8 @@ class DecoratorFocus {
     return this
   }
   combine = anchor => {
-    if (!(achor instanceof DecoratorAnchor)) throw new Error('misaligned decorations')
+    if (!(achor instanceof DecoratorAnchor))
+      throw new Error('misaligned decorations')
     return Range.create({
       anchorKey: anchor.anchorKey,
       focusKey: this.focusKey,
@@ -130,21 +134,21 @@ const CREATORS = {
     nodes[0].__decorations = (nodes[0].__decorations || []).concat([
       {
         anchorOffset: 0,
-        focusOffset: nodes.reduce((len,n) => len + n.text.length, 0),
-        marks: [{type: tagName}]
-      }
+        focusOffset: nodes.reduce((len, n) => len + n.text.length, 0),
+        marks: [{ type: tagName }],
+      },
     ])
     return nodes
   },
 
   decorationAnchor(tagName, attributes, children) {
-    const tagBase = tagName.slice(0,-6)
-    return new DecoratorAnchor(attributes.key, [{type: tagBase}])
+    const tagBase = tagName.slice(0, -6)
+    return new DecoratorAnchor(attributes.key, [{ type: tagBase }])
   },
 
   decorationFocus(tagName, attributes, children) {
-    const tagBase = tagName.slice(0,-5)
-    return new DecoratorFocus(attributes.key, [{type: tagBase}])
+    const tagBase = tagName.slice(0, -5)
+    return new DecoratorFocus(attributes.key, [{ type: tagBase }])
   },
 
   selection(tagName, attributes, children) {
@@ -181,13 +185,13 @@ const CREATORS = {
         if (text.__decorations != null) {
           // add in all complete decorations
           decorations = decorations.concat(
-            text.__decorations
-              .filter(d => d._key === undefined)
-              .map(d => Range.create({
+            text.__decorations.filter(d => d._key === undefined).map(d =>
+              Range.create({
                 ...d,
                 anchorKey: text.key,
                 focusKey: text.key,
-              }))
+              })
+            )
           )
           // store or combine partial decorations (anchor or focus)
           text.__decorations
@@ -195,7 +199,9 @@ const CREATORS = {
             .forEach(partial => {
               if (partialDecorations[partial._key]) {
                 decorations.push(
-                  partialDecorations[partial._key].combine(partial.withKey(text.key))
+                  partialDecorations[partial._key].combine(
+                    partial.withKey(text.key)
+                  )
                 )
                 delete partialDecorations[partial._key]
                 return
@@ -233,10 +239,7 @@ const CREATORS = {
 
     // apply any decorations built
     if (decorations.length > 0) {
-      value = value
-        .change()
-        .setValue({ decorations })
-        .value
+      value = value.change().setValue({ decorations }).value
     }
 
     return value
@@ -351,13 +354,16 @@ function createChildren(children, options = {}) {
       if (__focus != null) node.__focus = __focus + length
       if (__decorations != null) {
         node.__decorations = (node.__decorations || []).concat(
-          __decorations.map(d => ((d instanceof DecoratorAnchor) || (d instanceof DecoratorFocus))
-            ? d.addOffset(length)
-            : ({
-                ...d, 
-                anchorOffset: d.anchorOffset + length,
-                focusOffset: d.focusOffset + length,
-              }))
+          __decorations.map(
+            d =>
+              d instanceof DecoratorAnchor || d instanceof DecoratorFocus
+                ? d.addOffset(length)
+                : {
+                    ...d,
+                    anchorOffset: d.anchorOffset + length,
+                    focusOffset: d.focusOffset + length,
+                  }
+          )
         )
       }
 
@@ -369,9 +375,9 @@ function createChildren(children, options = {}) {
     if (child == FOCUS || child == CURSOR) node.__focus = length
 
     // if child is a decorator point, store it as partial decorator
-    if ((child instanceof DecoratorAnchor) || (child instanceof DecoratorFocus)) {
+    if (child instanceof DecoratorAnchor || child instanceof DecoratorFocus) {
       node.__decorations = (node.__decorations || []).concat([
-        child.withPosition(length)
+        child.withPosition(length),
       ])
     }
   })
@@ -412,8 +418,16 @@ function resolveCreators(options) {
   Object.keys(decorators).map(key => {
     creators[key] = normalizeNode(key, decorators[key], 'decoration')
     // also add [decorator]Anchor, [decorator]Focus tags
-    creators[`${key}Anchor`] = normalizeNode(key, decorators[key], 'decorationAnchor')
-    creators[`${key}Focus`] = normalizeNode(key, decorators[key], 'decorationFocus')
+    creators[`${key}Anchor`] = normalizeNode(
+      key,
+      decorators[key],
+      'decorationAnchor'
+    )
+    creators[`${key}Focus`] = normalizeNode(
+      key,
+      decorators[key],
+      'decorationFocus'
+    )
   })
 
   return creators

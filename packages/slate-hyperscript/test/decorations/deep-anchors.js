@@ -16,10 +16,10 @@ export const input = (
     <document>
       <ul>
         <li>
-          Item <highlightAnchor key="a"/>one.
+          Item <highlightAnchor key="a" />one.
         </li>
         <li>
-          Item<highlightFocus key="a"/> two.
+          Item<highlightFocus key="a" /> two.
         </li>
       </ul>
     </document>
@@ -27,69 +27,77 @@ export const input = (
 )
 
 export const output = {
-  object: "value",
+  object: 'value',
   document: {
-    object: "document",
+    object: 'document',
     data: {},
     nodes: [
       {
-        object: "block",
-        type: "ul",
+        object: 'block',
+        type: 'ul',
         isVoid: false,
         data: {},
         nodes: [
           {
-            object: "block",
-            type: "li",
+            object: 'block',
+            type: 'li',
             isVoid: false,
             data: {},
             nodes: [
               {
-                object: "text",
+                object: 'text',
                 leaves: [
                   {
-                    object: "leaf",
-                    text: "Item one.",
-                    marks: []
-                  }
-                ]
-              }
-            ]
+                    object: 'leaf',
+                    text: 'Item one.',
+                    marks: [],
+                  },
+                ],
+              },
+            ],
           },
           {
-            object: "block",
-            type: "li",
+            object: 'block',
+            type: 'li',
             isVoid: false,
             data: {},
             nodes: [
               {
-                object: "text",
+                object: 'text',
                 leaves: [
                   {
-                    object: "leaf",
-                    text: "Item two.",
-                    marks: []
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  }
+                    object: 'leaf',
+                    text: 'Item two.',
+                    marks: [],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
 }
 
 export const expectDecorations = [
   {
     anchorOffset: 5,
     focusOffset: 4,
-    anchorKey: input.document.filterDescendants(n => n.type==='li').get(0).getFirstText().key,
-    focusKey: input.document.filterDescendants(n => n.type==='li').get(1).getFirstText().key,
-    marks: [{
-      object: "mark",
-      type: "highlight",
-      data: {},
-    }]
+    anchorKey: input.document
+      .filterDescendants(n => n.type === 'li')
+      .get(0)
+      .getFirstText().key,
+    focusKey: input.document
+      .filterDescendants(n => n.type === 'li')
+      .get(1)
+      .getFirstText().key,
+    marks: [
+      {
+        object: 'mark',
+        type: 'highlight',
+        data: {},
+      },
+    ],
   },
 ]
