@@ -59,6 +59,18 @@ const CREATORS = {
     return nodes
   },
 
+  decoration(tagName, attributes, children) {
+    const nodes = createChildren(children, { key: attributes.key })
+    nodes[0].__decorations = (nodes[0].__decorations || []).concat([
+      Range.create({
+        anchorOffset: 0,
+        focusOffset: nodes.reduce((len,n) => len + n.text.length, 0),
+        marks: [{type: tagName}]
+      })
+    ])
+    return nodes
+  },
+
   selection(tagName, attributes, children) {
     return Range.create(attributes)
   },
@@ -68,6 +80,7 @@ const CREATORS = {
     const document = children.find(Document.isDocument)
     let selection = children.find(Range.isRange) || Range.create()
     const props = {}
+    let decorations = []
 
     // Search the document's texts to see if any of them have the anchor or
     // focus information saved, so we can set the selection.
@@ -83,6 +96,19 @@ const CREATORS = {
           props.focusKey = text.key
           props.focusOffset = text.__focus
           props.isFocused = true
+        }
+      })
+
+      // now check for decorations and hoist them to the top
+      document.getTexts().forEach(text => {
+        if (text.__decorations != null) {
+          decorations = decorations.concat(
+            text.__decorations.map(d => Range.create({
+              ...d.toJS(),
+              anchorKey: text.key,
+              focusKey: text.key,
+            }))
+          )
         }
       })
     }
@@ -103,7 +129,15 @@ const CREATORS = {
       selection = selection.merge(props).normalize(document)
     }
 
-    const value = Value.create({ data, document, selection })
+    let value = Value.create({ data, document, selection })
+
+    if (decorations.length > 0) {
+      value = value
+        .change()
+        .setValue({ decorations })
+        .value
+    }
+
     return value
   },
 
@@ -170,9 +204,10 @@ function createChildren(children, options = {}) {
   // Create a helper to update the current node while preserving any stored
   // anchor or focus information.
   function setNode(next) {
-    const { __anchor, __focus } = node
+    const { __anchor, __focus, __decorations } = node
     if (__anchor != null) next.__anchor = __anchor
     if (__focus != null) next.__focus = __focus
+    if (__decorations != null) next.__decorations = __decorations
     node = next
   }
 
@@ -197,7 +232,7 @@ function createChildren(children, options = {}) {
     // the existing node is empty, and the `key` option wasn't set, preserve the
     // child's key when updating the node.
     if (Text.isText(child)) {
-      const { __anchor, __focus } = child
+      const { __anchor, __focus, __decorations } = child
       let i = node.text.length
 
       if (!options.key && node.text.length == 0) {
@@ -213,6 +248,15 @@ function createChildren(children, options = {}) {
 
       if (__anchor != null) node.__anchor = __anchor + length
       if (__focus != null) node.__focus = __focus + length
+      if (__decorations != null) {
+        node.__decorations = (node.__decorations || []).concat(
+          __decorations.map(d => Range.create({
+            ...d.toJS(), 
+            anchorOffset: d.anchorOffset + length,
+            focusOffset: d.focusOffset + length,
+          }))
+        )
+      }
 
       length += child.text.length
     }
@@ -236,7 +280,7 @@ function createChildren(children, options = {}) {
  */
 
 function resolveCreators(options) {
-  const { blocks = {}, inlines = {}, marks = {} } = options
+  const { blocks = {}, inlines = {}, marks = {}, decorators = {} } = options
 
   const creators = {
     ...CREATORS,
@@ -253,6 +297,10 @@ function resolveCreators(options) {
 
   Object.keys(marks).map(key => {
     creators[key] = normalizeMark(key, marks[key])
+  })
+
+  Object.keys(decorators).map(key => {
+    creators[key] = normalizeNode(key, decorators[key], 'decoration')
   })
 
   return creators
