@@ -1,4 +1,5 @@
 /** @jsx h */
+
 import h from '../..'
 
 export const input = (

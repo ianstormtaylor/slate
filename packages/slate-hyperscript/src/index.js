@@ -71,7 +71,7 @@ class DecoratorFocus {
     return this
   }
   combine = anchor => {
-    if (!(achor instanceof DecoratorAnchor))
+    if (!(anchor instanceof DecoratorAnchor))
       throw new Error('misaligned decorations')
     return Range.create({
       anchorKey: anchor.anchorKey,

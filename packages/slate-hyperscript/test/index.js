@@ -6,7 +6,6 @@ import assert from 'assert'
 import fs from 'fs'
 import { Value } from 'slate'
 import { basename, extname, resolve } from 'path'
-import { ENGINE_METHOD_PKEY_METHS } from 'constants'
 
 /**
  * Tests.

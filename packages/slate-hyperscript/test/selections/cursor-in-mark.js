@@ -1,4 +1,5 @@
 /** @jsx h */
+
 import { createHyperscript } from '../..'
 
 const h = createHyperscript({
