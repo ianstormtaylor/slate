@@ -19,12 +19,17 @@ const FOCUS = {}
 
 class DecoratorAnchor { 
   constructor(key, marks) { 
+    if (key === null || key === undefined) throw new Error('decorator anchor requires key')
     this._key = key
     this.marks = marks
     return this 
   }
   withPosition = offset => {
     this.anchorOffset = offset
+    return this
+  }
+  addOffset = offset => {
+    this.anchorOffset += offset
     return this
   }
   withKey = key => {
@@ -45,12 +50,17 @@ class DecoratorAnchor {
 
 class DecoratorFocus { 
   constructor(key, marks) { 
+    if (key === null || key === undefined) throw new Error('decorator focus requires key')
     this._key = key
     this.marks = marks
     return this
   }
   withPosition = offset => {
     this.focusOffset = offset
+    return this
+  }
+  addOffset = offset => {
+    this.focusOffset += offset
     return this
   }
   withKey = key => {
@@ -341,11 +351,13 @@ function createChildren(children, options = {}) {
       if (__focus != null) node.__focus = __focus + length
       if (__decorations != null) {
         node.__decorations = (node.__decorations || []).concat(
-          __decorations.map(d => ({
-            ...d, 
-            anchorOffset: d.anchorOffset + length,
-            focusOffset: d.focusOffset + length,
-          }))
+          __decorations.map(d => ((d instanceof DecoratorAnchor) || (d instanceof DecoratorFocus))
+            ? d.addOffset(length)
+            : ({
+                ...d, 
+                anchorOffset: d.anchorOffset + length,
+                focusOffset: d.focusOffset + length,
+              }))
         )
       }
 
