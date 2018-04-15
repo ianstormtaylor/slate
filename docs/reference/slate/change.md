@@ -559,7 +559,7 @@ Wrap the given node in a [`Inline`](./inline.md) node that match `properties`. F
 
 `wraNodeByKey(key: String, parent: Node) => Change` <br/>
 
-Wrap the node with the specified key the parent [`Node`](./node.md). This will clear all children of the parent.
+Wrap the node with the specified key with the parent [`Node`](./node.md). This will clear all children of the parent.
 
 ## History Changes
 
