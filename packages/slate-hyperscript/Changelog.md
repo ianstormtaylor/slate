@@ -4,6 +4,12 @@ This document maintains a list of changes to the `slate-hyperscript` package wit
 
 ---
 
+### Unreleased
+
+* **Decorations** can now also be specified in hyperscript, similarly to specifying a selection. See the examples under `./test/decorations/`.
+
+---
+
 ### `0.5.0` — January 4, 2018
 
 ###### BREAKING
