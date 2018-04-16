@@ -239,7 +239,10 @@ const CREATORS = {
 
     // apply any decorations built
     if (decorations.length > 0) {
-      value = value.change().setValue({ decorations: decorations.map(d => d.normalize(document)) }).value
+      value = value
+        .change()
+        .setValue({ decorations: decorations.map(d => d.normalize(document)) })
+        .value
     }
 
     return value
