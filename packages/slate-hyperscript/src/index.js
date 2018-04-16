@@ -18,11 +18,12 @@ const FOCUS = {}
  */
 
 class DecoratorAnchor {
-  constructor(key, marks) {
+  constructor({key, ...rest}, marks) {
     if (key === null || key === undefined)
       throw new Error('decorator anchor requires key')
     this._key = key
     this.marks = marks
+    this.attribs = rest
     return this
   }
   withPosition = offset => {
@@ -46,16 +47,18 @@ class DecoratorAnchor {
       anchorOffset: this.anchorOffset,
       focusOffset: focus.focusOffset,
       marks: this.marks,
+      ...this.attribs,
     })
   }
 }
 
 class DecoratorFocus {
-  constructor(key, marks) {
+  constructor({key, ...rest}, marks) {
     if (key === null || key === undefined)
       throw new Error('decorator focus requires key')
     this._key = key
     this.marks = marks
+    this.attribs = rest
     return this
   }
   withPosition = offset => {
@@ -79,6 +82,7 @@ class DecoratorFocus {
       anchorOffset: anchor.anchorOffset,
       focusOffset: this.focusOffset,
       marks: this.marks,
+      ...this.attribs,
     })
   }
 }
@@ -136,6 +140,7 @@ const CREATORS = {
         anchorOffset: 0,
         focusOffset: nodes.reduce((len, n) => len + n.text.length, 0),
         marks: [{ type: tagName }],
+        ...attributes,
       },
     ])
     return nodes
@@ -143,12 +148,12 @@ const CREATORS = {
 
   decorationAnchor(tagName, attributes, children) {
     const tagBase = tagName.slice(0, -6)
-    return new DecoratorAnchor(attributes.key, [{ type: tagBase }])
+    return new DecoratorAnchor(attributes, [{ type: tagBase }])
   },
 
   decorationFocus(tagName, attributes, children) {
     const tagBase = tagName.slice(0, -5)
-    return new DecoratorFocus(attributes.key, [{ type: tagBase }])
+    return new DecoratorFocus(attributes, [{ type: tagBase }])
   },
 
   selection(tagName, attributes, children) {

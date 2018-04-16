@@ -53,6 +53,32 @@ function applyRangeAdjustments(value, checkAffected, adjustRange) {
 }
 
 /**
+ * clear any atomic ranges (in decorations) if they contain the point (key, offset, offset-end?)
+ * specified
+ * 
+ * @param {Value} value
+ * @param {String} key
+ * @param {Number} offset
+ * @param {Number?} offsetEnd
+ * @return {Value} 
+ */
+
+function clearAtomicRangesIfContains(value, key, offset, offsetEnd = null) {
+  return applyRangeAdjustments(
+    value,
+    range => {
+      if (!range.atomic) return false
+      const { startKey, startOffset, endKey, endOffset } = range
+      return (
+        (startKey == key && startOffset < offset && (endKey != key || endOffset > offset)) ||
+        (offsetEnd && startKey == key && startOffset < offsetEnd && (endKey != key || endOffset > offsetEnd))
+      )
+    },
+    range => range.deselect()
+  )
+}
+
+/**
  * Applying functions.
  *
  * @type {Object}
@@ -108,7 +134,6 @@ const APPLIERS = {
   insert_text(value, operation) {
     const { path, offset, text, marks } = operation
     let { document, selection } = value
-    const { anchorKey, focusKey, anchorOffset, focusOffset } = selection
     let node = document.assertPath(path)
 
     // Update the document
@@ -117,18 +142,27 @@ const APPLIERS = {
 
     value = value.set('document', document)
 
+    // if insert happens within atomic ranges, clear
+    value = clearAtomicRangesIfContains(value, node.key, offset)
+
     // Update the selection, decorations
     value = applyRangeAdjustments(
       value,
-      ({ anchorKey, anchorOffset }) =>
-        anchorKey == node.key && anchorOffset >= offset,
+      ({ anchorKey, anchorOffset, isBackward, atomic }) =>
+        anchorKey == node.key && (
+          anchorOffset > offset || 
+          (anchorOffset == offset && (!atomic || !isBackward))
+        ),
       range => range.moveAnchor(text.length)
     )
 
     value = applyRangeAdjustments(
       value,
-      ({ focusKey, focusOffset }) =>
-        focusKey == node.key && focusOffset >= offset,
+      ({ focusKey, focusOffset, isBackward, atomic }) =>
+        focusKey == node.key && (
+          focusOffset > offset || 
+          (focusOffset == offset && (!atomic || isBackward))
+        ),
       range => range.moveFocus(text.length)
     )
 
@@ -328,6 +362,9 @@ const APPLIERS = {
     let { document } = value
     
     let node = document.assertPath(path)
+
+    // if insert happens within atomic ranges, clear
+    value = clearAtomicRangesIfContains(value, node.key, offset, offset + length)
 
     value = applyRangeAdjustments(
       value,
