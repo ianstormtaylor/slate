@@ -18,7 +18,7 @@ const FOCUS = {}
  */
 
 class DecoratorAnchor {
-  constructor({key, ...rest}, marks) {
+  constructor({ key, ...rest }, marks) {
     if (key === null || key === undefined)
       throw new Error('decorator anchor requires key')
     this._key = key
@@ -53,7 +53,7 @@ class DecoratorAnchor {
 }
 
 class DecoratorFocus {
-  constructor({key, ...rest}, marks) {
+  constructor({ key, ...rest }, marks) {
     if (key === null || key === undefined)
       throw new Error('decorator focus requires key')
     this._key = key

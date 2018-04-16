@@ -680,7 +680,7 @@ class Value extends Record(DEFAULTS) {
       object.decorations &&
       !options.preserveKeys
     ) {
-      const { document, decorations } = this
+      const { document } = this
       object.decorations = object.decorations.map(decoration => {
         const withPath = {
           ...decoration,
