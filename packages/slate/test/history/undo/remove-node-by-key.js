@@ -13,7 +13,11 @@ export default function(value) {
 export const input = (
   <value>
     <document>
-      <paragraph key="a">one</paragraph>
+      <paragraph>zero</paragraph>
+      <paragraph key="a">
+        one <cursor />
+      </paragraph>
+      <paragraph>two</paragraph>
     </document>
   </value>
 )
