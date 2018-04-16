@@ -18,12 +18,12 @@ const FOCUS = {}
  */
 
 class DecoratorAnchor {
-  constructor({ key, ...rest }, marks) {
+  constructor({ key, data }, marks) {
     if (key === null || key === undefined)
       throw new Error('decorator anchor requires key')
     this._key = key
     this.marks = marks
-    this.attribs = rest
+    this.attribs = data || {}
     return this
   }
   withPosition = offset => {
@@ -53,12 +53,12 @@ class DecoratorAnchor {
 }
 
 class DecoratorFocus {
-  constructor({ key, ...rest }, marks) {
+  constructor({ key, data }, marks) {
     if (key === null || key === undefined)
       throw new Error('decorator focus requires key')
     this._key = key
     this.marks = marks
-    this.attribs = rest
+    this.attribs = data | {}
     return this
   }
   withPosition = offset => {
@@ -140,7 +140,7 @@ const CREATORS = {
         anchorOffset: 0,
         focusOffset: nodes.reduce((len, n) => len + n.text.length, 0),
         marks: [{ type: tagName }],
-        ...attributes,
+        ...(attributes.data || {}),
       },
     ])
     return nodes
