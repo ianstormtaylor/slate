@@ -495,7 +495,8 @@ class Node {
     }
 
     // Exclude this node itself.
-    return ancestors.rest().findLast(iterator)
+    const result = ancestors.findLast(iterator)
+    return result === this ? undefined : result
   }
 
   /**
