@@ -47,8 +47,8 @@ export const output = (
   <value>
     <document>
       <paragraph>
-        This decorati should be invalid,{' '}
-        <highlight atomic>this</highlight> one shouldn't.
+        This decorati should be invalid, <highlight atomic>this</highlight> one
+        shouldn't.
       </paragraph>
       <paragraph>
         <highlight atomic>decoration</highlight> will be fine.
