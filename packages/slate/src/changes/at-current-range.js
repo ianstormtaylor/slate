@@ -40,6 +40,11 @@ PROXY_TRANSFORMS.forEach(method => {
     const { selection } = value
     const methodAtRange = `${method}AtRange`
     change[methodAtRange](selection, ...args)
+    if (method.match(/Backward$/)) {
+      change.collapseToStart()
+    } else if (method.match(/Forward$/)) {
+      change.collapseToEnd()
+    }
   }
 })
 

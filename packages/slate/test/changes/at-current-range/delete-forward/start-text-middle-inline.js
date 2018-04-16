@@ -23,9 +23,8 @@ export const output = (
   <value>
     <document>
       <paragraph>
-        <anchor />
         <link>
-          <focus />wo
+          <cursor />wo
         </link>
       </paragraph>
     </document>
