@@ -30,11 +30,11 @@ export const input = (
   <value>
     <document>
       <paragraph>
-        This <highlight atomic={true}>decoration</highlight> should be invalid,{' '}
-        <highlight atomic={true}>this</highlight> one shouldn't.
+        This <highlight atomic>decoration</highlight> should be invalid,{' '}
+        <highlight atomic>this</highlight> one shouldn't.
       </paragraph>
       <paragraph>
-        This <highlight atomic={true}>decoration</highlight> will be fine.
+        This <highlight atomic>decoration</highlight> will be fine.
       </paragraph>
       <paragraph>
         This <highlight>decoration</highlight> can be altered, since non-atomic.
@@ -48,10 +48,10 @@ export const output = (
     <document>
       <paragraph>
         This decorati should be invalid,{' '}
-        <highlight atomic={true}>this</highlight> one shouldn't.
+        <highlight atomic>this</highlight> one shouldn't.
       </paragraph>
       <paragraph>
-        <highlight atomic={true}>decoration</highlight> will be fine.
+        <highlight atomic>decoration</highlight> will be fine.
       </paragraph>
       <paragraph>
         This <highlight>decor</highlight> can be altered, since non-atomic.
