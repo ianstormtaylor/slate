@@ -11,6 +11,48 @@ import Operation from '../models/operation'
 const debug = Debug('slate:operation:apply')
 
 /**
+ * Apply adjustments to affected ranges (selections, decorations);
+ * accepts (value, checking function -> bool, applying function -> range)
+ * returns value with affected ranges fixed
+ *
+ * @param {Value} value
+ * @param {Function} checkAffected
+ * @param {Function} adjustRange
+ * @return {Value}
+ */
+
+function applyRangeAdjustments(value, checkAffected, adjustRange) {
+  // gather all ranges from selection, decorations
+  const ranges = (value.selection ? [value.selection] : []).concat(
+    value.decorations ? value.decorations.toArray() : []
+  )
+  if (ranges.length === 0) return
+
+  for (let range of ranges) {
+    if (!checkAffected(range)) continue
+    let adjusted = adjustRange(range)
+
+    // apply at source of this range, comparing by identity
+    if (value.selection === range) {
+      value = value.set('selection', adjusted)
+    }
+    if (value.decorations !== null) {
+      // not using List.includes() since it isn't true identity check
+      value.decorations.forEach((decoration, i) => {
+        if (decoration === range) {
+          value = adjusted.anchorKey === null
+            // handle 'deselected' range
+            ? value.set('decorations', value.decorations.delete(i))
+            : value.set('decorations', value.decorations.set(i, adjusted))
+        }
+      })
+    }
+  }
+
+  return value
+}
+
+/**
  * Applying functions.
  *
  * @type {Object}
@@ -73,15 +115,23 @@ const APPLIERS = {
     node = node.insertText(offset, text, marks)
     document = document.updateNode(node)
 
-    // Update the selection
-    if (anchorKey == node.key && anchorOffset >= offset) {
-      selection = selection.moveAnchor(text.length)
-    }
-    if (focusKey == node.key && focusOffset >= offset) {
-      selection = selection.moveFocus(text.length)
-    }
+    value = value.set('document', document)
 
-    value = value.set('document', document).set('selection', selection)
+    // Update the selection, decorations
+    value = applyRangeAdjustments(
+      value,
+      ({ anchorKey, anchorOffset }) =>
+        anchorKey == node.key && anchorOffset >= offset,
+      range => range.moveAnchor(text.length)
+    )
+
+    value = applyRangeAdjustments(
+      value,
+      ({ focusKey, focusOffset }) =>
+        focusKey == node.key && focusOffset >= offset,
+      range => range.moveFocus(text.length)
+    )
+
     return value
   },
 
@@ -108,36 +158,28 @@ const APPLIERS = {
     // Perform the merge in the document.
     parent = parent.mergeNode(oneIndex, twoIndex)
     document = document.updateNode(parent)
+    value = value.set('document', document)
 
-    // If the nodes are text nodes and the selection is inside the second node
-    // update it to refer to the first node instead.
     if (one.object == 'text') {
-      const { anchorKey, anchorOffset, focusKey, focusOffset } = selection
-      let normalize = false
-
-      if (anchorKey == two.key) {
-        selection = selection.moveAnchorTo(
-          one.key,
-          one.text.length + anchorOffset
-        )
-        normalize = true
-      }
-
-      if (focusKey == two.key) {
-        selection = selection.moveFocusTo(
-          one.key,
-          one.text.length + focusOffset
-        )
-        normalize = true
-      }
-
-      if (normalize) {
-        selection = selection.normalize(document)
-      }
+      value = applyRangeAdjustments(
+        value,
+        // If the nodes are text nodes and the range is inside the second node:
+        ({anchorKey, focusKey}) => (anchorKey == two.key || focusKey == two.key),
+        // update it to refer to the first node instead:
+        range => {
+          if (range.anchorKey == two.key) range = range.moveAnchorTo(
+            one.key,
+            one.text.length + range.anchorOffset
+          )
+          if (range.focusKey == two.key) range = range.moveFocusTo(
+            one.key,
+            one.text.length + range.focusOffset
+          )
+          return range.normalize(document)
+        }
+      )
     }
 
-    // Update the document and selection.
-    value = value.set('document', document).set('selection', selection)
     return value
   },
 
@@ -222,44 +264,42 @@ const APPLIERS = {
   remove_node(value, operation) {
     const { path } = operation
     let { document, selection } = value
-    const { startKey, endKey } = selection
     const node = document.assertPath(path)
 
-    // If the selection is set, check to see if it needs to be updated.
-    if (selection.isSet) {
-      const hasStartNode = node.hasNode(startKey)
-      const hasEndNode = node.hasNode(endKey)
+    if (selection.isSet || value.decorations !== null) {
+
       const first = node.object == 'text' ? node : node.getFirstText() || node
       const last = node.object == 'text' ? node : node.getLastText() || node
       const prev = document.getPreviousText(first.key)
       const next = document.getNextText(last.key)
 
-      // If the start point was in this node, update it to be just before/after.
-      if (hasStartNode) {
-        if (prev) {
-          selection = selection.moveStartTo(prev.key, prev.text.length)
-        } else if (next) {
-          selection = selection.moveStartTo(next.key, 0)
-        } else {
-          selection = selection.deselect()
-        }
-      }
+      value = applyRangeAdjustments(
+        value,
+        // If the start or end point was in this node
+        ({ startKey, endKey }) => (node.hasNode(startKey) || node.hasNode(endKey)),
+        // update it to be just before/after
+        range => {
+          const { startKey, endKey } = range
 
-      // If the end point was in this node, update it to be just before/after.
-      if (selection.isSet && hasEndNode) {
-        if (prev) {
-          selection = selection.moveEndTo(prev.key, prev.text.length)
-        } else if (next) {
-          selection = selection.moveEndTo(next.key, 0)
-        } else {
-          selection = selection.deselect()
+          if (node.hasNode(startKey)) {
+            range = prev
+              ? range.moveStartTo(prev.key, prev.text.length)
+              : next
+                ? range.moveStartTo(next.key, 0)
+                : range.deselect()
+          }
+          if (node.hasNode(endKey)) {
+            range = prev
+              ? range.moveEndTo(prev.key, prev.text.length)
+              : next
+                ? range.moveEndTo(next.key, 0)
+                : range.deselect()
+          }
+          // If the range wasn't deselected, normalize it.
+          if (range.isSet) return range.normalize(document)
+          return range
         }
-      }
-
-      // If the selection wasn't deselected, normalize it.
-      if (selection.isSet) {
-        selection = selection.normalize(document)
-      }
+      )
     }
 
     // Remove the node from the document.
@@ -268,8 +308,8 @@ const APPLIERS = {
     parent = parent.removeNode(index)
     document = document.updateNode(parent)
 
-    // Update the document and selection.
-    value = value.set('document', document).set('selection', selection)
+    // Update the document and range.
+    value = value.set('document', document)
     return value
   },
 
@@ -285,29 +325,37 @@ const APPLIERS = {
     const { path, offset, text } = operation
     const { length } = text
     const rangeOffset = offset + length
-    let { document, selection } = value
-    const { anchorKey, focusKey, anchorOffset, focusOffset } = selection
+    let { document } = value
+    
     let node = document.assertPath(path)
 
-    if (anchorKey == node.key) {
-      if (anchorOffset >= rangeOffset) {
-        selection = selection.moveAnchor(-length)
-      } else if (anchorOffset > offset) {
-        selection = selection.moveAnchorTo(anchorKey, offset)
-      }
-    }
+    value = applyRangeAdjustments(
+      value,
+      // if anchor of range is here
+      ({ anchorKey }) => anchorKey == node.key,
+      // adjust if it is in or past the removal range
+      range => range.anchorOffset >= rangeOffset
+        ? range.moveAnchor(-length)
+        : range.anchorOffset > offset
+          ? range.moveAnchorTo(range.anchorKey, offset)
+          : range
+    )
 
-    if (focusKey == node.key) {
-      if (focusOffset >= rangeOffset) {
-        selection = selection.moveFocus(-length)
-      } else if (focusOffset > offset) {
-        selection = selection.moveFocusTo(focusKey, offset)
-      }
-    }
+    value = applyRangeAdjustments(
+      value,
+      // if focus of range is here
+      ({ focusKey }) => focusKey == node.key,
+      // adjust if it is in or past the removal range
+      range => range.focusOffset >= rangeOffset
+        ? range.moveFocus(-length)
+        : range.focusOffset > offset
+          ? range.moveFocusTo(range.focusKey, offset)
+          : range
+    )
 
     node = node.removeText(offset, length)
     document = document.updateNode(node)
-    value = value.set('document', document).set('selection', selection)
+    value = value.set('document', document)
     return value
   },
 
@@ -400,7 +448,7 @@ const APPLIERS = {
 
   split_node(value, operation) {
     const { path, position, properties } = operation
-    let { document, selection } = value
+    let { document } = value
 
     // Calculate a few things...
     const node = document.assertPath(path)
@@ -416,32 +464,38 @@ const APPLIERS = {
       }
     }
     document = document.updateNode(parent)
-
-    // Determine whether we need to update the selection...
-    const { startKey, endKey, startOffset, endOffset } = selection
     const next = document.getNextText(node.key)
-    let normalize = false
 
-    // If the start point is after or equal to the split, update it.
-    if (node.key == startKey && position <= startOffset) {
-      selection = selection.moveStartTo(next.key, startOffset - position)
-      normalize = true
-    }
+    value = applyRangeAdjustments(
+      value,
+      // check if range is affected
+      ({ startKey, startOffset, endKey, endOffset }) =>
+        (node.key == startKey && position <= startOffset) ||
+        (node.key == endKey && position <= endOffset)
+      ,
+      // update its start / end as needed
+      range => {
+        const { startKey, startOffset, endKey, endOffset } = range
+        let normalize = false
 
-    // If the end point is after or equal to the split, update it.
-    if (node.key == endKey && position <= endOffset) {
-      selection = selection.moveEndTo(next.key, endOffset - position)
-      normalize = true
-    }
+        if (node.key == startKey && position <= startOffset) {
+          range = range.moveStartTo(next.key, startOffset - position)
+          normalize = true
+        }
 
-    // Normalize the selection if we changed it, since the methods we use might
-    // leave it in a non-normalized value.
-    if (normalize) {
-      selection = selection.normalize(document)
-    }
+        if (node.key == endKey && position <= endOffset) {
+          range = range.moveEndTo(next.key, endOffset - position)
+          normalize = true
+        }
+
+        // Normalize the selection if we changed it
+        if (normalize) return range.normalize(document)
+        return range    
+      }      
+    )
 
     // Return the updated value.
-    value = value.set('document', document).set('selection', selection)
+    value = value.set('document', document)
     return value
   },
 }
