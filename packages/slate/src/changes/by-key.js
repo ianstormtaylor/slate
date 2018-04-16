@@ -2,6 +2,7 @@ import Block from '../models/block'
 import Inline from '../models/inline'
 import Mark from '../models/mark'
 import Node from '../models/node'
+import refindByKey from '../utils/refind-by-key'
 
 /**
  * Changes.
@@ -418,14 +419,32 @@ Changes.replaceNodeByKey = (change, key, newNode, options = {}) => {
   newNode = Node.create(newNode)
   const normalize = change.getFlag('normalize', options)
   const { value } = change
-  const { document } = value
+  const { document, selection } = value
   const node = document.getNode(key)
   const parent = document.getParent(key)
   const index = parent.nodes.indexOf(node)
   change.removeNodeByKey(key, { normalize: false })
-  change.insertNodeByKey(parent.key, index, newNode, options)
-  if (normalize) {
-    change.normalizeNodeByKey(parent.key)
+  change.insertNodeByKey(parent.key, index, newNode, { normalize })
+
+  // Restore the selection after replaceNode
+  const { anchorKey, focusKey } = selection
+  newNode = change.value.document.getDescendant(newNode.key)
+  if (!newNode) return undefined
+  if (anchorKey !== change.value.anchorKey) {
+    const { anchorOffset } = selection
+    const anchorText = refindByKey(anchorKey, node, newNode)
+    if (anchorText) {
+      const newOffset = Math.min(anchorText.text.length, anchorOffset)
+      change.moveAnchorTo(anchorText.key, newOffset)
+    }
+  }
+  if (focusKey !== change.value.focusKey) {
+    const { focusOffset } = selection
+    const focusText = refindByKey(focusKey, node, newNode)
+    if (focusText) {
+      const newOffset = Math.min(focusText.text.length, focusOffset)
+      change.moveFocusTo(focusText.key, newOffset)
+    }
   }
 }
 
