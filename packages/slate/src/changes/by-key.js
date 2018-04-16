@@ -330,8 +330,52 @@ Changes.removeNodeByKey = (change, key, options = {}) => {
   const normalize = change.getFlag('normalize', options)
   const { value } = change
   const { document } = value
+  let { selection } = value
+
   const path = document.getPath(key)
   const node = document.getNode(key)
+
+  // If the selection is set, check to see if it needs to be updated.
+  if (selection.isSet) {
+    const { startKey, endKey } = selection
+    const hasStartNode = node.hasNode(startKey)
+    const hasEndNode = node.hasNode(endKey)
+    const first = node.object == 'text' ? node : node.getFirstText() || node
+    const last = node.object == 'text' ? node : node.getLastText() || node
+    const prev = document.getPreviousText(first.key)
+    const next = document.getNextText(last.key)
+
+    // If the start point was in this node, update it to be just before/after.
+    if (hasStartNode) {
+      if (prev) {
+        selection = selection.moveStartTo(prev.key, prev.text.length)
+      } else if (next) {
+        selection = selection.moveStartTo(next.key, 0)
+      } else {
+        selection = selection.deselect()
+      }
+    }
+
+    // If the end point was in this node, update it to be just before/after.
+    if (selection.isSet && hasEndNode) {
+      if (prev) {
+        selection = selection.moveEndTo(prev.key, prev.text.length)
+      } else if (next) {
+        selection = selection.moveEndTo(next.key, 0)
+      } else {
+        selection = selection.deselect()
+      }
+    }
+
+    // If the selection wasn't deselected, normalize it.
+    if (selection.isSet) {
+      selection = selection.normalize(document)
+    }
+  }
+
+  if (selection !== value.selection) {
+    change.select(selection)
+  }
 
   change.applyOperation({
     type: 'remove_node',
