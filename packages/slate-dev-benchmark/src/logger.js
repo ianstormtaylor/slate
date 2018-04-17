@@ -43,7 +43,7 @@ export function log(message, ...args) {
   if (!IS_DEV) {
     return
   }
-  // if (IS_TEST) return
+  if (IS_TEST) return
 
   if (HAS_CONSOLE) {
     console.log(message, ...args)
@@ -80,7 +80,9 @@ export default function logger(obj) {
     const { cycles } = report
     for (const key of ['user', 'system', 'all']) {
       log(
-        `${prefix + prefix + prefix}${key} * ${cycles} cycles: ${report[key]}`
+        `${prefix + prefix + prefix}${key} * ${cycles} cycles: ${
+          report[key]
+        } ms`
       )
     }
     return log(`${prefix + prefix + prefix}cycles: ${cycles}`)
@@ -88,9 +90,9 @@ export default function logger(obj) {
   if (obj.isTimer) {
     const timerPrefix = prefix + prefix + prefix
     const { user, system, all } = obj.data
-    log(`${timerPrefix}- user: ${user} seconds`)
-    log(`${timerPrefix}- system: ${system} seconds`)
-    return log(`${timerPrefix}- all: ${all} seconds`)
+    log(`${timerPrefix}- user: ${user} ms`)
+    log(`${timerPrefix}- system: ${system} ms`)
+    return log(`${timerPrefix}- all: ${all} ms`)
   }
   return log(obj)
 }
