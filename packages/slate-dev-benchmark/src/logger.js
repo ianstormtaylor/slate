@@ -1,10 +1,4 @@
 /* eslint-disable no-console */
-import {
-  RepositoryType,
-  SuiteType,
-  BenchType,
-  TimerType,
-} from './components/types'
 
 /**
  * Is in development?
@@ -37,7 +31,7 @@ const HAS_CONSOLE =
  * @param {Any} ...args
  */
 
-export function log(level, message, ...args) {
+export function log(message, ...args) {
   if (!IS_DEV) {
     return
   }
@@ -63,13 +57,13 @@ export function errorLog(level, message, ...args) {
 
 export default function logger(obj) {
   const prefix = '    '
-  if (obj[RepositoryType]) {
+  if (obj.isRepository) {
     return log(`Repository ${obj.name} is running`)
   }
-  if (obj[SuiteType]) {
+  if (obj.isSuite) {
     return log(`${prefix}- Suite ${obj.name} is running`)
   }
-  if (obj[BenchType]) {
+  if (obj.isBench) {
     if (!obj.isFinished) {
       return log(`${prefix + prefix}- Bench ${obj.name} is running`)
     }

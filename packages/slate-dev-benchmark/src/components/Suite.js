@@ -15,16 +15,13 @@ class Suite {
       throw Error(`The suite name must be a string`)
     }
 
-    // this.repository = repository
     this.name = name
     this.options = makeOptions(options)
+    this.isFinished = false
+    this.benches = []
+    this.report = {}
     repository.addSuite(this)
   }
-
-  isFinished = false
-  benches = []
-  report = {};
-  [SuiteType]: true
 
   isSuite(obj) {
     return obj && obj[SuiteType]
@@ -48,5 +45,6 @@ class Suite {
     })
   }
 }
+Suite.prototype[SuiteType] = true
 
 export default Suite

@@ -7,14 +7,12 @@ class Repository {
   isRepository(obj) {
     return obj && obj[RepositoryType]
   }
-  contructor(name = 'default') {
+  constructor(name = 'default') {
     this.name = name
+    this.suites = []
+    this.report = {}
+    this.isFinished = false
   }
-
-  suites = []
-  report = {}
-  isFinished = false;
-  [RepositoryType]: true
 
   addSuite(suite) {
     this.suites.push(suite)
@@ -34,6 +32,7 @@ class Repository {
     })
   }
 }
+Repository.prototype[RepositoryType] = true
 
 export default Repository
 export const repo = new Repository()

@@ -8,14 +8,15 @@ const defaultOptions = {
 }
 
 export default function(options) {
-  for (const key in options) {
+  const result = { ...defaultOptions, ...options }
+  for (const key in defaultOptions) {
     const shallType = typeof defaultOptions[key]
-    const inputType = typeof options[key]
+    const inputType = typeof result[key]
     if (shallType !== inputType) {
       throw TypeError(
         `Wrong Input in Config Suite, options[${key}] should be ${shallType}, but the input type is ${inputType}`
       )
     }
   }
-  return { ...defaultOptions, options }
+  return result
 }

@@ -1,19 +1,20 @@
 import { TimerType } from './types'
 
 class Timer {
-  construct(maxTime) {
+  constructor(maxTime) {
     if (maxTime && maxTime > 0 && Number.isFinite(maxTime)) {
       this.maxTime = maxTime
     }
   }
+  isTimer(obj) {
+    return obj && obj[TimerType]
+  }
+  startTime = {}
   maxTimeTimerID = undefined
   isStopped = false
-  start = {}
   elapsed = {}
-  data = {};
-  [TimerType]: true
   start() {
-    this.start = process.cpuUsage()
+    this.startTime = process.cpuUsage()
     this.isStopped = false
     if (this.maxTime) {
       this.maxTimeTimerID = setTimeout(() => {
@@ -26,13 +27,14 @@ class Timer {
     clearTimeout(this.maxTimeTimerID)
     this.maxTimeTimerID = undefined
     this.isStopped = true
-    this.elapsed = process.cpuUsage(this.start)
-    const { user, system } = this.elapsed
-    this.data = {
-      user,
-      system,
-      all: user + system,
+    const elapsed = process.cpuUsage(this.startTime)
+    const { user, system } = elapsed
+    this.elapsed = {
+      user: user / 1000,
+      system: system / 1000,
+      all: (user + system) / 1000,
     }
   }
 }
+Timer.prototype[TimerType] = true
 export default Timer

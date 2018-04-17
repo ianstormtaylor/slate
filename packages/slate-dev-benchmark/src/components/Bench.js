@@ -15,13 +15,15 @@ class Bench {
   constructor(suite, name, options = {}) {
     this.name = name
     this.options = makeOptions({ ...suite.options, ...options })
+    this.isFinished = false
+    this.inputer = () => undefined
+    this.runner = () => {}
+    this.report = { ...errorReport }
     suite.addBench(this)
   }
-  isFinished = false
-  inputer = () => undefined
-  runner = () => {}
-  report = { ...errorReport };
-  [BenchType]: true
+  isBench(obj) {
+    return obj && obj[BenchType]
+  }
 
   input(inputer) {
     if (Array.isArray(inputer)) {
@@ -37,31 +39,30 @@ class Bench {
     this.runner = runner
   }
 
-  compose(times) {
-    const input = Array.from(times).map(index => this.inputer(index))
+  compose = times => {
+    const input = Array.from({ length: times }).map(index =>
+      this.inputer(index)
+    )
     const timer = new Timer(this.options.maxTime)
     timer.start()
-    return dispatch(0).then(index => {
-      timer.end()
-      return { ...timer.elapsed, cycles: index }
-    })
 
     function dispatch(index) {
       if (index === times) return Promise.resolve(index)
       if (timer.isStopped) return Promise.resolve(index)
-      try {
-        const prev = this.runner(input[index])
-        if (!prev.then) return dispatch(index + 1)
-        return prev.then(() => dispatch(index + 1))
-      } catch (err) {
-        errorLog(`Bench throws an error at index ${index}`)
-        throw err
-      }
+      return Promise.resolve(this.runner(input[index])).then(() =>
+        dispatch.call(this, index + 1)
+      )
     }
+
+    return dispatch.call(this, 0).then(index => {
+      timer.end()
+      return { ...timer.elapsed, cycles: index }
+    })
   }
 
   makeRun() {
     if (this.isFinished) return true
+    logger(this)
     const { options } = this
     const { minTries, maxTime, maxTries } = options
 
@@ -70,6 +71,7 @@ class Bench {
 
     return this.compose(minTries)
       .then(report => {
+        if (this.options.mode === 'static') return report
         const { all } = report
         if (all > minTime) return report
         const times = (minTime / all - 1) * minTries
@@ -83,9 +85,13 @@ class Bench {
         logger(this)
         return true
       })
+      .catch(err => {
+        errorLog(err)
+        throw err
+      })
   }
 }
-
+Bench.prototype[BenchType] = true
 function mergeResults(res1, res2) {
   const result = {}
   for (const key in res1) {
