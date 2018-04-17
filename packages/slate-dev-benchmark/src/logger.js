@@ -24,9 +24,17 @@ const HAS_CONSOLE =
   typeof console.error == 'function'
 
 /**
- * Log a `message` at `level`.
+ * IS in test
+ */
+
+const IS_TEST =
+  typeof process !== 'undefined' &&
+  process.env &&
+  process.env.BABEL_ENV === 'test'
+
+/**
+ * Log a `message`
  *
- * @param {String} level
  * @param {String} message
  * @param {Any} ...args
  */
@@ -35,6 +43,7 @@ export function log(message, ...args) {
   if (!IS_DEV) {
     return
   }
+  if (IS_TEST) return
 
   if (HAS_CONSOLE) {
     console.log(message, ...args)
@@ -76,7 +85,7 @@ export default function logger(obj) {
     }
     return log(`${prefix + prefix + prefix}cycles: ${cycles}`)
   }
-  if (obj[TimerType]) {
+  if (obj.isTimer) {
     const timerPrefix = prefix + prefix + prefix
     const { user, system, all } = obj.data
     log(`${timerPrefix}- user: ${user} seconds`)
