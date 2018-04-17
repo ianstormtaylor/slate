@@ -28,29 +28,21 @@ function applyRangeAdjustments(value, checkAffected, adjustRange) {
   )
   if (ranges.length === 0) return
 
-  for (const range of ranges) {
-    if (!checkAffected(range)) continue
-    const adjusted = adjustRange(range)
-
-    // apply at source of this range, comparing by identity
-    if (value.selection === range) {
-      value = value.set('selection', adjusted)
-    }
-    if (value.decorations !== null) {
-      // not using List.includes() since it isn't true identity check
-      value.decorations.forEach((decoration, i) => {
-        if (decoration === range) {
-          value =
-            adjusted.anchorKey === null
-              ? // handle 'deselected' range
-                value.set('decorations', value.decorations.delete(i))
-              : value.set('decorations', value.decorations.set(i, adjusted))
-        }
-      })
-    }
+  // check selection, apply if affected
+  if (value.selection && checkAffected(value.selection)) {
+    value = value.set('selection', adjustRange(value.selection))
   }
 
-  return value
+  if (!value.decorations) return value
+
+  const decorations = value.decorations
+    .map(
+      decoration =>
+        checkAffected(decoration) ? adjustRange(decoration) : decoration
+    )
+    .filter(decoration => decoration.anchorKey !== null)
+
+  return value.set('decorations', decorations)
 }
 
 /**
