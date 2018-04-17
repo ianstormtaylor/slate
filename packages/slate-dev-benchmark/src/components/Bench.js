@@ -39,7 +39,7 @@ class Bench {
     this.runner = runner
   }
 
-  compose = times => {
+  compose(times) {
     const input = Array.from({ length: times }).map(index =>
       this.inputer(index)
     )

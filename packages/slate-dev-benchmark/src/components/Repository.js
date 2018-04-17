@@ -15,6 +15,7 @@ class Repository {
   }
 
   addSuite(suite) {
+    this.isFinished = false
     this.suites.push(suite)
   }
 

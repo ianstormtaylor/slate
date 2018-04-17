@@ -28,6 +28,7 @@ class Suite {
   }
 
   addBench(bench, name) {
+    this.isFinished = false
     this.benches.push(bench)
   }
 

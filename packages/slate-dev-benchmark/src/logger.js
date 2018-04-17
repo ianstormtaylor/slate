@@ -43,7 +43,7 @@ export function log(message, ...args) {
   if (!IS_DEV) {
     return
   }
-  if (IS_TEST) return
+  // if (IS_TEST) return
 
   if (HAS_CONSOLE) {
     console.log(message, ...args)
