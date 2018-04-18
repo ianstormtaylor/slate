@@ -78,7 +78,7 @@ export default function logger(obj) {
     }
     const { report } = obj
     const { cycles } = report
-    for (const key of ['user', 'system', 'all']) {
+    for (const key of ['user', 'system', 'all', 'hr']) {
       log(
         `${prefix + prefix + prefix}${key} * ${cycles} cycles: ${
           report[key]
@@ -86,13 +86,6 @@ export default function logger(obj) {
       )
     }
     return log(`${prefix + prefix + prefix}cycles: ${cycles}`)
-  }
-  if (obj.isTimer) {
-    const timerPrefix = prefix + prefix + prefix
-    const { user, system, all } = obj.data
-    log(`${timerPrefix}- user: ${user} ms`)
-    log(`${timerPrefix}- system: ${system} ms`)
-    return log(`${timerPrefix}- all: ${all} ms`)
   }
   return log(obj)
 }
