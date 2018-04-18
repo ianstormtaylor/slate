@@ -26,8 +26,11 @@ export const output = (
     <document>
       <paragraph>zero</paragraph>
       <paragraph>
-        a<cursor />three
+        a<cursor />
       </paragraph>
+      <quote>
+        <focus />three
+      </quote>
     </document>
   </value>
 )

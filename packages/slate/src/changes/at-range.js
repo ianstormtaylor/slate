@@ -830,28 +830,46 @@ Changes.insertTextAtRange = (change, range, text, marks, options = {}) => {
   let { normalize } = options
   const { value } = change
   const { document } = value
-  const { startKey, startOffset, endKey } = range
+  const { startKey, startOffset, endOffset, endKey } = range
   const key = startKey
   const offset = startOffset
   const parent = document.getParent(startKey)
 
   if (parent.isVoid) return undefined
   change.insertTextByKey(key, offset, text, marks, { normalize: false })
-  if (range.isBachward) range = range.flip()
-  if (endKey === startKey) range = range.moveFocus(text.length)
-  range = range.moveAnchor(text.length)
+
+  // PERF: Unless specified, don't normalize if only inserting text.
+  if (normalize === undefined) {
+    normalize = range.isExpanded
+  }
 
   if (range.isExpanded) {
-    // PERF: Unless specified, don't normalize if only inserting text.
-    if (normalize === undefined) {
-      normalize = range.isExpanded
+    if (range.isBachward) range = range.flip()
+    if (endKey === startKey) range = range.moveFocus(text.length)
+    range = range.moveAnchor(text.length)
+
+    const startBlock = document.getClosestBlock(startKey)
+    const endBlock = document.getClosestBlock(endKey)
+    const isHanging =
+      startOffset == 0 &&
+      endOffset == 0 &&
+      !document.hasVoidParent(startKey) &&
+      startKey == startBlock.getFirstText().key &&
+      endKey == endBlock.getFirstText().key
+
+    // If hanging, do not merge the last block
+    if (isHanging) {
+      range = range.moveFocusToEndOf(
+        change.value.document.getPreviousBlock(endBlock.key)
+      )
     }
+
     change.deleteAtRange(range, { normalize: false })
   }
 
   if (normalize) {
     // normalize in the narrowest existing block that originally contains startKey and endKey
-    const commonAncestor = document.getCommonAncestor(startKey, range.endKey)
+    const commonAncestor = document.getCommonAncestor(startKey, endKey)
     const ancestors = document
       .getAncestors(commonAncestor.key)
       .push(commonAncestor)

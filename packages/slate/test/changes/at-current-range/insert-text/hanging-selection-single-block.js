@@ -25,8 +25,11 @@ export const output = (
     <document>
       <paragraph>Zero</paragraph>
       <paragraph>
-        a<cursor />two
+        a<cursor />
       </paragraph>
+      <quote>
+        <focus />two
+      </quote>
     </document>
   </value>
 )
