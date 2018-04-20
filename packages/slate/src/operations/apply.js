@@ -12,8 +12,8 @@ const debug = Debug('slate:operation:apply')
 
 /**
  * Apply adjustments to affected ranges (selections, decorations);
- * accepts (value, checking function -> bool, applying function -> range)
- * returns value with affected ranges fixed
+ * accepts (value, checking function(range) -> bool, applying function(range) -> range)
+ * returns value with affected ranges updated
  *
  * @param {Value} value
  * @param {Function} checkAffected
@@ -22,26 +22,19 @@ const debug = Debug('slate:operation:apply')
  */
 
 function applyRangeAdjustments(value, checkAffected, adjustRange) {
-  // gather all ranges from selection, decorations
-  const ranges = (value.selection ? [value.selection] : []).concat(
-    value.decorations ? value.decorations.toArray() : []
-  )
-  if (ranges.length === 0) return
-
-  // check selection, apply if affected
+  // check selection, apply adjustment if affected
   if (value.selection && checkAffected(value.selection)) {
     value = value.set('selection', adjustRange(value.selection))
   }
-
   if (!value.decorations) return value
 
+  // check all ranges, apply adjustment if affected
   const decorations = value.decorations
     .map(
       decoration =>
         checkAffected(decoration) ? adjustRange(decoration) : decoration
     )
     .filter(decoration => decoration.anchorKey !== null)
-
   return value.set('decorations', decorations)
 }
 
