@@ -46,7 +46,7 @@ class Value extends Record(DEFAULTS) {
     }
 
     if (isPlainObject(attrs)) {
-      return Value.fromJSON(attrs)
+      return Value.fromJSON(attrs, options)
     }
 
     throw new Error(
