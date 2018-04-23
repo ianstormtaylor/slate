@@ -4,6 +4,8 @@ const defaultOptions = {
   maxTime: 2000,
   minTries: 100,
   maxTries: Infinity,
+  allocationTries: 1000,
+  async: false,
   mode: 'adaptive',
 }
 
