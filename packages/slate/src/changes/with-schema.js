@@ -98,7 +98,7 @@ function normalizeNode(change, node, schema) {
   let iterations = 0
 
   function iterate(c, n) {
-    const normalize = n.validate(schema)
+    const normalize = n.validate(schema, c.value)
     if (!normalize) return
 
     // Run the `normalize` function to fix the node.
