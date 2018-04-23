@@ -27,7 +27,7 @@ describe('times', async () => {
     })
 
     return repo.run().then(() => {
-      assert.equal(index, 300)
+      assert.equal(index, 200)
     })
   })
 })
