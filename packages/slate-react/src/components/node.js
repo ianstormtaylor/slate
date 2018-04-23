@@ -7,6 +7,7 @@ import Types from 'prop-types'
 
 import Void from './void'
 import Text from './text'
+import orderChildDecorations from '../utils/order-child-decorations'
 
 /**
  * Debug.
@@ -109,55 +110,6 @@ class Node extends React.Component {
     // Otherwise, don't update.
     return false
   }
-
-  /**
-   * orders the children of this node and the decoration endpoints (start, end) 
-   * so that decorations can be passed only to relevant children (see use in render())
-   * 
-   * @param {List} childNodes
-   * @param {List} decorations
-   * @return {Array}
-   */
-
-  getDecoratedByIndex = (childNodes, decorations) => {
-    const { node } = this.props
-    const keyIndices = node.getKeysAsArray()
-
-    let endPoints = childNodes.map((child, i) => ({
-      isChild: true,
-      offset: keyIndices.indexOf(child.key),
-      key: child.key,
-      child,
-    }))
-
-    decorations.forEach(d => {
-      endPoints.push({
-        isRangeStart: true,
-        offset: keyIndices.indexOf(d.startKey) - 0.5,
-        key: d.startKey,
-        d,
-      })
-      endPoints.push({
-        isRangeEnd: true,
-        offset: keyIndices.indexOf(d.endKey) + 0.5,
-        key: d.endKey,
-        d,
-      })
-    })
-
-    const order = (a, b) => a.offset > b.offset ? 1 : -1
-
-    return endPoints.sort((a,b) => 
-      // if comparing a rangeStart with a child,
-      // move it before the child that owns its startKey
-      a.isRangeStart && b.isChild && b.child.getKeysAsArray
-        ? b.child.getKeysAsArray().includes(a.key) ? -1 : order(a,b)
-        : b.isRangeStart && a.isChild && a.child.getKeysAsArray
-          ? a.child.getKeysAsArray().includes(b.key) ? 1 : order(a,b)
-          : order(a,b)
-    )
-  }
-
   /**
    * Render.
    *
@@ -173,11 +125,10 @@ class Node extends React.Component {
     const indexes = node.getSelectionIndexes(selection, isSelected)
     const decs = decorations.concat(node.getDecorations(stack))
 
-    const childNodes = node.nodes.toArray()
     let activeDecorations = new Set()
     let children = []
 
-    this.getDecoratedByIndex(childNodes, decs).forEach(item => {
+    orderChildDecorations(node, decs).forEach(item => {
       if (item.isChild) {
         const isChildSelected = !!indexes && indexes.start <= item.i && item.i < indexes.end
         return children.push(
