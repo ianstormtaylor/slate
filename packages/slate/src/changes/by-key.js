@@ -423,7 +423,7 @@ Changes.replaceNodeByKey = (change, key, newNode, options = {}) => {
   const parent = document.getParent(key)
   const index = parent.nodes.indexOf(node)
   change.removeNodeByKey(key, { normalize: false })
-  change.insertNodeByKey(parent.key, index, newNode, options)
+  change.insertNodeByKey(parent.key, index, newNode, { normalize: false })
   if (normalize) {
     change.normalizeNodeByKey(parent.key)
   }
