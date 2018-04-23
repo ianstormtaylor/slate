@@ -39,7 +39,7 @@ class Bench {
     this.runner = runner
   }
 
-  async compose(times) {
+  async compose(times, initial) {
     const isAsync = this.options.async
     const { runner, inputer } = this
 
@@ -50,7 +50,7 @@ class Bench {
 
     const report = { user: 0, system: 0, all: 0, hr: 0, cycles: 0 }
     for (
-      let initialIndex = 0;
+      let initialIndex = initial;
       initialIndex < times;
       initialIndex += this.options.allocationTries
     ) {
@@ -100,6 +100,9 @@ class Bench {
 
   makeRun() {
     if (this.isFinished) return true
+    if (global.gc) {
+      global.gc()
+    }
     logger(this)
     const { options } = this
     const { minTries, maxTime, maxTries } = options
@@ -107,15 +110,17 @@ class Bench {
     let { minTime } = options
     if (minTime > maxTime) minTime = maxTime
 
-    return this.compose(minTries)
+    return this.compose(minTries, 0)
       .then(report => {
         if (this.options.mode === 'static') return report
         const { all } = report
         if (all > minTime) return report
         const times = (minTime / all - 1) * minTries
-        return this.compose(Math.min(times, maxTries)).then(newReport => {
-          return mergeResults(report, newReport)
-        })
+        return this.compose(Math.min(times, maxTries), minTries).then(
+          newReport => {
+            return mergeResults(report, newReport)
+          }
+        )
       })
       .then(report => {
         this.report = report
