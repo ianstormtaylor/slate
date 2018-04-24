@@ -9,6 +9,4 @@ Each of them has a corresponding GitbookIO/repository containing the Git history
 
 To build and publish our forks to GitHub, run `node publish.js`.
 
-In this forked monorepo, the dependencies to our forked packages use GitHub URLs as explaine here https://github.com/lerna/lerna#git-hosted-dependencies
-
-To publish
+In this forked monorepo, the dependencies to our forked packages use GitHub URLs as explained here https://github.com/lerna/lerna#git-hosted-dependencies This required us to upgrade to lerna v3-Beta.
