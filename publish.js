@@ -10,6 +10,7 @@ the respective fork repos, adding the package's version as a tag.
 */
 
 const path = require('path')
+const Promise = require('q')
 const program = require('commander')
 const exec = require('child-process-promise').exec
 

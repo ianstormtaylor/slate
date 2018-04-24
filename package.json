@@ -46,6 +46,7 @@
     "npm-run-all": "^4.1.2",
     "prettier": "^1.10.2",
     "prismjs": "^1.5.1",
+    "q": "^1.5.1",
     "react": "^16.0.0",
     "react-dom": "^16.0.0",
     "react-frame-aware-selection-plugin": "^1.0.0",
