@@ -32,13 +32,13 @@
   "peerDependencies": {
     "react": "^0.14.0 || ^15.0.0 || ^16.0.0",
     "react-dom": "^0.14.0 || ^15.0.0 || ^16.0.0",
-    "slate": ">=0.32.0"
+    "slate": "github:GitbookIO/slate-core#semver:>=0.32.0"
   },
   "devDependencies": {
     "mocha": "^2.5.3",
-    "slate": "^0.33.4",
     "slate-hyperscript": "^0.5.10",
     "slate-simulator": "^0.4.27"
+    "slate": "github:GitbookIO/slate-core#semver:^0.33.4",
   },
   "scripts": {
     "clean": "rm -rf ./dist ./lib ./node_modules"
