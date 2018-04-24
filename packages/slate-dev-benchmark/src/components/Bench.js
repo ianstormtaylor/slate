@@ -81,7 +81,7 @@ class Bench {
         if (index === tries) return Promise.resolve(tries)
         if (index === nextCheckIndex) {
           const hrEnd = process.hrtime(hrStart)
-          const elapsed = hrEnd[0] * 1e3 + hrEnd[1] / 1e3
+          const elapsed = hrEnd[0] * 1e3 + hrEnd[1] / 1e6
           if (elapsed > maxTime) {
             return Promise.resolve(index)
           } else {
