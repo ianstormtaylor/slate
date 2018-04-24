@@ -54,6 +54,9 @@ class Bench {
       initialIndex < times;
       initialIndex += this.options.allocationTries
     ) {
+      if (global.gc) {
+        global.gc()
+      }
       const tries = Math.min(times - initialIndex, this.options.allocationTries)
       const thisTryReport = await composeAnBench.call(this, tries, initialIndex)
       for (const key in report) {
