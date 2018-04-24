@@ -24,8 +24,8 @@
   },
   "devDependencies": {
     "mocha": "^2.5.3",
-    "slate-hyperscript": "^0.5.10"
     "slate": "github:GitbookIO/slate-core#semver:^0.33.4",
+    "slate-hyperscript": "^0.5.10"
   },
   "scripts": {
     "clean": "rm -rf ./dist ./lib ./node_modules"
