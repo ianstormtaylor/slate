@@ -12,7 +12,7 @@ the respective fork repos, adding the package's version as a tag.
 const path = require('path')
 const Promise = require('q')
 const program = require('commander')
-const exec = require('child-process-promise').exec
+const execCommand = require('child-process-promise').exec
 
 /* Parse command line args */
 
@@ -30,8 +30,8 @@ const PACKAGES = [
     // path: string
   },
   {
-    name: 'slate-core',
-    dir: 'packages/slate',
+    name: 'slate-react',
+    dir: 'packages/slate-react',
   },
 ]
 
@@ -54,33 +54,38 @@ PACKAGES.forEach(pkg => {
 // Run a chain of promise on all packages
 function forEachPackage(fn) {
   return PACKAGES.reduce((promise, pkg) => {
-    return promise.then(fn(pkg))
+    return promise.then(() => {
+      return fn(pkg)
+    })
   }, Promise())
+}
+
+function exec(command) {
+  console.log(` ${command}`)
+  return execCommand(command)
 }
 
 return Promise()
   .then(() => {
-    return exec('git diff-index --quiet HEAD --') // Avoid committing unwanted changes
-      .fail(() => {
-        console.error('Your git index is not clean. Aborting')
-        process.exit(1)
-      })
+    // return exec('git diff-index --quiet HEAD --') // Avoid committing unwanted changes
+    //   .fail(() => {
+    //     console.error('Your git index is not clean. Aborting')
+    //     process.exit(1)
+    //   })
   })
   .then(() => {
     console.log('Testing ...')
-    return exec('yarn run test')
+    // return exec('yarn run test')
   })
   .then(() => {
-    console.log('Building ...')
-    return exec('yarn run bootstrap')
+    // console.log('Building ...')
+    // return exec('yarn run bootstrap', { caputre: ['stdout', 'stderr'] })
   })
   .then(() => {
     console.log('Staging ...')
     return forEachPackage(pkg => {
-      const libPath = path.join(pkg.path, 'lib')
-      const distPath = path.join(pkg.path, 'dist')
-
-      return exec(`git add -f ${[libPath, distPath].join(' ')}`)
+      const libPath = path.join('./', pkg.dir, 'lib')
+      return exec(`git add -f ${libPath}`)
     })
   })
   .then(() => {
