@@ -1,7 +1,8 @@
 {
   "presets": [
     ["env", {
-      "modules": false
+      "modules": false,
+      "exclude": ["transform-regenerator"]
     }],
     "react",
     "stage-0"
@@ -23,7 +24,9 @@
     },
     "test": {
       "presets": [
-        "env",
+        ["env", {
+          "exclude": ["transform-regenerator"]
+        }],
         "react",
         "stage-0"
       ],
@@ -34,7 +37,6 @@
         ["env", {
           "targets" : {
             "node": "current",
-            "browsers": []
           }
         }],
         "react",

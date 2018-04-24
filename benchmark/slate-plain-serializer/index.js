@@ -1,8 +1,7 @@
-/* global suite, set, bench */
-
 import fs from 'fs'
 import { basename, extname, resolve } from 'path'
 import { resetMemoization } from 'slate'
+import { Suite, Bench } from 'slate-dev-benchmark'
 
 /**
  * Benchmarks.
@@ -14,33 +13,23 @@ const categories = fs
   .filter(c => c[0] != '.' && c != 'index.js')
 
 categories.forEach(category => {
-  suite(category, () => {
-    set('iterations', 50)
-    set('mintime', 1000)
+  const suite = new Suite(category, { minTries: 50, minTime: 1000 })
+  const benchmarkDir = resolve(categoryDir, category)
+  const benchmarks = fs
+    .readdirSync(benchmarkDir)
+    .filter(b => b[0] != '.' && !!~b.indexOf('.js'))
+    .map(b => basename(b, extname(b)))
 
-    if (category == 'models') {
-      after(() => {
-        resetMemoization()
-      })
-    }
+  benchmarks.forEach(benchmark => {
+    const bench = new Bench(suite, benchmark)
+    const dir = resolve(benchmarkDir, benchmark)
+    const module = require(dir)
+    const fn = module.default
+    bench.input(() => module.input)
 
-    const benchmarkDir = resolve(categoryDir, category)
-    const benchmarks = fs
-      .readdirSync(benchmarkDir)
-      .filter(b => b[0] != '.' && !!~b.indexOf('.js'))
-      .map(b => basename(b, extname(b)))
-
-    benchmarks.forEach(benchmark => {
-      const dir = resolve(benchmarkDir, benchmark)
-      const module = require(dir)
-      const fn = module.default
-      let { input, before, after } = module
-      if (before) input = before(input)
-
-      bench(benchmark, () => {
-        fn(input)
-        if (after) after()
-      })
+    bench.run(input => {
+      fn(input)
+      resetMemoization()
     })
   })
 })
