@@ -21,6 +21,7 @@ class Bench {
     this.report = { ...errorReport }
     suite.addBench(this)
   }
+
   isBench(obj) {
     return obj && obj[BenchType]
   }
@@ -48,17 +49,21 @@ class Bench {
     let nextCheckIndex = seq
     const hrStart = process.hrtime()
 
+    if (global.gc) {
+      global.gc()
+    }
+
     const report = { user: 0, system: 0, all: 0, hr: 0, cycles: 0 }
     for (
       let initialIndex = initial;
       initialIndex < times;
       initialIndex += this.options.allocationTries
     ) {
+      const tries = Math.min(times - initialIndex, this.options.allocationTries)
+      const thisTryReport = await composeAnBench.call(this, tries, initialIndex)
       if (global.gc) {
         global.gc()
       }
-      const tries = Math.min(times - initialIndex, this.options.allocationTries)
-      const thisTryReport = await composeAnBench.call(this, tries, initialIndex)
       for (const key in report) {
         report[key] += thisTryReport[key]
       }
@@ -95,7 +100,9 @@ class Bench {
           runner(inputs[index])
           return dispatch(index + 1)
         } else {
-          return Promise.resolve(inputs[index]).then(() => dispatch(index + 1))
+          return Promise.resolve(runner(inputs[index])).then(() =>
+            dispatch(index + 1)
+          )
         }
       }
     }
@@ -103,9 +110,6 @@ class Bench {
 
   makeRun() {
     if (this.isFinished) return true
-    if (global.gc) {
-      global.gc()
-    }
     logger(this)
     const { options } = this
     const { minTries, maxTime, maxTries } = options

@@ -6,17 +6,20 @@ export const experiment = 'max-time'
 
 let index = 0
 export function expected() {
-  assert(index === 10, `index should be 10, but is actually ${index}`)
+  assert(
+    index > 85 && index < 115,
+    `index should be around 100, but is actually ${index}`
+  )
   return true
 }
 
 export default function(suite) {
   const bench = new Bench(suite, experiment, {
     mode: 'adaptive',
-    minTries: 100,
-    maxTries: 200,
+    minTries: 1000,
+    maxTries: 2000,
     minTime: 1,
-    maxTime: 100,
+    maxTime: 1000,
     async: false,
   })
   bench.run(() => {

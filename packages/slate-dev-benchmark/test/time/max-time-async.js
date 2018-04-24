@@ -5,10 +5,11 @@ import assert from 'assert'
 export const experiment = 'max-time-async'
 
 let index = 0
+// A wider range than sync, becuase Promise intialization, babel-node takes time
 export function expected() {
   assert(
-    index > 8 && index < 15,
-    `index should be around 10, but is actually ${index}`
+    index > 5 && index < 12,
+    `index should be 10, but is actually ${index}`
   )
   return true
 }
@@ -28,4 +29,3 @@ export default function(suite) {
     })
   )
 }
-export const skip = true
