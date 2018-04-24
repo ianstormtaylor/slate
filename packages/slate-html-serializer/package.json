@@ -20,11 +20,11 @@
     "immutable": "^3.8.1",
     "react": "^0.14.0 || ^15.0.0 || ^16.0.0",
     "react-dom": "^0.14.0 || ^15.0.0 || ^16.0.0",
-    "slate": ">=0.32.0"
+    "slate": "github:GitbookIO/slate-core#>=0.32.0"
   },
   "devDependencies": {
     "mocha": "^2.5.3",
-    "slate": "^0.33.4",
+    "slate": "github:GitbookIO/slate-core#^0.33.4",
     "slate-hyperscript": "^0.5.10"
   },
   "scripts": {
