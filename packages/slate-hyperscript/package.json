@@ -15,14 +15,14 @@
   "dependencies": {
     "is-empty": "^1.0.0",
     "is-plain-object": "^2.0.4",
-    "slate-dev-logger": "github:GitbookIO/slate-dev-logger#semver:^0.1.39"
+    "slate-dev-logger": "^0.1.39"
   },
   "peerDependencies": {
-    "slate": "github:GitbookIO/slate#semver:>=0.32.0"
+    "slate": ">=0.32.0"
   },
   "devDependencies": {
     "mocha": "^2.5.3",
-    "slate": "github:GitbookIO/slate#semver:^0.33.4"
+    "slate": "^0.33.4"
   },
   "scripts": {
     "clean": "rm -rf ./dist ./lib ./node_modules"

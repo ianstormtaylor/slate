@@ -24,21 +24,21 @@
     "react-immutable-proptypes": "^2.1.0",
     "react-portal": "^3.1.0",
     "selection-is-backward": "^1.0.0",
-    "slate-base64-serializer": "github:GitbookIO/slate-base64-serializer#semver:^0.2.29",
-    "slate-dev-logger": "github:GitbookIO/slate-dev-logger#semver:^0.1.39",
-    "slate-plain-serializer": "github:GitbookIO/slate-plain-serializer#semver:^0.5.10",
-    "slate-prop-types": "github:GitbookIO/slate-prop-types#semver:^0.4.27"
+    "slate-base64-serializer": "^0.2.29",
+    "slate-dev-logger": "^0.1.39",
+    "slate-plain-serializer": "^0.5.10",
+    "slate-prop-types": "^0.4.27"
   },
   "peerDependencies": {
     "react": "^0.14.0 || ^15.0.0 || ^16.0.0",
     "react-dom": "^0.14.0 || ^15.0.0 || ^16.0.0",
-    "slate": "github:GitbookIO/slate#semver:>=0.32.0"
+    "slate": ">=0.32.0"
   },
   "devDependencies": {
     "mocha": "^2.5.3",
-    "slate": "github:GitbookIO/slate#semver:^0.33.4",
-    "slate-hyperscript": "github:GitbookIO/slate-hyperscript#semver:^0.5.10",
-    "slate-simulator": "github:GitbookIO/slate-simulator#semver:^0.4.27"
+    "slate": "^0.33.4",
+    "slate-hyperscript": "^0.5.10",
+    "slate-simulator": "^0.4.27"
   },
   "scripts": {
     "clean": "rm -rf ./dist ./lib ./node_modules"

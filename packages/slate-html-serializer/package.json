@@ -13,19 +13,19 @@
     "lib/"
   ],
   "dependencies": {
-    "slate-dev-logger": "github:GitbookIO/slate-dev-logger#semver:^0.1.39",
+    "slate-dev-logger": "^0.1.39",
     "type-of": "^2.0.1"
   },
   "peerDependencies": {
     "immutable": "^3.8.1",
     "react": "^0.14.0 || ^15.0.0 || ^16.0.0",
     "react-dom": "^0.14.0 || ^15.0.0 || ^16.0.0",
-    "slate": "github:GitbookIO/slate#semver:>=0.32.0"
+    "slate": ">=0.32.0"
   },
   "devDependencies": {
     "mocha": "^2.5.3",
-    "slate": "github:GitbookIO/slate#semver:^0.33.4",
-    "slate-hyperscript": "github:GitbookIO/slate-hyperscript#semver:^0.5.10"
+    "slate": "^0.33.4",
+    "slate-hyperscript": "^0.5.10"
   },
   "scripts": {
     "clean": "rm -rf ./dist ./lib ./node_modules"
