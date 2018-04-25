@@ -18,9 +18,9 @@ export const input = (
   <value>
     <document>
       <block type="paragraph">
-        This is a <highlightAnchor key="c" />paragraph{' '}
+        This is a <highlight anchor key="c" />paragraph{' '}
         <b>
-          with<highlightFocus key="c" />
+          with<highlight focus key="c" />
         </b>{' '}
         a highlight.
       </block>

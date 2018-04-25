@@ -14,7 +14,8 @@ const CURSOR = {}
 const FOCUS = {}
 
 /**
- *  wrappers for decorator points, for comparison by instanceof
+ *  wrappers for decorator points, for comparison by instanceof,
+ *  and for composition into ranges (anchor.combine(focus), etc)
  */
 
 class DecoratorAnchor {
@@ -130,6 +131,14 @@ const CREATORS = {
   },
 
   decoration(tagName, attributes, children) {
+    if (attributes.data.anchor) {
+      return new DecoratorAnchor(attributes.key, [{ type: tagName }])
+    }
+
+    if (attributes.data.focus) {
+      return new DecoratorFocus(attributes.key, [{ type: tagName }])
+    }
+
     const nodes = createChildren(children, { key: attributes.key })
     nodes[0].__decorations = (nodes[0].__decorations || []).concat([
       {
@@ -139,16 +148,6 @@ const CREATORS = {
       },
     ])
     return nodes
-  },
-
-  decorationAnchor(tagName, attributes, children) {
-    const tagBase = tagName.slice(0, -6)
-    return new DecoratorAnchor(attributes.key, [{ type: tagBase }])
-  },
-
-  decorationFocus(tagName, attributes, children) {
-    const tagBase = tagName.slice(0, -5)
-    return new DecoratorFocus(attributes.key, [{ type: tagBase }])
   },
 
   selection(tagName, attributes, children) {
@@ -420,17 +419,6 @@ function resolveCreators(options) {
 
   Object.keys(decorators).map(key => {
     creators[key] = normalizeNode(key, decorators[key], 'decoration')
-    // also add [decorator]Anchor, [decorator]Focus tags
-    creators[`${key}Anchor`] = normalizeNode(
-      key,
-      decorators[key],
-      'decorationAnchor'
-    )
-    creators[`${key}Focus`] = normalizeNode(
-      key,
-      decorators[key],
-      'decorationFocus'
-    )
   })
 
   return creators

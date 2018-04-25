@@ -15,10 +15,10 @@ export const input = (
   <value>
     <document>
       <paragraph>
-        This is one <highlightAnchor key="a" />block.
+        This is one <highlight anchor key="a" />block.
       </paragraph>
       <paragraph>
-        This is block<highlightFocus key="a" /> two.
+        This is block<highlight focus key="a" /> two.
       </paragraph>
     </document>
   </value>

@@ -17,10 +17,10 @@ export const input = (
     <document>
       <ul>
         <li>
-          Item <highlightAnchor key="a" />one.
+          Item <highlight anchor key="a" />one.
         </li>
         <li>
-          Item<highlightFocus key="a" /> two.
+          Item<highlight focus key="a" /> two.
         </li>
       </ul>
     </document>
