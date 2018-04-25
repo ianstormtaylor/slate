@@ -1,13 +1,15 @@
 const { TimerType } = require('./types')
 
 class Timer {
+  constructor() {
+    this.cpuStartTime = {}
+    this.hrStartTime = null
+    this.isStopped = false
+    this.elapsed = {}
+  }
   isTimer(obj) {
     return obj && obj[TimerType]
   }
-  cpuStartTime = {}
-  hrStartTime = null
-  isStopped = false
-  elapsed = {}
   start() {
     this.cpuStartTime = process.cpuUsage()
     this.hrStartTime = process.hrtime()

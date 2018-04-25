@@ -1,14 +1,14 @@
 /** @jsx h */
 /* eslint-disable react/jsx-key */
 
-import Plain from 'slate-plain-serializer'
-import h from '../../helpers/h'
+const Plain = require('slate-plain-serializer').default
+const h = require('../../helpers/h')
 
-export default function(state) {
+module.exports.default = function(state) {
   Plain.serialize(state)
 }
 
-export const input = (
+module.exports.input = (
   <value>
     <document>
       {Array.from(Array(10)).map(() => (

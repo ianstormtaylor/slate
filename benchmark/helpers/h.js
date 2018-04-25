@@ -1,4 +1,5 @@
-import { createHyperscript } from 'slate-hyperscript'
+/* eslint-disable import/no-extraneous-dependencies */
+const { createHyperscript } = require('slate-hyperscript')
 
 /**
  * Define a hyperscript.
@@ -41,4 +42,4 @@ const h = createHyperscript({
  * @type {Function}
  */
 
-export default h
+module.exports = h

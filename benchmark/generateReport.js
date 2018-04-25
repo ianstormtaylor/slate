@@ -29,9 +29,10 @@ function convertSuite(suite) {
   }
 }
 
-export default function generateReport(repo, filePath) {
+function generateReport(repo, filePath) {
   repo.run().then(report => {
     const data = JSON.stringify(convertRepo(report))
     writeFileSync(filePath, data)
   })
 }
+module.exports = { generateReport }

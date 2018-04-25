@@ -1,13 +1,15 @@
-import { repo } from 'slate-dev-benchmark'
-import { resolve } from 'path'
-import generateReport from './generateReport'
+const { repo } = require('slate-dev-benchmark')
+const { resolve } = require('path')
+const { readdirSync } = require('fs')
+const { generateReport } = require('./generateReport')
 
-const dirs = ['slate-plain-serializer']
+const categoryDir = resolve(__dirname)
+const categories = readdirSync(categoryDir).filter(
+  c => c[0] != '.' && c.match(/^slate/)
+)
 
-const baseDir = resolve(__dirname)
-
-dirs.forEach(dir => {
-  require(`${baseDir}/${dir}`)
+categories.forEach(dir => {
+  require(`./${dir}`)
 })
 
 const reportPath = process.env.COMPARE
