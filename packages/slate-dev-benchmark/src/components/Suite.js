@@ -1,9 +1,9 @@
 /* global Promise */
-import { repo } from './Repository.js'
-import { SuiteType } from './types'
-import logger from '../logger'
-import compose from '../compose'
-import makeOptions from './makeOptions'
+const { repo } = require('./Repository.js')
+const { SuiteType } = require('./types')
+const { logger } = require('../logger')
+const { compose } = require('../compose')
+const { makeOptions } = require('./makeOptions')
 
 class Suite {
   constructor(name, options = {}) {
@@ -46,6 +46,7 @@ class Suite {
     })
   }
 }
+
 Suite.prototype[SuiteType] = true
 
-export default Suite
+module.exports = { Suite }

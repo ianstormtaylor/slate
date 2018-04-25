@@ -1,6 +1,5 @@
-import Repository, { repo } from './components/Repository'
-import Suite from './components/Suite'
-import Bench from './components/Bench'
+const { Repository, repo } = require('./components/Repository')
+const { Suite } = require('./components/Suite')
+const { Bench } = require('./components/Bench')
 
-export { Repository, Suite, Bench, repo }
-export default { Repository, Suite, Bench, repo }
+module.exports = { Repository, Suite, Bench, repo }

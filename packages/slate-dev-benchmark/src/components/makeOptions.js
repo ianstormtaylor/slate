@@ -9,7 +9,7 @@ const defaultOptions = {
   mode: 'adaptive',
 }
 
-export default function(options) {
+function makeOptions(options) {
   const result = { ...defaultOptions, ...options }
   for (const key in defaultOptions) {
     const shallType = typeof defaultOptions[key]
@@ -22,3 +22,4 @@ export default function(options) {
   }
   return result
 }
+module.exports = { makeOptions }

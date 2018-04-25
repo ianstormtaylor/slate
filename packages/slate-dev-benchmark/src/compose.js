@@ -1,7 +1,7 @@
 /* global Promise */
-import { errorLog } from './logger'
+const { errorLog } = require('./logger')
 
-export default function compose(list, name = 'makeRun') {
+function compose(list, name = 'makeRun') {
   return dispatch(0)
   function dispatch(index) {
     if (index === list.length) return Promise.resolve(true)
@@ -11,3 +11,4 @@ export default function compose(list, name = 'makeRun') {
       .then(() => dispatch(index + 1))
   }
 }
+module.exports = { compose }

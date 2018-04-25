@@ -39,7 +39,7 @@ const IS_TEST =
  * @param {Any} ...args
  */
 
-export function log(message, ...args) {
+function log(message, ...args) {
   if (!IS_DEV) {
     return
   }
@@ -50,7 +50,7 @@ export function log(message, ...args) {
   }
 }
 
-export function errorLog(level, message, ...args) {
+function errorLog(message, ...args) {
   if (!IS_DEV) {
     return
   }
@@ -64,7 +64,7 @@ export function errorLog(level, message, ...args) {
  * Logging benchmark result
  */
 
-export default function logger(obj) {
+function logger(obj) {
   const prefix = '    '
   if (obj.isRepository) {
     return log(`Repository ${obj.name} is running`)
@@ -89,3 +89,4 @@ export default function logger(obj) {
   }
   return log(obj)
 }
+module.exports = { logger, errorLog, log }

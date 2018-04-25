@@ -1,8 +1,8 @@
 /* global Promise */
-import { BenchType } from './types'
-import makeOptions from './makeOptions'
-import Timer from './Timer'
-import logger, { errorLog } from '../logger'
+const { BenchType } = require('./types')
+const { makeOptions } = require('./makeOptions')
+const { Timer } = require('./Timer')
+const { logger } = require('../logger')
 
 const errorReport = {
   cycles: NaN,
@@ -135,10 +135,6 @@ class Bench {
         logger(this)
         return true
       })
-      .catch(err => {
-        errorLog(err)
-        throw err
-      })
   }
 }
 
@@ -152,4 +148,4 @@ function mergeResults(res1, res2) {
   return result
 }
 
-export default Bench
+module.exports = { Bench }

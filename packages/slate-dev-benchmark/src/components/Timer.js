@@ -1,4 +1,4 @@
-import { TimerType } from './types'
+const { TimerType } = require('./types')
 
 class Timer {
   isTimer(obj) {
@@ -29,4 +29,5 @@ class Timer {
   }
 }
 Timer.prototype[TimerType] = true
-export default Timer
+
+module.exports = { Timer }

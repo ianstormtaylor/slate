@@ -1,7 +1,7 @@
 /* global Promise */
-import { RepositoryType } from './types'
-import logger from '../logger'
-import compose from '../compose'
+const { RepositoryType } = require('./types')
+const { logger } = require('../logger')
+const { compose } = require('../compose')
 
 class Repository {
   isRepository(obj) {
@@ -34,6 +34,5 @@ class Repository {
   }
 }
 Repository.prototype[RepositoryType] = true
-
-export default Repository
-export const repo = new Repository()
+const repo = new Repository()
+module.exports = { Repository, repo }

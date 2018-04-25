@@ -9,7 +9,6 @@ const baseDir = resolve(__dirname)
 dirs.forEach(dir => {
   require(`${baseDir}/${dir}`)
 })
-repo.run()
 
 const reportPath = process.env.COMPARE
   ? './tmp/benchmark-compare-new.json'
