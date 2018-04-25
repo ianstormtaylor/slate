@@ -3,12 +3,20 @@
 import chalk from 'chalk'
 import baseline from '../../tmp/benchmark-baseline'
 import comparison from '../../tmp/benchmark-comparison'
+import { existsSync } from 'fs'
 
 /**
  * Constants.
  */
 
-const THRESHOLD = 0.333
+let THRESHOLD = 0.333
+const configPath = '../../tmp/benchmark-config.js'
+if (existsSync(configPath)) {
+  const alternative = require(configPath).THRESHOLD
+  if (typeof alternative === 'number' && alternative > 0) {
+    THRESHOLD = alternative
+  }
+}
 
 /**
  * Print.
@@ -31,18 +39,17 @@ baseline.forEach((suite, i) => {
       const threshold = b * THRESHOLD
       const slower = b / c > 1 + threshold
       const faster = c / b > 1 + threshold
-      const percent = Math.round(Math.abs(b - c) / b * 100)
-      const emojiPercent =
-        b > c ? percent : Math.round(Math.abs(c - b) / c * 100)
+      const percent = Math.round(Math.abs(b - c) / c * 100)
+      const balancePercent = b > c ? percent : (c - b) / c * 100
 
       let output = `${b.toFixed(2)} → ${c.toFixed(2)} ops/sec`
       if (slower) output = chalk.red(`${output} (${percent}% slower)`)
       else if (faster) output = chalk.green(`${output} (${percent}% faster)`)
       else output = chalk.gray(output)
 
-      if (emojiPercent > 1000) output += ' 😱'
-      else if (faster && emojiPercent > 100) output += ' 🙌'
-      else if (slower && emojiPercent > 100) output += ' 😟'
+      if (balancePercent > 1000) output += ' 😱'
+      else if (faster && balancePercent > 100) output += ' 🙌'
+      else if (slower && balancePercent > 100) output += ' 😟'
       console.log(`        ${elapsedKey} : ${output}`)
     }
   })
