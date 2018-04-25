@@ -79,7 +79,7 @@
     "slate-schema-violations": "*"
   },
   "scripts": {
-    "benchmark": "mkdir -p ./tmp && node ./node_modules/.bin/_matcha --reporter ./support/benchmark/reporter ./tmp/benchmark/*/index.js > ./tmp/benchmark-comparison.json && cross-env BABEL_ENV=test babel-node ./support/benchmark/compare",
+    "benchmark": "cross-env COMPARE=compare node ./tmp/benchmark/index.js && cross-env BABEL_ENV=test babel-node ./support/benchmark/compare",
     "benchmark:save": " yarn benchmark:prepare && node ./tmp/benchmark/index.js",
     "benchmark:prepare": "mkdir -p ./tmp && cross-env BABEL_ENV=benchmark babel benchmark --out-dir tmp/benchmark/",
     "bootstrap": "lerna bootstrap && yarn build",

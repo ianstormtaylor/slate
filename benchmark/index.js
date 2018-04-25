@@ -13,6 +13,6 @@ categories.forEach(dir => {
 })
 
 const reportPath = process.env.COMPARE
-  ? './tmp/benchmark-compare-new.json'
-  : './tmp/benchmark-baseline-new.json'
+  ? './tmp/benchmark-compare.json'
+  : './tmp/benchmark-baseline.json'
 generateReport(repo, reportPath)
