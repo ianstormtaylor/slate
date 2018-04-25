@@ -36,9 +36,8 @@ baseline.forEach((suite, i) => {
 
       const b = base.iterations / base[elapsedKey] * 1000
       const c = comp.iterations / comp[elapsedKey] * 1000
-      const threshold = b * THRESHOLD
-      const slower = b / c > 1 + threshold
-      const faster = c / b > 1 + threshold
+      const slower = b / c > 1 + THRESHOLD
+      const faster = c / b > 1 + THRESHOLD
       const percent = Math.round(Math.abs(b - c) / c * 100)
       const balancePercent = b > c ? percent : (c - b) / c * 100
 
