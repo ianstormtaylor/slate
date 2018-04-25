@@ -18,7 +18,7 @@ export const input = (
         <highlight key="a" />This is one <highlight key="b" />block.
       </paragraph>
       <paragraph>
-        <highlight key="a" />This is block<highlight key="b" /> two.
+        <highlight key="b" />This is block<highlight key="a" /> two.
       </paragraph>
     </document>
   </value>
@@ -72,7 +72,7 @@ export const output = {
 
 export const expectDecorations = [
   {
-    anchorOffset: 0,
+    anchorOffset: 12,
     focusOffset: 0,
     anchorKey: input.document.nodes.get(0).getFirstText().key,
     focusKey: input.document.nodes.get(1).getFirstText().key,
@@ -85,7 +85,7 @@ export const expectDecorations = [
     ],
   },
   {
-    anchorOffset: 12,
+    anchorOffset: 0,
     focusOffset: 13,
     anchorKey: input.document.nodes.get(0).getFirstText().key,
     focusKey: input.document.nodes.get(1).getFirstText().key,
