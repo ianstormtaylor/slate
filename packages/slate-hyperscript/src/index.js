@@ -18,67 +18,32 @@ const FOCUS = {}
  *  and for composition into ranges (anchor.combine(focus), etc)
  */
 
-class DecoratorAnchor {
+class DecoratorPoint {
   constructor(key, marks) {
-    if (key === null || key === undefined)
-      throw new Error('decorator anchor requires key')
     this._key = key
     this.marks = marks
     return this
   }
   withPosition = offset => {
-    this.anchorOffset = offset
+    this.offset = offset
     return this
   }
   addOffset = offset => {
-    this.anchorOffset += offset
+    this.offset += offset
     return this
   }
   withKey = key => {
-    this.anchorKey = key
+    this.key = key
     return this
   }
   combine = focus => {
-    if (!(focus instanceof DecoratorFocus))
+    if (!(focus instanceof DecoratorPoint))
       throw new Error('misaligned decorations')
     return Range.create({
-      anchorKey: this.anchorKey,
-      focusKey: focus.focusKey,
-      anchorOffset: this.anchorOffset,
-      focusOffset: focus.focusOffset,
-      marks: this.marks,
-    })
-  }
-}
-
-class DecoratorFocus {
-  constructor(key, marks) {
-    if (key === null || key === undefined)
-      throw new Error('decorator focus requires key')
-    this._key = key
-    this.marks = marks
-    return this
-  }
-  withPosition = offset => {
-    this.focusOffset = offset
-    return this
-  }
-  addOffset = offset => {
-    this.focusOffset += offset
-    return this
-  }
-  withKey = key => {
-    this.focusKey = key
-    return this
-  }
-  combine = anchor => {
-    if (!(anchor instanceof DecoratorAnchor))
-      throw new Error('misaligned decorations')
-    return Range.create({
-      anchorKey: anchor.anchorKey,
-      focusKey: this.focusKey,
-      anchorOffset: anchor.anchorOffset,
-      focusOffset: this.focusOffset,
+      anchorKey: this.key,
+      focusKey: focus.key,
+      anchorOffset: this.offset,
+      focusOffset: focus.offset,
       marks: this.marks,
     })
   }
@@ -131,12 +96,8 @@ const CREATORS = {
   },
 
   decoration(tagName, attributes, children) {
-    if (attributes.data.anchor) {
-      return new DecoratorAnchor(attributes.key, [{ type: tagName }])
-    }
-
-    if (attributes.data.focus) {
-      return new DecoratorFocus(attributes.key, [{ type: tagName }])
+    if (attributes.key) {
+      return new DecoratorPoint(attributes.key, [{ type: tagName }])
     }
 
     const nodes = createChildren(children, { key: attributes.key })
@@ -182,7 +143,7 @@ const CREATORS = {
       // now check for decorations and hoist them to the top
       document.getTexts().forEach(text => {
         if (text.__decorations != null) {
-          // add in all complete decorations
+          // add in all mark-like (keyless) decorations
           decorations = decorations.concat(
             text.__decorations.filter(d => d._key === undefined).map(d =>
               Range.create({
@@ -192,7 +153,7 @@ const CREATORS = {
               })
             )
           )
-          // store or combine partial decorations (anchor or focus)
+          // store or combine partial decorations (keyed with anchor / focus)
           text.__decorations
             .filter(d => d._key !== undefined)
             .forEach(partial => {
@@ -214,7 +175,7 @@ const CREATORS = {
     // should have no more parital decorations outstanding (all paired)
     if (Object.keys(partialDecorations).length > 0) {
       throw new Error(
-        `Slate hyperscript must have both an \`<anchor/>\` and \`<focus/>\` defined for each keyed decorator.`
+        `Slate hyperscript must have both an anchor and focus defined for each keyed decorator.`
       )
     }
 
@@ -358,7 +319,7 @@ function createChildren(children, options = {}) {
         node.__decorations = (node.__decorations || []).concat(
           __decorations.map(
             d =>
-              d instanceof DecoratorAnchor || d instanceof DecoratorFocus
+              d instanceof DecoratorPoint
                 ? d.addOffset(length)
                 : {
                     ...d,
@@ -377,7 +338,7 @@ function createChildren(children, options = {}) {
     if (child == FOCUS || child == CURSOR) node.__focus = length
 
     // if child is a decorator point, store it as partial decorator
-    if (child instanceof DecoratorAnchor || child instanceof DecoratorFocus) {
+    if (child instanceof DecoratorPoint) {
       node.__decorations = (node.__decorations || []).concat([
         child.withPosition(length),
       ])
