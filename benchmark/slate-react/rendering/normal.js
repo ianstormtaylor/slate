@@ -1,17 +1,17 @@
 /** @jsx h */
 /* eslint-disable react/jsx-key */
 
-import React from 'react'
-import ReactDOM from 'react-dom/server'
-import h from '../../helpers/h'
-import { Editor } from 'slate-react'
+const React = require('react')
+const ReactDOM = require('react-dom/server')
+const h = require('../../helpers/h')
+const { Editor } = require('slate-react')
 
-export default function(value) {
+module.exports.default = function(value) {
   const el = React.createElement(Editor, { value })
   ReactDOM.renderToStaticMarkup(el)
 }
 
-export const input = (
+module.exports.input = (
   <value>
     <document>
       {Array.from(Array(10)).map(() => (
