@@ -1,7 +1,7 @@
 {
   "presets": [
     ["env", {
-      "modules": false,
+      "modules": false
     }],
     "react",
     "stage-0"
@@ -33,8 +33,13 @@
     },
     "benchmark": {
       "presets": [
+        ["env", {
+          "exclude": ["transform-regenerator"]
+        }],
         "react",
+        "stage-0"
       ],
+      "plugins": ["transform-runtime"]
     }
   }
 }

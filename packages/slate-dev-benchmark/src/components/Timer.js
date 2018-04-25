@@ -11,13 +11,12 @@ class Timer {
     return obj && obj[TimerType]
   }
   start() {
+    this.isStopped = false
     this.cpuStartTime = process.cpuUsage()
     this.hrStartTime = process.hrtime()
-    this.isStopped = false
   }
   end() {
     if (this.isStopped) return
-    this.isStopped = true
     const cpuElapsed = process.cpuUsage(this.cpuStartTime)
     const hrElapsed = process.hrtime(this.hrStartTime)
     const { user, system } = cpuElapsed
@@ -28,6 +27,7 @@ class Timer {
       all: (user + system) / 1000,
       hr,
     }
+    this.isStopped = true
   }
 }
 Timer.prototype[TimerType] = true

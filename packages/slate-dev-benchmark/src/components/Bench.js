@@ -29,9 +29,11 @@ class Bench {
   input(inputer) {
     if (Array.isArray(inputer)) {
       this.inputer = index => inputer[index % inputer.length]
+      return
     }
     if (typeof inputer === 'function') {
       this.inputer = inputer
+      return
     }
     this.inputer = () => inputer
   }
@@ -41,6 +43,7 @@ class Bench {
   }
 
   async compose(times, initial) {
+    times = Math.floor(times)
     const isAsync = this.options.async
     const { runner, inputer } = this
 
@@ -97,7 +100,8 @@ class Bench {
           }
         }
         if (!isAsync) {
-          runner(inputs[index])
+          const inputVar = inputs[index]
+          runner(inputVar)
           return dispatch(index + 1)
         } else {
           return Promise.resolve(runner(inputs[index])).then(() =>

@@ -17,16 +17,17 @@ function convertSuite(suite) {
   const result = []
   for (const name in suite) {
     const bench = suite[name]
-    const { hr, cycles } = bench
+    const { user, cycles } = bench
     result.push({
       name,
       type: 'bench',
-      ...bench,
-      elapsed: hr,
+      elapsed: user,
       iterations: cycles,
-      ops: cycles / hr,
+      ops: 1000 * cycles / user,
+      ...bench,
     })
   }
+  return result
 }
 
 function generateReport(repo, filePath) {
