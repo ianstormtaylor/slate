@@ -1,4 +1,3 @@
-// Unable to enable maxTime unless rewrite Timer to handle coorountine
 const defaultOptions = {
   minTime: 1000,
   maxTime: 2000,
@@ -8,6 +7,19 @@ const defaultOptions = {
   async: false,
   mode: 'adaptive',
 }
+
+/**
+ * Merge two options for configuring a bench run
+ * @param {Object} options
+ * @returns {Object}
+ *   @property {number} minTime
+ *   @property {number} maxTime
+ *   @property {number} minTries
+ *   @property {number} maxTries
+ *   @property {number} allocationTries
+ *   @property {boolean} async
+ *   @property {"static"|"adaptive"} mode
+ */
 
 function makeOptions(options) {
   const result = { ...defaultOptions, ...options }
