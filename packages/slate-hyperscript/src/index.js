@@ -19,7 +19,7 @@ const FOCUS = {}
  */
 
 class DecoratorPoint {
-  constructor(key, marks) {
+  constructor({ key, data }, marks) {
     this._key = key
     this.marks = marks
     this.attribs = data || {}
@@ -99,7 +99,7 @@ const CREATORS = {
 
   decoration(tagName, attributes, children) {
     if (attributes.key) {
-      return new DecoratorPoint(attributes.key, [{ type: tagName }])
+      return new DecoratorPoint(attributes, [{ type: tagName }])
     }
 
     const nodes = createChildren(children, { key: attributes.key })
