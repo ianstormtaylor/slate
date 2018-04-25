@@ -82,7 +82,7 @@ function logger(obj) {
       log(
         `${prefix + prefix + prefix}${key} * ${cycles} cycles: ${
           report[key]
-        } ms`
+        } ms; ( ${cycles * 1000 / report[key]} ops/sec)`
       )
     }
     return log(`${prefix + prefix + prefix}cycles: ${cycles}`)

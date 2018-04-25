@@ -1,9 +1,10 @@
 /** @jsx h */
 /* eslint-disable react/jsx-key */
 
-import Html from 'slate-html-serializer'
-import React from 'react'
-import { JSDOM } from 'jsdom' // eslint-disable-line import/no-extraneous-dependencies
+const Html = require('slate-html-serializer').default
+const React = require('react')
+const h = require('../../helpers/h')
+const { JSDOM } = require('jsdom') // eslint-disable-line import/no-extraneous-dependencies
 
 const html = new Html({
   parseHtml: JSDOM.fragment,
@@ -33,16 +34,21 @@ const html = new Html({
   ],
 })
 
-export default function(string) {
-  html.deserialize(string)
+module.exports.default = function(state) {
+  html.serialize(state)
 }
 
-export const input = `
-  <blockquote>
-    <p>
-      This is editable <strong>rich</strong> text, <em>much</em> better than a textarea!
-    </p>
-  </blockquote>
-`
-  .trim()
-  .repeat(10)
+module.exports.input = (
+  <value>
+    <document>
+      {Array.from(Array(10)).map(() => (
+        <quote>
+          <paragraph>
+            This is editable <b>rich</b> text, <i>much</i> better than a
+            textarea!
+          </paragraph>
+        </quote>
+      ))}
+    </document>
+  </value>
+)

@@ -1,5 +1,5 @@
-const { basename, extname, resolve } = require('path')
 const { readdirSync } = require('fs')
+const { basename, extname, resolve } = require('path')
 const { resetMemoization } = require('slate')
 const { Suite, Bench } = require('slate-dev-benchmark')
 
@@ -13,10 +13,7 @@ const categories = readdirSync(categoryDir).filter(
 )
 
 categories.forEach(category => {
-  const suite = new Suite(category, {
-    minTries: 100,
-    minTime: 1000,
-  })
+  const suite = new Suite(category, { minTries: 100, minTime: 1000 })
   const benchmarkDir = resolve(categoryDir, category)
   const benchmarks = readdirSync(benchmarkDir)
     .filter(b => b[0] != '.' && !!~b.indexOf('.js'))
