@@ -7,16 +7,35 @@ class Timer {
     this.isStopped = false
     this.elapsed = {}
   }
+
+  /*
+   * Whether it is a Timer
+   * @param {any} obj
+  */
+
   isTimer(obj) {
     return obj && obj[TimerType]
   }
+
+  /*
+   * Start the timer
+   * @return {void}
+   */
+
   start() {
     this.isStopped = false
     this.cpuStartTime = process.cpuUsage()
     this.hrStartTime = process.hrtime()
+    this.elapsed = {}
   }
+
+  /*
+   * Stop the timer and store restore in tihs.elapsed
+   * @return {Object}
+   */
+
   end() {
-    if (this.isStopped) return
+    if (this.isStopped) return this.elapsed
     const cpuElapsed = process.cpuUsage(this.cpuStartTime)
     const hrElapsed = process.hrtime(this.hrStartTime)
     const { user, system } = cpuElapsed
@@ -28,8 +47,10 @@ class Timer {
       hr,
     }
     this.isStopped = true
+    return this.elapsed
   }
 }
+
 Timer.prototype[TimerType] = true
 
 module.exports = { Timer }

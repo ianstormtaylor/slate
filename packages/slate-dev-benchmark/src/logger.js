@@ -50,6 +50,10 @@ function log(message, ...args) {
   }
 }
 
+/*
+ * Log a error `message`
+*/
+
 function errorLog(message, ...args) {
   if (!IS_DEV) {
     return
