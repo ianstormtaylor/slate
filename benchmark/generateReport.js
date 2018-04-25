@@ -36,4 +36,5 @@ function generateReport(repo, filePath) {
     writeFileSync(filePath, data)
   })
 }
+
 module.exports = { generateReport }
