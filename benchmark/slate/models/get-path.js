@@ -7,23 +7,23 @@ export default function({ value, text }) {
   value.document.getPath(text.key)
 }
 
-export const input = () => {
-  const value = (
-    <value>
-      <document>
-        {Array.from(Array(10)).map(() => (
-          <quote>
+const value = (
+  <value>
+    <document>
+      {Array.from(Array(10)).map(() => (
+        <quote>
+          <paragraph>
             <paragraph>
-              <paragraph>
-                This is editable <b>rich</b> text, <i>much</i> better than a
-                textarea!
-              </paragraph>
+              This is editable <b>rich</b> text, <i>much</i> better than a
+              textarea!
             </paragraph>
-          </quote>
-        ))}
-      </document>
-    </value>
-  )
-  const text = value.document.getLastText()
+          </paragraph>
+        </quote>
+      ))}
+    </document>
+  </value>
+)
+const text = value.document.getLastText()
+export const input = () => {
   return { value, text }
 }

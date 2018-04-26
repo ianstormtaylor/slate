@@ -5,8 +5,7 @@ const { Value } = require('slate')
 module.exports.default = function(json) {
   Value.fromJSON(json)
 }
-
-module.exports.input = {
+const input = {
   document: {
     nodes: Array.from(Array(10)).map(() => ({
       object: 'block',
@@ -44,3 +43,4 @@ module.exports.input = {
     })),
   },
 }
+module.exports.input = input

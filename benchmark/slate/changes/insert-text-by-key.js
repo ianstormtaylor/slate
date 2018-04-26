@@ -7,26 +7,26 @@ module.exports.default = function({ change, text }) {
   change.insertTextByKey(text.key, 0, 'a')
 }
 
-module.exports.input = function() {
-  const value = (
-    <value>
-      <document>
-        {Array.from(Array(10)).map((v, i) => (
-          <quote>
+const value = (
+  <value>
+    <document>
+      {Array.from(Array(10)).map((v, i) => (
+        <quote>
+          <paragraph>
             <paragraph>
-              <paragraph>
-                This is editable <b>rich</b> text, <i>much</i> better than a
-                textarea!
-                {i == 0 ? <cursor /> : ''}
-              </paragraph>
+              This is editable <b>rich</b> text, <i>much</i> better than a
+              textarea!
+              {i == 0 ? <cursor /> : ''}
             </paragraph>
-          </quote>
-        ))}
-      </document>
-    </value>
-  )
+          </paragraph>
+        </quote>
+      ))}
+    </document>
+  </value>
+)
 
+const text = value.document.getLastText()
+module.exports.input = function() {
   const change = value.change()
-  const text = value.document.getLastText()
   return { change, text }
 }

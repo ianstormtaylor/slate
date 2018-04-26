@@ -9,26 +9,27 @@ module.exports.default = function({ value, keys }) {
   })
 }
 
-module.exports.input = function() {
-  const value = (
-    <value>
-      <document>
-        {Array.from(Array(10)).map(() => (
-          <quote>
+const value = (
+  <value>
+    <document>
+      {Array.from(Array(10)).map(() => (
+        <quote>
+          <paragraph>
             <paragraph>
-              <paragraph>
-                This is editable <b>rich</b> text, <i>much</i> better than a
-                textarea!
-              </paragraph>
+              This is editable <b>rich</b> text, <i>much</i> better than a
+              textarea!
             </paragraph>
-          </quote>
-        ))}
-      </document>
-    </value>
-  )
-  const keys = value.document
-    .getTexts()
-    .toArray()
-    .map(t => t.key)
+          </paragraph>
+        </quote>
+      ))}
+    </document>
+  </value>
+)
+const keys = value.document
+  .getTexts()
+  .toArray()
+  .map(t => t.key)
+
+module.exports.input = function() {
   return { value, keys }
 }

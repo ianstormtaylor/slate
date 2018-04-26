@@ -6,8 +6,7 @@ const h = require('../../helpers/h')
 module.exports.default = function(value) {
   value.document.getMarks()
 }
-
-module.exports.input = () => (
+const value = (
   <value>
     <document>
       {Array.from(Array(10)).map(() => (
@@ -23,3 +22,4 @@ module.exports.input = () => (
     </document>
   </value>
 )
+module.exports.input = () => value

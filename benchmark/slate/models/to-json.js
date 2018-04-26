@@ -7,21 +7,22 @@ module.exports.default = function(value) {
   value.toJSON()
 }
 
-module.exports.input = function() {
-  return (
-    <value>
-      <document>
-        {Array.from(Array(10)).map(() => (
-          <quote>
+const value = (
+  <value>
+    <document>
+      {Array.from(Array(10)).map(() => (
+        <quote>
+          <paragraph>
             <paragraph>
-              <paragraph>
-                This is editable <b>rich</b> text, <i>much</i> better than a
-                textarea!
-              </paragraph>
+              This is editable <b>rich</b> text, <i>much</i> better than a
+              textarea!
             </paragraph>
-          </quote>
-        ))}
-      </document>
-    </value>
-  )
+          </paragraph>
+        </quote>
+      ))}
+    </document>
+  </value>
+)
+module.exports.input = function() {
+  return value
 }

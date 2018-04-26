@@ -7,23 +7,23 @@ module.exports.default = function(change) {
   change.insertText('a')
 }
 
-module.exports.input = function() {
-  const value = (
-    <value>
-      <document>
-        {Array.from(Array(10)).map((v, i) => (
-          <quote>
+const value = (
+  <value>
+    <document>
+      {Array.from(Array(10)).map((v, i) => (
+        <quote>
+          <paragraph>
             <paragraph>
-              <paragraph>
-                This is editable <b>rich</b> text, <i>much</i> better than a
-                textarea!
-                {i == 0 ? <cursor /> : ''}
-              </paragraph>
+              This is editable <b>rich</b> text, <i>much</i> better than a
+              textarea!
+              {i == 0 ? <cursor /> : ''}
             </paragraph>
-          </quote>
-        ))}
-      </document>
-    </value>
-  )
+          </paragraph>
+        </quote>
+      ))}
+    </document>
+  </value>
+)
+module.exports.input = function() {
   return value.change()
 }

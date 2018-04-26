@@ -6,7 +6,9 @@ module.exports.default = function(json) {
   Value.fromJSON(json)
 }
 
-module.exports.input = () => ({
+module.exports.input = () => input
+
+const input = {
   document: {
     nodes: Array.from(Array(100)).map(() => ({
       type: 'list',
@@ -63,4 +65,4 @@ module.exports.input = () => ({
       })),
     })),
   },
-})
+}
