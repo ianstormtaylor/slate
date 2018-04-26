@@ -1092,7 +1092,7 @@ class Node {
   }
 
   /**
-   * Get a set of marks in a `position`, by treating it as collapsed.
+   * Get a set of marks in a `position`, the equivalent of a collapsed range
    *
    * @param {string} key
    * @param {number} offset
