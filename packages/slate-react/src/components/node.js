@@ -1,5 +1,6 @@
 import Debug from 'debug'
 import ImmutableTypes from 'react-immutable-proptypes'
+import { List, Set } from 'immutable'
 import React from 'react'
 import SlateTypes from 'slate-prop-types'
 import logger from 'slate-dev-logger'
@@ -110,6 +111,7 @@ class Node extends React.Component {
     // Otherwise, don't update.
     return false
   }
+
   /**
    * Render.
    *
@@ -118,35 +120,38 @@ class Node extends React.Component {
 
   render() {
     this.debug('render', this)
-    const { editor, isSelected, node, decorations, parent, readOnly } = this.props
+    const {
+      editor,
+      isSelected,
+      node,
+      decorations,
+      parent,
+      readOnly,
+    } = this.props
     const { value } = editor
     const { selection } = value
     const { stack } = editor
     const indexes = node.getSelectionIndexes(selection, isSelected)
     const decs = decorations.concat(node.getDecorations(stack))
 
-    let activeDecorations = new Set()
+    const activeDecorations = Set().asMutable()
     let children = []
 
     orderChildDecorations(node, decs).forEach(item => {
       if (item.isChild) {
-        const isChildSelected = !!indexes && indexes.start <= item.i && item.i < indexes.end
+        const isChildSelected =
+          !!indexes && indexes.start <= item.i && item.i < indexes.end
         return children.push(
-          this.renderNode(
-            item.child, 
-            isChildSelected, 
-            // using decorations.clear() to obtain empty List w/out importing immutable
-            decorations.clear().concat(Array.from(activeDecorations.values()))
-          )
+          this.renderNode(item.child, isChildSelected, List(activeDecorations))
         )
       }
       // if range start, add it to tracked set
       if (item.isRangeStart) return activeDecorations.add(item.d)
       // else must be rangeEnd; stop tracking it
-      activeDecorations.delete(item.d)
+      activeDecorations.remove(item.d)
     })
 
-    // Attributes that the developer must to mix into the element in their
+    // Attributes that the developer must mix into the element in their
     // custom node renderer component.
     const attributes = { 'data-key': node.key }
 
@@ -196,7 +201,7 @@ class Node extends React.Component {
     const { block, editor, node, readOnly } = this.props
     const { stack } = editor
     const Component = child.object == 'text' ? Text : Node
-    
+
     return (
       <Component
         block={node.object == 'block' ? node : block}
