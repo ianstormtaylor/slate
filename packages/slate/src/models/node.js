@@ -197,21 +197,22 @@ class Node {
     first = assertKey(first)
     second = assertKey(second)
 
+    if (first === second) return false
     const firstAncestor = this.getFurthestAncestor(first)
     const secondAncestor = this.getFurthestAncestor(second)
-    if (first === second) return false
     if (!firstAncestor || !secondAncestor) {
       return null
     }
-    if (firstAncestor === secondAncestor) {
-      if (firstAncestor.key === first) return true
-      if (firstAncestor.key === second) return false
-      return firstAncestor.areDescendantsSorted(first, second)
+
+    if (firstAncestor !== secondAncestor) {
+      const firstIndex = this.nodes.indexOf(firstAncestor)
+      const secondIndex = this.nodes.indexOf(secondAncestor)
+      return firstIndex < secondIndex
     }
 
-    const firstIndex = this.nodes.indexOf(firstAncestor)
-    const secondIndex = this.nodes.indexOf(secondAncestor)
-    return firstIndex < secondIndex
+    if (firstAncestor.key === first) return true
+    if (firstAncestor.key === second) return false
+    return firstAncestor.areDescendantsSorted(first, second)
   }
 
   /**
