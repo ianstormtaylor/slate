@@ -1083,7 +1083,7 @@ class Node {
     const empty = Set()
 
     return first.marks.withMutations(result => {
-      chars.slice(1).find(char => {
+      chars.find(char => {
         const marks = char ? char.marks : empty
         result.intersect(marks)
         return result.size === 0
