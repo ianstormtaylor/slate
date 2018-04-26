@@ -866,7 +866,21 @@ class Node {
   getInlinesAtRange(range) {
     range = range.normalize(this)
     if (range.isUnset) return List()
-    const texts = this.getTextsAtRange(range)
+    const { startKey, endKey } = range
+    return this.getInlinesBetweenPositions(startKey, endKey)
+  }
+
+  /*
+   * Cachable function for getInlinesAtRange
+   * @param {string} startKey
+   * @param {string} endKey
+   * @return {List<Node>}
+  */
+
+  getInlinesBetweenPositions(startKey, endKey) {
+    const texts = new List(
+      this.getTextsBetweenPositionsAsArray(startKey, endKey)
+    )
     const firstText = texts.find(t => this.getClosestInline(t.key))
     if (!firstText) return List()
     const lastText = texts.findLast(t => this.getClosestInline(t.key))
@@ -1996,7 +2010,7 @@ memoize(Node.prototype, [
   'getFurthestAncestor',
   'getFurthestOnlyChildAncestor',
   'getInlinesAsArray',
-  'getInlinesAtRange',
+  'getInlinesBetweenPositions',
   'getInlinesByTypeAsArray',
   'getMarksAsArray',
   'getMarksAtPosition',
