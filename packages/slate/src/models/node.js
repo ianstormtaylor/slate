@@ -1106,7 +1106,7 @@ class Node {
       if (this.getClosestBlock(key) !== this.getClosestBlock(previous.key)) {
         return OrderedSet()
       }
-      const char = previous.characters.get(previous.text.length - 1)
+      const char = previous.characters.last()
       if (!char) return OrderedSet()
 
       return new OrderedSet(char.marks)
