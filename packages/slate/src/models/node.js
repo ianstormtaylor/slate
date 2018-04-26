@@ -864,25 +864,30 @@ class Node {
    */
 
   getInlinesAtRange(range) {
-    const array = this.getInlinesAtRangeAsArray(range)
-    // Remove duplicates by converting it to an `OrderedSet` first.
-    return new List(new OrderedSet(array))
-  }
-
-  /**
-   * Get the closest inline nodes for each text node in a `range` as an array.
-   *
-   * @param {Range} range
-   * @return {Array}
-   */
-
-  getInlinesAtRangeAsArray(range) {
     range = range.normalize(this)
-    if (range.isUnset) return []
+    if (range.isUnset) return List()
+    const texts = this.getTextsAtRange(range)
+    const firstText = texts.find(t => this.getClosestInline(t.key))
+    if (!firstText) return List()
+    const lastText = texts.findLast(t => this.getClosestInline(t.key))
+    const first = this.getClosestInline(firstText.key)
+    const last = this.getClosestInline(lastText.key)
+    if (first === last) return List.of(first)
+    return List.of(first).withMutations(result => {
+      let previous = first
 
-    return this.getTextsAtRangeAsArray(range)
-      .map(text => this.getClosestInline(text.key))
-      .filter(exists => exists)
+      texts.forEach(t => {
+        const inline = this.getClosestInline(t.key)
+        if (inline === last) {
+          result.push(last)
+          return false
+        }
+        if (!inline) return
+        if (previous === inline) return
+        previous = inline
+        result.push(inline)
+      })
+    })
   }
 
   /**
@@ -1991,7 +1996,7 @@ memoize(Node.prototype, [
   'getFurthestAncestor',
   'getFurthestOnlyChildAncestor',
   'getInlinesAsArray',
-  'getInlinesAtRangeAsArray',
+  'getInlinesAtRange',
   'getInlinesByTypeAsArray',
   'getMarksAsArray',
   'getMarksAtPosition',
