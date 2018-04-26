@@ -410,7 +410,7 @@ class Node {
 
     // PERF: the most common case is when the range is in a single block node,
     // where we can avoid a lot of iterating of the tree.
-    if (startBlock === endBlock) return List.of(startBlock)
+    if (startKey === endKey) return List.of(startBlock)
     const endBlock = this.getClosestBlock(endKey)
 
     const blocks = this.getBlocks()
