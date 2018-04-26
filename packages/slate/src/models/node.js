@@ -982,7 +982,7 @@ class Node {
   }
 
   /**
-   * Get a set of the marks in a `range`.
+   * Get a set of the marks in a `range` for insertion behavior.
    *
    * @param {Range} range
    * @return {Set<Mark>}
