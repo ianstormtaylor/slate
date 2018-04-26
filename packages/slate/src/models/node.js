@@ -382,7 +382,7 @@ class Node {
    */
 
   getBlocks() {
-    const empty = new List()
+    const empty = List()
     const { nodes } = this
     return empty.withMutations(result => {
       nodes.forEach(child => {
@@ -403,7 +403,7 @@ class Node {
 
   getBlocksAtRange(range) {
     range = range.normalize(this)
-    if (range.isUnset) return new List()
+    if (range.isUnset) return List()
 
     const { startKey, endKey } = range
     const startBlock = this.getClosestBlock(startKey)
@@ -450,7 +450,7 @@ class Node {
 
   getCharactersAtRange(range) {
     range = range.normalize(this)
-    if (range.isUnset) return new List()
+    if (range.isUnset) return List()
     const { startKey, endKey, startOffset, endOffset } = range
     const endText = this.getDescendant(endKey)
     if (startKey === endKey) {
@@ -550,7 +550,7 @@ class Node {
 
     this.assertDescendant(one)
     this.assertDescendant(two)
-    let ancestors = new List()
+    let ancestors = List()
     let oneParent = this.getParent(one)
     let twoParent = this.getParent(two)
 
@@ -990,14 +990,14 @@ class Node {
 
   getInsertMarksAtRange(range) {
     range = range.normalize(this)
-    if (range.isUnset) return new Set()
+    if (range.isUnset) return Set()
     if (range.isCollapsed) {
       return this.getMarksAtPosition(range.startKey, range.startOffset)
     }
 
     const text = this.getDescendant(range.startKey)
     const char = text.characters.get(range.startOffset)
-    if (!char) return new Set()
+    if (!char) return Set()
 
     return char.marks
   }
@@ -1011,7 +1011,7 @@ class Node {
 
   getOrderedMarksAtRange(range) {
     range = range.normalize(this)
-    if (range.isUnset) return new OrderedSet()
+    if (range.isUnset) return OrderedSet()
     if (range.isCollapsed) {
       return this.getMarksAtPosition(range.startKey, range.startOffset)
     }
@@ -1047,7 +1047,7 @@ class Node {
       endOffset
     )
 
-    return new OrderedSet().withMutations(result => {
+    return OrderedSet().withMutations(result => {
       texts.forEach(text => {
         if (text.key === startKey) {
           result.union(
@@ -1071,16 +1071,16 @@ class Node {
 
   getActiveMarksAtRange(range) {
     range = range.normalize(this)
-    if (range.isUnset) return new Set()
+    if (range.isUnset) return Set()
     if (range.isCollapsed)
       return this.getMarksAtPosition(range.startKey, range.startOffset).toSet()
 
     // Otherwise, get a set of the marks for each character in the range.
     const chars = this.getCharactersAtRange(range)
     const first = chars.first()
-    if (!first || !first.marks) return new Set()
+    if (!first || !first.marks) return Set()
 
-    const empty = new Set()
+    const empty = Set()
 
     return first.marks.withMutations(result => {
       chars.slice(1).find(char => {
@@ -1102,19 +1102,19 @@ class Node {
   getMarksAtPosition(key, offset) {
     if (offset == 0) {
       const previous = this.getPreviousText(key)
-      if (!previous || previous.text.length == 0) return new OrderedSet()
+      if (!previous || previous.text.length == 0) return OrderedSet()
       if (this.getClosestBlock(key) !== this.getClosestBlock(previous.key)) {
-        return new OrderedSet()
+        return OrderedSet()
       }
       const char = previous.characters.get(previous.text.length - 1)
-      if (!char) return new OrderedSet()
+      if (!char) return OrderedSet()
 
       return new OrderedSet(char.marks)
     }
 
     const text = this.getDescendant(key)
     const char = text.characters.get(offset - 1)
-    if (!char) return new OrderedSet()
+    if (!char) return OrderedSet()
     return new OrderedSet(char.marks)
   }
 
