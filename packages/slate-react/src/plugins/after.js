@@ -602,7 +602,6 @@ function AfterPlugin() {
       <Content
         {...handlers}
         autoCorrect={props.autoCorrect}
-        autoFocus={props.autoFocus}
         className={props.className}
         children={props.children}
         editor={editor}

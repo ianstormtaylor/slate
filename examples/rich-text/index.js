@@ -263,6 +263,7 @@ class RichTextExample extends React.Component {
           renderNode={this.renderNode}
           renderMark={this.renderMark}
           spellCheck
+          autoFocus
         />
       </div>
     )

@@ -214,9 +214,7 @@ Mark.prototype[MODEL_TYPES.MARK] = true
  * Memoize read methods.
  */
 
-memoize(Mark.prototype, ['getComponent'], {
-  takesArguments: true,
-})
+memoize(Mark.prototype, ['getComponent'])
 
 /**
  * Export.

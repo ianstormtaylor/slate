@@ -845,16 +845,16 @@ class Node {
       throw new Error(`Could not find a descendant node with key "${key}".`)
     }
 
-    return (
-      ancestors
-        // Skip this node...
-        .skipLast()
-        // Take parents until there are more than one child...
-        .reverse()
-        .takeUntil(p => p.nodes.size > 1)
-        // And pick the highest.
-        .last()
-    )
+    const result = ancestors
+      // Skip this node...
+      .shift()
+      // Take parents until there are more than one child...
+      .reverse()
+      .takeUntil(p => p.nodes.size > 1)
+      // And pick the highest.
+      .last()
+    if (!result) return null
+    return result
   }
 
   /**
@@ -1987,6 +1987,22 @@ class Node {
   validate(schema) {
     return schema.validateNode(this)
   }
+
+  /**
+   * Get the first invalid descendant
+   *
+   * @param {Schema} schema
+   * @return {Node|Text|Null}
+   */
+
+  getFirstInvalidDescendant(schema) {
+    let result = null
+    this.nodes.find(n => {
+      result = n.validate(schema) ? n : n.getFirstInvalidDescendant(schema)
+      return result
+    })
+    return result
+  }
 }
 
 /**
@@ -2007,76 +2023,62 @@ function assertKey(arg) {
  * Memoize read methods.
  */
 
-memoize(
-  Node.prototype,
-  [
-    'getBlocksAsArray',
-    'getCharactersAsArray',
-    'getFirstText',
-    'getInlinesAsArray',
-    'getKeysAsArray',
-    'getLastText',
-    'getMarksAsArray',
-    'getText',
-    'getTextDirection',
-    'getTextsAsArray',
-    'isLeafBlock',
-    'isLeafInline',
-  ],
-  {
-    takesArguments: false,
-  }
-)
-
-memoize(
-  Node.prototype,
-  [
-    'areDescendantsSorted',
-    'getActiveMarksAtRangeAsArray',
-    'getAncestors',
-    'getBlocksAtRangeAsArray',
-    'getBlocksByTypeAsArray',
-    'getCharactersAtRangeAsArray',
-    'getChild',
-    'getClosestBlock',
-    'getClosestInline',
-    'getClosestVoid',
-    'getCommonAncestor',
-    'getDecorations',
-    'getDepth',
-    'getDescendant',
-    'getDescendantAtPath',
-    'getFragmentAtRange',
-    'getFurthestBlock',
-    'getFurthestInline',
-    'getFurthestAncestor',
-    'getFurthestOnlyChildAncestor',
-    'getInlinesAtRangeAsArray',
-    'getInlinesByTypeAsArray',
-    'getMarksAtRangeAsArray',
-    'getInsertMarksAtRangeAsArray',
-    'getMarksByTypeAsArray',
-    'getNextBlock',
-    'getNextSibling',
-    'getNextText',
-    'getNode',
-    'getNodeAtPath',
-    'getOffset',
-    'getOffsetAtRange',
-    'getParent',
-    'getPath',
-    'getPlaceholder',
-    'getPreviousBlock',
-    'getPreviousSibling',
-    'getPreviousText',
-    'getTextAtOffset',
-    'getTextsAtRangeAsArray',
-    'validate',
-  ],
-  {
-    takesArguments: true,
-  }
-)
+memoize(Node.prototype, [
+  'areDescendantsSorted',
+  'getActiveMarksAtRangeAsArray',
+  'getAncestors',
+  'getBlocksAsArray',
+  'getBlocksAtRangeAsArray',
+  'getBlocksByTypeAsArray',
+  'getCharactersAtRangeAsArray',
+  'getCharactersAsArray',
+  'getChild',
+  'getClosestBlock',
+  'getClosestInline',
+  'getClosestVoid',
+  'getCommonAncestor',
+  'getDecorations',
+  'getDepth',
+  'getDescendant',
+  'getDescendantAtPath',
+  'getFirstText',
+  'getFragmentAtRange',
+  'getFurthestBlock',
+  'getFurthestInline',
+  'getFurthestAncestor',
+  'getFurthestOnlyChildAncestor',
+  'getInlinesAsArray',
+  'getInlinesAtRangeAsArray',
+  'getInlinesByTypeAsArray',
+  'getMarksAsArray',
+  'getMarksAtRangeAsArray',
+  'getInsertMarksAtRangeAsArray',
+  'getKeysAsArray',
+  'getLastText',
+  'getMarksByTypeAsArray',
+  'getNextBlock',
+  'getNextSibling',
+  'getNextText',
+  'getNode',
+  'getNodeAtPath',
+  'getOffset',
+  'getOffsetAtRange',
+  'getParent',
+  'getPath',
+  'getPlaceholder',
+  'getPreviousBlock',
+  'getPreviousSibling',
+  'getPreviousText',
+  'getText',
+  'getTextAtOffset',
+  'getTextDirection',
+  'getTextsAsArray',
+  'getTextsAtRangeAsArray',
+  'isLeafBlock',
+  'isLeafInline',
+  'validate',
+  'getFirstInvalidDescendant',
+])
 
 /**
  * Export.

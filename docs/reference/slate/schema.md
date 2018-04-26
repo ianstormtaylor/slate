@@ -73,6 +73,7 @@ A dictionary of inlines by type, each with its own set of validation rules.
   isVoid: Boolean,
   last: Object,
   nodes: Array,
+  marks: Array,
   normalize: Function,
   parent: Object,
   text: RegExp,
@@ -148,6 +149,18 @@ Will validate a node's children. The `nodes` definitions can declare the `object
 
 > 🤖 The `nodes` array is order-sensitive! The example above will require that the first node be either an `image` or `video`, and that it be followed by one or more `paragraph` nodes.
 
+### `marks`
+
+`Array`
+
+```js
+{
+  marks: ['italic']
+}
+```
+
+Will validate a node's marks. The `marks` definitions can declare a list of marks type to be allowed. If declared, any marks that are not in the list will be removed.
+
 ### `normalize`
 
 `normalize(change: Change, violation: String, context: Object) => Void`
@@ -155,12 +168,14 @@ Will validate a node's children. The `nodes` definitions can declare the `object
 ```js
 {
   normalize: (change, violation, context) => {
-    case 'child_object_invalid':
-      change.wrapBlockByKey(context.child.key, 'paragraph')
-      return
-    case 'child_type_invalid':
-      change.setNodeByKey(context.child.key, 'paragraph')
-      return
+    switch (violation) {
+      case 'child_object_invalid':
+        change.wrapBlockByKey(context.child.key, 'paragraph')
+        return
+      case 'child_type_invalid':
+        change.setNodeByKey(context.child.key, 'paragraph')
+        return
+    }
   }
 }
 ```
@@ -227,4 +242,4 @@ Returns a JSON representation of the schema.
 
 When supplying your own `normalize` property for a schema rule, it will be called with `(change, violation, context)`. The `violation` will be one of a set of potential violation strings, and `context` will vary depending on the violation.
 
-A set of the invalid violation strings are available as constants via the [`slate-schema-violations`](../slate-schema-violations) package.
+A set of the invalid violation strings are available as constants via the [`slate-schema-violations`](../slate-schema-violations/index.md) package.

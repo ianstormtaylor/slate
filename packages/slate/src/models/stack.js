@@ -159,9 +159,7 @@ Stack.prototype[MODEL_TYPES.STACK] = true
  * Memoize read methods.
  */
 
-memoize(Stack.prototype, ['getPluginsWith'], {
-  takesArguments: true,
-})
+memoize(Stack.prototype, ['getPluginsWith'])
 
 /**
  * Export.

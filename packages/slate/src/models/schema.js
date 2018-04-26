@@ -584,9 +584,7 @@ Schema.prototype[MODEL_TYPES.SCHEMA] = true
  * Memoize read methods.
  */
 
-memoize(Schema.prototype, ['getParentRules'], {
-  takesArguments: true,
-})
+memoize(Schema.prototype, ['getParentRules'])
 
 /**
  * Export.
