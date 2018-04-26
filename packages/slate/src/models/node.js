@@ -1039,12 +1039,7 @@ class Node {
       return startText.getMarksBetweenOffsets(startOffset, endOffset)
     }
 
-    const texts = this.getTextsBetweenPositionsAsArray(
-      startKey,
-      startOffset,
-      endKey,
-      endOffset
-    )
+    const texts = this.getTextsBetweenPositionsAsArray(startKey, endKey)
 
     return OrderedSet().withMutations(result => {
       texts.forEach(text => {
@@ -1576,13 +1571,8 @@ class Node {
   getTextsAtRangeAsArray(range) {
     range = range.normalize(this)
     if (range.isUnset) return []
-    const { startKey, startOffset, endKey, endOffset } = range
-    return this.getTextsBetweenPositionsAsArray(
-      startKey,
-      startOffset,
-      endKey,
-      endOffset
-    )
+    const { startKey, endKey } = range
+    return this.getTextsBetweenPositionsAsArray(startKey, endKey)
   }
 
   /**
@@ -1592,7 +1582,7 @@ class Node {
    * @returns {Array}
    */
 
-  getTextsBetweenPositionsAsArray(startKey, startOffset, endKey, endOffset) {
+  getTextsBetweenPositionsAsArray(startKey, endKey) {
     const startText = this.getDescendant(startKey)
 
     // PERF: the most common case is when the range is in a single text node,
