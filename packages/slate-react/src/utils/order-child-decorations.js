@@ -4,47 +4,95 @@
  *
  * @param {Node} node
  * @param {List} decorations
- * @return {Array}
+ * @return {Array<Item>}
+ *
+ * where type Item =
+ * {
+ *   child: Node,
+ *   // Index of the child in its parent
+ *   index: number
+ * }
+ * or {
+ *   // True if this represents the start of the given decoration
+ *   isRangeStart: boolean,
+ *   // True if this represents the end of the given decoration
+ *   isRangeEnd: boolean,
+ *   decoration: Range
+ * }
  */
 
 function orderChildDecorations(node, decorations) {
-  const keyIndices = node.getKeysAsArray()
+  if (decorations.isEmpty()) {
+    return node.nodes.toArray().map((child, index) => ({
+      child,
+      index,
+    }))
+  }
+
+  // Map each key to its global order
+  const keyOrder = { [node.key]: 0 }
+  let globalOrder = 1
+  node.forEachDescendant(child => {
+    keyOrder[child.key] = globalOrder
+    globalOrder = globalOrder + 1
+  })
+
+  console.log('keyOrder', keyOrder)
+  console.log('decorations', decorations)
+
   const childNodes = node.nodes.toArray()
 
-  const endPoints = childNodes.map((child, i) => ({
-    isChild: true,
-    offset: keyIndices.indexOf(child.key),
-    key: child.key,
+  const endPoints = childNodes.map((child, index) => ({
     child,
+    index,
+    order: keyOrder[child.key],
   }))
 
-  decorations.forEach(d => {
+  decorations.forEach(decoration => {
     endPoints.push({
       isRangeStart: true,
-      offset: keyIndices.indexOf(d.startKey) - 0.5,
-      key: d.startKey,
-      d,
+      order: keyOrder[decoration.startKey] - 0.5,
+      decoration,
     })
     endPoints.push({
       isRangeEnd: true,
-      offset: keyIndices.indexOf(d.endKey) + 0.5,
-      key: d.endKey,
-      d,
+      order: keyOrder[decoration.endKey] + 0.5,
+      decoration,
     })
   })
 
-  const order = (a, b) => (a.offset > b.offset ? 1 : -1)
+  const sort = (a, b) => (a.order > b.order ? 1 : -1)
 
-  return endPoints.sort(
-    (a, b) =>
-      // if comparing a rangeStart with a child,
-      // move it before the child that owns its startKey
-      a.isRangeStart && b.isChild && b.child.getKeysAsArray
-        ? b.child.getKeysAsArray().includes(a.key) ? -1 : order(a, b)
-        : b.isRangeStart && a.isChild && a.child.getKeysAsArray
-          ? a.child.getKeysAsArray().includes(b.key) ? 1 : order(a, b)
-          : order(a, b)
-  )
+  const sortWithRangeStart = (rangeItem, childItem) => {
+    // A rangeStart should be before the child containing its startKey, so it is
+    // taken account before going down the child.
+
+    const nextChild = node.nodes.get(childItem.child.index + 1)
+    if (!nextChild) {
+      return sort(rangeItem, childItem)
+    }
+
+    const nextChildOrder = keyOrder[nextChild.key]
+
+    const containsRangeKey =
+      childItem.order < rangeItem.order && rangeItem.order < nextChildOrder
+
+    return containsRangeKey ? 1 : sort(rangeItem, childItem)
+  }
+
+  const res = endPoints.sort((a, b) => {
+    // Special cases for sorting a range start and a child
+    if (a.isRangeStart && b.child) {
+      return sortWithRangeStart(a, b)
+    } else if (a.child && b.isRangeStart) {
+      return -sortWithRangeStart(b, a)
+    } else {
+      return sort(a, b)
+    }
+  })
+
+  console.log('result', res)
+  return res
 }
 
 /**

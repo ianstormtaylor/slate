@@ -138,17 +138,23 @@ class Node extends React.Component {
     let children = []
 
     orderChildDecorations(node, decs).forEach(item => {
-      if (item.isChild) {
+      if (item.isRangeStart) {
+        // Item is a decoration start
+        activeDecorations.add(item.decoration)
+      } else if (item.isRangeEnd) {
+        // item is a decoration end
+        activeDecorations.remove(item.decoration)
+      } else {
+        // Item is a child node
+        const { child, index } = item
+
         const isChildSelected =
-          !!indexes && indexes.start <= item.i && item.i < indexes.end
-        return children.push(
-          this.renderNode(item.child, isChildSelected, List(activeDecorations))
+          !!indexes && indexes.start <= index && index < indexes.end
+
+        children.push(
+          this.renderNode(child, isChildSelected, List(activeDecorations))
         )
       }
-      // if range start, add it to tracked set
-      if (item.isRangeStart) return activeDecorations.add(item.d)
-      // else must be rangeEnd; stop tracking it
-      activeDecorations.remove(item.d)
     })
 
     // Attributes that the developer must mix into the element in their
@@ -199,7 +205,6 @@ class Node extends React.Component {
 
   renderNode = (child, isSelected, decorations) => {
     const { block, editor, node, readOnly } = this.props
-    const { stack } = editor
     const Component = child.object == 'text' ? Text : Node
 
     return (
