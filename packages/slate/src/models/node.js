@@ -1611,7 +1611,7 @@ class Node {
     const endText = this.getDescendant(endKey)
     const texts = this.getTextsAsArray()
     const start = texts.indexOf(startText)
-    const end = texts.indexOf(endText)
+    const end = texts.indexOf(endText, start)
     return texts.slice(start, end + 1)
   }
 
