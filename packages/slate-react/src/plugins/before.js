@@ -270,10 +270,10 @@ function BeforePlugin() {
     if (node.isVoid) event.preventDefault()
 
     // If a drag is already in progress, don't do this again.
-    if (isDragging) return true
-
-    isDragging = true
-    event.nativeEvent.dataTransfer.dropEffect = 'move'
+    if (!isDragging) {
+      isDragging = true
+      event.nativeEvent.dataTransfer.dropEffect = 'move'
+    }
 
     debug('onDragOver', { event })
   }
