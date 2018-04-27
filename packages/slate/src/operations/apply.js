@@ -221,46 +221,8 @@ const APPLIERS = {
 
   remove_node(value, operation) {
     const { path } = operation
-    let { document, selection } = value
-    const { startKey, endKey } = selection
+    let { document } = value
     const node = document.assertPath(path)
-
-    // If the selection is set, check to see if it needs to be updated.
-    if (selection.isSet) {
-      const hasStartNode = node.hasNode(startKey)
-      const hasEndNode = node.hasNode(endKey)
-      const first = node.object == 'text' ? node : node.getFirstText() || node
-      const last = node.object == 'text' ? node : node.getLastText() || node
-      const prev = document.getPreviousText(first.key)
-      const next = document.getNextText(last.key)
-
-      // If the start point was in this node, update it to be just before/after.
-      if (hasStartNode) {
-        if (prev) {
-          selection = selection.moveStartTo(prev.key, prev.text.length)
-        } else if (next) {
-          selection = selection.moveStartTo(next.key, 0)
-        } else {
-          selection = selection.deselect()
-        }
-      }
-
-      // If the end point was in this node, update it to be just before/after.
-      if (selection.isSet && hasEndNode) {
-        if (prev) {
-          selection = selection.moveEndTo(prev.key, prev.text.length)
-        } else if (next) {
-          selection = selection.moveEndTo(next.key, 0)
-        } else {
-          selection = selection.deselect()
-        }
-      }
-
-      // If the selection wasn't deselected, normalize it.
-      if (selection.isSet) {
-        selection = selection.normalize(document)
-      }
-    }
 
     // Remove the node from the document.
     let parent = document.getParent(node.key)
@@ -269,7 +231,7 @@ const APPLIERS = {
     document = document.updateNode(parent)
 
     // Update the document and selection.
-    value = value.set('document', document).set('selection', selection)
+    value = value.set('document', document)
     return value
   },
 
