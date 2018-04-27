@@ -27,10 +27,12 @@ describe('changes', async () => {
             .map(t => basename(t, extname(t)))
 
           for (const test of tests) {
-            it(test, async () => {
-              const module = require(resolve(testDir, test))
-              const { input, output } = module
-              const fn = module.default
+            const module = require(resolve(testDir, test))
+            const { input, output, skip } = module
+            const fn = module.default
+            const t = skip ? it.skip : it
+
+            t(test, async () => {
               const change = input.change()
               fn(change)
               const opts = { preserveSelection: true, preserveData: true }
