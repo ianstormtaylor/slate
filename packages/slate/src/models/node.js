@@ -199,6 +199,9 @@ class Node {
 
     if (first === second) return false
     if (parseInt(first, 10) > parseInt(second, 10)) {
+      // Ensure areDescendantSorted(second, first) is also cached
+      // Always prefer newer node in second argument, for potential
+      // futher optimization
       return !this.areDescendantSorted(second, first)
     }
     const firstAncestor = this.getFurthestAncestor(first)
