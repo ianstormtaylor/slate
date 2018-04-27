@@ -671,7 +671,11 @@ Changes.insertFragmentAtRange = (change, range, fragment, options = {}) => {
   // If the range is expanded, delete it first.
   if (range.isExpanded) {
     change.deleteAtRange(range, { normalize: false })
-    range = range.collapseToStart()
+    if (change.value.document.getDescendant(range.startKey)) {
+      range = range.collapseToStart()
+    } else {
+      range = range.collapseTo(range.endKey, 0)
+    }
   }
 
   // If the fragment is empty, there's nothing to do after deleting.
@@ -988,12 +992,7 @@ Changes.setInlineAtRange = (...args) => {
 Changes.splitBlockAtRange = (change, range, height = 1, options = {}) => {
   const normalize = change.getFlag('normalize', options)
 
-  if (range.isExpanded) {
-    change.deleteAtRange(range, { normalize })
-    range = range.collapseToStart()
-  }
-
-  const { startKey, startOffset } = range
+  const { startKey, startOffset, endOffset, endKey } = range
   const { value } = change
   const { document } = value
   let node = document.assertDescendant(startKey)
@@ -1006,7 +1005,19 @@ Changes.splitBlockAtRange = (change, range, height = 1, options = {}) => {
     h++
   }
 
-  change.splitDescendantsByKey(node.key, startKey, startOffset, { normalize })
+  change.splitDescendantsByKey(node.key, startKey, startOffset, {
+    normalize: normalize && range.isCollapsed,
+  })
+
+  if (range.isExpanded) {
+    if (range.isBackward) range = range.flip()
+    const nextBlock = change.value.document.getNextBlock(node.key)
+    range = range.moveAnchorToStartOf(nextBlock)
+    if (startKey === endKey) {
+      range = range.moveFocusTo(range.anchorKey, endOffset - startOffset)
+    }
+    change.deleteAtRange(range, { normalize })
+  }
 }
 
 /**

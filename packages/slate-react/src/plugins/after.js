@@ -305,8 +305,8 @@ function AfterPlugin() {
 
     // Get the selection point.
     const native = window.getSelection()
-    const { anchorNode, anchorOffset } = native
-    const point = findPoint(anchorNode, anchorOffset, value)
+    const { anchorNode } = native
+    const point = findPoint(anchorNode, 0, value)
     if (!point) return
 
     // Get the text node and leaf in question.
@@ -323,7 +323,7 @@ function AfterPlugin() {
       leaves.find(r => {
         start = end
         end += r.text.length
-        if (end >= point.offset) return true
+        if (end > point.offset) return true
       }) || lastLeaf
 
     // Get the text information.

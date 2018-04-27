@@ -3,30 +3,31 @@
 import h from '../../../helpers/h'
 
 export default function(change) {
-  change.deleteForward()
+  change.splitBlock()
 }
 
 export const input = (
   <value>
     <document>
+      <paragraph>zero</paragraph>
       <paragraph>
-        <anchor />one<link>
-          t<focus />wo
-        </link>
+        <anchor />word
       </paragraph>
+      <quote>
+        <focus />cat is cute
+      </quote>
     </document>
   </value>
 )
 
-// TODO: this output selection seems bad
 export const output = (
   <value>
     <document>
-      <paragraph>
-        <link>
-          <cursor />wo
-        </link>
-      </paragraph>
+      <paragraph>zero</paragraph>
+      <paragraph />
+      <quote>
+        <cursor />cat is cute
+      </quote>
     </document>
   </value>
 )

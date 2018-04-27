@@ -13,7 +13,7 @@
     "lib/"
   ],
   "dependencies": {
-    "debug": "^2.3.2",
+    "debug": "^3.1.0",
     "get-window": "^1.1.1",
     "is-window": "^1.0.2",
     "keycode": "^2.1.2",

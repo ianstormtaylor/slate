@@ -40,6 +40,11 @@ PROXY_TRANSFORMS.forEach(method => {
     const { selection } = value
     const methodAtRange = `${method}AtRange`
     change[methodAtRange](selection, ...args)
+    if (method.match(/Backward$/)) {
+      change.collapseToStart()
+    } else if (method.match(/Forward$/)) {
+      change.collapseToEnd()
+    }
   }
 })
 
@@ -217,8 +222,12 @@ Changes.insertText = (change, text, marks) => {
 
 Changes.splitBlock = (change, depth = 1) => {
   const { value } = change
-  const { selection } = value
+  const { selection, document } = value
+  const marks = selection.marks || document.getInsertMarksAtRange(selection)
   change.splitBlockAtRange(selection, depth).collapseToEnd()
+  if (marks && marks.size !== 0) {
+    change.select({ marks })
+  }
 }
 
 /**

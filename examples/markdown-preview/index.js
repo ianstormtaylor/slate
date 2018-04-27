@@ -69,19 +69,20 @@ class MarkdownPreview extends React.Component {
    */
 
   renderMark = props => {
-    const { children, mark } = props
+    const { children, mark, attributes } = props
     switch (mark.type) {
       case 'bold':
-        return <strong>{children}</strong>
+        return <strong {...attributes}>{children}</strong>
       case 'code':
-        return <code>{children}</code>
+        return <code {...attributes}>{children}</code>
       case 'italic':
-        return <em>{children}</em>
+        return <em {...attributes}>{children}</em>
       case 'underlined':
-        return <u>{children}</u>
+        return <u {...attributes}>{children}</u>
       case 'title': {
         return (
           <span
+            {...attributes}
             style={{
               fontWeight: 'bold',
               fontSize: '20px',
@@ -94,11 +95,16 @@ class MarkdownPreview extends React.Component {
         )
       }
       case 'punctuation': {
-        return <span style={{ opacity: 0.2 }}>{children}</span>
+        return (
+          <span {...attributes} style={{ opacity: 0.2 }}>
+            {children}
+          </span>
+        )
       }
       case 'list': {
         return (
           <span
+            {...attributes}
             style={{
               paddingLeft: '10px',
               lineHeight: '10px',
@@ -112,6 +118,7 @@ class MarkdownPreview extends React.Component {
       case 'hr': {
         return (
           <span
+            {...attributes}
             style={{
               borderBottom: '2px solid #000',
               display: 'block',

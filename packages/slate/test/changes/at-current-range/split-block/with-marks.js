@@ -3,29 +3,35 @@
 import h from '../../../helpers/h'
 
 export default function(change) {
-  change.deleteForward()
+  change
+    .addMark('italic')
+    .splitBlock()
+    .insertText('cat is cute')
 }
 
 export const input = (
   <value>
     <document>
       <paragraph>
-        <anchor />one<link>
-          t<focus />wo
-        </link>
+        <b>word</b>
+        <cursor />
       </paragraph>
     </document>
   </value>
 )
 
-// TODO: this output selection seems bad
 export const output = (
   <value>
     <document>
       <paragraph>
-        <link>
-          <cursor />wo
-        </link>
+        <b>word</b>
+        <cursor />
+      </paragraph>
+      <paragraph>
+        <i>
+          <b>cat is cute</b>
+        </i>
+        <cursor />
       </paragraph>
     </document>
   </value>
