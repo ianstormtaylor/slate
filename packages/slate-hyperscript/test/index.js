@@ -1,75 +1,128 @@
-/** @jsx h */
+/**
+ * Dependencies.
+ */
 
-import h from '../'
 import assert from 'assert'
-import { Value, Document, Block, Text } from 'slate'
+import fs from 'fs'
+import { Value } from 'slate'
+import { basename, extname, resolve } from 'path'
+
+/**
+ * Tests.
+ */
 
 describe('slate-hyperscript', () => {
-  it('should create a document with a single block', () => {
-    const output = (
-      <document>
-        <block type="paragraph">Single block</block>
-      </document>
-    )
-    const expected = Document.create({
-      nodes: [
-        Block.create({
-          type: 'paragraph',
-          nodes: [Text.create('Single block')],
-        }),
-      ],
-    })
+  describe('default settings', () => {
+    const dir = resolve(__dirname, './default')
+    const tests = fs
+      .readdirSync(dir)
+      .filter(t => t[0] != '.')
+      .map(t => basename(t, extname(t)))
 
-    assert.deepEqual(output.toJSON(), expected.toJSON())
+    for (const test of tests) {
+      it(test, async () => {
+        const module = require(resolve(dir, test))
+        const { input, output } = module
+
+        const actual = input.toJSON()
+        const expected = Value.isValue(output) ? output.toJSON() : output
+        assert.deepEqual(actual, expected)
+      })
+    }
   })
 
-  it('should normalize a value by default', () => {
-    const output = (
-      <value>
-        <document>
-          <block type="paragraph">Valid block</block>
-          <text>Invalid text</text>
-        </document>
-      </value>
-    )
-    const expected = Value.create({
-      document: Document.create({
-        nodes: [
-          Block.create({
-            type: 'paragraph',
-            nodes: [Text.create('Valid block')],
-          }),
-        ],
-      }),
-    })
+  describe('custom tags', () => {
+    const dir = resolve(__dirname, './custom')
+    const tests = fs
+      .readdirSync(dir)
+      .filter(t => t[0] != '.')
+      .map(t => basename(t, extname(t)))
 
-    assert.deepEqual(output.toJSON(), expected.toJSON())
+    for (const test of tests) {
+      it(test, async () => {
+        const module = require(resolve(dir, test))
+        const { input, output } = module
+
+        const actual = input.toJSON()
+        const expected = Value.isValue(output) ? output.toJSON() : output
+        assert.deepEqual(actual, expected)
+      })
+    }
   })
 
-  it('should not normalize a value, given the option', () => {
-    const output = (
-      <value normalize={false}>
-        <document>
-          <block type="paragraph">Valid block</block>
-          <text>Invalid text</text>
-        </document>
-      </value>
-    )
-    const expected = Value.fromJSON(
-      {
-        document: Document.create({
-          nodes: [
-            Block.create({
-              type: 'paragraph',
-              nodes: [Text.create('Valid block')],
-            }),
-            Text.create('Invalid text'),
-          ],
-        }),
-      },
-      { normalize: false }
-    )
+  describe('selections', () => {
+    const dir = resolve(__dirname, './selections')
+    const tests = fs
+      .readdirSync(dir)
+      .filter(t => t[0] != '.')
+      .map(t => basename(t, extname(t)))
 
-    assert.deepEqual(output.toJSON(), expected.toJSON())
+    for (const test of tests) {
+      it(test, async () => {
+        const module = require(resolve(dir, test))
+        const { input, output, expectSelection } = module
+
+        // ensure deserialization was okay
+        const actual = input.toJSON()
+        const expected = Value.isValue(output) ? output.toJSON() : output
+        assert.deepEqual(actual, expected)
+
+        // ensure expected properties of selection match
+        Object.keys(expectSelection).forEach(prop => {
+          assert.equal(input.selection[prop], expectSelection[prop])
+        })
+      })
+    }
+  })
+
+  describe('decorations', () => {
+    const dir = resolve(__dirname, './decorations')
+    const tests = fs
+      .readdirSync(dir)
+      .filter(t => t[0] != '.')
+      .map(t => basename(t, extname(t)))
+
+    for (const test of tests) {
+      it(test, async () => {
+        const module = require(resolve(dir, test))
+        const { input, output, expectDecorations } = module
+
+        // ensure deserialization was okay
+        const actual = input.toJSON()
+        const expected = Value.isValue(output) ? output.toJSON() : output
+        assert.deepEqual(actual, expected)
+
+        // ensure expected properties of decorations match
+        // note: they are expected to match order in test result
+        expectDecorations.forEach((decoration, i) => {
+          Object.keys(decoration).forEach(prop => {
+            assert.deepEqual(
+              decoration[prop],
+              input.decorations.toJS()[i][prop],
+              `decoration ${i} had incorrect prop: ${prop}`
+            )
+          })
+        })
+      })
+    }
+  })
+
+  describe('normalize', () => {
+    const dir = resolve(__dirname, './normalize')
+    const tests = fs
+      .readdirSync(dir)
+      .filter(t => t[0] != '.')
+      .map(t => basename(t, extname(t)))
+
+    for (const test of tests) {
+      it(test, async () => {
+        const module = require(resolve(dir, test))
+        const { input, output } = module
+
+        const actual = Value.isValue(input) ? input.toJSON() : input
+        const expected = Value.isValue(output) ? output.toJSON() : output
+        assert.deepEqual(actual, expected)
+      })
+    }
   })
 })

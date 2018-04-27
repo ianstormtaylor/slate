@@ -14,6 +14,42 @@ const CURSOR = {}
 const FOCUS = {}
 
 /**
+ *  wrappers for decorator points, for comparison by instanceof,
+ *  and for composition into ranges (anchor.combine(focus), etc)
+ */
+
+class DecoratorPoint {
+  constructor(key, marks) {
+    this._key = key
+    this.marks = marks
+    return this
+  }
+  withPosition = offset => {
+    this.offset = offset
+    return this
+  }
+  addOffset = offset => {
+    this.offset += offset
+    return this
+  }
+  withKey = key => {
+    this.key = key
+    return this
+  }
+  combine = focus => {
+    if (!(focus instanceof DecoratorPoint))
+      throw new Error('misaligned decorations')
+    return Range.create({
+      anchorKey: this.key,
+      focusKey: focus.key,
+      anchorOffset: this.offset,
+      focusOffset: focus.offset,
+      marks: this.marks,
+    })
+  }
+}
+
+/**
  * The default Slate hyperscript creator functions.
  *
  * @type {Object}
@@ -59,6 +95,22 @@ const CREATORS = {
     return nodes
   },
 
+  decoration(tagName, attributes, children) {
+    if (attributes.key) {
+      return new DecoratorPoint(attributes.key, [{ type: tagName }])
+    }
+
+    const nodes = createChildren(children, { key: attributes.key })
+    nodes[0].__decorations = (nodes[0].__decorations || []).concat([
+      {
+        anchorOffset: 0,
+        focusOffset: nodes.reduce((len, n) => len + n.text.length, 0),
+        marks: [{ type: tagName }],
+      },
+    ])
+    return nodes
+  },
+
   selection(tagName, attributes, children) {
     return Range.create(attributes)
   },
@@ -68,6 +120,8 @@ const CREATORS = {
     const document = children.find(Document.isDocument)
     let selection = children.find(Range.isRange) || Range.create()
     const props = {}
+    let decorations = []
+    const partialDecorations = {}
 
     // Search the document's texts to see if any of them have the anchor or
     // focus information saved, so we can set the selection.
@@ -85,6 +139,44 @@ const CREATORS = {
           props.isFocused = true
         }
       })
+
+      // now check for decorations and hoist them to the top
+      document.getTexts().forEach(text => {
+        if (text.__decorations != null) {
+          // add in all mark-like (keyless) decorations
+          decorations = decorations.concat(
+            text.__decorations.filter(d => d._key === undefined).map(d =>
+              Range.create({
+                ...d,
+                anchorKey: text.key,
+                focusKey: text.key,
+              })
+            )
+          )
+          // store or combine partial decorations (keyed with anchor / focus)
+          text.__decorations
+            .filter(d => d._key !== undefined)
+            .forEach(partial => {
+              if (partialDecorations[partial._key]) {
+                decorations.push(
+                  partialDecorations[partial._key].combine(
+                    partial.withKey(text.key)
+                  )
+                )
+                delete partialDecorations[partial._key]
+                return
+              }
+              partialDecorations[partial._key] = partial.withKey(text.key)
+            })
+        }
+      })
+    }
+
+    // should have no more parital decorations outstanding (all paired)
+    if (Object.keys(partialDecorations).length > 0) {
+      throw new Error(
+        `Slate hyperscript must have both an anchor and focus defined for each keyed decorator.`
+      )
     }
 
     if (props.anchorKey && !props.focusKey) {
@@ -103,7 +195,16 @@ const CREATORS = {
       selection = selection.merge(props).normalize(document)
     }
 
-    const value = Value.fromJSON({ data, document, selection }, { normalize })
+    let value = Value.fromJSON({ data, document, selection }, { normalize })
+
+    // apply any decorations built
+    if (decorations.length > 0) {
+      value = value
+        .change()
+        .setValue({ decorations: decorations.map(d => d.normalize(document)) })
+        .value
+    }
+
     return value
   },
 
@@ -170,9 +271,10 @@ function createChildren(children, options = {}) {
   // Create a helper to update the current node while preserving any stored
   // anchor or focus information.
   function setNode(next) {
-    const { __anchor, __focus } = node
+    const { __anchor, __focus, __decorations } = node
     if (__anchor != null) next.__anchor = __anchor
     if (__focus != null) next.__focus = __focus
+    if (__decorations != null) next.__decorations = __decorations
     node = next
   }
 
@@ -198,7 +300,7 @@ function createChildren(children, options = {}) {
     // the existing node is empty, and the `key` option wasn't set, preserve the
     // child's key when updating the node.
     if (Text.isText(child)) {
-      const { __anchor, __focus } = child
+      const { __anchor, __focus, __decorations } = child
       let i = node.text.length
 
       if (!options.key && node.text.length == 0) {
@@ -214,6 +316,20 @@ function createChildren(children, options = {}) {
 
       if (__anchor != null) node.__anchor = __anchor + length
       if (__focus != null) node.__focus = __focus + length
+      if (__decorations != null) {
+        node.__decorations = (node.__decorations || []).concat(
+          __decorations.map(
+            d =>
+              d instanceof DecoratorPoint
+                ? d.addOffset(length)
+                : {
+                    ...d,
+                    anchorOffset: d.anchorOffset + length,
+                    focusOffset: d.focusOffset + length,
+                  }
+          )
+        )
+      }
 
       length += child.text.length
     }
@@ -221,6 +337,13 @@ function createChildren(children, options = {}) {
     // If the child is a selection object store the current position.
     if (child == ANCHOR || child == CURSOR) node.__anchor = length
     if (child == FOCUS || child == CURSOR) node.__focus = length
+
+    // if child is a decorator point, store it as partial decorator
+    if (child instanceof DecoratorPoint) {
+      node.__decorations = (node.__decorations || []).concat([
+        child.withPosition(length),
+      ])
+    }
   })
 
   // Make sure the most recent node is added.
@@ -239,7 +362,7 @@ function createChildren(children, options = {}) {
  */
 
 function resolveCreators(options) {
-  const { blocks = {}, inlines = {}, marks = {} } = options
+  const { blocks = {}, inlines = {}, marks = {}, decorators = {} } = options
 
   const creators = {
     ...CREATORS,
@@ -256,6 +379,10 @@ function resolveCreators(options) {
 
   Object.keys(marks).map(key => {
     creators[key] = normalizeMark(key, marks[key])
+  })
+
+  Object.keys(decorators).map(key => {
+    creators[key] = normalizeNode(key, decorators[key], 'decoration')
   })
 
   return creators
