@@ -13,7 +13,7 @@
     "lib/"
   ],
   "dependencies": {
-    "debug": "^2.3.2",
+    "debug": "^3.1.0",
     "direction": "^0.1.5",
     "esrever": "^0.2.0",
     "is-empty": "^1.0.0",

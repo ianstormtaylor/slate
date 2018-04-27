@@ -3,9 +3,6 @@ language: node_js
 node_js: [node]
 
 before_install:
-  # Download and export yarn.
-  - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.0.1
-  - export PATH=$HOME/.yarn/bin:$PATH
   # Export the C++11 compiler.
   - if [[ $TRAVIS_OS_NAME == "linux" ]]; then export CXX=g++-4.8; fi
 
@@ -20,8 +17,6 @@ env:
     - TEST_TYPE=lint
 
 script:
-  # Run bootstrap first so that the proper workspaces links are created.
-  - yarn bootstrap
   # Build all of the packages so they are resolvable by each other.
   - yarn build
   # Run testing or linting depending on the environment.

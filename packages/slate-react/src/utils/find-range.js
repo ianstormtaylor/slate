@@ -1,10 +1,10 @@
 import getWindow from 'get-window'
 import isBackward from 'selection-is-backward'
 import { Range } from 'slate'
+import { IS_IE, IS_EDGE } from 'slate-dev-environment'
 
 import findPoint from './find-point'
 import findDOMPoint from './find-dom-point'
-import { IS_IE, IS_EDGE } from '../constants/environment'
 
 /**
  * Find a Slate range from a DOM `native` selection.
