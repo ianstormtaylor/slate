@@ -404,8 +404,19 @@ class Node {
   getBlocksAtRange(range) {
     range = range.normalize(this)
     if (range.isUnset) return List()
-
     const { startKey, endKey } = range
+    return this.getBlocksBetweenPositions(startKey, endKey)
+  }
+
+  /**
+   * Cachable Method for getBlocksAtRange
+   *
+   * @param {string} startKey
+   * @param {string} eneKey
+   * @return {List<Node>}
+   */
+
+  getBlocksBetweenPositions(startKey, endKey) {
     const startBlock = this.getClosestBlock(startKey)
 
     // PERF: the most common case is when the range is in a single block node,
@@ -2008,7 +2019,7 @@ memoize(Node.prototype, [
   'areDescendantsSorted',
   'getAncestors',
   'getBlocks',
-  'getBlocksAtRange',
+  'getBlocksBetweenPositions',
   'getBlocksByType',
   'getChild',
   'getClosestBlock',
