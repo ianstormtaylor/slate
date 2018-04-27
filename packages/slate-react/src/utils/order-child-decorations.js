@@ -30,10 +30,10 @@ function orderChildDecorations(node, decorations) {
   }
 
   // Map each key to its global order
-  const keyOrder = { [node.key]: 0 }
+  const keyOrders = { [node.key]: 0 }
   let globalOrder = 1
   node.forEachDescendant(child => {
-    keyOrder[child.key] = globalOrder
+    keyOrders[child.key] = globalOrder
     globalOrder = globalOrder + 1
   })
 
@@ -42,21 +42,26 @@ function orderChildDecorations(node, decorations) {
   const endPoints = childNodes.map((child, index) => ({
     child,
     index,
-    order: keyOrder[child.key],
+    order: keyOrders[child.key],
   }))
 
   decorations.forEach(decoration => {
-    let startKeyOrder = keyOrder[decoration.endKey]
-    startKeyOrder = (startKeyOrder === undefined ? 0 : startKeyOrder) - 0.5
+    // Range start.
+    // A rangeStart should be before the child containing its startKey, in order
+    // to consider it active before going down the child.
+    const startKeyOrder = keyOrders[decoration.endKey]
+    const containingChildOrder =
+      startKeyOrder === undefined
+        ? 0
+        : getContainingChildOrder(childNodes, keyOrders, startKeyOrder)
     endPoints.push({
       isRangeStart: true,
-      order: startKeyOrder,
+      order: containingChildOrder - 0.5,
       decoration,
     })
 
-    let endKeyOrder = keyOrder[decoration.endKey]
-    endKeyOrder = (endKeyOrder === undefined ? globalOrder : endKeyOrder) + 0.5
-
+    // Range end.
+    const endKeyOrder = (keyOrders[decoration.endKey] || globalOrder) + 0.5
     endPoints.push({
       isRangeEnd: true,
       order: endKeyOrder,
@@ -64,35 +69,25 @@ function orderChildDecorations(node, decorations) {
     })
   })
 
-  const sort = (a, b) => (a.order > b.order ? 1 : -1)
+  return endPoints.sort((a, b) => (a.order > b.order ? 1 : -1))
+}
 
-  const sortWithRangeStart = (rangeItem, childItem) => {
-    // A rangeStart should be before the child containing its startKey, so it is
-    // taken account before going down the child.
-    const nextChild = node.nodes.get(childItem.index + 1)
+/*
+ * Returns the key order of the child right before the given order.
+ */
 
-    // The child contains the start key if the start key is between the lowest
-    // and highest key in the child
-    const lowestOrder = childItem.order
-    const highestOrder = nextChild ? keyOrder[nextChild.key] : globalOrder + 1
-    const containsRangeKey =
-      lowestOrder < rangeItem.order && rangeItem.order < highestOrder
+function getContainingChildOrder(children, keyOrders, order) {
+  // Find the first child that is after the given key
+  const nextChildIndex = children.findIndex(
+    child => order < keyOrders[child.key]
+  )
 
-    return containsRangeKey ? -1 : sort(rangeItem, childItem)
+  if (nextChildIndex <= 0) {
+    return 0
   }
 
-  const res = endPoints.sort((a, b) => {
-    // Special cases for sorting a range start and a child
-    if (a.isRangeStart && b.child) {
-      return sortWithRangeStart(a, b)
-    } else if (a.child && b.isRangeStart) {
-      return -sortWithRangeStart(b, a)
-    } else {
-      return sort(a, b)
-    }
-  })
-
-  return res
+  const containingChild = children[nextChildIndex - 1]
+  return keyOrders[containingChild.key]
 }
 
 /**
