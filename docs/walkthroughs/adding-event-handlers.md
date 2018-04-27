@@ -13,7 +13,7 @@ Let's use the `onKeyDown` handler to change the editor's content when we press a
 Here's our app from earlier:
 
 ```js
-class App extends Component {
+class App extends React.Component {
   state = {
     value: initialValue,
   }
@@ -31,7 +31,7 @@ class App extends Component {
 Now we add an `onKeyDown` handler:
 
 ```js
-class App extends Component {
+class App extends React.Component {
   state = {
     value: initialValue,
   }
@@ -64,7 +64,7 @@ Now we want to make it actually change the content. For the purposes of our exam
 Our `onKeyDown` handler might look like this:
 
 ```js
-class App extends Component {
+class App extends React.Component {
   state = {
     value: initialValue,
   }
