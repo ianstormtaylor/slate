@@ -80,7 +80,6 @@
   "scripts": {
     "benchmark": "mkdir -p ./tmp && cross-env BABEL_ENV=test babel-node ./node_modules/.bin/_matcha --reporter ./support/benchmark/reporter ./packages/*/benchmark/index.js > ./tmp/benchmark-comparison.json && cross-env BABEL_ENV=test babel-node ./support/benchmark/compare",
     "benchmark:save": "mkdir -p ./tmp && cross-env BABEL_ENV=test babel-node ./node_modules/.bin/_matcha --reporter ./support/benchmark/reporter ./packages/*/benchmark/index.js > ./tmp/benchmark-baseline.json",
-    "bootstrap": "lerna bootstrap && yarn build",
     "build": "rollup --config ./support/rollup/config.js",
     "build:gh-pages": "cross-env NODE_ENV=production rollup --config ./support/rollup/config.js && cross-env NODE_ENV=production webpack --config support/webpack/config.js",
     "clean": "lerna run clean && rm -rf ./node_modules ./dist ./build",

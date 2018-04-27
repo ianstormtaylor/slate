@@ -21,7 +21,9 @@ env:
 
 script:
   # Run bootstrap first so that the proper workspaces links are created.
-  - yarn bootstrap
+  # HACK: Right now `upath` is broken to not work in latest node, so we need
+  # to ignore the engines field here.
+  - yarn install --ignore-engines
   # Build all of the packages so they are resolvable by each other.
   - yarn build
   # Run testing or linting depending on the environment.
