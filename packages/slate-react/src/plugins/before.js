@@ -1,14 +1,14 @@
 import Debug from 'debug'
 import getWindow from 'get-window'
 import { findDOMNode } from 'react-dom'
-
-import HOTKEYS from '../constants/hotkeys'
+import Hotkeys from 'slate-hotkeys'
 import {
   IS_FIREFOX,
   IS_IOS,
   IS_ANDROID,
   SUPPORTED_EVENTS,
-} from '../constants/environment'
+} from 'slate-dev-environment'
+
 import findNode from '../utils/find-node'
 
 /**
@@ -369,13 +369,13 @@ function BeforePlugin() {
     // typing. However, certain characters also move the selection before
     // we're able to handle it, so prevent their default behavior.
     if (isComposing) {
-      if (HOTKEYS.COMPOSING(event)) event.preventDefault()
+      if (Hotkeys.isComposing(event)) event.preventDefault()
       return true
     }
 
     // Certain hotkeys have native behavior in contenteditable elements which
     // will cause our value to be out of sync, so prevent them.
-    if (HOTKEYS.CONTENTEDITABLE(event) && !IS_IOS) {
+    if (Hotkeys.isContentEditable(event) && !IS_IOS) {
       event.preventDefault()
     }
 

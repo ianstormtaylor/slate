@@ -1,9 +1,9 @@
 import Base64 from 'slate-base64-serializer'
+import { IS_CHROME, IS_SAFARI } from 'slate-dev-environment'
 
 import getWindow from 'get-window'
 import findDOMNode from './find-dom-node'
 import { ZERO_WIDTH_SELECTOR, ZERO_WIDTH_ATTRIBUTE } from './find-point'
-import { IS_CHROME, IS_SAFARI } from '../constants/environment'
 
 /**
  * Prepares a Slate document fragment to be copied to the clipboard.

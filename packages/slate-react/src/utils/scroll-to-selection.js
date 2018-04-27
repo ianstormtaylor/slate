@@ -1,6 +1,6 @@
 import getWindow from 'get-window'
 import isBackward from 'selection-is-backward'
-import { IS_SAFARI, IS_IOS } from '../constants/environment'
+import { IS_SAFARI, IS_IOS } from 'slate-dev-environment'
 
 /**
  * CSS overflow values that would cause scrolling.
