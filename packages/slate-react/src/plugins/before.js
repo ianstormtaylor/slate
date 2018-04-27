@@ -143,7 +143,10 @@ function BeforePlugin() {
       // HACK: we need to re-render the editor here so that it will update its
       // placeholder in case one is currently rendered. This should be handled
       // differently ideally, in a less invasive way?
-      editor.setState({ isComposing: false })
+      // (apply force re-render if isComposing changes)
+      if (editor.state.isComposing) {
+        editor.setState({ isComposing: false })
+      }
     })
 
     debug('onCompositionEnd', { event })
@@ -164,7 +167,10 @@ function BeforePlugin() {
     // HACK: we need to re-render the editor here so that it will update its
     // placeholder in case one is currently rendered. This should be handled
     // differently ideally, in a less invasive way?
-    editor.setState({ isComposing: true })
+    // (apply force re-render if isComposing changes)
+    if (!editor.state.isComposing) {
+      editor.setState({ isComposing: true })
+    }
 
     debug('onCompositionStart', { event })
   }
