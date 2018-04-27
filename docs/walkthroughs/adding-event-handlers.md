@@ -19,7 +19,7 @@ class App extends React.Component {
   }
 
   onChange = ({ value }) => {
-    this.setState({ value });
+    this.setState({ value })
   }
 
   render() {
@@ -37,12 +37,12 @@ class App extends React.Component {
   }
 
   onChange = ({ value }) => {
-    this.setState({ value });
+    this.setState({ value })
   }
 
   // Define a new handler which prints the key that was pressed.
   onKeyDown = (event, change) => {
-    console.log(event.key);
+    console.log(event.key)
   }
 
   render() {
@@ -70,19 +70,19 @@ class App extends React.Component {
   }
 
   onChange = ({ value }) => {
-    this.setState({ value });
+    this.setState({ value })
   }
 
   onKeyDown = (event, change) => {
     // Return with no changes if the keypress is not '&'
-    if (event.key !== '&') { return; }
+    if (event.key !== '&') return
 
     // Prevent the ampersand character from being inserted.
-    event.preventDefault();
+    event.preventDefault()
 
     // Change the value by inserting 'and' at the cursor's position.
-    change.insertText('and');
-    return true;
+    change.insertText('and')
+    return true
   }
 
   render() {
@@ -92,7 +92,7 @@ class App extends React.Component {
         onChange={this.onChange}
         onKeyDown={this.onKeyDown}
       />
-    );
+    )
   }
 }
 ```
