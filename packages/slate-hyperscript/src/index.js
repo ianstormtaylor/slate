@@ -64,7 +64,7 @@ const CREATORS = {
   },
 
   value(tagName, attributes, children) {
-    const { data } = attributes
+    const { data, normalize = true } = attributes
     const document = children.find(Document.isDocument)
     let selection = children.find(Range.isRange) || Range.create()
     const props = {}
@@ -103,7 +103,7 @@ const CREATORS = {
       selection = selection.merge(props).normalize(document)
     }
 
-    const value = Value.create({ data, document, selection })
+    const value = Value.fromJSON({ data, document, selection }, { normalize })
     return value
   },
 
@@ -176,14 +176,15 @@ function createChildren(children, options = {}) {
     node = next
   }
 
-  children.forEach(child => {
+  children.forEach((child, index) => {
+    const isLast = index === children.length - 1
     // If the child is a non-text node, push the current node and the new child
     // onto the array, then creating a new node for future selection tracking.
     if (Node.isNode(child) && !Text.isText(child)) {
       if (node.text.length || node.__anchor != null || node.__focus != null)
         array.push(node)
       array.push(child)
-      node = Text.create()
+      node = isLast ? null : Text.create()
       length = 0
     }
 
@@ -223,7 +224,9 @@ function createChildren(children, options = {}) {
   })
 
   // Make sure the most recent node is added.
-  array.push(node)
+  if (node != null) {
+    array.push(node)
+  }
 
   return array
 }
