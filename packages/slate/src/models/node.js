@@ -198,6 +198,9 @@ class Node {
     second = assertKey(second)
 
     if (first === second) return false
+    if (parseInt(first, 10) > parseInt(second, 10)) {
+      return !this.areDescendantSorted(second, first)
+    }
     const firstAncestor = this.getFurthestAncestor(first)
     const secondAncestor = this.getFurthestAncestor(second)
     if (!firstAncestor || !secondAncestor) {
