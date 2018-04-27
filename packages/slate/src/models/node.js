@@ -1236,9 +1236,10 @@ class Node {
 
   getNextText(key) {
     key = assertKey(key)
-    return this.getTexts()
-      .skipUntil(text => text.key == key)
-      .get(1)
+    const texts = this.getTexts()
+    const index = texts.findIndex(t => t.key === key)
+    if (index === -1) return undefined
+    return texts.get(index + 1)
   }
 
   /**
@@ -1449,9 +1450,9 @@ class Node {
 
   getPreviousText(key) {
     key = assertKey(key)
-    return this.getTexts()
-      .takeUntil(text => text.key == key)
-      .last()
+    const texts = this.getTexts()
+    const index = texts.findIndex(t => t.key === key)
+    return index > 0 ? texts.get(index - 1) : undefined
   }
 
   /**
