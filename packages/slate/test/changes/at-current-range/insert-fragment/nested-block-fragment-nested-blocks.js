@@ -32,7 +32,7 @@ export const output = (
         <paragraph>woone</paragraph>
         <quote>
           <quote>
-            <cursor />tword
+            two<cursor />rd
           </quote>
         </quote>
       </quote>

@@ -24,7 +24,7 @@ describe('slate-hyperscript', () => {
         const module = require(resolve(dir, test))
         const { input, output } = module
 
-        const actual = Value.isValue(input) ? input.toJSON() : input
+        const actual = input.toJSON()
         const expected = Value.isValue(output) ? output.toJSON() : output
         assert.deepEqual(actual, expected)
       })
@@ -43,7 +43,7 @@ describe('slate-hyperscript', () => {
         const module = require(resolve(dir, test))
         const { input, output } = module
 
-        const actual = Value.isValue(input) ? input.toJSON() : input
+        const actual = input.toJSON()
         const expected = Value.isValue(output) ? output.toJSON() : output
         assert.deepEqual(actual, expected)
       })
@@ -63,7 +63,7 @@ describe('slate-hyperscript', () => {
         const { input, output, expectSelection } = module
 
         // ensure deserialization was okay
-        const actual = Value.isValue(input) ? input.toJSON() : input
+        const actual = input.toJSON()
         const expected = Value.isValue(output) ? output.toJSON() : output
         assert.deepEqual(actual, expected)
 
@@ -88,7 +88,7 @@ describe('slate-hyperscript', () => {
         const { input, output, expectDecorations } = module
 
         // ensure deserialization was okay
-        const actual = Value.isValue(input) ? input.toJSON() : input
+        const actual = input.toJSON()
         const expected = Value.isValue(output) ? output.toJSON() : output
         assert.deepEqual(actual, expected)
 
@@ -103,6 +103,25 @@ describe('slate-hyperscript', () => {
             )
           })
         })
+      })
+    }
+  })
+
+  describe('normalize', () => {
+    const dir = resolve(__dirname, './normalize')
+    const tests = fs
+      .readdirSync(dir)
+      .filter(t => t[0] != '.')
+      .map(t => basename(t, extname(t)))
+
+    for (const test of tests) {
+      it(test, async () => {
+        const module = require(resolve(dir, test))
+        const { input, output } = module
+
+        const actual = Value.isValue(input) ? input.toJSON() : input
+        const expected = Value.isValue(output) ? output.toJSON() : output
+        assert.deepEqual(actual, expected)
       })
     }
   })

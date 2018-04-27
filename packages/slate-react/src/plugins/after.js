@@ -1,13 +1,13 @@
 import Base64 from 'slate-base64-serializer'
 import Debug from 'debug'
 import Plain from 'slate-plain-serializer'
+import { IS_IOS } from 'slate-dev-environment'
 import React from 'react'
 import getWindow from 'get-window'
 import { Block, Inline, Text } from 'slate'
+import Hotkeys from 'slate-hotkeys'
 
-import { IS_IOS } from '../constants/environment'
 import EVENT_HANDLERS from '../constants/event-handlers'
-import HOTKEYS from '../constants/hotkeys'
 import Content from '../components/content'
 import cloneFragment from '../utils/clone-fragment'
 import findDOMNode from '../utils/find-dom-node'
@@ -370,63 +370,63 @@ function AfterPlugin() {
     // COMPAT: In iOS, some of these hotkeys are handled in the
     // `onNativeBeforeInput` handler of the `<Content>` component in order to
     // preserve native autocorrect behavior, so they shouldn't be handled here.
-    if (HOTKEYS.SPLIT_BLOCK(event) && !IS_IOS) {
+    if (Hotkeys.isSplitBlock(event) && !IS_IOS) {
       return value.isInVoid
         ? change.collapseToStartOfNextText()
         : change.splitBlock()
     }
 
-    if (HOTKEYS.DELETE_CHAR_BACKWARD(event) && !IS_IOS) {
+    if (Hotkeys.isDeleteCharBackward(event) && !IS_IOS) {
       return change.deleteCharBackward()
     }
 
-    if (HOTKEYS.DELETE_CHAR_FORWARD(event) && !IS_IOS) {
+    if (Hotkeys.isDeleteCharForward(event) && !IS_IOS) {
       return change.deleteCharForward()
     }
 
-    if (HOTKEYS.DELETE_LINE_BACKWARD(event)) {
+    if (Hotkeys.isDeleteLineBackward(event)) {
       return change.deleteLineBackward()
     }
 
-    if (HOTKEYS.DELETE_LINE_FORWARD(event)) {
+    if (Hotkeys.isDeleteLineForward(event)) {
       return change.deleteLineForward()
     }
 
-    if (HOTKEYS.DELETE_WORD_BACKWARD(event)) {
+    if (Hotkeys.isDeleteWordBackward(event)) {
       return change.deleteWordBackward()
     }
 
-    if (HOTKEYS.DELETE_WORD_FORWARD(event)) {
+    if (Hotkeys.isDeleteWordForward(event)) {
       return change.deleteWordForward()
     }
 
-    if (HOTKEYS.REDO(event)) {
+    if (Hotkeys.isRedo(event)) {
       return change.redo()
     }
 
-    if (HOTKEYS.UNDO(event)) {
+    if (Hotkeys.isUndo(event)) {
       return change.undo()
     }
 
     // COMPAT: Certain browsers don't handle the selection updates properly. In
     // Chrome, the selection isn't properly extended. And in Firefox, the
     // selection isn't properly collapsed. (2017/10/17)
-    if (HOTKEYS.COLLAPSE_LINE_BACKWARD(event)) {
+    if (Hotkeys.isCollapseLineBackward(event)) {
       event.preventDefault()
       return change.collapseLineBackward()
     }
 
-    if (HOTKEYS.COLLAPSE_LINE_FORWARD(event)) {
+    if (Hotkeys.isCollapseLineForward(event)) {
       event.preventDefault()
       return change.collapseLineForward()
     }
 
-    if (HOTKEYS.EXTEND_LINE_BACKWARD(event)) {
+    if (Hotkeys.isExtendLineBackward(event)) {
       event.preventDefault()
       return change.extendLineBackward()
     }
 
-    if (HOTKEYS.EXTEND_LINE_FORWARD(event)) {
+    if (Hotkeys.isExtendLineForward(event)) {
       event.preventDefault()
       return change.extendLineForward()
     }
@@ -434,7 +434,7 @@ function AfterPlugin() {
     // COMPAT: If a void node is selected, or a zero-width text node adjacent to
     // an inline is selected, we need to handle these hotkeys manually because
     // browsers won't know what to do.
-    if (HOTKEYS.COLLAPSE_CHAR_BACKWARD(event)) {
+    if (Hotkeys.isCollapseCharBackward(event)) {
       const { document, isInVoid, previousText, startText } = value
       const isPreviousInVoid =
         previousText && document.hasVoidParent(previousText.key)
@@ -444,7 +444,7 @@ function AfterPlugin() {
       }
     }
 
-    if (HOTKEYS.COLLAPSE_CHAR_FORWARD(event)) {
+    if (Hotkeys.isCollapseCharForward(event)) {
       const { document, isInVoid, nextText, startText } = value
       const isNextInVoid = nextText && document.hasVoidParent(nextText.key)
       if (isInVoid || isNextInVoid || startText.text == '') {
@@ -453,7 +453,7 @@ function AfterPlugin() {
       }
     }
 
-    if (HOTKEYS.EXTEND_CHAR_BACKWARD(event)) {
+    if (Hotkeys.isExtendCharBackward(event)) {
       const { document, isInVoid, previousText, startText } = value
       const isPreviousInVoid =
         previousText && document.hasVoidParent(previousText.key)
@@ -463,7 +463,7 @@ function AfterPlugin() {
       }
     }
 
-    if (HOTKEYS.EXTEND_CHAR_FORWARD(event)) {
+    if (Hotkeys.isExtendCharForward(event)) {
       const { document, isInVoid, nextText, startText } = value
       const isNextInVoid = nextText && document.hasVoidParent(nextText.key)
       if (isInVoid || isNextInVoid || startText.text == '') {

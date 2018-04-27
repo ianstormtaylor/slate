@@ -2,6 +2,12 @@ import Debug from 'debug'
 import React from 'react'
 import Types from 'prop-types'
 import getWindow from 'get-window'
+import {
+  IS_FIREFOX,
+  IS_IOS,
+  IS_ANDROID,
+  SUPPORTED_EVENTS,
+} from 'slate-dev-environment'
 import logger from 'slate-dev-logger'
 import throttle from 'lodash/throttle'
 
@@ -10,12 +16,6 @@ import Node from './node'
 import findDOMRange from '../utils/find-dom-range'
 import findRange from '../utils/find-range'
 import scrollToSelection from '../utils/scroll-to-selection'
-import {
-  IS_FIREFOX,
-  IS_IOS,
-  IS_ANDROID,
-  SUPPORTED_EVENTS,
-} from '../constants/environment'
 
 /**
  * Debug.
@@ -71,7 +71,6 @@ class Content extends React.Component {
   constructor(props) {
     super(props)
     this.tmp = {}
-    this.tmp.key = 0
     this.tmp.isUpdatingSelection = false
 
     EVENT_HANDLERS.forEach(handler => {
@@ -275,12 +274,6 @@ class Content extends React.Component {
 
   onEvent(handler, event) {
     debug('onEvent', handler)
-
-    // COMPAT: Composition events can change the DOM out of under React, so we
-    // increment this key to ensure that a full re-render happens. (2017/10/16)
-    if (handler == 'onCompositionEnd') {
-      this.tmp.key++
-    }
 
     // Ignore `onBlur`, `onFocus` and `onSelect` events generated
     // programmatically while updating selection.
@@ -491,7 +484,6 @@ class Content extends React.Component {
       <Container
         {...handlers}
         data-slate-editor
-        key={this.tmp.key}
         ref={this.ref}
         data-key={document.key}
         contentEditable={readOnly ? null : true}

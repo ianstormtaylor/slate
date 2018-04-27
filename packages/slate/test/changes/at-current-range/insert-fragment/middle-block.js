@@ -24,7 +24,7 @@ export const output = (
   <value>
     <document>
       <paragraph>
-        wo<cursor />fragmentrd
+        wofragment<cursor />rd
       </paragraph>
     </document>
   </value>

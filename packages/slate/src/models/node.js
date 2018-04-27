@@ -1854,13 +1854,12 @@ class Node {
   mapDescendants(iterator) {
     let { nodes } = this
 
-    nodes.forEach((node, i) => {
+    nodes.forEach((node, index) => {
       let ret = node
       if (ret.object != 'text') ret = ret.mapDescendants(iterator)
-      ret = iterator(ret, i, this.nodes)
+      ret = iterator(ret, index, this.nodes)
       if (ret == node) return
 
-      const index = nodes.indexOf(node)
       nodes = nodes.set(index, ret)
     })
 

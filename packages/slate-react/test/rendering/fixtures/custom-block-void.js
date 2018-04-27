@@ -31,15 +31,15 @@ export const value = (
 
 export const output = `
 <div data-slate-editor="true" contenteditable="true" role="textbox">
-  <div data-slate-void="true" contenteditable="false">
-    <div contenteditable="true" data-slate-spacer="true" style="height:0;color:transparent;outline:none">
+  <div data-slate-void="true">
+    <div data-slate-spacer="true" style="height:0;color:transparent;outline:none">
       <span>
         <span>
           <span data-slate-zero-width="z">&#x200B;</span>
         </span>
       </span>
     </div>
-    <div draggable="true">
+    <div contenteditable="false" draggable="true">
       <img src="https://example.com/image.png">
     </div>
   </div>
