@@ -117,7 +117,9 @@ class Text extends React.Component {
       return endsAfter
     })
 
-    const leaves = node.getLeaves(decs)
+    // Take advantage of cache
+    const leaves = decs.size === 0 ? node.getLeaves() : node.getLeaves(decs)
+
     let offset = 0
 
     const children = leaves.map((leaf, i) => {
