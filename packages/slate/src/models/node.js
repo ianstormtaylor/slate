@@ -936,6 +936,20 @@ class Node {
     }, [])
   }
 
+  /*
+   * get all keys of node as a set
+   */
+
+  getKeysAsSet() {
+    return Set().withMutations(result => {
+      result.add(this.key)
+      this.nodes.forEach(n => {
+        if (n.object === 'text') return result.add(n.key)
+        result.union(n.getKeysAsSet())
+      })
+    })
+  }
+
   /**
    * Get the last child text node.
    *
@@ -1668,13 +1682,14 @@ class Node {
    */
 
   insertNode(index, node) {
-    if (this.key === node.key || this.hasDescendant(node.key)) {
+    const keys = this.getKeysAsSet()
+    if (keys.includes(node.key)) {
       node = node.regenerateKey()
     }
 
     if (node.object != 'text') {
       node = node.mapDescendants(desc => {
-        if (this.key === node.key || this.hasDescendant(desc.key)) {
+        if (keys.includes(desc.key)) {
           return desc.regenerateKey()
         }
         return desc
@@ -2017,6 +2032,7 @@ memoize(Node.prototype, [
   'getMarksByTypeAsArray',
   'getOrderedMarksBetweenPositions',
   'getLastText',
+  'getKeysAsSet',
   'getNextBlock',
   'getNextSibling',
   'getNextText',
