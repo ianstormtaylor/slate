@@ -3,11 +3,11 @@ language: node_js
 node_js: [node]
 
 before_install:
-  # Download and export yarn.
-  - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.0.1
-  - export PATH=$HOME/.yarn/bin:$PATH
   # Export the C++11 compiler.
   - if [[ $TRAVIS_OS_NAME == "linux" ]]; then export CXX=g++-4.8; fi
+  # HACK: Right now `upath` is broken to not work in latest node, so we need
+  # to ignore the engines field here.
+  - yarn config set ignore-engines --global
 
 cache:
   # Cache yarn packages.
@@ -20,10 +20,6 @@ env:
     - TEST_TYPE=lint
 
 script:
-  # Run bootstrap first so that the proper workspaces links are created.
-  # HACK: Right now `upath` is broken to not work in latest node, so we need
-  # to ignore the engines field here.
-  - yarn install --ignore-engines
   # Build all of the packages so they are resolvable by each other.
   - yarn build
   # Run testing or linting depending on the environment.
