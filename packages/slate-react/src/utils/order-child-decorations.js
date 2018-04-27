@@ -37,9 +37,6 @@ function orderChildDecorations(node, decorations) {
     globalOrder = globalOrder + 1
   })
 
-  console.log('keyOrder', keyOrder)
-  console.log('decorations', decorations)
-
   const childNodes = node.nodes.toArray()
 
   const endPoints = childNodes.map((child, index) => ({
@@ -49,14 +46,20 @@ function orderChildDecorations(node, decorations) {
   }))
 
   decorations.forEach(decoration => {
+    let startKeyOrder = keyOrder[decoration.endKey]
+    startKeyOrder = (startKeyOrder === undefined ? 0 : startKeyOrder) - 0.5
     endPoints.push({
       isRangeStart: true,
-      order: keyOrder[decoration.startKey] - 0.5,
+      order: startKeyOrder,
       decoration,
     })
+
+    let endKeyOrder = keyOrder[decoration.endKey]
+    endKeyOrder = (endKeyOrder === undefined ? globalOrder : endKeyOrder) + 0.5
+
     endPoints.push({
       isRangeEnd: true,
-      order: keyOrder[decoration.endKey] + 0.5,
+      order: endKeyOrder,
       decoration,
     })
   })
@@ -66,18 +69,16 @@ function orderChildDecorations(node, decorations) {
   const sortWithRangeStart = (rangeItem, childItem) => {
     // A rangeStart should be before the child containing its startKey, so it is
     // taken account before going down the child.
+    const nextChild = node.nodes.get(childItem.index + 1)
 
-    const nextChild = node.nodes.get(childItem.child.index + 1)
-    if (!nextChild) {
-      return sort(rangeItem, childItem)
-    }
-
-    const nextChildOrder = keyOrder[nextChild.key]
-
+    // The child contains the start key if the start key is between the lowest
+    // and highest key in the child
+    const lowestOrder = childItem.order
+    const highestOrder = nextChild ? keyOrder[nextChild.key] : globalOrder + 1
     const containsRangeKey =
-      childItem.order < rangeItem.order && rangeItem.order < nextChildOrder
+      lowestOrder < rangeItem.order && rangeItem.order < highestOrder
 
-    return containsRangeKey ? 1 : sort(rangeItem, childItem)
+    return containsRangeKey ? -1 : sort(rangeItem, childItem)
   }
 
   const res = endPoints.sort((a, b) => {
@@ -91,7 +92,6 @@ function orderChildDecorations(node, decorations) {
     }
   })
 
-  console.log('result', res)
   return res
 }
 
