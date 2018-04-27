@@ -707,6 +707,20 @@ Changes.insertFragmentAtRange = (change, range, fragment, options = {}) => {
     return
   }
 
+  // If the fragment starts or ends with single nested block, (e.g., table),
+  // do not merge this fragment with existing blocks.
+  if (
+    firstBlock != lastBlock &&
+    Block.isBlock(fragment.nodes.first()) &&
+    Block.isBlock(fragment.nodes.last()) &&
+    (firstBlock != fragment.nodes.first() || lastBlock != fragment.nodes.last())
+  ) {
+    fragment.nodes.reverse().forEach((node) => {
+      change.insertBlockAtRange(range, node, options)
+    })
+    return
+  }
+
   // If the first and last block aren't the same, we need to insert all of the
   // nodes after the fragment's first block at the index.
   if (firstBlock != lastBlock) {
