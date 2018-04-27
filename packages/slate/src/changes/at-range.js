@@ -698,6 +698,8 @@ Changes.insertFragmentAtRange = (change, range, fragment, options = {}) => {
   const parent = document.getParent(startBlock.key)
   const index = parent.nodes.indexOf(startBlock)
   const blocks = fragment.getBlocks()
+  const firstChild = fragment.nodes.first()
+  const lastChild = fragment.nodes.last()
   const firstBlock = blocks.first()
   const lastBlock = blocks.last()
 
@@ -709,13 +711,8 @@ Changes.insertFragmentAtRange = (change, range, fragment, options = {}) => {
 
   // If the fragment starts or ends with single nested block, (e.g., table),
   // do not merge this fragment with existing blocks.
-  if (
-    firstBlock != lastBlock &&
-    Block.isBlock(fragment.nodes.first()) &&
-    Block.isBlock(fragment.nodes.last()) &&
-    (firstBlock != fragment.nodes.first() || lastBlock != fragment.nodes.last())
-  ) {
-    fragment.nodes.reverse().forEach((node) => {
+  if (fragment.hasBlocks(firstChild.key) || fragment.hasBlocks(lastChild.key)) {
+    fragment.nodes.reverse().forEach(node => {
       change.insertBlockAtRange(range, node, options)
     })
     return
