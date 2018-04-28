@@ -265,14 +265,13 @@ class Node {
    */
 
   assertNode(key) {
-    const node = this.getNode(key)
-
-    if (!node) {
-      key = assertKey(key)
+    key = assertKey(key)
+    const path = this.getPathAsString(key)
+    if (typeof path !== 'string') {
       throw new Error(`Could not find a node with key "${key}".`)
     }
 
-    return node
+    return this.getNode(key)
   }
 
   /**
@@ -617,20 +616,13 @@ class Node {
 
   getDescendant(key) {
     key = assertKey(key)
-    let descendantFound = null
-
-    const found = this.nodes.find(node => {
-      if (node.key === key) {
-        return node
-      } else if (node.object !== 'text') {
-        descendantFound = node.getDescendant(key)
-        return descendantFound
-      } else {
-        return false
-      }
+    if (typeof this.getPathAsString(key) !== 'string') return null
+    const path = this.getPath(key)
+    let descendantFound = this
+    path.forEach(index => {
+      descendantFound = descendantFound.nodes.get(index)
     })
-
-    return descendantFound || found
+    return descendantFound
   }
 
   /**
@@ -1356,17 +1348,33 @@ class Node {
    */
 
   getPath(key) {
-    let child = this.assertNode(key)
-    const ancestors = this.getAncestors(key)
-    const path = []
+    const path = this.getPathAsString(key)
+    if (typeof path !== 'string') {
+      throw new Error(`Could not find a node with key "${key}".`)
+    }
+    if (path.length === 0) {
+      return []
+    }
+    return path.split(' ').map(x => parseInt(x, 10))
+  }
 
-    ancestors.reverse().forEach(ancestor => {
-      const index = ancestor.nodes.indexOf(child)
-      path.unshift(index)
-      child = ancestor
+  getPathAsString(key) {
+    key = assertKey(key)
+    if (this.key === key) return ''
+    let result = null
+    const index = this.nodes.findIndex(child => {
+      if (child.key === key) {
+        result = ''
+        return true
+      }
+      if (child.object === 'text') {
+        return false
+      }
+      result = child.getPathAsString(key)
+      return typeof result === 'string'
     })
-
-    return path
+    if (index === -1) return null
+    return result.length !== 0 ? `${index} ${result}` : `${index}`
   }
 
   /**
@@ -2084,6 +2092,7 @@ memoize(Node.prototype, [
   'getOffset',
   'getParent',
   'getPath',
+  'getPathAsString',
   'getPlaceholder',
   'getPreviousBlock',
   'getPreviousSibling',
