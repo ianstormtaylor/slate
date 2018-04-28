@@ -204,21 +204,11 @@ class Node {
       // futher optimization
       return !this.areDescendantsSorted(second, first)
     }
-    const firstAncestor = this.getFurthestAncestor(first)
-    const secondAncestor = this.getFurthestAncestor(second)
-    if (!firstAncestor || !secondAncestor) {
-      return null
-    }
-
-    if (firstAncestor !== secondAncestor) {
-      const firstIndex = this.nodes.indexOf(firstAncestor)
-      const secondIndex = this.nodes.indexOf(secondAncestor)
-      return firstIndex < secondIndex
-    }
-
-    if (firstAncestor.key === first) return true
-    if (firstAncestor.key === second) return false
-    return firstAncestor.areDescendantsSorted(first, second)
+    if (first === this.key) return true
+    if (second === this.key) return false
+    const firstStr = this.getPathAsString(first)
+    const secondStr = this.getPathAsString(second)
+    return firstStr < secondStr
   }
 
   /**
