@@ -3,22 +3,19 @@
 import h from '../../../helpers/h'
 
 export default function(change) {
-  change.insertFragment(
-    <document>
-      <quote>
-        <quote>one</quote>
-        <quote>two</quote>
-      </quote>
-    </document>
-  )
+  change.splitBlock()
 }
 
 export const input = (
   <value>
     <document>
+      <paragraph>zero</paragraph>
       <paragraph>
-        wo<cursor />rd
+        <anchor />word
       </paragraph>
+      <quote>
+        <focus />cat is cute
+      </quote>
     </document>
   </value>
 )
@@ -26,14 +23,11 @@ export const input = (
 export const output = (
   <value>
     <document>
-      <paragraph>wo</paragraph>
+      <paragraph>zero</paragraph>
+      <paragraph />
       <quote>
-        <quote>one</quote>
-        <quote>two</quote>
+        <cursor />cat is cute
       </quote>
-      <paragraph>
-        rd<cursor />
-      </paragraph>
     </document>
   </value>
 )

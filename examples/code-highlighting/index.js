@@ -136,16 +136,32 @@ class CodeHighlighting extends React.Component {
    */
 
   renderMark = props => {
-    const { children, mark } = props
+    const { children, mark, attributes } = props
     switch (mark.type) {
       case 'comment':
-        return <span style={{ opacity: '0.33' }}>{children}</span>
+        return (
+          <span {...attributes} style={{ opacity: '0.33' }}>
+            {children}
+          </span>
+        )
       case 'keyword':
-        return <span style={{ fontWeight: 'bold' }}>{children}</span>
+        return (
+          <span {...attributes} style={{ fontWeight: 'bold' }}>
+            {children}
+          </span>
+        )
       case 'tag':
-        return <span style={{ fontWeight: 'bold' }}>{children}</span>
+        return (
+          <span {...attributes} style={{ fontWeight: 'bold' }}>
+            {children}
+          </span>
+        )
       case 'punctuation':
-        return <span style={{ opacity: '0.75' }}>{children}</span>
+        return (
+          <span {...attributes} style={{ opacity: '0.75' }}>
+            {children}
+          </span>
+        )
     }
   }
 

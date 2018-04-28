@@ -37,7 +37,7 @@ export const output = (
       <quote>fragment zero</quote>
       <paragraph>fragment one</paragraph>
       <paragraph>
-        <cursor />fragment twotwo
+        fragment two<cursor />two
       </paragraph>
     </document>
   </value>

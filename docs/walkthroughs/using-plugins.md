@@ -43,7 +43,7 @@ class App extends React.Component {
   renderMark = props => {
     switch (props.mark.type) {
       case 'bold':
-        return <strong>{props.children}</strong>
+        return <strong {...{props.attributes}}>{props.children}</strong>
     }
   }
 }

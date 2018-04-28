@@ -1663,6 +1663,32 @@ class Node {
   }
 
   /**
+   * Check if a node has block node children.
+   *
+   * @param {String} key
+   * @return {Boolean}
+   */
+
+  hasBlocks(key) {
+    const node = this.assertNode(key)
+    return !!(node.nodes && node.nodes.find(n => n.object === 'block'))
+  }
+
+  /**
+   * Check if a node has inline node children.
+   *
+   * @param {String} key
+   * @return {Boolean}
+   */
+
+  hasInlines(key) {
+    const node = this.assertNode(key)
+    return !!(
+      node.nodes && node.nodes.find(n => Inline.isInline(n) || Text.isText(n))
+    )
+  }
+
+  /**
    * Recursively check if a child node exists by `key`.
    *
    * @param {String} key

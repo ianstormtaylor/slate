@@ -47,11 +47,11 @@ Check out the [Examples readme](./examples) to see how to get the examples runni
 
 ## Running Tests
 
-To run the tests, you need to have the Slate repository cloned to your computer. After that, you need to `cd` into the directory where you cloned it, and install the dependencies with `yarn` and bootstrap the monorepo:
+To run the tests, you need to have the Slate repository cloned to your computer. After that, you need to `cd` into the directory where you cloned it, and install the dependencies with `yarn` and build the monorepo:
 
 ```
 yarn install
-yarn bootstrap
+yarn build
 ```
 
 Then run the tests with:
