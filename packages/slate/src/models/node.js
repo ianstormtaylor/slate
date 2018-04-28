@@ -256,11 +256,9 @@ class Node {
 
   assertNode(key) {
     key = assertKey(key)
-    const path = this.getPathAsString(key)
-    if (typeof path !== 'string') {
+    if (!this.hasNode(key)) {
       throw new Error(`Could not find a node with key "${key}".`)
     }
-
     return this.getNode(key)
   }
 
@@ -352,7 +350,7 @@ class Node {
 
   getAncestors(key) {
     key = assertKey(key)
-    if (typeof this.getPathAsString(key) !== 'string') return null
+    if (!this.hasNode(key)) return null
     const path = this.getPath(key)
     return List().withMutations(result => {
       let ancestor = this
@@ -599,7 +597,8 @@ class Node {
 
   getDescendant(key) {
     key = assertKey(key)
-    if (typeof this.getPathAsString(key) !== 'string') return null
+    if (!this.hasNode(key)) return null
+    if (this.key === key) return null
     const path = this.getPath(key)
     return this.getDescendantAtPath(path)
   }
@@ -738,7 +737,7 @@ class Node {
 
   getFurthest(key, iterator) {
     key = assertKey(key)
-    if (typeof this.getPathAsString(key) !== 'string') {
+    if (!this.hasNode(key)) {
       throw new Error(`Could not find a descendant node with key "${key}".`)
     }
     const path = this.getPath(key)
@@ -781,8 +780,8 @@ class Node {
 
   getFurthestAncestor(key) {
     key = assertKey(key)
+    if (!this.hasDescendant(key)) return null
     const str = this.getPathAsString(key)
-    if (typeof str !== 'string' || str.length === 0) return null
     const strIndex = str.indexOf(' ')
     const index =
       strIndex === -1 ? parseInt(str, 10) : parseInt(str.slice(0, strIndex), 10)
@@ -1309,9 +1308,9 @@ class Node {
    */
 
   getParent(key) {
-    const str = this.getPathAsString(key)
-    if (typeof str !== 'string' || str.length === 0) return null
+    if (!this.hasDescendant(key)) return null
 
+    const str = this.getPathAsString(key)
     const path = str.split(' ').map(x => parseInt(x, 10))
     path.pop()
     return this.getDescendantAtPath(path)
@@ -1325,10 +1324,10 @@ class Node {
    */
 
   getPath(key) {
-    const path = this.getPathAsString(key)
-    if (typeof path !== 'string') {
+    if (!this.hasNode(key)) {
       throw new Error(`Could not find a node with key "${key}".`)
     }
+    const path = this.getPathAsString(key)
     if (path.length === 0) {
       return []
     }
