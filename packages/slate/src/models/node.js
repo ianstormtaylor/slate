@@ -202,7 +202,7 @@ class Node {
       // Ensure areDescendantSorted(second, first) is also cached
       // Always prefer newer node in second argument, for potential
       // futher optimization
-      return !this.areDescendantSorted(second, first)
+      return !this.areDescendantsSorted(second, first)
     }
     const firstAncestor = this.getFurthestAncestor(first)
     const secondAncestor = this.getFurthestAncestor(second)
