@@ -791,11 +791,12 @@ class Node {
 
   getFurthestAncestor(key) {
     key = assertKey(key)
-    return this.nodes.find(node => {
-      if (node.key == key) return true
-      if (node.object == 'text') return false
-      return node.hasDescendant(key)
-    })
+    const str = this.getPathAsString(key)
+    if (typeof str !== 'string' || str.length === 0) return null
+    const strIndex = str.indexOf(' ')
+    const index =
+      strIndex === -1 ? parseInt(str, 10) : parseInt(str.slice(0, strIndex), 10)
+    return this.nodes.get(index)
   }
 
   /**
@@ -938,7 +939,9 @@ class Node {
   }
 
   /*
-   * get all keys of node as a set
+   * get all keys of node as a set; only used for deciding `not in keys` for efficiency
+   * for in keys, use assertDescendant, hasDescendant or alike methods
+   * @return {Set<string>}
    */
 
   getKeysAsSet() {
@@ -1316,20 +1319,12 @@ class Node {
    */
 
   getParent(key) {
-    if (this.hasChild(key)) return this
+    const str = this.getPathAsString(key)
+    if (typeof str !== 'string' || str.length === 0) return null
 
-    let node = null
-
-    this.nodes.find(child => {
-      if (child.object == 'text') {
-        return false
-      } else {
-        node = child.getParent(key)
-        return node
-      }
-    })
-
-    return node
+    const path = str.split(' ').map(x => parseInt(x, 10))
+    path.pop()
+    return this.getDescendantAtPath(path)
   }
 
   /**
@@ -1692,7 +1687,7 @@ class Node {
    */
 
   hasDescendant(key) {
-    return !!this.getDescendant(key)
+    return this.key !== key && this.hasNode(key)
   }
 
   /**
@@ -1703,7 +1698,7 @@ class Node {
    */
 
   hasNode(key) {
-    return !!this.getNode(key)
+    return typeof this.getPathAsString(key) === 'string'
   }
 
   /**
