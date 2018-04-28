@@ -362,22 +362,15 @@ class Node {
 
   getAncestors(key) {
     key = assertKey(key)
-
-    if (key == this.key) return List()
-    if (this.hasChild(key)) return List([this])
-
-    let ancestors
-    this.nodes.find(node => {
-      if (node.object == 'text') return false
-      ancestors = node.getAncestors(key)
-      return ancestors
+    if (typeof this.getPathAsString(key) !== 'string') return null
+    const path = this.getPath(key)
+    return List().withMutations(result => {
+      let ancestor = this
+      for (const index of path) {
+        result.push(ancestor)
+        ancestor = ancestor.nodes.get(index)
+      }
     })
-
-    if (ancestors) {
-      return ancestors.unshift(this)
-    } else {
-      return null
-    }
   }
 
   /**
@@ -603,8 +596,8 @@ class Node {
 
   getDepth(key, startAt = 1) {
     this.assertDescendant(key)
-    if (this.hasChild(key)) return startAt
-    return this.getFurthestAncestor(key).getDepth(key, startAt + 1)
+    const path = this.getPath(key)
+    return path.length - 1 + startAt
   }
 
   /**
