@@ -747,14 +747,17 @@ class Node {
    */
 
   getFurthest(key, iterator) {
-    const ancestors = this.getAncestors(key)
-    if (!ancestors) {
-      key = assertKey(key)
+    key = assertKey(key)
+    if (typeof this.getPathAsString(key) !== 'string') {
       throw new Error(`Could not find a descendant node with key "${key}".`)
     }
-
-    // Exclude this node itself
-    return ancestors.rest().find(iterator)
+    const path = this.getPath(key)
+    let node = this
+    for (const index of path) {
+      node = node.nodes.get(index)
+      if (iterator(node) && node.key !== key) return node
+    }
+    return null
   }
 
   /**
