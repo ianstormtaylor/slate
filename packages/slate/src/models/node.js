@@ -618,11 +618,7 @@ class Node {
     key = assertKey(key)
     if (typeof this.getPathAsString(key) !== 'string') return null
     const path = this.getPath(key)
-    let descendantFound = this
-    path.forEach(index => {
-      descendantFound = descendantFound.nodes.get(index)
-    })
-    return descendantFound
+    return this.getDescendantAtPath(path)
   }
 
   /**
