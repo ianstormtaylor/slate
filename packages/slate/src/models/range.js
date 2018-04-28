@@ -19,7 +19,7 @@ const DEFAULTS = {
   isBackward: null,
   isFocused: false,
   marks: null,
-  atomic: false,
+  isAtomic: false,
 }
 
 /**
@@ -85,7 +85,7 @@ class Range extends Record(DEFAULTS) {
         isBackward: attrs.isBackward,
         isFocused: attrs.isFocused,
         marks: attrs.marks,
-        atomic: attrs.atomic,
+        isAtomic: attrs.isAtomic,
       }
     }
 
@@ -101,7 +101,7 @@ class Range extends Record(DEFAULTS) {
       if ('isFocused' in attrs) props.isFocused = attrs.isFocused
       if ('marks' in attrs)
         props.marks = attrs.marks == null ? null : Mark.createSet(attrs.marks)
-      if ('atomic' in attrs) props.atomic = attrs.atomic
+      if ('isAtomic' in attrs) props.isAtomic = attrs.isAtomic
       return props
     }
 
@@ -126,7 +126,7 @@ class Range extends Record(DEFAULTS) {
       isBackward = null,
       isFocused = false,
       marks = null,
-      atomic = false,
+      isAtomic = false,
     } = object
 
     const range = new Range({
@@ -137,7 +137,7 @@ class Range extends Record(DEFAULTS) {
       isBackward,
       isFocused,
       marks: marks == null ? null : new Set(marks.map(Mark.fromJSON)),
-      atomic,
+      isAtomic,
     })
 
     return range
@@ -784,7 +784,7 @@ class Range extends Record(DEFAULTS) {
       isFocused: this.isFocused,
       marks:
         this.marks == null ? null : this.marks.toArray().map(m => m.toJSON()),
-      atomic: this.atomic,
+      isAtomic: this.isAtomic,
     }
 
     return object

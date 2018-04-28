@@ -23,6 +23,8 @@ class DecoratorPoint {
     this._key = key
     this.marks = marks
     this.attribs = data || {}
+    this.isAtomic = !!this.attribs.atomic
+    delete this.attribs.atomic
     return this
   }
   withPosition = offset => {
@@ -46,6 +48,7 @@ class DecoratorPoint {
       anchorOffset: this.offset,
       focusOffset: focus.offset,
       marks: this.marks,
+      isAtomic: this.isAtomic,
       ...this.attribs,
     })
   }
@@ -108,7 +111,7 @@ const CREATORS = {
         anchorOffset: 0,
         focusOffset: nodes.reduce((len, n) => len + n.text.length, 0),
         marks: [{ type: tagName }],
-        ...(attributes.data || {}),
+        isAtomic: !!attributes.data.atomic,
       },
     ])
     return nodes

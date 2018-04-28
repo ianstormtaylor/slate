@@ -53,7 +53,7 @@ function clearAtomicRangesIfContains(value, key, offset, offsetEnd = null) {
   return applyRangeAdjustments(
     value,
     range => {
-      if (!range.atomic) return false
+      if (!range.isAtomic) return false
       const { startKey, startOffset, endKey, endOffset } = range
       return (
         (startKey == key &&
@@ -139,19 +139,19 @@ const APPLIERS = {
     // Update the selection, decorations
     value = applyRangeAdjustments(
       value,
-      ({ anchorKey, anchorOffset, isBackward, atomic }) =>
+      ({ anchorKey, anchorOffset, isBackward, isAtomic }) =>
         anchorKey == node.key &&
         (anchorOffset > offset ||
-          (anchorOffset == offset && (!atomic || !isBackward))),
+          (anchorOffset == offset && (!isAtomic || !isBackward))),
       range => range.moveAnchor(text.length)
     )
 
     value = applyRangeAdjustments(
       value,
-      ({ focusKey, focusOffset, isBackward, atomic }) =>
+      ({ focusKey, focusOffset, isBackward, isAtomic }) =>
         focusKey == node.key &&
         (focusOffset > offset ||
-          (focusOffset == offset && (!atomic || isBackward))),
+          (focusOffset == offset && (!isAtomic || isBackward))),
       range => range.moveFocus(text.length)
     )
 
