@@ -1102,21 +1102,41 @@ class Node {
     if (range.isUnset) return Set()
     if (range.isCollapsed)
       return this.getMarksAtPosition(range.startKey, range.startOffset).toSet()
+    let { startKey, endKey, startOffset, endOffset } = range
+    let startText = this.getDescendant(startKey)
+    if (startKey !== endKey) {
+      while (startKey !== endKey && endOffset === 0) {
+        const endText = this.getPreviousText(endKey)
+        endKey = endText.key
+        endOffset = endText.text.length
+      }
 
-    // Otherwise, get a set of the marks for each character in the range.
-    const chars = this.getCharactersAtRange(range)
-    const first = chars.first()
-    if (!first || !first.marks) return Set()
-
-    const empty = Set()
-
-    return first.marks.withMutations(result => {
-      chars.find(char => {
-        const marks = char ? char.marks : empty
-        result.intersect(marks)
-        return result.size === 0
-      })
-    })
+      while (startKey !== endKey && startOffset === startText.text.length) {
+        startText = this.getNextText(startKey)
+        startKey = startText.key
+        startOffset = 0
+      }
+    }
+    if (startKey === endKey)
+      return startText.getActiveMarksBetweenOffsets(startOffset, endOffset)
+    const startMarks = startText.getActiveMarksBetweenOffsets(
+      startOffset,
+      startText.text.length
+    )
+    if (startMarks.size === 0) return Set()
+    const endText = this.getDescendant(endKey)
+    const endMarks = endText.getActiveMarksBetweenOffsets(0, endOffset)
+    let marks = startMarks.intersect(endMarks)
+    if (marks.size === 0) return marks
+    let text = this.getNextText(startKey)
+    while (text.key !== endKey) {
+      if (text.text.length !== 0) {
+        marks = marks.intersect(text.getActiveMarks())
+        if (marks.size === 0) return Set()
+      }
+      text = this.getNextText(text.key)
+    }
+    return marks
   }
 
   /**

@@ -303,10 +303,15 @@ class Text extends Record(DEFAULTS) {
    */
 
   getActiveMarksBetweenOffsets(startOffset, endOffset) {
-    const result = this.characters.get(startOffset).marks
+    if (startOffset === 0 && endOffset === this.characters.size) {
+      return this.getActiveMarks()
+    }
+    const startCharacter = this.characters.get(startOffset)
+    if (!startCharacter) return Set()
+    const result = startCharacter.marks
     if (result.size === 0) return result
     return result.withMutations(x => {
-      for (let index = startOffset + 1; index <= endOffset; index++) {
+      for (let index = startOffset + 1; index < endOffset; index++) {
         const c = this.characters.get(index)
         x.intersect(c.marks)
         if (x.size === 0) return
@@ -321,17 +326,12 @@ class Text extends Record(DEFAULTS) {
    */
 
   getActiveMarks() {
+    if (this.characters.size === 0) return Set()
     const result = this.characters.first().marks
     if (result.size === 0) return result
     return result.withMutations(x => {
       this.characters.forEach(c => {
-        if (c) {
-          if (c.marks) {
-            x.intersect(c.marks)
-          } else {
-            x = x.inertsect(Set())
-          }
-        }
+        x.intersect(c.marks)
         if (x.size === 0) return false
       })
     })
@@ -344,10 +344,13 @@ class Text extends Record(DEFAULTS) {
    */
 
   getMarksBetweenOffsets(startOffset, endOffset) {
+    if (startOffset === 0 && endOffset === this.characters.size) {
+      return this.getMarks()
+    }
     return new OrderedSet().withMutations(result => {
-      for (let index = startOffset; index <= endOffset; index++) {
+      for (let index = startOffset; index < endOffset; index++) {
         const c = this.characters.get(index)
-        if (c && c.marks) result.union(c.marks)
+        result.union(c.marks)
       }
     })
   }
