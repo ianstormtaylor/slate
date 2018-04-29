@@ -9,7 +9,7 @@ import { resetKeyGenerator } from 'slate'
  */
 
 describe('utils', () => {
-  require('./order-child-decorations')
+  require('./get-children-decorations')
 })
 
 /**

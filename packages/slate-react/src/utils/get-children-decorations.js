@@ -1,3 +1,33 @@
+import { Set } from 'immutable'
+
+/**
+ * Split the decorations in lists of relevant decorations for each child.
+ *
+ * @param {Node} node
+ * @param {List} decorations
+ * @return {Array<Array<Decoration>>}
+ */
+
+function getChildrenDecorations(node, decorations) {
+  const activeDecorations = Set().asMutable()
+  const childrenDecorations = []
+
+  orderChildDecorations(node, decorations).forEach(item => {
+    if (item.isRangeStart) {
+      // Item is a decoration start
+      activeDecorations.add(item.decoration)
+    } else if (item.isRangeEnd) {
+      // item is a decoration end
+      activeDecorations.remove(item.decoration)
+    } else {
+      // Item is a child node
+      childrenDecorations.push(activeDecorations.toArray())
+    }
+  })
+
+  return childrenDecorations
+}
+
 /**
  * Orders the children of provided node and its decoration endpoints (start, end)
  * so that decorations can be passed only to relevant children (see use in Node.render())
@@ -96,4 +126,4 @@ function getContainingChildOrder(children, keyOrders, order) {
  * @type {Function}
  */
 
-export default orderChildDecorations
+export default getChildrenDecorations

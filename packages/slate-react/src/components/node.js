@@ -1,6 +1,6 @@
 import Debug from 'debug'
 import ImmutableTypes from 'react-immutable-proptypes'
-import { List, Set } from 'immutable'
+import { List } from 'immutable'
 import React from 'react'
 import SlateTypes from 'slate-prop-types'
 import logger from 'slate-dev-logger'
@@ -8,7 +8,7 @@ import Types from 'prop-types'
 
 import Void from './void'
 import Text from './text'
-import orderChildDecorations from '../utils/order-child-decorations'
+import getChildrenDecorations from '../utils/get-children-decorations'
 
 /**
  * Debug.
@@ -134,27 +134,16 @@ class Node extends React.Component {
     const indexes = node.getSelectionIndexes(selection, isSelected)
     const decs = decorations.concat(node.getDecorations(stack))
 
-    const activeDecorations = Set().asMutable()
     let children = []
 
-    orderChildDecorations(node, decs).forEach(item => {
-      if (item.isRangeStart) {
-        // Item is a decoration start
-        activeDecorations.add(item.decoration)
-      } else if (item.isRangeEnd) {
-        // item is a decoration end
-        activeDecorations.remove(item.decoration)
-      } else {
-        // Item is a child node
-        const { child, index } = item
+    const childrenDecorations = getChildrenDecorations(node, decs)
 
-        const isChildSelected =
-          !!indexes && indexes.start <= index && index < indexes.end
+    node.nodes.forEach((child, i) => {
+      const isChildSelected = !!indexes && indexes.start <= i && i < indexes.end
 
-        children.push(
-          this.renderNode(child, isChildSelected, List(activeDecorations))
-        )
-      }
+      children.push(
+        this.renderNode(child, isChildSelected, childrenDecorations[i])
+      )
     })
 
     // Attributes that the developer must mix into the element in their
@@ -200,6 +189,7 @@ class Node extends React.Component {
    *
    * @param {Node} child
    * @param {Boolean} isSelected
+   * @param {Array<Decoration>} decorations
    * @return {Element}
    */
 
