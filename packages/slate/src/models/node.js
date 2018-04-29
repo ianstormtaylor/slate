@@ -1572,16 +1572,17 @@ class Node {
 
   getTextsAsArray() {
     let array = []
-
+    const result = [array]
     this.nodes.forEach(node => {
-      if (node.object == 'text') {
+      if (node.object === 'text') {
         array.push(node)
-      } else {
-        array = array.concat(node.getTextsAsArray())
+        return
       }
+      array = []
+      result.push(node.getTextsAsArray(), array)
     })
-
-    return array
+    if (result.length === 1) return result[0]
+    return Array.prototype.concat.apply([], result)
   }
 
   /**
