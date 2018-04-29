@@ -456,7 +456,7 @@ class Content extends React.Component {
     const Container = tagName
     const { document, selection, decorations } = value
     const indexes = document.getSelectionIndexes(selection, selection.isFocused)
-    const decs = decorations.concat(document.getDecorations(stack))
+    const decs = document.getDecorations(stack).concat(decorations || [])
     const childrenDecorations = getChildrenDecorations(document, decs)
 
     const children = document.nodes.toArray().map((child, i) => {

@@ -5,7 +5,7 @@ import { Set } from 'immutable'
  *
  * @param {Node} node
  * @param {List} decorations
- * @return {Array<Array<Decoration>>}
+ * @return {Array<List<Decoration>>}
  */
 
 function getChildrenDecorations(node, decorations) {
@@ -21,7 +21,7 @@ function getChildrenDecorations(node, decorations) {
       activeDecorations.remove(item.decoration)
     } else {
       // Item is a child node
-      childrenDecorations.push(activeDecorations.toArray())
+      childrenDecorations.push(activeDecorations.toList())
     }
   })
 
