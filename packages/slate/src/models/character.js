@@ -11,7 +11,7 @@ import MODEL_TYPES from '../constants/model-types'
  */
 
 const DEFAULTS = {
-  marks: Set(),
+  marks: new Set(),
   text: '',
 }
 
