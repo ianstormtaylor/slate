@@ -373,9 +373,16 @@ class Text extends Record(DEFAULTS) {
    */
 
   getMarksAsArray() {
-    return this.characters.reduce((array, char) => {
-      return array.concat(char.marks.toArray())
-    }, [])
+    if (this.characters.size === 0) return []
+    const first = this.characters.first().marks
+    let previousMark = first
+    const result = []
+    this.characters.forEach(c => {
+      if (c.marks === previousMark) return true
+      previousMark = c.marks
+      result.push(previousMark.toArray())
+    })
+    return Array.prototype.concat.apply(first.toArray(), result)
   }
 
   /**
