@@ -297,6 +297,41 @@ class Text extends Record(DEFAULTS) {
   }
 
   /**
+   * Get all of the active marks on between two offsets
+   *
+   * @return {Set<Mark>}
+   */
+
+  getActiveMarksBetweenOffsets(startOffset, endOffset) {
+    const result = this.characters.get(startOffset).marks
+    if (result.size === 0) return result
+    return result.withMutations(x => {
+      for (let index = startOffset + 1; index <= endOffset; index++) {
+        const c = this.characters.get(index)
+        x.intersect(c.marks)
+        if (x.size === 0) return
+      }
+    })
+  }
+
+  /**
+   * Get all of the active marks on the text
+   *
+   * @return {Set<Mark>}
+   */
+
+  getActiveMarks() {
+    const result = this.characters.first().marks
+    if (result.size === 0) return result
+    return result.withMutations(x => {
+      this.characters.forEach(c => {
+        x.intersect(c.marks)
+        if (x.size === 0) return false
+      })
+    })
+  }
+
+  /**
    * Get all of the marks on between two offsets
    *
    * @return {OrderedSet<Mark>}
@@ -304,9 +339,10 @@ class Text extends Record(DEFAULTS) {
 
   getMarksBetweenOffsets(startOffset, endOffset) {
     return new OrderedSet().withMutations(result => {
-      this.characters.slice(startOffset, endOffset).forEach(c => {
-        if (c && c.marks) result.union(c.marks)
-      })
+      for (let index = startOffset; index <= endOffset; index++) {
+        const c = this.characters.get(index)
+        result.union(c.marks)
+      }
     })
   }
 
@@ -537,6 +573,7 @@ memoize(Text.prototype, [
   'getDecoratedCharacters',
   'getDecorations',
   'getLeaves',
+  'getActiveMarks',
   'getMarks',
   'getMarksAsArray',
   'getMarksAtIndex',
