@@ -1,6 +1,5 @@
 import Debug from 'debug'
 import ImmutableTypes from 'react-immutable-proptypes'
-import { List } from 'immutable'
 import React from 'react'
 import SlateTypes from 'slate-prop-types'
 import logger from 'slate-dev-logger'
@@ -133,11 +132,9 @@ class Node extends React.Component {
     const { stack } = editor
     const indexes = node.getSelectionIndexes(selection, isSelected)
     const decs = decorations.concat(node.getDecorations(stack))
-
-    let children = []
-
     const childrenDecorations = getChildrenDecorations(node, decs)
 
+    let children = []
     node.nodes.forEach((child, i) => {
       const isChildSelected = !!indexes && indexes.start <= i && i < indexes.end
 
