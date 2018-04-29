@@ -544,21 +544,29 @@ class Node {
     if (one == this.key) return this
     if (two == this.key) return this
 
-    this.assertDescendant(one)
-    this.assertDescendant(two)
-    let ancestors = List()
-    let oneParent = this.getParent(one)
-    let twoParent = this.getParent(two)
-
-    while (oneParent) {
-      ancestors = ancestors.push(oneParent)
-      oneParent = this.getParent(oneParent.key)
+    if (!this.hasNode(one) || !this.hasNode(two)) {
+      throw new Error(`cannot find descendant ${one} or ${two}`)
     }
 
-    while (twoParent) {
-      if (ancestors.includes(twoParent)) return twoParent
-      twoParent = this.getParent(twoParent.key)
+    if (one === two) return this.getParent(one)
+    const pathOne = this.getPathAsString(one)
+    const pathTwo = this.getPathAsString(two)
+
+    if (pathOne.charAt(0) !== pathTwo.charAt(0)) return this
+
+    let index = 0
+    const length = Math.min(pathOne.length, pathTwo.length)
+    while (pathOne.charAt(index) === pathTwo.charAt(index) && index < length) {
+      index++
     }
+
+    index = pathOne.lastIndexOf(' ', index)
+    if (index === -1) return this
+    const commonPath = pathOne
+      .slice(0, index)
+      .split(' ')
+      .map(x => parseInt(x, 10))
+    return this.getDescendantAtPath(commonPath)
   }
 
   /**
