@@ -2017,6 +2017,9 @@ class Node {
       result = n.validate(schema) ? n : n.getFirstInvalidDescendant(schema)
       return result
     })
+    if (result) {
+      this.getPathAsString(result.key)
+    }
     return result
   }
 }
