@@ -325,7 +325,13 @@ class Text extends Record(DEFAULTS) {
     if (result.size === 0) return result
     return result.withMutations(x => {
       this.characters.forEach(c => {
-        x.intersect(c.marks)
+        if (c) {
+          if (c.marks) {
+            x.intersect(c.marks)
+          } else {
+            x = x.inertsect(Set())
+          }
+        }
         if (x.size === 0) return false
       })
     })
@@ -341,7 +347,7 @@ class Text extends Record(DEFAULTS) {
     return new OrderedSet().withMutations(result => {
       for (let index = startOffset; index <= endOffset; index++) {
         const c = this.characters.get(index)
-        result.union(c.marks)
+        if (c && c.marks) result.union(c.marks)
       }
     })
   }
