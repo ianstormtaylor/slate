@@ -901,11 +901,13 @@ class Node {
   */
 
   getInlinesBetweenPositions(startKey, endKey) {
+    // Short circuit when in the same text
     if (startKey === endKey) {
       const inline = this.getClosestInline(startKey)
       if (inline) return List.of(inline)
       return List()
     }
+
     const texts = new List(
       this.getTextsBetweenPositionsAsArray(startKey, endKey)
     )
@@ -914,7 +916,9 @@ class Node {
     const lastText = texts.findLast(t => this.getClosestInline(t.key))
     const first = this.getClosestInline(firstText.key)
     const last = this.getClosestInline(lastText.key)
+
     if (first === last) return List.of(first)
+
     return List.of(first).withMutations(result => {
       let previous = first
 
