@@ -515,7 +515,15 @@ class Node {
    */
 
   getClosestInline(key) {
-    return this.getClosest(key, parent => parent.object == 'inline')
+    let result = undefined
+    this.getAncestors(key).findLast(node => {
+      if (node.object === 'block') return true
+      if (node.object === 'inline') {
+        result = node
+        return true
+      }
+    })
+    return result
   }
 
   /**
