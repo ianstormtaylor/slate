@@ -424,11 +424,12 @@ class Node {
     // where we can avoid a lot of iterating of the tree.
     if (startKey === endKey) return List.of(startBlock)
     const endBlock = this.getClosestBlock(endKey)
+    if (startBlock === endBlock) return List.of(startBlock)
 
-    const blocks = this.getBlocks()
+    const blocks = this.getBlocksAsArray()
     const start = blocks.indexOf(startBlock)
-    const end = blocks.indexOf(endBlock)
-    return blocks.slice(start, end + 1)
+    const end = blocks.indexOf(endBlock, start)
+    return new List(blocks.slice(start, end + 1))
   }
 
   /**
@@ -900,6 +901,11 @@ class Node {
   */
 
   getInlinesBetweenPositions(startKey, endKey) {
+    if (startKey === endKey) {
+      const inline = this.getClosestInline(startKey)
+      if (inline) return List.of(inline)
+      return List()
+    }
     const texts = new List(
       this.getTextsBetweenPositionsAsArray(startKey, endKey)
     )
