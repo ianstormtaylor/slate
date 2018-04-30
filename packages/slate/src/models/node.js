@@ -368,20 +368,31 @@ class Node {
    */
 
   getBlocks() {
+    return new List(this.getBlocksAsArray())
+  }
+
+  /**
+   * Get the leaf block descendants of the node, as Array
+   *
+   * @returns {List<Node>}
+   */
+
+  getBlocksAsArray() {
     let array = []
     const result = [array]
     this.nodes.forEach(child => {
       if (child.object != 'block') return
       if (child.isLeafBlock()) return array.push(child)
       if (array.length === 0) {
-        result[result.length - 1] = child.getBlocks()
+        result[result.length - 1] = child.getBlocksAsArray()
         result.push(array)
       } else {
         array = []
-        result.push(child.getBlocks(), array)
+        result.push(child.getBlocksAsArray(), array)
       }
     })
-    return List.prototype.concat.apply(List(), result)
+    if (result.length === 1) return result[0]
+    return Array.prototype.concat.apply([], result)
   }
 
   /**
@@ -2095,7 +2106,7 @@ function assertKey(arg) {
 memoize(Node.prototype, [
   'areDescendantsSorted',
   'getAncestors',
-  'getBlocks',
+  'getBlocksAsArray',
   'getBlocksBetweenPositions',
   'getBlocksByType',
   'getChild',
