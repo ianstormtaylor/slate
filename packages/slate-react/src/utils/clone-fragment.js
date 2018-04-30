@@ -4,7 +4,6 @@ import { IS_CHROME, IS_SAFARI, IS_OPERA } from 'slate-dev-environment'
 import getWindow from 'get-window'
 import findDOMNode from './find-dom-node'
 import { ZERO_WIDTH_SELECTOR, ZERO_WIDTH_ATTRIBUTE } from './find-point'
-import { IS_CHROME, IS_SAFARI, IS_OPERA } from '../constants/environment'
 
 /**
  * Prepares a Slate document fragment to be copied to the clipboard.
