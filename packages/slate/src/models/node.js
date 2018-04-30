@@ -1647,8 +1647,13 @@ class Node {
         array.push(node)
         return
       }
-      array = []
-      result.push(node.getTextsAsArray(), array)
+      if (array.length === 0) {
+        result[result.length - 1] = node.getTextsAsArray()
+        result.push(array)
+      } else {
+        array = []
+        result.push(node.getTextsAsArray(), array)
+      }
     })
     if (result.length === 1) return result[0]
     return Array.prototype.concat.apply([], result)
