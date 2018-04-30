@@ -373,8 +373,13 @@ class Node {
     this.nodes.forEach(child => {
       if (child.object != 'block') return
       if (child.isLeafBlock()) return array.push(child)
-      array = []
-      result.push(child.getBlocks(), array)
+      if (array.length === 0) {
+        result[result.length - 1] = child.getBlocks()
+        result.push(array)
+      } else {
+        array = []
+        result.push(child.getBlocks(), array)
+      }
     })
     return List.prototype.concat.apply(List(), result)
   }
