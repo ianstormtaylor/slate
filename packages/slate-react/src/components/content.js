@@ -443,7 +443,15 @@ class Content extends React.Component {
 
   render() {
     const { props } = this
-    const { className, readOnly, editor, tabIndex, role, tagName } = props
+    const {
+      className,
+      readOnly,
+      editor,
+      tabIndex,
+      role,
+      tagName,
+      spellCheck,
+    } = props
     const { value } = editor
     const Container = tagName
     const { document, selection } = value
@@ -472,11 +480,6 @@ class Content extends React.Component {
       // Allow for passed-in styles to override anything.
       ...props.style,
     }
-
-    // COMPAT: In Firefox, spellchecking can remove entire wrapping elements
-    // including inline ones like `<a>`, which is jarring for the user but also
-    // causes the DOM to get into an irreconcilable value. (2016/09/01)
-    const spellCheck = IS_FIREFOX ? false : props.spellCheck
 
     debug('render', { props })
 
