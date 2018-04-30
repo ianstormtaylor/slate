@@ -1370,11 +1370,29 @@ class Node {
     return path.split(' ').map(x => parseInt(x, 10))
   }
 
+  /**
+   * Get the path of a descendant node by `key`, the path is got as string for faster speed.
+   * In v8, constructing string is like building a chain, which is faster than array operation
+   *
+   * @param {String|Node} key
+   * @returns {Array}
+   */
+
   getPathAsString(key) {
     key = assertKey(key)
     if (this.key === key) return ''
+    if (this.nodes.size === 0) return null
     let result = null
-    const index = this.nodes.findIndex(child => {
+    // We can use window.performance.now or process.hrtime for better sequence guess
+    const lastKey = parseInt(this.nodes.last().key, 10)
+    const firstKey = parseInt(this.nodes.first().key, 10)
+    const searchKey = parseInt(key, 10)
+
+    const method =
+      Math.abs(lastKey - searchKey) < Math.abs(searchKey - firstKey)
+        ? 'findLastIndex'
+        : 'findIndex'
+    const index = this.nodes[method](child => {
       if (child.key === key) {
         result = ''
         return true
