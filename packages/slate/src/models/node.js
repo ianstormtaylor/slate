@@ -368,16 +368,15 @@ class Node {
    */
 
   getBlocks() {
-    const empty = List()
-    const { nodes } = this
-    return empty.withMutations(result => {
-      nodes.forEach(child => {
-        if (child.object != 'block') return result
-        if (child.isLeafBlock()) return result.push(child)
-        // PREF: We shall use concat here when upgrade to immutable v4
-        child.getBlocks().forEach(b => result.push(b))
-      })
+    let array = []
+    const result = [array]
+    this.nodes.forEach(child => {
+      if (child.object != 'block') return
+      if (child.isLeafBlock()) return array.push(child)
+      array = []
+      result.push(child.getBlocks(), array)
     })
+    return List.prototype.concat.apply(List(), result)
   }
 
   /**
