@@ -187,16 +187,16 @@ class HoveringMenu extends React.Component {
    */
 
   renderMark = props => {
-    const { children, mark } = props
+    const { children, mark, attributes } = props
     switch (mark.type) {
       case 'bold':
-        return <strong>{children}</strong>
+        return <strong {...attributes}>{children}</strong>
       case 'code':
-        return <code>{children}</code>
+        return <code {...attributes}>{children}</code>
       case 'italic':
-        return <em>{children}</em>
+        return <em {...attributes}>{children}</em>
       case 'underlined':
-        return <u>{children}</u>
+        return <u {...attributes}>{children}</u>
     }
   }
 }

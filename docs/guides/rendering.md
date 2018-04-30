@@ -69,21 +69,23 @@ Marks work the same way, except they invoke the `renderMark` function. Like so:
 
 ```js
 function renderMark(props) {
-  const { children, mark } = props
+  const { children, mark, attributes } = props
   switch (mark.type) {
     case 'bold':
-      return <strong>{children}</strong>
+      return <strong {...{ attributes }}>{children}</strong>
     case 'italic':
-      return <em>{children}</em>
+      return <em {...{ attributes }}>{children}</em>
     case 'code':
-      return <code>{children}</code>
+      return <code {...{ attributes }}>{children}</code>
     case 'underline':
-      return <u>{children}</u>
+      return <u {...{ attributes }}>{children}</u>
     case 'strikethrough':
-      return <strike>{children}</strike>
+      return <strike {...{ attributes }}>{children}</strike>
   }
 }
 ```
+
+Be sure to mix `props.attributes` in your `renderMark`. `attributes` provides `data-*` dom attributes for spell-check in non-IE browsers.
 
 That way, if you happen to have a global stylesheet that defines `strong`, `em`, etc. styles then your editor's content will already be formatted!
 
