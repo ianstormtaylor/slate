@@ -151,13 +151,16 @@ class Change {
    * @return {Change}
    */
 
-  withoutNormalization(customChange) {
+  withoutNormalization(customChange, options = {}) {
     const original = this.flags.normalize
+    const { normalize = true } = options
     this.setOperationFlag('normalize', false)
     try {
       customChange(this)
       // if the change function worked then run normalization
-      this.normalizeDocument()
+      if (normalize) {
+        this.normalizeDocument()
+      }
     } finally {
       // restore the flag to whatever it was
       this.setOperationFlag('normalize', original)
