@@ -105,7 +105,7 @@ function normalizeNode(change, node, schema) {
 
     // Run the `normalize` function to fix the node.
     let path = c.value.document.getPath(n.key)
-    normalize(c)
+    c.withoutNormalization(normalize)
 
     // Re-find the node reference, in case it was updated. If the node no longer
     // exists, we're done for this branch.
