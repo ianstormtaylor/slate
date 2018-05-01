@@ -40,13 +40,22 @@ Changes.normalizeNodeByKey = (change, key) => {
   let { document, schema } = value
   if (change.__nextNormalizedKeys.length !== 0) {
     change.__nextNormalizedKeys.push(key)
+    return
   }
+  let firstRun = true
   change.__nextNormalizedKeys = [key]
   try {
     while (change.__nextNormalizedKeys.length !== 0) {
       key = change.__nextNormalizedKeys.shift()
-      const node = document.assertNode(key)
-      normalizeNodeAndChildren(change, node, schema)
+      document = change.value.document
+      if (firstRun) {
+        document.assertNode(key)
+        firstRun = false
+      }
+      const node = document.getNode(key)
+      if (node) {
+        normalizeNodeAndChildren(change, node, schema)
+      }
       document = change.value.document
       const ancestors = document.getAncestors(key)
       if (!ancestors) return
