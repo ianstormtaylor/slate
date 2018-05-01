@@ -8,7 +8,7 @@
 function findFurthestDifferentAncestor(previousNode, node) {
   if (node === previousNode) return null
   if (node.object !== previousNode.object) return node
-  if (node.object === 'text' || previousNode.object === 'text') return node
+  if (node.object === 'text') return node
   if (node.nodes.size !== previousNode.nodes.size) return node
   const first = node.nodes.findIndex(
     (child, index) => child !== previousNode.get(index)
