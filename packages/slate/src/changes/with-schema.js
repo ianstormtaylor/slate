@@ -38,19 +38,28 @@ Changes.normalizeDocument = change => {
 Changes.normalizeNodeByKey = (change, key) => {
   const { value } = change
   let { document, schema } = value
-  const node = document.assertNode(key)
+  if (change.__nextNormalizedKeys.length !== 0) {
+    change.__nextNormalizedKeys.push(key)
+  }
+  change.__nextNormalizedKeys = [key]
+  try {
+    while (change.__nextNormalizedKeys.length !== 0) {
+      key = change.__nextNormalizedKeys.shift()
+      const node = document.assertNode(key)
+      normalizeNodeAndChildren(change, node, schema)
+      document = change.value.document
+      const ancestors = document.getAncestors(key)
+      if (!ancestors) return
 
-  normalizeNodeAndChildren(change, node, schema)
-
-  document = change.value.document
-  const ancestors = document.getAncestors(key)
-  if (!ancestors) return
-
-  ancestors.forEach(ancestor => {
-    if (change.value.document.getDescendant(ancestor.key)) {
-      normalizeNode(change, ancestor, schema)
+      ancestors.forEach(ancestor => {
+        if (change.value.document.getDescendant(ancestor.key)) {
+          normalizeNode(change, ancestor, schema)
+        }
+      })
     }
-  })
+  } finally {
+    change.__nextNormalizedKeys = []
+  }
 }
 
 /**
@@ -105,7 +114,7 @@ function normalizeNode(change, node, schema) {
 
     // Run the `normalize` function to fix the node.
     let path = c.value.document.getPath(n.key)
-    c.withoutNormalization(normalize, { normalize: false })
+    normalize(c)
 
     // Re-find the node reference, in case it was updated. If the node no longer
     // exists, we're done for this branch.
