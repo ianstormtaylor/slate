@@ -1926,11 +1926,11 @@ class Node {
    */
 
   mapChildren(iterator) {
-    let { nodes } = this
-
-    nodes.forEach((node, i) => {
-      const ret = iterator(node, i, this.nodes)
-      if (ret != node) nodes = nodes.set(ret.key, ret)
+    const nodes = this.nodes.withMutations(result => {
+      this.nodes.forEach((node, i) => {
+        const ret = iterator(node, i, this.nodes)
+        if (ret != node) result.set(i, ret)
+      })
     })
 
     return this.set('nodes', nodes)
