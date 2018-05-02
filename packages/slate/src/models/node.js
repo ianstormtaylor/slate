@@ -609,22 +609,17 @@ class Node {
 
     if (one === two) return this.getParent(one)
     // PREF: use string as path, because string compare is faster than array compare
-    const pathOne = this.getPathAsString(one)
-    const pathTwo = this.getPathAsString(two)
-    if (pathOne.charAt(0) !== pathTwo.charAt(0)) return this
+    const pathOne = this.getPath(one)
+    const pathTwo = this.getPath(two)
+    if (pathOne[0] !== pathTwo[0]) return this
     let index = 0
     const length = Math.min(pathOne.length, pathTwo.length)
-    while (pathOne.charAt(index) === pathTwo.charAt(index) && index < length) {
+    while (pathOne[index] === pathTwo[index] && index < length) {
       index++
     }
     // Find the first space that pathOne and pathTwo is common
-    index = pathOne.lastIndexOf(' ', index)
-    if (index === -1) return this
-    // path as array to locate the common ancestor
-    const commonPath = pathOne
-      .slice(0, index)
-      .split(' ')
-      .map(x => parseInt(x, 10))
+
+    const commonPath = pathOne.slice(0, index)
     return this.getDescendantAtPath(commonPath)
   }
 
@@ -838,10 +833,8 @@ class Node {
   getFurthestAncestor(key) {
     key = assertKey(key)
     if (!this.hasDescendant(key)) return null
-    // PERF: operate directly on string, perhaps faster and saves some spaces
-    const pathStr = this.getPathAsString(key).match(/^[^ ]*/)[0]
-    const childIndex = parseInt(pathStr, 10)
-    return this.nodes.get(childIndex)
+    const path = this.getPath(key)
+    return this.nodes.get(path[0])
   }
 
   /**
@@ -1374,32 +1367,12 @@ class Node {
    * Get the path of a descendant node by `key`.
    *
    * @param {String|Node} key
-   * @return {Array}
+   * @return {Array|null}
    */
 
   getPath(key) {
-    if (!this.hasNode(key)) {
-      throw new Error(`Could not find a node with key "${key}".`)
-    }
-    const path = this.getPathAsString(key)
-    if (path.length === 0) {
-      return []
-    }
-    return path.split(' ').map(x => parseInt(x, 10))
-  }
-
-  /**
-   * Get the path of a descendant node by `key`, as string
-   * PERF: concat string is much faster than concat Array (at least in v8),
-   * becuase no extra space is required in v8's ConString
-   *
-   * @param {String|Node} key
-   * @returns {Array}
-   */
-
-  getPathAsString(key) {
     key = assertKey(key)
-    if (this.key === key) return ''
+    if (this.key === key) return []
     if (this.nodes.size === 0) return null
     let result = null
     // PERF: often the node keys is generated with sequences;
@@ -1418,17 +1391,23 @@ class Node {
         : 'findIndex'
     const index = this.nodes[method](child => {
       if (child.key === key) {
-        result = ''
+        result = []
         return true
       }
       if (child.object === 'text') {
         return false
       }
-      result = child.getPathAsString(key)
-      return typeof result === 'string'
+      result = child.getPath(key)
+      return Array.isArray(result)
     })
     if (index === -1) return null
-    return result.length !== 0 ? `${index} ${result}` : `${index}`
+    return [index].concat(result)
+  }
+
+  getPathAsString(key) {
+    const path = this.getPath(key)
+    if (Array.isArray(path)) return path.join(' ')
+    return null
   }
 
   /**
@@ -1755,7 +1734,7 @@ class Node {
    */
 
   hasNode(key) {
-    return typeof this.getPathAsString(key) === 'string'
+    return Array.isArray(this.getPath(key))
   }
 
   /**
@@ -2128,7 +2107,6 @@ memoize(Node.prototype, [
   'getOffset',
   'getParent',
   'getPath',
-  'getPathAsString',
   'getPlaceholder',
   'getPreviousBlock',
   'getPreviousSibling',
