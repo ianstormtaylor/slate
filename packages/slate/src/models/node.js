@@ -10,7 +10,6 @@ import Inline from './inline'
 import Range from './range'
 import Text from './text'
 import generateKey from '../utils/generate-key'
-import isIndexInRange from '../utils/is-index-in-range'
 import memoize from '../utils/memoize'
 
 /**
@@ -469,22 +468,7 @@ class Node {
    */
 
   getCharacters() {
-    const array = this.getCharactersAsArray()
-    return new List(array)
-  }
-
-  /**
-   * Get all of the characters for every text node as an array
-   *
-   * @return {Array}
-   */
-
-  getCharactersAsArray() {
-    return this.nodes.reduce((arr, node) => {
-      return node.object == 'text'
-        ? arr.concat(node.characters.toArray())
-        : arr.concat(node.getCharactersAsArray())
-    }, [])
+    return this.getTexts().flatMap(t => t.characters)
   }
 
   /**
@@ -495,28 +479,23 @@ class Node {
    */
 
   getCharactersAtRange(range) {
-    const array = this.getCharactersAtRangeAsArray(range)
-    return new List(array)
-  }
-
-  /**
-   * Get a list of the characters in a `range` as an array.
-   *
-   * @param {Range} range
-   * @return {Array}
-   */
-
-  getCharactersAtRangeAsArray(range) {
     range = range.normalize(this)
-    if (range.isUnset) return []
+    if (range.isUnset) return List()
+    const { startKey, endKey, startOffset, endOffset } = range
+    const endText = this.getDescendant(endKey)
+    if (startKey === endKey) {
+      return endText.characters.slice(startOffset, endOffset)
+    }
 
-    return this.getTextsAtRange(range).reduce((arr, text) => {
-      const chars = text.characters
-        .filter((char, i) => isIndexInRange(i, text, range))
-        .toArray()
-
-      return arr.concat(chars)
-    }, [])
+    return this.getTextsAtRange(range).flatMap(t => {
+      if (t.key === startKey) {
+        return t.characters.slice(startOffset)
+      }
+      if (t.key === endKey) {
+        return t.characters.slice(0, endOffset)
+      }
+      return t.characters
+    })
   }
 
   /**
@@ -2055,8 +2034,6 @@ memoize(Node.prototype, [
   'getBlocksAsArray',
   'getBlocksAtRangeAsArray',
   'getBlocksByTypeAsArray',
-  'getCharactersAtRangeAsArray',
-  'getCharactersAsArray',
   'getChild',
   'getClosestBlock',
   'getClosestInline',
