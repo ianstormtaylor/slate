@@ -39,7 +39,7 @@ baseline.forEach((suite, i) => {
       const slower = b / c > 1 + THRESHOLD
       const faster = c / b > 1 + THRESHOLD
       const percent = Math.round(Math.abs(b - c) / c * 100)
-      const balancePercent = b > c ? percent : (c - b) / c * 100
+      const balancePercent = b > c ? percent : (c - b) / b * 100
 
       let output = `${b.toFixed(2)} → ${c.toFixed(2)} ops/sec`
       if (slower) output = chalk.red(`${output} (${percent}% slower)`)
