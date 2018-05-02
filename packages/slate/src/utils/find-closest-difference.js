@@ -4,7 +4,7 @@
  * @param {Node|Text} node
  * @return {null|Node|Text}
  *
-*/
+ */
 
 function findClosestDifference(previousNode, node) {
   if (node === previousNode) return null
