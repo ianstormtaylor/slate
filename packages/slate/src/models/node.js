@@ -542,7 +542,11 @@ class Node {
     }
 
     // Exclude this node itself.
-    return ancestors.rest().findLast(iterator)
+    // PERF: rest() creates a new List, which can be slow
+    return ancestors.findLast((ancestor, index) => {
+      if (ancestor === this) return false
+      return iterator(ancestor, index)
+    })
   }
 
   /**
