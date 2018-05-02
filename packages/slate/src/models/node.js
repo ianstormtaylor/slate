@@ -610,7 +610,6 @@ class Node {
     }
 
     if (one === two) return this.getParent(one)
-    // PREF: use string as path, because string compare is faster than array compare
     const pathOne = this.getPath(one)
     const pathTwo = this.getPath(two)
     if (pathOne[0] !== pathTwo[0]) return this
@@ -619,7 +618,6 @@ class Node {
     while (pathOne[index] === pathTwo[index] && index < length) {
       index++
     }
-    // Find the first space that pathOne and pathTwo is common
 
     const commonPath = pathOne.slice(0, index)
     return this.getDescendantAtPath(commonPath)
