@@ -350,22 +350,15 @@ class Node {
 
   getAncestors(key) {
     key = assertKey(key)
-
-    if (key == this.key) return List()
-    if (this.hasChild(key)) return List([this])
-
-    let ancestors
-    this.nodes.find(node => {
-      if (node.object == 'text') return false
-      ancestors = node.getAncestors(key)
-      return ancestors
+    if (!this.hasNode(key)) return null
+    const path = this.getPath(key)
+    return List().withMutations(result => {
+      let ancestor = this
+      for (const index of path) {
+        result.push(ancestor)
+        ancestor = ancestor.nodes.get(index)
+      }
     })
-
-    if (ancestors) {
-      return ancestors.unshift(this)
-    } else {
-      return null
-    }
   }
 
   /**
