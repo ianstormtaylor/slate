@@ -238,14 +238,11 @@ class Node {
    */
 
   assertDescendant(key) {
-    const descendant = this.getDescendant(key)
-
-    if (!descendant) {
-      key = assertKey(key)
+    key = assertKey(key)
+    if (!this.hasDescendant(key)) {
       throw new Error(`Could not find a descendant node with key "${key}".`)
     }
-
-    return descendant
+    return this.getDescendant(key)
   }
 
   /**
@@ -256,14 +253,13 @@ class Node {
    */
 
   assertNode(key) {
-    const node = this.getNode(key)
+    key = assertKey(key)
 
-    if (!node) {
-      key = assertKey(key)
+    if (!this.hasNode(key)) {
       throw new Error(`Could not find a node with key "${key}".`)
     }
 
-    return node
+    return this.getNode(key)
   }
 
   /**
@@ -1738,7 +1734,7 @@ class Node {
    */
 
   hasDescendant(key) {
-    return !!this.getDescendant(key)
+    return this.hasNode(key) && this.key !== key
   }
 
   /**
