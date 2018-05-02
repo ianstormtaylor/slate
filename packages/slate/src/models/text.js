@@ -378,6 +378,9 @@ class Text extends Record(DEFAULTS) {
     let previousMark = first
     const result = []
     this.characters.forEach(c => {
+      // If the character marks is the same with the
+      // previous characters, we do not need to
+      // add the marks twice
       if (c.marks === previousMark) return true
       previousMark = c.marks
       result.push(previousMark.toArray())
