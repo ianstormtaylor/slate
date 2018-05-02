@@ -44,7 +44,7 @@ export const output = `
           </span>
         </span>
       </span>
-      <span contenteditable="false" draggable="true">
+      <span contenteditable="false">
         <img>
       </span>
     </span>

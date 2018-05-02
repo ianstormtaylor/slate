@@ -39,7 +39,7 @@ export const output = `
         </span>
       </span>
     </div>
-    <div contenteditable="false" draggable="true">
+    <div contenteditable="false">
       <img src="https://example.com/image.png">
     </div>
   </div>
