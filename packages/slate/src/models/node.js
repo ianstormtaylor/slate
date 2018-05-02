@@ -1651,8 +1651,31 @@ class Node {
    */
 
   getTextsAtRange(range) {
-    const array = this.getTextsAtRangeAsArray(range)
-    return new List(array)
+    range = range.normalize(this)
+    if (range.isUnset) return []
+    const { startKey, endKey } = range
+    return this.getTextsBetweenPositionsAsArray(startKey, endKey)
+  }
+
+  /**
+   * Get all of the text nodes in a `range` as an array.
+   *
+   * @param {Range} range
+   * @returns {Array}
+   */
+
+  getTextsBetweenPositionsAsArray(startKey, endKey) {
+    const startText = this.getDescendant(startKey)
+
+    // PERF: the most common case is when the range is in a single text node,
+    // where we can avoid a lot of iterating of the tree.
+    if (startKey == endKey) return [startText]
+
+    const endText = this.getDescendant(endKey)
+    const texts = this.getTextsAsArray()
+    const start = texts.indexOf(startText)
+    const end = texts.indexOf(endText, start)
+    return texts.slice(start, end + 1)
   }
 
   /**
@@ -2125,7 +2148,7 @@ memoize(Node.prototype, [
   'getTextAtOffset',
   'getTextDirection',
   'getTextsAsArray',
-  'getTextsAtRangeAsArray',
+  'getTextsBetweenPositionsAsArray',
   'isLeafBlock',
   'isLeafInline',
   'validate',
