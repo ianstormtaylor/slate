@@ -2140,7 +2140,6 @@ memoize(Node.prototype, [
   'getNode',
   'getNodeAtPath',
   'getOffset',
-  'getOffsetAtRange',
   'getParent',
   'getPath',
   'getPathAsString',
