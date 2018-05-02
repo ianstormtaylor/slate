@@ -1,5 +1,5 @@
 import Base64 from 'slate-base64-serializer'
-import { IS_CHROME, IS_SAFARI } from 'slate-dev-environment'
+import { IS_CHROME, IS_SAFARI, IS_OPERA } from 'slate-dev-environment'
 
 import getWindow from 'get-window'
 import findDOMNode from './find-dom-node'
@@ -30,6 +30,13 @@ function cloneFragment(event, value, fragment = value.fragment) {
   let contents = range.cloneContents()
   let attach = contents.childNodes[0]
 
+  // Make sure attach is a non-empty node, since empty nodes will not get copied
+  contents.childNodes.forEach(node => {
+    if (node.innerText.trim() !== '') {
+      attach = node
+    }
+  })
+
   // COMPAT: If the end node is a void node, we need to move the end of the
   // range from the void node's spacer span, to the end of the void node's
   // content, since the spacer is before void's content in the DOM.
@@ -52,7 +59,7 @@ function cloneFragment(event, value, fragment = value.fragment) {
   // not preserved when copying. If the attatched is not void, and the start key
   // and endKey is the same, check if there is marks involved. If so, set the
   // range start just before the start text node.
-  if ((IS_CHROME || IS_SAFARI) && !endVoid && startKey === endKey) {
+  if ((IS_CHROME || IS_SAFARI || IS_OPERA) && !endVoid && startKey === endKey) {
     const hasMarks =
       startText.characters
         .slice(value.selection.anchorOffset, value.selection.focusOffset)
@@ -76,7 +83,7 @@ function cloneFragment(event, value, fragment = value.fragment) {
   // COMPAT: In Chrome and Safari, if the last element in the selection to
   // copy has `contenteditable="false"` the copy will fail, and nothing will
   // be put in the clipboard. So we remove them all. (2017/05/04)
-  if (IS_CHROME || IS_SAFARI) {
+  if (IS_CHROME || IS_SAFARI || IS_OPERA) {
     const els = [].slice.call(
       contents.querySelectorAll('[contenteditable="false"]')
     )
