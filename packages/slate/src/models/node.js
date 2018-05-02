@@ -1405,7 +1405,9 @@ class Node {
     // PERF: often the node keys is generated with sequences;
     // newer node, key with bigger number, are closer to end
     // older node, key with smaller number, are closer to beginning
-    // Then we can choose find or findLast to control the order
+    // Then we can choose find or findLast to control the order.
+    // It is a costless guess, because findLast is not worse than find
+    // without prior knowledge
     const lastKey = parseInt(this.nodes.last().key, 10)
     const firstKey = parseInt(this.nodes.first().key, 10)
     const searchKey = parseInt(key, 10)
