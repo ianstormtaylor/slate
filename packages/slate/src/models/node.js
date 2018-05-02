@@ -1409,7 +1409,10 @@ class Node {
     if (this.key === key) return ''
     if (this.nodes.size === 0) return null
     let result = null
-    // We can use window.performance.now or process.hrtime for better sequence guess
+    // PERF: often the node keys is generated with sequences;
+    // newer node, key with bigger number, are closer to end
+    // older node, key with smaller number, are closer to beginning
+    // Then we can choose find or findLast to control the order
     const lastKey = parseInt(this.nodes.last().key, 10)
     const firstKey = parseInt(this.nodes.first().key, 10)
     const searchKey = parseInt(key, 10)
