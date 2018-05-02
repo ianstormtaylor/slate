@@ -766,14 +766,26 @@ class Node {
    */
 
   getFurthest(key, iterator) {
-    const ancestors = this.getAncestors(key)
-    if (!ancestors) {
-      key = assertKey(key)
+    key = assertKey(key)
+    if (!this.hasDescendant(key)) {
       throw new Error(`Could not find a descendant node with key "${key}".`)
     }
+    // PREF: use path to pass down to prevent creating getAncestors List()
+    // It is slow to create a new Immutable List
+    const path = this.getPath(key)
+    let node = this
 
-    // Exclude this node itself
-    return ancestors.rest().find(iterator)
+    // PREF: use find rather than for-in to prevent using v8's regenerator,
+    // which is slower than native JS engine
+    path.find(index => {
+      node = node.nodes.get(index)
+      if (node.key === key) {
+        node = null
+        return true
+      }
+      if (iterator(node)) return true
+    })
+    return node
   }
 
   /**
