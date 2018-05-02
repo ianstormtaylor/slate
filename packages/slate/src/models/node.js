@@ -1070,6 +1070,7 @@ class Node {
 
   /**
    * Get a set of the marks in a `range`.
+   * PREF: arguments use key and offset for utilizing cache
    *
    * @param {string} startKey
    * @param {number} startOffset
@@ -1630,8 +1631,10 @@ class Node {
 
   /**
    * Get all of the text nodes in a `range` as an array.
+   * PREF: use key in arguments for cache
    *
-   * @param {Range} range
+   * @param {string} startKey
+   * @param {string} endKey
    * @returns {Array}
    */
 
