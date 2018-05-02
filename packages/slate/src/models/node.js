@@ -1654,7 +1654,7 @@ class Node {
     range = range.normalize(this)
     if (range.isUnset) return []
     const { startKey, endKey } = range
-    return this.getTextsBetweenPositionsAsArray(startKey, endKey)
+    return new List(this.getTextsBetweenPositionsAsArray(startKey, endKey))
   }
 
   /**
