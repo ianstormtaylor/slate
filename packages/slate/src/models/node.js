@@ -2032,19 +2032,10 @@ class Node {
       return node
     }
 
-    let child = this.assertDescendant(node.key)
-    const ancestors = this.getAncestors(node.key)
-
-    ancestors.reverse().forEach(parent => {
-      let { nodes } = parent
-      const index = nodes.indexOf(child)
-      child = parent
-      nodes = nodes.set(index, node)
-      parent = parent.set('nodes', nodes)
-      node = parent
-    })
-
-    return node
+    this.assertDescendant(node.key)
+    const path = this.getPath(node.key).map(x => ['nodes', x])
+    // PERF: setIn is faster than recursive assign
+    return this.setIn(Array.prototype.concat.apply([], path), node)
   }
 
   /**
