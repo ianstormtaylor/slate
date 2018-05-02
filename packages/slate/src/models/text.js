@@ -329,6 +329,7 @@ class Text extends Record(DEFAULTS) {
     if (this.characters.size === 0) return Set()
     const result = this.characters.first().marks
     if (result.size === 0) return result
+
     return result.withMutations(x => {
       this.characters.forEach(c => {
         x.intersect(c.marks)
