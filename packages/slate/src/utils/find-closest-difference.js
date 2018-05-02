@@ -1,11 +1,12 @@
-/* Find the furthest ancestor in node that covers all difference between previousNode and node
+/**
+ * Find the smallest node covering all difference between previousNode and node
  * @param {Node|Text} previousMNode
  * @param {Node|Text} node
- * @return {void|Node|Text}
+ * @return {null|Node|Text}
  *
 */
 
-function findFurthestDifferentAncestor(previousNode, node) {
+function findClosestDifference(previousNode, node) {
   if (node === previousNode) return null
   if (node.object !== previousNode.object) return node
   if (node.object === 'text') return node
@@ -17,9 +18,16 @@ function findFurthestDifferentAncestor(previousNode, node) {
     (child, index) => child !== previousNode.get(index)
   )
   if (first !== last) return node
-  return findFurthestDifferentAncestor(
+  return findClosestDifference(
     previousNode.nodes.get(first),
     node.nodes.get(first)
   )
 }
-export default findFurthestDifferentAncestor
+
+/**
+ * Export.
+ *
+ * @type {Function}
+ */
+
+export default findClosestDifference

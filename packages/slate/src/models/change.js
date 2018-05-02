@@ -8,7 +8,7 @@ import MODEL_TYPES from '../constants/model-types'
 import Changes from '../changes'
 import Operation from './operation'
 import apply from '../operations/apply'
-import findFurthestDifferentAncestor from '../utils/find-furthest-different-ancestor'
+import findClosestDifference from '../utils/find-closest-difference'
 
 /**
  * Debug.
@@ -159,7 +159,7 @@ class Change {
       const { document } = this.value
       customChange(this)
       // if the change function worked then run normalization
-      const node = findFurthestDifferentAncestor(document, this.value.document)
+      const node = findClosestDifference(document, this.value.document)
       if (node) {
         this.normalizeNodeByKey(node.key)
       }
