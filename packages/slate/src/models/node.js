@@ -653,20 +653,9 @@ class Node {
 
   getDescendant(key) {
     key = assertKey(key)
-    let descendantFound = null
-
-    const found = this.nodes.find(node => {
-      if (node.key === key) {
-        return node
-      } else if (node.object !== 'text') {
-        descendantFound = node.getDescendant(key)
-        return descendantFound
-      } else {
-        return false
-      }
-    })
-
-    return descendantFound || found
+    if (!this.hasDescendant(key)) return null
+    const path = this.getPath(key)
+    return this.getDescendantAtPath(path)
   }
 
   /**
