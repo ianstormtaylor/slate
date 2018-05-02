@@ -198,12 +198,18 @@ class Node {
     first = assertKey(first)
     second = assertKey(second)
 
-    const keys = this.getKeysAsArray()
-    const firstIndex = keys.indexOf(first)
-    const secondIndex = keys.indexOf(second)
-    if (firstIndex == -1 || secondIndex == -1) return null
-
-    return firstIndex < secondIndex
+    if (first === second) return false
+    if (parseInt(first, 10) > parseInt(second, 10)) {
+      // Ensure areDescendantSorted(second, first) is also cached
+      // Always prefer newer node in second argument, for potential
+      // futher optimization
+      return !this.areDescendantsSorted(second, first)
+    }
+    if (first === this.key) return true
+    if (second === this.key) return false
+    const firstStr = this.getPathAsString(first)
+    const secondStr = this.getPathAsString(second)
+    return firstStr < secondStr
   }
 
   /**
@@ -956,25 +962,26 @@ class Node {
    * @return {Array<String>}
    */
 
-  getKeysAsArray() {
-    const keys = []
+  getKeysAsDictionary() {
+    const keys = {}
 
-    this.forEachDescendant(desc => {
-      keys.push(desc.key)
+    // PREF: prevent JS to search at prototype chain, performance concern
+    keys.__proto__ = null
+
+    this.nodes.forEach(child => {
+      if (child.object === 'text') {
+        keys[child.key] = true
+        return
+      }
+      // PREF: use the logic of utils._extend; becuase
+      // Object.assign is about 2x~3x slower than utils._extend
+      const childKeys = Object.keys(child.getKeysAsDictionary())
+      childKeys.forEach(key => {
+        keys[key] = true
+      })
     })
 
     return keys
-  }
-
-  /**
-   * Return a set of all keys in the node.
-   *
-   * @return {Set<String>}
-   */
-
-  getKeys() {
-    const keys = this.getKeysAsArray()
-    return new Set(keys)
   }
 
   /**
@@ -1370,17 +1377,52 @@ class Node {
    */
 
   getPath(key) {
-    let child = this.assertNode(key)
-    const ancestors = this.getAncestors(key)
-    const path = []
+    if (!this.hasNode(key)) {
+      throw new Error(`Could not find a node with key "${key}".`)
+    }
+    const path = this.getPathAsString(key)
+    if (path.length === 0) {
+      return []
+    }
+    return path.split(' ').map(x => parseInt(x, 10))
+  }
 
-    ancestors.reverse().forEach(ancestor => {
-      const index = ancestor.nodes.indexOf(child)
-      path.unshift(index)
-      child = ancestor
+  /**
+   * Get the path of a descendant node by `key`, as string
+   * PREF: concat string is much faster than concat Array (at least in v8),
+   * becuase no extra space is required in v8's ConString
+   *
+   * @param {String|Node} key
+   * @returns {Array}
+   */
+
+  getPathAsString(key) {
+    key = assertKey(key)
+    if (this.key === key) return ''
+    if (this.nodes.size === 0) return null
+    let result = null
+    // We can use window.performance.now or process.hrtime for better sequence guess
+    const lastKey = parseInt(this.nodes.last().key, 10)
+    const firstKey = parseInt(this.nodes.first().key, 10)
+    const searchKey = parseInt(key, 10)
+
+    const method =
+      Math.abs(lastKey - searchKey) < Math.abs(searchKey - firstKey)
+        ? 'findLastIndex'
+        : 'findIndex'
+    const index = this.nodes[method](child => {
+      if (child.key === key) {
+        result = ''
+        return true
+      }
+      if (child.object === 'text') {
+        return false
+      }
+      result = child.getPathAsString(key)
+      return typeof result === 'string'
     })
-
-    return path
+    if (index === -1) return null
+    return result.length !== 0 ? `${index} ${result}` : `${index}`
   }
 
   /**
@@ -1707,7 +1749,7 @@ class Node {
    */
 
   hasNode(key) {
-    return !!this.getNode(key)
+    return typeof this.getPathAsString(key) === 'string'
   }
 
   /**
@@ -1730,15 +1772,15 @@ class Node {
    */
 
   insertNode(index, node) {
-    const keys = this.getKeysAsArray()
+    const keys = this.getKeysAsDictionary()
 
-    if (keys.includes(node.key)) {
+    if (keys[node.key]) {
       node = node.regenerateKey()
     }
 
     if (node.object != 'text') {
       node = node.mapDescendants(desc => {
-        return keys.includes(desc.key) ? desc.regenerateKey() : desc
+        return keys[desc.key] ? desc.regenerateKey() : desc
       })
     }
 
@@ -2078,7 +2120,7 @@ memoize(Node.prototype, [
   'getMarksAsArray',
   'getMarksAtRangeAsArray',
   'getInsertMarksAtRangeAsArray',
-  'getKeysAsArray',
+  'getKeysAsDictionary',
   'getLastText',
   'getMarksByTypeAsArray',
   'getNextBlock',
@@ -2090,6 +2132,7 @@ memoize(Node.prototype, [
   'getOffsetAtRange',
   'getParent',
   'getPath',
+  'getPathAsString',
   'getPlaceholder',
   'getPreviousBlock',
   'getPreviousSibling',
