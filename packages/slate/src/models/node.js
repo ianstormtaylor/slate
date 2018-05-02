@@ -1357,10 +1357,9 @@ class Node {
   getParent(key) {
     if (!this.hasDescendant(key)) return null
 
-    const str = this.getPathAsString(key)
-    const path = str.split(' ').map(x => parseInt(x, 10))
-    path.pop()
-    return this.getDescendantAtPath(path)
+    const path = this.getPath(key)
+    const parentPath = path.slice(0, path.length - 1)
+    return this.getDescendantAtPath(parentPath)
   }
 
   /**
@@ -1402,12 +1401,6 @@ class Node {
     })
     if (index === -1) return null
     return [index].concat(result)
-  }
-
-  getPathAsString(key) {
-    const path = this.getPath(key)
-    if (Array.isArray(path)) return path.join(' ')
-    return null
   }
 
   /**
