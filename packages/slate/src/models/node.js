@@ -199,17 +199,19 @@ class Node {
     second = assertKey(second)
 
     if (first === second) return false
-    if (parseInt(first, 10) > parseInt(second, 10)) {
-      // Ensure areDescendantSorted(second, first) is also cached
-      // Always prefer newer node in second argument, for potential
-      // futher optimization
-      return !this.areDescendantsSorted(second, first)
-    }
     if (first === this.key) return true
     if (second === this.key) return false
-    const firstStr = this.getPathAsString(first)
-    const secondStr = this.getPathAsString(second)
-    return firstStr < secondStr
+    const firstPath = this.getPath(first)
+    const secondPath = this.getPath(second)
+    const length = Math.min(firstPath.length, secondPath.length)
+    let index = 0
+    while (firstPath[index] === secondPath[index] && index < length) {
+      index++
+    }
+    if (index === length) {
+      return firstPath.length < secondPath.length
+    }
+    return firstPath[index] < secondPath[index]
   }
 
   /**
