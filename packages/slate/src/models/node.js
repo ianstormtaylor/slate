@@ -1054,8 +1054,72 @@ class Node {
    */
 
   getActiveMarksAtRange(range) {
-    const array = this.getActiveMarksAtRangeAsArray(range)
-    return new Set(array)
+    range = range.normalize(this)
+    if (range.isUnset) return Set()
+    if (range.isCollapsed)
+      return this.getMarksAtPosition(range.startKey, range.startOffset).toSet()
+    let { startKey, endKey, startOffset, endOffset } = range
+    let startText = this.getDescendant(startKey)
+    if (startKey !== endKey) {
+      while (startKey !== endKey && endOffset === 0) {
+        const endText = this.getPreviousText(endKey)
+        endKey = endText.key
+        endOffset = endText.text.length
+      }
+
+      while (startKey !== endKey && startOffset === startText.text.length) {
+        startText = this.getNextText(startKey)
+        startKey = startText.key
+        startOffset = 0
+      }
+    }
+    if (startKey === endKey)
+      return startText.getActiveMarksBetweenOffsets(startOffset, endOffset)
+    const startMarks = startText.getActiveMarksBetweenOffsets(
+      startOffset,
+      startText.text.length
+    )
+    if (startMarks.size === 0) return Set()
+    const endText = this.getDescendant(endKey)
+    const endMarks = endText.getActiveMarksBetweenOffsets(0, endOffset)
+    let marks = startMarks.intersect(endMarks)
+    if (marks.size === 0) return marks
+    let text = this.getNextText(startKey)
+    while (text.key !== endKey) {
+      if (text.text.length !== 0) {
+        marks = marks.intersect(text.getActiveMarks())
+        if (marks.size === 0) return Set()
+      }
+      text = this.getNextText(text.key)
+    }
+    return marks
+  }
+
+  /**
+   * Get a set of marks in a `position`, the equivalent of a collapsed range
+   *
+   * @param {string} key
+   * @param {number} offset
+   * @return {OrderedSet}
+   */
+
+  getMarksAtPosition(key, offset) {
+    if (offset == 0) {
+      const previous = this.getPreviousText(key)
+      if (!previous || previous.text.length == 0) return OrderedSet()
+      if (this.getClosestBlock(key) !== this.getClosestBlock(previous.key)) {
+        return OrderedSet()
+      }
+      const char = previous.characters.last()
+      if (!char) return OrderedSet()
+
+      return new OrderedSet(char.marks)
+    }
+
+    const text = this.getDescendant(key)
+    const char = text.characters.get(offset - 1)
+    if (!char) return OrderedSet()
+    return new OrderedSet(char.marks)
   }
 
   /**
@@ -1128,34 +1192,6 @@ class Node {
     if (!char) return []
 
     return char.marks.toArray()
-  }
-
-  /**
-   * Get a set of marks in a `range`, by intersecting.
-   *
-   * @param {Range} range
-   * @return {Array}
-   */
-
-  getActiveMarksAtRangeAsArray(range) {
-    range = range.normalize(this)
-    if (range.isUnset) return []
-    if (range.isCollapsed) return this.getMarksAtCollapsedRangeAsArray(range)
-
-    // Otherwise, get a set of the marks for each character in the range.
-    const chars = this.getCharactersAtRange(range)
-    const first = chars.first()
-    if (!first) return []
-
-    let memo = first.marks
-
-    chars.slice(1).forEach(char => {
-      const marks = char ? char.marks : []
-      memo = memo.intersect(marks)
-      return memo.size != 0
-    })
-
-    return memo.toArray()
   }
 
   /**
@@ -2031,7 +2067,6 @@ function assertKey(arg) {
 
 memoize(Node.prototype, [
   'areDescendantsSorted',
-  'getActiveMarksAtRangeAsArray',
   'getAncestors',
   'getBlocksAsArray',
   'getBlocksAtRangeAsArray',
@@ -2055,6 +2090,7 @@ memoize(Node.prototype, [
   'getInlinesAtRangeAsArray',
   'getInlinesByTypeAsArray',
   'getMarksAsArray',
+  'getMarksAtPosition',
   'getMarksAtRangeAsArray',
   'getInsertMarksAtRangeAsArray',
   'getKeysAsArray',
