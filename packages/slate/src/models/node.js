@@ -1003,7 +1003,7 @@ class Node {
    */
 
   getMarksAsArray() {
-    // PREF: use only one concat rather than multiple concat
+    // PERF: use only one concat rather than multiple concat
     // becuase one concat is faster
     const result = []
     this.nodes.forEach(node => {
@@ -1034,7 +1034,7 @@ class Node {
     range = range.normalize(this)
     if (range.isUnset) return Set()
     if (range.isCollapsed) {
-      // PREF: range is not cachable, use key and offset as proxies for cache
+      // PERF: range is not cachable, use key and offset as proxies for cache
       return this.getMarksAtPosition(range.startKey, range.startOffset)
     }
 
@@ -1056,7 +1056,7 @@ class Node {
     range = range.normalize(this)
     if (range.isUnset) return OrderedSet()
     if (range.isCollapsed) {
-      // PREF: range is not cachable, use key and offset as proxies for cache
+      // PERF: range is not cachable, use key and offset as proxies for cache
       return this.getMarksAtPosition(range.startKey, range.startOffset)
     }
     const { startKey, startOffset, endKey, endOffset } = range
@@ -1070,7 +1070,7 @@ class Node {
 
   /**
    * Get a set of the marks in a `range`.
-   * PREF: arguments use key and offset for utilizing cache
+   * PERF: arguments use key and offset for utilizing cache
    *
    * @param {string} startKey
    * @param {number} startOffset
@@ -1631,7 +1631,7 @@ class Node {
 
   /**
    * Get all of the text nodes in a `range` as an array.
-   * PREF: use key in arguments for cache
+   * PERF: use key in arguments for cache
    *
    * @param {string} startKey
    * @param {string} endKey
