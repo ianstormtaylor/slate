@@ -1361,20 +1361,12 @@ class Node {
    */
 
   getParent(key) {
-    if (this.hasChild(key)) return this
+    if (!this.hasDescendant(key)) return null
 
-    let node = null
-
-    this.nodes.find(child => {
-      if (child.object == 'text') {
-        return false
-      } else {
-        node = child.getParent(key)
-        return node
-      }
-    })
-
-    return node
+    const str = this.getPathAsString(key)
+    const path = str.split(' ').map(x => parseInt(x, 10))
+    path.pop()
+    return this.getDescendantAtPath(path)
   }
 
   /**
