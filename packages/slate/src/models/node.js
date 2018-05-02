@@ -975,6 +975,7 @@ class Node {
 
     // PERF: prevent JS to search at prototype chain, performance concern
     keys.__proto__ = null
+    keys[this.key] = true
 
     this.nodes.forEach(child => {
       if (child.object === 'text') {
