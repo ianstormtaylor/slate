@@ -1059,6 +1059,7 @@ class Node {
       // PERF: range is not cachable, use key and offset as proxies for cache
       return this.getMarksAtPosition(range.startKey, range.startOffset)
     }
+
     const { startKey, startOffset, endKey, endOffset } = range
     return this.getOrderedMarksBetweenPositions(
       startKey,
@@ -1119,6 +1120,7 @@ class Node {
 
     let { startKey, endKey, startOffset, endOffset } = range
     let startText = this.getDescendant(startKey)
+
     if (startKey !== endKey) {
       while (startKey !== endKey && endOffset === 0) {
         const endText = this.getPreviousText(endKey)
@@ -1132,8 +1134,11 @@ class Node {
         startOffset = 0
       }
     }
-    if (startKey === endKey)
+
+    if (startKey === endKey) {
       return startText.getActiveMarksBetweenOffsets(startOffset, endOffset)
+    }
+
     const startMarks = startText.getActiveMarksBetweenOffsets(
       startOffset,
       startText.text.length
@@ -1142,7 +1147,9 @@ class Node {
     const endText = this.getDescendant(endKey)
     const endMarks = endText.getActiveMarksBetweenOffsets(0, endOffset)
     let marks = startMarks.intersect(endMarks)
+    // If marks is already empty, the active marks is empty
     if (marks.size === 0) return marks
+
     let text = this.getNextText(startKey)
     while (text.key !== endKey) {
       if (text.text.length !== 0) {
