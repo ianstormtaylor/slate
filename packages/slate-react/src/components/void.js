@@ -72,9 +72,7 @@ class Void extends React.Component {
     )
 
     const content = (
-      <Tag contentEditable={readOnly ? null : false}>
-        {children}
-      </Tag>
+      <Tag contentEditable={readOnly ? null : false}>{children}</Tag>
     )
 
     this.debug('render', { props })
