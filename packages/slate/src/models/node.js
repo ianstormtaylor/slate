@@ -807,11 +807,11 @@ class Node {
 
   getFurthestAncestor(key) {
     key = assertKey(key)
-    return this.nodes.find(node => {
-      if (node.key == key) return true
-      if (node.object == 'text') return false
-      return node.hasDescendant(key)
-    })
+    if (!this.hasDescendant(key)) return null
+    // PREF: operate directly on string, perhaps faster and saves some spaces
+    const pathStr = this.getPathAsString(key).replace(/ .*$/, '')
+    const childIndex = parseInt(pathStr, 10)
+    return this.nodes.get(childIndex)
   }
 
   /**
