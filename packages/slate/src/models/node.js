@@ -839,7 +839,7 @@ class Node {
     key = assertKey(key)
     if (!this.hasDescendant(key)) return null
     // PERF: operate directly on string, perhaps faster and saves some spaces
-    const pathStr = this.getPathAsString(key).replace(/ .*$/, '')
+    const pathStr = this.getPathAsString(key).match(/^[^ ]*/)[0]
     const childIndex = parseInt(pathStr, 10)
     return this.nodes.get(childIndex)
   }
