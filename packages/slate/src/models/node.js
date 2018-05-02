@@ -564,7 +564,13 @@ class Node {
    */
 
   getClosestInline(key) {
-    return this.getClosest(key, parent => parent.object == 'inline')
+    // PERF: short circuit for getClosestInline: inline cannot
+    // be placed beyond blocks and documents
+    const node = this.getAncestors(key).findLast(ancestor => {
+      if (ancestor.object === 'text') return false
+      return true
+    })
+    return node.object === 'inline' ? node : null
   }
 
   /**
