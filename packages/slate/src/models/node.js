@@ -1003,9 +1003,11 @@ class Node {
    */
 
   getMarksAsArray() {
-    return this.nodes.reduce((marks, node) => {
-      return marks.concat(node.getMarksAsArray())
-    }, [])
+    const result = []
+    this.nodes.forEach(node => {
+      result.push(node.getMarksAsArray())
+    })
+    return Array.prototype.concat.apply([], result)
   }
 
   /**
