@@ -593,21 +593,29 @@ class Node {
     if (one == this.key) return this
     if (two == this.key) return this
 
-    this.assertDescendant(one)
-    this.assertDescendant(two)
-    let ancestors = new List()
-    let oneParent = this.getParent(one)
-    let twoParent = this.getParent(two)
-
-    while (oneParent) {
-      ancestors = ancestors.push(oneParent)
-      oneParent = this.getParent(oneParent.key)
+    if (!this.hasNode(one) || !this.hasNode(two)) {
+      throw new Error(`cannot find descendant ${one} or ${two}`)
     }
 
-    while (twoParent) {
-      if (ancestors.includes(twoParent)) return twoParent
-      twoParent = this.getParent(twoParent.key)
+    if (one === two) return this.getParent(one)
+    // PREF: use string as path, because string compare is faster than array compare
+    const pathOne = this.getPathAsString(one)
+    const pathTwo = this.getPathAsString(two)
+    if (pathOne.charAt(0) !== pathTwo.charAt(0)) return this
+    let index = 0
+    const length = Math.min(pathOne.length, pathTwo.length)
+    while (pathOne.charAt(index) === pathTwo.charAt(index) && index < length) {
+      index++
     }
+    // Find the first space that pathOne and pathTwo is common
+    index = pathOne.lastIndexOf(' ', index)
+    if (index === -1) return this
+    // path as array to locate the common ancestor
+    const commonPath = pathOne
+      .slice(0, index)
+      .split(' ')
+      .map(x => parseInt(x, 10))
+    return this.getDescendantAtPath(commonPath)
   }
 
   /**
@@ -770,12 +778,12 @@ class Node {
     if (!this.hasDescendant(key)) {
       throw new Error(`Could not find a descendant node with key "${key}".`)
     }
-    // PREF: use path to pass down to prevent creating getAncestors List()
+    // PERF: use path to pass down to prevent creating getAncestors List()
     // It is slow to create a new Immutable List
     const path = this.getPath(key)
     let node = this
 
-    // PREF: use find rather than for-in to prevent using v8's regenerator,
+    // PERF: use find rather than for-in to prevent using v8's regenerator,
     // which is slower than native JS engine
     path.find(index => {
       node = node.nodes.get(index)
@@ -820,7 +828,7 @@ class Node {
   getFurthestAncestor(key) {
     key = assertKey(key)
     if (!this.hasDescendant(key)) return null
-    // PREF: operate directly on string, perhaps faster and saves some spaces
+    // PERF: operate directly on string, perhaps faster and saves some spaces
     const pathStr = this.getPathAsString(key).replace(/ .*$/, '')
     const childIndex = parseInt(pathStr, 10)
     return this.nodes.get(childIndex)
@@ -955,7 +963,7 @@ class Node {
   getKeysAsDictionary() {
     const keys = {}
 
-    // PREF: prevent JS to search at prototype chain, performance concern
+    // PERF: prevent JS to search at prototype chain, performance concern
     keys.__proto__ = null
 
     this.nodes.forEach(child => {
@@ -963,7 +971,7 @@ class Node {
         keys[child.key] = true
         return
       }
-      // PREF: use the logic of utils._extend; becuase
+      // PERF: use the logic of utils._extend; becuase
       // Object.assign is about 2x~3x slower than utils._extend
       const childKeys = Object.keys(child.getKeysAsDictionary())
       childKeys.forEach(key => {
@@ -1379,7 +1387,7 @@ class Node {
 
   /**
    * Get the path of a descendant node by `key`, as string
-   * PREF: concat string is much faster than concat Array (at least in v8),
+   * PERF: concat string is much faster than concat Array (at least in v8),
    * becuase no extra space is required in v8's ConString
    *
    * @param {String|Node} key
