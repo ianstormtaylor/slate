@@ -793,7 +793,7 @@ class Node {
     const path = this.getPath(key)
     let node = this
 
-    // PERF: use find rather than for-in to prevent using v8's regenerator,
+    // PERF: use find rather than for-in to prevent using babel's regenerator,
     // which is slower than native JS engine
     path.find(index => {
       node = node.nodes.get(index)
