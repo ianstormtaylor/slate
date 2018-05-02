@@ -1908,7 +1908,7 @@ class Node {
 
     nodes.forEach((node, i) => {
       const ret = iterator(node, i, this.nodes)
-      if (ret != node) nodes = nodes.set(ret.key, ret)
+      if (ret != node) nodes = nodes.set(i, ret)
     })
 
     return this.set('nodes', nodes)
