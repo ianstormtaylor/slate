@@ -633,8 +633,8 @@ class Node {
 
   getDepth(key, startAt = 1) {
     this.assertDescendant(key)
-    if (this.hasChild(key)) return startAt
-    return this.getFurthestAncestor(key).getDepth(key, startAt + 1)
+    const path = this.getPath(key)
+    return path.length - 1 + startAt
   }
 
   /**
