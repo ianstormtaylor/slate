@@ -1003,6 +1003,8 @@ class Node {
    */
 
   getMarksAsArray() {
+    // PREF: use only one concat rather than multiple concat
+    // becuase one concat is faster
     const result = []
     this.nodes.forEach(node => {
       result.push(node.getMarksAsArray())
@@ -1032,6 +1034,7 @@ class Node {
     range = range.normalize(this)
     if (range.isUnset) return Set()
     if (range.isCollapsed) {
+      // PREF: range is not cachable, use key and offset as proxies for cache
       return this.getMarksAtPosition(range.startKey, range.startOffset)
     }
 
@@ -1053,6 +1056,7 @@ class Node {
     range = range.normalize(this)
     if (range.isUnset) return OrderedSet()
     if (range.isCollapsed) {
+      // PREF: range is not cachable, use key and offset as proxies for cache
       return this.getMarksAtPosition(range.startKey, range.startOffset)
     }
     const { startKey, startOffset, endKey, endOffset } = range
@@ -1171,39 +1175,6 @@ class Node {
     const char = text.characters.get(offset - 1)
     if (!char) return OrderedSet()
     return new OrderedSet(char.marks)
-  }
-
-  /**
-   * Get a set of marks in a `range`, by treating it as collapsed.
-   *
-   * @param {Range} range
-   * @return {Array}
-   */
-
-  getMarksAtCollapsedRangeAsArray(range) {
-    if (range.isUnset) return []
-
-    const { startKey, startOffset } = range
-
-    if (startOffset == 0) {
-      const previous = this.getPreviousText(startKey)
-      if (!previous || previous.text.length == 0) return []
-      if (
-        this.getClosestBlock(startKey) !== this.getClosestBlock(previous.key)
-      ) {
-        return []
-      }
-      const char = previous.characters.get(previous.text.length - 1)
-      if (!char) return []
-
-      return char.marks.toArray()
-    }
-
-    const text = this.getDescendant(startKey)
-    const char = text.characters.get(startOffset - 1)
-    if (!char) return []
-
-    return char.marks.toArray()
   }
 
   /**
