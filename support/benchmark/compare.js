@@ -42,8 +42,9 @@ baseline.forEach((suite, i) => {
       const balancePercent = b > c ? percent : (c - b) / b * 100
 
       let output = `${b.toFixed(2)} → ${c.toFixed(2)} ops/sec`
-      if (slower) output = chalk.red(`${output} (${percent}% slower)`)
-      else if (faster) output = chalk.green(`${output} (${percent}% faster)`)
+      if (slower) output = chalk.red(`${output} (${balancePercent}% slower)`)
+      else if (faster)
+        output = chalk.green(`${output} (${balancePercent}% faster)`)
       else output = chalk.gray(output)
 
       if (balancePercent > 1000) output += ' 😱'
