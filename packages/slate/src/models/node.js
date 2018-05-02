@@ -482,8 +482,8 @@ class Node {
     range = range.normalize(this)
     if (range.isUnset) return List()
     const { startKey, endKey, startOffset, endOffset } = range
-    const endText = this.getDescendant(endKey)
     if (startKey === endKey) {
+      const endText = this.getDescendant(endKey)
       return endText.characters.slice(startOffset, endOffset)
     }
 
