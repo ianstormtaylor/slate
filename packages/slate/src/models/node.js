@@ -1018,7 +1018,7 @@ class Node {
    */
 
   getMarksAtRange(range) {
-    return new Set(this.getOrderedMarkAtRange(range))
+    return new Set(this.getOrderedMarksAtRange(range))
   }
 
   /**
