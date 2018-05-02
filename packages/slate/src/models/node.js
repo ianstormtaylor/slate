@@ -1112,8 +1112,11 @@ class Node {
   getActiveMarksAtRange(range) {
     range = range.normalize(this)
     if (range.isUnset) return Set()
-    if (range.isCollapsed)
-      return this.getMarksAtPosition(range.startKey, range.startOffset).toSet()
+    if (range.isCollapsed) {
+      const { startKey, startOffset } = range
+      return this.getMarksAtPosition(startKey, startOffset).toSet()
+    }
+
     let { startKey, endKey, startOffset, endOffset } = range
     let startText = this.getDescendant(startKey)
     if (startKey !== endKey) {
