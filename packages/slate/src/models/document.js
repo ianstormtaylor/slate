@@ -98,7 +98,11 @@ class Document extends Record(DEFAULTS) {
    */
 
   static isDocument(any) {
-    return !!(any && any[MODEL_TYPES.DOCUMENT])
+    if (!any || !any.__proto__) return false
+    if (any.__proto__.hasOwnProperty) {
+      return any.__proto__.hasOwnProperty(MODEL_TYPES.DOCUMENT)
+    }
+    return !!any[MODEL_TYPES.DOCUMENT]
   }
 
   /**

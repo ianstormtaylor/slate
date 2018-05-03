@@ -85,7 +85,11 @@ class History extends Record(DEFAULTS) {
    */
 
   static isHistory(any) {
-    return !!(any && any[MODEL_TYPES.HISTORY])
+    if (!any || !any.__proto__) return false
+    if (any.__proto__.hasOwnProperty) {
+      return any.__proto__.hasOwnProperty(MODEL_TYPES.HISTORY)
+    }
+    return !!any[MODEL_TYPES.HISTORY]
   }
 
   /**

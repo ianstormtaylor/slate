@@ -129,7 +129,11 @@ class Block extends Record(DEFAULTS) {
    */
 
   static isBlock(any) {
-    return !!(any && any[MODEL_TYPES.BLOCK])
+    if (!any || !any.__proto__) return false
+    if (any.__proto__.hasOwnProperty) {
+      return any.__proto__.hasOwnProperty(MODEL_TYPES.BLOCK)
+    }
+    return !!any[MODEL_TYPES.BLOCK]
   }
 
   /**
