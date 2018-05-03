@@ -192,7 +192,11 @@ class Operation extends Record(DEFAULTS) {
    */
 
   static isOperation(any) {
-    return !!(any && any[MODEL_TYPES.OPERATION])
+    if (!any || !any.__proto__) return false
+    if (any.__proto__.hasOwnProperty) {
+      return any.__proto__.hasOwnProperty(MODEL_TYPES.OPERATION)
+    }
+    return !!any[MODEL_TYPES.OPERATION]
   }
 
   /**

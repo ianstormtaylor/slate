@@ -147,8 +147,12 @@ class Value extends Record(DEFAULTS) {
    * @return {Boolean}
    */
 
-  static isValue(value) {
-    return !!(value && value[MODEL_TYPES.VALUE])
+  static isValue(any) {
+    if (!any || !any.__proto__) return false
+    if (any.__proto__.hasOwnProperty) {
+      return any.__proto__.hasOwnProperty(MODEL_TYPES.VALUE)
+    }
+    return !!any[MODEL_TYPES.VALUE]
   }
 
   /**

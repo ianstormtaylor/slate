@@ -151,8 +151,12 @@ class Range extends Record(DEFAULTS) {
    * @return {Boolean}
    */
 
-  static isRange(obj) {
-    return !!(obj && obj[MODEL_TYPES.RANGE])
+  static isRange(any) {
+    if (!any || !any.__proto__) return false
+    if (any.__proto__.hasOwnProperty) {
+      return any.__proto__.hasOwnProperty(MODEL_TYPES.RANGE)
+    }
+    return !!any[MODEL_TYPES.RANGE]
   }
 
   /**
