@@ -4,6 +4,9 @@ import { IS_CHROME, IS_SAFARI, IS_OPERA } from 'slate-dev-environment'
 import getWindow from 'get-window'
 import findDOMNode from './find-dom-node'
 import { ZERO_WIDTH_SELECTOR, ZERO_WIDTH_ATTRIBUTE } from './find-point'
+import TRANSFER_TYPES from '../constants/transfer-types'
+
+const { FRAGMENT, HTML, TEXT } = TRANSFER_TYPES
 
 /**
  * Prepares a Slate document fragment to be copied to the clipboard.
@@ -32,7 +35,7 @@ function cloneFragment(event, value, fragment = value.fragment) {
 
   // Make sure attach is a non-empty node, since empty nodes will not get copied
   contents.childNodes.forEach(node => {
-    if (node.innerText.trim() !== '') {
+    if (node.innerText && node.innerText.trim() !== '') {
       attach = node
     }
   })
@@ -107,31 +110,30 @@ function cloneFragment(event, value, fragment = value.fragment) {
 
   attach.setAttribute('data-slate-fragment', encoded)
 
-  // Add the phony content to the DOM, and select it, so it will be copied.
-  const editor = event.target.closest('[data-slate-editor]')
+  // Add the phony content to a div element. This is needed to copy the
+  // contents into the html clipboard register.
   const div = window.document.createElement('div')
+  div.appendChild(contents)
+
+  // For browsers supporting it, we set the clipboard registers manually,
+  // since the result is more predictable.
+  if (event.clipboardData && event.clipboardData.setData) {
+    event.preventDefault()
+    event.clipboardData.setData(TEXT, native.toString())
+    event.clipboardData.setData(FRAGMENT, encoded)
+    event.clipboardData.setData(HTML, div.innerHTML)
+    return
+  }
+
+  // COMPAT: For browser that don't support the Clipboard API's setData method,
+  // we must rely on the browser to natively copy what's selected.
+  // So we add the div (containing our content) to the DOM, and select it.
+  const editor = event.target.closest('[data-slate-editor]')
   div.setAttribute('contenteditable', true)
   div.style.position = 'absolute'
   div.style.left = '-9999px'
-
-  // COMPAT: In Firefox, the viewport jumps to find the phony div, so it
-  // should be created at the current scroll offset with `style.top`.
-  // The box model attributes which can interact with 'top' are also reset.
-  div.style.border = '0px'
-  div.style.padding = '0px'
-  div.style.margin = '0px'
-  div.style.top = `${window.pageYOffset ||
-    window.document.documentElement.scrollTop}px`
-
-  div.appendChild(contents)
   editor.appendChild(div)
-
-  // COMPAT: In Firefox, trying to use the terser `native.selectAllChildren`
-  // throws an error, so we use the older `range` equivalent. (2016/06/21)
-  const r = window.document.createRange()
-  r.selectNodeContents(div)
-  native.removeAllRanges()
-  native.addRange(r)
+  native.selectAllChildren(div)
 
   // Revert to the previous selection right after copying.
   window.requestAnimationFrame(() => {
