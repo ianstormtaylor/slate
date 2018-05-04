@@ -30,7 +30,7 @@ const APPLIERS = {
     let { document } = value
     let node = document.assertPath(path)
     node = node.addMark(offset, length, mark)
-    document = document.updateNode(node)
+    document = document.updateNode(node, false)
     value = value.set('document', document)
     return value
   },
@@ -45,12 +45,8 @@ const APPLIERS = {
 
   insert_node(value, operation) {
     const { path, node } = operation
-    const index = path[path.length - 1]
-    const rest = path.slice(0, -1)
     let { document } = value
-    let parent = document.assertPath(rest)
-    parent = parent.insertNode(index, node)
-    document = document.updateNode(parent)
+    document = document.insertNode(path, node)
     value = value.set('document', document)
     return value
   },
@@ -71,7 +67,7 @@ const APPLIERS = {
 
     // Update the document
     node = node.insertText(offset, text, marks)
-    document = document.updateNode(node)
+    document = document.updateNode(node, false)
 
     // Update the selection
     if (anchorKey == node.key && anchorOffset >= offset) {
@@ -101,13 +97,9 @@ const APPLIERS = {
     let { document, selection } = value
     const one = document.assertPath(withPath)
     const two = document.assertPath(path)
-    let parent = document.getParent(one.key)
-    const oneIndex = parent.nodes.indexOf(one)
-    const twoIndex = parent.nodes.indexOf(two)
 
     // Perform the merge in the document.
-    parent = parent.mergeNode(oneIndex, twoIndex)
-    document = document.updateNode(parent)
+    document = document.mergeNode(withPath, path)
 
     // If the nodes are text nodes and the selection is inside the second node
     // update it to refer to the first node instead.
@@ -159,36 +151,19 @@ const APPLIERS = {
     const node = document.assertPath(path)
 
     // Remove the node from its current parent.
-    let parent = document.getParent(node.key)
-    parent = parent.removeNode(oldIndex)
-    document = document.updateNode(parent)
+    document = document.removeNode(path)
 
-    // Find the new target...
-    let target
-
-    // If the old path and the rest of the new path are the same, then the new
-    // target is the old parent.
     if (
-      oldParentPath.every((x, i) => x === newParentPath[i]) &&
-      oldParentPath.length === newParentPath.length
-    ) {
-      target = parent
-    } else if (
       oldParentPath.every((x, i) => x === newParentPath[i]) &&
       oldIndex < newParentPath[oldParentPath.length]
     ) {
-      // Otherwise, if the old path removal resulted in the new path being no longer
+      // If the old path removal resulted in the new path being no longer
       // correct, we need to decrement the new path at the old path's last index.
       newParentPath[oldParentPath.length]--
-      target = document.assertPath(newParentPath)
-    } else {
-      // Otherwise, we can just grab the target normally...
-      target = document.assertPath(newParentPath)
     }
 
     // Insert the new node to its new parent.
-    target = target.insertNode(newIndex, node)
-    document = document.updateNode(target)
+    document = document.insertNode([...newParentPath, newIndex], node)
     value = value.set('document', document)
     return value
   },
@@ -206,7 +181,7 @@ const APPLIERS = {
     let { document } = value
     let node = document.assertPath(path)
     node = node.removeMark(offset, length, mark)
-    document = document.updateNode(node)
+    document = document.updateNode(node, false)
     value = value.set('document', document)
     return value
   },
@@ -263,10 +238,7 @@ const APPLIERS = {
     }
 
     // Remove the node from the document.
-    let parent = document.getParent(node.key)
-    const index = parent.nodes.indexOf(node)
-    parent = parent.removeNode(index)
-    document = document.updateNode(parent)
+    document = document.removeNode(path)
 
     // Update the document and selection.
     value = value.set('document', document).set('selection', selection)
@@ -306,7 +278,7 @@ const APPLIERS = {
     }
 
     node = node.removeText(offset, length)
-    document = document.updateNode(node)
+    document = document.updateNode(node, false)
     value = value.set('document', document).set('selection', selection)
     return value
   },
@@ -324,7 +296,7 @@ const APPLIERS = {
     let { document } = value
     let node = document.assertPath(path)
     node = node.updateMark(offset, length, mark, properties)
-    document = document.updateNode(node)
+    document = document.updateNode(node, false)
     value = value.set('document', document)
     return value
   },
@@ -342,7 +314,7 @@ const APPLIERS = {
     let { document } = value
     let node = document.assertPath(path)
     node = node.merge(properties)
-    document = document.updateNode(node)
+    document = document.updateNode(node, false)
     value = value.set('document', document)
     return value
   },
@@ -402,20 +374,14 @@ const APPLIERS = {
     const { path, position, properties } = operation
     let { document, selection } = value
 
-    // Calculate a few things...
     const node = document.assertPath(path)
-    let parent = document.getParent(node.key)
-    const index = parent.nodes.indexOf(node)
-
-    // Split the node by its parent.
-    parent = parent.splitNode(index, position)
+    document = document.splitNode(path, position)
     if (properties) {
-      const splitNode = parent.nodes.get(index + 1)
+      const splitNode = document.getNextSibling(node.key)
       if (splitNode.object !== 'text') {
-        parent = parent.updateNode(splitNode.merge(properties))
+        document = document.updateNode(splitNode.merge(properties), false)
       }
     }
-    document = document.updateNode(parent)
 
     // Determine whether we need to update the selection...
     const { startKey, endKey, startOffset, endOffset } = selection

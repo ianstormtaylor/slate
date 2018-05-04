@@ -1,7 +1,7 @@
 import direction from 'direction'
 import isPlainObject from 'is-plain-object'
 import logger from 'slate-dev-logger'
-import { List, OrderedSet, Set } from 'immutable'
+import { List, Map, OrderedSet, Set } from 'immutable'
 
 import Block from './block'
 import Data from './data'
@@ -352,18 +352,14 @@ class Node {
     if (key == this.key) return List()
     if (this.hasChild(key)) return List([this])
 
-    let ancestors
-    this.nodes.find(node => {
-      if (node.object == 'text') return false
-      ancestors = node.getAncestors(key)
-      return ancestors
-    })
-
-    if (ancestors) {
-      return ancestors.unshift(this)
-    } else {
-      return null
+    const path = this.getPath(key)
+    if (path) {
+      return path.slice(0, -1).reduce((ancestors, index) => {
+        const parent = ancestors.last()
+        return ancestors.push(parent.nodes.get(index))
+      }, List([this]))
     }
+    return null
   }
 
   /**
@@ -598,21 +594,23 @@ class Node {
     if (one == this.key) return this
     if (two == this.key) return this
 
+    // Both of one and two are descendants of `this`,
+    // so at least `this` is the commom ancestor
     this.assertDescendant(one)
     this.assertDescendant(two)
-    let ancestors = new List()
-    let oneParent = this.getParent(one)
-    let twoParent = this.getParent(two)
 
-    while (oneParent) {
-      ancestors = ancestors.push(oneParent)
-      oneParent = this.getParent(oneParent.key)
-    }
+    const onePath = this.getPath(one)
+    const twoPath = this.getPath(two)
 
-    while (twoParent) {
-      if (ancestors.includes(twoParent)) return twoParent
-      twoParent = this.getParent(twoParent.key)
+    // Find the first different ancestor in path
+    let index = 0
+    for (; index < onePath.length; index += 1) {
+      if (onePath[index] !== twoPath[index]) {
+        break
+      }
     }
+    const commonAncestorPath = onePath.slice(0, index)
+    return this.getDescendantAtPath(commonAncestorPath)
   }
 
   /**
@@ -651,20 +649,12 @@ class Node {
 
   getDescendant(key) {
     key = assertKey(key)
-    let descendantFound = null
 
-    const found = this.nodes.find(node => {
-      if (node.key === key) {
-        return node
-      } else if (node.object !== 'text') {
-        descendantFound = node.getDescendant(key)
-        return descendantFound
-      } else {
-        return false
-      }
-    })
-
-    return descendantFound || found
+    const path = this.getPath(key)
+    if (path) {
+      return this.getDescendantAtPath(path)
+    }
+    return null
   }
 
   /**
@@ -725,32 +715,27 @@ class Node {
     // Split at the start and end.
     let child = startText
     let previous
-    let parent
 
-    while ((parent = node.getParent(child.key))) {
-      const index = parent.nodes.indexOf(child)
+    while (node.getParent(child.key)) {
       const position =
         child.object == 'text' ? startOffset : child.nodes.indexOf(previous)
 
-      parent = parent.splitNode(index, position)
-      node = node.updateNode(parent)
-      previous = parent.nodes.get(index + 1)
-      child = parent
+      node = node.splitNode(node.getPath(child.key), position)
+      previous = node.getNextSibling(child.key)
+      child = node.getParent(child.key)
     }
 
     child = startKey == endKey ? node.getNextText(startKey) : endText
 
-    while ((parent = node.getParent(child.key))) {
-      const index = parent.nodes.indexOf(child)
+    while (node.getParent(child.key)) {
       const position =
         child.object == 'text'
           ? startKey == endKey ? endOffset - startOffset : endOffset
           : child.nodes.indexOf(previous)
 
-      parent = parent.splitNode(index, position)
-      node = node.updateNode(parent)
-      previous = parent.nodes.get(index + 1)
-      child = parent
+      node = node.splitNode(node.getPath(child.key), position)
+      previous = node.getNextSibling(child.key)
+      child = node.getParent(child.key)
     }
 
     // Get the start and end nodes.
@@ -823,11 +808,12 @@ class Node {
 
   getFurthestAncestor(key) {
     key = assertKey(key)
-    return this.nodes.find(node => {
-      if (node.key == key) return true
-      if (node.object == 'text') return false
-      return node.hasDescendant(key)
-    })
+
+    const path = this.getPath(key)
+    if (path) {
+      return this.getDescendantAtPath(path.slice(0, 1))
+    }
+    return null
   }
 
   /**
@@ -1346,20 +1332,57 @@ class Node {
    */
 
   getParent(key) {
+    if (key === this.key) return null
     if (this.hasChild(key)) return this
 
-    let node = null
+    const path = this.getPath(key)
+    if (path) {
+      return this.getDescendantAtPath(path.slice(0, -1))
+    }
+    return null
+  }
 
-    this.nodes.find(child => {
-      if (child.object == 'text') {
+  forEachDescendantWithPath(
+    iterator,
+    ancestorPath = [],
+    changedChildIndex = 0
+  ) {
+    let ret
+
+    this.nodes.forEach((child, i) => {
+      if (i < changedChildIndex) {
+        ret = true
+        return true
+      }
+
+      const path = [...ancestorPath, i]
+      if (iterator(child, path) === false) {
+        ret = false
         return false
-      } else {
-        node = child.getParent(key)
-        return node
+      }
+
+      if (child.object != 'text') {
+        ret = child.forEachDescendantWithPath(iterator, path)
+        return ret
       }
     })
 
-    return node
+    return ret
+  }
+
+  regeneratePathsCache() {
+    this.__cache_paths = Map()
+    this.forEachDescendantWithPath((descendant, path) => {
+      this.__cache_paths = this.__cache_paths.set(descendant.key, path)
+    })
+  }
+
+  getPathsCache() {
+    return this.__cache_paths
+  }
+
+  setPathsCache(pathsCache) {
+    return (this.__cache_paths = pathsCache)
   }
 
   /**
@@ -1370,17 +1393,15 @@ class Node {
    */
 
   getPath(key) {
-    let child = this.assertNode(key)
-    const ancestors = this.getAncestors(key)
-    const path = []
+    if (key === this.key) {
+      return []
+    }
 
-    ancestors.reverse().forEach(ancestor => {
-      const index = ancestor.nodes.indexOf(child)
-      path.unshift(index)
-      child = ancestor
-    })
+    if (!this.getPathsCache()) {
+      this.regeneratePathsCache()
+    }
 
-    return path
+    return this.getPathsCache().get(key, null)
   }
 
   /**
@@ -1722,28 +1743,28 @@ class Node {
   }
 
   /**
-   * Insert a `node` at `index`.
+   * Insert a `node` at `path`.
    *
-   * @param {Number} index
+   * @param {Array} path
    * @param {Node} node
    * @return {Node}
    */
 
-  insertNode(index, node) {
-    const keys = this.getKeysAsArray()
-
-    if (keys.includes(node.key)) {
+  insertNode(path, node) {
+    if (this.hasDescendant(node.key)) {
       node = node.regenerateKey()
     }
 
     if (node.object != 'text') {
       node = node.mapDescendants(desc => {
-        return keys.includes(desc.key) ? desc.regenerateKey() : desc
+        return this.hasDescendant(desc.key) ? desc.regenerateKey() : desc
       })
     }
 
-    const nodes = this.nodes.insert(index, node)
-    return this.set('nodes', nodes)
+    const parent = this.getDescendantAtPath(path.slice(0, -1))
+    const index = path[path.length - 1]
+    const nodes = parent.nodes.insert(index, node)
+    return this.updateNode(parent.set('nodes', nodes), true, index)
   }
 
   /**
@@ -1816,15 +1837,14 @@ class Node {
    * `first` and `second` will be concatenated in that order.
    * `first` and `second` must be two Nodes or two Text.
    *
-   * @param {Node} first
-   * @param {Node} second
+   * @param {Array} withPath
+   * @param {Array} path
    * @return {Node}
    */
 
-  mergeNode(withIndex, index) {
-    let node = this
-    let one = node.nodes.get(withIndex)
-    const two = node.nodes.get(index)
+  mergeNode(withPath, path) {
+    let one = this.getDescendantAtPath(withPath)
+    const two = this.getDescendantAtPath(path)
 
     if (one.object != two.object) {
       throw new Error(
@@ -1844,10 +1864,18 @@ class Node {
       one = one.set('nodes', nodes)
     }
 
-    node = node.removeNode(index)
-    node = node.removeNode(withIndex)
-    node = node.insertNode(withIndex, one)
-    return node
+    const parent = this.getDescendantAtPath(path.slice(0, -1))
+    const nodes = parent.nodes.reduce((children, child) => {
+      if (child.key === one.key) {
+        return children.push(one)
+      }
+      if (child.key === two.key) {
+        return children
+      }
+      return children.push(child)
+    }, List())
+    const index = withPath[withPath.length - 1]
+    return this.updateNode(parent.set('nodes', nodes), true, index)
   }
 
   /**
@@ -1927,52 +1955,59 @@ class Node {
   }
 
   /**
-   * Remove a node at `index`.
+   * Remove a node at `path`.
    *
-   * @param {Number} index
+   * @param {Array} path
    * @return {Node}
    */
 
-  removeNode(index) {
-    const nodes = this.nodes.splice(index, 1)
-    return this.set('nodes', nodes)
+  removeNode(path) {
+    const node = this.getDescendantAtPath(path)
+    const parent = this.getParent(node.key)
+    const nodes = parent.nodes.filter(({ key }) => key !== node.key)
+    const index = path[path.length - 1]
+    return this.updateNode(parent.set('nodes', nodes), true, index)
   }
 
   /**
-   * Split a child node by `index` at `position`.
+   * Split a descendant node by `path` at `position`.
    *
-   * @param {Number} index
+   * @param {Array} path
    * @param {Number} position
    * @return {Node}
    */
 
-  splitNode(index, position) {
-    let node = this
-    const child = node.nodes.get(index)
+  splitNode(path, position) {
+    const descendant = this.getDescendantAtPath(path)
+
     let one
     let two
-
     // If the child is a text node, the `position` refers to the text offset at
     // which to split it.
-    if (child.object == 'text') {
-      const befores = child.characters.take(position)
-      const afters = child.characters.skip(position)
-      one = child.set('characters', befores)
-      two = child.set('characters', afters).regenerateKey()
+    if (descendant.object == 'text') {
+      const befores = descendant.characters.take(position)
+      const afters = descendant.characters.skip(position)
+      one = descendant.set('characters', befores)
+      two = descendant.set('characters', afters).regenerateKey()
     } else {
       // Otherwise, if the child is not a text node, the `position` refers to the
       // index at which to split its children.
-      const befores = child.nodes.take(position)
-      const afters = child.nodes.skip(position)
-      one = child.set('nodes', befores)
-      two = child.set('nodes', afters).regenerateKey()
+      const befores = descendant.nodes.take(position)
+      const afters = descendant.nodes.skip(position)
+      one = descendant.set('nodes', befores)
+      two = descendant.set('nodes', afters).regenerateKey()
     }
 
     // Remove the old node and insert the newly split children.
-    node = node.removeNode(index)
-    node = node.insertNode(index, two)
-    node = node.insertNode(index, one)
-    return node
+    const parent = this.getDescendantAtPath(path.slice(0, -1))
+    const nodes = parent.nodes.reduce((children, child) => {
+      if (child.key === one.key) {
+        return children.push(one, two)
+      }
+      return children.push(child)
+    }, List())
+    const index = path[path.length - 1]
+    return this.updateNode(parent.set('nodes', nodes), true, index)
   }
 
   /**
@@ -1982,14 +2017,34 @@ class Node {
    * @return {Node}
    */
 
-  updateNode(node) {
+  updateNode(node, willTreeChanged = true, changedChildIndex = 0) {
     if (node.key == this.key) {
       return node
     }
 
     let child = this.assertDescendant(node.key)
-    const ancestors = this.getAncestors(node.key)
 
+    let pathsCache = this.getPathsCache()
+    if (pathsCache && willTreeChanged) {
+      const path = this.getPath(child.key)
+      if (!Text.isText(child)) {
+        child.forEachDescendantWithPath(
+          descendant => (pathsCache = pathsCache.remove(descendant.key)),
+          path,
+          changedChildIndex
+        )
+      }
+      if (!Text.isText(node)) {
+        node.forEachDescendantWithPath(
+          (descendant, descendantPath) =>
+            (pathsCache = pathsCache.set(descendant.key, descendantPath)),
+          path,
+          changedChildIndex
+        )
+      }
+    }
+
+    const ancestors = this.getAncestors(node.key)
     ancestors.reverse().forEach(parent => {
       let { nodes } = parent
       const index = nodes.indexOf(child)
@@ -1999,6 +2054,7 @@ class Node {
       node = parent
     })
 
+    node.setPathsCache(pathsCache)
     return node
   }
 
