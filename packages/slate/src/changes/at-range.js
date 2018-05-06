@@ -874,8 +874,8 @@ Changes.insertTextAtRange = (change, range, text, marks, options = {}) => {
     const ancestors = document
       .getAncestors(commonAncestor.key)
       .push(commonAncestor)
-    const normalizeAncestor = ancestors.findLast(n =>
-      n.object === 'document' || change.value.document.getDescendant(n.key)
+    const normalizeAncestor = ancestors.findLast(
+      n => n.object === 'document' || change.value.document.getDescendant(n.key)
     )
     change.normalizeNodeByKey(normalizeAncestor.key)
   }
