@@ -1,7 +1,7 @@
 import direction from 'direction'
 import isPlainObject from 'is-plain-object'
 import logger from 'slate-dev-logger'
-import { List, OrderedSet, Set } from 'immutable'
+import { List, OrderedSet, Set, OrderedMap } from 'immutable'
 
 import Block from './block'
 import Data from './data'
@@ -244,6 +244,7 @@ class Node {
 
   /**
    * Assert that a node's tree has a node by `key` and return it.
+   * Includes the node itself
    *
    * @param {String} key
    * @return {Node}
@@ -350,20 +351,21 @@ class Node {
     key = assertKey(key)
 
     if (key == this.key) return List()
-    if (this.hasChild(key)) return List([this])
 
-    let ancestors
-    this.nodes.find(node => {
-      if (node.object == 'text') return false
-      ancestors = node.getAncestors(key)
-      return ancestors
-    })
+    const parentMap = this.getParentMap()
 
-    if (ancestors) {
-      return ancestors.unshift(this)
-    } else {
+    let parent = parentMap.get(key)
+    if (!parent) {
       return null
     }
+
+    const ancestors = []
+    while (parent) {
+      ancestors.unshift(parent)
+      parent = parentMap.get(parent.key)
+    }
+
+    return List(ancestors)
   }
 
   /**
@@ -586,33 +588,27 @@ class Node {
   /**
    * Get the common ancestor of nodes `one` and `two` by keys.
    *
-   * @param {String} one
-   * @param {String} two
+   * @param {String} a
+   * @param {String} b
    * @return {Node}
    */
 
-  getCommonAncestor(one, two) {
-    one = assertKey(one)
-    two = assertKey(two)
+  getCommonAncestor(a, b) {
+    a = assertKey(a)
+    b = assertKey(b)
 
-    if (one == this.key) return this
-    if (two == this.key) return this
+    if (a == this.key) return this
+    if (b == this.key) return this
 
-    this.assertDescendant(one)
-    this.assertDescendant(two)
-    let ancestors = new List()
-    let oneParent = this.getParent(one)
-    let twoParent = this.getParent(two)
+    const aAncestors = this.getAncestors(a)
+    const bAncestors = this.getAncestors(b)
 
-    while (oneParent) {
-      ancestors = ancestors.push(oneParent)
-      oneParent = this.getParent(oneParent.key)
+    if (!aAncestors || !bAncestors) {
+      // Fail
+      return this.assertDescendant(a) && this.assertDescendant(b)
     }
 
-    while (twoParent) {
-      if (ancestors.includes(twoParent)) return twoParent
-      twoParent = this.getParent(twoParent.key)
-    }
+    return aAncestors.findLast(ancestor => bAncestors.contains(ancestor))
   }
 
   /**
@@ -651,20 +647,10 @@ class Node {
 
   getDescendant(key) {
     key = assertKey(key)
-    let descendantFound = null
 
-    const found = this.nodes.find(node => {
-      if (node.key === key) {
-        return node
-      } else if (node.object !== 'text') {
-        descendantFound = node.getDescendant(key)
-        return descendantFound
-      } else {
-        return false
-      }
-    })
-
-    return descendantFound || found
+    const parentMap = this.getParentMap()
+    const parent = parentMap.get(key)
+    return parent && parent.getChild(key)
   }
 
   /**
@@ -957,13 +943,9 @@ class Node {
    */
 
   getKeysAsArray() {
-    const keys = []
-
-    this.forEachDescendant(desc => {
-      keys.push(desc.key)
-    })
-
-    return keys
+    return this.getParentMap()
+      .keySeq()
+      .toArray()
   }
 
   /**
@@ -973,7 +955,7 @@ class Node {
    */
 
   getKeys() {
-    const keys = this.getKeysAsArray()
+    const keys = this.getParentMap().keySeq()
     return new Set(keys)
   }
 
@@ -1275,6 +1257,7 @@ class Node {
 
   /**
    * Get a node in the tree by `key`.
+   * Includes the node itself
    *
    * @param {String} key
    * @return {Node|Null}
@@ -1346,20 +1329,28 @@ class Node {
    */
 
   getParent(key) {
-    if (this.hasChild(key)) return this
+    return this.getParentMap().get(key)
+  }
 
-    let node = null
+  /**
+   * Get the parent map of this node
+   * @return {OrderedMap<String, Node>} OrderedMap<key, parentNode>
+   *   the order is the same than the order of forEachDescendant
+   */
 
-    this.nodes.find(child => {
-      if (child.object == 'text') {
-        return false
-      } else {
-        node = child.getParent(key)
-        return node
-      }
+  getParentMap() {
+    if (this.object === 'text') {
+      return OrderedMap()
+    }
+
+    return OrderedMap().withMutations(map => {
+      this.nodes.forEach(child => {
+        map.set(child.key, this)
+        if (child.object !== 'text') {
+          map.merge(child.getParentMap())
+        }
+      })
     })
-
-    return node
   }
 
   /**
@@ -2061,7 +2052,6 @@ memoize(Node.prototype, [
   'getClosestBlock',
   'getClosestInline',
   'getClosestVoid',
-  'getCommonAncestor',
   'getDecorations',
   'getDepth',
   'getDescendant',
@@ -2078,7 +2068,6 @@ memoize(Node.prototype, [
   'getMarksAsArray',
   'getMarksAtRangeAsArray',
   'getInsertMarksAtRangeAsArray',
-  'getKeysAsArray',
   'getLastText',
   'getMarksByTypeAsArray',
   'getNextBlock',
@@ -2088,7 +2077,7 @@ memoize(Node.prototype, [
   'getNodeAtPath',
   'getOffset',
   'getOffsetAtRange',
-  'getParent',
+  'getParentMap',
   'getPath',
   'getPlaceholder',
   'getPreviousBlock',
