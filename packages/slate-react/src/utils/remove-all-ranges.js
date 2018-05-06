@@ -1,12 +1,13 @@
 /**
  * COMPAT: if we are in <= IE11 and the selection contains
- * tables, `removeAllRanges()` will throw 
+ * tables, `removeAllRanges()` will throw
  * "unable to complete the operation due to error 800a025e"
- * 
- * @param {Selection} selection 
+ *
+ * @param {Selection} selection
  */
 function removeAllRanges(selection) {
-  if (document.body.createTextRange) { // All IE but Edge
+  if (document.body.createTextRange) {
+    // All IE but Edge
     const range = document.body.createTextRange()
     range.collapse()
     range.select()
