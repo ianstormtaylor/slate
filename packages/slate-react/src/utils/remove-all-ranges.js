@@ -3,12 +3,14 @@
  * tables, `removeAllRanges()` will throw
  * "unable to complete the operation due to error 800a025e"
  *
- * @param {Selection} selection
+ * @param {Selection} selection document selection
  */
+
 function removeAllRanges(selection) {
-  if (document.body.createTextRange) {
+  const doc = window.document
+  if (doc && doc.body.createTextRange) {
     // All IE but Edge
-    const range = document.body.createTextRange()
+    const range = doc.body.createTextRange()
     range.collapse()
     range.select()
   } else {
