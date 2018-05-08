@@ -32,6 +32,7 @@ export default function MySlatePlugin(options) {
   onKeyUp: Function,
   onPaste: Function,
   onSelect: Function
+  shouldNodeComponentUpdate: Function
 }
 ```
 
@@ -112,6 +113,9 @@ _Note: This is **not** Slate's internal selection representation (although it mi
 ```js
 {
   onChange: Function
+  renderEditor: Function
+  schema: Function
+  shouldNodeComponentUpdate: Function
 }
 ```
 
@@ -132,3 +136,23 @@ The `renderEditor` property allows you to define higher-order-component-like beh
 `Object`
 
 The `schema` property allows you to define a set of rules that will be added to the editor's schema. The rules from each of the schemas returned by the plugins are collected into a single schema for the editor.
+
+### `shouldNodeComponentUpdate`
+
+`Function shouldNodeComponentUpdate(props: Object, nextProps: Object) => boolean || null`
+
+To everride slate's default `shouldComponentUpdate` behavior, add this property in and define any custom logic. For example:
+
+```js
+{
+  shouldNodeComponentUpdate: (props, nextProps) => {
+    if (props.node.type === 'my-custom-type') {
+      return true;
+    }
+    
+    return null;
+  }
+}
+```
+
+If `shouldNodeComponentUpdate` returns false, Slate will still figure out whether a re-render is needed or not.
