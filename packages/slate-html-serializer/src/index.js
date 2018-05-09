@@ -299,7 +299,7 @@ class Html {
           leaf.marks.push({ type, data })
           return leaf
         })
-      } else {
+      } else if (node.nodes) {
         node.nodes = node.nodes.map(applyMark)
       }
 
