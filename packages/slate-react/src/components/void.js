@@ -66,26 +66,19 @@ class Void extends React.Component {
     }
 
     const spacer = (
-      <Tag
-        contentEditable
-        data-slate-spacer
-        suppressContentEditableWarning
-        style={style}
-      >
+      <Tag data-slate-spacer style={style}>
         {this.renderText()}
       </Tag>
     )
 
-    const content = <Tag draggable={readOnly ? null : true}>{children}</Tag>
+    const content = (
+      <Tag contentEditable={readOnly ? null : false}>{children}</Tag>
+    )
 
     this.debug('render', { props })
 
     return (
-      <Tag
-        data-slate-void
-        data-key={node.key}
-        contentEditable={readOnly ? null : false}
-      >
+      <Tag data-slate-void data-key={node.key}>
         {readOnly ? null : spacer}
         {content}
       </Tag>

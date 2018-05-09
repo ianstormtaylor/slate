@@ -99,9 +99,21 @@ class Leaf extends React.Component {
     const { marks, node, offset, text, editor } = this.props
     const { stack } = editor
     const leaf = this.renderText()
+    const attributes = {
+      'data-slate-leaf': true,
+    }
 
     return marks.reduce((children, mark) => {
-      const props = { editor, mark, marks, node, offset, text, children }
+      const props = {
+        editor,
+        mark,
+        marks,
+        node,
+        offset,
+        text,
+        children,
+        attributes,
+      }
       const element = stack.find('renderMark', props)
       return element || children
     }, leaf)

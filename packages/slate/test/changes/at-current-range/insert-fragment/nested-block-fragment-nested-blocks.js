@@ -29,12 +29,14 @@ export const output = (
   <value>
     <document>
       <quote>
-        <paragraph>woone</paragraph>
+        <paragraph>wo</paragraph>
         <quote>
-          <quote>
-            <cursor />tword
-          </quote>
+          <quote>one</quote>
+          <quote>two</quote>
         </quote>
+        <paragraph>
+          rd<cursor />
+        </paragraph>
       </quote>
     </document>
   </value>

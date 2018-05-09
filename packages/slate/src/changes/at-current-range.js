@@ -40,6 +40,11 @@ PROXY_TRANSFORMS.forEach(method => {
     const { selection } = value
     const methodAtRange = `${method}AtRange`
     change[methodAtRange](selection, ...args)
+    if (method.match(/Backward$/)) {
+      change.collapseToStart()
+    } else if (method.match(/Forward$/)) {
+      change.collapseToEnd()
+    }
   }
 })
 
@@ -145,11 +150,16 @@ Changes.insertFragment = (change, fragment) => {
   const { startText, endText, startInline } = value
   const lastText = fragment.getLastText()
   const lastInline = fragment.getClosestInline(lastText.key)
+  const firstChild = fragment.nodes.first()
+  const lastChild = fragment.nodes.last()
   const keys = document.getTexts().map(text => text.key)
   const isAppending =
     !startInline ||
     selection.hasEdgeAtStartOf(startText) ||
     selection.hasEdgeAtEndOf(endText)
+
+  const isInserting =
+    fragment.hasBlocks(firstChild.key) || fragment.hasBlocks(lastChild.key)
 
   change.insertFragmentAtRange(selection, fragment)
   value = change.value
@@ -158,7 +168,7 @@ Changes.insertFragment = (change, fragment) => {
   const newTexts = document.getTexts().filter(n => !keys.includes(n.key))
   const newText = isAppending ? newTexts.last() : newTexts.takeLast(2).first()
 
-  if (newText && lastInline) {
+  if ((newText && lastInline) || isInserting) {
     change.select(selection.collapseToEndOf(newText))
   } else if (newText) {
     change.select(
@@ -217,8 +227,12 @@ Changes.insertText = (change, text, marks) => {
 
 Changes.splitBlock = (change, depth = 1) => {
   const { value } = change
-  const { selection } = value
+  const { selection, document } = value
+  const marks = selection.marks || document.getInsertMarksAtRange(selection)
   change.splitBlockAtRange(selection, depth).collapseToEnd()
+  if (marks && marks.size !== 0) {
+    change.select({ marks })
+  }
 }
 
 /**

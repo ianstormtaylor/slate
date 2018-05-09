@@ -1,14 +1,14 @@
 import Debug from 'debug'
 import getWindow from 'get-window'
 import { findDOMNode } from 'react-dom'
-
-import HOTKEYS from '../constants/hotkeys'
+import Hotkeys from 'slate-hotkeys'
 import {
   IS_FIREFOX,
   IS_IOS,
   IS_ANDROID,
   SUPPORTED_EVENTS,
-} from '../constants/environment'
+} from 'slate-dev-environment'
+
 import findNode from '../utils/find-node'
 
 /**
@@ -143,7 +143,10 @@ function BeforePlugin() {
       // HACK: we need to re-render the editor here so that it will update its
       // placeholder in case one is currently rendered. This should be handled
       // differently ideally, in a less invasive way?
-      editor.setState({ isComposing: false })
+      // (apply force re-render if isComposing changes)
+      if (editor.state.isComposing) {
+        editor.setState({ isComposing: false })
+      }
     })
 
     debug('onCompositionEnd', { event })
@@ -164,7 +167,10 @@ function BeforePlugin() {
     // HACK: we need to re-render the editor here so that it will update its
     // placeholder in case one is currently rendered. This should be handled
     // differently ideally, in a less invasive way?
-    editor.setState({ isComposing: true })
+    // (apply force re-render if isComposing changes)
+    if (!editor.state.isComposing) {
+      editor.setState({ isComposing: true })
+    }
 
     debug('onCompositionStart', { event })
   }
@@ -270,10 +276,10 @@ function BeforePlugin() {
     if (node.isVoid) event.preventDefault()
 
     // If a drag is already in progress, don't do this again.
-    if (isDragging) return true
-
-    isDragging = true
-    event.nativeEvent.dataTransfer.dropEffect = 'move'
+    if (!isDragging) {
+      isDragging = true
+      event.nativeEvent.dataTransfer.dropEffect = 'move'
+    }
 
     debug('onDragOver', { event })
   }
@@ -369,13 +375,13 @@ function BeforePlugin() {
     // typing. However, certain characters also move the selection before
     // we're able to handle it, so prevent their default behavior.
     if (isComposing) {
-      if (HOTKEYS.COMPOSING(event)) event.preventDefault()
+      if (Hotkeys.isComposing(event)) event.preventDefault()
       return true
     }
 
     // Certain hotkeys have native behavior in contenteditable elements which
     // will cause our value to be out of sync, so prevent them.
-    if (HOTKEYS.CONTENTEDITABLE(event) && !IS_IOS) {
+    if (Hotkeys.isContentEditable(event) && !IS_IOS) {
       event.preventDefault()
     }
 

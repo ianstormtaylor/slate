@@ -85,6 +85,7 @@ if (browser) {
  */
 
 export const IS_CHROME = BROWSER === 'chrome'
+export const IS_OPERA = BROWSER === 'opera'
 export const IS_FIREFOX = BROWSER === 'firefox'
 export const IS_SAFARI = BROWSER === 'safari'
 export const IS_IE = BROWSER === 'ie'

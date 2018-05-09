@@ -2,6 +2,7 @@ import Block from '../models/block'
 import Inline from '../models/inline'
 import Mark from '../models/mark'
 import Node from '../models/node'
+import Range from '../models/range'
 
 /**
  * Changes.
@@ -347,6 +348,71 @@ Changes.removeNodeByKey = (change, key, options = {}) => {
 }
 
 /**
+ * Insert `text` at `offset` in node by `key`.
+ *
+ * @param {Change} change
+ * @param {String} key
+ * @param {String} text
+ * @param {Set<Mark>} marks (optional)
+ * @param {Object} options
+ *   @property {Boolean} normalize
+ */
+
+Changes.setTextByKey = (change, key, text, marks, options = {}) => {
+  const textNode = change.value.document.getDescendant(key)
+  change.replaceTextByKey(key, 0, textNode.text.length, text, marks, options)
+}
+
+/**
+ * Replace A Length of Text with another string or text
+ * @param {Change} change
+ * @param {String} key
+ * @param {Number} offset
+ * @param {Number} length
+ * @param {string} text
+ * @param {Set<Mark>} marks (optional)
+ * @param {Object} options
+ *   @property {Boolean} normalize
+ *
+ */
+
+Changes.replaceTextByKey = (
+  change,
+  key,
+  offset,
+  length,
+  text,
+  marks,
+  options
+) => {
+  const { document } = change.value
+  const textNode = document.getDescendant(key)
+  if (length + offset > textNode.text.length) {
+    length = textNode.text.length - offset
+  }
+  const range = Range.create({
+    anchorKey: key,
+    focusKey: key,
+    anchorOffset: offset,
+    focusOffset: offset + length,
+  })
+  let activeMarks = document.getActiveMarksAtRange(range)
+
+  change.removeTextByKey(key, offset, length, { normalize: false })
+  if (!marks) {
+    // Do not use mark at index when marks and activeMarks are both empty
+    marks = activeMarks ? activeMarks : []
+  } else if (activeMarks) {
+    // Do not use `has` because we may want to reset marks like font-size with an updated data;
+    activeMarks = activeMarks.filter(
+      activeMark => !marks.find(m => activeMark.type === m.type)
+    )
+    marks = activeMarks.merge(marks)
+  }
+  change.insertTextByKey(key, offset, text, marks, options)
+}
+
+/**
  * Remove text at `offset` and `length` in node by `key`.
  *
  * @param {Change} change
@@ -423,7 +489,7 @@ Changes.replaceNodeByKey = (change, key, newNode, options = {}) => {
   const parent = document.getParent(key)
   const index = parent.nodes.indexOf(node)
   change.removeNodeByKey(key, { normalize: false })
-  change.insertNodeByKey(parent.key, index, newNode, options)
+  change.insertNodeByKey(parent.key, index, newNode, { normalize: false })
   if (normalize) {
     change.normalizeNodeByKey(parent.key)
   }

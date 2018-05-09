@@ -17,7 +17,7 @@ function decorateNode(block) {
 }
 
 function Bold(props) {
-  return React.createElement('strong', null, props.children)
+  return React.createElement('strong', { ...props.attributes }, props.children)
 }
 
 function renderMark(props) {
@@ -45,7 +45,7 @@ export const output = `
   <div style="position:relative">
     <span>
       <span>o</span>
-      <span><strong>n</strong></span>
+      <span><strong data-slate-leaf="true">n</strong></span>
       <span>e</span>
     </span>
   </div>

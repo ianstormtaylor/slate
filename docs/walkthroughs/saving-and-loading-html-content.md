@@ -268,13 +268,14 @@ class App extends React.Component {
 
   // Add a `renderMark` method to render marks.
   renderMark = props => {
-    switch (props.mark.type) {
+    const { mark, attributes } = props
+    switch (mark.type) {
       case 'bold':
-        return <strong>{props.children}</strong>
+        return <strong {...{ attributes }}>{props.children}</strong>
       case 'italic':
-        return <em>{props.children}</em>
+        return <em {...{ attributes }}>{props.children}</em>
       case 'underline':
-        return <u>{props.children}</u>
+        return <u {...{ attributes }}>{props.children}</u>
     }
   }
 }

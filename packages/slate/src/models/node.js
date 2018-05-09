@@ -1663,6 +1663,32 @@ class Node {
   }
 
   /**
+   * Check if a node has block node children.
+   *
+   * @param {String} key
+   * @return {Boolean}
+   */
+
+  hasBlocks(key) {
+    const node = this.assertNode(key)
+    return !!(node.nodes && node.nodes.find(n => n.object === 'block'))
+  }
+
+  /**
+   * Check if a node has inline node children.
+   *
+   * @param {String} key
+   * @return {Boolean}
+   */
+
+  hasInlines(key) {
+    const node = this.assertNode(key)
+    return !!(
+      node.nodes && node.nodes.find(n => Inline.isInline(n) || Text.isText(n))
+    )
+  }
+
+  /**
    * Recursively check if a child node exists by `key`.
    *
    * @param {String} key
@@ -1854,13 +1880,12 @@ class Node {
   mapDescendants(iterator) {
     let { nodes } = this
 
-    nodes.forEach((node, i) => {
+    nodes.forEach((node, index) => {
       let ret = node
       if (ret.object != 'text') ret = ret.mapDescendants(iterator)
-      ret = iterator(ret, i, this.nodes)
+      ret = iterator(ret, index, this.nodes)
       if (ret == node) return
 
-      const index = nodes.indexOf(node)
       nodes = nodes.set(index, ret)
     })
 

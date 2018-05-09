@@ -2,6 +2,12 @@ import Debug from 'debug'
 import React from 'react'
 import Types from 'prop-types'
 import getWindow from 'get-window'
+import {
+  IS_FIREFOX,
+  IS_IOS,
+  IS_ANDROID,
+  SUPPORTED_EVENTS,
+} from 'slate-dev-environment'
 import logger from 'slate-dev-logger'
 import throttle from 'lodash/throttle'
 
@@ -11,12 +17,6 @@ import findDOMRange from '../utils/find-dom-range'
 import findRange from '../utils/find-range'
 import getChildrenDecorations from '../utils/get-children-decorations'
 import scrollToSelection from '../utils/scroll-to-selection'
-import {
-  IS_FIREFOX,
-  IS_IOS,
-  IS_ANDROID,
-  SUPPORTED_EVENTS,
-} from '../constants/environment'
 
 /**
  * Debug.
@@ -72,7 +72,6 @@ class Content extends React.Component {
   constructor(props) {
     super(props)
     this.tmp = {}
-    this.tmp.key = 0
     this.tmp.isUpdatingSelection = false
 
     EVENT_HANDLERS.forEach(handler => {
@@ -277,12 +276,6 @@ class Content extends React.Component {
   onEvent(handler, event) {
     debug('onEvent', handler)
 
-    // COMPAT: Composition events can change the DOM out of under React, so we
-    // increment this key to ensure that a full re-render happens. (2017/10/16)
-    if (handler == 'onCompositionEnd') {
-      this.tmp.key++
-    }
-
     // Ignore `onBlur`, `onFocus` and `onSelect` events generated
     // programmatically while updating selection.
     if (
@@ -451,7 +444,15 @@ class Content extends React.Component {
 
   render() {
     const { props } = this
-    const { className, readOnly, editor, tabIndex, role, tagName } = props
+    const {
+      className,
+      readOnly,
+      editor,
+      tabIndex,
+      role,
+      tagName,
+      spellCheck,
+    } = props
     const { value, stack } = editor
     const Container = tagName
     const { document, selection, decorations } = value
@@ -485,18 +486,12 @@ class Content extends React.Component {
       ...props.style,
     }
 
-    // COMPAT: In Firefox, spellchecking can remove entire wrapping elements
-    // including inline ones like `<a>`, which is jarring for the user but also
-    // causes the DOM to get into an irreconcilable value. (2016/09/01)
-    const spellCheck = IS_FIREFOX ? false : props.spellCheck
-
     debug('render', { props })
 
     return (
       <Container
         {...handlers}
         data-slate-editor
-        key={this.tmp.key}
         ref={this.ref}
         data-key={document.key}
         contentEditable={readOnly ? null : true}
