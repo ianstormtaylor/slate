@@ -24,6 +24,13 @@ If you don't include one of these, there's a very good chance your pull request 
 If your change is non-trivial, please include a short description of how the new logic works, and why you decided to solve it the way you did. This is incredibly helpful so that reviewers don't have to guess based on the code.
 -->
 
+#### Checklist
+
+<!-- Please make sure your PR passes tests and respects code-formatting rules -->
+
+* [ ] Tests passed (`yarn run test`)
+* [ ] Linting passed (`yarn run lint`). To automatically fix potential errors, try `yarn run prettier`.
+
 Fixes: #
 
 Reviewers: @
