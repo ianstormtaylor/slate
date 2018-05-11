@@ -1,10 +1,11 @@
 import Base64 from 'slate-base64-serializer'
 import { IS_CHROME, IS_SAFARI, IS_OPERA } from 'slate-dev-environment'
 
+import TRANSFER_TYPES from '../constants/transfer-types'
 import getWindow from 'get-window'
 import findDOMNode from './find-dom-node'
+import removeAllRanges from './remove-all-ranges'
 import { ZERO_WIDTH_SELECTOR, ZERO_WIDTH_ATTRIBUTE } from './find-point'
-import TRANSFER_TYPES from '../constants/transfer-types'
 
 const { FRAGMENT, HTML, TEXT } = TRANSFER_TYPES
 
@@ -138,7 +139,7 @@ function cloneFragment(event, value, fragment = value.fragment) {
   // Revert to the previous selection right after copying.
   window.requestAnimationFrame(() => {
     editor.removeChild(div)
-    native.removeAllRanges()
+    removeAllRanges(native)
     native.addRange(range)
   })
 }

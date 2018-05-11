@@ -16,6 +16,7 @@ import Node from './node'
 import findDOMRange from '../utils/find-dom-range'
 import findRange from '../utils/find-range'
 import scrollToSelection from '../utils/scroll-to-selection'
+import removeAllRanges from '../utils/remove-all-ranges'
 
 /**
  * Debug.
@@ -151,7 +152,7 @@ class Content extends React.Component {
     // DOM, blur it manually.
     if (selection.isBlurred) {
       if (!this.isInEditor(anchorNode)) return
-      native.removeAllRanges()
+      removeAllRanges(native)
       this.element.blur()
       debug('updateSelection', { selection, native })
       return
@@ -195,7 +196,7 @@ class Content extends React.Component {
 
     // Otherwise, set the `isUpdatingSelection` flag and update the selection.
     this.tmp.isUpdatingSelection = true
-    native.removeAllRanges()
+    removeAllRanges(native)
 
     // COMPAT: IE 11 does not support Selection.setBaseAndExtent
     if (native.setBaseAndExtent) {

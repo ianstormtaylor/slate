@@ -11,9 +11,9 @@ https://slate-slack.herokuapp.com/
 <!-- 
 For bugs, you **must** include the following: 
 
-  - A JSFiddle that minimally reproduces the issue.
-  - A GIF showing the issue in action.
-  - Information about your OS, browser, Slate version, etc.
+- A JSFiddle that minimally reproduces the issue.
+- A GIF showing the issue in action.
+- Information about your OS, browser, Slate version, etc.
 
 If you don't include these, there's a very good chance your issue will be closed, because it's much too hard to figure out exactly what is going wrong, and it makes maintenance much harder.
 

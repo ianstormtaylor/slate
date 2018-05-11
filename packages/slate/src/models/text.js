@@ -297,6 +297,66 @@ class Text extends Record(DEFAULTS) {
   }
 
   /**
+   * Get all of the active marks on between two offsets
+   *
+   * @return {Set<Mark>}
+   */
+
+  getActiveMarksBetweenOffsets(startOffset, endOffset) {
+    if (startOffset === 0 && endOffset === this.characters.size) {
+      return this.getActiveMarks()
+    }
+    const startCharacter = this.characters.get(startOffset)
+    if (!startCharacter) return Set()
+    const result = startCharacter.marks
+    if (result.size === 0) return result
+    return result.withMutations(x => {
+      for (let index = startOffset + 1; index < endOffset; index++) {
+        const c = this.characters.get(index)
+        x.intersect(c.marks)
+        if (x.size === 0) return
+      }
+    })
+  }
+
+  /**
+   * Get all of the active marks on the text
+   *
+   * @return {Set<Mark>}
+   */
+
+  getActiveMarks() {
+    if (this.characters.size === 0) return Set()
+    const result = this.characters.first().marks
+    if (result.size === 0) return result
+
+    return result.withMutations(x => {
+      this.characters.forEach(c => {
+        x.intersect(c.marks)
+        if (x.size === 0) return false
+      })
+    })
+  }
+
+  /**
+   * Get all of the marks on between two offsets
+   *
+   * @return {OrderedSet<Mark>}
+   */
+
+  getMarksBetweenOffsets(startOffset, endOffset) {
+    if (startOffset === 0 && endOffset === this.characters.size) {
+      return this.getMarks()
+    }
+    return new OrderedSet().withMutations(result => {
+      for (let index = startOffset; index < endOffset; index++) {
+        const c = this.characters.get(index)
+        result.union(c.marks)
+      }
+    })
+  }
+
+  /**
    * Get all of the marks on the text.
    *
    * @return {OrderedSet<Mark>}
@@ -314,9 +374,19 @@ class Text extends Record(DEFAULTS) {
    */
 
   getMarksAsArray() {
-    return this.characters.reduce((array, char) => {
-      return array.concat(char.marks.toArray())
-    }, [])
+    if (this.characters.size === 0) return []
+    const first = this.characters.first().marks
+    let previousMark = first
+    const result = []
+    this.characters.forEach(c => {
+      // If the character marks is the same with the
+      // previous characters, we do not need to
+      // add the marks twice
+      if (c.marks === previousMark) return true
+      previousMark = c.marks
+      result.push(previousMark.toArray())
+    })
+    return Array.prototype.concat.apply(first.toArray(), result)
   }
 
   /**
@@ -519,14 +589,13 @@ Text.prototype[MODEL_TYPES.TEXT] = true
  * Memoize read methods.
  */
 
-memoize(Text.prototype, ['getMarks', 'getMarksAsArray'], {
-  takesArguments: false,
-})
-
 memoize(Text.prototype, [
   'getDecoratedCharacters',
   'getDecorations',
   'getLeaves',
+  'getActiveMarks',
+  'getMarks',
+  'getMarksAsArray',
   'getMarksAtIndex',
   'validate',
 ])
