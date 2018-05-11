@@ -7,6 +7,7 @@ import Types from 'prop-types'
 
 import Void from './void'
 import Text from './text'
+import getChildrenDecorations from '../utils/get-children-decorations'
 
 /**
  * Debug.
@@ -118,18 +119,31 @@ class Node extends React.Component {
 
   render() {
     this.debug('render', this)
-
-    const { editor, isSelected, node, parent, readOnly } = this.props
+    const {
+      editor,
+      isSelected,
+      node,
+      decorations,
+      parent,
+      readOnly,
+    } = this.props
     const { value } = editor
     const { selection } = value
     const { stack } = editor
     const indexes = node.getSelectionIndexes(selection, isSelected)
-    let children = node.nodes.toArray().map((child, i) => {
+    const decs = decorations.concat(node.getDecorations(stack))
+    const childrenDecorations = getChildrenDecorations(node, decs)
+
+    let children = []
+    node.nodes.forEach((child, i) => {
       const isChildSelected = !!indexes && indexes.start <= i && i < indexes.end
-      return this.renderNode(child, isChildSelected)
+
+      children.push(
+        this.renderNode(child, isChildSelected, childrenDecorations[i])
+      )
     })
 
-    // Attributes that the developer must to mix into the element in their
+    // Attributes that the developer must mix into the element in their
     // custom node renderer component.
     const attributes = { 'data-key': node.key }
 
@@ -172,18 +186,18 @@ class Node extends React.Component {
    *
    * @param {Node} child
    * @param {Boolean} isSelected
+   * @param {Array<Decoration>} decorations
    * @return {Element}
    */
 
-  renderNode = (child, isSelected) => {
-    const { block, decorations, editor, node, readOnly } = this.props
-    const { stack } = editor
+  renderNode = (child, isSelected, decorations) => {
+    const { block, editor, node, readOnly } = this.props
     const Component = child.object == 'text' ? Text : Node
-    const decs = decorations.concat(node.getDecorations(stack))
+
     return (
       <Component
         block={node.object == 'block' ? node : block}
-        decorations={decs}
+        decorations={decorations}
         editor={editor}
         isSelected={isSelected}
         key={child.key}

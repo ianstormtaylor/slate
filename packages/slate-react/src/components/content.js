@@ -15,6 +15,7 @@ import EVENT_HANDLERS from '../constants/event-handlers'
 import Node from './node'
 import findDOMRange from '../utils/find-dom-range'
 import findRange from '../utils/find-range'
+import getChildrenDecorations from '../utils/get-children-decorations'
 import scrollToSelection from '../utils/scroll-to-selection'
 import removeAllRanges from '../utils/remove-all-ranges'
 
@@ -453,13 +454,17 @@ class Content extends React.Component {
       tagName,
       spellCheck,
     } = props
-    const { value } = editor
+    const { value, stack } = editor
     const Container = tagName
-    const { document, selection } = value
+    const { document, selection, decorations } = value
     const indexes = document.getSelectionIndexes(selection, selection.isFocused)
+    const decs = document.getDecorations(stack).concat(decorations || [])
+    const childrenDecorations = getChildrenDecorations(document, decs)
+
     const children = document.nodes.toArray().map((child, i) => {
       const isSelected = !!indexes && indexes.start <= i && i < indexes.end
-      return this.renderNode(child, isSelected)
+
+      return this.renderNode(child, isSelected, childrenDecorations[i])
     })
 
     const handlers = EVENT_HANDLERS.reduce((obj, handler) => {
@@ -532,18 +537,16 @@ class Content extends React.Component {
    * @return {Element}
    */
 
-  renderNode = (child, isSelected) => {
+  renderNode = (child, isSelected, decorations) => {
     const { editor, readOnly } = this.props
     const { value } = editor
-    const { document, decorations } = value
-    const { stack } = editor
-    let decs = document.getDecorations(stack)
-    if (decorations) decs = decorations.concat(decs)
+    const { document } = value
+
     return (
       <Node
         block={null}
         editor={editor}
-        decorations={decs}
+        decorations={decorations}
         isSelected={isSelected}
         key={child.key}
         node={child}

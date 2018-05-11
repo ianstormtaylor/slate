@@ -30,11 +30,13 @@
     "slate-prop-types": "^0.4.28"
   },
   "peerDependencies": {
+    "immutable": "^3.8.1",
     "react": "^0.14.0 || ^15.0.0 || ^16.0.0",
     "react-dom": "^0.14.0 || ^15.0.0 || ^16.0.0",
     "slate": ">=0.32.0"
   },
   "devDependencies": {
+    "immutable": "^3.8.1",
     "mocha": "^2.5.3",
     "slate": "^0.33.5",
     "slate-hyperscript": "^0.5.11",

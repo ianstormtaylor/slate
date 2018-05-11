@@ -110,12 +110,15 @@ class Text extends React.Component {
     const decs = decorations.filter(d => {
       const { startKey, endKey } = d
       if (startKey == key || endKey == key) return true
+      if (startKey === endKey) return false
       const startsBefore = document.areDescendantsSorted(startKey, key)
+      if (!startsBefore) return false
       const endsAfter = document.areDescendantsSorted(key, endKey)
-      return startsBefore && endsAfter
+      return endsAfter
     })
 
-    const leaves = node.getLeaves(decs)
+    // PERF: Take advantage of cache by avoiding arguments
+    const leaves = decs.size === 0 ? node.getLeaves() : node.getLeaves(decs)
     let offset = 0
 
     const children = leaves.map((leaf, i) => {
