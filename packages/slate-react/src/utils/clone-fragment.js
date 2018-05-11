@@ -4,6 +4,7 @@ import { IS_CHROME, IS_SAFARI, IS_OPERA } from 'slate-dev-environment'
 import getWindow from 'get-window'
 import findDOMNode from './find-dom-node'
 import { ZERO_WIDTH_SELECTOR, ZERO_WIDTH_ATTRIBUTE } from './find-point'
+import removeAllRanges from './remove-all-ranges'
 
 /**
  * Prepares a Slate document fragment to be copied to the clipboard.
@@ -130,13 +131,13 @@ function cloneFragment(event, value, fragment = value.fragment) {
   // throws an error, so we use the older `range` equivalent. (2016/06/21)
   const r = window.document.createRange()
   r.selectNodeContents(div)
-  native.removeAllRanges()
+  removeAllRanges(native)
   native.addRange(r)
 
   // Revert to the previous selection right after copying.
   window.requestAnimationFrame(() => {
     editor.removeChild(div)
-    native.removeAllRanges()
+    removeAllRanges(native)
     native.addRange(range)
   })
 }
