@@ -1,6 +1,4 @@
 import Base64 from 'slate-base64-serializer'
-import { IS_CHROME, IS_SAFARI, IS_OPERA } from 'slate-dev-environment'
-
 import TRANSFER_TYPES from '../constants/transfer-types'
 import getWindow from 'get-window'
 import findDOMNode from './find-dom-node'
@@ -20,7 +18,7 @@ const { FRAGMENT, HTML, TEXT } = TRANSFER_TYPES
 function cloneFragment(event, value, fragment = value.fragment) {
   const window = getWindow(event.target)
   const native = window.getSelection()
-  const { startKey, endKey, startText } = value
+  const { startKey, endKey } = value
   const startVoid = value.document.getClosestVoid(startKey)
   const endVoid = value.document.getClosestVoid(endKey)
 
@@ -59,40 +57,12 @@ function cloneFragment(event, value, fragment = value.fragment) {
     attach = contents.childNodes[0].childNodes[1].firstChild
   }
 
-  // COMPAT: in Safari and Chrome when selecting a single marked word, marks are
-  // not preserved when copying. If the attatched is not void, and the start key
-  // and endKey is the same, check if there is marks involved. If so, set the
-  // range start just before the start text node.
-  if ((IS_CHROME || IS_SAFARI || IS_OPERA) && !endVoid && startKey === endKey) {
-    const hasMarks =
-      startText.characters
-        .slice(value.selection.anchorOffset, value.selection.focusOffset)
-        .filter(char => char.marks.size !== 0).size !== 0
-    if (hasMarks) {
-      const r = range.cloneRange()
-      const node = findDOMNode(startText, window)
-      r.setStartBefore(node)
-      contents = r.cloneContents()
-      attach = contents.childNodes[contents.childNodes.length - 1].firstChild
-    }
-  }
-
   // Remove any zero-width space spans from the cloned DOM so that they don't
   // show up elsewhere when pasted.
   ;[].slice.call(contents.querySelectorAll(ZERO_WIDTH_SELECTOR)).forEach(zw => {
     const isNewline = zw.getAttribute(ZERO_WIDTH_ATTRIBUTE) === 'n'
     zw.textContent = isNewline ? '\n' : ''
   })
-
-  // COMPAT: In Chrome and Safari, if the last element in the selection to
-  // copy has `contenteditable="false"` the copy will fail, and nothing will
-  // be put in the clipboard. So we remove them all. (2017/05/04)
-  if (IS_CHROME || IS_SAFARI || IS_OPERA) {
-    const els = [].slice.call(
-      contents.querySelectorAll('[contenteditable="false"]')
-    )
-    els.forEach(el => el.removeAttribute('contenteditable'))
-  }
 
   // Set a `data-slate-fragment` attribute on a non-empty node, so it shows up
   // in the HTML, and can be used for intra-Slate pasting. If it's a text
