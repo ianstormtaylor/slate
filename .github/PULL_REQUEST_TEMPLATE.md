@@ -11,9 +11,9 @@ https://slate-slack.herokuapp.com/
 <!-- 
 Please include at least one of the following: 
 
-  - A GIF showing the new behavior in action.
-  - A code sample showing the new API in action.
-  - A description of how the new behavior works.
+- A GIF showing the new behavior in action.
+- A code sample showing the new API in action.
+- A description of how the new behavior works.
 
 If you don't include one of these, there's a very good chance your pull request will take longer to review. Thank you!
 -->
@@ -24,13 +24,18 @@ If you don't include one of these, there's a very good chance your pull request 
 If your change is non-trivial, please include a short description of how the new logic works, and why you decided to solve it the way you did. This is incredibly helpful so that reviewers don't have to guess based on the code.
 -->
 
-#### Checklist
+#### Have you checked that...?
 
-<!-- Please make sure your PR passes tests and respects code-formatting rules -->
+<!-- 
+Please run through this checklist for your pull request: 
+-->
 
-* [ ] Tests passed (`yarn run test`)
-* [ ] Linting passed (`yarn run lint`). To automatically fix potential errors, try `yarn run prettier`.
+* [ ] The new code matches the existing patterns and styles.
+* [ ] The tests pass with `yarn test`.
+* [ ] The linter passes with `yarn lint`. (Fix errors with `yarn prettier`.)
+* [ ] The relevant examples still work. (Run examples with `yarn watch`.)
+
+### Does this fix any issues or need any specific reviewers?
 
 Fixes: #
-
 Reviewers: @
