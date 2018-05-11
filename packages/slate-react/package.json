@@ -1,7 +1,7 @@
 {
   "name": "slate-react",
   "description": "A set of React components for building completely customizable rich-text editors.",
-  "version": "0.12.5",
+  "version": "0.12.6",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
   "main": "lib/slate-react.js",
@@ -22,12 +22,12 @@
     "react-immutable-proptypes": "^2.1.0",
     "react-portal": "^3.1.0",
     "selection-is-backward": "^1.0.0",
-    "slate-base64-serializer": "^0.2.30",
-    "slate-dev-environment": "^0.1.1",
+    "slate-base64-serializer": "^0.2.31",
+    "slate-dev-environment": "^0.1.2",
     "slate-dev-logger": "^0.1.39",
-    "slate-hotkeys": "^0.1.1",
-    "slate-plain-serializer": "^0.5.11",
-    "slate-prop-types": "^0.4.28"
+    "slate-hotkeys": "^0.1.2",
+    "slate-plain-serializer": "^0.5.12",
+    "slate-prop-types": "^0.4.29"
   },
   "peerDependencies": {
     "immutable": "^3.8.1",
@@ -38,9 +38,9 @@
   "devDependencies": {
     "immutable": "^3.8.1",
     "mocha": "^2.5.3",
-    "slate": "^0.33.5",
-    "slate-hyperscript": "^0.5.11",
-    "slate-simulator": "^0.4.28"
+    "slate": "^0.33.6",
+    "slate-hyperscript": "^0.5.12",
+    "slate-simulator": "^0.4.29"
   },
   "scripts": {
     "clean": "rm -rf ./dist ./lib ./node_modules"
