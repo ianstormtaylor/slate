@@ -842,7 +842,7 @@ Changes.insertInlineAtRange = (change, range, inline, options = {}) => {
  */
 
 Changes.insertTextAtRange = (change, range, text, marks, options = {}) => {
-  let normalize = change.getFlag('normalize', options)
+  let { normalize } = options
   const { value } = change
   const { document } = value
   const { startKey, startOffset } = range
@@ -864,8 +864,8 @@ Changes.insertTextAtRange = (change, range, text, marks, options = {}) => {
 
   // PERF: Unless specified, don't normalize if only inserting text.
   if (normalize === undefined) {
-    normalize = range.isExpanded
-  }
+   normalize = change.getFlag('normalize', options) && range.isExpanded;
+  } 
   change.insertTextByKey(key, offset, text, marks, { normalize: false })
 
   if (normalize) {
