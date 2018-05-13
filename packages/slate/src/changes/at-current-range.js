@@ -205,11 +205,11 @@ Changes.insertInline = (change, inline) => {
  * @param {Set<Mark>} marks (optional)
  */
 
-Changes.insertText = (change, text, marks) => {
+Changes.insertText = (change, text, marks, options = {}) => {
   const { value } = change
   const { document, selection } = value
   marks = marks || selection.marks || document.getInsertMarksAtRange(selection)
-  change.insertTextAtRange(selection, text, marks)
+  change.insertTextAtRange(selection, text, marks, options)
 
   // If the text was successfully inserted, and the selection had marks on it,
   // unset the selection's marks.
