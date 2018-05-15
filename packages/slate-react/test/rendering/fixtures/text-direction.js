@@ -7,15 +7,9 @@ export const props = {}
 export const value = (
   <value>
     <document>
-      <paragraph>
-        Hello, world!
-      </paragraph>
-      <paragraph>
-        مرحبا بالعالم
-      </paragraph>
-      <paragraph>
-        שלום עולם
-      </paragraph>
+      <paragraph>Hello, world!</paragraph>
+      <paragraph>مرحبا بالعالم</paragraph>
+      <paragraph>שלום עולם</paragraph>
     </document>
   </value>
 )

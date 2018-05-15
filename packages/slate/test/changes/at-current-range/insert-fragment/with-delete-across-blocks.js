@@ -2,14 +2,12 @@
 
 import h from '../../../helpers/h'
 
-export default function (change) {
-  change.insertFragment((
+export default function(change) {
+  change.insertFragment(
     <document>
-      <quote>
-        fragment
-      </quote>
+      <quote>fragment</quote>
     </document>
-  ))
+  )
 }
 
 export const input = (
@@ -29,7 +27,7 @@ export const output = (
   <value>
     <document>
       <paragraph>
-        wo<cursor />fragmentother
+        wofragment<cursor />other
       </paragraph>
     </document>
   </value>

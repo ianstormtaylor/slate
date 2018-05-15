@@ -2,10 +2,10 @@
 
 import h from '../../../helpers/h'
 
-export default function (change) {
-  change.setBlock({
+export default function(change) {
+  change.setBlocks({
     type: 'code',
-    data: { thing: 'value' }
+    data: { thing: 'value' },
   })
 }
 

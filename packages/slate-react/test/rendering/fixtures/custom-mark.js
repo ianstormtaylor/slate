@@ -4,12 +4,13 @@ import React from 'react'
 import h from '../../helpers/h'
 
 function Bold(props) {
-  return React.createElement('strong', null, props.children)
+  return React.createElement('strong', { ...props.attributes }, props.children)
 }
 
 function renderMark(props) {
   switch (props.mark.type) {
-    case 'bold': return Bold(props)
+    case 'bold':
+      return Bold(props)
   }
 }
 
@@ -32,7 +33,7 @@ export const output = `
   <div style="position:relative">
     <span>
       <span>one</span>
-      <span><strong>two</strong></span>
+      <span><strong data-slate-leaf="true">two</strong></span>
       <span>three</span>
     </span>
   </div>

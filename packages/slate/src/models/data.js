@@ -1,4 +1,3 @@
-
 import isPlainObject from 'is-plain-object'
 import { Map } from 'immutable'
 
@@ -12,7 +11,6 @@ import { Map } from 'immutable'
  */
 
 class Data {
-
   /**
    * Create a new `Data` with `attrs`.
    *
@@ -29,7 +27,9 @@ class Data {
       return Data.fromJSON(attrs)
     }
 
-    throw new Error(`\`Data.create\` only accepts objects or maps, but you passed it: ${attrs}`)
+    throw new Error(
+      `\`Data.create\` only accepts objects or maps, but you passed it: ${attrs}`
+    )
   }
 
   /**
@@ -48,7 +48,6 @@ class Data {
    */
 
   static fromJS = Data.fromJSON
-
 }
 
 /**

@@ -2,7 +2,7 @@
 
 import { Value } from '../..'
 
-export default function (json) {
+export default function(json) {
   Value.fromJSON(json)
 }
 
@@ -35,12 +35,12 @@ export const input = {
                 },
                 {
                   text: ' better than a textarea!',
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    }))
-  }
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    })),
+  },
 }

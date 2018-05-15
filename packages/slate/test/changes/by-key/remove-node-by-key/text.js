@@ -2,7 +2,7 @@
 
 import h from '../../../helpers/h'
 
-export default function (change) {
+export default function(change) {
   change.removeNodeByKey('a')
 }
 
@@ -10,11 +10,11 @@ export const input = (
   <value>
     <document>
       <paragraph>
-        <text key="a"><cursor />one</text>
+        <text key="a">
+          <cursor />one
+        </text>
       </paragraph>
-      <paragraph>
-        two
-      </paragraph>
+      <paragraph>two</paragraph>
     </document>
   </value>
 )

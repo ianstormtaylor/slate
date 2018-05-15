@@ -1,4 +1,3 @@
-
 /**
  * Event handlers used by Slate plugins.
  *

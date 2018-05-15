@@ -1,4 +1,3 @@
-
 /**
  * Slate-specific model types.
  *

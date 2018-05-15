@@ -1,4 +1,3 @@
-
 import { Editor } from 'slate-react'
 import { Value } from 'slate'
 
@@ -32,7 +31,6 @@ const isCodeHotkey = isKeyHotkey('mod+`')
  */
 
 class RichTextExample extends React.Component {
-
   /**
    * Deserialize the initial editor value.
    *
@@ -50,7 +48,7 @@ class RichTextExample extends React.Component {
    * @return {Boolean}
    */
 
-  hasMark = (type) => {
+  hasMark = type => {
     const { value } = this.state
     return value.activeMarks.some(mark => mark.type == type)
   }
@@ -62,7 +60,7 @@ class RichTextExample extends React.Component {
    * @return {Boolean}
    */
 
-  hasBlock = (type) => {
+  hasBlock = type => {
     const { value } = this.state
     return value.blocks.some(node => node.type == type)
   }
@@ -139,37 +137,32 @@ class RichTextExample extends React.Component {
 
       if (isList) {
         change
-          .setBlock(isActive ? DEFAULT_NODE : type)
+          .setBlocks(isActive ? DEFAULT_NODE : type)
           .unwrapBlock('bulleted-list')
           .unwrapBlock('numbered-list')
+      } else {
+        change.setBlocks(isActive ? DEFAULT_NODE : type)
       }
-
-      else {
-        change
-          .setBlock(isActive ? DEFAULT_NODE : type)
-      }
-    }
-
-    // Handle the extra wrapping required for list buttons.
-    else {
+    } else {
+      // Handle the extra wrapping required for list buttons.
       const isList = this.hasBlock('list-item')
-      const isType = value.blocks.some((block) => {
+      const isType = value.blocks.some(block => {
         return !!document.getClosest(block.key, parent => parent.type == type)
       })
 
       if (isList && isType) {
         change
-          .setBlock(DEFAULT_NODE)
+          .setBlocks(DEFAULT_NODE)
           .unwrapBlock('bulleted-list')
           .unwrapBlock('numbered-list')
       } else if (isList) {
         change
-          .unwrapBlock(type == 'bulleted-list' ? 'numbered-list' : 'bulleted-list')
+          .unwrapBlock(
+            type == 'bulleted-list' ? 'numbered-list' : 'bulleted-list'
+          )
           .wrapBlock(type)
       } else {
-        change
-          .setBlock('list-item')
-          .wrapBlock(type)
+        change.setBlocks('list-item').wrapBlock(type)
       }
     }
 
@@ -226,6 +219,7 @@ class RichTextExample extends React.Component {
     const onMouseDown = event => this.onClickMark(event, type)
 
     return (
+      // eslint-disable-next-line react/jsx-no-bind
       <span className="button" onMouseDown={onMouseDown} data-active={isActive}>
         <span className="material-icons">{icon}</span>
       </span>
@@ -241,10 +235,17 @@ class RichTextExample extends React.Component {
    */
 
   renderBlockButton = (type, icon) => {
-    const isActive = this.hasBlock(type)
+    let isActive = this.hasBlock(type)
+
+    if (['numbered-list', 'bulleted-list'].includes(type)) {
+      const { value } = this.state
+      const parent = value.document.getParent(value.blocks.first().key)
+      isActive = this.hasBlock('list-item') && parent && parent.type === type
+    }
     const onMouseDown = event => this.onClickBlock(event, type)
 
     return (
+      // eslint-disable-next-line react/jsx-no-bind
       <span className="button" onMouseDown={onMouseDown} data-active={isActive}>
         <span className="material-icons">{icon}</span>
       </span>
@@ -268,6 +269,7 @@ class RichTextExample extends React.Component {
           renderNode={this.renderNode}
           renderMark={this.renderMark}
           spellCheck
+          autoFocus
         />
       </div>
     )
@@ -280,15 +282,21 @@ class RichTextExample extends React.Component {
    * @return {Element}
    */
 
-  renderNode = (props) => {
+  renderNode = props => {
     const { attributes, children, node } = props
     switch (node.type) {
-      case 'block-quote': return <blockquote {...attributes}>{children}</blockquote>
-      case 'bulleted-list': return <ul {...attributes}>{children}</ul>
-      case 'heading-one': return <h1 {...attributes}>{children}</h1>
-      case 'heading-two': return <h2 {...attributes}>{children}</h2>
-      case 'list-item': return <li {...attributes}>{children}</li>
-      case 'numbered-list': return <ol {...attributes}>{children}</ol>
+      case 'block-quote':
+        return <blockquote {...attributes}>{children}</blockquote>
+      case 'bulleted-list':
+        return <ul {...attributes}>{children}</ul>
+      case 'heading-one':
+        return <h1 {...attributes}>{children}</h1>
+      case 'heading-two':
+        return <h2 {...attributes}>{children}</h2>
+      case 'list-item':
+        return <li {...attributes}>{children}</li>
+      case 'numbered-list':
+        return <ol {...attributes}>{children}</ol>
     }
   }
 
@@ -299,16 +307,19 @@ class RichTextExample extends React.Component {
    * @return {Element}
    */
 
-  renderMark = (props) => {
-    const { children, mark } = props
+  renderMark = props => {
+    const { children, mark, attributes } = props
     switch (mark.type) {
-      case 'bold': return <strong>{children}</strong>
-      case 'code': return <code>{children}</code>
-      case 'italic': return <em>{children}</em>
-      case 'underlined': return <u>{children}</u>
+      case 'bold':
+        return <strong {...attributes}>{children}</strong>
+      case 'code':
+        return <code {...attributes}>{children}</code>
+      case 'italic':
+        return <em {...attributes}>{children}</em>
+      case 'underlined':
+        return <u {...attributes}>{children}</u>
     }
   }
-
 }
 
 /**

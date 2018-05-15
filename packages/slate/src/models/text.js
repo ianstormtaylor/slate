@@ -1,4 +1,3 @@
-
 import isPlainObject from 'is-plain-object'
 import logger from 'slate-dev-logger'
 import { List, OrderedSet, Record, Set, is } from 'immutable'
@@ -28,7 +27,6 @@ const DEFAULTS = {
  */
 
 class Text extends Record(DEFAULTS) {
-
   /**
    * Create a new `Text` with `attrs`.
    *
@@ -54,7 +52,9 @@ class Text extends Record(DEFAULTS) {
       return Text.fromJSON(attrs)
     }
 
-    throw new Error(`\`Text.create\` only accepts objects, arrays, strings or texts, but you passed it: ${attrs}`)
+    throw new Error(
+      `\`Text.create\` only accepts objects, arrays, strings or texts, but you passed it: ${attrs}`
+    )
   }
 
   /**
@@ -70,7 +70,9 @@ class Text extends Record(DEFAULTS) {
       return list
     }
 
-    throw new Error(`\`Text.createList\` only accepts arrays or lists, but you passed it: ${elements}`)
+    throw new Error(
+      `\`Text.createList\` only accepts arrays or lists, but you passed it: ${elements}`
+    )
   }
 
   /**
@@ -85,10 +87,7 @@ class Text extends Record(DEFAULTS) {
       return object
     }
 
-    const {
-      leaves = [],
-      key = generateKey(),
-    } = object
+    const { leaves = [], key = generateKey() } = object
 
     const characters = leaves
       .map(Leaf.fromJSON)
@@ -141,7 +140,10 @@ class Text extends Record(DEFAULTS) {
   }
 
   get kind() {
-    logger.deprecate('slate@0.32.0', 'The `kind` property of Slate objects has been renamed to `object`.')
+    logger.deprecate(
+      'slate@0.32.0',
+      'The `kind` property of Slate objects has been renamed to `object`.'
+    )
     return this.object
   }
 
@@ -215,7 +217,7 @@ class Text extends Record(DEFAULTS) {
     // PERF: Exit early if there are no characters to be decorated.
     if (characters.size == 0) return characters
 
-    decorations.forEach((range) => {
+    decorations.forEach(range => {
       const { startKey, endKey, startOffset, endOffset, marks } = range
       const hasStart = startKey == key
       const hasEnd = endKey == key
@@ -256,10 +258,8 @@ class Text extends Record(DEFAULTS) {
     // If there are no characters, return one empty range.
     if (characters.size == 0) {
       leaves.push({})
-    }
-
-    // Otherwise, loop the characters and build the leaves...
-    else {
+    } else {
+      // Otherwise, loop the characters and build the leaves...
       characters.forEach((char, i) => {
         const { marks, text } = char
 
@@ -297,6 +297,66 @@ class Text extends Record(DEFAULTS) {
   }
 
   /**
+   * Get all of the active marks on between two offsets
+   *
+   * @return {Set<Mark>}
+   */
+
+  getActiveMarksBetweenOffsets(startOffset, endOffset) {
+    if (startOffset === 0 && endOffset === this.characters.size) {
+      return this.getActiveMarks()
+    }
+    const startCharacter = this.characters.get(startOffset)
+    if (!startCharacter) return Set()
+    const result = startCharacter.marks
+    if (result.size === 0) return result
+    return result.withMutations(x => {
+      for (let index = startOffset + 1; index < endOffset; index++) {
+        const c = this.characters.get(index)
+        x.intersect(c.marks)
+        if (x.size === 0) return
+      }
+    })
+  }
+
+  /**
+   * Get all of the active marks on the text
+   *
+   * @return {Set<Mark>}
+   */
+
+  getActiveMarks() {
+    if (this.characters.size === 0) return Set()
+    const result = this.characters.first().marks
+    if (result.size === 0) return result
+
+    return result.withMutations(x => {
+      this.characters.forEach(c => {
+        x.intersect(c.marks)
+        if (x.size === 0) return false
+      })
+    })
+  }
+
+  /**
+   * Get all of the marks on between two offsets
+   *
+   * @return {OrderedSet<Mark>}
+   */
+
+  getMarksBetweenOffsets(startOffset, endOffset) {
+    if (startOffset === 0 && endOffset === this.characters.size) {
+      return this.getMarks()
+    }
+    return new OrderedSet().withMutations(result => {
+      for (let index = startOffset; index < endOffset; index++) {
+        const c = this.characters.get(index)
+        result.union(c.marks)
+      }
+    })
+  }
+
+  /**
    * Get all of the marks on the text.
    *
    * @return {OrderedSet<Mark>}
@@ -314,9 +374,19 @@ class Text extends Record(DEFAULTS) {
    */
 
   getMarksAsArray() {
-    return this.characters.reduce((array, char) => {
-      return array.concat(char.marks.toArray())
-    }, [])
+    if (this.characters.size === 0) return []
+    const first = this.characters.first().marks
+    let previousMark = first
+    const result = []
+    this.characters.forEach(c => {
+      // If the character marks is the same with the
+      // previous characters, we do not need to
+      // add the marks twice
+      if (c.marks === previousMark) return true
+      previousMark = c.marks
+      result.push(previousMark.toArray())
+    })
+    return Array.prototype.concat.apply(first.toArray(), result)
   }
 
   /**
@@ -342,9 +412,7 @@ class Text extends Record(DEFAULTS) {
    */
 
   getNode(key) {
-    return this.key == key
-      ? this
-      : null
+    return this.key == key ? this : null
   }
 
   /**
@@ -369,9 +437,12 @@ class Text extends Record(DEFAULTS) {
 
   insertText(index, text, marks) {
     let { characters } = this
-    const chars = Character.createList(text.split('').map(char => ({ text: char, marks })))
+    const chars = Character.createList(
+      text.split('').map(char => ({ text: char, marks }))
+    )
 
-    characters = characters.slice(0, index)
+    characters = characters
+      .slice(0, index)
       .concat(chars)
       .concat(characters.slice(index))
 
@@ -437,7 +508,9 @@ class Text extends Record(DEFAULTS) {
   toJSON(options = {}) {
     const object = {
       object: this.object,
-      leaves: this.getLeaves().toArray().map(r => r.toJSON()),
+      leaves: this.getLeaves()
+        .toArray()
+        .map(r => r.toJSON()),
     }
 
     if (options.preserveKeys) {
@@ -493,6 +566,17 @@ class Text extends Record(DEFAULTS) {
     return schema.validateNode(this)
   }
 
+  /**
+   * Get the first invalid descendant
+   * PREF: Do not cache this method; because it can cause cycle reference
+   *
+   * @param {Schema} schema
+   * @returns {Text|Null}
+   */
+
+  getFirstInvalidDescendant(schema) {
+    return this.validate(schema) ? this : null
+  }
 }
 
 /**
@@ -506,21 +590,15 @@ Text.prototype[MODEL_TYPES.TEXT] = true
  */
 
 memoize(Text.prototype, [
-  'getMarks',
-  'getMarksAsArray',
-], {
-  takesArguments: false,
-})
-
-memoize(Text.prototype, [
   'getDecoratedCharacters',
   'getDecorations',
   'getLeaves',
+  'getActiveMarks',
+  'getMarks',
+  'getMarksAsArray',
   'getMarksAtIndex',
-  'validate'
-], {
-  takesArguments: true,
-})
+  'validate',
+])
 
 /**
  * Export.

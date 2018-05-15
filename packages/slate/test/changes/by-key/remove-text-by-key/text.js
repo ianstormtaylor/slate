@@ -2,7 +2,7 @@
 
 import h from '../../../helpers/h'
 
-export default function (change) {
+export default function(change) {
   change.removeTextByKey('a', 3, 1)
 }
 
@@ -19,9 +19,7 @@ export const input = (
 export const output = (
   <value>
     <document>
-      <paragraph>
-        wor
-      </paragraph>
+      <paragraph>wor</paragraph>
     </document>
   </value>
 )

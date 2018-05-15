@@ -2,7 +2,7 @@
 
 import h from '../../../helpers/h'
 
-export default function (simulator) {
+export default function(simulator) {
   simulator.blur()
 }
 

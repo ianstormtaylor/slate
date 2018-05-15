@@ -5,22 +5,25 @@ import h from '../../helpers/h'
 
 function decorateNode(block) {
   const text = block.getFirstText()
-  return [{
-    anchorKey: text.key,
-    anchorOffset: 1,
-    focusKey: text.key,
-    focusOffset: 2,
-    marks: [{ type: 'bold' }]
-  }]
+  return [
+    {
+      anchorKey: text.key,
+      anchorOffset: 1,
+      focusKey: text.key,
+      focusOffset: 2,
+      marks: [{ type: 'bold' }],
+    },
+  ]
 }
 
 function Bold(props) {
-  return React.createElement('strong', null, props.children)
+  return React.createElement('strong', { ...props.attributes }, props.children)
 }
 
 function renderMark(props) {
   switch (props.mark.type) {
-    case 'bold': return Bold(props)
+    case 'bold':
+      return Bold(props)
   }
 }
 
@@ -32,9 +35,7 @@ export const props = {
 export const value = (
   <value>
     <document>
-      <paragraph>
-        one
-      </paragraph>
+      <paragraph>one</paragraph>
     </document>
   </value>
 )
@@ -44,7 +45,7 @@ export const output = `
   <div style="position:relative">
     <span>
       <span>o</span>
-      <span><strong>n</strong></span>
+      <span><strong data-slate-leaf="true">n</strong></span>
       <span>e</span>
     </span>
   </div>

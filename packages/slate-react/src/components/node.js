@@ -1,4 +1,3 @@
-
 import Debug from 'debug'
 import ImmutableTypes from 'react-immutable-proptypes'
 import React from 'react'
@@ -8,6 +7,7 @@ import Types from 'prop-types'
 
 import Void from './void'
 import Text from './text'
+import getChildrenDecorations from '../utils/get-children-decorations'
 
 /**
  * Debug.
@@ -24,7 +24,6 @@ const debug = Debug('slate:node')
  */
 
 class Node extends React.Component {
-
   /**
    * Property types.
    *
@@ -62,10 +61,14 @@ class Node extends React.Component {
    * @return {Boolean}
    */
 
-  shouldComponentUpdate = (nextProps) => {
+  shouldComponentUpdate = nextProps => {
     const { props } = this
     const { stack } = props.editor
-    const shouldUpdate = stack.find('shouldNodeComponentUpdate', props, nextProps)
+    const shouldUpdate = stack.find(
+      'shouldNodeComponentUpdate',
+      props,
+      nextProps
+    )
     const n = nextProps
     const p = props
 
@@ -78,7 +81,9 @@ class Node extends React.Component {
       }
 
       if (shouldUpdate === false) {
-        logger.warn('Returning false in `shouldNodeComponentUpdate` does not disable Slate\'s internal `shouldComponentUpdate` logic. If you want to prevent updates, use React\'s `shouldComponentUpdate` instead.')
+        logger.warn(
+          "Returning false in `shouldNodeComponentUpdate` does not disable Slate's internal `shouldComponentUpdate` logic. If you want to prevent updates, use React's `shouldComponentUpdate` instead."
+        )
       }
     }
 
@@ -114,18 +119,31 @@ class Node extends React.Component {
 
   render() {
     this.debug('render', this)
-
-    const { editor, isSelected, node, parent, readOnly } = this.props
+    const {
+      editor,
+      isSelected,
+      node,
+      decorations,
+      parent,
+      readOnly,
+    } = this.props
     const { value } = editor
     const { selection } = value
     const { stack } = editor
     const indexes = node.getSelectionIndexes(selection, isSelected)
-    let children = node.nodes.toArray().map((child, i) => {
+    const decs = decorations.concat(node.getDecorations(stack))
+    const childrenDecorations = getChildrenDecorations(node, decs)
+
+    let children = []
+    node.nodes.forEach((child, i) => {
       const isChildSelected = !!indexes && indexes.start <= i && i < indexes.end
-      return this.renderNode(child, isChildSelected)
+
+      children.push(
+        this.renderNode(child, isChildSelected, childrenDecorations[i])
+      )
     })
 
-    // Attributes that the developer must to mix into the element in their
+    // Attributes that the developer must mix into the element in their
     // custom node renderer component.
     const attributes = { 'data-key': node.key }
 
@@ -148,15 +166,19 @@ class Node extends React.Component {
     let placeholder = stack.find('renderPlaceholder', props)
 
     if (placeholder) {
-      placeholder = React.cloneElement(placeholder, { key: `${node.key}-placeholder` })
+      placeholder = React.cloneElement(placeholder, {
+        key: `${node.key}-placeholder`,
+      })
       children = [placeholder, ...children]
     }
 
-    const element = stack.find('renderNode', { ...props, attributes, children })
+    const element = stack.find('renderNode', {
+      ...props,
+      attributes,
+      children,
+    })
 
-    return node.isVoid
-      ? <Void {...this.props}>{element}</Void>
-      : element
+    return node.isVoid ? <Void {...this.props}>{element}</Void> : element
   }
 
   /**
@@ -164,18 +186,18 @@ class Node extends React.Component {
    *
    * @param {Node} child
    * @param {Boolean} isSelected
+   * @param {Array<Decoration>} decorations
    * @return {Element}
    */
 
-  renderNode = (child, isSelected) => {
-    const { block, decorations, editor, node, readOnly } = this.props
-    const { stack } = editor
+  renderNode = (child, isSelected, decorations) => {
+    const { block, editor, node, readOnly } = this.props
     const Component = child.object == 'text' ? Text : Node
-    const decs = decorations.concat(node.getDecorations(stack))
+
     return (
       <Component
         block={node.object == 'block' ? node : block}
-        decorations={decs}
+        decorations={decorations}
         editor={editor}
         isSelected={isSelected}
         key={child.key}
@@ -185,7 +207,6 @@ class Node extends React.Component {
       />
     )
   }
-
 }
 
 /**

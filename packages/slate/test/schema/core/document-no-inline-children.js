@@ -7,12 +7,8 @@ export const schema = {}
 export const input = (
   <value>
     <document>
-      <link>
-        one
-      </link>
-      <paragraph>
-        two
-      </paragraph>
+      <link>one</link>
+      <paragraph>two</paragraph>
     </document>
   </value>
 )
@@ -36,11 +32,11 @@ export const output = {
                 object: 'leaf',
                 text: 'two',
                 marks: [],
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  }
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
 }

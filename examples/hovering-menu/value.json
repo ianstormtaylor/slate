@@ -9,7 +9,8 @@
             "object": "text",
             "leaves": [
               {
-                "text": "This example shows how you can make a hovering menu appear above your content, which you can use to make text "
+                "text":
+                  "This example shows how you can make a hovering menu appear above your content, which you can use to make text "
               },
               {
                 "text": "bold",

@@ -2,7 +2,7 @@
 
 import h from '../../../helpers/h'
 
-export default function (change) {
+export default function(change) {
   change.insertTextByKey('a', 1, 'x')
 }
 
@@ -10,7 +10,9 @@ export const input = (
   <value>
     <document>
       <paragraph>
-        <text key="a">w<anchor />or<focus />d</text>
+        <text key="a">
+          w<anchor />or<focus />d
+        </text>
       </paragraph>
     </document>
   </value>

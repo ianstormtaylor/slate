@@ -1,4 +1,3 @@
-
 <br/>
 <p align="center"><strong>Previous:</strong><br/><a href="./adding-event-handlers.md">Adding Event Handlers</a></p>
 <br/>
@@ -13,9 +12,8 @@ We'll show you how. Let's start with our app from earlier:
 
 ```js
 class App extends React.Component {
-
   state = {
-    value: initialValue
+    value: initialValue,
   }
 
   onChange = ({ value }) => {
@@ -25,7 +23,7 @@ class App extends React.Component {
   onKeyDown = (event, change) => {
     if (event.key != '&') return
     event.preventDefault()
-    change.insertText('and');
+    change.insertText('and')
     return true
   }
 
@@ -38,7 +36,6 @@ class App extends React.Component {
       />
     )
   }
-
 }
 ```
 
@@ -51,7 +48,11 @@ Node renderers are just simple React components, like so:
 ```js
 // Define a React component renderer for our code blocks.
 function CodeNode(props) {
-  return <pre {...props.attributes}><code>{props.children}</code></pre>
+  return (
+    <pre {...props.attributes}>
+      <code>{props.children}</code>
+    </pre>
+  )
 }
 ```
 
@@ -65,11 +66,14 @@ Now, let's add that renderer to our `Editor`:
 
 ```js
 function CodeNode(props) {
-  return <pre {...props.attributes}><code>{props.children}</code></pre>
+  return (
+    <pre {...props.attributes}>
+      <code>{props.children}</code>
+    </pre>
+  )
 }
 
 class App extends React.Component {
-
   state = {
     value: initialValue,
   }
@@ -98,24 +102,27 @@ class App extends React.Component {
   }
 
   // Add a `renderNode` method to render a `CodeNode` for code blocks.
-  renderNode = (props) => {
+  renderNode = props => {
     switch (props.node.type) {
-      case 'code': return <CodeNode {...props} />
+      case 'code':
+        return <CodeNode {...props} />
     }
   }
-
 }
 ```
 
-Okay, but now we'll need a way for the user to actually turn a block into a code block. So let's change our `onKeyDown` function to add a `⌘-\`` shortcut that does just that:
+Okay, but now we'll need a way for the user to actually turn a block into a code block. So let's change our `onKeyDown` function to add a `control-\`` shortcut that does just that:
 
 ```js
 function CodeNode(props) {
-  return <pre {...props.attributes}><code>{props.children}</code></pre>
+  return (
+    <pre {...props.attributes}>
+      <code>{props.children}</code>
+    </pre>
+  )
 }
 
 class App extends React.Component {
-
   state = {
     value: initialValue,
   }
@@ -125,14 +132,14 @@ class App extends React.Component {
   }
 
   onKeyDown = (event, change) => {
-    // Return with no changes if it's not the "`" key with cmd/ctrl pressed.
-    if (event.key != '`' || !event.metaKey) return
+    // Return with no changes if it's not the "`" key with ctrl pressed.
+    if (event.key != '`' || !event.ctrlKey) return
 
     // Prevent the "`" from being inserted by default.
     event.preventDefault()
 
     // Otherwise, set the currently selected blocks type to "code".
-    change.setBlock('code')
+    change.setBlocks('code')
     return true
   }
 
@@ -147,26 +154,31 @@ class App extends React.Component {
     )
   }
 
-  renderNode = (props) => {
+  renderNode = props => {
     switch (props.node.type) {
-      case 'code': return <CodeNode {...props} />
+      case 'code':
+        return <CodeNode {...props} />
     }
   }
-
 }
 ```
 
-Now, if you press `⌘-\``  the block your cursor is in should turn into a code block! Magic!
+Now, if you press `control-\`` the block your cursor is in should turn into a code block! Magic!
 
-But we forgot one thing. When you hit `⌘-\`` again, it should change the code block back into a paragraph. To do that, we'll need to add a bit of logic to change the type we set based on whether any of the currently selected blocks are already a code block:
+_Note: The Edge browser does not currently support `control-...` key events (see [issue](https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/742263/)), so this example won't work on it._
+
+But we forgot one thing. When you hit `control-\`` again, it should change the code block back into a paragraph. To do that, we'll need to add a bit of logic to change the type we set based on whether any of the currently selected blocks are already a code block:
 
 ```js
 function CodeNode(props) {
-  return <pre {...props.attributes}><code>{props.children}</code></pre>
+  return (
+    <pre {...props.attributes}>
+      <code>{props.children}</code>
+    </pre>
+  )
 }
 
 class App extends React.Component {
-
   state = {
     value: initialValue,
   }
@@ -176,7 +188,7 @@ class App extends React.Component {
   }
 
   onKeyDown = (event, change) => {
-    if (event.key != '`' || !event.metaKey) return
+    if (event.key != '`' || !event.ctrlKey) return
 
     event.preventDefault()
 
@@ -184,7 +196,7 @@ class App extends React.Component {
     const isCode = change.value.blocks.some(block => block.type == 'code')
 
     // Toggle the block type depending on `isCode`.
-    change.setBlock(isCode ? 'paragraph' : 'code')
+    change.setBlocks(isCode ? 'paragraph' : 'code')
     return true
   }
 
@@ -198,17 +210,17 @@ class App extends React.Component {
       />
     )
   }
-  
-  renderNode = (props) => {
+
+  renderNode = props => {
     switch (props.node.type) {
-      case 'code': return <CodeNode {...props} />
+      case 'code':
+        return <CodeNode {...props} />
     }
   }
-
 }
 ```
 
-And there you have it! If you press `⌘-\`` while inside a code block, it should turn back into a paragraph!
+And there you have it! If you press `control-\`` while inside a code block, it should turn back into a paragraph!
 
 <br/>
 <p align="center"><strong>Next:</strong><br/><a href="./applying-custom-formatting.md">Applying Custom Formatting</a></p>

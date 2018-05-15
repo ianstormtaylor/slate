@@ -1,4 +1,3 @@
-
 import { Block, Mark, Node, Value } from 'slate'
 import { Set } from 'immutable'
 
@@ -14,11 +13,7 @@ import { Set } from 'immutable'
  */
 
 function deserialize(string, options = {}) {
-  let {
-    defaultBlock = 'line',
-    defaultMarks = [],
-    toJSON = false,
-  } = options
+  let { defaultBlock = 'line', defaultMarks = [], toJSON = false } = options
 
   if (Set.isSet(defaultMarks)) {
     defaultMarks = defaultMarks.toArray()
@@ -32,7 +27,7 @@ function deserialize(string, options = {}) {
     document: {
       object: 'document',
       data: {},
-      nodes: string.split('\n').map((line) => {
+      nodes: string.split('\n').map(line => {
         return {
           ...defaultBlock,
           object: 'block',
@@ -46,13 +41,13 @@ function deserialize(string, options = {}) {
                   object: 'leaf',
                   text: line,
                   marks: defaultMarks,
-                }
-              ]
-            }
-          ]
+                },
+              ],
+            },
+          ],
         }
       }),
-    }
+    },
   }
 
   const ret = toJSON ? json : Value.fromJSON(json)
@@ -79,7 +74,7 @@ function serialize(value) {
 
 function serializeNode(node) {
   if (
-    (node.object == 'document') ||
+    node.object == 'document' ||
     (node.object == 'block' && Block.isBlockList(node.nodes))
   ) {
     return node.nodes.map(serializeNode).join('\n')
@@ -96,5 +91,5 @@ function serializeNode(node) {
 
 export default {
   deserialize,
-  serialize
+  serialize,
 }

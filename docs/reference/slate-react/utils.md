@@ -1,8 +1,7 @@
-
 # Utils
 
 ```js
-import { 
+import {
   cloneFragment,
   findDOMNode,
   findDOMRange,
@@ -16,10 +15,10 @@ import {
 
 React-specific utility functions for Slate that may be useful in certain use cases.
 
-
 ## Functions
 
 ### `cloneFragment`
+
 `cloneFragment(event: DOMEvent|ReactEvent, value: Value, fragment: Document)`
 
 During a cut or copy event, sets `fragment` as the Slate document fragment to be copied.
@@ -54,6 +53,7 @@ function onCut(event, change, editor) {
 ```
 
 ### `findDOMNode`
+
 `findDOMNode(node: Node) => DOMElement`
 
 Find the DOM node from a Slate [`Node`](../slate/node.md). Modelled after React's built-in `findDOMNode` helper.
@@ -67,11 +67,12 @@ function componentDidUpdate() {
 ```
 
 ### `findDOMRange`
+
 `findDOMRange(range: Range) => DOMRange`
 
 Find the DOM range from a Slate [`Range`](../slate/range.md).
 
-```js 
+```js
 function onChange(change) {
   const { value } = change
   const range = findDOMRange(value.selection)
@@ -80,6 +81,7 @@ function onChange(change) {
 ```
 
 ### `findNode`
+
 `findNode(element: DOMElement, value: Value) => Node`
 
 Find the Slate node from a DOM `element` and Slate `value`.
@@ -92,6 +94,7 @@ function onSomeNativeEvent(event) {
 ```
 
 ### `findRange`
+
 `findRange(selection: DOMSelection, value: Value) => Range`
 `findRange(range: DOMRange, value: Value) => Range`
 
@@ -110,6 +113,7 @@ function onSomeNativeEvent() {
 ```
 
 ### `getEventRange`
+
 `getEventRange(event: DOMEvent|ReactEvent, value: Value) => Range`
 
 Get the affected Slate range from a DOM `event` and Slate `value`.
@@ -122,6 +126,7 @@ function onDrop(event, change, editor) {
 ```
 
 ### `getEventTransfer`
+
 `getEventTransfer(event: DOMEvent|ReactEvent) => Object`
 
 Get the Slate-related data from a DOM `event` and Slate `value`.
@@ -138,6 +143,7 @@ function onDrop(event, change, editor) {
 ```
 
 ### `setEventTransfer`
+
 `setEventTransfer(event: DOMEvent|ReactEvent, type: String, data: Any)`
 
 Sets the Slate-related `data` with `type` on an `event`. The `type` must be one of the types Slate recognizes: `'fragment'`, `'html'`, `'node'`, `'rich'`, or `'text'`.

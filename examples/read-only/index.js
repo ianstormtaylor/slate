@@ -1,4 +1,3 @@
-
 import Plain from 'slate-plain-serializer'
 import { Editor } from 'slate-react'
 
@@ -11,7 +10,6 @@ import React from 'react'
  */
 
 class ReadOnly extends React.Component {
-
   /**
    * Deserialize the initial editor value.
    *
@@ -19,7 +17,9 @@ class ReadOnly extends React.Component {
    */
 
   state = {
-    value: Plain.deserialize('This is read-only text. You should not be able to edit it, which is useful for scenarios where you want to render via Slate, without giving the user editing permissions.')
+    value: Plain.deserialize(
+      'This is read-only text. You should not be able to edit it, which is useful for scenarios where you want to render via Slate, without giving the user editing permissions.'
+    ),
   }
 
   /**
@@ -50,7 +50,6 @@ class ReadOnly extends React.Component {
       </div>
     )
   }
-
 }
 
 /**

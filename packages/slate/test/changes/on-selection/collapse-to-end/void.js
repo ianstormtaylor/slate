@@ -2,7 +2,7 @@
 
 import h from '../../../helpers/h'
 
-export default function (change) {
+export default function(change) {
   change.collapseToEnd()
 }
 
@@ -10,7 +10,7 @@ export const input = (
   <value>
     <document>
       <image>
-        <anchor />{' '}<focus />
+        <anchor /> <focus />
       </image>
     </document>
   </value>
@@ -20,7 +20,8 @@ export const output = (
   <value>
     <document>
       <image>
-        {' '}<cursor />
+        {' '}
+        <cursor />
       </image>
     </document>
   </value>

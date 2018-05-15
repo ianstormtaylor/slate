@@ -1,16 +1,12 @@
+import { JSDOM } from 'jsdom' // eslint-disable-line import/no-extraneous-dependencies
 
-import parse5 from 'parse5' // eslint-disable-line import/no-extraneous-dependencies
-
-const UNWANTED_ATTRS = [
-  'data-key',
-  'data-offset-key'
-]
+const UNWANTED_ATTRS = ['data-key', 'data-offset-key']
 
 const UNWANTED_TOP_LEVEL_ATTRS = [
   'autocorrect',
   'spellcheck',
   'style',
-  'data-gramm'
+  'data-gramm',
 ]
 
 /**
@@ -21,20 +17,20 @@ const UNWANTED_TOP_LEVEL_ATTRS = [
  */
 
 function stripUnwantedAttrs(element) {
-  if (Array.isArray(element.attrs)) {
-    element.attrs = element.attrs.filter(({ name }) => { return !UNWANTED_ATTRS.includes(name) })
+  if (typeof element.removeAttribute === 'function') {
+    UNWANTED_ATTRS.forEach(attr => element.removeAttribute(attr))
 
     if (element.parentNode.nodeName === '#document-fragment') {
-      element.attrs = element.attrs.filter(({ name }) => { return !UNWANTED_TOP_LEVEL_ATTRS.includes(name) })
+      UNWANTED_TOP_LEVEL_ATTRS.forEach(attr => element.removeAttribute(attr))
     }
   }
 
-  if (Array.isArray(element.childNodes)) {
+  if (element.childNodes.length) {
     element.childNodes.forEach(stripUnwantedAttrs)
   }
 
   if (element.nodeName === '#text') {
-    element.value = element.value.trim()
+    element.textContent = element.textContent.trim()
   }
 
   return element
@@ -48,7 +44,7 @@ function stripUnwantedAttrs(element) {
  */
 
 export default function clean(html) {
-  const $ = parse5.parseFragment(html)
+  const $ = JSDOM.fragment(html)
   $.childNodes.forEach(stripUnwantedAttrs)
-  return parse5.serialize($)
+  return $.firstChild.outerHTML
 }

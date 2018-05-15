@@ -2,7 +2,7 @@
 
 import h from '../../../helpers/h'
 
-export default function (change) {
+export default function(change) {
   change.delete()
 }
 
@@ -10,7 +10,9 @@ export const input = (
   <value>
     <document>
       <paragraph>
-        one<emoji><anchor /></emoji>two
+        one<emoji>
+          <anchor />
+        </emoji>two
       </paragraph>
       <paragraph>
         <focus />three

@@ -1,15 +1,14 @@
-
 import Debug from 'debug'
 import getWindow from 'get-window'
 import { findDOMNode } from 'react-dom'
-
-import HOTKEYS from '../constants/hotkeys'
+import Hotkeys from 'slate-hotkeys'
 import {
   IS_FIREFOX,
   IS_IOS,
   IS_ANDROID,
-  SUPPORTED_EVENTS
-} from '../constants/environment'
+  SUPPORTED_EVENTS,
+} from 'slate-dev-environment'
+
 import findNode from '../utils/find-node'
 
 /**
@@ -117,9 +116,7 @@ function BeforePlugin() {
     // happen on the initialization of the editor, or if the schema changes.
     // This change isn't save into history since only schema is updated.
     if (value.schema != editor.schema) {
-      change
-        .setValue({ schema: editor.schema }, { save: false })
-        .normalize()
+      change.setValue({ schema: editor.schema }, { save: false }).normalize()
     }
 
     debug('onChange')
@@ -146,7 +143,10 @@ function BeforePlugin() {
       // HACK: we need to re-render the editor here so that it will update its
       // placeholder in case one is currently rendered. This should be handled
       // differently ideally, in a less invasive way?
-      editor.setState({ isComposing: false })
+      // (apply force re-render if isComposing changes)
+      if (editor.state.isComposing) {
+        editor.setState({ isComposing: false })
+      }
     })
 
     debug('onCompositionEnd', { event })
@@ -167,7 +167,10 @@ function BeforePlugin() {
     // HACK: we need to re-render the editor here so that it will update its
     // placeholder in case one is currently rendered. This should be handled
     // differently ideally, in a less invasive way?
-    editor.setState({ isComposing: true })
+    // (apply force re-render if isComposing changes)
+    if (!editor.state.isComposing) {
+      editor.setState({ isComposing: true })
+    }
 
     debug('onCompositionStart', { event })
   }
@@ -183,7 +186,7 @@ function BeforePlugin() {
   function onCopy(event, change, editor) {
     const window = getWindow(event.target)
     isCopying = true
-    window.requestAnimationFrame(() => isCopying = false)
+    window.requestAnimationFrame(() => (isCopying = false))
 
     debug('onCopy', { event })
   }
@@ -201,7 +204,7 @@ function BeforePlugin() {
 
     const window = getWindow(event.target)
     isCopying = true
-    window.requestAnimationFrame(() => isCopying = false)
+    window.requestAnimationFrame(() => (isCopying = false))
 
     debug('onCut', { event })
   }
@@ -273,10 +276,10 @@ function BeforePlugin() {
     if (node.isVoid) event.preventDefault()
 
     // If a drag is already in progress, don't do this again.
-    if (isDragging) return true
-
-    isDragging = true
-    event.nativeEvent.dataTransfer.dropEffect = 'move'
+    if (!isDragging) {
+      isDragging = true
+      event.nativeEvent.dataTransfer.dropEffect = 'move'
+    }
 
     debug('onDragOver', { event })
   }
@@ -304,9 +307,6 @@ function BeforePlugin() {
    */
 
   function onDrop(event, change, editor) {
-    // Stop propagation so the event isn't visible to parent editors.
-    event.stopPropagation()
-
     // Nothing happens in read-only mode.
     if (editor.props.readOnly) return true
 
@@ -375,13 +375,13 @@ function BeforePlugin() {
     // typing. However, certain characters also move the selection before
     // we're able to handle it, so prevent their default behavior.
     if (isComposing) {
-      if (HOTKEYS.COMPOSING(event)) event.preventDefault()
+      if (Hotkeys.isComposing(event)) event.preventDefault()
       return true
     }
 
     // Certain hotkeys have native behavior in contenteditable elements which
     // will cause our value to be out of sync, so prevent them.
-    if (HOTKEYS.CONTENTEDITABLE(event)) {
+    if (Hotkeys.isContentEditable(event) && !IS_IOS) {
       event.preventDefault()
     }
 

@@ -2,7 +2,7 @@
 
 import h from '../../../helpers/h'
 
-export default function (change) {
+export default function(change) {
   change.unwrapInline('hashtag')
 }
 
@@ -11,7 +11,10 @@ export const input = (
     <document>
       <quote>
         <paragraph>
-          w<anchor /><hashtag>or<focus /></hashtag>d
+          w<anchor />
+          <hashtag>
+            or<focus />
+          </hashtag>d
         </paragraph>
       </quote>
     </document>

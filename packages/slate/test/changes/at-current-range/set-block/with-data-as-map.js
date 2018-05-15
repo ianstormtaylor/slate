@@ -3,10 +3,10 @@
 import h from '../../../helpers/h'
 import { Data } from '../../../..'
 
-export default function (change) {
-  change.setBlock({
+export default function(change) {
+  change.setBlocks({
     type: 'code',
-    data: Data.create({ thing: 'value' })
+    data: Data.create({ thing: 'value' }),
   })
 }
 

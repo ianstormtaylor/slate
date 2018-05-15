@@ -1,4 +1,3 @@
-
 import Debug from 'debug'
 import isPlainObject from 'is-plain-object'
 import logger from 'slate-dev-logger'
@@ -25,7 +24,6 @@ const debug = Debug('slate:change')
  */
 
 class Change {
-
   /**
    * Check if `any` is a `Change`.
    *
@@ -48,7 +46,10 @@ class Change {
     const { value } = attrs
     this.value = value
     this.operations = new List()
-    this.flags = pick(attrs, ['merge', 'save'])
+    this.flags = {
+      normalize: true,
+      ...pick(attrs, ['merge', 'save', 'normalize']),
+    }
   }
 
   /**
@@ -62,7 +63,10 @@ class Change {
   }
 
   get kind() {
-    logger.deprecate('slate@0.32.0', 'The `kind` property of Slate objects has been renamed to `object`.')
+    logger.deprecate(
+      'slate@0.32.0',
+      'The `kind` property of Slate objects has been renamed to `object`.'
+    )
     return this.object
   }
 
@@ -141,6 +145,27 @@ class Change {
   }
 
   /**
+   * Applies a series of change mutations and defers normalization until the end.
+   *
+   * @param {Function} customChange - function that accepts a change object and executes change operations
+   * @return {Change}
+   */
+
+  withoutNormalization(customChange) {
+    const original = this.flags.normalize
+    this.setOperationFlag('normalize', false)
+    try {
+      customChange(this)
+      // if the change function worked then run normalization
+      this.normalizeDocument()
+    } finally {
+      // restore the flag to whatever it was
+      this.setOperationFlag('normalize', original)
+    }
+    return this
+  }
+
+  /**
    * Set an operation flag by `key` to `value`.
    *
    * @param {String} key
@@ -154,6 +179,19 @@ class Change {
   }
 
   /**
+   * Get the `value` of the specified flag by its `key`. Optionally accepts an `options`
+   * object with override flags.
+   *
+   * @param {String} key
+   * @param {Object} options
+   * @return {Change}
+   */
+
+  getFlag(key, options = {}) {
+    return options[key] !== undefined ? options[key] : this.flags[key]
+  }
+
+  /**
    * Unset an operation flag by `key`.
    *
    * @param {String} key
@@ -164,7 +202,6 @@ class Change {
     delete this.flags[key]
     return this
   }
-
 }
 
 /**
@@ -177,8 +214,8 @@ Change.prototype[MODEL_TYPES.CHANGE] = true
  * Add a change method for each of the changes.
  */
 
-Object.keys(Changes).forEach((type) => {
-  Change.prototype[type] = function (...args) {
+Object.keys(Changes).forEach(type => {
+  Change.prototype[type] = function(...args) {
     debug(type, { args })
     this.call(Changes[type], ...args)
     return this

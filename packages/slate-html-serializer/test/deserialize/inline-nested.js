@@ -1,4 +1,3 @@
-
 /** @jsx h */
 
 import h from '../helpers/h'
@@ -30,9 +29,9 @@ export const config = {
             }
           }
         }
-      }
-    }
-  ]
+      },
+    },
+  ],
 }
 
 export const input = `
@@ -44,9 +43,7 @@ export const output = (
     <document>
       <paragraph>
         <link>
-          <hashtag>
-            one
-          </hashtag>
+          <hashtag>one</hashtag>
         </link>
       </paragraph>
     </document>

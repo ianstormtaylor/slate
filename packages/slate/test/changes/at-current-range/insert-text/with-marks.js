@@ -3,7 +3,7 @@
 import h from '../../../helpers/h'
 import { Mark } from '../../../..'
 
-export default function (change) {
+export default function(change) {
   const marks = Mark.createSet([{ type: 'bold' }])
   change.insertText('a', marks)
 }
@@ -22,7 +22,8 @@ export const output = (
   <value>
     <document>
       <paragraph>
-        word<b>a</b><cursor />
+        word<b>a</b>
+        <cursor />
       </paragraph>
     </document>
   </value>

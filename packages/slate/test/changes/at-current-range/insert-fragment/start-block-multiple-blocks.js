@@ -2,20 +2,14 @@
 
 import h from '../../../helpers/h'
 
-export default function (change) {
-  change.insertFragment((
+export default function(change) {
+  change.insertFragment(
     <document>
-      <quote>
-        one
-      </quote>
-      <quote>
-        two
-      </quote>
-      <quote>
-        three
-      </quote>
+      <quote>one</quote>
+      <quote>two</quote>
+      <quote>three</quote>
     </document>
-  ))
+  )
 }
 
 export const input = (
@@ -31,14 +25,10 @@ export const input = (
 export const output = (
   <value>
     <document>
-      <paragraph>
-        one
-      </paragraph>
+      <paragraph>one</paragraph>
+      <quote>two</quote>
       <quote>
-        two
-      </quote>
-      <quote>
-        <cursor />threeword
+        three<cursor />word
       </quote>
     </document>
   </value>

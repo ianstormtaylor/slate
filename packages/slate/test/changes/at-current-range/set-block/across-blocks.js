@@ -2,8 +2,8 @@
 
 import h from '../../../helpers/h'
 
-export default function (change) {
-  change.setBlock({ type: 'code' })
+export default function(change) {
+  change.setBlocks({ type: 'code' })
 }
 
 export const input = (
@@ -13,7 +13,7 @@ export const input = (
         <anchor />word
       </paragraph>
       <paragraph>
-        <focus />another
+        a<focus />nother
       </paragraph>
     </document>
   </value>
@@ -26,7 +26,7 @@ export const output = (
         <anchor />word
       </code>
       <code>
-        <focus />another
+        a<focus />nother
       </code>
     </document>
   </value>

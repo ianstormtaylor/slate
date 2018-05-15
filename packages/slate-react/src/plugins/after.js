@@ -1,13 +1,13 @@
-
 import Base64 from 'slate-base64-serializer'
 import Debug from 'debug'
 import Plain from 'slate-plain-serializer'
+import { IS_IOS } from 'slate-dev-environment'
 import React from 'react'
 import getWindow from 'get-window'
 import { Block, Inline, Text } from 'slate'
+import Hotkeys from 'slate-hotkeys'
 
 import EVENT_HANDLERS from '../constants/event-handlers'
-import HOTKEYS from '../constants/hotkeys'
 import Content from '../components/content'
 import cloneFragment from '../utils/clone-fragment'
 import findDOMNode from '../utils/find-dom-node'
@@ -224,9 +224,11 @@ function AfterPlugin() {
       selection.endKey == target.endKey &&
       selection.endOffset < target.endOffset
     ) {
-      target = target.move(selection.startKey == selection.endKey
-        ? 0 - selection.endOffset + selection.startOffset
-        : 0 - selection.endOffset)
+      target = target.move(
+        selection.startKey == selection.endKey
+          ? 0 - selection.endOffset + selection.startOffset
+          : 0 - selection.endOffset
+      )
     }
 
     if (isDraggingInternally) {
@@ -251,12 +253,12 @@ function AfterPlugin() {
         if (n) change.collapseToStartOf(n)
       }
 
-      text
-        .split('\n')
-        .forEach((line, i) => {
+      if (text) {
+        text.split('\n').forEach((line, i) => {
           if (i > 0) change.splitBlock()
           change.insertText(line)
         })
+      }
     }
 
     if (type == 'fragment') {
@@ -264,11 +266,11 @@ function AfterPlugin() {
     }
 
     if (type == 'node' && Block.isBlock(node)) {
-      change.insertBlock(node).removeNodeByKey(node.key)
+      change.insertBlock(node.regenerateKey()).removeNodeByKey(node.key)
     }
 
     if (type == 'node' && Inline.isInline(node)) {
-      change.insertInline(node).removeNodeByKey(node.key)
+      change.insertInline(node.regenerateKey()).removeNodeByKey(node.key)
     }
 
     // COMPAT: React's onSelect event breaks after an onDrop event
@@ -279,11 +281,13 @@ function AfterPlugin() {
     const el = findDOMNode(focusNode, window)
     if (!el) return
 
-    el.dispatchEvent(new MouseEvent('mouseup', {
-      view: window,
-      bubbles: true,
-      cancelable: true
-    }))
+    el.dispatchEvent(
+      new MouseEvent('mouseup', {
+        view: window,
+        bubbles: true,
+        cancelable: true,
+      })
+    )
   }
 
   /**
@@ -301,8 +305,8 @@ function AfterPlugin() {
 
     // Get the selection point.
     const native = window.getSelection()
-    const { anchorNode, anchorOffset } = native
-    const point = findPoint(anchorNode, anchorOffset, value)
+    const { anchorNode } = native
+    const point = findPoint(anchorNode, 0, value)
     if (!point) return
 
     // Get the text node and leaf in question.
@@ -315,11 +319,12 @@ function AfterPlugin() {
     let start = 0
     let end = 0
 
-    const leaf = leaves.find((r) => {
-      start = end
-      end += r.text.length
-      if (end >= point.offset) return true
-    }) || lastLeaf
+    const leaf =
+      leaves.find(r => {
+        start = end
+        end += r.text.length
+        if (end > point.offset) return true
+      }) || lastLeaf
 
     // Get the text information.
     const { text } = leaf
@@ -341,12 +346,12 @@ function AfterPlugin() {
     // Determine what the selection should be after changing the text.
     const delta = textContent.length - text.length
     const corrected = selection.collapseToEnd().move(delta)
-    const entire = selection.moveAnchorTo(point.key, start).moveFocusTo(point.key, end)
+    const entire = selection
+      .moveAnchorTo(point.key, start)
+      .moveFocusTo(point.key, end)
 
     // Change the current value to have the leaf's text replaced.
-    change
-      .insertTextAtRange(entire, textContent, leaf.marks)
-      .select(corrected)
+    change.insertTextAtRange(entire, textContent, leaf.marks).select(corrected)
   }
 
   /**
@@ -362,63 +367,66 @@ function AfterPlugin() {
 
     const { value } = change
 
-    if (HOTKEYS.SPLIT_BLOCK(event)) {
+    // COMPAT: In iOS, some of these hotkeys are handled in the
+    // `onNativeBeforeInput` handler of the `<Content>` component in order to
+    // preserve native autocorrect behavior, so they shouldn't be handled here.
+    if (Hotkeys.isSplitBlock(event) && !IS_IOS) {
       return value.isInVoid
         ? change.collapseToStartOfNextText()
         : change.splitBlock()
     }
 
-    if (HOTKEYS.DELETE_CHAR_BACKWARD(event)) {
+    if (Hotkeys.isDeleteCharBackward(event) && !IS_IOS) {
       return change.deleteCharBackward()
     }
 
-    if (HOTKEYS.DELETE_CHAR_FORWARD(event)) {
+    if (Hotkeys.isDeleteCharForward(event) && !IS_IOS) {
       return change.deleteCharForward()
     }
 
-    if (HOTKEYS.DELETE_LINE_BACKWARD(event)) {
+    if (Hotkeys.isDeleteLineBackward(event)) {
       return change.deleteLineBackward()
     }
 
-    if (HOTKEYS.DELETE_LINE_FORWARD(event)) {
+    if (Hotkeys.isDeleteLineForward(event)) {
       return change.deleteLineForward()
     }
 
-    if (HOTKEYS.DELETE_WORD_BACKWARD(event)) {
+    if (Hotkeys.isDeleteWordBackward(event)) {
       return change.deleteWordBackward()
     }
 
-    if (HOTKEYS.DELETE_WORD_FORWARD(event)) {
+    if (Hotkeys.isDeleteWordForward(event)) {
       return change.deleteWordForward()
     }
 
-    if (HOTKEYS.REDO(event)) {
+    if (Hotkeys.isRedo(event)) {
       return change.redo()
     }
 
-    if (HOTKEYS.UNDO(event)) {
+    if (Hotkeys.isUndo(event)) {
       return change.undo()
     }
 
     // COMPAT: Certain browsers don't handle the selection updates properly. In
     // Chrome, the selection isn't properly extended. And in Firefox, the
     // selection isn't properly collapsed. (2017/10/17)
-    if (HOTKEYS.COLLAPSE_LINE_BACKWARD(event)) {
+    if (Hotkeys.isCollapseLineBackward(event)) {
       event.preventDefault()
       return change.collapseLineBackward()
     }
 
-    if (HOTKEYS.COLLAPSE_LINE_FORWARD(event)) {
+    if (Hotkeys.isCollapseLineForward(event)) {
       event.preventDefault()
       return change.collapseLineForward()
     }
 
-    if (HOTKEYS.EXTEND_LINE_BACKWARD(event)) {
+    if (Hotkeys.isExtendLineBackward(event)) {
       event.preventDefault()
       return change.extendLineBackward()
     }
 
-    if (HOTKEYS.EXTEND_LINE_FORWARD(event)) {
+    if (Hotkeys.isExtendLineForward(event)) {
       event.preventDefault()
       return change.extendLineForward()
     }
@@ -426,16 +434,17 @@ function AfterPlugin() {
     // COMPAT: If a void node is selected, or a zero-width text node adjacent to
     // an inline is selected, we need to handle these hotkeys manually because
     // browsers won't know what to do.
-    if (HOTKEYS.COLLAPSE_CHAR_BACKWARD(event)) {
+    if (Hotkeys.isCollapseCharBackward(event)) {
       const { document, isInVoid, previousText, startText } = value
-      const isPreviousInVoid = previousText && document.hasVoidParent(previousText.key)
+      const isPreviousInVoid =
+        previousText && document.hasVoidParent(previousText.key)
       if (isInVoid || isPreviousInVoid || startText.text == '') {
         event.preventDefault()
         return change.collapseCharBackward()
       }
     }
 
-    if (HOTKEYS.COLLAPSE_CHAR_FORWARD(event)) {
+    if (Hotkeys.isCollapseCharForward(event)) {
       const { document, isInVoid, nextText, startText } = value
       const isNextInVoid = nextText && document.hasVoidParent(nextText.key)
       if (isInVoid || isNextInVoid || startText.text == '') {
@@ -444,16 +453,17 @@ function AfterPlugin() {
       }
     }
 
-    if (HOTKEYS.EXTEND_CHAR_BACKWARD(event)) {
+    if (Hotkeys.isExtendCharBackward(event)) {
       const { document, isInVoid, previousText, startText } = value
-      const isPreviousInVoid = previousText && document.hasVoidParent(previousText.key)
+      const isPreviousInVoid =
+        previousText && document.hasVoidParent(previousText.key)
       if (isInVoid || isPreviousInVoid || startText.text == '') {
         event.preventDefault()
         return change.extendCharBackward()
       }
     }
 
-    if (HOTKEYS.EXTEND_CHAR_FORWARD(event)) {
+    if (Hotkeys.isExtendCharForward(event)) {
       const { document, isInVoid, nextText, startText } = value
       const isNextInVoid = nextText && document.hasVoidParent(nextText.key)
       if (isInVoid || isNextInVoid || startText.text == '') {
@@ -488,8 +498,9 @@ function AfterPlugin() {
       if (startBlock.isVoid) return
 
       const defaultBlock = startBlock
-      const defaultMarks = document.getMarksAtRange(selection.collapseToStart())
-      const frag = Plain.deserialize(text, { defaultBlock, defaultMarks }).document
+      const defaultMarks = document.getInsertMarksAtRange(selection)
+      const frag = Plain.deserialize(text, { defaultBlock, defaultMarks })
+        .document
       change.insertFragment(frag)
     }
   }
@@ -591,7 +602,6 @@ function AfterPlugin() {
       <Content
         {...handlers}
         autoCorrect={props.autoCorrect}
-        autoFocus={props.autoFocus}
         className={props.className}
         children={props.children}
         editor={editor}
@@ -617,7 +627,11 @@ function AfterPlugin() {
     if (node.object != 'block' && node.object != 'inline') return
     const Tag = node.object == 'block' ? 'div' : 'span'
     const style = { position: 'relative' }
-    return <Tag {...attributes} style={style}>{children}</Tag>
+    return (
+      <Tag {...attributes} style={style}>
+        {children}
+      </Tag>
+    )
   }
 
   /**

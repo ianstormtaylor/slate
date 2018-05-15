@@ -1,5 +1,5 @@
-
 import Block from './models/block'
+import Change from './models/change'
 import Changes from './changes'
 import Character from './models/character'
 import Data from './models/data'
@@ -17,6 +17,7 @@ import Stack from './models/stack'
 import Text from './models/text'
 import Value from './models/value'
 import { resetKeyGenerator, setKeyGenerator } from './utils/generate-key'
+import { resetMemoization, useMemoization } from './utils/memoize'
 
 /**
  * Export.
@@ -26,6 +27,7 @@ import { resetKeyGenerator, setKeyGenerator } from './utils/generate-key'
 
 export {
   Block,
+  Change,
   Changes,
   Character,
   Data,
@@ -44,6 +46,8 @@ export {
   Value,
   resetKeyGenerator,
   setKeyGenerator,
+  resetMemoization,
+  useMemoization,
 }
 
 export default {
@@ -66,4 +70,6 @@ export default {
   Value,
   resetKeyGenerator,
   setKeyGenerator,
+  resetMemoization,
+  useMemoization,
 }

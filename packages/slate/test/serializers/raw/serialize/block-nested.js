@@ -6,9 +6,7 @@ export const input = (
   <value>
     <document>
       <quote>
-        <paragraph>
-          one
-        </paragraph>
+        <paragraph>one</paragraph>
       </quote>
     </document>
   </value>
@@ -38,14 +36,14 @@ export const output = {
                   {
                     text: 'one',
                     object: 'leaf',
-                    marks: []
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  }
+                    marks: [],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
 }

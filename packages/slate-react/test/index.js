@@ -1,10 +1,3 @@
-
-/**
- * Polyfills.
- */
-
-import 'babel-polyfill' // eslint-disable-line import/no-extraneous-dependencies
-
 /**
  * Dependencies.
  */
@@ -18,6 +11,7 @@ import { resetKeyGenerator } from 'slate'
 describe('slate-react', () => {
   require('./plugins')
   require('./rendering')
+  require('./utils')
 })
 
 /**
