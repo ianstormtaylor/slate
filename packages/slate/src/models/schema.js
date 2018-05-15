@@ -558,8 +558,8 @@ function resolveNodeRule(object, type, obj) {
 }
 
 /**
- * A Lodash customizer for merging schema definitions. Special cases `objects`
- * and `types` arrays to be unioned, and ignores new `null` values.
+ * A Lodash customizer for merging schema definitions. Special cases `objects`,
+ * `marks` and `types` arrays to be unioned, and ignores new `null` values.
  *
  * @param {Mixed} target
  * @param {Mixed} source
