@@ -13,7 +13,7 @@ import Mark from './mark'
  */
 
 const DEFAULTS = {
-  marks: new Set(),
+  marks: Set(),
   text: '',
 }
 
@@ -96,6 +96,47 @@ class Leaf extends Record(DEFAULTS) {
     })
     if (!invalid) return leaves
     return result
+  }
+
+  /**
+   * Split a list of leaves to two lists
+   *
+   * @param {List<Leaf> leaves
+   * @return {Array<List<Leaf>>}
+   */
+
+  static splitLeaves(leaves, offset) {
+    let endOffset = 0
+    let index = -1
+    let left, right
+    leaves.find(leaf => {
+      index++
+      const startOffset = endOffset
+      const { text } = leaf
+      endOffset += text.length
+      if (endOffset < offset) return false
+      if (startOffset > offset) return false
+      const length = offset - startOffset
+      left = leaf.set('text', text.slice(0, length))
+      right = leaf.set('text', text.slice(length))
+      return true
+    })
+    if (left.text.length === 0) {
+      if (index === 0) {
+        return [List.of(left), leaves]
+      }
+      return [leaves.take(index), leaves.skip(index)]
+    }
+    if (right.text.length === 0) {
+      if (index === leaves.size - 1) {
+        return [leaves, List.of(right)]
+      }
+      return [leaves.take(index + 1), leaves.skip(index + 1)]
+    }
+    return [
+      leaves.take(index).push(left),
+      leaves.skip(index + 1).unshift(right),
+    ]
   }
 
   /**

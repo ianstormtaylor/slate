@@ -2,8 +2,6 @@ import isPlainObject from 'is-plain-object'
 import logger from 'slate-dev-logger'
 import { List, OrderedSet, Record, Set, is } from 'immutable'
 
-import Character from './character'
-import Mark from './mark'
 import Leaf from './leaf'
 import MODEL_TYPES from '../constants/model-types'
 import generateKey from '../utils/generate-key'
@@ -16,7 +14,7 @@ import memoize from '../utils/memoize'
  */
 
 const DEFAULTS = {
-  leaves: new List(),
+  leaves: List.of(new Leaf()),
   key: undefined,
 }
 
@@ -163,6 +161,28 @@ class Text extends Record(DEFAULTS) {
     return this.leaves.reduce((string, leaf) => string + leaf.text, '')
   }
 
+  get characters() {
+    return this.leaves.flatMap(x => x.getCharacters())
+  }
+
+  searchLeafAtOffset(offset) {
+    let endOffset = 0
+    let startOffset = 0
+    let index = -1
+    const leaf = this.leaves.find(l => {
+      index++
+      startOffset = endOffset
+      endOffset = startOffset + l.text.length
+      return endOffset >= offset
+    })
+    return {
+      leaf,
+      endOffset,
+      index,
+      startOffset,
+    }
+  }
+
   /**
    * Add a `mark` at `index` and `length`.
    *
@@ -302,17 +322,28 @@ class Text extends Record(DEFAULTS) {
     if (startOffset === 0 && endOffset === this.characters.size) {
       return this.getActiveMarks()
     }
-    const startCharacter = this.characters.get(startOffset)
-    if (!startCharacter) return Set()
-    const result = startCharacter.marks
-    if (result.size === 0) return result
-    return result.withMutations(x => {
-      for (let index = startOffset + 1; index < endOffset; index++) {
-        const c = this.characters.get(index)
-        x.intersect(c.marks)
-        if (x.size === 0) return
+
+    if (startOffset === endOffset) return Set()
+
+    let result = null
+    let leafEnd = 0
+
+    this.leaves.forEach(leaf => {
+      const leafStart = leafEnd
+      leafEnd = leafStart + leaf.text.length
+      if (leafEnd <= startOffset) return
+      if (leafStart > endOffset) return false
+      if (leafStart === endOffset) {
+        if (!result) result = leaf.marks
+        return false
       }
+      if (result && result.size === 0) return false
     })
+
+    if (!result) {
+      return Set()
+    }
+    return result
   }
 
   /**
@@ -322,12 +353,12 @@ class Text extends Record(DEFAULTS) {
    */
 
   getActiveMarks() {
-    if (this.characters.size === 0) return Set()
-    const result = this.characters.first().marks
+    if (this.leaves.size === 0) return Set()
+    const result = this.leaves.first().marks
     if (result.size === 0) return result
 
     return result.withMutations(x => {
-      this.characters.forEach(c => {
+      this.leaves.forEach(c => {
         x.intersect(c.marks)
         if (x.size === 0) return false
       })
@@ -370,16 +401,16 @@ class Text extends Record(DEFAULTS) {
    */
 
   getMarksAsArray() {
-    if (this.characters.size === 0) return []
-    const first = this.characters.first().marks
+    if (this.leaves.size === 0) return []
+    const first = this.leaves.first().marks
     let previousMark = first
     const result = []
-    this.characters.forEach(c => {
+    this.leaves.forEach(leaf => {
       // If the character marks is the same with the
       // previous characters, we do not need to
       // add the marks twice
-      if (c.marks === previousMark) return true
-      previousMark = c.marks
+      if (leaf.marks === previousMark) return true
+      previousMark = leaf.marks
       result.push(previousMark.toArray())
     })
     return Array.prototype.concat.apply(first.toArray(), result)
@@ -393,11 +424,9 @@ class Text extends Record(DEFAULTS) {
    */
 
   getMarksAtIndex(index) {
-    if (index == 0) return Mark.createSet()
-    const { characters } = this
-    const char = characters.get(index - 1)
-    if (!char) return Mark.createSet()
-    return char.marks
+    const { leaf } = this.searchLeafAtOffset(index)
+    if (!leaf) return Set()
+    return leaf.marks
   }
 
   /**
@@ -425,24 +454,36 @@ class Text extends Record(DEFAULTS) {
   /**
    * Insert `text` at `index`.
    *
-   * @param {Numbder} index
+   * @param {Numbder} offset
    * @param {String} text
-   * @param {String} marks (optional)
+   * @param {Set} marks (optional)
    * @return {Text}
    */
 
-  insertText(index, text, marks) {
-    let { characters } = this
-    const chars = Character.createList(
-      text.split('').map(char => ({ text: char, marks }))
+  insertText(offset, text, marks) {
+    if (text.length === 0) return this
+    if (!marks) marks = Set()
+
+    const { startOffset, leaf, index } = this.searchLeafAtOffset(offset)
+    const delta = offset - startOffset
+    const beforeText = leaf.slice(0, delta)
+    const afterText = leaf.slice(delta)
+
+    const { leaves } = this
+    if (leaf.marks.equals(marks)) {
+      return this.set(
+        'leaves',
+        leaves.set(index, leaf.set('text', beforeText + text + afterText))
+      )
+    }
+    const nextLeaves = leaves.splice(
+      index,
+      1,
+      leaf.set('text', beforeText),
+      Leaf.create({ text, marks }),
+      leaf.set('text', afterText)
     )
-
-    characters = characters
-      .slice(0, index)
-      .concat(chars)
-      .concat(characters.slice(index))
-
-    return this.set('characters', characters)
+    return this.set('leaves', Leaf.createLeaves(nextLeaves))
   }
 
   /**
@@ -557,11 +598,10 @@ class Text extends Record(DEFAULTS) {
    * @returns {Array<Text>}
    */
 
-  splitText(position) {
-    const befores = this.characters.take(position)
-    const afters = this.characters.skip(position)
-    const one = this.set('characters', befores)
-    const two = this.set('characters', afters).regenerateKey()
+  splitText(offset) {
+    const splitted = Leaf.splitLeaves(this.leaves, offset)
+    const one = this.set('leaves', splitted[0])
+    const two = this.set('leaves', splitted[1]).regenerateKey()
     return [one, two]
   }
 
@@ -572,8 +612,8 @@ class Text extends Record(DEFAULTS) {
    */
 
   mergeText(text) {
-    const characters = this.characters.concat(text.characters)
-    return this.set('characters', characters)
+    const leaves = Leaf.createLeaves(this.leaves.concat(text.leaves))
+    return this.set('leaves', leaves)
   }
 
   /**
