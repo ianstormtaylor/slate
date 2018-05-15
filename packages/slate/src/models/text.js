@@ -167,6 +167,10 @@ class Text extends Record(DEFAULTS) {
     return this.characters.reduce((string, char) => string + char.text, '')
   }
 
+  get leaves() {
+    return this.getLeaves()
+  }
+
   /**
    * Add a `mark` at `index` and `length`.
    *
@@ -552,6 +556,31 @@ class Text extends Record(DEFAULTS) {
       return char
     })
 
+    return this.set('characters', characters)
+  }
+
+  /**
+   * Split this text and return two different texts
+   * @param {Number} position
+   * @returns {Array<Text>}
+   */
+
+  splitText(position) {
+    const befores = this.characters.take(position)
+    const afters = this.characters.skip(position)
+    const one = this.set('characters', befores)
+    const two = this.set('characters', afters).regenerateKey()
+    return [one, two]
+  }
+
+  /**
+   * merge this text and another text at the end
+   * @param {Text} text
+   * @returns {Text}
+   */
+
+  mergeText(text) {
+    const characters = this.characters.concat(text.characters)
     return this.set('characters', characters)
   }
 
