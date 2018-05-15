@@ -567,7 +567,7 @@ function resolveNodeRule(object, type, obj) {
  */
 
 function customizer(target, source, key) {
-  if (key == 'objects' || key == 'types') {
+  if (key == 'objects' || key == 'types' || key == 'marks') {
     return target == null ? source : target.concat(source)
   } else {
     return source == null ? target : source
