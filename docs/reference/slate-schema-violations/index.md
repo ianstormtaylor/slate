@@ -14,8 +14,7 @@ import {
   NODE_IS_VOID_INVALID,
   NODE_MARK_INVALID,
   NODE_TEXT_INVALID,
-  PARENT_OBJECT_INVALID,
-  PARENT_TYPE_INVALID,
+  PARENT_INVALID,
 } from 'slate-schema-violations'
 ```
 
@@ -189,7 +188,7 @@ Raised when one of the marks in a node is invalid.
 
 Raised when the text content of a node is invalid.
 
-### `PARENT_OBJECT_INVALID`
+### `PARENT_INVALID`
 
 ```js
 {
@@ -199,16 +198,4 @@ Raised when the text content of a node is invalid.
 }
 ```
 
-Raised when the `object` property of the parent of a node is invalid, when a specific `parent` rule was defined in a schema.
-
-### `PARENT_TYPE_INVALID`
-
-```js
-{
-  node: Node,
-  parent: Node,
-  rule: Object,
-}
-```
-
-Raised when the `type` property of the parent of a node is invalid, when a specific `parent` rule was defined in a schema.
+Raised when the `object` or `type` property of the parent of a node is invalid, if some `types` or `objects` where specified in a schema `parent` rule.

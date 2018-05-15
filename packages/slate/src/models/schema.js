@@ -17,8 +17,7 @@ import {
   NODE_IS_VOID_INVALID,
   NODE_MARK_INVALID,
   NODE_TEXT_INVALID,
-  PARENT_OBJECT_INVALID,
-  PARENT_TYPE_INVALID,
+  PARENT_INVALID,
 } from 'slate-schema-violations'
 
 import CORE_SCHEMA_RULES from '../constants/core-schema-rules'
@@ -235,8 +234,7 @@ class Schema extends Record(DEFAULTS) {
 
       case CHILD_REQUIRED:
       case NODE_TEXT_INVALID:
-      case PARENT_OBJECT_INVALID:
-      case PARENT_TYPE_INVALID: {
+      case PARENT_INVALID: {
         const { node } = context
         return node.object == 'document'
           ? node.nodes.forEach(child => change.removeNodeByKey(child.key))
@@ -386,19 +384,19 @@ class Schema extends Record(DEFAULTS) {
         ) {
           const r = parents[child.type]
 
-          if (
-            r.parent.objects != null &&
-            !r.parent.objects.includes(node.object)
-          ) {
-            return this.fail(PARENT_OBJECT_INVALID, {
-              node: child,
-              parent: node,
-              rule: r,
-            })
-          }
+          // Refer to PARENT_INVALID documentation for the specification
+          const definedObjects = r.parent.objects != null
+          const definedTypes = r.parent.types != null
 
-          if (r.parent.types != null && !r.parent.types.includes(node.type)) {
-            return this.fail(PARENT_TYPE_INVALID, {
+          const allowedObject =
+            definedObjects && r.parent.objects.includes(node.object)
+          const allowedType = definedTypes && r.parent.types.includes(node.type)
+
+          const allowed =
+            (!definedObjects && !definedTypes) || allowedObject || allowedType
+
+          if (!allowed) {
+            return this.fail(PARENT_INVALID, {
               node: child,
               parent: node,
               rule: r,
