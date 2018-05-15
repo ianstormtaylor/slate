@@ -2112,7 +2112,7 @@ memoize(Node.prototype, [
   'getMarksAtPosition',
   'getOrderedMarksBetweenPositions',
   'getInsertMarksAtRange',
-  'getKeysAsArray',
+  'getKeysAsDictionary',
   'getLastText',
   'getMarksByTypeAsArray',
   'getNextBlock',
