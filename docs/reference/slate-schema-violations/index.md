@@ -198,4 +198,10 @@ Raised when the text content of a node is invalid.
 }
 ```
 
-Raised when the `object` or `type` property of the parent of a node is invalid, if some `types` or `objects` where specified in a schema `parent` rule.
+Raised when the `object` or `type` property of the parent of a node is invalid, if some `types` or `objects` where specified in a schema `parent` rule. See the table below to understand how `objects` and `types` work together:
+
+|               | no objects     | objects valid | objects invalid |
+| ------------- | -------------- | ------------- | --------------- |
+| no types      | ✅             | ✅            | PARENT_INVALID  |
+| types valid   | ✅             | ✅            | ✅              |
+| types invalid | PARENT_INVALID | ✅            | PARENT_INVALID  |
