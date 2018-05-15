@@ -8,10 +8,8 @@ import { resetKeyGenerator } from 'slate'
  * Tests.
  */
 
-describe('slate-react', () => {
-  require('./plugins')
-  require('./rendering')
-  require('./utils')
+describe('utils', () => {
+  require('./get-children-decorations')
 })
 
 /**

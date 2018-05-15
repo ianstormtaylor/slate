@@ -1,9 +1,11 @@
 import Base64 from 'slate-base64-serializer'
-import { IS_CHROME, IS_SAFARI, IS_OPERA } from 'slate-dev-environment'
-
+import TRANSFER_TYPES from '../constants/transfer-types'
 import getWindow from 'get-window'
 import findDOMNode from './find-dom-node'
+import removeAllRanges from './remove-all-ranges'
 import { ZERO_WIDTH_SELECTOR, ZERO_WIDTH_ATTRIBUTE } from './find-point'
+
+const { FRAGMENT, HTML, TEXT } = TRANSFER_TYPES
 
 /**
  * Prepares a Slate document fragment to be copied to the clipboard.
@@ -16,7 +18,7 @@ import { ZERO_WIDTH_SELECTOR, ZERO_WIDTH_ATTRIBUTE } from './find-point'
 function cloneFragment(event, value, fragment = value.fragment) {
   const window = getWindow(event.target)
   const native = window.getSelection()
-  const { startKey, endKey, startText } = value
+  const { startKey, endKey } = value
   const startVoid = value.document.getClosestVoid(startKey)
   const endVoid = value.document.getClosestVoid(endKey)
 
@@ -32,7 +34,7 @@ function cloneFragment(event, value, fragment = value.fragment) {
 
   // Make sure attach is a non-empty node, since empty nodes will not get copied
   contents.childNodes.forEach(node => {
-    if (node.innerText.trim() !== '') {
+    if (node.innerText && node.innerText.trim() !== '') {
       attach = node
     }
   })
@@ -55,40 +57,12 @@ function cloneFragment(event, value, fragment = value.fragment) {
     attach = contents.childNodes[0].childNodes[1].firstChild
   }
 
-  // COMPAT: in Safari and Chrome when selecting a single marked word, marks are
-  // not preserved when copying. If the attatched is not void, and the start key
-  // and endKey is the same, check if there is marks involved. If so, set the
-  // range start just before the start text node.
-  if ((IS_CHROME || IS_SAFARI || IS_OPERA) && !endVoid && startKey === endKey) {
-    const hasMarks =
-      startText.characters
-        .slice(value.selection.anchorOffset, value.selection.focusOffset)
-        .filter(char => char.marks.size !== 0).size !== 0
-    if (hasMarks) {
-      const r = range.cloneRange()
-      const node = findDOMNode(startText, window)
-      r.setStartBefore(node)
-      contents = r.cloneContents()
-      attach = contents.childNodes[contents.childNodes.length - 1].firstChild
-    }
-  }
-
   // Remove any zero-width space spans from the cloned DOM so that they don't
   // show up elsewhere when pasted.
   ;[].slice.call(contents.querySelectorAll(ZERO_WIDTH_SELECTOR)).forEach(zw => {
     const isNewline = zw.getAttribute(ZERO_WIDTH_ATTRIBUTE) === 'n'
     zw.textContent = isNewline ? '\n' : ''
   })
-
-  // COMPAT: In Chrome and Safari, if the last element in the selection to
-  // copy has `contenteditable="false"` the copy will fail, and nothing will
-  // be put in the clipboard. So we remove them all. (2017/05/04)
-  if (IS_CHROME || IS_SAFARI || IS_OPERA) {
-    const els = [].slice.call(
-      contents.querySelectorAll('[contenteditable="false"]')
-    )
-    els.forEach(el => el.removeAttribute('contenteditable'))
-  }
 
   // Set a `data-slate-fragment` attribute on a non-empty node, so it shows up
   // in the HTML, and can be used for intra-Slate pasting. If it's a text
@@ -107,36 +81,35 @@ function cloneFragment(event, value, fragment = value.fragment) {
 
   attach.setAttribute('data-slate-fragment', encoded)
 
-  // Add the phony content to the DOM, and select it, so it will be copied.
-  const editor = event.target.closest('[data-slate-editor]')
+  // Add the phony content to a div element. This is needed to copy the
+  // contents into the html clipboard register.
   const div = window.document.createElement('div')
+  div.appendChild(contents)
+
+  // For browsers supporting it, we set the clipboard registers manually,
+  // since the result is more predictable.
+  if (event.clipboardData && event.clipboardData.setData) {
+    event.preventDefault()
+    event.clipboardData.setData(TEXT, native.toString())
+    event.clipboardData.setData(FRAGMENT, encoded)
+    event.clipboardData.setData(HTML, div.innerHTML)
+    return
+  }
+
+  // COMPAT: For browser that don't support the Clipboard API's setData method,
+  // we must rely on the browser to natively copy what's selected.
+  // So we add the div (containing our content) to the DOM, and select it.
+  const editor = event.target.closest('[data-slate-editor]')
   div.setAttribute('contenteditable', true)
   div.style.position = 'absolute'
   div.style.left = '-9999px'
-
-  // COMPAT: In Firefox, the viewport jumps to find the phony div, so it
-  // should be created at the current scroll offset with `style.top`.
-  // The box model attributes which can interact with 'top' are also reset.
-  div.style.border = '0px'
-  div.style.padding = '0px'
-  div.style.margin = '0px'
-  div.style.top = `${window.pageYOffset ||
-    window.document.documentElement.scrollTop}px`
-
-  div.appendChild(contents)
   editor.appendChild(div)
-
-  // COMPAT: In Firefox, trying to use the terser `native.selectAllChildren`
-  // throws an error, so we use the older `range` equivalent. (2016/06/21)
-  const r = window.document.createRange()
-  r.selectNodeContents(div)
-  native.removeAllRanges()
-  native.addRange(r)
+  native.selectAllChildren(div)
 
   // Revert to the previous selection right after copying.
   window.requestAnimationFrame(() => {
     editor.removeChild(div)
-    native.removeAllRanges()
+    removeAllRanges(native)
     native.addRange(range)
   })
 }
