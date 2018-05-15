@@ -16,7 +16,7 @@ import memoize from '../utils/memoize'
  */
 
 const DEFAULTS = {
-  characters: new List(),
+  leaves: new List(),
   key: undefined,
 }
 
@@ -89,12 +89,8 @@ class Text extends Record(DEFAULTS) {
 
     const { leaves = [], key = generateKey() } = object
 
-    const characters = leaves
-      .map(Leaf.fromJSON)
-      .reduce((l, r) => l.concat(r.getCharacters()), new List())
-
     const node = new Text({
-      characters,
+      leaves: Leaf.createLeaves(leaves),
       key,
     })
 
@@ -164,11 +160,7 @@ class Text extends Record(DEFAULTS) {
    */
 
   get text() {
-    return this.characters.reduce((string, char) => string + char.text, '')
-  }
-
-  get leaves() {
-    return this.getLeaves()
+    return this.leaves.reduce((string, leaf) => string + leaf.text, '')
   }
 
   /**

@@ -50,6 +50,55 @@ class Leaf extends Record(DEFAULTS) {
   }
 
   /**
+   * Create a List of `Leaves` with `leaves`.
+   *
+   * @param {List<Object|Leaf>|Array<Object|Leaf> leaves
+   * @return {List<Leaf>}
+   */
+
+  static createLeaves(leaves) {
+    if (Array.isArray(leaves))
+      leaves = new List(leaves.map(l => Leaf.create(l)))
+
+    if (!List.isList(leaves)) {
+      throw new TypeError(
+        `create leaves only accepts Array or List, but it is given as ${leaves}`
+      )
+    }
+    if (leaves.size === 0) return leaves
+
+    let invalid = false
+    const result = List().withMutations(right => {
+      leaves.findLast((leaf, index) => {
+        if (!Leaf.isLeaf(leaf)) {
+          invalid = true
+          leaf = Leaf.create(leaf)
+        }
+        const firstLeaf = right.first()
+        if (firstLeaf) {
+          if (firstLeaf.marks.equals(leaf.marks)) {
+            invalid = true
+            return false
+          }
+          if (firstLeaf.text === 0) {
+            invalid = true
+            right.set(0, leaf)
+            return false
+          }
+          if (leaf.text === 0) {
+            invalid = true
+            return false
+          }
+        }
+        right.unshift(leaf)
+        return false
+      })
+    })
+    if (!invalid) return leaves
+    return result
+  }
+
+  /**
    * Create a `Leaf` list from `attrs`.
    *
    * @param {Array<Leaf|Object>|List<Leaf|Object>} attrs
@@ -99,7 +148,11 @@ class Leaf extends Record(DEFAULTS) {
    */
 
   static isLeaf(any) {
-    return !!(any && any[MODEL_TYPES.LEAF])
+    if (!any || !any.__proto__) return false
+    if (any.__proto__.hasOwnProperty) {
+      return any.__proto__.hasOwnProperty(MODEL_TYPES.LEAF)
+    }
+    return !!any[MODEL_TYPES.LEAF]
   }
 
   /**
