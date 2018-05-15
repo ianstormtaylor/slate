@@ -1861,8 +1861,7 @@ class Node {
 
     // If the nodes are text nodes, concatenate their characters together.
     if (one.object == 'text') {
-      const characters = one.characters.concat(two.characters)
-      one = one.set('characters', characters)
+      one = one.mergeText(two)
     } else {
       // Otherwise, concatenate their child nodes together.
       const nodes = one.nodes.concat(two.nodes)
@@ -1944,7 +1943,7 @@ class Node {
       throw new Error(`Could not find a descendant node with key "${key}".`)
 
     const index = parent.nodes.findIndex(n => n.key === key)
-    const nodes = parent.nodes.splice(index, 1)
+    const nodes = parent.nodes.delete(index)
 
     parent = parent.set('nodes', nodes)
     node = node.updateNode(parent)
@@ -1959,7 +1958,7 @@ class Node {
    */
 
   removeNode(index) {
-    const nodes = this.nodes.splice(index, 1)
+    const nodes = this.nodes.delete(index)
     return this.set('nodes', nodes)
   }
 
