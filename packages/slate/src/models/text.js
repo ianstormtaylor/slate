@@ -85,10 +85,13 @@ class Text extends Record(DEFAULTS) {
       return object
     }
 
-    const { leaves = [], key = generateKey() } = object
+    const { key = generateKey() } = object
+    let { leaves = List() } = object
+    if (Array.isArray(leaves)) leaves = new List(leaves)
+    leaves = leaves.map(x => Leaf.create(x))
 
     const node = new Text({
-      leaves: leaves.length === 0 ? List() : Leaf.createLeaves(leaves),
+      leaves: Leaf.createLeaves(leaves),
       key,
     })
 

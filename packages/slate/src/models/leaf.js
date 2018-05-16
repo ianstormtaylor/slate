@@ -57,14 +57,6 @@ class Leaf extends Record(DEFAULTS) {
    */
 
   static createLeaves(leaves) {
-    if (Array.isArray(leaves))
-      leaves = new List(leaves.map(l => Leaf.create(l)))
-
-    if (!List.isList(leaves)) {
-      throw new TypeError(
-        `create leaves only accepts Array or List, but it is given as ${leaves}`
-      )
-    }
     if (leaves.size === 0) return leaves
 
     let invalid = false
