@@ -1977,9 +1977,7 @@ class Node {
     // If the child is a text node, the `position` refers to the text offset at
     // which to split it.
     if (child.object == 'text') {
-      const result = child.splitText(position)
-      one = result[0]
-      two = result[1]
+      ;[one, two] = child.splitText(position)
     } else {
       // Otherwise, if the child is not a text node, the `position` refers to the
       // index at which to split its children.
