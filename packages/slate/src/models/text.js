@@ -17,6 +17,7 @@ const DEFAULTS = {
   leaves: List(),
   key: undefined,
 }
+const emptyLeaf = Leaf.create({})
 
 /**
  * Text.
@@ -206,7 +207,7 @@ class Text extends Record(DEFAULTS) {
    */
 
   addMark(index, length, mark) {
-    const marks = new Set([mark])
+    const marks = Set.of(mark)
     return this.addMarks(index, length, marks)
   }
 
@@ -249,7 +250,7 @@ class Text extends Record(DEFAULTS) {
 
   getLeaves(decorations = []) {
     let { leaves } = this
-    if (leaves.size === 0) return List.of(Leaf.create({}))
+    if (leaves.size === 0) return List.of(emptyLeaf)
     if (!decorations || decorations.length === 0) return leaves
     if (this.text.length === 0) return leaves
     const { key } = this
@@ -637,7 +638,6 @@ Text.prototype[MODEL_TYPES.TEXT] = true
 
 memoize(Text.prototype, [
   'getDecorations',
-  'getLeaves',
   'getActiveMarks',
   'getMarks',
   'getMarksAsArray',
