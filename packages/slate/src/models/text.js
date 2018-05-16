@@ -340,15 +340,33 @@ class Text extends Record(DEFAULTS) {
    */
 
   getMarksBetweenOffsets(startOffset, endOffset) {
-    if (startOffset === 0 && endOffset === this.characters.size) {
+    if (startOffset <= 0 && endOffset >= this.text.length) {
       return this.getMarks()
     }
-    return new OrderedSet().withMutations(result => {
-      for (let index = startOffset; index < endOffset; index++) {
-        const c = this.characters.get(index)
-        result.union(c.marks)
+    if (startOffset >= endOffset) return Set()
+    // For empty text in a paragraph, use getActiveMarks;
+    if (this.text === '') return this.getActiveMarks()
+
+    let result = null
+    let leafEnd = 0
+
+    this.leaves.forEach(leaf => {
+      const leafStart = leafEnd
+      leafEnd = leafStart + leaf.text.length
+      if (leafEnd <= startOffset) return
+      if (leafStart >= endOffset) return false
+      if (!result) {
+        result = leaf.marks
+        return
       }
+      result = result.union(leaf.marks)
+      return false
     })
+
+    if (!result) {
+      return Set()
+    }
+    return result
   }
 
   /**
