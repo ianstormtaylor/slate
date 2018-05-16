@@ -1237,17 +1237,12 @@ class Node {
     key = assertKey(key)
 
     const path = this.getPath(key)
-    if (path) {
-      const isLast = index => index === path.length - 1
-      const nextSiblingPath = path.map((n, i) => (isLast(i) ? n + 1 : n))
+    if (!path) return null
 
-      const sibling = this.getDescendantAtPath(nextSiblingPath)
-      if (sibling) {
-        return sibling
-      }
-    }
+    const isLast = index => index === path.length - 1
+    const nextSiblingPath = path.map((n, i) => (isLast(i) ? n + 1 : n))
 
-    throw new Error(`Could not find a child node with key "${key}".`)
+    return this.getDescendantAtPath(nextSiblingPath)
   }
 
   /**
