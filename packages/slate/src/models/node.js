@@ -1236,13 +1236,18 @@ class Node {
   getNextSibling(key) {
     key = assertKey(key)
 
-    const parent = this.getParent(key)
-    const after = parent.nodes.skipUntil(child => child.key == key)
+    const path = this.getPath(key)
+    if (path) {
+      const isLast = index => index === path.length - 1
+      const nextSiblingPath = path.map((n, i) => (isLast(i) ? n + 1 : n))
 
-    if (after.size == 0) {
-      throw new Error(`Could not find a child node with key "${key}".`)
+      const sibling = this.getDescendantAtPath(nextSiblingPath)
+      if (sibling) {
+        return sibling
+      }
     }
-    return after.get(1)
+
+    throw new Error(`Could not find a child node with key "${key}".`)
   }
 
   /**
@@ -1717,7 +1722,7 @@ class Node {
    */
 
   hasDescendant(key) {
-    return !!this.getDescendant(key)
+    return !!this.getPath(key)
   }
 
   /**
@@ -1728,7 +1733,8 @@ class Node {
    */
 
   hasNode(key) {
-    return !!this.getNode(key)
+    return !!this.getDescendant(key)
+    // return !!this.getNode(key)
   }
 
   /**
