@@ -285,7 +285,7 @@ class Text extends Record(DEFAULTS) {
     }
     if (startOffset >= endOffset) return Set()
     // For empty text in a paragraph, use getActiveMarks;
-    if (this.text.length === 0) return this.getActiveMarks()
+    if (this.text === '') return this.getActiveMarks()
 
     let result = null
     let leafEnd = 0
@@ -295,11 +295,13 @@ class Text extends Record(DEFAULTS) {
       leafEnd = leafStart + leaf.text.length
       if (leafEnd <= startOffset) return
       if (leafStart >= endOffset) return false
-      if (leafStart === endOffset) {
-        if (!result) result = leaf.marks
-        return false
+      if (!result) {
+        result = leaf.marks
+        return
       }
+      result = result.intersect(leaf.marks)
       if (result && result.size === 0) return false
+      return false
     })
 
     if (!result) {
@@ -419,7 +421,7 @@ class Text extends Record(DEFAULTS) {
 
   insertText(offset, text, marks) {
     if (text.length === 0) return this
-    if (this.text.length === 0)
+    if (this.text === '')
       return this.set('leaves', List.of(Leaf.create({ text, marks })))
     if (!marks) marks = Set()
 
@@ -488,6 +490,12 @@ class Text extends Record(DEFAULTS) {
     if (index >= this.text.length) return this
     const [before, bundle] = Leaf.splitLeaves(this.leaves, index)
     const after = Leaf.splitLeaves(bundle, length)[1]
+    const leaves = Leaf.createLeaves(before.concat(after))
+
+    if (leaves.size === 1) {
+      const first = leaves.first()
+      if (first.text === '') return this.set('leaves', List())
+    }
     return this.setLeaves(before.concat(after))
   }
 
@@ -604,7 +612,9 @@ class Text extends Record(DEFAULTS) {
     if (result.size === 1) {
       const first = result.first()
       if (!first.marks || first.marks.size === 0) {
-        return this.set('leaves', List())
+        if (first.text === '') {
+          return this.set('leaves', List())
+        }
       }
     }
 

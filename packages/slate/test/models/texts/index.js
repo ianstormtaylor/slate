@@ -26,7 +26,7 @@ describe('texts', () => {
             const fn = module.default
             const t = skip ? it.skip : it
 
-            t(test, () => {
+            t(test.replace('.js', ''), () => {
               const actual = fn(input)
               const opts = { preserveData: true }
               const expected = output.toJSON(opts)

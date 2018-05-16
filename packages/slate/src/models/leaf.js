@@ -81,12 +81,12 @@ class Leaf extends Record(DEFAULTS) {
             right.set(0, firstLeaf.set('text', `${leaf.text}${firstLeaf.text}`))
             return false
           }
-          if (firstLeaf.text.length === 0) {
+          if (firstLeaf.text === '') {
             invalid = true
             right.set(0, leaf)
             return false
           }
-          if (leaf.text.length === 0) {
+          if (leaf.text === '') {
             invalid = true
             return false
           }
@@ -126,13 +126,13 @@ class Leaf extends Record(DEFAULTS) {
       return true
     })
 
-    if (left.text.length === 0) {
+    if (left.text === '') {
       if (index === 0) {
         return [List.of(left), leaves]
       }
       return [leaves.take(index), leaves.skip(index)]
     }
-    if (right.text.length === 0) {
+    if (right.text === '') {
       if (index === leaves.size - 1) {
         return [leaves, List.of(right)]
       }
