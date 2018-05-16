@@ -11,7 +11,7 @@ module.exports.default = function(value) {
   ReactDOM.renderToStaticMarkup(el)
 }
 
-module.exports.input = (
+const value = (
   <value>
     <document>
       {Array.from(Array(10)).map(() => (
@@ -27,3 +27,20 @@ module.exports.input = (
     </document>
   </value>
 )
+
+const texts = value.document.getTexts()
+const decorations = texts.flatMap((t, index) => {
+  if (index % 4 !== 0) return []
+  if (t.length === 0) return []
+  return [
+    {
+      anchorKey: t.key,
+      anchorOffset: 0,
+      focusKey: t.key,
+      focusOffset: 1,
+      marks: [{ type: 'underline' }],
+    },
+  ]
+})
+
+module.exports.input = value.change().setValue({ decorations }).value
