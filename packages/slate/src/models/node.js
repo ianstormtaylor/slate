@@ -1183,9 +1183,7 @@ class Node {
     }
 
     const text = this.getDescendant(key)
-    const char = text.characters.get(offset - 1)
-    if (!char) return OrderedSet()
-    return new OrderedSet(char.marks)
+    return text.getMarksAtIndex(offset)
   }
 
   /**

@@ -13,8 +13,9 @@ import memoize from '../utils/memoize'
  * @type {Object}
  */
 
+const emptyLeaf = new Leaf()
 const DEFAULTS = {
-  leaves: List.of(new Leaf()),
+  leaves: List.of(emptyLeaf),
   key: undefined,
 }
 
@@ -462,12 +463,14 @@ class Text extends Record(DEFAULTS) {
 
   insertText(offset, text, marks) {
     if (text.length === 0) return this
+    if (this.text.length === 0)
+      return this.set('leaves', List.of(leaf.create({ text, marks })))
     if (!marks) marks = Set()
 
     const { startOffset, leaf, index } = this.searchLeafAtOffset(offset)
     const delta = offset - startOffset
-    const beforeText = leaf.slice(0, delta)
-    const afterText = leaf.slice(delta)
+    const beforeText = leaf.text.slice(0, delta)
+    const afterText = leaf.text.slice(delta)
 
     const { leaves } = this
     if (leaf.marks.equals(marks)) {
@@ -476,6 +479,7 @@ class Text extends Record(DEFAULTS) {
         leaves.set(index, leaf.set('text', beforeText + text + afterText))
       )
     }
+
     const nextLeaves = leaves.splice(
       index,
       1,
