@@ -78,14 +78,15 @@ class Leaf extends Record(DEFAULTS) {
         if (firstLeaf) {
           if (firstLeaf.marks.equals(leaf.marks)) {
             invalid = true
+            right.set(0, firstLeaf.set('text', `${leaf.text}${firstLeaf.text}`))
             return false
           }
-          if (firstLeaf.text === 0) {
+          if (firstLeaf.text.length === 0) {
             invalid = true
             right.set(0, leaf)
             return false
           }
-          if (leaf.text === 0) {
+          if (leaf.text.length === 0) {
             invalid = true
             return false
           }
@@ -106,6 +107,9 @@ class Leaf extends Record(DEFAULTS) {
    */
 
   static splitLeaves(leaves, offset) {
+    if (leaves.size === 0) {
+      return [List(), List()]
+    }
     let endOffset = 0
     let index = -1
     let left, right
@@ -121,6 +125,7 @@ class Leaf extends Record(DEFAULTS) {
       right = leaf.set('text', text.slice(length))
       return true
     })
+
     if (left.text.length === 0) {
       if (index === 0) {
         return [List.of(left), leaves]
@@ -169,7 +174,7 @@ class Leaf extends Record(DEFAULTS) {
 
     const leaf = new Leaf({
       text,
-      marks: new Set(marks.map(Mark.fromJSON)),
+      marks: Set(marks.map(Mark.fromJSON)),
     })
 
     return leaf
@@ -243,6 +248,48 @@ class Leaf extends Record(DEFAULTS) {
     )
 
     return characters
+  }
+
+  /**
+   * Update a `mark` at leaf, replace with newMark
+   *
+   * @param {Mark} mark
+   * @param {Mark} newMark
+   * @returns {Leaf}
+   */
+
+  updateMark(mark, newMark) {
+    const { marks } = this
+    if (newMark.equals(mark)) return this
+    if (!marks || !marks.has(mark)) return this
+    const newMarks = marks.withMutations(collection => {
+      collection.remove(mark).add(newMark)
+    })
+    return this.set('marks', newMarks)
+  }
+
+  /**
+   * Add a `set` of marks at `index` and `length`.
+   *
+   * @param {Set<Mark>} set
+   * @returns {Text}
+   */
+
+  addMarks(set) {
+    const { marks } = this
+    return this.set('marks', marks.union(set))
+  }
+
+  /**
+   * Remove a `mark` at `index` and `length`.
+   *
+   * @param {Mark} mark
+   * @returns {Text}
+   */
+
+  removeMark(mark) {
+    const { marks } = this
+    return this.set('marks', marks.remove(mark))
   }
 
   /**

@@ -1,6 +1,6 @@
 import isPlainObject from 'is-plain-object'
 import logger from 'slate-dev-logger'
-import { List, OrderedSet, Record, Set, is } from 'immutable'
+import { List, OrderedSet, Record, Set } from 'immutable'
 
 import Leaf from './leaf'
 import MODEL_TYPES from '../constants/model-types'
@@ -13,9 +13,8 @@ import memoize from '../utils/memoize'
  * @type {Object}
  */
 
-const emptyLeaf = new Leaf()
 const DEFAULTS = {
-  leaves: List.of(emptyLeaf),
+  leaves: List(),
   key: undefined,
 }
 
@@ -89,7 +88,7 @@ class Text extends Record(DEFAULTS) {
     const { leaves = [], key = generateKey() } = object
 
     const node = new Text({
-      leaves: Leaf.createLeaves(leaves),
+      leaves: leaves.length === 0 ? List() : Leaf.createLeaves(leaves),
       key,
     })
 
@@ -159,6 +158,16 @@ class Text extends Record(DEFAULTS) {
    */
 
   get text() {
+    return this.getString()
+  }
+
+  /**
+   * Get the concatenated text of the node, cached for text getter
+   *
+   * @returns {String}
+   */
+
+  getString() {
     return this.leaves.reduce((string, leaf) => string + leaf.text, '')
   }
 
@@ -208,42 +217,13 @@ class Text extends Record(DEFAULTS) {
    */
 
   addMarks(index, length, set) {
-    const characters = this.characters.map((char, i) => {
-      if (i < index) return char
-      if (i >= index + length) return char
-      let { marks } = char
-      marks = marks.union(set)
-      char = char.set('marks', marks)
-      return char
-    })
-
-    return this.set('characters', characters)
-  }
-
-  /**
-   * Derive a set of decorated characters with `decorations`.
-   *
-   * @param {List<Decoration>} decorations
-   * @return {List<Character>}
-   */
-
-  getDecoratedCharacters(decorations) {
-    let node = this
-    const { key, characters } = node
-
-    // PERF: Exit early if there are no characters to be decorated.
-    if (characters.size == 0) return characters
-
-    decorations.forEach(range => {
-      const { startKey, endKey, startOffset, endOffset, marks } = range
-      const hasStart = startKey == key
-      const hasEnd = endKey == key
-      const index = hasStart ? startOffset : 0
-      const length = hasEnd ? endOffset - index : characters.size
-      node = node.addMarks(index, length, marks)
-    })
-
-    return node.characters
+    if (length === 0) return this
+    if (this.text.length === 0) return this
+    if (index >= this.text.length) return this
+    const [before, bundle] = Leaf.splitLeaves(this.leaves, index)
+    const [middle, after] = Leaf.splitLeaves(bundle, length)
+    const leaves = before.concat(middle.map(x => x.addMarks(set)), after)
+    return this.setLeaves(leaves)
   }
 
   /**
@@ -265,52 +245,32 @@ class Text extends Record(DEFAULTS) {
    */
 
   getLeaves(decorations = []) {
-    const characters = this.getDecoratedCharacters(decorations)
-    let leaves = []
-
-    // PERF: cache previous values for faster lookup.
-    let prevChar
-    let prevLeaf
-
-    // If there are no characters, return one empty range.
-    if (characters.size == 0) {
-      leaves.push({})
-    } else {
-      // Otherwise, loop the characters and build the leaves...
-      characters.forEach((char, i) => {
-        const { marks, text } = char
-
-        // The first one can always just be created.
-        if (i == 0) {
-          prevChar = char
-          prevLeaf = { text, marks }
-          leaves.push(prevLeaf)
+    let { leaves } = this
+    if (leaves.size === 0) return List.of(Leaf.create({}))
+    if (!decorations || decorations.length === 0) return leaves
+    if (this.text.length === 0) return leaves
+    const { key } = this
+    decorations.forEach(range => {
+      const { startKey, endKey, startOffset, endOffset, marks } = range
+      const hasStart = startKey == key
+      const hasEnd = endKey == key
+      if (hasStart && hasEnd) {
+        const index = hasStart ? startOffset : 0
+        const length = hasEnd ? endOffset - index : this.text.length - index
+        if (length < 1) return
+        if (index >= this.text.length) return
+        if (index !== 0 || length < this.text.length) {
+          const [before, bundle] = Leaf.splitLeaves(this.leaves, index)
+          const [middle, after] = Leaf.splitLeaves(bundle, length)
+          leaves = before.concat(middle.map(x => x.addMarks(marks)), after)
           return
         }
-
-        // Otherwise, compare the current and previous marks.
-        const prevMarks = prevChar.marks
-        const isSame = is(marks, prevMarks)
-
-        // If the marks are the same, add the text to the previous range.
-        if (isSame) {
-          prevChar = char
-          prevLeaf.text += text
-          return
-        }
-
-        // Otherwise, create a new range.
-        prevChar = char
-        prevLeaf = { text, marks }
-        leaves.push(prevLeaf)
-      }, [])
-    }
-
-    // PERF: convert the leaves to immutable objects after iterating.
-    leaves = new List(leaves.map(object => new Leaf(object)))
-
-    // Return the leaves.
-    return leaves
+      }
+      leaves = leaves.map(x => x.addMarks(marks))
+      return
+    })
+    if (leaves === this.leaves) return leaves
+    return Leaf.createLeaves(leaves)
   }
 
   /**
@@ -320,11 +280,12 @@ class Text extends Record(DEFAULTS) {
    */
 
   getActiveMarksBetweenOffsets(startOffset, endOffset) {
-    if (startOffset === 0 && endOffset === this.characters.size) {
+    if (startOffset === 0 && endOffset === this.text.length) {
       return this.getActiveMarks()
     }
-
-    if (startOffset === endOffset) return Set()
+    if (startOffset >= endOffset) return Set()
+    // For empty text in a paragraph, use getActiveMarks;
+    if (this.text.length === 0) return this.getActiveMarks()
 
     let result = null
     let leafEnd = 0
@@ -333,7 +294,7 @@ class Text extends Record(DEFAULTS) {
       const leafStart = leafEnd
       leafEnd = leafStart + leaf.text.length
       if (leafEnd <= startOffset) return
-      if (leafStart > endOffset) return false
+      if (leafStart >= endOffset) return false
       if (leafStart === endOffset) {
         if (!result) result = leaf.marks
         return false
@@ -404,15 +365,10 @@ class Text extends Record(DEFAULTS) {
   getMarksAsArray() {
     if (this.leaves.size === 0) return []
     const first = this.leaves.first().marks
-    let previousMark = first
+    if (this.leaves.size === 1) return first.toArray()
     const result = []
     this.leaves.forEach(leaf => {
-      // If the character marks is the same with the
-      // previous characters, we do not need to
-      // add the marks twice
-      if (leaf.marks === previousMark) return true
-      previousMark = leaf.marks
-      result.push(previousMark.toArray())
+      result.push(leaf.marks.toArray())
     })
     return Array.prototype.concat.apply(first.toArray(), result)
   }
@@ -464,7 +420,7 @@ class Text extends Record(DEFAULTS) {
   insertText(offset, text, marks) {
     if (text.length === 0) return this
     if (this.text.length === 0)
-      return this.set('leaves', List.of(leaf.create({ text, marks })))
+      return this.set('leaves', List.of(Leaf.create({ text, marks })))
     if (!marks) marks = Set()
 
     const { startOffset, leaf, index } = this.searchLeafAtOffset(offset)
@@ -487,7 +443,7 @@ class Text extends Record(DEFAULTS) {
       Leaf.create({ text, marks }),
       leaf.set('text', afterText)
     )
-    return this.set('leaves', Leaf.createLeaves(nextLeaves))
+    return this.setLeaves(nextLeaves)
   }
 
   /**
@@ -511,16 +467,12 @@ class Text extends Record(DEFAULTS) {
    */
 
   removeMark(index, length, mark) {
-    const characters = this.characters.map((char, i) => {
-      if (i < index) return char
-      if (i >= index + length) return char
-      let { marks } = char
-      marks = marks.remove(mark)
-      char = char.set('marks', marks)
-      return char
-    })
-
-    return this.set('characters', characters)
+    if (length <= 0) return this
+    if (index >= this.text.length) return this
+    const [before, bundle] = Leaf.splitLeaves(this.leaves, index)
+    const [middle, after] = Leaf.splitLeaves(bundle, length)
+    const leaves = before.concat(middle.map(x => x.removeMark(mark)), after)
+    return this.setLeaves(leaves)
   }
 
   /**
@@ -532,11 +484,11 @@ class Text extends Record(DEFAULTS) {
    */
 
   removeText(index, length) {
-    let { characters } = this
-    const start = index
-    const end = index + length
-    characters = characters.filterNot((char, i) => start <= i && i < end)
-    return this.set('characters', characters)
+    if (length <= 0) return this
+    if (index >= this.text.length) return this
+    const [before, bundle] = Leaf.splitLeaves(this.leaves, index)
+    const after = Leaf.splitLeaves(bundle, length)[1]
+    return this.setLeaves(before.concat(after))
   }
 
   /**
@@ -580,20 +532,17 @@ class Text extends Record(DEFAULTS) {
    */
 
   updateMark(index, length, mark, properties) {
+    if (length <= 0) return this
+    if (index >= this.text.length) return this
     const newMark = mark.merge(properties)
 
-    const characters = this.characters.map((char, i) => {
-      if (i < index) return char
-      if (i >= index + length) return char
-      let { marks } = char
-      if (!marks.has(mark)) return char
-      marks = marks.remove(mark)
-      marks = marks.add(newMark)
-      char = char.set('marks', marks)
-      return char
-    })
-
-    return this.set('characters', characters)
+    const [before, bundle] = Leaf.splitLeaves(this.leaves, index)
+    const [middle, after] = Leaf.splitLeaves(bundle, length)
+    const leaves = before.concat(
+      middle.map(x => x.updateMark(mark, newMark)),
+      after
+    )
+    return this.setLeaves(leaves)
   }
 
   /**
@@ -616,8 +565,8 @@ class Text extends Record(DEFAULTS) {
    */
 
   mergeText(text) {
-    const leaves = Leaf.createLeaves(this.leaves.concat(text.leaves))
-    return this.set('leaves', leaves)
+    const leaves = this.leaves.concat(text.leaves)
+    return this.setLeaves(leaves)
   }
 
   /**
@@ -633,7 +582,7 @@ class Text extends Record(DEFAULTS) {
 
   /**
    * Get the first invalid descendant
-   * PREF: Do not cache this method; because it can cause cycle reference
+   * PERF: Do not cache this method; because it can cause cycle reference
    *
    * @param {Schema} schema
    * @returns {Text|Null}
@@ -641,6 +590,25 @@ class Text extends Record(DEFAULTS) {
 
   getFirstInvalidDescendant(schema) {
     return this.validate(schema) ? this : null
+  }
+
+  /**
+   * Get the first invalid descendant
+   *
+   * @param {Schema} schema
+   * @returns {Text|Null}
+   */
+
+  setLeaves(leaves) {
+    const result = Leaf.createLeaves(leaves)
+    if (result.size === 1) {
+      const first = result.first()
+      if (!first.marks || first.marks.size === 0) {
+        return this.set('leaves', List())
+      }
+    }
+
+    return this.set('leaves', Leaf.createLeaves(leaves))
   }
 }
 
@@ -655,7 +623,6 @@ Text.prototype[MODEL_TYPES.TEXT] = true
  */
 
 memoize(Text.prototype, [
-  'getDecoratedCharacters',
   'getDecorations',
   'getLeaves',
   'getActiveMarks',
@@ -663,6 +630,7 @@ memoize(Text.prototype, [
   'getMarksAsArray',
   'getMarksAtIndex',
   'validate',
+  'getString',
 ])
 
 /**
