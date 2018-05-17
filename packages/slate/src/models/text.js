@@ -487,9 +487,9 @@ class Text extends Record(DEFAULTS) {
    */
 
   insertText(offset, text, marks) {
-    if (text.length === 0) return this
     if (this.text === '')
       return this.set('leaves', List.of(Leaf.create({ text, marks })))
+    if (text.length === 0) return this
     if (!marks) marks = Set()
 
     const { startOffset, leaf, index } = this.searchLeafAtOffset(offset)

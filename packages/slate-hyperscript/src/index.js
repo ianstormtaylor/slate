@@ -266,7 +266,7 @@ function createChildren(children, options = {}) {
   // When creating the new node, try to preserve a key if one exists.
   const firstText = children.find(c => Text.isText(c))
   const key = options.key ? options.key : firstText ? firstText.key : undefined
-  let node = Text.create({ key })
+  let node = Text.create({ key, leaves: [{ text: '', marks: options.marks }] })
 
   // Create a helper to update the current node while preserving any stored
   // anchor or focus information.
@@ -286,7 +286,9 @@ function createChildren(children, options = {}) {
       if (node.text.length || node.__anchor != null || node.__focus != null)
         array.push(node)
       array.push(child)
-      node = isLast ? null : Text.create()
+      node = isLast
+        ? null
+        : Text.create({ leaves: [{ text: '', marks: options.marks }] })
       length = 0
     }
 
