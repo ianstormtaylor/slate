@@ -57,7 +57,7 @@ class Leaf extends Record(DEFAULTS) {
    */
 
   static createLeaves(leaves) {
-    if (leaves.size === 0) return leaves
+    if (leaves.size <= 1) return leaves
 
     let invalid = false
     const result = List().withMutations(right => {
