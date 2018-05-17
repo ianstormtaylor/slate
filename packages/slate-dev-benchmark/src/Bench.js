@@ -112,7 +112,7 @@ class Bench {
 
     /**
      * Run a bundle of tasks;
-     * the Bench estimate the time consuming of every 1000 tasks, then explictly run gc, and caculate the time consuming of next 1000 tasks
+     * the Bench estimate the time consuming of every `tries` tasks, then explictly run gc, and caculate the time consuming of next bundle tasks
      * @param {number} tries
      *   @param {number} initialIndex
      *   @return {Promise< Object , *>}
