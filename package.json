@@ -87,7 +87,7 @@
     "build:production": "cross-env NODE_ENV=production rollup --config ./support/rollup/config.js && cross-env NODE_ENV=production webpack --config support/webpack/config.js",
     "clean": "lerna run clean && rm -rf ./node_modules ./dist ./build",
     "gh-pages": "gh-pages --dist ./build",
-    "lint": "eslint packages/*/src packages/*/test examples/*/*.js examples/dev/*/*.js && prettier --list-different '**/*.{js,jsx,md,json,css}'",
+    "lint": "eslint benchmark packages/*/src packages/*/test examples/*/*.js examples/dev/*/*.js && prettier --list-different '**/*.{js,jsx,md,json,css}'",
     "open": "open http://localhost:8080",
     "prettier": "prettier --write '**/*.{js,jsx,md,json,css}'",
     "release": "yarn build:production && yarn test && yarn lint && lerna publish && yarn gh-pages",
