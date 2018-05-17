@@ -49,7 +49,7 @@ function logger(obj) {
     }
     const { report } = obj
     const { cycles } = report
-    for (const key of ['user', 'system', 'all', 'hr']) {
+    for (const key of ['user', 'hr']) {
       log(
         `${prefix + prefix + prefix}${key} * ${cycles} cycles: ${
           report[key]
