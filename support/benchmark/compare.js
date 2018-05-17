@@ -25,6 +25,10 @@ if (existsSync(configPath)) {
 console.log()
 console.log(`  benchmarks`)
 
+const header = {
+  user: 'User Space CPU Time Measure:',
+  hr: 'Real World Time Measure:    ',
+}
 baseline.forEach((suite, i) => {
   console.log(`    ${suite.name}`)
 
@@ -51,7 +55,7 @@ baseline.forEach((suite, i) => {
       if (balancePercent > 1000) output += ' 😱'
       else if (faster && balancePercent > 100) output += ' 🙌'
       else if (slower && balancePercent > 100) output += ' 😟'
-      console.log(`        ${elapsedKey} : ${output}`)
+      console.log(`        ${header[elapsedKey]} : ${output}`)
     }
   })
 })

@@ -37,21 +37,29 @@ function errorLog(message, ...args) {
 
 function logger(obj) {
   const prefix = '    '
+
   if (obj.isRepository) {
     return log(`Repository ${obj.name} is running`)
   }
+
   if (obj.isSuite) {
     return log(`${prefix}- Suite ${obj.name} is running`)
   }
+
   if (obj.isBench) {
     if (!obj.isFinished) {
       return log(`${prefix + prefix}- Bench ${obj.name} is running`)
     }
     const { report } = obj
     const { cycles } = report
+
+    const header = {
+      user: '(User Space CPU Time)',
+      hr: '(Real World Time)',
+    }
     for (const key of ['user', 'hr']) {
       log(
-        `${prefix + prefix + prefix}${key} * ${cycles} cycles: ${
+        `${prefix + prefix + prefix}${header[key]} * ${cycles} cycles: ${
           report[key]
         } ms; ( ${cycles * 1000 / report[key]} ops/sec)`
       )
