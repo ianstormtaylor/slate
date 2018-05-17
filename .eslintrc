@@ -16,6 +16,7 @@
     "node": true
   },
   "rules": {
+    "block-spacing": "always",
     "constructor-super": "error",
     "dot-notation": ["error", { "allowKeywords": true }],
     "import/default": "error",
