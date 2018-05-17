@@ -1,5 +1,5 @@
+/* global Promise */
 import { Bench } from '../..'
-import { asyncSleep } from '../utils/sleep'
 import assert from 'assert'
 
 export const experiment = 'max-time-async'
@@ -24,8 +24,6 @@ export default function(suite) {
     async: true,
   })
   bench.run(() =>
-    asyncSleep(10).then(() => {
-      index++
-    })
+    new Promise(resolve => setTimeout(resolve, 10)).then(() => index++)
   )
 }
