@@ -91,7 +91,9 @@ yarn benchmark
 There will be some subtle changes in iteration speed always, but the comparison reporter will highlight any changes that seem meaningful. You can run `benchmark` multiple times to ensure the speed up persists.
 
 ### Run Selected Benchmarks
+
 To run selected benchmarks, create `tmp/benchmark-config.js` with `module.exports.include`. For example, to run slate-core benchmarks only with `get-*`, we can create a `tmp/benchmark-config.js` as
+
 ```
 module.exports.include = {
   slate: /^get/
