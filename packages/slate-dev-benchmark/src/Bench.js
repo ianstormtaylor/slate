@@ -100,11 +100,7 @@ class Bench {
       initialIndex += this.options.allocationTries
     ) {
       const tries = Math.min(times - initialIndex, this.options.allocationTries)
-      const thisTryReport = await compposeAnAllocation.call(
-        this,
-        tries,
-        initialIndex
-      )
+      const thisTryReport = await runBundleTasks.call(this, tries, initialIndex)
       if (global.gc) {
         global.gc()
       }
@@ -122,13 +118,13 @@ class Bench {
      *    @return {Promise< Object , *>}
      */
 
-    function compposeAnAllocation(tries, initialIndex) {
+    function runBundleTasks(tries, initialIndex) {
       const inputs = Array.from({ length: tries }).map(index =>
         inputer(index + initialIndex)
       )
       const timer = new Timer()
       timer.start()
-      return dispatch(0).then(cycles => {
+      return runFrom(0).then(cycles => {
         timer.end()
         const { elapsed } = timer
         return { ...elapsed, cycles }
@@ -140,7 +136,7 @@ class Bench {
        *  @return {Promise<number, *>}
        */
 
-      function dispatch(index) {
+      function runFrom(index) {
         if (index === tries) return Promise.resolve(tries)
         if (index === nextCheckIndex) {
           const hrEnd = process.hrtime(hrStart)
@@ -157,10 +153,10 @@ class Bench {
         if (!isAsync) {
           const inputVar = inputs[index]
           runner(inputVar)
-          return dispatch(index + 1)
+          return runFrom(index + 1)
         } else {
           return Promise.resolve(runner(inputs[index])).then(() =>
-            dispatch(index + 1)
+            runFrom(index + 1)
           )
         }
       }
