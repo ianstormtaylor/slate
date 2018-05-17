@@ -27,14 +27,13 @@ console.log(`  benchmarks`)
 
 const header = {
   user: 'User Space CPU Time Measure:',
-  hr: 'Real World Time Measure:    ',
 }
 baseline.forEach((suite, i) => {
   console.log(`    ${suite.name}`)
 
   suite.benchmarks.forEach((base, j) => {
     console.log(`      ${base.name}`)
-    for (const elapsedKey of ['user', 'hr']) {
+    for (const elapsedKey of ['user']) {
       const comp = comparison[i].benchmarks[j]
       if (!comp) return
 
