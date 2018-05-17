@@ -30,7 +30,7 @@ class Timer {
   }
 
   /**
-   * Stop the timer and store restore in tihs.elapsed
+   * Stop the timer and store restore in this.elapsed
    * @return {Object}
    */
 
