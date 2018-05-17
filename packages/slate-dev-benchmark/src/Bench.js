@@ -2,7 +2,7 @@
 const { BenchType } = require('./types')
 const { makeOptions } = require('./makeOptions')
 const { Timer } = require('./Timer')
-const { logger } = require('../logger')
+const { logger } = require('./logger')
 
 const errorReport = {
   cycles: NaN,

@@ -1,8 +1,8 @@
 /* global Promise */
 const { repo } = require('./Repository.js')
 const { SuiteType } = require('./types')
-const { logger } = require('../logger')
-const { compose } = require('../compose')
+const { logger } = require('./logger')
+const { compose } = require('./compose')
 const { makeOptions } = require('./makeOptions')
 
 /*

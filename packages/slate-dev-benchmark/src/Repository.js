@@ -1,7 +1,7 @@
 /* global Promise */
 const { RepositoryType } = require('./types')
-const { logger } = require('../logger')
-const { compose } = require('../compose')
+const { logger } = require('./logger')
+const { compose } = require('./compose')
 
 /* Repository Class for holding Suite
 */
