@@ -30,6 +30,7 @@ const keys = value.document
   .getTexts()
   .toArray()
   .map(t => t.key)
+
 module.exports.input = function() {
   const change = value.change()
   return { change, keys }

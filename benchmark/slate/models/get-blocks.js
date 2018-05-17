@@ -6,6 +6,7 @@ const h = require('../../helpers/h')
 module.exports.default = function(value) {
   value.document.getBlocks()
 }
+
 const value = (
   <value>
     <document>
@@ -22,4 +23,7 @@ const value = (
     </document>
   </value>
 )
-module.exports.input = () => value
+
+module.exports.input = function() {
+  return value
+}

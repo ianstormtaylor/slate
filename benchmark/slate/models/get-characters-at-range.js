@@ -6,6 +6,7 @@ const h = require('../../helpers/h')
 module.exports.default = function(value) {
   value.document.getCharactersAtRange(value.selection)
 }
+
 const value = (
   <value>
     <document>
@@ -25,4 +26,6 @@ const value = (
   .change()
   .selectAll().value
 
-module.exports.input = () => value
+module.exports.input = function() {
+  return value
+}

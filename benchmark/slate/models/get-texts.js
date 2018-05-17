@@ -22,4 +22,6 @@ const value = (
     </document>
   </value>
 )
-module.exports.input = () => value
+module.exports.input = function() {
+  return value
+}

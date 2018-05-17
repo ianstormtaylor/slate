@@ -28,6 +28,7 @@ const texts = value.document.getTexts()
 const { size } = texts
 const text = texts.get(Math.round(size / 2))
 const next = text.insertText(0, 'some text')
+
 module.exports.input = function() {
   return { value, next }
 }

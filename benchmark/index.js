@@ -5,6 +5,7 @@ const { generateReport } = require('./generateReport')
 const { include } = require('./config')
 
 const categoryDir = resolve(__dirname)
+
 const categories = readdirSync(categoryDir).filter(
   c => c[0] != '.' && c.match(/^slate/)
 )

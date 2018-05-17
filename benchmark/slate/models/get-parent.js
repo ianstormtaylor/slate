@@ -3,7 +3,7 @@
 
 const h = require('../../helpers/h')
 
-export default function({ value, text }) {
+module.exports.default = function({ value, text }) {
   value.document.getParent(text.key)
 }
 
@@ -24,6 +24,7 @@ const value = (
   </value>
 )
 const text = value.document.getLastText()
-export const input = () => {
+
+module.exports.input = () => {
   return { value, text }
 }

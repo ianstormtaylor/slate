@@ -24,8 +24,8 @@ const value = (
     </document>
   </value>
 )
-
 const block = value.document.getBlocks().last()
+
 module.exports.input = function() {
   const change = value.change()
   return { change, block }

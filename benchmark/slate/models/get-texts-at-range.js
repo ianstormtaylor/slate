@@ -25,4 +25,7 @@ const value = (
 )
   .change()
   .selectAll().value
-module.exports.input = () => value
+
+module.exports.input = function() {
+  return value
+}

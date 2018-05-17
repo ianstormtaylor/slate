@@ -8,7 +8,9 @@ const input = `
 `
   .trim()
   .repeat(10)
+
 module.exports.input = input
+
 module.exports.default = function(string) {
   Plain.deserialize(string)
 }

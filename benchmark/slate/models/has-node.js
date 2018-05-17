@@ -24,6 +24,7 @@ const value = (
   </value>
 )
 const text = value.document.getLastText()
+
 module.exports.input = function() {
   return { value, text }
 }

@@ -3,7 +3,7 @@
 
 const h = require('../../helpers/h')
 
-export default function({ value, first, last }) {
+module.exports.default = function({ value, first, last }) {
   value.document.getCommonAncestor(first.key, last.key)
 }
 
@@ -23,8 +23,10 @@ const value = (
     </document>
   </value>
 )
+
 const first = value.document.getFirstText()
 const last = value.document.getLastText()
-export const input = () => {
+
+module.exports.input = function() {
   return { value, first, last }
 }

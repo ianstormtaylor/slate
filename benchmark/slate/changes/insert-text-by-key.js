@@ -24,8 +24,8 @@ const value = (
     </document>
   </value>
 )
-
 const text = value.document.getLastText()
+
 module.exports.input = function() {
   const change = value.change()
   return { change, text }
