@@ -1166,23 +1166,28 @@ class Node {
    *
    * @param {string} key
    * @param {number} offset
-   * @return {OrderedSet}
+   * @return {Set}
    */
 
   getMarksAtPosition(key, offset) {
-    if (offset == 0) {
-      const previous = this.getPreviousText(key)
-      if (!previous || previous.text.length == 0) return OrderedSet()
-      if (this.getClosestBlock(key) !== this.getClosestBlock(previous.key)) {
-        return OrderedSet()
-      }
-
-      const char = previous.characters.last()
-      if (!char) return OrderedSet()
-      return new OrderedSet(char.marks)
-    }
-
     const text = this.getDescendant(key)
+    if (offset == 0) {
+      const closestBlock = this.getClosestBlock(key)
+      if (closestBlock.text === '') {
+        // insert mark for empty block; the empty block are often created by split node or add marks in a range including empty blocks
+        return text.getMarksAtIndex(0)
+      }
+      const previous = this.getPreviousText(key)
+      if (!previous) return Set()
+      if (closestBlock.hasDescendant(previous.key)) {
+        return previous.getMarksAtIndex(previous.text.length)
+      }
+      const previousMarks = previous.getMarksAtIndex(previous.text.length)
+      if (previousMarks.size === 0) return Set()
+      const currentMark =
+        text.text === '' ? text.getMarksAtIndex(0) : text.getMarksAtIndex(1)
+      return currentMark.equals(previousMarks) ? currentMark : Set()
+    }
     return text.getMarksAtIndex(offset)
   }
 
