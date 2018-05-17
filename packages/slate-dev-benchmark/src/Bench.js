@@ -111,11 +111,11 @@ class Bench {
     return report
 
     /**
-     *  Run the task from initialIndex to index by {tries}
-     *  Split task to avoid allocating too much memories for {input} in the same time
-     *  @param {number} tries
-     *    @param {number} initialIndex
-     *    @return {Promise< Object , *>}
+     * Run a bundle of tasks;
+     * the Bench estimate the time consuming of every 1000 tasks, then explictly run gc, and caculate the time consuming of next 1000 tasks
+     * @param {number} tries
+     *   @param {number} initialIndex
+     *   @return {Promise< Object , *>}
      */
 
     function runBundleTasks(tries, initialIndex) {
