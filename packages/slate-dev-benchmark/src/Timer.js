@@ -8,16 +8,16 @@ class Timer {
     this.elapsed = {}
   }
 
-  /*
+  /**
    * Whether it is a Timer
    * @param {any} obj
-  */
+   */
 
   isTimer(obj) {
     return obj && obj[TimerType]
   }
 
-  /*
+  /**
    * Start the timer
    * @return {void}
    */
@@ -29,7 +29,7 @@ class Timer {
     this.elapsed = {}
   }
 
-  /*
+  /**
    * Stop the timer and store restore in tihs.elapsed
    * @return {Object}
    */

@@ -1,29 +1,6 @@
 /* eslint-disable no-console */
 
 /**
- * Is in development?
- *
- * @type {Boolean}
- */
-
-const IS_DEV =
-  typeof process !== 'undefined' &&
-  process.env &&
-  process.env.NODE_ENV !== 'production'
-
-/**
- * Has console?
- *
- * @type {Boolean}
- */
-
-const HAS_CONSOLE =
-  typeof console != 'undefined' &&
-  typeof console.log == 'function' &&
-  typeof console.warn == 'function' &&
-  typeof console.error == 'function'
-
-/**
  * IS in test
  */
 
@@ -37,17 +14,13 @@ const IS_TEST =
  *
  * @param {String} message
  * @param {Any} ...args
+ * @retrun {void}
  */
 
 function log(message, ...args) {
-  if (!IS_DEV) {
-    return
-  }
   if (IS_TEST) return
 
-  if (HAS_CONSOLE) {
-    console.log(message, ...args)
-  }
+  return console.log(message, ...args)
 }
 
 /*
@@ -55,13 +28,7 @@ function log(message, ...args) {
 */
 
 function errorLog(message, ...args) {
-  if (!IS_DEV) {
-    return
-  }
-
-  if (HAS_CONSOLE) {
-    console.error(message, ...args)
-  }
+  console.error(message, ...args)
 }
 
 /**

@@ -11,17 +11,17 @@ const errorReport = {
   all: NaN,
 }
 
-/*
+/**
  * Run a task and calculate the time consuming of tasks
-*/
+ */
 
 class Bench {
-  /*
+  /**
    * Construct a bench and register it to a Suite
    * @param {Suite} suite
    * @param {string} name
    * @param {Object} options
-  */
+   */
 
   constructor(suite, name, options = {}) {
     this.name = name
@@ -33,21 +33,21 @@ class Bench {
     suite.addBench(this)
   }
 
-  /*
+  /**
    * Is a Bench?
    * @param {any} obj
    * @return {boolean}
-  */
+   */
 
   isBench(obj) {
     return obj && obj[BenchType]
   }
 
-  /*
+  /**
    * Set the method to generate (different} inputs for each run
    * @param {Array|Function|Scalar} inputer
    * @return {void}
-  */
+   */
 
   input(inputer) {
     if (Array.isArray(inputer)) {
@@ -61,23 +61,23 @@ class Bench {
     this.inputer = () => inputer
   }
 
-  /*
+  /**
    * Set the task runner
    * @param {Function} runner
    * @return {void}
-  */
+   */
 
   run(runner) {
     this.runner = runner
   }
 
-  /*
+  /**
    * Tries to run tasks in `times`, if the time consuming excedes the max-time, then stop;
    * After run, generate report and return
    * If initial is the initial index to run the task, for continueing a task in adaptive mode
    * @param {number} times
    * @param {number} initial
-  */
+   */
 
   async compose(times, initial) {
     times = Math.floor(times)
@@ -114,12 +114,13 @@ class Bench {
     }
     return report
 
-    /*  Run the task from initialIndex to index by {tries}
+    /**
+     *  Run the task from initialIndex to index by {tries}
      *  Split task to avoid allocating too much memories for {input} in the same time
      *  @param {number} tries
-     *  @param {number} initialIndex
-     *  @return {Promise< Object , *>}
-    */
+     *    @param {number} initialIndex
+     *    @return {Promise< Object , *>}
+     */
 
     function compposeAnAllocation(tries, initialIndex) {
       const inputs = Array.from({ length: tries }).map(index =>
@@ -133,10 +134,11 @@ class Bench {
         return { ...elapsed, cycles }
       })
 
-      /*  Run a single task run; If the task is end, return a Promise with the index when the task ends
-     *  @param {number} index
-     *  @return {Promise<number, *>}
-     */
+      /**
+       *  Run a single task run; If the task is end, return a Promise with the index when the task ends
+       *  @param {number} index
+       *  @return {Promise<number, *>}
+       */
 
       function dispatch(index) {
         if (index === tries) return Promise.resolve(tries)
