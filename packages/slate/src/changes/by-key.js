@@ -581,11 +581,13 @@ Changes.setNodeByKey = (change, key, properties, options = {}) => {
  */
 
 Changes.splitNodeByKey = (change, key, position, options = {}) => {
-  const { normalize = true, target = null } = options
+  const normalize = change.getFlag('normalize', options)
+  const { target = null, splitVoid = false } = options
   const { value } = change
   const { document } = value
   const path = document.getPath(key)
   const node = document.getDescendantAtPath(path)
+  if (!splitVoid && node.isVoid) return
 
   change.applyOperation({
     type: 'split_node',
@@ -628,6 +630,7 @@ Changes.splitDescendantsByKey = (
   }
 
   const normalize = change.getFlag('normalize', options)
+  const { splitVoid = false } = options
   const { value } = change
   const { document } = value
 
@@ -647,6 +650,7 @@ Changes.splitDescendantsByKey = (
     change.splitNodeByKey(node.key, index, {
       normalize: false,
       target: prevIndex,
+      splitVoid,
     })
   })
 
