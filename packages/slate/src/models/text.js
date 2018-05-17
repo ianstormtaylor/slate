@@ -250,7 +250,7 @@ class Text extends Record(DEFAULTS) {
         )
       const newFirst = first.addMarks(set)
       if (newFirst === first) return this
-      return this.set('leaves', newFirst)
+      return this.set('leaves', List.of(newFirst))
     }
     if (this.text === '') return this
     if (length === 0) return this
