@@ -2,7 +2,7 @@ const { resolve } = require('path')
 const { existsSync } = require('fs')
 
 const config = resolve(`${__dirname}/../benchmark-config.js`)
-const userConfig = existsSync(config) ? {} : require(config)
+const userConfig = existsSync(config) ? require(config) : {}
 
 if (userConfig.include) {
   module.exports.include = userConfig.include
