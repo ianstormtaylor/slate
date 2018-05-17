@@ -23,7 +23,7 @@ export default function(suite) {
     maxTime: 100,
     async: true,
   })
-  bench.run(() =>
-    new Promise(resolve => setTimeout(resolve, 10)).then(() => index++)
+  bench.run(
+    () => new Promise(resolve => setTimeout(() => resolve(index++), 10))
   )
 }
