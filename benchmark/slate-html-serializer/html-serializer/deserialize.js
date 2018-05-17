@@ -2,29 +2,39 @@
 /* eslint-disable react/jsx-key */
 
 const Html = require('slate-html-serializer').default
-const React = require('react')
 const { JSDOM } = require('jsdom') // eslint-disable-line import/no-extraneous-dependencies
 
 const html = new Html({
   parseHtml: JSDOM.fragment,
   rules: [
     {
-      serialize(obj, children) {
-        switch (obj.object) {
-          case 'block': {
-            switch (obj.type) {
-              case 'paragraph':
-                return React.createElement('p', {}, children)
-              case 'quote':
-                return React.createElement('blockquote', {}, children)
+      deserialize(el, next) {
+        switch (el.tagName.toLowerCase()) {
+          case 'blockquote':
+            return {
+              object: 'block',
+              type: 'quote',
+              nodes: next(el.childNodes),
+            }
+          case 'p': {
+            return {
+              object: 'block',
+              type: 'paragraph',
+              nodes: next(el.childNodes),
             }
           }
-          case 'mark': {
-            switch (obj.type) {
-              case 'bold':
-                return React.createElement('strong', {}, children)
-              case 'italic':
-                return React.createElement('em', {}, children)
+          case 'strong': {
+            return {
+              object: 'mark',
+              type: 'bold',
+              nodes: next(el.childNodes),
+            }
+          }
+          case 'em': {
+            return {
+              object: 'mark',
+              type: 'italic',
+              nodes: next(el.childNodes),
             }
           }
         }
