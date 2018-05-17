@@ -1,7 +1,7 @@
 const { repo } = require('slate-dev-benchmark')
 const { resolve } = require('path')
 const { readdirSync } = require('fs')
-const { generateReport } = require('./generateReport')
+const { generateReport } = require('./generate-report')
 const { include } = require('./config')
 
 const categoryDir = resolve(__dirname)
