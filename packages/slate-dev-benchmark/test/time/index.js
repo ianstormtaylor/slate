@@ -10,8 +10,7 @@ describe('time', async () => {
     .filter(x => x[0] !== '.' && x !== 'index.js')
   for (const file of files) {
     const module = require(`./${file}`)
-    const t = module.skip ? it.skip : it
-    t(module.experiment, () => {
+    it(module.experiment, () => {
       module.default(suite)
       const { expected } = module
       repo.isFinished = false
