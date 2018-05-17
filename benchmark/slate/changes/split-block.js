@@ -6,6 +6,7 @@ const h = require('../../helpers/h')
 module.exports.default = function(change) {
   change.splitBlock()
 }
+
 const value = (
   <value>
     <document>
