@@ -1186,7 +1186,7 @@ class Node {
       if (previousMarks.size === 0) return Set()
       const currentMark =
         text.text === '' ? text.getMarksAtIndex(0) : text.getMarksAtIndex(1)
-      return currentMark.equals(previousMarks) ? currentMark : Set()
+      return currentMark.intersect(previousMarks)
     }
     return text.getMarksAtIndex(offset)
   }
