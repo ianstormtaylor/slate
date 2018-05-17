@@ -1,4 +1,4 @@
-import { Bench } from '../../src/'
+import { Bench } from '../..'
 
 export const experiment = 'max-tries adaptive mode'
 export const actual = { index: 0 }

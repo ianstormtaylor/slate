@@ -1,4 +1,4 @@
-import { Bench } from '../../src/'
+import { Bench } from '../..'
 import { asyncSleep } from '../utils/sleep'
 import assert from 'assert'
 

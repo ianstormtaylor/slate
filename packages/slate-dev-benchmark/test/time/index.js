@@ -1,4 +1,4 @@
-import { repo, Suite } from '../../src'
+import { repo, Suite } from '../..'
 import fs from 'fs'
 import { resolve } from 'path'
 
