@@ -182,6 +182,20 @@ class Text extends Record(DEFAULTS) {
     return this.leaves.flatMap(x => x.getCharacters())
   }
 
+  /**
+   * Find the 'first' leaf at offset; By 'first' the alorighthm prefers `endOffset === offset` than `startOffset === offset`
+   * Corner Cases:
+   *   1. if offset is negative, return the first leaf;
+   *   2. if offset is larger than text length, the leaf is null, startOffset, endOffset and index is of the last leaf
+   *
+   * @param {number}
+   * @returns {Object}
+   *   @property {number} startOffset
+   *   @property {number} endOffset
+   *   @property {number} index
+   *   @property {Leaf} leaf
+   */
+
   searchLeafAtOffset(offset) {
     let endOffset = 0
     let startOffset = 0
@@ -216,6 +230,8 @@ class Text extends Record(DEFAULTS) {
 
   /**
    * Add a `set` of marks at `index` and `length`.
+   * Corner Cases:
+   *   1. If empty text, and if length === 0 and index === 0
    *
    * @param {Number} index
    * @param {Number} length
@@ -224,8 +240,20 @@ class Text extends Record(DEFAULTS) {
    */
 
   addMarks(index, length, set) {
+    if (this.text === '' && length === 0 && index === 0) {
+      const { leaves } = this
+      const first = leaves.first()
+      if (!first)
+        return this.set(
+          'leaves',
+          List.of(Leaf.fromJSON({ text: '', marks: set }))
+        )
+      const newFirst = first.addMarks(set)
+      if (newFirst === first) return this
+      return this.set('leaves', newFirst)
+    }
+    if (this.text === '') return this
     if (length === 0) return this
-    if (this.text.length === 0) return this
     if (index >= this.text.length) return this
     const [before, bundle] = Leaf.splitLeaves(this.leaves, index)
     const [middle, after] = Leaf.splitLeaves(bundle, length)
@@ -245,7 +273,7 @@ class Text extends Record(DEFAULTS) {
   }
 
   /**
-   * Derive the leaves for a list of `characters`.
+   * Derive the leaves for a list of `decorations`.
    *
    * @param {Array|Void} decorations (optional)
    * @return {List<Leaf>}
@@ -282,12 +310,15 @@ class Text extends Record(DEFAULTS) {
 
   /**
    * Get all of the active marks on between two offsets
+   * Corner Cases:
+   *   1. if startOffset is equal or bigger than endOffset, then return Set();
+   *   2. If no text is selected between start and end, then return Set()
    *
    * @return {Set<Mark>}
    */
 
   getActiveMarksBetweenOffsets(startOffset, endOffset) {
-    if (startOffset === 0 && endOffset === this.text.length) {
+    if (startOffset <= 0 && endOffset >= this.text.length) {
       return this.getActiveMarks()
     }
     if (startOffset >= endOffset) return Set()
@@ -338,6 +369,9 @@ class Text extends Record(DEFAULTS) {
 
   /**
    * Get all of the marks on between two offsets
+   * Corner Cases:
+   *   1. if startOffset is equal or bigger than endOffset, then return Set();
+   *   2. If no text is selected between start and end, then return Set()
    *
    * @return {OrderedSet<Mark>}
    */
@@ -402,6 +436,11 @@ class Text extends Record(DEFAULTS) {
 
   /**
    * Get the marks on the text at `index`.
+   * Corner Cases:
+   *   1. if no text is before the index, and index !== 0, then return Set()
+   *   2. (for insert after split node or mark at range) if index === 0, and text === '', then return the leaf.marks
+   *   3. if index === 0, text !== '', return Set()
+   *
    *
    * @param {Number} index
    * @return {Set<Mark>}
@@ -410,7 +449,10 @@ class Text extends Record(DEFAULTS) {
   getMarksAtIndex(index) {
     const { leaf } = this.searchLeafAtOffset(index)
     if (!leaf) return Set()
-    return leaf.marks
+    if (index !== 0) return leaf.marks
+    // For get insertText after split node or mark at range
+    if (this.text === '') return leaf.marks
+    return Set()
   }
 
   /**
@@ -494,6 +536,13 @@ class Text extends Record(DEFAULTS) {
    */
 
   removeMark(index, length, mark) {
+    if (this.text === '' && index === 0 && length === 0) {
+      const first = this.leaves.first()
+      if (!first) return this
+      const newFirst = first.removeMark(mark)
+      if (newFirst === first) return this
+      return this.set('leaves', List.of(newFirst))
+    }
     if (length <= 0) return this
     if (index >= this.text.length) return this
     const [before, bundle] = Leaf.splitLeaves(this.leaves, index)

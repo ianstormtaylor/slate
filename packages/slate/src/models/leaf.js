@@ -50,9 +50,9 @@ class Leaf extends Record(DEFAULTS) {
   }
 
   /**
-   * Create a List of `Leaves` with `leaves`.
+   * Create a valid List of `Leaf` from `leaves`
    *
-   * @param {List<Object|Leaf>|Array<Object|Leaf> leaves
+   * @param {List<Leaf>} leaves
    * @return {List<Leaf>}
    */
 
@@ -60,6 +60,7 @@ class Leaf extends Record(DEFAULTS) {
     if (leaves.size <= 1) return leaves
 
     let invalid = false
+    // TODO: we can make this faster with [List] and then flatten
     const result = List().withMutations(right => {
       leaves.findLast((leaf, index) => {
         if (!Leaf.isLeaf(leaf)) {
@@ -92,13 +93,17 @@ class Leaf extends Record(DEFAULTS) {
   }
 
   /**
-   * Split a list of leaves to two lists
+   * Split a list of leaves to two lists; if the leaves are valid leaves, the returned leaves are also valid
+   * Corner Cases:
+   *   1. if offset is smaller than 0, then return [List(), leaves]
+   *   2. if offset is bigger than the text length, then return [leaves, List()]
    *
    * @param {List<Leaf> leaves
    * @return {Array<List<Leaf>>}
    */
 
   static splitLeaves(leaves, offset) {
+    if (offset < 0) return [List(), leaves]
     if (leaves.size === 0) {
       return [List(), List()]
     }
@@ -117,6 +122,7 @@ class Leaf extends Record(DEFAULTS) {
       right = leaf.set('text', text.slice(length))
       return true
     })
+    if (!left) return [leaves, List()]
 
     if (left.text === '') {
       if (index === 0) {
