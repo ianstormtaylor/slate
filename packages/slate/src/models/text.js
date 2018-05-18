@@ -552,17 +552,37 @@ class Text extends Record(DEFAULTS) {
   }
 
   /**
-   * Remove text from the text node at `index` for `length`.
+   * Remove text from the text node at `start` for `length`.
    *
-   * @param {Number} index
+   * @param {Number} start
    * @param {Number} length
    * @return {Text}
    */
 
-  removeText(index, length) {
+  removeText(start, length) {
     if (length <= 0) return this
-    if (index >= this.text.length) return this
-    const [before, bundle] = Leaf.splitLeaves(this.leaves, index)
+    if (start >= this.text.length) return this
+    // PERF: For simple backspace, we can operate directly on the leaf
+    if (length === 1) {
+      const { leaf, index, startOffset } = this.searchLeafAtOffset(start)
+      const offset = start - startOffset
+      if (leaf) {
+        if (leaf.text.length === 1) {
+          const leaves = this.leaves.remove(index)
+          return this.setLeaves(leaves)
+        }
+        const beforeText = leaf.text.slice(0, offset)
+        const afterText = leaf.text.slice(offset + length)
+        const text = beforeText + afterText
+        if (text.length > 0) {
+          return this.set(
+            'leaves',
+            this.leaves.set(index, leaf.set('text', text))
+          )
+        }
+      }
+    }
+    const [before, bundle] = Leaf.splitLeaves(this.leaves, start)
     const after = Leaf.splitLeaves(bundle, length)[1]
     const leaves = Leaf.createLeaves(before.concat(after))
 
