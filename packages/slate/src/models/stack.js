@@ -2,7 +2,6 @@ import logger from 'slate-dev-logger'
 import { Record } from 'immutable'
 
 import MODEL_TYPES from '../constants/model-types'
-import memoize from '../utils/memoize'
 
 /**
  * Default properties.
@@ -155,12 +154,6 @@ class Stack extends Record(DEFAULTS) {
  */
 
 Stack.prototype[MODEL_TYPES.STACK] = true
-
-/**
- * Memoize read methods.
- */
-
-memoize(Stack.prototype, ['getPluginsWith'])
 
 /**
  * Export.
