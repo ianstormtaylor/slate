@@ -235,6 +235,10 @@ class Leaf extends Record(DEFAULTS) {
    */
 
   getCharacters() {
+    logger.deprecate(
+      'slate@0.35.0',
+      'The `kind` property of Slate objects has been renamed to `object`.'
+    )
     const { marks } = this
     const characters = Character.createList(
       this.text.split('').map(char => {

@@ -731,7 +731,6 @@ memoize(Text.prototype, [
   'getActiveMarks',
   'getMarks',
   'getMarksAsArray',
-  'getMarksAtIndex',
   'validate',
   'getString',
 ])
