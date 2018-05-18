@@ -55,7 +55,11 @@ class SearchHighlighting extends React.Component {
     texts.forEach(node => {
       const { key, text } = node
       let offset = text.indexOf(string)
-      while (offset !== -1) {
+      for (
+        offset = text.indexOf(string);
+        offset !== -1;
+        offset = text.indexOf(string, offset + string.length)
+      ) {
         decorations.push({
           anchorKey: key,
           anchorOffset: offset,
@@ -63,8 +67,6 @@ class SearchHighlighting extends React.Component {
           focusOffset: offset + string.length,
           marks: [{ type: 'highlight' }],
         })
-        offset += string.length
-        offset = text.indexOf(string, offset)
       }
     })
 
