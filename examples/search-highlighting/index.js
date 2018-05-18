@@ -40,27 +40,32 @@ class SearchHighlighting extends React.Component {
   onInputChange = event => {
     const { value } = this.state
     const string = event.target.value
+    if (string === '') {
+      const change = value
+        .change()
+        .setOperationFlag('save', false)
+        .setValue({ decorations: [] })
+        .setOperationFlag('save', true)
+      this.onChange(change)
+      return
+    }
     const texts = value.document.getTexts()
     const decorations = []
 
     texts.forEach(node => {
       const { key, text } = node
-      const parts = text.split(string)
-      let offset = 0
-
-      parts.forEach((part, i) => {
-        if (i != 0) {
-          decorations.push({
-            anchorKey: key,
-            anchorOffset: offset - string.length,
-            focusKey: key,
-            focusOffset: offset,
-            marks: [{ type: 'highlight' }],
-          })
-        }
-
-        offset = offset + part.length + string.length
-      })
+      let offset = text.indexOf(string)
+      while (offset !== -1) {
+        decorations.push({
+          anchorKey: key,
+          anchorOffset: offset,
+          focusKey: key,
+          focusOffset: offset + string.length,
+          marks: [{ type: 'highlight' }],
+        })
+        offset += string.length
+        offset = text.indexOf(string, offset)
+      }
     })
 
     // setting the `save` option to false prevents this change from being added
