@@ -2,6 +2,7 @@ import logger from 'slate-dev-logger'
 import { Record } from 'immutable'
 
 import MODEL_TYPES from '../constants/model-types'
+import memoize from '../utils/memoize'
 
 /**
  * Default properties.
@@ -80,13 +81,11 @@ class Stack extends Record(DEFAULTS) {
    */
 
   find(property, ...args) {
-    const { plugins } = this
+    const plugins = this.getPluginsWith(property)
 
     for (const plugin of plugins) {
-      if (plugin[property]) {
-        const ret = plugin[property](...args)
-        if (ret != null) return ret
-      }
+      const ret = plugin[property](...args)
+      if (ret != null) return ret
     }
   }
 
@@ -99,14 +98,12 @@ class Stack extends Record(DEFAULTS) {
    */
 
   map(property, ...args) {
-    const { plugins } = this
+    const plugins = this.getPluginsWith(property)
     const array = []
 
     for (const plugin of plugins) {
-      if (plugin[property]) {
-        const ret = plugin[property](...args)
-        if (ret != null) array.push(ret)
-      }
+      const ret = plugin[property](...args)
+      if (ret != null) array.push(ret)
     }
 
     return array
@@ -120,13 +117,11 @@ class Stack extends Record(DEFAULTS) {
    */
 
   run(property, ...args) {
-    const { plugins } = this
+    const plugins = this.getPluginsWith(property)
 
     for (const plugin of plugins) {
-      if (plugin[property]) {
-        const ret = plugin[property](...args)
-        if (ret != null) return
-      }
+      const ret = plugin[property](...args)
+      if (ret != null) return
     }
   }
 
@@ -139,13 +134,18 @@ class Stack extends Record(DEFAULTS) {
    */
 
   render(property, props, ...args) {
-    return this.plugins.reduceRight((children, plugin) => {
-      if (!plugin[property]) return children
+    const plugins = this.getPluginsWith(property)
+      .slice()
+      .reverse()
+    let { children = null } = props
+
+    for (const plugin of plugins) {
       const ret = plugin[property](props, ...args)
-      if (ret == null) return children
-      props.children = ret
-      return ret
-    }, props.children === undefined ? null : props.children)
+      if (ret == null) continue
+      props.children = children = ret
+    }
+
+    return children
   }
 }
 
@@ -154,6 +154,12 @@ class Stack extends Record(DEFAULTS) {
  */
 
 Stack.prototype[MODEL_TYPES.STACK] = true
+
+/**
+ * Memoize read methods.
+ */
+
+memoize(Stack.prototype, ['getPluginsWith'])
 
 /**
  * Export.
