@@ -264,7 +264,8 @@ function createChildren(children, options = {}) {
   let length = 0
 
   // When creating the new node, try to preserve a key if one exists.
-  const firstText = children.find(c => Text.isText(c))
+  const firstNodeOrText = children.find(c => typeof c !== 'string')
+  const firstText = Text.isText(firstNodeOrText) ? firstNodeOrText : null
   const key = options.key ? options.key : firstText ? firstText.key : undefined
   let node = Text.create({ key })
 
