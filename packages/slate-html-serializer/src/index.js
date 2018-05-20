@@ -337,7 +337,7 @@ class Html {
    * Serialize a `node`.
    *
    * @param {Node} node
-   * @return {String}
+   * @return {React.Element|Array<React.Element|String>|String}
    */
 
   serializeNode = node => {
@@ -364,7 +364,7 @@ class Html {
    * Serialize a `leaf`.
    *
    * @param {Leaf} leaf
-   * @return {String}
+   * @return {React.Element|Array<React.Element|String>|String}
    */
 
   serializeLeaf = leaf => {
