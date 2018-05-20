@@ -353,7 +353,7 @@ class Html {
       const ret = rule.serialize(node, children)
       if (ret === null) return
       if (ret !== undefined) {
-        return React.isValidElement(ret) ? addKey(ret) : ret;
+        return React.isValidElement(ret) ? addKey(ret) : ret
       }
     }
 
@@ -377,7 +377,7 @@ class Html {
         const ret = rule.serialize(mark, children)
         if (ret === null) return
         if (ret !== undefined) {
-          return React.isValidElement(ret) ? addKey(ret) : ret;
+          return React.isValidElement(ret) ? addKey(ret) : ret
         }
       }
 
