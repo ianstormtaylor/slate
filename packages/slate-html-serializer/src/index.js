@@ -352,7 +352,9 @@ class Html {
       if (!rule.serialize) continue
       const ret = rule.serialize(node, children)
       if (ret === null) return
-      if (ret) return addKey(ret)
+      if (ret !== undefined) {
+        return React.isValidElement(ret) ? addKey(ret) : ret;
+      }
     }
 
     throw new Error(`No serializer defined for node of type "${node.type}".`)
@@ -374,7 +376,9 @@ class Html {
         if (!rule.serialize) continue
         const ret = rule.serialize(mark, children)
         if (ret === null) return
-        if (ret) return addKey(ret)
+        if (ret !== undefined) {
+          return React.isValidElement(ret) ? addKey(ret) : ret;
+        }
       }
 
       throw new Error(`No serializer defined for mark of type "${mark.type}".`)
