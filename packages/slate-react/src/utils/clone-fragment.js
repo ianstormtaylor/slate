@@ -34,7 +34,7 @@ function cloneFragment(event, value, fragment = value.fragment) {
 
   // Make sure attach is a non-empty node, since empty nodes will not get copied
   contents.childNodes.forEach(node => {
-    if (node.innerText && node.innerText.trim() !== '') {
+    if (node.textContent && node.textContent.trim() !== '') {
       attach = node
     }
   })
