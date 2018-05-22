@@ -2,7 +2,7 @@
 
 import h from '../../../../helpers/h'
 import { Set } from 'immutable'
-import { Mark } from '../../../../../src'
+import { Mark } from '../../../../..'
 
 export const input = (
   <text>

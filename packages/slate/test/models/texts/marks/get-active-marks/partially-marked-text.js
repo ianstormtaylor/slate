@@ -2,14 +2,12 @@
 
 import h from '../../../../helpers/h'
 import { Set } from 'immutable'
-import { Mark } from '../../../../../src'
 
 export const input = (
   <text>
-    <b>
-      <i>Cat is </i>
-      <i>Cute</i>
-    </b>
+    <i>Cat</i>
+    is
+    <i>Cute</i>
   </text>
 )[0]
 
@@ -17,4 +15,4 @@ export default function(t) {
   return t.getActiveMarks()
 }
 
-export const output = Set.of(Mark.create('italic'), Mark.create('bold'))
+export const output = Set()
