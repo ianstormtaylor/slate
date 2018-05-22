@@ -703,7 +703,7 @@ class Text extends Record(DEFAULTS) {
   }
 
   /**
-   * Get the first invalid descendant
+   * Set leaves with normalized `leaves`
    *
    * @param {Schema} schema
    * @returns {Text|Null}
