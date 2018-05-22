@@ -1,7 +1,7 @@
-const RepositoryType = '@@__Slate_Repository__@@'
-const SuiteType = '@@__Slate_Suite__@@'
-const BenchType = '@@__Slate_Bench__@@'
-const TimerType = '@@__Slate_Bench_Timer_@@'
+const RepositoryType = '@@__SLATE_REPOSITORY__@@'
+const SuiteType = '@@__SLATE_SUITE__@@'
+const BenchType = '@@__SLATE_BENCH__@@'
+const TimerType = '@@__SLATE_BENCH_TIMER_@@'
 module.exports = {
   RepositoryType,
   SuiteType,
