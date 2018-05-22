@@ -51,5 +51,5 @@ describe('models', () => {
     })
   })
 
-  require('./texts/')
+  require('./text/')
 })

@@ -1,6 +1,6 @@
 /** @jsx h */
 
-import { Mark } from '../../../../../src'
+import { Mark } from '../../../../..'
 import h from '../../../../helpers/h'
 
 export const input = (

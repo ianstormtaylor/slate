@@ -634,9 +634,17 @@ class Text extends Record(DEFAULTS) {
    */
 
   updateMark(index, length, mark, properties) {
+    const newMark = mark.merge(properties)
+    if (this.text === '' && length === 0 && index === 0) {
+      const { leaves } = this
+      const first = leaves.first()
+      if (!first) return this
+      const newFirst = first.updateMark(mark, newMark)
+      if (newFirst === first) return this
+      return this.set('leaves', List.of(newFirst))
+    }
     if (length <= 0) return this
     if (index >= this.text.length) return this
-    const newMark = mark.merge(properties)
 
     const [before, bundle] = Leaf.splitLeaves(this.leaves, index)
     const [middle, after] = Leaf.splitLeaves(bundle, length)
