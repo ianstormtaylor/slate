@@ -1,10 +1,11 @@
 /* eslint-disable no-console */
 
 import chalk from 'chalk'
+import figures from 'figures'
+import emojis from 'emojis'
 import baseline from '../../tmp/benchmark-baseline'
 import comparison from '../../tmp/benchmark-comparison'
 import { existsSync } from 'fs'
-import figures from 'figures'
 
 /**
  * Constants.
@@ -49,6 +50,15 @@ baseline.forEach((suite, i) => {
       compared[key].b = b
       compared[key].c = c
       compared[key].isFaster = c > b
+      if (balancePercent > 1000) {
+        compared[key].percentOutput += emojis.unicode(' :scream: ')
+      } else if (balancePercent > 100) {
+        if (c > b) {
+          compared[key].percentOutput += emojis.unicode(' :raised_hands: ')
+        } else {
+          compared[key].percentOutput += emojis.unicode(' :worried: ')
+        }
+      }
     }
 
     const { user, hr } = compared
