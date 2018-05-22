@@ -283,10 +283,12 @@ function createChildren(children, options = {}) {
     // If the child is a non-text node, push the current node and the new child
     // onto the array, then creating a new node for future selection tracking.
     if (Node.isNode(child) && !Text.isText(child)) {
-      if (node.text.length || node.__anchor != null || node.__focus != null) {
-        array.push(node)
-      }
-      if (!node.text.length && node.getMarksAtIndex(0).size) {
+      if (
+        node.text.length ||
+        node.__anchor != null ||
+        node.__focus != null ||
+        node.getMarksAtIndex(0).size
+      ) {
         array.push(node)
       }
       array.push(child)
