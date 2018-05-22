@@ -54,9 +54,10 @@ function logger(obj) {
     const { cycles } = report
 
     const header = {
-      user: '(User Space CPU Time)',
+      user: 'user:',
+      hr: 'real:',
     }
-    for (const key of ['user']) {
+    for (const key of ['user', 'hr']) {
       log(
         `${prefix + prefix + prefix}${header[key]} * ${cycles} cycles: ${
           report[key]

@@ -4,6 +4,7 @@ import chalk from 'chalk'
 import baseline from '../../tmp/benchmark-baseline'
 import comparison from '../../tmp/benchmark-comparison'
 import { existsSync } from 'fs'
+import figures from 'figures'
 
 /**
  * Constants.
@@ -25,37 +26,67 @@ if (existsSync(configPath)) {
 console.log()
 console.log(`  benchmarks`)
 
-const header = {
-  user: 'User Space CPU Time Measure:',
-}
 baseline.forEach((suite, i) => {
   console.log(`    ${suite.name}`)
 
   suite.benchmarks.forEach((base, j) => {
-    console.log(`      ${base.name}`)
-    for (const elapsedKey of ['user']) {
+    const compared = { user: {}, hr: {} }
+
+    for (const key of Object.keys(compared)) {
       const comp = comparison[i].benchmarks[j]
       if (!comp) return
+      const b = base.iterations / base[key] * 1000
+      const c = comp.iterations / comp[key] * 1000
+      const balancePercent =
+        b > c ? Math.round(Math.abs(b - c) / c * 100) : (c - b) / b * 100
 
-      const b = base.iterations / base[elapsedKey] * 1000
-      const c = comp.iterations / comp[elapsedKey] * 1000
-      const slower = b / c > 1 + THRESHOLD
-      const faster = c / b > 1 + THRESHOLD
-      const percent = Math.round(Math.abs(b - c) / c * 100)
-      const balancePercent = b > c ? percent : (c - b) / b * 100
-
-      let output = `${b.toFixed(2)} → ${c.toFixed(2)} ops/sec`
-      if (slower)
-        output = chalk.red(`${output} (${balancePercent.toFixed(2)}% slower)`)
-      else if (faster)
-        output = chalk.green(`${output} (${balancePercent.toFixed(2)}% faster)`)
-      else output = chalk.gray(output)
-
-      if (balancePercent > 1000) output += ' 😱'
-      else if (faster && balancePercent > 100) output += ' 🙌'
-      else if (slower && balancePercent > 100) output += ' 😟'
-      console.log(`        ${header[elapsedKey]} : ${output}`)
+      const output = `${b.toFixed(2)} -> ${c.toFixed(2)} ops/sec`
+      compared[key].baseOutput = output
+      compared[key].percentOutput = `${balancePercent.toFixed(2)}% ${
+        c > b ? 'faster' : 'slower'
+      }`
+      compared[key].percentValue = balancePercent
+      compared[key].b = b
+      compared[key].c = c
+      compared[key].isFaster = c > b
     }
+
+    const { user, hr } = compared
+
+    if (
+      user.percentValue < THRESHOLD * 100 &&
+      hr.percentValue < THRESHOLD * 100
+    ) {
+      console.log(
+        chalk.grey(
+          `      ${figures.tick} ${base.name}: ${user.baseOutput} (${
+            user.percentOutput
+          })`
+        )
+      )
+      return
+    }
+
+    if (user.isFaster === hr.isFaster) {
+      if (user.isFaster) {
+        console.log(chalk.green(`      ${figures.star} ${base.name}:`))
+        console.log(
+          `            user: ${user.baseOutput} (${user.percentOutput})`
+        )
+        console.log(`            real: ${hr.baseOutput} (${hr.percentOutput})`)
+        return
+      }
+      console.log(chalk.red(`      ${figures.cross} ${base.name}:`))
+      console.log(
+        `            user: ${user.baseOutput} (${user.percentOutput})`
+      )
+      console.log(`            real: ${hr.baseOutput} (${hr.percentOutput})`)
+      return
+    }
+
+    console.log(chalk.red(`      ${figures.questionMarkPrefix} ${base.name}:`))
+    console.log(`            user: ${user.baseOutput} (${user.percentOutput})`)
+    console.log(`            real: ${hr.baseOutput} (${hr.percentOutput})`)
   })
 })
 
