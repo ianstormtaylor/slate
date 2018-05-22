@@ -584,12 +584,7 @@ class Text extends Record(DEFAULTS) {
     }
     const [before, bundle] = Leaf.splitLeaves(this.leaves, start)
     const after = Leaf.splitLeaves(bundle, length)[1]
-    const leaves = Leaf.createLeaves(before.concat(after))
 
-    if (leaves.size === 1) {
-      const first = leaves.first()
-      if (first.text === '') return this.set('leaves', List())
-    }
     return this.setLeaves(before.concat(after))
   }
 
