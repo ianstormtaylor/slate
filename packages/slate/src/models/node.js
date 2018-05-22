@@ -1037,12 +1037,10 @@ class Node {
       // PERF: range is not cachable, use key and offset as proxies for cache
       return this.getMarksAtPosition(range.startKey, range.startOffset)
     }
-
-    const text = this.getDescendant(range.startKey)
-    const char = text.characters.get(range.startOffset)
-    if (!char) return Set()
-
-    return char.marks
+    const { startKey, startOffset } = range
+    if (startOffset === 0) return Set()
+    const text = this.getDescendant(startKey)
+    return text.getMarksAtIndex(startKey)
   }
 
   /**
@@ -1862,7 +1860,7 @@ class Node {
       )
     }
 
-    // If the nodes are text nodes, concatenate their characters together.
+    // If the nodes are text nodes, concatenate their leaves together
     if (one.object == 'text') {
       one = one.mergeText(two)
     } else {
