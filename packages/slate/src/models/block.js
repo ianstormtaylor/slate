@@ -45,6 +45,10 @@ class Block extends Record(DEFAULTS) {
     } else if (Block.isBlock(attrs)) {
       super()
       return attrs
+    } else {
+      throw new TypeError(
+        'Block constructor only accepts plain object, Block, and string'
+      )
     }
 
     super(attrs)
