@@ -4,6 +4,7 @@ import { resolve } from 'path'
 
 describe('texts', () => {
   const dir = resolve(__dirname)
+
   const categories = fs
     .readdirSync(dir)
     .filter(c => c[0] != '.' && c != 'index.js')
