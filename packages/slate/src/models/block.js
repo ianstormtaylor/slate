@@ -26,7 +26,7 @@ const DEFAULTS = {
   data: new Map(),
   isVoid: false,
   key: undefined,
-  nodes: new List(),
+  nodes: List(),
   type: undefined,
 }
 
@@ -37,14 +37,7 @@ const DEFAULTS = {
  */
 
 class Block extends Record(DEFAULTS) {
-  /**
-   * Create a new `Block` from `attrs`.
-   *
-   * @param {Object|String|Block} attrs
-   * @return {Block}
-   */
-
-  static create(attrs = {}) {
+  constructor(attrs = {}) {
     if (Block.isBlock(attrs)) {
       return attrs
     }
@@ -54,12 +47,21 @@ class Block extends Record(DEFAULTS) {
     }
 
     if (isPlainObject(attrs)) {
-      return Block.fromJSON(attrs)
+      attrs = Block.getAttrsFromJSON(attrs)
     }
 
-    throw new Error(
-      `\`Block.create\` only accepts objects, strings or blocks, but you passed it: ${attrs}`
-    )
+    super(attrs)
+  }
+
+  /**
+   * Create a new `Block` from `attrs`.
+   *
+   * @param {Object|String|Block} attrs
+   * @return {Block}
+   */
+
+  static create(attrs = {}) {
+    return new Block(attrs)
   }
 
   /**
@@ -81,17 +83,13 @@ class Block extends Record(DEFAULTS) {
   }
 
   /**
-   * Create a `Block` from a JSON `object`.
+   * Get attributes for new Block from JSON object
    *
-   * @param {Object|Block} object
-   * @return {Block}
+   * @param {Object} object
+   * @returns {Block}
    */
 
-  static fromJSON(object) {
-    if (Block.isBlock(object)) {
-      return object
-    }
-
+  static getAttrsFromJSON(object) {
     const {
       data = {},
       isVoid = false,
@@ -103,14 +101,28 @@ class Block extends Record(DEFAULTS) {
     if (typeof type != 'string') {
       throw new Error('`Block.fromJSON` requires a `type` string.')
     }
-
-    const block = new Block({
+    return {
       key,
       type,
       isVoid: !!isVoid,
-      data: new Map(data),
-      nodes: new List(nodes.map(Node.fromJSON)),
-    })
+      data: Map(data),
+      nodes: List(nodes.map(Node.fromJSON)),
+    }
+  }
+
+  /**
+   * Create a `Block` from a JSON `object`.
+   *
+   * @param {Object|Block} object
+   * @return {Block}
+   */
+
+  static fromJSON(object) {
+    if (Block.isBlock(object)) {
+      return object
+    }
+
+    const block = new Block(Block.getAttrsFromJSON(object))
 
     return block
   }
