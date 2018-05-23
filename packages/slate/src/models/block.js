@@ -39,6 +39,7 @@ const DEFAULTS = {
 class Block extends Record(DEFAULTS) {
   constructor(attrs = {}) {
     if (Block.isBlock(attrs)) {
+      super()
       return attrs
     }
 
