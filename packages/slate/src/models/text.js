@@ -697,6 +697,7 @@ class Text extends Record(DEFAULTS) {
       middle.map(x => x.updateMark(mark, newMark)),
       after
     )
+
     return this.setLeaves(leaves)
   }
 
