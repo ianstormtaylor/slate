@@ -38,7 +38,9 @@ const DEFAULTS = {
 
 class Block extends Record(DEFAULTS) {
   constructor(attrs = {}) {
-    if (isPlainObject(attrs)) {
+    if (typeof attrs == 'string') {
+      attrs = Block.getAttrsFromJSON({ type: attrs })
+    } else if (isPlainObject(attrs)) {
       attrs = Block.getAttrsFromJSON(attrs)
     } else if (Block.isBlock(attrs)) {
       super()
@@ -58,9 +60,6 @@ class Block extends Record(DEFAULTS) {
   static create(attrs = {}) {
     if (Block.isBlock(attrs)) {
       return attrs
-    }
-    if (typeof attrs == 'string') {
-      attrs = { type: attrs }
     }
     return new Block(attrs)
   }
