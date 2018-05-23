@@ -237,7 +237,7 @@ class Leaf extends Record(DEFAULTS) {
   getCharacters() {
     logger.deprecate(
       'slate@0.35.0',
-      'The `characters` property of Slate objects has been removed.'
+      'The `characters` property of Slate objects is deprecated'
     )
     const { marks } = this
     const characters = Character.createList(
@@ -263,7 +263,7 @@ class Leaf extends Record(DEFAULTS) {
   updateMark(mark, newMark) {
     const { marks } = this
     if (newMark.equals(mark)) return this
-    if (!marks || !marks.has(mark)) return this
+    if (!marks.has(mark)) return this
     const newMarks = marks.withMutations(collection => {
       collection.remove(mark).add(newMark)
     })
@@ -332,3 +332,9 @@ Leaf.prototype[MODEL_TYPES.LEAF] = true
  */
 
 export default Leaf
+
+/*
+ * An pre-created Leaf to speed up empty Leaf creation in some cases
+ */
+
+export const EMPTY_LEAF = Leaf.create({})

@@ -2,7 +2,7 @@ import isPlainObject from 'is-plain-object'
 import logger from 'slate-dev-logger'
 import { List, OrderedSet, Record, Set } from 'immutable'
 
-import Leaf from './leaf'
+import Leaf, { EMPTY_LEAF } from './leaf'
 import MODEL_TYPES from '../constants/model-types'
 import generateKey from '../utils/generate-key'
 import memoize from '../utils/memoize'
@@ -17,7 +17,6 @@ const DEFAULTS = {
   leaves: List(),
   key: undefined,
 }
-const emptyLeaf = Leaf.create({})
 
 /**
  * Text.
@@ -178,6 +177,12 @@ class Text extends Record(DEFAULTS) {
     return this.leaves.reduce((string, leaf) => string + leaf.text, '')
   }
 
+  /**
+   * Get the concatenated characters of the node;
+   *
+   * @returns {String}
+   */
+
   get characters() {
     return this.leaves.flatMap(x => x.getCharacters())
   }
@@ -281,19 +286,23 @@ class Text extends Record(DEFAULTS) {
 
   getLeaves(decorations = []) {
     let { leaves } = this
-    if (leaves.size === 0) return List.of(emptyLeaf)
+    if (leaves.size === 0) return List.of(EMPTY_LEAF)
     if (!decorations || decorations.length === 0) return leaves
     if (this.text.length === 0) return leaves
     const { key } = this
+
     decorations.forEach(range => {
       const { startKey, endKey, startOffset, endOffset, marks } = range
       const hasStart = startKey == key
       const hasEnd = endKey == key
+
       if (hasStart && hasEnd) {
         const index = hasStart ? startOffset : 0
         const length = hasEnd ? endOffset - index : this.text.length - index
+
         if (length < 1) return
         if (index >= this.text.length) return
+
         if (index !== 0 || length < this.text.length) {
           const [before, bundle] = Leaf.splitLeaves(this.leaves, index)
           const [middle, after] = Leaf.splitLeaves(bundle, length)
@@ -301,8 +310,8 @@ class Text extends Record(DEFAULTS) {
           return
         }
       }
+
       leaves = leaves.map(x => x.addMarks(marks))
-      return
     })
     if (leaves === this.leaves) return leaves
     return Leaf.createLeaves(leaves)
