@@ -8,6 +8,7 @@ export const input = (
     <b>Cat is Cute</b>
   </text>
 )[0]
+
 export default function(t) {
   return t.removeMark(0, 3, Mark.create('bold'))
 }

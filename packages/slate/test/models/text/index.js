@@ -7,12 +7,14 @@ describe('texts', () => {
   const categories = fs
     .readdirSync(dir)
     .filter(c => c[0] != '.' && c != 'index.js')
+
   for (const category of categories) {
     describe(category, () => {
       const categoryDir = resolve(dir, category)
       const methods = fs
         .readdirSync(categoryDir)
         .filter(c => c[0] != '.' && !c.includes('.js'))
+
       for (const method of methods) {
         describe(method, () => {
           const testDir = resolve(categoryDir, method)

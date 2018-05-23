@@ -9,6 +9,7 @@ export const input = (
     <i> is Cute</i>
   </text>
 )[0]
+
 export default function(t) {
   return t.updateMark(0, 6, Mark.create('bold'), { data: { x: 1 } })
 }

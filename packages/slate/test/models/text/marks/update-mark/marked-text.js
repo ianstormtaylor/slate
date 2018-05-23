@@ -4,6 +4,7 @@ import { Mark } from '../../../../..'
 import h from '../../../../helpers/h'
 
 export const input = <b>Cat is Cute</b>[0]
+
 export default function(t) {
   return t.updateMark(0, 3, Mark.create('bold'), { data: { x: 1 } })
 }

@@ -7,6 +7,7 @@ export const input = (
     <b>CatCute</b>
   </text>
 )[0]
+
 export default function(t) {
   return t.insertText(3, ' is ')
 }

@@ -3,6 +3,7 @@
 import h from '../../../../helpers/h'
 
 export const input = <b>Cat is Cute</b>[0]
+
 export default function(t) {
   return t.removeText(0, t.text.length)
 }

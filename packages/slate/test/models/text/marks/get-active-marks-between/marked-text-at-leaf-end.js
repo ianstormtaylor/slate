@@ -12,6 +12,7 @@ export const input = (
     </b>
   </text>
 )[0]
+
 export default function(t) {
   return t.getActiveMarksBetweenOffsets(0, 6)
 }

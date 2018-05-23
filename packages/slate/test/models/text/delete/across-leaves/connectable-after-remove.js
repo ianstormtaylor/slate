@@ -7,6 +7,7 @@ export const input = (
     <b>Cat is</b>very <b>very Cute</b>
   </text>
 )[0]
+
 export default function(t) {
   return t.removeText(6, 9)
 }

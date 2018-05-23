@@ -7,6 +7,7 @@ export const input = (
     Cat is <i>Cute</i>
   </b>
 )[0]
+
 export default function(t) {
   return t.removeText(0, t.text.length)
 }
