@@ -62,31 +62,35 @@ class Leaf extends Record(DEFAULTS) {
     let invalid = false
 
     // TODO: we can make this faster with [List] and then flatten
-    const result = List().withMutations(right => {
+    const result = List().withMutations(cache => {
       // Search from the leaves left end to find invalid node;
       leaves.findLast((leaf, index) => {
-        const firstLeaf = right.first()
+        const firstLeaf = cache.first()
 
+        // If the first leaf of cache exist, check whether the first leaf is connectable with the current leaf
         if (firstLeaf) {
+          // If marks equals, then the two leaves can be connected
           if (firstLeaf.marks.equals(leaf.marks)) {
             invalid = true
-            right.set(0, firstLeaf.set('text', `${leaf.text}${firstLeaf.text}`))
+            cache.set(0, firstLeaf.set('text', `${leaf.text}${firstLeaf.text}`))
             return
           }
 
+          // If the cached leaf is empty, drop the empty leaf with the upcoming leaf
           if (firstLeaf.text === '') {
             invalid = true
-            right.set(0, leaf)
+            cache.set(0, leaf)
             return
           }
 
+          // If the current leaf is empty, drop the leaf
           if (leaf.text === '') {
             invalid = true
             return
           }
         }
 
-        right.unshift(leaf)
+        cache.unshift(leaf)
       })
     })
 
