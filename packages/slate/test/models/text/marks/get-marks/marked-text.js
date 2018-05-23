@@ -6,8 +6,9 @@ import { Mark } from '../../../../../'
 
 export const input = (
   <text>
-    <i>Cat is </i>
-    <b>Cute</b>
+    <i>Cat </i>
+    is
+    <b> Cute</b>
   </text>
 )[0]
 

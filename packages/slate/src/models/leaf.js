@@ -60,34 +60,36 @@ class Leaf extends Record(DEFAULTS) {
     if (leaves.size <= 1) return leaves
 
     let invalid = false
+
     // TODO: we can make this faster with [List] and then flatten
     const result = List().withMutations(right => {
+      // Search from the leaves left end to find invalid node;
       leaves.findLast((leaf, index) => {
-        if (!Leaf.isLeaf(leaf)) {
-          invalid = true
-          leaf = Leaf.create(leaf)
-        }
         const firstLeaf = right.first()
+
         if (firstLeaf) {
           if (firstLeaf.marks.equals(leaf.marks)) {
             invalid = true
             right.set(0, firstLeaf.set('text', `${leaf.text}${firstLeaf.text}`))
-            return false
+            return
           }
+
           if (firstLeaf.text === '') {
             invalid = true
             right.set(0, leaf)
-            return false
+            return
           }
+
           if (leaf.text === '') {
             invalid = true
-            return false
+            return
           }
         }
+
         right.unshift(leaf)
-        return false
       })
     })
+
     if (!invalid) return leaves
     return result
   }
@@ -104,38 +106,48 @@ class Leaf extends Record(DEFAULTS) {
 
   static splitLeaves(leaves, offset) {
     if (offset < 0) return [List(), leaves]
+
     if (leaves.size === 0) {
       return [List(), List()]
     }
+
     let endOffset = 0
     let index = -1
     let left, right
+
     leaves.find(leaf => {
       index++
       const startOffset = endOffset
       const { text } = leaf
       endOffset += text.length
+
       if (endOffset < offset) return false
       if (startOffset > offset) return false
+
       const length = offset - startOffset
       left = leaf.set('text', text.slice(0, length))
       right = leaf.set('text', text.slice(length))
       return true
     })
+
     if (!left) return [leaves, List()]
 
     if (left.text === '') {
       if (index === 0) {
         return [List.of(left), leaves]
       }
+
       return [leaves.take(index), leaves.skip(index)]
     }
+
     if (right.text === '') {
       if (index === leaves.size - 1) {
         return [leaves, List.of(right)]
       }
+
       return [leaves.take(index + 1), leaves.skip(index + 1)]
     }
+
     return [
       leaves.take(index).push(left),
       leaves.skip(index + 1).unshift(right),
@@ -193,9 +205,11 @@ class Leaf extends Record(DEFAULTS) {
 
   static isLeaf(any) {
     if (!any || !any.__proto__) return false
+
     if (any.__proto__.hasOwnProperty) {
       return any.__proto__.hasOwnProperty(MODEL_TYPES.LEAF)
     }
+
     return !!any[MODEL_TYPES.LEAF]
   }
 
