@@ -23,7 +23,7 @@ import generateKey from '../utils/generate-key'
  */
 
 const DEFAULTS = {
-  data: new Map(),
+  data: Map(),
   isVoid: false,
   key: undefined,
   nodes: List(),
@@ -38,17 +38,11 @@ const DEFAULTS = {
 
 class Block extends Record(DEFAULTS) {
   constructor(attrs = {}) {
-    if (Block.isBlock(attrs)) {
-      super()
-      return attrs
-    }
-
-    if (typeof attrs == 'string') {
-      attrs = { type: attrs }
-    }
-
     if (isPlainObject(attrs)) {
       attrs = Block.getAttrsFromJSON(attrs)
+    } else if (Block.isBlock(attrs)) {
+      super()
+      return attrs
     }
 
     super(attrs)
@@ -62,6 +56,12 @@ class Block extends Record(DEFAULTS) {
    */
 
   static create(attrs = {}) {
+    if (Block.isBlock(attrs)) {
+      return attrs
+    }
+    if (typeof attrs == 'string') {
+      attrs = { type: attrs }
+    }
     return new Block(attrs)
   }
 
@@ -123,9 +123,7 @@ class Block extends Record(DEFAULTS) {
       return object
     }
 
-    const block = new Block(Block.getAttrsFromJSON(object))
-
-    return block
+    return new Block(object)
   }
 
   /**
