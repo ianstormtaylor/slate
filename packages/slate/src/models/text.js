@@ -693,6 +693,7 @@ class Text extends Record(DEFAULTS) {
 
     const [before, bundle] = Leaf.splitLeaves(this.leaves, index)
     const [middle, after] = Leaf.splitLeaves(bundle, length)
+
     const leaves = before.concat(
       middle.map(x => x.updateMark(mark, newMark)),
       after
