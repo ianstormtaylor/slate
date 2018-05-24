@@ -30,6 +30,18 @@ const DEFAULTS = {
   type: undefined,
 }
 
+let EMPTY_BLOCK
+
+/**
+ * PERF: Eliminate new function like immutable-js
+ * @returns {Block}
+ */
+
+function getEmptyBlock() {
+  if (!EMPTY_BLOCK) EMPTY_BLOCK = new Block()
+  return EMPTY_BLOCK
+}
+
 /**
  * Block.
  *
@@ -37,23 +49,6 @@ const DEFAULTS = {
  */
 
 class Block extends Record(DEFAULTS) {
-  constructor(attrs = {}) {
-    if (typeof attrs == 'string') {
-      attrs = Block.getAttrsFromJSON({ type: attrs })
-    } else if (isPlainObject(attrs)) {
-      attrs = Block.getAttrsFromJSON(attrs)
-    } else if (Block.isBlock(attrs)) {
-      super()
-      return attrs
-    } else {
-      throw new TypeError(
-        'Block constructor only accepts plain object, Block, and string'
-      )
-    }
-
-    super(attrs)
-  }
-
   /**
    * Create a new `Block` from `attrs`.
    *
@@ -62,10 +57,14 @@ class Block extends Record(DEFAULTS) {
    */
 
   static create(attrs = {}) {
-    if (Block.isBlock(attrs)) {
+    if (typeof attrs === 'string') {
+      attrs = { type: attrs }
+    } else if (Block.isBlock(attrs)) {
       return attrs
+    } else if (!isPlainObject(attrs)) {
+      throw new TypeError('attrs must be string, plain object or Block')
     }
-    return new Block(attrs)
+    return getEmptyBlock().merge(Block.getAttrsFromJSON(attrs))
   }
 
   /**
@@ -125,8 +124,7 @@ class Block extends Record(DEFAULTS) {
     if (Block.isBlock(object)) {
       return object
     }
-
-    return new Block(object)
+    return getEmptyBlock().merge(Block.getAttrsFromJSON(object))
   }
 
   /**
