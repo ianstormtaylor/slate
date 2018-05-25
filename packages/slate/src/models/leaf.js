@@ -254,7 +254,7 @@ class Leaf extends Record(DEFAULTS) {
 
   getCharacters() {
     logger.deprecate(
-      'slate@0.35.0',
+      'slate@0.34.0',
       'The `characters` property of Slate objects is deprecated'
     )
     const { marks } = this
