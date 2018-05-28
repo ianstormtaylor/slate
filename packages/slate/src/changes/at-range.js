@@ -467,7 +467,7 @@ Changes.deleteLineForwardAtRange = (change, range, options) => {
   const startBlock = document.getClosestBlock(startKey)
   const offset = startBlock.getOffset(startKey)
   const o = offset + startOffset
-  change.deleteForwardAtRange(range, o, options)
+  change.deleteForwardAtRange(range, startBlock.text.length - o, options)
 }
 
 /**
