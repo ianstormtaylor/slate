@@ -9,7 +9,6 @@ import {
   SUPPORTED_EVENTS,
 } from 'slate-dev-environment'
 import logger from 'slate-dev-logger'
-import throttle from 'lodash/throttle'
 
 import EVENT_HANDLERS from '../constants/event-handlers'
 import Node from './node'
@@ -427,7 +426,8 @@ class Content extends React.Component {
    * @param {Event} event
    */
 
-  onNativeSelectionChange = throttle(event => {
+  onNativeSelectionChange = event => {
+    if (this.tmp.isUpdatingSelection) return
     if (this.props.readOnly) return
 
     const window = getWindow(event.target)
@@ -435,7 +435,7 @@ class Content extends React.Component {
     if (activeElement !== this.element) return
 
     this.props.onSelect(event)
-  }, 100)
+  }
 
   /**
    * Render the editor content.
