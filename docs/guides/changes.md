@@ -30,9 +30,9 @@ change
     data: {
       src: 'http://placekitten.com/200/300',
       alt: 'Kittens',
-      className: 'img-responsive'
+      className: 'img-responsive',
     },
-    isVoid: true
+    isVoid: true,
   })
   .insertBlock('paragraph')
 ```
