@@ -49,7 +49,7 @@ const rules = [
           object: 'block',
           type: 'paragraph',
           data: {
-            className: el.getAttribute('class')
+            className: el.getAttribute('class'),
           },
           nodes: next(el.childNodes),
         }
@@ -72,7 +72,7 @@ const rules = [
           object: 'block',
           type: 'paragraph',
           data: {
-            className: el.getAttribute('class')
+            className: el.getAttribute('class'),
           },
           nodes: next(el.childNodes),
         }
@@ -114,7 +114,7 @@ const rules = [
           object: 'block',
           type: type,
           data: {
-            className: el.getAttribute('class')
+            className: el.getAttribute('class'),
           },
           nodes: next(el.childNodes),
         }
@@ -170,7 +170,7 @@ const rules = [
           object: 'block',
           type: type,
           data: {
-            className: el.getAttribute('class')
+            className: el.getAttribute('class'),
           },
           nodes: next(el.childNodes),
         }
