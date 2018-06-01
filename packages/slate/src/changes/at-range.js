@@ -1348,6 +1348,8 @@ Changes.wrapInlineAtRange = (change, range, inline, options = {}) => {
   const blocks = document.getBlocksAtRange(range)
   let startBlock = document.getClosestBlock(startKey)
   let endBlock = document.getClosestBlock(endKey)
+  let startInline = document.getClosestInline(startKey)
+  let endInline = document.getClosestInline(endKey)
   let startChild = startBlock.getFurthestAncestor(startKey)
   let endChild = endBlock.getFurthestAncestor(endKey)
 
@@ -1367,6 +1369,11 @@ Changes.wrapInlineAtRange = (change, range, inline, options = {}) => {
   const endIndex = endBlock.nodes.indexOf(endChild)
 
   if (startBlock == endBlock) {
+
+    if (startInline && startInline == endInline){
+      console.log("running this?")
+    }
+
     document = change.value.document
     startBlock = document.getClosestBlock(startKey)
     startChild = startBlock.getFurthestAncestor(startKey)
