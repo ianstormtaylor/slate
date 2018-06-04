@@ -1328,14 +1328,12 @@ Changes.wrapBlockAtRange = (change, range, block, options = {}) => {
  */
 
 Changes.wrapInlineAtRange = (change, range, inline, options = {}) => {
-  console.log("wrapInlineAtRange",range.startKey,range.endKey)
   const { value } = change
   let { document } = value
   const normalize = change.getFlag('normalize', options)
   const { startKey, startOffset, endKey, endOffset } = range
 
   if (range.isCollapsed) {
-    console.log("isCollapsed")
     // Wrapping an inline void
     const inlineParent = document.getClosestInline(startKey)
     if (!inlineParent.isVoid) {
@@ -1354,14 +1352,14 @@ Changes.wrapInlineAtRange = (change, range, inline, options = {}) => {
   let endInline = document.getClosestInline(endKey)
   let startChild = startBlock.getFurthestAncestor(startKey)
   let endChild = endBlock.getFurthestAncestor(endKey)
-
-  change.splitDescendantsByKey(endChild.key, endKey, endOffset, {
-    normalize: false,
-  })
-  change.splitDescendantsByKey(startChild.key, startKey, startOffset, {
-    normalize: false,
-  })
-
+  if (!startInline || startInline != endInline){
+    change.splitDescendantsByKey(endChild.key, endKey, endOffset, {
+      normalize: false,
+    })
+    change.splitDescendantsByKey(startChild.key, startKey, startOffset, {
+      normalize: false,
+    })
+  }
   document = change.value.document
   startBlock = document.getDescendant(startBlock.key)
   endBlock = document.getDescendant(endBlock.key)
@@ -1371,12 +1369,11 @@ Changes.wrapInlineAtRange = (change, range, inline, options = {}) => {
   const endIndex = endBlock.nodes.indexOf(endChild)
 
   if (startInline && startInline == endInline){
-    // get inner text
     let text = startInline.text.substring(startOffset,endOffset)
     inline = inline.set('nodes', List([Text.create(text)]))
-    Changes.insertInlineAtRange(change, range, inline, options)
-    change.delete()
-    let rng = {anchorKey:inline.key,focusKey:inline.key,anchorOffset:0,focusOffset:text.length,isFocused:true}
+    Changes.insertInlineAtRange(change, range, inline, {normalize: false})
+    let inlinekey = inline.getFirstText().key
+    let rng = {anchorKey:inlinekey,focusKey:inlinekey,anchorOffset:0,focusOffset:text.length,isFocused:true}
     change.select(rng)
   }else if (startBlock == endBlock) {
     document = change.value.document

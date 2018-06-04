@@ -10,7 +10,7 @@ export const input = (
   <value>
     <document>
       <paragraph>
-        <link>he<anchor />ll<focus />o</link>
+        <link><anchor />hel<focus />lo</link>
       </paragraph>
     </document>
   </value>
@@ -20,7 +20,7 @@ export const output = (
   <value>
     <document>
       <paragraph>
-        <link>he<hashtag><anchor />ll<focus /></hashtag>o</link>
+        <link><hashtag><anchor />hel<focus /></hashtag>lo</link>
       </paragraph>
     </document>
   </value>
