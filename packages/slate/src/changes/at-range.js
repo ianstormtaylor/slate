@@ -1348,11 +1348,11 @@ Changes.wrapInlineAtRange = (change, range, inline, options = {}) => {
   const blocks = document.getBlocksAtRange(range)
   let startBlock = document.getClosestBlock(startKey)
   let endBlock = document.getClosestBlock(endKey)
-  let startInline = document.getClosestInline(startKey)
-  let endInline = document.getClosestInline(endKey)
+  const startInline = document.getClosestInline(startKey)
+  const endInline = document.getClosestInline(endKey)
   let startChild = startBlock.getFurthestAncestor(startKey)
   let endChild = endBlock.getFurthestAncestor(endKey)
-  if (!startInline || startInline != endInline){
+  if (!startInline || startInline != endInline) {
     change.splitDescendantsByKey(endChild.key, endKey, endOffset, {
       normalize: false,
     })
@@ -1368,14 +1368,20 @@ Changes.wrapInlineAtRange = (change, range, inline, options = {}) => {
   const startIndex = startBlock.nodes.indexOf(startChild)
   const endIndex = endBlock.nodes.indexOf(endChild)
 
-  if (startInline && startInline == endInline){
-    let text = startInline.text.substring(startOffset,endOffset)
+  if (startInline && startInline == endInline) {
+    const text = startInline.text.substring(startOffset, endOffset)
     inline = inline.set('nodes', List([Text.create(text)]))
-    Changes.insertInlineAtRange(change, range, inline, {normalize: false})
-    let inlinekey = inline.getFirstText().key
-    let rng = {anchorKey:inlinekey,focusKey:inlinekey,anchorOffset:0,focusOffset:text.length,isFocused:true}
+    Changes.insertInlineAtRange(change, range, inline, { normalize: false })
+    const inlinekey = inline.getFirstText().key
+    const rng = {
+      anchorKey: inlinekey,
+      focusKey: inlinekey,
+      anchorOffset: 0,
+      focusOffset: text.length,
+      isFocused: true,
+    }
     change.select(rng)
-  }else if (startBlock == endBlock) {
+  } else if (startBlock == endBlock) {
     document = change.value.document
     startBlock = document.getClosestBlock(startKey)
     startChild = startBlock.getFurthestAncestor(startKey)
