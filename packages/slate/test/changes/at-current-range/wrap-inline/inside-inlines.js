@@ -20,8 +20,7 @@ export const output = (
   <value>
     <document>
       <paragraph>
-        <link>he<anchor /><hashtag>llo</hashtag><focus />
-        </link>
+        <link>he<hashtag><anchor />llo<focus /></hashtag></link>
       </paragraph>
     </document>
   </value>

@@ -3,6 +3,7 @@ import logger from 'slate-dev-logger'
 
 import Block from '../models/block'
 import Inline from '../models/inline'
+import Text from '../models/text'
 import Mark from '../models/mark'
 import Node from '../models/node'
 import String from '../utils/string'
@@ -1327,12 +1328,14 @@ Changes.wrapBlockAtRange = (change, range, block, options = {}) => {
  */
 
 Changes.wrapInlineAtRange = (change, range, inline, options = {}) => {
+  console.log("wrapInlineAtRange",range.startKey,range.endKey)
   const { value } = change
   let { document } = value
   const normalize = change.getFlag('normalize', options)
   const { startKey, startOffset, endKey, endOffset } = range
 
   if (range.isCollapsed) {
+    console.log("isCollapsed")
     // Wrapping an inline void
     const inlineParent = document.getClosestInline(startKey)
     if (!inlineParent.isVoid) {
@@ -1341,7 +1344,6 @@ Changes.wrapInlineAtRange = (change, range, inline, options = {}) => {
 
     return change.wrapInlineByKey(inlineParent.key, inline, options)
   }
-
   inline = Inline.create(inline)
   inline = inline.set('nodes', inline.nodes.clear())
 
@@ -1368,12 +1370,15 @@ Changes.wrapInlineAtRange = (change, range, inline, options = {}) => {
   const startIndex = startBlock.nodes.indexOf(startChild)
   const endIndex = endBlock.nodes.indexOf(endChild)
 
-  if (startBlock == endBlock) {
-
-    if (startInline && startInline == endInline){
-      console.log("running this?")
-    }
-
+  if (startInline && startInline == endInline){
+    // get inner text
+    let text = startInline.text.substring(startOffset,endOffset)
+    inline = inline.set('nodes', List([Text.create(text)]))
+    Changes.insertInlineAtRange(change, range, inline, options)
+    change.delete()
+    let rng = {anchorKey:inline.key,focusKey:inline.key,anchorOffset:0,focusOffset:text.length,isFocused:true}
+    change.select(rng)
+  }else if (startBlock == endBlock) {
     document = change.value.document
     startBlock = document.getClosestBlock(startKey)
     startChild = startBlock.getFurthestAncestor(startKey)
