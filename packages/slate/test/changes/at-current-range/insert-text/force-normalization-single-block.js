@@ -10,7 +10,7 @@ export default function(change) {
   // Replacing <hashtag> by an empty text means the <link> is now empty
   // and empty inlines are removed, according to Slate's core schema.
 
-  change.insertText('', [], {normalize: true})
+  change.insertText('', [], { normalize: true })
 }
 
 export const input = (
@@ -18,7 +18,9 @@ export const input = (
     <document>
       <paragraph>
         <link>
-          <hashtag key="a"><anchor />lorem<focus /></hashtag>
+          <hashtag key="a">
+            <anchor />lorem<focus />
+          </hashtag>
         </link>
       </paragraph>
     </document>

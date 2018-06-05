@@ -18,7 +18,9 @@ export const input = (
     <document>
       <paragraph>
         <link>
-          <hashtag key="a"><anchor />lorem<focus /></hashtag>
+          <hashtag key="a">
+            <anchor />lorem<focus />
+          </hashtag>
         </link>
       </paragraph>
     </document>
@@ -30,7 +32,9 @@ export const output = (
     <document>
       <paragraph>
         <link>
-          <hashtag key="a"><cursor /></hashtag>
+          <hashtag key="a">
+            <cursor />
+          </hashtag>
         </link>
       </paragraph>
     </document>

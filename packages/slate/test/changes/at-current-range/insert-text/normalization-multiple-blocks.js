@@ -18,18 +18,21 @@ export const input = (
     <document>
       <paragraph>
         <link>
-          <hashtag><anchor />lorem</hashtag>
+          <hashtag>
+            <anchor />lorem
+          </hashtag>
         </link>
       </paragraph>
       <paragraph>
         <link>
-          <hashtag>lorem<focus /></hashtag>
+          <hashtag>
+            lorem<focus />
+          </hashtag>
         </link>
       </paragraph>
     </document>
   </value>
 )
-
 
 export const output = (
   <value>

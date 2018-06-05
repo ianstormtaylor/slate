@@ -864,8 +864,8 @@ Changes.insertTextAtRange = (change, range, text, marks, options = {}) => {
 
   // PERF: Unless specified, don't normalize if only inserting text.
   if (normalize === undefined) {
-   normalize = change.getFlag('normalize', options) && range.isExpanded;
-  } 
+    normalize = change.getFlag('normalize', options) && range.isExpanded
+  }
   change.insertTextByKey(key, offset, text, marks, { normalize: false })
 
   if (normalize) {
