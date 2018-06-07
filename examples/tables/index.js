@@ -92,6 +92,8 @@ class Tables extends React.Component {
         if (['Backspace', 'Delete', 'Enter'].includes(event.key)) {
           event.preventDefault()
           return true
+        } else {
+          return
         }
       }
     }
