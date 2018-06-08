@@ -12,7 +12,7 @@ import isPlainObject from 'is-plain-object'
 import logger from 'slate-dev-logger'
 import { List, Map, Record } from 'immutable'
 
-import MODEL_TYPES from '../constants/model-types'
+import MODEL_TYPES, { isType } from '../constants/model-types'
 import Node from './node'
 import generateKey from '../utils/generate-key'
 
@@ -128,9 +128,7 @@ class Block extends Record(DEFAULTS) {
    * @return {Boolean}
    */
 
-  static isBlock(any) {
-    return !!(any && any[MODEL_TYPES.BLOCK])
-  }
+  static isBlock = isType.bind(null, 'BLOCK')
 
   /**
    * Check if `any` is a block list.

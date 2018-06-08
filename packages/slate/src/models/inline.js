@@ -13,7 +13,7 @@ import logger from 'slate-dev-logger'
 import { List, Map, Record } from 'immutable'
 
 import Node from './node'
-import MODEL_TYPES from '../constants/model-types'
+import MODEL_TYPES, { isType } from '../constants/model-types'
 import generateKey from '../utils/generate-key'
 
 /**
@@ -128,9 +128,7 @@ class Inline extends Record(DEFAULTS) {
    * @return {Boolean}
    */
 
-  static isInline(any) {
-    return !!(any && any[MODEL_TYPES.INLINE])
-  }
+  static isInline = isType.bind(null, 'INLINE')
 
   /**
    * Check if `any` is a list of inlines.

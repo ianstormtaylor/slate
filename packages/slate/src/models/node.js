@@ -7,6 +7,7 @@ import Block from './block'
 import Data from './data'
 import Document from './document'
 import Inline from './inline'
+import { isType } from '../constants/model-types'
 import Range from './range'
 import Text from './text'
 import generateKey from '../utils/generate-key'
@@ -165,11 +166,8 @@ class Node {
    */
 
   static isNode(any) {
-    return (
-      Block.isBlock(any) ||
-      Document.isDocument(any) ||
-      Inline.isInline(any) ||
-      Text.isText(any)
+    return !!['BLOCK', 'DOCUMENT', 'INLINE', 'TEXT'].find(type =>
+      isType(type, any)
     )
   }
 
