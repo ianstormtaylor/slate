@@ -2,7 +2,7 @@ import isPlainObject from 'is-plain-object'
 import logger from 'slate-dev-logger'
 import { List, Record, Set } from 'immutable'
 
-import MODEL_TYPES from '../constants/model-types'
+import MODEL_TYPES, { isType } from '../constants/model-types'
 
 /**
  * Default properties.
@@ -104,9 +104,7 @@ class Character extends Record(DEFAULTS) {
    * @return {Boolean}
    */
 
-  static isCharacter(any) {
-    return !!(any && any[MODEL_TYPES.CHARACTER])
-  }
+  static isCharacter = isType.bind(null, 'CHARACTER')
 
   /**
    * Check if `any` is a character list.
