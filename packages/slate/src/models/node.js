@@ -3,10 +3,10 @@ import isPlainObject from 'is-plain-object'
 import logger from 'slate-dev-logger'
 import { List, OrderedSet, Set } from 'immutable'
 
-import Block from './block'
 import Data from './data'
-import Document from './document'
+import Block from './block'
 import Inline from './inline'
+import Document from './document'
 import { isType } from '../constants/model-types'
 import Range from './range'
 import Text from './text'
@@ -75,7 +75,7 @@ class Node {
 
   static createList(elements = []) {
     if (List.isList(elements) || Array.isArray(elements)) {
-      const list = new List(elements.map(Node.create))
+      const list = List(elements.map(Node.create))
       return list
     }
 
@@ -2127,9 +2127,26 @@ memoize(Node.prototype, [
 ])
 
 /**
+ * Mix in `Node` methods.
+ */
+
+Object.getOwnPropertyNames(Node.prototype).forEach(method => {
+  if (method == 'constructor') return
+  Block.prototype[method] = Node.prototype[method]
+  Inline.prototype[method] = Node.prototype[method]
+  Document.prototype[method] = Node.prototype[method]
+})
+
+Block.createChildren = Node.createList
+Inline.createChildren = Node.createList
+Document.createChildren = Node.createList
+
+/**
  * Export.
  *
  * @type {Object}
  */
 
 export default Node
+
+export { Block, Inline, Document }
