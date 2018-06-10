@@ -79,7 +79,11 @@ class Void extends React.Component {
     this.debug('render', { props })
 
     return (
-      <Tag data-slate-void data-key={node.key}>
+      <Tag
+        data-slate-void
+        data-key={node.key}
+        contentEditable={readOnly || node.object == 'block' ? null : false}
+      >
         {readOnly ? null : spacer}
         {content}
       </Tag>
