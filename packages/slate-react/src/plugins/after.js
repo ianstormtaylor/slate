@@ -401,7 +401,7 @@ function AfterPlugin() {
       return change.deleteWordForward()
     }
 
-    if (event.key === 'Backspace') {
+    if (event.key === 'Backspace' || event.key === 'Delete') {
       event.preventDefault()
       return change.deleteCharBackward()
     }
