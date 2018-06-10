@@ -334,6 +334,7 @@ Changes.deleteWordBackwardAtRange = (change, range, options) => {
  */
 
 Changes.deleteBackwardAtRange = (change, range, n = 1, options = {}) => {
+  if (n === 0) return
   const normalize = change.getFlag('normalize', options)
   const { value } = change
   const { document } = value
@@ -467,7 +468,7 @@ Changes.deleteLineForwardAtRange = (change, range, options) => {
   const startBlock = document.getClosestBlock(startKey)
   const offset = startBlock.getOffset(startKey)
   const o = offset + startOffset
-  change.deleteForwardAtRange(range, o, options)
+  change.deleteForwardAtRange(range, startBlock.text.length - o, options)
 }
 
 /**
@@ -502,6 +503,7 @@ Changes.deleteWordForwardAtRange = (change, range, options) => {
  */
 
 Changes.deleteForwardAtRange = (change, range, n = 1, options = {}) => {
+  if (n === 0) return
   const normalize = change.getFlag('normalize', options)
   const { value } = change
   const { document } = value
