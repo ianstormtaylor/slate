@@ -32,7 +32,7 @@ change
       src: 'http://placekitten.com/200/300',
       alt: 'Kittens',
       className: 'img-responsive',
-    }
+    },
   })
   .insertBlock('paragraph')
 ```
