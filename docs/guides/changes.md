@@ -27,12 +27,12 @@ change
   .collapseToEndOfBlock()
   .insertBlock({
     type: 'image',
+    isVoid: true,
     data: {
       src: 'http://placekitten.com/200/300',
       alt: 'Kittens',
       className: 'img-responsive',
-    },
-    isVoid: true,
+    }
   })
   .insertBlock('paragraph')
 ```
