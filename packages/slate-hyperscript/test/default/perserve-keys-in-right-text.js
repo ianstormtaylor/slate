@@ -12,7 +12,8 @@ export const input = (
     </block>
   </document>
 )
-export function assertation() {
+
+export function test() {
   const block = input.nodes.first()
   assert.notEqual(block.nodes.first().key, 'a')
   assert.equal(block.nodes.last().key, 'a')

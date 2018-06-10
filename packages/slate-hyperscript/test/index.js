@@ -27,7 +27,7 @@ describe('slate-hyperscript', () => {
         const actual = input.toJSON()
         const expected = Value.isValue(output) ? output.toJSON() : output
         assert.deepEqual(actual, expected)
-        if (module.assertation) module.assertation()
+        if (module.test) module.test()
       })
     }
   })
