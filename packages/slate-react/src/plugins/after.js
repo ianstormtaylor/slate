@@ -401,6 +401,11 @@ function AfterPlugin() {
       return change.deleteWordForward()
     }
 
+    if (event.key === 'Backspace') {
+      event.preventDefault()
+      return change
+    }
+
     if (Hotkeys.isRedo(event)) {
       return change.redo()
     }
