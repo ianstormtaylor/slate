@@ -334,6 +334,7 @@ Changes.deleteWordBackwardAtRange = (change, range, options) => {
  */
 
 Changes.deleteBackwardAtRange = (change, range, n = 1, options = {}) => {
+  if (n === 0) return
   const normalize = change.getFlag('normalize', options)
   const { value } = change
   const { document } = value
@@ -502,6 +503,7 @@ Changes.deleteWordForwardAtRange = (change, range, options) => {
  */
 
 Changes.deleteForwardAtRange = (change, range, n = 1, options = {}) => {
+  if (n === 0) return
   const normalize = change.getFlag('normalize', options)
   const { value } = change
   const { document } = value
