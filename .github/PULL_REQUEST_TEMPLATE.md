@@ -35,7 +35,7 @@ Please run through this checklist for your pull request:
 * [ ] The linter passes with `yarn lint`. (Fix errors with `yarn prettier`.)
 * [ ] The relevant examples still work. (Run examples with `yarn watch`.)
 
-### Does this fix any issues or need any specific reviewers?
+#### Does this fix any issues or need any specific reviewers?
 
 Fixes: #
 Reviewers: @
