@@ -11,12 +11,12 @@ export const input = (
     <document>
       <paragraph>
         <cursor />
-        <emoji>😊</emoji>
         one
         <emoji>😊</emoji>
         two
-        <emoji>😀</emoji>
+        <emoji>😊</emoji>
         three
+        <emoji>😀</emoji>
       </paragraph>
     </document>
   </value>
