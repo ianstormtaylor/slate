@@ -403,7 +403,7 @@ function AfterPlugin() {
 
     if (event.key === 'Backspace') {
       event.preventDefault()
-      return change
+      return change.deleteCharBackward()
     }
 
     if (Hotkeys.isRedo(event)) {
