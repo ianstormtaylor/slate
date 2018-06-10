@@ -63,6 +63,7 @@ class Void extends React.Component {
       height: '0',
       color: 'transparent',
       outline: 'none',
+      position: 'absolute',
     }
 
     const spacer = (
