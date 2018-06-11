@@ -59,7 +59,7 @@ const isDeleteCharBackward = e => {
     isDeleteLineBackward,
     isDeleteLineForward,
     isDeleteWordBackward,
-    isDeleteLineForward,
+    isDeleteWordForward,
     isDeleteCharForward,
   ].find(fn => fn(e))
   return !other
