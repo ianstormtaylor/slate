@@ -1182,6 +1182,7 @@ class Node {
     if (closestBlock.hasDescendant(previous.key)) {
       return previous.getMarksAtIndex(previous.text.length)
     }
+
     return currentMarks
   }
 
