@@ -1167,30 +1167,22 @@ class Node {
 
   getMarksAtPosition(key, offset) {
     const text = this.getDescendant(key)
+    const currentMarks = text.getMarksAtIndex(offset)
+    if (offset !== 0) return currentMarks
+    const closestBlock = this.getClosestBlock(key)
 
-    if (offset == 0) {
-      const closestBlock = this.getClosestBlock(key)
-
-      if (closestBlock.text === '') {
-        // insert mark for empty block; the empty block are often created by split node or add marks in a range including empty blocks
-        return text.getMarksAtIndex(0)
-      }
-
-      const previous = this.getPreviousText(key)
-      if (!previous) return Set()
-
-      if (closestBlock.hasDescendant(previous.key)) {
-        return previous.getMarksAtIndex(previous.text.length)
-      }
-
-      const previousMarks = previous.getMarksAtIndex(previous.text.length)
-      if (previousMarks.size === 0) return Set()
-      const currentMark =
-        text.text === '' ? text.getMarksAtIndex(0) : text.getMarksAtIndex(1)
-      return currentMark.intersect(previousMarks)
+    if (closestBlock.text === '') {
+      // insert mark for empty block; the empty block are often created by split node or add marks in a range including empty blocks
+      return currentMarks
     }
 
-    return text.getMarksAtIndex(offset)
+    const previous = this.getPreviousText(key)
+    if (!previous) return Set()
+
+    if (closestBlock.hasDescendant(previous.key)) {
+      return previous.getMarksAtIndex(previous.text.length)
+    }
+    return currentMarks
   }
 
   /**

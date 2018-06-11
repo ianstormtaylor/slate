@@ -471,13 +471,8 @@ class Text extends Record(DEFAULTS) {
 
   getMarksAtIndex(index) {
     const { leaf } = this.searchLeafAtOffset(index)
-
     if (!leaf) return Set()
-
-    if (index !== 0) return leaf.marks
-    // For get insertText after split node or mark at range
-    if (this.text === '') return leaf.marks
-    return Set()
+    return leaf.marks
   }
 
   /**
