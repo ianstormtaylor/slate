@@ -2148,5 +2148,3 @@ Document.createChildren = Node.createList
  */
 
 export default Node
-
-export { Block, Inline, Document }
