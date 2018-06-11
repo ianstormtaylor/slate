@@ -2,7 +2,7 @@ import isPlainObject from 'is-plain-object'
 import logger from 'slate-dev-logger'
 import { Map, Record, Set } from 'immutable'
 
-import MODEL_TYPES from '../constants/model-types'
+import MODEL_TYPES, { isType } from '../constants/model-types'
 import Data from './data'
 import memoize from '../utils/memoize'
 
@@ -137,9 +137,7 @@ class Mark extends Record(DEFAULTS) {
    * @return {Boolean}
    */
 
-  static isMark(any) {
-    return !!(any && any[MODEL_TYPES.MARK])
-  }
+  static isMark = isType.bind(null, 'MARK')
 
   /**
    * Check if `any` is a set of marks.
