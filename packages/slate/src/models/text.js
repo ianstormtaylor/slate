@@ -3,7 +3,7 @@ import logger from 'slate-dev-logger'
 import { List, OrderedSet, Record, Set } from 'immutable'
 
 import Leaf, { EMPTY_LEAF } from './leaf'
-import MODEL_TYPES from '../constants/model-types'
+import MODEL_TYPES, { isType } from '../constants/model-types'
 import generateKey from '../utils/generate-key'
 import memoize from '../utils/memoize'
 
@@ -117,9 +117,7 @@ class Text extends Record(DEFAULTS) {
    * @return {Boolean}
    */
 
-  static isText(any) {
-    return !!(any && any[MODEL_TYPES.TEXT])
-  }
+  static isText = isType.bind(null, 'TEXT')
 
   /**
    * Check if `any` is a list of texts.

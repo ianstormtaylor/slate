@@ -4,7 +4,7 @@ import logger from 'slate-dev-logger'
 import pick from 'lodash/pick'
 import { List } from 'immutable'
 
-import MODEL_TYPES from '../constants/model-types'
+import MODEL_TYPES, { isType } from '../constants/model-types'
 import Changes from '../changes'
 import Operation from './operation'
 import apply from '../operations/apply'
@@ -31,9 +31,7 @@ class Change {
    * @return {Boolean}
    */
 
-  static isChange(any) {
-    return !!(any && any[MODEL_TYPES.CHANGE])
-  }
+  static isChange = isType.bind(null, 'CHANGE')
 
   /**
    * Create a new `Change` with `attrs`.

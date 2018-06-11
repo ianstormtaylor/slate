@@ -34,7 +34,7 @@ function cloneFragment(event, value, fragment = value.fragment) {
 
   // Make sure attach is a non-empty node, since empty nodes will not get copied
   contents.childNodes.forEach(node => {
-    if (node.innerText && node.innerText.trim() !== '') {
+    if (node.textContent && node.textContent.trim() !== '') {
       attach = node
     }
   })
@@ -90,7 +90,7 @@ function cloneFragment(event, value, fragment = value.fragment) {
   // since the result is more predictable.
   if (event.clipboardData && event.clipboardData.setData) {
     event.preventDefault()
-    event.clipboardData.setData(TEXT, native.toString())
+    event.clipboardData.setData(TEXT, div.textContent)
     event.clipboardData.setData(FRAGMENT, encoded)
     event.clipboardData.setData(HTML, div.innerHTML)
     return
