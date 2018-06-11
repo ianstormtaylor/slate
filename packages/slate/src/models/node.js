@@ -1035,10 +1035,10 @@ class Node {
       // PERF: range is not cachable, use key and offset as proxies for cache
       return this.getMarksAtPosition(range.startKey, range.startOffset)
     }
+
     const { startKey, startOffset } = range
-    if (startOffset === 0) return Set()
     const text = this.getDescendant(startKey)
-    return text.getMarksAtIndex(startKey)
+    return text.getMarksAtIndex(startOffset + 1)
   }
 
   /**
