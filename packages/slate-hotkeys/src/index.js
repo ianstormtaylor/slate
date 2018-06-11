@@ -31,8 +31,6 @@ const isDeleteForward = e => isDelete(e) || isShiftDelete(e)
 
 const isDeleteCharBackwardMac = isKeyHotkey('ctrl+h')
 const isDeleteCharForwardMac = isKeyHotkey('ctrl+d')
-const isDeleteCharBackward = e =>
-  isDeleteBackward(e) || (IS_APPLE && isDeleteCharBackwardMac(e))
 const isDeleteCharForward = e =>
   isDeleteForward(e) || (IS_APPLE && isDeleteCharForwardMac(e))
 
@@ -52,6 +50,20 @@ const isDeleteWordBackward = e =>
   IS_APPLE ? isDeleteWordBackwardMac(e) : isDeleteWordBackwardPC(e)
 const isDeleteWordForward = e =>
   IS_APPLE ? isDeleteWordForwardMac(e) : isDeleteWordForwardPC(e)
+
+const isDeleteCharBackward = e => {
+  if (isDeleteBackward(e) || (IS_APPLE && isDeleteCharBackwardMac(e)))
+    return true
+  if (e.key !== 'Backspace' && e.key !== 'Delete') return false
+  const other = [
+    isDeleteLineBackward,
+    isDeleteLineForward,
+    isDeleteWordBackward,
+    isDeleteLineForward,
+    isDeleteCharForward,
+  ].find(fn => fn(e))
+  return !other
+}
 
 const isExtendCharForward = isKeyHotkey('shift+right')
 const isExtendCharBackward = isKeyHotkey('shift+left')

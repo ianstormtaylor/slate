@@ -378,6 +378,7 @@ function AfterPlugin() {
     }
 
     if (Hotkeys.isDeleteCharBackward(event) && !IS_IOS) {
+      event.preventDefault()
       return change.deleteCharBackward()
     }
 
@@ -399,11 +400,6 @@ function AfterPlugin() {
 
     if (Hotkeys.isDeleteWordForward(event)) {
       return change.deleteWordForward()
-    }
-
-    if (event.key === 'Backspace' || event.key === 'Delete') {
-      event.preventDefault()
-      return change.deleteCharBackward()
     }
 
     if (Hotkeys.isRedo(event)) {
