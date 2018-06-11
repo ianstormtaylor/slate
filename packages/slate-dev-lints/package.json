@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
-  "main": "src/index.js",
+  "main": "eslintrc",
   "peerDependencies": {
     "babel-eslint": "^8.2.1",
     "eslint": "^4.16.0",
