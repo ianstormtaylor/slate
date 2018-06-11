@@ -16,7 +16,7 @@
     "slate-dev-logger": "^0.1.39"
   },
   "peerDependencies": {
-    "immutable": "^3.8.0 || ^4.0.0-rc",
+    "immutable": ">=3.8.0",
     "slate": ">=0.32.0"
   },
   "devDependencies": {
