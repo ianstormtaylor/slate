@@ -23,11 +23,23 @@ import generateKey from '../utils/generate-key'
  */
 
 const DEFAULTS = {
-  data: new Map(),
+  data: Map(),
   isVoid: false,
   key: undefined,
-  nodes: new List(),
+  nodes: List(),
   type: undefined,
+}
+
+let EMPTY_BLOCK
+
+/**
+ * PERF: Eliminate new function like immutable-js
+ * @returns {Block}
+ */
+
+function getEmptyBlock() {
+  if (!EMPTY_BLOCK) EMPTY_BLOCK = new Block()
+  return EMPTY_BLOCK
 }
 
 /**
@@ -45,21 +57,14 @@ class Block extends Record(DEFAULTS) {
    */
 
   static create(attrs = {}) {
-    if (Block.isBlock(attrs)) {
-      return attrs
-    }
-
-    if (typeof attrs == 'string') {
+    if (typeof attrs === 'string') {
       attrs = { type: attrs }
+    } else if (Block.isBlock(attrs)) {
+      return attrs
+    } else if (!isPlainObject(attrs)) {
+      throw new TypeError('attrs must be string, plain object or Block')
     }
-
-    if (isPlainObject(attrs)) {
-      return Block.fromJSON(attrs)
-    }
-
-    throw new Error(
-      `\`Block.create\` only accepts objects, strings or blocks, but you passed it: ${attrs}`
-    )
+    return getEmptyBlock().merge(Block.getAttrsFromJSON(attrs))
   }
 
   /**
@@ -81,17 +86,13 @@ class Block extends Record(DEFAULTS) {
   }
 
   /**
-   * Create a `Block` from a JSON `object`.
+   * Get attributes for new Block from JSON object
    *
-   * @param {Object|Block} object
-   * @return {Block}
+   * @param {Object} object
+   * @returns {Block}
    */
 
-  static fromJSON(object) {
-    if (Block.isBlock(object)) {
-      return object
-    }
-
+  static getAttrsFromJSON(object) {
     const {
       data = {},
       isVoid = false,
@@ -103,16 +104,27 @@ class Block extends Record(DEFAULTS) {
     if (typeof type != 'string') {
       throw new Error('`Block.fromJSON` requires a `type` string.')
     }
-
-    const block = new Block({
+    return {
       key,
       type,
       isVoid: !!isVoid,
-      data: new Map(data),
-      nodes: new List(nodes.map(Node.fromJSON)),
-    })
+      data: Map(data),
+      nodes: List(nodes.map(Node.fromJSON)),
+    }
+  }
 
-    return block
+  /**
+   * Create a `Block` from a JSON `object`.
+   *
+   * @param {Object|Block} object
+   * @return {Block}
+   */
+
+  static fromJSON(object) {
+    if (Block.isBlock(object)) {
+      return object
+    }
+    return getEmptyBlock().merge(Block.getAttrsFromJSON(object))
   }
 
   /**
