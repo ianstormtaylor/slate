@@ -25,7 +25,7 @@
   },
   "peerDependencies": {
     "immutable": ">=3.8.1",
-    "react": "^0.14.0 || ^15.0.0 || ^16.0.0"
+    "react": ">=0.14.0"
   },
   "devDependencies": {
     "slate-hyperscript": "^0.5.12"
