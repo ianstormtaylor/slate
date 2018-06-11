@@ -65,6 +65,7 @@ function memoize(object, properties) {
         this.__cache_key = CACHE_KEY
         this.__cache = new Map() // eslint-disable-line no-undef,no-restricted-globals
         this.__cache_no_args = {}
+        this.__cache_no_args.__proto__ = null
       }
 
       if (!this.__cache) {
@@ -72,6 +73,7 @@ function memoize(object, properties) {
       }
       if (!this.__cache_no_args) {
         this.__cache_no_args = {}
+        this.__cache_no_args.__proto__ = null
       }
 
       const takesArguments = args.length !== 0
