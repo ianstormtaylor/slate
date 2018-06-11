@@ -1,10 +1,4 @@
 /**
- * Prevent circular dependencies.
- */
-
-import './document'
-
-/**
  * Dependencies.
  */
 
@@ -12,8 +6,7 @@ import isPlainObject from 'is-plain-object'
 import logger from 'slate-dev-logger'
 import { List, Map, Record } from 'immutable'
 
-import Node from './node'
-import MODEL_TYPES from '../constants/model-types'
+import MODEL_TYPES, { isType } from '../constants/model-types'
 import generateKey from '../utils/generate-key'
 
 /**
@@ -109,7 +102,7 @@ class Inline extends Record(DEFAULTS) {
       type,
       isVoid: !!isVoid,
       data: new Map(data),
-      nodes: new List(nodes.map(Node.fromJSON)),
+      nodes: Inline.createChildren(nodes),
     })
 
     return inline
@@ -128,9 +121,7 @@ class Inline extends Record(DEFAULTS) {
    * @return {Boolean}
    */
 
-  static isInline(any) {
-    return !!(any && any[MODEL_TYPES.INLINE])
-  }
+  static isInline = isType.bind(null, 'INLINE')
 
   /**
    * Check if `any` is a list of inlines.
@@ -220,15 +211,6 @@ class Inline extends Record(DEFAULTS) {
  */
 
 Inline.prototype[MODEL_TYPES.INLINE] = true
-
-/**
- * Mix in `Node` methods.
- */
-
-Object.getOwnPropertyNames(Node.prototype).forEach(method => {
-  if (method == 'constructor') return
-  Inline.prototype[method] = Node.prototype[method]
-})
 
 /**
  * Export.

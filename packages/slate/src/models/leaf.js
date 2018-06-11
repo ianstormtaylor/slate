@@ -2,7 +2,7 @@ import isPlainObject from 'is-plain-object'
 import logger from 'slate-dev-logger'
 import { List, Record, Set } from 'immutable'
 
-import MODEL_TYPES from '../constants/model-types'
+import MODEL_TYPES, { isType } from '../constants/model-types'
 import Character from './character'
 import Mark from './mark'
 
@@ -98,9 +98,7 @@ class Leaf extends Record(DEFAULTS) {
    * @return {Boolean}
    */
 
-  static isLeaf(any) {
-    return !!(any && any[MODEL_TYPES.LEAF])
-  }
+  static isLeaf = isType.bind(null, 'LEAF')
 
   /**
    * Check if `any` is a list of leaves.
