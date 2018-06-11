@@ -342,9 +342,3 @@ Leaf.prototype[MODEL_TYPES.LEAF] = true
  */
 
 export default Leaf
-
-/*
- * An pre-created Leaf to speed up empty Leaf creation in some cases
- */
-
-export const EMPTY_LEAF = Leaf.create({})

@@ -2,7 +2,7 @@ import isPlainObject from 'is-plain-object'
 import logger from 'slate-dev-logger'
 import { List, OrderedSet, Record, Set } from 'immutable'
 
-import Leaf, { EMPTY_LEAF } from './leaf'
+import Leaf from './leaf'
 import MODEL_TYPES, { isType } from '../constants/model-types'
 import generateKey from '../utils/generate-key'
 import memoize from '../utils/memoize'
@@ -294,7 +294,7 @@ class Text extends Record(DEFAULTS) {
 
   getLeaves(decorations = []) {
     let { leaves } = this
-    if (leaves.size === 0) return List.of(EMPTY_LEAF)
+    if (leaves.size === 0) return List.of(Leaf.create({}))
     if (!decorations || decorations.length === 0) return leaves
     if (this.text.length === 0) return leaves
     const { key } = this
