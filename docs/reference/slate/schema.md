@@ -1,6 +1,6 @@
 # `Schema`
 
-Every Slate editor has a "schema" associated with it, which contains information about the structure of its content. For the most basic cases, you'll just rely on Slate's default core schema. But for advanced use cases you can enforce rules about what the content of a Slate document can contain.
+Every Slate editor has a "schema" associated with it, which contains information about the structure of its content. For the most basic cases, you'll just rely on Slate's default core schema. But for advanced use cases, you can enforce rules about what the content of a Slate document can contain.
 
 ## Properties
 
@@ -12,7 +12,7 @@ Every Slate editor has a "schema" associated with it, which contains information
 }
 ```
 
-The top-level properties of a schema all give you a way to define validation "rules" that the schema enforces.
+The top-level properties of a schema give you a way to define validation "rules" that the schema enforces.
 
 ### `document`
 
@@ -80,7 +80,7 @@ A dictionary of inlines by type, each with its own set of validation rules.
 }
 ```
 
-Slate schemas are built up of a set of validation rules. Each of the properties will validate certain pieces of the document based on the properties it defines.
+Slate schemas are built using a set of validation rules. Each of the properties will validate certain pieces of the document based on the properties it defines.
 
 ### `data`
 
@@ -159,7 +159,7 @@ Will validate a node's children. The `nodes` definitions can declare the `object
 }
 ```
 
-Will validate a node's marks. The `marks` definitions can declare a list of marks type to be allowed. If declared, any marks that are not in the list will be removed.
+Will validate a node's marks. The `marks` definitions can declare a list of mark types to be allowed. If declared, any marks that are not in the list will be removed.
 
 ### `normalize`
 
@@ -180,9 +180,9 @@ Will validate a node's marks. The `marks` definitions can declare a list of mark
 }
 ```
 
-A function that can be provided to override the default behavior in the case of a rule being invalid. By default Slate will do what it can, but since it doesn't know much about your schema, it will often remove invalid nodes. If you want to override this behavior, and "fix" the node instead of removing it, pass a custom `normalize` function.
+A function that can be provided to override the default behavior in the case of a rule being invalid. By default, Slate will do what it can, but since it doesn't know much about your schema, it will often remove invalid nodes. If you want to override this behavior and "fix" the node instead of removing it, pass a custom `normalize` function.
 
-For more information on the arguments passed to `normalize`, see the [Violations](#violations) reference.
+For more information on the arguments passed to `normalize`, see the [Violations](#violations) section.
 
 ### `parent`
 

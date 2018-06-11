@@ -35,7 +35,7 @@ Now... we need to add the [`Html`](../reference/serializers/html.md) serializer.
 * A `quote` block for quotes...
 * And `bold`, `italic` and `underline` formatting.
 
-By default, the `Html` serializer, knows nothing about our schema just like Slate itself. To fix this, we need to pass it a set of `rules`. Each rule defines how to serialize and deserialize a Slate object.
+By default, the `Html` serializer knows nothing about our schema, just like Slate itself. To fix this, we need to pass it a set of `rules`. Each rule defines how to serialize and deserialize a Slate object.
 
 To start, let's create a new rule with a `deserialize` function for paragraph blocks.
 
@@ -287,11 +287,11 @@ class App extends React.Component {
     const { mark, attributes } = props
     switch (mark.type) {
       case 'bold':
-        return <strong {...{ attributes }}>{props.children}</strong>
+        return <strong {...attributes}>{props.children}</strong>
       case 'italic':
-        return <em {...{ attributes }}>{props.children}</em>
+        return <em {...attributes}>{props.children}</em>
       case 'underline':
-        return <u {...{ attributes }}>{props.children}</u>
+        return <u {...attributes}>{props.children}</u>
     }
   }
 }
