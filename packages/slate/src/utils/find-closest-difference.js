@@ -11,13 +11,19 @@ function findClosestDifference(previousNode, node) {
   if (node.object !== previousNode.object) return node
   if (node.object === 'text') return node
   if (node.nodes.size !== previousNode.nodes.size) return node
+  if (node.key !== previousNode.key) return node
+  if (node.data !== previousNode.data) return node
+
   const first = node.nodes.findIndex(
-    (child, index) => child !== previousNode.get(index)
+    (child, index) => child !== previousNode.nodes.get(index)
   )
+
   const last = node.nodes.findLastIndex(
-    (child, index) => child !== previousNode.get(index)
+    (child, index) => child !== previousNode.nodes.get(index)
   )
+
   if (first !== last) return node
+
   return findClosestDifference(
     previousNode.nodes.get(first),
     node.nodes.get(first)
