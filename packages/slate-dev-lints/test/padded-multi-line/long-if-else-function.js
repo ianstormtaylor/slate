@@ -6,6 +6,8 @@ function test(a) {
   if (typeof a !== 'number') {
     b += 1
     return b
+  } else {
+    b += 2
   }
   return a
 }
@@ -18,6 +20,8 @@ function test(a) {
   if (typeof a !== 'number') {
     b += 1
     return b
+  } else {
+    b += 2
   }
 
   return a
@@ -39,7 +43,7 @@ export default function(ruleTester, name) {
             messageId: 'before',
           },
           {
-            message: 'after',
+            messageId: 'after',
           },
         ],
       },

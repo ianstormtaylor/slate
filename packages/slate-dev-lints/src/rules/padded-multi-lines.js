@@ -8,6 +8,10 @@ module.exports = {
       recommended: false,
       url: docsUrl('margin-blank-lines-for-multilines-block'),
     },
+    messages: {
+      before: 'Missing blank line before a multi-lines block',
+      after: 'Missing blank line after a multi-lines block',
+    },
     fixable: 'code',
     schema: [
       {
@@ -46,7 +50,7 @@ module.exports = {
       ) {
         context.report({
           node,
-          message: 'Missing blank line before a multi-lines block',
+          messageId: 'before',
           fix(fixer) {
             return fixer.insertTextBefore(node, '\n')
           },
@@ -67,7 +71,7 @@ module.exports = {
       ) {
         context.report({
           node,
-          message: 'Missing blank line after a multi-lines block',
+          messageId: 'after',
           fix(fixer) {
             return fixer.insertTextAfter(node, '\n')
           },
