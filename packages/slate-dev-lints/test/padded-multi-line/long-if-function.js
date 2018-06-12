@@ -1,4 +1,4 @@
-import rule from '../../src/rules/padded-multi-lines'
+import rule from '../../src/rules/padded-multilines'
 
 const invalidCode = `
 function test(a) {

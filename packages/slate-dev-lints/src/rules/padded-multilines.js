@@ -38,7 +38,7 @@ module.exports = {
 
     function checkBefore(node) {
       const { loc, parent } = node
-      if (parent.start.line < node.start.line - 1) return
+      if (parent.loc.start.line >= loc.start.line - 1) return
       const { line } = loc.start
 
       if (
@@ -68,7 +68,7 @@ module.exports = {
 
     function checkAfter(node) {
       const { loc, parent } = node
-      if (parent.end.line > node.end.line + 1) return
+      if (parent.loc.end.line <= loc.end.line + 1) return
       const { line } = loc.end
 
       if (
@@ -78,6 +78,7 @@ module.exports = {
         lines[line].trim() !== ''
       ) {
         const { end } = loc
+
         context.report({
           node,
           loc: { start: end, end },

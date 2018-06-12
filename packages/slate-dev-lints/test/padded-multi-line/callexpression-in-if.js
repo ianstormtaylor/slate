@@ -3,11 +3,13 @@ import rule from '../../src/rules/padded-multilines'
 const invalidCode = `
 function test(a) {
   let b = a
-  if (typeof a !== 'number') {
+  if ( a.find(x => {
+    if (x.checked) return true;
+    const {actual, expected} =x;
+    return actual === expected
+  })) {
     b += 1
     return b
-  } else {
-    b += 2
   }
   return a
 }
@@ -17,11 +19,15 @@ const validCode = `
 function test(a) {
   let b = a
 
-  if (typeof a !== 'number') {
+  if ( a.isPassed &&
+       !a.isNotPassed &&
+    a.find(x => {
+    if (x.checked) return true;
+    const {actual, expected} =x;
+    return actual === expected
+  })) {
     b += 1
     return b
-  } else {
-    b += 2
   }
 
   return a

@@ -1,5 +1,5 @@
 {
-  "extends": ["prettier", "prettier/react"],
+  "extends": ["prettier", "prettier/react", './src/index.js'],
   "plugins": ["import", "react", "prettier"],
   "settings": {
     "import/extensions": [".js"]
@@ -16,6 +16,7 @@
     "node": true
   },
   "rules": {
+    "padded-multilines": "always",
     "constructor-super": "error",
     "dot-notation": ["error", { "allowKeywords": true }],
     "import/default": "error",

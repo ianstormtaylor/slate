@@ -2,28 +2,25 @@ import rule from '../../src/rules/padded-multilines'
 
 const invalidCode = `
 function test(a) {
-  let b = a
-  if (typeof a !== 'number') {
-    b += 1
-    return b
-  } else {
-    b += 2
-  }
+  let b = \`teaswdcw
+  ceverv
+  fwevr3f3
+  fev3rf43f
+  f34f3\`
+  console.log(b)
   return a
 }
 `
 
 const validCode = `
 function test(a) {
-  let b = a
+  let b = \`teaswdcw
+  ceverv
+  fwevr3f3
+  fev3rf43f
+  f34f3\`
 
-  if (typeof a !== 'number') {
-    b += 1
-    return b
-  } else {
-    b += 2
-  }
-
+  console.log(b)
   return a
 }
 `
@@ -39,9 +36,6 @@ export default function(ruleTester, name) {
       {
         code: invalidCode,
         errors: [
-          {
-            messageId: 'before',
-          },
           {
             messageId: 'after',
           },
