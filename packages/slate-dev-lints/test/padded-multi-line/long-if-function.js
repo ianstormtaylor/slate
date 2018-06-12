@@ -23,18 +23,8 @@ function test(a) {
 }
 `
 
-const RuleTester = require('eslint').RuleTester
-
-const parserOptions = {
-  ecmaVersion: 2018,
-  sourceType: 'module',
-}
-const ruleTester = new RuleTester({ parserOptions })
-
-export const input = 'padded-multi-lines'
-
-export default function(ruleName) {
-  ruleTester.run(ruleName, rule, {
+export default function(ruleTester) {
+  ruleTester.run('padded-multi-lines', rule, {
     valid: [
       {
         code: validCode,
