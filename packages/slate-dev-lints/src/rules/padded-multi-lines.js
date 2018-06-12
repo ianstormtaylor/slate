@@ -32,8 +32,8 @@ module.exports = {
       if (
         loc.start.line > 1 &&
         parent.start.line !== loc.start.line &&
-        lines[loc.start.line] &&
-        lines[loc.start.line].trim() !== '' &&
+        lines[loc.start.line - 2] &&
+        lines[loc.start.line - 2].trim() !== '' &&
         lines[loc.start.line - 1] &&
         lines[loc.start.line - 1].trim() !== ''
       ) {
