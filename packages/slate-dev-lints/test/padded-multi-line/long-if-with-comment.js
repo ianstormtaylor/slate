@@ -3,9 +3,12 @@ import rule from '../../src/rules/padded-multi-lines'
 const invalidCode = `
 function test(a) {
   let b = a
+  /* some comments */
   if (typeof a !== 'number') {
     b += 1
     return b
+  } else {
+    b += 2
   }
   return a
 }
@@ -15,9 +18,12 @@ const validCode = `
 function test(a) {
   let b = a
 
+  /* some comments */
   if (typeof a !== 'number') {
     b += 1
     return b
+  } else {
+    b += 2
   }
 
   return a

@@ -2,23 +2,21 @@ import rule from '../../src/rules/padded-multi-lines'
 
 const invalidCode = `
 function test(a) {
-  let b = a
-  if (typeof a !== 'number') {
-    b += 1
-    return b
-  }
+  let b = a+100
+  setTimeout(() => {
+    console.log(b)
+  }, 1000)
   return a
 }
 `
 
 const validCode = `
 function test(a) {
-  let b = a
+  let b = a+100
 
-  if (typeof a !== 'number') {
-    b += 1
-    return b
-  }
+  setTimeout(() => {
+    console.log(b)
+  }, 1000)
 
   return a
 }

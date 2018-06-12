@@ -45,9 +45,17 @@ module.exports = {
         line > 1 &&
         lines[line - 2] &&
         lines[line - 2].trim() !== '' &&
-        lines[line - 1] &&
         lines[line - 1].trim() !== ''
       ) {
+        const comments = context.getCommentsBefore(node)
+        const beforeComment = comments.find(c => c.loc.end.line === line - 1)
+
+        if (beforeComment) {
+          const blankLine = beforeComment.loc.start.line - 1
+          if (blankLine < 1) return
+          if (lines[blankLine - 1].trim() === '') return
+        }
+
         context.report({
           node,
           messageId: 'before',
@@ -69,8 +77,10 @@ module.exports = {
         lines[line] &&
         lines[line].trim() !== ''
       ) {
+        const { end } = loc
         context.report({
           node,
+          loc: { start: end, end },
           messageId: 'after',
           fix(fixer) {
             return fixer.insertTextAfter(node, '\n')
@@ -82,6 +92,12 @@ module.exports = {
     return {
       IfStatement: check,
       VariableDeclaration: check,
+      SwitchStatement: check,
+      WhileStatement: check,
+      DoWhileStatement: check,
+      ForStatement: check,
+      ForInStatement: check,
+      ExpressionStatement: check,
     }
   },
 }
