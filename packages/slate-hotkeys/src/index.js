@@ -31,25 +31,33 @@ const isDeleteForward = e => isDelete(e) || isShiftDelete(e)
 
 const isDeleteCharBackwardMac = isKeyHotkey('ctrl+h')
 const isDeleteCharForwardMac = isKeyHotkey('ctrl+d')
+
 const isDeleteCharBackward = e =>
   isDeleteBackward(e) || (IS_APPLE && isDeleteCharBackwardMac(e))
+
 const isDeleteCharForward = e =>
   isDeleteForward(e) || (IS_APPLE && isDeleteCharForwardMac(e))
 
 const isDeleteLineBackwardMac = e =>
   isKeyHotkey('cmd+shift+backspace', e) || isKeyHotkey('cmd+backspace', e)
+
 const isDeleteLineForwardMac = isKeyHotkey('ctrl+k')
 const isDeleteLineBackward = e => IS_APPLE && isDeleteLineBackwardMac(e)
 const isDeleteLineForward = e => IS_APPLE && isDeleteLineForwardMac(e)
 
 const isDeleteWordBackwardMac = e =>
   isKeyHotkey('shift+option+backspace', e) || isKeyHotkey('option+backspace', e)
+
 const isDeleteWordBackwardPC = isKeyHotkey('ctrl+backspace')
+
 const isDeleteWordForwardMac = e =>
   isKeyHotkey('shift+option+delete', e) || isKeyHotkey('option+delete', e)
+
 const isDeleteWordForwardPC = isKeyHotkey('ctrl+delete')
+
 const isDeleteWordBackward = e =>
   IS_APPLE ? isDeleteWordBackwardMac(e) : isDeleteWordBackwardPC(e)
+
 const isDeleteWordForward = e =>
   IS_APPLE ? isDeleteWordForwardMac(e) : isDeleteWordForwardPC(e)
 
