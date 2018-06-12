@@ -16,11 +16,13 @@ describe('slate-dev-lints', () => {
   for (const category of categories) {
     describe(category, () => {
       const testDir = resolve(__dirname, category)
-      const tests = readdirSync(testDir).filter(x => x.length && x[0] !== '.')
+      const tests = readdirSync(testDir).filter(
+        x => x.match(/.js$/) && x[0] !== '.'
+      )
 
       for (const test of tests) {
         const module = require(resolve(testDir, test))
-        module.default(ruleTester, test)
+        module.default(ruleTester, test.replace(/.js$/, ''))
       }
     })
   }
