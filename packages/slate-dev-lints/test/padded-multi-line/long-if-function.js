@@ -23,8 +23,8 @@ function test(a) {
 }
 `
 
-export default function(ruleTester) {
-  ruleTester.run('padded-multi-lines', rule, {
+export default function(ruleTester, name) {
+  ruleTester.run(name, rule, {
     valid: [
       {
         code: validCode,

@@ -20,9 +20,7 @@ describe('slate-dev-lints', () => {
 
       for (const test of tests) {
         const module = require(resolve(testDir, test))
-        describe(test, () => {
-          module.default(ruleTester, test)
-        })
+        module.default(ruleTester, test)
       }
     })
   }
