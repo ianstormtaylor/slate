@@ -32,6 +32,7 @@ module.exports = {
       const { loc, parent } = node
       if (loc.start.line === loc.end.line) return
       if (!parent) return
+      if (node.type === 'IfStatement' && parent.type === 'IfStatement') return
       checkBefore(node)
       checkAfter(node)
     }
