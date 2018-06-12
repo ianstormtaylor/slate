@@ -19,6 +19,7 @@ function test(a) {
     b += 1
     return b
   }
+
   return a
 }
 `
@@ -36,6 +37,9 @@ export default function(ruleTester, name) {
         errors: [
           {
             message: 'Missing blank line before a multi-lines block',
+          },
+          {
+            message: 'Missing blank line after a multi-lines block',
           },
         ],
       },
