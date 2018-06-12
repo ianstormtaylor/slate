@@ -1,3 +1,3 @@
 {
-  "extends": ["./packages/slate-dev-lints/eslintrc"]
+  "extends": ["./packages/slate-dev-lints/index.js"]
 }

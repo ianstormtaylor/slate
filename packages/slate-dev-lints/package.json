@@ -1,10 +1,14 @@
 {
   "name": "slate-dev-lints",
+  "private": true,
   "description": "lint rules for developing with slateJS",
   "version": "0.0.1",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
-  "main": "eslintrc",
+  "main": "index.js",
+  "dependency": {
+    "eslint-plugin-rulesdir": "^0.1.0"
+  },
   "peerDependencies": {
     "babel-eslint": "^8.2.1",
     "eslint": "^4.16.0",
