@@ -10,7 +10,7 @@ To that end, Slate provides a `Schema` model, which allows you to easily define 
 
 ## Basic Schemas
 
-Slate schemas are defined as Javascript objects, with properties that describe the document, block nodes, and inlines nodes in your editor. Here's a simple schema:
+Slate schemas are defined as Javascript objects, with properties that describe the document, block nodes, and inline nodes in your editor. Here's a simple schema:
 
 ```js
 const schema = {
@@ -47,7 +47,7 @@ By default, Slate will normalize any invalid states to ensure that the document 
 
 For example, with the above schema, if a block that isn't a `paragraph` or an `image` is discovered in the document, Slate will simply remove it.
 
-But you might want to preserve the node, and instead just convert it to a `paragraph`, this way you aren't losing whatever the node's content was. Slate doesn't know those kinds of specifics about your data model, and trying to express all of these types of preferences in a declarative schema is a huge recipe for complexity.
+But you might want to preserve the node, and instead just convert it to a `paragraph`-this way you aren't losing whatever the node's content was. Slate doesn't know those kinds of specifics about your data model, and trying to express all of these types of preferences in a declarative schema is a huge recipe for complexity.
 
 Instead, Slate lets you define your own custom normalization logic.
 
@@ -69,7 +69,7 @@ const schema = {
 
 That's an example of defining your own custom `normalize` option for the document validation. If the invalid reason is `child_type_invalid`, it will set the child to be a `paragraph`.
 
-When Slate discovers an invalid child, it will first check to see if your custom normalizer handles that case, and if it does Slate won't do any of its default behavior. That way you can opt-in to customizing the normalization logic for specific cases, without having to re-implement all of the defaults yourself.
+When Slate discovers an invalid child, it will first check to see if your custom normalizer handles that case; if your normalizer handles it, then Slate won't run any of its default behavior. This way, you can opt-in to customizing the normalization logic for specific cases without having to re-implement all of the defaults yourself.
 
 This gives you the best of both worlds. You can write simple, terse, declarative validation rules that can be highly optimized. But you can still define fine-grained, imperative normalization logic for when invalid states occur.
 
@@ -103,11 +103,11 @@ This validation defines a very specific (honestly, useless) behavior, where if a
 
 When you need this level of specificity, using the `validateNode` property of the editor or plugins is handy.
 
-However, only use it when you absolutely have to. And when you do, you need to be aware of its performance. `validateNode` will be called **every time the node changes**, so it should be as performant as possible. That's why the example above returns early, so that the smallest amount of work is done as possible each time it is called.
+However, only use it when you absolutely have to. And when you do, make sure to optimize the function's performance. `validateNode` will be called **every time the node changes**, so it should be as performant as possible. That's why the example above returns early, so that the smallest amount of work is done each time it is called.
 
 ## Multi-step Normalizations
 
-Some normalizations will require multiple `change` function calls in order to complete. But after calling the first change function, the resulting document will be normalized, changing it out from under you. This can cause unintended behaviors.
+Some normalizations will require multiple `change` function calls in order to complete. But after calling the first change function, the resulting document will be normalized, changing the document out from underneath you. This can cause unintended behaviors.
 
 Consider the following validation function that merges adjacent text nodes together.
 
