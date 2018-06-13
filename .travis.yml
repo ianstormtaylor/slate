@@ -18,6 +18,7 @@ env:
 
 script:
   # Build all of the packages so they are resolvable by each other.
+  - lerna bootstrap
   - yarn build
   # Run testing or linting depending on the environment.
   - yarn $TEST_TYPE

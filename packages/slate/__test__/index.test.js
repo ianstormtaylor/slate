@@ -9,18 +9,17 @@ import { resetKeyGenerator } from '..'
  */
 
 describe('slate', () => {
+  /**
+   * Reset Slate's internal key generator state before each text.
+   */
+
+  beforeEach(() => {
+    resetKeyGenerator()
+  })
   require('./serializers')
   require('./schema')
   require('./changes')
   require('./history')
   require('./operations')
   require('./models')
-})
-
-/**
- * Reset Slate's internal key generator state before each text.
- */
-
-beforeEach(() => {
-  resetKeyGenerator()
 })

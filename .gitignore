@@ -7,6 +7,9 @@ lib/
 # Temporary files.
 tmp/
 
+# coverage files
+coverage
+
 # Gitbook files.
 _book/
 
