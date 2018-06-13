@@ -6,9 +6,7 @@ before_install:
   # Export the C++11 compiler.
   - if [[ $TRAVIS_OS_NAME == "linux" ]]; then export CXX=g++-4.8; fi
 
-cache:
-  # Cache yarn packages.
-  yarn: true
+cache: yarn
 
 env:
   # Do two runs, one for testing and one for linting.
@@ -17,8 +15,10 @@ env:
     - TEST_TYPE=lint:code
     - TEST_TYPE=lint:document
 
-script:
+before_script: 
   - lerna bootstrap
-  - yarn build
+  - if [[ $TEST_TYPE == 'lint:code' ]]; then yarn build; fi
+
+script:
   # Run testing or linting depending on the environment.
   - yarn $TEST_TYPE
