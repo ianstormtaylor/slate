@@ -1,4 +1,7 @@
+const { jest: lernaAliases } = require('lerna-alias')
+
 module.exports = {
   verbose: true,
-  collectCoverageFrom: ['**/src/**', '!**/test/**', '!**/lib/*.js'],
+  moduleNameMapper: lernaAliases(),
+  collectCoverageFrom: ['**/src/**', '!**/test/**'],
 }

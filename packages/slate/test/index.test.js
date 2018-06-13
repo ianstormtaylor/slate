@@ -2,7 +2,7 @@
  * Dependencies.
  */
 
-import { resetKeyGenerator } from '..'
+import { resetKeyGenerator } from '../src/'
 
 /**
  * Tests.
@@ -16,6 +16,7 @@ describe('slate', () => {
   beforeEach(() => {
     resetKeyGenerator()
   })
+
   require('./serializers')
   require('./schema')
   require('./changes')
