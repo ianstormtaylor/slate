@@ -19,5 +19,6 @@ env:
 
 script:
   - lerna bootstrap
+  - yarn build
   # Run testing or linting depending on the environment.
   - yarn $TEST_TYPE
