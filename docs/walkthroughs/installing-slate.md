@@ -12,6 +12,8 @@ You'll also need to be sure to install Slate's peer dependencies:
 npm install react react-dom immutable
 ```
 
+_Note, if you are new to react, then read the [react introduction](https://reactjs.org/docs/try-react.html) first and don't forget to install def-dependencies like babel.
+
 _Note, if you'd rather use a pre-bundled version of Slate, you can `npm install slate` and retrieve the bundled `dist/slate.js` file! Check out the [Using the Bundled Source](./using-the-bundled-source.md) guide for more information._
 
 Once you've installed Slate, you'll need to import it.
@@ -103,9 +105,15 @@ class App extends React.Component {
 
 You'll notice that the `onChange` handler passed into the `Editor` component just updates the app's state with the newest changed value. That way, when it re-renders the editor, the new value is reflected with your changes.
 
-And that's it!
+And that's it! That's the most basic example of Slate. 
 
-That's the most basic example of Slate. If you render that onto the page, you should see a paragraph with the text `A line of text in a paragraph.`. And when you type, you should see the text change!
+Now you can render out the editor like this: 
+
+```
+ReactDOM.render(App, document.getElementById('app'));
+```
+
+You should see a paragraph with the text `A line of text in a paragraph.`. And when you type, you should see the text change!
 
 <br/>
 <p align="center"><strong>Next:</strong><br/><a href="./adding-event-handlers.md">Adding Event Handlers</a></p>
