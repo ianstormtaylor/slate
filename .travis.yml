@@ -13,7 +13,7 @@ cache:
 env:
   # Do two runs, one for testing and one for linting.
   matrix:
-    - TEST_TYPE=test
+    - TEST_TYPE=test:coveralls
     - TEST_TYPE=lint
 
 script:
