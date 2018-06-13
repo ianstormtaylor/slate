@@ -92,7 +92,7 @@
     "server": "webpack-dev-server --config ./support/webpack/config.js",
     "start": "npm-run-all --parallel --print-label watch server",
     "test": "jest",
-    "test:coveralls": "jest --coverage --coverageReporters=text-lcov | coveralls",
+    "test:coveralls": "jest --coverage && cat ./coverage/lcov.info | coveralls",
     "watch": "rollup --config ./support/rollup/config.js --watch"
   }
 }
