@@ -2,7 +2,7 @@
  * Dependencies.
  */
 
-import Plain from '..'
+import Plain from '../src/'
 import assert from 'assert'
 import fs from 'fs'
 import { Value, resetKeyGenerator } from 'slate'

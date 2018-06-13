@@ -1,6 +1,6 @@
 import assert from 'assert'
 import fs from 'fs'
-import { Value } from '../..'
+import { Value } from '../../src'
 import { basename, extname, resolve } from 'path'
 
 /**

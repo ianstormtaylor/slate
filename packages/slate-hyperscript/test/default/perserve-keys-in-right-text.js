@@ -2,7 +2,7 @@
 
 import assert from 'assert'
 
-import h from '../..'
+import h from '../../src'
 
 export const input = (
   <document>

@@ -1,6 +1,6 @@
 /** @jsx h */
 
-import h from '../..'
+import h from '../../src'
 import { Value, Document, Block, Text } from 'slate'
 
 export const input = (

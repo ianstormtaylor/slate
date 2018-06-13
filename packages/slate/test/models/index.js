@@ -1,6 +1,6 @@
 import assert from 'assert'
 import fs from 'fs'
-import { Schema } from '../..'
+import { Schema } from '../../src'
 import { basename, extname, resolve } from 'path'
 
 /**

@@ -1,7 +1,7 @@
 /** @jsx h */
 
 import h from '../../../helpers/h'
-import { Block } from '../../../..'
+import { Block } from '../../../../src'
 
 export default function(change) {
   change.insertBlock(Block.create({ type: 'quote' }))

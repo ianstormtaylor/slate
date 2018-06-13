@@ -1,6 +1,6 @@
 /** @jsx h */
 
-import { createHyperscript } from '../..'
+import { createHyperscript } from '../../src'
 
 const h = createHyperscript({
   blocks: {

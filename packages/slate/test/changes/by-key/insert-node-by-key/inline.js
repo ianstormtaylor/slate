@@ -1,7 +1,7 @@
 /** @jsx h */
 
 import h from '../../../helpers/h'
-import { Inline } from '../../../..'
+import { Inline } from '../../../../src'
 
 export default function(change) {
   change.insertNodeByKey(

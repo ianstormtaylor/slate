@@ -1,7 +1,7 @@
 /** @jsx h */
 
 import h from '../../../helpers/h'
-import { Data } from '../../../..'
+import { Data } from '../../../../src'
 
 export default function(change) {
   change.setInlines({
