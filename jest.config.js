@@ -1,4 +1,4 @@
 module.exports = {
   verbose: true,
-  collectCoverageFrom: ['packages/**/src/*.js'],
+  coveragePathIgnorePatterns: ['/node_modules/', '/packages/*/test/*.js'],
 }
