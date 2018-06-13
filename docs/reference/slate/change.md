@@ -49,13 +49,21 @@ function onSomeEvent(event, change) {
 }
 ```
 
+### `normalize`
+
+`normalize() => Void`
+
+This method normalizes the document with the value's schema. This should run automatically-you should not need to call this method unless you have manually disabled normalization (and you should rarely, if ever, need to manually disable normalization). The vast majority of changes, whether by the user or invoked programmatically, will run `normalize` by default to ensure the document is always in adherence to its schema. `withoutNormalization` also runs `normalize` upon completion.
+
+> 🤖 If you must use this method, use it sparingly and strategically. Calling this method can be very expensive as it will run normalization on all of the nodes in your document.
+
 ### `withoutNormalization`
 
 `withoutNormalization(customChange: Function) => Change`
 
-This method calls the provided `customChange` function with the current instance of the `Change` object as the first argument. While `customChange` is executing, normalization is temporarily suppressed, but normalization will be executed once the `customChange` function completes execution.
+This method calls the provided `customChange` function with the current instance of the `Change` object as the first argument. Normalization is suspended while `customChange` is executing, but will be run after `customChange` completes.
 
-The purpose of `withoutNormalization` is to allow a sequence of change operations that should not be interrupted by normalization. For example:
+This method can be used to allow a sequence of change operations that should not be interrupted by normalization. For example:
 
 ```js
 /**
@@ -77,6 +85,8 @@ validateNode(node) {
   }
 }
 ```
+
+> 🤖 If you must use this method, use it sparingly and strategically. Calling this method can be very expensive as it will run normalization on all of the nodes in your document.
 
 ## Full Value Change
 
