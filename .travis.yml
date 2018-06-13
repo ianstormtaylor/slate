@@ -18,6 +18,6 @@ env:
     - TEST_TYPE=lint:document
 
 script:
-  lerna bootstrap
+  - lerna bootstrap
   # Run testing or linting depending on the environment.
   - yarn $TEST_TYPE
