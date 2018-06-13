@@ -9,18 +9,18 @@ import { Value, resetKeyGenerator } from 'slate'
 import { basename, extname, resolve } from 'path'
 
 /**
- * Reset Slate's internal key generator state before each text.
- */
-
-beforeEach(() => {
-  resetKeyGenerator()
-})
-
-/**
  * Tests.
  */
 
 describe('slate-plain-serializer', () => {
+  /**
+   * Reset Slate's internal key generator state before each text.
+   */
+
+  beforeEach(() => {
+    resetKeyGenerator()
+  })
+
   describe('deserialize()', () => {
     const dir = resolve(__dirname, './deserialize')
     const tests = fs
