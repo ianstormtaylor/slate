@@ -26,7 +26,7 @@ const FRAGMENT_MATCHER = / data-slate-fragment="([^\s"]+)"/
  */
 
 function getEventTransfer(event) {
-  // COMPAT: IE 11 doesn't populate nativeEvent with either 
+  // COMPAT: IE 11 doesn't populate nativeEvent with either
   // dataTransfer or clipboardData. We'll need to use the base event
   // object (2018/14/6)
   if (!IS_IE && event.nativeEvent) {
