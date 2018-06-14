@@ -2,14 +2,11 @@
 
 ```js
 import {
-  CHILD_OBJECT_INVALID,
+  CHILD_INVALID,
   CHILD_REQUIRED,
-  CHILD_TYPE_INVALID,
   CHILD_UNKNOWN,
-  FIRST_CHILD_OBJECT_INVALID,
-  FIRST_CHILD_TYPE_INVALID,
-  LAST_CHILD_OBJECT_INVALID,
-  LAST_CHILD_TYPE_INVALID,
+  FIRST_CHILD_INVALID,
+  LAST_CHILD_INVALID,
   NODE_DATA_INVALID,
   NODE_IS_VOID_INVALID,
   NODE_MARK_INVALID,
@@ -41,7 +38,7 @@ class Toolbar extends React.Component {
 
 ## Exports
 
-### `CHILD_OBJECT_INVALID`
+### `CHILD_INVALID`
 
 ```js
 {
@@ -52,7 +49,7 @@ class Toolbar extends React.Component {
 }
 ```
 
-Raised when the `object` property of a child node is invalid.
+Raised when the `object` or `type` property of a child node is invalid.
 
 ### `CHILD_REQUIRED`
 
@@ -65,19 +62,6 @@ Raised when the `object` property of a child node is invalid.
 ```
 
 Raised when a child node was required but none was found.
-
-### `CHILD_TYPE_INVALID`
-
-```js
-{
-  child: Node,
-  index: Number,
-  node: Node,
-  rule: Object,
-}
-```
-
-Raised when the `type` property of a child node is invalid.
 
 ### `CHILD_UNKNOWN`
 
@@ -92,7 +76,7 @@ Raised when the `type` property of a child node is invalid.
 
 Raised when a child was not expected but one was found.
 
-### `FIRST_CHILD_OBJECT_INVALID`
+### `FIRST_CHILD_INVALID`
 
 ```js
 {
@@ -102,21 +86,9 @@ Raised when a child was not expected but one was found.
 }
 ```
 
-Raised when the `object` property of the first child node is invalid, when a specific `first` rule was defined in a schema.
+Raised when the `type` or `object` property of the first child node is invalid, when a specific `first` rule was defined in a schema.
 
-### `FIRST_CHILD_TYPE_INVALID`
-
-```js
-{
-  child: Node,
-  node: Node,
-  rule: Object,
-}
-```
-
-Raised when the `type` property of the first child node is invalid, when a specific `first` rule was defined in a schema.
-
-### `LAST_CHILD_OBJECT_INVALID`
+### `LAST_CHILD_INVALID`
 
 ```js
 {
@@ -126,19 +98,7 @@ Raised when the `type` property of the first child node is invalid, when a speci
 }
 ```
 
-Raised when the `object` property of the last child node is invalid, when a specific `last` rule was defined in a schema.
-
-### `LAST_CHILD_TYPE_INVALID`
-
-```js
-{
-  child: Node,
-  node: Node,
-  rule: Object,
-}
-```
-
-Raised when the `type` property of the last child node is invalid, when a specific `last` rule was defined in a schema.
+Raised when the `object` or `type` property of the last child node is invalid, when a specific `last` rule was defined in a schema.
 
 ### `NODE_DATA_INVALID`
 
@@ -198,10 +158,4 @@ Raised when the text content of a node is invalid.
 }
 ```
 
-Raised when the `object` or `type` property of the parent of a node is invalid, if some `types` or `objects` where specified in a schema `parent` rule. See the table below to understand how `objects` and `types` work together:
-
-|               | no objects     | objects valid | objects invalid |
-| ------------- | -------------- | ------------- | --------------- |
-| no types      | ✅             | ✅            | PARENT_INVALID  |
-| types valid   | ✅             | ✅            | ✅              |
-| types invalid | PARENT_INVALID | ✅            | PARENT_INVALID  |
+Raised when the `object` or `type` property of the parent of a node is invalid, if some `parent` rule was defined in the schema.

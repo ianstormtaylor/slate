@@ -119,7 +119,7 @@ The third place you may perform change operationsâ€”for more complex use casesâ€
     list: {
       nodes: [{ types: ['item'] }],
       normalize: (change, reason, context) => {
-        if (reason == 'child_type_invalid') {
+        if (reason == 'child_invalid') {
           change.wrapBlockByKey(context.child.key, 'item')
         }
       }

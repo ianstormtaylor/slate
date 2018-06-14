@@ -169,11 +169,8 @@ Will validate a node's marks. The `marks` definitions can declare a list of mark
 {
   normalize: (change, violation, context) => {
     switch (violation) {
-      case 'child_object_invalid':
+      case 'child_invalid':
         change.wrapBlockByKey(context.child.key, 'paragraph')
-        return
-      case 'child_type_invalid':
-        change.setNodeByKey(context.child.key, 'paragraph')
         return
     }
   }
