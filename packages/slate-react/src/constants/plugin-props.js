@@ -10,6 +10,7 @@ const PLUGIN_PROPS = [
   ...EVENT_HANDLERS,
   'decorateNode',
   'onChange',
+  'renderEditor',
   'renderMark',
   'renderNode',
   'renderPlaceholder',
