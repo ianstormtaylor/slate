@@ -228,66 +228,49 @@ class Node {
    * @return {Boolean}
    * **/
 
-  areTwoRangesVisiblyTheSame(range1, range2) {
-    const isSameAnchor = this.areTwoCollapsedRangeVisiblyTheSame(
-      range1.collapseToAnchor(),
-      range2.collapseToAnchor()
+  areRangesEquivalent(range1, range2) {
+    if (range1 === range2) return true
+
+    const isSameAnchor = this.arePointsEquivalent(
+      { key: range1.anchorKey, offset: range1.anchorOffset },
+      { key: range2.anchorKey, offset: range2.anchorOffset }
     )
+
     if (!isSameAnchor) {
       return false
     }
-    const isSameFocus = this.areTwoCollapsedRangeVisiblyTheSame(
-      range1.collapseToFocus(),
-      range2.collapseToFocus()
+
+    return this.arePointsEquivalent(
+      { key: range1.focusKey, offset: range1.focusOffset },
+      { key: range2.focusKey, offset: range2.focusOffset }
     )
-    return isSameFocus
   }
 
   /**
    * Verify whether the positions are almost the same
-   * @param {String} key1
-   * @param {Number} offset1
-   * @param {String} key2
-   * @param {Number} offset2
+   * @param {Object} point1
+   *   @property {string} key
+   *   @property {number} offset
+   * @param {Object} point2
+   *   @property {string} key
+   *   @property {number} offset
    * @return {Boolean}
    *
    * **/
 
-  areTwoCollapsedRangeVisiblyTheSame(range1, range2) {
-    if (range1.isExpanded || range2.isExpanded) {
+  arePointsEquivalent(point1, point2) {
+    const { key, offset } = point1
+
+    if (key === point2.key) return offset === point2.offset
+
+    const block = this.getClosestBlock(key)
+    if (!block || !block.hasDescendant(point2.key)) {
       return false
     }
-    const { startKey, startOffset } = range1
-    const { endKey, endOffset } = range2
-    if (startKey === endKey && startOffset === endOffset) {
-      return true
-    }
-
-    const block = this.getClosestBlock(startKey)
-    if (!block) {
-      return false
-    }
-    const startText = block.getDescendant(startKey)
-    const endText = block.getDescendant(endKey)
-
-    if (!endText) {
-      return false
-    }
-
-    if (startOffset === 0 && endText.text.length === endOffset) {
-      const nextText = block.getNextText(endKey)
-      if (nextText === startText) {
-        return true
-      }
-    }
-
-    if (endOffset === 0 && startText.text.length === startOffset) {
-      const prevText = block.getPreviousText(endKey)
-      if (prevText === startText) {
-        return true
-      }
-    }
-    return false
+    return (
+      offset + block.getOffset(key) ===
+      point2.offset + block.getOffset(point2.key)
+    )
   }
 
   /**
