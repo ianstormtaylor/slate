@@ -15,8 +15,8 @@ env:
     - TEST_TYPE=lint:code
     - TEST_TYPE=lint:document
 
-before_script: 
-  - lerna bootstrap
+before_script:
+  - if [[ $TEST_TYPE == 'lint:code' ]]; then lerna bootstrap; fi
   - if [[ $TEST_TYPE == 'lint:code' ]]; then yarn build; fi
 
 script:
