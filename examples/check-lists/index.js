@@ -31,7 +31,7 @@ class CheckListItem extends React.Component {
    */
 
   render() {
-    const { attributes, children, node } = this.props
+    const { attributes, children, node, readOnly } = this.props
     const checked = node.data.get('checked')
     return (
       <div
@@ -42,7 +42,7 @@ class CheckListItem extends React.Component {
         <span>
           <input type="checkbox" checked={checked} onChange={this.onChange} />
         </span>
-        <span contentEditable suppressContentEditableWarning>
+        <span contentEditable={!readOnly} suppressContentEditableWarning>
           {children}
         </span>
       </div>
@@ -95,7 +95,7 @@ class CheckLists extends React.Component {
     const { value } = change
 
     if (event.key == 'Enter' && value.startBlock.type == 'check-list-item') {
-      change.splitBlock().setBlock({ data: { checked: false } })
+      change.splitBlock().setBlocks({ data: { checked: false } })
       return true
     }
 
@@ -105,7 +105,7 @@ class CheckLists extends React.Component {
       value.startBlock.type == 'check-list-item' &&
       value.selection.startOffset == 0
     ) {
-      change.setBlock('paragraph')
+      change.setBlocks('paragraph')
       return true
     }
   }

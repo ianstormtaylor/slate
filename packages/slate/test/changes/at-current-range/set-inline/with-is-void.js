@@ -3,7 +3,7 @@
 import h from '../../../helpers/h'
 
 export default function(change) {
-  change.setInline({
+  change.setInlines({
     type: 'emoji',
     isVoid: true,
   })
@@ -21,13 +21,13 @@ export const input = (
   </value>
 )
 
-// TODO: fix cursor placement
 export const output = (
   <value>
     <document>
       <paragraph>
-        <cursor />
-        <emoji />
+        <emoji>
+          <cursor />word
+        </emoji>
       </paragraph>
     </document>
   </value>

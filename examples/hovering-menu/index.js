@@ -5,8 +5,6 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import initialValue from './value.json'
 
-const root = window.document.querySelector('main')
-
 /**
  * The menu.
  *
@@ -67,6 +65,8 @@ class Menu extends React.Component {
    */
 
   render() {
+    const root = window.document.getElementById('root')
+
     return ReactDOM.createPortal(
       <div className="menu hover-menu" ref={this.props.menuRef}>
         {this.renderMarkButton('bold', 'format_bold')}
@@ -126,9 +126,9 @@ class HoveringMenu extends React.Component {
     const range = selection.getRangeAt(0)
     const rect = range.getBoundingClientRect()
     menu.style.opacity = 1
-    menu.style.top = `${rect.top + window.scrollY - menu.offsetHeight}px`
+    menu.style.top = `${rect.top + window.pageYOffset - menu.offsetHeight}px`
     menu.style.left = `${rect.left +
-      window.scrollX -
+      window.pageXOffset -
       menu.offsetWidth / 2 +
       rect.width / 2}px`
   }
@@ -187,16 +187,16 @@ class HoveringMenu extends React.Component {
    */
 
   renderMark = props => {
-    const { children, mark } = props
+    const { children, mark, attributes } = props
     switch (mark.type) {
       case 'bold':
-        return <strong>{children}</strong>
+        return <strong {...attributes}>{children}</strong>
       case 'code':
-        return <code>{children}</code>
+        return <code {...attributes}>{children}</code>
       case 'italic':
-        return <em>{children}</em>
+        return <em {...attributes}>{children}</em>
       case 'underlined':
-        return <u>{children}</u>
+        return <u {...attributes}>{children}</u>
     }
   }
 }

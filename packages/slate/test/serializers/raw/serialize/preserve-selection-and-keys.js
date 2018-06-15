@@ -14,7 +14,7 @@ export const output = {
   object: 'value',
   document: {
     object: 'document',
-    key: '4',
+    key: '3',
     data: {},
     nodes: [
       {
@@ -48,6 +48,7 @@ export const output = {
     isBackward: false,
     isFocused: false,
     marks: null,
+    isAtomic: false,
   },
 }
 

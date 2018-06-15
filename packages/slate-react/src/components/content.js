@@ -2,6 +2,12 @@ import Debug from 'debug'
 import React from 'react'
 import Types from 'prop-types'
 import getWindow from 'get-window'
+import {
+  IS_FIREFOX,
+  IS_IOS,
+  IS_ANDROID,
+  SUPPORTED_EVENTS,
+} from 'slate-dev-environment'
 import logger from 'slate-dev-logger'
 import throttle from 'lodash/throttle'
 
@@ -9,13 +15,9 @@ import EVENT_HANDLERS from '../constants/event-handlers'
 import Node from './node'
 import findDOMRange from '../utils/find-dom-range'
 import findRange from '../utils/find-range'
+import getChildrenDecorations from '../utils/get-children-decorations'
 import scrollToSelection from '../utils/scroll-to-selection'
-import {
-  IS_FIREFOX,
-  IS_IOS,
-  IS_ANDROID,
-  SUPPORTED_EVENTS,
-} from '../constants/environment'
+import removeAllRanges from '../utils/remove-all-ranges'
 
 /**
  * Debug.
@@ -40,7 +42,6 @@ class Content extends React.Component {
 
   static propTypes = {
     autoCorrect: Types.bool.isRequired,
-    autoFocus: Types.bool.isRequired,
     children: Types.any.isRequired,
     className: Types.string,
     editor: Types.object.isRequired,
@@ -72,7 +73,6 @@ class Content extends React.Component {
   constructor(props) {
     super(props)
     this.tmp = {}
-    this.tmp.key = 0
     this.tmp.isUpdatingSelection = false
 
     EVENT_HANDLERS.forEach(handler => {
@@ -87,11 +87,9 @@ class Content extends React.Component {
    *
    *   - Add native DOM event listeners.
    *   - Update the selection, in case it starts focused.
-   *   - Focus the editor if `autoFocus` is set.
    */
 
   componentDidMount = () => {
-    const { editor } = this.props
     const window = getWindow(this.element)
 
     window.document.addEventListener(
@@ -105,10 +103,6 @@ class Content extends React.Component {
     }
 
     this.updateSelection()
-
-    if (this.props.autoFocus) {
-      editor.focus()
-    }
   }
 
   /**
@@ -159,7 +153,7 @@ class Content extends React.Component {
     // DOM, blur it manually.
     if (selection.isBlurred) {
       if (!this.isInEditor(anchorNode)) return
-      native.removeAllRanges()
+      removeAllRanges(native)
       this.element.blur()
       debug('updateSelection', { selection, native })
       return
@@ -203,7 +197,7 @@ class Content extends React.Component {
 
     // Otherwise, set the `isUpdatingSelection` flag and update the selection.
     this.tmp.isUpdatingSelection = true
-    native.removeAllRanges()
+    removeAllRanges(native)
 
     // COMPAT: IE 11 does not support Selection.setBaseAndExtent
     if (native.setBaseAndExtent) {
@@ -283,12 +277,6 @@ class Content extends React.Component {
   onEvent(handler, event) {
     debug('onEvent', handler)
 
-    // COMPAT: Composition events can change the DOM out of under React, so we
-    // increment this key to ensure that a full re-render happens. (2017/10/16)
-    if (handler == 'onCompositionEnd') {
-      this.tmp.key++
-    }
-
     // Ignore `onBlur`, `onFocus` and `onSelect` events generated
     // programmatically while updating selection.
     if (
@@ -317,14 +305,15 @@ class Content extends React.Component {
       }
     }
 
-    // Don't handle drag events coming from embedded editors.
+    // Don't handle drag and drop events coming from embedded editors.
     if (
       handler == 'onDragEnd' ||
       handler == 'onDragEnter' ||
       handler == 'onDragExit' ||
       handler == 'onDragLeave' ||
       handler == 'onDragOver' ||
-      handler == 'onDragStart'
+      handler == 'onDragStart' ||
+      handler == 'onDrop'
     ) {
       const { target } = event
       const targetEditorNode = target.closest('[data-slate-editor]')
@@ -456,14 +445,26 @@ class Content extends React.Component {
 
   render() {
     const { props } = this
-    const { className, readOnly, editor, tabIndex, role, tagName } = props
-    const { value } = editor
+    const {
+      className,
+      readOnly,
+      editor,
+      tabIndex,
+      role,
+      tagName,
+      spellCheck,
+    } = props
+    const { value, stack } = editor
     const Container = tagName
-    const { document, selection } = value
+    const { document, selection, decorations } = value
     const indexes = document.getSelectionIndexes(selection, selection.isFocused)
+    const decs = document.getDecorations(stack).concat(decorations || [])
+    const childrenDecorations = getChildrenDecorations(document, decs)
+
     const children = document.nodes.toArray().map((child, i) => {
       const isSelected = !!indexes && indexes.start <= i && i < indexes.end
-      return this.renderNode(child, isSelected)
+
+      return this.renderNode(child, isSelected, childrenDecorations[i])
     })
 
     const handlers = EVENT_HANDLERS.reduce((obj, handler) => {
@@ -486,18 +487,12 @@ class Content extends React.Component {
       ...props.style,
     }
 
-    // COMPAT: In Firefox, spellchecking can remove entire wrapping elements
-    // including inline ones like `<a>`, which is jarring for the user but also
-    // causes the DOM to get into an irreconcilable value. (2016/09/01)
-    const spellCheck = IS_FIREFOX ? false : props.spellCheck
-
     debug('render', { props })
 
     return (
       <Container
         {...handlers}
         data-slate-editor
-        key={this.tmp.key}
         ref={this.ref}
         data-key={document.key}
         contentEditable={readOnly ? null : true}
@@ -542,18 +537,16 @@ class Content extends React.Component {
    * @return {Element}
    */
 
-  renderNode = (child, isSelected) => {
+  renderNode = (child, isSelected, decorations) => {
     const { editor, readOnly } = this.props
     const { value } = editor
-    const { document, decorations } = value
-    const { stack } = editor
-    let decs = document.getDecorations(stack)
-    if (decorations) decs = decorations.concat(decs)
+    const { document } = value
+
     return (
       <Node
         block={null}
         editor={editor}
-        decorations={decs}
+        decorations={decorations}
         isSelected={isSelected}
         key={child.key}
         node={child}

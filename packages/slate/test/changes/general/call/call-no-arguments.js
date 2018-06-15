@@ -28,7 +28,6 @@ export const output = (
   <value>
     <document>
       <image>
-        {' '}
         <cursor />
       </image>
       <paragraph>one</paragraph>

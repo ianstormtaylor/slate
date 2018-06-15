@@ -21,7 +21,7 @@ export const input = (
 export const output = (
   <value>
     <document>
-      <paragraph>{/* prettier-ignore */ ' '}</paragraph>
+      <paragraph />
     </document>
   </value>
 )

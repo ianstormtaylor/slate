@@ -1,4 +1,5 @@
 import { List } from 'immutable'
+import logger from 'slate-dev-logger'
 
 import Block from '../models/block'
 import Inline from '../models/inline'
@@ -297,25 +298,8 @@ Changes.deleteLineBackwardAtRange = (change, range, options) => {
   const { startKey, startOffset } = range
   const startBlock = document.getClosestBlock(startKey)
   const offset = startBlock.getOffset(startKey)
-  const startWithVoidInline =
-    startBlock.nodes.size > 1 &&
-    startBlock.nodes.get(0).text == '' &&
-    startBlock.nodes.get(1).object == 'inline'
-
-  let o = offset + startOffset
-
-  // If line starts with an void inline node, the text node inside this inline
-  // node disturbs the offset. Ignore this inline node and delete it afterwards.
-  if (startWithVoidInline) {
-    o -= 1
-  }
-
+  const o = offset + startOffset
   change.deleteBackwardAtRange(range, o, options)
-
-  // Delete the remaining first inline node if needed.
-  if (startWithVoidInline) {
-    change.deleteBackward()
-  }
 }
 
 /**
@@ -350,6 +334,7 @@ Changes.deleteWordBackwardAtRange = (change, range, options) => {
  */
 
 Changes.deleteBackwardAtRange = (change, range, n = 1, options = {}) => {
+  if (n === 0) return
   const normalize = change.getFlag('normalize', options)
   const { value } = change
   const { document } = value
@@ -361,24 +346,19 @@ Changes.deleteBackwardAtRange = (change, range, n = 1, options = {}) => {
     return
   }
 
+  const voidParent = document.getClosestVoid(startKey)
+
+  // If there is a void parent, delete it.
+  if (voidParent) {
+    change.removeNodeByKey(voidParent.key, { normalize })
+    return
+  }
+
   const block = document.getClosestBlock(startKey)
 
-  // If the closest block is void, delete it.
-  if (block && block.isVoid) {
-    change.removeNodeByKey(block.key, { normalize })
-    return
-  }
-
   // If the closest is not void, but empty, remove it
-  if (block && !block.isVoid && block.isEmpty && document.nodes.size !== 1) {
+  if (block && block.isEmpty && document.nodes.size !== 1) {
     change.removeNodeByKey(block.key, { normalize })
-    return
-  }
-
-  // If the closest inline is void, delete it.
-  const inline = document.getClosestInline(startKey)
-  if (inline && inline.isVoid) {
-    change.removeNodeByKey(inline.key, { normalize })
     return
   }
 
@@ -393,17 +373,11 @@ Changes.deleteBackwardAtRange = (change, range, n = 1, options = {}) => {
   if (range.isAtStartOf(text)) {
     const prev = document.getPreviousText(text.key)
     const prevBlock = document.getClosestBlock(prev.key)
-    const prevInline = document.getClosestInline(prev.key)
+    const prevVoid = document.getClosestVoid(prev.key)
 
-    // If the previous block is void, remove it.
-    if (prevBlock && prevBlock.isVoid) {
-      change.removeNodeByKey(prevBlock.key, { normalize })
-      return
-    }
-
-    // If the previous inline is void, remove it.
-    if (prevInline && prevInline.isVoid) {
-      change.removeNodeByKey(prevInline.key, { normalize })
+    // If the previous text node has a void parent, remove it.
+    if (prevVoid) {
+      change.removeNodeByKey(prevVoid.key, { normalize })
       return
     }
 
@@ -446,13 +420,6 @@ Changes.deleteBackwardAtRange = (change, range, n = 1, options = {}) => {
     } else {
       traversed = next
     }
-  }
-
-  // If the focus node is inside a void, go up until right after it.
-  if (document.hasVoidParent(node.key)) {
-    const parent = document.getClosestVoid(node.key)
-    node = document.getNextText(parent.key)
-    offset = 0
   }
 
   range = range.merge({
@@ -501,7 +468,7 @@ Changes.deleteLineForwardAtRange = (change, range, options) => {
   const startBlock = document.getClosestBlock(startKey)
   const offset = startBlock.getOffset(startKey)
   const o = offset + startOffset
-  change.deleteForwardAtRange(range, o, options)
+  change.deleteForwardAtRange(range, startBlock.text.length - o, options)
 }
 
 /**
@@ -536,6 +503,7 @@ Changes.deleteWordForwardAtRange = (change, range, options) => {
  */
 
 Changes.deleteForwardAtRange = (change, range, n = 1, options = {}) => {
+  if (n === 0) return
   const normalize = change.getFlag('normalize', options)
   const { value } = change
   const { document } = value
@@ -547,28 +515,23 @@ Changes.deleteForwardAtRange = (change, range, n = 1, options = {}) => {
     return
   }
 
-  const block = document.getClosestBlock(startKey)
+  const voidParent = document.getClosestVoid(startKey)
 
-  // If the closest block is void, delete it.
-  if (block && block.isVoid) {
-    change.removeNodeByKey(block.key, { normalize })
+  // If the node has a void parent, delete it.
+  if (voidParent) {
+    change.removeNodeByKey(voidParent.key, { normalize })
     return
   }
 
+  const block = document.getClosestBlock(startKey)
+
   // If the closest is not void, but empty, remove it
-  if (block && !block.isVoid && block.isEmpty && document.nodes.size !== 1) {
+  if (block && block.isEmpty && document.nodes.size !== 1) {
     const nextBlock = document.getNextBlock(block.key)
     change.removeNodeByKey(block.key, { normalize })
     if (nextBlock && nextBlock.key) {
       change.moveToStartOf(nextBlock)
     }
-    return
-  }
-
-  // If the closest inline is void, delete it.
-  const inline = document.getClosestInline(startKey)
-  if (inline && inline.isVoid) {
-    change.removeNodeByKey(inline.key, { normalize })
     return
   }
 
@@ -583,17 +546,11 @@ Changes.deleteForwardAtRange = (change, range, n = 1, options = {}) => {
   if (range.isAtEndOf(text)) {
     const next = document.getNextText(text.key)
     const nextBlock = document.getClosestBlock(next.key)
-    const nextInline = document.getClosestInline(next.key)
+    const nextVoid = document.getClosestVoid(next.key)
 
-    // If the previous block is void, remove it.
-    if (nextBlock && nextBlock.isVoid) {
-      change.removeNodeByKey(nextBlock.key, { normalize })
-      return
-    }
-
-    // If the previous inline is void, remove it.
-    if (nextInline && nextInline.isVoid) {
-      change.removeNodeByKey(nextInline.key, { normalize })
+    // If the next text node has a void parent, remove it.
+    if (nextVoid) {
+      change.removeNodeByKey(nextVoid.key, { normalize })
       return
     }
 
@@ -716,7 +673,11 @@ Changes.insertFragmentAtRange = (change, range, fragment, options = {}) => {
   // If the range is expanded, delete it first.
   if (range.isExpanded) {
     change.deleteAtRange(range, { normalize: false })
-    range = range.collapseToStart()
+    if (change.value.document.getDescendant(range.startKey)) {
+      range = range.collapseToStart()
+    } else {
+      range = range.collapseTo(range.endKey, 0)
+    }
   }
 
   // If the fragment is empty, there's nothing to do after deleting.
@@ -739,12 +700,23 @@ Changes.insertFragmentAtRange = (change, range, fragment, options = {}) => {
   const parent = document.getParent(startBlock.key)
   const index = parent.nodes.indexOf(startBlock)
   const blocks = fragment.getBlocks()
+  const firstChild = fragment.nodes.first()
+  const lastChild = fragment.nodes.last()
   const firstBlock = blocks.first()
   const lastBlock = blocks.last()
 
   // If the fragment only contains a void block, use `insertBlock` instead.
   if (firstBlock == lastBlock && firstBlock.isVoid) {
     change.insertBlockAtRange(range, firstBlock, options)
+    return
+  }
+
+  // If the fragment starts or ends with single nested block, (e.g., table),
+  // do not merge this fragment with existing blocks.
+  if (fragment.hasBlocks(firstChild.key) || fragment.hasBlocks(lastChild.key)) {
+    fragment.nodes.reverse().forEach(node => {
+      change.insertBlockAtRange(range, node, options)
+    })
     return
   }
 
@@ -893,11 +865,25 @@ Changes.insertTextAtRange = (change, range, text, marks, options = {}) => {
   }
 
   // PERF: Unless specified, don't normalize if only inserting text.
-  if (normalize !== undefined) {
-    normalize = range.isExpanded
+  if (normalize === undefined) {
+    normalize = range.isExpanded && marks.size !== 0
   }
+  change.insertTextByKey(key, offset, text, marks, { normalize: false })
 
-  change.insertTextByKey(key, offset, text, marks, { normalize })
+  if (normalize) {
+    // normalize in the narrowest existing block that originally contains startKey and endKey
+    const commonAncestor = document.getCommonAncestor(startKey, range.endKey)
+    const ancestors = document
+      .getAncestors(commonAncestor.key)
+      .push(commonAncestor)
+    const normalizeAncestor = ancestors.findLast(n =>
+      change.value.document.getDescendant(n.key)
+    )
+    // it is possible that normalizeAncestor doesn't return any node
+    // on that case fallback to startKey to be normalized
+    const normalizeKey = normalizeAncestor ? normalizeAncestor.key : startKey
+    change.normalizeNodeByKey(normalizeKey)
+  }
 }
 
 /**
@@ -942,15 +928,42 @@ Changes.removeMarkAtRange = (change, range, mark, options = {}) => {
  *   @property {Boolean} normalize
  */
 
-Changes.setBlockAtRange = (change, range, properties, options = {}) => {
+Changes.setBlocksAtRange = (change, range, properties, options = {}) => {
   const normalize = change.getFlag('normalize', options)
   const { value } = change
   const { document } = value
   const blocks = document.getBlocksAtRange(range)
 
-  blocks.forEach(block => {
+  const { startKey, startOffset, endKey, endOffset, isCollapsed } = range
+  const isStartVoid = document.hasVoidParent(startKey)
+  const startBlock = document.getClosestBlock(startKey)
+  const endBlock = document.getClosestBlock(endKey)
+
+  // Check if we have a "hanging" selection case where the even though the
+  // selection extends into the start of the end node, we actually want to
+  // ignore that for UX reasons.
+  const isHanging =
+    isCollapsed == false &&
+    startOffset == 0 &&
+    endOffset == 0 &&
+    isStartVoid == false &&
+    startKey == startBlock.getFirstText().key &&
+    endKey == endBlock.getFirstText().key
+
+  // If it's a hanging selection, ignore the last block.
+  const sets = isHanging ? blocks.slice(0, -1) : blocks
+
+  sets.forEach(block => {
     change.setNodeByKey(block.key, properties, { normalize })
   })
+}
+
+Changes.setBlockAtRange = (...args) => {
+  logger.deprecate(
+    'slate@0.33.0',
+    'The `setBlockAtRange` method of Slate changes has been renamed to `setBlocksAtRange`.'
+  )
+  Changes.setBlocksAtRange(...args)
 }
 
 /**
@@ -963,7 +976,7 @@ Changes.setBlockAtRange = (change, range, properties, options = {}) => {
  *   @property {Boolean} normalize
  */
 
-Changes.setInlineAtRange = (change, range, properties, options = {}) => {
+Changes.setInlinesAtRange = (change, range, properties, options = {}) => {
   const normalize = change.getFlag('normalize', options)
   const { value } = change
   const { document } = value
@@ -972,6 +985,14 @@ Changes.setInlineAtRange = (change, range, properties, options = {}) => {
   inlines.forEach(inline => {
     change.setNodeByKey(inline.key, properties, { normalize })
   })
+}
+
+Changes.setInlineAtRange = (...args) => {
+  logger.deprecate(
+    'slate@0.33.0',
+    'The `setInlineAtRange` method of Slate changes has been renamed to `setInlinesAtRange`.'
+  )
+  Changes.setInlinesAtRange(...args)
 }
 
 /**
@@ -987,12 +1008,7 @@ Changes.setInlineAtRange = (change, range, properties, options = {}) => {
 Changes.splitBlockAtRange = (change, range, height = 1, options = {}) => {
   const normalize = change.getFlag('normalize', options)
 
-  if (range.isExpanded) {
-    change.deleteAtRange(range, { normalize })
-    range = range.collapseToStart()
-  }
-
-  const { startKey, startOffset } = range
+  const { startKey, startOffset, endOffset, endKey } = range
   const { value } = change
   const { document } = value
   let node = document.assertDescendant(startKey)
@@ -1005,7 +1021,19 @@ Changes.splitBlockAtRange = (change, range, height = 1, options = {}) => {
     h++
   }
 
-  change.splitDescendantsByKey(node.key, startKey, startOffset, { normalize })
+  change.splitDescendantsByKey(node.key, startKey, startOffset, {
+    normalize: normalize && range.isCollapsed,
+  })
+
+  if (range.isExpanded) {
+    if (range.isBackward) range = range.flip()
+    const nextBlock = change.value.document.getNextBlock(node.key)
+    range = range.moveAnchorToStartOf(nextBlock)
+    if (startKey === endKey) {
+      range = range.moveFocusTo(range.anchorKey, endOffset - startOffset)
+    }
+    change.deleteAtRange(range, { normalize })
+  }
 }
 
 /**

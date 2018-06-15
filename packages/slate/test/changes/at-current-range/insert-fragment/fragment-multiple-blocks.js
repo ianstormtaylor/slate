@@ -26,7 +26,7 @@ export const output = (
     <document>
       <paragraph>woone</paragraph>
       <quote>
-        <cursor />tword
+        two<cursor />rd
       </quote>
     </document>
   </value>

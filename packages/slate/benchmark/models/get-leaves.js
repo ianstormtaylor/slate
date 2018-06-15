@@ -2,7 +2,7 @@
 /* eslint-disable react/jsx-key */
 
 import h from '../../test/helpers/h'
-import { __clear } from '../../lib/utils/memoize'
+import { resetMemoization } from '../..'
 
 export default function(text) {
   text.getLeaves()
@@ -10,7 +10,7 @@ export default function(text) {
 
 export function before(value) {
   const text = value.document.getFirstText()
-  __clear()
+  resetMemoization()
   return text
 }
 

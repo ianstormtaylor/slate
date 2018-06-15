@@ -1,8 +1,6 @@
-
 # Data Model
 
 Slate is based on an immutable data model that closely resembles the DOM. When you start using Slate, one of the most important things to do is familiarize yourself with this data model. This guide will help you do just that!
-
 
 ## Mirror the DOM
 
@@ -12,10 +10,9 @@ If you think about it, this makes sense. Slate is kind of like a nicer implement
 
 Because it mirrors the DOM, Slate's data model features a [`Document`](../reference/slate/document.md) with [`Block`](../reference/slate/block.md), [`Inline`](../reference/slate/inline.md) and [`Text`](../reference/slate/text.md) nodes. You can reference parts of the document with a [`Range`](../reference/slate/range.md). And there is a special range called a "selection" that represents the user's current cursor selection.
 
-
 ## Immutable Objects
 
-Slate's data model is built out of [`Immutable.js`](https://facebook.github.io/immutable-js/) objects. This allows us to make rendering much more performant, and it ensures that we don't end up with hard to track down bugs.
+Slate's data model is built out of [`Immutable.js`](https://facebook.github.io/immutable-js/) objects. This allows us to make rendering much more performant, and it ensures that we don't end up with hard to track down bugs due to accidentally modifying objects in-place.
 
 Specifically, Slate's models are [`Immutable.Record`](https://facebook.github.io/immutable-js/docs/#/Record) objects, which makes them very similar to Javascript objects for retrieiving values:
 
@@ -23,49 +20,46 @@ Specifically, Slate's models are [`Immutable.Record`](https://facebook.github.io
 const block = Block.create({ type: 'paragraph' })
 
 block.object // "block"
-block.type   // "paragraph"
+block.type // "paragraph"
 ```
 
 But for updating values, you'll need to use the [`Immutable.Record` API](https://facebook.github.io/immutable-js/docs/#/Record/set).
 
-Collections of Slate objects are represented as immutable `Lists`, `Sets`, `Stacks`, etc. Which means we get nice support for expressive methods like `filter`, `includes`, `take`, `skip`, `rest`, `last`, etc.
+Collections of Slate objects are represented as immutable `Lists`, `Sets`, `Stacks`, etc, which means we get nice support for expressive methods like `filter`, `includes`, `take`, `skip`, `rest` and `last`.
 
-If you haven't used Immutable.js before, there is definitely a learning curve. Before you give into Slate, you should check out the [Immutable.js docs](https://facebook.github.io/immutable-js/docs/#/). Once you get the hang of it, it won't slow you down at all, but it will take a few days to get used to, and you might write things a little "un-performantly" to start.
-
+If you haven't used Immutable.js before, there is definitely a learning curve. Before you dive into Slate, you should check out the [Immutable.js docs](https://facebook.github.io/immutable-js/docs/#/). Once you get the hang of it, it won't slow you down at all, but it will take a few days to get used to, and you might write things suboptimally at first.
 
 ## The "Value"
 
-The top-level object in Slate—the object encapsulates the entire value of an Slate editor—is called a [`Value`](../reference/slate/value.md).
+The top-level object in Slate—the object encapsulating the entire value of an Slate editor—is called a [`Value`](../reference/slate/value.md).
 
 It is made up of a document filled with content, and a selection representing the user's current cursor selection. It also has a history, to keep track of changes, and a few other more advanced properties like `decorations` and `data`.
 
 > 📋 For more info, check out the [`Value` reference](../reference/slate/value.md).
 
-
 ## Documents and Nodes
 
-Slate documents are nested and recursive. This means that a document has block nodes, and those block nodes can have child block nodes—all the way down. This lets you model more complex nested behaviors like tables, or figures with captions.
+Slate documents are nested and recursive. This means that a document has block nodes, and those block nodes can have child block nodes—all the way down. This lets you model more complex nested behaviors like tables and figures with captions.
 
-Unlike the DOM though, Slate enforces a few more restrictions on its documents, to reduce the complexity involved in manipulating them, and to prevent "impossible" situations from arising. These restrictions are:
+Unlike the DOM though, Slate enforces a few more restrictions on its documents. This reduces the complexity involved in manipulating them and prevents "impossible" situations from arising. These restrictions are:
 
-- **Documents can only contain block nodes as direct children.** This restriction mirrors how rich-text editors work, with the top-most elements being blocks that can be split when pressing <kbd>enter</kbd>.
+* **Documents can only contain block nodes as direct children.** This restriction mirrors how rich-text editors work, with the top-most elements being blocks that can be split when pressing <kbd>enter</kbd>.
 
-- **Blocks can only contain either other block nodes, or inlines and text nodes.** This is another "sane" restriction that allows you to avoid lots of boilerplate `if` statements in your code. Blocks either wrap other blocks, or contain actual content.
+* **Blocks can only contain either other block nodes, or inlines and text nodes.** This is another "sane" restriction that allows you to avoid lots of boilerplate `if` statements in your code. Blocks either wrap other blocks, or contain actual content.
 
-- **Inlines can only contain inline or text nodes.** This one is also for sanity and avoiding boilerplate. Once you've descended into an "inline" context, you can't have block nodes inside them.
+* **Inlines can only contain inline or text nodes.** This one is also for sanity and avoiding boilerplate. Once you've descended into an "inline" context, you can't have block nodes inside them.
 
-- **Inlines can't contain no text.** Any inline node whose text is an empty string (`''`) will be automatically removed. This makes sense when you think about a user backspacing through an inline. When they delete that last character, they'd expect the inline to be removed. And when there are no characters, you can't really put your selection into the inline anymore. So Slate removes them from the document automatically, to simplify things.
+* **Inlines can't contain no text.** Any inline node whose text is an empty string (`''`) will be automatically removed. This makes sense when you think about a user backspacing through an inline. When they delete that last character, they'd expect the inline to be removed. And when there are no characters, you can't really put your selection into the inline anymore. So Slate removes them from the document automatically, to simplify things.
 
-- **Text nodes can't be adjacent to other text nodes.** Any two adjacent text nodes will automatically be merged into one. This prevents ambiguous cases where a cursor could be at the end of one text node or at the start of the next. However, you can have an inline node surrounded by two texts.
+* **Text nodes can't be adjacent to other text nodes.** Any two adjacent text nodes will automatically be merged into one. This prevents ambiguous cases where a cursor could be at the end of one text node or at the start of the next. However, you can have an inline node surrounded by two texts.
 
-- **Blocks and inlines must always contain at least one text node.** This is to ensure that the user's cursor can always "enter" the nodes, and to make sure that ranges can be created referencing them.
+* **Blocks and inlines must always contain at least one text node.** This is to ensure that the user's cursor can always "enter" the nodes and to make sure that ranges can be created referencing them.
 
-Slate enforces all of these restrictions for you automatically. Any time you [perform changes](./changes.md) to the document, Slate will check if the document is invalid, and if so it will return it to a "normalized" value.
+Slate enforces all of these restrictions for you automatically. Any time you [perform changes](./changes.md) to the document, Slate will check if the document is invalid, and if so, it will return it to a "normalized" value.
 
 > 🙃 Fun fact: normalizing is actually based on the DOM's [`Node.normalize()`](https://developer.mozilla.org/en-US/docs/Web/API/Node/normalize)!
 
-In addition to documents, blocks and inlines, Slate introduces one other type of markup that the DOM doesn't have natively:  the [`Mark`](../reference/slate/mark.md).
-
+In addition to documents, blocks and inlines, Slate introduces one other type of markup that the DOM doesn't have natively, the [`Mark`](../reference/slate/mark.md).
 
 ## Marks
 
@@ -93,13 +87,12 @@ And if you happened to add another overlapping section of `<strike>` to that tex
 
 That all sounds pretty complex, but you don't have to think about it much, as long as you use marks and inlines for their intended purposes...
 
-- Marks represent **unordered**, character-level formatting.
-- Inlines represent **contiguous**, semantic elements in the document.
-
+* Marks represent **unordered**, character-level formatting.
+* Inlines represent **contiguous**, semantic elements in the document.
 
 ## Ranges and "The Selection"
 
-Just like in the DOM, you can reference a part of the document using a `Range`. And there's one special range that Slate keeps track of called the "selection" that refers to the user's current cursor selection.
+Just like in the DOM, you can reference a part of the document using a `Range`. And there's one special range that Slate keeps track of that refers to the user's current cursor selection, called the "selection".
 
 Ranges are defined by an "anchor" and "focus" point. The anchor is where the range starts, and the focus is where it ends. And each point is a combination of a "key" referencing a specific node, and an "offset". This ends up looking like this:
 
@@ -115,7 +108,7 @@ const range = Range.create({
 
 The more readable `node-a` name is just pseudocode, because Slate uses auto-incrementing numerical strings by default—`'1', '2', '3', ...` But the important part is that every node has a unique `key` property, and a range references nodes by their keys.
 
-The terms "anchor" and "focus" are borrowed from the DOM, where they mean the same thing. The anchor is where a range starts, and the focus is where it ends. However, be careful because the anchor point isn't always _before_ the focus point in the document. Just like in the DOM, it depends on whether the range is backwards or forwards.
+The terms "anchor" and "focus" are borrowed from the DOM, where they mean the same thing. The anchor point isn't always _before_ the focus point in the document. Just like in the DOM, it depends on whether the range is backwards or forwards.
 
 Here's how MDN explains it:
 

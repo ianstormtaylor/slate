@@ -13,7 +13,6 @@ export const input = (
         on<anchor />e
       </paragraph>
       <image>
-        {' '}
         <focus />
       </image>
       <paragraph>three</paragraph>

@@ -145,11 +145,16 @@ class Editor extends React.Component {
   }
 
   /**
-   * When the component first mounts, flush any temporary changes.
+   * When the component first mounts, flush any temporary changes,
+   * and then, focus the editor if `autoFocus` is set.
    */
 
   componentDidMount = () => {
     this.flushChange()
+
+    if (this.props.autoFocus) {
+      this.focus()
+    }
   }
 
   /**

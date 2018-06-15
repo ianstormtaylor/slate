@@ -32,6 +32,10 @@ const h = createHyperscript({
     b: 'bold',
     i: 'italic',
     u: 'underline',
+    fontSize: 'font-size',
+  },
+  decorators: {
+    highlight: 'highlight',
   },
 })
 

@@ -137,11 +137,11 @@ class RichTextExample extends React.Component {
 
       if (isList) {
         change
-          .setBlock(isActive ? DEFAULT_NODE : type)
+          .setBlocks(isActive ? DEFAULT_NODE : type)
           .unwrapBlock('bulleted-list')
           .unwrapBlock('numbered-list')
       } else {
-        change.setBlock(isActive ? DEFAULT_NODE : type)
+        change.setBlocks(isActive ? DEFAULT_NODE : type)
       }
     } else {
       // Handle the extra wrapping required for list buttons.
@@ -152,7 +152,7 @@ class RichTextExample extends React.Component {
 
       if (isList && isType) {
         change
-          .setBlock(DEFAULT_NODE)
+          .setBlocks(DEFAULT_NODE)
           .unwrapBlock('bulleted-list')
           .unwrapBlock('numbered-list')
       } else if (isList) {
@@ -162,7 +162,7 @@ class RichTextExample extends React.Component {
           )
           .wrapBlock(type)
       } else {
-        change.setBlock('list-item').wrapBlock(type)
+        change.setBlocks('list-item').wrapBlock(type)
       }
     }
 
@@ -235,7 +235,13 @@ class RichTextExample extends React.Component {
    */
 
   renderBlockButton = (type, icon) => {
-    const isActive = this.hasBlock(type)
+    let isActive = this.hasBlock(type)
+
+    if (['numbered-list', 'bulleted-list'].includes(type)) {
+      const { value } = this.state
+      const parent = value.document.getParent(value.blocks.first().key)
+      isActive = this.hasBlock('list-item') && parent && parent.type === type
+    }
     const onMouseDown = event => this.onClickBlock(event, type)
 
     return (
@@ -263,6 +269,7 @@ class RichTextExample extends React.Component {
           renderNode={this.renderNode}
           renderMark={this.renderMark}
           spellCheck
+          autoFocus
         />
       </div>
     )
@@ -301,16 +308,16 @@ class RichTextExample extends React.Component {
    */
 
   renderMark = props => {
-    const { children, mark } = props
+    const { children, mark, attributes } = props
     switch (mark.type) {
       case 'bold':
-        return <strong>{children}</strong>
+        return <strong {...attributes}>{children}</strong>
       case 'code':
-        return <code>{children}</code>
+        return <code {...attributes}>{children}</code>
       case 'italic':
-        return <em>{children}</em>
+        return <em {...attributes}>{children}</em>
       case 'underlined':
-        return <u>{children}</u>
+        return <u {...attributes}>{children}</u>
     }
   }
 }

@@ -77,11 +77,14 @@ class Emojis extends React.Component {
     const { value } = this.state
     const change = value.change()
 
-    change.insertInline({
-      type: 'emoji',
-      isVoid: true,
-      data: { code },
-    })
+    change
+      .insertInline({
+        type: 'emoji',
+        isVoid: true,
+        data: { code },
+      })
+      .collapseToStartOfNextText()
+      .focus()
 
     this.onChange(change)
   }

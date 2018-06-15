@@ -46,7 +46,7 @@ class Value extends Record(DEFAULTS) {
     }
 
     if (isPlainObject(attrs)) {
-      return Value.fromJSON(attrs)
+      return Value.fromJSON(attrs, options)
     }
 
     throw new Error(
@@ -603,7 +603,7 @@ class Value extends Record(DEFAULTS) {
   get isEmpty() {
     if (this.isCollapsed) return true
     if (this.endOffset != 0 && this.startOffset != 0) return false
-    return this.fragment.text.length == 0
+    return this.fragment.isEmpty
   }
 
   /**
@@ -673,6 +673,24 @@ class Value extends Record(DEFAULTS) {
         : null
       delete object.selection.anchorKey
       delete object.selection.focusKey
+    }
+
+    if (
+      options.preserveDecorations &&
+      object.decorations &&
+      !options.preserveKeys
+    ) {
+      const { document } = this
+      object.decorations = object.decorations.map(decoration => {
+        const withPath = {
+          ...decoration,
+          anchorPath: document.getPath(decoration.anchorKey),
+          focusPath: document.getPath(decoration.focusKey),
+        }
+        delete withPath.anchorKey
+        delete withPath.focusKey
+        return withPath
+      })
     }
 
     return object

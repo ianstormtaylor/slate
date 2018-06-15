@@ -2,7 +2,7 @@
 /* eslint-disable react/jsx-key */
 
 import h from '../../test/helpers/h'
-import { __clear } from '../../lib/utils/memoize'
+import { resetMemoization } from '../..'
 
 export default function({ value, keys }) {
   keys.forEach(key => {
@@ -15,7 +15,7 @@ export function before(value) {
     .getTexts()
     .toArray()
     .map(t => t.key)
-  __clear()
+  resetMemoization()
   return { value, keys }
 }
 

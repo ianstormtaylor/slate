@@ -29,7 +29,7 @@ function findDOMPoint(key, offset, win = window) {
 
     if (offset <= end) {
       const o = offset - start
-      return { node: n, offset: o }
+      return { node: n, offset: o >= 0 ? o : 0 }
     }
 
     start = end

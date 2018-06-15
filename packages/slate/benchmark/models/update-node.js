@@ -2,7 +2,7 @@
 /* eslint-disable react/jsx-key */
 
 import h from '../../test/helpers/h'
-import { __clear } from '../../lib/utils/memoize'
+import { resetMemoization } from '../..'
 
 export default function({ value, next }) {
   value.document.updateNode(next)
@@ -13,7 +13,7 @@ export function before(value) {
   const { size } = texts
   const text = texts.get(Math.round(size / 2))
   const next = text.insertText(0, 'some text')
-  __clear()
+  resetMemoization()
   return { value, next }
 }
 

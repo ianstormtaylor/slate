@@ -11,6 +11,7 @@ import { resetKeyGenerator } from 'slate'
 describe('slate-react', () => {
   require('./plugins')
   require('./rendering')
+  require('./utils')
 })
 
 /**

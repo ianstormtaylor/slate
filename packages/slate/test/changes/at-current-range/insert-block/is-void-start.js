@@ -10,7 +10,7 @@ export const input = (
   <value>
     <document>
       <image>
-        <cursor />{' '}
+        <cursor />text
       </image>
       <paragraph>text</paragraph>
     </document>
@@ -23,7 +23,7 @@ export const output = (
       <quote>
         <cursor />
       </quote>
-      <image />
+      <image>text</image>
       <paragraph>text</paragraph>
     </document>
   </value>

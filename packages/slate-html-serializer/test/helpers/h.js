@@ -25,6 +25,10 @@ const h = createHyperscript({
       type: 'emoji',
       isVoid: true,
     },
+    linebreak: {
+      type: 'linebreak',
+      isVoid: true,
+    },
   },
   marks: {
     b: 'bold',

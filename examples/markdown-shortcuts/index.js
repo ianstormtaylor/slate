@@ -153,7 +153,7 @@ class MarkdownShortcuts extends React.Component {
     if (type == 'list-item' && startBlock.type == 'list-item') return
     event.preventDefault()
 
-    change.setBlock(type)
+    change.setBlocks(type)
 
     if (type == 'list-item') {
       change.wrapBlock('bulleted-list')
@@ -180,7 +180,7 @@ class MarkdownShortcuts extends React.Component {
     if (startBlock.type == 'paragraph') return
 
     event.preventDefault()
-    change.setBlock('paragraph')
+    change.setBlocks('paragraph')
 
     if (startBlock.type == 'list-item') {
       change.unwrapBlock('bulleted-list')
@@ -219,7 +219,7 @@ class MarkdownShortcuts extends React.Component {
     }
 
     event.preventDefault()
-    change.splitBlock().setBlock('paragraph')
+    change.splitBlock().setBlocks('paragraph')
     return true
   }
 }

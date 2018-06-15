@@ -4,7 +4,7 @@ import h from '../../../helpers/h'
 import { Data } from '../../../..'
 
 export default function(change) {
-  change.setInline({
+  change.setInlines({
     type: 'hashtag',
     data: Data.create({ thing: 'value' }),
   })

@@ -45,6 +45,7 @@ export const output = {
     isBackward: false,
     isFocused: false,
     marks: null,
+    isAtomic: false,
   },
 }
 

@@ -1,84 +1,46 @@
-import path from 'path'
-import { startCase, cloneDeep } from 'lodash'
-import alias from 'rollup-plugin-alias'
-import resolve from 'rollup-plugin-node-resolve'
-import commonjs from 'rollup-plugin-commonjs'
 import babel from 'rollup-plugin-babel'
+import builtins from 'rollup-plugin-node-builtins'
+import commonjs from 'rollup-plugin-commonjs'
+import globals from 'rollup-plugin-node-globals'
+import json from 'rollup-plugin-json'
 import replace from 'rollup-plugin-replace'
+import resolve from 'rollup-plugin-node-resolve'
 import uglify from 'rollup-plugin-uglify'
+import { startCase } from 'lodash'
 
-const environment = process.env.NODE_ENV || 'development'
+/**
+ * Return a Rollup configuration for a `pkg` with `env` and `target`.
+ *
+ * @param {Object} pkg
+ * @param {String} env
+ * @param {String} format
+ * @return {Object}
+ */
 
-export default pkg => {
-  const pkgName = pkg.name
-  const output = {
-    cjs: pkg.main,
-    es: pkg.module,
-    umd: pkg.umd,
-    umdMin: pkg.umdMin,
-  }
-  const umdGlobals = pkg.umdGlobals
+function configure(pkg, env, target) {
+  const isProd = env === 'production'
+  const isUmd = target === 'umd'
+  const isModule = target === 'module'
+  const input = `packages/${pkg.name}/src/index.js`
+  const deps = []
+    .concat(pkg.dependencies ? Object.keys(pkg.dependencies) : [])
+    .concat(pkg.peerDependencies ? Object.keys(pkg.peerDependencies) : [])
 
-  // Generate list of external dependencies from package.json
-  let dependencies = []
-  if (pkg.dependencies) {
-    dependencies = dependencies.concat(Object.keys(pkg.dependencies))
-  }
-  if (pkg.peerDependencies) {
-    dependencies = dependencies.concat(Object.keys(pkg.peerDependencies))
-  }
+  const plugins = [
+    // Allow Rollup to resolve modules from `node_modules`, since it only
+    // resolves local modules by default.
+    resolve({
+      browser: true,
+    }),
 
-  // Consider a dependency external if:
-  // 1. It is directly located in the package.json dependencies/peerDependencies (e.g. `react`), or
-  // 2. It is part of a package.json dependency (e.g. `lodash/omit`)
-  // External dependencies are expected to be present at runtime (rather than being bundled into
-  // our built dist).
-  const isExternalDependency = id =>
-    !!dependencies.find(dep => dep === id || id.startsWith(`${dep}/`))
-
-  // UMD build for browsers
-  const umdConfig = {
-    input: `packages/${pkgName}/src/index.js`,
-
-    output: {
-      file: `packages/${pkgName}/${output.umd}`,
-      format: 'umd',
-      exports: 'named',
-
-      // For a package name such as `slate-react`, the UMD name
-      // should be SlateReact.
-      name: startCase(pkgName).replace(/ /g, ''),
-
-      // Some packages contain `umdGlobals` in their package.json, which
-      // indicates external dependencies that should be treated as globals
-      // rather than bundled into our dist, such as Immutable and React.
-      globals: umdGlobals,
-    },
-
-    // `external` tells rollup to treat the umdGlobals as external (and
-    // thus skip bundling them).
-    external: Object.keys(umdGlobals || {}),
-
-    plugins: [
-      // Force rollup to use the browser variant of `debug`.
-      // The main variant of `debug` relies on Node.js globals.
-      alias({
-        debug: path.resolve(__dirname, 'node_modules/debug/src/browser'),
-      }),
-
-      // Allow rollup to resolve modules that are npm dependencies
-      // (by default, it can only resolve local modules).
-      resolve(),
-
-      // Allow rollup to resolve npm dependencies that are CommonJS
-      // (by default, it can only handle ES2015 syntax).
+    // Allow Rollup to resolve CommonJS modules, since it only resolves ES2015
+    // modules by default.
+    isUmd &&
       commonjs({
-        exclude: [`packages/${pkgName}/src/**`],
-
-        // The CommonJS plugin sometimes cannot correctly identify named
-        // exports of CommonJS modules, so we manually specify here to
-        // hint that e.g. `import { List } from 'immutable'` is a reference
-        // to a valid named export.
+        exclude: [`packages/${pkg.name}/src/**`],
+        // HACK: Sometimes the CommonJS plugin can't identify named exports, so
+        // we have to manually specify named exports here for them to work.
+        // https://github.com/rollup/rollup-plugin-commonjs#custom-named-exports
         namedExports: {
           esrever: ['reverse'],
           immutable: [
@@ -95,76 +57,92 @@ export default pkg => {
         },
       }),
 
-      // Replace `process.env.NODE_ENV` with its value -- needed for
-      // some modules like React to use their production variant (and
-      // one place within Slate itself).
-      replace({
-        'process.env.NODE_ENV': JSON.stringify('production'),
-      }),
+    // Convert JSON imports to ES6 modules.
+    json(),
 
-      // Use babel to transpile the result -- limit to package src
-      // to prevent babel from trying to transpile npm dependencies.
-      babel({
-        include: [`packages/${pkgName}/src/**`],
-      }),
-    ],
-  }
+    // Replace `process.env.NODE_ENV` with its value, which enables some modules
+    // like React and Slate to use their production variant.
+    replace({
+      'process.env.NODE_ENV': JSON.stringify(env),
+    }),
 
-  // Additional UMD minified build based off of the unminified config
-  const umdConfigMin = cloneDeep(umdConfig)
-  umdConfigMin.output.file = `packages/${pkgName}/${output.umdMin}`
-  umdConfigMin.plugins.push(uglify())
+    // Register Node.js builtins for browserify compatibility.
+    builtins(),
 
-  // CommonJS (for Node) and ES module (for bundlers) build.
-  const moduleConfig = {
-    input: `packages/${pkgName}/src/index.js`,
-    output: [
-      {
-        file: `packages/${pkgName}/${output.es}`,
-        format: 'es',
-        sourcemap: environment === 'development',
-      },
-      {
-        file: `packages/${pkgName}/${output.cjs}`,
-        format: 'cjs',
+    // Use Babel to transpile the result, limiting it to the source code.
+    babel({
+      include: [`packages/${pkg.name}/src/**`],
+    }),
+
+    // Register Node.js globals for browserify compatibility.
+    globals(),
+
+    // Only minify the output in production, since it is very slow. And only
+    // for UMD builds, since modules will be bundled by the consumer.
+    isUmd && isProd && uglify(),
+  ].filter(Boolean)
+
+  if (isUmd) {
+    return {
+      plugins,
+      input,
+      output: {
+        format: 'umd',
+        file: `packages/${pkg.name}/${isProd ? pkg.umdMin : pkg.umd}`,
         exports: 'named',
+        name: startCase(pkg.name).replace(/ /g, ''),
+        globals: pkg.umdGlobals,
       },
-    ],
-    external: isExternalDependency,
-    plugins: [
-      // Force rollup to use the browser variant of `debug`.
-      // The main variant of `debug` relies on Node.js globals.
-      alias({
-        debug: path.resolve(__dirname, 'node_modules/debug/src/browser'),
-      }),
-
-      // Allow rollup to resolve modules that are npm dependencies
-      // (by default, it can only resolve local modules).
-      resolve(),
-
-      // Replace `process.env.NODE_ENV` with its value -- needed for
-      // some modules like React to use their production variant (and
-      // one place within Slate itself).
-      replace({
-        'process.env.NODE_ENV': JSON.stringify(environment),
-      }),
-
-      // Use babel to transpile the result -- limit to package src
-      // to prevent babel from trying to transpile npm dependencies.
-      babel({
-        include: [`packages/${pkgName}/src/**`],
-      }),
-    ],
+      external: Object.keys(pkg.umdGlobals || {}),
+    }
   }
 
-  const configurations = [moduleConfig]
-
-  if (environment === 'production') {
-    // In development, we only build the module version to
-    // reduce rebuild times. In production, we add the
-    // configs for the UMD variants here.
-    configurations.push(umdConfig, umdConfigMin)
+  if (isModule) {
+    return {
+      plugins,
+      input,
+      output: [
+        {
+          file: `packages/${pkg.name}/${pkg.module}`,
+          format: 'es',
+          sourcemap: true,
+        },
+        {
+          file: `packages/${pkg.name}/${pkg.main}`,
+          format: 'cjs',
+          exports: 'named',
+          sourcemap: true,
+        },
+      ],
+      // We need to explicitly state which modules are external, meaning that
+      // they are present at runtime. In the case of non-UMD configs, this means
+      // all non-Slate packages.
+      external: id => {
+        return !!deps.find(dep => dep === id || id.startsWith(`${dep}/`))
+      },
+    }
   }
-
-  return configurations
 }
+
+/**
+ * Return a Rollup configuration for a `pkg`.
+ *
+ * @return {Array}
+ */
+
+function factory(pkg) {
+  const isProd = process.env.NODE_ENV === 'production'
+  return [
+    configure(pkg, 'development', 'module'),
+    isProd && configure(pkg, 'development', 'umd'),
+    isProd && configure(pkg, 'production', 'umd'),
+  ].filter(Boolean)
+}
+
+/**
+ * Export.
+ *
+ * @type {Function}
+ */
+
+export default factory

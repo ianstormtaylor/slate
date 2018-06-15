@@ -22,14 +22,13 @@ export const input = (
   </value>
 )
 
-// TODO: this output selection should be at the end of the block
 export const output = (
   <value>
     <document>
       <paragraph>wordone</paragraph>
       <quote>two</quote>
       <quote>
-        <cursor />three
+        three<cursor />
       </quote>
     </document>
   </value>

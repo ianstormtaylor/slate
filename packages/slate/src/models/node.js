@@ -3,14 +3,14 @@ import isPlainObject from 'is-plain-object'
 import logger from 'slate-dev-logger'
 import { List, OrderedSet, Set } from 'immutable'
 
-import Block from './block'
 import Data from './data'
-import Document from './document'
+import Block from './block'
 import Inline from './inline'
+import Document from './document'
+import { isType } from '../constants/model-types'
 import Range from './range'
 import Text from './text'
 import generateKey from '../utils/generate-key'
-import isIndexInRange from '../utils/is-index-in-range'
 import memoize from '../utils/memoize'
 
 /**
@@ -75,7 +75,7 @@ class Node {
 
   static createList(elements = []) {
     if (List.isList(elements) || Array.isArray(elements)) {
-      const list = new List(elements.map(Node.create))
+      const list = List(elements.map(Node.create))
       return list
     }
 
@@ -166,11 +166,8 @@ class Node {
    */
 
   static isNode(any) {
-    return (
-      Block.isBlock(any) ||
-      Document.isDocument(any) ||
-      Inline.isInline(any) ||
-      Text.isText(any)
+    return !!['BLOCK', 'DOCUMENT', 'INLINE', 'TEXT'].find(type =>
+      isType(type, any)
     )
   }
 
@@ -538,22 +535,7 @@ class Node {
    */
 
   getCharacters() {
-    const array = this.getCharactersAsArray()
-    return new List(array)
-  }
-
-  /**
-   * Get all of the characters for every text node as an array
-   *
-   * @return {Array}
-   */
-
-  getCharactersAsArray() {
-    return this.nodes.reduce((arr, node) => {
-      return node.object == 'text'
-        ? arr.concat(node.characters.toArray())
-        : arr.concat(node.getCharactersAsArray())
-    }, [])
+    return this.getTexts().flatMap(t => t.characters)
   }
 
   /**
@@ -564,28 +546,23 @@ class Node {
    */
 
   getCharactersAtRange(range) {
-    const array = this.getCharactersAtRangeAsArray(range)
-    return new List(array)
-  }
-
-  /**
-   * Get a list of the characters in a `range` as an array.
-   *
-   * @param {Range} range
-   * @return {Array}
-   */
-
-  getCharactersAtRangeAsArray(range) {
     range = range.normalize(this)
-    if (range.isUnset) return []
+    if (range.isUnset) return List()
+    const { startKey, endKey, startOffset, endOffset } = range
+    if (startKey === endKey) {
+      const endText = this.getDescendant(endKey)
+      return endText.characters.slice(startOffset, endOffset)
+    }
 
-    return this.getTextsAtRange(range).reduce((arr, text) => {
-      const chars = text.characters
-        .filter((char, i) => isIndexInRange(i, text, range))
-        .toArray()
-
-      return arr.concat(chars)
-    }, [])
+    return this.getTextsAtRange(range).flatMap(t => {
+      if (t.key === startKey) {
+        return t.characters.slice(startOffset)
+      }
+      if (t.key === endKey) {
+        return t.characters.slice(0, endOffset)
+      }
+      return t.characters
+    })
   }
 
   /**
@@ -914,16 +891,16 @@ class Node {
       throw new Error(`Could not find a descendant node with key "${key}".`)
     }
 
-    return (
-      ancestors
-        // Skip this node...
-        .skipLast()
-        // Take parents until there are more than one child...
-        .reverse()
-        .takeUntil(p => p.nodes.size > 1)
-        // And pick the highest.
-        .last()
-    )
+    const result = ancestors
+      // Skip this node...
+      .shift()
+      // Take parents until there are more than one child...
+      .reverse()
+      .takeUntil(p => p.nodes.size > 1)
+      // And pick the highest.
+      .last()
+    if (!result) return null
+    return result
   }
 
   /**
@@ -1093,9 +1070,13 @@ class Node {
    */
 
   getMarksAsArray() {
-    return this.nodes.reduce((marks, node) => {
-      return marks.concat(node.getMarksAsArray())
-    }, [])
+    // PERF: use only one concat rather than multiple concat
+    // becuase one concat is faster
+    const result = []
+    this.nodes.forEach(node => {
+      result.push(node.getMarksAsArray())
+    })
+    return Array.prototype.concat.apply([], result)
   }
 
   /**
@@ -1106,8 +1087,7 @@ class Node {
    */
 
   getMarksAtRange(range) {
-    const array = this.getMarksAtRangeAsArray(range)
-    return new Set(array)
+    return new Set(this.getOrderedMarksAtRange(range))
   }
 
   /**
@@ -1118,8 +1098,16 @@ class Node {
    */
 
   getInsertMarksAtRange(range) {
-    const array = this.getInsertMarksAtRangeAsArray(range)
-    return new Set(array)
+    range = range.normalize(this)
+    if (range.isUnset) return Set()
+    if (range.isCollapsed) {
+      // PERF: range is not cachable, use key and offset as proxies for cache
+      return this.getMarksAtPosition(range.startKey, range.startOffset)
+    }
+
+    const { startKey, startOffset } = range
+    const text = this.getDescendant(startKey)
+    return text.getMarksAtIndex(startOffset + 1)
   }
 
   /**
@@ -1130,8 +1118,54 @@ class Node {
    */
 
   getOrderedMarksAtRange(range) {
-    const array = this.getMarksAtRangeAsArray(range)
-    return new OrderedSet(array)
+    range = range.normalize(this)
+    if (range.isUnset) return OrderedSet()
+    if (range.isCollapsed) {
+      // PERF: range is not cachable, use key and offset as proxies for cache
+      return this.getMarksAtPosition(range.startKey, range.startOffset)
+    }
+
+    const { startKey, startOffset, endKey, endOffset } = range
+    return this.getOrderedMarksBetweenPositions(
+      startKey,
+      startOffset,
+      endKey,
+      endOffset
+    )
+  }
+
+  /**
+   * Get a set of the marks in a `range`.
+   * PERF: arguments use key and offset for utilizing cache
+   *
+   * @param {string} startKey
+   * @param {number} startOffset
+   * @param {string} endKey
+   * @param {number} endOffset
+   * @returns {OrderedSet<Mark>}
+   */
+
+  getOrderedMarksBetweenPositions(startKey, startOffset, endKey, endOffset) {
+    if (startKey === endKey) {
+      const startText = this.getDescendant(startKey)
+      return startText.getMarksBetweenOffsets(startOffset, endOffset)
+    }
+
+    const texts = this.getTextsBetweenPositionsAsArray(startKey, endKey)
+
+    return OrderedSet().withMutations(result => {
+      texts.forEach(text => {
+        if (text.key === startKey) {
+          result.union(
+            text.getMarksBetweenOffsets(startOffset, text.text.length)
+          )
+        } else if (text.key === endKey) {
+          result.union(text.getMarksBetweenOffsets(0, endOffset))
+        } else {
+          result.union(text.getMarks())
+        }
+      })
+    })
   }
 
   /**
@@ -1142,94 +1176,83 @@ class Node {
    */
 
   getActiveMarksAtRange(range) {
-    const array = this.getActiveMarksAtRangeAsArray(range)
-    return new Set(array)
-  }
-
-  /**
-   * Get a set of the marks in a `range`, by unioning.
-   *
-   * @param {Range} range
-   * @return {Array}
-   */
-
-  getMarksAtRangeAsArray(range) {
     range = range.normalize(this)
-    if (range.isUnset) return []
-    if (range.isCollapsed) return this.getMarksAtCollaspsedRangeAsArray(range)
-
-    return this.getCharactersAtRange(range).reduce((memo, char) => {
-      char.marks.toArray().forEach(c => memo.push(c))
-      return memo
-    }, [])
-  }
-
-  /**
-   * Get a set of the marks in a `range` for insertion behavior.
-   *
-   * @param {Range} range
-   * @return {Array}
-   */
-
-  getInsertMarksAtRangeAsArray(range) {
-    range = range.normalize(this)
-    if (range.isUnset) return []
-    if (range.isCollapsed) return this.getMarksAtCollaspsedRangeAsArray(range)
-
-    const text = this.getDescendant(range.startKey)
-    const char = text.characters.get(range.startOffset)
-    return char.marks.toArray()
-  }
-
-  /**
-   * Get a set of marks in a `range`, by treating it as collapsed.
-   *
-   * @param {Range} range
-   * @return {Array}
-   */
-
-  getMarksAtCollaspsedRangeAsArray(range) {
-    if (range.isUnset) return []
-
-    const { startKey, startOffset } = range
-
-    if (startOffset == 0) {
-      const previous = this.getPreviousText(startKey)
-      if (!previous || previous.text.length == 0) return []
-      const char = previous.characters.get(previous.text.length - 1)
-      return char.marks.toArray()
+    if (range.isUnset) return Set()
+    if (range.isCollapsed) {
+      const { startKey, startOffset } = range
+      return this.getMarksAtPosition(startKey, startOffset).toSet()
     }
 
-    const text = this.getDescendant(startKey)
-    const char = text.characters.get(startOffset - 1)
-    return char.marks.toArray()
+    let { startKey, endKey, startOffset, endOffset } = range
+    let startText = this.getDescendant(startKey)
+
+    if (startKey !== endKey) {
+      while (startKey !== endKey && endOffset === 0) {
+        const endText = this.getPreviousText(endKey)
+        endKey = endText.key
+        endOffset = endText.text.length
+      }
+
+      while (startKey !== endKey && startOffset === startText.text.length) {
+        startText = this.getNextText(startKey)
+        startKey = startText.key
+        startOffset = 0
+      }
+    }
+
+    if (startKey === endKey) {
+      return startText.getActiveMarksBetweenOffsets(startOffset, endOffset)
+    }
+
+    const startMarks = startText.getActiveMarksBetweenOffsets(
+      startOffset,
+      startText.text.length
+    )
+    if (startMarks.size === 0) return Set()
+    const endText = this.getDescendant(endKey)
+    const endMarks = endText.getActiveMarksBetweenOffsets(0, endOffset)
+    let marks = startMarks.intersect(endMarks)
+    // If marks is already empty, the active marks is empty
+    if (marks.size === 0) return marks
+
+    let text = this.getNextText(startKey)
+    while (text.key !== endKey) {
+      if (text.text.length !== 0) {
+        marks = marks.intersect(text.getActiveMarks())
+        if (marks.size === 0) return Set()
+      }
+      text = this.getNextText(text.key)
+    }
+    return marks
   }
 
   /**
-   * Get a set of marks in a `range`, by intersecting.
+   * Get a set of marks in a `position`, the equivalent of a collapsed range
    *
-   * @param {Range} range
-   * @return {Array}
+   * @param {string} key
+   * @param {number} offset
+   * @return {Set}
    */
 
-  getActiveMarksAtRangeAsArray(range) {
-    range = range.normalize(this)
-    if (range.isUnset) return []
-    if (range.isCollapsed) return this.getMarksAtCollaspsedRangeAsArray(range)
+  getMarksAtPosition(key, offset) {
+    const text = this.getDescendant(key)
+    const currentMarks = text.getMarksAtIndex(offset)
+    if (offset !== 0) return currentMarks
+    const closestBlock = this.getClosestBlock(key)
 
-    // Otherwise, get a set of the marks for each character in the range.
-    const chars = this.getCharactersAtRange(range)
-    const first = chars.first()
-    if (!first) return []
+    if (closestBlock.text === '') {
+      // insert mark for empty block; the empty block are often created by split node or add marks in a range including empty blocks
+      return currentMarks
+    }
 
-    let memo = first.marks
+    const previous = this.getPreviousText(key)
+    if (!previous) return Set()
 
-    chars.slice(1).forEach(char => {
-      memo = memo.intersect(char.marks)
-      return memo.size != 0
-    })
+    if (closestBlock.hasDescendant(previous.key)) {
+      return previous.getMarksAtIndex(previous.text.length)
+    }
 
-    return memo.toArray()
+    return currentMarks
   }
 
   /**
@@ -1677,8 +1700,33 @@ class Node {
    */
 
   getTextsAtRange(range) {
-    const array = this.getTextsAtRangeAsArray(range)
-    return new List(array)
+    range = range.normalize(this)
+    if (range.isUnset) return List()
+    const { startKey, endKey } = range
+    return new List(this.getTextsBetweenPositionsAsArray(startKey, endKey))
+  }
+
+  /**
+   * Get all of the text nodes in a `range` as an array.
+   * PERF: use key in arguments for cache
+   *
+   * @param {string} startKey
+   * @param {string} endKey
+   * @returns {Array}
+   */
+
+  getTextsBetweenPositionsAsArray(startKey, endKey) {
+    const startText = this.getDescendant(startKey)
+
+    // PERF: the most common case is when the range is in a single text node,
+    // where we can avoid a lot of iterating of the tree.
+    if (startKey == endKey) return [startText]
+
+    const endText = this.getDescendant(endKey)
+    const texts = this.getTextsAsArray()
+    const start = texts.indexOf(startText)
+    const end = texts.indexOf(endText, start)
+    return texts.slice(start, end + 1)
   }
 
   /**
@@ -1691,19 +1739,8 @@ class Node {
   getTextsAtRangeAsArray(range) {
     range = range.normalize(this)
     if (range.isUnset) return []
-
     const { startKey, endKey } = range
-    const startText = this.getDescendant(startKey)
-
-    // PERF: the most common case is when the range is in a single text node,
-    // where we can avoid a lot of iterating of the tree.
-    if (startKey == endKey) return [startText]
-
-    const endText = this.getDescendant(endKey)
-    const texts = this.getTextsAsArray()
-    const start = texts.indexOf(startText)
-    const end = texts.indexOf(endText)
-    return texts.slice(start, end + 1)
+    return this.getTextsBetweenPositionsAsArray(startKey, endKey)
   }
 
   /**
@@ -1715,6 +1752,32 @@ class Node {
 
   hasChild(key) {
     return !!this.getChild(key)
+  }
+
+  /**
+   * Check if a node has block node children.
+   *
+   * @param {String} key
+   * @return {Boolean}
+   */
+
+  hasBlocks(key) {
+    const node = this.assertNode(key)
+    return !!(node.nodes && node.nodes.find(n => n.object === 'block'))
+  }
+
+  /**
+   * Check if a node has inline node children.
+   *
+   * @param {String} key
+   * @return {Boolean}
+   */
+
+  hasInlines(key) {
+    const node = this.assertNode(key)
+    return !!(
+      node.nodes && node.nodes.find(n => Inline.isInline(n) || Text.isText(n))
+    )
   }
 
   /**
@@ -1747,7 +1810,7 @@ class Node {
    */
 
   hasVoidParent(key) {
-    return !!this.getClosest(key, parent => parent.isVoid)
+    return !!this.getClosestVoid(key)
   }
 
   /**
@@ -1759,15 +1822,15 @@ class Node {
    */
 
   insertNode(index, node) {
-    const keys = this.getKeys()
+    const keys = this.getKeysAsArray()
 
-    if (keys.contains(node.key)) {
+    if (keys.includes(node.key)) {
       node = node.regenerateKey()
     }
 
     if (node.object != 'text') {
       node = node.mapDescendants(desc => {
-        return keys.contains(desc.key) ? desc.regenerateKey() : desc
+        return keys.includes(desc.key) ? desc.regenerateKey() : desc
       })
     }
 
@@ -1863,10 +1926,9 @@ class Node {
       )
     }
 
-    // If the nodes are text nodes, concatenate their characters together.
+    // If the nodes are text nodes, concatenate their leaves together
     if (one.object == 'text') {
-      const characters = one.characters.concat(two.characters)
-      one = one.set('characters', characters)
+      one = one.mergeText(two)
     } else {
       // Otherwise, concatenate their child nodes together.
       const nodes = one.nodes.concat(two.nodes)
@@ -1909,13 +1971,12 @@ class Node {
   mapDescendants(iterator) {
     let { nodes } = this
 
-    nodes.forEach((node, i) => {
+    nodes.forEach((node, index) => {
       let ret = node
       if (ret.object != 'text') ret = ret.mapDescendants(iterator)
-      ret = iterator(ret, i, this.nodes)
+      ret = iterator(ret, index, this.nodes)
       if (ret == node) return
 
-      const index = nodes.indexOf(node)
       nodes = nodes.set(index, ret)
     })
 
@@ -1949,7 +2010,7 @@ class Node {
       throw new Error(`Could not find a descendant node with key "${key}".`)
 
     const index = parent.nodes.findIndex(n => n.key === key)
-    const nodes = parent.nodes.splice(index, 1)
+    const nodes = parent.nodes.delete(index)
 
     parent = parent.set('nodes', nodes)
     node = node.updateNode(parent)
@@ -1964,7 +2025,7 @@ class Node {
    */
 
   removeNode(index) {
-    const nodes = this.nodes.splice(index, 1)
+    const nodes = this.nodes.delete(index)
     return this.set('nodes', nodes)
   }
 
@@ -1985,10 +2046,7 @@ class Node {
     // If the child is a text node, the `position` refers to the text offset at
     // which to split it.
     if (child.object == 'text') {
-      const befores = child.characters.take(position)
-      const afters = child.characters.skip(position)
-      one = child.set('characters', befores)
-      two = child.set('characters', afters).regenerateKey()
+      ;[one, two] = child.splitText(position)
     } else {
       // Otherwise, if the child is not a text node, the `position` refers to the
       // index at which to split its children.
@@ -2042,6 +2100,22 @@ class Node {
   validate(schema) {
     return schema.validateNode(this)
   }
+
+  /**
+   * Get the first invalid descendant
+   *
+   * @param {Schema} schema
+   * @return {Node|Text|Null}
+   */
+
+  getFirstInvalidDescendant(schema) {
+    let result = null
+    this.nodes.find(n => {
+      result = n.validate(schema) ? n : n.getFirstInvalidDescendant(schema)
+      return result
+    })
+    return result
+  }
 }
 
 /**
@@ -2062,99 +2136,75 @@ function assertKey(arg) {
  * Memoize read methods.
  */
 
-memoize(
-  Node.prototype,
-  [
-    'getBlocks',
-    'getBlocksAsArray',
-    'getCharacters',
-    'getCharactersAsArray',
-    'getFirstText',
-    'getInlines',
-    'getInlinesAsArray',
-    'getKeys',
-    'getKeysAsArray',
-    'getLastText',
-    'getMarks',
-    'getOrderedMarks',
-    'getMarksAsArray',
-    'getText',
-    'getTextDirection',
-    'getTexts',
-    'getTextsAsArray',
-    'isLeafBlock',
-    'isLeafInline',
-  ],
-  {
-    takesArguments: false,
-  }
-)
+memoize(Node.prototype, [
+  'areDescendantsSorted',
+  'getAncestors',
+  'getBlocksAsArray',
+  'getBlocksAtRangeAsArray',
+  'getBlocksByTypeAsArray',
+  'getChild',
+  'getClosestBlock',
+  'getClosestInline',
+  'getClosestVoid',
+  'getCommonAncestor',
+  'getDecorations',
+  'getDepth',
+  'getDescendant',
+  'getDescendantAtPath',
+  'getFirstText',
+  'getFragmentAtRange',
+  'getFurthestBlock',
+  'getFurthestInline',
+  'getFurthestAncestor',
+  'getFurthestOnlyChildAncestor',
+  'getInlinesAsArray',
+  'getInlinesAtRangeAsArray',
+  'getInlinesByTypeAsArray',
+  'getMarksAsArray',
+  'getMarksAtPosition',
+  'getOrderedMarksBetweenPositions',
+  'getInsertMarksAtRange',
+  'getKeysAsArray',
+  'getLastText',
+  'getMarksByTypeAsArray',
+  'getNextBlock',
+  'getNextSibling',
+  'getNextText',
+  'getNode',
+  'getNodeAtPath',
+  'getOffset',
+  'getOffsetAtRange',
+  'getParent',
+  'getPath',
+  'getPlaceholder',
+  'getPreviousBlock',
+  'getPreviousSibling',
+  'getPreviousText',
+  'getText',
+  'getTextAtOffset',
+  'getTextDirection',
+  'getTextsAsArray',
+  'getTextsBetweenPositionsAsArray',
+  'isLeafBlock',
+  'isLeafInline',
+  'validate',
+  'getFirstInvalidDescendant',
+])
 
-memoize(
-  Node.prototype,
-  [
-    'areDescendantsSorted',
-    'getActiveMarksAtRange',
-    'getActiveMarksAtRangeAsArray',
-    'getAncestors',
-    'getBlocksAtRange',
-    'getBlocksAtRangeAsArray',
-    'getBlocksByType',
-    'getBlocksByTypeAsArray',
-    'getCharactersAtRange',
-    'getCharactersAtRangeAsArray',
-    'getChild',
-    'getClosestBlock',
-    'getClosestInline',
-    'getClosestVoid',
-    'getCommonAncestor',
-    'getDecorations',
-    'getDepth',
-    'getDescendant',
-    'getDescendantAtPath',
-    'getFragmentAtRange',
-    'getFurthestBlock',
-    'getFurthestInline',
-    'getFurthestAncestor',
-    'getFurthestOnlyChildAncestor',
-    'getInlinesAtRange',
-    'getInlinesAtRangeAsArray',
-    'getInlinesByType',
-    'getInlinesByTypeAsArray',
-    'getMarksAtRange',
-    'getInsertMarksAtRange',
-    'getOrderedMarksAtRange',
-    'getMarksAtRangeAsArray',
-    'getInsertMarksAtRangeAsArray',
-    'getMarksByType',
-    'getOrderedMarksByType',
-    'getMarksByTypeAsArray',
-    'getNextBlock',
-    'getNextSibling',
-    'getNextText',
-    'getNode',
-    'getNodeAtPath',
-    'getOffset',
-    'getOffsetAtRange',
-    'getParent',
-    'getPath',
-    'getPlaceholder',
-    'getPreviousBlock',
-    'getPreviousSibling',
-    'getPreviousText',
-    'getTextAtOffset',
-    'getTextsAtRange',
-    'getTextsAtRangeAsArray',
-    'hasChild',
-    'hasDescendant',
-    'hasNode',
-    'hasVoidParent',
-    'validate',
-  ],
-  {
-    takesArguments: true,
-  }
-)
+/**
+ * Mix in `Node` methods.
+ */
+
+Object.getOwnPropertyNames(Node.prototype).forEach(method => {
+  if (method == 'constructor') return
+  Block.prototype[method] = Node.prototype[method]
+  Inline.prototype[method] = Node.prototype[method]
+  Document.prototype[method] = Node.prototype[method]
+})
+
+Block.createChildren = Node.createList
+Inline.createChildren = Node.createList
+Document.createChildren = Node.createList
 
 /**
  * Export.

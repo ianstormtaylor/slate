@@ -1,5 +1,5 @@
 import Base64 from 'slate-base64-serializer'
-
+import { IS_IE } from 'slate-dev-environment'
 import TRANSFER_TYPES from '../constants/transfer-types'
 
 /**
@@ -26,7 +26,10 @@ const FRAGMENT_MATCHER = / data-slate-fragment="([^\s"]+)"/
  */
 
 function getEventTransfer(event) {
-  if (event.nativeEvent) {
+  // COMPAT: IE 11 doesn't populate nativeEvent with either
+  // dataTransfer or clipboardData. We'll need to use the base event
+  // object (2018/14/6)
+  if (!IS_IE && event.nativeEvent) {
     event = event.nativeEvent
   }
 

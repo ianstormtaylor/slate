@@ -2,7 +2,7 @@
 
 import fs from 'fs'
 import { basename, extname, resolve } from 'path'
-import { __clear } from '../lib/utils/memoize'
+import { resetMemoization } from '..'
 
 /**
  * Benchmarks.
@@ -20,7 +20,7 @@ categories.forEach(category => {
 
     if (category == 'models') {
       after(() => {
-        __clear()
+        resetMemoization()
       })
     }
 

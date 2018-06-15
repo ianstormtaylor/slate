@@ -3,7 +3,7 @@
 import h from '../../../helpers/h'
 
 export default function(change) {
-  change.setBlock({
+  change.setBlocks({
     type: 'image',
     isVoid: true,
   })
@@ -23,7 +23,7 @@ export const output = (
   <value>
     <document>
       <image>
-        <cursor />{' '}
+        <cursor />word
       </image>
     </document>
   </value>

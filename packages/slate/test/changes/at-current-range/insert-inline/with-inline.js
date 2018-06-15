@@ -27,7 +27,6 @@ export const output = (
     <document>
       <paragraph>
         wo<emoji>
-          {' '}
           <cursor />
         </emoji>rd
       </paragraph>
