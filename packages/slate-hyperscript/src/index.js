@@ -19,9 +19,12 @@ const FOCUS = {}
  */
 
 class DecoratorPoint {
-  constructor(key, marks) {
+  constructor({ key, data }, marks) {
     this._key = key
     this.marks = marks
+    this.attribs = data || {}
+    this.isAtomic = !!this.attribs.atomic
+    delete this.attribs.atomic
     return this
   }
   withPosition = offset => {
@@ -45,6 +48,8 @@ class DecoratorPoint {
       anchorOffset: this.offset,
       focusOffset: focus.offset,
       marks: this.marks,
+      isAtomic: this.isAtomic,
+      ...this.attribs,
     })
   }
 }
@@ -97,7 +102,7 @@ const CREATORS = {
 
   decoration(tagName, attributes, children) {
     if (attributes.key) {
-      return new DecoratorPoint(attributes.key, [{ type: tagName }])
+      return new DecoratorPoint(attributes, [{ type: tagName }])
     }
 
     const nodes = createChildren(children, { key: attributes.key })
@@ -106,6 +111,7 @@ const CREATORS = {
         anchorOffset: 0,
         focusOffset: nodes.reduce((len, n) => len + n.text.length, 0),
         marks: [{ type: tagName }],
+        isAtomic: !!attributes.data.atomic,
       },
     ])
     return nodes
