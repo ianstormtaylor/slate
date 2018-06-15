@@ -63,7 +63,7 @@ class Mark extends Record(DEFAULTS) {
     }
 
     if (elements == null) {
-      return new Set()
+      return Set()
     }
 
     throw new Error(

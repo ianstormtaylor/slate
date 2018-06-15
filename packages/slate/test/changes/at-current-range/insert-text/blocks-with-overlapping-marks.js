@@ -3,21 +3,21 @@
 import h from '../../../helpers/h'
 
 export default function(change) {
-  change.addMark('bold')
+  change.insertText('is ')
 }
 
 export const input = (
   <value>
     <document>
       <paragraph>
-        <link>
-          wo<anchor />rd
-        </link>
+        <b>
+          <i>Cat</i>
+        </b>
       </paragraph>
       <paragraph>
-        <link>
-          an<focus />other
-        </link>
+        <b>
+          <cursor />Cute
+        </b>
       </paragraph>
     </document>
   </value>
@@ -27,18 +27,14 @@ export const output = (
   <value>
     <document>
       <paragraph>
-        <link>
-          wo<anchor />
-          <b>rd</b>
-        </link>
-        <b />
+        <b>
+          <i>Cat</i>
+        </b>
       </paragraph>
       <paragraph>
-        <b />
-        <link>
-          <b>an</b>
-          <focus />other
-        </link>
+        <b>
+          is <cursor />Cute
+        </b>
       </paragraph>
     </document>
   </value>

@@ -273,7 +273,7 @@ function createChildren(children, options = {}) {
   const firstNodeOrText = children.find(c => typeof c !== 'string')
   const firstText = Text.isText(firstNodeOrText) ? firstNodeOrText : null
   const key = options.key ? options.key : firstText ? firstText.key : undefined
-  let node = Text.create({ key })
+  let node = Text.create({ key, leaves: [{ text: '', marks: options.marks }] })
 
   // Create a helper to update the current node while preserving any stored
   // anchor or focus information.
@@ -290,10 +290,18 @@ function createChildren(children, options = {}) {
     // If the child is a non-text node, push the current node and the new child
     // onto the array, then creating a new node for future selection tracking.
     if (Node.isNode(child) && !Text.isText(child)) {
-      if (node.text.length || node.__anchor != null || node.__focus != null)
+      if (
+        node.text.length ||
+        node.__anchor != null ||
+        node.__focus != null ||
+        node.getMarksAtIndex(0).size
+      ) {
         array.push(node)
+      }
       array.push(child)
-      node = isLast ? null : Text.create()
+      node = isLast
+        ? null
+        : Text.create({ leaves: [{ text: '', marks: options.marks }] })
       length = 0
     }
 
