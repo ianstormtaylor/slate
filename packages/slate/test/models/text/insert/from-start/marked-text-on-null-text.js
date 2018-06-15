@@ -1,7 +1,7 @@
 /** @jsx h */
 
 import { List } from 'immutable'
-import { Mark } from '../../../../..'
+import { Mark } from '../../../../../src'
 import h from '../../../../helpers/h'
 
 export const input = <i />[0]
