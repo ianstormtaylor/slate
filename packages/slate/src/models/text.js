@@ -312,7 +312,7 @@ class Text extends Record(DEFAULTS) {
         if (index >= this.text.length) return
 
         if (index !== 0 || length < this.text.length) {
-          const [before, bundle] = Leaf.splitLeaves(this.leaves, index)
+          const [before, bundle] = Leaf.splitLeaves(leaves, index)
           const [middle, after] = Leaf.splitLeaves(bundle, length)
           leaves = before.concat(middle.map(x => x.addMarks(marks)), after)
           return
