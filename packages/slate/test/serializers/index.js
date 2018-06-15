@@ -2,6 +2,7 @@ import assert from 'assert'
 import fs from 'fs'
 import { Value } from '../..'
 import { basename, extname, resolve } from 'path'
+import printValueErrorMessage from '../../../../support/test/printValueErrorMessage'
 
 /**
  * Tests.
@@ -22,7 +23,11 @@ describe('serializers', () => {
           const { input, output, options } = module
           const actual = Value.fromJSON(input, options).toJSON()
           const expected = output.toJSON()
-          assert.deepEqual(actual, expected)
+          assert.deepEqual(
+            actual,
+            expected,
+            printValueErrorMessage('deepEqual', actual, expected)
+          )
         })
       }
     })
@@ -40,7 +45,11 @@ describe('serializers', () => {
           const { input, output, options } = module
           const actual = input.toJSON(options)
           const expected = output
-          assert.deepEqual(actual, expected)
+          assert.deepEqual(
+            actual,
+            expected,
+            printValueErrorMessage('deepEqual', actual, expected)
+          )
         })
       }
     })

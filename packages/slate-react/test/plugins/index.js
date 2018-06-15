@@ -5,6 +5,7 @@ import assert from 'assert'
 import fs from 'fs'
 import toCamel from 'to-camel-case' // eslint-disable-line import/no-extraneous-dependencies
 import { basename, extname, resolve } from 'path'
+import printValueErrorMessage from '../../../../support/test/printValueErrorMessage'
 
 /**
  * Tests.
@@ -36,7 +37,11 @@ describe('plugins', () => {
 
             const actual = simulator.value.toJSON({ preserveSelection: true })
             const expected = output.toJSON({ preserveSelection: true })
-            assert.deepEqual(actual, expected)
+            assert.deepEqual(
+              actual,
+              expected,
+              printValueErrorMessage('deepEqual', actual, expected)
+            )
           })
         }
       })

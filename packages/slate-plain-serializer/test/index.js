@@ -7,6 +7,7 @@ import assert from 'assert'
 import fs from 'fs'
 import { Value, resetKeyGenerator } from 'slate'
 import { basename, extname, resolve } from 'path'
+import printValueErrorMessage from '../../../support/test/printValueErrorMessage'
 
 /**
  * Reset Slate's internal key generator state before each text.
@@ -35,7 +36,11 @@ describe('slate-plain-serializer', () => {
         const value = Plain.deserialize(input, options)
         const actual = Value.isValue(value) ? value.toJSON() : value
         const expected = Value.isValue(output) ? output.toJSON() : output
-        assert.deepEqual(actual, expected)
+        assert.deepEqual(
+          actual,
+          expected,
+          printValueErrorMessage('deepEqual', actual, expected)
+        )
       })
     }
   })
@@ -54,7 +59,11 @@ describe('slate-plain-serializer', () => {
         const string = Plain.serialize(input, options)
         const actual = string
         const expected = output
-        assert.deepEqual(actual, expected)
+        assert.deepEqual(
+          actual,
+          expected,
+          printValueErrorMessage('deepEqual', actual, expected)
+        )
       })
     }
   })
