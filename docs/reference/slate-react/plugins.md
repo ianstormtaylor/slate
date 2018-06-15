@@ -31,7 +31,7 @@ export default function MySlatePlugin(options) {
   onKeyDown: Function,
   onKeyUp: Function,
   onPaste: Function,
-  onSelect: Function
+  onSelect: Function,
   shouldNodeComponentUpdate: Function
 }
 ```
@@ -112,9 +112,9 @@ _Note: This is **not** Slate's internal selection representation (although it mi
 
 ```js
 {
-  onChange: Function
-  renderEditor: Function
-  schema: Function
+  onChange: Function,
+  renderEditor: Function,
+  schema: Function,
   shouldNodeComponentUpdate: Function
 }
 ```
@@ -141,7 +141,7 @@ The `schema` property allows you to define a set of rules that will be added to 
 
 `Function shouldNodeComponentUpdate(props: Object, nextProps: Object) => boolean || null`
 
-To everride slate's default `shouldComponentUpdate` behavior, add this property in and define any custom logic. For example:
+To override slate's default `shouldComponentUpdate` behavior, add this property in and define any custom logic. For example:
 
 ```js
 {
