@@ -19,9 +19,12 @@ const FOCUS = {}
  */
 
 class DecoratorPoint {
-  constructor(key, marks) {
+  constructor({ key, data }, marks) {
     this._key = key
     this.marks = marks
+    this.attribs = data || {}
+    this.isAtomic = !!this.attribs.atomic
+    delete this.attribs.atomic
     return this
   }
   withPosition = offset => {
@@ -45,6 +48,8 @@ class DecoratorPoint {
       anchorOffset: this.offset,
       focusOffset: focus.offset,
       marks: this.marks,
+      isAtomic: this.isAtomic,
+      ...this.attribs,
     })
   }
 }
@@ -97,7 +102,7 @@ const CREATORS = {
 
   decoration(tagName, attributes, children) {
     if (attributes.key) {
-      return new DecoratorPoint(attributes.key, [{ type: tagName }])
+      return new DecoratorPoint(attributes, [{ type: tagName }])
     }
 
     const nodes = createChildren(children, { key: attributes.key })
@@ -106,6 +111,7 @@ const CREATORS = {
         anchorOffset: 0,
         focusOffset: nodes.reduce((len, n) => len + n.text.length, 0),
         marks: [{ type: tagName }],
+        isAtomic: !!attributes.data.atomic,
       },
     ])
     return nodes
@@ -267,7 +273,7 @@ function createChildren(children, options = {}) {
   const firstNodeOrText = children.find(c => typeof c !== 'string')
   const firstText = Text.isText(firstNodeOrText) ? firstNodeOrText : null
   const key = options.key ? options.key : firstText ? firstText.key : undefined
-  let node = Text.create({ key })
+  let node = Text.create({ key, leaves: [{ text: '', marks: options.marks }] })
 
   // Create a helper to update the current node while preserving any stored
   // anchor or focus information.
@@ -284,10 +290,18 @@ function createChildren(children, options = {}) {
     // If the child is a non-text node, push the current node and the new child
     // onto the array, then creating a new node for future selection tracking.
     if (Node.isNode(child) && !Text.isText(child)) {
-      if (node.text.length || node.__anchor != null || node.__focus != null)
+      if (
+        node.text.length ||
+        node.__anchor != null ||
+        node.__focus != null ||
+        node.getMarksAtIndex(0).size
+      ) {
         array.push(node)
+      }
       array.push(child)
-      node = isLast ? null : Text.create()
+      node = isLast
+        ? null
+        : Text.create({ leaves: [{ text: '', marks: options.marks }] })
       length = 0
     }
 

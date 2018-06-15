@@ -31,8 +31,10 @@ export const output = (
           wo<anchor />
           <b>rd</b>
         </link>
+        <mark type="bold" />
       </paragraph>
       <paragraph>
+        <mark type="bold" />
         <link>
           <b>an</b>
           <focus />other

@@ -56,6 +56,7 @@ class SearchHighlighting extends React.Component {
             focusKey: key,
             focusOffset: offset,
             marks: [{ type: 'highlight' }],
+            atomic: true,
           })
         }
 
