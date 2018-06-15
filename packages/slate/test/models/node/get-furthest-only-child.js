@@ -1,7 +1,7 @@
 /** @jsx h */
 
 import h from '../../helpers/h'
-import assert from 'assert'
+import { t as assert } from 'jest-t-assert' // eslint-disable-line import/no-extraneous-dependencies
 
 export default function() {
   const { document } = (

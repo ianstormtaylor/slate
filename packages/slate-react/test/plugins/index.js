@@ -1,7 +1,7 @@
 import AfterPlugin from '../../src/plugins/after'
 import BeforePlugin from '../../src/plugins/before'
 import Simulator from 'slate-simulator'
-import assert from 'assert'
+import { t as assert } from 'jest-t-assert' // eslint-disable-line import/no-extraneous-dependencies
 import fs from 'fs'
 import toCamel from 'to-camel-case' // eslint-disable-line import/no-extraneous-dependencies
 import { basename, extname, resolve } from 'path'

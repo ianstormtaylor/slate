@@ -2,7 +2,7 @@
  * Dependencies.
  */
 
-import assert from 'assert'
+import { t as assert } from 'jest-t-assert' // eslint-disable-line import/no-extraneous-dependencies
 import fs from 'fs'
 import { Value } from 'slate'
 import { basename, extname, resolve } from 'path'

@@ -1,4 +1,4 @@
-import assert from 'assert'
+import { t as assert } from 'jest-t-assert' // eslint-disable-line import/no-extraneous-dependencies
 import fs from 'fs-promise' // eslint-disable-line import/no-extraneous-dependencies
 import toCamel from 'to-camel-case' // eslint-disable-line import/no-extraneous-dependencies
 import { basename, extname, resolve } from 'path'

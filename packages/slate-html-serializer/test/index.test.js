@@ -3,7 +3,7 @@
  */
 
 import Html from '../src/'
-import assert from 'assert'
+import { t as assert } from 'jest-t-assert' // eslint-disable-line import/no-extraneous-dependencies
 import fs from 'fs'
 import { JSDOM } from 'jsdom' // eslint-disable-line import/no-extraneous-dependencies
 import { Value, resetKeyGenerator } from 'slate'

@@ -1,7 +1,7 @@
 /** @jsx h */
 
 import { List } from 'immutable'
-import assert from 'assert'
+import { t as assert } from 'jest-t-assert' // eslint-disable-line import/no-extraneous-dependencies
 
 import h from '../helpers/h'
 
