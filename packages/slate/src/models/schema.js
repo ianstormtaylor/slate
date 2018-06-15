@@ -558,8 +558,8 @@ function resolveNodeRule(object, type, obj) {
 }
 
 /**
- * A Lodash customizer for merging schema definitions. Special cases `objects`
- * and `types` arrays to be unioned, and ignores new `null` values.
+ * A Lodash customizer for merging schema definitions. Special cases `objects`,
+ * `marks` and `types` arrays to be unioned, and ignores new `null` values.
  *
  * @param {Mixed} target
  * @param {Mixed} source
@@ -567,7 +567,7 @@ function resolveNodeRule(object, type, obj) {
  */
 
 function customizer(target, source, key) {
-  if (key == 'objects' || key == 'types') {
+  if (key == 'objects' || key == 'types' || key == 'marks') {
     return target == null ? source : target.concat(source)
   } else {
     return source == null ? target : source
