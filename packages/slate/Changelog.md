@@ -4,6 +4,22 @@ This document maintains a list of changes to the `slate` package with each new v
 
 ---
 
+### `0.34.0` — June 14, 2018
+
+###### BREAKING
+
+* **Text nodes now represent their content as "leaves".** Previously their immutable representation used individual `Character` instance for each character. Now they have changed to group characters into `Leaf` models, which more closely resembles how they are used, and results in a _lot_ fewer immutable object instances floating around.
+
+###### DEPRECATED
+
+* **The `Character` model is deprecated.** Although the character concept is still in the repository for now, it is deprecated and will be removed in a future release. Everything it solves can be solved with leaves instead.
+
+###### NEW
+
+* **Decorations can now be "atomic".** If you set a decoration as atomic, it will be removed when changed, preventing it from entering a "partial" state, which can be useful for some use cases.
+
+---
+
 ### `0.33.0` — February 21, 2018
 
 ###### BREAKING
