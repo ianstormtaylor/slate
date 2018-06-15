@@ -8,7 +8,7 @@ This document maintains a list of changes to the `slate` package with each new v
 
 ###### BREAKING
 
-* **Text nodes now represent their content as "leaves".** Previously their immutable representation used individual `Character` instance for each character. Now they have changed to group characters into `Leaf` models, which more closely resembles how they are used, and results in a _lot_ fewer immutable object instances floating around.
+* **Text nodes now represent their content as "leaves".** Previously their immutable representation used individual `Character` instance for each character. Now they have changed to group characters into `Leaf` models, which more closely resembles how they are used, and results in a _lot_ fewer immutable object instances floating around. _For most people this shouldn't cause any issues, since this is a low-level aspect of Slate._
 
 ###### DEPRECATED
 
