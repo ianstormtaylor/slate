@@ -70,7 +70,7 @@ describe('slate-hyperscript', () => {
 
         // ensure expected properties of selection match
         Object.keys(expectSelection).forEach(prop => {
-          assert.equal(input.selection[prop], expectSelection[prop])
+          assert.is(input.selection[prop], expectSelection[prop])
         })
       })
     }

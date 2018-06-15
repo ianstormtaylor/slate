@@ -15,7 +15,7 @@ export default function() {
   const paragraph = document.nodes.first()
   const text = paragraph.getFirstText()
 
-  assert.equal(document.getFurthestOnlyChildAncestor(paragraph.key), null)
-  assert.equal(paragraph.getFurthestOnlyChildAncestor(text.key), null)
-  assert.equal(document.getFurthestOnlyChildAncestor(text.key), paragraph)
+  assert.is(document.getFurthestOnlyChildAncestor(paragraph.key), null)
+  assert.is(paragraph.getFurthestOnlyChildAncestor(text.key), null)
+  assert.is(document.getFurthestOnlyChildAncestor(text.key), paragraph)
 }

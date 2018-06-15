@@ -15,8 +15,8 @@ export const input = (
 
 export function test() {
   const block = input.nodes.first()
-  assert.notEqual(block.nodes.first().key, 'a')
-  assert.equal(block.nodes.last().key, 'a')
+  assert.not(block.nodes.first().key, 'a')
+  assert.is(block.nodes.last().key, 'a')
 }
 
 export const output = {

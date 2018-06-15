@@ -35,7 +35,7 @@ describe('rendering', () => {
         .replace(/\n/gm, '')
         .replace(/>\s*</g, '><')
 
-      assert.equal(clean(string), expected)
+      assert.is(clean(string), expected)
     })
   }
 })
