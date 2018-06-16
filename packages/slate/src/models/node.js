@@ -1226,7 +1226,7 @@ class Node {
   }
 
   /**
-   * Get the block node before a descendant text node by `key`.
+   * Get the block node after a descendant node by `key`.
    *
    * @param {String} key
    * @return {Node|Null}
@@ -1247,6 +1247,30 @@ class Node {
     if (!next) return null
 
     return this.getClosestBlock(next.key)
+  }
+
+  /**
+   * Get the inline node after a descendant node by `key`.
+   *
+   * @param {String} key
+   * @return {Node|Null}
+   */
+
+  getNextInline(key) {
+    const child = this.assertDescendant(key)
+    let last
+
+    if (child.object == 'inline') {
+      last = child.getLastText()
+    } else {
+      const inline = this.getClosestInline(key)
+      last = inline.getLastText()
+    }
+
+    const next = this.getNextText(this.getNextText(last.key).key)
+    if (!next) return null
+
+    return this.getClosestInline(next.key)
   }
 
   /**
@@ -1439,7 +1463,7 @@ class Node {
   }
 
   /**
-   * Get the block node before a descendant text node by `key`.
+   * Get the block node before a descendant node by `key`.
    *
    * @param {String} key
    * @return {Node|Null}
@@ -1460,6 +1484,30 @@ class Node {
     if (!previous) return null
 
     return this.getClosestBlock(previous.key)
+  }
+
+  /**
+   * Get the inline node before a descendant node by `key`.
+   *
+   * @param {String} key
+   * @return {Node|Null}
+   */
+
+  getPreviousInline(key) {
+    const child = this.assertDescendant(key)
+    let first
+
+    if (child.object == 'inline') {
+      first = child.getFirstText()
+    } else {
+      const inline = this.getClosestInline(key)
+      first = inline.getFirstText()
+    }
+
+    const previous = this.getPreviousText(this.getPreviousText(first.key).key)
+    if (!previous) return null
+
+    return this.getClosestInline(previous.key)
   }
 
   /**
