@@ -192,6 +192,14 @@ Split the [`Inline`](./inline.md) node in the current selection by `depth` level
 
 Remove a [`mark`](./mark.md) from the characters in the current selection. For convenience, you can pass a `type` string or `properties` object to implicitly create a [`Mark`](./mark.md) of that type.
 
+### `replaceMark`
+
+`removeMark(oldMark: Mark, newMark: Mark) => Change` <br/>
+`removeMark(oldProperties: Object, newProperties: Object) => Change` <br/>
+`removeMark(oldType: String, newType: String) => Change`
+
+Replace a [`mark`](./mark.md) in the characters in the current selection. For convenience, you can pass a `type` string or `properties` object to implicitly create a [`Mark`](./mark.md) of that type.
+
 ### `toggleMark`
 
 `toggleMark(mark: Mark) => Change` <br/>
