@@ -11,6 +11,7 @@ describe('serializers', () => {
   describe('raw', () => {
     describe('deserialize()', () => {
       const dir = resolve(__dirname, './raw/deserialize')
+
       const tests = fs
         .readdirSync(dir)
         .filter(t => t[0] != '.')
@@ -29,6 +30,7 @@ describe('serializers', () => {
 
     describe('serialize()', () => {
       const dir = resolve(__dirname, './raw/serialize')
+
       const tests = fs
         .readdirSync(dir)
         .filter(t => t[0] != '.')

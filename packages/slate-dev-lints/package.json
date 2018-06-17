@@ -1,0 +1,48 @@
+{
+  "name": "slate-dev-lints",
+  "private": true,
+  "description": "lint rules for developing with slateJS",
+  "version": "0.0.1",
+  "license": "MIT",
+  "repository": "git://github.com/ianstormtaylor/slate.git",
+  "main": "index.js",
+  "dependency": {
+    "eslint-plugin-rulesdir": "^0.1.0"
+  },
+  "peerDependencies": {
+    "babel-eslint": "^8.2.1",
+    "eslint": "^4.16.0",
+    "eslint-config-prettier": "^2.9.0",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-prettier": "^2.5.0",
+    "eslint-plugin-react": "^7.6.0"
+  },
+  "scripts": {
+    "clean": "rm -rf ./dist ./lib ./node_modules"
+  },
+  "umdGlobals": {
+    "immutable": "Immutable"
+  },
+  "keywords": [
+    "canvas",
+    "contenteditable",
+    "doc",
+    "docs",
+    "document",
+    "edit",
+    "editor",
+    "html",
+    "immutable",
+    "markdown",
+    "medium",
+    "paper",
+    "react",
+    "rich",
+    "rich-text",
+    "richtext",
+    "slate",
+    "text",
+    "wysiwyg",
+    "wysiwym"
+  ]
+}
