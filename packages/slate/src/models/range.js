@@ -4,6 +4,7 @@ import { List, Record, Set } from 'immutable'
 
 import MODEL_TYPES from '../constants/model-types'
 import Mark from './mark'
+import Point from './point'
 
 /**
  * Default properties.
@@ -278,6 +279,50 @@ class Range extends Record(DEFAULTS) {
 
   get endOffset() {
     return this.isBackward ? this.anchorOffset : this.focusOffset
+  }
+
+  /**
+   * Get the start point
+   *
+   * @return {String}
+   */
+
+  get anchorPoint() {
+    const key = this.anchorKey
+    const offset = this.anchorOffset
+    return Point.fromJSON({ key, offset })
+  }
+
+  /**
+   * Get the start point
+   *
+   * @return {String}
+   */
+
+  get focusPoint() {
+    const key = this.focusKey
+    const offset = this.focusOffset
+    return Point.fromJSON({ key, offset })
+  }
+
+  /**
+   * Get the start point
+   *
+   * @return {String}
+   */
+
+  get startPoint() {
+    return this.isBackward ? this.anchorPoint : this.focusPoint
+  }
+
+  /**
+   * Get the start point
+   *
+   * @return {String}
+   */
+
+  get endPoint() {
+    return this.isBackward ? this.focusPoint : this.anchorPoint
   }
 
   /**
