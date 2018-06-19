@@ -4,19 +4,27 @@ A few resources that are helpful for building with Slate.
 
 ## Libraries
 
+These libraries are helpful when developing with Slate:
+
 * [`is-hotkey`](https://github.com/ianstormtaylor/is-hotkey) is a simple way to check whether an `onKeyDown` handler should fire for a given hotkey, handling cross-platform concerns like <kbd>cmd</kbd> vs. <kbd>ctrl</kbd> keys for you automatically.
 * [`react-broadcast`](https://github.com/ReactTraining/react-broadcast) works well when you need to have your custom node components re-render based on state that lives outside the `document`. It's the same pattern that `react-router` uses to update `<Link>` components.
 
 ## Tooling
 
+These tools are helpful when developing with Slate:
+
 * [Immutable.js Console Extension](https://github.com/mattzeunert/immutable-object-formatter-extension) — this greatly improves the `console.log` output when working with [Immutable.js](https://facebook.github.io/immutable-js/) objects, which Slate's data model is based on.
 
 ## Products
+
+These products are built on top of Slate, and can give you an idea of what's possible:
 
 * [GitBook](https://www.gitbook.com/)
 * [Outline](https://www.getoutline.com/)
 
 ## Editors
+
+These pre-packaged editors are built with Slate, and can be helpful to see how you might structure your code:
 
 * [Canner Editor](https://github.com/Canner/canner-slate-editor) — a richt text editor.
 * [French Press Editor](https://github.com/roast-cms/french-press-editor) — a customizeable editor component with offline support.
