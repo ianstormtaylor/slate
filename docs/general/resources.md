@@ -20,6 +20,7 @@ These tools are helpful when developing with Slate:
 These products are built on top of Slate, and can give you an idea of what's possible:
 
 * [GitBook](https://www.gitbook.com/)
+* [Guru](https://www.getguru.com/)
 * [Outline](https://www.getoutline.com/)
 * [Yuque](https://www.yuque.com/)
 
