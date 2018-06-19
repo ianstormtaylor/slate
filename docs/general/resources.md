@@ -17,7 +17,7 @@ These tools are helpful when developing with Slate:
 
 ## Products
 
-These products are built on top of Slate, and can give you an idea of what's possible:
+These products are built with Slate, and can give you an idea of what's possible:
 
 * [GitBook](https://www.gitbook.com/)
 * [Guru](https://www.getguru.com/)
@@ -26,7 +26,7 @@ These products are built on top of Slate, and can give you an idea of what's pos
 
 ## Editors
 
-These pre-packaged editors are built with Slate, and can be helpful to see how you might structure your code:
+These pre-packaged editors are built on top of Slate, and can be helpful to see how you might structure your code:
 
 * [Canner Editor](https://github.com/Canner/canner-slate-editor) is a rich text editor.
 * [French Press Editor](https://github.com/roast-cms/french-press-editor) is a customizeable editor with offline support.
