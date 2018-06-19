@@ -170,7 +170,7 @@ class Point extends Record(DEFAULTS) {
    */
 
   normalize(node) {
-    const { key, offset } = node
+    const { key, offset } = this
 
     if (!Number.isSafeInteger(offset)) {
       logger.warn(

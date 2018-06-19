@@ -1,11 +1,13 @@
 /** @jsx h */
+/* eslint-disable import/no-extraneous-dependencies */
 
+import { Range } from 'slate'
 import h from '../../../helpers/h'
 
 export default function(change) {
   const { value } = change
-  const { selection, startText } = value
-  const range = selection.merge({
+  const { startText } = value
+  const range = Range.create({
     anchorKey: startText.key,
     anchorOffset: 0,
     focusKey: startText.key,

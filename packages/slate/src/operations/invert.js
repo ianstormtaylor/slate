@@ -193,7 +193,7 @@ function invertOperation(op) {
         focusPath === null ? null : document.assertPath(focusPath).key
     }
 
-    const inverseSelection = selection.merge(props)
+    const inverseSelection = selection.loadProps(props)
     const inverseProps = pick(selection, Object.keys(props))
 
     if (anchorPath !== undefined) {

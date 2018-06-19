@@ -26,7 +26,7 @@ Changes.select = (change, properties, options = {}) => {
   const { document, selection } = value
   const props = {}
   const sel = selection.toJSON()
-  const next = selection.merge(properties).normalize(document)
+  const next = selection.loadProps(properties).normalize(document)
   properties = pick(next, Object.keys(properties))
 
   // Remove any properties that are already equal to the current selection. And
