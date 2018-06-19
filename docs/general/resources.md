@@ -21,6 +21,7 @@ These products are built on top of Slate, and can give you an idea of what's pos
 
 * [GitBook](https://www.gitbook.com/)
 * [Outline](https://www.getoutline.com/)
+* [Yuque](https://www.yuque.com/)
 
 ## Editors
 
