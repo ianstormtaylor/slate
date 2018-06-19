@@ -229,7 +229,7 @@ class Range extends Record(DEFAULTS) {
    */
 
   get isSet() {
-    return this.anchorPoint.isSet() && this.focusPoint.isSet()
+    return this.anchorPoint.isSet && this.focusPoint.isSet
   }
 
   /**
@@ -756,6 +756,40 @@ class Range extends Record(DEFAULTS) {
 
   toJS() {
     return this.toJSON()
+  }
+
+  /**
+   * Compatability Issue
+   * @param{object} props
+   * @return
+   */
+
+  loadProps(props) {
+    let { anchorPoint = this.anchorPoint, focusPoint = this.focusPoint } = props
+
+    if (anchorPoint === this.anchorPoint) {
+      const { anchorOffset: offset, anchorKey: key } = props
+      if (key != null) anchorPoint = anchorPoint.set('key', key)
+      if (offset != null) anchorPoint = anchorPoint.set('offset', offset)
+    }
+
+    if (focusPoint === this.focusPoint) {
+      const { focusOffset: offset, focusKey: key } = props
+      if (key != null) focusPoint = focusPoint.set('key', key)
+      if (offset != null) focusPoint = focusPoint.set('offset', offset)
+    }
+
+    const object = {}
+    for (const key in props) {
+      if (!key.includes('anchor') && !key.includes('focus')) {
+        object[key] = props[key]
+      }
+    }
+
+    object.focusPoint = focusPoint
+    object.anchorPoint = anchorPoint
+
+    return this.merge(object)
   }
 }
 

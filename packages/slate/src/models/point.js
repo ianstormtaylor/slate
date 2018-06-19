@@ -74,7 +74,7 @@ class Point extends Record(DEFAULTS) {
 
   isAtStartOf(node) {
     // PERF: Do a check for a `0` offset first since it's quickest.
-    if (this.offset != 0) return false
+    if (this.offset !== 0) return false
     const first = getFirst(node)
     return this.key == first.key
   }
