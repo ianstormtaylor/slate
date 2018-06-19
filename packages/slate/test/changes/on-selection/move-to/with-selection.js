@@ -1,13 +1,11 @@
 /** @jsx h */
-/* eslint-disable import/no-extraneous-dependencies */
 
-import { Range } from 'slate'
 import h from '../../../helpers/h'
 
 export default function(change) {
   const { value } = change
-  const { startText } = value
-  const range = Range.create({
+  const { selection, startText } = value
+  const range = selection.loadProps({
     anchorKey: startText.key,
     anchorOffset: 0,
     focusKey: startText.key,
