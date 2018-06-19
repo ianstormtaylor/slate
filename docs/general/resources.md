@@ -11,8 +11,15 @@ A few resources that are helpful for building with Slate.
 
 * [Immutable.js Console Extension](https://github.com/mattzeunert/immutable-object-formatter-extension) — this greatly improves the `console.log` output when working with [Immutable.js](https://facebook.github.io/immutable-js/) objects, which Slate's data model is based on.
 
-## Showcase
+## Products
 
-* [ORY Editor](https://editor.ory.am/) — a self-contained, inline WYSIWYG editor library built on top of Slate.
-* [Nossas Editor](http://slate-editor.bonde.org/) — a drop-in WYSIWYG editor built with Slate.
-* [french-press-editor](https://github.com/roast-cms/french-press-editor) – a well-balanced, customizeable editor component with offline support; built with Slate.
+* [GitBook](https://www.gitbook.com/)
+* [Outline](https://www.getoutline.com/)
+
+## Editors
+
+* [Canner Editor](https://github.com/Canner/canner-slate-editor) - a richt text editor.
+* [French Press Editor](https://github.com/roast-cms/french-press-editor) – a customizeable editor component with offline support.
+* [Nossas Editor](http://slate-editor.bonde.org/) — a drop-in WYSIWYG editor.
+* [ORY Editor](https://editor.ory.am/) — a self-contained, inline WYSIWYG editor library.
+* [Outline Editor](https://github.com/outline/rich-markdown-editor) — the editor that powers the [Outline](https://www.getoutline.com/) wiki.
