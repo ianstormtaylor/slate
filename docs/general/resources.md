@@ -18,8 +18,8 @@ A few resources that are helpful for building with Slate.
 
 ## Editors
 
-* [Canner Editor](https://github.com/Canner/canner-slate-editor) - a richt text editor.
-* [French Press Editor](https://github.com/roast-cms/french-press-editor) – a customizeable editor component with offline support.
+* [Canner Editor](https://github.com/Canner/canner-slate-editor) — a richt text editor.
+* [French Press Editor](https://github.com/roast-cms/french-press-editor) — a customizeable editor component with offline support.
 * [Nossas Editor](http://slate-editor.bonde.org/) — a drop-in WYSIWYG editor.
 * [ORY Editor](https://editor.ory.am/) — a self-contained, inline WYSIWYG editor library.
 * [Outline Editor](https://github.com/outline/rich-markdown-editor) — the editor that powers the [Outline](https://www.getoutline.com/) wiki.
