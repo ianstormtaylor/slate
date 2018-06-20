@@ -471,7 +471,7 @@ class Range extends Record(DEFAULTS) {
       anchorPoint: UNSET_POINT,
       focusPoint: UNSET_POINT,
       isFocused: false,
-      isBackward: false,
+      isBackward: null,
     })
   }
 
