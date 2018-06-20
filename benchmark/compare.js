@@ -3,9 +3,10 @@
 const chalk = require('chalk')
 const figures = require('figures')
 const emojis = require('emojis')
-const baseline = require('../../tmp/benchmark-baseline')
+const { resolve } = require('path')
 
-const comparison = require('../../tmp/benchmark-comparison')
+const baseline = require(resolve(process.cwd(), 'tmp/benchmark-baseline'))
+const comparison = require(resolve(process.cwd(), 'tmp/benchmark-comparison'))
 const { existsSync } = require('fs')
 
 /**
