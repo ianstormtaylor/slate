@@ -41,7 +41,15 @@ class Point extends Record(DEFAULTS) {
     return new Point({ key, offset })
   }
 
+  /**
+   * Alias for fromJSON
+   */
+
   static fromJS = Point.fromJSON
+
+  /**
+   * Type Assertation
+   */
 
   static isPoint = isType.bind(null, 'POINT')
 
@@ -123,7 +131,7 @@ class Point extends Record(DEFAULTS) {
 
   move(n = 1) {
     const { offset } = this
-    return this.set('offset', offset + 1)
+    return this.set('offset', offset + n)
   }
 
   /**
@@ -234,4 +242,11 @@ function getLast(node) {
 }
 
 Point.prototype[MODEL_TYPES.POINT] = true
+
+/**
+ * Export.
+ *
+ * @type {Point}
+ */
+
 export default Point
