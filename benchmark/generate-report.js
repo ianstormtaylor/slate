@@ -30,11 +30,24 @@ function convertSuite(suite) {
   return result
 }
 
-function generateReport(repo, filePath) {
-  repo.run().then(report => {
-    const data = JSON.stringify(convertRepo(report))
-    writeFileSync(filePath, data)
-  })
+const IS_COMPARE = process.env.COMPARE
+const filePath = IS_COMPARE
+  ? './tmp/benchmark-comparison.json'
+  : './tmp/benchmark-baseline.json'
+
+function generateReport(repo) {
+  repo
+    .run()
+    .then(report => {
+      const data = JSON.stringify(convertRepo(report))
+      writeFileSync(filePath, data)
+      return report
+    })
+    .then(report => {
+      if (IS_COMPARE) {
+        require('./compare')
+      }
+    })
 }
 
 module.exports = { generateReport }
