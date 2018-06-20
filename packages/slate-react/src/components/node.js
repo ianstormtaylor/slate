@@ -38,6 +38,7 @@ class Node extends React.Component {
     node: SlateTypes.node.isRequired,
     parent: SlateTypes.node.isRequired,
     readOnly: Types.bool.isRequired,
+    selectionPosition: Types.string,
   }
 
   /**
@@ -107,6 +108,9 @@ class Node extends React.Component {
     // If the decorations have changed, update.
     if (!n.decorations.equals(p.decorations)) return true
 
+    // If selectionPosition has changed, update.
+    if (n.selectionPosition !== p.selectionPosition) return true
+
     // Otherwise, don't update.
     return false
   }
@@ -122,6 +126,7 @@ class Node extends React.Component {
     const {
       editor,
       isSelected,
+      selectionPosition,
       node,
       decorations,
       parent,
@@ -135,13 +140,43 @@ class Node extends React.Component {
     const childrenDecorations = getChildrenDecorations(node, decs)
 
     let children = []
-    node.nodes.forEach((child, i) => {
+    for (let i = 0; i < node.nodes.size; i += 1) {
+      const child = node.nodes.get(i)
+      const prevChild = node.nodes.get(i - 1)
+      const nextChild = node.nodes.get(i + 1)
+      const selectionAtLeftEdge = !!(
+        selection.isAtStartOf(child) ||
+        (prevChild && selection.isAtEndOf(prevChild))
+      )
+      const selectionAtRightEdge = !!(
+        selection.isAtEndOf(child) ||
+        (nextChild && selection.isAtStartOf(nextChild))
+      )
+
       const isChildSelected = !!indexes && indexes.start <= i && i < indexes.end
 
+      let selectionPosition
+      if (selectionAtLeftEdge && selectionAtRightEdge) {
+        selectionPosition = 'within'
+      } else if (selectionAtLeftEdge) {
+        selectionPosition = 'leftEdge'
+      } else if (selectionAtRightEdge) {
+        selectionPosition = 'rightEdge'
+      } else if (isChildSelected) {
+        selectionPosition = 'within'
+      } else {
+        selectionPosition = 'outside'
+      }
+
       children.push(
-        this.renderNode(child, isChildSelected, childrenDecorations[i])
+        this.renderNode(
+          child,
+          isChildSelected,
+          childrenDecorations[i],
+          selectionPosition
+        )
       )
-    })
+    }
 
     // Attributes that the developer must mix into the element in their
     // custom node renderer component.
@@ -161,6 +196,7 @@ class Node extends React.Component {
       node,
       parent,
       readOnly,
+      selectionPosition,
     }
 
     let placeholder = stack.find('renderPlaceholder', props)
@@ -190,7 +226,7 @@ class Node extends React.Component {
    * @return {Element}
    */
 
-  renderNode = (child, isSelected, decorations) => {
+  renderNode = (child, isSelected, decorations, selectionPosition) => {
     const { block, editor, node, readOnly } = this.props
     const Component = child.object == 'text' ? Text : Node
 
@@ -204,6 +240,7 @@ class Node extends React.Component {
         node={child}
         parent={node}
         readOnly={readOnly}
+        selectionPosition={selectionPosition}
       />
     )
   }
