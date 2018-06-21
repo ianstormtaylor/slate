@@ -40,6 +40,7 @@ PROXY_TRANSFORMS.forEach(method => {
     const { selection } = value
     const methodAtRange = `${method}AtRange`
     change[methodAtRange](selection, ...args)
+
     if (method.match(/Backward$/)) {
       change.collapseToStart()
     } else if (method.match(/Forward$/)) {
@@ -53,6 +54,7 @@ Changes.setBlock = (...args) => {
     'slate@0.33.0',
     'The `setBlock` method of Slate changes has been renamed to `setBlocks`.'
   )
+
   Changes.setBlocks(...args)
 }
 
@@ -61,6 +63,7 @@ Changes.setInline = (...args) => {
     'slate@0.33.0',
     'The `setInline` method of Slate changes has been renamed to `setInlines`.'
   )
+
   Changes.setInlines(...args)
 }
 
@@ -230,6 +233,7 @@ Changes.splitBlock = (change, depth = 1) => {
   const { selection, document } = value
   const marks = selection.marks || document.getInsertMarksAtRange(selection)
   change.splitBlockAtRange(selection, depth).collapseToEnd()
+
   if (marks && marks.size !== 0) {
     change.select({ marks })
   }

@@ -90,6 +90,7 @@ class Links extends React.Component {
     } else {
       const href = window.prompt('Enter the URL of the link:')
       const text = window.prompt('Enter the text for the link:')
+
       change
         .insertText(text)
         .extend(0 - text.length)
@@ -187,6 +188,7 @@ class Links extends React.Component {
 
   renderNode = props => {
     const { attributes, children, node } = props
+
     switch (node.type) {
       case 'link': {
         const { data } = node

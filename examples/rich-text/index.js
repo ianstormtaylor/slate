@@ -242,6 +242,7 @@ class RichTextExample extends React.Component {
       const parent = value.document.getParent(value.blocks.first().key)
       isActive = this.hasBlock('list-item') && parent && parent.type === type
     }
+
     const onMouseDown = event => this.onClickBlock(event, type)
 
     return (
@@ -284,6 +285,7 @@ class RichTextExample extends React.Component {
 
   renderNode = props => {
     const { attributes, children, node } = props
+
     switch (node.type) {
       case 'block-quote':
         return <blockquote {...attributes}>{children}</blockquote>
@@ -309,6 +311,7 @@ class RichTextExample extends React.Component {
 
   renderMark = props => {
     const { children, mark, attributes } = props
+
     switch (mark.type) {
       case 'bold':
         return <strong {...attributes}>{children}</strong>

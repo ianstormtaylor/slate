@@ -754,6 +754,7 @@ class Text extends Record(DEFAULTS) {
 
     if (result.size === 1) {
       const first = result.first()
+
       if (!first.marks || first.marks.size === 0) {
         if (first.text === '') {
           return this.set('leaves', List())

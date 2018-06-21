@@ -106,6 +106,7 @@ const CREATORS = {
     }
 
     const nodes = createChildren(children, { key: attributes.key })
+
     nodes[0].__decorations = (nodes[0].__decorations || []).concat([
       {
         anchorOffset: 0,
@@ -159,6 +160,7 @@ const CREATORS = {
               })
             )
           )
+
           // store or combine partial decorations (keyed with anchor / focus)
           text.__decorations
             .filter(d => d._key !== undefined)
@@ -169,9 +171,11 @@ const CREATORS = {
                     partial.withKey(text.key)
                   )
                 )
+
                 delete partialDecorations[partial._key]
                 return
               }
+
               partialDecorations[partial._key] = partial.withKey(text.key)
             })
         }
@@ -287,6 +291,7 @@ function createChildren(children, options = {}) {
 
   children.forEach((child, index) => {
     const isLast = index === children.length - 1
+
     // If the child is a non-text node, push the current node and the new child
     // onto the array, then creating a new node for future selection tracking.
     if (Node.isNode(child) && !Text.isText(child)) {
@@ -298,10 +303,13 @@ function createChildren(children, options = {}) {
       ) {
         array.push(node)
       }
+
       array.push(child)
+
       node = isLast
         ? null
         : Text.create({ leaves: [{ text: '', marks: options.marks }] })
+
       length = 0
     }
 
@@ -331,6 +339,7 @@ function createChildren(children, options = {}) {
 
       if (__anchor != null) node.__anchor = __anchor + length
       if (__focus != null) node.__focus = __focus + length
+
       if (__decorations != null) {
         node.__decorations = (node.__decorations || []).concat(
           __decorations.map(

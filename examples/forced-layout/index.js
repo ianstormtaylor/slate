@@ -90,6 +90,7 @@ class ForcedLayout extends React.Component {
 
   renderNode = props => {
     const { attributes, children, node } = props
+
     switch (node.type) {
       case 'title':
         return <h2 {...attributes}>{children}</h2>

@@ -154,6 +154,7 @@ class Emojis extends React.Component {
 
   renderNode = props => {
     const { attributes, children, node, isSelected } = props
+
     switch (node.type) {
       case 'paragraph': {
         return <p {...attributes}>{children}</p>

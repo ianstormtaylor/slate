@@ -43,6 +43,7 @@ class Node {
           'slate@0.32.0',
           'The `kind` property of Slate objects has been renamed to `object`.'
         )
+
         object = attrs.kind
       }
 
@@ -55,6 +56,7 @@ class Node {
           return Inline.create(attrs)
         case 'text':
           return Text.create(attrs)
+
         default: {
           throw new Error('`Node.create` requires a `object` string.')
         }
@@ -132,6 +134,7 @@ class Node {
         'slate@0.32.0',
         'The `kind` property of Slate objects has been renamed to `object`.'
       )
+
       object = value.kind
     }
 
@@ -144,6 +147,7 @@ class Node {
         return Inline.fromJSON(value)
       case 'text':
         return Text.fromJSON(value)
+
       default: {
         throw new Error(
           `\`Node.fromJSON\` requires an \`object\` of either 'block', 'document', 'inline' or 'text', but you passed: ${value}`
@@ -350,6 +354,7 @@ class Node {
     if (this.hasChild(key)) return List([this])
 
     let ancestors
+
     this.nodes.find(node => {
       if (node.object == 'text') return false
       ancestors = node.getAncestors(key)
@@ -480,6 +485,7 @@ class Node {
     range = range.normalize(this)
     if (range.isUnset) return List()
     const { startKey, endKey, startOffset, endOffset } = range
+
     if (startKey === endKey) {
       const endText = this.getDescendant(endKey)
       return endText.characters.slice(startOffset, endOffset)
@@ -489,6 +495,7 @@ class Node {
       if (t.key === startKey) {
         return t.characters.slice(startOffset)
       }
+
       if (t.key === endKey) {
         return t.characters.slice(0, endOffset)
       }
@@ -519,6 +526,7 @@ class Node {
   getClosest(key, iterator) {
     key = assertKey(key)
     const ancestors = this.getAncestors(key)
+
     if (!ancestors) {
       throw new Error(`Could not find a descendant node with key "${key}".`)
     }
@@ -760,6 +768,7 @@ class Node {
 
   getFurthest(key, iterator) {
     const ancestors = this.getAncestors(key)
+
     if (!ancestors) {
       key = assertKey(key)
       throw new Error(`Could not find a descendant node with key "${key}".`)
@@ -856,6 +865,7 @@ class Node {
 
     this.nodes.forEach(child => {
       if (child.object == 'text') return
+
       if (child.isLeafInline()) {
         array.push(child)
       } else {
@@ -1004,6 +1014,7 @@ class Node {
     // PERF: use only one concat rather than multiple concat
     // becuase one concat is faster
     const result = []
+
     this.nodes.forEach(node => {
       result.push(node.getMarksAsArray())
     })
@@ -1031,6 +1042,7 @@ class Node {
   getInsertMarksAtRange(range) {
     range = range.normalize(this)
     if (range.isUnset) return Set()
+
     if (range.isCollapsed) {
       // PERF: range is not cachable, use key and offset as proxies for cache
       return this.getMarksAtPosition(range.startKey, range.startOffset)
@@ -1051,6 +1063,7 @@ class Node {
   getOrderedMarksAtRange(range) {
     range = range.normalize(this)
     if (range.isUnset) return OrderedSet()
+
     if (range.isCollapsed) {
       // PERF: range is not cachable, use key and offset as proxies for cache
       return this.getMarksAtPosition(range.startKey, range.startOffset)
@@ -1109,6 +1122,7 @@ class Node {
   getActiveMarksAtRange(range) {
     range = range.normalize(this)
     if (range.isUnset) return Set()
+
     if (range.isCollapsed) {
       const { startKey, startOffset } = range
       return this.getMarksAtPosition(startKey, startOffset).toSet()
@@ -1147,11 +1161,13 @@ class Node {
     if (marks.size === 0) return marks
 
     let text = this.getNextText(startKey)
+
     while (text.key !== endKey) {
       if (text.text.length !== 0) {
         marks = marks.intersect(text.getActiveMarks())
         if (marks.size === 0) return Set()
       }
+
       text = this.getNextText(text.key)
     }
     return marks
@@ -1402,6 +1418,7 @@ class Node {
 
   refindPath(path, key) {
     const node = this.getDescendantAtPath(path)
+
     if (node && node.key === key) {
       return path
     }
@@ -1420,6 +1437,7 @@ class Node {
 
   refindNode(path, key) {
     const node = this.getDescendantAtPath(path)
+
     if (node && node.key === key) {
       return node
     }
@@ -2041,6 +2059,7 @@ class Node {
 
   getFirstInvalidDescendant(schema) {
     let result = null
+
     this.nodes.find(n => {
       result = n.validate(schema) ? n : n.getFirstInvalidDescendant(schema)
       return result

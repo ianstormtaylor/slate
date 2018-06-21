@@ -44,6 +44,7 @@ class Change {
     const { value } = attrs
     this.value = value
     this.operations = new List()
+
     this.flags = {
       normalize: true,
       ...pick(attrs, ['merge', 'save', 'normalize']),
@@ -152,6 +153,7 @@ class Change {
   withoutNormalization(customChange) {
     const original = this.flags.normalize
     this.setOperationFlag('normalize', false)
+
     try {
       customChange(this)
       // if the change function worked then run normalization

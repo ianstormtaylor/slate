@@ -62,6 +62,7 @@ function orderChildDecorations(node, decorations) {
   // Map each key to its global order
   const keyOrders = { [node.key]: 0 }
   let globalOrder = 1
+
   node.forEachDescendant(child => {
     keyOrders[child.key] = globalOrder
     globalOrder = globalOrder + 1
@@ -84,6 +85,7 @@ function orderChildDecorations(node, decorations) {
       startKeyOrder === undefined
         ? 0
         : getContainingChildOrder(childNodes, keyOrders, startKeyOrder)
+
     endPoints.push({
       isRangeStart: true,
       order: containingChildOrder - 0.5,
@@ -92,6 +94,7 @@ function orderChildDecorations(node, decorations) {
 
     // Range end.
     const endKeyOrder = (keyOrders[decoration.endKey] || globalOrder) + 0.5
+
     endPoints.push({
       isRangeEnd: true,
       order: endKeyOrder,

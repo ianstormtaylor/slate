@@ -381,6 +381,7 @@ class Content extends React.Component {
             change.splitBlockAtRange(range)
           }
         })
+
         break
       }
 

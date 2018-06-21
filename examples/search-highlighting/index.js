@@ -142,6 +142,7 @@ class SearchHighlighting extends React.Component {
 
   renderMark = props => {
     const { children, mark, attributes } = props
+
     switch (mark.type) {
       case 'highlight':
         return (
