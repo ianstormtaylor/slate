@@ -152,7 +152,8 @@
       { "blankLine": "always", "prev": "multiline-block-like", "next": "*" },
       { "blankLine": "any", "prev": "multiline-block-like", "next": "return" },
       { "blankLine": "always", "prev": "*", "next": "multiline-block-like" },
-      { "blankLine": "always", "prev": "*", "next": "multiline-block-like" }
+      { "blankLine": "always", "prev": "*", "next": "multiline-block-like" },
+      { "blankLine": "any", "prev": "case", "next": "case" }
     ]
   }
 }
