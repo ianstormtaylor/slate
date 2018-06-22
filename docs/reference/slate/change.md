@@ -99,7 +99,7 @@ Set the entire `value` using either a `properties` object or a `Value` object. C
 
 Warning: Calling `setValue` with a `Value` object has unpredictable behavior including the loss of the edit history. Only use with a `Value` object if you know what you are doing. For most use cases, we recommend passing `properties` as an `Object` (e.g. `change.setValue({data: myNewDataObject})`.
 
-Hint: Wrapping the call to `setValue` as follows can be helpful if you want to update a value, like in the value's `data` but do not want to have another save point in the undo history: `change.setOperationFlag({save: false}).change({data: myNewDataObject}).setOperationFlag({save: true}).
+Hint: Wrapping the call to `setValue` as follows can be helpful if you want to update a value, like in the value's `data` but do not want to have another save point in the undo history: `change.setOperationFlag({save: false}).setValue({data: myNewDataObject}).setOperationFlag({save: true}).
 
 ## Current Value Changes
 
@@ -191,6 +191,14 @@ Split the [`Inline`](./inline.md) node in the current selection by `depth` level
 `removeMark(type: String) => Change`
 
 Remove a [`mark`](./mark.md) from the characters in the current selection. For convenience, you can pass a `type` string or `properties` object to implicitly create a [`Mark`](./mark.md) of that type.
+
+### `replaceMark`
+
+`replaceMark(oldMark: Mark, newMark: Mark) => Change` <br/>
+`replaceMark(oldProperties: Object, newProperties: Object) => Change` <br/>
+`replaceMark(oldType: String, newType: String) => Change`
+
+Replace a [`mark`](./mark.md) in the characters in the current selection. For convenience, you can pass a `type` string or `properties` object to implicitly create a [`Mark`](./mark.md) of that type.
 
 ### `toggleMark`
 

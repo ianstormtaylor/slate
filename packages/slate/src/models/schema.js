@@ -369,6 +369,7 @@ class Schema extends Record(DEFAULTS) {
         if (max != null && offset == max) nextDef()
         return !!child
       }
+
       function rewind() {
         offset -= 1
         index -= 1

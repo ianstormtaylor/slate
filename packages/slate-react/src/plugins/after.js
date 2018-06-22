@@ -438,6 +438,7 @@ function AfterPlugin() {
       const { document, isInVoid, previousText, startText } = value
       const isPreviousInVoid =
         previousText && document.hasVoidParent(previousText.key)
+
       if (isInVoid || isPreviousInVoid || startText.text == '') {
         event.preventDefault()
         return change.collapseCharBackward()
@@ -447,6 +448,7 @@ function AfterPlugin() {
     if (Hotkeys.isCollapseCharForward(event)) {
       const { document, isInVoid, nextText, startText } = value
       const isNextInVoid = nextText && document.hasVoidParent(nextText.key)
+
       if (isInVoid || isNextInVoid || startText.text == '') {
         event.preventDefault()
         return change.collapseCharForward()
@@ -457,6 +459,7 @@ function AfterPlugin() {
       const { document, isInVoid, previousText, startText } = value
       const isPreviousInVoid =
         previousText && document.hasVoidParent(previousText.key)
+
       if (isInVoid || isPreviousInVoid || startText.text == '') {
         event.preventDefault()
         return change.extendCharBackward()
@@ -466,6 +469,7 @@ function AfterPlugin() {
     if (Hotkeys.isExtendCharForward(event)) {
       const { document, isInVoid, nextText, startText } = value
       const isNextInVoid = nextText && document.hasVoidParent(nextText.key)
+
       if (isInVoid || isNextInVoid || startText.text == '') {
         event.preventDefault()
         return change.extendCharForward()

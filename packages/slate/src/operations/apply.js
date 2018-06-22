@@ -26,6 +26,7 @@ function applyRangeAdjustments(value, checkAffected, adjustRange) {
   if (value.selection && checkAffected(value.selection)) {
     value = value.set('selection', adjustRange(value.selection))
   }
+
   if (!value.decorations) return value
 
   // check all ranges, apply adjustment if affected
@@ -312,11 +313,13 @@ const APPLIERS = {
               ? range.moveStartTo(prev.key, prev.text.length)
               : next ? range.moveStartTo(next.key, 0) : range.deselect()
           }
+
           if (node.hasNode(endKey)) {
             range = prev
               ? range.moveEndTo(prev.key, prev.text.length)
               : next ? range.moveEndTo(next.key, 0) : range.deselect()
           }
+
           // If the range wasn't deselected, normalize it.
           if (range.isSet) return range.normalize(document)
           return range
@@ -489,12 +492,15 @@ const APPLIERS = {
 
     // Split the node by its parent.
     parent = parent.splitNode(index, position)
+
     if (properties) {
       const splitNode = parent.nodes.get(index + 1)
+
       if (splitNode.object !== 'text') {
         parent = parent.updateNode(splitNode.merge(properties))
       }
     }
+
     document = document.updateNode(parent)
     const next = document.getNextText(node.key)
 

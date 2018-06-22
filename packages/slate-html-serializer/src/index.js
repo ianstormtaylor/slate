@@ -201,6 +201,7 @@ class Html {
 
     elements.filter(this.cruftNewline).forEach(element => {
       const node = this.deserializeElement(element)
+
       switch (typeOf(node)) {
         case 'array':
           nodes = nodes.concat(node)

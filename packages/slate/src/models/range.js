@@ -780,6 +780,7 @@ class Range extends Record(DEFAULTS) {
     }
 
     const object = {}
+
     for (const key in props) {
       if (!key.includes('anchor') && !key.includes('focus')) {
         object[key] = props[key]

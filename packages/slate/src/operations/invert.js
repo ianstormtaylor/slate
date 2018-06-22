@@ -201,6 +201,7 @@ function invertOperation(op) {
         inverseProps.anchorKey === null
           ? null
           : document.getPath(inverseProps.anchorKey)
+
       delete inverseProps.anchorKey
     }
 
@@ -209,6 +210,7 @@ function invertOperation(op) {
         inverseProps.focusKey === null
           ? null
           : document.getPath(inverseProps.focusKey)
+
       delete inverseProps.focusKey
     }
 

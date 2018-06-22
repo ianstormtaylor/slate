@@ -127,6 +127,7 @@ class HoveringMenu extends React.Component {
     const rect = range.getBoundingClientRect()
     menu.style.opacity = 1
     menu.style.top = `${rect.top + window.pageYOffset - menu.offsetHeight}px`
+
     menu.style.left = `${rect.left +
       window.pageXOffset -
       menu.offsetWidth / 2 +
@@ -188,6 +189,7 @@ class HoveringMenu extends React.Component {
 
   renderMark = props => {
     const { children, mark, attributes } = props
+
     switch (mark.type) {
       case 'bold':
         return <strong {...attributes}>{children}</strong>
