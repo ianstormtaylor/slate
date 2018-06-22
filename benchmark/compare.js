@@ -40,10 +40,10 @@ baseline.forEach((suite, i) => {
     for (const key of Object.keys(compared)) {
       const comp = comparison[i].benchmarks[j]
       if (!comp) return
-      const b = (base.iterations / base[key]) * 1000
-      const c = (comp.iterations / comp[key]) * 1000
+      const b = base.iterations / base[key] * 1000
+      const c = comp.iterations / comp[key] * 1000
       const balancePercent =
-        b > c ? Math.round((Math.abs(b - c) / c) * 100) : ((c - b) / b) * 100
+        b > c ? Math.round(Math.abs(b - c) / c * 100) : (c - b) / b * 100
 
       const output = `${b.toFixed(2)} -> ${c.toFixed(2)} ops/sec`
       compared[key].baseOutput = output

@@ -27,7 +27,7 @@ function convertSuite(suite) {
       type: 'bench',
       elapsed: user,
       iterations: cycles,
-      ops: (1000 * cycles) / user,
+      ops: 1000 * cycles / user,
       ...bench,
     })
   }
