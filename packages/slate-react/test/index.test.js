@@ -13,9 +13,7 @@ describe('slate-react', () => {
    * Reset Slate's internal state before each text.
    */
 
-  beforeEach(() => {
-    resetKeyGenerator()
-  })
+  beforeEach(resetKeyGenerator)
 
   require('./plugins')
   require('./rendering')

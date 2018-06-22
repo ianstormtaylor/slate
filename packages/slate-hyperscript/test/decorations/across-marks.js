@@ -1,6 +1,6 @@
 /** @jsx h */
-
-import { createHyperscript } from '../../src'
+/* eslint-disable import/no-extraneous-dependencies*/
+import { createHyperscript } from 'slate-hyperscript'
 
 const h = createHyperscript({
   blocks: {

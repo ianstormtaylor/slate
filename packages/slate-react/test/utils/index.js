@@ -16,6 +16,4 @@ describe('utils', () => {
  * Reset Slate's internal state before each text.
  */
 
-beforeEach(() => {
-  resetKeyGenerator()
-})
+beforeEach(resetKeyGenerator)

@@ -1,7 +1,7 @@
 /** @jsx h */
-
+/* eslint-disable import/no-extraneous-dependencies */
 import { List } from 'immutable'
-import { Mark } from '../../../../../src'
+import { Mark } from 'slate'
 import h from '../../../../helpers/h'
 
 export const input = <i />[0]

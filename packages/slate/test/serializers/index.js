@@ -1,6 +1,7 @@
-import { t as assert } from 'jest-t-assert' // eslint-disable-line import/no-extraneous-dependencies
+/* eslint-disable import/no-extraneous-dependencies */
+import { t as assert } from 'jest-t-assert'
 import fs from 'fs'
-import { Value } from '../../src'
+import { Value } from 'slate'
 import { basename, extname, resolve } from 'path'
 
 /**

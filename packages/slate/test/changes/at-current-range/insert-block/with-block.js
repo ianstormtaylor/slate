@@ -1,7 +1,7 @@
 /** @jsx h */
-
+/* eslint-disable import/no-extraneous-dependencies */
 import h from '../../../helpers/h'
-import { Block } from '../../../../src'
+import { Block } from 'slate'
 
 export default function(change) {
   change.insertBlock(Block.create({ type: 'quote' }))

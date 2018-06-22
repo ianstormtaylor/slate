@@ -1,10 +1,11 @@
+/* eslint-disable import/no-extraneous-dependencies */
 import React from 'react'
 import ReactDOM from 'react-dom/server'
 import { t as assert } from 'jest-t-assert' // eslint-disable-line import/no-extraneous-dependencies
+import { Editor } from 'slate-react'
 import clean from '../helpers/clean'
 import fs from 'fs-promise' // eslint-disable-line import/no-extraneous-dependencies
 import { JSDOM } from 'jsdom' // eslint-disable-line import/no-extraneous-dependencies
-import { Editor } from '../../src'
 import { basename, extname, resolve } from 'path'
 
 /**

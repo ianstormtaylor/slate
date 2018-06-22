@@ -1,8 +1,5 @@
-/**
- * Dependencies.
- */
-
-import Plain from '../src/'
+/* eslint-disable import/no-extraneous-dependencies */
+import Plain from 'slate-plain-serializer'
 import { t as assert } from 'jest-t-assert' // eslint-disable-line import/no-extraneous-dependencies
 import fs from 'fs'
 import { Value, resetKeyGenerator } from 'slate'
@@ -17,9 +14,7 @@ describe('slate-plain-serializer', () => {
    * Reset Slate's internal key generator state before each text.
    */
 
-  beforeEach(() => {
-    resetKeyGenerator()
-  })
+  beforeEach(resetKeyGenerator)
 
   describe('deserialize()', () => {
     const dir = resolve(__dirname, './deserialize')

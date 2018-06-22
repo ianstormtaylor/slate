@@ -1,8 +1,8 @@
 /** @jsx h */
-
+/* eslint-disable import/no-extraneous-dependencies */
 import { Set } from 'immutable'
 import h from '../../../../helpers/h'
-import { Mark } from '../../../../../src'
+import { Mark } from 'slate'
 
 export const input = <text>CatCute</text>[0]
 

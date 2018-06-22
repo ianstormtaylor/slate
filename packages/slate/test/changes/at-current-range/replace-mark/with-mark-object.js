@@ -1,8 +1,7 @@
 /** @jsx h */
-
+/* eslint-disable import/no-extraneous-dependencies*/
+import { Mark } from 'slate'
 import h from '../../../helpers/h'
-
-import { Mark } from '../../../..'
 
 export default function(change) {
   change.replaceMark(

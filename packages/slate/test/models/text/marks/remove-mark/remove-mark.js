@@ -1,6 +1,6 @@
 /** @jsx h */
-
-import { Mark } from '../../../../../src'
+/* eslint-disable import/no-extraneous-dependencies */
+import { Mark } from 'slate'
 import h from '../../../../helpers/h'
 
 export const input = (

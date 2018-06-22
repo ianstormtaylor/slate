@@ -1,8 +1,8 @@
 /** @jsx h */
-
+/* eslint-disable import/no-extraneous-dependencies*/
 import { t as assert } from 'jest-t-assert' // eslint-disable-line import/no-extraneous-dependencies
 
-import h from '../../src'
+import h from 'slate-hyperscript'
 
 export const input = (
   <document>

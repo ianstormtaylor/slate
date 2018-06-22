@@ -1,8 +1,5 @@
-/**
- * Dependencies.
- */
-
-import Html from '../src/'
+/* eslint-disable import/no-extraneous-dependencies */
+import Html from 'slate-html-serializer'
 import { t as assert } from 'jest-t-assert' // eslint-disable-line import/no-extraneous-dependencies
 import fs from 'fs'
 import { JSDOM } from 'jsdom' // eslint-disable-line import/no-extraneous-dependencies
@@ -18,9 +15,7 @@ describe('slate-html-serializer', () => {
    * Reset Slate's internal key generator state before each text.
    */
 
-  beforeEach(() => {
-    resetKeyGenerator()
-  })
+  beforeEach(resetKeyGenerator)
 
   describe('deserialize()', () => {
     const dir = resolve(__dirname, './deserialize')
