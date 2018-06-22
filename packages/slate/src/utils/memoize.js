@@ -70,6 +70,7 @@ function memoize(object, properties) {
       if (!this.__cache) {
         this.__cache = new Map() // eslint-disable-line no-undef,no-restricted-globals
       }
+
       if (!this.__cache_no_args) {
         this.__cache_no_args = {}
       }

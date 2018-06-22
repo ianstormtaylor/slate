@@ -12,11 +12,13 @@ export const schema = {
         if (reason == CHILD_UNKNOWN) {
           const previous = node.getPreviousSibling(child.key)
           const offset = previous.nodes.size
+
           child.nodes.forEach((n, i) =>
             change.moveNodeByKey(n.key, previous.key, offset + i, {
               normalize: false,
             })
           )
+
           change.removeNodeByKey(child.key)
         }
       },

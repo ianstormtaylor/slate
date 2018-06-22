@@ -167,6 +167,7 @@ const CORE_SCHEMA_RULES = [
             change.insertNodeByKey(node.key, shift + index, Text.create(), {
               normalize: false,
             })
+
             shift++
           }
 
@@ -174,6 +175,7 @@ const CORE_SCHEMA_RULES = [
             change.insertNodeByKey(node.key, shift + index + 1, Text.create(), {
               normalize: false,
             })
+
             shift++
           }
         })

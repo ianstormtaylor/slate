@@ -312,7 +312,7 @@ class Text extends Record(DEFAULTS) {
         if (index >= this.text.length) return
 
         if (index !== 0 || length < this.text.length) {
-          const [before, bundle] = Leaf.splitLeaves(this.leaves, index)
+          const [before, bundle] = Leaf.splitLeaves(leaves, index)
           const [middle, after] = Leaf.splitLeaves(bundle, length)
           leaves = before.concat(middle.map(x => x.addMarks(marks)), after)
           return
@@ -589,7 +589,7 @@ class Text extends Record(DEFAULTS) {
 
     // PERF: For simple backspace, we can operate directly on the leaf
     if (length === 1) {
-      const { leaf, index, startOffset } = this.searchLeafAtOffset(start)
+      const { leaf, index, startOffset } = this.searchLeafAtOffset(start + 1)
       const offset = start - startOffset
 
       if (leaf) {
@@ -754,6 +754,7 @@ class Text extends Record(DEFAULTS) {
 
     if (result.size === 1) {
       const first = result.first()
+
       if (!first.marks || first.marks.size === 0) {
         if (first.text === '') {
           return this.set('leaves', List())

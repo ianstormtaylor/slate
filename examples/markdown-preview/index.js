@@ -70,6 +70,7 @@ class MarkdownPreview extends React.Component {
 
   renderMark = props => {
     const { children, mark, attributes } = props
+
     switch (mark.type) {
       case 'bold':
         return <strong {...attributes}>{children}</strong>

@@ -2,33 +2,25 @@
 
 import h from '../../../helpers/h'
 
-import { Mark } from '../../../../src'
+import { Mark } from '../../../..'
 
 export default function(change) {
-  const marks = []
-
-  marks.push(
+  change.replaceMark(
+    'italic',
     Mark.create({
       type: 'bold',
       data: { thing: 'value' },
     })
   )
-
-  marks.push(
-    Mark.create({
-      type: 'italic',
-      data: { thing2: 'value2' },
-    })
-  )
-
-  change.addMarks(marks)
 }
 
 export const input = (
   <value>
     <document>
       <paragraph>
-        <anchor />w<focus />ord
+        <anchor />
+        <i>w</i>
+        <focus />ord
       </paragraph>
     </document>
   </value>
@@ -39,9 +31,7 @@ export const output = (
     <document>
       <paragraph>
         <anchor />
-        <i thing2="value2">
-          <b thing="value">w</b>
-        </i>
+        <b thing="value">w</b>
         <focus />ord
       </paragraph>
     </document>
