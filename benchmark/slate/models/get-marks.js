@@ -6,6 +6,7 @@ const h = require('../../helpers/h')
 module.exports.default = function(value) {
   value.document.getMarks()
 }
+
 const value = (
   <value>
     <document>

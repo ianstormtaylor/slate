@@ -2,8 +2,10 @@ const { writeFileSync } = require('fs')
 
 function convertRepo(report) {
   const result = []
+
   for (const name in report) {
     const suite = report[name]
+
     result.push({
       name,
       type: 'suite',
@@ -15,15 +17,17 @@ function convertRepo(report) {
 
 function convertSuite(suite) {
   const result = []
+
   for (const name in suite) {
     const bench = suite[name]
     const { user, cycles } = bench
+
     result.push({
       name,
       type: 'bench',
       elapsed: user,
       iterations: cycles,
-      ops: 1000 * cycles / user,
+      ops: (1000 * cycles) / user,
       ...bench,
     })
   }

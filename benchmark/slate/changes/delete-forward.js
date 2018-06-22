@@ -24,6 +24,7 @@ const value = (
     </document>
   </value>
 )
+
 module.exports.input = () => {
   return value.change()
 }

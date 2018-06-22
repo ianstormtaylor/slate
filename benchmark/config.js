@@ -8,6 +8,7 @@ program
   .parse(process.argv)
 
 const { grep } = program
+
 if (grep) {
   const pattern = new RegExp(grep)
 
