@@ -202,6 +202,7 @@ class Point extends Record(DEFAULTS) {
       )
       return this.moveToStartOf(text)
     }
+
     if (text.object !== 'text') {
       logger.warn(
         'The point was set to a Node that is not a Text node. This should not happen and can degrade performance. The node in question was:',
