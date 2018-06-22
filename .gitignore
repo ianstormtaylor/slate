@@ -8,7 +8,7 @@ lib/
 tmp/
 
 # coverage files
-coverage
+coverage/
 
 # Gitbook files.
 _book/
