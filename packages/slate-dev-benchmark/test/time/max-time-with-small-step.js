@@ -5,6 +5,7 @@ import assert from 'assert'
 export const experiment = 'max-time'
 
 let index = 0
+
 export function expected() {
   assert(
     index > 85 && index < 115,
@@ -22,6 +23,7 @@ export default function(suite) {
     maxTime: 1000,
     async: false,
   })
+
   bench.run(() => {
     syncSleep(10)
     index++

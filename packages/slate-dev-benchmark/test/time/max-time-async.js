@@ -5,6 +5,7 @@ import assert from 'assert'
 export const experiment = 'max-time-async'
 
 let index = 0
+
 // A wider range than sync, becuase Promise intialization, babel-node takes time
 export function expected() {
   assert(
@@ -23,6 +24,7 @@ export default function(suite) {
     maxTime: 100,
     async: true,
   })
+
   bench.run(
     () => new Promise(resolve => setTimeout(() => resolve(index++), 10))
   )

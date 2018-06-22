@@ -20,9 +20,11 @@ class Suite {
 
   constructor(name, options = {}) {
     const { repository = repo } = options
+
     if (repository[name]) {
       throw Error(`The suite name ${name} has benn occupied in repository`)
     }
+
     if (typeof name !== 'string') {
       throw Error(`The suite name must be a string`)
     }
@@ -67,9 +69,11 @@ class Suite {
     return compose(this.benches).then(() => {
       this.isFinished = true
       const report = {}
+
       for (const bench of this.benches) {
         report[bench.name] = bench.report
       }
+
       this.report = report
       return report
     })

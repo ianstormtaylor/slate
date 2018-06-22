@@ -8,8 +8,10 @@ describe('time', async () => {
   const files = fs
     .readdirSync(testDir)
     .filter(x => x[0] !== '.' && x !== 'index.js')
+
   for (const file of files) {
     const module = require(`./${file}`)
+
     it(module.experiment, () => {
       module.default(suite)
       const { expected } = module

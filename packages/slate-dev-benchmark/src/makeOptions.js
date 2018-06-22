@@ -23,9 +23,11 @@ const defaultOptions = {
 
 function makeOptions(options) {
   const result = { ...defaultOptions, ...options }
+
   for (const key in defaultOptions) {
     const shallType = typeof defaultOptions[key]
     const inputType = typeof result[key]
+
     if (shallType !== inputType) {
       throw TypeError(
         `Wrong Input in Config Suite, options[${key}] should be ${shallType}, but the input type is ${inputType}`
@@ -34,4 +36,5 @@ function makeOptions(options) {
   }
   return result
 }
+
 module.exports = { makeOptions }

@@ -12,6 +12,7 @@ export default function(suite) {
     minTime: 100,
     maxTime: Infinity,
   })
+
   bench.run(() => {
     actual.index++
   })

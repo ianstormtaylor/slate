@@ -11,6 +11,7 @@ export default function(suite) {
     maxTries: 200,
     minTime: 100,
   })
+
   bench.run(() => {
     actual.index++
   })

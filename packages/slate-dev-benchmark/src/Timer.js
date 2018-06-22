@@ -55,6 +55,7 @@ class Timer {
       all: (user + system) / 1000,
       hr,
     }
+
     this.isStopped = true
     return this.elapsed
   }

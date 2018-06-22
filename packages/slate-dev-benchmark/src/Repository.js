@@ -52,9 +52,11 @@ class Repository {
     return compose(this.suites).then(() => {
       this.isFinished = true
       const report = {}
+
       for (const suite of this.suites) {
         report[suite.name] = suite.report
       }
+
       this.report = report
       return report
     })

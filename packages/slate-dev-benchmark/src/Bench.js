@@ -54,10 +54,12 @@ class Bench {
       this.inputer = index => inputer[index % inputer.length]
       return
     }
+
     if (typeof inputer === 'function') {
       this.inputer = inputer
       return
     }
+
     this.inputer = () => inputer
   }
 
@@ -94,6 +96,7 @@ class Bench {
     }
 
     const report = { user: 0, system: 0, all: 0, hr: 0, cycles: 0 }
+
     for (
       let initialIndex = initial;
       initialIndex < times;
@@ -101,9 +104,11 @@ class Bench {
     ) {
       const tries = Math.min(times - initialIndex, this.options.allocationTries)
       const thisTryReport = await runBundleTasks.call(this, tries, initialIndex)
+
       if (global.gc) {
         global.gc()
       }
+
       for (const key in report) {
         report[key] += thisTryReport[key]
       }
@@ -138,18 +143,22 @@ class Bench {
 
       function runFrom(index) {
         if (index === tries) return Promise.resolve(tries)
+
         if (index === nextCheckIndex) {
           const hrEnd = process.hrtime(hrStart)
           const elapsed = hrEnd[0] * 1e3 + hrEnd[1] / 1e6
+
           if (elapsed > maxTime) {
             return Promise.resolve(index)
           } else {
             if (elapsed < maxTime / 20) {
               seq *= 2
             }
+
             nextCheckIndex = seq + nextCheckIndex
           }
         }
+
         if (!isAsync) {
           const inputVar = inputs[index]
           runner(inputVar)
@@ -208,6 +217,7 @@ Bench.prototype[BenchType] = true
 
 function mergeResults(res1, res2) {
   const result = {}
+
   for (const key in res1) {
     result[key] = res1[key] + res2[key]
   }

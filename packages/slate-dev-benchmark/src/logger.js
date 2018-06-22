@@ -50,6 +50,7 @@ function logger(obj) {
     if (!obj.isFinished) {
       return log(`${prefix + prefix}- Bench ${obj.name} is running`)
     }
+
     const { report } = obj
     const { cycles } = report
 
@@ -57,6 +58,7 @@ function logger(obj) {
       user: 'user:',
       hr: 'real:',
     }
+
     for (const key of ['user', 'hr']) {
       log(
         `${prefix + prefix + prefix}${header[key]} * ${cycles} cycles: ${
@@ -68,4 +70,5 @@ function logger(obj) {
   }
   return log(obj)
 }
+
 module.exports = { logger, errorLog, log }

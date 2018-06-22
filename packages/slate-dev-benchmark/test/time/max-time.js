@@ -5,6 +5,7 @@ import assert from 'assert'
 export const experiment = 'max-time'
 
 let index = 0
+
 export function expected() {
   assert(index === 10, `index should be 10, but is actually ${index}`)
   return true
@@ -19,6 +20,7 @@ export default function(suite) {
     maxTime: 100,
     async: false,
   })
+
   bench.run(() => {
     syncSleep(10)
     index++

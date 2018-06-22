@@ -9,6 +9,7 @@ const { errorLog } = require('./logger')
 
 function compose(list, name = 'makeRun') {
   return dispatch(0)
+
   function dispatch(index) {
     if (index === list.length) return Promise.resolve(true)
     const node = list[index]
@@ -17,4 +18,5 @@ function compose(list, name = 'makeRun') {
       .then(() => dispatch(index + 1))
   }
 }
+
 module.exports = { compose }
