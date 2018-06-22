@@ -8,6 +8,7 @@
 
 function removeAllRanges(selection) {
   const doc = window.document
+
   if (doc && doc.body.createTextRange) {
     // All IE but Edge
     const range = doc.body.createTextRange()

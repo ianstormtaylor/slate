@@ -135,6 +135,7 @@ class Node extends React.Component {
     const childrenDecorations = getChildrenDecorations(node, decs)
 
     let children = []
+
     node.nodes.forEach((child, i) => {
       const isChildSelected = !!indexes && indexes.start <= i && i < indexes.end
 
@@ -169,6 +170,7 @@ class Node extends React.Component {
       placeholder = React.cloneElement(placeholder, {
         key: `${node.key}-placeholder`,
       })
+
       children = [placeholder, ...children]
     }
 

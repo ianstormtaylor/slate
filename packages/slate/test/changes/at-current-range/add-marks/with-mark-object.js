@@ -13,6 +13,7 @@ export default function(change) {
       data: { thing: 'value' },
     })
   )
+
   marks.push(
     Mark.create({
       type: 'italic',

@@ -387,9 +387,11 @@ Changes.replaceTextByKey = (
 ) => {
   const { document } = change.value
   const textNode = document.getDescendant(key)
+
   if (length + offset > textNode.text.length) {
     length = textNode.text.length - offset
   }
+
   const range = Range.create({
     anchorKey: key,
     focusKey: key,
@@ -399,6 +401,7 @@ Changes.replaceTextByKey = (
   let activeMarks = document.getActiveMarksAtRange(range)
 
   change.removeTextByKey(key, offset, length, { normalize: false })
+
   if (!marks) {
     // Do not use mark at index when marks and activeMarks are both empty
     marks = activeMarks ? activeMarks : []
@@ -407,8 +410,10 @@ Changes.replaceTextByKey = (
     activeMarks = activeMarks.filter(
       activeMark => !marks.find(m => activeMark.type === m.type)
     )
+
     marks = activeMarks.merge(marks)
   }
+
   change.insertTextByKey(key, offset, text, marks, options)
 }
 
@@ -490,6 +495,7 @@ Changes.replaceNodeByKey = (change, key, newNode, options = {}) => {
   const index = parent.nodes.indexOf(node)
   change.removeNodeByKey(key, { normalize: false })
   change.insertNodeByKey(parent.key, index, newNode, { normalize: false })
+
   if (normalize) {
     change.normalizeNodeByKey(parent.key)
   }
@@ -644,6 +650,7 @@ Changes.splitDescendantsByKey = (
     const prevIndex = index == null ? null : index
     index = previous ? node.nodes.indexOf(previous) + 1 : textOffset
     previous = node
+
     change.splitNodeByKey(node.key, index, {
       normalize: false,
       target: prevIndex,
@@ -727,6 +734,7 @@ Changes.unwrapNodeByKey = (change, key, options = {}) => {
     change.moveNodeByKey(key, parentParent.key, parentIndex, {
       normalize: false,
     })
+
     change.removeNodeByKey(parent.key, options)
   } else if (isFirst) {
     // Just move the node before its parent.

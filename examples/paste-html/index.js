@@ -50,6 +50,7 @@ const RULES = [
   {
     deserialize(el, next) {
       const block = BLOCK_TAGS[el.tagName.toLowerCase()]
+
       if (block) {
         return {
           object: 'block',
@@ -62,6 +63,7 @@ const RULES = [
   {
     deserialize(el, next) {
       const mark = MARK_TAGS[el.tagName.toLowerCase()]
+
       if (mark) {
         return {
           object: 'mark',
@@ -202,6 +204,7 @@ class PasteHtml extends React.Component {
 
   renderNode = props => {
     const { attributes, children, node, isSelected } = props
+
     switch (node.type) {
       case 'quote':
         return <blockquote {...attributes}>{children}</blockquote>
@@ -258,6 +261,7 @@ class PasteHtml extends React.Component {
 
   renderMark = props => {
     const { children, mark, attributes } = props
+
     switch (mark.type) {
       case 'bold':
         return <strong {...attributes}>{children}</strong>
