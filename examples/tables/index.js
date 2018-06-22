@@ -1,8 +1,10 @@
-import { Editor } from 'slate-react'
+import Plain from 'slate-plain-serializer'
+import { Editor, getEventTransfer } from 'slate-react'
 import { Value } from 'slate'
 
 import React from 'react'
 import initialValue from './value.json'
+import { EditorWrapper } from '../components'
 
 /**
  * The tables example.
@@ -88,7 +90,7 @@ class Tables extends React.Component {
       const previous = document.getPreviousText(startNode.key)
       const prevBlock = document.getClosestBlock(previous.key)
 
-      if (prevBlock.type == 'table-cell') {
+      if (prevBlock.type === 'table-cell') {
         if (['Backspace', 'Delete', 'Enter'].includes(event.key)) {
           event.preventDefault()
           return true
@@ -98,7 +100,7 @@ class Tables extends React.Component {
       }
     }
 
-    if (value.startBlock.type != 'table-cell') {
+    if (value.startBlock.type !== 'table-cell') {
       return
     }
 
@@ -113,6 +115,32 @@ class Tables extends React.Component {
   }
 
   /**
+   * On paste or drop, only support plain text for this example.
+   *
+   * @param {Event} event
+   * @param {Change} change
+   */
+
+  onDropOrPaste = (event, change) => {
+    const transfer = getEventTransfer(event)
+    const { value } = change
+    const { text = '' } = transfer
+
+    if (value.startBlock.type !== 'table-cell') {
+      return
+    }
+
+    if (!text) {
+      return
+    }
+
+    const lines = text.split('\n')
+    const { document } = Plain.deserialize(lines[0] || '')
+    change.insertFragment(document)
+    return false
+  }
+
+  /**
    * Render the example.
    *
    * @return {Component} component
@@ -120,16 +148,18 @@ class Tables extends React.Component {
 
   render() {
     return (
-      <div className="editor">
+      <EditorWrapper>
         <Editor
           placeholder="Enter some text..."
           value={this.state.value}
           onChange={this.onChange}
           onKeyDown={this.onKeyDown}
+          onDrop={this.onDropOrPaste}
+          onPaste={this.onDropOrPaste}
           renderNode={this.renderNode}
           renderMark={this.renderMark}
         />
-      </div>
+      </EditorWrapper>
     )
   }
 
