@@ -265,6 +265,19 @@ Changes.removeMark = (change, mark) => {
 }
 
 /**
+ * Replace an `oldMark` with a `newMark` in the characters in the current selection.
+ *
+ * @param {Change} change
+ * @param {Mark} oldMark
+ * @param {Mark} newMark
+ */
+
+Changes.replaceMark = (change, oldMark, newMark) => {
+  change.removeMark(oldMark)
+  change.addMark(newMark)
+}
+
+/**
  * Add or remove a `mark` from the characters in the current selection,
  * depending on whether it's already there.
  *
