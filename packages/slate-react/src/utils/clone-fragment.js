@@ -59,7 +59,6 @@ function cloneFragment(event, value, fragment = value.fragment) {
 
   // Remove any zero-width space spans from the cloned DOM so that they don't
   // show up elsewhere when pasted.
-  // eslint-disable-next-line padding-line-between-statements
   ;[].slice.call(contents.querySelectorAll(ZERO_WIDTH_SELECTOR)).forEach(zw => {
     const isNewline = zw.getAttribute(ZERO_WIDTH_ATTRIBUTE) === 'n'
     zw.textContent = isNewline ? '\n' : ''
