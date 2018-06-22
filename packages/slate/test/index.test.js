@@ -9,10 +9,6 @@ import { resetKeyGenerator } from 'slate'
  */
 
 describe('slate', () => {
-  /**
-   * Reset Slate's internal key generator state before each text.
-   */
-
   beforeEach(resetKeyGenerator)
 
   require('./serializers')

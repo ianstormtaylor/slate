@@ -9,10 +9,6 @@ import { resetKeyGenerator } from 'slate'
  */
 
 describe('slate-react', () => {
-  /**
-   * Reset Slate's internal state before each text.
-   */
-
   beforeEach(resetKeyGenerator)
 
   require('./plugins')

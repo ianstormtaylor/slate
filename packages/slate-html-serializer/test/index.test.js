@@ -11,10 +11,6 @@ import { basename, extname, resolve } from 'path'
  */
 
 describe('slate-html-serializer', () => {
-  /**
-   * Reset Slate's internal key generator state before each text.
-   */
-
   beforeEach(resetKeyGenerator)
 
   describe('deserialize()', () => {
