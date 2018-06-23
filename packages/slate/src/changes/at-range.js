@@ -3,7 +3,9 @@ import logger from 'slate-dev-logger'
 
 import Block from '../models/block'
 import Inline from '../models/inline'
+import Range from '../models/range'
 import Text from '../models/text'
+import generateKey from '../utils/generate-key'
 import Mark from '../models/mark'
 import Node from '../models/node'
 import String from '../utils/string'
@@ -1369,15 +1371,15 @@ Changes.wrapInlineAtRange = (change, range, inline, options = {}) => {
   const endIndex = endBlock.nodes.indexOf(endChild)
 
   if (startInline && startInline == endInline) {
-    const text = startInline.text.substring(startOffset, endOffset)
-    inline = inline.set('nodes', List([Text.create(text)]))
+    const selectedCharacters = startBlock.getTextsAtRange(range).get(0).get("characters").slice(startOffset,endOffset)
+    inline = inline.set('nodes', List([new Text({characters:selectedCharacters,key:generateKey()})]))
     Changes.insertInlineAtRange(change, range, inline, { normalize: false })
     const inlinekey = inline.getFirstText().key
     const rng = {
       anchorKey: inlinekey,
       focusKey: inlinekey,
       anchorOffset: 0,
-      focusOffset: text.length,
+      focusOffset: selectedCharacters.size,
       isFocused: true,
     }
     change.select(rng)
