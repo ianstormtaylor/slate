@@ -1393,22 +1393,41 @@ Changes.wrapInlineAtRange = (change, range, inline, options = {}) => {
   const endIndex = endBlock.nodes.indexOf(endChild)
 
   if (startInline && startInline == endInline) {
-    const selectedCharacters = startBlock
+    let leafsize = startBlock
       .getTextsAtRange(range)
       .get(0)
-      .get('characters')
-      .slice(startOffset, endOffset)
+      .get('leaves').size
+    let textPosition = 0
+    let selectedLeaves = startBlock
+      .getTextsAtRange(range)
+      .get(0)
+      .get('leaves')
+      .map((leaf, idx) => {
+        let text = leaf.get('text')
+        if (idx == 0) {
+          text = text.substr(startOffset)
+        }
+        if (idx == leafsize - 1) {
+          text = text.substr(0, endOffset - textPosition - startOffset)
+        }
+        textPosition += text.length
+        return leaf.set('text', text)
+      })
+      .filter(leaf => {
+        return leaf.get('text') != ''
+      })
     inline = inline.set(
       'nodes',
-      List([new Text({ characters: selectedCharacters, key: generateKey() })])
+      List([new Text({ leaves: selectedLeaves, key: generateKey() })])
     )
+    // inline = inline.set('nodes', List([Text.create(text)]))
     Changes.insertInlineAtRange(change, range, inline, { normalize: false })
     const inlinekey = inline.getFirstText().key
     const rng = {
       anchorKey: inlinekey,
       focusKey: inlinekey,
       anchorOffset: 0,
-      focusOffset: selectedCharacters.size,
+      focusOffset: endOffset - startOffset,
       isFocused: true,
     }
     change.select(rng)
