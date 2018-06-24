@@ -3,7 +3,6 @@ import logger from 'slate-dev-logger'
 
 import Block from '../models/block'
 import Inline from '../models/inline'
-import Range from '../models/range'
 import Text from '../models/text'
 import generateKey from '../utils/generate-key'
 import Mark from '../models/mark'
@@ -1393,20 +1392,23 @@ Changes.wrapInlineAtRange = (change, range, inline, options = {}) => {
   const endIndex = endBlock.nodes.indexOf(endChild)
 
   if (startInline && startInline == endInline) {
-    let leaves = startBlock
+    const leaves = startBlock
       .getTextsAtRange(range)
       .get(0)
       .get('leaves')
     let textPosition = 0
-    let selectedLeaves = leaves
+    const selectedLeaves = leaves
       .map((leaf, idx) => {
         let text = leaf.get('text')
+
         if (idx == 0) {
           text = text.substr(startOffset)
         }
+
         if (idx == leaves.size - 1) {
           text = text.substr(0, endOffset - textPosition - startOffset)
         }
+        
         textPosition += text.length
         return leaf.set('text', text)
       })
