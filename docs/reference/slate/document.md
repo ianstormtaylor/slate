@@ -22,13 +22,13 @@ Document({
 
 `Immutable.Map`
 
+Arbitrary data associated with the document. Defaults to an empty `Map`.
+
 ### `object`
 
 `String`
 
 An immutable string value of `'document'` for easily separating this node from [`Block`](./block.md), [`Inline`](./inline.md) or [`Text`](./text.md) nodes.
-
-Arbitrary data associated with the document. Defaults to an empty `Map`.
 
 ### `nodes`
 

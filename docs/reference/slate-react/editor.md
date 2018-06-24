@@ -29,19 +29,19 @@ The top-level React component that renders the Slate editor itself.
 
 `Boolean`
 
-Whether the editor should attempt to autocorrect spellcheck errors.
+Whether or not the editor should attempt to autocorrect spellcheck errors.
 
 ### `autoFocus`
 
 `Boolean`
 
-An optional attribute that, when set to true, attempts to give the content editable element focus when it's loaded onto the page.
+Whether or not the editor should attempt to give the contenteditable element focus when it's loaded onto the page.
 
 ### `className`
 
 `String`
 
-An optional class name to apply to the content editable element.
+An optional class name to apply to the contenteditable element.
 
 ### `onChange`
 
@@ -77,13 +77,13 @@ ARIA property to define the role of the editor, it defaults to `textbox` when ed
 
 `Boolean`
 
-Whether spellcheck is turned on for the editor.
+Whether or not spellcheck is turned on for the editor.
 
 ### `style`
 
 `Object`
 
-An optional dictionary of styles to apply to the content editable element.
+An optional dictionary of styles to apply to the contenteditable element.
 
 ### `tabIndex`
 
@@ -170,7 +170,7 @@ Programmatically blur the editor.
 `change(fn) => Void`
 `change(fn, ...args) => Void`
 
-Programmatically invoke a change `fn` on the editor. The function will be invokved with a new `change` object representing the editor's current value.
+Programmatically invoke a change `fn` on the editor. The function will be invoked with a new `change` object representing the editor's current value.
 
 If extra `...args` are passed in, the change `fn` will be invoked with `(change, ...args)`, so you can use this as a shorthand for performing single-function changes.
 

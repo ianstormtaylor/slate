@@ -89,8 +89,12 @@ class Tables extends React.Component {
       const prevBlock = document.getClosestBlock(previous.key)
 
       if (prevBlock.type == 'table-cell') {
-        event.preventDefault()
-        return true
+        if (['Backspace', 'Delete', 'Enter'].includes(event.key)) {
+          event.preventDefault()
+          return true
+        } else {
+          return
+        }
       }
     }
 
@@ -138,6 +142,7 @@ class Tables extends React.Component {
 
   renderNode = props => {
     const { attributes, children, node } = props
+
     switch (node.type) {
       case 'table':
         return (
@@ -161,6 +166,7 @@ class Tables extends React.Component {
 
   renderMark = props => {
     const { children, mark, attributes } = props
+
     switch (mark.type) {
       case 'bold':
         return <strong {...attributes}>{children}</strong>

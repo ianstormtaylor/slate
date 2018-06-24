@@ -9,6 +9,7 @@ export default function(change) {
     type: 'bold',
     data: { thing: 'value' },
   })
+
   marks.push({
     type: 'italic',
     data: { thing2: 'value2' },

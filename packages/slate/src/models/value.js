@@ -665,14 +665,36 @@ class Value extends Record(DEFAULTS) {
 
     if (options.preserveSelection && !options.preserveKeys) {
       const { document, selection } = this
+
       object.selection.anchorPath = selection.isSet
         ? document.getPath(selection.anchorKey)
         : null
+
       object.selection.focusPath = selection.isSet
         ? document.getPath(selection.focusKey)
         : null
+
       delete object.selection.anchorKey
       delete object.selection.focusKey
+    }
+
+    if (
+      options.preserveDecorations &&
+      object.decorations &&
+      !options.preserveKeys
+    ) {
+      const { document } = this
+
+      object.decorations = object.decorations.map(decoration => {
+        const withPath = {
+          ...decoration,
+          anchorPath: document.getPath(decoration.anchorKey),
+          focusPath: document.getPath(decoration.focusKey),
+        }
+        delete withPath.anchorKey
+        delete withPath.focusKey
+        return withPath
+      })
     }
 
     return object

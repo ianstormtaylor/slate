@@ -337,6 +337,7 @@ Changes.deleteWordBackwardAtRange = (change, range, options) => {
  */
 
 Changes.deleteBackwardAtRange = (change, range, n = 1, options = {}) => {
+  if (n === 0) return
   const normalize = change.getFlag('normalize', options)
   const { value } = change
   const { document } = value
@@ -372,6 +373,7 @@ Changes.deleteBackwardAtRange = (change, range, n = 1, options = {}) => {
   // If the range is at the start of the text node, we need to figure out what
   // is behind it to know how to delete...
   const text = document.getDescendant(startKey)
+
   if (range.isAtStartOf(text)) {
     const prev = document.getPreviousText(text.key)
     const prevBlock = document.getClosestBlock(prev.key)
@@ -416,6 +418,7 @@ Changes.deleteBackwardAtRange = (change, range, n = 1, options = {}) => {
   while (n > traversed) {
     node = document.getPreviousText(node.key)
     const next = traversed + node.text.length
+
     if (n <= next) {
       offset = next - n
       break
@@ -470,7 +473,7 @@ Changes.deleteLineForwardAtRange = (change, range, options) => {
   const startBlock = document.getClosestBlock(startKey)
   const offset = startBlock.getOffset(startKey)
   const o = offset + startOffset
-  change.deleteForwardAtRange(range, o, options)
+  change.deleteForwardAtRange(range, startBlock.text.length - o, options)
 }
 
 /**
@@ -505,6 +508,7 @@ Changes.deleteWordForwardAtRange = (change, range, options) => {
  */
 
 Changes.deleteForwardAtRange = (change, range, n = 1, options = {}) => {
+  if (n === 0) return
   const normalize = change.getFlag('normalize', options)
   const { value } = change
   const { document } = value
@@ -530,6 +534,7 @@ Changes.deleteForwardAtRange = (change, range, n = 1, options = {}) => {
   if (block && block.isEmpty && document.nodes.size !== 1) {
     const nextBlock = document.getNextBlock(block.key)
     change.removeNodeByKey(block.key, { normalize })
+
     if (nextBlock && nextBlock.key) {
       change.moveToStartOf(nextBlock)
     }
@@ -544,6 +549,7 @@ Changes.deleteForwardAtRange = (change, range, n = 1, options = {}) => {
   // If the range is at the start of the text node, we need to figure out what
   // is behind it to know how to delete...
   const text = document.getDescendant(startKey)
+
   if (range.isAtEndOf(text)) {
     const next = document.getNextText(text.key)
     const nextBlock = document.getClosestBlock(next.key)
@@ -588,6 +594,7 @@ Changes.deleteForwardAtRange = (change, range, n = 1, options = {}) => {
   while (n > traversed) {
     node = document.getNextText(node.key)
     const next = traversed + node.text.length
+
     if (n <= next) {
       offset = n - traversed
       break
@@ -650,6 +657,7 @@ Changes.insertBlockAtRange = (change, range, block, options = {}) => {
     change.splitDescendantsByKey(startBlock.key, startKey, startOffset, {
       normalize: false,
     })
+
     change.insertNodeByKey(parent.key, index + 1, block, { normalize })
   }
 
@@ -674,6 +682,7 @@ Changes.insertFragmentAtRange = (change, range, fragment, options = {}) => {
   // If the range is expanded, delete it first.
   if (range.isExpanded) {
     change.deleteAtRange(range, { normalize: false })
+
     if (change.value.document.getDescendant(range.startKey)) {
       range = range.collapseToStart()
     } else {
@@ -765,6 +774,7 @@ Changes.insertFragmentAtRange = (change, range, fragment, options = {}) => {
 
     nextNodes.forEach((node, i) => {
       const newIndex = lastIndex + i
+
       change.moveNodeByKey(node.key, lastBlock.key, newIndex, {
         normalize: false,
       })
@@ -785,6 +795,7 @@ Changes.insertFragmentAtRange = (change, range, fragment, options = {}) => {
     firstBlock.nodes.forEach((inline, i) => {
       const o = startOffset == 0 ? 0 : 1
       const newIndex = inlineIndex + i + o
+
       change.insertNodeByKey(startBlock.key, newIndex, inline, {
         normalize: false,
       })
@@ -866,9 +877,10 @@ Changes.insertTextAtRange = (change, range, text, marks, options = {}) => {
   }
 
   // PERF: Unless specified, don't normalize if only inserting text.
-  if (normalize !== undefined) {
-    normalize = range.isExpanded
+  if (normalize === undefined) {
+    normalize = range.isExpanded && marks.size !== 0
   }
+
   change.insertTextByKey(key, offset, text, marks, { normalize: false })
 
   if (normalize) {
@@ -880,7 +892,10 @@ Changes.insertTextAtRange = (change, range, text, marks, options = {}) => {
     const normalizeAncestor = ancestors.findLast(n =>
       change.value.document.getDescendant(n.key)
     )
-    change.normalizeNodeByKey(normalizeAncestor.key)
+    // it is possible that normalizeAncestor doesn't return any node
+    // on that case fallback to startKey to be normalized
+    const normalizeKey = normalizeAncestor ? normalizeAncestor.key : startKey
+    change.normalizeNodeByKey(normalizeKey)
   }
 }
 
@@ -961,6 +976,7 @@ Changes.setBlockAtRange = (...args) => {
     'slate@0.33.0',
     'The `setBlockAtRange` method of Slate changes has been renamed to `setBlocksAtRange`.'
   )
+
   Changes.setBlocksAtRange(...args)
 }
 
@@ -990,6 +1006,7 @@ Changes.setInlineAtRange = (...args) => {
     'slate@0.33.0',
     'The `setInlineAtRange` method of Slate changes has been renamed to `setInlinesAtRange`.'
   )
+
   Changes.setInlinesAtRange(...args)
 }
 
@@ -1027,9 +1044,11 @@ Changes.splitBlockAtRange = (change, range, height = 1, options = {}) => {
     if (range.isBackward) range = range.flip()
     const nextBlock = change.value.document.getNextBlock(node.key)
     range = range.moveAnchorToStartOf(nextBlock)
+
     if (startKey === endKey) {
       range = range.moveFocusTo(range.anchorKey, endOffset - startOffset)
     }
+
     change.deleteAtRange(range, { normalize })
   }
 }
@@ -1174,9 +1193,11 @@ Changes.unwrapBlockAtRange = (change, range, properties, options = {}) => {
         })
     } else {
       const firstText = firstMatch.getFirstText()
+
       change.splitDescendantsByKey(block.key, firstText.key, 0, {
         normalize: false,
       })
+
       document = change.value.document
 
       children.forEach((child, i) => {
@@ -1338,6 +1359,7 @@ Changes.wrapInlineAtRange = (change, range, inline, options = {}) => {
   if (range.isCollapsed) {
     // Wrapping an inline void
     const inlineParent = document.getClosestInline(startKey)
+
     if (!inlineParent.isVoid) {
       return
     }
@@ -1426,6 +1448,7 @@ Changes.wrapInlineAtRange = (change, range, inline, options = {}) => {
     change.insertNodeByKey(startBlock.key, startIndex + 1, startNode, {
       normalize: false,
     })
+
     change.insertNodeByKey(endBlock.key, endIndex, endNode, {
       normalize: false,
     })

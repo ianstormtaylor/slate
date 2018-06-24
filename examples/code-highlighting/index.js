@@ -137,6 +137,7 @@ class CodeHighlighting extends React.Component {
 
   renderMark = props => {
     const { children, mark, attributes } = props
+
     switch (mark.type) {
       case 'comment':
         return (

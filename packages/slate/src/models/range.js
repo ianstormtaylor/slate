@@ -19,6 +19,7 @@ const DEFAULTS = {
   isBackward: null,
   isFocused: false,
   marks: null,
+  isAtomic: false,
 }
 
 /**
@@ -84,6 +85,7 @@ class Range extends Record(DEFAULTS) {
         isBackward: attrs.isBackward,
         isFocused: attrs.isFocused,
         marks: attrs.marks,
+        isAtomic: attrs.isAtomic,
       }
     }
 
@@ -99,6 +101,7 @@ class Range extends Record(DEFAULTS) {
       if ('isFocused' in attrs) props.isFocused = attrs.isFocused
       if ('marks' in attrs)
         props.marks = attrs.marks == null ? null : Mark.createSet(attrs.marks)
+      if ('isAtomic' in attrs) props.isAtomic = attrs.isAtomic
       return props
     }
 
@@ -123,6 +126,7 @@ class Range extends Record(DEFAULTS) {
       isBackward = null,
       isFocused = false,
       marks = null,
+      isAtomic = false,
     } = object
 
     const range = new Range({
@@ -133,6 +137,7 @@ class Range extends Record(DEFAULTS) {
       isBackward,
       isFocused,
       marks: marks == null ? null : new Set(marks.map(Mark.fromJSON)),
+      isAtomic,
     })
 
     return range
@@ -682,6 +687,7 @@ class Range extends Record(DEFAULTS) {
 
     const anchorOffsetType = typeof anchorOffset
     const focusOffsetType = typeof focusOffset
+
     if (anchorOffsetType != 'number' || focusOffsetType != 'number') {
       logger.warn(
         `The range offsets should be numbers, but they were of type "${anchorOffsetType}" and "${focusOffsetType}".`
@@ -709,6 +715,7 @@ class Range extends Record(DEFAULTS) {
         'The range was invalid and was reset. The range in question was:',
         range
       )
+
       const first = node.getFirstText()
       return range.merge({
         anchorKey: first ? first.key : null,
@@ -725,6 +732,7 @@ class Range extends Record(DEFAULTS) {
         'The range anchor was set to a Node that is not a Text node. This should not happen and can degrade performance. The node in question was:',
         anchorNode
       )
+
       const anchorText = anchorNode.getTextAtOffset(anchorOffset)
       const offset = anchorNode.getOffset(anchorText.key)
       anchorOffset = anchorOffset - offset
@@ -737,6 +745,7 @@ class Range extends Record(DEFAULTS) {
         'The range focus was set to a Node that is not a Text node. This should not happen and can degrade performance. The node in question was:',
         focusNode
       )
+
       const focusText = focusNode.getTextAtOffset(focusOffset)
       const offset = focusNode.getOffset(focusText.key)
       focusOffset = focusOffset - offset
@@ -779,6 +788,7 @@ class Range extends Record(DEFAULTS) {
       isFocused: this.isFocused,
       marks:
         this.marks == null ? null : this.marks.toArray().map(m => m.toJSON()),
+      isAtomic: this.isAtomic,
     }
 
     return object

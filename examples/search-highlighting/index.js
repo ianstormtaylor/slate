@@ -56,6 +56,7 @@ class SearchHighlighting extends React.Component {
             focusKey: key,
             focusOffset: offset,
             marks: [{ type: 'highlight' }],
+            atomic: true,
           })
         }
 
@@ -141,6 +142,7 @@ class SearchHighlighting extends React.Component {
 
   renderMark = props => {
     const { children, mark, attributes } = props
+
     switch (mark.type) {
       case 'highlight':
         return (

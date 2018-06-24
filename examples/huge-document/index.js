@@ -96,6 +96,7 @@ class HugeDocument extends React.Component {
 
   renderNode = props => {
     const { attributes, children, node } = props
+
     switch (node.type) {
       case 'heading':
         return <h1 {...attributes}>{children}</h1>
@@ -111,6 +112,7 @@ class HugeDocument extends React.Component {
 
   renderMark = props => {
     const { children, mark, attributes } = props
+
     switch (mark.type) {
       case 'bold':
         return <strong {...attributes}>{children}</strong>
