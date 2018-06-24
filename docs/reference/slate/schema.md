@@ -155,11 +155,11 @@ Will validate a node's children. The `nodes` definitions can declare the `object
 
 ```js
 {
-  marks: ['italic']
+  marks: [{ type: 'bold' }, { type: 'italic' }]
 }
 ```
 
-Will validate a node's marks. The `marks` definitions can declare a list of mark types to be allowed. If declared, any marks that are not in the list will be removed.
+Will validate a node's marks. The `marks` definitions can declare the `type` property, providing a list of mark types to be allowed. If declared, any marks that are not in the list will be removed.
 
 ### `normalize`
 

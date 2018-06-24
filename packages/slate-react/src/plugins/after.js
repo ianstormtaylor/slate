@@ -163,8 +163,6 @@ function AfterPlugin() {
 
   function onDragOver(event, change, editor) {
     debug('onDragOver', { event })
-
-    isDraggingInternally = false
   }
 
   /**

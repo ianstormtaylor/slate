@@ -149,6 +149,7 @@
       { "blankLine": "any", "prev": "multiline-expression", "next": "return" },
       { "blankLine": "always", "prev": "*", "next": "multiline-expression" },
       { "blankLine": "always", "prev": "*", "next": "multiline-expression" },
+      { "blankLine": "any", "prev": "empty", "next": "multiline-expression" },
       { "blankLine": "always", "prev": "multiline-block-like", "next": "*" },
       { "blankLine": "any", "prev": "multiline-block-like", "next": "return" },
       { "blankLine": "always", "prev": "*", "next": "multiline-block-like" },
