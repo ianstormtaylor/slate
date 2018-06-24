@@ -1393,21 +1393,18 @@ Changes.wrapInlineAtRange = (change, range, inline, options = {}) => {
   const endIndex = endBlock.nodes.indexOf(endChild)
 
   if (startInline && startInline == endInline) {
-    let leafsize = startBlock
-      .getTextsAtRange(range)
-      .get(0)
-      .get('leaves').size
-    let textPosition = 0
-    let selectedLeaves = startBlock
+    let leaves = startBlock
       .getTextsAtRange(range)
       .get(0)
       .get('leaves')
+    let textPosition = 0
+    let selectedLeaves = leaves
       .map((leaf, idx) => {
         let text = leaf.get('text')
         if (idx == 0) {
           text = text.substr(startOffset)
         }
-        if (idx == leafsize - 1) {
+        if (idx == leaves.size - 1) {
           text = text.substr(0, endOffset - textPosition - startOffset)
         }
         textPosition += text.length
