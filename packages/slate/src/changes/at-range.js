@@ -1365,6 +1365,7 @@ Changes.wrapInlineAtRange = (change, range, inline, options = {}) => {
 
     return change.wrapInlineByKey(inlineParent.key, inline, options)
   }
+
   inline = Inline.create(inline)
   inline = inline.set('nodes', inline.nodes.clear())
 
@@ -1375,14 +1376,17 @@ Changes.wrapInlineAtRange = (change, range, inline, options = {}) => {
   const endInline = document.getClosestInline(endKey)
   let startChild = startBlock.getFurthestAncestor(startKey)
   let endChild = endBlock.getFurthestAncestor(endKey)
+
   if (!startInline || startInline != endInline) {
     change.splitDescendantsByKey(endChild.key, endKey, endOffset, {
       normalize: false,
     })
+
     change.splitDescendantsByKey(startChild.key, startKey, startOffset, {
       normalize: false,
     })
   }
+
   document = change.value.document
   startBlock = document.getDescendant(startBlock.key)
   endBlock = document.getDescendant(endBlock.key)
@@ -1408,18 +1412,19 @@ Changes.wrapInlineAtRange = (change, range, inline, options = {}) => {
         if (idx == leaves.size - 1) {
           text = text.substr(0, endOffset - textPosition - startOffset)
         }
-        
+
         textPosition += text.length
         return leaf.set('text', text)
       })
       .filter(leaf => {
         return leaf.get('text') != ''
       })
+
     inline = inline.set(
       'nodes',
       List([new Text({ leaves: selectedLeaves, key: generateKey() })])
     )
-    // inline = inline.set('nodes', List([Text.create(text)]))
+
     Changes.insertInlineAtRange(change, range, inline, { normalize: false })
     const inlinekey = inline.getFirstText().key
     const rng = {
