@@ -129,8 +129,32 @@ class Content extends React.Component {
    * On update, update the selection.
    */
 
-  componentDidUpdate = () => {
-    this.updateSelection()
+  getSnapshotBeforeUpdate() {
+    // Android changes are debounced and the range needs to be cached
+    if (!IS_ANDROID) return null
+    const selection = window.getSelection()
+    if (selection.rangeCount !== 1) return null
+    const range = selection.getRangeAt(0)
+    return {
+      startOffset: range.startOffset,
+      endOffset: range.endOffset,
+      startContainer: range.startContainer,
+      endContainer: range.endContainer,
+    }
+  }
+
+  componentDidUpdate = (prevProps, prevState, snapshot) => {
+    if (snapshot) {
+      const selection = window.getSelection()
+      if (selection.rangeCount === 1) {
+        const range = selection.getRangeAt(0)
+        const { startContainer, endContainer, startOffset, endOffset } = snapshot
+        range.setStart(startContainer, startOffset)
+        range.setEnd(endContainer, endOffset)
+      }
+    } else {
+      this.updateSelection()
+    }
   }
 
   /**
