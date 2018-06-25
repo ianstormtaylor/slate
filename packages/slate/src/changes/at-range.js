@@ -1,10 +1,7 @@
 import { List } from 'immutable'
 import logger from 'slate-dev-logger'
-
 import Block from '../models/block'
 import Inline from '../models/inline'
-import Text from '../models/text'
-import generateKey from '../utils/generate-key'
 import Mark from '../models/mark'
 import Node from '../models/node'
 import String from '../utils/string'
@@ -1396,35 +1393,12 @@ Changes.wrapInlineAtRange = (change, range, inline, options = {}) => {
   const endIndex = endBlock.nodes.indexOf(endChild)
 
   if (startInline && startInline == endInline) {
-    const leaves = startBlock
+    const text = startBlock
       .getTextsAtRange(range)
       .get(0)
-      .get('leaves')
-    let textPosition = 0
-    const selectedLeaves = leaves
-      .map((leaf, idx) => {
-        let text = leaf.get('text')
-
-        if (idx == 0) {
-          text = text.substr(startOffset)
-        }
-
-        if (idx == leaves.size - 1) {
-          text = text.substr(0, endOffset - textPosition - startOffset)
-        }
-
-        textPosition += text.length
-        return leaf.set('text', text)
-      })
-      .filter(leaf => {
-        return leaf.get('text') != ''
-      })
-
-    inline = inline.set(
-      'nodes',
-      List([new Text({ leaves: selectedLeaves, key: generateKey() })])
-    )
-
+      .splitText(startOffset)[1]
+      .splitText(endOffset - startOffset)[0]
+    inline = inline.set('nodes', List([text]))
     Changes.insertInlineAtRange(change, range, inline, { normalize: false })
     const inlinekey = inline.getFirstText().key
     const rng = {
