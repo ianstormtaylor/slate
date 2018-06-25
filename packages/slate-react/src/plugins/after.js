@@ -36,6 +36,7 @@ const ANDROID_KEYSTROKE_DEBOUNCE = 300
 function AfterPlugin() {
   let isDraggingInternally = null
   let stagedChange = null
+
   /**
    * On before input, correct any browser inconsistencies.
    *
@@ -362,11 +363,16 @@ function AfterPlugin() {
       clearTimeout(stagedChange)
 
       stagedChange = setTimeout(() => {
-        change.insertTextAtRange(entire, textContent, leaf.marks).select(corrected)
+        change
+          .insertTextAtRange(entire, textContent, leaf.marks)
+          .select(corrected)
+
         editor.onChange(change)
       }, ANDROID_KEYSTROKE_DEBOUNCE)
     } else {
-      change.insertTextAtRange(entire, textContent, leaf.marks).select(corrected)
+      change
+        .insertTextAtRange(entire, textContent, leaf.marks)
+        .select(corrected)
     }
   }
 

@@ -146,9 +146,15 @@ class Content extends React.Component {
   componentDidUpdate = (prevProps, prevState, snapshot) => {
     if (snapshot) {
       const selection = window.getSelection()
+
       if (selection.rangeCount === 1) {
         const range = selection.getRangeAt(0)
-        const { startContainer, endContainer, startOffset, endOffset } = snapshot
+        const {
+          startContainer,
+          endContainer,
+          startOffset,
+          endOffset,
+        } = snapshot
         range.setStart(startContainer, startOffset)
         range.setEnd(endContainer, endOffset)
       }
