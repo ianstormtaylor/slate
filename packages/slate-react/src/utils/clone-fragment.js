@@ -60,10 +60,12 @@ function cloneFragment(event, value, fragment = value.fragment) {
 
   // Remove any zero-width space spans from the cloned DOM so that they don't
   // show up elsewhere when pasted.
-  ;[].slice.call(Array.from(contents.querySelectorAll(ZERO_WIDTH_SELECTOR))).forEach(zw => {
-    const isNewline = zw.getAttribute(ZERO_WIDTH_ATTRIBUTE) === 'n'
-    zw.textContent = isNewline ? '\n' : ''
-  })
+  ;[].slice
+    .call(Array.from(contents.querySelectorAll(ZERO_WIDTH_SELECTOR)))
+    .forEach(zw => {
+      const isNewline = zw.getAttribute(ZERO_WIDTH_ATTRIBUTE) === 'n'
+      zw.textContent = isNewline ? '\n' : ''
+    })
 
   // Set a `data-slate-fragment` attribute on a non-empty node, so it shows up
   // in the HTML, and can be used for intra-Slate pasting. If it's a text
