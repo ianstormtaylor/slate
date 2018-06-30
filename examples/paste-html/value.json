@@ -28,6 +28,45 @@
             ]
           }
         ]
+      },
+      {
+        "kind": "block",
+        "type": "paragraph",
+        "nodes": [
+          {
+            "kind": "text",
+            "leaves": [
+              {
+                "text": "Note: You should copy and paste rendered HTML, not raw HTML code. For example, copy what you see on"
+              }
+            ]
+          },
+          {
+            "kind": "inline",
+            "type": "link",
+            "data": {
+              "href": "http://www.example.com/"
+            },
+            "nodes": [
+              {
+                "kind": "text",
+                "leaves": [
+                  {
+                    "text": "http://www.example.com/"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "kind": "text",
+            "leaves": [
+              {
+                "text": "and paste it here. You will see that the styling is preserved."
+              }
+            ]
+          },
+        ]
       }
     ]
   }
