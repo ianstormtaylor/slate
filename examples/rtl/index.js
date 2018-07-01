@@ -5,7 +5,7 @@ import React from 'react'
 import initialValue from './value.json'
 
 /**
- * The plain text example.
+ * A right-to-left text example.
  *
  * @type {Component}
  */
@@ -19,6 +19,40 @@ class RTL extends React.Component {
 
   state = {
     value: Value.fromJSON(initialValue),
+  }
+
+  /**
+   * Render the editor.
+   *
+   * @return {Component} component
+   */
+
+  render() {
+    return (
+      <Editor
+        placeholder="Enter some plain text..."
+        value={this.state.value}
+        onChange={this.onChange}
+        onKeyDown={this.onKeyDown}
+        renderNode={this.renderNode}
+      />
+    )
+  }
+
+  /**
+   * Render a Slate node.
+   *
+   * @param {Object} props
+   * @return {Element}
+   */
+
+  renderNode = props => {
+    const { attributes, children, node } = props
+
+    switch (node.type) {
+      case 'block-quote':
+        return <blockquote {...attributes}>{children}</blockquote>
+    }
   }
 
   /**
@@ -43,42 +77,6 @@ class RTL extends React.Component {
       event.preventDefault()
       change.insertText('\n')
       return true
-    }
-  }
-
-  /**
-   * Render the editor.
-   *
-   * @return {Component} component
-   */
-
-  render() {
-    return (
-      <div className="editor">
-        <Editor
-          placeholder="Enter some plain text..."
-          value={this.state.value}
-          onChange={this.onChange}
-          onKeyDown={this.onKeyDown}
-          renderNode={this.renderNode}
-        />
-      </div>
-    )
-  }
-
-  /**
-   * Render a Slate node.
-   *
-   * @param {Object} props
-   * @return {Element}
-   */
-
-  renderNode = props => {
-    const { attributes, children, node } = props
-
-    switch (node.type) {
-      case 'block-quote':
-        return <blockquote {...attributes}>{children}</blockquote>
     }
   }
 }

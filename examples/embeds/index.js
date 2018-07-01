@@ -23,16 +23,6 @@ class Embeds extends React.Component {
   }
 
   /**
-   * On change.
-   *
-   * @param {Change} change
-   */
-
-  onChange = ({ value }) => {
-    this.setState({ value })
-  }
-
-  /**
    * Render the app.
    *
    * @return {Element} element
@@ -40,14 +30,12 @@ class Embeds extends React.Component {
 
   render() {
     return (
-      <div className="editor">
-        <Editor
-          placeholder="Enter some text..."
-          value={this.state.value}
-          onChange={this.onChange}
-          renderNode={this.renderNode}
-        />
-      </div>
+      <Editor
+        placeholder="Enter some text..."
+        value={this.state.value}
+        onChange={this.onChange}
+        renderNode={this.renderNode}
+      />
     )
   }
 
@@ -63,6 +51,16 @@ class Embeds extends React.Component {
       case 'video':
         return <Video {...props} />
     }
+  }
+
+  /**
+   * On change.
+   *
+   * @param {Change} change
+   */
+
+  onChange = ({ value }) => {
+    this.setState({ value })
   }
 }
 

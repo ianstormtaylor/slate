@@ -6,6 +6,21 @@ import React from 'react'
 import initialValue from './value.json'
 import imageExtensions from 'image-extensions'
 import isUrl from 'is-url'
+import styled from 'react-emotion'
+import { Button, Icon, Toolbar } from '../components'
+
+/**
+ * A styled image block component.
+ *
+ * @type {Component}
+ */
+
+const Image = styled('img')`
+  display: block;
+  max-width: 100%;
+  max-height: 20em;
+  box-shadow: ${props => (props.selected ? '0 0 0 2px blue;' : 'none')};
+`
 
 /*
  * A function to determine whether a URL has an image extension.
@@ -84,37 +99,11 @@ class Images extends React.Component {
   render() {
     return (
       <div>
-        {this.renderToolbar()}
-        {this.renderEditor()}
-      </div>
-    )
-  }
-
-  /**
-   * Render the toolbar.
-   *
-   * @return {Element} element
-   */
-
-  renderToolbar = () => {
-    return (
-      <div className="menu toolbar-menu">
-        <span className="button" onMouseDown={this.onClickImage}>
-          <span className="material-icons">image</span>
-        </span>
-      </div>
-    )
-  }
-
-  /**
-   * Render the editor.
-   *
-   * @return {Element} element
-   */
-
-  renderEditor = () => {
-    return (
-      <div className="editor">
+        <Toolbar>
+          <Button onMouseDown={this.onClickImage}>
+            <Icon>image</Icon>
+          </Button>
+        </Toolbar>
         <Editor
           placeholder="Enter some text..."
           value={this.state.value}
@@ -141,11 +130,7 @@ class Images extends React.Component {
     switch (node.type) {
       case 'image': {
         const src = node.data.get('src')
-        const className = isSelected ? 'active' : null
-        const style = { display: 'block' }
-        return (
-          <img src={src} className={className} style={style} {...attributes} />
-        )
+        return <Image src={src} selected={isSelected} {...attributes} />
       }
     }
   }

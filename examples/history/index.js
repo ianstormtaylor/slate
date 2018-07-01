@@ -3,18 +3,7 @@ import { Editor } from 'slate-react'
 
 import React from 'react'
 import initialValue from './value.json'
-
-/**
- * Toolbar button component.
- *
- * @type {Function}
- */
-
-const ToolbarButton = props => (
-  <span className="button" onMouseDown={props.onMouseDown}>
-    <span className="material-icons">{props.icon}</span>
-  </span>
-)
+import { Button, Icon, Toolbar } from '../components'
 
 /**
  * The history example.
@@ -31,6 +20,36 @@ class History extends React.Component {
 
   state = {
     value: Value.fromJSON(initialValue),
+  }
+
+  /**
+   * Render the editor.
+   *
+   * @return {Component} component
+   */
+
+  render() {
+    const { value } = this.state
+    const { history } = value
+    return (
+      <div>
+        <Toolbar>
+          <Button onMouseDown={this.onClickUndo}>
+            <Icon>undo</Icon>
+          </Button>
+          <Button onMouseDown={this.onClickRedo}>
+            <Icon>redo</Icon>
+          </Button>
+          <span>Undos: {history.undos.size}</span>
+          <span>Redos: {history.redos.size}</span>
+        </Toolbar>
+        <Editor
+          placeholder="Enter some text..."
+          value={this.state.value}
+          onChange={this.onChange}
+        />
+      </div>
+    )
   }
 
   /**
@@ -65,57 +84,6 @@ class History extends React.Component {
     const { value } = this.state
     const change = value.change().undo()
     this.onChange(change)
-  }
-
-  /**
-   * Render the editor.
-   *
-   * @return {Component} component
-   */
-
-  render() {
-    return (
-      <div className="editor">
-        {this.renderToolbar()}
-        {this.renderEditor()}
-      </div>
-    )
-  }
-
-  /**
-   * Render the toolbar.
-   *
-   * @return {Element}
-   */
-
-  renderToolbar = () => {
-    const { value } = this.state
-    return (
-      <div className="menu toolbar-menu">
-        <ToolbarButton icon="undo" onMouseDown={this.onClickUndo} />
-        <ToolbarButton icon="redo" onMouseDown={this.onClickRedo} />
-        <span className="button">Undos: {value.history.undos.size}</span>
-        <span className="button">Redos: {value.history.redos.size}</span>
-      </div>
-    )
-  }
-
-  /**
-   * Render the Slate editor.
-   *
-   * @return {Element}
-   */
-
-  renderEditor = () => {
-    return (
-      <div className="editor">
-        <Editor
-          placeholder="Enter some text..."
-          value={this.state.value}
-          onChange={this.onChange}
-        />
-      </div>
-    )
   }
 }
 
