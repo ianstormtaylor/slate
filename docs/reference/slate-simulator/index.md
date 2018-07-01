@@ -83,6 +83,12 @@ Simulator a `focus` event with an `event` object.
 
 Simulator a `keyDown` event with an `event` object.
 
+### `paste`
+
+`paste(event: Object) => Simulator`
+
+Simulator a `paste` event with an `event` object.
+
 ### `select`
 
 `select(event: Object) => Simulator`
