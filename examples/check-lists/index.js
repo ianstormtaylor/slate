@@ -99,6 +99,39 @@ class CheckLists extends React.Component {
   }
 
   /**
+   * Render.
+   *
+   * @return {Element}
+   */
+
+  render() {
+    return (
+      <Editor
+        spellCheck
+        placeholder="Get to work..."
+        value={this.state.value}
+        onChange={this.onChange}
+        onKeyDown={this.onKeyDown}
+        renderNode={this.renderNode}
+      />
+    )
+  }
+
+  /**
+   * Render a Slate node.
+   *
+   * @param {Object} props
+   * @return {Element}
+   */
+
+  renderNode = props => {
+    switch (props.node.type) {
+      case 'check-list-item':
+        return <CheckListItem {...props} />
+    }
+  }
+
+  /**
    * On change, save the new value.
    *
    * @param {Change} change
@@ -138,43 +171,6 @@ class CheckLists extends React.Component {
     ) {
       change.setBlocks('paragraph')
       return true
-    }
-  }
-
-  /**
-   * Render.
-   *
-   * @return {Element}
-   */
-
-  render() {
-    return (
-      <div>
-        <div className="editor">
-          <Editor
-            spellCheck
-            placeholder="Get to work..."
-            value={this.state.value}
-            onChange={this.onChange}
-            onKeyDown={this.onKeyDown}
-            renderNode={this.renderNode}
-          />
-        </div>
-      </div>
-    )
-  }
-
-  /**
-   * Render a Slate node.
-   *
-   * @param {Object} props
-   * @return {Element}
-   */
-
-  renderNode = props => {
-    switch (props.node.type) {
-      case 'check-list-item':
-        return <CheckListItem {...props} />
     }
   }
 }

@@ -4,6 +4,20 @@ import { Editor } from 'slate-react'
 import React from 'react'
 import CollapseOnEscape from 'slate-collapse-on-escape'
 import SoftBreak from 'slate-soft-break'
+import styled from 'react-emotion'
+
+/**
+ * A styled word counter component.
+ *
+ * @type {Component}
+ */
+
+const WordCounter = styled('span')`
+  margin-top: 10px;
+  padding: 12px;
+  background-color: #ebebeb;
+  display: inline-block;
+`
 
 /**
  * A simple word count plugin.
@@ -18,9 +32,9 @@ function WordCount(options) {
       return (
         <div>
           <div>{props.children}</div>
-          <span className="word-counter">
+          <WordCounter>
             Word Count: {props.value.document.text.split(' ').length}
-          </span>
+          </WordCounter>
         </div>
       )
     },
@@ -54,16 +68,6 @@ The third is an example of using the plugin.render property to create a higher-o
   }
 
   /**
-   * On change.
-   *
-   * @param {Change} change
-   */
-
-  onChange = ({ value }) => {
-    this.setState({ value })
-  }
-
-  /**
    * Render the editor.
    *
    * @return {Component} component
@@ -71,15 +75,23 @@ The third is an example of using the plugin.render property to create a higher-o
 
   render() {
     return (
-      <div className="editor">
-        <Editor
-          placeholder="Enter some text..."
-          plugins={plugins}
-          value={this.state.value}
-          onChange={this.onChange}
-        />
-      </div>
+      <Editor
+        placeholder="Enter some text..."
+        plugins={plugins}
+        value={this.state.value}
+        onChange={this.onChange}
+      />
     )
+  }
+
+  /**
+   * On change.
+   *
+   * @param {Change} change
+   */
+
+  onChange = ({ value }) => {
+    this.setState({ value })
   }
 }
 
