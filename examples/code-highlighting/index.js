@@ -46,6 +46,23 @@ function CodeBlockLine(props) {
 }
 
 /**
+ * A helper function to return the content of a Prism `token`.
+ *
+ * @param {Object} token
+ * @return {String}
+ */
+
+function getContent(token) {
+  if (typeof token == 'string') {
+    return token
+  } else if (typeof token.content == 'string') {
+    return token.content
+  } else {
+    return token.content.map(getContent).join('')
+  }
+}
+
+/**
  * The code highlighting example.
  *
  * @type {Component}
@@ -63,52 +80,22 @@ class CodeHighlighting extends React.Component {
   }
 
   /**
-   * On change, save the new value.
-   *
-   * @param {Change} change
-   */
-
-  onChange = ({ value }) => {
-    this.setState({ value })
-  }
-
-  /**
-   * On key down inside code blocks, insert soft new lines.
-   *
-   * @param {Event} event
-   * @param {Change} change
-   * @return {Change}
-   */
-
-  onKeyDown = (event, change) => {
-    const { value } = change
-    const { startBlock } = value
-    if (event.key != 'Enter') return
-    if (startBlock.type != 'code') return
-    if (value.isExpanded) change.delete()
-    change.insertText('\n')
-    return true
-  }
-
-  /**
    * Render.
    *
    * @return {Component}
    */
 
-  render = () => {
+  render() {
     return (
-      <div className="editor">
-        <Editor
-          placeholder="Write some code..."
-          value={this.state.value}
-          onChange={this.onChange}
-          onKeyDown={this.onKeyDown}
-          renderNode={this.renderNode}
-          renderMark={this.renderMark}
-          decorateNode={this.decorateNode}
-        />
-      </div>
+      <Editor
+        placeholder="Write some code..."
+        value={this.state.value}
+        onChange={this.onChange}
+        onKeyDown={this.onKeyDown}
+        renderNode={this.renderNode}
+        renderMark={this.renderMark}
+        decorateNode={this.decorateNode}
+      />
     )
   }
 
@@ -166,14 +153,32 @@ class CodeHighlighting extends React.Component {
     }
   }
 
-  tokenToContent = token => {
-    if (typeof token == 'string') {
-      return token
-    } else if (typeof token.content == 'string') {
-      return token.content
-    } else {
-      return token.content.map(this.tokenToContent).join('')
-    }
+  /**
+   * On change, save the new value.
+   *
+   * @param {Change} change
+   */
+
+  onChange = ({ value }) => {
+    this.setState({ value })
+  }
+
+  /**
+   * On key down inside code blocks, insert soft new lines.
+   *
+   * @param {Event} event
+   * @param {Change} change
+   * @return {Change}
+   */
+
+  onKeyDown = (event, change) => {
+    const { value } = change
+    const { startBlock } = value
+    if (event.key != 'Enter') return
+    if (startBlock.type != 'code') return
+    if (value.isExpanded) change.delete()
+    change.insertText('\n')
+    return true
   }
 
   /**
@@ -202,7 +207,7 @@ class CodeHighlighting extends React.Component {
       startText = endText
       startOffset = endOffset
 
-      const content = this.tokenToContent(token)
+      const content = getContent(token)
       const newlines = content.split('\n').length - 1
       const length = content.length - newlines
       const end = start + length

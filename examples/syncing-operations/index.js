@@ -3,7 +3,21 @@ import { Value } from 'slate'
 
 import React from 'react'
 import initialValue from './value.json'
+import styled from 'react-emotion'
 import { isKeyHotkey } from 'is-hotkey'
+import { Button, Icon, Toolbar } from '../components'
+
+/**
+ * A spacer component.
+ *
+ * @type {Component}
+ */
+
+const Spacer = styled('div')`
+  height: 20px;
+  background-color: #eee;
+  margin: 20px -20px;
+`
 
 /**
  * Hotkey matchers.
@@ -56,6 +70,74 @@ class SyncingEditor extends React.Component {
   hasMark = type => {
     const { value } = this.state
     return value.activeMarks.some(mark => mark.type == type)
+  }
+
+  /**
+   * Render.
+   *
+   * @return {Element}
+   */
+
+  render() {
+    return (
+      <div>
+        <Toolbar>
+          {this.renderMarkButton('bold', 'format_bold')}
+          {this.renderMarkButton('italic', 'format_italic')}
+          {this.renderMarkButton('underlined', 'format_underlined')}
+          {this.renderMarkButton('code', 'code')}
+        </Toolbar>
+        <Editor
+          placeholder="Enter some text..."
+          value={this.state.value}
+          onChange={this.onChange}
+          onKeyDown={this.onKeyDown}
+          renderMark={this.renderMark}
+          spellCheck
+        />
+      </div>
+    )
+  }
+
+  /**
+   * Render a mark-toggling toolbar button.
+   *
+   * @param {String} type
+   * @param {String} icon
+   * @return {Element}
+   */
+
+  renderMarkButton = (type, icon) => {
+    return (
+      <Button
+        active={this.hasMark(type)}
+        onMouseDown={event => this.onClickMark(event, type)}
+      >
+        <Icon>{icon}</Icon>
+      </Button>
+    )
+  }
+
+  /**
+   * Render a Slate mark.
+   *
+   * @param {Object} props
+   * @return {Element}
+   */
+
+  renderMark = props => {
+    const { children, mark, attributes } = props
+
+    switch (mark.type) {
+      case 'bold':
+        return <strong {...attributes}>{children}</strong>
+      case 'code':
+        return <code {...attributes}>{children}</code>
+      case 'italic':
+        return <em {...attributes}>{children}</em>
+      case 'underlined':
+        return <u {...attributes}>{children}</u>
+    }
   }
 
   /**
@@ -115,101 +197,6 @@ class SyncingEditor extends React.Component {
     const change = value.change().toggleMark(type)
     this.onChange(change)
   }
-
-  /**
-   * Render.
-   *
-   * @return {Element}
-   */
-
-  render() {
-    return (
-      <div>
-        {this.renderToolbar()}
-        {this.renderEditor()}
-      </div>
-    )
-  }
-
-  /**
-   * Render the toolbar.
-   *
-   * @return {Element}
-   */
-
-  renderToolbar = () => {
-    return (
-      <div className="menu toolbar-menu">
-        {this.renderButton('bold', 'format_bold')}
-        {this.renderButton('italic', 'format_italic')}
-        {this.renderButton('underlined', 'format_underlined')}
-        {this.renderButton('code', 'code')}
-      </div>
-    )
-  }
-
-  /**
-   * Render a mark-toggling toolbar button.
-   *
-   * @param {String} type
-   * @param {String} icon
-   * @return {Element}
-   */
-
-  renderButton = (type, icon) => {
-    const isActive = this.hasMark(type)
-    const onMouseDown = event => this.onClickMark(event, type)
-
-    return (
-      // eslint-disable-next-line react/jsx-no-bind
-      <span className="button" onMouseDown={onMouseDown} data-active={isActive}>
-        <span className="material-icons">{icon}</span>
-      </span>
-    )
-  }
-
-  /**
-   * Render the editor.
-   *
-   * @return {Element}
-   */
-
-  renderEditor = () => {
-    return (
-      <div className="editor">
-        <Editor
-          placeholder="Enter some text..."
-          value={this.state.value}
-          onChange={this.onChange}
-          onKeyDown={this.onKeyDown}
-          renderMark={this.renderMark}
-          spellCheck
-        />
-      </div>
-    )
-  }
-
-  /**
-   * Render a Slate mark.
-   *
-   * @param {Object} props
-   * @return {Element}
-   */
-
-  renderMark = props => {
-    const { children, mark, attributes } = props
-
-    switch (mark.type) {
-      case 'bold':
-        return <strong {...attributes}>{children}</strong>
-      case 'code':
-        return <code {...attributes}>{children}</code>
-      case 'italic':
-        return <em {...attributes}>{children}</em>
-      case 'underlined':
-        return <u {...attributes}>{children}</u>
-    }
-  }
 }
 
 /**
@@ -220,23 +207,25 @@ class SyncingEditor extends React.Component {
 
 class SyncingOperationsExample extends React.Component {
   /**
-   * Save a reference to editor `one`.
+   * Render both editors.
    *
-   * @param {SyncingEditor} one
+   * @return {Element}
    */
 
-  oneRef = one => {
-    this.one = one
-  }
-
-  /**
-   * Save a reference to editor `two`.
-   *
-   * @param {SyncingEditor} two
-   */
-
-  twoRef = two => {
-    this.two = two
+  render() {
+    return (
+      <div>
+        <SyncingEditor
+          ref={one => (this.one = one)}
+          onChange={this.onOneChange}
+        />
+        <Spacer />
+        <SyncingEditor
+          ref={two => (this.two = two)}
+          onChange={this.onTwoChange}
+        />
+      </div>
+    )
   }
 
   /**
@@ -269,28 +258,6 @@ class SyncingOperationsExample extends React.Component {
     setTimeout(() => {
       this.one.applyOperations(ops)
     })
-  }
-
-  /**
-   * Render both editors.
-   *
-   * @return {Element}
-   */
-
-  render() {
-    return (
-      <div>
-        <SyncingEditor ref={this.oneRef} onChange={this.onOneChange} />
-        <div
-          style={{
-            height: '20px',
-            backgroundColor: '#eee',
-            margin: '20px -20px',
-          }}
-        />
-        <SyncingEditor ref={this.twoRef} onChange={this.onTwoChange} />
-      </div>
-    )
   }
 }
 
