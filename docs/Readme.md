@@ -25,6 +25,7 @@
 * [Contributing](../Contributing.md)
 * [Changelog](./general/changelog.md)
 * [FAQ](./general/faq.md)
+* [Glossary](./general/glossary.md)
 
 ## Slate Core
 
