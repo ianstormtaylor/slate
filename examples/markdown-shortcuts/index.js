@@ -62,15 +62,13 @@ class MarkdownShortcuts extends React.Component {
 
   render() {
     return (
-      <div className="editor">
-        <Editor
-          placeholder="Write some markdown..."
-          value={this.state.value}
-          onChange={this.onChange}
-          onKeyDown={this.onKeyDown}
-          renderNode={this.renderNode}
-        />
-      </div>
+      <Editor
+        placeholder="Write some markdown..."
+        value={this.state.value}
+        onChange={this.onChange}
+        onKeyDown={this.onKeyDown}
+        renderNode={this.renderNode}
+      />
     )
   }
 

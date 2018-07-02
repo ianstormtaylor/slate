@@ -52,16 +52,6 @@ class ForcedLayout extends React.Component {
   }
 
   /**
-   * On change.
-   *
-   * @param {Change} change
-   */
-
-  onChange = ({ value }) => {
-    this.setState({ value })
-  }
-
-  /**
    * Render the editor.
    *
    * @return {Component} component
@@ -69,15 +59,13 @@ class ForcedLayout extends React.Component {
 
   render() {
     return (
-      <div className="editor">
-        <Editor
-          placeholder="Enter a title..."
-          value={this.state.value}
-          schema={schema}
-          onChange={this.onChange}
-          renderNode={this.renderNode}
-        />
-      </div>
+      <Editor
+        placeholder="Enter a title..."
+        value={this.state.value}
+        schema={schema}
+        onChange={this.onChange}
+        renderNode={this.renderNode}
+      />
     )
   }
 
@@ -97,6 +85,16 @@ class ForcedLayout extends React.Component {
       case 'paragraph':
         return <p {...attributes}>{children}</p>
     }
+  }
+
+  /**
+   * On change.
+   *
+   * @param {Change} change
+   */
+
+  onChange = ({ value }) => {
+    this.setState({ value })
   }
 }
 
