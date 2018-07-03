@@ -35,6 +35,7 @@ class Node extends React.Component {
     decorations: ImmutableTypes.list.isRequired,
     editor: Types.object.isRequired,
     isSelected: Types.bool.isRequired,
+    isFocused: Types.bool.isRequired,
     node: SlateTypes.node.isRequired,
     parent: SlateTypes.node.isRequired,
     readOnly: Types.bool.isRequired,
