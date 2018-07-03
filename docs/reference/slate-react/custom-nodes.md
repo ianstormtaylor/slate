@@ -10,6 +10,7 @@ Slate will render custom nodes for [`Block`](../slate/block.md) and [`Inline`](.
   children={Object}
   editor={Editor}
   isSelected={Boolean}
+  isFocused={Boolean}
   node={Node}
   parent={Node}
   readOnly={Boolean}
@@ -65,6 +66,14 @@ editor.change(change => {
 `Boolean`
 
 A boolean representing whether the node you are rendering is currently selected. You can use this to render a visual representation of the selection.
+
+This boolean is true when the node is selected and the editor is blurred.
+
+### `isFocused`
+
+`Boolean`
+
+A boolean representing whether the node you are rendering is currently focused. You can use this to render a visual representation of the focused selection.
 
 ### `node`
 
