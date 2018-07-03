@@ -458,7 +458,7 @@ class Content extends React.Component {
     const { value, stack } = editor
     const Container = tagName
     const { document, selection, decorations } = value
-    const indexes = document.getSelectionIndexes(selection, selection.isFocused)
+    const indexes = document.getSelectionIndexes(selection)
     const decs = document.getDecorations(stack).concat(decorations || [])
     const childrenDecorations = getChildrenDecorations(document, decs)
 
@@ -541,7 +541,7 @@ class Content extends React.Component {
   renderNode = (child, isSelected, decorations) => {
     const { editor, readOnly } = this.props
     const { value } = editor
-    const { document } = value
+    const { document, isFocused } = value
 
     return (
       <Node
@@ -549,6 +549,7 @@ class Content extends React.Component {
         editor={editor}
         decorations={decorations}
         isSelected={isSelected}
+        isFocused={isFocused && isSelected}
         key={child.key}
         node={child}
         parent={document}
