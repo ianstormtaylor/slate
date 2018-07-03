@@ -102,21 +102,13 @@ class Void extends React.Component {
    */
 
   renderText = () => {
-    const {
-      block,
-      decorations,
-      isSelected,
-      node,
-      readOnly,
-      editor,
-    } = this.props
+    const { block, decorations, node, readOnly, editor } = this.props
     const child = node.getFirstText()
     return (
       <Text
         block={node.object == 'block' ? node : block}
         decorations={decorations}
         editor={editor}
-        isSelected={isSelected}
         key={child.key}
         node={child}
         parent={node}

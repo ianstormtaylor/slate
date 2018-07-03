@@ -125,12 +125,12 @@ class Images extends React.Component {
    */
 
   renderNode = props => {
-    const { attributes, node, isSelected } = props
+    const { attributes, node, isFocused } = props
 
     switch (node.type) {
       case 'image': {
         const src = node.data.get('src')
-        return <Image src={src} selected={isSelected} {...attributes} />
+        return <Image src={src} selected={isFocused} {...attributes} />
       }
     }
   }

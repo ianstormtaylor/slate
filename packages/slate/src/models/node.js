@@ -1523,11 +1523,11 @@ class Node {
    * @return {Object|Null}
    */
 
-  getSelectionIndexes(range, isSelected = false) {
+  getSelectionIndexes(range, isSelected = true) {
     const { startKey, endKey } = range
 
-    // PERF: if we're not selected, or the range is blurred, we can exit early.
-    if (!isSelected || range.isBlurred) {
+    // PERF: if we're not selected, we can exit early.
+    if (!isSelected) {
       return null
     }
 
