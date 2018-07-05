@@ -46,6 +46,23 @@ function CodeBlockLine(props) {
 }
 
 /**
+ * A helper function to return the content of a Prism `token`.
+ *
+ * @param {Object} token
+ * @return {String}
+ */
+
+function getContent(token) {
+  if (typeof token == 'string') {
+    return token
+  } else if (typeof token.content == 'string') {
+    return token.content
+  } else {
+    return token.content.map(getContent).join('')
+  }
+}
+
+/**
  * The code highlighting example.
  *
  * @type {Component}
@@ -60,6 +77,80 @@ class CodeHighlighting extends React.Component {
 
   state = {
     value: Value.fromJSON(initialValue),
+  }
+
+  /**
+   * Render.
+   *
+   * @return {Component}
+   */
+
+  render() {
+    return (
+      <Editor
+        placeholder="Write some code..."
+        value={this.state.value}
+        onChange={this.onChange}
+        onKeyDown={this.onKeyDown}
+        renderNode={this.renderNode}
+        renderMark={this.renderMark}
+        decorateNode={this.decorateNode}
+      />
+    )
+  }
+
+  /**
+   * Render a Slate node.
+   *
+   * @param {Object} props
+   * @return {Element}
+   */
+
+  renderNode = props => {
+    switch (props.node.type) {
+      case 'code':
+        return <CodeBlock {...props} />
+      case 'code_line':
+        return <CodeBlockLine {...props} />
+    }
+  }
+
+  /**
+   * Render a Slate mark.
+   *
+   * @param {Object} props
+   * @return {Element}
+   */
+
+  renderMark = props => {
+    const { children, mark, attributes } = props
+
+    switch (mark.type) {
+      case 'comment':
+        return (
+          <span {...attributes} style={{ opacity: '0.33' }}>
+            {children}
+          </span>
+        )
+      case 'keyword':
+        return (
+          <span {...attributes} style={{ fontWeight: 'bold' }}>
+            {children}
+          </span>
+        )
+      case 'tag':
+        return (
+          <span {...attributes} style={{ fontWeight: 'bold' }}>
+            {children}
+          </span>
+        )
+      case 'punctuation':
+        return (
+          <span {...attributes} style={{ opacity: '0.75' }}>
+            {children}
+          </span>
+        )
+    }
   }
 
   /**
@@ -91,91 +182,6 @@ class CodeHighlighting extends React.Component {
   }
 
   /**
-   * Render.
-   *
-   * @return {Component}
-   */
-
-  render = () => {
-    return (
-      <div className="editor">
-        <Editor
-          placeholder="Write some code..."
-          value={this.state.value}
-          onChange={this.onChange}
-          onKeyDown={this.onKeyDown}
-          renderNode={this.renderNode}
-          renderMark={this.renderMark}
-          decorateNode={this.decorateNode}
-        />
-      </div>
-    )
-  }
-
-  /**
-   * Render a Slate node.
-   *
-   * @param {Object} props
-   * @return {Element}
-   */
-
-  renderNode = props => {
-    switch (props.node.type) {
-      case 'code':
-        return <CodeBlock {...props} />
-      case 'code_line':
-        return <CodeBlockLine {...props} />
-    }
-  }
-
-  /**
-   * Render a Slate mark.
-   *
-   * @param {Object} props
-   * @return {Element}
-   */
-
-  renderMark = props => {
-    const { children, mark, attributes } = props
-    switch (mark.type) {
-      case 'comment':
-        return (
-          <span {...attributes} style={{ opacity: '0.33' }}>
-            {children}
-          </span>
-        )
-      case 'keyword':
-        return (
-          <span {...attributes} style={{ fontWeight: 'bold' }}>
-            {children}
-          </span>
-        )
-      case 'tag':
-        return (
-          <span {...attributes} style={{ fontWeight: 'bold' }}>
-            {children}
-          </span>
-        )
-      case 'punctuation':
-        return (
-          <span {...attributes} style={{ opacity: '0.75' }}>
-            {children}
-          </span>
-        )
-    }
-  }
-
-  tokenToContent = token => {
-    if (typeof token == 'string') {
-      return token
-    } else if (typeof token.content == 'string') {
-      return token.content
-    } else {
-      return token.content.map(this.tokenToContent).join('')
-    }
-  }
-
-  /**
    * Decorate code blocks with Prism.js highlighting.
    *
    * @param {Node} node
@@ -201,7 +207,7 @@ class CodeHighlighting extends React.Component {
       startText = endText
       startOffset = endOffset
 
-      const content = this.tokenToContent(token)
+      const content = getContent(token)
       const newlines = content.split('\n').length - 1
       const length = content.length - newlines
       const end = start + length

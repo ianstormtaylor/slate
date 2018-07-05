@@ -50,4 +50,6 @@ describe('models', () => {
       }
     })
   })
+
+  require('./text/')
 })

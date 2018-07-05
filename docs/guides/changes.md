@@ -25,7 +25,15 @@ change
   .moveToOffsets(10, 14)
   .addMark('bold')
   .collapseToEndOfBlock()
-  .insertBlock({ type: 'image', isVoid: true })
+  .insertBlock({
+    type: 'image',
+    isVoid: true,
+    data: {
+      src: 'http://placekitten.com/200/300',
+      alt: 'Kittens',
+      className: 'img-responsive',
+    },
+  })
   .insertBlock('paragraph')
 ```
 

@@ -35,7 +35,7 @@ Now... we need to add the [`Html`](../reference/serializers/html.md) serializer.
 * A `quote` block for quotes...
 * And `bold`, `italic` and `underline` formatting.
 
-By default, the `Html` serializer, knows nothing about our schema just like Slate itself. To fix this, we need to pass it a set of `rules`. Each rule defines how to serialize and deserialize a Slate object.
+By default, the `Html` serializer knows nothing about our schema, just like Slate itself. To fix this, we need to pass it a set of `rules`. Each rule defines how to serialize and deserialize a Slate object.
 
 To start, let's create a new rule with a `deserialize` function for paragraph blocks.
 
@@ -48,6 +48,9 @@ const rules = [
         return {
           object: 'block',
           type: 'paragraph',
+          data: {
+            className: el.getAttribute('class'),
+          },
           nodes: next(el.childNodes),
         }
       }
@@ -68,6 +71,9 @@ const rules = [
         return {
           object: 'block',
           type: 'paragraph',
+          data: {
+            className: el.getAttribute('class'),
+          },
           nodes: next(el.childNodes),
         }
       }
@@ -75,7 +81,7 @@ const rules = [
     // Add a serializing function property to our rule...
     serialize(obj, children) {
       if (obj.object == 'block' && obj.type == 'paragraph') {
-        return <p>{children}</p>
+        return <p className={obj.data.get('className')}>{children}</p>
       }
     },
   },
@@ -107,6 +113,9 @@ const rules = [
         return {
           object: 'block',
           type: type,
+          data: {
+            className: el.getAttribute('class'),
+          },
           nodes: next(el.childNodes),
         }
       }
@@ -116,7 +125,7 @@ const rules = [
       if (obj.object == 'block') {
         switch (obj.type) {
           case 'paragraph':
-            return <p>{children}</p>
+            return <p className={obj.data.get('className')}>{children}</p>
           case 'quote':
             return <blockquote>{children}</blockquote>
           case 'code':
@@ -160,6 +169,9 @@ const rules = [
         return {
           object: 'block',
           type: type,
+          data: {
+            className: el.getAttribute('class'),
+          },
           nodes: next(el.childNodes),
         }
       }
@@ -174,7 +186,7 @@ const rules = [
               </pre>
             )
           case 'paragraph':
-            return <p>{children}</p>
+            return <p className={obj.data.get('className')}>{children}</p>
           case 'quote':
             return <blockquote>{children}</blockquote>
         }
@@ -260,7 +272,11 @@ class App extends React.Component {
           </pre>
         )
       case 'paragraph':
-        return <p {...props.attributes}>{props.children}</p>
+        return (
+          <p {...props.attributes} className={node.data.get('className')}>
+            {props.children}
+          </p>
+        )
       case 'quote':
         return <blockquote {...props.attributes}>{props.children}</blockquote>
     }
@@ -271,11 +287,11 @@ class App extends React.Component {
     const { mark, attributes } = props
     switch (mark.type) {
       case 'bold':
-        return <strong {...{ attributes }}>{props.children}</strong>
+        return <strong {...attributes}>{props.children}</strong>
       case 'italic':
-        return <em {...{ attributes }}>{props.children}</em>
+        return <em {...attributes}>{props.children}</em>
       case 'underline':
-        return <u {...{ attributes }}>{props.children}</u>
+        return <u {...attributes}>{props.children}</u>
     }
   }
 }

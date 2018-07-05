@@ -49,13 +49,21 @@ function onSomeEvent(event, change) {
 }
 ```
 
+### `normalize`
+
+`normalize() => Void`
+
+This method normalizes the document with the value's schema. This should run automatically-you should not need to call this method unless you have manually disabled normalization (and you should rarely, if ever, need to manually disable normalization). The vast majority of changes, whether by the user or invoked programmatically, will run `normalize` by default to ensure the document is always in adherence to its schema. `withoutNormalization` also runs `normalize` upon completion.
+
+> 🤖 If you must use this method, use it sparingly and strategically. Calling this method can be very expensive as it will run normalization on all of the nodes in your document.
+
 ### `withoutNormalization`
 
 `withoutNormalization(customChange: Function) => Change`
 
-This method calls the provided `customChange` function with the current instance of the `Change` object as the first argument. While `customChange` is executing, normalization is temporarily suppressed, but normalization will be executed once the `customChange` function completes execution.
+This method calls the provided `customChange` function with the current instance of the `Change` object as the first argument. Normalization is suspended while `customChange` is executing, but will be run after `customChange` completes.
 
-The purpose of `withoutNormalization` is to allow a sequence of change operations that should not be interrupted by normalization. For example:
+This method can be used to allow a sequence of change operations that should not be interrupted by normalization. For example:
 
 ```js
 /**
@@ -78,6 +86,8 @@ validateNode(node) {
 }
 ```
 
+> 🤖 If you must use this method, use it sparingly and strategically. Calling this method can be very expensive as it will run normalization on all of the nodes in your document.
+
 ## Full Value Change
 
 ### `setValue`
@@ -89,7 +99,7 @@ Set the entire `value` using either a `properties` object or a `Value` object. C
 
 Warning: Calling `setValue` with a `Value` object has unpredictable behavior including the loss of the edit history. Only use with a `Value` object if you know what you are doing. For most use cases, we recommend passing `properties` as an `Object` (e.g. `change.setValue({data: myNewDataObject})`.
 
-Hint: Wrapping the call to `setValue` as follows can be helpful if you want to update a value, like in the value's `data` but do not want to have another save point in the undo history: `change.setOperationFlag({save: false}).change({data: myNewDataObject}).setOperationFlag({save: true}).
+Hint: Wrapping the call to `setValue` as follows can be helpful if you want to update a value, like in the value's `data` but do not want to have another save point in the undo history: `change.setOperationFlag({save: false}).setValue({data: myNewDataObject}).setOperationFlag({save: true}).
 
 ## Current Value Changes
 
@@ -181,6 +191,14 @@ Split the [`Inline`](./inline.md) node in the current selection by `depth` level
 `removeMark(type: String) => Change`
 
 Remove a [`mark`](./mark.md) from the characters in the current selection. For convenience, you can pass a `type` string or `properties` object to implicitly create a [`Mark`](./mark.md) of that type.
+
+### `replaceMark`
+
+`replaceMark(oldMark: Mark, newMark: Mark) => Change` <br/>
+`replaceMark(oldProperties: Object, newProperties: Object) => Change` <br/>
+`replaceMark(oldType: String, newType: String) => Change`
+
+Replace a [`mark`](./mark.md) in the characters in the current selection. For convenience, you can pass a `type` string or `properties` object to implicitly create a [`Mark`](./mark.md) of that type.
 
 ### `toggleMark`
 

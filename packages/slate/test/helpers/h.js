@@ -34,6 +34,9 @@ const h = createHyperscript({
     u: 'underline',
     fontSize: 'font-size',
   },
+  decorators: {
+    highlight: 'highlight',
+  },
 })
 
 /**

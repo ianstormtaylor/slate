@@ -4,6 +4,7 @@ import h from '../../../helpers/h'
 
 export default function(change) {
   const { anchorKey, anchorOffset } = change.value
+
   change.replaceTextByKey(anchorKey, anchorOffset, 3, 'cat is cute', [
     { type: 'italic' },
   ])

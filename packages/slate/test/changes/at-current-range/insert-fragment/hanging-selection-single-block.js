@@ -9,6 +9,7 @@ const fragment = (
     <paragraph>fragment two</paragraph>
   </document>
 )
+
 export default function(change) {
   change.insertFragment(fragment)
 }

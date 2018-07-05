@@ -23,16 +23,6 @@ class ReadOnly extends React.Component {
   }
 
   /**
-   * On change.
-   *
-   * @param {Change} change
-   */
-
-  onChange = ({ value }) => {
-    this.setState({ value })
-  }
-
-  /**
    * Render the editor.
    *
    * @return {Component} component
@@ -40,15 +30,23 @@ class ReadOnly extends React.Component {
 
   render() {
     return (
-      <div className="editor">
-        <Editor
-          readOnly
-          placeholder="Enter some text..."
-          value={this.state.value}
-          onChange={this.onChange}
-        />
-      </div>
+      <Editor
+        readOnly
+        placeholder="Enter some text..."
+        value={this.state.value}
+        onChange={this.onChange}
+      />
     )
+  }
+
+  /**
+   * On change.
+   *
+   * @param {Change} change
+   */
+
+  onChange = ({ value }) => {
+    this.setState({ value })
   }
 }
 

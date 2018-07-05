@@ -23,16 +23,6 @@ class PlainText extends React.Component {
   }
 
   /**
-   * On change.
-   *
-   * @param {Change} change
-   */
-
-  onChange = ({ value }) => {
-    this.setState({ value })
-  }
-
-  /**
    * Render the editor.
    *
    * @return {Component} component
@@ -40,14 +30,22 @@ class PlainText extends React.Component {
 
   render() {
     return (
-      <div className="editor">
-        <Editor
-          placeholder="Enter some plain text..."
-          value={this.state.value}
-          onChange={this.onChange}
-        />
-      </div>
+      <Editor
+        placeholder="Enter some plain text..."
+        value={this.state.value}
+        onChange={this.onChange}
+      />
     )
+  }
+
+  /**
+   * On change.
+   *
+   * @param {Change} change
+   */
+
+  onChange = ({ value }) => {
+    this.setState({ value })
   }
 }
 

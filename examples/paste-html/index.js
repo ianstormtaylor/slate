@@ -4,6 +4,7 @@ import { Value } from 'slate'
 
 import React from 'react'
 import initialValue from './value.json'
+import styled from 'react-emotion'
 
 /**
  * Tags to blocks.
@@ -41,6 +42,19 @@ const MARK_TAGS = {
 }
 
 /**
+ * A styled image block component.
+ *
+ * @type {Component}
+ */
+
+const Image = styled('img')`
+  display: block;
+  max-width: 100%;
+  max-height: 20em;
+  box-shadow: ${props => (props.selected ? '0 0 0 2px blue;' : 'none')};
+`
+
+/**
  * Serializer rules.
  *
  * @type {Array}
@@ -50,6 +64,7 @@ const RULES = [
   {
     deserialize(el, next) {
       const block = BLOCK_TAGS[el.tagName.toLowerCase()]
+
       if (block) {
         return {
           object: 'block',
@@ -62,6 +77,7 @@ const RULES = [
   {
     deserialize(el, next) {
       const mark = MARK_TAGS[el.tagName.toLowerCase()]
+
       if (mark) {
         return {
           object: 'mark',
@@ -148,31 +164,6 @@ class PasteHtml extends React.Component {
   }
 
   /**
-   * On change, save the new value.
-   *
-   * @param {Change} change
-   */
-
-  onChange = ({ value }) => {
-    this.setState({ value })
-  }
-
-  /**
-   * On paste, deserialize the HTML and then insert the fragment.
-   *
-   * @param {Event} event
-   * @param {Change} change
-   */
-
-  onPaste = (event, change) => {
-    const transfer = getEventTransfer(event)
-    if (transfer.type != 'html') return
-    const { document } = serializer.deserialize(transfer.html)
-    change.insertFragment(document)
-    return true
-  }
-
-  /**
    * Render.
    *
    * @return {Component}
@@ -180,16 +171,14 @@ class PasteHtml extends React.Component {
 
   render() {
     return (
-      <div className="editor">
-        <Editor
-          placeholder="Paste in some HTML..."
-          value={this.state.value}
-          onPaste={this.onPaste}
-          onChange={this.onChange}
-          renderNode={this.renderNode}
-          renderMark={this.renderMark}
-        />
-      </div>
+      <Editor
+        placeholder="Paste in some HTML..."
+        value={this.state.value}
+        onPaste={this.onPaste}
+        onChange={this.onChange}
+        renderNode={this.renderNode}
+        renderMark={this.renderMark}
+      />
     )
   }
 
@@ -201,7 +190,8 @@ class PasteHtml extends React.Component {
    */
 
   renderNode = props => {
-    const { attributes, children, node, isSelected } = props
+    const { attributes, children, node, isFocused } = props
+
     switch (node.type) {
       case 'quote':
         return <blockquote {...attributes}>{children}</blockquote>
@@ -240,11 +230,7 @@ class PasteHtml extends React.Component {
       }
       case 'image': {
         const src = node.data.get('src')
-        const className = isSelected ? 'active' : null
-        const style = { display: 'block' }
-        return (
-          <img src={src} className={className} style={style} {...attributes} />
-        )
+        return <Image src={src} selected={isFocused} {...attributes} />
       }
     }
   }
@@ -258,6 +244,7 @@ class PasteHtml extends React.Component {
 
   renderMark = props => {
     const { children, mark, attributes } = props
+
     switch (mark.type) {
       case 'bold':
         return <strong {...attributes}>{children}</strong>
@@ -268,6 +255,31 @@ class PasteHtml extends React.Component {
       case 'underlined':
         return <u {...attributes}>{children}</u>
     }
+  }
+
+  /**
+   * On change, save the new value.
+   *
+   * @param {Change} change
+   */
+
+  onChange = ({ value }) => {
+    this.setState({ value })
+  }
+
+  /**
+   * On paste, deserialize the HTML and then insert the fragment.
+   *
+   * @param {Event} event
+   * @param {Change} change
+   */
+
+  onPaste = (event, change) => {
+    const transfer = getEventTransfer(event)
+    if (transfer.type != 'html') return
+    const { document } = serializer.deserialize(transfer.html)
+    change.insertFragment(document)
+    return true
   }
 }
 
