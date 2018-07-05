@@ -11,7 +11,7 @@ export default function(value) {
 }
 
 export const input = (
-  <value isFocused>
+  <value>
     <document>
       <paragraph>
         <anchor />wo<focus />rd

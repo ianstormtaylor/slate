@@ -17,7 +17,7 @@ export const input = (
 )
 
 export const output = (
-  <value isFocused={false}>
+  <value focused={false}>
     <document>
       <paragraph>
         <cursor />one

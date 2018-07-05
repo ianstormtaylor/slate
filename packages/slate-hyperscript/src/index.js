@@ -155,7 +155,8 @@ const CREATORS = {
       selection = selection.merge(props).normalize(document)
     }
 
-    const { isFocused = selection.isSet } = attributes
+    const isFocused =
+      attributes.focused != null ? attributes.focused : selection.isSet
 
     let value = Value.fromJSON(
       { data, document, selection, isFocused },

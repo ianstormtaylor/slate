@@ -3,7 +3,7 @@
 import h from '../..'
 
 export const input = (
-  <value isFocused={false}>
+  <value focused={false}>
     <document>
       <block type="paragraph">
         This is a paragraph with a cursor position <cursor />(closed selection).
