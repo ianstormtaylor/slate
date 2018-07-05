@@ -38,9 +38,9 @@
   "devDependencies": {
     "immutable": "^3.8.1",
     "mocha": "^2.5.3",
-    "slate": "^0.34.4",
-    "slate-hyperscript": "^0.5.19",
-    "slate-simulator": "^0.4.36"
+    "slate": "*",
+    "slate-hyperscript": "*",
+    "slate-simulator": "*"
   },
   "scripts": {
     "clean": "rm -rf ./dist ./lib ./node_modules"

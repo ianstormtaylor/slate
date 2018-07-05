@@ -28,7 +28,7 @@
     "react": ">=0.14.0"
   },
   "devDependencies": {
-    "slate-hyperscript": "^0.5.19"
+    "slate-hyperscript": "*"
   },
   "scripts": {
     "clean": "rm -rf ./dist ./lib ./node_modules"

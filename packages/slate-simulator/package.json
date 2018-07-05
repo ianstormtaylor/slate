@@ -16,7 +16,7 @@
     "slate": ">=0.32.0"
   },
   "devDependencies": {
-    "slate": "^0.34.4"
+    "slate": "*"
   },
   "scripts": {
     "clean": "rm -rf ./dist ./lib ./node_modules"
