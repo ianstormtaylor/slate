@@ -31,6 +31,30 @@ Changes.setValue = (change, properties, options = {}) => {
 }
 
 /**
+ * Focus the editor
+ *
+ * @param {Change} change
+ * @param {Object|Value} properties
+ * @param {Object} options
+ */
+
+Changes.focus = (change, options = {}) => {
+  change.setValue({ isFocused: true }, options)
+}
+
+/**
+ * Blur the editor
+ *
+ * @param {Change} change
+ * @param {Object|Value} properties
+ * @param {Object} options
+ */
+
+Changes.blur = (change, options = {}) => {
+  change.setValue({ isFocused: false }, options)
+}
+
+/**
  * Export.
  *
  * @type {Object}

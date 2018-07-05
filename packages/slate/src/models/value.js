@@ -23,6 +23,7 @@ const DEFAULTS = {
   history: History.create(),
   schema: Schema.create(),
   selection: Range.create(),
+  isFocused: false,
 }
 
 /**
@@ -95,7 +96,12 @@ class Value extends Record(DEFAULTS) {
    */
 
   static fromJSON(object, options = {}) {
-    let { document = {}, selection = {}, schema = {} } = object
+    let {
+      document = {},
+      selection = {},
+      schema = {},
+      isFocused = false,
+    } = object
 
     let data = new Map()
 
@@ -125,6 +131,7 @@ class Value extends Record(DEFAULTS) {
       document,
       selection,
       schema,
+      isFocused,
     })
 
     if (options.normalize !== false) {
@@ -132,6 +139,30 @@ class Value extends Record(DEFAULTS) {
     }
 
     return value
+  }
+
+  /**
+   * Focus the value.
+   *
+   * @return {Range}
+   */
+
+  focus() {
+    return this.merge({
+      isFocused: true,
+    })
+  }
+
+  /**
+   * Blur the value.
+   *
+   * @return {Range}
+   */
+
+  blur() {
+    return this.merge({
+      isFocused: false,
+    })
   }
 
   /**
@@ -204,10 +235,6 @@ class Value extends Record(DEFAULTS) {
    *
    * @return {Boolean}
    */
-
-  get isFocused() {
-    return this.selection.isFocused
-  }
 
   /**
    * Is the current selection collapsed?
