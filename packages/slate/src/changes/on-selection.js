@@ -321,6 +321,7 @@ PROXY_TRANSFORMS.forEach(method => {
     let next = selection[method](...args)
     if (normalize) next = next.normalize(document)
     change.select(next)
+    if (method == 'deselect') change.blur()
   }
 })
 

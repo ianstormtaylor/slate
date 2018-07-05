@@ -65,6 +65,7 @@ class Value extends Record(DEFAULTS) {
   static createProperties(attrs = {}) {
     if (Value.isValue(attrs)) {
       return {
+        isFocused: attrs.isFocused,
         data: attrs.data,
         decorations: attrs.decorations,
         schema: attrs.schema,
@@ -77,6 +78,7 @@ class Value extends Record(DEFAULTS) {
       if ('decorations' in attrs)
         props.decorations = Range.createList(attrs.decorations)
       if ('schema' in attrs) props.schema = Schema.create(attrs.schema)
+      if ('isFocused' in attrs) props.isFocused = attrs.isFocused
       return props
     }
 
