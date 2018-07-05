@@ -137,13 +137,11 @@ const CREATORS = {
         if (text.__anchor != null) {
           props.anchorKey = text.key
           props.anchorOffset = text.__anchor
-          props.isFocused = true
         }
 
         if (text.__focus != null) {
           props.focusKey = text.key
           props.focusOffset = text.__focus
-          props.isFocused = true
         }
       })
 

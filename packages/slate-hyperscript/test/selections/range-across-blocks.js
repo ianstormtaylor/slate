@@ -17,6 +17,7 @@ export const input = (
 
 export const output = {
   object: 'value',
+  isFocused: false,
   document: {
     object: 'document',
     data: {},

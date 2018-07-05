@@ -665,6 +665,7 @@ class Value extends Record(DEFAULTS) {
   toJSON(options = {}) {
     const object = {
       object: this.object,
+      isFocused: this.isFocused,
       document: this.document.toJSON(options),
     }
 
