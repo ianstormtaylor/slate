@@ -4,7 +4,7 @@ import { Block, Document, Inline, Mark, Range, Value } from 'slate'
 
 import createChildren from './createChildren'
 import { ANCHOR, CURSOR, FOCUS } from './constants/selection'
-import DecoratorPoint from './DecoratorPoint'
+import DecoratorPoint from './decorator-point'
 
 /**
  * The default Slate hyperscript creator functions.

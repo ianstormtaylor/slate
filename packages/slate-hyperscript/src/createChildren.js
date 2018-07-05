@@ -1,6 +1,6 @@
 import { Node, Text } from 'slate'
 import { ANCHOR, FOCUS, CURSOR } from './constants/selection'
-import DecoratorPoint from './DecoratorPoint'
+import DecoratorPoint from './decorator-point'
 
 /**
  * Create an array of `children`, storing selection anchor and focus.
