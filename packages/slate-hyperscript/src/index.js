@@ -75,7 +75,7 @@ const CREATORS = {
   },
 
   value(tagName, attributes, children) {
-    const { data, isFocused = false, normalize = true } = attributes
+    const { data, normalize = true } = attributes
     const document = children.find(Document.isDocument)
     let selection = children.find(Range.isRange) || Range.create()
     const props = {}
@@ -154,6 +154,8 @@ const CREATORS = {
     if (!isEmpty(props)) {
       selection = selection.merge(props).normalize(document)
     }
+
+    const { isFocused = selection.isSet } = attributes
 
     let value = Value.fromJSON(
       { data, document, selection, isFocused },
