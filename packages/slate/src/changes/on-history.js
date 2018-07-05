@@ -1,5 +1,6 @@
 import invert from '../operations/invert'
-import omit from 'lodash/omit'
+import Value from '../models/value'
+import Range from '../models/range'
 
 /**
  * Changes.
@@ -30,14 +31,6 @@ Changes.redo = change => {
 
   // Replay the next operations.
   next.forEach(op => {
-    const { type, properties } = op
-
-    // When the operation mutates the selection, omit its `isFocused` value to
-    // prevent the editor focus from changing during redoing.
-    if (type == 'set_selection') {
-      op = op.set('properties', omit(properties, 'isFocused'))
-    }
-
     change.applyOperation(op, { save: false })
   })
 
@@ -71,21 +64,48 @@ Changes.undo = change => {
   previous
     .slice()
     .reverse()
-    .map(invert)
-    .forEach(inverse => {
-      const { type, properties } = inverse
-
-      // When the operation mutates the selection, omit its `isFocused` value to
-      // prevent the editor focus from changing during undoing.
-      if (type == 'set_selection') {
-        inverse = inverse.set('properties', omit(properties, 'isFocused'))
-      }
+    .map(op => ({
+      origin: op,
+      inverse: invert(op),
+    }))
+    .forEach(ops => {
+      const { origin, inverse } = ops
 
       change.applyOperation(inverse, { save: false })
+      const { type } = origin
+
+      if (type === 'remove_node') {
+        ;({ value } = change)
+
+        // Fix selection change when remove_node moves the selection
+        if (!origin.value.selection.equals(change.value.selection)) {
+          change.applyOperation(
+            {
+              type: 'set_selection',
+              value,
+              properties: Range.createProperties(origin.value.selection),
+              selection: value.selection.toJSON(),
+            },
+            { save: false }
+          )
+        }
+
+        // Fix blur when remove_node blurs the selection
+        if (origin.value.isFocused && !change.value.isFocused) {
+          change.applyOperation(
+            {
+              type: 'set_value',
+              properties: Value.createProperties({ isFocused: true }),
+              value,
+            },
+            { save: false }
+          )
+        }
+      }
     })
 
   // Update the history.
-  value = change.value
+  ;({ value } = change)
   history = history.set('undos', undos).set('redos', redos)
   value = value.set('history', history)
   change.value = value

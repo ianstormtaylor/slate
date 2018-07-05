@@ -13,11 +13,11 @@ export default function(value) {
 export const input = (
   <value>
     <document>
-      <paragraph key="a">one</paragraph>
+      <paragraph key="a">
+        <cursor />one
+      </paragraph>
     </document>
   </value>
 )
 
 export const output = input
-
-export const skip = true
