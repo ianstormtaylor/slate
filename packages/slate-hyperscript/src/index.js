@@ -2,7 +2,7 @@ import isEmpty from 'is-empty'
 import isPlainObject from 'is-plain-object'
 import { Block, Document, Inline, Mark, Range, Value } from 'slate'
 
-import createChildren from './createChildren'
+import createChildren from './create-children'
 import { ANCHOR, CURSOR, FOCUS } from './constants/selection'
 import DecoratorPoint from './decorator-point'
 
