@@ -1,7 +1,7 @@
 import Base64 from 'slate-base64-serializer'
 import Debug from 'debug'
 import Plain from 'slate-plain-serializer'
-import { IS_IOS } from 'slate-dev-environment'
+import { IS_IOS, IS_ANDROID } from 'slate-dev-environment'
 import React from 'react'
 import getWindow from 'get-window'
 import { Block, Inline, Text } from 'slate'
@@ -25,6 +25,7 @@ import setEventTransfer from '../utils/set-event-transfer'
  */
 
 const debug = Debug('slate:after')
+const ANDROID_KEYSTROKE_DEBOUNCE = 300
 
 /**
  * The after plugin.
@@ -34,6 +35,7 @@ const debug = Debug('slate:after')
 
 function AfterPlugin() {
   let isDraggingInternally = null
+  let stagedChange = null
 
   /**
    * On before input, correct any browser inconsistencies.
@@ -45,7 +47,9 @@ function AfterPlugin() {
 
   function onBeforeInput(event, change, editor) {
     debug('onBeforeInput', { event })
-
+    // onBeforeInput is used as a cheaper insert
+    // Android events are debounced and a full diff is required
+    if (IS_ANDROID) return
     event.preventDefault()
     change.insertText(event.data)
   }
@@ -349,7 +353,27 @@ function AfterPlugin() {
       .moveFocusTo(point.key, end)
 
     // Change the current value to have the leaf's text replaced.
-    change.insertTextAtRange(entire, textContent, leaf.marks).select(corrected)
+
+    if (IS_ANDROID) {
+      // Controlled contentEditables lose their selection range every render
+      // and must be updated manually (see Content#componentDidUpdate)
+      // Updating the selection causes the IME auto-suggest to recompute
+      // synchronously, causing lost input events during that recompute
+      // If device turns off IME auto-suggest, this is not needed
+      clearTimeout(stagedChange)
+
+      stagedChange = setTimeout(() => {
+        change
+          .insertTextAtRange(entire, textContent, leaf.marks)
+          .select(corrected)
+
+        editor.onChange(change)
+      }, ANDROID_KEYSTROKE_DEBOUNCE)
+    } else {
+      change
+        .insertTextAtRange(entire, textContent, leaf.marks)
+        .select(corrected)
+    }
   }
 
   /**
