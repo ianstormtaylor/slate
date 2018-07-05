@@ -24,7 +24,13 @@ const debug = Debug('slate:operation:apply')
 function applyRangeAdjustments(value, checkAffected, adjustRange) {
   // check selection, apply adjustment if affected
   if (value.selection && checkAffected(value.selection)) {
+    const { selection } = value
     value = value.set('selection', adjustRange(value.selection))
+
+    // Blur the value when selection is unset
+    if (value.isFocused && selection.isSet && value.selection.isUnset) {
+      value = value.set('isFocused', false)
+    }
   }
 
   if (!value.decorations) return value
