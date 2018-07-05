@@ -30,7 +30,7 @@ export const input = (
 
 export const output = {
   object: 'value',
-  isFocused: false,
+  isFocused: true,
   document: {
     object: 'document',
     data: {},

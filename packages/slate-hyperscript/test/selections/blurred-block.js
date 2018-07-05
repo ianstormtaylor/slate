@@ -3,7 +3,7 @@
 import h from '../..'
 
 export const input = (
-  <value isFocused>
+  <value isFocused={false}>
     <document>
       <block type="paragraph">
         This is a paragraph with a cursor position <cursor />(closed selection).
@@ -14,7 +14,7 @@ export const input = (
 
 export const output = {
   object: 'value',
-  isFocused: true,
+  isFocused: false,
   document: {
     object: 'document',
     data: {},

@@ -17,9 +17,11 @@ export const input = (
 )
 
 export const output = (
-  <value>
+  <value isFocused={false}>
     <document>
-      <paragraph>one</paragraph>
+      <paragraph>
+        <cursor />one
+      </paragraph>
     </document>
   </value>
 )
