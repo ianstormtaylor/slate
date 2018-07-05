@@ -16,7 +16,7 @@ export const input = List([
 ])
 
 export default function(leaves) {
-  return List(Leaf.splitLeaves(leaves, 4))
+  return List(Leaf.splitLeaves(leaves, 'CatisCute'.length))
 }
 
 export const output = List([
@@ -25,15 +25,15 @@ export const output = List([
       text: 'Cat',
     }),
     Leaf.create({
-      text: 'i',
+      text: 'is',
+    }),
+    Leaf.create({
+      text: 'Cute',
     }),
   ]),
   List([
     Leaf.create({
-      text: 's',
-    }),
-    Leaf.create({
-      text: 'Cute',
+      text: '',
     }),
   ]),
 ])
