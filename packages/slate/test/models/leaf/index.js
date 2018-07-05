@@ -2,8 +2,7 @@ import assert from 'assert'
 import fs from 'fs'
 import { resolve } from 'path'
 
-describe('FILTER', () => {
-  console.log('text')
+describe('leaf', () => {
   const dir = resolve(__dirname)
 
   const methods = fs
