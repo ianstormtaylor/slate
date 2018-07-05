@@ -27,7 +27,7 @@ function applyRangeAdjustments(value, checkAffected, adjustRange) {
     const { selection } = value
     value = value.set('selection', adjustRange(value.selection))
 
-    // Blur the value when selection is unset
+    // Blur the value when selection changed to unset
     if (value.isFocused && selection.isSet && value.selection.isUnset) {
       value = value.set('isFocused', false)
     }
