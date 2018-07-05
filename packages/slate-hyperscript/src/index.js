@@ -123,7 +123,7 @@ const CREATORS = {
   },
 
   value(tagName, attributes, children) {
-    const { data, normalize = true } = attributes
+    const { data, isFocused = false, normalize = true } = attributes
     const document = children.find(Document.isDocument)
     let selection = children.find(Range.isRange) || Range.create()
     const props = {}
@@ -203,7 +203,10 @@ const CREATORS = {
       selection = selection.merge(props).normalize(document)
     }
 
-    let value = Value.fromJSON({ data, document, selection }, { normalize })
+    let value = Value.fromJSON(
+      { data, document, selection, isFocused },
+      { normalize }
+    )
 
     // apply any decorations built
     if (decorations.length > 0) {
