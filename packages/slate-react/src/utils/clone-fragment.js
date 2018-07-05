@@ -34,7 +34,7 @@ function cloneFragment(event, value, fragment = value.fragment) {
   let attach = contents.childNodes[0]
 
   // Make sure attach is a non-empty node, since empty nodes will not get copied
-  Array.from(contents.childNodes).forEach(node => {
+  contents.childNodes.forEach(node => {
     if (node.textContent && node.textContent.trim() !== '') {
       attach = node
     }
@@ -60,12 +60,10 @@ function cloneFragment(event, value, fragment = value.fragment) {
 
   // Remove any zero-width space spans from the cloned DOM so that they don't
   // show up elsewhere when pasted.
-  ;[].slice
-    .call(Array.from(contents.querySelectorAll(ZERO_WIDTH_SELECTOR)))
-    .forEach(zw => {
-      const isNewline = zw.getAttribute(ZERO_WIDTH_ATTRIBUTE) === 'n'
-      zw.textContent = isNewline ? '\n' : ''
-    })
+  ;[].slice.call(contents.querySelectorAll(ZERO_WIDTH_SELECTOR)).forEach(zw => {
+    const isNewline = zw.getAttribute(ZERO_WIDTH_ATTRIBUTE) === 'n'
+    zw.textContent = isNewline ? '\n' : ''
+  })
 
   // Set a `data-slate-fragment` attribute on a non-empty node, so it shows up
   // in the HTML, and can be used for intra-Slate pasting. If it's a text
@@ -91,6 +89,10 @@ function cloneFragment(event, value, fragment = value.fragment) {
 
   // For browsers supporting it, we set the clipboard registers manually,
   // since the result is more predictable.
+  // COMPAT: IE supports the setData method, but only in restricted sense.
+  // IE doesn't support arbitrary MIME types or common ones like 'text/plain';
+  // it only accepts "Text" (which gets mapped to 'text/plain') and "Url"
+  // (mapped to 'text/url-list'); so, we should only enter block if !IS_IE
   if (event.clipboardData && event.clipboardData.setData && !IS_IE) {
     event.preventDefault()
     event.clipboardData.setData(TEXT, div.textContent)
