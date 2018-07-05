@@ -3,10 +3,10 @@
 import h from '../..'
 
 export const input = (
-  <value>
-    <document isFocused>
+  <value isFocused>
+    <document>
       <block type="paragraph">
-        <cursor />Cat is Cute
+        This is a paragraph with a cursor position <cursor />(closed selection).
       </block>
     </document>
   </value>
@@ -30,7 +30,8 @@ export const output = {
             leaves: [
               {
                 object: 'leaf',
-                text: 'Cat is Cute',
+                text:
+                  'This is a paragraph with a cursor position (closed selection).',
                 marks: [],
               },
             ],
@@ -39,4 +40,12 @@ export const output = {
       },
     ],
   },
+}
+
+export const expectSelection = {
+  isCollapsed: true,
+  anchorOffset: 43,
+  focusOffset: 43,
+  anchorKey: input.texts.get(0).key,
+  focusKey: input.texts.get(0).key,
 }
