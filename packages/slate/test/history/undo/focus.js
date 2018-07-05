@@ -18,6 +18,6 @@ export const input = (
       </paragraph>
     </document>
   </value>
-).blur()
+)
 
 export const output = input
