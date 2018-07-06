@@ -73,24 +73,29 @@ class Editor extends React.Component {
 
   constructor(props) {
     super(props)
-    this.state = {}
-    this.tmp = {}
-    this.tmp.updates = 0
-    this.tmp.resolves = 0
+
+    this.tmp = {
+      updates: 0,
+      resolves: 0,
+    }
 
     // Resolve the plugins and create a stack and schema from them.
     const plugins = this.resolvePlugins(props.plugins, props.schema)
     const stack = Stack.create({ plugins })
     const schema = Schema.create({ plugins })
-    this.state.schema = schema
-    this.state.stack = stack
 
     // Run `onChange` on the passed-in value because we need to ensure that it
     // is normalized, and queue the resulting change.
+    this.state = { schema, stack }
     const change = props.value.change()
     stack.run('onChange', change, this)
     this.queueChange(change)
     this.state.value = change.value
+
+    this.state.props = {
+      schema: props.schema,
+      plugins: props.plugins,
+    }
 
     // Create a bound event handler for each event.
     EVENT_HANDLERS.forEach(handler => {
@@ -108,23 +113,18 @@ class Editor extends React.Component {
    */
 
   componentWillReceiveProps = props => {
-    let { schema, stack } = this
+    const { state } = this
+    let { schema, stack } = state
 
-    // Increment the updates counter as a baseline.
     this.tmp.updates++
 
-    // If the plugins or the schema have changed, we need to re-resolve the
-    // plugins, since it will result in a new stack and new validations.
     if (
-      props.plugins != this.props.plugins ||
-      props.schema != this.props.schema
+      state.props.plugins !== props.plugins ||
+      state.props.schema != props.schema
     ) {
       const plugins = this.resolvePlugins(props.plugins, props.schema)
       stack = Stack.create({ plugins })
       schema = Schema.create({ plugins })
-      this.setState({ schema, stack })
-
-      // Increment the resolves counter.
       this.tmp.resolves++
 
       // If we've resolved a few times already, and it's exactly in line with
@@ -135,13 +135,31 @@ class Editor extends React.Component {
         )
       }
     }
-
     // Run `onChange` on the passed-in value because we need to ensure that it
     // is normalized, and queue the resulting change.
     const change = props.value.change()
+
+    // TODO: [bug], if schema is changed, this.state.schema are not updated yet
+    // We shall have a better schema and stack getter
     stack.run('onChange', change, this)
+
     this.queueChange(change)
-    this.setState({ value: change.value })
+    const { value } = change
+    if (
+      state.value !== value ||
+      state.stack !== stack ||
+      state.schema !== schema
+    ) {
+      this.setState({
+        value,
+        stack,
+        schema,
+        props: {
+          plugins: props.plugins,
+          schema: props.schema,
+        },
+      })
+    }
   }
 
   /**
@@ -246,7 +264,7 @@ class Editor extends React.Component {
    * @param {Event} event
    */
 
-  onEvent = (handler, event) => {
+  onEvent(handler, event) {
     this.change(change => {
       this.stack.run(handler, event, change, this)
     })
