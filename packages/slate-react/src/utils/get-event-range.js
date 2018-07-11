@@ -56,11 +56,23 @@ function getEventRange(event, value) {
   // COMPAT: In Firefox, `caretRangeFromPoint` doesn't exist. (2016/07/25)
   if (window.document.caretRangeFromPoint) {
     native = window.document.caretRangeFromPoint(x, y)
-  } else {
+  } else if (window.document.caretPositionFromPoint) {
     const position = window.document.caretPositionFromPoint(x, y)
     native = window.document.createRange()
     native.setStart(position.offsetNode, position.offset)
     native.setEnd(position.offsetNode, position.offset)
+  } else if (window.document.body.createTextRange) {
+    // COMPAT: In IE, `caretRangeFromPoint` and
+    // `caretPositionFromPoint` don't exist. (2018/07/11)
+    native = window.document.body.createTextRange()
+
+    try {
+      native.moveToPoint(x, y)
+    } catch (error) {
+      // IE11 will raise an `unspecified error` if `moveToPoint` is
+      // called during a dropEvent.
+      return null
+    }
   }
 
   // Resolve a Slate range from the DOM range.
