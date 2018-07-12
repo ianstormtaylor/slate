@@ -36,8 +36,11 @@ const isDeleteCharForward = e =>
 
 const isDeleteLineBackwardMac = e =>
   isKeyHotkey('cmd+shift+backspace', e) || isKeyHotkey('cmd+backspace', e)
+const isDeleteLineBackwardPC = e =>
+  isKeyHotkey('ctrl+shift+backspace', e) || isKeyHotkey('ctrl+backspace', e)
 const isDeleteLineForwardMac = isKeyHotkey('ctrl+k')
-const isDeleteLineBackward = e => IS_APPLE && isDeleteLineBackwardMac(e)
+const isDeleteLineBackward = e =>
+  IS_APPLE ? isDeleteLineBackwardMac(e) : isDeleteLineBackwardPC(e)
 const isDeleteLineForward = e => IS_APPLE && isDeleteLineForwardMac(e)
 
 const isDeleteWordBackwardMac = e =>
