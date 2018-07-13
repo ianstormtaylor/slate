@@ -1,0 +1,208 @@
+dependencies:
+  slate-dev-logger: 0.1.39
+devDependencies:
+  mocha: 2.5.3
+  slate: 0.34.5
+  slate-hyperscript: 0.5.20
+packages:
+  /commander/0.6.1:
+    dev: true
+    engines:
+      node: '>= 0.4.x'
+    resolution:
+      integrity: sha1-+mihT2qUXVTbvlDYzbMyDp47GgY=
+  /commander/2.3.0:
+    dev: true
+    engines:
+      node: '>= 0.6.x'
+    resolution:
+      integrity: sha1-/UMOiJgy7DU7ms0d4hfBHLPu+HM=
+  /debug/2.2.0:
+    dependencies:
+      ms: 0.7.1
+    dev: true
+    resolution:
+      integrity: sha1-+HBX6ZWxofauaklgZkE3vFbwOdo=
+  /debug/3.1.0:
+    dependencies:
+      ms: 2.0.0
+    dev: true
+    resolution:
+      integrity: sha512-OX8XqP7/1a9cqkxYw2yXss15f26NKWBpDXQd0/uK/KPqdQhxbPa994hnzjcE2VqQpDslf55723cKPUOGSmMY3g==
+  /diff/1.4.0:
+    dev: true
+    engines:
+      node: '>=0.3.1'
+    resolution:
+      integrity: sha1-fyjS657nsVqX79ic5j3P2qPMur8=
+  /direction/0.1.5:
+    dev: true
+    resolution:
+      integrity: sha1-zl15f5fib4vnvv9T99xA4cGp7Ew=
+  /escape-string-regexp/1.0.2:
+    dev: true
+    engines:
+      node: '>=0.8.0'
+    resolution:
+      integrity: sha1-Tbwv5nTnGUnK8/smlc5/LcHZqNE=
+  /esrever/0.2.0:
+    dev: true
+    resolution:
+      integrity: sha1-lunSj08bGnZ4TNXUkOquAQ50B7g=
+  /glob/3.2.11:
+    dependencies:
+      inherits: 2.0.3
+      minimatch: 0.3.0
+    dev: true
+    resolution:
+      integrity: sha1-Spc/Y1uRkPcV0QmH1cAP0oFevj0=
+  /growl/1.9.2:
+    dev: true
+    resolution:
+      integrity: sha1-Dqd0NxXbjY3ixe3hd14bRayFwC8=
+  /inherits/2.0.3:
+    dev: true
+    resolution:
+      integrity: sha1-Yzwsg+PaQqUC9SRmAiSA9CCCYd4=
+  /is-empty/1.2.0:
+    dev: true
+    resolution:
+      integrity: sha1-3pu1snhzigWgsJpX4ftNSjQan2s=
+  /is-plain-object/2.0.4:
+    dependencies:
+      isobject: 3.0.1
+    dev: true
+    engines:
+      node: '>=0.10.0'
+    resolution:
+      integrity: sha512-h5PpgXkWitc38BBMYawTYMWJHFZJVnBquFE57xFpjB8pJFiF6gZ+bU+WyI/yqXiFR5mdLsgYNaPe8uao6Uv9Og==
+  /isobject/3.0.1:
+    dev: true
+    engines:
+      node: '>=0.10.0'
+    resolution:
+      integrity: sha1-TkMekrEalzFjaqH5yNHMvP2reN8=
+  /jade/0.26.3:
+    dependencies:
+      commander: 0.6.1
+      mkdirp: 0.3.0
+    deprecated: 'Jade has been renamed to pug, please install the latest version of pug instead of jade'
+    dev: true
+    resolution:
+      integrity: sha1-jxDXl32NefL2/4YqgbBRPMslaGw=
+  /lodash/4.17.10:
+    dev: true
+    resolution:
+      integrity: sha512-UejweD1pDoXu+AD825lWwp4ZGtSwgnpZxb3JDViD7StjQz+Nb/6l093lx4OQ0foGWNRoc19mWy7BzL+UAK2iVg==
+  /lru-cache/2.7.3:
+    dev: true
+    resolution:
+      integrity: sha1-bUUk6LlV+V1PW1iFHOId1y+06VI=
+  /minimatch/0.3.0:
+    dependencies:
+      lru-cache: 2.7.3
+      sigmund: 1.0.1
+    deprecated: Please update to minimatch 3.0.2 or higher to avoid a RegExp DoS issue
+    dev: true
+    resolution:
+      integrity: sha1-J12O2qxPG7MyZHIInnlJyDlGmd0=
+  /minimist/0.0.8:
+    dev: true
+    resolution:
+      integrity: sha1-hX/Kv8M5fSYluCKCYuhqp6ARsF0=
+  /mkdirp/0.3.0:
+    dev: true
+    resolution:
+      integrity: sha1-G79asbqCevI1dRQ0kEJkVfSB/h4=
+  /mkdirp/0.5.1:
+    dependencies:
+      minimist: 0.0.8
+    dev: true
+    resolution:
+      integrity: sha1-MAV0OOrGz3+MR2fzhkjWaX11yQM=
+  /mocha/2.5.3:
+    dependencies:
+      commander: 2.3.0
+      debug: 2.2.0
+      diff: 1.4.0
+      escape-string-regexp: 1.0.2
+      glob: 3.2.11
+      growl: 1.9.2
+      jade: 0.26.3
+      mkdirp: 0.5.1
+      supports-color: 1.2.0
+      to-iso-string: 0.0.2
+    dev: true
+    engines:
+      node: '>= 0.8.x'
+    resolution:
+      integrity: sha1-FhvlvetJZ3HrmzV0UFC2IrWu/Fg=
+  /ms/0.7.1:
+    dev: true
+    resolution:
+      integrity: sha1-nNE8A62/8ltl7/3nzoZO6VIBcJg=
+  /ms/2.0.0:
+    dev: true
+    resolution:
+      integrity: sha1-VgiurfwAvmwpAd9fmGF4jeDVl8g=
+  /sigmund/1.0.1:
+    dev: true
+    resolution:
+      integrity: sha1-P/IfGYytIXX587eBhT/ZTQ0ZtZA=
+  /slate-dev-logger/0.1.39:
+    resolution:
+      integrity: sha1-dEppuFA0JEcT5t5RSDr1cTw0WvQ=
+  /slate-hyperscript/0.5.20:
+    dependencies:
+      is-empty: 1.2.0
+      is-plain-object: 2.0.4
+      slate-dev-logger: 0.1.39
+    dev: true
+    peerDependencies:
+      slate: '>=0.32.0'
+    resolution:
+      integrity: sha1-gzVJBKV+4behILEzUVTsapB9tkk=
+  /slate-schema-violations/0.1.18:
+    dev: true
+    resolution:
+      integrity: sha1-vHYOF9q4WmE82aU5m5jL+GfbDrc=
+  /slate/0.34.5:
+    dependencies:
+      debug: 3.1.0
+      direction: 0.1.5
+      esrever: 0.2.0
+      is-empty: 1.2.0
+      is-plain-object: 2.0.4
+      lodash: 4.17.10
+      slate-dev-logger: 0.1.39
+      slate-schema-violations: 0.1.18
+      type-of: 2.0.1
+    dev: true
+    peerDependencies:
+      immutable: '>=3.8.1'
+      react: '>=0.14.0'
+    resolution:
+      integrity: sha1-S8MNwwDJJBk9QjcaevzBaGdvJ5g=
+  /supports-color/1.2.0:
+    dev: true
+    engines:
+      node: '>=0.10.0'
+    resolution:
+      integrity: sha1-/x7R5hFp0Gs88tWI4YixjYhH4X4=
+  /to-iso-string/0.0.2:
+    deprecated: 'to-iso-string has been deprecated, use @segment/to-iso-string instead.'
+    dev: true
+    resolution:
+      integrity: sha1-TcGeZk38y+Jb2NtQiwDG2hWCVdE=
+  /type-of/2.0.1:
+    dev: true
+    resolution:
+      integrity: sha1-5yoXQYllaOn2KDeNgW1pEvfyOXI=
+registry: 'https://registry.npmjs.org/'
+shrinkwrapMinorVersion: 7
+shrinkwrapVersion: 3
+specifiers:
+  mocha: ^2.5.3
+  slate: ^0.34.5
+  slate-dev-logger: ^0.1.39
+  slate-hyperscript: ^0.5.20

@@ -1,0 +1,43 @@
+{
+  "name": "slate-slt1-serializer",
+  "description": "A slt1 serializer for Slate editors.",
+  "version": "0.1.0",
+  "license": "MIT",
+  "repository": "git://github.com/ianstormtaylor/slate.git",
+  "main": "lib/slate-slt1-serializer.js",
+  "module": "lib/slate-slt1-serializer.es.js",
+  "umd": "dist/slate-slt1-serializer.js",
+  "umdMin": "dist/slate-slt1-serializer.min.js",
+  "files": [
+    "dist/",
+    "lib/"
+  ],
+  "dependencies": {
+    "slate-dev-logger": "^0.1.39"
+  },
+  "peerDependencies": {
+    "slate": ">=0.32.0"
+  },
+  "devDependencies": {
+    "mocha": "^2.5.3",
+    "slate": "^0.34.5",
+    "slate-hyperscript": "^0.5.20"
+  },
+  "scripts": {
+    "clean": "rm -rf ./dist ./lib ./node_modules"
+  },
+  "umdGlobals": {
+    "slate": "Slate"
+  },
+  "keywords": [
+    "deserialize",
+    "editor",
+    "slt1",
+    "serialize",
+    "serializer",
+    "slate",
+    "string",
+    "text",
+    "xml"
+  ]
+}
