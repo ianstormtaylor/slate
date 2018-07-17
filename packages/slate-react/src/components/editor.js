@@ -95,7 +95,10 @@ class Editor extends React.Component {
   static getDerivedStateFromProps(props, state) {
     if (state.props === props) return null
 
-    if (state.props.value === props.value || state.value === props.value) {
+    if (
+      state.props &&
+      (state.props.value === props.value || state.value === props.value)
+    ) {
       return null
     }
 
