@@ -240,7 +240,6 @@ class Editor extends React.Component {
     if (this.value === change.value) return
     const value = this.processValueOnChange(change.value, this.stack)
     const { onChange } = this.props
-    if (value === this.value) return
     this.tmp.value = value
     onChange(value.change())
   }
