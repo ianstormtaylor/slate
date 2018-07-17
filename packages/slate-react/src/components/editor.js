@@ -75,7 +75,7 @@ class Editor extends React.Component {
   tmp = {
     updates: 0,
     resolves: 0,
-    change: undefined,
+    value: undefined,
   }
 
   state = {}
@@ -86,10 +86,15 @@ class Editor extends React.Component {
    */
 
   componentDidMount() {
-    this.flushChange()
+    const { value } = this
 
     if (this.props.autoFocus) {
       this.focus()
+    } else {
+      this.tmp.value = value
+      const change = value.change()
+      debug('didMount', { change })
+      this.props.onChange(change)
     }
 
     this.tmp.updates++
@@ -125,37 +130,6 @@ class Editor extends React.Component {
       return obj
     }, {})
   )
-
-  /**
-   * Queue a `change` object, to be able to flush it later. This is required for
-   * when a change needs to be applied to the value, but because of the React
-   * lifecycle we can't apply that change immediately. So we cache it here and
-   * later can call `this.flushChange()` to flush it.
-   *
-   * @param {Change} change
-   */
-
-  queueChange = memoize(change => {
-    if (change.operations.size) {
-      debug('queueChange', { change })
-      this.tmp.change = change
-    }
-  })
-
-  /**
-   * Flush a temporarily stored `change` object, for when a change needed to be
-   * made but couldn't because of React's lifecycle.
-   */
-
-  flushChange = () => {
-    const { change } = this.tmp
-
-    if (change) {
-      debug('flushChange', { change })
-      this.tmp.change = undefined
-      this.props.onChange(change)
-    }
-  }
 
   /**
    * Perform a change on the editor, passing `...args` to `change.call`.
@@ -199,6 +173,7 @@ class Editor extends React.Component {
   }
 
   get value() {
+    if (this.tmp.value === this.props.value) return this.tmp.value
     return this.processValueOnChange(this.props.value, this.stack)
   }
 
@@ -236,10 +211,8 @@ class Editor extends React.Component {
    */
 
   processValueOnChange = memoize((value, stack) => {
-    if (this.tmp.change && value === this.tmp.change.value) return value
     const change = value.change()
     stack.run('onChange', change, this)
-    this.queueChange(change)
     return change.value
   })
 
@@ -268,6 +241,7 @@ class Editor extends React.Component {
     const value = this.processValueOnChange(change.value, this.stack)
     const { onChange } = this.props
     if (value === this.value) return
+    this.tmp.value = value
     onChange(value.change())
   }
 
