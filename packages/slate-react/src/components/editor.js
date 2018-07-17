@@ -79,33 +79,7 @@ class Editor extends React.Component {
     change: undefined,
   }
 
-  state = {
-    value: this.props.value,
-    getValue: value => this.processValueOnChange(value, this.stack),
-    props: undefined,
-  }
-
-  /**
-   * When the `props` are updated, create a new `Stack` if necessary and run
-   * `onChange` to ensure the value is normalized.
-   *
-   * @param {Object} props
-   */
-
-  static getDerivedStateFromProps(props, state) {
-    if (state.props === props) return null
-
-    if (
-      state.props &&
-      (state.props.value === props.value || state.value === props.value)
-    ) {
-      return null
-    }
-
-    const value = state.getValue(props.value)
-
-    return { value }
-  }
+  state = {}
 
   /**
    * When the component first mounts, flush any temporary changes,
@@ -227,7 +201,7 @@ class Editor extends React.Component {
   }
 
   get value() {
-    return this.state.value
+    return this.processValueOnChange(this.props.value, this.stack)
   }
 
   getStackWithMemoization = memoize(plugins => {
@@ -265,12 +239,10 @@ class Editor extends React.Component {
 
   onChange = change => {
     debug('onChange', { change })
-
-    this.stack.run('onChange', change, this)
-    const { value } = change
+    if (change.value === this.props.value) return
+    const value = this.processValueOnChange(change.value, this.stack)
     const { onChange } = this.props
-    if (value == this.value) return
-    onChange(change)
+    onChange(value.change())
   }
 
   /**
