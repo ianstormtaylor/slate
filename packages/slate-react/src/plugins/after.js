@@ -1,5 +1,5 @@
 import Base64 from 'slate-base64-serializer'
-import Debug from 'debug'
+import EventDebug from './event-debug'
 import Plain from 'slate-plain-serializer'
 import { IS_IOS } from 'slate-dev-environment'
 import React from 'react'
@@ -24,7 +24,7 @@ import setEventTransfer from '../utils/set-event-transfer'
  * @type {Function}
  */
 
-const debug = Debug('slate:after')
+const debug = EventDebug('slate:after')
 
 /**
  * The after plugin.
@@ -89,6 +89,32 @@ function AfterPlugin() {
     }
 
     debug('onClick', { event })
+  }
+
+  /**
+   * On composition end.
+   *
+   * @param {Event} event
+   * @param {Change} change
+   * @param {Editor} editor
+   */
+
+  function onCompositionEnd(event, change, editor) {
+    debug('onCompositionEnd', { event })
+  }
+
+  /**
+   * On composition start.
+   *
+   * @param {Event} event
+   * @param {Change} change
+   * @param {Editor} editor
+   */
+
+  function onCompositionStart(event, change, editor) {
+    const { value } = change
+    if (value.isExpanded) change.delete()
+    debug('onCompositionStart', { event })
   }
 
   /**
@@ -678,6 +704,8 @@ function AfterPlugin() {
     onBeforeInput,
     onBlur,
     onClick,
+    onCompositionStart,
+    onCompositionEnd,
     onCopy,
     onCut,
     onDragEnd,
