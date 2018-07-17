@@ -7,7 +7,6 @@ import getWindow from 'get-window'
 import { Block, Inline, Text } from 'slate'
 import Hotkeys from 'slate-hotkeys'
 
-import EVENT_HANDLERS from '../constants/event-handlers'
 import Content from '../components/content'
 import cloneFragment from '../utils/clone-fragment'
 import findDOMNode from '../utils/find-dom-node'
