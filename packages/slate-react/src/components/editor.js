@@ -210,6 +210,7 @@ class Editor extends React.Component {
   getSchemaWithMemoization = memoize(plugins => Schema.create({ plugins }))
 
   processValueOnChange = memoize((value, stack) => {
+    if (this.tmp.change && value === this.tmp.change.value) return value
     const change = value.change()
     stack.run('onChange', change, this)
     this.queueChange(change)
