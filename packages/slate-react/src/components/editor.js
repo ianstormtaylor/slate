@@ -202,12 +202,39 @@ class Editor extends React.Component {
     return this.processValueOnChange(this.props.value, this.stack)
   }
 
+  /**
+   * Get stack by plugins, it is a memoized function and therefore do not need
+   * to re-evaluate for the same plugins
+   *
+   * @param {Array<Object>} plugins
+   * @return {Stack}
+   */
+
   getStackWithMemoization = memoize(plugins => {
     this.tmp.resolves++
     return Stack.create({ plugins })
   })
 
+  /**
+   * Get schema by plugins, it is a memoized function and therefore do not need
+   * to re-evaluate for the same plugins
+   *
+   * @param {Array<Object>} plugins
+   * @return {Schema}
+   */
+
   getSchemaWithMemoization = memoize(plugins => Schema.create({ plugins }))
+
+  /**
+   * Get value after onChange stack, it is a memoized function and therefore do not need
+   * to re-evaluate for the same value and stack.
+   *
+   * If the value is produced by onChange with the same stack, then will immediately return
+   * this value.
+   *
+   * @param {Value} value
+   * @return {Schema}
+   */
 
   processValueOnChange = memoize((value, stack) => {
     if (this.tmp.change && value === this.tmp.change.value) return value
