@@ -100,7 +100,6 @@ class Editor extends React.Component {
    */
 
   componentDidUpdate(prevProps) {
-    this.flushChange()
     if (prevProps === this.props) return
     // Increment the updates counter as a baseline.
     this.tmp.updates++
@@ -153,7 +152,7 @@ class Editor extends React.Component {
 
     if (change) {
       debug('flushChange', { change })
-      delete this.tmp.change
+      this.tmp.change = undefined
       this.props.onChange(change)
     }
   }
