@@ -141,6 +141,10 @@ class Editor extends React.Component {
     }
   }
 
+  /**
+   * Get event handlers as passed by onEvent
+   */
+
   getHandlers = memoize(() =>
     EVENT_HANDLERS.reduce((obj, handler) => {
       obj[handler] = event => {
