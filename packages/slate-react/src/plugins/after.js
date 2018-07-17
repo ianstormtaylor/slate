@@ -34,6 +34,7 @@ const debug = EventDebug('slate:after')
 
 function AfterPlugin() {
   let isDraggingInternally = null
+  let resolveCompositionID = null
 
   /**
    * On before input, correct any browser inconsistencies.
@@ -47,6 +48,8 @@ function AfterPlugin() {
     debug('onBeforeInput', { event })
 
     event.preventDefault()
+    if (resolveCompositionID) clearTimeout(resolveCompositionID)
+    resolveCompositionID = null
     change.insertText(event.data)
   }
 
@@ -100,6 +103,17 @@ function AfterPlugin() {
    */
 
   function onCompositionEnd(event, change, editor) {
+    event.preventDefault()
+    const { data } = event
+
+    resolveCompositionID = setTimeout(() => {
+      const { value } = change
+
+      if (editor.resolveComposition) {
+        editor.resolveComposition(value, data)
+      }
+    }, 20)
+
     debug('onCompositionEnd', { event })
   }
 
