@@ -62,7 +62,7 @@ class Node extends React.Component {
    * @return {Boolean}
    */
 
-  shouldComponentUpdate = nextProps => {
+  shouldComponentUpdate(nextProps) {
     const { props } = this
     const { stack } = props.editor
     const shouldUpdate = stack.find(

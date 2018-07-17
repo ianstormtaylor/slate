@@ -5,6 +5,8 @@ import SlateTypes from 'slate-prop-types'
 import Types from 'prop-types'
 import logger from 'slate-dev-logger'
 import { Schema, Stack } from 'slate'
+import memoize from 'memoize-one'
+import { polyfill } from 'react-lifecycles-compat'
 
 import EVENT_HANDLERS from '../constants/event-handlers'
 import PLUGINS_PROPS from '../constants/plugin-props'
@@ -71,33 +73,16 @@ class Editor extends React.Component {
    * @param {Object} props
    */
 
-  constructor(props) {
-    super(props)
-    this.state = {}
-    this.tmp = {}
-    this.tmp.updates = 0
-    this.tmp.resolves = 0
+  tmp = {
+    updates: 0,
+    resolves: 0,
+    change: undefined,
+  }
 
-    // Resolve the plugins and create a stack and schema from them.
-    const plugins = this.resolvePlugins(props.plugins, props.schema)
-    const stack = Stack.create({ plugins })
-    const schema = Schema.create({ plugins })
-    this.state.schema = schema
-    this.state.stack = stack
-
-    // Run `onChange` on the passed-in value because we need to ensure that it
-    // is normalized, and queue the resulting change.
-    const change = props.value.change()
-    stack.run('onChange', change, this)
-    this.queueChange(change)
-    this.state.value = change.value
-
-    // Create a bound event handler for each event.
-    EVENT_HANDLERS.forEach(handler => {
-      this[handler] = (...args) => {
-        this.onEvent(handler, ...args)
-      }
-    })
+  state = {
+    value: this.props.value,
+    getValue: value => this.processValueOnChange(value, this.stack),
+    props: undefined,
   }
 
   /**
@@ -107,41 +92,13 @@ class Editor extends React.Component {
    * @param {Object} props
    */
 
-  componentWillReceiveProps = props => {
-    let { schema, stack } = this
+  static getDerivedStateFromProps(props, state) {
+    if (state.props === props) return null
+    const originalValue =
+      state.props.value === props.value ? state.value : props.value
 
-    // Increment the updates counter as a baseline.
-    this.tmp.updates++
-
-    // If the plugins or the schema have changed, we need to re-resolve the
-    // plugins, since it will result in a new stack and new validations.
-    if (
-      props.plugins != this.props.plugins ||
-      props.schema != this.props.schema
-    ) {
-      const plugins = this.resolvePlugins(props.plugins, props.schema)
-      stack = Stack.create({ plugins })
-      schema = Schema.create({ plugins })
-      this.setState({ schema, stack })
-
-      // Increment the resolves counter.
-      this.tmp.resolves++
-
-      // If we've resolved a few times already, and it's exactly in line with
-      // the updates, then warn the user that they may be doing something wrong.
-      if (this.tmp.resolves > 5 && this.tmp.resolves == this.tmp.updates) {
-        logger.warn(
-          'A Slate <Editor> is re-resolving `props.plugins` or `props.schema` on each update, which leads to poor performance. This is often due to passing in a new `schema` or `plugins` prop with each render by declaring them inline in your render function. Do not do this!'
-        )
-      }
-    }
-
-    // Run `onChange` on the passed-in value because we need to ensure that it
-    // is normalized, and queue the resulting change.
-    const change = props.value.change()
-    stack.run('onChange', change, this)
-    this.queueChange(change)
-    this.setState({ value: change.value })
+    const value = state.getValue(originalValue)
+    return { value }
   }
 
   /**
@@ -149,20 +106,33 @@ class Editor extends React.Component {
    * and then, focus the editor if `autoFocus` is set.
    */
 
-  componentDidMount = () => {
+  componentDidMount() {
     this.flushChange()
 
     if (this.props.autoFocus) {
       this.focus()
     }
+
+    this.tmp.updates++
   }
 
   /**
    * When the component updates, flush any temporary change.
    */
 
-  componentDidUpdate = () => {
+  componentDidUpdate(prevProps) {
     this.flushChange()
+    if (prevProps === this.props) return
+    // Increment the updates counter as a baseline.
+    this.tmp.updates++
+
+    // If we've resolved a few times already, and it's exactly in line with
+    // the updates, then warn the user that they may be doing something wrong.
+    if (this.tmp.resolves > 5 && this.tmp.resolves == this.tmp.updates) {
+      logger.warn(
+        'A Slate <Editor> is re-resolving `props.plugins` or `props.schema` on each update, which leads to poor performance. This is often due to passing in a new `schema` or `plugins` prop with each render by declaring them inline in your render function. Do not do this!'
+      )
+    }
   }
 
   /**
@@ -174,12 +144,12 @@ class Editor extends React.Component {
    * @param {Change} change
    */
 
-  queueChange = change => {
+  queueChange = memoize(change => {
     if (change.operations.size) {
       debug('queueChange', { change })
       this.tmp.change = change
     }
-  }
+  })
 
   /**
    * Flush a temporarily stored `change` object, for when a change needed to be
@@ -228,16 +198,32 @@ class Editor extends React.Component {
    */
 
   get schema() {
-    return this.state.schema
+    const plugins = this.resolvePlugins(this.props.plugins, this.props.schema)
+    return this.getSchemaWithMemoization(plugins)
   }
 
   get stack() {
-    return this.state.stack
+    const plugins = this.resolvePlugins(this.props.plugins, this.props.schema)
+    return this.getStackWithMemoization(plugins)
   }
 
   get value() {
     return this.state.value
   }
+
+  getStackWithMemoization = memoize(plugins => {
+    this.tmp.resolves++
+    return Stack.create({ plugins })
+  })
+
+  getSchemaWithMemoization = memoize(plugins => Schema.create({ plugins }))
+
+  processValueOnChange = memoize((value, stack) => {
+    const change = value.change()
+    stack.run('onChange', change)
+    this.queueChange(change)
+    return change.value
+  })
 
   /**
    * On event.
@@ -304,7 +290,7 @@ class Editor extends React.Component {
    * @return {Array}
    */
 
-  resolvePlugins = (plugins, schema) => {
+  resolvePlugins = memoize((plugins, schema) => {
     const beforePlugin = BeforePlugin()
     const afterPlugin = AfterPlugin()
     const editorPlugin = {
@@ -326,8 +312,10 @@ class Editor extends React.Component {
     }
 
     return [beforePlugin, editorPlugin, ...(plugins || []), afterPlugin]
-  }
+  })
 }
+
+polyfill(Editor)
 
 /**
  * Mix in the property types for the event handlers.

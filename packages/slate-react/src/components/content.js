@@ -5,6 +5,7 @@ import getWindow from 'get-window'
 import { IS_FIREFOX, HAS_INPUT_EVENTS_LEVEL_2 } from 'slate-dev-environment'
 import logger from 'slate-dev-logger'
 import throttle from 'lodash/throttle'
+import memoize from 'memoize-one'
 
 import EVENT_HANDLERS from '../constants/event-handlers'
 import Node from './node'
@@ -59,23 +60,20 @@ class Content extends React.Component {
     tagName: 'div',
   }
 
+  tmp = {
+    isUpdatingSelection: false,
+  }
+
   /**
-   * Constructor.
-   *
-   * @param {Object} props
+   * Get Synthethic Event Handlers
    */
 
-  constructor(props) {
-    super(props)
-    this.tmp = {}
-    this.tmp.isUpdatingSelection = false
-
-    EVENT_HANDLERS.forEach(handler => {
-      this[handler] = event => {
-        this.onEvent(handler, event)
-      }
-    })
-  }
+  getHandlers = memoize(() => {
+    return EVENT_HANDLERS.reduce((obj, handler) => {
+      obj[handler] = event => this.onEvent(handler, event)
+      return obj
+    }, {})
+  })
 
   /**
    * When the editor first mounts in the DOM we need to:
@@ -84,7 +82,7 @@ class Content extends React.Component {
    *   - Update the selection, in case it starts focused.
    */
 
-  componentDidMount = () => {
+  componentDidMount() {
     const window = getWindow(this.element)
 
     window.document.addEventListener(
@@ -124,7 +122,7 @@ class Content extends React.Component {
    * On update, update the selection.
    */
 
-  componentDidUpdate = () => {
+  componentDidUpdate() {
     this.updateSelection()
   }
 
@@ -386,10 +384,7 @@ class Content extends React.Component {
       return this.renderNode(child, isSelected, childrenDecorations[i])
     })
 
-    const handlers = EVENT_HANDLERS.reduce((obj, handler) => {
-      obj[handler] = this[handler]
-      return obj
-    }, {})
+    const handlers = this.getHandlers()
 
     const style = {
       // Prevent the default outline styles.

@@ -60,9 +60,9 @@ class Leaf extends React.Component {
     // If any of the regular properties have changed, re-render.
     if (
       props.index != this.props.index ||
-      props.marks != this.props.marks ||
+      !props.marks.equals(this.props.marks) ||
       props.text != this.props.text ||
-      props.parent != this.props.parent
+      !props.parent.equals(this.props.parent)
     ) {
       return true
     }
