@@ -412,21 +412,6 @@ class Content extends React.Component {
         contentEditable={readOnly ? null : true}
         suppressContentEditableWarning
         className={className}
-        onBlur={this.onBlur}
-        onFocus={this.onFocus}
-        onCompositionEnd={this.onCompositionEnd}
-        onCompositionStart={this.onCompositionStart}
-        onCopy={this.onCopy}
-        onCut={this.onCut}
-        onDragEnd={this.onDragEnd}
-        onDragOver={this.onDragOver}
-        onDragStart={this.onDragStart}
-        onDrop={this.onDrop}
-        onInput={this.onInput}
-        onKeyDown={this.onKeyDown}
-        onKeyUp={this.onKeyUp}
-        onPaste={this.onPaste}
-        onSelect={this.onSelect}
         autoCorrect={props.autoCorrect ? 'on' : 'off'}
         spellCheck={spellCheck}
         style={style}

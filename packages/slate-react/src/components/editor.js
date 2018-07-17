@@ -238,9 +238,9 @@ class Editor extends React.Component {
 
   onChange = change => {
     debug('onChange', { change })
-    if (change.value === this.props.value) return
     const value = this.processValueOnChange(change.value, this.stack)
     const { onChange } = this.props
+    if (value === this.value) return
     onChange(value.change())
   }
 
