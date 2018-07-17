@@ -211,7 +211,6 @@ class Editor extends React.Component {
    */
 
   getStackWithMemoization = memoize(plugins => {
-    this.tmp.resolves++
     return Stack.create({ plugins })
   })
 
@@ -309,6 +308,7 @@ class Editor extends React.Component {
    */
 
   resolvePlugins = memoize((plugins, schema) => {
+    this.tmp.resolves++
     const beforePlugin = BeforePlugin()
     const afterPlugin = AfterPlugin()
     const editorPlugin = {
