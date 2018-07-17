@@ -141,6 +141,15 @@ class Editor extends React.Component {
     }
   }
 
+  getHandlers = memoize(() =>
+    EVENT_HANDLERS.reduce((obj, handler) => {
+      obj[handler] = event => {
+        this.onEvent(handler, event)
+      }
+      return obj
+    }, {})
+  )
+
   /**
    * Queue a `change` object, to be able to flush it later. This is required for
    * when a change needs to be applied to the value, but because of the React
@@ -226,7 +235,7 @@ class Editor extends React.Component {
 
   processValueOnChange = memoize((value, stack) => {
     const change = value.change()
-    stack.run('onChange', change)
+    stack.run('onChange', change, this)
     this.queueChange(change)
     return change.value
   })

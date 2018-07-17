@@ -683,10 +683,7 @@ function AfterPlugin() {
    */
 
   function renderEditor(props, editor) {
-    const handlers = EVENT_HANDLERS.reduce((obj, handler) => {
-      obj[handler] = editor[handler]
-      return obj
-    }, {})
+    const handlers = editor.getHandlers()
 
     return (
       <Content
