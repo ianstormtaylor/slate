@@ -6,7 +6,6 @@ import Types from 'prop-types'
 import logger from 'slate-dev-logger'
 import { Schema, Stack } from 'slate'
 import memoize from 'memoize-one'
-import { polyfill } from 'react-lifecycles-compat'
 
 import EVENT_HANDLERS from '../constants/event-handlers'
 import PLUGINS_PROPS from '../constants/plugin-props'
@@ -305,8 +304,6 @@ class Editor extends React.Component {
     return [beforePlugin, editorPlugin, ...(plugins || []), afterPlugin]
   })
 }
-
-polyfill(Editor)
 
 /**
  * Mix in the property types for the event handlers.
