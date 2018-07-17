@@ -95,13 +95,14 @@ class Value extends Record(DEFAULTS) {
    */
 
   static fromJSON(object, options = {}) {
-    let { document = {}, selection = {}, schema = {} } = object
+    let { document = {}, selection = {}, schema = {}, history = {} } = object
 
     let data = new Map()
 
     document = Document.fromJSON(document)
     selection = Range.fromJSON(selection)
     schema = Schema.fromJSON(schema)
+    history = History.fromJSON(history)
 
     // Allow plugins to set a default value for `data`.
     if (options.plugins) {
@@ -125,6 +126,7 @@ class Value extends Record(DEFAULTS) {
       document,
       selection,
       schema,
+      history,
     })
 
     if (options.normalize !== false) {
