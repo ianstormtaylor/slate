@@ -100,6 +100,18 @@ class Value extends Record(DEFAULTS) {
     let data = new Map()
 
     document = Document.fromJSON(document)
+
+    // rebuild selection from anchorPath and focusPath if keys were dropped
+    const { anchorPath, focusPath, anchorKey, focusKey } = selection
+
+    if (anchorPath !== undefined && anchorKey === undefined) {
+      selection.anchorKey = document.assertPath(anchorPath).key
+    }
+
+    if (focusPath !== undefined && focusKey === undefined) {
+      selection.focusKey = document.assertPath(focusPath).key
+    }
+
     selection = Range.fromJSON(selection)
     schema = Schema.fromJSON(schema)
 
