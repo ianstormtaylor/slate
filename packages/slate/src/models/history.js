@@ -61,9 +61,12 @@ class History extends Record(DEFAULTS) {
    */
 
   static createList(operations = []) {
-    if (List.isList(operations) || Array.isArray(operations)) {
-      const list = new List(operations)
-      return list
+    if (List.isList(operations)) {
+      return operations
+    }
+
+    if (Array.isArray(operations)) {
+      return new List(operations)
     }
 
     throw new Error(
