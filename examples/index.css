@@ -76,8 +76,6 @@ input:focus {
 
 span[data-slate-zero-width='n'] {
   user-select: all;
-  display: inline-block;
-  min-width: 1em;
 }
 
 span[data-slate-zero-width='n']:before {
