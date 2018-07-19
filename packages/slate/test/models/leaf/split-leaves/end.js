@@ -1,7 +1,7 @@
 /** @jsx h */
-
+/* eslint-disable import/no-extraneous-dependencies */
 import { List } from 'immutable'
-import { Leaf } from '../../../..'
+import { Leaf } from 'slate'
 
 export const input = List([
   Leaf.create({

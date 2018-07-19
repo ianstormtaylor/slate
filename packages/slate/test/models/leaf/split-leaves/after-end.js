@@ -1,5 +1,4 @@
 /** @jsx h */
-
 /* eslint-disable import/no-extraneous-dependencies */
 import { List } from 'immutable'
 import { Leaf } from 'slate'
