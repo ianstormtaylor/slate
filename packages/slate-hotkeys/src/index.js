@@ -56,11 +56,13 @@ const isDeleteWordBackward = e =>
 const isDeleteWordForward = e =>
   IS_APPLE ? isDeleteWordForwardMac(e) : isDeleteWordForwardPC(e)
 
-const isDeleteCharBackward = e => {
-  if (isDeleteBackward(e) || (IS_APPLE && isDeleteCharBackwardMac(e)))
-    return true
+const isDeleteCharBackward = e =>
+  isDeleteBackward(e) || (IS_APPLE && isDeleteCharBackwardMac(e))
+
+const isUndefinedDelete = e => {
   if (e.key !== 'Backspace' && e.key !== 'Delete') return false
   const other = [
+    isDeleteCharBackward,
     isDeleteLineBackward,
     isDeleteLineForward,
     isDeleteWordBackward,
@@ -146,4 +148,5 @@ export default {
   isRedo,
   isSplitBlock,
   isUndo,
+  isUndefinedDelete,
 }
