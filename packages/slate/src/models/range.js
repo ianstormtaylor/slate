@@ -17,7 +17,6 @@ const DEFAULTS = {
   focusKey: null,
   focusOffset: 0,
   isBackward: null,
-  isFocused: false,
   marks: null,
   isAtomic: false,
 }
@@ -83,7 +82,6 @@ class Range extends Record(DEFAULTS) {
         focusKey: attrs.focusKey,
         focusOffset: attrs.focusOffset,
         isBackward: attrs.isBackward,
-        isFocused: attrs.isFocused,
         marks: attrs.marks,
         isAtomic: attrs.isAtomic,
       }
@@ -98,7 +96,6 @@ class Range extends Record(DEFAULTS) {
       if ('focusOffset' in attrs) props.focusOffset = attrs.focusOffset
       if ('focusPath' in attrs) props.focusPath = attrs.focusPath
       if ('isBackward' in attrs) props.isBackward = attrs.isBackward
-      if ('isFocused' in attrs) props.isFocused = attrs.isFocused
       if ('marks' in attrs)
         props.marks = attrs.marks == null ? null : Mark.createSet(attrs.marks)
       if ('isAtomic' in attrs) props.isAtomic = attrs.isAtomic
@@ -124,7 +121,6 @@ class Range extends Record(DEFAULTS) {
       focusKey = null,
       focusOffset = 0,
       isBackward = null,
-      isFocused = false,
       marks = null,
       isAtomic = false,
     } = object
@@ -135,7 +131,6 @@ class Range extends Record(DEFAULTS) {
       focusKey,
       focusOffset,
       isBackward,
-      isFocused,
       marks: marks == null ? null : new Set(marks.map(Mark.fromJSON)),
       isAtomic,
     })
@@ -176,16 +171,6 @@ class Range extends Record(DEFAULTS) {
       'The `kind` property of Slate objects has been renamed to `object`.'
     )
     return this.object
-  }
-
-  /**
-   * Check whether the range is blurred.
-   *
-   * @return {Boolean}
-   */
-
-  get isBlurred() {
-    return !this.isFocused
   }
 
   /**
@@ -416,30 +401,6 @@ class Range extends Record(DEFAULTS) {
   }
 
   /**
-   * Focus the range.
-   *
-   * @return {Range}
-   */
-
-  focus() {
-    return this.merge({
-      isFocused: true,
-    })
-  }
-
-  /**
-   * Blur the range.
-   *
-   * @return {Range}
-   */
-
-  blur() {
-    return this.merge({
-      isFocused: false,
-    })
-  }
-
-  /**
    * Unset the range.
    *
    * @return {Range}
@@ -451,7 +412,6 @@ class Range extends Record(DEFAULTS) {
       anchorOffset: 0,
       focusKey: null,
       focusOffset: 0,
-      isFocused: false,
       isBackward: false,
     })
   }
@@ -785,7 +745,6 @@ class Range extends Record(DEFAULTS) {
       focusKey: this.focusKey,
       focusOffset: this.focusOffset,
       isBackward: this.isBackward,
-      isFocused: this.isFocused,
       marks:
         this.marks == null ? null : this.marks.toArray().map(m => m.toJSON()),
       isAtomic: this.isAtomic,

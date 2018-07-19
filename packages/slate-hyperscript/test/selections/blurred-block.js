@@ -1,11 +1,13 @@
 /** @jsx h */
 
-import h from '../../../helpers/h'
+import h from '../..'
 
 export const input = (
-  <value>
+  <value focused={false}>
     <document>
-      <paragraph>one</paragraph>
+      <block type="paragraph">
+        This is a paragraph with a cursor position <cursor />(closed selection).
+      </block>
     </document>
   </value>
 )
@@ -20,15 +22,16 @@ export const output = {
       {
         object: 'block',
         type: 'paragraph',
-        data: {},
         isVoid: false,
+        data: {},
         nodes: [
           {
             object: 'text',
             leaves: [
               {
-                text: 'one',
                 object: 'leaf',
+                text:
+                  'This is a paragraph with a cursor position (closed selection).',
                 marks: [],
               },
             ],
@@ -37,18 +40,12 @@ export const output = {
       },
     ],
   },
-  selection: {
-    object: 'range',
-    anchorPath: [0, 0],
-    anchorOffset: 0,
-    focusPath: [0, 0],
-    focusOffset: 0,
-    isBackward: false,
-    marks: null,
-    isAtomic: false,
-  },
 }
 
-export const options = {
-  preserveSelection: true,
+export const expectSelection = {
+  isCollapsed: true,
+  anchorOffset: 43,
+  focusOffset: 43,
+  anchorKey: input.texts.get(0).key,
+  focusKey: input.texts.get(0).key,
 }

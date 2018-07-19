@@ -5,7 +5,7 @@ import h from '../../helpers/h'
 export default function(value) {
   return value
     .change()
-    .removeNodeByKey('a')
+    .focus()
     .value.change()
     .undo().value
 }
@@ -13,8 +13,8 @@ export default function(value) {
 export const input = (
   <value>
     <document>
-      <paragraph key="a">
-        <cursor />one
+      <paragraph>
+        <anchor />wo<focus />rd
       </paragraph>
     </document>
   </value>

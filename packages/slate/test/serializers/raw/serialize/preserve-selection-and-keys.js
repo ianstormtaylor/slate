@@ -12,6 +12,7 @@ export const input = (
 
 export const output = {
   object: 'value',
+  isFocused: false,
   document: {
     object: 'document',
     key: '3',
@@ -46,7 +47,6 @@ export const output = {
     focusKey: '0',
     focusOffset: 0,
     isBackward: false,
-    isFocused: false,
     marks: null,
     isAtomic: false,
   },

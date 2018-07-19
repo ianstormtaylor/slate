@@ -274,7 +274,6 @@ ALIAS_METHODS.forEach(([alias, method]) => {
  */
 
 const PROXY_TRANSFORMS = [
-  'blur',
   'collapseTo',
   'collapseToAnchor',
   'collapseToEnd',
@@ -287,7 +286,6 @@ const PROXY_TRANSFORMS = [
   'extendToEndOf',
   'extendToStartOf',
   'flip',
-  'focus',
   'move',
   'moveAnchor',
   'moveAnchorOffsetTo',
@@ -323,6 +321,7 @@ PROXY_TRANSFORMS.forEach(method => {
     let next = selection[method](...args)
     if (normalize) next = next.normalize(document)
     change.select(next)
+    if (method == 'deselect') change.blur()
   }
 })
 

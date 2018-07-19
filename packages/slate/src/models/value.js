@@ -23,6 +23,7 @@ const DEFAULTS = {
   history: History.create(),
   schema: Schema.create(),
   selection: Range.create(),
+  isFocused: false,
 }
 
 /**
@@ -64,6 +65,7 @@ class Value extends Record(DEFAULTS) {
   static createProperties(attrs = {}) {
     if (Value.isValue(attrs)) {
       return {
+        isFocused: attrs.isFocused,
         data: attrs.data,
         decorations: attrs.decorations,
         schema: attrs.schema,
@@ -76,6 +78,7 @@ class Value extends Record(DEFAULTS) {
       if ('decorations' in attrs)
         props.decorations = Range.createList(attrs.decorations)
       if ('schema' in attrs) props.schema = Schema.create(attrs.schema)
+      if ('isFocused' in attrs) props.isFocused = attrs.isFocused
       return props
     }
 
@@ -95,7 +98,12 @@ class Value extends Record(DEFAULTS) {
    */
 
   static fromJSON(object, options = {}) {
-    let { document = {}, selection = {}, schema = {} } = object
+    let {
+      document = {},
+      selection = {},
+      schema = {},
+      isFocused = false,
+    } = object
 
     let data = new Map()
 
@@ -137,6 +145,7 @@ class Value extends Record(DEFAULTS) {
       document,
       selection,
       schema,
+      isFocused,
     })
 
     if (options.normalize !== false) {
@@ -144,6 +153,30 @@ class Value extends Record(DEFAULTS) {
     }
 
     return value
+  }
+
+  /**
+   * Focus the value.
+   *
+   * @return {Range}
+   */
+
+  focus() {
+    return this.merge({
+      isFocused: true,
+    })
+  }
+
+  /**
+   * Blur the value.
+   *
+   * @return {Range}
+   */
+
+  blur() {
+    return this.merge({
+      isFocused: false,
+    })
   }
 
   /**
@@ -216,10 +249,6 @@ class Value extends Record(DEFAULTS) {
    *
    * @return {Boolean}
    */
-
-  get isFocused() {
-    return this.selection.isFocused
-  }
 
   /**
    * Is the current selection collapsed?
@@ -650,6 +679,7 @@ class Value extends Record(DEFAULTS) {
   toJSON(options = {}) {
     const object = {
       object: this.object,
+      isFocused: this.isFocused,
       document: this.document.toJSON(options),
     }
 
