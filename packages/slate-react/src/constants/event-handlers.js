@@ -8,6 +8,7 @@ const EVENT_HANDLERS = [
   'onBeforeInput',
   'onBlur',
   'onClick',
+  'onContextMenu',
   'onCompositionEnd',
   'onCompositionStart',
   'onCopy',
