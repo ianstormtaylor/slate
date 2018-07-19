@@ -3,6 +3,7 @@ import TRANSFER_TYPES from '../constants/transfer-types'
 import getWindow from 'get-window'
 import findDOMNode from './find-dom-node'
 import removeAllRanges from './remove-all-ranges'
+import { IS_IE } from 'slate-dev-environment'
 import { ZERO_WIDTH_SELECTOR, ZERO_WIDTH_ATTRIBUTE } from './find-point'
 
 const { FRAGMENT, HTML, TEXT } = TRANSFER_TYPES
@@ -88,7 +89,11 @@ function cloneFragment(event, value, fragment = value.fragment) {
 
   // For browsers supporting it, we set the clipboard registers manually,
   // since the result is more predictable.
-  if (event.clipboardData && event.clipboardData.setData) {
+  // COMPAT: IE supports the setData method, but only in restricted sense.
+  // IE doesn't support arbitrary MIME types or common ones like 'text/plain';
+  // it only accepts "Text" (which gets mapped to 'text/plain') and "Url"
+  // (mapped to 'text/url-list'); so, we should only enter block if !IS_IE
+  if (event.clipboardData && event.clipboardData.setData && !IS_IE) {
     event.preventDefault()
     event.clipboardData.setData(TEXT, div.textContent)
     event.clipboardData.setData(FRAGMENT, encoded)
