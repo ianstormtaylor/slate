@@ -5,4 +5,3 @@ module.exports = {
   moduleNameMapper: lernaAliases(),
   collectCoverageFrom: ['**/src/**', '!**/test/**'],
 }
-
