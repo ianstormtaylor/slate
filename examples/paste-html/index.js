@@ -190,7 +190,7 @@ class PasteHtml extends React.Component {
    */
 
   renderNode = props => {
-    const { attributes, children, node, isSelected } = props
+    const { attributes, children, node, isFocused } = props
 
     switch (node.type) {
       case 'quote':
@@ -230,7 +230,7 @@ class PasteHtml extends React.Component {
       }
       case 'image': {
         const src = node.data.get('src')
-        return <Image src={src} selected={isSelected} {...attributes} />
+        return <Image src={src} selected={isFocused} {...attributes} />
       }
     }
   }

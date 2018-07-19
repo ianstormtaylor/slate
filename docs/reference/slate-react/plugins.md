@@ -107,11 +107,12 @@ This handler is called whenever the native DOM selection changes.
 
 _Note: This is **not** Slate's internal selection representation (although it mirrors it). If you want to get notified when Slate's selection changes, use the [`onChange`](../slate-react/editor.md#onchange) property of the `<Editor>`. This handler is instead meant to give you lower-level access to the DOM selection handling, which **is not always triggered** as you'd expect._
 
-## Other Properties
+## Slate-React Properties
 
 ```js
 {
-  onChange: Function
+  onChange: Function,
+  shouldNodeComponentUpdate: Function
 }
 ```
 
@@ -121,11 +122,75 @@ _Note: This is **not** Slate's internal selection representation (although it mi
 
 The `onChange` handler isn't a native browser event handler. Instead, it is invoked whenever the editor value changes. This allows plugins to augment a change however they want.
 
+### `shouldNodeComponentUpdate`
+
+`Function shouldNodeComponentUpdate(previousEditorProps: Object, editorProps: Object) => true || Void`
+
+If this function returns `true`, it can force updating the editor where otherwise it wouldn't.
+
+## Slate-React Rendering
+
+```js
+{
+  renderEditor: Function,
+  renderMark: Function,
+  renderNode: Function,
+  renderPlaceholder: Function,
+  renderPortal: Function,
+}
+```
+
+These renderProps are used to create the Editor UI. They are called for each plugin in reverse plugin order (so the last plugin in the array is called first) and results are passed on as `children` to the next plugin.
+
 ### `renderEditor`
 
-`Function renderEditor(props: Object, editor: Editor) => Object || Void`
+`Function renderEditor(props: Object, editor: Editor) => ReactNode || Void`
 
 The `renderEditor` property allows you to define higher-order-component-like behavior. It is passed all of the properties of the editor, including `props.children`. You can then choose to wrap the existing `children` in any custom elements or proxy the properties however you choose. This can be useful for rendering toolbars, styling the editor, rendering validation, etc. Remember that the `renderEditor` function has to render `props.children` for editor's children to render.
+
+### `renderMark`
+
+`Function renderMark({ editor, mark, marks, node, offset, text, children, attributes }) => ReactNode || Void`
+
+Render a `Mark`.
+
+### `renderNode`
+
+`Function renderNode({ key, editor, isFocused, isSelected, node, parent, readOnly, children, attributes }) => ReactNode || Void`
+
+Render a `Node`.
+
+### `renderPlaceholder`
+
+`Function renderPlaceholder({ editor, mark, marks, node, offset, text, children, attributes }) => ReactNode || Void`
+
+Render the placeholder that is shown when the editor has no `value`.
+
+The `placeholder` prop that was passed to the editor can be found at `editor.props.placeholder`.
+
+### `renderPortal`
+
+`Function renderPortal(value: Value, editor: Editor) => ReactNode || Void`
+
+Unlike the other renderProps, this one is mapped, so each plugin that returns something gets its own Portal. The return value is given as `children` to a `react-portal` `<Portal/>`.
+
+## Other Properties
+
+```js
+{
+  decorateNode: Function,
+  validateNode: Function,
+  schema: Object
+}
+```
+
+### `decorateNode`
+
+`Function decorateNode(node: Node) => [Range] || Void`
+
+### `validateNode`
+
+`Function validateNode(node: Node) => Function(change: Change) || Void`
 
 ### `schema`
 

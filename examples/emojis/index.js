@@ -101,7 +101,7 @@ class Emojis extends React.Component {
    */
 
   renderNode = props => {
-    const { attributes, children, node, isSelected } = props
+    const { attributes, children, node, isFocused } = props
 
     switch (node.type) {
       case 'paragraph': {
@@ -112,7 +112,7 @@ class Emojis extends React.Component {
         return (
           <Emoji
             {...props.attributes}
-            selected={isSelected}
+            selected={isFocused}
             contentEditable={false}
             onDrop={noop}
           >

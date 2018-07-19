@@ -239,7 +239,7 @@ class Text extends Record(DEFAULTS) {
   /**
    * Add a `set` of marks at `index` and `length`.
    * Corner Cases:
-   *   1. If empty text, and if length === 0 and index === 0
+   *   1. If empty text, and if length === 0 and index === 0, will make sure the text contain an empty leaf with the given mark.
    *
    * @param {Number} index
    * @param {Number} length

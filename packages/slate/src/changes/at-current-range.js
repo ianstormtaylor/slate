@@ -171,7 +171,7 @@ Changes.insertFragment = (change, fragment) => {
   const newTexts = document.getTexts().filter(n => !keys.includes(n.key))
   const newText = isAppending ? newTexts.last() : newTexts.takeLast(2).first()
 
-  if ((newText && lastInline) || isInserting) {
+  if (newText && (lastInline || isInserting)) {
     change.select(selection.collapseToEndOf(newText))
   } else if (newText) {
     change.select(

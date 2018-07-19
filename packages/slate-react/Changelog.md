@@ -4,6 +4,14 @@ This document maintains a list of changes to the `slate-react` package with each
 
 ---
 
+### `0.13.0` — July 3, 2018
+
+###### BREAKING
+
+* **The `isSelected` prop of nodes has changed.** Previously it was only `true` when the node was selected and the editor was focused. Now it is true even when the editor is not focused, and a new `isFocused` property has been added for the old behavior.
+
+---
+
 ### `0.12.0` — February 21, 2018
 
 ###### BREAKING
