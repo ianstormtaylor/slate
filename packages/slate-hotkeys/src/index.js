@@ -59,7 +59,7 @@ const isDeleteWordForward = e =>
 const isDeleteCharBackward = e =>
   isDeleteBackward(e) || (IS_APPLE && isDeleteCharBackwardMac(e))
 
-const isUndefinedDelete = e => {
+const isOtherDelete = e => {
   if (e.key !== 'Backspace' && e.key !== 'Delete') return false
   const other = [
     isDeleteCharBackward,
@@ -106,6 +106,7 @@ const isContentEditable = e =>
   isDeleteLineForward(e) ||
   isDeleteWordBackward(e) ||
   isDeleteWordForward(e) ||
+  isOtherDelete(e) ||
   isItalic(e) ||
   isRedo(e) ||
   isSplitBlock(e) ||
@@ -148,5 +149,5 @@ export default {
   isRedo,
   isSplitBlock,
   isUndo,
-  isUndefinedDelete,
+  isDelete: isOtherDelete,
 }

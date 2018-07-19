@@ -379,9 +379,8 @@ function AfterPlugin() {
 
     if (
       (Hotkeys.isDeleteCharBackward(event) && !IS_IOS) ||
-      Hotkeys.isUndefinedDelete(event)
+      Hotkeys.isDelete(event)
     ) {
-      event.preventDefault()
       return change.deleteCharBackward()
     }
 
