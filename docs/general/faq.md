@@ -22,7 +22,7 @@ If you have an element that is not going to be editable, you can choose between 
 
 ### What browsers and devices does Slate support?
 
-Slate's goal is to support all the modern browsers on both desktop and mobile devices. 
+Slate's goal is to support all the modern browsers on both desktop and mobile devices.
 
 However, right now Slate is in beta and is community-driven, so its support is not as robust as it could be. It's currently tested against the latest few versions of Chrome, Firefox and Safari on desktops. It isn't currently tested against Internet Explorer or Edge, or against mobile devices. If you want to add more browser or device support, we'd love for you to submit a pull request!
 
