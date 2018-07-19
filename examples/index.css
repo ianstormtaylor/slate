@@ -86,5 +86,5 @@ span[data-slate-zero-width='n']:before {
 }
 
 span[data-slate-zero-width='n']::selection {
-  background-color: cyan;
+  background-color: #aed5d7;
 }
