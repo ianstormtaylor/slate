@@ -81,4 +81,8 @@ span[data-slate-zero-width='n'] {
 span[data-slate-zero-width='n']:before {
   content: ' ';
   user-select: all;
+  display: inline-block;
+  width: 4px;
+  padding: 2px 0px;
+  margin: -2px -4px -2px 0px;
 }
