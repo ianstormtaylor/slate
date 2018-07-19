@@ -1403,21 +1403,8 @@ class Node {
     if (this.key === key) return []
     if (this.nodes.size === 0) return null
     let result = null
-    // PERF: often the node keys is generated with sequences;
-    // newer node, key with bigger number, are closer to end
-    // older node, key with smaller number, are closer to beginning
-    // Then we can choose find or findLast to control the order.
-    // It is a costless guess, because findLast is not worse than find
-    // without prior knowledge
-    const lastKey = parseInt(this.nodes.last().key, 10)
-    const firstKey = parseInt(this.nodes.first().key, 10)
-    const searchKey = parseInt(key, 10)
 
-    const method =
-      Math.abs(lastKey - searchKey) < Math.abs(searchKey - firstKey)
-        ? 'findLastIndex'
-        : 'findIndex'
-    const index = this.nodes[method](child => {
+    const index = this.nodes.findIndex(child => {
       if (child.key === key) {
         result = []
         return true
