@@ -1,6 +1,5 @@
 import { List } from 'immutable'
 import logger from 'slate-dev-logger'
-
 import Block from '../models/block'
 import Inline from '../models/inline'
 import Mark from '../models/mark'
@@ -1370,16 +1369,20 @@ Changes.wrapInlineAtRange = (change, range, inline, options = {}) => {
   const blocks = document.getBlocksAtRange(range)
   let startBlock = document.getClosestBlock(startKey)
   let endBlock = document.getClosestBlock(endKey)
+  const startInline = document.getClosestInline(startKey)
+  const endInline = document.getClosestInline(endKey)
   let startChild = startBlock.getFurthestAncestor(startKey)
   let endChild = endBlock.getFurthestAncestor(endKey)
 
-  change.splitDescendantsByKey(endChild.key, endKey, endOffset, {
-    normalize: false,
-  })
+  if (!startInline || startInline != endInline) {
+    change.splitDescendantsByKey(endChild.key, endKey, endOffset, {
+      normalize: false,
+    })
 
-  change.splitDescendantsByKey(startChild.key, startKey, startOffset, {
-    normalize: false,
-  })
+    change.splitDescendantsByKey(startChild.key, startKey, startOffset, {
+      normalize: false,
+    })
+  }
 
   document = change.value.document
   startBlock = document.getDescendant(startBlock.key)
@@ -1389,7 +1392,24 @@ Changes.wrapInlineAtRange = (change, range, inline, options = {}) => {
   const startIndex = startBlock.nodes.indexOf(startChild)
   const endIndex = endBlock.nodes.indexOf(endChild)
 
-  if (startBlock == endBlock) {
+  if (startInline && startInline == endInline) {
+    const text = startBlock
+      .getTextsAtRange(range)
+      .get(0)
+      .splitText(startOffset)[1]
+      .splitText(endOffset - startOffset)[0]
+    inline = inline.set('nodes', List([text]))
+    Changes.insertInlineAtRange(change, range, inline, { normalize: false })
+    const inlinekey = inline.getFirstText().key
+    const rng = {
+      anchorKey: inlinekey,
+      focusKey: inlinekey,
+      anchorOffset: 0,
+      focusOffset: endOffset - startOffset,
+      isFocused: true,
+    }
+    change.select(rng)
+  } else if (startBlock == endBlock) {
     document = change.value.document
     startBlock = document.getClosestBlock(startKey)
     startChild = startBlock.getFurthestAncestor(startKey)

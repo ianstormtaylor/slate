@@ -1,11 +1,13 @@
 /* eslint-disable no-console */
 
-import chalk from 'chalk'
-import figures from 'figures'
-import emojis from 'emojis'
-import baseline from '../../tmp/benchmark-baseline'
-import comparison from '../../tmp/benchmark-comparison'
-import { existsSync } from 'fs'
+const chalk = require('chalk')
+const figures = require('figures')
+const emojis = require('emojis')
+const { resolve } = require('path')
+
+const baseline = require(resolve(process.cwd(), 'tmp/benchmark-baseline'))
+const comparison = require(resolve(process.cwd(), 'tmp/benchmark-comparison'))
+const { existsSync } = require('fs')
 
 /**
  * Constants.
@@ -13,8 +15,10 @@ import { existsSync } from 'fs'
 
 let THRESHOLD = 0.333
 const configPath = '../../tmp/benchmark-config.js'
+
 if (existsSync(configPath)) {
   const alternative = require(configPath).THRESHOLD
+
   if (typeof alternative === 'number' && alternative > 0) {
     THRESHOLD = alternative
   }
@@ -43,13 +47,16 @@ baseline.forEach((suite, i) => {
 
       const output = `${b.toFixed(2)} -> ${c.toFixed(2)} ops/sec`
       compared[key].baseOutput = output
+
       compared[key].percentOutput = `${balancePercent.toFixed(2)}% ${
         c > b ? 'faster' : 'slower'
       }`
+
       compared[key].percentValue = balancePercent
       compared[key].b = b
       compared[key].c = c
       compared[key].isFaster = c > b
+
       if (balancePercent > 1000) {
         compared[key].percentOutput += emojis.unicode(' :scream: ')
       } else if (balancePercent > 100) {
@@ -80,16 +87,21 @@ baseline.forEach((suite, i) => {
     if (user.isFaster === hr.isFaster) {
       if (user.isFaster) {
         console.log(chalk.green(`      ${figures.star} ${base.name}:`))
+
         console.log(
           `            user: ${user.baseOutput} (${user.percentOutput})`
         )
+
         console.log(`            real: ${hr.baseOutput} (${hr.percentOutput})`)
         return
       }
+
       console.log(chalk.red(`      ${figures.cross} ${base.name}:`))
+
       console.log(
         `            user: ${user.baseOutput} (${user.percentOutput})`
       )
+
       console.log(`            real: ${hr.baseOutput} (${hr.percentOutput})`)
       return
     }
