@@ -970,13 +970,8 @@ class Node {
         return
       }
 
-      // PERF: use the logic of utils._extend; becuase
-      // Object.assign is about 2x~3x slower than utils._extend
-      const childKeys = Object.keys(child.getKeysAsDictionary())
-
-      childKeys.forEach(key => {
-        keys[key] = true
-      })
+      const childKeys = child.getKeysAsDictionary()
+      Object.assign(keys, childKeys)
     })
 
     return keys
