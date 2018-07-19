@@ -41,7 +41,7 @@ const simulator = new Simulator({ value, plugins })
 
 Core plugins will trigger default behaviour for the events. Without them, only the changes defined in the plugins passed to slate-simulator will be applied. For example, `beforeInput()` event will not insert the data's text if none of the plugins being tested does it.
 
-# Example DataTransfer events
+## Example for `DataTransfer` events
 
 In order to simulate paste and drop events you will need to create a [DataTransfer](https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer). However this object is browser dependant and is not easy to manipulate in CI environments. The easiest work around is to fake its API with a mockup class:
 
