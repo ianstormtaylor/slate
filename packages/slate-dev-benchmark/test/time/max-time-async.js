@@ -9,7 +9,7 @@ let index = 0
 // A wider range than sync, becuase Promise intialization, babel-node takes time
 export function expected() {
   assert(
-    index > 5 && index < 12,
+    index > 4 && index < 15,
     `index should be 10, but is actually ${index}`
   )
   return true
