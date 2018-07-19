@@ -1761,7 +1761,7 @@ class Node {
    */
 
   hasNode(key) {
-    return Array.isArray(this.getPath(key))
+    return !!this.getPath(key)
   }
 
   /**
