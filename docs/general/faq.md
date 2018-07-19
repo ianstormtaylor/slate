@@ -22,6 +22,8 @@ If you have an element that is not going to be editable, you can choose between 
 
 ### What browsers and devices does Slate support?
 
-Slate's goal is to support all the modern browsers on both desktop and mobile devices. However, right now Slate is in beta, so its support is not as robust as it will later be. It's currently tested against the latest few versions of Chrome, Firefox and Safari on desktops. It isn't currently tested against Internet Explorer or Edge, or against mobile devices. If you want to add more browser or device support, we'd love for you to submit a pull request!
+Slate's goal is to support all the modern browsers on both desktop and mobile devices. 
 
-N.B. as of 7/5/2018, it is the Author's opinion that IE11, seeing as it's superseded by Edge, doesn't qualify as a modern browser. Since IE doesn't have tons of the functionality that is considered baseline these days, it's not something that we're going to support without polyfills. Otherwise every single library starts re-bundling the same polyfills over and over and everyone else suffers from bloat. IE11 compatibility fixes that address internal logic are more than welcomed -- people should feel free to leave a PR, so long as the fix isn't something that can be fixed by just bringing your own polyfill.
+However, right now Slate is in beta and is community-driven, so its support is not as robust as it could be. It's currently tested against the latest few versions of Chrome, Firefox and Safari on desktops. It isn't currently tested against Internet Explorer or Edge, or against mobile devices. If you want to add more browser or device support, we'd love for you to submit a pull request!
+
+For older browsers, such as IE11, a lot of the now standard native APIs aren't available. Slate's position on this is that it is up to the user to bring polyfills (like https://polyfill.io) when needed for things like `el.closest`, etc. Otherwise we'd have to bundle and maintain lots of polyfills that others may not even need in the first place.
