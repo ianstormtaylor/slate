@@ -73,3 +73,20 @@ input:focus {
 [data-slate-editor] > * + * {
   margin-top: 1em;
 }
+
+
+span[data-slate-zero-width="n"] {
+  user-select: all;
+  display: inline-block;
+  min-width: 1em;
+}
+
+span[data-slate-zero-width="n"]:before {
+  content:' ';
+  user-select: all;
+}
+
+span[data-slate-zero-width="n"]::selection {
+  background-color: cyan;
+}
+
