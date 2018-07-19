@@ -23,6 +23,9 @@ Plugins that add specific behaviors to your editor.
 | [`slate-sticky-inlines`](https://yarnpkg.com/en/package/slate-sticky-inlines)             | Changes the inline node behavior to allow editing at the edges. | ![](https://img.shields.io/npm/dm/slate-sticky-inlines.svg?maxAge=3600&label=⬇)       |
 | [`slate-suggestions`](https://yarnpkg.com/en/package/slate-suggestions)                   | Displays inline auto-completed suggestions.                     | ![](https://img.shields.io/npm/dm/slate-suggestions.svg?maxAge=3600&label=⬇)          |
 | [`slate-trailing-block`](https://yarnpkg.com/en/package/slate-trailing-block)             | Ensure that documents end in a specific kind of block.          | ![](https://img.shields.io/npm/dm/slate-trailing-block.svg?maxAge=3600&label=⬇)       |
+| [`slate-instant-replace`](https://www.npmjs.com/package/slate-instant-replace)            | Automatically transform last word typed.                        | ![](https://img.shields.io/npm/dm/slate-instant-replace.svg?maxAge=3600&label=⬇)      |
+
+Find more plugins on [npm](https://www.npmjs.com/search?q=slate%20plugin&page=0&perPage=20) or [yarn](https://yarnpkg.com/en/packages?q=slate%20plugin&p=1).
 
 ### Components
 
