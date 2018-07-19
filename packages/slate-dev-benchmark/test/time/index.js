@@ -11,8 +11,9 @@ describe('time', async () => {
 
   for (const file of files) {
     const module = require(`./${file}`)
+    const t = module.skip ? it.skip : it
 
-    it(module.experiment, () => {
+    t(module.experiment, () => {
       module.default(suite)
       const { expected } = module
       repo.isFinished = false

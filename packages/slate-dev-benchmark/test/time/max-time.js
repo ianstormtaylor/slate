@@ -26,3 +26,6 @@ export default function(suite) {
     index++
   })
 }
+
+// Unfortunately this task cannot run on travis CI with Jest
+export const skip = true
