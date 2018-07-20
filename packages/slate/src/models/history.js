@@ -60,7 +60,7 @@ class History extends Record(DEFAULTS) {
    * @return {List<Object>}
    */
 
-  static createList(operations = []) {
+  static createOperationsList(operations = []) {
     if (List.isList(operations)) {
       return operations
     }
@@ -85,8 +85,8 @@ class History extends Record(DEFAULTS) {
     const { redos = [], undos = [] } = object
 
     const history = new History({
-      redos: new Stack(redos.map(this.createList)),
-      undos: new Stack(undos.map(this.createList)),
+      redos: new Stack(redos.map(this.createOperationsList)),
+      undos: new Stack(undos.map(this.createOperationsList)),
     })
 
     return history
