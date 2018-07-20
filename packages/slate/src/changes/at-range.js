@@ -635,8 +635,9 @@ Changes.insertBlockAtRange = (change, range, block, options = {}) => {
 
   const { value } = change
   const { document } = value
-  const { startKey, startOffset } = range
+  let { startKey, startOffset } = range
   const startBlock = document.getClosestBlock(startKey)
+  const startInline = document.getClosestInline(startKey)
   const parent = document.getParent(startBlock.key)
   const index = parent.nodes.indexOf(startBlock)
 
@@ -650,6 +651,20 @@ Changes.insertBlockAtRange = (change, range, block, options = {}) => {
   } else if (range.isAtEndOf(startBlock)) {
     change.insertNodeByKey(parent.key, index + 1, block, { normalize })
   } else {
+    if (startInline && startInline.isVoid) {
+      const atEnd = range.isAtEndOf(startInline)
+      const siblingText = atEnd
+        ? document.getNextText(startKey)
+        : document.getPreviousText(startKey)
+
+      const splitRange = atEnd
+        ? range.moveToStartOf(siblingText)
+        : range.moveToEndOf(siblingText)
+
+      startKey = splitRange.startKey
+      startOffset = splitRange.startOffset
+    }
+
     change.splitDescendantsByKey(startBlock.key, startKey, startOffset, {
       normalize: false,
     })
