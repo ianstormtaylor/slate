@@ -54,6 +54,27 @@ class History extends Record(DEFAULTS) {
   }
 
   /**
+   * Create a list of `Operations` from `operations`.
+   *
+   * @param {Array<Object>|List<Object>} operations
+   * @return {List<Object>}
+   */
+
+  static createOperationsList(operations = []) {
+    if (List.isList(operations)) {
+      return operations
+    }
+
+    if (Array.isArray(operations)) {
+      return new List(operations)
+    }
+
+    throw new Error(
+      `\`History.createList\` only accepts arrays or lists, but you passed it: ${operations}`
+    )
+  }
+
+  /**
    * Create a `History` from a JSON `object`.
    *
    * @param {Object} object
@@ -64,8 +85,8 @@ class History extends Record(DEFAULTS) {
     const { redos = [], undos = [] } = object
 
     const history = new History({
-      redos: new Stack(redos),
-      undos: new Stack(undos),
+      redos: new Stack(redos.map(this.createOperationsList)),
+      undos: new Stack(undos.map(this.createOperationsList)),
     })
 
     return history
