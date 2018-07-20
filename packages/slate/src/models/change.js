@@ -49,6 +49,7 @@ class Change {
       normalize: true,
       ...pick(attrs, ['merge', 'save', 'normalize']),
     }
+    this.__nextNormalizedKeys = []
   }
 
   /**
