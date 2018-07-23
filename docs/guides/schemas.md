@@ -58,7 +58,7 @@ const schema = {
       { types: ['paragraph', 'image'] }
     ],
     normalize: (change, reason, context) => {
-      if (reason == 'child_type_invalid') {
+      if (reason == 'child_invalid') {
         change.setNodeByKey(context.child.key, { type: 'paragraph' })
       }
     }
@@ -67,7 +67,7 @@ const schema = {
 }
 ```
 
-That's an example of defining your own custom `normalize` option for the document validation. If the invalid reason is `child_type_invalid`, it will set the child to be a `paragraph`.
+That's an example of defining your own custom `normalize` option for the document validation. If the invalid reason is `child_invalid`, it will set the child to be a `paragraph`.
 
 When Slate discovers an invalid child, it will first check to see if your custom normalizer handles that case; if your normalizer handles it, then Slate won't run any of its default behavior. This way, you can opt-in to customizing the normalization logic for specific cases without having to re-implement all of the defaults yourself.
 

@@ -5,20 +5,16 @@ import mergeWith from 'lodash/mergeWith'
 import { Record } from 'immutable'
 
 import {
-  CHILD_OBJECT_INVALID,
+  CHILD_INVALID,
   CHILD_REQUIRED,
-  CHILD_TYPE_INVALID,
   CHILD_UNKNOWN,
-  FIRST_CHILD_OBJECT_INVALID,
-  FIRST_CHILD_TYPE_INVALID,
-  LAST_CHILD_OBJECT_INVALID,
-  LAST_CHILD_TYPE_INVALID,
+  FIRST_CHILD_INVALID,
+  LAST_CHILD_INVALID,
   NODE_DATA_INVALID,
   NODE_IS_VOID_INVALID,
   NODE_MARK_INVALID,
   NODE_TEXT_INVALID,
-  PARENT_OBJECT_INVALID,
-  PARENT_TYPE_INVALID,
+  PARENT_INVALID,
 } from 'slate-schema-violations'
 
 import CORE_SCHEMA_RULES from '../constants/core-schema-rules'
@@ -218,13 +214,10 @@ class Schema extends Record(DEFAULTS) {
 
   normalize(change, violation, context) {
     switch (violation) {
-      case CHILD_OBJECT_INVALID:
-      case CHILD_TYPE_INVALID:
+      case CHILD_INVALID:
       case CHILD_UNKNOWN:
-      case FIRST_CHILD_OBJECT_INVALID:
-      case FIRST_CHILD_TYPE_INVALID:
-      case LAST_CHILD_OBJECT_INVALID:
-      case LAST_CHILD_TYPE_INVALID: {
+      case FIRST_CHILD_INVALID:
+      case LAST_CHILD_INVALID: {
         const { child, node } = context
         return child.object == 'text' &&
           node.object == 'block' &&
@@ -235,8 +228,7 @@ class Schema extends Record(DEFAULTS) {
 
       case CHILD_REQUIRED:
       case NODE_TEXT_INVALID:
-      case PARENT_OBJECT_INVALID:
-      case PARENT_TYPE_INVALID: {
+      case PARENT_INVALID: {
         const { node } = context
         return node.object == 'document'
           ? node.nodes.forEach(child => change.removeNodeByKey(child.key))
@@ -322,11 +314,11 @@ class Schema extends Record(DEFAULTS) {
       const child = node.nodes.first()
 
       if (child && objects && !objects.includes(child.object)) {
-        return this.fail(FIRST_CHILD_OBJECT_INVALID, { ...ctx, child })
+        return this.fail(FIRST_CHILD_INVALID, { ...ctx, child })
       }
 
       if (child && types && !types.includes(child.type)) {
-        return this.fail(FIRST_CHILD_TYPE_INVALID, { ...ctx, child })
+        return this.fail(FIRST_CHILD_INVALID, { ...ctx, child })
       }
     }
 
@@ -335,11 +327,11 @@ class Schema extends Record(DEFAULTS) {
       const child = node.nodes.last()
 
       if (child && objects && !objects.includes(child.object)) {
-        return this.fail(LAST_CHILD_OBJECT_INVALID, { ...ctx, child })
+        return this.fail(LAST_CHILD_INVALID, { ...ctx, child })
       }
 
       if (child && types && !types.includes(child.type)) {
-        return this.fail(LAST_CHILD_TYPE_INVALID, { ...ctx, child })
+        return this.fail(LAST_CHILD_INVALID, { ...ctx, child })
       }
     }
 
@@ -387,19 +379,19 @@ class Schema extends Record(DEFAULTS) {
         ) {
           const r = parents[child.type]
 
-          if (
-            r.parent.objects != null &&
-            !r.parent.objects.includes(node.object)
-          ) {
-            return this.fail(PARENT_OBJECT_INVALID, {
-              node: child,
-              parent: node,
-              rule: r,
-            })
-          }
+          // Refer to PARENT_INVALID documentation for the specification
+          const definedObjects = r.parent.objects != null
+          const definedTypes = r.parent.types != null
 
-          if (r.parent.types != null && !r.parent.types.includes(node.type)) {
-            return this.fail(PARENT_TYPE_INVALID, {
+          const allowedObject =
+            definedObjects && r.parent.objects.includes(node.object)
+          const allowedType = definedTypes && r.parent.types.includes(node.type)
+
+          const allowed =
+            (!definedObjects && !definedTypes) || allowedObject || allowedType
+
+          if (!allowed) {
+            return this.fail(PARENT_INVALID, {
               node: child,
               parent: node,
               rule: r,
@@ -417,7 +409,7 @@ class Schema extends Record(DEFAULTS) {
               rewind()
               continue
             }
-            return this.fail(CHILD_OBJECT_INVALID, { ...ctx, child, index })
+            return this.fail(CHILD_INVALID, { ...ctx, child, index })
           }
 
           if (def.types != null && !def.types.includes(child.type)) {
@@ -425,7 +417,7 @@ class Schema extends Record(DEFAULTS) {
               rewind()
               continue
             }
-            return this.fail(CHILD_TYPE_INVALID, { ...ctx, child, index })
+            return this.fail(CHILD_INVALID, { ...ctx, child, index })
           }
         }
       }

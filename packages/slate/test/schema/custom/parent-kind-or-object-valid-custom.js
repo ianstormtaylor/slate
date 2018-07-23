@@ -5,12 +5,11 @@ import h from '../../helpers/h'
 
 export const schema = {
   blocks: {
-    list: {},
-    item: {
-      parent: { types: ['list'] },
+    quote: {
+      parent: { objects: ['document'], types: ['quote'] },
       normalize: (change, reason, { node }) => {
         if (reason == PARENT_INVALID) {
-          change.wrapBlockByKey(node.key, 'list')
+          change.unwrapNodeByKey(node.key)
         }
       },
     },
@@ -21,8 +20,12 @@ export const input = (
   <value>
     <document>
       <paragraph>
-        <item />
+        <quote>one</quote>
       </paragraph>
+      <quote>
+        <quote>two</quote>
+      </quote>
+      <quote>three</quote>
     </document>
   </value>
 )
@@ -30,11 +33,11 @@ export const input = (
 export const output = (
   <value>
     <document>
-      <paragraph>
-        <list>
-          <item />
-        </list>
-      </paragraph>
+      <quote>one</quote>
+      <quote>
+        <quote>two</quote>
+      </quote>
+      <quote>three</quote>
     </document>
   </value>
 )
