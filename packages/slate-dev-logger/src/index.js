@@ -6,6 +6,8 @@
  * @type {Boolean}
  */
 
+const IS_TEST = process.env && process.env.BABEL_ENV === 'test'
+
 const IS_DEV =
   typeof process !== 'undefined' &&
   process.env &&
@@ -75,6 +77,10 @@ function warn(message, ...args) {
  */
 
 function deprecate(version, message, ...args) {
+  if (IS_TEST) {
+    throw new Error(`Deprecation (${version}): ${message}`)
+  }
+
   log('warn', `Deprecation (${version}): ${message}`, ...args)
 }
 
