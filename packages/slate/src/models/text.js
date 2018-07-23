@@ -88,6 +88,15 @@ class Text extends Record(DEFAULTS) {
     const { key = generateKey() } = object
     let { leaves = List() } = object
 
+    if (leaves.size === 0 && object.ranges) {
+      logger.deprecate(
+        'slate@0.27.0',
+        'The `ranges` property of Slate objects has been renamed to `leaves`.'
+      )
+
+      leaves = object.ranges
+    }
+
     if (Array.isArray(leaves)) {
       leaves = List(leaves.map(x => Leaf.create(x)))
     } else if (List.isList(leaves)) {
