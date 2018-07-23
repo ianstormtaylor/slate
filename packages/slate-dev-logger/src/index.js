@@ -6,7 +6,7 @@
  * @type {Boolean}
  */
 
-const IS_TEST = process.env && process.env.BABEL_ENV === 'test'
+const IS_TEST = process && process.env && process.env.BABEL_ENV === 'test'
 
 const IS_DEV =
   typeof process !== 'undefined' &&
