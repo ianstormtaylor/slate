@@ -16,7 +16,7 @@ const CORE_SCHEMA_RULES = [
    */
 
   {
-    validateNode(node) {
+    normalizeNode(node) {
       if (node.object != 'document') return
       const invalids = node.nodes.filter(n => n.object != 'block')
       if (!invalids.size) return
@@ -36,7 +36,7 @@ const CORE_SCHEMA_RULES = [
    */
 
   {
-    validateNode(node) {
+    normalizeNode(node) {
       if (node.object != 'block') return
       const first = node.nodes.first()
       if (!first) return
@@ -59,7 +59,7 @@ const CORE_SCHEMA_RULES = [
    */
 
   {
-    validateNode(node) {
+    normalizeNode(node) {
       if (node.object != 'inline') return
       const invalids = node.nodes.filter(
         n => n.object != 'inline' && n.object != 'text'
@@ -81,7 +81,7 @@ const CORE_SCHEMA_RULES = [
    */
 
   {
-    validateNode(node) {
+    normalizeNode(node) {
       if (node.object != 'block' && node.object != 'inline') return
       if (node.nodes.size > 0) return
 
@@ -103,7 +103,7 @@ const CORE_SCHEMA_RULES = [
    */
 
   {
-    validateNode(node) {
+    normalizeNode(node) {
       if (node.object != 'inline' && node.object != 'block') return
 
       const invalids = node.nodes.filter(
@@ -135,7 +135,7 @@ const CORE_SCHEMA_RULES = [
    */
 
   {
-    validateNode(node) {
+    normalizeNode(node) {
       if (node.object != 'block' && node.object != 'inline') return
 
       const invalids = node.nodes.reduce((list, child, index) => {
@@ -190,7 +190,7 @@ const CORE_SCHEMA_RULES = [
    */
 
   {
-    validateNode(node) {
+    normalizeNode(node) {
       if (node.object != 'block' && node.object != 'inline') return
 
       const invalids = node.nodes
@@ -221,7 +221,7 @@ const CORE_SCHEMA_RULES = [
    */
 
   {
-    validateNode(node) {
+    normalizeNode(node) {
       if (node.object != 'block' && node.object != 'inline') return
       const { nodes } = node
       if (nodes.size <= 1) return

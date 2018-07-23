@@ -1,9 +1,7 @@
 import Debug from 'debug'
 import isPlainObject from 'is-plain-object'
 import logger from 'slate-dev-logger'
-import mergeWith from 'lodash/mergeWith'
 import { Record } from 'immutable'
-
 import {
   CHILD_OBJECT_INVALID,
   CHILD_REQUIRED,
@@ -16,7 +14,9 @@ import {
   NODE_DATA_INVALID,
   NODE_IS_VOID_INVALID,
   NODE_MARK_INVALID,
+  NODE_OBJECT_INVALID,
   NODE_TEXT_INVALID,
+  NODE_TYPE_INVALID,
   PARENT_OBJECT_INVALID,
   PARENT_TYPE_INVALID,
 } from 'slate-schema-violations'
@@ -24,7 +24,7 @@ import {
 import CORE_SCHEMA_RULES from '../constants/core-schema-rules'
 import MODEL_TYPES from '../constants/model-types'
 import Stack from './stack'
-import memoize from '../utils/memoize'
+import SlateError from '../utils/slate-error'
 
 /**
  * Debug.
@@ -42,9 +42,273 @@ const debug = Debug('slate:schema')
 
 const DEFAULTS = {
   stack: Stack.create(),
-  document: {},
-  blocks: {},
-  inlines: {},
+  rules: [],
+}
+
+/**
+ * Normalize an invalid value with `error` with default remedies.
+ *
+ * @param {Change} change
+ * @param {SlateError} error
+ */
+
+function defaultNormalize(change, error) {
+  switch (error.code) {
+    case CHILD_OBJECT_INVALID:
+    case CHILD_TYPE_INVALID:
+    case CHILD_UNKNOWN:
+    case FIRST_CHILD_OBJECT_INVALID:
+    case FIRST_CHILD_TYPE_INVALID:
+    case LAST_CHILD_OBJECT_INVALID:
+    case LAST_CHILD_TYPE_INVALID: {
+      const { child, node } = error
+      return child.object == 'text' &&
+        node.object == 'block' &&
+        node.nodes.size == 1
+        ? change.removeNodeByKey(node.key)
+        : change.removeNodeByKey(child.key)
+    }
+
+    case CHILD_REQUIRED:
+    case NODE_TEXT_INVALID:
+    case PARENT_OBJECT_INVALID:
+    case PARENT_TYPE_INVALID: {
+      const { node } = error
+      return node.object == 'document'
+        ? node.nodes.forEach(child => change.removeNodeByKey(child.key))
+        : change.removeNodeByKey(node.key)
+    }
+
+    case NODE_OBJECT_INVALID:
+    case NODE_TYPE_INVALID: {
+      const { node } = error
+      return change.removeNodeByKey(node.key)
+    }
+
+    case NODE_DATA_INVALID: {
+      const { node, key } = error
+      return node.data.get(key) === undefined && node.object != 'document'
+        ? change.removeNodeByKey(node.key)
+        : change.setNodeByKey(node.key, { data: node.data.delete(key) })
+    }
+
+    case NODE_IS_VOID_INVALID: {
+      const { node } = error
+      return change.setNodeByKey(node.key, { isVoid: !node.isVoid })
+    }
+
+    case NODE_MARK_INVALID: {
+      const { node, mark } = error
+      return node
+        .getTexts()
+        .forEach(t => change.removeMarkByKey(t.key, 0, t.text.length, mark))
+    }
+  }
+}
+
+/**
+ * Validate that a `node` matches one of a set of `rules`.
+ *
+ * @param {Node} node
+ * @param {Array} rules
+ * @return {Error|Void}
+ */
+
+function validateRules(node, rules) {
+  let first
+
+  for (const rule of rules) {
+    const error = validateRule(node, rule)
+    if (!error) return
+    first = first || error
+  }
+
+  return first
+}
+
+/**
+ * Validate that a `node` matches a `rule` object or array.
+ *
+ * @param {Node} node
+ * @param {Object} rule
+ * @param {Array|Void} parentRules
+ * @return {Error|Void}
+ */
+
+function validateRule(node, rule, parentRules = []) {
+  const ctx = { node }
+
+  if (rule.normalize) {
+    ctx.normalize = rule.normalize
+  }
+
+  if (rule.isVoid != null) {
+    if (node.isVoid != rule.isVoid) {
+      return new SlateError(NODE_IS_VOID_INVALID, ctx)
+    }
+  }
+
+  if (rule.object != null) {
+    if (node.object != rule.object) {
+      return new SlateError(NODE_OBJECT_INVALID, ctx)
+    }
+  }
+
+  if (rule.type != null) {
+    if (node.type != rule.type) {
+      return new SlateError(NODE_TYPE_INVALID, ctx)
+    }
+  }
+
+  if (rule.data != null) {
+    for (const key in rule.data) {
+      const fn = rule.data[key]
+      const value = node.data.get(key)
+      const valid = typeof fn === 'function' ? fn(value) : fn === value
+
+      if (!valid) {
+        return new SlateError(NODE_DATA_INVALID, { ...ctx, key, value })
+      }
+    }
+  }
+
+  if (rule.marks != null) {
+    const marks = node.getMarks().toArray()
+
+    for (const mark of marks) {
+      if (!rule.marks.some(def => def.type === mark.type)) {
+        return new SlateError(NODE_MARK_INVALID, { ...ctx, mark })
+      }
+    }
+  }
+
+  if (rule.text != null) {
+    const { text } = node
+
+    if (!rule.text.test(text)) {
+      return new SlateError(NODE_TEXT_INVALID, { ...ctx, text })
+    }
+  }
+
+  if (rule.first != null) {
+    const first = node.nodes.first()
+    const error = validateRules(first, rule.first)
+
+    if (error) {
+      error.child = first
+      error.code = error.code.replace('node_', 'first_child_')
+      return error
+    }
+  }
+
+  if (rule.last != null) {
+    const last = node.nodes.last()
+    const error = validateRules(last, rule.last)
+
+    if (error) {
+      error.child = last
+      error.code = error.code.replace('node_', 'last_child_')
+      return error
+    }
+  }
+
+  if (rule.nodes != null || parentRules.length != 0) {
+    const children = node.nodes.toArray()
+    const defs = rule.nodes != null ? rule.nodes.slice() : []
+
+    let offset
+    let min
+    let index
+    let def
+    let max
+    let child
+
+    function nextDef() {
+      offset = offset == null ? null : 0
+      def = defs.shift()
+      min = def && (def.min == null ? 0 : def.min)
+      max = def && (def.max == null ? Infinity : def.max)
+      return !!def
+    }
+
+    function nextChild() {
+      index = index == null ? 0 : index + 1
+      offset = offset == null ? 0 : offset + 1
+      child = children[index]
+      if (max != null && offset == max) nextDef()
+      return !!child
+    }
+
+    function rewind() {
+      offset -= 1
+      index -= 1
+    }
+
+    if (rule.nodes != null) {
+      nextDef()
+    }
+
+    while (nextChild()) {
+      if (parentRules.length != 0 && child.object != 'text') {
+        const parentRule = parentRules
+          .filter(r => checkRule(child, r.match))
+          .reduce((memo, r) => memo.concat(r.parent), [])
+
+        const error = validateRules(node, parentRule)
+
+        if (error) {
+          error.parent = node
+          error.node = child
+          error.code = error.code.replace('node_', 'parent_')
+          return error
+        }
+      }
+
+      if (rule.nodes != null) {
+        if (!def) {
+          return new SlateError(CHILD_UNKNOWN, { ...ctx, child, index })
+        }
+
+        const error = validateRules(child, def.match)
+
+        if (error && offset >= min && nextDef()) {
+          rewind()
+          continue
+        }
+
+        if (error) {
+          error.child = child
+          error.index = index
+          error.code = error.code.replace('node_', 'child_')
+          return error
+        }
+      }
+    }
+
+    if (rule.nodes != null) {
+      while (min != null) {
+        if (offset < min) {
+          return new SlateError(CHILD_REQUIRED, { ...ctx, index })
+        }
+
+        nextDef()
+      }
+    }
+  }
+}
+
+/**
+ * Check that a `node` matches a `rule`.
+ *
+ * @param {Node} node
+ * @param {Object|Function} rule
+ * @return {Boolean}
+ */
+
+function checkRule(node, rule) {
+  if (typeof rule === 'function') return rule(node)
+  const error = validateRule(node, rule)
+  return !error
 }
 
 /**
@@ -89,25 +353,13 @@ class Schema extends Record(DEFAULTS) {
 
     let { plugins } = object
 
-    if (object.rules) {
-      throw new Error(
-        'Schemas in Slate have changed! They are no longer accept a `rules` property.'
-      )
-    }
-
-    if (object.nodes) {
-      throw new Error(
-        'Schemas in Slate have changed! They are no longer accept a `nodes` property.'
-      )
-    }
-
     if (!plugins) {
       plugins = [{ schema: object }]
     }
 
-    const schema = resolveSchema(plugins)
+    const rules = resolveRules(plugins)
     const stack = Stack.create({ plugins: [...CORE_SCHEMA_RULES, ...plugins] })
-    const ret = new Schema({ ...schema, stack })
+    const ret = new Schema({ stack, rules })
     return ret
   }
 
@@ -147,298 +399,76 @@ class Schema extends Record(DEFAULTS) {
   }
 
   /**
-   * Get the rule for an `object`.
+   * Validate a `node` with the schema, returning an error if it's invalid.
    *
-   * @param {Mixed} object
-   * @return {Object}
+   * @param {Node} node
+   * @return {Error|Void}
    */
 
-  getRule(object) {
-    switch (object.object) {
-      case 'document':
-        return this.document
-      case 'block':
-        return this.blocks[object.type]
-      case 'inline':
-        return this.inlines[object.type]
+  validateNode(node) {
+    const rules = []
+    const parentRules = []
+
+    for (const rule of this.rules) {
+      if (checkRule(node, rule.match)) {
+        rules.push(rule)
+      }
+
+      if (rule.parent != null) {
+        parentRules.push(rule)
+      }
     }
+
+    return validateRules(node, rules, parentRules)
   }
 
   /**
-   * Get a dictionary of the parent rule validations by child type.
+   * Check whether a `node` is valid against the schema.
    *
-   * @return {Object|Null}
+   * @param {Node} node
+   * @return {Boolean}
    */
 
-  getParentRules() {
-    const { blocks, inlines } = this
-    const parents = {}
-
-    for (const key in blocks) {
-      const rule = blocks[key]
-      if (rule.parent == null) continue
-      parents[key] = rule
-    }
-
-    for (const key in inlines) {
-      const rule = inlines[key]
-      if (rule.parent == null) continue
-      parents[key] = rule
-    }
-
-    return Object.keys(parents).length == 0 ? null : parents
+  checkNode(node) {
+    const error = this.validateNode(node)
+    return !error
   }
 
   /**
-   * Fail validation by returning a normalizing change function.
+   * Assert that a `node` is valid against the schema.
    *
-   * @param {String} violation
-   * @param {Object} context
-   * @return {Function}
+   * @param {Node} node
+   * @throws
    */
 
-  fail(violation, context) {
-    return change => {
-      debug(`normalizing`, { violation, context })
-      const { rule } = context
-      const { size } = change.operations
-      if (rule.normalize) rule.normalize(change, violation, context)
-      if (change.operations.size > size) return
-      this.normalize(change, violation, context)
-    }
+  assertNode(node) {
+    const error = this.validateNode(node)
+    if (error) throw error
   }
 
   /**
-   * Normalize an invalid value with `violation` and `context`.
-   *
-   * @param {Change} change
-   * @param {String} violation
-   * @param {Mixed} context
-   */
-
-  normalize(change, violation, context) {
-    switch (violation) {
-      case CHILD_OBJECT_INVALID:
-      case CHILD_TYPE_INVALID:
-      case CHILD_UNKNOWN:
-      case FIRST_CHILD_OBJECT_INVALID:
-      case FIRST_CHILD_TYPE_INVALID:
-      case LAST_CHILD_OBJECT_INVALID:
-      case LAST_CHILD_TYPE_INVALID: {
-        const { child, node } = context
-        return child.object == 'text' &&
-          node.object == 'block' &&
-          node.nodes.size == 1
-          ? change.removeNodeByKey(node.key)
-          : change.removeNodeByKey(child.key)
-      }
-
-      case CHILD_REQUIRED:
-      case NODE_TEXT_INVALID:
-      case PARENT_OBJECT_INVALID:
-      case PARENT_TYPE_INVALID: {
-        const { node } = context
-        return node.object == 'document'
-          ? node.nodes.forEach(child => change.removeNodeByKey(child.key))
-          : change.removeNodeByKey(node.key)
-      }
-
-      case NODE_DATA_INVALID: {
-        const { node, key } = context
-        return node.data.get(key) === undefined && node.object != 'document'
-          ? change.removeNodeByKey(node.key)
-          : change.setNodeByKey(node.key, { data: node.data.delete(key) })
-      }
-
-      case NODE_IS_VOID_INVALID: {
-        const { node } = context
-        return change.setNodeByKey(node.key, { isVoid: !node.isVoid })
-      }
-
-      case NODE_MARK_INVALID: {
-        const { node, mark } = context
-        return node
-          .getTexts()
-          .forEach(t => change.removeMarkByKey(t.key, 0, t.text.length, mark))
-      }
-    }
-  }
-
-  /**
-   * Validate a `node` with the schema, returning a function that will fix the
+   * Normalize a `node` with the schema, returning a function that will fix the
    * invalid node, or void if the node is valid.
    *
    * @param {Node} node
    * @return {Function|Void}
    */
 
-  validateNode(node) {
-    const ret = this.stack.find('validateNode', node)
+  normalizeNode(node) {
+    const ret = this.stack.find('normalizeNode', node)
     if (ret) return ret
-
     if (node.object == 'text') return
 
-    const rule = this.getRule(node) || {}
-    const parents = this.getParentRules()
-    const ctx = { node, rule }
+    const error = this.validateNode(node)
+    if (!error) return
 
-    if (rule.isVoid != null) {
-      if (node.isVoid != rule.isVoid) {
-        return this.fail(NODE_IS_VOID_INVALID, ctx)
-      }
-    }
-
-    if (rule.data != null) {
-      for (const key in rule.data) {
-        const fn = rule.data[key]
-        const value = node.data.get(key)
-
-        if (!fn(value)) {
-          return this.fail(NODE_DATA_INVALID, { ...ctx, key, value })
-        }
-      }
-    }
-
-    if (rule.marks != null) {
-      const marks = node.getMarks().toArray()
-
-      for (const mark of marks) {
-        if (!rule.marks.some(def => def.type === mark.type)) {
-          return this.fail(NODE_MARK_INVALID, { ...ctx, mark })
-        }
-      }
-    }
-
-    if (rule.text != null) {
-      const { text } = node
-
-      if (!rule.text.test(text)) {
-        return this.fail(NODE_TEXT_INVALID, { ...ctx, text })
-      }
-    }
-
-    if (rule.first != null) {
-      const { objects, types } = rule.first
-      const child = node.nodes.first()
-
-      if (child && objects && !objects.includes(child.object)) {
-        return this.fail(FIRST_CHILD_OBJECT_INVALID, { ...ctx, child })
-      }
-
-      if (child && types && !types.includes(child.type)) {
-        return this.fail(FIRST_CHILD_TYPE_INVALID, { ...ctx, child })
-      }
-    }
-
-    if (rule.last != null) {
-      const { objects, types } = rule.last
-      const child = node.nodes.last()
-
-      if (child && objects && !objects.includes(child.object)) {
-        return this.fail(LAST_CHILD_OBJECT_INVALID, { ...ctx, child })
-      }
-
-      if (child && types && !types.includes(child.type)) {
-        return this.fail(LAST_CHILD_TYPE_INVALID, { ...ctx, child })
-      }
-    }
-
-    if (rule.nodes != null || parents != null) {
-      const children = node.nodes.toArray()
-      const defs = rule.nodes != null ? rule.nodes.slice() : []
-
-      let offset
-      let min
-      let index
-      let def
-      let max
-      let child
-
-      function nextDef() {
-        offset = offset == null ? null : 0
-        def = defs.shift()
-        min = def && (def.min == null ? 0 : def.min)
-        max = def && (def.max == null ? Infinity : def.max)
-        return !!def
-      }
-
-      function nextChild() {
-        index = index == null ? 0 : index + 1
-        offset = offset == null ? 0 : offset + 1
-        child = children[index]
-        if (max != null && offset == max) nextDef()
-        return !!child
-      }
-
-      function rewind() {
-        offset -= 1
-        index -= 1
-      }
-
-      if (rule.nodes != null) {
-        nextDef()
-      }
-
-      while (nextChild()) {
-        if (
-          parents != null &&
-          child.object != 'text' &&
-          child.type in parents
-        ) {
-          const r = parents[child.type]
-
-          if (
-            r.parent.objects != null &&
-            !r.parent.objects.includes(node.object)
-          ) {
-            return this.fail(PARENT_OBJECT_INVALID, {
-              node: child,
-              parent: node,
-              rule: r,
-            })
-          }
-
-          if (r.parent.types != null && !r.parent.types.includes(node.type)) {
-            return this.fail(PARENT_TYPE_INVALID, {
-              node: child,
-              parent: node,
-              rule: r,
-            })
-          }
-        }
-
-        if (rule.nodes != null) {
-          if (!def) {
-            return this.fail(CHILD_UNKNOWN, { ...ctx, child, index })
-          }
-
-          if (def.objects != null && !def.objects.includes(child.object)) {
-            if (offset >= min && nextDef()) {
-              rewind()
-              continue
-            }
-            return this.fail(CHILD_OBJECT_INVALID, { ...ctx, child, index })
-          }
-
-          if (def.types != null && !def.types.includes(child.type)) {
-            if (offset >= min && nextDef()) {
-              rewind()
-              continue
-            }
-            return this.fail(CHILD_TYPE_INVALID, { ...ctx, child, index })
-          }
-        }
-      }
-
-      if (rule.nodes != null) {
-        while (min != null) {
-          if (offset < min) {
-            return this.fail(CHILD_REQUIRED, { ...ctx, index })
-          }
-
-          nextDef()
-        }
-      }
+    return change => {
+      debug(`normalizing`, { error })
+      const { rule } = error
+      const { size } = change.operations
+      if (rule.normalize) rule.normalize(change, error)
+      if (change.operations.size > size) return
+      defaultNormalize(change, error)
     }
   }
 
@@ -451,9 +481,7 @@ class Schema extends Record(DEFAULTS) {
   toJSON() {
     const object = {
       object: this.object,
-      document: this.document,
-      blocks: this.blocks,
-      inlines: this.inlines,
+      rules: this.rules,
     }
 
     return object
@@ -475,104 +503,54 @@ class Schema extends Record(DEFAULTS) {
  * @return {Object}
  */
 
-function resolveSchema(plugins = []) {
-  const schema = {
-    document: {},
-    blocks: {},
-    inlines: {},
+function resolveRules(plugins = []) {
+  const rules = []
+
+  for (const plugin in plugins) {
+    const { schema } = plugin
+    if (!schema) continue
+
+    const { document, blocks = {}, inlines = {} } = schema
+
+    if (document) {
+      rules.push({
+        match: [{ object: 'document' }],
+        data: {},
+        nodes: null,
+        ...document,
+      })
+    }
+
+    for (const key in blocks) {
+      rules.push({
+        match: [{ object: 'block', type: key }],
+        data: {},
+        isVoid: null,
+        nodes: null,
+        first: null,
+        last: null,
+        parent: null,
+        text: null,
+        ...blocks[key],
+      })
+    }
+
+    for (const key in inlines) {
+      rules.push({
+        match: [{ object: 'inline', type: key }],
+        data: {},
+        isVoid: null,
+        nodes: null,
+        first: null,
+        last: null,
+        parent: null,
+        text: null,
+        ...inlines[key],
+      })
+    }
   }
 
-  plugins
-    .slice()
-    .reverse()
-    .forEach(plugin => {
-      if (!plugin.schema) return
-
-      if (plugin.schema.rules) {
-        throw new Error(
-          'Schemas in Slate have changed! They are no longer accept a `rules` property.'
-        )
-      }
-
-      if (plugin.schema.nodes) {
-        throw new Error(
-          'Schemas in Slate have changed! They are no longer accept a `nodes` property.'
-        )
-      }
-
-      const { document = {}, blocks = {}, inlines = {} } = plugin.schema
-      const d = resolveDocumentRule(document)
-      const bs = {}
-      const is = {}
-
-      for (const key in blocks) {
-        bs[key] = resolveNodeRule('block', key, blocks[key])
-      }
-
-      for (const key in inlines) {
-        is[key] = resolveNodeRule('inline', key, inlines[key])
-      }
-
-      mergeWith(schema.document, d, customizer)
-      mergeWith(schema.blocks, bs, customizer)
-      mergeWith(schema.inlines, is, customizer)
-    })
-
-  return schema
-}
-
-/**
- * Resolve a document rule `obj`.
- *
- * @param {Object} obj
- * @return {Object}
- */
-
-function resolveDocumentRule(obj) {
-  return {
-    data: {},
-    nodes: null,
-    ...obj,
-  }
-}
-
-/**
- * Resolve a node rule with `type` from `obj`.
- *
- * @param {String} object
- * @param {String} type
- * @param {Object} obj
- * @return {Object}
- */
-
-function resolveNodeRule(object, type, obj) {
-  return {
-    data: {},
-    isVoid: null,
-    nodes: null,
-    first: null,
-    last: null,
-    parent: null,
-    text: null,
-    ...obj,
-  }
-}
-
-/**
- * A Lodash customizer for merging schema definitions. Special cases `objects`,
- * `marks` and `types` arrays to be unioned, and ignores new `null` values.
- *
- * @param {Mixed} target
- * @param {Mixed} source
- * @return {Array|Void}
- */
-
-function customizer(target, source, key) {
-  if (key == 'objects' || key == 'types' || key == 'marks') {
-    return target == null ? source : target.concat(source)
-  } else {
-    return source == null ? target : source
-  }
+  return rules
 }
 
 /**
@@ -580,12 +558,6 @@ function customizer(target, source, key) {
  */
 
 Schema.prototype[MODEL_TYPES.SCHEMA] = true
-
-/**
- * Memoize read methods.
- */
-
-memoize(Schema.prototype, ['getParentRules'])
 
 /**
  * Export.

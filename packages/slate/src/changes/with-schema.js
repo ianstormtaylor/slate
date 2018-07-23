@@ -102,7 +102,7 @@ function normalizeNode(change, node, schema) {
   let iterations = 0
 
   function iterate(c, n) {
-    const normalize = n.validate(schema)
+    const normalize = n.normalize(schema)
     if (!normalize) return
 
     // Run the `normalize` function to fix the node.
@@ -117,14 +117,14 @@ function normalizeNode(change, node, schema) {
     path = c.value.document.refindPath(path, n.key)
 
     // Increment the iterations counter, and check to make sure that we haven't
-    // exceeded the max. Without this check, it's easy for the `validate` or
-    // `normalize` function of a schema rule to be written incorrectly and for
-    // an infinite invalid loop to occur.
+    // exceeded the max. Without this check, it's easy for the `normalize`
+    // function of a schema rule to be written incorrectly and for an infinite
+    // invalid loop to occur.
     iterations++
 
     if (iterations > max) {
       throw new Error(
-        'A schema rule could not be validated after sufficient iterations. This is usually due to a `rule.validate` or `rule.normalize` function of a schema being incorrectly written, causing an infinite loop.'
+        'A schema rule could not be normalized after sufficient iterations. This is usually due to a `rule.normalize` or `plugin.normalizeNode` function of a schema being incorrectly written, causing an infinite loop.'
       )
     }
 
