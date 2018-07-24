@@ -86,13 +86,45 @@ class Schema extends Record(DEFAULTS) {
     }
 
     let { plugins } = object
+    let rules = []
 
     if (!plugins) {
       plugins = [{ schema: object }]
     }
 
-    const rules = resolveRules(plugins)
-    const stack = Stack.create({ plugins: [...CORE_SCHEMA_RULES, ...plugins] })
+    plugins = [...CORE_SCHEMA_RULES, ...plugins]
+
+    for (const plugin of plugins) {
+      const { schema = {} } = plugin
+      const { blocks = {}, inlines = {} } = schema
+
+      if (schema.rules) {
+        rules = [...rules, ...schema.rules]
+      }
+
+      if (schema.document) {
+        rules.push({
+          match: [{ object: 'document' }],
+          ...schema.document,
+        })
+      }
+
+      for (const key in blocks) {
+        rules.push({
+          match: [{ object: 'block', type: key }],
+          ...blocks[key],
+        })
+      }
+
+      for (const key in inlines) {
+        rules.push({
+          match: [{ object: 'inline', type: key }],
+          ...inlines[key],
+        })
+      }
+    }
+
+    const stack = Stack.create({ plugins })
     const ret = new Schema({ stack, rules })
     return ret
   }
@@ -140,20 +172,8 @@ class Schema extends Record(DEFAULTS) {
    */
 
   validateNode(node) {
-    const rules = []
-    const parentRules = []
-
-    for (const rule of this.rules) {
-      if (checkRules(node, rule.match)) {
-        rules.push(rule)
-      }
-
-      if (rule.parent != null) {
-        parentRules.push(rule)
-      }
-    }
-
-    return validateRules(node, rules, parentRules)
+    const rules = this.rules.filter(r => checkRules(node, r.match))
+    return validateRules(node, rules, this.rules)
   }
 
   /**
@@ -200,9 +220,17 @@ class Schema extends Record(DEFAULTS) {
       debug(`normalizing`, { error })
       const { rule } = error
       const { size } = change.operations
-      if (rule.normalize) rule.normalize(change, error)
-      if (change.operations.size > size) return
-      defaultNormalize(change, error)
+
+      // First run the user-provided `normalize` function if one exists...
+      if (rule.normalize) {
+        rule.normalize(change, error)
+      }
+
+      // If the `normalize` function did not add any operations to the change
+      // object, it can't have normalized, so run the default one.
+      if (change.operations.size === size) {
+        defaultNormalize(change, error)
+      }
     }
   }
 
@@ -228,64 +256,6 @@ class Schema extends Record(DEFAULTS) {
   toJS() {
     return this.toJSON()
   }
-}
-
-/**
- * Resolve a set of schema rules from an array of `plugins`.
- *
- * @param {Array} plugins
- * @return {Object}
- */
-
-function resolveRules(plugins = []) {
-  let ret = []
-
-  for (const plugin of plugins) {
-    const { schema } = plugin
-    if (!schema) continue
-
-    const { document, blocks = {}, inlines = {}, rules = [] } = schema
-    ret = [...ret, ...rules]
-
-    if (document) {
-      ret.push({
-        match: [{ object: 'document' }],
-        data: {},
-        nodes: null,
-        ...document,
-      })
-    }
-
-    for (const key in blocks) {
-      ret.push({
-        match: [{ object: 'block', type: key }],
-        data: {},
-        isVoid: null,
-        nodes: null,
-        first: null,
-        last: null,
-        parent: null,
-        text: null,
-        ...blocks[key],
-      })
-    }
-
-    for (const key in inlines) {
-      ret.push({
-        match: [{ object: 'inline', type: key }],
-        data: {},
-        isVoid: null,
-        nodes: null,
-        first: null,
-        last: null,
-        parent: null,
-        text: null,
-        ...inlines[key],
-      })
-    }
-  }
-
-  return ret
 }
 
 /**
@@ -322,12 +292,6 @@ function defaultNormalize(change, error) {
         : change.removeNodeByKey(node.key)
     }
 
-    case NODE_OBJECT_INVALID:
-    case NODE_TYPE_INVALID: {
-      const { node } = error
-      return change.removeNodeByKey(node.key)
-    }
-
     case NODE_DATA_INVALID: {
       const { node, key } = error
       return node.data.get(key) === undefined && node.object != 'document'
@@ -345,6 +309,11 @@ function defaultNormalize(change, error) {
       return node
         .getTexts()
         .forEach(t => change.removeMarkByKey(t.key, 0, t.text.length, mark))
+    }
+
+    default: {
+      const { node } = error
+      return change.removeNodeByKey(node.key)
     }
   }
 }
@@ -371,21 +340,21 @@ function checkRules(node, rules) {
  *
  * @param {Node} node
  * @param {Object|Array} rule
- * @param {Array|Void} parentRules
+ * @param {Array|Void} rules
  * @return {Error|Void}
  */
 
-function validateRules(node, rule, parentRules = []) {
+function validateRules(node, rule, rules) {
   if (Array.isArray(rule)) {
     if (!rule.length) {
-      const error = validateRules(node, {}, parentRules)
+      const error = validateRules(node, {}, rules)
       return error
     }
 
     let first
 
     for (const r of rule) {
-      const error = validateRules(node, r, parentRules)
+      const error = validateRules(node, r, rules)
       if (!error) return
       first = first || error
     }
@@ -393,138 +362,149 @@ function validateRules(node, rule, parentRules = []) {
     return first
   }
 
-  const ctx = { rule, node }
+  const error =
+    validateObject(node, rule) ||
+    validateType(node, rule) ||
+    validateIsVoid(node, rule) ||
+    validateData(node, rule) ||
+    validateMarks(node, rule) ||
+    validateText(node, rule) ||
+    validateFirst(node, rule) ||
+    validateLast(node, rule) ||
+    validateNodes(node, rule, rules)
 
-  if (rule.normalize) {
-    ctx.normalize = rule.normalize
+  return error
+}
+
+function validateObject(node, rule) {
+  if (rule.object == null) return
+  if (rule.object === node.object) return
+  return new SlateError(NODE_OBJECT_INVALID, { rule, node })
+}
+
+function validateType(node, rule) {
+  if (rule.type == null) return
+  if (rule.type === node.type) return
+  return new SlateError(NODE_TYPE_INVALID, { rule, node })
+}
+
+function validateIsVoid(node, rule) {
+  if (rule.isVoid == null) return
+  if (rule.isVoid === node.isVoid) return
+  return new SlateError(NODE_IS_VOID_INVALID, { rule, node })
+}
+
+function validateData(node, rule) {
+  if (rule.data == null) return
+  if (node.data == null) return
+
+  for (const key in rule.data) {
+    const fn = rule.data[key]
+    const value = node.data && node.data.get(key)
+    const valid = typeof fn === 'function' ? fn(value) : fn === value
+    if (valid) continue
+    return new SlateError(NODE_DATA_INVALID, { rule, node, key, value })
+  }
+}
+
+function validateMarks(node, rule) {
+  if (rule.marks == null) return
+  const marks = node.getMarks().toArray()
+
+  for (const mark of marks) {
+    const valid = rule.marks.some(def => def.type === mark.type)
+    if (valid) continue
+    return new SlateError(NODE_MARK_INVALID, { rule, node, mark })
+  }
+}
+
+function validateText(node, rule) {
+  if (rule.text == null) return
+  const { text } = node
+  const valid = rule.text.test(text)
+  if (valid) return
+  return new SlateError(NODE_TEXT_INVALID, { rule, node, text })
+}
+
+function validateFirst(node, rule) {
+  if (rule.first == null) return
+  const first = node.nodes.first()
+  const error = validateRules(first, rule.first)
+  if (!error) return
+  error.rule = rule
+  error.node = node
+  error.child = first
+  error.code = error.code.replace('node_', 'first_child_')
+  return error
+}
+
+function validateLast(node, rule) {
+  if (rule.last == null) return
+  const last = node.nodes.last()
+  const error = validateRules(last, rule.last)
+  if (!error) return
+  error.rule = rule
+  error.node = node
+  error.child = last
+  error.code = error.code.replace('node_', 'last_child_')
+  return error
+}
+
+function validateNodes(node, rule, rules = []) {
+  if (node.nodes == null) return
+
+  const children = node.nodes.toArray()
+  const defs = rule.nodes != null ? rule.nodes.slice() : []
+  let offset
+  let min
+  let index
+  let def
+  let max
+  let child
+  let previous
+  let next
+
+  function nextDef() {
+    offset = offset == null ? null : 0
+    def = defs.shift()
+    min = def && (def.min == null ? 0 : def.min)
+    max = def && (def.max == null ? Infinity : def.max)
+    return !!def
   }
 
-  if (rule.object != null && node.object != rule.object) {
-    return new SlateError(NODE_OBJECT_INVALID, { rule, node })
+  function nextChild() {
+    index = index == null ? 0 : index + 1
+    offset = offset == null ? 0 : offset + 1
+    previous = child
+    child = children[index]
+    next = children[index + 1]
+    if (max != null && offset == max) nextDef()
+    return !!child
   }
 
-  if (rule.type != null && node.type != rule.type) {
-    return new SlateError(NODE_TYPE_INVALID, { rule, node })
+  function rewind() {
+    offset -= 1
+    index -= 1
   }
 
-  if (rule.isVoid != null && node.isVoid != rule.isVoid) {
-    return new SlateError(NODE_IS_VOID_INVALID, { rule, node })
+  if (rule.nodes != null) {
+    nextDef()
   }
 
-  if (rule.data != null && node.data) {
-    for (const key in rule.data) {
-      const fn = rule.data[key]
-      const value = node.data && node.data.get(key)
-      const valid = typeof fn === 'function' ? fn(value) : fn === value
+  while (nextChild()) {
+    const err =
+      validateParent(node, child, rules) ||
+      validatePrevious(node, child, previous, rules) ||
+      validateNext(node, child, next, rules)
 
-      if (!valid || !node.data) {
-        return new SlateError(NODE_DATA_INVALID, { rule, node, key, value })
-      }
-    }
-  }
-
-  if (rule.marks != null) {
-    const marks = node.getMarks().toArray()
-
-    for (const mark of marks) {
-      if (!rule.marks.some(def => def.type === mark.type)) {
-        return new SlateError(NODE_MARK_INVALID, { rule, node, mark })
-      }
-    }
-  }
-
-  if (rule.text != null) {
-    const { text } = node
-
-    if (!rule.text.test(text)) {
-      return new SlateError(NODE_TEXT_INVALID, { rule, node, text })
-    }
-  }
-
-  if (rule.first != null) {
-    const first = node.nodes.first()
-    const error = validateRules(first, rule.first)
-
-    if (error) {
-      error.rule = rule
-      error.node = node
-      error.child = first
-      error.code = error.code.replace('node_', 'first_child_')
-      return error
-    }
-  }
-
-  if (rule.last != null) {
-    const last = node.nodes.last()
-    const error = validateRules(last, rule.last)
-
-    if (error) {
-      error.rule = rule
-      error.node = node
-      error.child = last
-      error.code = error.code.replace('node_', 'last_child_')
-      return error
-    }
-  }
-
-  if (rule.nodes != null || (parentRules.length != 0 && node.nodes)) {
-    const children = node.nodes.toArray()
-    const defs = rule.nodes != null ? rule.nodes.slice() : []
-
-    let offset
-    let min
-    let index
-    let def
-    let max
-    let child
-
-    function nextDef() {
-      offset = offset == null ? null : 0
-      def = defs.shift()
-      min = def && (def.min == null ? 0 : def.min)
-      max = def && (def.max == null ? Infinity : def.max)
-      return !!def
-    }
-
-    function nextChild() {
-      index = index == null ? 0 : index + 1
-      offset = offset == null ? 0 : offset + 1
-      child = children[index]
-      if (max != null && offset == max) nextDef()
-      return !!child
-    }
-
-    function rewind() {
-      offset -= 1
-      index -= 1
-    }
+    if (err) return err
 
     if (rule.nodes != null) {
-      nextDef()
-    }
-
-    while (nextChild()) {
-      if (parentRules.length != 0) {
-        for (const r of parentRules) {
-          if (!checkRules(child, r.match)) continue
-
-          const error = validateRules(node, r.parent)
-
-          if (error) {
-            error.rule = r
-            error.parent = node
-            error.node = child
-            error.code = error.code.replace('node_', 'parent_')
-            return error
-          }
-        }
+      if (!def) {
+        return new SlateError(CHILD_UNKNOWN, { rule, node, child, index })
       }
 
-      if (rule.nodes != null) {
-        if (!def) {
-          return new SlateError(CHILD_UNKNOWN, { ...ctx, child, index })
-        }
-
+      if (def.match) {
         const error = validateRules(child, def.match)
 
         if (error && offset >= min && nextDef()) {
@@ -542,16 +522,70 @@ function validateRules(node, rule, parentRules = []) {
         }
       }
     }
+  }
 
-    if (rule.nodes != null) {
-      while (min != null) {
-        if (offset < min) {
-          return new SlateError(CHILD_REQUIRED, { ...ctx, index })
-        }
-
-        nextDef()
+  if (rule.nodes != null) {
+    while (min != null) {
+      if (offset < min) {
+        return new SlateError(CHILD_REQUIRED, { rule, node, index })
       }
+
+      nextDef()
     }
+  }
+}
+
+function validateParent(node, child, rules) {
+  for (const rule of rules) {
+    if (rule.parent == null) continue
+    if (!checkRules(child, rule.match)) continue
+
+    const error = validateRules(node, rule.parent)
+    if (!error) continue
+
+    error.rule = rule
+    error.parent = node
+    error.node = child
+    error.code = error.code.replace('node_', 'parent_')
+    return error
+  }
+}
+
+function validatePrevious(node, child, previous, rules) {
+  if (!previous) return
+
+  for (const rule of rules) {
+    if (rule.previous == null) continue
+    if (!checkRules(child, rule.match)) continue
+
+    const error = validateRules(previous, rule.previous)
+    if (!error) continue
+
+    error.rule = rule
+    error.parent = node
+    error.node = child
+    error.previous = previous
+    error.code = error.code.replace('node_', 'previous_child_')
+    return error
+  }
+}
+
+function validateNext(node, child, next, rules) {
+  if (!next) return
+
+  for (const rule of rules) {
+    if (rule.next == null) continue
+    if (!checkRules(child, rule.match)) continue
+
+    const error = validateRules(next, rule.next)
+    if (!error) continue
+
+    error.rule = rule
+    error.parent = node
+    error.node = child
+    error.next = next
+    error.code = error.code.replace('node_', 'next_child_')
+    return error
   }
 }
 

@@ -37,12 +37,24 @@ Changes.normalizeDocument = change => {
 
 Changes.normalizeNodeByKey = (change, key) => {
   const { value } = change
-  let { document, schema } = value
+  const { document, schema } = value
   const node = document.assertNode(key)
 
   normalizeNodeAndChildren(change, node, schema)
 
-  document = change.value.document
+  change.normalizeAncestorsByKey(key)
+}
+
+/**
+ * Normalize a node's ancestors by `key`.
+ *
+ * @param {Change} change
+ * @param {String} key
+ */
+
+Changes.normalizeAncestorsByKey = (change, key) => {
+  const { value } = change
+  const { document, schema } = value
   const ancestors = document.getAncestors(key)
   if (!ancestors) return
 
