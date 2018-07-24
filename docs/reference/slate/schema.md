@@ -21,9 +21,11 @@ The top-level properties of a schema give you a way to define validation "rules"
 ```js
 {
   document: {
-    nodes: [{
-      match: { type: 'paragraph' }
-    }]
+    nodes: [
+      {
+        match: { type: 'paragraph' },
+      },
+    ]
   }
 }
 ```
@@ -38,7 +40,7 @@ A set of validation rules that apply to the top-level document.
 {
   blocks: {
     list: {
-      nodes: [{ 
+      nodes: [{
         match: { type: 'item' }
       }]
     },
@@ -60,7 +62,7 @@ A dictionary of blocks by type, each with its own set of validation rules.
   inlines: {
     emoji: {
       isVoid: true,
-      nodes: [{ 
+      nodes: [{
         match: { object: 'text' }
       }]
     },
@@ -113,6 +115,7 @@ A dictionary of data attributes and their corresponding values or validation fun
   first: { type: 'quote' },
 }
 ```
+
 ```js
 {
   first: [{ type: 'quote' }, { type: 'paragraph' }],
@@ -142,6 +145,7 @@ Will validate a node's `isVoid` property.
   last: { type: 'quote' },
 }
 ```
+
 ```js
 {
   last: [{ type: 'quote' }, { type: 'paragraph' }],
@@ -218,6 +222,7 @@ For more information on the arguments passed to `normalize`, see the [Normalizin
   parent: { type: 'list' },
 }
 ```
+
 ```js
 {
   parent: [{ type: 'ordered_list' }, { type: 'unordered_list' }],

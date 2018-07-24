@@ -125,7 +125,7 @@ The third place you may perform change operationsâ€”for more complex use casesâ€
 {
   blocks: {
     list: {
-      nodes: [{ 
+      nodes: [{
         match: { type: 'item' }
       }],
       normalize: (change, error) => {

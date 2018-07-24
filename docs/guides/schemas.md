@@ -15,15 +15,19 @@ Slate schemas are defined as Javascript objects, with properties that describe t
 ```js
 const schema = {
   document: {
-    nodes: [{ 
-      match: [{ type: 'paragraph' }, { type: 'image' }],
-    }]
+    nodes: [
+      {
+        match: [{ type: 'paragraph' }, { type: 'image' }],
+      },
+    ],
   },
   blocks: {
     paragraph: {
-      nodes: [{ 
-        match: { object: 'text' },
-      }]
+      nodes: [
+        {
+          match: { object: 'text' },
+        },
+      ],
     },
     image: {
       isVoid: true,
@@ -58,7 +62,7 @@ Instead, Slate lets you define your own custom normalization logic.
 ```js
 const schema = {
   document: {
-    nodes: [{ 
+    nodes: [{
       match: [{ type: 'paragraph' }, { type: 'image' }],
     }],
     normalize: (change, error) => {
