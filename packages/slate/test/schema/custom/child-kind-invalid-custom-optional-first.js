@@ -8,11 +8,18 @@ export const schema = {
     paragraph: {},
     quote: {
       nodes: [
-        { objects: ['block'], types: ['image'], min: 0, max: 1 },
-        { objects: ['block'], types: ['paragraph'], min: 1 },
+        {
+          match: [{ object: 'block', type: 'image' }],
+          min: 0,
+          max: 1,
+        },
+        {
+          match: [{ object: 'block', type: 'paragraph' }],
+          min: 1,
+        },
       ],
-      normalize: (change, reason, { node, child }) => {
-        if (reason == CHILD_OBJECT_INVALID) {
+      normalize: (change, { code, child }) => {
+        if (code == CHILD_OBJECT_INVALID) {
           change.wrapBlockByKey(child.key, 'paragraph')
         }
       },

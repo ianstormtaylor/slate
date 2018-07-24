@@ -6,9 +6,9 @@ import h from '../../helpers/h'
 export const schema = {
   inlines: {
     link: {
-      parent: { objects: ['block'] },
-      normalize: (change, reason, { node }) => {
-        if (reason == PARENT_OBJECT_INVALID) {
+      parent: { object: 'block' },
+      normalize: (change, { code, node }) => {
+        if (code == PARENT_OBJECT_INVALID) {
           change.unwrapNodeByKey(node.key)
         }
       },

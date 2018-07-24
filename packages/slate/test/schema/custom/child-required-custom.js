@@ -7,9 +7,14 @@ export const schema = {
   blocks: {
     paragraph: {},
     quote: {
-      nodes: [{ types: ['paragraph'], min: 2 }],
-      normalize: (change, reason, { node, index }) => {
-        if (reason == CHILD_REQUIRED) {
+      nodes: [
+        {
+          match: [{ type: 'paragraph' }],
+          min: 2,
+        },
+      ],
+      normalize: (change, { code, node, index }) => {
+        if (code == CHILD_REQUIRED) {
           change.insertNodeByKey(node.key, index, {
             object: 'block',
             type: 'paragraph',
