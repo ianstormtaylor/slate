@@ -8,6 +8,7 @@ import MODEL_TYPES, { isType } from '../constants/model-types'
 import Changes from '../changes'
 import Operation from './operation'
 import apply from '../operations/apply'
+import findClosestDifference from '../utils/find-closest-difference'
 
 /**
  * Debug.
@@ -155,9 +156,13 @@ class Change {
     this.setOperationFlag('normalize', false)
 
     try {
+      const { document } = this.value
       customChange(this)
       // if the change function worked then run normalization
-      this.normalizeDocument()
+      const node = findClosestDifference(document, this.value.document)
+      if (node) {
+        this.normalizeNodeByKey(node.key)
+      }
     } finally {
       // restore the flag to whatever it was
       this.setOperationFlag('normalize', original)

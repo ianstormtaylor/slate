@@ -15,6 +15,7 @@ describe('slate', () => {
   require('./history')
   require('./operations')
   require('./models')
+  require('./utils')
 })
 
 /**
