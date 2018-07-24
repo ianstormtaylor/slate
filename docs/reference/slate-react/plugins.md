@@ -179,7 +179,7 @@ Unlike the other renderProps, this one is mapped, so each plugin that returns so
 ```js
 {
   decorateNode: Function,
-  validateNode: Function,
+  normalizeNode: Function,
   schema: Object
 }
 ```
@@ -188,9 +188,9 @@ Unlike the other renderProps, this one is mapped, so each plugin that returns so
 
 `Function decorateNode(node: Node) => [Range] || Void`
 
-### `validateNode`
+### `normalizeNode`
 
-`Function validateNode(node: Node) => Function(change: Change) || Void`
+`Function normalizeNode(node: Node) => Function(change: Change) || Void`
 
 ### `schema`
 
