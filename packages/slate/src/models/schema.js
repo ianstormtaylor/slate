@@ -296,6 +296,7 @@ class Schema extends Record(DEFAULTS) {
   validateNode(node) {
     const rules = this.rules.filter(r => testRules(node, r.match))
     const failure = validateRules(node, rules, this.rules, { every: true })
+    if (!failure) return
     const error = new SlateError(failure.code, failure)
     return error
   }
