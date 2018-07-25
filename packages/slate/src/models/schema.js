@@ -21,9 +21,9 @@ import {
   PARENT_TYPE_INVALID,
 } from 'slate-schema-violations'
 
-import CORE_SCHEMA_RULES from '../constants/core-schema-rules'
 import MODEL_TYPES from '../constants/model-types'
 import Stack from './stack'
+import Text from './text'
 import SlateError from '../utils/slate-error'
 
 /**
@@ -33,6 +33,134 @@ import SlateError from '../utils/slate-error'
  */
 
 const debug = Debug('slate:schema')
+
+/**
+ * Define the core schema rules, order-sensitive.
+ *
+ * @type {Array}
+ */
+
+const CORE_RULES = [
+  // Only allow block nodes in documents.
+  {
+    match: { object: 'document' },
+    nodes: [
+      {
+        match: { object: 'block' },
+      },
+    ],
+  },
+
+  // Only allow block nodes or inline and text nodes in blocks.
+  {
+    match: {
+      object: 'block',
+      first: { object: 'block' },
+    },
+    nodes: [
+      {
+        match: { object: 'block' },
+      },
+    ],
+  },
+  {
+    match: {
+      object: 'block',
+      first: [{ object: 'inline' }, { object: 'text' }],
+    },
+    nodes: [
+      {
+        match: [{ object: 'inline' }, { object: 'text' }],
+      },
+    ],
+  },
+
+  // Only allow inline and text nodes in inlines.
+  {
+    match: { object: 'inline' },
+    nodes: [{ match: [{ object: 'inline' }, { object: 'text' }] }],
+  },
+
+  // Ensure that block and inline nodes have at least one text child.
+  {
+    match: [{ object: 'block' }, { object: 'inline' }],
+    nodes: [{ min: 1 }],
+    normalize: (change, error) => {
+      const { code, node } = error
+      if (code !== 'child_required') return
+      change.insertNodeByKey(node.key, 0, Text.create(), { normalize: false })
+    },
+  },
+
+  // Ensure that inline non-void nodes are never empty.
+  {
+    match: {
+      object: 'inline',
+      isVoid: false,
+      nodes: [{ match: { object: 'text' } }],
+    },
+    text: /[\w\W]+/,
+  },
+
+  // Ensure that inline void nodes are surrounded by text nodes.
+  {
+    match: { object: 'block' },
+    first: [{ object: 'block' }, { object: 'text' }],
+    last: [{ object: 'block' }, { object: 'text' }],
+    normalize: (change, error) => {
+      const { code, node } = error
+      const text = Text.create()
+      let i
+
+      if (code === 'first_child_object_invalid') {
+        i = 0
+      } else if (code === 'last_child_object_invalid') {
+        i = node.nodes.size
+      } else {
+        return
+      }
+
+      change.insertNodeByKey(node.key, i, text, { normalize: false })
+    },
+  },
+  {
+    match: { object: 'inline' },
+    first: [{ object: 'block' }, { object: 'text' }],
+    last: [{ object: 'block' }, { object: 'text' }],
+    previous: [{ object: 'block' }, { object: 'text' }],
+    next: [{ object: 'block' }, { object: 'text' }],
+    normalize: (change, error) => {
+      const { code, node, index } = error
+      const text = Text.create()
+      let i
+
+      if (code === 'first_child_object_invalid') {
+        i = 0
+      } else if (code === 'last_child_object_invalid') {
+        i = node.nodes.size
+      } else if (code === 'previous_child_object_invalid') {
+        i = index
+      } else if (code === 'next_child_object_invalid') {
+        i = index + 1
+      } else {
+        return
+      }
+
+      change.insertNodeByKey(node.key, i, text, { normalize: false })
+    },
+  },
+
+  // Merge adjacent text nodes.
+  {
+    match: { object: 'text' },
+    next: [{ object: 'block' }, { object: 'inline' }],
+    normalize: (change, error) => {
+      const { code, next } = error
+      if (code !== 'next_child_object_invalid') return
+      change.mergeNodeByKey(next.key, { normalize: false })
+    },
+  },
+]
 
 /**
  * Default properties.
@@ -85,21 +213,15 @@ class Schema extends Record(DEFAULTS) {
       return object
     }
 
-    let { plugins } = object
-    let rules = []
-
-    if (!plugins) {
-      plugins = [{ schema: object }]
-    }
-
-    plugins = [...CORE_SCHEMA_RULES, ...plugins]
+    let rules = [...CORE_RULES]
+    const plugins = object.plugins ? object.plugins : [{ schema: object }]
 
     for (const plugin of plugins) {
       const { schema = {} } = plugin
       const { blocks = {}, inlines = {} } = schema
 
       if (schema.rules) {
-        rules = [...rules, ...schema.rules]
+        rules = rules.concat(schema.rules)
       }
 
       if (schema.document) {
@@ -287,7 +409,6 @@ function defaultNormalize(change, error) {
     case NODE_TEXT_INVALID:
     case PARENT_OBJECT_INVALID:
     case PARENT_TYPE_INVALID: {
-      debugger
       const { node } = error
       return node.object == 'document'
         ? node.nodes.forEach(child => change.removeNodeByKey(child.key))

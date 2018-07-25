@@ -17,6 +17,7 @@ describe('schema', () => {
 
     for (const test of tests) {
       it(test, async () => {
+        global.stop = true
         const module = require(resolve(testsDir, test))
         const { input, output, schema } = module
         const s = Schema.create(schema)
