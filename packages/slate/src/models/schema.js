@@ -21,6 +21,7 @@ import {
   PARENT_TYPE_INVALID,
 } from 'slate-schema-violations'
 
+import CORE_SCHEMA_RULES from '../constants/core-schema-rules'
 import MODEL_TYPES from '../constants/model-types'
 import Stack from './stack'
 import Text from './text'
@@ -213,8 +214,20 @@ class Schema extends Record(DEFAULTS) {
       return object
     }
 
-    let rules = [...CORE_RULES]
-    const plugins = object.plugins ? object.plugins : [{ schema: object }]
+    let rules = []
+    let plugins = object.plugins ? object.plugins : [{ schema: object }]
+    let NEW
+
+    NEW = true
+
+    if (NEW) {
+      rules = [...CORE_RULES]
+    } else {
+      plugins = [...CORE_SCHEMA_RULES, ...plugins]
+    }
+
+    NEW = false
+    NEW = true
 
     for (const plugin of plugins) {
       const { schema = {} } = plugin
@@ -454,6 +467,10 @@ function testRules(node, rules) {
   return !error
 }
 
+function fail(code, attrs) {
+  return { code, ...attrs }
+}
+
 /**
  * Validate that a `node` matches a `rule` object or array.
  *
@@ -497,19 +514,19 @@ function validateRules(node, rule, rules, options = {}) {
 function validateObject(node, rule) {
   if (rule.object == null) return
   if (rule.object === node.object) return
-  return new SlateError(NODE_OBJECT_INVALID, { rule, node })
+  return fail(NODE_OBJECT_INVALID, { rule, node })
 }
 
 function validateType(node, rule) {
   if (rule.type == null) return
   if (rule.type === node.type) return
-  return new SlateError(NODE_TYPE_INVALID, { rule, node })
+  return fail(NODE_TYPE_INVALID, { rule, node })
 }
 
 function validateIsVoid(node, rule) {
   if (rule.isVoid == null) return
   if (rule.isVoid === node.isVoid) return
-  return new SlateError(NODE_IS_VOID_INVALID, { rule, node })
+  return fail(NODE_IS_VOID_INVALID, { rule, node })
 }
 
 function validateData(node, rule) {
@@ -521,7 +538,7 @@ function validateData(node, rule) {
     const value = node.data && node.data.get(key)
     const valid = typeof fn === 'function' ? fn(value) : fn === value
     if (valid) continue
-    return new SlateError(NODE_DATA_INVALID, { rule, node, key, value })
+    return fail(NODE_DATA_INVALID, { rule, node, key, value })
   }
 }
 
@@ -532,7 +549,7 @@ function validateMarks(node, rule) {
   for (const mark of marks) {
     const valid = rule.marks.some(def => def.type === mark.type)
     if (valid) continue
-    return new SlateError(NODE_MARK_INVALID, { rule, node, mark })
+    return fail(NODE_MARK_INVALID, { rule, node, mark })
   }
 }
 
@@ -541,7 +558,7 @@ function validateText(node, rule) {
   const { text } = node
   const valid = rule.text.test(text)
   if (valid) return
-  return new SlateError(NODE_TEXT_INVALID, { rule, node, text })
+  return fail(NODE_TEXT_INVALID, { rule, node, text })
 }
 
 function validateFirst(node, rule) {
@@ -621,7 +638,7 @@ function validateNodes(node, rule, rules = []) {
 
     if (rule.nodes != null) {
       if (!def) {
-        return new SlateError(CHILD_UNKNOWN, { rule, node, child, index })
+        return fail(CHILD_UNKNOWN, { rule, node, child, index })
       }
 
       if (def.match) {
@@ -647,7 +664,7 @@ function validateNodes(node, rule, rules = []) {
   if (rule.nodes != null) {
     while (min != null) {
       if (offset < min) {
-        return new SlateError(CHILD_REQUIRED, { rule, node, index })
+        return fail(CHILD_REQUIRED, { rule, node, index })
       }
 
       nextDef()
