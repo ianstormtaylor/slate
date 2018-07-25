@@ -226,6 +226,58 @@ class Node {
   }
 
   /**
+   * Verify whether the anchor and focus of two ranges are visibly the same
+   * @param {Range} range1
+   * @param {Range} range2
+   * @return {Boolean}
+   * **/
+
+  areRangesEquivalent(range1, range2) {
+    if (range1 === range2) return true
+
+    const isSameAnchor = this.arePointsEquivalent(
+      { key: range1.anchorKey, offset: range1.anchorOffset },
+      { key: range2.anchorKey, offset: range2.anchorOffset }
+    )
+
+    if (!isSameAnchor) {
+      return false
+    }
+
+    return this.arePointsEquivalent(
+      { key: range1.focusKey, offset: range1.focusOffset },
+      { key: range2.focusKey, offset: range2.focusOffset }
+    )
+  }
+
+  /**
+   * Verify whether the positions are almost the same
+   * @param {Object} point1
+   *   @property {string} key
+   *   @property {number} offset
+   * @param {Object} point2
+   *   @property {string} key
+   *   @property {number} offset
+   * @return {Boolean}
+   *
+   * **/
+
+  arePointsEquivalent(point1, point2) {
+    const { key, offset } = point1
+
+    if (key === point2.key) return offset === point2.offset
+
+    const block = this.getClosestBlock(key)
+    if (!block || !block.hasDescendant(point2.key)) {
+      return false
+    }
+    return (
+      offset + block.getOffset(key) ===
+      point2.offset + block.getOffset(point2.key)
+    )
+  }
+
+  /**
    * Assert that a node has a descendant by `key` and return it.
    *
    * @param {String} key

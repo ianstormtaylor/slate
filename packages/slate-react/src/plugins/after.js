@@ -534,6 +534,14 @@ function AfterPlugin() {
     if (!range) return
 
     const { anchorKey, anchorOffset, focusKey, focusOffset } = range
+
+    // COMPAT: If there are no offset difference between the browser selection
+    // and slate selection, then do not update slate selection
+    // Because this selection is not triggered by user input, but by browser adjustment
+    if (document.areRangesEquivalent(value.selection, range)) {
+      return
+    }
+
     const anchorText = document.getNode(anchorKey)
     const focusText = document.getNode(focusKey)
     const anchorInline = document.getClosestInline(anchorKey)
