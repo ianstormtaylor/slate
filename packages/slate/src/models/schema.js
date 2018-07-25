@@ -21,7 +21,6 @@ import {
   PARENT_TYPE_INVALID,
 } from 'slate-schema-violations'
 
-import CORE_SCHEMA_RULES from '../constants/core-schema-rules'
 import MODEL_TYPES from '../constants/model-types'
 import Stack from './stack'
 import Text from './text'
@@ -214,20 +213,8 @@ class Schema extends Record(DEFAULTS) {
       return object
     }
 
-    let rules = []
-    let plugins = object.plugins ? object.plugins : [{ schema: object }]
-    let NEW
-
-    NEW = true
-
-    if (NEW) {
-      rules = [...CORE_RULES]
-    } else {
-      plugins = [...CORE_SCHEMA_RULES, ...plugins]
-    }
-
-    NEW = false
-    NEW = true
+    const plugins = object.plugins ? object.plugins : [{ schema: object }]
+    let rules = [...CORE_RULES]
 
     for (const plugin of plugins) {
       const { schema = {} } = plugin
@@ -308,7 +295,8 @@ class Schema extends Record(DEFAULTS) {
 
   validateNode(node) {
     const rules = this.rules.filter(r => testRules(node, r.match))
-    const error = validateRules(node, rules, this.rules, { every: true })
+    const failure = validateRules(node, rules, this.rules, { every: true })
+    const error = new SlateError(failure.code, failure)
     return error
   }
 
@@ -465,10 +453,6 @@ function defaultNormalize(change, error) {
 function testRules(node, rules) {
   const error = validateRules(node, rules)
   return !error
-}
-
-function fail(code, attrs) {
-  return { code, ...attrs }
 }
 
 /**
@@ -726,6 +710,18 @@ function validateNext(node, child, next, index, rules) {
     error.code = error.code.replace('node_', 'next_child_')
     return error
   }
+}
+
+/**
+ * Create an interim failure object with `code` and `attrs`.
+ *
+ * @param {String} code
+ * @param {Object} attrs
+ * @return {Object}
+ */
+
+function fail(code, attrs) {
+  return { code, ...attrs }
 }
 
 /**
