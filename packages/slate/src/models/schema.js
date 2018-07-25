@@ -172,18 +172,19 @@ class Schema extends Record(DEFAULTS) {
    */
 
   validateNode(node) {
-    const rules = this.rules.filter(r => checkRules(node, r.match))
-    return validateRules(node, rules, this.rules)
+    const rules = this.rules.filter(r => testRules(node, r.match))
+    const error = validateRules(node, rules, this.rules, { every: true })
+    return error
   }
 
   /**
-   * Check whether a `node` is valid against the schema.
+   * Test whether a `node` is valid against the schema.
    *
    * @param {Node} node
    * @return {Boolean}
    */
 
-  checkNode(node) {
+  testNode(node) {
     const error = this.validateNode(node)
     return !error
   }
@@ -286,6 +287,7 @@ function defaultNormalize(change, error) {
     case NODE_TEXT_INVALID:
     case PARENT_OBJECT_INVALID:
     case PARENT_TYPE_INVALID: {
+      debugger
       const { node } = error
       return node.object == 'document'
         ? node.nodes.forEach(child => change.removeNodeByKey(child.key))
@@ -322,15 +324,11 @@ function defaultNormalize(change, error) {
  * Check that a `node` matches one of a set of `rules`.
  *
  * @param {Node} node
- * @param {Object|Function} rules
+ * @param {Object|Array} rules
  * @return {Boolean}
  */
 
-function checkRules(node, rules) {
-  if (typeof rules === 'function') {
-    return rules(node)
-  }
-
+function testRules(node, rules) {
   const error = validateRules(node, rules)
   return !error
 }
@@ -344,19 +342,18 @@ function checkRules(node, rules) {
  * @return {Error|Void}
  */
 
-function validateRules(node, rule, rules) {
-  if (Array.isArray(rule)) {
-    if (!rule.length) {
-      const error = validateRules(node, {}, rules)
-      return error
-    }
+function validateRules(node, rule, rules, options = {}) {
+  const { every = false } = options
 
+  if (Array.isArray(rule)) {
+    const array = rule.length ? rule : [{}]
     let first
 
-    for (const r of rule) {
+    for (const r of array) {
       const error = validateRules(node, r, rules)
-      if (!error) return
       first = first || error
+      if (every && error) return error
+      if (!every && !error) return
     }
 
     return first
@@ -429,6 +426,7 @@ function validateText(node, rule) {
 function validateFirst(node, rule) {
   if (rule.first == null) return
   const first = node.nodes.first()
+  if (!first) return
   const error = validateRules(first, rule.first)
   if (!error) return
   error.rule = rule
@@ -441,6 +439,7 @@ function validateFirst(node, rule) {
 function validateLast(node, rule) {
   if (rule.last == null) return
   const last = node.nodes.last()
+  if (!last) return
   const error = validateRules(last, rule.last)
   if (!error) return
   error.rule = rule
@@ -467,8 +466,8 @@ function validateNodes(node, rule, rules = []) {
   function nextDef() {
     offset = offset == null ? null : 0
     def = defs.shift()
-    min = def && (def.min == null ? 0 : def.min)
-    max = def && (def.max == null ? Infinity : def.max)
+    min = def && def.min
+    max = def && def.max
     return !!def
   }
 
@@ -494,8 +493,8 @@ function validateNodes(node, rule, rules = []) {
   while (nextChild()) {
     const err =
       validateParent(node, child, rules) ||
-      validatePrevious(node, child, previous, rules) ||
-      validateNext(node, child, next, rules)
+      validatePrevious(node, child, previous, index, rules) ||
+      validateNext(node, child, next, index, rules)
 
     if (err) return err
 
@@ -538,7 +537,7 @@ function validateNodes(node, rule, rules = []) {
 function validateParent(node, child, rules) {
   for (const rule of rules) {
     if (rule.parent == null) continue
-    if (!checkRules(child, rule.match)) continue
+    if (!testRules(child, rule.match)) continue
 
     const error = validateRules(node, rule.parent)
     if (!error) continue
@@ -551,38 +550,40 @@ function validateParent(node, child, rules) {
   }
 }
 
-function validatePrevious(node, child, previous, rules) {
+function validatePrevious(node, child, previous, index, rules) {
   if (!previous) return
 
   for (const rule of rules) {
     if (rule.previous == null) continue
-    if (!checkRules(child, rule.match)) continue
+    if (!testRules(child, rule.match)) continue
 
     const error = validateRules(previous, rule.previous)
     if (!error) continue
 
     error.rule = rule
-    error.parent = node
-    error.node = child
+    error.node = node
+    error.child = child
+    error.index = index
     error.previous = previous
     error.code = error.code.replace('node_', 'previous_child_')
     return error
   }
 }
 
-function validateNext(node, child, next, rules) {
+function validateNext(node, child, next, index, rules) {
   if (!next) return
 
   for (const rule of rules) {
     if (rule.next == null) continue
-    if (!checkRules(child, rule.match)) continue
+    if (!testRules(child, rule.match)) continue
 
     const error = validateRules(next, rule.next)
     if (!error) continue
 
     error.rule = rule
-    error.parent = node
-    error.node = child
+    error.node = node
+    error.child = child
+    error.index = index
     error.next = next
     error.code = error.code.replace('node_', 'next_child_')
     return error

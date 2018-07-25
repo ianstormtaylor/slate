@@ -42,50 +42,50 @@ const CORE_SCHEMA_RULES = [
    * @type {Object}
    */
 
-  {
-    normalizeNode(node) {
-      if (node.object != 'block') return
-      const first = node.nodes.first()
-      if (!first) return
-      const objects = first.object == 'block' ? ['block'] : ['inline', 'text']
-      const invalids = node.nodes.filter(n => !objects.includes(n.object))
-      if (!invalids.size) return
-
-      return change => {
-        invalids.forEach(child => {
-          change.removeNodeByKey(child.key, { normalize: false })
-        })
-      }
-    },
-  },
   // {
-  //   schema: {
-  //     rules: [
-  //       {
-  //         match: {
-  //           object: 'block',
-  //           first: { object: 'block' },
-  //         },
-  //         nodes: [
-  //           {
-  //             match: { object: 'block' },
-  //           },
-  //         ],
-  //       },
-  //       {
-  //         match: {
-  //           object: 'block',
-  //           first: [{ object: 'inline' }, { object: 'text' }],
-  //         },
-  //         nodes: [
-  //           {
-  //             match: [{ object: 'inline' }, { object: 'text' }],
-  //           },
-  //         ],
-  //       },
-  //     ],
+  //   normalizeNode(node) {
+  //     if (node.object != 'block') return
+  //     const first = node.nodes.first()
+  //     if (!first) return
+  //     const objects = first.object == 'block' ? ['block'] : ['inline', 'text']
+  //     const invalids = node.nodes.filter(n => !objects.includes(n.object))
+  //     if (!invalids.size) return
+
+  //     return change => {
+  //       invalids.forEach(child => {
+  //         change.removeNodeByKey(child.key, { normalize: false })
+  //       })
+  //     }
   //   },
   // },
+  {
+    schema: {
+      rules: [
+        {
+          match: {
+            object: 'block',
+            first: { object: 'block' },
+          },
+          nodes: [
+            {
+              match: { object: 'block' },
+            },
+          ],
+        },
+        {
+          match: {
+            object: 'block',
+            first: [{ object: 'inline' }, { object: 'text' }],
+          },
+          nodes: [
+            {
+              match: [{ object: 'inline' }, { object: 'text' }],
+            },
+          ],
+        },
+      ],
+    },
+  },
 
   /**
    * Only allow inline and text nodes in inlines.
@@ -113,19 +113,7 @@ const CORE_SCHEMA_RULES = [
       rules: [
         {
           match: { object: 'inline' },
-          nodes: [
-            {
-              match: [{ object: 'inline' }, { object: 'text' }],
-              min: 1,
-            },
-          ],
-          normalize: (change, error) => {
-            if (error.code === 'child_required') {
-              change.insertNodeByKey(error.node.key, 0, Text.create(), {
-                normalize: false,
-              })
-            }
-          },
+          nodes: [{ match: [{ object: 'inline' }, { object: 'text' }] }],
         },
       ],
     },
@@ -137,35 +125,34 @@ const CORE_SCHEMA_RULES = [
    * @type {Object}
    */
 
-  {
-    normalizeNode(node) {
-      if (node.object != 'block') return
-      if (node.nodes.size > 0) return
-
-      return change => {
-        const text = Text.create()
-        change.insertNodeByKey(node.key, 0, text, { normalize: false })
-      }
-    },
-  },
   // {
-  //   schema: {
-  //     rules: [
-  //       {
-  //         match: [{ object: 'block' }, { object: 'inline' }],
-  //         nodes: [{ min: 1 }],
-  //         normalize: (change, error) => {
-  //           debugger
-  //           if (error.code === 'child_required') {
-  //             change.insertNodeByKey(error.node.key, 0, Text.create(), {
-  //               normalize: false,
-  //             })
-  //           }
-  //         },
-  //       },
-  //     ],
+  //   normalizeNode(node) {
+  //     if (node.object != 'block' && node.object != 'inline') return
+  //     if (node.nodes.size > 0) return
+
+  //     return change => {
+  //       const text = Text.create()
+  //       change.insertNodeByKey(node.key, 0, text, { normalize: false })
+  //     }
   //   },
   // },
+  {
+    schema: {
+      rules: [
+        {
+          match: [{ object: 'block' }, { object: 'inline' }],
+          nodes: [{ min: 1 }],
+          normalize: (change, error) => {
+            if (error.code === 'child_required') {
+              change.insertNodeByKey(error.node.key, 0, Text.create(), {
+                normalize: false,
+              })
+            }
+          },
+        },
+      ],
+    },
+  },
 
   /**
    * Ensure that inline non-void nodes are never empty.
@@ -205,8 +192,12 @@ const CORE_SCHEMA_RULES = [
     schema: {
       rules: [
         {
-          match: { object: 'inline', isVoid: false },
-          text: /.+/g,
+          match: {
+            object: 'inline',
+            isVoid: false,
+            nodes: [{ match: { object: 'text' } }],
+          },
+          text: /[\w\W]+/,
         },
       ],
     },
@@ -219,85 +210,106 @@ const CORE_SCHEMA_RULES = [
    * @type {Object}
    */
 
-  {
-    normalizeNode(node) {
-      if (node.object != 'block' && node.object != 'inline') return
-
-      const invalids = node.nodes.reduce((list, child, index) => {
-        if (child.object !== 'inline') return list
-
-        const prev = index > 0 ? node.nodes.get(index - 1) : null
-        const next = node.nodes.get(index + 1)
-
-        // We don't test if "prev" is inline, since it has already been
-        // processed in the loop
-        const insertBefore = !prev
-        const insertAfter = !next || next.object == 'inline'
-
-        if (insertAfter || insertBefore) {
-          list = list.push({ insertAfter, insertBefore, index })
-        }
-
-        return list
-      }, new List())
-
-      if (!invalids.size) return
-
-      return change => {
-        // Shift for every text node inserted previously.
-        let shift = 0
-
-        invalids.forEach(({ index, insertAfter, insertBefore }) => {
-          if (insertBefore) {
-            change.insertNodeByKey(node.key, shift + index, Text.create(), {
-              normalize: false,
-            })
-
-            shift++
-          }
-
-          if (insertAfter) {
-            change.insertNodeByKey(node.key, shift + index + 1, Text.create(), {
-              normalize: false,
-            })
-
-            shift++
-          }
-        })
-      }
-    },
-  },
   // {
-  //   schema: {
-  //     rules: [
-  //       {
-  //         match: { object: 'block' },
-  //         first: [{ object: 'block' }, { object: 'text' }],
-  //         last: [{ object: 'block' }, { object: 'text' }],
-  //         normalize: (change, error) => {
-  //           const { code, node } = error
-  //           const text = Text.create()
-  //           const i =
-  //             code === 'first_child_object_invalid' ? 0 : node.nodes.size
-  //           change.insertNodeByKey(node.key, i, text, { normalize: false })
-  //         },
-  //       },
+  //   normalizeNode(node) {
+  //     if (node.object != 'block' && node.object != 'inline') return
 
-  //       {
-  //         match: { object: 'inline' },
-  //         first: { object: 'text' },
-  //         last: { object: 'text' },
-  //         normalize: (change, error) => {
-  //           const { code, node } = error
-  //           const text = Text.create()
-  //           const i =
-  //             code === 'first_child_object_invalid' ? 0 : node.nodes.size
-  //           change.insertNodeByKey(node.key, i, text, { normalize: false })
-  //         },
-  //       },
-  //     ],
+  //     const invalids = node.nodes.reduce((list, child, index) => {
+  //       if (child.object !== 'inline') return list
+
+  //       const prev = index > 0 ? node.nodes.get(index - 1) : null
+  //       const next = node.nodes.get(index + 1)
+
+  //       // We don't test if "prev" is inline, since it has already been
+  //       // processed in the loop
+  //       const insertBefore = !prev
+  //       const insertAfter = !next || next.object == 'inline'
+
+  //       if (insertAfter || insertBefore) {
+  //         list = list.push({ insertAfter, insertBefore, index })
+  //       }
+
+  //       return list
+  //     }, new List())
+
+  //     if (!invalids.size) return
+
+  //     return change => {
+  //       // Shift for every text node inserted previously.
+  //       let shift = 0
+
+  //       invalids.forEach(({ index, insertAfter, insertBefore }) => {
+  //         if (insertBefore) {
+  //           change.insertNodeByKey(node.key, shift + index, Text.create(), {
+  //             normalize: false,
+  //           })
+
+  //           shift++
+  //         }
+
+  //         if (insertAfter) {
+  //           change.insertNodeByKey(node.key, shift + index + 1, Text.create(), {
+  //             normalize: false,
+  //           })
+
+  //           shift++
+  //         }
+  //       })
+  //     }
   //   },
   // },
+  {
+    schema: {
+      rules: [
+        {
+          match: { object: 'block' },
+          first: [{ object: 'block' }, { object: 'text' }],
+          last: [{ object: 'block' }, { object: 'text' }],
+          normalize: (change, error) => {
+            const { code, node } = error
+            const text = Text.create()
+            let i
+
+            if (code === 'first_child_object_invalid') {
+              i = 0
+            } else if (code === 'last_child_object_invalid') {
+              i = node.nodes.size
+            } else {
+              return
+            }
+
+            change.insertNodeByKey(node.key, i, text, { normalize: false })
+          },
+        },
+        {
+          match: { object: 'inline' },
+          first: [{ object: 'block' }, { object: 'text' }],
+          last: [{ object: 'block' }, { object: 'text' }],
+          previous: [{ object: 'block' }, { object: 'text' }],
+          next: [{ object: 'block' }, { object: 'text' }],
+          normalize: (change, error) => {
+            const { code, node, index } = error
+            const text = Text.create()
+            let i
+
+            if (code === 'first_child_object_invalid') {
+              i = 0
+            } else if (code === 'last_child_object_invalid') {
+              i = node.nodes.size
+            } else if (code === 'previous_child_object_invalid') {
+              i = index
+            } else if (code === 'next_child_object_invalid') {
+              i = index + 1
+            } else {
+              return
+            }
+
+            change.insertNodeByKey(node.key, i, text, { normalize: false })
+          },
+        },
+      ],
+    },
+  },
 
   /**
    * Merge adjacent text nodes.
@@ -305,141 +317,43 @@ const CORE_SCHEMA_RULES = [
    * @type {Object}
    */
 
-  {
-    normalizeNode(node) {
-      if (node.object != 'block' && node.object != 'inline') return
-
-      const invalids = node.nodes
-        .map((child, i) => {
-          const next = node.nodes.get(i + 1)
-          if (child.object != 'text') return
-          if (!next || next.object != 'text') return
-          return next
-        })
-        .filter(Boolean)
-
-      if (!invalids.size) return
-
-      return change => {
-        // Reverse the list to handle consecutive merges, since the earlier nodes
-        // will always exist after each merge.
-        invalids.reverse().forEach(n => {
-          change.mergeNodeByKey(n.key, { normalize: false })
-        })
-      }
-    },
-  },
   // {
-  //   schema: {
-  //     rules: [
-  //       {
-  //         match: { object: 'text' },
-  //         previous: [{ object: 'block' }, { object: 'inline' }],
-  //         next: [{ object: 'block' }, { object: 'inline' }],
-  //         normalize: (change, error) => {
-  //           const { code, node, next } = error
-  //           const target =
-  //             code === 'previous_child_object_invalid' ? node : next
-  //           change.mergeNodeByKey(target.key, { normalize: false })
-  //         },
-  //       },
-  //     ],
+  //   normalizeNode(node) {
+  //     if (node.object != 'block' && node.object != 'inline') return
+
+  //     const invalids = node.nodes
+  //       .map((child, i) => {
+  //         const next = node.nodes.get(i + 1)
+  //         if (child.object != 'text') return
+  //         if (!next || next.object != 'text') return
+  //         return next
+  //       })
+  //       .filter(Boolean)
+
+  //     if (!invalids.size) return
+
+  //     return change => {
+  //       // Reverse the list to handle consecutive merges, since the earlier nodes
+  //       // will always exist after each merge.
+  //       invalids.reverse().forEach(n => {
+  //         change.mergeNodeByKey(n.key, { normalize: false })
+  //       })
+  //     }
   //   },
   // },
-
-  /**
-   * Ensure that inline non-void nodes are never empty.
-   *
-   * This rule is applied to all blocks and inlines, because when they contain an empty
-   * inline, we need to remove the empty inline from that parent node. If `validate`
-   * was to be memoized, it should be against the parent node, not the empty inline itself.
-   *
-   * @type {Object}
-   */
-
-  // {
-  //   match: { object: 'inline', isVoid: false },
-  //   text: /.+/,
-  // },
-
   {
-    normalizeNode(node) {
-      if (node.object != 'inline' && node.object != 'block') return
-
-      const invalids = node.nodes.filter(
-        child => child.object === 'inline' && child.isEmpty
-      )
-
-      if (!invalids.size) return
-
-      return change => {
-        // If all of the block's nodes are invalid, insert an empty text node so
-        // that the selection will be preserved when they are all removed.
-        if (node.nodes.size == invalids.size) {
-          const text = Text.create()
-          change.insertNodeByKey(node.key, 1, text, { normalize: false })
-        }
-
-        invalids.forEach(child => {
-          change.removeNodeByKey(child.key, { normalize: false })
-        })
-      }
-    },
-  },
-
-  /**
-   * Ensure that inline void nodes are surrounded by text nodes, by adding extra
-   * blank text nodes if necessary.
-   *
-   * @type {Object}
-   */
-
-  {
-    normalizeNode(node) {
-      if (node.object != 'block' && node.object != 'inline') return
-
-      const invalids = node.nodes.reduce((list, child, index) => {
-        if (child.object !== 'inline') return list
-
-        const prev = index > 0 ? node.nodes.get(index - 1) : null
-        const next = node.nodes.get(index + 1)
-
-        // We don't test if "prev" is inline, since it has already been
-        // processed in the loop
-        const insertBefore = !prev
-        const insertAfter = !next || next.object == 'inline'
-
-        if (insertAfter || insertBefore) {
-          list = list.push({ insertAfter, insertBefore, index })
-        }
-
-        return list
-      }, new List())
-
-      if (!invalids.size) return
-
-      return change => {
-        // Shift for every text node inserted previously.
-        let shift = 0
-
-        invalids.forEach(({ index, insertAfter, insertBefore }) => {
-          if (insertBefore) {
-            change.insertNodeByKey(node.key, shift + index, Text.create(), {
-              normalize: false,
-            })
-
-            shift++
-          }
-
-          if (insertAfter) {
-            change.insertNodeByKey(node.key, shift + index + 1, Text.create(), {
-              normalize: false,
-            })
-
-            shift++
-          }
-        })
-      }
+    schema: {
+      rules: [
+        {
+          match: { object: 'text' },
+          next: [{ object: 'block' }, { object: 'inline' }],
+          normalize: (change, error) => {
+            const { code, next } = error
+            if (code !== 'next_child_object_invalid') return
+            change.mergeNodeByKey(next.key, { normalize: false })
+          },
+        },
+      ],
     },
   },
 

@@ -8,7 +8,7 @@ export const input = (
   <value>
     <document>
       <paragraph>
-        <link>
+        <link key="fuck">
           <paragraph>one</paragraph>
           two
         </link>
