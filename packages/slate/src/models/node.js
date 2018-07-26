@@ -432,7 +432,8 @@ class Node {
    */
 
   getCharacters() {
-    return this.getTexts().flatMap(t => t.characters)
+    const characters = this.getTexts().flatMap(t => t.characters)
+    return characters
   }
 
   /**
@@ -472,7 +473,8 @@ class Node {
    */
 
   getChildByPath(path) {
-    return path.size !== 1 ? null : this.nodes.get(path.first())
+    const child = path.size === 1 ? this.nodes.get(path.first()) : null
+    return child
   }
 
   /**
@@ -483,7 +485,8 @@ class Node {
    */
 
   getClosestBlockByPath(path) {
-    return this.getClosestByPath(path, parent => parent.object === 'block')
+    const closest = this.getClosestByPath(path, n => n.object === 'block')
+    return closest
   }
 
   /**
@@ -496,13 +499,15 @@ class Node {
 
   getClosestByPath(path, iterator) {
     const ancestors = this.getAncestors(path)
+    if (!ancestors) return null
 
-    // TODO: this should not throw
-    if (!ancestors) {
-      throw new Error(`Could not find a descendant node by path "${path}".`)
-    }
+    const closest = ancestors.findLast((node, ...args) => {
+      // We never want to include the top-level node.
+      if (node === this) return false
+      return iterator(node, ...args)
+    })
 
-    return ancestors.rest().findLast(iterator)
+    return closest || null
   }
 
   /**
@@ -513,7 +518,8 @@ class Node {
    */
 
   getClosestInlineByPath(path) {
-    return this.getClosestByPath(path, parent => parent.object == 'inline')
+    const closest = this.getClosestByPath(path, n => n.object === 'inline')
+    return closest
   }
 
   /**
@@ -524,7 +530,8 @@ class Node {
    */
 
   getClosestVoidByPath(path) {
-    return this.getClosestByPath(path, parent => parent.isVoid)
+    const closest = this.getClosestByPath(path, p => p.isVoid)
+    return closest
   }
 
   /**
@@ -576,8 +583,8 @@ class Node {
 
   getDepthByPath(path, startAt = 1) {
     const node = this.getNodeByPath(path)
-    if (!node) return null
-    return path.size - 1 + startAt
+    const depth = node ? path.size - 1 + startAt : null
+    return depth
   }
 
   /**
@@ -614,6 +621,7 @@ class Node {
       result = n.validate(schema) ? n : n.getFirstInvalidDescendant(schema)
       return result
     })
+
     return result
   }
 
@@ -624,15 +632,15 @@ class Node {
    */
 
   getFirstText() {
-    let descendantFound = null
+    let descendant = null
 
     const found = this.nodes.find(node => {
-      if (node.object == 'text') return true
-      descendantFound = node.getFirstText()
-      return descendantFound
+      if (node.object === 'text') return true
+      descendant = node.getFirstText()
+      return !!descendant
     })
 
-    return descendantFound || found
+    return descendant || found
   }
 
   /**
@@ -712,8 +720,8 @@ class Node {
    */
 
   getFurthestAncestorByPath(path) {
-    if (!path.size) return null
-    return this.nodes.get(path.first())
+    const furthest = path.size ? this.nodes.get(path.first()) : null
+    return furthest
   }
 
   /**
@@ -724,7 +732,8 @@ class Node {
    */
 
   getFurthestBlockByPath(path) {
-    return this.getFurthestByPath(path, node => node.object == 'block')
+    const furthest = this.getFurthestByPath(path, n => n.object === 'block')
+    return furthest
   }
 
   /**
@@ -737,7 +746,14 @@ class Node {
 
   getFurthestByPath(path, iterator) {
     const ancestors = this.getAncestorsByPath(path)
-    const furthest = ancestors && ancestors.rest().find(iterator)
+    if (!ancestors) return null
+
+    const furthest = ancestors.find((node, ...args) => {
+      // We never want to include the top-level node.
+      if (node === this) return false
+      return iterator(node, ...args)
+    })
+
     return furthest || null
   }
 
@@ -749,7 +765,8 @@ class Node {
    */
 
   getFurthestInlineByPath(path) {
-    return this.getFurthestByPath(path, node => node.object == 'inline')
+    const furthest = this.getFurthestByPath(path, n => n.object === 'inline')
+    return furthest
   }
 
   /**
@@ -780,7 +797,8 @@ class Node {
 
   getInlines() {
     const array = this.getInlinesAsArray()
-    return new List(array)
+    const list = new List(array)
+    return list
   }
 
   /**
@@ -815,7 +833,8 @@ class Node {
   getInlinesAtRange(range) {
     const array = this.getInlinesAtRangeAsArray(range)
     // Remove duplicates by converting it to an `OrderedSet` first.
-    return new List(new OrderedSet(array))
+    const list = new List(new OrderedSet(array))
+    return list
   }
 
   /**
@@ -829,9 +848,11 @@ class Node {
     range = range.normalize(this)
     if (range.isUnset) return []
 
-    return this.getTextsAtRangeAsArray(range)
+    const array = this.getTextsAtRangeAsArray(range)
       .map(text => this.getClosestInline(text.key))
       .filter(exists => exists)
+
+    return array
   }
 
   /**
@@ -843,7 +864,8 @@ class Node {
 
   getInlinesByType(type) {
     const array = this.getInlinesByTypeAsArray(type)
-    return new List(array)
+    const list = new List(array)
+    return list
   }
 
   /**
@@ -854,7 +876,7 @@ class Node {
    */
 
   getInlinesByTypeAsArray(type) {
-    return this.nodes.reduce((inlines, node) => {
+    const array = this.nodes.reduce((inlines, node) => {
       if (node.object == 'text') {
         return inlines
       } else if (node.isLeafInline() && node.type == type) {
@@ -864,6 +886,8 @@ class Node {
         return inlines.concat(node.getInlinesByTypeAsArray(type))
       }
     }, [])
+
+    return array
   }
 
   /**
@@ -884,26 +908,8 @@ class Node {
 
     const { startKey, startOffset } = range
     const text = this.getDescendant(startKey)
-    return text.getMarksAtIndex(startOffset + 1)
-  }
-
-  /**
-   * Get an array of all the keys in the node.
-   *
-   * @return {Array}
-   */
-
-  getKeysArray() {
-    const dict = this.getKeysPathsObject()
-    const keys = []
-
-    for (const key in dict) {
-      if (this.key !== key) {
-        keys.push(key)
-      }
-    }
-
-    return keys
+    const marks = text.getMarksAtIndex(startOffset + 1)
+    return marks
   }
 
   /**
@@ -912,7 +918,7 @@ class Node {
    * @return {Object}
    */
 
-  getKeysPathsObject() {
+  getKeyTable() {
     const ret = {
       [this.key]: [],
     }
@@ -921,7 +927,7 @@ class Node {
       ret[node.key] = [i]
 
       if (node.object !== 'text') {
-        const nested = node.getKeysPathsObject()
+        const nested = node.getKeyTable()
 
         for (const key in nested) {
           const path = nested[key]
@@ -940,15 +946,15 @@ class Node {
    */
 
   getLastText() {
-    let descendantFound = null
+    let descendant = null
 
     const found = this.nodes.findLast(node => {
       if (node.object == 'text') return true
-      descendantFound = node.getLastText()
-      return descendantFound
+      descendant = node.getLastText()
+      return descendant
     })
 
-    return descendantFound || found
+    return descendant || found
   }
 
   /**
@@ -959,7 +965,8 @@ class Node {
 
   getMarks() {
     const array = this.getMarksAsArray()
-    return new Set(array)
+    const set = new Set(array)
+    return set
   }
 
   /**
@@ -969,14 +976,15 @@ class Node {
    */
 
   getMarksAsArray() {
-    // PERF: use only one concat rather than multiple concat
-    // becuase one concat is faster
     const result = []
 
     this.nodes.forEach(node => {
       result.push(node.getMarksAsArray())
     })
-    return Array.prototype.concat.apply([], result)
+
+    // PERF: use only one concat rather than multiple for speed.
+    const array = [].concat(...result)
+    return array
   }
 
   /**
@@ -1016,7 +1024,8 @@ class Node {
    */
 
   getMarksAtRange(range) {
-    return new Set(this.getOrderedMarksAtRange(range))
+    const marks = new Set(this.getOrderedMarksAtRange(range))
+    return marks
   }
 
   /**
@@ -1028,7 +1037,8 @@ class Node {
 
   getMarksByType(type) {
     const array = this.getMarksByTypeAsArray(type)
-    return new Set(array)
+    const set = new Set(array)
+    return set
   }
 
   /**
@@ -1039,11 +1049,13 @@ class Node {
    */
 
   getMarksByTypeAsArray(type) {
-    return this.nodes.reduce((array, node) => {
+    const array = this.nodes.reduce((array, node) => {
       return node.object == 'text'
         ? array.concat(node.getMarksAsArray().filter(m => m.type == type))
         : array.concat(node.getMarksByTypeAsArray(type))
     }, [])
+
+    return array
   }
 
   /**
@@ -1067,7 +1079,8 @@ class Node {
     const next = this.getNextText(last.key)
     if (!next) return null
 
-    return this.getClosestBlock(next.key)
+    const closest = this.getClosestBlock(next.key)
+    return closest
   }
 
   /**
@@ -1130,7 +1143,8 @@ class Node {
    */
 
   getNodeByPath(path) {
-    return path.size ? this.getDescendantByPath(path) : this
+    const node = path.size ? this.getDescendantByPath(path) : this
+    return node
   }
 
   /**
@@ -1150,7 +1164,8 @@ class Node {
       .reduce((memo, n) => memo + n.text.length, 0)
 
     // Recurse if need be.
-    return this.hasChild(key) ? offset : offset + child.getOffset(key)
+    const ret = this.hasChild(key) ? offset : offset + child.getOffset(key)
+    return ret
   }
 
   /**
@@ -1172,7 +1187,8 @@ class Node {
     }
 
     const { startKey, startOffset } = range
-    return this.getOffset(startKey) + startOffset
+    const offset = this.getOffset(startKey) + startOffset
+    return offset
   }
 
   /**
@@ -1183,7 +1199,8 @@ class Node {
 
   getOrderedMarks() {
     const array = this.getMarksAsArray()
-    return new OrderedSet(array)
+    const set = new OrderedSet(array)
+    return set
   }
 
   /**
@@ -1203,12 +1220,14 @@ class Node {
     }
 
     const { startKey, startOffset, endKey, endOffset } = range
-    return this.getOrderedMarksBetweenPositions(
+    const marks = this.getOrderedMarksBetweenPositions(
       startKey,
       startOffset,
       endKey,
       endOffset
     )
+
+    return marks
   }
 
   /**
@@ -1254,7 +1273,8 @@ class Node {
 
   getOrderedMarksByType(type) {
     const array = this.getMarksByTypeAsArray(type)
-    return new OrderedSet(array)
+    const set = new OrderedSet(array)
+    return set
   }
 
   /**
@@ -1279,7 +1299,7 @@ class Node {
    */
 
   getPathByKey(key) {
-    const dict = this.getKeysPathsObject()
+    const dict = this.getKeyTable()
     const path = dict[key]
     return path ? List(path) : null
   }
@@ -1305,7 +1325,8 @@ class Node {
     const previous = this.getPreviousText(first.key)
     if (!previous) return null
 
-    return this.getClosestBlock(previous.key)
+    const closest = this.getClosestBlock(previous.key)
+    return closest
   }
 
   /**
@@ -1423,9 +1444,11 @@ class Node {
    */
 
   getText() {
-    return this.nodes.reduce((string, node) => {
+    const text = this.nodes.reduce((string, node) => {
       return string + node.text
     }, '')
+
+    return text
   }
 
   /**
@@ -1442,11 +1465,12 @@ class Node {
     if (offset < 0 || offset > this.text.length) return null
 
     let length = 0
-
-    return this.getTexts().find((node, i, nodes) => {
+    const text = this.getTexts().find((node, i, nodes) => {
       length += node.text.length
       return length > offset
     })
+
+    return text
   }
 
   /**
@@ -1457,7 +1481,7 @@ class Node {
 
   getTextDirection() {
     const dir = direction(this.text)
-    return dir == 'neutral' ? undefined : dir
+    return dir === 'neutral' ? null : dir
   }
 
   /**
@@ -1468,7 +1492,8 @@ class Node {
 
   getTexts() {
     const array = this.getTextsAsArray()
-    return new List(array)
+    const list = new List(array)
+    return list
   }
 
   /**
@@ -1502,7 +1527,11 @@ class Node {
     range = range.normalize(this)
     if (range.isUnset) return List()
     const { startKey, endKey } = range
-    return new List(this.getTextsBetweenPositionsAsArray(startKey, endKey))
+    const list = new List(
+      this.getTextsBetweenPositionsAsArray(startKey, endKey)
+    )
+
+    return list
   }
 
   /**
@@ -1516,7 +1545,8 @@ class Node {
     range = range.normalize(this)
     if (range.isUnset) return []
     const { startKey, endKey } = range
-    return this.getTextsBetweenPositionsAsArray(startKey, endKey)
+    const texts = this.getTextsBetweenPositionsAsArray(startKey, endKey)
+    return texts
   }
 
   /**
@@ -1539,7 +1569,8 @@ class Node {
     const texts = this.getTextsAsArray()
     const start = texts.indexOf(startText)
     const end = texts.indexOf(endText, start)
-    return texts.slice(start, end + 1)
+    const ret = texts.slice(start, end + 1)
+    return ret
   }
 
   /**
@@ -1572,8 +1603,8 @@ class Node {
 
   hasInlineChildren() {
     return !!(
-      node.nodes &&
-      node.nodes.find(n => n.object === 'inline' || n.object === 'text')
+      this.nodes &&
+      this.nodes.find(n => n.object === 'inline' || n.object === 'text')
     )
   }
 
@@ -1622,20 +1653,21 @@ class Node {
    */
 
   insertNode(index, node) {
-    const keys = this.getKeysArray()
+    const dict = this.getKeyTable()
 
-    if (keys.includes(node.key)) {
+    if (dict[node.key]) {
       node = node.regenerateKey()
     }
 
-    if (node.object != 'text') {
+    if (node.object !== 'text') {
       node = node.mapDescendants(desc => {
-        return keys.includes(desc.key) ? desc.regenerateKey() : desc
+        return dict[desc.key] ? desc.regenerateKey() : desc
       })
     }
 
     const nodes = this.nodes.insert(index, node)
-    return this.set('nodes', nodes)
+    const ret = this.set('nodes', nodes)
+    return ret
   }
 
   /**
@@ -1688,7 +1720,9 @@ class Node {
    */
 
   isLeafBlock() {
-    return this.object == 'block' && this.nodes.every(n => n.object != 'block')
+    return (
+      this.object === 'block' && this.nodes.every(n => n.object !== 'block')
+    )
   }
 
   /**
@@ -1699,7 +1733,7 @@ class Node {
 
   isLeafInline() {
     return (
-      this.object == 'inline' && this.nodes.every(n => n.object != 'inline')
+      this.object === 'inline' && this.nodes.every(n => n.object !== 'inline')
     )
   }
 
@@ -1716,10 +1750,11 @@ class Node {
 
     nodes.forEach((node, i) => {
       const ret = iterator(node, i, this.nodes)
-      if (ret != node) nodes = nodes.set(ret.key, ret)
+      if (ret !== node) nodes = nodes.set(ret.key, ret)
     })
 
-    return this.set('nodes', nodes)
+    const ret = this.set('nodes', nodes)
+    return ret
   }
 
   /**
@@ -1735,14 +1770,15 @@ class Node {
 
     nodes.forEach((node, index) => {
       let ret = node
-      if (ret.object != 'text') ret = ret.mapDescendants(iterator)
+      if (ret.object !== 'text') ret = ret.mapDescendants(iterator)
       ret = iterator(ret, index, this.nodes)
-      if (ret == node) return
+      if (ret === node) return
 
       nodes = nodes.set(index, ret)
     })
 
-    return this.set('nodes', nodes)
+    const ret = this.set('nodes', nodes)
+    return ret
   }
 
   /**
@@ -1760,7 +1796,7 @@ class Node {
     let one = node.nodes.get(withIndex)
     const two = node.nodes.get(index)
 
-    if (one.object != two.object) {
+    if (one.object !== two.object) {
       throw new Error(
         `Tried to merge two nodes of different objects: "${one.object}" and "${
           two.object
@@ -1769,7 +1805,7 @@ class Node {
     }
 
     // If the nodes are text nodes, concatenate their leaves together
-    if (one.object == 'text') {
+    if (one.object === 'text') {
       one = one.mergeText(two)
     } else {
       // Otherwise, concatenate their child nodes together.
@@ -1819,7 +1855,8 @@ class Node {
 
   regenerateKey() {
     const key = KeyUtils.generate()
-    return this.set('key', key)
+    const node = this.set('key', key)
+    return node
   }
 
   /**
@@ -1854,7 +1891,8 @@ class Node {
 
   removeNode(index) {
     const nodes = this.nodes.delete(index)
-    return this.set('nodes', nodes)
+    const node = this.set('nodes', nodes)
+    return node
   }
 
   /**
@@ -1899,23 +1937,14 @@ class Node {
    */
 
   updateNode(node) {
-    if (node.key == this.key) {
+    if (node.key === this.key) {
       return node
     }
 
-    let child = this.assertDescendant(node.key)
-    const ancestors = this.getAncestors(node.key)
-
-    ancestors.reverse().forEach(parent => {
-      let { nodes } = parent
-      const index = nodes.indexOf(child)
-      child = parent
-      nodes = nodes.set(index, node)
-      parent = parent.set('nodes', nodes)
-      node = parent
-    })
-
-    return node
+    this.assertDescendant(node.key)
+    const path = this.getPathByKey(node.key).flatMap(x => List(['nodes', x]))
+    const ret = this.setIn(path, node)
+    return ret
   }
 
   /**
@@ -1969,22 +1998,28 @@ class Node {
   }
 
   getKeys() {
-    logger.deprecate(
-      `0.35.0`,
-      'The `Node.getKeys` method is deprecated. Use the new `Node.getKeysArray` method instead.'
-    )
+    logger.deprecate(`0.35.0`, 'The `Node.getKeys` method is deprecated.')
 
-    const keys = this.getKeysArray()
+    const keys = this.getKeysAsArray()
     return new Set(keys)
   }
 
   getKeysAsArray() {
     logger.deprecate(
       `0.35.0`,
-      'The `Node.getKeysAsArray` method has been renamed to `Node.getKeysArray`.'
+      'The `Node.getKeysAsArray` method is deprecated.'
     )
 
-    return this.getKeysArray()
+    const dict = this.getKeyTable()
+    const keys = []
+
+    for (const key in dict) {
+      if (this.key !== key) {
+        keys.push(key)
+      }
+    }
+
+    return keys
   }
 
   areDescendantsSorted(first, second) {
@@ -1996,7 +2031,7 @@ class Node {
     first = KeyUtils.assert(first)
     second = KeyUtils.assert(second)
 
-    const keys = this.getKeysArray()
+    const keys = this.getKeysAsArray().filter(k => k !== this.key)
     const firstIndex = keys.indexOf(first)
     const secondIndex = keys.indexOf(second)
     if (firstIndex == -1 || secondIndex == -1) return null
@@ -2023,7 +2058,6 @@ const BY_PATHS = [
   'getFurthestBlock',
   'getFurthestInline',
   'getFurthestOnlyChildAncestor',
-  'getNextBlock',
   'getNextSibling',
   'getNextText',
   'getNode',
@@ -2126,8 +2160,8 @@ memoize(Node.prototype, [
   'getMarksAtPosition',
   'getOrderedMarksBetweenPositions',
   'getInsertMarksAtRange',
-  'getKeysPathsObject',
-  'getKeysArray',
+  'getKeyTable',
+  'getKeys',
   'getLastText',
   'getMarksByTypeAsArray',
   'getNextBlock',
