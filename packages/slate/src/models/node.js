@@ -199,12 +199,22 @@ class Node {
     first = assertKey(first)
     second = assertKey(second)
 
-    const keys = this.getKeysAsArray()
-    const firstIndex = keys.indexOf(first)
-    const secondIndex = keys.indexOf(second)
-    if (firstIndex == -1 || secondIndex == -1) return null
+    if (first === second) return false
+    if (first === this.key) return true
+    if (second === this.key) return false
+    const firstPath = this.getPath(first)
+    const secondPath = this.getPath(second)
+    const length = Math.min(firstPath.length, secondPath.length)
+    let index = 0
 
-    return firstIndex < secondIndex
+    while (firstPath[index] === secondPath[index] && index < length) {
+      index++
+    }
+
+    if (index === length) {
+      return firstPath.length < secondPath.length
+    }
+    return firstPath[index] < secondPath[index]
   }
 
   /**
@@ -233,14 +243,12 @@ class Node {
    */
 
   assertDescendant(key) {
-    const descendant = this.getDescendant(key)
+    key = assertKey(key)
 
-    if (!descendant) {
-      key = assertKey(key)
+    if (!this.hasDescendant(key)) {
       throw new Error(`Could not find a descendant node with key "${key}".`)
     }
-
-    return descendant
+    return this.getDescendant(key)
   }
 
   /**
@@ -251,14 +259,13 @@ class Node {
    */
 
   assertNode(key) {
-    const node = this.getNode(key)
+    key = assertKey(key)
 
-    if (!node) {
-      key = assertKey(key)
+    if (!this.hasNode(key)) {
       throw new Error(`Could not find a node with key "${key}".`)
     }
 
-    return node
+    return this.getNode(key)
   }
 
   /**
@@ -349,23 +356,16 @@ class Node {
 
   getAncestors(key) {
     key = assertKey(key)
+    if (!this.hasNode(key)) return null
+    const path = this.getPath(key)
+    return List().withMutations(result => {
+      let ancestor = this
 
-    if (key == this.key) return List()
-    if (this.hasChild(key)) return List([this])
-
-    let ancestors
-
-    this.nodes.find(node => {
-      if (node.object == 'text') return false
-      ancestors = node.getAncestors(key)
-      return ancestors
+      for (const index of path) {
+        result.push(ancestor)
+        ancestor = ancestor.nodes.get(index)
+      }
     })
-
-    if (ancestors) {
-      return ancestors.unshift(this)
-    } else {
-      return null
-    }
   }
 
   /**
@@ -532,7 +532,11 @@ class Node {
     }
 
     // Exclude this node itself.
-    return ancestors.rest().findLast(iterator)
+    // PERF: rest() creates a new List, which can be slow
+    return ancestors.findLast((ancestor, index) => {
+      if (ancestor === this) return false
+      return iterator(ancestor, index)
+    })
   }
 
   /**
@@ -554,7 +558,13 @@ class Node {
    */
 
   getClosestInline(key) {
-    return this.getClosest(key, parent => parent.object == 'inline')
+    // PERF: short circuit for getClosestInline: inline cannot
+    // be placed beyond blocks and documents
+    const node = this.getAncestors(key).findLast(ancestor => {
+      if (ancestor.object === 'text') return false
+      return true
+    })
+    return node.object === 'inline' ? node : null
   }
 
   /**
@@ -583,21 +593,23 @@ class Node {
     if (one == this.key) return this
     if (two == this.key) return this
 
-    this.assertDescendant(one)
-    this.assertDescendant(two)
-    let ancestors = new List()
-    let oneParent = this.getParent(one)
-    let twoParent = this.getParent(two)
-
-    while (oneParent) {
-      ancestors = ancestors.push(oneParent)
-      oneParent = this.getParent(oneParent.key)
+    if (!this.hasNode(one) || !this.hasNode(two)) {
+      throw new Error(`cannot find descendant ${one} or ${two}`)
     }
 
-    while (twoParent) {
-      if (ancestors.includes(twoParent)) return twoParent
-      twoParent = this.getParent(twoParent.key)
+    if (one === two) return this.getParent(one)
+    const pathOne = this.getPath(one)
+    const pathTwo = this.getPath(two)
+    if (pathOne[0] !== pathTwo[0]) return this
+    let index = 0
+    const length = Math.min(pathOne.length, pathTwo.length)
+
+    while (pathOne[index] === pathTwo[index] && index < length) {
+      index++
     }
+
+    const commonPath = pathOne.slice(0, index)
+    return this.getDescendantAtPath(commonPath)
   }
 
   /**
@@ -623,8 +635,8 @@ class Node {
 
   getDepth(key, startAt = 1) {
     this.assertDescendant(key)
-    if (this.hasChild(key)) return startAt
-    return this.getFurthestAncestor(key).getDepth(key, startAt + 1)
+    const path = this.getPath(key)
+    return path.length - 1 + startAt
   }
 
   /**
@@ -636,20 +648,9 @@ class Node {
 
   getDescendant(key) {
     key = assertKey(key)
-    let descendantFound = null
-
-    const found = this.nodes.find(node => {
-      if (node.key === key) {
-        return node
-      } else if (node.object !== 'text') {
-        descendantFound = node.getDescendant(key)
-        return descendantFound
-      } else {
-        return false
-      }
-    })
-
-    return descendantFound || found
+    if (!this.hasDescendant(key)) return null
+    const path = this.getPath(key)
+    return this.getDescendantAtPath(path)
   }
 
   /**
@@ -767,15 +768,30 @@ class Node {
    */
 
   getFurthest(key, iterator) {
-    const ancestors = this.getAncestors(key)
+    key = assertKey(key)
 
-    if (!ancestors) {
-      key = assertKey(key)
+    if (!this.hasDescendant(key)) {
       throw new Error(`Could not find a descendant node with key "${key}".`)
     }
 
-    // Exclude this node itself
-    return ancestors.rest().find(iterator)
+    // PERF: use path to pass down to prevent creating getAncestors List()
+    // It is slow to create a new Immutable List
+    const path = this.getPath(key)
+    let node = this
+
+    // PERF: use find rather than for-in to prevent using babel's regenerator,
+    // which is slower than native JS engine
+    path.find(index => {
+      node = node.nodes.get(index)
+
+      if (node.key === key) {
+        node = null
+        return true
+      }
+
+      if (iterator(node)) return true
+    })
+    return node
   }
 
   /**
@@ -809,11 +825,9 @@ class Node {
 
   getFurthestAncestor(key) {
     key = assertKey(key)
-    return this.nodes.find(node => {
-      if (node.key == key) return true
-      if (node.object == 'text') return false
-      return node.hasDescendant(key)
-    })
+    if (!this.hasDescendant(key)) return null
+    const path = this.getPath(key)
+    return this.nodes.get(path[0])
   }
 
   /**
@@ -943,25 +957,24 @@ class Node {
    * @return {Array<String>}
    */
 
-  getKeysAsArray() {
-    const keys = []
+  getKeysAsDictionary() {
+    const keys = {}
 
-    this.forEachDescendant(desc => {
-      keys.push(desc.key)
+    // PERF: prevent JS to search at prototype chain, performance concern
+    keys.__proto__ = null
+    keys[this.key] = true
+
+    this.nodes.forEach(child => {
+      if (child.object === 'text') {
+        keys[child.key] = true
+        return
+      }
+
+      const childKeys = child.getKeysAsDictionary()
+      Object.assign(keys, childKeys)
     })
 
     return keys
-  }
-
-  /**
-   * Return a set of all keys in the node.
-   *
-   * @return {Set<String>}
-   */
-
-  getKeys() {
-    const keys = this.getKeysAsArray()
-    return new Set(keys)
   }
 
   /**
@@ -1371,41 +1384,41 @@ class Node {
    */
 
   getParent(key) {
-    if (this.hasChild(key)) return this
+    if (!this.hasDescendant(key)) return null
 
-    let node = null
-
-    this.nodes.find(child => {
-      if (child.object == 'text') {
-        return false
-      } else {
-        node = child.getParent(key)
-        return node
-      }
-    })
-
-    return node
+    const path = this.getPath(key)
+    const parentPath = path.slice(0, path.length - 1)
+    return this.getDescendantAtPath(parentPath)
   }
 
   /**
    * Get the path of a descendant node by `key`.
    *
    * @param {String|Node} key
-   * @return {Array}
+   * @return {Array|null}
    */
 
   getPath(key) {
-    let child = this.assertNode(key)
-    const ancestors = this.getAncestors(key)
-    const path = []
+    key = assertKey(key)
+    if (this.key === key) return []
+    if (this.nodes.size === 0) return null
+    let result = null
 
-    ancestors.reverse().forEach(ancestor => {
-      const index = ancestor.nodes.indexOf(child)
-      path.unshift(index)
-      child = ancestor
+    const index = this.nodes.findIndex(child => {
+      if (child.key === key) {
+        result = []
+        return true
+      }
+
+      if (child.object === 'text') {
+        return false
+      }
+
+      result = child.getPath(key)
+      return Array.isArray(result)
     })
-
-    return path
+    if (index === -1) return null
+    return [index].concat(result)
   }
 
   /**
@@ -1737,7 +1750,7 @@ class Node {
    */
 
   hasDescendant(key) {
-    return !!this.getDescendant(key)
+    return this.hasNode(key) && this.key !== key
   }
 
   /**
@@ -1748,7 +1761,7 @@ class Node {
    */
 
   hasNode(key) {
-    return !!this.getNode(key)
+    return !!this.getPath(key)
   }
 
   /**
@@ -1771,15 +1784,15 @@ class Node {
    */
 
   insertNode(index, node) {
-    const keys = this.getKeysAsArray()
+    const keys = this.getKeysAsDictionary()
 
-    if (keys.includes(node.key)) {
+    if (keys[node.key]) {
       node = node.regenerateKey()
     }
 
     if (node.object != 'text') {
       node = node.mapDescendants(desc => {
-        return keys.includes(desc.key) ? desc.regenerateKey() : desc
+        return keys[desc.key] ? desc.regenerateKey() : desc
       })
     }
 
@@ -1903,7 +1916,7 @@ class Node {
 
     nodes.forEach((node, i) => {
       const ret = iterator(node, i, this.nodes)
-      if (ret != node) nodes = nodes.set(ret.key, ret)
+      if (ret != node) nodes = nodes.set(i, ret)
     })
 
     return this.set('nodes', nodes)
@@ -2024,19 +2037,10 @@ class Node {
       return node
     }
 
-    let child = this.assertDescendant(node.key)
-    const ancestors = this.getAncestors(node.key)
-
-    ancestors.reverse().forEach(parent => {
-      let { nodes } = parent
-      const index = nodes.indexOf(child)
-      child = parent
-      nodes = nodes.set(index, node)
-      parent = parent.set('nodes', nodes)
-      node = parent
-    })
-
-    return node
+    this.assertDescendant(node.key)
+    const path = this.getPath(node.key).map(x => ['nodes', x])
+    // PERF: setIn is faster than recursive assign
+    return this.setIn(Array.prototype.concat.apply([], path), node)
   }
 
   /**
@@ -2114,7 +2118,7 @@ memoize(Node.prototype, [
   'getMarksAtPosition',
   'getOrderedMarksBetweenPositions',
   'getInsertMarksAtRange',
-  'getKeysAsArray',
+  'getKeysAsDictionary',
   'getLastText',
   'getMarksByTypeAsArray',
   'getNextBlock',
@@ -2123,7 +2127,6 @@ memoize(Node.prototype, [
   'getNode',
   'getNodeAtPath',
   'getOffset',
-  'getOffsetAtRange',
   'getParent',
   'getPath',
   'getPlaceholder',
