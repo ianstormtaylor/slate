@@ -4,7 +4,7 @@ import Block from '../models/block'
 import Inline from '../models/inline'
 import Mark from '../models/mark'
 import Node from '../models/node'
-import String from '../utils/string'
+import TextUtils from '../utils/text-utils'
 
 /**
  * Changes.
@@ -278,7 +278,7 @@ Changes.deleteCharBackwardAtRange = (change, range, options) => {
   const offset = startBlock.getOffset(startKey)
   const o = offset + startOffset
   const { text } = startBlock
-  const n = String.getCharOffsetBackward(text, o)
+  const n = TextUtils.getCharOffsetBackward(text, o)
   change.deleteBackwardAtRange(range, n, options)
 }
 
@@ -318,7 +318,7 @@ Changes.deleteWordBackwardAtRange = (change, range, options) => {
   const offset = startBlock.getOffset(startKey)
   const o = offset + startOffset
   const { text } = startBlock
-  const n = String.getWordOffsetBackward(text, o)
+  const n = TextUtils.getWordOffsetBackward(text, o)
   change.deleteBackwardAtRange(range, n, options)
 }
 
@@ -449,7 +449,7 @@ Changes.deleteCharForwardAtRange = (change, range, options) => {
   const offset = startBlock.getOffset(startKey)
   const o = offset + startOffset
   const { text } = startBlock
-  const n = String.getCharOffsetForward(text, o)
+  const n = TextUtils.getCharOffsetForward(text, o)
   change.deleteForwardAtRange(range, n, options)
 }
 
@@ -489,7 +489,7 @@ Changes.deleteWordForwardAtRange = (change, range, options) => {
   const offset = startBlock.getOffset(startKey)
   const o = offset + startOffset
   const { text } = startBlock
-  const n = String.getWordOffsetForward(text, o)
+  const n = TextUtils.getWordOffsetForward(text, o)
   change.deleteForwardAtRange(range, n, options)
 }
 

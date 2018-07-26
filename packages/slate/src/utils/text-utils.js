@@ -188,8 +188,13 @@ function getWordOffsetForward(text, offset) {
  */
 
 export default {
-  getCharOffsetForward,
+  getCharLength,
+  getCharOffset,
   getCharOffsetBackward,
+  getCharOffsetForward,
+  getWordOffset,
   getWordOffsetBackward,
   getWordOffsetForward,
+  isSurrogate,
+  isWord,
 }
