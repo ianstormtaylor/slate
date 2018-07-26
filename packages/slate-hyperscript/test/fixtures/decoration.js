@@ -15,32 +15,38 @@ export const input = (
   <value>
     <document>
       <block type="paragraph">
-        This is a <highlight>paragraph with</highlight> a cursor position{' '}
-        <cursor />(closed selection).
+        one<highlight>two</highlight>three
       </block>
     </document>
   </value>
 )
 
+export const options = {
+  preserveDecorations: true,
+  preserveKeys: true,
+}
+
 export const output = {
   object: 'value',
   document: {
     object: 'document',
+    key: '3',
     data: {},
     nodes: [
       {
         object: 'block',
+        key: '1',
         type: 'paragraph',
         isVoid: false,
         data: {},
         nodes: [
           {
             object: 'text',
+            key: '0',
             leaves: [
               {
                 object: 'leaf',
-                text:
-                  'This is a paragraph with a cursor position (closed selection).',
+                text: 'onetwothree',
                 marks: [],
               },
             ],
@@ -49,20 +55,25 @@ export const output = {
       },
     ],
   },
+  decorations: [
+    {
+      object: 'range',
+      anchorKey: '0',
+      anchorPath: [0, 0],
+      anchorOffset: 3,
+      focusKey: '0',
+      focusPath: [0, 0],
+      focusOffset: 6,
+      isBackward: false,
+      isFocused: false,
+      isAtomic: false,
+      marks: [
+        {
+          object: 'mark',
+          type: 'highlight',
+          data: {},
+        },
+      ],
+    },
+  ],
 }
-
-export const expectDecorations = [
-  {
-    anchorOffset: 10,
-    focusOffset: 24,
-    anchorKey: input.texts.get(0).key,
-    focusKey: input.texts.get(0).key,
-    marks: [
-      {
-        object: 'mark',
-        type: 'highlight',
-        data: {},
-      },
-    ],
-  },
-]

@@ -2,6 +2,7 @@ import Block from '../models/block'
 import Inline from '../models/inline'
 import Mark from '../models/mark'
 import Node from '../models/node'
+import PathUtils from '../utils/path-utils'
 import Range from '../models/range'
 
 /**
@@ -13,24 +14,21 @@ import Range from '../models/range'
 const Changes = {}
 
 /**
- * Add mark to text at `offset` and `length` in node by `key`.
+ * Add mark to text at `offset` and `length` in node by `path`.
  *
  * @param {Change} change
- * @param {String} key
+ * @param {Array} path
  * @param {Number} offset
  * @param {Number} length
  * @param {Mixed} mark
  * @param {Object} options
- *   @property {Boolean} normalize
  */
 
-Changes.addMarkByKey = (change, key, offset, length, mark, options = {}) => {
+Changes.addMarkByPath = (change, path, offset, length, mark, options) => {
   mark = Mark.create(mark)
-  const normalize = change.getFlag('normalize', options)
   const { value } = change
   const { document } = value
-  const path = document.getPath(key)
-  const node = document.getNode(key)
+  const node = document.getNodeByPath(path)
   const leaves = node.getLeaves()
 
   const operations = []
@@ -65,52 +63,39 @@ Changes.addMarkByKey = (change, key, offset, length, mark, options = {}) => {
   })
 
   change.applyOperations(operations)
-
-  if (normalize) {
-    const parent = document.getParent(key)
-    change.normalizeNodeByKey(parent.key)
-  }
+  change.normalizeParentByPath(path, options)
 }
 
 /**
- * Insert a `fragment` at `index` in a node by `key`.
+ * Insert a `fragment` at `index` in a node by `path`.
  *
  * @param {Change} change
- * @param {String} key
+ * @param {Array} path
  * @param {Number} index
  * @param {Fragment} fragment
  * @param {Object} options
- *   @property {Boolean} normalize
  */
 
-Changes.insertFragmentByKey = (change, key, index, fragment, options = {}) => {
-  const normalize = change.getFlag('normalize', options)
-
+Changes.insertFragmentByPath = (change, path, index, fragment, options) => {
   fragment.nodes.forEach((node, i) => {
-    change.insertNodeByKey(key, index + i, node)
+    change.insertNodeByPath(path, index + i, node)
   })
 
-  if (normalize) {
-    change.normalizeNodeByKey(key)
-  }
+  change.normalizeNodeByPath(path, options)
 }
 
 /**
- * Insert a `node` at `index` in a node by `key`.
+ * Insert a `node` at `index` in a node by `path`.
  *
  * @param {Change} change
- * @param {String} key
+ * @param {Array} path
  * @param {Number} index
  * @param {Node} node
  * @param {Object} options
- *   @property {Boolean} normalize
  */
 
-Changes.insertNodeByKey = (change, key, index, node, options = {}) => {
-  const normalize = change.getFlag('normalize', options)
+Changes.insertNodeByPath = (change, path, index, node, options) => {
   const { value } = change
-  const { document } = value
-  const path = document.getPath(key)
 
   change.applyOperation({
     type: 'insert_node',
@@ -119,30 +104,24 @@ Changes.insertNodeByKey = (change, key, index, node, options = {}) => {
     node,
   })
 
-  if (normalize) {
-    change.normalizeNodeByKey(key)
-  }
+  change.normalizeNodeByPath(path, options)
 }
 
 /**
- * Insert `text` at `offset` in node by `key`.
+ * Insert `text` at `offset` in node by `path`.
  *
  * @param {Change} change
- * @param {String} key
+ * @param {Array} path
  * @param {Number} offset
  * @param {String} text
  * @param {Set<Mark>} marks (optional)
  * @param {Object} options
- *   @property {Boolean} normalize
  */
 
-Changes.insertTextByKey = (change, key, offset, text, marks, options = {}) => {
-  const normalize = change.getFlag('normalize', options)
-
+Changes.insertTextByPath = (change, path, offset, text, marks, options) => {
   const { value } = change
   const { document } = value
-  const path = document.getPath(key)
-  const node = document.getNode(key)
+  const node = document.getNodeByPath(path)
   marks = marks || node.getMarksAtIndex(offset)
 
   change.applyOperation({
@@ -154,31 +133,27 @@ Changes.insertTextByKey = (change, key, offset, text, marks, options = {}) => {
     marks,
   })
 
-  if (normalize) {
-    const parent = document.getParent(key)
-    change.normalizeNodeByKey(parent.key)
-  }
+  change.normalizeParentByPath(path, options)
 }
 
 /**
- * Merge a node by `key` with the previous node.
+ * Merge a node by `path` with the previous node.
  *
  * @param {Change} change
- * @param {String} key
+ * @param {Array} path
  * @param {Object} options
- *   @property {Boolean} normalize
  */
 
-Changes.mergeNodeByKey = (change, key, options = {}) => {
-  const normalize = change.getFlag('normalize', options)
+Changes.mergeNodeByPath = (change, path, options) => {
   const { value } = change
   const { document } = value
-  const path = document.getPath(key)
-  const original = document.getDescendant(key)
-  const previous = document.getPreviousSibling(key)
+  const original = document.getDescendantByPath(path)
+  const previous = document.getPreviousSiblingByPath(path)
 
   if (!previous) {
-    throw new Error(`Unable to merge node with key "${key}", no previous key.`)
+    throw new Error(
+      `Unable to merge node with path "${path}", because it has no previous sibling.`
+    )
   }
 
   const position =
@@ -198,30 +173,21 @@ Changes.mergeNodeByKey = (change, key, options = {}) => {
     target: null,
   })
 
-  if (normalize) {
-    const parent = document.getParent(key)
-    change.normalizeNodeByKey(parent.key)
-  }
+  change.normalizeParentByPath(path, options)
 }
 
 /**
- * Move a node by `key` to a new parent by `newKey` and `index`.
- * `newKey` is the key of the container (it can be the document itself)
+ * Move a node by `path` to a new parent by `newPath` and `index`.
  *
  * @param {Change} change
- * @param {String} key
- * @param {String} newKey
+ * @param {Array} path
+ * @param {String} newPath
  * @param {Number} index
  * @param {Object} options
- *   @property {Boolean} normalize
  */
 
-Changes.moveNodeByKey = (change, key, newKey, newIndex, options = {}) => {
-  const normalize = change.getFlag('normalize', options)
+Changes.moveNodeByPath = (change, path, newPath, newIndex, options) => {
   const { value } = change
-  const { document } = value
-  const path = document.getPath(key)
-  const newPath = document.getPath(newKey)
 
   change.applyOperation({
     type: 'move_node',
@@ -230,31 +196,26 @@ Changes.moveNodeByKey = (change, key, newKey, newIndex, options = {}) => {
     newPath: newPath.concat(newIndex),
   })
 
-  if (normalize) {
-    const parent = document.getCommonAncestor(key, newKey)
-    change.normalizeNodeByKey(parent.key)
-  }
+  const ancestorPath = PathUtils.getCommonAncestor(path, newPath)
+  change.normalizeNodeByPath(ancestorPath, options)
 }
 
 /**
- * Remove mark from text at `offset` and `length` in node by `key`.
+ * Remove mark from text at `offset` and `length` in node by `path`.
  *
  * @param {Change} change
- * @param {String} key
+ * @param {Array} path
  * @param {Number} offset
  * @param {Number} length
  * @param {Mark} mark
  * @param {Object} options
- *   @property {Boolean} normalize
  */
 
-Changes.removeMarkByKey = (change, key, offset, length, mark, options = {}) => {
+Changes.removeMarkByPath = (change, path, offset, length, mark, options) => {
   mark = Mark.create(mark)
-  const normalize = change.getFlag('normalize', options)
   const { value } = change
   const { document } = value
-  const path = document.getPath(key)
-  const node = document.getNode(key)
+  const node = document.getNodeByPath(path)
   const leaves = node.getLeaves()
 
   const operations = []
@@ -289,26 +250,21 @@ Changes.removeMarkByKey = (change, key, offset, length, mark, options = {}) => {
   })
 
   change.applyOperations(operations)
-
-  if (normalize) {
-    const parent = document.getParent(key)
-    change.normalizeNodeByKey(parent.key)
-  }
+  change.normalizeParentByPath(path, options)
 }
 
 /**
- * Remove all `marks` from node by `key`.
+ * Remove all `marks` from node by `path`.
  *
  * @param {Change} change
- * @param {String} key
+ * @param {Array} path
  * @param {Object} options
- *   @property {Boolean} normalize
  */
 
-Changes.removeAllMarksByKey = (change, key, options = {}) => {
+Changes.removeAllMarksByPath = (change, path, options) => {
   const { state } = change
   const { document } = state
-  const node = document.getNode(key)
+  const node = document.getNodeByPath(path)
   const texts = node.object === 'text' ? [node] : node.getTextsAsArray()
 
   texts.forEach(text => {
@@ -319,20 +275,17 @@ Changes.removeAllMarksByKey = (change, key, options = {}) => {
 }
 
 /**
- * Remove a node by `key`.
+ * Remove a node by `path`.
  *
  * @param {Change} change
- * @param {String} key
+ * @param {Array} path
  * @param {Object} options
- *   @property {Boolean} normalize
  */
 
-Changes.removeNodeByKey = (change, key, options = {}) => {
-  const normalize = change.getFlag('normalize', options)
+Changes.removeNodeByPath = (change, path, options) => {
   const { value } = change
   const { document } = value
-  const path = document.getPath(key)
-  const node = document.getNode(key)
+  const node = document.getNodeByPath(path)
 
   change.applyOperation({
     type: 'remove_node',
@@ -341,26 +294,25 @@ Changes.removeNodeByKey = (change, key, options = {}) => {
     node,
   })
 
-  if (normalize) {
-    const parent = document.getParent(key)
-    change.normalizeNodeByKey(parent.key)
-  }
+  change.normalizeParentByPath(path, options)
 }
 
 /**
- * Insert `text` at `offset` in node by `key`.
+ * Insert `text` at `offset` in node by `path`.
  *
  * @param {Change} change
- * @param {String} key
+ * @param {Array} path
  * @param {String} text
  * @param {Set<Mark>} marks (optional)
  * @param {Object} options
- *   @property {Boolean} normalize
  */
 
-Changes.setTextByKey = (change, key, text, marks, options = {}) => {
-  const textNode = change.value.document.getDescendant(key)
-  change.replaceTextByKey(key, 0, textNode.text.length, text, marks, options)
+Changes.setTextByPath = (change, path, text, marks, options) => {
+  const { value } = change
+  const { document } = value
+  const node = document.getNodeByPath(path)
+  const end = node.text.length
+  change.replaceTextByPath(path, 0, end, text, marks, options)
 }
 
 /**
@@ -372,13 +324,12 @@ Changes.setTextByKey = (change, key, text, marks, options = {}) => {
  * @param {string} text
  * @param {Set<Mark>} marks (optional)
  * @param {Object} options
- *   @property {Boolean} normalize
  *
  */
 
-Changes.replaceTextByKey = (
+Changes.replaceTextByPath = (
   change,
-  key,
+  path,
   offset,
   length,
   text,
@@ -386,21 +337,22 @@ Changes.replaceTextByKey = (
   options
 ) => {
   const { document } = change.value
-  const textNode = document.getDescendant(key)
+  const node = document.getNodeByPath(path)
 
-  if (length + offset > textNode.text.length) {
-    length = textNode.text.length - offset
+  if (length + offset > node.text.length) {
+    length = node.text.length - offset
   }
 
   const range = Range.create({
-    anchorKey: key,
-    focusKey: key,
+    anchorPath: path,
+    focusPath: path,
     anchorOffset: offset,
     focusOffset: offset + length,
-  })
+  }).normalize(document)
+
   let activeMarks = document.getActiveMarksAtRange(range)
 
-  change.removeTextByKey(key, offset, length, { normalize: false })
+  change.removeTextByPath(path, offset, length, { normalize: false })
 
   if (!marks) {
     // Do not use mark at index when marks and activeMarks are both empty
@@ -414,26 +366,23 @@ Changes.replaceTextByKey = (
     marks = activeMarks.merge(marks)
   }
 
-  change.insertTextByKey(key, offset, text, marks, options)
+  change.insertTextByPath(path, offset, text, marks, options)
 }
 
 /**
- * Remove text at `offset` and `length` in node by `key`.
+ * Remove text at `offset` and `length` in node by `path`.
  *
  * @param {Change} change
- * @param {String} key
+ * @param {Array} path
  * @param {Number} offset
  * @param {Number} length
  * @param {Object} options
- *   @property {Boolean} normalize
  */
 
-Changes.removeTextByKey = (change, key, offset, length, options = {}) => {
-  const normalize = change.getFlag('normalize', options)
+Changes.removeTextByPath = (change, path, offset, length, options) => {
   const { value } = change
   const { document } = value
-  const path = document.getPath(key)
-  const node = document.getNode(key)
+  const node = document.getNodeByPath(path)
   const leaves = node.getLeaves()
   const { text } = node
 
@@ -469,65 +418,53 @@ Changes.removeTextByKey = (change, key, offset, length, options = {}) => {
   // Apply in reverse order, so subsequent removals don't impact previous ones.
   change.applyOperations(removals.reverse())
 
-  if (normalize) {
-    const block = document.getClosestBlock(key)
-    change.normalizeNodeByKey(block.key)
-  }
+  const block = document.getClosestBlock(node.key)
+  change.normalizeNodeByKey(block.key, options)
 }
 
 /**
 `* Replace a `node` with another `node`
  *
  * @param {Change} change
- * @param {String} key
+ * @param {Array} path
  * @param {Object|Node} node
  * @param {Object} options
- *   @property {Boolean} normalize
  */
 
-Changes.replaceNodeByKey = (change, key, newNode, options = {}) => {
+Changes.replaceNodeByPath = (change, path, newNode, options) => {
   newNode = Node.create(newNode)
-  const normalize = change.getFlag('normalize', options)
   const { value } = change
   const { document } = value
-  const node = document.getNode(key)
-  const parent = document.getParent(key)
-  const index = parent.nodes.indexOf(node)
-  change.removeNodeByKey(key, { normalize: false })
-  change.insertNodeByKey(parent.key, index, newNode, { normalize: false })
-
-  if (normalize) {
-    change.normalizeNodeByKey(parent.key)
-  }
+  const index = PathUtils.getIndex(path)
+  const parentPath = PathUtils.getParent(path)
+  change.removeNodeByPath(path, { normalize: false })
+  change.insertNodeByPath(parentPath, index, newNode, { normalize: false })
+  change.normalizeParentByPath(path, options)
 }
 
 /**
- * Set `properties` on mark on text at `offset` and `length` in node by `key`.
+ * Set `properties` on mark on text at `offset` and `length` in node by `path`.
  *
  * @param {Change} change
- * @param {String} key
+ * @param {Array} path
  * @param {Number} offset
  * @param {Number} length
  * @param {Mark} mark
  * @param {Object} options
- *   @property {Boolean} normalize
  */
 
-Changes.setMarkByKey = (
+Changes.setMarkByPath = (
   change,
-  key,
+  path,
   offset,
   length,
   mark,
   properties,
-  options = {}
+  options
 ) => {
   mark = Mark.create(mark)
   properties = Mark.createProperties(properties)
-  const normalize = change.getFlag('normalize', options)
   const { value } = change
-  const { document } = value
-  const path = document.getPath(key)
 
   change.applyOperation({
     type: 'set_mark',
@@ -539,29 +476,23 @@ Changes.setMarkByKey = (
     properties,
   })
 
-  if (normalize) {
-    const parent = document.getParent(key)
-    change.normalizeNodeByKey(parent.key)
-  }
+  change.normalizeParentByPath(path, options)
 }
 
 /**
- * Set `properties` on a node by `key`.
+ * Set `properties` on a node by `path`.
  *
  * @param {Change} change
- * @param {String} key
+ * @param {Array} path
  * @param {Object|String} properties
  * @param {Object} options
- *   @property {Boolean} normalize
  */
 
-Changes.setNodeByKey = (change, key, properties, options = {}) => {
+Changes.setNodeByPath = (change, path, properties, options) => {
   properties = Node.createProperties(properties)
-  const normalize = change.getFlag('normalize', options)
   const { value } = change
   const { document } = value
-  const path = document.getPath(key)
-  const node = document.getNode(key)
+  const node = document.getNodeByPath(path)
 
   change.applyOperation({
     type: 'set_node',
@@ -571,27 +502,23 @@ Changes.setNodeByKey = (change, key, properties, options = {}) => {
     properties,
   })
 
-  if (normalize) {
-    change.normalizeNodeByKey(node.key)
-  }
+  change.normalizeNodeByPath(path, options)
 }
 
 /**
- * Split a node by `key` at `position`.
+ * Split a node by `path` at `position`.
  *
  * @param {Change} change
- * @param {String} key
+ * @param {Array} path
  * @param {Number} position
  * @param {Object} options
- *   @property {Boolean} normalize
  */
 
-Changes.splitNodeByKey = (change, key, position, options = {}) => {
-  const { normalize = true, target = null } = options
+Changes.splitNodeByPath = (change, path, position, options = {}) => {
+  const { target = null } = options
   const { value } = change
   const { document } = value
-  const path = document.getPath(key)
-  const node = document.getDescendantByPath(path)
+  const node = document.getNodeAtPath(path)
 
   change.applyOperation({
     type: 'split_node',
@@ -605,78 +532,71 @@ Changes.splitNodeByKey = (change, key, position, options = {}) => {
     target,
   })
 
-  if (normalize) {
-    const parent = document.getParent(key)
-    change.normalizeNodeByKey(parent.key)
-  }
+  change.normalizeParentByPath(path, options)
 }
 
 /**
- * Split a node deeply down the tree by `key`, `textKey` and `textOffset`.
+ * Split a node deeply down the tree by `path`, `textPath` and `textOffset`.
  *
  * @param {Change} change
- * @param {String} key
- * @param {Number} position
+ * @param {Array} path
+ * @param {Array} textPath
+ * @param {Number} textOffset
  * @param {Object} options
- *   @property {Boolean} normalize
  */
 
-Changes.splitDescendantsByKey = (
+Changes.splitDescendantsByPath = (
   change,
-  key,
-  textKey,
+  path,
+  textPath,
   textOffset,
-  options = {}
+  options
 ) => {
-  if (key == textKey) {
-    change.splitNodeByKey(textKey, textOffset, options)
+  if (PathUtils.isEqual(path, textPath)) {
+    change.splitNodeByPath(textPath, textOffset, options)
     return
   }
 
-  const normalize = change.getFlag('normalize', options)
   const { value } = change
   const { document } = value
-
-  const text = document.getNode(textKey)
-  const ancestors = document.getAncestors(textKey)
+  const node = document.getNodeByPath(path)
+  const text = document.getNodeByPath(textPath)
+  const ancestors = document.getAncestors(textPath)
   const nodes = ancestors
-    .skipUntil(a => a.key == key)
+    .skipUntil(a => a.key == node.key)
     .reverse()
     .unshift(text)
+
   let previous
   let index
 
-  nodes.forEach(node => {
+  nodes.forEach(n => {
     const prevIndex = index == null ? null : index
-    index = previous ? node.nodes.indexOf(previous) + 1 : textOffset
-    previous = node
+    index = previous ? n.nodes.indexOf(previous) + 1 : textOffset
+    previous = n
 
-    change.splitNodeByKey(node.key, index, {
+    change.splitNodeByKey(n.key, index, {
       normalize: false,
       target: prevIndex,
     })
   })
 
-  if (normalize) {
-    const parent = document.getParent(key)
-    change.normalizeNodeByKey(parent.key)
-  }
+  change.normalizeParentByPath(path, options)
 }
 
 /**
  * Unwrap content from an inline parent with `properties`.
  *
  * @param {Change} change
- * @param {String} key
+ * @param {Array} path
  * @param {Object|String} properties
  * @param {Object} options
- *   @property {Boolean} normalize
  */
 
-Changes.unwrapInlineByKey = (change, key, properties, options) => {
+Changes.unwrapInlineByPath = (change, path, properties, options) => {
   const { value } = change
   const { document, selection } = value
-  const node = document.assertDescendant(key)
+  const node = document.assertPath(path)
   const first = node.getFirstText()
   const last = node.getLastText()
   const range = selection.moveToRangeOf(first, last)
@@ -687,16 +607,15 @@ Changes.unwrapInlineByKey = (change, key, properties, options) => {
  * Unwrap content from a block parent with `properties`.
  *
  * @param {Change} change
- * @param {String} key
+ * @param {Array} path
  * @param {Object|String} properties
  * @param {Object} options
- *   @property {Boolean} normalize
  */
 
-Changes.unwrapBlockByKey = (change, key, properties, options) => {
+Changes.unwrapBlockByPath = (change, path, properties, options) => {
   const { value } = change
   const { document, selection } = value
-  const node = document.assertDescendant(key)
+  const node = document.assertPath(path)
   const first = node.getFirstText()
   const last = node.getLastText()
   const range = selection.moveToRangeOf(first, last)
@@ -711,46 +630,40 @@ Changes.unwrapBlockByKey = (change, key, properties, options) => {
  * simply replaced by the node itself.  Cannot unwrap a root node.
  *
  * @param {Change} change
- * @param {String} key
+ * @param {Array} path
  * @param {Object} options
- *   @property {Boolean} normalize
  */
 
-Changes.unwrapNodeByKey = (change, key, options) => {
+Changes.unwrapNodeByPath = (change, path, options) => {
   const { value } = change
   const { document } = value
-  const parent = document.getParent(key)
-  const node = parent.getChild(key)
-
-  const index = parent.nodes.indexOf(node)
+  const index = PathUtils.getIndex(path)
+  const parentPath = PathUtils.getParent(path)
+  const parentIndex = PathUtils.getIndex(parentPath)
+  const parent = document.getNodeByPath(parentPath)
+  const grandPath = PathUtils.getParent(parentPath)
   const isFirst = index === 0
   const isLast = index === parent.nodes.size - 1
 
-  const parentParent = document.getParent(parent.key)
-  const parentIndex = parentParent.nodes.indexOf(parent)
-
   if (parent.nodes.size === 1) {
-    change.moveNodeByKey(key, parentParent.key, parentIndex, {
-      normalize: false,
-    })
-
-    change.removeNodeByKey(parent.key, options)
+    change.moveNodeByPath(path, grandPath, parentIndex, { normalize: false })
+    change.removeNodeByPath(parentPath, options)
   } else if (isFirst) {
     // Just move the node before its parent.
-    change.moveNodeByKey(key, parentParent.key, parentIndex, options)
+    change.moveNodeByPath(path, grandPath, parentIndex, options)
   } else if (isLast) {
     // Just move the node after its parent.
-    change.moveNodeByKey(key, parentParent.key, parentIndex + 1, options)
+    change.moveNodeByPath(path, grandPath, parentIndex + 1, options)
   } else {
     // Split the parent.
-    change.splitNodeByKey(parent.key, index, { normalize: false })
+    change.splitNodeByPath(parentPath, index, { normalize: false })
 
     // Extract the node in between the splitted parent.
-    change.moveNodeByKey(key, parentParent.key, parentIndex + 1, {
+    change.moveNodeByPath(path, grandPath, parentIndex + 1, {
       normalize: false,
     })
 
-    change.normalizeNodeByKey(parentParent.key, options)
+    change.normalizeNodeByPath(grandPath, options)
   }
 }
 
@@ -758,64 +671,59 @@ Changes.unwrapNodeByKey = (change, key, options) => {
  * Wrap a node in a block with `properties`.
  *
  * @param {Change} change
- * @param {String} key The node to wrap
- * @param {Block|Object|String} block The wrapping block (its children are discarded)
+ * @param {Array} path
+ * @param {Block|Object|String} block
  * @param {Object} options
- *   @property {Boolean} normalize
  */
 
-Changes.wrapBlockByKey = (change, key, block, options) => {
+Changes.wrapBlockByPath = (change, path, block, options) => {
   block = Block.create(block)
   block = block.set('nodes', block.nodes.clear())
-  const { document } = change.value
-  const node = document.assertDescendant(key)
-  const parent = document.getParent(node.key)
-  const index = parent.nodes.indexOf(node)
-  change.insertNodeByKey(parent.key, index, block, { normalize: false })
-  change.moveNodeByKey(node.key, block.key, 0, options)
+  const parentPath = PathUtils.getParent(path)
+  const index = PathUtils.getIndex(path)
+  const newPath = PathUtils.increment(path)
+  change.insertNodeByPath(parentPath, index, block, { normalize: false })
+  change.moveNodeByPath(newPath, path, 0, options)
 }
 
 /**
  * Wrap a node in an inline with `properties`.
  *
  * @param {Change} change
- * @param {String} key The node to wrap
- * @param {Block|Object|String} inline The wrapping inline (its children are discarded)
+ * @param {Array} path
+ * @param {Block|Object|String} inline
  * @param {Object} options
- *   @property {Boolean} normalize
  */
 
-Changes.wrapInlineByKey = (change, key, inline, options) => {
+Changes.wrapInlineByPath = (change, path, inline, options) => {
   inline = Inline.create(inline)
   inline = inline.set('nodes', inline.nodes.clear())
-  const { document } = change.value
-  const node = document.assertDescendant(key)
-  const parent = document.getParent(node.key)
-  const index = parent.nodes.indexOf(node)
-  change.insertNodeByKey(parent.key, index, inline, { normalize: false })
-  change.moveNodeByKey(node.key, inline.key, 0, options)
+  const parentPath = PathUtils.getParent(path)
+  const index = PathUtils.getIndex(path)
+  const newPath = PathUtils.increment(path)
+  change.insertNodeByPath(parentPath, index, inline, { normalize: false })
+  change.moveNodeByPath(newPath, path, 0, options)
 }
 
 /**
- * Wrap a node by `key` with `parent`.
+ * Wrap a node by `path` with `node`.
  *
  * @param {Change} change
- * @param {String} key
- * @param {Node|Object} parent
+ * @param {Array} path
+ * @param {Node|Object} node
  * @param {Object} options
  */
 
-Changes.wrapNodeByKey = (change, key, parent, options) => {
-  parent = Node.create(parent)
-  parent = parent.set('nodes', parent.nodes.clear())
+Changes.wrapNodeByPath = (change, path, node) => {
+  node = Node.create(node)
 
-  if (parent.object == 'block') {
-    change.wrapBlockByKey(key, parent, options)
+  if (node.object == 'block') {
+    change.wrapBlockByPath(path, node)
     return
   }
 
-  if (parent.object == 'inline') {
-    change.wrapInlineByKey(key, parent, options)
+  if (node.object == 'inline') {
+    change.wrapInlineByPath(path, node)
     return
   }
 }

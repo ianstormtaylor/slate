@@ -2,19 +2,21 @@
 
 import h from '../../../helpers/h'
 
-export default function(change) {
-  debugger
-  change.splitInline()
-  debugger
-}
+export default [
+  {
+    type: 'remove_text',
+    path: [0, 0],
+    offset: 1,
+    text: 'or',
+    marks: [],
+  },
+]
 
 export const input = (
   <value>
     <document>
       <paragraph>
-        <link>
-          wo<cursor />rd
-        </link>
+        wor<anchor />d<focus />
       </paragraph>
     </document>
   </value>
@@ -24,10 +26,7 @@ export const output = (
   <value>
     <document>
       <paragraph>
-        <link>wo</link>
-        <link>
-          <cursor />rd
-        </link>
+        w<anchor />d<focus />
       </paragraph>
     </document>
   </value>

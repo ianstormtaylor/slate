@@ -1,6 +1,7 @@
 import Debug from 'debug'
 
 import Operation from '../models/operation'
+import PathUtils from '../utils/path-utils'
 
 /**
  * Debug.
@@ -11,63 +12,68 @@ import Operation from '../models/operation'
 const debug = Debug('slate:operation:apply')
 
 /**
- * Apply adjustments to affected ranges (selections, decorations);
- * accepts (value, checking function(range) -> bool, applying function(range) -> range)
- * returns value with affected ranges updated
+ * Map all range objects to apply adjustments with an `iterator`.
  *
  * @param {Value} value
- * @param {Function} checkAffected
- * @param {Function} adjustRange
+ * @param {Function} iterator
  * @return {Value}
  */
 
-function applyRangeAdjustments(value, checkAffected, adjustRange) {
-  // check selection, apply adjustment if affected
-  if (value.selection && checkAffected(value.selection)) {
-    value = value.set('selection', adjustRange(value.selection))
+function mapRanges(value, iterator) {
+  const { document, selection, decorations } = value
+
+  if (selection) {
+    let next = selection.isSet ? iterator(selection) : selection
+    if (!next) next = selection.deselect()
+    if (next !== selection) next = next.normalize(document)
+    value = value.set('selection', next)
   }
 
-  if (!value.decorations) return value
+  if (decorations) {
+    let next = decorations.map(decoration => {
+      let n = decoration.isSet ? iterator(decoration) : decoration
+      if (n && n !== decoration) n = n.normalize(document)
+      return n
+    })
 
-  // check all ranges, apply adjustment if affected
-  const decorations = value.decorations
-    .map(
-      decoration =>
-        checkAffected(decoration) ? adjustRange(decoration) : decoration
-    )
-    .filter(decoration => decoration.anchorKey !== null)
-  return value.set('decorations', decorations)
+    next = next.filter(decoration => !!decoration)
+    next = next.size ? next : null
+    value = value.set('decorations', next)
+  }
+
+  return value
 }
 
 /**
- * clear any atomic ranges (in decorations) if they contain the point (key, offset, offset-end?)
- * specified
+ * Remove any atomic ranges inside a `key`, `offset` and `length`.
  *
  * @param {Value} value
  * @param {String} key
- * @param {Number} offset
- * @param {Number?} offsetEnd
+ * @param {Number} start
+ * @param {Number?} end
  * @return {Value}
  */
 
-function clearAtomicRangesIfContains(value, key, offset, offsetEnd = null) {
-  return applyRangeAdjustments(
-    value,
-    range => {
-      if (!range.isAtomic) return false
-      const { startKey, startOffset, endKey, endOffset } = range
-      return (
-        (startKey == key &&
-          startOffset < offset &&
-          (endKey != key || endOffset > offset)) ||
-        (offsetEnd &&
-          startKey == key &&
-          startOffset < offsetEnd &&
-          (endKey != key || endOffset > offsetEnd))
-      )
-    },
-    range => range.deselect()
-  )
+function clearAtomicRanges(value, key, start, end = null) {
+  return mapRanges(value, range => {
+    const { isAtomic, startKey, startOffset, endKey, endOffset } = range
+    if (!isAtomic) return range
+    if (startKey !== key) return range
+
+    if (startOffset < start && (endKey !== key || endOffset > start)) {
+      return null
+    }
+
+    if (
+      end != null &&
+      startOffset < end &&
+      (endKey !== key || endOffset > end)
+    ) {
+      return null
+    }
+
+    return range
+  })
 }
 
 /**
@@ -105,13 +111,18 @@ const APPLIERS = {
 
   insert_node(value, operation) {
     const { path, node } = operation
-    const index = path[path.length - 1]
-    const rest = path.slice(0, -1)
+    const index = PathUtils.getIndex(path)
+    const parentPath = PathUtils.getParent(path)
     let { document } = value
-    let parent = document.assertPath(rest)
+    let parent = document.assertPath(parentPath)
     parent = parent.insertNode(index, node)
     document = document.updateNode(parent)
     value = value.set('document', document)
+
+    value = mapRanges(value, range => {
+      return range.merge({ anchorPath: null, focusPath: null })
+    })
+
     return value
   },
 
@@ -127,34 +138,40 @@ const APPLIERS = {
     const { path, offset, text, marks } = operation
     let { document } = value
     let node = document.assertPath(path)
-
-    // Update the document
     node = node.insertText(offset, text, marks)
     document = document.updateNode(node)
-
     value = value.set('document', document)
 
-    // if insert happens within atomic ranges, clear
-    value = clearAtomicRangesIfContains(value, node.key, offset)
+    // Update any ranges that were affected.
+    value = clearAtomicRanges(value, node.key, offset)
 
-    // Update the selection, decorations
-    value = applyRangeAdjustments(
-      value,
-      ({ anchorKey, anchorOffset, isBackward, isAtomic }) =>
-        anchorKey == node.key &&
+    value = mapRanges(value, range => {
+      const { anchorKey, anchorOffset, isBackward, isAtomic } = range
+
+      if (
+        anchorKey === node.key &&
         (anchorOffset > offset ||
-          (anchorOffset == offset && (!isAtomic || !isBackward))),
-      range => range.moveAnchor(text.length)
-    )
+          (anchorOffset === offset && (!isAtomic || !isBackward)))
+      ) {
+        return range.moveAnchor(text.length)
+      }
 
-    value = applyRangeAdjustments(
-      value,
-      ({ focusKey, focusOffset, isBackward, isAtomic }) =>
-        focusKey == node.key &&
+      return range
+    })
+
+    value = mapRanges(value, range => {
+      const { focusKey, focusOffset, isBackward, isAtomic } = range
+
+      if (
+        focusKey === node.key &&
         (focusOffset > offset ||
-          (focusOffset == offset && (!isAtomic || isBackward))),
-      range => range.moveFocus(text.length)
-    )
+          (focusOffset == offset && (!isAtomic || isBackward)))
+      ) {
+        return range.moveFocus(text.length)
+      }
+
+      return range
+    })
 
     return value
   },
@@ -169,42 +186,35 @@ const APPLIERS = {
 
   merge_node(value, operation) {
     const { path } = operation
-    const withPath = path
-      .slice(0, path.length - 1)
-      .concat([path[path.length - 1] - 1])
+    const withPath = PathUtils.decrement(path)
     let { document } = value
     const one = document.assertPath(withPath)
     const two = document.assertPath(path)
-    let parent = document.getParent(one.key)
-    const oneIndex = parent.nodes.indexOf(one)
-    const twoIndex = parent.nodes.indexOf(two)
+    let parent = document.getParentByPath(path)
+    const oneIndex = PathUtils.getIndex(withPath)
+    const twoIndex = PathUtils.getIndex(path)
 
     // Perform the merge in the document.
     parent = parent.mergeNode(oneIndex, twoIndex)
     document = document.updateNode(parent)
     value = value.set('document', document)
 
-    if (one.object == 'text') {
-      value = applyRangeAdjustments(
-        value,
-        // If the nodes are text nodes and the range is inside the second node:
-        ({ anchorKey, focusKey }) =>
-          anchorKey == two.key || focusKey == two.key,
-        // update it to refer to the first node instead:
-        range => {
-          if (range.anchorKey == two.key)
-            range = range.moveAnchorTo(
-              one.key,
-              one.text.length + range.anchorOffset
-            )
-          if (range.focusKey == two.key)
-            range = range.moveFocusTo(
-              one.key,
-              one.text.length + range.focusOffset
-            )
-          return range.normalize(document)
+    // If the merged node was a text node, update any ranges that refer to it.
+    if (two.object === 'text') {
+      value = mapRanges(value, range => {
+        const max = one.text.length
+
+        if (range.anchorKey === two.key) {
+          range = range.moveAnchorTo(one.key, max + range.anchorOffset)
         }
-      )
+
+        if (range.focusKey === two.key) {
+          range = range.moveFocusTo(one.key, max + range.focusOffset)
+        }
+
+        range = range.merge({ anchorPath: null, focusPath: null })
+        return range
+      })
     }
 
     return value
@@ -220,15 +230,15 @@ const APPLIERS = {
 
   move_node(value, operation) {
     const { path, newPath } = operation
-    const newIndex = newPath[newPath.length - 1]
-    const newParentPath = newPath.slice(0, -1)
-    const oldParentPath = path.slice(0, -1)
-    const oldIndex = path[path.length - 1]
+    const newIndex = PathUtils.getIndex(newPath)
+    let newParentPath = PathUtils.getParent(newPath)
+    const oldParentPath = PathUtils.getParent(path)
+    const oldIndex = PathUtils.getIndex(path)
     let { document } = value
     const node = document.assertPath(path)
 
     // Remove the node from its current parent.
-    let parent = document.getParent(node.key)
+    let parent = document.getParentByPath(path)
     parent = parent.removeNode(oldIndex)
     document = document.updateNode(parent)
 
@@ -238,17 +248,15 @@ const APPLIERS = {
     // If the old path and the rest of the new path are the same, then the new
     // target is the old parent.
     if (
-      oldParentPath.every((x, i) => x === newParentPath[i]) &&
-      oldParentPath.length === newParentPath.length
+      oldParentPath.every((x, i) => x === newParentPath.get(i)) &&
+      oldParentPath.size === newParentPath.size
     ) {
       target = parent
     } else if (
-      oldParentPath.every((x, i) => x === newParentPath[i]) &&
-      oldIndex < newParentPath[oldParentPath.length]
+      oldParentPath.every((x, i) => x === newParentPath.get(i)) &&
+      oldIndex < newParentPath.get(oldParentPath.size)
     ) {
-      // Otherwise, if the old path removal resulted in the new path being no longer
-      // correct, we need to decrement the new path at the old path's last index.
-      newParentPath[oldParentPath.length]--
+      newParentPath = PathUtils.decrement(newParentPath, 1, oldParentPath.size)
       target = document.assertPath(newParentPath)
     } else {
       // Otherwise, we can just grab the target normally...
@@ -259,6 +267,11 @@ const APPLIERS = {
     target = target.insertNode(newIndex, node)
     document = document.updateNode(target)
     value = value.set('document', document)
+
+    value = mapRanges(value, range => {
+      return range.merge({ anchorPath: null, focusPath: null })
+    })
+
     return value
   },
 
@@ -290,51 +303,39 @@ const APPLIERS = {
 
   remove_node(value, operation) {
     const { path } = operation
-    let { document, selection } = value
+    let { document } = value
     const node = document.assertPath(path)
-
-    if (selection.isSet || value.decorations !== null) {
-      const first = node.object == 'text' ? node : node.getFirstText() || node
-      const last = node.object == 'text' ? node : node.getLastText() || node
-      const prev = document.getPreviousText(first.key)
-      const next = document.getNextText(last.key)
-
-      value = applyRangeAdjustments(
-        value,
-        // If the start or end point was in this node
-        ({ startKey, endKey }) =>
-          node.hasNode(startKey) || node.hasNode(endKey),
-        // update it to be just before/after
-        range => {
-          const { startKey, endKey } = range
-
-          if (node.hasNode(startKey)) {
-            range = prev
-              ? range.moveStartTo(prev.key, prev.text.length)
-              : next ? range.moveStartTo(next.key, 0) : range.deselect()
-          }
-
-          if (node.hasNode(endKey)) {
-            range = prev
-              ? range.moveEndTo(prev.key, prev.text.length)
-              : next ? range.moveEndTo(next.key, 0) : range.deselect()
-          }
-
-          // If the range wasn't deselected, normalize it.
-          if (range.isSet) return range.normalize(document)
-          return range
-        }
-      )
-    }
+    const first = node.object == 'text' ? node : node.getFirstText() || node
+    const last = node.object == 'text' ? node : node.getLastText() || node
+    const prev = document.getPreviousText(first.key)
+    const next = document.getNextText(last.key)
 
     // Remove the node from the document.
     let parent = document.getParent(node.key)
     const index = parent.nodes.indexOf(node)
     parent = parent.removeNode(index)
     document = document.updateNode(parent)
-
-    // Update the document and range.
     value = value.set('document', document)
+
+    // Update the ranges in case they referenced the removed node.
+    value = mapRanges(value, range => {
+      const { startKey, endKey } = range
+      if (node.hasNode(startKey)) {
+        range = prev
+          ? range.moveStartTo(prev.key, prev.text.length)
+          : next ? range.moveStartTo(next.key, 0) : range.deselect()
+      }
+
+      if (node.hasNode(endKey)) {
+        range = prev
+          ? range.moveEndTo(prev.key, prev.text.length)
+          : next ? range.moveEndTo(next.key, 0) : range.deselect()
+      }
+
+      range = range.merge({ anchorPath: null, focusPath: null })
+      return range
+    })
+
     return value
   },
 
@@ -352,45 +353,43 @@ const APPLIERS = {
     const rangeOffset = offset + length
     let { document } = value
 
+    // Remove the text from the node and update the document.
     let node = document.assertPath(path)
+    node = node.removeText(offset, length)
+    document = document.updateNode(node)
+    value = value.set('document', document)
 
-    // if insert happens within atomic ranges, clear
-    value = clearAtomicRangesIfContains(
-      value,
-      node.key,
-      offset,
-      offset + length
-    )
+    // Update any rnages that might be affected.
+    value = clearAtomicRanges(value, node.key, offset, offset + length)
 
-    value = applyRangeAdjustments(
-      value,
-      // if anchor of range is here
-      ({ anchorKey }) => anchorKey == node.key,
-      // adjust if it is in or past the removal range
-      range =>
-        range.anchorOffset >= rangeOffset
+    value = mapRanges(value, range => {
+      const { anchorKey } = range
+
+      if (anchorKey === node.key) {
+        return range.anchorOffset >= rangeOffset
           ? range.moveAnchor(-length)
           : range.anchorOffset > offset
             ? range.moveAnchorTo(range.anchorKey, offset)
             : range
-    )
+      }
 
-    value = applyRangeAdjustments(
-      value,
-      // if focus of range is here
-      ({ focusKey }) => focusKey == node.key,
-      // adjust if it is in or past the removal range
-      range =>
-        range.focusOffset >= rangeOffset
+      return range
+    })
+
+    value = mapRanges(value, range => {
+      const { focusKey } = range
+
+      if (focusKey === node.key) {
+        return range.focusOffset >= rangeOffset
           ? range.moveFocus(-length)
           : range.focusOffset > offset
             ? range.moveFocusTo(range.focusKey, offset)
             : range
-    )
+      }
 
-    node = node.removeText(offset, length)
-    document = document.updateNode(node)
-    value = value.set('document', document)
+      return range
+    })
+
     return value
   },
 
@@ -440,20 +439,8 @@ const APPLIERS = {
 
   set_selection(value, operation) {
     const { properties } = operation
-    const { anchorPath, focusPath, ...props } = properties
     let { document, selection } = value
-
-    if (anchorPath !== undefined) {
-      props.anchorKey =
-        anchorPath === null ? null : document.assertPath(anchorPath).key
-    }
-
-    if (focusPath !== undefined) {
-      props.focusKey =
-        focusPath === null ? null : document.assertPath(focusPath).key
-    }
-
-    selection = selection.merge(props)
+    selection = selection.merge(properties)
     selection = selection.normalize(document)
     value = value.set('selection', selection)
     return value
@@ -485,54 +472,41 @@ const APPLIERS = {
     const { path, position, properties } = operation
     let { document } = value
 
-    // Calculate a few things...
-    const node = document.assertPath(path)
-    let parent = document.getParent(node.key)
-    const index = parent.nodes.indexOf(node)
-
     // Split the node by its parent.
+    const node = document.assertPath(path)
+    const index = path.last()
+    let parent = document.getParentByPath(path)
     parent = parent.splitNode(index, position)
 
-    if (properties) {
-      const splitNode = parent.nodes.get(index + 1)
-
-      if (splitNode.object !== 'text') {
-        parent = parent.updateNode(splitNode.merge(properties))
-      }
+    // Update the properties on the new node if needed.
+    if (properties && node.object !== 'text') {
+      const newNode = parent.nodes.get(index + 1)
+      parent = parent.updateNode(newNode.merge(properties))
     }
 
+    // Update the node in the document.
     document = document.updateNode(parent)
-    const next = document.getNextText(node.key)
-
-    value = applyRangeAdjustments(
-      value,
-      // check if range is affected
-      ({ startKey, startOffset, endKey, endOffset }) =>
-        (node.key == startKey && position <= startOffset) ||
-        (node.key == endKey && position <= endOffset),
-      // update its start / end as needed
-      range => {
-        const { startKey, startOffset, endKey, endOffset } = range
-        let normalize = false
-
-        if (node.key == startKey && position <= startOffset) {
-          range = range.moveStartTo(next.key, startOffset - position)
-          normalize = true
-        }
-
-        if (node.key == endKey && position <= endOffset) {
-          range = range.moveEndTo(next.key, endOffset - position)
-          normalize = true
-        }
-
-        // Normalize the selection if we changed it
-        if (normalize) return range.normalize(document)
-        return range
-      }
-    )
-
-    // Return the updated value.
     value = value.set('document', document)
+
+    // Update any ranges that were affected.
+    value = mapRanges(value, range => {
+      const next = document.getNextText(node.key)
+      const { startKey, startOffset, endKey, endOffset } = range
+
+      // If the start was after the split, move it to the next node.
+      if (node.key === startKey && position <= startOffset) {
+        range = range.moveStartTo(next.key, startOffset - position)
+      }
+
+      // If the end was after the split, move it to the next node.
+      if (node.key === endKey && position <= endOffset) {
+        range = range.moveEndTo(next.key, endOffset - position)
+      }
+
+      range = range.merge({ anchorPath: null, focusPath: null })
+      return range
+    })
+
     return value
   },
 }

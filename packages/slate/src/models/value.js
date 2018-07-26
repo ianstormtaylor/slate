@@ -61,26 +61,25 @@ class Value extends Record(DEFAULTS) {
    * @return {Object}
    */
 
-  static createProperties(attrs = {}) {
-    if (Value.isValue(attrs)) {
+  static createProperties(a = {}) {
+    if (Value.isValue(a)) {
       return {
-        data: attrs.data,
-        decorations: attrs.decorations,
-        schema: attrs.schema,
+        data: a.data,
+        decorations: a.decorations,
+        schema: a.schema,
       }
     }
 
-    if (isPlainObject(attrs)) {
-      const props = {}
-      if ('data' in attrs) props.data = Data.create(attrs.data)
-      if ('decorations' in attrs)
-        props.decorations = Range.createList(attrs.decorations)
-      if ('schema' in attrs) props.schema = Schema.create(attrs.schema)
-      return props
+    if (isPlainObject(a)) {
+      const p = {}
+      if ('data' in a) p.data = Data.create(a.data)
+      if ('decorations' in a) p.decorations = Range.createList(a.decorations)
+      if ('schema' in a) p.schema = Schema.create(a.schema)
+      return p
     }
 
     throw new Error(
-      `\`Value.createProperties\` only accepts objects or values, but you passed it: ${attrs}`
+      `\`Value.createProperties\` only accepts objects or values, but you passed it: ${a}`
     )
   }
 
@@ -96,22 +95,8 @@ class Value extends Record(DEFAULTS) {
 
   static fromJSON(object, options = {}) {
     let { document = {}, selection = {}, schema = {}, history = {} } = object
-
     let data = new Map()
-
     document = Document.fromJSON(document)
-
-    // rebuild selection from anchorPath and focusPath if keys were dropped
-    const { anchorPath, focusPath, anchorKey, focusKey } = selection
-
-    if (anchorPath !== undefined && anchorKey === undefined) {
-      selection.anchorKey = document.assertPath(anchorPath).key
-    }
-
-    if (focusPath !== undefined && focusKey === undefined) {
-      selection.focusKey = document.assertPath(focusPath).key
-    }
-
     selection = Range.fromJSON(selection)
     schema = Schema.fromJSON(schema)
     history = History.fromJSON(history)
@@ -132,6 +117,8 @@ class Value extends Record(DEFAULTS) {
       const text = document.getFirstText()
       if (text) selection = selection.collapseToStartOf(text)
     }
+
+    selection = selection.normalize(document)
 
     let value = new Value({
       data,
@@ -284,6 +271,26 @@ class Value extends Record(DEFAULTS) {
   }
 
   /**
+   * Get the current start path.
+   *
+   * @return {String}
+   */
+
+  get startPath() {
+    return this.selection.startPath
+  }
+
+  /**
+   * Get the current end path.
+   *
+   * @return {String}
+   */
+
+  get endPath() {
+    return this.selection.endPath
+  }
+
+  /**
    * Get the current start offset.
    *
    * @return {String}
@@ -321,6 +328,26 @@ class Value extends Record(DEFAULTS) {
 
   get focusKey() {
     return this.selection.focusKey
+  }
+
+  /**
+   * Get the current anchor path.
+   *
+   * @return {String}
+   */
+
+  get anchorPath() {
+    return this.selection.anchorPath
+  }
+
+  /**
+   * Get the current focus path.
+   *
+   * @return {String}
+   */
+
+  get focusPath() {
+    return this.selection.focusPath
   }
 
   /**
@@ -656,59 +683,25 @@ class Value extends Record(DEFAULTS) {
     }
 
     if (options.preserveData) {
-      object.data = this.data.toJSON()
+      object.data = this.data.toJSON(options)
     }
 
     if (options.preserveDecorations) {
       object.decorations = this.decorations
-        ? this.decorations.toArray().map(d => d.toJSON())
+        ? this.decorations.toArray().map(d => d.toJSON(options))
         : null
     }
 
     if (options.preserveHistory) {
-      object.history = this.history.toJSON()
+      object.history = this.history.toJSON(options)
     }
 
     if (options.preserveSelection) {
-      object.selection = this.selection.toJSON()
+      object.selection = this.selection.toJSON(options)
     }
 
     if (options.preserveSchema) {
-      object.schema = this.schema.toJSON()
-    }
-
-    if (options.preserveSelection && !options.preserveKeys) {
-      const { document, selection } = this
-
-      object.selection.anchorPath = selection.isSet
-        ? document.getPath(selection.anchorKey)
-        : null
-
-      object.selection.focusPath = selection.isSet
-        ? document.getPath(selection.focusKey)
-        : null
-
-      delete object.selection.anchorKey
-      delete object.selection.focusKey
-    }
-
-    if (
-      options.preserveDecorations &&
-      object.decorations &&
-      !options.preserveKeys
-    ) {
-      const { document } = this
-
-      object.decorations = object.decorations.map(decoration => {
-        const withPath = {
-          ...decoration,
-          anchorPath: document.getPath(decoration.anchorKey),
-          focusPath: document.getPath(decoration.focusKey),
-        }
-        delete withPath.anchorKey
-        delete withPath.focusKey
-        return withPath
-      })
+      object.schema = this.schema.toJSON(options)
     }
 
     return object

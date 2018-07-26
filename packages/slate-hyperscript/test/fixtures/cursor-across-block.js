@@ -1,14 +1,21 @@
 /** @jsx h */
 
-import h from '../../../helpers/h'
+import h from '../..'
 
 export const input = (
   <value>
     <document>
-      <paragraph>one</paragraph>
+      <block type="paragraph">
+        w<anchor />or<focus />d
+      </block>
     </document>
   </value>
 )
+
+export const options = {
+  preserveSelection: true,
+  preserveKeys: true,
+}
 
 export const output = {
   object: 'value',
@@ -19,18 +26,18 @@ export const output = {
     nodes: [
       {
         object: 'block',
-        type: 'paragraph',
         key: '1',
-        data: {},
+        type: 'paragraph',
         isVoid: false,
+        data: {},
         nodes: [
           {
             object: 'text',
             key: '0',
             leaves: [
               {
-                text: 'one',
                 object: 'leaf',
+                text: 'word',
                 marks: [],
               },
             ],
@@ -43,18 +50,13 @@ export const output = {
     object: 'range',
     anchorKey: '0',
     anchorPath: [0, 0],
-    anchorOffset: 0,
+    anchorOffset: 1,
     focusKey: '0',
     focusPath: [0, 0],
-    focusOffset: 0,
+    focusOffset: 3,
     isBackward: false,
-    isFocused: false,
-    marks: null,
+    isFocused: true,
     isAtomic: false,
+    marks: null,
   },
-}
-
-export const options = {
-  preserveKeys: true,
-  preserveSelection: true,
 }

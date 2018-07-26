@@ -6,31 +6,38 @@ export const input = (
   <value>
     <document>
       <block type="paragraph">
-        This is a paragraph with a cursor position <cursor />(closed selection).
+        one<cursor />
       </block>
     </document>
   </value>
 )
 
+export const options = {
+  preserveSelection: true,
+  preserveKeys: true,
+}
+
 export const output = {
   object: 'value',
   document: {
     object: 'document',
+    key: '3',
     data: {},
     nodes: [
       {
         object: 'block',
+        key: '1',
         type: 'paragraph',
         isVoid: false,
         data: {},
         nodes: [
           {
             object: 'text',
+            key: '0',
             leaves: [
               {
                 object: 'leaf',
-                text:
-                  'This is a paragraph with a cursor position (closed selection).',
+                text: 'one',
                 marks: [],
               },
             ],
@@ -39,12 +46,17 @@ export const output = {
       },
     ],
   },
-}
-
-export const expectSelection = {
-  isCollapsed: true,
-  anchorOffset: 43,
-  focusOffset: 43,
-  anchorKey: input.texts.get(0).key,
-  focusKey: input.texts.get(0).key,
+  selection: {
+    object: 'range',
+    anchorKey: '0',
+    anchorPath: [0, 0],
+    anchorOffset: 3,
+    focusKey: '0',
+    focusPath: [0, 0],
+    focusOffset: 3,
+    isBackward: false,
+    isFocused: true,
+    isAtomic: false,
+    marks: null,
+  },
 }

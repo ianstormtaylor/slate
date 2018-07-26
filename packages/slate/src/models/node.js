@@ -8,6 +8,7 @@ import Block from './block'
 import Inline from './inline'
 import Document from './document'
 import { isType } from '../constants/model-types'
+import PathUtils from '../utils/path-utils'
 import Range from './range'
 import Text from './text'
 import generateKey from '../utils/generate-key'
@@ -269,7 +270,7 @@ class Node {
    */
 
   assertPath(path) {
-    const descendant = this.getDescendantAtPath(path)
+    const descendant = this.getDescendantByPath(path)
 
     if (!descendant) {
       throw new Error(`Could not find a descendant at path "${path}".`)
@@ -366,6 +367,18 @@ class Node {
     } else {
       return null
     }
+  }
+
+  getAncestorsByPath(path) {
+    const ancestors = []
+
+    path.forEach((p, i) => {
+      const current = path.slice(0, i)
+      const parent = this.getNodeByPath(current)
+      ancestors.push(parent)
+    })
+
+    return List(ancestors)
   }
 
   /**
@@ -659,16 +672,26 @@ class Node {
    * @return {Node|Null}
    */
 
-  getDescendantAtPath(path) {
+  getDescendantByPath(path) {
+    const array = path.toArray()
     let descendant = this
 
-    for (const index of path) {
-      if (!descendant) return
-      if (!descendant.nodes) return
+    for (const index of array) {
+      if (!descendant) return null
+      if (!descendant.nodes) return null
       descendant = descendant.nodes.get(index)
     }
 
     return descendant
+  }
+
+  getDescendantAtPath(path) {
+    logger.deprecate(
+      `0.35.0`,
+      'The `Node.getDescendantAtPath` has been renamed to `Node.getDescendantByPath`.'
+    )
+
+    return this.getDescendantByPath(path)
   }
 
   /**
@@ -1313,12 +1336,28 @@ class Node {
   /**
    * Get a node in the tree by `path`.
    *
-   * @param {Array} path
+   * @param {List} path
+   * @return {Node|Null}
+   */
+
+  getNodeByPath(path) {
+    return path.size ? this.getDescendantByPath(path) : this
+  }
+
+  /**
+   * Get a node in the tree by `path`.
+   *
+   * @param {List} path
    * @return {Node|Null}
    */
 
   getNodeAtPath(path) {
-    return path.length ? this.getDescendantAtPath(path) : this
+    logger.deprecate(
+      `0.35.0`,
+      'The `Node.getNodeAtPath` method has been renamed to `Node.getNodeByPath`.'
+    )
+
+    return this.getNodeByPath(path)
   }
 
   /**
@@ -1387,11 +1426,18 @@ class Node {
     return node
   }
 
+  getParentByPath(path) {
+    if (!path.size) return null
+    const parentPath = PathUtils.getParent(path)
+    const parent = this.getNodeByPath(parentPath)
+    return parent
+  }
+
   /**
    * Get the path of a descendant node by `key`.
    *
    * @param {String|Node} key
-   * @return {Array}
+   * @return {List}
    */
 
   getPath(key) {
@@ -1405,7 +1451,7 @@ class Node {
       child = ancestor
     })
 
-    return path
+    return List(path)
   }
 
   /**
@@ -1417,7 +1463,7 @@ class Node {
    */
 
   refindPath(path, key) {
-    const node = this.getDescendantAtPath(path)
+    const node = this.getDescendantByPath(path)
 
     if (node && node.key === key) {
       return path
@@ -1436,7 +1482,7 @@ class Node {
    */
 
   refindNode(path, key) {
-    const node = this.getDescendantAtPath(path)
+    const node = this.getDescendantByPath(path)
 
     if (node && node.key === key) {
       return node
@@ -1497,6 +1543,13 @@ class Node {
     }
 
     return before.last()
+  }
+
+  getPreviousSiblingByPath(path) {
+    const index = path.last()
+    if (index == null || index === 0) return null
+    const previousPath = PathUtils.decrement(path)
+    return this.getNodeByPath(previousPath)
   }
 
   /**
@@ -2100,7 +2153,7 @@ memoize(Node.prototype, [
   'getDecorations',
   'getDepth',
   'getDescendant',
-  'getDescendantAtPath',
+  'getDescendantByPath',
   'getFirstText',
   'getFragmentAtRange',
   'getFurthestBlock',
@@ -2121,7 +2174,7 @@ memoize(Node.prototype, [
   'getNextSibling',
   'getNextText',
   'getNode',
-  'getNodeAtPath',
+  'getNodeByPath',
   'getOffset',
   'getOffsetAtRange',
   'getParent',

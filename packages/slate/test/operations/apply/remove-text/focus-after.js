@@ -6,8 +6,8 @@ export default [
   {
     type: 'remove_text',
     path: [0, 0],
-    offset: 2,
-    text: 'is is some text inside ',
+    offset: 1,
+    text: 'or',
     marks: [],
   },
 ]
@@ -16,7 +16,7 @@ export const input = (
   <value>
     <document>
       <paragraph>
-        This <cursor />is some text inside a paragraph.
+        <anchor />wor<focus />d
       </paragraph>
     </document>
   </value>
@@ -26,7 +26,7 @@ export const output = (
   <value>
     <document>
       <paragraph>
-        Th<cursor />a paragraph.
+        <anchor />w<focus />d
       </paragraph>
     </document>
   </value>

@@ -1,7 +1,5 @@
 /** @jsx h */
 
-import assert from 'assert'
-
 import h from '../..'
 
 export const input = (
@@ -13,24 +11,25 @@ export const input = (
   </document>
 )
 
-export function test() {
-  const block = input.nodes.first()
-  assert.notEqual(block.nodes.first().key, 'a')
-  assert.equal(block.nodes.last().key, 'a')
+export const options = {
+  preserveKeys: true,
 }
 
 export const output = {
   object: 'document',
+  key: '6',
   data: {},
   nodes: [
     {
       object: 'block',
+      key: '4',
       type: 'paragraph',
       isVoid: false,
       data: {},
       nodes: [
         {
           object: 'text',
+          key: '2',
           leaves: [
             {
               object: 'leaf',
@@ -41,12 +40,14 @@ export const output = {
         },
         {
           object: 'inline',
+          key: '1',
           type: 'link',
           data: {},
           isVoid: false,
           nodes: [
             {
               object: 'text',
+              key: '0',
               leaves: [
                 {
                   object: 'leaf',
@@ -59,6 +60,7 @@ export const output = {
         },
         {
           object: 'text',
+          key: 'a',
           leaves: [
             {
               object: 'leaf',

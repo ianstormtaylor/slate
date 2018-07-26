@@ -1,11 +1,12 @@
 /** @jsx h */
 
-import h from '../../../helpers/h'
+import h from '../..'
 
 export const input = (
   <value>
     <document>
-      <paragraph>one</paragraph>
+      <block type="paragraph">word</block>
+      <text>invalid</text>
     </document>
   </value>
 )
@@ -14,23 +15,20 @@ export const output = {
   object: 'value',
   document: {
     object: 'document',
-    key: '3',
     data: {},
     nodes: [
       {
         object: 'block',
         type: 'paragraph',
-        key: '1',
-        data: {},
         isVoid: false,
+        data: {},
         nodes: [
           {
             object: 'text',
-            key: '0',
             leaves: [
               {
-                text: 'one',
                 object: 'leaf',
+                text: 'word',
                 marks: [],
               },
             ],
@@ -39,22 +37,4 @@ export const output = {
       },
     ],
   },
-  selection: {
-    object: 'range',
-    anchorKey: '0',
-    anchorPath: [0, 0],
-    anchorOffset: 0,
-    focusKey: '0',
-    focusPath: [0, 0],
-    focusOffset: 0,
-    isBackward: false,
-    isFocused: false,
-    marks: null,
-    isAtomic: false,
-  },
-}
-
-export const options = {
-  preserveKeys: true,
-  preserveSelection: true,
 }

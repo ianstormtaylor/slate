@@ -6,33 +6,42 @@ export const input = (
   <value>
     <document>
       <block type="paragraph">
-        This is one <anchor />block.
+        <anchor />one
       </block>
+      <block type="paragraph">two</block>
       <block type="paragraph">
-        This is block<focus /> two.
+        <focus />three
       </block>
     </document>
   </value>
 )
 
+export const options = {
+  preserveSelection: true,
+  preserveKeys: true,
+}
+
 export const output = {
   object: 'value',
   document: {
     object: 'document',
+    key: '9',
     data: {},
     nodes: [
       {
         object: 'block',
+        key: '1',
         type: 'paragraph',
         isVoid: false,
         data: {},
         nodes: [
           {
             object: 'text',
+            key: '0',
             leaves: [
               {
                 object: 'leaf',
-                text: 'This is one block.',
+                text: 'one',
                 marks: [],
               },
             ],
@@ -41,16 +50,38 @@ export const output = {
       },
       {
         object: 'block',
+        key: '3',
         type: 'paragraph',
         isVoid: false,
         data: {},
         nodes: [
           {
             object: 'text',
+            key: '2',
             leaves: [
               {
                 object: 'leaf',
-                text: 'This is block two.',
+                text: 'two',
+                marks: [],
+              },
+            ],
+          },
+        ],
+      },
+      {
+        object: 'block',
+        key: '5',
+        type: 'paragraph',
+        isVoid: false,
+        data: {},
+        nodes: [
+          {
+            object: 'text',
+            key: '4',
+            leaves: [
+              {
+                object: 'leaf',
+                text: 'three',
                 marks: [],
               },
             ],
@@ -59,12 +90,17 @@ export const output = {
       },
     ],
   },
-}
-
-export const expectSelection = {
-  isCollapsed: false,
-  anchorOffset: 12,
-  focusOffset: 13,
-  anchorKey: input.texts.get(0).key,
-  focusKey: input.texts.get(1).key,
+  selection: {
+    object: 'range',
+    anchorKey: '0',
+    anchorPath: [0, 0],
+    anchorOffset: 0,
+    focusKey: '4',
+    focusPath: [2, 0],
+    focusOffset: 0,
+    isBackward: false,
+    isFocused: true,
+    isAtomic: false,
+    marks: null,
+  },
 }
