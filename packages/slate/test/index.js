@@ -2,7 +2,7 @@
  * Dependencies.
  */
 
-import { resetKeyGenerator } from '..'
+import { KeyUtils } from '..'
 
 /**
  * Tests.
@@ -22,5 +22,5 @@ describe('slate', () => {
  */
 
 beforeEach(() => {
-  resetKeyGenerator()
+  KeyUtils.resetGenerator()
 })

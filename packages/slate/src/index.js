@@ -6,15 +6,18 @@ import Data from './models/data'
 import Document from './models/document'
 import History from './models/history'
 import Inline from './models/inline'
+import KeyUtils from './utils/key-utils'
 import Leaf from './models/leaf'
 import Mark from './models/mark'
 import Node from './models/node'
 import Operation from './models/operation'
 import Operations from './operations'
+import PathUtils from './utils/path-utils'
 import Range from './models/range'
 import Schema from './models/schema'
 import Stack from './models/stack'
 import Text from './models/text'
+import TextUtils from './utils/text-utils'
 import Value from './models/value'
 import { resetKeyGenerator, setKeyGenerator } from './utils/generate-key'
 import { resetMemoization, useMemoization } from './utils/memoize'
@@ -34,20 +37,23 @@ export {
   Document,
   History,
   Inline,
+  KeyUtils,
   Leaf,
   Mark,
   Node,
   Operation,
   Operations,
+  PathUtils,
   Range,
+  resetKeyGenerator,
+  resetMemoization,
   Schema,
+  setKeyGenerator,
   Stack,
   Text,
-  Value,
-  resetKeyGenerator,
-  setKeyGenerator,
-  resetMemoization,
+  TextUtils,
   useMemoization,
+  Value,
 }
 
 export default {
@@ -58,18 +64,21 @@ export default {
   Document,
   History,
   Inline,
+  KeyUtils,
   Leaf,
   Mark,
   Node,
   Operation,
   Operations,
+  PathUtils,
   Range,
+  resetKeyGenerator,
+  resetMemoization,
   Schema,
+  setKeyGenerator,
   Stack,
   Text,
-  Value,
-  resetKeyGenerator,
-  setKeyGenerator,
-  resetMemoization,
+  TextUtils,
   useMemoization,
+  Value,
 }

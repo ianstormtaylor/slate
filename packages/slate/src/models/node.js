@@ -3,16 +3,16 @@ import isPlainObject from 'is-plain-object'
 import logger from 'slate-dev-logger'
 import { List, OrderedSet, Set } from 'immutable'
 
-import Data from './data'
 import Block from './block'
-import Inline from './inline'
+import Data from './data'
 import Document from './document'
-import { isType } from '../constants/model-types'
+import Inline from './inline'
+import KeyUtils from '../utils/key-utils'
+import memoize from '../utils/memoize'
 import PathUtils from '../utils/path-utils'
 import Range from './range'
 import Text from './text'
-import generateKey from '../utils/generate-key'
-import memoize from '../utils/memoize'
+import { isType } from '../constants/model-types'
 
 /**
  * Node.
@@ -250,6 +250,48 @@ class Node {
   }
 
   /**
+   * Map all child nodes, updating them in their parents. This method is
+   * optimized to not return a new node if no changes are made.
+   *
+   * @param {Function} iterator
+   * @return {Node}
+   */
+
+  mapChildren(iterator) {
+    let { nodes } = this
+
+    nodes.forEach((node, i) => {
+      const ret = iterator(node, i, this.nodes)
+      if (ret != node) nodes = nodes.set(ret.key, ret)
+    })
+
+    return this.set('nodes', nodes)
+  }
+
+  /**
+   * Map all descendant nodes, updating them in their parents. This method is
+   * optimized to not return a new node if no changes are made.
+   *
+   * @param {Function} iterator
+   * @return {Node}
+   */
+
+  mapDescendants(iterator) {
+    let { nodes } = this
+
+    nodes.forEach((node, index) => {
+      let ret = node
+      if (ret.object != 'text') ret = ret.mapDescendants(iterator)
+      ret = iterator(ret, index, this.nodes)
+      if (ret == node) return
+
+      nodes = nodes.set(index, ret)
+    })
+
+    return this.set('nodes', nodes)
+  }
+
+  /**
    * Get a list of the ancestors of a descendant by `path`.
    *
    * @param {List} path
@@ -475,8 +517,8 @@ class Node {
    */
 
   getCommonAncestor(one, two) {
-    one = assertKey(one)
-    two = assertKey(two)
+    one = KeyUtils.assert(one)
+    two = KeyUtils.assert(two)
 
     if (one == this.key) return this
     if (two == this.key) return this
@@ -680,7 +722,7 @@ class Node {
    */
 
   getFurthestAncestor(key) {
-    key = assertKey(key)
+    key = KeyUtils.assert(key)
     return this.nodes.find(node => {
       if (node.key == key) return true
       if (node.object == 'text') return false
@@ -699,7 +741,7 @@ class Node {
     const ancestors = this.getAncestors(key)
 
     if (!ancestors) {
-      key = assertKey(key)
+      key = KeyUtils.assert(key)
       throw new Error(`Could not find a descendant node with key "${key}".`)
     }
 
@@ -1131,7 +1173,7 @@ class Node {
    */
 
   getNextText(key) {
-    key = assertKey(key)
+    key = KeyUtils.assert(key)
     return this.getTexts()
       .skipUntil(text => text.key == key)
       .get(1)
@@ -1264,70 +1306,31 @@ class Node {
   }
 
   /**
-   * Find and assert the path to a node by `key`.
+   * Attempt to "refind" the path to a node by a previous `path`, falling back
+   * to looking it up by `key`.
    *
+   * @param {List} path
    * @param {String} key
-   * @return {List}
-   */
-
-  assertPathByKey(key) {
-    const path = this.getPathByKey(key)
-
-    if (!path) {
-      throw new Error(
-        `\`assertPathByKey\` was unable to find a node by key: ${key}`
-      )
-    }
-
-    return path
-  }
-
-  /**
-   * Refind the path of node if path is changed.
-   *
-   * @param {Array} path
-   * @param {String} key
-   * @return {Array}
+   * @return {List|Null}
    */
 
   refindPath(path, key) {
     const node = this.getDescendantByPath(path)
-
-    if (node && node.key === key) {
-      return path
-    }
-
-    return this.getPathByKey(key)
+    return node && node.key === key ? path : this.getPathByKey(key)
   }
 
   /**
-   *
-   * Refind the node with the same node.key after change.
+   * Attempt to "refind" a node by a previous `path`, falling back to looking
+   * it up by `key` again.
    *
    * @param {Array} path
    * @param {String} key
-   * @return {Node|Void}
+   * @return {Node|Null}
    */
 
   refindNode(path, key) {
     const node = this.getDescendantByPath(path)
-
-    if (node && node.key === key) {
-      return node
-    }
-
-    return this.getDescendant(key)
-  }
-
-  /**
-   * Get the placeholder for the node from a `schema`.
-   *
-   * @param {Schema} schema
-   * @return {Component|Void}
-   */
-
-  getPlaceholder(schema) {
-    return schema.__getPlaceholder(this)
+    return node && node.key === key ? node : this.getDescendant(key)
   }
 
   /**
@@ -1379,7 +1382,7 @@ class Node {
    */
 
   getPreviousText(key) {
-    key = assertKey(key)
+    key = KeyUtils.assert(key)
     return this.getTexts()
       .takeUntil(text => text.key == key)
       .last()
@@ -1767,55 +1770,13 @@ class Node {
   }
 
   /**
-   * Map all child nodes, updating them in their parents. This method is
-   * optimized to not return a new node if no changes are made.
-   *
-   * @param {Function} iterator
-   * @return {Node}
-   */
-
-  mapChildren(iterator) {
-    let { nodes } = this
-
-    nodes.forEach((node, i) => {
-      const ret = iterator(node, i, this.nodes)
-      if (ret != node) nodes = nodes.set(ret.key, ret)
-    })
-
-    return this.set('nodes', nodes)
-  }
-
-  /**
-   * Map all descendant nodes, updating them in their parents. This method is
-   * optimized to not return a new node if no changes are made.
-   *
-   * @param {Function} iterator
-   * @return {Node}
-   */
-
-  mapDescendants(iterator) {
-    let { nodes } = this
-
-    nodes.forEach((node, index) => {
-      let ret = node
-      if (ret.object != 'text') ret = ret.mapDescendants(iterator)
-      ret = iterator(ret, index, this.nodes)
-      if (ret == node) return
-
-      nodes = nodes.set(index, ret)
-    })
-
-    return this.set('nodes', nodes)
-  }
-
-  /**
    * Regenerate the node's key.
    *
    * @return {Node}
    */
 
   regenerateKey() {
-    const key = generateKey()
+    const key = KeyUtils.generate()
     return this.set('key', key)
   }
 
@@ -1827,7 +1788,7 @@ class Node {
    */
 
   removeDescendant(key) {
-    key = assertKey(key)
+    key = KeyUtils.assert(key)
 
     let node = this
     let parent = node.getParent(key)
@@ -2007,8 +1968,8 @@ class Node {
       'The `Node.areDescendantsSorted` method is deprecated. Use the new `PathUtils.compare` helper instead.'
     )
 
-    first = assertKey(first)
-    second = assertKey(second)
+    first = KeyUtils.assert(first)
+    second = KeyUtils.assert(second)
 
     const keys = this.getKeysArray()
     const firstIndex = keys.indexOf(first)
@@ -2053,7 +2014,7 @@ for (const method of BY_PATHS) {
   }
 
   Node.prototype[`${method}ByKey`] = function(key, ...args) {
-    key = assertKey(key)
+    key = KeyUtils.assert(key)
     const path = this.getPathByKey(key)
     if (!path) return null
     return this[`${method}ByPath`](path, ...args)
@@ -2064,7 +2025,7 @@ for (const method of BY_PATHS) {
  * Mix in assertion variants.
  */
 
-const ASSERTS = ['Child', 'Depth', 'Descendant', 'Node', 'Parent']
+const ASSERTS = ['Child', 'Depth', 'Descendant', 'Node', 'Parent', 'Path']
 
 for (const method of ASSERTS) {
   Node.prototype[`assert${method}`] = function(keyOrPath, ...args) {
@@ -2073,44 +2034,34 @@ for (const method of ASSERTS) {
       : this[`get${method}ByPath`](keyOrPath, ...args)
   }
 
-  Node.prototype[`assert${method}ByPath`] = function(path, ...args) {
-    const ret = this[`get${method}ByPath`](path, ...args)
+  if (Node.prototype[`get${method}ByPath`]) {
+    Node.prototype[`assert${method}ByPath`] = function(path, ...args) {
+      const ret = this[`get${method}ByPath`](path, ...args)
 
-    if (ret == null) {
-      throw new Error(
-        `\`assert${method}ByKey\` could not find a node by path: ${path}`
-      )
+      if (ret == null) {
+        throw new Error(
+          `\`assert${method}ByKey\` could not find a node by path: ${path}`
+        )
+      }
+
+      return ret
     }
-
-    return ret
   }
 
-  Node.prototype[`assert${method}ByKey`] = function(key, ...args) {
-    const ret = this[`get${method}ByKey`](key, ...args)
+  if (Node.prototype[`get${method}ByKey`]) {
+    Node.prototype[`assert${method}ByKey`] = function(key, ...args) {
+      const ret = this[`get${method}ByKey`](key, ...args)
 
-    if (!ret) {
-      key = assertKey(key)
-      throw new Error(
-        `\`assert${method}ByKey\` could not find a node by key: ${key}`
-      )
+      if (!ret) {
+        key = KeyUtils.assert(key)
+        throw new Error(
+          `\`assert${method}ByKey\` could not find a node by key: ${key}`
+        )
+      }
+
+      return ret
     }
-
-    return ret
   }
-}
-
-/**
- * Assert a key `arg`.
- *
- * @param {String} arg
- * @return {String}
- */
-
-function assertKey(arg) {
-  if (typeof arg == 'string') return arg
-  throw new Error(
-    `Invalid \`key\` argument! It must be a key string, but you passed: ${arg}`
-  )
 }
 
 /**
@@ -2158,7 +2109,6 @@ memoize(Node.prototype, [
   'getOffsetAtRange',
   'getParent',
   'getPath',
-  'getPlaceholder',
   'getPreviousBlock',
   'getPreviousSibling',
   'getPreviousText',

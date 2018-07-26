@@ -1,9 +1,9 @@
 import assert from 'assert'
 import fs from 'fs'
-import { Value, resetKeyGenerator } from 'slate'
+import { Value, KeyUtils } from 'slate'
 import { basename, extname, resolve } from 'path'
 
-beforeEach(resetKeyGenerator)
+beforeEach(KeyUtils.resetGenerator)
 
 describe('slate-hyperscript', () => {
   const dir = resolve(__dirname, './fixtures')

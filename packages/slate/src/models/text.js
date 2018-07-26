@@ -4,7 +4,7 @@ import { List, OrderedSet, Record, Set } from 'immutable'
 
 import Leaf from './leaf'
 import MODEL_TYPES, { isType } from '../constants/model-types'
-import generateKey from '../utils/generate-key'
+import KeyUtils from '../utils/key-utils'
 import memoize from '../utils/memoize'
 
 /**
@@ -85,7 +85,7 @@ class Text extends Record(DEFAULTS) {
       return object
     }
 
-    const { key = generateKey() } = object
+    const { key = KeyUtils.generate() } = object
     let { leaves = List() } = object
 
     if (Array.isArray(leaves)) {
@@ -545,7 +545,7 @@ class Text extends Record(DEFAULTS) {
    */
 
   regenerateKey() {
-    const key = generateKey()
+    const key = KeyUtils.generate()
     return this.set('key', key)
   }
 
