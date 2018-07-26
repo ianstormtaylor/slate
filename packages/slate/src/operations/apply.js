@@ -199,9 +199,8 @@ const APPLIERS = {
     document = document.updateNode(parent)
     value = value.set('document', document)
 
-    // If the merged node was a text node, update any ranges that refer to it.
-    if (two.object === 'text') {
-      value = mapRanges(value, range => {
+    value = mapRanges(value, range => {
+      if (two.object === 'text') {
         const max = one.text.length
 
         if (range.anchorKey === two.key) {
@@ -211,11 +210,11 @@ const APPLIERS = {
         if (range.focusKey === two.key) {
           range = range.moveFocusTo(one.key, max + range.focusOffset)
         }
+      }
 
-        range = range.merge({ anchorPath: null, focusPath: null })
-        return range
-      })
-    }
+      range = range.merge({ anchorPath: null, focusPath: null })
+      return range
+    })
 
     return value
   },

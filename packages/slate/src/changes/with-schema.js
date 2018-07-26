@@ -62,6 +62,7 @@ Changes.normalizeParentByKey = (change, key, options) => {
   const { value } = change
   const { document } = value
   const parent = document.getParent(key)
+  if (!parent) debugger
   change.normalizeNodeByKey(parent.key, options)
 }
 
