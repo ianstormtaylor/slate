@@ -7,7 +7,7 @@ import { basename, extname, resolve } from 'path'
  * Tests.
  */
 
-describe.skip('schema', () => {
+describe('schema', () => {
   describe('core', () => {
     const testsDir = resolve(__dirname, 'core')
     const tests = fs
