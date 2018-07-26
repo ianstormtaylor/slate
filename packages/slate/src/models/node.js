@@ -705,19 +705,15 @@ class Node {
   }
 
   /**
-   * Get the furthest ancestor of a node by `key`.
+   * Get the furthest ancestor of a node by `path`.
    *
-   * @param {String} key
+   * @param {Path} path
    * @return {Node|Null}
    */
 
-  getFurthestAncestor(key) {
-    key = KeyUtils.assert(key)
-    return this.nodes.find(node => {
-      if (node.key == key) return true
-      if (node.object == 'text') return false
-      return node.hasDescendant(key)
-    })
+  getFurthestAncestorByPath(path) {
+    if (!path.size) return null
+    return this.nodes.get(path.first())
   }
 
   /**
@@ -741,12 +737,8 @@ class Node {
 
   getFurthestByPath(path, iterator) {
     const ancestors = this.getAncestorsByPath(path)
-
-    if (!ancestors) {
-      throw new Error(`Could not find a descendant node by path "${path}".`)
-    }
-
-    return ancestors.rest().find(iterator)
+    const furthest = ancestors && ancestors.rest().find(iterator)
+    return furthest || null
   }
 
   /**
@@ -761,30 +753,23 @@ class Node {
   }
 
   /**
-   * Get the furthest ancestor of a node by `key` that has only one child.
+   * Get the furthest ancestor of a node by `path` that has only one child.
    *
-   * @param {String} key
+   * @param {Path} path
    * @return {Node|Null}
    */
 
-  getFurthestOnlyChildAncestor(key) {
-    const ancestors = this.getAncestors(key)
+  getFurthestOnlyChildAncestorByPath(path) {
+    const ancestors = this.getAncestorsByPath(path)
+    if (!ancestors) return null
 
-    if (!ancestors) {
-      key = KeyUtils.assert(key)
-      throw new Error(`Could not find a descendant node with key "${key}".`)
-    }
-
-    const result = ancestors
-      // Skip this node...
-      .shift()
-      // Take parents until there are more than one child...
+    const furthest = ancestors
+      .rest()
       .reverse()
       .takeUntil(p => p.nodes.size > 1)
-      // And pick the highest.
       .last()
-    if (!result) return null
-    return result
+
+    return furthest || null
   }
 
   /**
@@ -1086,7 +1071,30 @@ class Node {
   }
 
   /**
-   * Get the next sibling of a descendant by `path`.
+   * Get the next node from a node by `path`.
+   *
+   * This will not only check for siblings but instead move up the tree
+   * returning the next ancestor if no sibling is found.
+   *
+   * @param {List} path
+   * @return {Node|Null}
+   */
+
+  getNextNodeByPath(path) {
+    if (!path.size) return null
+
+    for (let i = path.size; i > 0; i--) {
+      const p = path.slice(0, i)
+      const target = PathUtils.increment(p)
+      const node = this.getNodeByPath(target)
+      if (node) return node
+    }
+
+    return null
+  }
+
+  /**
+   * Get the next sibling of a node by `path`.
    *
    * @param {List} path
    * @return {Node|Null}
@@ -1094,22 +1102,24 @@ class Node {
 
   getNextSiblingByPath(path) {
     if (!path.size) return null
-    const nextPath = PathUtils.increment(path)
-    return this.getNodeByPath(nextPath)
+    const p = PathUtils.increment(path)
+    const sibling = this.getNodeByPath(p)
+    return sibling
   }
 
   /**
-   * Get the text node after a descendant text node by `key`.
+   * Get the text node after a descendant text node by `path`.
    *
-   * @param {String} key
+   * @param {List} path
    * @return {Node|Null}
    */
 
-  getNextText(key) {
-    key = KeyUtils.assert(key)
-    return this.getTexts()
-      .skipUntil(text => text.key == key)
-      .get(1)
+  getNextTextByPath(path) {
+    if (!path.size) return null
+    const next = this.getNextNodeByPath(path)
+    if (!next) return null
+    const text = next.getFirstText()
+    return text
   }
 
   /**
@@ -1299,7 +1309,32 @@ class Node {
   }
 
   /**
-   * Get the node before a descendant node by `path`.
+   * Get the previous node from a node by `path`.
+   *
+   * This will not only check for siblings but instead move up the tree
+   * returning the previous ancestor if no sibling is found.
+   *
+   * @param {List} path
+   * @return {Node|Null}
+   */
+
+  getPreviousNodeByPath(path) {
+    if (!path.size) return null
+
+    for (let i = path.size; i > 0; i--) {
+      const p = path.slice(0, i)
+      if (p.last() === 0) continue
+
+      const target = PathUtils.decrement(p)
+      const node = this.getNodeByPath(target)
+      if (node) return node
+    }
+
+    return null
+  }
+
+  /**
+   * Get the previous sibling of a node by `path`.
    *
    * @param {List} path
    * @return {Node|Null}
@@ -1307,26 +1342,25 @@ class Node {
 
   getPreviousSiblingByPath(path) {
     if (!path.size) return null
-
-    // PERF: we can short-circuit the common case of first child.
     if (path.last() === 0) return null
-
-    const previousPath = PathUtils.decrement(path)
-    return this.getNodeByPath(previousPath)
+    const p = PathUtils.decrement(path)
+    const sibling = this.getNodeByPath(p)
+    return sibling
   }
 
   /**
-   * Get the text node before a descendant text node by `key`.
+   * Get the text node after a descendant text node by `path`.
    *
-   * @param {String} key
+   * @param {List} path
    * @return {Node|Null}
    */
 
-  getPreviousText(key) {
-    key = KeyUtils.assert(key)
-    return this.getTexts()
-      .takeUntil(text => text.key == key)
-      .last()
+  getPreviousTextByPath(path) {
+    if (!path.size) return null
+    const previous = this.getPreviousNodeByPath(path)
+    if (!previous) return null
+    const text = previous.getLastText()
+    return text
   }
 
   /**
@@ -1403,8 +1437,8 @@ class Node {
 
   getTextAtOffset(offset) {
     // PERF: Add a few shortcuts for the obvious cases.
-    if (offset == 0) return this.getFirstText()
-    if (offset == this.text.length) return this.getLastText()
+    if (offset === 0) return this.getFirstText()
+    if (offset === this.text.length) return this.getLastText()
     if (offset < 0 || offset > this.text.length) return null
 
     let length = 0
@@ -1509,15 +1543,13 @@ class Node {
   }
 
   /**
-   * Check if a node has block node children.
+   * Check if the node has block children.
    *
-   * @param {String} key
    * @return {Boolean}
    */
 
-  hasBlocks(key) {
-    const node = this.assertNode(key)
-    return !!(node.nodes && node.nodes.find(n => n.object === 'block'))
+  hasBlockChildren() {
+    return !!(this.nodes && this.nodes.find(n => n.object === 'block'))
   }
 
   /**
@@ -1533,16 +1565,15 @@ class Node {
   }
 
   /**
-   * Check if a node has inline node children.
+   * Check if a node has inline children.
    *
-   * @param {String} key
    * @return {Boolean}
    */
 
-  hasInlines(key) {
-    const node = this.assertNode(key)
+  hasInlineChildren() {
     return !!(
-      node.nodes && node.nodes.find(n => Inline.isInline(n) || Text.isText(n))
+      node.nodes &&
+      node.nodes.find(n => n.object === 'inline' || n.object === 'text')
     )
   }
 
@@ -1988,11 +2019,16 @@ const BY_PATHS = [
   'getDescendant',
   'getDepth',
   'getFurthest',
+  'getFurthestAncestor',
   'getFurthestBlock',
   'getFurthestInline',
+  'getFurthestOnlyChildAncestor',
+  'getNextBlock',
   'getNextSibling',
+  'getNextText',
   'getNode',
   'getPreviousSibling',
+  'getPreviousText',
   'getParent',
   'hasChild',
   'hasDescendant',

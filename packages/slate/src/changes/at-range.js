@@ -599,13 +599,6 @@ Changes.deleteForwardAtRange = (change, range, n = 1, options = {}) => {
     }
   }
 
-  // If the focus node is inside a void, go up until right before it.
-  if (document.hasVoidParent(node.key)) {
-    const parent = document.getClosestVoid(node.key)
-    node = document.getPreviousText(parent.key)
-    offset = node.text.length
-  }
-
   range = range.merge({
     focusKey: node.key,
     focusOffset: offset,
@@ -734,7 +727,7 @@ Changes.insertFragmentAtRange = (change, range, fragment, options = {}) => {
 
   // If the fragment starts or ends with single nested block, (e.g., table),
   // do not merge this fragment with existing blocks.
-  if (fragment.hasBlocks(firstChild.key) || fragment.hasBlocks(lastChild.key)) {
+  if (firstChild.hasBlockChildren() || lastChild.hasBlockChildren()) {
     fragment.nodes.reverse().forEach(node => {
       change.insertBlockAtRange(range, node, options)
     })

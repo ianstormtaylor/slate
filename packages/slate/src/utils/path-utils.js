@@ -9,14 +9,12 @@ import { List } from 'immutable'
  */
 
 function compare(a, b) {
-  a = a.toArray()
-  b = b.toArray()
+  // PERF: if the paths are the same we can exit early.
+  if (a.size !== b.size) return null
 
-  if (a.length !== b.length) return null
-
-  for (let i = 0; i < a.length; i++) {
-    const av = a[i]
-    const bv = b[i]
+  for (let i = 0; i < a.size; i++) {
+    const av = a.get(i)
+    const bv = b.get(i)
 
     // If a's value is ever less than b's, it's before.
     if (av < bv) return -1
@@ -55,6 +53,19 @@ function create(attrs) {
 }
 
 /**
+ * Crop paths `a` and `b` to an equal size, defaulting to the shortest.
+ *
+ * @param {List} a
+ * @param {List} b
+ */
+
+function crop(a, b, size = min(a, b)) {
+  const ca = a.slice(0, size)
+  const cb = b.slice(0, size)
+  return [ca, cb]
+}
+
+/**
  * Decrement a `path` by `n` at `index`, defaulting to the last index.
  *
  * @param {List} path
@@ -64,12 +75,6 @@ function create(attrs) {
 
 function decrement(path, n = 1, index = path.size - 1) {
   return increment(path, 0 - n, index)
-}
-
-function crop(a, b, size = min(a, b)) {
-  const ca = a.slice(0, size)
-  const cb = b.slice(0, size)
-  return [ca, cb]
 }
 
 /**

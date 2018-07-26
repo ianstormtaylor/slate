@@ -387,6 +387,14 @@ class Text extends Record(DEFAULTS) {
     })
   }
 
+  getFirstText() {
+    return this
+  }
+
+  getLastText() {
+    return this
+  }
+
   /**
    * Get all of the marks on between two offsets
    * Corner Cases:
