@@ -94,7 +94,7 @@ const APPLIERS = {
   add_mark(value, operation) {
     const { path, offset, length, mark } = operation
     let { document } = value
-    let node = document.assertPath(path)
+    let node = document.assertNode(path)
     node = node.addMark(offset, length, mark)
     document = document.updateNode(node)
     value = value.set('document', document)
@@ -114,7 +114,7 @@ const APPLIERS = {
     const index = PathUtils.getIndex(path)
     const parentPath = PathUtils.getParent(path)
     let { document } = value
-    let parent = document.assertPath(parentPath)
+    let parent = document.assertNode(parentPath)
     parent = parent.insertNode(index, node)
     document = document.updateNode(parent)
     value = value.set('document', document)
@@ -137,7 +137,7 @@ const APPLIERS = {
   insert_text(value, operation) {
     const { path, offset, text, marks } = operation
     let { document } = value
-    let node = document.assertPath(path)
+    let node = document.assertNode(path)
     node = node.insertText(offset, text, marks)
     document = document.updateNode(node)
     value = value.set('document', document)
@@ -188,8 +188,8 @@ const APPLIERS = {
     const { path } = operation
     const withPath = PathUtils.decrement(path)
     let { document } = value
-    const one = document.assertPath(withPath)
-    const two = document.assertPath(path)
+    const one = document.assertNode(withPath)
+    const two = document.assertNode(path)
     let parent = document.getParentByPath(path)
     const oneIndex = PathUtils.getIndex(withPath)
     const twoIndex = PathUtils.getIndex(path)
@@ -234,7 +234,7 @@ const APPLIERS = {
     const oldParentPath = PathUtils.getParent(path)
     const oldIndex = PathUtils.getIndex(path)
     let { document } = value
-    const node = document.assertPath(path)
+    const node = document.assertNode(path)
 
     // Remove the node from its current parent.
     let parent = document.getParentByPath(path)
@@ -256,10 +256,10 @@ const APPLIERS = {
       oldIndex < newParentPath.get(oldParentPath.size)
     ) {
       newParentPath = PathUtils.decrement(newParentPath, 1, oldParentPath.size)
-      target = document.assertPath(newParentPath)
+      target = document.assertNode(newParentPath)
     } else {
       // Otherwise, we can just grab the target normally...
-      target = document.assertPath(newParentPath)
+      target = document.assertNode(newParentPath)
     }
 
     // Insert the new node to its new parent.
@@ -285,7 +285,7 @@ const APPLIERS = {
   remove_mark(value, operation) {
     const { path, offset, length, mark } = operation
     let { document } = value
-    let node = document.assertPath(path)
+    let node = document.assertNode(path)
     node = node.removeMark(offset, length, mark)
     document = document.updateNode(node)
     value = value.set('document', document)
@@ -303,7 +303,7 @@ const APPLIERS = {
   remove_node(value, operation) {
     const { path } = operation
     let { document } = value
-    const node = document.assertPath(path)
+    const node = document.assertNode(path)
     const first = node.object == 'text' ? node : node.getFirstText() || node
     const last = node.object == 'text' ? node : node.getLastText() || node
     const prev = document.getPreviousText(first.key)
@@ -353,7 +353,7 @@ const APPLIERS = {
     let { document } = value
 
     // Remove the text from the node and update the document.
-    let node = document.assertPath(path)
+    let node = document.assertNode(path)
     node = node.removeText(offset, length)
     document = document.updateNode(node)
     value = value.set('document', document)
@@ -403,7 +403,7 @@ const APPLIERS = {
   set_mark(value, operation) {
     const { path, offset, length, mark, properties } = operation
     let { document } = value
-    let node = document.assertPath(path)
+    let node = document.assertNode(path)
     node = node.updateMark(offset, length, mark, properties)
     document = document.updateNode(node)
     value = value.set('document', document)
@@ -421,7 +421,7 @@ const APPLIERS = {
   set_node(value, operation) {
     const { path, properties } = operation
     let { document } = value
-    let node = document.assertPath(path)
+    let node = document.assertNode(path)
     node = node.merge(properties)
     document = document.updateNode(node)
     value = value.set('document', document)
@@ -472,7 +472,7 @@ const APPLIERS = {
     let { document } = value
 
     // Split the node by its parent.
-    const node = document.assertPath(path)
+    const node = document.assertNode(path)
     const index = path.last()
     let parent = document.getParentByPath(path)
     parent = parent.splitNode(index, position)

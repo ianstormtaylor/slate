@@ -28,7 +28,7 @@ Changes.addMarkByPath = (change, path, offset, length, mark, options) => {
   mark = Mark.create(mark)
   const { value } = change
   const { document } = value
-  const node = document.assertPath(path)
+  const node = document.assertNode(path)
   const leaves = node.getLeaves()
 
   const operations = []
@@ -121,7 +121,7 @@ Changes.insertNodeByPath = (change, path, index, node, options) => {
 Changes.insertTextByPath = (change, path, offset, text, marks, options) => {
   const { value } = change
   const { document } = value
-  const node = document.assertPath(path)
+  const node = document.assertNode(path)
   marks = marks || node.getMarksAtIndex(offset)
 
   change.applyOperation({
@@ -215,7 +215,7 @@ Changes.removeMarkByPath = (change, path, offset, length, mark, options) => {
   mark = Mark.create(mark)
   const { value } = change
   const { document } = value
-  const node = document.assertPath(path)
+  const node = document.assertNode(path)
   const leaves = node.getLeaves()
 
   const operations = []
@@ -264,7 +264,7 @@ Changes.removeMarkByPath = (change, path, offset, length, mark, options) => {
 Changes.removeAllMarksByPath = (change, path, options) => {
   const { state } = change
   const { document } = state
-  const node = document.assertPath(path)
+  const node = document.assertNode(path)
   const texts = node.object === 'text' ? [node] : node.getTextsAsArray()
 
   texts.forEach(text => {
@@ -285,7 +285,7 @@ Changes.removeAllMarksByPath = (change, path, options) => {
 Changes.removeNodeByPath = (change, path, options) => {
   const { value } = change
   const { document } = value
-  const node = document.assertPath(path)
+  const node = document.assertNode(path)
 
   change.applyOperation({
     type: 'remove_node',
@@ -310,7 +310,7 @@ Changes.removeNodeByPath = (change, path, options) => {
 Changes.setTextByPath = (change, path, text, marks, options) => {
   const { value } = change
   const { document } = value
-  const node = document.assertPath(path)
+  const node = document.assertNode(path)
   const end = node.text.length
   change.replaceTextByPath(path, 0, end, text, marks, options)
 }
@@ -337,7 +337,7 @@ Changes.replaceTextByPath = (
   options
 ) => {
   const { document } = change.value
-  const node = document.assertPath(path)
+  const node = document.assertNode(path)
 
   if (length + offset > node.text.length) {
     length = node.text.length - offset
@@ -382,7 +382,7 @@ Changes.replaceTextByPath = (
 Changes.removeTextByPath = (change, path, offset, length, options) => {
   const { value } = change
   const { document } = value
-  const node = document.assertPath(path)
+  const node = document.assertNode(path)
   const leaves = node.getLeaves()
   const { text } = node
 
@@ -492,7 +492,7 @@ Changes.setNodeByPath = (change, path, properties, options) => {
   properties = Node.createProperties(properties)
   const { value } = change
   const { document } = value
-  const node = document.assertPath(path)
+  const node = document.assertNode(path)
 
   change.applyOperation({
     type: 'set_node',
@@ -559,8 +559,8 @@ Changes.splitDescendantsByPath = (
 
   const { value } = change
   const { document } = value
-  const node = document.assertPath(path)
-  const text = document.assertPath(textPath)
+  const node = document.assertNode(path)
+  const text = document.assertNode(textPath)
   const ancestors = document.getAncestors(textPath)
   const nodes = ancestors
     .skipUntil(a => a.key == node.key)
@@ -596,7 +596,7 @@ Changes.splitDescendantsByPath = (
 Changes.unwrapInlineByPath = (change, path, properties, options) => {
   const { value } = change
   const { document, selection } = value
-  const node = document.assertPath(path)
+  const node = document.assertNode(path)
   const first = node.getFirstText()
   const last = node.getLastText()
   const range = selection.moveToRangeOf(first, last)
@@ -615,7 +615,7 @@ Changes.unwrapInlineByPath = (change, path, properties, options) => {
 Changes.unwrapBlockByPath = (change, path, properties, options) => {
   const { value } = change
   const { document, selection } = value
-  const node = document.assertPath(path)
+  const node = document.assertNode(path)
   const first = node.getFirstText()
   const last = node.getLastText()
   const range = selection.moveToRangeOf(first, last)
@@ -637,10 +637,10 @@ Changes.unwrapBlockByPath = (change, path, properties, options) => {
 Changes.unwrapNodeByPath = (change, path, options) => {
   const { value } = change
   const { document } = value
-  document.assertPath(path)
+  document.assertNode(path)
 
   const parentPath = PathUtils.getParent(path)
-  const parent = document.assertPath(parentPath)
+  const parent = document.assertNode(parentPath)
   const index = path.last()
   const parentIndex = parentPath.last()
   const grandPath = PathUtils.getParent(parentPath)

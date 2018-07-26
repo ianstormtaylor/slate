@@ -188,98 +188,6 @@ class Node {
   }
 
   /**
-   * True if the node has both descendants in that order, false otherwise. The
-   * order is depth-first, post-order.
-   *
-   * @param {String} first
-   * @param {String} second
-   * @return {Boolean}
-   */
-
-  areDescendantsSorted(first, second) {
-    first = assertKey(first)
-    second = assertKey(second)
-
-    const keys = this.getKeysAsArray()
-    const firstIndex = keys.indexOf(first)
-    const secondIndex = keys.indexOf(second)
-    if (firstIndex == -1 || secondIndex == -1) return null
-
-    return firstIndex < secondIndex
-  }
-
-  /**
-   * Assert that a node has a child by `key` and return it.
-   *
-   * @param {String} key
-   * @return {Node}
-   */
-
-  assertChild(key) {
-    const child = this.getChild(key)
-
-    if (!child) {
-      key = assertKey(key)
-      throw new Error(`Could not find a child node with key "${key}".`)
-    }
-
-    return child
-  }
-
-  /**
-   * Assert that a node has a descendant by `key` and return it.
-   *
-   * @param {String} key
-   * @return {Node}
-   */
-
-  assertDescendant(key) {
-    const descendant = this.getDescendant(key)
-
-    if (!descendant) {
-      key = assertKey(key)
-      throw new Error(`Could not find a descendant node with key "${key}".`)
-    }
-
-    return descendant
-  }
-
-  /**
-   * Assert that a node's tree has a node by `key` and return it.
-   *
-   * @param {String} key
-   * @return {Node}
-   */
-
-  assertNode(key) {
-    const node = this.getNode(key)
-
-    if (!node) {
-      key = assertKey(key)
-      throw new Error(`Could not find a node with key "${key}".`)
-    }
-
-    return node
-  }
-
-  /**
-   * Assert that a node exists at `path` and return it.
-   *
-   * @param {Array} path
-   * @return {Node}
-   */
-
-  assertPath(path) {
-    const descendant = this.getDescendantByPath(path)
-
-    if (!descendant) {
-      throw new Error(`Could not find a descendant at path "${path}".`)
-    }
-
-    return descendant
-  }
-
-  /**
    * Recursively filter all descendant nodes with `iterator`.
    *
    * @param {Function} iterator
@@ -604,42 +512,17 @@ class Node {
   }
 
   /**
-   * Get the depth of a child node by `key`, with optional `startAt`.
+   * Get the depth of a child node by `path`, with optional `startAt`.
    *
-   * @param {String} key
-   * @param {Number} startAt (optional)
-   * @return {Number} depth
+   * @param {List} path
+   * @param {Number} startAt
+   * @return {Number|Null}
    */
 
-  getDepth(key, startAt = 1) {
-    this.assertDescendant(key)
-    if (this.hasChild(key)) return startAt
-    return this.getFurthestAncestor(key).getDepth(key, startAt + 1)
-  }
-
-  /**
-   * Get a descendant node by `key`.
-   *
-   * @param {String} key
-   * @return {Node|Null}
-   */
-
-  getDescendant(key) {
-    key = assertKey(key)
-    let descendantFound = null
-
-    const found = this.nodes.find(node => {
-      if (node.key === key) {
-        return node
-      } else if (node.object !== 'text') {
-        descendantFound = node.getDescendant(key)
-        return descendantFound
-      } else {
-        return false
-      }
-    })
-
-    return descendantFound || found
+  getDepthByPath(path, startAt = 1) {
+    const node = this.getNodeByPath(path)
+    if (!node) return null
+    return path.size - 1 + startAt
   }
 
   /**
@@ -650,7 +533,6 @@ class Node {
    */
 
   getDescendantByPath(path) {
-    if (path && !path.toArray) debugger
     const array = path.toArray()
     let descendant = this
 
@@ -661,15 +543,6 @@ class Node {
     }
 
     return descendant
-  }
-
-  getDescendantAtPath(path) {
-    logger.deprecate(
-      `0.35.0`,
-      'The `Node.getDescendantAtPath` has been renamed to `Node.getDescendantByPath`.'
-    )
-
-    return this.getDescendantByPath(path)
   }
 
   /**
@@ -934,33 +807,6 @@ class Node {
         return inlines.concat(node.getInlinesByTypeAsArray(type))
       }
     }, [])
-  }
-
-  /**
-   * Return a set of all keys in the node as an array.
-   *
-   * @return {Array<String>}
-   */
-
-  getKeysAsArray() {
-    const keys = []
-
-    this.forEachDescendant(desc => {
-      keys.push(desc.key)
-    })
-
-    return keys
-  }
-
-  /**
-   * Return a set of all keys in the node.
-   *
-   * @return {Set<String>}
-   */
-
-  getKeys() {
-    const keys = this.getKeysAsArray()
-    return new Set(keys)
   }
 
   /**
@@ -1292,18 +1138,6 @@ class Node {
   }
 
   /**
-   * Get a node in the tree by `key`.
-   *
-   * @param {String} key
-   * @return {Node|Null}
-   */
-
-  getNode(key) {
-    key = assertKey(key)
-    return this.key == key ? this : this.getDescendant(key)
-  }
-
-  /**
    * Get a node in the tree by `path`.
    *
    * @param {List} path
@@ -1312,22 +1146,6 @@ class Node {
 
   getNodeByPath(path) {
     return path.size ? this.getDescendantByPath(path) : this
-  }
-
-  /**
-   * Get a node in the tree by `path`.
-   *
-   * @param {List} path
-   * @return {Node|Null}
-   */
-
-  getNodeAtPath(path) {
-    logger.deprecate(
-      `0.35.0`,
-      'The `Node.getNodeAtPath` method has been renamed to `Node.getNodeByPath`.'
-    )
-
-    return this.getNodeByPath(path)
   }
 
   /**
@@ -1387,13 +1205,31 @@ class Node {
   }
 
   /**
-   * Get the path of a descendant node by `key`.
+   * Get an array of all the keys in the node.
    *
-   * @param {String|Node} key
-   * @return {List}
+   * @return {Array}
    */
 
-  getKeyPathDictionary() {
+  getKeysArray() {
+    const dict = this.getKeysPathsObject()
+    const keys = []
+
+    for (const key in dict) {
+      if (this.key !== key) {
+        keys.push(key)
+      }
+    }
+
+    return keys
+  }
+
+  /**
+   * Get an object mapping all the keys in the node to their paths.
+   *
+   * @return {Object}
+   */
+
+  getKeysPathsObject() {
     const ret = {
       [this.key]: [],
     }
@@ -1402,7 +1238,7 @@ class Node {
       ret[node.key] = [i]
 
       if (node.object !== 'text') {
-        const nested = node.getKeyPathDictionary()
+        const nested = node.getKeysPathsObject()
 
         for (const key in nested) {
           const path = nested[key]
@@ -1414,11 +1250,25 @@ class Node {
     return ret
   }
 
+  /**
+   * Find the path to a node by `key`.
+   *
+   * @param {String} key
+   * @return {List}
+   */
+
   getPathByKey(key) {
-    const dict = this.getKeyPathDictionary()
+    const dict = this.getKeysPathsObject()
     const path = dict[key]
     return path ? List(path) : null
   }
+
+  /**
+   * Find and assert the path to a node by `key`.
+   *
+   * @param {String} key
+   * @return {List}
+   */
 
   assertPathByKey(key) {
     const path = this.getPathByKey(key)
@@ -1431,28 +1281,6 @@ class Node {
 
     return path
   }
-
-  getPath(key) {
-    logger.deprecate(
-      `0.35.0`,
-      'The `Node.getPath` method has been renamed to `Node.getPathByKey`.'
-    )
-    return this.getPathByKey(key)
-  }
-
-  // getPath(key) {
-  //   let child = this.assertNode(key)
-  //   const ancestors = this.getAncestors(key)
-  //   const path = []
-
-  //   ancestors.reverse().forEach(ancestor => {
-  //     const index = ancestor.nodes.indexOf(child)
-  //     path.unshift(index)
-  //     child = ancestor
-  //   })
-
-  //   return List(path)
-  // }
 
   /**
    * Refind the path of node if path is changed.
@@ -1819,7 +1647,7 @@ class Node {
    */
 
   insertNode(index, node) {
-    const keys = this.getKeysAsArray()
+    const keys = this.getKeysArray()
 
     if (keys.includes(node.key)) {
       node = node.regenerateKey()
@@ -2114,6 +1942,81 @@ class Node {
     })
     return result
   }
+
+  /**
+   * Deprecated.
+   */
+
+  assertPath(path) {
+    logger.deprecate(
+      `0.35.0`,
+      'The `Node.assertPath` method is deprecated. Use the `Node.assertNode` method which takes a key or a path instead.'
+    )
+
+    return this.assertNodeByPath(path)
+  }
+
+  getPath(key) {
+    logger.deprecate(
+      `0.35.0`,
+      'The `Node.getPath` method has been renamed to `Node.getPathByKey`.'
+    )
+    return this.getPathByKey(key)
+  }
+
+  getNodeAtPath(path) {
+    logger.deprecate(
+      `0.35.0`,
+      'The `Node.getNodeAtPath` method has been renamed to `Node.getNodeByPath`.'
+    )
+
+    return this.getNodeByPath(path)
+  }
+
+  getDescendantAtPath(path) {
+    logger.deprecate(
+      `0.35.0`,
+      'The `Node.getDescendantAtPath` has been renamed to `Node.getDescendantByPath`.'
+    )
+
+    return this.getDescendantByPath(path)
+  }
+
+  getKeys() {
+    logger.deprecate(
+      `0.35.0`,
+      'The `Node.getKeys` method is deprecated. Use the new `Node.getKeysArray` method instead.'
+    )
+
+    const keys = this.getKeysArray()
+    return new Set(keys)
+  }
+
+  getKeysAsArray() {
+    logger.deprecate(
+      `0.35.0`,
+      'The `Node.getKeysAsArray` method has been renamed to `Node.getKeysArray`.'
+    )
+
+    return this.getKeysArray()
+  }
+
+  areDescendantsSorted(first, second) {
+    logger.deprecate(
+      `0.35.0`,
+      'The `Node.areDescendantsSorted` method is deprecated. Use the new `PathUtils.compare` helper instead.'
+    )
+
+    first = assertKey(first)
+    second = assertKey(second)
+
+    const keys = this.getKeysArray()
+    const firstIndex = keys.indexOf(first)
+    const secondIndex = keys.indexOf(second)
+    if (firstIndex == -1 || secondIndex == -1) return null
+
+    return firstIndex < secondIndex
+  }
 }
 
 /**
@@ -2127,10 +2030,13 @@ const BY_PATHS = [
   'getClosestBlock',
   'getClosestInline',
   'getClosestVoid',
+  'getDescendant',
+  'getDepth',
   'getFurthest',
   'getFurthestBlock',
   'getFurthestInline',
   'getNextSibling',
+  'getNode',
   'getPreviousSibling',
   'getParent',
   'hasChild',
@@ -2158,7 +2064,7 @@ for (const method of BY_PATHS) {
  * Mix in assertion variants.
  */
 
-const ASSERTS = ['Child', 'Parent']
+const ASSERTS = ['Child', 'Depth', 'Descendant', 'Node', 'Parent']
 
 for (const method of ASSERTS) {
   Node.prototype[`assert${method}`] = function(keyOrPath, ...args) {
@@ -2170,7 +2076,7 @@ for (const method of ASSERTS) {
   Node.prototype[`assert${method}ByPath`] = function(path, ...args) {
     const ret = this[`get${method}ByPath`](path, ...args)
 
-    if (!ret) {
+    if (ret == null) {
       throw new Error(
         `\`assert${method}ByKey\` could not find a node by path: ${path}`
       )
@@ -2239,8 +2145,8 @@ memoize(Node.prototype, [
   'getMarksAtPosition',
   'getOrderedMarksBetweenPositions',
   'getInsertMarksAtRange',
-  'getKeyPathDictionary',
-  'getKeysAsArray',
+  'getKeysPathsObject',
+  'getKeysArray',
   'getLastText',
   'getMarksByTypeAsArray',
   'getNextBlock',

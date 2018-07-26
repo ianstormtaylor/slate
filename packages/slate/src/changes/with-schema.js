@@ -62,7 +62,6 @@ Changes.normalizeParentByKey = (change, key, options) => {
   const { value } = change
   const { document } = value
   const parent = document.getParent(key)
-  if (!parent) debugger
   change.normalizeNodeByKey(parent.key, options)
 }
 
@@ -79,7 +78,7 @@ Changes.normalizeNodeByPath = (change, path, options = {}) => {
 
   const { value } = change
   let { document, schema } = value
-  const node = document.assertPath(path)
+  const node = document.assertNode(path)
 
   normalizeNodeAndChildren(change, node, schema)
 
