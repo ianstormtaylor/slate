@@ -4,18 +4,23 @@
 const h = require('../../helpers/h')
 
 module.exports.default = function(change) {
-  change.insertNodeByKey('a', 0, <paragraph>Hello world</paragraph>)
+  change.addMark('bold')
 }
 
 const value = (
   <value>
     <document>
       {Array.from(Array(10)).map((v, i) => (
-        <quote key="a">
+        <quote>
           <paragraph>
-            This is editable <b>rich</b> text, <i>much</i> better than a
-            textarea!
-            {i == 0 ? <cursor /> : ''}
+            <paragraph>
+              This is editable {i == 0 ? <anchor /> : ''}rich{i == 0 ? (
+                <focus />
+              ) : (
+                ''
+              )}{' '}
+              text, <i>much</i> better than a textarea!
+            </paragraph>
           </paragraph>
         </quote>
       ))}
