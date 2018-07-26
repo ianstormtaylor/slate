@@ -827,7 +827,7 @@ class Range extends Record(DEFAULTS) {
       )
 
       const first = node.getFirstText()
-      const path = first && node.getPath(first.key)
+      const path = first && node.getPathByKey(first.key)
       return range.merge({
         anchorKey: first ? first.key : null,
         anchorOffset: 0,
@@ -867,8 +867,8 @@ class Range extends Record(DEFAULTS) {
 
     anchorKey = anchorNode.key
     focusKey = focusNode.key
-    anchorPath = node.getPath(anchorKey)
-    focusPath = node.getPath(focusKey)
+    anchorPath = node.getPathByKey(anchorKey)
+    focusPath = node.getPathByKey(focusKey)
 
     // If `isBackward` is not set, derive it.
     if (isBackward == null) {

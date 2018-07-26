@@ -40,8 +40,6 @@ describe('operations', async () => {
               }
               const actual = change.value.toJSON(opts)
               const expected = output.toJSON(opts)
-
-              debugger
               assert.deepEqual(actual, expected)
             })
           }

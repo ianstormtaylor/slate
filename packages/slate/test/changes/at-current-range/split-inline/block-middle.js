@@ -3,9 +3,7 @@
 import h from '../../../helpers/h'
 
 export default function(change) {
-  debugger
   change.splitInline()
-  debugger
 }
 
 export const input = (

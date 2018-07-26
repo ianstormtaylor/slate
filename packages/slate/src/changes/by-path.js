@@ -28,7 +28,7 @@ Changes.addMarkByPath = (change, path, offset, length, mark, options) => {
   mark = Mark.create(mark)
   const { value } = change
   const { document } = value
-  const node = document.getNodeByPath(path)
+  const node = document.assertPath(path)
   const leaves = node.getLeaves()
 
   const operations = []
@@ -121,7 +121,7 @@ Changes.insertNodeByPath = (change, path, index, node, options) => {
 Changes.insertTextByPath = (change, path, offset, text, marks, options) => {
   const { value } = change
   const { document } = value
-  const node = document.getNodeByPath(path)
+  const node = document.assertPath(path)
   marks = marks || node.getMarksAtIndex(offset)
 
   change.applyOperation({
@@ -215,7 +215,7 @@ Changes.removeMarkByPath = (change, path, offset, length, mark, options) => {
   mark = Mark.create(mark)
   const { value } = change
   const { document } = value
-  const node = document.getNodeByPath(path)
+  const node = document.assertPath(path)
   const leaves = node.getLeaves()
 
   const operations = []
@@ -264,7 +264,7 @@ Changes.removeMarkByPath = (change, path, offset, length, mark, options) => {
 Changes.removeAllMarksByPath = (change, path, options) => {
   const { state } = change
   const { document } = state
-  const node = document.getNodeByPath(path)
+  const node = document.assertPath(path)
   const texts = node.object === 'text' ? [node] : node.getTextsAsArray()
 
   texts.forEach(text => {
@@ -285,7 +285,7 @@ Changes.removeAllMarksByPath = (change, path, options) => {
 Changes.removeNodeByPath = (change, path, options) => {
   const { value } = change
   const { document } = value
-  const node = document.getNodeByPath(path)
+  const node = document.assertPath(path)
 
   change.applyOperation({
     type: 'remove_node',
@@ -310,7 +310,7 @@ Changes.removeNodeByPath = (change, path, options) => {
 Changes.setTextByPath = (change, path, text, marks, options) => {
   const { value } = change
   const { document } = value
-  const node = document.getNodeByPath(path)
+  const node = document.assertPath(path)
   const end = node.text.length
   change.replaceTextByPath(path, 0, end, text, marks, options)
 }
@@ -337,7 +337,7 @@ Changes.replaceTextByPath = (
   options
 ) => {
   const { document } = change.value
-  const node = document.getNodeByPath(path)
+  const node = document.assertPath(path)
 
   if (length + offset > node.text.length) {
     length = node.text.length - offset
@@ -382,7 +382,7 @@ Changes.replaceTextByPath = (
 Changes.removeTextByPath = (change, path, offset, length, options) => {
   const { value } = change
   const { document } = value
-  const node = document.getNodeByPath(path)
+  const node = document.assertPath(path)
   const leaves = node.getLeaves()
   const { text } = node
 
@@ -492,7 +492,7 @@ Changes.setNodeByPath = (change, path, properties, options) => {
   properties = Node.createProperties(properties)
   const { value } = change
   const { document } = value
-  const node = document.getNodeByPath(path)
+  const node = document.assertPath(path)
 
   change.applyOperation({
     type: 'set_node',
@@ -518,7 +518,7 @@ Changes.splitNodeByPath = (change, path, position, options = {}) => {
   const { target = null } = options
   const { value } = change
   const { document } = value
-  const node = document.getNodeAtPath(path)
+  const node = document.getDescendantByPath(path)
 
   change.applyOperation({
     type: 'split_node',
@@ -552,15 +552,15 @@ Changes.splitDescendantsByPath = (
   textOffset,
   options
 ) => {
-  if (PathUtils.isEqual(path, textPath)) {
+  if (path.equals(textPath)) {
     change.splitNodeByPath(textPath, textOffset, options)
     return
   }
 
   const { value } = change
   const { document } = value
-  const node = document.getNodeByPath(path)
-  const text = document.getNodeByPath(textPath)
+  const node = document.assertPath(path)
+  const text = document.assertPath(textPath)
   const ancestors = document.getAncestors(textPath)
   const nodes = ancestors
     .skipUntil(a => a.key == node.key)
@@ -637,29 +637,31 @@ Changes.unwrapBlockByPath = (change, path, properties, options) => {
 Changes.unwrapNodeByPath = (change, path, options) => {
   const { value } = change
   const { document } = value
-  const index = PathUtils.getIndex(path)
+  document.assertPath(path)
+
   const parentPath = PathUtils.getParent(path)
-  const parentIndex = PathUtils.getIndex(parentPath)
-  const parent = document.getNodeByPath(parentPath)
+  const parent = document.assertPath(parentPath)
+  const index = path.last()
+  const parentIndex = parentPath.last()
   const grandPath = PathUtils.getParent(parentPath)
   const isFirst = index === 0
   const isLast = index === parent.nodes.size - 1
 
   if (parent.nodes.size === 1) {
-    change.moveNodeByPath(path, grandPath, parentIndex, { normalize: false })
+    change.moveNodeByPath(path, grandPath, parentIndex + 1, {
+      normalize: false,
+    })
     change.removeNodeByPath(parentPath, options)
   } else if (isFirst) {
-    // Just move the node before its parent.
     change.moveNodeByPath(path, grandPath, parentIndex, options)
   } else if (isLast) {
-    // Just move the node after its parent.
     change.moveNodeByPath(path, grandPath, parentIndex + 1, options)
   } else {
-    // Split the parent.
     change.splitNodeByPath(parentPath, index, { normalize: false })
 
-    // Extract the node in between the splitted parent.
-    change.moveNodeByPath(path, grandPath, parentIndex + 1, {
+    let updatedPath = PathUtils.increment(path, 1, parentPath.size - 1)
+    updatedPath = updatedPath.set(updatedPath.size - 1, 0)
+    change.moveNodeByPath(updatedPath, grandPath, parentIndex + 1, {
       normalize: false,
     })
 
@@ -726,6 +728,61 @@ Changes.wrapNodeByPath = (change, path, node) => {
     change.wrapInlineByPath(path, node)
     return
   }
+}
+
+/**
+ * Mix in `*ByKey` variants.
+ */
+
+const CHANGES = [
+  'addMark',
+  'insertFragment',
+  'insertNode',
+  'insertText',
+  'mergeNode',
+  'removeMark',
+  'removeAllMarks',
+  'removeNode',
+  'setText',
+  'replaceText',
+  'removeText',
+  'replaceNode',
+  'setMark',
+  'setNode',
+  'splitNode',
+  'unwrapInline',
+  'unwrapBlock',
+  'unwrapNode',
+  'wrapBlock',
+  'wrapInline',
+  'wrapNode',
+]
+
+for (const method of CHANGES) {
+  Changes[`${method}ByKey`] = (change, key, ...args) => {
+    const { value } = change
+    const { document } = value
+    const path = document.assertPathByKey(key)
+    change[`${method}ByPath`](path, ...args)
+  }
+}
+
+// Moving nodes takes two keys, so it's slightly different.
+Changes.moveNodeByKey = (change, key, newKey, ...args) => {
+  const { value } = change
+  const { document } = value
+  const path = document.assertPathByKey(key)
+  const newPath = document.assertPathByKey(newKey)
+  change.moveNodeByPath(path, newPath, ...args)
+}
+
+// Splitting descendants takes two keys, so it's slightly different.
+Changes.splitDescendantsByKey = (change, key, textKey, ...args) => {
+  const { value } = change
+  const { document } = value
+  const path = document.assertPathByKey(key)
+  const textPath = document.assertPathByKey(textKey)
+  change.splitDescendantsByPath(path, textPath, ...args)
 }
 
 /**

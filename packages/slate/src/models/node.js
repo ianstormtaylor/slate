@@ -650,6 +650,7 @@ class Node {
    */
 
   getDescendantByPath(path) {
+    if (path && !path.toArray) debugger
     const array = path.toArray()
     let descendant = this
 
@@ -1413,10 +1414,30 @@ class Node {
     return ret
   }
 
-  getPath(key) {
+  getPathByKey(key) {
     const dict = this.getKeyPathDictionary()
     const path = dict[key]
     return path ? List(path) : null
+  }
+
+  assertPathByKey(key) {
+    const path = this.getPathByKey(key)
+
+    if (!path) {
+      throw new Error(
+        `\`assertPathByKey\` was unable to find a node by key: ${key}`
+      )
+    }
+
+    return path
+  }
+
+  getPath(key) {
+    logger.deprecate(
+      `0.35.0`,
+      'The `Node.getPath` method has been renamed to `Node.getPathByKey`.'
+    )
+    return this.getPathByKey(key)
   }
 
   // getPath(key) {
@@ -1448,7 +1469,7 @@ class Node {
       return path
     }
 
-    return this.getPath(key)
+    return this.getPathByKey(key)
   }
 
   /**
@@ -2127,7 +2148,7 @@ for (const method of BY_PATHS) {
 
   Node.prototype[`${method}ByKey`] = function(key, ...args) {
     key = assertKey(key)
-    const path = this.getPath(key)
+    const path = this.getPathByKey(key)
     if (!path) return null
     return this[`${method}ByPath`](path, ...args)
   }

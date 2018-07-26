@@ -88,7 +88,7 @@ Changes.normalizeNodeByPath = (change, path, options = {}) => {
   if (!ancestors) return
 
   ancestors.forEach(ancestor => {
-    if (change.value.document.getDescendantByPath(ancestor.key)) {
+    if (change.value.document.getDescendant(ancestor.key)) {
       normalizeNode(change, ancestor, schema)
     }
   })
@@ -114,7 +114,7 @@ function normalizeNodeAndChildren(change, node, schema) {
   }
 
   let child = node.getFirstInvalidDescendant(schema)
-  let path = change.value.document.getPath(node.key)
+  let path = change.value.document.getPathByKey(node.key)
 
   while (node && child) {
     normalizeNodeAndChildren(change, child, schema)
@@ -152,7 +152,7 @@ function normalizeNode(change, node, schema) {
     if (!normalize) return
 
     // Run the `normalize` function to fix the node.
-    let path = c.value.document.getPath(n.key)
+    let path = c.value.document.getPathByKey(n.key)
     normalize(c)
 
     // Re-find the node reference, in case it was updated. If the node no longer
