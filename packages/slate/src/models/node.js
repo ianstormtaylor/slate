@@ -528,35 +528,29 @@ class Node {
   }
 
   /**
-   * Get the common ancestor of nodes `one` and `two` by keys.
+   * Get the common ancestor of nodes `a` and `b`.
    *
-   * @param {String} one
-   * @param {String} two
+   * @param {List} a
+   * @param {List} b
    * @return {Node}
    */
 
-  getCommonAncestor(one, two) {
-    one = KeyUtils.assert(one)
-    two = KeyUtils.assert(two)
+  getCommonAncestorByPath(a, b) {
+    const path = PathUtils.getCommonAncestor(a, b)
+    const node = this.getNode(path)
+    return node
+  }
 
-    if (one == this.key) return this
-    if (two == this.key) return this
+  getCommonAncestorByKey(a, b) {
+    const ap = this.assertPathByKey(a)
+    const bp = this.assertPathByKey(b)
+    return this.getCommonAncestorByPath(ap, bp)
+  }
 
-    this.assertDescendant(one)
-    this.assertDescendant(two)
-    let ancestors = new List()
-    let oneParent = this.getParent(one)
-    let twoParent = this.getParent(two)
-
-    while (oneParent) {
-      ancestors = ancestors.push(oneParent)
-      oneParent = this.getParent(oneParent.key)
-    }
-
-    while (twoParent) {
-      if (ancestors.includes(twoParent)) return twoParent
-      twoParent = this.getParent(twoParent.key)
-    }
+  getCommonAncestor(a, b) {
+    return typeof a === 'string'
+      ? this.getCommonAncestorByKey(a, b)
+      : this.getCommonAncestorByPath(a, b)
   }
 
   /**
