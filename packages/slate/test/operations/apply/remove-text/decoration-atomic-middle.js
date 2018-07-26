@@ -25,9 +25,7 @@ export const input = (
 export const output = (
   <value>
     <document>
-      <paragraph>
-        wrd
-      </paragraph>
+      <paragraph>wrd</paragraph>
     </document>
   </value>
 )
