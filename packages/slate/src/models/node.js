@@ -639,7 +639,7 @@ class Node {
     let result = null
 
     this.nodes.find(n => {
-      result = n.normalize(schema) ? n : n.getFirstInvalidDescendant(schema)
+      result = n.validate(schema) ? n : n.getFirstInvalidDescendant(schema)
       return result
     })
 
