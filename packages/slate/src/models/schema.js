@@ -138,9 +138,9 @@ const CORE_RULES = [
         i = 0
       } else if (code === 'last_child_object_invalid') {
         i = node.nodes.size
-      } else if (code === 'previous_child_object_invalid') {
+      } else if (code === 'previous_sibling_object_invalid') {
         i = index
-      } else if (code === 'next_child_object_invalid') {
+      } else if (code === 'next_sibling_object_invalid') {
         i = index + 1
       } else {
         return
@@ -156,7 +156,7 @@ const CORE_RULES = [
     next: [{ object: 'block' }, { object: 'inline' }],
     normalize: (change, error) => {
       const { code, next } = error
-      if (code !== 'next_child_object_invalid') return
+      if (code !== 'next_sibling_object_invalid') return
       change.mergeNodeByKey(next.key, { normalize: false })
     },
   },
@@ -714,7 +714,7 @@ function validatePrevious(node, child, previous, index, rules) {
     error.child = child
     error.index = index
     error.previous = previous
-    error.code = error.code.replace('node_', 'previous_child_')
+    error.code = error.code.replace('node_', 'previous_sibling_')
     return error
   }
 }
@@ -734,7 +734,7 @@ function validateNext(node, child, next, index, rules) {
     error.child = child
     error.index = index
     error.next = next
-    error.code = error.code.replace('node_', 'next_child_')
+    error.code = error.code.replace('node_', 'next_sibling_')
     return error
   }
 }
