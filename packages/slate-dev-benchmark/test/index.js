@@ -7,6 +7,6 @@
  */
 
 describe('slate-dev-benchmark', () => {
-  require('./tries/')
-  require('./time/')
+  // require('./tries/')
+  // require('./time/')
 })
