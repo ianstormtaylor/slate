@@ -78,56 +78,6 @@ function decrement(path, n = 1, index = path.size - 1) {
 }
 
 /**
- * Get the parent path of a `path`.
- *
- * @param {List} path
- * @return {Array}
- */
-
-function getParent(path) {
-  const parentPath = path.slice(0, -1)
-  return parentPath
-}
-
-/**
- * Get the index of a node by `path` in its parent.
- *
- * @param {List} path
- * @return {Number}
- */
-
-function getIndex(path) {
-  const last = path.last()
-  return last
-}
-
-/**
- * Get the common ancestor path of path `a` and path `b`.
- *
- * @param {List} a
- * @param {List} b
- * @return {List}
- */
-
-function getCommonAncestor(a, b) {
-  const array = []
-
-  for (let i = 0; i < a.size && i < b.size; i++) {
-    const av = a.get(i)
-    const bv = b.get(i)
-
-    // If the values aren't equal, they've diverged and don't share an ancestor.
-    if (av !== bv) break
-
-    // Otherwise, the current value is still a common ancestor.
-    array.push(av)
-  }
-
-  const path = create(array)
-  return path
-}
-
-/**
  * Increment a `path` by `n` at `index`, defaulting to the last index.
  *
  * @param {List} path
@@ -151,9 +101,8 @@ function increment(path, n = 1, index = path.size - 1) {
  */
 
 function isAbove(path, target) {
-  return (
-    path.size < target.size && compare(path, target.slice(0, path.size)) === 0
-  )
+  const [p, t] = crop(path, target)
+  return path.size < target.size && compare(p, t) === 0
 }
 
 /**
@@ -165,9 +114,7 @@ function isAbove(path, target) {
  */
 
 function isAfter(path, target) {
-  const size = min(path, target)
-  const p = path.slice(0, size)
-  const t = target.slice(0, size)
+  const [p, t] = crop(path, target)
   return compare(p, t) === 1
 }
 
@@ -180,10 +127,33 @@ function isAfter(path, target) {
  */
 
 function isBefore(path, target) {
-  const size = min(path, target)
-  const p = path.slice(0, size)
-  const t = target.slice(0, size)
+  const [p, t] = crop(path, target)
   return compare(p, t) === -1
+}
+
+/**
+ * Lift a `path` to refer to its parent.
+ *
+ * @param {List} path
+ * @return {Array}
+ */
+
+function lift(path) {
+  const parent = path.slice(0, -1)
+  return parent
+}
+
+/**
+ * Get the maximum length of paths `a` and `b`.
+ *
+ * @param {List} path
+ * @param {List} path
+ * @return {Number}
+ */
+
+function max(a, b) {
+  const n = Math.max(a.size, b.size)
+  return n
 }
 
 /**
@@ -200,6 +170,32 @@ function min(a, b) {
 }
 
 /**
+ * Get the common ancestor path of path `a` and path `b`.
+ *
+ * @param {List} a
+ * @param {List} b
+ * @return {List}
+ */
+
+function relate(a, b) {
+  const array = []
+
+  for (let i = 0; i < a.size && i < b.size; i++) {
+    const av = a.get(i)
+    const bv = b.get(i)
+
+    // If the values aren't equal, they've diverged and don't share an ancestor.
+    if (av !== bv) break
+
+    // Otherwise, the current value is still a common ancestor.
+    array.push(av)
+  }
+
+  const path = create(array)
+  return path
+}
+
+/**
  * Export.
  *
  * @type {Object}
@@ -210,12 +206,12 @@ export default {
   create,
   crop,
   decrement,
-  getCommonAncestor,
-  getIndex,
-  getParent,
   increment,
   isAbove,
   isAfter,
   isBefore,
+  lift,
+  max,
   min,
+  relate,
 }

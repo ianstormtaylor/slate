@@ -4,10 +4,10 @@ import logger from 'slate-dev-logger'
 function generateKey() {
   logger.deprecate(
     `0.35.0`,
-    'The `generateKey()` util is deprecrated. Use the `KeyUtils.generate()` helper instead.'
+    'The `generateKey()` util is deprecrated. Use the `KeyUtils.create()` helper instead.'
   )
 
-  return KeyUtils.generate()
+  return KeyUtils.create()
 }
 
 function setKeyGenerator(fn) {

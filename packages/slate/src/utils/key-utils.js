@@ -12,33 +12,25 @@ let n
  * @type {Function}
  */
 
-let generator
+let generate
 
 /**
- * Assert that a key `value` is valid.
+ * Create a key, using a provided key if available.
  *
- * @param {String} value
+ * @param {String|Void} key
  * @return {String}
  */
 
-function assert(value) {
-  if (typeof value === 'string') {
-    return value
+function create(key) {
+  if (key == null) {
+    return generate()
   }
 
-  throw new Error(
-    `Invalid \`key\` argument! It must be a key string, but you passed: ${value}`
-  )
-}
+  if (typeof key === 'string') {
+    return key
+  }
 
-/**
- * Generate a key.
- *
- * @return {String}
- */
-
-function generate() {
-  return generator()
+  throw new Error(`Keys must be strings, but you passed: ${key}`)
 }
 
 /**
@@ -48,7 +40,7 @@ function generate() {
  */
 
 function setGenerator(func) {
-  generator = func
+  generate = func
 }
 
 /**
@@ -57,7 +49,7 @@ function setGenerator(func) {
 
 function resetGenerator() {
   n = 0
-  generator = () => `${n++}`
+  generate = () => `${n++}`
 }
 
 /**
@@ -73,8 +65,7 @@ resetGenerator()
  */
 
 export default {
-  assert,
-  generate,
+  create,
   setGenerator,
   resetGenerator,
 }

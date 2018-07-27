@@ -88,7 +88,7 @@ class Inline extends Record(DEFAULTS) {
     const {
       data = {},
       isVoid = false,
-      key = KeyUtils.generate(),
+      key = KeyUtils.create(),
       nodes = [],
       type,
     } = object

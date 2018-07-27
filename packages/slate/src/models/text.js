@@ -85,7 +85,7 @@ class Text extends Record(DEFAULTS) {
       return object
     }
 
-    const { key = KeyUtils.generate() } = object
+    const { key = KeyUtils.create() } = object
     let { leaves = List() } = object
 
     if (Array.isArray(leaves)) {
@@ -553,7 +553,7 @@ class Text extends Record(DEFAULTS) {
    */
 
   regenerateKey() {
-    const key = KeyUtils.generate()
+    const key = KeyUtils.create()
     return this.set('key', key)
   }
 

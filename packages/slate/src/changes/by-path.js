@@ -196,7 +196,7 @@ Changes.moveNodeByPath = (change, path, newPath, newIndex, options) => {
     newPath: newPath.concat(newIndex),
   })
 
-  const ancestorPath = PathUtils.getCommonAncestor(path, newPath)
+  const ancestorPath = PathUtils.relate(path, newPath)
   change.normalizeNodeByPath(ancestorPath, options)
 }
 
@@ -433,8 +433,8 @@ Changes.removeTextByPath = (change, path, offset, length, options) => {
 
 Changes.replaceNodeByPath = (change, path, newNode, options) => {
   newNode = Node.create(newNode)
-  const index = PathUtils.getIndex(path)
-  const parentPath = PathUtils.getParent(path)
+  const index = path.last()
+  const parentPath = PathUtils.lift(path)
   change.removeNodeByPath(path, { normalize: false })
   change.insertNodeByPath(parentPath, index, newNode, { normalize: false })
   change.normalizeParentByPath(path, options)
@@ -637,11 +637,11 @@ Changes.unwrapNodeByPath = (change, path, options) => {
   const { document } = value
   document.assertNode(path)
 
-  const parentPath = PathUtils.getParent(path)
+  const parentPath = PathUtils.lift(path)
   const parent = document.assertNode(parentPath)
   const index = path.last()
   const parentIndex = parentPath.last()
-  const grandPath = PathUtils.getParent(parentPath)
+  const grandPath = PathUtils.lift(parentPath)
   const isFirst = index === 0
   const isLast = index === parent.nodes.size - 1
 
@@ -681,8 +681,8 @@ Changes.unwrapNodeByPath = (change, path, options) => {
 Changes.wrapBlockByPath = (change, path, block, options) => {
   block = Block.create(block)
   block = block.set('nodes', block.nodes.clear())
-  const parentPath = PathUtils.getParent(path)
-  const index = PathUtils.getIndex(path)
+  const parentPath = PathUtils.lift(path)
+  const index = path.last()
   const newPath = PathUtils.increment(path)
   change.insertNodeByPath(parentPath, index, block, { normalize: false })
   change.moveNodeByPath(newPath, path, 0, options)
@@ -700,8 +700,8 @@ Changes.wrapBlockByPath = (change, path, block, options) => {
 Changes.wrapInlineByPath = (change, path, inline, options) => {
   inline = Inline.create(inline)
   inline = inline.set('nodes', inline.nodes.clear())
-  const parentPath = PathUtils.getParent(path)
-  const index = PathUtils.getIndex(path)
+  const parentPath = PathUtils.lift(path)
+  const index = path.last()
   const newPath = PathUtils.increment(path)
   change.insertNodeByPath(parentPath, index, inline, { normalize: false })
   change.moveNodeByPath(newPath, path, 0, options)

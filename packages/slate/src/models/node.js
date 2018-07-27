@@ -570,7 +570,7 @@ class Node {
     b = this.resolvePath(b)
     if (!a || !b) return null
 
-    const path = PathUtils.getCommonAncestor(a, b)
+    const path = PathUtils.relate(a, b)
     const node = this.getNode(path)
     return node
   }
@@ -1319,7 +1319,7 @@ class Node {
     path = this.resolvePath(path)
     if (!path) return null
     if (!path.size) return null
-    const parentPath = PathUtils.getParent(path)
+    const parentPath = PathUtils.lift(path)
     const parent = this.getNode(parentPath)
     return parent
   }
@@ -1697,7 +1697,7 @@ class Node {
   insertNode(path, node) {
     path = this.resolvePath(path)
     const index = path.last()
-    const parentPath = PathUtils.getParent(path)
+    const parentPath = PathUtils.lift(path)
     let parent = this.assertNode(parentPath)
     const nodes = parent.nodes.splice(index, 0, node)
     parent = parent.set('nodes', nodes)
@@ -1889,7 +1889,7 @@ class Node {
     path = this.resolvePath(path)
     newPath = this.resolvePath(newPath, newIndex)
 
-    const newParentPath = PathUtils.getParent(newPath)
+    const newParentPath = PathUtils.lift(newPath)
     this.assertNode(newParentPath)
 
     const [p, np] = PathUtils.crop(path, newPath)
@@ -1944,7 +1944,7 @@ class Node {
    */
 
   regenerateKey() {
-    const key = KeyUtils.generate()
+    const key = KeyUtils.create()
     const node = this.set('key', key)
     return node
   }
@@ -2180,8 +2180,8 @@ class Node {
       'The `Node.areDescendantsSorted` method is deprecated. Use the new `PathUtils.compare` helper instead.'
     )
 
-    first = KeyUtils.assert(first)
-    second = KeyUtils.assert(second)
+    first = KeyUtils.create(first)
+    second = KeyUtils.create(second)
 
     const keys = this.getKeysAsArray().filter(k => k !== this.key)
     const firstIndex = keys.indexOf(first)
@@ -2217,25 +2217,13 @@ for (const method of ASSERTS) {
  */
 
 memoize(Node.prototype, [
-  'areDescendantsSorted',
-  'getAncestors',
   'getBlocksAsArray',
   'getBlocksAtRangeAsArray',
   'getBlocksByTypeAsArray',
-  'getChild',
-  'getClosestBlock',
-  'getClosestInline',
-  'getClosestVoid',
-  'getCommonAncestor',
   'getDecorations',
-  'getDepth',
-  'getDescendant',
+  'getFirstInvalidDescendant',
   'getFirstText',
   'getFragmentAtRange',
-  'getFurthestBlock',
-  'getFurthestInline',
-  'getFurthestAncestor',
-  'getFurthestOnlyChildAncestor',
   'getInlinesAsArray',
   'getInlinesAtRangeAsArray',
   'getInlinesByTypeAsArray',
@@ -2244,20 +2232,12 @@ memoize(Node.prototype, [
   'getOrderedMarksBetweenPositions',
   'getInsertMarksAtRange',
   'getKeysToPathsTable',
-  'getKeys',
   'getLastText',
   'getMarksByTypeAsArray',
   'getNextBlock',
-  'getNextSibling',
-  'getNextText',
-  'getNode',
   'getOffset',
   'getOffsetAtRange',
-  'getParent',
-  'getPath',
   'getPreviousBlock',
-  'getPreviousSibling',
-  'getPreviousText',
   'getText',
   'getTextAtOffset',
   'getTextDirection',
@@ -2266,7 +2246,6 @@ memoize(Node.prototype, [
   'isLeafBlock',
   'isLeafInline',
   'validate',
-  'getFirstInvalidDescendant',
 ])
 
 /**
@@ -2274,7 +2253,7 @@ memoize(Node.prototype, [
  */
 
 Object.getOwnPropertyNames(Node.prototype).forEach(method => {
-  if (method == 'constructor') return
+  if (method === 'constructor') return
   Block.prototype[method] = Node.prototype[method]
   Inline.prototype[method] = Node.prototype[method]
   Document.prototype[method] = Node.prototype[method]

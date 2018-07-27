@@ -65,7 +65,7 @@ class Document extends Record(DEFAULTS) {
       return object
     }
 
-    const { data = {}, key = KeyUtils.generate(), nodes = [] } = object
+    const { data = {}, key = KeyUtils.create(), nodes = [] } = object
 
     const document = new Document({
       key,

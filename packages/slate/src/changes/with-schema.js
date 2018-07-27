@@ -94,7 +94,7 @@ Changes.normalizeNodeByPath = (change, path, options = {}) => {
 }
 
 Changes.normalizeParentByPath = (change, path, options) => {
-  const p = PathUtils.getParent(path)
+  const p = PathUtils.lift(path)
   change.normalizeNodeByPath(p, options)
 }
 
