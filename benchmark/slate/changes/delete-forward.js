@@ -4,7 +4,12 @@
 const h = require('../../helpers/h')
 
 module.exports.default = function(change) {
-  change.deleteForward()
+  change
+    .deleteForward()
+    .deleteForward()
+    .deleteForward()
+    .deleteForward()
+    .deleteForward()
 }
 
 const value = (
@@ -14,9 +19,9 @@ const value = (
         <quote>
           <paragraph>
             <paragraph>
+              {i == 0 ? <cursor /> : ''}
               This is editable <b>rich</b> text, <i>much</i> better than a
               textarea!
-              {i == 0 ? <cursor /> : ''}
             </paragraph>
           </paragraph>
         </quote>

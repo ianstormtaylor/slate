@@ -67,7 +67,9 @@ These are changes like `blur()`, `collapseToStart()`, `moveToRangeOf()`, etc. th
 
 ### On a Specific Node
 
-These are changes like `removeNodeByKey()`, `setNodeByKey()`, `removeMarkByKey()`, etc. that take a `key` string referring to a specific node, and then change that node in different ways. These are often what you use when making programmatic changes from inside your custom node components, where you already have a reference to `props.node.key`.
+There are two types of changes referring to specific nodes, either by `path` or by `key`. These are often what you use when making programmatic changes from inside your custom node components, where you already have a reference to `props.node.key`.
+
+Path-based changes are ones like `removeNodeByPath()`, `insertNodeByPath()`, etc. that take a `path` pinpointing the node in the document. And key-based changes are ones like `removeNodeByKey()`, `setNodeByKey()`, `removeMarkByKey()`, etc. that take a `key` string referring to a specific node, and then change that node in different ways.
 
 ### On the Top-level Value
 

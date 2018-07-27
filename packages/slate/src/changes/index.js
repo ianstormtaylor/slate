@@ -1,6 +1,6 @@
 import AtCurrentRange from './at-current-range'
 import AtRange from './at-range'
-import ByKey from './by-key'
+import ByPath from './by-path'
 import OnHistory from './on-history'
 import OnSelection from './on-selection'
 import OnValue from './on-value'
@@ -15,7 +15,7 @@ import WithSchema from './with-schema'
 export default {
   ...AtCurrentRange,
   ...AtRange,
-  ...ByKey,
+  ...ByPath,
   ...OnHistory,
   ...OnSelection,
   ...OnValue,

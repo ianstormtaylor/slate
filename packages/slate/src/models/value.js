@@ -3,6 +3,7 @@ import logger from 'slate-dev-logger'
 import { Record, Set, List, Map } from 'immutable'
 
 import MODEL_TYPES from '../constants/model-types'
+import PathUtils from '../utils/path-utils'
 import Change from './change'
 import Data from './data'
 import Document from './document'
@@ -61,26 +62,25 @@ class Value extends Record(DEFAULTS) {
    * @return {Object}
    */
 
-  static createProperties(attrs = {}) {
-    if (Value.isValue(attrs)) {
+  static createProperties(a = {}) {
+    if (Value.isValue(a)) {
       return {
-        data: attrs.data,
-        decorations: attrs.decorations,
-        schema: attrs.schema,
+        data: a.data,
+        decorations: a.decorations,
+        schema: a.schema,
       }
     }
 
-    if (isPlainObject(attrs)) {
-      const props = {}
-      if ('data' in attrs) props.data = Data.create(attrs.data)
-      if ('decorations' in attrs)
-        props.decorations = Range.createList(attrs.decorations)
-      if ('schema' in attrs) props.schema = Schema.create(attrs.schema)
-      return props
+    if (isPlainObject(a)) {
+      const p = {}
+      if ('data' in a) p.data = Data.create(a.data)
+      if ('decorations' in a) p.decorations = Range.createList(a.decorations)
+      if ('schema' in a) p.schema = Schema.create(a.schema)
+      return p
     }
 
     throw new Error(
-      `\`Value.createProperties\` only accepts objects or values, but you passed it: ${attrs}`
+      `\`Value.createProperties\` only accepts objects or values, but you passed it: ${a}`
     )
   }
 
@@ -96,22 +96,8 @@ class Value extends Record(DEFAULTS) {
 
   static fromJSON(object, options = {}) {
     let { document = {}, selection = {}, schema = {}, history = {} } = object
-
     let data = new Map()
-
     document = Document.fromJSON(document)
-
-    // rebuild selection from anchorPath and focusPath if keys were dropped
-    const { anchorPath, focusPath, anchorKey, focusKey } = selection
-
-    if (anchorPath !== undefined && anchorKey === undefined) {
-      selection.anchorKey = document.assertPath(anchorPath).key
-    }
-
-    if (focusPath !== undefined && focusKey === undefined) {
-      selection.focusKey = document.assertPath(focusPath).key
-    }
-
     selection = Range.fromJSON(selection)
     schema = Schema.fromJSON(schema)
     history = History.fromJSON(history)
@@ -132,6 +118,8 @@ class Value extends Record(DEFAULTS) {
       const text = document.getFirstText()
       if (text) selection = selection.collapseToStartOf(text)
     }
+
+    selection = selection.normalize(document)
 
     let value = new Value({
       data,
@@ -284,6 +272,26 @@ class Value extends Record(DEFAULTS) {
   }
 
   /**
+   * Get the current start path.
+   *
+   * @return {String}
+   */
+
+  get startPath() {
+    return this.selection.startPath
+  }
+
+  /**
+   * Get the current end path.
+   *
+   * @return {String}
+   */
+
+  get endPath() {
+    return this.selection.endPath
+  }
+
+  /**
    * Get the current start offset.
    *
    * @return {String}
@@ -321,6 +329,26 @@ class Value extends Record(DEFAULTS) {
 
   get focusKey() {
     return this.selection.focusKey
+  }
+
+  /**
+   * Get the current anchor path.
+   *
+   * @return {String}
+   */
+
+  get anchorPath() {
+    return this.selection.anchorPath
+  }
+
+  /**
+   * Get the current focus path.
+   *
+   * @return {String}
+   */
+
+  get focusPath() {
+    return this.selection.focusPath
   }
 
   /**
@@ -643,6 +671,422 @@ class Value extends Record(DEFAULTS) {
   }
 
   /**
+   * Add mark to text at `offset` and `length` in node by `path`.
+   *
+   * @param {List|String} path
+   * @param {Number} offset
+   * @param {Number} length
+   * @param {Mark} mark
+   * @return {Value}
+   */
+
+  addMark(path, offset, length, mark) {
+    let value = this
+    let { document } = value
+    document = document.addMark(path, offset, length, mark)
+    value = this.set('document', document)
+    return value
+  }
+
+  /**
+   * Insert a `node`.
+   *
+   * @param {List|String} path
+   * @param {Node} node
+   * @return {Value}
+   */
+
+  insertNode(path, node) {
+    let value = this
+    let { document } = value
+    document = document.insertNode(path, node)
+    value = value.set('document', document)
+
+    value = value.mapRanges(range => {
+      return range.merge({ anchorPath: null, focusPath: null })
+    })
+
+    return value
+  }
+
+  /**
+   * Insert `text` at `offset` in node by `path`.
+   *
+   * @param {List|String} path
+   * @param {Number} offset
+   * @param {String} text
+   * @param {Set} marks
+   * @return {Value}
+   */
+
+  insertText(path, offset, text, marks) {
+    let value = this
+    let { document } = value
+    document = document.insertText(path, offset, text, marks)
+    value = value.set('document', document)
+
+    // Update any ranges that were affected.
+    const node = document.assertNode(path)
+    value = value.clearAtomicRanges(node.key, offset)
+
+    value = value.mapRanges(range => {
+      const { anchorKey, anchorOffset, isBackward, isAtomic } = range
+
+      if (
+        anchorKey === node.key &&
+        (anchorOffset > offset ||
+          (anchorOffset === offset && (!isAtomic || !isBackward)))
+      ) {
+        return range.moveAnchor(text.length)
+      }
+
+      return range
+    })
+
+    value = value.mapRanges(range => {
+      const { focusKey, focusOffset, isBackward, isAtomic } = range
+
+      if (
+        focusKey === node.key &&
+        (focusOffset > offset ||
+          (focusOffset == offset && (!isAtomic || isBackward)))
+      ) {
+        return range.moveFocus(text.length)
+      }
+
+      return range
+    })
+
+    return value
+  }
+
+  /**
+   * Merge a node backwards its previous sibling.
+   *
+   * @param {List|Key} path
+   * @return {Value}
+   */
+
+  mergeNode(path) {
+    let value = this
+    const { document } = value
+    const newDocument = document.mergeNode(path)
+    path = document.resolvePath(path)
+    const withPath = PathUtils.decrement(path)
+    const one = document.getNode(withPath)
+    const two = document.getNode(path)
+    value = value.set('document', newDocument)
+
+    value = value.mapRanges(range => {
+      if (two.object === 'text') {
+        const max = one.text.length
+
+        if (range.anchorKey === two.key) {
+          range = range.moveAnchorTo(one.key, max + range.anchorOffset)
+        }
+
+        if (range.focusKey === two.key) {
+          range = range.moveFocusTo(one.key, max + range.focusOffset)
+        }
+      }
+
+      range = range.merge({ anchorPath: null, focusPath: null })
+      return range
+    })
+
+    return value
+  }
+
+  /**
+   * Move a node by `path` to `newPath`.
+   *
+   * A `newIndex` can be provided when move nodes by `key`, to account for not
+   * being able to have a key for a location in the tree that doesn't exist yet.
+   *
+   * @param {List|Key} path
+   * @param {List|Key} newPath
+   * @param {Number} newIndex
+   * @return {Value}
+   */
+
+  moveNode(path, newPath, newIndex = 0) {
+    let value = this
+    let { document } = value
+    document = document.moveNode(path, newPath, newIndex)
+    value = value.set('document', document)
+
+    value = value.mapRanges(range => {
+      return range.merge({ anchorPath: null, focusPath: null })
+    })
+
+    return value
+  }
+
+  /**
+   * Remove mark from text at `offset` and `length` in node.
+   *
+   * @param {List|String} path
+   * @param {Number} offset
+   * @param {Number} length
+   * @param {Mark} mark
+   * @return {Value}
+   */
+
+  removeMark(path, offset, length, mark) {
+    let value = this
+    let { document } = value
+    document = document.removeMark(path, offset, length, mark)
+    value = this.set('document', document)
+    return value
+  }
+
+  /**
+   * Remove a node by `path`.
+   *
+   * @param {List|String} path
+   * @return {Value}
+   */
+
+  removeNode(path) {
+    let value = this
+    let { document } = value
+    const node = document.assertNode(path)
+    const first = node.object == 'text' ? node : node.getFirstText() || node
+    const last = node.object == 'text' ? node : node.getLastText() || node
+    const prev = document.getPreviousText(first.key)
+    const next = document.getNextText(last.key)
+
+    document = document.removeNode(path)
+    value = value.set('document', document)
+
+    value = value.mapRanges(range => {
+      const { startKey, endKey } = range
+
+      if (node.hasNode(startKey)) {
+        range = prev
+          ? range.moveStartTo(prev.key, prev.text.length)
+          : next ? range.moveStartTo(next.key, 0) : range.deselect()
+      }
+
+      if (node.hasNode(endKey)) {
+        range = prev
+          ? range.moveEndTo(prev.key, prev.text.length)
+          : next ? range.moveEndTo(next.key, 0) : range.deselect()
+      }
+
+      range = range.merge({ anchorPath: null, focusPath: null })
+      return range
+    })
+
+    return value
+  }
+
+  /**
+   * Remove `text` at `offset` in node by `path`.
+   *
+   * @param {List|Key} path
+   * @param {Number} offset
+   * @param {String} text
+   * @return {Value}
+   */
+
+  removeText(path, offset, text) {
+    let value = this
+    let { document } = value
+    document = document.removeText(path, offset, text)
+    value = value.set('document', document)
+
+    const node = document.assertNode(path)
+    const { length } = text
+    const rangeOffset = offset + length
+    value = value.clearAtomicRanges(node.key, offset, offset + length)
+
+    value = value.mapRanges(range => {
+      const { anchorKey } = range
+
+      if (anchorKey === node.key) {
+        return range.anchorOffset >= rangeOffset
+          ? range.moveAnchor(-length)
+          : range.anchorOffset > offset
+            ? range.moveAnchorTo(range.anchorKey, offset)
+            : range
+      }
+
+      return range
+    })
+
+    value = value.mapRanges(range => {
+      const { focusKey } = range
+
+      if (focusKey === node.key) {
+        return range.focusOffset >= rangeOffset
+          ? range.moveFocus(-length)
+          : range.focusOffset > offset
+            ? range.moveFocusTo(range.focusKey, offset)
+            : range
+      }
+
+      return range
+    })
+
+    return value
+  }
+
+  /**
+   * Set `properties` on a node.
+   *
+   * @param {List|String} path
+   * @param {Object} properties
+   * @return {Value}
+   */
+
+  setNode(path, properties) {
+    let value = this
+    let { document } = value
+    document = document.setNode(path, properties)
+    value = value.set('document', document)
+    return value
+  }
+
+  /**
+   * Set `properties` on `mark` on text at `offset` and `length` in node.
+   *
+   * @param {List|String} path
+   * @param {Number} offset
+   * @param {Number} length
+   * @param {Mark} mark
+   * @param {Object} properties
+   * @return {Value}
+   */
+
+  setMark(path, offset, length, mark, properties) {
+    let value = this
+    let { document } = value
+    document = document.setMark(path, offset, length, mark, properties)
+    value = value.set('document', document)
+    return value
+  }
+
+  /**
+   * Set `properties` on the selection.
+   *
+   * @param {Value} value
+   * @param {Operation} operation
+   * @return {Value}
+   */
+
+  setSelection(properties) {
+    let value = this
+    let { document, selection } = value
+    selection = selection.merge(properties)
+    selection = selection.normalize(document)
+    value = value.set('selection', selection)
+    return value
+  }
+
+  /**
+   * Split a node by `path` at `position` with optional `properties` to apply
+   * to the newly split node.
+   *
+   * @param {List|String} path
+   * @param {Number} position
+   * @param {Object} properties
+   * @return {Value}
+   */
+
+  splitNode(path, position, properties) {
+    let value = this
+    const { document } = value
+    const newDocument = document.splitNode(path, position, properties)
+    const node = document.assertNode(path)
+    value = value.set('document', newDocument)
+
+    value = value.mapRanges(range => {
+      const next = newDocument.getNextText(node.key)
+      const { startKey, startOffset, endKey, endOffset } = range
+
+      // If the start was after the split, move it to the next node.
+      if (node.key === startKey && position <= startOffset) {
+        range = range.moveStartTo(next.key, startOffset - position)
+      }
+
+      // If the end was after the split, move it to the next node.
+      if (node.key === endKey && position <= endOffset) {
+        range = range.moveEndTo(next.key, endOffset - position)
+      }
+
+      range = range.merge({ anchorPath: null, focusPath: null })
+      return range
+    })
+
+    return value
+  }
+
+  /**
+   * Map all range objects to apply adjustments with an `iterator`.
+   *
+   * @param {Function} iterator
+   * @return {Value}
+   */
+
+  mapRanges(iterator) {
+    let value = this
+    const { document, selection, decorations } = value
+
+    if (selection) {
+      let next = selection.isSet ? iterator(selection) : selection
+      if (!next) next = selection.deselect()
+      if (next !== selection) next = next.normalize(document)
+      value = value.set('selection', next)
+    }
+
+    if (decorations) {
+      let next = decorations.map(decoration => {
+        let n = decoration.isSet ? iterator(decoration) : decoration
+        if (n && n !== decoration) n = n.normalize(document)
+        return n
+      })
+
+      next = next.filter(decoration => !!decoration)
+      next = next.size ? next : null
+      value = value.set('decorations', next)
+    }
+
+    return value
+  }
+
+  /**
+   * Remove any atomic ranges inside a `key`, `offset` and `length`.
+   *
+   * @param {String} key
+   * @param {Number} start
+   * @param {Number?} end
+   * @return {Value}
+   */
+
+  clearAtomicRanges(key, start, end = null) {
+    return this.mapRanges(range => {
+      const { isAtomic, startKey, startOffset, endKey, endOffset } = range
+      if (!isAtomic) return range
+      if (startKey !== key) return range
+
+      if (startOffset < start && (endKey !== key || endOffset > start)) {
+        return null
+      }
+
+      if (
+        end != null &&
+        startOffset < end &&
+        (endKey !== key || endOffset > end)
+      ) {
+        return null
+      }
+
+      return range
+    })
+  }
+
+  /**
    * Return a JSON representation of the value.
    *
    * @param {Object} options
@@ -656,59 +1100,25 @@ class Value extends Record(DEFAULTS) {
     }
 
     if (options.preserveData) {
-      object.data = this.data.toJSON()
+      object.data = this.data.toJSON(options)
     }
 
     if (options.preserveDecorations) {
       object.decorations = this.decorations
-        ? this.decorations.toArray().map(d => d.toJSON())
+        ? this.decorations.toArray().map(d => d.toJSON(options))
         : null
     }
 
     if (options.preserveHistory) {
-      object.history = this.history.toJSON()
+      object.history = this.history.toJSON(options)
     }
 
     if (options.preserveSelection) {
-      object.selection = this.selection.toJSON()
+      object.selection = this.selection.toJSON(options)
     }
 
     if (options.preserveSchema) {
-      object.schema = this.schema.toJSON()
-    }
-
-    if (options.preserveSelection && !options.preserveKeys) {
-      const { document, selection } = this
-
-      object.selection.anchorPath = selection.isSet
-        ? document.getPath(selection.anchorKey)
-        : null
-
-      object.selection.focusPath = selection.isSet
-        ? document.getPath(selection.focusKey)
-        : null
-
-      delete object.selection.anchorKey
-      delete object.selection.focusKey
-    }
-
-    if (
-      options.preserveDecorations &&
-      object.decorations &&
-      !options.preserveKeys
-    ) {
-      const { document } = this
-
-      object.decorations = object.decorations.map(decoration => {
-        const withPath = {
-          ...decoration,
-          anchorPath: document.getPath(decoration.anchorKey),
-          focusPath: document.getPath(decoration.focusKey),
-        }
-        delete withPath.anchorKey
-        delete withPath.focusKey
-        return withPath
-      })
+      object.schema = this.schema.toJSON(options)
     }
 
     return object

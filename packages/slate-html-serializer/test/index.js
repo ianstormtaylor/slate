@@ -6,7 +6,7 @@ import Html from '..'
 import assert from 'assert'
 import fs from 'fs'
 import { JSDOM } from 'jsdom' // eslint-disable-line import/no-extraneous-dependencies
-import { Value, resetKeyGenerator } from 'slate'
+import { Value, KeyUtils } from 'slate'
 import { basename, extname, resolve } from 'path'
 
 /**
@@ -14,7 +14,7 @@ import { basename, extname, resolve } from 'path'
  */
 
 beforeEach(() => {
-  resetKeyGenerator()
+  KeyUtils.resetGenerator()
 })
 
 /**

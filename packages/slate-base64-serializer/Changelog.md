@@ -8,7 +8,7 @@ This document maintains a list of changes to the `slate-base64-serializer` packa
 
 ###### BREAKING
 
-* **Updated to work with `slate@0.29.0`.** This is required because `slate-base64-serializer` needs access to the new `Value` model.
+**Updated to work with `slate@0.29.0`.** This is required because `slate-base64-serializer` needs access to the new `Value` model.
 
 ---
 
