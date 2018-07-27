@@ -149,6 +149,10 @@ function invertOperation(op) {
         .set('properties', inverseProperties)
       return inverse
     }
+
+    default: {
+      throw new Error(`Unknown operation type: "${type}".`)
+    }
   }
 }
 

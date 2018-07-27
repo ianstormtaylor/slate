@@ -918,7 +918,7 @@ class Node {
    * @return {Object}
    */
 
-  getKeyTable() {
+  getKeysToPathsTable() {
     const ret = {
       [this.key]: [],
     }
@@ -927,7 +927,7 @@ class Node {
       ret[node.key] = [i]
 
       if (node.object !== 'text') {
-        const nested = node.getKeyTable()
+        const nested = node.getKeysToPathsTable()
 
         for (const key in nested) {
           const path = nested[key]
@@ -1299,7 +1299,7 @@ class Node {
    */
 
   getPathByKey(key) {
-    const dict = this.getKeyTable()
+    const dict = this.getKeysToPathsTable()
     const path = dict[key]
     return path ? List(path) : null
   }
@@ -1653,7 +1653,7 @@ class Node {
    */
 
   insertNode(index, node) {
-    const dict = this.getKeyTable()
+    const dict = this.getKeysToPathsTable()
 
     if (dict[node.key]) {
       node = node.regenerateKey()
@@ -1667,6 +1667,16 @@ class Node {
 
     const nodes = this.nodes.insert(index, node)
     const ret = this.set('nodes', nodes)
+    return ret
+  }
+
+  insertNodeByPath(path, node) {
+    const index = path.last()
+    const parentPath = PathUtils.getParent(path)
+    let parent = this.assertNode(parentPath)
+    const nodes = parent.nodes.splice(index, 0, node)
+    parent = parent.set('nodes', nodes)
+    const ret = this.updateNodeByPath(parentPath, parent)
     return ret
   }
 
@@ -1895,6 +1905,27 @@ class Node {
     return node
   }
 
+  removeNodeByPath(path) {
+    this.assertDescendant(path)
+    const deep = path.flatMap(x => List(['nodes', x]))
+    const ret = this.deleteIn(deep)
+    return ret
+  }
+
+  addMarkByPath(path, offset, length, mark) {
+    let node = this.assertDescendant(path)
+    node = node.addMark(offset, length, mark)
+    const ret = this.updateNodeByPath(path, node)
+    return ret
+  }
+
+  removeMarkByPath(path, offset, length, mark) {
+    let node = this.assertDescendant(path)
+    node = node.removeMark(offset, length, mark)
+    const ret = this.updateNodeByPath(path, node)
+    return ret
+  }
+
   /**
    * Split a child node by `index` at `position`.
    *
@@ -1936,14 +1967,11 @@ class Node {
    * @return {Node}
    */
 
-  updateNode(node) {
-    if (node.key === this.key) {
-      return node
-    }
-
-    this.assertDescendant(node.key)
-    const path = this.getPathByKey(node.key).flatMap(x => List(['nodes', x]))
-    const ret = this.setIn(path, node)
+  updateNodeByPath(path, node) {
+    if (!path.size) return node
+    this.assertNode(path)
+    const deep = path.flatMap(x => List(['nodes', x]))
+    const ret = this.setIn(deep, node)
     return ret
   }
 
@@ -1956,6 +1984,21 @@ class Node {
 
   validate(schema) {
     return schema.validateNode(this)
+  }
+
+  /**
+   * TODO: remove this
+   */
+
+  updateNode(node) {
+    if (node.key === this.key) {
+      return node
+    }
+
+    this.assertDescendant(node.key)
+    const path = this.getPathByKey(node.key).flatMap(x => List(['nodes', x]))
+    const ret = this.setIn(path, node)
+    return ret
   }
 
   /**
@@ -2010,7 +2053,7 @@ class Node {
       'The `Node.getKeysAsArray` method is deprecated.'
     )
 
-    const dict = this.getKeyTable()
+    const dict = this.getKeysToPathsTable()
     const keys = []
 
     for (const key in dict) {
@@ -2094,8 +2137,8 @@ const ASSERTS = ['Child', 'Depth', 'Descendant', 'Node', 'Parent', 'Path']
 for (const method of ASSERTS) {
   Node.prototype[`assert${method}`] = function(keyOrPath, ...args) {
     return typeof keyOrPath === 'string'
-      ? this[`get${method}ByKey`](keyOrPath, ...args)
-      : this[`get${method}ByPath`](keyOrPath, ...args)
+      ? this[`assert${method}ByKey`](keyOrPath, ...args)
+      : this[`assert${method}ByPath`](keyOrPath, ...args)
   }
 
   if (Node.prototype[`get${method}ByPath`]) {
@@ -2116,7 +2159,7 @@ for (const method of ASSERTS) {
     Node.prototype[`assert${method}ByKey`] = function(key, ...args) {
       const ret = this[`get${method}ByKey`](key, ...args)
 
-      if (!ret) {
+      if (ret == null) {
         key = KeyUtils.assert(key)
         throw new Error(
           `\`assert${method}ByKey\` could not find a node by key: ${key}`
@@ -2160,7 +2203,7 @@ memoize(Node.prototype, [
   'getMarksAtPosition',
   'getOrderedMarksBetweenPositions',
   'getInsertMarksAtRange',
-  'getKeyTable',
+  'getKeysToPathsTable',
   'getKeys',
   'getLastText',
   'getMarksByTypeAsArray',
