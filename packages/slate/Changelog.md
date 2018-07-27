@@ -14,7 +14,7 @@ This document maintains a list of changes to the `slate` package with each new v
 }
 ```
 
-Now there is a new `match` object concept, which is used in all places that previously took `types/objects` rules. It looks like:
+Now there is a new `match` object concept, which looks like:
 
 ```js
 {
@@ -44,6 +44,8 @@ Additionally, schema rules can now be defined using a `schema.rules` array of ob
   }
 }
 ```
+
+All of the shorthands like `schema.blocks` and `schema.inlines` are still available, and are simply rewritten to the more flexible `rules` syntax under the covers. These changes are just a small way of making Slate more flexible for advanced use cases when you run into them.
 
 ---
 
