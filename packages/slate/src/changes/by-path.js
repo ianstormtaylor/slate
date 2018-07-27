@@ -433,8 +433,6 @@ Changes.removeTextByPath = (change, path, offset, length, options) => {
 
 Changes.replaceNodeByPath = (change, path, newNode, options) => {
   newNode = Node.create(newNode)
-  const { value } = change
-  const { document } = value
   const index = PathUtils.getIndex(path)
   const parentPath = PathUtils.getParent(path)
   change.removeNodeByPath(path, { normalize: false })
@@ -651,6 +649,7 @@ Changes.unwrapNodeByPath = (change, path, options) => {
     change.moveNodeByPath(path, grandPath, parentIndex + 1, {
       normalize: false,
     })
+
     change.removeNodeByPath(parentPath, options)
   } else if (isFirst) {
     change.moveNodeByPath(path, grandPath, parentIndex, options)
@@ -661,6 +660,7 @@ Changes.unwrapNodeByPath = (change, path, options) => {
 
     let updatedPath = PathUtils.increment(path, 1, parentPath.size - 1)
     updatedPath = updatedPath.set(updatedPath.size - 1, 0)
+
     change.moveNodeByPath(updatedPath, grandPath, parentIndex + 1, {
       normalize: false,
     })

@@ -769,7 +769,7 @@ class Value extends Record(DEFAULTS) {
 
   mergeNode(path) {
     let value = this
-    let { document } = value
+    const { document } = value
     const newDocument = document.mergeNode(path)
     path = document.resolvePath(path)
     const withPath = PathUtils.decrement(path)
@@ -861,6 +861,7 @@ class Value extends Record(DEFAULTS) {
 
     value = value.mapRanges(range => {
       const { startKey, endKey } = range
+
       if (node.hasNode(startKey)) {
         range = prev
           ? range.moveStartTo(prev.key, prev.text.length)

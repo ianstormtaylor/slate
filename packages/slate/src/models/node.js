@@ -1072,10 +1072,10 @@ class Node {
    */
 
   getMarksByTypeAsArray(type) {
-    const array = this.nodes.reduce((array, node) => {
+    const array = this.nodes.reduce((memo, node) => {
       return node.object == 'text'
-        ? array.concat(node.getMarksAsArray().filter(m => m.type == type))
-        : array.concat(node.getMarksByTypeAsArray(type))
+        ? memo.concat(node.getMarksAsArray().filter(m => m.type == type))
+        : memo.concat(node.getMarksByTypeAsArray(type))
     }, [])
 
     return array
@@ -2093,7 +2093,6 @@ class Node {
   splitNode(path, position, properties) {
     const child = this.assertNode(path)
     path = this.resolvePath(path)
-    let node = this.assertParent(path)
     let a
     let b
 
