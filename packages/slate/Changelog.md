@@ -2,6 +2,49 @@
 
 This document maintains a list of changes to the `slate` package with each new version. Until `1.0.0` is released, breaking changes will be added as minor version bumps, and smaller changes won't be accounted for since the library is moving quickly.
 
+### `0.36.0` — July 27, 2018
+
+###### BREAKING
+
+**Schema rules have changed!** To make them able to be used in more cases (so you don't have to dip down to the slower `validateNode/normalizeNode` function), the matching syntax for schema rules has changed. Previously multiples types/objects would be expressed as:
+
+```js
+{
+  parent: { types: ['ordered_list', 'unordered_list'] },
+}
+```
+
+Now there is a new `match` object concept, which is used in all places that previously took `types/objects` rules. It looks like:
+
+```js
+{
+  parent: { object: 'block', type: 'list' },
+}
+```
+
+Match objects can be objects, or an array of objects which acts as `OR`:
+
+```js
+
+{
+  parent: [{ type: 'ordered_list' }, { type: 'unordered_list' }],
+}
+```
+
+Additionally, schema rules can now be defined using a `schema.rules` array of objects with top-level match properties. This allows for matching nodes in ways that were previously impossible. For example:
+
+```js
+{
+  schema: {
+    rules: [{
+      // Match all blocks, regardless of type!
+      match: { object: 'block' },
+      text: /.../g,
+    }]
+  }
+}
+```
+
 ---
 
 ### `0.35.0` — July 27, 2018
