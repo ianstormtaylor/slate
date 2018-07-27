@@ -42,12 +42,43 @@ Additionally, schema rules can now be defined using a `schema.rules` array of ob
       // Match all blocks, regardless of type!
       match: { object: 'block' },
       text: /.../g,
+      normalize: () => { ... },
     }]
   }
 }
 ```
 
 All of the shorthands like `schema.blocks` and `schema.inlines` are still available, and are simply rewritten to the more flexible `rules` syntax under the covers. These changes are just a small way of making Slate more flexible for advanced use cases when you run into them.
+
+**Schema rule `normalize` functions now receive `SlateError` objects.** Previously they would be called with a signature of `(change, violation, context)`. They are now called with `(change, error)`. This new error is a `SlateError` object with an `error.code` and all of the same context properties.
+
+A normalizer that previously looked like:
+
+```js
+{
+  normalize: (change, violation, context) {
+    if (violation === 'child_type_invalid') {
+      const type = index === 0 ? 'title' : 'paragraph'
+      return change.setNodeByKey(context.child.key, type)
+    }
+  }
+}
+```
+
+Would now look like:
+
+```js
+{
+  normalize: (change, error) {
+    if (error.code === 'child_type_invalid') {
+      const type = index === 0 ? 'title' : 'paragraph'
+      return change.setNodeByKey(error.child.key, type)
+    }
+  }
+}
+```
+
+This is just an attempt to make dealing with normalization errors slightly more idiomatic with how errors are represented in most libraries, in order to not reinvent the wheel unnecessarily.
 
 ---
 
