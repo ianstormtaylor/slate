@@ -4,7 +4,12 @@
 const h = require('../../helpers/h')
 
 module.exports.default = function({ change, text }) {
-  change.insertTextByKey(text.key, 0, 'a')
+  change
+    .insertTextByKey('T1', 0, 'one')
+    .insertTextByKey('T2', 5, 'two')
+    .insertTextByKey('T3', 10, 'three')
+    .insertTextByKey('T4', 15, 'four')
+    .insertTextByKey('T5', 20, 'five')
 }
 
 const value = (
@@ -14,9 +19,11 @@ const value = (
         <quote>
           <paragraph>
             <paragraph>
-              This is editable <b>rich</b> text, <i>much</i> better than a
-              textarea!
-              {i == 0 ? <cursor /> : ''}
+              <text key={`T${i}`}>
+                This is editable <b>rich</b> text, <i>much</i> better than a
+                textarea!
+                {i == 0 ? <cursor /> : ''}
+              </text>
             </paragraph>
           </paragraph>
         </quote>

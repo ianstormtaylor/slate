@@ -4,7 +4,12 @@
 const h = require('../../helpers/h')
 
 module.exports.default = function(change) {
-  change.insertNodeByKey('a', 0, <paragraph>Hello world</paragraph>)
+  change
+    .insertNodeByKey('a', 0, <paragraph>Hello world</paragraph>)
+    .insertNodeByKey('a', 1, <paragraph>Hello world</paragraph>)
+    .insertNodeByKey('a', 2, <paragraph>Hello world</paragraph>)
+    .insertNodeByKey('a', 3, <paragraph>Hello world</paragraph>)
+    .insertNodeByKey('a', 4, <paragraph>Hello world</paragraph>)
 }
 
 const value = (
