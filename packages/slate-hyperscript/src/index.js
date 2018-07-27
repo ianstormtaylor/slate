@@ -201,18 +201,17 @@ const CREATORS = {
       )
     }
 
-    if (!isEmpty(props)) {
-      selection = selection.merge(props).normalize(document)
-    }
-
     let value = Value.fromJSON({ data, document, selection }, { normalize })
 
-    // apply any decorations built
+    if (!isEmpty(props)) {
+      selection = selection.merge(props).normalize(value.document)
+      value = value.set('selection', selection)
+    }
+
     if (decorations.length > 0) {
-      value = value
-        .change()
-        .setValue({ decorations: decorations.map(d => d.normalize(document)) })
-        .value
+      decorations = decorations.map(d => d.normalize(value.document))
+      decorations = Range.createList(decorations)
+      value = value.set('decorations', decorations)
     }
 
     return value

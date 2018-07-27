@@ -4,7 +4,7 @@ import h from '../..'
 
 export const input = (
   <document>
-    <block type="paragraph">Single block</block>
+    <block type="paragraph">word</block>
   </document>
 )
 
@@ -23,7 +23,7 @@ export const output = {
           leaves: [
             {
               object: 'leaf',
-              text: 'Single block',
+              text: 'word',
               marks: [],
             },
           ],

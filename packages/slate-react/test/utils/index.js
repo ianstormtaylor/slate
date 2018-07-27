@@ -1,21 +1,7 @@
-/**
- * Dependencies.
- */
+import { KeyUtils } from 'slate'
 
-import { resetKeyGenerator } from 'slate'
-
-/**
- * Tests.
- */
+beforeEach(KeyUtils.resetGenerator)
 
 describe('utils', () => {
   require('./get-children-decorations')
-})
-
-/**
- * Reset Slate's internal state before each text.
- */
-
-beforeEach(() => {
-  resetKeyGenerator()
 })

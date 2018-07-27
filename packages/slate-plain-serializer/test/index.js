@@ -1,24 +1,10 @@
-/**
- * Dependencies.
- */
-
 import Plain from '..'
 import assert from 'assert'
 import fs from 'fs'
-import { Value, resetKeyGenerator } from 'slate'
+import { Value, KeyUtils } from 'slate'
 import { basename, extname, resolve } from 'path'
 
-/**
- * Reset Slate's internal key generator state before each text.
- */
-
-beforeEach(() => {
-  resetKeyGenerator()
-})
-
-/**
- * Tests.
- */
+beforeEach(KeyUtils.resetGenerator)
 
 describe('slate-plain-serializer', () => {
   describe('deserialize()', () => {
