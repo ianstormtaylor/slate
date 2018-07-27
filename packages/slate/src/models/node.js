@@ -2028,7 +2028,7 @@ class Node {
    * An `index` can be provided, in which case paths created from a key string
    * will have the index pushed onto them. This is helpful in cases where you
    * want to accept either a `path` or a `key, index` combination for targeting
-   * a location in the tree that doesn't existing yet, like when inserting.
+   * a location in the tree that doesn't exist yet, like when inserting.
    *
    * @param {List|String} value
    * @param {Number} index
@@ -2126,21 +2126,6 @@ class Node {
 
   validate(schema) {
     return schema.validateNode(this)
-  }
-
-  /**
-   * TODO: remove this
-   */
-
-  updateNode(node) {
-    if (node.key === this.key) {
-      return node
-    }
-
-    this.assertDescendant(node.key)
-    const path = this.getPath(node.key).flatMap(x => List(['nodes', x]))
-    const ret = this.setIn(path, node)
-    return ret
   }
 
   /**
