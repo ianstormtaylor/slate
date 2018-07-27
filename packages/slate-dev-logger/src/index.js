@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 
 /**
- * Is deprecate interface forbid?
+ * Is deprecate interface forbidden?
  */
 
 const FORBID_DEPRECATE =
