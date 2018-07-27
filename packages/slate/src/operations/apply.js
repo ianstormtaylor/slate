@@ -453,7 +453,7 @@ const APPLIERS = {
         focusPath === null ? null : document.assertPath(focusPath).key
     }
 
-    selection = selection.merge(props)
+    selection = selection.loadProps(props)
     selection = selection.normalize(document)
     value = value.set('selection', selection)
     return value

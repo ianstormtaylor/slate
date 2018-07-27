@@ -19,6 +19,7 @@ const MODEL_TYPES = {
   STACK: '@@__SLATE_STACK__@@',
   TEXT: '@@__SLATE_TEXT__@@',
   VALUE: '@@__SLATE_VALUE__@@',
+  POINT: '@@__SLATE_POINT__@@',
 }
 
 /**

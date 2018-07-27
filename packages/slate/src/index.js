@@ -11,6 +11,7 @@ import Mark from './models/mark'
 import Node from './models/node'
 import Operation from './models/operation'
 import Operations from './operations'
+import Point from './models/point'
 import Range from './models/range'
 import Schema from './models/schema'
 import Stack from './models/stack'
@@ -39,6 +40,7 @@ export {
   Node,
   Operation,
   Operations,
+  Point,
   Range,
   Schema,
   Stack,
@@ -63,6 +65,7 @@ export default {
   Node,
   Operation,
   Operations,
+  Point,
   Range,
   Schema,
   Stack,

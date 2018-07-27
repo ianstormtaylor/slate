@@ -384,10 +384,7 @@ Changes.deleteBackwardAtRange = (change, range, n = 1, options = {}) => {
     // If we're deleting by one character and the previous text node is not
     // inside the current block, we need to merge the two blocks together.
     if (n == 1 && prevBlock != block) {
-      range = range.merge({
-        anchorKey: prev.key,
-        anchorOffset: prev.text.length,
-      })
+      range = range.moveAnchorTo(prev.key, prev.text.length)
 
       change.deleteAtRange(range, { normalize })
       return
@@ -397,10 +394,7 @@ Changes.deleteBackwardAtRange = (change, range, n = 1, options = {}) => {
   // If the focus offset is farther than the number of characters to delete,
   // just remove the characters backwards inside the current node.
   if (n < focusOffset) {
-    range = range.merge({
-      focusOffset: focusOffset - n,
-      isBackward: true,
-    })
+    range = range.moveFocusOffsetTo(focusOffset - n).set('isBackward', true)
 
     change.deleteAtRange(range, { normalize })
     return
@@ -423,12 +417,7 @@ Changes.deleteBackwardAtRange = (change, range, n = 1, options = {}) => {
     }
   }
 
-  range = range.merge({
-    focusKey: node.key,
-    focusOffset: offset,
-    isBackward: true,
-  })
-
+  range = range.moveFocusTo(node.key, offset).set('isBackward', true)
   change.deleteAtRange(range, { normalize })
 }
 
@@ -560,11 +549,7 @@ Changes.deleteForwardAtRange = (change, range, n = 1, options = {}) => {
     // If we're deleting by one character and the previous text node is not
     // inside the current block, we need to merge the two blocks together.
     if (n == 1 && nextBlock != block) {
-      range = range.merge({
-        focusKey: next.key,
-        focusOffset: 0,
-      })
-
+      range = range.moveFocusTo(next.key, 0)
       change.deleteAtRange(range, { normalize })
       return
     }
@@ -574,10 +559,7 @@ Changes.deleteForwardAtRange = (change, range, n = 1, options = {}) => {
   // to the number of characters to delete, just remove the characters forwards
   // inside the current node.
   if (n <= text.text.length - focusOffset) {
-    range = range.merge({
-      focusOffset: focusOffset + n,
-    })
-
+    range = range.moveFocusOffsetTo(focusOffset + n)
     change.deleteAtRange(range, { normalize })
     return
   }
@@ -606,10 +588,7 @@ Changes.deleteForwardAtRange = (change, range, n = 1, options = {}) => {
     offset = node.text.length
   }
 
-  range = range.merge({
-    focusKey: node.key,
-    focusOffset: offset,
-  })
+  range = range.moveFocusTo(node.key, offset)
 
   change.deleteAtRange(range, { normalize })
 }

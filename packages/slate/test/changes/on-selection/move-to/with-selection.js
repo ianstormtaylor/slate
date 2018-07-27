@@ -5,7 +5,7 @@ import h from '../../../helpers/h'
 export default function(change) {
   const { value } = change
   const { selection, startText } = value
-  const range = selection.merge({
+  const range = selection.loadProps({
     anchorKey: startText.key,
     anchorOffset: 0,
     focusKey: startText.key,

@@ -202,7 +202,7 @@ const CREATORS = {
     }
 
     if (!isEmpty(props)) {
-      selection = selection.merge(props).normalize(document)
+      selection = selection.loadProps(props).normalize(document)
     }
 
     let value = Value.fromJSON({ data, document, selection }, { normalize })
