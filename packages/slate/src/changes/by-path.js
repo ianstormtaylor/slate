@@ -147,8 +147,8 @@ Changes.insertTextByPath = (change, path, offset, text, marks, options) => {
 Changes.mergeNodeByPath = (change, path, options) => {
   const { value } = change
   const { document } = value
-  const original = document.getDescendantByPath(path)
-  const previous = document.getPreviousSiblingByPath(path)
+  const original = document.getDescendant(path)
+  const previous = document.getPreviousSibling(path)
 
   if (!previous) {
     throw new Error(
@@ -518,7 +518,7 @@ Changes.splitNodeByPath = (change, path, position, options = {}) => {
   const { target = null } = options
   const { value } = change
   const { document } = value
-  const node = document.getDescendantByPath(path)
+  const node = document.getDescendant(path)
 
   change.applyOperation({
     type: 'split_node',
@@ -762,7 +762,7 @@ for (const method of CHANGES) {
   Changes[`${method}ByKey`] = (change, key, ...args) => {
     const { value } = change
     const { document } = value
-    const path = document.assertPathByKey(key)
+    const path = document.assertPath(key)
     change[`${method}ByPath`](path, ...args)
   }
 }
@@ -771,8 +771,8 @@ for (const method of CHANGES) {
 Changes.moveNodeByKey = (change, key, newKey, ...args) => {
   const { value } = change
   const { document } = value
-  const path = document.assertPathByKey(key)
-  const newPath = document.assertPathByKey(newKey)
+  const path = document.assertPath(key)
+  const newPath = document.assertPath(newKey)
   change.moveNodeByPath(path, newPath, ...args)
 }
 
@@ -780,8 +780,8 @@ Changes.moveNodeByKey = (change, key, newKey, ...args) => {
 Changes.splitDescendantsByKey = (change, key, textKey, ...args) => {
   const { value } = change
   const { document } = value
-  const path = document.assertPathByKey(key)
-  const textPath = document.assertPathByKey(textKey)
+  const path = document.assertPath(key)
+  const textPath = document.assertPath(textKey)
   change.splitDescendantsByPath(path, textPath, ...args)
 }
 

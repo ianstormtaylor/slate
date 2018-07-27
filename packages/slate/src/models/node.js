@@ -311,18 +311,21 @@ class Node {
   }
 
   /**
-   * Get a list of the ancestors of a descendant by `path`.
+   * Get a list of the ancestors of a descendant.
    *
-   * @param {List} path
+   * @param {List|String} path
    * @return {List<Node>|Null}
    */
 
-  getAncestorsByPath(path) {
+  getAncestors(path) {
+    path = this.resolvePath(path)
+    if (!path) return null
+
     const ancestors = []
 
     path.forEach((p, i) => {
       const current = path.slice(0, i)
-      const parent = this.getNodeByPath(current)
+      const parent = this.getNode(current)
       ancestors.push(parent)
     })
 
@@ -466,38 +469,40 @@ class Node {
   }
 
   /**
-   * Get a child node by `path`.
+   * Get a child node.
    *
-   * @param {List} path
+   * @param {List|String} path
    * @return {Node|Null}
    */
 
-  getChildByPath(path) {
+  getChild(path) {
+    path = this.resolvePath(path)
+    if (!path) return null
     const child = path.size === 1 ? this.nodes.get(path.first()) : null
     return child
   }
 
   /**
-   * Get the closest block parent of a node by `path`.
+   * Get the closest block parent of a node.
    *
-   * @param {List} path
+   * @param {List|String} path
    * @return {Node|Null}
    */
 
-  getClosestBlockByPath(path) {
-    const closest = this.getClosestByPath(path, n => n.object === 'block')
+  getClosestBlock(path) {
+    const closest = this.getClosest(path, n => n.object === 'block')
     return closest
   }
 
   /**
-   * Get closest parent of node by `path` that matches `iterator`.
+   * Get closest parent of node that matches an `iterator`.
    *
-   * @param {List} path
+   * @param {List|String} path
    * @param {Function} iterator
    * @return {Node|Null}
    */
 
-  getClosestByPath(path, iterator) {
+  getClosest(path, iterator) {
     const ancestors = this.getAncestors(path)
     if (!ancestors) return null
 
@@ -513,24 +518,24 @@ class Node {
   /**
    * Get the closest inline parent of a node by `path`.
    *
-   * @param {List} path
+   * @param {List|String} path
    * @return {Node|Null}
    */
 
-  getClosestInlineByPath(path) {
-    const closest = this.getClosestByPath(path, n => n.object === 'inline')
+  getClosestInline(path) {
+    const closest = this.getClosest(path, n => n.object === 'inline')
     return closest
   }
 
   /**
    * Get the closest void parent of a node by `path`.
    *
-   * @param {List} path
+   * @param {List|String} path
    * @return {Node|Null}
    */
 
-  getClosestVoidByPath(path) {
-    const closest = this.getClosestByPath(path, p => p.isVoid)
+  getClosestVoid(path) {
+    const closest = this.getClosest(path, p => p.isVoid)
     return closest
   }
 
@@ -542,22 +547,14 @@ class Node {
    * @return {Node}
    */
 
-  getCommonAncestorByPath(a, b) {
+  getCommonAncestor(a, b) {
+    a = this.resolvePath(a)
+    b = this.resolvePath(b)
+    if (!a || !b) return null
+
     const path = PathUtils.getCommonAncestor(a, b)
     const node = this.getNode(path)
     return node
-  }
-
-  getCommonAncestorByKey(a, b) {
-    const ap = this.assertPathByKey(a)
-    const bp = this.assertPathByKey(b)
-    return this.getCommonAncestorByPath(ap, bp)
-  }
-
-  getCommonAncestor(a, b) {
-    return typeof a === 'string'
-      ? this.getCommonAncestorByKey(a, b)
-      : this.getCommonAncestorByPath(a, b)
   }
 
   /**
@@ -574,27 +571,33 @@ class Node {
   }
 
   /**
-   * Get the depth of a child node by `path`, with optional `startAt`.
+   * Get the depth of a descendant, with optional `startAt`.
    *
-   * @param {List} path
+   * @param {List|String} path
    * @param {Number} startAt
    * @return {Number|Null}
    */
 
-  getDepthByPath(path, startAt = 1) {
-    const node = this.getNodeByPath(path)
+  getDepth(path, startAt = 1) {
+    path = this.resolvePath(path)
+    if (!path) return null
+
+    const node = this.getNode(path)
     const depth = node ? path.size - 1 + startAt : null
     return depth
   }
 
   /**
-   * Get a descendant by `path`.
+   * Get a descendant node.
    *
-   * @param {Array} path
+   * @param {List|String} path
    * @return {Node|Null}
    */
 
-  getDescendantByPath(path) {
+  getDescendant(path) {
+    path = this.resolvePath(path)
+    if (!path) return null
+
     const array = path.toArray()
     let descendant = this
 
@@ -713,39 +716,41 @@ class Node {
   }
 
   /**
-   * Get the furthest ancestor of a node by `path`.
+   * Get the furthest ancestor of a node.
    *
    * @param {Path} path
    * @return {Node|Null}
    */
 
-  getFurthestAncestorByPath(path) {
+  getFurthestAncestor(path) {
+    path = this.resolvePath(path)
+    if (!path) return null
     const furthest = path.size ? this.nodes.get(path.first()) : null
     return furthest
   }
 
   /**
-   * Get the furthest block parent of a node by `path`.
+   * Get the furthest block parent of a node.
    *
    * @param {Path} path
    * @return {Node|Null}
    */
 
-  getFurthestBlockByPath(path) {
-    const furthest = this.getFurthestByPath(path, n => n.object === 'block')
+  getFurthestBlock(path) {
+    const furthest = this.getFurthest(path, n => n.object === 'block')
     return furthest
   }
 
   /**
-   * Get the furthest parent of a node by `path` that matches an `iterator`.
+   * Get the furthest parent of a node that matches an `iterator`.
    *
    * @param {Path} path
    * @param {Function} iterator
    * @return {Node|Null}
    */
 
-  getFurthestByPath(path, iterator) {
-    const ancestors = this.getAncestorsByPath(path)
+  getFurthest(path, iterator) {
+    const ancestors = this.getAncestors(path)
     if (!ancestors) return null
 
     const furthest = ancestors.find((node, ...args) => {
@@ -758,26 +763,26 @@ class Node {
   }
 
   /**
-   * Get the furthest inline parent of a node by `path`.
+   * Get the furthest inline parent of a node.
    *
    * @param {Path} path
    * @return {Node|Null}
    */
 
-  getFurthestInlineByPath(path) {
-    const furthest = this.getFurthestByPath(path, n => n.object === 'inline')
+  getFurthestInline(path) {
+    const furthest = this.getFurthest(path, n => n.object === 'inline')
     return furthest
   }
 
   /**
-   * Get the furthest ancestor of a node by `path` that has only one child.
+   * Get the furthest ancestor of a node that has only one child.
    *
    * @param {Path} path
    * @return {Node|Null}
    */
 
-  getFurthestOnlyChildAncestorByPath(path) {
-    const ancestors = this.getAncestorsByPath(path)
+  getFurthestOnlyChildAncestor(path) {
+    const ancestors = this.getAncestors(path)
     if (!ancestors) return null
 
     const furthest = ancestors
@@ -1084,22 +1089,24 @@ class Node {
   }
 
   /**
-   * Get the next node from a node by `path`.
+   * Get the next node in the tree from a node.
    *
    * This will not only check for siblings but instead move up the tree
    * returning the next ancestor if no sibling is found.
    *
-   * @param {List} path
+   * @param {List|String} path
    * @return {Node|Null}
    */
 
-  getNextNodeByPath(path) {
+  getNextNode(path) {
+    path = this.resolvePath(path)
+    if (!path) return null
     if (!path.size) return null
 
     for (let i = path.size; i > 0; i--) {
       const p = path.slice(0, i)
       const target = PathUtils.increment(p)
-      const node = this.getNodeByPath(target)
+      const node = this.getNode(target)
       if (node) return node
     }
 
@@ -1107,43 +1114,49 @@ class Node {
   }
 
   /**
-   * Get the next sibling of a node by `path`.
+   * Get the next sibling of a node.
    *
-   * @param {List} path
+   * @param {List|String} path
    * @return {Node|Null}
    */
 
-  getNextSiblingByPath(path) {
+  getNextSibling(path) {
+    path = this.resolvePath(path)
+    if (!path) return null
     if (!path.size) return null
     const p = PathUtils.increment(path)
-    const sibling = this.getNodeByPath(p)
+    const sibling = this.getNode(p)
     return sibling
   }
 
   /**
-   * Get the text node after a descendant text node by `path`.
+   * Get the text node after a descendant text node.
    *
-   * @param {List} path
+   * @param {List|String} path
    * @return {Node|Null}
    */
 
-  getNextTextByPath(path) {
+  getNextText(path) {
+    path = this.resolvePath(path)
+    if (!path) return null
     if (!path.size) return null
-    const next = this.getNextNodeByPath(path)
+    const next = this.getNextNode(path)
     if (!next) return null
     const text = next.getFirstText()
     return text
   }
 
   /**
-   * Get a node in the tree by `path`.
+   * Get a node in the tree.
    *
-   * @param {List} path
+   * @param {List|String} path
    * @return {Node|Null}
    */
 
-  getNodeByPath(path) {
-    const node = path.size ? this.getDescendantByPath(path) : this
+  getNode(path) {
+    path = this.resolvePath(path)
+    if (!path) return null
+    const node = path.size ? this.getDescendant(path) : this
     return node
   }
 
@@ -1278,27 +1291,32 @@ class Node {
   }
 
   /**
-   * Get the parent of a child node by `key`.
+   * Get the parent of a descendant node.
    *
-   * @param {String} key
+   * @param {List|String} path
    * @return {Node|Null}
    */
 
-  getParentByPath(path) {
+  getParent(path) {
+    path = this.resolvePath(path)
+    if (!path) return null
     if (!path.size) return null
     const parentPath = PathUtils.getParent(path)
-    const parent = this.getNodeByPath(parentPath)
+    const parent = this.getNode(parentPath)
     return parent
   }
 
   /**
-   * Find the path to a node by `key`.
+   * Find the path to a node.
    *
-   * @param {String} key
+   * @param {String|List} key
    * @return {List}
    */
 
-  getPathByKey(key) {
+  getPath(key) {
+    // Handle the case of passing in a path directly, to match other methods.
+    if (List.isList(key)) return key
+
     const dict = this.getKeysToPathsTable()
     const path = dict[key]
     return path ? List(path) : null
@@ -1330,16 +1348,18 @@ class Node {
   }
 
   /**
-   * Get the previous node from a node by `path`.
+   * Get the previous node from a node in the tree.
    *
    * This will not only check for siblings but instead move up the tree
    * returning the previous ancestor if no sibling is found.
    *
-   * @param {List} path
+   * @param {List|String} path
    * @return {Node|Null}
    */
 
-  getPreviousNodeByPath(path) {
+  getPreviousNode(path) {
+    path = this.resolvePath(path)
+    if (!path) return null
     if (!path.size) return null
 
     for (let i = path.size; i > 0; i--) {
@@ -1347,7 +1367,7 @@ class Node {
       if (p.last() === 0) continue
 
       const target = PathUtils.decrement(p)
-      const node = this.getNodeByPath(target)
+      const node = this.getNode(target)
       if (node) return node
     }
 
@@ -1355,30 +1375,34 @@ class Node {
   }
 
   /**
-   * Get the previous sibling of a node by `path`.
+   * Get the previous sibling of a node.
    *
-   * @param {List} path
+   * @param {List|String} path
    * @return {Node|Null}
    */
 
-  getPreviousSiblingByPath(path) {
+  getPreviousSibling(path) {
+    path = this.resolvePath(path)
+    if (!path) return null
     if (!path.size) return null
     if (path.last() === 0) return null
     const p = PathUtils.decrement(path)
-    const sibling = this.getNodeByPath(p)
+    const sibling = this.getNode(p)
     return sibling
   }
 
   /**
-   * Get the text node after a descendant text node by `path`.
+   * Get the text node after a descendant text node.
    *
-   * @param {List} path
+   * @param {List|String} path
    * @return {Node|Null}
    */
 
-  getPreviousTextByPath(path) {
+  getPreviousText(path) {
+    path = this.resolvePath(path)
+    if (!path) return null
     if (!path.size) return null
-    const previous = this.getPreviousNodeByPath(path)
+    const previous = this.getPreviousNode(path)
     if (!previous) return null
     const text = previous.getLastText()
     return text
@@ -1584,14 +1608,14 @@ class Node {
   }
 
   /**
-   * Check if a child node exists by `path`.
+   * Check if a child node exists.
    *
-   * @param {List} path
+   * @param {List|String} path
    * @return {Boolean}
    */
 
-  hasChildByPath(path) {
-    const child = this.getChildByPath(path)
+  hasChild(path) {
+    const child = this.getChild(path)
     return !!child
   }
 
@@ -1609,38 +1633,38 @@ class Node {
   }
 
   /**
-   * Recursively check if a child node exists by `path`.
+   * Recursively check if a child node exists.
    *
-   * @param {List} path
+   * @param {List|String} path
    * @return {Boolean}
    */
 
-  hasDescendantByPath(path) {
-    const descendant = this.getDescendantByPath(path)
+  hasDescendant(path) {
+    const descendant = this.getDescendant(path)
     return !!descendant
   }
 
   /**
-   * Recursively check if a node exists by `path`.
+   * Recursively check if a node exists.
    *
-   * @param {List} path
+   * @param {List|String} path
    * @return {Boolean}
    */
 
-  hasNodeByPath(path) {
-    const node = this.getNodeByPath(path)
+  hasNode(path) {
+    const node = this.getNode(path)
     return !!node
   }
 
   /**
-   * Check if a node has a void parent by `path`.
+   * Check if a node has a void parent.
    *
-   * @param {List} path
+   * @param {List|String} path
    * @return {Boolean}
    */
 
-  hasVoidParentByPath(path) {
-    const closest = this.getClosestVoidByPath(path)
+  hasVoidParent(path) {
+    const closest = this.getClosestVoid(path)
     return !!closest
   }
 
@@ -1833,13 +1857,13 @@ class Node {
    * Attempt to "refind" a node by a previous `path`, falling back to looking
    * it up by `key` again.
    *
-   * @param {Array} path
+   * @param {List|String} path
    * @param {String} key
    * @return {Node|Null}
    */
 
   refindNode(path, key) {
-    const node = this.getDescendantByPath(path)
+    const node = this.getDescendant(path)
     return node && node.key === key ? node : this.getDescendant(key)
   }
 
@@ -1847,14 +1871,14 @@ class Node {
    * Attempt to "refind" the path to a node by a previous `path`, falling back
    * to looking it up by `key`.
    *
-   * @param {List} path
+   * @param {List|String} path
    * @param {String} key
    * @return {List|Null}
    */
 
   refindPath(path, key) {
-    const node = this.getDescendantByPath(path)
-    return node && node.key === key ? path : this.getPathByKey(key)
+    const node = this.getDescendant(path)
+    return node && node.key === key ? path : this.getPath(key)
   }
 
   /**
@@ -1909,6 +1933,18 @@ class Node {
     this.assertDescendant(path)
     const deep = path.flatMap(x => List(['nodes', x]))
     const ret = this.deleteIn(deep)
+    return ret
+  }
+
+  /**
+   * Resolve a path from a path list or key string.
+   *
+   * @param {List|String} value
+   * @return {List}
+   */
+
+  resolvePath(path) {
+    const ret = typeof path === 'string' ? this.getPath(path) : path
     return ret
   }
 
@@ -1996,7 +2032,7 @@ class Node {
     }
 
     this.assertDescendant(node.key)
-    const path = this.getPathByKey(node.key).flatMap(x => List(['nodes', x]))
+    const path = this.getPath(node.key).flatMap(x => List(['nodes', x]))
     const ret = this.setIn(path, node)
     return ret
   }
@@ -2005,39 +2041,22 @@ class Node {
    * Deprecated.
    */
 
-  assertPath(path) {
-    logger.deprecate(
-      `0.35.0`,
-      'The `Node.assertPath` method is deprecated. Use the `Node.assertNode` method which takes a key or a path instead.'
-    )
-
-    return this.assertNodeByPath(path)
-  }
-
-  getPath(key) {
-    logger.deprecate(
-      `0.35.0`,
-      'The `Node.getPath` method has been renamed to `Node.getPathByKey`.'
-    )
-    return this.getPathByKey(key)
-  }
-
   getNodeAtPath(path) {
     logger.deprecate(
       `0.35.0`,
-      'The `Node.getNodeAtPath` method has been renamed to `Node.getNodeByPath`.'
+      'The `Node.getNodeAtPath` method has been combined into `Node.getNode`.'
     )
 
-    return this.getNodeByPath(path)
+    return this.getNode(path)
   }
 
   getDescendantAtPath(path) {
     logger.deprecate(
       `0.35.0`,
-      'The `Node.getDescendantAtPath` has been renamed to `Node.getDescendantByPath`.'
+      'The `Node.getDescendantAtPath` has been combined into `Node.getDescendant`.'
     )
 
-    return this.getDescendantByPath(path)
+    return this.getDescendant(path)
   }
 
   getKeys() {
@@ -2084,90 +2103,20 @@ class Node {
 }
 
 /**
- * Mix in key-handling methods.
- */
-
-const BY_PATHS = [
-  'getAncestors',
-  'getChild',
-  'getClosest',
-  'getClosestBlock',
-  'getClosestInline',
-  'getClosestVoid',
-  'getDescendant',
-  'getDepth',
-  'getFurthest',
-  'getFurthestAncestor',
-  'getFurthestBlock',
-  'getFurthestInline',
-  'getFurthestOnlyChildAncestor',
-  'getNextSibling',
-  'getNextText',
-  'getNode',
-  'getPreviousSibling',
-  'getPreviousText',
-  'getParent',
-  'hasChild',
-  'hasDescendant',
-  'hasNode',
-  'hasVoidParent',
-]
-
-for (const method of BY_PATHS) {
-  Node.prototype[method] = function(keyOrPath, ...args) {
-    return typeof keyOrPath === 'string'
-      ? this[`${method}ByKey`](keyOrPath, ...args)
-      : this[`${method}ByPath`](keyOrPath, ...args)
-  }
-
-  Node.prototype[`${method}ByKey`] = function(key, ...args) {
-    key = KeyUtils.assert(key)
-    const path = this.getPathByKey(key)
-    if (!path) return null
-    return this[`${method}ByPath`](path, ...args)
-  }
-}
-
-/**
  * Mix in assertion variants.
  */
 
 const ASSERTS = ['Child', 'Depth', 'Descendant', 'Node', 'Parent', 'Path']
 
 for (const method of ASSERTS) {
-  Node.prototype[`assert${method}`] = function(keyOrPath, ...args) {
-    return typeof keyOrPath === 'string'
-      ? this[`assert${method}ByKey`](keyOrPath, ...args)
-      : this[`assert${method}ByPath`](keyOrPath, ...args)
-  }
+  Node.prototype[`assert${method}`] = function(...args) {
+    const ret = this[`get${method}`](...args)
 
-  if (Node.prototype[`get${method}ByPath`]) {
-    Node.prototype[`assert${method}ByPath`] = function(path, ...args) {
-      const ret = this[`get${method}ByPath`](path, ...args)
-
-      if (ret == null) {
-        throw new Error(
-          `\`assert${method}ByKey\` could not find a node by path: ${path}`
-        )
-      }
-
-      return ret
+    if (ret == null) {
+      throw new Error(`\`Node.assert${method}\` could not find node: ${path}`)
     }
-  }
 
-  if (Node.prototype[`get${method}ByKey`]) {
-    Node.prototype[`assert${method}ByKey`] = function(key, ...args) {
-      const ret = this[`get${method}ByKey`](key, ...args)
-
-      if (ret == null) {
-        key = KeyUtils.assert(key)
-        throw new Error(
-          `\`assert${method}ByKey\` could not find a node by key: ${key}`
-        )
-      }
-
-      return ret
-    }
+    return ret
   }
 }
 
@@ -2189,7 +2138,6 @@ memoize(Node.prototype, [
   'getDecorations',
   'getDepth',
   'getDescendant',
-  'getDescendantByPath',
   'getFirstText',
   'getFragmentAtRange',
   'getFurthestBlock',
@@ -2211,7 +2159,6 @@ memoize(Node.prototype, [
   'getNextSibling',
   'getNextText',
   'getNode',
-  'getNodeByPath',
   'getOffset',
   'getOffsetAtRange',
   'getParent',

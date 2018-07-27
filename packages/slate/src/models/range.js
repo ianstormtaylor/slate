@@ -812,12 +812,8 @@ class Range extends Record(DEFAULTS) {
     }
 
     // Get the anchor and focus nodes.
-    let anchorNode = anchorKey
-      ? node.getDescendant(anchorKey)
-      : node.getNodeByPath(anchorPath)
-    let focusNode = focusKey
-      ? node.getDescendant(focusKey)
-      : node.getNodeByPath(focusPath)
+    let anchorNode = node.getNode(anchorKey || anchorPath)
+    let focusNode = node.getNode(focusKey || focusPath)
 
     // If the range is malformed, warn and zero it out.
     if (!anchorNode || !focusNode) {
@@ -827,7 +823,7 @@ class Range extends Record(DEFAULTS) {
       )
 
       const first = node.getFirstText()
-      const path = first && node.getPathByKey(first.key)
+      const path = first && node.getPath(first.key)
       return range.merge({
         anchorKey: first ? first.key : null,
         anchorOffset: 0,
@@ -867,8 +863,8 @@ class Range extends Record(DEFAULTS) {
 
     anchorKey = anchorNode.key
     focusKey = focusNode.key
-    anchorPath = node.getPathByKey(anchorKey)
-    focusPath = node.getPathByKey(focusKey)
+    anchorPath = node.getPath(anchorKey)
+    focusPath = node.getPath(focusKey)
 
     // If `isBackward` is not set, derive it.
     if (isBackward == null) {

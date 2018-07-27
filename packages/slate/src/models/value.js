@@ -818,7 +818,7 @@ class Value extends Record(DEFAULTS) {
     const node = document.assertNode(path)
 
     // Remove the node from its current parent.
-    let parent = document.getParentByPath(path)
+    let parent = document.getParent(path)
     parent = parent.removeNode(oldIndex)
     document = document.updateNodeByPath(oldParentPath, parent)
 
