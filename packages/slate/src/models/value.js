@@ -669,26 +669,29 @@ class Value extends Record(DEFAULTS) {
   change(attrs = {}) {
     return new Change({ ...attrs, value: this })
   }
+
   /**
    * Add mark to text at `offset` and `length` in node by `path`.
    *
-   * @param {Value} value
-   * @param {Operation} operation
+   * @param {List|String} path
+   * @param {Number} offset
+   * @param {Number} length
+   * @param {Mark} mark
    * @return {Value}
    */
 
   addMark(path, offset, length, mark) {
     let value = this
     let { document } = value
-    document = document.addMarkByPath(path, offset, length, mark)
+    document = document.addMark(path, offset, length, mark)
     value = this.set('document', document)
     return value
   }
 
   /**
-   * Insert a `node` at `path`.
+   * Insert a `node`.
    *
-   * @param {List} path
+   * @param {List|String} path
    * @param {Node} node
    * @return {Value}
    */
@@ -696,7 +699,7 @@ class Value extends Record(DEFAULTS) {
   insertNode(path, node) {
     let value = this
     let { document } = value
-    document = document.insertNodeByPath(path, node)
+    document = document.insertNode(path, node)
     value = value.set('document', document)
 
     value = value.mapRanges(range => {
@@ -709,20 +712,21 @@ class Value extends Record(DEFAULTS) {
   /**
    * Insert `text` at `offset` in node by `path`.
    *
-   * @param {Value} value
-   * @param {Operation} operation
+   * @param {List|String} path
+   * @param {Number} offset
+   * @param {String} text
+   * @param {Set} marks
    * @return {Value}
    */
 
   insertText(path, offset, text, marks) {
     let value = this
     let { document } = value
-    let node = document.assertNode(path)
-    node = node.insertText(offset, text, marks)
-    document = document.updateNodeByPath(path, node)
+    document = document.insertText(path, offset, text, marks)
     value = value.set('document', document)
 
     // Update any ranges that were affected.
+    const node = document.assertNode(path)
     value = value.clearAtomicRanges(node.key, offset)
 
     value = value.mapRanges(range => {
@@ -757,28 +761,21 @@ class Value extends Record(DEFAULTS) {
   }
 
   /**
-   * Merge a node at `path` with the previous node.
+   * Merge a node backwards its previous sibling.
    *
-   * @param {Value} value
-   * @param {Operation} operation
+   * @param {List|Key} path
    * @return {Value}
    */
 
   mergeNode(path) {
     let value = this
-    const withPath = PathUtils.decrement(path)
     let { document } = value
-    const one = document.assertNode(withPath)
-    const two = document.assertNode(path)
-    const parentPath = PathUtils.getParent(path)
-    let parent = document.getNode(parentPath)
-    const oneIndex = PathUtils.getIndex(withPath)
-    const twoIndex = PathUtils.getIndex(path)
-
-    // Perform the merge in the document.
-    parent = parent.mergeNode(oneIndex, twoIndex)
-    document = document.updateNodeByPath(parentPath, parent)
-    value = value.set('document', document)
+    const newDocument = document.mergeNode(path)
+    path = document.resolvePath(path)
+    const withPath = PathUtils.decrement(path)
+    const one = document.getNode(withPath)
+    const two = document.getNode(path)
+    value = value.set('document', newDocument)
 
     value = value.mapRanges(range => {
       if (two.object === 'text') {
@@ -803,47 +800,19 @@ class Value extends Record(DEFAULTS) {
   /**
    * Move a node by `path` to `newPath`.
    *
-   * @param {Value} value
-   * @param {Operation} operation
+   * A `newIndex` can be provided when move nodes by `key`, to account for not
+   * being able to have a key for a location in the tree that doesn't exist yet.
+   *
+   * @param {List|Key} path
+   * @param {List|Key} newPath
+   * @param {Number} newIndex
    * @return {Value}
    */
 
-  moveNode(path, newPath) {
+  moveNode(path, newPath, newIndex = 0) {
     let value = this
-    const newIndex = PathUtils.getIndex(newPath)
-    let newParentPath = PathUtils.getParent(newPath)
-    const oldParentPath = PathUtils.getParent(path)
-    const oldIndex = PathUtils.getIndex(path)
     let { document } = value
-    const node = document.assertNode(path)
-
-    // Remove the node from its current parent.
-    let parent = document.getParent(path)
-    parent = parent.removeNode(oldIndex)
-    document = document.updateNodeByPath(oldParentPath, parent)
-
-    // Find the new target...
-    let target
-
-    // If the old path and the rest of the new path are the same, then the new
-    // target is the old parent.
-    if (oldParentPath.equals(newParentPath)) {
-      target = parent
-    } else if (
-      oldParentPath.every((x, i) => x === newParentPath.get(i)) &&
-      oldIndex < newParentPath.get(oldParentPath.size)
-    ) {
-      newParentPath = PathUtils.decrement(newParentPath, 1, oldParentPath.size)
-      target = document.assertNode(newParentPath)
-    } else {
-      // Otherwise, we can just grab the target normally...
-      target = document.assertNode(newParentPath)
-    }
-
-    // Insert the new node to its new parent.
-    if (!node) debugger
-    target = target.insertNode(newIndex, node)
-    document = document.updateNodeByPath(newParentPath, target)
+    document = document.moveNode(path, newPath, newIndex)
     value = value.set('document', document)
 
     value = value.mapRanges(range => {
@@ -854,9 +823,9 @@ class Value extends Record(DEFAULTS) {
   }
 
   /**
-   * Remove mark from text at `offset` and `length` in node by `path`.
+   * Remove mark from text at `offset` and `length` in node.
    *
-   * @param {List} path
+   * @param {List|String} path
    * @param {Number} offset
    * @param {Number} length
    * @param {Mark} mark
@@ -866,7 +835,7 @@ class Value extends Record(DEFAULTS) {
   removeMark(path, offset, length, mark) {
     let value = this
     let { document } = value
-    document = document.removeMarkByPath(path, offset, length, mark)
+    document = document.removeMark(path, offset, length, mark)
     value = this.set('document', document)
     return value
   }
@@ -874,8 +843,7 @@ class Value extends Record(DEFAULTS) {
   /**
    * Remove a node by `path`.
    *
-   * @param {Value} value
-   * @param {Operation} operation
+   * @param {List|String} path
    * @return {Value}
    */
 
@@ -888,11 +856,9 @@ class Value extends Record(DEFAULTS) {
     const prev = document.getPreviousText(first.key)
     const next = document.getNextText(last.key)
 
-    // Remove the node from the document.
-    document = document.removeNodeByPath(path)
+    document = document.removeNode(path)
     value = value.set('document', document)
 
-    // Update the ranges in case they referenced the removed node.
     value = value.mapRanges(range => {
       const { startKey, endKey } = range
       if (node.hasNode(startKey)) {
@@ -917,24 +883,21 @@ class Value extends Record(DEFAULTS) {
   /**
    * Remove `text` at `offset` in node by `path`.
    *
-   * @param {Value} value
-   * @param {Operation} operation
+   * @param {List|Key} path
+   * @param {Number} offset
+   * @param {String} text
    * @return {Value}
    */
 
   removeText(path, offset, text) {
     let value = this
-    const { length } = text
-    const rangeOffset = offset + length
     let { document } = value
-
-    // Remove the text from the node and update the document.
-    let node = document.assertNode(path)
-    node = node.removeText(offset, length)
-    document = document.updateNodeByPath(path, node)
+    document = document.removeText(path, offset, text)
     value = value.set('document', document)
 
-    // Update any rnages that might be affected.
+    const node = document.assertNode(path)
+    const { length } = text
+    const rangeOffset = offset + length
     value = value.clearAtomicRanges(node.key, offset, offset + length)
 
     value = value.mapRanges(range => {
@@ -969,37 +932,36 @@ class Value extends Record(DEFAULTS) {
   }
 
   /**
-   * Set `properties` on a node by `path`.
+   * Set `properties` on a node.
    *
-   * @param {Value} value
-   * @param {Operation} operation
+   * @param {List|String} path
+   * @param {Object} properties
    * @return {Value}
    */
 
   setNode(path, properties) {
     let value = this
     let { document } = value
-    let node = document.assertNode(path)
-    node = node.merge(properties)
-    document = document.updateNodeByPath(path, node)
+    document = document.setNode(path, properties)
     value = value.set('document', document)
     return value
   }
 
   /**
-   * Set `properties` on mark on text at `offset` and `length` in node by `path`.
+   * Set `properties` on `mark` on text at `offset` and `length` in node.
    *
-   * @param {Value} value
-   * @param {Operation} operation
+   * @param {List|String} path
+   * @param {Number} offset
+   * @param {Number} length
+   * @param {Mark} mark
+   * @param {Object} properties
    * @return {Value}
    */
 
   setMark(path, offset, length, mark, properties) {
     let value = this
     let { document } = value
-    let node = document.assertNode(path)
-    node = node.updateMark(offset, length, mark, properties)
-    document = document.updateNodeByPath(path, node)
+    document = document.setMark(path, offset, length, mark, properties)
     value = value.set('document', document)
     return value
   }
@@ -1022,39 +984,24 @@ class Value extends Record(DEFAULTS) {
   }
 
   /**
-   * Split a node by `path` at `offset`.
+   * Split a node by `path` at `position` with optional `properties` to apply
+   * to the newly split node.
    *
-   * @param {Value} value
-   * @param {Operation} operation
+   * @param {List|String} path
+   * @param {Number} position
+   * @param {Object} properties
    * @return {Value}
    */
 
   splitNode(path, position, properties) {
     let value = this
-    let { document } = value
-
-    // Split the node by its parent.
+    const { document } = value
+    const newDocument = document.splitNode(path, position, properties)
     const node = document.assertNode(path)
-    const index = path.last()
-    const parentPath = PathUtils.getParent(path)
-    let parent = document.getNode(parentPath)
-    parent = parent.splitNode(index, position)
+    value = value.set('document', newDocument)
 
-    // Update the properties on the new node if needed.
-    if (properties && node.object !== 'text') {
-      const p = List([index + 1])
-      let newNode = parent.getNode(p)
-      newNode = newNode.merge(properties)
-      parent = parent.updateNodeByPath(p, newNode)
-    }
-
-    // Update the node in the document.
-    document = document.updateNodeByPath(parentPath, parent)
-    value = value.set('document', document)
-
-    // Update any ranges that were affected.
     value = value.mapRanges(range => {
-      const next = document.getNextText(node.key)
+      const next = newDocument.getNextText(node.key)
       const { startKey, startOffset, endKey, endOffset } = range
 
       // If the start was after the split, move it to the next node.

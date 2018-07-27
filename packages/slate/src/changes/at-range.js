@@ -743,7 +743,7 @@ Changes.insertFragmentAtRange = (change, range, fragment, options = {}) => {
     )
     const lonelyChild = lonelyParent || firstBlock
     const startIndex = parent.nodes.indexOf(startBlock)
-    fragment = fragment.removeDescendant(lonelyChild.key)
+    fragment = fragment.removeNode(lonelyChild.key)
 
     fragment.nodes.forEach((node, i) => {
       const newIndex = startIndex + i + 1
