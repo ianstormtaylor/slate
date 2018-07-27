@@ -6,7 +6,7 @@ export const schema = {
   blocks: {
     paragraph: {},
     quote: {
-      last: { types: ['paragraph'] },
+      last: { type: 'paragraph' },
     },
   },
 }

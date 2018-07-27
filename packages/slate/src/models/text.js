@@ -741,10 +741,21 @@ class Text extends Record(DEFAULTS) {
   }
 
   /**
+   * Normalize the text node with a `schema`.
+   *
+   * @param {Schema} schema
+   * @return {Function|Void}
+   */
+
+  normalize(schema) {
+    return schema.normalizeNode(this)
+  }
+
+  /**
    * Validate the text node against a `schema`.
    *
    * @param {Schema} schema
-   * @return {Object|Void}
+   * @return {Error|Void}
    */
 
   validate(schema) {
@@ -802,6 +813,7 @@ memoize(Text.prototype, [
   'getActiveMarks',
   'getMarks',
   'getMarksAsArray',
+  'normalize',
   'validate',
   'getString',
 ])

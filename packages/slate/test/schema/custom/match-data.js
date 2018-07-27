@@ -3,28 +3,24 @@
 import h from '../../helpers/h'
 
 export const schema = {
-  blocks: {
-    paragraph: {},
-    quote: {
-      last: [{ object: 'text' }],
+  rules: [
+    {
+      match: [{ object: 'block', data: { thing: 'value' } }],
+      type: 'quote',
     },
-  },
+  ],
 }
 
 export const input = (
   <value>
     <document>
-      <quote>
-        <paragraph />
-      </quote>
+      <paragraph thing="value" />
     </document>
   </value>
 )
 
 export const output = (
   <value>
-    <document>
-      <quote />
-    </document>
+    <document />
   </value>
 )

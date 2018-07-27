@@ -1,14 +1,14 @@
 /** @jsx h */
 
-import { NODE_MARK_INVALID } from 'slate-schema-violations'
+import { NODE_TEXT_INVALID } from 'slate-schema-violations'
 import h from '../../helpers/h'
 
 export const schema = {
   blocks: {
     paragraph: {
-      marks: [{ type: 'bold' }],
+      text: /^\d*$/,
       normalize: (change, { code, node }) => {
-        if (code == NODE_MARK_INVALID) {
+        if (code == NODE_TEXT_INVALID) {
           node.nodes.forEach(n => change.removeNodeByKey(n.key))
         }
       },
@@ -19,9 +19,7 @@ export const schema = {
 export const input = (
   <value>
     <document>
-      <paragraph>
-        one <i>two</i> three
-      </paragraph>
+      <paragraph>123</paragraph>
     </document>
   </value>
 )
@@ -29,7 +27,7 @@ export const input = (
 export const output = (
   <value>
     <document>
-      <paragraph />
+      <paragraph>123</paragraph>
     </document>
   </value>
 )

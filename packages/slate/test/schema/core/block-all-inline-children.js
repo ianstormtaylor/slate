@@ -7,12 +7,10 @@ export const schema = {}
 export const input = (
   <value>
     <document>
-      <paragraph>
-        <link key="fuck">
-          <paragraph>one</paragraph>
-          two
-        </link>
-      </paragraph>
+      <quote>
+        <link>one</link>
+        <paragraph>two</paragraph>
+      </quote>
     </document>
   </value>
 )
@@ -25,7 +23,7 @@ export const output = {
     nodes: [
       {
         object: 'block',
-        type: 'paragraph',
+        type: 'quote',
         isVoid: false,
         data: {},
         nodes: [
@@ -50,7 +48,7 @@ export const output = {
                 leaves: [
                   {
                     object: 'leaf',
-                    text: 'two',
+                    text: 'one',
                     marks: [],
                   },
                 ],

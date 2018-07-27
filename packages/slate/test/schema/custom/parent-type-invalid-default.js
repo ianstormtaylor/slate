@@ -6,7 +6,7 @@ export const schema = {
   blocks: {
     list: {},
     item: {
-      parent: { types: ['list'] },
+      parent: { type: 'list' },
     },
   },
 }

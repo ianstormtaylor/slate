@@ -2076,10 +2076,21 @@ class Node {
   }
 
   /**
+   * Normalize the node with a `schema`.
+   *
+   * @param {Schema} schema
+   * @return {Function|Void}
+   */
+
+  normalize(schema) {
+    return schema.normalizeNode(this)
+  }
+
+  /**
    * Validate the node against a `schema`.
    *
    * @param {Schema} schema
-   * @return {Function|Null}
+   * @return {Error|Void}
    */
 
   validate(schema) {
@@ -2245,6 +2256,7 @@ memoize(Node.prototype, [
   'getTextsBetweenPositionsAsArray',
   'isLeafBlock',
   'isLeafInline',
+  'normalize',
   'validate',
 ])
 

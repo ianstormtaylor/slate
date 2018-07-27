@@ -3,5 +3,5 @@ import { KeyUtils } from 'slate'
 beforeEach(KeyUtils.resetGenerator)
 
 describe('utils', () => {
-  require('./get-children-decorations')
+  // require('./get-children-decorations')
 })

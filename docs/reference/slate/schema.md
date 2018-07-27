@@ -21,7 +21,11 @@ The top-level properties of a schema give you a way to define validation "rules"
 ```js
 {
   document: {
-    nodes: [{ types: ['paragraph'] }]
+    nodes: [
+      {
+        match: { type: 'paragraph' },
+      },
+    ]
   }
 }
 ```
@@ -36,10 +40,12 @@ A set of validation rules that apply to the top-level document.
 {
   blocks: {
     list: {
-      nodes: [{ types: ['item'] }]
+      nodes: [{
+        match: { type: 'item' }
+      }]
     },
     item: {
-      parent: { types: ['list'] }
+      parent: { type: 'list' }
     },
   }
 }
@@ -56,7 +62,9 @@ A dictionary of blocks by type, each with its own set of validation rules.
   inlines: {
     emoji: {
       isVoid: true,
-      nodes: [{ objects: ['text'] }]
+      nodes: [{
+        match: { object: 'text' }
+      }]
     },
   }
 }
@@ -69,13 +77,14 @@ A dictionary of inlines by type, each with its own set of validation rules.
 ```js
 {
   data: Object,
-  first: Object,
+  first: Object|Array,
   isVoid: Boolean,
-  last: Object,
-  nodes: Array,
+  last: Object|Array,
   marks: Array,
+  match: Object|Array,
+  nodes: Array,
   normalize: Function,
-  parent: Object,
+  parent: Object|Array,
   text: RegExp,
 }
 ```
@@ -89,24 +98,31 @@ Slate schemas are built using a set of validation rules. Each of the properties 
 ```js
 {
   data: {
+    level: 2,
     href: v => isUrl(v),
   }
 }
 ```
 
-A dictionary of data attributes and their corresponding validation functions. The functions should return a boolean indicating whether the data value is valid or not.
+A dictionary of data attributes and their corresponding values or validation functions. The functions should return a boolean indicating whether the data value is valid or not.
 
 ### `first`
 
-`Object`
+`Object|Array`
 
 ```js
 {
-  first: { types: ['quote', 'paragraph'] },
+  first: { type: 'quote' },
 }
 ```
 
-Will validate the first child node. The `first` definition can declare `objects` and `types` properties.
+```js
+{
+  first: [{ type: 'quote' }, { type: 'paragraph' }],
+}
+```
+
+Will validate the first child node against a [`match`](#match).
 
 ### `isVoid`
 
@@ -122,15 +138,21 @@ Will validate a node's `isVoid` property.
 
 ### `last`
 
-`Object`
+`Object|Array`
 
 ```js
 {
-  last: { types: ['quote', 'paragraph'] },
+  last: { type: 'quote' },
 }
 ```
 
-Will validate the last child node. The `last` definition can declare `objects` and `types` properties.
+```js
+{
+  last: [{ type: 'quote' }, { type: 'paragraph' }],
+}
+```
+
+Will validate the last child node against a [`match`](#match).
 
 ### `nodes`
 
@@ -139,13 +161,20 @@ Will validate the last child node. The `last` definition can declare `objects` a
 ```js
 {
   nodes: [
-    { types: ['image', 'video'], min: 1, max: 3 },
-    { types: ['paragraph'], min: 0 },
-  ]
+    {
+      match: [{ type: 'image' }, { type: 'video' }],
+      min: 1,
+      max: 3,
+    },
+    {
+      match: { type: 'paragraph' },
+      min: 0,
+    },
+  ],
 }
 ```
 
-Will validate a node's children. The `nodes` definitions can declare the `objects`, `types`, `min` and `max` properties.
+Will validate a node's children. The `nodes` definitions can declare a [`match`](#match) as well as `min` and `max` properties.
 
 > 🤖 The `nodes` array is order-sensitive! The example above will require that the first node be either an `image` or `video`, and that it be followed by one or more `paragraph` nodes.
 
@@ -167,13 +196,13 @@ Will validate a node's marks. The `marks` definitions can declare the `type` pro
 
 ```js
 {
-  normalize: (change, violation, context) => {
-    switch (violation) {
+  normalize: (change, error) => {
+    switch (error.code) {
       case 'child_object_invalid':
-        change.wrapBlockByKey(context.child.key, 'paragraph')
+        change.wrapBlockByKey(error.child.key, 'paragraph')
         return
       case 'child_type_invalid':
-        change.setNodeByKey(context.child.key, 'paragraph')
+        change.setNodeByKey(error.child.key, 'paragraph')
         return
     }
   }
@@ -182,21 +211,25 @@ Will validate a node's marks. The `marks` definitions can declare the `type` pro
 
 A function that can be provided to override the default behavior in the case of a rule being invalid. By default, Slate will do what it can, but since it doesn't know much about your schema, it will often remove invalid nodes. If you want to override this behavior and "fix" the node instead of removing it, pass a custom `normalize` function.
 
-For more information on the arguments passed to `normalize`, see the [Violations](#violations) section.
+For more information on the arguments passed to `normalize`, see the [Normalizing](#normalizing) section.
 
 ### `parent`
 
-`Array`
+`Object|Array`
 
 ```js
 {
-  parent: {
-    types: ['list']
-  }
+  parent: { type: 'list' },
 }
 ```
 
-Will validate a node's parent. The parent definition can declare the `objects` and/or `types` properties.
+```js
+{
+  parent: [{ type: 'ordered_list' }, { type: 'unordered_list' }],
+}
+```
+
+Will validate a node's parent against a [`match`](#match).
 
 ### `text`
 
@@ -208,7 +241,7 @@ Will validate a node's parent. The parent definition can declare the `objects` a
 }
 ```
 
-Will validate a node's text.
+Will validate a node's text with a regex.
 
 ## Static Methods
 
@@ -238,8 +271,8 @@ Returns a boolean if the passed in argument is a `Schema`.
 
 Returns a JSON representation of the schema.
 
-## Violations
+## Normalizing
 
-When supplying your own `normalize` property for a schema rule, it will be called with `(change, violation, context)`. The `violation` will be one of a set of potential violation strings, and `context` will vary depending on the violation.
+When supplying your own `normalize` property for a schema rule, it will be called with `(change, error)`. The error `code` will be one of a set of potential code strings, and it will contain additional helpful properties depending on the type of error.
 
 A set of the invalid violation strings are available as constants via the [`slate-schema-violations`](../slate-schema-violations/index.md) package.

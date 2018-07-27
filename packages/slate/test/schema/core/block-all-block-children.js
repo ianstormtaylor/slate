@@ -7,12 +7,10 @@ export const schema = {}
 export const input = (
   <value>
     <document>
-      <paragraph>
-        <link key="fuck">
-          <paragraph>one</paragraph>
-          two
-        </link>
-      </paragraph>
+      <quote>
+        <paragraph>one</paragraph>
+        <link>two</link>
+      </quote>
     </document>
   </value>
 )
@@ -25,23 +23,13 @@ export const output = {
     nodes: [
       {
         object: 'block',
-        type: 'paragraph',
+        type: 'quote',
         isVoid: false,
         data: {},
         nodes: [
           {
-            object: 'text',
-            leaves: [
-              {
-                object: 'leaf',
-                text: '',
-                marks: [],
-              },
-            ],
-          },
-          {
-            object: 'inline',
-            type: 'link',
+            object: 'block',
+            type: 'paragraph',
             isVoid: false,
             data: {},
             nodes: [
@@ -50,20 +38,10 @@ export const output = {
                 leaves: [
                   {
                     object: 'leaf',
-                    text: 'two',
+                    text: 'one',
                     marks: [],
                   },
                 ],
-              },
-            ],
-          },
-          {
-            object: 'text',
-            leaves: [
-              {
-                object: 'leaf',
-                text: '',
-                marks: [],
               },
             ],
           },

@@ -42,12 +42,24 @@ Changes.normalizeNodeByKey = (change, key, options = {}) => {
   if (!normalize) return
 
   const { value } = change
-  let { document, schema } = value
+  const { document, schema } = value
   const node = document.assertNode(key)
 
   normalizeNodeAndChildren(change, node, schema)
 
-  document = change.value.document
+  change.normalizeAncestorsByKey(key)
+}
+
+/**
+ * Normalize a node's ancestors by `key`.
+ *
+ * @param {Change} change
+ * @param {String} key
+ */
+
+Changes.normalizeAncestorsByKey = (change, key) => {
+  const { value } = change
+  const { document, schema } = value
   const ancestors = document.getAncestors(key)
   if (!ancestors) return
 
@@ -143,11 +155,11 @@ function normalizeNodeAndChildren(change, node, schema) {
  */
 
 function normalizeNode(change, node, schema) {
-  const max = schema.stack.plugins.length + 1
+  const max = schema.stack.plugins.length + schema.rules.length + 1
   let iterations = 0
 
   function iterate(c, n) {
-    const normalize = n.validate(schema)
+    const normalize = n.normalize(schema)
     if (!normalize) return
 
     // Run the `normalize` function to fix the node.
@@ -162,14 +174,14 @@ function normalizeNode(change, node, schema) {
     path = c.value.document.refindPath(path, n.key)
 
     // Increment the iterations counter, and check to make sure that we haven't
-    // exceeded the max. Without this check, it's easy for the `validate` or
-    // `normalize` function of a schema rule to be written incorrectly and for
-    // an infinite invalid loop to occur.
+    // exceeded the max. Without this check, it's easy for the `normalize`
+    // function of a schema rule to be written incorrectly and for an infinite
+    // invalid loop to occur.
     iterations++
 
     if (iterations > max) {
       throw new Error(
-        'A schema rule could not be validated after sufficient iterations. This is usually due to a `rule.validate` or `rule.normalize` function of a schema being incorrectly written, causing an infinite loop.'
+        'A schema rule could not be normalized after sufficient iterations. This is usually due to a `rule.normalize` or `plugin.normalizeNode` function of a schema being incorrectly written, causing an infinite loop.'
       )
     }
 
