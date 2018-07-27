@@ -1,16 +1,17 @@
 /* eslint-disable no-console */
 
 /**
+ * Is deprecate interface forbid?
+ */
+
+const FORBID_DEPRECATE =
+  process && process.env && process.env.FORBID_DEPRECATIONS
+
+/**
  * Is in development?
  *
  * @type {Boolean}
  */
-
-const FORBID_DEPRECATE =
-  process &&
-  process.env &&
-  process.env.BABEL_ENV === 'test' &&
-  !process.env.ALLOW_DEPRECATE
 
 const IS_DEV =
   typeof process !== 'undefined' &&
