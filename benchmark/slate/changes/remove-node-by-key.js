@@ -4,7 +4,12 @@
 const h = require('../../helpers/h')
 
 module.exports.default = function({ change, text }) {
-  change.removeNodeByKey(text.key)
+  change
+    .removeNodeByKey('T1')
+    .removeNodeByKey('T2')
+    .removeNodeByKey('T3')
+    .removeNodeByKey('T4')
+    .removeNodeByKey('T5')
 }
 
 const value = (
@@ -14,9 +19,11 @@ const value = (
         <quote>
           <paragraph>
             <paragraph>
-              This is editable <b>rich</b> text, <i>much</i> better than a
-              textarea!
-              {i == 0 ? <cursor /> : ''}
+              <text key={`T${i}`}>
+                {i == 0 ? <cursor /> : ''}
+                This is editable <b>rich</b> text, <i>much</i> better than a
+                textarea!
+              </text>
             </paragraph>
           </paragraph>
         </quote>

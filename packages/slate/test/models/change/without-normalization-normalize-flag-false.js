@@ -38,7 +38,9 @@ export const output = (
   <value>
     <document>
       <list>
-        <item />
+        <item>
+          <paragraph />
+        </item>
       </list>
     </document>
   </value>

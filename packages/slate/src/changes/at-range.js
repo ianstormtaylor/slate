@@ -4,7 +4,7 @@ import Block from '../models/block'
 import Inline from '../models/inline'
 import Mark from '../models/mark'
 import Node from '../models/node'
-import String from '../utils/string'
+import TextUtils from '../utils/text-utils'
 
 /**
  * Changes.
@@ -278,7 +278,7 @@ Changes.deleteCharBackwardAtRange = (change, range, options) => {
   const offset = startBlock.getOffset(startKey)
   const o = offset + startOffset
   const { text } = startBlock
-  const n = String.getCharOffsetBackward(text, o)
+  const n = TextUtils.getCharOffsetBackward(text, o)
   change.deleteBackwardAtRange(range, n, options)
 }
 
@@ -318,7 +318,7 @@ Changes.deleteWordBackwardAtRange = (change, range, options) => {
   const offset = startBlock.getOffset(startKey)
   const o = offset + startOffset
   const { text } = startBlock
-  const n = String.getWordOffsetBackward(text, o)
+  const n = TextUtils.getWordOffsetBackward(text, o)
   change.deleteBackwardAtRange(range, n, options)
 }
 
@@ -449,7 +449,7 @@ Changes.deleteCharForwardAtRange = (change, range, options) => {
   const offset = startBlock.getOffset(startKey)
   const o = offset + startOffset
   const { text } = startBlock
-  const n = String.getCharOffsetForward(text, o)
+  const n = TextUtils.getCharOffsetForward(text, o)
   change.deleteForwardAtRange(range, n, options)
 }
 
@@ -489,7 +489,7 @@ Changes.deleteWordForwardAtRange = (change, range, options) => {
   const offset = startBlock.getOffset(startKey)
   const o = offset + startOffset
   const { text } = startBlock
-  const n = String.getWordOffsetForward(text, o)
+  const n = TextUtils.getWordOffsetForward(text, o)
   change.deleteForwardAtRange(range, n, options)
 }
 
@@ -599,13 +599,6 @@ Changes.deleteForwardAtRange = (change, range, n = 1, options = {}) => {
     }
   }
 
-  // If the focus node is inside a void, go up until right before it.
-  if (document.hasVoidParent(node.key)) {
-    const parent = document.getClosestVoid(node.key)
-    node = document.getPreviousText(parent.key)
-    offset = node.text.length
-  }
-
   range = range.merge({
     focusKey: node.key,
     focusOffset: offset,
@@ -635,8 +628,9 @@ Changes.insertBlockAtRange = (change, range, block, options = {}) => {
 
   const { value } = change
   const { document } = value
-  const { startKey, startOffset } = range
+  let { startKey, startOffset } = range
   const startBlock = document.getClosestBlock(startKey)
+  const startInline = document.getClosestInline(startKey)
   const parent = document.getParent(startBlock.key)
   const index = parent.nodes.indexOf(startBlock)
 
@@ -650,6 +644,20 @@ Changes.insertBlockAtRange = (change, range, block, options = {}) => {
   } else if (range.isAtEndOf(startBlock)) {
     change.insertNodeByKey(parent.key, index + 1, block, { normalize })
   } else {
+    if (startInline && startInline.isVoid) {
+      const atEnd = range.isAtEndOf(startInline)
+      const siblingText = atEnd
+        ? document.getNextText(startKey)
+        : document.getPreviousText(startKey)
+
+      const splitRange = atEnd
+        ? range.moveToStartOf(siblingText)
+        : range.moveToEndOf(siblingText)
+
+      startKey = splitRange.startKey
+      startOffset = splitRange.startOffset
+    }
+
     change.splitDescendantsByKey(startBlock.key, startKey, startOffset, {
       normalize: false,
     })
@@ -719,7 +727,7 @@ Changes.insertFragmentAtRange = (change, range, fragment, options = {}) => {
 
   // If the fragment starts or ends with single nested block, (e.g., table),
   // do not merge this fragment with existing blocks.
-  if (fragment.hasBlocks(firstChild.key) || fragment.hasBlocks(lastChild.key)) {
+  if (firstChild.hasBlockChildren() || lastChild.hasBlockChildren()) {
     fragment.nodes.reverse().forEach(node => {
       change.insertBlockAtRange(range, node, options)
     })
@@ -735,7 +743,7 @@ Changes.insertFragmentAtRange = (change, range, fragment, options = {}) => {
     )
     const lonelyChild = lonelyParent || firstBlock
     const startIndex = parent.nodes.indexOf(startBlock)
-    fragment = fragment.removeDescendant(lonelyChild.key)
+    fragment = fragment.removeNode(lonelyChild.key)
 
     fragment.nodes.forEach((node, i) => {
       const newIndex = startIndex + i + 1

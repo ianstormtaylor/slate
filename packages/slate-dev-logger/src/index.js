@@ -1,6 +1,13 @@
 /* eslint-disable no-console */
 
 /**
+ * Is deprecate interface forbidden?
+ */
+
+const FORBID_DEPRECATE =
+  process && process.env && process.env.FORBID_DEPRECATIONS
+
+/**
  * Is in development?
  *
  * @type {Boolean}
@@ -75,6 +82,10 @@ function warn(message, ...args) {
  */
 
 function deprecate(version, message, ...args) {
+  if (FORBID_DEPRECATE) {
+    throw new Error(`Deprecation (${version}): ${message}`)
+  }
+
   log('warn', `Deprecation (${version}): ${message}`, ...args)
 }
 

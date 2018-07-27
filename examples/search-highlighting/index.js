@@ -4,7 +4,7 @@ import { Value } from 'slate'
 import React from 'react'
 import initialValue from './value.json'
 import styled from 'react-emotion'
-import { Toolbar } from '../components'
+import { Icon, Toolbar } from '../components'
 
 /**
  * Some styled components for the search box.
@@ -16,7 +16,7 @@ const SearchWrapper = styled('div')`
   position: relative;
 `
 
-const SearchIcon = styled('icon')`
+const SearchIcon = styled(Icon)`
   position: absolute;
   top: 0.5em;
   left: 0.5em;
@@ -130,7 +130,7 @@ class SearchHighlighting extends React.Component {
             focusKey: key,
             focusOffset: offset,
             marks: [{ type: 'highlight' }],
-            atomic: true,
+            isAtomic: true,
           })
         }
 

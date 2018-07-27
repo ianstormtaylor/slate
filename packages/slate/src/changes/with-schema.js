@@ -1,3 +1,5 @@
+import PathUtils from '../utils/path-utils'
+
 /**
  * Changes.
  *
@@ -12,8 +14,8 @@ const Changes = {}
  * @param {Change} change
  */
 
-Changes.normalize = change => {
-  change.normalizeDocument()
+Changes.normalize = (change, options) => {
+  change.normalizeDocument(options)
 }
 
 /**
@@ -22,10 +24,10 @@ Changes.normalize = change => {
  * @param {Change} change
  */
 
-Changes.normalizeDocument = change => {
+Changes.normalizeDocument = (change, options) => {
   const { value } = change
   const { document } = value
-  change.normalizeNodeByKey(document.key)
+  change.normalizeNodeByKey(document.key, options)
 }
 
 /**
@@ -35,7 +37,10 @@ Changes.normalizeDocument = change => {
  * @param {Node|String} key
  */
 
-Changes.normalizeNodeByKey = (change, key) => {
+Changes.normalizeNodeByKey = (change, key, options = {}) => {
+  const normalize = change.getFlag('normalize', options)
+  if (!normalize) return
+
   const { value } = change
   let { document, schema } = value
   const node = document.assertNode(key)
@@ -51,6 +56,46 @@ Changes.normalizeNodeByKey = (change, key) => {
       normalizeNode(change, ancestor, schema)
     }
   })
+}
+
+Changes.normalizeParentByKey = (change, key, options) => {
+  const { value } = change
+  const { document } = value
+  const parent = document.getParent(key)
+  change.normalizeNodeByKey(parent.key, options)
+}
+
+/**
+ * Normalize a `node` and its children with the value's schema.
+ *
+ * @param {Change} change
+ * @param {Array} path
+ */
+
+Changes.normalizeNodeByPath = (change, path, options = {}) => {
+  const normalize = change.getFlag('normalize', options)
+  if (!normalize) return
+
+  const { value } = change
+  let { document, schema } = value
+  const node = document.assertNode(path)
+
+  normalizeNodeAndChildren(change, node, schema)
+
+  document = change.value.document
+  const ancestors = document.getAncestors(path)
+  if (!ancestors) return
+
+  ancestors.forEach(ancestor => {
+    if (change.value.document.getDescendant(ancestor.key)) {
+      normalizeNode(change, ancestor, schema)
+    }
+  })
+}
+
+Changes.normalizeParentByPath = (change, path, options) => {
+  const p = PathUtils.lift(path)
+  change.normalizeNodeByPath(p, options)
 }
 
 /**

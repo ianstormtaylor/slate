@@ -4,7 +4,16 @@
 const h = require('../../helpers/h')
 
 module.exports.default = function(change) {
-  change.splitBlock()
+  change
+    .splitBlock()
+    .move(5)
+    .splitBlock()
+    .move(5)
+    .splitBlock()
+    .move(5)
+    .splitBlock()
+    .move(5)
+    .splitBlock()
 }
 
 const value = (
@@ -14,9 +23,9 @@ const value = (
         <quote>
           <paragraph>
             <paragraph>
-              This is editable <b>rich</b> text, <i>much</i> better than a
-              textarea!
+              This
               {i == 0 ? <cursor /> : ''}
+              is editable <b>rich</b> text, <i>much</i> better than a textarea!
             </paragraph>
           </paragraph>
         </quote>

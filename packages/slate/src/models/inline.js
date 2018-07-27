@@ -7,7 +7,7 @@ import logger from 'slate-dev-logger'
 import { List, Map, Record } from 'immutable'
 
 import MODEL_TYPES, { isType } from '../constants/model-types'
-import generateKey from '../utils/generate-key'
+import KeyUtils from '../utils/key-utils'
 
 /**
  * Default properties.
@@ -88,7 +88,7 @@ class Inline extends Record(DEFAULTS) {
     const {
       data = {},
       isVoid = false,
-      key = generateKey(),
+      key = KeyUtils.create(),
       nodes = [],
       type,
     } = object

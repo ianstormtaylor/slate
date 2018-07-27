@@ -1,91 +1,37 @@
-/**
- * Dependencies.
- */
-
 import assert from 'assert'
 import fs from 'fs'
-import { Value } from 'slate'
+import { Value, KeyUtils } from 'slate'
 import { basename, extname, resolve } from 'path'
 
-/**
- * Tests.
- */
+beforeEach(KeyUtils.resetGenerator)
 
 describe('slate-hyperscript', () => {
-  describe('default settings', () => {
-    const dir = resolve(__dirname, './default')
-    const tests = fs
-      .readdirSync(dir)
+  const dir = resolve(__dirname, './fixtures')
+  const tests = fs
+    .readdirSync(dir)
+    .filter(t => t[0] != '.')
+    .map(t => basename(t, extname(t)))
+
+  for (const test of tests) {
+    it(test, async () => {
+      const module = require(resolve(dir, test))
+      const { input, output, options } = module
+      const actual = input.toJSON(options)
+      const expected = Value.isValue(output) ? output.toJSON() : output
+      assert.deepEqual(actual, expected)
+    })
+  }
+
+  describe.skip('decorations', () => {
+    const decDir = resolve(__dirname, './decorations')
+    const decTests = fs
+      .readdirSync(decDir)
       .filter(t => t[0] != '.')
       .map(t => basename(t, extname(t)))
 
-    for (const test of tests) {
+    for (const test of decTests) {
       it(test, async () => {
-        const module = require(resolve(dir, test))
-        const { input, output } = module
-
-        const actual = input.toJSON()
-        const expected = Value.isValue(output) ? output.toJSON() : output
-        assert.deepEqual(actual, expected)
-        if (module.test) module.test()
-      })
-    }
-  })
-
-  describe('custom tags', () => {
-    const dir = resolve(__dirname, './custom')
-    const tests = fs
-      .readdirSync(dir)
-      .filter(t => t[0] != '.')
-      .map(t => basename(t, extname(t)))
-
-    for (const test of tests) {
-      it(test, async () => {
-        const module = require(resolve(dir, test))
-        const { input, output } = module
-
-        const actual = input.toJSON()
-        const expected = Value.isValue(output) ? output.toJSON() : output
-        assert.deepEqual(actual, expected)
-      })
-    }
-  })
-
-  describe('selections', () => {
-    const dir = resolve(__dirname, './selections')
-    const tests = fs
-      .readdirSync(dir)
-      .filter(t => t[0] != '.')
-      .map(t => basename(t, extname(t)))
-
-    for (const test of tests) {
-      it(test, async () => {
-        const module = require(resolve(dir, test))
-        const { input, output, expectSelection } = module
-
-        // ensure deserialization was okay
-        const actual = input.toJSON()
-        const expected = Value.isValue(output) ? output.toJSON() : output
-        assert.deepEqual(actual, expected)
-
-        // ensure expected properties of selection match
-        Object.keys(expectSelection).forEach(prop => {
-          assert.equal(input.selection[prop], expectSelection[prop])
-        })
-      })
-    }
-  })
-
-  describe('decorations', () => {
-    const dir = resolve(__dirname, './decorations')
-    const tests = fs
-      .readdirSync(dir)
-      .filter(t => t[0] != '.')
-      .map(t => basename(t, extname(t)))
-
-    for (const test of tests) {
-      it(test, async () => {
-        const module = require(resolve(dir, test))
+        const module = require(resolve(decDir, test))
         const { input, output, expectDecorations } = module
 
         // ensure deserialization was okay
@@ -104,25 +50,6 @@ describe('slate-hyperscript', () => {
             )
           })
         })
-      })
-    }
-  })
-
-  describe('normalize', () => {
-    const dir = resolve(__dirname, './normalize')
-    const tests = fs
-      .readdirSync(dir)
-      .filter(t => t[0] != '.')
-      .map(t => basename(t, extname(t)))
-
-    for (const test of tests) {
-      it(test, async () => {
-        const module = require(resolve(dir, test))
-        const { input, output } = module
-
-        const actual = Value.isValue(input) ? input.toJSON() : input
-        const expected = Value.isValue(output) ? output.toJSON() : output
-        assert.deepEqual(actual, expected)
       })
     }
   })

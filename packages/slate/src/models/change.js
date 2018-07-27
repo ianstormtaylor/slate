@@ -144,24 +144,18 @@ class Change {
   }
 
   /**
-   * Applies a series of change mutations and defers normalization until the end.
+   * Applies a series of change mutations, deferring normalization to the end.
    *
-   * @param {Function} customChange - function that accepts a change object and executes change operations
+   * @param {Function} fn
    * @return {Change}
    */
 
-  withoutNormalization(customChange) {
+  withoutNormalization(fn) {
     const original = this.flags.normalize
     this.setOperationFlag('normalize', false)
-
-    try {
-      customChange(this)
-      // if the change function worked then run normalization
-      this.normalizeDocument()
-    } finally {
-      // restore the flag to whatever it was
-      this.setOperationFlag('normalize', original)
-    }
+    fn(this)
+    this.setOperationFlag('normalize', original)
+    this.normalizeDocument()
     return this
   }
 

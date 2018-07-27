@@ -7,7 +7,7 @@ import logger from 'slate-dev-logger'
 import { List, Map, Record } from 'immutable'
 
 import MODEL_TYPES, { isType } from '../constants/model-types'
-import generateKey from '../utils/generate-key'
+import KeyUtils from '../utils/key-utils'
 
 /**
  * Default properties.
@@ -65,7 +65,7 @@ class Document extends Record(DEFAULTS) {
       return object
     }
 
-    const { data = {}, key = generateKey(), nodes = [] } = object
+    const { data = {}, key = KeyUtils.create(), nodes = [] } = object
 
     const document = new Document({
       key,
