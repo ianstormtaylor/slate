@@ -3,8 +3,12 @@
 
 const h = require('../../helpers/h')
 
-module.exports.default = function(value) {
-  value.document.getBlocks()
+module.exports.default = function(document) {
+  document.getBlocks()
+  document.getBlocks()
+  document.getBlocks()
+  document.getBlocks()
+  document.getBlocks()
 }
 
 const value = (
@@ -25,5 +29,5 @@ const value = (
 )
 
 module.exports.input = function() {
-  return value
+  return value.document
 }

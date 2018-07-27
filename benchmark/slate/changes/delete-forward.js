@@ -4,7 +4,12 @@
 const h = require('../../helpers/h')
 
 module.exports.default = function(change) {
-  change.deleteForward()
+  change
+    .deleteForward()
+    .deleteForward()
+    .deleteForward()
+    .deleteForward()
+    .deleteForward()
 }
 
 const value = (

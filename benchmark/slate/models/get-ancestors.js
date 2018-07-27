@@ -3,19 +3,25 @@
 
 const h = require('../../helpers/h')
 
-module.exports.default = function({ value, text }) {
-  value.document.getAncestors(text.key)
+module.exports.default = function(document) {
+  document.getAncestors('T1')
+  document.getAncestors('T2')
+  document.getAncestors('T3')
+  document.getAncestors('T4')
+  document.getAncestors('T5')
 }
 
 const value = (
   <value>
     <document>
-      {Array.from(Array(10)).map(() => (
+      {Array.from(Array(10)).map((_, i) => (
         <quote>
           <paragraph>
             <paragraph>
-              This is editable <b>rich</b> text, <i>much</i> better than a
-              textarea!
+              <text key={`T${i}`}>
+                This is editable <b>rich</b> text, <i>much</i> better than a
+                textarea!
+              </text>
             </paragraph>
           </paragraph>
         </quote>
@@ -23,8 +29,7 @@ const value = (
     </document>
   </value>
 )
-const text = value.document.getLastText()
 
 module.exports.input = function() {
-  return { value, text }
+  return value.document
 }

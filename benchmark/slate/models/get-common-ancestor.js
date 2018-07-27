@@ -3,19 +3,25 @@
 
 const h = require('../../helpers/h')
 
-module.exports.default = function({ value, first, last }) {
-  value.document.getCommonAncestor(first.key, last.key)
+module.exports.default = function(document) {
+  document.getCommonAncestor('T1', 'T2')
+  document.getCommonAncestor('T2', 'T3')
+  document.getCommonAncestor('T3', 'T4')
+  document.getCommonAncestor('T4', 'T5')
+  document.getCommonAncestor('T5', 'T6')
 }
 
 const value = (
   <value>
     <document>
-      {Array.from(Array(10)).map(() => (
+      {Array.from(Array(10)).map((_, i) => (
         <quote>
           <paragraph>
             <paragraph>
-              This is editable <b>rich</b> text, <i>much</i> better than a
-              textarea!
+              <text key={`T${i}`}>
+                This is editable <b>rich</b> text, <i>much</i> better than a
+                textarea!
+              </text>
             </paragraph>
           </paragraph>
         </quote>
@@ -24,9 +30,6 @@ const value = (
   </value>
 )
 
-const first = value.document.getFirstText()
-const last = value.document.getLastText()
-
 module.exports.input = function() {
-  return { value, first, last }
+  return value.document
 }

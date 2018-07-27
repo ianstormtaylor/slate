@@ -4,7 +4,12 @@
 const h = require('../../helpers/h')
 
 module.exports.default = function(change) {
-  change.setBlocks('quote')
+  change
+    .setBlocks('quote')
+    .setBlocks('paragraph')
+    .setBlocks('aside')
+    .setBlocks('code')
+    .setBlocks('heading')
 }
 
 const value = (

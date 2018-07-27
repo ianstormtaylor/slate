@@ -4,7 +4,16 @@
 const h = require('../../helpers/h')
 
 module.exports.default = function(change) {
-  change.addMark('bold')
+  change
+    .addMark('bold')
+    .move(5)
+    .addMark('bold')
+    .move(5)
+    .addMark('bold')
+    .move(5)
+    .addMark('bold')
+    .move(5)
+    .addMark('bold')
 }
 
 const value = (
@@ -19,7 +28,7 @@ const value = (
               ) : (
                 ''
               )}{' '}
-              text, <i>much</i> better than a textarea!
+              text, <i>much</i> better than a textarea! For reals.
             </paragraph>
           </paragraph>
         </quote>
