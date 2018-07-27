@@ -501,18 +501,6 @@ class Node {
   }
 
   /**
-   * Get the closest block parent of a node.
-   *
-   * @param {List|String} path
-   * @return {Node|Null}
-   */
-
-  getClosestBlock(path) {
-    const closest = this.getClosest(path, n => n.object === 'block')
-    return closest
-  }
-
-  /**
    * Get closest parent of node that matches an `iterator`.
    *
    * @param {List|String} path
@@ -531,6 +519,18 @@ class Node {
     })
 
     return closest || null
+  }
+
+  /**
+   * Get the closest block parent of a node.
+   *
+   * @param {List|String} path
+   * @return {Node|Null}
+   */
+
+  getClosestBlock(path) {
+    const closest = this.getClosest(path, n => n.object === 'block')
+    return closest
   }
 
   /**
@@ -734,6 +734,27 @@ class Node {
   }
 
   /**
+   * Get the furthest parent of a node that matches an `iterator`.
+   *
+   * @param {Path} path
+   * @param {Function} iterator
+   * @return {Node|Null}
+   */
+
+  getFurthest(path, iterator) {
+    const ancestors = this.getAncestors(path)
+    if (!ancestors) return null
+
+    const furthest = ancestors.find((node, ...args) => {
+      // We never want to include the top-level node.
+      if (node === this) return false
+      return iterator(node, ...args)
+    })
+
+    return furthest || null
+  }
+
+  /**
    * Get the furthest ancestor of a node.
    *
    * @param {Path} path
@@ -757,27 +778,6 @@ class Node {
   getFurthestBlock(path) {
     const furthest = this.getFurthest(path, n => n.object === 'block')
     return furthest
-  }
-
-  /**
-   * Get the furthest parent of a node that matches an `iterator`.
-   *
-   * @param {Path} path
-   * @param {Function} iterator
-   * @return {Node|Null}
-   */
-
-  getFurthest(path, iterator) {
-    const ancestors = this.getAncestors(path)
-    if (!ancestors) return null
-
-    const furthest = ancestors.find((node, ...args) => {
-      // We never want to include the top-level node.
-      if (node === this) return false
-      return iterator(node, ...args)
-    })
-
-    return furthest || null
   }
 
   /**
@@ -1724,49 +1724,6 @@ class Node {
   }
 
   /**
-   * Check whether the node is in a `range`.
-   *
-   * @param {Range} range
-   * @return {Boolean}
-   */
-
-  isInRange(range) {
-    range = range.normalize(this)
-
-    const node = this
-    const { startKey, endKey, isCollapsed } = range
-
-    // PERF: solve the most common cast where the start or end key are inside
-    // the node, for collapsed selections.
-    if (
-      node.key == startKey ||
-      node.key == endKey ||
-      node.hasDescendant(startKey) ||
-      node.hasDescendant(endKey)
-    ) {
-      return true
-    }
-
-    // PERF: if the selection is collapsed and the previous check didn't return
-    // true, then it must be false.
-    if (isCollapsed) {
-      return false
-    }
-
-    // Otherwise, look through all of the leaf text nodes in the range, to see
-    // if any of them are inside the node.
-    const texts = node.getTextsAtRange(range)
-    let memo = false
-
-    texts.forEach(text => {
-      if (node.hasDescendant(text.key)) memo = true
-      return memo
-    })
-
-    return memo
-  }
-
-  /**
    * Check whether the node is a leaf block.
    *
    * @return {Boolean}
@@ -2042,6 +1999,8 @@ class Node {
       if (index != null) {
         path = path.concat(index)
       }
+    } else {
+      path = PathUtils.create(path)
     }
 
     return path
@@ -2189,6 +2148,47 @@ class Node {
     if (firstIndex == -1 || secondIndex == -1) return null
 
     return firstIndex < secondIndex
+  }
+
+  isInRange(range) {
+    logger.deprecate(
+      `0.35.0`,
+      'The `Node.isInRange` method is deprecated. Use the new `PathUtils.compare` helper instead.'
+    )
+
+    range = range.normalize(this)
+
+    const node = this
+    const { startKey, endKey, isCollapsed } = range
+
+    // PERF: solve the most common cast where the start or end key are inside
+    // the node, for collapsed selections.
+    if (
+      node.key == startKey ||
+      node.key == endKey ||
+      node.hasDescendant(startKey) ||
+      node.hasDescendant(endKey)
+    ) {
+      return true
+    }
+
+    // PERF: if the selection is collapsed and the previous check didn't return
+    // true, then it must be false.
+    if (isCollapsed) {
+      return false
+    }
+
+    // Otherwise, look through all of the leaf text nodes in the range, to see
+    // if any of them are inside the node.
+    const texts = node.getTextsAtRange(range)
+    let memo = false
+
+    texts.forEach(text => {
+      if (node.hasDescendant(text.key)) memo = true
+      return memo
+    })
+
+    return memo
   }
 }
 
