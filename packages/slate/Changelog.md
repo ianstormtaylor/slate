@@ -27,7 +27,6 @@ Now there is a new `match` object concept, which looks like:
 Match objects can be objects, or an array of objects which acts as `OR`:
 
 ```js
-
 {
   parent: [{ type: 'ordered_list' }, { type: 'unordered_list' }],
 }
