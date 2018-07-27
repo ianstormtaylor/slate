@@ -4,6 +4,14 @@ This document maintains a list of changes to the `slate-react` package with each
 
 ---
 
+### `0.14.0` — July 27, 2018
+
+###### NEW
+
+**Updated to work with the `slate@0.35.0` with paths.** It now uses the `PathUtils` export in the latest `slate` internally to work with paths. This isn't a breaking change, but to use this library with the latest Slate you'll need to upgrade.
+
+---
+
 ### `0.13.0` — July 3, 2018
 
 ###### BREAKING

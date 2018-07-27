@@ -4,6 +4,14 @@ This document maintains a list of changes to the `slate-hyperscript` package wit
 
 ---
 
+### `0.6.0` — July 27, 2018
+
+###### NEW
+
+**Updated to work with the `slate@0.35.0` with paths.** The original logic for selections and decorations didn't account for paths properly. This isn't a breaking change, but to use this library with the latest Slate you'll need to upgrade.
+
+---
+
 ### `0.5.0` — January 4, 2018
 
 ###### BREAKING
