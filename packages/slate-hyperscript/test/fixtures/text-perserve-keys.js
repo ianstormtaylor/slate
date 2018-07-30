@@ -1,6 +1,5 @@
 /** @jsx h */
 /* eslint-disable import/no-extraneous-dependencies*/
-
 import h from 'slate-hyperscript'
 
 export const input = (
