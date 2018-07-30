@@ -1,14 +1,6 @@
-/**
- * Dependencies.
- */
-
-import { resetKeyGenerator } from 'slate'
-
-/**
- * Tests.
- */
+import { KeyUtils } from 'slate'
 
 describe('utils', () => {
-  beforeEach(resetKeyGenerator)
+  beforeEach(KeyUtils.resetGenerator)
   require('./get-children-decorations')
 })

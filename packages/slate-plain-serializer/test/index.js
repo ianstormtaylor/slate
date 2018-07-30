@@ -2,15 +2,11 @@
 import Plain from 'slate-plain-serializer'
 import { t as assert } from 'jest-t-assert' // eslint-disable-line import/no-extraneous-dependencies
 import fs from 'fs'
-import { Value, resetKeyGenerator } from 'slate'
+import { Value, KeyUtils } from 'slate'
 import { basename, extname, resolve } from 'path'
 
-/**
- * Tests.
- */
-
 describe('slate-plain-serializer', () => {
-  beforeEach(resetKeyGenerator)
+  beforeEach(KeyUtils.resetGenerator)
 
   describe('deserialize()', () => {
     const dir = resolve(__dirname, './deserialize')

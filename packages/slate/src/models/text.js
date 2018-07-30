@@ -4,7 +4,7 @@ import { List, OrderedSet, Record, Set } from 'immutable'
 
 import Leaf from './leaf'
 import MODEL_TYPES, { isType } from '../constants/model-types'
-import generateKey from '../utils/generate-key'
+import KeyUtils from '../utils/key-utils'
 import memoize from '../utils/memoize'
 
 /**
@@ -85,8 +85,21 @@ class Text extends Record(DEFAULTS) {
       return object
     }
 
-    const { key = generateKey() } = object
-    let { leaves = List() } = object
+    const { key = KeyUtils.create() } = object
+    let { leaves } = object
+
+    if (!leaves) {
+      if (object.ranges) {
+        logger.deprecate(
+          'slate@0.27.0',
+          'The `ranges` property of Slate objects has been renamed to `leaves`.'
+        )
+
+        leaves = object.ranges
+      } else {
+        leaves = List()
+      }
+    }
 
     if (Array.isArray(leaves)) {
       leaves = List(leaves.map(x => Leaf.create(x)))
@@ -387,6 +400,14 @@ class Text extends Record(DEFAULTS) {
     })
   }
 
+  getFirstText() {
+    return this
+  }
+
+  getLastText() {
+    return this
+  }
+
   /**
    * Get all of the marks on between two offsets
    * Corner Cases:
@@ -545,7 +566,7 @@ class Text extends Record(DEFAULTS) {
    */
 
   regenerateKey() {
-    const key = generateKey()
+    const key = KeyUtils.create()
     return this.set('key', key)
   }
 
@@ -720,10 +741,21 @@ class Text extends Record(DEFAULTS) {
   }
 
   /**
+   * Normalize the text node with a `schema`.
+   *
+   * @param {Schema} schema
+   * @return {Function|Void}
+   */
+
+  normalize(schema) {
+    return schema.normalizeNode(this)
+  }
+
+  /**
    * Validate the text node against a `schema`.
    *
    * @param {Schema} schema
-   * @return {Object|Void}
+   * @return {Error|Void}
    */
 
   validate(schema) {
@@ -781,6 +813,7 @@ memoize(Text.prototype, [
   'getActiveMarks',
   'getMarks',
   'getMarksAsArray',
+  'normalize',
   'validate',
   'getString',
 ])

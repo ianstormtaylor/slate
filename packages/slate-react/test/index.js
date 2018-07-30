@@ -1,15 +1,7 @@
-/**
- * Dependencies.
- */
-
-import { resetKeyGenerator } from 'slate'
-
-/**
- * Tests.
- */
+import { KeyUtils } from 'slate'
 
 describe('slate-react', () => {
-  beforeEach(resetKeyGenerator)
+  beforeEach(KeyUtils.resetGenerator)
 
   require('./plugins')
   require('./rendering')

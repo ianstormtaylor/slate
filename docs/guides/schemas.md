@@ -15,11 +15,19 @@ Slate schemas are defined as Javascript objects, with properties that describe t
 ```js
 const schema = {
   document: {
-    nodes: [{ types: ['paragraph', 'image'] }],
+    nodes: [
+      {
+        match: [{ type: 'paragraph' }, { type: 'image' }],
+      },
+    ],
   },
   blocks: {
     paragraph: {
-      nodes: [{ objects: ['text'] }],
+      nodes: [
+        {
+          match: { object: 'text' },
+        },
+      ],
     },
     image: {
       isVoid: true,
@@ -54,12 +62,12 @@ Instead, Slate lets you define your own custom normalization logic.
 ```js
 const schema = {
   document: {
-    nodes: [
-      { types: ['paragraph', 'image'] }
-    ],
-    normalize: (change, reason, context) => {
-      if (reason == 'child_type_invalid') {
-        change.setNodeByKey(context.child.key, { type: 'paragraph' })
+    nodes: [{
+      match: [{ type: 'paragraph' }, { type: 'image' }],
+    }],
+    normalize: (change, error) => {
+      if (error.code == 'child_type_invalid') {
+        change.setNodeByKey(error.child.key, { type: 'paragraph' })
       }
     }
   },
@@ -73,18 +81,18 @@ When Slate discovers an invalid child, it will first check to see if your custom
 
 This gives you the best of both worlds. You can write simple, terse, declarative validation rules that can be highly optimized. But you can still define fine-grained, imperative normalization logic for when invalid states occur.
 
-> 🤖 For a full list of validation `reason` arguments, check out the [`Schema` reference](../reference/slate/schema.md).
+> 🤖 For a full list of error `code` types, check out the [`Schema` reference](../reference/slate/schema.md).
 
-## Custom Validations
+## Low-level Normalizations
 
-Sometimes though, the declarative validation syntax isn't fine-grained enough to handle a specific piece of validation. That's okay, because you can actually define schema validations in Slate as regular functions when you need more control, using the `validateNode` property of plugins and editors.
+Sometimes though, the declarative validation syntax isn't fine-grained enough to handle a specific piece of validation. That's okay, because you can actually define schema validations in Slate as regular functions when you need more control, using the `normalizeNode` property of plugins and editors.
 
-> 🤖 Actually, under the covers the declarative schemas are all translated into `validateNode` functions too!
+> 🤖 Actually, under the covers the declarative schemas are all translated into `normalizeNode` functions too!
 
-When you define a `validateNode` function, you either return nothing if the node's already valid, or you return a normalizer function that will make the node valid if it isn't. Here's an example:
+When you define a `normalizeNode` function, you either return nothing if the node's already valid, or you return a normalizer function that will make the node valid if it isn't. Here's an example:
 
 ```js
-function validateNode(node) {
+function normalizeNode(node) {
   if (node.object != 'block') return
   if (node.isVoid) return
 
@@ -101,9 +109,9 @@ function validateNode(node) {
 
 This validation defines a very specific (honestly, useless) behavior, where if a node is block, non-void and has three children, the first and last of which are text nodes, it is removed. I don't know why you'd ever do that, but the point is that you can get very specific with your validations this way. Any property of the node can be examined.
 
-When you need this level of specificity, using the `validateNode` property of the editor or plugins is handy.
+When you need this level of specificity, using the `normalizeNode` property of the editor or plugins is handy.
 
-However, only use it when you absolutely have to. And when you do, make sure to optimize the function's performance. `validateNode` will be called **every time the node changes**, so it should be as performant as possible. That's why the example above returns early, so that the smallest amount of work is done each time it is called.
+However, only use it when you absolutely have to. And when you do, make sure to optimize the function's performance. `normalizeNode` will be called **every time the node changes**, so it should be as performant as possible. That's why the example above returns early, so that the smallest amount of work is done each time it is called.
 
 ## Multi-step Normalizations
 
@@ -119,7 +127,7 @@ Note: This functionality is already correctly implemented in slate-core so you d
   *
   * @type {Object}
   */
-validateNode(node) {
+normalizeNode(node) {
   if (node.object != 'block' && node.object != 'inline') return
 
   const invalids = node.nodes
@@ -155,7 +163,7 @@ The above validation function can then be written as below
   *
   * @type {Object}
   */
-validateNode(node) {
+normalizeNode(node) {
   ...
   return (change) => {
     change.withoutNormalization((c) => {

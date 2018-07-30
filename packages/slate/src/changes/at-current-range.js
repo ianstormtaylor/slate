@@ -162,7 +162,7 @@ Changes.insertFragment = (change, fragment) => {
     selection.hasEdgeAtEndOf(endText)
 
   const isInserting =
-    fragment.hasBlocks(firstChild.key) || fragment.hasBlocks(lastChild.key)
+    firstChild.hasBlockChildren() || lastChild.hasBlockChildren()
 
   change.insertFragmentAtRange(selection, fragment)
   value = change.value

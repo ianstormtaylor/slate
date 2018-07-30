@@ -2,6 +2,7 @@ import isPlainObject from 'is-plain-object'
 import logger from 'slate-dev-logger'
 import { List, Record, Set } from 'immutable'
 
+import PathUtils from '../utils/path-utils'
 import MODEL_TYPES from '../constants/model-types'
 import Mark from './mark'
 
@@ -14,12 +15,14 @@ import Mark from './mark'
 const DEFAULTS = {
   anchorKey: null,
   anchorOffset: 0,
+  anchorPath: null,
   focusKey: null,
   focusOffset: 0,
+  focusPath: null,
+  isAtomic: false,
   isBackward: null,
   isFocused: false,
   marks: null,
-  isAtomic: false,
 }
 
 /**
@@ -75,38 +78,49 @@ class Range extends Record(DEFAULTS) {
    * @return {Object}
    */
 
-  static createProperties(attrs = {}) {
-    if (Range.isRange(attrs)) {
+  static createProperties(a = {}) {
+    if (Range.isRange(a)) {
       return {
-        anchorKey: attrs.anchorKey,
-        anchorOffset: attrs.anchorOffset,
-        focusKey: attrs.focusKey,
-        focusOffset: attrs.focusOffset,
-        isBackward: attrs.isBackward,
-        isFocused: attrs.isFocused,
-        marks: attrs.marks,
-        isAtomic: attrs.isAtomic,
+        anchorKey: a.anchorKey,
+        anchorOffset: a.anchorOffset,
+        anchorPath: a.anchorPath,
+        focusKey: a.focusKey,
+        focusOffset: a.focusOffset,
+        focusPath: a.focusPath,
+        isAtomic: a.isAtomic,
+        isBackward: a.isBackward,
+        isFocused: a.isFocused,
+        marks: a.marks,
       }
     }
 
-    if (isPlainObject(attrs)) {
-      const props = {}
-      if ('anchorKey' in attrs) props.anchorKey = attrs.anchorKey
-      if ('anchorOffset' in attrs) props.anchorOffset = attrs.anchorOffset
-      if ('anchorPath' in attrs) props.anchorPath = attrs.anchorPath
-      if ('focusKey' in attrs) props.focusKey = attrs.focusKey
-      if ('focusOffset' in attrs) props.focusOffset = attrs.focusOffset
-      if ('focusPath' in attrs) props.focusPath = attrs.focusPath
-      if ('isBackward' in attrs) props.isBackward = attrs.isBackward
-      if ('isFocused' in attrs) props.isFocused = attrs.isFocused
-      if ('marks' in attrs)
-        props.marks = attrs.marks == null ? null : Mark.createSet(attrs.marks)
-      if ('isAtomic' in attrs) props.isAtomic = attrs.isAtomic
-      return props
+    if (isPlainObject(a)) {
+      const p = {}
+      if ('anchorKey' in a) p.anchorKey = a.anchorKey
+      if ('anchorOffset' in a) p.anchorOffset = a.anchorOffset
+      if ('anchorPath' in a) p.anchorPath = PathUtils.create(a.anchorPath)
+      if ('focusKey' in a) p.focusKey = a.focusKey
+      if ('focusOffset' in a) p.focusOffset = a.focusOffset
+      if ('focusPath' in a) p.focusPath = PathUtils.create(a.focusPath)
+      if ('isAtomic' in a) p.isAtomic = a.isAtomic
+      if ('isBackward' in a) p.isBackward = a.isBackward
+      if ('isFocused' in a) p.isFocused = a.isFocused
+      if ('marks' in a)
+        p.marks = a.marks == null ? null : Mark.createSet(a.marks)
+
+      // If only a path is set, or only a key is set, ensure that the other is
+      // set to null so that it can be normalized back to the right value.
+      // Otherwise we won't realize that the path and key don't match anymore.
+      if ('anchorPath' in a && !('anchorKey' in a)) p.anchorKey = null
+      if ('anchorKey' in a && !('anchorPath' in a)) p.anchorPath = null
+      if ('focusPath' in a && !('focusKey' in a)) p.focusKey = null
+      if ('focusKey' in a && !('focusPath' in a)) p.focusPath = null
+
+      return p
     }
 
     throw new Error(
-      `\`Range.createProperties\` only accepts objects or ranges, but you passed it: ${attrs}`
+      `\`Range.createProperties\` only accepts objects or ranges, but you passed it: ${a}`
     )
   }
 
@@ -121,23 +135,27 @@ class Range extends Record(DEFAULTS) {
     const {
       anchorKey = null,
       anchorOffset = 0,
+      anchorPath = null,
       focusKey = null,
       focusOffset = 0,
+      focusPath = null,
+      isAtomic = false,
       isBackward = null,
       isFocused = false,
       marks = null,
-      isAtomic = false,
     } = object
 
     const range = new Range({
       anchorKey,
       anchorOffset,
+      anchorPath: PathUtils.create(anchorPath),
       focusKey,
       focusOffset,
+      focusPath: PathUtils.create(focusPath),
+      isAtomic,
       isBackward,
       isFocused,
       marks: marks == null ? null : new Set(marks.map(Mark.fromJSON)),
-      isAtomic,
     })
 
     return range
@@ -227,7 +245,10 @@ class Range extends Record(DEFAULTS) {
    */
 
   get isSet() {
-    return this.anchorKey != null && this.focusKey != null
+    return (
+      (this.anchorKey != null && this.focusKey != null) ||
+      (this.anchorPath != null && this.focusPath != null)
+    )
   }
 
   /**
@@ -261,6 +282,16 @@ class Range extends Record(DEFAULTS) {
   }
 
   /**
+   * Get the start path.
+   *
+   * @return {String}
+   */
+
+  get startPath() {
+    return this.isBackward ? this.focusPath : this.anchorPath
+  }
+
+  /**
    * Get the end key.
    *
    * @return {String}
@@ -281,6 +312,16 @@ class Range extends Record(DEFAULTS) {
   }
 
   /**
+   * Get the end path.
+   *
+   * @return {String}
+   */
+
+  get endPath() {
+    return this.isBackward ? this.anchorPath : this.focusPath
+  }
+
+  /**
    * Check whether anchor point of the range is at the start of a `node`.
    *
    * @param {Node} node
@@ -290,7 +331,7 @@ class Range extends Record(DEFAULTS) {
   hasAnchorAtStartOf(node) {
     // PERF: Do a check for a `0` offset first since it's quickest.
     if (this.anchorOffset != 0) return false
-    const first = getFirst(node)
+    const first = getFirstText(node)
     return this.anchorKey == first.key
   }
 
@@ -302,7 +343,7 @@ class Range extends Record(DEFAULTS) {
    */
 
   hasAnchorAtEndOf(node) {
-    const last = getLast(node)
+    const last = getLastText(node)
     return this.anchorKey == last.key && this.anchorOffset == last.text.length
   }
 
@@ -345,7 +386,7 @@ class Range extends Record(DEFAULTS) {
    */
 
   hasFocusAtEndOf(node) {
-    const last = getLast(node)
+    const last = getLastText(node)
     return this.focusKey == last.key && this.focusOffset == last.text.length
   }
 
@@ -358,7 +399,7 @@ class Range extends Record(DEFAULTS) {
 
   hasFocusAtStartOf(node) {
     if (this.focusOffset != 0) return false
-    const first = getFirst(node)
+    const first = getFirstText(node)
     return this.focusKey == first.key
   }
 
@@ -449,8 +490,10 @@ class Range extends Record(DEFAULTS) {
     return this.merge({
       anchorKey: null,
       anchorOffset: 0,
+      anchorPath: null,
       focusKey: null,
       focusOffset: 0,
+      focusPath: null,
       isFocused: false,
       isBackward: false,
     })
@@ -466,8 +509,10 @@ class Range extends Record(DEFAULTS) {
     return this.merge({
       anchorKey: this.focusKey,
       anchorOffset: this.focusOffset,
+      anchorPath: this.focusPath,
       focusKey: this.anchorKey,
       focusOffset: this.anchorOffset,
+      focusPath: this.anchorPath,
       isBackward: this.isBackward == null ? null : !this.isBackward,
     })
   }
@@ -507,43 +552,91 @@ class Range extends Record(DEFAULTS) {
   }
 
   /**
-   * Move the range's anchor point to a `key` and `offset`.
+   * Move the range's anchor point to a new `key` or `path` and `offset`.
    *
-   * @param {String} key
+   * @param {String|List} key or path
    * @param {Number} offset
    * @return {Range}
    */
 
   moveAnchorTo(key, offset) {
-    const { anchorKey, focusKey, focusOffset, isBackward } = this
-    return this.merge({
-      anchorKey: key,
-      anchorOffset: offset,
-      isBackward:
-        key == focusKey
+    const {
+      anchorKey,
+      focusKey,
+      focusOffset,
+      anchorPath,
+      focusPath,
+      isBackward,
+    } = this
+
+    if (typeof key === 'string') {
+      const isAnchor = key === anchorKey
+      const isFocus = key === focusKey
+      return this.merge({
+        anchorKey: key,
+        anchorPath: isFocus ? focusPath : isAnchor ? anchorPath : null,
+        anchorOffset: offset,
+        isBackward: isFocus
           ? offset > focusOffset
-          : key == anchorKey ? isBackward : null,
-    })
+          : isAnchor ? isBackward : null,
+      })
+    } else {
+      const path = key
+      const isAnchor = path && path.equals(anchorPath)
+      const isFocus = path && path.equals(focusPath)
+      return this.merge({
+        anchorPath: path,
+        anchorKey: isAnchor ? anchorKey : isFocus ? focusKey : null,
+        anchorOffset: offset,
+        isBackward: isFocus
+          ? offset > focusOffset
+          : isAnchor ? isBackward : null,
+      })
+    }
   }
 
   /**
-   * Move the range's focus point to a `key` and `offset`.
+   * Move the range's focus point to a new `key` or `path` and `offset`.
    *
-   * @param {String} key
+   * @param {String|List} key or path
    * @param {Number} offset
    * @return {Range}
    */
 
   moveFocusTo(key, offset) {
-    const { focusKey, anchorKey, anchorOffset, isBackward } = this
-    return this.merge({
-      focusKey: key,
-      focusOffset: offset,
-      isBackward:
-        key == anchorKey
-          ? anchorOffset > offset
-          : key == focusKey ? isBackward : null,
-    })
+    const {
+      focusKey,
+      anchorKey,
+      anchorOffset,
+      anchorPath,
+      focusPath,
+      isBackward,
+    } = this
+
+    if (typeof key === 'string') {
+      const isAnchor = key === anchorKey
+      const isFocus = key === focusKey
+      return this.merge({
+        focusKey: key,
+        focusPath: isAnchor ? anchorPath : isFocus ? focusPath : null,
+        focusOffset: offset,
+        isBackward: isAnchor
+          ? offset < anchorOffset
+          : isFocus ? isBackward : null,
+      })
+    } else {
+      const path = key
+      const isAnchor = path && path.equals(anchorPath)
+      const isFocus = path && path.equals(focusPath)
+      return this.merge({
+        focusPath: path,
+        focusKey: isFocus ? focusKey : isAnchor ? anchorKey : null,
+        focusOffset: offset,
+        isBackward: isAnchor
+          ? offset < anchorOffset
+          : isFocus ? isBackward : null,
+      })
+    }
   }
 
   /**
@@ -620,7 +713,7 @@ class Range extends Record(DEFAULTS) {
    */
 
   moveAnchorToStartOf(node) {
-    node = getFirst(node)
+    node = getFirstText(node)
     return this.moveAnchorTo(node.key, 0)
   }
 
@@ -632,7 +725,7 @@ class Range extends Record(DEFAULTS) {
    */
 
   moveAnchorToEndOf(node) {
-    node = getLast(node)
+    node = getLastText(node)
     return this.moveAnchorTo(node.key, node.text.length)
   }
 
@@ -644,7 +737,7 @@ class Range extends Record(DEFAULTS) {
    */
 
   moveFocusToStartOf(node) {
-    node = getFirst(node)
+    node = getFirstText(node)
     return this.moveFocusTo(node.key, 0)
   }
 
@@ -656,7 +749,7 @@ class Range extends Record(DEFAULTS) {
    */
 
   moveFocusToEndOf(node) {
-    node = getLast(node)
+    node = getLastText(node)
     return this.moveFocusTo(node.key, node.text.length)
   }
 
@@ -683,7 +776,15 @@ class Range extends Record(DEFAULTS) {
 
   normalize(node) {
     const range = this
-    let { anchorKey, anchorOffset, focusKey, focusOffset, isBackward } = range
+    let {
+      anchorKey,
+      anchorOffset,
+      anchorPath,
+      focusKey,
+      focusOffset,
+      focusPath,
+      isBackward,
+    } = range
 
     const anchorOffsetType = typeof anchorOffset
     const focusOffsetType = typeof focusOffset
@@ -694,20 +795,25 @@ class Range extends Record(DEFAULTS) {
       )
     }
 
-    // If the range is unset, make sure it is properly zeroed out.
-    if (anchorKey == null || focusKey == null) {
+    // If either point in the range is unset, make sure it is fully unset.
+    if (
+      (anchorKey == null && anchorPath == null) ||
+      (focusKey == null && focusPath == null)
+    ) {
       return range.merge({
         anchorKey: null,
         anchorOffset: 0,
+        anchorPath: null,
         focusKey: null,
         focusOffset: 0,
+        focusPath: null,
         isBackward: false,
       })
     }
 
     // Get the anchor and focus nodes.
-    let anchorNode = node.getDescendant(anchorKey)
-    let focusNode = node.getDescendant(focusKey)
+    let anchorNode = node.getNode(anchorKey || anchorPath)
+    let focusNode = node.getNode(focusKey || focusPath)
 
     // If the range is malformed, warn and zero it out.
     if (!anchorNode || !focusNode) {
@@ -717,11 +823,14 @@ class Range extends Record(DEFAULTS) {
       )
 
       const first = node.getFirstText()
+      const path = first && node.getPath(first.key)
       return range.merge({
         anchorKey: first ? first.key : null,
         anchorOffset: 0,
+        anchorPath: first ? path : null,
         focusKey: first ? first.key : null,
         focusOffset: 0,
+        focusPath: first ? path : null,
         isBackward: false,
       })
     }
@@ -752,21 +861,25 @@ class Range extends Record(DEFAULTS) {
       focusNode = focusText
     }
 
+    anchorKey = anchorNode.key
+    focusKey = focusNode.key
+    anchorPath = node.getPath(anchorKey)
+    focusPath = node.getPath(focusKey)
+
     // If `isBackward` is not set, derive it.
     if (isBackward == null) {
-      if (anchorNode.key === focusNode.key) {
-        isBackward = anchorOffset > focusOffset
-      } else {
-        isBackward = !node.areDescendantsSorted(anchorNode.key, focusNode.key)
-      }
+      const result = PathUtils.compare(anchorPath, focusPath)
+      isBackward = result === 0 ? anchorOffset > focusOffset : result === 1
     }
 
     // Merge in any updated properties.
     return range.merge({
-      anchorKey: anchorNode.key,
+      anchorKey,
       anchorOffset,
-      focusKey: focusNode.key,
+      anchorPath,
+      focusKey,
       focusOffset,
+      focusPath,
       isBackward,
     })
   }
@@ -774,21 +887,29 @@ class Range extends Record(DEFAULTS) {
   /**
    * Return a JSON representation of the range.
    *
+   * @param {Object} options
    * @return {Object}
    */
 
-  toJSON() {
+  toJSON(options = {}) {
     const object = {
       object: this.object,
       anchorKey: this.anchorKey,
       anchorOffset: this.anchorOffset,
+      anchorPath: this.anchorPath && this.anchorPath.toArray(),
       focusKey: this.focusKey,
       focusOffset: this.focusOffset,
+      focusPath: this.focusPath && this.focusPath.toArray(),
+      isAtomic: this.isAtomic,
       isBackward: this.isBackward,
       isFocused: this.isFocused,
       marks:
         this.marks == null ? null : this.marks.toArray().map(m => m.toJSON()),
-      isAtomic: this.isAtomic,
+    }
+
+    if (!options.preserveKeys) {
+      delete object.anchorKey
+      delete object.focusKey
     }
 
     return object
@@ -892,7 +1013,7 @@ ALIAS_METHODS.forEach(([alias, method]) => {
  * @return {Text}
  */
 
-function getFirst(node) {
+function getFirstText(node) {
   return node.object == 'text' ? node : node.getFirstText()
 }
 
@@ -903,7 +1024,7 @@ function getFirst(node) {
  * @return {Text}
  */
 
-function getLast(node) {
+function getLastText(node) {
   return node.object == 'text' ? node : node.getLastText()
 }
 

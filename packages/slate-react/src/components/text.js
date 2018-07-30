@@ -3,6 +3,7 @@ import ImmutableTypes from 'react-immutable-proptypes'
 import React from 'react'
 import SlateTypes from 'slate-prop-types'
 import Types from 'prop-types'
+import { PathUtils } from 'slate'
 
 import Leaf from './leaf'
 
@@ -108,13 +109,23 @@ class Text extends React.Component {
     const { key } = node
 
     const decs = decorations.filter(d => {
-      const { startKey, endKey } = d
-      if (startKey == key || endKey == key) return true
+      const { startKey, endKey, startPath, endPath } = d
+
+      // If either of the decoration's keys match, include it.
+      if (startKey === key || endKey === key) return true
+
+      // Otherwise, if the decoration is in a single node, it's not ours.
       if (startKey === endKey) return false
-      const startsBefore = document.areDescendantsSorted(startKey, key)
-      if (!startsBefore) return false
-      const endsAfter = document.areDescendantsSorted(key, endKey)
-      return endsAfter
+
+      // If the node's path is before the start path, ignore it.
+      const path = document.assertPathByKey(key)
+      if (PathUtils.compare(path, startPath) === -1) return false
+
+      // If the node's path is after the end path, ignore it.
+      if (PathUtils.compare(path, endPath) === 1) return false
+
+      // Otherwise, include it.
+      return true
     })
 
     // PERF: Take advantage of cache by avoiding arguments

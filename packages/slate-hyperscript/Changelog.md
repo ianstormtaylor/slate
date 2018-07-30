@@ -4,11 +4,19 @@ This document maintains a list of changes to the `slate-hyperscript` package wit
 
 ---
 
+### `0.6.0` — July 27, 2018
+
+###### NEW
+
+**Updated to work with the `slate@0.35.0` with paths.** The original logic for selections and decorations didn't account for paths properly. This isn't a breaking change, but to use this library with the latest Slate you'll need to upgrade.
+
+---
+
 ### `0.5.0` — January 4, 2018
 
 ###### BREAKING
 
-* **The `kind` property of Slate objects has been renamed to `object`.** This is to reduce the confusion over the difference between "kind" and "type" which are practically synonyms. The "object" name was chosen to match the Stripe API, since it seems like a sensible choice and reads much more nicely when looking through JSON.
+**The `kind` property of Slate objects has been renamed to `object`.** This is to reduce the confusion over the difference between "kind" and "type" which are practically synonyms. The "object" name was chosen to match the Stripe API, since it seems like a sensible choice and reads much more nicely when looking through JSON.
 
 ---
 
@@ -16,7 +24,7 @@ This document maintains a list of changes to the `slate-hyperscript` package wit
 
 ###### BREAKING
 
-* **Remove all previously deprecated code paths.** This helps to reduce some of the complexity in Slate by not having to handle these code paths anymore. And it helps to reduce file size. When upgrading, it's _highly_ recommended that you upgrade to the previous version first and ensure there are no deprecation warnings being logged, then upgrade to this version.
+**Remove all previously deprecated code paths.** This helps to reduce some of the complexity in Slate by not having to handle these code paths anymore. And it helps to reduce file size. When upgrading, it's _highly_ recommended that you upgrade to the previous version first and ensure there are no deprecation warnings being logged, then upgrade to this version.
 
 ---
 
@@ -24,11 +32,11 @@ This document maintains a list of changes to the `slate-hyperscript` package wit
 
 ###### BREAKING
 
-* **Updated to work with `slate@0.29.0`.** This is required because `slate-hyperscript` needs access to the new `Value` model.
+**Updated to work with `slate@0.29.0`.** This is required because `slate-hyperscript` needs access to the new `Value` model.
 
 ###### DEPRECATED
 
-* **The `<state>` tag has been renamed to `<value>`.** This is to stay in line with the newest version of Slate where the `State` object was renamed to `Value`.
+**The `<state>` tag has been renamed to `<value>`.** This is to stay in line with the newest version of Slate where the `State` object was renamed to `Value`.
 
 ---
 
@@ -36,7 +44,7 @@ This document maintains a list of changes to the `slate-hyperscript` package wit
 
 ###### BREAKING
 
-* **Updated work with `slate@0.27.0`.** The new version of Slate renames the old `Range` model to `Leaf`, and the old `Selection` model to `Range`.
+**Updated work with `slate@0.27.0`.** The new version of Slate renames the old `Range` model to `Leaf`, and the old `Selection` model to `Range`.
 
 ---
 

@@ -1,16 +1,15 @@
+/* eslint-disable import/no-extraneous-dependencies */
 /**
  * Dependencies.
  */
-/* eslint-disable import/no-extraneous-dependencies */
-import { resetKeyGenerator } from 'slate'
+
+import { KeyUtils } from 'slate'
 
 /**
  * Tests.
  */
 
 describe('slate', () => {
-  beforeEach(resetKeyGenerator)
-
   require('./serializers')
   require('./schema')
   require('./changes')
@@ -18,3 +17,5 @@ describe('slate', () => {
   require('./operations')
   require('./models')
 })
+
+beforeEach(KeyUtils.resetGenerator)

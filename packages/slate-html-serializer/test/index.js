@@ -1,17 +1,13 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import Html from 'slate-html-serializer'
-import { t as assert } from 'jest-t-assert' // eslint-disable-line import/no-extraneous-dependencies
+import { t as assert } from 'jest-t-assert'
 import fs from 'fs'
-import { JSDOM } from 'jsdom' // eslint-disable-line import/no-extraneous-dependencies
-import { Value, resetKeyGenerator } from 'slate'
+import { JSDOM } from 'jsdom'
+import { Value, KeyUtils } from 'slate'
 import { basename, extname, resolve } from 'path'
 
-/**
- * Tests.
- */
-
 describe('slate-html-serializer', () => {
-  beforeEach(resetKeyGenerator)
+  beforeEach(KeyUtils.resetGenerator)
 
   describe('deserialize()', () => {
     const dir = resolve(__dirname, './deserialize')

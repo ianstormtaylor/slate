@@ -6,7 +6,11 @@ export const schema = {
   blocks: {
     paragraph: {},
     quote: {
-      nodes: [{ objects: ['text'] }],
+      nodes: [
+        {
+          match: [{ object: 'text' }],
+        },
+      ],
     },
   },
 }
