@@ -103,8 +103,8 @@
     "release": "yarn build:production && yarn test && yarn lint && lerna publish && yarn gh-pages",
     "server": "webpack-dev-server --config ./support/webpack/config.js",
     "start": "npm-run-all --parallel --print-label watch server",
-    "test": "FORBID_DEPRECATIONS=true jest",
-    "test:coverage": "FORBID_DEPRECATIONS=true jest --coverage && codecov",
+    "test": "FORBID_DEPRECATIONS=true jest --config support/jest/config.js",
+    "test:coverage": "FORBID_DEPRECATIONS=true jest --coverage --config support/jest/config.js && codecov",
     "watch": "rollup --config ./support/rollup/config.js --watch"
   }
 }
