@@ -1,6 +1,6 @@
 /** @jsx h */
-
-import h from '../..'
+/* eslint-disable import/no-extraneous-dependencies */
+import h from 'slate-hyperscript'
 
 export const input = (
   <value normalize={false}>
