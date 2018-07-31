@@ -673,64 +673,35 @@ class Node {
 
   getFragmentAtRange(range) {
     range = range.normalize(this)
-    if (range.isUnset) return Document.create()
 
+    if (range.isUnset) {
+      return Document.create()
+    }
+
+    const { startPath, startOffset, endPath, endOffset } = range
     let node = this
+    let targetPath = endPath
+    let targetPosition = endOffset
+    let mode = 'end'
 
-    // Make sure the children exist.
-    const { startKey, startOffset, endKey, endOffset } = range
-    const startText = node.assertDescendant(startKey)
-    const endText = node.assertDescendant(endKey)
+    while (targetPath.size) {
+      const index = targetPath.last()
+      node = node.splitNode(targetPath, targetPosition)
+      targetPosition = index + 1
+      targetPath = PathUtils.lift(targetPath)
 
-    // Split at the start and end.
-    let child = startText
-    let previous
-    let parent
-
-    while ((parent = node.getParent(child.key))) {
-      const index = parent.nodes.indexOf(child)
-      const position =
-        child.object == 'text' ? startOffset : child.nodes.indexOf(previous)
-
-      parent = parent.splitNode(index, position)
-      node = node.replaceNode(parent.key, parent)
-      previous = parent.nodes.get(index + 1)
-      child = parent
+      if (!targetPath.size && mode === 'end') {
+        targetPath = startPath
+        targetPosition = startOffset
+        mode = 'start'
+      }
     }
 
-    child = startKey == endKey ? node.getNextText(startKey) : endText
-
-    while ((parent = node.getParent(child.key))) {
-      const index = parent.nodes.indexOf(child)
-      const position =
-        child.object == 'text'
-          ? startKey == endKey ? endOffset - startOffset : endOffset
-          : child.nodes.indexOf(previous)
-
-      parent = parent.splitNode(index, position)
-      node = node.replaceNode(parent.key, parent)
-      previous = parent.nodes.get(index + 1)
-      child = parent
-    }
-
-    // Get the start and end nodes.
-    const startNode = node.getNextSibling(
-      node.getFurthestAncestor(startKey).key
-    )
-    const endNode =
-      startKey == endKey
-        ? node.getNextSibling(
-            node.getNextSibling(node.getFurthestAncestor(endKey).key).key
-          )
-        : node.getNextSibling(node.getFurthestAncestor(endKey).key)
-
-    // Get children range of nodes from start to end nodes
-    const startIndex = node.nodes.indexOf(startNode)
-    const endIndex = node.nodes.indexOf(endNode)
+    const startIndex = startPath.first() + 1
+    const endIndex = endPath.first() + 2
     const nodes = node.nodes.slice(startIndex, endIndex)
-
-    // Return a new document fragment.
-    return Document.create({ nodes })
+    const fragment = Document.create({ nodes })
+    return fragment
   }
 
   /**
