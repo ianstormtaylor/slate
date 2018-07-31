@@ -22,6 +22,18 @@ const MODEL_TYPES = {
 }
 
 /**
+ * Export type identification function
+ *
+ * @param {string} type
+ * @param {any} any
+ * @return {boolean}
+ */
+
+export function isType(type, any) {
+  return !!(any && any[MODEL_TYPES[type]])
+}
+
+/**
  * Export.
  *
  * @type {Object}

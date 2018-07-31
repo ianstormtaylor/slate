@@ -7,16 +7,23 @@ export const schema = {
   blocks: {
     paragraph: {},
     quote: {
-      nodes: [{ types: ['paragraph'], max: 1 }],
-      normalize: (change, reason, { node, child, index }) => {
-        if (reason == CHILD_UNKNOWN) {
+      nodes: [
+        {
+          match: [{ type: 'paragraph' }],
+          max: 1,
+        },
+      ],
+      normalize: (change, { code, node, child }) => {
+        if (code == CHILD_UNKNOWN) {
           const previous = node.getPreviousSibling(child.key)
           const offset = previous.nodes.size
+
           child.nodes.forEach((n, i) =>
             change.moveNodeByKey(n.key, previous.key, offset + i, {
               normalize: false,
             })
           )
+
           change.removeNodeByKey(child.key)
         }
       },

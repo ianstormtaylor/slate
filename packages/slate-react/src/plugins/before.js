@@ -4,6 +4,7 @@ import { findDOMNode } from 'react-dom'
 import Hotkeys from 'slate-hotkeys'
 import {
   IS_FIREFOX,
+  IS_IE,
   IS_IOS,
   IS_ANDROID,
   SUPPORTED_EVENTS,
@@ -275,10 +276,21 @@ function BeforePlugin() {
     const node = findNode(event.target, editor.value)
     if (node.isVoid) event.preventDefault()
 
+    // COMPAT: IE won't call onDrop on contentEditables unless the
+    // default dragOver is prevented:
+    // https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/913982/
+    // (2018/07/11)
+    if (IS_IE) event.preventDefault()
+
     // If a drag is already in progress, don't do this again.
     if (!isDragging) {
       isDragging = true
-      event.nativeEvent.dataTransfer.dropEffect = 'move'
+
+      // COMPAT: IE will raise an `unspecified error` if dropEffect is
+      // set. (2018/07/11)
+      if (!IS_IE) {
+        event.nativeEvent.dataTransfer.dropEffect = 'move'
+      }
     }
 
     debug('onDragOver', { event })

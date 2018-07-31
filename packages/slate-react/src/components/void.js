@@ -63,6 +63,7 @@ class Void extends React.Component {
       height: '0',
       color: 'transparent',
       outline: 'none',
+      position: 'absolute',
     }
 
     const spacer = (
@@ -78,7 +79,11 @@ class Void extends React.Component {
     this.debug('render', { props })
 
     return (
-      <Tag data-slate-void data-key={node.key}>
+      <Tag
+        data-slate-void
+        data-key={node.key}
+        contentEditable={readOnly || node.object == 'block' ? null : false}
+      >
         {readOnly ? null : spacer}
         {content}
       </Tag>
@@ -97,21 +102,13 @@ class Void extends React.Component {
    */
 
   renderText = () => {
-    const {
-      block,
-      decorations,
-      isSelected,
-      node,
-      readOnly,
-      editor,
-    } = this.props
+    const { block, decorations, node, readOnly, editor } = this.props
     const child = node.getFirstText()
     return (
       <Text
         block={node.object == 'block' ? node : block}
         decorations={decorations}
         editor={editor}
-        isSelected={isSelected}
         key={child.key}
         node={child}
         parent={node}

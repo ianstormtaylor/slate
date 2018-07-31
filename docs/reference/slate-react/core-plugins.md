@@ -67,4 +67,4 @@ function onBeforeInput(event, change, editor) {
 }
 ```
 
-Notice that is calls `event.preventDefault()` to prevent the default browser behavior, and it returns `false` to prevent the editor from continuing to resolve its plugins stack.
+Notice that it calls `event.preventDefault()` to prevent the default browser behavior, and it returns `false` to prevent the editor from continuing to resolve its plugins stack.

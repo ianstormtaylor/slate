@@ -23,7 +23,19 @@
     },
     "test": {
       "presets": [
-        "env",
+        ["env", {
+          "exclude": ["transform-regenerator"]
+        }],
+        "react",
+        "stage-0"
+      ],
+      "plugins": ["transform-runtime"]
+    },
+    "benchmark": {
+      "presets": [
+        ["env", {
+          "exclude": ["transform-regenerator"]
+        }],
         "react",
         "stage-0"
       ],

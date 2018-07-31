@@ -9,8 +9,8 @@ export const schema = {
       data: {
         thing: v => v == 'value',
       },
-      normalize: (change, reason, { node, key }) => {
-        if (reason == NODE_DATA_INVALID) {
+      normalize: (change, { code, node, key }) => {
+        if (code == NODE_DATA_INVALID) {
           change.setNodeByKey(node.key, { data: { thing: 'value' } })
         }
       },

@@ -4,6 +4,7 @@ import { Value } from 'slate'
 import React from 'react'
 import initialValue from './value.json'
 import isUrl from 'is-url'
+import { Button, Icon, Toolbar } from '../components'
 
 /**
  * A change helper to standardize wrapping links.
@@ -60,6 +61,54 @@ class Links extends React.Component {
   }
 
   /**
+   * Render the app.
+   *
+   * @return {Element} element
+   */
+
+  render() {
+    return (
+      <div>
+        <Toolbar>
+          <Button active={this.hasLinks()} onMouseDown={this.onClickLink}>
+            <Icon>link</Icon>
+          </Button>
+        </Toolbar>
+        <Editor
+          placeholder="Enter some text..."
+          value={this.state.value}
+          onChange={this.onChange}
+          onPaste={this.onPaste}
+          renderNode={this.renderNode}
+        />
+      </div>
+    )
+  }
+
+  /**
+   * Render a Slate node.
+   *
+   * @param {Object} props
+   * @return {Element}
+   */
+
+  renderNode = props => {
+    const { attributes, children, node } = props
+
+    switch (node.type) {
+      case 'link': {
+        const { data } = node
+        const href = data.get('href')
+        return (
+          <a {...attributes} href={href}>
+            {children}
+          </a>
+        )
+      }
+    }
+  }
+
+  /**
    * On change.
    *
    * @param {Change} change
@@ -90,6 +139,7 @@ class Links extends React.Component {
     } else {
       const href = window.prompt('Enter the URL of the link:')
       const text = window.prompt('Enter the text for the link:')
+
       change
         .insertText(text)
         .extend(0 - text.length)
@@ -120,84 +170,6 @@ class Links extends React.Component {
 
     change.call(wrapLink, text)
     return true
-  }
-
-  /**
-   * Render the app.
-   *
-   * @return {Element} element
-   */
-
-  render() {
-    return (
-      <div>
-        {this.renderToolbar()}
-        {this.renderEditor()}
-      </div>
-    )
-  }
-
-  /**
-   * Render the toolbar.
-   *
-   * @return {Element} element
-   */
-
-  renderToolbar = () => {
-    const hasLinks = this.hasLinks()
-    return (
-      <div className="menu toolbar-menu">
-        <span
-          className="button"
-          onMouseDown={this.onClickLink}
-          data-active={hasLinks}
-        >
-          <span className="material-icons">link</span>
-        </span>
-      </div>
-    )
-  }
-
-  /**
-   * Render the editor.
-   *
-   * @return {Element} element
-   */
-
-  renderEditor = () => {
-    return (
-      <div className="editor">
-        <Editor
-          placeholder="Enter some text..."
-          value={this.state.value}
-          onChange={this.onChange}
-          onPaste={this.onPaste}
-          renderNode={this.renderNode}
-        />
-      </div>
-    )
-  }
-
-  /**
-   * Render a Slate node.
-   *
-   * @param {Object} props
-   * @return {Element}
-   */
-
-  renderNode = props => {
-    const { attributes, children, node } = props
-    switch (node.type) {
-      case 'link': {
-        const { data } = node
-        const href = data.get('href')
-        return (
-          <a {...attributes} href={href}>
-            {children}
-          </a>
-        )
-      }
-    }
   }
 }
 

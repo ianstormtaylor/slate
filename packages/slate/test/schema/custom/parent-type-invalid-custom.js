@@ -7,9 +7,9 @@ export const schema = {
   blocks: {
     list: {},
     item: {
-      parent: { types: ['list'] },
-      normalize: (change, reason, { node }) => {
-        if (reason == PARENT_TYPE_INVALID) {
+      parent: { type: 'list' },
+      normalize: (change, { code, node }) => {
+        if (code == PARENT_TYPE_INVALID) {
           change.wrapBlockByKey(node.key, 'list')
         }
       },

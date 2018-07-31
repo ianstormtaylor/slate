@@ -15,8 +15,10 @@ Often times, you don't need to specifically know which point is the "anchor" and
 ```js
 Range({
   anchorKey: String,
+  anchorPath: List,
   anchorOffset: Number,
   focusKey: String,
+  focusPath: List,
   focusOffset: Number,
   isFocused: Boolean,
   isBackward: Boolean,
@@ -29,6 +31,12 @@ Range({
 
 The key of the text node at the range's anchor point.
 
+### `anchorPath`
+
+`List`
+
+The path to the text node at the range's anchor point.
+
 ### `anchorOffset`
 
 `Number`
@@ -40,6 +48,12 @@ The number of characters from the start of the text node at the range's anchor p
 `String`
 
 The key of the text node at the range's focus point.
+
+### `focusPath`
+
+`List`
+
+The path to the text node at the range's focus point.
 
 ### `focusOffset`
 
@@ -95,9 +109,13 @@ The opposite of `isBackward`, for convenience.
 
 ### `startKey`
 
+### `startPath`
+
 ### `startOffset`
 
 ### `endKey`
+
+### `endPath`
 
 ### `endOffset`
 

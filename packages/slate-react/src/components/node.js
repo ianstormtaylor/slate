@@ -34,6 +34,7 @@ class Node extends React.Component {
     block: SlateTypes.block,
     decorations: ImmutableTypes.list.isRequired,
     editor: Types.object.isRequired,
+    isFocused: Types.bool.isRequired,
     isSelected: Types.bool.isRequired,
     node: SlateTypes.node.isRequired,
     parent: SlateTypes.node.isRequired,
@@ -103,6 +104,7 @@ class Node extends React.Component {
     // selection value of some of its children could have been changed and they
     // need to be rendered again.
     if (n.isSelected || p.isSelected) return true
+    if (n.isFocused || p.isFocused) return true
 
     // If the decorations have changed, update.
     if (!n.decorations.equals(p.decorations)) return true
@@ -122,6 +124,7 @@ class Node extends React.Component {
     const {
       editor,
       isSelected,
+      isFocused,
       node,
       decorations,
       parent,
@@ -135,6 +138,7 @@ class Node extends React.Component {
     const childrenDecorations = getChildrenDecorations(node, decs)
 
     let children = []
+
     node.nodes.forEach((child, i) => {
       const isChildSelected = !!indexes && indexes.start <= i && i < indexes.end
 
@@ -157,6 +161,7 @@ class Node extends React.Component {
     const props = {
       key: node.key,
       editor,
+      isFocused,
       isSelected,
       node,
       parent,
@@ -169,6 +174,7 @@ class Node extends React.Component {
       placeholder = React.cloneElement(placeholder, {
         key: `${node.key}-placeholder`,
       })
+
       children = [placeholder, ...children]
     }
 
@@ -191,7 +197,7 @@ class Node extends React.Component {
    */
 
   renderNode = (child, isSelected, decorations) => {
-    const { block, editor, node, readOnly } = this.props
+    const { block, editor, node, readOnly, isFocused } = this.props
     const Component = child.object == 'text' ? Text : Node
 
     return (
@@ -200,6 +206,7 @@ class Node extends React.Component {
         decorations={decorations}
         editor={editor}
         isSelected={isSelected}
+        isFocused={isFocused && isSelected}
         key={child.key}
         node={child}
         parent={node}

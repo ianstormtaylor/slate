@@ -1,59 +1,32 @@
-/**
- * An auto-incrementing index for generating keys.
- *
- * @type {Number}
- */
-
-let n
-
-/**
- * The global key generating function.
- *
- * @type {Function}
- */
-
-let generate
-
-/**
- * Generate a key.
- *
- * @return {String}
- */
+import KeyUtils from './key-utils'
+import logger from 'slate-dev-logger'
 
 function generateKey() {
-  return generate()
+  logger.deprecate(
+    `0.35.0`,
+    'The `generateKey()` util is deprecrated. Use the `KeyUtils.create()` helper instead.'
+  )
+
+  return KeyUtils.create()
 }
 
-/**
- * Set a different unique ID generating `function`.
- *
- * @param {Function} func
- */
+function setKeyGenerator(fn) {
+  logger.deprecate(
+    `0.35.0`,
+    'The `setKeyGenerator()` util is deprecrated. Use the `KeyUtils.setGenerator()` helper instead.'
+  )
 
-function setKeyGenerator(func) {
-  generate = func
+  return KeyUtils.setGenerator(fn)
 }
-
-/**
- * Reset the key generating function to its initial state.
- */
 
 function resetKeyGenerator() {
-  n = 0
-  generate = () => `${n++}`
+  logger.deprecate(
+    `0.35.0`,
+    'The `resetKeyGenerator()` util is deprecrated. Use the `KeyUtils.resetGenerator()` helper instead.'
+  )
+
+  return KeyUtils.resetGenerator()
 }
-
-/**
- * Set the initial state.
- */
-
-resetKeyGenerator()
-
-/**
- * Export.
- *
- * @type {Object}
- */
 
 export default generateKey
 export { setKeyGenerator, resetKeyGenerator }

@@ -50,4 +50,7 @@ describe('models', () => {
       }
     })
   })
+
+  require('./text/')
+  require('./leaf/')
 })

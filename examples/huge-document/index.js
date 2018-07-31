@@ -48,22 +48,7 @@ class HugeDocument extends React.Component {
    * @type {Object}
    */
 
-  constructor() {
-    super()
-    console.time('deserializeHugeDocument')
-    this.state = { value: Value.fromJSON(json, { normalize: false }) }
-    console.timeEnd('deserializeHugeDocument')
-  }
-
-  /**
-   * On change.
-   *
-   * @param {Change} change
-   */
-
-  onChange = ({ value }) => {
-    this.setState({ value })
-  }
+  state = { value: Value.fromJSON(json, { normalize: false }) }
 
   /**
    * Render the editor.
@@ -73,17 +58,14 @@ class HugeDocument extends React.Component {
 
   render() {
     return (
-      <div className="editor">
-        <Editor
-          placeholder="Enter some text..."
-          spellCheck={false}
-          value={this.state.value}
-          onChange={this.onChange}
-          onKeyDown={this.onKeyDown}
-          renderNode={this.renderNode}
-          renderMark={this.renderMark}
-        />
-      </div>
+      <Editor
+        placeholder="Enter some text..."
+        spellCheck={false}
+        value={this.state.value}
+        onChange={this.onChange}
+        renderNode={this.renderNode}
+        renderMark={this.renderMark}
+      />
     )
   }
 
@@ -96,6 +78,7 @@ class HugeDocument extends React.Component {
 
   renderNode = props => {
     const { attributes, children, node } = props
+
     switch (node.type) {
       case 'heading':
         return <h1 {...attributes}>{children}</h1>
@@ -111,6 +94,7 @@ class HugeDocument extends React.Component {
 
   renderMark = props => {
     const { children, mark, attributes } = props
+
     switch (mark.type) {
       case 'bold':
         return <strong {...attributes}>{children}</strong>
@@ -121,6 +105,16 @@ class HugeDocument extends React.Component {
       case 'underlined':
         return <u {...attributes}>{children}</u>
     }
+  }
+
+  /**
+   * On change.
+   *
+   * @param {Change} change
+   */
+
+  onChange = ({ value }) => {
+    this.setState({ value })
   }
 }
 

@@ -1,11 +1,4 @@
 /**
- * Prevent circular dependencies.
- */
-
-import './block'
-import './inline'
-
-/**
  * Dependencies.
  */
 
@@ -13,9 +6,8 @@ import isPlainObject from 'is-plain-object'
 import logger from 'slate-dev-logger'
 import { List, Map, Record } from 'immutable'
 
-import Node from './node'
-import MODEL_TYPES from '../constants/model-types'
-import generateKey from '../utils/generate-key'
+import MODEL_TYPES, { isType } from '../constants/model-types'
+import KeyUtils from '../utils/key-utils'
 
 /**
  * Default properties.
@@ -73,12 +65,12 @@ class Document extends Record(DEFAULTS) {
       return object
     }
 
-    const { data = {}, key = generateKey(), nodes = [] } = object
+    const { data = {}, key = KeyUtils.create(), nodes = [] } = object
 
     const document = new Document({
       key,
       data: new Map(data),
-      nodes: new List(nodes.map(Node.fromJSON)),
+      nodes: Document.createChildren(nodes),
     })
 
     return document
@@ -97,9 +89,7 @@ class Document extends Record(DEFAULTS) {
    * @return {Boolean}
    */
 
-  static isDocument(any) {
-    return !!(any && any[MODEL_TYPES.DOCUMENT])
-  }
+  static isDocument = isType.bind(null, 'DOCUMENT')
 
   /**
    * Object.
@@ -175,15 +165,6 @@ class Document extends Record(DEFAULTS) {
  */
 
 Document.prototype[MODEL_TYPES.DOCUMENT] = true
-
-/**
- * Mix in `Node` methods.
- */
-
-Object.getOwnPropertyNames(Node.prototype).forEach(method => {
-  if (method == 'constructor') return
-  Document.prototype[method] = Node.prototype[method]
-})
 
 /**
  * Export.

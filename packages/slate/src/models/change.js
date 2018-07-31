@@ -4,7 +4,7 @@ import logger from 'slate-dev-logger'
 import pick from 'lodash/pick'
 import { List } from 'immutable'
 
-import MODEL_TYPES from '../constants/model-types'
+import MODEL_TYPES, { isType } from '../constants/model-types'
 import Changes from '../changes'
 import Operation from './operation'
 import apply from '../operations/apply'
@@ -31,9 +31,7 @@ class Change {
    * @return {Boolean}
    */
 
-  static isChange(any) {
-    return !!(any && any[MODEL_TYPES.CHANGE])
-  }
+  static isChange = isType.bind(null, 'CHANGE')
 
   /**
    * Create a new `Change` with `attrs`.
@@ -46,6 +44,7 @@ class Change {
     const { value } = attrs
     this.value = value
     this.operations = new List()
+
     this.flags = {
       normalize: true,
       ...pick(attrs, ['merge', 'save', 'normalize']),
@@ -145,23 +144,18 @@ class Change {
   }
 
   /**
-   * Applies a series of change mutations and defers normalization until the end.
+   * Applies a series of change mutations, deferring normalization to the end.
    *
-   * @param {Function} customChange - function that accepts a change object and executes change operations
+   * @param {Function} fn
    * @return {Change}
    */
 
-  withoutNormalization(customChange) {
+  withoutNormalization(fn) {
     const original = this.flags.normalize
     this.setOperationFlag('normalize', false)
-    try {
-      customChange(this)
-      // if the change function worked then run normalization
-      this.normalizeDocument()
-    } finally {
-      // restore the flag to whatever it was
-      this.setOperationFlag('normalize', original)
-    }
+    fn(this)
+    this.setOperationFlag('normalize', original)
+    this.normalizeDocument()
     return this
   }
 

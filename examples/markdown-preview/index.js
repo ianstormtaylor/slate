@@ -31,16 +31,6 @@ class MarkdownPreview extends React.Component {
   }
 
   /**
-   * On change.
-   *
-   * @param {Change} change
-   */
-
-  onChange = ({ value }) => {
-    this.setState({ value })
-  }
-
-  /**
    *
    * Render the example.
    *
@@ -49,15 +39,13 @@ class MarkdownPreview extends React.Component {
 
   render() {
     return (
-      <div className="editor">
-        <Editor
-          placeholder="Write some markdown..."
-          value={this.state.value}
-          onChange={this.onChange}
-          renderMark={this.renderMark}
-          decorateNode={this.decorateNode}
-        />
-      </div>
+      <Editor
+        placeholder="Write some markdown..."
+        value={this.state.value}
+        onChange={this.onChange}
+        renderMark={this.renderMark}
+        decorateNode={this.decorateNode}
+      />
     )
   }
 
@@ -70,6 +58,7 @@ class MarkdownPreview extends React.Component {
 
   renderMark = props => {
     const { children, mark, attributes } = props
+
     switch (mark.type) {
       case 'bold':
         return <strong {...attributes}>{children}</strong>
@@ -130,6 +119,16 @@ class MarkdownPreview extends React.Component {
         )
       }
     }
+  }
+
+  /**
+   * On change.
+   *
+   * @param {Change} change
+   */
+
+  onChange = ({ value }) => {
+    this.setState({ value })
   }
 
   /**

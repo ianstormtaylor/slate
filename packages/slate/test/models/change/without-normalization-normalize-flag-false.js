@@ -8,8 +8,12 @@ export const schema = {
   blocks: {
     paragraph: {},
     item: {
-      parent: { types: ['list'] },
-      nodes: [{ objects: ['text'] }],
+      parent: { type: 'list' },
+      nodes: [
+        {
+          match: [{ object: 'text' }],
+        },
+      ],
     },
     list: {},
   },
@@ -38,7 +42,9 @@ export const output = (
   <value>
     <document>
       <list>
-        <item />
+        <item>
+          <paragraph />
+        </item>
       </list>
     </document>
   </value>

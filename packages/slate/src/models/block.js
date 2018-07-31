@@ -1,10 +1,4 @@
 /**
- * Prevent circular dependencies.
- */
-
-import './document'
-
-/**
  * Dependencies.
  */
 
@@ -12,9 +6,8 @@ import isPlainObject from 'is-plain-object'
 import logger from 'slate-dev-logger'
 import { List, Map, Record } from 'immutable'
 
-import MODEL_TYPES from '../constants/model-types'
-import Node from './node'
-import generateKey from '../utils/generate-key'
+import MODEL_TYPES, { isType } from '../constants/model-types'
+import KeyUtils from '../utils/key-utils'
 
 /**
  * Default properties.
@@ -95,7 +88,7 @@ class Block extends Record(DEFAULTS) {
     const {
       data = {},
       isVoid = false,
-      key = generateKey(),
+      key = KeyUtils.create(),
       nodes = [],
       type,
     } = object
@@ -108,8 +101,8 @@ class Block extends Record(DEFAULTS) {
       key,
       type,
       isVoid: !!isVoid,
-      data: new Map(data),
-      nodes: new List(nodes.map(Node.fromJSON)),
+      data: Map(data),
+      nodes: Block.createChildren(nodes),
     })
 
     return block
@@ -128,9 +121,7 @@ class Block extends Record(DEFAULTS) {
    * @return {Boolean}
    */
 
-  static isBlock(any) {
-    return !!(any && any[MODEL_TYPES.BLOCK])
-  }
+  static isBlock = isType.bind(null, 'BLOCK')
 
   /**
    * Check if `any` is a block list.
@@ -220,15 +211,6 @@ class Block extends Record(DEFAULTS) {
  */
 
 Block.prototype[MODEL_TYPES.BLOCK] = true
-
-/**
- * Mix in `Node` methods.
- */
-
-Object.getOwnPropertyNames(Node.prototype).forEach(method => {
-  if (method == 'constructor') return
-  Block.prototype[method] = Node.prototype[method]
-})
 
 /**
  * Export.

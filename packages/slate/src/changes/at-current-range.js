@@ -40,6 +40,7 @@ PROXY_TRANSFORMS.forEach(method => {
     const { selection } = value
     const methodAtRange = `${method}AtRange`
     change[methodAtRange](selection, ...args)
+
     if (method.match(/Backward$/)) {
       change.collapseToStart()
     } else if (method.match(/Forward$/)) {
@@ -53,6 +54,7 @@ Changes.setBlock = (...args) => {
     'slate@0.33.0',
     'The `setBlock` method of Slate changes has been renamed to `setBlocks`.'
   )
+
   Changes.setBlocks(...args)
 }
 
@@ -61,6 +63,7 @@ Changes.setInline = (...args) => {
     'slate@0.33.0',
     'The `setInline` method of Slate changes has been renamed to `setInlines`.'
   )
+
   Changes.setInlines(...args)
 }
 
@@ -159,7 +162,7 @@ Changes.insertFragment = (change, fragment) => {
     selection.hasEdgeAtEndOf(endText)
 
   const isInserting =
-    fragment.hasBlocks(firstChild.key) || fragment.hasBlocks(lastChild.key)
+    firstChild.hasBlockChildren() || lastChild.hasBlockChildren()
 
   change.insertFragmentAtRange(selection, fragment)
   value = change.value
@@ -168,7 +171,7 @@ Changes.insertFragment = (change, fragment) => {
   const newTexts = document.getTexts().filter(n => !keys.includes(n.key))
   const newText = isAppending ? newTexts.last() : newTexts.takeLast(2).first()
 
-  if ((newText && lastInline) || isInserting) {
+  if (newText && (lastInline || isInserting)) {
     change.select(selection.collapseToEndOf(newText))
   } else if (newText) {
     change.select(
@@ -230,6 +233,7 @@ Changes.splitBlock = (change, depth = 1) => {
   const { selection, document } = value
   const marks = selection.marks || document.getInsertMarksAtRange(selection)
   change.splitBlockAtRange(selection, depth).collapseToEnd()
+
   if (marks && marks.size !== 0) {
     change.select({ marks })
   }
@@ -258,6 +262,19 @@ Changes.removeMark = (change, mark) => {
     const sel = selection.set('marks', marks)
     change.select(sel)
   }
+}
+
+/**
+ * Replace an `oldMark` with a `newMark` in the characters in the current selection.
+ *
+ * @param {Change} change
+ * @param {Mark} oldMark
+ * @param {Mark} newMark
+ */
+
+Changes.replaceMark = (change, oldMark, newMark) => {
+  change.removeMark(oldMark)
+  change.addMark(newMark)
 }
 
 /**

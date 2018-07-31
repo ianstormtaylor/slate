@@ -3,11 +3,33 @@ import logger from 'slate-dev-logger'
 import { List, Record } from 'immutable'
 
 import MODEL_TYPES from '../constants/model-types'
-import OPERATION_ATTRIBUTES from '../constants/operation-attributes'
 import Mark from './mark'
 import Node from './node'
+import PathUtils from '../utils/path-utils'
 import Range from './range'
 import Value from './value'
+
+/**
+ * Operation attributes.
+ *
+ * @type {Array}
+ */
+
+const OPERATION_ATTRIBUTES = {
+  add_mark: ['value', 'path', 'offset', 'length', 'mark'],
+  insert_node: ['value', 'path', 'node'],
+  insert_text: ['value', 'path', 'offset', 'text', 'marks'],
+  merge_node: ['value', 'path', 'position', 'properties', 'target'],
+  move_node: ['value', 'path', 'newPath'],
+  remove_mark: ['value', 'path', 'offset', 'length', 'mark'],
+  remove_node: ['value', 'path', 'node'],
+  remove_text: ['value', 'path', 'offset', 'text', 'marks'],
+  set_mark: ['value', 'path', 'offset', 'length', 'mark', 'properties'],
+  set_node: ['value', 'path', 'node', 'properties'],
+  set_selection: ['value', 'selection', 'properties'],
+  set_value: ['value', 'properties'],
+  split_node: ['value', 'path', 'position', 'properties', 'target'],
+}
 
 /**
  * Default properties.
@@ -90,7 +112,7 @@ class Operation extends Record(DEFAULTS) {
       return object
     }
 
-    const { type, value } = object
+    const { type } = object
     const ATTRIBUTES = OPERATION_ATTRIBUTES[type]
     const attrs = { type }
 
@@ -116,58 +138,51 @@ class Operation extends Record(DEFAULTS) {
         )
       }
 
-      if (key == 'mark') {
+      if (key === 'path' || key === 'newPath') {
+        v = PathUtils.create(v)
+      }
+
+      if (key === 'mark') {
         v = Mark.create(v)
       }
 
-      if (key == 'marks' && v != null) {
+      if (key === 'marks' && v != null) {
         v = Mark.createSet(v)
       }
 
-      if (key == 'node') {
+      if (key === 'node') {
         v = Node.create(v)
       }
 
-      if (key == 'selection') {
+      if (key === 'selection') {
         v = Range.create(v)
       }
 
-      if (key == 'value') {
+      if (key === 'value') {
         v = Value.create(v)
       }
 
-      if (key == 'properties' && type == 'merge_node') {
+      if (key === 'properties' && type === 'merge_node') {
         v = Node.createProperties(v)
       }
 
-      if (key == 'properties' && type == 'set_mark') {
+      if (key === 'properties' && type === 'set_mark') {
         v = Mark.createProperties(v)
       }
 
-      if (key == 'properties' && type == 'set_node') {
+      if (key === 'properties' && type === 'set_node') {
         v = Node.createProperties(v)
       }
 
-      if (key == 'properties' && type == 'set_selection') {
-        const { anchorKey, focusKey, ...rest } = v
-        v = Range.createProperties(rest)
-
-        if (anchorKey !== undefined) {
-          v.anchorPath =
-            anchorKey === null ? null : value.document.getPath(anchorKey)
-        }
-
-        if (focusKey !== undefined) {
-          v.focusPath =
-            focusKey === null ? null : value.document.getPath(focusKey)
-        }
+      if (key === 'properties' && type === 'set_selection') {
+        v = Range.createProperties(v)
       }
 
-      if (key == 'properties' && type == 'set_value') {
+      if (key === 'properties' && type === 'set_value') {
         v = Value.createProperties(v)
       }
 
-      if (key == 'properties' && type == 'split_node') {
+      if (key === 'properties' && type === 'split_node') {
         v = Node.createProperties(v)
       }
 
@@ -275,13 +290,14 @@ class Operation extends Record(DEFAULTS) {
       if (key == 'properties' && type == 'set_selection') {
         const v = {}
         if ('anchorOffset' in value) v.anchorOffset = value.anchorOffset
-        if ('anchorPath' in value) v.anchorPath = value.anchorPath
+        if ('anchorPath' in value)
+          v.anchorPath = value.anchorPath && value.anchorPath.toJSON()
         if ('focusOffset' in value) v.focusOffset = value.focusOffset
-        if ('focusPath' in value) v.focusPath = value.focusPath
+        if ('focusPath' in value)
+          v.focusPath = value.focusPath && value.focusPath.toJSON()
         if ('isBackward' in value) v.isBackward = value.isBackward
         if ('isFocused' in value) v.isFocused = value.isFocused
-        if ('marks' in value)
-          v.marks = value.marks == null ? null : value.marks.toJSON()
+        if ('marks' in value) v.marks = value.marks && value.marks.toJSON()
         value = v
       }
 

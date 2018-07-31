@@ -14,19 +14,17 @@ import initialValue from './value.json'
 const schema = {
   document: {
     nodes: [
-      { types: ['title'], min: 1, max: 1 },
-      { types: ['paragraph'], min: 1 },
+      { match: { type: 'title' }, min: 1, max: 1 },
+      { match: { type: 'paragraph' }, min: 1 },
     ],
-    normalize: (change, violation, { node, child, index }) => {
-      switch (violation) {
+    normalize: (change, { code, node, child, index }) => {
+      switch (code) {
         case CHILD_TYPE_INVALID: {
-          return change.setNodeByKey(
-            child.key,
-            index == 0 ? 'title' : 'paragraph'
-          )
+          const type = index === 0 ? 'title' : 'paragraph'
+          return change.setNodeByKey(child.key, type)
         }
         case CHILD_REQUIRED: {
-          const block = Block.create(index == 0 ? 'title' : 'paragraph')
+          const block = Block.create(index === 0 ? 'title' : 'paragraph')
           return change.insertNodeByKey(node.key, index, block)
         }
       }
@@ -52,16 +50,6 @@ class ForcedLayout extends React.Component {
   }
 
   /**
-   * On change.
-   *
-   * @param {Change} change
-   */
-
-  onChange = ({ value }) => {
-    this.setState({ value })
-  }
-
-  /**
    * Render the editor.
    *
    * @return {Component} component
@@ -69,15 +57,13 @@ class ForcedLayout extends React.Component {
 
   render() {
     return (
-      <div className="editor">
-        <Editor
-          placeholder="Enter a title..."
-          value={this.state.value}
-          schema={schema}
-          onChange={this.onChange}
-          renderNode={this.renderNode}
-        />
-      </div>
+      <Editor
+        placeholder="Enter a title..."
+        value={this.state.value}
+        schema={schema}
+        onChange={this.onChange}
+        renderNode={this.renderNode}
+      />
     )
   }
 
@@ -90,12 +76,23 @@ class ForcedLayout extends React.Component {
 
   renderNode = props => {
     const { attributes, children, node } = props
+
     switch (node.type) {
       case 'title':
         return <h2 {...attributes}>{children}</h2>
       case 'paragraph':
         return <p {...attributes}>{children}</p>
     }
+  }
+
+  /**
+   * On change.
+   *
+   * @param {Change} change
+   */
+
+  onChange = ({ value }) => {
+    this.setState({ value })
   }
 }
 
