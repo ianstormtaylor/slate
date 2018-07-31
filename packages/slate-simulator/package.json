@@ -1,7 +1,7 @@
 {
   "name": "slate-simulator",
   "description": "A simulator for testing Slate editors and plugins.",
-  "version": "0.4.41",
+  "version": "0.4.42",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
   "main": "lib/slate-simulator.js",
@@ -16,7 +16,7 @@
     "slate": ">=0.32.0"
   },
   "devDependencies": {
-    "slate": "^0.36.0"
+    "slate": "^0.36.1"
   },
   "scripts": {
     "clean": "rm -rf ./dist ./lib ./node_modules"
