@@ -1,7 +1,6 @@
 import {
   Block,
   Change,
-  Character,
   Data,
   Document,
   History,
@@ -59,8 +58,6 @@ const Types = {
   block: create('Block', v => Block.isBlock(v)),
   blocks: create('List<Block>', v => Block.isBlockList(v)),
   change: create('Change', v => Change.isChange(v)),
-  character: create('Character', v => Character.isCharacter(v)),
-  characters: create('List<Character>', v => Character.isCharacterList(v)),
   data: create('Data', v => Data.isData(v)),
   document: create('Document', v => Document.isDocument(v)),
   history: create('History', v => History.isHistory(v)),

@@ -39,14 +39,6 @@ Ensure that a value is an immutable `List` of Slate [`Block`](../slate/block.md)
 
 Ensure that a value is a Slate `Change`.
 
-### `character`
-
-Ensure that a value is a Slate `Character`.
-
-### `characters`
-
-Ensure that a value is an immutable `List` of Slate [`Character`](../slate/character.md) objects.
-
 ### `data`
 
 Ensure that a value is a Slate `Data`.

@@ -1,7 +1,6 @@
 import Block from './models/block'
 import Change from './models/change'
 import Changes from './changes'
-import Character from './models/character'
 import Data from './models/data'
 import Document from './models/document'
 import History from './models/history'
@@ -32,7 +31,6 @@ export {
   Block,
   Change,
   Changes,
-  Character,
   Data,
   Document,
   History,
@@ -59,7 +57,6 @@ export {
 export default {
   Block,
   Changes,
-  Character,
   Data,
   Document,
   History,

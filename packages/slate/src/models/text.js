@@ -192,16 +192,6 @@ class Text extends Record(DEFAULTS) {
   }
 
   /**
-   * Get the concatenated characters of the node;
-   *
-   * @returns {String}
-   */
-
-  get characters() {
-    return this.leaves.flatMap(x => x.getCharacters())
-  }
-
-  /**
    * Find the 'first' leaf at offset; By 'first' the alorighthm prefers `endOffset === offset` than `startOffset === offset`
    * Corner Cases:
    *   1. if offset is negative, return the first leaf;

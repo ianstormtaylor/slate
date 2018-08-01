@@ -73,18 +73,6 @@ Get all of the bottom-most [`Block`](./block.md) nodes in a `range`.
 
 Get all of the bottom-most [`Block`](./block.md) nodes by `type`.
 
-### `getCharacters`
-
-`getCharacters() => List`
-
-Get a list of all of the [`Characters`](./character.md) in the node.
-
-### `getCharactersAtRange`
-
-`getCharactersAtRange(range: Range) => List`
-
-Get a list of all of the [`Characters`](./character.md) in a `range`.
-
 ### `getChild`
 
 `getChild(path: List|Array) => Node|Void`

@@ -7,7 +7,6 @@
 const MODEL_TYPES = {
   BLOCK: '@@__SLATE_BLOCK__@@',
   CHANGE: '@@__SLATE_CHANGE__@@',
-  CHARACTER: '@@__SLATE_CHARACTER__@@',
   DOCUMENT: '@@__SLATE_DOCUMENT__@@',
   HISTORY: '@@__SLATE_HISTORY__@@',
   INLINE: '@@__SLATE_INLINE__@@',

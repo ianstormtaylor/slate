@@ -3,7 +3,6 @@ import logger from 'slate-dev-logger'
 import { List, Record, Set } from 'immutable'
 
 import MODEL_TYPES, { isType } from '../constants/model-types'
-import Character from './character'
 import Mark from './mark'
 
 /**
@@ -236,31 +235,6 @@ class Leaf extends Record(DEFAULTS) {
       'The `kind` property of Slate objects has been renamed to `object`.'
     )
     return this.object
-  }
-
-  /**
-   * Return leaf as a list of characters
-   *
-   * @return {List<Character>}
-   */
-
-  getCharacters() {
-    logger.deprecate(
-      'slate@0.34.0',
-      'The `characters` property of Slate objects is deprecated'
-    )
-
-    const { marks } = this
-    const characters = Character.createList(
-      this.text.split('').map(char => {
-        return Character.create({
-          text: char,
-          marks,
-        })
-      })
-    )
-
-    return characters
   }
 
   /**

@@ -10,14 +10,9 @@ A text node in a Slate [`Document`](./document.md). Text nodes are always the bo
 
 ```js
 Text({
-  characters: Immutable.List<Character>,
-  key: String
+  key: String,
 })
 ```
-
-### `characters`
-
-A list of [`Characters`](./character.md) with associated [`Marks`](./mark.md) that make up the text node's content.
 
 ### `key`
 

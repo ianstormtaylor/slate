@@ -447,46 +447,6 @@ class Node {
   }
 
   /**
-   * Get all of the characters for every text node.
-   *
-   * @return {List<Character>}
-   */
-
-  getCharacters() {
-    const characters = this.getTexts().flatMap(t => t.characters)
-    return characters
-  }
-
-  /**
-   * Get a list of the characters in a `range`.
-   *
-   * @param {Range} range
-   * @return {List<Character>}
-   */
-
-  getCharactersAtRange(range) {
-    range = range.normalize(this)
-    if (range.isUnset) return List()
-    const { startKey, endKey, startOffset, endOffset } = range
-
-    if (startKey === endKey) {
-      const endText = this.getDescendant(endKey)
-      return endText.characters.slice(startOffset, endOffset)
-    }
-
-    return this.getTextsAtRange(range).flatMap(t => {
-      if (t.key === startKey) {
-        return t.characters.slice(startOffset)
-      }
-
-      if (t.key === endKey) {
-        return t.characters.slice(0, endOffset)
-      }
-      return t.characters
-    })
-  }
-
-  /**
    * Get a child node.
    *
    * @param {List|String} path
