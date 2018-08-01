@@ -1,1 +1,1 @@
-This package contains the logger that Slate uses to log warnings and deprecations only when in development environments.
+This package contains a set of testing utilities used by Slate's other core packages for writing their tests.

@@ -32,7 +32,6 @@
     "figures": "^2.0.0",
     "fs-promise": "^1.0.0",
     "gh-pages": "^0.11.0",
-    "glob": "^7.1.2",
     "html-webpack-plugin": "^2.30.1",
     "html-webpack-template": "^6.1.0",
     "image-extensions": "^1.1.0",
