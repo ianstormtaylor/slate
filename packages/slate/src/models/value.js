@@ -119,7 +119,7 @@ class Value extends Record(DEFAULTS) {
       if (text) selection = selection.collapseToStartOf(text)
     }
 
-    selection = selection.normalize(document)
+    selection = document.createRange(selection)
 
     let value = new Value({
       data,
@@ -978,8 +978,8 @@ class Value extends Record(DEFAULTS) {
   setSelection(properties) {
     let value = this
     let { document, selection } = value
-    selection = selection.merge(properties)
-    selection = selection.normalize(document)
+    const next = selection.merge(properties)
+    selection = document.createRange(next)
     value = value.set('selection', selection)
     return value
   }
@@ -1036,14 +1036,14 @@ class Value extends Record(DEFAULTS) {
     if (selection) {
       let next = selection.isSet ? iterator(selection) : selection
       if (!next) next = selection.deselect()
-      if (next !== selection) next = next.normalize(document)
+      if (next !== selection) next = document.createRange(next)
       value = value.set('selection', next)
     }
 
     if (decorations) {
       let next = decorations.map(decoration => {
         let n = decoration.isSet ? iterator(decoration) : decoration
-        if (n && n !== decoration) n = n.normalize(document)
+        if (n && n !== decoration) n = document.createRange(n)
         return n
       })
 

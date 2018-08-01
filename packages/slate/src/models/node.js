@@ -206,6 +206,19 @@ class Node {
   }
 
   /**
+   * Create a new range with `properties` relative to the node.
+   *
+   * @param {Object|Range} properties
+   * @return {Range}
+   */
+
+  createRange(properties) {
+    properties = Range.createProperties(properties)
+    const range = this.resolveRange(properties)
+    return range
+  }
+
+  /**
    * Recursively filter all descendant nodes with `iterator`.
    *
    * @param {Function} iterator
@@ -275,7 +288,7 @@ class Node {
    */
 
   getActiveMarksAtRange(range) {
-    range = range.normalize(this)
+    range = this.resolveRange(range)
     if (range.isUnset) return Set()
 
     if (range.isCollapsed) {
@@ -397,7 +410,7 @@ class Node {
    */
 
   getBlocksAtRangeAsArray(range) {
-    range = range.normalize(this)
+    range = this.resolveRange(range)
     if (range.isUnset) return []
 
     const { startKey, endKey } = range
@@ -465,7 +478,7 @@ class Node {
    */
 
   getCharactersAtRange(range) {
-    range = range.normalize(this)
+    range = this.resolveRange(range)
     if (range.isUnset) return List()
     const { startKey, endKey, startOffset, endOffset } = range
 
@@ -672,7 +685,7 @@ class Node {
    */
 
   getFragmentAtRange(range) {
-    range = range.normalize(this)
+    range = this.resolveRange(range)
 
     if (range.isUnset) {
       return Document.create()
@@ -839,7 +852,7 @@ class Node {
    */
 
   getInlinesAtRangeAsArray(range) {
-    range = range.normalize(this)
+    range = this.resolveRange(range)
     if (range.isUnset) return []
 
     const array = this.getTextsAtRangeAsArray(range)
@@ -892,7 +905,7 @@ class Node {
    */
 
   getInsertMarksAtRange(range) {
-    range = range.normalize(this)
+    range = this.resolveRange(range)
     if (range.isUnset) return Set()
 
     if (range.isCollapsed) {
@@ -1178,7 +1191,7 @@ class Node {
    */
 
   getOffsetAtRange(range) {
-    range = range.normalize(this)
+    range = this.resolveRange(range)
 
     if (range.isUnset) {
       throw new Error('The range cannot be unset to calculcate its offset.')
@@ -1213,7 +1226,7 @@ class Node {
    */
 
   getOrderedMarksAtRange(range) {
-    range = range.normalize(this)
+    range = this.resolveRange(range)
     if (range.isUnset) return OrderedSet()
 
     if (range.isCollapsed) {
@@ -1537,7 +1550,7 @@ class Node {
    */
 
   getTextsAtRange(range) {
-    range = range.normalize(this)
+    range = this.resolveRange(range)
     if (range.isUnset) return List()
     const { startKey, endKey } = range
     const list = new List(
@@ -1555,7 +1568,7 @@ class Node {
    */
 
   getTextsAtRangeAsArray(range) {
-    range = range.normalize(this)
+    range = this.resolveRange(range)
     if (range.isUnset) return []
     const { startKey, endKey } = range
     const texts = this.getTextsBetweenPositionsAsArray(startKey, endKey)
@@ -1836,6 +1849,18 @@ class Node {
   }
 
   /**
+   * Normalize the node with a `schema`.
+   *
+   * @param {Schema} schema
+   * @return {Function|Void}
+   */
+
+  normalize(schema) {
+    const normalizer = schema.normalizeNode(this)
+    return normalizer
+  }
+
+  /**
    * Attempt to "refind" a node by a previous `path`, falling back to looking
    * it up by `key` again.
    *
@@ -1978,6 +2003,20 @@ class Node {
   }
 
   /**
+   * Resolve a `range`, relative to the node, ensuring that the keys and
+   * offsets in the range exist and that they are synced with the paths.
+   *
+   * @param {Range|Object} range
+   * @return {Range}
+   */
+
+  resolveRange(range) {
+    range = Range.create(range)
+    range = range.normalize(this)
+    return range
+  }
+
+  /**
    * Set `properties` on a node.
    *
    * @param {List|String} path
@@ -2044,17 +2083,6 @@ class Node {
     ret = ret.insertNode(path, b)
     ret = ret.insertNode(path, a)
     return ret
-  }
-
-  /**
-   * Normalize the node with a `schema`.
-   *
-   * @param {Schema} schema
-   * @return {Function|Void}
-   */
-
-  normalize(schema) {
-    return schema.normalizeNode(this)
   }
 
   /**
@@ -2138,7 +2166,7 @@ class Node {
       'The `Node.isInRange` method is deprecated. Use the new `PathUtils.compare` helper instead.'
     )
 
-    range = range.normalize(this)
+    range = this.resolveRange(range)
 
     const node = this
     const { startKey, endKey, isCollapsed } = range

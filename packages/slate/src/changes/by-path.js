@@ -343,12 +343,12 @@ Changes.replaceTextByPath = (
     length = node.text.length - offset
   }
 
-  const range = Range.create({
+  const range = document.createRange({
     anchorPath: path,
     focusPath: path,
     anchorOffset: offset,
     focusOffset: offset + length,
-  }).normalize(document)
+  })
 
   let activeMarks = document.getActiveMarksAtRange(range)
 
@@ -358,7 +358,8 @@ Changes.replaceTextByPath = (
     // Do not use mark at index when marks and activeMarks are both empty
     marks = activeMarks ? activeMarks : []
   } else if (activeMarks) {
-    // Do not use `has` because we may want to reset marks like font-size with an updated data;
+    // Do not use `has` because we may want to reset marks like font-size with
+    // an updated data;
     activeMarks = activeMarks.filter(
       activeMark => !marks.find(m => activeMark.type === m.type)
     )
