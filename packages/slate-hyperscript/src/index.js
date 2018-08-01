@@ -126,7 +126,6 @@ const CREATORS = {
     const { data, normalize = true } = attributes
     const document = children.find(Document.isDocument)
     let selection = children.find(Range.isRange) || Range.create()
-    debugger
     const props = {}
     let decorations = []
     const partialDecorations = {}
@@ -205,9 +204,7 @@ const CREATORS = {
     let value = Value.fromJSON({ data, document, selection }, { normalize })
 
     if (!isEmpty(props)) {
-      debugger
       selection = selection.merge(props).normalize(value.document)
-      debugger
       value = value.set('selection', selection)
     }
 
@@ -217,7 +214,6 @@ const CREATORS = {
       value = value.set('decorations', decorations)
     }
 
-    debugger
     return value
   },
 
