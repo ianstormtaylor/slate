@@ -913,8 +913,8 @@ class Node {
    */
 
   getKeysToPathsTable() {
-    if (this.nodes !== this.__lastNodes) {
-      this.__lastNodes = this.nodes
+    if (!this.__dict) {
+      // this.__lastNodes = this.nodes
 
       const ret = {
         [this.key]: [],
@@ -2219,7 +2219,7 @@ memoize(Node.prototype, [
   'getMarksAtPosition',
   'getOrderedMarksBetweenPositions',
   'getInsertMarksAtRange',
-  'getKeysToPathsTable',
+  // 'getKeysToPathsTable',
   'getLastText',
   'getMarksByTypeAsArray',
   'getNextBlock',
