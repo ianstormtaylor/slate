@@ -112,7 +112,7 @@ class Image extends React.Component {
   }
 
   render() {
-    ;<img {...this.props.attributes} onClick={this.onClick} />
+    <img {...this.props.attributes} onClick={this.onClick} />
   }
 }
 ```
