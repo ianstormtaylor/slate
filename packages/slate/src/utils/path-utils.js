@@ -1,26 +1,26 @@
 import { List } from 'immutable'
 
 /**
- * Compare paths `a` and `b` to see which is before or after.
+ * Compare paths `path` and `b` to see which is before or after.
  *
- * @param {List} a
+ * @param {List} path
  * @param {List} b
  * @return {Number|Null}
  */
 
-function compare(a, b) {
+function compare(path, target) {
   // PERF: if the paths are the same we can exit early.
-  if (a.size !== b.size) return null
+  if (path.size !== target.size) return null
 
-  for (let i = 0; i < a.size; i++) {
-    const av = a.get(i)
-    const bv = b.get(i)
+  for (let i = 0; i < path.size; i++) {
+    const pv = path.get(i)
+    const tv = target.get(i)
 
-    // If a's value is ever less than b's, it's before.
-    if (av < bv) return -1
+    // If the path's value is ever less than the target's, it's before.
+    if (pv < tv) return -1
 
-    // If b's value is ever less than a's, it's after.
-    if (av > bv) return 1
+    // If the target's value is ever less than the path's, it's after.
+    if (pv > tv) return 1
   }
 
   // Otherwise they were equal the whole way, it's the same.

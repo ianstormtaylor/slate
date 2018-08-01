@@ -54,7 +54,6 @@ export const output = {
     focusKey: '0',
     focusPath: [0, 0],
     focusOffset: 3,
-    isBackward: false,
     isFocused: true,
     isAtomic: false,
     marks: null,
