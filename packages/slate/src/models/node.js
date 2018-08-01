@@ -913,24 +913,30 @@ class Node {
    */
 
   getKeysToPathsTable() {
-    const ret = {
-      [this.key]: [],
+    if (this.nodes !== this.__lastNodes) {
+      this.__lastNodes = this.nodes
+
+      const ret = {
+        [this.key]: [],
+      }
+
+      this.nodes.forEach((node, i) => {
+        ret[node.key] = [i]
+
+        if (node.object !== 'text') {
+          const nested = node.getKeysToPathsTable()
+
+          for (const key in nested) {
+            const path = nested[key]
+            ret[key] = [i, ...path]
+          }
+        }
+      })
+
+      this.__dict = ret
     }
 
-    this.nodes.forEach((node, i) => {
-      ret[node.key] = [i]
-
-      if (node.object !== 'text') {
-        const nested = node.getKeysToPathsTable()
-
-        for (const key in nested) {
-          const path = nested[key]
-          ret[key] = [i, ...path]
-        }
-      }
-    })
-
-    return ret
+    return this.__dict
   }
 
   /**
