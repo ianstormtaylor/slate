@@ -171,7 +171,12 @@ class Editor extends React.Component {
   }
 
   get value() {
-    if (this.tmp.value === this.props.value) return this.tmp.value
+    if (
+      this.tmp.value === this.props.value &&
+      this.tmp.stack === this.stack.stack
+    ) {
+      return this.tmp.value
+    }
     return this.associateStackAndValue(this.props.value, this.stack)
   }
 
@@ -219,6 +224,8 @@ class Editor extends React.Component {
     const { value } = change
     const { onChange } = this.props
     if (value == this.value) return
+    this.tmp.value = value
+    this.tmp.stack = this.stack
     onChange(change)
   }
 
