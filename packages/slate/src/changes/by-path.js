@@ -3,7 +3,6 @@ import Inline from '../models/inline'
 import Mark from '../models/mark'
 import Node from '../models/node'
 import PathUtils from '../utils/path-utils'
-import Range from '../models/range'
 
 /**
  * Changes.

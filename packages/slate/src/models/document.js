@@ -4,7 +4,6 @@ import { List, Map, Record } from 'immutable'
 
 import KeyUtils from '../utils/key-utils'
 import MODEL_TYPES, { isType } from '../constants/model-types'
-import Range from './range'
 
 /**
  * Default properties.
