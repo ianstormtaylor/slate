@@ -397,11 +397,7 @@ Changes.deleteBackwardAtRange = (change, range, n = 1, options = {}) => {
   // If the focus offset is farther than the number of characters to delete,
   // just remove the characters backwards inside the current node.
   if (n < focusOffset) {
-    range = range.merge({
-      focusOffset: focusOffset - n,
-      isBackward: true,
-    })
-
+    range = range.merge({ focusOffset: focusOffset - n })
     change.deleteAtRange(range, { normalize })
     return
   }
@@ -424,9 +420,8 @@ Changes.deleteBackwardAtRange = (change, range, n = 1, options = {}) => {
   }
 
   range = range.merge({
-    focusKey: node.key,
-    focusOffset: offset,
-    isBackward: true,
+    anchorKey: node.key,
+    anchorOffset: offset,
   })
 
   change.deleteAtRange(range, { normalize })
