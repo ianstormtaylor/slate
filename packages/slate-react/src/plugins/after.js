@@ -682,7 +682,7 @@ function AfterPlugin() {
    */
 
   function renderEditor(props, editor) {
-    const handlers = editor.getHandlers()
+    const { handlers } = editor
 
     return (
       <Content

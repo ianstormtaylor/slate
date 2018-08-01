@@ -122,14 +122,12 @@ class Editor extends React.Component {
    * Get event handlers as passed by onEvent
    */
 
-  getHandlers = memoize(() =>
-    EVENT_HANDLERS.reduce((obj, handler) => {
-      obj[handler] = event => {
-        this.onEvent(handler, event)
-      }
-      return obj
-    }, {})
-  )
+  handlers = EVENT_HANDLERS.reduce((obj, handler) => {
+    obj[handler] = event => {
+      this.onEvent(handler, event)
+    }
+    return obj
+  }, {})
 
   /**
    * Perform a change on the editor, passing `...args` to `change.call`.
