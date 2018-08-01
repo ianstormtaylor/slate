@@ -347,6 +347,7 @@ function AfterPlugin() {
     const entire = selection
       .moveAnchorTo(point.key, start)
       .moveFocusTo(point.key, end)
+      .normalize(document)
 
     // Change the current value to have the leaf's text replaced.
     change.insertTextAtRange(entire, textContent, leaf.marks).select(corrected)

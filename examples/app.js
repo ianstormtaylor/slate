@@ -102,14 +102,14 @@ const TabList = styled('div')`
   }
 `
 
-const Tab = styled(RouterLink)`
+const Tab = styled(({ active, ...props }) => <RouterLink {...props} />)`
   display: inline-block;
   margin-bottom: 0.2em;
   padding: 0.2em 0.5em;
   border-radius: 0.2em;
   text-decoration: none;
-  color: ${props => (props.active ? 'white' : '#777')};
-  background: ${props => (props.active ? '#333' : 'transparent')};
+  color: ${p => (p.active ? 'white' : '#777')};
+  background: ${p => (p.active ? '#333' : 'transparent')};
 
   &:hover {
     background: #333;

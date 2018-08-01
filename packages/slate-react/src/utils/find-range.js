@@ -60,7 +60,7 @@ function findRange(native, value) {
     }
   }
 
-  const range = Range.create({
+  let range = Range.create({
     anchorKey: anchor.key,
     anchorOffset: anchor.offset,
     focusKey: focus.key,
@@ -69,6 +69,7 @@ function findRange(native, value) {
     isFocused: true,
   })
 
+  range = range.normalize(value.document)
   return range
 }
 
