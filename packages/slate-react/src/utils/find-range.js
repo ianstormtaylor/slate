@@ -1,6 +1,5 @@
 import getWindow from 'get-window'
 import isBackward from 'selection-is-backward'
-import { Range } from 'slate'
 import { IS_IE, IS_EDGE } from 'slate-dev-environment'
 
 import findPoint from './find-point'
@@ -60,7 +59,8 @@ function findRange(native, value) {
     }
   }
 
-  let range = Range.create({
+  const { document } = value
+  const range = document.createRange({
     anchorKey: anchor.key,
     anchorOffset: anchor.offset,
     focusKey: focus.key,
@@ -69,7 +69,6 @@ function findRange(native, value) {
     isFocused: true,
   })
 
-  range = range.normalize(value.document)
   return range
 }
 

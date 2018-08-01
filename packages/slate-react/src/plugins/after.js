@@ -344,10 +344,11 @@ function AfterPlugin() {
     // Determine what the selection should be after changing the text.
     const delta = textContent.length - text.length
     const corrected = selection.collapseToEnd().move(delta)
-    const entire = selection
+    let entire = selection
       .moveAnchorTo(point.key, start)
       .moveFocusTo(point.key, end)
-      .normalize(document)
+
+    entire = document.normalizeRange(entire)
 
     // Change the current value to have the leaf's text replaced.
     change.insertTextAtRange(entire, textContent, leaf.marks).select(corrected)
@@ -583,7 +584,7 @@ function AfterPlugin() {
       if (next) range = range.moveFocusTo(next.key, 0)
     }
 
-    range = range.normalize(document)
+    range = document.normalizeRange(range)
     change.select(range)
   }
 

@@ -25,7 +25,7 @@ Changes.select = (change, properties, options = {}) => {
   const { value } = change
   const { document, selection } = value
   const props = {}
-  const next = selection.merge(properties).normalize(document)
+  const next = document.createRange(selection.merge(properties))
 
   // Re-compute the properties, to ensure that we get their normalized values.
   properties = pick(next, Object.keys(properties))
@@ -325,7 +325,7 @@ PROXY_TRANSFORMS.forEach(method => {
     const { value } = change
     const { document, selection } = value
     let next = selection[method](...args)
-    if (normalize) next = next.normalize(document)
+    if (normalize) next = document.createRange(next)
     change.select(next)
   }
 })
