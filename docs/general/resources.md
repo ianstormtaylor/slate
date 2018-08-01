@@ -19,7 +19,6 @@ These tools are helpful when developing with Slate:
 
 These products are built with Slate, and can give you an idea of what's possible:
 
-
 * [GitBook](https://www.gitbook.com/)
 * [Grafana](https://grafana.com/)
 * [Guru](https://www.getguru.com/)
