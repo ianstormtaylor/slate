@@ -3,12 +3,20 @@ import { basename, extname, resolve } from 'path'
 import { KeyUtils } from 'slate'
 
 export const fixtures = (...args) => {
-  const fn = args.pop()
+  let fn = args.pop()
+  let options = { skip: false }
+
+  if (typeof fn !== 'function') {
+    options = fn
+    fn = args.pop()
+  }
+
   const path = resolve(...args)
   const files = fs.readdirSync(path)
   const dir = basename(path)
+  const d = options.skip ? describe.skip : describe
 
-  describe(dir, () => {
+  d(dir, () => {
     for (const file of files) {
       const p = resolve(path, file)
       const stat = fs.statSync(p)
@@ -44,4 +52,8 @@ export const fixtures = (...args) => {
       }
     }
   })
+}
+
+fixtures.skip = (...args) => {
+  fixtures(...args, { skip: true })
 }

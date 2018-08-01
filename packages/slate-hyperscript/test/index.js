@@ -1,7 +1,5 @@
 import assert from 'assert'
-import fs from 'fs'
 import { Value } from 'slate'
-import { basename, extname, resolve } from 'path'
 import { fixtures } from 'slate-dev-test-utils'
 
 describe('slate-hyperscript', () => {
@@ -12,35 +10,20 @@ describe('slate-hyperscript', () => {
     assert.deepEqual(actual, expected)
   })
 
-  describe.skip('decorations', () => {
-    const decDir = resolve(__dirname, './decorations')
-    const decTests = fs
-      .readdirSync(decDir)
-      .filter(t => t[0] != '.')
-      .map(t => basename(t, extname(t)))
+  fixtures.skip(__dirname, 'decorations', ({ module }) => {
+    const { input, output, expectDecorations } = module
+    const actual = input.toJSON()
+    const expected = Value.isValue(output) ? output.toJSON() : output
+    assert.deepEqual(actual, expected)
 
-    for (const test of decTests) {
-      it(test, async () => {
-        const module = require(resolve(decDir, test))
-        const { input, output, expectDecorations } = module
-
-        // ensure deserialization was okay
-        const actual = input.toJSON()
-        const expected = Value.isValue(output) ? output.toJSON() : output
-        assert.deepEqual(actual, expected)
-
-        // ensure expected properties of decorations match
-        // note: they are expected to match order in test result
-        expectDecorations.forEach((decoration, i) => {
-          Object.keys(decoration).forEach(prop => {
-            assert.deepEqual(
-              decoration[prop],
-              input.decorations.toJS()[i][prop],
-              `decoration ${i} had incorrect prop: ${prop}`
-            )
-          })
-        })
+    expectDecorations.forEach((decoration, i) => {
+      Object.keys(decoration).forEach(prop => {
+        assert.deepEqual(
+          decoration[prop],
+          input.decorations.toJS()[i][prop],
+          `decoration ${i} had incorrect prop: ${prop}`
+        )
       })
-    }
+    })
   })
 })
