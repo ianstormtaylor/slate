@@ -5,7 +5,7 @@ import SlateTypes from 'slate-prop-types'
 import Types from 'prop-types'
 import logger from 'slate-dev-logger'
 import { Schema, Stack } from 'slate'
-import memoize from 'memoize-one'
+import memoizeOne from 'memoize-one'
 
 import EVENT_HANDLERS from '../constants/event-handlers'
 import PLUGINS_PROPS from '../constants/plugin-props'
@@ -192,7 +192,7 @@ class Editor extends React.Component {
    * @return {Change}
    */
 
-  associateStackAndValue = memoize((value, stack) => {
+  associateStackAndValue = memoizeOne((value, stack) => {
     const change = value.change()
     stack.run('onChange', change, this)
     return change.value
@@ -265,7 +265,7 @@ class Editor extends React.Component {
    * @return {Array}
    */
 
-  resolvePlugins = memoize((plugins, schema) => {
+  resolvePlugins = memoizeOne((plugins, schema) => {
     this.tmp.resolves++
     const beforePlugin = BeforePlugin()
     const afterPlugin = AfterPlugin()
@@ -298,7 +298,7 @@ class Editor extends React.Component {
    * @return {Stack}
    */
 
-  resolveStack = memoize(plugins => Stack.create({ plugins }))
+  resolveStack = memoizeOne(plugins => Stack.create({ plugins }))
 
   /**
    * Get schema by plugins, it is a memoized function and therefore do not need
@@ -308,7 +308,7 @@ class Editor extends React.Component {
    * @return {Schema}
    */
 
-  resolveSchema = memoize(plugins => Schema.create({ plugins }))
+  resolveSchema = memoizeOne(plugins => Schema.create({ plugins }))
 }
 
 /**
