@@ -28,7 +28,8 @@
     "react": ">=0.14.0"
   },
   "devDependencies": {
-    "slate-hyperscript": "^0.6.2"
+    "slate-hyperscript": "^0.6.2",
+    "slate-dev-test-utils": "*"
   },
   "scripts": {
     "clean": "rm -rf ./dist ./lib ./node_modules"

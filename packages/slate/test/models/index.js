@@ -1,56 +1,51 @@
 import assert from 'assert'
-import fs from 'fs'
-import { Schema } from '../..'
-import { basename, extname, resolve } from 'path'
-
-/**
- * Tests.
- */
+import { Node, Schema } from '../..'
+import { fixtures } from 'slate-dev-test-utils'
 
 describe('models', () => {
-  describe('change', () => {
-    describe('withoutNormalization', () => {
-      const testsDir = resolve(__dirname, 'change')
-      const tests = fs
-        .readdirSync(testsDir)
-        .filter(t => t[0] != '.')
-        .map(t => basename(t, extname(t)))
-
-      for (const test of tests) {
-        it(test, async () => {
-          const module = require(resolve(testsDir, test))
-          const { input, output, schema, flags, customChange } = module
-          const s = Schema.create(schema)
-          const expected = output.toJSON()
-          const actual = input
-            .change(flags)
-            .setValue({ schema: s })
-            .withoutNormalization(customChange)
-            .value.toJSON()
-
-          assert.deepEqual(actual, expected)
-        })
-      }
-    })
+  fixtures(__dirname, 'leaf', ({ module }) => {
+    const { input, output } = module
+    const fn = module.default
+    const actual = fn(input).toJSON()
+    const expected = output.toJSON()
+    assert.deepEqual(actual, expected)
   })
 
-  describe('node', () => {
-    describe('node', () => {
-      const testsDir = resolve(__dirname, 'node')
-      const tests = fs
-        .readdirSync(testsDir)
-        .filter(t => t[0] != '.')
-        .map(t => basename(t, extname(t)))
-
-      for (const test of tests) {
-        it(test, async () => {
-          const run = require(resolve(testsDir, test)).default
-          run()
-        })
-      }
-    })
+  fixtures(__dirname, 'text', ({ module }) => {
+    const { input, output } = module
+    const fn = module.default
+    const actual = fn(input).toJSON()
+    const expected = output.toJSON()
+    assert.deepEqual(actual, expected)
   })
 
-  require('./text/')
-  require('./leaf/')
+  fixtures(__dirname, 'node', ({ module }) => {
+    const { input, output } = module
+    const fn = module.default
+    let actual = fn(input)
+    let expected = output
+
+    if (Node.isNode(actual)) {
+      actual = actual.toJSON()
+    }
+
+    if (Node.isNode(expected)) {
+      expected = expected.toJSON()
+    }
+
+    assert.deepEqual(actual, expected)
+  })
+
+  fixtures(__dirname, 'change', ({ module }) => {
+    const { input, output, schema, flags, customChange } = module
+    const s = Schema.create(schema)
+    const expected = output.toJSON()
+    const actual = input
+      .change(flags)
+      .setValue({ schema: s })
+      .withoutNormalization(customChange)
+      .value.toJSON()
+
+    assert.deepEqual(actual, expected)
+  })
 })

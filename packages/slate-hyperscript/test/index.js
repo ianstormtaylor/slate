@@ -1,26 +1,16 @@
 import assert from 'assert'
 import fs from 'fs'
-import { Value, KeyUtils } from 'slate'
+import { Value } from 'slate'
 import { basename, extname, resolve } from 'path'
-
-beforeEach(KeyUtils.resetGenerator)
+import { fixtures } from 'slate-dev-test-utils'
 
 describe('slate-hyperscript', () => {
-  const dir = resolve(__dirname, './fixtures')
-  const tests = fs
-    .readdirSync(dir)
-    .filter(t => t[0] != '.')
-    .map(t => basename(t, extname(t)))
-
-  for (const test of tests) {
-    it(test, async () => {
-      const module = require(resolve(dir, test))
-      const { input, output, options } = module
-      const actual = input.toJSON(options)
-      const expected = Value.isValue(output) ? output.toJSON() : output
-      assert.deepEqual(actual, expected)
-    })
-  }
+  fixtures(__dirname, 'fixtures', ({ module }) => {
+    const { input, output, options } = module
+    const actual = input.toJSON(options)
+    const expected = Value.isValue(output) ? output.toJSON() : output
+    assert.deepEqual(actual, expected)
+  })
 
   describe.skip('decorations', () => {
     const decDir = resolve(__dirname, './decorations')

@@ -1,6 +1,6 @@
 {
   "name": "slate-dev-benchmark",
-  "description": "A simple, development-only benchmark for Slate",
+  "description": "INTERNAL: A development-only benchmark tool for Slate's core.",
   "version": "0.0.3",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
@@ -10,8 +10,5 @@
   },
   "scripts": {
     "clean": "rm -rf ./dist ./lib ./node_modules"
-  },
-  "keywords": [
-    "slate"
-  ]
+  }
 }

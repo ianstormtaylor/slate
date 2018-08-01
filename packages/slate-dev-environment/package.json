@@ -1,6 +1,6 @@
 {
   "name": "slate-dev-environment",
-  "description": "Detect browser and OS environments in core Slate packages",
+  "description": "INTERNAL: A set of environment-related constants for Slate's core.",
   "version": "0.1.3",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
@@ -12,13 +12,10 @@
     "dist/",
     "lib/"
   ],
-  "scripts": {
-    "clean": "rm -rf ./dist ./lib ./node_modules"
-  },
-  "keywords": [
-    "slate"
-  ],
   "dependencies": {
     "is-in-browser": "^1.1.3"
+  },
+  "scripts": {
+    "clean": "rm -rf ./dist ./lib ./node_modules"
   }
 }
