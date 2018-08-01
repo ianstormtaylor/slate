@@ -172,7 +172,7 @@ class Editor extends React.Component {
 
   get value() {
     if (this.tmp.value === this.props.value) return this.tmp.value
-    return this.normalizeOnChangeValue(this.props.value, this.stack)
+    return this.associateStackAndValue(this.props.value, this.stack)
   }
 
   /**
@@ -183,10 +183,11 @@ class Editor extends React.Component {
    * this value.
    *
    * @param {Value} value
-   * @return {Schema}
+   * @param {Stack} stack
+   * @return {Change}
    */
 
-  normalizeOnChangeValue = memoize((value, stack) => {
+  associateStackAndValue = memoize((value, stack) => {
     const change = value.change()
     stack.run('onChange', change, this)
     return change.value
@@ -213,11 +214,12 @@ class Editor extends React.Component {
 
   onChange = change => {
     debug('onChange', { change })
-    if (this.value === change.value) return
-    const value = this.normalizeOnChangeValue(change.value, this.stack)
+
+    this.stack.run('onChange', change, this)
+    const { value } = change
     const { onChange } = this.props
-    this.tmp.value = value
-    onChange(value.change())
+    if (value == this.value) return
+    onChange(change)
   }
 
   /**
