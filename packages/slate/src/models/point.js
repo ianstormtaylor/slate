@@ -195,15 +195,26 @@ class Point extends Record(DEFAULTS) {
   }
 
   /**
-   * Move the point's offset `n` characters.
+   * Move the point's offset backward `n` characters.
    *
    * @param {Number} n (optional)
    * @return {Point}
    */
 
-  move(n = 1) {
-    const offset = this.offset + n
-    const point = this.merge({ offset })
+  moveBackward(n = 1) {
+    const point = this.setOffset(this.offset - n)
+    return point
+  }
+
+  /**
+   * Move the point's offset forward `n` characters.
+   *
+   * @param {Number} n (optional)
+   * @return {Point}
+   */
+
+  moveForward(n = 1) {
+    const point = this.setOffset(this.offset + n)
     return point
   }
 
@@ -277,12 +288,12 @@ class Point extends Record(DEFAULTS) {
     }
 
     const { key, offset, path } = this
-    const target = node.getNode(path || key)
+    const target = node.getNode(key || path)
 
     if (!target) {
       logger.warn("A point's `path` or `key` invalid and was reset:", this)
 
-      const text = target.getFirstText()
+      const text = node.getFirstText()
       if (!text) return Point.create()
 
       const point = this.merge({
@@ -345,7 +356,7 @@ class Point extends Record(DEFAULTS) {
    */
 
   setOffset(offset) {
-    const point = this.set('offset', null)
+    const point = this.set('offset', offset)
     return point
   }
 

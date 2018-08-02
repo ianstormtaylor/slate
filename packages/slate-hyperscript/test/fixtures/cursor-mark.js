@@ -1,38 +1,63 @@
 /** @jsx h */
 
-import h from '../../../helpers/h'
-
-export const skip = true
+import h from '../..'
 
 export const input = (
   <value>
     <document>
-      <paragraph>one</paragraph>
+      <block type="paragraph">
+        one
+        <mark type="bold">
+          t<cursor />wo
+        </mark>
+        three
+      </block>
     </document>
   </value>
 )
+
+export const options = {
+  preserveSelection: true,
+  preserveKeys: true,
+}
 
 export const output = {
   object: 'value',
   document: {
     object: 'document',
-    key: '3',
     data: {},
+    key: '3',
     nodes: [
       {
         object: 'block',
-        type: 'paragraph',
         key: '1',
-        data: {},
+        type: 'paragraph',
         isVoid: false,
+        data: {},
         nodes: [
           {
             object: 'text',
             key: '0',
             leaves: [
               {
-                text: 'one',
                 object: 'leaf',
+                text: 'one',
+                marks: [],
+              },
+              {
+                object: 'leaf',
+                text: 'two',
+                marks: [
+                  {
+                    object: 'mark',
+                    type: 'bold',
+                    data: {},
+                  },
+                ],
+              },
+              {
+                object: 'leaf',
+                text: 'three',
                 marks: [],
               },
             ],
@@ -47,21 +72,16 @@ export const output = {
       object: 'point',
       key: '0',
       path: [0, 0],
-      offset: 0,
+      offset: 4,
     },
     focus: {
       object: 'point',
       key: '0',
       path: [0, 0],
-      offset: 0,
+      offset: 4,
     },
-    isFocused: false,
-    marks: null,
+    isFocused: true,
     isAtomic: false,
+    marks: null,
   },
-}
-
-export const options = {
-  preserveKeys: true,
-  preserveSelection: true,
 }

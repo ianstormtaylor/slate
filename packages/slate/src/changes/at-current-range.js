@@ -150,6 +150,7 @@ Changes.insertFragment = (change, fragment) => {
 
   let { value } = change
   let { document, selection } = value
+  const { start, end } = selection
   const { startText, endText, startInline } = value
   const lastText = fragment.getLastText()
   const lastInline = fragment.getClosestInline(lastText.key)
@@ -158,8 +159,8 @@ Changes.insertFragment = (change, fragment) => {
   const keys = document.getTexts().map(text => text.key)
   const isAppending =
     !startInline ||
-    selection.hasEdgeAtStartOf(startText) ||
-    selection.hasEdgeAtEndOf(endText)
+    (start.isAtStartOfNode(startText) || end.isAtStartOfNode(startText)) ||
+    (start.isAtEndOfNode(endText) || end.isAtEndOfNode(endText))
 
   const isInserting =
     firstChild.hasBlockChildren() || lastChild.hasBlockChildren()
@@ -172,13 +173,13 @@ Changes.insertFragment = (change, fragment) => {
   const newText = isAppending ? newTexts.last() : newTexts.takeLast(2).first()
 
   if (newText && (lastInline || isInserting)) {
-    change.select(selection.collapseToEndOf(newText))
+    change.select(selection.moveToEndOfNode(newText))
   } else if (newText) {
     change.select(
-      selection.collapseToStartOf(newText).move(lastText.text.length)
+      selection.moveToStartOfNode(newText).moveForward(lastText.text.length)
     )
   } else {
-    change.select(selection.collapseToStart().move(lastText.text.length))
+    change.select(selection.collapseToStart().moveForward(lastText.text.length))
   }
 }
 

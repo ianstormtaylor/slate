@@ -235,9 +235,11 @@ class Range extends Record(DEFAULTS) {
 
   get isBackward() {
     const { isUnset, anchor, focus } = this
-    if (isUnset) return null
 
-    // PERF: if the two keys are the same, we can just use the offsets.
+    if (isUnset) {
+      return null
+    }
+
     if (anchor.key === focus.key) {
       return anchor.offset > focus.offset
     }
@@ -356,26 +358,58 @@ class Range extends Record(DEFAULTS) {
   }
 
   /**
-   * Move the anchor and focus offsets by `n` characters.
+   * Move the anchor and focus offsets forward `n` characters.
    *
    * @param {Number} n
    * @return {Range}
    */
 
-  move(n) {
-    const range = this.setPoints([this.anchor.move(n), this.focus.move(n)])
+  moveForward(n) {
+    const range = this.setPoints([
+      this.anchor.moveForward(n),
+      this.focus.moveForward(n),
+    ])
+
     return range
   }
 
   /**
-   * Move the anchor offset `n` characters.
+   * Move the anchor and focus offsets backward `n` characters.
    *
    * @param {Number} n
    * @return {Range}
    */
 
-  moveAnchor(n) {
-    const range = this.setAnchor(this.anchor.move(n))
+  moveBackward(n) {
+    const range = this.setPoints([
+      this.anchor.moveBackward(n),
+      this.focus.moveBackward(n),
+    ])
+
+    return range
+  }
+
+  /**
+   * Move the anchor offset backward `n` characters.
+   *
+   * @param {Number} n
+   * @return {Range}
+   */
+
+  moveAnchorBackward(n) {
+    const range = this.setAnchor(this.anchor.moveBackward(n))
+    return range
+  }
+
+  /**
+   * Move the anchor offset forward `n` characters.
+   *
+   * @param {Number} n
+   * @return {Range}
+   */
+
+  moveAnchorForward(n) {
+    const range = this.setAnchor(this.anchor.moveForward(n))
     return range
   }
 
@@ -420,14 +454,26 @@ class Range extends Record(DEFAULTS) {
   }
 
   /**
-   * Move the end offset `n` characters.
+   * Move the end offset backward `n` characters.
    *
    * @param {Number} n
    * @return {Range}
    */
 
-  moveEnd(n) {
-    const range = this.setEnd(this.end.move(n))
+  moveEndBackward(n) {
+    const range = this.setEnd(this.end.moveBackward(n))
+    return range
+  }
+
+  /**
+   * Move the end offset forward `n` characters.
+   *
+   * @param {Number} n
+   * @return {Range}
+   */
+
+  moveEndForward(n) {
+    const range = this.setEnd(this.end.moveForward(n))
     return range
   }
 
@@ -472,14 +518,26 @@ class Range extends Record(DEFAULTS) {
   }
 
   /**
-   * Move the anchor offset `n` characters.
+   * Move the focus offset backward `n` characters.
    *
    * @param {Number} n
    * @return {Range}
    */
 
-  moveFocus(n) {
-    const range = this.setFocus(this.focus.move(n))
+  moveFocusBackward(n) {
+    const range = this.setFocus(this.focus.moveBackward(n))
+    return range
+  }
+
+  /**
+   * Move the focus offset forward `n` characters.
+   *
+   * @param {Number} n
+   * @return {Range}
+   */
+
+  moveFocusForward(n) {
+    const range = this.setFocus(this.focus.moveForward(n))
     return range
   }
 
@@ -524,14 +582,26 @@ class Range extends Record(DEFAULTS) {
   }
 
   /**
-   * Move the start offset `n` characters.
+   * Move the start offset backward `n` characters.
    *
    * @param {Number} n
    * @return {Range}
    */
 
-  moveStart(n) {
-    const range = this.setStart(this.start.move(n))
+  moveStartBackward(n) {
+    const range = this.setStart(this.start.moveBackward(n))
+    return range
+  }
+
+  /**
+   * Move the start offset forward `n` characters.
+   *
+   * @param {Number} n
+   * @return {Range}
+   */
+
+  moveStartForward(n) {
+    const range = this.setStart(this.start.moveForward(n))
     return range
   }
 
@@ -665,7 +735,7 @@ class Range extends Record(DEFAULTS) {
    */
 
   setAnchor(anchor) {
-    const range = this.merge({ anchor })
+    const range = this.set('anchor', anchor)
     return range
   }
 
@@ -689,7 +759,7 @@ class Range extends Record(DEFAULTS) {
    */
 
   setFocus(focus) {
-    const range = this.merge({ focus })
+    const range = this.set('focus', focus)
     return range
   }
 
@@ -702,7 +772,7 @@ class Range extends Record(DEFAULTS) {
 
   setPoints(values) {
     const [anchor, focus] = values
-    const range = this.merge({ anchor, focus })
+    const range = this.set('anchor', anchor).set('focus', focus)
     return range
   }
 
@@ -727,10 +797,17 @@ class Range extends Record(DEFAULTS) {
 
   setProperties(properties) {
     properties = Range.createProperties(properties)
-    const { anchor, focus, ...rest } = properties
-    const a = Point.create(anchor)
-    const f = Point.create(focus)
-    const range = this.merge({ anchor: a, focus: f, ...rest })
+    const { anchor, focus, ...props } = properties
+
+    if (anchor) {
+      props.anchor = Point.create(anchor)
+    }
+
+    if (focus) {
+      props.focus = Point.create(focus)
+    }
+
+    const range = this.merge(props)
     return range
   }
 
@@ -1114,22 +1191,22 @@ class Range extends Record(DEFAULTS) {
     return Range.create()
   }
 
-  moveAnchorOffsetTo(anchorOffset) {
+  moveAnchorOffsetTo(o) {
     logger.deprecate(
       '0.37.0',
       'The `Range.moveAnchorOffsetTo` method is deprecated, please use `Range.moveAnchorTo(offset)` instead.'
     )
 
-    return this.moveAnchorTo(anchorOffset)
+    return this.moveAnchorTo(o)
   }
 
-  moveFocusOffsetTo(focusOffset) {
+  moveFocusOffsetTo(fo) {
     logger.deprecate(
       '0.37.0',
       'The `Range.moveFocusOffsetTo` method is deprecated, please use `Range.moveFocusTo(offset)` instead.'
     )
 
-    return this.moveFocusTo(focusOffset)
+    return this.moveFocusTo(fo)
   }
 
   moveStartOffsetTo(o) {
@@ -1150,13 +1227,13 @@ class Range extends Record(DEFAULTS) {
     return this.moveEndTo(o)
   }
 
-  moveOffsetsTo(anchorOffset, focusOffset = anchorOffset) {
+  moveOffsetsTo(ao, fo = ao) {
     logger.deprecate(
       '0.37.0',
       'The `Range.moveOffsetsTo` method is deprecated, please use `Range.moveAnchorTo` and `Range.moveFocusTo` in sequence instead.'
     )
 
-    return this.moveAnchorTo(anchorOffset).moveFocusTo(focusOffset)
+    return this.moveAnchorTo(ao).moveFocusTo(fo)
   }
 
   moveAnchorToStartOf(node) {
@@ -1256,6 +1333,51 @@ class Range extends Record(DEFAULTS) {
     )
 
     return this.collapseToStart()
+  }
+
+  move(n = 1) {
+    logger.deprecate(
+      '0.37.0',
+      'The `Range.move` method is deprecated, please use `Range.moveForward` or `Range.moveBackward` instead.'
+    )
+
+    return n > 0 ? this.moveForward(n) : this.moveBackward(-n)
+  }
+
+  moveAnchor(n = 1) {
+    logger.deprecate(
+      '0.37.0',
+      'The `Range.moveAnchor` method is deprecated, please use `Range.moveAnchorForward` or `Range.moveAnchorBackward` instead.'
+    )
+
+    return n > 0 ? this.moveAnchorForward(n) : this.moveAnchorBackward(-n)
+  }
+
+  moveEnd(n = 1) {
+    logger.deprecate(
+      '0.37.0',
+      'The `Range.moveEnd` method is deprecated, please use `Range.moveEndForward` or `Range.moveEndBackward` instead.'
+    )
+
+    return n > 0 ? this.moveEndForward(n) : this.moveEndBackward(-n)
+  }
+
+  moveFocus(n = 1) {
+    logger.deprecate(
+      '0.37.0',
+      'The `Range.moveFocus` method is deprecated, please use `Range.moveFocusForward` or `Range.moveFocusBackward` instead.'
+    )
+
+    return n > 0 ? this.moveFocusForward(n) : this.moveFocusBackward(-n)
+  }
+
+  moveStart(n = 1) {
+    logger.deprecate(
+      '0.37.0',
+      'The `Range.moveStart` method is deprecated, please use `Range.moveStartForward` or `Range.moveStartBackward` instead.'
+    )
+
+    return n > 0 ? this.moveStartForward(n) : this.moveStartBackward(-n)
   }
 }
 

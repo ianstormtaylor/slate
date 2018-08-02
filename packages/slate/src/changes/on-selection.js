@@ -25,7 +25,8 @@ Changes.select = (change, properties, options = {}) => {
   const { value } = change
   const { document, selection } = value
   const props = {}
-  const next = document.createRange(selection.setProperties(properties))
+  let next = selection.setProperties(properties)
+  next = document.resolveRange(next)
 
   // Re-compute the properties, to ensure that we get their normalized values.
   properties = pick(next, Object.keys(properties))
@@ -86,6 +87,18 @@ Changes.snapshotSelection = change => {
   change.select(selection, { snapshot: true })
 }
 
+Changes.focus = change => {
+  change.select({ isFocused: true })
+}
+
+Changes.blur = change => {
+  change.select({ isFocused: false })
+}
+
+Changes.deselect = change => {
+  change.select(Range.create())
+}
+
 /**
  * Move the anchor point backward, accounting for being at the start of a block.
  *
@@ -95,13 +108,13 @@ Changes.snapshotSelection = change => {
 Changes.moveAnchorCharBackward = change => {
   const { value } = change
   const { document, selection, anchorText, anchorBlock } = value
-  const { anchorOffset } = selection
+  const { anchor } = selection
   const previousText = document.getPreviousText(anchorText.key)
   const isInVoid = document.hasVoidParent(anchorText.key)
   const isPreviousInVoid =
     previousText && document.hasVoidParent(previousText.key)
 
-  if (!isInVoid && anchorOffset > 0) {
+  if (!isInVoid && anchor.offset > 0) {
     change.moveAnchor(-1)
     return
   }
@@ -126,12 +139,12 @@ Changes.moveAnchorCharBackward = change => {
 Changes.moveAnchorCharForward = change => {
   const { value } = change
   const { document, selection, anchorText, anchorBlock } = value
-  const { anchorOffset } = selection
+  const { anchor } = selection
   const nextText = document.getNextText(anchorText.key)
   const isInVoid = document.hasVoidParent(anchorText.key)
   const isNextInVoid = nextText && document.hasVoidParent(nextText.key)
 
-  if (!isInVoid && anchorOffset < anchorText.text.length) {
+  if (!isInVoid && anchor.offset < anchorText.text.length) {
     change.moveAnchor(1)
     return
   }
@@ -156,13 +169,13 @@ Changes.moveAnchorCharForward = change => {
 Changes.moveFocusCharBackward = change => {
   const { value } = change
   const { document, selection, focusText, focusBlock } = value
-  const { focusOffset } = selection
+  const { focus } = selection
   const previousText = document.getPreviousText(focusText.key)
   const isInVoid = document.hasVoidParent(focusText.key)
   const isPreviousInVoid =
     previousText && document.hasVoidParent(previousText.key)
 
-  if (!isInVoid && focusOffset > 0) {
+  if (!isInVoid && focus.offset > 0) {
     change.moveFocus(-1)
     return
   }
@@ -271,7 +284,6 @@ ALIAS_METHODS.forEach(([alias, method]) => {
  */
 
 const PROXY_TRANSFORMS = [
-  'blur',
   'collapseTo',
   'collapseToAnchor',
   'collapseToEnd',
@@ -284,7 +296,6 @@ const PROXY_TRANSFORMS = [
   'extendToEndOf',
   'extendToStartOf',
   'flip',
-  'focus',
   'move',
   'moveAnchor',
   'moveAnchorOffsetTo',
@@ -309,7 +320,6 @@ const PROXY_TRANSFORMS = [
   'moveToRangeOf',
   'moveToStart',
   'moveToStartOf',
-  'deselect',
 ]
 
 PROXY_TRANSFORMS.forEach(method => {
@@ -357,19 +367,19 @@ PREFIXES.forEach(prefix => {
       Changes[`${method}${object}`] = change => {
         const { value } = change
         const { document, selection } = value
-        const node = document[getNode](selection.startKey)
+        const node = document[getNode](selection.start.key)
         if (!node) return
         change[method](node)
       }
 
       DIRECTIONS.forEach(direction => {
         const getDirectionNode = `get${direction}${object}`
-        const directionKey = direction == 'Next' ? 'startKey' : 'endKey'
+        const directionPoint = direction == 'Next' ? 'start' : 'end'
 
         Changes[`${method}${direction}${object}`] = change => {
           const { value } = change
           const { document, selection } = value
-          const node = document[getNode](selection[directionKey])
+          const node = document[getNode](selection[directionPoint].key)
           if (!node) return
           const target = document[getDirectionNode](node.key)
           if (!target) return

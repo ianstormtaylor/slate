@@ -7,10 +7,14 @@ export default function(change) {
   const { startText } = value
 
   change.select({
-    anchorKey: startText.key,
-    anchorOffset: 0,
-    focusKey: startText.key,
-    focusOffset: startText.text.length,
+    anchor: {
+      key: startText.key,
+      offset: 0,
+    },
+    focus: {
+      key: startText.key,
+      offset: startText.text.length,
+    },
   })
 }
 

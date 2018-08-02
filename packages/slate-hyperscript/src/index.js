@@ -13,9 +13,10 @@ import {
 } from 'slate'
 
 /**
- * Create selection point constants, for comparison by reference.
+ * Point classes that can be created at different points in the document and
+ * then searched for afterwards, for creating ranges.
  *
- * @type {Object}
+ * @type {Class}
  */
 
 class CursorPoint {
@@ -146,12 +147,12 @@ const CREATORS = {
     const focus = children.find(c => c instanceof FocusPoint)
     const selection = Range.create({
       ...attributes,
-      anchor: {
+      anchor: anchor && {
         key: anchor.key,
         offset: anchor.offset,
         path: anchor.path,
       },
-      focus: {
+      focus: focus && {
         key: focus.key,
         offset: focus.offset,
         path: focus.path,
@@ -385,13 +386,13 @@ function createChildren(children, options = {}) {
       })
 
       if (__anchor != null) {
-        __anchor.offset += length
-        node.__anchor = __anchor
+        node.__anchor = new AnchorPoint()
+        node.__anchor.offset = __anchor.offset + length
       }
 
       if (__focus != null) {
-        __focus.offset += length
-        node.__focus = __focus
+        node.__focus = new FocusPoint()
+        node.__focus.offset = __focus.offset + length
       }
 
       if (__decorations != null) {

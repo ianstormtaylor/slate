@@ -28,9 +28,6 @@ export const input = (
   </value>
 )
 
-// The cursor position of insertFragment has some problems;
-// If you submit PR to fixed cursor position restore in insertFragment;
-// Please change this test as well
 export const output = (
   <value>
     <document>

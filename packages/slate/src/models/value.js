@@ -628,36 +628,30 @@ class Value extends Record(DEFAULTS) {
 
     // Update any ranges that were affected.
     const node = document.assertNode(path)
-    value = value.clearAtomicRanges(node.key, offset)
 
     value = value.mapRanges(range => {
-      const { anchor, isBackward, isAtomic } = range
+      const { anchor, focus, isBackward, isAtomic } = range
 
       if (
         anchor.key === node.key &&
         (anchor.offset > offset ||
           (anchor.offset === offset && (!isAtomic || !isBackward)))
       ) {
-        return range.moveAnchor(text.length)
+        range = range.moveAnchorForward(text.length)
       }
-
-      return range
-    })
-
-    value = value.mapRanges(range => {
-      const { focus, isBackward, isAtomic } = range
 
       if (
         focus.key === node.key &&
         (focus.offset > offset ||
           (focus.offset == offset && (!isAtomic || isBackward)))
       ) {
-        return range.moveFocus(text.length)
+        range = range.moveFocusForward(text.length)
       }
 
       return range
     })
 
+    value = value.clearAtomicRanges(node.key, offset)
     return value
   }
 
@@ -773,13 +767,13 @@ class Value extends Record(DEFAULTS) {
       if (node.hasNode(start.key)) {
         range = prev
           ? range.moveStartTo(prev.key, prev.text.length)
-          : next ? range.moveStartTo(next.key, 0) : range.deselect()
+          : next ? range.moveStartTo(next.key, 0) : Range.create()
       }
 
       if (node.hasNode(end.key)) {
         range = prev
           ? range.moveEndTo(prev.key, prev.text.length)
-          : next ? range.moveEndTo(next.key, 0) : range.deselect()
+          : next ? range.moveEndTo(next.key, 0) : Range.create()
       }
 
       range = range.setPoints([
@@ -814,26 +808,24 @@ class Value extends Record(DEFAULTS) {
     value = value.clearAtomicRanges(node.key, offset, offset + length)
 
     value = value.mapRanges(range => {
-      const { anchor } = range
+      const { anchor, focus } = range
 
       if (anchor.key === node.key) {
-        return anchor.offset >= rangeOffset
-          ? range.moveAnchor(-length)
-          : anchor.offset > offset
-            ? range.moveAnchorTo(anchor.key, offset)
-            : range
+        range =
+          anchor.offset >= rangeOffset
+            ? range.moveAnchorBackward(length)
+            : anchor.offset > offset
+              ? range.moveAnchorTo(anchor.key, offset)
+              : range
       }
 
-      return range
-    })
-
-    value = value.mapRanges(range => {
-      const { focus } = range
-
       if (focus.key === node.key) {
-        return focus.offset >= rangeOffset
-          ? range.moveFocus(-length)
-          : focus.offset > offset ? range.moveFocusTo(focus.key, offset) : range
+        range =
+          focus.offset >= rangeOffset
+            ? range.moveFocusBackward(length)
+            : focus.offset > offset
+              ? range.moveFocusTo(focus.key, offset)
+              : range
       }
 
       return range
@@ -888,8 +880,8 @@ class Value extends Record(DEFAULTS) {
   setSelection(properties) {
     let value = this
     let { document, selection } = value
-    const next = selection.merge(properties)
-    selection = document.createRange(next)
+    const next = selection.setProperties(properties)
+    selection = document.resolveRange(next)
     value = value.set('selection', selection)
     return value
   }
@@ -949,7 +941,7 @@ class Value extends Record(DEFAULTS) {
 
     if (selection) {
       let next = selection.isSet ? iterator(selection) : selection
-      if (!next) next = selection.deselect()
+      if (!next) next = Range.create()
       if (next !== selection) next = document.createRange(next)
       value = value.set('selection', next)
     }
