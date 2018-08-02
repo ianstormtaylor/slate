@@ -1,23 +1,31 @@
 /** @jsx h */
 
-import h from '../..'
+import { createHyperscript } from '../..'
+
+const h = createHyperscript({
+  blocks: {
+    paragraph: 'paragraph',
+  },
+  decorators: {
+    highlight: 'highlight',
+  },
+})
 
 export const input = (
   <value>
     <document>
       <block type="paragraph">
-        on<anchor />e
+        o<highlight key="a" />ne
       </block>
-      <block type="paragraph">two</block>
       <block type="paragraph">
-        t<focus />hree
+        tw<highlight key="a" />o
       </block>
     </document>
   </value>
 )
 
 export const options = {
-  preserveSelection: true,
+  preserveDecorations: true,
   preserveKeys: true,
 }
 
@@ -25,7 +33,7 @@ export const output = {
   object: 'value',
   document: {
     object: 'document',
-    key: '9',
+    key: '6',
     data: {},
     nodes: [
       {
@@ -68,44 +76,32 @@ export const output = {
           },
         ],
       },
-      {
-        object: 'block',
-        key: '5',
-        type: 'paragraph',
-        isVoid: false,
-        data: {},
-        nodes: [
-          {
-            object: 'text',
-            key: '4',
-            leaves: [
-              {
-                object: 'leaf',
-                text: 'three',
-                marks: [],
-              },
-            ],
-          },
-        ],
-      },
     ],
   },
-  selection: {
-    object: 'range',
-    anchor: {
-      object: 'point',
-      key: '0',
-      path: [0, 0],
-      offset: 2,
+  decorations: [
+    {
+      object: 'range',
+      anchor: {
+        object: 'point',
+        key: '0',
+        path: [0, 0],
+        offset: 1,
+      },
+      focus: {
+        object: 'point',
+        key: '2',
+        path: [1, 0],
+        offset: 2,
+      },
+      isFocused: false,
+      isAtomic: false,
+      marks: [
+        {
+          object: 'mark',
+          type: 'highlight',
+          data: {},
+        },
+      ],
     },
-    focus: {
-      object: 'point',
-      key: '4',
-      path: [2, 0],
-      offset: 1,
-    },
-    isFocused: true,
-    isAtomic: false,
-    marks: null,
-  },
+  ],
 }

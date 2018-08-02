@@ -384,11 +384,7 @@ Changes.deleteBackwardAtRange = (change, range, n = 1, options = {}) => {
     // If we're deleting by one character and the previous text node is not
     // inside the current block, we need to merge the two blocks together.
     if (n == 1 && prevBlock != block) {
-      range = range.merge({
-        anchorKey: prev.key,
-        anchorOffset: prev.text.length,
-      })
-
+      range = range.moveAnchorTo(prev.key, prev.text.length)
       change.deleteAtRange(range, { normalize })
       return
     }
@@ -397,7 +393,7 @@ Changes.deleteBackwardAtRange = (change, range, n = 1, options = {}) => {
   // If the focus offset is farther than the number of characters to delete,
   // just remove the characters backwards inside the current node.
   if (n < focusOffset) {
-    range = range.merge({ focusOffset: focusOffset - n })
+    range = range.moveFocus(-n)
     change.deleteAtRange(range, { normalize })
     return
   }
@@ -419,11 +415,7 @@ Changes.deleteBackwardAtRange = (change, range, n = 1, options = {}) => {
     }
   }
 
-  range = range.merge({
-    anchorKey: node.key,
-    anchorOffset: offset,
-  })
-
+  range = range.moveAnchorTo(node.key, offset)
   change.deleteAtRange(range, { normalize })
 }
 
@@ -555,11 +547,7 @@ Changes.deleteForwardAtRange = (change, range, n = 1, options = {}) => {
     // If we're deleting by one character and the previous text node is not
     // inside the current block, we need to merge the two blocks together.
     if (n == 1 && nextBlock != block) {
-      range = range.merge({
-        focusKey: next.key,
-        focusOffset: 0,
-      })
-
+      range = range.moveFocusTo(next.key, 0)
       change.deleteAtRange(range, { normalize })
       return
     }
@@ -569,10 +557,7 @@ Changes.deleteForwardAtRange = (change, range, n = 1, options = {}) => {
   // to the number of characters to delete, just remove the characters forwards
   // inside the current node.
   if (n <= text.text.length - focusOffset) {
-    range = range.merge({
-      focusOffset: focusOffset + n,
-    })
-
+    range = range.moveFocus(n)
     change.deleteAtRange(range, { normalize })
     return
   }
@@ -594,11 +579,7 @@ Changes.deleteForwardAtRange = (change, range, n = 1, options = {}) => {
     }
   }
 
-  range = range.merge({
-    focusKey: node.key,
-    focusOffset: offset,
-  })
-
+  range = range.moveFocusTo(node.key, offset)
   change.deleteAtRange(range, { normalize })
 }
 
@@ -1022,10 +1003,10 @@ Changes.setInlineAtRange = (...args) => {
 Changes.splitBlockAtRange = (change, range, height = 1, options = {}) => {
   const normalize = change.getFlag('normalize', options)
 
-  const { startKey, startOffset, endOffset, endKey } = range
+  const { start, end } = range
   const { value } = change
   const { document } = value
-  let node = document.assertDescendant(startKey)
+  let node = document.assertDescendant(start.key)
   let parent = document.getClosestBlock(node.key)
   let h = 0
 
@@ -1035,7 +1016,7 @@ Changes.splitBlockAtRange = (change, range, height = 1, options = {}) => {
     h++
   }
 
-  change.splitDescendantsByKey(node.key, startKey, startOffset, {
+  change.splitDescendantsByKey(node.key, start.key, start.offset, {
     normalize: normalize && range.isCollapsed,
   })
 
@@ -1044,8 +1025,8 @@ Changes.splitBlockAtRange = (change, range, height = 1, options = {}) => {
     const nextBlock = change.value.document.getNextBlock(node.key)
     range = range.moveAnchorToStartOf(nextBlock)
 
-    if (startKey === endKey) {
-      range = range.moveFocusTo(range.anchorKey, endOffset - startOffset)
+    if (start.key === end.key) {
+      range = range.moveFocusTo(range.anchor.key, end.offset - start.offset)
     }
 
     change.deleteAtRange(range, { normalize })
@@ -1405,10 +1386,14 @@ Changes.wrapInlineAtRange = (change, range, inline, options = {}) => {
     Changes.insertInlineAtRange(change, range, inline, { normalize: false })
     const inlinekey = inline.getFirstText().key
     const rng = {
-      anchorKey: inlinekey,
-      focusKey: inlinekey,
-      anchorOffset: 0,
-      focusOffset: endOffset - startOffset,
+      anchor: {
+        key: inlinekey,
+        offset: 0,
+      },
+      focus: {
+        key: inlinekey,
+        offset: endOffset - startOffset,
+      },
       isFocused: true,
     }
     change.select(rng)

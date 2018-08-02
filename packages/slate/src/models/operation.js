@@ -289,12 +289,8 @@ class Operation extends Record(DEFAULTS) {
 
       if (key == 'properties' && type == 'set_selection') {
         const v = {}
-        if ('anchorOffset' in value) v.anchorOffset = value.anchorOffset
-        if ('anchorPath' in value)
-          v.anchorPath = value.anchorPath && value.anchorPath.toJSON()
-        if ('focusOffset' in value) v.focusOffset = value.focusOffset
-        if ('focusPath' in value)
-          v.focusPath = value.focusPath && value.focusPath.toJSON()
+        if ('anchor' in value) v.anchor = value.anchor.toJSON()
+        if ('focus' in value) v.focus = value.focus.toJSON()
         if ('isFocused' in value) v.isFocused = value.isFocused
         if ('marks' in value) v.marks = value.marks && value.marks.toJSON()
         value = v

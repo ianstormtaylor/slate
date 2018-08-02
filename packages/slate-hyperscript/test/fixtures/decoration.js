@@ -58,12 +58,18 @@ export const output = {
   decorations: [
     {
       object: 'range',
-      anchorKey: '0',
-      anchorPath: [0, 0],
-      anchorOffset: 3,
-      focusKey: '0',
-      focusPath: [0, 0],
-      focusOffset: 6,
+      anchor: {
+        object: 'point',
+        key: '0',
+        path: [0, 0],
+        offset: 3,
+      },
+      focus: {
+        object: 'point',
+        key: '0',
+        path: [0, 0],
+        offset: 6,
+      },
       isFocused: false,
       isAtomic: false,
       marks: [

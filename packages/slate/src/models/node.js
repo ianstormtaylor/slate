@@ -10,6 +10,7 @@ import Inline from './inline'
 import KeyUtils from '../utils/key-utils'
 import memoize from '../utils/memoize'
 import PathUtils from '../utils/path-utils'
+import Point from './point'
 import Range from './range'
 import Text from './text'
 import { isType } from '../constants/model-types'
@@ -206,7 +207,20 @@ class Node {
   }
 
   /**
-   * Create a new range with `properties` relative to the node.
+   * Create a point with `properties` relative to the node.
+   *
+   * @param {Object|Point} properties
+   * @return {Range}
+   */
+
+  createPoint(properties) {
+    properties = Point.createProperties(properties)
+    const point = this.resolvePoint(properties)
+    return point
+  }
+
+  /**
+   * Create a range with `properties` relative to the node.
    *
    * @param {Object|Range} properties
    * @return {Range}
@@ -2000,6 +2014,20 @@ class Node {
     }
 
     return path
+  }
+
+  /**
+   * Resolve a `point`, relative to the node, ensuring that the keys and
+   * offsets in the point exist and that they are synced with the paths.
+   *
+   * @param {Point|Object} point
+   * @return {Point}
+   */
+
+  resolvePoint(point) {
+    point = Point.create(point)
+    point = point.normalize(this)
+    return point
   }
 
   /**

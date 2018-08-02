@@ -25,7 +25,7 @@ Changes.select = (change, properties, options = {}) => {
   const { value } = change
   const { document, selection } = value
   const props = {}
-  const next = document.createRange(selection.merge(properties))
+  const next = document.createRange(selection.setProperties(properties))
 
   // Re-compute the properties, to ensure that we get their normalized values.
   properties = pick(next, Object.keys(properties))
@@ -41,14 +41,7 @@ Changes.select = (change, properties, options = {}) => {
 
   // If the selection moves, clear any marks, unless the new selection
   // properties change the marks in some way.
-  if (
-    selection.marks &&
-    !props.marks &&
-    (props.hasOwnProperty('anchorKey') ||
-      props.hasOwnProperty('anchorOffset') ||
-      props.hasOwnProperty('focusKey') ||
-      props.hasOwnProperty('focusOffset'))
-  ) {
+  if (selection.marks && !props.marks && (props.anchor || props.focus)) {
     props.marks = null
   }
 
@@ -77,7 +70,7 @@ Changes.select = (change, properties, options = {}) => {
 Changes.selectAll = change => {
   const { value } = change
   const { document, selection } = value
-  const next = selection.moveToRangeOf(document)
+  const next = selection.moveToRangeOfNode(document)
   change.select(next)
 }
 
