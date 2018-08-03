@@ -1,6 +1,5 @@
 import getWindow from 'get-window'
 
-import { Range } from 'slate'
 import findNode from './find-node'
 import findRange from './find-range'
 
@@ -35,7 +34,7 @@ function getEventRange(event, value) {
         : y - rect.top < rect.top + rect.height - y
 
     const text = node.getFirstText()
-    const range = Range.create()
+    const range = document.createRange()
 
     if (isPrevious) {
       const previousText = document.getPreviousText(text.key)
