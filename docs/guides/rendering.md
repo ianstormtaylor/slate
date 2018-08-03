@@ -120,7 +120,7 @@ function renderPlaceholder(props) {
 />
 ```
 
-That will render a simple placeholder element inside all of the your `caption` blocks until someone decides to write in a caption.
+That will render a simple placeholder element inside all of your `caption` blocks until someone decides to write in a caption.
 
 ## The Editor Itself
 
