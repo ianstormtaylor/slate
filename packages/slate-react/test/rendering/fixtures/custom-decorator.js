@@ -7,10 +7,14 @@ function decorateNode(block) {
   const text = block.getFirstText()
   return [
     {
-      anchorKey: text.key,
-      anchorOffset: 1,
-      focusKey: text.key,
-      focusOffset: 2,
+      anchor: {
+        key: text.key,
+        offset: 1,
+      },
+      focus: {
+        key: text.key,
+        offset: 2,
+      },
       marks: [{ type: 'bold' }],
     },
   ]

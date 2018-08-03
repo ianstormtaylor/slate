@@ -523,7 +523,7 @@ Changes.deleteForwardAtRange = (change, range, n = 1, options = {}) => {
     change.removeNodeByKey(block.key, { normalize })
 
     if (nextBlock && nextBlock.key) {
-      change.moveToStartOf(nextBlock)
+      change.moveToStartOfNode(nextBlock)
     }
     return
   }
@@ -603,7 +603,7 @@ Changes.insertBlockAtRange = (change, range, block, options = {}) => {
 
   if (range.isExpanded) {
     change.deleteAtRange(range)
-    range = range.collapseToStart()
+    range = range.moveToStart()
   }
 
   const { value } = change
@@ -670,7 +670,7 @@ Changes.insertFragmentAtRange = (change, range, fragment, options = {}) => {
     change.deleteAtRange(range, { normalize: false })
 
     if (change.value.document.getDescendant(range.start.key)) {
-      range = range.collapseToStart()
+      range = range.moveToStart()
     } else {
       range = range.moveTo(range.end.key, 0).normalize(change.value.document)
     }
@@ -810,7 +810,7 @@ Changes.insertInlineAtRange = (change, range, inline, options = {}) => {
 
   if (range.isExpanded) {
     change.deleteAtRange(range, { normalize: false })
-    range = range.collapseToStart()
+    range = range.moveToStart()
   }
 
   const { value } = change
@@ -1058,7 +1058,7 @@ Changes.splitInlineAtRange = (
 
   if (range.isExpanded) {
     change.deleteAtRange(range, { normalize })
-    range = range.collapseToStart()
+    range = range.moveToStart()
   }
 
   const { start } = range
@@ -1492,8 +1492,8 @@ Changes.wrapTextAtRange = (
 ) => {
   const normalize = change.getFlag('normalize', options)
   const { start, end } = range
-  const startRange = range.collapseToStart()
-  let endRange = range.collapseToEnd()
+  const startRange = range.moveToStart()
+  let endRange = range.moveToEnd()
 
   if (start.key == end.key) {
     endRange = endRange.moveForward(prefix.length)

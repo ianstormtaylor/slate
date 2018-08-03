@@ -140,10 +140,6 @@ class History extends Record(DEFAULTS) {
     const prevBatch = undos.peek()
     const prevOperation = prevBatch && prevBatch.last()
 
-    if (skip == null) {
-      skip = shouldSkip(operation, prevOperation)
-    }
-
     if (skip) {
       return history
     }

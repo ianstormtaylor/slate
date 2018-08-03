@@ -3,14 +3,14 @@
 import h from '../../../helpers/h'
 
 export default function(change) {
-  change.collapseToFocus()
+  change.moveToEnd()
 }
 
 export const input = (
   <value>
     <document>
       <paragraph>
-        <anchor />one<focus />
+        on<cursor />e
       </paragraph>
     </document>
   </value>
@@ -20,7 +20,7 @@ export const output = (
   <value>
     <document>
       <paragraph>
-        one<cursor />
+        on<cursor />e
       </paragraph>
     </document>
   </value>

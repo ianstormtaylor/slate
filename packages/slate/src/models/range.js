@@ -303,50 +303,6 @@ class Range extends Record(DEFAULTS) {
   }
 
   /**
-   * Collapse the focus point to the anchor point.
-   *
-   * @return {Range}
-   */
-
-  collapseToAnchor() {
-    const range = this.setFocus(this.anchor)
-    return range
-  }
-
-  /**
-   * Collapse the anchor point to the focus point.
-   *
-   * @return {Range}
-   */
-
-  collapseToFocus() {
-    const range = this.setAnchor(this.focus)
-    return range
-  }
-
-  /**
-   * Collapse the end point to the start point.
-   *
-   * @return {Range}
-   */
-
-  collapseToStart() {
-    const range = this.setEnd(this.start)
-    return range
-  }
-
-  /**
-   * Collapse the start point to the end point.
-   *
-   * @return {Range}
-   */
-
-  collapseToEnd() {
-    const range = this.setStart(this.end)
-    return range
-  }
-
-  /**
    * Flip the range.
    *
    * @return {Range}
@@ -662,18 +618,24 @@ class Range extends Record(DEFAULTS) {
   }
 
   /**
-   * Move the range's points to the start of a `node`.
+   * Move the focus point to the anchor point.
    *
-   * @param {Node} node
    * @return {Range}
    */
 
-  moveToStartOfNode(node) {
-    const range = this.setPoints([
-      this.anchor.moveToStartOfNode(node),
-      this.focus.moveToStartOfNode(node),
-    ])
+  moveToAnchor() {
+    const range = this.setFocus(this.anchor)
+    return range
+  }
 
+  /**
+   * Move the start point to the end point.
+   *
+   * @return {Range}
+   */
+
+  moveToEnd() {
+    const range = this.setStart(this.end)
     return range
   }
 
@@ -694,6 +656,17 @@ class Range extends Record(DEFAULTS) {
   }
 
   /**
+   * Move the anchor point to the focus point.
+   *
+   * @return {Range}
+   */
+
+  moveToFocus() {
+    const range = this.setAnchor(this.focus)
+    return range
+  }
+
+  /**
    * Move to the entire range of `start` and `end` nodes.
    *
    * @param {Node} start
@@ -705,6 +678,33 @@ class Range extends Record(DEFAULTS) {
     const range = this.setPoints([
       this.anchor.moveToStartOfNode(start),
       this.focus.moveToEndOfNode(end),
+    ])
+
+    return range
+  }
+
+  /**
+   * Move the end point to the start point.
+   *
+   * @return {Range}
+   */
+
+  moveToStart() {
+    const range = this.setEnd(this.start)
+    return range
+  }
+
+  /**
+   * Move the range's points to the start of a `node`.
+   *
+   * @param {Node} node
+   * @return {Range}
+   */
+
+  moveToStartOfNode(node) {
+    const range = this.setPoints([
+      this.anchor.moveToStartOfNode(node),
+      this.focus.moveToStartOfNode(node),
     ])
 
     return range
@@ -1299,40 +1299,40 @@ class Range extends Record(DEFAULTS) {
     return this.moveToRangeOfNode(...args)
   }
 
-  moveToAnchor() {
+  collapseToAnchor() {
     logger.deprecate(
       '0.37.0',
-      'The `Range.moveToAnchor` method is deprecated, please use `Range.collapseToAnchor` instead.'
+      'The `Range.collapseToAnchor` method is deprecated, please use `Range.moveToAnchor` instead.'
     )
 
-    return this.collapseToAnchor()
+    return this.moveToAnchor()
   }
 
-  moveToEnd() {
+  collapseToEnd() {
     logger.deprecate(
       '0.37.0',
-      'The `Range.moveToEnd` method is deprecated, please use `Range.collapseToEnd` instead.'
+      'The `Range.collapseToEnd` method is deprecated, please use `Range.moveToEnd` instead.'
     )
 
-    return this.collapseToEnd()
+    return this.moveToEnd()
   }
 
-  moveToFocus() {
+  collapseToFocus() {
     logger.deprecate(
       '0.37.0',
-      'The `Range.moveToFocus` method is deprecated, please use `Range.collapseToFocus` instead.'
+      'The `Range.collapseToFocus` method is deprecated, please use `Range.moveToFocus` instead.'
     )
 
-    return this.collapseToFocus()
+    return this.moveToFocus()
   }
 
-  moveToStart() {
+  collapseToStart() {
     logger.deprecate(
       '0.37.0',
-      'The `Range.moveToStart` method is deprecated, please use `Range.collapseToStart` instead.'
+      'The `Range.collapseToStart` method is deprecated, please use `Range.moveToStart` instead.'
     )
 
-    return this.collapseToStart()
+    return this.moveToStart()
   }
 
   move(n = 1) {

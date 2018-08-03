@@ -376,7 +376,7 @@ class Content extends React.Component {
 
         editor.change(change => {
           if (change.value.isInVoid) {
-            change.collapseToStartOfNextText()
+            change.moveToStartOfNextText()
           } else {
             change.splitBlockAtRange(range)
           }

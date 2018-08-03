@@ -61,10 +61,14 @@ function findRange(native, value) {
 
   const { document } = value
   const range = document.createRange({
-    anchorKey: anchor.key,
-    anchorOffset: anchor.offset,
-    focusKey: focus.key,
-    focusOffset: focus.offset,
+    anchor: {
+      key: anchor.key,
+      offset: anchor.offset,
+    },
+    focus: {
+      key: focus.key,
+      offset: focus.offset,
+    },
     isBackward: isCollapsed ? false : isBackward(native),
     isFocused: true,
   })

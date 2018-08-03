@@ -3,7 +3,7 @@
 import h from '../../../helpers/h'
 
 export default function(change) {
-  change.collapseToStart()
+  change.moveToEnd()
 }
 
 export const input = (
@@ -20,7 +20,7 @@ export const output = (
   <value>
     <document>
       <paragraph>
-        <cursor />one
+        one<cursor />
       </paragraph>
     </document>
   </value>
