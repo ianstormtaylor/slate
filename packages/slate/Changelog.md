@@ -38,7 +38,7 @@ const range = document.createRange({
   focus: {
     key: 'a',
     offset: 4,
-  }
+  },
 })
 ```
 
@@ -57,6 +57,8 @@ const anchor = document.createPoint({
 
 **The `Range.focus` method was removed. (Not `Change.focus`!)** This was necessary to make way for the new `range.focus` point property. Usually this would have been done in a migration-friendly way like the rest of the method changes in this release, but this was an exception. However the `change.focus()` method is still available and works as expected.
 
+**`Range.set` and `Range.merge` are dangerous.** If you were previously using the super low-level Immutable.js methods `range.set` or `range.merge` with any of the now-removed properties of ranges, these invocations will fail. Instead, you should use the `range.set*` helpers going forward which can be migrated with deprecations warnings instead of failing outright.
+
 **The `Range.toJSON()` structure has changed.** With the introduction of points, the range now returns its `anchor` and `focus` properties as nested point JSON objects instead of directly as properties. For example:
 
 ```json
@@ -72,10 +74,10 @@ const anchor = document.createPoint({
     "object": "point",
     "key": "a",
     "offset": 3,
-    "path": [0, 0],
+    "path": [0, 0]
   },
-  "isFocused": false,
   "isAtomic": false,
+  "isFocused": false,
   "marks": []
 }
 ```
@@ -113,7 +115,7 @@ focusOffset -> focus.offset
 focusPath -> focus.path
 hasAnchorAtEndOf -> anchor.isAtEndOfNode
 hasAnchorAtStartOf -> anchor.isAtStartOfNode
-hasAnchorBetween -> 
+hasAnchorBetween ->
 hasAnchorIn -> anchor.isInNode
 hasEdgeAtEndOf -> anchor.isAtEndOfNode || focus.isAtEndOfNode
 hasEdgeAtStartOf -> anchor.isAtStartOfNode || focus.isAtStartOfNode
@@ -121,7 +123,7 @@ hasEdgeBetween ->
 hasEdgeIn -> anchor.isInNode || focus.isInNode
 hasEndAtEndOf -> end.isAtEndOfNode
 hasEndAtStartOf -> end.isAtEndOfNode
-hasEndBetween -> 
+hasEndBetween ->
 hasEndIn -> end.isInNode
 hasFocusAtEndOf -> focus.isAtEndOfNode
 hasFocusAtStartOf -> focus.isAtStartOfNode
@@ -129,7 +131,7 @@ hasFocusBetween ->
 hasFocusIn -> focus.isInNode
 hasStartAtEndOf -> start.isAtEndOfNode
 hasStartAtStartOf -> start.isAtStartOfNode
-hasStartBetween -> 
+hasStartBetween ->
 hasStartIn -> start.isInNode
 isAtEndOf -> isCollapsed && anchor.isAtEndOfNode
 isAtStartOf -> isCollapsed && anchor.isAtStartOfNode
@@ -236,7 +238,6 @@ moveToRangeOf -> moveToRangeOfNode
 moveToStartOf -> moveToStartOfNode
 selectAll -> moveToRangeOfDocument
 ```
-
 
 ---
 
