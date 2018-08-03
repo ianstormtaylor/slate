@@ -149,6 +149,20 @@ class Point extends Record(DEFAULTS) {
   }
 
   /**
+   * Check whether the point is at the end of a `node`.
+   *
+   * @param {Node} node
+   * @return {Boolean}
+   */
+
+  isAtEndOfNode(node) {
+    if (this.isUnset) return false
+    const last = node.getLastText()
+    const is = this.key === last.key && this.offset === last.text.length
+    return is
+  }
+
+  /**
    * Check whether the point is at the start of a `node`.
    *
    * @param {Node} node
@@ -163,20 +177,6 @@ class Point extends Record(DEFAULTS) {
 
     const first = node.getFirstText()
     const is = this.key === first.key
-    return is
-  }
-
-  /**
-   * Check whether the point is at the end of a `node`.
-   *
-   * @param {Node} node
-   * @return {Boolean}
-   */
-
-  isAtEndOfNode(node) {
-    if (this.isUnset) return false
-    const last = node.getLastText()
-    const is = this.key === last.key && this.offset === last.text.length
     return is
   }
 
