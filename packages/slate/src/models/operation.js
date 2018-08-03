@@ -295,7 +295,6 @@ class Operation extends Record(DEFAULTS) {
         if ('focusOffset' in value) v.focusOffset = value.focusOffset
         if ('focusPath' in value)
           v.focusPath = value.focusPath && value.focusPath.toJSON()
-        if ('isBackward' in value) v.isBackward = value.isBackward
         if ('isFocused' in value) v.isFocused = value.isFocused
         if ('marks' in value) v.marks = value.marks && value.marks.toJSON()
         value = v

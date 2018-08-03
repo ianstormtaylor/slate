@@ -114,12 +114,13 @@ class Value extends Record(DEFAULTS) {
       data = data.merge(object.data)
     }
 
+    selection = document.createRange(selection)
+
     if (selection.isUnset) {
       const text = document.getFirstText()
       if (text) selection = selection.collapseToStartOf(text)
+      selection = document.createRange(selection)
     }
-
-    selection = document.createRange(selection)
 
     let value = new Value({
       data,
