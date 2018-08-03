@@ -449,18 +449,6 @@ class Value extends Record(DEFAULTS) {
   }
 
   /**
-   * Get the characters in the current selection.
-   *
-   * @return {List<Character>}
-   */
-
-  get characters() {
-    return this.selection.isUnset
-      ? new List()
-      : this.document.getCharactersAtRange(this.selection)
-  }
-
-  /**
    * Get the marks of the current selection.
    *
    * @return {Set<Mark>}

@@ -207,7 +207,6 @@ class Node {
   }
 
   /**
-<<<<<<< HEAD
    * Create a point with `properties` relative to the node.
    *
    * @param {Object|Point} properties
@@ -222,9 +221,6 @@ class Node {
 
   /**
    * Create a range with `properties` relative to the node.
-=======
-   * Create a new range with `properties` relative to the node.
->>>>>>> master
    *
    * @param {Object|Range} properties
    * @return {Range}
@@ -479,47 +475,6 @@ class Node {
         return array.concat(node.getBlocksByTypeAsArray(type))
       }
     }, [])
-  }
-
-  /**
-   * Get all of the characters for every text node.
-   *
-   * @return {List<Character>}
-   */
-
-  getCharacters() {
-    const characters = this.getTexts().flatMap(t => t.characters)
-    return characters
-  }
-
-  /**
-   * Get a list of the characters in a `range`.
-   *
-   * @param {Range} range
-   * @return {List<Character>}
-   */
-
-  getCharactersAtRange(range) {
-    range = this.resolveRange(range)
-    if (range.isUnset) return List()
-
-    const { start, end } = range
-
-    if (start.key === end.key) {
-      const endText = this.getDescendant(end.key)
-      return endText.characters.slice(start.offset, end.offset)
-    }
-
-    return this.getTextsAtRange(range).flatMap(t => {
-      if (t.key === start.key) {
-        return t.characters.slice(start.offset)
-      }
-
-      if (t.key === end.key) {
-        return t.characters.slice(0, end.offset)
-      }
-      return t.characters
-    })
   }
 
   /**
@@ -2032,7 +1987,6 @@ class Node {
   }
 
   /**
-<<<<<<< HEAD
    * Resolve a `point`, relative to the node, ensuring that the keys and
    * offsets in the point exist and that they are synced with the paths.
    *
@@ -2047,8 +2001,6 @@ class Node {
   }
 
   /**
-=======
->>>>>>> master
    * Resolve a `range`, relative to the node, ensuring that the keys and
    * offsets in the range exist and that they are synced with the paths.
    *
