@@ -59,6 +59,8 @@ const anchor = document.createPoint({
 
 **`Range.set` and `Range.merge` are dangerous.** If you were previously using the super low-level Immutable.js methods `range.set` or `range.merge` with any of the now-removed properties of ranges, these invocations will fail. Instead, you should use the `range.set*` helpers going forward which can be migrated with deprecations warnings instead of failing outright.
 
+**The `offset` property of points defaults to `null`.** Previously it would default to `0` but that could be confusing because it made no distinction from a "set" or "unset" offset. Now they default to `null` instead. This shouldn't really affect any real-world usage of Slate.
+
 **The `Range.toJSON()` structure has changed.** With the introduction of points, the range now returns its `anchor` and `focus` properties as nested point JSON objects instead of directly as properties. For example:
 
 ```json
