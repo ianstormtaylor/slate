@@ -207,6 +207,7 @@ class Node {
   }
 
   /**
+<<<<<<< HEAD
    * Create a point with `properties` relative to the node.
    *
    * @param {Object|Point} properties
@@ -221,6 +222,9 @@ class Node {
 
   /**
    * Create a range with `properties` relative to the node.
+=======
+   * Create a new range with `properties` relative to the node.
+>>>>>>> master
    *
    * @param {Object|Range} properties
    * @return {Range}
@@ -2028,6 +2032,7 @@ class Node {
   }
 
   /**
+<<<<<<< HEAD
    * Resolve a `point`, relative to the node, ensuring that the keys and
    * offsets in the point exist and that they are synced with the paths.
    *
@@ -2042,6 +2047,8 @@ class Node {
   }
 
   /**
+=======
+>>>>>>> master
    * Resolve a `range`, relative to the node, ensuring that the keys and
    * offsets in the range exist and that they are synced with the paths.
    *

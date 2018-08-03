@@ -114,7 +114,7 @@ class Value extends Record(DEFAULTS) {
       data = data.merge(object.data)
     }
 
-    selection = selection.normalize(document)
+    selection = document.createRange(selection)
 
     if (selection.isUnset) {
       const text = document.getFirstText()
