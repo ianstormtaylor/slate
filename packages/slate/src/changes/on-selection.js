@@ -416,6 +416,10 @@ Changes.moveToEndOfBlock = change => {
   change.moveEndToEndOfBlock().moveToEnd()
 }
 
+Changes.moveToEndOfDocument = change => {
+  change.moveEndToEndOfNode(change.value.document).moveToEnd()
+}
+
 Changes.moveToEndOfInline = change => {
   change.moveEndToEndOfInline().moveToEnd()
 }
@@ -470,6 +474,10 @@ Changes.moveToStart = change => {
 
 Changes.moveToStartOfBlock = change => {
   change.moveStartToStartOfBlock().moveToStart()
+}
+
+Changes.moveToStartOfDocument = change => {
+  change.moveStartToStartOfNode(change.value.document).moveToStart()
 }
 
 Changes.moveToStartOfInline = change => {
@@ -613,6 +621,9 @@ function pointEdgeSideObject(change, point, edge, side, object) {
 }
 
 function pointBackward(change, point, n = 1) {
+  if (n === 0) return
+  if (n < 0) return pointForward(change, point, -n)
+
   const Point = point.slice(0, 1).toUpperCase() + point.slice(1)
   const { value } = change
   const { document, selection } = value
@@ -640,6 +651,9 @@ function pointBackward(change, point, n = 1) {
 }
 
 function pointForward(change, point, n = 1) {
+  if (n === 0) return
+  if (n < 0) return pointBackward(change, point, -n)
+
   const Point = point.slice(0, 1).toUpperCase() + point.slice(1)
   const { value } = change
   const { document, selection } = value
@@ -671,60 +685,6 @@ function pointForward(change, point, n = 1) {
  * Deprecated.
  */
 
-Changes.extend = (change, n = 1) => {
-  logger.deprecate(
-    '0.37.0',
-    'The `Change.extend` method is deprecated, please use `Change.moveFocusForward` or `Change.moveFocusBackward` instead.'
-  )
-
-  return n > 0 ? change.moveFocusForward(n) : change.moveFocusBackward(-n)
-}
-
-Changes.move = (change, n = 1) => {
-  logger.deprecate(
-    '0.37.0',
-    'The `Change.move` method is deprecated, please use `Change.moveForward` or `Change.moveBackward` instead.'
-  )
-
-  return n > 0 ? change.moveForward(n) : change.moveBackward(-n)
-}
-
-Changes.moveAnchor = (change, n = 1) => {
-  logger.deprecate(
-    '0.37.0',
-    'The `Change.moveAnchor` method is deprecated, please use `Change.moveAnchorForward` or `Change.moveAnchorBackward` instead.'
-  )
-
-  return n > 0 ? change.moveAnchorForward(n) : change.moveAnchorBackward(-n)
-}
-
-Changes.moveFocus = (change, n = 1) => {
-  logger.deprecate(
-    '0.37.0',
-    'The `Change.moveFocus` method is deprecated, please use `Change.moveFocusForward` or `Change.moveFocusBackward` instead.'
-  )
-
-  return n > 0 ? change.moveFocusForward(n) : change.moveFocusBackward(-n)
-}
-
-Changes.moveStart = (change, n = 1) => {
-  logger.deprecate(
-    '0.37.0',
-    'The `Change.moveStart` method is deprecated, please use `Change.moveStartForward` or `Change.moveStartBackward` instead.'
-  )
-
-  return n > 0 ? change.moveStartForward(n) : change.moveStartBackward(-n)
-}
-
-Changes.moveEnd = (change, n = 1) => {
-  logger.deprecate(
-    '0.37.0',
-    'The `Change.moveEnd` method is deprecated, please use `Change.moveEndForward` or `Change.moveEndBackward` instead.'
-  )
-
-  return n > 0 ? change.moveEndForward(n) : change.moveEndBackward(-n)
-}
-
 Changes.moveOffsetsTo = (change, start, end = start) => {
   logger.deprecate(
     '0.37.0',
@@ -744,6 +704,12 @@ const DEPRECATEDS = [
   ['collapseToEnd', 'moveToEnd'],
   ['collapseToEndOf', 'moveToEndOfNode'],
   ['collapseToEndOfBlock', 'moveToEndOfBlock'],
+  ['collapseToEndOfNextBlock', 'moveToEndOfNextBlock'],
+  ['collapseToEndOfNextInline', 'moveToEndOfNextInline'],
+  ['collapseToEndOfNextText', 'moveToEndOfNextText'],
+  ['collapseToEndOfPreviousBlock', 'moveToEndOfPreviousBlock'],
+  ['collapseToEndOfPreviousInline', 'moveToEndOfPreviousInline'],
+  ['collapseToEndOfPreviousText', 'moveToEndOfPreviousText'],
   ['collapseToFocus', 'moveToFocus'],
   ['collapseToStart', 'moveToStart'],
   ['collapseToStartOf', 'moveToStartOfNode'],
@@ -754,13 +720,21 @@ const DEPRECATEDS = [
   ['collapseToStartOfPreviousBlock', 'moveToStartOfPreviousBlock'],
   ['collapseToStartOfPreviousInline', 'moveToStartOfPreviousInline'],
   ['collapseToStartOfPreviousText', 'moveToStartOfPreviousText'],
+  ['extend', 'moveFocusForward'],
   ['extendCharBackward', 'moveFocusBackward'],
   ['extendCharForward', 'moveFocusForward'],
-  ['extendLineBackward', 'moveFocusLineBackward'],
-  ['extendLineForward', 'moveFocusLineForward'],
+  ['extendLineBackward', 'moveFocusToStartOfBlock'],
+  ['extendLineForward', 'moveFocusToEndOfBlock'],
   ['extendTo', 'moveFocusTo'],
   ['extendToEndOf', 'moveFocusToEndOfNode'],
   ['extendToEndOfBlock', 'moveFocusToEndOfBlock'],
+  ['extendToEndOfBlock', 'moveFocusToEndOfBlock'],
+  ['extendToEndOfNextBlock', 'moveFocusToEndOfNextBlock'],
+  ['extendToEndOfNextInline', 'moveFocusToEndOfNextInline'],
+  ['extendToEndOfNextText', 'moveFocusToEndOfNextText'],
+  ['extendToEndOfPreviousBlock', 'moveFocusToEndOfPreviousBlock'],
+  ['extendToEndOfPreviousInline', 'moveFocusToEndOfPreviousInline'],
+  ['extendToEndOfPreviousText', 'moveFocusToEndOfPreviousText'],
   ['extendToStartOf', 'moveFocusToStartOfNode'],
   ['extendToStartOfBlock', 'moveFocusToStartOfBlock'],
   ['extendToStartOfNextBlock', 'moveFocusToStartOfNextBlock'],
@@ -769,6 +743,8 @@ const DEPRECATEDS = [
   ['extendToStartOfPreviousBlock', 'moveFocusToStartOfPreviousBlock'],
   ['extendToStartOfPreviousInline', 'moveFocusToStartOfPreviousInline'],
   ['extendToStartOfPreviousText', 'moveFocusToStartOfPreviousText'],
+  ['move', 'moveForward'],
+  ['moveAnchor', 'moveAnchorForward'],
   ['moveAnchorCharBackward', 'moveAnchorBackward'],
   ['moveAnchorCharForward', 'moveAnchorForward'],
   ['moveAnchorOffsetTo', 'moveAnchorTo'],
@@ -776,14 +752,17 @@ const DEPRECATEDS = [
   ['moveAnchorToStartOf', 'moveAnchorToStartOfNode'],
   ['moveCharBackward', 'moveBackward'],
   ['moveCharForward', 'moveForward'],
+  ['moveEnd', 'moveEndForward'],
   ['moveEndCharBackward', 'moveEndBackward'],
   ['moveEndCharForward', 'moveEndForward'],
   ['moveEndOffsetTo', 'moveEndTo'],
+  ['moveFocus', 'moveFocusForward'],
   ['moveFocusCharBackward', 'moveFocusBackward'],
   ['moveFocusCharForward', 'moveFocusForward'],
   ['moveFocusOffsetTo', 'moveFocusTo'],
   ['moveFocusToEndOf', 'moveFocusToEndOfNode'],
   ['moveFocusToStartOf', 'moveFocusToStartOfNode'],
+  ['moveStart', 'moveStartForward'],
   ['moveStartCharBackward', 'moveStartBackward'],
   ['moveStartCharForward', 'moveStartForward'],
   ['moveStartOffsetTo', 'moveStartTo'],

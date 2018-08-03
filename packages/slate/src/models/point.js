@@ -202,6 +202,8 @@ class Point extends Record(DEFAULTS) {
    */
 
   moveBackward(n = 1) {
+    if (n === 0) return this
+    if (n < 0) return this.moveForward(-n)
     const point = this.setOffset(this.offset - n)
     return point
   }
@@ -214,6 +216,8 @@ class Point extends Record(DEFAULTS) {
    */
 
   moveForward(n = 1) {
+    if (n === 0) return this
+    if (n < 0) return this.moveBackward(-n)
     const point = this.setOffset(this.offset + n)
     return point
   }
