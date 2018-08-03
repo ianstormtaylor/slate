@@ -16,7 +16,7 @@ export const fixtures = (...args) => {
   const dir = basename(path)
   const d = options.skip ? describe.skip : describe
 
-  d(dir, () => {
+  d(dir, async () => {
     for (const file of files) {
       const p = resolve(path, file)
       const stat = fs.statSync(p)
@@ -35,18 +35,15 @@ export const fixtures = (...args) => {
       ) {
         const name = basename(file, extname(file))
 
-        // This needs to be a non-arrow function to use `this.skip()`.
-        it(name, function() {
-          // Ensure that the key generator is reset. We have to do this here
-          // because the `require` call will create the Slate objects.
-          KeyUtils.resetGenerator()
-          const module = require(p)
+        // Ensure that the key generator is reset. We have to do this here
+        // because the `require` call will create the Slate objects.
+        KeyUtils.resetGenerator()
+        const module = require(p)
+        const keyState = KeyUtils.getCurrentState()
+        const t = module.skip ? it.skip : it
 
-          if (module.skip) {
-            this.skip()
-            return
-          }
-
+        t(name, () => {
+          KeyUtils.resetGenerator(keyState)
           fn({ name, path, module })
         })
       }

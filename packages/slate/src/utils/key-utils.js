@@ -1,4 +1,15 @@
 /**
+ * Is in development?
+ *
+ * @type {Boolean}
+ */
+
+const IS_DEV =
+  typeof process !== 'undefined' &&
+  process.env &&
+  process.env.NODE_ENV !== 'production'
+
+/**
  * An auto-incrementing index for generating keys.
  *
  * @type {Number}
@@ -47,9 +58,17 @@ function setGenerator(func) {
  * Reset the key generating function to its initial state.
  */
 
-function resetGenerator() {
-  n = 0
-  generate = () => `${n++}`
+function resetGenerator(state = {}) {
+  const { count = 0, generator = () => `${n++}` } = state
+  n = count
+  generate = generator
+}
+
+function getCurrentState() {
+  if (!IS_DEV) {
+    throw Error('Slate: Cannot get current key utils during production')
+  }
+  return { count: n, generator: generate }
 }
 
 /**
@@ -68,4 +87,5 @@ export default {
   create,
   setGenerator,
   resetGenerator,
+  getCurrentState,
 }
