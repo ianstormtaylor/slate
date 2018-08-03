@@ -6,7 +6,11 @@ export const input = (
   <value>
     <document>
       <block type="paragraph">
-        o<cursor />ne
+        one
+        <mark type="bold">
+          two<cursor />
+        </mark>
+        three
       </block>
     </document>
   </value>
@@ -21,8 +25,8 @@ export const output = {
   object: 'value',
   document: {
     object: 'document',
-    key: '3',
     data: {},
+    key: '3',
     nodes: [
       {
         object: 'block',
@@ -40,6 +44,22 @@ export const output = {
                 text: 'one',
                 marks: [],
               },
+              {
+                object: 'leaf',
+                text: 'two',
+                marks: [
+                  {
+                    object: 'mark',
+                    type: 'bold',
+                    data: {},
+                  },
+                ],
+              },
+              {
+                object: 'leaf',
+                text: 'three',
+                marks: [],
+              },
             ],
           },
         ],
@@ -52,13 +72,13 @@ export const output = {
       object: 'point',
       key: '0',
       path: [0, 0],
-      offset: 1,
+      offset: 6,
     },
     focus: {
       object: 'point',
       key: '0',
       path: [0, 0],
-      offset: 1,
+      offset: 6,
     },
     isFocused: true,
     isAtomic: false,

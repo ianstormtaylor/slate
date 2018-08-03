@@ -140,10 +140,6 @@ class History extends Record(DEFAULTS) {
     const prevBatch = undos.peek()
     const prevOperation = prevBatch && prevBatch.last()
 
-    if (skip == null) {
-      skip = shouldSkip(operation, prevOperation)
-    }
-
     if (skip) {
       return history
     }
@@ -230,22 +226,6 @@ function shouldMerge(o, p) {
       isEqual(o.path, p.path))
 
   return merge
-}
-
-/**
- * Check whether to skip a new operation `o`, given previous operation `p`.
- *
- * @param {Object} o
- * @param {Object} p
- * @return {Boolean}
- */
-
-function shouldSkip(o, p) {
-  if (!p) return false
-
-  const skip = o.type == 'set_selection' && p.type == 'set_selection'
-
-  return skip
 }
 
 /**

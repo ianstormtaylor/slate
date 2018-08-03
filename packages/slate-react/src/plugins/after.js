@@ -85,7 +85,7 @@ function AfterPlugin() {
       // an inline node will be automatically replaced to be at the last offset
       // of a previous inline node, which screws us up, so we always want to set
       // it to the end of the node. (2016/11/29)
-      change.focus().collapseToEndOf(node)
+      change.focus().moveToEndOfNode(node)
     }
 
     debug('onClick', { event })
@@ -125,7 +125,8 @@ function AfterPlugin() {
       // If user cuts a void block node or a void inline node,
       // manually removes it since selection is collapsed in this case.
       const { value } = change
-      const { endBlock, endInline, isCollapsed } = value
+      const { endBlock, endInline, selection } = value
+      const { isCollapsed } = selection
       const isVoidBlock = endBlock && endBlock.isVoid && isCollapsed
       const isVoidInline = endInline && endInline.isVoid && isCollapsed
 
@@ -219,13 +220,13 @@ function AfterPlugin() {
     // needs to account for the selection's content being deleted.
     if (
       isDraggingInternally &&
-      selection.endKey == target.endKey &&
-      selection.endOffset < target.endOffset
+      selection.end.key == target.end.key &&
+      selection.end.offset < target.end.offset
     ) {
       target = target.move(
-        selection.startKey == selection.endKey
-          ? 0 - selection.endOffset + selection.startOffset
-          : 0 - selection.endOffset
+        selection.start.key == selection.end.key
+          ? 0 - selection.end.offset + selection.start.offset
+          : 0 - selection.end.offset
       )
     }
 
@@ -236,11 +237,11 @@ function AfterPlugin() {
     change.select(target)
 
     if (type == 'text' || type == 'html') {
-      const { anchorKey } = target
-      let hasVoidParent = document.hasVoidParent(anchorKey)
+      const { anchor } = target
+      let hasVoidParent = document.hasVoidParent(anchor.key)
 
       if (hasVoidParent) {
-        let n = document.getNode(anchorKey)
+        let n = document.getNode(anchor.key)
 
         while (hasVoidParent) {
           n = document.getNextText(n.key)
@@ -248,7 +249,7 @@ function AfterPlugin() {
           hasVoidParent = document.hasVoidParent(n.key)
         }
 
-        if (n) change.collapseToStartOf(n)
+        if (n) change.moveToStartOfNode(n)
       }
 
       if (text) {
@@ -275,7 +276,7 @@ function AfterPlugin() {
     // has fired in a node: https://github.com/facebook/react/issues/11379.
     // Until this is fixed in React, we dispatch a mouseup event on that
     // DOM node, since that will make it go back to normal.
-    const focusNode = document.getNode(target.focusKey)
+    const focusNode = document.getNode(target.focus.key)
     const el = findDOMNode(focusNode, window)
     if (!el) return
 
@@ -343,12 +344,12 @@ function AfterPlugin() {
 
     // Determine what the selection should be after changing the text.
     const delta = textContent.length - text.length
-    const corrected = selection.collapseToEnd().move(delta)
+    const corrected = selection.moveToEnd().moveForward(delta)
     let entire = selection
       .moveAnchorTo(point.key, start)
       .moveFocusTo(point.key, end)
 
-    entire = document.normalizeRange(entire)
+    entire = document.resolveRange(entire)
 
     // Change the current value to have the leaf's text replaced.
     change.insertTextAtRange(entire, textContent, leaf.marks).select(corrected)
@@ -372,7 +373,7 @@ function AfterPlugin() {
     // preserve native autocorrect behavior, so they shouldn't be handled here.
     if (Hotkeys.isSplitBlock(event) && !IS_IOS) {
       return value.isInVoid
-        ? change.collapseToStartOfNextText()
+        ? change.moveToStartOfNextText()
         : change.splitBlock()
     }
 
@@ -413,22 +414,22 @@ function AfterPlugin() {
     // selection isn't properly collapsed. (2017/10/17)
     if (Hotkeys.isCollapseLineBackward(event)) {
       event.preventDefault()
-      return change.collapseLineBackward()
+      return change.moveToStartOfBlock()
     }
 
     if (Hotkeys.isCollapseLineForward(event)) {
       event.preventDefault()
-      return change.collapseLineForward()
+      return change.moveToEndOfBlock()
     }
 
     if (Hotkeys.isExtendLineBackward(event)) {
       event.preventDefault()
-      return change.extendLineBackward()
+      return change.moveFocusToStartOfBlock()
     }
 
     if (Hotkeys.isExtendLineForward(event)) {
       event.preventDefault()
-      return change.extendLineForward()
+      return change.moveFocusToEndOfBlock()
     }
 
     // COMPAT: If a void node is selected, or a zero-width text node adjacent to
@@ -441,7 +442,7 @@ function AfterPlugin() {
 
       if (isInVoid || isPreviousInVoid || startText.text == '') {
         event.preventDefault()
-        return change.collapseCharBackward()
+        return change.moveBackward()
       }
     }
 
@@ -451,7 +452,7 @@ function AfterPlugin() {
 
       if (isInVoid || isNextInVoid || startText.text == '') {
         event.preventDefault()
-        return change.collapseCharForward()
+        return change.moveForward()
       }
     }
 
@@ -462,7 +463,7 @@ function AfterPlugin() {
 
       if (isInVoid || isPreviousInVoid || startText.text == '') {
         event.preventDefault()
-        return change.extendCharBackward()
+        return change.moveFocusBackward()
       }
     }
 
@@ -472,7 +473,7 @@ function AfterPlugin() {
 
       if (isInVoid || isNextInVoid || startText.text == '') {
         event.preventDefault()
-        return change.extendCharForward()
+        return change.moveFocusForward()
       }
     }
   }
@@ -535,13 +536,13 @@ function AfterPlugin() {
     let range = findRange(native, value)
     if (!range) return
 
-    const { anchorKey, anchorOffset, focusKey, focusOffset } = range
-    const anchorText = document.getNode(anchorKey)
-    const focusText = document.getNode(focusKey)
-    const anchorInline = document.getClosestInline(anchorKey)
-    const focusInline = document.getClosestInline(focusKey)
-    const focusBlock = document.getClosestBlock(focusKey)
-    const anchorBlock = document.getClosestBlock(anchorKey)
+    const { anchor, focus } = range
+    const anchorText = document.getNode(anchor.key)
+    const focusText = document.getNode(focus.key)
+    const anchorInline = document.getClosestInline(anchor.key)
+    const focusInline = document.getClosestInline(focus.key)
+    const focusBlock = document.getClosestBlock(focus.key)
+    const anchorBlock = document.getClosestBlock(anchor.key)
 
     // COMPAT: If the anchor point is at the start of a non-void, and the
     // focus point is inside a void node with an offset that isn't `0`, set
@@ -553,12 +554,12 @@ function AfterPlugin() {
     if (
       anchorBlock &&
       !anchorBlock.isVoid &&
-      anchorOffset == 0 &&
+      anchor.offset == 0 &&
       focusBlock &&
       focusBlock.isVoid &&
-      focusOffset != 0
+      focus.offset != 0
     ) {
-      range = range.set('focusOffset', 0)
+      range = range.setFocus(focus.setOffset(0))
     }
 
     // COMPAT: If the selection is at the end of a non-void inline node, and
@@ -567,24 +568,24 @@ function AfterPlugin() {
     if (
       anchorInline &&
       !anchorInline.isVoid &&
-      anchorOffset == anchorText.text.length
+      anchor.offset == anchorText.text.length
     ) {
-      const block = document.getClosestBlock(anchorKey)
-      const next = block.getNextText(anchorKey)
+      const block = document.getClosestBlock(anchor.key)
+      const next = block.getNextText(anchor.key)
       if (next) range = range.moveAnchorTo(next.key, 0)
     }
 
     if (
       focusInline &&
       !focusInline.isVoid &&
-      focusOffset == focusText.text.length
+      focus.offset == focusText.text.length
     ) {
-      const block = document.getClosestBlock(focusKey)
-      const next = block.getNextText(focusKey)
+      const block = document.getClosestBlock(focus.key)
+      const next = block.getNextText(focus.key)
       if (next) range = range.moveFocusTo(next.key, 0)
     }
 
-    range = document.normalizeRange(range)
+    range = document.resolveRange(range)
     change.select(range)
   }
 

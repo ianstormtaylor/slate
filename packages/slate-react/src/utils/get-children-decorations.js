@@ -80,7 +80,7 @@ function orderChildDecorations(node, decorations) {
     // Range start.
     // A rangeStart should be before the child containing its startKey, in order
     // to consider it active before going down the child.
-    const startKeyOrder = keyOrders[decoration.startKey]
+    const startKeyOrder = keyOrders[decoration.start.key]
     const containingChildOrder =
       startKeyOrder === undefined
         ? 0
@@ -93,7 +93,7 @@ function orderChildDecorations(node, decorations) {
     })
 
     // Range end.
-    const endKeyOrder = (keyOrders[decoration.endKey] || globalOrder) + 0.5
+    const endKeyOrder = (keyOrders[decoration.end.key] || globalOrder) + 0.5
 
     endPoints.push({
       isRangeEnd: true,

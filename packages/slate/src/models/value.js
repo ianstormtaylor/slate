@@ -118,9 +118,11 @@ class Value extends Record(DEFAULTS) {
 
     if (selection.isUnset) {
       const text = document.getFirstText()
-      if (text) selection = selection.collapseToStartOf(text)
+      if (text) selection = selection.moveToStartOfNode(text)
       selection = document.createRange(selection)
     }
+
+    selection = document.createRange(selection)
 
     let value = new Value({
       data,
@@ -213,173 +215,16 @@ class Value extends Record(DEFAULTS) {
   }
 
   /**
-   * Is the current selection collapsed?
-   *
-   * @return {Boolean}
-   */
-
-  get isCollapsed() {
-    return this.selection.isCollapsed
-  }
-
-  /**
-   * Is the current selection expanded?
-   *
-   * @return {Boolean}
-   */
-
-  get isExpanded() {
-    return this.selection.isExpanded
-  }
-
-  /**
-   * Is the current selection backward?
-   *
-   * @return {Boolean} isBackward
-   */
-
-  get isBackward() {
-    return this.selection.isBackward
-  }
-
-  /**
-   * Is the current selection forward?
-   *
-   * @return {Boolean}
-   */
-
-  get isForward() {
-    return this.selection.isForward
-  }
-
-  /**
-   * Get the current start key.
-   *
-   * @return {String}
-   */
-
-  get startKey() {
-    return this.selection.startKey
-  }
-
-  /**
-   * Get the current end key.
-   *
-   * @return {String}
-   */
-
-  get endKey() {
-    return this.selection.endKey
-  }
-
-  /**
-   * Get the current start path.
-   *
-   * @return {String}
-   */
-
-  get startPath() {
-    return this.selection.startPath
-  }
-
-  /**
-   * Get the current end path.
-   *
-   * @return {String}
-   */
-
-  get endPath() {
-    return this.selection.endPath
-  }
-
-  /**
-   * Get the current start offset.
-   *
-   * @return {String}
-   */
-
-  get startOffset() {
-    return this.selection.startOffset
-  }
-
-  /**
-   * Get the current end offset.
-   *
-   * @return {String}
-   */
-
-  get endOffset() {
-    return this.selection.endOffset
-  }
-
-  /**
-   * Get the current anchor key.
-   *
-   * @return {String}
-   */
-
-  get anchorKey() {
-    return this.selection.anchorKey
-  }
-
-  /**
-   * Get the current focus key.
-   *
-   * @return {String}
-   */
-
-  get focusKey() {
-    return this.selection.focusKey
-  }
-
-  /**
-   * Get the current anchor path.
-   *
-   * @return {String}
-   */
-
-  get anchorPath() {
-    return this.selection.anchorPath
-  }
-
-  /**
-   * Get the current focus path.
-   *
-   * @return {String}
-   */
-
-  get focusPath() {
-    return this.selection.focusPath
-  }
-
-  /**
-   * Get the current anchor offset.
-   *
-   * @return {String}
-   */
-
-  get anchorOffset() {
-    return this.selection.anchorOffset
-  }
-
-  /**
-   * Get the current focus offset.
-   *
-   * @return {String}
-   */
-
-  get focusOffset() {
-    return this.selection.focusOffset
-  }
-
-  /**
    * Get the current start text node's closest block parent.
    *
    * @return {Block}
    */
 
   get startBlock() {
-    return this.startKey && this.document.getClosestBlock(this.startKey)
+    return (
+      this.selection.start.key &&
+      this.document.getClosestBlock(this.selection.start.key)
+    )
   }
 
   /**
@@ -389,7 +234,10 @@ class Value extends Record(DEFAULTS) {
    */
 
   get endBlock() {
-    return this.endKey && this.document.getClosestBlock(this.endKey)
+    return (
+      this.selection.end.key &&
+      this.document.getClosestBlock(this.selection.end.key)
+    )
   }
 
   /**
@@ -399,7 +247,10 @@ class Value extends Record(DEFAULTS) {
    */
 
   get anchorBlock() {
-    return this.anchorKey && this.document.getClosestBlock(this.anchorKey)
+    return (
+      this.selection.anchor.key &&
+      this.document.getClosestBlock(this.selection.anchor.key)
+    )
   }
 
   /**
@@ -409,7 +260,10 @@ class Value extends Record(DEFAULTS) {
    */
 
   get focusBlock() {
-    return this.focusKey && this.document.getClosestBlock(this.focusKey)
+    return (
+      this.selection.focus.key &&
+      this.document.getClosestBlock(this.selection.focus.key)
+    )
   }
 
   /**
@@ -419,7 +273,10 @@ class Value extends Record(DEFAULTS) {
    */
 
   get startInline() {
-    return this.startKey && this.document.getClosestInline(this.startKey)
+    return (
+      this.selection.start.key &&
+      this.document.getClosestInline(this.selection.start.key)
+    )
   }
 
   /**
@@ -429,7 +286,10 @@ class Value extends Record(DEFAULTS) {
    */
 
   get endInline() {
-    return this.endKey && this.document.getClosestInline(this.endKey)
+    return (
+      this.selection.end.key &&
+      this.document.getClosestInline(this.selection.end.key)
+    )
   }
 
   /**
@@ -439,7 +299,10 @@ class Value extends Record(DEFAULTS) {
    */
 
   get anchorInline() {
-    return this.anchorKey && this.document.getClosestInline(this.anchorKey)
+    return (
+      this.selection.anchor.key &&
+      this.document.getClosestInline(this.selection.anchor.key)
+    )
   }
 
   /**
@@ -449,7 +312,10 @@ class Value extends Record(DEFAULTS) {
    */
 
   get focusInline() {
-    return this.focusKey && this.document.getClosestInline(this.focusKey)
+    return (
+      this.selection.focus.key &&
+      this.document.getClosestInline(this.selection.focus.key)
+    )
   }
 
   /**
@@ -459,7 +325,10 @@ class Value extends Record(DEFAULTS) {
    */
 
   get startText() {
-    return this.startKey && this.document.getDescendant(this.startKey)
+    return (
+      this.selection.start.key &&
+      this.document.getDescendant(this.selection.start.key)
+    )
   }
 
   /**
@@ -469,7 +338,10 @@ class Value extends Record(DEFAULTS) {
    */
 
   get endText() {
-    return this.endKey && this.document.getDescendant(this.endKey)
+    return (
+      this.selection.end.key &&
+      this.document.getDescendant(this.selection.end.key)
+    )
   }
 
   /**
@@ -479,7 +351,10 @@ class Value extends Record(DEFAULTS) {
    */
 
   get anchorText() {
-    return this.anchorKey && this.document.getDescendant(this.anchorKey)
+    return (
+      this.selection.anchor.key &&
+      this.document.getDescendant(this.selection.anchor.key)
+    )
   }
 
   /**
@@ -489,7 +364,10 @@ class Value extends Record(DEFAULTS) {
    */
 
   get focusText() {
-    return this.focusKey && this.document.getDescendant(this.focusKey)
+    return (
+      this.selection.focus.key &&
+      this.document.getDescendant(this.selection.focus.key)
+    )
   }
 
   /**
@@ -499,7 +377,10 @@ class Value extends Record(DEFAULTS) {
    */
 
   get nextBlock() {
-    return this.endKey && this.document.getNextBlock(this.endKey)
+    return (
+      this.selection.end.key &&
+      this.document.getNextBlock(this.selection.end.key)
+    )
   }
 
   /**
@@ -509,7 +390,10 @@ class Value extends Record(DEFAULTS) {
    */
 
   get previousBlock() {
-    return this.startKey && this.document.getPreviousBlock(this.startKey)
+    return (
+      this.selection.start.key &&
+      this.document.getPreviousBlock(this.selection.start.key)
+    )
   }
 
   /**
@@ -519,7 +403,10 @@ class Value extends Record(DEFAULTS) {
    */
 
   get nextInline() {
-    return this.endKey && this.document.getNextInline(this.endKey)
+    return (
+      this.selection.end.key &&
+      this.document.getNextInline(this.selection.end.key)
+    )
   }
 
   /**
@@ -529,7 +416,10 @@ class Value extends Record(DEFAULTS) {
    */
 
   get previousInline() {
-    return this.startKey && this.document.getPreviousInline(this.startKey)
+    return (
+      this.selection.start.key &&
+      this.document.getPreviousInline(this.selection.start.key)
+    )
   }
 
   /**
@@ -539,7 +429,10 @@ class Value extends Record(DEFAULTS) {
    */
 
   get nextText() {
-    return this.endKey && this.document.getNextText(this.endKey)
+    return (
+      this.selection.end.key &&
+      this.document.getNextText(this.selection.end.key)
+    )
   }
 
   /**
@@ -549,7 +442,10 @@ class Value extends Record(DEFAULTS) {
    */
 
   get previousText() {
-    return this.startKey && this.document.getPreviousText(this.startKey)
+    return (
+      this.selection.start.key &&
+      this.document.getPreviousText(this.selection.start.key)
+    )
   }
 
   /**
@@ -644,8 +540,9 @@ class Value extends Record(DEFAULTS) {
    */
 
   get isEmpty() {
-    if (this.isCollapsed) return true
-    if (this.endOffset != 0 && this.startOffset != 0) return false
+    if (this.selection.isCollapsed) return true
+    if (this.selection.end.offset != 0 && this.selection.start.offset != 0)
+      return false
     return this.fragment.isEmpty
   }
 
@@ -656,8 +553,8 @@ class Value extends Record(DEFAULTS) {
    */
 
   get isInVoid() {
-    if (this.isExpanded) return false
-    return this.document.hasVoidParent(this.startKey)
+    if (this.selection.isExpanded) return false
+    return this.document.hasVoidParent(this.selection.start.key)
   }
 
   /**
@@ -704,7 +601,10 @@ class Value extends Record(DEFAULTS) {
     value = value.set('document', document)
 
     value = value.mapRanges(range => {
-      return range.merge({ anchorPath: null, focusPath: null })
+      return range.setPoints([
+        range.anchor.setPath(null),
+        range.focus.setPath(null),
+      ])
     })
 
     return value
@@ -728,36 +628,30 @@ class Value extends Record(DEFAULTS) {
 
     // Update any ranges that were affected.
     const node = document.assertNode(path)
+
+    value = value.mapRanges(range => {
+      const { anchor, focus, isBackward, isAtomic } = range
+
+      if (
+        anchor.key === node.key &&
+        (anchor.offset > offset ||
+          (anchor.offset === offset && (!isAtomic || !isBackward)))
+      ) {
+        range = range.moveAnchorForward(text.length)
+      }
+
+      if (
+        focus.key === node.key &&
+        (focus.offset > offset ||
+          (focus.offset == offset && (!isAtomic || isBackward)))
+      ) {
+        range = range.moveFocusForward(text.length)
+      }
+
+      return range
+    })
+
     value = value.clearAtomicRanges(node.key, offset)
-
-    value = value.mapRanges(range => {
-      const { anchorKey, anchorOffset, isBackward, isAtomic } = range
-
-      if (
-        anchorKey === node.key &&
-        (anchorOffset > offset ||
-          (anchorOffset === offset && (!isAtomic || !isBackward)))
-      ) {
-        return range.moveAnchor(text.length)
-      }
-
-      return range
-    })
-
-    value = value.mapRanges(range => {
-      const { focusKey, focusOffset, isBackward, isAtomic } = range
-
-      if (
-        focusKey === node.key &&
-        (focusOffset > offset ||
-          (focusOffset == offset && (!isAtomic || isBackward)))
-      ) {
-        return range.moveFocus(text.length)
-      }
-
-      return range
-    })
-
     return value
   }
 
@@ -782,16 +676,20 @@ class Value extends Record(DEFAULTS) {
       if (two.object === 'text') {
         const max = one.text.length
 
-        if (range.anchorKey === two.key) {
-          range = range.moveAnchorTo(one.key, max + range.anchorOffset)
+        if (range.anchor.key === two.key) {
+          range = range.moveAnchorTo(one.key, max + range.anchor.offset)
         }
 
-        if (range.focusKey === two.key) {
-          range = range.moveFocusTo(one.key, max + range.focusOffset)
+        if (range.focus.key === two.key) {
+          range = range.moveFocusTo(one.key, max + range.focus.offset)
         }
       }
 
-      range = range.merge({ anchorPath: null, focusPath: null })
+      range = range.setPoints([
+        range.anchor.setPath(null),
+        range.focus.setPath(null),
+      ])
+
       return range
     })
 
@@ -817,7 +715,10 @@ class Value extends Record(DEFAULTS) {
     value = value.set('document', document)
 
     value = value.mapRanges(range => {
-      return range.merge({ anchorPath: null, focusPath: null })
+      return range.setPoints([
+        range.anchor.setPath(null),
+        range.focus.setPath(null),
+      ])
     })
 
     return value
@@ -861,21 +762,25 @@ class Value extends Record(DEFAULTS) {
     value = value.set('document', document)
 
     value = value.mapRanges(range => {
-      const { startKey, endKey } = range
+      const { start, end } = range
 
-      if (node.hasNode(startKey)) {
+      if (node.hasNode(start.key)) {
         range = prev
           ? range.moveStartTo(prev.key, prev.text.length)
-          : next ? range.moveStartTo(next.key, 0) : range.deselect()
+          : next ? range.moveStartTo(next.key, 0) : Range.create()
       }
 
-      if (node.hasNode(endKey)) {
+      if (node.hasNode(end.key)) {
         range = prev
           ? range.moveEndTo(prev.key, prev.text.length)
-          : next ? range.moveEndTo(next.key, 0) : range.deselect()
+          : next ? range.moveEndTo(next.key, 0) : Range.create()
       }
 
-      range = range.merge({ anchorPath: null, focusPath: null })
+      range = range.setPoints([
+        range.anchor.setPath(null),
+        range.focus.setPath(null),
+      ])
+
       return range
     })
 
@@ -903,28 +808,24 @@ class Value extends Record(DEFAULTS) {
     value = value.clearAtomicRanges(node.key, offset, offset + length)
 
     value = value.mapRanges(range => {
-      const { anchorKey } = range
+      const { anchor, focus } = range
 
-      if (anchorKey === node.key) {
-        return range.anchorOffset >= rangeOffset
-          ? range.moveAnchor(-length)
-          : range.anchorOffset > offset
-            ? range.moveAnchorTo(range.anchorKey, offset)
-            : range
+      if (anchor.key === node.key) {
+        range =
+          anchor.offset >= rangeOffset
+            ? range.moveAnchorBackward(length)
+            : anchor.offset > offset
+              ? range.moveAnchorTo(anchor.key, offset)
+              : range
       }
 
-      return range
-    })
-
-    value = value.mapRanges(range => {
-      const { focusKey } = range
-
-      if (focusKey === node.key) {
-        return range.focusOffset >= rangeOffset
-          ? range.moveFocus(-length)
-          : range.focusOffset > offset
-            ? range.moveFocusTo(range.focusKey, offset)
-            : range
+      if (focus.key === node.key) {
+        range =
+          focus.offset >= rangeOffset
+            ? range.moveFocusBackward(length)
+            : focus.offset > offset
+              ? range.moveFocusTo(focus.key, offset)
+              : range
       }
 
       return range
@@ -979,8 +880,8 @@ class Value extends Record(DEFAULTS) {
   setSelection(properties) {
     let value = this
     let { document, selection } = value
-    const next = selection.merge(properties)
-    selection = document.createRange(next)
+    const next = selection.setProperties(properties)
+    selection = document.resolveRange(next)
     value = value.set('selection', selection)
     return value
   }
@@ -1004,19 +905,23 @@ class Value extends Record(DEFAULTS) {
 
     value = value.mapRanges(range => {
       const next = newDocument.getNextText(node.key)
-      const { startKey, startOffset, endKey, endOffset } = range
+      const { start, end } = range
 
       // If the start was after the split, move it to the next node.
-      if (node.key === startKey && position <= startOffset) {
-        range = range.moveStartTo(next.key, startOffset - position)
+      if (node.key === start.key && position <= start.offset) {
+        range = range.moveStartTo(next.key, start.offset - position)
       }
 
       // If the end was after the split, move it to the next node.
-      if (node.key === endKey && position <= endOffset) {
-        range = range.moveEndTo(next.key, endOffset - position)
+      if (node.key === end.key && position <= end.offset) {
+        range = range.moveEndTo(next.key, end.offset - position)
       }
 
-      range = range.merge({ anchorPath: null, focusPath: null })
+      range = range.setPoints([
+        range.anchor.setPath(null),
+        range.focus.setPath(null),
+      ])
+
       return range
     })
 
@@ -1036,7 +941,7 @@ class Value extends Record(DEFAULTS) {
 
     if (selection) {
       let next = selection.isSet ? iterator(selection) : selection
-      if (!next) next = selection.deselect()
+      if (!next) next = Range.create()
       if (next !== selection) next = document.createRange(next)
       value = value.set('selection', next)
     }
@@ -1060,25 +965,25 @@ class Value extends Record(DEFAULTS) {
    * Remove any atomic ranges inside a `key`, `offset` and `length`.
    *
    * @param {String} key
-   * @param {Number} start
-   * @param {Number?} end
+   * @param {Number} from
+   * @param {Number?} to
    * @return {Value}
    */
 
-  clearAtomicRanges(key, start, end = null) {
+  clearAtomicRanges(key, from, to = null) {
     return this.mapRanges(range => {
-      const { isAtomic, startKey, startOffset, endKey, endOffset } = range
+      const { isAtomic, start, end } = range
       if (!isAtomic) return range
-      if (startKey !== key) return range
+      if (start.key !== key) return range
 
-      if (startOffset < start && (endKey !== key || endOffset > start)) {
+      if (start.offset < from && (end.key !== key || end.offset > from)) {
         return null
       }
 
       if (
-        end != null &&
-        startOffset < end &&
-        (endKey !== key || endOffset > end)
+        to != null &&
+        start.offset < to &&
+        (end.key !== key || end.offset > to)
       ) {
         return null
       }
@@ -1131,6 +1036,154 @@ class Value extends Record(DEFAULTS) {
 
   toJS(options) {
     return this.toJSON(options)
+  }
+
+  /**
+   * Deprecated.
+   */
+
+  get isCollapsed() {
+    logger.deprecate(
+      '0.37.0',
+      'The `value.isCollapsed` property is deprecated, please use `selection.isCollapsed` instead.'
+    )
+
+    return this.selection.isCollapsed
+  }
+
+  get isExpanded() {
+    logger.deprecate(
+      '0.37.0',
+      'The `value.isExpanded` property is deprecated, please use `selection.isExpanded` instead.'
+    )
+
+    return this.selection.isExpanded
+  }
+
+  get isBackward() {
+    logger.deprecate(
+      '0.37.0',
+      'The `value.isBackward` property is deprecated, please use `selection.isBackward` instead.'
+    )
+
+    return this.selection.isBackward
+  }
+
+  get isForward() {
+    logger.deprecate(
+      '0.37.0',
+      'The `value.isForward` property is deprecated, please use `selection.isForward` instead.'
+    )
+
+    return this.selection.isForward
+  }
+
+  get startKey() {
+    logger.deprecate(
+      '0.37.0',
+      'The `value.startKey` property is deprecated, please use `selection.start.key` instead.'
+    )
+
+    return this.selection.start.key
+  }
+
+  get endKey() {
+    logger.deprecate(
+      '0.37.0',
+      'The `value.endKey` property is deprecated, please use `selection.end.key` instead.'
+    )
+
+    return this.selection.end.key
+  }
+
+  get startPath() {
+    logger.deprecate(
+      '0.37.0',
+      'The `value.startPath` property is deprecated, please use `selection.start.path` instead.'
+    )
+
+    return this.selection.start.path
+  }
+
+  get endPath() {
+    logger.deprecate(
+      '0.37.0',
+      'The `value.endPath` property is deprecated, please use `selection.end.path` instead.'
+    )
+
+    return this.selection.end.path
+  }
+
+  get startOffset() {
+    logger.deprecate(
+      '0.37.0',
+      'The `value.startOffset` property is deprecated, please use `selection.start.offset` instead.'
+    )
+
+    return this.selection.start.offset
+  }
+
+  get endOffset() {
+    logger.deprecate(
+      '0.37.0',
+      'The `value.endOffset` property is deprecated, please use `selection.end.offset` instead.'
+    )
+
+    return this.selection.end.offset
+  }
+
+  get anchorKey() {
+    logger.deprecate(
+      '0.37.0',
+      'The `value.anchorKey` property is deprecated, please use `selection.anchor.key` instead.'
+    )
+
+    return this.selection.anchor.key
+  }
+
+  get focusKey() {
+    logger.deprecate(
+      '0.37.0',
+      'The `value.focusKey` property is deprecated, please use `selection.focus.key` instead.'
+    )
+
+    return this.selection.focus.key
+  }
+
+  get anchorPath() {
+    logger.deprecate(
+      '0.37.0',
+      'The `value.anchorPath` property is deprecated, please use `selection.anchor.path` instead.'
+    )
+
+    return this.selection.anchor.path
+  }
+
+  get focusPath() {
+    logger.deprecate(
+      '0.37.0',
+      'The `value.focusPath` property is deprecated, please use `selection.focus.path` instead.'
+    )
+
+    return this.selection.focus.path
+  }
+
+  get anchorOffset() {
+    logger.deprecate(
+      '0.37.0',
+      'The `value.anchorOffset` property is deprecated, please use `selection.anchor.offset` instead.'
+    )
+
+    return this.selection.anchor.offset
+  }
+
+  get focusOffset() {
+    logger.deprecate(
+      '0.37.0',
+      'The `value.focusOffset` property is deprecated, please use `selection.focus.offset` instead.'
+    )
+
+    return this.selection.focus.offset
   }
 }
 

@@ -4,15 +4,18 @@ import h from '../../../helpers/h'
 
 export default function(change) {
   const { value } = change
-  const { selection, startText } = value
-  const range = selection.merge({
-    anchorKey: startText.key,
-    anchorOffset: 0,
-    focusKey: startText.key,
-    focusOffset: startText.text.length,
-  })
+  const { startText } = value
 
-  change.select(range)
+  change.select({
+    anchor: {
+      key: startText.key,
+      offset: 0,
+    },
+    focus: {
+      key: startText.key,
+      offset: startText.text.length,
+    },
+  })
 }
 
 export const input = (

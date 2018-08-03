@@ -38,6 +38,7 @@
 * [Mark](./reference//slate/mark.md)
 * [Node](./reference/slate/node.md)
 * [Operation](./reference/slate/operation.md)
+* [Point](./reference/slate/point.md)
 * [Range](./reference/slate/range.md)
 * [Schema](./reference/slate/schema.md)
 * [Text](./reference/slate/text.md)

@@ -3,15 +3,17 @@
 import h from '../../../helpers/h'
 
 export default function(change) {
-  change.collapseToEnd()
+  change.moveToRangeOfDocument()
 }
 
 export const input = (
   <value>
     <document>
       <paragraph>
-        <anchor />one<focus />
+        <cursor />one
       </paragraph>
+      <paragraph>two</paragraph>
+      <paragraph>three</paragraph>
     </document>
   </value>
 )
@@ -20,7 +22,11 @@ export const output = (
   <value>
     <document>
       <paragraph>
-        one<cursor />
+        <anchor />one
+      </paragraph>
+      <paragraph>two</paragraph>
+      <paragraph>
+        three<focus />
       </paragraph>
     </document>
   </value>

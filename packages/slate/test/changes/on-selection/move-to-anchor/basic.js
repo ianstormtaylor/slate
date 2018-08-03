@@ -3,17 +3,15 @@
 import h from '../../../helpers/h'
 
 export default function(change) {
-  change.selectAll()
+  change.moveToAnchor()
 }
 
 export const input = (
   <value>
     <document>
       <paragraph>
-        <cursor />one
+        <anchor />one<focus />
       </paragraph>
-      <paragraph>two</paragraph>
-      <paragraph>three</paragraph>
     </document>
   </value>
 )
@@ -22,11 +20,7 @@ export const output = (
   <value>
     <document>
       <paragraph>
-        <anchor />one
-      </paragraph>
-      <paragraph>two</paragraph>
-      <paragraph>
-        three<focus />
+        <cursor />one
       </paragraph>
     </document>
   </value>

@@ -6,11 +6,11 @@ export const input = (
   <value>
     <document>
       <block type="paragraph">
-        on<anchor />e
-      </block>
-      <block type="paragraph">two</block>
-      <block type="paragraph">
-        t<focus />hree
+        one
+        <inline type="link">
+          <cursor />two
+        </inline>
+        three
       </block>
     </document>
   </value>
@@ -25,32 +25,12 @@ export const output = {
   object: 'value',
   document: {
     object: 'document',
-    key: '9',
     data: {},
+    key: '6',
     nodes: [
       {
         object: 'block',
-        key: '1',
-        type: 'paragraph',
-        isVoid: false,
-        data: {},
-        nodes: [
-          {
-            object: 'text',
-            key: '0',
-            leaves: [
-              {
-                object: 'leaf',
-                text: 'one',
-                marks: [],
-              },
-            ],
-          },
-        ],
-      },
-      {
-        object: 'block',
-        key: '3',
+        key: '4',
         type: 'paragraph',
         isVoid: false,
         data: {},
@@ -61,23 +41,34 @@ export const output = {
             leaves: [
               {
                 object: 'leaf',
-                text: 'two',
+                text: 'one',
                 marks: [],
               },
             ],
           },
-        ],
-      },
-      {
-        object: 'block',
-        key: '5',
-        type: 'paragraph',
-        isVoid: false,
-        data: {},
-        nodes: [
+          {
+            object: 'inline',
+            key: '1',
+            type: 'link',
+            isVoid: false,
+            data: {},
+            nodes: [
+              {
+                object: 'text',
+                key: '0',
+                leaves: [
+                  {
+                    object: 'leaf',
+                    text: 'two',
+                    marks: [],
+                  },
+                ],
+              },
+            ],
+          },
           {
             object: 'text',
-            key: '4',
+            key: '3',
             leaves: [
               {
                 object: 'leaf',
@@ -95,14 +86,14 @@ export const output = {
     anchor: {
       object: 'point',
       key: '0',
-      path: [0, 0],
-      offset: 2,
+      path: [0, 1, 0],
+      offset: 0,
     },
     focus: {
       object: 'point',
-      key: '4',
-      path: [2, 0],
-      offset: 1,
+      key: '0',
+      path: [0, 1, 0],
+      offset: 0,
     },
     isFocused: true,
     isAtomic: false,

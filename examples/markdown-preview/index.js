@@ -183,10 +183,14 @@ class MarkdownPreview extends React.Component {
 
       if (typeof token != 'string') {
         const range = {
-          anchorKey: startText.key,
-          anchorOffset: startOffset,
-          focusKey: endText.key,
-          focusOffset: endOffset,
+          anchor: {
+            key: startText.key,
+            offset: startOffset,
+          },
+          focus: {
+            key: endText.key,
+            offset: endOffset,
+          },
           marks: [{ type: token.type }],
         }
 

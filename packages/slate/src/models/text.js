@@ -313,13 +313,13 @@ class Text extends Record(DEFAULTS) {
     const { key } = this
 
     decorations.forEach(range => {
-      const { startKey, endKey, startOffset, endOffset, marks } = range
-      const hasStart = startKey == key
-      const hasEnd = endKey == key
+      const { start, end, marks } = range
+      const hasStart = start.key == key
+      const hasEnd = end.key == key
 
       if (hasStart && hasEnd) {
-        const index = hasStart ? startOffset : 0
-        const length = hasEnd ? endOffset - index : this.text.length - index
+        const index = hasStart ? start.offset : 0
+        const length = hasEnd ? end.offset - index : this.text.length - index
 
         if (length < 1) return
         if (index >= this.text.length) return

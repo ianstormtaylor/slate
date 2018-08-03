@@ -9,7 +9,10 @@ export const input = (
         one<text key="a">two</text>three
       </block>
     </document>
-    <selection anchorKey="a" anchorOffset={1} focusKey="a" focusOffset={2} />
+    <selection>
+      <anchor key="a" offset={1} />
+      <focus key="a" offset={2} />
+    </selection>
   </value>
 )
 
@@ -49,12 +52,18 @@ export const output = {
   },
   selection: {
     object: 'range',
-    anchorKey: 'a',
-    anchorPath: [0, 0],
-    anchorOffset: 1,
-    focusKey: 'a',
-    focusPath: [0, 0],
-    focusOffset: 2,
+    anchor: {
+      object: 'point',
+      key: 'a',
+      path: [0, 0],
+      offset: 1,
+    },
+    focus: {
+      object: 'point',
+      key: 'a',
+      path: [0, 0],
+      offset: 2,
+    },
     isFocused: false,
     isAtomic: false,
     marks: null,

@@ -150,7 +150,7 @@ class Emojis extends React.Component {
         isVoid: true,
         data: { code },
       })
-      .collapseToStartOfNextText()
+      .moveToStartOfNextText()
       .focus()
 
     this.onChange(change)

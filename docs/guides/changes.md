@@ -19,12 +19,13 @@ To solve this, Slate has very expressive, chainable changes. Like this:
 ```js
 change
   .focus()
-  .selectAll()
+  .moveToRangeOfDocument()
   .delete()
   .insertText('A bit of rich text, followed by...')
-  .moveToOffsets(10, 14)
+  .moveTo(10)
+  .moveFocusForward(4)
   .addMark('bold')
-  .collapseToEndOfBlock()
+  .moveToEndOfBlock()
   .insertBlock({
     type: 'image',
     isVoid: true,
@@ -63,7 +64,7 @@ These are changes like `delete()`, `addMark()`, `insertBlock()`, etc. that are t
 
 ### On the Selection
 
-These are changes like `blur()`, `collapseToStart()`, `moveToRangeOf()`, etc. that change the `value.selection` model and update the user's cursor without affecting the content of the document.
+These are changes like `blur()`, `moveToStart()`, `moveToRangeOfNode()`, etc. that change the `value.selection` model and update the user's cursor without affecting the content of the document.
 
 ### On a Specific Node
 
@@ -151,7 +152,7 @@ That said, if that's okay with you, you can make changes manually by using the `
 ```js
 const change = value
   .change()
-  .selectAll()
+  .moveToRangeOfDocument()
   .delete()
 
 const newValue = change.value

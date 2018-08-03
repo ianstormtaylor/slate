@@ -3,8 +3,8 @@
 import h from '../../../helpers/h'
 
 export default function(change) {
-  const { anchorKey, anchorOffset } = change.value
-  change.replaceTextByKey(anchorKey, anchorOffset, 3, 'cat is cute')
+  const { anchor } = change.value.selection
+  change.replaceTextByKey(anchor.key, anchor.offset, 3, 'cat is cute')
 }
 
 export const input = (

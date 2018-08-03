@@ -3,17 +3,17 @@
 import h from '../../helpers/h'
 
 export default function(value) {
-  return value
+  const a = value.change().insertText('t').value
+  const b = a
     .change()
-    .insertText('t')
-    .value.change()
-    .move(-1)
-    .insertText('w')
-    .value.change()
-    .move(-1)
-    .insertText('o')
-    .value.change()
-    .undo().value
+    .moveBackward(1)
+    .insertText('w').value
+  const c = b
+    .change()
+    .moveBackward(1)
+    .insertText('o').value
+  const d = c.change().undo().value
+  return d
 }
 
 export const input = (

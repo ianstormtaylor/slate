@@ -173,10 +173,10 @@ class CodeHighlighting extends React.Component {
 
   onKeyDown = (event, change) => {
     const { value } = change
-    const { startBlock } = value
+    const { selection, startBlock } = value
     if (event.key != 'Enter') return
     if (startBlock.type != 'code') return
-    if (value.isExpanded) change.delete()
+    if (selection.isExpanded) change.delete()
     change.insertText('\n')
     return true
   }
@@ -226,10 +226,14 @@ class CodeHighlighting extends React.Component {
 
       if (typeof token != 'string') {
         const range = {
-          anchorKey: startText.key,
-          anchorOffset: startOffset,
-          focusKey: endText.key,
-          focusOffset: endOffset,
+          anchor: {
+            key: startText.key,
+            offset: startOffset,
+          },
+          focus: {
+            key: endText.key,
+            offset: endOffset,
+          },
           marks: [{ type: token.type }],
         }
 

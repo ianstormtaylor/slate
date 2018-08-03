@@ -90,41 +90,49 @@ That all sounds pretty complex, but you don't have to think about it much, as lo
 * Marks represent **unordered**, character-level formatting.
 * Inlines represent **contiguous**, semantic elements in the document.
 
-## Ranges and "The Selection"
+## Ranges, Points and "The Selection"
 
 Just like in the DOM, you can reference a part of the document using a `Range`. And there's one special range that Slate keeps track of that refers to the user's current cursor selection, called the "selection".
 
-Ranges are defined by an "anchor" and "focus" point. The anchor is where the range starts, and the focus is where it ends. And each point is a combination of a "path" or "key" referencing a specific node, and an "offset". This ends up looking like this:
+Ranges are defined by two `Point`s, an "anchor" point and a "focus" point. The anchor is where the range starts, and the focus is where it ends. And each point is a combination of a "path" or "key" referencing a specific node, and an "offset". This ends up looking like this:
 
 ```js
 const range = Range.create({
-  anchorKey: 'node-a',
-  anchorOffset: 0,
-  focusKey: 'node-b',
-  focusOffset: 4,
-  isBackward: false,
+  anchor: {
+    key: 'node-a',
+    offset: 0,
+  },
+  focus: {
+    key: 'node-b',
+    offset: 4,
+  },
 })
 
 const range = Range.create({
-  anchorPath: [0, 2, 1],
-  anchorOffset: 0,
-  focusPath: [0, 3, 2],
-  focusOffset: 4,
-  isBackward: false,
+  anchor: {
+    path: [0, 2, 1],
+    offset: 0,
+  },
+  focus: {
+    path: [0, 3, 2],
+    offset: 4,
+  },
 })
 ```
 
 The more readable `node-a` name is just pseudocode, because Slate uses auto-incrementing numerical strings by default—`'1', '2', '3', ...` But the important part is that every node has a unique `key` property, and a range can reference nodes by their keys.
 
-The terms "anchor" and "focus" are borrowed from the DOM, where they mean the same thing. The anchor point isn't always _before_ the focus point in the document. Just like in the DOM, it depends on whether the range is backwards or forwards.
+The terms "anchor" and "focus" are borrowed from the DOM API. The anchor point isn't always _before_ the focus point in the document. Just like in the DOM, it depends on whether the range is backwards or forwards.
 
 Here's how MDN explains it:
 
 > A user may make a selection from left to right (in document order) or right to left (reverse of document order). The anchor is where the user began the selection and the focus is where the user ends the selection. If you make a selection with a desktop mouse, the anchor is placed where you pressed the mouse button and the focus is placed where you released the mouse button. Anchor and focus should not be confused with the start and end positions of a selection, since anchor can be placed before the focus or vice versa, depending on the direction you made your selection.
 > — [`Selection`, MDN](https://developer.mozilla.org/en-US/docs/Web/API/Selection)
 
-To make dealing with ranges easier though, they also provide "start" and "end" properties that take whether the range is forward or backward into account. The `startKey` and `startPath` will always be before the `endKey` and `endPath` in the document.
+To make dealing with ranges easier though, `Range` objects also provide `start` and `end` point properties that take whether the range is forward or backward into account. The `start.key` and `start.path` will always be before the `end.key` and `end.path` in the document.
 
-One important thing to note is that the anchor and focus points of ranges **always reference the "leaf-most" text nodes**. They never reference blocks or inlines, always their child text nodes. This makes dealing with ranges a _lot_ easier.
+These `start` and `end` points are what most of your logic will be based on, since you rarely care which side of the selection is "extendable".
+
+One important thing to note is that the anchor and focus points of ranges **always reference the "leaf-most" text nodes** in a document. They never reference blocks or inlines, always their child text nodes. This is different than in the DOM API, but it makes dealing with ranges a _lot_ easier because there are less edge cases to handle.
 
 > 📋 For more info, check out the [`Range` reference](../reference/slate/range.md).

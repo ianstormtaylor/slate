@@ -5,6 +5,7 @@ import { List, Record, Set } from 'immutable'
 import PathUtils from '../utils/path-utils'
 import MODEL_TYPES from '../constants/model-types'
 import Mark from './mark'
+import Point from './point'
 
 /**
  * Default properties.
@@ -13,12 +14,8 @@ import Mark from './mark'
  */
 
 const DEFAULTS = {
-  anchorKey: null,
-  anchorOffset: null,
-  anchorPath: null,
-  focusKey: null,
-  focusOffset: null,
-  focusPath: null,
+  anchor: Point.create(),
+  focus: Point.create(),
   isAtomic: false,
   isFocused: false,
   marks: null,
@@ -80,12 +77,8 @@ class Range extends Record(DEFAULTS) {
   static createProperties(a = {}) {
     if (Range.isRange(a)) {
       return {
-        anchorKey: a.anchorKey,
-        anchorOffset: a.anchorOffset,
-        anchorPath: a.anchorPath,
-        focusKey: a.focusKey,
-        focusOffset: a.focusOffset,
-        focusPath: a.focusPath,
+        anchor: Point.createProperties(a.anchor),
+        focus: Point.createProperties(a.focus),
         isAtomic: a.isAtomic,
         isFocused: a.isFocused,
         marks: a.marks,
@@ -94,25 +87,12 @@ class Range extends Record(DEFAULTS) {
 
     if (isPlainObject(a)) {
       const p = {}
-      if ('anchorKey' in a) p.anchorKey = a.anchorKey
-      if ('anchorOffset' in a) p.anchorOffset = a.anchorOffset
-      if ('anchorPath' in a) p.anchorPath = PathUtils.create(a.anchorPath)
-      if ('focusKey' in a) p.focusKey = a.focusKey
-      if ('focusOffset' in a) p.focusOffset = a.focusOffset
-      if ('focusPath' in a) p.focusPath = PathUtils.create(a.focusPath)
+      if ('anchor' in a) p.anchor = Point.create(a.anchor)
+      if ('focus' in a) p.focus = Point.create(a.focus)
       if ('isAtomic' in a) p.isAtomic = a.isAtomic
       if ('isFocused' in a) p.isFocused = a.isFocused
       if ('marks' in a)
         p.marks = a.marks == null ? null : Mark.createSet(a.marks)
-
-      // If only a path is set, or only a key is set, ensure that the other is
-      // set to null so that it can be normalized back to the right value.
-      // Otherwise we won't realize that the path and key don't match anymore.
-      if ('anchorPath' in a && !('anchorKey' in a)) p.anchorKey = null
-      if ('anchorKey' in a && !('anchorPath' in a)) p.anchorPath = null
-      if ('focusPath' in a && !('focusKey' in a)) p.focusKey = null
-      if ('focusKey' in a && !('focusPath' in a)) p.focusPath = null
-
       return p
     }
 
@@ -129,25 +109,48 @@ class Range extends Record(DEFAULTS) {
    */
 
   static fromJSON(object) {
-    const {
-      anchorKey = null,
-      anchorOffset = null,
-      anchorPath = null,
-      focusKey = null,
-      focusOffset = null,
-      focusPath = null,
+    let {
+      anchor,
+      focus,
       isAtomic = false,
       isFocused = false,
       marks = null,
     } = object
 
+    if (
+      !anchor &&
+      (object.anchorKey || object.anchorOffset || object.anchorPath)
+    ) {
+      logger.deprecate(
+        '0.37.0',
+        '`Range` objects now take a `Point` object as an `anchor` instead of taking `anchorKey/Offset/Path` properties. But you passed:',
+        object
+      )
+
+      anchor = {
+        key: object.anchorKey,
+        offset: object.anchorOffset,
+        path: object.anchorPath,
+      }
+    }
+
+    if (!focus && (object.focusKey || object.focusOffset || object.focusPath)) {
+      logger.deprecate(
+        '0.37.0',
+        '`Range` objects now take a `Point` object as a `focus` instead of taking `focusKey/Offset/Path` properties. But you passed:',
+        object
+      )
+
+      focus = {
+        key: object.focusKey,
+        offset: object.focusOffset,
+        path: object.focusPath,
+      }
+    }
+
     const range = new Range({
-      anchorKey,
-      anchorOffset,
-      anchorPath: PathUtils.create(anchorPath),
-      focusKey,
-      focusOffset,
-      focusPath: PathUtils.create(focusPath),
+      anchor: Point.fromJSON(anchor || {}),
+      focus: Point.fromJSON(focus || {}),
       isAtomic,
       isFocused,
       marks: marks == null ? null : new Set(marks.map(Mark.fromJSON)),
@@ -209,7 +212,8 @@ class Range extends Record(DEFAULTS) {
 
   get isCollapsed() {
     return (
-      this.anchorKey == this.focusKey && this.anchorOffset == this.focusOffset
+      this.anchor.key === this.focus.key &&
+      this.anchor.offset === this.focus.offset
     )
   }
 
@@ -230,14 +234,17 @@ class Range extends Record(DEFAULTS) {
    */
 
   get isBackward() {
-    if (this.isUnset) return null
+    const { isUnset, anchor, focus } = this
 
-    // PERF: if the two keys are the same, we can just use the offsets.
-    if (this.anchorKey === this.focusKey) {
-      return this.anchorOffset > this.focusOffset
+    if (isUnset) {
+      return null
     }
 
-    const isBackward = PathUtils.isBefore(this.focusPath, this.anchorPath)
+    if (anchor.key === focus.key) {
+      return anchor.offset > focus.offset
+    }
+
+    const isBackward = PathUtils.isBefore(focus.path, anchor.path)
     return isBackward
   }
 
@@ -249,7 +256,8 @@ class Range extends Record(DEFAULTS) {
 
   get isForward() {
     const { isBackward } = this
-    return isBackward == null ? null : !isBackward
+    const isForward = isBackward == null ? null : !isBackward
+    return isForward
   }
 
   /**
@@ -259,14 +267,9 @@ class Range extends Record(DEFAULTS) {
    */
 
   get isUnset() {
-    return (
-      this.anchorKey == null ||
-      this.anchorOffset == null ||
-      this.anchorPath == null ||
-      this.focusKey == null ||
-      this.focusOffset == null ||
-      this.focusPath == null
-    )
+    const { anchor, focus } = this
+    const isUnset = anchor.isUnset || focus.isUnset
+    return isUnset
   }
 
   /**
@@ -280,240 +283,23 @@ class Range extends Record(DEFAULTS) {
   }
 
   /**
-   * Get the start key.
+   * Get the start point.
    *
    * @return {String}
    */
 
-  get startKey() {
-    return this.isBackward ? this.focusKey : this.anchorKey
+  get start() {
+    return this.isBackward ? this.focus : this.anchor
   }
 
   /**
-   * Get the start offset.
+   * Get the end point.
    *
    * @return {String}
    */
 
-  get startOffset() {
-    return this.isBackward ? this.focusOffset : this.anchorOffset
-  }
-
-  /**
-   * Get the start path.
-   *
-   * @return {String}
-   */
-
-  get startPath() {
-    return this.isBackward ? this.focusPath : this.anchorPath
-  }
-
-  /**
-   * Get the end key.
-   *
-   * @return {String}
-   */
-
-  get endKey() {
-    return this.isBackward ? this.anchorKey : this.focusKey
-  }
-
-  /**
-   * Get the end offset.
-   *
-   * @return {String}
-   */
-
-  get endOffset() {
-    return this.isBackward ? this.anchorOffset : this.focusOffset
-  }
-
-  /**
-   * Get the end path.
-   *
-   * @return {String}
-   */
-
-  get endPath() {
-    return this.isBackward ? this.anchorPath : this.focusPath
-  }
-
-  /**
-   * Check whether anchor point of the range is at the start of a `node`.
-   *
-   * @param {Node} node
-   * @return {Boolean}
-   */
-
-  hasAnchorAtStartOf(node) {
-    // PERF: Do a check for a `0` offset first since it's quickest.
-    if (this.anchorOffset != 0) return false
-    const first = getFirstText(node)
-    return this.anchorKey == first.key
-  }
-
-  /**
-   * Check whether anchor point of the range is at the end of a `node`.
-   *
-   * @param {Node} node
-   * @return {Boolean}
-   */
-
-  hasAnchorAtEndOf(node) {
-    const last = getLastText(node)
-    return this.anchorKey == last.key && this.anchorOffset == last.text.length
-  }
-
-  /**
-   * Check whether the anchor edge of a range is in a `node` and at an
-   * offset between `start` and `end`.
-   *
-   * @param {Node} node
-   * @param {Number} start
-   * @param {Number} end
-   * @return {Boolean}
-   */
-
-  hasAnchorBetween(node, start, end) {
-    return (
-      this.anchorOffset <= end &&
-      start <= this.anchorOffset &&
-      this.hasAnchorIn(node)
-    )
-  }
-
-  /**
-   * Check whether the anchor edge of a range is in a `node`.
-   *
-   * @param {Node} node
-   * @return {Boolean}
-   */
-
-  hasAnchorIn(node) {
-    return node.object == 'text'
-      ? node.key == this.anchorKey
-      : this.anchorKey != null && node.hasDescendant(this.anchorKey)
-  }
-
-  /**
-   * Check whether focus point of the range is at the end of a `node`.
-   *
-   * @param {Node} node
-   * @return {Boolean}
-   */
-
-  hasFocusAtEndOf(node) {
-    const last = getLastText(node)
-    return this.focusKey == last.key && this.focusOffset == last.text.length
-  }
-
-  /**
-   * Check whether focus point of the range is at the start of a `node`.
-   *
-   * @param {Node} node
-   * @return {Boolean}
-   */
-
-  hasFocusAtStartOf(node) {
-    if (this.focusOffset !== 0) return false
-    const first = getFirstText(node)
-    return this.focusKey == first.key
-  }
-
-  /**
-   * Check whether the focus edge of a range is in a `node` and at an
-   * offset between `start` and `end`.
-   *
-   * @param {Node} node
-   * @param {Number} start
-   * @param {Number} end
-   * @return {Boolean}
-   */
-
-  hasFocusBetween(node, start, end) {
-    return (
-      start <= this.focusOffset &&
-      this.focusOffset <= end &&
-      this.hasFocusIn(node)
-    )
-  }
-
-  /**
-   * Check whether the focus edge of a range is in a `node`.
-   *
-   * @param {Node} node
-   * @return {Boolean}
-   */
-
-  hasFocusIn(node) {
-    return node.object == 'text'
-      ? node.key == this.focusKey
-      : this.focusKey != null && node.hasDescendant(this.focusKey)
-  }
-
-  /**
-   * Check whether the range is at the start of a `node`.
-   *
-   * @param {Node} node
-   * @return {Boolean}
-   */
-
-  isAtStartOf(node) {
-    return this.isCollapsed && this.hasAnchorAtStartOf(node)
-  }
-
-  /**
-   * Check whether the range is at the end of a `node`.
-   *
-   * @param {Node} node
-   * @return {Boolean}
-   */
-
-  isAtEndOf(node) {
-    return this.isCollapsed && this.hasAnchorAtEndOf(node)
-  }
-
-  /**
-   * Focus the range.
-   *
-   * @return {Range}
-   */
-
-  focus() {
-    return this.merge({
-      isFocused: true,
-    })
-  }
-
-  /**
-   * Blur the range.
-   *
-   * @return {Range}
-   */
-
-  blur() {
-    return this.merge({
-      isFocused: false,
-    })
-  }
-
-  /**
-   * Unset the range.
-   *
-   * @return {Range}
-   */
-
-  deselect() {
-    return this.merge({
-      anchorKey: null,
-      anchorOffset: null,
-      anchorPath: null,
-      focusKey: null,
-      focusOffset: null,
-      focusPath: null,
-      isFocused: false,
-    })
+  get end() {
+    return this.isBackward ? this.anchor : this.focus
   }
 
   /**
@@ -523,154 +309,80 @@ class Range extends Record(DEFAULTS) {
    */
 
   flip() {
-    return this.merge({
-      anchorKey: this.focusKey,
-      anchorOffset: this.focusOffset,
-      anchorPath: this.focusPath,
-      focusKey: this.anchorKey,
-      focusOffset: this.anchorOffset,
-      focusPath: this.anchorPath,
-    })
+    const range = this.setPoints([this.focus, this.anchor])
+    return range
   }
 
   /**
-   * Move the anchor offset `n` characters.
+   * Move the anchor and focus offsets forward `n` characters.
    *
-   * @param {Number} n (optional)
+   * @param {Number} n
    * @return {Range}
    */
 
-  moveAnchor(n = 1) {
-    const anchorOffset = this.anchorOffset + n
-    return this.merge({ anchorOffset })
+  moveForward(n) {
+    const range = this.setPoints([
+      this.anchor.moveForward(n),
+      this.focus.moveForward(n),
+    ])
+
+    return range
   }
 
   /**
-   * Move the anchor offset `n` characters.
+   * Move the anchor and focus offsets backward `n` characters.
    *
-   * @param {Number} n (optional)
+   * @param {Number} n
    * @return {Range}
    */
 
-  moveFocus(n = 1) {
-    const focusOffset = this.focusOffset + n
-    return this.merge({ focusOffset })
+  moveBackward(n) {
+    const range = this.setPoints([
+      this.anchor.moveBackward(n),
+      this.focus.moveBackward(n),
+    ])
+
+    return range
   }
 
   /**
-   * Move the range's anchor point to a new `key` or `path` and `offset`.
+   * Move the anchor offset backward `n` characters.
    *
-   * @param {String|List} key or path
+   * @param {Number} n
+   * @return {Range}
+   */
+
+  moveAnchorBackward(n) {
+    const range = this.setAnchor(this.anchor.moveBackward(n))
+    return range
+  }
+
+  /**
+   * Move the anchor offset forward `n` characters.
+   *
+   * @param {Number} n
+   * @return {Range}
+   */
+
+  moveAnchorForward(n) {
+    const range = this.setAnchor(this.anchor.moveForward(n))
+    return range
+  }
+
+  /**
+   * Move the range's anchor point to a new `path` and `offset`.
+   *
+   * Optionally, the `path` can be a key string, or omitted entirely in which
+   * case it would be the offset number.
+   *
+   * @param {List|String} path
    * @param {Number} offset
    * @return {Range}
    */
 
-  moveAnchorTo(key, offset) {
-    const { anchorKey, focusKey, anchorPath, focusPath } = this
-
-    if (typeof key === 'string') {
-      const isAnchor = key === anchorKey
-      const isFocus = key === focusKey
-      return this.merge({
-        anchorKey: key,
-        anchorPath: isFocus ? focusPath : isAnchor ? anchorPath : null,
-        anchorOffset: offset,
-      })
-    } else {
-      const path = key
-      const isAnchor = path && path.equals(anchorPath)
-      const isFocus = path && path.equals(focusPath)
-      return this.merge({
-        anchorPath: path,
-        anchorKey: isAnchor ? anchorKey : isFocus ? focusKey : null,
-        anchorOffset: offset,
-      })
-    }
-  }
-
-  /**
-   * Move the range's focus point to a new `key` or `path` and `offset`.
-   *
-   * @param {String|List} key or path
-   * @param {Number} offset
-   * @return {Range}
-   */
-
-  moveFocusTo(key, offset) {
-    const { focusKey, anchorKey, anchorPath, focusPath } = this
-
-    if (typeof key === 'string') {
-      const isAnchor = key === anchorKey
-      const isFocus = key === focusKey
-      return this.merge({
-        focusKey: key,
-        focusPath: isAnchor ? anchorPath : isFocus ? focusPath : null,
-        focusOffset: offset,
-      })
-    } else {
-      const path = key
-      const isAnchor = path && path.equals(anchorPath)
-      const isFocus = path && path.equals(focusPath)
-      return this.merge({
-        focusPath: path,
-        focusKey: isFocus ? focusKey : isAnchor ? anchorKey : null,
-        focusOffset: offset,
-      })
-    }
-  }
-
-  /**
-   * Move the range to `anchorOffset`.
-   *
-   * @param {Number} anchorOffset
-   * @return {Range}
-   */
-
-  moveAnchorOffsetTo(anchorOffset) {
-    return this.merge({ anchorOffset })
-  }
-
-  /**
-   * Move the range to `focusOffset`.
-   *
-   * @param {Number} focusOffset
-   * @return {Range}
-   */
-
-  moveFocusOffsetTo(focusOffset) {
-    return this.merge({ focusOffset })
-  }
-
-  /**
-   * Move the range to `anchorOffset` and `focusOffset`.
-   *
-   * @param {Number} anchorOffset
-   * @param {Number} focusOffset (optional)
-   * @return {Range}
-   */
-
-  moveOffsetsTo(anchorOffset, focusOffset = anchorOffset) {
-    return this.moveAnchorOffsetTo(anchorOffset).moveFocusOffsetTo(focusOffset)
-  }
-
-  /**
-   * Move the focus point to the anchor point.
-   *
-   * @return {Range}
-   */
-
-  moveToAnchor() {
-    return this.moveFocusTo(this.anchorKey, this.anchorOffset)
-  }
-
-  /**
-   * Move the anchor point to the focus point.
-   *
-   * @return {Range}
-   */
-
-  moveToFocus() {
-    return this.moveAnchorTo(this.focusKey, this.focusOffset)
+  moveAnchorTo(path, offset) {
+    const range = this.setAnchor(this.anchor.moveTo(path, offset))
+    return range
   }
 
   /**
@@ -680,9 +392,9 @@ class Range extends Record(DEFAULTS) {
    * @return {Range}
    */
 
-  moveAnchorToStartOf(node) {
-    node = getFirstText(node)
-    return this.moveAnchorTo(node.key, 0)
+  moveAnchorToStartOfNode(node) {
+    const range = this.setAnchor(this.anchor.moveToStartOfNode(node))
+    return range
   }
 
   /**
@@ -692,9 +404,113 @@ class Range extends Record(DEFAULTS) {
    * @return {Range}
    */
 
-  moveAnchorToEndOf(node) {
-    node = getLastText(node)
-    return this.moveAnchorTo(node.key, node.text.length)
+  moveAnchorToEndOfNode(node) {
+    const range = this.setAnchor(this.anchor.moveToEndOfNode(node))
+    return range
+  }
+
+  /**
+   * Move the end offset backward `n` characters.
+   *
+   * @param {Number} n
+   * @return {Range}
+   */
+
+  moveEndBackward(n) {
+    const range = this.setEnd(this.end.moveBackward(n))
+    return range
+  }
+
+  /**
+   * Move the end offset forward `n` characters.
+   *
+   * @param {Number} n
+   * @return {Range}
+   */
+
+  moveEndForward(n) {
+    const range = this.setEnd(this.end.moveForward(n))
+    return range
+  }
+
+  /**
+   * Move the range's end point to a new `path` and `offset`.
+   *
+   * Optionally, the `path` can be a key string, or omitted entirely in which
+   * case it would be the offset number.
+   *
+   * @param {List|String} path
+   * @param {Number} offset
+   * @return {Range}
+   */
+
+  moveEndTo(path, offset) {
+    const range = this.setEnd(this.end.moveTo(path, offset))
+    return range
+  }
+
+  /**
+   * Move the range's end point to the start of a `node`.
+   *
+   * @param {Node} node
+   * @return {Range}
+   */
+
+  moveEndToStartOfNode(node) {
+    const range = this.setEnd(this.end.moveToStartOfNode(node))
+    return range
+  }
+
+  /**
+   * Move the range's end point to the end of a `node`.
+   *
+   * @param {Node} node
+   * @return {Range}
+   */
+
+  moveEndToEndOfNode(node) {
+    const range = this.setEnd(this.end.moveToEndOfNode(node))
+    return range
+  }
+
+  /**
+   * Move the focus offset backward `n` characters.
+   *
+   * @param {Number} n
+   * @return {Range}
+   */
+
+  moveFocusBackward(n) {
+    const range = this.setFocus(this.focus.moveBackward(n))
+    return range
+  }
+
+  /**
+   * Move the focus offset forward `n` characters.
+   *
+   * @param {Number} n
+   * @return {Range}
+   */
+
+  moveFocusForward(n) {
+    const range = this.setFocus(this.focus.moveForward(n))
+    return range
+  }
+
+  /**
+   * Move the range's focus point to a new `path` and `offset`.
+   *
+   * Optionally, the `path` can be a key string, or omitted entirely in which
+   * case it would be the offset number.
+   *
+   * @param {List|String} path
+   * @param {Number} offset
+   * @return {Range}
+   */
+
+  moveFocusTo(path, offset) {
+    const range = this.setFocus(this.focus.moveTo(path, offset))
+    return range
   }
 
   /**
@@ -704,9 +520,9 @@ class Range extends Record(DEFAULTS) {
    * @return {Range}
    */
 
-  moveFocusToStartOf(node) {
-    node = getFirstText(node)
-    return this.moveFocusTo(node.key, 0)
+  moveFocusToStartOfNode(node) {
+    const range = this.setFocus(this.focus.moveToStartOfNode(node))
+    return range
   }
 
   /**
@@ -716,9 +532,138 @@ class Range extends Record(DEFAULTS) {
    * @return {Range}
    */
 
-  moveFocusToEndOf(node) {
-    node = getLastText(node)
-    return this.moveFocusTo(node.key, node.text.length)
+  moveFocusToEndOfNode(node) {
+    const range = this.setFocus(this.focus.moveToEndOfNode(node))
+    return range
+  }
+
+  /**
+   * Move the start offset backward `n` characters.
+   *
+   * @param {Number} n
+   * @return {Range}
+   */
+
+  moveStartBackward(n) {
+    const range = this.setStart(this.start.moveBackward(n))
+    return range
+  }
+
+  /**
+   * Move the start offset forward `n` characters.
+   *
+   * @param {Number} n
+   * @return {Range}
+   */
+
+  moveStartForward(n) {
+    const range = this.setStart(this.start.moveForward(n))
+    return range
+  }
+
+  /**
+   * Move the range's start point to a new `path` and `offset`.
+   *
+   * Optionally, the `path` can be a key string, or omitted entirely in which
+   * case it would be the offset number.
+   *
+   * @param {List|String} path
+   * @param {Number} offset
+   * @return {Range}
+   */
+
+  moveStartTo(path, offset) {
+    const range = this.setStart(this.start.moveTo(path, offset))
+    return range
+  }
+
+  /**
+   * Move the range's start point to the start of a `node`.
+   *
+   * @param {Node} node
+   * @return {Range}
+   */
+
+  moveStartToStartOfNode(node) {
+    const range = this.setStart(this.start.moveToStartOfNode(node))
+    return range
+  }
+
+  /**
+   * Move the range's start point to the end of a `node`.
+   *
+   * @param {Node} node
+   * @return {Range}
+   */
+
+  moveStartToEndOfNode(node) {
+    const range = this.setStart(this.start.moveToEndOfNode(node))
+    return range
+  }
+
+  /**
+   * Move range's points to a new `path` and `offset`.
+   *
+   * @param {Number} n
+   * @return {Range}
+   */
+
+  moveTo(path, offset) {
+    const range = this.setPoints([
+      this.anchor.moveTo(path, offset),
+      this.focus.moveTo(path, offset),
+    ])
+
+    return range
+  }
+
+  /**
+   * Move the focus point to the anchor point.
+   *
+   * @return {Range}
+   */
+
+  moveToAnchor() {
+    const range = this.setFocus(this.anchor)
+    return range
+  }
+
+  /**
+   * Move the start point to the end point.
+   *
+   * @return {Range}
+   */
+
+  moveToEnd() {
+    const range = this.setStart(this.end)
+    return range
+  }
+
+  /**
+   * Move the range's points to the end of a `node`.
+   *
+   * @param {Node} node
+   * @return {Range}
+   */
+
+  moveToEndOfNode(node) {
+    const range = this.setPoints([
+      this.anchor.moveToEndOfNode(node),
+      this.focus.moveToEndOfNode(node),
+    ])
+
+    return range
+  }
+
+  /**
+   * Move the anchor point to the focus point.
+   *
+   * @return {Range}
+   */
+
+  moveToFocus() {
+    const range = this.setAnchor(this.focus)
+    return range
   }
 
   /**
@@ -729,8 +674,39 @@ class Range extends Record(DEFAULTS) {
    * @return {Range}
    */
 
-  moveToRangeOf(start, end = start) {
-    const range = this.moveAnchorToStartOf(start).moveFocusToEndOf(end)
+  moveToRangeOfNode(start, end = start) {
+    const range = this.setPoints([
+      this.anchor.moveToStartOfNode(start),
+      this.focus.moveToEndOfNode(end),
+    ])
+
+    return range
+  }
+
+  /**
+   * Move the end point to the start point.
+   *
+   * @return {Range}
+   */
+
+  moveToStart() {
+    const range = this.setEnd(this.start)
+    return range
+  }
+
+  /**
+   * Move the range's points to the start of a `node`.
+   *
+   * @param {Node} node
+   * @return {Range}
+   */
+
+  moveToStartOfNode(node) {
+    const range = this.setPoints([
+      this.anchor.moveToStartOfNode(node),
+      this.focus.moveToStartOfNode(node),
+    ])
+
     return range
   }
 
@@ -743,89 +719,96 @@ class Range extends Record(DEFAULTS) {
    */
 
   normalize(node) {
-    const range = this
-    let {
-      anchorKey,
-      anchorOffset,
-      anchorPath,
-      focusKey,
-      focusOffset,
-      focusPath,
-    } = range
+    const range = this.setPoints([
+      this.anchor.normalize(node),
+      this.focus.normalize(node),
+    ])
 
-    // If either point in the range is unset, make sure it is fully unset.
-    if (
-      (anchorKey == null && anchorPath == null) ||
-      (focusKey == null && focusPath == null) ||
-      anchorOffset == null ||
-      focusOffset == null
-    ) {
-      return Range.create()
+    return range
+  }
+
+  /**
+   * Set the anchor point to a new `anchor`.
+   *
+   * @param {Point} anchor
+   * @return {Range}
+   */
+
+  setAnchor(anchor) {
+    const range = this.set('anchor', anchor)
+    return range
+  }
+
+  /**
+   * Set the end point to a new `point`.
+   *
+   * @param {Point} point
+   * @return {Range}
+   */
+
+  setEnd(point) {
+    const range = this.isBackward ? this.setAnchor(point) : this.setFocus(point)
+    return range
+  }
+
+  /**
+   * Set the focus point to a new `focus`.
+   *
+   * @param {Point} focus
+   * @return {Range}
+   */
+
+  setFocus(focus) {
+    const range = this.set('focus', focus)
+    return range
+  }
+
+  /**
+   * Set the anchor and focus points to new `values`.
+   *
+   * @param {Array<Point>} values
+   * @return {Range}
+   */
+
+  setPoints(values) {
+    const [anchor, focus] = values
+    const range = this.set('anchor', anchor).set('focus', focus)
+    return range
+  }
+
+  /**
+   * Set the start point to a new `point`.
+   *
+   * @param {Point} point
+   * @return {Range}
+   */
+
+  setStart(point) {
+    const range = this.isBackward ? this.setFocus(point) : this.setAnchor(point)
+    return range
+  }
+
+  /**
+   * Set new `properties` on the range.
+   *
+   * @param {Object|Range} properties
+   * @return {Range}
+   */
+
+  setProperties(properties) {
+    properties = Range.createProperties(properties)
+    const { anchor, focus, ...props } = properties
+
+    if (anchor) {
+      props.anchor = Point.create(anchor)
     }
 
-    // Get the anchor and focus nodes.
-    let anchorNode = node.getNode(anchorKey || anchorPath)
-    let focusNode = node.getNode(focusKey || focusPath)
-
-    // If the range is malformed, warn and zero it out.
-    if (!anchorNode || !focusNode) {
-      logger.warn(
-        'The range was invalid and was reset. The range in question was:',
-        range
-      )
-
-      const first = node.getFirstText()
-      const path = first && node.getPath(first.key)
-      return range.merge({
-        anchorKey: first ? first.key : null,
-        anchorOffset: first ? 0 : null,
-        anchorPath: first ? path : null,
-        focusKey: first ? first.key : null,
-        focusOffset: first ? 0 : null,
-        focusPath: first ? path : null,
-      })
+    if (focus) {
+      props.focus = Point.create(focus)
     }
 
-    // If the anchor node isn't a text node, match it to one.
-    if (anchorNode.object != 'text') {
-      logger.warn(
-        'The range anchor was set to a Node that is not a Text node. This should not happen and can degrade performance. The node in question was:',
-        anchorNode
-      )
-
-      const anchorText = anchorNode.getTextAtOffset(anchorOffset)
-      const offset = anchorNode.getOffset(anchorText.key)
-      anchorOffset = anchorOffset - offset
-      anchorNode = anchorText
-    }
-
-    // If the focus node isn't a text node, match it to one.
-    if (focusNode.object != 'text') {
-      logger.warn(
-        'The range focus was set to a Node that is not a Text node. This should not happen and can degrade performance. The node in question was:',
-        focusNode
-      )
-
-      const focusText = focusNode.getTextAtOffset(focusOffset)
-      const offset = focusNode.getOffset(focusText.key)
-      focusOffset = focusOffset - offset
-      focusNode = focusText
-    }
-
-    anchorKey = anchorNode.key
-    focusKey = focusNode.key
-    anchorPath = node.getPath(anchorKey)
-    focusPath = node.getPath(focusKey)
-
-    // Merge in any updated properties.
-    return range.merge({
-      anchorKey,
-      anchorOffset,
-      anchorPath,
-      focusKey,
-      focusOffset,
-      focusPath,
-    })
+    const range = this.merge(props)
+    return range
   }
 
   /**
@@ -838,21 +821,12 @@ class Range extends Record(DEFAULTS) {
   toJSON(options = {}) {
     const object = {
       object: this.object,
-      anchorKey: this.anchorKey,
-      anchorOffset: this.anchorOffset,
-      anchorPath: this.anchorPath && this.anchorPath.toArray(),
-      focusKey: this.focusKey,
-      focusOffset: this.focusOffset,
-      focusPath: this.focusPath && this.focusPath.toArray(),
+      anchor: this.anchor.toJSON(options),
+      focus: this.focus.toJSON(options),
       isAtomic: this.isAtomic,
       isFocused: this.isFocused,
       marks:
         this.marks == null ? null : this.marks.toArray().map(m => m.toJSON()),
-    }
-
-    if (!options.preserveKeys) {
-      delete object.anchorKey
-      delete object.focusKey
     }
 
     return object
@@ -865,6 +839,546 @@ class Range extends Record(DEFAULTS) {
   toJS() {
     return this.toJSON()
   }
+
+  /**
+   * Deprecated.
+   */
+
+  get anchorKey() {
+    logger.deprecate(
+      '0.37.0',
+      'The `range.anchorKey` property has been deprecated, use `range.anchor.key` instead.'
+    )
+
+    return this.anchor.key
+  }
+
+  get anchorOffset() {
+    logger.deprecate(
+      '0.37.0',
+      'The `range.anchorOffset` property has been deprecated, use `range.anchor.offset` instead.'
+    )
+
+    return this.anchor.offset
+  }
+
+  get anchorPath() {
+    logger.deprecate(
+      '0.37.0',
+      'The `range.anchorPath` property has been deprecated, use `range.anchor.path` instead.'
+    )
+
+    return this.anchor.path
+  }
+
+  get focusKey() {
+    logger.deprecate(
+      '0.37.0',
+      'The `range.focusKey` property has been deprecated, use `range.focus.key` instead.'
+    )
+
+    return this.focus.key
+  }
+
+  get focusOffset() {
+    logger.deprecate(
+      '0.37.0',
+      'The `range.focusOffset` property has been deprecated, use `range.focus.offset` instead.'
+    )
+
+    return this.focus.offset
+  }
+
+  get focusPath() {
+    logger.deprecate(
+      '0.37.0',
+      'The `range.focusPath` property has been deprecated, use `range.focus.path` instead.'
+    )
+
+    return this.focus.path
+  }
+
+  get startKey() {
+    logger.deprecate(
+      '0.37.0',
+      'The `range.startKey` property has been deprecated, use `range.start.key` instead.'
+    )
+
+    return this.start.key
+  }
+
+  get startOffset() {
+    logger.deprecate(
+      '0.37.0',
+      'The `range.startOffset` property has been deprecated, use `range.start.offset` instead.'
+    )
+
+    return this.start.offset
+  }
+
+  get startPath() {
+    logger.deprecate(
+      '0.37.0',
+      'The `range.startPath` property has been deprecated, use `range.start.path` instead.'
+    )
+
+    return this.start.path
+  }
+
+  get endKey() {
+    logger.deprecate(
+      '0.37.0',
+      'The `range.endKey` property has been deprecated, use `range.end.key` instead.'
+    )
+
+    return this.end.key
+  }
+
+  get endOffset() {
+    logger.deprecate(
+      '0.37.0',
+      'The `range.endOffset` property has been deprecated, use `range.end.offset` instead.'
+    )
+
+    return this.end.offset
+  }
+
+  get endPath() {
+    logger.deprecate(
+      '0.37.0',
+      'The `range.endPath` property has been deprecated, use `range.end.path` instead.'
+    )
+
+    return this.end.path
+  }
+
+  hasAnchorAtStartOf(node) {
+    logger.deprecate(
+      '0.37.0',
+      'The `Range.hasAnchorAtStartOf` method is deprecated, please use `Range.anchor.isAtStartOfNode` instead.'
+    )
+
+    return this.anchor.isAtStartOfNode(node)
+  }
+
+  hasAnchorAtEndOf(node) {
+    logger.deprecate(
+      '0.37.0',
+      'The `Range.hasAnchorAtEndOf` method is deprecated, please use `Range.anchor.isAtEndOfNode` instead.'
+    )
+
+    return this.anchor.isAtEndOfNode(node)
+  }
+
+  hasAnchorBetween(node, start, end) {
+    logger.deprecate(
+      '0.37.0',
+      'The `Range.hasAnchorBetween` method is deprecated, please use the `Range.anchor` methods and properties directly instead.'
+    )
+
+    return (
+      this.anchor.offset <= end &&
+      start <= this.anchor.offset &&
+      this.anchor.isInNode(node)
+    )
+  }
+
+  hasAnchorIn(node) {
+    logger.deprecate(
+      '0.37.0',
+      'The `Range.hasAnchorAtEndOf` method is deprecated, please use `Range.anchor.isInNode` instead.'
+    )
+
+    return this.anchor.isInNode(node)
+  }
+
+  hasEdgeAtStartOf(node) {
+    logger.deprecate(
+      '0.37.0',
+      'The `Range.hasEdgeAtStartOf` method is deprecated.'
+    )
+
+    return this.anchor.isAtStartOfNode(node) || this.focus.isAtStartOfNode(node)
+  }
+
+  hasEdgeAtEndOf(node) {
+    logger.deprecate(
+      '0.37.0',
+      'The `Range.hasEdgeAtEndOf` method is deprecated.'
+    )
+
+    return this.anchor.isAtEndOfNode(node) || this.focus.isAtEndOfNode(node)
+  }
+
+  hasEdgeBetween(node, start, end) {
+    logger.deprecate(
+      '0.37.0',
+      'The `Range.hasEdgeBetween` method is deprecated.'
+    )
+
+    return (
+      (this.anchor.offset <= end &&
+        start <= this.anchor.offset &&
+        this.anchor.isInNode(node)) ||
+      (this.focus.offset <= end &&
+        start <= this.focus.offset &&
+        this.focus.isInNode(node))
+    )
+  }
+
+  hasEdgeIn(node) {
+    logger.deprecate(
+      '0.37.0',
+      'The `Range.hasEdgeAtEndOf` method is deprecated.'
+    )
+
+    return this.anchor.isInNode(node) || this.focus.isInNode(node)
+  }
+
+  hasEndAtStartOf(node) {
+    logger.deprecate(
+      '0.37.0',
+      'The `Range.hasEndAtStartOf` method is deprecated, please use `Range.end.isAtStartOfNode` instead.'
+    )
+
+    return this.end.isAtStartOfNode(node)
+  }
+
+  hasEndAtEndOf(node) {
+    logger.deprecate(
+      '0.37.0',
+      'The `Range.hasEndAtEndOf` method is deprecated, please use `Range.end.isAtEndOfNode` instead.'
+    )
+
+    return this.end.isAtEndOfNode(node)
+  }
+
+  hasEndBetween(node, start, end) {
+    logger.deprecate(
+      '0.37.0',
+      'The `Range.hasEndBetween` method is deprecated, please use the `Range.end` methods and properties directly instead.'
+    )
+
+    return (
+      this.end.offset <= end &&
+      start <= this.end.offset &&
+      this.end.isInNode(node)
+    )
+  }
+
+  hasEndIn(node) {
+    logger.deprecate(
+      '0.37.0',
+      'The `Range.hasEndAtEndOf` method is deprecated, please use `Range.end.isInNode` instead.'
+    )
+
+    return this.end.isInNode(node)
+  }
+
+  hasFocusAtEndOf(node) {
+    logger.deprecate(
+      '0.37.0',
+      'The `Range.hasFocusAtEndOf` method is deprecated, please use `Range.focus.isAtEndOfNode` instead.'
+    )
+
+    return this.focus.isAtEndOfNode(node)
+  }
+
+  hasFocusAtStartOf(node) {
+    logger.deprecate(
+      '0.37.0',
+      'The `Range.hasFocusAtStartOf` method is deprecated, please use `Range.focus.isAtStartOfNode` instead.'
+    )
+
+    return this.focus.isAtStartOfNode(node)
+  }
+
+  hasFocusBetween(node, start, end) {
+    logger.deprecate(
+      '0.37.0',
+      'The `Range.hasFocusBetween` method is deprecated, please use the `Range.focus` methods and properties directly instead.'
+    )
+
+    return (
+      start <= this.focus.offset &&
+      this.focus.offset <= end &&
+      this.focus.isInNode(node)
+    )
+  }
+
+  hasFocusIn(node) {
+    logger.deprecate(
+      '0.37.0',
+      'The `Range.hasFocusAtEndOf` method is deprecated, please use `Range.focus.isInNode` instead.'
+    )
+
+    return this.focus.isInNode(node)
+  }
+
+  hasStartAtStartOf(node) {
+    logger.deprecate(
+      '0.37.0',
+      'The `Range.hasStartAtStartOf` method is deprecated, please use `Range.start.isAtStartOfNode` instead.'
+    )
+
+    return this.start.isAtStartOfNode(node)
+  }
+
+  hasStartAtEndOf(node) {
+    logger.deprecate(
+      '0.37.0',
+      'The `Range.hasStartAtEndOf` method is deprecated, please use `Range.start.isAtEndOfNode` instead.'
+    )
+
+    return this.start.isAtEndOfNode(node)
+  }
+
+  hasStartBetween(node, start, end) {
+    logger.deprecate(
+      '0.37.0',
+      'The `Range.hasStartBetween` method is deprecated, please use the `Range.start` methods and properties directly instead.'
+    )
+
+    return (
+      this.start.offset <= end &&
+      start <= this.start.offset &&
+      this.start.isInNode(node)
+    )
+  }
+
+  hasStartIn(node) {
+    logger.deprecate(
+      '0.37.0',
+      'The `Range.hasStartAtEndOf` method is deprecated, please use `Range.start.isInNode` instead.'
+    )
+
+    return this.start.isInNode(node)
+  }
+
+  isAtStartOf(node) {
+    logger.deprecate(
+      '0.37.0',
+      'The `Range.isAtStartOf` method is deprecated, please use `Range.isCollapsed` and `Point.isAtStartOfNode` instead.'
+    )
+
+    return this.isCollapsed && this.anchor.isAtStartOfNode(node)
+  }
+
+  isAtEndOf(node) {
+    logger.deprecate(
+      '0.37.0',
+      'The `Range.isAtEndOf` method is deprecated, please use `Range.isCollapsed` and `Point.isAtEndOfNode` instead.'
+    )
+
+    return this.isCollapsed && this.anchor.isAtEndOfNode(node)
+  }
+
+  blur() {
+    logger.deprecate(
+      '0.37.0',
+      'The `Range.blur` method is deprecated, please use `Range.merge` directly instead.'
+    )
+
+    return this.merge({ isFocused: false })
+  }
+
+  deselect() {
+    logger.deprecate(
+      '0.37.0',
+      'The `Range.deselect` method is deprecated, please use `Range.create` to create a new unset range instead.'
+    )
+
+    return Range.create()
+  }
+
+  moveAnchorOffsetTo(o) {
+    logger.deprecate(
+      '0.37.0',
+      'The `Range.moveAnchorOffsetTo` method is deprecated, please use `Range.moveAnchorTo(offset)` instead.'
+    )
+
+    return this.moveAnchorTo(o)
+  }
+
+  moveFocusOffsetTo(fo) {
+    logger.deprecate(
+      '0.37.0',
+      'The `Range.moveFocusOffsetTo` method is deprecated, please use `Range.moveFocusTo(offset)` instead.'
+    )
+
+    return this.moveFocusTo(fo)
+  }
+
+  moveStartOffsetTo(o) {
+    logger.deprecate(
+      '0.37.0',
+      'The `Range.moveStartOffsetTo` method is deprecated, please use `Range.moveStartTo(offset)` instead.'
+    )
+
+    return this.moveStartTo(o)
+  }
+
+  moveEndOffsetTo(o) {
+    logger.deprecate(
+      '0.37.0',
+      'The `Range.moveEndOffsetTo` method is deprecated, please use `Range.moveEndTo(offset)` instead.'
+    )
+
+    return this.moveEndTo(o)
+  }
+
+  moveOffsetsTo(ao, fo = ao) {
+    logger.deprecate(
+      '0.37.0',
+      'The `Range.moveOffsetsTo` method is deprecated, please use `Range.moveAnchorTo` and `Range.moveFocusTo` in sequence instead.'
+    )
+
+    return this.moveAnchorTo(ao).moveFocusTo(fo)
+  }
+
+  moveAnchorToStartOf(node) {
+    logger.deprecate(
+      '0.37.0',
+      'The `Range.moveAnchorToStartOf` method is deprecated, please use `Range.moveAnchorToStartOfNode` instead.'
+    )
+
+    return this.moveAnchorToStartOfNode(node)
+  }
+
+  moveAnchorToEndOf(node) {
+    logger.deprecate(
+      '0.37.0',
+      'The `Range.moveAnchorToEndOf` method is deprecated, please use `Range.moveAnchorToEndOfNode` instead.'
+    )
+
+    return this.moveAnchorToEndOfNode(node)
+  }
+
+  moveFocusToStartOf(node) {
+    logger.deprecate(
+      '0.37.0',
+      'The `Range.moveFocusToStartOf` method is deprecated, please use `Range.moveFocusToStartOfNode` instead.'
+    )
+
+    return this.moveFocusToStartOfNode(node)
+  }
+
+  moveFocusToEndOf(node) {
+    logger.deprecate(
+      '0.37.0',
+      'The `Range.moveFocusToEndOf` method is deprecated, please use `Range.moveFocusToEndOfNode` instead.'
+    )
+
+    return this.moveFocusToEndOfNode(node)
+  }
+
+  moveToStartOf(node) {
+    logger.deprecate(
+      '0.37.0',
+      'The `Range.moveToStartOf` method is deprecated, please use `Range.moveToStartOfNode` instead.'
+    )
+
+    return this.moveToStartOfNode(node)
+  }
+
+  moveToEndOf(node) {
+    logger.deprecate(
+      '0.37.0',
+      'The `Range.moveToEndOf` method is deprecated, please use `Range.moveToEndOfNode` instead.'
+    )
+
+    return this.moveToEndOfNode(node)
+  }
+
+  moveToRangeOf(...args) {
+    logger.deprecate(
+      '0.37.0',
+      'The `Range.moveToRangeOf` method is deprecated, please use `Range.moveToRangeOfNode` instead.'
+    )
+
+    return this.moveToRangeOfNode(...args)
+  }
+
+  collapseToAnchor() {
+    logger.deprecate(
+      '0.37.0',
+      'The `Range.collapseToAnchor` method is deprecated, please use `Range.moveToAnchor` instead.'
+    )
+
+    return this.moveToAnchor()
+  }
+
+  collapseToEnd() {
+    logger.deprecate(
+      '0.37.0',
+      'The `Range.collapseToEnd` method is deprecated, please use `Range.moveToEnd` instead.'
+    )
+
+    return this.moveToEnd()
+  }
+
+  collapseToFocus() {
+    logger.deprecate(
+      '0.37.0',
+      'The `Range.collapseToFocus` method is deprecated, please use `Range.moveToFocus` instead.'
+    )
+
+    return this.moveToFocus()
+  }
+
+  collapseToStart() {
+    logger.deprecate(
+      '0.37.0',
+      'The `Range.collapseToStart` method is deprecated, please use `Range.moveToStart` instead.'
+    )
+
+    return this.moveToStart()
+  }
+
+  move(n = 1) {
+    logger.deprecate(
+      '0.37.0',
+      'The `Range.move` method is deprecated, please use `Range.moveForward` or `Range.moveBackward` instead.'
+    )
+
+    return n > 0 ? this.moveForward(n) : this.moveBackward(-n)
+  }
+
+  moveAnchor(n = 1) {
+    logger.deprecate(
+      '0.37.0',
+      'The `Range.moveAnchor` method is deprecated, please use `Range.moveAnchorForward` or `Range.moveAnchorBackward` instead.'
+    )
+
+    return n > 0 ? this.moveAnchorForward(n) : this.moveAnchorBackward(-n)
+  }
+
+  moveEnd(n = 1) {
+    logger.deprecate(
+      '0.37.0',
+      'The `Range.moveEnd` method is deprecated, please use `Range.moveEndForward` or `Range.moveEndBackward` instead.'
+    )
+
+    return n > 0 ? this.moveEndForward(n) : this.moveEndBackward(-n)
+  }
+
+  moveFocus(n = 1) {
+    logger.deprecate(
+      '0.37.0',
+      'The `Range.moveFocus` method is deprecated, please use `Range.moveFocusForward` or `Range.moveFocusBackward` instead.'
+    )
+
+    return n > 0 ? this.moveFocusForward(n) : this.moveFocusBackward(-n)
+  }
+
+  moveStart(n = 1) {
+    logger.deprecate(
+      '0.37.0',
+      'The `Range.moveStart` method is deprecated, please use `Range.moveStartForward` or `Range.moveStartBackward` instead.'
+    )
+
+    return n > 0 ? this.moveStartForward(n) : this.moveStartBackward(-n)
+  }
 }
 
 /**
@@ -874,102 +1388,29 @@ class Range extends Record(DEFAULTS) {
 Range.prototype[MODEL_TYPES.RANGE] = true
 
 /**
- * Mix in some "move" convenience methods.
- */
-
-const MOVE_METHODS = [
-  ['move', ''],
-  ['move', 'To'],
-  ['move', 'ToStartOf'],
-  ['move', 'ToEndOf'],
-]
-
-MOVE_METHODS.forEach(([p, s]) => {
-  Range.prototype[`${p}${s}`] = function(...args) {
-    return this[`${p}Anchor${s}`](...args)[`${p}Focus${s}`](...args)
-  }
-})
-
-/**
- * Mix in the "start", "end" and "edge" convenience methods.
- */
-
-const EDGE_METHODS = [
-  ['has', 'AtStartOf', true],
-  ['has', 'AtEndOf', true],
-  ['has', 'Between', true],
-  ['has', 'In', true],
-  ['collapseTo', ''],
-  ['move', ''],
-  ['moveTo', ''],
-  ['move', 'To'],
-  ['move', 'OffsetTo'],
-]
-
-EDGE_METHODS.forEach(([p, s, hasEdge]) => {
-  const anchor = `${p}Anchor${s}`
-  const focus = `${p}Focus${s}`
-
-  Range.prototype[`${p}Start${s}`] = function(...args) {
-    return this.isBackward ? this[focus](...args) : this[anchor](...args)
-  }
-
-  Range.prototype[`${p}End${s}`] = function(...args) {
-    return this.isBackward ? this[anchor](...args) : this[focus](...args)
-  }
-
-  if (hasEdge) {
-    Range.prototype[`${p}Edge${s}`] = function(...args) {
-      return this[anchor](...args) || this[focus](...args)
-    }
-  }
-})
-
-/**
  * Mix in some aliases for convenience / parallelism with the browser APIs.
  */
 
 const ALIAS_METHODS = [
   ['collapseTo', 'moveTo'],
-  ['collapseToAnchor', 'moveToAnchor'],
-  ['collapseToFocus', 'moveToFocus'],
-  ['collapseToStart', 'moveToStart'],
-  ['collapseToEnd', 'moveToEnd'],
-  ['collapseToStartOf', 'moveToStartOf'],
-  ['collapseToEndOf', 'moveToEndOf'],
+  ['collapseToStartOf', 'moveToStartOfNode'],
+  ['collapseToEndOf', 'moveToEndOfNode'],
   ['extend', 'moveFocus'],
   ['extendTo', 'moveFocusTo'],
-  ['extendToStartOf', 'moveFocusToStartOf'],
-  ['extendToEndOf', 'moveFocusToEndOf'],
+  ['extendToStartOf', 'moveFocusToStartOfNode'],
+  ['extendToEndOf', 'moveFocusToEndOfNode'],
 ]
 
 ALIAS_METHODS.forEach(([alias, method]) => {
   Range.prototype[alias] = function(...args) {
+    logger.deprecate(
+      '0.37.0',
+      `The \`Range.${alias}\` method is deprecated, please use \`Range.${method}\` instead.`
+    )
+
     return this[method](...args)
   }
 })
-
-/**
- * Get the first text of a `node`.
- *
- * @param {Node} node
- * @return {Text}
- */
-
-function getFirstText(node) {
-  return node.object == 'text' ? node : node.getFirstText()
-}
-
-/**
- * Get the last text of a `node`.
- *
- * @param {Node} node
- * @return {Text}
- */
-
-function getLastText(node) {
-  return node.object == 'text' ? node : node.getLastText()
-}
 
 /**
  * Export.

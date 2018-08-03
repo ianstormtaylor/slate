@@ -142,10 +142,12 @@ class MarkdownShortcuts extends React.Component {
 
   onSpace = (event, change) => {
     const { value } = change
-    if (value.isExpanded) return
+    const { selection } = value
+    if (selection.isExpanded) return
 
-    const { startBlock, startOffset } = value
-    const chars = startBlock.text.slice(0, startOffset).replace(/\s*/g, '')
+    const { startBlock } = value
+    const { start } = selection
+    const chars = startBlock.text.slice(0, start.offset).replace(/\s*/g, '')
     const type = this.getType(chars)
 
     if (!type) return
@@ -158,7 +160,7 @@ class MarkdownShortcuts extends React.Component {
       change.wrapBlock('bulleted-list')
     }
 
-    change.extendToStartOf(startBlock).delete()
+    change.moveFocusToStartOf(startBlock).delete()
     return true
   }
 
@@ -172,8 +174,9 @@ class MarkdownShortcuts extends React.Component {
 
   onBackspace = (event, change) => {
     const { value } = change
-    if (value.isExpanded) return
-    if (value.startOffset != 0) return
+    const { selection } = value
+    if (selection.isExpanded) return
+    if (selection.start.offset != 0) return
 
     const { startBlock } = value
     if (startBlock.type == 'paragraph') return
@@ -198,12 +201,14 @@ class MarkdownShortcuts extends React.Component {
 
   onEnter = (event, change) => {
     const { value } = change
-    if (value.isExpanded) return
+    const { selection } = value
+    const { start, end, isExpanded } = selection
+    if (isExpanded) return
 
-    const { startBlock, startOffset, endOffset } = value
-    if (startOffset == 0 && startBlock.text.length == 0)
+    const { startBlock } = value
+    if (start.offset == 0 && startBlock.text.length == 0)
       return this.onBackspace(event, change)
-    if (endOffset != startBlock.text.length) return
+    if (end.offset != startBlock.text.length) return
 
     if (
       startBlock.type != 'heading-one' &&

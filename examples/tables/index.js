@@ -92,7 +92,8 @@ class Tables extends React.Component {
 
   onBackspace = (event, change) => {
     const { value } = change
-    if (value.startOffset != 0) return
+    const { selection } = value
+    if (selection.start.offset != 0) return
     event.preventDefault()
     return true
   }
@@ -116,7 +117,8 @@ class Tables extends React.Component {
 
   onDelete = (event, change) => {
     const { value } = change
-    if (value.endOffset != value.startText.text.length) return
+    const { selection } = value
+    if (selection.end.offset != value.startText.text.length) return
     event.preventDefault()
     return true
   }
@@ -169,10 +171,10 @@ class Tables extends React.Component {
   onKeyDown = (event, change) => {
     const { value } = change
     const { document, selection } = value
-    const { startKey } = selection
-    const startNode = document.getDescendant(startKey)
+    const { start, isCollapsed } = selection
+    const startNode = document.getDescendant(start.key)
 
-    if (selection.isAtStartOf(startNode)) {
+    if (isCollapsed && start.isAtStartOfNode(startNode)) {
       const previous = document.getPreviousText(startNode.key)
       const prevBlock = document.getClosestBlock(previous.key)
 

@@ -3,15 +3,15 @@
 import h from '../../../helpers/h'
 
 export default function(change) {
-  change.collapseToAnchor()
+  change.moveToEnd()
 }
 
 export const input = (
   <value>
     <document>
-      <paragraph>
-        <anchor />one<focus />
-      </paragraph>
+      <image>
+        <anchor /> <focus />
+      </image>
     </document>
   </value>
 )
@@ -19,9 +19,10 @@ export const input = (
 export const output = (
   <value>
     <document>
-      <paragraph>
-        <cursor />one
-      </paragraph>
+      <image>
+        {' '}
+        <cursor />
+      </image>
     </document>
   </value>
 )

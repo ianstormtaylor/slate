@@ -48,8 +48,8 @@ function findRange(native, value) {
   // last word of a span, it sets the endContainer to the containing span.
   // `selection-is-backward` doesn't handle this case.
   if (IS_IE || IS_EDGE) {
-    const domAnchor = findDOMPoint(anchor.key, anchor.offset)
-    const domFocus = findDOMPoint(focus.key, focus.offset)
+    const domAnchor = findDOMPoint(anchor)
+    const domFocus = findDOMPoint(focus)
 
     native = {
       anchorNode: domAnchor.node,
@@ -61,10 +61,8 @@ function findRange(native, value) {
 
   const { document } = value
   const range = document.createRange({
-    anchorKey: anchor.key,
-    anchorOffset: anchor.offset,
-    focusKey: focus.key,
-    focusOffset: focus.offset,
+    anchor,
+    focus,
     isBackward: isCollapsed ? false : isBackward(native),
     isFocused: true,
   })

@@ -343,10 +343,8 @@ Changes.replaceTextByPath = (
   }
 
   const range = document.createRange({
-    anchorPath: path,
-    focusPath: path,
-    anchorOffset: offset,
-    focusOffset: offset + length,
+    anchor: { path, offset },
+    focus: { path, offset: offset + length },
   })
 
   let activeMarks = document.getActiveMarksAtRange(range)
@@ -597,7 +595,7 @@ Changes.unwrapInlineByPath = (change, path, properties, options) => {
   const node = document.assertNode(path)
   const first = node.getFirstText()
   const last = node.getLastText()
-  const range = selection.moveToRangeOf(first, last)
+  const range = selection.moveToRangeOfNode(first, last)
   change.unwrapInlineAtRange(range, properties, options)
 }
 
@@ -616,7 +614,7 @@ Changes.unwrapBlockByPath = (change, path, properties, options) => {
   const node = document.assertNode(path)
   const first = node.getFirstText()
   const last = node.getLastText()
-  const range = selection.moveToRangeOf(first, last)
+  const range = selection.moveToRangeOfNode(first, last)
   change.unwrapBlockAtRange(range, properties, options)
 }
 

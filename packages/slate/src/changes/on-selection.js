@@ -1,23 +1,520 @@
 import { is } from 'immutable'
 import isEmpty from 'is-empty'
+import logger from 'slate-dev-logger'
 import pick from 'lodash/pick'
 
 import Range from '../models/range'
 
-/**
- * Changes.
- *
- * @type {Object}
- */
-
 const Changes = {}
 
-/**
- * Set `properties` on the selection.
- *
- * @param {Change} change
- * @param {Object} properties
- */
+Changes.blur = change => {
+  change.select({ isFocused: false })
+}
+
+Changes.deselect = change => {
+  const range = Range.create()
+  change.select(range)
+}
+
+Changes.focus = change => {
+  change.select({ isFocused: true })
+}
+
+Changes.flip = change => {
+  change.call(proxy, 'flip')
+}
+
+Changes.moveAnchorBackward = (change, ...args) => {
+  change.call(pointBackward, 'anchor', ...args)
+}
+
+Changes.moveAnchorForward = (change, ...args) => {
+  change.call(pointForward, 'anchor', ...args)
+}
+
+Changes.moveAnchorTo = (change, ...args) => {
+  change.call(proxy, 'moveAnchorTo', ...args)
+}
+
+Changes.moveAnchorToEndOfBlock = change => {
+  change.call(pointEdgeObject, 'anchor', 'end', 'block')
+}
+
+Changes.moveAnchorToEndOfInline = change => {
+  change.call(pointEdgeObject, 'anchor', 'end', 'inline')
+}
+
+Changes.moveAnchorToEndOfNextBlock = change => {
+  change.call(pointEdgeSideObject, 'anchor', 'end', 'previous', 'block')
+}
+
+Changes.moveAnchorToEndOfNextInline = change => {
+  change.call(pointEdgeSideObject, 'anchor', 'end', 'previous', 'inline')
+}
+
+Changes.moveAnchorToEndOfNextText = change => {
+  change.call(pointEdgeSideObject, 'anchor', 'end', 'next', 'text')
+}
+
+Changes.moveAnchorToEndOfNode = (change, ...args) => {
+  change.call(proxy, 'moveAnchorToEndOfNode', ...args)
+}
+
+Changes.moveAnchorToEndOfPreviousBlock = change => {
+  change.call(pointEdgeSideObject, 'anchor', 'end', 'next', 'block')
+}
+
+Changes.moveAnchorToEndOfPreviousInline = change => {
+  change.call(pointEdgeSideObject, 'anchor', 'end', 'next', 'inline')
+}
+
+Changes.moveAnchorToEndOfPreviousText = change => {
+  change.call(pointEdgeSideObject, 'anchor', 'end', 'previous', 'text')
+}
+
+Changes.moveAnchorToEndOfText = change => {
+  change.call(pointEdgeObject, 'anchor', 'end', 'text')
+}
+
+Changes.moveAnchorToStartOfBlock = change => {
+  change.call(pointEdgeObject, 'anchor', 'start', 'block')
+}
+
+Changes.moveAnchorToStartOfInline = change => {
+  change.call(pointEdgeObject, 'anchor', 'start', 'inline')
+}
+
+Changes.moveAnchorToStartOfNextBlock = change => {
+  change.call(pointEdgeSideObject, 'anchor', 'start', 'next', 'block')
+}
+
+Changes.moveAnchorToStartOfNextInline = change => {
+  change.call(pointEdgeSideObject, 'anchor', 'start', 'next', 'inline')
+}
+
+Changes.moveAnchorToStartOfNextText = change => {
+  change.call(pointEdgeSideObject, 'anchor', 'start', 'next', 'text')
+}
+
+Changes.moveAnchorToStartOfNode = (change, ...args) => {
+  change.call(proxy, 'moveAnchorToStartOfNode', ...args)
+}
+
+Changes.moveAnchorToStartOfPreviousBlock = change => {
+  change.call(pointEdgeSideObject, 'anchor', 'start', 'previous', 'block')
+}
+
+Changes.moveAnchorToStartOfPreviousInline = change => {
+  change.call(pointEdgeSideObject, 'anchor', 'start', 'previous', 'inline')
+}
+
+Changes.moveAnchorToStartOfPreviousText = change => {
+  change.call(pointEdgeSideObject, 'anchor', 'start', 'previous', 'text')
+}
+
+Changes.moveAnchorToStartOfText = change => {
+  change.call(pointEdgeObject, 'anchor', 'start', 'text')
+}
+
+Changes.moveBackward = (change, ...args) => {
+  change.moveAnchorBackward(...args).moveFocusBackward(...args)
+}
+
+Changes.moveEndBackward = (change, ...args) => {
+  change.call(pointBackward, 'end', ...args)
+}
+
+Changes.moveEndForward = (change, ...args) => {
+  change.call(pointForward, 'end', ...args)
+}
+
+Changes.moveEndTo = (change, ...args) => {
+  change.call(proxy, 'moveEndTo', ...args)
+}
+
+Changes.moveEndToEndOfBlock = change => {
+  change.call(pointEdgeObject, 'end', 'end', 'block')
+}
+
+Changes.moveEndToEndOfInline = change => {
+  change.call(pointEdgeObject, 'end', 'end', 'inline')
+}
+
+Changes.moveEndToEndOfNextBlock = change => {
+  change.call(pointEdgeSideObject, 'end', 'end', 'previous', 'block')
+}
+
+Changes.moveEndToEndOfNextInline = change => {
+  change.call(pointEdgeSideObject, 'end', 'end', 'previous', 'inline')
+}
+
+Changes.moveEndToEndOfNextText = change => {
+  change.call(pointEdgeSideObject, 'end', 'end', 'next', 'text')
+}
+
+Changes.moveEndToEndOfNode = (change, ...args) => {
+  change.call(proxy, 'moveEndToEndOfNode', ...args)
+}
+
+Changes.moveEndToEndOfPreviousBlock = change => {
+  change.call(pointEdgeSideObject, 'end', 'end', 'next', 'block')
+}
+
+Changes.moveEndToEndOfPreviousInline = change => {
+  change.call(pointEdgeSideObject, 'end', 'end', 'next', 'inline')
+}
+
+Changes.moveEndToEndOfPreviousText = change => {
+  change.call(pointEdgeSideObject, 'end', 'end', 'previous', 'text')
+}
+
+Changes.moveEndToEndOfText = change => {
+  change.call(pointEdgeObject, 'end', 'end', 'text')
+}
+
+Changes.moveEndToStartOfBlock = change => {
+  change.call(pointEdgeObject, 'end', 'start', 'block')
+}
+
+Changes.moveEndToStartOfInline = change => {
+  change.call(pointEdgeObject, 'end', 'start', 'inline')
+}
+
+Changes.moveEndToStartOfNextBlock = change => {
+  change.call(pointEdgeSideObject, 'end', 'start', 'next', 'block')
+}
+
+Changes.moveEndToStartOfNextInline = change => {
+  change.call(pointEdgeSideObject, 'end', 'start', 'next', 'inline')
+}
+
+Changes.moveEndToStartOfNextText = change => {
+  change.call(pointEdgeSideObject, 'end', 'start', 'next', 'text')
+}
+
+Changes.moveEndToStartOfNode = (change, ...args) => {
+  change.call(proxy, 'moveEndToStartOfNode', ...args)
+}
+
+Changes.moveEndToStartOfPreviousBlock = change => {
+  change.call(pointEdgeSideObject, 'end', 'start', 'previous', 'block')
+}
+
+Changes.moveEndToStartOfPreviousInline = change => {
+  change.call(pointEdgeSideObject, 'end', 'start', 'previous', 'inline')
+}
+
+Changes.moveEndToStartOfPreviousText = change => {
+  change.call(pointEdgeSideObject, 'end', 'start', 'previous', 'text')
+}
+
+Changes.moveEndToStartOfText = change => {
+  change.call(pointEdgeObject, 'end', 'start', 'text')
+}
+
+Changes.moveFocusBackward = (change, ...args) => {
+  change.call(pointBackward, 'focus', ...args)
+}
+
+Changes.moveFocusForward = (change, ...args) => {
+  change.call(pointForward, 'focus', ...args)
+}
+
+Changes.moveFocusTo = (change, ...args) => {
+  change.call(proxy, 'moveFocusTo', ...args)
+}
+
+Changes.moveFocusToEndOfBlock = change => {
+  change.call(pointEdgeObject, 'focus', 'end', 'block')
+}
+
+Changes.moveFocusToEndOfInline = change => {
+  change.call(pointEdgeObject, 'focus', 'end', 'inline')
+}
+
+Changes.moveFocusToEndOfNextBlock = change => {
+  change.call(pointEdgeSideObject, 'focus', 'end', 'previous', 'block')
+}
+
+Changes.moveFocusToEndOfNextInline = change => {
+  change.call(pointEdgeSideObject, 'focus', 'end', 'previous', 'inline')
+}
+
+Changes.moveFocusToEndOfNextText = change => {
+  change.call(pointEdgeSideObject, 'focus', 'end', 'next', 'text')
+}
+
+Changes.moveFocusToEndOfNode = (change, ...args) => {
+  change.call(proxy, 'moveFocusToEndOfNode', ...args)
+}
+
+Changes.moveFocusToEndOfPreviousBlock = change => {
+  change.call(pointEdgeSideObject, 'focus', 'end', 'next', 'block')
+}
+
+Changes.moveFocusToEndOfPreviousInline = change => {
+  change.call(pointEdgeSideObject, 'focus', 'end', 'next', 'inline')
+}
+
+Changes.moveFocusToEndOfPreviousText = change => {
+  change.call(pointEdgeSideObject, 'focus', 'end', 'previous', 'text')
+}
+
+Changes.moveFocusToEndOfText = change => {
+  change.call(pointEdgeObject, 'focus', 'end', 'text')
+}
+
+Changes.moveFocusToStartOfBlock = change => {
+  change.call(pointEdgeObject, 'focus', 'start', 'block')
+}
+
+Changes.moveFocusToStartOfInline = change => {
+  change.call(pointEdgeObject, 'focus', 'start', 'inline')
+}
+
+Changes.moveFocusToStartOfNextBlock = change => {
+  change.call(pointEdgeSideObject, 'focus', 'start', 'next', 'block')
+}
+
+Changes.moveFocusToStartOfNextInline = change => {
+  change.call(pointEdgeSideObject, 'focus', 'start', 'next', 'inline')
+}
+
+Changes.moveFocusToStartOfNextText = change => {
+  change.call(pointEdgeSideObject, 'focus', 'start', 'next', 'text')
+}
+
+Changes.moveFocusToStartOfNode = (change, ...args) => {
+  change.call(proxy, 'moveFocusToStartOfNode', ...args)
+}
+
+Changes.moveFocusToStartOfPreviousBlock = change => {
+  change.call(pointEdgeSideObject, 'focus', 'start', 'previous', 'block')
+}
+
+Changes.moveFocusToStartOfPreviousInline = change => {
+  change.call(pointEdgeSideObject, 'focus', 'start', 'previous', 'inline')
+}
+
+Changes.moveFocusToStartOfPreviousText = change => {
+  change.call(pointEdgeSideObject, 'focus', 'start', 'previous', 'text')
+}
+
+Changes.moveFocusToStartOfText = change => {
+  change.call(pointEdgeObject, 'focus', 'start', 'text')
+}
+
+Changes.moveForward = (change, ...args) => {
+  change.moveAnchorForward(...args).moveFocusForward(...args)
+}
+
+Changes.moveStartBackward = (change, ...args) => {
+  change.call(pointBackward, 'start', ...args)
+}
+
+Changes.moveStartForward = (change, ...args) => {
+  change.call(pointForward, 'start', ...args)
+}
+
+Changes.moveStartTo = (change, ...args) => {
+  change.call(proxy, 'moveStartTo', ...args)
+}
+
+Changes.moveStartToEndOfBlock = change => {
+  change.call(pointEdgeObject, 'start', 'end', 'block')
+}
+
+Changes.moveStartToEndOfInline = change => {
+  change.call(pointEdgeObject, 'start', 'end', 'inline')
+}
+
+Changes.moveStartToEndOfNextBlock = change => {
+  change.call(pointEdgeSideObject, 'start', 'end', 'previous', 'block')
+}
+
+Changes.moveStartToEndOfNextInline = change => {
+  change.call(pointEdgeSideObject, 'start', 'end', 'previous', 'inline')
+}
+
+Changes.moveStartToEndOfNextText = change => {
+  change.call(pointEdgeSideObject, 'start', 'end', 'next', 'text')
+}
+
+Changes.moveStartToEndOfNode = (change, ...args) => {
+  change.call(proxy, 'moveStartToEndOfNode', ...args)
+}
+
+Changes.moveStartToEndOfPreviousBlock = change => {
+  change.call(pointEdgeSideObject, 'start', 'end', 'next', 'block')
+}
+
+Changes.moveStartToEndOfPreviousInline = change => {
+  change.call(pointEdgeSideObject, 'start', 'end', 'next', 'inline')
+}
+
+Changes.moveStartToEndOfPreviousText = change => {
+  change.call(pointEdgeSideObject, 'start', 'end', 'previous', 'text')
+}
+
+Changes.moveStartToEndOfText = change => {
+  change.call(pointEdgeObject, 'start', 'end', 'text')
+}
+
+Changes.moveStartToStartOfBlock = change => {
+  change.call(pointEdgeObject, 'start', 'start', 'block')
+}
+
+Changes.moveStartToStartOfInline = change => {
+  change.call(pointEdgeObject, 'start', 'start', 'inline')
+}
+
+Changes.moveStartToStartOfNextBlock = change => {
+  change.call(pointEdgeSideObject, 'start', 'start', 'next', 'block')
+}
+
+Changes.moveStartToStartOfNextInline = change => {
+  change.call(pointEdgeSideObject, 'start', 'start', 'next', 'inline')
+}
+
+Changes.moveStartToStartOfNextText = change => {
+  change.call(pointEdgeSideObject, 'start', 'start', 'next', 'text')
+}
+
+Changes.moveStartToStartOfNode = (change, ...args) => {
+  change.call(proxy, 'moveStartToStartOfNode', ...args)
+}
+
+Changes.moveStartToStartOfPreviousBlock = change => {
+  change.call(pointEdgeSideObject, 'start', 'start', 'previous', 'block')
+}
+
+Changes.moveStartToStartOfPreviousInline = change => {
+  change.call(pointEdgeSideObject, 'start', 'start', 'previous', 'inline')
+}
+
+Changes.moveStartToStartOfPreviousText = change => {
+  change.call(pointEdgeSideObject, 'start', 'start', 'previous', 'text')
+}
+
+Changes.moveStartToStartOfText = change => {
+  change.call(pointEdgeObject, 'start', 'start', 'text')
+}
+
+Changes.moveTo = (change, ...args) => {
+  change.call(proxy, 'moveTo', ...args)
+}
+
+Changes.moveToAnchor = change => {
+  change.call(proxy, 'moveToAnchor')
+}
+
+Changes.moveToEnd = change => {
+  change.call(proxy, 'moveToEnd')
+}
+
+Changes.moveToEndOfBlock = change => {
+  change.moveEndToEndOfBlock().moveToEnd()
+}
+
+Changes.moveToEndOfDocument = change => {
+  change.moveEndToEndOfNode(change.value.document).moveToEnd()
+}
+
+Changes.moveToEndOfInline = change => {
+  change.moveEndToEndOfInline().moveToEnd()
+}
+
+Changes.moveToEndOfNextBlock = change => {
+  change.moveEndToEndOfNextBlock().moveToEnd()
+}
+
+Changes.moveToEndOfNextInline = change => {
+  change.moveEndToEndOfNextInline().moveToEnd()
+}
+
+Changes.moveToEndOfNextText = change => {
+  change.moveEndToEndOfNextText().moveToEnd()
+}
+
+Changes.moveToEndOfNode = (change, ...args) => {
+  change.call(proxy, 'moveToEndOfNode', ...args)
+}
+
+Changes.moveToEndOfPreviousBlock = change => {
+  change.moveStartToEndOfPreviousBlock().moveToStart()
+}
+
+Changes.moveToEndOfPreviousInline = change => {
+  change.moveStartToEndOfPreviousInline().moveToStart()
+}
+
+Changes.moveToEndOfPreviousText = change => {
+  change.moveStartToEndOfPreviousText().moveToStart()
+}
+
+Changes.moveToEndOfText = change => {
+  change.moveEndToEndOfText().moveToEnd()
+}
+
+Changes.moveToFocus = change => {
+  change.call(proxy, 'moveToFocus')
+}
+
+Changes.moveToRangeOfDocument = change => {
+  change.moveToRangeOfNode(change.value.document)
+}
+
+Changes.moveToRangeOfNode = (change, ...args) => {
+  change.call(proxy, 'moveToRangeOfNode', ...args)
+}
+
+Changes.moveToStart = change => {
+  change.call(proxy, 'moveToStart')
+}
+
+Changes.moveToStartOfBlock = change => {
+  change.moveStartToStartOfBlock().moveToStart()
+}
+
+Changes.moveToStartOfDocument = change => {
+  change.moveStartToStartOfNode(change.value.document).moveToStart()
+}
+
+Changes.moveToStartOfInline = change => {
+  change.moveStartToStartOfInline().moveToStart()
+}
+
+Changes.moveToStartOfNextBlock = change => {
+  change.moveEndToStartOfNextBlock().moveToEnd()
+}
+
+Changes.moveToStartOfNextInline = change => {
+  change.moveEndToStartOfNextInline().moveToEnd()
+}
+
+Changes.moveToStartOfNextText = change => {
+  change.moveEndToStartOfNextText().moveToEnd()
+}
+
+Changes.moveToStartOfNode = (change, ...args) => {
+  change.call(proxy, 'moveToStartOfNode', ...args)
+}
+
+Changes.moveToStartOfPreviousBlock = change => {
+  change.moveStartToStartOfPreviousBlock().moveToStart()
+}
+
+Changes.moveToStartOfPreviousInline = change => {
+  change.moveStartToStartOfPreviousInline().moveToStart()
+}
+
+Changes.moveToStartOfPreviousText = change => {
+  change.moveStartToStartOfPreviousText().moveToStart()
+}
+
+Changes.moveToStartOfText = change => {
+  change.moveStartToStartOfText().moveToStart()
+}
 
 Changes.select = (change, properties, options = {}) => {
   properties = Range.createProperties(properties)
@@ -25,7 +522,8 @@ Changes.select = (change, properties, options = {}) => {
   const { value } = change
   const { document, selection } = value
   const props = {}
-  const next = document.createRange(selection.merge(properties))
+  let next = selection.setProperties(properties)
+  next = document.resolveRange(next)
 
   // Re-compute the properties, to ensure that we get their normalized values.
   properties = pick(next, Object.keys(properties))
@@ -41,14 +539,7 @@ Changes.select = (change, properties, options = {}) => {
 
   // If the selection moves, clear any marks, unless the new selection
   // properties change the marks in some way.
-  if (
-    selection.marks &&
-    !props.marks &&
-    (props.hasOwnProperty('anchorKey') ||
-      props.hasOwnProperty('anchorOffset') ||
-      props.hasOwnProperty('focusKey') ||
-      props.hasOwnProperty('focusOffset'))
-  ) {
+  if (selection.marks && !props.marks && (props.anchor || props.focus)) {
     props.marks = null
   }
 
@@ -68,329 +559,228 @@ Changes.select = (change, properties, options = {}) => {
   )
 }
 
-/**
- * Select the whole document.
- *
- * @param {Change} change
- */
-
-Changes.selectAll = change => {
-  const { value } = change
-  const { document, selection } = value
-  const next = selection.moveToRangeOf(document)
-  change.select(next)
+Changes.setAnchor = (change, ...args) => {
+  change.call(proxy, 'setAnchor', ...args)
 }
 
-/**
- * Snapshot the current selection.
- *
- * @param {Change} change
- */
+Changes.setEnd = (change, ...args) => {
+  change.call(proxy, 'setEnd', ...args)
+}
+
+Changes.setFocus = (change, ...args) => {
+  change.call(proxy, 'setFocus', ...args)
+}
+
+Changes.setStart = (change, ...args) => {
+  change.call(proxy, 'setStart', ...args)
+}
 
 Changes.snapshotSelection = change => {
-  const { value } = change
-  const { selection } = value
-  change.select(selection, { snapshot: true })
+  change.select(change.value.selection, { snapshot: true })
 }
 
 /**
- * Move the anchor point backward, accounting for being at the start of a block.
- *
- * @param {Change} change
+ * Helpers.
  */
 
-Changes.moveAnchorCharBackward = change => {
+function proxy(change, method, ...args) {
+  const range = change.value.selection[method](...args)
+  change.select(range)
+}
+
+function pointEdgeObject(change, point, edge, object) {
+  const Point = point.slice(0, 1).toUpperCase() + point.slice(1)
+  const Edge = edge.slice(0, 1).toUpperCase() + edge.slice(1)
+  const Object = object.slice(0, 1).toUpperCase() + object.slice(1)
+  const method = `move${Point}To${Edge}OfNode`
+  const getNode = object == 'text' ? 'getNode' : `getClosest${Object}`
   const { value } = change
-  const { document, selection, anchorText, anchorBlock } = value
-  const { anchorOffset } = selection
-  const previousText = document.getPreviousText(anchorText.key)
-  const isInVoid = document.hasVoidParent(anchorText.key)
-  const isPreviousInVoid =
-    previousText && document.hasVoidParent(previousText.key)
+  const { document, selection } = value
+  const p = selection[point]
+  const node = document[getNode](p.key)
+  if (!node) return
+  change[method](node)
+}
 
-  if (!isInVoid && anchorOffset > 0) {
-    change.moveAnchor(-1)
+function pointEdgeSideObject(change, point, edge, side, object) {
+  const Point = point.slice(0, 1).toUpperCase() + point.slice(1)
+  const Edge = edge.slice(0, 1).toUpperCase() + edge.slice(1)
+  const Side = side.slice(0, 1).toUpperCase() + side.slice(1)
+  const Object = object.slice(0, 1).toUpperCase() + object.slice(1)
+  const method = `move${Point}To${Edge}OfNode`
+  const getNode = object == 'text' ? 'getNode' : `getClosest${Object}`
+  const getDirectionNode = `get${Side}${Object}`
+  const { value } = change
+  const { document, selection } = value
+  const p = selection[point]
+  const node = document[getNode](p.key)
+  if (!node) return
+  const target = document[getDirectionNode](node.key)
+  if (!target) return
+  change[method](node)
+}
+
+function pointBackward(change, point, n = 1) {
+  if (n === 0) return
+  if (n < 0) return pointForward(change, point, -n)
+
+  const Point = point.slice(0, 1).toUpperCase() + point.slice(1)
+  const { value } = change
+  const { document, selection } = value
+  const p = selection[point]
+  const isInVoid = document.hasVoidParent(p.path)
+
+  if (!isInVoid && p.offset - n >= 0) {
+    const range = selection[`move${Point}Backward`](n)
+    change.select(range)
     return
   }
 
-  if (!previousText) {
-    return
-  }
+  const previous = document.getPreviousText(p.path)
+  if (!previous) return
 
-  change.moveAnchorToEndOf(previousText)
+  const block = document.getClosestBlock(p.path)
+  const isInBlock = block.hasNode(previous.key)
+  const isPreviousInVoid = previous && document.hasVoidParent(previous.key)
+  change.moveToEndOfNode(previous)
 
-  if (!isInVoid && !isPreviousInVoid && anchorBlock.hasNode(previousText.key)) {
-    change.moveAnchor(-1)
+  if (!isInVoid && !isPreviousInVoid && isInBlock) {
+    const range = change.value.selection[`move${Point}Backward`](n)
+    change.select(range)
   }
 }
 
-/**
- * Move the anchor point forward, accounting for being at the end of a block.
- *
- * @param {Change} change
- */
+function pointForward(change, point, n = 1) {
+  if (n === 0) return
+  if (n < 0) return pointBackward(change, point, -n)
 
-Changes.moveAnchorCharForward = change => {
+  const Point = point.slice(0, 1).toUpperCase() + point.slice(1)
   const { value } = change
-  const { document, selection, anchorText, anchorBlock } = value
-  const { anchorOffset } = selection
-  const nextText = document.getNextText(anchorText.key)
-  const isInVoid = document.hasVoidParent(anchorText.key)
-  const isNextInVoid = nextText && document.hasVoidParent(nextText.key)
+  const { document, selection } = value
+  const p = selection[point]
+  const text = document.getNode(p.path)
+  const isInVoid = document.hasVoidParent(p.path)
 
-  if (!isInVoid && anchorOffset < anchorText.text.length) {
-    change.moveAnchor(1)
+  if (!isInVoid && p.offset + n <= text.text.length) {
+    const range = selection[`move${Point}Forward`](n)
+    change.select(range)
     return
   }
 
-  if (!nextText) {
-    return
-  }
+  const block = document.getClosestBlock(p.path)
+  const isInBlock = block.hasNode(next.key)
+  const next = document.getNextText(p.path)
+  const isNextInVoid = next && document.hasVoidParent(next.key)
+  if (!next) return
 
-  change.moveAnchorToStartOf(nextText)
+  change.moveAnchorToStartOf(next)
 
-  if (!isInVoid && !isNextInVoid && anchorBlock.hasNode(nextText.key)) {
-    change.moveAnchor(1)
-  }
-}
-
-/**
- * Move the focus point backward, accounting for being at the start of a block.
- *
- * @param {Change} change
- */
-
-Changes.moveFocusCharBackward = change => {
-  const { value } = change
-  const { document, selection, focusText, focusBlock } = value
-  const { focusOffset } = selection
-  const previousText = document.getPreviousText(focusText.key)
-  const isInVoid = document.hasVoidParent(focusText.key)
-  const isPreviousInVoid =
-    previousText && document.hasVoidParent(previousText.key)
-
-  if (!isInVoid && focusOffset > 0) {
-    change.moveFocus(-1)
-    return
-  }
-
-  if (!previousText) {
-    return
-  }
-
-  change.moveFocusToEndOf(previousText)
-
-  if (!isInVoid && !isPreviousInVoid && focusBlock.hasNode(previousText.key)) {
-    change.moveFocus(-1)
-  }
-}
-
-/**
- * Move the focus point forward, accounting for being at the end of a block.
- *
- * @param {Change} change
- */
-
-Changes.moveFocusCharForward = change => {
-  const { value } = change
-  const { document, selection, focusText, focusBlock } = value
-  const { focusOffset } = selection
-  const nextText = document.getNextText(focusText.key)
-  const isInVoid = document.hasVoidParent(focusText.key)
-  const isNextInVoid = nextText && document.hasVoidParent(nextText.key)
-
-  if (!isInVoid && focusOffset < focusText.text.length) {
-    change.moveFocus(1)
-    return
-  }
-
-  if (!nextText) {
-    return
-  }
-
-  change.moveFocusToStartOf(nextText)
-
-  if (!isInVoid && !isNextInVoid && focusBlock.hasNode(nextText.key)) {
-    change.moveFocus(1)
+  if (!isInVoid && !isNextInVoid && isInBlock) {
+    const range = change.value.selection[`move${Point}Forward`](n)
+    change.select(range)
   }
 }
 
 /**
- * Mix in move methods.
+ * Deprecated.
  */
 
-const MOVE_DIRECTIONS = ['Forward', 'Backward']
+Changes.moveOffsetsTo = (change, start, end = start) => {
+  logger.deprecate(
+    '0.37.0',
+    'The `Change.moveOffsetsTo` method is deprecated, please use `Change.moveAnchorTo` and `Change.moveFocusTo` instead.'
+  )
 
-MOVE_DIRECTIONS.forEach(direction => {
-  const anchor = `moveAnchorChar${direction}`
-  const focus = `moveFocusChar${direction}`
+  change.moveAnchorTo(start).moveFocusTo(end)
+}
 
-  Changes[`moveChar${direction}`] = change => {
-    change[anchor]()[focus]()
-  }
-
-  Changes[`moveStartChar${direction}`] = change => {
-    if (change.value.isBackward) {
-      change[focus]()
-    } else {
-      change[anchor]()
-    }
-  }
-
-  Changes[`moveEndChar${direction}`] = change => {
-    if (change.value.isBackward) {
-      change[anchor]()
-    } else {
-      change[focus]()
-    }
-  }
-
-  Changes[`extendChar${direction}`] = change => {
-    change[`moveFocusChar${direction}`]()
-  }
-
-  Changes[`collapseChar${direction}`] = change => {
-    const collapse =
-      direction == 'Forward' ? 'collapseToEnd' : 'collapseToStart'
-    change[collapse]()[`moveChar${direction}`]()
-  }
-})
-
-/**
- * Mix in alias methods.
- */
-
-const ALIAS_METHODS = [
-  ['collapseLineBackward', 'collapseToStartOfBlock'],
-  ['collapseLineForward', 'collapseToEndOfBlock'],
-  ['extendLineBackward', 'extendToStartOfBlock'],
-  ['extendLineForward', 'extendToEndOfBlock'],
+const DEPRECATEDS = [
+  ['collapseCharBackward', 'moveBackward'],
+  ['collapseCharForward', 'moveForward'],
+  ['collapseLineBackward', 'moveLineBackward'],
+  ['collapseLineForward', 'moveLineForward'],
+  ['collapseTo', 'moveTo'],
+  ['collapseToAnchor', 'moveToAnchor'],
+  ['collapseToEnd', 'moveToEnd'],
+  ['collapseToEndOf', 'moveToEndOfNode'],
+  ['collapseToEndOfBlock', 'moveToEndOfBlock'],
+  ['collapseToEndOfNextBlock', 'moveToEndOfNextBlock'],
+  ['collapseToEndOfNextInline', 'moveToEndOfNextInline'],
+  ['collapseToEndOfNextText', 'moveToEndOfNextText'],
+  ['collapseToEndOfPreviousBlock', 'moveToEndOfPreviousBlock'],
+  ['collapseToEndOfPreviousInline', 'moveToEndOfPreviousInline'],
+  ['collapseToEndOfPreviousText', 'moveToEndOfPreviousText'],
+  ['collapseToFocus', 'moveToFocus'],
+  ['collapseToStart', 'moveToStart'],
+  ['collapseToStartOf', 'moveToStartOfNode'],
+  ['collapseToStartOfBlock', 'moveToStartOfBlock'],
+  ['collapseToStartOfNextBlock', 'moveToStartOfNextBlock'],
+  ['collapseToStartOfNextInline', 'moveToStartOfNextInline'],
+  ['collapseToStartOfNextText', 'moveToStartOfNextText'],
+  ['collapseToStartOfPreviousBlock', 'moveToStartOfPreviousBlock'],
+  ['collapseToStartOfPreviousInline', 'moveToStartOfPreviousInline'],
+  ['collapseToStartOfPreviousText', 'moveToStartOfPreviousText'],
+  ['extend', 'moveFocusForward'],
+  ['extendCharBackward', 'moveFocusBackward'],
+  ['extendCharForward', 'moveFocusForward'],
+  ['extendLineBackward', 'moveFocusToStartOfBlock'],
+  ['extendLineForward', 'moveFocusToEndOfBlock'],
+  ['extendTo', 'moveFocusTo'],
+  ['extendToEndOf', 'moveFocusToEndOfNode'],
+  ['extendToEndOfBlock', 'moveFocusToEndOfBlock'],
+  ['extendToEndOfBlock', 'moveFocusToEndOfBlock'],
+  ['extendToEndOfNextBlock', 'moveFocusToEndOfNextBlock'],
+  ['extendToEndOfNextInline', 'moveFocusToEndOfNextInline'],
+  ['extendToEndOfNextText', 'moveFocusToEndOfNextText'],
+  ['extendToEndOfPreviousBlock', 'moveFocusToEndOfPreviousBlock'],
+  ['extendToEndOfPreviousInline', 'moveFocusToEndOfPreviousInline'],
+  ['extendToEndOfPreviousText', 'moveFocusToEndOfPreviousText'],
+  ['extendToStartOf', 'moveFocusToStartOfNode'],
+  ['extendToStartOfBlock', 'moveFocusToStartOfBlock'],
+  ['extendToStartOfNextBlock', 'moveFocusToStartOfNextBlock'],
+  ['extendToStartOfNextInline', 'moveFocusToStartOfNextInline'],
+  ['extendToStartOfNextText', 'moveFocusToStartOfNextText'],
+  ['extendToStartOfPreviousBlock', 'moveFocusToStartOfPreviousBlock'],
+  ['extendToStartOfPreviousInline', 'moveFocusToStartOfPreviousInline'],
+  ['extendToStartOfPreviousText', 'moveFocusToStartOfPreviousText'],
+  ['move', 'moveForward'],
+  ['moveAnchor', 'moveAnchorForward'],
+  ['moveAnchorCharBackward', 'moveAnchorBackward'],
+  ['moveAnchorCharForward', 'moveAnchorForward'],
+  ['moveAnchorOffsetTo', 'moveAnchorTo'],
+  ['moveAnchorToEndOf', 'moveAnchorToEndOfNode'],
+  ['moveAnchorToStartOf', 'moveAnchorToStartOfNode'],
+  ['moveCharBackward', 'moveBackward'],
+  ['moveCharForward', 'moveForward'],
+  ['moveEnd', 'moveEndForward'],
+  ['moveEndCharBackward', 'moveEndBackward'],
+  ['moveEndCharForward', 'moveEndForward'],
+  ['moveEndOffsetTo', 'moveEndTo'],
+  ['moveFocus', 'moveFocusForward'],
+  ['moveFocusCharBackward', 'moveFocusBackward'],
+  ['moveFocusCharForward', 'moveFocusForward'],
+  ['moveFocusOffsetTo', 'moveFocusTo'],
+  ['moveFocusToEndOf', 'moveFocusToEndOfNode'],
+  ['moveFocusToStartOf', 'moveFocusToStartOfNode'],
+  ['moveStart', 'moveStartForward'],
+  ['moveStartCharBackward', 'moveStartBackward'],
+  ['moveStartCharForward', 'moveStartForward'],
+  ['moveStartOffsetTo', 'moveStartTo'],
+  ['moveToEndOf', 'moveToEndOfNode'],
+  ['moveToRangeOf', 'moveToRangeOfNode'],
+  ['moveToStartOf', 'moveToStartOfNode'],
+  ['selectAll', 'moveToRangeOfDocument'],
 ]
 
-ALIAS_METHODS.forEach(([alias, method]) => {
-  Changes[alias] = function(change, ...args) {
-    change[method](change, ...args)
+DEPRECATEDS.forEach(([deprecated, method]) => {
+  Changes[deprecated] = function(change, ...args) {
+    logger.deprecate(
+      '0.37.0',
+      `The \`Change.${deprecated}\` method is deprecated, please use \`Change.${method}\` instead.`
+    )
+
+    change[method](...args)
   }
 })
-
-/**
- * Mix in selection changes that are just a proxy for the selection method.
- */
-
-const PROXY_TRANSFORMS = [
-  'blur',
-  'collapseTo',
-  'collapseToAnchor',
-  'collapseToEnd',
-  'collapseToEndOf',
-  'collapseToFocus',
-  'collapseToStart',
-  'collapseToStartOf',
-  'extend',
-  'extendTo',
-  'extendToEndOf',
-  'extendToStartOf',
-  'flip',
-  'focus',
-  'move',
-  'moveAnchor',
-  'moveAnchorOffsetTo',
-  'moveAnchorTo',
-  'moveAnchorToEndOf',
-  'moveAnchorToStartOf',
-  'moveEnd',
-  'moveEndOffsetTo',
-  'moveEndTo',
-  'moveFocus',
-  'moveFocusOffsetTo',
-  'moveFocusTo',
-  'moveFocusToEndOf',
-  'moveFocusToStartOf',
-  'moveOffsetsTo',
-  'moveStart',
-  'moveStartOffsetTo',
-  'moveStartTo',
-  'moveTo',
-  'moveToEnd',
-  'moveToEndOf',
-  'moveToRangeOf',
-  'moveToStart',
-  'moveToStartOf',
-  'deselect',
-]
-
-PROXY_TRANSFORMS.forEach(method => {
-  Changes[method] = (change, ...args) => {
-    const normalize = method != 'deselect'
-    const { value } = change
-    const { document, selection } = value
-    let next = selection[method](...args)
-    if (normalize) next = document.createRange(next)
-    change.select(next)
-  }
-})
-
-/**
- * Mix in node-related changes.
- */
-
-const PREFIXES = [
-  'moveTo',
-  'moveAnchorTo',
-  'moveFocusTo',
-  'moveStartTo',
-  'moveEndTo',
-  'collapseTo',
-  'extendTo',
-]
-
-const DIRECTIONS = ['Next', 'Previous']
-
-const OBJECTS = ['Block', 'Inline', 'Text']
-
-PREFIXES.forEach(prefix => {
-  const edges = ['Start', 'End']
-
-  if (prefix == 'moveTo') {
-    edges.push('Range')
-  }
-
-  edges.forEach(edge => {
-    const method = `${prefix}${edge}Of`
-
-    OBJECTS.forEach(object => {
-      const getNode = object == 'Text' ? 'getNode' : `getClosest${object}`
-
-      Changes[`${method}${object}`] = change => {
-        const { value } = change
-        const { document, selection } = value
-        const node = document[getNode](selection.startKey)
-        if (!node) return
-        change[method](node)
-      }
-
-      DIRECTIONS.forEach(direction => {
-        const getDirectionNode = `get${direction}${object}`
-        const directionKey = direction == 'Next' ? 'startKey' : 'endKey'
-
-        Changes[`${method}${direction}${object}`] = change => {
-          const { value } = change
-          const { document, selection } = value
-          const node = document[getNode](selection[directionKey])
-          if (!node) return
-          const target = document[getDirectionNode](node.key)
-          if (!target) return
-          change[method](target)
-        }
-      })
-    })
-  })
-})
-
-/**
- * Export.
- *
- * @type {Object}
- */
 
 export default Changes

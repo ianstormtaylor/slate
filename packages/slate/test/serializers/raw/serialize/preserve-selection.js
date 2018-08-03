@@ -38,10 +38,16 @@ export const output = {
   },
   selection: {
     object: 'range',
-    anchorPath: [0, 0],
-    anchorOffset: 0,
-    focusPath: [0, 0],
-    focusOffset: 0,
+    anchor: {
+      object: 'point',
+      path: [0, 0],
+      offset: 0,
+    },
+    focus: {
+      object: 'point',
+      path: [0, 0],
+      offset: 0,
+    },
     isFocused: false,
     marks: null,
     isAtomic: false,

@@ -3,7 +3,7 @@
 import h from '../../../helpers/h'
 
 export default function(change) {
-  change.collapseToAnchor()
+  change.moveToEnd()
 }
 
 export const input = (
