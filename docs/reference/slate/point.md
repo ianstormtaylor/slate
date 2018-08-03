@@ -20,13 +20,13 @@ Point({
 
 `String`
 
-The key of the text node at the point's  point.
+The key of the text node at the point's point.
 
 ### `path`
 
 `List`
 
-The path to the text node at the point's  point.
+The path to the text node at the point's point.
 
 ### `object`
 
@@ -38,7 +38,7 @@ A string with a value of `'point'`.
 
 `Number`
 
-The number of characters from the start of the text node at the point's  point.
+The number of characters from the start of the text node at the point's point.
 
 ## Computed Properties
 
@@ -128,7 +128,7 @@ Return a new point with its offset moved forwards by `n` characters.
 `moveTo(key: String, offset: Number) => Point`
 `moveTo(offset: Number) => Point`
 
-Return a new point with its `path`, `key` and `offset` set to new values. 
+Return a new point with its `path`, `key` and `offset` set to new values.
 
 > 🤖 When using `point.moveTo`, since the point isn't aware of the document, it's possible it will become "unset" if the path or key changes and need to be re-normalized relative to the document using `point.normalize(document)`.
 
