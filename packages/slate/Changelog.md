@@ -86,9 +86,11 @@ const anchor = document.createPoint({
 
 ###### DEPRECATED
 
+**The selection-based shorts on `Value` were deprecated.** Previously you could access things like `anchorKey`, `startOffset` and `isCollapsed` directly on `Value` objects. This results in extra duplication that is hard to maintain over time, and hard for newcomers to understand, without much benefit. All of these properties are deprecated and should be accessed on the `value.selection` object directly instead.
+
 **The `Range` methods were standardized, with many deprecated.** The methods on `Range` objects had grown drastically in size. Many of them weren't consistently named, or overlapped in unnecessary ways. With the introduction of `Point` objects a lot of these methods could be cleaned up and their logic delegated to the points directly. All of these methods remain available but will raise deprecation warnings, making it easier to upgrade.
 
-_These are fairly low-level methods, so there's a very good chance you're only using a handful of them in your codebase. Either way, all of them will log warnings._
+_These are fairly low-level methods, so there's a very good chance you're only using a handful of them in your codebase. Either way, all of them will log warnings. For an example of migrating see [this commit](https://github.com/ianstormtaylor/slate/pull/2035/commits/1bc560ab6242bc015c9f6d3bd20086f18849f8b7)._
 
 Here's a full list of the newly deprecated methods and properties, and their new alternative if one exists:
 
@@ -163,7 +165,7 @@ startPath -> start.path
 
 **The selection-based changes were standardized, with many deprecated.** Similarly to the `Range` method deprecations, the same confusion and poor naming choices existed in the `Change` methods that dealt with selections. Many of them have been renamed for consistency, or deprecated when alternatives existed. All of these methods remain available but will raise deprecation warnings, making it easier to upgrade.
 
-_There's a very good chance you're only using a handful of these change methods in your codebase. Either way, all of them will log warnings._
+_There's a very good chance you're only using a handful of these change methods in your codebase. Either way, all of them will log warnings. For an example of migrating see [this commit](https://github.com/ianstormtaylor/slate/pull/2035/commits/1bc560ab6242bc015c9f6d3bd20086f18849f8b7)._
 
 Here's a full list of the newly deprecated changed methods, and their new alternative if one exists:
 
