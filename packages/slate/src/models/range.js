@@ -764,6 +764,18 @@ class Range extends Record(DEFAULTS) {
   }
 
   /**
+   * Set the `isFocused` property to a new `value`.
+   *
+   * @param {Boolean} value
+   * @return {Range}
+   */
+
+  setIsFocused(value) {
+    const range = this.set('isFocused', value)
+    return range
+  }
+
+  /**
    * Set the anchor and focus points to new `values`.
    *
    * @param {Array<Point>} values

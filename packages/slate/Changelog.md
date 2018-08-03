@@ -4,6 +4,242 @@ This document maintains a list of changes to the `slate` package with each new v
 
 ---
 
+### `0.37.0` — August 3, 2018
+
+###### NEW
+
+**Introducing the `Point` model.** Ranges are now built up of two `Point` models—an `anchor` and a `focus`—instead of having the properties set directly on the range itself. This makes the "point" concept first-class in Slate and better API's can be built around point objects.
+
+```js
+Point.create({
+  key: 'a',
+  path: [0, 0],
+  offset: 31,
+})
+```
+
+These points are exposed on `Range` objects via the `anchor`, `focus`, `start` and `end` properties:
+
+```js
+const { anchor, focus } = range
+change.removeNodeByKey(anchor.key)
+```
+
+These replace the earlier `anchorKey`, `anchorOffset`, etc. properties.
+
+**`Document.createRange` creates a relative range.** Previously you'd have to use `Range.create` and make sure that you passed valid arguments, and ensure that you "normalized" the range to sync its keys and paths. This is no longer the case, since the `createRange` method will do it for you.
+
+```js
+const range = document.createRange({
+  anchor: {
+    key: 'a',
+    offset: 1,
+  },
+  focus: {
+    key: 'a',
+    offset: 4,
+  }
+})
+```
+
+This will automatically ensure that the range references leaf text nodes, and that its `anchor` and `focus` paths are set.
+
+**`Document.createPoint` creates a relative point.** Just like the `createRange` method, `createPoint` will create a point that is guaranteed to be relative to the document itself. This is often a lot easier than using `Point.create` directly.
+
+```js
+const anchor = document.createPoint({
+  key: 'a',
+  offset: 1,
+})
+```
+
+###### BREAKING
+
+**The `Range.focus` method was removed. (Not `Change.focus`!)** This was necessary to make way for the new `range.focus` point property. Usually this would have been done in a migration-friendly way like the rest of the method changes in this release, but this was an exception. However the `change.focus()` method is still available and works as expected.
+
+**The `Range.toJSON()` structure has changed.** With the introduction of points, the range now returns its `anchor` and `focus` properties as nested point JSON objects instead of directly as properties. For example:
+
+```json
+{
+  "object": "range",
+  "anchor": {
+    "object": "point",
+    "key": "a",
+    "offset": 1,
+    "path": [0, 0]
+  },
+  "focus": {
+    "object": "point",
+    "key": "a",
+    "offset": 3,
+    "path": [0, 0],
+  },
+  "isFocused": false,
+  "isAtomic": false,
+  "marks": []
+}
+```
+
+###### DEPRECATED
+
+**The `Range` methods were standardized, with many deprecated.** The methods on `Range` objects had grown drastically in size. Many of them weren't consistently named, or overlapped in unnecessary ways. With the introduction of `Point` objects a lot of these methods could be cleaned up and their logic delegated to the points directly. All of these methods remain available but will raise deprecation warnings, making it easier to upgrade.
+
+_These are fairly low-level methods, so there's a very good chance you're only using a handful of them in your codebase. Either way, all of them will log warnings._
+
+Here's a full list of the newly deprecated methods and properties, and their new alternative if one exists:
+
+```rs
+anchorKey -> anchor.key
+anchorOffset -> anchor.offset
+anchorPath -> anchor.path
+blur -> setIsFocused
+collapseTo -> moveTo
+collapseToAnchor -> moveToAnchor
+collapseToEnd -> moveToEnd
+collapseToEndOf -> moveToEndOfNode
+collapseToFocus -> moveToFocus
+collapseToStart -> moveToStart
+collapseToStartOf -> moveToStartOfNode
+deselect -> Range.create
+endKey -> end.key
+endOffset -> end.offset
+endPath -> end.path
+extend -> moveFocus
+extendTo -> moveFocusTo
+extendToEndOf -> moveFocusToEndOfNode
+extendToStartOf -> moveFocusToStartOfNode
+focusKey -> focus.key
+focusOffset -> focus.offset
+focusPath -> focus.path
+hasAnchorAtEndOf -> anchor.isAtEndOfNode
+hasAnchorAtStartOf -> anchor.isAtStartOfNode
+hasAnchorBetween -> 
+hasAnchorIn -> anchor.isInNode
+hasEdgeAtEndOf -> anchor.isAtEndOfNode || focus.isAtEndOfNode
+hasEdgeAtStartOf -> anchor.isAtStartOfNode || focus.isAtStartOfNode
+hasEdgeBetween ->
+hasEdgeIn -> anchor.isInNode || focus.isInNode
+hasEndAtEndOf -> end.isAtEndOfNode
+hasEndAtStartOf -> end.isAtEndOfNode
+hasEndBetween -> 
+hasEndIn -> end.isInNode
+hasFocusAtEndOf -> focus.isAtEndOfNode
+hasFocusAtStartOf -> focus.isAtStartOfNode
+hasFocusBetween ->
+hasFocusIn -> focus.isInNode
+hasStartAtEndOf -> start.isAtEndOfNode
+hasStartAtStartOf -> start.isAtStartOfNode
+hasStartBetween -> 
+hasStartIn -> start.isInNode
+isAtEndOf -> isCollapsed && anchor.isAtEndOfNode
+isAtStartOf -> isCollapsed && anchor.isAtStartOfNode
+move -> moveForward/Backward
+moveAnchor -> moveAnchorForward/Backward
+moveAnchorOffsetTo -> moveAnchorTo
+moveAnchorOffsetTo -> moveAnchorTo
+moveAnchorToEndOf -> moveAnchorToEndOfNode
+moveAnchorToStartOf -> moveAnchorToStartOfNode
+moveEnd -> moveEndForward/Backward
+moveEndOffsetTo -> moveEndTo
+moveFocus -> moveFocusForward/Backward
+moveFocusOffsetTo -> moveFocusTo
+moveFocusOffsetTo -> moveFocusTo
+moveFocusToEndOf -> moveFocusToEndOfNode
+moveFocusToStartOf -> moveFocusToStartOfNode
+moveOffsetsTo -> moveAnchorTo && moveFocusTo
+moveStart -> moveStartForward/Backward
+moveStartOffsetTo -> moveStartTo
+moveToEndOf -> moveToEndOfNode
+moveToRangeOf -> moveToRangeOfNode
+moveToStartOf -> moveToStartOfNode
+startKey -> start.key
+startOffset -> start.offset
+startPath -> start.path
+```
+
+**The selection-based changes were standardized, with many deprecated.** Similarly to the `Range` method deprecations, the same confusion and poor naming choices existed in the `Change` methods that dealt with selections. Many of them have been renamed for consistency, or deprecated when alternatives existed. All of these methods remain available but will raise deprecation warnings, making it easier to upgrade.
+
+_There's a very good chance you're only using a handful of these change methods in your codebase. Either way, all of them will log warnings._
+
+Here's a full list of the newly deprecated changed methods, and their new alternative if one exists:
+
+```rs
+collapseCharBackward -> moveBackward
+collapseCharForward -> moveForward
+collapseLineBackward -> moveToStartOfBlock
+collapseLineForward -> moveToEndOfBlock
+collapseTo -> moveTo
+collapseToAnchor -> moveToAnchor
+collapseToEnd -> moveToEnd
+collapseToEndOf -> moveToEndOfNode
+collapseToEndOfBlock -> moveToEndOfBlock
+collapseToEndOfNextBlock -> moveToEndOfNextBlock
+collapseToEndOfNextText -> moveToEndOfNextText
+collapseToEndOfPreviousBlock -> moveToEndOfPreviousBlock
+collapseToEndOfPreviousText -> moveToEndOfPreviousText
+collapseToFocus -> moveToFocus
+collapseToStart -> moveToStart
+collapseToStartOf -> moveToStartOfNode
+collapseToStartOfBlock -> moveToStartOfBlock
+collapseToStartOfNextBlock -> moveToStartOfNextBlock
+collapseToStartOfNextText -> moveToStartOfNextText
+collapseToStartOfPreviousBlock -> moveToStartOfPreviousBlock
+collapseToStartOfPreviousText -> moveToStartOfPreviousText
+extend -> moveFocusForward/Backward
+extendCharBackward -> moveFocusBackward
+extendCharForward -> moveFocusForward
+extendLineBackward -> moveFocusToStartOfBlock
+extendLineForward -> moveFocusToEndOfBlock
+extendTo -> moveFocusTo
+extendToEndOf -> moveFocusToEndOfNode
+extendToEndOfBlock -> moveFocusToEndOfBlock
+extendToEndOfNextBlock -> moveFocusToEndOfNextBlock
+extendToEndOfNextInline -> moveFocusToEndOfNextInline
+extendToEndOfNextText -> moveFocusToEndOfNextText
+extendToEndOfPreviousBlock -> moveFocusToEndOfPreviousBlock
+extendToEndOfPreviousInline -> moveFocusToEndOfPreviousInline
+extendToEndOfPreviousText -> moveFocusToEndOfPreviousText
+extendToStartOf -> moveFocusToStartOfNode
+extendToStartOfBlock -> moveFocusToStartOfBlock
+extendToStartOfNextBlock -> moveFocusToStartOfNextBlock
+extendToStartOfNextInline -> moveFocusToStartOfNextInline
+extendToStartOfNextText -> moveFocusToStartOfNextText
+extendToStartOfPreviousBlock -> moveFocusToStartOfPreviousBlock
+extendToStartOfPreviousInline -> moveFocusToStartOfPreviousInline
+extendToStartOfPreviousText -> moveFocusToStartOfPreviousText
+move -> moveForward/Backward
+moveAnchor -> moveAnchorForward/Backward
+moveAnchorCharBackward -> moveAnchorBackward
+moveAnchorCharForward -> moveAnchorForward
+moveAnchorOffsetTo -> moveAnchorTo
+moveAnchorToEndOf -> moveAnchorToEndOfNode
+moveAnchorToStartOf -> moveAnchorToEndOfNode
+moveCharBackward -> moveBackward
+moveCharForward -> moveForward
+moveEnd -> moveEndForward/Backward
+moveEndCharBackward -> moveEndBackward
+moveEndCharForward -> moveEndForward
+moveEndOffsetTo -> moveEndTo
+moveFocus -> moveFocusForward/Backward
+moveFocusCharBackward -> moveFocusBackward
+moveFocusCharForward -> moveFocusForward
+moveFocusOffsetTo -> moveFocusTo
+moveFocusToEndOf -> moveFocusToEndOfNode
+moveFocusToStartOf -> moveFocusToEndOfNode
+moveOffsetsTo -> moveAnchorTo/moveFocusTo
+moveStart -> moveStartForward/Backward
+moveStartCharBackward -> moveStartBackward
+moveStartCharForward -> moveStartForward
+moveStartOffsetTo -> moveStartTo
+moveToEndOf -> moveToEndOfNode
+moveToRangeOf -> moveToRangeOfNode
+moveToStartOf -> moveToStartOfNode
+selectAll -> moveToRangeOfDocument
+```
+
+
+---
+
 ### `0.36.0` — July 27, 2018
 
 ###### BREAKING
@@ -83,6 +319,12 @@ This is just an attempt to make dealing with normalization errors slightly more 
 
 ### `0.35.0` — July 27, 2018
 
+###### NEW
+
+**`Range` objects now keep track of paths, in addition to keys.** Previously ranges only stored their points as keys. Now both paths and keys are used, which allows you to choose which one is the most convenient or most performant for your use case. They are kept in sync my Slate under the covers.
+
+**A new set of `*ByPath` change methods have been added.** All of the changes you could previously do with a `*ByKey` change are now also supported with a `*ByPath` change of the same name. The path-based changes are often more performant than the key-based ones.
+
 ###### BREAKING
 
 **Internal-yet-public `Node` methods have been changed.** There were a handful of internal methods that shouldn't be used in 99% of Slate implementations that updated or removed. This was done in the process of streamlining many of the `Node` methods to make them more consistent and easier to use. For a list of those affected:
@@ -101,15 +343,13 @@ This is just an attempt to make dealing with normalization errors slightly more 
 * `Node.areDescendantsSorted` and `Node.isInRange` were deprecated. These were used to check whether a node was in a range, but this can be done more performantly and more easily with paths now.
 * `Node.getNodeAtPath` and `Node.getDescendantAtPath` were deprecated. These were probably not in use by anyone, but if you were using them you can use the existing `Node.getNode` and `Node.getDescendant` methods instead which now take either paths or keys.
 
-###### NEW
-
-**`Range` objects now keep track of paths, in addition to keys.** Previously ranges only stored their points as keys. Now both paths and keys are used, which allows you to choose which one is the most convenient or most performant for your use case. They are kept in sync my Slate under the covers.
-
-**A new set of `*ByPath` change methods have been added.** All of the changes you could previously do with a `*ByKey` change are now also supported with a `*ByPath` change of the same name. The path-based changes are often more performant than the key-based ones.
-
 ---
 
 ### `0.34.0` — June 14, 2018
+
+###### NEW
+
+**Decorations can now be "atomic".** If you set a decoration as atomic, it will be removed when changed, preventing it from entering a "partial" state, which can be useful for some use cases.
 
 ###### BREAKING
 
@@ -118,10 +358,6 @@ This is just an attempt to make dealing with normalization errors slightly more 
 ###### DEPRECATED
 
 **The `Character` model is deprecated.** Although the character concept is still in the repository for now, it is deprecated and will be removed in a future release. Everything it solves can be solved with leaves instead.
-
-###### NEW
-
-**Decorations can now be "atomic".** If you set a decoration as atomic, it will be removed when changed, preventing it from entering a "partial" state, which can be useful for some use cases.
 
 ---
 
@@ -151,15 +387,15 @@ This is just an attempt to make dealing with normalization errors slightly more 
 
 ### `0.31.0` — November 16, 2017
 
+###### NEW
+
+**Added a new `Operation` model.** This model is used to store operations for the history stack, and (de)serializes them in a consistent way for collaborative editing use cases.
+
 ###### BREAKING
 
 **Operation objects in Slate are now immutable records.** Previously they were native, mutable Javascript objects. Now, there's a new immutable `Operation` model in Slate, ensuring that all of the data inside `Value` objects are immutable. And it allows for easy serialization of operations using `operation.toJSON()` for when sending them between editors. This should not affect most users, unless you are relying on changing the values of the low-level Slate operations (simply reading them is fine).
 
 **Operation lists in Slate are now immutable lists.** Previously they were native, mutable Javascript arrays. Now, to keep consistent with other immutable uses, they are immutable lists. This should not affect most users.
-
-###### NEW
-
-**Added a new `Operation` model.** This model is used to store operations for the history stack, and (de)serializes them in a consistent way for collaborative editing use cases.
 
 ---
 
@@ -173,6 +409,10 @@ This is just an attempt to make dealing with normalization errors slightly more 
 
 ### `0.29.0` — October 27, 2017
 
+###### NEW
+
+**Added the new `Value` model to replace `State`.** The new model is exactly the same, but with a new name. There is also a shimmed `State` model exported that warns when used, to ease migration.
+
 ###### BREAKING
 
 **The `set_state` operation has been renamed `set_value`**. This shouldn't affect almost anyone, but in the event that you were relying on the low-level operation types you'll need to update this.
@@ -181,23 +421,19 @@ This is just an attempt to make dealing with normalization errors slightly more 
 
 **The "state" has been renamed to "value" everywhere.** All of the current references are maintained as deprecations, so you should be able to upgrade and see warnings logged instead of being greeted with a broken editor. This is to reduce the confusion between React's "state" and Slate's editor value, and in an effort to further mimic the native DOM APIs.
 
-###### NEW
-
-**Added the new `Value` model to replace `State`.** The new model is exactly the same, but with a new name. There is also a shimmed `State` model exported that warns when used, to ease migration.
-
 ---
 
 ### `0.28.0` — October 25, 2017
+
+###### NEW
+
+**`State` objects now have an embedded `state.schema` property.** This new schema property is used to automatically normalize the state as it changes, according to the editor's current schema. This makes normalization much easier.
 
 ###### BREAKING
 
 **The `Schema` objects in Slate have changed!** Previously, they used to be where you could define normalization rules, define rendering rules, and define decoration rules. This was overloaded, and made other improvements hard. Now, rendering and decorating is done via the newly added plugin functions (`renderNode`, `renderMark`, `decorateNode`). And validation is done either via the lower-level `validateNode` plugin function, or via the new `schema` objects.
 
 **The `normalize*` change methods no longer take a `schema` argument.** Previously you had to maintain a reference to your schema, and pass it into the normalize methods when you called them. Since `State` objects now have an embedded `state.schema` property, this is no longer needed.
-
-###### NEW
-
-**`State` objects now have an embedded `state.schema` property.** This new schema property is used to automatically normalize the state as it changes, according to the editor's current schema. This makes normalization much easier.
 
 ---
 
@@ -227,13 +463,13 @@ This is just an attempt to make dealing with normalization errors slightly more 
 
 ###### DEPRECATED
 
-**The `setData` change method has been replaced by `setState`.** Previously you would call `change.setData(data)`. But as new `State` properties are introduced it doesn't make sense to need to add new change methods each time. Instead, the new `change.setState(properties)` more closesely mimics the existing `setMarkByKey` and `setNodeByKey`. To achieve the old behavior, you can do `change.setState({ data })`.
-
-**The `preserveStateData` option of `state.toJSON` has changed.** The same behavior is now called `preserveData` instead. This makes it consistent with all of the existing options, and the new `preserveDecorations` option as well.
-
 ###### NEW
 
 **You can now set decorations based on external information.** Previously, the "decoration" logic in Slate was always based off of the text of a node, and would only re-render when that text changed. Now, there is a new `state.decorations` property that you can set via `change.setState({ decorations })`. You can use this to add presentation-only marks to arbitrary ranges of text in the document. Check out the new [`search-highlighting`](https://github.com/ianstormtaylor/slate/blob/master/examples/search-highlighting/index.js) example to see this in action.
+
+**The `setData` change method has been replaced by `setState`.** Previously you would call `change.setData(data)`. But as new `State` properties are introduced it doesn't make sense to need to add new change methods each time. Instead, the new `change.setState(properties)` more closesely mimics the existing `setMarkByKey` and `setNodeByKey`. To achieve the old behavior, you can do `change.setState({ data })`.
+
+**The `preserveStateData` option of `state.toJSON` has changed.** The same behavior is now called `preserveData` instead. This makes it consistent with all of the existing options, and the new `preserveDecorations` option as well.
 
 ---
 
@@ -249,14 +485,6 @@ This is just an attempt to make dealing with normalization errors slightly more 
 
 ### `0.24.0` — September 11, 2017
 
-###### BREAKING
-
-**`immutable` is now a _peer_ dependency of Slate.** Previously it was a regular dependency, but this prevented you from bringing your own version, or you'd have duplication. You'll need to ensure you install it!
-
-**The `Html`, `Plain` and `Raw` serializers are broken into new packages.** Previously you'd import them from `slate`. But now you'll import them from `slate-html-serializer` and `slate-plain-serializer`. And the `Raw` serializer that was deprecated is now removed.
-
-**The `Editor` and `Placeholder` components are broken into a new React-specific package.** Previously you'd import them from `slate`. But now you `import { Editor } from 'slate-react'` instead.
-
 ###### NEW
 
 **Slate is now a "monorepo".** Instead of a single package, Slate has been divided up into individual packages so that you can only require what you need, cutting down on file size. In the process, some helpful modules that used to be internal-only are now exposed.
@@ -267,9 +495,23 @@ This is just an attempt to make dealing with normalization errors slightly more 
 
 **The `slate-simulator` package is now exposed.** Previously this was an internal testing utility, but now you can use it in your own tests as well. It's currently pretty bare bones, but we can add to it over time.
 
+###### BREAKING
+
+**`immutable` is now a _peer_ dependency of Slate.** Previously it was a regular dependency, but this prevented you from bringing your own version, or you'd have duplication. You'll need to ensure you install it!
+
+**The `Html`, `Plain` and `Raw` serializers are broken into new packages.** Previously you'd import them from `slate`. But now you'll import them from `slate-html-serializer` and `slate-plain-serializer`. And the `Raw` serializer that was deprecated is now removed.
+
+**The `Editor` and `Placeholder` components are broken into a new React-specific package.** Previously you'd import them from `slate`. But now you `import { Editor } from 'slate-react'` instead.
+
 ---
 
 ### `0.23.0` — September 10, 2017
+
+###### NEW
+
+**Slate models now have `Model.fromJSON(object)` and `model.toJSON()` methods.** These methods operate with the canonical JSON form (which used to be called "raw"). This way you don't need to `import` a serializer to retrieve JSON, if you have the model you can serialize/deserialize.
+
+**Models also have `toJS` and `fromJS` aliases.** This is just to match Immutable.js objects, which have both methods. For Slate though, the methods are equivalent.
 
 ###### BREAKING
 
@@ -287,15 +529,13 @@ This is just an attempt to make dealing with normalization errors slightly more 
 
 **The `defaultBlockType` of the `Html` serializer is now called `defaultBlock`.** This is just to make it more clear that it supports not only setting the default `type` but also `data` and `isVoid`.
 
-###### NEW
-
-**Slate models now have `Model.fromJSON(object)` and `model.toJSON()` methods.** These methods operate with the canonical JSON form (which used to be called "raw"). This way you don't need to `import` a serializer to retrieve JSON, if you have the model you can serialize/deserialize.
-
-**Models also have `toJS` and `fromJS` aliases.** This is just to match Immutable.js objects, which have both methods. For Slate though, the methods are equivalent.
-
 ---
 
 ### `0.22.0` — September 5, 2017
+
+###### NEW
+
+**The `state.activeMarks` returns the intersection of marks in the selection.** Previously there was only `state.marks` which returns marks that appeared on _any_ character in the selection. But `state.activeMarks` returns marks that appear on _every_ character in the selection, which is often more useful for implementing standard rich-text editor behaviors.
 
 ###### BREAKING
 
@@ -346,10 +586,6 @@ function onKeyDown(e, data, change) {
 ###### DEPRECATED
 
 **The `transform.apply()` method is deprecated.** Previously this is where the saving into the history would happen, but it created an awkward convention that wasn't necessary. Now operations are saved into the history as they are created with change methods, instead of waiting until the end. You can access the new `State` of a change at any time via `change.state`.
-
-###### NEW
-
-**The `state.activeMarks` returns the intersection of marks in the selection.** Previously there was only `state.marks` which returns marks that appeared on _any_ character in the selection. But `state.activeMarks` returns marks that appear on _every_ character in the selection, which is often more useful for implementing standard rich-text editor behaviors.
 
 ---
 

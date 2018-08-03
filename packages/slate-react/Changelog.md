@@ -4,6 +4,14 @@ This document maintains a list of changes to the `slate-react` package with each
 
 ---
 
+### `0.15.0` — August 3, 2018
+
+###### NEW
+
+**Updated to work with `slate@0.37.0` with points.** This isn't a breaking change to any of the API's in `slate-react` itself, but it does update it to no longer depend on the core API's that were deprecated in `0.37.0`.
+
+---
+
 ### `0.14.0` — July 27, 2018
 
 ###### NEW
