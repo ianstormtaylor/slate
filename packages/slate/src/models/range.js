@@ -14,10 +14,10 @@ import Mark from './mark'
 
 const DEFAULTS = {
   anchorKey: null,
-  anchorOffset: 0,
+  anchorOffset: null,
   anchorPath: null,
   focusKey: null,
-  focusOffset: 0,
+  focusOffset: null,
   focusPath: null,
   isAtomic: false,
   isBackward: null,
@@ -134,10 +134,10 @@ class Range extends Record(DEFAULTS) {
   static fromJSON(object) {
     const {
       anchorKey = null,
-      anchorOffset = 0,
+      anchorOffset = null,
       anchorPath = null,
       focusKey = null,
-      focusOffset = 0,
+      focusOffset = null,
       focusPath = null,
       isAtomic = false,
       isBackward = null,
@@ -398,7 +398,7 @@ class Range extends Record(DEFAULTS) {
    */
 
   hasFocusAtStartOf(node) {
-    if (this.focusOffset != 0) return false
+    if (this.focusOffset !== 0) return false
     const first = getFirstText(node)
     return this.focusKey == first.key
   }
@@ -489,10 +489,10 @@ class Range extends Record(DEFAULTS) {
   deselect() {
     return this.merge({
       anchorKey: null,
-      anchorOffset: 0,
+      anchorOffset: null,
       anchorPath: null,
       focusKey: null,
-      focusOffset: 0,
+      focusOffset: null,
       focusPath: null,
       isFocused: false,
       isBackward: false,
@@ -786,29 +786,14 @@ class Range extends Record(DEFAULTS) {
       isBackward,
     } = range
 
-    const anchorOffsetType = typeof anchorOffset
-    const focusOffsetType = typeof focusOffset
-
-    if (anchorOffsetType != 'number' || focusOffsetType != 'number') {
-      logger.warn(
-        `The range offsets should be numbers, but they were of type "${anchorOffsetType}" and "${focusOffsetType}".`
-      )
-    }
-
     // If either point in the range is unset, make sure it is fully unset.
     if (
       (anchorKey == null && anchorPath == null) ||
-      (focusKey == null && focusPath == null)
+      (focusKey == null && focusPath == null) ||
+      anchorOffset == null ||
+      focusOffset == null
     ) {
-      return range.merge({
-        anchorKey: null,
-        anchorOffset: 0,
-        anchorPath: null,
-        focusKey: null,
-        focusOffset: 0,
-        focusPath: null,
-        isBackward: false,
-      })
+      return Range.create()
     }
 
     // Get the anchor and focus nodes.
@@ -826,10 +811,10 @@ class Range extends Record(DEFAULTS) {
       const path = first && node.getPath(first.key)
       return range.merge({
         anchorKey: first ? first.key : null,
-        anchorOffset: 0,
+        anchorOffset: first ? 0 : null,
         anchorPath: first ? path : null,
         focusKey: first ? first.key : null,
-        focusOffset: 0,
+        focusOffset: first ? 0 : null,
         focusPath: first ? path : null,
         isBackward: false,
       })
