@@ -16,7 +16,7 @@ export const fixtures = (...args) => {
   const dir = basename(path)
   const d = options.skip ? describe.skip : describe
 
-  d(dir, async () => {
+  d(dir, () => {
     for (const file of files) {
       const p = resolve(path, file)
       const stat = fs.statSync(p)
