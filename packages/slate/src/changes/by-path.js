@@ -3,7 +3,6 @@ import Inline from '../models/inline'
 import Mark from '../models/mark'
 import Node from '../models/node'
 import PathUtils from '../utils/path-utils'
-import Range from '../models/range'
 
 /**
  * Changes.
@@ -343,12 +342,10 @@ Changes.replaceTextByPath = (
     length = node.text.length - offset
   }
 
-  const range = Range.create({
-    anchorPath: path,
-    focusPath: path,
-    anchorOffset: offset,
-    focusOffset: offset + length,
-  }).normalize(document)
+  const range = document.createRange({
+    anchor: { path, offset },
+    focus: { path, offset: offset + length },
+  })
 
   let activeMarks = document.getActiveMarksAtRange(range)
 
@@ -358,7 +355,8 @@ Changes.replaceTextByPath = (
     // Do not use mark at index when marks and activeMarks are both empty
     marks = activeMarks ? activeMarks : []
   } else if (activeMarks) {
-    // Do not use `has` because we may want to reset marks like font-size with an updated data;
+    // Do not use `has` because we may want to reset marks like font-size with
+    // an updated data;
     activeMarks = activeMarks.filter(
       activeMark => !marks.find(m => activeMark.type === m.type)
     )
@@ -597,7 +595,7 @@ Changes.unwrapInlineByPath = (change, path, properties, options) => {
   const node = document.assertNode(path)
   const first = node.getFirstText()
   const last = node.getLastText()
-  const range = selection.moveToRangeOf(first, last)
+  const range = selection.moveToRangeOfNode(first, last)
   change.unwrapInlineAtRange(range, properties, options)
 }
 
@@ -616,7 +614,7 @@ Changes.unwrapBlockByPath = (change, path, properties, options) => {
   const node = document.assertNode(path)
   const first = node.getFirstText()
   const last = node.getLastText()
-  const range = selection.moveToRangeOf(first, last)
+  const range = selection.moveToRangeOfNode(first, last)
   change.unwrapBlockAtRange(range, properties, options)
 }
 

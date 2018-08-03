@@ -1,16 +1,15 @@
 import findDOMNode from './find-dom-node'
 
 /**
- * Find a native DOM selection point from a Slate `key` and `offset`.
+ * Find a native DOM selection point from a Slate `point`.
  *
- * @param {String} key
- * @param {Number} offset
+ * @param {Point} point
  * @param {Window} win (optional)
  * @return {Object|Null}
  */
 
-function findDOMPoint(key, offset, win = window) {
-  const el = findDOMNode(key, win)
+function findDOMPoint(point, win = window) {
+  const el = findDOMNode(point.key, win)
   let start = 0
   let n
 
@@ -27,8 +26,8 @@ function findDOMPoint(key, offset, win = window) {
     const { length } = n.textContent
     const end = start + length
 
-    if (offset <= end) {
-      const o = offset - start
+    if (point.offset <= end) {
+      const o = point.offset - start
       return { node: n, offset: o >= 0 ? o : 0 }
     }
 

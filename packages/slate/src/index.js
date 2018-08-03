@@ -12,6 +12,7 @@ import Node from './models/node'
 import Operation from './models/operation'
 import Operations from './operations'
 import PathUtils from './utils/path-utils'
+import Point from './models/point'
 import Range from './models/range'
 import Schema from './models/schema'
 import Stack from './models/stack'
@@ -42,6 +43,7 @@ export {
   Operation,
   Operations,
   PathUtils,
+  Point,
   Range,
   resetKeyGenerator,
   resetMemoization,
@@ -68,6 +70,7 @@ export default {
   Operation,
   Operations,
   PathUtils,
+  Point,
   Range,
   resetKeyGenerator,
   resetMemoization,

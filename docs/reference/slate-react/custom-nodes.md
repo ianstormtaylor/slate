@@ -57,7 +57,7 @@ const value = editor.value
 
 ```js
 editor.change(change => {
-  change.selectAll().delete()
+  change.moveToRangeOfDocument().delete()
 })
 ```
 

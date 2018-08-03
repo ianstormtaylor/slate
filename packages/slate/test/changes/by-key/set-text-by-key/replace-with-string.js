@@ -3,7 +3,7 @@
 import h from '../../../helpers/h'
 
 export default function(change) {
-  change.setTextByKey(change.value.anchorKey, 'cat is cute')
+  change.setTextByKey(change.value.selection.anchor.key, 'cat is cute')
 }
 
 export const input = (

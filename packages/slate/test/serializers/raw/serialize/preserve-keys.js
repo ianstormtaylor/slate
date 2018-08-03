@@ -2,6 +2,8 @@
 
 import h from '../../../helpers/h'
 
+export const skip = true
+
 export const input = (
   <value>
     <document>

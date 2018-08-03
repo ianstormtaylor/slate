@@ -1,52 +1,71 @@
-import isEmpty from 'is-empty'
 import isPlainObject from 'is-plain-object'
 
-import { Block, Document, Inline, Mark, Node, Range, Text, Value } from 'slate'
+import {
+  Block,
+  Document,
+  Inline,
+  Mark,
+  Node,
+  Point,
+  Range,
+  Text,
+  Value,
+} from 'slate'
 
 /**
- * Create selection point constants, for comparison by reference.
+ * Point classes that can be created at different points in the document and
+ * then searched for afterwards, for creating ranges.
  *
- * @type {Object}
+ * @type {Class}
  */
 
-const ANCHOR = {}
-const CURSOR = {}
-const FOCUS = {}
+class CursorPoint {
+  constructor() {
+    this.offset = null
+  }
+}
 
-/**
- *  wrappers for decorator points, for comparison by instanceof,
- *  and for composition into ranges (anchor.combine(focus), etc)
- */
+class AnchorPoint {
+  constructor(attrs = {}) {
+    const { key = null, offset = null, path = null } = attrs
+    this.key = key
+    this.offset = offset
+    this.path = path
+  }
+}
 
-class DecoratorPoint {
-  constructor({ key, data }, marks) {
-    this._key = key
+class FocusPoint {
+  constructor(attrs = {}) {
+    const { key = null, offset = null, path = null } = attrs
+    this.key = key
+    this.offset = offset
+    this.path = path
+  }
+}
+
+class DecorationPoint {
+  constructor(attrs) {
+    const { key = null, data = {}, marks } = attrs
+    this.id = key
+    this.offset = 0
     this.marks = marks
     this.attribs = data || {}
     this.isAtomic = !!this.attribs.atomic
     delete this.attribs.atomic
     return this
   }
-  withPosition = offset => {
-    this.offset = offset
-    return this
-  }
-  addOffset = offset => {
-    this.offset += offset
-    return this
-  }
-  withKey = key => {
-    this.key = key
-    return this
-  }
   combine = focus => {
-    if (!(focus instanceof DecoratorPoint))
+    if (!(focus instanceof DecorationPoint))
       throw new Error('misaligned decorations')
     return Range.create({
-      anchorKey: this.key,
-      focusKey: focus.key,
-      anchorOffset: this.offset,
-      focusOffset: focus.offset,
+      anchor: {
+        key: this.key,
+        offset: this.offset,
+      },
+      focus: {
+        key: focus.key,
+        offset: focus.offset,
+      },
       marks: this.marks,
       isAtomic: this.isAtomic,
       ...this.attribs,
@@ -62,7 +81,7 @@ class DecoratorPoint {
 
 const CREATORS = {
   anchor(tagName, attributes, children) {
-    return ANCHOR
+    return new AnchorPoint(attributes)
   },
 
   block(tagName, attributes, children) {
@@ -73,7 +92,7 @@ const CREATORS = {
   },
 
   cursor(tagName, attributes, children) {
-    return CURSOR
+    return new CursorPoint()
   },
 
   document(tagName, attributes, children) {
@@ -84,7 +103,7 @@ const CREATORS = {
   },
 
   focus(tagName, attributes, children) {
-    return FOCUS
+    return new FocusPoint(attributes)
   },
 
   inline(tagName, attributes, children) {
@@ -102,109 +121,139 @@ const CREATORS = {
 
   decoration(tagName, attributes, children) {
     if (attributes.key) {
-      return new DecoratorPoint(attributes, [{ type: tagName }])
+      return new DecorationPoint({
+        ...attributes,
+        marks: [{ type: tagName }],
+      })
     }
 
-    const nodes = createChildren(children, { key: attributes.key })
+    const nodes = createChildren(children)
+    const node = nodes[0]
+    const { __decorations = [] } = node
+    const __decoration = {
+      anchorOffset: 0,
+      focusOffset: nodes.reduce((len, n) => len + n.text.length, 0),
+      marks: [{ type: tagName }],
+      isAtomic: !!attributes.data.atomic,
+    }
 
-    nodes[0].__decorations = (nodes[0].__decorations || []).concat([
-      {
-        anchorOffset: 0,
-        focusOffset: nodes.reduce((len, n) => len + n.text.length, 0),
-        marks: [{ type: tagName }],
-        isAtomic: !!attributes.data.atomic,
-      },
-    ])
+    __decorations.push(__decoration)
+    node.__decorations = __decorations
     return nodes
   },
 
   selection(tagName, attributes, children) {
-    return Range.create(attributes)
+    const anchor = children.find(c => c instanceof AnchorPoint)
+    const focus = children.find(c => c instanceof FocusPoint)
+    const selection = Range.create({
+      ...attributes,
+      anchor: anchor && {
+        key: anchor.key,
+        offset: anchor.offset,
+        path: anchor.path,
+      },
+      focus: focus && {
+        key: focus.key,
+        offset: focus.offset,
+        path: focus.path,
+      },
+    })
+
+    return selection
   },
 
   value(tagName, attributes, children) {
     const { data, normalize = true } = attributes
     const document = children.find(Document.isDocument)
     let selection = children.find(Range.isRange) || Range.create()
-    const props = {}
+    let anchor
+    let focus
     let decorations = []
-    const partialDecorations = {}
+    const partials = {}
 
     // Search the document's texts to see if any of them have the anchor or
-    // focus information saved, so we can set the selection.
+    // focus information saved, or decorations applied.
     if (document) {
       document.getTexts().forEach(text => {
         if (text.__anchor != null) {
-          props.anchorKey = text.key
-          props.anchorOffset = text.__anchor
-          props.isFocused = true
+          anchor = Point.create({ key: text.key, offset: text.__anchor.offset })
         }
 
         if (text.__focus != null) {
-          props.focusKey = text.key
-          props.focusOffset = text.__focus
-          props.isFocused = true
+          focus = Point.create({ key: text.key, offset: text.__focus.offset })
         }
-      })
 
-      // now check for decorations and hoist them to the top
-      document.getTexts().forEach(text => {
         if (text.__decorations != null) {
-          // add in all mark-like (keyless) decorations
-          decorations = decorations.concat(
-            text.__decorations.filter(d => d._key === undefined).map(d =>
-              Range.create({
-                ...d,
-                anchorKey: text.key,
-                focusKey: text.key,
+          text.__decorations.forEach(dec => {
+            const { id } = dec
+            let range
+
+            if (!id) {
+              range = Range.create({
+                anchor: {
+                  key: text.key,
+                  offset: dec.anchorOffset,
+                },
+                focus: {
+                  key: text.key,
+                  offset: dec.focusOffset,
+                },
+                marks: dec.marks,
+                isAtomic: dec.isAtomic,
               })
-            )
-          )
+            } else if (partials[id]) {
+              const partial = partials[id]
+              delete partials[id]
 
-          // store or combine partial decorations (keyed with anchor / focus)
-          text.__decorations
-            .filter(d => d._key !== undefined)
-            .forEach(partial => {
-              if (partialDecorations[partial._key]) {
-                decorations.push(
-                  partialDecorations[partial._key].combine(
-                    partial.withKey(text.key)
-                  )
-                )
+              range = Range.create({
+                anchor: {
+                  key: partial.key,
+                  offset: partial.offset,
+                },
+                focus: {
+                  key: text.key,
+                  offset: dec.offset,
+                },
+                marks: partial.marks,
+                isAtomic: partial.isAtomic,
+              })
+            } else {
+              dec.key = text.key
+              partials[id] = dec
+            }
 
-                delete partialDecorations[partial._key]
-                return
-              }
-
-              partialDecorations[partial._key] = partial.withKey(text.key)
-            })
+            if (range) {
+              decorations.push(range)
+            }
+          })
         }
       })
     }
 
-    // should have no more parital decorations outstanding (all paired)
-    if (Object.keys(partialDecorations).length > 0) {
+    if (Object.keys(partials).length > 0) {
       throw new Error(
-        `Slate hyperscript must have both an anchor and focus defined for each keyed decorator.`
+        `Slate hyperscript must have both a start and an end defined for each decoration using the \`key=\` prop.`
       )
     }
 
-    if (props.anchorKey && !props.focusKey) {
+    if (anchor && !focus) {
       throw new Error(
-        `Slate hyperscript must have both \`<anchor/>\` and \`<focus/>\` defined if one is defined, but you only defined \`<anchor/>\`. For collapsed selections, use \`<cursor/>\`.`
+        `Slate hyperscript ranges must have both \`<anchor />\` and \`<focus />\` defined if one is defined, but you only defined \`<anchor />\`. For collapsed selections, use \`<cursor />\` instead.`
       )
     }
 
-    if (!props.anchorKey && props.focusKey) {
+    if (!anchor && focus) {
       throw new Error(
-        `Slate hyperscript must have both \`<anchor/>\` and \`<focus/>\` defined if one is defined, but you only defined \`<focus/>\`. For collapsed selections, use \`<cursor/>\`.`
+        `Slate hyperscript ranges must have both \`<anchor />\` and \`<focus />\` defined if one is defined, but you only defined \`<focus />\`. For collapsed selections, use \`<cursor />\` instead.`
       )
     }
 
     let value = Value.fromJSON({ data, document, selection }, { normalize })
 
-    if (!isEmpty(props)) {
-      selection = selection.merge(props).normalize(value.document)
+    if (anchor || focus) {
+      selection = selection.setPoints([anchor, focus])
+      selection = selection.merge({ isFocused: true })
+      selection = selection.normalize(value.document)
       value = value.set('selection', selection)
     }
 
@@ -336,36 +385,47 @@ function createChildren(children, options = {}) {
         i += leaf.text.length
       })
 
-      if (__anchor != null) node.__anchor = __anchor + length
-      if (__focus != null) node.__focus = __focus + length
+      if (__anchor != null) {
+        node.__anchor = new AnchorPoint()
+        node.__anchor.offset = __anchor.offset + length
+      }
+
+      if (__focus != null) {
+        node.__focus = new FocusPoint()
+        node.__focus.offset = __focus.offset + length
+      }
 
       if (__decorations != null) {
-        node.__decorations = (node.__decorations || []).concat(
-          __decorations.map(
-            d =>
-              d instanceof DecoratorPoint
-                ? d.addOffset(length)
-                : {
-                    ...d,
-                    anchorOffset: d.anchorOffset + length,
-                    focusOffset: d.focusOffset + length,
-                  }
-          )
-        )
+        __decorations.forEach(d => {
+          if (d instanceof DecorationPoint) {
+            d.offset += length
+          } else {
+            d.anchorOffset += length
+            d.focusOffset += length
+          }
+        })
+
+        node.__decorations = node.__decorations || []
+        node.__decorations = node.__decorations.concat(__decorations)
       }
 
       length += child.text.length
     }
 
-    // If the child is a selection object store the current position.
-    if (child == ANCHOR || child == CURSOR) node.__anchor = length
-    if (child == FOCUS || child == CURSOR) node.__focus = length
+    if (child instanceof AnchorPoint || child instanceof CursorPoint) {
+      child.offset = length
+      node.__anchor = child
+    }
 
-    // if child is a decorator point, store it as partial decorator
-    if (child instanceof DecoratorPoint) {
-      node.__decorations = (node.__decorations || []).concat([
-        child.withPosition(length),
-      ])
+    if (child instanceof FocusPoint || child instanceof CursorPoint) {
+      child.offset = length
+      node.__focus = child
+    }
+
+    if (child instanceof DecorationPoint) {
+      child.offset = length
+      node.__decorations = node.__decorations || []
+      node.__decorations = node.__decorations.concat(child)
     }
   })
 

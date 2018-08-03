@@ -2,6 +2,8 @@
 
 import h from '../../../helpers/h'
 
+export const skip = true
+
 export const input = (
   <value>
     <document>
@@ -41,13 +43,18 @@ export const output = {
   },
   selection: {
     object: 'range',
-    anchorKey: '0',
-    anchorPath: [0, 0],
-    anchorOffset: 0,
-    focusKey: '0',
-    focusPath: [0, 0],
-    focusOffset: 0,
-    isBackward: false,
+    anchor: {
+      object: 'point',
+      key: '0',
+      path: [0, 0],
+      offset: 0,
+    },
+    focus: {
+      object: 'point',
+      key: '0',
+      path: [0, 0],
+      offset: 0,
+    },
     isFocused: false,
     marks: null,
     isAtomic: false,

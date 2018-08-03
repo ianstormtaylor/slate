@@ -66,6 +66,7 @@
     "rollup-plugin-uglify": "^3.0.0",
     "slate-collapse-on-escape": "^0.6.0",
     "slate-dev-benchmark": "*",
+    "slate-dev-test-utils": "*",
     "slate-soft-break": "^0.6.0",
     "source-map-loader": "^0.2.3",
     "source-map-support": "^0.4.0",

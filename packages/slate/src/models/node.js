@@ -10,6 +10,7 @@ import Inline from './inline'
 import KeyUtils from '../utils/key-utils'
 import memoize from '../utils/memoize'
 import PathUtils from '../utils/path-utils'
+import Point from './point'
 import Range from './range'
 import Text from './text'
 import { isType } from '../constants/model-types'
@@ -206,6 +207,32 @@ class Node {
   }
 
   /**
+   * Create a point with `properties` relative to the node.
+   *
+   * @param {Object|Point} properties
+   * @return {Range}
+   */
+
+  createPoint(properties) {
+    properties = Point.createProperties(properties)
+    const point = this.resolvePoint(properties)
+    return point
+  }
+
+  /**
+   * Create a range with `properties` relative to the node.
+   *
+   * @param {Object|Range} properties
+   * @return {Range}
+   */
+
+  createRange(properties) {
+    properties = Range.createProperties(properties)
+    const range = this.resolveRange(properties)
+    return range
+  }
+
+  /**
    * Recursively filter all descendant nodes with `iterator`.
    *
    * @param {Function} iterator
@@ -275,15 +302,19 @@ class Node {
    */
 
   getActiveMarksAtRange(range) {
-    range = range.normalize(this)
+    range = this.resolveRange(range)
     if (range.isUnset) return Set()
 
     if (range.isCollapsed) {
-      const { startKey, startOffset } = range
-      return this.getMarksAtPosition(startKey, startOffset).toSet()
+      const { start } = range
+      return this.getMarksAtPosition(start.key, start.offset).toSet()
     }
 
-    let { startKey, endKey, startOffset, endOffset } = range
+    const { start, end } = range
+    let startKey = start.key
+    let startOffset = start.offset
+    let endKey = end.key
+    let endOffset = end.offset
     let startText = this.getDescendant(startKey)
 
     if (startKey !== endKey) {
@@ -397,21 +428,21 @@ class Node {
    */
 
   getBlocksAtRangeAsArray(range) {
-    range = range.normalize(this)
+    range = this.resolveRange(range)
     if (range.isUnset) return []
 
-    const { startKey, endKey } = range
-    const startBlock = this.getClosestBlock(startKey)
+    const { start, end } = range
+    const startBlock = this.getClosestBlock(start.key)
 
     // PERF: the most common case is when the range is in a single block node,
     // where we can avoid a lot of iterating of the tree.
-    if (startKey === endKey) return [startBlock]
+    if (start.key === end.key) return [startBlock]
 
-    const endBlock = this.getClosestBlock(endKey)
+    const endBlock = this.getClosestBlock(end.key)
     const blocks = this.getBlocksAsArray()
-    const start = blocks.indexOf(startBlock)
-    const end = blocks.indexOf(endBlock)
-    return blocks.slice(start, end + 1)
+    const startIndex = blocks.indexOf(startBlock)
+    const endIndex = blocks.indexOf(endBlock)
+    return blocks.slice(startIndex, endIndex + 1)
   }
 
   /**
@@ -632,16 +663,16 @@ class Node {
    */
 
   getFragmentAtRange(range) {
-    range = range.normalize(this)
+    range = this.resolveRange(range)
 
     if (range.isUnset) {
       return Document.create()
     }
 
-    const { startPath, startOffset, endPath, endOffset } = range
+    const { start, end } = range
     let node = this
-    let targetPath = endPath
-    let targetPosition = endOffset
+    let targetPath = end.path
+    let targetPosition = end.offset
     let mode = 'end'
 
     while (targetPath.size) {
@@ -651,14 +682,14 @@ class Node {
       targetPath = PathUtils.lift(targetPath)
 
       if (!targetPath.size && mode === 'end') {
-        targetPath = startPath
-        targetPosition = startOffset
+        targetPath = start.path
+        targetPosition = start.offset
         mode = 'start'
       }
     }
 
-    const startIndex = startPath.first() + 1
-    const endIndex = endPath.first() + 2
+    const startIndex = start.path.first() + 1
+    const endIndex = end.path.first() + 2
     const nodes = node.nodes.slice(startIndex, endIndex)
     const fragment = Document.create({ nodes })
     return fragment
@@ -799,7 +830,7 @@ class Node {
    */
 
   getInlinesAtRangeAsArray(range) {
-    range = range.normalize(this)
+    range = this.resolveRange(range)
     if (range.isUnset) return []
 
     const array = this.getTextsAtRangeAsArray(range)
@@ -852,17 +883,20 @@ class Node {
    */
 
   getInsertMarksAtRange(range) {
-    range = range.normalize(this)
-    if (range.isUnset) return Set()
+    range = this.resolveRange(range)
+    const { start } = range
+
+    if (range.isUnset) {
+      return Set()
+    }
 
     if (range.isCollapsed) {
       // PERF: range is not cachable, use key and offset as proxies for cache
-      return this.getMarksAtPosition(range.startKey, range.startOffset)
+      return this.getMarksAtPosition(start.key, start.offset)
     }
 
-    const { startKey, startOffset } = range
-    const text = this.getDescendant(startKey)
-    const marks = text.getMarksAtIndex(startOffset + 1)
+    const text = this.getDescendant(start.key)
+    const marks = text.getMarksAtIndex(start.offset + 1)
     return marks
   }
 
@@ -1138,7 +1172,7 @@ class Node {
    */
 
   getOffsetAtRange(range) {
-    range = range.normalize(this)
+    range = this.resolveRange(range)
 
     if (range.isUnset) {
       throw new Error('The range cannot be unset to calculcate its offset.')
@@ -1148,8 +1182,8 @@ class Node {
       throw new Error('The range must be collapsed to calculcate its offset.')
     }
 
-    const { startKey, startOffset } = range
-    const offset = this.getOffset(startKey) + startOffset
+    const { start } = range
+    const offset = this.getOffset(start.key) + start.offset
     return offset
   }
 
@@ -1173,20 +1207,23 @@ class Node {
    */
 
   getOrderedMarksAtRange(range) {
-    range = range.normalize(this)
-    if (range.isUnset) return OrderedSet()
+    range = this.resolveRange(range)
+    const { start, end } = range
+
+    if (range.isUnset) {
+      return OrderedSet()
+    }
 
     if (range.isCollapsed) {
       // PERF: range is not cachable, use key and offset as proxies for cache
-      return this.getMarksAtPosition(range.startKey, range.startOffset)
+      return this.getMarksAtPosition(start.key, start.offset)
     }
 
-    const { startKey, startOffset, endKey, endOffset } = range
     const marks = this.getOrderedMarksBetweenPositions(
-      startKey,
-      startOffset,
-      endKey,
-      endOffset
+      start.key,
+      start.offset,
+      end.key,
+      end.offset
     )
 
     return marks
@@ -1368,7 +1405,7 @@ class Node {
    */
 
   getSelectionIndexes(range, isSelected = true) {
-    const { startKey, endKey } = range
+    const { start, end } = range
 
     // PERF: if we're not selected, we can exit early.
     if (!isSelected) {
@@ -1382,32 +1419,32 @@ class Node {
 
     // PERF: if the start and end keys are the same, just check for the child
     // that contains that single key.
-    if (startKey == endKey) {
-      const child = this.getFurthestAncestor(startKey)
+    if (start.key == end.key) {
+      const child = this.getFurthestAncestor(start.key)
       const index = child ? this.nodes.indexOf(child) : null
       return { start: index, end: index + 1 }
     }
 
     // Otherwise, check all of the children...
-    let start = null
-    let end = null
+    let startIndex = null
+    let endIndex = null
 
     this.nodes.forEach((child, i) => {
       if (child.object == 'text') {
-        if (start == null && child.key == startKey) start = i
-        if (end == null && child.key == endKey) end = i + 1
+        if (startIndex == null && child.key == start.key) startIndex = i
+        if (endIndex == null && child.key == end.key) endIndex = i + 1
       } else {
-        if (start == null && child.hasDescendant(startKey)) start = i
-        if (end == null && child.hasDescendant(endKey)) end = i + 1
+        if (startIndex == null && child.hasDescendant(start.key)) startIndex = i
+        if (endIndex == null && child.hasDescendant(end.key)) endIndex = i + 1
       }
 
       // PERF: exit early if both start and end have been found.
-      return start == null || end == null
+      return startIndex == null || endIndex == null
     })
 
-    if (isSelected && start == null) start = 0
-    if (isSelected && end == null) end = this.nodes.size
-    return start == null ? null : { start, end }
+    if (isSelected && startIndex == null) startIndex = 0
+    if (isSelected && endIndex == null) endIndex = this.nodes.size
+    return startIndex == null ? null : { start: startIndex, end: endIndex }
   }
 
   /**
@@ -1497,11 +1534,11 @@ class Node {
    */
 
   getTextsAtRange(range) {
-    range = range.normalize(this)
+    range = this.resolveRange(range)
     if (range.isUnset) return List()
-    const { startKey, endKey } = range
+    const { start, end } = range
     const list = new List(
-      this.getTextsBetweenPositionsAsArray(startKey, endKey)
+      this.getTextsBetweenPositionsAsArray(start.key, end.key)
     )
 
     return list
@@ -1515,10 +1552,10 @@ class Node {
    */
 
   getTextsAtRangeAsArray(range) {
-    range = range.normalize(this)
+    range = this.resolveRange(range)
     if (range.isUnset) return []
-    const { startKey, endKey } = range
-    const texts = this.getTextsBetweenPositionsAsArray(startKey, endKey)
+    const { start, end } = range
+    const texts = this.getTextsBetweenPositionsAsArray(start.key, end.key)
     return texts
   }
 
@@ -1796,6 +1833,18 @@ class Node {
   }
 
   /**
+   * Normalize the node with a `schema`.
+   *
+   * @param {Schema} schema
+   * @return {Function|Void}
+   */
+
+  normalize(schema) {
+    const normalizer = schema.normalizeNode(this)
+    return normalizer
+  }
+
+  /**
    * Attempt to "refind" a node by a previous `path`, falling back to looking
    * it up by `key` again.
    *
@@ -1938,6 +1987,34 @@ class Node {
   }
 
   /**
+   * Resolve a `point`, relative to the node, ensuring that the keys and
+   * offsets in the point exist and that they are synced with the paths.
+   *
+   * @param {Point|Object} point
+   * @return {Point}
+   */
+
+  resolvePoint(point) {
+    point = Point.create(point)
+    point = point.normalize(this)
+    return point
+  }
+
+  /**
+   * Resolve a `range`, relative to the node, ensuring that the keys and
+   * offsets in the range exist and that they are synced with the paths.
+   *
+   * @param {Range|Object} range
+   * @return {Range}
+   */
+
+  resolveRange(range) {
+    range = Range.create(range)
+    range = range.normalize(this)
+    return range
+  }
+
+  /**
    * Set `properties` on a node.
    *
    * @param {List|String} path
@@ -2004,17 +2081,6 @@ class Node {
     ret = ret.insertNode(path, b)
     ret = ret.insertNode(path, a)
     return ret
-  }
-
-  /**
-   * Normalize the node with a `schema`.
-   *
-   * @param {Schema} schema
-   * @return {Function|Void}
-   */
-
-  normalize(schema) {
-    return schema.normalizeNode(this)
   }
 
   /**
@@ -2098,7 +2164,7 @@ class Node {
       'The `Node.isInRange` method is deprecated. Use the new `PathUtils.compare` helper instead.'
     )
 
-    range = range.normalize(this)
+    range = this.resolveRange(range)
 
     const node = this
     const { startKey, endKey, isCollapsed } = range

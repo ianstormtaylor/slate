@@ -21,7 +21,7 @@ Here's a really simple plugin:
   },
   onClick(event, change, editor) {
     if (change.value.isBlurred) {
-      change.selectAll().focus()
+      change.moveToRangeOfDocument().focus()
     }
   }  
 }
@@ -287,7 +287,10 @@ const plugins = [
   AddMark({
     hotkey: 'cmd+opt+c',
     change: change => {
-      change.addMark({ type: 'comment', data: { id: userId } }).selectAll()
+      change
+        .addMark({ type: 'comment', data: { id: userId } })
+        .moveBackward(3)
+        .delete()
     },
   }),
 ]

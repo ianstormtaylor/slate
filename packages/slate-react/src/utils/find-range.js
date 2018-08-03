@@ -1,6 +1,5 @@
 import getWindow from 'get-window'
 import isBackward from 'selection-is-backward'
-import { Range } from 'slate'
 import { IS_IE, IS_EDGE } from 'slate-dev-environment'
 
 import findPoint from './find-point'
@@ -49,8 +48,8 @@ function findRange(native, value) {
   // last word of a span, it sets the endContainer to the containing span.
   // `selection-is-backward` doesn't handle this case.
   if (IS_IE || IS_EDGE) {
-    const domAnchor = findDOMPoint(anchor.key, anchor.offset)
-    const domFocus = findDOMPoint(focus.key, focus.offset)
+    const domAnchor = findDOMPoint(anchor)
+    const domFocus = findDOMPoint(focus)
 
     native = {
       anchorNode: domAnchor.node,
@@ -60,11 +59,10 @@ function findRange(native, value) {
     }
   }
 
-  const range = Range.create({
-    anchorKey: anchor.key,
-    anchorOffset: anchor.offset,
-    focusKey: focus.key,
-    focusOffset: focus.offset,
+  const { document } = value
+  const range = document.createRange({
+    anchor,
+    focus,
     isBackward: isCollapsed ? false : isBackward(native),
     isFocused: true,
   })

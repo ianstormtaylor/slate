@@ -21,7 +21,7 @@ const VOID_SELECTOR = '[data-slate-void]'
  * @param {Element} nativeNode
  * @param {Number} nativeOffset
  * @param {Value} value
- * @return {Object}
+ * @return {Point}
  */
 
 function findPoint(nativeNode, nativeOffset, value) {
@@ -78,10 +78,8 @@ function findPoint(nativeNode, nativeOffset, value) {
   // then afterwards for the correct `element`. (2017/03/03)
   if (!value.document.hasDescendant(key)) return null
 
-  return {
-    key,
-    offset,
-  }
+  const point = value.document.createPoint({ key, offset })
+  return point
 }
 
 /**

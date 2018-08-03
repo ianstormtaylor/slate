@@ -4,6 +4,27 @@ This document maintains a list of changes to the `slate-hyperscript` package wit
 
 ---
 
+### `0.7.0` — August 3, 2018
+
+###### NEW
+
+**Updated to work with `slate@0.37.0` with points.** This isn't a breaking change to any of the API's in `slate-hyperscript` itself, but it does update it to no longer depend on the core API's that were deprecated in `0.37.0`.
+
+###### DEPRECATED
+
+**The `<selection>` tag now takes `<anchor />` and `<focus />` children.** Previously you would set properties like `anchorKey=` or `focusOffset=` directly on the `<selection>` itself, but now these are handled as two children point tags:
+
+```jsx
+const selection = (
+  <selection>
+    <anchor key="a" offset={1} />
+    <focus key="a" offset={3} />
+  </selection>
+)
+```
+
+---
+
 ### `0.6.0` — July 27, 2018
 
 ###### NEW

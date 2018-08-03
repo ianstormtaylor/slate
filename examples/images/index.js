@@ -61,7 +61,7 @@ function insertImage(change, src, target) {
 
 const schema = {
   document: {
-    last: { types: ['paragraph'] },
+    last: { type: 'paragraph' },
     normalize: (change, reason, { node, child }) => {
       switch (reason) {
         case LAST_CHILD_TYPE_INVALID: {

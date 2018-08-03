@@ -42,9 +42,9 @@ PROXY_TRANSFORMS.forEach(method => {
     change[methodAtRange](selection, ...args)
 
     if (method.match(/Backward$/)) {
-      change.collapseToStart()
+      change.moveToStart()
     } else if (method.match(/Forward$/)) {
-      change.collapseToEnd()
+      change.moveToEnd()
     }
   }
 })
@@ -117,7 +117,7 @@ Changes.delete = change => {
   // Ensure that the selection is collapsed to the start, because in certain
   // cases when deleting across inline nodes, when splitting the inline node the
   // end point of the selection will end up after the split point.
-  change.collapseToStart()
+  change.moveToStart()
 }
 
 /**
@@ -135,7 +135,7 @@ Changes.insertBlock = (change, block) => {
 
   // If the node was successfully inserted, update the selection.
   const node = change.value.document.getNode(block.key)
-  if (node) change.collapseToEndOf(node)
+  if (node) change.moveToEndOfNode(node)
 }
 
 /**
@@ -150,6 +150,7 @@ Changes.insertFragment = (change, fragment) => {
 
   let { value } = change
   let { document, selection } = value
+  const { start, end } = selection
   const { startText, endText, startInline } = value
   const lastText = fragment.getLastText()
   const lastInline = fragment.getClosestInline(lastText.key)
@@ -158,8 +159,8 @@ Changes.insertFragment = (change, fragment) => {
   const keys = document.getTexts().map(text => text.key)
   const isAppending =
     !startInline ||
-    selection.hasEdgeAtStartOf(startText) ||
-    selection.hasEdgeAtEndOf(endText)
+    (start.isAtStartOfNode(startText) || end.isAtStartOfNode(startText)) ||
+    (start.isAtEndOfNode(endText) || end.isAtEndOfNode(endText))
 
   const isInserting =
     firstChild.hasBlockChildren() || lastChild.hasBlockChildren()
@@ -172,13 +173,13 @@ Changes.insertFragment = (change, fragment) => {
   const newText = isAppending ? newTexts.last() : newTexts.takeLast(2).first()
 
   if (newText && (lastInline || isInserting)) {
-    change.select(selection.collapseToEndOf(newText))
+    change.select(selection.moveToEndOfNode(newText))
   } else if (newText) {
     change.select(
-      selection.collapseToStartOf(newText).move(lastText.text.length)
+      selection.moveToStartOfNode(newText).moveForward(lastText.text.length)
     )
   } else {
-    change.select(selection.collapseToStart().move(lastText.text.length))
+    change.select(selection.moveToStart().moveForward(lastText.text.length))
   }
 }
 
@@ -197,7 +198,7 @@ Changes.insertInline = (change, inline) => {
 
   // If the node was successfully inserted, update the selection.
   const node = change.value.document.getNode(inline.key)
-  if (node) change.collapseToEndOf(node)
+  if (node) change.moveToEndOfNode(node)
 }
 
 /**
@@ -232,7 +233,7 @@ Changes.splitBlock = (change, depth = 1) => {
   const { value } = change
   const { selection, document } = value
   const marks = selection.marks || document.getInsertMarksAtRange(selection)
-  change.splitBlockAtRange(selection, depth).collapseToEnd()
+  change.splitBlockAtRange(selection, depth).moveToEnd()
 
   if (marks && marks.size !== 0) {
     change.select({ marks })
@@ -312,12 +313,12 @@ Changes.wrapText = (change, prefix, suffix = prefix) => {
 
   // If the selection was collapsed, it will have moved the start offset too.
   if (selection.isCollapsed) {
-    change.moveStart(0 - prefix.length)
+    change.moveStartBackward(prefix.length)
   }
 
   // Adding the suffix will have pushed the end of the selection further on, so
   // we need to move it back to account for this.
-  change.moveEnd(0 - suffix.length)
+  change.moveEndBackward(suffix.length)
 
   // There's a chance that the selection points moved "through" each other,
   // resulting in a now-incorrect selection direction.
