@@ -90,7 +90,7 @@ const anchor = document.createPoint({
 
 **The `Range` methods were standardized, with many deprecated.** The methods on `Range` objects had grown drastically in size. Many of them weren't consistently named, or overlapped in unnecessary ways. With the introduction of `Point` objects a lot of these methods could be cleaned up and their logic delegated to the points directly. All of these methods remain available but will raise deprecation warnings, making it easier to upgrade.
 
-_These are fairly low-level methods, so there's a very good chance you're only using a handful of them in your codebase. Either way, all of them will log warnings. For an example of migrating see [this commit](https://github.com/ianstormtaylor/slate/pull/2035/commits/1bc560ab6242bc015c9f6d3bd20086f18849f8b7)._
+_There's a very good chance you're only using a handful of them in your codebase. Either way, all of them will log warnings. For an example of migrating see [this commit](https://github.com/ianstormtaylor/slate/pull/2035/commits/1bc560ab6242bc015c9f6d3bd20086f18849f8b7)._
 
 Here's a full list of the newly deprecated methods and properties, and their new alternative if one exists:
 
