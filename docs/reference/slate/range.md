@@ -16,7 +16,9 @@ Often times, you don't need to specifically know which point is the "anchor" and
 Range({
   anchor: Point,
   focus: Point,
+  isAtomic: Boolean,
   isFocused: Boolean,
+  marks: Set,
 })
 ```
 
@@ -32,11 +34,23 @@ The range's anchor point.
 
 The range's focus point.
 
+### `isAtomic`
+
+`Boolean`
+
+Whether the range is atomic (for decorations only).
+
 ### `isFocused`
 
 `Boolean`
 
 Whether the range currently has focus.
+
+### `marks`
+
+`Set`
+
+A set of marks associated with the range.
 
 ### `object`
 
@@ -209,6 +223,24 @@ Return a new range with a new `end` point.
 `setFocus(focus: Point) => Range`
 
 Return a new range with a new `focus` point.
+
+### `setIsAtomic`
+
+`setIsAtomic(isAtomic: Boolean) => Range`
+
+Return a new range with a new `isAtomic` value.
+
+### `setIsFocused`
+
+`setIsFocused(isFocused: Boolean) => Range`
+
+Return a new range with a new `isFocused` value.
+
+### `setMarks`
+
+`setMarks(marks: Set|Null) => Range`
+
+Return a new range with a new set of `marks`.
 
 ### `setProperties`
 

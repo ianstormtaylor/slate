@@ -764,6 +764,18 @@ class Range extends Record(DEFAULTS) {
   }
 
   /**
+   * Set the `isAtomic` property to a new `value`.
+   *
+   * @param {Boolean} value
+   * @return {Range}
+   */
+
+  setIsAtomic(value) {
+    const range = this.set('isAtomic', value)
+    return range
+  }
+
+  /**
    * Set the `isFocused` property to a new `value`.
    *
    * @param {Boolean} value
@@ -772,6 +784,18 @@ class Range extends Record(DEFAULTS) {
 
   setIsFocused(value) {
     const range = this.set('isFocused', value)
+    return range
+  }
+
+  /**
+   * Set the `marks` property to a new set of `marks`.
+   *
+   * @param {Set} marks
+   * @return {Range}
+   */
+
+  setMarks(marks) {
+    const range = this.set('marks', marks)
     return range
   }
 
