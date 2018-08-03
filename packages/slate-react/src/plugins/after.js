@@ -349,7 +349,7 @@ function AfterPlugin() {
       .moveAnchorTo(point.key, start)
       .moveFocusTo(point.key, end)
 
-    entire = document.normalizeRange(entire)
+    entire = document.resolveRange(entire)
 
     // Change the current value to have the leaf's text replaced.
     change.insertTextAtRange(entire, textContent, leaf.marks).select(corrected)
