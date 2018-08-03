@@ -229,22 +229,6 @@ function shouldMerge(o, p) {
 }
 
 /**
- * Check whether to skip a new operation `o`, given previous operation `p`.
- *
- * @param {Object} o
- * @param {Object} p
- * @return {Boolean}
- */
-
-function shouldSkip(o, p) {
-  if (!p) return false
-
-  const skip = o.type == 'set_selection' && p.type == 'set_selection'
-
-  return skip
-}
-
-/**
  * Export.
  *
  * @type {History}
