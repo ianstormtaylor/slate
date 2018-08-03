@@ -23,6 +23,7 @@ These products are built with Slate, and can give you an idea of what's possible
 * [Grafana](https://grafana.com/)
 * [Guru](https://www.getguru.com/)
 * [Outline](https://www.getoutline.com/)
+* [Taskade](https://www.taskade.com/)
 * [Yuque](https://www.yuque.com/)
 
 ## Editors

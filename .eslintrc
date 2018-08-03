@@ -155,5 +155,13 @@
       { "blankLine": "always", "prev": "*", "next": "multiline-block-like" },
       { "blankLine": "any", "prev": "case", "next": "case" }
     ]
-  }
+  },
+  "overrides": [
+    {
+      "files": "**/test/**/*.js",
+      "rules": {
+        "import/no-extraneous-dependencies": false
+      }
+    }
+  ]
 }

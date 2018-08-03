@@ -1,3 +1,4 @@
+import { is } from 'immutable'
 import isEmpty from 'is-empty'
 import pick from 'lodash/pick'
 
@@ -20,45 +21,48 @@ const Changes = {}
 
 Changes.select = (change, properties, options = {}) => {
   properties = Range.createProperties(properties)
-
   const { snapshot = false } = options
   const { value } = change
   const { document, selection } = value
   const props = {}
-  const sel = selection.toJSON()
   const next = selection.merge(properties).normalize(document)
+
+  // Re-compute the properties, to ensure that we get their normalized values.
   properties = pick(next, Object.keys(properties))
 
   // Remove any properties that are already equal to the current selection. And
   // create a dictionary of the previous values for all of the properties that
   // are being changed, for the inverse operation.
   for (const k in properties) {
-    if (snapshot == false && properties[k] == sel[k]) continue
-    props[k] = properties[k]
+    if (snapshot === true || !is(properties[k], selection[k])) {
+      props[k] = properties[k]
+    }
   }
 
   // If the selection moves, clear any marks, unless the new selection
   // properties change the marks in some way.
-  const moved = ['anchorKey', 'anchorOffset', 'focusKey', 'focusOffset'].some(
-    p => props.hasOwnProperty(p)
-  )
-
-  if (sel.marks && properties.marks == sel.marks && moved) {
+  if (
+    selection.marks &&
+    !props.marks &&
+    (props.hasOwnProperty('anchorKey') ||
+      props.hasOwnProperty('anchorOffset') ||
+      props.hasOwnProperty('focusKey') ||
+      props.hasOwnProperty('focusOffset'))
+  ) {
     props.marks = null
   }
 
-  // If there are no new properties to set, abort.
+  // If there are no new properties to set, abort to avoid extra operations.
   if (isEmpty(props)) {
     return
   }
 
-  // Apply the operation.
   change.applyOperation(
     {
       type: 'set_selection',
       value,
       properties: props,
-      selection: sel,
+      selection: selection.toJSON(),
     },
     snapshot ? { skip: false, merge: false } : {}
   )

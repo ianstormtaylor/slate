@@ -192,7 +192,7 @@ Will validate a node's marks. The `marks` definitions can declare the `type` pro
 
 ### `normalize`
 
-`normalize(change: Change, violation: String, context: Object) => Void`
+`normalize(change: Change, error: SlateError) => Void`
 
 ```js
 {

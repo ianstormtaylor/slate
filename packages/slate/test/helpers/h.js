@@ -1,11 +1,5 @@
 import { createHyperscript } from 'slate-hyperscript'
 
-/**
- * Define a hyperscript.
- *
- * @type {Function}
- */
-
 const h = createHyperscript({
   blocks: {
     line: 'line',
@@ -38,11 +32,5 @@ const h = createHyperscript({
     highlight: 'highlight',
   },
 })
-
-/**
- * Export.
- *
- * @type {Function}
- */
 
 export default h
