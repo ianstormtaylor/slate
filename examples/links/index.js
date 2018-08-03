@@ -19,7 +19,7 @@ function wrapLink(change, href) {
     data: { href },
   })
 
-  change.collapseToEnd()
+  change.moveToEnd()
 }
 
 /**
@@ -157,7 +157,7 @@ class Links extends React.Component {
    */
 
   onPaste = (event, change) => {
-    if (change.value.isCollapsed) return
+    if (change.value.selection.isCollapsed) return
 
     const transfer = getEventTransfer(event)
     const { type, text } = transfer

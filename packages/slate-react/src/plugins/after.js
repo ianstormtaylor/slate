@@ -125,7 +125,8 @@ function AfterPlugin() {
       // If user cuts a void block node or a void inline node,
       // manually removes it since selection is collapsed in this case.
       const { value } = change
-      const { endBlock, endInline, isCollapsed } = value
+      const { endBlock, endInline, selection } = value
+      const { isCollapsed } = selection
       const isVoidBlock = endBlock && endBlock.isVoid && isCollapsed
       const isVoidInline = endInline && endInline.isVoid && isCollapsed
 

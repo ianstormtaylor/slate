@@ -125,10 +125,8 @@ class SearchHighlighting extends React.Component {
       parts.forEach((part, i) => {
         if (i != 0) {
           decorations.push({
-            anchorKey: key,
-            anchorOffset: offset - string.length,
-            focusKey: key,
-            focusOffset: offset,
+            anchor: { key, offset: offset - string.length },
+            focus: { key, offset },
             marks: [{ type: 'highlight' }],
             isAtomic: true,
           })
