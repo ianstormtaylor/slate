@@ -1,13 +1,9 @@
-/**
- * Dependencies.
- */
-
 import isPlainObject from 'is-plain-object'
 import logger from 'slate-dev-logger'
 import { List, Map, Record } from 'immutable'
 
-import MODEL_TYPES, { isType } from '../constants/model-types'
 import KeyUtils from '../utils/key-utils'
+import MODEL_TYPES, { isType } from '../constants/model-types'
 
 /**
  * Default properties.
