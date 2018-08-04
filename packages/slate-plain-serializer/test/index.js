@@ -1,5 +1,5 @@
-import Plain from '..'
-import assert from 'assert'
+import Plain from 'slate-plain-serializer'
+import { t as assert } from 'jest-t-assert'
 import { Value } from 'slate'
 import { fixtures } from 'slate-dev-test-utils'
 

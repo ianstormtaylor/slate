@@ -5,7 +5,7 @@ import clean from './helpers/clean'
 import React from 'react'
 import ReactDOM from 'react-dom/server'
 import Simulator from 'slate-simulator'
-import { Editor } from '..'
+import { Editor } from 'slate-react'
 import { fixtures } from 'slate-dev-test-utils'
 import { JSDOM } from 'jsdom'
 

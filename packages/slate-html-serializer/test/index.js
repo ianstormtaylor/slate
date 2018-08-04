@@ -1,4 +1,4 @@
-import Html from '..'
+import Html from 'slate-html-serializer'
 import assert from 'assert'
 import { JSDOM } from 'jsdom'
 import { Value } from 'slate'

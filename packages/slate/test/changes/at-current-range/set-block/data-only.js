@@ -1,8 +1,7 @@
 /** @jsx h */
-
+/* eslint-disable import/no-extraneous-dependencies */
 import h from '../../../helpers/h'
-
-import { Data } from '../../../..'
+import { Data } from 'slate'
 
 export default function(change) {
   change.setBlocks({ data: Data.create({ thing: 'value' }) })

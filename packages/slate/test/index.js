@@ -1,6 +1,6 @@
 import assert from 'assert'
 import { fixtures } from 'slate-dev-test-utils'
-import { Node, Schema, Value } from '..'
+import { Node, Schema, Value } from 'slate'
 
 describe('slate', () => {
   fixtures(__dirname, 'models/leaf', ({ module }) => {

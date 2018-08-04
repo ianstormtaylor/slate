@@ -1,4 +1,4 @@
-import assert from 'assert'
+import { t as assert } from 'jest-t-assert'
 import { Value } from 'slate'
 import { fixtures } from 'slate-dev-test-utils'
 

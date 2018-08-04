@@ -1,8 +1,7 @@
 /** @jsx h */
-
+/* eslint-disable import/no-extraneous-dependencies*/
 import h from '../../../helpers/h'
-
-import { Mark } from '../../../..'
+import { Mark } from 'slate'
 
 export default function(change) {
   const marks = []
