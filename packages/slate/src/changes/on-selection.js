@@ -49,11 +49,11 @@ Changes.moveAnchorToEndOfDocument = change => {
 }
 
 Changes.moveAnchorToEndOfNextBlock = change => {
-  change.call(pointEdgeSideObject, 'anchor', 'end', 'previous', 'block')
+  change.call(pointEdgeSideObject, 'anchor', 'end', 'next', 'block')
 }
 
 Changes.moveAnchorToEndOfNextInline = change => {
-  change.call(pointEdgeSideObject, 'anchor', 'end', 'previous', 'inline')
+  change.call(pointEdgeSideObject, 'anchor', 'end', 'next', 'inline')
 }
 
 Changes.moveAnchorToEndOfNextText = change => {
@@ -65,11 +65,11 @@ Changes.moveAnchorToEndOfNode = (change, ...args) => {
 }
 
 Changes.moveAnchorToEndOfPreviousBlock = change => {
-  change.call(pointEdgeSideObject, 'anchor', 'end', 'next', 'block')
+  change.call(pointEdgeSideObject, 'anchor', 'end', 'previous', 'block')
 }
 
 Changes.moveAnchorToEndOfPreviousInline = change => {
-  change.call(pointEdgeSideObject, 'anchor', 'end', 'next', 'inline')
+  change.call(pointEdgeSideObject, 'anchor', 'end', 'previous', 'inline')
 }
 
 Changes.moveAnchorToEndOfPreviousText = change => {
@@ -153,11 +153,11 @@ Changes.moveEndToEndOfInline = change => {
 }
 
 Changes.moveEndToEndOfNextBlock = change => {
-  change.call(pointEdgeSideObject, 'end', 'end', 'previous', 'block')
+  change.call(pointEdgeSideObject, 'end', 'end', 'next', 'block')
 }
 
 Changes.moveEndToEndOfNextInline = change => {
-  change.call(pointEdgeSideObject, 'end', 'end', 'previous', 'inline')
+  change.call(pointEdgeSideObject, 'end', 'end', 'next', 'inline')
 }
 
 Changes.moveEndToEndOfNextText = change => {
@@ -169,11 +169,11 @@ Changes.moveEndToEndOfNode = (change, ...args) => {
 }
 
 Changes.moveEndToEndOfPreviousBlock = change => {
-  change.call(pointEdgeSideObject, 'end', 'end', 'next', 'block')
+  change.call(pointEdgeSideObject, 'end', 'end', 'previous', 'block')
 }
 
 Changes.moveEndToEndOfPreviousInline = change => {
-  change.call(pointEdgeSideObject, 'end', 'end', 'next', 'inline')
+  change.call(pointEdgeSideObject, 'end', 'end', 'previous', 'inline')
 }
 
 Changes.moveEndToEndOfPreviousText = change => {
@@ -253,11 +253,11 @@ Changes.moveFocusToEndOfInline = change => {
 }
 
 Changes.moveFocusToEndOfNextBlock = change => {
-  change.call(pointEdgeSideObject, 'focus', 'end', 'previous', 'block')
+  change.call(pointEdgeSideObject, 'focus', 'end', 'next', 'block')
 }
 
 Changes.moveFocusToEndOfNextInline = change => {
-  change.call(pointEdgeSideObject, 'focus', 'end', 'previous', 'inline')
+  change.call(pointEdgeSideObject, 'focus', 'end', 'next', 'inline')
 }
 
 Changes.moveFocusToEndOfNextText = change => {
@@ -269,11 +269,11 @@ Changes.moveFocusToEndOfNode = (change, ...args) => {
 }
 
 Changes.moveFocusToEndOfPreviousBlock = change => {
-  change.call(pointEdgeSideObject, 'focus', 'end', 'next', 'block')
+  change.call(pointEdgeSideObject, 'focus', 'end', 'previous', 'block')
 }
 
 Changes.moveFocusToEndOfPreviousInline = change => {
-  change.call(pointEdgeSideObject, 'focus', 'end', 'next', 'inline')
+  change.call(pointEdgeSideObject, 'focus', 'end', 'previous', 'inline')
 }
 
 Changes.moveFocusToEndOfPreviousText = change => {
@@ -357,11 +357,11 @@ Changes.moveStartToEndOfInline = change => {
 }
 
 Changes.moveStartToEndOfNextBlock = change => {
-  change.call(pointEdgeSideObject, 'start', 'end', 'previous', 'block')
+  change.call(pointEdgeSideObject, 'start', 'end', 'next', 'block')
 }
 
 Changes.moveStartToEndOfNextInline = change => {
-  change.call(pointEdgeSideObject, 'start', 'end', 'previous', 'inline')
+  change.call(pointEdgeSideObject, 'start', 'end', 'next', 'inline')
 }
 
 Changes.moveStartToEndOfNextText = change => {
@@ -373,11 +373,11 @@ Changes.moveStartToEndOfNode = (change, ...args) => {
 }
 
 Changes.moveStartToEndOfPreviousBlock = change => {
-  change.call(pointEdgeSideObject, 'start', 'end', 'next', 'block')
+  change.call(pointEdgeSideObject, 'start', 'end', 'previous', 'block')
 }
 
 Changes.moveStartToEndOfPreviousInline = change => {
-  change.call(pointEdgeSideObject, 'start', 'end', 'next', 'inline')
+  change.call(pointEdgeSideObject, 'start', 'end', 'previous', 'inline')
 }
 
 Changes.moveStartToEndOfPreviousText = change => {
@@ -649,7 +649,7 @@ function pointEdgeSideObject(change, point, edge, side, object) {
   if (!node) return
   const target = document[getDirectionNode](node.key)
   if (!target) return
-  change[method](node)
+  change[method](target)
 }
 
 function pointBackward(change, point, n = 1) {
