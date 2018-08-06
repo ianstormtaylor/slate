@@ -109,23 +109,5 @@
     "test": "cross-env BABEL_ENV=test FORBID_DEPRECATIONS=true mocha --require babel-core/register ./packages/*/test/index.js",
     "test:coverage": "cross-env NODE_ENV=test nyc yarn test",
     "watch": "rollup --config ./support/rollup/config.js --watch"
-  },
-  "nyc": {
-      "require": [
-        "babel-register"
-      ],
-      "sourceMap": false,
-      "instrument": false,
-      "all": true,
-      "extension" : ["js"],
-      "cache": false,
-      "exclude": ["**/test/**", "**/benchmark/**"],
-      "reporter": [
-        "html",
-        "lcov",
-        "text",
-        "text-summary"
-       ],
-      "report-dir": "coverage"
-    }
+  }
 }
