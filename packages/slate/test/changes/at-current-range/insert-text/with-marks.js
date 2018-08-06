@@ -1,7 +1,7 @@
 /** @jsx h */
 
 import h from '../../../helpers/h'
-import { Mark } from '../../../..'
+import { Mark } from 'slate'
 
 export default function(change) {
   const marks = Mark.createSet([{ type: 'bold' }])

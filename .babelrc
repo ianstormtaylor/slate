@@ -29,7 +29,14 @@
         "react",
         "stage-0"
       ],
-      "plugins": ["transform-runtime"]
+      "plugins": [
+        "transform-runtime",
+        ["module-resolver", {
+          "alias" : {
+            "^(slate.*)": "./packages/\\1/src"
+          }
+        }]
+      ]
     },
     "benchmark": {
       "presets": [

@@ -1,4 +1,4 @@
-import Plain from '..'
+import Plain from 'slate-plain-serializer'
 import assert from 'assert'
 import { Value } from 'slate'
 import { fixtures } from 'slate-dev-test-utils'

@@ -1,6 +1,6 @@
 /** @jsx h */
 
-import h from '../..'
+import h from 'slate-hyperscript'
 
 export const input = (
   <value>
