@@ -20,5 +20,8 @@ before_script:
 
 script:
   # Run testing or linting depending on the environment.
-  - yarn $TEST_TYPE
-  - if [[ $TEST_TYPE == 'test:coverage' ]]; then yarn codecov; fi
+  - |
+    set -e
+    yarn $TEST_TYPE
+    if [[ $TEST_TYPE == 'test:coverage' ]]; then yarn codecov; fi
+    set +e
