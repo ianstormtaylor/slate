@@ -1,0 +1,16 @@
+{
+  "sourceMap": false,
+  "instrument": false,
+  "all": true,
+  "extension" : ["js"],
+  "cache": false,
+  "include": ["**/src/**"],
+  "reporter": [
+    "html",
+    "lcov",
+    "text",
+    "text-summary"
+  ],
+  "report-dir": "coverage"
+}
+

@@ -1,7 +1,7 @@
 /** @jsx h */
 
 import { List } from 'immutable'
-import { Leaf } from '../../../..'
+import { Leaf } from 'slate'
 
 export const input = List([
   Leaf.create({
