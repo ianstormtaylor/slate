@@ -1,4 +1,6 @@
 import Base64 from 'slate-base64-serializer'
+import Plain from 'slate-plain-serializer'
+import { Value } from 'slate'
 import TRANSFER_TYPES from '../constants/transfer-types'
 import getWindow from 'get-window'
 import findDOMNode from './find-dom-node'
@@ -82,16 +84,15 @@ function cloneFragment(event, value, fragment = value.fragment) {
 
   attach.setAttribute('data-slate-fragment', encoded)
   
-  //  Builds plaintext object for clipboard line by line using top-level nodes.
-  //  Adds '\u000A' (unicode LF) to end of each line except the last.
-  //  This prevents line breaks from being lost when pasting to targets
-  //  which don't support html input.
-  let plainText = ''
-
-  for (let i = 0; i < contents.childNodes.length; i++) {
-    plainText += contents.childNodes[i].innerText
-    if (i < contents.childNodes.length - 1) plainText += '\u000A'
-  }
+  //  Creates value from only the selected blocks
+  //  Then gets plaintext for clipboard with proper linebreaks for BLOCK elements
+  //  Via Plain serializer
+  const valFromSelection = Value.create({
+    document: {
+      nodes: value.blocks,
+    },
+  })
+  const plainText = Plain.serialize(valFromSelection)
 
   // Add the phony content to a div element. This is needed to copy the
   // contents into the html clipboard register.
