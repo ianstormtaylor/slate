@@ -297,77 +297,6 @@ Changes.removeNodeByPath = (change, path, options) => {
 }
 
 /**
- * Insert `text` at `offset` in node by `path`.
- *
- * @param {Change} change
- * @param {Array} path
- * @param {String} text
- * @param {Set<Mark>} marks (optional)
- * @param {Object} options
- */
-
-Changes.setTextByPath = (change, path, text, marks, options) => {
-  const { value } = change
-  const { document } = value
-  const node = document.assertNode(path)
-  const end = node.text.length
-  change.replaceTextByPath(path, 0, end, text, marks, options)
-}
-
-/**
- * Replace A Length of Text with another string or text
- * @param {Change} change
- * @param {String} key
- * @param {Number} offset
- * @param {Number} length
- * @param {string} text
- * @param {Set<Mark>} marks (optional)
- * @param {Object} options
- *
- */
-
-Changes.replaceTextByPath = (
-  change,
-  path,
-  offset,
-  length,
-  text,
-  marks,
-  options
-) => {
-  const { document } = change.value
-  const node = document.assertNode(path)
-
-  if (length + offset > node.text.length) {
-    length = node.text.length - offset
-  }
-
-  const range = document.createRange({
-    anchor: { path, offset },
-    focus: { path, offset: offset + length },
-  })
-
-  let activeMarks = document.getActiveMarksAtRange(range)
-
-  change.removeTextByPath(path, offset, length, { normalize: false })
-
-  if (!marks) {
-    // Do not use mark at index when marks and activeMarks are both empty
-    marks = activeMarks ? activeMarks : []
-  } else if (activeMarks) {
-    // Do not use `has` because we may want to reset marks like font-size with
-    // an updated data;
-    activeMarks = activeMarks.filter(
-      activeMark => !marks.find(m => activeMark.type === m.type)
-    )
-
-    marks = activeMarks.merge(marks)
-  }
-
-  change.insertTextByPath(path, offset, text, marks, options)
-}
-
-/**
  * Remove text at `offset` and `length` in node by `path`.
  *
  * @param {Change} change
@@ -439,6 +368,59 @@ Changes.replaceNodeByPath = (change, path, newNode, options) => {
 }
 
 /**
+ * Replace A Length of Text with another string or text
+ * @param {Change} change
+ * @param {String} key
+ * @param {Number} offset
+ * @param {Number} length
+ * @param {string} text
+ * @param {Set<Mark>} marks (optional)
+ * @param {Object} options
+ *
+ */
+
+Changes.replaceTextByPath = (
+  change,
+  path,
+  offset,
+  length,
+  text,
+  marks,
+  options
+) => {
+  const { document } = change.value
+  const node = document.assertNode(path)
+
+  if (length + offset > node.text.length) {
+    length = node.text.length - offset
+  }
+
+  const range = document.createRange({
+    anchor: { path, offset },
+    focus: { path, offset: offset + length },
+  })
+
+  let activeMarks = document.getActiveMarksAtRange(range)
+
+  change.removeTextByPath(path, offset, length, { normalize: false })
+
+  if (!marks) {
+    // Do not use mark at index when marks and activeMarks are both empty
+    marks = activeMarks ? activeMarks : []
+  } else if (activeMarks) {
+    // Do not use `has` because we may want to reset marks like font-size with
+    // an updated data;
+    activeMarks = activeMarks.filter(
+      activeMark => !marks.find(m => activeMark.type === m.type)
+    )
+
+    marks = activeMarks.merge(marks)
+  }
+
+  change.insertTextByPath(path, offset, text, marks, options)
+}
+
+/**
  * Set `properties` on mark on text at `offset` and `length` in node by `path`.
  *
  * @param {Change} change
@@ -499,6 +481,24 @@ Changes.setNodeByPath = (change, path, properties, options) => {
   })
 
   change.normalizeNodeByPath(path, options)
+}
+
+/**
+ * Insert `text` at `offset` in node by `path`.
+ *
+ * @param {Change} change
+ * @param {Array} path
+ * @param {String} text
+ * @param {Set<Mark>} marks (optional)
+ * @param {Object} options
+ */
+
+Changes.setTextByPath = (change, path, text, marks, options) => {
+  const { value } = change
+  const { document } = value
+  const node = document.assertNode(path)
+  const end = node.text.length
+  change.replaceTextByPath(path, 0, end, text, marks, options)
 }
 
 /**

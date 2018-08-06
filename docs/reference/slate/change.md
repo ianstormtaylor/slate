@@ -101,21 +101,17 @@ Warning: Calling `setValue` with a `Value` object has unpredictable behavior inc
 
 Hint: Wrapping the call to `setValue` as follows can be helpful if you want to update a value, like in the value's `data` but do not want to have another save point in the undo history: `change.setOperationFlag({save: false}).setValue({data: myNewDataObject}).setOperationFlag({save: true}).
 
-## Current Value Changes
+## Current Selection Changes
 
-These changes act on the `document` based on the current `selection`. They are equivalent to calling the [Document Changes](#document-changes) with the current selection as the `range` argument, but they are there for convenience, since you often want to act with the current selection, as a user would.
+These changes act on the `document` based on the current `selection`. They are equivalent to calling the [Document Range Changes](#document-range-changes) with the current selection as the `range` argument, but they are there for convenience, since you often want to act with the current selection, as a user would.
 
-### `deleteBackward`
+### `addMark`
 
-`deleteBackward(n: Number) => Change`
+`addMark(mark: Mark) => Change` <br/>
+`addMark(properties: Object) => Change` <br/>
+`addMark(type: String) => Change`
 
-Delete backward `n` characters at the current cursor. If the selection is expanded, this method is equivalent to a regular [`delete()`](#delete). `n` defaults to `1`.
-
-### `deleteForward`
-
-`deleteForward(n: Number) => Change`
-
-Delete forward `n` characters at the current cursor. If the selection is expanded, this method is equivalent to a regular [`delete()`](#delete). `n` defaults to `1`.
+Add a [`mark`](./mark.md) to the characters in the current selection. For convenience, you can pass a `type` string or `properties` object to implicitly create a [`Mark`](./mark.md) of that type.
 
 ### `delete`
 
@@ -128,6 +124,18 @@ Delete everything in the current selection.
 `insertBlock(block: Block) => Change` <br/>
 `insertBlock(properties: Object) => Change` <br/>
 `insertBlock(type: String) => Change`
+
+### `deleteBackward`
+
+`deleteBackward(n: Number) => Change`
+
+Delete backward `n` characters at the current cursor. If the selection is expanded, this method is equivalent to a regular [`delete()`](#delete). `n` defaults to `1`.
+
+### `deleteForward`
+
+`deleteForward(n: Number) => Change`
+
+Delete forward `n` characters at the current cursor. If the selection is expanded, this method is equivalent to a regular [`delete()`](#delete). `n` defaults to `1`.
 
 Insert a new block at the same level as the current block, splitting the current block to make room if it is non-empty. If the selection is expanded, it will be deleted first.
 
@@ -149,14 +157,6 @@ Insert a new inline at the current cursor position, splitting the text to make r
 `insertText(text: String) => Change`
 
 Insert a string of `text` at the current selection. If the selection is expanded, it will be deleted first.
-
-### `addMark`
-
-`addMark(mark: Mark) => Change` <br/>
-`addMark(properties: Object) => Change` <br/>
-`addMark(type: String) => Change`
-
-Add a [`mark`](./mark.md) to the characters in the current selection. For convenience, you can pass a `type` string or `properties` object to implicitly create a [`Mark`](./mark.md) of that type.
 
 ### `setBlocks`
 
@@ -252,41 +252,11 @@ These changes change the current `selection`, without touching the `document`.
 
 Blur the current selection.
 
-### `collapseTo{Edge}`
+### `deselect`
 
-`collapseTo{Edge}() => Change`
+`deselect() => Change`
 
-Collapse the current selection to its `{Edge}`. Where `{Edge}` is either `Anchor`, `Focus`, `Start` or `End`.
-
-### `collapseTo{Edge}Of`
-
-`collapseTo{Edge}Of(node: Node) => Change`
-
-Collapse the current selection to the `{Edge}` of `node`. Where `{Edge}` is either `Start` or `End`.
-
-### `collapseTo{Edge}Of{Direction}Block`
-
-`collapseTo{Edge}Of{Direction}Block() => Change`
-
-Collapse the current selection to the `{Edge}` of the next [`Block`](./block.md) node in `{Direction}`. Where `{Edge}` is either `Start` or `End` and `{Direction}` is either `Next` or `Previous`.
-
-### `collapseTo{Edge}Of{Direction}Text`
-
-`collapseTo{Edge}Of{Direction}Text() => Change`
-
-Collapse the current selection to the `{Edge}` of the next [`Text`](./text.md) node in `{Direction}`. Where `{Edge}` is either `Start` or `End` and `{Direction}` is either `Next` or `Previous`.
-
-### `extend`
-
-`extend(n: Number) => Change`
-
-Extend the current selection's points by `n` characters. `n` can be positive or negative to indicate direction.
-
-### `extendTo{Edge}Of`
-
-`extendTo{Edge}Of(node: Node) => Change`
-
-Extend the current selection to the `{Edge}` of a `node`. Where `{Edge}` is either `Start` or `End`.
+Unset the selection.
 
 ### `flip`
 
@@ -300,23 +270,79 @@ Flip the selection.
 
 Focus the current selection.
 
-### `move`
+### `move{Point}Backward`
 
-`move(n: Number) => Change`
+`move{Point}Backward(n: Number) => Change`
 
-Move the current selection's offsets by `n`.
+Move the `{Point}` of the selection backward `n` characters. Where `{Point}` is either `Anchor`, `Focus`, `Start` or `End`. You can also omit `{Point}` to move both the anchor and focus points at the same time.
 
-### `move{Edge}`
+### `move{Point}Forward`
 
-`move{Edge}(n: Number) => Change`
+`move{Point}Forward(n: Number) => Change`
 
-Move the current selection's `{Edge}` offset by `n`. `{Edge}` can be one of `Start`, `End`.
+Move the `{Point}` of the selection forward `n` characters. Where `{Point}` is either `Anchor`, `Focus`, `Start` or `End`. You can also omit `{Point}` to move both the anchor and focus points at the same time.
 
-### `moveOffsetsTo`
+### `move{Point}To`
 
-`moveOffsetsTo(anchorOffset: Number, focusOffset: Number) => Change`
+`moveTo(path: List, offset: Number) => Change`
+`moveTo(key: String, offset: Number) => Change`
+`moveTo(offset: Number) => Change`
 
-Move the current selection's offsets to a new `anchorOffset` and `focusOffset`.
+Move the `{Point}` of the selection to a new `path` or `key` and `offset`. Where `{Point}` is either `Anchor`, `Focus`, `Start` or `End`. You can also omit `{Point}` to move both the anchor and focus points at the same time.
+
+### `moveTo{Point}`
+
+`moveTo{Point}() => Change`
+
+Collapse the current selection to one of its points. Where `{Point}` is either `Anchor`, `Focus`, `Start` or `End`.
+
+### `move{Point}To{Edge}OfBlock`
+
+`move{Point}To{Edge}OfBlock() => Change`
+
+Move the current selection to the `{Edge}` of the closest block parent. Where `{Edge}` is either `Start` or `End`. And where `{Point}` is either `Anchor`, `Focus`, `Start` or `End`. You can also omit `{Point}` to move both the anchor and focus points at the same time.
+
+### `move{Point}To{Edge}OfDocument`
+
+`move{Point}To{Edge}OfDocument() => Change`
+
+Move the current selection to the `{Edge}` of the document. Where `{Edge}` is either `Start` or `End`. And where `{Point}` is either `Anchor`, `Focus`, `Start` or `End`. You can also omit `{Point}` to move both the anchor and focus points at the same time.
+
+### `move{Point}To{Edge}OfInline`
+
+`move{Point}To{Edge}OfInline() => Change`
+
+Move the current selection to the `{Edge}` of the closest inline parent. Where `{Edge}` is either `Start` or `End`. And where `{Point}` is either `Anchor`, `Focus`, `Start` or `End`. You can also omit `{Point}` to move both the anchor and focus points at the same time.
+
+### `move{Point}To{Edge}OfNode`
+
+`move{Point}To{Edge}OfNode(node: Node) => Change`
+
+Move the current selection to the `{Edge}` of a `node`. Where `{Edge}` is either `Start` or `End`. And where `{Point}` is either `Anchor`, `Focus`, `Start` or `End`. You can also omit `{Point}` to move both the anchor and focus points at the same time.
+
+### `move{Point}To{Edge}OfText`
+
+`move{Point}To{Edge}OfText() => Change`
+
+Move the current selection to the `{Edge}` of the current text node. Where `{Edge}` is either `Start` or `End`. And where `{Point}` is either `Anchor`, `Focus`, `Start` or `End`. You can also omit `{Point}` to move both the anchor and focus points at the same time.
+
+### `move{Point}To{Edge}Of{Direction}Block`
+
+`move{Point}To{Edge}Of{Direction}Block() => Change`
+
+Move the current selection to the `{Edge}` of the closest block parent. Where `{Edge}` is either `Start` or `End`. And where `{Point}` is either `Anchor`, `Focus`, `Start` or `End`. You can also omit `{Point}` to move both the anchor and focus points at the same time.
+
+### `move{Point}To{Edge}Of{Direction}Inline`
+
+`move{Point}To{Edge}Of{Direction}Inline() => Change`
+
+Move the current selection to the `{Edge}` of the closest inline parent. Where `{Edge}` is either `Start` or `End`. And where `{Point}` is either `Anchor`, `Focus`, `Start` or `End`. You can also omit `{Point}` to move both the anchor and focus points at the same time.
+
+### `move{Point}To{Edge}Of{Direction}Text`
+
+`move{Point}To{Edge}Of{Direction}Text() => Change`
+
+Move the current selection to the `{Edge}` of the current text node. Where `{Edge}` is either `Start` or `End`. And where `{Point}` is either `Anchor`, `Focus`, `Start` or `End`. You can also omit `{Point}` to move both the anchor and focus points at the same time.
 
 ### `moveToRangeOf`
 
@@ -324,27 +350,35 @@ Move the current selection's offsets to a new `anchorOffset` and `focusOffset`.
 
 Move the current selection's anchor point to the start of a `node` and its focus point to the end of the `node`.
 
+### `moveToRangeOfDocument`
+
+`moveToRangeOf() => Change`
+
+Move the current selection's anchor point to the start of the document and its focus point to the end of the document, selecting everything.
+
 ### `select`
 
 `select(properties: Range || Object) => Change`
 
 Set the current selection to a range with merged `properties`. The `properties` can either be a [`Range`](./range.md) object or a plain Javascript object of selection properties.
 
-### `selectAll`
-
-`selectAll() => Change`
-
-Select the entire document and focus the selection.
-
-### `deselect`
-
-`deselect() => Change`
-
-Unset the selection.
-
-## Document Changes
+## Document Range Changes
 
 These changes act on a specific [`Range`](./range.md) of the document.
+
+### `addMarkAtRange`
+
+`addMarkAtRange(range: Range, mark: Mark) => Change` <br/>
+`addMarkAtRange(range: Range, properties: Object) => Change` <br/>
+`addMarkAtRange(range: Range, type: String) => Change`
+
+Add a [`mark`](./mark.md) to the characters in a `range`. For convenience, you can pass a `type` string or `properties` object to implicitly create a [`Mark`](./mark.md) of that type.
+
+### `deleteAtRange`
+
+`deleteAtRange(range: Range, ) => Change`
+
+Delete everything in a `range`.
 
 ### `deleteBackwardAtRange`
 
@@ -357,12 +391,6 @@ Delete backward `n` characters at a `range`. If the `range` is expanded, this me
 `deleteForwardAtRange(range: Range, n: Number) => Change`
 
 Delete forward `n` characters at a `range`. If the `range` is expanded, this method is equivalent to a regular [`delete()`](#delete). `n` defaults to `1`.
-
-### `deleteAtRange`
-
-`deleteAtRange(range: Range, ) => Change`
-
-Delete everything in a `range`.
 
 ### `insertBlockAtRange`
 
@@ -390,14 +418,6 @@ Insert a new inline at a `range`, splitting the text to make room if it is non-e
 `insertTextAtRange(range: Range, text: String) => Change`
 
 Insert a string of `text` at a `range`. If the selection is expanded, it will be deleted first.
-
-### `addMarkAtRange`
-
-`addMarkAtRange(range: Range, mark: Mark) => Change` <br/>
-`addMarkAtRange(range: Range, properties: Object) => Change` <br/>
-`addMarkAtRange(range: Range, type: String) => Change`
-
-Add a [`mark`](./mark.md) to the characters in a `range`. For convenience, you can pass a `type` string or `properties` object to implicitly create a [`Mark`](./mark.md) of that type.
 
 ### `setBlocksAtRange`
 
@@ -477,118 +497,148 @@ Surround the text in a `range` with `prefix` and `suffix` strings. If the `suffi
 
 ## Node Changes
 
-These changes are lower-level, and act on a specific node by its `key`. They're often used in your custom components because you'll have access to `props.node`.
+These changes are lower-level, and act on a specific node by its `key` or `path`. They're often used in your custom components because you'll have access to `props.node`.
 
-### `addMarkByKey`
+### `addMarkByKey/Path`
 
 `addMarkByKey(key: String, offset: Number, length: Number, mark: Mark) => Change`
+`addMarkByPath(path: List, offset: Number, length: Number, mark: Mark) => Change`
 
-Add a `mark` to `length` characters starting at an `offset` in a [`Node`](./node.md) by its `key`.
+Add a `mark` to `length` characters starting at an `offset` in a [`Node`](./node.md) by its `key` or `path`.
 
-### `insertNodeByKey`
+### `insertNodeByKey/Path`
 
 `insertNodeByKey(key: String, index: Number, node: Node) => Change`
+`insertNodeByPath(path: List, index: Number, node: Node) => Change`
 
-Insert a `node` at `index` inside a parent [`Node`](./node.md) by its `key`.
+Insert a `node` at `index` inside a parent [`Node`](./node.md) by its `key` or `path`.
 
-### `insertFragmentByKey`
+### `insertFragmentByKey/Path`
 
 `insertFragmentByKey(key: String, index: Number, fragment: Fragment) => Transform`
+`insertFragmentByPath(path: list, index: Number, fragment: Fragment) => Transform`
 
-Insert a [`Fragment`](./fragment.md) at `index` inside a parent [`Node`](./node.md) by its `key`.
+Insert a [`Fragment`](./fragment.md) at `index` inside a parent [`Node`](./node.md) by its `key` or `path`.
 
-### `insertTextByKey`
+### `insertTextByKey/Path`
 
 `insertTextByKey(key: String, offset: Number, text: String, [marks: Set]) => Change`
+`insertTextByPath(path: List, offset: Number, text: String, [marks: Set]) => Change`
 
 Insert `text` at an `offset` in a [`Text Node`](./text.md) by its `key` with optional `marks`.
 
-### `moveNodeByKey`
+### `mergeNodeByKey/Path`
+
+`mergeNodeByKey(key: String) => Change`
+`mergeNodeByPath(path: List) => Change`
+
+Merge a [`Node`](./node.md) by its `key` or `path` with its previous sibling.
+
+### `moveNodeByKey/Path`
 
 `moveNodeByKey(key: String, newKey: String, newIndex: Number) => Change`
+`moveNodeByPath(path: List, newKey: String, newIndex: Number) => Change`
 
-Move a [`Node`](./node.md) by its `key` to a new parent node with its `newKey` and at a `newIndex`.
+Move a [`Node`](./node.md) by its `key` or `path` to a new parent node with its `newKey` and at a `newIndex`.
 
-### `removeMarkByKey`
+### `removeMarkByKey/Path`
 
 `removeMarkByKey(key: String, offset: Number, length: Number, mark: Mark) => Change`
+`removeMarkByPath(path: List, offset: Number, length: Number, mark: Mark) => Change`
 
-Remove a `mark` from `length` characters starting at an `offset` in a [`Node`](./node.md) by its `key`.
+Remove a `mark` from `length` characters starting at an `offset` in a [`Node`](./node.md) by its `key` or `path`.
 
-### `removeNodeByKey`
+### `removeNodeByKey/Path`
 
 `removeNodeByKey(key: String) => Change`
+`removeNodeByPath(path: List) => Change`
 
-Remove a [`Node`](./node.md) from the document by its `key`.
+Remove a [`Node`](./node.md) from the document by its `key` or `path`.
 
-### `replaceNodeByKey`
+### `replaceNodeByKey/Path`
 
 `replaceNodeByKey(key: String, node: Node) => Change`
+`replaceNodeByPath(path: List, node: Node) => Change`
 
-Replace a [`Node`](./node.md) in the document with a new [`Node`](./node.md) by its `key`.
+Replace a [`Node`](./node.md) in the document with a new [`Node`](./node.md) by its `key` or `path`.
 
-### `removeTextByKey`
+### `removeTextByKey/Path`
 
 `removeTextByKey(key: String, offset: Number, length: Number) => Change`
+`removeTextByPath(path: List, offset: Number, length: Number) => Change`
 
-Remove `length` characters of text starting at an `offset` in a [`Node`](./node.md) by its `key`.
+Remove `length` characters of text starting at an `offset` in a [`Node`](./node.md) by its `key` or `path`.
 
-### `setMarkByKey`
+### `setMarkByKey/Path`
 
 `setMarkByKey(key: String, offset: Number, length: Number, mark: Mark, properties: Object) => Change`
+`setMarkByPath(path: List, offset: Number, length: Number, mark: Mark, properties: Object) => Change`
 
-Set a dictionary of `properties` on a [`mark`](./mark.md) on a [`Node`](./node.md) by its `key`.
+Set a dictionary of `properties` on a [`mark`](./mark.md) on a [`Node`](./node.md) by its `key` or `path`.
 
-### `setNodeByKey`
+### `setNodeByKey/Path`
 
 `setNodeByKey(key: String, properties: Object) => Change` <br/>
 `setNodeByKey(key: String, type: String) => Change`
+`setNodeByPath(path: List, properties: Object) => Change` <br/>
+`setNodeByPath(path: List, type: String) => Change`
 
-Set a dictionary of `properties` on a [`Node`](./node.md) by its `key`. For convenience, you can pass a `type` string or `properties` object.
+Set a dictionary of `properties` on a [`Node`](./node.md) by its `key` or `path`. For convenience, you can pass a `type` string or `properties` object.
 
-### `splitNodeByKey`
+### `splitNodeByKey/Path`
 
 `splitNodeByKey(key: String, offset: Number) => Change`
+`splitNodeByPath(path: List, offset: Number) => Change`
 
-Split a node by its `key` at an `offset`.
+Split a node by its `key` or `path` at an `offset`.
 
-### `unwrapInlineByKey`
+### `unwrapInlineByKey/Path`
 
 `unwrapInlineByKey(key: String, properties: Object) => Change` <br/>
 `unwrapInlineByKey(key: String, type: String) => Change`
+`unwrapInlineByPath(path: List, properties: Object) => Change` <br/>
+`unwrapInlineByPath(path: List, type: String) => Change`
 
-Unwrap all inner content of an [`Inline`](./inline.md) node by its `key` that match `properties`. For convenience, you can pass a `type` string or `properties` object.
+Unwrap all inner content of an [`Inline`](./inline.md) node by its `key` or `path` that match `properties`. For convenience, you can pass a `type` string or `properties` object.
 
-### `unwrapBlockByKey`
+### `unwrapBlockByKey/Path`
 
 `unwrapBlockByKey(key: String, properties: Object) => Change` <br/>
 `unwrapBlockByKey(key: String, type: String) => Change`
+`unwrapBlockByPath(path: List, properties: Object) => Change` <br/>
+`unwrapBlockByPath(path: List, type: String) => Change`
 
-Unwrap all inner content of a [`Block`](./block.md) node by its `key` that match `properties`. For convenience, you can pass a `type` string or `properties` object.
+Unwrap all inner content of a [`Block`](./block.md) node by its `key` or `path` that match `properties`. For convenience, you can pass a `type` string or `properties` object.
 
-### `unwrapNodeByKey`
+### `unwrapNodeByKey/Path`
 
 `unwrapNodeByKey(key: String) => Change`
+`unwrapNodeByPath(path: List) => Change`
 
 Unwrap a single node from its parent. If the node is surrounded with siblings, its parent will be split. If the node is the only child, the parent is removed, and simply replaced by the node itself. Cannot unwrap a root node.
 
-### `wrapBlockByKey`
+### `wrapBlockByKey/Path`
 
 `wrapBlockByKey(key: String, properties: Object) => Change` <br/>
 `wrapBlockByKey(key: String, type: String) => Change`
+`wrapBlockByPath(path: List, properties: Object) => Change` <br/>
+`wrapBlockByPath(path: List, type: String) => Change`
 
 Wrap the given node in a [`Block`](./block.md) node that match `properties`. For convenience, you can pass a `type` string or `properties` object.
 
-### `wrapInlineByKey`
+### `wrapInlineByKey/Path`
 
 `wrapInlineByKey(key: String, properties: Object) => Change` <br/>
 `wrapInlineByKey(key: String, type: String) => Change`
+`wrapInlineByPath(path: List, properties: Object) => Change` <br/>
+`wrapInlineByPath(path: List, type: String) => Change`
 
 Wrap the given node in a [`Inline`](./inline.md) node that match `properties`. For convenience, you can pass a `type` string or `properties` object.
 
-### `wrapNodeByKey`
+### `wrapNodeByKey/Path`
 
 `wraNodeByKey(key: String, parent: Node) => Change` <br/>
+`wraNodeByPath(path: List, parent: Node) => Change` <br/>
 
 Wrap the node with the specified key with the parent [`Node`](./node.md). This will clear all children of the parent.
 
@@ -612,4 +662,4 @@ Move backward one step in the history.
 
 `snapshotSelection() => Change`
 
-Snapshot `value.selection` for `undo` purposes, useful with delete operations like `removeNodeByKey(focusBlock.key).undo()`
+Snapshot `value.selection` for `undo` purposes, useful with delete operations like `change.removeNodeByKey(focusBlock.key).undo()`.

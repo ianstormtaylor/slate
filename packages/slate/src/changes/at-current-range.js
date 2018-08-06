@@ -223,24 +223,6 @@ Changes.insertText = (change, text, marks) => {
 }
 
 /**
- * Split the block node at the current selection, to optional `depth`.
- *
- * @param {Change} change
- * @param {Number} depth (optional)
- */
-
-Changes.splitBlock = (change, depth = 1) => {
-  const { value } = change
-  const { selection, document } = value
-  const marks = selection.marks || document.getInsertMarksAtRange(selection)
-  change.splitBlockAtRange(selection, depth).moveToEnd()
-
-  if (marks && marks.size !== 0) {
-    change.select({ marks })
-  }
-}
-
-/**
  * Remove a `mark` from the characters in the current selection.
  *
  * @param {Change} change
@@ -276,6 +258,24 @@ Changes.removeMark = (change, mark) => {
 Changes.replaceMark = (change, oldMark, newMark) => {
   change.removeMark(oldMark)
   change.addMark(newMark)
+}
+
+/**
+ * Split the block node at the current selection, to optional `depth`.
+ *
+ * @param {Change} change
+ * @param {Number} depth (optional)
+ */
+
+Changes.splitBlock = (change, depth = 1) => {
+  const { value } = change
+  const { selection, document } = value
+  const marks = selection.marks || document.getInsertMarksAtRange(selection)
+  change.splitBlockAtRange(selection, depth).moveToEnd()
+
+  if (marks && marks.size !== 0) {
+    change.select({ marks })
+  }
 }
 
 /**

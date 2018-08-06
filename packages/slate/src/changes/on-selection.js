@@ -44,6 +44,10 @@ Changes.moveAnchorToEndOfInline = change => {
   change.call(pointEdgeObject, 'anchor', 'end', 'inline')
 }
 
+Changes.moveAnchorToEndOfDocument = change => {
+  change.moveAnchorToEndOfNode(change.value.document).moveToAnchor()
+}
+
 Changes.moveAnchorToEndOfNextBlock = change => {
   change.call(pointEdgeSideObject, 'anchor', 'end', 'previous', 'block')
 }
@@ -78,6 +82,10 @@ Changes.moveAnchorToEndOfText = change => {
 
 Changes.moveAnchorToStartOfBlock = change => {
   change.call(pointEdgeObject, 'anchor', 'start', 'block')
+}
+
+Changes.moveAnchorToStartOfDocument = change => {
+  change.moveAnchorToStartOfNode(change.value.document).moveToAnchor()
 }
 
 Changes.moveAnchorToStartOfInline = change => {
@@ -136,6 +144,10 @@ Changes.moveEndToEndOfBlock = change => {
   change.call(pointEdgeObject, 'end', 'end', 'block')
 }
 
+Changes.moveEndToEndOfDocument = change => {
+  change.moveEndToEndOfNode(change.value.document).moveToEnd()
+}
+
 Changes.moveEndToEndOfInline = change => {
   change.call(pointEdgeObject, 'end', 'end', 'inline')
 }
@@ -174,6 +186,10 @@ Changes.moveEndToEndOfText = change => {
 
 Changes.moveEndToStartOfBlock = change => {
   change.call(pointEdgeObject, 'end', 'start', 'block')
+}
+
+Changes.moveEndToStartOfDocument = change => {
+  change.moveEndToStartOfNode(change.value.document).moveToEnd()
 }
 
 Changes.moveEndToStartOfInline = change => {
@@ -228,6 +244,10 @@ Changes.moveFocusToEndOfBlock = change => {
   change.call(pointEdgeObject, 'focus', 'end', 'block')
 }
 
+Changes.moveFocusToEndOfDocument = change => {
+  change.moveFocusToEndOfNode(change.value.document).moveToFocus()
+}
+
 Changes.moveFocusToEndOfInline = change => {
   change.call(pointEdgeObject, 'focus', 'end', 'inline')
 }
@@ -266,6 +286,10 @@ Changes.moveFocusToEndOfText = change => {
 
 Changes.moveFocusToStartOfBlock = change => {
   change.call(pointEdgeObject, 'focus', 'start', 'block')
+}
+
+Changes.moveFocusToStartOfDocument = change => {
+  change.moveFocusToStartOfNode(change.value.document).moveToFocus()
 }
 
 Changes.moveFocusToStartOfInline = change => {
@@ -324,6 +348,10 @@ Changes.moveStartToEndOfBlock = change => {
   change.call(pointEdgeObject, 'start', 'end', 'block')
 }
 
+Changes.moveStartToEndOfDocument = change => {
+  change.moveStartToEndOfNode(change.value.document).moveToStart()
+}
+
 Changes.moveStartToEndOfInline = change => {
   change.call(pointEdgeObject, 'start', 'end', 'inline')
 }
@@ -362,6 +390,10 @@ Changes.moveStartToEndOfText = change => {
 
 Changes.moveStartToStartOfBlock = change => {
   change.call(pointEdgeObject, 'start', 'start', 'block')
+}
+
+Changes.moveStartToStartOfDocument = change => {
+  change.moveStartToStartOfNode(change.value.document).moveToStart()
 }
 
 Changes.moveStartToStartOfInline = change => {
