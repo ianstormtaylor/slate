@@ -15,8 +15,13 @@ env:
     - TEST_TYPE=lint:prettier
 
 before_script:
-  - if [[ $TEST_TYPE == 'lint:eslint' ]]; then lerna bootstrap; fi
-  - if [[ $TEST_TYPE == 'lint:eslint' ]]; then yarn build; fi
+  - |
+    set -e
+    if [[ $TEST_TYPE == 'lint:eslint' ]]; then
+      lerna bootstrap
+      yarn build
+    fi
+    set +e
 
 script:
   # Run testing or linting depending on the environment.
