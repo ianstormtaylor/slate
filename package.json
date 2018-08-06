@@ -107,16 +107,22 @@
     "server": "webpack-dev-server --config ./support/webpack/config.js",
     "start": "npm-run-all --parallel --print-label watch server",
     "test": "cross-env BABEL_ENV=test FORBID_DEPRECATIONS=true mocha --require babel-core/register ./packages/*/test/index.js",
-    "test:coverage": "cross-env BABEL_ENV=test FORBID_DEPRECATIONS=true nyc ---require babel-core/register --reporter=lcov mocha  ./packages/*/test/index.js",
+    "test:coverage": "cross-env NODE_ENV=test nyc yarn test",
     "watch": "rollup --config ./support/rollup/config.js --watch"
   },
-  "config": {
-    "blanket": {
-      "pattern": "src",
-      "data-cover-never": [
-        "node_modules",
-        "test"
-      ]
+  "nyc": {
+      "check-coverage": true,
+      "reporter": [
+        "html",
+        "lcov",
+        "text",
+        "text-summary"
+       ],
+      "exclude": [
+        "**/node_modules/**",
+        "**/test/**",
+        "example/**"
+       ],
+      "report-dir": "coverage"
     }
-  }
 }

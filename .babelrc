@@ -36,9 +36,7 @@
             "^(slate.*)": "./packages/\\1/src"
           }
         }],
-        ["istanbul", {
-          "exclude": ["**/test/**/*.js"]
-        }]
+        "istanbul"
       ]
     },
     "benchmark": {
