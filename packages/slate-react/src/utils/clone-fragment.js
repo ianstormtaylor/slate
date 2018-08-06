@@ -81,6 +81,17 @@ function cloneFragment(event, value, fragment = value.fragment) {
   }
 
   attach.setAttribute('data-slate-fragment', encoded)
+  
+  //  Builds plaintext object for clipboard line by line using top-level nodes.
+  //  Adds '\u000A' (unicode LF) to end of each line except the last.
+  //  This prevents line breaks from being lost when pasting to targets
+  //  which don't support html input.
+  let plainText = ''
+
+  for (let i = 0; i < contents.childNodes.length; i++) {
+    plainText += contents.childNodes[i].innerText
+    if (i < contents.childNodes.length - 1) plainText += '\u000A'
+  }
 
   // Add the phony content to a div element. This is needed to copy the
   // contents into the html clipboard register.
@@ -95,7 +106,7 @@ function cloneFragment(event, value, fragment = value.fragment) {
   // (mapped to 'text/url-list'); so, we should only enter block if !IS_IE
   if (event.clipboardData && event.clipboardData.setData && !IS_IE) {
     event.preventDefault()
-    event.clipboardData.setData(TEXT, div.textContent)
+    event.clipboardData.setData(TEXT, plainText)
     event.clipboardData.setData(FRAGMENT, encoded)
     event.clipboardData.setData(HTML, div.innerHTML)
     return
