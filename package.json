@@ -111,17 +111,20 @@
     "watch": "rollup --config ./support/rollup/config.js --watch"
   },
   "nyc": {
-      "check-coverage": true,
+      "require": [
+        "babel-register"
+      ],
+      "sourceMap": false,
+      "instrument": false,
+      "all": true,
+      "extension" : ["js"],
+      "cache": false,
+      "exclude": ["**/test/**", "**/benchmark/**"],
       "reporter": [
         "html",
         "lcov",
         "text",
         "text-summary"
-       ],
-      "exclude": [
-        "**/node_modules/**",
-        "**/test/**",
-        "example/**"
        ],
       "report-dir": "coverage"
     }
