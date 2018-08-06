@@ -83,7 +83,7 @@ function cloneFragment(event, value, fragment = value.fragment) {
   }
 
   attach.setAttribute('data-slate-fragment', encoded)
-  
+
   //  Creates value from only the selected blocks
   //  Then gets plaintext for clipboard with proper linebreaks for BLOCK elements
   //  Via Plain serializer
