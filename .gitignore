@@ -16,6 +16,8 @@ node_modules/
 npm-debug.log
 yarn-error.log
 packages/*/yarn.lock
+coverage/
+.nyc_output/
 
 # OS files.
 .DS_Store
