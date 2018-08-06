@@ -24,6 +24,7 @@ Plugins that add specific behaviors to your editor.
 | [`slate-suggestions`](https://yarnpkg.com/en/package/slate-suggestions)                   | Displays inline auto-completed suggestions.                     | ![](https://img.shields.io/npm/dm/slate-suggestions.svg?maxAge=3600&label=⬇)          |
 | [`slate-trailing-block`](https://yarnpkg.com/en/package/slate-trailing-block)             | Ensure that documents end in a specific kind of block.          | ![](https://img.shields.io/npm/dm/slate-trailing-block.svg?maxAge=3600&label=⬇)       |
 | [`slate-instant-replace`](https://www.npmjs.com/package/slate-instant-replace)            | Automatically transform last word typed.                        | ![](https://img.shields.io/npm/dm/slate-instant-replace.svg?maxAge=3600&label=⬇)      |
+| [`slate-poor-mentions`](https://yarnpkg.com/en/package/slate-poor-mentions)               | Popup mentions portal when typing trigger chars                 | ![](https://img.shields.io/npm/dm/slate-poor-mentions.svg?maxAge=3600&label=?)        |
 
 Find more plugins on [npm](https://www.npmjs.com/search?q=slate%20plugin&page=0&perPage=20) or [yarn](https://yarnpkg.com/en/packages?q=slate%20plugin&p=1).
 
