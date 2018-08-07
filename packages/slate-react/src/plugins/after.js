@@ -377,7 +377,10 @@ function AfterPlugin() {
         : change.splitBlock()
     }
 
-    if (Hotkeys.isDeleteCharBackward(event) && !IS_IOS) {
+    if (
+      (Hotkeys.isDeleteCharBackward(event) && !IS_IOS) ||
+      Hotkeys.isDelete(event)
+    ) {
       return change.deleteCharBackward()
     }
 

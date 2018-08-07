@@ -31,16 +31,19 @@ const isDeleteForward = e => isDelete(e) || isShiftDelete(e)
 
 const isDeleteCharBackwardMac = isKeyHotkey('ctrl+h')
 const isDeleteCharForwardMac = isKeyHotkey('ctrl+d')
-const isDeleteCharBackward = e =>
-  isDeleteBackward(e) || (IS_APPLE && isDeleteCharBackwardMac(e))
 const isDeleteCharForward = e =>
   isDeleteForward(e) || (IS_APPLE && isDeleteCharForwardMac(e))
 
 const isDeleteLineBackwardMac = e =>
   isKeyHotkey('cmd+shift+backspace', e) || isKeyHotkey('cmd+backspace', e)
+const isDeleteLineBackwardPC = e =>
+  isKeyHotkey('ctrl+shift+backspace', e) || isKeyHotkey('ctrl+backspace', e)
 const isDeleteLineForwardMac = isKeyHotkey('ctrl+k')
-const isDeleteLineBackward = e => IS_APPLE && isDeleteLineBackwardMac(e)
-const isDeleteLineForward = e => IS_APPLE && isDeleteLineForwardMac(e)
+const isDeleteLineForwardPC = isKeyHotkey('ctrl+shift+delete')
+const isDeleteLineBackward = e =>
+  IS_APPLE ? isDeleteLineBackwardMac(e) : isDeleteLineBackwardPC(e)
+const isDeleteLineForward = e =>
+  IS_APPLE ? isDeleteLineForwardMac(e) : isDeleteLineForwardPC(e)
 
 const isDeleteWordBackwardMac = e =>
   isKeyHotkey('shift+option+backspace', e) || isKeyHotkey('option+backspace', e)
@@ -52,6 +55,22 @@ const isDeleteWordBackward = e =>
   IS_APPLE ? isDeleteWordBackwardMac(e) : isDeleteWordBackwardPC(e)
 const isDeleteWordForward = e =>
   IS_APPLE ? isDeleteWordForwardMac(e) : isDeleteWordForwardPC(e)
+
+const isDeleteCharBackward = e =>
+  isDeleteBackward(e) || (IS_APPLE && isDeleteCharBackwardMac(e))
+
+const isOtherDelete = e => {
+  if (e.key !== 'Backspace' && e.key !== 'Delete') return false
+  const other = [
+    isDeleteCharBackward,
+    isDeleteLineBackward,
+    isDeleteLineForward,
+    isDeleteWordBackward,
+    isDeleteWordForward,
+    isDeleteCharForward,
+  ].find(fn => fn(e))
+  return !other
+}
 
 const isExtendCharForward = isKeyHotkey('shift+right')
 const isExtendCharBackward = isKeyHotkey('shift+left')
@@ -81,12 +100,10 @@ const isTransposeCharacter = e => IS_APPLE && isTransposeCharacterMac(e)
 
 const isContentEditable = e =>
   isBold(e) ||
-  isDeleteCharBackward(e) ||
   isDeleteCharForward(e) ||
-  isDeleteLineBackward(e) ||
   isDeleteLineForward(e) ||
-  isDeleteWordBackward(e) ||
-  isDeleteWordForward(e) ||
+  e.key === 'Backspace' ||
+  e.key === 'Delete' ||
   isItalic(e) ||
   isRedo(e) ||
   isSplitBlock(e) ||
@@ -129,4 +146,5 @@ export default {
   isRedo,
   isSplitBlock,
   isUndo,
+  isDelete: isOtherDelete,
 }
