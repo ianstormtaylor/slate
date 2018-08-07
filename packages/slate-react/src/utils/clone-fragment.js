@@ -87,11 +87,7 @@ function cloneFragment(event, value, fragment = value.fragment) {
   //  Creates value from only the selected blocks
   //  Then gets plaintext for clipboard with proper linebreaks for BLOCK elements
   //  Via Plain serializer
-  const valFromSelection = Value.create({
-    document: {
-      nodes: value.blocks,
-    },
-  })
+  const valFromSelection = Value.create({ document: fragment })
   const plainText = Plain.serialize(valFromSelection)
 
   // Add the phony content to a div element. This is needed to copy the
