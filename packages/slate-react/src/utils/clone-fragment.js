@@ -1,4 +1,6 @@
 import Base64 from 'slate-base64-serializer'
+import Plain from 'slate-plain-serializer'
+import { Value } from 'slate'
 import TRANSFER_TYPES from '../constants/transfer-types'
 import getWindow from 'get-window'
 import findDOMNode from './find-dom-node'
@@ -82,6 +84,12 @@ function cloneFragment(event, value, fragment = value.fragment) {
 
   attach.setAttribute('data-slate-fragment', encoded)
 
+  //  Creates value from only the selected blocks
+  //  Then gets plaintext for clipboard with proper linebreaks for BLOCK elements
+  //  Via Plain serializer
+  const valFromSelection = Value.create({ document: fragment })
+  const plainText = Plain.serialize(valFromSelection)
+
   // Add the phony content to a div element. This is needed to copy the
   // contents into the html clipboard register.
   const div = window.document.createElement('div')
@@ -95,7 +103,7 @@ function cloneFragment(event, value, fragment = value.fragment) {
   // (mapped to 'text/url-list'); so, we should only enter block if !IS_IE
   if (event.clipboardData && event.clipboardData.setData && !IS_IE) {
     event.preventDefault()
-    event.clipboardData.setData(TEXT, div.textContent)
+    event.clipboardData.setData(TEXT, plainText)
     event.clipboardData.setData(FRAGMENT, encoded)
     event.clipboardData.setData(HTML, div.innerHTML)
     return
