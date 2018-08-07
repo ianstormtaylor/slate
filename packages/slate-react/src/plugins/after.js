@@ -377,11 +377,11 @@ function AfterPlugin() {
         : change.splitBlock()
     }
 
-    if (Hotkeys.isDeleteCharBackward(event) && !IS_IOS) {
+    if (Hotkeys.isDeleteBackward(event) && !IS_IOS) {
       return change.deleteCharBackward()
     }
 
-    if (Hotkeys.isDeleteCharForward(event) && !IS_IOS) {
+    if (Hotkeys.isDeleteForward(event) && !IS_IOS) {
       return change.deleteCharForward()
     }
 
@@ -412,12 +412,12 @@ function AfterPlugin() {
     // COMPAT: Certain browsers don't handle the selection updates properly. In
     // Chrome, the selection isn't properly extended. And in Firefox, the
     // selection isn't properly collapsed. (2017/10/17)
-    if (Hotkeys.isCollapseLineBackward(event)) {
+    if (Hotkeys.isMoveLineBackward(event)) {
       event.preventDefault()
       return change.moveToStartOfBlock()
     }
 
-    if (Hotkeys.isCollapseLineForward(event)) {
+    if (Hotkeys.isMoveLineForward(event)) {
       event.preventDefault()
       return change.moveToEndOfBlock()
     }
@@ -435,7 +435,7 @@ function AfterPlugin() {
     // COMPAT: If a void node is selected, or a zero-width text node adjacent to
     // an inline is selected, we need to handle these hotkeys manually because
     // browsers won't know what to do.
-    if (Hotkeys.isCollapseCharBackward(event)) {
+    if (Hotkeys.isMoveBackward(event)) {
       const { document, isInVoid, previousText, startText } = value
       const isPreviousInVoid =
         previousText && document.hasVoidParent(previousText.key)
@@ -446,7 +446,7 @@ function AfterPlugin() {
       }
     }
 
-    if (Hotkeys.isCollapseCharForward(event)) {
+    if (Hotkeys.isMoveForward(event)) {
       const { document, isInVoid, nextText, startText } = value
       const isNextInVoid = nextText && document.hasVoidParent(nextText.key)
 
@@ -456,7 +456,7 @@ function AfterPlugin() {
       }
     }
 
-    if (Hotkeys.isExtendCharBackward(event)) {
+    if (Hotkeys.isExtendBackward(event)) {
       const { document, isInVoid, previousText, startText } = value
       const isPreviousInVoid =
         previousText && document.hasVoidParent(previousText.key)
@@ -467,7 +467,7 @@ function AfterPlugin() {
       }
     }
 
-    if (Hotkeys.isExtendCharForward(event)) {
+    if (Hotkeys.isExtendForward(event)) {
       const { document, isInVoid, nextText, startText } = value
       const isNextInVoid = nextText && document.hasVoidParent(nextText.key)
 

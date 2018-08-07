@@ -387,13 +387,28 @@ function BeforePlugin() {
     // typing. However, certain characters also move the selection before
     // we're able to handle it, so prevent their default behavior.
     if (isComposing) {
-      if (Hotkeys.isComposing(event)) event.preventDefault()
+      if (Hotkeys.isCompose(event)) event.preventDefault()
       return true
     }
 
-    // Certain hotkeys have native behavior in contenteditable elements which
-    // will cause our value to be out of sync, so prevent them.
-    if (Hotkeys.isContentEditable(event) && !IS_IOS) {
+    // Certain hotkeys have native editing behaviors in `contenteditable`
+    // elements which will change the DOM and cause our value to be out of sync,
+    // so they need to always be prevented.
+    if (
+      !IS_IOS &&
+      (Hotkeys.isBold(event) ||
+        Hotkeys.isDeleteBackward(event) ||
+        Hotkeys.isDeleteForward(event) ||
+        Hotkeys.isDeleteLineBackward(event) ||
+        Hotkeys.isDeleteLineForward(event) ||
+        Hotkeys.isDeleteWordBackward(event) ||
+        Hotkeys.isDeleteWordForward(event) ||
+        Hotkeys.isItalic(event) ||
+        Hotkeys.isRedo(event) ||
+        Hotkeys.isSplitBlock(event) ||
+        Hotkeys.isTransposeCharacter(event) ||
+        Hotkeys.isUndo(event))
+    ) {
       event.preventDefault()
     }
 
