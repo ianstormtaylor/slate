@@ -322,7 +322,7 @@ Changes.deleteWordBackwardAtRange = (change, range, options) => {
   const offset = startBlock.getOffset(start.key)
   const o = offset + start.offset
   const { text } = startBlock
-  const n = TextUtils.getWordOffsetBackward(text, o)
+  const n = o === 0 ? 1 : TextUtils.getWordOffsetBackward(text, o)
   change.deleteBackwardAtRange(range, n, options)
 }
 
