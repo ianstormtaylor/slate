@@ -14,12 +14,6 @@ import AfterPlugin from '../plugins/after'
 import BeforePlugin from '../plugins/before'
 import noop from '../utils/noop'
 
-/*
- * Identify function used in componentDidMount just for passing value to parent
-*/
-
-const id = change => change
-
 /**
  * Debug.
  *
@@ -97,7 +91,7 @@ class Editor extends React.Component {
     if (this.props.autoFocus) {
       this.focus()
     } else {
-      this.change(id)
+      this.change(change => change)
     }
 
     this.tmp.updates++
@@ -139,11 +133,13 @@ class Editor extends React.Component {
    */
 
   change = (...args) => {
-    const change = this.tmp.changes.get(this.value).call(...args)
+    const change = this.tmp.changes.get(this.value)
+    const lastOperationSize = change.operations.size
+    change.call(...args)
     debug('onChange', { change })
 
     // Do not rerun the change if onChange is run already in the first mount
-    if (args[0] !== id && change.operations.size) {
+    if (change.operations.size > lastOperationSize) {
       this.stack.run('onChange', change, this)
     }
 
