@@ -186,14 +186,12 @@ class Editor extends React.Component {
   }
 
   get value() {
-    if (
-      this.tmp.value === this.props.value &&
-      this.tmp.stack === this.props.stack
-    ) {
+    if (this.tmp.value === this.props.value && this.tmp.stack === this.stack) {
       const { value } = this.tmp
       this.queueChange(value.change())
       return value
     }
+
     return this.associateStackAndValue(this.props.value, this.stack)
   }
 
