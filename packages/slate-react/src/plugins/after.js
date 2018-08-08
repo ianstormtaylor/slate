@@ -6,8 +6,8 @@ import React from 'react'
 import getWindow from 'get-window'
 import { Block, Inline, Text } from 'slate'
 import Hotkeys from 'slate-hotkeys'
-import EVENT_HANDLERS from '../constants/event-handlers'
 
+import EVENT_HANDLERS from '../constants/event-handlers'
 import Content from '../components/content'
 import cloneFragment from '../utils/clone-fragment'
 import findDOMNode from '../utils/find-dom-node'
@@ -598,7 +598,6 @@ function AfterPlugin() {
 
   function renderEditor(props, editor) {
     const handlers = EVENT_HANDLERS.reduce((obj, handler) => {
-      const { handlers } = editor
       obj[handler] = editor[handler]
       return obj
     }, {})
