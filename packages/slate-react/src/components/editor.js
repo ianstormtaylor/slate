@@ -1,5 +1,5 @@
 import Debug from 'debug'
-import Portal from 'react-portal'
+import { Portal } from 'react-portal'
 import React from 'react'
 import SlateTypes from 'slate-prop-types'
 import Types from 'prop-types'

@@ -20,7 +20,7 @@
     "lodash": "^4.1.1",
     "prop-types": "^15.5.8",
     "react-immutable-proptypes": "^2.1.0",
-    "react-portal": "^3.1.0",
+    "react-portal": "^4.1.1",
     "selection-is-backward": "^1.0.0",
     "slate-base64-serializer": "^0.2.48",
     "slate-dev-environment": "^0.1.4",
