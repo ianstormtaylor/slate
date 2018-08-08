@@ -14,6 +14,8 @@ import AfterPlugin from '../plugins/after'
 import BeforePlugin from '../plugins/before'
 import noop from '../utils/noop'
 
+const id = change => change
+
 /**
  * Debug.
  *
@@ -88,15 +90,10 @@ class Editor extends React.Component {
    */
 
   componentDidMount() {
-    const { value } = this
-
     if (this.props.autoFocus) {
       this.focus()
     } else {
-      this.tmp.value = value
-      const change = this.tmp.changes.get(value)
-      this.tmp.changes.clear()
-      this.props.onChange(change)
+      this.change(id)
     }
 
     this.tmp.updates++
@@ -138,8 +135,20 @@ class Editor extends React.Component {
    */
 
   change = (...args) => {
-    const change = this.value.change().call(...args)
-    this.onChange(change)
+    const change = this.tmp.changes.get(this.value).call(...args)
+    debug('onChange', { change })
+
+    // Do not rerun the change if onChange is run already in the first mount
+    if (args[0] !== id && change.operations.size) {
+      this.stack.run('onChange', change, this)
+    }
+
+    const { value } = change
+    if (value == this.value) return
+    this.tmp.value = value
+    this.tmp.stack = this.stack
+    this.tmp.changes.clear()
+    this.props.onChange(change)
   }
 
   /**
@@ -224,24 +233,6 @@ class Editor extends React.Component {
     this.change(change => {
       this.stack.run(handler, event, change, this)
     })
-  }
-
-  /**
-   * On change.
-   *
-   * @param {Change} change
-   */
-
-  onChange = change => {
-    debug('onChange', { change })
-
-    if (change.operations.size) this.stack.run('onChange', change, this)
-    const { value } = change
-    if (value == this.value) return
-    this.tmp.value = value
-    this.tmp.stack = this.stack
-    this.tmp.changes.clear()
-    this.props.onChange(change)
   }
 
   /**
