@@ -132,7 +132,7 @@ class Editor extends React.Component {
    */
 
   change = (...args) => {
-    const change = this.tmp.changes.get(this.value)
+  const {change} = this.tmp
     const lastOperationSize = change.operations.size
     change.call(...args)
     debug('onChange', { change })
