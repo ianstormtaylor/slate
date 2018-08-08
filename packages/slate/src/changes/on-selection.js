@@ -699,12 +699,12 @@ function pointForward(change, point, n = 1) {
     return
   }
 
-  const block = document.getClosestBlock(p.path)
-  const isInBlock = block.hasNode(next.key)
   const next = document.getNextText(p.path)
-  const isNextInVoid = next && document.hasVoidParent(next.key)
   if (!next) return
 
+  const block = document.getClosestBlock(p.path)
+  const isInBlock = block.hasNode(next.key)
+  const isNextInVoid = next && document.hasVoidParent(next.key)
   change.moveAnchorToStartOf(next)
 
   if (!isInVoid && !isNextInVoid && isInBlock) {
