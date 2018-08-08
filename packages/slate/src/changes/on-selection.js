@@ -675,13 +675,12 @@ function pointBackward(change, point, n = 1) {
   const block = document.getClosestBlock(p.path)
   const isInBlock = block.hasNode(previous.key)
   const isPreviousInVoid = previous && document.hasVoidParent(previous.key)
-  const range = change.value.selection[`move${Point}Backward`](n)
   change[`move${Point}ToEndOfNode`](previous)
 
   // when is this called?
   if (!isInVoid && !isPreviousInVoid && isInBlock) {
     const range = change.value.selection[`move${Point}Backward`](n)
-    change.select(change.value.selection)
+    change.select(range)
   }
 }
 
