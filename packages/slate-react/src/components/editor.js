@@ -101,7 +101,6 @@ class Editor extends React.Component {
    */
 
   componentDidUpdate(prevProps) {
-    if (prevProps === this.props) return
     // Increment the updates counter as a baseline.
     this.tmp.updates++
 
@@ -112,6 +111,8 @@ class Editor extends React.Component {
         'A Slate <Editor> is re-resolving `props.plugins` or `props.schema` on each update, which leads to poor performance. This is often due to passing in a new `schema` or `plugins` prop with each render by declaring them inline in your render function. Do not do this!'
       )
     }
+
+    this.change(change => change)
   }
 
   /**
@@ -140,6 +141,10 @@ class Editor extends React.Component {
     // Do not rerun the change if onChange is run already in the first mount
     if (change.operations.size > lastOperationSize) {
       this.stack.run('onChange', change, this)
+    }
+
+    if (change.operations.size === 0 && change.value === this.props.value) {
+      return
     }
 
     this.tmp.value = change.value
