@@ -7,7 +7,6 @@ import getWindow from 'get-window'
 import { Block, Inline, Text } from 'slate'
 import Hotkeys from 'slate-hotkeys'
 
-import EVENT_HANDLERS from '../constants/event-handlers'
 import Content from '../components/content'
 import cloneFragment from '../utils/clone-fragment'
 import findDOMNode from '../utils/find-dom-node'
@@ -116,12 +115,11 @@ function AfterPlugin() {
   function onCut(event, change, editor) {
     debug('onCut', { event })
 
-    cloneFragment(event, change.value)
-    const window = getWindow(event.target)
+    const callback = cloneFragment(event, change.value)
 
     // Once the fake cut content has successfully been added to the clipboard,
     // delete the content in the current selection.
-    window.requestAnimationFrame(() => {
+    callback(() => {
       // If user cuts a void block node or a void inline node,
       // manually removes it since selection is collapsed in this case.
       const { value } = change
@@ -598,10 +596,7 @@ function AfterPlugin() {
    */
 
   function renderEditor(props, editor) {
-    const handlers = EVENT_HANDLERS.reduce((obj, handler) => {
-      obj[handler] = editor[handler]
-      return obj
-    }, {})
+    const { handlers } = editor
 
     return (
       <Content

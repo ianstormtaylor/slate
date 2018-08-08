@@ -106,7 +106,7 @@ function cloneFragment(event, value, fragment = value.fragment) {
     event.clipboardData.setData(TEXT, plainText)
     event.clipboardData.setData(FRAGMENT, encoded)
     event.clipboardData.setData(HTML, div.innerHTML)
-    return
+    return callback => callback()
   }
 
   // COMPAT: For browser that don't support the Clipboard API's setData method,
@@ -120,11 +120,14 @@ function cloneFragment(event, value, fragment = value.fragment) {
   native.selectAllChildren(div)
 
   // Revert to the previous selection right after copying.
-  window.requestAnimationFrame(() => {
-    editor.removeChild(div)
-    removeAllRanges(native)
-    native.addRange(range)
-  })
+  return callback => {
+    window.requestAnimationFrame(() => {
+      editor.removeChild(div)
+      removeAllRanges(native)
+      native.addRange(range)
+      callback()
+    })
+  }
 }
 
 export default cloneFragment
