@@ -143,9 +143,7 @@ class Editor extends React.Component {
       this.stack.run('onChange', change, this)
     }
 
-    const { value } = change
-    if (value == this.value) return
-    this.tmp.value = value
+    this.tmp.value = change.value
     this.tmp.stack = this.stack
     this.tmp.changes.clear()
     this.props.onChange(change)
