@@ -2,6 +2,7 @@ import Debug from 'debug'
 import getWindow from 'get-window'
 import { findDOMNode } from 'react-dom'
 import Hotkeys from 'slate-hotkeys'
+import EVENT_HANDLERS from '../constants/event-handlers'
 import {
   IS_FIREFOX,
   IS_IE,
