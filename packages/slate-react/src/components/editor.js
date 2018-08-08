@@ -1,4 +1,3 @@
-/* global Map */
 import Debug from 'debug'
 import Portal from 'react-portal'
 import React from 'react'
@@ -77,7 +76,7 @@ class Editor extends React.Component {
     updates: 0,
     resolves: 0,
     value: undefined,
-    changes: new Map(), // eslint-disable-line no-restricted-globals
+    change: undefined,
   }
 
   state = {}
@@ -145,7 +144,7 @@ class Editor extends React.Component {
 
     this.tmp.value = change.value
     this.tmp.stack = this.stack
-    this.tmp.changes.clear()
+    this.tmp.change = undefined
     this.props.onChange(change)
   }
 
@@ -185,7 +184,7 @@ class Editor extends React.Component {
       this.tmp.stack === this.props.stack
     ) {
       const { value } = this.tmp
-      this.queueChange(value, value.change())
+      this.queueChange(value.change())
       return value
     }
     return this.associateStackAndValue(this.props.value, this.stack)
@@ -206,18 +205,17 @@ class Editor extends React.Component {
   associateStackAndValue = memoizeOne((value, stack) => {
     const change = value.change()
     stack.run('onChange', change, this)
-    this.queueChange(change.value, change)
+    this.queueChange(change)
     return change.value
   })
 
   /**
    * Queue a change object with value, to save operations of an value
-   * @param {Value} value
    * @param {Change} change
    */
 
-  queueChange(value, change) {
-    this.tmp.changes.set(value, change)
+  queueChange(change) {
+    this.tmp.change = change
   }
 
   /**
