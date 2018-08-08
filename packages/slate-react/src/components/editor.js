@@ -1,3 +1,4 @@
+/* global Map */
 import Debug from 'debug'
 import Portal from 'react-portal'
 import React from 'react'
@@ -76,6 +77,7 @@ class Editor extends React.Component {
     updates: 0,
     resolves: 0,
     value: undefined,
+    changes: new Map(), // eslint-disable-line no-restricted-globals
   }
 
   state = {}
@@ -92,8 +94,8 @@ class Editor extends React.Component {
       this.focus()
     } else {
       this.tmp.value = value
-      const change = value.change()
-      debug('didMount', { change })
+      const change = this.tmp.changes.get(value)
+      this.tmp.changes.clear()
       this.props.onChange(change)
     }
 
@@ -173,9 +175,11 @@ class Editor extends React.Component {
   get value() {
     if (
       this.tmp.value === this.props.value &&
-      this.tmp.stack === this.stack.stack
+      this.tmp.stack === this.props.stack
     ) {
-      return this.tmp.value
+      const { value } = this.tmp
+      this.queueChange(value, value.change())
+      return value
     }
     return this.associateStackAndValue(this.props.value, this.stack)
   }
@@ -195,8 +199,19 @@ class Editor extends React.Component {
   associateStackAndValue = memoizeOne((value, stack) => {
     const change = value.change()
     stack.run('onChange', change, this)
+    this.queueChange(change.value, change)
     return change.value
   })
+
+  /**
+   * Queue a change object with value, to save operations of an value
+   * @param {Value} value
+   * @param {Change} change
+   */
+
+  queueChange(value, change) {
+    this.tmp.changes.set(value, change)
+  }
 
   /**
    * On event.
@@ -222,11 +237,11 @@ class Editor extends React.Component {
 
     if (change.operations.size) this.stack.run('onChange', change, this)
     const { value } = change
-    const { onChange } = this.props
     if (value == this.value) return
     this.tmp.value = value
     this.tmp.stack = this.stack
-    onChange(change)
+    this.tmp.changes.clear()
+    this.props.onChange(change)
   }
 
   /**
