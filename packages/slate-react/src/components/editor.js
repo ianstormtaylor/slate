@@ -14,6 +14,10 @@ import AfterPlugin from '../plugins/after'
 import BeforePlugin from '../plugins/before'
 import noop from '../utils/noop'
 
+/*
+ * Identify function used in componentDidMount just for passing value to parent
+*/
+
 const id = change => change
 
 /**
