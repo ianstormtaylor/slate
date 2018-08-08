@@ -138,11 +138,13 @@ class Editor extends React.Component {
     change.call(...args)
     debug('onChange', { change })
 
-    // Do not rerun the change if onChange is run already in the first mount
+    // Do not rerun the change if onChange is run already in associateStackAndValue without more following operations
     if (change.operations.size > lastOperationSize) {
       this.stack.run('onChange', change, this)
     }
 
+    // After we update the change with props.onChange; do not re-update in second
+    // cycle if no other operations are added
     if (change.operations.size === 0 && change.value === this.props.value) {
       return
     }
