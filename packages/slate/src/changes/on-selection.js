@@ -662,6 +662,7 @@ function pointBackward(change, point, n = 1) {
   const p = selection[point]
   const isInVoid = document.hasVoidParent(p.path)
 
+  // what is this?
   if (!isInVoid && p.offset - n >= 0) {
     const range = selection[`move${Point}Backward`](n)
     change.select(range)
@@ -674,8 +675,9 @@ function pointBackward(change, point, n = 1) {
   const block = document.getClosestBlock(p.path)
   const isInBlock = block.hasNode(previous.key)
   const isPreviousInVoid = previous && document.hasVoidParent(previous.key)
-  change.moveToEndOfNode(previous)
+  change[`move${Point}ToEndOfNode`](previous)
 
+  // when is this called?
   if (!isInVoid && !isPreviousInVoid && isInBlock) {
     const range = change.value.selection[`move${Point}Backward`](n)
     change.select(range)
@@ -693,20 +695,22 @@ function pointForward(change, point, n = 1) {
   const text = document.getNode(p.path)
   const isInVoid = document.hasVoidParent(p.path)
 
+  // what is this?
   if (!isInVoid && p.offset + n <= text.text.length) {
     const range = selection[`move${Point}Forward`](n)
     change.select(range)
     return
   }
 
-  const block = document.getClosestBlock(p.path)
-  const isInBlock = block.hasNode(next.key)
   const next = document.getNextText(p.path)
-  const isNextInVoid = next && document.hasVoidParent(next.key)
   if (!next) return
 
-  change.moveAnchorToStartOf(next)
+  const block = document.getClosestBlock(p.path)
+  const isInBlock = block.hasNode(next.key)
+  const isNextInVoid = document.hasVoidParent(next.key)
+  change[`move${Point}ToStartOfNode`](next)
 
+  // when is this called?
   if (!isInVoid && !isNextInVoid && isInBlock) {
     const range = change.value.selection[`move${Point}Forward`](n)
     change.select(range)
