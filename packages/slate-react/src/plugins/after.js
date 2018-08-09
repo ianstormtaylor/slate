@@ -36,7 +36,7 @@ function AfterPlugin() {
   let isDraggingInternally = null
 
   /**
-   * On before input, correct any browser inconsistencies.
+   * On before input.
    *
    * @param {Event} event
    * @param {Change} change
@@ -46,8 +46,96 @@ function AfterPlugin() {
   function onBeforeInput(event, change, editor) {
     debug('onBeforeInput', { event })
 
+    const isSynthetic = !!event.nativeEvent
+
+    // If the event is synthetic, it's React's polyfill of `beforeinput` that
+    // isn't a true `beforeinput` event with meaningful information. It only
+    // gets triggered for character insertions, so we can just insert directly.
+    if (isSynthetic) {
+      event.preventDefault()
+      change.insertText(event.data)
+      return
+    }
+
+    // Otherwise, we can use the information in the `beforeinput` event to
+    // figure out the exact change that will occur, and prevent it.
+    const [targetRange] = event.getTargetRanges()
+    if (!targetRange) return
+
     event.preventDefault()
-    change.insertText(event.data)
+
+    const { value } = change
+    const { selection } = value
+    const range = findRange(targetRange, value)
+
+    switch (event.inputType) {
+      case 'deleteByDrag':
+      case 'deleteByCut':
+      case 'deleteContent':
+      case 'deleteContentBackward':
+      case 'deleteContentForward': {
+        change.deleteAtRange(range)
+        return
+      }
+
+      case 'deleteWordBackward': {
+        change.deleteWordBackwardAtRange(range)
+        return
+      }
+
+      case 'deleteWordForward': {
+        change.deleteWordForwardAtRange(range)
+        return
+      }
+
+      case 'deleteSoftLineBackward':
+      case 'deleteHardLineBackward': {
+        change.deleteLineBackwardAtRange(range)
+        return
+      }
+
+      case 'deleteSoftLineForward':
+      case 'deleteHardLineForward': {
+        change.deleteLineForwardAtRange(range)
+        return
+      }
+
+      case 'insertLineBreak':
+      case 'insertParagraph': {
+        if (change.value.isInVoid) {
+          change.moveToStartOfNextText()
+        } else {
+          change.splitBlockAtRange(range)
+        }
+
+        return
+      }
+
+      case 'insertFromYank':
+      case 'insertReplacementText':
+      case 'insertText': {
+        // COMPAT: `data` should have the text for the `insertText` input type
+        // and `dataTransfer` should have the text for the
+        // `insertReplacementText` input type, but Safari uses `insertText` for
+        // spell check replacements and sets `data` to `null`. (2018/08/09)
+        const text =
+          event.data == null
+            ? event.dataTransfer.getData('text/plain')
+            : event.data
+
+        if (text == null) return
+
+        change.insertTextAtRange(range, text, selection.marks)
+
+        // If the text was successfully inserted, and the selection had marks
+        // on it, unset the selection's marks.
+        if (selection.marks && value.document != change.value.document) {
+          change.select({ marks: null })
+        }
+
+        return
+      }
+    }
   }
 
   /**

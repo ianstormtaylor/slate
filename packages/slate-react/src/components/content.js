@@ -6,7 +6,7 @@ import {
   IS_FIREFOX,
   IS_IOS,
   IS_ANDROID,
-  SUPPORTED_EVENTS,
+  HAS_INPUT_EVENTS_LEVEL_2,
 } from 'slate-dev-environment'
 import logger from 'slate-dev-logger'
 import throttle from 'lodash/throttle'
@@ -97,9 +97,10 @@ class Content extends React.Component {
       this.onNativeSelectionChange
     )
 
-    // COMPAT: Restrict scope of `beforeinput` to mobile.
-    if ((IS_IOS || IS_ANDROID) && SUPPORTED_EVENTS.beforeinput) {
-      this.element.addEventListener('beforeinput', this.onNativeBeforeInput)
+    // COMPAT: Restrict scope of `beforeinput` to clients that support the
+    // Input Events Level 2 spec, since they are preventable events.
+    if (HAS_INPUT_EVENTS_LEVEL_2) {
+      this.element.addEventListener('beforeinput', this.onBeforeInput)
     }
 
     this.updateSelection()
@@ -119,9 +120,8 @@ class Content extends React.Component {
       )
     }
 
-    // COMPAT: Restrict scope of `beforeinput` to mobile.
-    if ((IS_IOS || IS_ANDROID) && SUPPORTED_EVENTS.beforeinput) {
-      this.element.removeEventListener('beforeinput', this.onNativeBeforeInput)
+    if (HAS_INPUT_EVENTS_LEVEL_2) {
+      this.element.removeEventListener('beforeinput', this.onBeforeInput)
     }
   }
 
@@ -340,83 +340,6 @@ class Content extends React.Component {
     }
 
     this.props[handler](event)
-  }
-
-  /**
-   * On a native `beforeinput` event, use the additional range information
-   * provided by the event to manipulate text exactly as the browser would.
-   *
-   * This is currently only used on iOS and Android.
-   *
-   * @param {InputEvent} event
-   */
-
-  onNativeBeforeInput = event => {
-    if (this.props.readOnly) return
-    if (!this.isInEditor(event.target)) return
-
-    const [targetRange] = event.getTargetRanges()
-    if (!targetRange) return
-
-    const { editor } = this.props
-
-    switch (event.inputType) {
-      case 'deleteContentBackward': {
-        event.preventDefault()
-
-        const range = findRange(targetRange, editor.value)
-        editor.change(change => change.deleteAtRange(range))
-        break
-      }
-
-      case 'insertLineBreak': // intentional fallthru
-      case 'insertParagraph': {
-        event.preventDefault()
-        const range = findRange(targetRange, editor.value)
-
-        editor.change(change => {
-          if (change.value.isInVoid) {
-            change.moveToStartOfNextText()
-          } else {
-            change.splitBlockAtRange(range)
-          }
-        })
-
-        break
-      }
-
-      case 'insertReplacementText': // intentional fallthru
-      case 'insertText': {
-        // `data` should have the text for the `insertText` input type and
-        // `dataTransfer` should have the text for the `insertReplacementText`
-        // input type, but Safari uses `insertText` for spell check replacements
-        // and sets `data` to `null`.
-        const text =
-          event.data == null
-            ? event.dataTransfer.getData('text/plain')
-            : event.data
-
-        if (text == null) return
-
-        event.preventDefault()
-
-        const { value } = editor
-        const { selection } = value
-        const range = findRange(targetRange, value)
-
-        editor.change(change => {
-          change.insertTextAtRange(range, text, selection.marks)
-
-          // If the text was successfully inserted, and the selection had marks
-          // on it, unset the selection's marks.
-          if (selection.marks && value.document != change.value.document) {
-            change.select({ marks: null })
-          }
-        })
-
-        break
-      }
-    }
   }
 
   /**

@@ -1,4 +1,4 @@
-import browser from 'is-in-browser'
+import isBrowser from 'is-in-browser'
 
 /**
  * Browser matching rules.
@@ -19,13 +19,16 @@ const BROWSER_RULES = [
   ['safari', /Version\/([0-9\._]+).*Safari/],
 ]
 
-/**
- * DOM event matching rules.
- *
- * @type {Array}
- */
+let browser
 
-const EVENT_RULES = [['beforeinput', el => 'onbeforeinput' in el]]
+if (isBrowser) {
+  for (const [name, regexp] of BROWSER_RULES) {
+    if (regexp.test(window.navigator.userAgent)) {
+      browser = name
+      break
+    }
+  }
+}
 
 /**
  * Operating system matching rules.
@@ -41,59 +44,70 @@ const OS_RULES = [
   ['windows', /windows\s*(?:nt)?\s*([\.\_\d]+)/i],
 ]
 
-/**
- * Define variables to store the result.
- */
+let os
 
-let BROWSER
-const EVENTS = {}
-let OS
-
-/**
- * Run the matchers when in browser.
- */
-
-if (browser) {
-  const { userAgent } = window.navigator
-
-  for (const [name, regexp] of BROWSER_RULES) {
-    if (regexp.test(userAgent)) {
-      BROWSER = name
-      break
-    }
-  }
-
+if (isBrowser) {
   for (const [name, regexp] of OS_RULES) {
-    if (regexp.test(userAgent)) {
-      OS = name
+    if (regexp.test(window.navigator.userAgent)) {
+      os = name
       break
     }
   }
+}
 
-  const testEl = window.document.createElement('div')
-  testEl.contentEditable = true
+/**
+ * Feature matching rules.
+ *
+ * @type {Array}
+ */
 
-  for (const [name, testFn] of EVENT_RULES) {
-    EVENTS[name] = testFn(testEl)
+const FEATURE_RULES = [
+  [
+    'inputeventslevel1',
+    window => {
+      const event = window.InputEvent ? new InputEvent('input') : {}
+      const support = 'inputType' in event
+      return support
+    },
+  ],
+  [
+    'inputeventslevel2',
+    window => {
+      const element = document.createElement('div')
+      element.contentEditable = true
+      const support = 'onbeforeinput' in element
+      return support
+    },
+  ],
+]
+
+const features = []
+
+if (isBrowser) {
+  for (const [name, test] of FEATURE_RULES) {
+    if (test(window)) {
+      features.push(name)
+    }
   }
 }
 
 /**
  * Export.
  *
- * @type {Object}
+ * @type {Boolean}
  */
 
-export const IS_CHROME = BROWSER === 'chrome'
-export const IS_OPERA = BROWSER === 'opera'
-export const IS_FIREFOX = BROWSER === 'firefox'
-export const IS_SAFARI = BROWSER === 'safari'
-export const IS_IE = BROWSER === 'ie'
-export const IS_EDGE = BROWSER === 'edge'
+export const IS_CHROME = browser === 'chrome'
+export const IS_OPERA = browser === 'opera'
+export const IS_FIREFOX = browser === 'firefox'
+export const IS_SAFARI = browser === 'safari'
+export const IS_IE = browser === 'ie'
+export const IS_EDGE = browser === 'edge'
 
-export const IS_ANDROID = OS === 'android'
-export const IS_IOS = OS === 'ios'
-export const IS_MAC = OS === 'macos'
-export const IS_WINDOWS = OS === 'windows'
+export const IS_ANDROID = os === 'android'
+export const IS_IOS = os === 'ios'
+export const IS_MAC = os === 'macos'
+export const IS_WINDOWS = os === 'windows'
 
-export const SUPPORTED_EVENTS = EVENTS
+export const HAS_INPUT_EVENTS_LEVEL_1 = features.includes('inputeventslevel1')
+export const HAS_INPUT_EVENTS_LEVEL_2 = features.includes('inputeventslevel2')
