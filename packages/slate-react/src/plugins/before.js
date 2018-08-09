@@ -6,8 +6,7 @@ import {
   IS_FIREFOX,
   IS_IE,
   IS_IOS,
-  IS_ANDROID,
-  SUPPORTED_EVENTS,
+  HAS_INPUT_EVENTS_LEVEL_2,
 } from 'slate-dev-environment'
 
 import findNode from '../utils/find-node'
@@ -44,15 +43,12 @@ function BeforePlugin() {
   function onBeforeInput(event, change, editor) {
     if (editor.props.readOnly) return true
 
-    // COMPAT: React's `onBeforeInput` synthetic event is based on the native
-    // `keypress` and `textInput` events. In browsers that support the native
-    // `beforeinput` event, we instead use that event to trigger text insertion,
-    // since it provides more useful information about the range being affected
-    // and also preserves compatibility with iOS autocorrect, which would be
-    // broken if we called `preventDefault()` on React's synthetic event here.
-    // Since native `onbeforeinput` mainly benefits autocorrect and spellcheck
-    // for mobile, on desktop it brings IME issue, limit its scope for now.
-    if ((IS_IOS || IS_ANDROID) && SUPPORTED_EVENTS.beforeinput) return true
+    const isSynthetic = !!event.nativeEvent
+
+    // COMPAT: If the browser supports Input Events Level 2, we will have
+    // attached a custom handler for the real `beforeinput` events, instead of
+    // allowing React's synthetic polyfill, so we need to ignore synthetics.
+    if (isSynthetic && HAS_INPUT_EVENTS_LEVEL_2) return true
 
     debug('onBeforeInput', { event })
   }
