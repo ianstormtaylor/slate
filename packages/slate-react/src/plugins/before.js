@@ -6,7 +6,6 @@ import {
   IS_FIREFOX,
   IS_IE,
   IS_IOS,
-  IS_ANDROID,
   HAS_INPUT_EVENTS_LEVEL_2,
 } from 'slate-dev-environment'
 

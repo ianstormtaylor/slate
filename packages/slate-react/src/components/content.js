@@ -2,12 +2,7 @@ import Debug from 'debug'
 import React from 'react'
 import Types from 'prop-types'
 import getWindow from 'get-window'
-import {
-  IS_FIREFOX,
-  IS_IOS,
-  IS_ANDROID,
-  HAS_INPUT_EVENTS_LEVEL_2,
-} from 'slate-dev-environment'
+import { IS_FIREFOX, HAS_INPUT_EVENTS_LEVEL_2 } from 'slate-dev-environment'
 import logger from 'slate-dev-logger'
 import throttle from 'lodash/throttle'
 
