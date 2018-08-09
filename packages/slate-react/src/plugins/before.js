@@ -1,4 +1,4 @@
-import Debug from 'debug'
+import EventDebug from './event-debug'
 import getWindow from 'get-window'
 import { findDOMNode } from 'react-dom'
 import Hotkeys from 'slate-hotkeys'
@@ -18,7 +18,7 @@ import findNode from '../utils/find-node'
  * @type {Function}
  */
 
-const debug = Debug('slate:before')
+const debug = EventDebug('slate:before')
 
 /**
  * The core before plugin.
@@ -150,7 +150,8 @@ function BeforePlugin() {
       }
     })
 
-    debug('onCompositionEnd', { event })
+    const { data, locale } = event
+    debug('onCompositionEnd', { event: { data, locale } })
   }
 
   /**
@@ -173,7 +174,8 @@ function BeforePlugin() {
       editor.setState({ isComposing: true })
     }
 
-    debug('onCompositionStart', { event })
+    const { data, locale } = event
+    debug('onCompositionStart', { event: { data, locale } })
   }
 
   /**

@@ -1,5 +1,5 @@
 import Base64 from 'slate-base64-serializer'
-import Debug from 'debug'
+import EventDebug from './event-debug'
 import Plain from 'slate-plain-serializer'
 import { IS_IOS } from 'slate-dev-environment'
 import React from 'react'
@@ -24,7 +24,7 @@ import setEventTransfer from '../utils/set-event-transfer'
  * @type {Function}
  */
 
-const debug = Debug('slate:after')
+const debug = EventDebug('slate:after')
 
 /**
  * The after plugin.
@@ -34,6 +34,7 @@ const debug = Debug('slate:after')
 
 function AfterPlugin() {
   let isDraggingInternally = null
+  let resolveCompositionID = null
 
   /**
    * On before input, correct any browser inconsistencies.
@@ -47,6 +48,8 @@ function AfterPlugin() {
     debug('onBeforeInput', { event })
 
     event.preventDefault()
+    if (resolveCompositionID) clearTimeout(resolveCompositionID)
+    resolveCompositionID = null
     change.insertText(event.data)
   }
 
@@ -89,6 +92,43 @@ function AfterPlugin() {
     }
 
     debug('onClick', { event })
+  }
+
+  /**
+   * On composition end.
+   *
+   * @param {Event} event
+   * @param {Change} change
+   * @param {Editor} editor
+   */
+
+  function onCompositionEnd(event, change, editor) {
+    event.preventDefault()
+    const { data } = event
+
+    resolveCompositionID = setTimeout(() => {
+      const { value } = change
+
+      if (editor.resolveComposition) {
+        editor.resolveComposition(value, data)
+      }
+    }, 20)
+
+    debug('onCompositionEnd', { event })
+  }
+
+  /**
+   * On composition start.
+   *
+   * @param {Event} event
+   * @param {Change} change
+   * @param {Editor} editor
+   */
+
+  function onCompositionStart(event, change, editor) {
+    const { value } = change
+    if (value.isExpanded) change.delete()
+    debug('onCompositionStart', { event })
   }
 
   /**
@@ -681,6 +721,8 @@ function AfterPlugin() {
     onBeforeInput,
     onBlur,
     onClick,
+    onCompositionStart,
+    onCompositionEnd,
     onCopy,
     onCut,
     onDragEnd,
