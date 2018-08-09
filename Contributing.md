@@ -51,6 +51,7 @@ To run the tests, you need to have the Slate repository cloned to your computer.
 
 ```
 yarn install
+yarn bootstrap
 yarn build
 ```
 
