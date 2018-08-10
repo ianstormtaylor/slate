@@ -27,6 +27,7 @@ import RTL from './rtl'
 import ReadOnly from './read-only'
 import RichText from './rich-text'
 import SearchHighlighting from './search-highlighting'
+import InputTester from './input-tester'
 import SyncingOperations from './syncing-operations'
 import Tables from './tables'
 
@@ -58,6 +59,7 @@ const EXAMPLES = [
   ['Forced Layout', ForcedLayout, '/forced-layout'],
   ['Huge Document', HugeDocument, '/huge-document'],
   ['History', History, '/history'],
+  ['Input Tester', InputTester, '/input-tester'],
 ]
 
 /**
@@ -102,7 +104,9 @@ const TabList = styled('div')`
   }
 `
 
-const Tab = styled(({ active, ...props }) => <RouterLink {...props} />)`
+const MaskedRouterLink = ({ active, ...props }) => <RouterLink {...props} />
+
+const Tab = styled(MaskedRouterLink)`
   display: inline-block;
   margin-bottom: 0.2em;
   padding: 0.2em 0.5em;

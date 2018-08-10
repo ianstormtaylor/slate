@@ -1,0 +1,83 @@
+{
+  "document": {
+    "nodes": [
+      {
+        "object": "block",
+        "type": "paragraph",
+        "nodes": [
+          {
+            "object": "text",
+            "leaves": [
+              {
+                "text": "This Slate editor records all of the "
+              },
+              {
+                "text": "bold",
+                "marks": [
+                  {
+                    "type": "keyboard"
+                  }
+                ]
+              },
+              {
+                "text": ", "
+              },
+              {
+                "text": "bold",
+                "marks": [
+                  {
+                    "type": "input"
+                  }
+                ]
+              },
+              {
+                "text": " and "
+              },
+              {
+                "text": "bold",
+                "marks": [
+                  {
+                    "type": "selection"
+                  }
+                ]
+              },
+              {
+                "text":
+                  " event that occur while using it, so you can debug the exact combination of events that is firing for particular editing behaviors."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "object": "block",
+        "type": "block-quote",
+        "nodes": [
+          {
+            "object": "text",
+            "leaves": [
+              {
+                "text":
+                  "And this is a quote in case you need to try testing across block types."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "object": "block",
+        "type": "paragraph",
+        "nodes": [
+          {
+            "object": "text",
+            "leaves": [
+              {
+                "text": "Try it out!"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
