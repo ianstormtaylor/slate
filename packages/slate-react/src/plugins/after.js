@@ -116,11 +116,9 @@ function AfterPlugin() {
   function onCut(event, change, editor) {
     debug('onCut', { event })
 
-    const callback = cloneFragment(event, change.value)
-
     // Once the fake cut content has successfully been added to the clipboard,
     // delete the content in the current selection.
-    callback(() => {
+    cloneFragment(event, change.value, change.value.fragment, () => {
       // If user cuts a void block node or a void inline node,
       // manually removes it since selection is collapsed in this case.
       const { value } = change
