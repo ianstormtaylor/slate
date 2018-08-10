@@ -156,6 +156,21 @@ class Editor extends React.Component {
   }
 
   /**
+   * On change.
+   *
+   * @param {Change} change
+   */
+
+  onChange = change => {
+    debug('onChange', { change })
+    this.stack.run('onChange', change, this)
+    const { value } = change
+    const { onChange } = this.props
+    if (value == this.value) return
+    onChange(change)
+  }
+
+  /**
    * Programmatically blur the editor.
    */
 
