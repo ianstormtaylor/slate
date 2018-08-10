@@ -4,7 +4,7 @@ import { Value } from 'slate'
 import React from 'react'
 import styled from 'react-emotion'
 import initialValue from './value.json'
-import { Button, Icon } from '../components'
+import { Icon } from '../components'
 import { createArrayValue } from 'react-values'
 
 const EventsValue = createArrayValue()
@@ -60,12 +60,6 @@ const EventsTable = styled('table')`
     border-top: 1px solid #eee;
     border-bottom: 1px solid #eee;
   }
-`
-
-const Spacer = styled('div')`
-  height: 20px;
-  background-color: #eee;
-  margin: 20px -20px;
 `
 
 const Pill = styled('span')`
@@ -286,7 +280,7 @@ class InputTester extends React.Component {
     const nativeRange = nativeSelection.rangeCount
       ? nativeSelection.getRangeAt(0)
       : undefined
-    const selection = nativeSelection && findRange(nativeSelection, value)
+    const selection = nativeRange && findRange(nativeRange, value)
 
     EventsValue.push({
       event,
@@ -330,6 +324,7 @@ class InputTester extends React.Component {
         const [nativeTargetRange] = event.getTargetRanges()
         const targetRange =
           nativeTargetRange && findRange(nativeTargetRange, value)
+
         details = {
           inputType,
           data,
@@ -339,6 +334,7 @@ class InputTester extends React.Component {
           selection,
           value,
         }
+
         break
       }
 
@@ -361,7 +357,7 @@ class InputTester extends React.Component {
       }
     }
 
-    console.log(prefix, style, details)
+    console.log(prefix, style, details) // eslint-disable-line no-console
   }
 }
 
