@@ -4,7 +4,7 @@ import { Value } from 'slate'
 import React from 'react'
 import styled from 'react-emotion'
 import initialValue from './value.json'
-import { Button, Icon, Toolbar } from '../components'
+import { Button, Icon } from '../components'
 import { createArrayValue } from 'react-values'
 
 const EventsValue = createArrayValue()
@@ -126,7 +126,14 @@ const EventsList = () => (
           <thead>
             <tr>
               <th>
-                <I color="#666" onMouseDown={EventsValue.clear}>
+                <I
+                  color="#666"
+                  style={{ cursor: 'pointer' }}
+                  onMouseDown={e => {
+                    e.preventDefault()
+                    EventsValue.clear()
+                  }}
+                >
                   block
                 </I>
               </th>
@@ -191,43 +198,6 @@ const Event = ({ event, targetRange, selection }) => {
   )
 }
 
-const TestEditor = ({ value, onChange }) => (
-  <Editor
-    spellCheck
-    placeholder="Enter some text..."
-    value={value}
-    onChange={onChange}
-    renderNode={({ attributes, children, node }) => {
-      switch (node.type) {
-        case 'block-quote':
-          return <blockquote {...attributes}>{children}</blockquote>
-        case 'bulleted-list':
-          return <ul {...attributes}>{children}</ul>
-        case 'heading-one':
-          return <h1 {...attributes}>{children}</h1>
-        case 'heading-two':
-          return <h2 {...attributes}>{children}</h2>
-        case 'list-item':
-          return <li {...attributes}>{children}</li>
-        case 'numbered-list':
-          return <ol {...attributes}>{children}</ol>
-      }
-    }}
-    renderMark={({ attributes, children, mark }) => {
-      switch (mark.type) {
-        case 'bold':
-          return <strong {...attributes}>{children}</strong>
-        case 'code':
-          return <code {...attributes}>{children}</code>
-        case 'italic':
-          return <em {...attributes}>{children}</em>
-        case 'underlined':
-          return <u {...attributes}>{children}</u>
-      }
-    }}
-  />
-)
-
 class InputTester extends React.Component {
   state = {
     value: Value.fromJSON(initialValue),
@@ -249,12 +219,40 @@ class InputTester extends React.Component {
   render() {
     return (
       <Wrapper innerRef={this.onRef}>
-        <Toolbar>
-          <Button onMouseDown={EventsValue.clear}>
-            <Icon>clear</Icon> Clear
-          </Button>
-        </Toolbar>
-        <TestEditor value={this.state.value} onChange={this.onChange} />
+        <Editor
+          spellCheck
+          placeholder="Enter some text..."
+          value={this.state.value}
+          onChange={this.onChange}
+          renderNode={({ attributes, children, node }) => {
+            switch (node.type) {
+              case 'block-quote':
+                return <blockquote {...attributes}>{children}</blockquote>
+              case 'bulleted-list':
+                return <ul {...attributes}>{children}</ul>
+              case 'heading-one':
+                return <h1 {...attributes}>{children}</h1>
+              case 'heading-two':
+                return <h2 {...attributes}>{children}</h2>
+              case 'list-item':
+                return <li {...attributes}>{children}</li>
+              case 'numbered-list':
+                return <ol {...attributes}>{children}</ol>
+            }
+          }}
+          renderMark={({ attributes, children, mark }) => {
+            switch (mark.type) {
+              case 'bold':
+                return <strong {...attributes}>{children}</strong>
+              case 'code':
+                return <code {...attributes}>{children}</code>
+              case 'italic':
+                return <em {...attributes}>{children}</em>
+              case 'underlined':
+                return <u {...attributes}>{children}</u>
+            }
+          }}
+        />
         <EventsList />
       </Wrapper>
     )
