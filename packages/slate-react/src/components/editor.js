@@ -167,6 +167,9 @@ class Editor extends React.Component {
     const { value } = change
     const { onChange } = this.props
     if (value == this.value) return
+    this.tmp.value = value
+    this.tmp.stack = this.stack
+    this.tmp.change = undefined
     onChange(change)
   }
 
