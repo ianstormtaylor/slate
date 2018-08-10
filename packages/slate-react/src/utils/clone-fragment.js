@@ -18,7 +18,12 @@ const { FRAGMENT, HTML, TEXT } = TRANSFER_TYPES
  * @param {Document} [fragment]
  */
 
-function cloneFragment(event, value, fragment = value.fragment) {
+function cloneFragment(
+  event,
+  value,
+  fragment = value.fragment,
+  callback = () => undefined
+) {
   const window = getWindow(event.target)
   const native = window.getSelection()
   const { start, end } = value.selection
@@ -106,7 +111,7 @@ function cloneFragment(event, value, fragment = value.fragment) {
     event.clipboardData.setData(TEXT, plainText)
     event.clipboardData.setData(FRAGMENT, encoded)
     event.clipboardData.setData(HTML, div.innerHTML)
-    return
+    callback()
   }
 
   // COMPAT: For browser that don't support the Clipboard API's setData method,
@@ -124,6 +129,7 @@ function cloneFragment(event, value, fragment = value.fragment) {
     editor.removeChild(div)
     removeAllRanges(native)
     native.addRange(range)
+    callback()
   })
 }
 
