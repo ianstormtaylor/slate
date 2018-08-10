@@ -188,7 +188,7 @@ class Editor extends React.Component {
   get value() {
     if (this.tmp.value === this.props.value && this.tmp.stack === this.stack) {
       const { value } = this.tmp
-      this.queueChange(value.change())
+      this.tmp.change = value.change()
       return value
     }
 
@@ -210,18 +210,9 @@ class Editor extends React.Component {
   associateStackAndValue = memoizeOne((value, stack) => {
     const change = value.change()
     stack.run('onChange', change, this)
-    this.queueChange(change)
+    this.tmp.change = change
     return change.value
   })
-
-  /**
-   * Queue a change object with value, to save operations of an value
-   * @param {Change} change
-   */
-
-  queueChange(change) {
-    this.tmp.change = change
-  }
 
   /**
    * On event.
