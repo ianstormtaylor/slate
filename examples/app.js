@@ -104,7 +104,9 @@ const TabList = styled('div')`
   }
 `
 
-const Tab = styled(({ active, ...props }) => <RouterLink {...props} />)`
+const MaskedRouterLink = ({ active, ...props }) => <RouterLink {...props} />
+
+const Tab = styled(MaskedRouterLink)`
   display: inline-block;
   margin-bottom: 0.2em;
   padding: 0.2em 0.5em;

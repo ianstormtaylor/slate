@@ -15,14 +15,14 @@ const Wrapper = styled('div')`
 
 const EventsWrapper = styled('div')`
   position: fixed;
-  background: white;
-  border-top: 1px solid #ccc;
   left: 0;
   bottom: 0;
   right: 0;
-  max-height: 33vh;
-  height: 400px;
+  max-height: 40vh;
+  height: 500px;
   overflow: auto;
+  border-top: 1px solid #ccc;
+  background: white;
 `
 
 const EventsTable = styled('table')`
@@ -36,21 +36,29 @@ const EventsTable = styled('table')`
     margin-top: 1px;
   }
 
-  tr {
+  tr,
+  th,
+  td {
     border: none;
-    border-bottom: 1px solid #eee;
-    border-top: 1px solid #eee;
   }
 
-  td,
-  th {
-    border: none;
+  th,
+  td {
     text-align: left;
-    padding: 0.5em;
+    padding: 0.333em;
   }
 
-  th > tr:first-child {
-    border-top: none;
+  th {
+    position: sticky;
+    top: 0;
+    background-color: #eee;
+    border-bottom: 1px solid #ccc;
+  }
+
+  td {
+    background-color: white;
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
   }
 `
 
@@ -68,38 +76,32 @@ const Pill = styled('span')`
 `
 
 const I = styled(Icon)`
-  font-size: 0.85em;
+  font-size: 0.9em;
   color: ${p => p.color};
 `
 
-const CompositionCell = props => <Pill color="aquamarine" {...props} />
-
-const InputCell = props => <Pill color="lightskyblue" {...props} />
-
-const KeyboardCell = props => <Pill color="wheat" {...props} />
+const MissingCell = props => <I color="silver">texture</I>
 
 const TypeCell = ({ event }) => {
   switch (event.constructor.name) {
     case 'CompositionEvent':
-      return <CompositionCell>{event.type}</CompositionCell>
+      return <Pill color="thistle">{event.type}</Pill>
     case 'InputEvent':
-      return <InputCell>{event.type}</InputCell>
+      return <Pill color="lightskyblue">{event.type}</Pill>
     case 'KeyboardEvent':
-      return <KeyboardCell>{event.type}</KeyboardCell>
+      return <Pill color="wheat">{event.type}</Pill>
+    case 'Event':
+      return <Pill color="#ddd">{event.type}</Pill>
+    default:
+      return <Pill color="palegreen">{event.type}</Pill>
   }
 }
 
-const TrueCell = props => <I color="mediumseagreen">check</I>
-
-const FalseCell = props => <I color="tomato">clear</I>
-
-const MissingCell = props => <I color="silver">texture</I>
-
 const BooleanCell = ({ value }) =>
   value === true ? (
-    <TrueCell />
+    <I color="mediumseagreen">check</I>
   ) : value === false ? (
-    <FalseCell />
+    <I color="tomato">clear</I>
   ) : (
     <MissingCell />
   )
@@ -111,9 +113,9 @@ const RangeCell = ({ value }) =>
   value == null ? (
     <MissingCell />
   ) : (
-    `${value.anchor.path.toJSON()}:${
+    `${value.anchor.path.toJSON()}.${
       value.anchor.offset
-    }–${value.focus.path.toJSON()}:${value.focus.offset}`
+    }–${value.focus.path.toJSON()}.${value.focus.offset}`
   )
 
 const EventsList = () => (
@@ -123,14 +125,21 @@ const EventsList = () => (
         <EventsTable>
           <thead>
             <tr>
+              <th>
+                <I color="#666" onMouseDown={EventsValue.clear}>
+                  block
+                </I>
+              </th>
               <th>type</th>
               <th>key</th>
               <th>code</th>
+              <th>repeat</th>
               <th>inputType</th>
               <th>data</th>
+              <th>dataTransfer</th>
               <th>targetRange</th>
               <th>isComposing</th>
-              <th>selection</th>
+              <th>findSelection</th>
             </tr>
           </thead>
           <tbody>
@@ -145,6 +154,7 @@ const EventsList = () => (
 const Event = ({ event, targetRange, selection }) => {
   return (
     <tr>
+      <td />
       <td>
         <TypeCell event={event} />
       </td>
@@ -155,10 +165,18 @@ const Event = ({ event, targetRange, selection }) => {
         <StringCell value={event.code} />
       </td>
       <td>
+        <BooleanCell value={event.repeat} />
+      </td>
+      <td>
         <StringCell value={event.inputType} />
       </td>
       <td>
         <StringCell value={event.data} />
+      </td>
+      <td>
+        <StringCell
+          value={event.dataTransfer && event.dataTransfer.get('text/plain')}
+        />
       </td>
       <td>
         <RangeCell value={targetRange} />
@@ -225,6 +243,7 @@ class InputTester extends React.Component {
     editor.addEventListener('compositionstart', this.onEvent)
     editor.addEventListener('compositionupdate', this.onEvent)
     editor.addEventListener('compositionend', this.onEvent)
+    window.document.addEventListener('selectionchange', this.onEvent)
   }
 
   render() {
@@ -241,14 +260,50 @@ class InputTester extends React.Component {
     )
   }
 
+  onRef = ref => {
+    this.el = ref
+  }
+
   onChange = ({ value }) => {
     this.setState({ value })
+    this.recordEvent({ type: 'change' })
+    this.logEvent({ type: 'change' })
   }
 
   onEvent = event => {
+    this.recordEvent(event)
+    this.logEvent(event)
+  }
+
+  recordEvent = event => {
+    const { value } = this.state
+    let targetRange
+
+    if (event.getTargetRanges) {
+      const [nativeTargetRange] = event.getTargetRanges()
+      targetRange = nativeTargetRange && findRange(nativeTargetRange, value)
+    }
+
+    const nativeSelection = window.getSelection()
+    const nativeRange = nativeSelection.rangeCount
+      ? nativeSelection.getRangeAt(0)
+      : undefined
+    const selection = nativeSelection && findRange(nativeSelection, value)
+
+    EventsValue.push({
+      event,
+      value,
+      targetRange,
+      selection,
+    })
+  }
+
+  logEvent = event => {
     const { value } = this.state
     const nativeSelection = window.getSelection()
-    const nativeRange = nativeSelection.getRangeAt(0)
+    const nativeRange = nativeSelection.rangeCount
+      ? nativeSelection.getRangeAt(0)
+      : undefined
     const selection = nativeRange && findRange(nativeRange, value)
 
     const {
@@ -261,21 +316,22 @@ class InputTester extends React.Component {
       isComposing,
     } = event
 
-    const prefix = `%c${type.padEnd(12)}`
+    const prefix = `%c${type.padEnd(15)}`
     let style = 'padding: 3px'
     let details
 
     switch (event.constructor.name) {
       case 'CompositionEvent': {
-        style += '; background-color: aquamarine'
+        style += '; background-color: thistle'
         details = { data, selection, value }
         break
       }
 
       case 'InputEvent': {
         style += '; background-color: lightskyblue'
-        const [nativeRange] = event.getTargetRanges()
-        const targetRange = nativeRange && findRange(nativeRange, value)
+        const [nativeTargetRange] = event.getTargetRanges()
+        const targetRange =
+          nativeTargetRange && findRange(nativeTargetRange, value)
         details = {
           inputType,
           data,
@@ -293,15 +349,21 @@ class InputTester extends React.Component {
         details = { key, code, isComposing, selection, value }
         break
       }
+
+      case 'Event': {
+        style += '; background-color: #ddd'
+        details = { isComposing, selection, value }
+        break
+      }
+
+      default: {
+        style += '; background-color: palegreen'
+        details = { selection, value }
+        break
+      }
     }
 
     console.log(prefix, style, details)
-
-    EventsValue.push({ event, value, selection })
-  }
-
-  onRef = ref => {
-    this.el = ref
   }
 }
 
