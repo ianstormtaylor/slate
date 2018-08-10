@@ -149,10 +149,7 @@ class Editor extends React.Component {
       return
     }
 
-    this.tmp.value = change.value
-    this.tmp.stack = this.stack
-    this.tmp.change = undefined
-    this.props.onChange(change)
+    this.updateChange(change)
   }
 
   /**
@@ -163,10 +160,20 @@ class Editor extends React.Component {
 
   onChange = change => {
     debug('onChange', { change })
-    this.stack.run('onChange', change, this)
     const { value } = change
+    if (value == this.props.value && change.operations.size === 0) return
+    this.stack.run('onChange', change, this)
+    this.updateChange(change)
+  }
+
+  /*
+   * Update by change, and cache the current stack and value for update
+   * @param {Change} change
+  */
+
+  updateChange = change => {
     const { onChange } = this.props
-    if (value == this.value) return
+    const { value } = change
     this.tmp.value = value
     this.tmp.stack = this.stack
     this.tmp.change = undefined
