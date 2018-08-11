@@ -90,7 +90,7 @@ class Editor extends React.Component {
     if (this.props.autoFocus) {
       this.focus()
     } else {
-      this.change(change => change)
+      this.onChange(this.tmp.change)
     }
 
     this.tmp.updates++
@@ -112,7 +112,7 @@ class Editor extends React.Component {
       )
     }
 
-    this.change(change => change)
+    this.onChange(this.tmp.change)
   }
 
   /**
@@ -136,20 +136,14 @@ class Editor extends React.Component {
     const { change } = this.tmp
     const lastOperationSize = change.operations.size
     change.call(...args)
-    debug('onChange', { change })
 
-    // Do not rerun the change if onChange is run already in associateStackAndValue without more following operations
+    // Do not rerun the change if onChange is run already in resolveValue without more following operations
     if (change.operations.size > lastOperationSize) {
+      debug('onChange', { change })
       this.stack.run('onChange', change, this)
     }
 
-    // After we update the change with props.onChange; do not re-update in second
-    // cycle if no other operations are added
-    if (change.operations.size === 0 && change.value === this.props.value) {
-      return
-    }
-
-    this.updateChange(change)
+    this.onChange(change)
   }
 
   /**
@@ -160,20 +154,14 @@ class Editor extends React.Component {
 
   onChange = change => {
     debug('onChange', { change })
+
+    if (this.tmp.change !== change) {
+      this.stack.run('onChange', change, this)
+    }
+
     const { value } = change
     if (value == this.props.value && change.operations.size === 0) return
-    this.stack.run('onChange', change, this)
-    this.updateChange(change)
-  }
-
-  /*
-   * Update by change, and cache the current stack and value for update
-   * @param {Change} change
-  */
-
-  updateChange = change => {
     const { onChange } = this.props
-    const { value } = change
     this.tmp.value = value
     this.tmp.stack = this.stack
     this.tmp.change = undefined
@@ -211,13 +199,15 @@ class Editor extends React.Component {
   }
 
   get value() {
+    // If value is obtained from the last lifecyle, which is already normalized with `onChange`;
+    // do not run onChange again on it
     if (this.tmp.value === this.props.value && this.tmp.stack === this.stack) {
       const { value } = this.tmp
       this.tmp.change = value.change()
       return value
     }
 
-    return this.associateStackAndValue(this.props.value, this.stack)
+    return this.resolveValue(this.props.value, this.stack)
   }
 
   /**
@@ -232,8 +222,9 @@ class Editor extends React.Component {
    * @return {Change}
    */
 
-  associateStackAndValue = memoizeOne((value, stack) => {
+  resolveValue = memoizeOne((value, stack) => {
     const change = value.change()
+    debug('onChange', { change })
     stack.run('onChange', change, this)
     this.tmp.change = change
     return change.value
