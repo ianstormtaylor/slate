@@ -445,7 +445,7 @@ function createChildren(children, options = {}) {
  */
 
 function resolveCreators(options) {
-  const { blocks = {}, inlines = {}, marks = {}, decorators = {} } = options
+  const { blocks = {}, inlines = {}, marks = {}, decorations = {} } = options
 
   const creators = {
     ...CREATORS,
@@ -464,8 +464,8 @@ function resolveCreators(options) {
     creators[key] = normalizeMark(key, marks[key])
   })
 
-  Object.keys(decorators).map(key => {
-    creators[key] = normalizeNode(key, decorators[key], 'decoration')
+  Object.keys(decorations).map(key => {
+    creators[key] = normalizeNode(key, decorations[key], 'decoration')
   })
 
   return creators

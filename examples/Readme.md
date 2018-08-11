@@ -13,7 +13,7 @@ This directory contains a set of examples that give you an idea for how you migh
 * [**Hovering menu**](./hovering-menu) — showing how a contextual hovering menu can be implemented.
 * [**Tables**](./tables) — showing how to nest blocks to render more advanced components.
 * [**Paste HTML**](./paste-html) — showing how to use an HTML serializer to handle pasted HTML.
-* [**Code Highlighting**](./code-highlighting) — showing how to use decorators to dynamically mark text.
+* [**Code Highlighting**](./code-highlighting) — showing how to use decorations to dynamically mark text.
 * ...and more!
 
 If you have an idea for an example that shows a common use case, pull request it!

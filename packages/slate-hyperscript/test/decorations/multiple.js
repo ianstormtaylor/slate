@@ -6,7 +6,7 @@ const h = createHyperscript({
   blocks: {
     paragraph: 'paragraph',
   },
-  decorators: {
+  decorations: {
     highlight: 'highlight',
     lowlight: 'lowlight',
   },

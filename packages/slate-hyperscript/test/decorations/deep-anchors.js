@@ -7,7 +7,7 @@ const h = createHyperscript({
     ul: 'ul',
     li: 'li',
   },
-  decorators: {
+  decorations: {
     highlight: 'highlight',
   },
 })
