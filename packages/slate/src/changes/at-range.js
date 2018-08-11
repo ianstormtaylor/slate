@@ -240,7 +240,9 @@ Changes.deleteAtRange = (change, range, options = {}) => {
           endBlock.key,
           startParent.key,
           startParentIndex + 1,
-          { normalize: false }
+          {
+            normalize: false,
+          }
         )
       }
 
@@ -263,27 +265,6 @@ Changes.deleteAtRange = (change, range, options = {}) => {
       change.normalizeNodeByKey(ancestor.key)
     }
   }
-}
-
-/**
- * Delete backward until the character boundary at a `range`.
- *
- * @param {Change} change
- * @param {Range} range
- * @param {Object} options
- *   @property {Boolean} normalize
- */
-
-Changes.deleteCharBackwardAtRange = (change, range, options) => {
-  const { value } = change
-  const { document } = value
-  const { start } = range
-  const startBlock = document.getClosestBlock(start.key)
-  const offset = startBlock.getOffset(start.key)
-  const o = offset + start.offset
-  const { text } = startBlock
-  const n = TextUtils.getCharOffsetBackward(text, o)
-  change.deleteBackwardAtRange(range, n, options)
 }
 
 /**
@@ -421,27 +402,6 @@ Changes.deleteBackwardAtRange = (change, range, n = 1, options = {}) => {
 
   range = range.moveAnchorTo(node.key, offset)
   change.deleteAtRange(range, { normalize })
-}
-
-/**
- * Delete forward until the character boundary at a `range`.
- *
- * @param {Change} change
- * @param {Range} range
- * @param {Object} options
- *   @property {Boolean} normalize
- */
-
-Changes.deleteCharForwardAtRange = (change, range, options) => {
-  const { value } = change
-  const { document } = value
-  const { start } = range
-  const startBlock = document.getClosestBlock(start.key)
-  const offset = startBlock.getOffset(start.key)
-  const o = offset + start.offset
-  const { text } = startBlock
-  const n = TextUtils.getCharOffsetForward(text, o)
-  change.deleteForwardAtRange(range, n, options)
 }
 
 /**

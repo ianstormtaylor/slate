@@ -463,11 +463,11 @@ function AfterPlugin() {
     }
 
     if (Hotkeys.isDeleteBackward(event) && !IS_IOS) {
-      return change.deleteCharBackward()
+      return change.deleteBackward()
     }
 
     if (Hotkeys.isDeleteForward(event) && !IS_IOS) {
-      return change.deleteCharForward()
+      return change.deleteForward()
     }
 
     if (Hotkeys.isDeleteLineBackward(event)) {

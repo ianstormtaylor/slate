@@ -18,11 +18,9 @@ const Changes = {}
 
 const PROXY_TRANSFORMS = [
   'deleteBackward',
-  'deleteCharBackward',
   'deleteLineBackward',
   'deleteWordBackward',
   'deleteForward',
-  'deleteCharForward',
   'deleteWordForward',
   'deleteLineForward',
   'setBlocks',
