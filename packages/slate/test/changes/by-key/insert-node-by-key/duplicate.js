@@ -27,3 +27,9 @@ export const output = (
     </document>
   </value>
 )
+
+/*
+ * Slate v0.37: We no longer support duplicate key check in either insertNode and splitNode
+*/
+
+export const skip = true
