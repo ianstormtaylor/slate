@@ -76,8 +76,7 @@ function error(message, ...args) {
 
 function warn(message, ...args) {
   if (FORBID_WARNING) {
-    error(`Warning: ${message}`, ...args)
-    throw new Error({ message, args })
+    throw new Error(message)
   }
 
   log('warn', `Warning: ${message}`, ...args)
