@@ -8,7 +8,7 @@ const FORBID_DEPRECATE =
   process && process.env && process.env.FORBID_DEPRECATIONS
 
 /**
- * Is deprecate interface forbidden?
+ * Is warning scenarios forbidden?
  */
 
 const FORBID_WARNING = process && process.env && process.env.FORBID_WARNINGS
