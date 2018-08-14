@@ -94,7 +94,7 @@ function deprecate(version, message, ...args) {
 }
 
 function forbidden(level, message, ...args) {
-  throw new Error([message, ...args])
+  throw new Error(message)
 }
 
 /**
