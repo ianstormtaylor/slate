@@ -1900,7 +1900,7 @@ class Node {
   removeNode(path) {
     this.assertDescendant(path)
     path = this.resolvePath(path)
-    const deep = path.flatMap(x => List(['nodes', x]))
+    const deep = path.flatMap(x => ['nodes', x])
     const ret = this.deleteIn(deep)
     return ret
   }
