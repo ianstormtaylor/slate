@@ -389,7 +389,7 @@ class Node {
 
   getBlocks() {
     const array = this.getBlocksAsArray()
-    return new List(array)
+    return List(array)
   }
 
   /**
@@ -417,7 +417,7 @@ class Node {
   getBlocksAtRange(range) {
     const array = this.getBlocksAtRangeAsArray(range)
     // Eliminate duplicates by converting to an `OrderedSet` first.
-    return new List(new OrderedSet(array))
+    return List(OrderedSet(array))
   }
 
   /**
@@ -454,7 +454,7 @@ class Node {
 
   getBlocksByType(type) {
     const array = this.getBlocksByTypeAsArray(type)
-    return new List(array)
+    return List(array)
   }
 
   /**
@@ -775,7 +775,7 @@ class Node {
 
   getInlines() {
     const array = this.getInlinesAsArray()
-    const list = new List(array)
+    const list = List(array)
     return list
   }
 
@@ -811,7 +811,7 @@ class Node {
   getInlinesAtRange(range) {
     const array = this.getInlinesAtRangeAsArray(range)
     // Remove duplicates by converting it to an `OrderedSet` first.
-    const list = new List(new OrderedSet(array))
+    const list = List(OrderedSet(array))
     return list
   }
 
@@ -842,7 +842,7 @@ class Node {
 
   getInlinesByType(type) {
     const array = this.getInlinesByTypeAsArray(type)
-    const list = new List(array)
+    const list = List(array)
     return list
   }
 
@@ -946,8 +946,7 @@ class Node {
 
   getMarks() {
     const array = this.getMarksAsArray()
-    const set = new Set(array)
-    return set
+    return Set(array)
   }
 
   /**
@@ -1005,7 +1004,7 @@ class Node {
    */
 
   getMarksAtRange(range) {
-    const marks = new Set(this.getOrderedMarksAtRange(range))
+    const marks = Set(this.getOrderedMarksAtRange(range))
     return marks
   }
 
@@ -1018,8 +1017,7 @@ class Node {
 
   getMarksByType(type) {
     const array = this.getMarksByTypeAsArray(type)
-    const set = new Set(array)
-    return set
+    return Set(array)
   }
 
   /**
@@ -1188,8 +1186,7 @@ class Node {
 
   getOrderedMarks() {
     const array = this.getMarksAsArray()
-    const set = new OrderedSet(array)
-    return set
+    return OrderedSet(array)
   }
 
   /**
@@ -1265,8 +1262,7 @@ class Node {
 
   getOrderedMarksByType(type) {
     const array = this.getMarksByTypeAsArray(type)
-    const set = new OrderedSet(array)
-    return set
+    return OrderedSet(array)
   }
 
   /**
@@ -1495,8 +1491,7 @@ class Node {
 
   getTexts() {
     const array = this.getTextsAsArray()
-    const list = new List(array)
-    return list
+    return List(array)
   }
 
   /**
@@ -1530,9 +1525,7 @@ class Node {
     range = this.resolveRange(range)
     if (range.isUnset) return List()
     const { start, end } = range
-    const list = new List(
-      this.getTextsBetweenPositionsAsArray(start.key, end.key)
-    )
+    const list = List(this.getTextsBetweenPositionsAsArray(start.key, end.key))
 
     return list
   }
@@ -2113,7 +2106,7 @@ class Node {
     logger.deprecate(`0.35.0`, 'The `Node.getKeys` method is deprecated.')
 
     const keys = this.getKeysAsArray()
-    return new Set(keys)
+    return Set(keys)
   }
 
   getKeysAsArray() {
