@@ -907,7 +907,7 @@ class Node {
     this.nodes.forEach((node, i) => {
       if (node.object === 'text') {
         if (ret[node.key]) {
-          logger(`key ${node.key} in duplicate in node`, this)
+          logger.warn(`key ${node.key} in duplicate in node`, this)
         }
 
         ret[node.key] = [i]
