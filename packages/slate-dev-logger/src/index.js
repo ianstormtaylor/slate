@@ -8,6 +8,12 @@ const FORBID_DEPRECATE =
   process && process.env && process.env.FORBID_DEPRECATIONS
 
 /**
+ * Is deprecate interface forbidden?
+ */
+
+const FORBID_WARNING = process && process.env && process.env.FORBID_WARNINGS
+
+/**
  * Is in development?
  *
  * @type {Boolean}
@@ -69,6 +75,10 @@ function error(message, ...args) {
  */
 
 function warn(message, ...args) {
+  if (FORBID_WARNING) {
+    throw new Error({ message, args })
+  }
+
   log('warn', `Warning: ${message}`, ...args)
 }
 
