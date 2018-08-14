@@ -93,7 +93,7 @@ function deprecate(version, message, ...args) {
   logger('warn', `Deprecation (${version}): ${message}`, ...args)
 }
 
-function forbidden(level, message, ...args) {
+function forbidden(level, message) {
   throw new Error(message)
 }
 
