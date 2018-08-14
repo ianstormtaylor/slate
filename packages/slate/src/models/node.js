@@ -607,16 +607,9 @@ class Node {
     path = this.resolvePath(path)
     if (!path) return null
 
-    const array = path.toArray()
-    let descendant = this
-
-    for (const index of array) {
-      if (!descendant) return null
-      if (!descendant.nodes) return null
-      descendant = descendant.nodes.get(index)
-    }
-
-    return descendant
+    const deep = path.flatMap(x => ['nodes', x])
+    const ret = this.getIn(deep)
+    return ret
   }
 
   /**
@@ -1954,7 +1947,7 @@ class Node {
 
     if (!path.size) return node
     this.assertNode(path)
-    const deep = path.flatMap(x => List(['nodes', x]))
+    const deep = path.flatMap(x => ['nodes', x])
     const ret = this.setIn(deep, node)
     return ret
   }
