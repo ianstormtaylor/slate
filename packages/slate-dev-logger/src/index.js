@@ -75,11 +75,8 @@ function error(message, ...args) {
  */
 
 function warn(message, ...args) {
-  if (FORBID_WARNING) {
-    throw new Error(message)
-  }
-
-  log('warn', `Warning: ${message}`, ...args)
+  const logger = FORBID_WARNING ? forbidden : log
+  logger('warn', `Warning: ${message}`, ...args)
 }
 
 /**
@@ -92,11 +89,12 @@ function warn(message, ...args) {
  */
 
 function deprecate(version, message, ...args) {
-  if (FORBID_DEPRECATE) {
-    throw new Error(`Deprecation (${version}): ${message}`)
-  }
+  const logger = FORBID_DEPRECATE ? forbidden : log
+  logger('warn', `Deprecation (${version}): ${message}`, ...args)
+}
 
-  log('warn', `Deprecation (${version}): ${message}`, ...args)
+function forbidden(level, message, ...args) {
+  throw new Error([message, ...args])
 }
 
 /**
