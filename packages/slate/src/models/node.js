@@ -913,9 +913,9 @@ class Node {
         for (const key in nested) {
           const path = nested[key]
 
-          // if (ret[key]) {
-          // logger.warn(`key: ${key} is duplicated in node:`, this)
-          // }
+          if (ret[key]) {
+            logger.warn(`key: ${key} is duplicated in node:`, this)
+          }
 
           ret[key] = [i, ...path]
         }
