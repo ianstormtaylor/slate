@@ -1649,6 +1649,24 @@ class Node {
    */
 
   insertNode(path, node) {
+    if (this.hasNode(node.key)) {
+      node = node.regenerateKey()
+    }
+
+    if (node.object !== 'text') {
+      const insertNodeKeys = Object.keys(node.getKeysToPathsTable())
+      let iNode = node
+
+      insertNodeKeys.forEach(k => {
+        if (!this.hasNode(k)) return
+        const descendantPath = node.getPath(k)
+        const descendant = node.getNode(descendantPath)
+        iNode = iNode.replaceNode(descendantPath, descendant.regenerateKey())
+      })
+
+      node = iNode
+    }
+
     path = this.resolvePath(path)
     const index = path.last()
     const parentPath = PathUtils.lift(path)
