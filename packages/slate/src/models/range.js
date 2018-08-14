@@ -812,6 +812,13 @@ class Range extends Record(DEFAULTS) {
     return range
   }
 
+  updatePoints(updator) {
+    let { anchor, focus } = this
+    anchor = updator(anchor)
+    focus = updator(focus)
+    return this.merge({ anchor, focus })
+  }
+
   /**
    * Set the start point to a new `point`.
    *

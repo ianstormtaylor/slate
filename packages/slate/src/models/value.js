@@ -589,10 +589,7 @@ class Value extends Record(DEFAULTS) {
     value = value.set('document', document)
 
     value = value.mapRanges(range => {
-      return range.setPoints([
-        range.anchor.setPath(null),
-        range.focus.setPath(null),
-      ])
+      return range.updatePoints(point => point.refindPath(document))
     })
 
     return value
@@ -673,10 +670,7 @@ class Value extends Record(DEFAULTS) {
         }
       }
 
-      range = range.setPoints([
-        range.anchor.setPath(null),
-        range.focus.setPath(null),
-      ])
+      range = range.updatePoints(point => point.setPath(null))
 
       return range
     })
@@ -764,10 +758,12 @@ class Value extends Record(DEFAULTS) {
           : next ? range.moveEndTo(next.key, 0) : Range.create()
       }
 
-      range = range.setPoints([
-        range.anchor.setPath(null),
-        range.focus.setPath(null),
-      ])
+      range = range.setPoints(
+        [range.anchor, range.focus].map(
+          point =>
+            point.key ? point.refindPath(document) : point.setPath(null)
+        )
+      )
 
       return range
     })
@@ -905,10 +901,7 @@ class Value extends Record(DEFAULTS) {
         range = range.moveEndTo(next.key, end.offset - position)
       }
 
-      range = range.setPoints([
-        range.anchor.setPath(null),
-        range.focus.setPath(null),
-      ])
+      range = range.updatePoints(point => point.setPath(null))
 
       return range
     })
@@ -924,29 +917,28 @@ class Value extends Record(DEFAULTS) {
    */
 
   mapRanges(iterator) {
-    let value = this
-    const { document, selection, decorations } = value
+    return this.withMutations(value => {
+      const { document, selection, decorations } = value
 
-    if (selection) {
-      let next = selection.isSet ? iterator(selection) : selection
-      if (!next) next = Range.create()
-      if (next !== selection) next = document.createRange(next)
-      value = value.set('selection', next)
-    }
+      if (selection) {
+        let next = selection.isSet ? iterator(selection, document) : selection
+        if (!next) next = Range.create()
+        if (next !== selection) next = document.createRange(next)
+        value.set('selection', next)
+      }
 
-    if (decorations) {
-      let next = decorations.map(decoration => {
-        let n = decoration.isSet ? iterator(decoration) : decoration
-        if (n && n !== decoration) n = document.createRange(n)
-        return n
-      })
+      if (decorations) {
+        let next = decorations.map(decoration => {
+          let n = decoration.isSet ? iterator(decoration, document) : decoration
+          if (n && n !== decoration) n = document.createRange(n)
+          return n
+        })
 
-      next = next.filter(decoration => !!decoration)
-      next = next.size ? next : null
-      value = value.set('decorations', next)
-    }
-
-    return value
+        next = next.filter(decoration => !!decoration)
+        next = next.size ? next : null
+        value.set('decorations', next)
+      }
+    })
   }
 
   /**
