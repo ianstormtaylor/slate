@@ -144,6 +144,18 @@ class Text extends Record(DEFAULTS) {
   }
 
   /**
+   * Get an object mapping all the keys in the node to their paths.
+   *
+   * @return {Object}
+   */
+
+  getKeysToPathsTable() {
+    return {
+      [this.key]: [],
+    }
+  }
+
+  /**
    * Object.
    *
    * @return {String}
@@ -806,6 +818,7 @@ memoize(Text.prototype, [
   'normalize',
   'validate',
   'getString',
+  'getKeysToPathsTable',
 ])
 
 /**

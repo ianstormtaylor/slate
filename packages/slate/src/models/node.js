@@ -905,15 +905,6 @@ class Node {
     }
 
     this.nodes.forEach((node, i) => {
-      if (node.object === 'text') {
-        if (ret[node.key]) {
-          logger.warn(`key ${node.key} in duplicate in node`, this)
-        }
-
-        ret[node.key] = [i]
-        return
-      }
-
       const nested = node.getKeysToPathsTable()
 
       for (const key in nested) {
