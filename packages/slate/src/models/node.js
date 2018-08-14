@@ -911,7 +911,10 @@ class Node {
         const path = nested[key]
 
         if (ret[key]) {
-          logger.warn(`key ${key} in duplicate in node`, this)
+          logger.warn(
+            `A node with a duplicate key of "${key}" was found! Duplicate keys are not allowed, you should use \`node.regenerateKey\` before inserting if you are reusing an existing node.`,
+            this
+          )
         }
 
         ret[key] = [i, ...path]
