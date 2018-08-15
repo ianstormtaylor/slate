@@ -4,6 +4,14 @@ This document maintains a list of changes to the `slate-hyperscript` package wit
 
 ---
 
+### `0.8.0` — August 15, 2018
+
+###### BREAKING
+
+**The `decorators` option was renamed to `decorations`.** This was previously incorrectly named, and renaming it is just an attempt to keep the API consistent with how Slate describes the concept everywhere else.
+
+---
+
 ### `0.7.0` — August 3, 2018
 
 ###### NEW
