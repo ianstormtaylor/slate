@@ -905,15 +905,19 @@ class Node {
     }
 
     this.nodes.forEach((node, i) => {
-      ret[node.key] = [i]
+      const nested = node.getKeysToPathsTable()
 
-      if (node.object !== 'text') {
-        const nested = node.getKeysToPathsTable()
+      for (const key in nested) {
+        const path = nested[key]
 
-        for (const key in nested) {
-          const path = nested[key]
-          ret[key] = [i, ...path]
+        if (ret[key]) {
+          logger.warn(
+            `A node with a duplicate key of "${key}" was found! Duplicate keys are not allowed, you should use \`node.regenerateKey\` before inserting if you are reusing an existing node.`,
+            this
+          )
         }
+
+        ret[key] = [i, ...path]
       }
     })
 

@@ -8,6 +8,12 @@ const FORBID_DEPRECATE =
   process && process.env && process.env.FORBID_DEPRECATIONS
 
 /**
+ * Is warning scenarios forbidden?
+ */
+
+const FORBID_WARNING = process && process.env && process.env.FORBID_WARNINGS
+
+/**
  * Is in development?
  *
  * @type {Boolean}
@@ -69,7 +75,8 @@ function error(message, ...args) {
  */
 
 function warn(message, ...args) {
-  log('warn', `Warning: ${message}`, ...args)
+  const logger = FORBID_WARNING ? forbidden : log
+  logger('warn', `Warning: ${message}`, ...args)
 }
 
 /**
@@ -82,11 +89,12 @@ function warn(message, ...args) {
  */
 
 function deprecate(version, message, ...args) {
-  if (FORBID_DEPRECATE) {
-    throw new Error(`Deprecation (${version}): ${message}`)
-  }
+  const logger = FORBID_DEPRECATE ? forbidden : log
+  logger('warn', `Deprecation (${version}): ${message}`, ...args)
+}
 
-  log('warn', `Deprecation (${version}): ${message}`, ...args)
+function forbidden(level, message) {
+  throw new Error(message)
 }
 
 /**
