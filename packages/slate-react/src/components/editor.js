@@ -145,7 +145,13 @@ class Editor extends React.Component {
     }
 
     // Do not flush change if it is called inside onEvent
-    if (isInEvent) return
+    if (isInEvent) {
+      logger.warn(
+        'editor.change is called inside an onEvent; editor.change shall be called asynchronously'
+      )
+      return
+    }
+
     this.onChange(change)
   }
 
