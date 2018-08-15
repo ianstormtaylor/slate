@@ -391,7 +391,9 @@ class Schema extends Record(DEFAULTS) {
  */
 
 function defaultNormalize(change, error) {
-  switch (error.code) {
+  const { code, node, child, key, mark } = error
+
+  switch (code) {
     case CHILD_OBJECT_INVALID:
     case CHILD_TYPE_INVALID:
     case CHILD_UNKNOWN:
@@ -399,46 +401,52 @@ function defaultNormalize(change, error) {
     case FIRST_CHILD_TYPE_INVALID:
     case LAST_CHILD_OBJECT_INVALID:
     case LAST_CHILD_TYPE_INVALID: {
-      const { child, node } = error
-      return child.object == 'text' &&
-        node.object == 'block' &&
-        node.nodes.size == 1
-        ? change.removeNodeByKey(node.key)
-        : change.removeNodeByKey(child.key)
+      return child.object === 'text' &&
+        node.object === 'block' &&
+        node.nodes.size === 1
+        ? change.removeNodeByKey(node.key, { normalize: false })
+        : change.removeNodeByKey(child.key, { normalize: false })
     }
 
     case CHILD_REQUIRED:
     case NODE_TEXT_INVALID:
     case PARENT_OBJECT_INVALID:
     case PARENT_TYPE_INVALID: {
-      const { node } = error
-      return node.object == 'document'
-        ? node.nodes.forEach(child => change.removeNodeByKey(child.key))
-        : change.removeNodeByKey(node.key)
+      return node.object === 'document'
+        ? node.nodes.forEach(n =>
+            change.removeNodeByKey(n.key, { normalize: false })
+          )
+        : change.removeNodeByKey(node.key, { normalize: false })
     }
 
     case NODE_DATA_INVALID: {
-      const { node, key } = error
-      return node.data.get(key) === undefined && node.object != 'document'
-        ? change.removeNodeByKey(node.key)
-        : change.setNodeByKey(node.key, { data: node.data.delete(key) })
+      return node.data.get(key) === undefined && node.object !== 'document'
+        ? change.removeNodeByKey(node.key, { normalize: false })
+        : change.setNodeByKey(
+            node.key,
+            { data: node.data.delete(key) },
+            { normalize: false }
+          )
     }
 
     case NODE_IS_VOID_INVALID: {
-      const { node } = error
-      return change.setNodeByKey(node.key, { isVoid: !node.isVoid })
+      return change.setNodeByKey(
+        node.key,
+        { isVoid: !node.isVoid },
+        { normalize: false }
+      )
     }
 
     case NODE_MARK_INVALID: {
-      const { node, mark } = error
-      return node
-        .getTexts()
-        .forEach(t => change.removeMarkByKey(t.key, 0, t.text.length, mark))
+      return node.getTexts().forEach(t =>
+        change.removeMarkByKey(t.key, 0, t.text.length, mark, {
+          normalize: false,
+        })
+      )
     }
 
     default: {
-      const { node } = error
-      return change.removeNodeByKey(node.key)
+      return change.removeNodeByKey(node.key, { normalize: false })
     }
   }
 }
