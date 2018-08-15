@@ -77,6 +77,7 @@ class Editor extends React.Component {
     resolves: 0,
     value: undefined,
     change: undefined,
+    isInEvent: false,
   }
 
   state = {}
@@ -133,7 +134,7 @@ class Editor extends React.Component {
    */
 
   change = (...args) => {
-    const { change } = this.tmp
+    const { change, isInEvent } = this.tmp
     const lastOperationSize = change.operations.size
     change.call(...args)
 
@@ -143,6 +144,8 @@ class Editor extends React.Component {
       this.stack.run('onChange', change, this)
     }
 
+    // Do not flush change if it is called inside onEvent
+    if (isInEvent) return
     this.onChange(change)
   }
 
@@ -239,7 +242,9 @@ class Editor extends React.Component {
 
   onEvent = (handler, event) => {
     this.change(change => {
+      this.tmp.isInEvent = true
       this.stack.run(handler, event, change, this)
+      this.tmp.isInEvent = false
     })
   }
 
