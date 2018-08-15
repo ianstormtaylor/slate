@@ -29,7 +29,7 @@ export const output = (
 )
 
 /*
- * Slate v0.37: We no longer support duplicate key check in either insertNode and splitNode
+ * Slate v0.37: We no longer support duplicate key check in either insertNode and replaceNode
 */
 
 export const skip = true
