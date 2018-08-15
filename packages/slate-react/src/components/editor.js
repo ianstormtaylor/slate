@@ -77,7 +77,7 @@ class Editor extends React.Component {
     resolves: 0,
     value: undefined,
     change: undefined,
-    isInEvent: false,
+    isInChange: false,
   }
 
   state = {}
@@ -134,18 +134,27 @@ class Editor extends React.Component {
    */
 
   change = (...args) => {
-    const { change, isInEvent } = this.tmp
+    const { change, isInChange } = this.tmp
     const lastOperationSize = change.operations.size
-    change.call(...args)
+    this.tmp.isInChange = true
 
-    // Do not rerun the change if onChange is run already in resolveValue without more following operations
-    if (change.operations.size > lastOperationSize) {
-      debug('onChange', { change })
-      this.stack.run('onChange', change, this)
+    try {
+      change.call(...args)
+
+      // Do not rerun the change if onChange is run already in resolveValue without more following operations
+      if (change.operations.size > lastOperationSize) {
+        debug('onChange', { change })
+        this.stack.run('onChange', change, this)
+      }
+    } catch (error) {
+      this.tmp.isInChange = false
+      throw error
     }
 
+    this.tmp.isInChange = false
+
     // Do not flush change if it is called inside onEvent
-    if (isInEvent) {
+    if (isInChange) {
       logger.warn(
         'editor.change is called inside an onEvent; editor.change shall be called asynchronously'
       )
@@ -248,9 +257,7 @@ class Editor extends React.Component {
 
   onEvent = (handler, event) => {
     this.change(change => {
-      this.tmp.isInEvent = true
       this.stack.run(handler, event, change, this)
-      this.tmp.isInEvent = false
     })
   }
 
