@@ -1,7 +1,7 @@
 {
   "name": "slate-dev-logger",
   "description": "INTERNAL: A simple, development-only logger for Slate.",
-  "version": "0.1.42",
+  "version": "0.1.43",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
   "main": "lib/slate-dev-logger.js",
