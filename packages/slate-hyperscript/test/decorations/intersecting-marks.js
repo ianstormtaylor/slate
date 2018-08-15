@@ -9,7 +9,7 @@ const h = createHyperscript({
   marks: {
     b: 'bold',
   },
-  decorators: {
+  decorations: {
     highlight: 'highlight',
   },
 })

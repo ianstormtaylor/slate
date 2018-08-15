@@ -9,12 +9,12 @@
 <br/>
 
 <p align="center">
-  <a href="#why"><strong>Why?</strong></a> · 
-  <a href="#principles"><strong>Principles</strong></a> · 
-  <a href="http://slatejs.org"><strong>Demo</strong></a> · 
-  <a href="#examples"><strong>Examples</strong></a> · 
-  <a href="./docs/general/plugins.md"><strong>Plugins</strong></a> · 
-  <a href="http://docs.slatejs.org"><strong>Documentation</strong></a> · 
+  <a href="#why"><strong>Why?</strong></a> ·
+  <a href="#principles"><strong>Principles</strong></a> ·
+  <a href="http://slatejs.org"><strong>Demo</strong></a> ·
+  <a href="#examples"><strong>Examples</strong></a> ·
+  <a href="./docs/general/plugins.md"><strong>Plugins</strong></a> ·
+  <a href="http://docs.slatejs.org"><strong>Documentation</strong></a> ·
   <a href="./Contributing.md"><strong>Contributing!</strong></a>
 </p>
 <br/>
@@ -26,7 +26,7 @@
 <p align="center">
   <a href="https://www.npmjs.com/package/slate">
     <img src="https://img.shields.io/npm/dt/localeval.svg?maxAge=3600">
-  </a> 
+  </a>
   <a href="https://unpkg.com/slate/dist/slate.min.js">
     <img src="http://img.badgesize.io/https://unpkg.com/slate/dist/slate.min.js?compression=gzip&amp;label=slate">
   </a>
@@ -35,19 +35,19 @@
   </a>
   <a href="https://travis-ci.org/ianstormtaylor/slate">
     <img src="https://travis-ci.org/ianstormtaylor/slate.svg?branch=master">
-  </a> 
+  </a>
   <a href="https://slate-slack.herokuapp.com">
     <img src="https://slate-slack.herokuapp.com/badge.svg">
-  <a/> 
+  </a>
   <a href="./packages/slate/package.json">
     <img src="https://img.shields.io/npm/v/slate.svg?maxAge=3600&label=slate&colorB=007ec6">
-  </a> 
+  </a>
   <a href="./packages/slate-react/package.json">
     <img src="https://img.shields.io/npm/v/slate-react.svg?maxAge=3600&label=slate-react&colorB=007ec6">
-  </a> 
+  </a>
   <a href="./License.md">
     <img src="https://img.shields.io/npm/l/slate.svg?maxAge=3600">
-  </a> 
+  </a>
 </p>
 <br/>
 
@@ -127,7 +127,7 @@ To get a sense for how you might use Slate, check out a few of the examples:
 * [**Hovering menu**](./examples/hovering-menu) — showing how a contextual hovering menu can be implemented.
 * [**Tables**](./examples/tables) — showing how to nest blocks to render more advanced components.
 * [**Paste HTML**](./examples/paste-html) — showing how to use an HTML serializer to handle pasted HTML.
-* [**Code Highlighting**](./examples/code-highlighting) — showing how to use decorators to dynamically mark text.
+* [**Code Highlighting**](./examples/code-highlighting) — showing how to use decorations to dynamically mark text.
 * [**See all the examples...**](./examples)
 
 If you have an idea for an example that shows a common use case, pull request it!

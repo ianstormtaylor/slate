@@ -70,7 +70,7 @@ To get a sense for how you might use Slate, check out a few of the examples:
 * [**Hovering menu**](https://github.com/ianstormtaylor/slate/tree/master/examples/hovering-menu) — showing how a contextual hovering menu can be implemented.
 * [**Tables**](https://github.com/ianstormtaylor/slate/tree/master/examples/tables) — showing how to nest blocks to render more advanced components.
 * [**Paste HTML**](https://github.com/ianstormtaylor/slate/tree/master/examples/paste-html) — showing how to use an HTML serializer to handle pasted HTML.
-* [**Code Highlighting**](https://github.com/ianstormtaylor/slate/tree/master/examples/code-highlighting) — showing how to use decorators to dynamically mark text.
+* [**Code Highlighting**](https://github.com/ianstormtaylor/slate/tree/master/examples/code-highlighting) — showing how to use decorations to dynamically mark text.
 
 If you have an idea for an example that shows a common use case, pull request it!
 
