@@ -111,6 +111,3 @@ export const IS_WINDOWS = os === 'windows'
 
 export const HAS_INPUT_EVENTS_LEVEL_1 = features.includes('inputeventslevel1')
 export const HAS_INPUT_EVENTS_LEVEL_2 = features.includes('inputeventslevel2')
-
-// COMPAT: this is needed for an older version of `slate-react` support.
-export const SUPPORTED_EVENTS = { beforeinput: HAS_INPUT_EVENTS_LEVEL_2 }
