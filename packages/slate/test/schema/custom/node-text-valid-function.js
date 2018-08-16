@@ -5,7 +5,7 @@ import h from '../../helpers/h'
 export const schema = {
   blocks: {
     paragraph: {
-      text: /^\d*$/,
+      text: t => t === 'valid',
     },
   },
 }
@@ -13,7 +13,7 @@ export const schema = {
 export const input = (
   <value>
     <document>
-      <paragraph>123</paragraph>
+      <paragraph>valid</paragraph>
     </document>
   </value>
 )
@@ -21,7 +21,7 @@ export const input = (
 export const output = (
   <value>
     <document>
-      <paragraph>123</paragraph>
+      <paragraph>valid</paragraph>
     </document>
   </value>
 )

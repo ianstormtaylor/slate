@@ -561,7 +561,8 @@ function validateMarks(node, rule) {
 function validateText(node, rule) {
   if (rule.text == null) return
   const { text } = node
-  const valid = rule.text.test(text)
+  const valid =
+    typeof rule.text === 'function' ? rule.text(text) : rule.text.test(text)
   if (valid) return
   return fail(NODE_TEXT_INVALID, { rule, node, text })
 }

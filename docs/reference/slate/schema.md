@@ -233,15 +233,20 @@ Will validate a node's parent against a [`match`](#match).
 
 ### `text`
 
-`Array`
+`RegExp|Function`
 
 ```js
 {
   text: /^\w+$/
 }
 ```
+```js
+{
+  text: string => string === 'valid'
+}
+```
 
-Will validate a node's text with a regex.
+Will validate a node's text with a regex or function.
 
 ## Static Methods
 
