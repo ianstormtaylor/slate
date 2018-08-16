@@ -240,6 +240,7 @@ Will validate a node's parent against a [`match`](#match).
   text: /^\w+$/
 }
 ```
+
 ```js
 {
   text: string => string === 'valid'
