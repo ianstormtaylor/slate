@@ -909,28 +909,28 @@ class Value extends Record(DEFAULTS) {
    */
 
   mapRanges(iterator) {
-    return this.withMutations(value => {
-      const { document, selection, decorations } = value
+    let value = this
+    const { document, selection, decorations } = value
 
-      if (selection) {
-        let next = selection.isSet ? iterator(selection, document) : selection
-        if (!next) next = Range.create()
-        if (next !== selection) next = document.createRange(next)
-        value.set('selection', next)
-      }
+    if (selection) {
+      let next = selection.isSet ? iterator(selection, document) : selection
+      if (!next) next = Range.create()
+      if (next !== selection) next = document.createRange(next)
+      value = value.set('selection', next)
+    }
 
-      if (decorations) {
-        let next = decorations.map(decoration => {
-          let n = decoration.isSet ? iterator(decoration, document) : decoration
-          if (n && n !== decoration) n = document.createRange(n)
-          return n
-        })
+    if (decorations) {
+      let next = decorations.map(decoration => {
+        let n = decoration.isSet ? iterator(decoration, document) : decoration
+        if (n && n !== decoration) n = document.createRange(n)
+        return n
+      })
 
-        next = next.filter(decoration => !!decoration)
-        next = next.size ? next : null
-        value.set('decorations', next)
-      }
-    })
+      next = next.filter(decoration => !!decoration)
+      next = next.size ? next : null
+      value = value.set('decorations', next)
+    }
+    return value
   }
 
   /**
