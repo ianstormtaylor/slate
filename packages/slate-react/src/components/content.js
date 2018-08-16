@@ -59,12 +59,20 @@ class Content extends React.Component {
     tagName: 'div',
   }
 
+  /**
+   * Temporary values.
+   *
+   * @type {Object}
+   */
+
   tmp = {
     isUpdatingSelection: false,
   }
 
   /**
-   * Get Synthethic Event Handlers
+   * Create a set of bound event handlers.
+   *
+   * @type {Object}
    */
 
   handlers = EVENT_HANDLERS.reduce((obj, handler) => {
