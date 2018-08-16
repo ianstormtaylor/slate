@@ -24,7 +24,7 @@ const value = (
   </value>
 )
   .change()
-  .selectAll().value
+  .moveToRangeOfDocument().value
 
 module.exports.input = function() {
   return value
