@@ -913,7 +913,7 @@ class Value extends Record(DEFAULTS) {
     const { document, selection, decorations } = value
 
     if (selection) {
-      let next = selection.isSet ? iterator(selection, document) : selection
+      let next = selection.isSet ? iterator(selection) : selection
       if (!next) next = Range.create()
       if (next !== selection) next = document.createRange(next)
       value = value.set('selection', next)
@@ -921,7 +921,7 @@ class Value extends Record(DEFAULTS) {
 
     if (decorations) {
       let next = decorations.map(decoration => {
-        let n = decoration.isSet ? iterator(decoration, document) : decoration
+        let n = decoration.isSet ? iterator(decoration) : decoration
         if (n && n !== decoration) n = document.createRange(n)
         return n
       })
