@@ -276,33 +276,6 @@ class Point extends Record(DEFAULTS) {
     return point
   }
 
-  /*
-   * After node change, refind the new Path with the information of old Path
-   * @param {Node} node
-   * @return {Point}
-  */
-
-  refindPath(node) {
-    const { path, key } = this
-    const newPath = node.refindPath(path, key)
-
-    if (!newPath) {
-      logger.warn("A point's `key` invalid and was reset:", this)
-      const text = node.getFirstText()
-      if (!text) return Point.create()
-
-      const point = this.merge({
-        key: text.key,
-        offset: 0,
-        path: node.getPath(text.key),
-      })
-
-      return point
-    }
-
-    return this.set('path', newPath)
-  }
-
   /**
    * Normalize the point relative to a `node`, ensuring that its key and path
    * reference a text node, or that it gets unset.

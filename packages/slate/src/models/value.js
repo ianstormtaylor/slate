@@ -588,9 +588,9 @@ class Value extends Record(DEFAULTS) {
     document = document.insertNode(path, node)
     value = value.set('document', document)
 
-    value = value.mapRanges(range => {
-      return range.updatePoints(point => point.refindPath(document))
-    })
+    value = value.mapRanges(range =>
+      range.updatePoints(point => point.setPath(null))
+    )
 
     return value
   }
@@ -696,12 +696,9 @@ class Value extends Record(DEFAULTS) {
     document = document.moveNode(path, newPath, newIndex)
     value = value.set('document', document)
 
-    value = value.mapRanges(range => {
-      return range.setPoints([
-        range.anchor.setPath(null),
-        range.focus.setPath(null),
-      ])
-    })
+    value = value.mapRanges(range =>
+      range.updatePoints(point => point.setPath(null))
+    )
 
     return value
   }
@@ -758,12 +755,7 @@ class Value extends Record(DEFAULTS) {
           : next ? range.moveEndTo(next.key, 0) : Range.create()
       }
 
-      range = range.setPoints(
-        [range.anchor, range.focus].map(
-          point =>
-            point.key ? point.refindPath(document) : point.setPath(null)
-        )
-      )
+      range = range.updatePoints(point => point.setPath(null))
 
       return range
     })

@@ -212,8 +212,9 @@ class Range extends Record(DEFAULTS) {
 
   get isCollapsed() {
     return (
-      this.anchor.key === this.focus.key &&
-      this.anchor.offset === this.focus.offset
+      this.anchor === this.focus ||
+      (this.anchor.key === this.focus.key &&
+        this.anchor.offset === this.focus.offset)
     )
   }
 
@@ -321,12 +322,7 @@ class Range extends Record(DEFAULTS) {
    */
 
   moveForward(n) {
-    const range = this.setPoints([
-      this.anchor.moveForward(n),
-      this.focus.moveForward(n),
-    ])
-
-    return range
+    return this.updatePoints(point => point.moveForward(n))
   }
 
   /**
@@ -337,12 +333,7 @@ class Range extends Record(DEFAULTS) {
    */
 
   moveBackward(n) {
-    const range = this.setPoints([
-      this.anchor.moveBackward(n),
-      this.focus.moveBackward(n),
-    ])
-
-    return range
+    return this.updatePoints(point => point.moveBackward(n))
   }
 
   /**
@@ -609,12 +600,7 @@ class Range extends Record(DEFAULTS) {
    */
 
   moveTo(path, offset) {
-    const range = this.setPoints([
-      this.anchor.moveTo(path, offset),
-      this.focus.moveTo(path, offset),
-    ])
-
-    return range
+    return this.updatePoints(point => point.moveTo(path, offset))
   }
 
   /**
@@ -647,12 +633,7 @@ class Range extends Record(DEFAULTS) {
    */
 
   moveToEndOfNode(node) {
-    const range = this.setPoints([
-      this.anchor.moveToEndOfNode(node),
-      this.focus.moveToEndOfNode(node),
-    ])
-
-    return range
+    return this.updatePoints(point => point.moveToEndOfNode(node))
   }
 
   /**
@@ -702,12 +683,7 @@ class Range extends Record(DEFAULTS) {
    */
 
   moveToStartOfNode(node) {
-    const range = this.setPoints([
-      this.anchor.moveToStartOfNode(node),
-      this.focus.moveToStartOfNode(node),
-    ])
-
-    return range
+    return this.updatePoints(point => point.moveToStartOfNode(node))
   }
 
   /**
@@ -719,12 +695,7 @@ class Range extends Record(DEFAULTS) {
    */
 
   normalize(node) {
-    const range = this.setPoints([
-      this.anchor.normalize(node),
-      this.focus.normalize(node),
-    ])
-
-    return range
+    return this.updatePoints(point => point.normalize(node))
   }
 
   /**
@@ -811,6 +782,13 @@ class Range extends Record(DEFAULTS) {
     const range = this.set('anchor', anchor).set('focus', focus)
     return range
   }
+
+  /**
+   * Set the anchor and focus points with `updator` callback
+   *
+   * @param {Function} updator
+   * @return {Range}
+   */
 
   updatePoints(updator) {
     let { anchor, focus } = this
