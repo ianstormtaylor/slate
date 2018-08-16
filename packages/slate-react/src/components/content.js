@@ -60,22 +60,25 @@ class Content extends React.Component {
   }
 
   /**
-   * Constructor.
+   * Temporary values.
    *
-   * @param {Object} props
+   * @type {Object}
    */
 
-  constructor(props) {
-    super(props)
-    this.tmp = {}
-    this.tmp.isUpdatingSelection = false
-
-    EVENT_HANDLERS.forEach(handler => {
-      this[handler] = event => {
-        this.onEvent(handler, event)
-      }
-    })
+  tmp = {
+    isUpdatingSelection: false,
   }
+
+  /**
+   * Create a set of bound event handlers.
+   *
+   * @type {Object}
+   */
+
+  handlers = EVENT_HANDLERS.reduce((obj, handler) => {
+    obj[handler] = event => this.onEvent(handler, event)
+    return obj
+  }, {})
 
   /**
    * When the editor first mounts in the DOM we need to:
@@ -84,7 +87,7 @@ class Content extends React.Component {
    *   - Update the selection, in case it starts focused.
    */
 
-  componentDidMount = () => {
+  componentDidMount() {
     const window = getWindow(this.element)
 
     window.document.addEventListener(
@@ -124,7 +127,7 @@ class Content extends React.Component {
    * On update, update the selection.
    */
 
-  componentDidUpdate = () => {
+  componentDidUpdate() {
     this.updateSelection()
   }
 
@@ -363,7 +366,7 @@ class Content extends React.Component {
    */
 
   render() {
-    const { props } = this
+    const { props, handlers } = this
     const {
       className,
       readOnly,
@@ -385,11 +388,6 @@ class Content extends React.Component {
 
       return this.renderNode(child, isSelected, childrenDecorations[i])
     })
-
-    const handlers = EVENT_HANDLERS.reduce((obj, handler) => {
-      obj[handler] = this[handler]
-      return obj
-    }, {})
 
     const style = {
       // Prevent the default outline styles.
@@ -417,21 +415,6 @@ class Content extends React.Component {
         contentEditable={readOnly ? null : true}
         suppressContentEditableWarning
         className={className}
-        onBlur={this.onBlur}
-        onFocus={this.onFocus}
-        onCompositionEnd={this.onCompositionEnd}
-        onCompositionStart={this.onCompositionStart}
-        onCopy={this.onCopy}
-        onCut={this.onCut}
-        onDragEnd={this.onDragEnd}
-        onDragOver={this.onDragOver}
-        onDragStart={this.onDragStart}
-        onDrop={this.onDrop}
-        onInput={this.onInput}
-        onKeyDown={this.onKeyDown}
-        onKeyUp={this.onKeyUp}
-        onPaste={this.onPaste}
-        onSelect={this.onSelect}
         autoCorrect={props.autoCorrect ? 'on' : 'off'}
         spellCheck={spellCheck}
         style={style}

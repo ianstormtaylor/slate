@@ -18,6 +18,7 @@
     "is-window": "^1.0.2",
     "keycode": "^2.1.2",
     "lodash": "^4.1.1",
+    "memoize-one": "^4.0.0",
     "prop-types": "^15.5.8",
     "react-immutable-proptypes": "^2.1.0",
     "react-portal": "^3.1.0",
