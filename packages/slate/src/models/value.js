@@ -930,6 +930,7 @@ class Value extends Record(DEFAULTS) {
       next = next.size ? next : null
       value = value.set('decorations', next)
     }
+
     return value
   }
 
