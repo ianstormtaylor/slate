@@ -6,13 +6,13 @@ const h = require('../../helpers/h')
 module.exports.default = function(change) {
   change
     .splitBlock()
-    .move(5)
+    .moveForward(5)
     .splitBlock()
-    .move(5)
+    .moveForward(5)
     .splitBlock()
-    .move(5)
+    .moveForward(5)
     .splitBlock()
-    .move(5)
+    .moveForward(5)
     .splitBlock()
 }
 

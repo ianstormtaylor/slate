@@ -6,13 +6,13 @@ const h = require('../../helpers/h')
 module.exports.default = function(change) {
   change
     .addMark('bold')
-    .move(5)
+    .moveForward(5)
     .addMark('bold')
-    .move(5)
+    .moveForward(5)
     .addMark('bold')
-    .move(5)
+    .moveForward(5)
     .addMark('bold')
-    .move(5)
+    .moveForward(5)
     .addMark('bold')
 }
 

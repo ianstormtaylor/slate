@@ -6,13 +6,13 @@ const h = require('../../helpers/h')
 module.exports.default = function(change) {
   change
     .normalize()
-    .move(5)
+    .moveForward(5)
     .normalize()
-    .move(5)
+    .moveForward(5)
     .normalize()
-    .move(5)
+    .moveForward(5)
     .normalize()
-    .move(5)
+    .moveForward(5)
     .normalize()
 }
 

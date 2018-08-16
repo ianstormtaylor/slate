@@ -6,13 +6,13 @@ const h = require('../../helpers/h')
 module.exports.default = function(change) {
   change
     .insertText('one')
-    .move(5)
+    .moveForward(5)
     .insertText('two')
-    .move(5)
+    .moveForward(5)
     .insertText('three')
-    .move(5)
+    .moveForward(5)
     .insertText('four')
-    .move(5)
+    .moveForward(5)
     .insertText('five')
 }
 
