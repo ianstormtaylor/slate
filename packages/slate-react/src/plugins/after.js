@@ -266,20 +266,9 @@ function AfterPlugin() {
     isDraggingInternally = true
 
     const { value } = change
-    const { document, schema } = value
-    const node = findNode(event.target, value)
-    const ancestors = document.getAncestors(node.key)
-    const isVoid =
-      node && (schema.isVoid(node) || ancestors.some(a => schema.isVoid(a)))
-
-    if (isVoid) {
-      const encoded = Base64.serializeNode(node, { preserveKeys: true })
-      setEventTransfer(event, 'node', encoded)
-    } else {
-      const { fragment } = value
-      const encoded = Base64.serializeNode(fragment)
-      setEventTransfer(event, 'fragment', encoded)
-    }
+    const { fragment } = value
+    const encoded = Base64.serializeNode(fragment)
+    setEventTransfer(event, 'fragment', encoded)
   }
 
   /**
@@ -352,12 +341,14 @@ function AfterPlugin() {
       change.insertFragment(fragment)
     }
 
+    // todo: this never gets called anymore because we just work with fragments
     if (type == 'node' && Block.isBlock(node)) {
-      change.insertBlock(node.regenerateKey()).removeNodeByKey(node.key)
+      change.insertBlock(node.regenerateKey())
     }
 
+    // todo: this never gets called anymore because we just work with fragments
     if (type == 'node' && Inline.isInline(node)) {
-      change.insertInline(node.regenerateKey()).removeNodeByKey(node.key)
+      change.insertInline(node.regenerateKey())
     }
 
     // COMPAT: React's onSelect event breaks after an onDrop event
