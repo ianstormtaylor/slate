@@ -62,8 +62,8 @@ function insertImage(change, src, target) {
 const schema = {
   document: {
     last: { type: 'paragraph' },
-    normalize: (change, reason, { node, child }) => {
-      switch (reason) {
+    normalize: (change, { code, node, child }) => {
+      switch (code) {
         case LAST_CHILD_TYPE_INVALID: {
           const paragraph = Block.create('paragraph')
           return change.insertNodeByKey(node.key, node.nodes.size, paragraph)
