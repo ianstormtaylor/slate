@@ -1433,6 +1433,32 @@ ALIAS_METHODS.forEach(([alias, method]) => {
   }
 })
 
+const DEPRECATED_EDGE_METHODS = [
+  {
+    getAlias: edge => `has${edge}AtStartOf`,
+    pointMethod: 'isAtStartOfNode',
+  },
+  {
+    getAlias: edge => `has${edge}AtEndOf`,
+    pointMethod: `isAtEndOfNode`,
+  },
+]
+
+DEPRECATED_EDGE_METHODS.forEach(({ getAlias, pointMethod }) => {
+  ;['start', 'end', 'focus', 'anchor'].forEach(edge => {
+    const alias = getAlias(edge.charAt(0).toUpperCase() + edge.substr(1))
+
+    Range.prototype[alias] = function(...args) {
+      logger.deprecate(
+        '0.37.0',
+        `The \`Range.${alias}\` method is deprecated, please use \`this[${edge}].${pointMethod}\` instead.`
+      )
+
+      return this[edge][pointMethod](...args)
+    }
+  })
+})
+
 /**
  * Export.
  *
