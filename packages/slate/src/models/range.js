@@ -986,24 +986,6 @@ class Range extends Record(DEFAULTS) {
     )
   }
 
-  hasEdgeAtStartOf(node) {
-    logger.deprecate(
-      '0.37.0',
-      'The `Range.hasEdgeAtStartOf` method is deprecated.'
-    )
-
-    return this.anchor.isAtStartOfNode(node) || this.focus.isAtStartOfNode(node)
-  }
-
-  hasEdgeAtEndOf(node) {
-    logger.deprecate(
-      '0.37.0',
-      'The `Range.hasEdgeAtEndOf` method is deprecated.'
-    )
-
-    return this.anchor.isAtEndOfNode(node) || this.focus.isAtEndOfNode(node)
-  }
-
   hasEdgeBetween(node, start, end) {
     logger.deprecate(
       '0.37.0',
@@ -1018,15 +1000,6 @@ class Range extends Record(DEFAULTS) {
         start <= this.focus.offset &&
         this.focus.isInNode(node))
     )
-  }
-
-  hasEdgeIn(node) {
-    logger.deprecate(
-      '0.37.0',
-      'The `Range.hasEdgeAtEndOf` method is deprecated.'
-    )
-
-    return this.anchor.isInNode(node) || this.focus.isInNode(node)
   }
 
   hasEndBetween(node, start, end) {
@@ -1341,7 +1314,7 @@ const DEPRECATED_EDGE_METHODS = [
 ]
 
 DEPRECATED_EDGE_METHODS.forEach(({ getAlias, pointMethod }) => {
-  ;['start', 'end', 'focus', 'anchor'].forEach(edge => {
+  ;['start', 'end', 'focus', 'anchor', 'edge'].forEach(edge => {
     const alias = getAlias(edge.charAt(0).toUpperCase() + edge.substr(1))
 
     Range.prototype[alias] = function(...args) {
@@ -1349,6 +1322,12 @@ DEPRECATED_EDGE_METHODS.forEach(({ getAlias, pointMethod }) => {
         '0.37.0',
         `The \`Range.${alias}\` method is deprecated, please use \`this[${edge}].${pointMethod}\` instead.`
       )
+
+      if (edge === 'edge') {
+        return (
+          this.focus[pointMethod](...args) || this.anchor[pointMethod](...args)
+        )
+      }
 
       return this[edge][pointMethod](...args)
     }
