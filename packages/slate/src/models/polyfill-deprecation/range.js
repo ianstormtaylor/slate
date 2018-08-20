@@ -180,6 +180,10 @@ export default function polyfillDeprecation(Range) {
       getNewMethod: edge => `move${edge}ToEndOfNode`,
       edges: ['Focus', 'Anchor'],
     },
+    {
+      getAlias: edge => `collapseTo${edge}`,
+      getNewMethod: edge => `moveTo${edge}`,
+    },
   ]
 
   DEPRECATED_EGDES_BY_NEW_RANGE_METHODS.forEach(
@@ -203,4 +207,86 @@ export default function polyfillDeprecation(Range) {
       })
     }
   )
+
+  /**
+   * Ad-hoc Deprecation
+   */
+
+  const otherDeprecation = {
+    blur() {
+      logger.deprecate(
+        '0.37.0',
+        'The `Range.blur` method is deprecated, please use `Range.merge` directly instead.'
+      )
+
+      return this.merge({ isFocused: false })
+    },
+
+    deselect() {
+      logger.deprecate(
+        '0.37.0',
+        'The `Range.deselect` method is deprecated, please use `Range.create` to create a new unset range instead.'
+      )
+
+      return Range.create()
+    },
+
+    moveOffsetsTo(ao, fo = ao) {
+      logger.deprecate(
+        '0.37.0',
+        'The `Range.moveOffsetsTo` method is deprecated, please use `Range.moveAnchorTo` and `Range.moveFocusTo` in sequence instead.'
+      )
+
+      return this.moveAnchorTo(ao).moveFocusTo(fo)
+    },
+
+    move(n = 1) {
+      logger.deprecate(
+        '0.37.0',
+        'The `Range.move` method is deprecated, please use `Range.moveForward` or `Range.moveBackward` instead.'
+      )
+
+      return n > 0 ? this.moveForward(n) : this.moveBackward(-n)
+    },
+
+    moveAnchor(n = 1) {
+      logger.deprecate(
+        '0.37.0',
+        'The `Range.moveAnchor` method is deprecated, please use `Range.moveAnchorForward` or `Range.moveAnchorBackward` instead.'
+      )
+
+      return n > 0 ? this.moveAnchorForward(n) : this.moveAnchorBackward(-n)
+    },
+
+    moveEnd(n = 1) {
+      logger.deprecate(
+        '0.37.0',
+        'The `Range.moveEnd` method is deprecated, please use `Range.moveEndForward` or `Range.moveEndBackward` instead.'
+      )
+
+      return n > 0 ? this.moveEndForward(n) : this.moveEndBackward(-n)
+    },
+
+    moveFocus(n = 1) {
+      logger.deprecate(
+        '0.37.0',
+        'The `Range.moveFocus` method is deprecated, please use `Range.moveFocusForward` or `Range.moveFocusBackward` instead.'
+      )
+
+      return n > 0 ? this.moveFocusForward(n) : this.moveFocusBackward(-n)
+    },
+
+    moveStart(n = 1) {
+      logger.deprecate(
+        '0.37.0',
+        'The `Range.moveStart` method is deprecated, please use `Range.moveStartForward` or `Range.moveStartBackward` instead.'
+      )
+
+      return n > 0 ? this.moveStartForward(n) : this.moveStartBackward(-n)
+    },
+  }
+
+  Object.entries(otherDeprecation).forEach(([alias, method]) => {
+    Range.prototype[alias] = method
+  })
 }
