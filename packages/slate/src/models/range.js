@@ -1000,42 +1000,6 @@ class Range extends Record(DEFAULTS) {
     return this.moveAnchorTo(ao).moveFocusTo(fo)
   }
 
-  moveAnchorToStartOf(node) {
-    logger.deprecate(
-      '0.37.0',
-      'The `Range.moveAnchorToStartOf` method is deprecated, please use `Range.moveAnchorToStartOfNode` instead.'
-    )
-
-    return this.moveAnchorToStartOfNode(node)
-  }
-
-  moveAnchorToEndOf(node) {
-    logger.deprecate(
-      '0.37.0',
-      'The `Range.moveAnchorToEndOf` method is deprecated, please use `Range.moveAnchorToEndOfNode` instead.'
-    )
-
-    return this.moveAnchorToEndOfNode(node)
-  }
-
-  moveFocusToStartOf(node) {
-    logger.deprecate(
-      '0.37.0',
-      'The `Range.moveFocusToStartOf` method is deprecated, please use `Range.moveFocusToStartOfNode` instead.'
-    )
-
-    return this.moveFocusToStartOfNode(node)
-  }
-
-  moveFocusToEndOf(node) {
-    logger.deprecate(
-      '0.37.0',
-      'The `Range.moveFocusToEndOf` method is deprecated, please use `Range.moveFocusToEndOfNode` instead.'
-    )
-
-    return this.moveFocusToEndOfNode(node)
-  }
-
   moveToStartOf(node) {
     logger.deprecate(
       '0.37.0',
@@ -1244,11 +1208,26 @@ const DEPRECATED_EGDES_BY_NEW_RANGE_METHODS = [
     getNewMethod: edge => `move${edge}To`,
     fixArgs: '(offset)',
   },
+  {
+    getAlias: edge => `move${edge}ToStartOf`,
+    getNewMethod: edge => `move${edge}ToStartOfNode`,
+    edges: ['Focus', 'Anchor'],
+  },
+  {
+    getAlias: edge => `move${edge}ToEndOf`,
+    getNewMethod: edge => `move${edge}ToEndOfNode`,
+    edges: ['Focus', 'Anchor'],
+  },
 ]
 
 DEPRECATED_EGDES_BY_NEW_RANGE_METHODS.forEach(
-  ({ getAlias, getNewMethod, fixArgs = '' }) => {
-    ;['Start', 'End', 'Focus', 'Anchor'].forEach(edge => {
+  ({
+    getAlias,
+    getNewMethod,
+    fixArgs = '',
+    edges = ['Start', 'End', 'Focus', 'Anchor'],
+  }) => {
+    edges.forEach(edge => {
       const alias = getAlias(edge)
       const method = getNewMethod(edge)
 
