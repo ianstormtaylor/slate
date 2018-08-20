@@ -973,74 +973,6 @@ class Range extends Record(DEFAULTS) {
     return this.end.path
   }
 
-  hasAnchorBetween(node, start, end) {
-    logger.deprecate(
-      '0.37.0',
-      'The `Range.hasAnchorBetween` method is deprecated, please use the `Range.anchor` methods and properties directly instead.'
-    )
-
-    return (
-      this.anchor.offset <= end &&
-      start <= this.anchor.offset &&
-      this.anchor.isInNode(node)
-    )
-  }
-
-  hasEdgeBetween(node, start, end) {
-    logger.deprecate(
-      '0.37.0',
-      'The `Range.hasEdgeBetween` method is deprecated.'
-    )
-
-    return (
-      (this.anchor.offset <= end &&
-        start <= this.anchor.offset &&
-        this.anchor.isInNode(node)) ||
-      (this.focus.offset <= end &&
-        start <= this.focus.offset &&
-        this.focus.isInNode(node))
-    )
-  }
-
-  hasEndBetween(node, start, end) {
-    logger.deprecate(
-      '0.37.0',
-      'The `Range.hasEndBetween` method is deprecated, please use the `Range.end` methods and properties directly instead.'
-    )
-
-    return (
-      this.end.offset <= end &&
-      start <= this.end.offset &&
-      this.end.isInNode(node)
-    )
-  }
-
-  hasFocusBetween(node, start, end) {
-    logger.deprecate(
-      '0.37.0',
-      'The `Range.hasFocusBetween` method is deprecated, please use the `Range.focus` methods and properties directly instead.'
-    )
-
-    return (
-      start <= this.focus.offset &&
-      this.focus.offset <= end &&
-      this.focus.isInNode(node)
-    )
-  }
-
-  hasStartBetween(node, start, end) {
-    logger.deprecate(
-      '0.37.0',
-      'The `Range.hasStartBetween` method is deprecated, please use the `Range.start` methods and properties directly instead.'
-    )
-
-    return (
-      this.start.offset <= end &&
-      start <= this.start.offset &&
-      this.start.isInNode(node)
-    )
-  }
-
   blur() {
     logger.deprecate(
       '0.37.0',
@@ -1292,6 +1224,10 @@ const DEPRECATED_EDGE_METHODS = [
   {
     getAlias: edge => `has${edge}In`,
     pointMethod: `isInNode`,
+  },
+  {
+    getAlias: edge => `has${edge}Between`,
+    pointMethod: `isBetweenInNode`,
   },
 ]
 

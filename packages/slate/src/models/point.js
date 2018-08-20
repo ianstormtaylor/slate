@@ -195,6 +195,25 @@ class Point extends Record(DEFAULTS) {
   }
 
   /**
+   * Check whether the point is between a `start` and `end` in a node
+   *
+   * @param {Node} node
+   * @param {Number} start
+   * @param {Number} end
+   * @returns {Boolean}
+   */
+
+  isBetweenInNode(node, start, end) {
+    if (!this.isInNode) return false
+    let { offset, key } = this
+
+    if (node.object !== 'text') {
+      offset += node.getOffset(key)
+    }
+    return offset <= end && start <= offset
+  }
+
+  /**
    * Move the point's offset backward `n` characters.
    *
    * @param {Number} n (optional)
