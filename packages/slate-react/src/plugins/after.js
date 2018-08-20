@@ -33,6 +33,8 @@ const debug = Debug('slate:after')
 
 function AfterPlugin() {
   let isDraggingInternally = null
+  let isMouseMovingInternally = false
+  let mouseMoveCallbackId
 
   /**
    * On before input.
@@ -443,6 +445,27 @@ function AfterPlugin() {
     change.insertTextAtRange(entire, textContent, leaf.marks).select(corrected)
   }
 
+  /*
+   * On mouse move
+   *
+   * @param {Event} event
+   * @param {Change} change
+   * @param {Editor} editor
+  */
+
+  function onMouseMove(event, change, editor) {
+    debug('onMouseMove', { event })
+    window.clearTimeout(mouseMoveCallbackId)
+
+    isMouseMovingInternally = event.buttons % 2 === 1
+
+    if (isMouseMovingInternally) {
+      mouseMoveCallbackId = window.setTimeout(() => {
+        isMouseMovingInternally = false
+      }, 24)
+    }
+  }
+
   /**
    * On key down.
    *
@@ -776,6 +799,7 @@ function AfterPlugin() {
     onDragStart,
     onDrop,
     onInput,
+    onMouseMove,
     onKeyDown,
     onPaste,
     onSelect,

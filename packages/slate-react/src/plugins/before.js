@@ -373,6 +373,18 @@ function BeforePlugin() {
   }
 
   /**
+   * On mouse move.
+   *
+   * @param {Event} event
+   * @param {Change} change
+   * @param {Editor} editor
+   */
+
+  function onMouseMove(event) {
+    debug('onMouseMove', { event })
+  }
+
+  /**
    * On key down.
    *
    * @param {Event} event
@@ -475,6 +487,7 @@ function BeforePlugin() {
     onDrop,
     onFocus,
     onInput,
+    onMouseMove,
     onKeyDown,
     onPaste,
     onSelect,

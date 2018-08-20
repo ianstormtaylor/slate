@@ -22,6 +22,7 @@ const EVENT_HANDLERS = [
   'onDrop',
   'onInput',
   'onFocus',
+  'onMouseMove',
   'onKeyDown',
   'onKeyUp',
   'onPaste',
