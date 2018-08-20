@@ -973,24 +973,6 @@ class Range extends Record(DEFAULTS) {
     return this.end.path
   }
 
-  hasAnchorAtStartOf(node) {
-    logger.deprecate(
-      '0.37.0',
-      'The `Range.hasAnchorAtStartOf` method is deprecated, please use `Range.anchor.isAtStartOfNode` instead.'
-    )
-
-    return this.anchor.isAtStartOfNode(node)
-  }
-
-  hasAnchorAtEndOf(node) {
-    logger.deprecate(
-      '0.37.0',
-      'The `Range.hasAnchorAtEndOf` method is deprecated, please use `Range.anchor.isAtEndOfNode` instead.'
-    )
-
-    return this.anchor.isAtEndOfNode(node)
-  }
-
   hasAnchorBetween(node, start, end) {
     logger.deprecate(
       '0.37.0',
@@ -1056,24 +1038,6 @@ class Range extends Record(DEFAULTS) {
     return this.anchor.isInNode(node) || this.focus.isInNode(node)
   }
 
-  hasEndAtStartOf(node) {
-    logger.deprecate(
-      '0.37.0',
-      'The `Range.hasEndAtStartOf` method is deprecated, please use `Range.end.isAtStartOfNode` instead.'
-    )
-
-    return this.end.isAtStartOfNode(node)
-  }
-
-  hasEndAtEndOf(node) {
-    logger.deprecate(
-      '0.37.0',
-      'The `Range.hasEndAtEndOf` method is deprecated, please use `Range.end.isAtEndOfNode` instead.'
-    )
-
-    return this.end.isAtEndOfNode(node)
-  }
-
   hasEndBetween(node, start, end) {
     logger.deprecate(
       '0.37.0',
@@ -1096,24 +1060,6 @@ class Range extends Record(DEFAULTS) {
     return this.end.isInNode(node)
   }
 
-  hasFocusAtEndOf(node) {
-    logger.deprecate(
-      '0.37.0',
-      'The `Range.hasFocusAtEndOf` method is deprecated, please use `Range.focus.isAtEndOfNode` instead.'
-    )
-
-    return this.focus.isAtEndOfNode(node)
-  }
-
-  hasFocusAtStartOf(node) {
-    logger.deprecate(
-      '0.37.0',
-      'The `Range.hasFocusAtStartOf` method is deprecated, please use `Range.focus.isAtStartOfNode` instead.'
-    )
-
-    return this.focus.isAtStartOfNode(node)
-  }
-
   hasFocusBetween(node, start, end) {
     logger.deprecate(
       '0.37.0',
@@ -1134,24 +1080,6 @@ class Range extends Record(DEFAULTS) {
     )
 
     return this.focus.isInNode(node)
-  }
-
-  hasStartAtStartOf(node) {
-    logger.deprecate(
-      '0.37.0',
-      'The `Range.hasStartAtStartOf` method is deprecated, please use `Range.start.isAtStartOfNode` instead.'
-    )
-
-    return this.start.isAtStartOfNode(node)
-  }
-
-  hasStartAtEndOf(node) {
-    logger.deprecate(
-      '0.37.0',
-      'The `Range.hasStartAtEndOf` method is deprecated, please use `Range.start.isAtEndOfNode` instead.'
-    )
-
-    return this.start.isAtEndOfNode(node)
   }
 
   hasStartBetween(node, start, end) {
