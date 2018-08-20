@@ -1041,24 +1041,6 @@ class Range extends Record(DEFAULTS) {
     )
   }
 
-  isAtStartOf(node) {
-    logger.deprecate(
-      '0.37.0',
-      'The `Range.isAtStartOf` method is deprecated, please use `Range.isCollapsed` and `Point.isAtStartOfNode` instead.'
-    )
-
-    return this.isCollapsed && this.anchor.isAtStartOfNode(node)
-  }
-
-  isAtEndOf(node) {
-    logger.deprecate(
-      '0.37.0',
-      'The `Range.isAtEndOf` method is deprecated, please use `Range.isCollapsed` and `Point.isAtEndOfNode` instead.'
-    )
-
-    return this.isCollapsed && this.anchor.isAtEndOfNode(node)
-  }
-
   blur() {
     logger.deprecate(
       '0.37.0',
@@ -1320,7 +1302,7 @@ DEPRECATED_EDGE_METHODS.forEach(({ getAlias, pointMethod }) => {
     Range.prototype[alias] = function(...args) {
       logger.deprecate(
         '0.37.0',
-        `The \`Range.${alias}\` method is deprecated, please use \`this[${edge}].${pointMethod}\` instead.`
+        `The \`Range.${alias}\` method is deprecated, please use \`this.${edge}.${pointMethod}\` instead.`
       )
 
       if (edge === 'edge') {
@@ -1332,6 +1314,29 @@ DEPRECATED_EDGE_METHODS.forEach(({ getAlias, pointMethod }) => {
       return this[edge][pointMethod](...args)
     }
   })
+})
+
+const DEPRECATED_COLLAPSED_METHODS = [
+  {
+    edge: 'Start',
+    pointMethod: 'isAtStartOfNode',
+  },
+  {
+    edge: 'End',
+    pointMethod: 'isAtEndOfNode',
+  },
+]
+
+DEPRECATED_COLLAPSED_METHODS.forEach(({ edge, pointMethod }) => {
+  const alias = `isAt${edge}Of`
+
+  Range.prototype[alias] = function(...args) {
+    logger.deprecate(
+      '0.37.0',
+      'The `Range.${alias}` method is deprecated, please use `Range.isCollapsed` and `Point.[$pointMethod]` instead.'
+    )
+    return this.isCollapsed && this.anchor[pointMethod](...args)
+  }
 })
 
 /**
