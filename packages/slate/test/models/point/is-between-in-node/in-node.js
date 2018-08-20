@@ -1,6 +1,5 @@
 /** @jsx h */
 
-import assert from 'assert'
 import h from '../../../helpers/h'
 
 export const input = (
