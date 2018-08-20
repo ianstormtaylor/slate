@@ -986,15 +986,6 @@ class Range extends Record(DEFAULTS) {
     )
   }
 
-  hasAnchorIn(node) {
-    logger.deprecate(
-      '0.37.0',
-      'The `Range.hasAnchorAtEndOf` method is deprecated, please use `Range.anchor.isInNode` instead.'
-    )
-
-    return this.anchor.isInNode(node)
-  }
-
   hasEdgeAtStartOf(node) {
     logger.deprecate(
       '0.37.0',
@@ -1051,15 +1042,6 @@ class Range extends Record(DEFAULTS) {
     )
   }
 
-  hasEndIn(node) {
-    logger.deprecate(
-      '0.37.0',
-      'The `Range.hasEndAtEndOf` method is deprecated, please use `Range.end.isInNode` instead.'
-    )
-
-    return this.end.isInNode(node)
-  }
-
   hasFocusBetween(node, start, end) {
     logger.deprecate(
       '0.37.0',
@@ -1073,15 +1055,6 @@ class Range extends Record(DEFAULTS) {
     )
   }
 
-  hasFocusIn(node) {
-    logger.deprecate(
-      '0.37.0',
-      'The `Range.hasFocusAtEndOf` method is deprecated, please use `Range.focus.isInNode` instead.'
-    )
-
-    return this.focus.isInNode(node)
-  }
-
   hasStartBetween(node, start, end) {
     logger.deprecate(
       '0.37.0',
@@ -1093,15 +1066,6 @@ class Range extends Record(DEFAULTS) {
       start <= this.start.offset &&
       this.start.isInNode(node)
     )
-  }
-
-  hasStartIn(node) {
-    logger.deprecate(
-      '0.37.0',
-      'The `Range.hasStartAtEndOf` method is deprecated, please use `Range.start.isInNode` instead.'
-    )
-
-    return this.start.isInNode(node)
   }
 
   isAtStartOf(node) {
@@ -1369,6 +1333,10 @@ const DEPRECATED_EDGE_METHODS = [
   {
     getAlias: edge => `has${edge}AtEndOf`,
     pointMethod: `isAtEndOfNode`,
+  },
+  {
+    getAlias: edge => `has${edge}In`,
+    pointMethod: `isInNode`,
   },
 ]
 
