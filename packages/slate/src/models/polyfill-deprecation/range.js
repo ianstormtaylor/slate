@@ -42,9 +42,39 @@ export function resolveDeprecatedAttributes(object) {
   return { ...object, anchor, focus }
 }
 
+/*
+ * Uppercase the first char
+ * @param {string} str
+ * @return {string}
+*/
+
+function upperFirstLetter(str) {
+  return `${str.charAt(0).toUpperCase()}${str.substr(1)}`
+}
+
 export default function polyfillDeprecation(Range) {
+  /*
+   * Deprecated edge getters
+  */
+
+  ;['offset', 'key', 'path'].forEach(pointProperty => {
+    ;['start', 'end', 'focus', 'anchor'].forEach(edge => {
+      const alias = `${edge}${upperFirstLetter(pointProperty)}`
+
+      Object.defineProperty(Range.prototype, alias, {
+        get() {
+          logger.deprecate(
+            '0.37.0',
+            `The \`range.${alias}\` property has been deprecated, use \`range.${edge}.${pointProperty}\` instead.`
+          )
+          return this[edge][pointProperty]
+        },
+      })
+    })
+  })
+
   /**
-   * Mix in some aliases for convenience / parallelism with the browser APIs.
+   * Deprecated interfaces with renamed new ones
    */
 
   const ALIAS_METHODS = [
