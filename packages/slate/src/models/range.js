@@ -1000,33 +1000,6 @@ class Range extends Record(DEFAULTS) {
     return this.moveAnchorTo(ao).moveFocusTo(fo)
   }
 
-  moveToStartOf(node) {
-    logger.deprecate(
-      '0.37.0',
-      'The `Range.moveToStartOf` method is deprecated, please use `Range.moveToStartOfNode` instead.'
-    )
-
-    return this.moveToStartOfNode(node)
-  }
-
-  moveToEndOf(node) {
-    logger.deprecate(
-      '0.37.0',
-      'The `Range.moveToEndOf` method is deprecated, please use `Range.moveToEndOfNode` instead.'
-    )
-
-    return this.moveToEndOfNode(node)
-  }
-
-  moveToRangeOf(...args) {
-    logger.deprecate(
-      '0.37.0',
-      'The `Range.moveToRangeOf` method is deprecated, please use `Range.moveToRangeOfNode` instead.'
-    )
-
-    return this.moveToRangeOfNode(...args)
-  }
-
   collapseToAnchor() {
     logger.deprecate(
       '0.37.0',
@@ -1127,6 +1100,9 @@ const ALIAS_METHODS = [
   ['extendTo', 'moveFocusTo'],
   ['extendToStartOf', 'moveFocusToStartOfNode'],
   ['extendToEndOf', 'moveFocusToEndOfNode'],
+  ['moveToStartOf', 'moveToStartOfNode'],
+  ['moveToEndOf', 'moveToEndOfNode'],
+  ['moveToRangeOf', 'moveToRangeOfNode'],
 ]
 
 ALIAS_METHODS.forEach(([alias, method]) => {
