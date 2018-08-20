@@ -833,6 +833,10 @@ class Range extends Record(DEFAULTS) {
     return this.toJSON()
   }
 
+  /**
+   * Deprecated
+   */
+
   blur() {
     logger.deprecate(
       '0.37.0',
