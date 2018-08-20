@@ -1,6 +1,5 @@
 /** @jsx h */
 
-import assert from 'assert'
 import h from '../../../helpers/h'
 
 export const input = (
@@ -17,6 +16,13 @@ export const input = (
 
 export default function(value) {
   const { selection: { anchor, focus }, anchorText } = value
-  assert(anchor.isBetweenInNode(anchorText, 0, 1), true)
-  assert(focus.isBetweenInNode(anchorText, 0, 2), false)
+  return {
+    anchor: anchor.isBetweenInNode(anchorText, 0, 0),
+    focus: focus.isBetweenInNode(anchorText, 0, 0),
+  }
+}
+
+export const output = {
+  anchor: true,
+  focus: false,
 }

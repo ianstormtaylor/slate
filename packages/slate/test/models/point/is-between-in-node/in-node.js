@@ -17,7 +17,14 @@ export const input = (
 )
 
 export default function(value) {
-  const { selection: { anchor, focus }, anchorBlock } = value
-  assert(anchor.isBetweenInNode(anchorBlock, 3, 4), true)
-  assert(focus.isBetweenInNode(anchorBlock, 0, 5), false)
+  const { selection: { anchor, focus }, document } = value
+  return {
+    anchor: anchor.isBetweenInNode(document, 3, 4),
+    focus: focus.isBetweenInNode(document, 0, 5),
+  }
+}
+
+export const output = {
+  anchor: true,
+  focus: false,
 }

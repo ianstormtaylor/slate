@@ -204,10 +204,11 @@ class Point extends Record(DEFAULTS) {
    */
 
   isBetweenInNode(node, start, end) {
-    if (!this.isInNode) return false
-    let { offset, key } = this
+    if (!this.isInNode(node)) return false
+    let { offset } = this
 
     if (node.object !== 'text') {
+      const { key } = this
       offset += node.getOffset(key)
     }
     return offset <= end && start <= offset
