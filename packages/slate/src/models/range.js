@@ -1257,7 +1257,7 @@ DEPRECATED_EGDES_BY_NEW_RANGE_METHODS.forEach(
           '0.37.0',
           `The \`Range.${alias}\` method is deprecated, please use \`Range.isCollapsed\` and \`Point.${method}${fixArgs}\` instead.`
         )
-        return this[method]
+        return this[method](...args)
       }
     })
   }
