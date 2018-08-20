@@ -109,44 +109,13 @@ class Range extends Record(DEFAULTS) {
    */
 
   static fromJSON(object) {
-    let {
+    const {
       anchor,
       focus,
       isAtomic = false,
       isFocused = false,
       marks = null,
-    } = object
-
-    if (
-      !anchor &&
-      (object.anchorKey || object.anchorOffset || object.anchorPath)
-    ) {
-      logger.deprecate(
-        '0.37.0',
-        '`Range` objects now take a `Point` object as an `anchor` instead of taking `anchorKey/Offset/Path` properties. But you passed:',
-        object
-      )
-
-      anchor = {
-        key: object.anchorKey,
-        offset: object.anchorOffset,
-        path: object.anchorPath,
-      }
-    }
-
-    if (!focus && (object.focusKey || object.focusOffset || object.focusPath)) {
-      logger.deprecate(
-        '0.37.0',
-        '`Range` objects now take a `Point` object as a `focus` instead of taking `focusKey/Offset/Path` properties. But you passed:',
-        object
-      )
-
-      focus = {
-        key: object.focusKey,
-        offset: object.focusOffset,
-        path: object.focusPath,
-      }
-    }
+    } = resolveDeprecatedAttributes(object)
 
     const range = new Range({
       anchor: Point.fromJSON(anchor || {}),
@@ -1080,6 +1049,48 @@ class Range extends Record(DEFAULTS) {
 
     return n > 0 ? this.moveStartForward(n) : this.moveStartBackward(-n)
   }
+}
+
+/* Resolve the deprecated attributes in Range.fromJSON
+ * @param {Object} object
+ * @return {Object}
+*/
+
+function resolveDeprecatedAttributes(object) {
+  let { anchor, focus } = object
+  if (anchor && focus) return object
+
+  if (
+    !anchor &&
+    (object.anchorKey || object.anchorOffset || object.anchorPath)
+  ) {
+    logger.deprecate(
+      '0.37.0',
+      '`Range` objects now take a `Point` object as an `anchor` instead of taking `anchorKey/Offset/Path` properties. But you passed:',
+      object
+    )
+
+    anchor = {
+      key: object.anchorKey,
+      offset: object.anchorOffset,
+      path: object.anchorPath,
+    }
+  }
+
+  if (!focus && (object.focusKey || object.focusOffset || object.focusPath)) {
+    logger.deprecate(
+      '0.37.0',
+      '`Range` objects now take a `Point` object as a `focus` instead of taking `focusKey/Offset/Path` properties. But you passed:',
+      object
+    )
+
+    focus = {
+      key: object.focusKey,
+      offset: object.focusOffset,
+      path: object.focusPath,
+    }
+  }
+  return { ...object, anchor, focus }
 }
 
 /**
