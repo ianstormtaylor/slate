@@ -206,6 +206,18 @@ export default function polyfillDeprecation(Range) {
         }
       })
     }
+  )[('move', 'moveAnchor', 'moveFocus', 'moveStart', 'moveEnd')].forEach(
+    moveMethodName => {
+      Range.prototype[moveMethodName] = function(n = 1) {
+        logger.deprecate(
+          '0.37.0',
+          `The \`Range.${moveMethodName}\` method is deprecated, please use \`Range.${moveMethodName}Forward\` or \`Range.${moveMethodName}Backward\` instead.`
+        )
+        return n > 0
+          ? this[`${moveMethodName}Forward`](n)
+          : this[`${moveMethodName}Backward`](-n)
+      }
+    }
   )
 
   /**
@@ -238,51 +250,6 @@ export default function polyfillDeprecation(Range) {
       )
 
       return this.moveAnchorTo(ao).moveFocusTo(fo)
-    },
-
-    move(n = 1) {
-      logger.deprecate(
-        '0.37.0',
-        'The `Range.move` method is deprecated, please use `Range.moveForward` or `Range.moveBackward` instead.'
-      )
-
-      return n > 0 ? this.moveForward(n) : this.moveBackward(-n)
-    },
-
-    moveAnchor(n = 1) {
-      logger.deprecate(
-        '0.37.0',
-        'The `Range.moveAnchor` method is deprecated, please use `Range.moveAnchorForward` or `Range.moveAnchorBackward` instead.'
-      )
-
-      return n > 0 ? this.moveAnchorForward(n) : this.moveAnchorBackward(-n)
-    },
-
-    moveEnd(n = 1) {
-      logger.deprecate(
-        '0.37.0',
-        'The `Range.moveEnd` method is deprecated, please use `Range.moveEndForward` or `Range.moveEndBackward` instead.'
-      )
-
-      return n > 0 ? this.moveEndForward(n) : this.moveEndBackward(-n)
-    },
-
-    moveFocus(n = 1) {
-      logger.deprecate(
-        '0.37.0',
-        'The `Range.moveFocus` method is deprecated, please use `Range.moveFocusForward` or `Range.moveFocusBackward` instead.'
-      )
-
-      return n > 0 ? this.moveFocusForward(n) : this.moveFocusBackward(-n)
-    },
-
-    moveStart(n = 1) {
-      logger.deprecate(
-        '0.37.0',
-        'The `Range.moveStart` method is deprecated, please use `Range.moveStartForward` or `Range.moveStartBackward` instead.'
-      )
-
-      return n > 0 ? this.moveStartForward(n) : this.moveStartBackward(-n)
     },
   }
 
