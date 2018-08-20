@@ -991,42 +991,6 @@ class Range extends Record(DEFAULTS) {
     return Range.create()
   }
 
-  moveAnchorOffsetTo(o) {
-    logger.deprecate(
-      '0.37.0',
-      'The `Range.moveAnchorOffsetTo` method is deprecated, please use `Range.moveAnchorTo(offset)` instead.'
-    )
-
-    return this.moveAnchorTo(o)
-  }
-
-  moveFocusOffsetTo(fo) {
-    logger.deprecate(
-      '0.37.0',
-      'The `Range.moveFocusOffsetTo` method is deprecated, please use `Range.moveFocusTo(offset)` instead.'
-    )
-
-    return this.moveFocusTo(fo)
-  }
-
-  moveStartOffsetTo(o) {
-    logger.deprecate(
-      '0.37.0',
-      'The `Range.moveStartOffsetTo` method is deprecated, please use `Range.moveStartTo(offset)` instead.'
-    )
-
-    return this.moveStartTo(o)
-  }
-
-  moveEndOffsetTo(o) {
-    logger.deprecate(
-      '0.37.0',
-      'The `Range.moveEndOffsetTo` method is deprecated, please use `Range.moveEndTo(offset)` instead.'
-    )
-
-    return this.moveEndTo(o)
-  }
-
   moveOffsetsTo(ao, fo = ao) {
     logger.deprecate(
       '0.37.0',
@@ -1254,26 +1218,50 @@ DEPRECATED_EDGE_METHODS.forEach(({ getAlias, pointMethod }) => {
 
 const DEPRECATED_COLLAPSED_METHODS = [
   {
-    edge: 'Start',
-    pointMethod: 'isAtStartOfNode',
-  },
-  {
-    edge: 'End',
-    pointMethod: 'isAtEndOfNode',
+    getAlias: edge => `isAt${edge}Of`,
+    getPointMethod: edge => `isAt${edge}OfNode`,
   },
 ]
 
-DEPRECATED_COLLAPSED_METHODS.forEach(({ edge, pointMethod }) => {
-  const alias = `isAt${edge}Of`
+DEPRECATED_COLLAPSED_METHODS.forEach(({ getAlias, getPointMethod }) => {
+  ;['Start', 'End'].forEach(edge => {
+    const alias = getAlias(edge)
+    const pointMethod = getPointMethod(edge)
 
-  Range.prototype[alias] = function(...args) {
-    logger.deprecate(
-      '0.37.0',
-      'The `Range.${alias}` method is deprecated, please use `Range.isCollapsed` and `Point.[$pointMethod]` instead.'
-    )
-    return this.isCollapsed && this.anchor[pointMethod](...args)
-  }
+    Range.prototype[alias] = function(...args) {
+      logger.deprecate(
+        '0.37.0',
+        `The \`Range.${alias}\` method is deprecated, please use \`Range.isCollapsed\` and \`Point.${pointMethod}\` instead.`
+      )
+      return this.isCollapsed && this.anchor[pointMethod](...args)
+    }
+  })
 })
+
+const DEPRECATED_EGDES_BY_NEW_RANGE_METHODS = [
+  {
+    getAlias: edge => `move${edge}OffsetTo`,
+    getNewMethod: edge => `move${edge}To`,
+    fixArgs: '(offset)',
+  },
+]
+
+DEPRECATED_EGDES_BY_NEW_RANGE_METHODS.forEach(
+  ({ getAlias, getNewMethod, fixArgs = '' }) => {
+    ;['Start', 'End', 'Focus', 'Anchor'].forEach(edge => {
+      const alias = getAlias(edge)
+      const method = getNewMethod(edge)
+
+      Range.prototype[alias] = function(...args) {
+        logger.deprecate(
+          '0.37.0',
+          `The \`Range.${alias}\` method is deprecated, please use \`Range.isCollapsed\` and \`Point.${method}${fixArgs}\` instead.`
+        )
+        return this[method]
+      }
+    })
+  }
+)
 
 /**
  * Export.
