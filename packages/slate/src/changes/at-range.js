@@ -626,8 +626,6 @@ Changes.insertBlockAtRange = (change, range, block, options = {}) => {
   const parent = document.getParent(startBlock.key)
   const index = parent.nodes.indexOf(startBlock)
 
-  debugger
-
   if (schema.isVoid(startBlock)) {
     const extra = start.isAtEndOfNode(startBlock) ? 1 : 0
     change.insertNodeByKey(parent.key, index + extra, block, { normalize })

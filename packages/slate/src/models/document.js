@@ -111,7 +111,6 @@ class Document extends Record(DEFAULTS) {
       'The `Node.isVoid` property is deprecated, please use the `Schema.isVoid()` checking method instead.'
     )
 
-    debugger
     return this.get('isVoid')
   }
 

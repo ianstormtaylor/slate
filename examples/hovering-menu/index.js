@@ -131,7 +131,7 @@ class HoveringMenu extends React.Component {
     const { value } = this.state
     const { fragment, selection } = value
 
-    if (select.isBlurred || selection.isCollapsed || fragment.text === '') {
+    if (selection.isBlurred || selection.isCollapsed || fragment.text === '') {
       menu.removeAttribute('style')
       return
     }
