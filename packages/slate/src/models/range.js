@@ -1,5 +1,4 @@
 import isPlainObject from 'is-plain-object'
-import logger from 'slate-dev-logger'
 import { List, Record, Set } from 'immutable'
 
 import PathUtils from '../utils/path-utils'
@@ -156,14 +155,6 @@ class Range extends Record(DEFAULTS) {
 
   get object() {
     return 'range'
-  }
-
-  get kind() {
-    logger.deprecate(
-      'slate@0.32.0',
-      'The `kind` property of Slate objects has been renamed to `object`.'
-    )
-    return this.object
   }
 
   /**
