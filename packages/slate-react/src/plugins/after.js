@@ -266,7 +266,16 @@ function AfterPlugin() {
     isDraggingInternally = true
 
     const { value } = change
-    const { fragment } = value
+    const { selection, document } = value
+    const node = findNode(event.target, value)
+    const isVoid = node && (node.isVoid || document.hasVoidParent(node.key))
+    const selectionIncludesNode = value.blocks.some(block => block.key === node.key)
+
+    if (isVoid && !selectionIncludesNode) {
+      change.moveToRangeOfNode(node)
+    }
+
+    const fragment = change.value.fragment;
     const encoded = Base64.serializeNode(fragment)
     setEventTransfer(event, 'fragment', encoded)
   }
