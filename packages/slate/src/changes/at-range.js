@@ -70,7 +70,6 @@ Changes.addMarksAtRange = (change, range, marks, options = {}) => {
  */
 
 Changes.deleteAtRange = (change, range, options = {}) => {
-
   // Snapshot the selection, which creates an extra undo save point, so that
   // when you undo a delete, the expanded selection will be retained.
   change.snapshotSelection()
