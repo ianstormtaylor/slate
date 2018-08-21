@@ -5,6 +5,7 @@
   "extension" : ["js"],
   "cache": false,
   "include": ["**/src/**"],
+  "exclude": ["**/polyfill-deprecation/**"],
   "reporter": [
     "html",
     "lcov",
