@@ -19,18 +19,6 @@ describe('slate', () => {
     assert.deepEqual(actual, expected)
   })
 
-  fixtures(__dirname, 'models/point', ({ module }) => {
-    const { input, output } = module
-    const fn = module.default
-    const actual = fn(input)
-
-    if (!actual.toJSON) {
-      assert.deepEqual(actual, output)
-    } else {
-      assert.deepEqual(actual.toJSON(), output.toJSON())
-    }
-  })
-
   fixtures(__dirname, 'models/node', ({ module }) => {
     const { input, output } = module
     const fn = module.default
