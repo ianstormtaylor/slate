@@ -4,6 +4,14 @@ A list of changes to the `slate` package with each new version. Until `1.0.0` is
 
 ---
 
+### `0.38.0` — August 21, 2018
+
+###### DEPRECATED
+
+**`Node.isVoid` access is deprecated.** Previously the "voidness" of a node was hardcoded in the data model. Soon it will be determined at runtime based on your editor's schema. This deprecation just ensures that you aren't using the `node.isVoid` property which will not work in future verisons.
+
+---
+
 ### `0.37.0` — August 3, 2018
 
 ###### NEW
