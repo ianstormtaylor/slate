@@ -457,6 +457,7 @@ function AfterPlugin() {
     debug('onMouseMove', { event })
     window.clearTimeout(mouseMoveCallbackId)
 
+    // It means the left key of mouse is pressed
     isMouseMovingInternally = event.buttons % 2 === 1
 
     if (isMouseMovingInternally) {
@@ -658,6 +659,17 @@ function AfterPlugin() {
     const focusInline = document.getClosestInline(focus.key)
     const focusBlock = document.getClosestBlock(focus.key)
     const anchorBlock = document.getClosestBlock(anchor.key)
+
+    // COMPAT: If the mouse is moving with major down, and the previous selection is
+    // collapsed, and the new selection is also collapsed start; Then extend the
+    // selection rather than move the selection;
+    if (
+      isMouseMovingInternally &&
+      range.isCollapsed &&
+      value.selection.isCollapsed
+    ) {
+      range = range.setAnchor(value.selection.anchor)
+    }
 
     // COMPAT: If the anchor point is at the start of a non-void, and the
     // focus point is inside a void node with an offset that isn't `0`, set
