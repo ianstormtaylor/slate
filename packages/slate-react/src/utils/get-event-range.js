@@ -19,14 +19,14 @@ function getEventRange(event, value) {
   const { x, y, target } = event
   if (x == null || y == null) return null
 
-  const { document } = value
+  const { document, schema } = value
   const node = findNode(target, value)
   if (!node) return null
 
   // If the drop target is inside a void node, move it into either the next or
   // previous node, depending on which side the `x` and `y` coordinates are
   // closest to.
-  if (node.isVoid) {
+  if (schema.isVoid(node)) {
     const rect = target.getBoundingClientRect()
     const isPrevious =
       node.object == 'inline'

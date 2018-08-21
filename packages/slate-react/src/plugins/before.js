@@ -66,6 +66,7 @@ function BeforePlugin() {
     if (editor.props.readOnly) return true
 
     const { value } = change
+    const { schema } = value
     const { relatedTarget, target } = event
     const window = getWindow(target)
 
@@ -93,7 +94,8 @@ function BeforePlugin() {
       // editable section of an element that isn't a void node (eg. a list item
       // of the check list example).
       const node = findNode(relatedTarget, value)
-      if (el.contains(relatedTarget) && node && !node.isVoid) return true
+      if (el.contains(relatedTarget) && node && !schema.isVoid(node))
+        return true
     }
 
     debug('onBlur', { event })
@@ -269,8 +271,10 @@ function BeforePlugin() {
     // call `preventDefault` to signal that drops are allowed.
     // When the target is editable, dropping is already allowed by
     // default, and calling `preventDefault` hides the cursor.
+    const { value } = editor
+    const { schema } = value
     const node = findNode(event.target, editor.value)
-    if (node.isVoid) event.preventDefault()
+    if (schema.isVoid(node)) event.preventDefault()
 
     // COMPAT: IE won't call onDrop on contentEditables unless the
     // default dragOver is prevented:

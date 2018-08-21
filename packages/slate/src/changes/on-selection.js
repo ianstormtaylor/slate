@@ -658,9 +658,9 @@ function pointBackward(change, point, n = 1) {
 
   const Point = point.slice(0, 1).toUpperCase() + point.slice(1)
   const { value } = change
-  const { document, selection } = value
+  const { document, selection, schema } = value
   const p = selection[point]
-  const isInVoid = document.hasVoidParent(p.path)
+  const isInVoid = document.hasVoidParent(p.path, schema)
 
   // what is this?
   if (!isInVoid && p.offset - n >= 0) {
@@ -674,7 +674,8 @@ function pointBackward(change, point, n = 1) {
 
   const block = document.getClosestBlock(p.path)
   const isInBlock = block.hasNode(previous.key)
-  const isPreviousInVoid = previous && document.hasVoidParent(previous.key)
+  const isPreviousInVoid =
+    previous && document.hasVoidParent(previous.key, schema)
   change[`move${Point}ToEndOfNode`](previous)
 
   // when is this called?
@@ -690,10 +691,10 @@ function pointForward(change, point, n = 1) {
 
   const Point = point.slice(0, 1).toUpperCase() + point.slice(1)
   const { value } = change
-  const { document, selection } = value
+  const { document, selection, schema } = value
   const p = selection[point]
   const text = document.getNode(p.path)
-  const isInVoid = document.hasVoidParent(p.path)
+  const isInVoid = document.hasVoidParent(p.path, schema)
 
   // what is this?
   if (!isInVoid && p.offset + n <= text.text.length) {
@@ -707,7 +708,7 @@ function pointForward(change, point, n = 1) {
 
   const block = document.getClosestBlock(p.path)
   const isInBlock = block.hasNode(next.key)
-  const isNextInVoid = document.hasVoidParent(next.key)
+  const isNextInVoid = document.hasVoidParent(next.key, schema)
   change[`move${Point}ToStartOfNode`](next)
 
   // when is this called?

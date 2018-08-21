@@ -528,6 +528,7 @@ class Value extends Record(DEFAULTS) {
    */
 
   get isEmpty() {
+    logger.deprecate('0.38.0', 'The `Value.isEmpty` property is deprecated.')
     if (this.selection.isCollapsed) return true
     if (this.selection.end.offset != 0 && this.selection.start.offset != 0)
       return false
@@ -541,8 +542,9 @@ class Value extends Record(DEFAULTS) {
    */
 
   get isInVoid() {
+    logger.deprecate('0.38.0', 'The `Value.isInVoid` property is deprecated.')
     if (this.selection.isExpanded) return false
-    return this.document.hasVoidParent(this.selection.start.key)
+    return this.document.hasVoidParent(this.selection.start.key, this.schema)
   }
 
   /**

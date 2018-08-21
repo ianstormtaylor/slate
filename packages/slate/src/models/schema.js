@@ -360,6 +360,19 @@ class Schema extends Record(DEFAULTS) {
   }
 
   /**
+   * Check if a node is void.
+   *
+   * @param {Node}
+   * @return {Boolean}
+   */
+
+  isVoid(node) {
+    // COMPAT: Right now this just provides a way to get around the
+    // deprecation warnings, but in the future it will check the rules.
+    return node.get('isVoid')
+  }
+
+  /**
    * Return a JSON representation of the schema.
    *
    * @return {Object}
@@ -432,7 +445,7 @@ function defaultNormalize(change, error) {
     case NODE_IS_VOID_INVALID: {
       return change.setNodeByKey(
         node.key,
-        { isVoid: !node.isVoid },
+        { isVoid: !node.get('isVoid') },
         { normalize: false }
       )
     }
@@ -530,7 +543,7 @@ function validateType(node, rule) {
 
 function validateIsVoid(node, rule) {
   if (rule.isVoid == null) return
-  if (rule.isVoid === node.isVoid) return
+  if (rule.isVoid === node.get('isVoid')) return
   return fail(NODE_IS_VOID_INVALID, { rule, node })
 }
 

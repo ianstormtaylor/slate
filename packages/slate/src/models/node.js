@@ -540,12 +540,24 @@ class Node {
    * Get the closest void parent of a node by `path`.
    *
    * @param {List|String} path
+   * @param {Schema} schema
    * @return {Node|Null}
    */
 
-  getClosestVoid(path) {
-    const closest = this.getClosest(path, p => p.isVoid)
-    return closest
+  getClosestVoid(path, schema) {
+    if (!schema) {
+      logger.deprecate(
+        '0.38.0',
+        'Calling the `Node.getClosestVoid` method without passing a second `schema` argument is deprecated.'
+      )
+
+      const closest = this.getClosest(path, p => p.get('isVoid'))
+      return closest
+    }
+
+    const ancestors = this.getAncestors(path)
+    const ancestor = ancestors.findLast(a => schema.isVoid(a))
+    return ancestor
   }
 
   /**
@@ -1636,11 +1648,22 @@ class Node {
    * Check if a node has a void parent.
    *
    * @param {List|String} path
+   * @param {Schema} schema
    * @return {Boolean}
    */
 
-  hasVoidParent(path) {
-    const closest = this.getClosestVoid(path)
+  hasVoidParent(path, schema) {
+    if (!schema) {
+      logger.deprecate(
+        '0.38.0',
+        'Calling the `Node.hasVoidParent` method without the second `schema` argument is deprecated.'
+      )
+
+      const closest = this.getClosestVoid(path)
+      return !!closest
+    }
+
+    const closest = this.getClosestVoid(path, schema)
     return !!closest
   }
 
