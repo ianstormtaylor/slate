@@ -152,6 +152,16 @@ class Inline extends Record(DEFAULTS) {
     return this.object
   }
 
+  get isVoid() {
+    logger.deprecate(
+      '0.38.0',
+      'The `Node.isVoid` property is deprecated, please use the `Schema.isVoid()` checking method instead.'
+    )
+
+    debugger
+    return this.get('isVoid')
+  }
+
   /**
    * Check if the inline is empty.
    * Returns true if inline is not void and all it's children nodes are empty.
@@ -161,7 +171,8 @@ class Inline extends Record(DEFAULTS) {
    */
 
   get isEmpty() {
-    return !this.isVoid && !this.nodes.some(child => !child.isEmpty)
+    logger.deprecate('0.38.0', 'The `Node.isEmpty` property is deprecated.')
+    return !this.get('isVoid') && !this.nodes.some(child => !child.isEmpty)
   }
 
   /**
@@ -185,7 +196,7 @@ class Inline extends Record(DEFAULTS) {
     const object = {
       object: this.object,
       type: this.type,
-      isVoid: this.isVoid,
+      isVoid: this.get('isVoid'),
       data: this.data.toJSON(),
       nodes: this.nodes.toArray().map(n => n.toJSON(options)),
     }

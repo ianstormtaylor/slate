@@ -125,17 +125,19 @@ class HoveringMenu extends React.Component {
    */
 
   updateMenu = () => {
-    const { value } = this.state
     const menu = this.menu
     if (!menu) return
 
-    if (value.isBlurred || value.isEmpty) {
+    const { value } = this.state
+    const { fragment, selection } = value
+
+    if (select.isBlurred || selection.isCollapsed || fragment.text === '') {
       menu.removeAttribute('style')
       return
     }
 
-    const selection = window.getSelection()
-    const range = selection.getRangeAt(0)
+    const native = window.getSelection()
+    const range = native.getRangeAt(0)
     const rect = range.getBoundingClientRect()
     menu.style.opacity = 1
     menu.style.top = `${rect.top + window.pageYOffset - menu.offsetHeight}px`

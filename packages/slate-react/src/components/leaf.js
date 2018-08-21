@@ -126,11 +126,13 @@ class Leaf extends React.Component {
    */
 
   renderText() {
-    const { block, node, parent, text, index, leaves } = this.props
+    const { block, node, editor, parent, text, index, leaves } = this.props
+    const { value } = editor
+    const { schema } = value
 
     // COMPAT: Render text inside void nodes with a zero-width space.
     // So the node can contain selection but the text is not visible.
-    if (parent.isVoid) {
+    if (schema.isVoid(parent)) {
       return <span data-slate-zero-width="z">{'\u200B'}</span>
     }
 

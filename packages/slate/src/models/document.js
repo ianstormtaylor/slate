@@ -105,6 +105,16 @@ class Document extends Record(DEFAULTS) {
     return this.object
   }
 
+  get isVoid() {
+    logger.deprecate(
+      '0.38.0',
+      'The `Node.isVoid` property is deprecated, please use the `Schema.isVoid()` checking method instead.'
+    )
+
+    debugger
+    return this.get('isVoid')
+  }
+
   /**
    * Check if the document is empty.
    * Returns true if all it's children nodes are empty.
@@ -113,6 +123,7 @@ class Document extends Record(DEFAULTS) {
    */
 
   get isEmpty() {
+    logger.deprecate('0.38.0', 'The `Node.isEmpty` property is deprecated.')
     return !this.nodes.some(child => !child.isEmpty)
   }
 

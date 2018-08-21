@@ -93,21 +93,16 @@ When you define a `normalizeNode` function, you either return nothing if the nod
 
 ```js
 function normalizeNode(node) {
-  if (node.object != 'block') return
-  if (node.isVoid) return
-
   const { nodes } = node
-  if (nodes.size != 3) return
-  if (nodes.first().object != 'text') return
-  if (nodes.last().object != 'text') return
-
-  return change => {
-    change.removeNodeByKey(node.key)
-  }
+  if (node.object !== 'block') return
+  if (nodes.size !== 3) return
+  if (nodes.first().object !== 'text') return
+  if (nodes.last().object !== 'text') return
+  return change => change.removeNodeByKey(node.key)
 }
 ```
 
-This validation defines a very specific (honestly, useless) behavior, where if a node is block, non-void and has three children, the first and last of which are text nodes, it is removed. I don't know why you'd ever do that, but the point is that you can get very specific with your validations this way. Any property of the node can be examined.
+This validation defines a very specific (honestly, useless) behavior, where if a node is a block and has three children, the first and last of which are text nodes, it is removed. I don't know why you'd ever do that, but the point is that you can get very specific with your validations this way. Any property of the node can be examined.
 
 When you need this level of specificity, using the `normalizeNode` property of the editor or plugins is handy.
 
