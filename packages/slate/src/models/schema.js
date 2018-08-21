@@ -12,7 +12,6 @@ import {
   LAST_CHILD_OBJECT_INVALID,
   LAST_CHILD_TYPE_INVALID,
   NODE_DATA_INVALID,
-  NODE_IS_VOID_INVALID,
   NODE_MARK_INVALID,
   NODE_OBJECT_INVALID,
   NODE_TEXT_INVALID,
@@ -92,17 +91,7 @@ const CORE_RULES = [
     },
   },
 
-  // Ensure that inline non-void nodes are never empty.
-  {
-    match: {
-      object: 'inline',
-      isVoid: false,
-      nodes: [{ match: { object: 'text' } }],
-    },
-    text: /[\w\W]+/,
-  },
-
-  // Ensure that inline void nodes are surrounded by text nodes.
+  // Ensure that inline nodes are surrounded by text nodes.
   {
     match: { object: 'block' },
     first: [{ object: 'block' }, { object: 'text' }],
@@ -287,6 +276,18 @@ class Schema extends Record(DEFAULTS) {
   }
 
   /**
+   * Get the schema rules for a `node`.
+   *
+   * @param {Node} node
+   * @return {Array}
+   */
+
+  getNodeRules(node) {
+    const rules = this.rules.filter(r => testRules(node, r.match))
+    return rules
+  }
+
+  /**
    * Validate a `node` with the schema, returning an error if it's invalid.
    *
    * @param {Node} node
@@ -294,7 +295,7 @@ class Schema extends Record(DEFAULTS) {
    */
 
   validateNode(node) {
-    const rules = this.rules.filter(r => testRules(node, r.match))
+    const rules = this.getNodeRules(node)
     const failure = validateRules(node, rules, this.rules, { every: true })
     if (!failure) return
     const error = new SlateError(failure.code, failure)
@@ -367,9 +368,10 @@ class Schema extends Record(DEFAULTS) {
    */
 
   isVoid(node) {
-    // COMPAT: Right now this just provides a way to get around the
-    // deprecation warnings, but in the future it will check the rules.
-    return node.get('isVoid')
+    const rules = this.getNodeRules(node)
+    const rule = rules.find(r => 'isVoid' in r)
+    if (!rule) return false
+    return rule.isVoid
   }
 
   /**
@@ -442,14 +444,6 @@ function defaultNormalize(change, error) {
           )
     }
 
-    case NODE_IS_VOID_INVALID: {
-      return change.setNodeByKey(
-        node.key,
-        { isVoid: !node.get('isVoid') },
-        { normalize: false }
-      )
-    }
-
     case NODE_MARK_INVALID: {
       return node.getTexts().forEach(t =>
         change.removeMarkByKey(t.key, 0, t.text.length, mark, {
@@ -506,7 +500,6 @@ function validateRules(node, rule, rules, options = {}) {
   const error =
     validateObject(node, rule) ||
     validateType(node, rule) ||
-    validateIsVoid(node, rule) ||
     validateData(node, rule) ||
     validateMarks(node, rule) ||
     validateText(node, rule) ||
@@ -539,12 +532,6 @@ function validateType(node, rule) {
   if (rule.type == null) return
   if (rule.type === node.type) return
   return fail(NODE_TYPE_INVALID, { rule, node })
-}
-
-function validateIsVoid(node, rule) {
-  if (rule.isVoid == null) return
-  if (rule.isVoid === node.get('isVoid')) return
-  return fail(NODE_IS_VOID_INVALID, { rule, node })
 }
 
 function validateData(node, rule) {

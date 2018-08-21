@@ -282,7 +282,6 @@ class Operation extends Record(DEFAULTS) {
       if (key == 'properties' && type == 'set_node') {
         const v = {}
         if ('data' in value) v.data = value.data.toJS()
-        if ('isVoid' in value) v.isVoid = value.get('isVoid')
         if ('type' in value) v.type = value.type
         value = v
       }

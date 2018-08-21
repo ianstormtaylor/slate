@@ -12,7 +12,7 @@ export const input = (
         </inline>{' '}
         editor!
       </block>
-      <block type="image" data={{ src: 'https://...' }} isVoid />
+      <block type="image" data={{ src: 'https://...' }} />
     </document>
   </value>
 )
@@ -26,7 +26,6 @@ export const output = {
       {
         object: 'block',
         type: 'paragraph',
-        isVoid: false,
         data: {},
         nodes: [
           {
@@ -58,7 +57,6 @@ export const output = {
           {
             object: 'inline',
             type: 'link',
-            isVoid: false,
             data: {
               src: 'http://slatejs.org',
             },
@@ -90,7 +88,6 @@ export const output = {
       {
         object: 'block',
         type: 'image',
-        isVoid: true,
         data: {
           src: 'https://...',
         },

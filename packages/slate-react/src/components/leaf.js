@@ -143,13 +143,13 @@ class Leaf extends React.Component {
       text === '' &&
       parent.object === 'block' &&
       parent.text === '' &&
-      parent.nodes.size === 1
+      parent.nodes.last() === node
     ) {
       return <span data-slate-zero-width="n">{'\u200B'}</span>
     }
 
     // COMPAT: If the text is empty, it's because it's on the edge of an inline
-    // void node, so we render a zero-width space so that the selection can be
+    // node, so we render a zero-width space so that the selection can be
     // inserted next to it still.
     if (text === '') {
       return <span data-slate-zero-width="z">{'\u200B'}</span>

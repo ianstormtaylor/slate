@@ -18,7 +18,6 @@ export const config = {
             return {
               object: 'inline',
               type: 'emoji',
-              isVoid: true,
               nodes: next(el.childNodes),
             }
           }

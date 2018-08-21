@@ -112,7 +112,6 @@ const RULES = [
         return {
           object: 'block',
           type: 'image',
-          isVoid: true,
           nodes: next(el.childNodes),
           data: {
             src: el.getAttribute('src'),
@@ -164,6 +163,20 @@ class PasteHtml extends React.Component {
   }
 
   /**
+   * The editor's schema.
+   *
+   * @type {Object}
+   */
+
+  schema = {
+    blocks: {
+      image: {
+        isVoid: true,
+      },
+    },
+  }
+
+  /**
    * Render.
    *
    * @return {Component}
@@ -174,6 +187,7 @@ class PasteHtml extends React.Component {
       <Editor
         placeholder="Paste in some HTML..."
         value={this.state.value}
+        schema={this.schema}
         onPaste={this.onPaste}
         onChange={this.onChange}
         renderNode={this.renderNode}

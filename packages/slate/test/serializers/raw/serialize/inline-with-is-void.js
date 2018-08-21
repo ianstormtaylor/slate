@@ -21,7 +21,6 @@ export const output = {
       {
         object: 'block',
         type: 'paragraph',
-        isVoid: false,
         data: {},
         nodes: [
           {
@@ -37,7 +36,6 @@ export const output = {
           {
             object: 'inline',
             type: 'emoji',
-            isVoid: true,
             data: {},
             nodes: [
               {

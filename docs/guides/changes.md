@@ -28,7 +28,6 @@ change
   .moveToEndOfBlock()
   .insertBlock({
     type: 'image',
-    isVoid: true,
     data: {
       src: 'http://placekitten.com/200/300',
       alt: 'Kittens',
@@ -176,7 +175,6 @@ function insertParagraph(change) {
 function insertImage(change, src) {
   change.insertBlock({
     type: 'image',
-    isVoid: true,
     data: { src },
   })
 }

@@ -32,7 +32,6 @@ export const output = {
         object: 'block',
         key: '1',
         type: 'paragraph',
-        isVoid: false,
         data: {},
         nodes: [
           {
@@ -52,7 +51,6 @@ export const output = {
         object: 'block',
         key: '3',
         type: 'paragraph',
-        isVoid: false,
         data: {},
         nodes: [
           {
@@ -72,7 +70,6 @@ export const output = {
         object: 'block',
         key: '5',
         type: 'paragraph',
-        isVoid: false,
         data: {},
         nodes: [
           {

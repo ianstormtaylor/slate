@@ -5,10 +5,7 @@ import { createHyperscript } from 'slate-hyperscript'
 const h = createHyperscript({
   blocks: {
     paragraph: 'paragraph',
-    image: {
-      type: 'image',
-      isVoid: true,
-    },
+    image: 'image',
   },
   inlines: {
     link: 'link',
@@ -39,7 +36,6 @@ export const output = {
       {
         object: 'block',
         type: 'paragraph',
-        isVoid: false,
         data: {},
         nodes: [
           {
@@ -71,7 +67,6 @@ export const output = {
           {
             object: 'inline',
             type: 'link',
-            isVoid: false,
             data: {
               src: 'http://slatejs.org',
             },
@@ -103,7 +98,6 @@ export const output = {
       {
         object: 'block',
         type: 'image',
-        isVoid: true,
         data: {
           src: 'https://...',
         },

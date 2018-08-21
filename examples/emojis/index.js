@@ -68,6 +68,20 @@ class Emojis extends React.Component {
   }
 
   /**
+   * The editor's schema.
+   *
+   * @type {Object}
+   */
+
+  schema = {
+    inlines: {
+      emoji: {
+        isVoid: true,
+      },
+    },
+  }
+
+  /**
    * Render the app.
    *
    * @return {Element} element
@@ -86,6 +100,7 @@ class Emojis extends React.Component {
         <Editor
           placeholder="Write some 😍👋🎉..."
           value={this.state.value}
+          schema={this.schema}
           onChange={this.onChange}
           renderNode={this.renderNode}
         />
@@ -147,7 +162,6 @@ class Emojis extends React.Component {
     change
       .insertInline({
         type: 'emoji',
-        isVoid: true,
         data: { code },
       })
       .moveToStartOfNextText()

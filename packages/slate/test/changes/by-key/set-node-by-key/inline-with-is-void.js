@@ -3,10 +3,7 @@
 import h from '../../../helpers/h'
 
 export default function(change) {
-  change.setNodeByKey('a', {
-    type: 'emoji',
-    isVoid: true,
-  })
+  change.setNodeByKey('a', 'emoji')
 }
 
 export const input = (

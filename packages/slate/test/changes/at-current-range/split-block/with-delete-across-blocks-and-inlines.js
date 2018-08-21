@@ -30,6 +30,7 @@ export const output = (
         <link>wo</link>
       </paragraph>
       <paragraph>
+        <link />
         <hashtag>
           <cursor />other
         </hashtag>

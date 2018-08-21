@@ -13,7 +13,6 @@ Block nodes may contain nested block nodes, inline nodes, and text nodes—just 
 ```js
 Block({
   data: Data,
-  isVoid: Boolean,
   key: String,
   nodes: Immutable.List<Node>,
   type: String
@@ -25,14 +24,6 @@ Block({
 `Immutable.Map`
 
 Arbitrary data associated with the node. Defaults to an empty `Map`.
-
-### `isVoid`
-
-`Boolean`
-
-Whether the node is a "void" node, meaning that it has no child content (eg. images, videos, etc.). Defaults to `false`.
-
-Note that even though a node may be "void", it will still contain a single, empty [`Text`](./text.md) node for consistency across other operations. However, when rendered by Slate that single [`Text`](./text.md) node will not be visible.
 
 ### `key`
 

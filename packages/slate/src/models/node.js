@@ -99,7 +99,6 @@ class Node {
     if (Block.isBlock(attrs) || Inline.isInline(attrs)) {
       return {
         data: attrs.data,
-        isVoid: attrs.isVoid,
         type: attrs.type,
       }
     }
@@ -112,7 +111,6 @@ class Node {
       const props = {}
       if ('type' in attrs) props.type = attrs.type
       if ('data' in attrs) props.data = Data.create(attrs.data)
-      if ('isVoid' in attrs) props.isVoid = attrs.isVoid
       return props
     }
 
@@ -545,16 +543,6 @@ class Node {
    */
 
   getClosestVoid(path, schema) {
-    if (!schema) {
-      logger.deprecate(
-        '0.38.0',
-        'Calling the `Node.getClosestVoid` method without passing a second `schema` argument is deprecated.'
-      )
-
-      const closest = this.getClosest(path, p => p.get('isVoid'))
-      return closest
-    }
-
     const ancestors = this.getAncestors(path)
     const ancestor = ancestors.findLast(a => schema.isVoid(a))
     return ancestor

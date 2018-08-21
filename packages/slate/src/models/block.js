@@ -17,7 +17,6 @@ import KeyUtils from '../utils/key-utils'
 
 const DEFAULTS = {
   data: new Map(),
-  isVoid: false,
   key: undefined,
   nodes: new List(),
   type: undefined,
@@ -85,13 +84,7 @@ class Block extends Record(DEFAULTS) {
       return object
     }
 
-    const {
-      data = {},
-      isVoid = false,
-      key = KeyUtils.create(),
-      nodes = [],
-      type,
-    } = object
+    const { data = {}, key = KeyUtils.create(), nodes = [], type } = object
 
     if (typeof type != 'string') {
       throw new Error('`Block.fromJSON` requires a `type` string.')
@@ -100,7 +93,6 @@ class Block extends Record(DEFAULTS) {
     const block = new Block({
       key,
       type,
-      isVoid: !!isVoid,
       data: Map(data),
       nodes: Block.createChildren(nodes),
     })
@@ -152,29 +144,6 @@ class Block extends Record(DEFAULTS) {
     return this.object
   }
 
-  get isVoid() {
-    logger.deprecate(
-      '0.38.0',
-      'The `Node.isVoid` property is deprecated, please use the `Schema.isVoid()` checking method instead.'
-    )
-
-    return this.get('isVoid')
-  }
-
-  /**
-   * Check if the block is empty.
-   * Returns true if block is not void and all it's children nodes are empty.
-   * Void node is never empty, regardless of it's content.
-   *
-   * @return {Boolean}
-   */
-
-  get isEmpty() {
-    logger.deprecate('0.38.0', 'The `Node.isEmpty` property is deprecated.')
-
-    return !this.get('isVoid') && !this.nodes.some(child => !child.isEmpty)
-  }
-
   /**
    * Get the concatenated text of all the block's children.
    *
@@ -196,7 +165,6 @@ class Block extends Record(DEFAULTS) {
     const object = {
       object: this.object,
       type: this.type,
-      isVoid: this.get('isVoid'),
       data: this.data.toJSON(),
       nodes: this.nodes.toArray().map(n => n.toJSON(options)),
     }

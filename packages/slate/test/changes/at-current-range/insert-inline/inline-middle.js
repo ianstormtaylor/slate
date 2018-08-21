@@ -3,10 +3,7 @@
 import h from '../../../helpers/h'
 
 export default function(change) {
-  change.insertInline({
-    type: 'emoji',
-    isVoid: true,
-  })
+  change.insertInline('emoji')
 }
 
 export const input = (
