@@ -206,19 +206,27 @@ export default function polyfillDeprecation(Range) {
         }
       })
     }
-  )[('move', 'moveAnchor', 'moveFocus', 'moveStart', 'moveEnd')].forEach(
-    moveMethodName => {
-      Range.prototype[moveMethodName] = function(n = 1) {
-        logger.deprecate(
-          '0.37.0',
-          `The \`Range.${moveMethodName}\` method is deprecated, please use \`Range.${moveMethodName}Forward\` or \`Range.${moveMethodName}Backward\` instead.`
-        )
-        return n > 0
-          ? this[`${moveMethodName}Forward`](n)
-          : this[`${moveMethodName}Backward`](-n)
-      }
-    }
   )
+
+  const DEPRECATED_MOVE_METHODS = [
+    'move',
+    'moveAnchor',
+    'moveFocus',
+    'moveStart',
+    'moveEnd',
+  ]
+
+  DEPRECATED_MOVE_METHODS.forEach(moveMethodName => {
+    Range.prototype[moveMethodName] = function(n = 1) {
+      logger.deprecate(
+        '0.37.0',
+        `The \`Range.${moveMethodName}\` method is deprecated, please use \`Range.${moveMethodName}Forward\` or \`Range.${moveMethodName}Backward\` instead.`
+      )
+      return n > 0
+        ? this[`${moveMethodName}Forward`](n)
+        : this[`${moveMethodName}Backward`](-n)
+    }
+  })
 
   /**
    * Ad-hoc Deprecation
