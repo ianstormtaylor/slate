@@ -148,6 +148,49 @@ class Text extends Record(DEFAULTS) {
   }
 
   /**
+<<<<<<< HEAD
+=======
+   * Is the node empty?
+   *
+   * @return {Boolean}
+   */
+
+  get isEmpty() {
+    logger.deprecate('0.39.0', 'The `Text.isEmpty` property is deprecated.')
+    return this.text == ''
+  }
+
+  /**
+   * Get the concatenated text of the node.
+   *
+   * @return {String}
+   */
+
+  get text() {
+    return this.getText()
+  }
+
+  /**
+   * Get the concatenated text of the node, cached for text getter
+   *
+   * @returns {String}
+   */
+
+  getText() {
+    return this.leaves.reduce((string, leaf) => string + leaf.text, '')
+  }
+
+  getString() {
+    logger.deprecate(
+      '0.39.0',
+      'The `Text.getString` property is deprecated, please use `Text.getText` instead.'
+    )
+
+    return this.getText()
+  }
+
+  /**
+>>>>>>> master
    * Find the 'first' leaf at offset; By 'first' the alorighthm prefers `endOffset === offset` than `startOffset === offset`
    * Corner Cases:
    *   1. if offset is negative, return the first leaf;
