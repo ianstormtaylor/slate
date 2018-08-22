@@ -166,6 +166,7 @@ class Text extends Record(DEFAULTS) {
    */
 
   get isEmpty() {
+    logger.deprecate('0.39.0', 'The `Text.isEmpty` property is deprecated.')
     return this.text == ''
   }
 
@@ -176,7 +177,7 @@ class Text extends Record(DEFAULTS) {
    */
 
   get text() {
-    return this.getString()
+    return this.getText()
   }
 
   /**
@@ -185,8 +186,17 @@ class Text extends Record(DEFAULTS) {
    * @returns {String}
    */
 
-  getString() {
+  getText() {
     return this.leaves.reduce((string, leaf) => string + leaf.text, '')
+  }
+
+  getString() {
+    logger.deprecate(
+      '0.39.0',
+      'The `Text.getString` property is deprecated, please use `Text.getText` instead.'
+    )
+
+    return this.getText()
   }
 
   /**
@@ -739,8 +749,17 @@ class Text extends Record(DEFAULTS) {
    * @returns {Text|Null}
    */
 
-  getFirstInvalidDescendant(schema) {
+  getFirstInvalidNode(schema) {
     return this.validate(schema) ? this : null
+  }
+
+  getFirstInvalidDescendant(schema) {
+    logger.deprecate(
+      '0.39.0',
+      'The `Node.getFirstInvalidDescendant` method is deprecated, please use `Node.getFirstInvalidNode` instead.'
+    )
+
+    return this.getFirstInvalidNode(schema)
   }
 
   /**
@@ -783,7 +802,7 @@ memoize(Text.prototype, [
   'getMarksAsArray',
   'normalize',
   'validate',
-  'getString',
+  'getText',
   'getKeysToPathsTable',
 ])
 
