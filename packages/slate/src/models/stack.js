@@ -130,10 +130,12 @@ class Stack extends Record(DEFAULTS) {
     return plugins.reduceRight((children, plugin) => {
       if (!plugin[property]) return children
 
-      logger.deprecate(
-        '0.39.0',
-        'The `renderPortal` property of plugins is deprecated, please use `renderEditor` with a `<React.Fragment>` in React 16 instead.'
-      )
+      if (property === 'renderPortal') {
+        logger.deprecate(
+          '0.39.0',
+          'The `renderPortal` property of plugins is deprecated, please use `renderEditor` with a `<React.Fragment>` in React 16 instead.'
+        )
+      }
 
       const ret = plugin[property](props, ...args)
       if (ret == null) return children
