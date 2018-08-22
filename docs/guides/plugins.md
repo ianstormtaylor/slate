@@ -20,7 +20,7 @@ Here's a really simple plugin:
     }
   },
   onClick(event, change, editor) {
-    if (change.value.isBlurred) {
+    if (change.value.selection.isBlurred) {
       change.moveToRangeOfDocument().focus()
     }
   }  

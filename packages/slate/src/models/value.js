@@ -175,46 +175,6 @@ class Value extends Record(DEFAULTS) {
   }
 
   /**
-   * Are there undoable events?
-   *
-   * @return {Boolean}
-   */
-
-  get hasUndos() {
-    return this.history.undos.size > 0
-  }
-
-  /**
-   * Are there redoable events?
-   *
-   * @return {Boolean}
-   */
-
-  get hasRedos() {
-    return this.history.redos.size > 0
-  }
-
-  /**
-   * Is the current selection blurred?
-   *
-   * @return {Boolean}
-   */
-
-  get isBlurred() {
-    return this.selection.isBlurred
-  }
-
-  /**
-   * Is the current selection focused?
-   *
-   * @return {Boolean}
-   */
-
-  get isFocused() {
-    return this.selection.isFocused
-  }
-
-  /**
    * Get the current start text node's closest block parent.
    *
    * @return {Block}
@@ -519,32 +479,6 @@ class Value extends Record(DEFAULTS) {
     return this.selection.isUnset
       ? new List()
       : this.document.getTextsAtRange(this.selection)
-  }
-
-  /**
-   * Check whether the selection is empty.
-   *
-   * @return {Boolean}
-   */
-
-  get isEmpty() {
-    logger.deprecate('0.38.0', 'The `Value.isEmpty` property is deprecated.')
-    if (this.selection.isCollapsed) return true
-    if (this.selection.end.offset != 0 && this.selection.start.offset != 0)
-      return false
-    return this.fragment.isEmpty
-  }
-
-  /**
-   * Check whether the selection is collapsed in a void node.
-   *
-   * @return {Boolean}
-   */
-
-  get isInVoid() {
-    logger.deprecate('0.38.0', 'The `Value.isInVoid` property is deprecated.')
-    if (this.selection.isExpanded) return false
-    return this.document.hasVoidParent(this.selection.start.key, this.schema)
   }
 
   /**
@@ -1016,6 +950,56 @@ class Value extends Record(DEFAULTS) {
   /**
    * Deprecated.
    */
+
+  get hasUndos() {
+    logger.deprecate(
+      '0.38.0',
+      'The `Value.hasUndos` property is deprecated, please use `history.undos.size` instead.'
+    )
+
+    return this.history.undos.size > 0
+  }
+
+  get hasRedos() {
+    logger.deprecate(
+      '0.38.0',
+      'The `Value.hasRedos` property is deprecated, please use `history.redos.size` instead.'
+    )
+
+    return this.history.redos.size > 0
+  }
+
+  get isBlurred() {
+    logger.deprecate(
+      '0.38.0',
+      'The `Value.isBlurred` property is deprecated, please use `selection.isBlurred` instead.'
+    )
+
+    return this.selection.isBlurred
+  }
+
+  get isFocused() {
+    logger.deprecate(
+      '0.38.0',
+      'The `Value.isFocused` property is deprecated, please use `selection.isFocused` instead.'
+    )
+
+    return this.selection.isFocused
+  }
+
+  get isEmpty() {
+    logger.deprecate('0.38.0', 'The `Value.isEmpty` property is deprecated.')
+    if (this.selection.isCollapsed) return true
+    if (this.selection.end.offset != 0 && this.selection.start.offset != 0)
+      return false
+    return this.fragment.isEmpty
+  }
+
+  get isInVoid() {
+    logger.deprecate('0.38.0', 'The `Value.isInVoid` property is deprecated.')
+    if (this.selection.isExpanded) return false
+    return this.document.hasVoidParent(this.selection.start.key, this.schema)
+  }
 
   get isCollapsed() {
     logger.deprecate(
