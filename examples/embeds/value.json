@@ -19,7 +19,6 @@
       {
         "object": "block",
         "type": "video",
-        "isVoid": true,
         "data": {
           "video": "https://www.youtube.com/embed/FaHEusBG20c"
         }

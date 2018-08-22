@@ -11,12 +11,10 @@ const input = {
     nodes: Array.from(Array(100)).map(() => ({
       type: 'list',
       object: 'block',
-      isVoid: false,
       data: {},
       nodes: Array.from(Array(10)).map(() => ({
         type: 'list-item',
         object: 'block',
-        isVoid: false,
         data: {},
         nodes: [
           {
@@ -32,7 +30,6 @@ const input = {
           {
             type: 'link',
             object: 'inline',
-            isVoid: false,
             data: {
               id: 1,
             },

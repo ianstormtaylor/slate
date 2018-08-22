@@ -154,17 +154,6 @@ Raised when the `type` property of the last child node is invalid, when a specif
 
 Raised when the `data` property of a node contains an invalid entry.
 
-### `NODE_IS_VOID_INVALID`
-
-```js
-{
-  node: Node,
-  rule: Object,
-}
-```
-
-Raised when the `isVoid` property of a node is invalid.
-
 ### `NODE_MARK_INVALID`
 
 ```js

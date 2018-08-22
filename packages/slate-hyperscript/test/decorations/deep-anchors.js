@@ -36,13 +36,11 @@ export const output = {
       {
         object: 'block',
         type: 'ul',
-        isVoid: false,
         data: {},
         nodes: [
           {
             object: 'block',
             type: 'li',
-            isVoid: false,
             data: {},
             nodes: [
               {
@@ -60,7 +58,6 @@ export const output = {
           {
             object: 'block',
             type: 'li',
-            isVoid: false,
             data: {},
             nodes: [
               {

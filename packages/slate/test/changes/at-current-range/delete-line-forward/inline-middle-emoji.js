@@ -22,6 +22,7 @@ export const output = (
     <document>
       <paragraph>
         <cursor />
+        <link />
       </paragraph>
     </document>
   </value>

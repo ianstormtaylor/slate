@@ -11,7 +11,6 @@ export const input = {
       {
         object: 'block',
         type: 'image',
-        isVoid: true,
         data: {},
         nodes: [
           {

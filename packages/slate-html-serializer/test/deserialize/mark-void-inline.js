@@ -25,7 +25,6 @@ export const config = {
             return {
               object: 'inline',
               type: 'linebreak',
-              isVoid: true,
             }
           }
         }

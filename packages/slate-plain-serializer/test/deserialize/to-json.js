@@ -11,7 +11,6 @@ export const output = {
       {
         object: 'block',
         type: 'line',
-        isVoid: false,
         data: {},
         nodes: [
           {

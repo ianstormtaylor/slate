@@ -24,7 +24,7 @@ const value = (
         </inline>{' '}
         editor!
       </block>
-      <block type="image" data={{ src: 'https://...' }} isVoid />
+      <block type="image" data={{ src: 'https://...' }} />
     </document>
   </value>
 )
@@ -38,10 +38,7 @@ import { createHyperscript } from 'slate-hyperscript'
 const h = createHyperscript({
   blocks: {
     paragraph: 'paragraph',
-    image: {
-      type: 'image',
-      isVoid: true,
-    },
+    image: 'image',
   },
   inlines: {
     link: 'link',

@@ -17,7 +17,6 @@
           {
             "object": "inline",
             "type": "emoji",
-            "isVoid": true,
             "data": {
               "code": "😃"
             }
@@ -39,7 +38,6 @@
           {
             "object": "inline",
             "type": "emoji",
-            "isVoid": true,
             "data": {
               "code": "🍔"
             }

@@ -12,7 +12,6 @@ export const input = {
         object: 'block',
         type: 'paragraph',
         data: {},
-        isVoid: false,
         nodes: [
           {
             object: 'text',

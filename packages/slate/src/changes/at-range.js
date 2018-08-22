@@ -1016,10 +1016,9 @@ Changes.setInlineAtRange = (...args) => {
 
 Changes.splitBlockAtRange = (change, range, height = 1, options = {}) => {
   const normalize = change.getFlag('normalize', options)
-
   const { start, end } = range
-  const { value } = change
-  const { document } = value
+  let { value } = change
+  let { document } = value
   let node = document.assertDescendant(start.key)
   let parent = document.getClosestBlock(node.key)
   let h = 0
@@ -1034,15 +1033,20 @@ Changes.splitBlockAtRange = (change, range, height = 1, options = {}) => {
     normalize: normalize && range.isCollapsed,
   })
 
+  value = change.value
+  document = value.document
+
   if (range.isExpanded) {
     if (range.isBackward) range = range.flip()
-    const nextBlock = change.value.document.getNextBlock(node.key)
+    const nextBlock = document.getNextBlock(node.key)
     range = range.moveAnchorToStartOfNode(nextBlock)
+    range = range.setFocus(range.focus.setPath(null))
 
     if (start.key === end.key) {
       range = range.moveFocusTo(range.anchor.key, end.offset - start.offset)
     }
 
+    range = document.resolveRange(range)
     change.deleteAtRange(range, { normalize })
   }
 }
@@ -1130,18 +1134,13 @@ Changes.unwrapBlockAtRange = (change, range, properties, options = {}) => {
 
   const normalize = change.getFlag('normalize', options)
   const { value } = change
-  let { document, schema } = value
+  let { document } = value
   const blocks = document.getBlocksAtRange(range)
   const wrappers = blocks
     .map(block => {
       return document.getClosest(block.key, parent => {
         if (parent.object != 'block') return false
         if (properties.type != null && parent.type != properties.type)
-          return false
-        if (
-          properties.isVoid != null &&
-          schema.isVoid(parent) != properties.isVoid
-        )
           return false
         if (properties.data != null && !parent.data.isSuperset(properties.data))
           return false
@@ -1232,18 +1231,13 @@ Changes.unwrapInlineAtRange = (change, range, properties, options = {}) => {
 
   const normalize = change.getFlag('normalize', options)
   const { value } = change
-  const { document, schema } = value
+  const { document } = value
   const texts = document.getTextsAtRange(range)
   const inlines = texts
     .map(text => {
       return document.getClosest(text.key, parent => {
         if (parent.object != 'inline') return false
         if (properties.type != null && parent.type != properties.type)
-          return false
-        if (
-          properties.isVoid != null &&
-          schema.isVoid(parent) != properties.isVoid
-        )
           return false
         if (properties.data != null && !parent.data.isSuperset(properties.data))
           return false
@@ -1263,6 +1257,8 @@ Changes.unwrapInlineAtRange = (change, range, properties, options = {}) => {
         normalize: false,
       })
     })
+
+    change.removeNodeByKey(inline.key, { normalize: false })
   })
 
   // TODO: optmize to only normalize the right block

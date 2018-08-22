@@ -15,19 +15,13 @@ const h = createHyperscript({
     code: 'code',
     list: 'list',
     item: 'item',
-    image: {
-      type: 'image',
-      isVoid: true,
-    },
+    image: 'image',
   },
   inlines: {
     link: 'link',
     hashtag: 'hashtag',
     comment: 'comment',
-    emoji: {
-      type: 'emoji',
-      isVoid: true,
-    },
+    emoji: 'emoji',
   },
   marks: {
     b: 'bold',

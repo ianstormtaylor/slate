@@ -9,7 +9,7 @@ export const input = (
     <document>
       <paragraph>
         <link>
-          <inline isVoid type="" />
+          <inline type="" />
         </link>
       </paragraph>
     </document>
@@ -25,7 +25,6 @@ export const output = {
       {
         object: 'block',
         type: 'paragraph',
-        isVoid: false,
         data: {},
         nodes: [
           {
@@ -41,7 +40,6 @@ export const output = {
           {
             object: 'inline',
             type: 'link',
-            isVoid: false,
             data: {},
             nodes: [
               {
@@ -57,7 +55,6 @@ export const output = {
               {
                 object: 'inline',
                 type: '',
-                isVoid: true,
                 data: {},
                 nodes: [
                   {

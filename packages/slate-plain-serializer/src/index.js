@@ -31,7 +31,6 @@ function deserialize(string, options = {}) {
         return {
           ...defaultBlock,
           object: 'block',
-          isVoid: false,
           data: {},
           nodes: [
             {

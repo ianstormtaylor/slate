@@ -48,13 +48,12 @@ function insertImage(change, src, target) {
 
   change.insertBlock({
     type: 'image',
-    isVoid: true,
     data: { src },
   })
 }
 
 /**
- * A schema to enforce that there's always a paragraph as the last block.
+ * The editor's schema.
  *
  * @type {Object}
  */
@@ -69,6 +68,11 @@ const schema = {
           return change.insertNodeByKey(node.key, node.nodes.size, paragraph)
         }
       }
+    },
+  },
+  blocks: {
+    image: {
+      isVoid: true,
     },
   },
 }

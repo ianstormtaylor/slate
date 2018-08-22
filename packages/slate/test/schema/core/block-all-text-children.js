@@ -24,7 +24,6 @@ export const output = {
       {
         object: 'block',
         type: 'quote',
-        isVoid: false,
         data: {},
         nodes: [
           {

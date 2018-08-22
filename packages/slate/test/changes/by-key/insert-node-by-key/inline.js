@@ -4,14 +4,7 @@ import h from '../../../helpers/h'
 import { Inline } from 'slate'
 
 export default function(change) {
-  change.insertNodeByKey(
-    'a',
-    0,
-    Inline.create({
-      type: 'emoji',
-      isVoid: true,
-    })
-  )
+  change.insertNodeByKey('a', 0, Inline.create('emoji'))
 }
 
 export const input = (

@@ -24,7 +24,6 @@ export const output = {
         key: '1',
         type: 'paragraph',
         data: {},
-        isVoid: false,
         nodes: [
           {
             object: 'text',

@@ -134,7 +134,7 @@ Will validate the first child node against a [`match`](#match).
 }
 ```
 
-Will validate a node's `isVoid` property.
+Will determine whether the node is treated as a "void" node or not, making its content a black box that Slate doesn't control editing for.
 
 ### `last`
 

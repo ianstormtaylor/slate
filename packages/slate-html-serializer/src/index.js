@@ -144,7 +144,6 @@ class Html {
       const block = {
         object: 'block',
         data: {},
-        isVoid: false,
         ...defaultBlock,
         nodes: [node],
       }
@@ -159,7 +158,6 @@ class Html {
         {
           object: 'block',
           data: {},
-          isVoid: false,
           ...defaultBlock,
           nodes: [
             {

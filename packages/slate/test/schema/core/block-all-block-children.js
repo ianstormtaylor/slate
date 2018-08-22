@@ -24,13 +24,11 @@ export const output = {
       {
         object: 'block',
         type: 'quote',
-        isVoid: false,
         data: {},
         nodes: [
           {
             object: 'block',
             type: 'paragraph',
-            isVoid: false,
             data: {},
             nodes: [
               {

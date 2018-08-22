@@ -660,10 +660,10 @@ function pointBackward(change, point, n = 1) {
   const { value } = change
   const { document, selection, schema } = value
   const p = selection[point]
-  const isInVoid = document.hasVoidParent(p.path, schema)
+  const hasVoidParent = document.hasVoidParent(p.path, schema)
 
   // what is this?
-  if (!isInVoid && p.offset - n >= 0) {
+  if (!hasVoidParent && p.offset - n >= 0) {
     const range = selection[`move${Point}Backward`](n)
     change.select(range)
     return
@@ -679,7 +679,7 @@ function pointBackward(change, point, n = 1) {
   change[`move${Point}ToEndOfNode`](previous)
 
   // when is this called?
-  if (!isInVoid && !isPreviousInVoid && isInBlock) {
+  if (!hasVoidParent && !isPreviousInVoid && isInBlock) {
     const range = change.value.selection[`move${Point}Backward`](n)
     change.select(range)
   }
@@ -694,10 +694,10 @@ function pointForward(change, point, n = 1) {
   const { document, selection, schema } = value
   const p = selection[point]
   const text = document.getNode(p.path)
-  const isInVoid = document.hasVoidParent(p.path, schema)
+  const hasVoidParent = document.hasVoidParent(p.path, schema)
 
   // what is this?
-  if (!isInVoid && p.offset + n <= text.text.length) {
+  if (!hasVoidParent && p.offset + n <= text.text.length) {
     const range = selection[`move${Point}Forward`](n)
     change.select(range)
     return
@@ -712,7 +712,7 @@ function pointForward(change, point, n = 1) {
   change[`move${Point}ToStartOfNode`](next)
 
   // when is this called?
-  if (!isInVoid && !isNextInVoid && isInBlock) {
+  if (!hasVoidParent && !isNextInVoid && isInBlock) {
     const range = change.value.selection[`move${Point}Forward`](n)
     change.select(range)
   }

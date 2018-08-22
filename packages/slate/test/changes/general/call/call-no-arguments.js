@@ -3,10 +3,7 @@
 import h from '../../../helpers/h'
 
 function insertImageBlock(change, blockType) {
-  change.insertBlock({
-    type: 'image',
-    isVoid: true,
-  })
+  change.insertBlock('image')
 }
 
 export default function(change) {

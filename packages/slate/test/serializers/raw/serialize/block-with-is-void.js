@@ -19,7 +19,6 @@ export const output = {
       {
         object: 'block',
         type: 'image',
-        isVoid: true,
         data: {},
         nodes: [
           {

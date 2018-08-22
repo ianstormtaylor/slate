@@ -37,7 +37,6 @@ export const output = {
         object: 'block',
         key: '1',
         type: 'paragraph',
-        isVoid: false,
         data: {},
         nodes: [
           {

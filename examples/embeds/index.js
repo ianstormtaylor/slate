@@ -23,6 +23,20 @@ class Embeds extends React.Component {
   }
 
   /**
+   * The editor's schema.
+   *
+   * @type {Object}
+   */
+
+  schema = {
+    blocks: {
+      video: {
+        isVoid: true,
+      },
+    },
+  }
+
+  /**
    * Render the app.
    *
    * @return {Element} element
@@ -33,6 +47,7 @@ class Embeds extends React.Component {
       <Editor
         placeholder="Enter some text..."
         value={this.state.value}
+        schema={this.schema}
         onChange={this.onChange}
         renderNode={this.renderNode}
       />
