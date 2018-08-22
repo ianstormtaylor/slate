@@ -1,7 +1,7 @@
 {
   "name": "slate",
   "description": "A completely customizable framework for building rich text editors.",
-  "version": "0.37.7",
+  "version": "0.39.0",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
   "main": "lib/slate.js",
@@ -20,7 +20,7 @@
     "is-plain-object": "^2.0.4",
     "lodash": "^4.17.4",
     "slate-dev-logger": "^0.1.43",
-    "slate-schema-violations": "^0.1.32",
+    "slate-schema-violations": "^0.1.36",
     "type-of": "^2.0.1"
   },
   "peerDependencies": {
@@ -29,7 +29,7 @@
   },
   "devDependencies": {
     "slate-dev-test-utils": "^0.0.1",
-    "slate-hyperscript": "^0.8.2"
+    "slate-hyperscript": "^0.9.0"
   },
   "scripts": {
     "clean": "rm -rf ./dist ./lib ./node_modules"

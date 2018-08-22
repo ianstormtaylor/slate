@@ -41,7 +41,7 @@ export const output = {
     ],
   },
   selection: {
-    object: 'range',
+    object: 'selection',
     anchor: {
       object: 'point',
       key: '0',
@@ -56,7 +56,6 @@ export const output = {
     },
     isFocused: false,
     marks: null,
-    isAtomic: false,
   },
 }
 

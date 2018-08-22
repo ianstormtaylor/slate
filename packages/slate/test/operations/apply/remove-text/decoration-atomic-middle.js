@@ -16,7 +16,7 @@ export const input = (
   <value>
     <document>
       <paragraph>
-        w<highlight atomic>or</highlight>d
+        w<result>or</result>d
       </paragraph>
     </document>
   </value>

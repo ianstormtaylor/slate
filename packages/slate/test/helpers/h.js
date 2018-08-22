@@ -23,6 +23,7 @@ const h = createHyperscript({
     fontSize: 'font-size',
   },
   decorations: {
+    result: 'result',
     highlight: 'highlight',
   },
   schema: {
@@ -34,6 +35,11 @@ const h = createHyperscript({
     inlines: {
       emoji: {
         isVoid: true,
+      },
+    },
+    marks: {
+      result: {
+        isAtomic: true,
       },
     },
   },

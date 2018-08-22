@@ -1,13 +1,9 @@
-/**
- * Dependencies.
- */
-
 import isPlainObject from 'is-plain-object'
-import logger from 'slate-dev-logger'
 import { List, Map, Record } from 'immutable'
 
-import MODEL_TYPES, { isType } from '../constants/model-types'
 import KeyUtils from '../utils/key-utils'
+import MODEL_TYPES, { isType } from '../constants/model-types'
+import Node from './node'
 
 /**
  * Default properties.
@@ -94,17 +90,11 @@ class Inline extends Record(DEFAULTS) {
       key,
       type,
       data: new Map(data),
-      nodes: Inline.createChildren(nodes),
+      nodes: Node.createList(nodes),
     })
 
     return inline
   }
-
-  /**
-   * Alias `fromJS`.
-   */
-
-  static fromJS = Inline.fromJSON
 
   /**
    * Check if `any` is a `Inline`.
@@ -136,24 +126,6 @@ class Inline extends Record(DEFAULTS) {
     return 'inline'
   }
 
-  get kind() {
-    logger.deprecate(
-      'slate@0.32.0',
-      'The `kind` property of Slate objects has been renamed to `object`.'
-    )
-    return this.object
-  }
-
-  /**
-   * Get the concatenated text of all the inline's children.
-   *
-   * @return {String}
-   */
-
-  get text() {
-    return this.getText()
-  }
-
   /**
    * Return a JSON representation of the inline.
    *
@@ -174,14 +146,6 @@ class Inline extends Record(DEFAULTS) {
     }
 
     return object
-  }
-
-  /**
-   * Alias `toJS`.
-   */
-
-  toJS(options) {
-    return this.toJSON(options)
   }
 }
 

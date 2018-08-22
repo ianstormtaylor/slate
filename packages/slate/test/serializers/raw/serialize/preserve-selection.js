@@ -36,7 +36,7 @@ export const output = {
     ],
   },
   selection: {
-    object: 'range',
+    object: 'selection',
     anchor: {
       object: 'point',
       path: [0, 0],
@@ -49,7 +49,6 @@ export const output = {
     },
     isFocused: false,
     marks: null,
-    isAtomic: false,
   },
 }
 

@@ -182,7 +182,7 @@ class MarkdownPreview extends React.Component {
       }
 
       if (typeof token != 'string') {
-        const range = {
+        const dec = {
           anchor: {
             key: startText.key,
             offset: startOffset,
@@ -191,10 +191,12 @@ class MarkdownPreview extends React.Component {
             key: endText.key,
             offset: endOffset,
           },
-          marks: [{ type: token.type }],
+          mark: {
+            type: token.type,
+          },
         }
 
-        decorations.push(range)
+        decorations.push(dec)
       }
 
       start = end

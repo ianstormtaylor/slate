@@ -1,12 +1,11 @@
 import isPlainObject from 'is-plain-object'
-import logger from 'slate-dev-logger'
 import { List, Record } from 'immutable'
 
 import MODEL_TYPES from '../constants/model-types'
 import Mark from './mark'
 import Node from './node'
 import PathUtils from '../utils/path-utils'
-import Range from './range'
+import Selection from './selection'
 import Value from './value'
 
 /**
@@ -155,7 +154,7 @@ class Operation extends Record(DEFAULTS) {
       }
 
       if (key === 'selection') {
-        v = Range.create(v)
+        v = Selection.create(v)
       }
 
       if (key === 'value') {
@@ -175,7 +174,7 @@ class Operation extends Record(DEFAULTS) {
       }
 
       if (key === 'properties' && type === 'set_selection') {
-        v = Range.createProperties(v)
+        v = Selection.createProperties(v)
       }
 
       if (key === 'properties' && type === 'set_value') {
@@ -192,12 +191,6 @@ class Operation extends Record(DEFAULTS) {
     const node = new Operation(attrs)
     return node
   }
-
-  /**
-   * Alias `fromJS`.
-   */
-
-  static fromJS = Operation.fromJSON
 
   /**
    * Check if `any` is a `Operation`.
@@ -229,14 +222,6 @@ class Operation extends Record(DEFAULTS) {
 
   get object() {
     return 'operation'
-  }
-
-  get kind() {
-    logger.deprecate(
-      'slate@0.32.0',
-      'The `kind` property of Slate objects has been renamed to `object`.'
-    )
-    return this.object
   }
 
   /**
@@ -314,14 +299,6 @@ class Operation extends Record(DEFAULTS) {
     }
 
     return json
-  }
-
-  /**
-   * Alias `toJS`.
-   */
-
-  toJS(options) {
-    return this.toJSON(options)
   }
 }
 
