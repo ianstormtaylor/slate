@@ -773,6 +773,7 @@ class Value extends Record(DEFAULTS) {
     const node = document.assertNode(path)
     const { length } = text
     const rangeOffset = offset + length
+
     value = value.clearAtomicRanges(node.key, offset, offset + length)
 
     value = value.mapRanges(range => {
@@ -834,6 +835,41 @@ class Value extends Record(DEFAULTS) {
     let { document } = value
     document = document.setMark(path, offset, length, mark, properties)
     value = value.set('document', document)
+    return value
+  }
+
+  /**
+   * Set `properties` on the value.
+   *
+   * @param {Object} properties
+   * @return {Value}
+   */
+
+  setProperties(properties) {
+    let value = this
+    const { document } = value
+    const { data, decorations, history, schema } = properties
+    const props = {}
+
+    if (data) {
+      props.data = data
+    }
+
+    if (history) {
+      props.history = history
+    }
+
+    if (schema) {
+      props.schema = schema
+    }
+
+    if (decorations) {
+      props.decorations = decorations.map(d => {
+        return d.isSet ? d : document.resolveDecoration(d)
+      })
+    }
+
+    value = value.merge(props)
     return value
   }
 
