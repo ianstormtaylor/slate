@@ -96,32 +96,18 @@ class Value extends Record(DEFAULTS) {
    */
 
   static fromJSON(object, options = {}) {
-    let { document = {}, selection = {}, schema = {}, history = {} } = object
-    let data = new Map()
-    document = Document.fromJSON(document)
-    selection = Selection.fromJSON(selection)
+    let {
+      data = {},
+      document = {},
+      selection = {},
+      schema = {},
+      history = {},
+    } = object
+
+    data = Data.fromJSON(data)
     schema = Schema.fromJSON(schema)
     history = History.fromJSON(history)
-
-    // Allow plugins to set a default value for `data`.
-    if (options.plugins) {
-      for (const plugin of options.plugins) {
-        if (plugin.data) {
-          logger.deprecate(
-            '0.39.0',
-            'The plugin `data` property is deprecated.'
-          )
-
-          data = data.merge(plugin.data)
-        }
-      }
-    }
-
-    // Then merge in the `data` provided.
-    if ('data' in object) {
-      data = data.merge(object.data)
-    }
-
+    document = Document.fromJSON(document)
     selection = document.createSelection(selection)
 
     if (selection.isUnset) {
@@ -129,8 +115,6 @@ class Value extends Record(DEFAULTS) {
       if (text) selection = selection.moveToStartOfNode(text)
       selection = document.createSelection(selection)
     }
-
-    selection = document.createSelection(selection)
 
     let value = new Value({
       data,
