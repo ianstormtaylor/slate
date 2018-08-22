@@ -19,8 +19,8 @@ import Schema from './schema'
  */
 
 const DEFAULTS = {
-  data: new Map(),
-  decorations: null,
+  data: Map(),
+  decorations: List(),
   document: Document.create(),
   history: History.create(),
   schema: Schema.create(),
@@ -940,25 +940,19 @@ class Value extends Record(DEFAULTS) {
     let value = this
     const { document, selection, decorations } = value
 
-    if (selection) {
-      let next = selection.isSet ? iterator(selection) : selection
-      if (!next) next = next.unset()
-      if (next !== selection) next = document.createSelection(next)
-      value = value.set('selection', next)
-    }
+    let sel = selection.isSet ? iterator(selection) : selection
+    if (!sel) sel = selection.unset()
+    if (sel !== selection) sel = document.createSelection(sel)
+    value = value.set('selection', sel)
 
-    if (decorations) {
-      let next = decorations.map(decoration => {
-        let n = decoration.isSet ? iterator(decoration) : decoration
-        if (n && n !== decoration) n = document.createDecoration(n)
-        return n
-      })
+    let decs = decorations.map(decoration => {
+      let n = decoration.isSet ? iterator(decoration) : decoration
+      if (n && n !== decoration) n = document.createDecoration(n)
+      return n
+    })
 
-      next = next.filter(decoration => !!decoration)
-      next = next.size ? next : null
-      value = value.set('decorations', next)
-    }
-
+    decs = decs.filter(decoration => !!decoration)
+    value = value.set('decorations', decs)
     return value
   }
 
@@ -1019,8 +1013,8 @@ class Value extends Record(DEFAULTS) {
 
     if (options.preserveDecorations) {
       object.decorations = this.decorations
-        ? this.decorations.toArray().map(d => d.toJSON(options))
-        : null
+        .toArray()
+        .map(d => d.toJSON(options))
     }
 
     if (options.preserveHistory) {

@@ -54,8 +54,10 @@ class DecorationPoint {
   }
 
   combine = focus => {
-    if (!(focus instanceof DecorationPoint))
+    if (!(focus instanceof DecorationPoint)) {
       throw new Error('misaligned decorations')
+    }
+
     return Decoration.create({
       anchor: {
         key: this.key,
