@@ -124,7 +124,7 @@ function normalizeNodeAndChildren(change, node, schema) {
     return
   }
 
-  let child = node.getFirstInvalidDescendant(schema)
+  let child = node.getFirstInvalidNode(schema)
   let path = change.value.document.getPath(node.key)
 
   while (node && child) {
@@ -136,7 +136,7 @@ function normalizeNodeAndChildren(change, node, schema) {
       child = null
     } else {
       path = change.value.document.refindPath(path, node.key)
-      child = node.getFirstInvalidDescendant(schema)
+      child = node.getFirstInvalidNode(schema)
     }
   }
 

@@ -138,18 +138,6 @@ class Text extends Record(DEFAULTS) {
   }
 
   /**
-   * Get an object mapping all the keys in the node to their paths.
-   *
-   * @return {Object}
-   */
-
-  getKeysToPathsTable() {
-    return {
-      [this.key]: [],
-    }
-  }
-
-  /**
    * Object.
    *
    * @return {String}
@@ -157,36 +145,6 @@ class Text extends Record(DEFAULTS) {
 
   get object() {
     return 'text'
-  }
-
-  /**
-   * Is the node empty?
-   *
-   * @return {Boolean}
-   */
-
-  get isEmpty() {
-    return this.text == ''
-  }
-
-  /**
-   * Get the concatenated text of the node.
-   *
-   * @return {String}
-   */
-
-  get text() {
-    return this.getString()
-  }
-
-  /**
-   * Get the concatenated text of the node, cached for text getter
-   *
-   * @returns {String}
-   */
-
-  getString() {
-    return this.leaves.reduce((string, leaf) => string + leaf.text, '')
   }
 
   /**
@@ -377,14 +335,6 @@ class Text extends Record(DEFAULTS) {
     })
   }
 
-  getFirstText() {
-    return this
-  }
-
-  getLastText() {
-    return this
-  }
-
   /**
    * Get all of the marks on between two offsets
    * Corner Cases:
@@ -474,28 +424,6 @@ class Text extends Record(DEFAULTS) {
   }
 
   /**
-   * Get a node by `key`, to parallel other nodes.
-   *
-   * @param {String} key
-   * @return {Node|Null}
-   */
-
-  getNode(key) {
-    return this.key == key ? this : null
-  }
-
-  /**
-   * Check if the node has a node by `key`, to parallel other nodes.
-   *
-   * @param {String} key
-   * @return {Boolean}
-   */
-
-  hasNode(key) {
-    return !!this.getNode(key)
-  }
-
-  /**
    * Insert `text` at `index`.
    *
    * @param {Numbder} offset
@@ -534,17 +462,6 @@ class Text extends Record(DEFAULTS) {
     )
 
     return this.setLeaves(nextLeaves)
-  }
-
-  /**
-   * Regenerate the node's key.
-   *
-   * @return {Text}
-   */
-
-  regenerateKey() {
-    const key = KeyUtils.create()
-    return this.set('key', key)
   }
 
   /**
@@ -710,40 +627,6 @@ class Text extends Record(DEFAULTS) {
   }
 
   /**
-   * Normalize the text node with a `schema`.
-   *
-   * @param {Schema} schema
-   * @return {Function|Void}
-   */
-
-  normalize(schema) {
-    return schema.normalizeNode(this)
-  }
-
-  /**
-   * Validate the text node against a `schema`.
-   *
-   * @param {Schema} schema
-   * @return {Error|Void}
-   */
-
-  validate(schema) {
-    return schema.validateNode(this)
-  }
-
-  /**
-   * Get the first invalid descendant
-   * PERF: Do not cache this method; because it can cause cycle reference
-   *
-   * @param {Schema} schema
-   * @returns {Text|Null}
-   */
-
-  getFirstInvalidDescendant(schema) {
-    return this.validate(schema) ? this : null
-  }
-
-  /**
    * Set leaves with normalized `leaves`
    *
    * @param {Schema} schema
@@ -777,15 +660,7 @@ Text.prototype[MODEL_TYPES.TEXT] = true
  * Memoize read methods.
  */
 
-memoize(Text.prototype, [
-  'getActiveMarks',
-  'getMarks',
-  'getMarksAsArray',
-  'normalize',
-  'validate',
-  'getString',
-  'getKeysToPathsTable',
-])
+memoize(Text.prototype, ['getActiveMarks', 'getMarks', 'getMarksAsArray'])
 
 /**
  * Export.
