@@ -1785,13 +1785,6 @@ class NodeInterface {
  */
 
 memoize(NodeInterface.prototype, [
-<<<<<<< HEAD
-=======
-  'getBlocksAsArray',
-  'getBlocksAtRangeAsArray',
-  'getBlocksByTypeAsArray',
-  'getDecorations',
->>>>>>> master
   'getFirstInvalidNode',
   'getFirstText',
   'getKeysToPathsTable',
