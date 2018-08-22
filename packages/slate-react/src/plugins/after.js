@@ -4,7 +4,7 @@ import Plain from 'slate-plain-serializer'
 import { IS_IOS } from 'slate-dev-environment'
 import React from 'react'
 import getWindow from 'get-window'
-import { Block, Inline, Text } from 'slate'
+import { Text } from 'slate'
 import Hotkeys from 'slate-hotkeys'
 
 import Content from '../components/content'
@@ -271,15 +271,18 @@ function AfterPlugin() {
     const ancestors = document.getAncestors(node.key)
     const isVoid =
       node && (schema.isVoid(node) || ancestors.some(a => schema.isVoid(a)))
+    const selectionIncludesNode = value.blocks.some(
+      block => block.key === node.key
+    )
 
-    if (isVoid) {
-      const encoded = Base64.serializeNode(node, { preserveKeys: true })
-      setEventTransfer(event, 'node', encoded)
-    } else {
-      const { fragment } = value
-      const encoded = Base64.serializeNode(fragment)
-      setEventTransfer(event, 'fragment', encoded)
+    // If a void block is dragged and is not selected, select it (necessary for local drags).
+    if (isVoid && !selectionIncludesNode) {
+      change.moveToRangeOfNode(node)
     }
+
+    const fragment = change.value.fragment
+    const encoded = Base64.serializeNode(fragment)
+    setEventTransfer(event, 'fragment', encoded)
   }
 
   /**
@@ -300,7 +303,7 @@ function AfterPlugin() {
     if (!target) return
 
     const transfer = getEventTransfer(event)
-    const { type, fragment, node, text } = transfer
+    const { type, fragment, text } = transfer
 
     change.focus()
 
@@ -350,14 +353,6 @@ function AfterPlugin() {
 
     if (type == 'fragment') {
       change.insertFragment(fragment)
-    }
-
-    if (type == 'node' && Block.isBlock(node)) {
-      change.insertBlock(node.regenerateKey()).removeNodeByKey(node.key)
-    }
-
-    if (type == 'node' && Inline.isInline(node)) {
-      change.insertInline(node.regenerateKey()).removeNodeByKey(node.key)
     }
 
     // COMPAT: React's onSelect event breaks after an onDrop event
