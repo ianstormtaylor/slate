@@ -80,7 +80,7 @@ export const output = {
   },
   decorations: [
     {
-      object: 'range',
+      object: 'decoration',
       anchor: {
         object: 'point',
         key: '0',
@@ -93,15 +93,11 @@ export const output = {
         path: [1, 0],
         offset: 2,
       },
-      isFocused: false,
-      isAtomic: false,
-      marks: [
-        {
-          object: 'mark',
-          type: 'highlight',
-          data: {},
-        },
-      ],
+      mark: {
+        object: 'mark',
+        type: 'highlight',
+        data: {},
+      },
     },
   ],
 }

@@ -1,10 +1,8 @@
 import isPlainObject from 'is-plain-object'
-import logger from 'slate-dev-logger'
 import { Map, Record, Set } from 'immutable'
 
 import MODEL_TYPES, { isType } from '../constants/model-types'
 import Data from './data'
-import memoize from '../utils/memoize'
 
 /**
  * Default properties.
@@ -125,12 +123,6 @@ class Mark extends Record(DEFAULTS) {
   }
 
   /**
-   * Alias `fromJS`.
-   */
-
-  static fromJS = Mark.fromJSON
-
-  /**
    * Check if `any` is a `Mark`.
    *
    * @param {Any} any
@@ -158,25 +150,6 @@ class Mark extends Record(DEFAULTS) {
     return 'mark'
   }
 
-  get kind() {
-    logger.deprecate(
-      'slate@0.32.0',
-      'The `kind` property of Slate objects has been renamed to `object`.'
-    )
-    return this.object
-  }
-
-  /**
-   * Get the component for the node from a `schema`.
-   *
-   * @param {Schema} schema
-   * @return {Component|Void}
-   */
-
-  getComponent(schema) {
-    return schema.__getComponent(this)
-  }
-
   /**
    * Return a JSON representation of the mark.
    *
@@ -192,14 +165,6 @@ class Mark extends Record(DEFAULTS) {
 
     return object
   }
-
-  /**
-   * Alias `toJS`.
-   */
-
-  toJS() {
-    return this.toJSON()
-  }
 }
 
 /**
@@ -207,12 +172,6 @@ class Mark extends Record(DEFAULTS) {
  */
 
 Mark.prototype[MODEL_TYPES.MARK] = true
-
-/**
- * Memoize read methods.
- */
-
-memoize(Mark.prototype, ['getComponent'])
 
 /**
  * Export.

@@ -1,13 +1,14 @@
 import isPlainObject from 'is-plain-object'
-
 import {
   Block,
+  Decoration,
   Document,
   Inline,
   Mark,
   Node,
   Point,
-  Range,
+  Schema,
+  Selection,
   Text,
   Value,
 } from 'slate'
@@ -45,19 +46,19 @@ class FocusPoint {
 
 class DecorationPoint {
   constructor(attrs) {
-    const { key = null, data = {}, marks } = attrs
+    const { key = null, data = {}, type } = attrs
     this.id = key
     this.offset = 0
-    this.marks = marks
-    this.attribs = data || {}
-    this.isAtomic = !!this.attribs.atomic
-    delete this.attribs.atomic
-    return this
+    this.type = type
+    this.data = data
   }
+
   combine = focus => {
-    if (!(focus instanceof DecorationPoint))
+    if (!(focus instanceof DecorationPoint)) {
       throw new Error('misaligned decorations')
-    return Range.create({
+    }
+
+    return Decoration.create({
       anchor: {
         key: this.key,
         offset: this.offset,
@@ -66,9 +67,10 @@ class DecorationPoint {
         key: focus.key,
         offset: focus.offset,
       },
-      marks: this.marks,
-      isAtomic: this.isAtomic,
-      ...this.attribs,
+      mark: {
+        type: this.type,
+        data: this.data,
+      },
     })
   }
 }
@@ -95,6 +97,29 @@ const CREATORS = {
     return new CursorPoint()
   },
 
+  decoration(tagName, attributes, children) {
+    const { key, data } = attributes
+    const type = tagName
+
+    if (key) {
+      return new DecorationPoint({ key, type, data })
+    }
+
+    const nodes = createChildren(children)
+    const node = nodes[0]
+    const { __decorations = [] } = node
+    const __decoration = {
+      anchorOffset: 0,
+      focusOffset: nodes.reduce((len, n) => len + n.text.length, 0),
+      type,
+      data,
+    }
+
+    __decorations.push(__decoration)
+    node.__decorations = __decorations
+    return nodes
+  },
+
   document(tagName, attributes, children) {
     return Document.create({
       ...attributes,
@@ -119,34 +144,13 @@ const CREATORS = {
     return nodes
   },
 
-  decoration(tagName, attributes, children) {
-    if (attributes.key) {
-      return new DecorationPoint({
-        ...attributes,
-        marks: [{ type: tagName }],
-      })
-    }
-
-    const nodes = createChildren(children)
-    const node = nodes[0]
-    const { __decorations = [] } = node
-    const __decoration = {
-      anchorOffset: 0,
-      focusOffset: nodes.reduce((len, n) => len + n.text.length, 0),
-      marks: [{ type: tagName }],
-      isAtomic: !!attributes.data.atomic,
-    }
-
-    __decorations.push(__decoration)
-    node.__decorations = __decorations
-    return nodes
-  },
-
   selection(tagName, attributes, children) {
     const anchor = children.find(c => c instanceof AnchorPoint)
     const focus = children.find(c => c instanceof FocusPoint)
-    const selection = Range.create({
-      ...attributes,
+    const { marks, focused } = attributes
+    const selection = Selection.create({
+      marks,
+      isFocused: focused,
       anchor: anchor && {
         key: anchor.key,
         offset: anchor.offset,
@@ -162,10 +166,16 @@ const CREATORS = {
     return selection
   },
 
+  text(tagName, attributes, children) {
+    const nodes = createChildren(children, { key: attributes.key })
+    return nodes
+  },
+
   value(tagName, attributes, children) {
     const { data, normalize = true } = attributes
+    const schema = Schema.create(attributes.schema || {})
     const document = children.find(Document.isDocument)
-    let selection = children.find(Range.isRange) || Range.create()
+    let selection = children.find(Selection.isSelection) || Selection.create()
     let anchor
     let focus
     let decorations = []
@@ -189,7 +199,7 @@ const CREATORS = {
             let range
 
             if (!id) {
-              range = Range.create({
+              range = Decoration.create({
                 anchor: {
                   key: text.key,
                   offset: dec.anchorOffset,
@@ -198,14 +208,16 @@ const CREATORS = {
                   key: text.key,
                   offset: dec.focusOffset,
                 },
-                marks: dec.marks,
-                isAtomic: dec.isAtomic,
+                mark: {
+                  type: dec.type,
+                  data: dec.data,
+                },
               })
             } else if (partials[id]) {
               const partial = partials[id]
               delete partials[id]
 
-              range = Range.create({
+              range = Decoration.create({
                 anchor: {
                   key: partial.key,
                   offset: partial.offset,
@@ -214,8 +226,10 @@ const CREATORS = {
                   key: text.key,
                   offset: dec.offset,
                 },
-                marks: partial.marks,
-                isAtomic: partial.isAtomic,
+                mark: {
+                  type: dec.type,
+                  data: dec.data,
+                },
               })
             } else {
               dec.key = text.key
@@ -248,27 +262,25 @@ const CREATORS = {
       )
     }
 
-    let value = Value.fromJSON({ data, document, selection }, { normalize })
+    let value = Value.fromJSON(
+      { data, document, selection, schema },
+      { normalize }
+    )
 
     if (anchor || focus) {
       selection = selection.setPoints([anchor, focus])
-      selection = selection.merge({ isFocused: true })
+      selection = selection.setIsFocused(true)
       selection = selection.normalize(value.document)
       value = value.set('selection', selection)
     }
 
     if (decorations.length > 0) {
       decorations = decorations.map(d => d.normalize(value.document))
-      decorations = Range.createList(decorations)
+      decorations = Decoration.createList(decorations)
       value = value.set('decorations', decorations)
     }
 
     return value
-  },
-
-  text(tagName, attributes, children) {
-    const nodes = createChildren(children, { key: attributes.key })
-    return nodes
   },
 }
 
@@ -445,7 +457,13 @@ function createChildren(children, options = {}) {
  */
 
 function resolveCreators(options) {
-  const { blocks = {}, inlines = {}, marks = {}, decorations = {} } = options
+  const {
+    blocks = {},
+    inlines = {},
+    marks = {},
+    decorations = {},
+    schema,
+  } = options
 
   const creators = {
     ...CREATORS,
@@ -467,6 +485,11 @@ function resolveCreators(options) {
   Object.keys(decorations).map(key => {
     creators[key] = normalizeNode(key, decorations[key], 'decoration')
   })
+
+  creators.value = (tagName, attributes = {}, children) => {
+    const attrs = { schema, ...attributes }
+    return CREATORS.value(tagName, attrs, children)
+  }
 
   return creators
 }

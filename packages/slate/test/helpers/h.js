@@ -29,7 +29,15 @@ const h = createHyperscript({
     fontSize: 'font-size',
   },
   decorations: {
+    result: 'result',
     highlight: 'highlight',
+  },
+  schema: {
+    marks: {
+      result: {
+        isAtomic: true,
+      },
+    },
   },
 })
 

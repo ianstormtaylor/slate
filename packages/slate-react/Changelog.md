@@ -4,6 +4,14 @@ This document maintains a list of changes to the `slate-react` package with each
 
 ---
 
+### `0.17.0` — August 22, 2018
+
+###### NEW
+
+**Updated to work with `slate@0.39.0` with the new `Decoration` and `Selection`.** This isn't a breaking change to any of the API's in `slate-react`, but it does update it to work with the newly introduced models and breaking changed in the newest version of Slate core.
+
+---
+
 ### `0.16.0` — August 21, 2018
 
 ###### NEW

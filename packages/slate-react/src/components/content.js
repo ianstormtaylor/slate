@@ -297,7 +297,7 @@ class Content extends React.Component {
       const native = window.getSelection()
       const range = findRange(native, value)
 
-      if (range && range.equals(selection)) {
+      if (range && range.equals(selection.toRange())) {
         this.updateSelection()
         return
       }
@@ -380,7 +380,7 @@ class Content extends React.Component {
     const Container = tagName
     const { document, selection, decorations } = value
     const indexes = document.getSelectionIndexes(selection)
-    const decs = document.getDecorations(stack).concat(decorations || [])
+    const decs = document.getDecorations(stack).concat(decorations)
     const childrenDecorations = getChildrenDecorations(document, decs)
 
     const children = document.nodes.toArray().map((child, i) => {

@@ -6,9 +6,10 @@ import MODEL_TYPES from '../constants/model-types'
 import PathUtils from '../utils/path-utils'
 import Change from './change'
 import Data from './data'
+import Decoration from './decoration'
 import Document from './document'
 import History from './history'
-import Range from './range'
+import Selection from './selection'
 import Schema from './schema'
 
 /**
@@ -18,12 +19,12 @@ import Schema from './schema'
  */
 
 const DEFAULTS = {
-  data: new Map(),
-  decorations: null,
+  data: Map(),
+  decorations: List(),
   document: Document.create(),
   history: History.create(),
   schema: Schema.create(),
-  selection: Range.create(),
+  selection: Selection.create(),
 }
 
 /**
@@ -74,7 +75,8 @@ class Value extends Record(DEFAULTS) {
     if (isPlainObject(a)) {
       const p = {}
       if ('data' in a) p.data = Data.create(a.data)
-      if ('decorations' in a) p.decorations = Range.createList(a.decorations)
+      if ('decorations' in a)
+        p.decorations = Decoration.createList(a.decorations)
       if ('schema' in a) p.schema = Schema.create(a.schema)
       return p
     }
@@ -98,7 +100,7 @@ class Value extends Record(DEFAULTS) {
     let { document = {}, selection = {}, schema = {}, history = {} } = object
     let data = new Map()
     document = Document.fromJSON(document)
-    selection = Range.fromJSON(selection)
+    selection = Selection.fromJSON(selection)
     schema = Schema.fromJSON(schema)
     history = History.fromJSON(history)
 
@@ -114,15 +116,15 @@ class Value extends Record(DEFAULTS) {
       data = data.merge(object.data)
     }
 
-    selection = document.createRange(selection)
+    selection = document.createSelection(selection)
 
     if (selection.isUnset) {
       const text = document.getFirstText()
       if (text) selection = selection.moveToStartOfNode(text)
-      selection = document.createRange(selection)
+      selection = document.createSelection(selection)
     }
 
-    selection = document.createRange(selection)
+    selection = document.createSelection(selection)
 
     let value = new Value({
       data,
@@ -138,12 +140,6 @@ class Value extends Record(DEFAULTS) {
 
     return value
   }
-
-  /**
-   * Alias `fromJS`.
-   */
-
-  static fromJS = Value.fromJSON
 
   /**
    * Check if a `value` is a `Value`.
@@ -164,14 +160,6 @@ class Value extends Record(DEFAULTS) {
 
   get object() {
     return 'value'
-  }
-
-  get kind() {
-    logger.deprecate(
-      'slate@0.32.0',
-      'The `kind` property of Slate objects has been renamed to `object`.'
-    )
-    return this.object
   }
 
   /**
@@ -543,7 +531,7 @@ class Value extends Record(DEFAULTS) {
 
   insertText(path, offset, text, marks) {
     let value = this
-    let { document } = value
+    let { document, schema } = value
     document = document.insertText(path, offset, text, marks)
     value = value.set('document', document)
 
@@ -551,7 +539,9 @@ class Value extends Record(DEFAULTS) {
     const node = document.assertNode(path)
 
     value = value.mapRanges(range => {
-      const { anchor, focus, isBackward, isAtomic } = range
+      const { anchor, focus, isBackward } = range
+      const isAtomic =
+        Decoration.isDecoration(range) && schema.isAtomic(range.mark)
 
       if (
         anchor.key === node.key &&
@@ -682,13 +672,13 @@ class Value extends Record(DEFAULTS) {
       if (node.hasNode(start.key)) {
         range = prev
           ? range.moveStartTo(prev.key, prev.text.length)
-          : next ? range.moveStartTo(next.key, 0) : Range.create()
+          : next ? range.moveStartTo(next.key, 0) : range.unset()
       }
 
       if (node.hasNode(end.key)) {
         range = prev
           ? range.moveEndTo(prev.key, prev.text.length)
-          : next ? range.moveEndTo(next.key, 0) : Range.create()
+          : next ? range.moveEndTo(next.key, 0) : range.unset()
       }
 
       range = range.updatePoints(point => point.setPath(null))
@@ -717,6 +707,7 @@ class Value extends Record(DEFAULTS) {
     const node = document.assertNode(path)
     const { length } = text
     const rangeOffset = offset + length
+
     value = value.clearAtomicRanges(node.key, offset, offset + length)
 
     value = value.mapRanges(range => {
@@ -782,6 +773,41 @@ class Value extends Record(DEFAULTS) {
   }
 
   /**
+   * Set `properties` on the value.
+   *
+   * @param {Object} properties
+   * @return {Value}
+   */
+
+  setProperties(properties) {
+    let value = this
+    const { document } = value
+    const { data, decorations, history, schema } = properties
+    const props = {}
+
+    if (data) {
+      props.data = data
+    }
+
+    if (history) {
+      props.history = history
+    }
+
+    if (schema) {
+      props.schema = schema
+    }
+
+    if (decorations) {
+      props.decorations = decorations.map(d => {
+        return d.isSet ? d : document.resolveDecoration(d)
+      })
+    }
+
+    value = value.merge(props)
+    return value
+  }
+
+  /**
    * Set `properties` on the selection.
    *
    * @param {Value} value
@@ -793,7 +819,7 @@ class Value extends Record(DEFAULTS) {
     let value = this
     let { document, selection } = value
     const next = selection.setProperties(properties)
-    selection = document.resolveRange(next)
+    selection = document.resolveSelection(next)
     value = value.set('selection', selection)
     return value
   }
@@ -848,25 +874,19 @@ class Value extends Record(DEFAULTS) {
     let value = this
     const { document, selection, decorations } = value
 
-    if (selection) {
-      let next = selection.isSet ? iterator(selection) : selection
-      if (!next) next = Range.create()
-      if (next !== selection) next = document.createRange(next)
-      value = value.set('selection', next)
-    }
+    let sel = selection.isSet ? iterator(selection) : selection
+    if (!sel) sel = selection.unset()
+    if (sel !== selection) sel = document.createSelection(sel)
+    value = value.set('selection', sel)
 
-    if (decorations) {
-      let next = decorations.map(decoration => {
-        let n = decoration.isSet ? iterator(decoration) : decoration
-        if (n && n !== decoration) n = document.createRange(n)
-        return n
-      })
+    let decs = decorations.map(decoration => {
+      let n = decoration.isSet ? iterator(decoration) : decoration
+      if (n && n !== decoration) n = document.createDecoration(n)
+      return n
+    })
 
-      next = next.filter(decoration => !!decoration)
-      next = next.size ? next : null
-      value = value.set('decorations', next)
-    }
-
+    decs = decs.filter(decoration => !!decoration)
+    value = value.set('decorations', decs)
     return value
   }
 
@@ -880,8 +900,13 @@ class Value extends Record(DEFAULTS) {
    */
 
   clearAtomicRanges(key, from, to = null) {
-    return this.mapRanges(range => {
-      const { isAtomic, start, end } = range
+    let value = this
+    const { schema } = value
+
+    value = this.mapRanges(range => {
+      if (!Decoration.isDecoration(range)) return range
+      const { start, end, mark } = range
+      const isAtomic = schema.isAtomic(mark)
       if (!isAtomic) return range
       if (start.key !== key) return range
 
@@ -899,6 +924,8 @@ class Value extends Record(DEFAULTS) {
 
       return range
     })
+
+    return value
   }
 
   /**
@@ -920,8 +947,8 @@ class Value extends Record(DEFAULTS) {
 
     if (options.preserveDecorations) {
       object.decorations = this.decorations
-        ? this.decorations.toArray().map(d => d.toJSON(options))
-        : null
+        .toArray()
+        .map(d => d.toJSON(options))
     }
 
     if (options.preserveHistory) {
@@ -937,14 +964,6 @@ class Value extends Record(DEFAULTS) {
     }
 
     return object
-  }
-
-  /**
-   * Alias `toJS`.
-   */
-
-  toJS(options) {
-    return this.toJSON(options)
   }
 
   /**

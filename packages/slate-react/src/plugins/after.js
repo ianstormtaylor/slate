@@ -671,8 +671,9 @@ function AfterPlugin() {
       if (next) range = range.moveFocusTo(next.key, 0)
     }
 
-    range = document.resolveRange(range)
-    change.select(range)
+    let selection = document.createSelection(range)
+    selection = selection.setIsFocused(true)
+    change.select(selection)
   }
 
   /**

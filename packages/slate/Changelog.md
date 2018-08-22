@@ -4,11 +4,98 @@ A list of changes to the `slate` package with each new version. Until `1.0.0` is
 
 ---
 
+### `0.39.0` — August 22, 2018
+
+###### NEW
+
+**Introducing the `Range` model _and_ interface.** Previously the "range" concept was used in multiple different places, for the selection, for decorations, and for acting on ranges of the document. This worked okay, but it was hiding the underlying system which is that `Range` is really an interface that other models can choose to implement. Now, we still use the `Range` model for referencing parts of the document, but it can also be implemented by other models that need to attach more semantic meaning...
+
+**Introducing the `Decoration` and `Selection` models.** These two new models both implement the new `Range` interface. Where previously they had to mis-use the `Range` model itself with added semantics. This just cleans up some of the confusion around overlapping properties, and allows us to add even more domain-specific methods and properties in the future without trouble.
+
+###### BREAKING
+
+**Decorations have changed!** Previously, decorations piggybacked on the `Range` model, using the existing `marks` property, and introducing their own `isAtomic` property. However, they have now been split out into their own `Decoration` model with a single `mark` and with the `isAtomic` property controlled by the schema. What previously would have looked like:
+
+```js
+Range.create({
+  anchor: { ... },
+  focus: { ... },
+  marks: [{ type: 'highlight' }],
+  isAtomic: true,
+})
+```
+
+Is now:
+
+```js
+Decoration.create({
+  anchor: { ... },
+  focus: { ... },
+  mark: { type: 'highlight' },
+})
+```
+
+Each decoration maps to a single `mark` object. And the atomicity of the mark controlled in the schema instead, for example:
+
+```js
+const schema = {
+  marks: {
+    highlight: {
+      isAtomic: true,
+    },
+  },
+}
+```
+
+**The `Range` model has reduced semantics.** Previously, since all decorations and selections were ranges, you could create ranges with an `isFocused`, `isAtomic` or `marks` properties. Now `Range` objects are much simpler, offering only an `anchor` and a `focus`, and can be extended by other models implementing the range interface. However, this means that using `Range.create` or `document.createRange` might not be what you want anymore. For example, for creating a new selection, you used to use:
+
+```js
+const selection = document.createRange({
+  isFocused: true,
+  anchor: { ... },
+  focus: { ... },
+})
+```
+
+But now, you'll need to use `document.createSelection` instead:
+
+```js
+const selection = document.createSelection({
+  isFocused: true,
+  anchor: { ... },
+  focus: { ... },
+})
+```
+
+**The `value.decorations` property is no longer nullable.** Previously when no decorations were applied to the value, the `decorations` property would be set to `null`. Now it will be an empty `List` object, so that the interface is more consistent.
+
+###### DEPRECATED
+
+**The `Node.createChildren` static method is deprecated.** This was just an alias for `Node.createList` and wasn't necessary. You can use `Node.createList` going forward for the same effect.
+
+---
+
 ### `0.38.0` — August 21, 2018
 
 ###### DEPRECATED
 
-**`Node.isVoid` access is deprecated.** Previously the "voidness" of a node was hardcoded in the data model. Soon it will be determined at runtime based on your editor's schema. This deprecation just ensures that you aren't using the `node.isVoid` property which will not work in future verisons.
+**`Node.isVoid` access is deprecated.** Previously the "voidness" of a node was hardcoded in the data model. Soon it will be determined at runtime based on your editor's schema. This deprecation just ensures that you aren't using the `node.isVoid` property which will not work in future verisons. What previously would have been:
+
+```js
+if (node.isVoid) {
+  ...
+}
+```
+
+Now becomes:
+
+```js
+if (schema.isVoid(node)) {
+  ...
+}
+```
+
+This requires you to have a reference to the `schema` object, which can be access as `value.schema`.
 
 **`Value.isFocused/isBlurred` and `Value.hasUndos/hasRedos` are deprecated.** These properties are easily available via `value.selection` and `value.history` instead, and are now deprecated to reduce the complexity and number of different ways of doing things.
 

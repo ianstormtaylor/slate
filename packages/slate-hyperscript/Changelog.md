@@ -4,6 +4,20 @@ This document maintains a list of changes to the `slate-hyperscript` package wit
 
 ---
 
+### `0.9.0` — August 22, 2018
+
+###### NEW
+
+**Introducing the `schema` option.** You can now pass in a `schema` option to the `createHyperscript` factory, which will ensure that schema rules are bound whenever you use the `<value>` tag. This is helpful for defining atomicity of decorations, or the voidness of nodes in the future.
+
+###### BREAKING
+
+**The `isFocused` prop of `<selection>` is now `focused`.** This is just to match the other boolean properties in this library which all omit the `is*` prefix to stay consistent with the DOM-style.
+
+**The `atomic` prop of decorations is now controlled by the schema.** Previously each individual decoration could control whether it was atomic or not, but now this is controlled in the schema definition for the mark itself.
+
+---
+
 ### `0.8.0` — August 15, 2018
 
 ###### BREAKING
