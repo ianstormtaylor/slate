@@ -1,7 +1,6 @@
 import Debug from 'debug'
 import isEqual from 'lodash/isEqual'
 import isPlainObject from 'is-plain-object'
-import logger from 'slate-dev-logger'
 import { List, Record, Stack } from 'immutable'
 
 import MODEL_TYPES, { isType } from '../constants/model-types'

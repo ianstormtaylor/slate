@@ -53,7 +53,7 @@ class Selection extends Record(DEFAULTS) {
   }
 
   /**
-   * Create a dictionary of settable range properties from `attrs`.
+   * Create a dictionary of settable selection properties from `attrs`.
    *
    * @param {Object|String|Selection} attrs
    * @return {Object}
@@ -132,14 +132,14 @@ class Selection extends Record(DEFAULTS) {
       }
     }
 
-    const range = new Selection({
+    const selection = new Selection({
       anchor: Point.fromJSON(anchor || {}),
       focus: Point.fromJSON(focus || {}),
       isFocused,
       marks: marks == null ? null : new Set(marks.map(Mark.fromJSON)),
     })
 
-    return range
+    return selection
   }
 
   /**
@@ -164,7 +164,7 @@ class Selection extends Record(DEFAULTS) {
   }
 
   /**
-   * Check whether the range is blurred.
+   * Check whether the selection is blurred.
    *
    * @return {Boolean}
    */
@@ -181,8 +181,8 @@ class Selection extends Record(DEFAULTS) {
    */
 
   setIsFocused(value) {
-    const range = this.set('isFocused', value)
-    return range
+    const selection = this.set('isFocused', value)
+    return selection
   }
 
   /**
@@ -193,8 +193,8 @@ class Selection extends Record(DEFAULTS) {
    */
 
   setMarks(marks) {
-    const range = this.set('marks', marks)
-    return range
+    const selection = this.set('marks', marks)
+    return selection
   }
 
   /**
