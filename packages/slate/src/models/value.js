@@ -107,7 +107,14 @@ class Value extends Record(DEFAULTS) {
     // Allow plugins to set a default value for `data`.
     if (options.plugins) {
       for (const plugin of options.plugins) {
-        if (plugin.data) data = data.merge(plugin.data)
+        if (plugin.data) {
+          logger.deprecate(
+            '0.39.0',
+            'The plugin `data` property is deprecated.'
+          )
+
+          data = data.merge(plugin.data)
+        }
       }
     }
 

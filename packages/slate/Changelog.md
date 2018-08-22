@@ -75,6 +75,8 @@ const selection = document.createSelection({
 
 **The `renderPortal` property of plugins is deprecated.** This allows `slate-react` to be slightly slimmer, since this behavior can be handled in React 16 with the new `<React.Fragment>` using the `renderEditor` property instead, in a way that offers more control over the portal behavior.
 
+**The `data` property of plugins is deprecated.** This property wasn't well designed and circumvented the core tenet that all changes to the `value` object will flow through operations inside `Change` objects. It was mostly used for view-layer state which should be handled with React-specific conventions for state management instead.
+
 ---
 
 ### `0.38.0` — August 21, 2018
