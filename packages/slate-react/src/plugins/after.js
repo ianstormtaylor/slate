@@ -4,7 +4,7 @@ import Plain from 'slate-plain-serializer'
 import { IS_IOS } from 'slate-dev-environment'
 import React from 'react'
 import getWindow from 'get-window'
-import { Block, Inline, Text } from 'slate'
+import { Text } from 'slate'
 import Hotkeys from 'slate-hotkeys'
 
 import Content from '../components/content'
@@ -273,6 +273,7 @@ function AfterPlugin() {
       block => block.key === node.key
     )
 
+    // If a void block is dragged and is not selected, select it (necessary for local drags).
     if (isVoid && !selectionIncludesNode) {
       change.moveToRangeOfNode(node)
     }
@@ -300,7 +301,7 @@ function AfterPlugin() {
     if (!target) return
 
     const transfer = getEventTransfer(event)
-    const { type, fragment, node, text } = transfer
+    const { type, fragment, text } = transfer
 
     change.focus()
 
@@ -350,16 +351,6 @@ function AfterPlugin() {
 
     if (type == 'fragment') {
       change.insertFragment(fragment)
-    }
-
-    // todo: this never gets called anymore because we just work with fragments
-    if (type == 'node' && Block.isBlock(node)) {
-      change.insertBlock(node.regenerateKey())
-    }
-
-    // todo: this never gets called anymore because we just work with fragments
-    if (type == 'node' && Inline.isInline(node)) {
-      change.insertInline(node.regenerateKey())
     }
 
     // COMPAT: React's onSelect event breaks after an onDrop event
