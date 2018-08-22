@@ -73,6 +73,8 @@ const selection = document.createSelection({
 
 **The `Node.createChildren` static method is deprecated.** This was just an alias for `Node.createList` and wasn't necessary. You can use `Node.createList` going forward for the same effect.
 
+**The `renderPortal` property of plugins is deprecated.** This allows `slate-react` to be slightly slimmer, since this behavior can be handled in React 16 with the new `<React.Fragment>` using the `renderEditor` property instead, in a way that offers more control over the portal behavior.
+
 ---
 
 ### `0.38.0` — August 21, 2018
