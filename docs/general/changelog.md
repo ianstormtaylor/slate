@@ -4,7 +4,6 @@ Since Slate is a monorepo with many packages that are versioned separately, we m
 
 * [`slate`](https://github.com/ianstormtaylor/slate/tree/master/packages/slate/Changelog.md)
 * [`slate-base64-serializer`](https://github.com/ianstormtaylor/slate/tree/master/packages/slate-base64-serializer/Changelog.md)
-* [`slate-dev-logger`](https://github.com/ianstormtaylor/slate/tree/master/packages/slate-dev-logger/Changelog.md)
 * [`slate-html-serializer`](https://github.com/ianstormtaylor/slate/tree/master/packages/slate-html-serializer/Changelog.md)
 * [`slate-hyperscript`](https://github.com/ianstormtaylor/slate/tree/master/packages/slate-hyperscript/Changelog.md)
 * [`slate-plain-serializer`](https://github.com/ianstormtaylor/slate/tree/master/packages/slate-plain-serializer/Changelog.md)

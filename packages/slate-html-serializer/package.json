@@ -13,7 +13,6 @@
     "lib/"
   ],
   "dependencies": {
-    "slate-dev-logger": "^0.1.43",
     "type-of": "^2.0.1"
   },
   "peerDependencies": {

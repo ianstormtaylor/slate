@@ -12,9 +12,6 @@
     "dist/",
     "lib/"
   ],
-  "dependencies": {
-    "slate-dev-logger": "^0.1.43"
-  },
   "peerDependencies": {
     "immutable": ">=3.8.1",
     "slate": ">=0.32.0"

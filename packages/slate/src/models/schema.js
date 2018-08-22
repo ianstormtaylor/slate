@@ -1,6 +1,5 @@
 import Debug from 'debug'
 import isPlainObject from 'is-plain-object'
-import logger from 'slate-dev-logger'
 import { Record } from 'immutable'
 import {
   CHILD_OBJECT_INVALID,
@@ -509,24 +508,12 @@ function validateRules(object, rule, rules, options = {}) {
 }
 
 function validateObject(node, rule) {
-  if (rule.objects) {
-    logger.warn(
-      'The `objects` schema validation rule was changed. Please use the new `match` syntax with `object`.'
-    )
-  }
-
   if (rule.object == null) return
   if (rule.object === node.object) return
   return fail(NODE_OBJECT_INVALID, { rule, node })
 }
 
 function validateType(node, rule) {
-  if (rule.types) {
-    logger.warn(
-      'The `types` schema validation rule was changed. Please use the new `match` syntax with `type`.'
-    )
-  }
-
   if (rule.type == null) return
   if (rule.type === node.type) return
   return fail(NODE_TYPE_INVALID, { rule, node })
@@ -643,20 +630,6 @@ function validateNodes(node, rule, rules = []) {
     if (rule.nodes != null) {
       if (!def) {
         return fail(CHILD_UNKNOWN, { rule, node, child, index })
-      }
-
-      if (def) {
-        if (def.objects) {
-          logger.warn(
-            'The `objects` schema validation rule was changed. Please use the new `match` syntax with `object`.'
-          )
-        }
-
-        if (def.types) {
-          logger.warn(
-            'The `types` schema validation rule was changed. Please use the new `match` syntax with `type`.'
-          )
-        }
       }
 
       if (def.match) {

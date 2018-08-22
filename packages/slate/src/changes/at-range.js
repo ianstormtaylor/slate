@@ -1,5 +1,4 @@
 import { List } from 'immutable'
-import logger from 'slate-dev-logger'
 import Block from '../models/block'
 import Inline from '../models/inline'
 import Mark from '../models/mark'
@@ -965,15 +964,6 @@ Changes.setBlocksAtRange = (change, range, properties, options = {}) => {
   })
 }
 
-Changes.setBlockAtRange = (...args) => {
-  logger.deprecate(
-    'slate@0.33.0',
-    'The `setBlockAtRange` method of Slate changes has been renamed to `setBlocksAtRange`.'
-  )
-
-  Changes.setBlocksAtRange(...args)
-}
-
 /**
  * Set the `properties` of inline nodes in a `range`.
  *
@@ -993,15 +983,6 @@ Changes.setInlinesAtRange = (change, range, properties, options = {}) => {
   inlines.forEach(inline => {
     change.setNodeByKey(inline.key, properties, { normalize })
   })
-}
-
-Changes.setInlineAtRange = (...args) => {
-  logger.deprecate(
-    'slate@0.33.0',
-    'The `setInlineAtRange` method of Slate changes has been renamed to `setInlinesAtRange`.'
-  )
-
-  Changes.setInlinesAtRange(...args)
 }
 
 /**

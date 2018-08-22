@@ -25,7 +25,7 @@
     "selection-is-backward": "^1.0.0",
     "slate-base64-serializer": "^0.2.57",
     "slate-dev-environment": "^0.2.0",
-    "slate-dev-logger": "^0.1.43",
+    "slate-dev-warning": "^0.0.0",
     "slate-hotkeys": "^0.2.3",
     "slate-plain-serializer": "^0.5.38",
     "slate-prop-types": "^0.4.55"

@@ -1,5 +1,5 @@
 import direction from 'direction'
-import logger from 'slate-dev-logger'
+import warning from 'slate-dev-warning'
 import { List, OrderedSet, Set } from 'immutable'
 
 import mixin from '../utils/mixin'
@@ -415,16 +415,6 @@ class NodeInterface {
    */
 
   getClosestVoid(path, schema) {
-    if (!schema) {
-      logger.deprecate(
-        '0.38.0',
-        'Calling the `Node.getClosestVoid` method without passing a second `schema` argument is deprecated.'
-      )
-
-      const closest = this.getClosest(path, p => p.get('isVoid'))
-      return closest
-    }
-
     const ancestors = this.getAncestors(path)
     const ancestor = ancestors.findLast(a => schema.isVoid(a))
     return ancestor
@@ -792,12 +782,10 @@ class NodeInterface {
       for (const key in nested) {
         const path = nested[key]
 
-        if (ret[key]) {
-          logger.warn(
-            `A node with a duplicate key of "${key}" was found! Duplicate keys are not allowed, you should use \`node.regenerateKey\` before inserting if you are reusing an existing node.`,
-            this
-          )
-        }
+        warning(
+          key in ret,
+          `A node with a duplicate key of "${key}" was found! Duplicate keys are not allowed, you should use \`node.regenerateKey\` before inserting if you are reusing an existing node.`
+        )
 
         ret[key] = [i, ...path]
       }
@@ -1523,16 +1511,6 @@ class NodeInterface {
    */
 
   hasVoidParent(path, schema) {
-    if (!schema) {
-      logger.deprecate(
-        '0.38.0',
-        'Calling the `Node.hasVoidParent` method without the second `schema` argument is deprecated.'
-      )
-
-      const closest = this.getClosestVoid(path)
-      return !!closest
-    }
-
     const closest = this.getClosestVoid(path, schema)
     return !!closest
   }
@@ -1581,9 +1559,9 @@ class NodeInterface {
    */
 
   isLeafBlock() {
-    return (
-      this.object === 'block' && this.nodes.every(n => n.object !== 'block')
-    )
+    const { object, nodes } = this
+    const first = nodes.first()
+    return object === 'block' && first.object !== 'block'
   }
 
   /**
@@ -1593,9 +1571,9 @@ class NodeInterface {
    */
 
   isLeafInline() {
-    return (
-      this.object === 'inline' && this.nodes.every(n => n.object !== 'inline')
-    )
+    const { object, nodes } = this
+    const first = nodes.first()
+    return object === 'inline' && first.object !== 'inline'
   }
 
   /**
@@ -2004,135 +1982,6 @@ class NodeInterface {
   validate(schema) {
     return schema.validateNode(this)
   }
-
-  /**
-   * Deprecated.
-   */
-
-  static createChildren(...args) {
-    logger.deprecate(
-      '0.39.0',
-      'The `Node.createChildren` static method is deprecated, please use `Node.createList` instead.'
-    )
-
-    return this.createList(...args)
-  }
-
-  get isVoid() {
-    logger.deprecate(
-      '0.38.0',
-      'The `Node.isVoid` property is deprecated, please use the `Schema.isVoid()` checking method instead.'
-    )
-
-    return this.get('isVoid')
-  }
-
-  get isEmpty() {
-    logger.deprecate('0.38.0', 'The `Node.isEmpty` property is deprecated.')
-
-    return !this.get('isVoid') && !this.nodes.some(child => !child.isEmpty)
-  }
-
-  getNodeAtPath(path) {
-    logger.deprecate(
-      `0.35.0`,
-      'The `Node.getNodeAtPath` method has been combined into `Node.getNode`.'
-    )
-
-    return this.getNode(path)
-  }
-
-  getDescendantAtPath(path) {
-    logger.deprecate(
-      `0.35.0`,
-      'The `Node.getDescendantAtPath` has been combined into `Node.getDescendant`.'
-    )
-
-    return this.getDescendant(path)
-  }
-
-  getKeys() {
-    logger.deprecate(`0.35.0`, 'The `Node.getKeys` method is deprecated.')
-
-    const keys = this.getKeysAsArray()
-    return Set(keys)
-  }
-
-  getKeysAsArray() {
-    logger.deprecate(
-      `0.35.0`,
-      'The `Node.getKeysAsArray` method is deprecated.'
-    )
-
-    const dict = this.getKeysToPathsTable()
-    const keys = []
-
-    for (const key in dict) {
-      if (this.key !== key) {
-        keys.push(key)
-      }
-    }
-
-    return keys
-  }
-
-  areDescendantsSorted(first, second) {
-    logger.deprecate(
-      `0.35.0`,
-      'The `Node.areDescendantsSorted` method is deprecated. Use the new `PathUtils.compare` helper instead.'
-    )
-
-    first = KeyUtils.create(first)
-    second = KeyUtils.create(second)
-
-    const keys = this.getKeysAsArray().filter(k => k !== this.key)
-    const firstIndex = keys.indexOf(first)
-    const secondIndex = keys.indexOf(second)
-    if (firstIndex == -1 || secondIndex == -1) return null
-
-    return firstIndex < secondIndex
-  }
-
-  isInRange(range) {
-    logger.deprecate(
-      `0.35.0`,
-      'The `Node.isInRange` method is deprecated. Use the new `PathUtils.compare` helper instead.'
-    )
-
-    range = this.resolveRange(range)
-
-    const node = this
-    const { startKey, endKey, isCollapsed } = range
-
-    // PERF: solve the most common cast where the start or end key are inside
-    // the node, for collapsed selections.
-    if (
-      node.key == startKey ||
-      node.key == endKey ||
-      node.hasDescendant(startKey) ||
-      node.hasDescendant(endKey)
-    ) {
-      return true
-    }
-
-    // PERF: if the selection is collapsed and the previous check didn't return
-    // true, then it must be false.
-    if (isCollapsed) {
-      return false
-    }
-
-    // Otherwise, look through all of the leaf text nodes in the range, to see
-    // if any of them are inside the node.
-    const texts = node.getTextsAtRange(range)
-    let memo = false
-
-    texts.forEach(text => {
-      if (node.hasDescendant(text.key)) memo = true
-      return memo
-    })
-
-    return memo
-  }
 }
 
 /**
@@ -2186,8 +2035,6 @@ memoize(NodeInterface.prototype, [
   'getTextDirection',
   'getTextsAsArray',
   'getTextsBetweenPositionsAsArray',
-  'isLeafBlock',
-  'isLeafInline',
   'normalize',
   'validate',
 ])

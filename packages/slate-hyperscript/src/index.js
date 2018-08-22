@@ -7,7 +7,6 @@ import {
   Mark,
   Node,
   Point,
-  Schema,
   Selection,
   Text,
   Value,

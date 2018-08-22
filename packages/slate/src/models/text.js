@@ -1,5 +1,5 @@
 import isPlainObject from 'is-plain-object'
-import logger from 'slate-dev-logger'
+import warning from 'slate-dev-warning'
 import { List, OrderedSet, Record, Set } from 'immutable'
 
 import Leaf from './leaf'
@@ -90,9 +90,9 @@ class Text extends Record(DEFAULTS) {
 
     if (!leaves) {
       if (object.ranges) {
-        logger.deprecate(
-          'slate@0.27.0',
-          'The `ranges` property of Slate objects has been renamed to `leaves`.'
+        warning(
+          true,
+          'As of slate@0.27.0, the `ranges` property of Slate objects has been renamed to `leaves`.'
         )
 
         leaves = object.ranges

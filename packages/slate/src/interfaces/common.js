@@ -1,5 +1,3 @@
-import logger from 'slate-dev-logger'
-
 import mixin from '../utils/mixin'
 import Block from '../models/block'
 import Change from '../models/change'
@@ -40,19 +38,6 @@ class CommonInterface {
 
   toJS(...args) {
     return this.toJSON(...args)
-  }
-
-  /**
-   * Deprecated.
-   */
-
-  get kind() {
-    logger.deprecate(
-      'slate@0.32.0',
-      'The `kind` property of Slate objects has been renamed to `object`.'
-    )
-
-    return this.object
   }
 }
 

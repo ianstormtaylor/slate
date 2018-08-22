@@ -2,7 +2,7 @@ import Debug from 'debug'
 import ImmutableTypes from 'react-immutable-proptypes'
 import React from 'react'
 import SlateTypes from 'slate-prop-types'
-import logger from 'slate-dev-logger'
+import warning from 'slate-dev-warning'
 import Types from 'prop-types'
 
 import Void from './void'
@@ -81,11 +81,10 @@ class Node extends React.Component {
         return true
       }
 
-      if (shouldUpdate === false) {
-        logger.warn(
-          "Returning false in `shouldNodeComponentUpdate` does not disable Slate's internal `shouldComponentUpdate` logic. If you want to prevent updates, use React's `shouldComponentUpdate` instead."
-        )
-      }
+      warning(
+        shouldUpdate === false,
+        "Returning false in `shouldNodeComponentUpdate` does not disable Slate's internal `shouldComponentUpdate` logic. If you want to prevent updates, use React's `shouldComponentUpdate` instead."
+      )
     }
 
     // If the `readOnly` status has changed, re-render in case there is any
