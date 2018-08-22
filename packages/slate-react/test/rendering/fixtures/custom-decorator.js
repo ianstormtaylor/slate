@@ -15,7 +15,9 @@ function decorateNode(block) {
         key: text.key,
         offset: 2,
       },
-      marks: [{ type: 'bold' }],
+      mark: {
+        type: 'bold',
+      },
     },
   ]
 }

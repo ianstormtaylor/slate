@@ -16,7 +16,7 @@ export const input = (
   <value>
     <document>
       <paragraph>
-        <highlight atomic>w</highlight>ord
+        <result>w</result>ord
       </paragraph>
     </document>
   </value>
@@ -26,7 +26,7 @@ export const output = (
   <value>
     <document>
       <paragraph>
-        <highlight atomic>w</highlight>d
+        <result>w</result>d
       </paragraph>
     </document>
   </value>

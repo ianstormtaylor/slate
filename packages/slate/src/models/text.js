@@ -314,8 +314,8 @@ class Text extends Record(DEFAULTS) {
     if (this.text.length === 0) return leaves
     const { key } = this
 
-    decorations.forEach(range => {
-      const { start, end, marks } = range
+    decorations.forEach(dec => {
+      const { start, end, mark } = dec
       const hasStart = start.key == key
       const hasEnd = end.key == key
 
@@ -329,12 +329,12 @@ class Text extends Record(DEFAULTS) {
         if (index !== 0 || length < this.text.length) {
           const [before, bundle] = Leaf.splitLeaves(leaves, index)
           const [middle, after] = Leaf.splitLeaves(bundle, length)
-          leaves = before.concat(middle.map(x => x.addMarks(marks)), after)
+          leaves = before.concat(middle.map(x => x.addMark(mark)), after)
           return
         }
       }
 
-      leaves = leaves.map(x => x.addMarks(marks))
+      leaves = leaves.map(x => x.addMark(mark))
     })
 
     if (leaves === this.leaves) return leaves

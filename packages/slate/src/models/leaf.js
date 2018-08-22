@@ -1,5 +1,4 @@
 import isPlainObject from 'is-plain-object'
-import logger from 'slate-dev-logger'
 import { List, Record, Set } from 'immutable'
 
 import MODEL_TYPES, { isType } from '../constants/model-types'
@@ -194,12 +193,6 @@ class Leaf extends Record(DEFAULTS) {
   }
 
   /**
-   * Alias `fromJS`.
-   */
-
-  static fromJS = Leaf.fromJSON
-
-  /**
    * Check if `any` is a `Leaf`.
    *
    * @param {Any} any
@@ -229,14 +222,6 @@ class Leaf extends Record(DEFAULTS) {
     return 'leaf'
   }
 
-  get kind() {
-    logger.deprecate(
-      'slate@0.32.0',
-      'The `kind` property of Slate objects has been renamed to `object`.'
-    )
-    return this.object
-  }
-
   /**
    * Update a `mark` at leaf, replace with newMark
    *
@@ -256,7 +241,19 @@ class Leaf extends Record(DEFAULTS) {
   }
 
   /**
-   * Add a `set` of marks at `index` and `length`.
+   * Add a `mark` to the leaf.
+   *
+   * @param {Mark} mark
+   * @returns {Text}
+   */
+
+  addMark(mark) {
+    const { marks } = this
+    return this.set('marks', marks.add(mark))
+  }
+
+  /**
+   * Add a `set` of marks to the leaf.
    *
    * @param {Set<Mark>} set
    * @returns {Text}
@@ -268,7 +265,7 @@ class Leaf extends Record(DEFAULTS) {
   }
 
   /**
-   * Remove a `mark` at `index` and `length`.
+   * Remove a `mark` from the leaf.
    *
    * @param {Mark} mark
    * @returns {Text}
@@ -293,14 +290,6 @@ class Leaf extends Record(DEFAULTS) {
     }
 
     return object
-  }
-
-  /**
-   * Alias `toJS`.
-   */
-
-  toJS() {
-    return this.toJSON()
   }
 }
 

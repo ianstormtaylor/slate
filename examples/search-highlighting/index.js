@@ -46,6 +46,20 @@ class SearchHighlighting extends React.Component {
   }
 
   /**
+   * The editor's schema.
+   *
+   * @type {Object}
+   */
+
+  schema = {
+    decorations: {
+      highlight: {
+        isAtomic: true,
+      },
+    },
+  }
+
+  /**
    * Render.
    *
    * @return {Element}
@@ -67,6 +81,7 @@ class SearchHighlighting extends React.Component {
         <Editor
           placeholder="Enter some rich text..."
           value={this.state.value}
+          schema={this.schema}
           onChange={this.onChange}
           renderMark={this.renderMark}
           spellCheck
@@ -127,8 +142,7 @@ class SearchHighlighting extends React.Component {
           decorations.push({
             anchor: { key, offset: offset - string.length },
             focus: { key, offset },
-            marks: [{ type: 'highlight' }],
-            isAtomic: true,
+            type: 'highlight',
           })
         }
 

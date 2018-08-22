@@ -57,7 +57,7 @@ export const output = {
   },
   decorations: [
     {
-      object: 'range',
+      object: 'decoration',
       anchor: {
         object: 'point',
         key: '0',
@@ -70,15 +70,11 @@ export const output = {
         path: [0, 0],
         offset: 6,
       },
-      isFocused: false,
-      isAtomic: false,
-      marks: [
-        {
-          object: 'mark',
-          type: 'highlight',
-          data: {},
-        },
-      ],
+      mark: {
+        object: 'mark',
+        type: 'highlight',
+        data: {},
+      },
     },
   ],
 }

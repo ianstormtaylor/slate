@@ -218,7 +218,7 @@ class Schema extends Record(DEFAULTS) {
 
     for (const plugin of plugins) {
       const { schema = {} } = plugin
-      const { blocks = {}, inlines = {} } = schema
+      const { blocks = {}, inlines = {}, marks = {} } = schema
 
       if (schema.rules) {
         rules = rules.concat(schema.rules)
@@ -242,6 +242,13 @@ class Schema extends Record(DEFAULTS) {
         rules.push({
           match: [{ object: 'inline', type: key }],
           ...inlines[key],
+        })
+      }
+
+      for (const key in marks) {
+        rules.push({
+          match: [{ object: 'mark', type: key }],
+          ...marks[key],
         })
       }
     }
@@ -360,6 +367,21 @@ class Schema extends Record(DEFAULTS) {
   }
 
   /**
+   * Check if a mark is void.
+   *
+   * @param {Mark}
+   * @return {Boolean}
+   */
+
+  isAtomic(mark) {
+    const rule = this.rules.find(
+      r => 'isAtomic' in r && testRules(mark, r.match)
+    )
+
+    return rule ? rule.isAtomic : false
+  }
+
+  /**
    * Check if a node is void.
    *
    * @param {Node}
@@ -465,28 +487,28 @@ function defaultNormalize(change, error) {
 }
 
 /**
- * Check that a `node` matches one of a set of `rules`.
+ * Check that an `object` matches one of a set of `rules`.
  *
- * @param {Node} node
+ * @param {Mixed} object
  * @param {Object|Array} rules
  * @return {Boolean}
  */
 
-function testRules(node, rules) {
-  const error = validateRules(node, rules)
+function testRules(object, rules) {
+  const error = validateRules(object, rules)
   return !error
 }
 
 /**
- * Validate that a `node` matches a `rule` object or array.
+ * Validate that a `object` matches a `rule` object or array.
  *
- * @param {Node} node
+ * @param {Mixed} object
  * @param {Object|Array} rule
  * @param {Array|Void} rules
  * @return {Error|Void}
  */
 
-function validateRules(node, rule, rules, options = {}) {
+function validateRules(object, rule, rules, options = {}) {
   const { every = false } = options
 
   if (Array.isArray(rule)) {
@@ -494,7 +516,7 @@ function validateRules(node, rule, rules, options = {}) {
     let first
 
     for (const r of array) {
-      const error = validateRules(node, r, rules)
+      const error = validateRules(object, r, rules)
       first = first || error
       if (every && error) return error
       if (!every && !error) return
@@ -504,15 +526,15 @@ function validateRules(node, rule, rules, options = {}) {
   }
 
   const error =
-    validateObject(node, rule) ||
-    validateType(node, rule) ||
-    validateIsVoid(node, rule) ||
-    validateData(node, rule) ||
-    validateMarks(node, rule) ||
-    validateText(node, rule) ||
-    validateFirst(node, rule) ||
-    validateLast(node, rule) ||
-    validateNodes(node, rule, rules)
+    validateObject(object, rule) ||
+    validateType(object, rule) ||
+    validateIsVoid(object, rule) ||
+    validateData(object, rule) ||
+    validateMarks(object, rule) ||
+    validateText(object, rule) ||
+    validateFirst(object, rule) ||
+    validateLast(object, rule) ||
+    validateNodes(object, rule, rules)
 
   return error
 }

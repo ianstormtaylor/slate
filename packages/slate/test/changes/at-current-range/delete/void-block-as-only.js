@@ -19,11 +19,6 @@ export const input = (
 export const output = (
   <value>
     <document />
-    <selection
-      anchorKey={null}
-      anchorOffset={0}
-      focusKey={null}
-      focusOffset={0}
-    />
+    <selection focused />
   </value>
 )

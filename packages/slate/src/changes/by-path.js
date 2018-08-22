@@ -376,7 +376,6 @@ Changes.replaceNodeByPath = (change, path, newNode, options) => {
  * @param {string} text
  * @param {Set<Mark>} marks (optional)
  * @param {Object} options
- *
  */
 
 Changes.replaceTextByPath = (

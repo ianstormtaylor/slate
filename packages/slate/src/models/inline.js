@@ -1,13 +1,9 @@
-/**
- * Dependencies.
- */
-
 import isPlainObject from 'is-plain-object'
-import logger from 'slate-dev-logger'
 import { List, Map, Record } from 'immutable'
 
-import MODEL_TYPES, { isType } from '../constants/model-types'
 import KeyUtils from '../utils/key-utils'
+import MODEL_TYPES, { isType } from '../constants/model-types'
+import Node from './node'
 
 /**
  * Default properties.
@@ -102,17 +98,11 @@ class Inline extends Record(DEFAULTS) {
       type,
       isVoid: !!isVoid,
       data: new Map(data),
-      nodes: Inline.createChildren(nodes),
+      nodes: Node.createList(nodes),
     })
 
     return inline
   }
-
-  /**
-   * Alias `fromJS`.
-   */
-
-  static fromJS = Inline.fromJSON
 
   /**
    * Check if `any` is a `Inline`.
@@ -144,46 +134,6 @@ class Inline extends Record(DEFAULTS) {
     return 'inline'
   }
 
-  get kind() {
-    logger.deprecate(
-      'slate@0.32.0',
-      'The `kind` property of Slate objects has been renamed to `object`.'
-    )
-    return this.object
-  }
-
-  get isVoid() {
-    logger.deprecate(
-      '0.38.0',
-      'The `Node.isVoid` property is deprecated, please use the `Schema.isVoid()` checking method instead.'
-    )
-
-    return this.get('isVoid')
-  }
-
-  /**
-   * Check if the inline is empty.
-   * Returns true if inline is not void and all it's children nodes are empty.
-   * Void node is never empty, regardless of it's content.
-   *
-   * @return {Boolean}
-   */
-
-  get isEmpty() {
-    logger.deprecate('0.38.0', 'The `Node.isEmpty` property is deprecated.')
-    return !this.get('isVoid') && !this.nodes.some(child => !child.isEmpty)
-  }
-
-  /**
-   * Get the concatenated text of all the inline's children.
-   *
-   * @return {String}
-   */
-
-  get text() {
-    return this.getText()
-  }
-
   /**
    * Return a JSON representation of the inline.
    *
@@ -205,14 +155,6 @@ class Inline extends Record(DEFAULTS) {
     }
 
     return object
-  }
-
-  /**
-   * Alias `toJS`.
-   */
-
-  toJS(options) {
-    return this.toJSON(options)
   }
 }
 

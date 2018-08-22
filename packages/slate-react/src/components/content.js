@@ -297,7 +297,7 @@ class Content extends React.Component {
       const native = window.getSelection()
       const range = findRange(native, value)
 
-      if (range && range.equals(selection)) {
+      if (range && range.equals(selection.toRange())) {
         this.updateSelection()
         return
       }

@@ -403,11 +403,17 @@ class Point extends Record(DEFAULTS) {
   }
 
   /**
-   * Alias `toJS`.
+   * Unset the point.
+   *
+   * @return {Point}
    */
 
-  toJS() {
-    return this.toJSON()
+  unset() {
+    return this.merge({
+      key: null,
+      offset: null,
+      path: null,
+    })
   }
 }
 
