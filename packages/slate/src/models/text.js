@@ -91,7 +91,7 @@ class Text extends Record(DEFAULTS) {
     if (!leaves) {
       if (object.ranges) {
         warning(
-          true,
+          false,
           'As of slate@0.27.0, the `ranges` property of Slate objects has been renamed to `leaves`.'
         )
 

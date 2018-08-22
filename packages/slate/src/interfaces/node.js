@@ -783,7 +783,7 @@ class NodeInterface {
         const path = nested[key]
 
         warning(
-          key in ret,
+          !(key in ret),
           `A node with a duplicate key of "${key}" was found! Duplicate keys are not allowed, you should use \`node.regenerateKey\` before inserting if you are reusing an existing node.`
         )
 

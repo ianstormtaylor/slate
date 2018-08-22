@@ -166,7 +166,7 @@ class Content extends React.Component {
 
     if (!range) {
       warning(
-        true,
+        false,
         'Unable to find a native DOM range from the current selection.'
       )
 

@@ -280,5 +280,3 @@ Returns a JSON representation of the schema.
 ## Normalizing
 
 When supplying your own `normalize` property for a schema rule, it will be called with `(change, error)`. The error `code` will be one of a set of potential code strings, and it will contain additional helpful properties depending on the type of error.
-
-A set of the invalid violation strings are available as constants via the [`slate-schema-violations`](../slate-schema-violations/index.md) package.

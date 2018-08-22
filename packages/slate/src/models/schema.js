@@ -1,23 +1,6 @@
 import Debug from 'debug'
 import isPlainObject from 'is-plain-object'
 import { Record } from 'immutable'
-import {
-  CHILD_OBJECT_INVALID,
-  CHILD_REQUIRED,
-  CHILD_TYPE_INVALID,
-  CHILD_UNKNOWN,
-  FIRST_CHILD_OBJECT_INVALID,
-  FIRST_CHILD_TYPE_INVALID,
-  LAST_CHILD_OBJECT_INVALID,
-  LAST_CHILD_TYPE_INVALID,
-  NODE_DATA_INVALID,
-  NODE_MARK_INVALID,
-  NODE_OBJECT_INVALID,
-  NODE_TEXT_INVALID,
-  NODE_TYPE_INVALID,
-  PARENT_OBJECT_INVALID,
-  PARENT_TYPE_INVALID,
-} from 'slate-schema-violations'
 
 import MODEL_TYPES from '../constants/model-types'
 import Stack from './stack'
@@ -406,13 +389,13 @@ function defaultNormalize(change, error) {
   const { code, node, child, key, mark } = error
 
   switch (code) {
-    case CHILD_OBJECT_INVALID:
-    case CHILD_TYPE_INVALID:
-    case CHILD_UNKNOWN:
-    case FIRST_CHILD_OBJECT_INVALID:
-    case FIRST_CHILD_TYPE_INVALID:
-    case LAST_CHILD_OBJECT_INVALID:
-    case LAST_CHILD_TYPE_INVALID: {
+    case 'child_object_invalid':
+    case 'child_type_invalid':
+    case 'child_unknown':
+    case 'first_child_object_invalid':
+    case 'first_child_type_invalid':
+    case 'last_child_object_invalid':
+    case 'last_child_type_invalid': {
       return child.object === 'text' &&
         node.object === 'block' &&
         node.nodes.size === 1
@@ -420,10 +403,10 @@ function defaultNormalize(change, error) {
         : change.removeNodeByKey(child.key, { normalize: false })
     }
 
-    case CHILD_REQUIRED:
-    case NODE_TEXT_INVALID:
-    case PARENT_OBJECT_INVALID:
-    case PARENT_TYPE_INVALID: {
+    case 'child_required':
+    case 'node_text_invalid':
+    case 'parent_object_invalid':
+    case 'parent_type_invalid': {
       return node.object === 'document'
         ? node.nodes.forEach(n =>
             change.removeNodeByKey(n.key, { normalize: false })
@@ -431,7 +414,7 @@ function defaultNormalize(change, error) {
         : change.removeNodeByKey(node.key, { normalize: false })
     }
 
-    case NODE_DATA_INVALID: {
+    case 'node_data_invalid': {
       return node.data.get(key) === undefined && node.object !== 'document'
         ? change.removeNodeByKey(node.key, { normalize: false })
         : change.setNodeByKey(
@@ -441,7 +424,7 @@ function defaultNormalize(change, error) {
           )
     }
 
-    case NODE_MARK_INVALID: {
+    case 'node_mark_invalid': {
       return node.getTexts().forEach(t =>
         change.removeMarkByKey(t.key, 0, t.text.length, mark, {
           normalize: false,
@@ -510,13 +493,13 @@ function validateRules(object, rule, rules, options = {}) {
 function validateObject(node, rule) {
   if (rule.object == null) return
   if (rule.object === node.object) return
-  return fail(NODE_OBJECT_INVALID, { rule, node })
+  return fail('node_object_invalid', { rule, node })
 }
 
 function validateType(node, rule) {
   if (rule.type == null) return
   if (rule.type === node.type) return
-  return fail(NODE_TYPE_INVALID, { rule, node })
+  return fail('node_type_invalid', { rule, node })
 }
 
 function validateData(node, rule) {
@@ -528,7 +511,7 @@ function validateData(node, rule) {
     const value = node.data && node.data.get(key)
     const valid = typeof fn === 'function' ? fn(value) : fn === value
     if (valid) continue
-    return fail(NODE_DATA_INVALID, { rule, node, key, value })
+    return fail('node_data_invalid', { rule, node, key, value })
   }
 }
 
@@ -539,7 +522,7 @@ function validateMarks(node, rule) {
   for (const mark of marks) {
     const valid = rule.marks.some(def => def.type === mark.type)
     if (valid) continue
-    return fail(NODE_MARK_INVALID, { rule, node, mark })
+    return fail('node_mark_invalid', { rule, node, mark })
   }
 }
 
@@ -549,7 +532,7 @@ function validateText(node, rule) {
   const valid =
     typeof rule.text === 'function' ? rule.text(text) : rule.text.test(text)
   if (valid) return
-  return fail(NODE_TEXT_INVALID, { rule, node, text })
+  return fail('node_text_invalid', { rule, node, text })
 }
 
 function validateFirst(node, rule) {
@@ -629,7 +612,7 @@ function validateNodes(node, rule, rules = []) {
 
     if (rule.nodes != null) {
       if (!def) {
-        return fail(CHILD_UNKNOWN, { rule, node, child, index })
+        return fail('child_unknown', { rule, node, child, index })
       }
 
       if (def.match) {
@@ -655,7 +638,7 @@ function validateNodes(node, rule, rules = []) {
   if (rule.nodes != null) {
     while (min != null) {
       if (offset < min) {
-        return fail(CHILD_REQUIRED, { rule, node, index })
+        return fail('child_required', { rule, node, index })
       }
 
       nextDef()

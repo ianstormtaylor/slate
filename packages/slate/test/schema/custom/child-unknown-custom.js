@@ -1,6 +1,5 @@
 /** @jsx h */
 
-import { CHILD_UNKNOWN } from 'slate-schema-violations'
 import h from '../../helpers/h'
 
 export const schema = {
@@ -14,7 +13,7 @@ export const schema = {
         },
       ],
       normalize: (change, { code, node, child }) => {
-        if (code == CHILD_UNKNOWN) {
+        if (code == 'child_unknown') {
           const previous = node.getPreviousSibling(child.key)
           const offset = previous.nodes.size
 

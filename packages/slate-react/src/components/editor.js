@@ -137,7 +137,7 @@ class Editor extends React.Component {
     // If we've resolved a few times already, and it's exactly in line with
     // the updates, then warn the user that they may be doing something wrong.
     warning(
-      resolves > 5 && resolves === updates,
+      resolves < 5 || resolves !== updates,
       'A Slate <Editor> component is re-resolving `props.plugins` or `props.schema` on each update, which leads to poor performance. This is often due to passing in a new `schema` or `plugins` prop with each render by declaring them inline in your render function. Do not do this!'
     )
 
@@ -231,7 +231,7 @@ class Editor extends React.Component {
   change = (...args) => {
     if (this.tmp.isChanging) {
       warning(
-        true,
+        false,
         "The `editor.change` method was called from within an existing `editor.change` callback. This is not allowed, and often due to calling `editor.change` directly from a plugin's event handler which is unnecessary."
       )
 

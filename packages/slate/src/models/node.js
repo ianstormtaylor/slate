@@ -33,7 +33,7 @@ class Node {
 
       if (!object && attrs.kind) {
         warning(
-          true,
+          false,
           'As of slate@0.32.0, the `kind` property of Slate objects has been renamed to `object`.'
         )
 
@@ -122,7 +122,7 @@ class Node {
 
     if (!object && value.kind) {
       warning(
-        true,
+        false,
         'As of slate@0.32.0, the `kind` property of Slate objects has been renamed to `object`.'
       )
 

@@ -82,7 +82,7 @@ class Node extends React.Component {
       }
 
       warning(
-        shouldUpdate === false,
+        shouldUpdate !== false,
         "Returning false in `shouldNodeComponentUpdate` does not disable Slate's internal `shouldComponentUpdate` logic. If you want to prevent updates, use React's `shouldComponentUpdate` instead."
       )
     }

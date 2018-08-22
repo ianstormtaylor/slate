@@ -289,7 +289,7 @@ class Point extends Record(DEFAULTS) {
     const target = node.getNode(key || path)
 
     if (!target) {
-      warning(true, "A point's `path` or `key` invalid and was reset!")
+      warning(false, "A point's `path` or `key` invalid and was reset!")
 
       const text = node.getFirstText()
       if (!text) return Point.create()
@@ -304,7 +304,7 @@ class Point extends Record(DEFAULTS) {
     }
 
     if (target.object !== 'text') {
-      warning(true, 'A point should not reference a non-text node!')
+      warning(false, 'A point should not reference a non-text node!')
 
       const text = target.getTextAtOffset(offset)
       const before = target.getOffset(text.key)
@@ -318,7 +318,7 @@ class Point extends Record(DEFAULTS) {
     }
 
     if (target && path && key && key !== target.key) {
-      warning(true, "A point's `key` did not match its `path`!")
+      warning(false, "A point's `key` did not match its `path`!")
     }
 
     const point = this.merge({

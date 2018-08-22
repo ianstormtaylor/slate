@@ -20,7 +20,6 @@
     "is-plain-object": "^2.0.4",
     "lodash": "^4.17.4",
     "slate-dev-warning": "^0.0.0",
-    "slate-schema-violations": "^0.1.36",
     "type-of": "^2.0.1"
   },
   "peerDependencies": {

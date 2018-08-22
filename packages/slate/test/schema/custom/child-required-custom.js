@@ -1,6 +1,5 @@
 /** @jsx h */
 
-import { CHILD_REQUIRED } from 'slate-schema-violations'
 import h from '../../helpers/h'
 
 export const schema = {
@@ -14,7 +13,7 @@ export const schema = {
         },
       ],
       normalize: (change, { code, node, index }) => {
-        if (code == CHILD_REQUIRED) {
+        if (code == 'child_required') {
           change.insertNodeByKey(node.key, index, {
             object: 'block',
             type: 'paragraph',

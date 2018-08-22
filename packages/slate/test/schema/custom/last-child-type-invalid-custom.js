@@ -1,6 +1,5 @@
 /** @jsx h */
 
-import { LAST_CHILD_TYPE_INVALID } from 'slate-schema-violations'
 import h from '../../helpers/h'
 
 export const schema = {
@@ -9,7 +8,7 @@ export const schema = {
     quote: {
       last: [{ type: 'paragraph' }],
       normalize: (change, { code, child }) => {
-        if (code == LAST_CHILD_TYPE_INVALID) {
+        if (code == 'last_child_type_invalid') {
           change.wrapBlockByKey(child.key, 'paragraph')
         }
       },
