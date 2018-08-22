@@ -1,5 +1,4 @@
 import { Record } from 'immutable'
-import logger from 'slate-dev-logger'
 
 import MODEL_TYPES from '../constants/model-types'
 import memoize from '../utils/memoize'
@@ -129,14 +128,6 @@ class Stack extends Record(DEFAULTS) {
     const plugins = this.getPluginsWith(property)
     return plugins.reduceRight((children, plugin) => {
       if (!plugin[property]) return children
-
-      if (property === 'renderPortal') {
-        logger.deprecate(
-          '0.39.0',
-          'The `renderPortal` property of plugins is deprecated, please use `renderEditor` with a `<React.Fragment>` in React 16 instead.'
-        )
-      }
-
       const ret = plugin[property](props, ...args)
       if (ret == null) return children
       props.children = ret

@@ -1,5 +1,4 @@
 import Debug from 'debug'
-import Portal from 'react-portal'
 import React from 'react'
 import SlateTypes from 'slate-prop-types'
 import Types from 'prop-types'
@@ -154,16 +153,7 @@ class Editor extends React.Component {
 
   render() {
     debug('render', this)
-
-    const children = this.stack
-      .map('renderPortal', this.value, this)
-      .map((child, i) => (
-        <Portal key={i} isOpened>
-          {child}
-        </Portal>
-      ))
-
-    const props = { ...this.props, children }
+    const props = { ...this.props }
     const tree = this.stack.render('renderEditor', props, this)
     return tree
   }

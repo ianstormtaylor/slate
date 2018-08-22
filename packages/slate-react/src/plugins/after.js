@@ -692,13 +692,11 @@ function AfterPlugin() {
 
   function renderEditor(props, editor) {
     const { handlers } = editor
-
     return (
       <Content
         {...handlers}
         autoCorrect={props.autoCorrect}
         className={props.className}
-        children={props.children}
         editor={editor}
         readOnly={props.readOnly}
         role={props.role}

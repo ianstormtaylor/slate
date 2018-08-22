@@ -37,7 +37,6 @@ class Content extends React.Component {
 
   static propTypes = {
     autoCorrect: Types.bool.isRequired,
-    children: Types.any.isRequired,
     className: Types.string,
     editor: Types.object.isRequired,
     readOnly: Types.bool.isRequired,
@@ -427,7 +426,6 @@ class Content extends React.Component {
         data-gramm={false}
       >
         {children}
-        {this.props.children}
       </Container>
     )
   }
