@@ -52,7 +52,7 @@ class SearchHighlighting extends React.Component {
    */
 
   schema = {
-    decorations: {
+    marks: {
       highlight: {
         isAtomic: true,
       },
@@ -142,7 +142,7 @@ class SearchHighlighting extends React.Component {
           decorations.push({
             anchor: { key, offset: offset - string.length },
             focus: { key, offset },
-            type: 'highlight',
+            mark: { type: 'highlight' },
           })
         }
 
