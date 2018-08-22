@@ -2,7 +2,8 @@
  * event log is enabled by localStorage
 */
 
-const IS_EVENT_LOG_ENABLED = window && window.localStorage.ENABLE_EVENT_LOG
+const IS_EVENT_LOG_ENABLED =
+  global.window && global.window.localStorage.ENABLE_EVENT_LOG
 
 /*
  * Call event.persist() to view event property in devtool
