@@ -10,6 +10,8 @@ A list of changes to the `slate` package with each new version. Until `1.0.0` is
 
 **`Node.isVoid` access is deprecated.** Previously the "voidness" of a node was hardcoded in the data model. Soon it will be determined at runtime based on your editor's schema. This deprecation just ensures that you aren't using the `node.isVoid` property which will not work in future verisons.
 
+**`Value.isFocused/isBlurred` and `Value.hasUndos/hasRedos` are deprecated.** These properties are easily available via `value.selection` and `value.history` instead, and are now deprecated to reduce the complexity and number of different ways of doing things.
+
 ---
 
 ### `0.37.0` — August 3, 2018
