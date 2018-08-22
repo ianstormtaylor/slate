@@ -6,7 +6,7 @@ import React from 'react'
 import getWindow from 'get-window'
 import { Text } from 'slate'
 import Hotkeys from 'slate-hotkeys'
-
+import eventLogger from './event-logger'
 import Content from '../components/content'
 import cloneFragment from '../utils/clone-fragment'
 import findDOMNode from '../utils/find-dom-node'
@@ -23,7 +23,7 @@ import setEventTransfer from '../utils/set-event-transfer'
  * @type {Function}
  */
 
-const debug = Debug('slate:after')
+const debug = eventLogger(Debug('slate:after'))
 
 /**
  * The after plugin.
