@@ -1,5 +1,4 @@
 import Debug from 'debug'
-import isEqual from 'lodash/isEqual'
 import isPlainObject from 'is-plain-object'
 import { List, Record, Stack } from 'immutable'
 
@@ -196,11 +195,11 @@ function shouldMerge(o, p) {
     (o.type == 'insert_text' &&
       p.type == 'insert_text' &&
       o.offset == p.offset + p.text.length &&
-      isEqual(o.path, p.path)) ||
+      o.path.equals(p.path)) ||
     (o.type == 'remove_text' &&
       p.type == 'remove_text' &&
       o.offset + o.text.length == p.offset &&
-      isEqual(o.path, p.path))
+      o.path.equals(p.path))
 
   return merge
 }

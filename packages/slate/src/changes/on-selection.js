@@ -1,5 +1,4 @@
 import { is } from 'immutable'
-import isEmpty from 'is-empty'
 import pick from 'lodash/pick'
 
 import Selection from '../models/selection'
@@ -575,7 +574,7 @@ Changes.select = (change, properties, options = {}) => {
   }
 
   // If there are no new properties to set, abort to avoid extra operations.
-  if (isEmpty(props)) {
+  if (Object.keys(props).lengtgh === 0) {
     return
   }
 
