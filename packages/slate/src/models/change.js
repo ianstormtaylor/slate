@@ -1,6 +1,5 @@
 import Debug from 'debug'
 import isPlainObject from 'is-plain-object'
-import logger from 'slate-dev-logger'
 import pick from 'lodash/pick'
 import { List } from 'immutable'
 
@@ -59,14 +58,6 @@ class Change {
 
   get object() {
     return 'change'
-  }
-
-  get kind() {
-    logger.deprecate(
-      'slate@0.32.0',
-      'The `kind` property of Slate objects has been renamed to `object`.'
-    )
-    return this.object
   }
 
   /**

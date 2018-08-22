@@ -15,7 +15,7 @@ import Range from './range'
 const DEFAULTS = {
   anchor: Point.create(),
   focus: Point.create(),
-  mark: null,
+  mark: undefined,
 }
 
 /**

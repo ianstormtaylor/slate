@@ -118,12 +118,6 @@ class Text extends Record(DEFAULTS) {
   }
 
   /**
-   * Alias `fromJS`.
-   */
-
-  static fromJS = Text.fromJSON
-
-  /**
    * Check if `any` is a `Text`.
    *
    * @param {Any} any
@@ -163,14 +157,6 @@ class Text extends Record(DEFAULTS) {
 
   get object() {
     return 'text'
-  }
-
-  get kind() {
-    logger.deprecate(
-      'slate@0.32.0',
-      'The `kind` property of Slate objects has been renamed to `object`.'
-    )
-    return this.object
   }
 
   /**
@@ -287,17 +273,6 @@ class Text extends Record(DEFAULTS) {
     const [middle, after] = Leaf.splitLeaves(bundle, length)
     const leaves = before.concat(middle.map(x => x.addMarks(set)), after)
     return this.setLeaves(leaves)
-  }
-
-  /**
-   * Get the decorations for the node from a `schema`.
-   *
-   * @param {Schema} schema
-   * @return {Array}
-   */
-
-  getDecorations(schema) {
-    return schema.__getDecorations(this)
   }
 
   /**
@@ -675,14 +650,6 @@ class Text extends Record(DEFAULTS) {
   }
 
   /**
-   * Alias `toJS`.
-   */
-
-  toJS(options) {
-    return this.toJSON(options)
-  }
-
-  /**
    * Update a `mark` at `index` and `length` with `properties`.
    *
    * @param {Number} index
@@ -811,7 +778,6 @@ Text.prototype[MODEL_TYPES.TEXT] = true
  */
 
 memoize(Text.prototype, [
-  'getDecorations',
   'getActiveMarks',
   'getMarks',
   'getMarksAsArray',

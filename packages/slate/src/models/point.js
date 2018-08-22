@@ -102,12 +102,6 @@ class Point extends Record(DEFAULTS) {
   }
 
   /**
-   * Alias `fromJS`.
-   */
-
-  static fromJS = Point.fromJSON
-
-  /**
    * Check if an `obj` is a `Point`.
    *
    * @param {Any} obj

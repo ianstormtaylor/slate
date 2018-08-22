@@ -259,12 +259,6 @@ class Schema extends Record(DEFAULTS) {
   }
 
   /**
-   * Alias `fromJS`.
-   */
-
-  static fromJS = Schema.fromJSON
-
-  /**
    * Check if `any` is a `Schema`.
    *
    * @param {Any} any
@@ -283,14 +277,6 @@ class Schema extends Record(DEFAULTS) {
 
   get object() {
     return 'schema'
-  }
-
-  get kind() {
-    logger.deprecate(
-      'slate@0.32.0',
-      'The `kind` property of Slate objects has been renamed to `object`.'
-    )
-    return this.object
   }
 
   /**
@@ -407,14 +393,6 @@ class Schema extends Record(DEFAULTS) {
     }
 
     return object
-  }
-
-  /**
-   * Alias `toJS`.
-   */
-
-  toJS() {
-    return this.toJSON()
   }
 }
 
