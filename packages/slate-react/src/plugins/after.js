@@ -266,9 +266,11 @@ function AfterPlugin() {
     isDraggingInternally = true
 
     const { value } = change
-    const { document } = value
+    const { document, schema } = value
     const node = findNode(event.target, value)
-    const isVoid = node && (node.isVoid || document.hasVoidParent(node.key))
+    const ancestors = document.getAncestors(node.key)
+    const isVoid =
+      node && (schema.isVoid(node) || ancestors.some(a => schema.isVoid(a)))
     const selectionIncludesNode = value.blocks.some(
       block => block.key === node.key
     )
