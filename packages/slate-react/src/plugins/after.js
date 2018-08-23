@@ -660,7 +660,7 @@ function AfterPlugin() {
     }
 
     return (
-      <span contentEditable={false} style={style}>
+      <span style={style}>
         {editor.props.placeholder}
       </span>
     )

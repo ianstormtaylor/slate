@@ -66,12 +66,7 @@ class Void extends React.Component {
     }
 
     const spacer = (
-      <Tag
-        contentEditable
-        data-slate-spacer
-        suppressContentEditableWarning
-        style={style}
-      >
+      <Tag data-slate-spacer style={style}>
         {this.renderText()}
       </Tag>
     )
@@ -81,11 +76,7 @@ class Void extends React.Component {
     this.debug('render', { props })
 
     return (
-      <Tag
-        data-slate-void
-        data-key={node.key}
-        contentEditable={readOnly ? null : false}
-      >
+      <Tag data-slate-void data-key={node.key}>
         {readOnly ? null : spacer}
         {content}
       </Tag>

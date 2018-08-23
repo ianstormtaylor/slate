@@ -494,8 +494,6 @@ class Content extends React.Component {
         key={this.tmp.key}
         ref={this.ref}
         data-key={document.key}
-        contentEditable={readOnly ? null : true}
-        suppressContentEditableWarning
         className={className}
         onBlur={this.onBlur}
         onFocus={this.onFocus}
