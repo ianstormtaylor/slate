@@ -37,7 +37,7 @@ change
   .insertBlock('paragraph')
 ```
 
-Hopefully from reading that you can discern that those changes result in... the entire document's content being selected and deleted, some text bring written, a word being bolded, and finally an image block and a paragraph block being added.
+Hopefully from reading that you can discern that those changes result in... the entire document's content being selected and deleted, some text being written, a word being bolded, and finally an image block and a paragraph block being added.
 
 Of course you're not usually going to chain that much.
 
@@ -55,7 +55,7 @@ There are a handful of different categories of changes that ship with Slate by d
 
 ### At a Specific Range
 
-These are changes like `deleteAtRange()`, `addMarkAtArange()`, `unwrapBlockAtRange()`, etc. that take in a [`Range`](./range.md) argument and apply a change to the document for all of the content in that range. These aren't used that often, because you'll usually be able to get away with using the next category of changes instead...
+These are changes like `deleteAtRange()`, `addMarkAtArange()`, `unwrapBlockAtRange()`, etc. that take in a [`Range`](../reference/slate/range.md) argument and apply a change to the document for all of the content in that range. These aren't used that often, because you'll usually be able to get away with using the next category of changes instead...
 
 ### At the Current Selection
 
