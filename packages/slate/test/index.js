@@ -90,8 +90,13 @@ describe('slate', () => {
   })
 
   fixtures(__dirname, 'schema', ({ module }) => {
-    const { input, output, schema } = module
+    let { input, output, schema } = module
     const s = Schema.create(schema)
+
+    if (!Value.isValue(input)) {
+      input = Value.fromJSON(input)
+    }
+
     let expected = output
     let actual = input
       .change()

@@ -155,7 +155,11 @@ function normalizeNodeAndChildren(change, node, schema) {
  */
 
 function normalizeNode(change, node, schema) {
-  const max = schema.stack.plugins.length + schema.rules.length + 1
+  const max =
+    schema.stack.plugins.length +
+    schema.rules.length +
+    (node.object === 'text' ? 1 : node.nodes.size)
+
   let iterations = 0
 
   function iterate(c, n) {
