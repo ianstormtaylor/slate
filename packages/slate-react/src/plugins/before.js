@@ -8,8 +8,8 @@ import {
   IS_IOS,
   HAS_INPUT_EVENTS_LEVEL_2,
 } from 'slate-dev-environment'
-import eventLogger from './event-logger'
 
+import eventLogger from './event-logger'
 import findNode from '../utils/find-node'
 
 /**

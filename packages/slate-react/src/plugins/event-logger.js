@@ -1,9 +1,13 @@
-/*
- * event log is enabled by localStorage
-*/
+/**
+ * Is in development?
+ *
+ * @type {Boolean}
+ */
 
-const IS_EVENT_LOG_ENABLED =
-  global.window && global.window.localStorage.ENABLE_EVENT_LOG
+const IS_DEV =
+  typeof process !== 'undefined' &&
+  process.env &&
+  process.env.NODE_ENV !== 'production'
 
 /*
  * Call event.persist() to view event property in devtool
@@ -12,7 +16,7 @@ const IS_EVENT_LOG_ENABLED =
 */
 
 function eventLogger(debug) {
-  if (!IS_EVENT_LOG_ENABLED) return debug
+  if (!IS_DEV) return debug
 
   return function(handlerType, message) {
     if (!message || !debug.enabled) {
