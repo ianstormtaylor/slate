@@ -1,7 +1,7 @@
 {
   "name": "slate-dev-warning",
   "description": "INTERNAL: A simple, development-only warning helper for Slate.",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
   "main": "lib/slate-dev-warning.js",
