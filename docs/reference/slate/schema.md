@@ -277,6 +277,177 @@ Returns a boolean if the passed in argument is a `Schema`.
 
 Returns a JSON representation of the schema.
 
-## Normalizing
+## Errors
 
 When supplying your own `normalize` property for a schema rule, it will be called with `(change, error)`. The error `code` will be one of a set of potential code strings, and it will contain additional helpful properties depending on the type of error.
+
+### `'child_object_invalid'`
+
+```js
+{
+  child: Node,
+  index: Number,
+  node: Node,
+  rule: Object,
+}
+```
+
+Raised when the `object` property of a child node is invalid.
+
+### `'child_required'`
+
+```js
+{
+  index: Number,
+  node: Node,
+  rule: Object,
+}
+```
+
+Raised when a child node was required but none was found.
+
+### `'child_type_invalid'`
+
+```js
+{
+  child: Node,
+  index: Number,
+  node: Node,
+  rule: Object,
+}
+```
+
+Raised when the `type` property of a child node is invalid.
+
+### `'child_unknown'`
+
+```js
+{
+  child: Node,
+  index: Number,
+  node: Node,
+  rule: Object,
+}
+```
+
+Raised when a child was not expected but one was found.
+
+### `'first_child_object_invalid'`
+
+```js
+{
+  child: Node,
+  node: Node,
+  rule: Object,
+}
+```
+
+Raised when the `object` property of the first child node is invalid, when a specific `first` rule was defined in a schema.
+
+### `'first_child_type_invalid'`
+
+```js
+{
+  child: Node,
+  node: Node,
+  rule: Object,
+}
+```
+
+Raised when the `type` property of the first child node is invalid, when a specific `first` rule was defined in a schema.
+
+### `'last_child_object_invalid'`
+
+```js
+{
+  child: Node,
+  node: Node,
+  rule: Object,
+}
+```
+
+Raised when the `object` property of the last child node is invalid, when a specific `last` rule was defined in a schema.
+
+### `'last_child_type_invalid'`
+
+```js
+{
+  child: Node,
+  node: Node,
+  rule: Object,
+}
+```
+
+Raised when the `type` property of the last child node is invalid, when a specific `last` rule was defined in a schema.
+
+### `'node_data_invalid'`
+
+```js
+{
+  key: String,
+  node: Node,
+  rule: Object,
+  value: Mixed,
+}
+```
+
+Raised when the `data` property of a node contains an invalid entry.
+
+### `'node_is_void_invalid'`
+
+```js
+{
+  node: Node,
+  rule: Object,
+}
+```
+
+Raised when the `isVoid` property of a node is invalid.
+
+### `'node_mark_invalid'`
+
+```js
+{
+  mark: Mark,
+  node: Node,
+  rule: Object,
+}
+```
+
+Raised when one of the marks in a node is invalid.
+
+### `'node_text_invalid'`
+
+```js
+{
+  text: String,
+  node: Node,
+  rule: Object,
+}
+```
+
+Raised when the text content of a node is invalid.
+
+### `'parent_object_invalid'`
+
+```js
+{
+  node: Node,
+  parent: Node,
+  rule: Object,
+}
+```
+
+Raised when the `object` property of the parent of a node is invalid, when a specific `parent` rule was defined in a schema.
+
+### `'parent_type_invalid'`
+
+```js
+{
+  node: Node,
+  parent: Node,
+  rule: Object,
+}
+```
+
+Raised when the `type` property of the parent of a node is invalid, when a specific `parent` rule was defined in a schema.

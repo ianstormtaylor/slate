@@ -8,7 +8,7 @@ One of the main principles of Slate is that it tries to mirror the native DOM AP
 
 If you think about it, this makes sense. Slate is kind of like a nicer implementation of `contenteditable`, which itself is built with the DOM. And people use the DOM to represent documents with rich-text-like structures all the time. Mirroring the DOM helps make the library familiar for new users, and it lets us reuse battle-tested patterns without having to reinvent them ourselves.
 
-Because it mirrors the DOM, Slate's data model features a [`Document`](../reference/slate/document.md) with [`Block`](../reference/slate/block.md), [`Inline`](../reference/slate/inline.md) and [`Text`](../reference/slate/text.md) nodes. You can reference parts of the document with a [`Range`](../reference/slate/range.md). And there is a special range called a "selection" that represents the user's current cursor selection.
+Because it mirrors the DOM, Slate's data model features a [`Document`](../reference/slate/document.md) with [`Block`](../reference/slate/block.md), [`Inline`](../reference/slate/inline.md) and [`Text`](../reference/slate/text.md) nodes. You can reference parts of the document with a [`Range`](../reference/slate/range.md). And there is a special range-like object called a [`Selection`](../reference/slate/selection.md) that represents the user's current cursor selection.
 
 ## Immutable Objects
 
@@ -39,7 +39,7 @@ It is made up of a document filled with content, and a selection representing th
 
 ## Documents and Nodes
 
-Slate documents are nested and recursive. This means that a document has block nodes, and those block nodes can have child block nodes—all the way down. This lets you model more complex nested behaviors like tables and figures with captions.
+Slate documents are nested and recursive. This means that a document has block nodes, and those block nodes can have child nodes—all the way down. This lets you model more complex nested behaviors like tables and figures with captions.
 
 Unlike the DOM though, Slate enforces a few more restrictions on its documents. This reduces the complexity involved in manipulating them and prevents "impossible" situations from arising. These restrictions are:
 
@@ -49,15 +49,13 @@ Unlike the DOM though, Slate enforces a few more restrictions on its documents. 
 
 * **Inlines can only contain inline or text nodes.** This one is also for sanity and avoiding boilerplate. Once you've descended into an "inline" context, you can't have block nodes inside them.
 
-* **Inlines can't contain no text.** Any inline node whose text is an empty string (`''`) will be automatically removed. This makes sense when you think about a user backspacing through an inline. When they delete that last character, they'd expect the inline to be removed. And when there are no characters, you can't really put your selection into the inline anymore. So Slate removes them from the document automatically, to simplify things.
-
 * **Text nodes can't be adjacent to other text nodes.** Any two adjacent text nodes will automatically be merged into one. This prevents ambiguous cases where a cursor could be at the end of one text node or at the start of the next. However, you can have an inline node surrounded by two texts.
 
 * **Blocks and inlines must always contain at least one text node.** This is to ensure that the user's cursor can always "enter" the nodes and to make sure that ranges can be created referencing them.
 
 Slate enforces all of these restrictions for you automatically. Any time you [perform changes](./changes.md) to the document, Slate will check if the document is invalid, and if so, it will return it to a "normalized" value.
 
-> 🙃 Fun fact: normalizing is actually based on the DOM's [`Node.normalize()`](https://developer.mozilla.org/en-US/docs/Web/API/Node/normalize)!
+> 🙃 Fun fact: "normalizing" is actually based on the DOM's [`Node.normalize()`](https://developer.mozilla.org/en-US/docs/Web/API/Node/normalize)!
 
 In addition to documents, blocks and inlines, Slate introduces one other type of markup that the DOM doesn't have natively, the [`Mark`](../reference/slate/mark.md).
 
@@ -92,7 +90,7 @@ That all sounds pretty complex, but you don't have to think about it much, as lo
 
 ## Ranges, Points and "The Selection"
 
-Just like in the DOM, you can reference a part of the document using a `Range`. And there's one special range that Slate keeps track of that refers to the user's current cursor selection, called the "selection".
+Just like in the DOM, you can reference a part of the document using a `Range`. And there's one special range that Slate keeps track of that refers to the user's current cursor selection, called the `Selection`.
 
 Ranges are defined by two `Point`s, an "anchor" point and a "focus" point. The anchor is where the range starts, and the focus is where it ends. And each point is a combination of a "path" or "key" referencing a specific node, and an "offset". This ends up looking like this:
 
@@ -100,20 +98,11 @@ Ranges are defined by two `Point`s, an "anchor" point and a "focus" point. The a
 const range = Range.create({
   anchor: {
     key: 'node-a',
-    offset: 0,
-  },
-  focus: {
-    key: 'node-b',
-    offset: 4,
-  },
-})
-
-const range = Range.create({
-  anchor: {
     path: [0, 2, 1],
     offset: 0,
   },
   focus: {
+    key: 'node-b',
     path: [0, 3, 2],
     offset: 4,
   },
@@ -136,3 +125,41 @@ These `start` and `end` points are what most of your logic will be based on, sin
 One important thing to note is that the anchor and focus points of ranges **always reference the "leaf-most" text nodes** in a document. They never reference blocks or inlines, always their child text nodes. This is different than in the DOM API, but it makes dealing with ranges a _lot_ easier because there are less edge cases to handle.
 
 > 📋 For more info, check out the [`Range` reference](../reference/slate/range.md).
+
+The `Selection` model contains slightly more information than the simple `Range` model, because it needs to keep track of "focus" and "marks" for the user. For example:
+
+```js
+const selection = Selection.create({
+  anchor: {
+    key: 'node-a',
+    path: [0, 2, 1],
+    offset: 0,
+  },
+  focus: {
+    key: 'node-b',
+    path: [0, 3, 2],
+    offset: 4,
+  },
+  isFocused: true,
+  marks: [{ type: 'bold' }],
+})
+```
+
+However, keeping the `key` and `path` of ranges or selections in sync yourself is tedious. Instead, you can create selections using either and have the other automatically be inferred by the document. To do that, you use the `createRange` and `createSelection` methods:
+
+```js
+const selection = document.createSelection({
+  anchor: {
+    key: 'node-a',
+    offset: 0,
+  },
+  focus: {
+    key: 'node-b',
+    offset: 4,
+  },
+  isFocused: true,
+  marks: [{ type: 'bold' }],
+})
+```
+
+The resulting `selection` will have a both the `key` and `path` set for its points, with the `key` being used to look up the `path` in the document.

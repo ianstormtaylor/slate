@@ -171,3 +171,9 @@ Return a new point with a new `offset`.
 `setPath(path: List|Array|Null) => Point`
 
 Return a new point with a new `path`.
+
+### `unset`
+
+`unset() => Point`
+
+Return a new point with the key, path, and offset all set to `null`.

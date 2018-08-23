@@ -136,7 +136,6 @@ If this function returns `true`, it can force updating the editor where otherwis
   renderMark: Function,
   renderNode: Function,
   renderPlaceholder: Function,
-  renderPortal: Function,
 }
 ```
 
@@ -167,12 +166,6 @@ Render a `Node`.
 Render the placeholder that is shown when the editor has no `value`.
 
 The `placeholder` prop that was passed to the editor can be found at `editor.props.placeholder`.
-
-### `renderPortal`
-
-`Function renderPortal(value: Value, editor: Editor) => ReactNode || Void`
-
-Unlike the other renderProps, this one is mapped, so each plugin that returns something gets its own Portal. The return value is given as `children` to a `react-portal` `<Portal/>`.
 
 ## Other Properties
 
