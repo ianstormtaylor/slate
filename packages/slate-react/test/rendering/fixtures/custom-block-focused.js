@@ -5,7 +5,7 @@ import h from '../../helpers/h'
 
 function Image(props) {
   return React.createElement('img', {
-    className: props.isSelected ? 'selected' : '',
+    className: props.isFocused ? 'focused' : '',
     src: props.node.data.get('src'),
     ...props.attributes,
   })
@@ -20,6 +20,13 @@ function renderNode(props) {
 
 export const props = {
   renderNode,
+  schema: {
+    blocks: {
+      image: {
+        isVoid: true,
+      },
+    },
+  },
 }
 
 export const value = (
@@ -55,7 +62,7 @@ export const output = `
       </span>
     </div>
     <div contenteditable="false">
-      <img class="selected" src="https://example.com/image.png">
+      <img class="focused" src="https://example.com/image.png">
     </div>
   </div>
   <div style="position:relative">

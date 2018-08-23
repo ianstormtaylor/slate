@@ -22,7 +22,6 @@ export const output = {
         object: 'block',
         type: 'paragraph',
         data: {},
-        isVoid: false,
         nodes: [
           {
             object: 'text',
@@ -37,7 +36,6 @@ export const output = {
           {
             object: 'inline',
             type: 'link',
-            isVoid: false,
             data: {
               thing: 'value',
             },

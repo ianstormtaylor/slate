@@ -1,6 +1,8 @@
 import './interfaces/common'
+import './interfaces/element'
 import './interfaces/node'
 import './interfaces/range'
+
 import Block from './models/block'
 import Change from './models/change'
 import Changes from './changes'
@@ -24,7 +26,6 @@ import Stack from './models/stack'
 import Text from './models/text'
 import TextUtils from './utils/text-utils'
 import Value from './models/value'
-import { resetKeyGenerator, setKeyGenerator } from './utils/generate-key'
 import { resetMemoization, useMemoization } from './utils/memoize'
 
 /**
@@ -51,11 +52,9 @@ export {
   PathUtils,
   Point,
   Range,
-  resetKeyGenerator,
   resetMemoization,
   Schema,
   Selection,
-  setKeyGenerator,
   Stack,
   Text,
   TextUtils,
@@ -80,11 +79,9 @@ export default {
   PathUtils,
   Point,
   Range,
-  resetKeyGenerator,
   resetMemoization,
   Schema,
   Selection,
-  setKeyGenerator,
   Stack,
   Text,
   TextUtils,

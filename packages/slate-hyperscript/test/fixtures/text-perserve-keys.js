@@ -24,7 +24,6 @@ export const output = {
       object: 'block',
       key: '4',
       type: 'paragraph',
-      isVoid: false,
       data: {},
       nodes: [
         {
@@ -43,7 +42,6 @@ export const output = {
           key: '1',
           type: 'link',
           data: {},
-          isVoid: false,
           nodes: [
             {
               object: 'text',

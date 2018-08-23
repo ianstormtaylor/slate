@@ -10,15 +10,14 @@ The "anchor" is the fixed point in a range, and the "focus" is the non-fixed poi
 
 Often times, you don't need to specifically know which point is the "anchor" and which is the "focus", and you just need to know which comes first and last in the document. For these cases, there are many convenience equivalent properties and methods referring to the "start" and "end" points.
 
+The `Range` model is also used as an interface and implemented by the [`Decoration`](./decoration.md) and [`Selection`](./selection.md) models.
+
 ## Properties
 
 ```js
 Range({
   anchor: Point,
   focus: Point,
-  isAtomic: Boolean,
-  isFocused: Boolean,
-  marks: Set,
 })
 ```
 
@@ -33,24 +32,6 @@ The range's anchor point.
 `Point`
 
 The range's focus point.
-
-### `isAtomic`
-
-`Boolean`
-
-Whether the range is atomic (for decorations only).
-
-### `isFocused`
-
-`Boolean`
-
-Whether the range currently has focus.
-
-### `marks`
-
-`Set`
-
-A set of marks associated with the range.
 
 ### `object`
 
@@ -71,12 +52,6 @@ Either the `anchor` or the `focus` point, depending on which comes last in the d
 `Boolean`
 
 Whether the range is backward. A range is considered "backward" when its focus point references a location earlier in the document than its anchor point.
-
-### `isBlurred`
-
-`Boolean`
-
-The opposite of `isFocused`, for convenience.
 
 ### `isCollapsed`
 
@@ -224,24 +199,6 @@ Return a new range with a new `end` point.
 
 Return a new range with a new `focus` point.
 
-### `setIsAtomic`
-
-`setIsAtomic(isAtomic: Boolean) => Range`
-
-Return a new range with a new `isAtomic` value.
-
-### `setIsFocused`
-
-`setIsFocused(isFocused: Boolean) => Range`
-
-Return a new range with a new `isFocused` value.
-
-### `setMarks`
-
-`setMarks(marks: Set|Null) => Range`
-
-Return a new range with a new set of `marks`.
-
 ### `setProperties`
 
 `setProperties(properties: Object|Range) => Range`
@@ -253,3 +210,9 @@ Return a new range with new `properties` set.
 `setStart(start: Point) => Range`
 
 Return a new range with a new `start` point.
+
+### `unset`
+
+`unset() => Range`
+
+Return a new range with both of its point unset.

@@ -13,7 +13,6 @@ import Node from './node'
 
 const DEFAULTS = {
   data: new Map(),
-  isVoid: false,
   key: undefined,
   nodes: new List(),
   type: undefined,
@@ -81,13 +80,7 @@ class Inline extends Record(DEFAULTS) {
       return object
     }
 
-    const {
-      data = {},
-      isVoid = false,
-      key = KeyUtils.create(),
-      nodes = [],
-      type,
-    } = object
+    const { data = {}, key = KeyUtils.create(), nodes = [], type } = object
 
     if (typeof type != 'string') {
       throw new Error('`Inline.fromJS` requires a `type` string.')
@@ -96,7 +89,6 @@ class Inline extends Record(DEFAULTS) {
     const inline = new Inline({
       key,
       type,
-      isVoid: !!isVoid,
       data: new Map(data),
       nodes: Node.createList(nodes),
     })
@@ -145,7 +137,6 @@ class Inline extends Record(DEFAULTS) {
     const object = {
       object: this.object,
       type: this.type,
-      isVoid: this.get('isVoid'),
       data: this.data.toJSON(),
       nodes: this.nodes.toArray().map(n => n.toJSON(options)),
     }

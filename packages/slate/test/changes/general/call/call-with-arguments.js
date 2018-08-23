@@ -2,15 +2,12 @@
 
 import h from '../../../helpers/h'
 
-function insertVoid(change, blockType) {
-  change.insertBlock({
-    type: blockType,
-    isVoid: true,
-  })
+function insertBlockByType(change, blockType) {
+  change.insertBlock({ type: blockType })
 }
 
 export default function(change) {
-  change.call(insertVoid, 'image')
+  change.call(insertBlockByType, 'image')
 }
 
 export const input = (

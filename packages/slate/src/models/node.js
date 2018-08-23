@@ -1,5 +1,5 @@
 import isPlainObject from 'is-plain-object'
-import logger from 'slate-dev-logger'
+import warning from 'slate-dev-warning'
 import { List } from 'immutable'
 
 import Block from './block'
@@ -32,9 +32,9 @@ class Node {
       let { object } = attrs
 
       if (!object && attrs.kind) {
-        logger.deprecate(
-          'slate@0.32.0',
-          'The `kind` property of Slate objects has been renamed to `object`.'
+        warning(
+          false,
+          'As of slate@0.32.0, the `kind` property of Slate objects has been renamed to `object`.'
         )
 
         object = attrs.kind
@@ -90,7 +90,6 @@ class Node {
     if (Block.isBlock(attrs) || Inline.isInline(attrs)) {
       return {
         data: attrs.data,
-        isVoid: attrs.isVoid,
         type: attrs.type,
       }
     }
@@ -103,7 +102,6 @@ class Node {
       const props = {}
       if ('type' in attrs) props.type = attrs.type
       if ('data' in attrs) props.data = Data.create(attrs.data)
-      if ('isVoid' in attrs) props.isVoid = attrs.isVoid
       return props
     }
 
@@ -123,9 +121,9 @@ class Node {
     let { object } = value
 
     if (!object && value.kind) {
-      logger.deprecate(
-        'slate@0.32.0',
-        'The `kind` property of Slate objects has been renamed to `object`.'
+      warning(
+        false,
+        'As of slate@0.32.0, the `kind` property of Slate objects has been renamed to `object`.'
       )
 
       object = value.kind

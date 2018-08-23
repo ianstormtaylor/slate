@@ -89,8 +89,7 @@
     "slate": "*",
     "slate-html-serializer": "*",
     "slate-plain-serializer": "*",
-    "slate-react": "*",
-    "slate-schema-violations": "*"
+    "slate-react": "*"
   },
   "scripts": {
     "benchmark": "cross-env COMPARE=compare node --expose-gc ./tmp/benchmark/index.js",

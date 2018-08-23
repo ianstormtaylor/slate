@@ -21,7 +21,9 @@ export const input = (
 export const output = (
   <value>
     <document>
-      <paragraph>word</paragraph>
+      <paragraph>
+        word<link href="website.com" />
+      </paragraph>
       <paragraph>
         <link href="website.com">
           <cursor />hyperlink

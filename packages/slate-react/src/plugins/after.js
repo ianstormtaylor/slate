@@ -64,7 +64,7 @@ function AfterPlugin() {
     event.preventDefault()
 
     const { value } = change
-    const { selection } = value
+    const { document, selection, schema } = value
     const range = findRange(targetRange, value)
 
     switch (event.inputType) {
@@ -101,7 +101,12 @@ function AfterPlugin() {
 
       case 'insertLineBreak':
       case 'insertParagraph': {
-        if (change.value.isInVoid) {
+        const hasVoidParent = document.hasVoidParent(
+          selection.start.path,
+          schema
+        )
+
+        if (hasVoidParent) {
           change.moveToStartOfNextText()
         } else {
           change.splitBlockAtRange(range)
@@ -450,13 +455,14 @@ function AfterPlugin() {
     debug('onKeyDown', { event })
 
     const { value } = change
-    const { schema } = value
+    const { document, selection, schema } = value
+    const hasVoidParent = document.hasVoidParent(selection.start.path, schema)
 
     // COMPAT: In iOS, some of these hotkeys are handled in the
     // `onNativeBeforeInput` handler of the `<Content>` component in order to
     // preserve native autocorrect behavior, so they shouldn't be handled here.
     if (Hotkeys.isSplitBlock(event) && !IS_IOS) {
-      return value.isInVoid
+      return hasVoidParent
         ? change.moveToStartOfNextText()
         : change.splitBlock()
     }
@@ -520,44 +526,44 @@ function AfterPlugin() {
     // an inline is selected, we need to handle these hotkeys manually because
     // browsers won't know what to do.
     if (Hotkeys.isMoveBackward(event)) {
-      const { document, isInVoid, previousText, startText } = value
+      const { previousText, startText } = value
       const isPreviousInVoid =
         previousText && document.hasVoidParent(previousText.key, schema)
 
-      if (isInVoid || isPreviousInVoid || startText.text == '') {
+      if (hasVoidParent || isPreviousInVoid || startText.text == '') {
         event.preventDefault()
         return change.moveBackward()
       }
     }
 
     if (Hotkeys.isMoveForward(event)) {
-      const { document, isInVoid, nextText, startText } = value
+      const { nextText, startText } = value
       const isNextInVoid =
         nextText && document.hasVoidParent(nextText.key, schema)
 
-      if (isInVoid || isNextInVoid || startText.text == '') {
+      if (hasVoidParent || isNextInVoid || startText.text == '') {
         event.preventDefault()
         return change.moveForward()
       }
     }
 
     if (Hotkeys.isExtendBackward(event)) {
-      const { document, isInVoid, previousText, startText } = value
+      const { previousText, startText } = value
       const isPreviousInVoid =
         previousText && document.hasVoidParent(previousText.key, schema)
 
-      if (isInVoid || isPreviousInVoid || startText.text == '') {
+      if (hasVoidParent || isPreviousInVoid || startText.text == '') {
         event.preventDefault()
         return change.moveFocusBackward()
       }
     }
 
     if (Hotkeys.isExtendForward(event)) {
-      const { document, isInVoid, nextText, startText } = value
+      const { nextText, startText } = value
       const isNextInVoid =
         nextText && document.hasVoidParent(nextText.key, schema)
 
-      if (isInVoid || isNextInVoid || startText.text == '') {
+      if (hasVoidParent || isNextInVoid || startText.text == '') {
         event.preventDefault()
         return change.moveFocusForward()
       }
@@ -686,13 +692,11 @@ function AfterPlugin() {
 
   function renderEditor(props, editor) {
     const { handlers } = editor
-
     return (
       <Content
         {...handlers}
         autoCorrect={props.autoCorrect}
         className={props.className}
-        children={props.children}
         editor={editor}
         readOnly={props.readOnly}
         role={props.role}

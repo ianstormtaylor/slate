@@ -22,13 +22,11 @@ export const output = {
         object: 'block',
         type: 'quote',
         data: {},
-        isVoid: false,
         nodes: [
           {
             object: 'block',
             type: 'paragraph',
             data: {},
-            isVoid: false,
             nodes: [
               {
                 object: 'text',

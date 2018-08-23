@@ -7,7 +7,6 @@ import {
   Mark,
   Node,
   Point,
-  Schema,
   Selection,
   Text,
   Value,
@@ -173,7 +172,6 @@ const CREATORS = {
 
   value(tagName, attributes, children) {
     const { data, normalize = true } = attributes
-    const schema = Schema.create(attributes.schema || {})
     const document = children.find(Document.isDocument)
     let selection = children.find(Selection.isSelection) || Selection.create()
     let anchor
@@ -263,7 +261,7 @@ const CREATORS = {
     }
 
     let value = Value.fromJSON(
-      { data, document, selection, schema },
+      { data, document, selection, ...attributes },
       { normalize }
     )
 
@@ -471,19 +469,19 @@ function resolveCreators(options) {
   }
 
   Object.keys(blocks).map(key => {
-    creators[key] = normalizeNode(key, blocks[key], 'block')
+    creators[key] = normalizeNode(blocks[key], 'block')
   })
 
   Object.keys(inlines).map(key => {
-    creators[key] = normalizeNode(key, inlines[key], 'inline')
+    creators[key] = normalizeNode(inlines[key], 'inline')
   })
 
   Object.keys(marks).map(key => {
-    creators[key] = normalizeMark(key, marks[key])
+    creators[key] = normalizeMark(marks[key])
   })
 
   Object.keys(decorations).map(key => {
-    creators[key] = normalizeNode(key, decorations[key], 'decoration')
+    creators[key] = normalizeNode(decorations[key], 'decoration')
   })
 
   creators.value = (tagName, attributes = {}, children) => {
@@ -495,15 +493,14 @@ function resolveCreators(options) {
 }
 
 /**
- * Normalize a node creator with `key` and `value`, of `object`.
+ * Normalize a node creator of `value` and `object`.
  *
- * @param {String} key
  * @param {Function|Object|String} value
  * @param {String} object
  * @return {Function}
  */
 
-function normalizeNode(key, value, object) {
+function normalizeNode(value, object) {
   if (typeof value == 'function') {
     return value
   }
@@ -514,11 +511,11 @@ function normalizeNode(key, value, object) {
 
   if (isPlainObject(value)) {
     return (tagName, attributes, children) => {
-      const { key: attrKey, ...rest } = attributes
+      const { key, ...rest } = attributes
       const attrs = {
         ...value,
         object,
-        key: attrKey,
+        key,
         data: {
           ...(value.data || {}),
           ...rest,
@@ -535,14 +532,13 @@ function normalizeNode(key, value, object) {
 }
 
 /**
- * Normalize a mark creator with `key` and `value`.
+ * Normalize a mark creator of `value`.
  *
- * @param {String} key
  * @param {Function|Object|String} value
  * @return {Function}
  */
 
-function normalizeMark(key, value) {
+function normalizeMark(value) {
   if (typeof value == 'function') {
     return value
   }

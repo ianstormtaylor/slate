@@ -1,6 +1,5 @@
 import { Editor, getEventRange, getEventTransfer } from 'slate-react'
 import { Block, Value } from 'slate'
-import { LAST_CHILD_TYPE_INVALID } from 'slate-schema-violations'
 
 import React from 'react'
 import initialValue from './value.json'
@@ -48,13 +47,12 @@ function insertImage(change, src, target) {
 
   change.insertBlock({
     type: 'image',
-    isVoid: true,
     data: { src },
   })
 }
 
 /**
- * A schema to enforce that there's always a paragraph as the last block.
+ * The editor's schema.
  *
  * @type {Object}
  */
@@ -64,11 +62,16 @@ const schema = {
     last: { type: 'paragraph' },
     normalize: (change, { code, node, child }) => {
       switch (code) {
-        case LAST_CHILD_TYPE_INVALID: {
+        case 'last_child_type_invalid': {
           const paragraph = Block.create('paragraph')
           return change.insertNodeByKey(node.key, node.nodes.size, paragraph)
         }
       }
+    },
+  },
+  blocks: {
+    image: {
+      isVoid: true,
     },
   },
 }

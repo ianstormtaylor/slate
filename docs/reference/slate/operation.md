@@ -13,10 +13,10 @@ There are a handful of Slate operation types. The goal is to have the fewest pos
 ```js
 {
   type: 'insert_text',
-  path: Array,
+  path: List,
   offset: Number,
   text: String,
-  marks: Array,
+  marks: List,
 }
 ```
 
@@ -27,7 +27,7 @@ Inserts a `text` string at `offset` into a text node at `path`, with optional `m
 ```js
 {
   type: 'remove_text',
-  path: Array,
+  path: List,
   offset: Number,
   text: String,
 }
@@ -42,10 +42,10 @@ Removes a string of `text` at `offset` into a text node at `path`.
 ```js
 {
   type: 'add_mark',
-  path: Array,
+  path: List,
   offset: Number,
   length: Number,
-  mark: Object,
+  mark: Mark,
 }
 ```
 
@@ -56,10 +56,10 @@ Adds a `mark` to the text node at `path` starting at an `offset` and spanning `l
 ```js
 {
   type: 'remove_mark',
-  path: Array,
+  path: List,
   offset: Number,
   length: Number,
-  mark: Object,
+  mark: Mark,
 }
 ```
 
@@ -70,10 +70,10 @@ Removes a `mark` from a text node at `path` starting at an `offset` and spanning
 ```js
 {
   type: 'set_mark',
-  path: Array,
+  path: List,
   offset: Number,
   length: Number,
-  mark: Object,
+  mark: Mark,
   properties: Object,
 }
 ```
@@ -87,8 +87,8 @@ Set new `properties` on any marks that match an existing `mark` in a text node a
 ```js
 {
   type: 'insert_node',
-  path: Array,
-  node: Object,
+  path: List,
+  node: Node,
 }
 ```
 
@@ -99,7 +99,7 @@ Insert a new `node` at `path`.
 ```js
 {
   type: 'merge_node',
-  path: Array,
+  path: List,
   position: Number,
   properties: Object,
 }
@@ -112,7 +112,7 @@ Merge the node at `path` with its previous sibling. The `position` refers to eit
 ```js
 {
   type: 'move_node',
-  path: Array,
+  path: List,
   newPath: Array,
 }
 ```
@@ -124,8 +124,8 @@ Move the node at `path` to a `newPath`.
 ```js
 {
   type: 'remove_node',
-  path: Array,
-  node: Object,
+  path: List,
+  node: Node,
 }
 ```
 
@@ -136,9 +136,9 @@ Remove the node at `path`.
 ```js
 {
   type: 'set_node',
-  path: Array,
+  path: List,
   properties: Object,
-  node: Object,
+  node: Node,
 }
 ```
 
@@ -149,7 +149,7 @@ Set new `properties` on the node at `path`.
 ```js
 {
   type: 'split_node',
-  path: Array,
+  path: List,
   position: Number,
   target: Number,
   properties: Object,
@@ -166,7 +166,7 @@ Split the node at `path` at `position`. The `position` refers to either the inde
 {
   type: 'set_selection',
   properties: Object,
-  selection: Object,
+  selection: Selection,
 }
 ```
 
@@ -178,7 +178,7 @@ Set new `properties` on the selection.
 {
   type: 'set_value',
   properties: Object,
-  value: Object,
+  value: Value,
 }
 ```
 

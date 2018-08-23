@@ -20,7 +20,8 @@ export const output = (
   <value>
     <document>
       <paragraph>
-        w<hashtag>
+        w<link />
+        <hashtag>
           <link>
             <anchor />or
           </link>

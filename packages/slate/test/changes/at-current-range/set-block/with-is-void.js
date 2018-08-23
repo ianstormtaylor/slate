@@ -3,10 +3,7 @@
 import h from '../../../helpers/h'
 
 export default function(change) {
-  change.setBlocks({
-    type: 'image',
-    isVoid: true,
-  })
+  change.setBlocks('image')
 }
 
 export const input = (

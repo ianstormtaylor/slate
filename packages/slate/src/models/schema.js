@@ -1,25 +1,6 @@
 import Debug from 'debug'
 import isPlainObject from 'is-plain-object'
-import logger from 'slate-dev-logger'
 import { Record } from 'immutable'
-import {
-  CHILD_OBJECT_INVALID,
-  CHILD_REQUIRED,
-  CHILD_TYPE_INVALID,
-  CHILD_UNKNOWN,
-  FIRST_CHILD_OBJECT_INVALID,
-  FIRST_CHILD_TYPE_INVALID,
-  LAST_CHILD_OBJECT_INVALID,
-  LAST_CHILD_TYPE_INVALID,
-  NODE_DATA_INVALID,
-  NODE_IS_VOID_INVALID,
-  NODE_MARK_INVALID,
-  NODE_OBJECT_INVALID,
-  NODE_TEXT_INVALID,
-  NODE_TYPE_INVALID,
-  PARENT_OBJECT_INVALID,
-  PARENT_TYPE_INVALID,
-} from 'slate-schema-violations'
 
 import MODEL_TYPES from '../constants/model-types'
 import Stack from './stack'
@@ -92,17 +73,7 @@ const CORE_RULES = [
     },
   },
 
-  // Ensure that inline non-void nodes are never empty.
-  {
-    match: {
-      object: 'inline',
-      isVoid: false,
-      nodes: [{ match: { object: 'text' } }],
-    },
-    text: /[\w\W]+/,
-  },
-
-  // Ensure that inline void nodes are surrounded by text nodes.
+  // Ensure that inline nodes are surrounded by text nodes.
   {
     match: { object: 'block' },
     first: [{ object: 'block' }, { object: 'text' }],
@@ -280,6 +251,18 @@ class Schema extends Record(DEFAULTS) {
   }
 
   /**
+   * Get the schema rules for a `node`.
+   *
+   * @param {Node} node
+   * @return {Array}
+   */
+
+  getNodeRules(node) {
+    const rules = this.rules.filter(r => testRules(node, r.match))
+    return rules
+  }
+
+  /**
    * Validate a `node` with the schema, returning an error if it's invalid.
    *
    * @param {Node} node
@@ -287,7 +270,7 @@ class Schema extends Record(DEFAULTS) {
    */
 
   validateNode(node) {
-    const rules = this.rules.filter(r => testRules(node, r.match))
+    const rules = this.getNodeRules(node)
     const failure = validateRules(node, rules, this.rules, { every: true })
     if (!failure) return
     const error = new SlateError(failure.code, failure)
@@ -375,9 +358,8 @@ class Schema extends Record(DEFAULTS) {
    */
 
   isVoid(node) {
-    // COMPAT: Right now this just provides a way to get around the
-    // deprecation warnings, but in the future it will check the rules.
-    return node.get('isVoid')
+    const rule = this.rules.find(r => 'isVoid' in r && testRules(node, r.match))
+    return rule ? rule.isVoid : false
   }
 
   /**
@@ -407,13 +389,13 @@ function defaultNormalize(change, error) {
   const { code, node, child, key, mark } = error
 
   switch (code) {
-    case CHILD_OBJECT_INVALID:
-    case CHILD_TYPE_INVALID:
-    case CHILD_UNKNOWN:
-    case FIRST_CHILD_OBJECT_INVALID:
-    case FIRST_CHILD_TYPE_INVALID:
-    case LAST_CHILD_OBJECT_INVALID:
-    case LAST_CHILD_TYPE_INVALID: {
+    case 'child_object_invalid':
+    case 'child_type_invalid':
+    case 'child_unknown':
+    case 'first_child_object_invalid':
+    case 'first_child_type_invalid':
+    case 'last_child_object_invalid':
+    case 'last_child_type_invalid': {
       return child.object === 'text' &&
         node.object === 'block' &&
         node.nodes.size === 1
@@ -421,10 +403,10 @@ function defaultNormalize(change, error) {
         : change.removeNodeByKey(child.key, { normalize: false })
     }
 
-    case CHILD_REQUIRED:
-    case NODE_TEXT_INVALID:
-    case PARENT_OBJECT_INVALID:
-    case PARENT_TYPE_INVALID: {
+    case 'child_required':
+    case 'node_text_invalid':
+    case 'parent_object_invalid':
+    case 'parent_type_invalid': {
       return node.object === 'document'
         ? node.nodes.forEach(n =>
             change.removeNodeByKey(n.key, { normalize: false })
@@ -432,7 +414,7 @@ function defaultNormalize(change, error) {
         : change.removeNodeByKey(node.key, { normalize: false })
     }
 
-    case NODE_DATA_INVALID: {
+    case 'node_data_invalid': {
       return node.data.get(key) === undefined && node.object !== 'document'
         ? change.removeNodeByKey(node.key, { normalize: false })
         : change.setNodeByKey(
@@ -442,15 +424,7 @@ function defaultNormalize(change, error) {
           )
     }
 
-    case NODE_IS_VOID_INVALID: {
-      return change.setNodeByKey(
-        node.key,
-        { isVoid: !node.get('isVoid') },
-        { normalize: false }
-      )
-    }
-
-    case NODE_MARK_INVALID: {
+    case 'node_mark_invalid': {
       return node.getTexts().forEach(t =>
         change.removeMarkByKey(t.key, 0, t.text.length, mark, {
           normalize: false,
@@ -506,7 +480,6 @@ function validateRules(object, rule, rules, options = {}) {
   const error =
     validateObject(object, rule) ||
     validateType(object, rule) ||
-    validateIsVoid(object, rule) ||
     validateData(object, rule) ||
     validateMarks(object, rule) ||
     validateText(object, rule) ||
@@ -518,33 +491,15 @@ function validateRules(object, rule, rules, options = {}) {
 }
 
 function validateObject(node, rule) {
-  if (rule.objects) {
-    logger.warn(
-      'The `objects` schema validation rule was changed. Please use the new `match` syntax with `object`.'
-    )
-  }
-
   if (rule.object == null) return
   if (rule.object === node.object) return
-  return fail(NODE_OBJECT_INVALID, { rule, node })
+  return fail('node_object_invalid', { rule, node })
 }
 
 function validateType(node, rule) {
-  if (rule.types) {
-    logger.warn(
-      'The `types` schema validation rule was changed. Please use the new `match` syntax with `type`.'
-    )
-  }
-
   if (rule.type == null) return
   if (rule.type === node.type) return
-  return fail(NODE_TYPE_INVALID, { rule, node })
-}
-
-function validateIsVoid(node, rule) {
-  if (rule.isVoid == null) return
-  if (rule.isVoid === node.get('isVoid')) return
-  return fail(NODE_IS_VOID_INVALID, { rule, node })
+  return fail('node_type_invalid', { rule, node })
 }
 
 function validateData(node, rule) {
@@ -556,7 +511,7 @@ function validateData(node, rule) {
     const value = node.data && node.data.get(key)
     const valid = typeof fn === 'function' ? fn(value) : fn === value
     if (valid) continue
-    return fail(NODE_DATA_INVALID, { rule, node, key, value })
+    return fail('node_data_invalid', { rule, node, key, value })
   }
 }
 
@@ -567,7 +522,7 @@ function validateMarks(node, rule) {
   for (const mark of marks) {
     const valid = rule.marks.some(def => def.type === mark.type)
     if (valid) continue
-    return fail(NODE_MARK_INVALID, { rule, node, mark })
+    return fail('node_mark_invalid', { rule, node, mark })
   }
 }
 
@@ -577,7 +532,7 @@ function validateText(node, rule) {
   const valid =
     typeof rule.text === 'function' ? rule.text(text) : rule.text.test(text)
   if (valid) return
-  return fail(NODE_TEXT_INVALID, { rule, node, text })
+  return fail('node_text_invalid', { rule, node, text })
 }
 
 function validateFirst(node, rule) {
@@ -657,21 +612,7 @@ function validateNodes(node, rule, rules = []) {
 
     if (rule.nodes != null) {
       if (!def) {
-        return fail(CHILD_UNKNOWN, { rule, node, child, index })
-      }
-
-      if (def) {
-        if (def.objects) {
-          logger.warn(
-            'The `objects` schema validation rule was changed. Please use the new `match` syntax with `object`.'
-          )
-        }
-
-        if (def.types) {
-          logger.warn(
-            'The `types` schema validation rule was changed. Please use the new `match` syntax with `type`.'
-          )
-        }
+        return fail('child_unknown', { rule, node, child, index })
       }
 
       if (def.match) {
@@ -697,7 +638,7 @@ function validateNodes(node, rule, rules = []) {
   if (rule.nodes != null) {
     while (min != null) {
       if (offset < min) {
-        return fail(CHILD_REQUIRED, { rule, node, index })
+        return fail('child_required', { rule, node, index })
       }
 
       nextDef()

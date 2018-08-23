@@ -17,6 +17,13 @@ function renderNode(props) {
 export const props = {
   readOnly: true,
   renderNode,
+  schema: {
+    inlines: {
+      emoji: {
+        isVoid: true,
+      },
+    },
+  },
 }
 
 export const value = (
@@ -44,7 +51,7 @@ export const output = `
     </span>
     <span>
       <span>
-        <span data-slate-zero-width="z">&#x200B;</span>
+        <span data-slate-zero-width="n">&#x200B;</span>
       </span>
     </span>
   </div>

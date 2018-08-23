@@ -1,14 +1,13 @@
 /** @jsx h */
 
-import { PARENT_OBJECT_INVALID } from 'slate-schema-violations'
 import h from '../../helpers/h'
 
 export const schema = {
-  inlines: {
-    link: {
-      parent: { object: 'block' },
+  blocks: {
+    paragraph: {
+      parent: { object: 'document' },
       normalize: (change, { code, node }) => {
-        if (code == PARENT_OBJECT_INVALID) {
+        if (code == 'parent_object_invalid') {
           change.unwrapNodeByKey(node.key)
         }
       },
@@ -19,11 +18,9 @@ export const schema = {
 export const input = (
   <value>
     <document>
-      <paragraph>
-        <link>
-          <link>one</link>
-        </link>
-      </paragraph>
+      <quote>
+        <paragraph>one</paragraph>
+      </quote>
     </document>
   </value>
 )
@@ -31,9 +28,7 @@ export const input = (
 export const output = (
   <value>
     <document>
-      <paragraph>
-        <link>one</link>
-      </paragraph>
+      <paragraph>one</paragraph>
     </document>
   </value>
 )

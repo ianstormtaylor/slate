@@ -19,6 +19,13 @@ function renderNode(props) {
 
 export const props = {
   renderNode,
+  schema: {
+    blocks: {
+      image: {
+        isVoid: true,
+      },
+    },
+  },
 }
 
 export const value = (

@@ -2,9 +2,9 @@ import Debug from 'debug'
 import React from 'react'
 import Types from 'prop-types'
 import getWindow from 'get-window'
-import { IS_FIREFOX, HAS_INPUT_EVENTS_LEVEL_2 } from 'slate-dev-environment'
-import logger from 'slate-dev-logger'
+import warning from 'slate-dev-warning'
 import throttle from 'lodash/throttle'
+import { IS_FIREFOX, HAS_INPUT_EVENTS_LEVEL_2 } from 'slate-dev-environment'
 
 import EVENT_HANDLERS from '../constants/event-handlers'
 import Node from './node'
@@ -37,7 +37,6 @@ class Content extends React.Component {
 
   static propTypes = {
     autoCorrect: Types.bool.isRequired,
-    children: Types.any.isRequired,
     className: Types.string,
     editor: Types.object.isRequired,
     readOnly: Types.bool.isRequired,
@@ -165,10 +164,11 @@ class Content extends React.Component {
     const range = findDOMRange(selection, window)
 
     if (!range) {
-      logger.error(
-        'Unable to find a native DOM range from the current selection.',
-        { selection }
+      warning(
+        false,
+        'Unable to find a native DOM range from the current selection.'
       )
+
       return
     }
 
@@ -426,7 +426,6 @@ class Content extends React.Component {
         data-gramm={false}
       >
         {children}
-        {this.props.children}
       </Container>
     )
   }

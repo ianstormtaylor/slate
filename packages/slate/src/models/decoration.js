@@ -1,5 +1,4 @@
 import isPlainObject from 'is-plain-object'
-import logger from 'slate-dev-logger'
 import { List, Record } from 'immutable'
 
 import Mark from './mark'
@@ -106,18 +105,7 @@ class Decoration extends Record(DEFAULTS) {
    */
 
   static fromJSON(object) {
-    const { anchor, focus } = object
-    let { mark } = object
-
-    if (object.marks) {
-      logger.deprecate(
-        '0.39.0',
-        'The `marks` property of decorations has been changed to a single `mark` property instead.'
-      )
-
-      mark = object.marks[0]
-    }
-
+    const { anchor, focus, mark } = object
     const decoration = new Decoration({
       anchor: Point.fromJSON(anchor || {}),
       focus: Point.fromJSON(focus || {}),

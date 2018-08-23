@@ -1,0 +1,21 @@
+{
+  "name": "slate-dev-warning",
+  "description": "INTERNAL: A simple, development-only warning helper for Slate.",
+  "version": "0.0.0",
+  "license": "MIT",
+  "repository": "git://github.com/ianstormtaylor/slate.git",
+  "main": "lib/slate-dev-warning.js",
+  "module": "lib/slate-dev-warning.es.js",
+  "umd": "dist/slate-dev-warning.js",
+  "umdMin": "dist/slate-dev-warning.min.js",
+  "files": [
+    "dist/",
+    "lib/"
+  ],
+  "devDependencies": {
+    "mocha": "^2.5.3"
+  },
+  "scripts": {
+    "clean": "rm -rf ./dist ./lib ./node_modules"
+  }
+}

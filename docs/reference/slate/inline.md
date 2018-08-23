@@ -13,7 +13,6 @@ Inline nodes may contain nested inline nodes and text nodes—just like in the D
 ```js
 Inline({
   data: Data,
-  isVoid: Boolean,
   key: String,
   nodes: Immutable.List<Node>,
   type: String
@@ -25,14 +24,6 @@ Inline({
 `Immutable.Map`
 
 Arbitrary data associated with the node. Defaults to an empty `Map`.
-
-### `isVoid`
-
-`Boolean`
-
-Whether the node is a "void" node, meaning that it has no child content (eg. emoji, icons, etc.). Defaults to `false`.
-
-Note that even though a node may be "void", it will still contain a single, empty [`Text`](./text.md) node for consistency across other operations. However, when rendered by Slate that single [`Text`](./text.md) node will not be visible.
 
 ### `key`
 

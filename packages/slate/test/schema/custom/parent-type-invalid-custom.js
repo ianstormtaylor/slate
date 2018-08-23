@@ -1,6 +1,5 @@
 /** @jsx h */
 
-import { PARENT_TYPE_INVALID } from 'slate-schema-violations'
 import h from '../../helpers/h'
 
 export const schema = {
@@ -9,7 +8,7 @@ export const schema = {
     item: {
       parent: { type: 'list' },
       normalize: (change, { code, node }) => {
-        if (code == PARENT_TYPE_INVALID) {
+        if (code == 'parent_type_invalid') {
           change.wrapBlockByKey(node.key, 'list')
         }
       },

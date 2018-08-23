@@ -28,7 +28,6 @@ change
   .moveToEndOfBlock()
   .insertBlock({
     type: 'image',
-    isVoid: true,
     data: {
       src: 'http://placekitten.com/200/300',
       alt: 'Kittens',
@@ -145,7 +144,7 @@ When a rule's validation fails, Slate passes a [`Change`](../reference/slate/cha
 
 ### 4. From Outside Slate
 
-This is the fourth place you might want to make changes, and also the most dangerous. You should know that any changes you make outside of the Slate editor might not be seen by your plugins, might interact with the history in weird ways, and may not work with collaborative editing implements.
+This is the fourth place you might want to make changes, and also the most dangerous. You should know that any changes you make outside of the Slate editor might not be seen by your plugins (eg. if they register an `onChange` handler) and may not work with collaborative editing implements.
 
 That said, if that's okay with you, you can make changes manually by using the `change()` method on a Slate [`Value`](../reference/slate/value.md). For example:
 
@@ -176,7 +175,6 @@ function insertParagraph(change) {
 function insertImage(change, src) {
   change.insertBlock({
     type: 'image',
-    isVoid: true,
     data: { src },
   })
 }

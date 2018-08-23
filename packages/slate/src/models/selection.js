@@ -1,5 +1,4 @@
 import isPlainObject from 'is-plain-object'
-import logger from 'slate-dev-logger'
 import { Record, Set } from 'immutable'
 
 import MODEL_TYPES from '../constants/model-types'
@@ -99,39 +98,7 @@ class Selection extends Record(DEFAULTS) {
    */
 
   static fromJSON(object) {
-    let { anchor, focus, isFocused = false, marks = null } = object
-
-    if (
-      !anchor &&
-      (object.anchorKey || object.anchorOffset || object.anchorPath)
-    ) {
-      logger.deprecate(
-        '0.37.0',
-        '`Selection` objects now take a `Point` object as an `anchor` instead of taking `anchorKey/Offset/Path` properties. But you passed:',
-        object
-      )
-
-      anchor = {
-        key: object.anchorKey,
-        offset: object.anchorOffset,
-        path: object.anchorPath,
-      }
-    }
-
-    if (!focus && (object.focusKey || object.focusOffset || object.focusPath)) {
-      logger.deprecate(
-        '0.37.0',
-        '`Selection` objects now take a `Point` object as a `focus` instead of taking `focusKey/Offset/Path` properties. But you passed:',
-        object
-      )
-
-      focus = {
-        key: object.focusKey,
-        offset: object.focusOffset,
-        path: object.focusPath,
-      }
-    }
-
+    const { anchor, focus, isFocused = false, marks = null } = object
     const selection = new Selection({
       anchor: Point.fromJSON(anchor || {}),
       focus: Point.fromJSON(focus || {}),

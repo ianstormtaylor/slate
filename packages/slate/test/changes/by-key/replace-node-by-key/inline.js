@@ -6,7 +6,6 @@ export default function(change) {
   change.replaceNodeByKey('a', {
     object: 'inline',
     type: 'emoji',
-    isVoid: true,
   })
 }
 

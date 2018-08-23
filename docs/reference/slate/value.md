@@ -4,7 +4,7 @@
 import { Value } from 'slate'
 ```
 
-A `Value` is the top-level representation of data in Slate, containing both a [`Document`](./document.md) and a selection [`Range`](./range.md). It's what you need to pass into the Slate [`<Editor>`](../slate-react/editor.md) to render something onto the page.
+A `Value` is the top-level representation of data in Slate, containing both a [`Document`](./document.md) and a [`Selection`](./selection.md). It's what you need to pass into the Slate [`<Editor>`](../slate-react/editor.md) to render something onto the page.
 
 All changes to the document and selection are also performed through the value object, so that they can stay in sync, and be propagated to its internal history of undo/redo value.
 
@@ -15,11 +15,11 @@ For convenience, in addition to changes, many of the selection and document prop
 ```js
 Value({
   document: Document,
-  selection: Range,
+  selection: Selection,
   history: History,
   schema: Schema,
   data: Data,
-  decorations: List<Ranges>|Null,
+  decorations: List<Decoration>,
 })
 ```
 
@@ -31,7 +31,7 @@ An object containing arbitrary data for the value.
 
 ### `decorations`
 
-`List<Ranges>|Null`
+`List<Decoration>`
 
 A list of ranges in the document with marks that aren't part of the content itself—like matches for the current search string.
 
@@ -61,7 +61,7 @@ An object representing the schema of the value's document.
 
 ### `selection`
 
-`Range`
+`Selection`
 
 The current selection of the value.
 

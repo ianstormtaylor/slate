@@ -22,7 +22,9 @@ export const output = (
   <value>
     <document>
       <paragraph>
-        one<cursor />two
+        one<link>
+          <cursor />
+        </link>two
       </paragraph>
     </document>
   </value>

@@ -1,5 +1,5 @@
 import isPlainObject from 'is-plain-object'
-import logger from 'slate-dev-logger'
+import warning from 'slate-dev-warning'
 import { Record } from 'immutable'
 
 import KeyUtils from '../utils/key-utils'
@@ -289,7 +289,7 @@ class Point extends Record(DEFAULTS) {
     const target = node.getNode(key || path)
 
     if (!target) {
-      logger.warn("A point's `path` or `key` invalid and was reset:", this)
+      warning(false, "A point's `path` or `key` invalid and was reset!")
 
       const text = node.getFirstText()
       if (!text) return Point.create()
@@ -304,7 +304,7 @@ class Point extends Record(DEFAULTS) {
     }
 
     if (target.object !== 'text') {
-      logger.warn('A point should not reference a non-text node:', target)
+      warning(false, 'A point should not reference a non-text node!')
 
       const text = target.getTextAtOffset(offset)
       const before = target.getOffset(text.key)
@@ -318,7 +318,7 @@ class Point extends Record(DEFAULTS) {
     }
 
     if (target && path && key && key !== target.key) {
-      logger.warn("A point's `key` did not match its `path`:", this, target)
+      warning(false, "A point's `key` did not match its `path`!")
     }
 
     const point = this.merge({

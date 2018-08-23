@@ -42,7 +42,7 @@ When the user pastes content into the editor, the core plugin handles all pastes
 
 When the user makes a new selection in the DOM, the core plugin updates that selection in Slate's internal data model, re-rendering if it needs to.
 
-### `render`
+### `renderEditor`
 
 Renders all of the default contents of the editor!
 

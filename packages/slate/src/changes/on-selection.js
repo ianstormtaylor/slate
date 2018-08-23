@@ -1,6 +1,4 @@
 import { is } from 'immutable'
-import isEmpty from 'is-empty'
-import logger from 'slate-dev-logger'
 import pick from 'lodash/pick'
 
 import Selection from '../models/selection'
@@ -576,7 +574,7 @@ Changes.select = (change, properties, options = {}) => {
   }
 
   // If there are no new properties to set, abort to avoid extra operations.
-  if (isEmpty(props)) {
+  if (Object.keys(props).lengtgh === 0) {
     return
   }
 
@@ -660,10 +658,10 @@ function pointBackward(change, point, n = 1) {
   const { value } = change
   const { document, selection, schema } = value
   const p = selection[point]
-  const isInVoid = document.hasVoidParent(p.path, schema)
+  const hasVoidParent = document.hasVoidParent(p.path, schema)
 
   // what is this?
-  if (!isInVoid && p.offset - n >= 0) {
+  if (!hasVoidParent && p.offset - n >= 0) {
     const range = selection[`move${Point}Backward`](n)
     change.select(range)
     return
@@ -679,7 +677,7 @@ function pointBackward(change, point, n = 1) {
   change[`move${Point}ToEndOfNode`](previous)
 
   // when is this called?
-  if (!isInVoid && !isPreviousInVoid && isInBlock) {
+  if (!hasVoidParent && !isPreviousInVoid && isInBlock) {
     const range = change.value.selection[`move${Point}Backward`](n)
     change.select(range)
   }
@@ -694,10 +692,10 @@ function pointForward(change, point, n = 1) {
   const { document, selection, schema } = value
   const p = selection[point]
   const text = document.getNode(p.path)
-  const isInVoid = document.hasVoidParent(p.path, schema)
+  const hasVoidParent = document.hasVoidParent(p.path, schema)
 
   // what is this?
-  if (!isInVoid && p.offset + n <= text.text.length) {
+  if (!hasVoidParent && p.offset + n <= text.text.length) {
     const range = selection[`move${Point}Forward`](n)
     change.select(range)
     return
@@ -712,112 +710,10 @@ function pointForward(change, point, n = 1) {
   change[`move${Point}ToStartOfNode`](next)
 
   // when is this called?
-  if (!isInVoid && !isNextInVoid && isInBlock) {
+  if (!hasVoidParent && !isNextInVoid && isInBlock) {
     const range = change.value.selection[`move${Point}Forward`](n)
     change.select(range)
   }
 }
-
-/**
- * Deprecated.
- */
-
-Changes.moveOffsetsTo = (change, start, end = start) => {
-  logger.deprecate(
-    '0.37.0',
-    'The `Change.moveOffsetsTo` method is deprecated, please use `Change.moveAnchorTo` and `Change.moveFocusTo` instead.'
-  )
-
-  change.moveAnchorTo(start).moveFocusTo(end)
-}
-
-const DEPRECATEDS = [
-  ['collapseCharBackward', 'moveBackward'],
-  ['collapseCharForward', 'moveForward'],
-  ['collapseLineBackward', 'moveLineBackward'],
-  ['collapseLineForward', 'moveLineForward'],
-  ['collapseTo', 'moveTo'],
-  ['collapseToAnchor', 'moveToAnchor'],
-  ['collapseToEnd', 'moveToEnd'],
-  ['collapseToEndOf', 'moveToEndOfNode'],
-  ['collapseToEndOfBlock', 'moveToEndOfBlock'],
-  ['collapseToEndOfNextBlock', 'moveToEndOfNextBlock'],
-  ['collapseToEndOfNextInline', 'moveToEndOfNextInline'],
-  ['collapseToEndOfNextText', 'moveToEndOfNextText'],
-  ['collapseToEndOfPreviousBlock', 'moveToEndOfPreviousBlock'],
-  ['collapseToEndOfPreviousInline', 'moveToEndOfPreviousInline'],
-  ['collapseToEndOfPreviousText', 'moveToEndOfPreviousText'],
-  ['collapseToFocus', 'moveToFocus'],
-  ['collapseToStart', 'moveToStart'],
-  ['collapseToStartOf', 'moveToStartOfNode'],
-  ['collapseToStartOfBlock', 'moveToStartOfBlock'],
-  ['collapseToStartOfNextBlock', 'moveToStartOfNextBlock'],
-  ['collapseToStartOfNextInline', 'moveToStartOfNextInline'],
-  ['collapseToStartOfNextText', 'moveToStartOfNextText'],
-  ['collapseToStartOfPreviousBlock', 'moveToStartOfPreviousBlock'],
-  ['collapseToStartOfPreviousInline', 'moveToStartOfPreviousInline'],
-  ['collapseToStartOfPreviousText', 'moveToStartOfPreviousText'],
-  ['extend', 'moveFocusForward'],
-  ['extendCharBackward', 'moveFocusBackward'],
-  ['extendCharForward', 'moveFocusForward'],
-  ['extendLineBackward', 'moveFocusToStartOfBlock'],
-  ['extendLineForward', 'moveFocusToEndOfBlock'],
-  ['extendTo', 'moveFocusTo'],
-  ['extendToEndOf', 'moveFocusToEndOfNode'],
-  ['extendToEndOfBlock', 'moveFocusToEndOfBlock'],
-  ['extendToEndOfBlock', 'moveFocusToEndOfBlock'],
-  ['extendToEndOfNextBlock', 'moveFocusToEndOfNextBlock'],
-  ['extendToEndOfNextInline', 'moveFocusToEndOfNextInline'],
-  ['extendToEndOfNextText', 'moveFocusToEndOfNextText'],
-  ['extendToEndOfPreviousBlock', 'moveFocusToEndOfPreviousBlock'],
-  ['extendToEndOfPreviousInline', 'moveFocusToEndOfPreviousInline'],
-  ['extendToEndOfPreviousText', 'moveFocusToEndOfPreviousText'],
-  ['extendToStartOf', 'moveFocusToStartOfNode'],
-  ['extendToStartOfBlock', 'moveFocusToStartOfBlock'],
-  ['extendToStartOfNextBlock', 'moveFocusToStartOfNextBlock'],
-  ['extendToStartOfNextInline', 'moveFocusToStartOfNextInline'],
-  ['extendToStartOfNextText', 'moveFocusToStartOfNextText'],
-  ['extendToStartOfPreviousBlock', 'moveFocusToStartOfPreviousBlock'],
-  ['extendToStartOfPreviousInline', 'moveFocusToStartOfPreviousInline'],
-  ['extendToStartOfPreviousText', 'moveFocusToStartOfPreviousText'],
-  ['move', 'moveForward'],
-  ['moveAnchor', 'moveAnchorForward'],
-  ['moveAnchorCharBackward', 'moveAnchorBackward'],
-  ['moveAnchorCharForward', 'moveAnchorForward'],
-  ['moveAnchorOffsetTo', 'moveAnchorTo'],
-  ['moveAnchorToEndOf', 'moveAnchorToEndOfNode'],
-  ['moveAnchorToStartOf', 'moveAnchorToStartOfNode'],
-  ['moveCharBackward', 'moveBackward'],
-  ['moveCharForward', 'moveForward'],
-  ['moveEnd', 'moveEndForward'],
-  ['moveEndCharBackward', 'moveEndBackward'],
-  ['moveEndCharForward', 'moveEndForward'],
-  ['moveEndOffsetTo', 'moveEndTo'],
-  ['moveFocus', 'moveFocusForward'],
-  ['moveFocusCharBackward', 'moveFocusBackward'],
-  ['moveFocusCharForward', 'moveFocusForward'],
-  ['moveFocusOffsetTo', 'moveFocusTo'],
-  ['moveFocusToEndOf', 'moveFocusToEndOfNode'],
-  ['moveFocusToStartOf', 'moveFocusToStartOfNode'],
-  ['moveStart', 'moveStartForward'],
-  ['moveStartCharBackward', 'moveStartBackward'],
-  ['moveStartCharForward', 'moveStartForward'],
-  ['moveStartOffsetTo', 'moveStartTo'],
-  ['moveToEndOf', 'moveToEndOfNode'],
-  ['moveToRangeOf', 'moveToRangeOfNode'],
-  ['moveToStartOf', 'moveToStartOfNode'],
-  ['selectAll', 'moveToRangeOfDocument'],
-]
-
-DEPRECATEDS.forEach(([deprecated, method]) => {
-  Changes[deprecated] = function(change, ...args) {
-    logger.deprecate(
-      '0.37.0',
-      `The \`Change.${deprecated}\` method is deprecated, please use \`Change.${method}\` instead.`
-    )
-
-    change[method](...args)
-  }
-})
 
 export default Changes

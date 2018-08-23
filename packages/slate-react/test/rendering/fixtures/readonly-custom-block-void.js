@@ -20,6 +20,13 @@ function renderNode(props) {
 export const props = {
   readOnly: true,
   renderNode,
+  schema: {
+    blocks: {
+      image: {
+        isVoid: true,
+      },
+    },
+  },
 }
 
 export const value = (

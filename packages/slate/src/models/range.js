@@ -1,5 +1,4 @@
 import isPlainObject from 'is-plain-object'
-import logger from 'slate-dev-logger'
 import { List, Record } from 'immutable'
 
 import Decoration from './decoration'
@@ -42,24 +41,6 @@ class Range extends Record(DEFAULTS) {
     }
 
     if (isPlainObject(attrs)) {
-      if ('isFocused' in attrs || 'marks' in attrs) {
-        logger.deprecate(
-          '0.39.0',
-          'Using `Range.create` for selections is deprecated, please use `Selection.create` instead.'
-        )
-
-        return Selection.create(attrs)
-      }
-
-      if ('isAtomic' in attrs) {
-        logger.deprecate(
-          '0.39.0',
-          'Using `Range.create` for decorations is deprecated, please use `Decoration.create` instead.'
-        )
-
-        return Decoration.create(attrs)
-      }
-
       return Range.fromJSON(attrs)
     }
 
@@ -121,39 +102,7 @@ class Range extends Record(DEFAULTS) {
    */
 
   static fromJSON(object) {
-    let { anchor, focus } = object
-
-    if (
-      !anchor &&
-      (object.anchorKey || object.anchorOffset || object.anchorPath)
-    ) {
-      logger.deprecate(
-        '0.37.0',
-        '`Range` objects now take a `Point` object as an `anchor` instead of taking `anchorKey/Offset/Path` properties. But you passed:',
-        object
-      )
-
-      anchor = {
-        key: object.anchorKey,
-        offset: object.anchorOffset,
-        path: object.anchorPath,
-      }
-    }
-
-    if (!focus && (object.focusKey || object.focusOffset || object.focusPath)) {
-      logger.deprecate(
-        '0.37.0',
-        '`Range` objects now take a `Point` object as a `focus` instead of taking `focusKey/Offset/Path` properties. But you passed:',
-        object
-      )
-
-      focus = {
-        key: object.focusKey,
-        offset: object.focusOffset,
-        path: object.focusPath,
-      }
-    }
-
+    const { anchor, focus } = object
     const range = new Range({
       anchor: Point.fromJSON(anchor || {}),
       focus: Point.fromJSON(focus || {}),
