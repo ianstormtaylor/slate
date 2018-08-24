@@ -1,0 +1,114 @@
+{
+  "document": {
+    "nodes": [
+      {
+        "object": "block",
+        "type": "paragraph",
+        "nodes": [
+          {
+            "object": "text",
+            "leaves": [
+              {
+                "text": "This is editable "
+              },
+              {
+                "text": "rich",
+                "marks": [
+                  {
+                    "type": "bold"
+                  },
+                  {
+                    "type": "italic"
+                  }
+                ]
+              },
+              {
+                "text": " text that is being styled by Bootstrap's CSS rules!"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "object": "block",
+        "type": "paragraph",
+        "nodes": [
+          {
+            "object": "text",
+            "leaves": [
+              {
+                "text": "Since it's rich text, you can do things like turn a selection of text "
+              },
+              {
+                "text": "bold",
+                "marks": [
+                  {
+                    "type": "bold"
+                  }
+                ]
+              },{
+                "text": ", or add a semantically rendered block quote in the middle of the page, like this:"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "object": "block",
+        "type": "block-quote",
+        "nodes": [
+          {
+            "object": "text",
+            "leaves": [
+              {
+                "text": "A wise quote."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "object": "block",
+        "type": "paragraph",
+        "nodes": [
+          {
+            "object": "text",
+            "leaves": [
+              {
+                "text": "And since it's inside an iframe which loads Bootstrap's CSS, the content will automatically take on Bootstrap's style rules. For example, code blocks will look like Bootstrap code blocks do:"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "object": "block",
+        "type": "block-code",
+        "nodes": [
+          {
+            "object": "text",
+            "leaves": [
+              {
+                "text": "console.log('Hello world!');"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "object": "block",
+        "type": "paragraph",
+        "nodes": [
+          {
+            "object": "text",
+            "leaves": [
+              {
+                "text": "Try it out for yourself!"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

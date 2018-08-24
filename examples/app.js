@@ -9,6 +9,7 @@ import ForcedLayout from './forced-layout'
 import History from './history'
 import HoveringMenu from './hovering-menu'
 import HugeDocument from './huge-document'
+import Iframes from './iframes'
 import Images from './images'
 import Links from './links'
 import MarkdownPreview from './markdown-preview'
@@ -35,6 +36,7 @@ const EXAMPLES = [
   ['Hovering Menu', HoveringMenu, '/hovering-menu'],
   ['Links', Links, '/links'],
   ['Images', Images, '/images'],
+  ['Iframes', Iframes, '/iframes'],
   ['Embeds', Embeds, '/embeds'],
   ['Emojis', Emojis, '/emojis'],
   ['Markdown Preview', MarkdownPreview, '/markdown-preview'],
