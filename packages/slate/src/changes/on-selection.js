@@ -574,7 +574,7 @@ Changes.select = (change, properties, options = {}) => {
   }
 
   // If there are no new properties to set, abort to avoid extra operations.
-  if (Object.keys(props).lengtgh === 0) {
+  if (Object.keys(props).length === 0) {
     return
   }
 
