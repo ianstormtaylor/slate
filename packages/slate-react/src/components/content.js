@@ -273,7 +273,9 @@ class Content extends React.Component {
    */
 
   onEvent(handler, event) {
-    debug('onEvent', handler)
+    if (handler !== 'onMouseMove') {
+      debug('onEvent', handler)
+    }
 
     // Ignore `onBlur`, `onFocus` and `onSelect` events generated
     // programmatically while updating selection.
