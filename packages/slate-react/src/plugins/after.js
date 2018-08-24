@@ -672,7 +672,7 @@ function AfterPlugin() {
     // collapsed, and the new selection is also collapsed start; Then extend the
     // selection rather than move the selection;
     if (
-      event.timeStamp - lastMousePressedMovingTimeStamp < 24 &&
+      event.timeStamp - lastMousePressedMovingTimeStamp < 0 &&
       range.isCollapsed &&
       value.selection.isCollapsed
     ) {
