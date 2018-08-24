@@ -33,7 +33,7 @@ const debug = Debug('slate:after')
 
 function AfterPlugin() {
   let isDraggingInternally = null
-  let lastMouseMovingTimeStamp
+  let lastMousePressedMovingTimeStamp
 
   /**
    * On before input.
@@ -456,10 +456,23 @@ function AfterPlugin() {
     // It means the left key of mouse is pressed
     if (event.buttons % 2 === 1) {
       debug('onMouseMove', { event })
-      lastMouseMovingTimeStamp = event.timeStamp
+      lastMousePressedMovingTimeStamp = event.timeStamp
     } else {
-      lastMouseMovingTimeStamp = NaN
+      lastMousePressedMovingTimeStamp = NaN
     }
+  }
+
+  /*
+   * On mouse up
+   *
+   * @param {Event} event
+   * @param {Change} change
+   * @param {Editor} editor
+  */
+
+  function onMouseUp(event) {
+    debug('onMouseUp', { event })
+    if (event.buttons % 2 !== 1) lastMousePressedMovingTimeStamp = NaN
   }
 
   /**
@@ -659,7 +672,7 @@ function AfterPlugin() {
     // collapsed, and the new selection is also collapsed start; Then extend the
     // selection rather than move the selection;
     if (
-      event.timeStamp - lastMouseMovingTimeStamp < 24 &&
+      event.timeStamp - lastMousePressedMovingTimeStamp < 24 &&
       range.isCollapsed &&
       value.selection.isCollapsed
     ) {
@@ -807,6 +820,7 @@ function AfterPlugin() {
     onDrop,
     onInput,
     onMouseMove,
+    onMouseUp,
     onKeyDown,
     onPaste,
     onSelect,
