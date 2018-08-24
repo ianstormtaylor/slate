@@ -457,6 +457,8 @@ function AfterPlugin() {
     if (event.buttons % 2 === 1) {
       debug('onMouseMove', { event })
       lastMouseMovingTimeStamp = event.timeStamp
+    } else {
+      lastMouseMovingTimeStamp = NaN
     }
   }
 
