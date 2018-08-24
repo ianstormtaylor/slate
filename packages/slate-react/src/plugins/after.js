@@ -453,10 +453,9 @@ function AfterPlugin() {
   */
 
   function onMouseMove(event, change, editor) {
-    debug('onMouseMove', { event })
-
     // It means the left key of mouse is pressed
     if (event.buttons % 2 === 1) {
+      debug('onMouseMove', { event })
       lastMouseMovingTimeStamp = event.timeStamp
     }
   }
