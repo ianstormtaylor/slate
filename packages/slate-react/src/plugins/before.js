@@ -354,6 +354,9 @@ function BeforePlugin() {
       return true
     }
 
+    // This handles the case where .focus() was called directly on the DOM Node instead of via the editor
+    change.focus();
+
     debug('onFocus', { event })
   }
 
