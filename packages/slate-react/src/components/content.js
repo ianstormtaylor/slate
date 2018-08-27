@@ -91,13 +91,13 @@ class Content extends React.Component {
 
     window.document.addEventListener(
       'selectionchange',
-      this.onNativeSelectionChange
+      this.handlers.onNativeSelectionChange
     )
 
     // COMPAT: Restrict scope of `beforeinput` to clients that support the
     // Input Events Level 2 spec, since they are preventable events.
     if (HAS_INPUT_EVENTS_LEVEL_2) {
-      this.element.addEventListener('beforeinput', this.onBeforeInput)
+      this.element.addEventListener('beforeinput', this.handlers.onBeforeInput)
     }
 
     this.updateSelection()
