@@ -113,12 +113,15 @@ class Content extends React.Component {
     if (window) {
       window.document.removeEventListener(
         'selectionchange',
-        this.onNativeSelectionChange
+        this.handlers.onNativeSelectionChange
       )
     }
 
     if (HAS_INPUT_EVENTS_LEVEL_2) {
-      this.element.removeEventListener('beforeinput', this.onBeforeInput)
+      this.element.removeEventListener(
+        'beforeinput',
+        this.handlers.onBeforeInput
+      )
     }
   }
 
