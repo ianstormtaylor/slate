@@ -160,7 +160,7 @@ class MarkdownShortcuts extends React.Component {
       change.wrapBlock('bulleted-list')
     }
 
-    change.moveFocusToStartOf(startBlock).delete()
+    change.moveFocusToStartOfNode(startBlock).delete()
     return true
   }
 
