@@ -386,7 +386,7 @@ class Schema extends Record(DEFAULTS) {
  */
 
 function defaultNormalize(change, error) {
-  const { code, node, child, key, mark } = error
+  const { code, node, child, next, previous, key, mark } = error
 
   switch (code) {
     case 'child_object_invalid':
@@ -401,6 +401,24 @@ function defaultNormalize(change, error) {
         node.nodes.size === 1
         ? change.removeNodeByKey(node.key, { normalize: false })
         : change.removeNodeByKey(child.key, { normalize: false })
+    }
+
+    case 'previous_sibling_object_invalid':
+    case 'previous_sibling_type_invalid': {
+      return previous.object === 'text' &&
+        node.object === 'block' &&
+        node.nodes.size === 1
+        ? change.removeNodeByKey(node.key, { normalize: false })
+        : change.removeNodeByKey(previous.key, { normalize: false })
+    }
+
+    case 'next_sibling_object_invalid':
+    case 'next_sibling_type_invalid': {
+      return next.object === 'text' &&
+        node.object === 'block' &&
+        node.nodes.size === 1
+        ? change.removeNodeByKey(node.key, { normalize: false })
+        : change.removeNodeByKey(next.key, { normalize: false })
     }
 
     case 'child_required':
@@ -493,18 +511,25 @@ function validateRules(object, rule, rules, options = {}) {
 function validateObject(node, rule) {
   if (rule.object == null) return
   if (rule.object === node.object) return
+  if (typeof rule.object === 'function' && rule.object(node.object)) return
   return fail('node_object_invalid', { rule, node })
 }
 
 function validateType(node, rule) {
   if (rule.type == null) return
   if (rule.type === node.type) return
+  if (typeof rule.type === 'function' && rule.type(node.type)) return
   return fail('node_type_invalid', { rule, node })
 }
 
 function validateData(node, rule) {
   if (rule.data == null) return
   if (node.data == null) return
+
+  if (typeof rule.data === 'function') {
+    if (rule.data(node.data)) return
+    return fail('node_data_invalid', { rule, node })
+  }
 
   for (const key in rule.data) {
     const fn = rule.data[key]
@@ -520,7 +545,12 @@ function validateMarks(node, rule) {
   const marks = node.getMarks().toArray()
 
   for (const mark of marks) {
-    const valid = rule.marks.some(def => def.type === mark.type)
+    const valid = rule.marks.some(
+      def =>
+        typeof def.type === 'function'
+          ? def.type(mark.type)
+          : def.type === mark.type
+    )
     if (valid) continue
     return fail('node_mark_invalid', { rule, node, mark })
   }

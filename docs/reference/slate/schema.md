@@ -154,6 +154,24 @@ Will determine whether the node is treated as a "void" node or not, making its c
 
 Will validate the last child node against a [`match`](#match).
 
+### `next`
+
+`Object|Array`
+
+```js
+{
+  next: { type: 'quote' },
+}
+```
+
+```js
+{
+  next: [{ type: 'quote' }, { type: 'paragraph' }],
+}
+```
+
+Will validate the next sibling node against a [`match`](#match).
+
 ### `nodes`
 
 `Array`
@@ -230,6 +248,24 @@ For more information on the arguments passed to `normalize`, see the [Normalizin
 ```
 
 Will validate a node's parent against a [`match`](#match).
+
+### `previous`
+
+`Object|Array`
+
+```js
+{
+  previous: { type: 'quote' },
+}
+```
+
+```js
+{
+  previous: [{ type: 'quote' }, { type: 'paragraph' }],
+}
+```
+
+Will validate the previous sibling node against a [`match`](#match).
 
 ### `text`
 
@@ -380,6 +416,30 @@ Raised when the `object` property of the last child node is invalid, when a spec
 
 Raised when the `type` property of the last child node is invalid, when a specific `last` rule was defined in a schema.
 
+### `'next_sibling_object_invalid'`
+
+```js
+{
+  next: Node,
+  node: Node,
+  rule: Object,
+}
+```
+
+Raised when the `object` property of the next sibling node is invalid, when a specific `next` rule was defined in a schema.
+
+### `'next_sibling_type_invalid'`
+
+```js
+{
+  next: Node,
+  node: Node,
+  rule: Object,
+}
+```
+
+Raised when the `type` property of the next sibling node is invalid, when a specific `next` rule was defined in a schema.
+
 ### `'node_data_invalid'`
 
 ```js
@@ -451,3 +511,27 @@ Raised when the `object` property of the parent of a node is invalid, when a spe
 ```
 
 Raised when the `type` property of the parent of a node is invalid, when a specific `parent` rule was defined in a schema.
+
+### `'previous_sibling_object_invalid'`
+
+```js
+{
+  previous: Node,
+  node: Node,
+  rule: Object,
+}
+```
+
+Raised when the `object` property of the previous sibling node is invalid, when a specific `previous` rule was defined in a schema.
+
+### `'previous_sibling_type_invalid'`
+
+```js
+{
+  previous: Node,
+  node: Node,
+  rule: Object,
+}
+```
+
+Raised when the `type` property of the previous sibling node is invalid, when a specific `previous` rule was defined in a schema.
