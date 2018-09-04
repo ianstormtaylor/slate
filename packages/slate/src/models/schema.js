@@ -386,7 +386,7 @@ class Schema extends Record(DEFAULTS) {
  */
 
 function defaultNormalize(change, error) {
-  const { code, node, child, key, mark } = error
+  const { code, node, child, next, previous, key, mark } = error
 
   switch (code) {
     case 'child_object_invalid':
@@ -401,6 +401,24 @@ function defaultNormalize(change, error) {
         node.nodes.size === 1
         ? change.removeNodeByKey(node.key, { normalize: false })
         : change.removeNodeByKey(child.key, { normalize: false })
+    }
+
+    case 'previous_sibling_object_invalid':
+    case 'previous_sibling_type_invalid': {
+      return previous.object === 'text' &&
+        node.object === 'block' &&
+        node.nodes.size === 1
+        ? change.removeNodeByKey(node.key, { normalize: false })
+        : change.removeNodeByKey(previous.key, { normalize: false })
+    }
+
+    case 'next_sibling_object_invalid':
+    case 'next_sibling_type_invalid': {
+      return next.object === 'text' &&
+        node.object === 'block' &&
+        node.nodes.size === 1
+        ? change.removeNodeByKey(node.key, { normalize: false })
+        : change.removeNodeByKey(next.key, { normalize: false })
     }
 
     case 'child_required':
