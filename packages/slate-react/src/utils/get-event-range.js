@@ -40,12 +40,12 @@ function getEventRange(event, value) {
       const previousText = document.getPreviousText(text.key)
 
       if (previousText) {
-        return range.moveToEndOf(previousText)
+        return range.moveToEndOfNode(previousText)
       }
     }
 
     const nextText = document.getNextText(text.key)
-    return nextText ? range.moveToStartOf(nextText) : null
+    return nextText ? range.moveToStartOfNode(nextText) : null
   }
 
   // Else resolve a range from the caret position where the drop occured.
