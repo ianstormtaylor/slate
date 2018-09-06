@@ -8,6 +8,8 @@ That said, just because Slate is agnostic doesn't mean you aren't going to need 
 
 To that end, Slate provides a `Schema` model, which allows you to easily define validations for the structure of your documents, and to fix them if the document ever becomes invalid. This guide will show you how they work.
 
+> ❗️To tell Slate about your custom schema add it to the editor as a prop [like this](https://github.com/ianstormtaylor/slate/blob/405cef0225c314b4162d587c74cfce6b65a7b257/examples/forced-layout/index.js#L62).
+
 ## Basic Schemas
 
 Slate schemas are defined as Javascript objects, with properties that describe the document, block nodes, and inline nodes in your editor. Here's a simple schema:
