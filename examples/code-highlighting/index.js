@@ -226,18 +226,10 @@ class CodeHighlighting extends React.Component {
 
       if (typeof token != 'string') {
         const dec = {
-          anchor: {
-            key: startText.key,
-            offset: startOffset,
-          },
-          focus: {
-            key: endText.key,
-            offset: endOffset,
-          },
-          mark: {
-            type: token.type,
-          },
-        }
+            anchor: { key: startText.key, offset: startOffset, path: node.getPath(startText.key) },
+            focus: { key: endText.key, offset: endOffset, path: node.getPath(endText.key) },
+            mark: { type: token.type }
+          }
 
         decorations.push(dec)
       }
