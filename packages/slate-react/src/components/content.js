@@ -144,6 +144,11 @@ class Content extends React.Component {
     const { isBackward } = selection
     const window = getWindow(this.element)
     const native = window.getSelection()
+
+    // .getSelection() can return null in some cases
+    // https://bugzilla.mozilla.org/show_bug.cgi?id=827585
+    if (!native) return
+
     const { rangeCount, anchorNode } = native
 
     // If both selections are blurred, do nothing.
