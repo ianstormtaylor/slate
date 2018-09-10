@@ -214,7 +214,7 @@ class Editor extends React.Component {
         false,
         `editor.value is initializing during onChange. Please call editor.props.value instead.`
       )
-      return this.props.onChange
+      return this.props.value
     }
 
     const value = this.resolveValue(this.plugins, this.props.value)
