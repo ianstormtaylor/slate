@@ -82,6 +82,7 @@ class Editor extends React.Component {
   tmp = {
     change: null,
     isChanging: false,
+    isResolvingValue: false,
     operationsSize: null,
     plugins: null,
     resolves: 0,
@@ -206,6 +207,14 @@ class Editor extends React.Component {
       this.props.value === this.tmp.value
     ) {
       return this.tmp.value
+    }
+
+    if (this.tmp.isResolvingValue) {
+      warning(
+        false,
+        `editor.value is initializing during onChange. Please call editor.props.value instead.`
+      )
+      return this.props.onChange
     }
 
     const value = this.resolveValue(this.plugins, this.props.value)
@@ -390,13 +399,20 @@ class Editor extends React.Component {
   resolveValue = memoizeOne((plugins, value) => {
     debug('resolveValue', { plugins, value })
     let change = value.change()
-    change = this.resolveChange(plugins, change, change.operations.size)
+    this.tmp.isResolvingValue = true
+
+    try {
+      change = this.resolveChange(plugins, change, change.operations.size)
+    } catch (error) {
+      throw error
+    } finally {
+      this.tmp.isResolvingValue = false
+    }
 
     // Store the change and it's operations count so that it can be flushed once
     // the component next updates.
     this.tmp.change = change
     this.tmp.operationsSize = change.operations.size
-
     return change.value
   })
 }
