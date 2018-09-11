@@ -526,22 +526,14 @@ function AfterPlugin() {
     // an inline is selected, we need to handle these hotkeys manually because
     // browsers won't know what to do.
     if (Hotkeys.isMoveBackward(event)) {
-      const { previousText, startText } = value
-      const isPreviousInVoid =
-        previousText && document.hasVoidParent(previousText.key, schema)
-
-      if (hasVoidParent || isPreviousInVoid || startText.text == '') {
+      if (hasVoidParent || value.startText.text == '') {
         event.preventDefault()
         return change.moveBackward()
       }
     }
 
     if (Hotkeys.isMoveForward(event)) {
-      const { nextText, startText } = value
-      const isNextInVoid =
-        nextText && document.hasVoidParent(nextText.key, schema)
-
-      if (hasVoidParent || isNextInVoid || startText.text == '') {
+      if (hasVoidParent || value.startText.text == '') {
         event.preventDefault()
         return change.moveForward()
       }
