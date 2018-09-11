@@ -530,7 +530,7 @@ function AfterPlugin() {
       const isPreviousInVoid =
         previousText && document.hasVoidParent(previousText.key, schema)
 
-      if (hasVoidParent || isPreviousInVoid || startText.text == '') {
+      if (hasVoidParent || (isPreviousInVoid && startText.text == '')) {
         event.preventDefault()
         return change.moveBackward()
       }
@@ -541,7 +541,7 @@ function AfterPlugin() {
       const isNextInVoid =
         nextText && document.hasVoidParent(nextText.key, schema)
 
-      if (hasVoidParent || isNextInVoid || startText.text == '') {
+      if (hasVoidParent || (isNextInVoid && startText.text == '')) {
         event.preventDefault()
         return change.moveForward()
       }
