@@ -14,7 +14,7 @@
   ],
   "dependencies": {
     "is-hotkey": "^0.1.1",
-    "slate-dev-environment": "^0.1.2"
+    "@gitbook/slate-dev-environment": "^0.1.2"
   },
   "scripts": {
     "clean": "rm -rf ./dist ./lib ./node_modules"

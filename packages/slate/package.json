@@ -19,8 +19,8 @@
     "is-empty": "^1.0.0",
     "is-plain-object": "^2.0.4",
     "lodash": "^4.17.4",
-    "slate-dev-logger": "^0.1.39",
-    "slate-schema-violations": "^0.1.20",
+    "@gitbook/slate-dev-logger": "^0.1.39",
+    "@gitbook/slate-schema-violations": "^0.1.20",
     "type-of": "^2.0.1"
   },
   "peerDependencies": {
@@ -28,7 +28,7 @@
     "react": ">=0.14.0"
   },
   "devDependencies": {
-    "slate-hyperscript": "^0.5.22"
+    "@gitbook/slate-hyperscript": "^0.5.22"
   },
   "scripts": {
     "clean": "rm -rf ./dist ./lib ./node_modules"

@@ -13,7 +13,7 @@
     "lib/"
   ],
   "dependencies": {
-    "slate-dev-logger": "^0.1.39"
+    "@gitbook/slate-dev-logger": "^0.1.39"
   },
   "peerDependencies": {
     "immutable": ">=3.8.1",

@@ -15,7 +15,7 @@
   "dependencies": {
     "is-empty": "^1.0.0",
     "is-plain-object": "^2.0.4",
-    "slate-dev-logger": "^0.1.39"
+    "@gitbook/slate-dev-logger": "^0.1.39"
   },
   "peerDependencies": {
     "slate": ">=0.32.0"

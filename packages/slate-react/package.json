@@ -22,12 +22,12 @@
     "react-immutable-proptypes": "^2.1.0",
     "react-portal": "^3.1.0",
     "selection-is-backward": "^1.0.0",
-    "slate-base64-serializer": "^0.2.41",
-    "slate-dev-environment": "^0.1.2",
-    "slate-dev-logger": "^0.1.39",
-    "slate-hotkeys": "^0.1.2",
-    "slate-plain-serializer": "^0.5.22",
-    "slate-prop-types": "^0.4.39"
+    "@gitbook/slate-base64-serializer": "^0.2.41",
+    "@gitbook/slate-dev-environment": "^0.1.2",
+    "@gitbook/slate-dev-logger": "^0.1.39",
+    "@gitbook/slate-hotkeys": "^0.1.2",
+    "@gitbook/slate-plain-serializer": "^0.5.22",
+    "@gitbook/slate-prop-types": "^0.4.39"
   },
   "peerDependencies": {
     "immutable": ">=3.8.1",
@@ -39,8 +39,8 @@
     "immutable": "^3.8.1",
     "mocha": "^2.5.3",
     "slate": "^0.34.7",
-    "slate-hyperscript": "^0.5.22",
-    "slate-simulator": "^0.4.39"
+    "@gitbook/slate-hyperscript": "^0.5.22",
+    "@gitbook/slate-simulator": "^0.4.39"
   },
   "scripts": {
     "clean": "rm -rf ./dist ./lib ./node_modules"
