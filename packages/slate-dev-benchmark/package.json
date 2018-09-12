@@ -1,5 +1,5 @@
 {
-  "name": "slate-dev-benchmark",
+  "name": "@gitbook/slate-dev-benchmark",
   "description": "A simple, development-only benchmark for Slate",
   "version": "0.0.2",
   "license": "MIT",

@@ -1,5 +1,5 @@
 {
-  "name": "slate-html-serializer",
+  "name": "@gitbook/slate-html-serializer",
   "description": "An HTML serializer for Slate editors.",
   "version": "0.6.13",
   "license": "MIT",

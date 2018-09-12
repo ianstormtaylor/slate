@@ -1,5 +1,5 @@
 {
-  "name": "slate",
+  "name": "@gitbook/slate",
   "description": "A completely customizable framework for building rich text editors.",
   "version": "0.34.7",
   "license": "MIT",

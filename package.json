@@ -1,6 +1,6 @@
 {
   "private": true,
-  "name": "slate-packages",
+  "name": "@gitbook/slate-packages",
   "workspaces": [
     "packages/*"
   ],

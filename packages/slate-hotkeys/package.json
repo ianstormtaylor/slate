@@ -1,5 +1,5 @@
 {
-  "name": "slate-hotkeys",
+  "name": "@gitbook/slate-hotkeys",
   "description": "A set of function to detect common keypresses in a platform-agnostic way",
   "version": "0.1.2",
   "license": "MIT",

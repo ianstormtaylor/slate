@@ -1,5 +1,5 @@
 {
-  "name": "slate-base64-serializer",
+  "name": "@gitbook/slate-base64-serializer",
   "description": "A Base64 serializer for Slate editors.",
   "version": "0.2.41",
   "license": "MIT",

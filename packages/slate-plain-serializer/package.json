@@ -1,5 +1,5 @@
 {
-  "name": "slate-plain-serializer",
+  "name": "@gitbook/slate-plain-serializer",
   "description": "A plain text serializer for Slate editors.",
   "version": "0.5.22",
   "license": "MIT",
