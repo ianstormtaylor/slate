@@ -1,6 +1,6 @@
 import Debug from 'debug'
 import isPlainObject from 'is-plain-object'
-import logger from 'slate-dev-logger'
+import logger from '@gitbook/slate-dev-logger'
 import mergeWith from 'lodash/mergeWith'
 import { Record } from 'immutable'
 
@@ -19,7 +19,7 @@ import {
   NODE_TEXT_INVALID,
   PARENT_OBJECT_INVALID,
   PARENT_TYPE_INVALID,
-} from 'slate-schema-violations'
+} from '@gitbook/slate-schema-violations'
 
 import CORE_SCHEMA_RULES from '../constants/core-schema-rules'
 import MODEL_TYPES from '../constants/model-types'

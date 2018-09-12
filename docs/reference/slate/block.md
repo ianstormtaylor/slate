@@ -1,7 +1,7 @@
 # `Block`
 
 ```js
-import { Block } from 'slate'
+import { Block } from '@gitbook/slate'
 ```
 
 A block node in a Slate [`Document`](./document.md). Block nodes implement the [`Node`](./node.md) interface.

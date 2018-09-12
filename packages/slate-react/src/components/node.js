@@ -1,8 +1,8 @@
 import Debug from 'debug'
 import ImmutableTypes from 'react-immutable-proptypes'
 import React from 'react'
-import SlateTypes from 'slate-prop-types'
-import logger from 'slate-dev-logger'
+import SlateTypes from '@gitbook/slate-prop-types'
+import logger from '@gitbook/slate-dev-logger'
 import Types from 'prop-types'
 
 import Void from './void'

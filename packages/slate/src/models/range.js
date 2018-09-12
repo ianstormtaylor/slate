@@ -1,5 +1,5 @@
 import isPlainObject from 'is-plain-object'
-import logger from 'slate-dev-logger'
+import logger from '@gitbook/slate-dev-logger'
 import { List, Record, Set } from 'immutable'
 
 import MODEL_TYPES from '../constants/model-types'

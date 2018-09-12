@@ -1,5 +1,5 @@
 import { isKeyHotkey } from 'is-hotkey'
-import { IS_IOS, IS_MAC } from 'slate-dev-environment'
+import { IS_IOS, IS_MAC } from '@gitbook/slate-dev-environment'
 
 /**
  * Is Apple?

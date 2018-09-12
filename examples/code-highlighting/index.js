@@ -1,5 +1,5 @@
-import { Editor } from 'slate-react'
-import { Value } from 'slate'
+import { Editor } from '@gitbook/slate-react'
+import { Value } from '@gitbook/slate'
 
 import Prism from 'prismjs'
 import React from 'react'

@@ -1,4 +1,4 @@
-import logger from 'slate-dev-logger'
+import logger from '@gitbook/slate-dev-logger'
 import Block from '../models/block'
 import Inline from '../models/inline'
 import Mark from '../models/mark'

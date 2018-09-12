@@ -1,6 +1,6 @@
 import AfterPlugin from '../../src/plugins/after'
 import BeforePlugin from '../../src/plugins/before'
-import Simulator from 'slate-simulator'
+import Simulator from '@gitbook/slate-simulator'
 import assert from 'assert'
 import fs from 'fs'
 import toCamel from 'to-camel-case' // eslint-disable-line import/no-extraneous-dependencies

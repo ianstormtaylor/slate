@@ -1,10 +1,10 @@
 import Debug from 'debug'
 import Portal from 'react-portal'
 import React from 'react'
-import SlateTypes from 'slate-prop-types'
+import SlateTypes from '@gitbook/slate-prop-types'
 import Types from 'prop-types'
-import logger from 'slate-dev-logger'
-import { Schema, Stack } from 'slate'
+import logger from '@gitbook/slate-dev-logger'
+import { Schema, Stack } from '@gitbook/slate'
 
 import EVENT_HANDLERS from '../constants/event-handlers'
 import PLUGINS_PROPS from '../constants/plugin-props'

@@ -1,6 +1,6 @@
 import getWindow from 'get-window'
 
-import { Range } from 'slate'
+import { Range } from '@gitbook/slate'
 import findNode from './find-node'
 import findRange from './find-range'
 

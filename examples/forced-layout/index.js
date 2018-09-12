@@ -1,6 +1,6 @@
-import { Editor } from 'slate-react'
-import { Block, Value } from 'slate'
-import { CHILD_REQUIRED, CHILD_TYPE_INVALID } from 'slate-schema-violations'
+import { Editor } from '@gitbook/slate-react'
+import { Block, Value } from '@gitbook/slate'
+import { CHILD_REQUIRED, CHILD_TYPE_INVALID } from '@gitbook/slate-schema-violations'
 
 import React from 'react'
 import initialValue from './value.json'

@@ -1,6 +1,6 @@
 /** @jsx h */
 
-import { LAST_CHILD_OBJECT_INVALID } from 'slate-schema-violations'
+import { LAST_CHILD_OBJECT_INVALID } from '@gitbook/slate-schema-violations'
 import h from '../../helpers/h'
 
 export const schema = {

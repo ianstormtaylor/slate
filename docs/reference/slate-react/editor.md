@@ -1,7 +1,7 @@
 # `<Editor>`
 
 ```js
-import { Editor } from 'slate-react'
+import { Editor } from '@gitbook/slate-react'
 ```
 
 The top-level React component that renders the Slate editor itself.

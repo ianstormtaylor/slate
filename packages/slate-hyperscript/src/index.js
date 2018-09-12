@@ -1,7 +1,7 @@
 import isEmpty from 'is-empty'
 import isPlainObject from 'is-plain-object'
 
-import { Block, Document, Inline, Mark, Node, Range, Text, Value } from 'slate'
+import { Block, Document, Inline, Mark, Node, Range, Text, Value } from '@gitbook/slate'
 
 /**
  * Create selection point constants, for comparison by reference.

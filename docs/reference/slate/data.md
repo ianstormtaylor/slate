@@ -1,7 +1,7 @@
 # `Data`
 
 ```js
-import { Data } from 'slate'
+import { Data } from '@gitbook/slate'
 ```
 
 Data is simply a thin wrapper around [`Immutable.Map`](https://facebook.github.io/immutable-js/docs/#/Map), so that you don't need to ever depend on Immutable directly, and for future compatibility.

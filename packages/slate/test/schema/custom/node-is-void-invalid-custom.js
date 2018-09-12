@@ -1,6 +1,6 @@
 /** @jsx h */
 
-import { NODE_IS_VOID_INVALID } from 'slate-schema-violations'
+import { NODE_IS_VOID_INVALID } from '@gitbook/slate-schema-violations'
 import h from '../../helpers/h'
 
 export const schema = {

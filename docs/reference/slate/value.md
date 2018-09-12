@@ -1,7 +1,7 @@
 # `Value`
 
 ```js
-import { Value } from 'slate'
+import { Value } from '@gitbook/slate'
 ```
 
 A `Value` is the top-level representation of data in Slate, containing both a [`Document`](./document.md) and a selection [`Range`](./range.md). It's what you need to pass into the Slate [`<Editor>`](../slate-react/editor.md) to render something onto the page.

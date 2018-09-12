@@ -1,8 +1,8 @@
 # `slate-hyperscript`
 
 ```js
-import h from 'slate-hyperscript'
-import { createHyperscript } from 'slate-hyperscript'
+import h from '@gitbook/slate-hyperscript'
+import { createHyperscript } from '@gitbook/slate-hyperscript'
 ```
 
 A hyperscript helper for writing Slate documents with JSX!
@@ -12,7 +12,7 @@ A hyperscript helper for writing Slate documents with JSX!
 ```js
 /** @jsx h */
 
-import h from 'slate-hyperscript'
+import h from '@gitbook/slate-hyperscript'
 
 const value = (
   <value>
@@ -33,7 +33,7 @@ const value = (
 ```js
 /** @jsx h */
 
-import { createHyperscript } from 'slate-hyperscript'
+import { createHyperscript } from '@gitbook/slate-hyperscript'
 
 const h = createHyperscript({
   blocks: {

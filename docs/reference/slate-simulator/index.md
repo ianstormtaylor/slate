@@ -1,7 +1,7 @@
 # `slate-simulator`
 
 ```js
-import Simulator from 'slate-simulator'
+import Simulator from '@gitbook/slate-simulator'
 ```
 
 A simulator to help writing tests for Slate editors and plugins. By default the simulator does not include the [core plugins](https://docs.slatejs.org/guides/plugins#core-plugins) as they have a lot of dependencies on browser-specific globals, so running them in CI environments is very hard. If you need the core plugins for your use case you need to import them manually.
@@ -9,7 +9,7 @@ A simulator to help writing tests for Slate editors and plugins. By default the 
 ## Example
 
 ```js
-import Simulator from 'slate-simulator'
+import Simulator from '@gitbook/slate-simulator'
 
 const value = ...
 const plugins = [ ... ]
@@ -31,8 +31,8 @@ const newValue = simulator.value
 ## Example with core plugins
 
 ```js
-import Simulator from 'slate-simulator'
-import { BeforePlugin, AfterPlugin } from 'slate-react'
+import Simulator from '@gitbook/slate-simulator'
+import { BeforePlugin, AfterPlugin } from '@gitbook/slate-react'
 
 const value = ...
 const plugins = [ BeforePlugin(), ... , AfterPlugin() ]
@@ -66,7 +66,7 @@ class FakeDataTransfer {
 Later, you can use it this way to fake a paste event:
 
 ```js
-import { setEventTransfer } from 'slate-react'
+import { setEventTransfer } from '@gitbook/slate-react'
 
 const pastedText = 'slatejs.org'
 

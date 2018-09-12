@@ -4,7 +4,7 @@
 
 import assert from 'assert'
 import fs from 'fs'
-import { Value } from 'slate'
+import { Value } from '@gitbook/slate'
 import { basename, extname, resolve } from 'path'
 
 /**

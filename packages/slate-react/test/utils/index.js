@@ -2,7 +2,7 @@
  * Dependencies.
  */
 
-import { resetKeyGenerator } from 'slate'
+import { resetKeyGenerator } from '@gitbook/slate'
 
 /**
  * Tests.

@@ -1,7 +1,7 @@
 # `Text`
 
 ```js
-import { Text } from 'slate'
+import { Text } from '@gitbook/slate'
 ```
 
 A text node in a Slate [`Document`](./document.md). Text nodes are always the bottom-most leaves in the document, just like in the DOM.

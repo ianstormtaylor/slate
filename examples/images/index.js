@@ -1,6 +1,6 @@
-import { Editor, getEventRange, getEventTransfer } from 'slate-react'
-import { Block, Value } from 'slate'
-import { LAST_CHILD_TYPE_INVALID } from 'slate-schema-violations'
+import { Editor, getEventRange, getEventTransfer } from '@gitbook/slate-react'
+import { Block, Value } from '@gitbook/slate'
+import { LAST_CHILD_TYPE_INVALID } from '@gitbook/slate-schema-violations'
 
 import React from 'react'
 import initialValue from './value.json'

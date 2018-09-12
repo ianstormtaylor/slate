@@ -1,7 +1,7 @@
 # `Change`
 
 ```js
-import { Change } from 'slate'
+import { Change } from '@gitbook/slate'
 ```
 
 A change allows you to define a series of changes you'd like to make to the current [`Value`](./value.md).

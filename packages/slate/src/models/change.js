@@ -1,6 +1,6 @@
 import Debug from 'debug'
 import isPlainObject from 'is-plain-object'
-import logger from 'slate-dev-logger'
+import logger from '@gitbook/slate-dev-logger'
 import pick from 'lodash/pick'
 import { List } from 'immutable'
 

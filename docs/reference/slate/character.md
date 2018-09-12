@@ -1,7 +1,7 @@
 # `Character`
 
 ```js
-import { Character } from 'slate'
+import { Character } from '@gitbook/slate'
 ```
 
 A character in a [`Text`](./text.md) node.

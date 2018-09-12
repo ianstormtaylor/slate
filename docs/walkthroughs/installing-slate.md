@@ -20,15 +20,15 @@ Slate exposes a set of modules that you'll use to build your editor. The most im
 
 ```js
 // Import the Slate editor.
-import { Editor } from 'slate-react'
+import { Editor } from '@gitbook/slate-react'
 ```
 
 In addition to rendering the editor, you need to give Slate a "initial value" to render as content. We'll use the `Value` model that ships with Slate to create a new initial value that just contains a single paragraph block with some text in it:
 
 ```js
 // Import the `Value` model.
-import { Editor } from 'slate-react'
-import { Value } from 'slate'
+import { Editor } from '@gitbook/slate-react'
+import { Value } from '@gitbook/slate'
 
 // Create our initial value...
 const initialValue = Value.fromJSON({
@@ -58,8 +58,8 @@ And now that we've our initial value, we define our `App` and pass it into Slate
 ```js
 // Import React!
 import React from 'react'
-import { Editor } from 'slate-react'
-import { Value } from 'slate'
+import { Editor } from '@gitbook/slate-react'
+import { Value } from '@gitbook/slate'
 
 const initialValue = Value.fromJSON({
   document: {

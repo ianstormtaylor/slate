@@ -1,5 +1,5 @@
-import Base64 from 'slate-base64-serializer'
-import { IS_IE } from 'slate-dev-environment'
+import Base64 from '@gitbook/slate-base64-serializer'
+import { IS_IE } from '@gitbook/slate-dev-environment'
 import TRANSFER_TYPES from '../constants/transfer-types'
 
 /**

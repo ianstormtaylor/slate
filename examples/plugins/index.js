@@ -1,9 +1,9 @@
-import Plain from 'slate-plain-serializer'
-import { Editor } from 'slate-react'
+import Plain from '@gitbook/slate-plain-serializer'
+import { Editor } from '@gitbook/slate-react'
 
 import React from 'react'
-import CollapseOnEscape from 'slate-collapse-on-escape'
-import SoftBreak from 'slate-soft-break'
+import CollapseOnEscape from '@gitbook/slate-collapse-on-escape'
+import SoftBreak from '@gitbook/slate-soft-break'
 import styled from 'react-emotion'
 
 /**

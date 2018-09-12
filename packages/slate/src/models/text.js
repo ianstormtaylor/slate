@@ -1,5 +1,5 @@
 import isPlainObject from 'is-plain-object'
-import logger from 'slate-dev-logger'
+import logger from '@gitbook/slate-dev-logger'
 import { List, OrderedSet, Record, Set } from 'immutable'
 
 import Leaf from './leaf'

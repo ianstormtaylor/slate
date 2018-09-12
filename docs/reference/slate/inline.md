@@ -1,7 +1,7 @@
 # `Inline`
 
 ```js
-import { Inline } from 'slate'
+import { Inline } from '@gitbook/slate'
 ```
 
 A inline node in a Slate [`Document`](./document.md). Inline nodes implement the [`Node`](./node.md) interface.

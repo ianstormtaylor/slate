@@ -1,7 +1,7 @@
 # `slate-plain-serializer`
 
 ```js
-import Plain from 'slate-plain-serializer'
+import Plain from '@gitbook/slate-plain-serializer'
 ```
 
 A serializer that converts a Slate [`Value`](../slate/value.md) to and from a plain text string.

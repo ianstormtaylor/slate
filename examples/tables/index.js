@@ -1,6 +1,6 @@
-import Plain from 'slate-plain-serializer'
-import { Editor, getEventTransfer } from 'slate-react'
-import { Value } from 'slate'
+import Plain from '@gitbook/slate-plain-serializer'
+import { Editor, getEventTransfer } from '@gitbook/slate-react'
+import { Value } from '@gitbook/slate'
 
 import React from 'react'
 import initialValue from './value.json'

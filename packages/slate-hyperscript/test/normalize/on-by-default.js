@@ -1,7 +1,7 @@
 /** @jsx h */
 
 import h from '../..'
-import { Value, Document, Block, Text } from 'slate'
+import { Value, Document, Block, Text } from '@gitbook/slate'
 
 export const input = (
   <value>

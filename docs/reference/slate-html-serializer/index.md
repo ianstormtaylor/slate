@@ -1,7 +1,7 @@
 # `slate-html-serializer`
 
 ```js
-import Html from 'slate-html-serializer'
+import Html from '@gitbook/slate-html-serializer'
 ```
 
 The HTML serializer lets you parse and stringify arbitrary HTML content, based on your specific schema's use case. You must pass a series of `rules` to define how your Slate schema should be serialized to and from HTML.
