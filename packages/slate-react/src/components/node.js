@@ -174,7 +174,7 @@ class Node extends React.Component {
         key: `${node.key}-placeholder`,
       })
 
-      children = [...children, placeholder, ]
+      children = [...children, placeholder]
     }
 
     const element = stack.find('renderNode', {
