@@ -14,6 +14,8 @@ import getChildrenDecorations from '../utils/get-children-decorations'
 import scrollToSelection from '../utils/scroll-to-selection'
 import removeAllRanges from '../utils/remove-all-ranges'
 
+const FIREFOX_NODE_TYPE_ACCESS_ERROR = /Permission denied to access property "nodeType"/
+
 /**
  * Debug.
  *
@@ -264,9 +266,24 @@ class Content extends React.Component {
 
   isInEditor = target => {
     const { element } = this
-    // COMPAT: Text nodes don't have `isContentEditable` property. So, when
-    // `target` is a text node use its parent node for check.
-    const el = target.nodeType === 3 ? target.parentNode : target
+
+    let el
+
+    try {
+      // COMPAT: Text nodes don't have `isContentEditable` property. So, when
+      // `target` is a text node use its parent node for check.
+      el = target.nodeType === 3 ? target.parentNode : target
+    } catch (err) {
+      // COMPAT: In Firefox, `target.nodeType` will throw an error if target is
+      // originating from an internal "restricted" element (e.g. a stepper
+      // arrow on a number input)
+      // see github.com/ianstormtaylor/slate/issues/1819
+      if (IS_FIREFOX && FIREFOX_NODE_TYPE_ACCESS_ERROR.test(err.message)) {
+        return false
+      }
+
+      throw err
+    }
     return (
       el.isContentEditable &&
       (el === element || el.closest('[data-slate-editor]') === element)
