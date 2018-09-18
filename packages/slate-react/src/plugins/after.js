@@ -677,12 +677,13 @@ function AfterPlugin() {
       if (next) range = range.moveFocusTo(next.key, 0)
     }
 
-    // Preserve active marks from the current selection.
-    // They will be cleared by `change.select` if the selection actually moved.
-    range = range.set('marks', value.selection.marks)
-
     let selection = document.createSelection(range)
     selection = selection.setIsFocused(true)
+
+    // Preserve active marks from the current selection.
+    // They will be cleared by `change.select` if the selection actually moved.
+    selection = selection.set('marks', value.selection.marks)
+
     change.select(selection)
   }
 
