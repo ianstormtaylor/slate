@@ -10,7 +10,6 @@ cache: yarn
 env:
   # Do two runs, one for testing and one for linting.
   matrix:
-    - TEST_TYPE=test:coverage
     - TEST_TYPE=lint:eslint
     - TEST_TYPE=lint:prettier
 
@@ -28,5 +27,4 @@ script:
   - |
     set -e
     yarn $TEST_TYPE
-    if [[ $TEST_TYPE == 'test:coverage' ]]; then yarn codecov; fi
     set +e
