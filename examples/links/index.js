@@ -133,16 +133,30 @@ class Links extends React.Component {
 
     if (hasLinks) {
       change.call(unwrapLink)
-    } else if (value.isExpanded) {
+    } else if (value.selection.isExpanded) {
       const href = window.prompt('Enter the URL of the link:')
+
+      if (href === null) {
+        return
+      }
+
       change.call(wrapLink, href)
     } else {
       const href = window.prompt('Enter the URL of the link:')
+
+      if (href === null) {
+        return
+      }
+
       const text = window.prompt('Enter the text for the link:')
+
+      if (text === null) {
+        return
+      }
 
       change
         .insertText(text)
-        .extend(0 - text.length)
+        .moveFocusBackward(text.length)
         .call(wrapLink, href)
     }
 
