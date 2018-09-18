@@ -319,7 +319,7 @@ function AfterPlugin() {
       selection.end.key == target.end.key &&
       selection.end.offset < target.end.offset
     ) {
-      target = target.move(
+      target = target.moveForward(
         selection.start.key == selection.end.key
           ? 0 - selection.end.offset + selection.start.offset
           : 0 - selection.end.offset
