@@ -85,7 +85,6 @@ class Editor extends React.Component {
     plugins: null,
     resolves: 0,
     updates: 0,
-    cycles: 0,
     value: null,
     propsValue: null,
   }
