@@ -278,7 +278,7 @@ class Editor extends React.Component {
     debug('onChange', { change })
 
     if (change.operations.size > this.tmp.operationsSize) {
-      this.resolveChange(this.plugins, change)
+      this.resolveChange(change)
     }
 
     // Store a reference to the last `value` and `plugins` that were seen by the
@@ -317,7 +317,7 @@ class Editor extends React.Component {
    * @param {Number} size
    */
 
-  resolveChange = (plugins, change) => {
+  resolveChange = change => {
     const { stack } = this
     stack.run('onChange', change, this)
     return change
@@ -428,7 +428,7 @@ class Editor extends React.Component {
     try {
       this.tmp.isResolvingValue = true
       debug('resolveValue', { plugins, value })
-      this.resolveChange(plugins, change)
+      this.resolveChange(change)
 
       // Store the change and it's operations count so that it can be flushed once
       // the component next updates.
