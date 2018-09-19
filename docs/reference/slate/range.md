@@ -1,7 +1,7 @@
 # `Range`
 
 ```js
-import { Range } from 'slate'
+import { Range } from '@gitbook/slate'
 ```
 
 A range of a Slate [`Document`](./document.md). Ranges in Slate are modeled after a combination of the [DOM Selection API](https://developer.mozilla.org/en-US/docs/Web/API/Selection) and the [DOM Range API](https://developer.mozilla.org/en-US/docs/Web/API/Range), using terms like "anchor", "focus" and "collapsed".

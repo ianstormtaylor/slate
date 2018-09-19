@@ -4,7 +4,7 @@
 const React = require('react')
 const ReactDOM = require('react-dom/server')
 const h = require('../../helpers/h')
-const { Editor } = require('slate-react')
+const { Editor } = require('@gitbook/slate-react')
 
 module.exports.default = function(value) {
   const el = React.createElement(Editor, { value })

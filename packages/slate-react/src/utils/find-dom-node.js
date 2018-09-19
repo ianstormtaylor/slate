@@ -1,4 +1,4 @@
-import { Node } from 'slate'
+import { Node } from '@gitbook/slate'
 
 /**
  * Find the DOM node for a `key`.

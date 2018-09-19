@@ -7,8 +7,8 @@ import {
   IS_IOS,
   IS_ANDROID,
   SUPPORTED_EVENTS,
-} from 'slate-dev-environment'
-import logger from 'slate-dev-logger'
+} from '@gitbook/slate-dev-environment'
+import logger from '@gitbook/slate-dev-logger'
 import throttle from 'lodash/throttle'
 
 import EVENT_HANDLERS from '../constants/event-handlers'

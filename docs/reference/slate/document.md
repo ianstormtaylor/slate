@@ -1,7 +1,7 @@
 # `Document`
 
 ```js
-import { Document } from 'slate'
+import { Document } from '@gitbook/slate'
 ```
 
 The top-level node in Slate's document model.

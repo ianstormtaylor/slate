@@ -9,7 +9,7 @@ In the previous guide, we looked at how to serialize the Slate editor's content 
 Let's start with a basic editor:
 
 ```js
-import { Editor } from 'slate-react'
+import { Editor } from '@gitbook/slate-react'
 
 class App extends React.Component {
   state = {
@@ -224,7 +224,7 @@ const rules = [
 Great, that's all of the rules we need! Now let's create a new `Html` serializer and pass in those rules:
 
 ```js
-import Html from 'slate-html-serializer'
+import Html from '@gitbook/slate-html-serializer'
 
 // Create a new serializer instance with our `rules` from above.
 const html = new Html({ rules })

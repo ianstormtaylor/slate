@@ -1,9 +1,9 @@
-import Base64 from 'slate-base64-serializer'
+import Base64 from '@gitbook/slate-base64-serializer'
 import TRANSFER_TYPES from '../constants/transfer-types'
 import getWindow from 'get-window'
 import findDOMNode from './find-dom-node'
 import removeAllRanges from './remove-all-ranges'
-import { IS_IE } from 'slate-dev-environment'
+import { IS_IE } from '@gitbook/slate-dev-environment'
 import { ZERO_WIDTH_SELECTOR, ZERO_WIDTH_ATTRIBUTE } from './find-point'
 
 const { FRAGMENT, HTML, TEXT } = TRANSFER_TYPES

@@ -1,5 +1,5 @@
 {
-  "name": "slate-hyperscript",
+  "name": "@gitbook/slate-hyperscript",
   "description": "A hyperscript helper for creating Slate documents.",
   "version": "0.5.22",
   "license": "MIT",
@@ -13,22 +13,22 @@
     "lib/"
   ],
   "dependencies": {
+    "@gitbook/slate-dev-logger": "^0.1.39",
     "is-empty": "^1.0.0",
-    "is-plain-object": "^2.0.4",
-    "slate-dev-logger": "^0.1.39"
+    "is-plain-object": "^2.0.4"
   },
   "peerDependencies": {
-    "slate": ">=0.32.0"
+    "@gitbook/slate": ">=0.32.0"
   },
   "devDependencies": {
-    "mocha": "^2.5.3",
-    "slate": "^0.34.7"
+    "@gitbook/slate": "^0.34.7",
+    "mocha": "^2.5.3"
   },
   "scripts": {
     "clean": "rm -rf ./dist ./lib ./node_modules"
   },
   "umdGlobals": {
-    "slate": "Slate"
+    "@gitbook/slate": "Slate"
   },
   "keywords": [
     "hyperscript",

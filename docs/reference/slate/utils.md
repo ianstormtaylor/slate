@@ -1,7 +1,7 @@
 # Utils
 
 ```js
-import { resetKeyGenerator, setKeyGenerator } from 'slate'
+import { resetKeyGenerator, setKeyGenerator } from '@gitbook/slate'
 ```
 
 Utility functions that ship with Slate that may be useful for certain use cases.

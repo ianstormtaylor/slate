@@ -1,5 +1,5 @@
 {
-  "name": "slate-react",
+  "name": "@gitbook/slate-react",
   "description": "A set of React components for building completely customizable rich-text editors.",
   "version": "0.13.4",
   "license": "MIT",
@@ -13,6 +13,12 @@
     "lib/"
   ],
   "dependencies": {
+    "@gitbook/slate-base64-serializer": "^0.2.41",
+    "@gitbook/slate-dev-environment": "^0.1.2",
+    "@gitbook/slate-dev-logger": "^0.1.39",
+    "@gitbook/slate-hotkeys": "^0.1.2",
+    "@gitbook/slate-plain-serializer": "^0.5.22",
+    "@gitbook/slate-prop-types": "^0.4.39",
     "debug": "^3.1.0",
     "get-window": "^1.1.1",
     "is-window": "^1.0.2",
@@ -21,26 +27,20 @@
     "prop-types": "^15.5.8",
     "react-immutable-proptypes": "^2.1.0",
     "react-portal": "^3.1.0",
-    "selection-is-backward": "^1.0.0",
-    "slate-base64-serializer": "^0.2.41",
-    "slate-dev-environment": "^0.1.2",
-    "slate-dev-logger": "^0.1.39",
-    "slate-hotkeys": "^0.1.2",
-    "slate-plain-serializer": "^0.5.22",
-    "slate-prop-types": "^0.4.39"
+    "selection-is-backward": "^1.0.0"
   },
   "peerDependencies": {
+    "@gitbook/slate": ">=0.32.0",
     "immutable": ">=3.8.1",
     "react": ">=0.14.0",
-    "react-dom": ">=0.14.0",
-    "slate": ">=0.32.0"
+    "react-dom": ">=0.14.0"
   },
   "devDependencies": {
+    "@gitbook/slate": "^0.34.7",
+    "@gitbook/slate-hyperscript": "^0.5.22",
+    "@gitbook/slate-simulator": "^0.4.39",
     "immutable": "^3.8.1",
-    "mocha": "^2.5.3",
-    "slate": "^0.34.7",
-    "slate-hyperscript": "^0.5.22",
-    "slate-simulator": "^0.4.39"
+    "mocha": "^2.5.3"
   },
   "scripts": {
     "clean": "rm -rf ./dist ./lib ./node_modules"
@@ -49,7 +49,7 @@
     "immutable": "Immutable",
     "react": "React",
     "react-dom": "ReactDOM",
-    "slate": "Slate"
+    "@gitbook/slate": "Slate"
   },
   "keywords": [
     "canvas",

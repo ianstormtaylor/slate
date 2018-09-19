@@ -1,6 +1,6 @@
 {
   "private": true,
-  "name": "slate-packages",
+  "name": "@gitbook/slate-packages",
   "workspaces": [
     "packages/*"
   ],
@@ -65,7 +65,7 @@
     "rollup-plugin-sourcemaps": "^0.4.2",
     "rollup-plugin-uglify": "^3.0.0",
     "slate-collapse-on-escape": "^0.6.0",
-    "slate-dev-benchmark": "*",
+    "@gitbook/slate-dev-benchmark": "*",
     "slate-soft-break": "^0.6.0",
     "source-map-loader": "^0.2.3",
     "source-map-support": "^0.4.0",
@@ -76,11 +76,11 @@
     "webpack-dev-server": "^2.11.1"
   },
   "peerDependencies": {
-    "slate": "*",
-    "slate-html-serializer": "*",
-    "slate-plain-serializer": "*",
-    "slate-react": "*",
-    "slate-schema-violations": "*"
+    "@gitbook/slate": "*",
+    "@gitbook/slate-html-serializer": "*",
+    "@gitbook/slate-plain-serializer": "*",
+    "@gitbook/slate-react": "*",
+    "@gitbook/slate-schema-violations": "*"
   },
   "scripts": {
     "benchmark": "cross-env COMPARE=compare node --expose-gc ./tmp/benchmark/index.js",

@@ -1,6 +1,6 @@
-import Html from 'slate-html-serializer'
-import { Editor, getEventTransfer } from 'slate-react'
-import { Value } from 'slate'
+import Html from '@gitbook/slate-html-serializer'
+import { Editor, getEventTransfer } from '@gitbook/slate-react'
+import { Value } from '@gitbook/slate'
 
 import React from 'react'
 import initialValue from './value.json'

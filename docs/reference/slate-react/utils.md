@@ -10,7 +10,7 @@ import {
   getEventRange,
   getEventTransfer,
   setEventTransfer,
-} from 'slate-react'
+} from '@gitbook/slate-react'
 ```
 
 React-specific utility functions for Slate that may be useful in certain use cases.

@@ -1,4 +1,4 @@
-import logger from 'slate-dev-logger'
+import logger from '@gitbook/slate-dev-logger'
 import { Record } from 'immutable'
 
 import MODEL_TYPES from '../constants/model-types'

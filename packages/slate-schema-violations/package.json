@@ -1,5 +1,5 @@
 {
-  "name": "slate-schema-violations",
+  "name": "@gitbook/slate-schema-violations",
   "description": "A set of constants for the built-in violations in a Slate schema.",
   "version": "0.1.20",
   "license": "MIT",
@@ -13,8 +13,8 @@
     "lib/"
   ],
   "devDependencies": {
-    "mocha": "^2.5.3",
-    "slate": "^0.34.7"
+    "@gitbook/slate": "^0.34.7",
+    "mocha": "^2.5.3"
   },
   "scripts": {
     "clean": "rm -rf ./dist ./lib ./node_modules"

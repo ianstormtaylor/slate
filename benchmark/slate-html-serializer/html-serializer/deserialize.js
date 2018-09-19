@@ -1,7 +1,7 @@
 /** @jsx h */
 /* eslint-disable react/jsx-key */
 
-const Html = require('slate-html-serializer').default
+const Html = require('@gitbook/slate-html-serializer').default
 const { JSDOM } = require('jsdom') // eslint-disable-line import/no-extraneous-dependencies
 
 const html = new Html({

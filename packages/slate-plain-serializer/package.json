@@ -1,5 +1,5 @@
 {
-  "name": "slate-plain-serializer",
+  "name": "@gitbook/slate-plain-serializer",
   "description": "A plain text serializer for Slate editors.",
   "version": "0.5.22",
   "license": "MIT",
@@ -13,23 +13,23 @@
     "lib/"
   ],
   "dependencies": {
-    "slate-dev-logger": "^0.1.39"
+    "@gitbook/slate-dev-logger": "^0.1.39"
   },
   "peerDependencies": {
-    "immutable": ">=3.8.1",
-    "slate": ">=0.32.0"
+    "@gitbook/slate": ">=0.32.0",
+    "immutable": ">=3.8.1"
   },
   "devDependencies": {
-    "mocha": "^2.5.3",
-    "slate": "^0.34.7",
-    "slate-hyperscript": "^0.5.22"
+    "@gitbook/slate": "^0.34.7",
+    "@gitbook/slate-hyperscript": "^0.5.22",
+    "mocha": "^2.5.3"
   },
   "scripts": {
     "clean": "rm -rf ./dist ./lib ./node_modules"
   },
   "umdGlobals": {
     "immutable": "Immutable",
-    "slate": "Slate"
+    "@gitbook/slate": "Slate"
   },
   "keywords": [
     "deserialize",

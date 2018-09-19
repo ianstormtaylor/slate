@@ -1,6 +1,6 @@
 import direction from 'direction'
 import isPlainObject from 'is-plain-object'
-import logger from 'slate-dev-logger'
+import logger from '@gitbook/slate-dev-logger'
 import { List, OrderedSet, Set } from 'immutable'
 
 import Data from './data'

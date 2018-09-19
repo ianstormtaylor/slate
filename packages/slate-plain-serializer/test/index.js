@@ -5,7 +5,7 @@
 import Plain from '..'
 import assert from 'assert'
 import fs from 'fs'
-import { Value, resetKeyGenerator } from 'slate'
+import { Value, resetKeyGenerator } from '@gitbook/slate'
 import { basename, extname, resolve } from 'path'
 
 /**

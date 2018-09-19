@@ -1,7 +1,7 @@
 import React from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import typeOf from 'type-of'
-import { Node, Value } from 'slate'
+import { Node, Value } from '@gitbook/slate'
 import { Record } from 'immutable'
 
 /**

@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-key */
 
-const { Value } = require('slate')
+const { Value } = require('@gitbook/slate')
 
 module.exports.default = function(json) {
   Value.fromJSON(json)

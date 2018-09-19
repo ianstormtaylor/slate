@@ -1,4 +1,4 @@
-import { Stack } from 'slate'
+import { Stack } from '@gitbook/slate'
 
 /**
  * Event handlers that can be simulated.

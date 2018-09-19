@@ -1,5 +1,5 @@
 {
-  "name": "slate-dev-logger",
+  "name": "@gitbook/slate-dev-logger",
   "description": "A simple, development-only logger for Slate.",
   "version": "0.1.39",
   "license": "MIT",

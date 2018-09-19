@@ -1,5 +1,5 @@
 {
-  "name": "slate-hotkeys",
+  "name": "@gitbook/slate-hotkeys",
   "description": "A set of function to detect common keypresses in a platform-agnostic way",
   "version": "0.1.2",
   "license": "MIT",
@@ -13,8 +13,8 @@
     "lib/"
   ],
   "dependencies": {
-    "is-hotkey": "^0.1.1",
-    "slate-dev-environment": "^0.1.2"
+    "@gitbook/slate-dev-environment": "^0.1.2",
+    "is-hotkey": "^0.1.1"
   },
   "scripts": {
     "clean": "rm -rf ./dist ./lib ./node_modules"

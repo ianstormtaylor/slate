@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 
-import { Editor } from 'slate-react'
-import { Value } from 'slate'
+import { Editor } from '@gitbook/slate-react'
+import { Value } from '@gitbook/slate'
 
 import React from 'react'
 import faker from 'faker'

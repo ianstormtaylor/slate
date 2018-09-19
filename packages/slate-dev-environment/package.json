@@ -1,5 +1,5 @@
 {
-  "name": "slate-dev-environment",
+  "name": "@gitbook/slate-dev-environment",
   "description": "Detect browser and OS environments in core Slate packages",
   "version": "0.1.2",
   "license": "MIT",

@@ -1,6 +1,6 @@
 import Debug from 'debug'
 import React from 'react'
-import SlateTypes from 'slate-prop-types'
+import SlateTypes from '@gitbook/slate-prop-types'
 import Types from 'prop-types'
 
 import Text from './text'

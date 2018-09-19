@@ -16,7 +16,7 @@ import {
   NODE_TEXT_INVALID,
   PARENT_OBJECT_INVALID,
   PARENT_TYPE_INVALID,
-} from 'slate-schema-violations'
+} from '@gitbook/slate-schema-violations'
 ```
 
 A set of constants for the built-in violations in a Slate schema.
@@ -25,7 +25,7 @@ A set of constants for the built-in violations in a Slate schema.
 
 ```js
 import React from 'react'
-import Types from 'slate-prop-types'
+import Types from '@gitbook/slate-prop-types'
 
 class Toolbar extends React.Component {
 

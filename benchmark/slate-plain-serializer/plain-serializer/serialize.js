@@ -1,7 +1,7 @@
 /** @jsx h */
 /* eslint-disable react/jsx-key */
 
-const Plain = require('slate-plain-serializer').default
+const Plain = require('@gitbook/slate-plain-serializer').default
 const h = require('../../helpers/h')
 
 module.exports.default = function(state) {

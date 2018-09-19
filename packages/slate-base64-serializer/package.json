@@ -1,5 +1,5 @@
 {
-  "name": "slate-base64-serializer",
+  "name": "@gitbook/slate-base64-serializer",
   "description": "A Base64 serializer for Slate editors.",
   "version": "0.2.41",
   "license": "MIT",
@@ -13,11 +13,11 @@
     "lib/"
   ],
   "peerDependencies": {
-    "slate": ">=0.32.0"
+    "@gitbook/slate": ">=0.32.0"
   },
   "devDependencies": {
-    "mocha": "^2.5.3",
-    "slate": "^0.34.7"
+    "@gitbook/slate": "^0.34.7",
+    "mocha": "^2.5.3"
   },
   "dependencies": {
     "isomorphic-base64": "^1.0.2"
@@ -26,7 +26,7 @@
     "clean": "rm -rf ./dist ./lib ./node_modules"
   },
   "umdGlobals": {
-    "slate": "Slate"
+    "@gitbook/slate": "Slate"
   },
   "keywords": [
     "deserialize",

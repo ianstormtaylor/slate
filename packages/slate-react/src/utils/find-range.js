@@ -1,7 +1,7 @@
 import getWindow from 'get-window'
 import isBackward from 'selection-is-backward'
-import { Range } from 'slate'
-import { IS_IE, IS_EDGE } from 'slate-dev-environment'
+import { Range } from '@gitbook/slate'
+import { IS_IE, IS_EDGE } from '@gitbook/slate-dev-environment'
 
 import findPoint from './find-point'
 import findDOMPoint from './find-dom-point'

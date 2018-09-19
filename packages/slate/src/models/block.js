@@ -3,7 +3,7 @@
  */
 
 import isPlainObject from 'is-plain-object'
-import logger from 'slate-dev-logger'
+import logger from '@gitbook/slate-dev-logger'
 import { List, Map, Record } from 'immutable'
 
 import MODEL_TYPES, { isType } from '../constants/model-types'

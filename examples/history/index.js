@@ -1,5 +1,5 @@
-import { Value } from 'slate'
-import { Editor } from 'slate-react'
+import { Value } from '@gitbook/slate'
+import { Editor } from '@gitbook/slate-react'
 
 import React from 'react'
 import initialValue from './value.json'

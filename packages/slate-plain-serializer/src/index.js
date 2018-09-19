@@ -1,4 +1,4 @@
-import { Block, Mark, Node, Value } from 'slate'
+import { Block, Mark, Node, Value } from '@gitbook/slate'
 import { Set } from 'immutable'
 
 /**

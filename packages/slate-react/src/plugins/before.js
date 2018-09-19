@@ -1,14 +1,14 @@
 import Debug from 'debug'
 import getWindow from 'get-window'
 import { findDOMNode } from 'react-dom'
-import Hotkeys from 'slate-hotkeys'
+import Hotkeys from '@gitbook/slate-hotkeys'
 import {
   IS_FIREFOX,
   IS_IE,
   IS_IOS,
   IS_ANDROID,
   SUPPORTED_EVENTS,
-} from 'slate-dev-environment'
+} from '@gitbook/slate-dev-environment'
 
 import findNode from '../utils/find-node'
 

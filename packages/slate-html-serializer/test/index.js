@@ -6,7 +6,7 @@ import Html from '..'
 import assert from 'assert'
 import fs from 'fs'
 import { JSDOM } from 'jsdom' // eslint-disable-line import/no-extraneous-dependencies
-import { Value, resetKeyGenerator } from 'slate'
+import { Value, resetKeyGenerator } from '@gitbook/slate'
 import { basename, extname, resolve } from 'path'
 
 /**
