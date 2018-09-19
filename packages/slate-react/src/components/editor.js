@@ -74,19 +74,27 @@ class Editor extends React.Component {
   state = {}
 
   /**
-   * Temporary values.
+   * Temporary values related to react cycles or slate cycles.
    *
    * @type {Object}
    */
 
   tmp = {
-    change: null,
     isChanging: false,
     operationsSize: null,
     plugins: null,
     resolves: 0,
     updates: 0,
     value: null,
+  }
+
+  /*
+   * Memoized result for results within the cycle
+   */
+
+  memoized = {
+    value: undefined,
+    change: undefined,
   }
 
   /**
@@ -122,6 +130,8 @@ class Editor extends React.Component {
     if (change) {
       this.onChange(change)
     }
+
+    this.memoized = {}
   }
 
   /**
@@ -143,6 +153,8 @@ class Editor extends React.Component {
     if (change) {
       this.onChange(change)
     }
+
+    this.memoized = {}
   }
 
   /**
@@ -198,18 +210,7 @@ class Editor extends React.Component {
    */
 
   get value() {
-    // If the current `plugins` and `value` are the same as the last seen ones
-    // that were saved in `tmp`, don't re-resolve because that will trigger
-    // extra `onChange` runs.
-    if (
-      this.plugins === this.tmp.plugins &&
-      this.props.value === this.tmp.value
-    ) {
-      return this.tmp.value
-    }
-
-    const value = this.resolveValue(this.plugins, this.props.value)
-    return value
+    return this.resolveValue()
   }
 
   /**
@@ -228,7 +229,7 @@ class Editor extends React.Component {
       return
     }
 
-    const change = this.value.change()
+    const change = this.value && this.memoized.change
 
     try {
       this.tmp.isChanging = true
@@ -271,7 +272,10 @@ class Editor extends React.Component {
     }
 
     debug('onChange', { change })
-    change = this.resolveChange(this.plugins, change, change.operations.size)
+
+    if (change.operations.size > this.tmp.operationsSize) {
+      this.resolveChange(this.plugins, change)
+    }
 
     // Store a reference to the last `value` and `plugins` that were seen by the
     // editor, so we can know whether to normalize a new unknown value if one
@@ -282,6 +286,7 @@ class Editor extends React.Component {
     // Remove the temporary `change`, since it's being flushed.
     delete this.tmp.change
     delete this.tmp.operationsSize
+    this.memoized = {}
 
     this.props.onChange(change)
   }
@@ -308,11 +313,11 @@ class Editor extends React.Component {
    * @param {Number} size
    */
 
-  resolveChange = memoizeOne((plugins, change, size) => {
-    const stack = this.resolveStack(plugins)
+  resolveChange = (plugins, change) => {
+    const { stack } = this
     stack.run('onChange', change, this)
     return change
-  })
+  }
 
   /**
    * Resolve a set of plugins from potential `plugins` and a `schema`.
@@ -387,18 +392,42 @@ class Editor extends React.Component {
    * @return {Change}
    */
 
-  resolveValue = memoizeOne((plugins, value) => {
-    debug('resolveValue', { plugins, value })
-    let change = value.change()
-    change = this.resolveChange(plugins, change, change.operations.size)
+  resolveValue = (plugins, value) => {
+    // If the current `plugins` and `value` are the same as the last seen ones
+    // that were saved in `tmp`, don't re-resolve because that will trigger
+    // extra `onChange` runs.
+    if (
+      this.plugins === this.tmp.plugins &&
+      this.props.value === this.tmp.value
+    ) {
+      this.memoized.change = this.tmp.value.change()
+      return this.tmp.value
+    }
 
-    // Store the change and it's operations count so that it can be flushed once
-    // the component next updates.
-    this.tmp.change = change
-    this.tmp.operationsSize = change.operations.size
+    if (this.memoized.value) return this.memoized.value
 
-    return change.value
-  })
+    // Fallback to state.value
+    if (this.isResolvingValue) return this.props.value
+
+    try {
+      this.isResolvingValue = true
+      debug('resolveValue', { plugins, value })
+
+      const change = value.change()
+      this.memoized.change = change
+      this.resolveChange(plugins, change)
+
+      // Store the change and it's operations count so that it can be flushed once
+      // the component next updates.
+      this.tmp.operationsSize = change.operations.size
+      this.isResolvingValue = false
+      this.memoized.value = value
+      return value
+    } catch (e) {
+      this.isResolvingValue = false
+      throw e
+    }
+  }
 }
 
 /**
