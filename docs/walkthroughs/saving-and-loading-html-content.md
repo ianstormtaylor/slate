@@ -16,7 +16,7 @@ class App extends React.Component {
     value: Plain.deserialize(''),
   }
 
-  onChange({ value }) {
+  onChange = ({ value }) => {
     this.setState({ value })
   }
 
