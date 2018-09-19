@@ -583,6 +583,11 @@ function AfterPlugin() {
     }
 
     range = range.normalize(document)
+    
+    // Preserve active marks from the current selection.
+    // They will be cleared by `change.select` if the selection actually moved.
+    range = range.set('marks', value.selection.marks)
+
     change.select(range)
   }
 
