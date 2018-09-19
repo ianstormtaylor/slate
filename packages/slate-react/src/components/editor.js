@@ -85,6 +85,7 @@ class Editor extends React.Component {
     plugins: null,
     resolves: 0,
     updates: 0,
+    cycles: 0,
     value: null,
   }
 
@@ -210,7 +211,14 @@ class Editor extends React.Component {
    */
 
   get value() {
-    return this.resolveValue()
+    if (this.memoized.value) return this.memoized.value
+
+    // When the value is resolving, we return the last normalized value
+    // When in first mount, we return the proops.value
+    if (this.isResolvingValue) return this.tmp.value || this.props.value
+
+    this.resolveMemoize(this.memoized)
+    return this.memoized.value
   }
 
   /**
@@ -392,22 +400,17 @@ class Editor extends React.Component {
    * @return {Change}
    */
 
-  resolveValue = (plugins, value) => {
+  resolveMemoize = memoizeOne(memoized => {
+    const { value, plugins } = this.props
+
     // If the current `plugins` and `value` are the same as the last seen ones
     // that were saved in `tmp`, don't re-resolve because that will trigger
     // extra `onChange` runs.
-    if (
-      this.plugins === this.tmp.plugins &&
-      this.props.value === this.tmp.value
-    ) {
-      this.memoized.change = this.tmp.value.change()
-      return this.tmp.value
+    if (this.plugins === this.tmp.plugins && value === this.tmp.value) {
+      memoized.change = value.change()
+      memoized.value = value
+      return memoized
     }
-
-    if (this.memoized.value) return this.memoized.value
-
-    // Fallback to state.value
-    if (this.isResolvingValue) return this.props.value
 
     try {
       this.isResolvingValue = true
@@ -421,13 +424,13 @@ class Editor extends React.Component {
       // the component next updates.
       this.tmp.operationsSize = change.operations.size
       this.isResolvingValue = false
-      this.memoized.value = value
+      this.memoized.value = change.value
       return value
-    } catch (e) {
+    } catch (error) {
       this.isResolvingValue = false
-      throw e
+      throw error
     }
-  }
+  })
 }
 
 /**
