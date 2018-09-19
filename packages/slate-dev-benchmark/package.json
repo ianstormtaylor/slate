@@ -1,7 +1,7 @@
 {
   "name": "@gitbook/slate-dev-benchmark",
   "description": "A simple, development-only benchmark for Slate",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
   "main": "src/index.js",
