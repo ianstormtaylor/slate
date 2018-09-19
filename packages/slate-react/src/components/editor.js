@@ -87,6 +87,7 @@ class Editor extends React.Component {
     updates: 0,
     cycles: 0,
     value: null,
+    propsValue: null,
   }
 
   /*
@@ -118,19 +119,16 @@ class Editor extends React.Component {
     this.tmp.updates++
 
     const { autoFocus } = this.props
-    const { change } = this.tmp
+    this.resolveMemoize()
+    const change = this.memoized.change
 
     if (autoFocus) {
       if (change) {
         change.focus()
-      } else {
-        this.focus()
       }
     }
 
-    if (change) {
-      this.onChange(change)
-    }
+    this.onChange(change)
 
     this.memoized = {}
   }
@@ -142,7 +140,9 @@ class Editor extends React.Component {
   componentDidUpdate(prevProps) {
     this.tmp.updates++
 
-    const { change, resolves, updates } = this.tmp
+    this.resolveMemoize()
+    const { change } = this.memoized
+    const { resolves, updates } = this.tmp
 
     // If we've resolved a few times already, and it's exactly in line with
     // the updates, then warn the user that they may be doing something wrong.
@@ -151,9 +151,7 @@ class Editor extends React.Component {
       'A Slate <Editor> component is re-resolving `props.plugins` or `props.schema` on each update, which leads to poor performance. This is often due to passing in a new `schema` or `plugins` prop with each render by declaring them inline in your render function. Do not do this!'
     )
 
-    if (change) {
-      this.onChange(change)
-    }
+    this.onChange(change)
 
     this.memoized = {}
   }
@@ -211,13 +209,11 @@ class Editor extends React.Component {
    */
 
   get value() {
-    if (this.memoized.value) return this.memoized.value
-
     // When the value is resolving, we return the last normalized value
     // When in first mount, we return the proops.value
-    if (this.isResolvingValue) return this.tmp.value || this.props.value
+    if (this.tmp.isResolvingValue) return this.tmp.value || this.props.value
 
-    this.resolveMemoize(this.memoized)
+    this.resolveMemoize()
     return this.memoized.value
   }
 
@@ -237,7 +233,8 @@ class Editor extends React.Component {
       return
     }
 
-    const change = this.value && this.memoized.change
+    this.resolveMemoize()
+    const change = this.memoized.change
 
     try {
       this.tmp.isChanging = true
@@ -294,8 +291,8 @@ class Editor extends React.Component {
     // Remove the temporary `change`, since it's being flushed.
     delete this.tmp.change
     delete this.tmp.operationsSize
-    this.memoized = {}
 
+    this.memoized = {}
     this.props.onChange(change)
   }
 
@@ -400,37 +397,50 @@ class Editor extends React.Component {
    * @return {Change}
    */
 
-  resolveMemoize = memoizeOne(memoized => {
+  resolveMemoize = () => {
+    if (this.tmp.propsValue !== this.props.value) {
+      this.tmp.propsValue = this.props.value
+      this.memoized = {}
+    }
+
+    if (this.plugins !== this.tmp.plugins) {
+      this.tmp.plugins = this.plugins
+      this.memoized = {}
+    }
+
+    const { memoized } = this
+
+    if (memoized.value && memoized.change) {
+      return
+    }
+
     const { value, plugins } = this.props
+    const change = value.change()
+    memoized.change = change
 
     // If the current `plugins` and `value` are the same as the last seen ones
     // that were saved in `tmp`, don't re-resolve because that will trigger
     // extra `onChange` runs.
     if (this.plugins === this.tmp.plugins && value === this.tmp.value) {
-      memoized.change = value.change()
       memoized.value = value
-      return memoized
+      return
     }
 
     try {
-      this.isResolvingValue = true
+      this.tmp.isResolvingValue = true
       debug('resolveValue', { plugins, value })
-
-      const change = value.change()
-      this.memoized.change = change
       this.resolveChange(plugins, change)
 
       // Store the change and it's operations count so that it can be flushed once
       // the component next updates.
       this.tmp.operationsSize = change.operations.size
-      this.isResolvingValue = false
-      this.memoized.value = change.value
-      return value
+      memoized.value = change.value
     } catch (error) {
-      this.isResolvingValue = false
       throw error
+    } finally {
+      this.tmp.isResolvingValue = false
     }
-  })
+  }
 }
 
 /**
