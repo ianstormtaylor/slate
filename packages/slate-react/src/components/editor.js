@@ -81,6 +81,7 @@ class Editor extends React.Component {
 
   tmp = {
     isChanging: false,
+    isResolvingValue: false,
     operationsSize: null,
     plugins: null,
     resolves: 0,
@@ -119,7 +120,7 @@ class Editor extends React.Component {
 
     const { autoFocus } = this.props
     this.resolveMemoize()
-    const change = this.memoized.change
+    const { change } = this.memoized
 
     if (autoFocus) {
       if (change) {
@@ -233,7 +234,7 @@ class Editor extends React.Component {
     }
 
     this.resolveMemoize()
-    const change = this.memoized.change
+    const { change } = this.memoized
 
     try {
       this.tmp.isChanging = true
