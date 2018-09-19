@@ -4,6 +4,14 @@ This document maintains a list of changes to the `slate-react` package with each
 
 ---
 
+### `0.13.1` — September 19, 2018
+
+* Handling Firefox nodeType permission errors more gracefully
+* Fix marks being cleared from selection
+
+# Before GitBook fork
+
+
 ### `0.13.0` — July 3, 2018
 
 ###### BREAKING
