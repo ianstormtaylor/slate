@@ -440,7 +440,7 @@ class ElementInterface {
       .map('decorateNode', this)
       .reduce((decorations, current) => (
         decorations.concat(Decoration.createList(current))
-      ), new List())
+      ), List())
     return list
   }
 
