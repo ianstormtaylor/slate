@@ -24,7 +24,7 @@ A [`Value`](./value.md) with the change's current operations applied. Each time 
 
 ### `call`
 
-`call(customChange: Function, ...args) => Change`
+`call(fn: Function, ...args) => Change`
 
 This method calls the provided `customChange` function with the current instance of the `Change` object as the first argument and passes through the remaining `args`.
 
@@ -59,7 +59,7 @@ This method normalizes the document with the value's schema. This should run aut
 
 ### `deferNormalizing`
 
-`deferNormalizing(customChange: Function) => Change`
+`deferNormalizing(fn: Function) => Change`
 
 This method calls the provided `customChange` function with the current instance of the `Change` object as the first argument. Normalization is deferred while `customChange` is executing, but will be run after `customChange` completes.
 
@@ -80,17 +80,23 @@ function removeManyNodes(node) {
 
 ### `withoutSaving`
 
-`withoutSaving(customChange: Function) => Change`
+`withoutSaving(fn: Function) => Change`
 
 By default all new operations are saved to the editor's history. If you have changes that you don't want to show up in the history when the user presses <kbd>cmd+z</kbd>, you can use `withoutSaving` to skip those changes.
 
 ```js
 change.withoutSaving(() => {
-  change.removeNodeByKey(node.key)
+  change.setValue({ decorations })
 })
 ```
 
 However, be sure you know what you are doing because this will create changes that cannot be undone by the user, and might result in confusing behaviors.
+
+### `withoutMerging`
+
+`withoutMerging(fn: Function) => Change`
+
+Usually, all of the operations in a `Change` are grouped into a single save point in the editor's history. However, sometimes you may want more control over this, to be able to create distinct save points in a single change. To do that, you can use the `withoutMerging` helper.
 
 ## Full Value Change
 

@@ -229,7 +229,7 @@ Will validate a node's marks. The `marks` definitions can declare the `type` pro
 
 A function that can be provided to override the default behavior in the case of a rule being invalid. By default, Slate will do what it can, but since it doesn't know much about your schema, it will often remove invalid nodes. If you want to override this behavior and "fix" the node instead of removing it, pass a custom `normalize` function.
 
-For more information on the arguments passed to `normalize`, see the [Normalizing](#normalizing) section.
+For more information on the arguments passed to `normalize`, see the [Errors](#errors) section.
 
 ### `parent`
 
