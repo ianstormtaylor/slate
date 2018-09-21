@@ -4,7 +4,7 @@
   "all": true,
   "extension" : ["js"],
   "cache": false,
-  "include": ["**/src/**"],
+  "include": ["packages/slate/src/**", "packages/slate-html-serializer/src/**",  "packages/slate-plain-serializer/src/**"],
   "reporter": [
     "html",
     "lcov",
