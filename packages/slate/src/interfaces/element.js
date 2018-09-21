@@ -436,11 +436,10 @@ class ElementInterface {
    */
 
   getDecorations(stack) {
-    const list = stack
+    const allDecorations = stack
       .map('decorateNode', this)
-      .reduce((decorations, current) => (
-        decorations.concat(Decoration.createList(current))
-      ), List())
+      .map(decorations => Decoration.createList(decorations))
+    const list = List(allDecorations).flatten(1)
     return list
   }
 
