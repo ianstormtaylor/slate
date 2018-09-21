@@ -420,25 +420,22 @@ function getDirtyKeys(operation, newValue, oldValue) {
 
     case 'insert_node': {
       const table = node.getKeysToPathsTable()
-      const parent = newDocument.assertParent(path)
-      const keys = [parent.key, ...Object.keys(table)]
+      const keys = Object.keys(table)
       return keys
     }
 
     case 'split_node': {
       const nextPath = PathUtils.increment(path)
-      const parent = newDocument.assertParent(path)
       const target = newDocument.assertNode(path)
       const split = newDocument.assertNode(nextPath)
-      const keys = [parent.key, target.key, split.key]
+      const keys = [target.key, split.key]
       return keys
     }
 
     case 'merge_node': {
       const previousPath = PathUtils.decrement(path)
-      const parent = newDocument.assertParent(path)
       const merged = newDocument.assertNode(previousPath)
-      const keys = [parent.key, merged.key]
+      const keys = [merged.key]
       return keys
     }
 
