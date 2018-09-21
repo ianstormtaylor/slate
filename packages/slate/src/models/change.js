@@ -208,18 +208,31 @@ class Change {
    * additional `path` argument specifics the current depth/location.
    *
    * @param {Map} map
-   * @param {List} path (optional)
+   * @param {Array} path (optional)
    * @return {Change}
    */
 
-  normalizeMapAndPath(map, path = List()) {
+  normalizeMapAndPath(map, path = []) {
     map.forEach((m, k) => {
-      const p = path.concat(k)
+      const p = [...path, k]
       this.normalizeMapAndPath(m, p)
     })
 
+    this.normalizePath(path)
+    return this
+  }
+
+  /**
+   * Normalize the node at a specific `path`, iterating as many times as
+   * necessary until it satisfies all of the schema rules.
+   *
+   * @param {Array} path
+   * @return {Change}
+   */
+
+  normalizePath(path) {
     const { value } = this
-    const { document, schema } = value
+    let { document, schema } = value
     let node = document.assertNode(path)
 
     let iterations = 0
@@ -229,19 +242,31 @@ class Change {
       (node.object === 'text' ? 1 : node.nodes.size)
 
     const iterate = () => {
-      const normalize = node.normalize(schema)
-      if (!normalize) return
+      const fn = node.normalize(schema)
+      if (!fn) return
 
-      // Run the `normalize` function to fix the node.
-      path = this.value.document.getPath(node.key)
-      normalize(this)
+      // Run the normalize `fn` to fix the node.
+      fn(this)
 
-      // Re-find the node reference, in case it was updated. If the node no longer
-      // exists, we're done for this branch.
-      node = this.value.document.refindNode(path, node.key)
-      if (!node) return
+      // Attempt to re-find the node by path, or by key if it has changed
+      // locations in the tree continue iterating.
+      document = this.value.document
+      const { key } = node
+      let found = document.getDescendant(path)
 
-      path = this.value.document.refindPath(path, node.key)
+      if (found && found.key === key) {
+        node = found
+      } else {
+        found = document.getDescendant(key)
+
+        if (found) {
+          node = found
+          path = document.getPath(key)
+        } else {
+          // If it no longer exists by key, it was removed, so abort.
+          return
+        }
+      }
 
       // Increment the iterations counter, and check to make sure that we haven't
       // exceeded the max. Without this check, it's easy for the `normalize`

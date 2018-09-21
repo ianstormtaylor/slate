@@ -1545,36 +1545,6 @@ class ElementInterface {
   }
 
   /**
-   * Attempt to "refind" a node by a previous `path`, falling back to looking
-   * it up by `key` again.
-   *
-   * @param {List|String} path
-   * @param {String} key
-   * @return {Node|Null}
-   */
-
-  refindNode(path, key) {
-    const node = this.getDescendant(path)
-    const found = node && node.key === key ? node : this.getDescendant(key)
-    return found
-  }
-
-  /**
-   * Attempt to "refind" the path to a node by a previous `path`, falling back
-   * to looking it up by `key`.
-   *
-   * @param {List|String} path
-   * @param {String} key
-   * @return {List|Null}
-   */
-
-  refindPath(path, key) {
-    const node = this.getDescendant(path)
-    const found = node && node.key === key ? path : this.getPath(key)
-    return found
-  }
-
-  /**
    * Remove mark from text at `offset` and `length` in node.
    *
    * @param {List} path
