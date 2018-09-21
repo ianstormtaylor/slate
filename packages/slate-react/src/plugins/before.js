@@ -9,6 +9,7 @@ import {
   HAS_INPUT_EVENTS_LEVEL_2,
 } from 'slate-dev-environment'
 
+import eventLogger from './event-logger'
 import findNode from '../utils/find-node'
 
 /**
@@ -17,7 +18,7 @@ import findNode from '../utils/find-node'
  * @type {Function}
  */
 
-const debug = Debug('slate:before')
+const debug = eventLogger(Debug('slate:before'))
 
 /**
  * The core before plugin.
