@@ -407,6 +407,17 @@ function getDirtyKeys(operation, newValue, oldValue) {
   const oldDocument = oldValue.document
 
   switch (type) {
+    case 'add_mark':
+    case 'insert_text':
+    case 'remove_mark':
+    case 'remove_text':
+    case 'set_mark':
+    case 'set_node': {
+      const target = newDocument.assertNode(path)
+      const keys = [target.key]
+      return keys
+    }
+
     case 'insert_node': {
       const table = node.getKeysToPathsTable()
       const parent = newDocument.assertParent(path)
