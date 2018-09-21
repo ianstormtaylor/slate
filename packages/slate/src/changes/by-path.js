@@ -334,7 +334,7 @@ Changes.replaceNodeByPath = (change, path, newNode) => {
   const index = path.last()
   const parentPath = PathUtils.lift(path)
 
-  change.deferNormalizing(() => {
+  change.withoutNormalizing(() => {
     change.removeNodeByPath(path)
     change.insertNodeByPath(parentPath, index, newNode)
   })
@@ -365,7 +365,7 @@ Changes.replaceTextByPath = (change, path, offset, length, text, marks) => {
 
   let activeMarks = document.getActiveMarksAtRange(range)
 
-  change.deferNormalizing(() => {
+  change.withoutNormalizing(() => {
     change.removeTextByPath(path, offset, length)
 
     if (!marks) {
@@ -507,7 +507,7 @@ Changes.splitDescendantsByPath = (change, path, textPath, textOffset) => {
   let previous
   let index
 
-  change.deferNormalizing(() => {
+  change.withoutNormalizing(() => {
     nodes.forEach(n => {
       const prevIndex = index == null ? null : index
       index = previous ? n.nodes.indexOf(previous) + 1 : textOffset
@@ -577,7 +577,7 @@ Changes.unwrapNodeByPath = (change, path) => {
   const isFirst = index === 0
   const isLast = index === parent.nodes.size - 1
 
-  change.deferNormalizing(() => {
+  change.withoutNormalizing(() => {
     if (parent.nodes.size === 1) {
       change.moveNodeByPath(path, grandPath, parentIndex + 1)
       change.removeNodeByPath(parentPath)
@@ -609,7 +609,7 @@ Changes.wrapBlockByPath = (change, path, block) => {
   const index = path.last()
   const newPath = PathUtils.increment(path)
 
-  change.deferNormalizing(() => {
+  change.withoutNormalizing(() => {
     change.insertNodeByPath(parentPath, index, block)
     change.moveNodeByPath(newPath, path, 0)
   })
@@ -630,7 +630,7 @@ Changes.wrapInlineByPath = (change, path, inline) => {
   const index = path.last()
   const newPath = PathUtils.increment(path)
 
-  change.deferNormalizing(() => {
+  change.withoutNormalizing(() => {
     change.insertNodeByPath(parentPath, index, inline)
     change.moveNodeByPath(newPath, path, 0)
   })

@@ -57,11 +57,11 @@ This method normalizes the document with the value's schema. This should run aut
 
 > 🤖 If you must use this method, use it sparingly and strategically. Calling this method can be very expensive as it will run normalization on all of the nodes in your document.
 
-### `deferNormalizing`
+### `withoutNormalizing`
 
-`deferNormalizing(fn: Function) => Change`
+`withoutNormalizing(fn: Function) => Change`
 
-This method calls the provided function with the current instance of the `Change` object as the first argument. Normalization is deferred while the fuction is executing, but will be run immediately after it completes.
+This method calls the provided function with the current instance of the `Change` object as the first argument. Normalization does not occur while the fuction is executing, and is instead deferred to be be run immediately after it completes.
 
 This method can be used to allow a sequence of change operations that should not be interrupted by normalization. For example:
 
@@ -70,7 +70,7 @@ function removeManyNodes(node) {
   const toRemove = node.nodes.filter(n => n.object != 'block')
   if (!toRemove.size) return
 
-  change.deferNormalizing(() => {
+  change.withoutNormalizing(() => {
     toRemove.forEach(child => {
       change.removeNodeByKey(child.key)
     })

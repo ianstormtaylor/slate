@@ -196,7 +196,7 @@ class Change {
     })
 
     // To avoid infinite loops, we need to defer normalization until the end.
-    this.deferNormalizing(() => {
+    this.withoutNormalizing(() => {
       this.normalizeMapAndPath(map)
     })
 
@@ -265,13 +265,13 @@ class Change {
 
   /**
    * Apply a series of changes inside a synchronous `fn`, deferring
-   * normalization to the end after the function has executed.
+   * normalization until after the function has finished executing.
    *
    * @param {Function} fn
    * @return {Change}
    */
 
-  deferNormalizing(fn) {
+  withoutNormalizing(fn) {
     const value = this.tmp.normalize
     this.tmp.normalize = false
     fn(this)
@@ -360,10 +360,10 @@ class Change {
   withoutNormalization(fn) {
     warning(
       false,
-      'As of slate@0.41.0 the `change.withoutNormalization` helper has been renamed to `change.deferNormalizing`.'
+      'As of slate@0.41.0 the `change.withoutNormalization` helper has been renamed to `change.withoutNormalizing`.'
     )
 
-    return this.deferNormalizing(fn)
+    return this.withoutNormalizing(fn)
   }
 }
 

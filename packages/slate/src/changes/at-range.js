@@ -29,7 +29,7 @@ Changes.addMarkAtRange = (change, range, mark) => {
   const { start, end } = range
   const texts = document.getTextsAtRange(range)
 
-  change.deferNormalizing(() => {
+  change.withoutNormalizing(() => {
     texts.forEach(node => {
       const { key } = node
       let index = 0
@@ -98,7 +98,7 @@ Changes.deleteAtRange = (change, range) => {
     isEndVoid = document.hasVoidParent(endKey, schema)
   }
 
-  change.deferNormalizing(() => {
+  change.withoutNormalizing(() => {
     // If the start node is inside a void node, remove the void node and update
     // the starting point to be right after it, continuously until the start point
     // is not a void, or until the entire range is handled.
@@ -615,7 +615,7 @@ Changes.insertBlockAtRange = (change, range, block) => {
       startOffset = splitRange.start.offset
     }
 
-    change.deferNormalizing(() => {
+    change.withoutNormalizing(() => {
       change.splitDescendantsByKey(startBlock.key, startKey, startOffset)
       change.insertNodeByKey(parent.key, index + 1, block)
     })
@@ -631,7 +631,7 @@ Changes.insertBlockAtRange = (change, range, block) => {
  */
 
 Changes.insertFragmentAtRange = (change, range, fragment) => {
-  change.deferNormalizing(() => {
+  change.withoutNormalizing(() => {
     // If the range is expanded, delete it first.
     if (range.isExpanded) {
       change.deleteAtRange(range)
@@ -761,7 +761,7 @@ Changes.insertFragmentAtRange = (change, range, fragment) => {
 Changes.insertInlineAtRange = (change, range, inline) => {
   inline = Inline.create(inline)
 
-  change.deferNormalizing(() => {
+  change.withoutNormalizing(() => {
     if (range.isExpanded) {
       change.deleteAtRange(range)
       range = range.moveToStart()
@@ -802,7 +802,7 @@ Changes.insertTextAtRange = (change, range, text, marks) => {
     return
   }
 
-  change.deferNormalizing(() => {
+  change.withoutNormalizing(() => {
     if (range.isExpanded) {
       change.deleteAtRange(range)
 
@@ -833,7 +833,7 @@ Changes.removeMarkAtRange = (change, range, mark) => {
   const texts = document.getTextsAtRange(range)
   const { start, end } = range
 
-  change.deferNormalizing(() => {
+  change.withoutNormalizing(() => {
     texts.forEach(node => {
       const { key } = node
       let index = 0
@@ -880,7 +880,7 @@ Changes.setBlocksAtRange = (change, range, properties) => {
   // If it's a hanging selection, ignore the last block.
   const sets = isHanging ? blocks.slice(0, -1) : blocks
 
-  change.deferNormalizing(() => {
+  change.withoutNormalizing(() => {
     sets.forEach(block => {
       change.setNodeByKey(block.key, properties)
     })
@@ -900,7 +900,7 @@ Changes.setInlinesAtRange = (change, range, properties) => {
   const { document } = value
   const inlines = document.getInlinesAtRange(range)
 
-  change.deferNormalizing(() => {
+  change.withoutNormalizing(() => {
     inlines.forEach(inline => {
       change.setNodeByKey(inline.key, properties)
     })
@@ -929,7 +929,7 @@ Changes.splitBlockAtRange = (change, range, height = 1) => {
     h++
   }
 
-  change.deferNormalizing(() => {
+  change.withoutNormalizing(() => {
     change.splitDescendantsByKey(node.key, start.key, start.offset)
 
     value = change.value
@@ -1036,7 +1036,7 @@ Changes.unwrapBlockAtRange = (change, range, properties) => {
     .toOrderedSet()
     .toList()
 
-  change.deferNormalizing(() => {
+  change.withoutNormalizing(() => {
     wrappers.forEach(block => {
       const first = block.nodes.first()
       const last = block.nodes.last()
@@ -1117,7 +1117,7 @@ Changes.unwrapInlineAtRange = (change, range, properties) => {
     .toOrderedSet()
     .toList()
 
-  change.deferNormalizing(() => {
+  change.withoutNormalizing(() => {
     inlines.forEach(inline => {
       const parent = change.value.document.getParent(inline.key)
       const index = parent.nodes.indexOf(inline)
@@ -1184,7 +1184,7 @@ Changes.wrapBlockAtRange = (change, range, block) => {
     index = parent.nodes.indexOf(siblings.first())
   }
 
-  change.deferNormalizing(() => {
+  change.withoutNormalizing(() => {
     // Inject the new block node into the parent.
     change.insertNodeByKey(parent.key, index, block)
 
@@ -1230,7 +1230,7 @@ Changes.wrapInlineAtRange = (change, range, inline) => {
   let startChild = startBlock.getFurthestAncestor(start.key)
   let endChild = endBlock.getFurthestAncestor(end.key)
 
-  change.deferNormalizing(() => {
+  change.withoutNormalizing(() => {
     if (!startInline || startInline != endInline) {
       change.splitDescendantsByKey(endChild.key, end.key, end.offset)
       change.splitDescendantsByKey(startChild.key, start.key, start.offset)
@@ -1337,7 +1337,7 @@ Changes.wrapTextAtRange = (change, range, prefix, suffix = prefix) => {
     endRange = endRange.moveForward(prefix.length)
   }
 
-  change.deferNormalizing(() => {
+  change.withoutNormalizing(() => {
     change.insertTextAtRange(startRange, prefix, [])
     change.insertTextAtRange(endRange, suffix, [])
   })
