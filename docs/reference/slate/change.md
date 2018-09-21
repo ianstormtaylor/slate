@@ -53,40 +53,44 @@ function onSomeEvent(event, change) {
 
 `normalize() => Void`
 
-This method normalizes the document with the value's schema. This should run automatically-you should not need to call this method unless you have manually disabled normalization (and you should rarely, if ever, need to manually disable normalization). The vast majority of changes, whether by the user or invoked programmatically, will run `normalize` by default to ensure the document is always in adherence to its schema. `withoutNormalization` also runs `normalize` upon completion.
+This method normalizes the document with the value's schema. This should run automatically-you should not need to call this method unless you have manually disabled normalization (and you should rarely, if ever, need to manually disable normalization). The vast majority of changes, whether by the user or invoked programmatically, will run `normalize` by default to ensure the document is always in adherence to its schema.
 
 > 🤖 If you must use this method, use it sparingly and strategically. Calling this method can be very expensive as it will run normalization on all of the nodes in your document.
 
-### `withoutNormalization`
+### `deferNormalizing`
 
-`withoutNormalization(customChange: Function) => Change`
+`deferNormalizing(customChange: Function) => Change`
 
-This method calls the provided `customChange` function with the current instance of the `Change` object as the first argument. Normalization is suspended while `customChange` is executing, but will be run after `customChange` completes.
+This method calls the provided `customChange` function with the current instance of the `Change` object as the first argument. Normalization is deferred while `customChange` is executing, but will be run after `customChange` completes.
 
 This method can be used to allow a sequence of change operations that should not be interrupted by normalization. For example:
 
 ```js
-/**
- * Only allow block nodes in documents.
- *
- * @type {Object}
- */
-validateNode(node) {
-  if (node.object != 'document') return
-  const invalids = node.nodes.filter(n => n.object != 'block')
-  if (!invalids.size) return
+function removeManyNodes(node) {
+  const toRemove = node.nodes.filter(n => n.object != 'block')
+  if (!toRemove.size) return
 
-  return (change) => {
-    change.withoutNormalization((c) => {
-      invalids.forEach((child) => {
-        c.removeNodeByKey(child.key)
-      })
+  change.deferNormalizing(() => {
+    toRemove.forEach(child => {
+      change.removeNodeByKey(child.key)
     })
-  }
+  })
 }
 ```
 
-> 🤖 If you must use this method, use it sparingly and strategically. Calling this method can be very expensive as it will run normalization on all of the nodes in your document.
+### `withoutSaving`
+
+`withoutSaving(customChange: Function) => Change`
+
+By default all new operations are saved to the editor's history. If you have changes that you don't want to show up in the history when the user presses <kbd>cmd+z</kbd>, you can use `withoutSaving` to skip those changes.
+
+```js
+change.withoutSaving(() => {
+  change.removeNodeByKey(node.key)
+})
+```
+
+However, be sure you know what you are doing because this will create changes that cannot be undone by the user, and might result in confusing behaviors.
 
 ## Full Value Change
 

@@ -36,19 +36,6 @@ describe('slate', () => {
     assert.deepEqual(actual, expected)
   })
 
-  fixtures(__dirname, 'models/change', ({ module }) => {
-    const { input, output, schema, flags, customChange } = module
-    const s = Schema.create(schema)
-    const expected = output.toJSON()
-    const actual = input
-      .change(flags)
-      .setValue({ schema: s })
-      .withoutNormalization(customChange)
-      .value.toJSON()
-
-    assert.deepEqual(actual, expected)
-  })
-
   fixtures(__dirname, 'serializers/raw/deserialize', ({ module }) => {
     const { input, output, options } = module
     const actual = Value.fromJSON(input, options).toJSON()

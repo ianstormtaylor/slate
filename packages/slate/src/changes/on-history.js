@@ -1,4 +1,3 @@
-import invert from '../operations/invert'
 import omit from 'lodash/omit'
 
 /**
@@ -71,7 +70,7 @@ Changes.undo = change => {
   previous
     .slice()
     .reverse()
-    .map(invert)
+    .map(op => op.invert())
     .forEach(inverse => {
       const { type, properties } = inverse
 

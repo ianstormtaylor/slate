@@ -13,21 +13,17 @@ const Changes = {}
  *
  * @param {Change} change
  * @param {Object|Value} properties
- * @param {Object} options
  */
 
-Changes.setValue = (change, properties, options = {}) => {
+Changes.setValue = (change, properties) => {
   properties = Value.createProperties(properties)
   const { value } = change
 
-  change.applyOperation(
-    {
-      type: 'set_value',
-      properties,
-      value,
-    },
-    options
-  )
+  change.applyOperation({
+    type: 'set_value',
+    properties,
+    value,
+  })
 }
 
 /**

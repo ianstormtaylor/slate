@@ -18,9 +18,7 @@ export const schema = {
           const offset = previous.nodes.size
 
           child.nodes.forEach((n, i) =>
-            change.moveNodeByKey(n.key, previous.key, offset + i, {
-              normalize: false,
-            })
+            change.moveNodeByKey(n.key, previous.key, offset + i)
           )
 
           change.removeNodeByKey(child.key)

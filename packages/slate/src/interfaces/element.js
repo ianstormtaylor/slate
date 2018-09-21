@@ -404,6 +404,8 @@ class ElementInterface {
 
   getClosestVoid(path, schema) {
     const ancestors = this.getAncestors(path)
+    if (!ancestors) return null
+
     const ancestor = ancestors.findLast(a => schema.isVoid(a))
     return ancestor
   }

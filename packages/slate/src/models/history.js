@@ -121,12 +121,13 @@ class History extends Record(DEFAULTS) {
     let history = this
     let { undos, redos } = history
     let { merge, skip } = options
-    const prevBatch = undos.peek()
-    const prevOperation = prevBatch && prevBatch.last()
 
     if (skip) {
       return history
     }
+
+    const prevBatch = undos.peek()
+    const prevOperation = prevBatch && prevBatch.last()
 
     if (merge == null) {
       merge = shouldMerge(operation, prevOperation)

@@ -1,12 +1,12 @@
 import Debug from 'debug'
 import isPlainObject from 'is-plain-object'
-import pick from 'lodash/pick'
-import { List } from 'immutable'
+import warning from 'slate-dev-warning'
+import { List, Map } from 'immutable'
 
 import MODEL_TYPES, { isType } from '../constants/model-types'
 import Changes from '../changes'
 import Operation from './operation'
-import apply from '../operations/apply'
+import PathUtils from '../utils/path-utils'
 
 /**
  * Debug.
@@ -44,9 +44,11 @@ class Change {
     this.value = value
     this.operations = new List()
 
-    this.flags = {
+    this.tmp = {
+      dirty: [],
+      merge: null,
       normalize: true,
-      ...pick(attrs, ['merge', 'save', 'normalize']),
+      save: true,
     }
   }
 
@@ -70,9 +72,10 @@ class Change {
    */
 
   applyOperation(operation, options = {}) {
-    const { operations, flags } = this
+    const { operations } = this
     let { value } = this
     let { history } = value
+    const oldValue = value
 
     // Add in the current `value` in case the operation was serialized.
     if (isPlainObject(operation)) {
@@ -83,24 +86,27 @@ class Change {
 
     // Default options to the change-level flags, this allows for setting
     // specific options for all of the operations of a given change.
-    options = { ...flags, ...options }
+    let { merge, save } = this.tmp
 
-    // Derive the default option values.
-    const {
-      merge = operations.size == 0 ? null : true,
-      save = true,
-      skip = null,
-    } = options
+    // If `merge` is non-commital, and this is not the first operation in a new change
+    // then we should merge.
+    if (merge == null && operations.size !== 0) {
+      merge = true
+    }
 
     // Apply the operation to the value.
     debug('apply', { operation, save, merge })
-    value = apply(value, operation)
+    value = operation.apply(value)
 
     // If needed, save the operation to the history.
     if (history && save) {
-      history = history.save(operation, { merge, skip })
+      history = history.save(operation, { merge })
       value = value.set('history', history)
     }
+
+    // Get the keys of the affected nodes, and mark them as dirty.
+    const keys = getDirtyKeys(operation, value, oldValue)
+    this.tmp.dirty = this.tmp.dirty.concat(keys)
 
     // Update the mutable change object.
     this.value = value
@@ -131,22 +137,198 @@ class Change {
 
   call(fn, ...args) {
     fn(this, ...args)
+    this.normalizeDirtyOperations()
     return this
   }
 
   /**
-   * Applies a series of change mutations, deferring normalization to the end.
+   * Normalize all of the nodes in the document from scratch.
+   *
+   * @return {Change}
+   */
+
+  normalize() {
+    const { value } = this
+    const { document } = value
+    const keys = Object.keys(document.getKeysToPathsTable())
+    this.normalizeKeys(keys)
+    return this
+  }
+
+  /**
+   * Normalize any new "dirty" operations that have been added to the change.
+   *
+   * @return {Change}
+   */
+
+  normalizeDirtyOperations() {
+    const { normalize, dirty } = this.tmp
+    if (!normalize) return this
+    if (!dirty.length) return this
+    this.tmp.dirty = []
+    this.normalizeKeys(dirty)
+    return this
+  }
+
+  /**
+   * Normalize a set of nodes by their `keys`.
+   *
+   * @param {Array} keys
+   * @return {Change}
+   */
+
+  normalizeKeys(keys) {
+    const { value } = this
+    const { document } = value
+
+    // TODO: if we had an `Operations.tranform` method, we could optimize this
+    // to not use keys, and instead used transformed operation paths.
+    const table = document.getKeysToPathsTable()
+    let map = Map()
+
+    // TODO: this could be optimized to not need the nested map, and instead use
+    // clever sorting to arrive at the proper depth-first normalizing.
+    keys.forEach(key => {
+      const path = table[key]
+      if (!path) return
+      if (!path.length) return
+      if (!map.hasIn(path)) map = map.setIn(path, Map())
+    })
+
+    // To avoid infinite loops, we need to defer normalization until the end.
+    this.deferNormalizing(() => {
+      this.normalizeMapAndPath(map)
+    })
+
+    return this
+  }
+
+  /**
+   * Normalize all of the nodes in a normalization `map`, depth-first. An
+   * additional `path` argument specifics the current depth/location.
+   *
+   * @param {Map} map
+   * @param {List} path (optional)
+   * @return {Change}
+   */
+
+  normalizeMapAndPath(map, path = List()) {
+    map.forEach((m, k) => {
+      const p = path.concat(k)
+      this.normalizeMapAndPath(m, p)
+    })
+
+    const { value } = this
+    const { document, schema } = value
+    let node = document.assertNode(path)
+
+    let iterations = 0
+    const max =
+      schema.stack.plugins.length +
+      schema.rules.length +
+      (node.object === 'text' ? 1 : node.nodes.size)
+
+    const iterate = () => {
+      const normalize = node.normalize(schema)
+      if (!normalize) return
+
+      // Run the `normalize` function to fix the node.
+      path = this.value.document.getPath(node.key)
+      normalize(this)
+
+      // Re-find the node reference, in case it was updated. If the node no longer
+      // exists, we're done for this branch.
+      node = this.value.document.refindNode(path, node.key)
+      if (!node) return
+
+      path = this.value.document.refindPath(path, node.key)
+
+      // Increment the iterations counter, and check to make sure that we haven't
+      // exceeded the max. Without this check, it's easy for the `normalize`
+      // function of a schema rule to be written incorrectly and for an infinite
+      // invalid loop to occur.
+      iterations++
+
+      if (iterations > max) {
+        throw new Error(
+          'A schema rule could not be normalized after sufficient iterations. This is usually due to a `rule.normalize` or `plugin.normalizeNode` function of a schema being incorrectly written, causing an infinite loop.'
+        )
+      }
+
+      // Otherwise, iterate again.
+      iterate()
+    }
+
+    iterate()
+    return this
+  }
+
+  /**
+   * Apply a series of changes inside a synchronous `fn`, deferring
+   * normalization to the end after the function has executed.
    *
    * @param {Function} fn
    * @return {Change}
    */
 
-  withoutNormalization(fn) {
-    const original = this.flags.normalize
-    this.setOperationFlag('normalize', false)
+  deferNormalizing(fn) {
+    const value = this.tmp.normalize
+    this.tmp.normalize = false
     fn(this)
-    this.setOperationFlag('normalize', original)
-    this.normalizeDocument()
+    this.tmp.normalize = value
+
+    if (this.tmp.normalize) {
+      this.normalizeDirtyOperations()
+    }
+
+    return this
+  }
+
+  /**
+   * Apply a series of changes inside a synchronous `fn`, merging all of the new
+   * operations into the previous save point in the history.
+   *
+   * @param {Function} fn
+   * @return {Change}
+   */
+
+  withMerging(fn) {
+    const value = this.tmp.merge
+    this.tmp.merge = true
+    fn(this)
+    this.tmp.merge = value
+    return this
+  }
+
+  /**
+   * Apply a series of changes inside a synchronous `fn`, without merging any of
+   * the new operations into previous save point in the history.
+   *
+   * @param {Function} fn
+   * @return {Change}
+   */
+
+  withoutMerging(fn) {
+    const value = this.tmp.merge
+    this.tmp.merge = false
+    fn(this)
+    this.tmp.merge = value
+    return this
+  }
+
+  /**
+   * Apply a series of changes inside a synchronous `fn`, without saving any of
+   * their operations into the history.
+   *
+   * @param {Function} fn
+   * @return {Change}
+   */
+
+  withoutSaving(fn) {
+    const value = this.tmp.save
+    this.tmp.save = false
+    fn(this)
+    this.tmp.save = value
     return this
   }
 
@@ -158,34 +340,107 @@ class Change {
    * @return {Change}
    */
 
+  /**
+   * Deprecated.
+   */
+
   setOperationFlag(key, value) {
-    this.flags[key] = value
+    warning(
+      false,
+      'As of slate@0.41.0 the `change.setOperationFlag` method has been deprecated.'
+    )
+
+    this.tmp[key] = value
     return this
   }
-
-  /**
-   * Get the `value` of the specified flag by its `key`. Optionally accepts an `options`
-   * object with override flags.
-   *
-   * @param {String} key
-   * @param {Object} options
-   * @return {Change}
-   */
 
   getFlag(key, options = {}) {
-    return options[key] !== undefined ? options[key] : this.flags[key]
+    warning(
+      false,
+      'As of slate@0.41.0 the `change.getFlag` method has been deprecated.'
+    )
+
+    return options[key] !== undefined ? options[key] : this.tmp[key]
   }
 
-  /**
-   * Unset an operation flag by `key`.
-   *
-   * @param {String} key
-   * @return {Change}
-   */
-
   unsetOperationFlag(key) {
-    delete this.flags[key]
+    warning(
+      false,
+      'As of slate@0.41.0 the `change.unsetOperationFlag` method has been deprecated.'
+    )
+
+    delete this.tmp[key]
     return this
+  }
+
+  withoutNormalization(fn) {
+    warning(
+      false,
+      'As of slate@0.41.0 the `change.withoutNormalization` helper has been renamed to `change.deferNormalizing`.'
+    )
+
+    return this.deferNormalizing(fn)
+  }
+}
+
+/**
+ * Get the "dirty" nodes's keys for a given `operation` and values.
+ *
+ * @param {Operation} operation
+ * @param {Value} newValue
+ * @param {Value} oldValue
+ * @return {Array}
+ */
+
+function getDirtyKeys(operation, newValue, oldValue) {
+  const { type, node, path, newPath } = operation
+  const newDocument = newValue.document
+  const oldDocument = oldValue.document
+
+  switch (type) {
+    case 'insert_node': {
+      const table = node.getKeysToPathsTable()
+      const parent = newDocument.assertParent(path)
+      const keys = [parent.key, ...Object.keys(table)]
+      return keys
+    }
+
+    case 'split_node': {
+      const nextPath = PathUtils.increment(path)
+      const parent = newDocument.assertParent(path)
+      const target = newDocument.assertNode(path)
+      const split = newDocument.assertNode(nextPath)
+      const keys = [parent.key, target.key, split.key]
+      return keys
+    }
+
+    case 'merge_node': {
+      const previousPath = PathUtils.decrement(path)
+      const parent = newDocument.assertParent(path)
+      const merged = newDocument.assertNode(previousPath)
+      const keys = [parent.key, merged.key]
+      return keys
+    }
+
+    case 'move_node': {
+      const parentPath = PathUtils.lift(path)
+      const newParentPath = PathUtils.lift(newPath)
+      const oldParent = oldDocument.assertNode(parentPath)
+      const newParent = oldDocument.assertNode(newParentPath)
+      const keys = [oldParent.key, newParent.key]
+      return keys
+    }
+
+    case 'remove_node': {
+      const parentPath = PathUtils.lift(path)
+      const parent = newDocument.assertNode(parentPath)
+      const keys = [parent.key]
+      return keys
+    }
+
+    default: {
+      return []
+    }
   }
 }
 

@@ -4,7 +4,6 @@ import ByPath from './by-path'
 import OnHistory from './on-history'
 import OnSelection from './on-selection'
 import OnValue from './on-value'
-import WithSchema from './with-schema'
 
 /**
  * Export.
@@ -19,5 +18,4 @@ export default {
   ...OnHistory,
   ...OnSelection,
   ...OnValue,
-  ...WithSchema,
 }
