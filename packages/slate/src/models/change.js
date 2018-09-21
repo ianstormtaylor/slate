@@ -285,22 +285,6 @@ class Change {
   }
 
   /**
-   * Apply a series of changes inside a synchronous `fn`, merging all of the new
-   * operations into the previous save point in the history.
-   *
-   * @param {Function} fn
-   * @return {Change}
-   */
-
-  withMerging(fn) {
-    const value = this.tmp.merge
-    this.tmp.merge = true
-    fn(this)
-    this.tmp.merge = value
-    return this
-  }
-
-  /**
    * Apply a series of changes inside a synchronous `fn`, without merging any of
    * the new operations into previous save point in the history.
    *

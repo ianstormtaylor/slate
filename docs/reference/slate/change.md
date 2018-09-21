@@ -101,10 +101,6 @@ However, be sure you know what you are doing because this will create changes th
 
 Set the entire `value` using either a `properties` object or a `Value` object. Can be used to set `value.data` and other properties that cannot otherwise be easily set using the available methods.
 
-Warning: Calling `setValue` with a `Value` object has unpredictable behavior including the loss of the edit history. Only use with a `Value` object if you know what you are doing. For most use cases, we recommend passing `properties` as an `Object` (e.g. `change.setValue({data: myNewDataObject})`.
-
-Hint: Wrapping the call to `setValue` as follows can be helpful if you want to update a value, like in the value's `data` but do not want to have another save point in the undo history: `change.setOperationFlag('save', false).setValue({data: myNewDataObject}).setOperationFlag('save', true).
-
 ## Current Selection Changes
 
 These changes act on the `document` based on the current `selection`. They are equivalent to calling the [Document Range Changes](#document-range-changes) with the current selection as the `range` argument, but they are there for convenience, since you often want to act with the current selection, as a user would.

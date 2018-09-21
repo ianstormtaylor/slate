@@ -150,14 +150,13 @@ class SearchHighlighting extends React.Component {
       })
     })
 
-    // Setting the `save` option to false prevents this change from being added
-    // to the undo/redo stack and clearing the redo stack if the user has undone
-    // changes.
-    const change = value
-      .change()
-      .setOperationFlag('save', false)
-      .setValue({ decorations })
-      .setOperationFlag('save', true)
+    const change = value.change()
+
+    // Make the change to decorations without saving it into the undo history,
+    // so that there isn't a confusing behavior when undoing.
+    change.withoutSaving(() => {
+      change.setValue({ decorations })
+    })
 
     this.onChange(change)
   }
