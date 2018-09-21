@@ -26,7 +26,7 @@ A [`Value`](./value.md) with the change's current operations applied. Each time 
 
 `call(fn: Function, ...args) => Change`
 
-This method calls the provided `customChange` function with the current instance of the `Change` object as the first argument and passes through the remaining `args`.
+This method calls the provided function with the current instance of the `Change` object as the first argument and passes through the remaining `args`.
 
 The purpose of `call` is to enable custom change methods to exist and called in a chain. For example:
 
@@ -61,7 +61,7 @@ This method normalizes the document with the value's schema. This should run aut
 
 `deferNormalizing(fn: Function) => Change`
 
-This method calls the provided `customChange` function with the current instance of the `Change` object as the first argument. Normalization is deferred while `customChange` is executing, but will be run after `customChange` completes.
+This method calls the provided function with the current instance of the `Change` object as the first argument. Normalization is deferred while the fuction is executing, but will be run immediately after it completes.
 
 This method can be used to allow a sequence of change operations that should not be interrupted by normalization. For example:
 
