@@ -4,6 +4,36 @@ A list of changes to the `slate` package with each new version. Until `1.0.0` is
 
 ---
 
+### `0.41.0` — September 21, 2018
+
+###### DEPRECATED
+
+**The `withoutNormalization` helper has been renamed to `withoutNormalizing`.** This is to stay consistent with the new helpers for `withoutSaving` and `withoutMerging`.
+
+###### BREAKING
+
+**The the "operation flags" concept was removed.** This was a confusing concept that was implemented in multiple different ways and led to the logic around normalizing, saving, and merging operations being more complex than it needed to be. These flags have been replaced with three simpler helper functions: `withoutNormalizing`, `withoutSaving` and `withoutMerging`.
+
+```js
+change.withoutNormalizing(() => {
+  nodes.forEach(node => change.removeNodeByKey(node.key))
+})
+```
+
+```js
+change.withoutSaving(() => {
+  change.setValue({ decorations })
+})
+```
+
+This means that you no longer use the `{ normalize: false }` or `{ save: false }` options as arguments to individual change methods, and instead use these new helper methods to apply these behaviors to groups of changes at once.
+
+**The "normalize" change methods have been removed.** Previously there were a handful of different normalization change methods like `normalizeNodeByPath`, `normalizeParentByKey`, etc. These were confusing because it put the onus on the implemented to know exact which nodes needed to be normalized. They have been removed, and implementers no longer ever need to worry about which specific nodes to normalize, as Slate will handle that for them.
+
+**The internal `refindNode` and `refindPath` methods were removed.** These should never have been exposed in the first place, and are now no longer present on the `Element` interface. These were only used internally during the normalization process.
+
+---
+
 ### `0.40.0` — August 22, 2018
 
 ###### BREAKING

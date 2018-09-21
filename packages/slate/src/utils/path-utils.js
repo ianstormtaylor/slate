@@ -9,7 +9,7 @@ import { List } from 'immutable'
  */
 
 function compare(path, target) {
-  // PERF: if the paths are the same we can exit early.
+  // PERF: if the paths are not the same size we can exit early.
   if (path.size !== target.size) return null
 
   for (let i = 0; i < path.size; i++) {
@@ -132,6 +132,33 @@ function isBefore(path, target) {
 }
 
 /**
+ * Is a `path` equal to another `target` path in a document?
+ *
+ * @param {List} path
+ * @param {List} target
+ * @return {Boolean}
+ */
+
+function isEqual(path, target) {
+  return path.equals(target)
+}
+
+/**
+ * Is a `path` a sibling of a `target` path?
+ *
+ * @param {List} path
+ * @param {List} target
+ * @return {Boolean}
+ */
+
+function isSibling(path, target) {
+  if (path.size !== target.size) return false
+  const p = path.butLast()
+  const t = target.butLast()
+  return p.equals(t)
+}
+
+/**
  * Lift a `path` to refer to its parent.
  *
  * @param {List} path
@@ -210,6 +237,8 @@ export default {
   isAbove,
   isAfter,
   isBefore,
+  isEqual,
+  isSibling,
   lift,
   max,
   min,

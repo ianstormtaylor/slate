@@ -115,7 +115,9 @@ function BeforePlugin() {
     // happen on the initialization of the editor, or if the schema changes.
     // This change isn't save into history since only schema is updated.
     if (value.schema != editor.schema) {
-      change.setValue({ schema: editor.schema }, { save: false }).normalize()
+      change.withoutSaving(() => {
+        change.setValue({ schema: editor.schema }).normalize()
+      })
     }
 
     debug('onChange')

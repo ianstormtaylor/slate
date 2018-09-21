@@ -7,6 +7,8 @@ import Node from './node'
 import PathUtils from '../utils/path-utils'
 import Selection from './selection'
 import Value from './value'
+import apply from '../operations/apply'
+import invert from '../operations/invert'
 
 /**
  * Operation attributes.
@@ -222,6 +224,29 @@ class Operation extends Record(DEFAULTS) {
 
   get object() {
     return 'operation'
+  }
+
+  /**
+   * Apply the operation to a `value`.
+   *
+   * @param {Value} value
+   * @return {Value}
+   */
+
+  apply(value) {
+    const next = apply(value, this)
+    return next
+  }
+
+  /**
+   * Invert the operation.
+   *
+   * @return {Operation}
+   */
+
+  invert() {
+    const inverted = invert(this)
+    return inverted
   }
 
   /**

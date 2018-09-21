@@ -1,4 +1,3 @@
-import invert from '../operations/invert'
 import omit from 'lodash/omit'
 
 /**
@@ -38,7 +37,9 @@ Changes.redo = change => {
       op = op.set('properties', omit(properties, 'isFocused'))
     }
 
-    change.applyOperation(op, { save: false })
+    change.withoutSaving(() => {
+      change.applyOperation(op)
+    })
   })
 
   // Update the history.
@@ -71,7 +72,7 @@ Changes.undo = change => {
   previous
     .slice()
     .reverse()
-    .map(invert)
+    .map(op => op.invert())
     .forEach(inverse => {
       const { type, properties } = inverse
 
@@ -81,7 +82,9 @@ Changes.undo = change => {
         inverse = inverse.set('properties', omit(properties, 'isFocused'))
       }
 
-      change.applyOperation(inverse, { save: false })
+      change.withoutSaving(() => {
+        change.applyOperation(inverse)
+      })
     })
 
   // Update the history.

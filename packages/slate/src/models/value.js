@@ -125,7 +125,9 @@ class Value extends Record(DEFAULTS) {
     })
 
     if (options.normalize !== false) {
-      value = value.change({ save: false }).normalize().value
+      const change = value.change()
+      change.withoutSaving(() => change.normalize())
+      value = change.value
     }
 
     return value

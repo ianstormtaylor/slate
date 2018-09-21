@@ -45,7 +45,7 @@ const schema = {
 
 Hopefully just by reading this definition you'll understand what kinds of blocks are allowed in the document and what properties they can have—schemas are designed to prioritize legibility.
 
-This schema defines a document that only allows `paragraph` and `image` blocks. In the case of `paragraph` blocks, they can only contain text nodes. And in the case of `image` blocks, they are always void nodes with a `data.src` property that is a URL. Simple enough, right?
+This schema defines a document that only allows `paragraph` and `image` blocks. In the case of `paragraph` blocks, they can only contain text nodes. And in the case of `image` blocks, they are void nodes with a `data.src` property that is a URL. Simple enough, right?
 
 The magic is that by passing a schema like this into your editor, it will automatically "validate" the document when changes are made, to make sure the schema is being adhered to. If it is, great. But if it isn't, and one of the nodes in the document is invalid, the editor will automatically "normalize" the node, to make the document valid again.
 
@@ -109,67 +109,3 @@ This validation defines a very specific (honestly, useless) behavior, where if a
 When you need this level of specificity, using the `normalizeNode` property of the editor or plugins is handy.
 
 However, only use it when you absolutely have to. And when you do, make sure to optimize the function's performance. `normalizeNode` will be called **every time the node changes**, so it should be as performant as possible. That's why the example above returns early, so that the smallest amount of work is done each time it is called.
-
-## Multi-step Normalizations
-
-Some normalizations will require multiple `change` function calls in order to complete. But after calling the first change function, the resulting document will be normalized, changing the document out from underneath you. This can cause unintended behaviors.
-
-Consider the following validation function that merges adjacent text nodes together.
-
-Note: This functionality is already correctly implemented in slate-core so you don't need to put it in yourself!
-
-```js
-/**
-  * Merge adjacent text nodes.
-  *
-  * @type {Object}
-  */
-normalizeNode(node) {
-  if (node.object != 'block' && node.object != 'inline') return
-
-  const invalids = node.nodes
-    .map((child, i) => {
-      const next = node.nodes.get(i + 1)
-      if (child.object != 'text') return
-      if (!next || next.object != 'text') return
-      return next
-    })
-    .filter(Boolean)
-
-  if (!invalids.size) return
-
-  return (change) => {
-    // Reverse the list to handle consecutive merges, since the earlier nodes
-    // will always exist after each merge.
-    invalids.reverse().forEach((n) => {
-      change.mergeNodeByKey(n.key)
-    })
-  }
-}
-```
-
-There is actually a problem with this code. Because each `change` function call will cause nodes impacted by the mutation to be normalized, this can cause interruptions to carefully implemented sequences of `change` functions and may create performance problems or errors. The normalization logic in the above example will merge the last node in the invalids list together, but then it'll trigger another normalization and start over!
-
-How can we deal with this? Well, normalization can be suppressed temporarily for multiple `change` function calls by using the `change.withoutNormalization` function. `withoutNormalization` accepts a function that takes a `change` object as a parameter, and executes the function while suppressing normalization. Once the function is done executing, the entire document is then normalized to pick up any unnnormalized transformations and ensure your document is in a normalized state.
-
-The above validation function can then be written as below
-
-```js
-/**
-  * Merge adjacent text nodes.
-  *
-  * @type {Object}
-  */
-normalizeNode(node) {
-  ...
-  return (change) => {
-    change.withoutNormalization((c) => {
-      // Reverse the list to handle consecutive merges, since the earlier nodes
-      // will always exist after each merge.
-      invalids.reverse().forEach((n) => {
-        c.mergeNodeByKey(n.key)
-      })
-    });
-  }
-}
-```

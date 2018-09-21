@@ -404,6 +404,8 @@ class ElementInterface {
 
   getClosestVoid(path, schema) {
     const ancestors = this.getAncestors(path)
+    if (!ancestors) return null
+
     const ancestor = ancestors.findLast(a => schema.isVoid(a))
     return ancestor
   }
@@ -1540,36 +1542,6 @@ class ElementInterface {
     ret = ret.removeNode(path)
     ret = ret.insertNode(newPath, node)
     return ret
-  }
-
-  /**
-   * Attempt to "refind" a node by a previous `path`, falling back to looking
-   * it up by `key` again.
-   *
-   * @param {List|String} path
-   * @param {String} key
-   * @return {Node|Null}
-   */
-
-  refindNode(path, key) {
-    const node = this.getDescendant(path)
-    const found = node && node.key === key ? node : this.getDescendant(key)
-    return found
-  }
-
-  /**
-   * Attempt to "refind" the path to a node by a previous `path`, falling back
-   * to looking it up by `key`.
-   *
-   * @param {List|String} path
-   * @param {String} key
-   * @return {List|Null}
-   */
-
-  refindPath(path, key) {
-    const node = this.getDescendant(path)
-    const found = node && node.key === key ? path : this.getPath(key)
-    return found
   }
 
   /**
