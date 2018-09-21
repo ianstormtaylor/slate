@@ -106,6 +106,15 @@ class Decoration extends Record(DEFAULTS) {
 
   static fromJSON(object) {
     const { anchor, focus, mark } = object
+
+    if (!mark) {
+      throw new Error(
+        `Decorations must be created with a \`mark\`, but you passed: ${JSON.stringify(
+          object
+        )}`
+      )
+    }
+
     const decoration = new Decoration({
       anchor: Point.fromJSON(anchor || {}),
       focus: Point.fromJSON(focus || {}),

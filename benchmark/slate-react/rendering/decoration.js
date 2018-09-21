@@ -42,7 +42,9 @@ const decorations = texts.flatMap((t, index) => {
         key: t.key,
         offset: 1,
       },
-      marks: [{ type: 'underline' }],
+      mark: {
+        type: 'underline',
+      },
     },
   ]
 })
