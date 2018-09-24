@@ -377,9 +377,7 @@ class Editor extends React.Component {
    * Resolve a change from the current `plugins`, a potential `change` and its
    * current operations `size`.
    *
-   * @param {Array} plugins
-   * @param {Change} change
-   * @param {Number} size
+   * @return {Change}
    */
 
   resolveChange = () => {
@@ -388,14 +386,13 @@ class Editor extends React.Component {
   }
 
   /**
-   * Resolve a value from the current `plugins` and a potential `value`.
+   * Resolve value and change in each lifecycle, and store them in this.memoized
    *
-   * @param {Array} plugins
-   * @param {Value} value
-   * @return {Change}
+   * @return {}
    */
 
   resolveMemoize = () => {
+    // Flush the memoize when props changes
     if (this.tmp.propsValue !== this.props.value) {
       this.tmp.propsValue = this.props.value
       this.memoized = {}
