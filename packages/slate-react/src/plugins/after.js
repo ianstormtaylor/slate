@@ -33,6 +33,7 @@ const debug = Debug('slate:after')
 
 function AfterPlugin() {
   let isDraggingInternally = null
+  let lastMousePressedMovingTimeStamp
 
   /**
    * On before input.
@@ -443,6 +444,37 @@ function AfterPlugin() {
     change.insertTextAtRange(entire, textContent, leaf.marks).select(corrected)
   }
 
+  /*
+   * On mouse move
+   *
+   * @param {Event} event
+   * @param {Change} change
+   * @param {Editor} editor
+  */
+
+  function onMouseMove(event, change, editor) {
+    // It means the left key of mouse is pressed
+    if (event.buttons % 2 === 1) {
+      debug('onMouseMove', { event })
+      lastMousePressedMovingTimeStamp = event.timeStamp
+    } else {
+      lastMousePressedMovingTimeStamp = NaN
+    }
+  }
+
+  /*
+   * On mouse up
+   *
+   * @param {Event} event
+   * @param {Change} change
+   * @param {Editor} editor
+  */
+
+  function onMouseUp(event) {
+    debug('onMouseUp', { event })
+    if (event.buttons % 2 !== 1) lastMousePressedMovingTimeStamp = NaN
+  }
+
   /**
    * On key down.
    *
@@ -636,6 +668,17 @@ function AfterPlugin() {
     const focusBlock = document.getClosestBlock(focus.key)
     const anchorBlock = document.getClosestBlock(anchor.key)
 
+    // COMPAT: If the mouse is moving with major down, and the previous selection is
+    // collapsed, and the new selection is also collapsed start; Then extend the
+    // selection rather than move the selection;
+    if (
+      event.timeStamp - lastMousePressedMovingTimeStamp < 0 &&
+      range.isCollapsed &&
+      value.selection.isCollapsed
+    ) {
+      range = range.setAnchor(value.selection.anchor)
+    }
+
     // COMPAT: If the anchor point is at the start of a non-void, and the
     // focus point is inside a void node with an offset that isn't `0`, set
     // the focus offset to `0`. This is due to void nodes <span>'s being
@@ -781,6 +824,8 @@ function AfterPlugin() {
     onDragStart,
     onDrop,
     onInput,
+    onMouseMove,
+    onMouseUp,
     onKeyDown,
     onPaste,
     onSelect,
