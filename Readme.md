@@ -48,6 +48,9 @@
   <a href="./License.md">
     <img src="https://img.shields.io/npm/l/slate.svg?maxAge=3600">
   </a>
+  <a href="https://codecov.io/gh/ianstormtaylor/slate">
+    <img src="https://codecov.io/gh/ianstormtaylor/slate/branch/master/graph/badge.svg" />
+  </a>
 </p>
 <br/>
 
