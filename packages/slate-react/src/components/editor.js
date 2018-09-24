@@ -119,8 +119,7 @@ class Editor extends React.Component {
     this.tmp.updates++
 
     const { autoFocus } = this.props
-    this.resolveMemoize()
-    const { change } = this.memoized
+    const change = this.resolveChange()
 
     if (autoFocus) {
       if (change) {
@@ -140,8 +139,7 @@ class Editor extends React.Component {
   componentDidUpdate(prevProps) {
     this.tmp.updates++
 
-    this.resolveMemoize()
-    const { change } = this.memoized
+    const change = this.resolveChange()
     const { resolves, updates } = this.tmp
 
     // If we've resolved a few times already, and it's exactly in line with
@@ -279,7 +277,8 @@ class Editor extends React.Component {
     debug('onChange', { change })
 
     if (change.operations.size > this.tmp.operationsSize) {
-      this.resolveChange(change)
+      const { stack } = this
+      stack.run('onChange', change, this)
     }
 
     // Store a reference to the last `value` and `plugins` that were seen by the
@@ -307,21 +306,6 @@ class Editor extends React.Component {
     this.change(change => {
       this.stack.run(handler, event, change, this)
     })
-  }
-
-  /**
-   * Resolve a change from the current `plugins`, a potential `change` and its
-   * current operations `size`.
-   *
-   * @param {Array} plugins
-   * @param {Change} change
-   * @param {Number} size
-   */
-
-  resolveChange = change => {
-    const { stack } = this
-    stack.run('onChange', change, this)
-    return change
   }
 
   /**
@@ -390,6 +374,20 @@ class Editor extends React.Component {
   })
 
   /**
+   * Resolve a change from the current `plugins`, a potential `change` and its
+   * current operations `size`.
+   *
+   * @param {Array} plugins
+   * @param {Change} change
+   * @param {Number} size
+   */
+
+  resolveChange = () => {
+    this.resolveMemoize()
+    return this.memoized.change
+  }
+
+  /**
    * Resolve a value from the current `plugins` and a potential `value`.
    *
    * @param {Array} plugins
@@ -429,7 +427,8 @@ class Editor extends React.Component {
     try {
       this.tmp.isResolvingValue = true
       debug('resolveValue', { plugins, value })
-      this.resolveChange(change)
+      const { stack } = this
+      stack.run('onChange', change, this)
 
       // Store the change and it's operations count so that it can be flushed once
       // the component next updates.
