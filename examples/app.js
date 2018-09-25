@@ -14,6 +14,7 @@ import Embeds from './embeds'
 import Emojis from './emojis'
 import ForcedLayout from './forced-layout'
 import History from './history'
+import Versions from './versions'
 import HoveringMenu from './hovering-menu'
 import HugeDocument from './huge-document'
 import Images from './images'
@@ -59,6 +60,7 @@ const EXAMPLES = [
   ['Forced Layout', ForcedLayout, '/forced-layout'],
   ['Huge Document', HugeDocument, '/huge-document'],
   ['History', History, '/history'],
+  ['Versions', Versions, '/versions'],
   ['Input Tester', InputTester, '/input-tester'],
 ]
 
