@@ -10,7 +10,7 @@ import { Button, Icon, Toolbar } from '../components'
 
 const initialVersionState = [
   {
-    name: 'root',
+    name: 'version 1',
     isRoot: true,
     value: {
       document: {
@@ -34,7 +34,7 @@ const initialVersionState = [
     },
   },
   {
-    name: 'version 1',
+    name: 'version 2',
     changes: [
       [
         Operation.create({
@@ -104,6 +104,10 @@ class Versions extends React.Component {
     value: Value.fromJSON(initialVersionState[0].value),
     versions: initialVersionState,
     activeVersionIndex: 0,
+  }
+
+  componentDidMount() {
+    this.setVersion(initialVersionState.length - 1)
   }
 
   /**
