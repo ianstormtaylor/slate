@@ -10,21 +10,20 @@ import { Button, Icon, Toolbar } from '../components'
 
 const initialVersionState = [
   {
-    name: "root",
+    name: 'root',
     isRoot: true,
     value: {
-      "document": {
-        "nodes": [
+      document: {
+        nodes: [
           {
-            "object": "block",
-            "type": "paragraph",
-            "nodes": [
+            object: 'block',
+            type: 'paragraph',
+            nodes: [
               {
-                "object": "text",
-                "leaves": [
+                object: 'text',
+                leaves: [
                   {
-                    "text":
-                    "This example shows versions."
+                    text: 'This example shows versions.',
                   },
                 ],
               },
@@ -32,55 +31,54 @@ const initialVersionState = [
           },
         ],
       },
-    }
+    },
   },
   {
-    name: "version 1",
+    name: 'version 1',
     changes: [
       [
         Operation.create({
-          object: "operation",
-          path: [ 0, 0 ],
+          object: 'operation',
+          path: [0, 0],
           position: 28,
           properties: {
             data: {},
-            type: undefined
+            type: undefined,
           },
           target: null,
-          type: "split_node",
+          type: 'split_node',
         }),
         Operation.create({
-          object: "operation",
-          path: [ 0 ],
+          object: 'operation',
+          path: [0],
           position: 1,
           properties: {
             data: {},
-            type: "paragraph"
+            type: 'paragraph',
           },
           target: 28,
-          type: "split_node",
-        })
+          type: 'split_node',
+        }),
       ],
       [
         Operation.create({
           marks: [],
-          object: "operation",
+          object: 'operation',
           offset: 0,
-          path: [ 1, 0 ],
-          text: "Try adding a new version by clicking the + icon.",
-          type: "insert_text",
-        })
+          path: [1, 0],
+          text: 'Try adding a new version by clicking the + icon.',
+          type: 'insert_text',
+        }),
       ],
     ],
   },
 ]
 
-export const VersionList = styled('ul')`
-`
+export const VersionList = styled('ul')``
 
 export const VersionListItem = styled('li')`
   cursor: pointer;
-  color: ${props => props.active ? "red" : "black" };
+  color: ${props => (props.active ? 'red' : 'black')};
 `
 
 export const Version = ({ active, onClick, name }) => (
@@ -112,15 +110,18 @@ class Versions extends React.Component {
    * Resets the history stack
    *
    */
-  resetHistory = () => {
-    let { value } = this.state;
-    const change = value.change();
 
-    const history = value.history.set('undos', new Stack()).set('redos', new Stack())
+  resetHistory = () => {
+    let { value } = this.state
+    const change = value.change()
+
+    const history = value.history
+      .set('undos', new Stack())
+      .set('redos', new Stack())
     value = value.set('history', history)
     change.value = value
 
-    this.onChange(change);
+    this.onChange(change)
   }
 
   /**
@@ -128,17 +129,17 @@ class Versions extends React.Component {
    *
    * @param {Number} index
    */
-  setVersion = (index) => {
-    const { value, versions, activeVersionIndex } = this.state;
 
+  setVersion = index => {
+    const { value, versions, activeVersionIndex } = this.state
 
     if (index === activeVersionIndex) {
-      return;
+      return
     }
 
-    this.resetHistory();
+    this.resetHistory()
 
-    const change = value.change();
+    const change = value.change()
     const version = versions[index]
 
     // the root just has a value so set it explicitly.
@@ -147,21 +148,20 @@ class Versions extends React.Component {
         activeVersionIndex: index,
         value: Value.fromJSON(version.value),
       })
-    }
-    else {
-      const changes = version.changes;
+    } else {
       const isForward = index > activeVersionIndex
 
-      let operationsToApply;
+      let operationsToApply
 
       if (isForward) {
-        operationsToApply = versions.slice(activeVersionIndex+1, index+1)
-          .map(version => version.changes.flat())
+        operationsToApply = versions
+          .slice(activeVersionIndex + 1, index + 1)
+          .map(v => v.changes.flat())
           .flat()
-      }
-      else {
-        operationsToApply = versions.slice(index+1, activeVersionIndex+1)
-          .map(version => version.changes.flat())
+      } else {
+        operationsToApply = versions
+          .slice(index + 1, activeVersionIndex + 1)
+          .map(v => v.changes.flat())
           .flat()
           .reverse()
           .map(op => op.invert())
@@ -169,11 +169,11 @@ class Versions extends React.Component {
 
       change.withoutNormalizing(() => {
         change.withoutSaving(() => {
-          change.applyOperations(operationsToApply);
+          change.applyOperations(operationsToApply)
         })
       })
 
-      this.onChange(change);
+      this.onChange(change)
       this.setState({ activeVersionIndex: index })
     }
   }
@@ -182,45 +182,47 @@ class Versions extends React.Component {
    * Creates a version below the active version
    *
    */
+
   addVersion = () => {
     /*
     */
-    const versionName = window.prompt("How do you want to call this version?")
+
+    const versionName = window.prompt('How do you want to call this version?')
 
     if (!versionName) {
-      return;
+      return
     }
 
-    const { value, versions, activeVersionIndex } = this.state;
+    const { value, versions, activeVersionIndex } = this.state
     const { history } = value
 
     const newVersion = {
       name: versionName,
       value: this.state.value.toJSON(),
-      changes: history.undos.toArray().reverse().map(list => list.toArray())
+      changes: history.undos
+        .toArray()
+        .reverse()
+        .map(list => list.toArray()),
     }
 
     this.setState({
-      versions: [
-        ...versions,
-        newVersion
-      ],
-      activeVersionIndex: activeVersionIndex+1
+      versions: [...versions, newVersion],
+      activeVersionIndex: activeVersionIndex + 1,
     })
 
-    this.resetHistory();
-
+    this.resetHistory()
   }
 
   /**
    * Check if we are at the last version
    *
-   * @return {Boolean}
+   * @returns {Boolean}
    */
+
   atTail = () => {
     const { versions, activeVersionIndex } = this.state
 
-    return versions.length-1 === activeVersionIndex
+    return versions.length - 1 === activeVersionIndex
   }
 
   /**
@@ -236,13 +238,14 @@ class Versions extends React.Component {
     return (
       <div>
         <VersionList>
-          { versions.map((version, index) => 
-            <Version 
+          {versions.map((version, index) => (
+            <Version
+              key={index}
               name={version.name}
               active={index === activeVersionIndex}
               onClick={() => this.setVersion(index)}
             />
-          )}
+          ))}
         </VersionList>
         <Toolbar>
           <Button active={history.undos.size} onMouseDown={this.addVersion}>
