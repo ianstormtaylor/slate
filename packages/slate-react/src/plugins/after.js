@@ -73,12 +73,19 @@ function AfterPlugin() {
    */
 
   function onClick(event, change, editor) {
-    if (editor.props.readOnly) return true
+    if (editor.props.readOnly) {
+      return true
+    }
 
     const { value } = change
     const { document } = value
     const node = findNode(event.target, value)
-    const isVoid = node && (node.isVoid || document.hasVoidParent(node.key))
+
+    if (!node) {
+      return
+    }
+
+    const isVoid = node.isVoid || document.hasVoidParent(node.key)
 
     if (isVoid) {
       // COMPAT: In Chrome & Safari, selections that are at the zero offset of
