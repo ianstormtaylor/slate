@@ -19,6 +19,7 @@ These tools are helpful when developing with Slate:
 
 These products are built with Slate, and can give you an idea of what's possible:
 
+* [Cake](https://www.cake.co/)
 * [GitBook](https://www.gitbook.com/)
 * [Grafana](https://grafana.com/)
 * [Guru](https://www.getguru.com/)
@@ -35,3 +36,4 @@ These pre-packaged editors are built on top of Slate, and can be helpful to see 
 * [Nossas Editor](http://slate-editor.bonde.org/) is a drop-in WYSIWYG editor.
 * [ORY Editor](https://editor.ory.am/) is a self-contained, inline WYSIWYG editor library.
 * [Outline Editor](https://github.com/outline/rich-markdown-editor) is the editor that powers the [Outline](https://www.getoutline.com/) wiki.
+* [Chatterslate](https://github.com/chatterbugapp/chatterslate) helps teach language grammar and more at [Chatterbug](https://chatterbug.com)
