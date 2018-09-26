@@ -165,11 +165,18 @@ function AfterPlugin() {
    */
 
   function onClick(event, change, editor) {
-    if (editor.props.readOnly) return true
+    if (editor.props.readOnly) {
+      return true
+    }
 
     const { value } = change
     const { document, schema } = value
     const node = findNode(event.target, value)
+
+    if (!node) {
+      return
+    }
+
     const ancestors = document.getAncestors(node.key)
     const isVoid =
       node && (schema.isVoid(node) || ancestors.some(a => schema.isVoid(a)))
