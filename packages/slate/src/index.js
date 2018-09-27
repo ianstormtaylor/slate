@@ -1,6 +1,7 @@
-import './interfaces/common'
-import './interfaces/element'
+import './interfaces/object'
+import './interfaces/model'
 import './interfaces/node'
+import './interfaces/element'
 import './interfaces/range'
 
 import Block from './models/block'

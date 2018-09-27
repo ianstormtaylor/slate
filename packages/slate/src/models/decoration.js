@@ -2,7 +2,6 @@ import isPlainObject from 'is-plain-object'
 import { List, Record } from 'immutable'
 
 import Mark from './mark'
-import MODEL_TYPES from '../constants/model-types'
 import Point from './point'
 import Range from './range'
 
@@ -13,8 +12,8 @@ import Range from './range'
  */
 
 const DEFAULTS = {
-  anchor: Point.create(),
-  focus: Point.create(),
+  anchor: undefined,
+  focus: undefined,
   mark: undefined,
 }
 
@@ -125,27 +124,6 @@ class Decoration extends Record(DEFAULTS) {
   }
 
   /**
-   * Check if an `obj` is a `Decoration`.
-   *
-   * @param {Any} obj
-   * @return {Boolean}
-   */
-
-  static isDecoration(obj) {
-    return !!(obj && obj[MODEL_TYPES.DECORATION])
-  }
-
-  /**
-   * Object.
-   *
-   * @return {String}
-   */
-
-  get object() {
-    return 'decoration'
-  }
-
-  /**
    * Set new `properties` on the decoration.
    *
    * @param {Object|Range|Selection} properties
@@ -191,12 +169,6 @@ class Decoration extends Record(DEFAULTS) {
     return object
   }
 }
-
-/**
- * Attach a pseudo-symbol for type checking.
- */
-
-Decoration.prototype[MODEL_TYPES.DECORATION] = true
 
 /**
  * Export.

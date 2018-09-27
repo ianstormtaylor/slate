@@ -4,7 +4,6 @@ import { Record } from 'immutable'
 
 import KeyUtils from '../utils/key-utils'
 import PathUtils from '../utils/path-utils'
-import MODEL_TYPES from '../constants/model-types'
 
 /**
  * Default properties.
@@ -13,9 +12,9 @@ import MODEL_TYPES from '../constants/model-types'
  */
 
 const DEFAULTS = {
-  key: null,
-  offset: null,
-  path: null,
+  key: undefined,
+  offset: undefined,
+  path: undefined,
 }
 
 /**
@@ -99,27 +98,6 @@ class Point extends Record(DEFAULTS) {
     })
 
     return point
-  }
-
-  /**
-   * Check if an `obj` is a `Point`.
-   *
-   * @param {Any} obj
-   * @return {Boolean}
-   */
-
-  static isPoint(obj) {
-    return !!(obj && obj[MODEL_TYPES.POINT])
-  }
-
-  /**
-   * Object.
-   *
-   * @return {String}
-   */
-
-  get object() {
-    return 'point'
   }
 
   /**
@@ -410,12 +388,6 @@ class Point extends Record(DEFAULTS) {
     })
   }
 }
-
-/**
- * Attach a pseudo-symbol for type checking.
- */
-
-Point.prototype[MODEL_TYPES.POINT] = true
 
 /**
  * Export.

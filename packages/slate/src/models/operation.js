@@ -1,7 +1,6 @@
 import isPlainObject from 'is-plain-object'
 import { List, Record } from 'immutable'
 
-import MODEL_TYPES from '../constants/model-types'
 import Mark from './mark'
 import Node from './node'
 import PathUtils from '../utils/path-utils'
@@ -195,17 +194,6 @@ class Operation extends Record(DEFAULTS) {
   }
 
   /**
-   * Check if `any` is a `Operation`.
-   *
-   * @param {Any} any
-   * @return {Boolean}
-   */
-
-  static isOperation(any) {
-    return !!(any && any[MODEL_TYPES.OPERATION])
-  }
-
-  /**
    * Check if `any` is a list of operations.
    *
    * @param {Any} any
@@ -214,16 +202,6 @@ class Operation extends Record(DEFAULTS) {
 
   static isOperationList(any) {
     return List.isList(any) && any.every(item => Operation.isOperation(item))
-  }
-
-  /**
-   * Object.
-   *
-   * @return {String}
-   */
-
-  get object() {
-    return 'operation'
   }
 
   /**
@@ -326,12 +304,6 @@ class Operation extends Record(DEFAULTS) {
     return json
   }
 }
-
-/**
- * Attach a pseudo-symbol for type checking.
- */
-
-Operation.prototype[MODEL_TYPES.OPERATION] = true
 
 /**
  * Export.

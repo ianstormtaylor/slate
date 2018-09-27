@@ -23,7 +23,7 @@ import Value from '../models/value'
  * @type {Class}
  */
 
-class CommonInterface {
+class ModelInterface {
   /**
    * Alias `fromJS`.
    */
@@ -47,7 +47,7 @@ class CommonInterface {
  * @param {Record}
  */
 
-mixin(CommonInterface, [
+mixin(ModelInterface, [
   Block,
   Change,
   Decoration,

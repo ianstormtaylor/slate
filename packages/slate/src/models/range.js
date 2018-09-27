@@ -2,9 +2,9 @@ import isPlainObject from 'is-plain-object'
 import { List, Record } from 'immutable'
 
 import Decoration from './decoration'
-import MODEL_TYPES from '../constants/model-types'
 import Point from './point'
 import Selection from './selection'
+import isObject from '../utils/is-object'
 
 /**
  * Default properties.
@@ -13,8 +13,8 @@ import Selection from './selection'
  */
 
 const DEFAULTS = {
-  anchor: Point.create(),
-  focus: Point.create(),
+  anchor: undefined,
+  focus: undefined,
 }
 
 /**
@@ -112,28 +112,18 @@ class Range extends Record(DEFAULTS) {
   }
 
   /**
-   * Check if an `obj` is a `Range`, or is range-like.
+   * Check if a `value` is a `Range`, or is range-like.
    *
-   * @param {Any} obj
+   * @param {Any} value
    * @return {Boolean}
    */
 
-  static isRange(obj) {
+  static isRange(value) {
     return (
-      !!(obj && obj[MODEL_TYPES.RANGE]) ||
-      Decoration.isDecoration(obj) ||
-      Selection.isSelection(obj)
+      isObject('range', value) ||
+      Decoration.isDecoration(value) ||
+      Selection.isSelection(value)
     )
-  }
-
-  /**
-   * Object.
-   *
-   * @return {String}
-   */
-
-  get object() {
-    return 'range'
   }
 
   /**
@@ -153,12 +143,6 @@ class Range extends Record(DEFAULTS) {
     return object
   }
 }
-
-/**
- * Attach a pseudo-symbol for type checking.
- */
-
-Range.prototype[MODEL_TYPES.RANGE] = true
 
 /**
  * Export.

@@ -3,7 +3,6 @@ import isPlainObject from 'is-plain-object'
 import warning from 'slate-dev-warning'
 import { List, Map } from 'immutable'
 
-import MODEL_TYPES, { isType } from '../constants/model-types'
 import Changes from '../changes'
 import Operation from './operation'
 import PathUtils from '../utils/path-utils'
@@ -24,15 +23,6 @@ const debug = Debug('slate:change')
 
 class Change {
   /**
-   * Check if `any` is a `Change`.
-   *
-   * @param {Any} any
-   * @return {Boolean}
-   */
-
-  static isChange = isType.bind(null, 'CHANGE')
-
-  /**
    * Create a new `Change` with `attrs`.
    *
    * @param {Object} attrs
@@ -50,16 +40,6 @@ class Change {
       normalize: true,
       save: true,
     }
-  }
-
-  /**
-   * Object.
-   *
-   * @return {String}
-   */
-
-  get object() {
-    return 'change'
   }
 
   /**
@@ -460,12 +440,6 @@ function getDirtyKeys(operation, newValue, oldValue) {
     }
   }
 }
-
-/**
- * Attach a pseudo-symbol for type checking.
- */
-
-Change.prototype[MODEL_TYPES.CHANGE] = true
 
 /**
  * Add a change method for each of the changes.

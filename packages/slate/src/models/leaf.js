@@ -1,7 +1,6 @@
 import isPlainObject from 'is-plain-object'
 import { List, Record, Set } from 'immutable'
 
-import MODEL_TYPES, { isType } from '../constants/model-types'
 import Mark from './mark'
 
 /**
@@ -11,8 +10,8 @@ import Mark from './mark'
  */
 
 const DEFAULTS = {
-  marks: Set(),
-  text: '',
+  marks: undefined,
+  text: undefined,
 }
 
 /**
@@ -193,15 +192,6 @@ class Leaf extends Record(DEFAULTS) {
   }
 
   /**
-   * Check if `any` is a `Leaf`.
-   *
-   * @param {Any} any
-   * @return {Boolean}
-   */
-
-  static isLeaf = isType.bind(null, 'LEAF')
-
-  /**
    * Check if `any` is a list of leaves.
    *
    * @param {Any} any
@@ -210,16 +200,6 @@ class Leaf extends Record(DEFAULTS) {
 
   static isLeafList(any) {
     return List.isList(any) && any.every(item => Leaf.isLeaf(item))
-  }
-
-  /**
-   * Object.
-   *
-   * @return {String}
-   */
-
-  get object() {
-    return 'leaf'
   }
 
   /**
@@ -292,12 +272,6 @@ class Leaf extends Record(DEFAULTS) {
     return object
   }
 }
-
-/**
- * Attach a pseudo-symbol for type checking.
- */
-
-Leaf.prototype[MODEL_TYPES.LEAF] = true
 
 /**
  * Export.

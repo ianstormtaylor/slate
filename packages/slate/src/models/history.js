@@ -2,8 +2,6 @@ import Debug from 'debug'
 import isPlainObject from 'is-plain-object'
 import { List, Record, Stack } from 'immutable'
 
-import MODEL_TYPES, { isType } from '../constants/model-types'
-
 /**
  * Debug.
  *
@@ -19,8 +17,8 @@ const debug = Debug('slate:history')
  */
 
 const DEFAULTS = {
-  redos: new Stack(),
-  undos: new Stack(),
+  redos: undefined,
+  undos: undefined,
 }
 
 /**
@@ -91,25 +89,6 @@ class History extends Record(DEFAULTS) {
   }
 
   /**
-   * Check if `any` is a `History`.
-   *
-   * @param {Any} any
-   * @return {Boolean}
-   */
-
-  static isHistory = isType.bind(null, 'HISTORY')
-
-  /**
-   * Object.
-   *
-   * @return {String}
-   */
-
-  get object() {
-    return 'history'
-  }
-
-  /**
    * Save an `operation` into the history.
    *
    * @param {Object} operation
@@ -173,12 +152,6 @@ class History extends Record(DEFAULTS) {
     return object
   }
 }
-
-/**
- * Attach a pseudo-symbol for type checking.
- */
-
-History.prototype[MODEL_TYPES.HISTORY] = true
 
 /**
  * Check whether to merge a new operation `o` into the previous operation `p`.

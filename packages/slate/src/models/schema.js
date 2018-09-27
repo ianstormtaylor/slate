@@ -2,7 +2,6 @@ import Debug from 'debug'
 import isPlainObject from 'is-plain-object'
 import { Record } from 'immutable'
 
-import MODEL_TYPES from '../constants/model-types'
 import Stack from './stack'
 import Text from './text'
 import SlateError from '../utils/slate-error'
@@ -140,8 +139,8 @@ const CORE_RULES = [
  */
 
 const DEFAULTS = {
-  stack: Stack.create(),
-  rules: [],
+  stack: undefined,
+  rules: undefined,
 }
 
 /**
@@ -227,27 +226,6 @@ class Schema extends Record(DEFAULTS) {
     const stack = Stack.create({ plugins })
     const ret = new Schema({ stack, rules })
     return ret
-  }
-
-  /**
-   * Check if `any` is a `Schema`.
-   *
-   * @param {Any} any
-   * @return {Boolean}
-   */
-
-  static isSchema(any) {
-    return !!(any && any[MODEL_TYPES.SCHEMA])
-  }
-
-  /**
-   * Object.
-   *
-   * @return {String}
-   */
-
-  get object() {
-    return 'schema'
   }
 
   /**
@@ -743,12 +721,6 @@ function validateNext(node, child, next, index, rules) {
 function fail(code, attrs) {
   return { code, ...attrs }
 }
-
-/**
- * Attach a pseudo-symbol for type checking.
- */
-
-Schema.prototype[MODEL_TYPES.SCHEMA] = true
 
 /**
  * Export.

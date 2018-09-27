@@ -1,14 +1,12 @@
 import isPlainObject from 'is-plain-object'
-import { Record, Set, List, Map } from 'immutable'
+import { Record, Set, List } from 'immutable'
 
-import MODEL_TYPES from '../constants/model-types'
 import PathUtils from '../utils/path-utils'
 import Change from './change'
 import Data from './data'
 import Decoration from './decoration'
 import Document from './document'
 import History from './history'
-import Selection from './selection'
 import Schema from './schema'
 
 /**
@@ -18,12 +16,12 @@ import Schema from './schema'
  */
 
 const DEFAULTS = {
-  data: Map(),
-  decorations: List(),
-  document: Document.create(),
-  history: History.create(),
-  schema: Schema.create(),
-  selection: Selection.create(),
+  data: undefined,
+  decorations: undefined,
+  document: undefined,
+  history: undefined,
+  schema: undefined,
+  selection: undefined,
 }
 
 /**
@@ -98,6 +96,7 @@ class Value extends Record(DEFAULTS) {
   static fromJSON(object, options = {}) {
     let {
       data = {},
+      decorations = [],
       document = {},
       selection = {},
       schema = {},
@@ -109,6 +108,7 @@ class Value extends Record(DEFAULTS) {
     history = History.fromJSON(history)
     document = Document.fromJSON(document)
     selection = document.createSelection(selection)
+    decorations = List(decorations.map(d => Decoration.fromJSON(d)))
 
     if (selection.isUnset) {
       const text = document.getFirstText()
@@ -118,6 +118,7 @@ class Value extends Record(DEFAULTS) {
 
     let value = new Value({
       data,
+      decorations,
       document,
       selection,
       schema,
@@ -131,27 +132,6 @@ class Value extends Record(DEFAULTS) {
     }
 
     return value
-  }
-
-  /**
-   * Check if a `value` is a `Value`.
-   *
-   * @param {Any} value
-   * @return {Boolean}
-   */
-
-  static isValue(value) {
-    return !!(value && value[MODEL_TYPES.VALUE])
-  }
-
-  /**
-   * Object.
-   *
-   * @return {String}
-   */
-
-  get object() {
-    return 'value'
   }
 
   /**
@@ -958,12 +938,6 @@ class Value extends Record(DEFAULTS) {
     return object
   }
 }
-
-/**
- * Attach a pseudo-symbol for type checking.
- */
-
-Value.prototype[MODEL_TYPES.VALUE] = true
 
 /**
  * Export.

@@ -1,6 +1,5 @@
 import { Record } from 'immutable'
 
-import MODEL_TYPES from '../constants/model-types'
 import memoize from '../utils/memoize'
 
 /**
@@ -10,7 +9,7 @@ import memoize from '../utils/memoize'
  */
 
 const DEFAULTS = {
-  plugins: [],
+  plugins: undefined,
 }
 
 /**
@@ -30,27 +29,6 @@ class Stack extends Record(DEFAULTS) {
     const { plugins = [] } = attrs
     const stack = new Stack({ plugins })
     return stack
-  }
-
-  /**
-   * Check if `any` is a `Stack`.
-   *
-   * @param {Any} any
-   * @return {Boolean}
-   */
-
-  static isStack(any) {
-    return !!(any && any[MODEL_TYPES.STACK])
-  }
-
-  /**
-   * Object.
-   *
-   * @return {String}
-   */
-
-  get object() {
-    return 'stack'
   }
 
   /**
@@ -135,12 +113,6 @@ class Stack extends Record(DEFAULTS) {
     }, props.children === undefined ? null : props.children)
   }
 }
-
-/**
- * Attach a pseudo-symbol for type checking.
- */
-
-Stack.prototype[MODEL_TYPES.STACK] = true
 
 /**
  * Memoize read methods.
