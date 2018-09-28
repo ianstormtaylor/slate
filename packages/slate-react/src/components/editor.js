@@ -3,7 +3,7 @@ import React from 'react'
 import SlateTypes from 'slate-prop-types'
 import Types from 'prop-types'
 import warning from 'slate-dev-warning'
-import { Change, Schema } from 'slate'
+import { Editor as Controller } from 'slate'
 import memoizeOne from 'memoize-one'
 
 import EVENT_HANDLERS from '../constants/event-handlers'
@@ -47,6 +47,10 @@ class Editor extends React.Component {
     style: Types.object,
     tabIndex: Types.number,
     value: SlateTypes.value.isRequired,
+    ...EVENT_HANDLERS.reduce((obj, handler) => {
+      obj[handler] = Types.func
+      return obj
+    }, {}),
   }
 
   /**
@@ -66,82 +70,73 @@ class Editor extends React.Component {
   }
 
   /**
-   * Initial state.
+   * Constructor.
    *
-   * @type {Object}
+   * @param {Object} props
    */
 
-  state = {}
+  constructor(props) {
+    super(props)
+    this.state = {}
+    this.resolvePlugins = memoizeOne(this.resolvePlugins)
 
-  /**
-   * Temporary values.
-   *
-   * @type {Object}
-   */
+    this.tmp = {
+      mounted: false,
+      change: null,
+      resolves: 0,
+      updates: 0,
+    }
 
-  tmp = {
-    change: null,
-    isChanging: false,
-    operationsSize: null,
-    plugins: null,
-    resolves: 0,
-    updates: 0,
-    value: null,
+    this.controller = new Controller({
+      plugins: this.resolvePlugins(props.plugins, props.schema),
+      value: props.value,
+      onChange: change => {
+        if (this.tmp.mounted) {
+          this.props.onChange(change)
+        } else {
+          this.tmp.change = change
+        }
+      },
+    })
   }
 
   /**
-   * Create a set of bound event handlers.
-   *
-   * @type {Object}
-   */
-
-  handlers = EVENT_HANDLERS.reduce((obj, handler) => {
-    obj[handler] = event => this.onEvent(handler, event)
-    return obj
-  }, {})
-
-  /**
-   * When the component first mounts, flush any temporary changes, and then,
-   * focus the editor if `autoFocus` is set.
+   * When the component first mounts, focus the editor if `autoFocus` is set,
+   * and then flush a queued change if one exists.
    */
 
   componentDidMount() {
+    this.tmp.mounted = true
     this.tmp.updates++
 
-    const { autoFocus } = this.props
-    const { change } = this.tmp
-
-    if (autoFocus) {
-      if (change) {
-        change.focus()
-      } else {
-        this.focus()
-      }
+    if (this.props.autoFocus) {
+      this.controller.change(c => c.focus())
     }
 
-    if (change) {
-      this.onChange(change)
+    if (this.tmp.change) {
+      this.props.onChange(this.tmp.change)
+      this.tmp.change = null
     }
   }
 
   /**
-   * When the component updates, flush any temporary change.
+   * When the component updates, ensure that it's not re-resolving often, and
+   * then flush a queued change if one exists.
    */
 
   componentDidUpdate(prevProps) {
     this.tmp.updates++
 
-    const { change, resolves, updates } = this.tmp
-
     // If we've resolved a few times already, and it's exactly in line with
     // the updates, then warn the user that they may be doing something wrong.
     warning(
-      resolves < 5 || resolves !== updates,
+      this.tmp.resolves < 5 || this.tmp.resolves !== this.tmp.updates,
       'A Slate <Editor> component is re-resolving `props.plugins` or `props.schema` on each update, which leads to poor performance. This is often due to passing in a new `schema` or `plugins` prop with each render by declaring them inline in your render function. Do not do this!'
     )
 
-    if (change) {
-      this.onChange(change)
+    if (this.tmp.change) {
+      this.props.onChange(this.tmp.change)
+      this.tmp.change = null
     }
   }
 
@@ -153,226 +148,18 @@ class Editor extends React.Component {
 
   render() {
     debug('render', this)
+    const { controller, tmp } = this
     const props = { ...this.props }
-    const tree = this.runRender('renderEditor', props, this)
+
+    controller.setProperties({
+      plugins: this.resolvePlugins(props.plugins, props.schema),
+      value: tmp.change ? tmp.change.value : props.value,
+      readOnly: props.readOnly,
+    })
+
+    const tree = controller.runRender('renderEditor', props, this)
     return tree
   }
-
-  /**
-   * Get the editor's current plugins.
-   *
-   * @return {Array}
-   */
-
-  get plugins() {
-    const plugins = this.resolvePlugins(this.props.plugins, this.props.schema)
-    return plugins
-  }
-
-  /**
-   * Get the editor's current schema.
-   *
-   * @return {Schema}
-   */
-
-  get schema() {
-    const schema = this.resolveSchema(this.plugins)
-    return schema
-  }
-
-  /**
-   * Get the editor's current value.
-   *
-   * @return {Value}
-   */
-
-  get value() {
-    // If the current `plugins` and `value` are the same as the last seen ones
-    // that were saved in `tmp`, don't re-resolve because that will trigger
-    // extra `onChange` runs.
-    if (
-      this.plugins === this.tmp.plugins &&
-      this.props.value === this.tmp.value
-    ) {
-      return this.tmp.value
-    }
-
-    const value = this.resolveValue(this.plugins, this.props.value)
-    return value
-  }
-
-  /**
-   * Perform a change on the editor, passing `...args` to `change.call`.
-   *
-   * @param {Mixed} ...args
-   */
-
-  change = (...args) => {
-    if (this.tmp.isChanging) {
-      warning(
-        false,
-        "The `editor.change` method was called from within an existing `editor.change` callback. This is not allowed, and often due to calling `editor.change` directly from a plugin's event handler which is unnecessary."
-      )
-
-      return
-    }
-
-    const change = new Change({ editor: this, value: this.value })
-
-    try {
-      this.tmp.isChanging = true
-      change.call(...args)
-    } catch (error) {
-      throw error
-    } finally {
-      this.tmp.isChanging = false
-    }
-
-    this.onChange(change)
-  }
-
-  /**
-   * Programmatically blur the editor.
-   */
-
-  blur = () => {
-    this.change(c => c.blur())
-  }
-
-  /**
-   * Programmatically focus the editor.
-   */
-
-  focus = () => {
-    this.change(c => c.focus())
-  }
-
-  /**
-   * On change.
-   *
-   * @param {Change} change
-   */
-
-  onChange = change => {
-    // If the change doesn't define any operations to apply, abort.
-    if (change.operations.size === 0) {
-      return
-    }
-
-    debug('onChange', { change })
-    change = this.resolveChange(this.plugins, change, change.operations.size)
-
-    // Store a reference to the last `value` and `plugins` that were seen by the
-    // editor, so we can know whether to normalize a new unknown value if one
-    // is passed in via `this.props`.
-    this.tmp.value = change.value
-    this.tmp.plugins = this.plugins
-
-    // Remove the temporary `change`, since it's being flushed.
-    delete this.tmp.change
-    delete this.tmp.operationsSize
-
-    this.props.onChange(change)
-  }
-
-  /**
-   * On event.
-   *
-   * @param {String} handler
-   * @param {Event} event
-   */
-
-  onEvent = (handler, event) => {
-    this.change(change => {
-      this.run(handler, event, change, this)
-    })
-  }
-
-  /**
-   * Iterate the plugins with `property`, breaking on any a non-null values.
-   *
-   * @param {String} property
-   * @param {Any} ...args
-   */
-
-  run(property, ...args) {
-    const plugins = this.plugins.filter(p => property in p)
-
-    for (const plugin of plugins) {
-      const ret = plugin[property](...args)
-      if (ret != null) return
-    }
-  }
-
-  /**
-   * Iterate the plugins with `property`, returning the first non-null value.
-   *
-   * @param {String} property
-   * @param {Any} ...args
-   */
-
-  runFind(property, ...args) {
-    const plugins = this.plugins.filter(p => property in p)
-
-    for (const plugin of plugins) {
-      const ret = plugin[property](...args)
-      if (ret != null) return ret
-    }
-  }
-
-  /**
-   * Iterate the plugins with `property`, returning all the non-null values.
-   *
-   * @param {String} property
-   * @param {Any} ...args
-   * @return {Array}
-   */
-
-  runMap(property, ...args) {
-    const plugins = this.plugins.filter(p => property in p)
-    const array = []
-
-    for (const plugin of plugins) {
-      const ret = plugin[property](...args)
-      if (ret != null) array.push(ret)
-    }
-
-    return array
-  }
-
-  /**
-   * Iterate the plugins with `property`, reducing to a set of React children.
-   *
-   * @param {String} property
-   * @param {Object} props
-   * @param {Any} ...args
-   */
-
-  runRender(property, props, ...args) {
-    const plugins = this.plugins.filter(p => property in p)
-
-    return plugins.reduceRight((children, plugin) => {
-      if (!plugin[property]) return children
-      const ret = plugin[property](props, ...args)
-      if (ret == null) return children
-      props.children = ret
-      return ret
-    }, props.children === undefined ? null : props.children)
-  }
-
-  /**
-   * Resolve a change from the current `plugins`, a potential `change` and its
-   * current operations `size`.
-   *
-   * @param {Array} plugins
-   * @param {Change} change
-   * @param {Number} size
-   */
-
-  resolveChange = memoizeOne((plugins, change, size) => {
-    this.run('onChange', change, this)
-    return change
-  })
 
   /**
    * Resolve a set of plugins from potential `plugins` and a `schema`.
@@ -383,12 +170,12 @@ class Editor extends React.Component {
    * - The top-level editor plugin, which allows for top-level handlers, etc.
    * - The two "core" plugins, one before all the other and one after.
    *
-   * @param {Array|Void} plugins
-   * @param {Schema|Object|Void} schema
+   * @param {Array} plugins
+   * @param {Schema|Object} schema
    * @return {Array}
    */
 
-  resolvePlugins = memoizeOne((plugins = [], schema = {}) => {
+  resolvePlugins = (plugins = [], schema = {}) => {
     debug('resolvePlugins', { plugins, schema })
     this.tmp.resolves++
 
@@ -411,50 +198,73 @@ class Editor extends React.Component {
     }
 
     return [beforePlugin, editorPlugin, ...plugins, afterPlugin]
-  })
+  }
 
   /**
-   * Resolve a schema from the current `plugins`.
-   *
-   * @param {Array} plugins
-   * @return {Schema}
+   * Mimic the API of the `Editor` controller, so that this component instance
+   * can be passed in its place to plugins.
    */
 
-  resolveSchema = memoizeOne(plugins => {
-    debug('resolveSchema', { plugins })
-    const schema = Schema.create({ plugins })
-    return schema
-  })
+  get onChange() {
+    return this.controller.onChange
+  }
+
+  get plugins() {
+    return this.controller.plugins
+  }
+
+  get readOnly() {
+    return this.controller.readOnly
+  }
+
+  get schema() {
+    return this.controller.schema
+  }
+
+  get value() {
+    return this.controller.value
+  }
+
+  change = (...args) => {
+    this.controller.change(change => {
+      change.editor = this
+      change.call(...args)
+    })
+  }
+
+  event = (handler, event) => {
+    this.change(change => {
+      this.run(handler, event, change)
+    })
+  }
+
+  run = (...args) => {
+    return this.controller.run(...args)
+  }
+
+  runFind = (...args) => {
+    return this.controller.runFind(...args)
+  }
+
+  runMap = (...args) => {
+    return this.controller.runMap(...args)
+  }
+
+  runRender = (...args) => {
+    return this.controller.runRender(...args)
+  }
 
   /**
-   * Resolve a value from the current `plugins` and a potential `value`.
-   *
-   * @param {Array} plugins
-   * @param {Value} value
-   * @return {Change}
+   * Mimic the API of a DOM input/textarea, to maintain a React-like interface.
    */
 
-  resolveValue = memoizeOne((plugins, value) => {
-    debug('resolveValue', { plugins, value })
+  blur = () => {
+    this.controller.change(c => c.blur())
+  }
 
-    let change = new Change({ editor: this, value })
-    change = this.resolveChange(plugins, change, change.operations.size)
-
-    // Store the change and it's operations count so that it can be flushed once
-    // the component next updates.
-    this.tmp.change = change
-    this.tmp.operationsSize = change.operations.size
-
-    return change.value
-  })
-}
-
-/**
- * Mix in the prop types for the event handlers.
- */
-
-for (const prop of EVENT_HANDLERS) {
-  Editor.propTypes[prop] = Types.func
+  focus = () => {
+    this.controller.change(c => c.focus())
+  }
 }
 
 /**

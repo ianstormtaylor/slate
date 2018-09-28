@@ -4,7 +4,7 @@ import warning from 'slate-dev-warning'
 import { List, Map } from 'immutable'
 
 import Changes from '../changes'
-import Operation from './operation'
+import Operation from '../models/operation'
 import PathUtils from '../utils/path-utils'
 
 /**

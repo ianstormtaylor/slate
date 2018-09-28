@@ -9,6 +9,7 @@ export const TYPES = {
   change: '@@__SLATE_CHANGE__@@',
   decoration: '@@__SLATE_DECORATION__@@',
   document: '@@__SLATE_DOCUMENT__@@',
+  editor: '@@__SLATE_EDITOR__@@',
   history: '@@__SLATE_HISTORY__@@',
   inline: '@@__SLATE_INLINE__@@',
   leaf: '@@__SLATE_LEAF__@@',

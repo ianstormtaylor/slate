@@ -2,7 +2,7 @@ import Debug from 'debug'
 import isPlainObject from 'is-plain-object'
 import { Record } from 'immutable'
 
-import Text from './text'
+import Text from '../models/text'
 import SlateError from '../utils/slate-error'
 
 /**

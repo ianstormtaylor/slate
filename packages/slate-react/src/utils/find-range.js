@@ -40,8 +40,8 @@ function findRange(native, editor) {
     isCollapsed,
   } = native
   const { value } = editor
-  const anchor = findPoint(anchorNode, anchorOffset, value)
-  const focus = isCollapsed ? anchor : findPoint(focusNode, focusOffset, value)
+  const anchor = findPoint(anchorNode, anchorOffset, editor)
+  const focus = isCollapsed ? anchor : findPoint(focusNode, focusOffset, editor)
   if (!anchor || !focus) return null
 
   // COMPAT: ??? The Edge browser seems to have a case where if you select the

@@ -39,10 +39,9 @@ function AfterPlugin() {
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
    */
 
-  function onBeforeInput(event, change, editor) {
+  function onBeforeInput(event, change) {
     debug('onBeforeInput', { event })
 
     const isSynthetic = !!event.nativeEvent
@@ -63,7 +62,7 @@ function AfterPlugin() {
 
     event.preventDefault()
 
-    const { value } = change
+    const { editor, value } = change
     const { schema } = editor
     const { document, selection } = value
     const range = findRange(targetRange, editor)
@@ -148,10 +147,9 @@ function AfterPlugin() {
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
    */
 
-  function onBlur(event, change, editor) {
+  function onBlur(event, change) {
     debug('onBlur', { event })
 
     change.blur()
@@ -162,15 +160,15 @@ function AfterPlugin() {
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
    */
 
-  function onClick(event, change, editor) {
+  function onClick(event, change) {
+    const { editor, value } = change
+
     if (editor.props.readOnly) {
       return true
     }
 
-    const { value } = change
     const { schema } = editor
     const { document } = value
     const node = findNode(event.target, value)
@@ -199,12 +197,12 @@ function AfterPlugin() {
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
    */
 
-  function onCopy(event, change, editor) {
+  function onCopy(event, change) {
     debug('onCopy', { event })
 
+    const { editor } = change
     cloneFragment(event, editor)
   }
 
@@ -213,11 +211,12 @@ function AfterPlugin() {
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
    */
 
-  function onCut(event, change, editor) {
+  function onCut(event, change) {
     debug('onCut', { event })
+
+    const { editor } = change
 
     // Once the fake cut content has successfully been added to the clipboard,
     // delete the content in the current selection.
@@ -246,10 +245,9 @@ function AfterPlugin() {
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
    */
 
-  function onDragEnd(event, change, editor) {
+  function onDragEnd(event, change) {
     debug('onDragEnd', { event })
 
     isDraggingInternally = null
@@ -260,10 +258,9 @@ function AfterPlugin() {
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
    */
 
-  function onDragOver(event, change, editor) {
+  function onDragOver(event, change) {
     debug('onDragOver', { event })
   }
 
@@ -272,15 +269,14 @@ function AfterPlugin() {
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
    */
 
-  function onDragStart(event, change, editor) {
+  function onDragStart(event, change) {
     debug('onDragStart', { event })
 
     isDraggingInternally = true
 
-    const { value } = change
+    const { editor, value } = change
     const { schema } = editor
     const { document } = value
     const node = findNode(event.target, value)
@@ -306,13 +302,12 @@ function AfterPlugin() {
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
    */
 
-  function onDrop(event, change, editor) {
+  function onDrop(event, change) {
     debug('onDrop', { event })
 
-    const { value } = change
+    const { editor, value } = change
     const { schema } = editor
     const { document, selection } = value
     const window = getWindow(event.target)
@@ -392,20 +387,20 @@ function AfterPlugin() {
   /**
    * On input.
    *
-   * @param {Event} eventvent
+   * @param {Event} event
    * @param {Change} change
    */
 
-  function onInput(event, change, editor) {
+  function onInput(event, change) {
     debug('onInput', { event })
 
     const window = getWindow(event.target)
-    const { value } = change
+    const { editor, value } = change
 
     // Get the selection point.
     const native = window.getSelection()
     const { anchorNode } = native
-    const point = findPoint(anchorNode, 0, value)
+    const point = findPoint(anchorNode, 0, editor)
     if (!point) return
 
     // Get the text node and leaf in question.
@@ -460,13 +455,12 @@ function AfterPlugin() {
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
    */
 
-  function onKeyDown(event, change, editor) {
+  function onKeyDown(event, change) {
     debug('onKeyDown', { event })
 
-    const { value } = change
+    const { editor, value } = change
     const { schema } = editor
     const { document, selection } = value
     const hasVoidParent = document.hasVoidParent(selection.start.path, schema)
@@ -588,10 +582,9 @@ function AfterPlugin() {
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
    */
 
-  function onPaste(event, change, editor) {
+  function onPaste(event, change) {
     debug('onPaste', { event })
 
     const transfer = getEventTransfer(event)
@@ -603,7 +596,7 @@ function AfterPlugin() {
 
     if (type == 'text' || type == 'html') {
       if (!text) return
-      const { value } = change
+      const { editor, value } = change
       const { schema } = editor
       const { document, selection, startBlock } = value
       if (schema.isVoid(startBlock)) return
@@ -621,14 +614,13 @@ function AfterPlugin() {
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
    */
 
-  function onSelect(event, change, editor) {
+  function onSelect(event, change) {
     debug('onSelect', { event })
 
     const window = getWindow(event.target)
-    const { value } = change
+    const { editor, value } = change
     const { schema } = editor
     const { document } = value
     const native = window.getSelection()
@@ -711,10 +703,9 @@ function AfterPlugin() {
    */
 
   function renderEditor(props, editor) {
-    const { handlers } = editor
     return (
       <Content
-        {...handlers}
+        onEvent={editor.event}
         autoCorrect={props.autoCorrect}
         className={props.className}
         editor={editor}

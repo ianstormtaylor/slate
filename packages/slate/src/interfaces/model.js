@@ -1,6 +1,5 @@
 import mixin from '../utils/mixin'
 import Block from '../models/block'
-import Change from '../models/change'
 import Decoration from '../models/decoration'
 import Document from '../models/document'
 import History from '../models/history'
@@ -11,7 +10,6 @@ import Node from '../models/node'
 import Operation from '../models/operation'
 import Point from '../models/point'
 import Range from '../models/range'
-import Schema from '../models/schema'
 import Selection from '../models/selection'
 import Text from '../models/text'
 import Value from '../models/value'
@@ -48,7 +46,6 @@ class ModelInterface {
 
 mixin(ModelInterface, [
   Block,
-  Change,
   Decoration,
   Document,
   History,
@@ -59,7 +56,6 @@ mixin(ModelInterface, [
   Operation,
   Point,
   Range,
-  Schema,
   Selection,
   Text,
   Value,

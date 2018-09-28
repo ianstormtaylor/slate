@@ -37,13 +37,12 @@ function BeforePlugin() {
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
    */
 
-  function onBeforeInput(event, change, editor) {
-    if (editor.props.readOnly) return true
-
+  function onBeforeInput(event, change) {
+    const { editor } = change
     const isSynthetic = !!event.nativeEvent
+    if (editor.props.readOnly) return true
 
     // COMPAT: If the browser supports Input Events Level 2, we will have
     // attached a custom handler for the real `beforeinput` events, instead of
@@ -58,14 +57,13 @@ function BeforePlugin() {
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
    */
 
-  function onBlur(event, change, editor) {
+  function onBlur(event, change) {
+    const { editor, value } = change
     if (isCopying) return true
     if (editor.props.readOnly) return true
 
-    const { value } = change
     const { schema } = editor
     const { relatedTarget, target } = event
     const window = getWindow(target)
@@ -102,36 +100,14 @@ function BeforePlugin() {
   }
 
   /**
-   * On change.
-   *
-   * @param {Change} change
-   * @param {Editor} editor
-   */
-
-  function onChange(change, editor) {
-    // const { value } = change
-
-    // // If the value's schema isn't the editor's schema, update it. This can
-    // // happen on the initialization of the editor, or if the schema changes.
-    // // This change isn't save into history since only schema is updated.
-    // if (value.schema != editor.schema) {
-    //   change.withoutSaving(() => {
-    //     change.setValue({ schema: editor.schema }).normalize()
-    //   })
-    // }
-
-    debug('onChange')
-  }
-
-  /**
    * On composition end.
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
    */
 
-  function onCompositionEnd(event, change, editor) {
+  function onCompositionEnd(event, change) {
+    const { editor } = change
     const n = compositionCount
 
     // The `count` check here ensures that if another composition starts
@@ -158,12 +134,12 @@ function BeforePlugin() {
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
    */
 
-  function onCompositionStart(event, change, editor) {
+  function onCompositionStart(event, change) {
     isComposing = true
     compositionCount++
+    const { editor } = change
 
     // HACK: we need to re-render the editor here so that it will update its
     // placeholder in case one is currently rendered. This should be handled
@@ -181,10 +157,9 @@ function BeforePlugin() {
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
    */
 
-  function onCopy(event, change, editor) {
+  function onCopy(event, change) {
     const window = getWindow(event.target)
     isCopying = true
     window.requestAnimationFrame(() => (isCopying = false))
@@ -197,10 +172,10 @@ function BeforePlugin() {
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
    */
 
-  function onCut(event, change, editor) {
+  function onCut(event, change) {
+    const { editor } = change
     if (editor.props.readOnly) return true
 
     const window = getWindow(event.target)
@@ -215,10 +190,9 @@ function BeforePlugin() {
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
    */
 
-  function onDragEnd(event, change, editor) {
+  function onDragEnd(event, change) {
     isDragging = false
 
     debug('onDragEnd', { event })
@@ -229,10 +203,9 @@ function BeforePlugin() {
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
    */
 
-  function onDragEnter(event, change, editor) {
+  function onDragEnter(event, change) {
     debug('onDragEnter', { event })
   }
 
@@ -241,10 +214,9 @@ function BeforePlugin() {
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
    */
 
-  function onDragExit(event, change, editor) {
+  function onDragExit(event, change) {
     debug('onDragExit', { event })
   }
 
@@ -253,10 +225,9 @@ function BeforePlugin() {
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
    */
 
-  function onDragLeave(event, change, editor) {
+  function onDragLeave(event, change) {
     debug('onDragLeave', { event })
   }
 
@@ -265,14 +236,14 @@ function BeforePlugin() {
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
    */
 
-  function onDragOver(event, change, editor) {
+  function onDragOver(event, change) {
     // If the target is inside a void node, and only in this case,
     // call `preventDefault` to signal that drops are allowed.
     // When the target is editable, dropping is already allowed by
     // default, and calling `preventDefault` hides the cursor.
+    const { editor } = change
     const { schema } = editor
     const node = findNode(event.target, editor.value)
     if (schema.isVoid(node)) event.preventDefault()
@@ -302,10 +273,9 @@ function BeforePlugin() {
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
    */
 
-  function onDragStart(event, change, editor) {
+  function onDragStart(event, change) {
     isDragging = true
 
     debug('onDragStart', { event })
@@ -316,11 +286,10 @@ function BeforePlugin() {
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
    */
 
-  function onDrop(event, change, editor) {
-    // Nothing happens in read-only mode.
+  function onDrop(event, change) {
+    const { editor } = change
     if (editor.props.readOnly) return true
 
     // Prevent default so the DOM's value isn't corrupted.
@@ -334,10 +303,10 @@ function BeforePlugin() {
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
    */
 
-  function onFocus(event, change, editor) {
+  function onFocus(event, change) {
+    const { editor } = change
     if (isCopying) return true
     if (editor.props.readOnly) return true
 
@@ -363,10 +332,9 @@ function BeforePlugin() {
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
    */
 
-  function onInput(event, change, editor) {
+  function onInput(event, change) {
     if (isComposing) return true
     if (change.value.selection.isBlurred) return true
 
@@ -378,10 +346,10 @@ function BeforePlugin() {
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
    */
 
-  function onKeyDown(event, change, editor) {
+  function onKeyDown(event, change) {
+    const { editor } = change
     if (editor.props.readOnly) return true
 
     // When composing, we need to prevent all hotkeys from executing while
@@ -421,10 +389,10 @@ function BeforePlugin() {
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
    */
 
-  function onPaste(event, change, editor) {
+  function onPaste(event, change) {
+    const { editor } = change
     if (editor.props.readOnly) return true
 
     // Prevent defaults so the DOM state isn't corrupted.
@@ -438,12 +406,13 @@ function BeforePlugin() {
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
    */
 
-  function onSelect(event, change, editor) {
+  function onSelect(event, change) {
     if (isCopying) return true
     if (isComposing) return true
+
+    const { editor } = change
     if (editor.props.readOnly) return true
 
     // Save the new `activeElement`.
@@ -462,7 +431,6 @@ function BeforePlugin() {
   return {
     onBeforeInput,
     onBlur,
-    onChange,
     onCompositionEnd,
     onCompositionStart,
     onCopy,
