@@ -217,9 +217,8 @@ class Change {
 
     let iterations = 0
     const max =
-      schema.stack.plugins.length +
-      schema.rules.length +
-      (node.object === 'text' ? 1 : node.nodes.size)
+      // schema.stack.plugins.length +
+      schema.rules.length + (node.object === 'text' ? 1 : node.nodes.size)
 
     const iterate = () => {
       const fn = node.normalize(schema)

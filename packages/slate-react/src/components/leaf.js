@@ -97,7 +97,6 @@ class Leaf extends React.Component {
 
   renderMarks() {
     const { marks, node, offset, text, editor } = this.props
-    const { stack } = editor
     const leaf = this.renderText()
     const attributes = {
       'data-slate-leaf': true,
@@ -114,7 +113,7 @@ class Leaf extends React.Component {
         children,
         attributes,
       }
-      const element = stack.find('renderMark', props)
+      const element = editor.runFind('renderMark', props)
       return element || children
     }, leaf)
   }

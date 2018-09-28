@@ -23,7 +23,6 @@ import Point from './models/point'
 import Range from './models/range'
 import Schema from './models/schema'
 import Selection from './models/selection'
-import Stack from './models/stack'
 import Text from './models/text'
 import TextUtils from './utils/text-utils'
 import Value from './models/value'
@@ -56,7 +55,6 @@ export {
   resetMemoization,
   Schema,
   Selection,
-  Stack,
   Text,
   TextUtils,
   useMemoization,
@@ -83,7 +81,6 @@ export default {
   resetMemoization,
   Schema,
   Selection,
-  Stack,
   Text,
   TextUtils,
   useMemoization,

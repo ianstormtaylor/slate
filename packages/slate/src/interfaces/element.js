@@ -429,15 +429,15 @@ class ElementInterface {
   }
 
   /**
-   * Get the decorations for the node from a `stack`.
+   * Get the decorations for the node from an `editor`.
    *
-   * @param {Stack} stack
+   * @param {Editor} editor
    * @return {List}
    */
 
-  getDecorations(stack) {
-    const allDecorations = stack
-      .map('decorateNode', this)
+  getDecorations(editor) {
+    const allDecorations = editor
+      .runMap('decorateNode', this)
       .map(decorations => Decoration.createList(decorations))
     const list = List(allDecorations).flatten(true)
     return list

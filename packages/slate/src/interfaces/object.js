@@ -12,7 +12,6 @@ import Point from '../models/point'
 import Range from '../models/range'
 import Schema from '../models/schema'
 import Selection from '../models/selection'
-import Stack from '../models/stack'
 import Text from '../models/text'
 import Value from '../models/value'
 import isObject, { TYPES } from '../utils/is-object'
@@ -50,8 +49,6 @@ function create(type) {
  * Mix in the object interfaces.
  */
 
-debugger
-
 mixin(create('block'), [Block])
 mixin(create('change'), [Change])
 mixin(create('decoration'), [Decoration])
@@ -66,6 +63,5 @@ mixin(create('point'), [Point])
 mixin(create('range'), [Range])
 mixin(create('schema'), [Schema])
 mixin(create('selection'), [Selection])
-mixin(create('stack'), [Stack])
 mixin(create('text'), [Text])
 mixin(create('value'), [Value])

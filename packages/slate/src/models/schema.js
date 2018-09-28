@@ -2,7 +2,6 @@ import Debug from 'debug'
 import isPlainObject from 'is-plain-object'
 import { Record } from 'immutable'
 
-import Stack from './stack'
 import Text from './text'
 import SlateError from '../utils/slate-error'
 
@@ -139,7 +138,6 @@ const CORE_RULES = [
  */
 
 const DEFAULTS = {
-  stack: undefined,
   rules: undefined,
 }
 
@@ -223,8 +221,7 @@ class Schema extends Record(DEFAULTS) {
       }
     }
 
-    const stack = Stack.create({ plugins })
-    const ret = new Schema({ stack, rules })
+    const ret = new Schema({ rules })
     return ret
   }
 
@@ -288,8 +285,8 @@ class Schema extends Record(DEFAULTS) {
    */
 
   normalizeNode(node) {
-    const ret = this.stack.find('normalizeNode', node)
-    if (ret) return ret
+    // const ret = this.stack.find('normalizeNode', node)
+    // if (ret) return ret
     if (node.object == 'text') return
 
     const error = this.validateNode(node)

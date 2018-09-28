@@ -64,8 +64,8 @@ class Node extends React.Component {
 
   shouldComponentUpdate(nextProps) {
     const { props } = this
-    const { stack } = props.editor
-    const shouldUpdate = stack.find(
+    const { editor } = props
+    const shouldUpdate = editor.runFind(
       'shouldNodeComponentUpdate',
       props,
       nextProps
@@ -131,9 +131,8 @@ class Node extends React.Component {
     } = this.props
     const { value } = editor
     const { selection, schema } = value
-    const { stack } = editor
     const indexes = node.getSelectionIndexes(selection, isSelected)
-    const decs = decorations.concat(node.getDecorations(stack))
+    const decs = decorations.concat(node.getDecorations(editor))
     const childrenDecorations = getChildrenDecorations(node, decs)
 
     let children = []
@@ -167,7 +166,7 @@ class Node extends React.Component {
       readOnly,
     }
 
-    let placeholder = stack.find('renderPlaceholder', props)
+    let placeholder = editor.runFind('renderPlaceholder', props)
 
     if (placeholder) {
       placeholder = React.cloneElement(placeholder, {
@@ -177,7 +176,7 @@ class Node extends React.Component {
       children = [placeholder, ...children]
     }
 
-    const element = stack.find('renderNode', {
+    const element = editor.runFind('renderNode', {
       ...props,
       attributes,
       children,

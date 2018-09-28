@@ -13,7 +13,6 @@ import Point from '../models/point'
 import Range from '../models/range'
 import Schema from '../models/schema'
 import Selection from '../models/selection'
-import Stack from '../models/stack'
 import Text from '../models/text'
 import Value from '../models/value'
 
@@ -62,7 +61,6 @@ mixin(ModelInterface, [
   Range,
   Schema,
   Selection,
-  Stack,
   Text,
   Value,
 ])

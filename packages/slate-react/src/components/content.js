@@ -403,11 +403,11 @@ class Content extends React.Component {
       tagName,
       spellCheck,
     } = props
-    const { value, stack } = editor
+    const { value } = editor
     const Container = tagName
     const { document, selection, decorations } = value
     const indexes = document.getSelectionIndexes(selection)
-    const decs = document.getDecorations(stack).concat(decorations)
+    const decs = document.getDecorations(editor).concat(decorations)
     const childrenDecorations = getChildrenDecorations(document, decs)
 
     const children = document.nodes.toArray().map((child, i) => {

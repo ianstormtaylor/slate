@@ -3,7 +3,7 @@ import React from 'react'
 import SlateTypes from 'slate-prop-types'
 import Types from 'prop-types'
 import warning from 'slate-dev-warning'
-import { Schema, Stack } from 'slate'
+import { Schema } from 'slate'
 import memoizeOne from 'memoize-one'
 
 import EVENT_HANDLERS from '../constants/event-handlers'
@@ -154,7 +154,7 @@ class Editor extends React.Component {
   render() {
     debug('render', this)
     const props = { ...this.props }
-    const tree = this.stack.render('renderEditor', props, this)
+    const tree = this.runRender('renderEditor', props, this)
     return tree
   }
 
@@ -178,17 +178,6 @@ class Editor extends React.Component {
   get schema() {
     const schema = this.resolveSchema(this.plugins)
     return schema
-  }
-
-  /**
-   * Get the editor's current stack.
-   *
-   * @return {Stack}
-   */
-
-  get stack() {
-    const stack = this.resolveStack(this.plugins)
-    return stack
   }
 
   /**
@@ -295,8 +284,80 @@ class Editor extends React.Component {
 
   onEvent = (handler, event) => {
     this.change(change => {
-      this.stack.run(handler, event, change, this)
+      this.run(handler, event, change, this)
     })
+  }
+
+  /**
+   * Iterate the plugins with `property`, breaking on any a non-null values.
+   *
+   * @param {String} property
+   * @param {Any} ...args
+   */
+
+  run(property, ...args) {
+    const plugins = this.plugins.filter(p => property in p)
+
+    for (const plugin of plugins) {
+      const ret = plugin[property](...args)
+      if (ret != null) return
+    }
+  }
+
+  /**
+   * Iterate the plugins with `property`, returning the first non-null value.
+   *
+   * @param {String} property
+   * @param {Any} ...args
+   */
+
+  runFind(property, ...args) {
+    const plugins = this.plugins.filter(p => property in p)
+
+    for (const plugin of plugins) {
+      const ret = plugin[property](...args)
+      if (ret != null) return ret
+    }
+  }
+
+  /**
+   * Iterate the plugins with `property`, returning all the non-null values.
+   *
+   * @param {String} property
+   * @param {Any} ...args
+   * @return {Array}
+   */
+
+  runMap(property, ...args) {
+    const plugins = this.plugins.filter(p => property in p)
+    const array = []
+
+    for (const plugin of plugins) {
+      const ret = plugin[property](...args)
+      if (ret != null) array.push(ret)
+    }
+
+    return array
+  }
+
+  /**
+   * Iterate the plugins with `property`, reducing to a set of React children.
+   *
+   * @param {String} property
+   * @param {Object} props
+   * @param {Any} ...args
+   */
+
+  runRender(property, props, ...args) {
+    const plugins = this.plugins.filter(p => property in p)
+
+    return plugins.reduceRight((children, plugin) => {
+      if (!plugin[property]) return children
+      const ret = plugin[property](props, ...args)
+      if (ret == null) return children
+      props.children = ret
+      return ret
+    }, props.children === undefined ? null : props.children)
   }
 
   /**
@@ -309,8 +370,7 @@ class Editor extends React.Component {
    */
 
   resolveChange = memoizeOne((plugins, change, size) => {
-    const stack = this.resolveStack(plugins)
-    stack.run('onChange', change, this)
+    this.run('onChange', change, this)
     return change
   })
 
@@ -364,19 +424,6 @@ class Editor extends React.Component {
     debug('resolveSchema', { plugins })
     const schema = Schema.create({ plugins })
     return schema
-  })
-
-  /**
-   * Resolve a stack from the current `plugins`.
-   *
-   * @param {Array} plugins
-   * @return {Stack}
-   */
-
-  resolveStack = memoizeOne(plugins => {
-    debug('resolveStack', { plugins })
-    const stack = Stack.create({ plugins })
-    return stack
   })
 
   /**
