@@ -6,7 +6,6 @@ import './interfaces/range'
 
 import Block from './models/block'
 import Change from './controllers/change'
-import Changes from './changes'
 import Data from './models/data'
 import Decoration from './models/decoration'
 import Document from './models/document'
@@ -38,7 +37,6 @@ import { resetMemoization, useMemoization } from './utils/memoize'
 export {
   Block,
   Change,
-  Changes,
   Data,
   Decoration,
   Document,
@@ -66,7 +64,6 @@ export {
 export default {
   Block,
   Change,
-  Changes,
   Data,
   Decoration,
   Document,

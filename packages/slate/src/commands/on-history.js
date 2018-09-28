@@ -1,12 +1,12 @@
 import omit from 'lodash/omit'
 
 /**
- * Changes.
+ * Commands.
  *
  * @type {Object}
  */
 
-const Changes = {}
+const Commands = {}
 
 /**
  * Redo to the next value in the history.
@@ -14,7 +14,7 @@ const Changes = {}
  * @param {Change} change
  */
 
-Changes.redo = change => {
+Commands.redo = change => {
   let { value } = change
   let { history } = value
   if (!history) return
@@ -55,7 +55,7 @@ Changes.redo = change => {
  * @param {Change} change
  */
 
-Changes.undo = change => {
+Commands.undo = change => {
   let { value } = change
   let { history } = value
   if (!history) return
@@ -100,4 +100,4 @@ Changes.undo = change => {
  * @type {Object}
  */
 
-export default Changes
+export default Commands

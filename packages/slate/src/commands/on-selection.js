@@ -3,550 +3,550 @@ import pick from 'lodash/pick'
 
 import Selection from '../models/selection'
 
-const Changes = {}
+const Commands = {}
 
-Changes.blur = change => {
+Commands.blur = change => {
   change.select({ isFocused: false })
 }
 
-Changes.deselect = change => {
+Commands.deselect = change => {
   const range = Selection.create()
   change.select(range)
 }
 
-Changes.focus = change => {
+Commands.focus = change => {
   change.select({ isFocused: true })
 }
 
-Changes.flip = change => {
+Commands.flip = change => {
   change.call(proxy, 'flip')
 }
 
-Changes.moveAnchorBackward = (change, ...args) => {
+Commands.moveAnchorBackward = (change, ...args) => {
   change.call(pointBackward, 'anchor', ...args)
 }
 
-Changes.moveAnchorForward = (change, ...args) => {
+Commands.moveAnchorForward = (change, ...args) => {
   change.call(pointForward, 'anchor', ...args)
 }
 
-Changes.moveAnchorTo = (change, ...args) => {
+Commands.moveAnchorTo = (change, ...args) => {
   change.call(proxy, 'moveAnchorTo', ...args)
 }
 
-Changes.moveAnchorToEndOfBlock = change => {
+Commands.moveAnchorToEndOfBlock = change => {
   change.call(pointEdgeObject, 'anchor', 'end', 'block')
 }
 
-Changes.moveAnchorToEndOfInline = change => {
+Commands.moveAnchorToEndOfInline = change => {
   change.call(pointEdgeObject, 'anchor', 'end', 'inline')
 }
 
-Changes.moveAnchorToEndOfDocument = change => {
+Commands.moveAnchorToEndOfDocument = change => {
   change.moveAnchorToEndOfNode(change.value.document).moveToAnchor()
 }
 
-Changes.moveAnchorToEndOfNextBlock = change => {
+Commands.moveAnchorToEndOfNextBlock = change => {
   change.call(pointEdgeSideObject, 'anchor', 'end', 'next', 'block')
 }
 
-Changes.moveAnchorToEndOfNextInline = change => {
+Commands.moveAnchorToEndOfNextInline = change => {
   change.call(pointEdgeSideObject, 'anchor', 'end', 'next', 'inline')
 }
 
-Changes.moveAnchorToEndOfNextText = change => {
+Commands.moveAnchorToEndOfNextText = change => {
   change.call(pointEdgeSideObject, 'anchor', 'end', 'next', 'text')
 }
 
-Changes.moveAnchorToEndOfNode = (change, ...args) => {
+Commands.moveAnchorToEndOfNode = (change, ...args) => {
   change.call(proxy, 'moveAnchorToEndOfNode', ...args)
 }
 
-Changes.moveAnchorToEndOfPreviousBlock = change => {
+Commands.moveAnchorToEndOfPreviousBlock = change => {
   change.call(pointEdgeSideObject, 'anchor', 'end', 'previous', 'block')
 }
 
-Changes.moveAnchorToEndOfPreviousInline = change => {
+Commands.moveAnchorToEndOfPreviousInline = change => {
   change.call(pointEdgeSideObject, 'anchor', 'end', 'previous', 'inline')
 }
 
-Changes.moveAnchorToEndOfPreviousText = change => {
+Commands.moveAnchorToEndOfPreviousText = change => {
   change.call(pointEdgeSideObject, 'anchor', 'end', 'previous', 'text')
 }
 
-Changes.moveAnchorToEndOfText = change => {
+Commands.moveAnchorToEndOfText = change => {
   change.call(pointEdgeObject, 'anchor', 'end', 'text')
 }
 
-Changes.moveAnchorToStartOfBlock = change => {
+Commands.moveAnchorToStartOfBlock = change => {
   change.call(pointEdgeObject, 'anchor', 'start', 'block')
 }
 
-Changes.moveAnchorToStartOfDocument = change => {
+Commands.moveAnchorToStartOfDocument = change => {
   change.moveAnchorToStartOfNode(change.value.document).moveToAnchor()
 }
 
-Changes.moveAnchorToStartOfInline = change => {
+Commands.moveAnchorToStartOfInline = change => {
   change.call(pointEdgeObject, 'anchor', 'start', 'inline')
 }
 
-Changes.moveAnchorToStartOfNextBlock = change => {
+Commands.moveAnchorToStartOfNextBlock = change => {
   change.call(pointEdgeSideObject, 'anchor', 'start', 'next', 'block')
 }
 
-Changes.moveAnchorToStartOfNextInline = change => {
+Commands.moveAnchorToStartOfNextInline = change => {
   change.call(pointEdgeSideObject, 'anchor', 'start', 'next', 'inline')
 }
 
-Changes.moveAnchorToStartOfNextText = change => {
+Commands.moveAnchorToStartOfNextText = change => {
   change.call(pointEdgeSideObject, 'anchor', 'start', 'next', 'text')
 }
 
-Changes.moveAnchorToStartOfNode = (change, ...args) => {
+Commands.moveAnchorToStartOfNode = (change, ...args) => {
   change.call(proxy, 'moveAnchorToStartOfNode', ...args)
 }
 
-Changes.moveAnchorToStartOfPreviousBlock = change => {
+Commands.moveAnchorToStartOfPreviousBlock = change => {
   change.call(pointEdgeSideObject, 'anchor', 'start', 'previous', 'block')
 }
 
-Changes.moveAnchorToStartOfPreviousInline = change => {
+Commands.moveAnchorToStartOfPreviousInline = change => {
   change.call(pointEdgeSideObject, 'anchor', 'start', 'previous', 'inline')
 }
 
-Changes.moveAnchorToStartOfPreviousText = change => {
+Commands.moveAnchorToStartOfPreviousText = change => {
   change.call(pointEdgeSideObject, 'anchor', 'start', 'previous', 'text')
 }
 
-Changes.moveAnchorToStartOfText = change => {
+Commands.moveAnchorToStartOfText = change => {
   change.call(pointEdgeObject, 'anchor', 'start', 'text')
 }
 
-Changes.moveBackward = (change, ...args) => {
+Commands.moveBackward = (change, ...args) => {
   change.moveAnchorBackward(...args).moveFocusBackward(...args)
 }
 
-Changes.moveEndBackward = (change, ...args) => {
+Commands.moveEndBackward = (change, ...args) => {
   change.call(pointBackward, 'end', ...args)
 }
 
-Changes.moveEndForward = (change, ...args) => {
+Commands.moveEndForward = (change, ...args) => {
   change.call(pointForward, 'end', ...args)
 }
 
-Changes.moveEndTo = (change, ...args) => {
+Commands.moveEndTo = (change, ...args) => {
   change.call(proxy, 'moveEndTo', ...args)
 }
 
-Changes.moveEndToEndOfBlock = change => {
+Commands.moveEndToEndOfBlock = change => {
   change.call(pointEdgeObject, 'end', 'end', 'block')
 }
 
-Changes.moveEndToEndOfDocument = change => {
+Commands.moveEndToEndOfDocument = change => {
   change.moveEndToEndOfNode(change.value.document).moveToEnd()
 }
 
-Changes.moveEndToEndOfInline = change => {
+Commands.moveEndToEndOfInline = change => {
   change.call(pointEdgeObject, 'end', 'end', 'inline')
 }
 
-Changes.moveEndToEndOfNextBlock = change => {
+Commands.moveEndToEndOfNextBlock = change => {
   change.call(pointEdgeSideObject, 'end', 'end', 'next', 'block')
 }
 
-Changes.moveEndToEndOfNextInline = change => {
+Commands.moveEndToEndOfNextInline = change => {
   change.call(pointEdgeSideObject, 'end', 'end', 'next', 'inline')
 }
 
-Changes.moveEndToEndOfNextText = change => {
+Commands.moveEndToEndOfNextText = change => {
   change.call(pointEdgeSideObject, 'end', 'end', 'next', 'text')
 }
 
-Changes.moveEndToEndOfNode = (change, ...args) => {
+Commands.moveEndToEndOfNode = (change, ...args) => {
   change.call(proxy, 'moveEndToEndOfNode', ...args)
 }
 
-Changes.moveEndToEndOfPreviousBlock = change => {
+Commands.moveEndToEndOfPreviousBlock = change => {
   change.call(pointEdgeSideObject, 'end', 'end', 'previous', 'block')
 }
 
-Changes.moveEndToEndOfPreviousInline = change => {
+Commands.moveEndToEndOfPreviousInline = change => {
   change.call(pointEdgeSideObject, 'end', 'end', 'previous', 'inline')
 }
 
-Changes.moveEndToEndOfPreviousText = change => {
+Commands.moveEndToEndOfPreviousText = change => {
   change.call(pointEdgeSideObject, 'end', 'end', 'previous', 'text')
 }
 
-Changes.moveEndToEndOfText = change => {
+Commands.moveEndToEndOfText = change => {
   change.call(pointEdgeObject, 'end', 'end', 'text')
 }
 
-Changes.moveEndToStartOfBlock = change => {
+Commands.moveEndToStartOfBlock = change => {
   change.call(pointEdgeObject, 'end', 'start', 'block')
 }
 
-Changes.moveEndToStartOfDocument = change => {
+Commands.moveEndToStartOfDocument = change => {
   change.moveEndToStartOfNode(change.value.document).moveToEnd()
 }
 
-Changes.moveEndToStartOfInline = change => {
+Commands.moveEndToStartOfInline = change => {
   change.call(pointEdgeObject, 'end', 'start', 'inline')
 }
 
-Changes.moveEndToStartOfNextBlock = change => {
+Commands.moveEndToStartOfNextBlock = change => {
   change.call(pointEdgeSideObject, 'end', 'start', 'next', 'block')
 }
 
-Changes.moveEndToStartOfNextInline = change => {
+Commands.moveEndToStartOfNextInline = change => {
   change.call(pointEdgeSideObject, 'end', 'start', 'next', 'inline')
 }
 
-Changes.moveEndToStartOfNextText = change => {
+Commands.moveEndToStartOfNextText = change => {
   change.call(pointEdgeSideObject, 'end', 'start', 'next', 'text')
 }
 
-Changes.moveEndToStartOfNode = (change, ...args) => {
+Commands.moveEndToStartOfNode = (change, ...args) => {
   change.call(proxy, 'moveEndToStartOfNode', ...args)
 }
 
-Changes.moveEndToStartOfPreviousBlock = change => {
+Commands.moveEndToStartOfPreviousBlock = change => {
   change.call(pointEdgeSideObject, 'end', 'start', 'previous', 'block')
 }
 
-Changes.moveEndToStartOfPreviousInline = change => {
+Commands.moveEndToStartOfPreviousInline = change => {
   change.call(pointEdgeSideObject, 'end', 'start', 'previous', 'inline')
 }
 
-Changes.moveEndToStartOfPreviousText = change => {
+Commands.moveEndToStartOfPreviousText = change => {
   change.call(pointEdgeSideObject, 'end', 'start', 'previous', 'text')
 }
 
-Changes.moveEndToStartOfText = change => {
+Commands.moveEndToStartOfText = change => {
   change.call(pointEdgeObject, 'end', 'start', 'text')
 }
 
-Changes.moveFocusBackward = (change, ...args) => {
+Commands.moveFocusBackward = (change, ...args) => {
   change.call(pointBackward, 'focus', ...args)
 }
 
-Changes.moveFocusForward = (change, ...args) => {
+Commands.moveFocusForward = (change, ...args) => {
   change.call(pointForward, 'focus', ...args)
 }
 
-Changes.moveFocusTo = (change, ...args) => {
+Commands.moveFocusTo = (change, ...args) => {
   change.call(proxy, 'moveFocusTo', ...args)
 }
 
-Changes.moveFocusToEndOfBlock = change => {
+Commands.moveFocusToEndOfBlock = change => {
   change.call(pointEdgeObject, 'focus', 'end', 'block')
 }
 
-Changes.moveFocusToEndOfDocument = change => {
+Commands.moveFocusToEndOfDocument = change => {
   change.moveFocusToEndOfNode(change.value.document).moveToFocus()
 }
 
-Changes.moveFocusToEndOfInline = change => {
+Commands.moveFocusToEndOfInline = change => {
   change.call(pointEdgeObject, 'focus', 'end', 'inline')
 }
 
-Changes.moveFocusToEndOfNextBlock = change => {
+Commands.moveFocusToEndOfNextBlock = change => {
   change.call(pointEdgeSideObject, 'focus', 'end', 'next', 'block')
 }
 
-Changes.moveFocusToEndOfNextInline = change => {
+Commands.moveFocusToEndOfNextInline = change => {
   change.call(pointEdgeSideObject, 'focus', 'end', 'next', 'inline')
 }
 
-Changes.moveFocusToEndOfNextText = change => {
+Commands.moveFocusToEndOfNextText = change => {
   change.call(pointEdgeSideObject, 'focus', 'end', 'next', 'text')
 }
 
-Changes.moveFocusToEndOfNode = (change, ...args) => {
+Commands.moveFocusToEndOfNode = (change, ...args) => {
   change.call(proxy, 'moveFocusToEndOfNode', ...args)
 }
 
-Changes.moveFocusToEndOfPreviousBlock = change => {
+Commands.moveFocusToEndOfPreviousBlock = change => {
   change.call(pointEdgeSideObject, 'focus', 'end', 'previous', 'block')
 }
 
-Changes.moveFocusToEndOfPreviousInline = change => {
+Commands.moveFocusToEndOfPreviousInline = change => {
   change.call(pointEdgeSideObject, 'focus', 'end', 'previous', 'inline')
 }
 
-Changes.moveFocusToEndOfPreviousText = change => {
+Commands.moveFocusToEndOfPreviousText = change => {
   change.call(pointEdgeSideObject, 'focus', 'end', 'previous', 'text')
 }
 
-Changes.moveFocusToEndOfText = change => {
+Commands.moveFocusToEndOfText = change => {
   change.call(pointEdgeObject, 'focus', 'end', 'text')
 }
 
-Changes.moveFocusToStartOfBlock = change => {
+Commands.moveFocusToStartOfBlock = change => {
   change.call(pointEdgeObject, 'focus', 'start', 'block')
 }
 
-Changes.moveFocusToStartOfDocument = change => {
+Commands.moveFocusToStartOfDocument = change => {
   change.moveFocusToStartOfNode(change.value.document).moveToFocus()
 }
 
-Changes.moveFocusToStartOfInline = change => {
+Commands.moveFocusToStartOfInline = change => {
   change.call(pointEdgeObject, 'focus', 'start', 'inline')
 }
 
-Changes.moveFocusToStartOfNextBlock = change => {
+Commands.moveFocusToStartOfNextBlock = change => {
   change.call(pointEdgeSideObject, 'focus', 'start', 'next', 'block')
 }
 
-Changes.moveFocusToStartOfNextInline = change => {
+Commands.moveFocusToStartOfNextInline = change => {
   change.call(pointEdgeSideObject, 'focus', 'start', 'next', 'inline')
 }
 
-Changes.moveFocusToStartOfNextText = change => {
+Commands.moveFocusToStartOfNextText = change => {
   change.call(pointEdgeSideObject, 'focus', 'start', 'next', 'text')
 }
 
-Changes.moveFocusToStartOfNode = (change, ...args) => {
+Commands.moveFocusToStartOfNode = (change, ...args) => {
   change.call(proxy, 'moveFocusToStartOfNode', ...args)
 }
 
-Changes.moveFocusToStartOfPreviousBlock = change => {
+Commands.moveFocusToStartOfPreviousBlock = change => {
   change.call(pointEdgeSideObject, 'focus', 'start', 'previous', 'block')
 }
 
-Changes.moveFocusToStartOfPreviousInline = change => {
+Commands.moveFocusToStartOfPreviousInline = change => {
   change.call(pointEdgeSideObject, 'focus', 'start', 'previous', 'inline')
 }
 
-Changes.moveFocusToStartOfPreviousText = change => {
+Commands.moveFocusToStartOfPreviousText = change => {
   change.call(pointEdgeSideObject, 'focus', 'start', 'previous', 'text')
 }
 
-Changes.moveFocusToStartOfText = change => {
+Commands.moveFocusToStartOfText = change => {
   change.call(pointEdgeObject, 'focus', 'start', 'text')
 }
 
-Changes.moveForward = (change, ...args) => {
+Commands.moveForward = (change, ...args) => {
   change.moveAnchorForward(...args).moveFocusForward(...args)
 }
 
-Changes.moveStartBackward = (change, ...args) => {
+Commands.moveStartBackward = (change, ...args) => {
   change.call(pointBackward, 'start', ...args)
 }
 
-Changes.moveStartForward = (change, ...args) => {
+Commands.moveStartForward = (change, ...args) => {
   change.call(pointForward, 'start', ...args)
 }
 
-Changes.moveStartTo = (change, ...args) => {
+Commands.moveStartTo = (change, ...args) => {
   change.call(proxy, 'moveStartTo', ...args)
 }
 
-Changes.moveStartToEndOfBlock = change => {
+Commands.moveStartToEndOfBlock = change => {
   change.call(pointEdgeObject, 'start', 'end', 'block')
 }
 
-Changes.moveStartToEndOfDocument = change => {
+Commands.moveStartToEndOfDocument = change => {
   change.moveStartToEndOfNode(change.value.document).moveToStart()
 }
 
-Changes.moveStartToEndOfInline = change => {
+Commands.moveStartToEndOfInline = change => {
   change.call(pointEdgeObject, 'start', 'end', 'inline')
 }
 
-Changes.moveStartToEndOfNextBlock = change => {
+Commands.moveStartToEndOfNextBlock = change => {
   change.call(pointEdgeSideObject, 'start', 'end', 'next', 'block')
 }
 
-Changes.moveStartToEndOfNextInline = change => {
+Commands.moveStartToEndOfNextInline = change => {
   change.call(pointEdgeSideObject, 'start', 'end', 'next', 'inline')
 }
 
-Changes.moveStartToEndOfNextText = change => {
+Commands.moveStartToEndOfNextText = change => {
   change.call(pointEdgeSideObject, 'start', 'end', 'next', 'text')
 }
 
-Changes.moveStartToEndOfNode = (change, ...args) => {
+Commands.moveStartToEndOfNode = (change, ...args) => {
   change.call(proxy, 'moveStartToEndOfNode', ...args)
 }
 
-Changes.moveStartToEndOfPreviousBlock = change => {
+Commands.moveStartToEndOfPreviousBlock = change => {
   change.call(pointEdgeSideObject, 'start', 'end', 'previous', 'block')
 }
 
-Changes.moveStartToEndOfPreviousInline = change => {
+Commands.moveStartToEndOfPreviousInline = change => {
   change.call(pointEdgeSideObject, 'start', 'end', 'previous', 'inline')
 }
 
-Changes.moveStartToEndOfPreviousText = change => {
+Commands.moveStartToEndOfPreviousText = change => {
   change.call(pointEdgeSideObject, 'start', 'end', 'previous', 'text')
 }
 
-Changes.moveStartToEndOfText = change => {
+Commands.moveStartToEndOfText = change => {
   change.call(pointEdgeObject, 'start', 'end', 'text')
 }
 
-Changes.moveStartToStartOfBlock = change => {
+Commands.moveStartToStartOfBlock = change => {
   change.call(pointEdgeObject, 'start', 'start', 'block')
 }
 
-Changes.moveStartToStartOfDocument = change => {
+Commands.moveStartToStartOfDocument = change => {
   change.moveStartToStartOfNode(change.value.document).moveToStart()
 }
 
-Changes.moveStartToStartOfInline = change => {
+Commands.moveStartToStartOfInline = change => {
   change.call(pointEdgeObject, 'start', 'start', 'inline')
 }
 
-Changes.moveStartToStartOfNextBlock = change => {
+Commands.moveStartToStartOfNextBlock = change => {
   change.call(pointEdgeSideObject, 'start', 'start', 'next', 'block')
 }
 
-Changes.moveStartToStartOfNextInline = change => {
+Commands.moveStartToStartOfNextInline = change => {
   change.call(pointEdgeSideObject, 'start', 'start', 'next', 'inline')
 }
 
-Changes.moveStartToStartOfNextText = change => {
+Commands.moveStartToStartOfNextText = change => {
   change.call(pointEdgeSideObject, 'start', 'start', 'next', 'text')
 }
 
-Changes.moveStartToStartOfNode = (change, ...args) => {
+Commands.moveStartToStartOfNode = (change, ...args) => {
   change.call(proxy, 'moveStartToStartOfNode', ...args)
 }
 
-Changes.moveStartToStartOfPreviousBlock = change => {
+Commands.moveStartToStartOfPreviousBlock = change => {
   change.call(pointEdgeSideObject, 'start', 'start', 'previous', 'block')
 }
 
-Changes.moveStartToStartOfPreviousInline = change => {
+Commands.moveStartToStartOfPreviousInline = change => {
   change.call(pointEdgeSideObject, 'start', 'start', 'previous', 'inline')
 }
 
-Changes.moveStartToStartOfPreviousText = change => {
+Commands.moveStartToStartOfPreviousText = change => {
   change.call(pointEdgeSideObject, 'start', 'start', 'previous', 'text')
 }
 
-Changes.moveStartToStartOfText = change => {
+Commands.moveStartToStartOfText = change => {
   change.call(pointEdgeObject, 'start', 'start', 'text')
 }
 
-Changes.moveTo = (change, ...args) => {
+Commands.moveTo = (change, ...args) => {
   change.call(proxy, 'moveTo', ...args)
 }
 
-Changes.moveToAnchor = change => {
+Commands.moveToAnchor = change => {
   change.call(proxy, 'moveToAnchor')
 }
 
-Changes.moveToEnd = change => {
+Commands.moveToEnd = change => {
   change.call(proxy, 'moveToEnd')
 }
 
-Changes.moveToEndOfBlock = change => {
+Commands.moveToEndOfBlock = change => {
   change.moveEndToEndOfBlock().moveToEnd()
 }
 
-Changes.moveToEndOfDocument = change => {
+Commands.moveToEndOfDocument = change => {
   change.moveEndToEndOfNode(change.value.document).moveToEnd()
 }
 
-Changes.moveToEndOfInline = change => {
+Commands.moveToEndOfInline = change => {
   change.moveEndToEndOfInline().moveToEnd()
 }
 
-Changes.moveToEndOfNextBlock = change => {
+Commands.moveToEndOfNextBlock = change => {
   change.moveEndToEndOfNextBlock().moveToEnd()
 }
 
-Changes.moveToEndOfNextInline = change => {
+Commands.moveToEndOfNextInline = change => {
   change.moveEndToEndOfNextInline().moveToEnd()
 }
 
-Changes.moveToEndOfNextText = change => {
+Commands.moveToEndOfNextText = change => {
   change.moveEndToEndOfNextText().moveToEnd()
 }
 
-Changes.moveToEndOfNode = (change, ...args) => {
+Commands.moveToEndOfNode = (change, ...args) => {
   change.call(proxy, 'moveToEndOfNode', ...args)
 }
 
-Changes.moveToEndOfPreviousBlock = change => {
+Commands.moveToEndOfPreviousBlock = change => {
   change.moveStartToEndOfPreviousBlock().moveToStart()
 }
 
-Changes.moveToEndOfPreviousInline = change => {
+Commands.moveToEndOfPreviousInline = change => {
   change.moveStartToEndOfPreviousInline().moveToStart()
 }
 
-Changes.moveToEndOfPreviousText = change => {
+Commands.moveToEndOfPreviousText = change => {
   change.moveStartToEndOfPreviousText().moveToStart()
 }
 
-Changes.moveToEndOfText = change => {
+Commands.moveToEndOfText = change => {
   change.moveEndToEndOfText().moveToEnd()
 }
 
-Changes.moveToFocus = change => {
+Commands.moveToFocus = change => {
   change.call(proxy, 'moveToFocus')
 }
 
-Changes.moveToRangeOfDocument = change => {
+Commands.moveToRangeOfDocument = change => {
   change.moveToRangeOfNode(change.value.document)
 }
 
-Changes.moveToRangeOfNode = (change, ...args) => {
+Commands.moveToRangeOfNode = (change, ...args) => {
   change.call(proxy, 'moveToRangeOfNode', ...args)
 }
 
-Changes.moveToStart = change => {
+Commands.moveToStart = change => {
   change.call(proxy, 'moveToStart')
 }
 
-Changes.moveToStartOfBlock = change => {
+Commands.moveToStartOfBlock = change => {
   change.moveStartToStartOfBlock().moveToStart()
 }
 
-Changes.moveToStartOfDocument = change => {
+Commands.moveToStartOfDocument = change => {
   change.moveStartToStartOfNode(change.value.document).moveToStart()
 }
 
-Changes.moveToStartOfInline = change => {
+Commands.moveToStartOfInline = change => {
   change.moveStartToStartOfInline().moveToStart()
 }
 
-Changes.moveToStartOfNextBlock = change => {
+Commands.moveToStartOfNextBlock = change => {
   change.moveEndToStartOfNextBlock().moveToEnd()
 }
 
-Changes.moveToStartOfNextInline = change => {
+Commands.moveToStartOfNextInline = change => {
   change.moveEndToStartOfNextInline().moveToEnd()
 }
 
-Changes.moveToStartOfNextText = change => {
+Commands.moveToStartOfNextText = change => {
   change.moveEndToStartOfNextText().moveToEnd()
 }
 
-Changes.moveToStartOfNode = (change, ...args) => {
+Commands.moveToStartOfNode = (change, ...args) => {
   change.call(proxy, 'moveToStartOfNode', ...args)
 }
 
-Changes.moveToStartOfPreviousBlock = change => {
+Commands.moveToStartOfPreviousBlock = change => {
   change.moveStartToStartOfPreviousBlock().moveToStart()
 }
 
-Changes.moveToStartOfPreviousInline = change => {
+Commands.moveToStartOfPreviousInline = change => {
   change.moveStartToStartOfPreviousInline().moveToStart()
 }
 
-Changes.moveToStartOfPreviousText = change => {
+Commands.moveToStartOfPreviousText = change => {
   change.moveStartToStartOfPreviousText().moveToStart()
 }
 
-Changes.moveToStartOfText = change => {
+Commands.moveToStartOfText = change => {
   change.moveStartToStartOfText().moveToStart()
 }
 
-Changes.select = (change, properties, options = {}) => {
+Commands.select = (change, properties, options = {}) => {
   properties = Selection.createProperties(properties)
   const { snapshot = false } = options
   const { value } = change
@@ -589,23 +589,23 @@ Changes.select = (change, properties, options = {}) => {
   )
 }
 
-Changes.setAnchor = (change, ...args) => {
+Commands.setAnchor = (change, ...args) => {
   change.call(proxy, 'setAnchor', ...args)
 }
 
-Changes.setEnd = (change, ...args) => {
+Commands.setEnd = (change, ...args) => {
   change.call(proxy, 'setEnd', ...args)
 }
 
-Changes.setFocus = (change, ...args) => {
+Commands.setFocus = (change, ...args) => {
   change.call(proxy, 'setFocus', ...args)
 }
 
-Changes.setStart = (change, ...args) => {
+Commands.setStart = (change, ...args) => {
   change.call(proxy, 'setStart', ...args)
 }
 
-Changes.snapshotSelection = change => {
+Commands.snapshotSelection = change => {
   change.select(change.value.selection, { snapshot: true })
 }
 
@@ -718,4 +718,4 @@ function pointForward(change, point, n = 1) {
   }
 }
 
-export default Changes
+export default Commands

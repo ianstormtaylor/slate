@@ -3,7 +3,6 @@ import isPlainObject from 'is-plain-object'
 import warning from 'slate-dev-warning'
 import { List, Map } from 'immutable'
 
-import Changes from '../changes'
 import Operation from '../models/operation'
 import PathUtils from '../utils/path-utils'
 
@@ -441,18 +440,6 @@ function getDirtyKeys(operation, newValue, oldValue) {
     }
   }
 }
-
-/**
- * Add a change method for each of the changes.
- */
-
-Object.keys(Changes).forEach(type => {
-  Change.prototype[type] = function(...args) {
-    debug(type, { args })
-    this.call(Changes[type], ...args)
-    return this
-  }
-})
 
 /**
  * Export.

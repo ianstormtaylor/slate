@@ -1,12 +1,12 @@
 import Value from '../models/value'
 
 /**
- * Changes.
+ * Commands.
  *
  * @type {Object}
  */
 
-const Changes = {}
+const Commands = {}
 
 /**
  * Set `properties` on the value.
@@ -15,7 +15,7 @@ const Changes = {}
  * @param {Object|Value} properties
  */
 
-Changes.setValue = (change, properties) => {
+Commands.setValue = (change, properties) => {
   properties = Value.createProperties(properties)
   const { value } = change
 
@@ -32,4 +32,4 @@ Changes.setValue = (change, properties) => {
  * @type {Object}
  */
 
-export default Changes
+export default Commands

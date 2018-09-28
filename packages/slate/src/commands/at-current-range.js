@@ -3,12 +3,12 @@ import Inline from '../models/inline'
 import Mark from '../models/mark'
 
 /**
- * Changes.
+ * Commands.
  *
  * @type {Object}
  */
 
-const Changes = {}
+const Commands = {}
 
 /**
  * Mix in the changes that pass through to their at-range equivalents because
@@ -34,7 +34,7 @@ const PROXY_TRANSFORMS = [
 ]
 
 PROXY_TRANSFORMS.forEach(method => {
-  Changes[method] = (change, ...args) => {
+  Commands[method] = (change, ...args) => {
     const { value } = change
     const { selection } = value
     const methodAtRange = `${method}AtRange`
@@ -55,7 +55,7 @@ PROXY_TRANSFORMS.forEach(method => {
  * @param {Mark} mark
  */
 
-Changes.addMark = (change, mark) => {
+Commands.addMark = (change, mark) => {
   mark = Mark.create(mark)
   const { value } = change
   const { document, selection } = value
@@ -80,7 +80,7 @@ Changes.addMark = (change, mark) => {
  * @param {Mark} mark
  */
 
-Changes.addMarks = (change, marks) => {
+Commands.addMarks = (change, marks) => {
   marks.forEach(mark => change.addMark(mark))
 }
 
@@ -90,7 +90,7 @@ Changes.addMarks = (change, marks) => {
  * @param {Change} change
  */
 
-Changes.delete = change => {
+Commands.delete = change => {
   const { value } = change
   const { selection } = value
   change.deleteAtRange(selection)
@@ -108,7 +108,7 @@ Changes.delete = change => {
  * @param {String|Object|Block} block
  */
 
-Changes.insertBlock = (change, block) => {
+Commands.insertBlock = (change, block) => {
   block = Block.create(block)
   const { value } = change
   const { selection } = value
@@ -126,7 +126,7 @@ Changes.insertBlock = (change, block) => {
  * @param {Document} fragment
  */
 
-Changes.insertFragment = (change, fragment) => {
+Commands.insertFragment = (change, fragment) => {
   if (!fragment.nodes.size) return
 
   let { value } = change
@@ -171,7 +171,7 @@ Changes.insertFragment = (change, fragment) => {
  * @param {String|Object|Inline} inline
  */
 
-Changes.insertInline = (change, inline) => {
+Commands.insertInline = (change, inline) => {
   inline = Inline.create(inline)
   const { value } = change
   const { selection } = value
@@ -190,7 +190,7 @@ Changes.insertInline = (change, inline) => {
  * @param {Set<Mark>} marks (optional)
  */
 
-Changes.insertText = (change, text, marks) => {
+Commands.insertText = (change, text, marks) => {
   const { value } = change
   const { document, selection } = value
   marks = marks || selection.marks || document.getInsertMarksAtRange(selection)
@@ -210,7 +210,7 @@ Changes.insertText = (change, text, marks) => {
  * @param {Mark} mark
  */
 
-Changes.removeMark = (change, mark) => {
+Commands.removeMark = (change, mark) => {
   mark = Mark.create(mark)
   const { value } = change
   const { document, selection } = value
@@ -236,7 +236,7 @@ Changes.removeMark = (change, mark) => {
  * @param {Mark} newMark
  */
 
-Changes.replaceMark = (change, oldMark, newMark) => {
+Commands.replaceMark = (change, oldMark, newMark) => {
   change.removeMark(oldMark)
   change.addMark(newMark)
 }
@@ -248,7 +248,7 @@ Changes.replaceMark = (change, oldMark, newMark) => {
  * @param {Number} depth (optional)
  */
 
-Changes.splitBlock = (change, depth = 1) => {
+Commands.splitBlock = (change, depth = 1) => {
   const { value } = change
   const { selection, document } = value
   const marks = selection.marks || document.getInsertMarksAtRange(selection)
@@ -267,7 +267,7 @@ Changes.splitBlock = (change, depth = 1) => {
  * @param {Mark} mark
  */
 
-Changes.toggleMark = (change, mark) => {
+Commands.toggleMark = (change, mark) => {
   mark = Mark.create(mark)
   const { value } = change
   const exists = value.activeMarks.has(mark)
@@ -287,7 +287,7 @@ Changes.toggleMark = (change, mark) => {
  * @param {String} suffix
  */
 
-Changes.wrapText = (change, prefix, suffix = prefix) => {
+Commands.wrapText = (change, prefix, suffix = prefix) => {
   const { value } = change
   const { selection } = value
   change.wrapTextAtRange(selection, prefix, suffix)
@@ -314,4 +314,4 @@ Changes.wrapText = (change, prefix, suffix = prefix) => {
  * @type {Object}
  */
 
-export default Changes
+export default Commands

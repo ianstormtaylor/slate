@@ -5,12 +5,12 @@ import Node from '../models/node'
 import PathUtils from '../utils/path-utils'
 
 /**
- * Changes.
+ * Commands.
  *
  * @type {Object}
  */
 
-const Changes = {}
+const Commands = {}
 
 /**
  * Add mark to text at `offset` and `length` in node by `path`.
@@ -22,7 +22,7 @@ const Changes = {}
  * @param {Mixed} mark
  */
 
-Changes.addMarkByPath = (change, path, offset, length, mark) => {
+Commands.addMarkByPath = (change, path, offset, length, mark) => {
   mark = Mark.create(mark)
   const { value } = change
   const { document } = value
@@ -72,7 +72,7 @@ Changes.addMarkByPath = (change, path, offset, length, mark) => {
  * @param {Fragment} fragment
  */
 
-Changes.insertFragmentByPath = (change, path, index, fragment) => {
+Commands.insertFragmentByPath = (change, path, index, fragment) => {
   fragment.nodes.forEach((node, i) => {
     change.insertNodeByPath(path, index + i, node)
   })
@@ -87,7 +87,7 @@ Changes.insertFragmentByPath = (change, path, index, fragment) => {
  * @param {Node} node
  */
 
-Changes.insertNodeByPath = (change, path, index, node) => {
+Commands.insertNodeByPath = (change, path, index, node) => {
   const { value } = change
 
   change.applyOperation({
@@ -108,7 +108,7 @@ Changes.insertNodeByPath = (change, path, index, node) => {
  * @param {Set<Mark>} marks (optional)
  */
 
-Changes.insertTextByPath = (change, path, offset, text, marks) => {
+Commands.insertTextByPath = (change, path, offset, text, marks) => {
   const { value } = change
   const { document } = value
   const node = document.assertNode(path)
@@ -131,7 +131,7 @@ Changes.insertTextByPath = (change, path, offset, text, marks) => {
  * @param {Array} path
  */
 
-Changes.mergeNodeByPath = (change, path) => {
+Commands.mergeNodeByPath = (change, path) => {
   const { value } = change
   const { document } = value
   const original = document.getDescendant(path)
@@ -170,7 +170,7 @@ Changes.mergeNodeByPath = (change, path) => {
  * @param {Number} index
  */
 
-Changes.moveNodeByPath = (change, path, newPath, newIndex) => {
+Commands.moveNodeByPath = (change, path, newPath, newIndex) => {
   const { value } = change
 
   change.applyOperation({
@@ -191,7 +191,7 @@ Changes.moveNodeByPath = (change, path, newPath, newIndex) => {
  * @param {Mark} mark
  */
 
-Changes.removeMarkByPath = (change, path, offset, length, mark) => {
+Commands.removeMarkByPath = (change, path, offset, length, mark) => {
   mark = Mark.create(mark)
   const { value } = change
   const { document } = value
@@ -239,7 +239,7 @@ Changes.removeMarkByPath = (change, path, offset, length, mark) => {
  * @param {Array} path
  */
 
-Changes.removeAllMarksByPath = (change, path) => {
+Commands.removeAllMarksByPath = (change, path) => {
   const { state } = change
   const { document } = state
   const node = document.assertNode(path)
@@ -259,7 +259,7 @@ Changes.removeAllMarksByPath = (change, path) => {
  * @param {Array} path
  */
 
-Changes.removeNodeByPath = (change, path) => {
+Commands.removeNodeByPath = (change, path) => {
   const { value } = change
   const { document } = value
   const node = document.assertNode(path)
@@ -281,7 +281,7 @@ Changes.removeNodeByPath = (change, path) => {
  * @param {Number} length
  */
 
-Changes.removeTextByPath = (change, path, offset, length) => {
+Commands.removeTextByPath = (change, path, offset, length) => {
   const { value } = change
   const { document } = value
   const node = document.assertNode(path)
@@ -329,7 +329,7 @@ Changes.removeTextByPath = (change, path, offset, length) => {
  * @param {Object|Node} node
  */
 
-Changes.replaceNodeByPath = (change, path, newNode) => {
+Commands.replaceNodeByPath = (change, path, newNode) => {
   newNode = Node.create(newNode)
   const index = path.last()
   const parentPath = PathUtils.lift(path)
@@ -350,7 +350,7 @@ Changes.replaceNodeByPath = (change, path, newNode) => {
  * @param {Set<Mark>} marks (optional)
  */
 
-Changes.replaceTextByPath = (change, path, offset, length, text, marks) => {
+Commands.replaceTextByPath = (change, path, offset, length, text, marks) => {
   const { document } = change.value
   const node = document.assertNode(path)
 
@@ -395,7 +395,7 @@ Changes.replaceTextByPath = (change, path, offset, length, text, marks) => {
  * @param {Mark} mark
  */
 
-Changes.setMarkByPath = (change, path, offset, length, mark, properties) => {
+Commands.setMarkByPath = (change, path, offset, length, mark, properties) => {
   mark = Mark.create(mark)
   properties = Mark.createProperties(properties)
   const { value } = change
@@ -419,7 +419,7 @@ Changes.setMarkByPath = (change, path, offset, length, mark, properties) => {
  * @param {Object|String} properties
  */
 
-Changes.setNodeByPath = (change, path, properties) => {
+Commands.setNodeByPath = (change, path, properties) => {
   properties = Node.createProperties(properties)
   const { value } = change
   const { document } = value
@@ -443,7 +443,7 @@ Changes.setNodeByPath = (change, path, properties) => {
  * @param {Set<Mark>} marks (optional)
  */
 
-Changes.setTextByPath = (change, path, text, marks) => {
+Commands.setTextByPath = (change, path, text, marks) => {
   const { value } = change
   const { document } = value
   const node = document.assertNode(path)
@@ -460,7 +460,7 @@ Changes.setTextByPath = (change, path, text, marks) => {
  * @param {Object} options
  */
 
-Changes.splitNodeByPath = (change, path, position, options = {}) => {
+Commands.splitNodeByPath = (change, path, position, options = {}) => {
   const { target = null } = options
   const { value } = change
   const { document } = value
@@ -488,7 +488,7 @@ Changes.splitNodeByPath = (change, path, position, options = {}) => {
  * @param {Number} textOffset
  */
 
-Changes.splitDescendantsByPath = (change, path, textPath, textOffset) => {
+Commands.splitDescendantsByPath = (change, path, textPath, textOffset) => {
   if (path.equals(textPath)) {
     change.splitNodeByPath(textPath, textOffset)
     return
@@ -525,7 +525,7 @@ Changes.splitDescendantsByPath = (change, path, textPath, textOffset) => {
  * @param {Object|String} properties
  */
 
-Changes.unwrapInlineByPath = (change, path, properties) => {
+Commands.unwrapInlineByPath = (change, path, properties) => {
   const { value } = change
   const { document, selection } = value
   const node = document.assertNode(path)
@@ -543,7 +543,7 @@ Changes.unwrapInlineByPath = (change, path, properties) => {
  * @param {Object|String} properties
  */
 
-Changes.unwrapBlockByPath = (change, path, properties) => {
+Commands.unwrapBlockByPath = (change, path, properties) => {
   const { value } = change
   const { document, selection } = value
   const node = document.assertNode(path)
@@ -564,7 +564,7 @@ Changes.unwrapBlockByPath = (change, path, properties) => {
  * @param {Array} path
  */
 
-Changes.unwrapNodeByPath = (change, path) => {
+Commands.unwrapNodeByPath = (change, path) => {
   const { value } = change
   const { document } = value
   document.assertNode(path)
@@ -602,7 +602,7 @@ Changes.unwrapNodeByPath = (change, path) => {
  * @param {Block|Object|String} block
  */
 
-Changes.wrapBlockByPath = (change, path, block) => {
+Commands.wrapBlockByPath = (change, path, block) => {
   block = Block.create(block)
   block = block.set('nodes', block.nodes.clear())
   const parentPath = PathUtils.lift(path)
@@ -623,7 +623,7 @@ Changes.wrapBlockByPath = (change, path, block) => {
  * @param {Block|Object|String} inline
  */
 
-Changes.wrapInlineByPath = (change, path, inline) => {
+Commands.wrapInlineByPath = (change, path, inline) => {
   inline = Inline.create(inline)
   inline = inline.set('nodes', inline.nodes.clear())
   const parentPath = PathUtils.lift(path)
@@ -644,7 +644,7 @@ Changes.wrapInlineByPath = (change, path, inline) => {
  * @param {Node|Object} node
  */
 
-Changes.wrapNodeByPath = (change, path, node) => {
+Commands.wrapNodeByPath = (change, path, node) => {
   node = Node.create(node)
 
   if (node.object === 'block') {
@@ -658,7 +658,7 @@ Changes.wrapNodeByPath = (change, path, node) => {
  * Mix in `*ByKey` variants.
  */
 
-const CHANGES = [
+const COMMANDS = [
   'addMark',
   'insertFragment',
   'insertNode',
@@ -682,8 +682,8 @@ const CHANGES = [
   'wrapNode',
 ]
 
-for (const method of CHANGES) {
-  Changes[`${method}ByKey`] = (change, key, ...args) => {
+for (const method of COMMANDS) {
+  Commands[`${method}ByKey`] = (change, key, ...args) => {
     const { value } = change
     const { document } = value
     const path = document.assertPath(key)
@@ -692,7 +692,7 @@ for (const method of CHANGES) {
 }
 
 // Moving nodes takes two keys, so it's slightly different.
-Changes.moveNodeByKey = (change, key, newKey, ...args) => {
+Commands.moveNodeByKey = (change, key, newKey, ...args) => {
   const { value } = change
   const { document } = value
   const path = document.assertPath(key)
@@ -701,7 +701,7 @@ Changes.moveNodeByKey = (change, key, newKey, ...args) => {
 }
 
 // Splitting descendants takes two keys, so it's slightly different.
-Changes.splitDescendantsByKey = (change, key, textKey, ...args) => {
+Commands.splitDescendantsByKey = (change, key, textKey, ...args) => {
   const { value } = change
   const { document } = value
   const path = document.assertPath(key)
@@ -715,4 +715,4 @@ Changes.splitDescendantsByKey = (change, key, textKey, ...args) => {
  * @type {Object}
  */
 
-export default Changes
+export default Commands

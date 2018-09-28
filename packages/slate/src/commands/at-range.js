@@ -6,12 +6,12 @@ import Node from '../models/node'
 import TextUtils from '../utils/text-utils'
 
 /**
- * Changes.
+ * Commands.
  *
  * @type {Object}
  */
 
-const Changes = {}
+const Commands = {}
 
 /**
  * Add a new `mark` to the characters at `range`.
@@ -21,7 +21,7 @@ const Changes = {}
  * @param {Mixed} mark
  */
 
-Changes.addMarkAtRange = (change, range, mark) => {
+Commands.addMarkAtRange = (change, range, mark) => {
   if (range.isCollapsed) return
 
   const { value } = change
@@ -52,7 +52,7 @@ Changes.addMarkAtRange = (change, range, mark) => {
  * @param {Array<Mixed>} mark
  */
 
-Changes.addMarksAtRange = (change, range, marks) => {
+Commands.addMarksAtRange = (change, range, marks) => {
   marks.forEach(mark => change.addMarkAtRange(range, mark))
 }
 
@@ -63,7 +63,7 @@ Changes.addMarksAtRange = (change, range, marks) => {
  * @param {Range} range
  */
 
-Changes.deleteAtRange = (change, range) => {
+Commands.deleteAtRange = (change, range) => {
   // Snapshot the selection, which creates an extra undo save point, so that
   // when you undo a delete, the expanded selection will be retained.
   change.snapshotSelection()
@@ -258,7 +258,7 @@ Changes.deleteAtRange = (change, range) => {
  * @param {Range} range
  */
 
-Changes.deleteCharBackwardAtRange = (change, range) => {
+Commands.deleteCharBackwardAtRange = (change, range) => {
   const { value } = change
   const { document } = value
   const { start } = range
@@ -277,7 +277,7 @@ Changes.deleteCharBackwardAtRange = (change, range) => {
  * @param {Range} range
  */
 
-Changes.deleteLineBackwardAtRange = (change, range) => {
+Commands.deleteLineBackwardAtRange = (change, range) => {
   const { value } = change
   const { document } = value
   const { start } = range
@@ -294,7 +294,7 @@ Changes.deleteLineBackwardAtRange = (change, range) => {
  * @param {Range} range
  */
 
-Changes.deleteWordBackwardAtRange = (change, range) => {
+Commands.deleteWordBackwardAtRange = (change, range) => {
   const { value } = change
   const { document } = value
   const { start } = range
@@ -314,7 +314,7 @@ Changes.deleteWordBackwardAtRange = (change, range) => {
  * @param {Number} n (optional)
  */
 
-Changes.deleteBackwardAtRange = (change, range, n = 1) => {
+Commands.deleteBackwardAtRange = (change, range, n = 1) => {
   if (n === 0) return
   const { editor, value } = change
   const { schema } = editor
@@ -413,7 +413,7 @@ Changes.deleteBackwardAtRange = (change, range, n = 1) => {
  * @param {Range} range
  */
 
-Changes.deleteCharForwardAtRange = (change, range) => {
+Commands.deleteCharForwardAtRange = (change, range) => {
   const { value } = change
   const { document } = value
   const { start } = range
@@ -432,7 +432,7 @@ Changes.deleteCharForwardAtRange = (change, range) => {
  * @param {Range} range
  */
 
-Changes.deleteLineForwardAtRange = (change, range) => {
+Commands.deleteLineForwardAtRange = (change, range) => {
   const { value } = change
   const { document } = value
   const { start } = range
@@ -449,7 +449,7 @@ Changes.deleteLineForwardAtRange = (change, range) => {
  * @param {Range} range
  */
 
-Changes.deleteWordForwardAtRange = (change, range) => {
+Commands.deleteWordForwardAtRange = (change, range) => {
   const { value } = change
   const { document } = value
   const { start } = range
@@ -469,7 +469,7 @@ Changes.deleteWordForwardAtRange = (change, range) => {
  * @param {Number} n (optional)
  */
 
-Changes.deleteForwardAtRange = (change, range, n = 1) => {
+Commands.deleteForwardAtRange = (change, range, n = 1) => {
   if (n === 0) return
   const { editor, value } = change
   const { schema } = editor
@@ -576,7 +576,7 @@ Changes.deleteForwardAtRange = (change, range, n = 1) => {
  * @param {Block|String|Object} block
  */
 
-Changes.insertBlockAtRange = (change, range, block) => {
+Commands.insertBlockAtRange = (change, range, block) => {
   block = Block.create(block)
 
   if (range.isExpanded) {
@@ -634,7 +634,7 @@ Changes.insertBlockAtRange = (change, range, block) => {
  * @param {Document} fragment
  */
 
-Changes.insertFragmentAtRange = (change, range, fragment) => {
+Commands.insertFragmentAtRange = (change, range, fragment) => {
   change.withoutNormalizing(() => {
     // If the range is expanded, delete it first.
     if (range.isExpanded) {
@@ -762,7 +762,7 @@ Changes.insertFragmentAtRange = (change, range, fragment) => {
  * @param {Inline|String|Object} inline
  */
 
-Changes.insertInlineAtRange = (change, range, inline) => {
+Commands.insertInlineAtRange = (change, range, inline) => {
   inline = Inline.create(inline)
 
   change.withoutNormalizing(() => {
@@ -795,7 +795,7 @@ Changes.insertInlineAtRange = (change, range, inline) => {
  * @param {Set<Mark>} marks (optional)
  */
 
-Changes.insertTextAtRange = (change, range, text, marks) => {
+Commands.insertTextAtRange = (change, range, text, marks) => {
   const { editor, value } = change
   const { schema } = editor
   const { document } = value
@@ -831,7 +831,7 @@ Changes.insertTextAtRange = (change, range, text, marks) => {
  * @param {Mark|String} mark (optional)
  */
 
-Changes.removeMarkAtRange = (change, range, mark) => {
+Commands.removeMarkAtRange = (change, range, mark) => {
   if (range.isCollapsed) return
 
   const { value } = change
@@ -862,7 +862,7 @@ Changes.removeMarkAtRange = (change, range, mark) => {
  * @param {Object|String} properties
  */
 
-Changes.setBlocksAtRange = (change, range, properties) => {
+Commands.setBlocksAtRange = (change, range, properties) => {
   const { editor, value } = change
   const { schema } = editor
   const { document } = value
@@ -902,7 +902,7 @@ Changes.setBlocksAtRange = (change, range, properties) => {
  * @param {Object|String} properties
  */
 
-Changes.setInlinesAtRange = (change, range, properties) => {
+Commands.setInlinesAtRange = (change, range, properties) => {
   const { value } = change
   const { document } = value
   const inlines = document.getInlinesAtRange(range)
@@ -922,7 +922,7 @@ Changes.setInlinesAtRange = (change, range, properties) => {
  * @param {Number} height (optional)
  */
 
-Changes.splitBlockAtRange = (change, range, height = 1) => {
+Commands.splitBlockAtRange = (change, range, height = 1) => {
   const { start, end } = range
   let { value } = change
   let { document } = value
@@ -966,7 +966,7 @@ Changes.splitBlockAtRange = (change, range, height = 1) => {
  * @param {Number} height (optional)
  */
 
-Changes.splitInlineAtRange = (change, range, height = Infinity) => {
+Commands.splitInlineAtRange = (change, range, height = Infinity) => {
   if (range.isExpanded) {
     change.deleteAtRange(range)
     range = range.moveToStart()
@@ -997,7 +997,7 @@ Changes.splitInlineAtRange = (change, range, height = Infinity) => {
  * @param {Mixed} mark
  */
 
-Changes.toggleMarkAtRange = (change, range, mark) => {
+Commands.toggleMarkAtRange = (change, range, mark) => {
   if (range.isCollapsed) return
 
   mark = Mark.create(mark)
@@ -1022,7 +1022,7 @@ Changes.toggleMarkAtRange = (change, range, mark) => {
  * @param {String|Object} properties
  */
 
-Changes.unwrapBlockAtRange = (change, range, properties) => {
+Commands.unwrapBlockAtRange = (change, range, properties) => {
   properties = Node.createProperties(properties)
 
   const { value } = change
@@ -1103,7 +1103,7 @@ Changes.unwrapBlockAtRange = (change, range, properties) => {
  * @param {String|Object} properties
  */
 
-Changes.unwrapInlineAtRange = (change, range, properties) => {
+Commands.unwrapInlineAtRange = (change, range, properties) => {
   properties = Node.createProperties(properties)
 
   const { value } = change
@@ -1146,7 +1146,7 @@ Changes.unwrapInlineAtRange = (change, range, properties) => {
  * @param {Block|Object|String} block
  */
 
-Changes.wrapBlockAtRange = (change, range, block) => {
+Commands.wrapBlockAtRange = (change, range, block) => {
   block = Block.create(block)
   block = block.set('nodes', block.nodes.clear())
 
@@ -1210,7 +1210,7 @@ Changes.wrapBlockAtRange = (change, range, block) => {
  * @param {Inline|Object|String} inline
  */
 
-Changes.wrapInlineAtRange = (change, range, inline) => {
+Commands.wrapInlineAtRange = (change, range, inline) => {
   const { editor, value } = change
   const { schema } = editor
   let { document } = value
@@ -1336,7 +1336,7 @@ Changes.wrapInlineAtRange = (change, range, inline) => {
  * @param {String} suffix (optional)
  */
 
-Changes.wrapTextAtRange = (change, range, prefix, suffix = prefix) => {
+Commands.wrapTextAtRange = (change, range, prefix, suffix = prefix) => {
   const { start, end } = range
   const startRange = range.moveToStart()
   let endRange = range.moveToEnd()
@@ -1357,4 +1357,4 @@ Changes.wrapTextAtRange = (change, range, prefix, suffix = prefix) => {
  * @type {Object}
  */
 
-export default Changes
+export default Commands

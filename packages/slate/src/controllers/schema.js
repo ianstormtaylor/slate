@@ -336,21 +336,6 @@ class Schema extends Record(DEFAULTS) {
     const rule = this.rules.find(r => 'isVoid' in r && testRules(node, r.match))
     return rule ? rule.isVoid : false
   }
-
-  /**
-   * Return a JSON representation of the schema.
-   *
-   * @return {Object}
-   */
-
-  toJSON() {
-    const object = {
-      object: this.object,
-      rules: this.rules,
-    }
-
-    return object
-  }
 }
 
 /**

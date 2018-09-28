@@ -1,5 +1,16 @@
+import Debug from 'debug'
+
+import AbstractChange from './change'
+import CorePlugin from '../plugins/core'
 import Schema from './schema'
-import Change from './change'
+
+/**
+ * Debug.
+ *
+ * @type {Function}
+ */
+
+const debug = Debug('slate:command')
 
 /**
  * Editor.
@@ -18,11 +29,10 @@ class Editor {
     const { onChange, plugins = [], readOnly = false, value } = attrs
 
     this.tmp = {
-      change: null,
-      changing: false,
-      plugins: null,
-      updates: 0,
-      value: null,
+      isChanging: false,
+      lastPlugins: null,
+      lastValue: null,
+      rawPlugins: null,
     }
 
     this.setProperties({ onChange, plugins, readOnly, value })
@@ -35,20 +45,21 @@ class Editor {
    */
 
   change = (...args) => {
+    const { Change } = this
     const change = new Change({ value: this.value, editor: this })
-    const { changing } = this.tmp
+    const { isChanging } = this.tmp
 
     try {
-      this.tmp.changing = true
+      this.tmp.isChanging = true
       change.call(...args)
     } catch (error) {
       throw error
     } finally {
-      this.tmp.changing = changing
+      this.tmp.isChanging = isChanging
     }
 
     // If this is the top-most change, run the `onChange` handler.
-    if (changing === false) {
+    if (isChanging === false) {
       this.run('onChange', change)
     }
 
@@ -60,8 +71,8 @@ class Editor {
     // Store a reference to the last `value` and `plugins` that were seen by the
     // editor, so we can know whether to normalize a new unknown value if one
     // is passed in via `this.props`.
-    this.tmp.value = change.value
-    this.tmp.plugins = this.plugins
+    this.tmp.lastValue = change.value
+    this.tmp.lastPlugins = this.plugins
 
     // Call the provided `onChange` handler.
     this.onChange(change)
@@ -172,12 +183,38 @@ class Editor {
    */
 
   setPlugins(plugins) {
-    if (plugins !== this.plugins) {
-      this.tmp.updates++
-      this.plugins = plugins
-      this.schema = Schema.create({ plugins })
+    // PERF: If they try to set the same `plugins` again, we can avoid work.
+    if (plugins === this.tmp.rawPlugins) {
+      return this
     }
 
+    const rawPlugins = plugins
+    plugins = [CorePlugin(), ...plugins]
+
+    const reversed = plugins.slice().reverse()
+    const schema = Schema.create({ plugins })
+    class Change extends AbstractChange {}
+
+    for (const plugin of reversed) {
+      const { commands = {} } = plugin
+
+      Object.keys(commands).forEach(key => {
+        Change.prototype[key] = function(...args) {
+          debug(key, { args })
+          const fn = commands[key]
+          this.call(fn, ...args)
+          return this
+        }
+      })
+    }
+
+    // PERF: Save a reference to the "raw" plugins that were set, so that we can
+    // compare it by reference for a future set to avoid repeating work.
+    this.tmp.rawPlugins = rawPlugins
+
+    this.plugins = plugins
+    this.schema = schema
+    this.Change = Change
     return this
   }
 
@@ -217,7 +254,12 @@ class Editor {
    */
 
   setValue(value) {
-    if (this.plugins === this.tmp.plugins && this.value === this.tmp.value) {
+    // PERF: If the plugins and value haven't changed from the last seen one, we
+    // don't have to normalize it because we know it was already normalized.
+    if (
+      this.plugins === this.tmp.lastPlugins &&
+      this.value === this.tmp.lastValue
+    ) {
       this.value = value
       return this
     }
