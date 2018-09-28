@@ -74,19 +74,29 @@ class Editor extends React.Component {
   state = {}
 
   /**
-   * Temporary values.
+   * Temporary values related to react cycles or slate cycles.
    *
    * @type {Object}
    */
 
   tmp = {
-    change: null,
     isChanging: false,
+    isResolvingValue: false,
     operationsSize: null,
     plugins: null,
     resolves: 0,
     updates: 0,
     value: null,
+    propsValue: null,
+  }
+
+  /*
+   * Memoized result for results within the cycle
+   */
+
+  memoized = {
+    value: undefined,
+    change: undefined,
   }
 
   /**
@@ -109,19 +119,17 @@ class Editor extends React.Component {
     this.tmp.updates++
 
     const { autoFocus } = this.props
-    const { change } = this.tmp
+    const change = this.resolveChange()
 
     if (autoFocus) {
       if (change) {
         change.focus()
-      } else {
-        this.focus()
       }
     }
 
-    if (change) {
-      this.onChange(change)
-    }
+    this.onChange(change)
+
+    this.memoized = {}
   }
 
   /**
@@ -131,7 +139,8 @@ class Editor extends React.Component {
   componentDidUpdate(prevProps) {
     this.tmp.updates++
 
-    const { change, resolves, updates } = this.tmp
+    const change = this.resolveChange()
+    const { resolves, updates } = this.tmp
 
     // If we've resolved a few times already, and it's exactly in line with
     // the updates, then warn the user that they may be doing something wrong.
@@ -140,9 +149,9 @@ class Editor extends React.Component {
       'A Slate <Editor> component is re-resolving `props.plugins` or `props.schema` on each update, which leads to poor performance. This is often due to passing in a new `schema` or `plugins` prop with each render by declaring them inline in your render function. Do not do this!'
     )
 
-    if (change) {
-      this.onChange(change)
-    }
+    this.onChange(change)
+
+    this.memoized = {}
   }
 
   /**
@@ -198,18 +207,12 @@ class Editor extends React.Component {
    */
 
   get value() {
-    // If the current `plugins` and `value` are the same as the last seen ones
-    // that were saved in `tmp`, don't re-resolve because that will trigger
-    // extra `onChange` runs.
-    if (
-      this.plugins === this.tmp.plugins &&
-      this.props.value === this.tmp.value
-    ) {
-      return this.tmp.value
-    }
+    // When the value is resolving, we return the last normalized value
+    // When in first mount, we return the proops.value
+    if (this.tmp.isResolvingValue) return this.tmp.value || this.props.value
 
-    const value = this.resolveValue(this.plugins, this.props.value)
-    return value
+    this.resolveMemoize()
+    return this.memoized.value
   }
 
   /**
@@ -228,7 +231,8 @@ class Editor extends React.Component {
       return
     }
 
-    const change = this.value.change()
+    this.resolveMemoize()
+    const { change } = this.memoized
 
     try {
       this.tmp.isChanging = true
@@ -271,7 +275,11 @@ class Editor extends React.Component {
     }
 
     debug('onChange', { change })
-    change = this.resolveChange(this.plugins, change, change.operations.size)
+
+    if (change.operations.size > this.tmp.operationsSize) {
+      const { stack } = this
+      stack.run('onChange', change, this)
+    }
 
     // Store a reference to the last `value` and `plugins` that were seen by the
     // editor, so we can know whether to normalize a new unknown value if one
@@ -283,6 +291,7 @@ class Editor extends React.Component {
     delete this.tmp.change
     delete this.tmp.operationsSize
 
+    this.memoized = {}
     this.props.onChange(change)
   }
 
@@ -298,21 +307,6 @@ class Editor extends React.Component {
       this.stack.run(handler, event, change, this)
     })
   }
-
-  /**
-   * Resolve a change from the current `plugins`, a potential `change` and its
-   * current operations `size`.
-   *
-   * @param {Array} plugins
-   * @param {Change} change
-   * @param {Number} size
-   */
-
-  resolveChange = memoizeOne((plugins, change, size) => {
-    const stack = this.resolveStack(plugins)
-    stack.run('onChange', change, this)
-    return change
-  })
 
   /**
    * Resolve a set of plugins from potential `plugins` and a `schema`.
@@ -380,25 +374,69 @@ class Editor extends React.Component {
   })
 
   /**
-   * Resolve a value from the current `plugins` and a potential `value`.
+   * Resolve a change from the current `plugins`, a potential `change` and its
+   * current operations `size`.
    *
-   * @param {Array} plugins
-   * @param {Value} value
    * @return {Change}
    */
 
-  resolveValue = memoizeOne((plugins, value) => {
-    debug('resolveValue', { plugins, value })
-    let change = value.change()
-    change = this.resolveChange(plugins, change, change.operations.size)
+  resolveChange = () => {
+    this.resolveMemoize()
+    return this.memoized.change
+  }
 
-    // Store the change and it's operations count so that it can be flushed once
-    // the component next updates.
-    this.tmp.change = change
-    this.tmp.operationsSize = change.operations.size
+  /**
+   * Resolve value and change in each lifecycle, and store them in this.memoized
+   *
+   * @return {}
+   */
 
-    return change.value
-  })
+  resolveMemoize = () => {
+    // Flush the memoize when props changes
+    if (this.tmp.propsValue !== this.props.value) {
+      this.tmp.propsValue = this.props.value
+      this.memoized = {}
+    }
+
+    if (this.plugins !== this.tmp.plugins) {
+      this.tmp.plugins = this.plugins
+      this.memoized = {}
+    }
+
+    const { memoized } = this
+
+    if (memoized.value && memoized.change) {
+      return
+    }
+
+    const { value, plugins } = this.props
+    const change = value.change()
+    memoized.change = change
+
+    // If the current `plugins` and `value` are the same as the last seen ones
+    // that were saved in `tmp`, don't re-resolve because that will trigger
+    // extra `onChange` runs.
+    if (this.plugins === this.tmp.plugins && value === this.tmp.value) {
+      memoized.value = value
+      return
+    }
+
+    try {
+      this.tmp.isResolvingValue = true
+      debug('resolveValue', { plugins, value })
+      const { stack } = this
+      stack.run('onChange', change, this)
+
+      // Store the change and it's operations count so that it can be flushed once
+      // the component next updates.
+      this.tmp.operationsSize = change.operations.size
+      memoized.value = change.value
+    } catch (error) {
+      throw error
+    } finally {
+      this.tmp.isResolvingValue = false
+    }
+  }
 }
 
 /**
