@@ -655,8 +655,9 @@ function pointBackward(change, point, n = 1) {
   if (n < 0) return pointForward(change, point, -n)
 
   const Point = point.slice(0, 1).toUpperCase() + point.slice(1)
-  const { value } = change
-  const { document, selection, schema } = value
+  const { editor, value } = change
+  const { schema } = editor
+  const { document, selection } = value
   const p = selection[point]
   const hasVoidParent = document.hasVoidParent(p.path, schema)
 
@@ -688,8 +689,9 @@ function pointForward(change, point, n = 1) {
   if (n < 0) return pointBackward(change, point, -n)
 
   const Point = point.slice(0, 1).toUpperCase() + point.slice(1)
-  const { value } = change
-  const { document, selection, schema } = value
+  const { editor, value } = change
+  const { schema } = editor
+  const { document, selection } = value
   const p = selection[point]
   const text = document.getNode(p.path)
   const hasVoidParent = document.hasVoidParent(p.path, schema)

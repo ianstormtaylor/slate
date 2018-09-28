@@ -3,7 +3,7 @@ import React from 'react'
 import SlateTypes from 'slate-prop-types'
 import Types from 'prop-types'
 import warning from 'slate-dev-warning'
-import { Schema } from 'slate'
+import { Change, Schema } from 'slate'
 import memoizeOne from 'memoize-one'
 
 import EVENT_HANDLERS from '../constants/event-handlers'
@@ -217,7 +217,7 @@ class Editor extends React.Component {
       return
     }
 
-    const change = this.value.change()
+    const change = new Change({ editor: this, value: this.value })
 
     try {
       this.tmp.isChanging = true
@@ -436,7 +436,8 @@ class Editor extends React.Component {
 
   resolveValue = memoizeOne((plugins, value) => {
     debug('resolveValue', { plugins, value })
-    let change = value.change()
+
+    let change = new Change({ editor: this, value })
     change = this.resolveChange(plugins, change, change.operations.size)
 
     // Store the change and it's operations count so that it can be flushed once

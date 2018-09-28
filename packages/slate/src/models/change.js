@@ -30,7 +30,8 @@ class Change {
    */
 
   constructor(attrs) {
-    const { value } = attrs
+    const { editor, value } = attrs
+    this.editor = editor
     this.value = value
     this.operations = new List()
 
@@ -211,8 +212,9 @@ class Change {
    */
 
   normalizePath(path) {
-    const { value } = this
-    let { document, schema } = value
+    const { editor, value } = this
+    const { schema } = editor
+    let { document } = value
     let node = document.assertNode(path)
 
     let iterations = 0

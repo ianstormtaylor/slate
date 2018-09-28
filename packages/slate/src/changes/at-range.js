@@ -68,13 +68,14 @@ Changes.deleteAtRange = (change, range) => {
   // when you undo a delete, the expanded selection will be retained.
   change.snapshotSelection()
 
-  const { value } = change
+  const { editor, value } = change
+  const { schema } = editor
   const { start, end } = range
   let startKey = start.key
   let startOffset = start.offset
   let endKey = end.key
   let endOffset = end.offset
-  let { document, schema } = value
+  let { document } = value
   let isStartVoid = document.hasVoidParent(startKey, schema)
   let isEndVoid = document.hasVoidParent(endKey, schema)
   let startBlock = document.getClosestBlock(startKey, schema)
@@ -315,8 +316,9 @@ Changes.deleteWordBackwardAtRange = (change, range) => {
 
 Changes.deleteBackwardAtRange = (change, range, n = 1) => {
   if (n === 0) return
-  const { value } = change
-  const { document, schema } = value
+  const { editor, value } = change
+  const { schema } = editor
+  const { document } = value
   const { start, focus } = range
 
   // If the range is expanded, perform a regular delete instead.
@@ -469,8 +471,9 @@ Changes.deleteWordForwardAtRange = (change, range) => {
 
 Changes.deleteForwardAtRange = (change, range, n = 1) => {
   if (n === 0) return
-  const { value } = change
-  const { document, schema } = value
+  const { editor, value } = change
+  const { schema } = editor
+  const { document } = value
   const { start, focus } = range
 
   // If the range is expanded, perform a regular delete instead.
@@ -581,8 +584,9 @@ Changes.insertBlockAtRange = (change, range, block) => {
     range = range.moveToStart()
   }
 
-  const { value } = change
-  const { document, schema } = value
+  const { editor, value } = change
+  const { schema } = editor
+  const { document } = value
   const { start } = range
   let startKey = start.key
   let startOffset = start.offset
@@ -767,8 +771,9 @@ Changes.insertInlineAtRange = (change, range, inline) => {
       range = range.moveToStart()
     }
 
-    const { value } = change
-    const { document, schema } = value
+    const { editor, value } = change
+    const { schema } = editor
+    const { document } = value
     const { start } = range
     const parent = document.getParent(start.key)
     const startText = document.assertDescendant(start.key)
@@ -791,8 +796,9 @@ Changes.insertInlineAtRange = (change, range, inline) => {
  */
 
 Changes.insertTextAtRange = (change, range, text, marks) => {
-  const { value } = change
-  const { document, schema } = value
+  const { editor, value } = change
+  const { schema } = editor
+  const { document } = value
   const { start } = range
   let key = start.key
   let offset = start.offset
@@ -857,8 +863,9 @@ Changes.removeMarkAtRange = (change, range, mark) => {
  */
 
 Changes.setBlocksAtRange = (change, range, properties) => {
-  const { value } = change
-  const { document, schema } = value
+  const { editor, value } = change
+  const { schema } = editor
+  const { document } = value
   const blocks = document.getBlocksAtRange(range)
 
   const { start, end, isCollapsed } = range
@@ -1204,8 +1211,9 @@ Changes.wrapBlockAtRange = (change, range, block) => {
  */
 
 Changes.wrapInlineAtRange = (change, range, inline) => {
-  const { value } = change
-  let { document, schema } = value
+  const { editor, value } = change
+  const { schema } = editor
+  let { document } = value
   const { start, end } = range
 
   if (range.isCollapsed) {

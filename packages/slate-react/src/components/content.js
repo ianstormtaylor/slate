@@ -322,7 +322,7 @@ class Content extends React.Component {
       const { selection } = value
       const window = getWindow(event.target)
       const native = window.getSelection()
-      const range = findRange(native, value)
+      const range = findRange(native, editor)
 
       if (range && range.equals(selection.toRange())) {
         this.updateSelection()

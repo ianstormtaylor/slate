@@ -126,8 +126,7 @@ class Leaf extends React.Component {
 
   renderText() {
     const { block, node, editor, parent, text, index, leaves } = this.props
-    const { value } = editor
-    const { schema } = value
+    const { schema } = editor
 
     // COMPAT: Render text inside void nodes with a zero-width space.
     // So the node can contain selection but the text is not visible.

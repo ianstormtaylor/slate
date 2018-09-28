@@ -64,8 +64,9 @@ function AfterPlugin() {
     event.preventDefault()
 
     const { value } = change
-    const { document, selection, schema } = value
-    const range = findRange(targetRange, value)
+    const { schema } = editor
+    const { document, selection } = value
+    const range = findRange(targetRange, editor)
 
     switch (event.inputType) {
       case 'deleteByDrag':
@@ -170,7 +171,8 @@ function AfterPlugin() {
     }
 
     const { value } = change
-    const { document, schema } = value
+    const { schema } = editor
+    const { document } = value
     const node = findNode(event.target, value)
 
     if (!node) {
@@ -203,7 +205,7 @@ function AfterPlugin() {
   function onCopy(event, change, editor) {
     debug('onCopy', { event })
 
-    cloneFragment(event, change.value)
+    cloneFragment(event, editor)
   }
 
   /**
@@ -219,11 +221,12 @@ function AfterPlugin() {
 
     // Once the fake cut content has successfully been added to the clipboard,
     // delete the content in the current selection.
-    cloneFragment(event, change.value, change.value.fragment, () => {
+    cloneFragment(event, editor, () => {
       // If user cuts a void block node or a void inline node,
       // manually removes it since selection is collapsed in this case.
       const { value } = change
-      const { endBlock, endInline, selection, schema } = value
+      const { schema } = editor
+      const { endBlock, endInline, selection } = value
       const { isCollapsed } = selection
       const isVoidBlock = endBlock && schema.isVoid(endBlock) && isCollapsed
       const isVoidInline = endInline && schema.isVoid(endInline) && isCollapsed
@@ -278,7 +281,8 @@ function AfterPlugin() {
     isDraggingInternally = true
 
     const { value } = change
-    const { document, schema } = value
+    const { schema } = editor
+    const { document } = value
     const node = findNode(event.target, value)
     const ancestors = document.getAncestors(node.key)
     const isVoid =
@@ -309,9 +313,10 @@ function AfterPlugin() {
     debug('onDrop', { event })
 
     const { value } = change
-    const { document, selection, schema } = value
+    const { schema } = editor
+    const { document, selection } = value
     const window = getWindow(event.target)
-    let target = getEventRange(event, value)
+    let target = getEventRange(event, editor)
     if (!target) return
 
     const transfer = getEventTransfer(event)
@@ -462,7 +467,8 @@ function AfterPlugin() {
     debug('onKeyDown', { event })
 
     const { value } = change
-    const { document, selection, schema } = value
+    const { schema } = editor
+    const { document, selection } = value
     const hasVoidParent = document.hasVoidParent(selection.start.path, schema)
 
     // COMPAT: In iOS, some of these hotkeys are handled in the
@@ -598,7 +604,8 @@ function AfterPlugin() {
     if (type == 'text' || type == 'html') {
       if (!text) return
       const { value } = change
-      const { document, selection, startBlock, schema } = value
+      const { schema } = editor
+      const { document, selection, startBlock } = value
       if (schema.isVoid(startBlock)) return
 
       const defaultBlock = startBlock
@@ -622,7 +629,8 @@ function AfterPlugin() {
 
     const window = getWindow(event.target)
     const { value } = change
-    const { document, schema } = value
+    const { schema } = editor
+    const { document } = value
     const native = window.getSelection()
 
     // If there are no ranges, the editor was blurred natively.
@@ -632,7 +640,7 @@ function AfterPlugin() {
     }
 
     // Otherwise, determine the Slate selection from the native one.
-    let range = findRange(native, value)
+    let range = findRange(native, editor)
     if (!range) return
 
     const { anchor, focus } = range

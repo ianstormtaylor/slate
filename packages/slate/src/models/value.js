@@ -2,12 +2,10 @@ import isPlainObject from 'is-plain-object'
 import { Record, Set, List } from 'immutable'
 
 import PathUtils from '../utils/path-utils'
-import Change from './change'
 import Data from './data'
 import Decoration from './decoration'
 import Document from './document'
 import History from './history'
-import Schema from './schema'
 
 /**
  * Default properties.
@@ -20,7 +18,6 @@ const DEFAULTS = {
   decorations: undefined,
   document: undefined,
   history: undefined,
-  schema: undefined,
   selection: undefined,
 }
 
@@ -65,7 +62,6 @@ class Value extends Record(DEFAULTS) {
       return {
         data: a.data,
         decorations: a.decorations,
-        schema: a.schema,
       }
     }
 
@@ -74,7 +70,6 @@ class Value extends Record(DEFAULTS) {
       if ('data' in a) p.data = Data.create(a.data)
       if ('decorations' in a)
         p.decorations = Decoration.createList(a.decorations)
-      if ('schema' in a) p.schema = Schema.create(a.schema)
       return p
     }
 
@@ -99,12 +94,10 @@ class Value extends Record(DEFAULTS) {
       decorations = [],
       document = {},
       selection = {},
-      schema = {},
       history = {},
     } = object
 
     data = Data.fromJSON(data)
-    schema = Schema.fromJSON(schema)
     history = History.fromJSON(history)
     document = Document.fromJSON(document)
     selection = document.createSelection(selection)
@@ -121,15 +114,14 @@ class Value extends Record(DEFAULTS) {
       decorations,
       document,
       selection,
-      schema,
       history,
     })
 
-    if (options.normalize !== false) {
-      const change = value.change()
-      change.withoutSaving(() => change.normalize())
-      value = change.value
-    }
+    // if (options.normalize !== false) {
+    //   const change = value.change()
+    //   change.withoutSaving(() => change.normalize())
+    //   value = change.value
+    // }
 
     return value
   }
@@ -442,17 +434,6 @@ class Value extends Record(DEFAULTS) {
   }
 
   /**
-   * Create a new `Change` with the current value as a starting point.
-   *
-   * @param {Object} attrs
-   * @return {Change}
-   */
-
-  change(attrs = {}) {
-    return new Change({ ...attrs, value: this })
-  }
-
-  /**
    * Add mark to text at `offset` and `length` in node by `path`.
    *
    * @param {List|String} path
@@ -503,7 +484,8 @@ class Value extends Record(DEFAULTS) {
 
   insertText(path, offset, text, marks) {
     let value = this
-    let { document, schema } = value
+    // let { document, schema } = value
+    let { document } = value
     document = document.insertText(path, offset, text, marks)
     value = value.set('document', document)
 
@@ -511,14 +493,14 @@ class Value extends Record(DEFAULTS) {
     const node = document.assertNode(path)
 
     value = value.mapRanges(range => {
-      const { anchor, focus, isBackward } = range
-      const isAtomic =
-        Decoration.isDecoration(range) && schema.isAtomic(range.mark)
+      const { anchor, focus, isBackward, isCollapsed } = range
+      // const isAtomic =
+      // Decoration.isDecoration(range) && schema.isAtomic(range.mark)
 
       if (
         anchor.key === node.key &&
         (anchor.offset > offset ||
-          (anchor.offset === offset && (!isAtomic || !isBackward)))
+          (anchor.offset === offset && (isCollapsed || !isBackward)))
       ) {
         range = range.moveAnchorForward(text.length)
       }
@@ -526,7 +508,7 @@ class Value extends Record(DEFAULTS) {
       if (
         focus.key === node.key &&
         (focus.offset > offset ||
-          (focus.offset == offset && (!isAtomic || isBackward)))
+          (focus.offset === offset && (isCollapsed || isBackward)))
       ) {
         range = range.moveFocusForward(text.length)
       }
@@ -754,7 +736,7 @@ class Value extends Record(DEFAULTS) {
   setProperties(properties) {
     let value = this
     const { document } = value
-    const { data, decorations, history, schema } = properties
+    const { data, decorations, history } = properties
     const props = {}
 
     if (data) {
@@ -763,10 +745,6 @@ class Value extends Record(DEFAULTS) {
 
     if (history) {
       props.history = history
-    }
-
-    if (schema) {
-      props.schema = schema
     }
 
     if (decorations) {
@@ -873,13 +851,13 @@ class Value extends Record(DEFAULTS) {
 
   clearAtomicRanges(key, from, to = null) {
     let value = this
-    const { schema } = value
+    // const { schema } = value
 
     value = this.mapRanges(range => {
       if (!Decoration.isDecoration(range)) return range
       const { start, end, mark } = range
-      const isAtomic = schema.isAtomic(mark)
-      if (!isAtomic) return range
+      // const isAtomic = schema.isAtomic(mark)
+      // if (!isAtomic) return range
       if (start.key !== key) return range
 
       if (start.offset < from && (end.key !== key || end.offset > from)) {
@@ -929,10 +907,6 @@ class Value extends Record(DEFAULTS) {
 
     if (options.preserveSelection) {
       object.selection = this.selection.toJSON(options)
-    }
-
-    if (options.preserveSchema) {
-      object.schema = this.schema.toJSON(options)
     }
 
     return object

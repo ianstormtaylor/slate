@@ -7,11 +7,11 @@ import findRange from './find-range'
  * Get the target range from a DOM `event`.
  *
  * @param {Event} event
- * @param {Value} value
+ * @param {Editor} editor
  * @return {Range}
  */
 
-function getEventRange(event, value) {
+function getEventRange(event, editor) {
   if (event.nativeEvent) {
     event = event.nativeEvent
   }
@@ -19,7 +19,8 @@ function getEventRange(event, value) {
   const { x, y, target } = event
   if (x == null || y == null) return null
 
-  const { document, schema } = value
+  const { schema, value } = editor
+  const { document } = value
   const node = findNode(target, value)
   if (!node) return null
 
@@ -75,7 +76,7 @@ function getEventRange(event, value) {
   }
 
   // Resolve a Slate range from the DOM range.
-  const range = findRange(native, value)
+  const range = findRange(native, editor)
   if (!range) return null
 
   return range

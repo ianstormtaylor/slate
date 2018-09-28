@@ -66,7 +66,7 @@ function BeforePlugin() {
     if (editor.props.readOnly) return true
 
     const { value } = change
-    const { schema } = value
+    const { schema } = editor
     const { relatedTarget, target } = event
     const window = getWindow(target)
 
@@ -109,16 +109,16 @@ function BeforePlugin() {
    */
 
   function onChange(change, editor) {
-    const { value } = change
+    // const { value } = change
 
-    // If the value's schema isn't the editor's schema, update it. This can
-    // happen on the initialization of the editor, or if the schema changes.
-    // This change isn't save into history since only schema is updated.
-    if (value.schema != editor.schema) {
-      change.withoutSaving(() => {
-        change.setValue({ schema: editor.schema }).normalize()
-      })
-    }
+    // // If the value's schema isn't the editor's schema, update it. This can
+    // // happen on the initialization of the editor, or if the schema changes.
+    // // This change isn't save into history since only schema is updated.
+    // if (value.schema != editor.schema) {
+    //   change.withoutSaving(() => {
+    //     change.setValue({ schema: editor.schema }).normalize()
+    //   })
+    // }
 
     debug('onChange')
   }
@@ -273,8 +273,7 @@ function BeforePlugin() {
     // call `preventDefault` to signal that drops are allowed.
     // When the target is editable, dropping is already allowed by
     // default, and calling `preventDefault` hides the cursor.
-    const { value } = editor
-    const { schema } = value
+    const { schema } = editor
     const node = findNode(event.target, editor.value)
     if (schema.isVoid(node)) event.preventDefault()
 

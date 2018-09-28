@@ -8,11 +8,11 @@ import findDOMPoint from './find-dom-point'
  * Find a Slate range from a DOM `native` selection.
  *
  * @param {Selection} native
- * @param {Value} value
+ * @param {Editor} editor
  * @return {Range}
  */
 
-function findRange(native, value) {
+function findRange(native, editor) {
   const el = native.anchorNode || native.startContainer
   if (!el) return null
 
@@ -39,6 +39,7 @@ function findRange(native, value) {
     focusOffset,
     isCollapsed,
   } = native
+  const { value } = editor
   const anchor = findPoint(anchorNode, anchorOffset, value)
   const focus = isCollapsed ? anchor : findPoint(focusNode, focusOffset, value)
   if (!anchor || !focus) return null
