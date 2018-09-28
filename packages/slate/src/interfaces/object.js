@@ -3,7 +3,6 @@ import Change from '../controllers/change'
 import Decoration from '../models/decoration'
 import Document from '../models/document'
 import Editor from '../controllers/editor'
-import History from '../models/history'
 import Inline from '../models/inline'
 import Leaf from '../models/leaf'
 import Mark from '../models/mark'
@@ -55,7 +54,6 @@ mixin(create('change'), [Change])
 mixin(create('decoration'), [Decoration])
 mixin(create('document'), [Document])
 mixin(create('editor'), [Editor])
-mixin(create('history'), [History])
 mixin(create('inline'), [Inline])
 mixin(create('leaf'), [Leaf])
 mixin(create('mark'), [Mark])

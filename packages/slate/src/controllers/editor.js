@@ -188,9 +188,11 @@ class Editor {
       return this
     }
 
-    const rawPlugins = plugins
-    plugins = [CorePlugin(), ...plugins]
+    // PERF: Save a reference to the "raw" plugins that were set, so that we can
+    // compare it by reference for a future set to avoid repeating work.
+    this.tmp.rawPlugins = plugins
 
+    plugins = [...plugins, CorePlugin()]
     const reversed = plugins.slice().reverse()
     const schema = Schema.create({ plugins })
     class Change extends AbstractChange {}
@@ -207,10 +209,6 @@ class Editor {
         }
       })
     }
-
-    // PERF: Save a reference to the "raw" plugins that were set, so that we can
-    // compare it by reference for a future set to avoid repeating work.
-    this.tmp.rawPlugins = rawPlugins
 
     this.plugins = plugins
     this.schema = schema

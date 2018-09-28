@@ -2,7 +2,6 @@ import mixin from '../utils/mixin'
 import Block from '../models/block'
 import Decoration from '../models/decoration'
 import Document from '../models/document'
-import History from '../models/history'
 import Inline from '../models/inline'
 import Leaf from '../models/leaf'
 import Mark from '../models/mark'
@@ -48,7 +47,6 @@ mixin(ModelInterface, [
   Block,
   Decoration,
   Document,
-  History,
   Inline,
   Leaf,
   Mark,

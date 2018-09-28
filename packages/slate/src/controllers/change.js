@@ -53,9 +53,8 @@ class Change {
 
   applyOperation(operation, options = {}) {
     const { operations } = this
-    let { value } = this
-    let { history } = value
-    const oldValue = value
+    let value = this.value
+    const previousValue = value
 
     // Add in the current `value` in case the operation was serialized.
     if (isPlainObject(operation)) {
@@ -64,28 +63,16 @@ class Change {
 
     operation = Operation.create(operation)
 
-    // Default options to the change-level flags, this allows for setting
-    // specific options for all of the operations of a given change.
-    let { merge, save } = this.tmp
-
-    // If `merge` is non-commital, and this is not the first operation in a new change
-    // then we should merge.
-    if (merge == null && operations.size !== 0) {
-      merge = true
-    }
+    // Save the operation into the history.
+    this.save(operation)
+    value = this.value
 
     // Apply the operation to the value.
-    debug('apply', { operation, save, merge })
+    debug('apply', { operation })
     value = operation.apply(value)
 
-    // If needed, save the operation to the history.
-    if (history && save) {
-      history = history.save(operation, { merge })
-      value = value.set('history', history)
-    }
-
     // Get the keys of the affected nodes, and mark them as dirty.
-    const keys = getDirtyKeys(operation, value, oldValue)
+    const keys = getDirtyKeys(operation, value, previousValue)
     this.tmp.dirty = this.tmp.dirty.concat(keys)
 
     // Update the mutable change object.
@@ -288,46 +275,6 @@ class Change {
 
     return this
   }
-
-  /**
-   * Apply a series of changes inside a synchronous `fn`, without merging any of
-   * the new operations into previous save point in the history.
-   *
-   * @param {Function} fn
-   * @return {Change}
-   */
-
-  withoutMerging(fn) {
-    const value = this.tmp.merge
-    this.tmp.merge = false
-    fn(this)
-    this.tmp.merge = value
-    return this
-  }
-
-  /**
-   * Apply a series of changes inside a synchronous `fn`, without saving any of
-   * their operations into the history.
-   *
-   * @param {Function} fn
-   * @return {Change}
-   */
-
-  withoutSaving(fn) {
-    const value = this.tmp.save
-    this.tmp.save = false
-    fn(this)
-    this.tmp.save = value
-    return this
-  }
-
-  /**
-   * Set an operation flag by `key` to `value`.
-   *
-   * @param {String} key
-   * @param {Any} value
-   * @return {Change}
-   */
 
   /**
    * Deprecated.

@@ -10,7 +10,6 @@ import Data from './models/data'
 import Decoration from './models/decoration'
 import Document from './models/document'
 import Editor from './controllers/editor'
-import History from './models/history'
 import Inline from './models/inline'
 import KeyUtils from './utils/key-utils'
 import Leaf from './models/leaf'
@@ -41,7 +40,6 @@ export {
   Decoration,
   Document,
   Editor,
-  History,
   Inline,
   KeyUtils,
   Leaf,
@@ -68,7 +66,6 @@ export default {
   Decoration,
   Document,
   Editor,
-  History,
   Inline,
   KeyUtils,
   Leaf,

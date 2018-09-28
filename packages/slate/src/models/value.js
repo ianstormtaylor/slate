@@ -5,7 +5,6 @@ import PathUtils from '../utils/path-utils'
 import Data from './data'
 import Decoration from './decoration'
 import Document from './document'
-import History from './history'
 
 /**
  * Default properties.
@@ -17,7 +16,6 @@ const DEFAULTS = {
   data: undefined,
   decorations: undefined,
   document: undefined,
-  history: undefined,
   selection: undefined,
 }
 
@@ -89,16 +87,8 @@ class Value extends Record(DEFAULTS) {
    */
 
   static fromJSON(object, options = {}) {
-    let {
-      data = {},
-      decorations = [],
-      document = {},
-      selection = {},
-      history = {},
-    } = object
-
+    let { data = {}, decorations = [], document = {}, selection = {} } = object
     data = Data.fromJSON(data)
-    history = History.fromJSON(history)
     document = Document.fromJSON(document)
     selection = document.createSelection(selection)
     decorations = List(decorations.map(d => Decoration.fromJSON(d)))
@@ -109,19 +99,12 @@ class Value extends Record(DEFAULTS) {
       selection = document.createSelection(selection)
     }
 
-    let value = new Value({
+    const value = new Value({
       data,
       decorations,
       document,
       selection,
-      history,
     })
-
-    // if (options.normalize !== false) {
-    //   const change = value.change()
-    //   change.withoutSaving(() => change.normalize())
-    //   value = change.value
-    // }
 
     return value
   }
@@ -736,15 +719,11 @@ class Value extends Record(DEFAULTS) {
   setProperties(properties) {
     let value = this
     const { document } = value
-    const { data, decorations, history } = properties
+    const { data, decorations } = properties
     const props = {}
 
     if (data) {
       props.data = data
-    }
-
-    if (history) {
-      props.history = history
     }
 
     if (decorations) {
@@ -899,10 +878,6 @@ class Value extends Record(DEFAULTS) {
       object.decorations = this.decorations
         .toArray()
         .map(d => d.toJSON(options))
-    }
-
-    if (options.preserveHistory) {
-      object.history = this.history.toJSON(options)
     }
 
     if (options.preserveSelection) {
