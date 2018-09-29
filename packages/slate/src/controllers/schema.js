@@ -1,8 +1,5 @@
 import Debug from 'debug'
-import isPlainObject from 'is-plain-object'
-import { Record } from 'immutable'
 
-import Text from '../models/text'
 import SlateError from '../utils/slate-error'
 
 /**
@@ -14,175 +11,21 @@ import SlateError from '../utils/slate-error'
 const debug = Debug('slate:schema')
 
 /**
- * Define the core schema rules, order-sensitive.
- *
- * @type {Array}
- */
-
-const CORE_RULES = [
-  // Only allow block nodes in documents.
-  {
-    match: { object: 'document' },
-    nodes: [
-      {
-        match: { object: 'block' },
-      },
-    ],
-  },
-
-  // Only allow block nodes or inline and text nodes in blocks.
-  {
-    match: {
-      object: 'block',
-      first: { object: 'block' },
-    },
-    nodes: [
-      {
-        match: { object: 'block' },
-      },
-    ],
-  },
-  {
-    match: {
-      object: 'block',
-      first: [{ object: 'inline' }, { object: 'text' }],
-    },
-    nodes: [
-      {
-        match: [{ object: 'inline' }, { object: 'text' }],
-      },
-    ],
-  },
-
-  // Only allow inline and text nodes in inlines.
-  {
-    match: { object: 'inline' },
-    nodes: [{ match: [{ object: 'inline' }, { object: 'text' }] }],
-  },
-
-  // Ensure that block and inline nodes have at least one text child.
-  {
-    match: [{ object: 'block' }, { object: 'inline' }],
-    nodes: [{ min: 1 }],
-    normalize: (change, error) => {
-      const { code, node } = error
-      if (code !== 'child_required') return
-      change.insertNodeByKey(node.key, 0, Text.create(), { normalize: false })
-    },
-  },
-
-  // Ensure that inline nodes are surrounded by text nodes.
-  {
-    match: { object: 'block' },
-    first: [{ object: 'block' }, { object: 'text' }],
-    last: [{ object: 'block' }, { object: 'text' }],
-    normalize: (change, error) => {
-      const { code, node } = error
-      const text = Text.create()
-      let i
-
-      if (code === 'first_child_object_invalid') {
-        i = 0
-      } else if (code === 'last_child_object_invalid') {
-        i = node.nodes.size
-      } else {
-        return
-      }
-
-      change.insertNodeByKey(node.key, i, text, { normalize: false })
-    },
-  },
-  {
-    match: { object: 'inline' },
-    first: [{ object: 'block' }, { object: 'text' }],
-    last: [{ object: 'block' }, { object: 'text' }],
-    previous: [{ object: 'block' }, { object: 'text' }],
-    next: [{ object: 'block' }, { object: 'text' }],
-    normalize: (change, error) => {
-      const { code, node, index } = error
-      const text = Text.create()
-      let i
-
-      if (code === 'first_child_object_invalid') {
-        i = 0
-      } else if (code === 'last_child_object_invalid') {
-        i = node.nodes.size
-      } else if (code === 'previous_sibling_object_invalid') {
-        i = index
-      } else if (code === 'next_sibling_object_invalid') {
-        i = index + 1
-      } else {
-        return
-      }
-
-      change.insertNodeByKey(node.key, i, text, { normalize: false })
-    },
-  },
-
-  // Merge adjacent text nodes.
-  {
-    match: { object: 'text' },
-    next: [{ object: 'block' }, { object: 'inline' }],
-    normalize: (change, error) => {
-      const { code, next } = error
-      if (code !== 'next_sibling_object_invalid') return
-      change.mergeNodeByKey(next.key, { normalize: false })
-    },
-  },
-]
-
-/**
- * Default properties.
- *
- * @type {Object}
- */
-
-const DEFAULTS = {
-  rules: undefined,
-}
-
-/**
  * Schema.
  *
  * @type {Schema}
  */
 
-class Schema extends Record(DEFAULTS) {
+class Schema {
   /**
-   * Create a new `Schema` with `attrs`.
+   * Constructor.
    *
-   * @param {Object|Schema} attrs
-   * @return {Schema}
+   * @param {Object} attrs
    */
 
-  static create(attrs = {}) {
-    if (Schema.isSchema(attrs)) {
-      return attrs
-    }
-
-    if (isPlainObject(attrs)) {
-      return Schema.fromJSON(attrs)
-    }
-
-    throw new Error(
-      `\`Schema.create\` only accepts objects or schemas, but you passed it: ${attrs}`
-    )
-  }
-
-  /**
-   * Create a `Schema` from a JSON `object`.
-   *
-   * @param {Object} object
-   * @return {Schema}
-   */
-
-  static fromJSON(object) {
-    if (Schema.isSchema(object)) {
-      return object
-    }
-
-    const plugins = object.plugins ? object.plugins : [{ schema: object }]
-    let rules = [...CORE_RULES]
+  constructor(attrs = {}) {
+    const { plugins } = attrs
+    let rules = []
 
     for (const plugin of plugins) {
       const { schema = {} } = plugin
@@ -221,8 +64,7 @@ class Schema extends Record(DEFAULTS) {
       }
     }
 
-    const ret = new Schema({ rules })
-    return ret
+    this.rules = rules
   }
 
   /**

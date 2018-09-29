@@ -1,7 +1,8 @@
 import Debug from 'debug'
 
 import AbstractChange from './change'
-import CorePlugin from '../plugins/core'
+import CommandsPlugin from '../plugins/commands'
+import SchemaPlugin from '../plugins/schema'
 import Schema from './schema'
 
 /**
@@ -193,9 +194,9 @@ class Editor {
     // compare it by reference for a future set to avoid repeating work.
     this.tmp.rawPlugins = plugins
 
-    plugins = [...plugins, CorePlugin()]
+    plugins = [SchemaPlugin(), ...plugins, CommandsPlugin()]
     const reversed = plugins.slice().reverse()
-    const schema = Schema.create({ plugins })
+    const schema = new Schema({ plugins })
     class Change extends AbstractChange {}
 
     for (const plugin of reversed) {

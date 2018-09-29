@@ -6,35 +6,21 @@ import OnSelection from '../commands/on-selection'
 import OnValue from '../commands/on-value'
 
 /**
- * The core plugin.
+ * A plugin that defines the core Slate commands.
  *
  * @return {Object}
  */
 
-function CorePlugin() {
-  /**
-   * Build up a dictionary of the core Slate commands.
-   *
-   * @type {Object}
-   */
-
-  const commands = {
-    ...AtCurrentRange,
-    ...AtRange,
-    ...ByPath,
-    ...OnHistory,
-    ...OnSelection,
-    ...OnValue,
-  }
-
-  /**
-   * Return the plugin.
-   *
-   * @type {Object}
-   */
-
+function CommandsPlugin() {
   return {
-    commands,
+    commands: {
+      ...AtCurrentRange,
+      ...AtRange,
+      ...ByPath,
+      ...OnHistory,
+      ...OnSelection,
+      ...OnValue,
+    },
   }
 }
 
@@ -44,4 +30,4 @@ function CorePlugin() {
  * @type {Object}
  */
 
-export default CorePlugin
+export default CommandsPlugin
