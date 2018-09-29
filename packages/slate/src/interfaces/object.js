@@ -50,8 +50,6 @@ function create(type) {
  * Mix in the object interfaces.
  */
 
-debugger
-
 mixin(create('block'), [Block])
 mixin(create('change'), [Change])
 mixin(create('decoration'), [Decoration])
