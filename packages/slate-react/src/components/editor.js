@@ -38,6 +38,7 @@ class Editor extends React.Component {
     autoFocus: Types.bool,
     className: Types.string,
     onChange: Types.func,
+    options: Types.object,
     placeholder: Types.any,
     plugins: Types.array,
     readOnly: Types.bool,
@@ -63,6 +64,7 @@ class Editor extends React.Component {
     autoFocus: false,
     autoCorrect: true,
     onChange: noop,
+    options: {},
     plugins: [],
     readOnly: false,
     schema: {},
@@ -77,6 +79,7 @@ class Editor extends React.Component {
 
   constructor(props) {
     super(props)
+    const { plugins, schema, value, options } = props
     this.state = {}
     this.resolvePlugins = memoizeOne(this.resolvePlugins)
 
@@ -87,17 +90,20 @@ class Editor extends React.Component {
       updates: 0,
     }
 
-    this.controller = new Controller({
-      plugins: this.resolvePlugins(props.plugins, props.schema),
-      value: props.value,
-      onChange: change => {
-        if (this.tmp.mounted) {
-          this.props.onChange(change)
-        } else {
-          this.tmp.change = change
-        }
+    this.controller = new Controller(
+      {
+        value,
+        plugins: this.resolvePlugins(plugins, schema),
+        onChange: change => {
+          if (this.tmp.mounted) {
+            this.props.onChange(change)
+          } else {
+            this.tmp.change = change
+          }
+        },
       },
-    })
+      options
+    )
   }
 
   /**
@@ -150,12 +156,16 @@ class Editor extends React.Component {
     debug('render', this)
     const { controller, tmp } = this
     const props = { ...this.props }
+    const { plugins, schema, value, readOnly, options } = props
 
-    controller.setProperties({
-      plugins: this.resolvePlugins(props.plugins, props.schema),
-      value: tmp.change ? tmp.change.value : props.value,
-      readOnly: props.readOnly,
-    })
+    controller.setProperties(
+      {
+        plugins: this.resolvePlugins(plugins, schema),
+        value: tmp.change ? tmp.change.value : value,
+        readOnly,
+      },
+      options
+    )
 
     const tree = controller.runRender('renderEditor', props, this)
     return tree

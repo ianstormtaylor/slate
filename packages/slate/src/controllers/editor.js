@@ -23,9 +23,10 @@ class Editor {
    * Create a new `Editor` with `attrs`.
    *
    * @param {Object} attrs
+   * @param {Object} options
    */
 
-  constructor(attrs = {}) {
+  constructor(attrs = {}, options = {}) {
     const { onChange, plugins = [], readOnly = false, value } = attrs
 
     this.tmp = {
@@ -35,7 +36,7 @@ class Editor {
       rawPlugins: null,
     }
 
-    this.setProperties({ onChange, plugins, readOnly, value })
+    this.setProperties({ onChange, plugins, readOnly, value }, options)
   }
 
   /**
@@ -220,15 +221,16 @@ class Editor {
    * Set `properties` on the editor.
    *
    * @param {Object} properties
+   * @param {Object} options
    * @return {Editor}
    */
 
-  setProperties(properties = {}) {
+  setProperties(properties = {}, options) {
     const { onChange, plugins, readOnly, value } = properties
     if (onChange !== undefined) this.setOnChange(onChange)
     if (plugins !== undefined) this.setPlugins(plugins)
     if (readOnly !== undefined) this.setReadOnly(readOnly)
-    if (value !== undefined) this.setValue(value)
+    if (value !== undefined) this.setValue(value, options)
     return this
   }
 
@@ -248,15 +250,19 @@ class Editor {
    * Set the editor's `value`.
    *
    * @param {Value} value
+   * @param {Options} options
    * @return {Editor}
    */
 
-  setValue(value) {
+  setValue(value, options = {}) {
+    const { normalize = true } = options
+
     // PERF: If the plugins and value haven't changed from the last seen one, we
     // don't have to normalize it because we know it was already normalized.
     if (
-      this.plugins === this.tmp.lastPlugins &&
-      this.value === this.tmp.lastValue
+      normalize === false ||
+      (this.plugins === this.tmp.lastPlugins &&
+        this.value === this.tmp.lastValue)
     ) {
       this.value = value
       return this
