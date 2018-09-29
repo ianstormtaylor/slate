@@ -11,7 +11,7 @@ import Schema from './schema'
  * @type {Function}
  */
 
-const debug = Debug('slate:command')
+const debug = Debug('slate:editor')
 
 /**
  * Editor.
@@ -31,6 +31,7 @@ class Editor {
     const { onChange, plugins = [], readOnly = false, value } = attrs
 
     this.tmp = {
+      change: null,
       isChanging: false,
       lastPlugins: null,
       lastValue: null,
@@ -48,10 +49,13 @@ class Editor {
 
   change = (...args) => {
     const { Change } = this
-    const change = new Change({ value: this.value, editor: this })
     const { isChanging } = this.tmp
+    const change = isChanging
+      ? this.tmp.change
+      : new Change({ value: this.value, editor: this })
 
     try {
+      this.tmp.change = change
       this.tmp.isChanging = true
       change.call(...args)
     } catch (error) {
@@ -60,10 +64,12 @@ class Editor {
       this.tmp.isChanging = isChanging
     }
 
-    // If this is the top-most change, run the `onChange` handler.
-    if (isChanging === false) {
-      this.run('onChange', change)
+    // If this isn't the top-most change function, exit to let it finish.
+    if (isChanging === true) {
+      return
     }
+
+    this.run('onChange', change)
 
     // If the change doesn't define any operations to apply, abort.
     if (change.operations.size === 0) {
@@ -81,6 +87,22 @@ class Editor {
   }
 
   /**
+   * Trigger a `command` with `...args`.
+   *
+   * @param {String} command
+   * @param {Any} ...args
+   */
+
+  command = (command, ...args) => {
+    debug('command', { arguments: args })
+
+    this.change(change => {
+      const fn = this.commands[command]
+      change.call(fn, ...args)
+    })
+  }
+
+  /**
    * Process an `event` by running it through the stack.
    *
    * @param {String} handler
@@ -88,6 +110,8 @@ class Editor {
    */
 
   event = (handler, event) => {
+    debug('event', { handler, event })
+
     this.change(change => {
       this.run(handler, event, change)
     })
@@ -197,16 +221,20 @@ class Editor {
     plugins = [SchemaPlugin(), ...plugins, CommandsPlugin()]
     const reversed = plugins.slice().reverse()
     const schema = new Schema({ plugins })
+    const editor = this
+    const cmds = {}
+
     class Change extends AbstractChange {}
 
     for (const plugin of reversed) {
       const { commands = {} } = plugin
 
       Object.keys(commands).forEach(key => {
+        const fn = commands[key]
+        cmds[key] = fn
+
         Change.prototype[key] = function(...args) {
-          debug(key, { args })
-          const fn = commands[key]
-          this.call(fn, ...args)
+          editor.command(key, ...args)
           return this
         }
       })
@@ -214,6 +242,7 @@ class Editor {
 
     this.plugins = plugins
     this.schema = schema
+    this.commands = cmds
     this.Change = Change
     return this
   }
