@@ -1,8 +1,8 @@
 import Debug from 'debug'
 
 import AbstractChange from './change'
+import CorePlugin from '../plugins/core'
 import CommandsPlugin from '../plugins/commands'
-import SchemaPlugin from '../plugins/schema'
 import Schema from './schema'
 
 /**
@@ -124,8 +124,8 @@ class Editor {
     debug('command', { arguments: args })
 
     this.change(change => {
-      const fn = this.commands[command]
-      change.call(fn, ...args)
+      const obj = { type: command, args }
+      this.run('onCommand', obj, change)
     })
   }
 
@@ -173,31 +173,33 @@ class Editor {
     // compare it by reference for a future set to avoid repeating work.
     this.tmp.rawPlugins = plugins
 
-    plugins = [SchemaPlugin(), ...plugins, CommandsPlugin()]
-    const reversed = plugins.slice().reverse()
-    const schema = new Schema({ plugins })
-    const editor = this
-    const cmds = {}
+    const corePlugin = CorePlugin()
+    plugins = [corePlugin, ...plugins]
 
     class Change extends AbstractChange {}
+    const ps = []
 
-    for (const plugin of reversed) {
-      const { commands = {} } = plugin
+    for (const plugin of plugins) {
+      const { commands } = plugin
 
-      Object.keys(commands).forEach(key => {
-        const fn = commands[key]
-        cmds[key] = fn
+      if (commands) {
+        const editor = this
+        const c = CommandsPlugin(commands)
+        ps.push(c)
 
-        Change.prototype[key] = function(...args) {
-          editor.command(key, ...args)
-          return this
-        }
-      })
+        Object.keys(commands).forEach(key => {
+          Change.prototype[key] = function(...args) {
+            editor.command(key, ...args)
+            return this
+          }
+        })
+      }
+
+      ps.push(plugin)
     }
 
-    this.plugins = plugins
-    this.schema = schema
-    this.commands = cmds
+    this.plugins = ps
+    this.schema = new Schema({ plugins })
     this.Change = Change
     return this
   }

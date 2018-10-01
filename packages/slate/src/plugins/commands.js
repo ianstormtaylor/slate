@@ -1,26 +1,43 @@
-import AtCurrentRange from '../commands/at-current-range'
-import AtRange from '../commands/at-range'
-import ByPath from '../commands/by-path'
-import OnHistory from '../commands/on-history'
-import OnSelection from '../commands/on-selection'
-import OnValue from '../commands/on-value'
-
 /**
- * A plugin that defines the core Slate commands.
+ * Create a plugin from a set of `commands`.
  *
+ * @param {Object} commands
  * @return {Object}
  */
 
-function CommandsPlugin() {
+function CommandsPlugin(commands) {
+  /**
+   * On command, if it exists in our list of commands, call it.
+   *
+   * @param {Object} type
+   * @param {Change} change
+   * @param {Function} next
+   */
+
+  function onCommand(command, change, next) {
+    const { type, args } = command
+
+    // Defer to other plugins in the stack.
+    const ret = next()
+    if (ret !== undefined) return ret
+
+    // If the command isn't found, abort.
+    if (!(type in commands)) return
+
+    // Otherwise, call the change function.
+    const fn = commands[type]
+    change.call(fn, ...args)
+    return true
+  }
+
+  /**
+   * Return the plugin.
+   *
+   * @type {Object}
+   */
+
   return {
-    commands: {
-      ...AtCurrentRange,
-      ...AtRange,
-      ...ByPath,
-      ...OnHistory,
-      ...OnSelection,
-      ...OnValue,
-    },
+    onCommand,
   }
 }
 

@@ -16,7 +16,6 @@ import Leaf from './models/leaf'
 import Mark from './models/mark'
 import Node from './models/node'
 import Operation from './models/operation'
-import Operations from './operations'
 import PathUtils from './utils/path-utils'
 import Point from './models/point'
 import Range from './models/range'
@@ -46,7 +45,6 @@ export {
   Mark,
   Node,
   Operation,
-  Operations,
   PathUtils,
   Point,
   Range,
@@ -72,7 +70,6 @@ export default {
   Mark,
   Node,
   Operation,
-  Operations,
   PathUtils,
   Point,
   Range,
