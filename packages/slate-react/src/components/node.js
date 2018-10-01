@@ -65,7 +65,7 @@ class Node extends React.Component {
   shouldComponentUpdate(nextProps) {
     const { props } = this
     const { editor } = props
-    const shouldUpdate = editor.runFind(
+    const shouldUpdate = editor.run(
       'shouldNodeComponentUpdate',
       props,
       nextProps
@@ -166,7 +166,7 @@ class Node extends React.Component {
       readOnly,
     }
 
-    let placeholder = editor.runFind('renderPlaceholder', props)
+    let placeholder = editor.run('renderPlaceholder', props, editor)
 
     if (placeholder) {
       placeholder = React.cloneElement(placeholder, {
@@ -176,11 +176,15 @@ class Node extends React.Component {
       children = [placeholder, ...children]
     }
 
-    const element = editor.runFind('renderNode', {
-      ...props,
-      attributes,
-      children,
-    })
+    const element = editor.run(
+      'renderNode',
+      {
+        ...props,
+        attributes,
+        children,
+      },
+      editor
+    )
 
     return schema.isVoid(node) ? (
       <Void {...this.props}>{element}</Void>

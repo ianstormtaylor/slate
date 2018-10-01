@@ -7,9 +7,8 @@ import { Editor as Controller } from 'slate'
 import memoizeOne from 'memoize-one'
 
 import EVENT_HANDLERS from '../constants/event-handlers'
-import PLUGINS_PROPS from '../constants/plugin-props'
-import AfterPlugin from '../plugins/after'
-import BeforePlugin from '../plugins/before'
+import PropsPlugin from '../plugins/props'
+import ReactPlugin from '../plugins/react'
 import noop from '../utils/noop'
 
 /**
@@ -107,8 +106,7 @@ class Editor extends React.Component {
   }
 
   /**
-   * When the component first mounts, focus the editor if `autoFocus` is set,
-   * and then flush a queued change if one exists.
+   * When the component first mounts, flush a queued change if one exists.
    */
 
   componentDidMount() {
@@ -116,7 +114,7 @@ class Editor extends React.Component {
     this.tmp.updates++
 
     if (this.props.autoFocus) {
-      this.controller.change(c => c.focus())
+      this.change(c => c.focus())
     }
 
     if (this.tmp.change) {
@@ -126,19 +124,11 @@ class Editor extends React.Component {
   }
 
   /**
-   * When the component updates, ensure that it's not re-resolving often, and
-   * then flush a queued change if one exists.
+   * When the component updates, flush a queued change if one exists.
    */
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate() {
     this.tmp.updates++
-
-    // If we've resolved a few times already, and it's exactly in line with
-    // the updates, then warn the user that they may be doing something wrong.
-    warning(
-      this.tmp.resolves < 5 || this.tmp.resolves !== this.tmp.updates,
-      'A Slate <Editor> component is re-resolving `props.plugins` or `props.schema` on each update, which leads to poor performance. This is often due to passing in a new `schema` or `plugins` prop with each render by declaring them inline in your render function. Do not do this!'
-    )
 
     if (this.tmp.change) {
       this.props.onChange(this.tmp.change)
@@ -167,7 +157,7 @@ class Editor extends React.Component {
       options
     )
 
-    const tree = controller.runRender('renderEditor', props, this)
+    const tree = controller.run('renderEditor', props, this)
     return tree
   }
 
@@ -177,8 +167,8 @@ class Editor extends React.Component {
    * In addition to the plugins provided in props, this will initialize three
    * other plugins:
    *
-   * - The top-level editor plugin, which allows for top-level handlers, etc.
-   * - The two "core" plugins, one before all the other and one after.
+   * - The "react" plugin which defines default behaviors.
+   * - The "props" plugin, which allows for `onKeyDown`, `onCopy`, etc.
    *
    * @param {Array} plugins
    * @param {Schema|Object} schema
@@ -189,25 +179,16 @@ class Editor extends React.Component {
     debug('resolvePlugins', { plugins, schema })
     this.tmp.resolves++
 
-    const beforePlugin = BeforePlugin()
-    const afterPlugin = AfterPlugin()
-    const editorPlugin = { schema }
+    // If we've resolved a few times already, and it's exactly in line with
+    // the updates, then warn the user that they may be doing something wrong.
+    warning(
+      this.tmp.resolves < 5 || this.tmp.resolves !== this.tmp.updates,
+      'A Slate <Editor> component is re-resolving `props.plugins` or `props.schema` on each update, which leads to poor performance. This is often due to passing in a new `schema` or `plugins` prop with each render by declaring them inline in your render function. Do not do this!'
+    )
 
-    for (const prop of PLUGINS_PROPS) {
-      // Skip `onChange` because the editor's `onChange` is special.
-      if (prop == 'onChange') continue
-
-      // Skip `schema` because it can't be proxied easily, so it must be passed
-      // in as an argument to this function instead.
-      if (prop == 'schema') continue
-
-      // Define a function that will just proxies into `props`.
-      editorPlugin[prop] = (...args) => {
-        return this.props[prop] && this.props[prop](...args)
-      }
-    }
-
-    return [beforePlugin, editorPlugin, ...plugins, afterPlugin]
+    const reactPlugin = ReactPlugin()
+    const propsPlugin = PropsPlugin(this.props, schema)
+    return [reactPlugin, propsPlugin, ...plugins]
   }
 
   /**
@@ -235,6 +216,10 @@ class Editor extends React.Component {
     return this.controller.value
   }
 
+  run = (...args) => {
+    return this.controller.run(...args)
+  }
+
   change = (...args) => {
     this.controller.change(change => {
       change.editor = this
@@ -246,22 +231,6 @@ class Editor extends React.Component {
     this.change(change => {
       this.run(handler, event, change)
     })
-  }
-
-  run = (...args) => {
-    return this.controller.run(...args)
-  }
-
-  runFind = (...args) => {
-    return this.controller.runFind(...args)
-  }
-
-  runMap = (...args) => {
-    return this.controller.runMap(...args)
-  }
-
-  runRender = (...args) => {
-    return this.controller.runRender(...args)
   }
 
   /**

@@ -42,6 +42,33 @@ class Editor {
   }
 
   /**
+   * Run through the plugins stack for `property` with `args`.
+   *
+   * @param {String} property
+   * @param {Any} ...args
+   * @return {Any}
+   */
+
+  run = (property, ...args) => {
+    const plugins = this.plugins.filter(p => property in p)
+    let i = 0
+
+    function next(...overrides) {
+      const plugin = plugins[i++]
+      if (!plugin) return
+
+      if (overrides.length) {
+        args = overrides
+      }
+
+      const ret = plugin[property](...args, next)
+      return ret
+    }
+
+    return next()
+  }
+
+  /**
    * Perform a change on the editor, passing `...args` to `change.call`.
    *
    * @param {Mixed} ...args
@@ -115,78 +142,6 @@ class Editor {
     this.change(change => {
       this.run(handler, event, change)
     })
-  }
-
-  /**
-   * Iterate the plugins with `property`, breaking on any a non-null values.
-   *
-   * @param {String} property
-   * @param {Any} ...args
-   */
-
-  run(property, ...args) {
-    const plugins = this.plugins.filter(p => property in p)
-
-    for (const plugin of plugins) {
-      const ret = plugin[property](...args)
-      if (ret != null) return
-    }
-  }
-
-  /**
-   * Iterate the plugins with `property`, returning the first non-null value.
-   *
-   * @param {String} property
-   * @param {Any} ...args
-   */
-
-  runFind(property, ...args) {
-    const plugins = this.plugins.filter(p => property in p)
-
-    for (const plugin of plugins) {
-      const ret = plugin[property](...args)
-      if (ret != null) return ret
-    }
-  }
-
-  /**
-   * Iterate the plugins with `property`, returning all the non-null values.
-   *
-   * @param {String} property
-   * @param {Any} ...args
-   * @return {Array}
-   */
-
-  runMap(property, ...args) {
-    const plugins = this.plugins.filter(p => property in p)
-    const array = []
-
-    for (const plugin of plugins) {
-      const ret = plugin[property](...args)
-      if (ret != null) array.push(ret)
-    }
-
-    return array
-  }
-
-  /**
-   * Iterate the plugins with `property`, reducing to a set of React children.
-   *
-   * @param {String} property
-   * @param {Object} props
-   * @param {Any} ...args
-   */
-
-  runRender(property, props, ...args) {
-    const plugins = this.plugins.filter(p => property in p)
-
-    return plugins.reduceRight((children, plugin) => {
-      if (!plugin[property]) return children
-      const ret = plugin[property](props, ...args)
-      if (ret == null) return children
-      props.children = ret
-      return ret
-    }, props.children === undefined ? null : props.children)
   }
 
   /**

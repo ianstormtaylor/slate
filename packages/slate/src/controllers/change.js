@@ -47,11 +47,10 @@ class Change {
    * history if needed.
    *
    * @param {Operation|Object} operation
-   * @param {Object} options
    * @return {Change}
    */
 
-  applyOperation(operation, options = {}) {
+  applyOperation(operation) {
     const { operations } = this
     let value = this.value
     const previousValue = value
@@ -85,12 +84,11 @@ class Change {
    * Apply a series of `operations` to the current value.
    *
    * @param {Array|List} operations
-   * @param {Object} options
    * @return {Change}
    */
 
-  applyOperations(operations, options) {
-    operations.forEach(op => this.applyOperation(op, options))
+  applyOperations(operations) {
+    operations.forEach(op => this.applyOperation(op))
     return this
   }
 

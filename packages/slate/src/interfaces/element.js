@@ -436,11 +436,9 @@ class ElementInterface {
    */
 
   getDecorations(editor) {
-    const allDecorations = editor
-      .runMap('decorateNode', this)
-      .map(decorations => Decoration.createList(decorations))
-    const list = List(allDecorations).flatten(true)
-    return list
+    const array = editor.run('decorateNode', this) || []
+    const decorations = Decoration.createList(array)
+    return decorations
   }
 
   /**

@@ -113,7 +113,7 @@ class Leaf extends React.Component {
         children,
         attributes,
       }
-      const element = editor.runFind('renderMark', props)
+      const element = editor.run('renderMark', props)
       return element || children
     }, leaf)
   }
