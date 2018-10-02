@@ -19,7 +19,7 @@ function getEventRange(event, editor) {
   const { x, y, target } = event
   if (x == null || y == null) return null
 
-  const { schema, value } = editor
+  const { value } = editor
   const { document } = value
   const node = findNode(target, value)
   if (!node) return null
@@ -27,7 +27,7 @@ function getEventRange(event, editor) {
   // If the drop target is inside a void node, move it into either the next or
   // previous node, depending on which side the `x` and `y` coordinates are
   // closest to.
-  if (schema.isVoid(node)) {
+  if (editor.query('isVoid', node)) {
     const rect = target.getBoundingClientRect()
     const isPrevious =
       node.object == 'inline'

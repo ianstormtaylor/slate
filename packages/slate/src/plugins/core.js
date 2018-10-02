@@ -29,6 +29,19 @@ function CorePlugin() {
   }
 
   /**
+   * The core Slate queries.
+   *
+   * @type {Object}
+   */
+
+  const queries = {
+    isAtomic: () => false,
+    isVoid: () => false,
+    normalizeNode: () => {},
+    validateNode: () => {},
+  }
+
+  /**
    * The core Slate schema.
    *
    * @type {Object}
@@ -160,6 +173,7 @@ function CorePlugin() {
 
   return {
     commands,
+    queries,
     schema,
   }
 }

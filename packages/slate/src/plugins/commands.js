@@ -9,7 +9,7 @@ function CommandsPlugin(commands) {
   /**
    * On command, if it exists in our list of commands, call it.
    *
-   * @param {Object} type
+   * @param {Object} command
    * @param {Change} change
    * @param {Function} next
    */

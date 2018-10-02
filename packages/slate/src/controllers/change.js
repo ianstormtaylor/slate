@@ -107,6 +107,33 @@ class Change {
   }
 
   /**
+   * Run a `command` with `args`.
+   *
+   * @param {String} command
+   * @param {Any} ...args
+   * @return {Change}
+   */
+
+  command(command, ...args) {
+    const { editor } = this
+    editor.command(command, ...args)
+    return this
+  }
+
+  /**
+   * Run a `query` with `args`.
+   *
+   * @param {String} query
+   * @param {Any} ...args
+   * @return {Change}
+   */
+
+  query(query, ...args) {
+    const { editor } = this
+    return editor.query(query, ...args)
+  }
+
+  /**
    * Normalize all of the nodes in the document from scratch.
    *
    * @return {Change}
@@ -197,17 +224,14 @@ class Change {
 
   normalizePath(path) {
     const { editor, value } = this
-    const { schema } = editor
     let { document } = value
     let node = document.assertNode(path)
 
     let iterations = 0
-    const max =
-      // schema.stack.plugins.length +
-      schema.rules.length + (node.object === 'text' ? 1 : node.nodes.size)
+    const max = 1000 + (node.object === 'text' ? 1 : node.nodes.size)
 
     const iterate = () => {
-      const fn = node.normalize(schema)
+      const fn = node.normalize(editor)
       if (!fn) return
 
       // Run the normalize `fn` to fix the node.

@@ -3,7 +3,9 @@ import Debug from 'debug'
 import AbstractChange from './change'
 import CorePlugin from '../plugins/core'
 import CommandsPlugin from '../plugins/commands'
-import Schema from './schema'
+import QueriesPlugin from '../plugins/queries'
+import SchemaPlugin from '../plugins/schema'
+import Value from '../models/value'
 
 /**
  * Debug.
@@ -28,7 +30,15 @@ class Editor {
    */
 
   constructor(attrs = {}, options = {}) {
-    const { onChange, plugins = [], readOnly = false, value } = attrs
+    const { editor = this } = options
+    const {
+      onChange = () => {},
+      plugins = [],
+      readOnly = false,
+      value = Value.create(),
+    } = attrs
+
+    this.editor = editor
 
     this.tmp = {
       change: null,
@@ -42,44 +52,15 @@ class Editor {
   }
 
   /**
-   * Run through the plugins stack for `property` with `args`.
-   *
-   * @param {String} property
-   * @param {Any} ...args
-   * @return {Any}
-   */
-
-  run = (property, ...args) => {
-    const plugins = this.plugins.filter(p => property in p)
-    let i = 0
-
-    function next(...overrides) {
-      const plugin = plugins[i++]
-      if (!plugin) return
-
-      if (overrides.length) {
-        args = overrides
-      }
-
-      const ret = plugin[property](...args, next)
-      return ret
-    }
-
-    return next()
-  }
-
-  /**
    * Perform a change on the editor, passing `...args` to `change.call`.
    *
    * @param {Mixed} ...args
    */
 
   change = (...args) => {
-    const { Change } = this
+    const { Change, editor, value } = this
     const { isChanging } = this.tmp
-    const change = isChanging
-      ? this.tmp.change
-      : new Change({ value: this.value, editor: this })
+    const change = isChanging ? this.tmp.change : new Change({ value, editor })
 
     try {
       this.tmp.change = change
@@ -121,7 +102,7 @@ class Editor {
    */
 
   command = (command, ...args) => {
-    debug('command', { arguments: args })
+    debug('command', { command, args })
 
     this.change(change => {
       const obj = { type: command, args }
@@ -145,6 +126,47 @@ class Editor {
   }
 
   /**
+   * Ask a `query` with `...args`.
+   *
+   * @param {String} query
+   * @param {Any} ...args
+   */
+
+  query = (query, ...args) => {
+    debug('query', { query, args })
+
+    const obj = { type: query, args }
+    return this.run('onQuery', obj)
+  }
+
+  /**
+   * Run through the plugins stack for `property` with `args`.
+   *
+   * @param {String} property
+   * @param {Any} ...args
+   * @return {Any}
+   */
+
+  run = (property, ...args) => {
+    const plugins = this.plugins.filter(p => property in p)
+    let i = 0
+
+    function next(...overrides) {
+      const plugin = plugins[i++]
+      if (!plugin) return
+
+      if (overrides.length) {
+        args = overrides
+      }
+
+      const ret = plugin[property](...args, next)
+      return ret
+    }
+
+    return next()
+  }
+
+  /**
    * Set the `onChange` handler.
    *
    * @param {Function} onChange
@@ -157,49 +179,61 @@ class Editor {
   }
 
   /**
-   * Set the editor's `plugins`.
+   * Set the editor's plugins.
    *
-   * @param {Array} plugins
+   * @param {Array} rawPlugins
    * @return {Editor}
    */
 
-  setPlugins(plugins) {
+  setPlugins(rawPlugins) {
     // PERF: If they try to set the same `plugins` again, we can avoid work.
-    if (plugins === this.tmp.rawPlugins) {
+    if (rawPlugins === this.tmp.rawPlugins) {
       return this
     }
 
     // PERF: Save a reference to the "raw" plugins that were set, so that we can
     // compare it by reference for a future set to avoid repeating work.
-    this.tmp.rawPlugins = plugins
+    this.tmp.rawPlugins = rawPlugins
 
     const corePlugin = CorePlugin()
-    plugins = [corePlugin, ...plugins]
+    const plugins = [corePlugin, ...rawPlugins]
 
     class Change extends AbstractChange {}
-    const ps = []
+    const array = []
 
     for (const plugin of plugins) {
-      const { commands } = plugin
+      const { commands, queries, schema } = plugin
+      array.push(plugin)
 
       if (commands) {
-        const editor = this
-        const c = CommandsPlugin(commands)
-        ps.push(c)
+        const commandsPlugin = CommandsPlugin(commands)
+        array.push(commandsPlugin)
 
         Object.keys(commands).forEach(key => {
           Change.prototype[key] = function(...args) {
-            editor.command(key, ...args)
-            return this
+            return this.command(key, ...args)
           }
         })
       }
 
-      ps.push(plugin)
+      if (queries) {
+        const queriesPlugin = QueriesPlugin(queries)
+        array.push(queriesPlugin)
+
+        Object.keys(queries).forEach(key => {
+          Change.prototype[key] = function(...args) {
+            return this.query(key, ...args)
+          }
+        })
+      }
+
+      if (schema) {
+        const schemaPlugin = SchemaPlugin(schema)
+        array.push(schemaPlugin)
+      }
     }
 
-    this.plugins = ps
-    this.schema = new Schema({ plugins })
+    this.plugins = array
     this.Change = Change
     return this
   }

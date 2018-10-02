@@ -69,17 +69,16 @@ Commands.deleteAtRange = (change, range) => {
   change.snapshotSelection()
 
   const { editor, value } = change
-  const { schema } = editor
   const { start, end } = range
   let startKey = start.key
   let startOffset = start.offset
   let endKey = end.key
   let endOffset = end.offset
   let { document } = value
-  let isStartVoid = document.hasVoidParent(startKey, schema)
-  let isEndVoid = document.hasVoidParent(endKey, schema)
-  let startBlock = document.getClosestBlock(startKey, schema)
-  let endBlock = document.getClosestBlock(endKey, schema)
+  let isStartVoid = document.hasVoidParent(startKey, editor)
+  let isEndVoid = document.hasVoidParent(endKey, editor)
+  let startBlock = document.getClosestBlock(startKey)
+  let endBlock = document.getClosestBlock(endKey)
 
   // Check if we have a "hanging" selection case where the even though the
   // selection extends into the start of the end node, we actually want to
@@ -96,7 +95,7 @@ Commands.deleteAtRange = (change, range) => {
     const prevText = document.getPreviousText(endKey)
     endKey = prevText.key
     endOffset = prevText.text.length
-    isEndVoid = document.hasVoidParent(endKey, schema)
+    isEndVoid = document.hasVoidParent(endKey, editor)
   }
 
   change.withoutNormalizing(() => {
@@ -104,7 +103,7 @@ Commands.deleteAtRange = (change, range) => {
     // the starting point to be right after it, continuously until the start point
     // is not a void, or until the entire range is handled.
     while (isStartVoid) {
-      const startVoid = document.getClosestVoid(startKey, schema)
+      const startVoid = document.getClosestVoid(startKey, editor)
       const nextText = document.getNextText(startKey)
       change.removeNodeByKey(startVoid.key)
 
@@ -118,14 +117,14 @@ Commands.deleteAtRange = (change, range) => {
       document = change.value.document
       startKey = nextText.key
       startOffset = 0
-      isStartVoid = document.hasVoidParent(startKey, schema)
+      isStartVoid = document.hasVoidParent(startKey, editor)
     }
 
     // If the end node is inside a void node, do the same thing but backwards. But
     // we don't need any aborting checks because if we've gotten this far there
     // must be a non-void node that will exit the loop.
     while (isEndVoid) {
-      const endVoid = document.getClosestVoid(endKey, schema)
+      const endVoid = document.getClosestVoid(endKey, editor)
       const prevText = document.getPreviousText(endKey)
       change.removeNodeByKey(endVoid.key)
 
@@ -133,7 +132,7 @@ Commands.deleteAtRange = (change, range) => {
       document = change.value.document
       endKey = prevText.key
       endOffset = prevText.text.length
-      isEndVoid = document.hasVoidParent(endKey, schema)
+      isEndVoid = document.hasVoidParent(endKey, editor)
     }
 
     // If the start and end key are the same, and it was a hanging selection, we
@@ -317,7 +316,6 @@ Commands.deleteWordBackwardAtRange = (change, range) => {
 Commands.deleteBackwardAtRange = (change, range, n = 1) => {
   if (n === 0) return
   const { editor, value } = change
-  const { schema } = editor
   const { document } = value
   const { start, focus } = range
 
@@ -327,7 +325,7 @@ Commands.deleteBackwardAtRange = (change, range, n = 1) => {
     return
   }
 
-  const voidParent = document.getClosestVoid(start.key, schema)
+  const voidParent = document.getClosestVoid(start.key, editor)
 
   // If there is a void parent, delete it.
   if (voidParent) {
@@ -340,7 +338,7 @@ Commands.deleteBackwardAtRange = (change, range, n = 1) => {
   // If the closest is not void, but empty, remove it
   if (
     block &&
-    !schema.isVoid(block) &&
+    !change.isVoid(block) &&
     block.text === '' &&
     document.nodes.size !== 1
   ) {
@@ -360,7 +358,7 @@ Commands.deleteBackwardAtRange = (change, range, n = 1) => {
   if (start.isAtStartOfNode(text)) {
     const prev = document.getPreviousText(text.key)
     const prevBlock = document.getClosestBlock(prev.key)
-    const prevVoid = document.getClosestVoid(prev.key, schema)
+    const prevVoid = document.getClosestVoid(prev.key, editor)
 
     // If the previous text node has a void parent, remove it.
     if (prevVoid) {
@@ -472,7 +470,6 @@ Commands.deleteWordForwardAtRange = (change, range) => {
 Commands.deleteForwardAtRange = (change, range, n = 1) => {
   if (n === 0) return
   const { editor, value } = change
-  const { schema } = editor
   const { document } = value
   const { start, focus } = range
 
@@ -482,7 +479,7 @@ Commands.deleteForwardAtRange = (change, range, n = 1) => {
     return
   }
 
-  const voidParent = document.getClosestVoid(start.key, schema)
+  const voidParent = document.getClosestVoid(start.key, editor)
 
   // If the node has a void parent, delete it.
   if (voidParent) {
@@ -495,7 +492,7 @@ Commands.deleteForwardAtRange = (change, range, n = 1) => {
   // If the closest is not void, but empty, remove it
   if (
     block &&
-    !schema.isVoid(block) &&
+    !change.isVoid(block) &&
     block.text === '' &&
     document.nodes.size !== 1
   ) {
@@ -521,7 +518,7 @@ Commands.deleteForwardAtRange = (change, range, n = 1) => {
   if (start.isAtEndOfNode(text)) {
     const next = document.getNextText(text.key)
     const nextBlock = document.getClosestBlock(next.key)
-    const nextVoid = document.getClosestVoid(next.key, schema)
+    const nextVoid = document.getClosestVoid(next.key, editor)
 
     // If the next text node has a void parent, remove it.
     if (nextVoid) {
@@ -585,7 +582,6 @@ Commands.insertBlockAtRange = (change, range, block) => {
   }
 
   const { editor, value } = change
-  const { schema } = editor
   const { document } = value
   const { start } = range
   let startKey = start.key
@@ -595,7 +591,7 @@ Commands.insertBlockAtRange = (change, range, block) => {
   const parent = document.getParent(startBlock.key)
   const index = parent.nodes.indexOf(startBlock)
 
-  if (schema.isVoid(startBlock)) {
+  if (change.isVoid(startBlock)) {
     const extra = start.isAtEndOfNode(startBlock) ? 1 : 0
     change.insertNodeByKey(parent.key, index + extra, block)
   } else if (!startInline && startBlock.text === '') {
@@ -605,7 +601,7 @@ Commands.insertBlockAtRange = (change, range, block) => {
   } else if (start.isAtEndOfNode(startBlock)) {
     change.insertNodeByKey(parent.key, index + 1, block)
   } else {
-    if (startInline && schema.isVoid(startInline)) {
+    if (startInline && change.isVoid(startInline)) {
       const atEnd = start.isAtEndOfNode(startInline)
       const siblingText = atEnd
         ? document.getNextText(startKey)
@@ -658,8 +654,7 @@ Commands.insertFragmentAtRange = (change, range, fragment) => {
 
     // Calculate a few things...
     const { start } = range
-    const { value } = change
-    const { schema } = value
+    const { editor, value } = change
     let { document } = value
     let startText = document.getDescendant(start.key)
     let startBlock = document.getClosestBlock(startText.key)
@@ -674,7 +669,7 @@ Commands.insertFragmentAtRange = (change, range, fragment) => {
     const lastBlock = blocks.last()
 
     // If the fragment only contains a void block, use `insertBlock` instead.
-    if (firstBlock === lastBlock && schema.isVoid(firstBlock)) {
+    if (firstBlock === lastBlock && change.isVoid(firstBlock)) {
       change.insertBlockAtRange(range, firstBlock)
       return
     }
@@ -736,7 +731,7 @@ Commands.insertFragmentAtRange = (change, range, fragment) => {
 
     // If the starting block is empty, we replace it entirely with the first block
     // of the fragment, since this leads to a more expected behavior for the user.
-    if (!schema.isVoid(startBlock) && startBlock.text === '') {
+    if (!change.isVoid(startBlock) && startBlock.text === '') {
       change.removeNodeByKey(startBlock.key)
       change.insertNodeByKey(parent.key, index, firstBlock)
     } else {
@@ -772,14 +767,13 @@ Commands.insertInlineAtRange = (change, range, inline) => {
     }
 
     const { editor, value } = change
-    const { schema } = editor
     const { document } = value
     const { start } = range
     const parent = document.getParent(start.key)
     const startText = document.assertDescendant(start.key)
     const index = parent.nodes.indexOf(startText)
 
-    if (schema.isVoid(parent)) return
+    if (change.isVoid(parent)) return
 
     change.splitNodeByKey(start.key, start.offset)
     change.insertNodeByKey(parent.key, index + 1, inline)
@@ -797,14 +791,13 @@ Commands.insertInlineAtRange = (change, range, inline) => {
 
 Commands.insertTextAtRange = (change, range, text, marks) => {
   const { editor, value } = change
-  const { schema } = editor
   const { document } = value
   const { start } = range
   let key = start.key
   let offset = start.offset
   const parent = document.getParent(start.key)
 
-  if (schema.isVoid(parent)) {
+  if (change.isVoid(parent)) {
     return
   }
 
@@ -864,12 +857,11 @@ Commands.removeMarkAtRange = (change, range, mark) => {
 
 Commands.setBlocksAtRange = (change, range, properties) => {
   const { editor, value } = change
-  const { schema } = editor
   const { document } = value
   const blocks = document.getBlocksAtRange(range)
 
   const { start, end, isCollapsed } = range
-  const isStartVoid = document.hasVoidParent(start.key, schema)
+  const isStartVoid = document.hasVoidParent(start.key, editor)
   const startBlock = document.getClosestBlock(start.key)
   const endBlock = document.getClosestBlock(end.key)
 
@@ -1212,7 +1204,6 @@ Commands.wrapBlockAtRange = (change, range, block) => {
 
 Commands.wrapInlineAtRange = (change, range, inline) => {
   const { editor, value } = change
-  const { schema } = editor
   let { document } = value
   const { start, end } = range
 
@@ -1220,7 +1211,7 @@ Commands.wrapInlineAtRange = (change, range, inline) => {
     // Wrapping an inline void
     const inlineParent = document.getClosestInline(start.key)
 
-    if (!schema.isVoid(inlineParent)) {
+    if (!change.isVoid(inlineParent)) {
       return
     }
 

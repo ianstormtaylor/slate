@@ -287,7 +287,6 @@ class Operation extends Record(DEFAULTS) {
         const v = {}
         if ('data' in value) v.data = value.data.toJS()
         if ('decorations' in value) v.decorations = value.decorations.toJS()
-        if ('schema' in value) v.schema = value.schema.toJS()
         value = v
       }
 

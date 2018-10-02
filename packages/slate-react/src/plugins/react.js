@@ -86,7 +86,6 @@ function BeforePlugin() {
 
     event.preventDefault()
 
-    const { schema } = editor
     const { document, selection } = value
     const range = findRange(targetRange, editor)
 
@@ -126,7 +125,7 @@ function BeforePlugin() {
       case 'insertParagraph': {
         const hasVoidParent = document.hasVoidParent(
           selection.start.path,
-          schema
+          editor
         )
 
         if (hasVoidParent) {
@@ -179,7 +178,6 @@ function BeforePlugin() {
     if (isCopying) return true
     if (editor.props.readOnly) return true
 
-    const { schema } = editor
     const { relatedTarget, target } = event
     const window = getWindow(target)
 
@@ -207,7 +205,7 @@ function BeforePlugin() {
       // editable section of an element that isn't a void node (eg. a list item
       // of the check list example).
       const node = findNode(relatedTarget, value)
-      if (el.contains(relatedTarget) && node && !schema.isVoid(node))
+      if (el.contains(relatedTarget) && node && !change.isVoid(node))
         return true
     }
 
@@ -275,14 +273,13 @@ function BeforePlugin() {
     const { editor, value } = change
     if (editor.props.readOnly) return true
 
-    const { schema } = editor
     const { document } = value
     const node = findNode(event.target, value)
     if (!node) return true
 
     const ancestors = document.getAncestors(node.key)
     const isVoid =
-      node && (schema.isVoid(node) || ancestors.some(a => schema.isVoid(a)))
+      node && (change.isVoid(node) || ancestors.some(a => change.isVoid(a)))
 
     if (isVoid) {
       // COMPAT: In Chrome & Safari, selections that are at the zero offset of
@@ -377,11 +374,10 @@ function BeforePlugin() {
       // If user cuts a void block node or a void inline node,
       // manually removes it since selection is collapsed in this case.
       const { value } = change
-      const { schema } = editor
       const { endBlock, endInline, selection } = value
       const { isCollapsed } = selection
-      const isVoidBlock = endBlock && schema.isVoid(endBlock) && isCollapsed
-      const isVoidInline = endInline && schema.isVoid(endInline) && isCollapsed
+      const isVoidBlock = endBlock && change.isVoid(endBlock) && isCollapsed
+      const isVoidInline = endInline && change.isVoid(endInline) && isCollapsed
 
       if (isVoidBlock) {
         editor.change(c => c.removeNodeByKey(endBlock.key))
@@ -468,9 +464,8 @@ function BeforePlugin() {
     // When the target is editable, dropping is already allowed by
     // default, and calling `preventDefault` hides the cursor.
     const { editor } = change
-    const { schema } = editor
     const node = findNode(event.target, editor.value)
-    if (schema.isVoid(node)) event.preventDefault()
+    if (change.isVoid(node)) event.preventDefault()
 
     // COMPAT: IE won't call onDrop on contentEditables unless the
     // default dragOver is prevented:
@@ -512,12 +507,11 @@ function BeforePlugin() {
     if (ret !== undefined) return ret
 
     const { editor, value } = change
-    const { schema } = editor
     const { document } = value
     const node = findNode(event.target, value)
     const ancestors = document.getAncestors(node.key)
     const isVoid =
-      node && (schema.isVoid(node) || ancestors.some(a => schema.isVoid(a)))
+      node && (change.isVoid(node) || ancestors.some(a => change.isVoid(a)))
     const selectionIncludesNode = value.blocks.some(
       block => block.key === node.key
     )
@@ -554,7 +548,6 @@ function BeforePlugin() {
     const ret = next()
     if (ret !== undefined) return ret
 
-    const { schema } = editor
     const { document, selection } = value
     const window = getWindow(event.target)
     let target = getEventRange(event, editor)
@@ -587,7 +580,7 @@ function BeforePlugin() {
 
     if (type == 'text' || type == 'html') {
       const { anchor } = target
-      let hasVoidParent = document.hasVoidParent(anchor.key, schema)
+      let hasVoidParent = document.hasVoidParent(anchor.key, editor)
 
       if (hasVoidParent) {
         let n = document.getNode(anchor.key)
@@ -595,7 +588,7 @@ function BeforePlugin() {
         while (hasVoidParent) {
           n = document.getNextText(n.key)
           if (!n) break
-          hasVoidParent = document.hasVoidParent(n.key, schema)
+          hasVoidParent = document.hasVoidParent(n.key, editor)
         }
 
         if (n) change.moveToStartOfNode(n)
@@ -787,9 +780,8 @@ function BeforePlugin() {
     const ret = next()
     if (ret !== undefined) return ret
 
-    const { schema } = editor
     const { document, selection } = value
-    const hasVoidParent = document.hasVoidParent(selection.start.path, schema)
+    const hasVoidParent = document.hasVoidParent(selection.start.path, editor)
 
     // COMPAT: In iOS, some of these hotkeys are handled in the
     // `onNativeBeforeInput` handler of the `<Content>` component in order to
@@ -861,7 +853,7 @@ function BeforePlugin() {
     if (Hotkeys.isMoveBackward(event)) {
       const { previousText, startText } = value
       const isPreviousInVoid =
-        previousText && document.hasVoidParent(previousText.key, schema)
+        previousText && document.hasVoidParent(previousText.key, editor)
 
       if (hasVoidParent || isPreviousInVoid || startText.text == '') {
         event.preventDefault()
@@ -872,7 +864,7 @@ function BeforePlugin() {
     if (Hotkeys.isMoveForward(event)) {
       const { nextText, startText } = value
       const isNextInVoid =
-        nextText && document.hasVoidParent(nextText.key, schema)
+        nextText && document.hasVoidParent(nextText.key, editor)
 
       if (hasVoidParent || isNextInVoid || startText.text == '') {
         event.preventDefault()
@@ -883,7 +875,7 @@ function BeforePlugin() {
     if (Hotkeys.isExtendBackward(event)) {
       const { previousText, startText } = value
       const isPreviousInVoid =
-        previousText && document.hasVoidParent(previousText.key, schema)
+        previousText && document.hasVoidParent(previousText.key, editor)
 
       if (hasVoidParent || isPreviousInVoid || startText.text == '') {
         event.preventDefault()
@@ -894,7 +886,7 @@ function BeforePlugin() {
     if (Hotkeys.isExtendForward(event)) {
       const { nextText, startText } = value
       const isNextInVoid =
-        nextText && document.hasVoidParent(nextText.key, schema)
+        nextText && document.hasVoidParent(nextText.key, editor)
 
       if (hasVoidParent || isNextInVoid || startText.text == '') {
         event.preventDefault()
@@ -936,9 +928,8 @@ function BeforePlugin() {
 
     if (type == 'text' || type == 'html') {
       if (!text) return true
-      const { schema } = editor
       const { document, selection, startBlock } = value
-      if (schema.isVoid(startBlock)) return true
+      if (change.isVoid(startBlock)) return true
 
       const defaultBlock = startBlock
       const defaultMarks = document.getInsertMarksAtRange(selection)
@@ -976,7 +967,6 @@ function BeforePlugin() {
     const ret = next()
     if (ret !== undefined) return ret
 
-    const { schema } = editor
     const { document } = value
     const native = window.getSelection()
 
@@ -1007,10 +997,10 @@ function BeforePlugin() {
     // selection, go with `0`. (2017/09/07)
     if (
       anchorBlock &&
-      !schema.isVoid(anchorBlock) &&
+      !change.isVoid(anchorBlock) &&
       anchor.offset == 0 &&
       focusBlock &&
-      schema.isVoid(focusBlock) &&
+      change.isVoid(focusBlock) &&
       focus.offset != 0
     ) {
       range = range.setFocus(focus.setOffset(0))
@@ -1021,7 +1011,7 @@ function BeforePlugin() {
     // standardizes the behavior, since it's indistinguishable to the user.
     if (
       anchorInline &&
-      !schema.isVoid(anchorInline) &&
+      !change.isVoid(anchorInline) &&
       anchor.offset == anchorText.text.length
     ) {
       const block = document.getClosestBlock(anchor.key)
@@ -1031,7 +1021,7 @@ function BeforePlugin() {
 
     if (
       focusInline &&
-      !schema.isVoid(focusInline) &&
+      !change.isVoid(focusInline) &&
       focus.offset == focusText.text.length
     ) {
       const block = document.getClosestBlock(focus.key)

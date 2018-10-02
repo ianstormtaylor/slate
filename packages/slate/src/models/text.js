@@ -609,8 +609,8 @@ class Text extends Record(DEFAULTS) {
   /**
    * Set leaves with normalized `leaves`
    *
-   * @param {Schema} schema
-   * @returns {Text|Null}
+   * @param {List} leaves
+   * @returns {Text}
    */
 
   setLeaves(leaves) {

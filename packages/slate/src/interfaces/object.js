@@ -10,7 +10,6 @@ import Node from '../models/node'
 import Operation from '../models/operation'
 import Point from '../models/point'
 import Range from '../models/range'
-import Schema from '../controllers/schema'
 import Selection from '../models/selection'
 import Text from '../models/text'
 import Value from '../models/value'
@@ -61,7 +60,6 @@ mixin(create('node'), [Node])
 mixin(create('operation'), [Operation])
 mixin(create('point'), [Point])
 mixin(create('range'), [Range])
-mixin(create('schema'), [Schema])
 mixin(create('selection'), [Selection])
 mixin(create('text'), [Text])
 mixin(create('value'), [Value])

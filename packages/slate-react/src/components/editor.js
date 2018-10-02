@@ -78,7 +78,18 @@ class Editor extends React.Component {
 
   constructor(props) {
     super(props)
-    const { plugins, schema, value, options } = props
+
+    const onChange = change => {
+      if (this.tmp.mounted) {
+        this.props.onChange(change)
+      } else {
+        this.tmp.change = change
+      }
+    }
+
+    const attrs = { onChange }
+    const options = { editor: this, normalize: false }
+    this.controller = new Controller(attrs, options)
     this.state = {}
     this.resolvePlugins = memoizeOne(this.resolvePlugins)
 
@@ -88,21 +99,6 @@ class Editor extends React.Component {
       resolves: 0,
       updates: 0,
     }
-
-    this.controller = new Controller(
-      {
-        value,
-        plugins: this.resolvePlugins(plugins, schema),
-        onChange: change => {
-          if (this.tmp.mounted) {
-            this.props.onChange(change)
-          } else {
-            this.tmp.change = change
-          }
-        },
-      },
-      options
-    )
   }
 
   /**
@@ -146,17 +142,15 @@ class Editor extends React.Component {
     debug('render', this)
     const { controller, tmp } = this
     const props = { ...this.props }
-    const { plugins, schema, value, readOnly, options } = props
+    const { options, plugins, readOnly, schema, value } = props
 
-    controller.setProperties(
-      {
-        plugins: this.resolvePlugins(plugins, schema),
-        value: tmp.change ? tmp.change.value : value,
-        readOnly,
-      },
-      options
-    )
+    const attrs = {
+      plugins: this.resolvePlugins(plugins, schema),
+      value: tmp.change ? tmp.change.value : value,
+      readOnly,
+    }
 
+    controller.setProperties(attrs, options)
     const tree = controller.run('renderEditor', props, this)
     return tree
   }
@@ -196,41 +190,32 @@ class Editor extends React.Component {
    * can be passed in its place to plugins.
    */
 
-  get onChange() {
-    return this.controller.onChange
-  }
-
-  get plugins() {
-    return this.controller.plugins
-  }
-
-  get readOnly() {
-    return this.controller.readOnly
-  }
-
-  get schema() {
-    return this.controller.schema
-  }
-
   get value() {
     return this.controller.value
   }
 
+  change = (...args) => {
+    return this.controller.change(...args)
+  }
+
+  command = (...args) => {
+    return this.controller.command(...args)
+  }
+
+  event = (...args) => {
+    return this.controller.event(...args)
+  }
+
+  onChange = (...args) => {
+    return this.controller.onChange(...args)
+  }
+
+  query = (...args) => {
+    return this.controller.query(...args)
+  }
+
   run = (...args) => {
     return this.controller.run(...args)
-  }
-
-  change = (...args) => {
-    this.controller.change(change => {
-      change.editor = this
-      change.call(...args)
-    })
-  }
-
-  event = (handler, event) => {
-    this.change(change => {
-      this.run(handler, event, change)
-    })
   }
 
   /**
@@ -238,11 +223,11 @@ class Editor extends React.Component {
    */
 
   blur = () => {
-    this.controller.change(c => c.blur())
+    this.change(c => c.blur())
   }
 
   focus = () => {
-    this.controller.change(c => c.focus())
+    this.change(c => c.focus())
   }
 }
 

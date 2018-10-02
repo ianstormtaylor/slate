@@ -398,15 +398,15 @@ class ElementInterface {
    * Get the closest void parent of a node by `path`.
    *
    * @param {List|String} path
-   * @param {Schema} schema
+   * @param {Editor} editor
    * @return {Node|Null}
    */
 
-  getClosestVoid(path, schema) {
+  getClosestVoid(path, editor) {
     const ancestors = this.getAncestors(path)
     if (!ancestors) return null
 
-    const ancestor = ancestors.findLast(a => schema.isVoid(a))
+    const ancestor = ancestors.findLast(a => editor.query('isVoid', a))
     return ancestor
   }
 
@@ -1357,12 +1357,12 @@ class ElementInterface {
    * Check if a node has a void parent.
    *
    * @param {List|String} path
-   * @param {Schema} schema
+   * @param {Editor} editor
    * @return {Boolean}
    */
 
-  hasVoidParent(path, schema) {
-    const closest = this.getClosestVoid(path, schema)
+  hasVoidParent(path, editor) {
+    const closest = this.getClosestVoid(path, editor)
     return !!closest
   }
 

@@ -19,7 +19,6 @@ import Operation from './models/operation'
 import PathUtils from './utils/path-utils'
 import Point from './models/point'
 import Range from './models/range'
-import Schema from './controllers/schema'
 import Selection from './models/selection'
 import Text from './models/text'
 import TextUtils from './utils/text-utils'
@@ -49,7 +48,6 @@ export {
   Point,
   Range,
   resetMemoization,
-  Schema,
   Selection,
   Text,
   TextUtils,
@@ -74,7 +72,6 @@ export default {
   Point,
   Range,
   resetMemoization,
-  Schema,
   Selection,
   Text,
   TextUtils,

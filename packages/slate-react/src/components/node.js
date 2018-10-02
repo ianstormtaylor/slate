@@ -186,7 +186,7 @@ class Node extends React.Component {
       editor
     )
 
-    return schema.isVoid(node) ? (
+    return editor.query('isVoid', node) ? (
       <Void {...this.props}>{element}</Void>
     ) : (
       element
