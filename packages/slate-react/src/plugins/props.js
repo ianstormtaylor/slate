@@ -14,12 +14,13 @@ const PROPS = [
   'renderNode',
   'renderPlaceholder',
   'schema',
-  'validateNode',
+  'normalizeNode',
 ]
 
 /**
  * A plugin that is defined from the props on the `<Editor>` component.
  *
+ * @param {Object} props
  * @return {Object}
  */
 
