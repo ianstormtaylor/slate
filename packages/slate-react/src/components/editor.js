@@ -10,7 +10,6 @@ import EVENT_HANDLERS from '../constants/event-handlers'
 import BrowserPlugin from '../plugins/browser'
 import PropsPlugin from '../plugins/props'
 import ReactPlugin from '../plugins/react'
-import noop from '../utils/noop'
 
 /**
  * Debug.
@@ -63,7 +62,7 @@ class Editor extends React.Component {
   static defaultProps = {
     autoFocus: false,
     autoCorrect: true,
-    onChange: noop,
+    onChange: () => {},
     options: {},
     plugins: [],
     readOnly: false,
@@ -155,7 +154,7 @@ class Editor extends React.Component {
    * Resolve a set of plugins from the passed-in `plugins` and `schema`.
    *
    * @param {Array} plugins
-   * @param {Schema|Object} schema
+   * @param {Object} schema
    * @return {Array}
    */
 
