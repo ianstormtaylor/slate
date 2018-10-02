@@ -73,33 +73,65 @@ class NodeInterface {
   }
 
   /**
+   * Call f with the node and path of each node in the tree rooted here.
+   *
+   * Deeper nodes are visited before shallower nodes, and later siblings are
+   * visited before earlier siblings. This is a useful order because deleting
+   * nodes as they are traversed won't affect the paths of nodes that are yet to
+   * be visited.
+   *
+   * @param {Function} f
+   * @param {Path|Null}
+   */
+
+  visitNodesReverseDFS(f, path = []) {
+    if (this.nodes) {
+      this.nodes.reverse().forEach((node, fromEndI) => {
+        const i = this.nodes.size - fromEndI - 1
+        node.visitNodesReverseDFS(f, [...path, i])
+      })
+    }
+
+    f(this, path)
+  }
+
+  /**
+   * Get the nodes along the given path.
+   *
+   * @param {Path} path
+   * @returns {List}
+   */
+
+  getNodesInPath(path) {
+    let node = this
+    const ret = [node]
+
+    path.forEach(i => {
+      node = node.nodes.get(i)
+      ret.push(node)
+    })
+    return ret
+  }
+
+  /**
    * Get an object mapping all the keys in the node to their paths.
    *
    * @return {Object}
    */
 
   getKeysToPathsTable() {
-    const ret = {
-      [this.key]: [],
-    }
+    const ret = {}
 
-    if (this.nodes) {
-      this.nodes.forEach((node, i) => {
-        const nested = node.getKeysToPathsTable()
+    this.visitNodesReverseDFS((node, path) => {
+      warning(
+        !(node.key in ret),
+        `A node with a duplicate key of "${
+          node.key
+        }" was found! Duplicate keys are not allowed, you should use \`node.regenerateKey\` before inserting if you are reusing an existing node.`
+      )
 
-        for (const key in nested) {
-          const path = nested[key]
-
-          warning(
-            !(key in ret),
-            `A node with a duplicate key of "${key}" was found! Duplicate keys are not allowed, you should use \`node.regenerateKey\` before inserting if you are reusing an existing node.`
-          )
-
-          ret[key] = [i, ...path]
-        }
-      })
-    }
-
+      ret[node.key] = path
+    })
     return ret
   }
 

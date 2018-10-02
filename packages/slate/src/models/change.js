@@ -1,7 +1,7 @@
 import Debug from 'debug'
 import isPlainObject from 'is-plain-object'
 import warning from 'slate-dev-warning'
-import { List, Map } from 'immutable'
+import { List } from 'immutable'
 
 import Changes from '../changes'
 import Operation from './operation'
@@ -161,44 +161,23 @@ class Change {
     const { value } = this
     const { document } = value
 
-    // TODO: if we had an `Operations.tranform` method, we could optimize this
-    // to not use keys, and instead used transformed operation paths.
-    const table = document.getKeysToPathsTable()
-    let map = Map()
+    const keysToVisit = {}
+    keys.forEach(key => (keysToVisit[key] = true))
+    const pathsToVisit = []
 
-    // TODO: this could be optimized to not need the nested map, and instead use
-    // clever sorting to arrive at the proper depth-first normalizing.
-    keys.forEach(key => {
-      const path = table[key]
-      if (!path) return
-      if (!path.length) return
-      if (!map.hasIn(path)) map = map.setIn(path, Map())
+    document.visitNodesReverseDFS((node, path) => {
+      // If this key is included, also visit the parents.
+      if (keysToVisit[node.key]) {
+        document.getNodesInPath(path).forEach(n => (keysToVisit[n.key] = true))
+
+        pathsToVisit.push(path)
+      }
     })
 
-    // To avoid infinite loops, we need to defer normalization until the end.
     this.withoutNormalizing(() => {
-      this.normalizeMapAndPath(map)
+      pathsToVisit.forEach(path => this.normalizePath(path))
     })
 
-    return this
-  }
-
-  /**
-   * Normalize all of the nodes in a normalization `map`, depth-first. An
-   * additional `path` argument specifics the current depth/location.
-   *
-   * @param {Map} map
-   * @param {Array} path (optional)
-   * @return {Change}
-   */
-
-  normalizeMapAndPath(map, path = []) {
-    map.forEach((m, k) => {
-      const p = [...path, k]
-      this.normalizeMapAndPath(m, p)
-    })
-
-    this.normalizePath(path)
     return this
   }
 
