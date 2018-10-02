@@ -118,7 +118,7 @@ _Note: This is **not** Slate's internal selection representation (although it mi
 
 ### `onChange`
 
-`Function onChange(change: Change) => Any || Void`
+`Function onChange(change: Change, editor: Editor) => Any || Void`
 
 The `onChange` handler isn't a native browser event handler. Instead, it is invoked whenever the editor value changes. This allows plugins to augment a change however they want.
 

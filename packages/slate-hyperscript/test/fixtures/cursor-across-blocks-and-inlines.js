@@ -39,7 +39,7 @@ export const output = {
         nodes: [
           {
             object: 'text',
-            key: '11',
+            key: '13',
             leaves: [
               {
                 object: 'leaf',
@@ -69,7 +69,7 @@ export const output = {
           },
           {
             object: 'text',
-            key: '12',
+            key: '14',
             leaves: [
               {
                 object: 'leaf',
@@ -88,7 +88,7 @@ export const output = {
         nodes: [
           {
             object: 'text',
-            key: '13',
+            key: '11',
             leaves: [
               {
                 object: 'leaf',
@@ -118,7 +118,7 @@ export const output = {
           },
           {
             object: 'text',
-            key: '14',
+            key: '12',
             leaves: [
               {
                 object: 'leaf',
