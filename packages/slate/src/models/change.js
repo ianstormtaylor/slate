@@ -55,7 +55,6 @@ class Change {
     const { operations } = this
     let { value } = this
     let { history } = value
-    const oldValue = value
 
     // Add in the current `value` in case the operation was serialized.
     if (isPlainObject(operation)) {
@@ -84,9 +83,17 @@ class Change {
       value = value.set('history', history)
     }
 
-    // Get the keys of the affected nodes, and mark them as dirty.
-    const keys = getDirtyKeys(operation, value, oldValue)
-    this.tmp.dirty = this.tmp.dirty.concat(keys)
+    // Get the paths of the affected nodes, and mark them as dirty.
+    const newDirtyPaths = getDirtyPaths(operation)
+    const dirty = this.tmp.dirty.reduce((memo, path) => {
+      path = PathUtils.create(path)
+      if (!path) debugger
+      const transformed = PathUtils.transform(path, operation)
+      memo = memo.concat(transformed.toArray())
+      return memo
+    }, newDirtyPaths)
+
+    this.tmp.dirty = dirty
 
     // Update the mutable change object.
     this.value = value
@@ -142,11 +149,14 @@ class Change {
    */
 
   normalizeDirtyOperations() {
-    const { normalize, dirty } = this.tmp
+    const { normalize } = this.tmp
     if (!normalize) return this
-    if (!dirty.length) return this
-    this.tmp.dirty = []
-    this.normalizeKeys(dirty)
+
+    while (this.tmp.dirty.length) {
+      const path = this.tmp.dirty.pop()
+      this.normalizePath(path)
+    }
+
     return this
   }
 
@@ -433,6 +443,68 @@ function getDirtyKeys(operation, newValue, oldValue) {
       const parent = newDocument.assertNode(parentPath)
       const keys = [parent.key]
       return keys
+    }
+
+    default: {
+      return []
+    }
+  }
+}
+
+function getDirtyPaths(operation) {
+  const { type, node, path, newPath } = operation
+
+  switch (type) {
+    case 'add_mark':
+    case 'insert_text':
+    case 'remove_mark':
+    case 'remove_text':
+    case 'set_mark':
+    case 'set_node': {
+      return [path]
+    }
+
+    case 'insert_node': {
+      const table = node.getKeysToPathsTable()
+      const paths = Object.values(table).map(p => path.concat(p))
+      const parentPath = PathUtils.lift(path)
+      return [parentPath, path, ...paths]
+    }
+
+    case 'split_node': {
+      const parentPath = PathUtils.lift(path)
+      const nextPath = PathUtils.increment(path)
+      return [parentPath, path, nextPath]
+    }
+
+    case 'merge_node': {
+      const parentPath = PathUtils.lift(path)
+      const previousPath = PathUtils.decrement(path)
+      return [parentPath, previousPath]
+    }
+
+    case 'move_node': {
+      let parentPath = PathUtils.lift(path)
+      let newParentPath = PathUtils.lift(newPath)
+
+      // HACK: this clause only exists because the `move_path` logic isn't
+      // consistent when it deals with siblings.
+      if (!PathUtils.isSibling(path, newPath)) {
+        if (newParentPath.size && PathUtils.isYounger(path, newPath)) {
+          newParentPath = PathUtils.decrement(newParentPath, 1, path.size - 1)
+        }
+
+        if (parentPath.size && PathUtils.isYounger(newPath, path)) {
+          parentPath = PathUtils.increment(parentPath, 1, newPath.size - 1)
+        }
+      }
+
+      return [parentPath, newParentPath]
+    }
+
+    case 'remove_node': {
+      const parentPath = PathUtils.lift(path)
+      return [parentPath]
     }
 
     default: {

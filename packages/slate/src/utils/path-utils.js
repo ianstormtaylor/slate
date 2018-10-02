@@ -144,6 +144,23 @@ function isEqual(path, target) {
 }
 
 /**
+ * Is a `path` older than a `target` path? Meaning that it ends as an older
+ * sibling of one of the indexes in the target.
+ *
+ * @param {List} path
+ * @param {List} target
+ * @return {Boolean}
+ */
+
+function isOlder(path, target) {
+  const index = path.size - 1
+  const [p, t] = crop(path, target, index)
+  const pl = path.get(index)
+  const tl = target.get(index)
+  return isEqual(p, t) && pl > tl
+}
+
+/**
  * Is a `path` a sibling of a `target` path?
  *
  * @param {List} path
@@ -156,6 +173,23 @@ function isSibling(path, target) {
   const p = path.butLast()
   const t = target.butLast()
   return p.equals(t)
+}
+
+/**
+ * Is a `path` younger than a `target` path? Meaning that it ends as a younger
+ * sibling of one of the indexes in the target.
+ *
+ * @param {List} path
+ * @param {List} target
+ * @return {Boolean}
+ */
+
+function isYounger(path, target) {
+  const index = path.size - 1
+  const [p, t] = crop(path, target, index)
+  const pl = path.get(index)
+  const tl = target.get(index)
+  return isEqual(p, t) && pl < tl
 }
 
 /**
@@ -223,6 +257,98 @@ function relate(a, b) {
 }
 
 /**
+ * Transform a `path` by an `operation`, adjusting it to stay current.
+ *
+ * @param {List} path
+ * @param {Operation} operation
+ * @return {List<List>}
+ */
+
+function transform(path, operation) {
+  const { type, position, path: p } = operation
+
+  if (
+    type === 'add_mark' ||
+    type === 'insert_text' ||
+    type === 'remove_mark' ||
+    type === 'remove_text' ||
+    type === 'set_mark' ||
+    type === 'set_node' ||
+    type === 'set_selection' ||
+    type === 'set_value' ||
+    path.size === 0
+  ) {
+    return List([path])
+  }
+
+  const pIndex = p.size - 1
+  const pEqual = isEqual(p, path)
+  const pYounger = isYounger(p, path)
+  const pAbove = isAbove(p, path)
+
+  if (type === 'insert_node') {
+    if (pEqual || pYounger || pAbove) {
+      path = increment(path, 1, pIndex)
+    }
+  }
+
+  if (type === 'remove_node') {
+    if (pYounger) {
+      path = decrement(path, 1, pIndex)
+    } else if (pEqual || pAbove) {
+      path = []
+    }
+  }
+
+  if (type === 'merge_node') {
+    if (pEqual || pYounger) {
+      path = decrement(path, 1, pIndex)
+    } else if (pAbove) {
+      path = decrement(path, 1, pIndex)
+      path = increment(path, position, pIndex + 1)
+    }
+  }
+
+  if (type === 'split_node') {
+    if (pEqual) {
+      path = [path, increment(path)]
+    } else if (pYounger) {
+      path = increment(path, 1, pIndex)
+    } else if (pAbove) {
+      if (path.get(pIndex + 1) >= position) {
+        path = increment(path, 1, pIndex)
+        path = decrement(path, position, pIndex + 1)
+      }
+    }
+  }
+
+  if (type === 'move_node') {
+    const { newPath: np } = operation
+    const npIndex = np.size - 1
+    const npEqual = isEqual(np, path)
+    const npYounger = isYounger(np, path)
+    const npAbove = isAbove(np, path)
+
+    if (pAbove) {
+      path = np.concat(path.slice(p.size))
+    } else {
+      if (pEqual) {
+        path = np
+      } else if (pYounger) {
+        path = decrement(path, 1, pIndex)
+      }
+
+      if (npEqual || npYounger || npAbove) {
+        path = increment(path, 1, npIndex)
+      }
+    }
+  }
+
+  const paths = Array.isArray(path) ? path : [path]
+  return List(paths)
+}
+
+/**
  * Export.
  *
  * @type {Object}
@@ -238,9 +364,12 @@ export default {
   isAfter,
   isBefore,
   isEqual,
+  isOlder,
   isSibling,
+  isYounger,
   lift,
   max,
   min,
   relate,
+  transform,
 }
