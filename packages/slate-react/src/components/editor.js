@@ -7,6 +7,7 @@ import { Editor as Controller } from 'slate'
 import memoizeOne from 'memoize-one'
 
 import EVENT_HANDLERS from '../constants/event-handlers'
+import BrowserPlugin from '../plugins/browser'
 import PropsPlugin from '../plugins/props'
 import ReactPlugin from '../plugins/react'
 import noop from '../utils/noop'
@@ -142,27 +143,16 @@ class Editor extends React.Component {
     debug('render', this)
     const { controller, tmp } = this
     const props = { ...this.props }
-    const { options, plugins, readOnly, schema, value } = props
-
-    const attrs = {
-      plugins: this.resolvePlugins(plugins, schema),
-      value: tmp.change ? tmp.change.value : value,
-      readOnly,
-    }
-
-    controller.setProperties(attrs, options)
-    const tree = controller.run('renderEditor', props, this)
-    return tree
+    const { options, readOnly } = props
+    const plugins = this.resolvePlugins(props.plugins, props.schema)
+    const value = tmp.change ? tmp.change.value : props.value
+    controller.setProperties({ plugins, readOnly, value }, options)
+    const children = controller.run('renderEditor', props, this)
+    return children
   }
 
   /**
-   * Resolve a set of plugins from potential `plugins` and a `schema`.
-   *
-   * In addition to the plugins provided in props, this will initialize three
-   * other plugins:
-   *
-   * - The "react" plugin which defines default behaviors.
-   * - The "props" plugin, which allows for `onKeyDown`, `onCopy`, etc.
+   * Resolve a set of plugins from the passed-in `plugins` and `schema`.
    *
    * @param {Array} plugins
    * @param {Schema|Object} schema
@@ -181,14 +171,19 @@ class Editor extends React.Component {
     )
 
     const reactPlugin = ReactPlugin()
+    const browserPlugin = BrowserPlugin()
     const propsPlugin = PropsPlugin(this.props, schema)
-    return [reactPlugin, propsPlugin, ...plugins]
+    return [reactPlugin, browserPlugin, propsPlugin, ...plugins]
   }
 
   /**
    * Mimic the API of the `Editor` controller, so that this component instance
    * can be passed in its place to plugins.
    */
+
+  get readOnly() {
+    return this.controller.readOnly
+  }
 
   get value() {
     return this.controller.value
