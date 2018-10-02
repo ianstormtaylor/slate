@@ -87,7 +87,6 @@ class Change {
     const newDirtyPaths = getDirtyPaths(operation)
     const dirty = this.tmp.dirty.reduce((memo, path) => {
       path = PathUtils.create(path)
-      if (!path) debugger
       const transformed = PathUtils.transform(path, operation)
       memo = memo.concat(transformed.toArray())
       return memo
@@ -124,7 +123,7 @@ class Change {
 
   call(fn, ...args) {
     fn(this, ...args)
-    this.normalizeDirtyOperations()
+    this.normalizeDirtyPaths()
     return this
   }
 
@@ -137,78 +136,29 @@ class Change {
   normalize() {
     const { value } = this
     const { document } = value
-    const keys = Object.keys(document.getKeysToPathsTable())
-    this.normalizeKeys(keys)
+    const table = document.getKeysToPathsTable()
+    const paths = Object.values(table).map(PathUtils.create)
+    this.tmp.dirty = this.tmp.dirty.concat(paths)
+    this.normalizeDirtyPaths()
     return this
   }
 
   /**
-   * Normalize any new "dirty" operations that have been added to the change.
+   * Normalize any new "dirty" paths that have been added to the change.
    *
    * @return {Change}
    */
 
-  normalizeDirtyOperations() {
-    const { normalize } = this.tmp
-    if (!normalize) return this
+  normalizeDirtyPaths() {
+    if (!this.tmp.normalize) {
+      return this
+    }
 
     while (this.tmp.dirty.length) {
       const path = this.tmp.dirty.pop()
-      this.normalizePath(path)
+      this.normalizeNodeByPath(path)
     }
 
-    return this
-  }
-
-  /**
-   * Normalize a set of nodes by their `keys`.
-   *
-   * @param {Array} keys
-   * @return {Change}
-   */
-
-  normalizeKeys(keys) {
-    const { value } = this
-    const { document } = value
-
-    // TODO: if we had an `Operations.tranform` method, we could optimize this
-    // to not use keys, and instead used transformed operation paths.
-    const table = document.getKeysToPathsTable()
-    let map = Map()
-
-    // TODO: this could be optimized to not need the nested map, and instead use
-    // clever sorting to arrive at the proper depth-first normalizing.
-    keys.forEach(key => {
-      const path = table[key]
-      if (!path) return
-      if (!path.length) return
-      if (!map.hasIn(path)) map = map.setIn(path, Map())
-    })
-
-    // To avoid infinite loops, we need to defer normalization until the end.
-    this.withoutNormalizing(() => {
-      this.normalizeMapAndPath(map)
-    })
-
-    return this
-  }
-
-  /**
-   * Normalize all of the nodes in a normalization `map`, depth-first. An
-   * additional `path` argument specifics the current depth/location.
-   *
-   * @param {Map} map
-   * @param {Array} path (optional)
-   * @return {Change}
-   */
-
-  normalizeMapAndPath(map, path = []) {
-    map.forEach((m, k) => {
-      const p = [...path, k]
-      this.normalizeMapAndPath(m, p)
-    })
-
-    this.normalizePath(path)
     return this
   }
 
@@ -220,7 +170,7 @@ class Change {
    * @return {Change}
    */
 
-  normalizePath(path) {
+  normalizeNodeByPath(path) {
     const { value } = this
     let { document, schema } = value
     let node = document.assertNode(path)
@@ -274,7 +224,10 @@ class Change {
       iterate()
     }
 
-    iterate()
+    this.withoutNormalizing(() => {
+      iterate()
+    })
+
     return this
   }
 
@@ -291,11 +244,7 @@ class Change {
     this.tmp.normalize = false
     fn(this)
     this.tmp.normalize = value
-
-    if (this.tmp.normalize) {
-      this.normalizeDirtyOperations()
-    }
-
+    this.normalizeDirtyPaths()
     return this
   }
 
@@ -383,73 +332,11 @@ class Change {
 }
 
 /**
- * Get the "dirty" nodes's keys for a given `operation` and values.
+ * Get the "dirty" paths for a given `operation`.
  *
  * @param {Operation} operation
- * @param {Value} newValue
- * @param {Value} oldValue
  * @return {Array}
  */
-
-function getDirtyKeys(operation, newValue, oldValue) {
-  const { type, node, path, newPath } = operation
-  const newDocument = newValue.document
-  const oldDocument = oldValue.document
-
-  switch (type) {
-    case 'add_mark':
-    case 'insert_text':
-    case 'remove_mark':
-    case 'remove_text':
-    case 'set_mark':
-    case 'set_node': {
-      const target = newDocument.assertNode(path)
-      const keys = [target.key]
-      return keys
-    }
-
-    case 'insert_node': {
-      const table = node.getKeysToPathsTable()
-      const keys = Object.keys(table)
-      return keys
-    }
-
-    case 'split_node': {
-      const nextPath = PathUtils.increment(path)
-      const target = newDocument.assertNode(path)
-      const split = newDocument.assertNode(nextPath)
-      const keys = [target.key, split.key]
-      return keys
-    }
-
-    case 'merge_node': {
-      const previousPath = PathUtils.decrement(path)
-      const merged = newDocument.assertNode(previousPath)
-      const keys = [merged.key]
-      return keys
-    }
-
-    case 'move_node': {
-      const parentPath = PathUtils.lift(path)
-      const newParentPath = PathUtils.lift(newPath)
-      const oldParent = oldDocument.assertNode(parentPath)
-      const newParent = oldDocument.assertNode(newParentPath)
-      const keys = [oldParent.key, newParent.key]
-      return keys
-    }
-
-    case 'remove_node': {
-      const parentPath = PathUtils.lift(path)
-      const parent = newDocument.assertNode(parentPath)
-      const keys = [parent.key]
-      return keys
-    }
-
-    default: {
-      return []
-    }
-  }
-}
 
 function getDirtyPaths(operation) {
   const { type, node, path, newPath } = operation
