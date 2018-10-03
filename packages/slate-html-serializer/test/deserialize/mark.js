@@ -35,7 +35,10 @@ export const output = (
   <value>
     <document>
       <paragraph>
-        on<b>e</b>
+        <text>on</text>
+        <text>
+          <b>e</b>
+        </text>
       </paragraph>
     </document>
   </value>
