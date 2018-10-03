@@ -30,7 +30,7 @@ export const output = {
   object: 'value',
   document: {
     object: 'document',
-    key: '3',
+    key: '2',
     data: {},
     nodes: [
       {

@@ -3,18 +3,19 @@
 import h from 'slate-hyperscript'
 
 export const input = (
-  <document>
-    <block type="paragraph">word</block>
-  </document>
+  <block type="paragraph">
+    <inline type="link">word</inline>
+  </block>
 )
 
 export const output = {
-  object: 'document',
+  object: 'block',
+  type: 'paragraph',
   data: {},
   nodes: [
     {
-      object: 'block',
-      type: 'paragraph',
+      object: 'inline',
+      type: 'link',
       data: {},
       nodes: [
         {

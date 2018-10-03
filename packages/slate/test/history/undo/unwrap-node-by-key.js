@@ -2,12 +2,14 @@
 
 import h from '../../helpers/h'
 
-export default function(value) {
-  return value
-    .change()
-    .unwrapNodeByKey('a')
-    .value.change()
-    .undo().value
+export default function(editor) {
+  editor.change(change => {
+    change.unwrapNodeByKey('a')
+  })
+
+  editor.change(change => {
+    change.undo()
+  })
 }
 
 export const input = (

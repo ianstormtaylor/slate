@@ -77,20 +77,20 @@ class Editor {
       return
     }
 
-    this.run('onChange', change)
-
     // If the change doesn't define any operations to apply, abort.
     if (change.operations.size === 0) {
       return
     }
 
+    this.run('onChange', change)
+
     // Store a reference to the last `value` and `plugins` that were seen by the
     // editor, so we can know whether to normalize a new unknown value if one
     // is passed in via `this.props`.
-    this.tmp.lastValue = change.value
     this.tmp.lastPlugins = this.plugins
 
     // Call the provided `onChange` handler.
+    this.value = change.value
     this.onChange(change)
   }
 
@@ -202,8 +202,8 @@ class Editor {
     const array = []
 
     for (const plugin of plugins) {
-      const { commands, queries, schema } = plugin
-      array.push(plugin)
+      const { commands, queries, schema, ...rest } = plugin
+      array.push(rest)
 
       if (commands) {
         const commandsPlugin = CommandsPlugin(commands)
@@ -280,20 +280,22 @@ class Editor {
 
     // PERF: If the plugins and value haven't changed from the last seen one, we
     // don't have to normalize it because we know it was already normalized.
-    if (
-      normalize === false ||
-      (this.plugins === this.tmp.lastPlugins && value === this.tmp.lastValue)
-    ) {
-      this.value = value
+    if (value === this.value && this.plugins === this.tmp.lastPlugins) {
       return this
     }
 
     this.value = value
 
+    // If the `normalize` option is false, do not normalize new unknown values.
+    if (normalize === false) {
+      return this
+    }
+
     this.change(change => {
       change.normalize()
+      const { document, selection } = change.value
 
-      if (value.selection.isUnset) {
+      if (selection.isUnset && document.nodes.size) {
         change.moveToStartOfDocument()
       }
     })

@@ -245,6 +245,20 @@ class Leaf extends Record(DEFAULTS) {
   }
 
   /**
+   * Insert a text `string` into the leaf at `offset`.
+   *
+   * @param {Number} offset
+   * @param {String} string
+   * @return {Leaf}
+   */
+
+  insertText(offset, string) {
+    const { text } = this
+    const next = text.slice(0, offset) + string + text.slice(offset)
+    return this.set('text', next)
+  }
+
+  /**
    * Remove a `mark` from the leaf.
    *
    * @param {Mark} mark

@@ -467,39 +467,19 @@ class Value extends Record(DEFAULTS) {
 
   insertText(path, offset, text, marks) {
     let value = this
-    // let { document, schema } = value
     let { document } = value
+    const node = document.assertNode(path)
     document = document.insertText(path, offset, text, marks)
     value = value.set('document', document)
 
-    // Update any ranges that were affected.
-    const node = document.assertNode(path)
-
     value = value.mapRanges(range => {
-      const { anchor, focus, isBackward, isCollapsed } = range
-      // const isAtomic =
-      // Decoration.isDecoration(range) && schema.isAtomic(range.mark)
-
-      if (
-        anchor.key === node.key &&
-        (anchor.offset > offset ||
-          (anchor.offset === offset && (isCollapsed || !isBackward)))
-      ) {
-        range = range.moveAnchorForward(text.length)
-      }
-
-      if (
-        focus.key === node.key &&
-        (focus.offset > offset ||
-          (focus.offset === offset && (isCollapsed || isBackward)))
-      ) {
-        range = range.moveFocusForward(text.length)
-      }
-
-      return range
+      return range.updatePoints(point => {
+        return point.key === node.key && point.offset >= offset
+          ? point.setOffset(point.offset + text.length)
+          : point
+      })
     })
 
-    value = value.clearAtomicRanges(node.key, offset)
     return value
   }
 

@@ -134,6 +134,7 @@ function SchemaPlugin(schema) {
    */
 
   function onQuery(query, next) {
+    debugger
     // Defer to the other plugins in the stack.
     const ret = next()
     if (ret !== undefined) return ret
@@ -184,8 +185,8 @@ function defaultNormalize(change, error) {
       return child.object === 'text' &&
         node.object === 'block' &&
         node.nodes.size === 1
-        ? change.removeNodeByKey(node.key, { normalize: false })
-        : change.removeNodeByKey(child.key, { normalize: false })
+        ? change.removeNodeByKey(node.key)
+        : change.removeNodeByKey(child.key)
     }
 
     case 'previous_sibling_object_invalid':
@@ -193,8 +194,8 @@ function defaultNormalize(change, error) {
       return previous.object === 'text' &&
         node.object === 'block' &&
         node.nodes.size === 1
-        ? change.removeNodeByKey(node.key, { normalize: false })
-        : change.removeNodeByKey(previous.key, { normalize: false })
+        ? change.removeNodeByKey(node.key)
+        : change.removeNodeByKey(previous.key)
     }
 
     case 'next_sibling_object_invalid':
@@ -202,8 +203,8 @@ function defaultNormalize(change, error) {
       return next.object === 'text' &&
         node.object === 'block' &&
         node.nodes.size === 1
-        ? change.removeNodeByKey(node.key, { normalize: false })
-        : change.removeNodeByKey(next.key, { normalize: false })
+        ? change.removeNodeByKey(node.key)
+        : change.removeNodeByKey(next.key)
     }
 
     case 'child_required':
@@ -211,32 +212,24 @@ function defaultNormalize(change, error) {
     case 'parent_object_invalid':
     case 'parent_type_invalid': {
       return node.object === 'document'
-        ? node.nodes.forEach(n =>
-            change.removeNodeByKey(n.key, { normalize: false })
-          )
-        : change.removeNodeByKey(node.key, { normalize: false })
+        ? node.nodes.forEach(n => change.removeNodeByKey(n.key))
+        : change.removeNodeByKey(node.key)
     }
 
     case 'node_data_invalid': {
       return node.data.get(key) === undefined && node.object !== 'document'
-        ? change.removeNodeByKey(node.key, { normalize: false })
-        : change.setNodeByKey(
-            node.key,
-            { data: node.data.delete(key) },
-            { normalize: false }
-          )
+        ? change.removeNodeByKey(node.key)
+        : change.setNodeByKey(node.key, { data: node.data.delete(key) })
     }
 
     case 'node_mark_invalid': {
-      return node.getTexts().forEach(t =>
-        change.removeMarkByKey(t.key, 0, t.text.length, mark, {
-          normalize: false,
-        })
-      )
+      return node
+        .getTexts()
+        .forEach(t => change.removeMarkByKey(t.key, 0, t.text.length, mark))
     }
 
     default: {
-      return change.removeNodeByKey(node.key, { normalize: false })
+      return change.removeNodeByKey(node.key)
     }
   }
 }

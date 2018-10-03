@@ -175,8 +175,7 @@ class Change {
   }
 
   /**
-   * Normalize the node at a specific `path`, iterating as many times as
-   * necessary until it satisfies all of the schema rules.
+   * Normalize the node at a specific `path`.
    *
    * @param {Array} path
    * @return {Change}

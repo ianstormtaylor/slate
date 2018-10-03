@@ -790,16 +790,18 @@ Commands.insertInlineAtRange = (change, range, inline) => {
  */
 
 Commands.insertTextAtRange = (change, range, text, marks) => {
-  const { editor, value } = change
+  const { value } = change
   const { document } = value
   const { start } = range
   let key = start.key
   let offset = start.offset
   const parent = document.getParent(start.key)
 
+  debugger
   if (change.isVoid(parent)) {
     return
   }
+  debugger
 
   change.withoutNormalizing(() => {
     if (range.isExpanded) {
