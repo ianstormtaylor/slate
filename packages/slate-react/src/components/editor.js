@@ -144,9 +144,8 @@ class Editor extends React.Component {
     const props = { ...this.props }
 
     // Update the props on the controller before rendering.
-    const { options, readOnly } = props
+    const { options, readOnly, value } = props
     const plugins = this.resolvePlugins(props.plugins, props.schema)
-    const value = tmp.change ? tmp.change.value : props.value
     controller.setProperties({ plugins, readOnly, value }, options)
 
     // Render the children using the controller's stack.

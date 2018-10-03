@@ -20,11 +20,11 @@ const { FRAGMENT, HTML, TEXT } = TRANSFER_TYPES
 function cloneFragment(event, editor, callback = () => undefined) {
   const window = getWindow(event.target)
   const native = window.getSelection()
-  const { schema, value } = editor
+  const { value } = editor
   const { document, fragment, selection } = value
   const { start, end } = selection
-  const startVoid = document.getClosestVoid(start.key, schema)
-  const endVoid = document.getClosestVoid(end.key, schema)
+  const startVoid = document.getClosestVoid(start.key, editor)
+  const endVoid = document.getClosestVoid(end.key, editor)
 
   // If the selection is collapsed, and it isn't inside a void node, abort.
   if (native.isCollapsed && !startVoid) return

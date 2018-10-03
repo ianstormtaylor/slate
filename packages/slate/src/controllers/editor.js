@@ -282,8 +282,7 @@ class Editor {
     // don't have to normalize it because we know it was already normalized.
     if (
       normalize === false ||
-      (this.plugins === this.tmp.lastPlugins &&
-        this.value === this.tmp.lastValue)
+      (this.plugins === this.tmp.lastPlugins && value === this.tmp.lastValue)
     ) {
       this.value = value
       return this
