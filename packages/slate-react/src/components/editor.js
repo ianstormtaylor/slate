@@ -140,16 +140,15 @@ class Editor extends React.Component {
 
   render() {
     debug('render', this)
-    const { controller, tmp } = this
     const props = { ...this.props }
 
     // Update the props on the controller before rendering.
     const { options, readOnly, value } = props
     const plugins = this.resolvePlugins(props.plugins, props.schema)
-    controller.setProperties({ plugins, readOnly, value }, options)
+    this.controller.setProperties({ plugins, readOnly, value }, options)
 
     // Render the children using the controller's stack.
-    const children = controller.run('renderEditor', props, this)
+    const children = this.controller.run('renderEditor', props, this)
     return children
   }
 

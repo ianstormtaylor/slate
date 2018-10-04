@@ -581,7 +581,7 @@ Commands.insertBlockAtRange = (change, range, block) => {
     range = range.moveToStart()
   }
 
-  const { editor, value } = change
+  const { value } = change
   const { document } = value
   const { start } = range
   let startKey = start.key
@@ -654,7 +654,7 @@ Commands.insertFragmentAtRange = (change, range, fragment) => {
 
     // Calculate a few things...
     const { start } = range
-    const { editor, value } = change
+    const { value } = change
     let { document } = value
     let startText = document.getDescendant(start.key)
     let startBlock = document.getClosestBlock(startText.key)
@@ -766,7 +766,7 @@ Commands.insertInlineAtRange = (change, range, inline) => {
       range = range.moveToStart()
     }
 
-    const { editor, value } = change
+    const { value } = change
     const { document } = value
     const { start } = range
     const parent = document.getParent(start.key)
@@ -797,11 +797,9 @@ Commands.insertTextAtRange = (change, range, text, marks) => {
   let offset = start.offset
   const parent = document.getParent(start.key)
 
-  debugger
   if (change.isVoid(parent)) {
     return
   }
-  debugger
 
   change.withoutNormalizing(() => {
     if (range.isExpanded) {
@@ -1205,7 +1203,7 @@ Commands.wrapBlockAtRange = (change, range, block) => {
  */
 
 Commands.wrapInlineAtRange = (change, range, inline) => {
-  const { editor, value } = change
+  const { value } = change
   let { document } = value
   const { start, end } = range
 

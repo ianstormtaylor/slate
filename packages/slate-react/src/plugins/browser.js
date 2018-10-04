@@ -503,7 +503,7 @@ function BrowserPlugin() {
     const ret = next()
     if (ret !== undefined) return ret
 
-    const { editor, value } = change
+    const { value } = change
     const { document } = value
     const node = findNode(event.target, value)
     const ancestors = document.getAncestors(node.key)
