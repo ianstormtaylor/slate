@@ -28,7 +28,9 @@ export const input = (
 export const output = (
   <value>
     <document>
-      <quote />
+      <quote>
+        <text />
+      </quote>
     </document>
   </value>
 )

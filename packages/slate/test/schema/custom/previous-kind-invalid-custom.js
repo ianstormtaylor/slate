@@ -19,8 +19,12 @@ export const input = (
   <value>
     <document>
       <paragraph>
-        <quote />
-        <image />
+        <quote>
+          <text />
+        </quote>
+        <image>
+          <text />
+        </image>
       </paragraph>
     </document>
   </value>
@@ -29,9 +33,13 @@ export const input = (
 export const output = (
   <value>
     <document>
-      <quote />
+      <quote>
+        <text />
+      </quote>
       <paragraph>
-        <image />
+        <image>
+          <text />
+        </image>
       </paragraph>
     </document>
   </value>

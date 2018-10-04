@@ -185,7 +185,6 @@ class Change {
     const { editor, value } = this
     let { document } = value
     let node = document.assertNode(path)
-
     let iterations = 0
     const max = 1000 + (node.object === 'text' ? 1 : node.nodes.size)
 

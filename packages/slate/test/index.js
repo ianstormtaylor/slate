@@ -114,29 +114,11 @@ describe('slate', () => {
   })
 
   fixtures(__dirname, 'schema', ({ module }) => {
-    let { input, output, schema } = module
-
-    if (!Value.isValue(input)) {
-      input = Value.fromJSON(input)
-    }
-
-    const plugin = [{ schema }]
-    const editor = new Editor({ plugins: [plugin] })
-
-    editor.setValue(input)
-    let actual = editor.value
-
-    editor.setValue(output)
-    let expected = editor.value
-
-    if (Value.isValue(actual)) {
-      actual = actual.toJSON()
-    }
-
-    if (Value.isValue(expected)) {
-      expected = expected.toJSON()
-    }
-
+    const { input, output, schema } = module
+    const editor = new Editor({ value: input, plugins: [{ schema }] })
+    debugger
+    const actual = editor.value.toJSON()
+    const expected = output.toJSON()
     assert.deepEqual(actual, expected)
   })
 

@@ -89,7 +89,7 @@ function SchemaPlugin(schema) {
 
   function validateNode(node) {
     const matches = schemaRules.filter(r => testRules(node, r.match))
-    const failure = validateRules(node, matches, rules, { every: true })
+    const failure = validateRules(node, matches, schemaRules, { every: true })
     if (!failure) return
     const error = new SlateError(failure.code, failure)
     return error
@@ -134,7 +134,6 @@ function SchemaPlugin(schema) {
    */
 
   function onQuery(query, next) {
-    debugger
     // Defer to the other plugins in the stack.
     const ret = next()
     if (ret !== undefined) return ret
