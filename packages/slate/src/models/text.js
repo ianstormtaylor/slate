@@ -307,7 +307,7 @@ class Text extends Record(DEFAULTS) {
     const result = this.leaves.first().marks
     if (result.size === 0) return result
 
-    return result.withMutations(x => {
+    return result.toOrderedSet().withMutations(x => {
       this.leaves.forEach(c => {
         x.intersect(c.marks)
         if (x.size === 0) return false
