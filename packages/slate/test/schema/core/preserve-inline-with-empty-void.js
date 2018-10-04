@@ -11,7 +11,9 @@ export const input = (
         <text />
         <link>
           <text />
-          <inline type="" />
+          <inline type="">
+            <text />
+          </inline>
           <text />
         </link>
         <text />

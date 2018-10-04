@@ -116,7 +116,6 @@ describe('slate', () => {
   fixtures(__dirname, 'schema', ({ module }) => {
     const { input, output, schema } = module
     const editor = new Editor({ value: input, plugins: [{ schema }] })
-    debugger
     const actual = editor.value.toJSON()
     const expected = output.toJSON()
     assert.deepEqual(actual, expected)

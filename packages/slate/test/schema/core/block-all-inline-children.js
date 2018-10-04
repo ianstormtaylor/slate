@@ -8,7 +8,9 @@ export const input = (
   <value>
     <document>
       <quote>
+        <text />
         <link>one</link>
+        <text />
         <paragraph>two</paragraph>
       </quote>
     </document>
@@ -19,7 +21,9 @@ export const output = (
   <value>
     <document>
       <quote>
+        <text />
         <link>one</link>
+        <text />
       </quote>
     </document>
   </value>
