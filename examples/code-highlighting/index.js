@@ -188,9 +188,8 @@ class CodeHighlighting extends React.Component {
    * @return {Array}
    */
 
-  decorateNode = (node, next) => {
-    const others = next()
-    if (node.type != 'code') return others
+  decorateNode = node => {
+    if (node.type != 'code') return
 
     const language = node.data.get('language')
     const texts = node.getTexts().toArray()
@@ -246,7 +245,7 @@ class CodeHighlighting extends React.Component {
       start = end
     }
 
-    return [...others, ...decorations]
+    return decorations
   }
 }
 
