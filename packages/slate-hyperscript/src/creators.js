@@ -310,7 +310,7 @@ export function createText(tagName, attributes, children) {
 export function createValue(tagName, attributes, children) {
   const { data } = attributes
   const document = children.find(Document.isDocument)
-  let selection = children.find(Selection.isSelection) || Selection.create()
+  let selection = children.find(Selection.isSelection)
   let anchor
   let focus
   let decorations = []
@@ -379,20 +379,29 @@ export function createValue(tagName, attributes, children) {
     )
   }
 
-  let value = Value.fromJSON({ data, document, selection, ...attributes })
-
   if (anchor || focus) {
-    selection = selection.setPoints([anchor, focus])
-    selection = selection.setIsFocused(true)
-    selection = selection.normalize(value.document)
-    value = value.set('selection', selection)
+    if (!selection) {
+      selection = Selection.create({ anchor, focus, isFocused: true })
+    } else {
+      selection = selection.setPoints([anchor, focus])
+    }
+  } else if (!selection) {
+    selection = Selection.create()
   }
+
+  selection = selection.normalize(document)
 
   if (decorations.length > 0) {
-    decorations = decorations.map(d => d.normalize(value.document))
-    decorations = Decoration.createList(decorations)
-    value = value.set('decorations', decorations)
+    decorations = decorations.map(d => d.normalize(document))
   }
+
+  const value = Value.fromJSON({
+    data,
+    decorations,
+    document,
+    selection,
+    ...attributes,
+  })
 
   return value
 }

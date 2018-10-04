@@ -15,6 +15,8 @@ describe('slate-react', () => {
       ...(props || {}),
     }
 
+    debugger
+
     const string = ReactDOM.renderToStaticMarkup(<Editor {...p} />)
     const dom = JSDOM.fragment(output)
     const expected = dom.firstChild.outerHTML

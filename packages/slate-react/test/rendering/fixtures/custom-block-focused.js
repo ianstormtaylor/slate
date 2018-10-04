@@ -33,13 +33,21 @@ export const value = (
   <value>
     <document>
       <paragraph>
-        <anchor />
+        <text key="a">
+          <anchor />
+        </text>
       </paragraph>
-      <image key="a" src="https://example.com/image.png" />
+      <image src="https://example.com/image.png">
+        <text />
+      </image>
       <paragraph>
-        <focus />
+        <text key="b">
+          <focus />
+        </text>
       </paragraph>
-      <image key="b" src="https://example.com/image2.png" />
+      <image src="https://example.com/image2.png">
+        <text />
+      </image>
     </document>
   </value>
 )

@@ -618,37 +618,30 @@ class Value extends Record(DEFAULTS) {
   removeText(path, offset, text) {
     let value = this
     let { document } = value
+    const node = document.assertNode(path)
     document = document.removeText(path, offset, text)
     value = value.set('document', document)
 
-    const node = document.assertNode(path)
     const { length } = text
-    const rangeOffset = offset + length
-
-    value = value.clearAtomicRanges(node.key, offset, offset + length)
+    const start = offset
+    const end = offset + length
 
     value = value.mapRanges(range => {
-      const { anchor, focus } = range
+      return range.updatePoints(point => {
+        if (point.key !== node.key) {
+          return point
+        }
 
-      if (anchor.key === node.key) {
-        range =
-          anchor.offset >= rangeOffset
-            ? range.moveAnchorBackward(length)
-            : anchor.offset > offset
-              ? range.moveAnchorTo(anchor.key, offset)
-              : range
-      }
+        if (point.offset >= end) {
+          return point.setOffset(point.offset - length)
+        }
 
-      if (focus.key === node.key) {
-        range =
-          focus.offset >= rangeOffset
-            ? range.moveFocusBackward(length)
-            : focus.offset > offset
-              ? range.moveFocusTo(focus.key, offset)
-              : range
-      }
+        if (point.offset > start) {
+          return point.setOffset(start)
+        }
 
-      return range
+        return point
+      })
     })
 
     return value
@@ -796,44 +789,6 @@ class Value extends Record(DEFAULTS) {
 
     decs = decs.filter(decoration => !!decoration)
     value = value.set('decorations', decs)
-    return value
-  }
-
-  /**
-   * Remove any atomic ranges inside a `key`, `offset` and `length`.
-   *
-   * @param {String} key
-   * @param {Number} from
-   * @param {Number?} to
-   * @return {Value}
-   */
-
-  clearAtomicRanges(key, from, to = null) {
-    let value = this
-    // const { schema } = value
-
-    value = this.mapRanges(range => {
-      if (!Decoration.isDecoration(range)) return range
-      const { start, end, mark } = range
-      // const isAtomic = schema.isAtomic(mark)
-      // if (!isAtomic) return range
-      if (start.key !== key) return range
-
-      if (start.offset < from && (end.key !== key || end.offset > from)) {
-        return null
-      }
-
-      if (
-        to != null &&
-        start.offset < to &&
-        (end.key !== key || end.offset > to)
-      ) {
-        return null
-      }
-
-      return range
-    })
-
     return value
   }
 

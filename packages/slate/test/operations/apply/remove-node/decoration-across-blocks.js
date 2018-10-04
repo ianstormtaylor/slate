@@ -4,11 +4,8 @@ import h from '../../../helpers/h'
 
 export default [
   {
-    type: 'insert_text',
-    path: [0, 0],
-    offset: 2,
-    text: ' added',
-    marks: [],
+    type: 'remove_node',
+    path: [0],
   },
 ]
 
@@ -16,7 +13,10 @@ export const input = (
   <value>
     <document>
       <paragraph>
-        Hi<cursor /> there <highlight>you</highlight>
+        o<highlight key="a" />ne
+      </paragraph>
+      <paragraph>
+        tw<highlight key="a" />o
       </paragraph>
     </document>
   </value>
@@ -26,7 +26,7 @@ export const output = (
   <value>
     <document>
       <paragraph>
-        Hi added<cursor /> there <highlight>you</highlight>
+        <highlight>tw</highlight>o
       </paragraph>
     </document>
   </value>

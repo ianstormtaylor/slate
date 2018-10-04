@@ -26,9 +26,13 @@ export const value = (
   <value>
     <document>
       <paragraph>
+        <text />
         <link href="https://google.com">word</link>
+        <text />
         <link href="https://google.com">word</link>
+        <text />
         <link href="https://google.com">word</link>
+        <text />
       </paragraph>
     </document>
   </value>

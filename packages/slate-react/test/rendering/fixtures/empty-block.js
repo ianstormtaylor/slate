@@ -7,7 +7,9 @@ export const props = {}
 export const value = (
   <value>
     <document>
-      <paragraph />
+      <paragraph>
+        <text />
+      </paragraph>
     </document>
   </value>
 )

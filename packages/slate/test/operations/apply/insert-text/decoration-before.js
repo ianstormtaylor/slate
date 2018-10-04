@@ -4,10 +4,10 @@ import h from '../../../helpers/h'
 
 export default [
   {
-    type: 'remove_text',
+    type: 'insert_text',
     path: [0, 0],
     offset: 1,
-    text: 'or',
+    text: 'x',
     marks: [],
   },
 ]
@@ -16,7 +16,8 @@ export const input = (
   <value>
     <document>
       <paragraph>
-        <result>w</result>ord
+        w<cursor />
+        <highlight>or</highlight>d
       </paragraph>
     </document>
   </value>
@@ -26,7 +27,8 @@ export const output = (
   <value>
     <document>
       <paragraph>
-        <result>w</result>d
+        wx<cursor />
+        <highlight>or</highlight>d
       </paragraph>
     </document>
   </value>

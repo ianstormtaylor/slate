@@ -61,9 +61,12 @@ class Change {
 
     operation = Operation.create(operation)
 
-    // Save the operation into the history.
-    this.save(operation)
-    value = this.value
+    // Save the operation into the history. Since `save` is a command, we need
+    // to do it without normalizing, since it would have side effects.
+    this.withoutNormalizing(() => {
+      this.save(operation)
+      value = this.value
+    })
 
     // Apply the operation to the value.
     debug('apply', { operation })

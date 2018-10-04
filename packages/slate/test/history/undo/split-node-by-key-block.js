@@ -16,9 +16,13 @@ export const input = (
   <value>
     <document>
       <paragraph key="a">
+        <text />
         <link>one</link>
-        <cursor />
+        <text>
+          <cursor />
+        </text>
         <link>two</link>
+        <text />
       </paragraph>
     </document>
   </value>

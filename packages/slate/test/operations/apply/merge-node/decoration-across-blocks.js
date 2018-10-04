@@ -4,8 +4,18 @@ import h from '../../../helpers/h'
 
 export default [
   {
-    type: 'remove_node',
-    path: [0],
+    type: 'merge_node',
+    path: [1],
+    position: 1,
+    properties: {},
+    target: null,
+  },
+  {
+    type: 'merge_node',
+    path: [0, 1],
+    position: 1,
+    properties: {},
+    target: null,
   },
 ]
 
@@ -13,11 +23,10 @@ export const input = (
   <value>
     <document>
       <paragraph>
-        The decoration begins<highlight key="1" /> in this soon deleted
-        paragraph
+        o<highlight key="a" />ne
       </paragraph>
       <paragraph>
-        And ends in this <highlight key="1" />one.
+        tw<highlight key="a" />o
       </paragraph>
     </document>
   </value>
@@ -27,7 +36,7 @@ export const output = (
   <value>
     <document>
       <paragraph>
-        <highlight key="1" />And ends in this <highlight key="1" />one.
+        o<highlight>netw</highlight>o
       </paragraph>
     </document>
   </value>
