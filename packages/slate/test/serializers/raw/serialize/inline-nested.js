@@ -6,9 +6,13 @@ export const input = (
   <value>
     <document>
       <paragraph>
+        <text />
         <link>
+          <text />
           <hashtag>one</hashtag>
+          <text />
         </link>
+        <text />
       </paragraph>
     </document>
   </value>

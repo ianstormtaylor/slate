@@ -29,7 +29,9 @@ export const output = (
         <text />
         <link>
           <text />
-          <inline type="" />
+          <inline type="">
+            <text />
+          </inline>
           <text />
         </link>
         <text />

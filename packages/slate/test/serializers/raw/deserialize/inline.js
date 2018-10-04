@@ -60,7 +60,9 @@ export const output = (
   <value>
     <document>
       <paragraph>
+        <text />
         <link>one</link>
+        <text />
       </paragraph>
     </document>
   </value>

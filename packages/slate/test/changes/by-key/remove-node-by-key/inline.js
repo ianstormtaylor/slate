@@ -10,7 +10,9 @@ export const input = (
   <value>
     <document>
       <paragraph>
+        <text />
         <link key="a">one</link>
+        <text />
       </paragraph>
       <paragraph>two</paragraph>
     </document>
@@ -20,7 +22,9 @@ export const input = (
 export const output = (
   <value>
     <document>
-      <paragraph />
+      <paragraph>
+        <text />
+      </paragraph>
       <paragraph>two</paragraph>
     </document>
   </value>
