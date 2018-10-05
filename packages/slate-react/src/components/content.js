@@ -270,8 +270,9 @@ class Content extends React.Component {
     let el
 
     try {
+      // COMPAT: In Firefox, sometimes the node can be comment which doesn't
+      // have .closest and it crashes.
       if (target.nodeType === 8) {
-        // COMPAT: in Firefox, sometimes the node can be comment which doesn't have .closest and it crashes
         return false
       }
 
