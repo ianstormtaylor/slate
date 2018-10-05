@@ -82,6 +82,16 @@ class Emojis extends React.Component {
   }
 
   /**
+   * Store a reference to the `editor`.
+   *
+   * @param {Editor} editor
+   */
+
+  ref = editor => {
+    this.editor = editor
+  }
+
+  /**
    * Render the app.
    *
    * @return {Element} element
@@ -99,6 +109,7 @@ class Emojis extends React.Component {
         </Toolbar>
         <Editor
           placeholder="Write some 😍👋🎉..."
+          ref={this.ref}
           value={this.state.value}
           schema={this.schema}
           onChange={this.onChange}
@@ -156,18 +167,16 @@ class Emojis extends React.Component {
 
   onClickEmoji = (e, code) => {
     e.preventDefault()
-    const { value } = this.state
-    const change = value.change()
 
-    change
-      .insertInline({
-        type: 'emoji',
-        data: { code },
-      })
-      .moveToStartOfNextText()
-      .focus()
-
-    this.onChange(change)
+    this.editor.change(change => {
+      change
+        .insertInline({
+          type: 'emoji',
+          data: { code },
+        })
+        .moveToStartOfNextText()
+        .focus()
+    })
   }
 }
 

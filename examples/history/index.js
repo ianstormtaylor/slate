@@ -23,6 +23,16 @@ class History extends React.Component {
   }
 
   /**
+   * Store a reference to the `editor`.
+   *
+   * @param {Editor} editor
+   */
+
+  ref = editor => {
+    this.editor = editor
+  }
+
+  /**
    * Render the editor.
    *
    * @return {Component} component
@@ -30,7 +40,9 @@ class History extends React.Component {
 
   render() {
     const { value } = this.state
-    const { history } = value
+    const { data } = value
+    const undos = data.get('undos')
+    const redos = data.get('redos')
     return (
       <div>
         <Toolbar>
@@ -40,11 +52,12 @@ class History extends React.Component {
           <Button onMouseDown={this.onClickRedo}>
             <Icon>redo</Icon>
           </Button>
-          <span>Undos: {history.undos.size}</span>
-          <span>Redos: {history.redos.size}</span>
+          <span>Undos: {undos ? undos.size : 0}</span>
+          <span>Redos: {redos ? redos.size : 0}</span>
         </Toolbar>
         <Editor
           placeholder="Enter some text..."
+          ref={this.ref}
           value={this.state.value}
           onChange={this.onChange}
         />
@@ -69,9 +82,7 @@ class History extends React.Component {
 
   onClickRedo = event => {
     event.preventDefault()
-    const { value } = this.state
-    const change = value.change().redo()
-    this.onChange(change)
+    this.editor.change(change => change.redo())
   }
 
   /**
@@ -81,9 +92,7 @@ class History extends React.Component {
 
   onClickUndo = event => {
     event.preventDefault()
-    const { value } = this.state
-    const change = value.change().undo()
-    this.onChange(change)
+    this.editor.change(change => change.undo())
   }
 }
 

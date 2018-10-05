@@ -55,9 +55,9 @@ class SyncingEditor extends React.Component {
    */
 
   applyOperations = operations => {
-    const { value } = this.state
-    const change = value.change().applyOperations(operations)
-    this.onChange(change, { remote: true })
+    this.remote = true
+    this.editor.change(change => change.applyOperations(operations))
+    this.remote = false
   }
 
   /**
@@ -70,6 +70,16 @@ class SyncingEditor extends React.Component {
   hasMark = type => {
     const { value } = this.state
     return value.activeMarks.some(mark => mark.type == type)
+  }
+
+  /**
+   * Store a reference to the `editor`.
+   *
+   * @param {Editor} editor
+   */
+
+  ref = editor => {
+    this.editor = editor
   }
 
   /**
@@ -89,6 +99,7 @@ class SyncingEditor extends React.Component {
         </Toolbar>
         <Editor
           placeholder="Enter some text..."
+          ref={this.ref}
           value={this.state.value}
           onChange={this.onChange}
           onKeyDown={this.onKeyDown}
@@ -151,7 +162,7 @@ class SyncingEditor extends React.Component {
   onChange = (change, options = {}) => {
     this.setState({ value: change.value })
 
-    if (!options.remote) {
+    if (!this.remote) {
       this.props.onChange(change)
     }
   }
@@ -193,9 +204,7 @@ class SyncingEditor extends React.Component {
 
   onClickMark = (event, type) => {
     event.preventDefault()
-    const { value } = this.state
-    const change = value.change().toggleMark(type)
-    this.onChange(change)
+    this.editor.change(change => change.toggleMark(type))
   }
 }
 

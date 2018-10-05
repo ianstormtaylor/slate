@@ -63,7 +63,8 @@ class HoverMenu extends React.Component {
    */
 
   renderMarkButton(type, icon) {
-    const { value } = this.props
+    const { editor } = this.props
+    const { value } = editor
     const isActive = value.activeMarks.some(mark => mark.type == type)
     return (
       <Button
@@ -84,10 +85,9 @@ class HoverMenu extends React.Component {
    */
 
   onClickMark(event, type) {
-    const { value, onChange } = this.props
+    const { editor } = this.props
     event.preventDefault()
-    const change = value.change().toggleMark(type)
-    onChange(change)
+    editor.change(change => change.toggleMark(type))
   }
 }
 
@@ -157,18 +157,31 @@ class HoveringMenu extends React.Component {
   render() {
     return (
       <div>
-        <HoverMenu
-          innerRef={menu => (this.menu = menu)}
-          value={this.state.value}
-          onChange={this.onChange}
-        />
         <Editor
           placeholder="Enter some text..."
           value={this.state.value}
           onChange={this.onChange}
+          renderEditor={this.renderEditor}
           renderMark={this.renderMark}
         />
       </div>
+    )
+  }
+
+  /**
+   * Render the editor.
+   *
+   * @param {Object} props
+   * @param {Editor} editor
+   * @return {Element}
+   */
+
+  renderEditor = (props, editor) => {
+    return (
+      <React.Fragment>
+        {props.children}
+        <HoverMenu innerRef={menu => (this.menu = menu)} editor={editor} />
+      </React.Fragment>
     )
   }
 

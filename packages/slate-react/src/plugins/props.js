@@ -8,13 +8,14 @@ import EVENT_HANDLERS from '../constants/event-handlers'
 
 const PROPS = [
   ...EVENT_HANDLERS,
+  'commands',
   'decorateNode',
+  'queries',
   'renderEditor',
   'renderMark',
   'renderNode',
   'renderPlaceholder',
   'schema',
-  'normalizeNode',
 ]
 
 /**
