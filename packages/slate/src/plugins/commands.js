@@ -31,6 +31,21 @@ function CommandsPlugin(commands) {
   }
 
   /**
+   * On construct, register all the commands.
+   *
+   * @param {Editor} editor
+   * @param {Function} next
+   */
+
+  function onConstruct(editor, next) {
+    for (const command in commands) {
+      editor.registerCommand(command)
+    }
+
+    return next()
+  }
+
+  /**
    * Return the plugin.
    *
    * @type {Object}
@@ -38,6 +53,7 @@ function CommandsPlugin(commands) {
 
   return {
     onCommand,
+    onConstruct,
   }
 }
 

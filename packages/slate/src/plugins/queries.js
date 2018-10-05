@@ -7,6 +7,21 @@
 
 function QueriesPlugin(queries) {
   /**
+   * On construct, register all the queries.
+   *
+   * @param {Editor} editor
+   * @param {Function} next
+   */
+
+  function onConstruct(editor, next) {
+    for (const query in queries) {
+      editor.registerQuery(query)
+    }
+
+    return next()
+  }
+
+  /**
    * On query, if it exists in our list of queries, call it.
    *
    * @param {Object} query
@@ -35,6 +50,7 @@ function QueriesPlugin(queries) {
    */
 
   return {
+    onConstruct,
     onQuery,
   }
 }

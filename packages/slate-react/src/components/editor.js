@@ -78,20 +78,8 @@ class Editor extends React.Component {
 
   constructor(props) {
     super(props)
-
-    const onChange = change => {
-      if (this.tmp.mounted) {
-        this.props.onChange(change)
-      } else {
-        this.tmp.change = change
-      }
-    }
-
-    const attrs = { onChange }
-    const options = { editor: this, normalize: false }
-    this.controller = new Controller(attrs, options)
-    this.state = {}
     this.resolvePlugins = memoizeOne(this.resolvePlugins)
+    this.state = {}
 
     this.tmp = {
       mounted: false,
@@ -133,6 +121,20 @@ class Editor extends React.Component {
   }
 
   /**
+   * On controller change, call `onChange` or queue the change for flushing.
+   *
+   * @param {Change} change
+   */
+
+  onControllerChange = change => {
+    if (this.tmp.mounted) {
+      this.props.onChange(change)
+    } else {
+      this.tmp.change = change
+    }
+  }
+
+  /**
    * Render the editor.
    *
    * @return {Element}
@@ -142,25 +144,33 @@ class Editor extends React.Component {
     debug('render', this)
     const props = { ...this.props }
 
-    // Update the props on the controller before rendering.
-    const { options, readOnly, value } = props
-    const plugins = this.resolvePlugins(props.plugins, props.schema)
-    this.controller.setProperties({ plugins, readOnly, value }, options)
+    // Re-resolve the controller if needed based on memoized props.
+    const { commands, plugins, queries, schema } = props
+    this.resolveController(plugins, schema, commands, queries)
 
-    // Render the children using the controller's stack.
+    // Set the current props on the controller.
+    const { options, readOnly, value } = props
+    this.controller.setReadOnly(readOnly)
+    this.controller.setValue(value, options)
+
+    // Render the editor's children with the controller.
     const children = this.controller.run('renderEditor', props, this)
     return children
   }
 
   /**
-   * Resolve a set of plugins from the passed-in `plugins` and `schema`.
+   * Resolve an editor controller from the passed-in props. This method takes
+   * all of the props as individual arguments to be able to properly memoize
+   * against anything that could change and invalidate the old editor.
    *
    * @param {Array} plugins
    * @param {Object} schema
-   * @return {Array}
+   * @param {Object} commands
+   * @param {Object} queries
+   * @return {Editor}
    */
 
-  resolvePlugins = (plugins = [], schema = {}) => {
+  resolveController = (plugins = [], schema, commands, queries) => {
     debug('resolvePlugins', { plugins, schema })
     this.tmp.resolves++
 
@@ -168,13 +178,16 @@ class Editor extends React.Component {
     // the updates, then warn the user that they may be doing something wrong.
     warning(
       this.tmp.resolves < 5 || this.tmp.resolves !== this.tmp.updates,
-      'A Slate <Editor> component is re-resolving `props.plugins` or `props.schema` on each update, which leads to poor performance. This is often due to passing in a new `schema` or `plugins` prop with each render by declaring them inline in your render function. Do not do this!'
+      'A Slate <Editor> component is re-resolving the `plugins`, `schema`, `commands` or `queries` on each update, which leads to poor performance. This is often due to passing in a new references for these props with each render by declaring them inline in your render function. Do not do this! Declare them outside your render function, or memoize them instead.'
     )
 
+    const { props, onControllerChange } = this
     const reactPlugin = ReactPlugin()
     const browserPlugin = BrowserPlugin()
-    const propsPlugin = PropsPlugin(this.props)
-    return [reactPlugin, browserPlugin, propsPlugin, ...plugins]
+    const propsPlugin = PropsPlugin(props)
+    const allPlugins = [reactPlugin, browserPlugin, propsPlugin, ...plugins]
+    const attrs = { onChange: onControllerChange, plugins: allPlugins }
+    this.controller = new Controller(attrs, { editor: this, normalize: false })
   }
 
   /**

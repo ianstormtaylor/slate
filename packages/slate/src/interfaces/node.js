@@ -231,6 +231,8 @@ memoize(NodeInterface.prototype, [
   'getKeysToPathsTable',
   'getLastText',
   'getText',
+  'normalize',
+  'validate',
 ])
 
 /**

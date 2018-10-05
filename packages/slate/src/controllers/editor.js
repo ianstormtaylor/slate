@@ -38,17 +38,27 @@ class Editor {
       value = Value.create(),
     } = attrs
 
+    this.Change = class Change extends AbstractChange {}
+    this.middleware = {}
     this.editor = editor
+    this.onChange = onChange
 
     this.tmp = {
       change: null,
       isChanging: false,
-      lastPlugins: null,
       lastValue: null,
-      rawPlugins: null,
     }
 
-    this.setProperties({ onChange, plugins, readOnly, value }, options)
+    const corePlugin = CorePlugin()
+    this.registerPlugin(corePlugin)
+
+    for (const plugin of plugins) {
+      this.registerPlugin(plugin)
+    }
+
+    this.setReadOnly(readOnly)
+    this.setValue(value, options)
+    this.run('onConstruct', this)
   }
 
   /**
@@ -83,11 +93,6 @@ class Editor {
     }
 
     this.run('onChange', change)
-
-    // Store a reference to the last `value` and `plugins` that were seen by the
-    // editor, so we can know whether to normalize a new unknown value if one
-    // is passed in via `this.props`.
-    this.tmp.lastPlugins = this.plugins
 
     // Call the provided `onChange` handler.
     this.value = change.value
@@ -140,119 +145,87 @@ class Editor {
   }
 
   /**
-   * Run through the plugins stack for `property` with `args`.
+   * Register a `command` with the editor.
    *
-   * @param {String} property
+   * @param {String} command
+   */
+
+  registerCommand(command) {
+    this.Change.prototype[command] = function(...args) {
+      const change = this.command(command, ...args)
+      return change
+    }
+  }
+
+  /**
+   * Register a `plugin` with the editor.
+   *
+   * @param {Object} plugin
+   */
+
+  registerPlugin(plugin) {
+    const { commands, queries, schema, ...rest } = plugin
+
+    if (commands) {
+      const commandsPlugin = CommandsPlugin(commands)
+      this.registerPlugin(commandsPlugin)
+    }
+
+    if (queries) {
+      const queriesPlugin = QueriesPlugin(queries)
+      this.registerPlugin(queriesPlugin)
+    }
+
+    if (schema) {
+      const schemaPlugin = SchemaPlugin(schema)
+      this.registerPlugin(schemaPlugin)
+    }
+
+    for (const key in rest) {
+      const fn = rest[key]
+      const middleware = (this.middleware[key] = this.middleware[key] || [])
+      middleware.push(fn)
+    }
+  }
+
+  /**
+   * Register a `query` with the editor.
+   *
+   * @param {String} query
+   */
+
+  registerQuery(query) {
+    this.Change.prototype[query] = function(...args) {
+      const ret = this.query(query, ...args)
+      return ret
+    }
+  }
+
+  /**
+   * Run through the middleware stack by `key` with `args`.
+   *
+   * @param {String} key
    * @param {Any} ...args
    * @return {Any}
    */
 
-  run = (property, ...args) => {
-    const plugins = this.plugins.filter(p => property in p)
+  run = (key, ...args) => {
+    const middleware = this.middleware[key] || []
     let i = 0
 
     function next(...overrides) {
-      const plugin = plugins[i++]
-      if (!plugin) return
+      const fn = middleware[i++]
+      if (!fn) return
 
       if (overrides.length) {
         args = overrides
       }
 
-      const ret = plugin[property](...args, next)
+      const ret = fn(...args, next)
       return ret
     }
 
     return next()
-  }
-
-  /**
-   * Set the `onChange` handler.
-   *
-   * @param {Function} onChange
-   * @return {Editor}
-   */
-
-  setOnChange(onChange) {
-    this.onChange = onChange
-    return this
-  }
-
-  /**
-   * Set the editor's plugins.
-   *
-   * @param {Array} rawPlugins
-   * @return {Editor}
-   */
-
-  setPlugins(rawPlugins) {
-    // PERF: If they try to set the same `plugins` again, we can avoid work.
-    if (rawPlugins === this.tmp.rawPlugins) {
-      return this
-    }
-
-    // PERF: Save a reference to the "raw" plugins that were set, so that we can
-    // compare it by reference for a future set to avoid repeating work.
-    this.tmp.rawPlugins = rawPlugins
-
-    const corePlugin = CorePlugin()
-    const plugins = [corePlugin, ...rawPlugins]
-
-    class Change extends AbstractChange {}
-    const array = []
-
-    for (const plugin of plugins) {
-      const { commands, queries, schema, ...rest } = plugin
-      array.push(rest)
-
-      if (commands) {
-        const commandsPlugin = CommandsPlugin(commands)
-        array.push(commandsPlugin)
-
-        Object.keys(commands).forEach(key => {
-          Change.prototype[key] = function(...args) {
-            return this.command(key, ...args)
-          }
-        })
-      }
-
-      if (queries) {
-        const queriesPlugin = QueriesPlugin(queries)
-        array.push(queriesPlugin)
-
-        Object.keys(queries).forEach(key => {
-          Change.prototype[key] = function(...args) {
-            return this.query(key, ...args)
-          }
-        })
-      }
-
-      if (schema) {
-        const schemaPlugin = SchemaPlugin(schema)
-        array.push(schemaPlugin)
-      }
-    }
-
-    this.plugins = array
-    this.Change = Change
-    return this
-  }
-
-  /**
-   * Set `properties` on the editor.
-   *
-   * @param {Object} properties
-   * @param {Object} options
-   * @return {Editor}
-   */
-
-  setProperties(properties = {}, options) {
-    const { onChange, plugins, readOnly, value } = properties
-    if (onChange !== undefined) this.setOnChange(onChange)
-    if (plugins !== undefined) this.setPlugins(plugins)
-    if (readOnly !== undefined) this.setReadOnly(readOnly)
-    if (value !== undefined) this.setValue(value, options)
-    return this
   }
 
   /**
@@ -276,29 +249,12 @@ class Editor {
    */
 
   setValue(value, options = {}) {
-    const { normalize = true } = options
-
-    // PERF: If the plugins and value haven't changed from the last seen one, we
-    // don't have to normalize it because we know it was already normalized.
-    if (value === this.value && this.plugins === this.tmp.lastPlugins) {
-      return this
-    }
-
+    const { normalize = value !== this.value } = options
     this.value = value
 
-    // If the `normalize` option is false, do not normalize new unknown values.
-    if (normalize === false) {
-      return this
+    if (normalize) {
+      this.change(change => change.normalize())
     }
-
-    this.change(change => {
-      change.normalize()
-      const { document, selection } = change.value
-
-      if (selection.isUnset && document.nodes.size) {
-        change.moveToStartOfDocument()
-      }
-    })
 
     return this
   }

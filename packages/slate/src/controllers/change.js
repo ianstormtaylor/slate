@@ -155,6 +155,13 @@ class Change {
     const paths = Object.values(table).map(PathUtils.create)
     this.tmp.dirty = this.tmp.dirty.concat(paths)
     this.normalizeDirtyPaths()
+
+    const { selection } = value
+
+    if (selection.isUnset && this.document.nodes.size) {
+      this.moveToStartOfDocument()
+    }
+
     return this
   }
 
