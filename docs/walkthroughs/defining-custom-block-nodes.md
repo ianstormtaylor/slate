@@ -20,8 +20,8 @@ class App extends React.Component {
     this.setState({ value })
   }
 
-  onKeyDown = (event, change) => {
-    if (event.key != '&') return
+  onKeyDown = (event, change, next) => {
+    if (event.key != '&') return next()
     event.preventDefault()
     change.insertText('and')
     return true
@@ -82,8 +82,8 @@ class App extends React.Component {
     this.setState({ value })
   }
 
-  onKeyDown = (event, change) => {
-    if (event.key != '&') return
+  onKeyDown = (event, change, next) => {
+    if (event.key != '&') return next()
     event.preventDefault()
     change.insertText('and')
     return true
@@ -102,10 +102,12 @@ class App extends React.Component {
   }
 
   // Add a `renderNode` method to render a `CodeNode` for code blocks.
-  renderNode = props => {
+  renderNode = (props, next) => {
     switch (props.node.type) {
       case 'code':
         return <CodeNode {...props} />
+      default:
+        return next()
     }
   }
 }
@@ -131,9 +133,9 @@ class App extends React.Component {
     this.setState({ value })
   }
 
-  onKeyDown = (event, change) => {
+  onKeyDown = (event, change, next) => {
     // Return with no changes if it's not the "`" key with ctrl pressed.
-    if (event.key != '`' || !event.ctrlKey) return
+    if (event.key != '`' || !event.ctrlKey) return next()
 
     // Prevent the "`" from being inserted by default.
     event.preventDefault()
@@ -154,10 +156,12 @@ class App extends React.Component {
     )
   }
 
-  renderNode = props => {
+  renderNode = (props, next) => {
     switch (props.node.type) {
       case 'code':
         return <CodeNode {...props} />
+      default:
+        return next()
     }
   }
 }
@@ -187,8 +191,8 @@ class App extends React.Component {
     this.setState({ value })
   }
 
-  onKeyDown = (event, change) => {
-    if (event.key != '`' || !event.ctrlKey) return
+  onKeyDown = (event, change, next) => {
+    if (event.key != '`' || !event.ctrlKey) return next()
 
     event.preventDefault()
 
@@ -211,10 +215,12 @@ class App extends React.Component {
     )
   }
 
-  renderNode = props => {
+  renderNode = (props, next) => {
     switch (props.node.type) {
       case 'code':
         return <CodeNode {...props} />
+      default:
+        return next()
     }
   }
 }

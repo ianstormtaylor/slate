@@ -1,14 +1,16 @@
 # `Change`
 
-```js
-import { Change } from 'slate'
-```
-
 A change allows you to define a series of changes you'd like to make to the current [`Value`](./value.md).
 
 All changes are performed through `Change` objects, so that a history of changes can be preserved for use in undo/redo operations, and to make collaborative editing possible.
 
 ## Properties
+
+### `editor`
+
+`Editor`
+
+A reference to the editor the change is being made in.
 
 ### `object`
 
@@ -17,6 +19,8 @@ All changes are performed through `Change` objects, so that a history of changes
 A string with a value of `'change'`.
 
 ### `value`
+
+`Value`
 
 A [`Value`](./value.md) with the change's current operations applied. Each time you run a new change function this property will be updated.
 
@@ -366,7 +370,7 @@ Move the current selection's anchor point to the start of the document and its f
 
 `select(properties: Range || Object) => Change`
 
-Set the current selection to a range with merged `properties`. The `properties` can either be a [`Range`](./range.md) object or a plain Javascript object of selection properties.
+Set the current selection to a range with merged `properties`. The `properties` can either be a [`Range`](./range.md) object or a plain JavaScript object of selection properties.
 
 ## Document Range Changes
 

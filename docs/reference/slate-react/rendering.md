@@ -1,20 +1,20 @@
-# Custom Nodes
+# Rendering
 
 Slate will render custom nodes for [`Block`](../slate/block.md) and [`Inline`](../slate/inline.md) models, based on what you pass in as your schema. This allows you to completely customize the rendering behavior of your Slate editor.
 
 ## Props
 
 ```js
-<{Custom}
-  attributes={Object}
-  children={Object}
-  editor={Editor}
-  isSelected={Boolean}
-  isFocused={Boolean}
-  node={Node}
-  parent={Node}
-  readOnly={Boolean}
-/>
+{
+  attributes: Object,
+  children: Object,
+  editor: Editor,
+  isSelected: Boolean,
+  isFocused: Boolean,
+  node: Node,
+  parent: Node,
+  readOnly: Boolean,
+}
 ```
 
 ### `attributes`

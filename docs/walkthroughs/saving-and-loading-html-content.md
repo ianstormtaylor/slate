@@ -263,7 +263,7 @@ class App extends React.Component {
     )
   }
 
-  renderNode = props => {
+  renderNode = (props, next) => {
     switch (props.node.type) {
       case 'code':
         return (
@@ -279,11 +279,13 @@ class App extends React.Component {
         )
       case 'quote':
         return <blockquote {...props.attributes}>{props.children}</blockquote>
+      default:
+        return next()
     }
   }
 
   // Add a `renderMark` method to render marks.
-  renderMark = props => {
+  renderMark = (props, next) => {
     const { mark, attributes } = props
     switch (mark.type) {
       case 'bold':
@@ -292,6 +294,8 @@ class App extends React.Component {
         return <em {...attributes}>{props.children}</em>
       case 'underline':
         return <u {...attributes}>{props.children}</u>
+      default:
+        return next()
     }
   }
 }
