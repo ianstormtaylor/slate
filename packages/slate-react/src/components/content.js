@@ -207,28 +207,30 @@ class Content extends React.Component {
     this.tmp.isUpdatingSelection = true
     removeAllRanges(native)
 
-    // COMPAT: IE 11 does not support Selection.setBaseAndExtent
-    if (native.setBaseAndExtent) {
-      // COMPAT: Since the DOM range has no concept of backwards/forwards
-      // we need to check and do the right thing here.
-      if (isBackward) {
-        native.setBaseAndExtent(
-          range.endContainer,
-          range.endOffset,
-          range.startContainer,
-          range.startOffset
-        )
+    if (IS_FIREFOX) {
+      // COMPAT: IE 11 does not support Selection.setBaseAndExtent
+      if (native.setBaseAndExtent) {
+        // COMPAT: Since the DOM range has no concept of backwards/forwards
+        // we need to check and do the right thing here.
+        if (isBackward) {
+          native.setBaseAndExtent(
+            range.endContainer,
+            range.endOffset,
+            range.startContainer,
+            range.startOffset
+          )
+        } else {
+          native.setBaseAndExtent(
+            range.startContainer,
+            range.startOffset,
+            range.endContainer,
+            range.endOffset
+          )
+        }
       } else {
-        native.setBaseAndExtent(
-          range.startContainer,
-          range.startOffset,
-          range.endContainer,
-          range.endOffset
-        )
+        // COMPAT: IE 11 does not support Selection.extend, fallback to addRange
+        native.addRange(range)
       }
-    } else {
-      // COMPAT: IE 11 does not support Selection.extend, fallback to addRange
-      native.addRange(range)
     }
 
     // Scroll to the selection, in case it's out of view.
@@ -236,9 +238,6 @@ class Content extends React.Component {
 
     // Then unset the `isUpdatingSelection` flag after a delay.
     setTimeout(() => {
-      // COMPAT: In Firefox, it's not enough to create a range, you also need to
-      // focus the contenteditable element too. (2016/11/16)
-      if (IS_FIREFOX && this.element) this.element.focus()
       this.tmp.isUpdatingSelection = false
     })
 
