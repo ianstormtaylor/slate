@@ -25,13 +25,13 @@
 
 <p align="center">
   <a href="https://unpkg.com/slate/dist/slate.min.js">
-    <img src="http://img.badgesize.io/https://unpkg.com/slate/dist/slate.min.js?compression=gzip&amp;label=slate">
+    <img src="http://img.badgesize.io/https://unpkg.com/slate/dist/slate.min.js?compression=gzip&amp;label=size">
   </a>
   <a href="https://slate-slack.herokuapp.com">
     <img src="https://slate-slack.herokuapp.com/badge.svg">
   </a>
   <a href="./packages/slate/package.json">
-    <img src="https://img.shields.io/npm/v/slate.svg?maxAge=3600&label=slate&colorB=007ec6">
+    <img src="https://img.shields.io/npm/v/slate.svg?maxAge=3600&label=version&colorB=007ec6">
   </a>
 </p>
 <br/>
