@@ -65,7 +65,7 @@ class Change {
 
     // Default options to the change-level flags, this allows for setting
     // specific options for all of the operations of a given change.
-    let { merge, save } = this.tmp
+    let { merge, save } = { ...this.tmp, ...options }
 
     // If `merge` is non-commital, and this is not the first operation in a new change
     // then we should merge.
