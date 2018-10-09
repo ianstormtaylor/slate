@@ -2,10 +2,21 @@
 
 import h from '../../../../helpers/h'
 
-export const input = [<i>Some</i>[0], <text />[0]]
-
-export default function(texts) {
-  return texts[0].mergeText(texts[1])
+export const input = {
+  a: (
+    <text>
+      <i>Some</i>
+    </text>
+  ),
+  b: <text />,
 }
 
-export const output = <i>Some</i>[0]
+export default function({ a, b }) {
+  return a.mergeText(b)
+}
+
+export const output = (
+  <text>
+    <i>Some</i>
+  </text>
+)

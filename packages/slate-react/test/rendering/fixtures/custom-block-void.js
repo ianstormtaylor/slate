@@ -31,7 +31,9 @@ export const props = {
 export const value = (
   <value>
     <document>
-      <image src="https://example.com/image.png" />
+      <image src="https://example.com/image.png">
+        <text />
+      </image>
     </document>
   </value>
 )

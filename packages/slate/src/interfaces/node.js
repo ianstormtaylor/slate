@@ -1,4 +1,4 @@
-import warning from 'slate-dev-warning'
+import warning from 'tiny-warning'
 import { List } from 'immutable'
 
 import mixin from '../utils/mixin'
@@ -26,28 +26,6 @@ class NodeInterface {
 
   get text() {
     return this.getText()
-  }
-
-  /**
-   * Check whether the node is a leaf inline.
-   *
-   * @return {Boolean}
-   */
-
-  getFirstInvalidNode(schema) {
-    if (this.object === 'text') {
-      const invalid = this.validate(schema) ? this : null
-      return invalid
-    }
-
-    let invalid = null
-
-    this.nodes.find(n => {
-      invalid = n.validate(schema) ? n : n.getFirstInvalidNode(schema)
-      return invalid
-    })
-
-    return invalid
   }
 
   /**
@@ -181,14 +159,14 @@ class NodeInterface {
   }
 
   /**
-   * Normalize the text node with a `schema`.
+   * Normalize the text node with an `editor`.
    *
-   * @param {Schema} schema
+   * @param {Editor} editor
    * @return {Function|Void}
    */
 
-  normalize(schema) {
-    const normalizer = schema.normalizeNode(this)
+  normalize(editor) {
+    const normalizer = editor.run('normalizeNode', this)
     return normalizer
   }
 
@@ -232,14 +210,14 @@ class NodeInterface {
   }
 
   /**
-   * Validate the node against a `schema`.
+   * Validate the node with an `editor`.
    *
-   * @param {Schema} schema
+   * @param {Editor} editor
    * @return {Error|Void}
    */
 
-  validate(schema) {
-    const error = schema.validateNode(this)
+  validate(editor) {
+    const error = editor.run('validateNode', this)
     return error
   }
 }
@@ -249,7 +227,6 @@ class NodeInterface {
  */
 
 memoize(NodeInterface.prototype, [
-  'getFirstInvalidNode',
   'getFirstText',
   'getKeysToPathsTable',
   'getLastText',

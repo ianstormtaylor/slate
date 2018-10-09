@@ -16,7 +16,7 @@ export const input = (
     <i> is</i>
     <b>Cat</b>
   </text>
-)[0]
+)
 
 export default function(t) {
   return t.getMarksBetweenOffsets(0, 12)

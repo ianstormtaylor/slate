@@ -23,16 +23,17 @@
     "selection-is-backward": "^1.0.0",
     "slate-base64-serializer": "^0.2.69",
     "slate-dev-environment": "^0.2.0",
-    "slate-dev-warning": "^0.0.1",
     "slate-hotkeys": "^0.2.5",
     "slate-plain-serializer": "^0.6.8",
-    "slate-prop-types": "^0.4.67"
+    "slate-prop-types": "^0.4.67",
+    "tiny-invariant": "^1.0.1",
+    "tiny-warning": "^0.0.3"
   },
   "peerDependencies": {
     "immutable": ">=3.8.1",
     "react": ">=0.14.0",
     "react-dom": ">=0.14.0",
-    "slate": ">=0.37.0"
+    "slate": ">=0.42.0"
   },
   "devDependencies": {
     "immutable": "^3.8.1",

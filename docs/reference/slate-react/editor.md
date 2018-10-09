@@ -13,11 +13,14 @@ The top-level React component that renders the Slate editor itself.
   autoCorrect={Boolean}
   autoFocus={Boolean}
   className={String}
+  commands={Object}
   onChange={Function}
-  placeholder={String || Element}
+  placeholder={String | Element}
   plugins={Array}
+  queries={Object}
   readOnly={Boolean}
   role={String}
+  schema={Object}
   spellCheck={Boolean}
   value={Value}
   style={Object}
@@ -174,25 +177,43 @@ Programmatically invoke a change `fn` on the editor. The function will be invoke
 
 If extra `...args` are passed in, the change `fn` will be invoked with `(change, ...args)`, so you can use this as a shorthand for performing single-function changes.
 
+### `command`
+
+`command(name, ...args) => Void`
+
+Invoke a command by `name` on the editor with `args`.
+
+### `event`
+
+`event(handler, event, ...args) => Any`
+
+Programmatically invoke an `event` on the editor. This isn't something you should normally use except in test environments.
+
 ### `focus`
 
 `focus() => Void`
 
 Programmatically focus the editor.
 
+### `query`
+
+`query(name, ...args) => Any`
+
+Invoke a query by `name` on the editor with `args`, returning its result.
+
+### `run`
+
+`run(key, ...args) => Any`
+
+Run the middleware stack by `key` with `args`, returning its result.
+
 ## Instance Properties
 
-### `schema`
+### `readOnly`
 
-`Schema`
+`Boolean`
 
-The editor's current schema.
-
-### `stack`
-
-`Stack`
-
-The editor's current stack.
+Whether the editor is currently read-only or not.
 
 ### `value`
 

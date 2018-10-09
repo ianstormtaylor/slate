@@ -8,37 +8,26 @@ export const input = (
   <value>
     <document>
       <paragraph>
-        <text key="a">one</text>
-        <text key="b">two</text>
-        <text key="c">three</text>
+        <text>1</text>
+        <text>2</text>
+        <text>3</text>
+        <text>4</text>
+        <text>5</text>
+        <text>6</text>
+        <text>7</text>
+        <text>8</text>
+        <text>9</text>
       </paragraph>
     </document>
   </value>
 )
 
-export const output = {
-  object: 'value',
-  document: {
-    object: 'document',
-    data: {},
-    nodes: [
-      {
-        object: 'block',
-        type: 'paragraph',
-        data: {},
-        nodes: [
-          {
-            object: 'text',
-            leaves: [
-              {
-                object: 'leaf',
-                text: 'onetwothree',
-                marks: [],
-              },
-            ],
-          },
-        ],
-      },
-    ],
-  },
-}
+export const output = (
+  <value>
+    <document>
+      <paragraph>
+        <text>123456789</text>
+      </paragraph>
+    </document>
+  </value>
+)

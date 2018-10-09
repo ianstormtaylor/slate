@@ -10,7 +10,7 @@ export const input = (
     is
     <i>Cute</i>
   </text>
-)[0]
+)
 
 export default function(t) {
   return t.getMarks()

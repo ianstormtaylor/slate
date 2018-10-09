@@ -8,7 +8,7 @@ export const input = (
     <b>Cat</b>
     <i> is Cute</i>
   </text>
-)[0]
+)
 
 export default function(t) {
   return t.updateMark(0, 6, Mark.create('bold'), { data: { x: 1 } })
@@ -19,4 +19,4 @@ export const output = (
     <b x={1}>Cat</b>
     <i> is Cute</i>
   </text>
-)[0]
+)

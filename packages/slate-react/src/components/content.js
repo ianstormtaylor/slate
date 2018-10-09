@@ -2,7 +2,7 @@ import Debug from 'debug'
 import React from 'react'
 import Types from 'prop-types'
 import getWindow from 'get-window'
-import warning from 'slate-dev-warning'
+import warning from 'tiny-warning'
 import throttle from 'lodash/throttle'
 import { IS_FIREFOX, HAS_INPUT_EVENTS_LEVEL_2 } from 'slate-dev-environment'
 
@@ -328,7 +328,7 @@ class Content extends React.Component {
       const { selection } = value
       const window = getWindow(event.target)
       const native = window.getSelection()
-      const range = findRange(native, value)
+      const range = findRange(native, editor)
 
       if (range && range.equals(selection.toRange())) {
         this.updateSelection()
@@ -370,7 +370,7 @@ class Content extends React.Component {
       if (!this.isInEditor(event.target)) return
     }
 
-    this.props[handler](event)
+    this.props.onEvent(handler, event)
   }
 
   /**
@@ -389,7 +389,7 @@ class Content extends React.Component {
     const { activeElement } = window.document
     if (activeElement !== this.element) return
 
-    this.props.onSelect(event)
+    this.props.onEvent('onSelect', event)
   }, 100)
 
   /**
@@ -409,11 +409,11 @@ class Content extends React.Component {
       tagName,
       spellCheck,
     } = props
-    const { value, stack } = editor
+    const { value } = editor
     const Container = tagName
     const { document, selection, decorations } = value
     const indexes = document.getSelectionIndexes(selection)
-    const decs = document.getDecorations(stack).concat(decorations)
+    const decs = document.getDecorations(editor).concat(decorations)
     const childrenDecorations = getChildrenDecorations(document, decs)
 
     const children = document.nodes.toArray().map((child, i) => {
@@ -492,14 +492,6 @@ class Content extends React.Component {
     )
   }
 }
-
-/**
- * Mix in handler prop types.
- */
-
-EVENT_HANDLERS.forEach(handler => {
-  Content.propTypes[handler] = Types.func.isRequired
-})
 
 /**
  * Export.

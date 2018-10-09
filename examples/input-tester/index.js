@@ -210,12 +210,17 @@ class InputTester extends React.Component {
     window.document.addEventListener('selectionchange', this.onEvent)
   }
 
+  ref = editor => {
+    this.editor = editor
+  }
+
   render() {
     return (
       <Wrapper innerRef={this.onRef}>
         <Editor
           spellCheck
           placeholder="Enter some text..."
+          ref={this.ref}
           value={this.state.value}
           onChange={this.onChange}
           renderNode={({ attributes, children, node }) => {
@@ -268,19 +273,20 @@ class InputTester extends React.Component {
   }
 
   recordEvent = event => {
-    const { value } = this.state
+    const { editor } = this
+    const { value } = editor
     let targetRange
 
     if (event.getTargetRanges) {
       const [nativeTargetRange] = event.getTargetRanges()
-      targetRange = nativeTargetRange && findRange(nativeTargetRange, value)
+      targetRange = nativeTargetRange && findRange(nativeTargetRange, editor)
     }
 
     const nativeSelection = window.getSelection()
     const nativeRange = nativeSelection.rangeCount
       ? nativeSelection.getRangeAt(0)
       : undefined
-    const selection = nativeRange && findRange(nativeRange, value)
+    const selection = nativeRange && findRange(nativeRange, editor)
 
     EventsValue.push({
       event,
@@ -291,12 +297,13 @@ class InputTester extends React.Component {
   }
 
   logEvent = event => {
-    const { value } = this.state
+    const { editor } = this
+    const { value } = editor
     const nativeSelection = window.getSelection()
     const nativeRange = nativeSelection.rangeCount
       ? nativeSelection.getRangeAt(0)
       : undefined
-    const selection = nativeRange && findRange(nativeRange, value)
+    const selection = nativeRange && findRange(nativeRange, editor)
 
     const {
       type,
@@ -323,7 +330,7 @@ class InputTester extends React.Component {
         style += '; background-color: lightskyblue'
         const [nativeTargetRange] = event.getTargetRanges()
         const targetRange =
-          nativeTargetRange && findRange(nativeTargetRange, value)
+          nativeTargetRange && findRange(nativeTargetRange, editor)
 
         details = {
           inputType,

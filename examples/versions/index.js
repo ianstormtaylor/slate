@@ -1,91 +1,28 @@
-import { Value, Operation } from 'slate'
+import { Value } from 'slate'
 import { Editor } from 'slate-react'
-
 import React from 'react'
-import styled from 'react-emotion'
+import { List } from 'immutable'
 
-import { Stack } from 'immutable'
-
+import initialValue from './value.json'
 import { Button, Icon, Toolbar } from '../components'
 
-const initialVersionState = [
-  {
-    name: 'version 1',
-    isRoot: true,
-    value: {
-      document: {
-        nodes: [
-          {
-            object: 'block',
-            type: 'paragraph',
-            nodes: [
-              {
-                object: 'text',
-                leaves: [
-                  {
-                    text: 'This example shows versions.',
-                  },
-                ],
-              },
-            ],
-          },
-        ],
-      },
-    },
+/**
+ * Commands.
+ *
+ * @type {Object}
+ */
+
+const commands = {
+  resetHistory(change) {
+    const { value } = change
+    const { data } = value
+    const newData = data.set('undos', List()).set('redos', List())
+
+    change.withoutSaving(() => {
+      change.setValue({ data: newData })
+    })
   },
-  {
-    name: 'version 2',
-    changes: [
-      [
-        Operation.create({
-          object: 'operation',
-          path: [0, 0],
-          position: 28,
-          properties: {
-            data: {},
-            type: undefined,
-          },
-          target: null,
-          type: 'split_node',
-        }),
-        Operation.create({
-          object: 'operation',
-          path: [0],
-          position: 1,
-          properties: {
-            data: {},
-            type: 'paragraph',
-          },
-          target: 28,
-          type: 'split_node',
-        }),
-      ],
-      [
-        Operation.create({
-          marks: [],
-          object: 'operation',
-          offset: 0,
-          path: [1, 0],
-          text: 'Try adding a new version by clicking the + icon.',
-          type: 'insert_text',
-        }),
-      ],
-    ],
-  },
-]
-
-export const VersionList = styled('ul')``
-
-export const VersionListItem = styled('li')`
-  cursor: pointer;
-  color: ${props => (props.active ? 'red' : 'black')};
-`
-
-export const Version = ({ active, onClick, name }) => (
-  <VersionListItem active={active} onClick={onClick}>
-    {name}
-  </VersionListItem>
-)
+}
 
 /**
  * The versions example.
@@ -101,132 +38,27 @@ class Versions extends React.Component {
    */
 
   state = {
-    value: Value.fromJSON(initialVersionState[0].value),
-    versions: initialVersionState,
-    activeVersionIndex: 0,
+    value: Value.fromJSON(initialValue),
+    versions: [],
+    v: '',
   }
+
+  /**
+   * On mounting, save an initial version.
+   */
 
   componentDidMount() {
-    this.setVersion(initialVersionState.length - 1)
+    this.saveVersion()
   }
 
   /**
-   * Resets the history stack
+   * Store a reference to the `editor`.
    *
+   * @param {Editor} editor
    */
 
-  resetHistory = () => {
-    let { value } = this.state
-    const change = value.change()
-
-    const history = value.history
-      .set('undos', new Stack())
-      .set('redos', new Stack())
-    value = value.set('history', history)
-    change.value = value
-
-    this.onChange(change)
-  }
-
-  /**
-   * Sets a version as the active version
-   *
-   * @param {Number} index
-   */
-
-  setVersion = index => {
-    const { value, versions, activeVersionIndex } = this.state
-
-    if (index === activeVersionIndex) {
-      return
-    }
-
-    this.resetHistory()
-
-    const change = value.change()
-    const version = versions[index]
-
-    // the root just has a value so set it explicitly.
-    if (version.isRoot) {
-      this.setState({
-        activeVersionIndex: index,
-        value: Value.fromJSON(version.value),
-      })
-    } else {
-      const isForward = index > activeVersionIndex
-
-      let operationsToApply
-
-      if (isForward) {
-        operationsToApply = versions
-          .slice(activeVersionIndex + 1, index + 1)
-          .map(v => v.changes.flat())
-          .flat()
-      } else {
-        operationsToApply = versions
-          .slice(index + 1, activeVersionIndex + 1)
-          .map(v => v.changes.flat())
-          .flat()
-          .reverse()
-          .map(op => op.invert())
-      }
-
-      change.withoutNormalizing(() => {
-        change.withoutSaving(() => {
-          change.applyOperations(operationsToApply)
-        })
-      })
-
-      this.onChange(change)
-      this.setState({ activeVersionIndex: index })
-    }
-  }
-
-  /**
-   * Creates a version below the active version
-   *
-   */
-
-  addVersion = () => {
-    /*
-    */
-
-    const versionName = window.prompt('How do you want to call this version?')
-
-    if (!versionName) {
-      return
-    }
-
-    const { value, versions, activeVersionIndex } = this.state
-    const { history } = value
-
-    const newVersion = {
-      name: versionName,
-      value: this.state.value.toJSON(),
-      changes: history.undos
-        .toArray()
-        .reverse()
-        .map(list => list.toArray()),
-    }
-
-    this.setState({
-      versions: [...versions, newVersion],
-      activeVersionIndex: activeVersionIndex + 1,
-    })
-
-    this.resetHistory()
-  }
-
-  /**
-   * Check if we are at the last version
-   *
-   * @returns {Boolean}
-   */
-
-  atTail = () => {
-    const { versions, activeVersionIndex } = this.state
-
-    return versions.length - 1 === activeVersionIndex
+  ref = editor => {
+    this.editor = editor
   }
 
   /**
@@ -236,31 +68,31 @@ class Versions extends React.Component {
    */
 
   render() {
-    const { value, versions, activeVersionIndex } = this.state
-    const { history } = value
-
+    const { versions, v } = this.state
     return (
       <div>
-        <VersionList>
-          {versions.map((version, index) => (
-            <Version
-              key={index}
-              name={version.name}
-              active={index === activeVersionIndex}
-              onClick={() => this.setVersion(index)}
-            />
-          ))}
-        </VersionList>
         <Toolbar>
-          <Button active={history.undos.size} onMouseDown={this.addVersion}>
-            <Icon>add</Icon>
+          <select value={v} onChange={this.onVersionSelectChange}>
+            <option disabled>Choose a version to rollback to...</option>
+            {versions.map((version, i) => {
+              const { createdAt } = version
+              const time = createdAt.toLocaleTimeString()
+              const name = `Version ${i + 1} — ${time}`
+              return (
+                <option key={i} value={i}>
+                  {name}
+                </option>
+              )
+            })}
+          </select>
+          <Button onMouseDown={this.saveVersion}>
+            <Icon>add</Icon> Save Version
           </Button>
-          <span>Undos: {history.undos.size}</span>
-          <span>Redos: {history.redos.size}</span>
         </Toolbar>
         <Editor
-          readOnly={!this.atTail()}
           placeholder="Enter some text..."
+          commands={commands}
+          ref={this.ref}
           value={this.state.value}
           onChange={this.onChange}
         />
@@ -276,6 +108,93 @@ class Versions extends React.Component {
 
   onChange = ({ value }) => {
     this.setState({ value })
+  }
+
+  /**
+   * On version select change.
+   *
+   * @param {Event} event
+   */
+
+  onVersionSelectChange = event => {
+    const { value } = event.target
+    const n = parseInt(value, 10)
+    this.setVersion(n)
+  }
+
+  /**
+   * Set the current version to version number `n`.
+   *
+   * @param {Number} n
+   */
+
+  setVersion = n => {
+    const { versions, v } = this.state
+    const isForward = n > v
+    if (n === v) return
+
+    this.editor.change(change => {
+      let operations
+
+      if (isForward) {
+        operations = versions
+          .slice(v + 1, n + 1)
+          .map(vers => vers.operations)
+          .flat()
+      } else {
+        operations = versions
+          .slice(n + 1, v + 1)
+          .map(vers => vers.operations)
+          .flat()
+          .reverse()
+          .map(op => op.invert())
+      }
+
+      change.withoutNormalizing(() => {
+        change.withoutSaving(() => {
+          change.applyOperations(operations)
+          change.resetHistory()
+        })
+      })
+    })
+
+    this.setState(state => {
+      return {
+        versions: state.versions.slice(0, n + 1),
+        v: n,
+      }
+    })
+  }
+
+  /**
+   * Save a new version checkpoint to the version history.
+   */
+
+  saveVersion = () => {
+    const { value } = this.state
+    const { data } = value
+    const undos = data.get('undos') || List()
+    const version = {
+      createdAt: new Date(),
+      operations: undos
+        .toArray()
+        .reverse()
+        .map(list => list.toArray()),
+    }
+
+    this.setState(
+      state => {
+        return {
+          versions: [...state.versions, version],
+          v: state.v === '' ? 0 : state.v + 1,
+        }
+      },
+      () => {
+        this.editor.change(change => {
+          change.resetHistory()
+        })
+      }
+    )
   }
 }
 

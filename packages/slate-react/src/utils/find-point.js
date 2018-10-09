@@ -1,4 +1,6 @@
 import getWindow from 'get-window'
+import invariant from 'tiny-invariant'
+import { Value } from 'slate'
 
 import OffsetKey from './offset-key'
 
@@ -20,11 +22,16 @@ const VOID_SELECTOR = '[data-slate-void]'
  *
  * @param {Element} nativeNode
  * @param {Number} nativeOffset
- * @param {Value} value
+ * @param {Editor} editor
  * @return {Point}
  */
 
-function findPoint(nativeNode, nativeOffset, value) {
+function findPoint(nativeNode, nativeOffset, editor) {
+  invariant(
+    !Value.isValue(editor),
+    'As of Slate 0.42.0, the `findPoint` utility takes an `editor` instead of a `value`.'
+  )
+
   const { node: nearestNode, offset: nearestOffset } = normalizeNodeAndOffset(
     nativeNode,
     nativeOffset
@@ -76,6 +83,7 @@ function findPoint(nativeNode, nativeOffset, value) {
   // COMPAT: If someone is clicking from one Slate editor into another, the
   // select event fires twice, once for the old editor's `element` first, and
   // then afterwards for the correct `element`. (2017/03/03)
+  const { value } = editor
   if (!value.document.hasDescendant(key)) return null
 
   const point = value.document.createPoint({ key, offset })

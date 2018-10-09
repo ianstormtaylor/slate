@@ -97,7 +97,6 @@ class Leaf extends React.Component {
 
   renderMarks() {
     const { marks, node, offset, text, editor } = this.props
-    const { stack } = editor
     const leaf = this.renderText()
     const attributes = {
       'data-slate-leaf': true,
@@ -114,7 +113,7 @@ class Leaf extends React.Component {
         children,
         attributes,
       }
-      const element = stack.find('renderMark', props)
+      const element = editor.run('renderMark', props)
       return element || children
     }, leaf)
   }
@@ -127,12 +126,10 @@ class Leaf extends React.Component {
 
   renderText() {
     const { block, node, editor, parent, text, index, leaves } = this.props
-    const { value } = editor
-    const { schema } = value
 
     // COMPAT: Render text inside void nodes with a zero-width space.
     // So the node can contain selection but the text is not visible.
-    if (schema.isVoid(parent)) {
+    if (editor.query('isVoid', parent)) {
       return <span data-slate-zero-width="z">{'\uFEFF'}</span>
     }
 

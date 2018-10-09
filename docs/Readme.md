@@ -12,7 +12,7 @@
 
 ## Guides
 
-* [Changes](./guides/changes.md)
+* [Commands & Queries](./guides/commands-and-queries.md)
 * [Data Model](./guides/data-model.md)
 * [Plugins](./guides/plugins.md)
 * [Rendering](./guides/rendering.md)
@@ -34,33 +34,25 @@
 * [Data](./reference/slate/data.md)
 * [Decoration](./reference/slate/decoration.md)
 * [Document](./reference/slate/document.md)
+* [Editor](./reference/slate/editor.md)
 * [Inline](./reference/slate/inline.md)
 * [Mark](./reference//slate/mark.md)
 * [Node](./reference/slate/node.md)
 * [Operation](./reference/slate/operation.md)
+* [Plugins](./reference/slate/plugins.md)
 * [Point](./reference/slate/point.md)
 * [Range](./reference/slate/range.md)
-* [Schema](./reference/slate/schema.md)
 * [Selection](./reference/slate/selection.md)
 * [Text](./reference/slate/text.md)
+* [Utils](./reference/slate/utils.md)
 * [Value](./reference/slate/value.md)
-* [setKeyGenerator](./reference/slate/utils.md)
-* [resetKeyGenerator](./reference/slate/utils.md)
 
 ## Slate React
 
 * [Editor](./reference/slate-react/editor.md)
 * [Plugins](./reference/slate-react/plugins.md)
-* [Custom Nodes](./reference/slate-react/custom-nodes.md)
-* [Core Plugins](./reference/slate-react/core-plugins.md)
-* [cloneFragment](./reference/slate-react/utils.md)
-* [findDOMNode](./reference/slate-react/utils.md)
-* [findDOMRange](./reference/slate-react/utils.md)
-* [findNode](./reference/slate-react/utils.md)
-* [findRange](./reference/slate-react/utils.md)
-* [getEventRange](./reference/slate-react/utils.md)
-* [getEventTransfer](./reference/slate-react/utils.md)
-* [setEventTransfer](./reference/slate-react/utils.md)
+* [Rendering](./reference/slate-react/rendering.md)
+* [Utils](./reference/slate-react/utils.md)
 
 ## Other Packages
 
@@ -68,4 +60,3 @@
 * [`slate-hyperscript`](./reference/slate-hyperscript/index.md)
 * [`slate-plain-serializer`](./reference/slate-plain-serializer/index.md)
 * [`slate-prop-types`](./reference/slate-prop-types/index.md)
-* [`slate-simulator`](./reference/slate-simulator/index.md)

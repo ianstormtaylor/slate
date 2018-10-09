@@ -94,6 +94,16 @@ class Images extends React.Component {
   }
 
   /**
+   * Store a reference to the `editor`.
+   *
+   * @param {Editor} editor
+   */
+
+  ref = editor => {
+    this.editor = editor
+  }
+
+  /**
    * Render the app.
    *
    * @return {Element} element
@@ -109,6 +119,7 @@ class Images extends React.Component {
         </Toolbar>
         <Editor
           placeholder="Enter some text..."
+          ref={this.ref}
           value={this.state.value}
           schema={schema}
           onChange={this.onChange}
@@ -158,10 +169,7 @@ class Images extends React.Component {
     event.preventDefault()
     const src = window.prompt('Enter the URL of the image:')
     if (!src) return
-
-    const change = this.state.value.change().call(insertImage, src)
-
-    this.onChange(change)
+    this.editor.change(insertImage, src)
   }
 
   /**
@@ -169,11 +177,11 @@ class Images extends React.Component {
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
    */
 
-  onDropOrPaste = (event, change, editor) => {
-    const target = getEventRange(event, change.value)
+  onDropOrPaste = (event, change) => {
+    const { editor } = change
+    const target = getEventRange(event, editor)
     if (!target && event.type == 'drop') return
 
     const transfer = getEventTransfer(event)

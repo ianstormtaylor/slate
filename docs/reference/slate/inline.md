@@ -63,13 +63,13 @@ A concatenated string of all of the descendant [`Text`](./text.md) nodes of this
 
 `Inline.create(properties: Object) => Inline`
 
-Create an inline from a plain Javascript object of `properties`.
+Create an inline from a plain JavaScript object of `properties`.
 
 ### `Inline.createList`
 
 `Inline.createList(array: Array) => List`
 
-Create a list of inline nodes from a plain Javascript `array`.
+Create a list of inline nodes from a plain JavaScript `array`.
 
 ### `Inline.fromJSON`
 

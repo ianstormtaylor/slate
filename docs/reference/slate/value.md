@@ -6,18 +6,12 @@ import { Value } from 'slate'
 
 A `Value` is the top-level representation of data in Slate, containing both a [`Document`](./document.md) and a [`Selection`](./selection.md). It's what you need to pass into the Slate [`<Editor>`](../slate-react/editor.md) to render something onto the page.
 
-All changes to the document and selection are also performed through the value object, so that they can stay in sync, and be propagated to its internal history of undo/redo value.
-
-For convenience, in addition to changes, many of the selection and document properties are exposed as proxies on the `Value` object.
-
 ## Properties
 
 ```js
 Value({
   document: Document,
   selection: Selection,
-  history: History,
-  schema: Schema,
   data: Data,
   decorations: List<Decoration>,
 })
@@ -41,23 +35,11 @@ A list of ranges in the document with marks that aren't part of the content itse
 
 The current document of the value.
 
-### `history`
-
-`History`
-
-An object that stores the history of changes.
-
 ### `object`
 
 `String`
 
 A string with a value of `'value'`.
-
-### `schema`
-
-`Schema`
-
-An object representing the schema of the value's document.
 
 ### `selection`
 
@@ -138,12 +120,6 @@ Create a value from a JSON `object`.
 Returns a boolean if the passed in argument is a `Value`.
 
 ## Instance Methods
-
-### `change`
-
-`change() => Change`
-
-Create a new [`Change`](./change.md) that acts on the current value.
 
 ### `toJSON`
 

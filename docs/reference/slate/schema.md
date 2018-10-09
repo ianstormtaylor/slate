@@ -1,4 +1,4 @@
-# `Schema`
+# Schema
 
 Every Slate editor has a "schema" associated with it, which contains information about the structure of its content. For the most basic cases, you'll just rely on Slate's default core schema. But for advanced use cases, you can enforce rules about what the content of a Slate document can contain.
 
@@ -9,6 +9,7 @@ Every Slate editor has a "schema" associated with it, which contains information
   document: Object,
   blocks: Object,
   inlines: Object,
+  rules: Array,
 }
 ```
 
@@ -284,34 +285,6 @@ Will validate the previous sibling node against a [`match`](#match).
 ```
 
 Will validate a node's text with a regex or function.
-
-## Static Methods
-
-### `Schema.create`
-
-`Schema.create(properties: Object) => Schema`
-
-Create a new `Schema` instance with `properties`.
-
-### `Schema.fromJSON`
-
-`Schema.fromJSON(object: Object) => Schema`
-
-Create a schema from a JSON `object`.
-
-### `Schema.isSchema`
-
-`Schema.isSchema(maybeSchema: Any) => Boolean`
-
-Returns a boolean if the passed in argument is a `Schema`.
-
-## Instance Methods
-
-### `toJSON`
-
-`toJSON() => Object`
-
-Returns a JSON representation of the schema.
 
 ## Errors
 

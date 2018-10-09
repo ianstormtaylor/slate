@@ -3,13 +3,19 @@
 import h from '../../../../helpers/h'
 
 export const input = (
-  <b>
-    Cat is <i>Cute</i>
-  </b>
-)[0]
+  <text>
+    <b>
+      Cat is <i>Cute</i>
+    </b>
+  </text>
+)
 
 export default function(t) {
   return t.removeText(0, t.text.length)
 }
 
-export const output = <b />[0]
+export const output = (
+  <text>
+    <b />
+  </text>
+)

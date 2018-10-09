@@ -41,8 +41,9 @@ class App extends React.Component {
   }
 
   // Define a new handler which prints the key that was pressed.
-  onKeyDown = (event, change) => {
+  onKeyDown = (event, change, next) => {
     console.log(event.key)
+    return next()
   }
 
   render() {
@@ -73,9 +74,9 @@ class App extends React.Component {
     this.setState({ value })
   }
 
-  onKeyDown = (event, change) => {
+  onKeyDown = (event, change, next) => {
     // Return with no changes if the keypress is not '&'
-    if (event.key !== '&') return
+    if (event.key !== '&') return next()
 
     // Prevent the ampersand character from being inserted.
     event.preventDefault()

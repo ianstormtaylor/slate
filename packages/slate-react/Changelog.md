@@ -4,6 +4,76 @@ This document maintains a list of changes to the `slate-react` package with each
 
 ---
 
+### `0.19.0` — October 9, 2018
+
+###### NEW
+
+**The `<Editor>` can now choose to not normalize on mount.** A nice side effect of splitting out the `Editor` logic into a reusable place is that it's easier to implement customizable behaviors for normalization. You can now pass an `options={{ normalize: false }}` prop to the React `<Editor>` which will disable the default normalization that takes place when the editor is constructed. This is helpful in cases where you are guaranteed to have an already normalized value, and don't want to incur the performance cost of normalizing it again.
+
+**The middleware stack is now deferrable.** With the introduction of the `Editor` controller, the middleware stack in Slate has also been upgraded. Each middleware now receives a `next` function (similar to Express or Koa) that allows you to choose whether to iterating the stack or not.
+
+```js
+// Previously, you'd return `undefined` to continue.
+function onKeyDown(event, change, editor) {
+  if (event.key !== 'Enter') return
+  ...
+}
+
+// Now, you call `next()` to continue...
+function onKeyDown(event, change, next) {
+  if (event.key !== 'Enter') return next()
+  ...
+}
+```
+
+While that may seem inconvenient, it opens up an entire new behavior, which is deferring to the plugins later in the stack to see if they "handle" a specific case, and if not, handling it yourself:
+
+```js
+function onKeyDown(event, change, next) {
+  if (event.key === 'Enter') {
+    const handled = next()
+    if (handled) return handled
+
+    // Otherwise, handle `Enter` yourself...
+  }
+}
+```
+
+This is how all of the core logic in `slate-react` is now implemented, eliminating the need for a "before" and an "after" plugin that duplicate logic.
+
+Under the covers, the `schema`, `commands` and `queries` concept are all implemented as plugins that attach varying middleware as well. For example, commands are processed using the `onCommand` middleware under the covers:
+
+```js
+const plugin = {
+  onCommand(command, change, next) {
+    ...
+  }
+}
+```
+
+This allows you to actually listen in to all commands, and override individual behaviors if you choose to do so, without having to override the command itself. This is a very advanced feature, which most people won't need, but it shows the flexibility provided by migrating all of the previously custom internal logic to be based on the new middleware stack.
+
+###### BREAKING
+
+**Updated to the latest version of `slate`.** The `slate-react` codebase has been updated to be compatible with the latest version of `slate`, `0.42.0`. This is a backward incompatible upgrade, and so the peer dependency range has been bumped.
+
+**The middleware stack must now be explicitly continued, using `next`.** Previously returning `undefined` from a middleware would (usually) continue the stack onto the next middleware. Now, with middleware taking a `next` function argument you must explicitly decide to continue the stack by call `next()` yourself.
+
+**The `editor` object is no longer passed to event handlers.** Previously, the third argument to event handlers would be the React `editor` instance. However, now that `Change` objects contain a direct reference to the editor, you can access this on `change.editor` instead.
+
+```js
+function onKeyDown(event, change, next) {
+  const { editor } = change
+  ...
+}
+```
+
+In its place is the new `next` argument, which allows you to choose to defer to the plugins further on the stack before handling the event yourself.
+
+**The `findRange`, `findPoint`, `cloneFragment`, and `getEventRange` utils now take an `editor`.** Previously these utility functions took a `schema` argument, but this has been replaced with the new `editor` controller instead now that the `Schema` model has been removed.
+
+---
+
 ### `0.18.0` — August 22, 2018
 
 ###### BREAKING

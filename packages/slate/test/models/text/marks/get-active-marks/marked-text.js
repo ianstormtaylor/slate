@@ -11,7 +11,7 @@ export const input = (
       Cute
     </b>
   </text>
-)[0]
+)
 
 export default function(t) {
   return t.getActiveMarks()

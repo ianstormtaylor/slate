@@ -33,18 +33,28 @@ export const value = (
   <value>
     <document>
       <paragraph>
-        <anchor />
+        <text key="a">
+          <anchor />
+        </text>
       </paragraph>
-      <image key="a" src="https://example.com/image.png" />
+      <image src="https://example.com/image.png">
+        <text />
+      </image>
       <paragraph>
-        <focus />
+        <text key="b">
+          <focus />
+        </text>
       </paragraph>
-      <image key="b" src="https://example.com/image2.png" />
+      <image src="https://example.com/image2.png">
+        <text />
+      </image>
     </document>
+    <selection isFocused={false}>
+      <anchor key="a" offset={0} />
+      <focus key="b" offset={0} />
+    </selection>
   </value>
 )
-  .change()
-  .blur().value
 
 export const output = `
 <div data-slate-editor="true" contenteditable="true" role="textbox">

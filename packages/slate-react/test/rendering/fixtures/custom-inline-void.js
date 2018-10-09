@@ -29,7 +29,11 @@ export const value = (
   <value>
     <document>
       <paragraph>
-        <emoji />
+        <text />
+        <emoji>
+          <text />
+        </emoji>
+        <text />
       </paragraph>
     </document>
   </value>

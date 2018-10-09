@@ -1,11 +1,12 @@
 import Base64 from 'slate-base64-serializer'
 import Plain from 'slate-plain-serializer'
-import { Value } from 'slate'
 import TRANSFER_TYPES from '../constants/transfer-types'
-import getWindow from 'get-window'
 import findDOMNode from './find-dom-node'
+import getWindow from 'get-window'
+import invariant from 'tiny-invariant'
 import removeAllRanges from './remove-all-ranges'
 import { IS_IE } from 'slate-dev-environment'
+import { Value } from 'slate'
 import { ZERO_WIDTH_SELECTOR, ZERO_WIDTH_ATTRIBUTE } from './find-point'
 
 const { FRAGMENT, HTML, TEXT } = TRANSFER_TYPES
@@ -14,22 +15,22 @@ const { FRAGMENT, HTML, TEXT } = TRANSFER_TYPES
  * Prepares a Slate document fragment to be copied to the clipboard.
  *
  * @param {Event} event
- * @param {Value} value
- * @param {Document} [fragment]
+ * @param {Editor} editor
  */
 
-function cloneFragment(
-  event,
-  value,
-  fragment = value.fragment,
-  callback = () => undefined
-) {
+function cloneFragment(event, editor, callback = () => undefined) {
+  invariant(
+    !Value.isValue(editor),
+    'As of Slate 0.42.0, the `cloneFragment` utility takes an `editor` instead of a `value`.'
+  )
+
   const window = getWindow(event.target)
   const native = window.getSelection()
-  const { schema } = value
-  const { start, end } = value.selection
-  const startVoid = value.document.getClosestVoid(start.key, schema)
-  const endVoid = value.document.getClosestVoid(end.key, schema)
+  const { value } = editor
+  const { document, fragment, selection } = value
+  const { start, end } = selection
+  const startVoid = document.getClosestVoid(start.key, editor)
+  const endVoid = document.getClosestVoid(end.key, editor)
 
   // If the selection is collapsed, and it isn't inside a void node, abort.
   if (native.isCollapsed && !startVoid) return
@@ -118,16 +119,16 @@ function cloneFragment(
   // COMPAT: For browser that don't support the Clipboard API's setData method,
   // we must rely on the browser to natively copy what's selected.
   // So we add the div (containing our content) to the DOM, and select it.
-  const editor = event.target.closest('[data-slate-editor]')
+  const editorEl = event.target.closest('[data-slate-editor]')
   div.setAttribute('contenteditable', true)
   div.style.position = 'absolute'
   div.style.left = '-9999px'
-  editor.appendChild(div)
+  editorEl.appendChild(div)
   native.selectAllChildren(div)
 
   // Revert to the previous selection right after copying.
   window.requestAnimationFrame(() => {
-    editor.removeChild(div)
+    editorEl.removeChild(div)
     removeAllRanges(native)
     native.addRange(range)
     callback()

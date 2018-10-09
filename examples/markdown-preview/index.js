@@ -135,11 +135,13 @@ class MarkdownPreview extends React.Component {
    * Define a decorator for markdown styles.
    *
    * @param {Node} node
+   * @param {Function} next
    * @return {Array}
    */
 
-  decorateNode(node) {
-    if (node.object != 'block') return
+  decorateNode(node, next) {
+    const others = next() || []
+    if (node.object != 'block') return others
 
     const string = node.text
     const texts = node.getTexts().toArray()
@@ -202,7 +204,7 @@ class MarkdownPreview extends React.Component {
       start = end
     }
 
-    return decorations
+    return [...others, ...decorations]
   }
 }
 
