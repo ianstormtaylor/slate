@@ -37,7 +37,7 @@ export const output = `
   <div style="position:relative">
     <span>
       <span>
-        <span data-slate-zero-width="z">&#x200B;</span>
+        <span data-slate-zero-width="z">&#xFEFF;</span>
       </span>
     </span>
     <a href="https://google.com">
@@ -47,7 +47,7 @@ export const output = `
     </a>
     <span>
       <span>
-        <span data-slate-zero-width="z">&#x200B;</span>
+        <span data-slate-zero-width="z">&#xFEFF;</span>
       </span>
     </span>
   </div>
