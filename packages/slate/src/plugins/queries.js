@@ -33,10 +33,11 @@ function QueriesPlugin(options = {}) {
    * On query, if it exists in our list of queries, call it.
    *
    * @param {Object} query
+   * @param {Editor} editor
    * @param {Function} next
    */
 
-  function onQuery(query, next) {
+  function onQuery(query, editor, next) {
     const { type, args } = query
     const fn = queries[type]
     if (!fn) return next()
@@ -46,7 +47,7 @@ function QueriesPlugin(options = {}) {
       if (ret !== undefined) return ret
     }
 
-    const ret = fn(...args)
+    const ret = fn(editor, ...args)
     return ret === undefined ? next() : ret
   }
 

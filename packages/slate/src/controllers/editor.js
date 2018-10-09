@@ -147,8 +147,9 @@ class Editor {
   query(query, ...args) {
     debug('query', { query, args })
 
+    const { editor } = this
     const obj = { type: query, args }
-    return this.run('onQuery', obj)
+    return this.run('onQuery', obj, editor)
   }
 
   /**

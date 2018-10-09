@@ -53,11 +53,12 @@ function SchemaPlugin(schema) {
   /**
    * Check if a `mark` is void based on the schema rules.
    *
+   * @param {Editor} editor
    * @param {Mark} mark
    * @return {Boolean}
    */
 
-  function isAtomic(mark) {
+  function isAtomic(editor, mark) {
     const rule = schemaRules.find(
       r => 'isAtomic' in r && testRules(mark, r.match)
     )
@@ -68,11 +69,12 @@ function SchemaPlugin(schema) {
   /**
    * Check if a `node` is void based on the schema rules.
    *
+   * @param {Editor} editor
    * @param {Node} node
    * @return {Boolean}
    */
 
-  function isVoid(node) {
+  function isVoid(editor, node) {
     const rule = schemaRules.find(
       r => 'isVoid' in r && testRules(node, r.match)
     )
