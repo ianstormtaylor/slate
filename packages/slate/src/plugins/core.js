@@ -1,9 +1,12 @@
 import AtCurrentRange from '../commands/at-current-range'
 import AtRange from '../commands/at-range'
 import ByPath from '../commands/by-path'
+import Commands from './commands'
 import OnHistory from '../commands/on-history'
 import OnSelection from '../commands/on-selection'
 import OnValue from '../commands/on-value'
+import Queries from './queries'
+import Schema from './schema'
 import Text from '../models/text'
 
 /**
@@ -19,14 +22,17 @@ function CorePlugin() {
    * @type {Object}
    */
 
-  const commands = {
-    ...AtCurrentRange,
-    ...AtRange,
-    ...ByPath,
-    ...OnHistory,
-    ...OnSelection,
-    ...OnValue,
-  }
+  const commands = Commands({
+    defer: true,
+    commands: {
+      ...AtCurrentRange,
+      ...AtRange,
+      ...ByPath,
+      ...OnHistory,
+      ...OnSelection,
+      ...OnValue,
+    },
+  })
 
   /**
    * The core Slate queries.
@@ -34,12 +40,15 @@ function CorePlugin() {
    * @type {Object}
    */
 
-  const queries = {
-    isAtomic: () => false,
-    isVoid: () => false,
-    normalizeNode: () => {},
-    validateNode: () => {},
-  }
+  const queries = Queries({
+    defer: true,
+    queries: {
+      isAtomic: () => false,
+      isVoid: () => false,
+      normalizeNode: () => {},
+      validateNode: () => {},
+    },
+  })
 
   /**
    * The core Slate schema.
@@ -47,7 +56,7 @@ function CorePlugin() {
    * @type {Object}
    */
 
-  const schema = {
+  const schema = Schema({
     rules: [
       // Only allow block nodes in documents.
       {
@@ -163,19 +172,15 @@ function CorePlugin() {
         },
       },
     ],
-  }
+  })
 
   /**
-   * Return the plugin.
+   * Return the plugins.
    *
-   * @type {Object}
+   * @type {Array}
    */
 
-  return {
-    commands,
-    queries,
-    schema,
-  }
+  return [commands, queries, schema]
 }
 
 /**

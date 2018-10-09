@@ -39,9 +39,11 @@ class Editor {
     } = attrs
 
     this.Change = class Change extends AbstractChange {}
-    this.middleware = {}
     this.editor = editor
+    this.middleware = {}
     this.onChange = onChange
+    this.readOnly = null
+    this.value = null
 
     this.tmp = {
       change: null,
@@ -56,18 +58,19 @@ class Editor {
       this.registerPlugin(plugin)
     }
 
+    this.run('onConstruct', this)
+
     this.setReadOnly(readOnly)
     this.setValue(value, options)
-    this.run('onConstruct', this)
   }
 
   /**
    * Perform a change on the editor, passing `...args` to `change.call`.
    *
-   * @param {Mixed} ...args
+   * @param {Any} ...args
    */
 
-  change = (...args) => {
+  change(...args) {
     const { Change, editor, value } = this
     const { isChanging } = this.tmp
     const change = isChanging ? this.tmp.change : new Change({ value, editor })
@@ -106,7 +109,7 @@ class Editor {
    * @param {Any} ...args
    */
 
-  command = (command, ...args) => {
+  command(command, ...args) {
     debug('command', { command, args })
 
     this.change(change => {
@@ -122,7 +125,7 @@ class Editor {
    * @param {Event} event
    */
 
-  event = (handler, event) => {
+  event(handler, event) {
     debug('event', { handler, event })
 
     this.change(change => {
@@ -137,7 +140,7 @@ class Editor {
    * @param {Any} ...args
    */
 
-  query = (query, ...args) => {
+  query(query, ...args) {
     debug('query', { query, args })
 
     const obj = { type: query, args }
@@ -160,10 +163,15 @@ class Editor {
   /**
    * Register a `plugin` with the editor.
    *
-   * @param {Object} plugin
+   * @param {Object|Array} plugin
    */
 
   registerPlugin(plugin) {
+    if (Array.isArray(plugin)) {
+      plugin.forEach(p => this.registerPlugin(p))
+      return
+    }
+
     const { commands, queries, schema, ...rest } = plugin
 
     if (commands) {
@@ -209,7 +217,7 @@ class Editor {
    * @return {Any}
    */
 
-  run = (key, ...args) => {
+  run(key, ...args) {
     const middleware = this.middleware[key] || []
     let i = 0
 

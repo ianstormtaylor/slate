@@ -1,11 +1,13 @@
 /**
- * Create a plugin from a set of `commands`.
+ * A plugin that adds a set of commands to the editor.
  *
- * @param {Object} commands
+ * @param {Object} options
  * @return {Object}
  */
 
-function CommandsPlugin(commands) {
+function CommandsPlugin(options = {}) {
+  const { commands, defer = false } = options
+
   /**
    * On command, if it exists in our list of commands, call it.
    *
@@ -16,16 +18,14 @@ function CommandsPlugin(commands) {
 
   function onCommand(command, change, next) {
     const { type, args } = command
-
-    // Defer to other plugins in the stack.
-    const ret = next()
-    if (ret !== undefined) return ret
-
-    // If the command isn't found, abort.
-    if (!(type in commands)) return
-
-    // Otherwise, call the change function.
     const fn = commands[type]
+    if (!fn) return next()
+
+    if (defer) {
+      const ret = next()
+      if (ret !== undefined) return ret
+    }
+
     change.call(fn, ...args)
     return true
   }

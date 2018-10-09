@@ -1,11 +1,13 @@
 /**
- * Create a plugin from a set of `queries`.
+ * A plugin that adds a set of queries to the editor.
  *
- * @param {Object} queries
+ * @param {Object} options
  * @return {Object}
  */
 
-function QueriesPlugin(queries) {
+function QueriesPlugin(options = {}) {
+  const { queries, defer = false } = options
+
   /**
    * On construct, register all the queries.
    *
@@ -30,17 +32,16 @@ function QueriesPlugin(queries) {
 
   function onQuery(query, next) {
     const { type, args } = query
-
-    // Defer to other plugins in the stack.
-    const ret = next()
-    if (ret !== undefined) return ret
-
-    // If the query isn't found, abort.
-    if (!(type in queries)) return
-
-    // Otherwise, run the query.
     const fn = queries[type]
-    return fn(...args)
+    if (!fn) return next()
+
+    if (defer) {
+      const ret = next()
+      if (ret !== undefined) return ret
+    }
+
+    const ret = fn(...args)
+    return ret
   }
 
   /**

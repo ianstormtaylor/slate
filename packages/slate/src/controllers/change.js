@@ -150,15 +150,16 @@ class Change {
 
   normalize() {
     const { value } = this
-    const { document } = value
+    let { document } = value
     const table = document.getKeysToPathsTable()
     const paths = Object.values(table).map(PathUtils.create)
     this.tmp.dirty = this.tmp.dirty.concat(paths)
     this.normalizeDirtyPaths()
 
     const { selection } = value
+    document = value.document
 
-    if (selection.isUnset && this.document.nodes.size) {
+    if (selection.isUnset && document.nodes.size) {
       this.moveToStartOfDocument()
     }
 
