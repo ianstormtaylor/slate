@@ -110,9 +110,30 @@ Commands.insertNodeByPath = (change, path, index, node) => {
 
 Commands.insertTextByPath = (change, path, offset, text, marks) => {
   const { value } = change
-  const { document } = value
+  const { decorations, document } = value
   const node = document.assertNode(path)
   marks = marks || node.getMarksAtIndex(offset)
+
+  let updated = false
+  const { key } = node
+
+  const decs = decorations.filter(dec => {
+    const { start, end, mark } = dec
+    const isAtomic = change.isAtomic(mark)
+    if (!isAtomic) return true
+    if (start.key !== key) return true
+
+    if (start.offset < offset && (end.key !== key || end.offset > offset)) {
+      updated = true
+      return false
+    }
+
+    return true
+  })
+
+  if (updated) {
+    change.setValue({ decorations: decs })
+  }
 
   change.applyOperation({
     type: 'insert_text',
@@ -283,10 +304,38 @@ Commands.removeNodeByPath = (change, path) => {
 
 Commands.removeTextByPath = (change, path, offset, length) => {
   const { value } = change
-  const { document } = value
+  const { decorations, document } = value
   const node = document.assertNode(path)
   const leaves = node.getLeaves()
   const { text } = node
+
+  let updated = false
+  const { key } = node
+  const from = offset
+  const to = offset + length
+
+  const decs = decorations.filter(dec => {
+    const { start, end, mark } = dec
+    const isAtomic = change.isAtomic(mark)
+    if (!isAtomic) return true
+    if (start.key !== key) return true
+
+    if (start.offset < from && (end.key !== key || end.offset > from)) {
+      updated = true
+      return false
+    }
+
+    if (start.offset < to && (end.key !== key || end.offset > to)) {
+      updated = true
+      return null
+    }
+
+    return true
+  })
+
+  if (updated) {
+    change.setValue({ decorations: decs })
+  }
 
   const removals = []
   const bx = offset

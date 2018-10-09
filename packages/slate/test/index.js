@@ -99,10 +99,10 @@ describe('slate', () => {
   // editor doesn't! It needs to live in the tests instead.
 
   fixtures(__dirname, 'changes', ({ module }) => {
-    const { input, output } = module
+    const { input, output, options = {} } = module
     const fn = module.default
     const editor = new Editor({ plugins })
-    const opts = { preserveSelection: true }
+    const opts = { preserveSelection: true, ...options }
 
     editor.setValue(input)
     editor.change(fn)

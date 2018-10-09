@@ -10,14 +10,22 @@ Plugins are plain JavaScript objects, containing a set of middleware functions t
 
 ```js
 {
+  normalizeNode: Function,
   onChange: Function,
   onCommand: Function,
   onConstruct: Function,
   onQuery: Function,
+  validateNode: Function,
 }
 ```
 
 When a hook is triggered, the middleware function is passed a set of arguments, with the last argument being a `next` function. Choosing whether to call `next` or not determines whether the editor will continue traversing the stack.
+
+### `normalizeNode`
+
+`Function normalizeNode(node: Node, next: Function) => Function(change: Change)|Void`
+
+The `normalizeNode` hook takes a `node` and either returns `undefined` if the node is valid, or a change function that normalizes the node into a valid state if not.
 
 ### `onChange`
 
@@ -108,6 +116,12 @@ The `onConstruct` hook is called when a new instance of `Editor` is created. Thi
 The `onQuery` hook is called with a `query` object resulting from an `editor.query(type, ...args)` or a `change[query](...args)` call:
 
 The `onQuery` hook is a low-level way to have access to all of the queries passing through the editor. Most of the time you should use the `queries` shorthand instead.
+
+### `validateNode`
+
+`Function validateNode(node: Node, next: Function) => SlateError|Void`
+
+The `validateNode` hook takes a `node` and either returns `undefined` if the node is valid, or a `SlateError` object if it is invalid.
 
 ## Shorthands
 

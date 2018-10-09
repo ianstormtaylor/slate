@@ -11,7 +11,6 @@ In addition to the [core plugin hooks](../slate/plugins.md), when using `slate-r
 ```js
 {
   decorateNode: Function,
-  normalizeNode: Function,
   onBeforeInput: Function,
   onBlur: Function,
   onCopy: Function,
@@ -36,11 +35,9 @@ The rendering hooks are just like render props common to other React API's, and 
 
 ### `decorateNode`
 
-`Function decorateNode(node: Node) => Array<Decoration>|Void`
+`Function decorateNode(node: Node, next: Function) => Array<Decoration>|Void`
 
-### `normalizeNode`
-
-`Function normalizeNode(node: Node) => Function(change: Change)|Void`
+The `decorateNode` hook takes a `node` and returns an array of decorations with marks to be applied to the node when it is rendered.
 
 ### `onBeforeInput`
 
