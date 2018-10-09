@@ -28,7 +28,7 @@ class App extends React.Component {
 
 That will render a basic Slate editor on your page.
 
-Now... we need to add the [`Html`](../reference/serializers/html.md) serializer. And to do that, we need to tell it a bit about the schema we plan on using. For this example, we'll work with a schema that has a few different parts:
+Now... we need to add the [`Html`](../reference/slate-html-serializer/index.md) serializer. And to do that, we need to tell it a bit about the schema we plan on using. For this example, we'll work with a schema that has a few different parts:
 
 * A `paragraph` block.
 * A `code` block for code samples.
