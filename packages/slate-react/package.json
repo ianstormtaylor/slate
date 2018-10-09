@@ -33,7 +33,7 @@
     "immutable": ">=3.8.1",
     "react": ">=0.14.0",
     "react-dom": ">=0.14.0",
-    "slate": ">=0.37.0"
+    "slate": ">=0.42.0"
   },
   "devDependencies": {
     "immutable": "^3.8.1",
