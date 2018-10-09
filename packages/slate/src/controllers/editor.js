@@ -179,12 +179,12 @@ class Editor {
     const { commands, queries, schema, ...rest } = plugin
 
     if (commands) {
-      const commandsPlugin = CommandsPlugin(commands)
+      const commandsPlugin = CommandsPlugin({ commands })
       this.registerPlugin(commandsPlugin)
     }
 
     if (queries) {
-      const queriesPlugin = QueriesPlugin(queries)
+      const queriesPlugin = QueriesPlugin({ queries })
       this.registerPlugin(queriesPlugin)
     }
 

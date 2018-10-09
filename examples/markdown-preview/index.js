@@ -140,7 +140,7 @@ class MarkdownPreview extends React.Component {
    */
 
   decorateNode(node, next) {
-    const others = next()
+    const others = next() || []
     if (node.object != 'block') return others
 
     const string = node.text

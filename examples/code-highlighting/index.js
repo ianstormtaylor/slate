@@ -189,7 +189,7 @@ class CodeHighlighting extends React.Component {
    */
 
   decorateNode = (node, next) => {
-    const others = next()
+    const others = next() || []
     if (node.type != 'code') return others
 
     const language = node.data.get('language')

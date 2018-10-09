@@ -171,7 +171,7 @@ function BrowserPlugin() {
    */
 
   function onBlur(event, change, next) {
-    const { editor, value } = change
+    const { editor } = change
     if (isCopying) return true
     if (editor.readOnly) return true
 
@@ -201,7 +201,7 @@ function BrowserPlugin() {
       // COMPAT: The event should be ignored if the focus is moving to a non-
       // editable section of an element that isn't a void node (eg. a list item
       // of the check list example).
-      const node = findNode(relatedTarget, value)
+      const node = findNode(relatedTarget, editor)
       if (el.contains(relatedTarget) && node && !change.isVoid(node))
         return true
     }
@@ -267,11 +267,12 @@ function BrowserPlugin() {
     const ret = next()
     if (ret !== undefined) return ret
 
-    const { editor, value } = change
+    const { editor } = change
     if (editor.readOnly) return true
 
+    const { value } = editor
     const { document } = value
-    const node = findNode(event.target, value)
+    const node = findNode(event.target, editor)
     if (!node) return true
 
     const ancestors = document.getAncestors(node.key)
@@ -461,7 +462,7 @@ function BrowserPlugin() {
     // When the target is editable, dropping is already allowed by
     // default, and calling `preventDefault` hides the cursor.
     const { editor } = change
-    const node = findNode(event.target, editor.value)
+    const node = findNode(event.target, editor)
     if (change.isVoid(node)) event.preventDefault()
 
     // COMPAT: IE won't call onDrop on contentEditables unless the
@@ -503,9 +504,10 @@ function BrowserPlugin() {
     const ret = next()
     if (ret !== undefined) return ret
 
-    const { value } = change
+    const { editor } = change
+    const { value } = editor
     const { document } = value
-    const node = findNode(event.target, value)
+    const node = findNode(event.target, editor)
     const ancestors = document.getAncestors(node.key)
     const isVoid =
       node && (change.isVoid(node) || ancestors.some(a => change.isVoid(a)))

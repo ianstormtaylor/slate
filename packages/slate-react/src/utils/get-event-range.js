@@ -28,7 +28,7 @@ function getEventRange(event, editor) {
 
   const { value } = editor
   const { document } = value
-  const node = findNode(target, value)
+  const node = findNode(target, editor)
   if (!node) return null
 
   // If the drop target is inside a void node, move it into either the next or
