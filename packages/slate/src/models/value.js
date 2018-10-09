@@ -1,4 +1,5 @@
 import isPlainObject from 'is-plain-object'
+import invariant from 'tiny-invariant'
 import { Record, Set, List } from 'immutable'
 
 import PathUtils from '../utils/path-utils'
@@ -820,6 +821,24 @@ class Value extends Record(DEFAULTS) {
     }
 
     return object
+  }
+
+  /**
+   * Deprecated.
+   */
+
+  get history() {
+    invariant(
+      false,
+      'As of Slate 0.42.0, the `value.history` model no longer exists, and the history is stored in `value.data` instead using plugins.'
+    )
+  }
+
+  change() {
+    invariant(
+      false,
+      'As of Slate 0.42.0, value object are no longer schema-aware, and the `value.change()` method is no longer available. Use the `editor.change()` method on the new `Editor` controller instead.'
+    )
   }
 }
 

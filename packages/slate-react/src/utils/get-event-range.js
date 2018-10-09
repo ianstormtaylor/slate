@@ -1,4 +1,6 @@
 import getWindow from 'get-window'
+import invariant from 'tiny-invariant'
+import { Value } from 'slate'
 
 import findNode from './find-node'
 import findRange from './find-range'
@@ -12,6 +14,11 @@ import findRange from './find-range'
  */
 
 function getEventRange(event, editor) {
+  invariant(
+    !Value.isValue(editor),
+    'As of Slate 0.42.0, the `findNode` utility takes an `editor` instead of a `value`.'
+  )
+
   if (event.nativeEvent) {
     event = event.nativeEvent
   }

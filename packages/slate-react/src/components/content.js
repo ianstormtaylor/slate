@@ -2,7 +2,7 @@ import Debug from 'debug'
 import React from 'react'
 import Types from 'prop-types'
 import getWindow from 'get-window'
-import warning from 'slate-dev-warning'
+import warning from 'tiny-warning'
 import throttle from 'lodash/throttle'
 import { IS_FIREFOX, HAS_INPUT_EVENTS_LEVEL_2 } from 'slate-dev-environment'
 

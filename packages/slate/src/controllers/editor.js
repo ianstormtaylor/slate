@@ -1,4 +1,5 @@
 import Debug from 'debug'
+import invariant from 'tiny-invariant'
 
 import AbstractChange from './change'
 import CorePlugin from '../plugins/core'
@@ -238,6 +239,51 @@ class Editor {
       const ret = fn(...args, next)
       return ret
     }
+
+    Object.defineProperty(next, 'change', {
+      get() {
+        invariant(
+          false,
+          'As of Slate 0.42.0, the `editor` is no longer passed as the third argument to event handlers. You can access it via `change.editor` instead.'
+        )
+      },
+    })
+
+    Object.defineProperty(next, 'onChange', {
+      get() {
+        invariant(
+          false,
+          'As of Slate 0.42.0, the `editor` is no longer passed as the third argument to event handlers. You can access it via `change.editor` instead.'
+        )
+      },
+    })
+
+    Object.defineProperty(next, 'props', {
+      get() {
+        invariant(
+          false,
+          'As of Slate 0.42.0, the `editor` is no longer passed as the third argument to event handlers. You can access it via `change.editor` instead.'
+        )
+      },
+    })
+
+    Object.defineProperty(next, 'schema', {
+      get() {
+        invariant(
+          false,
+          'As of Slate 0.42.0, the `editor` is no longer passed as the third argument to event handlers. You can access it via `change.editor` instead.'
+        )
+      },
+    })
+
+    Object.defineProperty(next, 'stack', {
+      get() {
+        invariant(
+          false,
+          'As of Slate 0.42.0, the `editor` is no longer passed as the third argument to event handlers. You can access it via `change.editor` instead.'
+        )
+      },
+    })
 
     return next()
   }

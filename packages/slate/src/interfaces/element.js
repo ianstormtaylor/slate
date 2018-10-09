@@ -1,4 +1,5 @@
 import direction from 'direction'
+import invariant from 'tiny-invariant'
 import { List, OrderedSet, Set } from 'immutable'
 
 import mixin from '../utils/mixin'
@@ -11,6 +12,7 @@ import PathUtils from '../utils/path-utils'
 import Point from '../models/point'
 import Range from '../models/range'
 import Selection from '../models/selection'
+import Value from '../models/value'
 
 /**
  * The interface that `Document`, `Block` and `Inline` all implement, to make
@@ -403,6 +405,11 @@ class ElementInterface {
    */
 
   getClosestVoid(path, editor) {
+    invariant(
+      !Value.isValue(editor),
+      'As of Slate 0.42.0, the `node.getClosestVoid` method takes an `editor` instead of a `value`.'
+    )
+
     const ancestors = this.getAncestors(path)
     if (!ancestors) return null
 
@@ -436,6 +443,11 @@ class ElementInterface {
    */
 
   getDecorations(editor) {
+    invariant(
+      !Value.isValue(editor),
+      'As of Slate 0.42.0, the `node.getDecorations` method takes an `editor` instead of a `value`.'
+    )
+
     const array = editor.run('decorateNode', this) || []
     const decorations = Decoration.createList(array)
     return decorations
@@ -1362,6 +1374,11 @@ class ElementInterface {
    */
 
   hasVoidParent(path, editor) {
+    invariant(
+      !Value.isValue(editor),
+      'As of Slate 0.42.0, the `node.hasVoidParent` method takes an `editor` instead of a `value`.'
+    )
+
     const closest = this.getClosestVoid(path, editor)
     return !!closest
   }

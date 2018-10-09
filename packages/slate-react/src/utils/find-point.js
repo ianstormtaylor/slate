@@ -1,4 +1,6 @@
 import getWindow from 'get-window'
+import invariant from 'tiny-invariant'
+import { Value } from 'slate'
 
 import OffsetKey from './offset-key'
 
@@ -25,6 +27,11 @@ const VOID_SELECTOR = '[data-slate-void]'
  */
 
 function findPoint(nativeNode, nativeOffset, editor) {
+  invariant(
+    !Value.isValue(editor),
+    'As of Slate 0.42.0, the `findPoint` utility takes an `editor` instead of a `value`.'
+  )
+
   const { node: nearestNode, offset: nearestOffset } = normalizeNodeAndOffset(
     nativeNode,
     nativeOffset

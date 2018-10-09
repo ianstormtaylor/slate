@@ -2,9 +2,10 @@ import Debug from 'debug'
 import React from 'react'
 import SlateTypes from 'slate-prop-types'
 import Types from 'prop-types'
-import warning from 'slate-dev-warning'
-import { Editor as Controller } from 'slate'
+import invariant from 'tiny-invariant'
 import memoizeOne from 'memoize-one'
+import warning from 'tiny-warning'
+import { Editor as Controller } from 'slate'
 
 import EVENT_HANDLERS from '../constants/event-handlers'
 import BrowserPlugin from '../plugins/browser'
@@ -237,6 +238,24 @@ class Editor extends React.Component {
 
   focus = () => {
     this.change(c => c.focus())
+  }
+
+  /**
+   * Deprecated.
+   */
+
+  get schema() {
+    invariant(
+      false,
+      'As of Slate 0.42.0, the `editor.schema` property no longer exists, and its functionality has been folded into the editor itself. Use the `editor` instead.'
+    )
+  }
+
+  get stack() {
+    invariant(
+      false,
+      'As of Slate 0.42.0, the `editor.stack` property no longer exists, and its functionality has been folded into the editor itself. Use the `editor` instead.'
+    )
   }
 }
 

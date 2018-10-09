@@ -1,4 +1,4 @@
-import warning from 'slate-dev-warning'
+import warning from 'tiny-warning'
 import { List } from 'immutable'
 
 import mixin from '../utils/mixin'

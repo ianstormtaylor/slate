@@ -1,5 +1,7 @@
 import getWindow from 'get-window'
+import invariant from 'tiny-invariant'
 import { IS_IE, IS_EDGE } from 'slate-dev-environment'
+import { Value } from 'slate'
 
 import findPoint from './find-point'
 import findDOMPoint from './find-dom-point'
@@ -13,6 +15,11 @@ import findDOMPoint from './find-dom-point'
  */
 
 function findRange(native, editor) {
+  invariant(
+    !Value.isValue(editor),
+    'As of Slate 0.42.0, the `findNode` utility takes an `editor` instead of a `value`.'
+  )
+
   const el = native.anchorNode || native.startContainer
   if (!el) return null
 

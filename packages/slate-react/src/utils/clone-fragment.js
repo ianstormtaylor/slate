@@ -1,11 +1,12 @@
 import Base64 from 'slate-base64-serializer'
 import Plain from 'slate-plain-serializer'
-import { Value } from 'slate'
 import TRANSFER_TYPES from '../constants/transfer-types'
-import getWindow from 'get-window'
 import findDOMNode from './find-dom-node'
+import getWindow from 'get-window'
+import invariant from 'tiny-invariant'
 import removeAllRanges from './remove-all-ranges'
 import { IS_IE } from 'slate-dev-environment'
+import { Value } from 'slate'
 import { ZERO_WIDTH_SELECTOR, ZERO_WIDTH_ATTRIBUTE } from './find-point'
 
 const { FRAGMENT, HTML, TEXT } = TRANSFER_TYPES
@@ -18,6 +19,11 @@ const { FRAGMENT, HTML, TEXT } = TRANSFER_TYPES
  */
 
 function cloneFragment(event, editor, callback = () => undefined) {
+  invariant(
+    !Value.isValue(editor),
+    'As of Slate 0.42.0, the `cloneFragment` utility takes an `editor` instead of a `value`.'
+  )
+
   const window = getWindow(event.target)
   const native = window.getSelection()
   const { value } = editor
