@@ -34,6 +34,7 @@
 * [Data](./reference/slate/data.md)
 * [Decoration](./reference/slate/decoration.md)
 * [Document](./reference/slate/document.md)
+* [Editor](./reference/slate/editor.md)
 * [Inline](./reference/slate/inline.md)
 * [Mark](./reference//slate/mark.md)
 * [Node](./reference/slate/node.md)

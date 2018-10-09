@@ -17,6 +17,14 @@ import Value from '../models/value'
 const debug = Debug('slate:editor')
 
 /**
+ * The core plugin.
+ *
+ * @type {Array|Object}
+ */
+
+const corePlugin = CorePlugin()
+
+/**
  * Editor.
  *
  * @type {Editor}
@@ -49,15 +57,10 @@ class Editor {
     this.tmp = {
       change: null,
       isChanging: false,
-      lastValue: null,
     }
 
-    const corePlugin = CorePlugin()
-    this.registerPlugin(corePlugin)
-
-    for (const plugin of plugins) {
-      this.registerPlugin(plugin)
-    }
+    registerPlugin(this, corePlugin)
+    plugins.forEach(p => registerPlugin(this, p))
 
     this.run('onConstruct', this)
 
@@ -161,42 +164,6 @@ class Editor {
     Change.prototype[command] = function(...args) {
       const change = this.command(command, ...args)
       return change
-    }
-  }
-
-  /**
-   * Register a `plugin` with the editor.
-   *
-   * @param {Object|Array} plugin
-   */
-
-  registerPlugin(plugin) {
-    if (Array.isArray(plugin)) {
-      plugin.forEach(p => this.registerPlugin(p))
-      return
-    }
-
-    const { commands, queries, schema, ...rest } = plugin
-
-    if (commands) {
-      const commandsPlugin = CommandsPlugin({ commands })
-      this.registerPlugin(commandsPlugin)
-    }
-
-    if (queries) {
-      const queriesPlugin = QueriesPlugin({ queries })
-      this.registerPlugin(queriesPlugin)
-    }
-
-    if (schema) {
-      const schemaPlugin = SchemaPlugin(schema)
-      this.registerPlugin(schemaPlugin)
-    }
-
-    for (const key in rest) {
-      const fn = rest[key]
-      const middleware = (this.middleware[key] = this.middleware[key] || [])
-      middleware.push(fn)
     }
   }
 
@@ -317,6 +284,43 @@ class Editor {
     }
 
     return this
+  }
+}
+
+/**
+ * Register a `plugin` with the editor.
+ *
+ * @param {Editor} editor
+ * @param {Object|Array} plugin
+ */
+
+function registerPlugin(editor, plugin) {
+  if (Array.isArray(plugin)) {
+    plugin.forEach(p => registerPlugin(editor, p))
+    return
+  }
+
+  const { commands, queries, schema, ...rest } = plugin
+
+  if (commands) {
+    const commandsPlugin = CommandsPlugin({ commands })
+    registerPlugin(editor, commandsPlugin)
+  }
+
+  if (queries) {
+    const queriesPlugin = QueriesPlugin({ queries })
+    registerPlugin(editor, queriesPlugin)
+  }
+
+  if (schema) {
+    const schemaPlugin = SchemaPlugin(schema)
+    registerPlugin(editor, schemaPlugin)
+  }
+
+  for (const key in rest) {
+    const fn = rest[key]
+    const middleware = (editor.middleware[key] = editor.middleware[key] || [])
+    middleware.push(fn)
   }
 }
 
