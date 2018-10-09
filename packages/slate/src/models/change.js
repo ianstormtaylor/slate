@@ -47,11 +47,10 @@ class Change {
    * history if needed.
    *
    * @param {Operation|Object} operation
-   * @param {Object} options
    * @return {Change}
    */
 
-  applyOperation(operation, options = {}) {
+  applyOperation(operation) {
     const { operations } = this
     let { value } = this
     let { history } = value
