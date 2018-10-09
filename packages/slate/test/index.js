@@ -98,7 +98,7 @@ describe('slate', () => {
   // The hyperscript editor has the schema, but the test
   // editor doesn't! It needs to live in the tests instead.
 
-  fixtures(__dirname, 'changes', ({ module }) => {
+  fixtures(__dirname, 'commands', ({ module }) => {
     const { input, output, options = {} } = module
     const fn = module.default
     const editor = new Editor({ plugins })
