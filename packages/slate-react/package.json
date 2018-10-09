@@ -1,9 +1,9 @@
 {
   "name": "slate-react",
   "description": "A set of React components for building completely customizable rich-text editors.",
-  "version": "0.18.12",
+  "version": "0.18.13",
   "license": "MIT",
-  "repository": "git://github.com/ianstormtaylor/slate.git",
+  "repository": "git://github.com/pie-framework/slate.git",
   "main": "lib/slate-react.js",
   "module": "lib/slate-react.es.js",
   "umd": "dist/slate-react.js",
