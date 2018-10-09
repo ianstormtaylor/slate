@@ -27,17 +27,11 @@
   <a href="https://unpkg.com/slate/dist/slate.min.js">
     <img src="http://img.badgesize.io/https://unpkg.com/slate/dist/slate.min.js?compression=gzip&amp;label=slate">
   </a>
-  <a href="https://unpkg.com/slate-react/dist/slate-react.min.js">
-    <img src="http://img.badgesize.io/https://unpkg.com/slate-react/dist/slate-react.min.js?compression=gzip&amp;label=slate--react">
-  </a>
   <a href="https://slate-slack.herokuapp.com">
     <img src="https://slate-slack.herokuapp.com/badge.svg">
   </a>
   <a href="./packages/slate/package.json">
     <img src="https://img.shields.io/npm/v/slate.svg?maxAge=3600&label=slate&colorB=007ec6">
-  </a>
-  <a href="./packages/slate-react/package.json">
-    <img src="https://img.shields.io/npm/v/slate-react.svg?maxAge=3600&label=slate-react&colorB=007ec6">
   </a>
 </p>
 <br/>
