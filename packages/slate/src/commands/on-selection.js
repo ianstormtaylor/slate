@@ -606,9 +606,9 @@ Commands.setStart = (change, ...args) => {
 }
 
 Commands.snapshotSelection = change => {
-  change.withoutMerging(c =>
-    c.select(change.value.selection, { snapshot: true })
-  )
+  change.withoutMerging(() => {
+    change.select(change.value.selection, { snapshot: true })
+  })
 }
 
 /**
