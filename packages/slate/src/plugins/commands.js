@@ -8,6 +8,12 @@
 function CommandsPlugin(options = {}) {
   const { commands, defer = false } = options
 
+  if (!commands) {
+    throw new Error(
+      'You must pass in the `commands` option to the Slate commands plugin.'
+    )
+  }
+
   /**
    * On command, if it exists in our list of commands, call it.
    *

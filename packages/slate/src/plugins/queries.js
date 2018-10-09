@@ -8,6 +8,12 @@
 function QueriesPlugin(options = {}) {
   const { queries, defer = false } = options
 
+  if (!queries) {
+    throw new Error(
+      'You must pass in the `queries` option to the Slate queries plugin.'
+    )
+  }
+
   /**
    * On construct, register all the queries.
    *
@@ -41,7 +47,7 @@ function QueriesPlugin(options = {}) {
     }
 
     const ret = fn(...args)
-    return ret
+    return ret === undefined ? next() : ret
   }
 
   /**

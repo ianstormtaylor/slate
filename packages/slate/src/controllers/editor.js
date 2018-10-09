@@ -154,7 +154,10 @@ class Editor {
    */
 
   registerCommand(command) {
-    this.Change.prototype[command] = function(...args) {
+    const { Change } = this
+    if (Change.prototype[command]) return
+
+    Change.prototype[command] = function(...args) {
       const change = this.command(command, ...args)
       return change
     }
@@ -203,7 +206,10 @@ class Editor {
    */
 
   registerQuery(query) {
-    this.Change.prototype[query] = function(...args) {
+    const { Change } = this
+    if (Change.prototype[query]) return
+
+    Change.prototype[query] = function(...args) {
       const ret = this.query(query, ...args)
       return ret
     }

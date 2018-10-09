@@ -1,4 +1,5 @@
 import SlateError from '../utils/slate-error'
+import Queries from './queries'
 
 /**
  * Create a plugin from a `schema` definition.
@@ -61,7 +62,7 @@ function SchemaPlugin(schema) {
       r => 'isAtomic' in r && testRules(mark, r.match)
     )
 
-    return rule && !!rule.isAtomic
+    return rule && rule.isAtomic
   }
 
   /**
@@ -76,23 +77,7 @@ function SchemaPlugin(schema) {
       r => 'isVoid' in r && testRules(node, r.match)
     )
 
-    return rule && !!rule.isVoid
-  }
-
-  /**
-   * Validate a `node` with the schema rules, returning a `SlateError` if it's
-   * invalid.
-   *
-   * @param {Node} node
-   * @return {Error|Void}
-   */
-
-  function validateNode(node) {
-    const matches = schemaRules.filter(r => testRules(node, r.match))
-    const failure = validateRules(node, matches, schemaRules, { every: true })
-    if (!failure) return
-    const error = new SlateError(failure.code, failure)
-    return error
+    return rule && rule.isVoid
   }
 
   /**
@@ -100,14 +85,13 @@ function SchemaPlugin(schema) {
    * fix the invalid node, or void if the node is valid.
    *
    * @param {Node} node
+   * @param {Function} next
    * @return {Function|Void}
    */
 
-  function normalizeNode(node) {
-    if (node.object === 'text') return
-
-    const error = validateNode(node)
-    if (!error) return
+  function normalizeNode(node, next) {
+    const error = validateNode(node, () => {})
+    if (!error) return next()
 
     return change => {
       const { rule } = error
@@ -127,40 +111,43 @@ function SchemaPlugin(schema) {
   }
 
   /**
+   * Validate a `node` with the schema rules, returning a `SlateError` if it's
+   * invalid.
+   *
+   * @param {Node} node
+   * @param {Function} next
+   * @return {Error|Void}
+   */
+
+  function validateNode(node, next) {
+    const matches = schemaRules.filter(r => testRules(node, r.match))
+    const failure = validateRules(node, matches, schemaRules, { every: true })
+    if (!failure) return next()
+    const error = new SlateError(failure.code, failure)
+    return error
+  }
+
+  /**
    * On schema-related queries, respond if we can.
    *
    * @param {Object} query
    * @param {Function} next
    */
 
-  function onQuery(query, next) {
-    // Defer to the other plugins in the stack.
-    const ret = next()
-    if (ret !== undefined) return ret
-
-    const { type, args } = query
-
-    switch (type) {
-      case 'isAtomic':
-        return isAtomic(...args)
-      case 'isVoid':
-        return isVoid(...args)
-      case 'validateNode':
-        return validateNode(...args)
-      case 'normalizeNode':
-        return normalizeNode(...args)
-    }
-  }
+  const queries = Queries({
+    queries: {
+      isAtomic,
+      isVoid,
+    },
+  })
 
   /**
-   * Return the plugin.
+   * Return the plugins.
    *
    * @type {Object}
    */
 
-  return {
-    onQuery,
-  }
+  return [{ normalizeNode, validateNode }, queries]
 }
 
 /**

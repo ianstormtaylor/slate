@@ -166,7 +166,7 @@ class NodeInterface {
    */
 
   normalize(editor) {
-    const normalizer = editor.query('normalizeNode', this)
+    const normalizer = editor.run('normalizeNode', this)
     return normalizer
   }
 
@@ -217,7 +217,7 @@ class NodeInterface {
    */
 
   validate(editor) {
-    const error = editor.query('validateNode', this)
+    const error = editor.run('validateNode', this)
     return error
   }
 }
