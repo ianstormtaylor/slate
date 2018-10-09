@@ -24,9 +24,6 @@
 </p>
 
 <p align="center">
-  <a href="https://www.npmjs.com/package/slate">
-    <img src="https://img.shields.io/npm/dt/localeval.svg?maxAge=3600">
-  </a>
   <a href="https://unpkg.com/slate/dist/slate.min.js">
     <img src="http://img.badgesize.io/https://unpkg.com/slate/dist/slate.min.js?compression=gzip&amp;label=slate">
   </a>
@@ -44,9 +41,6 @@
   </a>
   <a href="./packages/slate-react/package.json">
     <img src="https://img.shields.io/npm/v/slate-react.svg?maxAge=3600&label=slate-react&colorB=007ec6">
-  </a>
-  <a href="./License.md">
-    <img src="https://img.shields.io/npm/l/slate.svg?maxAge=3600">
   </a>
 </p>
 <br/>
