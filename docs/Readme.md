@@ -12,7 +12,7 @@
 
 ## Guides
 
-* [Changes](./guides/changes.md)
+* [Commands & Queries](./guides/commands-and-queries.md)
 * [Data Model](./guides/data-model.md)
 * [Plugins](./guides/plugins.md)
 * [Rendering](./guides/rendering.md)

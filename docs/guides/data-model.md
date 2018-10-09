@@ -53,7 +53,7 @@ Unlike the DOM though, Slate enforces a few more restrictions on its documents. 
 
 * **Blocks and inlines must always contain at least one text node.** This is to ensure that the user's cursor can always "enter" the nodes and to make sure that ranges can be created referencing them.
 
-Slate enforces all of these restrictions for you automatically. Any time you [perform changes](./changes.md) to the document, Slate will check if the document is invalid, and if so, it will return it to a "normalized" value.
+Slate enforces all of these restrictions for you automatically. Any time you [run commands](./commands-and-queries.md) that manipulate the document, Slate will check if the document is invalid, and if so, it will return it to a "normalized" value.
 
 > 🙃 Fun fact: "normalizing" is actually based on the DOM's [`Node.normalize()`](https://developer.mozilla.org/en-US/docs/Web/API/Node/normalize)!
 

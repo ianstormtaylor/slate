@@ -1,4 +1,4 @@
-# Commands
+# Commands & Queries
 
 All commands to a Slate editor's value, whether it's the `selection`, `document`, `history`, etc. happen via "commands" that are applied to a [`Change`]([operations](../reference/slate/change.md).
 
@@ -79,13 +79,13 @@ These are commands like `setData()`, `setDecorations()`, etc. that act on the ot
 
 These are commands like `undo()`, `redo()`, etc. that use the operation history and redo or undo commands that have already happened. You generally don't need to worry about these, because they're already bound to the keyboard shortcuts you'd expect, and the user can use them.
 
-## Making Changes
+## Running Commands
 
 When you decide you want to make a change to the Slate value, you're almost always in one of four places...
 
 ### 1. In Slate Handlers
 
-The first place, is inside a Slate-controlled event handler, like `onKeyDown` or `onPaste`. These handlers take a signature of `event, change, editor`. That `change` argument is a [`Change`](../reference/slate/change.md) object that you can manipulate. For example...
+The first place, is inside a Slate-controlled event handler, like `onKeyDown` or `onPaste`. These handlers take a signature of `event, change, next`. That `change` argument is a [`Change`](../reference/slate/change.md) object that you can manipulate. For example...
 
 ```js
 function onKeyDown(event, change, editor) {
@@ -153,7 +153,25 @@ editor in the render tree, and you'll need to explicitly pass them a reference t
 
 Which gives you a reference to the Slate editor. And from there you can use the same `editor.change` syntax from above to apply changes.
 
-## Reusing Changes
+## Running Queries
+
+Queries are similar to commands, but instead of manipulating the current value of the editor, they return information about the current value, or a specific node, etc.
+
+By default, Slate only defines two queries: `isAtomic` for marks and decorations, and `isVoid` for nodes. You can access them directly on the change object:
+
+```js
+const isVoid = change.isVoid(node)
+```
+
+But you can also define your own queries that are specific to your schema. For example, you might use a query to determine whether the "bold" mark is active...
+
+```js
+const isBold = change.isBoldActive(value)
+```
+
+And then use that information to mark the <kbd>bold</kbd> button in your editor's toolbar as active or not.
+
+## Reusing Commands and Queries
 
 In addition to using the built-in commands, if your editor is of any complexity you'll want to write your own reusable commands. That way, you can reuse a single `insertImage` change instead of constantly writing `insertBlock(...args)`.
 
@@ -183,3 +201,23 @@ change.insertImage('https://google.com/logo.png')
 ```
 
 And any arguments you pass in are sent to your custom command functions.
+
+The same thing goes for queries, which can be defined in plugins and re-used across your entire codebase. To do so, define a `queries` object:
+
+```js
+const yourPlugin = {
+  queries: {
+    getActiveListItem(value) {
+      ...
+    }
+  }
+}
+```
+
+And then you can use them:
+
+```js
+change.getActiveListItem(change.value)
+```
+
+This reusability is key to being able to organize your commands and queries, and compose them together to create more advanced behaviors.
