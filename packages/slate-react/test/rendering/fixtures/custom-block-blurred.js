@@ -61,7 +61,7 @@ export const output = `
    <div style="position:relative">
     <span>
       <span>
-        <span data-slate-zero-width="n">​</span>
+        <span data-slate-zero-width="n">&#xFEFF;</span>
       </span>
     </span>
   </div>
@@ -69,7 +69,7 @@ export const output = `
     <div data-slate-spacer="true" style="height:0;color:transparent;outline:none;position:absolute">
       <span>
         <span>
-          <span data-slate-zero-width="z">&#x200B;</span>
+          <span data-slate-zero-width="z">&#xFEFF;</span>
         </span>
       </span>
     </div>
@@ -80,7 +80,7 @@ export const output = `
   <div style="position:relative">
     <span>
       <span>
-        <span data-slate-zero-width="n">​</span>
+        <span data-slate-zero-width="n">&#xFEFF;</span>
       </span>
     </span>
   </div>
@@ -88,7 +88,7 @@ export const output = `
     <div data-slate-spacer="true" style="height:0;color:transparent;outline:none;position:absolute">
       <span>
         <span>
-          <span data-slate-zero-width="z">&#x200B;</span>
+          <span data-slate-zero-width="z">&#xFEFF;</span>
         </span>
       </span>
     </div>

@@ -249,7 +249,13 @@ class Operation extends Record(DEFAULTS) {
       if (key == 'value') continue
       if (key == 'node' && type != 'insert_node') continue
 
-      if (key == 'mark' || key == 'marks' || key == 'node') {
+      if (
+        key == 'mark' ||
+        key == 'marks' ||
+        key == 'node' ||
+        key == 'path' ||
+        key == 'newPath'
+      ) {
         value = value.toJSON()
       }
 

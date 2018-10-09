@@ -130,7 +130,7 @@ class Leaf extends React.Component {
     // COMPAT: Render text inside void nodes with a zero-width space.
     // So the node can contain selection but the text is not visible.
     if (editor.query('isVoid', parent)) {
-      return <span data-slate-zero-width="z">{'\u200B'}</span>
+      return <span data-slate-zero-width="z">{'\uFEFF'}</span>
     }
 
     // COMPAT: If this is the last text node in an empty block, render a zero-
@@ -142,14 +142,14 @@ class Leaf extends React.Component {
       parent.text === '' &&
       parent.nodes.last() === node
     ) {
-      return <span data-slate-zero-width="n">{'\u200B'}</span>
+      return <span data-slate-zero-width="n">{'\uFEFF'}</span>
     }
 
     // COMPAT: If the text is empty, it's because it's on the edge of an inline
     // node, so we render a zero-width space so that the selection can be
     // inserted next to it still.
     if (text === '') {
-      return <span data-slate-zero-width="z">{'\u200B'}</span>
+      return <span data-slate-zero-width="z">{'\uFEFF'}</span>
     }
 
     // COMPAT: Browsers will collapse trailing new lines at the end of blocks,

@@ -21,7 +21,7 @@ export const output = `
   <div style="position:relative">
     <span>
       <span>
-        <span data-slate-zero-width="z">&#x200B;</span>
+        <span data-slate-zero-width="z">&#xFEFF;</span>
       </span>
     </span>
     <span style="position:relative">
@@ -31,7 +31,7 @@ export const output = `
     </span>
     <span>
       <span>
-        <span data-slate-zero-width="z">&#x200B;</span>
+        <span data-slate-zero-width="z">&#xFEFF;</span>
       </span>
     </span>
   </div>
