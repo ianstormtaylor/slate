@@ -7,10 +7,12 @@ function Emoji(props) {
   return React.createElement('img', props.attributes)
 }
 
-function renderNode(props) {
+function renderNode(props, next) {
   switch (props.node.type) {
     case 'emoji':
       return Emoji(props)
+    default:
+      return next()
   }
 }
 

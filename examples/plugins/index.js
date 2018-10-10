@@ -28,10 +28,11 @@ const WordCounter = styled('span')`
 
 function WordCount(options) {
   return {
-    renderEditor(props) {
+    renderEditor(props, next) {
+      const children = next()
       return (
         <div>
-          <div>{props.children}</div>
+          <div>{children}</div>
           <WordCounter>
             Word Count: {props.value.document.text.split(' ').length}
           </WordCounter>

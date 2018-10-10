@@ -106,12 +106,14 @@ class CodeHighlighting extends React.Component {
    * @return {Element}
    */
 
-  renderNode = props => {
+  renderNode = (props, next) => {
     switch (props.node.type) {
       case 'code':
         return <CodeBlock {...props} />
       case 'code_line':
         return <CodeBlockLine {...props} />
+      default:
+        return next()
     }
   }
 
@@ -122,7 +124,7 @@ class CodeHighlighting extends React.Component {
    * @return {Element}
    */
 
-  renderMark = props => {
+  renderMark = (props, next) => {
     const { children, mark, attributes } = props
 
     switch (mark.type) {
@@ -150,6 +152,8 @@ class CodeHighlighting extends React.Component {
             {children}
           </span>
         )
+      default:
+        return next()
     }
   }
 
@@ -168,17 +172,20 @@ class CodeHighlighting extends React.Component {
    *
    * @param {Event} event
    * @param {Change} change
+   * @param {Function} next
    * @return {Change}
    */
 
-  onKeyDown = (event, change) => {
+  onKeyDown = (event, change, next) => {
     const { value } = change
-    const { selection, startBlock } = value
-    if (event.key != 'Enter') return
-    if (startBlock.type != 'code') return
-    if (selection.isExpanded) change.delete()
-    change.insertText('\n')
-    return true
+    const { startBlock } = value
+
+    if (event.key === 'Enter' && startBlock.type === 'code') {
+      change.insertText('\n')
+      return
+    }
+
+    next()
   }
 
   /**

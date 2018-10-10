@@ -1,19 +1,11 @@
 /**
  * A plugin that adds a set of queries to the editor.
  *
- * @param {Object} options
+ * @param {Object} queries
  * @return {Object}
  */
 
-function QueriesPlugin(options = {}) {
-  const { queries, defer = false } = options
-
-  if (!queries) {
-    throw new Error(
-      'You must pass in the `queries` option to the Slate queries plugin.'
-    )
-  }
-
+function QueriesPlugin(queries = {}) {
   /**
    * On construct, register all the queries.
    *
@@ -41,12 +33,6 @@ function QueriesPlugin(options = {}) {
     const { type, args } = query
     const fn = queries[type]
     if (!fn) return next()
-
-    if (defer) {
-      const ret = next()
-      if (ret !== undefined) return ret
-    }
-
     const ret = fn(editor, ...args)
     return ret === undefined ? next() : ret
   }

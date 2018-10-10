@@ -8,8 +8,6 @@ import warning from 'tiny-warning'
 import { Editor as Controller } from 'slate'
 
 import EVENT_HANDLERS from '../constants/event-handlers'
-import BrowserPlugin from '../plugins/browser'
-import PropsPlugin from '../plugins/props'
 import ReactPlugin from '../plugins/react'
 
 /**
@@ -143,7 +141,7 @@ class Editor extends React.Component {
 
   render() {
     debug('render', this)
-    const props = { ...this.props }
+    const props = { ...this.props, editor: this }
 
     // Re-resolve the controller if needed based on memoized props.
     const { commands, plugins, queries, schema } = props
@@ -155,7 +153,7 @@ class Editor extends React.Component {
     this.controller.setValue(value, options)
 
     // Render the editor's children with the controller.
-    const children = this.controller.run('renderEditor', props, this)
+    const children = this.controller.run('renderEditor', props)
     return children
   }
 
@@ -182,12 +180,8 @@ class Editor extends React.Component {
       'A Slate <Editor> component is re-resolving the `plugins`, `schema`, `commands` or `queries` on each update, which leads to poor performance. This is often due to passing in a new references for these props with each render by declaring them inline in your render function. Do not do this! Declare them outside your render function, or memoize them instead.'
     )
 
-    const { props, onControllerChange } = this
-    const reactPlugin = ReactPlugin()
-    const browserPlugin = BrowserPlugin()
-    const propsPlugin = PropsPlugin(props)
-    const allPlugins = [reactPlugin, browserPlugin, propsPlugin, ...plugins]
-    const attrs = { onChange: onControllerChange, plugins: allPlugins }
+    const react = ReactPlugin(this.props)
+    const attrs = { onChange: this.onControllerChange, plugins: [react] }
     this.controller = new Controller(attrs, { editor: this, normalize: false })
   }
 

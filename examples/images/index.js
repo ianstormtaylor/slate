@@ -138,13 +138,17 @@ class Images extends React.Component {
    * @return {Element}
    */
 
-  renderNode = props => {
+  renderNode = (props, next) => {
     const { attributes, node, isFocused } = props
 
     switch (node.type) {
       case 'image': {
         const src = node.data.get('src')
         return <Image src={src} selected={isFocused} {...attributes} />
+      }
+
+      default: {
+        return next()
       }
     }
   }
@@ -177,21 +181,22 @@ class Images extends React.Component {
    *
    * @param {Event} event
    * @param {Change} change
+   * @param {Function} next
    */
 
-  onDropOrPaste = (event, change) => {
+  onDropOrPaste = (event, change, next) => {
     const { editor } = change
     const target = getEventRange(event, editor)
-    if (!target && event.type == 'drop') return
+    if (!target && event.type === 'drop') return next()
 
     const transfer = getEventTransfer(event)
     const { type, text, files } = transfer
 
-    if (type == 'files') {
+    if (type === 'files') {
       for (const file of files) {
         const reader = new FileReader()
         const [mime] = file.type.split('/')
-        if (mime != 'image') continue
+        if (mime !== 'image') continue
 
         reader.addEventListener('load', () => {
           editor.change(c => {
@@ -201,13 +206,17 @@ class Images extends React.Component {
 
         reader.readAsDataURL(file)
       }
+      return
     }
 
-    if (type == 'text') {
-      if (!isUrl(text)) return
-      if (!isImage(text)) return
+    if (type === 'text') {
+      if (!isUrl(text)) return next()
+      if (!isImage(text)) return next()
       change.call(insertImage, text, target)
+      return
     }
+
+    next()
   }
 }
 

@@ -166,7 +166,7 @@ class Node extends React.Component {
       readOnly,
     }
 
-    let placeholder = editor.run('renderPlaceholder', props, editor)
+    let placeholder = editor.run('renderPlaceholder', props)
 
     if (placeholder) {
       placeholder = React.cloneElement(placeholder, {
@@ -176,15 +176,11 @@ class Node extends React.Component {
       children = [placeholder, ...children]
     }
 
-    const element = editor.run(
-      'renderNode',
-      {
-        ...props,
-        attributes,
-        children,
-      },
-      editor
-    )
+    const element = editor.run('renderNode', {
+      ...props,
+      attributes,
+      children,
+    })
 
     return editor.query('isVoid', node) ? (
       <Void {...this.props}>{element}</Void>

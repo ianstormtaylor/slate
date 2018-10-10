@@ -136,12 +136,7 @@ function SchemaPlugin(schema) {
    * @param {Function} next
    */
 
-  const queries = Queries({
-    queries: {
-      isAtomic,
-      isVoid,
-    },
-  })
+  const queries = Queries({ isAtomic, isVoid })
 
   /**
    * Return the plugins.

@@ -124,10 +124,12 @@ class CheckLists extends React.Component {
    * @return {Element}
    */
 
-  renderNode = props => {
+  renderNode = (props, next) => {
     switch (props.node.type) {
       case 'check-list-item':
         return <CheckListItem {...props} />
+      default:
+        return next()
     }
   }
 
@@ -152,15 +154,15 @@ class CheckLists extends React.Component {
    *
    * @param {Event} event
    * @param {Change} change
-   * @return {Value|Void}
+   * @param {Function} next
    */
 
-  onKeyDown = (event, change) => {
+  onKeyDown = (event, change, next) => {
     const { value } = change
 
     if (event.key == 'Enter' && value.startBlock.type == 'check-list-item') {
       change.splitBlock().setBlocks({ data: { checked: false } })
-      return true
+      return
     }
 
     if (
@@ -170,8 +172,10 @@ class CheckLists extends React.Component {
       value.selection.startOffset == 0
     ) {
       change.setBlocks('paragraph')
-      return true
+      return
     }
+
+    next()
   }
 }
 

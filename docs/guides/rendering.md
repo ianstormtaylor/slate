@@ -139,11 +139,12 @@ This sounds weird, but it can be pretty useful if you want to render additional 
 
 ```js
 function renderEditor(props, next) {
-  const { children, editor } = props
+  const { editor } = props
   const wordCount = countWords(editor.value.text)
+  const children = next()
   return (
     <React.Fragment>
-      {props.children}
+      {children}
       <span className="word-count">{wordCount}</span>
     </React.Fragment>
   )

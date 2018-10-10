@@ -31,7 +31,7 @@ In addition to the [core plugin hooks](../slate/plugins.md), when using `slate-r
 
 The event hooks have a signature of `(event, change, next)`—the `event` is a React object that you are used to from React's event handlers.
 
-The rendering hooks are just like render props common to other React API's, and receive `(props, editor, next)`. For more information, see the [Rendering](./rendering.md) reference.
+The rendering hooks are just like render props common to other React API's, and receive `(props, next)`. For more information, see the [Rendering](./rendering.md) reference.
 
 ### `decorateNode`
 
@@ -107,7 +107,7 @@ This handler is called whenever the native DOM selection changes.
 
 ### `renderEditor`
 
-`Function renderEditor(props: Object, editor: Editor) => ReactNode|Void`
+`Function renderEditor(props: Object, next: Function) => ReactNode|Void`
 
 The `renderEditor` property allows you to define higher-order-component-like behavior. It is passed all of the properties of the editor, including `props.children`. You can then choose to wrap the existing `children` in any custom elements or proxy the properties however you choose. This can be useful for rendering toolbars, styling the editor, rendering validation, etc. Remember that the `renderEditor` function has to render `props.children` for editor's content to render.
 

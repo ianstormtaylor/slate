@@ -11,10 +11,12 @@ function Link(props) {
   )
 }
 
-function renderNode(props) {
+function renderNode(props, next) {
   switch (props.node.type) {
     case 'link':
       return Link(props)
+    default:
+      return next()
   }
 }
 

@@ -53,21 +53,27 @@ class MarkdownPreview extends React.Component {
    * Render a Slate mark.
    *
    * @param {Object} props
+   * @param {Editor} editor
+   * @param {Function} next
    * @return {Element}
    */
 
-  renderMark = props => {
+  renderMark = (props, next) => {
     const { children, mark, attributes } = props
 
     switch (mark.type) {
       case 'bold':
         return <strong {...attributes}>{children}</strong>
+
       case 'code':
         return <code {...attributes}>{children}</code>
+
       case 'italic':
         return <em {...attributes}>{children}</em>
+
       case 'underlined':
         return <u {...attributes}>{children}</u>
+
       case 'title': {
         return (
           <span
@@ -83,6 +89,7 @@ class MarkdownPreview extends React.Component {
           </span>
         )
       }
+
       case 'punctuation': {
         return (
           <span {...attributes} style={{ opacity: 0.2 }}>
@@ -90,6 +97,7 @@ class MarkdownPreview extends React.Component {
           </span>
         )
       }
+
       case 'list': {
         return (
           <span
@@ -104,6 +112,7 @@ class MarkdownPreview extends React.Component {
           </span>
         )
       }
+
       case 'hr': {
         return (
           <span
@@ -117,6 +126,10 @@ class MarkdownPreview extends React.Component {
             {children}
           </span>
         )
+      }
+
+      default: {
+        return next()
       }
     }
   }

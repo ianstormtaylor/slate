@@ -10,10 +10,12 @@ function Image(props) {
   })
 }
 
-function renderNode(props) {
+function renderNode(props, next) {
   switch (props.node.type) {
     case 'image':
       return Image(props)
+    default:
+      return next()
   }
 }
 

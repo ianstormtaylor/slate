@@ -73,15 +73,19 @@ class HugeDocument extends React.Component {
    * Render a Slate node.
    *
    * @param {Object} props
+   * @param {Editor} editor
+   * @param {Function} next
    * @return {Element}
    */
 
-  renderNode = props => {
+  renderNode = (props, next) => {
     const { attributes, children, node } = props
 
     switch (node.type) {
       case 'heading':
         return <h1 {...attributes}>{children}</h1>
+      default:
+        return next()
     }
   }
 
@@ -89,10 +93,12 @@ class HugeDocument extends React.Component {
    * Render a Slate mark.
    *
    * @param {Object} props
+   * @param {Editor} editor
+   * @param {Function} next
    * @return {Element}
    */
 
-  renderMark = props => {
+  renderMark = (props, next) => {
     const { children, mark, attributes } = props
 
     switch (mark.type) {
@@ -104,6 +110,8 @@ class HugeDocument extends React.Component {
         return <em {...attributes}>{children}</em>
       case 'underlined':
         return <u {...attributes}>{children}</u>
+      default:
+        return next()
     }
   }
 

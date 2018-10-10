@@ -100,10 +100,12 @@ class Links extends React.Component {
    * Render a Slate node.
    *
    * @param {Object} props
+   * @param {Editor} editor
+   * @param {Function} next
    * @return {Element}
    */
 
-  renderNode = props => {
+  renderNode = (props, next) => {
     const { attributes, children, node } = props
 
     switch (node.type) {
@@ -115,6 +117,10 @@ class Links extends React.Component {
             {children}
           </a>
         )
+      }
+
+      default: {
+        return next()
       }
     }
   }
@@ -179,22 +185,22 @@ class Links extends React.Component {
    *
    * @param {Event} event
    * @param {Change} change
+   * @param {Function} next
    */
 
-  onPaste = (event, change) => {
-    if (change.value.selection.isCollapsed) return
+  onPaste = (event, change, next) => {
+    if (change.value.selection.isCollapsed) return next()
 
     const transfer = getEventTransfer(event)
     const { type, text } = transfer
-    if (type != 'text' && type != 'html') return
-    if (!isUrl(text)) return
+    if (type != 'text' && type != 'html') return next()
+    if (!isUrl(text)) return next()
 
     if (this.hasLinks()) {
       change.call(unwrapLink)
     }
 
     change.call(wrapLink, text)
-    return true
   }
 }
 

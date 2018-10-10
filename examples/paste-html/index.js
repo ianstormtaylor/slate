@@ -203,7 +203,7 @@ class PasteHtml extends React.Component {
    * @return {Element}
    */
 
-  renderNode = props => {
+  renderNode = (props, next) => {
     const { attributes, children, node, isFocused } = props
 
     switch (node.type) {
@@ -246,6 +246,10 @@ class PasteHtml extends React.Component {
         const src = node.data.get('src')
         return <Image src={src} selected={isFocused} {...attributes} />
       }
+
+      default: {
+        return next()
+      }
     }
   }
 
@@ -256,7 +260,7 @@ class PasteHtml extends React.Component {
    * @return {Element}
    */
 
-  renderMark = props => {
+  renderMark = (props, next) => {
     const { children, mark, attributes } = props
 
     switch (mark.type) {
@@ -268,6 +272,8 @@ class PasteHtml extends React.Component {
         return <em {...attributes}>{children}</em>
       case 'underlined':
         return <u {...attributes}>{children}</u>
+      default:
+        return next()
     }
   }
 
@@ -288,12 +294,11 @@ class PasteHtml extends React.Component {
    * @param {Change} change
    */
 
-  onPaste = (event, change) => {
+  onPaste = (event, change, next) => {
     const transfer = getEventTransfer(event)
-    if (transfer.type != 'html') return
+    if (transfer.type != 'html') return next()
     const { document } = serializer.deserialize(transfer.html)
     change.insertFragment(document)
-    return true
   }
 }
 

@@ -100,12 +100,12 @@ Sometimes though, the declarative validation syntax isn't fine-grained enough to
 When you define a `normalizeNode` function, you either return nothing if the node's already valid, or you return a normalizer function that will make the node valid if it isn't. Here's an example:
 
 ```js
-function normalizeNode(node) {
+function normalizeNode(node, next) {
   const { nodes } = node
-  if (node.object !== 'block') return
-  if (nodes.size !== 3) return
-  if (nodes.first().object !== 'text') return
-  if (nodes.last().object !== 'text') return
+  if (node.object !== 'block') return next()
+  if (nodes.size !== 3) return next()
+  if (nodes.first().object !== 'text') return next()
+  if (nodes.last().object !== 'text') return next()
   return change => change.removeNodeByKey(node.key)
 }
 ```

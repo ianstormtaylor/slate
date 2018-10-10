@@ -1,19 +1,11 @@
 /**
  * A plugin that adds a set of commands to the editor.
  *
- * @param {Object} options
+ * @param {Object} commands
  * @return {Object}
  */
 
-function CommandsPlugin(options = {}) {
-  const { commands, defer = false } = options
-
-  if (!commands) {
-    throw new Error(
-      'You must pass in the `commands` option to the Slate commands plugin.'
-    )
-  }
-
+function CommandsPlugin(commands = {}) {
   /**
    * On command, if it exists in our list of commands, call it.
    *
@@ -26,14 +18,7 @@ function CommandsPlugin(options = {}) {
     const { type, args } = command
     const fn = commands[type]
     if (!fn) return next()
-
-    if (defer) {
-      const ret = next()
-      if (ret !== undefined) return ret
-    }
-
     change.call(fn, ...args)
-    return true
   }
 
   /**

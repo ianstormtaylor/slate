@@ -12,10 +12,13 @@ import Text from '../models/text'
 /**
  * A plugin that defines the core Slate logic.
  *
+ * @param {Object} options
  * @return {Object}
  */
 
-function CorePlugin() {
+function CorePlugin(options = {}) {
+  const { plugins = [] } = options
+
   /**
    * The core Slate commands.
    *
@@ -23,15 +26,12 @@ function CorePlugin() {
    */
 
   const commands = Commands({
-    defer: true,
-    commands: {
-      ...AtCurrentRange,
-      ...AtRange,
-      ...ByPath,
-      ...OnHistory,
-      ...OnSelection,
-      ...OnValue,
-    },
+    ...AtCurrentRange,
+    ...AtRange,
+    ...ByPath,
+    ...OnHistory,
+    ...OnSelection,
+    ...OnValue,
   })
 
   /**
@@ -41,13 +41,8 @@ function CorePlugin() {
    */
 
   const queries = Queries({
-    defer: true,
-    queries: {
-      isAtomic: () => false,
-      isVoid: () => false,
-      normalizeNode: () => {},
-      validateNode: () => {},
-    },
+    isAtomic: () => false,
+    isVoid: () => false,
   })
 
   /**
@@ -180,7 +175,7 @@ function CorePlugin() {
    * @type {Array}
    */
 
-  return [commands, queries, schema]
+  return [schema, ...plugins, commands, queries]
 }
 
 /**

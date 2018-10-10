@@ -136,7 +136,7 @@ class SyncingEditor extends React.Component {
    * @return {Element}
    */
 
-  renderMark = props => {
+  renderMark = (props, next) => {
     const { children, mark, attributes } = props
 
     switch (mark.type) {
@@ -148,6 +148,8 @@ class SyncingEditor extends React.Component {
         return <em {...attributes}>{children}</em>
       case 'underlined':
         return <u {...attributes}>{children}</u>
+      default:
+        return next()
     }
   }
 
@@ -175,7 +177,7 @@ class SyncingEditor extends React.Component {
    * @return {Change}
    */
 
-  onKeyDown = (event, change) => {
+  onKeyDown = (event, change, next) => {
     let mark
 
     if (isBoldHotkey(event)) {
@@ -187,12 +189,11 @@ class SyncingEditor extends React.Component {
     } else if (isCodeHotkey(event)) {
       mark = 'code'
     } else {
-      return
+      return next()
     }
 
     event.preventDefault()
     change.toggleMark(mark)
-    return true
   }
 
   /**

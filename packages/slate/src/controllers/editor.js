@@ -17,14 +17,6 @@ import Value from '../models/value'
 const debug = Debug('slate:editor')
 
 /**
- * The core plugin.
- *
- * @type {Array|Object}
- */
-
-const corePlugin = CorePlugin()
-
-/**
  * Editor.
  *
  * @type {Editor}
@@ -59,8 +51,8 @@ class Editor {
       isChanging: false,
     }
 
-    registerPlugin(this, corePlugin)
-    plugins.forEach(p => registerPlugin(this, p))
+    const core = CorePlugin({ plugins })
+    registerPlugin(this, core)
 
     this.run('onConstruct', this)
 
@@ -304,12 +296,12 @@ function registerPlugin(editor, plugin) {
   const { commands, queries, schema, ...rest } = plugin
 
   if (commands) {
-    const commandsPlugin = CommandsPlugin({ commands })
+    const commandsPlugin = CommandsPlugin(commands)
     registerPlugin(editor, commandsPlugin)
   }
 
   if (queries) {
-    const queriesPlugin = QueriesPlugin({ queries })
+    const queriesPlugin = QueriesPlugin(queries)
     registerPlugin(editor, queriesPlugin)
   }
 

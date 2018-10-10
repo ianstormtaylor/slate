@@ -108,7 +108,7 @@ class SearchHighlighting extends React.Component {
    * @return {Element}
    */
 
-  renderMark = props => {
+  renderMark = (props, next) => {
     const { children, mark, attributes } = props
 
     switch (mark.type) {
@@ -118,6 +118,8 @@ class SearchHighlighting extends React.Component {
             {children}
           </span>
         )
+      default:
+        return next()
     }
   }
 

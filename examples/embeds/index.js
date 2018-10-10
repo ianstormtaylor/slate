@@ -58,13 +58,16 @@ class Embeds extends React.Component {
    * Render a Slate node.
    *
    * @param {Object} props
-   * @return {Element}
+   * @param {Editor} editor
+   * @param {Function} next
    */
 
-  renderNode = props => {
+  renderNode = (props, next) => {
     switch (props.node.type) {
       case 'video':
         return <Video {...props} />
+      default:
+        return next()
     }
   }
 

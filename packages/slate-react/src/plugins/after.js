@@ -2,14 +2,8 @@ import Base64 from 'slate-base64-serializer'
 import Debug from 'debug'
 import Hotkeys from 'slate-hotkeys'
 import Plain from 'slate-plain-serializer'
-import ReactDOM from 'react-dom'
 import getWindow from 'get-window'
-import {
-  IS_FIREFOX,
-  IS_IE,
-  IS_IOS,
-  HAS_INPUT_EVENTS_LEVEL_2,
-} from 'slate-dev-environment'
+import { IS_IOS } from 'slate-dev-environment'
 
 import cloneFragment from '../utils/clone-fragment'
 import findDOMNode from '../utils/find-dom-node'
@@ -26,20 +20,16 @@ import setEventTransfer from '../utils/set-event-transfer'
  * @type {Function}
  */
 
-const debug = Debug('slate:browser')
+const debug = Debug('slate:after')
 
 /**
- * A plugin that adds the browser-specific logic to the editor.
+ * A plugin that adds the "after" browser-specific logic to the editor.
  *
+ * @param {Object} options
  * @return {Object}
  */
 
-function BrowserPlugin() {
-  let activeElement = null
-  let compositionCount = 0
-  let isComposing = false
-  let isCopying = false
-  let isDragging = false
+function AfterPlugin(options = {}) {
   let isDraggingInternally = null
 
   /**
@@ -48,24 +38,11 @@ function BrowserPlugin() {
    * @param {Event} event
    * @param {Change} change
    * @param {Function} next
-   * @return {Boolean}
    */
 
   function onBeforeInput(event, change, next) {
     const { editor, value } = change
     const isSynthetic = !!event.nativeEvent
-    if (editor.readOnly) return true
-
-    // COMPAT: If the browser supports Input Events Level 2, we will have
-    // attached a custom handler for the real `beforeinput` events, instead of
-    // allowing React's synthetic polyfill, so we need to ignore synthetics.
-    if (isSynthetic && HAS_INPUT_EVENTS_LEVEL_2) return true
-
-    debug('onBeforeInput', { event })
-
-    // Delegate to the plugins stack.
-    const ret = next()
-    if (ret !== undefined) return ret
 
     // If the event is synthetic, it's React's polyfill of `beforeinput` that
     // isn't a true `beforeinput` event with meaningful information. It only
@@ -73,13 +50,15 @@ function BrowserPlugin() {
     if (isSynthetic) {
       event.preventDefault()
       change.insertText(event.data)
-      return
+      return next()
     }
 
     // Otherwise, we can use the information in the `beforeinput` event to
     // figure out the exact change that will occur, and prevent it.
     const [targetRange] = event.getTargetRanges()
-    if (!targetRange) return
+    if (!targetRange) return next()
+
+    debug('onBeforeInput', { event })
 
     event.preventDefault()
 
@@ -93,29 +72,29 @@ function BrowserPlugin() {
       case 'deleteContentBackward':
       case 'deleteContentForward': {
         change.deleteAtRange(range)
-        return
+        break
       }
 
       case 'deleteWordBackward': {
         change.deleteWordBackwardAtRange(range)
-        return
+        break
       }
 
       case 'deleteWordForward': {
         change.deleteWordForwardAtRange(range)
-        return
+        break
       }
 
       case 'deleteSoftLineBackward':
       case 'deleteHardLineBackward': {
         change.deleteLineBackwardAtRange(range)
-        return
+        break
       }
 
       case 'deleteSoftLineForward':
       case 'deleteHardLineForward': {
         change.deleteLineForwardAtRange(range)
-        return
+        break
       }
 
       case 'insertLineBreak':
@@ -131,7 +110,7 @@ function BrowserPlugin() {
           change.splitBlockAtRange(range)
         }
 
-        return
+        break
       }
 
       case 'insertFromYank':
@@ -146,7 +125,7 @@ function BrowserPlugin() {
             ? event.dataTransfer.getData('text/plain')
             : event.data
 
-        if (text == null) return
+        if (text == null) break
 
         change.insertTextAtRange(range, text, selection.marks)
 
@@ -156,9 +135,11 @@ function BrowserPlugin() {
           change.select({ marks: null })
         }
 
-        return
+        break
       }
     }
+
+    next()
   }
 
   /**
@@ -167,88 +148,12 @@ function BrowserPlugin() {
    * @param {Event} event
    * @param {Change} change
    * @param {Function} next
-   * @return {Boolean}
    */
 
   function onBlur(event, change, next) {
-    const { editor } = change
-    if (isCopying) return true
-    if (editor.readOnly) return true
-
-    const { relatedTarget, target } = event
-    const window = getWindow(target)
-
-    // COMPAT: If the current `activeElement` is still the previous one, this is
-    // due to the window being blurred when the tab itself becomes unfocused, so
-    // we want to abort early to allow to editor to stay focused when the tab
-    // becomes focused again.
-    if (activeElement === window.document.activeElement) return true
-
-    // COMPAT: The `relatedTarget` can be null when the new focus target is not
-    // a "focusable" element (eg. a `<div>` without `tabindex` set).
-    if (relatedTarget) {
-      const el = ReactDOM.findDOMNode(editor)
-
-      // COMPAT: The event should be ignored if the focus is returning to the
-      // editor from an embedded editable element (eg. an <input> element inside
-      // a void node).
-      if (relatedTarget === el) return true
-
-      // COMPAT: The event should be ignored if the focus is moving from the
-      // editor to inside a void node's spacer element.
-      if (relatedTarget.hasAttribute('data-slate-spacer')) return true
-
-      // COMPAT: The event should be ignored if the focus is moving to a non-
-      // editable section of an element that isn't a void node (eg. a list item
-      // of the check list example).
-      const node = findNode(relatedTarget, editor)
-      if (el.contains(relatedTarget) && node && !change.isVoid(node))
-        return true
-    }
-
     debug('onBlur', { event })
-
-    // Delegate to the plugins stack.
-    const ret = next()
-    if (ret !== undefined) return ret
-
     change.blur()
-    return true
-  }
-
-  /**
-   * On composition end.
-   *
-   * @param {Event} event
-   * @param {Change} change
-   * @param {Function} next
-   * @return {Boolean}
-   */
-
-  function onCompositionEnd(event, change, next) {
-    const { editor } = change
-    const n = compositionCount
-
-    // The `count` check here ensures that if another composition starts
-    // before the timeout has closed out this one, we will abort unsetting the
-    // `isComposing` flag, since a composition is still in affect.
-    window.requestAnimationFrame(() => {
-      if (compositionCount > n) return
-      isComposing = false
-
-      // HACK: we need to re-render the editor here so that it will update its
-      // placeholder in case one is currently rendered. This should be handled
-      // differently ideally, in a less invasive way?
-      // (apply force re-render if isComposing changes)
-      if (editor.state.isComposing) {
-        editor.setState({ isComposing: false })
-      }
-    })
-
-    debug('onCompositionEnd', { event })
-
-    // Delegate to the plugins stack.
-    return next()
+    next()
   }
 
   /**
@@ -257,23 +162,18 @@ function BrowserPlugin() {
    * @param {Event} event
    * @param {Change} change
    * @param {Function} next
-   * @return {Boolean}
    */
 
   function onClick(event, change, next) {
-    debug('onClick', { event })
-
-    // Delegate to the plugins stack.
-    const ret = next()
-    if (ret !== undefined) return ret
-
     const { editor } = change
-    if (editor.readOnly) return true
+    if (editor.readOnly) return next()
 
     const { value } = editor
     const { document } = value
     const node = findNode(event.target, editor)
-    if (!node) return true
+    if (!node) return next()
+
+    debug('onClick', { event })
 
     const ancestors = document.getAncestors(node.key)
     const isVoid =
@@ -287,35 +187,7 @@ function BrowserPlugin() {
       change.focus().moveToEndOfNode(node)
     }
 
-    return true
-  }
-
-  /**
-   * On composition start.
-   *
-   * @param {Event} event
-   * @param {Change} change
-   * @param {Function} next
-   * @return {Boolean}
-   */
-
-  function onCompositionStart(event, change, next) {
-    isComposing = true
-    compositionCount++
-    const { editor } = change
-
-    // HACK: we need to re-render the editor here so that it will update its
-    // placeholder in case one is currently rendered. This should be handled
-    // differently ideally, in a less invasive way?
-    // (apply force re-render if isComposing changes)
-    if (!editor.state.isComposing) {
-      editor.setState({ isComposing: true })
-    }
-
-    debug('onCompositionStart', { event })
-
-    // Delegate to the plugins stack.
-    return next()
+    next()
   }
 
   /**
@@ -324,23 +196,13 @@ function BrowserPlugin() {
    * @param {Event} event
    * @param {Change} change
    * @param {Function} next
-   * @return {Boolean}
    */
 
   function onCopy(event, change, next) {
-    const window = getWindow(event.target)
-    isCopying = true
-    window.requestAnimationFrame(() => (isCopying = false))
-
     debug('onCopy', { event })
-
-    // Delegate to the plugins stack.
-    const ret = next()
-    if (ret !== undefined) return ret
-
     const { editor } = change
     cloneFragment(event, editor)
-    return true
+    next()
   }
 
   /**
@@ -349,22 +211,11 @@ function BrowserPlugin() {
    * @param {Event} event
    * @param {Change} change
    * @param {Function} next
-   * @return {Boolean}
    */
 
   function onCut(event, change, next) {
-    const { editor } = change
-    if (editor.readOnly) return true
-
-    const window = getWindow(event.target)
-    isCopying = true
-    window.requestAnimationFrame(() => (isCopying = false))
-
     debug('onCut', { event })
-
-    // Delegate to the plugins stack.
-    const ret = next()
-    if (ret !== undefined) return ret
+    const { editor } = change
 
     // Once the fake cut content has successfully been added to the clipboard,
     // delete the content in the current selection.
@@ -385,6 +236,8 @@ function BrowserPlugin() {
         editor.change(c => c.delete())
       }
     })
+
+    next()
   }
 
   /**
@@ -393,96 +246,12 @@ function BrowserPlugin() {
    * @param {Event} event
    * @param {Change} change
    * @param {Function} next
-   * @return {Boolean}
    */
 
   function onDragEnd(event, change, next) {
     debug('onDragEnd', { event })
-    isDragging = false
     isDraggingInternally = null
-    return next()
-  }
-
-  /**
-   * On drag enter.
-   *
-   * @param {Event} event
-   * @param {Change} change
-   * @param {Function} next
-   * @return {Boolean}
-   */
-
-  function onDragEnter(event, change, next) {
-    debug('onDragEnter', { event })
-    return next()
-  }
-
-  /**
-   * On drag exit.
-   *
-   * @param {Event} event
-   * @param {Change} change
-   * @param {Function} next
-   * @return {Boolean}
-   */
-
-  function onDragExit(event, change, next) {
-    debug('onDragExit', { event })
-    return next()
-  }
-
-  /**
-   * On drag leave.
-   *
-   * @param {Event} event
-   * @param {Change} change
-   * @param {Function} next
-   * @return {Boolean}
-   */
-
-  function onDragLeave(event, change, next) {
-    debug('onDragLeave', { event })
-    return next()
-  }
-
-  /**
-   * On drag over.
-   *
-   * @param {Event} event
-   * @param {Change} change
-   * @param {Function} next
-   * @return {Boolean}
-   */
-
-  function onDragOver(event, change, next) {
-    debug('onDragOver', { event })
-
-    // If the target is inside a void node, and only in this case,
-    // call `preventDefault` to signal that drops are allowed.
-    // When the target is editable, dropping is already allowed by
-    // default, and calling `preventDefault` hides the cursor.
-    const { editor } = change
-    const node = findNode(event.target, editor)
-    if (change.isVoid(node)) event.preventDefault()
-
-    // COMPAT: IE won't call onDrop on contentEditables unless the
-    // default dragOver is prevented:
-    // https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/913982/
-    // (2018/07/11)
-    if (IS_IE) event.preventDefault()
-
-    // If a drag is already in progress, don't do this again.
-    if (!isDragging) {
-      isDragging = true
-
-      // COMPAT: IE will raise an `unspecified error` if dropEffect is
-      // set. (2018/07/11)
-      if (!IS_IE) {
-        event.nativeEvent.dataTransfer.dropEffect = 'move'
-      }
-    }
-
-    return next()
+    next()
   }
 
   /**
@@ -491,18 +260,12 @@ function BrowserPlugin() {
    * @param {Event} event
    * @param {Change} change
    * @param {Function} next
-   * @return {Boolean}
    */
 
   function onDragStart(event, change, next) {
     debug('onDragStart', { event })
 
-    isDragging = true
     isDraggingInternally = true
-
-    // Delegate to the plugins stack.
-    const ret = next()
-    if (ret !== undefined) return ret
 
     const { editor } = change
     const { value } = editor
@@ -523,6 +286,7 @@ function BrowserPlugin() {
     const fragment = change.value.fragment
     const encoded = Base64.serializeNode(fragment)
     setEventTransfer(event, 'fragment', encoded)
+    next()
   }
 
   /**
@@ -531,26 +295,16 @@ function BrowserPlugin() {
    * @param {Event} event
    * @param {Change} change
    * @param {Function} next
-   * @return {Boolean}
    */
 
   function onDrop(event, change, next) {
     const { editor, value } = change
-    if (editor.readOnly) return true
-
-    debug('onDrop', { event })
-
-    // Prevent default so the DOM's value isn't corrupted.
-    event.preventDefault()
-
-    // Delegate to the plugins stack.
-    const ret = next()
-    if (ret !== undefined) return ret
-
     const { document, selection } = value
     const window = getWindow(event.target)
     let target = getEventRange(event, editor)
-    if (!target) return true
+    if (!target) return next()
+
+    debug('onDrop', { event })
 
     const transfer = getEventTransfer(event)
     const { type, fragment, text } = transfer
@@ -611,49 +365,18 @@ function BrowserPlugin() {
     // DOM node, since that will make it go back to normal.
     const focusNode = document.getNode(target.focus.key)
     const el = findDOMNode(focusNode, window)
-    if (!el) return true
 
-    el.dispatchEvent(
-      new MouseEvent('mouseup', {
-        view: window,
-        bubbles: true,
-        cancelable: true,
-      })
-    )
-
-    return true
-  }
-
-  /**
-   * On focus.
-   *
-   * @param {Event} event
-   * @param {Change} change
-   * @param {Function} next
-   * @return {Boolean}
-   */
-
-  function onFocus(event, change, next) {
-    const { editor } = change
-    if (isCopying) return true
-    if (editor.readOnly) return true
-
-    const el = ReactDOM.findDOMNode(editor)
-
-    // Save the new `activeElement`.
-    const window = getWindow(event.target)
-    activeElement = window.document.activeElement
-
-    // COMPAT: If the editor has nested editable elements, the focus can go to
-    // those elements. In Firefox, this must be prevented because it results in
-    // issues with keyboard navigation. (2017/03/30)
-    if (IS_FIREFOX && event.target != el) {
-      el.focus()
-      return true
+    if (el) {
+      el.dispatchEvent(
+        new MouseEvent('mouseup', {
+          view: window,
+          bubbles: true,
+          cancelable: true,
+        })
+      )
     }
 
-    debug('onFocus', { event })
-    return next()
+    next()
   }
 
   /**
@@ -662,19 +385,9 @@ function BrowserPlugin() {
    * @param {Event} event
    * @param {Change} change
    * @param {Function} next
-   * @return {Boolean}
    */
 
   function onInput(event, change, next) {
-    if (isComposing) return true
-    if (change.value.selection.isBlurred) return true
-
-    debug('onInput', { event })
-
-    // Delegate to the plugins stack.
-    const ret = next()
-    if (ret !== undefined) return ret
-
     const window = getWindow(event.target)
     const { editor, value } = change
 
@@ -682,7 +395,7 @@ function BrowserPlugin() {
     const native = window.getSelection()
     const { anchorNode } = native
     const point = findPoint(anchorNode, 0, editor)
-    if (!point) return
+    if (!point) return next()
 
     // Get the text node and leaf in question.
     const { document, selection } = value
@@ -716,7 +429,9 @@ function BrowserPlugin() {
     }
 
     // If the text is no different, abort.
-    if (textContent == text) return
+    if (textContent == text) return next()
+
+    debug('onInput', { event })
 
     // Determine what the selection should be after changing the text.
     const delta = textContent.length - text.length
@@ -729,6 +444,7 @@ function BrowserPlugin() {
 
     // Change the current value to have the leaf's text replaced.
     change.insertTextAtRange(entire, textContent, leaf.marks).select(corrected)
+    next()
   }
 
   /**
@@ -737,48 +453,12 @@ function BrowserPlugin() {
    * @param {Event} event
    * @param {Change} change
    * @param {Function} next
-   * @return {Boolean}
    */
 
   function onKeyDown(event, change, next) {
-    const { editor, value } = change
-    if (editor.readOnly) return true
-
-    // When composing, we need to prevent all hotkeys from executing while
-    // typing. However, certain characters also move the selection before
-    // we're able to handle it, so prevent their default behavior.
-    if (isComposing) {
-      if (Hotkeys.isCompose(event)) event.preventDefault()
-      return true
-    }
-
     debug('onKeyDown', { event })
 
-    // Certain hotkeys have native editing behaviors in `contenteditable`
-    // elements which will change the DOM and cause our value to be out of sync,
-    // so they need to always be prevented.
-    if (
-      !IS_IOS &&
-      (Hotkeys.isBold(event) ||
-        Hotkeys.isDeleteBackward(event) ||
-        Hotkeys.isDeleteForward(event) ||
-        Hotkeys.isDeleteLineBackward(event) ||
-        Hotkeys.isDeleteLineForward(event) ||
-        Hotkeys.isDeleteWordBackward(event) ||
-        Hotkeys.isDeleteWordForward(event) ||
-        Hotkeys.isItalic(event) ||
-        Hotkeys.isRedo(event) ||
-        Hotkeys.isSplitBlock(event) ||
-        Hotkeys.isTransposeCharacter(event) ||
-        Hotkeys.isUndo(event))
-    ) {
-      event.preventDefault()
-    }
-
-    // Delegate to the plugins stack.
-    const ret = next()
-    if (ret !== undefined) return ret
-
+    const { editor, value } = change
     const { document, selection } = value
     const hasVoidParent = document.hasVoidParent(selection.start.path, editor)
 
@@ -893,7 +573,7 @@ function BrowserPlugin() {
       }
     }
 
-    return true
+    next()
   }
 
   /**
@@ -902,22 +582,12 @@ function BrowserPlugin() {
    * @param {Event} event
    * @param {Change} change
    * @param {Function} next
-   * @return {Boolean}
    */
 
   function onPaste(event, change, next) {
-    const { editor, value } = change
-    if (editor.readOnly) return true
-
     debug('onPaste', { event })
 
-    // Prevent defaults so the DOM state isn't corrupted.
-    event.preventDefault()
-
-    // Delegate to the plugins stack.
-    const ret = next()
-    if (ret !== undefined) return ret
-
+    const { value } = change
     const transfer = getEventTransfer(event)
     const { type, fragment, text } = transfer
 
@@ -926,9 +596,9 @@ function BrowserPlugin() {
     }
 
     if (type == 'text' || type == 'html') {
-      if (!text) return true
+      if (!text) return next()
       const { document, selection, startBlock } = value
-      if (change.isVoid(startBlock)) return true
+      if (change.isVoid(startBlock)) return next()
 
       const defaultBlock = startBlock
       const defaultMarks = document.getInsertMarksAtRange(selection)
@@ -937,7 +607,7 @@ function BrowserPlugin() {
       change.insertFragment(frag)
     }
 
-    return true
+    next()
   }
 
   /**
@@ -946,38 +616,25 @@ function BrowserPlugin() {
    * @param {Event} event
    * @param {Change} change
    * @param {Function} next
-   * @return {Boolean}
    */
 
   function onSelect(event, change, next) {
-    if (isCopying) return true
-    if (isComposing) return true
-
-    const { editor, value } = change
-    if (editor.readOnly) return true
-
     debug('onSelect', { event })
 
-    // Save the new `activeElement`.
     const window = getWindow(event.target)
-    activeElement = window.document.activeElement
-
-    // Delegate to the plugins stack.
-    const ret = next()
-    if (ret !== undefined) return ret
-
+    const { editor, value } = change
     const { document } = value
     const native = window.getSelection()
 
     // If there are no ranges, the editor was blurred natively.
     if (!native.rangeCount) {
       change.blur()
-      return true
+      return
     }
 
     // Otherwise, determine the Slate selection from the native one.
     let range = findRange(native, editor)
-    if (!range) return true
+    if (!range) return
 
     const { anchor, focus } = range
     const anchorText = document.getNode(anchor.key)
@@ -1036,7 +693,7 @@ function BrowserPlugin() {
     selection = selection.set('marks', value.selection.marks)
 
     change.select(selection)
-    return true
+    next()
   }
 
   /**
@@ -1049,18 +706,11 @@ function BrowserPlugin() {
     onBeforeInput,
     onBlur,
     onClick,
-    onCompositionEnd,
-    onCompositionStart,
     onCopy,
     onCut,
     onDragEnd,
-    onDragEnter,
-    onDragExit,
-    onDragLeave,
-    onDragOver,
     onDragStart,
     onDrop,
-    onFocus,
     onInput,
     onKeyDown,
     onPaste,
@@ -1074,4 +724,4 @@ function BrowserPlugin() {
  * @type {Object}
  */
 
-export default BrowserPlugin
+export default AfterPlugin

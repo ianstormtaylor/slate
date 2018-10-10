@@ -166,7 +166,7 @@ class RichTextExample extends React.Component {
    * @return {Element}
    */
 
-  renderNode = props => {
+  renderNode = (props, next) => {
     const { attributes, children, node } = props
 
     switch (node.type) {
@@ -182,6 +182,8 @@ class RichTextExample extends React.Component {
         return <li {...attributes}>{children}</li>
       case 'numbered-list':
         return <ol {...attributes}>{children}</ol>
+      default:
+        return next()
     }
   }
 
@@ -192,7 +194,7 @@ class RichTextExample extends React.Component {
    * @return {Element}
    */
 
-  renderMark = props => {
+  renderMark = (props, next) => {
     const { children, mark, attributes } = props
 
     switch (mark.type) {
@@ -204,6 +206,8 @@ class RichTextExample extends React.Component {
         return <em {...attributes}>{children}</em>
       case 'underlined':
         return <u {...attributes}>{children}</u>
+      default:
+        return next()
     }
   }
 
@@ -225,7 +229,7 @@ class RichTextExample extends React.Component {
    * @return {Change}
    */
 
-  onKeyDown = (event, change) => {
+  onKeyDown = (event, change, next) => {
     let mark
 
     if (isBoldHotkey(event)) {
@@ -237,12 +241,11 @@ class RichTextExample extends React.Component {
     } else if (isCodeHotkey(event)) {
       mark = 'code'
     } else {
-      return
+      return next()
     }
 
     event.preventDefault()
     change.toggleMark(mark)
-    return true
   }
 
   /**

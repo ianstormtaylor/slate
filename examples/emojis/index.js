@@ -123,16 +123,19 @@ class Emojis extends React.Component {
    * Render a Slate node.
    *
    * @param {Object} props
+   * @param {Editor} editor
+   * @param {Function} next
    * @return {Element}
    */
 
-  renderNode = props => {
+  renderNode = (props, next) => {
     const { attributes, children, node, isFocused } = props
 
     switch (node.type) {
       case 'paragraph': {
         return <p {...attributes}>{children}</p>
       }
+
       case 'emoji': {
         const code = node.data.get('code')
         return (
@@ -145,6 +148,10 @@ class Emojis extends React.Component {
             {code}
           </Emoji>
         )
+      }
+
+      default: {
+        return next()
       }
     }
   }

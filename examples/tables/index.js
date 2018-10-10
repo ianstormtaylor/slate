@@ -50,7 +50,7 @@ class Tables extends React.Component {
    * @return {Element}
    */
 
-  renderNode = props => {
+  renderNode = (props, next) => {
     const { attributes, children, node } = props
 
     switch (node.type) {
@@ -64,6 +64,8 @@ class Tables extends React.Component {
         return <tr {...attributes}>{children}</tr>
       case 'table-cell':
         return <td {...attributes}>{children}</td>
+      default:
+        return next()
     }
   }
 
@@ -74,12 +76,14 @@ class Tables extends React.Component {
    * @return {Element}
    */
 
-  renderMark = props => {
+  renderMark = (props, next) => {
     const { children, mark, attributes } = props
 
     switch (mark.type) {
       case 'bold':
         return <strong {...attributes}>{children}</strong>
+      default:
+        return next()
     }
   }
 
@@ -90,12 +94,11 @@ class Tables extends React.Component {
    * @param {Change} change
    */
 
-  onBackspace = (event, change) => {
+  onBackspace = (event, change, next) => {
     const { value } = change
     const { selection } = value
-    if (selection.start.offset != 0) return
+    if (selection.start.offset != 0) return next()
     event.preventDefault()
-    return true
   }
 
   /**
@@ -115,12 +118,11 @@ class Tables extends React.Component {
    * @param {Change} change
    */
 
-  onDelete = (event, change) => {
+  onDelete = (event, change, next) => {
     const { value } = change
     const { selection } = value
-    if (selection.end.offset != value.startText.text.length) return
+    if (selection.end.offset != value.startText.text.length) return next()
     event.preventDefault()
-    return true
   }
 
   /**
@@ -130,23 +132,22 @@ class Tables extends React.Component {
    * @param {Change} change
    */
 
-  onDropOrPaste = (event, change) => {
+  onDropOrPaste = (event, change, next) => {
     const transfer = getEventTransfer(event)
     const { value } = change
     const { text = '' } = transfer
 
     if (value.startBlock.type !== 'table-cell') {
-      return
+      return next()
     }
 
     if (!text) {
-      return
+      return next()
     }
 
     const lines = text.split('\n')
     const { document } = Plain.deserialize(lines[0] || '')
     change.insertFragment(document)
-    return false
   }
 
   /**
@@ -156,9 +157,8 @@ class Tables extends React.Component {
    * @param {Change} change
    */
 
-  onEnter = (event, change) => {
+  onEnter = (event, change, next) => {
     event.preventDefault()
-    return true
   }
 
   /**
@@ -168,7 +168,7 @@ class Tables extends React.Component {
    * @param {Change} change
    */
 
-  onKeyDown = (event, change) => {
+  onKeyDown = (event, change, next) => {
     const { value } = change
     const { document, selection } = value
     const { start, isCollapsed } = selection
@@ -181,24 +181,25 @@ class Tables extends React.Component {
       if (prevBlock.type === 'table-cell') {
         if (['Backspace', 'Delete', 'Enter'].includes(event.key)) {
           event.preventDefault()
-          return true
         } else {
-          return
+          return next()
         }
       }
     }
 
     if (value.startBlock.type !== 'table-cell') {
-      return
+      return next()
     }
 
     switch (event.key) {
       case 'Backspace':
-        return this.onBackspace(event, change)
+        return this.onBackspace(event, change, next)
       case 'Delete':
-        return this.onDelete(event, change)
+        return this.onDelete(event, change, next)
       case 'Enter':
-        return this.onEnter(event, change)
+        return this.onEnter(event, change, next)
+      default:
+        return next()
     }
   }
 }
