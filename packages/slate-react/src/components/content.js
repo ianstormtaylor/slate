@@ -171,7 +171,7 @@ class Content extends React.Component {
 
     // Otherwise, figure out which DOM nodes should be selected...
     const current = !!rangeCount && native.getRangeAt(0)
-    const range = findDOMRange(selection, window)
+    let range = findDOMRange(selection, window)
 
     if (!range) {
       warning(
@@ -208,29 +208,31 @@ class Content extends React.Component {
     removeAllRanges(native)
 
     if (IS_FIREFOX) {
-      // COMPAT: IE 11 does not support Selection.setBaseAndExtent
-      if (native.setBaseAndExtent) {
-        // COMPAT: Since the DOM range has no concept of backwards/forwards
-        // we need to check and do the right thing here.
-        if (isBackward) {
-          native.setBaseAndExtent(
-            range.endContainer,
-            range.endOffset,
-            range.startContainer,
-            range.startOffset
-          )
-        } else {
-          native.setBaseAndExtent(
-            range.startContainer,
-            range.startOffset,
-            range.endContainer,
-            range.endOffset
-          )
-        }
+      range = current;
+    }
+
+    // COMPAT: IE 11 does not support Selection.setBaseAndExtent
+    if (native.setBaseAndExtent) {
+      // COMPAT: Since the DOM range has no concept of backwards/forwards
+      // we need to check and do the right thing here.
+      if (isBackward) {
+        native.setBaseAndExtent(
+          range.endContainer,
+          range.endOffset,
+          range.startContainer,
+          range.startOffset
+        )
       } else {
-        // COMPAT: IE 11 does not support Selection.extend, fallback to addRange
-        native.addRange(range)
+        native.setBaseAndExtent(
+          range.startContainer,
+          range.startOffset,
+          range.endContainer,
+          range.endOffset
+        )
       }
+    } else {
+      // COMPAT: IE 11 does not support Selection.extend, fallback to addRange
+      native.addRange(range)
     }
 
     // Scroll to the selection, in case it's out of view.
