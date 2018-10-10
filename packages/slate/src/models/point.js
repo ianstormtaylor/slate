@@ -135,6 +135,19 @@ class Point extends Record(DEFAULTS) {
   }
 
   /**
+   * Check whether the point is at the start of a `range`.
+   *
+   * @return {Boolean}
+   */
+
+  isAtStartOfRange(range) {
+    if (this.isUnset) return false
+    const is =
+      this.key === range.start.key && this.offset === range.start.offset
+    return is
+  }
+
+  /**
    * Check whether the point is before a `range`.
    *
    * @return {Boolean}
