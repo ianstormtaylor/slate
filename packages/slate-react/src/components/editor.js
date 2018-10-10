@@ -3,7 +3,6 @@ import React from 'react'
 import SlateTypes from 'slate-prop-types'
 import Types from 'prop-types'
 import invariant from 'tiny-invariant'
-import memoizeOne from 'memoize-one'
 import warning from 'tiny-warning'
 import { Editor as Controller } from 'slate'
 
@@ -69,23 +68,13 @@ class Editor extends React.Component {
     spellCheck: true,
   }
 
-  /**
-   * Constructor.
-   *
-   * @param {Object} props
-   */
+  state = {}
 
-  constructor(props) {
-    super(props)
-    this.resolvePlugins = memoizeOne(this.resolvePlugins)
-    this.state = {}
-
-    this.tmp = {
-      mounted: false,
-      change: null,
-      resolves: 0,
-      updates: 0,
-    }
+  tmp = {
+    mounted: false,
+    change: null,
+    resolves: 0,
+    updates: 0,
   }
 
   /**
