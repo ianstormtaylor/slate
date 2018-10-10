@@ -1,6 +1,34 @@
 import { List } from 'immutable'
 
 /**
+ * Compare paths `path` and `target` to see which is before or after.
+ *
+ * @param {List} path
+ * @param {List} target
+ * @return {Number}
+ */
+
+function compare(path, target) {
+  const m = min(path, target)
+
+  for (let i = 0; i < m; i++) {
+    const pv = path.get(i)
+    const tv = target.get(i)
+
+    // If the path's value is ever less than the target's, it's before.
+    if (pv < tv) return -1
+
+    // If the target's value is ever less than the path's, it's after.
+    if (pv > tv) return 1
+  }
+
+  // Otherwise size decides.
+  if (path.size === target.size) return 0
+
+  return path.size < target.size ? -1 : 1
+}
+
+/**
  * Compare paths `path` and `target` of the same size to see which is before or after.
  * Returns null if the paths are not the same size.
  *
@@ -356,6 +384,7 @@ function transform(path, operation) {
  */
 
 export default {
+  compare,
   compareOfSameSize,
   create,
   crop,
