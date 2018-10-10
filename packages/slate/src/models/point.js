@@ -135,6 +135,20 @@ class Point extends Record(DEFAULTS) {
   }
 
   /**
+   * Check whether the point is before a `range`.
+   *
+   * @return {Boolean}
+   */
+
+  isBeforeRange(range) {
+    if (this.isUnset) return false
+    const is =
+      (this.key === range.start.key && this.offset < range.start.offset) ||
+      PathUtils.compare(this.path, range.start.path) === -1
+    return is
+  }
+
+  /**
    * Check whether the point is at the end of a `node`.
    *
    * @param {Node} node
