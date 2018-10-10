@@ -205,34 +205,31 @@ class Content extends React.Component {
 
     // Otherwise, set the `isUpdatingSelection` flag and update the selection.
     this.tmp.isUpdatingSelection = true
-    removeAllRanges(native)
 
-    if (IS_FIREFOX) {
-      range = current;
-    }
-
-    // COMPAT: IE 11 does not support Selection.setBaseAndExtent
-    if (native.setBaseAndExtent) {
-      // COMPAT: Since the DOM range has no concept of backwards/forwards
-      // we need to check and do the right thing here.
-      if (isBackward) {
-        native.setBaseAndExtent(
-          range.endContainer,
-          range.endOffset,
-          range.startContainer,
-          range.startOffset
-        )
+    if (!IS_FIREFOX) {
+      // COMPAT: IE 11 does not support Selection.setBaseAndExtent
+      if (native.setBaseAndExtent) {
+        // COMPAT: Since the DOM range has no concept of backwards/forwards
+        // we need to check and do the right thing here.
+        if (isBackward) {
+          native.setBaseAndExtent(
+            range.endContainer,
+            range.endOffset,
+            range.startContainer,
+            range.startOffset
+          )
+        } else {
+          native.setBaseAndExtent(
+            range.startContainer,
+            range.startOffset,
+            range.endContainer,
+            range.endOffset
+          )
+        }
       } else {
-        native.setBaseAndExtent(
-          range.startContainer,
-          range.startOffset,
-          range.endContainer,
-          range.endOffset
-        )
+        // COMPAT: IE 11 does not support Selection.extend, fallback to addRange
+        native.addRange(range)
       }
-    } else {
-      // COMPAT: IE 11 does not support Selection.extend, fallback to addRange
-      native.addRange(range)
     }
 
     // Scroll to the selection, in case it's out of view.
