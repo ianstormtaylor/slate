@@ -1,14 +1,15 @@
 import { List } from 'immutable'
 
 /**
- * Compare paths `path` and `b` to see which is before or after.
+ * Compare paths `path` and `target` of the same size to see which is before or after.
+ * Returns null if the paths are not the same size.
  *
  * @param {List} path
- * @param {List} b
+ * @param {List} target
  * @return {Number|Null}
  */
 
-function compare(path, target) {
+function compareOfSameSize(path, target) {
   // PERF: if the paths are not the same size we can exit early.
   if (path.size !== target.size) return null
 
@@ -102,7 +103,7 @@ function increment(path, n = 1, index = path.size - 1) {
 
 function isAbove(path, target) {
   const [p, t] = crop(path, target)
-  return path.size < target.size && compare(p, t) === 0
+  return path.size < target.size && compareOfSameSize(p, t) === 0
 }
 
 /**
@@ -115,7 +116,7 @@ function isAbove(path, target) {
 
 function isAfter(path, target) {
   const [p, t] = crop(path, target)
-  return compare(p, t) === 1
+  return compareOfSameSize(p, t) === 1
 }
 
 /**
@@ -128,7 +129,7 @@ function isAfter(path, target) {
 
 function isBefore(path, target) {
   const [p, t] = crop(path, target)
-  return compare(p, t) === -1
+  return compareOfSameSize(p, t) === -1
 }
 
 /**
@@ -355,7 +356,7 @@ function transform(path, operation) {
  */
 
 export default {
-  compare,
+  compareOfSameSize,
   create,
   crop,
   decrement,
