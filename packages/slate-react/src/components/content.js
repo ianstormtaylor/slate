@@ -171,7 +171,7 @@ class Content extends React.Component {
 
     // Otherwise, figure out which DOM nodes should be selected...
     const current = !!rangeCount && native.getRangeAt(0)
-    let range = findDOMRange(selection, window)
+    const range = findDOMRange(selection, window)
 
     if (!range) {
       warning(
