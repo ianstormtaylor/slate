@@ -1,5 +1,4 @@
 import Debug from 'debug'
-import pick from 'lodash/pick'
 
 import Operation from '../models/operation'
 import PathUtils from '../utils/path-utils'
@@ -74,13 +73,14 @@ function invertOperation(op) {
       return inverse
     }
 
-    case 'set_node': {
-      const { properties, node } = op
-      const inverseNode = node.merge(properties)
-      const inverseProperties = pick(node, Object.keys(properties))
+    case 'set_node':
+    case 'set_value':
+    case 'set_selection':
+    case 'set_mark': {
+      const { properties, newProperties } = op
       const inverse = op
-        .set('node', inverseNode)
-        .set('properties', inverseProperties)
+        .set('properties', newProperties)
+        .set('newProperties', properties)
       return inverse
     }
 
@@ -101,36 +101,6 @@ function invertOperation(op) {
 
     case 'remove_mark': {
       const inverse = op.set('type', 'add_mark')
-      return inverse
-    }
-
-    case 'set_mark': {
-      const { properties, mark } = op
-      const inverseMark = mark.merge(properties)
-      const inverseProperties = pick(mark, Object.keys(properties))
-      const inverse = op
-        .set('mark', inverseMark)
-        .set('properties', inverseProperties)
-      return inverse
-    }
-
-    case 'set_selection': {
-      const { properties, selection } = op
-      const inverseSelection = selection.merge(properties)
-      const inverseProps = pick(selection, Object.keys(properties))
-      const inverse = op
-        .set('selection', inverseSelection)
-        .set('properties', inverseProps)
-      return inverse
-    }
-
-    case 'set_value': {
-      const { properties, value } = op
-      const inverseValue = value.merge(properties)
-      const inverseProperties = pick(value, Object.keys(properties))
-      const inverse = op
-        .set('value', inverseValue)
-        .set('properties', inverseProperties)
       return inverse
     }
 

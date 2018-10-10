@@ -2240,9 +2240,9 @@ class ElementInterface {
    * @return {Node}
    */
 
-  setMark(path, offset, length, mark, properties) {
+  setMark(path, offset, length, properties, newProperties) {
     let node = this.assertNode(path)
-    node = node.updateMark(offset, length, mark, properties)
+    node = node.updateMark(offset, length, properties, newProperties)
     const ret = this.replaceNode(path, node)
     return ret
   }
