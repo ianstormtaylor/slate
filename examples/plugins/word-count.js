@@ -12,12 +12,13 @@ export default function WordCount(options) {
   return {
     renderEditor(props, next) {
       const children = next()
+      const wordCount = props.value.document
+        .getBlocks()
+        .reduce((memo, b) => memo + b.text.trim().split(/\s+/).length, 0)
       return (
         <div>
           <div>{children}</div>
-          <WordCounter>
-            Word Count: {props.value.document.text.split(' ').length}
-          </WordCounter>
+          <WordCounter>Word Count: {wordCount}</WordCounter>
         </div>
       )
     },
