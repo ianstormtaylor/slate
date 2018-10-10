@@ -174,6 +174,26 @@ class Point extends Record(DEFAULTS) {
   }
 
   /**
+   * Check whether the point is inside a `range`.
+   *
+   * @return {Boolean}
+   */
+
+  isInRange(range) {
+    if (this.isUnset) return false
+
+    const afterOrAtStart =
+      (this.key === range.start.key && this.offset >= range.start.offset) ||
+      PathUtils.compare(this.path, range.start.path) === 1
+    const beforeOrAtEnd =
+      (this.key === range.end.key && this.offset <= range.end.offset) ||
+      PathUtils.compare(this.path, range.end.path) === -1
+
+    const is = afterOrAtStart && beforeOrAtEnd
+    return is
+  }
+
+  /**
    * Check whether the point is at the end of a `node`.
    *
    * @param {Node} node
