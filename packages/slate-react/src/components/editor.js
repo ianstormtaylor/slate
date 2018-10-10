@@ -70,22 +70,24 @@ class Editor extends React.Component {
   }
 
   /**
-   * Constructor.
+   * Initial state.
    *
-   * @param {Object} props
+   * @type {Object}
    */
 
-  constructor(props) {
-    super(props)
-    this.resolvePlugins = memoizeOne(this.resolvePlugins)
-    this.state = {}
+  state = {}
 
-    this.tmp = {
-      mounted: false,
-      change: null,
-      resolves: 0,
-      updates: 0,
-    }
+  /**
+   * Temporary values.
+   *
+   * @type {Object}
+   */
+
+  tmp = {
+    mounted: false,
+    change: null,
+    resolves: 0,
+    updates: 0,
   }
 
   /**
@@ -169,10 +171,7 @@ class Editor extends React.Component {
    * @return {Editor}
    */
 
-  resolveController = (plugins = [], schema, commands, queries) => {
-    debug('resolvePlugins', { plugins, schema })
-    this.tmp.resolves++
-
+  resolveController = memoizeOne((plugins = [], schema, commands, queries) => {
     // If we've resolved a few times already, and it's exactly in line with
     // the updates, then warn the user that they may be doing something wrong.
     warning(
@@ -180,10 +179,11 @@ class Editor extends React.Component {
       'A Slate <Editor> component is re-resolving the `plugins`, `schema`, `commands` or `queries` on each update, which leads to poor performance. This is often due to passing in a new references for these props with each render by declaring them inline in your render function. Do not do this! Declare them outside your render function, or memoize them instead.'
     )
 
+    this.tmp.resolves++
     const react = ReactPlugin(this.props)
     const attrs = { onChange: this.onControllerChange, plugins: [react] }
     this.controller = new Controller(attrs, { editor: this, normalize: false })
-  }
+  })
 
   /**
    * Mimic the API of the `Editor` controller, so that this component instance
