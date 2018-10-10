@@ -172,14 +172,16 @@ class HoveringMenu extends React.Component {
    * Render the editor.
    *
    * @param {Object} props
-   * @param {Editor} editor
+   * @param {Function} next
    * @return {Element}
    */
 
-  renderEditor = (props, editor) => {
+  renderEditor = (props, next) => {
+    const { editor } = props
+    const children = next()
     return (
       <React.Fragment>
-        {props.children}
+        {children}
         <HoverMenu innerRef={menu => (this.menu = menu)} editor={editor} />
       </React.Fragment>
     )
