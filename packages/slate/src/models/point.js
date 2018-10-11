@@ -121,6 +121,20 @@ class Point extends Record(DEFAULTS) {
   }
 
   /**
+   * Check whether the point is after another `point`.
+   *
+   * @return {Boolean}
+   */
+
+  isAfterPoint(point) {
+    if (this.isUnset) return false
+    const is =
+      (this.key === point.key && this.offset > point.offset) ||
+      PathUtils.compare(this.path, point.path) === 1
+    return is
+  }
+
+  /**
    * Check whether the point is after a `range`.
    *
    * @return {Boolean}
