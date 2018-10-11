@@ -142,9 +142,7 @@ class Point extends Record(DEFAULTS) {
 
   isAfterRange(range) {
     if (this.isUnset) return false
-    const is =
-      (this.key === range.end.key && this.offset > range.end.offset) ||
-      PathUtils.compare(this.path, range.end.path) === 1
+    const is = this.isAfterPoint(range.end)
     return is
   }
 
@@ -156,7 +154,7 @@ class Point extends Record(DEFAULTS) {
 
   isAtEndOfRange(range) {
     if (this.isUnset) return false
-    const is = this.key === range.end.key && this.offset === range.end.offset
+    const is = this.equals(range.end)
     return is
   }
 
@@ -168,8 +166,7 @@ class Point extends Record(DEFAULTS) {
 
   isAtStartOfRange(range) {
     if (this.isUnset) return false
-    const is =
-      this.key === range.start.key && this.offset === range.start.offset
+    const is = this.equals(range.start)
     return is
   }
 
@@ -195,9 +192,7 @@ class Point extends Record(DEFAULTS) {
 
   isBeforeRange(range) {
     if (this.isUnset) return false
-    const is =
-      (this.key === range.start.key && this.offset < range.start.offset) ||
-      PathUtils.compare(this.path, range.start.path) === -1
+    const is = this.isBeforePoint(range.start)
     return is
   }
 
@@ -209,15 +204,10 @@ class Point extends Record(DEFAULTS) {
 
   isInRange(range) {
     if (this.isUnset) return false
-
-    const afterOrAtStart =
-      (this.key === range.start.key && this.offset >= range.start.offset) ||
-      PathUtils.compare(this.path, range.start.path) === 1
-    const beforeOrAtEnd =
-      (this.key === range.end.key && this.offset <= range.end.offset) ||
-      PathUtils.compare(this.path, range.end.path) === -1
-
-    const is = afterOrAtStart && beforeOrAtEnd
+    const is =
+      this.equals(range.start) ||
+      this.equals(range.end) ||
+      (this.isAfterPoint(range.start) && this.isBeforePoint(range.end))
     return is
   }
 
