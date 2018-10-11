@@ -119,10 +119,10 @@ class Text extends React.Component {
 
       // If the node's path is before the start path, ignore it.
       const path = document.assertPath(key)
-      if (PathUtils.compareOfSameSize(path, start.path) === -1) return false
+      if (PathUtils.compare(path, start.path) === -1) return false
 
       // If the node's path is after the end path, ignore it.
-      if (PathUtils.compareOfSameSize(path, end.path) === 1) return false
+      if (PathUtils.compare(path, end.path) === 1) return false
 
       // Otherwise, include it.
       return true

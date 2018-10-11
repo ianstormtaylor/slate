@@ -29,34 +29,6 @@ function compare(path, target) {
 }
 
 /**
- * Compare paths `path` and `target` of the same size to see which is before or after.
- * Returns null if the paths are not the same size.
- *
- * @param {List} path
- * @param {List} target
- * @return {Number|Null}
- */
-
-function compareOfSameSize(path, target) {
-  // PERF: if the paths are not the same size we can exit early.
-  if (path.size !== target.size) return null
-
-  for (let i = 0; i < path.size; i++) {
-    const pv = path.get(i)
-    const tv = target.get(i)
-
-    // If the path's value is ever less than the target's, it's before.
-    if (pv < tv) return -1
-
-    // If the target's value is ever less than the path's, it's after.
-    if (pv > tv) return 1
-  }
-
-  // Otherwise they were equal the whole way, it's the same.
-  return 0
-}
-
-/**
  * Create a path from `attrs`.
  *
  * @param {Array|List} attrs
@@ -131,7 +103,7 @@ function increment(path, n = 1, index = path.size - 1) {
 
 function isAbove(path, target) {
   const [p, t] = crop(path, target)
-  return path.size < target.size && compareOfSameSize(p, t) === 0
+  return path.size < target.size && compare(p, t) === 0
 }
 
 /**
@@ -144,7 +116,7 @@ function isAbove(path, target) {
 
 function isAfter(path, target) {
   const [p, t] = crop(path, target)
-  return compareOfSameSize(p, t) === 1
+  return compare(p, t) === 1
 }
 
 /**
@@ -157,7 +129,7 @@ function isAfter(path, target) {
 
 function isBefore(path, target) {
   const [p, t] = crop(path, target)
-  return compareOfSameSize(p, t) === -1
+  return compare(p, t) === -1
 }
 
 /**
@@ -385,7 +357,6 @@ function transform(path, operation) {
 
 export default {
   compare,
-  compareOfSameSize,
   create,
   crop,
   decrement,

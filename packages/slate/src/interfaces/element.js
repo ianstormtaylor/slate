@@ -1547,7 +1547,7 @@ class ElementInterface {
     this.assertNode(newParentPath)
 
     const [p, np] = PathUtils.crop(path, newPath)
-    const position = PathUtils.compareOfSameSize(p, np)
+    const position = PathUtils.compare(p, np)
 
     // If the old path ends above and before a node in the new path, then
     // removing it will alter the target, so we need to adjust the new path.
