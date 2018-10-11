@@ -160,6 +160,20 @@ class Point extends Record(DEFAULTS) {
   }
 
   /**
+   * Check whether the point is before another `point`.
+   *
+   * @return {Boolean}
+   */
+
+  isBeforePoint(point) {
+    if (this.isUnset) return false
+    const is =
+      (this.key === point.key && this.offset < point.offset) ||
+      PathUtils.compare(this.path, point.path) === -1
+    return is
+  }
+
+  /**
    * Check whether the point is before a `range`.
    *
    * @return {Boolean}
