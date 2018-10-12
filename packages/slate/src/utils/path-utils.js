@@ -5,7 +5,7 @@ import { List } from 'immutable'
  *
  * @param {List} path
  * @param {List} target
- * @return {Number}
+ * @return {Number|Null}
  */
 
 function compare(path, target) {
@@ -22,10 +22,8 @@ function compare(path, target) {
     if (pv > tv) return 1
   }
 
-  // Otherwise size decides.
-  if (path.size === target.size) return 0
-
-  return path.size < target.size ? -1 : 1
+  // Paths should now be equal, otherwise something is wrong
+  return path.size === target.size ? 0 : null
 }
 
 /**
