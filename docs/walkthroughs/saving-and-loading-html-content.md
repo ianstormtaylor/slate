@@ -10,6 +10,7 @@ Let's start with a basic editor:
 
 ```js
 import { Editor } from 'slate-react'
+import Plain from 'slate-plain-serializer'
 
 class App extends React.Component {
   state = {
