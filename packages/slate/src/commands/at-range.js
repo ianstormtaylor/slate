@@ -794,7 +794,8 @@ Commands.insertTextAtRange = (change, range, text, marks) => {
   const { document } = value
   const { start } = range
   let key = start.key
-  let offset = start.offset
+  const offset = start.offset
+  const path = start.path
   const parent = document.getParent(start.key)
 
   if (change.isVoid(parent)) {
@@ -805,10 +806,11 @@ Commands.insertTextAtRange = (change, range, text, marks) => {
     if (range.isExpanded) {
       change.deleteAtRange(range)
 
+      const startText = change.value.document.getNode(path)
+
       // Update range start after delete
-      if (change.value.selection.start.key !== key) {
-        key = change.value.selection.start.key
-        offset = change.value.selection.start.offset
+      if (startText && startText.key !== key) {
+        key = startText.key
       }
     }
 
