@@ -13,7 +13,7 @@ import { Set } from 'immutable'
  */
 
 function deserialize(string, options = {}) {
-  let { defaultBlock = 'line', defaultMarks = [], toJSON = false } = options
+  let { defaultBlock = 'line', defaultMarks = [], delimiter = "\n", toJSON = false } = options
 
   if (Set.isSet(defaultMarks)) {
     defaultMarks = defaultMarks.toArray()
@@ -27,7 +27,7 @@ function deserialize(string, options = {}) {
     document: {
       object: 'document',
       data: {},
-      nodes: string.split('\n').map(line => {
+      nodes: string.split(delimiter).map(line => {
         return {
           ...defaultBlock,
           object: 'block',
