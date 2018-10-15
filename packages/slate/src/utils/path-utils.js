@@ -1,18 +1,17 @@
 import { List } from 'immutable'
 
 /**
- * Compare paths `path` and `b` to see which is before or after.
+ * Compare paths `path` and `target` to see which is before or after.
  *
  * @param {List} path
- * @param {List} b
+ * @param {List} target
  * @return {Number|Null}
  */
 
 function compare(path, target) {
-  // PERF: if the paths are not the same size we can exit early.
-  if (path.size !== target.size) return null
+  const m = min(path, target)
 
-  for (let i = 0; i < path.size; i++) {
+  for (let i = 0; i < m; i++) {
     const pv = path.get(i)
     const tv = target.get(i)
 
@@ -23,8 +22,8 @@ function compare(path, target) {
     if (pv > tv) return 1
   }
 
-  // Otherwise they were equal the whole way, it's the same.
-  return 0
+  // Paths should now be equal, otherwise something is wrong
+  return path.size === target.size ? 0 : null
 }
 
 /**

@@ -121,6 +121,97 @@ class Point extends Record(DEFAULTS) {
   }
 
   /**
+   * Check whether the point is after another `point`.
+   *
+   * @return {Boolean}
+   */
+
+  isAfterPoint(point) {
+    if (this.isUnset) return false
+    const is =
+      (this.key === point.key && this.offset > point.offset) ||
+      PathUtils.compare(this.path, point.path) === 1
+    return is
+  }
+
+  /**
+   * Check whether the point is after a `range`.
+   *
+   * @return {Boolean}
+   */
+
+  isAfterRange(range) {
+    if (this.isUnset) return false
+    const is = this.isAfterPoint(range.end)
+    return is
+  }
+
+  /**
+   * Check whether the point is at the end of a `range`.
+   *
+   * @return {Boolean}
+   */
+
+  isAtEndOfRange(range) {
+    if (this.isUnset) return false
+    const is = this.equals(range.end)
+    return is
+  }
+
+  /**
+   * Check whether the point is at the start of a `range`.
+   *
+   * @return {Boolean}
+   */
+
+  isAtStartOfRange(range) {
+    if (this.isUnset) return false
+    const is = this.equals(range.start)
+    return is
+  }
+
+  /**
+   * Check whether the point is before another `point`.
+   *
+   * @return {Boolean}
+   */
+
+  isBeforePoint(point) {
+    if (this.isUnset) return false
+    const is =
+      (this.key === point.key && this.offset < point.offset) ||
+      PathUtils.compare(this.path, point.path) === -1
+    return is
+  }
+
+  /**
+   * Check whether the point is before a `range`.
+   *
+   * @return {Boolean}
+   */
+
+  isBeforeRange(range) {
+    if (this.isUnset) return false
+    const is = this.isBeforePoint(range.start)
+    return is
+  }
+
+  /**
+   * Check whether the point is inside a `range`.
+   *
+   * @return {Boolean}
+   */
+
+  isInRange(range) {
+    if (this.isUnset) return false
+    const is =
+      this.equals(range.start) ||
+      this.equals(range.end) ||
+      (this.isAfterPoint(range.start) && this.isBeforePoint(range.end))
+    return is
+  }
+
+  /**
    * Check whether the point is at the end of a `node`.
    *
    * @param {Node} node
