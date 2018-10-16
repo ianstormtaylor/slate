@@ -7,10 +7,12 @@ function Bold(props) {
   return React.createElement('strong', { ...props.attributes }, props.children)
 }
 
-function renderMark(props) {
+function renderMark(props, next) {
   switch (props.mark.type) {
     case 'bold':
       return Bold(props)
+    default:
+      return next()
   }
 }
 

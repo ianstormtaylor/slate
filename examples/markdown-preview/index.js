@@ -53,21 +53,27 @@ class MarkdownPreview extends React.Component {
    * Render a Slate mark.
    *
    * @param {Object} props
+   * @param {Editor} editor
+   * @param {Function} next
    * @return {Element}
    */
 
-  renderMark = props => {
+  renderMark = (props, next) => {
     const { children, mark, attributes } = props
 
     switch (mark.type) {
       case 'bold':
         return <strong {...attributes}>{children}</strong>
+
       case 'code':
         return <code {...attributes}>{children}</code>
+
       case 'italic':
         return <em {...attributes}>{children}</em>
+
       case 'underlined':
         return <u {...attributes}>{children}</u>
+
       case 'title': {
         return (
           <span
@@ -83,6 +89,7 @@ class MarkdownPreview extends React.Component {
           </span>
         )
       }
+
       case 'punctuation': {
         return (
           <span {...attributes} style={{ opacity: 0.2 }}>
@@ -90,6 +97,7 @@ class MarkdownPreview extends React.Component {
           </span>
         )
       }
+
       case 'list': {
         return (
           <span
@@ -104,6 +112,7 @@ class MarkdownPreview extends React.Component {
           </span>
         )
       }
+
       case 'hr': {
         return (
           <span
@@ -117,6 +126,10 @@ class MarkdownPreview extends React.Component {
             {children}
           </span>
         )
+      }
+
+      default: {
+        return next()
       }
     }
   }
@@ -135,11 +148,13 @@ class MarkdownPreview extends React.Component {
    * Define a decorator for markdown styles.
    *
    * @param {Node} node
+   * @param {Function} next
    * @return {Array}
    */
 
-  decorateNode(node) {
-    if (node.object != 'block') return
+  decorateNode(node, next) {
+    const others = next() || []
+    if (node.object != 'block') return others
 
     const string = node.text
     const texts = node.getTexts().toArray()
@@ -202,7 +217,7 @@ class MarkdownPreview extends React.Component {
       start = end
     }
 
-    return decorations
+    return [...others, ...decorations]
   }
 }
 

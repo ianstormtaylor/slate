@@ -81,7 +81,6 @@ The other export is a `createHyperscript` helper that you can use to create your
   inlines: Object,
   marks: Object,
   decorations: Object,
-  schema: Object,
   creators: Object,
 }
 ```

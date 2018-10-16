@@ -2,16 +2,22 @@
 
 import h from '../../helpers/h'
 
-export default function(value) {
-  return value
-    .change()
-    .insertText('t')
-    .value.change()
-    .insertText('w')
-    .value.change()
-    .insertText('o')
-    .value.change()
-    .undo().value
+export default function(editor) {
+  editor.change(change => {
+    change.insertText('t')
+  })
+
+  editor.change(change => {
+    change.insertText('w')
+  })
+
+  editor.change(change => {
+    change.insertText('o')
+  })
+
+  editor.change(change => {
+    change.undo()
+  })
 }
 
 export const input = (

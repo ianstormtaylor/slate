@@ -60,6 +60,16 @@ class SearchHighlighting extends React.Component {
   }
 
   /**
+   * Store a reference to the `editor`.
+   *
+   * @param {Editor} editor
+   */
+
+  ref = editor => {
+    this.editor = editor
+  }
+
+  /**
    * Render.
    *
    * @return {Element}
@@ -80,6 +90,7 @@ class SearchHighlighting extends React.Component {
         </Toolbar>
         <Editor
           placeholder="Enter some rich text..."
+          ref={this.ref}
           value={this.state.value}
           schema={this.schema}
           onChange={this.onChange}
@@ -97,7 +108,7 @@ class SearchHighlighting extends React.Component {
    * @return {Element}
    */
 
-  renderMark = props => {
+  renderMark = (props, next) => {
     const { children, mark, attributes } = props
 
     switch (mark.type) {
@@ -107,6 +118,8 @@ class SearchHighlighting extends React.Component {
             {children}
           </span>
         )
+      default:
+        return next()
     }
   }
 
@@ -127,38 +140,36 @@ class SearchHighlighting extends React.Component {
    */
 
   onInputChange = event => {
-    const { value } = this.state
-    const string = event.target.value
-    const texts = value.document.getTexts()
-    const decorations = []
+    this.editor.change(change => {
+      const { value } = change
+      const string = event.target.value
+      const texts = value.document.getTexts()
+      const decorations = []
 
-    texts.forEach(node => {
-      const { key, text } = node
-      const parts = text.split(string)
-      let offset = 0
+      texts.forEach(node => {
+        const { key, text } = node
+        const parts = text.split(string)
+        let offset = 0
 
-      parts.forEach((part, i) => {
-        if (i != 0) {
-          decorations.push({
-            anchor: { key, offset: offset - string.length },
-            focus: { key, offset },
-            mark: { type: 'highlight' },
-          })
-        }
+        parts.forEach((part, i) => {
+          if (i != 0) {
+            decorations.push({
+              anchor: { key, offset: offset - string.length },
+              focus: { key, offset },
+              mark: { type: 'highlight' },
+            })
+          }
 
-        offset = offset + part.length + string.length
+          offset = offset + part.length + string.length
+        })
+      })
+
+      // Make the change to decorations without saving it into the undo history,
+      // so that there isn't a confusing behavior when undoing.
+      change.withoutSaving(() => {
+        change.setValue({ decorations })
       })
     })
-
-    const change = value.change()
-
-    // Make the change to decorations without saving it into the undo history,
-    // so that there isn't a confusing behavior when undoing.
-    change.withoutSaving(() => {
-      change.setValue({ decorations })
-    })
-
-    this.onChange(change)
   }
 }
 

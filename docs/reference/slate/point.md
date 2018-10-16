@@ -90,6 +90,36 @@ Return a JSON representation of the point.
 
 ## Checking Methods
 
+### `isAfterRange`
+
+`isAfterRange(range: Range) => Boolean`
+
+Determine whether the point is after a `range`.
+
+### `isAtEndOfRange`
+
+`isAtEndOfRange(range: Range) => Boolean`
+
+Determine whether the point is at the end of a `range`.
+
+### `isAtStartOfRange`
+
+`isAtStartOfRange(range: Range) => Boolean`
+
+Determine whether the point is at the start of a `range`.
+
+### `isBeforeRange`
+
+`isBeforeRange(range: Range) => Boolean`
+
+Determine whether the point is before a `range`.
+
+### `isInRange`
+
+`isInRange(range: Range) => Boolean`
+
+Determine whether the point is inside a `range`.
+
 ### `isAtEndOfNode`
 
 `isAtEndOfNode(node: Node) => Boolean`

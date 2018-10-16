@@ -11,10 +11,12 @@ function Image(props) {
   })
 }
 
-function renderNode(props) {
+function renderNode(props, next) {
   switch (props.node.type) {
     case 'image':
       return Image(props)
+    default:
+      return next()
   }
 }
 
@@ -33,13 +35,21 @@ export const value = (
   <value>
     <document>
       <paragraph>
-        <anchor />
+        <text key="a">
+          <anchor />
+        </text>
       </paragraph>
-      <image key="a" src="https://example.com/image.png" />
+      <image src="https://example.com/image.png">
+        <text />
+      </image>
       <paragraph>
-        <focus />
+        <text key="b">
+          <focus />
+        </text>
       </paragraph>
-      <image key="b" src="https://example.com/image2.png" />
+      <image src="https://example.com/image2.png">
+        <text />
+      </image>
     </document>
   </value>
 )
@@ -49,7 +59,7 @@ export const output = `
   <div style="position:relative">
     <span>
       <span>
-        <span data-slate-zero-width="n">​</span>
+        <span data-slate-zero-width="n">&#xFEFF;</span>
       </span>
     </span>
   </div>
@@ -57,7 +67,7 @@ export const output = `
     <div data-slate-spacer="true" style="height:0;color:transparent;outline:none;position:absolute">
       <span>
         <span>
-          <span data-slate-zero-width="z">&#x200B;</span>
+          <span data-slate-zero-width="z">&#xFEFF;</span>
         </span>
       </span>
     </div>
@@ -68,7 +78,7 @@ export const output = `
   <div style="position:relative">
     <span>
       <span>
-        <span data-slate-zero-width="n">​</span>
+        <span data-slate-zero-width="n">&#xFEFF;</span>
       </span>
     </span>
   </div>
@@ -76,7 +86,7 @@ export const output = `
     <div data-slate-spacer="true" style="height:0;color:transparent;outline:none;position:absolute">
       <span>
         <span>
-          <span data-slate-zero-width="z">&#x200B;</span>
+          <span data-slate-zero-width="z">&#xFEFF;</span>
         </span>
       </span>
     </div>

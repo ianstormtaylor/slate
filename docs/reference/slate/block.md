@@ -63,13 +63,13 @@ A concatenated string of all of the descendant [`Text`](./text.md) nodes of this
 
 `Block.create(properties: Object) => Block`
 
-Create a block from a plain Javascript object of `properties`.
+Create a block from a plain JavaScript object of `properties`.
 
 ### `Block.createList`
 
 `Block.createList(array: Array) => List`
 
-Create a list of block nodes from a plain Javascript `array`.
+Create a list of block nodes from a plain JavaScript `array`.
 
 ### `Block.fromJSON`
 

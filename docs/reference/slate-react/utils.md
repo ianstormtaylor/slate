@@ -19,17 +19,17 @@ React-specific utility functions for Slate that may be useful in certain use cas
 
 ### `cloneFragment`
 
-`cloneFragment(event: DOMEvent|ReactEvent, value: Value, fragment: Document)`
+`cloneFragment(event: DOMEvent|ReactEvent, editor: Editor, fragment: Document)`
 
 During a cut or copy event, sets `fragment` as the Slate document fragment to be copied.
 
 ```js
-function onCopy(event, change, editor) {
-  const { value } = change
+function onCopy(event, change, next) {
+  const { editor } = change
   const fragment = // ... create a fragment from a set of nodes ...
 
   if (fragment) {
-    cloneFragment(event, value, fragment)
+    cloneFragment(event, editor, fragment)
     return true
   }
 }
@@ -38,12 +38,12 @@ function onCopy(event, change, editor) {
 Note that calling `cloneFragment` should be the last thing you do in your event handler. If you change the window selection after calling `cloneFragment`, the browser may copy the wrong content. If you need to perform an action after calling `cloneFragment`, wrap it in `requestAnimationFrame`:
 
 ```js
-function onCut(event, change, editor) {
-  const { value } = change
+function onCut(event, change, next) {
+  const { editor } = change
   const fragment = // ... create a fragment from a set of nodes ...
 
   if (fragment) {
-    cloneFragment(event, value, fragment)
+    cloneFragment(event, editor, fragment)
     window.requestAnimationFrame(() => {
       editor.change(change => change.delete())
     })
@@ -82,45 +82,45 @@ function onChange(change) {
 
 ### `findNode`
 
-`findNode(element: DOMElement, value: Value) => Node`
+`findNode(element: DOMElement, editor: Editor) => Node`
 
-Find the Slate node from a DOM `element` and Slate `value`.
+Find the Slate node from a DOM `element` and Slate `editor`.
 
 ```js
 function onSomeNativeEvent(event) {
-  const node = findNode(event.target)
+  const node = findNode(event.target, editor)
   // Do something with `node`...
 }
 ```
 
 ### `findRange`
 
-`findRange(selection: DOMSelection, value: Value) => Range`
-`findRange(range: DOMRange, value: Value) => Range`
+`findRange(selection: DOMSelection, editor: Editor) => Range`
+`findRange(range: DOMRange, editor: Editor) => Range`
 
-Find the Slate range from a DOM `range` or `selection` and a Slate `value`.
+Find the Slate range from a DOM `range` or `selection` and a Slate `editor`.
 
 ```js
 function onSomeNativeEvent() {
   // You can find a range from a native DOM selection...
   const nativeSelection = window.getSelection()
-  const range = findRange(nativeSelection, value)
+  const range = findRange(nativeSelection, editor)
 
   // ...or from a native DOM range...
   const nativeRange = nativeSelection.getRangeAt(0)
-  const range = findRange(nativeRange, value)
+  const range = findRange(nativeRange, editor)
 }
 ```
 
 ### `getEventRange`
 
-`getEventRange(event: DOMEvent|ReactEvent, value: Value) => Range`
+`getEventRange(event: DOMEvent|ReactEvent, editor: Editor) => Range`
 
-Get the affected Slate range from a DOM `event` and Slate `value`.
+Get the affected Slate range from a DOM `event` and Slate `editor`.
 
 ```js
-function onDrop(event, change, editor) {
-  const targetRange = getEventRange(event)
+function onDrop(event, change, next) {
+  const targetRange = getEventRange(event, editor)
   // Do something at the drop `targetRange`...
 }
 ```
@@ -132,7 +132,7 @@ function onDrop(event, change, editor) {
 Get the Slate-related data from a DOM `event` and Slate `value`.
 
 ```js
-function onDrop(event, change, editor) {
+function onDrop(event, change, next) {
   const transfer = getEventTransfer(event)
   const { type, node } = transfer
 
@@ -149,7 +149,7 @@ function onDrop(event, change, editor) {
 Sets the Slate-related `data` with `type` on an `event`. The `type` must be one of the types Slate recognizes: `'fragment'`, `'html'`, `'node'`, `'rich'`, or `'text'`.
 
 ```js
-function onDragStart(event, change, editor) {
+function onDragStart(event, change, next) {
   const { value } = change
   const { startNode } = value
   setEventTransfer(event, 'node', startNode)

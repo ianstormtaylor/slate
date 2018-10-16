@@ -7,10 +7,12 @@ function Emoji(props) {
   return React.createElement('img', props.attributes)
 }
 
-function renderNode(props) {
+function renderNode(props, next) {
   switch (props.node.type) {
     case 'emoji':
       return Emoji(props)
+    default:
+      return next()
   }
 }
 
@@ -30,7 +32,9 @@ export const value = (
   <value>
     <document>
       <paragraph>
-        <emoji />
+        <emoji>
+          <text />
+        </emoji>
       </paragraph>
     </document>
   </value>
@@ -41,7 +45,7 @@ export const output = `
   <div style="position:relative">
     <span>
       <span>
-        <span data-slate-zero-width="z">&#x200B;</span>
+        <span data-slate-zero-width="z">&#xFEFF;</span>
       </span>
     </span>
     <span data-slate-void="true">
@@ -51,7 +55,7 @@ export const output = `
     </span>
     <span>
       <span>
-        <span data-slate-zero-width="n">&#x200B;</span>
+        <span data-slate-zero-width="n">&#xFEFF;</span>
       </span>
     </span>
   </div>

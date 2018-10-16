@@ -61,6 +61,16 @@ class Links extends React.Component {
   }
 
   /**
+   * Store a reference to the `editor`.
+   *
+   * @param {Editor} editor
+   */
+
+  ref = editor => {
+    this.editor = editor
+  }
+
+  /**
    * Render the app.
    *
    * @return {Element} element
@@ -76,6 +86,7 @@ class Links extends React.Component {
         </Toolbar>
         <Editor
           placeholder="Enter some text..."
+          ref={this.ref}
           value={this.state.value}
           onChange={this.onChange}
           onPaste={this.onPaste}
@@ -89,10 +100,12 @@ class Links extends React.Component {
    * Render a Slate node.
    *
    * @param {Object} props
+   * @param {Editor} editor
+   * @param {Function} next
    * @return {Element}
    */
 
-  renderNode = props => {
+  renderNode = (props, next) => {
     const { attributes, children, node } = props
 
     switch (node.type) {
@@ -104,6 +117,10 @@ class Links extends React.Component {
             {children}
           </a>
         )
+      }
+
+      default: {
+        return next()
       }
     }
   }
@@ -127,40 +144,40 @@ class Links extends React.Component {
 
   onClickLink = event => {
     event.preventDefault()
-    const { value } = this.state
-    const hasLinks = this.hasLinks()
-    const change = value.change()
 
-    if (hasLinks) {
-      change.call(unwrapLink)
-    } else if (value.selection.isExpanded) {
-      const href = window.prompt('Enter the URL of the link:')
+    this.editor.change(change => {
+      const { value } = change
+      const hasLinks = this.hasLinks()
 
-      if (href === null) {
-        return
+      if (hasLinks) {
+        change.call(unwrapLink)
+      } else if (value.selection.isExpanded) {
+        const href = window.prompt('Enter the URL of the link:')
+
+        if (href === null) {
+          return
+        }
+
+        change.call(wrapLink, href)
+      } else {
+        const href = window.prompt('Enter the URL of the link:')
+
+        if (href === null) {
+          return
+        }
+
+        const text = window.prompt('Enter the text for the link:')
+
+        if (text === null) {
+          return
+        }
+
+        change
+          .insertText(text)
+          .moveFocusBackward(text.length)
+          .call(wrapLink, href)
       }
-
-      change.call(wrapLink, href)
-    } else {
-      const href = window.prompt('Enter the URL of the link:')
-
-      if (href === null) {
-        return
-      }
-
-      const text = window.prompt('Enter the text for the link:')
-
-      if (text === null) {
-        return
-      }
-
-      change
-        .insertText(text)
-        .moveFocusBackward(text.length)
-        .call(wrapLink, href)
-    }
-
-    this.onChange(change)
+    })
   }
 
   /**
@@ -168,22 +185,22 @@ class Links extends React.Component {
    *
    * @param {Event} event
    * @param {Change} change
+   * @param {Function} next
    */
 
-  onPaste = (event, change) => {
-    if (change.value.selection.isCollapsed) return
+  onPaste = (event, change, next) => {
+    if (change.value.selection.isCollapsed) return next()
 
     const transfer = getEventTransfer(event)
     const { type, text } = transfer
-    if (type != 'text' && type != 'html') return
-    if (!isUrl(text)) return
+    if (type != 'text' && type != 'html') return next()
+    if (!isUrl(text)) return next()
 
     if (this.hasLinks()) {
       change.call(unwrapLink)
     }
 
     change.call(wrapLink, text)
-    return true
   }
 }
 

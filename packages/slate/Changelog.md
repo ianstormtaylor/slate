@@ -4,6 +4,192 @@ A list of changes to the `slate` package with each new version. Until `1.0.0` is
 
 ---
 
+### `0.42.0` — October 9, 2018
+
+###### NEW
+
+**Introducing the `Editor` controller.** Previously there was a vague `editor` concept, that was the React component itself. This was helpful, but because it was tightly coupled to React and the browser, it didn't lend itself to non-browser use cases well. This meant that the line between "model" and "controller/view" was blurred, and some concepts lived in both places at once, in inconsistent ways.
+
+A new `Editor` controller now makes this relationship clear. It borrows many of its behaviors from the React `<Editor>` component. And the component actually just instantiates its own plain JavaScript `Editor` under the covers to delegate the work to.
+
+This new concept powers a lot of the thinking in this new version, unlocking a lot of changes that bring a clearer separation of responsibilities to Slate. It allows us to create editors in any environment, which makes server-side use cases easier, brings parity to testing, and even opens us up to supporting other view layers like React Native or Vue.js in the future.
+
+It has a familiar API, based on the existing `editor` concept:
+
+```js
+const editor = new Editor({ plugins, value, onChange })
+
+editor.change(change => {
+  ...
+})
+```
+
+However it also introduces imperative methods to make testing easier:
+
+```js
+editor.run('renderNode', props)
+
+editor.event('onKeyDown', event)
+
+editor.command('addMark', 'bold')
+
+editor.query('isVoid', node)
+```
+
+I'm very excited about it, so I hope you like it!
+
+**Introducing the "commands" concept.** Previously, "change methods" were treated in a first-class way, but plugins had no easy way to add their own change methods that were reusable elsewhere. And they had no way to override the built-in logic for certain commands, for example `splitBlock` or `insertText`. However, now this is all customizable by plugins, with the core Slate plugin providing all of the previous default commands.
+
+```js
+const plugin = {
+  commands: {
+    wrapQuote(change) {
+      change.wrapBlock('quote')
+    },
+  },
+}
+```
+
+Those commands are then available directly on the `change` objects, which are now editor-specific:
+
+```js
+change.wrapQuote()
+```
+
+This allows you to define all of your commands in a single, easily-testable place. And then "behavioral" plugins can simply take command names as options, so that you have full control over the logic they trigger.
+
+**Introducing the "queries" concept.** Similarly to the commands, queries allow plugins to define specific behaviors that the editor can be queried for in a reusable way, to be used when rendering buttons, or deciding on command behaviors, etc.
+
+For example, you might define an `getActiveList` query:
+
+```js
+const plugin = {
+  queries: {
+    getActiveList(value) {},
+  },
+}
+```
+
+And then be able to re-use that logic easily in different places in your codebase, or pass in the query name to a plugin that can use your custom logic itself:
+
+```js
+const { value } = change
+const list = change.getActiveList(value)
+
+if (list) {
+  ...
+} else {
+  ...
+}
+```
+
+Taken together, commands and queries offer a better way for plugins to manage their inter-dependencies. They can take in command or query names as options to change their behaviors, or they can export new commands and queries that you can reuse in your codebase.
+
+**The middleware stack is now deferrable.** With the introduction of the `Editor` controller, the middleware stack in Slate has also been upgraded. Each middleware now receives a `next` function (similar to Express or Koa) that allows you to choose whether to iterating the stack or not.
+
+```js
+// Previously, you'd return `undefined` to continue.
+function onKeyDown(event, change, editor) {
+  if (event.key !== 'Enter') return
+  ...
+}
+
+// Now, you call `next()` to continue...
+function onKeyDown(event, change, next) {
+  if (event.key !== 'Enter') return next()
+  ...
+}
+```
+
+While that may seem inconvenient, it opens up an entire new behavior, which is deferring to the plugins later in the stack to see if they "handle" a specific case, and if not, handling it yourself:
+
+```js
+function onKeyDown(event, change, next) {
+  if (event.key === 'Enter') {
+    const handled = next()
+    if (handled) return handled
+
+    // Otherwise, handle `Enter` yourself...
+  }
+}
+```
+
+This is how all of the core logic in `slate-react` is now implemented, eliminating the need for a "before" and an "after" plugin that duplicate logic.
+
+Under the covers, the `schema`, `commands` and `queries` concept are all implemented as plugins that attach varying middleware as well. For example, commands are processed using the `onCommand` middleware under the covers:
+
+```js
+const plugin = {
+  onCommand(command, change, next) {
+    ...
+  }
+}
+```
+
+This allows you to actually listen in to all commands, and override individual behaviors if you choose to do so, without having to override the command itself. This is a very advanced feature, which most people won't need, but it shows the flexibility provided by migrating all of the previously custom internal logic to be based on the new middleware stack.
+
+**Plugins can now be defined in nested arrays.** This is a small addition, but it means that you no longer need to differentiate between individual plugins and multiple plugins in an array. This allows plugins to be more easily composed up from multiple other plugins themselves, without the end user having to change how they use them. Small, but encourages reuse just a little bit more.
+
+###### DEPRECATED
+
+**The `slate-simulator` is deprecated.** Previously this was used as a pseudo-controller for testing purposes. However, now with the new `Editor` controller as a first-class concept, everything the simulator could do can now be done directly in the library. This should make testing in non-browser environments much easier to do.
+
+###### BREAKING
+
+**The `Value` object is no longer tied to changes.** Previously, you could create a new `Change` by calling `value.change()` and retrieve a new value. With the re-architecture to properly decouple the schema, commands, queries and plugins from the core Slate data models, this is no longer possible. Instead, changes are always created via an `Editor` instance, where those concepts live.
+
+```js
+// Instead of...
+const { value } = this.state
+const change = value.change()
+...
+this.onChange(change)
+
+// You now would do...
+this.editor.change(change => {
+  const { value } = change
+  ...
+})
+```
+
+Sometimes this means you will need to store the React `ref` of the `editor` to be able to access its `editor.change` method in your React components.
+
+**Remove the `Stack` "model", in favor of the new `Editor`.** Previously there was a pseudo-model called the `Stack` that was very low level, and not really a model. This concept has now been rolled into the new `Editor` controller, which can be used in any environment because it's just plain JavaScript. There was almost no need to directly use a `Stack` instance previously, so this change shouldn't affect almost anyone.
+
+**Remove the `Schema` "model", in favor of the new `Editor`.** Previously there was another pseudo-model called the `Schema`, that was used to contain validation logic. All of the same validation features are still available, but the old `Schema` model is now rolled into the `Editor` controller as well, in the form of an internal `SchemaPlugin` that isn't exposed.
+
+**Remove the `schema.isVoid` and `schema.isAtomic` in favor of queries.** Previously these two methods were used to query the schema about the behavior of a specific `node` or `decoration`. Now these same queries as possible using the "queries" concept, and are available directly on the `change` object:
+
+```js
+if (change.isVoid(node)) {
+  ...
+}
+```
+
+**The middleware stack must now be explicitly continued, using `next`.** Previously returning `undefined` from a middleware would (usually) continue the stack onto the next middleware. Now, with middleware taking a `next` function argument you must explicitly decide to continue the stack by call `next()` yourself.
+
+**Remove the `History` model, in favor of commands.** Previously there was a `History` model that stored the undo/redo stacks, and managing saving new operations to those stacks. All of this logic has been folded into the new "commands" concept, and the undo/redo stacks now live in `value.data`. This has the benefit of allowing the history behavior to be completely overridable by userland plugins, which was not an easy feat to manage before.
+
+**Values can no longer be normalized on creation.** With the decoupling of the data model and the plugin layer, the schema rules are no longer available inside the `Value` model. This means that you can no longer receive a "normalized" value without having access to the `Editor` and its plugins.
+
+```js
+// While previously you could attach a `schema` to a value...
+const normalized = Value.create({ ..., schema })
+
+// Now you'd need to do that with the `editor`...
+const value = Value.create({ ... })
+const editor = new Editor({ value, plugins: [{ schema }] })
+const normalized = editor.value
+```
+
+While this seems inconvenient, it makes the boundaries in the API much more clear, and keeps the immutable and mutable concepts separated. This specific code sample gets longer, but the complexities elsewhere in the library are removed.
+
+**The `Change` class is no longer exported.** Changes are now editor-specific, so exporting the `Change` class no longer makes sense. Instead, you can use the `editor.change()` API to receive a new change object with the commands and queries specific to your editor's plugins.
+
+**The `getClosestVoid`, `getDecorations` and `hasVoidParent` method now take an `editor`.** Previously these `Node` methods took a `schema` argument, but this has been replaced with the new `editor` controller instead now that the `Schema` model has been removed.
+
+---
+
 ### `0.41.0` — September 21, 2018
 
 ###### DEPRECATED
@@ -537,9 +723,9 @@ This is just an attempt to make dealing with normalization errors slightly more 
 
 ###### BREAKING
 
-**Operation objects in Slate are now immutable records.** Previously they were native, mutable Javascript objects. Now, there's a new immutable `Operation` model in Slate, ensuring that all of the data inside `Value` objects are immutable. And it allows for easy serialization of operations using `operation.toJSON()` for when sending them between editors. This should not affect most users, unless you are relying on changing the values of the low-level Slate operations (simply reading them is fine).
+**Operation objects in Slate are now immutable records.** Previously they were native, mutable JavaScript objects. Now, there's a new immutable `Operation` model in Slate, ensuring that all of the data inside `Value` objects are immutable. And it allows for easy serialization of operations using `operation.toJSON()` for when sending them between editors. This should not affect most users, unless you are relying on changing the values of the low-level Slate operations (simply reading them is fine).
 
-**Operation lists in Slate are now immutable lists.** Previously they were native, mutable Javascript arrays. Now, to keep consistent with other immutable uses, they are immutable lists. This should not affect most users.
+**Operation lists in Slate are now immutable lists.** Previously they were native, mutable JavaScript arrays. Now, to keep consistent with other immutable uses, they are immutable lists. This should not affect most users.
 
 ---
 
@@ -873,7 +1059,7 @@ function onKeyDown(e, data, change) {
 
 ###### BREAKING
 
-**Void nodes are renderered implicitly again!** Previously Slate had required that you wrap void node renderers yourself with the exposed `<Void>` wrapping component. This was to allow for selection styling, but a change was made to make selection styling able to handled in Javascript. Now the `<Void>` wrapper will be implicitly rendered by Slate, so you do not need to worry about it, and "voidness" only needs to toggled in one place, the `isVoid: true` property of a node.
+**Void nodes are renderered implicitly again!** Previously Slate had required that you wrap void node renderers yourself with the exposed `<Void>` wrapping component. This was to allow for selection styling, but a change was made to make selection styling able to handled in JavaScript. Now the `<Void>` wrapper will be implicitly rendered by Slate, so you do not need to worry about it, and "voidness" only needs to toggled in one place, the `isVoid: true` property of a node.
 
 ---
 
@@ -919,7 +1105,7 @@ function onKeyDown(e, data, change) {
 
 ###### BREAKING
 
-**Void components are no longer rendered implicity!** Previously, Slate would automatically wrap any node with `isVoid: true` in a `<Void>` component. But doing this prevented you from customizing the wrapper, like adding a `className` or `style` property. So you **must now render the wrapper yourself**, and it has been exported as `Slate.Void`. This, combined with a small change to the `<Void>` component's structure allows the "selected" state of void nodes to be rendered purely with CSS based on the `:focus` property of a `<Void>` element, which previously [had to be handled in Javascript](https://github.com/ianstormtaylor/slate/commit/31782cb11a272466b6b9f1e4d6cc0c698504d97f). This allows us to streamline selection-handling logic, improving performance and reducing complexity.
+**Void components are no longer rendered implicity!** Previously, Slate would automatically wrap any node with `isVoid: true` in a `<Void>` component. But doing this prevented you from customizing the wrapper, like adding a `className` or `style` property. So you **must now render the wrapper yourself**, and it has been exported as `Slate.Void`. This, combined with a small change to the `<Void>` component's structure allows the "selected" state of void nodes to be rendered purely with CSS based on the `:focus` property of a `<Void>` element, which previously [had to be handled in JavaScript](https://github.com/ianstormtaylor/slate/commit/31782cb11a272466b6b9f1e4d6cc0c698504d97f). This allows us to streamline selection-handling logic, improving performance and reducing complexity.
 
 **`data-offset-key` is now `<key>-<index>` instead of `<key>:<start>-<end>`.** This shouldn't actually affect anyone, unless you were specifically relying on that attribute in the DOM. This change greatly reduces the number of re-renders needed, since previously any additional characters would cause a cascading change in the `<start>` and `<end>` offsets of latter text ranges.
 

@@ -6,15 +6,15 @@ This turns out to be extremely helpful when building complex editors, because it
 
 That said, just because Slate is agnostic doesn't mean you aren't going to need to enforce a "schema" for your documents.
 
-To that end, Slate provides a `Schema` model, which allows you to easily define validations for the structure of your documents, and to fix them if the document ever becomes invalid. This guide will show you how they work.
+To that end, Slate lets you define validations for the structure of your documents, and to fix them if the document ever becomes invalid. This guide will show you how they work.
 
-> ❗️To tell Slate about your custom schema add it to the editor as a prop [like this](https://github.com/ianstormtaylor/slate/blob/405cef0225c314b4162d587c74cfce6b65a7b257/examples/forced-layout/index.js#L62).
+> 🤖 To see a full example of a schema in affect, check out the [Forced Layout](https://github.com/ianstormtaylor/slate/blob/405cef0225c314b4162d587c74cfce6b65a7b257/examples/forced-layout/index.js#L62) example.
 
 ## Basic Schemas
 
-Slate schemas are defined as Javascript objects, with properties that describe the document, block nodes, and inline nodes in your editor. Here's a simple schema:
+Slate schemas are defined as JavaScript objects, with properties that describe the document, block nodes, and inline nodes in your editor. Here's a simple schema:
 
-```js
+```jsx
 const schema = {
   document: {
     nodes: [
@@ -39,9 +39,13 @@ const schema = {
     },
   },
 }
-```
 
-> 🤖 Internally, Slate instantiates schemas as immutable `Schema` models, but you don't have to worry about that. In user-land schemas can always be defined as plain Javascript objects, and you can let Slate handle the rest.
+<Editor
+  schema={schema}
+  value={this.state.value}
+  ...
+/>
+```
 
 Hopefully just by reading this definition you'll understand what kinds of blocks are allowed in the document and what properties they can have—schemas are designed to prioritize legibility.
 
@@ -50,6 +54,8 @@ This schema defines a document that only allows `paragraph` and `image` blocks. 
 The magic is that by passing a schema like this into your editor, it will automatically "validate" the document when changes are made, to make sure the schema is being adhered to. If it is, great. But if it isn't, and one of the nodes in the document is invalid, the editor will automatically "normalize" the node, to make the document valid again.
 
 This way you can guarantee that the data is in a format that you expect, so you don't have to handle tons of edge-cases or invalid states in your own code.
+
+> 🤖 Internally, Slate converts those schema definitions into plugins that enforce certain behaviors when changes are applied to the document.
 
 ## Custom Normalizers
 
@@ -94,12 +100,12 @@ Sometimes though, the declarative validation syntax isn't fine-grained enough to
 When you define a `normalizeNode` function, you either return nothing if the node's already valid, or you return a normalizer function that will make the node valid if it isn't. Here's an example:
 
 ```js
-function normalizeNode(node) {
+function normalizeNode(node, next) {
   const { nodes } = node
-  if (node.object !== 'block') return
-  if (nodes.size !== 3) return
-  if (nodes.first().object !== 'text') return
-  if (nodes.last().object !== 'text') return
+  if (node.object !== 'block') return next()
+  if (nodes.size !== 3) return next()
+  if (nodes.first().object !== 'text') return next()
+  if (nodes.last().object !== 'text') return next()
   return change => change.removeNodeByKey(node.key)
 }
 ```

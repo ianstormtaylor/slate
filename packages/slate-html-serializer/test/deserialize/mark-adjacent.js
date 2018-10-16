@@ -42,7 +42,13 @@ export const output = (
   <value>
     <document>
       <paragraph>
-        o<b>ne</b>
+        <text>o</text>
+        <text>
+          <b>n</b>
+        </text>
+        <text>
+          <b>e</b>
+        </text>
       </paragraph>
     </document>
   </value>

@@ -82,6 +82,16 @@ class Emojis extends React.Component {
   }
 
   /**
+   * Store a reference to the `editor`.
+   *
+   * @param {Editor} editor
+   */
+
+  ref = editor => {
+    this.editor = editor
+  }
+
+  /**
    * Render the app.
    *
    * @return {Element} element
@@ -99,6 +109,7 @@ class Emojis extends React.Component {
         </Toolbar>
         <Editor
           placeholder="Write some 😍👋🎉..."
+          ref={this.ref}
           value={this.state.value}
           schema={this.schema}
           onChange={this.onChange}
@@ -112,16 +123,19 @@ class Emojis extends React.Component {
    * Render a Slate node.
    *
    * @param {Object} props
+   * @param {Editor} editor
+   * @param {Function} next
    * @return {Element}
    */
 
-  renderNode = props => {
+  renderNode = (props, next) => {
     const { attributes, children, node, isFocused } = props
 
     switch (node.type) {
       case 'paragraph': {
         return <p {...attributes}>{children}</p>
       }
+
       case 'emoji': {
         const code = node.data.get('code')
         return (
@@ -134,6 +148,10 @@ class Emojis extends React.Component {
             {code}
           </Emoji>
         )
+      }
+
+      default: {
+        return next()
       }
     }
   }
@@ -156,18 +174,16 @@ class Emojis extends React.Component {
 
   onClickEmoji = (e, code) => {
     e.preventDefault()
-    const { value } = this.state
-    const change = value.change()
 
-    change
-      .insertInline({
-        type: 'emoji',
-        data: { code },
-      })
-      .moveToStartOfNextText()
-      .focus()
-
-    this.onChange(change)
+    this.editor.change(change => {
+      change
+        .insertInline({
+          type: 'emoji',
+          data: { code },
+        })
+        .moveToStartOfNextText()
+        .focus()
+    })
   }
 }
 

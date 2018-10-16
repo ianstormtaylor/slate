@@ -7439,15 +7439,9 @@ slash@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/slash/-/slash-1.0.0.tgz#c41f2f6c39fc16d1cd17ad4b5d896114ae470d55"
 
-slate-collapse-on-escape@^0.6.0:
-  version "0.6.0"
-  resolved "https://registry.yarnpkg.com/slate-collapse-on-escape/-/slate-collapse-on-escape-0.6.0.tgz#668f2318770608a09a25a95623f5fb4329a277bf"
-  dependencies:
-    to-pascal-case "^1.0.0"
-
-slate-soft-break@^0.6.0:
-  version "0.6.0"
-  resolved "https://registry.yarnpkg.com/slate-soft-break/-/slate-soft-break-0.6.0.tgz#1e44815b7ff4ddada055bba14cd0d2d4ef0fd463"
+slate-simulator@^0.4.67:
+  version "0.4.67"
+  resolved "https://registry.yarnpkg.com/slate-simulator/-/slate-simulator-0.4.67.tgz#9313c84736db1e23d6aebacd536f582b6d54723c"
 
 slice-ansi@1.0.0:
   version "1.0.0"
@@ -8029,6 +8023,14 @@ tiny-emitter@^1.0.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/tiny-emitter/-/tiny-emitter-1.2.0.tgz#6dc845052cb08ebefc1874723b58f24a648c3b6f"
 
+tiny-invariant@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/tiny-invariant/-/tiny-invariant-1.0.1.tgz#54700d039a0384ef2e83afd0e81af84c6d67b140"
+
+tiny-warning@^0.0.3:
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/tiny-warning/-/tiny-warning-0.0.3.tgz#1807eb4c5f81784a6354d58ea1d5024f18c6c81f"
+
 tmp@^0.0.33:
   version "0.0.33"
   resolved "https://registry.yarnpkg.com/tmp/-/tmp-0.0.33.tgz#6d34335889768d21b2bcda0aa277ced3b1bfadf9"
@@ -8066,12 +8068,6 @@ to-object-path@^0.3.0:
   resolved "https://registry.yarnpkg.com/to-object-path/-/to-object-path-0.3.0.tgz#297588b7b0e7e0ac08e04e672f85c1f4999e17af"
   dependencies:
     kind-of "^3.0.2"
-
-to-pascal-case@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/to-pascal-case/-/to-pascal-case-1.0.0.tgz#0bbdc8df448886ba01535e543327048d0aa1ce78"
-  dependencies:
-    to-space-case "^1.0.0"
 
 to-regex-range@^2.1.0:
   version "2.1.1"

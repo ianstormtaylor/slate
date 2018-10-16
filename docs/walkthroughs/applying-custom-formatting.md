@@ -20,8 +20,8 @@ class App extends React.Component {
     this.setState({ value })
   }
 
-  onKeyDown = (event, change) => {
-    if (event.key != '`' || !event.ctrlKey) return
+  onKeyDown = (event, change, next) => {
+    if (event.key != '`' || !event.ctrlKey) return next()
     event.preventDefault()
     const isCode = change.value.blocks.some(block => block.type == 'code')
 
@@ -40,10 +40,12 @@ class App extends React.Component {
     )
   }
 
-  renderNode = props => {
+  renderNode = (props, next) => {
     switch (props.node.type) {
       case 'code':
         return <CodeNode {...props} />
+      default:
+        return next()
     }
   }
 }
@@ -61,8 +63,8 @@ class App extends React.Component {
     this.setState({ value })
   }
 
-  onKeyDown = (event, change) => {
-    if (!event.ctrlKey) return
+  onKeyDown = (event, change, next) => {
+    if (!event.ctrlKey) return next()
 
     // Decide what to do based on the key code...
     switch (event.key) {
@@ -79,6 +81,10 @@ class App extends React.Component {
         change.setBlocks(isCode ? 'paragraph' : 'code')
         return true
       }
+      // Otherwise, let other plugins handle it.
+      default: {
+        return next()
+      }
     }
   }
 
@@ -93,10 +99,12 @@ class App extends React.Component {
     )
   }
 
-  renderNode = props => {
+  renderNode = (props, next) => {
     switch (props.node.type) {
       case 'code':
         return <CodeNode {...props} />
+      default:
+        return next()
     }
   }
 }
@@ -131,8 +139,8 @@ class App extends React.Component {
     this.setState({ value })
   }
 
-  onKeyDown = (event, change) => {
-    if (!event.ctrlKey) return
+  onKeyDown = (event, change, next) => {
+    if (!event.ctrlKey) return next()
 
     switch (event.key) {
       case 'b': {
@@ -145,6 +153,9 @@ class App extends React.Component {
         event.preventDefault()
         change.setBlocks(isCode ? 'paragraph' : 'code')
         return true
+      }
+      default: {
+        return next()
       }
     }
   }
@@ -162,18 +173,22 @@ class App extends React.Component {
     )
   }
 
-  renderNode = props => {
+  renderNode = (props, next) => {
     switch (props.node.type) {
       case 'code':
         return <CodeNode {...props} />
+      default:
+        return next()
     }
   }
 
   // Add a `renderMark` method to render marks.
-  renderMark = props => {
+  renderMark = (props, next) => {
     switch (props.mark.type) {
       case 'bold':
         return <BoldMark {...props} />
+      default:
+        return next()
     }
   }
 }

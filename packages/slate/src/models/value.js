@@ -1,13 +1,11 @@
 import isPlainObject from 'is-plain-object'
+import invariant from 'tiny-invariant'
 import { Record, Set, List } from 'immutable'
 
 import PathUtils from '../utils/path-utils'
-import Change from './change'
 import Data from './data'
 import Decoration from './decoration'
 import Document from './document'
-import History from './history'
-import Schema from './schema'
 
 /**
  * Default properties.
@@ -19,8 +17,6 @@ const DEFAULTS = {
   data: undefined,
   decorations: undefined,
   document: undefined,
-  history: undefined,
-  schema: undefined,
   selection: undefined,
 }
 
@@ -65,7 +61,6 @@ class Value extends Record(DEFAULTS) {
       return {
         data: a.data,
         decorations: a.decorations,
-        schema: a.schema,
       }
     }
 
@@ -74,7 +69,6 @@ class Value extends Record(DEFAULTS) {
       if ('data' in a) p.data = Data.create(a.data)
       if ('decorations' in a)
         p.decorations = Decoration.createList(a.decorations)
-      if ('schema' in a) p.schema = Schema.create(a.schema)
       return p
     }
 
@@ -94,18 +88,8 @@ class Value extends Record(DEFAULTS) {
    */
 
   static fromJSON(object, options = {}) {
-    let {
-      data = {},
-      decorations = [],
-      document = {},
-      selection = {},
-      schema = {},
-      history = {},
-    } = object
-
+    let { data = {}, decorations = [], document = {}, selection = {} } = object
     data = Data.fromJSON(data)
-    schema = Schema.fromJSON(schema)
-    history = History.fromJSON(history)
     document = Document.fromJSON(document)
     selection = document.createSelection(selection)
     decorations = List(decorations.map(d => Decoration.fromJSON(d)))
@@ -116,20 +100,12 @@ class Value extends Record(DEFAULTS) {
       selection = document.createSelection(selection)
     }
 
-    let value = new Value({
+    const value = new Value({
       data,
       decorations,
       document,
       selection,
-      schema,
-      history,
     })
-
-    if (options.normalize !== false) {
-      const change = value.change()
-      change.withoutSaving(() => change.normalize())
-      value = change.value
-    }
 
     return value
   }
@@ -442,17 +418,6 @@ class Value extends Record(DEFAULTS) {
   }
 
   /**
-   * Create a new `Change` with the current value as a starting point.
-   *
-   * @param {Object} attrs
-   * @return {Change}
-   */
-
-  change(attrs = {}) {
-    return new Change({ ...attrs, value: this })
-  }
-
-  /**
    * Add mark to text at `offset` and `length` in node by `path`.
    *
    * @param {List|String} path
@@ -503,38 +468,19 @@ class Value extends Record(DEFAULTS) {
 
   insertText(path, offset, text, marks) {
     let value = this
-    let { document, schema } = value
+    let { document } = value
+    const node = document.assertNode(path)
     document = document.insertText(path, offset, text, marks)
     value = value.set('document', document)
 
-    // Update any ranges that were affected.
-    const node = document.assertNode(path)
-
     value = value.mapRanges(range => {
-      const { anchor, focus, isBackward } = range
-      const isAtomic =
-        Decoration.isDecoration(range) && schema.isAtomic(range.mark)
-
-      if (
-        anchor.key === node.key &&
-        (anchor.offset > offset ||
-          (anchor.offset === offset && (!isAtomic || !isBackward)))
-      ) {
-        range = range.moveAnchorForward(text.length)
-      }
-
-      if (
-        focus.key === node.key &&
-        (focus.offset > offset ||
-          (focus.offset == offset && (!isAtomic || isBackward)))
-      ) {
-        range = range.moveFocusForward(text.length)
-      }
-
-      return range
+      return range.updatePoints(point => {
+        return point.key === node.key && point.offset >= offset
+          ? point.setOffset(point.offset + text.length)
+          : point
+      })
     })
 
-    value = value.clearAtomicRanges(node.key, offset)
     return value
   }
 
@@ -673,37 +619,30 @@ class Value extends Record(DEFAULTS) {
   removeText(path, offset, text) {
     let value = this
     let { document } = value
+    const node = document.assertNode(path)
     document = document.removeText(path, offset, text)
     value = value.set('document', document)
 
-    const node = document.assertNode(path)
     const { length } = text
-    const rangeOffset = offset + length
-
-    value = value.clearAtomicRanges(node.key, offset, offset + length)
+    const start = offset
+    const end = offset + length
 
     value = value.mapRanges(range => {
-      const { anchor, focus } = range
+      return range.updatePoints(point => {
+        if (point.key !== node.key) {
+          return point
+        }
 
-      if (anchor.key === node.key) {
-        range =
-          anchor.offset >= rangeOffset
-            ? range.moveAnchorBackward(length)
-            : anchor.offset > offset
-              ? range.moveAnchorTo(anchor.key, offset)
-              : range
-      }
+        if (point.offset >= end) {
+          return point.setOffset(point.offset - length)
+        }
 
-      if (focus.key === node.key) {
-        range =
-          focus.offset >= rangeOffset
-            ? range.moveFocusBackward(length)
-            : focus.offset > offset
-              ? range.moveFocusTo(focus.key, offset)
-              : range
-      }
+        if (point.offset > start) {
+          return point.setOffset(start)
+        }
 
-      return range
+        return point
+      })
     })
 
     return value
@@ -754,19 +693,11 @@ class Value extends Record(DEFAULTS) {
   setProperties(properties) {
     let value = this
     const { document } = value
-    const { data, decorations, history, schema } = properties
+    const { data, decorations } = properties
     const props = {}
 
     if (data) {
       props.data = data
-    }
-
-    if (history) {
-      props.history = history
-    }
-
-    if (schema) {
-      props.schema = schema
     }
 
     if (decorations) {
@@ -863,44 +794,6 @@ class Value extends Record(DEFAULTS) {
   }
 
   /**
-   * Remove any atomic ranges inside a `key`, `offset` and `length`.
-   *
-   * @param {String} key
-   * @param {Number} from
-   * @param {Number?} to
-   * @return {Value}
-   */
-
-  clearAtomicRanges(key, from, to = null) {
-    let value = this
-    const { schema } = value
-
-    value = this.mapRanges(range => {
-      if (!Decoration.isDecoration(range)) return range
-      const { start, end, mark } = range
-      const isAtomic = schema.isAtomic(mark)
-      if (!isAtomic) return range
-      if (start.key !== key) return range
-
-      if (start.offset < from && (end.key !== key || end.offset > from)) {
-        return null
-      }
-
-      if (
-        to != null &&
-        start.offset < to &&
-        (end.key !== key || end.offset > to)
-      ) {
-        return null
-      }
-
-      return range
-    })
-
-    return value
-  }
-
-  /**
    * Return a JSON representation of the value.
    *
    * @param {Object} options
@@ -923,19 +816,29 @@ class Value extends Record(DEFAULTS) {
         .map(d => d.toJSON(options))
     }
 
-    if (options.preserveHistory) {
-      object.history = this.history.toJSON(options)
-    }
-
     if (options.preserveSelection) {
       object.selection = this.selection.toJSON(options)
     }
 
-    if (options.preserveSchema) {
-      object.schema = this.schema.toJSON(options)
-    }
-
     return object
+  }
+
+  /**
+   * Deprecated.
+   */
+
+  get history() {
+    invariant(
+      false,
+      'As of Slate 0.42.0, the `value.history` model no longer exists, and the history is stored in `value.data` instead using plugins.'
+    )
+  }
+
+  change() {
+    invariant(
+      false,
+      'As of Slate 0.42.0, value object are no longer schema-aware, and the `value.change()` method is no longer available. Use the `editor.change()` method on the new `Editor` controller instead.'
+    )
   }
 }
 

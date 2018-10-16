@@ -4,6 +4,68 @@ This document maintains a list of changes to the `slate-hyperscript` package wit
 
 ---
 
+### `0.11.0` — October 9, 2018
+
+###### BREAKING
+
+**Updated to the latest version of `slate`.** The `slate-hyperscript` codebase has been updated to be compatible with the latest version of `slate`, `0.42.0`. This is a backward incompatible upgrade, and so the peer dependency range has been bumped.
+
+**`slate-hyperscript` no longer normalizes values.** This behavior was very problematic because it meant that you could not determine exactly what output you'd receive from any given hyperscript creation. The logic for creating child nodes was inconsistent, relying on the built-in normalization to help keep it "normal". While this is sometimes helpful, it makes writing tests for invalid states very tricky, if not impossible.
+
+Now, `slate-hyperscript` does not do any normalization, meaning that you can create any document structure with it. For example, you can create a block node inside an inline node, even though a Slate editor wouldn't allow it. Or, if you don't create leaf text nodes, they won't exist in the output.
+
+For example these are no longer equivalent:
+
+```jsx
+<document>
+  <paragraph>
+    <link>word</link>
+  </paragraph>
+</document>
+```
+
+```jsx
+<document>
+  <paragraph>
+    <text />
+    <link>word</link>
+    <text />
+  </paragraph>
+</document>
+```
+
+Similarly, these are no longer equivalent either:
+
+```jsx
+<document>
+  <paragraph />
+</document>
+```
+
+```jsx
+<document>
+  <paragraph>
+    <text />
+  </paragraph>
+</document>
+```
+
+This allows you to much more easily test invalid states and transition states. However, it means that you need to be more explicit in the "normal" states than previously.
+
+**The `<text>` and `<mark>` creators now return useful objects.** This is a related change that makes the library more useful. Previously you could expect to receive a `value` from the `<value>` creator, but the others were less consistent. For example, the `<text>` creator would actually return an array, instead of the `Text` node that you expect.
+
+```js
+// Previously you had to do...
+const text = <text>word</text>[0]
+
+// But now it's more obvious...
+const text = <text>word</text>
+```
+
+Similarly, the `mark` creator used to return a `Text` node. Now it returns a list of `Leaf` objects, which can be passed directly as children to the `<text>` creator.
+
+---
+
 ### `0.10.0` — August 22, 2018
 
 ###### BREAKING

@@ -50,7 +50,7 @@ A concatenated string of all of the descendant [`Text`](./text.md) nodes of this
 
 `Document.create(properties: Object) => Document`
 
-Create a document from a plain Javascript object of `properties`.
+Create a document from a plain JavaScript object of `properties`.
 
 ### `Document.fromJSON`
 

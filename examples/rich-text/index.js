@@ -67,6 +67,16 @@ class RichTextExample extends React.Component {
   }
 
   /**
+   * Store a reference to the `editor`.
+   *
+   * @param {Editor} editor
+   */
+
+  ref = editor => {
+    this.editor = editor
+  }
+
+  /**
    * Render.
    *
    * @return {Element}
@@ -90,6 +100,7 @@ class RichTextExample extends React.Component {
           spellCheck
           autoFocus
           placeholder="Enter some rich text..."
+          ref={this.ref}
           value={this.state.value}
           onChange={this.onChange}
           onKeyDown={this.onKeyDown}
@@ -155,7 +166,7 @@ class RichTextExample extends React.Component {
    * @return {Element}
    */
 
-  renderNode = props => {
+  renderNode = (props, next) => {
     const { attributes, children, node } = props
 
     switch (node.type) {
@@ -171,6 +182,8 @@ class RichTextExample extends React.Component {
         return <li {...attributes}>{children}</li>
       case 'numbered-list':
         return <ol {...attributes}>{children}</ol>
+      default:
+        return next()
     }
   }
 
@@ -181,7 +194,7 @@ class RichTextExample extends React.Component {
    * @return {Element}
    */
 
-  renderMark = props => {
+  renderMark = (props, next) => {
     const { children, mark, attributes } = props
 
     switch (mark.type) {
@@ -193,6 +206,8 @@ class RichTextExample extends React.Component {
         return <em {...attributes}>{children}</em>
       case 'underlined':
         return <u {...attributes}>{children}</u>
+      default:
+        return next()
     }
   }
 
@@ -214,7 +229,7 @@ class RichTextExample extends React.Component {
    * @return {Change}
    */
 
-  onKeyDown = (event, change) => {
+  onKeyDown = (event, change, next) => {
     let mark
 
     if (isBoldHotkey(event)) {
@@ -226,12 +241,11 @@ class RichTextExample extends React.Component {
     } else if (isCodeHotkey(event)) {
       mark = 'code'
     } else {
-      return
+      return next()
     }
 
     event.preventDefault()
     change.toggleMark(mark)
-    return true
   }
 
   /**
@@ -243,9 +257,10 @@ class RichTextExample extends React.Component {
 
   onClickMark = (event, type) => {
     event.preventDefault()
-    const { value } = this.state
-    const change = value.change().toggleMark(type)
-    this.onChange(change)
+
+    this.editor.change(change => {
+      change.toggleMark(type)
+    })
   }
 
   /**
@@ -257,47 +272,47 @@ class RichTextExample extends React.Component {
 
   onClickBlock = (event, type) => {
     event.preventDefault()
-    const { value } = this.state
-    const change = value.change()
-    const { document } = value
 
-    // Handle everything but list buttons.
-    if (type != 'bulleted-list' && type != 'numbered-list') {
-      const isActive = this.hasBlock(type)
-      const isList = this.hasBlock('list-item')
+    this.editor.change(change => {
+      const { value } = change
+      const { document } = value
 
-      if (isList) {
-        change
-          .setBlocks(isActive ? DEFAULT_NODE : type)
-          .unwrapBlock('bulleted-list')
-          .unwrapBlock('numbered-list')
+      // Handle everything but list buttons.
+      if (type != 'bulleted-list' && type != 'numbered-list') {
+        const isActive = this.hasBlock(type)
+        const isList = this.hasBlock('list-item')
+
+        if (isList) {
+          change
+            .setBlocks(isActive ? DEFAULT_NODE : type)
+            .unwrapBlock('bulleted-list')
+            .unwrapBlock('numbered-list')
+        } else {
+          change.setBlocks(isActive ? DEFAULT_NODE : type)
+        }
       } else {
-        change.setBlocks(isActive ? DEFAULT_NODE : type)
-      }
-    } else {
-      // Handle the extra wrapping required for list buttons.
-      const isList = this.hasBlock('list-item')
-      const isType = value.blocks.some(block => {
-        return !!document.getClosest(block.key, parent => parent.type == type)
-      })
+        // Handle the extra wrapping required for list buttons.
+        const isList = this.hasBlock('list-item')
+        const isType = value.blocks.some(block => {
+          return !!document.getClosest(block.key, parent => parent.type == type)
+        })
 
-      if (isList && isType) {
-        change
-          .setBlocks(DEFAULT_NODE)
-          .unwrapBlock('bulleted-list')
-          .unwrapBlock('numbered-list')
-      } else if (isList) {
-        change
-          .unwrapBlock(
-            type == 'bulleted-list' ? 'numbered-list' : 'bulleted-list'
-          )
-          .wrapBlock(type)
-      } else {
-        change.setBlocks('list-item').wrapBlock(type)
+        if (isList && isType) {
+          change
+            .setBlocks(DEFAULT_NODE)
+            .unwrapBlock('bulleted-list')
+            .unwrapBlock('numbered-list')
+        } else if (isList) {
+          change
+            .unwrapBlock(
+              type == 'bulleted-list' ? 'numbered-list' : 'bulleted-list'
+            )
+            .wrapBlock(type)
+        } else {
+          change.setBlocks('list-item').wrapBlock(type)
+        }
       }
-    }
-
-    this.onChange(change)
+    })
   }
 }
 

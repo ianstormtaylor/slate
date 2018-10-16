@@ -101,18 +101,7 @@ export const output = {
         data: {
           src: 'https://...',
         },
-        nodes: [
-          {
-            object: 'text',
-            leaves: [
-              {
-                object: 'leaf',
-                text: '',
-                marks: [],
-              },
-            ],
-          },
-        ],
+        nodes: [],
       },
     ],
   },
