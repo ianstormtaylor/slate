@@ -8,11 +8,14 @@ production implementation:
 1. Serialization - in an actual implementation, you will probably want to
    serialize the mentions out in a manner that your DB can parse, in order
    to send notifications on the back end.
-2. Anchored suggestion list - You can see how to do something like this in
-   the `hovering-menu` example.
-3. Linkifying the mentions - There isn't really a good place to link to for
+2. Linkifying the mentions - There isn't really a good place to link to for
    this example. But in most cases you would probably want to link to the
    user's profile on click.
+3. Keyboard accessibility - it adds quite a bit of complexity to the
+   implementation to add this, as it involves capturing keyboard events like up
+   / down / enter and proxying them into the `Suggestions` component using a
+   `ref`. I've left this out because this is already a pretty confusing use
+   case.
 
 The list of characters was extracted from this list on Wikipedia:
 https://en.wikipedia.org/wiki/List_of_Star_Wars_characters
@@ -22,38 +25,28 @@ import { Editor } from 'slate-react'
 import { Value } from 'slate'
 import _ from 'lodash'
 import React from 'react'
-import styled from 'react-emotion'
 
 import initialValue from './value.json'
 import users from './users.json'
+import Suggestions from './Suggestions'
 
-const SuggestionContainer = styled('div')`
-  border-top: 2px solid #eee;
-  position: relative;
-  padding: 0 20px;
-  margin: 0 -20px;
-  margin-top: 20px;
-`
+/**
+ * @type {String}
+ */
 
-const SuggestionList = styled('ul')`
-  list-style: none;
-  margin: 0;
-  padding: 0;
-`
+const USER_MENTION_NODE_TYPE = 'userMention'
 
-const Suggestion = styled('li')`
-  height: 32px;
+/**
+ * The decoration mark type that the menu will position itself against. The
+ * "context" is just the current text after the @ symbol.
+ * @type {String}
+ */
 
-  &:hover {
-    background: #87cefa;
-  }
-`
-
-const USER_MENTION_TYPE = 'userMention'
+const CONTEXT_MARK_TYPE = 'mentionContext'
 
 const schema = {
   inlines: {
-    [USER_MENTION_TYPE]: {
+    [USER_MENTION_NODE_TYPE]: {
       // It's important that we mark the mentions as void nodes so that users
       // can't edit the text of the mention.
       isVoid: true,
@@ -83,9 +76,7 @@ function getInput(value) {
   }
 
   const startOffset = value.selection.start.offset
-
   const textBefore = value.startText.text.slice(0, startOffset)
-
   const result = CAPTURE_REGEX.exec(textBefore)
 
   return result === null ? null : result[1]
@@ -116,38 +107,49 @@ class MentionsExample extends React.Component {
           onChange={this.onChange}
           ref={this.editorRef}
           renderNode={this.renderNode}
+          renderMark={this.renderMark}
           schema={schema}
         />
-        <SuggestionContainer>
-          <h2>Select a user</h2>
-          <SuggestionList>
-            {this.state.users.map(user => {
-              return (
-                <Suggestion
-                  key={user.id}
-                  onClick={() => this.insertMention(user)}
-                >
-                  {user.username}
-                </Suggestion>
-              )
-            })}
-          </SuggestionList>
-        </SuggestionContainer>
+        <Suggestions
+          anchor=".mention-context"
+          users={this.state.users}
+          onSelect={this.insertMention}
+        />
       </div>
     )
+  }
+
+  renderMark(props) {
+    if (props.mark.type === CONTEXT_MARK_TYPE) {
+      return (
+        // Adding the className here is important so taht the `Suggestions`
+        // component can find an anchor.
+        <span {...props.attributes} className="mention-context">
+          {props.children}
+        </span>
+      )
+    }
   }
 
   renderNode = props => {
     const { attributes, node } = props
 
-    if (node.type === USER_MENTION_TYPE) {
+    if (node.type === USER_MENTION_NODE_TYPE) {
       // This is where you could turn the mention into a link to the user's
       // profile or something.
       return <b {...attributes}>{props.node.text}</b>
     }
   }
 
-  insertMention(user) {
+  /**
+   * Replaces the current "context" with a user mention node corresponding to
+   * the given user.
+   * @param {Object} user
+   *   @param {string} user.id
+   *   @param {string} user.username
+   */
+
+  insertMention = user => {
     const value = this.state.value
     const inputValue = getInput(value)
 
@@ -174,7 +176,7 @@ class MentionsExample extends React.Component {
               ],
             },
           ],
-          type: USER_MENTION_TYPE,
+          type: USER_MENTION_NODE_TYPE,
         })
         .focus()
 
@@ -190,15 +192,46 @@ class MentionsExample extends React.Component {
    * @param {Change} change
    */
 
-  onChange = ({ value }) => {
-    const inputValue = getInput(value)
+  onChange = change => {
+    const inputValue = getInput(change.value)
 
-    if (inputValue !== this.lastInputValue && hasValidAncestors(value)) {
+    if (
+      inputValue !== this.lastInputValue ||
+      // In case the user changes their selection to a location that happens
+      // to capture the exact same value.
+      inputValue
+    ) {
+      const { selection } = change.value
+
+      let decorations = change.value.decorations.filter(
+        value => value.mark.type !== CONTEXT_MARK_TYPE
+      )
+
+      if (inputValue && hasValidAncestors(change.value)) {
+        decorations = decorations.push({
+          anchor: {
+            key: selection.start.key,
+            offset: selection.start.offset - inputValue.length,
+          },
+          focus: {
+            key: selection.start.key,
+            offset: selection.start.offset,
+          },
+          mark: {
+            type: CONTEXT_MARK_TYPE,
+          },
+        })
+      }
+
+      change.withoutSaving(() => change.setValue({ decorations }))
+    }
+
+    if (inputValue !== this.lastInputValue && hasValidAncestors(change.value)) {
       this.lastInputValue = inputValue
       this.search(inputValue)
     }
 
-    this.setState({ value })
+    this.setState({ value: change.value })
   }
 
   /**
@@ -236,9 +269,12 @@ class MentionsExample extends React.Component {
 }
 
 /**
- * Determine if the current selection has valid ancestors for a context.
+ * Determine if the current selection has valid ancestors for a context. In our
+ * case, we want to make sure that the mention is only a direct child of a
+ * paragraph. In this simple example it isn't that important, but in a complex
+ * editor you wouldn't want it to be a child of another inline like a link.
  *
- * @type {Value}
+ * @param {Value} value
  */
 
 function hasValidAncestors(value) {
@@ -253,9 +289,5 @@ function hasValidAncestors(value) {
 
   return !invalidParent
 }
-
-/**
- * Export.
- */
 
 export default MentionsExample
