@@ -1,6 +1,6 @@
 # Commands & Queries
 
-All commands to a Slate editor's value, whether it's the `selection`, `document`, `history`, etc. happen via "commands" that are applied to a [`Change`]([operations](../reference/slate/change.md).
+All commands to a Slate editor's value, whether it's the `selection`, `document`, `history`, etc. happen via "commands" that are applied to a [`Change`](../reference/slate/change.md).
 
 Under the covers, Slate takes care of converting each command into a set of low-level [operations](../reference/slate/operation.md) that are applied to produce a new value. This is what makes collaborative editing implementations possible. But you don't have to worry about that, because it happens automatically.
 
