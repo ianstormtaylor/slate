@@ -77,7 +77,7 @@ function serialize(value, options = {}) {
  */
 
 function serializeNode(node, options = {}) {
-  let { delimiter = '\n' } = options
+  const { delimiter = '\n' } = options
 
   if (
     node.object == 'document' ||
