@@ -31,6 +31,7 @@ import SearchHighlighting from './search-highlighting'
 import InputTester from './input-tester'
 import SyncingOperations from './syncing-operations'
 import Tables from './tables'
+import Mentions from './mentions'
 
 /**
  * Examples.
@@ -62,6 +63,7 @@ const EXAMPLES = [
   ['History', History, '/history'],
   ['Versions', Versions, '/versions'],
   ['Input Tester', InputTester, '/input-tester'],
+  ['Mentions', Mentions, '/mentions'],
 ]
 
 /**
