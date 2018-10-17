@@ -16,8 +16,12 @@ production implementation:
    / down / enter and proxying them into the `Suggestions` component using a
    `ref`. I've left this out because this is already a pretty confusing use
    case.
+4. Plugin Mentions - in reality, you will probably want to put mentions into a
+   plugin, and make them configurable to support more than one kind of mention,
+   like users and hashtags. As you can see below it is a bit unweildy to bolt
+   all this directly to the editor.
 
-The list of characters was extracted from this list on Wikipedia:
+The list of characters was extracted from Wikipedia:
 https://en.wikipedia.org/wiki/List_of_Star_Wars_characters
 */
 
@@ -82,6 +86,10 @@ function getInput(value) {
   return result === null ? null : result[1]
 }
 
+/**
+ * @extends React.Component
+ */
+
 class MentionsExample extends React.Component {
   /**
    * Deserialize the initial editor value.
@@ -93,6 +101,10 @@ class MentionsExample extends React.Component {
     users: [],
     value: Value.fromJSON(initialValue),
   }
+
+  /**
+   * @type {React.RefObject}
+   */
 
   editorRef = React.createRef()
 
@@ -119,7 +131,7 @@ class MentionsExample extends React.Component {
     )
   }
 
-  renderMark(props) {
+  renderMark(props, next) {
     if (props.mark.type === CONTEXT_MARK_TYPE) {
       return (
         // Adding the className here is important so taht the `Suggestions`
@@ -129,9 +141,11 @@ class MentionsExample extends React.Component {
         </span>
       )
     }
+
+    return next()
   }
 
-  renderNode = props => {
+  renderNode(props, next) {
     const { attributes, node } = props
 
     if (node.type === USER_MENTION_NODE_TYPE) {
@@ -139,6 +153,8 @@ class MentionsExample extends React.Component {
       // profile or something.
       return <b {...attributes}>{props.node.text}</b>
     }
+
+    return next()
   }
 
   /**
@@ -195,12 +211,13 @@ class MentionsExample extends React.Component {
   onChange = change => {
     const inputValue = getInput(change.value)
 
-    if (
-      inputValue !== this.lastInputValue ||
-      // In case the user changes their selection to a location that happens
-      // to capture the exact same value.
-      inputValue
-    ) {
+    if (inputValue !== this.lastInputValue) {
+      this.lastInputValue = inputValue
+
+      if (hasValidAncestors(change.value)) {
+        this.search(inputValue)
+      }
+
       const { selection } = change.value
 
       let decorations = change.value.decorations.filter(
@@ -223,12 +240,7 @@ class MentionsExample extends React.Component {
         })
       }
 
-      change.withoutSaving(() => change.setValue({ decorations }))
-    }
-
-    if (inputValue !== this.lastInputValue && hasValidAncestors(change.value)) {
-      this.lastInputValue = inputValue
-      this.search(inputValue)
+      return change.withoutSaving(() => change.setValue({ decorations }))
     }
 
     this.setState({ value: change.value })
@@ -262,7 +274,8 @@ class MentionsExample extends React.Component {
       })
 
       this.setState({
-        users: result,
+        // Only return the first 5 results
+        users: result.slice(0, 5),
       })
     }, 50)
   }
