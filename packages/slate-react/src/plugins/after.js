@@ -530,25 +530,33 @@ function AfterPlugin(options = {}) {
     // an inline is selected, we need to handle these hotkeys manually because
     // browsers won't know what to do.
     if (Hotkeys.isMoveBackward(event)) {
-      const { previousText, startText } = value
-      const isPreviousInVoid =
-        previousText && document.hasVoidParent(previousText.key, editor)
+      event.preventDefault()
 
-      if (hasVoidParent || isPreviousInVoid || startText.text == '') {
-        event.preventDefault()
-        return change.moveBackward()
+      if (!selection.isCollapsed) {
+        return change.moveToStart()
       }
+
+      return change.moveBackward()
     }
 
     if (Hotkeys.isMoveForward(event)) {
-      const { nextText, startText } = value
-      const isNextInVoid =
-        nextText && document.hasVoidParent(nextText.key, editor)
+      event.preventDefault()
 
-      if (hasVoidParent || isNextInVoid || startText.text == '') {
-        event.preventDefault()
-        return change.moveForward()
+      if (!selection.isCollapsed) {
+        return change.moveToEnd()
       }
+
+      return change.moveForward()
+    }
+
+    if (Hotkeys.isMoveWordBackward(event)) {
+      event.preventDefault()
+      return change.moveWordBackward()
+    }
+
+    if (Hotkeys.isMoveWordForward(event)) {
+      event.preventDefault()
+      return change.moveWordForward()
     }
 
     if (Hotkeys.isExtendBackward(event)) {
