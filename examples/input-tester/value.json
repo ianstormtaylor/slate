@@ -12,10 +12,10 @@
                 "text": "This Slate editor records all of the "
               },
               {
-                "text": "bold",
+                "text": "keyboard",
                 "marks": [
                   {
-                    "type": "keyboard"
+                    "type": "bold"
                   }
                 ]
               },
@@ -23,10 +23,10 @@
                 "text": ", "
               },
               {
-                "text": "bold",
+                "text": "input",
                 "marks": [
                   {
-                    "type": "input"
+                    "type": "bold"
                   }
                 ]
               },
@@ -34,10 +34,10 @@
                 "text": " and "
               },
               {
-                "text": "bold",
+                "text": "selection",
                 "marks": [
                   {
-                    "type": "selection"
+                    "type": "bold"
                   }
                 ]
               },
