@@ -1,14 +1,16 @@
 # `Change`
 
-```js
-import { Change } from 'slate'
-```
-
 A change allows you to define a series of changes you'd like to make to the current [`Value`](./value.md).
 
 All changes are performed through `Change` objects, so that a history of changes can be preserved for use in undo/redo operations, and to make collaborative editing possible.
 
 ## Properties
+
+### `editor`
+
+`Editor`
+
+A reference to the editor the change is being made in.
 
 ### `object`
 
@@ -18,15 +20,17 @@ A string with a value of `'change'`.
 
 ### `value`
 
+`Value`
+
 A [`Value`](./value.md) with the change's current operations applied. Each time you run a new change function this property will be updated.
 
 ## Methods
 
 ### `call`
 
-`call(customChange: Function, ...args) => Change`
+`call(fn: Function, ...args) => Change`
 
-This method calls the provided `customChange` function with the current instance of the `Change` object as the first argument and passes through the remaining `args`.
+This method calls the provided function with the current instance of the `Change` object as the first argument and passes through the remaining `args`.
 
 The purpose of `call` is to enable custom change methods to exist and called in a chain. For example:
 
@@ -53,40 +57,50 @@ function onSomeEvent(event, change) {
 
 `normalize() => Void`
 
-This method normalizes the document with the value's schema. This should run automatically-you should not need to call this method unless you have manually disabled normalization (and you should rarely, if ever, need to manually disable normalization). The vast majority of changes, whether by the user or invoked programmatically, will run `normalize` by default to ensure the document is always in adherence to its schema. `withoutNormalization` also runs `normalize` upon completion.
+This method normalizes the document with the value's schema. This should run automatically-you should not need to call this method unless you have manually disabled normalization (and you should rarely, if ever, need to manually disable normalization). The vast majority of changes, whether by the user or invoked programmatically, will run `normalize` by default to ensure the document is always in adherence to its schema.
 
 > 🤖 If you must use this method, use it sparingly and strategically. Calling this method can be very expensive as it will run normalization on all of the nodes in your document.
 
-### `withoutNormalization`
+### `withoutNormalizing`
 
-`withoutNormalization(customChange: Function) => Change`
+`withoutNormalizing(fn: Function) => Change`
 
-This method calls the provided `customChange` function with the current instance of the `Change` object as the first argument. Normalization is suspended while `customChange` is executing, but will be run after `customChange` completes.
+This method calls the provided function with the current instance of the `Change` object as the first argument. Normalization does not occur while the fuction is executing, and is instead deferred to be be run immediately after it completes.
 
 This method can be used to allow a sequence of change operations that should not be interrupted by normalization. For example:
 
 ```js
-/**
- * Only allow block nodes in documents.
- *
- * @type {Object}
- */
-validateNode(node) {
-  if (node.object != 'document') return
-  const invalids = node.nodes.filter(n => n.object != 'block')
-  if (!invalids.size) return
+function removeManyNodes(node) {
+  const toRemove = node.nodes.filter(n => n.object != 'block')
+  if (!toRemove.size) return
 
-  return (change) => {
-    change.withoutNormalization((c) => {
-      invalids.forEach((child) => {
-        c.removeNodeByKey(child.key)
-      })
+  change.withoutNormalizing(() => {
+    toRemove.forEach(child => {
+      change.removeNodeByKey(child.key)
     })
-  }
+  })
 }
 ```
 
-> 🤖 If you must use this method, use it sparingly and strategically. Calling this method can be very expensive as it will run normalization on all of the nodes in your document.
+### `withoutSaving`
+
+`withoutSaving(fn: Function) => Change`
+
+By default all new operations are saved to the editor's history. If you have changes that you don't want to show up in the history when the user presses <kbd>cmd+z</kbd>, you can use `withoutSaving` to skip those changes.
+
+```js
+change.withoutSaving(() => {
+  change.setValue({ decorations })
+})
+```
+
+However, be sure you know what you are doing because this will create changes that cannot be undone by the user, and might result in confusing behaviors.
+
+### `withoutMerging`
+
+`withoutMerging(fn: Function) => Change`
+
+Usually, all of the operations in a `Change` are grouped into a single save point in the editor's history. However, sometimes you may want more control over this, to be able to create distinct save points in a single change. To do that, you can use the `withoutMerging` helper.
 
 ## Full Value Change
 
@@ -96,10 +110,6 @@ validateNode(node) {
 `setValue(value: Value, [options: Object]) => Change` (see warning below)
 
 Set the entire `value` using either a `properties` object or a `Value` object. Can be used to set `value.data` and other properties that cannot otherwise be easily set using the available methods.
-
-Warning: Calling `setValue` with a `Value` object has unpredictable behavior including the loss of the edit history. Only use with a `Value` object if you know what you are doing. For most use cases, we recommend passing `properties` as an `Object` (e.g. `change.setValue({data: myNewDataObject})`.
-
-Hint: Wrapping the call to `setValue` as follows can be helpful if you want to update a value, like in the value's `data` but do not want to have another save point in the undo history: `change.setOperationFlag({save: false}).setValue({data: myNewDataObject}).setOperationFlag({save: true}).
 
 ## Current Selection Changes
 
@@ -360,7 +370,7 @@ Move the current selection's anchor point to the start of the document and its f
 
 `select(properties: Range || Object) => Change`
 
-Set the current selection to a range with merged `properties`. The `properties` can either be a [`Range`](./range.md) object or a plain Javascript object of selection properties.
+Set the current selection to a range with merged `properties`. The `properties` can either be a [`Range`](./range.md) object or a plain JavaScript object of selection properties.
 
 ## Document Range Changes
 

@@ -6,7 +6,7 @@ export const input = (
   <value>
     <document>
       <block type="paragraph">
-        one<text key="a">two</text>three
+        <text key="a">two</text>
       </block>
     </document>
     <selection>
@@ -25,7 +25,7 @@ export const output = {
   object: 'value',
   document: {
     object: 'document',
-    key: '2',
+    key: '1',
     data: {},
     nodes: [
       {
@@ -40,7 +40,7 @@ export const output = {
             leaves: [
               {
                 object: 'leaf',
-                text: 'onetwothree',
+                text: 'two',
                 marks: [],
               },
             ],

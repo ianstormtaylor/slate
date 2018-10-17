@@ -26,7 +26,7 @@ export const output = {
   document: {
     object: 'document',
     data: {},
-    key: '3',
+    key: '2',
     nodes: [
       {
         object: 'block',

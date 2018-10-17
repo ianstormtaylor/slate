@@ -1,12 +1,13 @@
 import isPlainObject from 'is-plain-object'
 import { List, Record } from 'immutable'
 
-import MODEL_TYPES from '../constants/model-types'
 import Mark from './mark'
 import Node from './node'
 import PathUtils from '../utils/path-utils'
 import Selection from './selection'
 import Value from './value'
+import apply from '../operations/apply'
+import invert from '../operations/invert'
 
 /**
  * Operation attributes.
@@ -193,17 +194,6 @@ class Operation extends Record(DEFAULTS) {
   }
 
   /**
-   * Check if `any` is a `Operation`.
-   *
-   * @param {Any} any
-   * @return {Boolean}
-   */
-
-  static isOperation(any) {
-    return !!(any && any[MODEL_TYPES.OPERATION])
-  }
-
-  /**
    * Check if `any` is a list of operations.
    *
    * @param {Any} any
@@ -215,13 +205,26 @@ class Operation extends Record(DEFAULTS) {
   }
 
   /**
-   * Object.
+   * Apply the operation to a `value`.
    *
-   * @return {String}
+   * @param {Value} value
+   * @return {Value}
    */
 
-  get object() {
-    return 'operation'
+  apply(value) {
+    const next = apply(value, this)
+    return next
+  }
+
+  /**
+   * Invert the operation.
+   *
+   * @return {Operation}
+   */
+
+  invert() {
+    const inverted = invert(this)
+    return inverted
   }
 
   /**
@@ -246,7 +249,13 @@ class Operation extends Record(DEFAULTS) {
       if (key == 'value') continue
       if (key == 'node' && type != 'insert_node') continue
 
-      if (key == 'mark' || key == 'marks' || key == 'node') {
+      if (
+        key == 'mark' ||
+        key == 'marks' ||
+        key == 'node' ||
+        key == 'path' ||
+        key == 'newPath'
+      ) {
         value = value.toJSON()
       }
 
@@ -284,7 +293,6 @@ class Operation extends Record(DEFAULTS) {
         const v = {}
         if ('data' in value) v.data = value.data.toJS()
         if ('decorations' in value) v.decorations = value.decorations.toJS()
-        if ('schema' in value) v.schema = value.schema.toJS()
         value = v
       }
 
@@ -301,12 +309,6 @@ class Operation extends Record(DEFAULTS) {
     return json
   }
 }
-
-/**
- * Attach a pseudo-symbol for type checking.
- */
-
-Operation.prototype[MODEL_TYPES.OPERATION] = true
 
 /**
  * Export.

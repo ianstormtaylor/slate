@@ -4,7 +4,11 @@ import { Set } from 'immutable'
 import h from '../../../../helpers/h'
 import { Mark } from 'slate'
 
-export const input = <b />[0]
+export const input = (
+  <text>
+    <b />
+  </text>
+)
 
 export default function(t) {
   return t.getActiveMarksBetweenOffsets(0, 0)

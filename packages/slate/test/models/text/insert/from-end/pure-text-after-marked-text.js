@@ -7,7 +7,7 @@ export const input = (
     <i>Cat</i>
     <b> Cute</b>
   </text>
-)[0]
+)
 
 export default function(t) {
   return t.insertText(3, ' is')
@@ -17,4 +17,4 @@ export const output = (
   <text>
     <i>Cat</i> is<b> Cute</b>
   </text>
-)[0]
+)

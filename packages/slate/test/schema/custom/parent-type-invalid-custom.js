@@ -20,7 +20,9 @@ export const input = (
   <value>
     <document>
       <paragraph>
-        <item />
+        <item>
+          <text />
+        </item>
       </paragraph>
     </document>
   </value>
@@ -31,7 +33,9 @@ export const output = (
     <document>
       <paragraph>
         <list>
-          <item />
+          <item>
+            <text />
+          </item>
         </list>
       </paragraph>
     </document>

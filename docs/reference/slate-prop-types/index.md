@@ -16,7 +16,6 @@ class Toolbar extends React.Component {
 
   propTypes = {
     block: Types.block,
-    schema: Types.schema.isRequired,
     value: Types.value.isRequired,
   }
 
@@ -46,10 +45,6 @@ Ensure that a value is a Slate `Data`.
 ### `document`
 
 Ensure that a value is a Slate `Document`.
-
-### `history`
-
-Ensure that a value is a Slate `History`.
 
 ### `inline`
 
@@ -90,14 +85,6 @@ Ensure that a value is a Slate `Range`.
 ### `ranges`
 
 Ensure that a value is an immutable `List` of Slate [`Range`](../slate/range.md) objects.
-
-### `schema`
-
-Ensure that a value is a Slate `Schema`.
-
-### `stack`
-
-Ensure that a value is a Slate `Stack`.
 
 ### `text`
 

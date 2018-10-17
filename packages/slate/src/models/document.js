@@ -2,7 +2,6 @@ import isPlainObject from 'is-plain-object'
 import { List, Map, Record } from 'immutable'
 
 import KeyUtils from '../utils/key-utils'
-import MODEL_TYPES, { isType } from '../constants/model-types'
 import Node from './node'
 
 /**
@@ -12,9 +11,9 @@ import Node from './node'
  */
 
 const DEFAULTS = {
-  data: new Map(),
+  data: undefined,
   key: undefined,
-  nodes: new List(),
+  nodes: undefined,
 }
 
 /**
@@ -73,25 +72,6 @@ class Document extends Record(DEFAULTS) {
   }
 
   /**
-   * Check if `any` is a `Document`.
-   *
-   * @param {Any} any
-   * @return {Boolean}
-   */
-
-  static isDocument = isType.bind(null, 'DOCUMENT')
-
-  /**
-   * Object.
-   *
-   * @return {String}
-   */
-
-  get object() {
-    return 'document'
-  }
-
-  /**
    * Return a JSON representation of the document.
    *
    * @param {Object} options
@@ -112,12 +92,6 @@ class Document extends Record(DEFAULTS) {
     return object
   }
 }
-
-/**
- * Attach a pseudo-symbol for type checking.
- */
-
-Document.prototype[MODEL_TYPES.DOCUMENT] = true
 
 /**
  * Export.

@@ -1,9 +1,8 @@
 import isPlainObject from 'is-plain-object'
-import warning from 'slate-dev-warning'
+import warning from 'tiny-warning'
 import { List, OrderedSet, Record, Set } from 'immutable'
 
 import Leaf from './leaf'
-import MODEL_TYPES, { isType } from '../constants/model-types'
 import KeyUtils from '../utils/key-utils'
 import memoize from '../utils/memoize'
 
@@ -14,7 +13,7 @@ import memoize from '../utils/memoize'
  */
 
 const DEFAULTS = {
-  leaves: List(),
+  leaves: undefined,
   key: undefined,
 }
 
@@ -118,15 +117,6 @@ class Text extends Record(DEFAULTS) {
   }
 
   /**
-   * Check if `any` is a `Text`.
-   *
-   * @param {Any} any
-   * @return {Boolean}
-   */
-
-  static isText = isType.bind(null, 'TEXT')
-
-  /**
    * Check if `any` is a list of texts.
    *
    * @param {Any} any
@@ -135,16 +125,6 @@ class Text extends Record(DEFAULTS) {
 
   static isTextList(any) {
     return List.isList(any) && any.every(item => Text.isText(item))
-  }
-
-  /**
-   * Object.
-   *
-   * @return {String}
-   */
-
-  get object() {
-    return 'text'
   }
 
   /**
@@ -327,7 +307,7 @@ class Text extends Record(DEFAULTS) {
     const result = this.leaves.first().marks
     if (result.size === 0) return result
 
-    return result.withMutations(x => {
+    return result.toOrderedSet().withMutations(x => {
       this.leaves.forEach(c => {
         x.intersect(c.marks)
         if (x.size === 0) return false
@@ -629,8 +609,8 @@ class Text extends Record(DEFAULTS) {
   /**
    * Set leaves with normalized `leaves`
    *
-   * @param {Schema} schema
-   * @returns {Text|Null}
+   * @param {List} leaves
+   * @returns {Text}
    */
 
   setLeaves(leaves) {
@@ -649,12 +629,6 @@ class Text extends Record(DEFAULTS) {
     return this.set('leaves', Leaf.createLeaves(leaves))
   }
 }
-
-/**
- * Attach a pseudo-symbol for type checking.
- */
-
-Text.prototype[MODEL_TYPES.TEXT] = true
 
 /**
  * Memoize read methods.

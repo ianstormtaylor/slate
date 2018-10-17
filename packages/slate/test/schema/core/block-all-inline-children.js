@@ -8,63 +8,23 @@ export const input = (
   <value>
     <document>
       <quote>
+        <text />
         <link>one</link>
+        <text />
         <paragraph>two</paragraph>
       </quote>
     </document>
   </value>
 )
 
-export const output = {
-  object: 'value',
-  document: {
-    object: 'document',
-    data: {},
-    nodes: [
-      {
-        object: 'block',
-        type: 'quote',
-        data: {},
-        nodes: [
-          {
-            object: 'text',
-            leaves: [
-              {
-                object: 'leaf',
-                text: '',
-                marks: [],
-              },
-            ],
-          },
-          {
-            object: 'inline',
-            type: 'link',
-            data: {},
-            nodes: [
-              {
-                object: 'text',
-                leaves: [
-                  {
-                    object: 'leaf',
-                    text: 'one',
-                    marks: [],
-                  },
-                ],
-              },
-            ],
-          },
-          {
-            object: 'text',
-            leaves: [
-              {
-                object: 'leaf',
-                text: '',
-                marks: [],
-              },
-            ],
-          },
-        ],
-      },
-    ],
-  },
-}
+export const output = (
+  <value>
+    <document>
+      <quote>
+        <text />
+        <link>one</link>
+        <text />
+      </quote>
+    </document>
+  </value>
+)

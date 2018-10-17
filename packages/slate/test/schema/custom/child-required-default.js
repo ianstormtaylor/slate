@@ -19,7 +19,9 @@ export const schema = {
 export const input = (
   <value>
     <document>
-      <quote />
+      <quote>
+        <text />
+      </quote>
     </document>
   </value>
 )

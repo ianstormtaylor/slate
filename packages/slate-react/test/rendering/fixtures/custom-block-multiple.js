@@ -11,10 +11,12 @@ function Code(props) {
   )
 }
 
-function renderNode(props) {
+function renderNode(props, next) {
   switch (props.node.type) {
     case 'code':
       return Code(props)
+    default:
+      return next()
   }
 }
 

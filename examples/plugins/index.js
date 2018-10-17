@@ -2,44 +2,9 @@ import Plain from 'slate-plain-serializer'
 import { Editor } from 'slate-react'
 
 import React from 'react'
-import CollapseOnEscape from 'slate-collapse-on-escape'
-import SoftBreak from 'slate-soft-break'
-import styled from 'react-emotion'
-
-/**
- * A styled word counter component.
- *
- * @type {Component}
- */
-
-const WordCounter = styled('span')`
-  margin-top: 10px;
-  padding: 12px;
-  background-color: #ebebeb;
-  display: inline-block;
-`
-
-/**
- * A simple word count plugin.
- *
- * @param {Object} options
- * @return {Object}
- */
-
-function WordCount(options) {
-  return {
-    renderEditor(props) {
-      return (
-        <div>
-          <div>{props.children}</div>
-          <WordCounter>
-            Word Count: {props.value.document.text.split(' ').length}
-          </WordCounter>
-        </div>
-      )
-    },
-  }
-}
+import CollapseOnEscape from './collapse-on-escape'
+import SoftBreak from './soft-break'
+import WordCount from './word-count'
 
 /**
  * Plugins.

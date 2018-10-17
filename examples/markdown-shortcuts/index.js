@@ -76,10 +76,12 @@ class MarkdownShortcuts extends React.Component {
    * Render a Slate node.
    *
    * @param {Object} props
+   * @param {Editor} editor
+   * @param {Function} next
    * @return {Element}
    */
 
-  renderNode = props => {
+  renderNode = (props, next) => {
     const { attributes, children, node } = props
 
     switch (node.type) {
@@ -101,6 +103,8 @@ class MarkdownShortcuts extends React.Component {
         return <h6 {...attributes}>{children}</h6>
       case 'list-item':
         return <li {...attributes}>{children}</li>
+      default:
+        return next()
     }
   }
 
@@ -119,16 +123,19 @@ class MarkdownShortcuts extends React.Component {
    *
    * @param {Event} event
    * @param {Change} change
+   * @param {Function} next
    */
 
-  onKeyDown = (event, change) => {
+  onKeyDown = (event, change, next) => {
     switch (event.key) {
       case ' ':
-        return this.onSpace(event, change)
+        return this.onSpace(event, change, next)
       case 'Backspace':
-        return this.onBackspace(event, change)
+        return this.onBackspace(event, change, next)
       case 'Enter':
-        return this.onEnter(event, change)
+        return this.onEnter(event, change, next)
+      default:
+        return next()
     }
   }
 
@@ -138,20 +145,20 @@ class MarkdownShortcuts extends React.Component {
    *
    * @param {Event} event
    * @param {Change} change
+   * @param {Function} next
    */
 
-  onSpace = (event, change) => {
+  onSpace = (event, change, next) => {
     const { value } = change
     const { selection } = value
-    if (selection.isExpanded) return
+    if (selection.isExpanded) return next()
 
     const { startBlock } = value
     const { start } = selection
     const chars = startBlock.text.slice(0, start.offset).replace(/\s*/g, '')
     const type = this.getType(chars)
-
-    if (!type) return
-    if (type == 'list-item' && startBlock.type == 'list-item') return
+    if (!type) return next()
+    if (type == 'list-item' && startBlock.type == 'list-item') return next()
     event.preventDefault()
 
     change.setBlocks(type)
@@ -161,7 +168,6 @@ class MarkdownShortcuts extends React.Component {
     }
 
     change.moveFocusToStartOfNode(startBlock).delete()
-    return true
   }
 
   /**
@@ -170,16 +176,17 @@ class MarkdownShortcuts extends React.Component {
    *
    * @param {Event} event
    * @param {Change} change
+   * @param {Function} next
    */
 
-  onBackspace = (event, change) => {
+  onBackspace = (event, change, next) => {
     const { value } = change
     const { selection } = value
-    if (selection.isExpanded) return
-    if (selection.start.offset != 0) return
+    if (selection.isExpanded) return next()
+    if (selection.start.offset != 0) return next()
 
     const { startBlock } = value
-    if (startBlock.type == 'paragraph') return
+    if (startBlock.type == 'paragraph') return next()
 
     event.preventDefault()
     change.setBlocks('paragraph')
@@ -187,8 +194,6 @@ class MarkdownShortcuts extends React.Component {
     if (startBlock.type == 'list-item') {
       change.unwrapBlock('bulleted-list')
     }
-
-    return true
   }
 
   /**
@@ -197,18 +202,19 @@ class MarkdownShortcuts extends React.Component {
    *
    * @param {Event} event
    * @param {Change} change
+   * @param {Function} next
    */
 
-  onEnter = (event, change) => {
+  onEnter = (event, change, next) => {
     const { value } = change
     const { selection } = value
     const { start, end, isExpanded } = selection
-    if (isExpanded) return
+    if (isExpanded) return next()
 
     const { startBlock } = value
     if (start.offset == 0 && startBlock.text.length == 0)
-      return this.onBackspace(event, change)
-    if (end.offset != startBlock.text.length) return
+      return this.onBackspace(event, change, next)
+    if (end.offset != startBlock.text.length) return next()
 
     if (
       startBlock.type != 'heading-one' &&
@@ -219,12 +225,11 @@ class MarkdownShortcuts extends React.Component {
       startBlock.type != 'heading-six' &&
       startBlock.type != 'block-quote'
     ) {
-      return
+      return next()
     }
 
     event.preventDefault()
     change.splitBlock().setBlocks('paragraph')
-    return true
   }
 }
 

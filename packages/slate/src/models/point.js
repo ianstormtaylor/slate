@@ -1,10 +1,9 @@
 import isPlainObject from 'is-plain-object'
-import warning from 'slate-dev-warning'
+import warning from 'tiny-warning'
 import { Record } from 'immutable'
 
 import KeyUtils from '../utils/key-utils'
 import PathUtils from '../utils/path-utils'
-import MODEL_TYPES from '../constants/model-types'
 
 /**
  * Default properties.
@@ -13,9 +12,9 @@ import MODEL_TYPES from '../constants/model-types'
  */
 
 const DEFAULTS = {
-  key: null,
-  offset: null,
-  path: null,
+  key: undefined,
+  offset: undefined,
+  path: undefined,
 }
 
 /**
@@ -102,27 +101,6 @@ class Point extends Record(DEFAULTS) {
   }
 
   /**
-   * Check if an `obj` is a `Point`.
-   *
-   * @param {Any} obj
-   * @return {Boolean}
-   */
-
-  static isPoint(obj) {
-    return !!(obj && obj[MODEL_TYPES.POINT])
-  }
-
-  /**
-   * Object.
-   *
-   * @return {String}
-   */
-
-  get object() {
-    return 'point'
-  }
-
-  /**
    * Check whether all properties of the point are set.
    *
    * @return {Boolean}
@@ -140,6 +118,97 @@ class Point extends Record(DEFAULTS) {
 
   get isUnset() {
     return !this.isSet
+  }
+
+  /**
+   * Check whether the point is after another `point`.
+   *
+   * @return {Boolean}
+   */
+
+  isAfterPoint(point) {
+    if (this.isUnset) return false
+    const is =
+      (this.key === point.key && this.offset > point.offset) ||
+      PathUtils.compare(this.path, point.path) === 1
+    return is
+  }
+
+  /**
+   * Check whether the point is after a `range`.
+   *
+   * @return {Boolean}
+   */
+
+  isAfterRange(range) {
+    if (this.isUnset) return false
+    const is = this.isAfterPoint(range.end)
+    return is
+  }
+
+  /**
+   * Check whether the point is at the end of a `range`.
+   *
+   * @return {Boolean}
+   */
+
+  isAtEndOfRange(range) {
+    if (this.isUnset) return false
+    const is = this.equals(range.end)
+    return is
+  }
+
+  /**
+   * Check whether the point is at the start of a `range`.
+   *
+   * @return {Boolean}
+   */
+
+  isAtStartOfRange(range) {
+    if (this.isUnset) return false
+    const is = this.equals(range.start)
+    return is
+  }
+
+  /**
+   * Check whether the point is before another `point`.
+   *
+   * @return {Boolean}
+   */
+
+  isBeforePoint(point) {
+    if (this.isUnset) return false
+    const is =
+      (this.key === point.key && this.offset < point.offset) ||
+      PathUtils.compare(this.path, point.path) === -1
+    return is
+  }
+
+  /**
+   * Check whether the point is before a `range`.
+   *
+   * @return {Boolean}
+   */
+
+  isBeforeRange(range) {
+    if (this.isUnset) return false
+    const is = this.isBeforePoint(range.start)
+    return is
+  }
+
+  /**
+   * Check whether the point is inside a `range`.
+   *
+   * @return {Boolean}
+   */
+
+  isInRange(range) {
+    if (this.isUnset) return false
+    const is =
+      this.equals(range.start) ||
+      this.equals(range.end) ||
+      (this.isAfterPoint(range.start) && this.isBeforePoint(range.end))
+    return is
   }
 
   /**
@@ -410,12 +479,6 @@ class Point extends Record(DEFAULTS) {
     })
   }
 }
-
-/**
- * Attach a pseudo-symbol for type checking.
- */
-
-Point.prototype[MODEL_TYPES.POINT] = true
 
 /**
  * Export.

@@ -12,10 +12,12 @@ function Code(props) {
 }
 
 export const props = {
-  renderNode(p) {
+  renderNode(p, editor, next) {
     switch (p.node.type) {
       case 'code':
         return Code(p)
+      default:
+        return next()
     }
   },
 }

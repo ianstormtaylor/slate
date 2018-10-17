@@ -1,4 +1,5 @@
 import direction from 'direction'
+import invariant from 'tiny-invariant'
 import { List, OrderedSet, Set } from 'immutable'
 
 import mixin from '../utils/mixin'
@@ -11,6 +12,7 @@ import PathUtils from '../utils/path-utils'
 import Point from '../models/point'
 import Range from '../models/range'
 import Selection from '../models/selection'
+import Value from '../models/value'
 
 /**
  * The interface that `Document`, `Block` and `Inline` all implement, to make
@@ -398,13 +400,20 @@ class ElementInterface {
    * Get the closest void parent of a node by `path`.
    *
    * @param {List|String} path
-   * @param {Schema} schema
+   * @param {Editor} editor
    * @return {Node|Null}
    */
 
-  getClosestVoid(path, schema) {
+  getClosestVoid(path, editor) {
+    invariant(
+      !Value.isValue(editor),
+      'As of Slate 0.42.0, the `node.getClosestVoid` method takes an `editor` instead of a `value`.'
+    )
+
     const ancestors = this.getAncestors(path)
-    const ancestor = ancestors.findLast(a => schema.isVoid(a))
+    if (!ancestors) return null
+
+    const ancestor = ancestors.findLast(a => editor.query('isVoid', a))
     return ancestor
   }
 
@@ -427,16 +436,21 @@ class ElementInterface {
   }
 
   /**
-   * Get the decorations for the node from a `stack`.
+   * Get the decorations for the node from an `editor`.
    *
-   * @param {Stack} stack
+   * @param {Editor} editor
    * @return {List}
    */
 
-  getDecorations(stack) {
-    const decorations = stack.find('decorateNode', this)
-    const list = Decoration.createList(decorations || [])
-    return list
+  getDecorations(editor) {
+    invariant(
+      !Value.isValue(editor),
+      'As of Slate 0.42.0, the `node.getDecorations` method takes an `editor` instead of a `value`.'
+    )
+
+    const array = editor.run('decorateNode', this) || []
+    const decorations = Decoration.createList(array)
+    return decorations
   }
 
   /**
@@ -1355,12 +1369,17 @@ class ElementInterface {
    * Check if a node has a void parent.
    *
    * @param {List|String} path
-   * @param {Schema} schema
+   * @param {Editor} editor
    * @return {Boolean}
    */
 
-  hasVoidParent(path, schema) {
-    const closest = this.getClosestVoid(path, schema)
+  hasVoidParent(path, editor) {
+    invariant(
+      !Value.isValue(editor),
+      'As of Slate 0.42.0, the `node.hasVoidParent` method takes an `editor` instead of a `value`.'
+    )
+
+    const closest = this.getClosestVoid(path, editor)
     return !!closest
   }
 
@@ -1540,36 +1559,6 @@ class ElementInterface {
     ret = ret.removeNode(path)
     ret = ret.insertNode(newPath, node)
     return ret
-  }
-
-  /**
-   * Attempt to "refind" a node by a previous `path`, falling back to looking
-   * it up by `key` again.
-   *
-   * @param {List|String} path
-   * @param {String} key
-   * @return {Node|Null}
-   */
-
-  refindNode(path, key) {
-    const node = this.getDescendant(path)
-    const found = node && node.key === key ? node : this.getDescendant(key)
-    return found
-  }
-
-  /**
-   * Attempt to "refind" the path to a node by a previous `path`, falling back
-   * to looking it up by `key`.
-   *
-   * @param {List|String} path
-   * @param {String} key
-   * @return {List|Null}
-   */
-
-  refindPath(path, key) {
-    const node = this.getDescendant(path)
-    const found = node && node.key === key ? path : this.getPath(key)
-    return found
   }
 
   /**

@@ -4,6 +4,14 @@ This document maintains a list of changes to the `slate-prop-types` package with
 
 ---
 
+### `0.5.0` — October 9, 2018
+
+###### BREAKING
+
+**Updated to the latest version of `slate`.** The `slate-react` codebase has been updated to be compatible with the latest version of `slate`, `0.42.0`. This is a backward incompatible upgrade, and so the peer dependency range has been bumped.
+
+---
+
 ### `0.4.0` — October 27, 2017
 
 ###### BREAKING

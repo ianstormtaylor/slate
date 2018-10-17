@@ -1,5 +1,5 @@
 import isPlainObject from 'is-plain-object'
-import warning from 'slate-dev-warning'
+import warning from 'tiny-warning'
 import { List } from 'immutable'
 
 import Block from './block'
@@ -7,7 +7,6 @@ import Data from './data'
 import Document from './document'
 import Inline from './inline'
 import Text from './text'
-import { isType } from '../constants/model-types'
 
 /**
  * A pseudo-model that is used for its static methods only.
@@ -155,8 +154,11 @@ class Node {
    */
 
   static isNode(any) {
-    return !!['BLOCK', 'DOCUMENT', 'INLINE', 'TEXT'].find(type =>
-      isType(type, any)
+    return (
+      Block.isBlock(any) ||
+      Document.isDocument(any) ||
+      Inline.isInline(any) ||
+      Text.isText(any)
     )
   }
 

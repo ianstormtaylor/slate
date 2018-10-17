@@ -2,7 +2,6 @@ import isPlainObject from 'is-plain-object'
 import { List, Record } from 'immutable'
 
 import Mark from './mark'
-import MODEL_TYPES from '../constants/model-types'
 import Point from './point'
 import Range from './range'
 
@@ -13,8 +12,8 @@ import Range from './range'
  */
 
 const DEFAULTS = {
-  anchor: Point.create(),
-  focus: Point.create(),
+  anchor: undefined,
+  focus: undefined,
   mark: undefined,
 }
 
@@ -106,6 +105,15 @@ class Decoration extends Record(DEFAULTS) {
 
   static fromJSON(object) {
     const { anchor, focus, mark } = object
+
+    if (!mark) {
+      throw new Error(
+        `Decorations must be created with a \`mark\`, but you passed: ${JSON.stringify(
+          object
+        )}`
+      )
+    }
+
     const decoration = new Decoration({
       anchor: Point.fromJSON(anchor || {}),
       focus: Point.fromJSON(focus || {}),
@@ -113,27 +121,6 @@ class Decoration extends Record(DEFAULTS) {
     })
 
     return decoration
-  }
-
-  /**
-   * Check if an `obj` is a `Decoration`.
-   *
-   * @param {Any} obj
-   * @return {Boolean}
-   */
-
-  static isDecoration(obj) {
-    return !!(obj && obj[MODEL_TYPES.DECORATION])
-  }
-
-  /**
-   * Object.
-   *
-   * @return {String}
-   */
-
-  get object() {
-    return 'decoration'
   }
 
   /**
@@ -182,12 +169,6 @@ class Decoration extends Record(DEFAULTS) {
     return object
   }
 }
-
-/**
- * Attach a pseudo-symbol for type checking.
- */
-
-Decoration.prototype[MODEL_TYPES.DECORATION] = true
 
 /**
  * Export.

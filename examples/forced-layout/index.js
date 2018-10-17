@@ -70,10 +70,12 @@ class ForcedLayout extends React.Component {
    * Render a Slate node.
    *
    * @param {Object} props
+   * @param {Editor} editor
+   * @param {Function} next
    * @return {Element}
    */
 
-  renderNode = props => {
+  renderNode = (props, next) => {
     const { attributes, children, node } = props
 
     switch (node.type) {
@@ -81,6 +83,8 @@ class ForcedLayout extends React.Component {
         return <h2 {...attributes}>{children}</h2>
       case 'paragraph':
         return <p {...attributes}>{children}</p>
+      default:
+        return next()
     }
   }
 

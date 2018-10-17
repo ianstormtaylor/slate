@@ -6,14 +6,18 @@ export const input = (
   <value>
     <document>
       <block type="paragraph">
+        <text />
         <inline type="link">
           on<anchor />e
         </inline>
+        <text />
       </block>
       <block type="paragraph">
+        <text />
         <inline type="link">
           t<focus />wo
         </inline>
+        <text />
       </block>
     </document>
   </value>
@@ -33,13 +37,13 @@ export const output = {
     nodes: [
       {
         object: 'block',
-        key: '3',
+        key: '4',
         type: 'paragraph',
         data: {},
         nodes: [
           {
             object: 'text',
-            key: '11',
+            key: '0',
             leaves: [
               {
                 object: 'leaf',
@@ -50,13 +54,13 @@ export const output = {
           },
           {
             object: 'inline',
-            key: '1',
+            key: '2',
             type: 'link',
             data: {},
             nodes: [
               {
                 object: 'text',
-                key: '0',
+                key: '1',
                 leaves: [
                   {
                     object: 'leaf',
@@ -69,7 +73,7 @@ export const output = {
           },
           {
             object: 'text',
-            key: '12',
+            key: '3',
             leaves: [
               {
                 object: 'leaf',
@@ -82,13 +86,13 @@ export const output = {
       },
       {
         object: 'block',
-        key: '7',
+        key: '9',
         type: 'paragraph',
         data: {},
         nodes: [
           {
             object: 'text',
-            key: '13',
+            key: '5',
             leaves: [
               {
                 object: 'leaf',
@@ -99,13 +103,13 @@ export const output = {
           },
           {
             object: 'inline',
-            key: '5',
+            key: '7',
             type: 'link',
             data: {},
             nodes: [
               {
                 object: 'text',
-                key: '4',
+                key: '6',
                 leaves: [
                   {
                     object: 'leaf',
@@ -118,7 +122,7 @@ export const output = {
           },
           {
             object: 'text',
-            key: '14',
+            key: '8',
             leaves: [
               {
                 object: 'leaf',
@@ -135,13 +139,13 @@ export const output = {
     object: 'selection',
     anchor: {
       object: 'point',
-      key: '0',
+      key: '1',
       path: [0, 1, 0],
       offset: 2,
     },
     focus: {
       object: 'point',
-      key: '4',
+      key: '6',
       path: [1, 1, 0],
       offset: 1,
     },

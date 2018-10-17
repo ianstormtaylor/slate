@@ -14,7 +14,7 @@ Because it mirrors the DOM, Slate's data model features a [`Document`](../refere
 
 Slate's data model is built out of [`Immutable.js`](https://facebook.github.io/immutable-js/) objects. This allows us to make rendering much more performant, and it ensures that we don't end up with hard to track down bugs due to accidentally modifying objects in-place.
 
-Specifically, Slate's models are [`Immutable.Record`](https://facebook.github.io/immutable-js/docs/#/Record) objects, which makes them very similar to Javascript objects for retrieiving values:
+Specifically, Slate's models are [`Immutable.Record`](https://facebook.github.io/immutable-js/docs/#/Record) objects, which makes them very similar to JavaScript objects for retrieiving values:
 
 ```js
 const block = Block.create({ type: 'paragraph' })
@@ -33,7 +33,7 @@ If you haven't used Immutable.js before, there is definitely a learning curve. B
 
 The top-level object in Slate—the object encapsulating the entire value of an Slate editor—is called a [`Value`](../reference/slate/value.md).
 
-It is made up of a document filled with content, and a selection representing the user's current cursor selection. It also has a history, to keep track of changes, and a few other more advanced properties like `decorations` and `data`.
+It is made up of a document filled with content, and a selection representing the user's current cursor selection. It also has a few other more advanced properties like `decorations` and `data`.
 
 > 📋 For more info, check out the [`Value` reference](../reference/slate/value.md).
 
@@ -53,7 +53,7 @@ Unlike the DOM though, Slate enforces a few more restrictions on its documents. 
 
 * **Blocks and inlines must always contain at least one text node.** This is to ensure that the user's cursor can always "enter" the nodes and to make sure that ranges can be created referencing them.
 
-Slate enforces all of these restrictions for you automatically. Any time you [perform changes](./changes.md) to the document, Slate will check if the document is invalid, and if so, it will return it to a "normalized" value.
+Slate enforces all of these restrictions for you automatically. Any time you [run commands](./commands-and-queries.md) that manipulate the document, Slate will check if the document is invalid, and if so, it will return it to a "normalized" value.
 
 > 🙃 Fun fact: "normalizing" is actually based on the DOM's [`Node.normalize()`](https://developer.mozilla.org/en-US/docs/Web/API/Node/normalize)!
 

@@ -1,7 +1,7 @@
 import Debug from 'debug'
-import getWindow from 'get-window'
-import { findDOMNode } from 'react-dom'
 import Hotkeys from 'slate-hotkeys'
+import ReactDOM from 'react-dom'
+import getWindow from 'get-window'
 import {
   IS_FIREFOX,
   IS_IE,
@@ -20,7 +20,7 @@ import findNode from '../utils/find-node'
 const debug = Debug('slate:before')
 
 /**
- * The core before plugin.
+ * A plugin that adds the "before" browser-specific logic to the editor.
  *
  * @return {Object}
  */
@@ -37,20 +37,21 @@ function BeforePlugin() {
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
+   * @param {Function} next
    */
 
-  function onBeforeInput(event, change, editor) {
-    if (editor.props.readOnly) return true
-
+  function onBeforeInput(event, change, next) {
+    const { editor } = change
     const isSynthetic = !!event.nativeEvent
+    if (editor.readOnly) return
 
     // COMPAT: If the browser supports Input Events Level 2, we will have
     // attached a custom handler for the real `beforeinput` events, instead of
     // allowing React's synthetic polyfill, so we need to ignore synthetics.
-    if (isSynthetic && HAS_INPUT_EVENTS_LEVEL_2) return true
+    if (isSynthetic && HAS_INPUT_EVENTS_LEVEL_2) return
 
     debug('onBeforeInput', { event })
+    next()
   }
 
   /**
@@ -58,15 +59,14 @@ function BeforePlugin() {
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
+   * @param {Function} next
    */
 
-  function onBlur(event, change, editor) {
-    if (isCopying) return true
-    if (editor.props.readOnly) return true
+  function onBlur(event, change, next) {
+    const { editor } = change
+    if (isCopying) return
+    if (editor.readOnly) return
 
-    const { value } = change
-    const { schema } = value
     const { relatedTarget, target } = event
     const window = getWindow(target)
 
@@ -74,51 +74,31 @@ function BeforePlugin() {
     // due to the window being blurred when the tab itself becomes unfocused, so
     // we want to abort early to allow to editor to stay focused when the tab
     // becomes focused again.
-    if (activeElement == window.document.activeElement) return true
+    if (activeElement === window.document.activeElement) return
 
     // COMPAT: The `relatedTarget` can be null when the new focus target is not
     // a "focusable" element (eg. a `<div>` without `tabindex` set).
     if (relatedTarget) {
-      const el = findDOMNode(editor)
+      const el = ReactDOM.findDOMNode(editor)
 
       // COMPAT: The event should be ignored if the focus is returning to the
       // editor from an embedded editable element (eg. an <input> element inside
       // a void node).
-      if (relatedTarget == el) return true
+      if (relatedTarget === el) return
 
       // COMPAT: The event should be ignored if the focus is moving from the
       // editor to inside a void node's spacer element.
-      if (relatedTarget.hasAttribute('data-slate-spacer')) return true
+      if (relatedTarget.hasAttribute('data-slate-spacer')) return
 
       // COMPAT: The event should be ignored if the focus is moving to a non-
       // editable section of an element that isn't a void node (eg. a list item
       // of the check list example).
-      const node = findNode(relatedTarget, value)
-      if (el.contains(relatedTarget) && node && !schema.isVoid(node))
-        return true
+      const node = findNode(relatedTarget, editor)
+      if (el.contains(relatedTarget) && node && !change.isVoid(node)) return
     }
 
     debug('onBlur', { event })
-  }
-
-  /**
-   * On change.
-   *
-   * @param {Change} change
-   * @param {Editor} editor
-   */
-
-  function onChange(change, editor) {
-    const { value } = change
-
-    // If the value's schema isn't the editor's schema, update it. This can
-    // happen on the initialization of the editor, or if the schema changes.
-    // This change isn't save into history since only schema is updated.
-    if (value.schema != editor.schema) {
-      change.setValue({ schema: editor.schema }, { save: false }).normalize()
-    }
-
-    debug('onChange')
+    next()
   }
 
   /**
@@ -126,10 +106,11 @@ function BeforePlugin() {
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
+   * @param {Function} next
    */
 
-  function onCompositionEnd(event, change, editor) {
+  function onCompositionEnd(event, change, next) {
+    const { editor } = change
     const n = compositionCount
 
     // The `count` check here ensures that if another composition starts
@@ -149,6 +130,20 @@ function BeforePlugin() {
     })
 
     debug('onCompositionEnd', { event })
+    next()
+  }
+
+  /**
+   * On click.
+   *
+   * @param {Event} event
+   * @param {Change} change
+   * @param {Function} next
+   */
+
+  function onClick(event, change, next) {
+    debug('onClick', { event })
+    next()
   }
 
   /**
@@ -156,12 +151,13 @@ function BeforePlugin() {
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
+   * @param {Function} next
    */
 
-  function onCompositionStart(event, change, editor) {
+  function onCompositionStart(event, change, next) {
     isComposing = true
     compositionCount++
+    const { editor } = change
 
     // HACK: we need to re-render the editor here so that it will update its
     // placeholder in case one is currently rendered. This should be handled
@@ -172,6 +168,7 @@ function BeforePlugin() {
     }
 
     debug('onCompositionStart', { event })
+    next()
   }
 
   /**
@@ -179,15 +176,16 @@ function BeforePlugin() {
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
+   * @param {Function} next
    */
 
-  function onCopy(event, change, editor) {
+  function onCopy(event, change, next) {
     const window = getWindow(event.target)
     isCopying = true
     window.requestAnimationFrame(() => (isCopying = false))
 
     debug('onCopy', { event })
+    next()
   }
 
   /**
@@ -195,17 +193,19 @@ function BeforePlugin() {
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
+   * @param {Function} next
    */
 
-  function onCut(event, change, editor) {
-    if (editor.props.readOnly) return true
+  function onCut(event, change, next) {
+    const { editor } = change
+    if (editor.readOnly) return
 
     const window = getWindow(event.target)
     isCopying = true
     window.requestAnimationFrame(() => (isCopying = false))
 
     debug('onCut', { event })
+    next()
   }
 
   /**
@@ -213,13 +213,13 @@ function BeforePlugin() {
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
+   * @param {Function} next
    */
 
-  function onDragEnd(event, change, editor) {
+  function onDragEnd(event, change, next) {
     isDragging = false
-
     debug('onDragEnd', { event })
+    next()
   }
 
   /**
@@ -227,11 +227,12 @@ function BeforePlugin() {
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
+   * @param {Function} next
    */
 
-  function onDragEnter(event, change, editor) {
+  function onDragEnter(event, change, next) {
     debug('onDragEnter', { event })
+    next()
   }
 
   /**
@@ -239,11 +240,12 @@ function BeforePlugin() {
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
+   * @param {Function} next
    */
 
-  function onDragExit(event, change, editor) {
+  function onDragExit(event, change, next) {
     debug('onDragExit', { event })
+    next()
   }
 
   /**
@@ -251,11 +253,12 @@ function BeforePlugin() {
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
+   * @param {Function} next
    */
 
-  function onDragLeave(event, change, editor) {
+  function onDragLeave(event, change, next) {
     debug('onDragLeave', { event })
+    next()
   }
 
   /**
@@ -263,24 +266,25 @@ function BeforePlugin() {
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
+   * @param {Function} next
    */
 
-  function onDragOver(event, change, editor) {
+  function onDragOver(event, change, next) {
     // If the target is inside a void node, and only in this case,
     // call `preventDefault` to signal that drops are allowed.
     // When the target is editable, dropping is already allowed by
     // default, and calling `preventDefault` hides the cursor.
-    const { value } = editor
-    const { schema } = value
-    const node = findNode(event.target, editor.value)
-    if (schema.isVoid(node)) event.preventDefault()
+    const { editor } = change
+    const node = findNode(event.target, editor)
+    if (change.isVoid(node)) event.preventDefault()
 
     // COMPAT: IE won't call onDrop on contentEditables unless the
     // default dragOver is prevented:
     // https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/913982/
     // (2018/07/11)
-    if (IS_IE) event.preventDefault()
+    if (IS_IE) {
+      event.preventDefault()
+    }
 
     // If a drag is already in progress, don't do this again.
     if (!isDragging) {
@@ -294,6 +298,7 @@ function BeforePlugin() {
     }
 
     debug('onDragOver', { event })
+    next()
   }
 
   /**
@@ -301,13 +306,13 @@ function BeforePlugin() {
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
+   * @param {Function} next
    */
 
-  function onDragStart(event, change, editor) {
+  function onDragStart(event, change, next) {
     isDragging = true
-
     debug('onDragStart', { event })
+    next()
   }
 
   /**
@@ -315,17 +320,18 @@ function BeforePlugin() {
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
+   * @param {Function} next
    */
 
-  function onDrop(event, change, editor) {
-    // Nothing happens in read-only mode.
-    if (editor.props.readOnly) return true
+  function onDrop(event, change, next) {
+    const { editor } = change
+    if (editor.readOnly) return
 
     // Prevent default so the DOM's value isn't corrupted.
     event.preventDefault()
 
     debug('onDrop', { event })
+    next()
   }
 
   /**
@@ -333,14 +339,15 @@ function BeforePlugin() {
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
+   * @param {Function} next
    */
 
-  function onFocus(event, change, editor) {
-    if (isCopying) return true
-    if (editor.props.readOnly) return true
+  function onFocus(event, change, next) {
+    const { editor } = change
+    if (isCopying) return
+    if (editor.readOnly) return
 
-    const el = findDOMNode(editor)
+    const el = ReactDOM.findDOMNode(editor)
 
     // Save the new `activeElement`.
     const window = getWindow(event.target)
@@ -351,10 +358,11 @@ function BeforePlugin() {
     // issues with keyboard navigation. (2017/03/30)
     if (IS_FIREFOX && event.target != el) {
       el.focus()
-      return true
+      return
     }
 
     debug('onFocus', { event })
+    next()
   }
 
   /**
@@ -362,14 +370,14 @@ function BeforePlugin() {
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
+   * @param {Function} next
    */
 
-  function onInput(event, change, editor) {
-    if (isComposing) return true
-    if (change.value.selection.isBlurred) return true
-
+  function onInput(event, change, next) {
+    if (isComposing) return
+    if (change.value.selection.isBlurred) return
     debug('onInput', { event })
+    next()
   }
 
   /**
@@ -377,18 +385,19 @@ function BeforePlugin() {
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
+   * @param {Function} next
    */
 
-  function onKeyDown(event, change, editor) {
-    if (editor.props.readOnly) return true
+  function onKeyDown(event, change, next) {
+    const { editor } = change
+    if (editor.readOnly) return
 
     // When composing, we need to prevent all hotkeys from executing while
     // typing. However, certain characters also move the selection before
     // we're able to handle it, so prevent their default behavior.
     if (isComposing) {
       if (Hotkeys.isCompose(event)) event.preventDefault()
-      return true
+      return
     }
 
     // Certain hotkeys have native editing behaviors in `contenteditable`
@@ -413,6 +422,7 @@ function BeforePlugin() {
     }
 
     debug('onKeyDown', { event })
+    next()
   }
 
   /**
@@ -420,16 +430,18 @@ function BeforePlugin() {
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
+   * @param {Function} next
    */
 
-  function onPaste(event, change, editor) {
-    if (editor.props.readOnly) return true
+  function onPaste(event, change, next) {
+    const { editor } = change
+    if (editor.readOnly) return
 
     // Prevent defaults so the DOM state isn't corrupted.
     event.preventDefault()
 
     debug('onPaste', { event })
+    next()
   }
 
   /**
@@ -437,19 +449,22 @@ function BeforePlugin() {
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
+   * @param {Function} next
    */
 
-  function onSelect(event, change, editor) {
-    if (isCopying) return true
-    if (isComposing) return true
-    if (editor.props.readOnly) return true
+  function onSelect(event, change, next) {
+    if (isCopying) return
+    if (isComposing) return
+
+    const { editor } = change
+    if (editor.readOnly) return
 
     // Save the new `activeElement`.
     const window = getWindow(event.target)
     activeElement = window.document.activeElement
 
     debug('onSelect', { event })
+    next()
   }
 
   /**
@@ -461,7 +476,7 @@ function BeforePlugin() {
   return {
     onBeforeInput,
     onBlur,
-    onChange,
+    onClick,
     onCompositionEnd,
     onCompositionStart,
     onCopy,

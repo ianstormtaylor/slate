@@ -62,7 +62,9 @@ export const output = (
   <value>
     <document>
       <paragraph>
+        <text />
         <link thing="value">one</link>
+        <text />
       </paragraph>
     </document>
   </value>

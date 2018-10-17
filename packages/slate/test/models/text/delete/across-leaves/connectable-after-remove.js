@@ -6,7 +6,7 @@ export const input = (
   <text>
     <b>Cat is</b>very <b>very Cute</b>
   </text>
-)[0]
+)
 
 export default function(t) {
   return t.removeText(6, 9)
@@ -16,4 +16,4 @@ export const output = (
   <text>
     <b>Cat is Cute</b>
   </text>
-)[0]
+)

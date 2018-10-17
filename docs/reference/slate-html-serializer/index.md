@@ -81,7 +81,7 @@ Each rule must define two properties:
 
 `rule.deserialize(el: Element, next: Function) => Object || Void`
 
-The `deserialize` function receives a DOM element and should return a plain Javascript object representing the deserialized value, or nothing if the rule in question doesn't know how to deserialize the object, in which case the next rule in the stack will be attempted.
+The `deserialize` function receives a DOM element and should return a plain JavaScript object representing the deserialized value, or nothing if the rule in question doesn't know how to deserialize the object, in which case the next rule in the stack will be attempted.
 
 The object should be one of:
 

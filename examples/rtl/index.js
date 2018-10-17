@@ -46,12 +46,14 @@ class RTL extends React.Component {
    * @return {Element}
    */
 
-  renderNode = props => {
+  renderNode = (props, next) => {
     const { attributes, children, node } = props
 
     switch (node.type) {
       case 'block-quote':
         return <blockquote {...attributes}>{children}</blockquote>
+      default:
+        return next()
     }
   }
 
@@ -72,12 +74,14 @@ class RTL extends React.Component {
    * @param {Change} change
    */
 
-  onKeyDown = (event, change) => {
+  onKeyDown = (event, change, next) => {
     if (event.key == 'Enter' && event.shiftKey) {
       event.preventDefault()
       change.insertText('\n')
-      return true
+      return
     }
+
+    next()
   }
 }
 

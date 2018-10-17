@@ -39,13 +39,13 @@ The custom type of the mark (eg. `bold` or `italic`).
 
 `Mark.create(properties: Object) => Mark`
 
-Create a mark from a plain Javascript object of `properties`.
+Create a mark from a plain JavaScript object of `properties`.
 
 ### `Mark.createSet`
 
 `Mark.createSet(array: Array) => Set`
 
-Create a set of marks from a plain Javascript `array`.
+Create a set of marks from a plain JavaScript `array`.
 
 ### `Mark.fromJSON`
 

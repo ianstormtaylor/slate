@@ -7,7 +7,9 @@ export const props = {}
 export const value = (
   <value>
     <document>
-      <paragraph />
+      <paragraph>
+        <text />
+      </paragraph>
     </document>
   </value>
 )
@@ -17,7 +19,7 @@ export const output = `
   <div style="position:relative">
     <span>
       <span>
-        <span data-slate-zero-width="n">\u200B</span>
+        <span data-slate-zero-width="n">\uFEFF</span>
       </span>
     </span>
   </div>

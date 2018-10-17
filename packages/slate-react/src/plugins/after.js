@@ -1,13 +1,10 @@
 import Base64 from 'slate-base64-serializer'
 import Debug from 'debug'
-import Plain from 'slate-plain-serializer'
-import { IS_IOS } from 'slate-dev-environment'
-import React from 'react'
-import getWindow from 'get-window'
-import { Text } from 'slate'
 import Hotkeys from 'slate-hotkeys'
+import Plain from 'slate-plain-serializer'
+import getWindow from 'get-window'
+import { IS_IOS } from 'slate-dev-environment'
 
-import Content from '../components/content'
 import cloneFragment from '../utils/clone-fragment'
 import findDOMNode from '../utils/find-dom-node'
 import findNode from '../utils/find-node'
@@ -26,12 +23,13 @@ import setEventTransfer from '../utils/set-event-transfer'
 const debug = Debug('slate:after')
 
 /**
- * The after plugin.
+ * A plugin that adds the "after" browser-specific logic to the editor.
  *
+ * @param {Object} options
  * @return {Object}
  */
 
-function AfterPlugin() {
+function AfterPlugin(options = {}) {
   let isDraggingInternally = null
 
   /**
@@ -39,12 +37,11 @@ function AfterPlugin() {
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
+   * @param {Function} next
    */
 
-  function onBeforeInput(event, change, editor) {
-    debug('onBeforeInput', { event })
-
+  function onBeforeInput(event, change, next) {
+    const { editor, value } = change
     const isSynthetic = !!event.nativeEvent
 
     // If the event is synthetic, it's React's polyfill of `beforeinput` that
@@ -53,19 +50,20 @@ function AfterPlugin() {
     if (isSynthetic) {
       event.preventDefault()
       change.insertText(event.data)
-      return
+      return next()
     }
 
     // Otherwise, we can use the information in the `beforeinput` event to
     // figure out the exact change that will occur, and prevent it.
     const [targetRange] = event.getTargetRanges()
-    if (!targetRange) return
+    if (!targetRange) return next()
+
+    debug('onBeforeInput', { event })
 
     event.preventDefault()
 
-    const { value } = change
-    const { document, selection, schema } = value
-    const range = findRange(targetRange, value)
+    const { document, selection } = value
+    const range = findRange(targetRange, editor)
 
     switch (event.inputType) {
       case 'deleteByDrag':
@@ -74,36 +72,36 @@ function AfterPlugin() {
       case 'deleteContentBackward':
       case 'deleteContentForward': {
         change.deleteAtRange(range)
-        return
+        break
       }
 
       case 'deleteWordBackward': {
         change.deleteWordBackwardAtRange(range)
-        return
+        break
       }
 
       case 'deleteWordForward': {
         change.deleteWordForwardAtRange(range)
-        return
+        break
       }
 
       case 'deleteSoftLineBackward':
       case 'deleteHardLineBackward': {
         change.deleteLineBackwardAtRange(range)
-        return
+        break
       }
 
       case 'deleteSoftLineForward':
       case 'deleteHardLineForward': {
         change.deleteLineForwardAtRange(range)
-        return
+        break
       }
 
       case 'insertLineBreak':
       case 'insertParagraph': {
         const hasVoidParent = document.hasVoidParent(
           selection.start.path,
-          schema
+          editor
         )
 
         if (hasVoidParent) {
@@ -112,7 +110,7 @@ function AfterPlugin() {
           change.splitBlockAtRange(range)
         }
 
-        return
+        break
       }
 
       case 'insertFromYank':
@@ -127,7 +125,7 @@ function AfterPlugin() {
             ? event.dataTransfer.getData('text/plain')
             : event.data
 
-        if (text == null) return
+        if (text == null) break
 
         change.insertTextAtRange(range, text, selection.marks)
 
@@ -137,9 +135,11 @@ function AfterPlugin() {
           change.select({ marks: null })
         }
 
-        return
+        break
       }
     }
+
+    next()
   }
 
   /**
@@ -147,13 +147,13 @@ function AfterPlugin() {
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
+   * @param {Function} next
    */
 
-  function onBlur(event, change, editor) {
+  function onBlur(event, change, next) {
     debug('onBlur', { event })
-
     change.blur()
+    next()
   }
 
   /**
@@ -161,18 +161,23 @@ function AfterPlugin() {
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
+   * @param {Function} next
    */
 
-  function onClick(event, change, editor) {
-    if (editor.props.readOnly) return true
+  function onClick(event, change, next) {
+    const { editor } = change
+    if (editor.readOnly) return next()
 
-    const { value } = change
-    const { document, schema } = value
-    const node = findNode(event.target, value)
+    const { value } = editor
+    const { document } = value
+    const node = findNode(event.target, editor)
+    if (!node) return next()
+
+    debug('onClick', { event })
+
     const ancestors = document.getAncestors(node.key)
     const isVoid =
-      node && (schema.isVoid(node) || ancestors.some(a => schema.isVoid(a)))
+      node && (change.isVoid(node) || ancestors.some(a => change.isVoid(a)))
 
     if (isVoid) {
       // COMPAT: In Chrome & Safari, selections that are at the zero offset of
@@ -182,7 +187,7 @@ function AfterPlugin() {
       change.focus().moveToEndOfNode(node)
     }
 
-    debug('onClick', { event })
+    next()
   }
 
   /**
@@ -190,13 +195,14 @@ function AfterPlugin() {
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
+   * @param {Function} next
    */
 
-  function onCopy(event, change, editor) {
+  function onCopy(event, change, next) {
     debug('onCopy', { event })
-
-    cloneFragment(event, change.value)
+    const { editor } = change
+    cloneFragment(event, editor)
+    next()
   }
 
   /**
@@ -204,22 +210,23 @@ function AfterPlugin() {
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
+   * @param {Function} next
    */
 
-  function onCut(event, change, editor) {
+  function onCut(event, change, next) {
     debug('onCut', { event })
+    const { editor } = change
 
     // Once the fake cut content has successfully been added to the clipboard,
     // delete the content in the current selection.
-    cloneFragment(event, change.value, change.value.fragment, () => {
+    cloneFragment(event, editor, () => {
       // If user cuts a void block node or a void inline node,
       // manually removes it since selection is collapsed in this case.
       const { value } = change
-      const { endBlock, endInline, selection, schema } = value
+      const { endBlock, endInline, selection } = value
       const { isCollapsed } = selection
-      const isVoidBlock = endBlock && schema.isVoid(endBlock) && isCollapsed
-      const isVoidInline = endInline && schema.isVoid(endInline) && isCollapsed
+      const isVoidBlock = endBlock && change.isVoid(endBlock) && isCollapsed
+      const isVoidInline = endInline && change.isVoid(endInline) && isCollapsed
 
       if (isVoidBlock) {
         editor.change(c => c.removeNodeByKey(endBlock.key))
@@ -229,6 +236,8 @@ function AfterPlugin() {
         editor.change(c => c.delete())
       }
     })
+
+    next()
   }
 
   /**
@@ -236,25 +245,13 @@ function AfterPlugin() {
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
+   * @param {Function} next
    */
 
-  function onDragEnd(event, change, editor) {
+  function onDragEnd(event, change, next) {
     debug('onDragEnd', { event })
-
     isDraggingInternally = null
-  }
-
-  /**
-   * On drag over.
-   *
-   * @param {Event} event
-   * @param {Change} change
-   * @param {Editor} editor
-   */
-
-  function onDragOver(event, change, editor) {
-    debug('onDragOver', { event })
+    next()
   }
 
   /**
@@ -262,20 +259,21 @@ function AfterPlugin() {
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
+   * @param {Function} next
    */
 
-  function onDragStart(event, change, editor) {
+  function onDragStart(event, change, next) {
     debug('onDragStart', { event })
 
     isDraggingInternally = true
 
-    const { value } = change
-    const { document, schema } = value
-    const node = findNode(event.target, value)
+    const { editor } = change
+    const { value } = editor
+    const { document } = value
+    const node = findNode(event.target, editor)
     const ancestors = document.getAncestors(node.key)
     const isVoid =
-      node && (schema.isVoid(node) || ancestors.some(a => schema.isVoid(a)))
+      node && (change.isVoid(node) || ancestors.some(a => change.isVoid(a)))
     const selectionIncludesNode = value.blocks.some(
       block => block.key === node.key
     )
@@ -288,6 +286,7 @@ function AfterPlugin() {
     const fragment = change.value.fragment
     const encoded = Base64.serializeNode(fragment)
     setEventTransfer(event, 'fragment', encoded)
+    next()
   }
 
   /**
@@ -295,17 +294,17 @@ function AfterPlugin() {
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
+   * @param {Function} next
    */
 
-  function onDrop(event, change, editor) {
-    debug('onDrop', { event })
-
-    const { value } = change
-    const { document, selection, schema } = value
+  function onDrop(event, change, next) {
+    const { editor, value } = change
+    const { document, selection } = value
     const window = getWindow(event.target)
-    let target = getEventRange(event, value)
-    if (!target) return
+    let target = getEventRange(event, editor)
+    if (!target) return next()
+
+    debug('onDrop', { event })
 
     const transfer = getEventTransfer(event)
     const { type, fragment, text } = transfer
@@ -319,7 +318,7 @@ function AfterPlugin() {
       selection.end.key == target.end.key &&
       selection.end.offset < target.end.offset
     ) {
-      target = target.move(
+      target = target.moveForward(
         selection.start.key == selection.end.key
           ? 0 - selection.end.offset + selection.start.offset
           : 0 - selection.end.offset
@@ -334,7 +333,7 @@ function AfterPlugin() {
 
     if (type == 'text' || type == 'html') {
       const { anchor } = target
-      let hasVoidParent = document.hasVoidParent(anchor.key, schema)
+      let hasVoidParent = document.hasVoidParent(anchor.key, editor)
 
       if (hasVoidParent) {
         let n = document.getNode(anchor.key)
@@ -342,7 +341,7 @@ function AfterPlugin() {
         while (hasVoidParent) {
           n = document.getNextText(n.key)
           if (!n) break
-          hasVoidParent = document.hasVoidParent(n.key, schema)
+          hasVoidParent = document.hasVoidParent(n.key, editor)
         }
 
         if (n) change.moveToStartOfNode(n)
@@ -366,35 +365,37 @@ function AfterPlugin() {
     // DOM node, since that will make it go back to normal.
     const focusNode = document.getNode(target.focus.key)
     const el = findDOMNode(focusNode, window)
-    if (!el) return
 
-    el.dispatchEvent(
-      new MouseEvent('mouseup', {
-        view: window,
-        bubbles: true,
-        cancelable: true,
-      })
-    )
+    if (el) {
+      el.dispatchEvent(
+        new MouseEvent('mouseup', {
+          view: window,
+          bubbles: true,
+          cancelable: true,
+        })
+      )
+    }
+
+    next()
   }
 
   /**
    * On input.
    *
-   * @param {Event} eventvent
+   * @param {Event} event
    * @param {Change} change
+   * @param {Function} next
    */
 
-  function onInput(event, change, editor) {
-    debug('onInput', { event })
-
+  function onInput(event, change, next) {
     const window = getWindow(event.target)
-    const { value } = change
+    const { editor, value } = change
 
     // Get the selection point.
     const native = window.getSelection()
     const { anchorNode } = native
-    const point = findPoint(anchorNode, 0, value)
-    if (!point) return
+    const point = findPoint(anchorNode, 0, editor)
+    if (!point) return next()
 
     // Get the text node and leaf in question.
     const { document, selection } = value
@@ -428,7 +429,9 @@ function AfterPlugin() {
     }
 
     // If the text is no different, abort.
-    if (textContent == text) return
+    if (textContent == text) return next()
+
+    debug('onInput', { event })
 
     // Determine what the selection should be after changing the text.
     const delta = textContent.length - text.length
@@ -441,6 +444,7 @@ function AfterPlugin() {
 
     // Change the current value to have the leaf's text replaced.
     change.insertTextAtRange(entire, textContent, leaf.marks).select(corrected)
+    next()
   }
 
   /**
@@ -448,15 +452,15 @@ function AfterPlugin() {
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
+   * @param {Function} next
    */
 
-  function onKeyDown(event, change, editor) {
+  function onKeyDown(event, change, next) {
     debug('onKeyDown', { event })
 
-    const { value } = change
-    const { document, selection, schema } = value
-    const hasVoidParent = document.hasVoidParent(selection.start.path, schema)
+    const { editor, value } = change
+    const { document, selection } = value
+    const hasVoidParent = document.hasVoidParent(selection.start.path, editor)
 
     // COMPAT: In iOS, some of these hotkeys are handled in the
     // `onNativeBeforeInput` handler of the `<Content>` component in order to
@@ -526,14 +530,22 @@ function AfterPlugin() {
     // an inline is selected, we need to handle these hotkeys manually because
     // browsers won't know what to do.
     if (Hotkeys.isMoveBackward(event)) {
-      if (hasVoidParent || value.startText.text == '') {
+      const { previousText, startText } = value
+      const isPreviousInVoid =
+        previousText && document.hasVoidParent(previousText.key, editor)
+
+      if (hasVoidParent || isPreviousInVoid || startText.text == '') {
         event.preventDefault()
         return change.moveBackward()
       }
     }
 
     if (Hotkeys.isMoveForward(event)) {
-      if (hasVoidParent || value.startText.text == '') {
+      const { nextText, startText } = value
+      const isNextInVoid =
+        nextText && document.hasVoidParent(nextText.key, editor)
+
+      if (hasVoidParent || isNextInVoid || startText.text == '') {
         event.preventDefault()
         return change.moveForward()
       }
@@ -542,7 +554,7 @@ function AfterPlugin() {
     if (Hotkeys.isExtendBackward(event)) {
       const { previousText, startText } = value
       const isPreviousInVoid =
-        previousText && document.hasVoidParent(previousText.key, schema)
+        previousText && document.hasVoidParent(previousText.key, editor)
 
       if (hasVoidParent || isPreviousInVoid || startText.text == '') {
         event.preventDefault()
@@ -553,13 +565,15 @@ function AfterPlugin() {
     if (Hotkeys.isExtendForward(event)) {
       const { nextText, startText } = value
       const isNextInVoid =
-        nextText && document.hasVoidParent(nextText.key, schema)
+        nextText && document.hasVoidParent(nextText.key, editor)
 
       if (hasVoidParent || isNextInVoid || startText.text == '') {
         event.preventDefault()
         return change.moveFocusForward()
       }
     }
+
+    next()
   }
 
   /**
@@ -567,12 +581,13 @@ function AfterPlugin() {
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
+   * @param {Function} next
    */
 
-  function onPaste(event, change, editor) {
+  function onPaste(event, change, next) {
     debug('onPaste', { event })
 
+    const { value } = change
     const transfer = getEventTransfer(event)
     const { type, fragment, text } = transfer
 
@@ -581,10 +596,9 @@ function AfterPlugin() {
     }
 
     if (type == 'text' || type == 'html') {
-      if (!text) return
-      const { value } = change
-      const { document, selection, startBlock, schema } = value
-      if (schema.isVoid(startBlock)) return
+      if (!text) return next()
+      const { document, selection, startBlock } = value
+      if (change.isVoid(startBlock)) return next()
 
       const defaultBlock = startBlock
       const defaultMarks = document.getInsertMarksAtRange(selection)
@@ -592,6 +606,8 @@ function AfterPlugin() {
         .document
       change.insertFragment(frag)
     }
+
+    next()
   }
 
   /**
@@ -599,15 +615,15 @@ function AfterPlugin() {
    *
    * @param {Event} event
    * @param {Change} change
-   * @param {Editor} editor
+   * @param {Function} next
    */
 
-  function onSelect(event, change, editor) {
+  function onSelect(event, change, next) {
     debug('onSelect', { event })
 
     const window = getWindow(event.target)
-    const { value } = change
-    const { document, schema } = value
+    const { editor, value } = change
+    const { document } = value
     const native = window.getSelection()
 
     // If there are no ranges, the editor was blurred natively.
@@ -617,7 +633,7 @@ function AfterPlugin() {
     }
 
     // Otherwise, determine the Slate selection from the native one.
-    let range = findRange(native, value)
+    let range = findRange(native, editor)
     if (!range) return
 
     const { anchor, focus } = range
@@ -637,10 +653,10 @@ function AfterPlugin() {
     // selection, go with `0`. (2017/09/07)
     if (
       anchorBlock &&
-      !schema.isVoid(anchorBlock) &&
+      !change.isVoid(anchorBlock) &&
       anchor.offset == 0 &&
       focusBlock &&
-      schema.isVoid(focusBlock) &&
+      change.isVoid(focusBlock) &&
       focus.offset != 0
     ) {
       range = range.setFocus(focus.setOffset(0))
@@ -651,104 +667,33 @@ function AfterPlugin() {
     // standardizes the behavior, since it's indistinguishable to the user.
     if (
       anchorInline &&
-      !schema.isVoid(anchorInline) &&
+      !change.isVoid(anchorInline) &&
       anchor.offset == anchorText.text.length
     ) {
       const block = document.getClosestBlock(anchor.key)
-      const next = block.getNextText(anchor.key)
-      if (next) range = range.moveAnchorTo(next.key, 0)
+      const nextText = block.getNextText(anchor.key)
+      if (nextText) range = range.moveAnchorTo(nextText.key, 0)
     }
 
     if (
       focusInline &&
-      !schema.isVoid(focusInline) &&
+      !change.isVoid(focusInline) &&
       focus.offset == focusText.text.length
     ) {
       const block = document.getClosestBlock(focus.key)
-      const next = block.getNextText(focus.key)
-      if (next) range = range.moveFocusTo(next.key, 0)
+      const nextText = block.getNextText(focus.key)
+      if (nextText) range = range.moveFocusTo(nextText.key, 0)
     }
 
     let selection = document.createSelection(range)
     selection = selection.setIsFocused(true)
+
+    // Preserve active marks from the current selection.
+    // They will be cleared by `change.select` if the selection actually moved.
+    selection = selection.set('marks', value.selection.marks)
+
     change.select(selection)
-  }
-
-  /**
-   * Render editor.
-   *
-   * @param {Object} props
-   * @param {Editor} editor
-   * @return {Object}
-   */
-
-  function renderEditor(props, editor) {
-    const { handlers } = editor
-    return (
-      <Content
-        {...handlers}
-        autoCorrect={props.autoCorrect}
-        className={props.className}
-        editor={editor}
-        readOnly={props.readOnly}
-        role={props.role}
-        spellCheck={props.spellCheck}
-        style={props.style}
-        tabIndex={props.tabIndex}
-        tagName={props.tagName}
-      />
-    )
-  }
-
-  /**
-   * Render node.
-   *
-   * @param {Object} props
-   * @return {Element}
-   */
-
-  function renderNode(props) {
-    const { attributes, children, node } = props
-    if (node.object != 'block' && node.object != 'inline') return
-    const Tag = node.object == 'block' ? 'div' : 'span'
-    const style = { position: 'relative' }
-    return (
-      <Tag {...attributes} style={style}>
-        {children}
-      </Tag>
-    )
-  }
-
-  /**
-   * Render placeholder.
-   *
-   * @param {Object} props
-   * @return {Element}
-   */
-
-  function renderPlaceholder(props) {
-    const { editor, node } = props
-    if (!editor.props.placeholder) return
-    if (editor.state.isComposing) return
-    if (node.object != 'block') return
-    if (!Text.isTextList(node.nodes)) return
-    if (node.text != '') return
-    if (editor.value.document.getBlocks().size > 1) return
-
-    const style = {
-      pointerEvents: 'none',
-      display: 'inline-block',
-      width: '0',
-      maxWidth: '100%',
-      whiteSpace: 'nowrap',
-      opacity: '0.333',
-    }
-
-    return (
-      <span contentEditable={false} style={style}>
-        {editor.props.placeholder}
-      </span>
-    )
+    next()
   }
 
   /**
@@ -764,16 +709,12 @@ function AfterPlugin() {
     onCopy,
     onCut,
     onDragEnd,
-    onDragOver,
     onDragStart,
     onDrop,
     onInput,
     onKeyDown,
     onPaste,
     onSelect,
-    renderEditor,
-    renderNode,
-    renderPlaceholder,
   }
 }
 

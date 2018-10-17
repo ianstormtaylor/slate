@@ -22,8 +22,8 @@ class App extends React.Component {
     this.setState({ value })
   }
 
-  onKeyDown = (event, change) => {
-    if (event.key != 'b' || !event.ctrlKey) return
+  onKeyDown = (event, change, next) => {
+    if (event.key != 'b' || !event.ctrlKey) return next()
     event.preventDefault()
     change.toggleMark('bold')
     return true
@@ -40,10 +40,12 @@ class App extends React.Component {
     )
   }
 
-  renderMark = props => {
+  renderMark = (props, next) => {
     switch (props.mark.type) {
       case 'bold':
         return <strong {...props.attributes}>{props.children}</strong>
+      default:
+        return next()
     }
   }
 }
@@ -70,9 +72,9 @@ function MarkHotkey(options) {
 
   // Return our "plugin" object, containing the `onKeyDown` handler.
   return {
-    onKeyDown(event, change) {
-      // Check that the key pressed matches our `key` option.
-      if (!event.ctrlKey || event.key != key) return
+    onKeyDown(event, change, next) {
+      // If it doesn't match our `key`, let other plugins handle it.
+      if (!event.ctrlKey || event.key != key) return next()
 
       // Prevent the default characters from being inserted.
       event.preventDefault()
@@ -120,10 +122,12 @@ class App extends React.Component {
     )
   }
 
-  renderMark = props => {
+  renderMark = (props, next) => {
     switch (props.mark.type) {
       case 'bold':
         return <strong>{props.children}</strong>
+      default:
+        return next()
     }
   }
 }
@@ -163,7 +167,7 @@ class App extends React.Component {
     )
   }
 
-  renderMark = props => {
+  renderMark = (props, next) => {
     switch (props.mark.type) {
       case 'bold':
         return <strong>{props.children}</strong>
@@ -176,6 +180,8 @@ class App extends React.Component {
         return <del>{props.children}</del>
       case 'underline':
         return <u>{props.children}</u>
+      default:
+        return next()
     }
   }
 }

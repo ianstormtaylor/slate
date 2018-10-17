@@ -10,13 +10,14 @@ Let's start with a basic editor:
 
 ```js
 import { Editor } from 'slate-react'
+import Plain from 'slate-plain-serializer'
 
 class App extends React.Component {
   state = {
     value: Plain.deserialize(''),
   }
 
-  onChange({ value }) {
+  onChange = ({ value }) => {
     this.setState({ value })
   }
 
@@ -28,7 +29,7 @@ class App extends React.Component {
 
 That will render a basic Slate editor on your page.
 
-Now... we need to add the [`Html`](../reference/serializers/html.md) serializer. And to do that, we need to tell it a bit about the schema we plan on using. For this example, we'll work with a schema that has a few different parts:
+Now... we need to add the [`Html`](../reference/slate-html-serializer/index.md) serializer. And to do that, we need to tell it a bit about the schema we plan on using. For this example, we'll work with a schema that has a few different parts:
 
 * A `paragraph` block.
 * A `code` block for code samples.
@@ -263,7 +264,7 @@ class App extends React.Component {
     )
   }
 
-  renderNode = props => {
+  renderNode = (props, next) => {
     switch (props.node.type) {
       case 'code':
         return (
@@ -279,11 +280,13 @@ class App extends React.Component {
         )
       case 'quote':
         return <blockquote {...props.attributes}>{props.children}</blockquote>
+      default:
+        return next()
     }
   }
 
   // Add a `renderMark` method to render marks.
-  renderMark = props => {
+  renderMark = (props, next) => {
     const { mark, attributes } = props
     switch (mark.type) {
       case 'bold':
@@ -292,6 +295,8 @@ class App extends React.Component {
         return <em {...attributes}>{props.children}</em>
       case 'underline':
         return <u {...attributes}>{props.children}</u>
+      default:
+        return next()
     }
   }
 }
