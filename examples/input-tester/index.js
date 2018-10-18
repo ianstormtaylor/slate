@@ -210,6 +210,19 @@ class InputTester extends React.Component {
     window.document.addEventListener('selectionchange', this.onEvent)
   }
 
+  componentWillUnmount() {
+    const editor = this.el.querySelector('[contenteditable="true"]')
+    editor.removeEventListener('keydown', this.onEvent)
+    editor.removeEventListener('keyup', this.onEvent)
+    editor.removeEventListener('keypress', this.onEvent)
+    editor.removeEventListener('input', this.onEvent)
+    editor.removeEventListener('beforeinput', this.onEvent)
+    editor.removeEventListener('compositionstart', this.onEvent)
+    editor.removeEventListener('compositionupdate', this.onEvent)
+    editor.removeEventListener('compositionend', this.onEvent)
+    window.document.removeEventListener('selectionchange', this.onEvent)
+  }
+
   ref = editor => {
     this.editor = editor
   }
