@@ -8,6 +8,7 @@ import { Icon } from '../components'
 import { createArrayValue } from 'react-values'
 
 const EventsValue = createArrayValue()
+let itemCount = 0
 
 const Wrapper = styled('div')`
   position: relative;
@@ -114,7 +115,7 @@ const RangeCell = ({ value }) =>
 
 const EventsList = () => (
   <EventsValue>
-    {({ value: events }) => (
+    {({ value: eventrows }) => (
       <EventsWrapper>
         <EventsTable>
           <thead>
@@ -126,6 +127,7 @@ const EventsList = () => (
                   onMouseDown={e => {
                     e.preventDefault()
                     EventsValue.clear()
+                    itemCount = 0
                   }}
                 >
                   block
@@ -143,18 +145,16 @@ const EventsList = () => (
               <th>findSelection</th>
             </tr>
           </thead>
-          <tbody>
-            {events.map((props, i) => <Event key={i} {...props} />)}
-          </tbody>
+          <tbody>{eventrows}</tbody>
         </EventsTable>
       </EventsWrapper>
     )}
   </EventsValue>
 )
 
-const Event = ({ event, targetRange, selection }) => {
+const EventRow = ({ key, event, targetRange, selection }) => {
   return (
-    <tr>
+    <tr key={key}>
       <td />
       <td>
         <TypeCell event={event} />
@@ -299,7 +299,6 @@ class InputTester extends React.Component {
 
   recordEvent = event => {
     const { editor } = this
-    const { value } = editor
     let targetRange
 
     if (event.getTargetRanges) {
@@ -312,13 +311,16 @@ class InputTester extends React.Component {
       ? nativeSelection.getRangeAt(0)
       : undefined
     const selection = nativeRange && findRange(nativeRange, editor)
-
-    EventsValue.push({
+    const key = itemCount++
+    if (itemCount > 150) EventsValue.shift()
+    const tr = EventRow({
+      key,
       event,
-      value,
       targetRange,
       selection,
     })
+
+    EventsValue.push(tr)
   }
 
   logEvent = event => {
