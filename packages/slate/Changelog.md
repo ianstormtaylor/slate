@@ -65,7 +65,7 @@ For example, you might define an `getActiveList` query:
 ```js
 const plugin = {
   queries: {
-    getActiveList(value) {},
+    getActiveList(editor) {},
   },
 }
 ```
@@ -73,8 +73,7 @@ const plugin = {
 And then be able to re-use that logic easily in different places in your codebase, or pass in the query name to a plugin that can use your custom logic itself:
 
 ```js
-const { value } = change
-const list = change.getActiveList(value)
+const list = change.getActiveList()
 
 if (list) {
   ...
