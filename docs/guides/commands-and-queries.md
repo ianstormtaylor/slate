@@ -207,7 +207,7 @@ The same thing goes for queries, which can be defined in plugins and re-used acr
 ```js
 const yourPlugin = {
   queries: {
-    getActiveListItem(value) {
+    getActiveListItem(editor) {
       ...
     }
   }
@@ -217,7 +217,7 @@ const yourPlugin = {
 And then you can use them:
 
 ```js
-change.getActiveListItem(change.value)
+change.getActiveListItem()
 ```
 
 This reusability is key to being able to organize your commands and queries, and compose them together to create more advanced behaviors.

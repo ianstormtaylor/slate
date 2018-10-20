@@ -160,7 +160,7 @@ Each command has a signature of `(change, ...args)`.
 ```js
 {
   queries: {
-    getActiveList(value) {
+    getActiveList(editor) {
       ...
     }
   }
@@ -169,7 +169,7 @@ Each command has a signature of `(change, ...args)`.
 
 The `queries` shorthand defines a set of custom queries that are made available in the editor, and as first-class methods on the `change` objects created by the editor.
 
-Each query has a signature of `(...args)`.
+Each query has a signature of `(editor, ...args)`.
 
 ### `schema`
 
