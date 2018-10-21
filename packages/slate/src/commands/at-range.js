@@ -455,7 +455,8 @@ Commands.deleteWordForwardAtRange = (change, range) => {
   const offset = startBlock.getOffset(start.key)
   const o = offset + start.offset
   const { text } = startBlock
-  const n = TextUtils.getWordOffsetForward(text, o)
+  const wordOffset = TextUtils.getWordOffsetForward(text, o)
+  const n = wordOffset === 0 ? 1 : wordOffset
   change.deleteForwardAtRange(range, n)
 }
 
