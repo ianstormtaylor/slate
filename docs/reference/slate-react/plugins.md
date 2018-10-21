@@ -109,14 +109,18 @@ This handler is called whenever the native DOM selection changes.
 
 `Function renderEditor(props: Object, next: Function) => ReactNode|Void`
 
-The `renderEditor` property allows you to define higher-order-component-like behavior. It is passed all of the properties of the editor, including `children`, which you can access as `next()`. You can then choose to wrap the existing `children` in any custom elements or proxy the properties however you choose. This can be useful for rendering toolbars, styling the editor, rendering validation, etc. Remember that the `renderEditor` function has to render `children` for editor's content to render. For example:
+The `renderEditor` property allows you to define higher-order-component-like behavior. It is passed all of the properties of the editor, including `children`, which you can access as `next()`. You can then choose to wrap the existing `children` in any custom elements or proxy the properties however you choose. Note, that multiple plugins can define `renderEditor` and each one can add a specific behaviour to the editor, as `next()` refers to `children` from another plugin in the stack. This can be useful for rendering toolbars, styling the editor, rendering validation, etc, and each plugin can be responsible for a given functionality only, keeping your code dry and well organized. Just remember that the `renderEditor` function has to render `children` for editor's content to render. For example:
 ```js
-renderEditor: ({ editor }, next) => (
-  <div>
-    <MyToolbarComponent editor={editor} />
-    <MyEditorComponent editor={editor}>{next()}</MyEditorComponent>
-  </div>
-)
+renderEditor: (props, next) => {
+  const children = next();
+
+  return (
+    <div>
+      <MyToolbarComponent editor={props.editor} />
+      <MyEditorComponent editor={props.editor}>{children}</MyEditorComponent>
+    </div>
+  );
+}
 ```
 
 ### `renderMark`
