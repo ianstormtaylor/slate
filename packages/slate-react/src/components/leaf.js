@@ -142,7 +142,12 @@ class Leaf extends React.Component {
       parent.text === '' &&
       parent.nodes.last() === node
     ) {
-      return <span data-slate-zero-width="n">{'\uFEFF'}</span>
+      return (
+        <span data-slate-zero-width="n">
+          {'\uFEFF'}
+          <br />
+        </span>
+      )
     }
 
     // COMPAT: If the text is empty, it's because it's on the edge of an inline
