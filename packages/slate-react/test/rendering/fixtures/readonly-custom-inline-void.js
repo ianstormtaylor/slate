@@ -55,7 +55,7 @@ export const output = `
     </span>
     <span>
       <span>
-        <span data-slate-zero-width="n">&#xFEFF;</span>
+        <br />
       </span>
     </span>
   </div>

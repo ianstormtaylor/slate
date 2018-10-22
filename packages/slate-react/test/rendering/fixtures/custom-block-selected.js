@@ -59,7 +59,7 @@ export const output = `
   <div style="position:relative">
     <span>
       <span>
-        <span data-slate-zero-width="n">&#xFEFF;</span>
+        <br />
       </span>
     </span>
   </div>
@@ -78,7 +78,7 @@ export const output = `
   <div style="position:relative">
     <span>
       <span>
-        <span data-slate-zero-width="n">&#xFEFF;</span>
+        <br />
       </span>
     </span>
   </div>
