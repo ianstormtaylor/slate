@@ -88,7 +88,7 @@ When you decide you want to make a change to the Slate value, you're almost alwa
 The first place, is inside a Slate-controlled event handler, like `onKeyDown` or `onPaste`. These handlers take a signature of `event, change, next`. That `change` argument is a [`Change`](../reference/slate/change.md) object that you can manipulate. For example...
 
 ```js
-function onKeyDown(event, change, editor) {
+function onKeyDown(event, change, next) {
   if (event.key == 'Enter') {
     change.splitBlock()
   }
