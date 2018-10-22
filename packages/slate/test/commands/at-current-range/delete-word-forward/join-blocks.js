@@ -9,10 +9,10 @@ export default function(change) {
 export const input = (
   <value>
     <document>
-      <paragraph>word<cursor /></paragraph>
       <paragraph>
-        another
+        word<cursor />
       </paragraph>
+      <paragraph>another</paragraph>
     </document>
   </value>
 )
