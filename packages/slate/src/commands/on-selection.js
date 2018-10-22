@@ -2,6 +2,7 @@ import { is } from 'immutable'
 import pick from 'lodash/pick'
 
 import Selection from '../models/selection'
+import TextUtils from '../utils/text-utils'
 
 const Commands = {}
 
@@ -26,8 +27,16 @@ Commands.moveAnchorBackward = (change, ...args) => {
   change.call(pointBackward, 'anchor', ...args)
 }
 
+Commands.moveAnchorWordBackward = (change, ...args) => {
+  change.call(pointWordBackward, 'anchor', ...args)
+}
+
 Commands.moveAnchorForward = (change, ...args) => {
   change.call(pointForward, 'anchor', ...args)
+}
+
+Commands.moveAnchorWordForward = (change, ...args) => {
+  change.call(pointWordForward, 'anchor', ...args)
 }
 
 Commands.moveAnchorTo = (change, ...args) => {
@@ -126,12 +135,24 @@ Commands.moveBackward = (change, ...args) => {
   change.moveAnchorBackward(...args).moveFocusBackward(...args)
 }
 
+Commands.moveWordBackward = (change, ...args) => {
+  change.moveFocusWordBackward(...args).moveToFocus()
+}
+
 Commands.moveEndBackward = (change, ...args) => {
   change.call(pointBackward, 'end', ...args)
 }
 
+Commands.moveEndWordBackward = (change, ...args) => {
+  change.call(pointWordBackward, 'end', ...args)
+}
+
 Commands.moveEndForward = (change, ...args) => {
   change.call(pointForward, 'end', ...args)
+}
+
+Commands.moveEndWordForward = (change, ...args) => {
+  change.call(pointWordForward, 'end', ...args)
 }
 
 Commands.moveEndTo = (change, ...args) => {
@@ -230,8 +251,16 @@ Commands.moveFocusBackward = (change, ...args) => {
   change.call(pointBackward, 'focus', ...args)
 }
 
+Commands.moveFocusWordBackward = (change, ...args) => {
+  change.call(pointWordBackward, 'focus', ...args)
+}
+
 Commands.moveFocusForward = (change, ...args) => {
   change.call(pointForward, 'focus', ...args)
+}
+
+Commands.moveFocusWordForward = (change, ...args) => {
+  change.call(pointWordForward, 'focus', ...args)
 }
 
 Commands.moveFocusTo = (change, ...args) => {
@@ -330,12 +359,24 @@ Commands.moveForward = (change, ...args) => {
   change.moveAnchorForward(...args).moveFocusForward(...args)
 }
 
+Commands.moveWordForward = (change, ...args) => {
+  change.moveFocusWordForward(...args).moveToFocus(...args)
+}
+
 Commands.moveStartBackward = (change, ...args) => {
   change.call(pointBackward, 'start', ...args)
 }
 
+Commands.moveStartWordBackward = (change, ...args) => {
+  change.call(pointWordBackward, 'start', ...args)
+}
+
 Commands.moveStartForward = (change, ...args) => {
   change.call(pointForward, 'start', ...args)
+}
+
+Commands.moveStartWordForward = (change, ...args) => {
+  change.call(pointWordForward, 'start', ...args)
 }
 
 Commands.moveStartTo = (change, ...args) => {
@@ -716,6 +757,30 @@ function pointForward(change, point, n = 1) {
     const range = change.value.selection[`move${Point}Forward`](n)
     change.select(range)
   }
+}
+
+function pointWordBackward(change, pointName) {
+  const { value } = change
+  const { document, selection } = value
+  const point = selection[pointName]
+  const block = document.getClosestBlock(point.key)
+  const offset = block.getOffset(point.key)
+  const o = offset + point.offset
+  const { text } = block
+  const n = TextUtils.getWordOffsetBackward(text, o)
+  change.call(pointBackward, pointName, n > 0 ? n : 1)
+}
+
+function pointWordForward(change, pointName) {
+  const { value } = change
+  const { document, selection } = value
+  const point = selection[pointName]
+  const block = document.getClosestBlock(point.key)
+  const offset = block.getOffset(point.key)
+  const o = offset + point.offset
+  const { text } = block
+  const n = TextUtils.getWordOffsetForward(text, o)
+  change.call(pointForward, pointName, n > 0 ? n : 1)
 }
 
 export default Commands

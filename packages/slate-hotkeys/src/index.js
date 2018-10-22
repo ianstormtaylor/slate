@@ -10,8 +10,10 @@ import { IS_IOS, IS_MAC } from 'slate-dev-environment'
 const HOTKEYS = {
   bold: 'mod+b',
   compose: ['down', 'left', 'right', 'up', 'backspace', 'enter'],
-  moveBackward: 'mod?+ctrl?+alt?+left',
-  moveForward: 'mod?+ctrl?+alt?+right',
+  moveBackward: 'left',
+  moveForward: 'right',
+  moveWordBackward: 'ctrl+left',
+  moveWordForward: 'ctrl+right',
   deleteBackward: 'shift?+backspace',
   deleteForward: 'shift?+delete',
   extendBackward: 'shift+left',
@@ -24,6 +26,8 @@ const HOTKEYS = {
 const APPLE_HOTKEYS = {
   moveLineBackward: 'opt+up',
   moveLineForward: 'opt+down',
+  moveWordBackward: 'opt+left',
+  moveWordForward: 'opt+right',
   deleteBackward: ['ctrl+backspace', 'ctrl+h'],
   deleteForward: ['ctrl+delete', 'ctrl+d'],
   deleteLineBackward: 'cmd+shift?+backspace',
