@@ -644,6 +644,34 @@ Commands.unwrapNodeByPath = (change, path) => {
 }
 
 /**
+ * Unwrap all of the children of a node, by removing the node and replacing it
+ * with the children in the tree.
+ *
+ * @param {Change} change
+ * @param {Array} path
+ */
+
+Commands.unwrapChildrenByPath = (change, path) => {
+  path = PathUtils.create(path)
+  const { value } = change
+  const { document } = value
+  const node = document.assertNode(path)
+  const parentPath = PathUtils.lift(path)
+  const index = path.last()
+  const { nodes } = node
+
+  change.withoutNormalizing(() => {
+    nodes.reverse().forEach((child, i) => {
+      const childIndex = nodes.size - i - 1
+      const childPath = path.push(childIndex)
+      change.moveNodeByPath(childPath, parentPath, index + 1)
+    })
+
+    change.removeNodeByPath(path)
+  })
+}
+
+/**
  * Wrap a node in a block with `properties`.
  *
  * @param {Change} change
@@ -713,18 +741,19 @@ const COMMANDS = [
   'insertNode',
   'insertText',
   'mergeNode',
-  'removeMark',
   'removeAllMarks',
+  'removeMark',
   'removeNode',
-  'setText',
-  'replaceText',
   'removeText',
   'replaceNode',
+  'replaceText',
   'setMark',
   'setNode',
+  'setText',
   'splitNode',
-  'unwrapInline',
   'unwrapBlock',
+  'unwrapChildren',
+  'unwrapInline',
   'unwrapNode',
   'wrapBlock',
   'wrapInline',
