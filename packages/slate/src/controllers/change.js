@@ -327,7 +327,7 @@ function getDirtyPaths(operation) {
     case 'set_mark': {
       return [path]
     }
-    
+
     case 'set_node':
     case 'insert_node': {
       const table = node.getKeysToPathsTable()
