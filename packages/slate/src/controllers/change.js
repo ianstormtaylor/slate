@@ -326,7 +326,8 @@ function getDirtyPaths(operation) {
     case 'remove_text':
     case 'set_mark':
     case 'set_node': {
-      return [path]
+      const ancestors = PathUtils.getAncestors(path).toArray()
+      return [...ancestors, path]
     }
 
     case 'insert_node': {
