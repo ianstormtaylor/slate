@@ -40,7 +40,7 @@
     "html-webpack-template": "^6.1.0",
     "image-extensions": "^1.1.0",
     "immutable": "^3.8.1",
-    "is-hotkey": "^0.1.1",
+    "is-hotkey": "^0.1.4",
     "is-url": "^1.2.2",
     "jsdom": "^11.5.1",
     "lerna": "^2.7.1",
