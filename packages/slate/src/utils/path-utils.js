@@ -77,6 +77,23 @@ function decrement(path, n = 1, index = path.size - 1) {
 }
 
 /**
+ * Get all ancestor paths of th given path.
+ *
+ * @param {List} path
+ * @returns {List}
+ */
+
+function getAncestors(path) {
+  let ancestors = new List()
+
+  for (let i = 0; i < path.size; i++) {
+    ancestors = ancestors.push(path.slice(0, i))
+  }
+
+  return ancestors
+}
+
+/**
  * Increment a `path` by `n` at `index`, defaulting to the last index.
  *
  * @param {List} path
@@ -358,6 +375,7 @@ export default {
   create,
   crop,
   decrement,
+  getAncestors,
   increment,
   isAbove,
   isAfter,
