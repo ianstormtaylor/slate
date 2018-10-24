@@ -362,7 +362,7 @@ Move the current selection's anchor point to the start of a `node` and its focus
 
 ### `moveToRangeOfDocument`
 
-`moveToRangeOf() => Change`
+`moveToRangeOfDocument() => Change`
 
 Move the current selection's anchor point to the start of the document and its focus point to the end of the document, selecting everything.
 
