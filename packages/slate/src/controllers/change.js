@@ -324,11 +324,11 @@ function getDirtyPaths(operation) {
     case 'insert_text':
     case 'remove_mark':
     case 'remove_text':
-    case 'set_mark':
-    case 'set_node': {
+    case 'set_mark': {
       return [path]
     }
-
+    
+    case 'set_node':
     case 'insert_node': {
       const table = node.getKeysToPathsTable()
       const paths = Object.values(table).map(p => path.concat(p))
