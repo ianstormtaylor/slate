@@ -326,26 +326,27 @@ function getDirtyPaths(operation) {
     case 'remove_text':
     case 'set_mark':
     case 'set_node': {
-      return [path]
+      const ancestors = PathUtils.getAncestors(path).toArray()
+      return [...ancestors, path]
     }
 
     case 'insert_node': {
       const table = node.getKeysToPathsTable()
       const paths = Object.values(table).map(p => path.concat(p))
-      const parentPath = PathUtils.lift(path)
-      return [parentPath, path, ...paths]
+      const ancestors = PathUtils.getAncestors(path).toArray()
+      return [...ancestors, path, ...paths]
     }
 
     case 'split_node': {
-      const parentPath = PathUtils.lift(path)
+      const ancestors = PathUtils.getAncestors(path).toArray()
       const nextPath = PathUtils.increment(path)
-      return [parentPath, path, nextPath]
+      return [...ancestors, path, nextPath]
     }
 
     case 'merge_node': {
-      const parentPath = PathUtils.lift(path)
+      const ancestors = PathUtils.getAncestors(path).toArray()
       const previousPath = PathUtils.decrement(path)
-      return [parentPath, previousPath]
+      return [...ancestors, previousPath]
     }
 
     case 'move_node': {
@@ -364,12 +365,15 @@ function getDirtyPaths(operation) {
         }
       }
 
-      return [parentPath, newParentPath]
+      const oldAncestors = PathUtils.getAncestors(parentPath).toArray()
+      const newAncestors = PathUtils.getAncestors(newParentPath).toArray()
+
+      return [...oldAncestors, parentPath, ...newAncestors, newParentPath]
     }
 
     case 'remove_node': {
-      const parentPath = PathUtils.lift(path)
-      return [parentPath]
+      const ancestors = PathUtils.getAncestors(path).toArray()
+      return [...ancestors]
     }
 
     default: {
