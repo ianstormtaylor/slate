@@ -121,3 +121,9 @@ npm run release
 ```
 
 And follow the prompts Lerna gives you.
+
+
+Name:  Sreelakshmi T D
+Place:  Kerala,India
+GitHub:  SreelakshmiTD
+LinkedIn:  Sreelakshmi T D
