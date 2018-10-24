@@ -526,6 +526,33 @@ function AfterPlugin(options = {}) {
       return change.moveFocusToEndOfBlock()
     }
 
+    // Note, these need to come before `isMoveForward()` and `isMoveBackward()`
+    if (Hotkeys.isExtendBackward(event)) {
+      const { previousText, startText } = value
+      const isPreviousInVoid =
+        previousText && document.hasVoidParent(previousText.key, editor)
+
+      if (hasVoidParent || isPreviousInVoid || startText.text == '') {
+        event.preventDefault()
+        return change.moveFocusBackward()
+      }
+
+      return true
+    }
+
+    if (Hotkeys.isExtendForward(event)) {
+      const { nextText, startText } = value
+      const isNextInVoid =
+        nextText && document.hasVoidParent(nextText.key, editor)
+
+      if (hasVoidParent || isNextInVoid || startText.text == '') {
+        event.preventDefault()
+        return change.moveFocusForward()
+      }
+
+      return true
+    }
+
     // COMPAT: If a void node is selected, or a zero-width text node adjacent to
     // an inline is selected, we need to handle these hotkeys manually because
     // browsers won't know what to do.
@@ -557,28 +584,6 @@ function AfterPlugin(options = {}) {
     if (Hotkeys.isMoveWordForward(event)) {
       event.preventDefault()
       return change.moveWordForward()
-    }
-
-    if (Hotkeys.isExtendBackward(event)) {
-      const { previousText, startText } = value
-      const isPreviousInVoid =
-        previousText && document.hasVoidParent(previousText.key, editor)
-
-      if (hasVoidParent || isPreviousInVoid || startText.text == '') {
-        event.preventDefault()
-        return change.moveFocusBackward()
-      }
-    }
-
-    if (Hotkeys.isExtendForward(event)) {
-      const { nextText, startText } = value
-      const isNextInVoid =
-        nextText && document.hasVoidParent(nextText.key, editor)
-
-      if (hasVoidParent || isNextInVoid || startText.text == '') {
-        event.preventDefault()
-        return change.moveFocusForward()
-      }
     }
 
     next()
