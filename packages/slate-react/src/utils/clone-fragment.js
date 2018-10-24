@@ -114,6 +114,7 @@ function cloneFragment(event, editor, callback = () => undefined) {
     event.clipboardData.setData(FRAGMENT, encoded)
     event.clipboardData.setData(HTML, div.innerHTML)
     callback()
+    return
   }
 
   // COMPAT: For browser that don't support the Clipboard API's setData method,
