@@ -342,6 +342,11 @@ function transform(path, operation) {
     const { newPath: np } = operation
     const npIndex = np.size - 1
     const npEqual = isEqual(np, path)
+
+    if (npEqual) {
+      return List([path])
+    }
+
     const npYounger = isYounger(np, path)
     const npAbove = isAbove(np, path)
 

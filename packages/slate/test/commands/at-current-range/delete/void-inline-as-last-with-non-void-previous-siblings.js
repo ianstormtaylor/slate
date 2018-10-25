@@ -9,13 +9,14 @@ export default function(change) {
 export const input = (
   <value>
     <document>
-      <anchor />
-      <paragraph>Hi</paragraph>
+      <paragraph>
+        <anchor />Hi
+      </paragraph>
       <paragraph>there</paragraph>
       <paragraph>
-        <emoji>😊</emoji>
+        <emoji />
+        <focus />
       </paragraph>
-      <focus />
     </document>
   </value>
 )
