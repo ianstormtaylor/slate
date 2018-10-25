@@ -167,6 +167,20 @@ function BeforePlugin() {
       editor.setState({ isComposing: true })
     }
 
+    const { value } = change
+    const { selection } = value
+
+    if (!selection.isCollapsed) {
+      // https://github.com/ianstormtaylor/slate/issues/1879
+      // When composition starts and the current selection is not collapsed, the
+      // second composition key-down would drop the text wrapping <spans> which
+      // resulted on crash in content.updateSelection after composition ends
+      // (because it cannot find <span> nodes in DOM). This is a workaround that
+      // erases selection as soon as composition starts and preventing <spans>
+      // to be dropped.
+      change.delete()
+    }
+
     debug('onCompositionStart', { event })
     next()
   }
