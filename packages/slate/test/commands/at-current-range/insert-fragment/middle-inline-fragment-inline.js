@@ -24,7 +24,6 @@ export const input = (
   </value>
 )
 
-// TODO: the cursor placement needs to be fixed
 export const output = (
   <value>
     <document>
