@@ -320,10 +320,13 @@ function getDirtyPaths(operation) {
   const { type, node, path, newPath } = operation
 
   switch (type) {
+    case 'remove_text': {
+      return [path]
+    }
+
     case 'add_mark':
     case 'insert_text':
     case 'remove_mark':
-    case 'remove_text':
     case 'set_mark':
     case 'set_node': {
       const ancestors = PathUtils.getAncestors(path).toArray()
