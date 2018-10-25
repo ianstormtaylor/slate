@@ -343,7 +343,7 @@ function transform(path, operation) {
     const npIndex = np.size - 1
     const npEqual = isEqual(np, path)
 
-    if (npEqual) {
+    if (isEqual(p, np)) {
       return List([path])
     }
 
