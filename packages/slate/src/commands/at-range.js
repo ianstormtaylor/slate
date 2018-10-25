@@ -668,6 +668,7 @@ Commands.insertFragmentAtRange = (change, range, fragment) => {
     const lastChild = fragment.nodes.last()
     const firstBlock = blocks.first()
     const lastBlock = blocks.last()
+    const insertionNode = findInsertionNode(fragment, document, startBlock.key)
 
     // If the fragment only contains a void block, use `insertBlock` instead.
     if (firstBlock === lastBlock && change.isVoid(firstBlock)) {
@@ -675,9 +676,12 @@ Commands.insertFragmentAtRange = (change, range, fragment) => {
       return
     }
 
-    // If the fragment starts or ends with single nested block, (e.g., table),
-    // do not merge this fragment with existing blocks.
-    if (firstChild.hasBlockChildren() || lastChild.hasBlockChildren()) {
+    // If inserting the entire fragment and it starts or ends with a single
+    // nested block, e.g. a table, we do not merge it with existing blocks.
+    if (
+      insertionNode === fragment &&
+      (firstChild.hasBlockChildren() || lastChild.hasBlockChildren())
+    ) {
       fragment.nodes.reverse().forEach(node => {
         change.insertBlockAtRange(range, node)
       })
@@ -685,17 +689,18 @@ Commands.insertFragmentAtRange = (change, range, fragment) => {
     }
 
     // If the first and last block aren't the same, we need to insert all of the
-    // nodes after the fragment's first block at the index.
+    // nodes after the insertion node's first block at the index.
     if (firstBlock != lastBlock) {
-      const lonelyParent = fragment.getFurthest(
+      const lonelyParent = insertionNode.getFurthest(
         firstBlock.key,
         p => p.nodes.size == 1
       )
       const lonelyChild = lonelyParent || firstBlock
-      const startIndex = parent.nodes.indexOf(startBlock)
-      fragment = fragment.removeNode(lonelyChild.key)
 
-      fragment.nodes.forEach((node, i) => {
+      const startIndex = parent.nodes.indexOf(startBlock)
+      const excludingLonelyChild = insertionNode.removeNode(lonelyChild.key)
+
+      excludingLonelyChild.nodes.forEach((node, i) => {
         const newIndex = startIndex + i + 1
         change.insertNodeByKey(parent.key, newIndex, node)
       })
@@ -748,6 +753,34 @@ Commands.insertFragmentAtRange = (change, range, fragment) => {
       })
     }
   })
+}
+
+const findInsertionNode = (fragment, document, startKey) => {
+  const hasSingleNode = object => object && object.nodes.size === 1
+  const firstNode = object => object && object.nodes.first()
+  let node = fragment
+
+  if (hasSingleNode(fragment)) {
+    let fragmentInner = firstNode(fragment)
+
+    const matches = documentNode => documentNode.type === fragmentInner.type
+    let documentInner = document.getFurthest(startKey, matches)
+
+    if (documentInner === document.getParent(startKey)) node = fragmentInner
+
+    while (hasSingleNode(fragmentInner) && hasSingleNode(documentInner)) {
+      fragmentInner = firstNode(fragmentInner)
+      documentInner = firstNode(documentInner)
+
+      if (fragmentInner.type === documentInner.type) {
+        node = fragmentInner
+      } else {
+        break
+      }
+    }
+  }
+
+  return node
 }
 
 /**
