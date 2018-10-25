@@ -176,7 +176,7 @@ const Event = ({ event, targetRange, selection }) => {
       </td>
       <td>
         <StringCell
-          value={event.dataTransfer && event.dataTransfer.get('text/plain')}
+          value={event.dataTransfer && event.dataTransfer.getData('text/plain')}
         />
       </td>
       <td>
