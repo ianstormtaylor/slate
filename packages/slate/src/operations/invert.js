@@ -37,6 +37,11 @@ function invertOperation(op) {
 
     case 'move_node': {
       const { newPath, path } = op
+
+      if (PathUtils.isEqual(newPath, path)) {
+        return op
+      }
+
       let inversePath = newPath
       let inverseNewPath = path
 
