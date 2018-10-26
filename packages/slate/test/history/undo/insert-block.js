@@ -3,13 +3,8 @@
 import h from '../../helpers/h'
 
 export default function(editor) {
-  editor.change(change => {
-    change.insertBlock('quote')
-  })
-
-  editor.change(change => {
-    change.undo()
-  })
+  editor.insertBlock('quote')
+  editor.flush().undo()
 }
 
 export const input = (

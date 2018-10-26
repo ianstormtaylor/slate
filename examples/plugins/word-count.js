@@ -10,7 +10,7 @@ const WordCounter = styled('span')`
 
 export default function WordCount(options) {
   return {
-    renderEditor(props, next) {
+    renderEditor(props, editor, next) {
       const children = next()
       const wordCount = props.value.document
         .getBlocks()

@@ -2,8 +2,8 @@
 
 import h from '../../../helpers/h'
 
-export default function(change) {
-  change.setInlines('emoji')
+export default function(editor) {
+  editor.setInlines('emoji')
 }
 
 export const input = (

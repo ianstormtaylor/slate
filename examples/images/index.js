@@ -35,17 +35,17 @@ function isImage(url) {
 /**
  * A change function to standardize inserting images.
  *
- * @param {Change} change
+ * @param {Editor} editor
  * @param {String} src
  * @param {Range} target
  */
 
-function insertImage(change, src, target) {
+function insertImage(editor, src, target) {
   if (target) {
-    change.select(target)
+    editor.select(target)
   }
 
-  change.insertBlock({
+  editor.insertBlock({
     type: 'image',
     data: { src },
   })
@@ -60,11 +60,11 @@ function insertImage(change, src, target) {
 const schema = {
   document: {
     last: { type: 'paragraph' },
-    normalize: (change, { code, node, child }) => {
+    normalize: (editor, { code, node, child }) => {
       switch (code) {
         case 'last_child_type_invalid': {
           const paragraph = Block.create('paragraph')
-          return change.insertNodeByKey(node.key, node.nodes.size, paragraph)
+          return editor.insertNodeByKey(node.key, node.nodes.size, paragraph)
         }
       }
     },
@@ -138,7 +138,7 @@ class Images extends React.Component {
    * @return {Element}
    */
 
-  renderNode = (props, next) => {
+  renderNode = (props, editor, next) => {
     const { attributes, node, isFocused } = props
 
     switch (node.type) {
@@ -156,7 +156,7 @@ class Images extends React.Component {
   /**
    * On change.
    *
-   * @param {Change} change
+   * @param {Editor} editor
    */
 
   onChange = ({ value }) => {
@@ -173,19 +173,18 @@ class Images extends React.Component {
     event.preventDefault()
     const src = window.prompt('Enter the URL of the image:')
     if (!src) return
-    this.editor.change(insertImage, src)
+    this.editor.command(insertImage, src)
   }
 
   /**
    * On drop, insert the image wherever it is dropped.
    *
    * @param {Event} event
-   * @param {Change} change
+   * @param {Editor} editor
    * @param {Function} next
    */
 
-  onDropOrPaste = (event, change, next) => {
-    const { editor } = change
+  onDropOrPaste = (event, editor, next) => {
     const target = getEventRange(event, editor)
     if (!target && event.type === 'drop') return next()
 
@@ -199,9 +198,7 @@ class Images extends React.Component {
         if (mime !== 'image') continue
 
         reader.addEventListener('load', () => {
-          editor.change(c => {
-            c.call(insertImage, reader.result, target)
-          })
+          editor.command(insertImage, reader.result, target)
         })
 
         reader.readAsDataURL(file)
@@ -212,7 +209,7 @@ class Images extends React.Component {
     if (type === 'text') {
       if (!isUrl(text)) return next()
       if (!isImage(text)) return next()
-      change.call(insertImage, text, target)
+      editor.command(insertImage, text, target)
       return
     }
 

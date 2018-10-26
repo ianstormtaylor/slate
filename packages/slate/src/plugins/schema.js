@@ -87,27 +87,28 @@ function SchemaPlugin(schema) {
    * fix the invalid node, or void if the node is valid.
    *
    * @param {Node} node
+   * @param {Editor} editor
    * @param {Function} next
    * @return {Function|Void}
    */
 
-  function normalizeNode(node, next) {
-    const error = validateNode(node, () => {})
+  function normalizeNode(node, editor, next) {
+    const error = validateNode(node, editor, () => {})
     if (!error) return next()
 
-    return change => {
+    return () => {
       const { rule } = error
-      const { size } = change.operations
+      const { size } = editor.operations
 
       // First run the user-provided `normalize` function if one exists...
       if (rule.normalize) {
-        rule.normalize(change, error)
+        rule.normalize(editor, error)
       }
 
-      // If the `normalize` function did not add any operations to the change
+      // If the `normalize` function did not add any operations to the editor
       // object, it can't have normalized, so run the default one.
-      if (change.operations.size === size) {
-        defaultNormalize(change, error)
+      if (editor.operations.size === size) {
+        defaultNormalize(editor, error)
       }
     }
   }
@@ -117,11 +118,12 @@ function SchemaPlugin(schema) {
    * invalid.
    *
    * @param {Node} node
+   * @param {Editor} editor
    * @param {Function} next
    * @return {Error|Void}
    */
 
-  function validateNode(node, next) {
+  function validateNode(node, editor, next) {
     const matches = schemaRules.filter(r => testRules(node, r.match))
     const failure = validateRules(node, matches, schemaRules, { every: true })
     if (!failure) return next()
@@ -150,11 +152,11 @@ function SchemaPlugin(schema) {
 /**
  * Normalize an invalid value with `error` with default remedies.
  *
- * @param {Change} change
+ * @param {Editor} editor
  * @param {SlateError} error
  */
 
-function defaultNormalize(change, error) {
+function defaultNormalize(editor, error) {
   const { code, node, child, next, previous, key, mark } = error
 
   switch (code) {
@@ -168,8 +170,8 @@ function defaultNormalize(change, error) {
       return child.object === 'text' &&
         node.object === 'block' &&
         node.nodes.size === 1
-        ? change.removeNodeByKey(node.key)
-        : change.removeNodeByKey(child.key)
+        ? editor.removeNodeByKey(node.key)
+        : editor.removeNodeByKey(child.key)
     }
 
     case 'previous_sibling_object_invalid':
@@ -177,8 +179,8 @@ function defaultNormalize(change, error) {
       return previous.object === 'text' &&
         node.object === 'block' &&
         node.nodes.size === 1
-        ? change.removeNodeByKey(node.key)
-        : change.removeNodeByKey(previous.key)
+        ? editor.removeNodeByKey(node.key)
+        : editor.removeNodeByKey(previous.key)
     }
 
     case 'next_sibling_object_invalid':
@@ -186,8 +188,8 @@ function defaultNormalize(change, error) {
       return next.object === 'text' &&
         node.object === 'block' &&
         node.nodes.size === 1
-        ? change.removeNodeByKey(node.key)
-        : change.removeNodeByKey(next.key)
+        ? editor.removeNodeByKey(node.key)
+        : editor.removeNodeByKey(next.key)
     }
 
     case 'child_required':
@@ -195,24 +197,24 @@ function defaultNormalize(change, error) {
     case 'parent_object_invalid':
     case 'parent_type_invalid': {
       return node.object === 'document'
-        ? node.nodes.forEach(n => change.removeNodeByKey(n.key))
-        : change.removeNodeByKey(node.key)
+        ? node.nodes.forEach(n => editor.removeNodeByKey(n.key))
+        : editor.removeNodeByKey(node.key)
     }
 
     case 'node_data_invalid': {
       return node.data.get(key) === undefined && node.object !== 'document'
-        ? change.removeNodeByKey(node.key)
-        : change.setNodeByKey(node.key, { data: node.data.delete(key) })
+        ? editor.removeNodeByKey(node.key)
+        : editor.setNodeByKey(node.key, { data: node.data.delete(key) })
     }
 
     case 'node_mark_invalid': {
       return node
         .getTexts()
-        .forEach(t => change.removeMarkByKey(t.key, 0, t.text.length, mark))
+        .forEach(t => editor.removeMarkByKey(t.key, 0, t.text.length, mark))
     }
 
     default: {
-      return change.removeNodeByKey(node.key)
+      return editor.removeNodeByKey(node.key)
     }
   }
 }

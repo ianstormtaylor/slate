@@ -6,591 +6,591 @@ import TextUtils from '../utils/text-utils'
 
 const Commands = {}
 
-Commands.blur = change => {
-  change.select({ isFocused: false })
+Commands.blur = editor => {
+  editor.select({ isFocused: false })
 }
 
-Commands.deselect = change => {
+Commands.deselect = editor => {
   const range = Selection.create()
-  change.select(range)
+  editor.select(range)
 }
 
-Commands.focus = change => {
-  change.select({ isFocused: true })
+Commands.focus = editor => {
+  editor.select({ isFocused: true })
 }
 
-Commands.flip = change => {
-  change.call(proxy, 'flip')
+Commands.flip = editor => {
+  editor.command(proxy, 'flip')
 }
 
-Commands.moveAnchorBackward = (change, ...args) => {
-  change.call(pointBackward, 'anchor', ...args)
+Commands.moveAnchorBackward = (editor, ...args) => {
+  editor.command(pointBackward, 'anchor', ...args)
 }
 
-Commands.moveAnchorWordBackward = (change, ...args) => {
-  change.call(pointWordBackward, 'anchor', ...args)
+Commands.moveAnchorWordBackward = (editor, ...args) => {
+  editor.command(pointWordBackward, 'anchor', ...args)
 }
 
-Commands.moveAnchorForward = (change, ...args) => {
-  change.call(pointForward, 'anchor', ...args)
+Commands.moveAnchorForward = (editor, ...args) => {
+  editor.command(pointForward, 'anchor', ...args)
 }
 
-Commands.moveAnchorWordForward = (change, ...args) => {
-  change.call(pointWordForward, 'anchor', ...args)
+Commands.moveAnchorWordForward = (editor, ...args) => {
+  editor.command(pointWordForward, 'anchor', ...args)
 }
 
-Commands.moveAnchorTo = (change, ...args) => {
-  change.call(proxy, 'moveAnchorTo', ...args)
+Commands.moveAnchorTo = (editor, ...args) => {
+  editor.command(proxy, 'moveAnchorTo', ...args)
 }
 
-Commands.moveAnchorToEndOfBlock = change => {
-  change.call(pointEdgeObject, 'anchor', 'end', 'block')
+Commands.moveAnchorToEndOfBlock = editor => {
+  editor.command(pointEdgeObject, 'anchor', 'end', 'block')
 }
 
-Commands.moveAnchorToEndOfInline = change => {
-  change.call(pointEdgeObject, 'anchor', 'end', 'inline')
+Commands.moveAnchorToEndOfInline = editor => {
+  editor.command(pointEdgeObject, 'anchor', 'end', 'inline')
 }
 
-Commands.moveAnchorToEndOfDocument = change => {
-  change.moveAnchorToEndOfNode(change.value.document).moveToAnchor()
+Commands.moveAnchorToEndOfDocument = editor => {
+  editor.moveAnchorToEndOfNode(editor.value.document).moveToAnchor()
 }
 
-Commands.moveAnchorToEndOfNextBlock = change => {
-  change.call(pointEdgeSideObject, 'anchor', 'end', 'next', 'block')
+Commands.moveAnchorToEndOfNextBlock = editor => {
+  editor.command(pointEdgeSideObject, 'anchor', 'end', 'next', 'block')
 }
 
-Commands.moveAnchorToEndOfNextInline = change => {
-  change.call(pointEdgeSideObject, 'anchor', 'end', 'next', 'inline')
+Commands.moveAnchorToEndOfNextInline = editor => {
+  editor.command(pointEdgeSideObject, 'anchor', 'end', 'next', 'inline')
 }
 
-Commands.moveAnchorToEndOfNextText = change => {
-  change.call(pointEdgeSideObject, 'anchor', 'end', 'next', 'text')
+Commands.moveAnchorToEndOfNextText = editor => {
+  editor.command(pointEdgeSideObject, 'anchor', 'end', 'next', 'text')
 }
 
-Commands.moveAnchorToEndOfNode = (change, ...args) => {
-  change.call(proxy, 'moveAnchorToEndOfNode', ...args)
+Commands.moveAnchorToEndOfNode = (editor, ...args) => {
+  editor.command(proxy, 'moveAnchorToEndOfNode', ...args)
 }
 
-Commands.moveAnchorToEndOfPreviousBlock = change => {
-  change.call(pointEdgeSideObject, 'anchor', 'end', 'previous', 'block')
+Commands.moveAnchorToEndOfPreviousBlock = editor => {
+  editor.command(pointEdgeSideObject, 'anchor', 'end', 'previous', 'block')
 }
 
-Commands.moveAnchorToEndOfPreviousInline = change => {
-  change.call(pointEdgeSideObject, 'anchor', 'end', 'previous', 'inline')
+Commands.moveAnchorToEndOfPreviousInline = editor => {
+  editor.command(pointEdgeSideObject, 'anchor', 'end', 'previous', 'inline')
 }
 
-Commands.moveAnchorToEndOfPreviousText = change => {
-  change.call(pointEdgeSideObject, 'anchor', 'end', 'previous', 'text')
+Commands.moveAnchorToEndOfPreviousText = editor => {
+  editor.command(pointEdgeSideObject, 'anchor', 'end', 'previous', 'text')
 }
 
-Commands.moveAnchorToEndOfText = change => {
-  change.call(pointEdgeObject, 'anchor', 'end', 'text')
+Commands.moveAnchorToEndOfText = editor => {
+  editor.command(pointEdgeObject, 'anchor', 'end', 'text')
 }
 
-Commands.moveAnchorToStartOfBlock = change => {
-  change.call(pointEdgeObject, 'anchor', 'start', 'block')
+Commands.moveAnchorToStartOfBlock = editor => {
+  editor.command(pointEdgeObject, 'anchor', 'start', 'block')
 }
 
-Commands.moveAnchorToStartOfDocument = change => {
-  change.moveAnchorToStartOfNode(change.value.document).moveToAnchor()
+Commands.moveAnchorToStartOfDocument = editor => {
+  editor.moveAnchorToStartOfNode(editor.value.document).moveToAnchor()
 }
 
-Commands.moveAnchorToStartOfInline = change => {
-  change.call(pointEdgeObject, 'anchor', 'start', 'inline')
+Commands.moveAnchorToStartOfInline = editor => {
+  editor.command(pointEdgeObject, 'anchor', 'start', 'inline')
 }
 
-Commands.moveAnchorToStartOfNextBlock = change => {
-  change.call(pointEdgeSideObject, 'anchor', 'start', 'next', 'block')
+Commands.moveAnchorToStartOfNextBlock = editor => {
+  editor.command(pointEdgeSideObject, 'anchor', 'start', 'next', 'block')
 }
 
-Commands.moveAnchorToStartOfNextInline = change => {
-  change.call(pointEdgeSideObject, 'anchor', 'start', 'next', 'inline')
+Commands.moveAnchorToStartOfNextInline = editor => {
+  editor.command(pointEdgeSideObject, 'anchor', 'start', 'next', 'inline')
 }
 
-Commands.moveAnchorToStartOfNextText = change => {
-  change.call(pointEdgeSideObject, 'anchor', 'start', 'next', 'text')
+Commands.moveAnchorToStartOfNextText = editor => {
+  editor.command(pointEdgeSideObject, 'anchor', 'start', 'next', 'text')
 }
 
-Commands.moveAnchorToStartOfNode = (change, ...args) => {
-  change.call(proxy, 'moveAnchorToStartOfNode', ...args)
+Commands.moveAnchorToStartOfNode = (editor, ...args) => {
+  editor.command(proxy, 'moveAnchorToStartOfNode', ...args)
 }
 
-Commands.moveAnchorToStartOfPreviousBlock = change => {
-  change.call(pointEdgeSideObject, 'anchor', 'start', 'previous', 'block')
+Commands.moveAnchorToStartOfPreviousBlock = editor => {
+  editor.command(pointEdgeSideObject, 'anchor', 'start', 'previous', 'block')
 }
 
-Commands.moveAnchorToStartOfPreviousInline = change => {
-  change.call(pointEdgeSideObject, 'anchor', 'start', 'previous', 'inline')
+Commands.moveAnchorToStartOfPreviousInline = editor => {
+  editor.command(pointEdgeSideObject, 'anchor', 'start', 'previous', 'inline')
 }
 
-Commands.moveAnchorToStartOfPreviousText = change => {
-  change.call(pointEdgeSideObject, 'anchor', 'start', 'previous', 'text')
+Commands.moveAnchorToStartOfPreviousText = editor => {
+  editor.command(pointEdgeSideObject, 'anchor', 'start', 'previous', 'text')
 }
 
-Commands.moveAnchorToStartOfText = change => {
-  change.call(pointEdgeObject, 'anchor', 'start', 'text')
+Commands.moveAnchorToStartOfText = editor => {
+  editor.command(pointEdgeObject, 'anchor', 'start', 'text')
 }
 
-Commands.moveBackward = (change, ...args) => {
-  change.moveAnchorBackward(...args).moveFocusBackward(...args)
+Commands.moveBackward = (editor, ...args) => {
+  editor.moveAnchorBackward(...args).moveFocusBackward(...args)
 }
 
-Commands.moveWordBackward = (change, ...args) => {
-  change.moveFocusWordBackward(...args).moveToFocus()
+Commands.moveWordBackward = (editor, ...args) => {
+  editor.moveFocusWordBackward(...args).moveToFocus()
 }
 
-Commands.moveEndBackward = (change, ...args) => {
-  change.call(pointBackward, 'end', ...args)
+Commands.moveEndBackward = (editor, ...args) => {
+  editor.command(pointBackward, 'end', ...args)
 }
 
-Commands.moveEndWordBackward = (change, ...args) => {
-  change.call(pointWordBackward, 'end', ...args)
+Commands.moveEndWordBackward = (editor, ...args) => {
+  editor.command(pointWordBackward, 'end', ...args)
 }
 
-Commands.moveEndForward = (change, ...args) => {
-  change.call(pointForward, 'end', ...args)
+Commands.moveEndForward = (editor, ...args) => {
+  editor.command(pointForward, 'end', ...args)
 }
 
-Commands.moveEndWordForward = (change, ...args) => {
-  change.call(pointWordForward, 'end', ...args)
+Commands.moveEndWordForward = (editor, ...args) => {
+  editor.command(pointWordForward, 'end', ...args)
 }
 
-Commands.moveEndTo = (change, ...args) => {
-  change.call(proxy, 'moveEndTo', ...args)
+Commands.moveEndTo = (editor, ...args) => {
+  editor.command(proxy, 'moveEndTo', ...args)
 }
 
-Commands.moveEndToEndOfBlock = change => {
-  change.call(pointEdgeObject, 'end', 'end', 'block')
+Commands.moveEndToEndOfBlock = editor => {
+  editor.command(pointEdgeObject, 'end', 'end', 'block')
 }
 
-Commands.moveEndToEndOfDocument = change => {
-  change.moveEndToEndOfNode(change.value.document).moveToEnd()
+Commands.moveEndToEndOfDocument = editor => {
+  editor.moveEndToEndOfNode(editor.value.document).moveToEnd()
 }
 
-Commands.moveEndToEndOfInline = change => {
-  change.call(pointEdgeObject, 'end', 'end', 'inline')
+Commands.moveEndToEndOfInline = editor => {
+  editor.command(pointEdgeObject, 'end', 'end', 'inline')
 }
 
-Commands.moveEndToEndOfNextBlock = change => {
-  change.call(pointEdgeSideObject, 'end', 'end', 'next', 'block')
+Commands.moveEndToEndOfNextBlock = editor => {
+  editor.command(pointEdgeSideObject, 'end', 'end', 'next', 'block')
 }
 
-Commands.moveEndToEndOfNextInline = change => {
-  change.call(pointEdgeSideObject, 'end', 'end', 'next', 'inline')
+Commands.moveEndToEndOfNextInline = editor => {
+  editor.command(pointEdgeSideObject, 'end', 'end', 'next', 'inline')
 }
 
-Commands.moveEndToEndOfNextText = change => {
-  change.call(pointEdgeSideObject, 'end', 'end', 'next', 'text')
+Commands.moveEndToEndOfNextText = editor => {
+  editor.command(pointEdgeSideObject, 'end', 'end', 'next', 'text')
 }
 
-Commands.moveEndToEndOfNode = (change, ...args) => {
-  change.call(proxy, 'moveEndToEndOfNode', ...args)
+Commands.moveEndToEndOfNode = (editor, ...args) => {
+  editor.command(proxy, 'moveEndToEndOfNode', ...args)
 }
 
-Commands.moveEndToEndOfPreviousBlock = change => {
-  change.call(pointEdgeSideObject, 'end', 'end', 'previous', 'block')
+Commands.moveEndToEndOfPreviousBlock = editor => {
+  editor.command(pointEdgeSideObject, 'end', 'end', 'previous', 'block')
 }
 
-Commands.moveEndToEndOfPreviousInline = change => {
-  change.call(pointEdgeSideObject, 'end', 'end', 'previous', 'inline')
+Commands.moveEndToEndOfPreviousInline = editor => {
+  editor.command(pointEdgeSideObject, 'end', 'end', 'previous', 'inline')
 }
 
-Commands.moveEndToEndOfPreviousText = change => {
-  change.call(pointEdgeSideObject, 'end', 'end', 'previous', 'text')
+Commands.moveEndToEndOfPreviousText = editor => {
+  editor.command(pointEdgeSideObject, 'end', 'end', 'previous', 'text')
 }
 
-Commands.moveEndToEndOfText = change => {
-  change.call(pointEdgeObject, 'end', 'end', 'text')
+Commands.moveEndToEndOfText = editor => {
+  editor.command(pointEdgeObject, 'end', 'end', 'text')
 }
 
-Commands.moveEndToStartOfBlock = change => {
-  change.call(pointEdgeObject, 'end', 'start', 'block')
+Commands.moveEndToStartOfBlock = editor => {
+  editor.command(pointEdgeObject, 'end', 'start', 'block')
 }
 
-Commands.moveEndToStartOfDocument = change => {
-  change.moveEndToStartOfNode(change.value.document).moveToEnd()
+Commands.moveEndToStartOfDocument = editor => {
+  editor.moveEndToStartOfNode(editor.value.document).moveToEnd()
 }
 
-Commands.moveEndToStartOfInline = change => {
-  change.call(pointEdgeObject, 'end', 'start', 'inline')
+Commands.moveEndToStartOfInline = editor => {
+  editor.command(pointEdgeObject, 'end', 'start', 'inline')
 }
 
-Commands.moveEndToStartOfNextBlock = change => {
-  change.call(pointEdgeSideObject, 'end', 'start', 'next', 'block')
+Commands.moveEndToStartOfNextBlock = editor => {
+  editor.command(pointEdgeSideObject, 'end', 'start', 'next', 'block')
 }
 
-Commands.moveEndToStartOfNextInline = change => {
-  change.call(pointEdgeSideObject, 'end', 'start', 'next', 'inline')
+Commands.moveEndToStartOfNextInline = editor => {
+  editor.command(pointEdgeSideObject, 'end', 'start', 'next', 'inline')
 }
 
-Commands.moveEndToStartOfNextText = change => {
-  change.call(pointEdgeSideObject, 'end', 'start', 'next', 'text')
+Commands.moveEndToStartOfNextText = editor => {
+  editor.command(pointEdgeSideObject, 'end', 'start', 'next', 'text')
 }
 
-Commands.moveEndToStartOfNode = (change, ...args) => {
-  change.call(proxy, 'moveEndToStartOfNode', ...args)
+Commands.moveEndToStartOfNode = (editor, ...args) => {
+  editor.command(proxy, 'moveEndToStartOfNode', ...args)
 }
 
-Commands.moveEndToStartOfPreviousBlock = change => {
-  change.call(pointEdgeSideObject, 'end', 'start', 'previous', 'block')
+Commands.moveEndToStartOfPreviousBlock = editor => {
+  editor.command(pointEdgeSideObject, 'end', 'start', 'previous', 'block')
 }
 
-Commands.moveEndToStartOfPreviousInline = change => {
-  change.call(pointEdgeSideObject, 'end', 'start', 'previous', 'inline')
+Commands.moveEndToStartOfPreviousInline = editor => {
+  editor.command(pointEdgeSideObject, 'end', 'start', 'previous', 'inline')
 }
 
-Commands.moveEndToStartOfPreviousText = change => {
-  change.call(pointEdgeSideObject, 'end', 'start', 'previous', 'text')
+Commands.moveEndToStartOfPreviousText = editor => {
+  editor.command(pointEdgeSideObject, 'end', 'start', 'previous', 'text')
 }
 
-Commands.moveEndToStartOfText = change => {
-  change.call(pointEdgeObject, 'end', 'start', 'text')
+Commands.moveEndToStartOfText = editor => {
+  editor.command(pointEdgeObject, 'end', 'start', 'text')
 }
 
-Commands.moveFocusBackward = (change, ...args) => {
-  change.call(pointBackward, 'focus', ...args)
+Commands.moveFocusBackward = (editor, ...args) => {
+  editor.command(pointBackward, 'focus', ...args)
 }
 
-Commands.moveFocusWordBackward = (change, ...args) => {
-  change.call(pointWordBackward, 'focus', ...args)
+Commands.moveFocusWordBackward = (editor, ...args) => {
+  editor.command(pointWordBackward, 'focus', ...args)
 }
 
-Commands.moveFocusForward = (change, ...args) => {
-  change.call(pointForward, 'focus', ...args)
+Commands.moveFocusForward = (editor, ...args) => {
+  editor.command(pointForward, 'focus', ...args)
 }
 
-Commands.moveFocusWordForward = (change, ...args) => {
-  change.call(pointWordForward, 'focus', ...args)
+Commands.moveFocusWordForward = (editor, ...args) => {
+  editor.command(pointWordForward, 'focus', ...args)
 }
 
-Commands.moveFocusTo = (change, ...args) => {
-  change.call(proxy, 'moveFocusTo', ...args)
+Commands.moveFocusTo = (editor, ...args) => {
+  editor.command(proxy, 'moveFocusTo', ...args)
 }
 
-Commands.moveFocusToEndOfBlock = change => {
-  change.call(pointEdgeObject, 'focus', 'end', 'block')
+Commands.moveFocusToEndOfBlock = editor => {
+  editor.command(pointEdgeObject, 'focus', 'end', 'block')
 }
 
-Commands.moveFocusToEndOfDocument = change => {
-  change.moveFocusToEndOfNode(change.value.document).moveToFocus()
+Commands.moveFocusToEndOfDocument = editor => {
+  editor.moveFocusToEndOfNode(editor.value.document).moveToFocus()
 }
 
-Commands.moveFocusToEndOfInline = change => {
-  change.call(pointEdgeObject, 'focus', 'end', 'inline')
+Commands.moveFocusToEndOfInline = editor => {
+  editor.command(pointEdgeObject, 'focus', 'end', 'inline')
 }
 
-Commands.moveFocusToEndOfNextBlock = change => {
-  change.call(pointEdgeSideObject, 'focus', 'end', 'next', 'block')
+Commands.moveFocusToEndOfNextBlock = editor => {
+  editor.command(pointEdgeSideObject, 'focus', 'end', 'next', 'block')
 }
 
-Commands.moveFocusToEndOfNextInline = change => {
-  change.call(pointEdgeSideObject, 'focus', 'end', 'next', 'inline')
+Commands.moveFocusToEndOfNextInline = editor => {
+  editor.command(pointEdgeSideObject, 'focus', 'end', 'next', 'inline')
 }
 
-Commands.moveFocusToEndOfNextText = change => {
-  change.call(pointEdgeSideObject, 'focus', 'end', 'next', 'text')
+Commands.moveFocusToEndOfNextText = editor => {
+  editor.command(pointEdgeSideObject, 'focus', 'end', 'next', 'text')
 }
 
-Commands.moveFocusToEndOfNode = (change, ...args) => {
-  change.call(proxy, 'moveFocusToEndOfNode', ...args)
+Commands.moveFocusToEndOfNode = (editor, ...args) => {
+  editor.command(proxy, 'moveFocusToEndOfNode', ...args)
 }
 
-Commands.moveFocusToEndOfPreviousBlock = change => {
-  change.call(pointEdgeSideObject, 'focus', 'end', 'previous', 'block')
+Commands.moveFocusToEndOfPreviousBlock = editor => {
+  editor.command(pointEdgeSideObject, 'focus', 'end', 'previous', 'block')
 }
 
-Commands.moveFocusToEndOfPreviousInline = change => {
-  change.call(pointEdgeSideObject, 'focus', 'end', 'previous', 'inline')
+Commands.moveFocusToEndOfPreviousInline = editor => {
+  editor.command(pointEdgeSideObject, 'focus', 'end', 'previous', 'inline')
 }
 
-Commands.moveFocusToEndOfPreviousText = change => {
-  change.call(pointEdgeSideObject, 'focus', 'end', 'previous', 'text')
+Commands.moveFocusToEndOfPreviousText = editor => {
+  editor.command(pointEdgeSideObject, 'focus', 'end', 'previous', 'text')
 }
 
-Commands.moveFocusToEndOfText = change => {
-  change.call(pointEdgeObject, 'focus', 'end', 'text')
+Commands.moveFocusToEndOfText = editor => {
+  editor.command(pointEdgeObject, 'focus', 'end', 'text')
 }
 
-Commands.moveFocusToStartOfBlock = change => {
-  change.call(pointEdgeObject, 'focus', 'start', 'block')
+Commands.moveFocusToStartOfBlock = editor => {
+  editor.command(pointEdgeObject, 'focus', 'start', 'block')
 }
 
-Commands.moveFocusToStartOfDocument = change => {
-  change.moveFocusToStartOfNode(change.value.document).moveToFocus()
+Commands.moveFocusToStartOfDocument = editor => {
+  editor.moveFocusToStartOfNode(editor.value.document).moveToFocus()
 }
 
-Commands.moveFocusToStartOfInline = change => {
-  change.call(pointEdgeObject, 'focus', 'start', 'inline')
+Commands.moveFocusToStartOfInline = editor => {
+  editor.command(pointEdgeObject, 'focus', 'start', 'inline')
 }
 
-Commands.moveFocusToStartOfNextBlock = change => {
-  change.call(pointEdgeSideObject, 'focus', 'start', 'next', 'block')
+Commands.moveFocusToStartOfNextBlock = editor => {
+  editor.command(pointEdgeSideObject, 'focus', 'start', 'next', 'block')
 }
 
-Commands.moveFocusToStartOfNextInline = change => {
-  change.call(pointEdgeSideObject, 'focus', 'start', 'next', 'inline')
+Commands.moveFocusToStartOfNextInline = editor => {
+  editor.command(pointEdgeSideObject, 'focus', 'start', 'next', 'inline')
 }
 
-Commands.moveFocusToStartOfNextText = change => {
-  change.call(pointEdgeSideObject, 'focus', 'start', 'next', 'text')
+Commands.moveFocusToStartOfNextText = editor => {
+  editor.command(pointEdgeSideObject, 'focus', 'start', 'next', 'text')
 }
 
-Commands.moveFocusToStartOfNode = (change, ...args) => {
-  change.call(proxy, 'moveFocusToStartOfNode', ...args)
+Commands.moveFocusToStartOfNode = (editor, ...args) => {
+  editor.command(proxy, 'moveFocusToStartOfNode', ...args)
 }
 
-Commands.moveFocusToStartOfPreviousBlock = change => {
-  change.call(pointEdgeSideObject, 'focus', 'start', 'previous', 'block')
+Commands.moveFocusToStartOfPreviousBlock = editor => {
+  editor.command(pointEdgeSideObject, 'focus', 'start', 'previous', 'block')
 }
 
-Commands.moveFocusToStartOfPreviousInline = change => {
-  change.call(pointEdgeSideObject, 'focus', 'start', 'previous', 'inline')
+Commands.moveFocusToStartOfPreviousInline = editor => {
+  editor.command(pointEdgeSideObject, 'focus', 'start', 'previous', 'inline')
 }
 
-Commands.moveFocusToStartOfPreviousText = change => {
-  change.call(pointEdgeSideObject, 'focus', 'start', 'previous', 'text')
+Commands.moveFocusToStartOfPreviousText = editor => {
+  editor.command(pointEdgeSideObject, 'focus', 'start', 'previous', 'text')
 }
 
-Commands.moveFocusToStartOfText = change => {
-  change.call(pointEdgeObject, 'focus', 'start', 'text')
+Commands.moveFocusToStartOfText = editor => {
+  editor.command(pointEdgeObject, 'focus', 'start', 'text')
 }
 
-Commands.moveForward = (change, ...args) => {
-  change.moveAnchorForward(...args).moveFocusForward(...args)
+Commands.moveForward = (editor, ...args) => {
+  editor.moveAnchorForward(...args).moveFocusForward(...args)
 }
 
-Commands.moveWordForward = (change, ...args) => {
-  change.moveFocusWordForward(...args).moveToFocus(...args)
+Commands.moveWordForward = (editor, ...args) => {
+  editor.moveFocusWordForward(...args).moveToFocus(...args)
 }
 
-Commands.moveStartBackward = (change, ...args) => {
-  change.call(pointBackward, 'start', ...args)
+Commands.moveStartBackward = (editor, ...args) => {
+  editor.command(pointBackward, 'start', ...args)
 }
 
-Commands.moveStartWordBackward = (change, ...args) => {
-  change.call(pointWordBackward, 'start', ...args)
+Commands.moveStartWordBackward = (editor, ...args) => {
+  editor.command(pointWordBackward, 'start', ...args)
 }
 
-Commands.moveStartForward = (change, ...args) => {
-  change.call(pointForward, 'start', ...args)
+Commands.moveStartForward = (editor, ...args) => {
+  editor.command(pointForward, 'start', ...args)
 }
 
-Commands.moveStartWordForward = (change, ...args) => {
-  change.call(pointWordForward, 'start', ...args)
+Commands.moveStartWordForward = (editor, ...args) => {
+  editor.command(pointWordForward, 'start', ...args)
 }
 
-Commands.moveStartTo = (change, ...args) => {
-  change.call(proxy, 'moveStartTo', ...args)
+Commands.moveStartTo = (editor, ...args) => {
+  editor.command(proxy, 'moveStartTo', ...args)
 }
 
-Commands.moveStartToEndOfBlock = change => {
-  change.call(pointEdgeObject, 'start', 'end', 'block')
+Commands.moveStartToEndOfBlock = editor => {
+  editor.command(pointEdgeObject, 'start', 'end', 'block')
 }
 
-Commands.moveStartToEndOfDocument = change => {
-  change.moveStartToEndOfNode(change.value.document).moveToStart()
+Commands.moveStartToEndOfDocument = editor => {
+  editor.moveStartToEndOfNode(editor.value.document).moveToStart()
 }
 
-Commands.moveStartToEndOfInline = change => {
-  change.call(pointEdgeObject, 'start', 'end', 'inline')
+Commands.moveStartToEndOfInline = editor => {
+  editor.command(pointEdgeObject, 'start', 'end', 'inline')
 }
 
-Commands.moveStartToEndOfNextBlock = change => {
-  change.call(pointEdgeSideObject, 'start', 'end', 'next', 'block')
+Commands.moveStartToEndOfNextBlock = editor => {
+  editor.command(pointEdgeSideObject, 'start', 'end', 'next', 'block')
 }
 
-Commands.moveStartToEndOfNextInline = change => {
-  change.call(pointEdgeSideObject, 'start', 'end', 'next', 'inline')
+Commands.moveStartToEndOfNextInline = editor => {
+  editor.command(pointEdgeSideObject, 'start', 'end', 'next', 'inline')
 }
 
-Commands.moveStartToEndOfNextText = change => {
-  change.call(pointEdgeSideObject, 'start', 'end', 'next', 'text')
+Commands.moveStartToEndOfNextText = editor => {
+  editor.command(pointEdgeSideObject, 'start', 'end', 'next', 'text')
 }
 
-Commands.moveStartToEndOfNode = (change, ...args) => {
-  change.call(proxy, 'moveStartToEndOfNode', ...args)
+Commands.moveStartToEndOfNode = (editor, ...args) => {
+  editor.command(proxy, 'moveStartToEndOfNode', ...args)
 }
 
-Commands.moveStartToEndOfPreviousBlock = change => {
-  change.call(pointEdgeSideObject, 'start', 'end', 'previous', 'block')
+Commands.moveStartToEndOfPreviousBlock = editor => {
+  editor.command(pointEdgeSideObject, 'start', 'end', 'previous', 'block')
 }
 
-Commands.moveStartToEndOfPreviousInline = change => {
-  change.call(pointEdgeSideObject, 'start', 'end', 'previous', 'inline')
+Commands.moveStartToEndOfPreviousInline = editor => {
+  editor.command(pointEdgeSideObject, 'start', 'end', 'previous', 'inline')
 }
 
-Commands.moveStartToEndOfPreviousText = change => {
-  change.call(pointEdgeSideObject, 'start', 'end', 'previous', 'text')
+Commands.moveStartToEndOfPreviousText = editor => {
+  editor.command(pointEdgeSideObject, 'start', 'end', 'previous', 'text')
 }
 
-Commands.moveStartToEndOfText = change => {
-  change.call(pointEdgeObject, 'start', 'end', 'text')
+Commands.moveStartToEndOfText = editor => {
+  editor.command(pointEdgeObject, 'start', 'end', 'text')
 }
 
-Commands.moveStartToStartOfBlock = change => {
-  change.call(pointEdgeObject, 'start', 'start', 'block')
+Commands.moveStartToStartOfBlock = editor => {
+  editor.command(pointEdgeObject, 'start', 'start', 'block')
 }
 
-Commands.moveStartToStartOfDocument = change => {
-  change.moveStartToStartOfNode(change.value.document).moveToStart()
+Commands.moveStartToStartOfDocument = editor => {
+  editor.moveStartToStartOfNode(editor.value.document).moveToStart()
 }
 
-Commands.moveStartToStartOfInline = change => {
-  change.call(pointEdgeObject, 'start', 'start', 'inline')
+Commands.moveStartToStartOfInline = editor => {
+  editor.command(pointEdgeObject, 'start', 'start', 'inline')
 }
 
-Commands.moveStartToStartOfNextBlock = change => {
-  change.call(pointEdgeSideObject, 'start', 'start', 'next', 'block')
+Commands.moveStartToStartOfNextBlock = editor => {
+  editor.command(pointEdgeSideObject, 'start', 'start', 'next', 'block')
 }
 
-Commands.moveStartToStartOfNextInline = change => {
-  change.call(pointEdgeSideObject, 'start', 'start', 'next', 'inline')
+Commands.moveStartToStartOfNextInline = editor => {
+  editor.command(pointEdgeSideObject, 'start', 'start', 'next', 'inline')
 }
 
-Commands.moveStartToStartOfNextText = change => {
-  change.call(pointEdgeSideObject, 'start', 'start', 'next', 'text')
+Commands.moveStartToStartOfNextText = editor => {
+  editor.command(pointEdgeSideObject, 'start', 'start', 'next', 'text')
 }
 
-Commands.moveStartToStartOfNode = (change, ...args) => {
-  change.call(proxy, 'moveStartToStartOfNode', ...args)
+Commands.moveStartToStartOfNode = (editor, ...args) => {
+  editor.command(proxy, 'moveStartToStartOfNode', ...args)
 }
 
-Commands.moveStartToStartOfPreviousBlock = change => {
-  change.call(pointEdgeSideObject, 'start', 'start', 'previous', 'block')
+Commands.moveStartToStartOfPreviousBlock = editor => {
+  editor.command(pointEdgeSideObject, 'start', 'start', 'previous', 'block')
 }
 
-Commands.moveStartToStartOfPreviousInline = change => {
-  change.call(pointEdgeSideObject, 'start', 'start', 'previous', 'inline')
+Commands.moveStartToStartOfPreviousInline = editor => {
+  editor.command(pointEdgeSideObject, 'start', 'start', 'previous', 'inline')
 }
 
-Commands.moveStartToStartOfPreviousText = change => {
-  change.call(pointEdgeSideObject, 'start', 'start', 'previous', 'text')
+Commands.moveStartToStartOfPreviousText = editor => {
+  editor.command(pointEdgeSideObject, 'start', 'start', 'previous', 'text')
 }
 
-Commands.moveStartToStartOfText = change => {
-  change.call(pointEdgeObject, 'start', 'start', 'text')
+Commands.moveStartToStartOfText = editor => {
+  editor.command(pointEdgeObject, 'start', 'start', 'text')
 }
 
-Commands.moveTo = (change, ...args) => {
-  change.call(proxy, 'moveTo', ...args)
+Commands.moveTo = (editor, ...args) => {
+  editor.command(proxy, 'moveTo', ...args)
 }
 
-Commands.moveToAnchor = change => {
-  change.call(proxy, 'moveToAnchor')
+Commands.moveToAnchor = editor => {
+  editor.command(proxy, 'moveToAnchor')
 }
 
-Commands.moveToEnd = change => {
-  change.call(proxy, 'moveToEnd')
+Commands.moveToEnd = editor => {
+  editor.command(proxy, 'moveToEnd')
 }
 
-Commands.moveToEndOfBlock = change => {
-  change.moveEndToEndOfBlock().moveToEnd()
+Commands.moveToEndOfBlock = editor => {
+  editor.moveEndToEndOfBlock().moveToEnd()
 }
 
-Commands.moveToEndOfDocument = change => {
-  change.moveEndToEndOfNode(change.value.document).moveToEnd()
+Commands.moveToEndOfDocument = editor => {
+  editor.moveEndToEndOfNode(editor.value.document).moveToEnd()
 }
 
-Commands.moveToEndOfInline = change => {
-  change.moveEndToEndOfInline().moveToEnd()
+Commands.moveToEndOfInline = editor => {
+  editor.moveEndToEndOfInline().moveToEnd()
 }
 
-Commands.moveToEndOfNextBlock = change => {
-  change.moveEndToEndOfNextBlock().moveToEnd()
+Commands.moveToEndOfNextBlock = editor => {
+  editor.moveEndToEndOfNextBlock().moveToEnd()
 }
 
-Commands.moveToEndOfNextInline = change => {
-  change.moveEndToEndOfNextInline().moveToEnd()
+Commands.moveToEndOfNextInline = editor => {
+  editor.moveEndToEndOfNextInline().moveToEnd()
 }
 
-Commands.moveToEndOfNextText = change => {
-  change.moveEndToEndOfNextText().moveToEnd()
+Commands.moveToEndOfNextText = editor => {
+  editor.moveEndToEndOfNextText().moveToEnd()
 }
 
-Commands.moveToEndOfNode = (change, ...args) => {
-  change.call(proxy, 'moveToEndOfNode', ...args)
+Commands.moveToEndOfNode = (editor, ...args) => {
+  editor.command(proxy, 'moveToEndOfNode', ...args)
 }
 
-Commands.moveToEndOfPreviousBlock = change => {
-  change.moveStartToEndOfPreviousBlock().moveToStart()
+Commands.moveToEndOfPreviousBlock = editor => {
+  editor.moveStartToEndOfPreviousBlock().moveToStart()
 }
 
-Commands.moveToEndOfPreviousInline = change => {
-  change.moveStartToEndOfPreviousInline().moveToStart()
+Commands.moveToEndOfPreviousInline = editor => {
+  editor.moveStartToEndOfPreviousInline().moveToStart()
 }
 
-Commands.moveToEndOfPreviousText = change => {
-  change.moveStartToEndOfPreviousText().moveToStart()
+Commands.moveToEndOfPreviousText = editor => {
+  editor.moveStartToEndOfPreviousText().moveToStart()
 }
 
-Commands.moveToEndOfText = change => {
-  change.moveEndToEndOfText().moveToEnd()
+Commands.moveToEndOfText = editor => {
+  editor.moveEndToEndOfText().moveToEnd()
 }
 
-Commands.moveToFocus = change => {
-  change.call(proxy, 'moveToFocus')
+Commands.moveToFocus = editor => {
+  editor.command(proxy, 'moveToFocus')
 }
 
-Commands.moveToRangeOfDocument = change => {
-  change.moveToRangeOfNode(change.value.document)
+Commands.moveToRangeOfDocument = editor => {
+  editor.moveToRangeOfNode(editor.value.document)
 }
 
-Commands.moveToRangeOfNode = (change, ...args) => {
-  change.call(proxy, 'moveToRangeOfNode', ...args)
+Commands.moveToRangeOfNode = (editor, ...args) => {
+  editor.command(proxy, 'moveToRangeOfNode', ...args)
 }
 
-Commands.moveToStart = change => {
-  change.call(proxy, 'moveToStart')
+Commands.moveToStart = editor => {
+  editor.command(proxy, 'moveToStart')
 }
 
-Commands.moveToStartOfBlock = change => {
-  change.moveStartToStartOfBlock().moveToStart()
+Commands.moveToStartOfBlock = editor => {
+  editor.moveStartToStartOfBlock().moveToStart()
 }
 
-Commands.moveToStartOfDocument = change => {
-  change.moveStartToStartOfNode(change.value.document).moveToStart()
+Commands.moveToStartOfDocument = editor => {
+  editor.moveStartToStartOfNode(editor.value.document).moveToStart()
 }
 
-Commands.moveToStartOfInline = change => {
-  change.moveStartToStartOfInline().moveToStart()
+Commands.moveToStartOfInline = editor => {
+  editor.moveStartToStartOfInline().moveToStart()
 }
 
-Commands.moveToStartOfNextBlock = change => {
-  change.moveEndToStartOfNextBlock().moveToEnd()
+Commands.moveToStartOfNextBlock = editor => {
+  editor.moveEndToStartOfNextBlock().moveToEnd()
 }
 
-Commands.moveToStartOfNextInline = change => {
-  change.moveEndToStartOfNextInline().moveToEnd()
+Commands.moveToStartOfNextInline = editor => {
+  editor.moveEndToStartOfNextInline().moveToEnd()
 }
 
-Commands.moveToStartOfNextText = change => {
-  change.moveEndToStartOfNextText().moveToEnd()
+Commands.moveToStartOfNextText = editor => {
+  editor.moveEndToStartOfNextText().moveToEnd()
 }
 
-Commands.moveToStartOfNode = (change, ...args) => {
-  change.call(proxy, 'moveToStartOfNode', ...args)
+Commands.moveToStartOfNode = (editor, ...args) => {
+  editor.command(proxy, 'moveToStartOfNode', ...args)
 }
 
-Commands.moveToStartOfPreviousBlock = change => {
-  change.moveStartToStartOfPreviousBlock().moveToStart()
+Commands.moveToStartOfPreviousBlock = editor => {
+  editor.moveStartToStartOfPreviousBlock().moveToStart()
 }
 
-Commands.moveToStartOfPreviousInline = change => {
-  change.moveStartToStartOfPreviousInline().moveToStart()
+Commands.moveToStartOfPreviousInline = editor => {
+  editor.moveStartToStartOfPreviousInline().moveToStart()
 }
 
-Commands.moveToStartOfPreviousText = change => {
-  change.moveStartToStartOfPreviousText().moveToStart()
+Commands.moveToStartOfPreviousText = editor => {
+  editor.moveStartToStartOfPreviousText().moveToStart()
 }
 
-Commands.moveToStartOfText = change => {
-  change.moveStartToStartOfText().moveToStart()
+Commands.moveToStartOfText = editor => {
+  editor.moveStartToStartOfText().moveToStart()
 }
 
-Commands.select = (change, properties, options = {}) => {
+Commands.select = (editor, properties, options = {}) => {
   properties = Selection.createProperties(properties)
   const { snapshot = false } = options
-  const { value } = change
+  const { value } = editor
   const { document, selection } = value
   const props = {}
   let next = selection.setProperties(properties)
@@ -609,7 +609,7 @@ Commands.select = (change, properties, options = {}) => {
   }
 
   // If the selection moves, clear any marks, unless the new selection
-  // properties change the marks in some way.
+  // properties editor the marks in some way.
   if (selection.marks && !props.marks && (props.anchor || props.focus)) {
     props.marks = null
   }
@@ -619,7 +619,7 @@ Commands.select = (change, properties, options = {}) => {
     return
   }
 
-  change.applyOperation(
+  editor.applyOperation(
     {
       type: 'set_selection',
       value,
@@ -630,25 +630,25 @@ Commands.select = (change, properties, options = {}) => {
   )
 }
 
-Commands.setAnchor = (change, ...args) => {
-  change.call(proxy, 'setAnchor', ...args)
+Commands.setAnchor = (editor, ...args) => {
+  editor.command(proxy, 'setAnchor', ...args)
 }
 
-Commands.setEnd = (change, ...args) => {
-  change.call(proxy, 'setEnd', ...args)
+Commands.setEnd = (editor, ...args) => {
+  editor.command(proxy, 'setEnd', ...args)
 }
 
-Commands.setFocus = (change, ...args) => {
-  change.call(proxy, 'setFocus', ...args)
+Commands.setFocus = (editor, ...args) => {
+  editor.command(proxy, 'setFocus', ...args)
 }
 
-Commands.setStart = (change, ...args) => {
-  change.call(proxy, 'setStart', ...args)
+Commands.setStart = (editor, ...args) => {
+  editor.command(proxy, 'setStart', ...args)
 }
 
-Commands.snapshotSelection = change => {
-  change.withoutMerging(() => {
-    change.select(change.value.selection, { snapshot: true })
+Commands.snapshotSelection = editor => {
+  editor.withoutMerging(() => {
+    editor.select(editor.value.selection, { snapshot: true })
   })
 }
 
@@ -656,26 +656,26 @@ Commands.snapshotSelection = change => {
  * Helpers.
  */
 
-function proxy(change, method, ...args) {
-  const range = change.value.selection[method](...args)
-  change.select(range)
+function proxy(editor, method, ...args) {
+  const range = editor.value.selection[method](...args)
+  editor.select(range)
 }
 
-function pointEdgeObject(change, point, edge, object) {
+function pointEdgeObject(editor, point, edge, object) {
   const Point = point.slice(0, 1).toUpperCase() + point.slice(1)
   const Edge = edge.slice(0, 1).toUpperCase() + edge.slice(1)
   const Object = object.slice(0, 1).toUpperCase() + object.slice(1)
   const method = `move${Point}To${Edge}OfNode`
   const getNode = object == 'text' ? 'getNode' : `getClosest${Object}`
-  const { value } = change
+  const { value } = editor
   const { document, selection } = value
   const p = selection[point]
   const node = document[getNode](p.key)
   if (!node) return
-  change[method](node)
+  editor[method](node)
 }
 
-function pointEdgeSideObject(change, point, edge, side, object) {
+function pointEdgeSideObject(editor, point, edge, side, object) {
   const Point = point.slice(0, 1).toUpperCase() + point.slice(1)
   const Edge = edge.slice(0, 1).toUpperCase() + edge.slice(1)
   const Side = side.slice(0, 1).toUpperCase() + side.slice(1)
@@ -683,22 +683,22 @@ function pointEdgeSideObject(change, point, edge, side, object) {
   const method = `move${Point}To${Edge}OfNode`
   const getNode = object == 'text' ? 'getNode' : `getClosest${Object}`
   const getDirectionNode = `get${Side}${Object}`
-  const { value } = change
+  const { value } = editor
   const { document, selection } = value
   const p = selection[point]
   const node = document[getNode](p.key)
   if (!node) return
   const target = document[getDirectionNode](node.key)
   if (!target) return
-  change[method](target)
+  editor[method](target)
 }
 
-function pointBackward(change, point, n = 1) {
+function pointBackward(editor, point, n = 1) {
   if (n === 0) return
-  if (n < 0) return pointForward(change, point, -n)
+  if (n < 0) return pointForward(editor, point, -n)
 
   const Point = point.slice(0, 1).toUpperCase() + point.slice(1)
-  const { editor, value } = change
+  const { value } = editor
   const { document, selection } = value
   const p = selection[point]
   const hasVoidParent = document.hasVoidParent(p.path, editor)
@@ -706,7 +706,7 @@ function pointBackward(change, point, n = 1) {
   // what is this?
   if (!hasVoidParent && p.offset - n >= 0) {
     const range = selection[`move${Point}Backward`](n)
-    change.select(range)
+    editor.select(range)
     return
   }
 
@@ -717,21 +717,21 @@ function pointBackward(change, point, n = 1) {
   const isInBlock = block.hasNode(previous.key)
   const isPreviousInVoid =
     previous && document.hasVoidParent(previous.key, editor)
-  change[`move${Point}ToEndOfNode`](previous)
+  editor[`move${Point}ToEndOfNode`](previous)
 
   // when is this called?
   if (!hasVoidParent && !isPreviousInVoid && isInBlock) {
-    const range = change.value.selection[`move${Point}Backward`](n)
-    change.select(range)
+    const range = editor.value.selection[`move${Point}Backward`](n)
+    editor.select(range)
   }
 }
 
-function pointForward(change, point, n = 1) {
+function pointForward(editor, point, n = 1) {
   if (n === 0) return
-  if (n < 0) return pointBackward(change, point, -n)
+  if (n < 0) return pointBackward(editor, point, -n)
 
   const Point = point.slice(0, 1).toUpperCase() + point.slice(1)
-  const { editor, value } = change
+  const { value } = editor
   const { document, selection } = value
   const p = selection[point]
   const text = document.getNode(p.path)
@@ -740,7 +740,7 @@ function pointForward(change, point, n = 1) {
   // what is this?
   if (!hasVoidParent && p.offset + n <= text.text.length) {
     const range = selection[`move${Point}Forward`](n)
-    change.select(range)
+    editor.select(range)
     return
   }
 
@@ -750,17 +750,17 @@ function pointForward(change, point, n = 1) {
   const block = document.getClosestBlock(p.path)
   const isInBlock = block.hasNode(next.key)
   const isNextInVoid = document.hasVoidParent(next.key, editor)
-  change[`move${Point}ToStartOfNode`](next)
+  editor[`move${Point}ToStartOfNode`](next)
 
   // when is this called?
   if (!hasVoidParent && !isNextInVoid && isInBlock) {
-    const range = change.value.selection[`move${Point}Forward`](n)
-    change.select(range)
+    const range = editor.value.selection[`move${Point}Forward`](n)
+    editor.select(range)
   }
 }
 
-function pointWordBackward(change, pointName) {
-  const { value } = change
+function pointWordBackward(editor, pointName) {
+  const { value } = editor
   const { document, selection } = value
   const point = selection[pointName]
   const block = document.getClosestBlock(point.key)
@@ -768,11 +768,11 @@ function pointWordBackward(change, pointName) {
   const o = offset + point.offset
   const { text } = block
   const n = TextUtils.getWordOffsetBackward(text, o)
-  change.call(pointBackward, pointName, n > 0 ? n : 1)
+  editor.command(pointBackward, pointName, n > 0 ? n : 1)
 }
 
-function pointWordForward(change, pointName) {
-  const { value } = change
+function pointWordForward(editor, pointName) {
+  const { value } = editor
   const { document, selection } = value
   const point = selection[pointName]
   const block = document.getClosestBlock(point.key)
@@ -780,7 +780,7 @@ function pointWordForward(change, pointName) {
   const o = offset + point.offset
   const { text } = block
   const n = TextUtils.getWordOffsetForward(text, o)
-  change.call(pointForward, pointName, n > 0 ? n : 1)
+  editor.command(pointForward, pointName, n > 0 ? n : 1)
 }
 
 export default Commands

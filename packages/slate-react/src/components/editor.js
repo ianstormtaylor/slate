@@ -99,7 +99,7 @@ class Editor extends React.Component {
     this.tmp.updates++
 
     if (this.props.autoFocus) {
-      this.change(c => c.focus())
+      this.focus()
     }
 
     if (this.tmp.change) {
@@ -118,20 +118,6 @@ class Editor extends React.Component {
     if (this.tmp.change) {
       this.props.onChange(this.tmp.change)
       this.tmp.change = null
-    }
-  }
-
-  /**
-   * On controller change, call `onChange` or queue the change for flushing.
-   *
-   * @param {Change} change
-   */
-
-  onControllerChange = change => {
-    if (this.tmp.mounted) {
-      this.props.onChange(change)
-    } else {
-      this.tmp.change = change
     }
   }
 
@@ -181,14 +167,31 @@ class Editor extends React.Component {
 
     this.tmp.resolves++
     const react = ReactPlugin(this.props)
-    const attrs = { onChange: this.onControllerChange, plugins: [react] }
-    this.controller = new Controller(attrs, { editor: this, normalize: false })
+
+    const onChange = change => {
+      if (this.tmp.mounted) {
+        this.props.onChange(change)
+      } else {
+        this.tmp.change = change
+      }
+    }
+
+    this.controller = new Controller(
+      { plugins: [react], onChange },
+      { controller: this, construct: false }
+    )
+
+    this.controller.run('onConstruct')
   })
 
   /**
    * Mimic the API of the `Editor` controller, so that this component instance
    * can be passed in its place to plugins.
    */
+
+  get operations() {
+    return this.controller.operations
+  }
 
   get readOnly() {
     return this.controller.readOnly
@@ -198,58 +201,90 @@ class Editor extends React.Component {
     return this.controller.value
   }
 
-  change = (...args) => {
-    return this.controller.change(...args)
+  applyOperation(...args) {
+    return this.controller.applyOperation(...args)
   }
 
-  command = (...args) => {
+  command(...args) {
     return this.controller.command(...args)
   }
 
-  event = (...args) => {
-    return this.controller.event(...args)
+  normalize(...args) {
+    return this.controller.normalize(...args)
   }
 
-  onChange = (...args) => {
-    return this.controller.onChange(...args)
-  }
-
-  query = (...args) => {
+  query(...args) {
     return this.controller.query(...args)
   }
 
-  run = (...args) => {
+  registerCommand(...args) {
+    return this.controller.registerCommand(...args)
+  }
+
+  registerQuery(...args) {
+    return this.controller.registerQuery(...args)
+  }
+
+  run(...args) {
     return this.controller.run(...args)
   }
 
-  /**
-   * Mimic the API of a DOM input/textarea, to maintain a React-like interface.
-   */
-
-  blur = () => {
-    this.change(c => c.blur())
-  }
-
-  focus = () => {
-    this.change(c => c.focus())
+  withoutNormalizing(...args) {
+    return this.controller.withoutNormalizing(...args)
   }
 
   /**
    * Deprecated.
    */
 
+  get editor() {
+    return this.controller.editor
+  }
+
   get schema() {
     invariant(
       false,
-      'As of Slate 0.42.0, the `editor.schema` property no longer exists, and its functionality has been folded into the editor itself. Use the `editor` instead.'
+      'As of Slate 0.42, the `editor.schema` property no longer exists, and its functionality has been folded into the editor itself. Use the `editor` instead.'
     )
   }
 
   get stack() {
     invariant(
       false,
-      'As of Slate 0.42.0, the `editor.stack` property no longer exists, and its functionality has been folded into the editor itself. Use the `editor` instead.'
+      'As of Slate 0.42, the `editor.stack` property no longer exists, and its functionality has been folded into the editor itself. Use the `editor` instead.'
     )
+  }
+
+  call(...args) {
+    return this.controller.call(...args)
+  }
+
+  change(...args) {
+    return this.controller.change(...args)
+  }
+
+  onChange(...args) {
+    return this.controller.onChange(...args)
+  }
+
+  applyOperations(...args) {
+    return this.controller.applyOperations(...args)
+  }
+
+  setOperationFlag(...args) {
+    return this.controller.setOperationFlag(...args)
+  }
+
+  getFlag(...args) {
+    return this.controller.getFlag(...args)
+  }
+
+  unsetOperationFlag(...args) {
+    return this.controller.unsetOperationFlag(...args)
+  }
+
+  withoutNormalization(...args) {
+    return this.controller.withoutNormalization(...args)
   }
 }
 

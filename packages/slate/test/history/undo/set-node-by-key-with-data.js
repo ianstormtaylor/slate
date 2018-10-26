@@ -3,15 +3,11 @@
 import h from '../../helpers/h'
 
 export default function(editor) {
-  editor.change(change => {
-    change.setNodeByKey('a', {
-      data: { thing: 'value' },
-    })
+  editor.setNodeByKey('a', {
+    data: { thing: 'value' },
   })
 
-  editor.change(change => {
-    change.undo()
-  })
+  editor.flush().undo()
 }
 
 export const input = (

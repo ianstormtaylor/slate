@@ -46,7 +46,7 @@ class RTL extends React.Component {
    * @return {Element}
    */
 
-  renderNode = (props, next) => {
+  renderNode = (props, editor, next) => {
     const { attributes, children, node } = props
 
     switch (node.type) {
@@ -60,7 +60,7 @@ class RTL extends React.Component {
   /**
    * On change.
    *
-   * @param {Change} change
+   * @param {Editor} editor
    */
 
   onChange = ({ value }) => {
@@ -71,13 +71,13 @@ class RTL extends React.Component {
    * On key down, if it's <shift-enter> add a soft break.
    *
    * @param {Event} event
-   * @param {Change} change
+   * @param {Editor} editor
    */
 
-  onKeyDown = (event, change, next) => {
+  onKeyDown = (event, editor, next) => {
     if (event.key == 'Enter' && event.shiftKey) {
       event.preventDefault()
-      change.insertText('\n')
+      editor.insertText('\n')
       return
     }
 

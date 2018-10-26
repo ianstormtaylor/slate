@@ -10,8 +10,8 @@ const fragment = (
   </document>
 )
 
-export default function(change) {
-  change.insertFragment(fragment)
+export default function(editor) {
+  editor.insertFragment(fragment)
 }
 
 export const input = (

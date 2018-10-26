@@ -7,7 +7,7 @@ function Bold(props) {
   return React.createElement('strong', { ...props.attributes }, props.children)
 }
 
-function renderMark(props, next) {
+function renderMark(props, editor, next) {
   switch (props.mark.type) {
     case 'bold':
       return Bold(props)

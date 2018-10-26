@@ -6,9 +6,9 @@ export const schema = {
   blocks: {
     paragraph: {
       text: /^\d*$/,
-      normalize: (change, { code, node }) => {
+      normalize: (editor, { code, node }) => {
         if (code == 'node_text_invalid') {
-          node.nodes.forEach(n => change.removeNodeByKey(n.key))
+          node.nodes.forEach(n => editor.removeNodeByKey(n.key))
         }
       },
     },

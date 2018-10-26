@@ -58,7 +58,7 @@ class MarkdownPreview extends React.Component {
    * @return {Element}
    */
 
-  renderMark = (props, next) => {
+  renderMark = (props, editor, next) => {
     const { children, mark, attributes } = props
 
     switch (mark.type) {
@@ -137,7 +137,7 @@ class MarkdownPreview extends React.Component {
   /**
    * On change.
    *
-   * @param {Change} change
+   * @param {Editor} editor
    */
 
   onChange = ({ value }) => {
@@ -152,7 +152,7 @@ class MarkdownPreview extends React.Component {
    * @return {Array}
    */
 
-  decorateNode(node, next) {
+  decorateNode(node, editor, next) {
     const others = next() || []
     if (node.object != 'block') return others
 

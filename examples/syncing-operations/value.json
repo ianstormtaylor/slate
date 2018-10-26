@@ -38,7 +38,7 @@
                   "They achieve this by sending any document-altering operations to each other whenever a change occurs, and then applying them locally with "
               },
               {
-                "text": "change.applyOperations()",
+                "text": "editor.applyOperation()",
                 "marks": [
                   {
                     "type": "code"

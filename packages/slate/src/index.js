@@ -5,7 +5,7 @@ import './interfaces/element'
 import './interfaces/range'
 
 import Block from './models/block'
-import Change from './controllers/change'
+import Change from './models/change'
 import Data from './models/data'
 import Decoration from './models/decoration'
 import Document from './models/document'

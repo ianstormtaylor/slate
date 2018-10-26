@@ -68,7 +68,7 @@ class History extends React.Component {
   /**
    * On change.
    *
-   * @param {Change} change
+   * @param {Editor} editor
    */
 
   onChange = ({ value }) => {
@@ -82,7 +82,7 @@ class History extends React.Component {
 
   onClickRedo = event => {
     event.preventDefault()
-    this.editor.change(change => change.redo())
+    this.editor.redo()
   }
 
   /**
@@ -92,7 +92,7 @@ class History extends React.Component {
 
   onClickUndo = event => {
     event.preventDefault()
-    this.editor.change(change => change.undo())
+    this.editor.undo()
   }
 }
 

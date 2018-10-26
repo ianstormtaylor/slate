@@ -29,19 +29,19 @@ In addition to the [core plugin hooks](../slate/plugins.md), when using `slate-r
 }
 ```
 
-The event hooks have a signature of `(event, change, next)`—the `event` is a React object that you are used to from React's event handlers.
+The event hooks have a signature of `(event, editor, next)`—the `event` is a React object that you are used to from React's event handlers.
 
-The rendering hooks are just like render props common to other React API's, and receive `(props, next)`. For more information, see the [Rendering](./rendering.md) reference.
+The rendering hooks are just like render props common to other React API's, and receive `(props, editor, next)`. For more information, see the [Rendering](./rendering.md) reference.
 
 ### `decorateNode`
 
-`Function decorateNode(node: Node, next: Function) => Array<Decoration>|Void`
+`Function decorateNode(node: Node, editor: Editor, next: Function) => Array<Decoration>|Void`
 
 The `decorateNode` hook takes a `node` and returns an array of decorations with marks to be applied to the node when it is rendered.
 
 ### `onBeforeInput`
 
-`Function onBeforeInput(event: Event, change: Change, next: Function) => Boolean`
+`Function onBeforeInput(event: Event, editor: Editor, next: Function) => Boolean`
 
 This handler is called right before a string of text is inserted into the `contenteditable` element.
 
@@ -49,37 +49,37 @@ Make sure to `event.preventDefault()` if you do not want the default insertion b
 
 ### `onBlur`
 
-`Function onBlur(event: Event, change: Change, next: Function) => Boolean`
+`Function onBlur(event: Event, editor: Editor, next: Function) => Boolean`
 
 This handler is called when the editor's `contenteditable` element is blurred.
 
 ### `onFocus`
 
-`Function onFocus(event: Event, change: Change, next: Function) => Boolean`
+`Function onFocus(event: Event, editor: Editor, next: Function) => Boolean`
 
 This handler is called when the editor's `contenteditable` element is focused.
 
 ### `onCopy`
 
-`Function onCopy(event: Event, change: Change, next: Function) => Boolean`
+`Function onCopy(event: Event, editor: Editor, next: Function) => Boolean`
 
 This handler is called when there is a copy event in the editor's `contenteditable` element.
 
 ### `onCut`
 
-`Function onCut(event: Event, change: Change, next: Function) => Boolean`
+`Function onCut(event: Event, editor: Editor, next: Function) => Boolean`
 
 This handler is equivalent to the `onCopy` handler.
 
 ### `onDrop`
 
-`Function onDrop(event: Event, change: Change, next: Function) => Boolean`
+`Function onDrop(event: Event, editor: Editor, next: Function) => Boolean`
 
 This handler is called when the user drops content into the `contenteditable` element. The event is already prevented by default, so you must define a value change to have any affect occur.
 
 ### `onKeyDown`
 
-`Function onKeyDown(event: Event, change: Change, next: Function) => Boolean`
+`Function onKeyDown(event: Event, editor: Editor, next: Function) => Boolean`
 
 This handler is called when any key is pressed in the `contenteditable` element, before any action is taken.
 
@@ -87,19 +87,19 @@ Make sure to `event.preventDefault()` if you do not want the default insertion b
 
 ### `onKeyUp`
 
-`Function onKeyUp(event: Event, change: Change, next: Function) => Boolean`
+`Function onKeyUp(event: Event, editor: Editor, next: Function) => Boolean`
 
 This handler is called when any key is released in the `contenteditable` element.
 
 ### `onPaste`
 
-`Function onPaste(event: Event, change: Change, next: Function) => Boolean`
+`Function onPaste(event: Event, editor: Editor, next: Function) => Boolean`
 
 This handler is called when the user pastes content into the `contenteditable` element. The event is already prevented by default, so you must define a value change to have any affect occur.
 
 ### `onSelect`
 
-`Function onSelect(event: Event, change: Change, next: Function) => Boolean`
+`Function onSelect(event: Event, editor: Editor, next: Function) => Boolean`
 
 This handler is called whenever the native DOM selection changes.
 
@@ -107,13 +107,13 @@ This handler is called whenever the native DOM selection changes.
 
 ### `renderEditor`
 
-`Function renderEditor(props: Object, next: Function) => ReactNode|Void`
+`Function renderEditor(props: Object, editor: Editor, next: Function) => ReactNode|Void`
 
 The `renderEditor` property allows you to define higher-order-component-like behavior. It is passed all of the properties of the editor, including `props.children`. You can then choose to wrap the existing `children` in any custom elements or proxy the properties however you choose. This can be useful for rendering toolbars, styling the editor, rendering validation, etc. Remember that the `renderEditor` function has to render `props.children` for editor's content to render.
 
 ### `renderMark`
 
-`Function renderMark(props: Object, next: Function) => ReactNode|Void`
+`Function renderMark(props: Object, editor: Editor, next: Function) => ReactNode|Void`
 
 Render a `Mark` with `props`. The `props` object contains:
 
@@ -134,7 +134,7 @@ You must spread the `props.attributes` onto the top-level DOM node you use to re
 
 ### `renderNode`
 
-`Function renderNode(props: Object, next: Function) => ReactNode|Void`
+`Function renderNode(props: Object, editor: Editor, next: Function) => ReactNode|Void`
 
 Render a `Node` with `props`. The `props` object contains:
 
@@ -155,7 +155,7 @@ You must spread the `props.attributes` onto the top-level DOM node you use to re
 
 ### `renderPlaceholder`
 
-`Function renderPlaceholder(props: Object, next: Function) => ReactNode|Void`
+`Function renderPlaceholder(props: Object, editor: Editor, next: Function) => ReactNode|Void`
 
 Render the placeholder that is shown when the editor has no `value`. The `props` object contains:
 
@@ -170,6 +170,6 @@ The `placeholder` prop that was passed to the editor can be found at `editor.pro
 
 ### `shouldNodeComponentUpdate`
 
-`Function shouldNodeComponentUpdate(previousProps: Object, props: Object, next: Function) => Boolean|Void`
+`Function shouldNodeComponentUpdate(previousProps: Object, props: Object, editor: Editor, next: Function) => Boolean|Void`
 
 If this function returns `true`, it can force updating the node's component where otherwise it wouldn't for performance.

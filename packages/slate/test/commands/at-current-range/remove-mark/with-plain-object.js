@@ -2,8 +2,8 @@
 
 import h from '../../../helpers/h'
 
-export default function(change) {
-  change.removeMark({
+export default function(editor) {
+  editor.removeMark({
     type: 'bold',
     data: { thing: 'value' },
   })

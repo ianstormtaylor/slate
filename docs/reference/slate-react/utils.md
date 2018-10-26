@@ -24,8 +24,7 @@ React-specific utility functions for Slate that may be useful in certain use cas
 During a cut or copy event, sets `fragment` as the Slate document fragment to be copied.
 
 ```js
-function onCopy(event, change, next) {
-  const { editor } = change
+function onCopy(event, editor, next) {
   const fragment = // ... create a fragment from a set of nodes ...
 
   if (fragment) {
@@ -38,14 +37,13 @@ function onCopy(event, change, next) {
 Note that calling `cloneFragment` should be the last thing you do in your event handler. If you change the window selection after calling `cloneFragment`, the browser may copy the wrong content. If you need to perform an action after calling `cloneFragment`, wrap it in `requestAnimationFrame`:
 
 ```js
-function onCut(event, change, next) {
-  const { editor } = change
+function onCut(event, editor, next) {
   const fragment = // ... create a fragment from a set of nodes ...
 
   if (fragment) {
     cloneFragment(event, editor, fragment)
     window.requestAnimationFrame(() => {
-      editor.change(change => change.delete())
+      editor.delete()
     })
     return true
   }
@@ -73,8 +71,8 @@ function componentDidUpdate() {
 Find the DOM range from a Slate [`Range`](../slate/range.md).
 
 ```js
-function onChange(change) {
-  const { value } = change
+function onChange(editor) {
+  const { value } = editor
   const range = findDOMRange(value.selection)
   // Do something with the DOM `range`...
 }
@@ -119,7 +117,7 @@ function onSomeNativeEvent() {
 Get the affected Slate range from a DOM `event` and Slate `editor`.
 
 ```js
-function onDrop(event, change, next) {
+function onDrop(event, editor, next) {
   const targetRange = getEventRange(event, editor)
   // Do something at the drop `targetRange`...
 }
@@ -132,7 +130,7 @@ function onDrop(event, change, next) {
 Get the Slate-related data from a DOM `event` and Slate `value`.
 
 ```js
-function onDrop(event, change, next) {
+function onDrop(event, editor, next) {
   const transfer = getEventTransfer(event)
   const { type, node } = transfer
 
@@ -149,8 +147,8 @@ function onDrop(event, change, next) {
 Sets the Slate-related `data` with `type` on an `event`. The `type` must be one of the types Slate recognizes: `'fragment'`, `'html'`, `'node'`, `'rich'`, or `'text'`.
 
 ```js
-function onDragStart(event, change, next) {
-  const { value } = change
+function onDragStart(event, editor, next) {
+  const { value } = editor
   const { startNode } = value
   setEventTransfer(event, 'node', startNode)
 }

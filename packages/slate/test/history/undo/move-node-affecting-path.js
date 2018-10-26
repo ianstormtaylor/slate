@@ -3,13 +3,8 @@
 import h from '../../helpers/h'
 
 export default function(editor) {
-  editor.change(change => {
-    change.moveNodeByKey('c', 'd', 1)
-  })
-
-  editor.change(change => {
-    change.undo()
-  })
+  editor.moveNodeByKey('c', 'd', 1)
+  editor.flush().undo()
 }
 
 export const input = (

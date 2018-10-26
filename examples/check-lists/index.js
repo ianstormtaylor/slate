@@ -51,7 +51,7 @@ class CheckListItem extends React.Component {
   onChange = event => {
     const checked = event.target.checked
     const { editor, node } = this.props
-    editor.change(c => c.setNodeByKey(node.key, { data: { checked } }))
+    editor.setNodeByKey(node.key, { data: { checked } })
   }
 
   /**
@@ -124,7 +124,7 @@ class CheckLists extends React.Component {
    * @return {Element}
    */
 
-  renderNode = (props, next) => {
+  renderNode = (props, editor, next) => {
     switch (props.node.type) {
       case 'check-list-item':
         return <CheckListItem {...props} />
@@ -136,7 +136,7 @@ class CheckLists extends React.Component {
   /**
    * On change, save the new value.
    *
-   * @param {Change} change
+   * @param {Editor} editor
    */
 
   onChange = ({ value }) => {
@@ -153,15 +153,15 @@ class CheckLists extends React.Component {
    * then turn it back into a paragraph.
    *
    * @param {Event} event
-   * @param {Change} change
+   * @param {Editor} editor
    * @param {Function} next
    */
 
-  onKeyDown = (event, change, next) => {
-    const { value } = change
+  onKeyDown = (event, editor, next) => {
+    const { value } = editor
 
     if (event.key == 'Enter' && value.startBlock.type == 'check-list-item') {
-      change.splitBlock().setBlocks({ data: { checked: false } })
+      editor.splitBlock().setBlocks({ data: { checked: false } })
       return
     }
 
@@ -171,7 +171,7 @@ class CheckLists extends React.Component {
       value.startBlock.type == 'check-list-item' &&
       value.selection.startOffset == 0
     ) {
-      change.setBlocks('paragraph')
+      editor.setBlocks('paragraph')
       return
     }
 

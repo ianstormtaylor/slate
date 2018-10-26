@@ -2,9 +2,9 @@
 
 import h from '../../../helpers/h'
 
-export default function(change) {
-  const node = change.value.document.getBlocks().first()
-  change.insertNodeByKey('a', 0, node)
+export default function(editor) {
+  const node = editor.value.document.getBlocks().first()
+  editor.insertNodeByKey('a', 0, node)
 }
 
 export const input = (

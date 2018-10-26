@@ -2,8 +2,8 @@
 
 import h from '../../../helpers/h'
 
-export default function(change) {
-  change.setInlines({ type: 'comment' })
+export default function(editor) {
+  editor.setInlines({ type: 'comment' })
 }
 
 export const input = (

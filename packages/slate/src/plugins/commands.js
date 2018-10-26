@@ -10,15 +10,15 @@ function CommandsPlugin(commands = {}) {
    * On command, if it exists in our list of commands, call it.
    *
    * @param {Object} command
-   * @param {Change} change
+   * @param {Editor} editor
    * @param {Function} next
    */
 
-  function onCommand(command, change, next) {
+  function onCommand(command, editor, next) {
     const { type, args } = command
     const fn = commands[type]
     if (!fn) return next()
-    change.call(fn, ...args)
+    editor.command(fn, ...args)
   }
 
   /**

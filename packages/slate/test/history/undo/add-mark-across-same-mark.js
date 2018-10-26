@@ -3,13 +3,8 @@
 import h from '../../helpers/h'
 
 export default function(editor) {
-  editor.change(change => {
-    change.addMark('bold')
-  })
-
-  editor.change(change => {
-    change.undo()
-  })
+  editor.addMark('bold')
+  editor.flush().undo()
 }
 
 export const input = (

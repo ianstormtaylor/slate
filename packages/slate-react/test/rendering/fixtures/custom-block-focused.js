@@ -11,7 +11,7 @@ function Image(props) {
   })
 }
 
-function renderNode(props, next) {
+function renderNode(props, editor, next) {
   switch (props.node.type) {
     case 'image':
       return Image(props)

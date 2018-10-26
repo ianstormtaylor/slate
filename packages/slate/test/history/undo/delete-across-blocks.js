@@ -3,13 +3,8 @@
 import h from '../../helpers/h'
 
 export default function(editor) {
-  editor.change(change => {
-    change.delete()
-  })
-
-  editor.change(change => {
-    change.undo()
-  })
+  editor.delete()
+  editor.flush().undo()
 }
 
 // the paragraph and code blocks have some random data

@@ -1,6 +1,6 @@
 # Commands & Queries
 
-All commands to a Slate editor's value, whether it's the `selection`, `document`, `history`, etc. happen via "commands" that are applied to a [`Change`](../reference/slate/change.md).
+All commands to a Slate editor's value, whether it's the `selection`, `document`, `history`, etc. happen via "commands".
 
 Under the covers, Slate takes care of converting each command into a set of low-level [operations](../reference/slate/operation.md) that are applied to produce a new value. This is what makes collaborative editing implementations possible. But you don't have to worry about that, because it happens automatically.
 
@@ -17,7 +17,7 @@ And if the API for commands was verbose, or if it required lots of in between st
 To solve this, Slate has very expressive, chainable commands. Like this:
 
 ```js
-change
+editor
   .focus()
   .moveToRangeOfDocument()
   .delete()
@@ -85,30 +85,29 @@ When you decide you want to make a change to the Slate value, you're almost alwa
 
 ### 1. In Slate Handlers
 
-The first place, is inside a Slate-controlled event handler, like `onKeyDown` or `onPaste`. These handlers take a signature of `event, change, next`. That `change` argument is a [`Change`](../reference/slate/change.md) object that you can manipulate. For example...
+The first place, is inside a Slate-controlled event handler, like `onKeyDown` or `onPaste`. These handlers take a signature of `event, editor, next`. For example...
 
 ```js
-function onKeyDown(event, change, next) {
+function onKeyDown(event, editor, next) {
   if (event.key == 'Enter') {
-    change.splitBlock()
+    editor.splitBlock()
+  } else {
+    return next()
   }
 }
 ```
 
-Any commands you call will be applied, and when the event handler stack is finished resolving, the editor will automatically update with those commands.
+Any commands you call will be applied immediately to the `editor` object, and flushed to the `onChange` handler on the next tick.
 
 ### 2. From Custom Node Components
 
-The second place is inside a custom node component. For example, you might have an `<Image>` component and you want to make a change when the image is clicked.
-
-In that case, you'll need to use the `change()` method on the Slate [`<Editor>`](../reference/slate-react/editor.md) which you have available as `props.editor`. For example...
+The second place is inside a custom node component. For example, you might have an `<Image>` component and you want to make a change when the image is clicked. For example...
 
 ```js
 class Image extends React.Component {
   onClick = event => {
-    this.props.editor.change(change => {
-      change.removeNodeByKey(this.props.node.key)
-    })
+    const { editor, node } = this.props
+    editor.removeNodeByKey(node.key)
   }
 
   render() {
@@ -117,7 +116,7 @@ class Image extends React.Component {
 }
 ```
 
-The `editor.change()` method will create a new [`Change`](../reference/slate/change.md) object for you, based on the editor's current plugins and value. You can then call any commands you want, and the new value will be applied to the editor.
+The `<Image>` node component will be passed the `editor` and the `node` it represents as props, so you can use these to trigger commands.
 
 ### 3. From Schema Rules
 
@@ -130,9 +129,9 @@ The third place you may perform change operationsâ€”for more complex use casesâ€
       nodes: [{
         match: { type: 'item' }
       }],
-      normalize: (change, error) => {
+      normalize: (editor, error) => {
         if (error.code == 'child_type_invalid') {
-          change.wrapBlockByKey(error.child.key, 'item')
+          editor.wrapBlockByKey(error.child.key, 'item')
         }
       }
     }
@@ -140,7 +139,7 @@ The third place you may perform change operationsâ€”for more complex use casesâ€
 }
 ```
 
-When a rule's validation fails, Slate passes a [`Change`](../reference/slate/change.md) object to the `normalize` function of the rule, if one exists. You can use this object to apply the commands necessary to make your document valid on the next normalization pass.
+When a rule's validation fails, Slate passes the editor to the `normalize` function of the rule, if one exists. You can use these normalizing funcrtions to apply the commands necessary to make your document valid on the next normalization pass.
 
 ### 4. From Outside Slate
 
@@ -148,25 +147,28 @@ The last place is from outside of Slate. Sometimes you'll have components that l
 editor in the render tree, and you'll need to explicitly pass them a reference to the Slate `editor` to run changes. In React you do this with the `ref={}` prop...
 
 ```js
-<Editor ref={this.editor = editor} ...>
+<Editor
+  ref={editor => this.editor = editor}
+  ...
+/>
 ```
 
-Which gives you a reference to the Slate editor. And from there you can use the same `editor.change` syntax from above to apply changes.
+Which gives you a reference to the Slate editor. And from there you can use the same commands syntax from above to apply changes.
 
 ## Running Queries
 
 Queries are similar to commands, but instead of manipulating the current value of the editor, they return information about the current value, or a specific node, etc.
 
-By default, Slate only defines two queries: `isAtomic` for marks and decorations, and `isVoid` for nodes. You can access them directly on the change object:
+By default, Slate only defines two queries: `isAtomic` for marks and decorations, and `isVoid` for nodes. You can access them directly on the editor:
 
 ```js
-const isVoid = change.isVoid(node)
+const isVoid = editor.isVoid(node)
 ```
 
 But you can also define your own queries that are specific to your schema. For example, you might use a query to determine whether the "bold" mark is active...
 
 ```js
-const isBold = change.isBoldActive(value)
+const isBold = editor.isBoldActive(value)
 ```
 
 And then use that information to mark the <kbd>bold</kbd> button in your editor's toolbar as active or not.
@@ -175,17 +177,17 @@ And then use that information to mark the <kbd>bold</kbd> button in your editor'
 
 In addition to using the built-in commands, if your editor is of any complexity you'll want to write your own reusable commands. That way, you can reuse a single `insertImage` change instead of constantly writing `insertBlock(...args)`.
 
-To do that, you can define commands in your own Slate plugin, which will be made available as methods on the `change` object specific to your editor. For example, here are two simple block inserting commands...
+To do that, you can define commands in your own Slate plugin, which will be made available as methods on the `editor` object. For example, here are two simple block inserting commands...
 
 ```js
 const yourPlugin = {
   commands: {
-    insertParagraph(change) {
-      change.insertBlock('paragraph')
+    insertParagraph(editor) {
+      editor.insertBlock('paragraph')
     },
 
-    insertImage(change, src) {
-      change.insertBlock({
+    insertImage(editor, src) {
+      editor.insertBlock({
         type: 'image',
         data: { src },
       })
@@ -197,7 +199,7 @@ const yourPlugin = {
 Notice how rewriting that image inserting logic multiple times without having it encapsulated in a single function would get tedious. Now with those change functions defined, you can reuse them!
 
 ```js
-change.insertImage('https://google.com/logo.png')
+editor.insertImage('https://google.com/logo.png')
 ```
 
 And any arguments you pass in are sent to your custom command functions.
@@ -214,10 +216,10 @@ const yourPlugin = {
 }
 ```
 
-And then you can use them:
+And then you can use them right from the `editor` instance:
 
 ```js
-change.getActiveListItem()
+editor.getActiveListItem()
 ```
 
 This reusability is key to being able to organize your commands and queries, and compose them together to create more advanced behaviors.

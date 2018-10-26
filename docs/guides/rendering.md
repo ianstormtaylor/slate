@@ -13,7 +13,7 @@ Using custom components for the nodes and marks is the most common rendering nee
 The function is called with the node's props, including `props.node` which is the node itself. You can use these to determine what to render. For example, you can render nodes using simple HTML elements:
 
 ```js
-function renderNode(props, next) {
+function renderNode(props, editor, next) {
   const { node, attributes, children } = props
 
   switch (node.type) {
@@ -36,7 +36,7 @@ function renderNode(props, next) {
 You don't have to use simple HTML elements, you can use your own custom React components too:
 
 ```js
-function renderNode(props, next) {
+function renderNode(props, editor, next) {
   switch (props.node.type) {
     case 'paragraph':
       return <ParagraphComponent {...props} />
@@ -55,7 +55,7 @@ And you can just as easily put that `renderNode` logic into a plugin, and pass t
 ```js
 function SomeRenderingPlugin() {
   return {
-    renderNode(props, next) {
+    renderNode(props, editor, next) {
       ...
     }
   }
@@ -75,7 +75,7 @@ const plugins = [
 Marks work the same way, except they invoke the `renderMark` function. Like so:
 
 ```js
-function renderMark(props, next) {
+function renderMark(props, editor, next) {
   const { children, mark, attributes } = props
   switch (mark.type) {
     case 'bold':
@@ -107,8 +107,8 @@ By default Slate will render a placeholder for you which mimics the native DOM `
 However sometimes you want to customize things. Or maybe you want to render placeholders inside specific blocks like inside an image caption. To do that, you can define your own `renderPlaceholder` function:
 
 ```js
-function renderPlaceholder(props, next) {
-  const { node, editor } = props
+function renderPlaceholder(props, editor, next) {
+  const { node } = props
   if (node.object != 'block') return next()
   if (node.type != 'caption') return next()
   if (node.text != '') return next()
@@ -138,7 +138,7 @@ Not only can you control the rendering behavior of the components inside the edi
 This sounds weird, but it can be pretty useful if you want to render additional top-level elements from inside a plugin. To do so, you use the `renderEditor` function:
 
 ```js
-function renderEditor(props, next) {
+function renderEditor(props, editor, next) {
   const { editor } = props
   const wordCount = countWords(editor.value.text)
   const children = next()

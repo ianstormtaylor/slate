@@ -56,7 +56,7 @@ class SyncingEditor extends React.Component {
 
   applyOperations = operations => {
     this.remote = true
-    this.editor.change(change => change.applyOperations(operations))
+    operations.forEach(o => this.editor.applyOperation(o))
     this.remote = false
   }
 
@@ -136,7 +136,7 @@ class SyncingEditor extends React.Component {
    * @return {Element}
    */
 
-  renderMark = (props, next) => {
+  renderMark = (props, editor, next) => {
     const { children, mark, attributes } = props
 
     switch (mark.type) {
@@ -157,7 +157,7 @@ class SyncingEditor extends React.Component {
    * On change, save the new `value`. And if it's a local change, call the
    * passed-in `onChange` handler.
    *
-   * @param {Change} change
+   * @param {Editor} editor
    * @param {Object} options
    */
 
@@ -173,11 +173,11 @@ class SyncingEditor extends React.Component {
    * On key down, if it's a formatting command toggle a mark.
    *
    * @param {Event} event
-   * @param {Change} change
+   * @param {Editor} editor
    * @return {Change}
    */
 
-  onKeyDown = (event, change, next) => {
+  onKeyDown = (event, editor, next) => {
     let mark
 
     if (isBoldHotkey(event)) {
@@ -193,7 +193,7 @@ class SyncingEditor extends React.Component {
     }
 
     event.preventDefault()
-    change.toggleMark(mark)
+    editor.toggleMark(mark)
   }
 
   /**
@@ -205,7 +205,7 @@ class SyncingEditor extends React.Component {
 
   onClickMark = (event, type) => {
     event.preventDefault()
-    this.editor.change(change => change.toggleMark(type))
+    this.editor.toggleMark(type)
   }
 }
 
@@ -250,7 +250,7 @@ class SyncingOperationsExample extends React.Component {
       .toJS()
 
     setTimeout(() => {
-      this.two.applyOperations(ops)
+      ops.forEach(o => this.two.applyOperation(o))
     })
   }
 
@@ -266,7 +266,7 @@ class SyncingOperationsExample extends React.Component {
       .toJS()
 
     setTimeout(() => {
-      this.one.applyOperations(ops)
+      ops.forEach(o => this.one.applyOperation(o))
     })
   }
 }

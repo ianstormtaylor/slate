@@ -3,8 +3,8 @@
 import h from '../../../helpers/h'
 import { Data } from 'slate'
 
-export default function(change) {
-  change.setBlocks({
+export default function(editor) {
+  editor.setBlocks({
     type: 'code',
     data: Data.create({ thing: 'value' }),
   })

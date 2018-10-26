@@ -2,8 +2,8 @@
 
 import h from '../../../helpers/h'
 
-export default function(change) {
-  change.wrapBlock({
+export default function(editor) {
+  editor.wrapBlock({
     type: 'quote',
     data: { thing: 'value' },
   })

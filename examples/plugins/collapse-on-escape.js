@@ -1,11 +1,11 @@
 export default function CollapseOnEscape(options = {}) {
   return {
-    onKeyDown(event, change, next) {
-      const { value } = change
+    onKeyDown(event, editor, next) {
+      const { value } = editor
       const { selection } = value
 
       if (event.key === 'Escape' && selection.isExpanded) {
-        change.moveToEnd()
+        editor.moveToEnd()
       } else {
         return next()
       }

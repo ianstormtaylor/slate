@@ -2,8 +2,8 @@
 
 import h from '../../../helpers/h'
 
-export default function(change) {
-  change.moveNodeByKey('a', 'b', 3)
+export default function(editor) {
+  editor.moveNodeByKey('a', 'b', 3)
 }
 
 export const input = (

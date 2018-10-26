@@ -23,17 +23,17 @@ When a hook is triggered, the middleware function is passed a set of arguments, 
 
 ### `normalizeNode`
 
-`Function normalizeNode(node: Node, next: Function) => Function(change: Change)|Void`
+`Function normalizeNode(node: Node, editor: Editor, next: Function) => Function(editor: Editor)|Void`
 
 The `normalizeNode` hook takes a `node` and either returns `undefined` if the node is valid, or a change function that normalizes the node into a valid state if not.
 
 ### `onChange`
 
-`onChange(change: Change, next: Function) => Void`
+`onChange(editor: Editor, next: Function) => Void`
 
 ```js
 {
-  onChange(change, next) {
+  onChange(editor, next) {
     ...
     return next()
   }
@@ -44,11 +44,11 @@ The `onChange` hook is called whenever a new change is about to be applied to an
 
 ### `onCommand`
 
-`onCommand(command: Object, change: Change, ) => Void`
+`onCommand(command: Object, editor: Editor, next: Function) => Void`
 
 ```js
 {
-  onCommand(command, change, next) {
+  onCommand(command, editor, next) {
     const { type, args } = command
 
     if (type === 'wrapQuote') {
@@ -90,11 +90,11 @@ The `onConstruct` hook is called when a new instance of `Editor` is created. Thi
 
 ### `onQuery`
 
-`onQuery(query: Object, next: Function) => Void`
+`onQuery(query: Object, editor: Editor, next: Function) => Void`
 
 ```js
 {
-  onQuery(query, next) {
+  onQuery(query, editor, next) {
     const { type, args } = query
 
     if (type === 'getActiveList') {
@@ -119,7 +119,7 @@ The `onQuery` hook is a low-level way to have access to all of the queries passi
 
 ### `validateNode`
 
-`Function validateNode(node: Node, next: Function) => SlateError|Void`
+`Function validateNode(node: Node, editor: Editor, next: Function) => SlateError|Void`
 
 The `validateNode` hook takes a `node` and either returns `undefined` if the node is valid, or a `SlateError` object if it is invalid.
 
@@ -142,16 +142,16 @@ In addition to the middleware functions, Slate also provides three shorthands wh
 ```js
 {
   commands: {
-    setHeader(change, level) {
-      change.setBlocks({ type: 'header', data: { level }})
+    setHeader(editor, level) {
+      editor.setBlocks({ type: 'header', data: { level }})
     }
   }
 }
 ```
 
-The `commands` shorthand defines a set of custom commands that are made available in the editor, and as first-class methods on the `change` objects created by the editor.
+The `commands` shorthand defines a set of custom commands that are made available in the editor, and as first-class methods on the `editor`.
 
-Each command has a signature of `(change, ...args)`.
+Each command has a signature of `(editor, ...args)`.
 
 ### `queries`
 
@@ -167,7 +167,7 @@ Each command has a signature of `(change, ...args)`.
 }
 ```
 
-The `queries` shorthand defines a set of custom queries that are made available in the editor, and as first-class methods on the `change` objects created by the editor.
+The `queries` shorthand defines a set of custom queries that are made available in the editor, and as first-class methods on the `editor`.
 
 Each query has a signature of `(editor, ...args)`.
 

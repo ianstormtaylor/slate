@@ -2,8 +2,8 @@
 
 import h from '../../../helpers/h'
 
-export default function(change) {
-  change.mergeNodeByKey('a')
+export default function(editor) {
+  editor.mergeNodeByKey('a')
 }
 
 export const input = (

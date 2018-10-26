@@ -2,7 +2,7 @@
 
 An operation is the lowest-level description of a specific change to a part of Slate's value. They are designed to be collaborative-editing friendly.
 
-All of the [`Change`](./change.md) methods result in operations being created and applied to a [`Value`](./value.md) They're accessible via the `change.operations` property.
+All of the [`Commands`](./commands.md) methods result in operations being created and applied to a [`Value`](./value.md) They're accessible via the `editor.operations` property.
 
 There are a handful of Slate operation types. The goal is to have the fewest possible types, while still maintaining the necessary semantics for collaborative editing to work.
 

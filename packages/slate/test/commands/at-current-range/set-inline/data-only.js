@@ -3,8 +3,8 @@
 import h from '../../../helpers/h'
 import { Data } from 'slate'
 
-export default function(change) {
-  change.setInlines({ data: Data.create({ thing: 'value' }) })
+export default function(editor) {
+  editor.setInlines({ data: Data.create({ thing: 'value' }) })
 }
 
 export const input = (

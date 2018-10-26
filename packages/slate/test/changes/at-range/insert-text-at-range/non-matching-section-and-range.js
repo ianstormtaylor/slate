@@ -4,13 +4,13 @@ import { Point, Range } from 'slate'
 
 import h from '../../../helpers/h'
 
-export default function(change) {
-  const { key } = change.value.document.getFirstText()
+export default function(editor) {
+  const { key } = editor.value.document.getFirstText()
   const range = new Range({
     anchor: new Point({ key, offset: 0 }),
     focus: new Point({ key, offset: 3 }),
   })
-  change.insertTextAtRange(range, 'That')
+  editor.insertTextAtRange(range, 'That')
 }
 
 export const input = (

@@ -3,8 +3,8 @@
 import h from '../../../helpers/h'
 import { Block } from 'slate'
 
-export default function(change) {
-  change.insertNodeByKey('a', 0, Block.create('paragraph'))
+export default function(editor) {
+  editor.insertNodeByKey('a', 0, Block.create('paragraph'))
 }
 
 export const input = (

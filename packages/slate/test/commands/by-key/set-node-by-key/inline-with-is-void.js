@@ -2,8 +2,8 @@
 
 import h from '../../../helpers/h'
 
-export default function(change) {
-  change.setNodeByKey('a', 'emoji')
+export default function(editor) {
+  editor.setNodeByKey('a', 'emoji')
 }
 
 export const input = (

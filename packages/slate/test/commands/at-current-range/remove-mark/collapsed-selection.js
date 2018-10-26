@@ -2,8 +2,8 @@
 
 import h from '../../../helpers/h'
 
-export default function(change) {
-  change
+export default function(editor) {
+  editor
     .addMark('bold')
     .removeMark('bold')
     .insertText('a')

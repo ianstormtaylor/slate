@@ -3,8 +3,8 @@
 import h from '../../../helpers/h'
 import { Data } from 'slate'
 
-export default function(change) {
-  change.setInlines({
+export default function(editor) {
+  editor.setInlines({
     type: 'hashtag',
     data: Data.create({ thing: 'value' }),
   })

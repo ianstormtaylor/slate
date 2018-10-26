@@ -2,8 +2,8 @@
 
 import h from '../../../helpers/h'
 
-export default function(change) {
-  change.setBlocks('code')
+export default function(editor) {
+  editor.setBlocks('code')
 }
 
 export const input = (

@@ -6,11 +6,11 @@ export const schema = {
   blocks: {
     paragraph: {
       previous: [{ type: 'paragraph' }],
-      normalize: (change, error) => {
+      normalize: (editor, error) => {
         const { code, previous } = error
 
         if (code === 'previous_sibling_type_invalid') {
-          change.wrapBlockByKey(previous.key, 'paragraph')
+          editor.wrapBlockByKey(previous.key, 'paragraph')
         }
       },
     },

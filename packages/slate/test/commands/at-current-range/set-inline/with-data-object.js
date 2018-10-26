@@ -2,8 +2,8 @@
 
 import h from '../../../helpers/h'
 
-export default function(change) {
-  change.setInlines({
+export default function(editor) {
+  editor.setInlines({
     type: 'hashtag',
     data: { thing: 'value' },
   })

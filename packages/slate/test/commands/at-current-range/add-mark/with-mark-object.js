@@ -4,8 +4,8 @@ import h from '../../../helpers/h'
 
 import { Mark } from 'slate'
 
-export default function(change) {
-  change.addMark(
+export default function(editor) {
+  editor.addMark(
     Mark.create({
       type: 'bold',
       data: { thing: 'value' },

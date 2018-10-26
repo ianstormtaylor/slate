@@ -2,11 +2,11 @@
 
 import h from '../../../helpers/h'
 
-export default function(change) {
-  const { value } = change
+export default function(editor) {
+  const { value } = editor
   const { startText } = value
 
-  change.select({
+  editor.select({
     anchor: {
       key: startText.key,
       offset: 0,

@@ -166,7 +166,7 @@ class RichTextExample extends React.Component {
    * @return {Element}
    */
 
-  renderNode = (props, next) => {
+  renderNode = (props, editor, next) => {
     const { attributes, children, node } = props
 
     switch (node.type) {
@@ -194,7 +194,7 @@ class RichTextExample extends React.Component {
    * @return {Element}
    */
 
-  renderMark = (props, next) => {
+  renderMark = (props, editor, next) => {
     const { children, mark, attributes } = props
 
     switch (mark.type) {
@@ -214,7 +214,7 @@ class RichTextExample extends React.Component {
   /**
    * On change, save the new `value`.
    *
-   * @param {Change} change
+   * @param {Editor} editor
    */
 
   onChange = ({ value }) => {
@@ -225,11 +225,11 @@ class RichTextExample extends React.Component {
    * On key down, if it's a formatting command toggle a mark.
    *
    * @param {Event} event
-   * @param {Change} change
+   * @param {Editor} editor
    * @return {Change}
    */
 
-  onKeyDown = (event, change, next) => {
+  onKeyDown = (event, editor, next) => {
     let mark
 
     if (isBoldHotkey(event)) {
@@ -245,7 +245,7 @@ class RichTextExample extends React.Component {
     }
 
     event.preventDefault()
-    change.toggleMark(mark)
+    editor.toggleMark(mark)
   }
 
   /**
@@ -257,10 +257,7 @@ class RichTextExample extends React.Component {
 
   onClickMark = (event, type) => {
     event.preventDefault()
-
-    this.editor.change(change => {
-      change.toggleMark(type)
-    })
+    this.editor.toggleMark(type)
   }
 
   /**
@@ -273,46 +270,45 @@ class RichTextExample extends React.Component {
   onClickBlock = (event, type) => {
     event.preventDefault()
 
-    this.editor.change(change => {
-      const { value } = change
-      const { document } = value
+    const { editor } = this
+    const { value } = editor
+    const { document } = value
 
-      // Handle everything but list buttons.
-      if (type != 'bulleted-list' && type != 'numbered-list') {
-        const isActive = this.hasBlock(type)
-        const isList = this.hasBlock('list-item')
+    // Handle everything but list buttons.
+    if (type != 'bulleted-list' && type != 'numbered-list') {
+      const isActive = this.hasBlock(type)
+      const isList = this.hasBlock('list-item')
 
-        if (isList) {
-          change
-            .setBlocks(isActive ? DEFAULT_NODE : type)
-            .unwrapBlock('bulleted-list')
-            .unwrapBlock('numbered-list')
-        } else {
-          change.setBlocks(isActive ? DEFAULT_NODE : type)
-        }
+      if (isList) {
+        editor
+          .setBlocks(isActive ? DEFAULT_NODE : type)
+          .unwrapBlock('bulleted-list')
+          .unwrapBlock('numbered-list')
       } else {
-        // Handle the extra wrapping required for list buttons.
-        const isList = this.hasBlock('list-item')
-        const isType = value.blocks.some(block => {
-          return !!document.getClosest(block.key, parent => parent.type == type)
-        })
-
-        if (isList && isType) {
-          change
-            .setBlocks(DEFAULT_NODE)
-            .unwrapBlock('bulleted-list')
-            .unwrapBlock('numbered-list')
-        } else if (isList) {
-          change
-            .unwrapBlock(
-              type == 'bulleted-list' ? 'numbered-list' : 'bulleted-list'
-            )
-            .wrapBlock(type)
-        } else {
-          change.setBlocks('list-item').wrapBlock(type)
-        }
+        editor.setBlocks(isActive ? DEFAULT_NODE : type)
       }
-    })
+    } else {
+      // Handle the extra wrapping required for list buttons.
+      const isList = this.hasBlock('list-item')
+      const isType = value.blocks.some(block => {
+        return !!document.getClosest(block.key, parent => parent.type == type)
+      })
+
+      if (isList && isType) {
+        editor
+          .setBlocks(DEFAULT_NODE)
+          .unwrapBlock('bulleted-list')
+          .unwrapBlock('numbered-list')
+      } else if (isList) {
+        editor
+          .unwrapBlock(
+            type == 'bulleted-list' ? 'numbered-list' : 'bulleted-list'
+          )
+          .wrapBlock(type)
+      } else {
+        editor.setBlocks('list-item').wrapBlock(type)
+      }
+    }
   }
 }
 

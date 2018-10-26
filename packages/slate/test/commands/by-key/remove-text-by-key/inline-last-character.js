@@ -2,8 +2,8 @@
 
 import h from '../../../helpers/h'
 
-export default function(change) {
-  change.removeTextByKey('a', 0, 1)
+export default function(editor) {
+  editor.removeTextByKey('a', 0, 1)
 }
 
 export const input = (

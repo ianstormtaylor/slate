@@ -14,13 +14,13 @@ This document maintains a list of changes to the `slate-react` package with each
 
 ```js
 // Previously, you'd return `undefined` to continue.
-function onKeyDown(event, change, editor) {
+function onKeyDown(event, editor, next) {
   if (event.key !== 'Enter') return
   ...
 }
 
 // Now, you call `next()` to continue...
-function onKeyDown(event, change, next) {
+function onKeyDown(event, editor, next) {
   if (event.key !== 'Enter') return next()
   ...
 }
@@ -29,7 +29,7 @@ function onKeyDown(event, change, next) {
 While that may seem inconvenient, it opens up an entire new behavior, which is deferring to the plugins later in the stack to see if they "handle" a specific case, and if not, handling it yourself:
 
 ```js
-function onKeyDown(event, change, next) {
+function onKeyDown(event, editor, next) {
   if (event.key === 'Enter') {
     const handled = next()
     if (handled) return handled
@@ -45,7 +45,7 @@ Under the covers, the `schema`, `commands` and `queries` concept are all impleme
 
 ```js
 const plugin = {
-  onCommand(command, change, next) {
+  onCommand(command, editor, next) {
     ...
   }
 }
@@ -62,7 +62,7 @@ This allows you to actually listen in to all commands, and override individual b
 **The `editor` object is no longer passed to event handlers.** Previously, the third argument to event handlers would be the React `editor` instance. However, now that `Change` objects contain a direct reference to the editor, you can access this on `change.editor` instead.
 
 ```js
-function onKeyDown(event, change, next) {
+function onKeyDown(event, editor, next) {
   const { editor } = change
   ...
 }
@@ -206,7 +206,7 @@ In its place is the new `next` argument, which allows you to choose to defer to 
 
 ###### BREAKING
 
-**The `data` argument to event handlers has been removed.** Previously event handlers had a signature of `(event, data, change, editor)`, but now they have a signature of just `(event, change, editor)`. This leads to simpler internal Slate logic, and less complex relationship dependencies between plugins. All of the information inside the old `data` argument can be accessed via the similar properties on the `event` argument, or via the `getEventRange`, `getEventTransfer` and `setEventTransfer` helpers.
+**The `data` argument to event handlers has been removed.** Previously event handlers had a signature of `(event, data, change, editor)`, but now they have a signature of just `(event, editor, next)`. This leads to simpler internal Slate logic, and less complex relationship dependencies between plugins. All of the information inside the old `data` argument can be accessed via the similar properties on the `event` argument, or via the `getEventRange`, `getEventTransfer` and `setEventTransfer` helpers.
 
 ###### NEW
 

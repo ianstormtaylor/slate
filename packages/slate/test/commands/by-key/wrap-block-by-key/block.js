@@ -2,8 +2,8 @@
 
 import h from '../../../helpers/h'
 
-export default function(change) {
-  change.wrapBlockByKey('a', 'quote')
+export default function(editor) {
+  editor.wrapBlockByKey('a', 'quote')
 }
 
 export const input = (

@@ -2,8 +2,8 @@
 
 import h from '../../../helpers/h'
 
-export default function(change) {
-  change.splitNodeByKey('a', 2)
+export default function(editor) {
+  editor.splitNodeByKey('a', 2)
 }
 
 export const input = (

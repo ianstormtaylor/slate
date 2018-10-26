@@ -91,10 +91,7 @@ describe('slate', () => {
     }
 
     editor.setValue(input)
-
-    editor.change(change => {
-      change.applyOperations(operations)
-    })
+    operations.forEach(op => editor.applyOperation(op))
 
     const actual = editor.value.toJSON(opts)
 
@@ -113,7 +110,7 @@ describe('slate', () => {
     const opts = { preserveSelection: true, ...options }
 
     editor.setValue(input)
-    editor.change(fn)
+    fn(editor)
     const actual = editor.value.toJSON(opts)
 
     editor.setValue(output)

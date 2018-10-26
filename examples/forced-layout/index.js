@@ -16,15 +16,15 @@ const schema = {
       { match: { type: 'title' }, min: 1, max: 1 },
       { match: { type: 'paragraph' }, min: 1 },
     ],
-    normalize: (change, { code, node, child, index }) => {
+    normalize: (editor, { code, node, child, index }) => {
       switch (code) {
         case 'child_type_invalid': {
           const type = index === 0 ? 'title' : 'paragraph'
-          return change.setNodeByKey(child.key, type)
+          return editor.setNodeByKey(child.key, type)
         }
         case 'child_required': {
           const block = Block.create(index === 0 ? 'title' : 'paragraph')
-          return change.insertNodeByKey(node.key, index, block)
+          return editor.insertNodeByKey(node.key, index, block)
         }
       }
     },
@@ -75,7 +75,7 @@ class ForcedLayout extends React.Component {
    * @return {Element}
    */
 
-  renderNode = (props, next) => {
+  renderNode = (props, editor, next) => {
     const { attributes, children, node } = props
 
     switch (node.type) {
@@ -91,7 +91,7 @@ class ForcedLayout extends React.Component {
   /**
    * On change.
    *
-   * @param {Change} change
+   * @param {Editor} editor
    */
 
   onChange = ({ value }) => {

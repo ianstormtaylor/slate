@@ -2,8 +2,8 @@
 
 import h from '../../../helpers/h'
 
-export default function(change) {
-  change.moveAnchorBackward()
+export default function(editor) {
+  editor.moveAnchorBackward()
 }
 
 export const input = (

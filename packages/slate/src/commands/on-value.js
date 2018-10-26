@@ -11,15 +11,33 @@ const Commands = {}
 /**
  * Set `properties` on the value.
  *
- * @param {Change} change
+ * @param {Editor} editor
  * @param {Object|Value} properties
  */
 
-Commands.setValue = (change, properties) => {
-  properties = Value.createProperties(properties)
-  const { value } = change
+Commands.setData = (editor, data = {}) => {
+  const properties = Value.createProperties({ data })
+  const { value } = editor
 
-  change.applyOperation({
+  editor.applyOperation({
+    type: 'set_value',
+    properties,
+    value,
+  })
+}
+
+/**
+ * Set `properties` on the value.
+ *
+ * @param {Editor} editor
+ * @param {Object|Value} properties
+ */
+
+Commands.setDecorations = (editor, decorations = []) => {
+  const properties = Value.createProperties({ decorations })
+  const { value } = editor
+
+  editor.applyOperation({
     type: 'set_value',
     properties,
     value,

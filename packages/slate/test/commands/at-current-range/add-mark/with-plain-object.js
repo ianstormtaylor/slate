@@ -2,8 +2,8 @@
 
 import h from '../../../helpers/h'
 
-export default function(change) {
-  change.addMark({
+export default function(editor) {
+  editor.addMark({
     type: 'bold',
     data: { thing: 'value' },
   })

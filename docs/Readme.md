@@ -30,7 +30,7 @@
 ## Slate Core
 
 * [Block](./reference/slate/block.md)
-* [Change](./reference/slate/change.md)
+* [Commands](./reference/slate/commands.md)
 * [Data](./reference/slate/data.md)
 * [Decoration](./reference/slate/decoration.md)
 * [Document](./reference/slate/document.md)

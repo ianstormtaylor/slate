@@ -2,8 +2,8 @@
 
 import h from '../../../helpers/h'
 
-export default function(change) {
-  change.toggleMark({
+export default function(editor) {
+  editor.toggleMark({
     type: 'bold',
     data: { thing: 'value' },
   })

@@ -20,12 +20,12 @@ class App extends React.Component {
     this.setState({ value })
   }
 
-  onKeyDown = (event, change, next) => {
+  onKeyDown = (event, editor, next) => {
     if (event.key != '`' || !event.ctrlKey) return next()
     event.preventDefault()
-    const isCode = change.value.blocks.some(block => block.type == 'code')
+    const isCode = editor.value.blocks.some(block => block.type == 'code')
 
-    change.setBlocks(isCode ? 'paragraph' : 'code')
+    editor.setBlocks(isCode ? 'paragraph' : 'code')
     return true
   }
 
@@ -40,7 +40,7 @@ class App extends React.Component {
     )
   }
 
-  renderNode = (props, next) => {
+  renderNode = (props, editor, next) => {
     switch (props.node.type) {
       case 'code':
         return <CodeNode {...props} />
@@ -63,7 +63,7 @@ class App extends React.Component {
     this.setState({ value })
   }
 
-  onKeyDown = (event, change, next) => {
+  onKeyDown = (event, editor, next) => {
     if (!event.ctrlKey) return next()
 
     // Decide what to do based on the key code...
@@ -71,15 +71,13 @@ class App extends React.Component {
       // When "B" is pressed, add a "bold" mark to the text.
       case 'b': {
         event.preventDefault()
-        change.addMark('bold')
-        return true
+        editor.addMark('bold')
       }
       // When "`" is pressed, keep our existing code block logic.
       case '`': {
-        const isCode = change.value.blocks.some(block => block.type == 'code')
+        const isCode = editor.value.blocks.some(block => block.type == 'code')
         event.preventDefault()
-        change.setBlocks(isCode ? 'paragraph' : 'code')
-        return true
+        editor.setBlocks(isCode ? 'paragraph' : 'code')
       }
       // Otherwise, let other plugins handle it.
       default: {
@@ -99,7 +97,7 @@ class App extends React.Component {
     )
   }
 
-  renderNode = (props, next) => {
+  renderNode = (props, editor, next) => {
     switch (props.node.type) {
       case 'code':
         return <CodeNode {...props} />
@@ -139,20 +137,18 @@ class App extends React.Component {
     this.setState({ value })
   }
 
-  onKeyDown = (event, change, next) => {
+  onKeyDown = (event, editor, next) => {
     if (!event.ctrlKey) return next()
 
     switch (event.key) {
       case 'b': {
         event.preventDefault()
-        change.toggleMark('bold')
-        return true
+        editor.toggleMark('bold')
       }
       case '`': {
-        const isCode = change.value.blocks.some(block => block.type == 'code')
+        const isCode = editor.value.blocks.some(block => block.type == 'code')
         event.preventDefault()
-        change.setBlocks(isCode ? 'paragraph' : 'code')
-        return true
+        editor.setBlocks(isCode ? 'paragraph' : 'code')
       }
       default: {
         return next()
@@ -173,7 +169,7 @@ class App extends React.Component {
     )
   }
 
-  renderNode = (props, next) => {
+  renderNode = (props, editor, next) => {
     switch (props.node.type) {
       case 'code':
         return <CodeNode {...props} />
@@ -183,7 +179,7 @@ class App extends React.Component {
   }
 
   // Add a `renderMark` method to render marks.
-  renderMark = (props, next) => {
+  renderMark = (props, editor, next) => {
     switch (props.mark.type) {
       case 'bold':
         return <BoldMark {...props} />

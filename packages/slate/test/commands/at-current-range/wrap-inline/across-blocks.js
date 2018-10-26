@@ -2,8 +2,8 @@
 
 import h from '../../../helpers/h'
 
-export default function(change) {
-  change.wrapInline('hashtag')
+export default function(editor) {
+  editor.wrapInline('hashtag')
 }
 
 export const input = (

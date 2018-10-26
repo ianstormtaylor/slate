@@ -12,14 +12,14 @@ const Commands = {}
 /**
  * Save an `operation` into the history.
  *
- * @param {Change} change
+ * @param {Editor} editor
  * @param {Object} operation
  */
 
-Commands.save = (change, operation) => {
-  const { operations, value } = change
+Commands.save = (editor, operation) => {
+  const { operations, value } = editor
   const { data } = value
-  let { save, merge } = change.tmp
+  let { save, merge } = editor.tmp
   if (save === false) return
 
   let undos = data.get('undos') || List()
@@ -27,7 +27,7 @@ Commands.save = (change, operation) => {
   const lastOperation = lastBatch && lastBatch.last()
 
   // If `merge` is non-commital, and this is not the first operation in a new
-  // change, then merge, otherwise merge based on the last operation.
+  // editor, then merge, otherwise merge based on the last operation.
   if (merge == null) {
     if (operations.size !== 0) {
       merge = true
@@ -53,28 +53,28 @@ Commands.save = (change, operation) => {
   }
 
   // Clear the redos and update the history.
-  change.withoutSaving(() => {
+  editor.withoutSaving(() => {
     const redos = List()
     const newData = data.set('undos', undos).set('redos', redos)
-    change.setValue({ data: newData })
+    editor.setData(newData)
   })
 }
 
 /**
  * Redo to the next value in the history.
  *
- * @param {Change} change
+ * @param {Editor} editor
  */
 
-Commands.redo = change => {
-  const { value } = change
+Commands.redo = editor => {
+  const { value } = editor
   const { data } = value
   let redos = data.get('redos') || List()
   let undos = data.get('undos') || List()
   const batch = redos.last()
   if (!batch) return
 
-  change.withoutSaving(() => {
+  editor.withoutSaving(() => {
     // Replay the batch of operations.
     batch.forEach(op => {
       const { type, properties } = op
@@ -85,32 +85,32 @@ Commands.redo = change => {
         op = op.set('properties', omit(properties, 'isFocused'))
       }
 
-      change.applyOperation(op)
+      editor.applyOperation(op)
     })
 
     // Shift the next value into the undo stack.
     redos = redos.pop()
     undos = undos.push(batch)
     const newData = data.set('undos', undos).set('redos', redos)
-    change.setValue({ data: newData })
+    editor.setData(newData)
   })
 }
 
 /**
  * Undo the previous operations in the history.
  *
- * @param {Change} change
+ * @param {Editor} editor
  */
 
-Commands.undo = change => {
-  const { value } = change
+Commands.undo = editor => {
+  const { value } = editor
   const { data } = value
   let redos = data.get('redos') || List()
   let undos = data.get('undos') || List()
   const batch = undos.last()
   if (!batch) return
 
-  change.withoutSaving(() => {
+  editor.withoutSaving(() => {
     // Replay the inverse of the previous operations.
     batch
       .slice()
@@ -125,14 +125,14 @@ Commands.undo = change => {
           inverse = inverse.set('properties', omit(properties, 'isFocused'))
         }
 
-        change.applyOperation(inverse)
+        editor.applyOperation(inverse)
       })
 
     // Shift the previous operations into the redo stack.
     redos = redos.push(batch)
     undos = undos.pop()
     const newData = data.set('undos', undos).set('redos', redos)
-    change.setValue({ data: newData })
+    editor.setData(newData)
   })
 }
 
@@ -140,30 +140,30 @@ Commands.undo = change => {
  * Apply a series of changes inside a synchronous `fn`, without merging any of
  * the new operations into previous save point in the history.
  *
- * @param {Change} change
+ * @param {Editor} editor
  * @param {Function} fn
  */
 
-Commands.withoutMerging = (change, fn) => {
-  const value = change.tmp.merge
-  change.tmp.merge = false
-  fn(change)
-  change.tmp.merge = value
+Commands.withoutMerging = (editor, fn) => {
+  const value = editor.tmp.merge
+  editor.tmp.merge = false
+  fn(editor)
+  editor.tmp.merge = value
 }
 
 /**
  * Apply a series of changes inside a synchronous `fn`, without saving any of
  * their operations into the history.
  *
- * @param {Change}
+ * @param {Editor} editor
  * @param {Function} fn
  */
 
-Commands.withoutSaving = (change, fn) => {
-  const value = change.tmp.save
-  change.tmp.save = false
-  fn(change)
-  change.tmp.save = value
+Commands.withoutSaving = (editor, fn) => {
+  const value = editor.tmp.save
+  editor.tmp.save = false
+  fn(editor)
+  editor.tmp.save = value
 }
 
 /**

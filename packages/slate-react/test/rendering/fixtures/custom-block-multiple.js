@@ -11,7 +11,7 @@ function Code(props) {
   )
 }
 
-function renderNode(props, next) {
+function renderNode(props, editor, next) {
   switch (props.node.type) {
     case 'code':
       return Code(props)

@@ -2,8 +2,8 @@
 
 import h from '../../../helpers/h'
 
-export default function(change) {
-  change.setValue({ data: { thing: 'value' } })
+export default function(editor) {
+  editor.setData({ thing: 'value' })
 }
 
 export const input = (

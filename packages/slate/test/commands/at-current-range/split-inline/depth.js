@@ -2,8 +2,8 @@
 
 import h from '../../../helpers/h'
 
-export default function(change) {
-  change.splitInline(1)
+export default function(editor) {
+  editor.splitInline(1)
 }
 
 export const input = (

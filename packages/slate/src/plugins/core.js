@@ -97,11 +97,11 @@ function CorePlugin(options = {}) {
       {
         match: [{ object: 'block' }, { object: 'inline' }],
         nodes: [{ min: 1 }],
-        normalize: (change, error) => {
+        normalize: (editor, error) => {
           const { code, node } = error
 
           if (code === 'child_required') {
-            change.insertNodeByKey(node.key, 0, Text.create())
+            editor.insertNodeByKey(node.key, 0, Text.create())
           }
         },
       },
@@ -111,7 +111,7 @@ function CorePlugin(options = {}) {
         match: { object: 'block' },
         first: [{ object: 'block' }, { object: 'text' }],
         last: [{ object: 'block' }, { object: 'text' }],
-        normalize: (change, error) => {
+        normalize: (editor, error) => {
           const { code, node } = error
           const text = Text.create()
           let i
@@ -124,7 +124,7 @@ function CorePlugin(options = {}) {
             return
           }
 
-          change.insertNodeByKey(node.key, i, text)
+          editor.insertNodeByKey(node.key, i, text)
         },
       },
       {
@@ -133,7 +133,7 @@ function CorePlugin(options = {}) {
         last: [{ object: 'block' }, { object: 'text' }],
         previous: [{ object: 'block' }, { object: 'text' }],
         next: [{ object: 'block' }, { object: 'text' }],
-        normalize: (change, error) => {
+        normalize: (editor, error) => {
           const { code, node, index } = error
           const text = Text.create()
           let i
@@ -150,7 +150,7 @@ function CorePlugin(options = {}) {
             return
           }
 
-          change.insertNodeByKey(node.key, i, text)
+          editor.insertNodeByKey(node.key, i, text)
         },
       },
 
@@ -158,11 +158,11 @@ function CorePlugin(options = {}) {
       {
         match: { object: 'text' },
         next: [{ object: 'block' }, { object: 'inline' }],
-        normalize: (change, error) => {
+        normalize: (editor, error) => {
           const { code, next } = error
 
           if (code === 'next_sibling_object_invalid') {
-            change.mergeNodeByKey(next.key)
+            editor.mergeNodeByKey(next.key)
           }
         },
       },

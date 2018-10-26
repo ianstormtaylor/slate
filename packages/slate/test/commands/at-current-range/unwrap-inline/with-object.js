@@ -2,8 +2,8 @@
 
 import h from '../../../helpers/h'
 
-export default function(change) {
-  change.unwrapInline({
+export default function(editor) {
+  editor.unwrapInline({
     type: 'hashtag',
     data: { thing: 'value' },
   })

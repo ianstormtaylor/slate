@@ -2,8 +2,8 @@
 
 import h from '../../../helpers/h'
 
-export default function(change) {
-  change.replaceNodeByKey('a', { object: 'block', type: 'quote' })
+export default function(editor) {
+  editor.replaceNodeByKey('a', { object: 'block', type: 'quote' })
 }
 
 export const input = (

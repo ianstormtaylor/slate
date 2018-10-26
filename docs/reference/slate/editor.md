@@ -23,7 +23,13 @@ new Editor({
 
 `Function onChange(change: Change)`
 
-A change handler that will be called with the `change` that applied the change. When the `onChange` handler is called, the `editor.value` will already reflect the new state.
+A change handler that will be called asynchronously with the `change` that applied the change. When the `onChange` handler is called, the `editor.value` will already reflect the new state.
+
+### `operations`
+
+`List<Operation>`
+
+An immutable list of [`Operation`](./operation.md) models that have already been applied to the editor in the current change. As soon as the first operation is added, the `onChange` is queued to run on the next tick.
 
 ### `plugins`
 
@@ -47,66 +53,99 @@ A [`Value`](../slate/value.md) object representing the current value of the edit
 
 ## Methods
 
-### `change`
-
-`change(fn) => Void`
-`change(fn, ...args) => Void`
-
-Programmatically invoke a change `fn` on the editor. The function will be invoked with a new `change` object representing the editor's current value.
-
-If extra `...args` are passed in, the change `fn` will be invoked with `(change, ...args)`, so you can use this as a shorthand for performing single-function changes.
-
 ### `command`
 
-`command(name, ...args) => Void`
+`command(type: String, ...args) => Editor`
+`command(fn: Function, ...args) => Editor`
 
-Invoke a command by `name` on the editor with `args`.
+```js
+editor.command('insertText', 'word')
+editor.command((editor, text) => { ... }, 'word')
+```
 
-### `event`
+Invoke a command by `type` on the editor with `args`.
 
-`event(handler, event, ...args) => Any`
+Alternatively, the `type` argument can be a function, which will be invoked with `(editor, ...args)`. This is helpful in situations where you want write one-off commands with customized logic.
 
-Programmatically invoke an `event` on the editor. This isn't something you should normally use except in test environments.
+### `flush`
 
-### `focus`
+`flush() => Editor`
 
-`focus() => Void`
+```js
+editor.flush()
+```
 
-Programmatically focus the editor.
+Synchronously flush the current changes to editor, calling `onChange`.
+
+> 🤖 In normal operation you never need to use this method! However, it can be helpful for writing tests to be able to keep the entire test synchronous.
 
 ### `query`
 
-`query(name, ...args) => Any`
+`query(type: String, ...args) => Any`
+`query(fn: Function, ...args) => Editor`
 
-Invoke a query by `name` on the editor with `args`, returning its result.
+```js
+editor.query('isLinkActive')
+editor.query(editor => { ... })
+```
+
+Invoke a query by `type` on the editor with `args`, returning its result.
+
+Alternatively, the `type` argument can be a function, which will be invoked with `(editor, ...args)`. This is helpful in situations where you want write one-off queries with customized logic.
 
 ### `registerCommand`
 
-`registerCommand(command: String) => Void`
+`registerCommand(type: String) => Void`
 
-Register a new `command` by name with the editor. This will make the command available as a method on the editor's `Change` objects.
+```js
+editor.registerCommand('insertLink')
+```
+
+Add a new command by `type` with the editor. This will make the command available as a top-level method on the `editor`.
+
+> 🤖 Note that this method only registers the command with the editor, creating the top-level command method. It does not define the queries behaviors, which are defined with the `onCommand` middleware.
 
 ### `registerQuery`
 
-`registerQuery(query: String) => Void`
+`registerQuery(type: String) => Void`
 
-Register a new `query` by name with the editor. This will make the query available as a method on the editor's `Change` objects.
+```js
+editor.registerQuery('isLinkActive')
+```
+
+Add a new query by `type` with the editor. This will make the query available as a top-level method on the `editor`.
+
+> 🤖 Note that this method only registers the query with the editor, creating the top-level query method. It does not define the queries behaviors, which are defined with the `onQuery` middleware.
 
 ### `run`
 
 `run(key, ...args) => Any`
 
+```js
+editor.run('onKeyDown', { key: 'Tab', ... })
+```
+
 Run the middleware stack by `key` with `args`, returning its result.
+
+> 🤖 In normal operation you never need to use this method! However, it's useful for writing tests to be able to simulate plugin behaviors.
 
 ### `setReadOnly`
 
 `setReadOnly(readOnly: Boolean) => Editor`
+
+```js
+editor.setReadOnly(true)
+```
 
 Set the editor's `readOnly` state.
 
 ### `setValue`
 
 `setValue(value: Value, options: Object) => Editor`
+
+```js
+editor.setValue(value)
+```
 
 Set the editor's `value` state.
 
