@@ -194,6 +194,12 @@ Commands.mergeNodeByPath = (change, path) => {
 Commands.moveNodeByPath = (change, path, newPath, newIndex) => {
   const { value } = change
 
+  // If the operation path and newPath are the same,
+  // this should be considered a NOOP
+  if (PathUtils.isEqual(path, newPath)) {
+    return change
+  }
+
   change.applyOperation({
     type: 'move_node',
     value,

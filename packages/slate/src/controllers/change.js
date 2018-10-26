@@ -353,6 +353,10 @@ function getDirtyPaths(operation) {
       let parentPath = PathUtils.lift(path)
       let newParentPath = PathUtils.lift(newPath)
 
+      if (PathUtils.isEqual(path, newPath)) {
+        return []
+      }
+
       // HACK: this clause only exists because the `move_path` logic isn't
       // consistent when it deals with siblings.
       if (!PathUtils.isSibling(path, newPath)) {
