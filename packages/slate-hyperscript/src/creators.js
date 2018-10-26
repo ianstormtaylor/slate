@@ -313,6 +313,8 @@ export function createValue(tagName, attributes, children) {
   let selection = children.find(Selection.isSelection)
   let anchor
   let focus
+  let marks
+  let isFocused
   let decorations = []
   const partials = {}
 
@@ -320,16 +322,22 @@ export function createValue(tagName, attributes, children) {
   // focus information saved, or decorations applied.
   if (document) {
     document.getTexts().forEach(text => {
-      if (text.__anchor != null) {
-        anchor = Point.create({ key: text.key, offset: text.__anchor.offset })
+      const { __anchor, __decorations, __focus } = text
+
+      if (__anchor != null) {
+        anchor = Point.create({ key: text.key, offset: __anchor.offset })
+        marks = __anchor.marks
+        isFocused = __anchor.isFocused
       }
 
-      if (text.__focus != null) {
-        focus = Point.create({ key: text.key, offset: text.__focus.offset })
+      if (__focus != null) {
+        focus = Point.create({ key: text.key, offset: __focus.offset })
+        marks = __focus.marks
+        isFocused = __focus.isFocused
       }
 
-      if (text.__decorations != null) {
-        for (const dec of text.__decorations) {
+      if (__decorations != null) {
+        for (const dec of __decorations) {
           const { id } = dec
           const partial = partials[id]
           delete partials[id]
@@ -381,7 +389,7 @@ export function createValue(tagName, attributes, children) {
 
   if (anchor || focus) {
     if (!selection) {
-      selection = Selection.create({ anchor, focus, isFocused: true })
+      selection = Selection.create({ anchor, focus, isFocused, marks })
     } else {
       selection = selection.setPoints([anchor, focus])
     }
@@ -414,15 +422,26 @@ export function createValue(tagName, attributes, children) {
  */
 
 class CursorPoint {
-  constructor() {
+  constructor(attrs = {}) {
+    const { isFocused = true, marks = null } = attrs
+    this.isFocused = isFocused
+    this.marks = marks
     this.offset = null
   }
 }
 
 class AnchorPoint {
   constructor(attrs = {}) {
-    const { key = null, offset = null, path = null } = attrs
+    const {
+      isFocused = true,
+      key = null,
+      marks = null,
+      offset = null,
+      path = null,
+    } = attrs
+    this.isFocused = isFocused
     this.key = key
+    this.marks = marks
     this.offset = offset
     this.path = path
   }
@@ -430,8 +449,16 @@ class AnchorPoint {
 
 class FocusPoint {
   constructor(attrs = {}) {
-    const { key = null, offset = null, path = null } = attrs
+    const {
+      isFocused = true,
+      key = null,
+      marks = null,
+      offset = null,
+      path = null,
+    } = attrs
+    this.isFocused = isFocused
     this.key = key
+    this.marks = marks
     this.offset = offset
     this.path = path
   }
