@@ -3,21 +3,19 @@
 import h from '../../helpers/h'
 
 export default function(editor) {
-  editor.change(change => {
-    change.insertText('t')
-  })
+  editor.insertText('t')
 
-  editor.change(change => {
-    change.moveBackward(1).insertText('w')
-  })
+  editor
+    .flush()
+    .moveBackward(1)
+    .insertText('w')
 
-  editor.change(change => {
-    change.moveBackward(1).insertText('o')
-  })
+  editor
+    .flush()
+    .moveBackward(1)
+    .insertText('o')
 
-  editor.change(change => {
-    change.undo()
-  })
+  editor.flush().undo()
 }
 
 export const input = (

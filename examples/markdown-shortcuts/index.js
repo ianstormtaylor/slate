@@ -81,7 +81,7 @@ class MarkdownShortcuts extends React.Component {
    * @return {Element}
    */
 
-  renderNode = (props, next) => {
+  renderNode = (props, editor, next) => {
     const { attributes, children, node } = props
 
     switch (node.type) {
@@ -111,7 +111,7 @@ class MarkdownShortcuts extends React.Component {
   /**
    * On change.
    *
-   * @param {Change} change
+   * @param {Editor} editor
    */
 
   onChange = ({ value }) => {
@@ -122,18 +122,18 @@ class MarkdownShortcuts extends React.Component {
    * On key down, check for our specific key shortcuts.
    *
    * @param {Event} event
-   * @param {Change} change
+   * @param {Editor} editor
    * @param {Function} next
    */
 
-  onKeyDown = (event, change, next) => {
+  onKeyDown = (event, editor, next) => {
     switch (event.key) {
       case ' ':
-        return this.onSpace(event, change, next)
+        return this.onSpace(event, editor, next)
       case 'Backspace':
-        return this.onBackspace(event, change, next)
+        return this.onBackspace(event, editor, next)
       case 'Enter':
-        return this.onEnter(event, change, next)
+        return this.onEnter(event, editor, next)
       default:
         return next()
     }
@@ -144,12 +144,12 @@ class MarkdownShortcuts extends React.Component {
    * node into the shortcut's corresponding type.
    *
    * @param {Event} event
-   * @param {Change} change
+   * @param {Editor} editor
    * @param {Function} next
    */
 
-  onSpace = (event, change, next) => {
-    const { value } = change
+  onSpace = (event, editor, next) => {
+    const { value } = editor
     const { selection } = value
     if (selection.isExpanded) return next()
 
@@ -161,13 +161,13 @@ class MarkdownShortcuts extends React.Component {
     if (type == 'list-item' && startBlock.type == 'list-item') return next()
     event.preventDefault()
 
-    change.setBlocks(type)
+    editor.setBlocks(type)
 
     if (type == 'list-item') {
-      change.wrapBlock('bulleted-list')
+      editor.wrapBlock('bulleted-list')
     }
 
-    change.moveFocusToStartOfNode(startBlock).delete()
+    editor.moveFocusToStartOfNode(startBlock).delete()
   }
 
   /**
@@ -175,12 +175,12 @@ class MarkdownShortcuts extends React.Component {
    * paragraph node.
    *
    * @param {Event} event
-   * @param {Change} change
+   * @param {Editor} editor
    * @param {Function} next
    */
 
-  onBackspace = (event, change, next) => {
-    const { value } = change
+  onBackspace = (event, editor, next) => {
+    const { value } = editor
     const { selection } = value
     if (selection.isExpanded) return next()
     if (selection.start.offset != 0) return next()
@@ -189,10 +189,10 @@ class MarkdownShortcuts extends React.Component {
     if (startBlock.type == 'paragraph') return next()
 
     event.preventDefault()
-    change.setBlocks('paragraph')
+    editor.setBlocks('paragraph')
 
     if (startBlock.type == 'list-item') {
-      change.unwrapBlock('bulleted-list')
+      editor.unwrapBlock('bulleted-list')
     }
   }
 
@@ -201,19 +201,19 @@ class MarkdownShortcuts extends React.Component {
    * create a new paragraph below it.
    *
    * @param {Event} event
-   * @param {Change} change
+   * @param {Editor} editor
    * @param {Function} next
    */
 
-  onEnter = (event, change, next) => {
-    const { value } = change
+  onEnter = (event, editor, next) => {
+    const { value } = editor
     const { selection } = value
     const { start, end, isExpanded } = selection
     if (isExpanded) return next()
 
     const { startBlock } = value
     if (start.offset == 0 && startBlock.text.length == 0)
-      return this.onBackspace(event, change, next)
+      return this.onBackspace(event, editor, next)
     if (end.offset != startBlock.text.length) return next()
 
     if (
@@ -229,7 +229,7 @@ class MarkdownShortcuts extends React.Component {
     }
 
     event.preventDefault()
-    change.splitBlock().setBlocks('paragraph')
+    editor.splitBlock().setBlocks('paragraph')
   }
 }
 

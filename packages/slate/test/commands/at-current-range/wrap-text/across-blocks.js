@@ -2,8 +2,8 @@
 
 import h from '../../../helpers/h'
 
-export default function(change) {
-  change.wrapText('[[', ']]')
+export default function(editor) {
+  editor.wrapText('[[', ']]')
 }
 
 export const input = (

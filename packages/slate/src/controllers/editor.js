@@ -1,9 +1,13 @@
 import Debug from 'debug'
 import invariant from 'tiny-invariant'
+import isPlainObject from 'is-plain-object'
+import warning from 'tiny-warning'
+import { List } from 'immutable'
 
-import AbstractChange from './change'
-import CorePlugin from '../plugins/core'
 import CommandsPlugin from '../plugins/commands'
+import CorePlugin from '../plugins/core'
+import Operation from '../models/operation'
+import PathUtils from '../utils/path-utils'
 import QueriesPlugin from '../plugins/queries'
 import SchemaPlugin from '../plugins/schema'
 import Value from '../models/value'
@@ -31,7 +35,7 @@ class Editor {
    */
 
   constructor(attrs = {}, options = {}) {
-    const { editor = this } = options
+    const { controller = this, construct = true } = options
     const {
       onChange = () => {},
       plugins = [],
@@ -39,141 +43,213 @@ class Editor {
       value = Value.create(),
     } = attrs
 
-    this.Change = class Change extends AbstractChange {}
-    this.editor = editor
+    this.controller = controller
     this.middleware = {}
     this.onChange = onChange
+    this.operations = List()
     this.readOnly = null
     this.value = null
 
     this.tmp = {
-      change: null,
-      isChanging: false,
+      dirty: [],
+      flushing: false,
+      merge: null,
+      normalize: true,
+      save: true,
     }
 
     const core = CorePlugin({ plugins })
     registerPlugin(this, core)
 
-    this.run('onConstruct', this)
-
-    this.setReadOnly(readOnly)
-    this.setValue(value, options)
+    if (construct) {
+      this.run('onConstruct')
+      this.setReadOnly(readOnly)
+      this.setValue(value, options)
+    }
   }
 
   /**
-   * Perform a change on the editor, passing `...args` to `change.call`.
+   * Apply an `operation` to the editor, updating its value.
    *
-   * @param {Any} ...args
+   * @param {Operation|Object} operation
+   * @return {Editor}
    */
 
-  change(...args) {
-    const { Change, editor, value } = this
-    const { isChanging } = this.tmp
-    const change = isChanging ? this.tmp.change : new Change({ value, editor })
+  applyOperation(operation) {
+    const { operations, controller } = this
+    let value = this.value
 
-    try {
-      this.tmp.change = change
-      this.tmp.isChanging = true
-      change.call(...args)
-    } catch (error) {
-      throw error
-    } finally {
-      this.tmp.isChanging = isChanging
+    // Add in the current `value` in case the operation was serialized.
+    if (isPlainObject(operation)) {
+      operation = { ...operation, value }
     }
 
-    // If this isn't the top-most change function, exit to let it finish.
-    if (isChanging === true) {
-      return
+    operation = Operation.create(operation)
+
+    // Save the operation into the history. Since `save` is a command, we need
+    // to do it without normalizing, since it would have side effects.
+    this.withoutNormalizing(() => {
+      controller.save(operation)
+      value = this.value
+    })
+
+    // Apply the operation to the value.
+    debug('apply', { operation })
+    this.value = operation.apply(value)
+    this.operations = operations.push(operation)
+
+    // Get the paths of the affected nodes, and mark them as dirty.
+    const newDirtyPaths = getDirtyPaths(operation)
+    const dirty = this.tmp.dirty.reduce((memo, path) => {
+      path = PathUtils.create(path)
+      const transformed = PathUtils.transform(path, operation)
+      memo = memo.concat(transformed.toArray())
+      return memo
+    }, newDirtyPaths)
+
+    this.tmp.dirty = dirty
+
+    // If we're not already, queue the flushing process on the next tick.
+    if (!this.tmp.flushing) {
+      this.tmp.flushing = true
+      Promise.resolve().then(() => this.flush())
     }
 
-    // If the change doesn't define any operations to apply, abort.
-    if (change.operations.size === 0) {
-      return
-    }
+    return controller
+  }
 
-    this.run('onChange', change)
+  /**
+   * Flush the editor's current change.
+   *
+   * @return {Editor}
+   */
 
-    // Call the provided `onChange` handler.
-    this.value = change.value
+  flush() {
+    this.run('onChange')
+    const { value, operations, controller } = this
+    const change = { value, operations }
+    this.operations = List()
+    this.tmp.flushing = false
     this.onChange(change)
+    return controller
   }
 
   /**
-   * Trigger a `command` with `...args`.
+   * Trigger a command by `type` with `...args`.
    *
-   * @param {String} command
+   * @param {String|Function} type
    * @param {Any} ...args
+   * @return {Editor}
    */
 
-  command(command, ...args) {
-    debug('command', { command, args })
+  command(type, ...args) {
+    const { controller } = this
 
-    this.change(change => {
-      const obj = { type: command, args }
-      this.run('onCommand', obj, change)
-    })
+    if (typeof type === 'function') {
+      type(controller, ...args)
+      normalizeDirtyPaths(this)
+      return controller
+    }
+
+    debug('command', { type, args })
+    const obj = { type, args }
+    this.run('onCommand', obj)
+    normalizeDirtyPaths(this)
+    return controller
   }
 
   /**
-   * Process an `event` by running it through the stack.
+   * Normalize all of the nodes in the document from scratch.
    *
-   * @param {String} handler
-   * @param {Event} event
+   * @return {Editor}
    */
 
-  event(handler, event) {
-    debug('event', { handler, event })
+  normalize() {
+    const { value, controller } = this
+    let { document } = value
+    const table = document.getKeysToPathsTable()
+    const paths = Object.values(table).map(PathUtils.create)
+    this.tmp.dirty = this.tmp.dirty.concat(paths)
+    normalizeDirtyPaths(this)
 
-    this.change(change => {
-      this.run(handler, event, change)
-    })
+    const { selection } = value
+    document = value.document
+
+    if (selection.isUnset && document.nodes.size) {
+      controller.moveToStartOfDocument()
+    }
+
+    return controller
   }
 
   /**
-   * Ask a `query` with `...args`.
+   * Ask a query by `type` with `...args`.
    *
-   * @param {String} query
+   * @param {String|Function} type
    * @param {Any} ...args
+   * @return {Any}
    */
 
-  query(query, ...args) {
-    debug('query', { query, args })
+  query(type, ...args) {
+    const { controller } = this
 
-    const { editor } = this
-    const obj = { type: query, args }
-    return this.run('onQuery', obj, editor)
+    if (typeof type === 'function') {
+      return type(controller, ...args)
+    }
+
+    debug('query', { type, args })
+    const obj = { type, args }
+    return this.run('onQuery', obj)
   }
 
   /**
-   * Register a `command` with the editor.
+   * Register a command `type` with the editor.
    *
-   * @param {String} command
+   * @param {String} type
+   * @return {Editor}
    */
 
-  registerCommand(command) {
-    const { Change } = this
-    if (Change.prototype[command]) return
+  registerCommand(type) {
+    const { controller } = this
 
-    Change.prototype[command] = function(...args) {
-      const change = this.command(command, ...args)
-      return change
+    if (type in controller && controller[type].__command) {
+      return controller
     }
+
+    invariant(
+      !(type in controller),
+      `You cannot register a \`${type}\` command because it would overwrite an existing property of the \`Editor\`.`
+    )
+
+    const method = (...args) => this.command(type, ...args)
+    controller[type] = method
+    method.__command = true
+    return controller
   }
 
   /**
-   * Register a `query` with the editor.
+   * Register a query `type` with the editor.
    *
-   * @param {String} query
+   * @param {String} type
+   * @return {Editor}
    */
 
-  registerQuery(query) {
-    const { Change } = this
-    if (Change.prototype[query]) return
+  registerQuery(type) {
+    const { controller } = this
 
-    Change.prototype[query] = function(...args) {
-      const ret = this.query(query, ...args)
-      return ret
+    if (type in controller && controller[type].__query) {
+      return controller
     }
+
+    invariant(
+      !(type in controller),
+      `You cannot register a \`${type}\` query because it would overwrite an existing property of the \`Editor\`.`
+    )
+
+    const method = (...args) => this.query(type, ...args)
+    controller[type] = method
+    method.__query = true
+    return controller
   }
 
   /**
@@ -185,18 +261,19 @@ class Editor {
    */
 
   run(key, ...args) {
-    const middleware = this.middleware[key] || []
+    const { controller, middleware } = this
+    const fns = middleware[key] || []
     let i = 0
 
     function next(...overrides) {
-      const fn = middleware[i++]
+      const fn = fns[i++]
       if (!fn) return
 
       if (overrides.length) {
         args = overrides
       }
 
-      const ret = fn(...args, next)
+      const ret = fn(...args, controller, next)
       return ret
     }
 
@@ -204,7 +281,7 @@ class Editor {
       get() {
         invariant(
           false,
-          'As of Slate 0.42.0, the `editor` is no longer passed as the third argument to event handlers. You can access it via `change.editor` instead.'
+          'As of Slate 0.42, the `editor` is no longer passed as the third argument to event handlers. You can access it via `change.editor` instead.'
         )
       },
     })
@@ -213,7 +290,7 @@ class Editor {
       get() {
         invariant(
           false,
-          'As of Slate 0.42.0, the `editor` is no longer passed as the third argument to event handlers. You can access it via `change.editor` instead.'
+          'As of Slate 0.42, the `editor` is no longer passed as the third argument to event handlers. You can access it via `change.editor` instead.'
         )
       },
     })
@@ -222,7 +299,7 @@ class Editor {
       get() {
         invariant(
           false,
-          'As of Slate 0.42.0, the `editor` is no longer passed as the third argument to event handlers. You can access it via `change.editor` instead.'
+          'As of Slate 0.42, the `editor` is no longer passed as the third argument to event handlers. You can access it via `change.editor` instead.'
         )
       },
     })
@@ -231,7 +308,7 @@ class Editor {
       get() {
         invariant(
           false,
-          'As of Slate 0.42.0, the `editor` is no longer passed as the third argument to event handlers. You can access it via `change.editor` instead.'
+          'As of Slate 0.42, the `editor` is no longer passed as the third argument to event handlers. You can access it via `change.editor` instead.'
         )
       },
     })
@@ -240,7 +317,7 @@ class Editor {
       get() {
         invariant(
           false,
-          'As of Slate 0.42.0, the `editor` is no longer passed as the third argument to event handlers. You can access it via `change.editor` instead.'
+          'As of Slate 0.42, the `editor` is no longer passed as the third argument to event handlers. You can access it via `change.editor` instead.'
         )
       },
     })
@@ -273,11 +350,265 @@ class Editor {
     this.value = value
 
     if (normalize) {
-      this.change(change => change.normalize())
+      this.normalize()
     }
 
     return this
   }
+
+  /**
+   * Apply a series of changes inside a synchronous `fn`, deferring
+   * normalization until after the function has finished executing.
+   *
+   * @param {Function} fn
+   * @return {Editor}
+   */
+
+  withoutNormalizing(fn) {
+    const { controller } = this
+    const value = this.tmp.normalize
+    this.tmp.normalize = false
+    fn(controller)
+    this.tmp.normalize = value
+    normalizeDirtyPaths(this)
+    return controller
+  }
+
+  /**
+   * Deprecated.
+   */
+
+  get editor() {
+    warning(
+      false,
+      "As of Slate 0.43 the `change` object has been replaced with `editor`, so you don't need to access `change.editor`."
+    )
+
+    return this.controller
+  }
+
+  change(fn, ...args) {
+    warning(
+      false,
+      'As of Slate 0.43 the `change` object has been replaced with `editor`, so the `editor.change()` method is deprecated.`'
+    )
+
+    fn(this.controller, ...args)
+  }
+
+  call(fn, ...args) {
+    warning(
+      false,
+      'As of Slate 0.43 the `editor.command(fn)` method has been deprecated, please use `editor.command(fn)` instead.'
+    )
+
+    fn(this.controller, ...args)
+    return this.controller
+  }
+
+  applyOperations(operations) {
+    warning(
+      false,
+      'As of Slate 0.43 the `applyOperations` method is deprecated, please apply each operation in a loop instead.'
+    )
+
+    operations.forEach(op => this.applyOperation(op))
+    return this.controller
+  }
+
+  setOperationFlag(key, value) {
+    warning(
+      false,
+      'As of slate@0.41 the `change.setOperationFlag` method has been deprecated.'
+    )
+
+    this.tmp[key] = value
+    return this
+  }
+
+  getFlag(key, options = {}) {
+    warning(
+      false,
+      'As of slate@0.41 the `change.getFlag` method has been deprecated.'
+    )
+
+    return options[key] !== undefined ? options[key] : this.tmp[key]
+  }
+
+  unsetOperationFlag(key) {
+    warning(
+      false,
+      'As of slate@0.41 the `change.unsetOperationFlag` method has been deprecated.'
+    )
+
+    delete this.tmp[key]
+    return this
+  }
+
+  withoutNormalization(fn) {
+    warning(
+      false,
+      'As of slate@0.41 the `change.withoutNormalization` helper has been renamed to `change.withoutNormalizing`.'
+    )
+
+    return this.withoutNormalizing(fn)
+  }
+}
+
+/**
+ * Get the "dirty" paths for a given `operation`.
+ *
+ * @param {Operation} operation
+ * @return {Array}
+ */
+
+function getDirtyPaths(operation) {
+  const { type, node, path, newPath } = operation
+
+  switch (type) {
+    case 'add_mark':
+    case 'insert_text':
+    case 'remove_mark':
+    case 'remove_text':
+    case 'set_mark':
+    case 'set_node': {
+      const ancestors = PathUtils.getAncestors(path).toArray()
+      return [...ancestors, path]
+    }
+
+    case 'insert_node': {
+      const table = node.getKeysToPathsTable()
+      const paths = Object.values(table).map(p => path.concat(p))
+      const ancestors = PathUtils.getAncestors(path).toArray()
+      return [...ancestors, path, ...paths]
+    }
+
+    case 'split_node': {
+      const ancestors = PathUtils.getAncestors(path).toArray()
+      const nextPath = PathUtils.increment(path)
+      return [...ancestors, path, nextPath]
+    }
+
+    case 'merge_node': {
+      const ancestors = PathUtils.getAncestors(path).toArray()
+      const previousPath = PathUtils.decrement(path)
+      return [...ancestors, previousPath]
+    }
+
+    case 'move_node': {
+      let parentPath = PathUtils.lift(path)
+      let newParentPath = PathUtils.lift(newPath)
+
+      if (PathUtils.isEqual(path, newPath)) {
+        return []
+      }
+
+      // HACK: this clause only exists because the `move_path` logic isn't
+      // consistent when it deals with siblings.
+      if (!PathUtils.isSibling(path, newPath)) {
+        if (newParentPath.size && PathUtils.isYounger(path, newPath)) {
+          newParentPath = PathUtils.decrement(newParentPath, 1, path.size - 1)
+        }
+
+        if (parentPath.size && PathUtils.isYounger(newPath, path)) {
+          parentPath = PathUtils.increment(parentPath, 1, newPath.size - 1)
+        }
+      }
+
+      const oldAncestors = PathUtils.getAncestors(parentPath).toArray()
+      const newAncestors = PathUtils.getAncestors(newParentPath).toArray()
+
+      return [...oldAncestors, parentPath, ...newAncestors, newParentPath]
+    }
+
+    case 'remove_node': {
+      const ancestors = PathUtils.getAncestors(path).toArray()
+      return [...ancestors]
+    }
+
+    default: {
+      return []
+    }
+  }
+}
+
+/**
+ * Normalize any new "dirty" paths that have been added to the change.
+ *
+ * @param {Editor}
+ */
+
+function normalizeDirtyPaths(editor) {
+  if (!editor.tmp.normalize) {
+    return
+  }
+
+  while (editor.tmp.dirty.length) {
+    const path = editor.tmp.dirty.pop()
+    normalizeNodeByPath(editor, path)
+  }
+}
+
+/**
+ * Normalize the node at a specific `path`.
+ *
+ * @param {Editor} editor
+ * @param {Array} path
+ */
+
+function normalizeNodeByPath(editor, path) {
+  const { controller, value } = editor
+  let { document } = value
+  let node = document.assertNode(path)
+  let iterations = 0
+  const max = 1000 + (node.object === 'text' ? 1 : node.nodes.size)
+
+  const iterate = () => {
+    const fn = node.normalize(controller)
+    if (!fn) return
+
+    // Run the normalize `fn` to fix the node.
+    fn(controller)
+
+    // Attempt to re-find the node by path, or by key if it has changed
+    // locations in the tree continue iterating.
+    document = editor.value.document
+    const { key } = node
+    let found = document.getDescendant(path)
+
+    if (found && found.key === key) {
+      node = found
+    } else {
+      found = document.getDescendant(key)
+
+      if (found) {
+        node = found
+        path = document.getPath(key)
+      } else {
+        // If it no longer exists by key, it was removed, so abort.
+        return
+      }
+    }
+
+    // Increment the iterations counter, and check to make sure that we haven't
+    // exceeded the max. Without this check, it's easy for the `normalize`
+    // function of a schema rule to be written incorrectly and for an infinite
+    // invalid loop to occur.
+    iterations++
+
+    if (iterations > max) {
+      throw new Error(
+        'A schema rule could not be normalized after sufficient iterations. This is usually due to a `rule.normalize` or `plugin.normalizeNode` function of a schema being incorrectly written, causing an infinite loop.'
+      )
+    }
+
+    // Otherwise, iterate again.
+    iterate()
+  }
+
+  editor.withoutNormalizing(() => {
+    iterate()
+  })
 }
 
 /**

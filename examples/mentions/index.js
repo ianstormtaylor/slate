@@ -131,7 +131,7 @@ class MentionsExample extends React.Component {
     )
   }
 
-  renderMark(props, next) {
+  renderMark(props, editor, next) {
     if (props.mark.type === CONTEXT_MARK_TYPE) {
       return (
         // Adding the className here is important so taht the `Suggestions`
@@ -145,7 +145,7 @@ class MentionsExample extends React.Component {
     return next()
   }
 
-  renderNode(props, next) {
+  renderNode(props, editor, next) {
     const { attributes, node } = props
 
     if (node.type === USER_MENTION_NODE_TYPE) {
@@ -205,7 +205,7 @@ class MentionsExample extends React.Component {
   /**
    * On change, save the new `value`.
    *
-   * @param {Change} change
+   * @param {Editor} editor
    */
 
   onChange = change => {
@@ -240,7 +240,7 @@ class MentionsExample extends React.Component {
         })
       }
 
-      return change.withoutSaving(() => change.setValue({ decorations }))
+      return change.withoutSaving(() => change.setDecorations(decorations))
     }
 
     this.setState({ value: change.value })

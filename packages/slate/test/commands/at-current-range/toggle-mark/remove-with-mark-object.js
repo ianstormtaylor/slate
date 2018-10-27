@@ -3,8 +3,8 @@
 import h from '../../../helpers/h'
 import { Mark } from 'slate'
 
-export default function(change) {
-  change.toggleMark(
+export default function(editor) {
+  editor.toggleMark(
     Mark.create({
       type: 'bold',
       data: { thing: 'value' },

@@ -3,21 +3,10 @@
 import h from '../../helpers/h'
 
 export default function(editor) {
-  editor.change(change => {
-    change.insertText('t')
-  })
-
-  editor.change(change => {
-    change.insertText('w')
-  })
-
-  editor.change(change => {
-    change.insertText('o')
-  })
-
-  editor.change(change => {
-    change.undo()
-  })
+  editor.insertText('t')
+  editor.flush().insertText('w')
+  editor.flush().insertText('o')
+  editor.flush().undo()
 }
 
 export const input = (

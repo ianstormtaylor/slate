@@ -3,9 +3,9 @@
 import h from '../../../helpers/h'
 import { Mark } from 'slate'
 
-export default function(change) {
+export default function(editor) {
   const marks = Mark.createSet([{ type: 'bold' }])
-  change.insertText('a', marks)
+  editor.insertText('a', marks)
 }
 
 export const input = (

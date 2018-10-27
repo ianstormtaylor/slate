@@ -264,7 +264,7 @@ class App extends React.Component {
     )
   }
 
-  renderNode = (props, next) => {
+  renderNode = (props, editor, next) => {
     switch (props.node.type) {
       case 'code':
         return (
@@ -286,7 +286,7 @@ class App extends React.Component {
   }
 
   // Add a `renderMark` method to render marks.
-  renderMark = (props, next) => {
+  renderMark = (props, editor, next) => {
     const { mark, attributes } = props
     switch (mark.type) {
       case 'bold':

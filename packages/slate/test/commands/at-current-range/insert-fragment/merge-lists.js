@@ -2,8 +2,8 @@
 
 import h from '../../../helpers/h'
 
-export default function(change) {
-  change.insertFragment(
+export default function(editor) {
+  editor.insertFragment(
     <document>
       <list>
         <item>3</item>

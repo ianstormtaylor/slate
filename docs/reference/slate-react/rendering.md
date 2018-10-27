@@ -56,9 +56,7 @@ const value = editor.value
 ```
 
 ```js
-editor.change(change => {
-  change.moveToRangeOfDocument().delete()
-})
+editor.moveToRangeOfDocument().delete()
 ```
 
 ### `isSelected`

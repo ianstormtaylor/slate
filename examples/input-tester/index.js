@@ -231,7 +231,7 @@ class InputTester extends React.Component {
     )
   }
 
-  renderNode = (props, next) => {
+  renderNode = (props, editor, next) => {
     const { attributes, children, node } = props
 
     switch (node.type) {
@@ -252,7 +252,7 @@ class InputTester extends React.Component {
     }
   }
 
-  renderMark = (props, next) => {
+  renderMark = (props, editor, next) => {
     const { attributes, children, mark } = props
 
     switch (mark.type) {

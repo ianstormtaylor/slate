@@ -2,8 +2,8 @@
 
 import h from '../../../helpers/h'
 
-export default function(change) {
-  change.insertFragmentByKey(
+export default function(editor) {
+  editor.insertFragmentByKey(
     'a',
     1,
     <document>

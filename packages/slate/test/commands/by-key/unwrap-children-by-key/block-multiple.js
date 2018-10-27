@@ -2,8 +2,8 @@
 
 import h from '../../../helpers/h'
 
-export default function(change) {
-  change.unwrapChildrenByKey('a')
+export default function(editor) {
+  editor.unwrapChildrenByKey('a')
 }
 
 export const input = (

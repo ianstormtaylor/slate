@@ -3,8 +3,8 @@
 import h from '../../../helpers/h'
 import { Block } from 'slate'
 
-export default function(change) {
-  change.insertBlock(Block.create({ type: 'quote' }))
+export default function(editor) {
+  editor.insertBlock(Block.create({ type: 'quote' }))
 }
 
 export const input = (

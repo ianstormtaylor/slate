@@ -4,8 +4,8 @@ import h from '../../../helpers/h'
 
 import { Mark } from 'slate'
 
-export default function(change) {
-  change.replaceMark(
+export default function(editor) {
+  editor.replaceMark(
     'italic',
     Mark.create({
       type: 'bold',

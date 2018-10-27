@@ -1,8 +1,8 @@
 export default function SoftBreak(options = {}) {
   return {
-    onKeyDown(event, change, next) {
+    onKeyDown(event, editor, next) {
       if (event.key === 'Enter') {
-        change.insertText('\n')
+        editor.insertText('\n')
       } else {
         next()
       }

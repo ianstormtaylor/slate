@@ -2,8 +2,8 @@
 
 import h from '../../../helpers/h'
 
-export default function(change) {
-  change.replaceMark('italic', {
+export default function(editor) {
+  editor.replaceMark('italic', {
     type: 'bold',
     data: { thing: 'value' },
   })

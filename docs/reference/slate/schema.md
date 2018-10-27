@@ -211,17 +211,17 @@ Will validate a node's marks. The `marks` definitions can declare the `type` pro
 
 ### `normalize`
 
-`normalize(change: Change, error: SlateError) => Void`
+`normalize(editor: Editor, error: SlateError) => Void`
 
 ```js
 {
-  normalize: (change, error) => {
+  normalize: (editor, error) => {
     switch (error.code) {
       case 'child_object_invalid':
-        change.wrapBlockByKey(error.child.key, 'paragraph')
+        editor.wrapBlockByKey(error.child.key, 'paragraph')
         return
       case 'child_type_invalid':
-        change.setNodeByKey(error.child.key, 'paragraph')
+        editor.setNodeByKey(error.child.key, 'paragraph')
         return
     }
   }
@@ -288,7 +288,7 @@ Will validate a node's text with a regex or function.
 
 ## Errors
 
-When supplying your own `normalize` property for a schema rule, it will be called with `(change, error)`. The error `code` will be one of a set of potential code strings, and it will contain additional helpful properties depending on the type of error.
+When supplying your own `normalize` property for a schema rule, it will be called with `(editor, error)`. The error `code` will be one of a set of potential code strings, and it will contain additional helpful properties depending on the type of error.
 
 ### `'child_object_invalid'`
 

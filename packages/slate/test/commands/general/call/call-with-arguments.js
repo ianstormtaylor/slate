@@ -2,12 +2,12 @@
 
 import h from '../../../helpers/h'
 
-function insertBlockByType(change, blockType) {
-  change.insertBlock({ type: blockType })
+function insertBlockByType(editor, blockType) {
+  editor.insertBlock({ type: blockType })
 }
 
-export default function(change) {
-  change.call(insertBlockByType, 'image')
+export default function(editor) {
+  editor.command(insertBlockByType, 'image')
 }
 
 export const input = (

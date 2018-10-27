@@ -2,9 +2,9 @@
 
 import h from '../../../helpers/h'
 
-export default function(change) {
-  const { anchor } = change.value.selection
-  change.replaceTextByKey(anchor.key, anchor.offset, 3, 'cat is cute')
+export default function(editor) {
+  const { anchor } = editor.value.selection
+  editor.replaceTextByKey(anchor.key, anchor.offset, 3, 'cat is cute')
 }
 
 export const input = (

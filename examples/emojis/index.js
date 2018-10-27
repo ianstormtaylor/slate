@@ -128,7 +128,7 @@ class Emojis extends React.Component {
    * @return {Element}
    */
 
-  renderNode = (props, next) => {
+  renderNode = (props, editor, next) => {
     const { attributes, children, node, isFocused } = props
 
     switch (node.type) {
@@ -159,7 +159,7 @@ class Emojis extends React.Component {
   /**
    * On change.
    *
-   * @param {Change} change
+   * @param {Editor} editor
    */
 
   onChange = ({ value }) => {
@@ -175,15 +175,10 @@ class Emojis extends React.Component {
   onClickEmoji = (e, code) => {
     e.preventDefault()
 
-    this.editor.change(change => {
-      change
-        .insertInline({
-          type: 'emoji',
-          data: { code },
-        })
-        .moveToStartOfNextText()
-        .focus()
-    })
+    this.editor
+      .insertInline({ type: 'emoji', data: { code } })
+      .moveToStartOfNextText()
+      .focus()
   }
 }
 

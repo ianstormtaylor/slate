@@ -2,8 +2,8 @@
 
 import h from '../../../helpers/h'
 
-export default function(change) {
-  const { value } = change
+export default function(editor) {
+  const { value } = editor
   const { selection, startText } = value
   const range = selection.setProperties({
     anchor: {
@@ -16,7 +16,7 @@ export default function(change) {
     },
   })
 
-  change.select(range)
+  editor.select(range)
 }
 
 export const input = (

@@ -11,9 +11,9 @@ export const schema = {
           match: [{ type: 'paragraph' }],
         },
       ],
-      normalize: (change, { code, child }) => {
+      normalize: (editor, { code, child }) => {
         if (code == 'child_type_invalid') {
-          change.wrapBlockByKey(child.key, 'paragraph')
+          editor.wrapBlockByKey(child.key, 'paragraph')
         }
       },
     },

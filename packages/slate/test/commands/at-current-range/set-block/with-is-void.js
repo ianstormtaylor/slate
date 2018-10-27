@@ -2,8 +2,8 @@
 
 import h from '../../../helpers/h'
 
-export default function(change) {
-  change.setBlocks('image')
+export default function(editor) {
+  editor.setBlocks('image')
 }
 
 export const input = (

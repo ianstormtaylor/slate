@@ -2,8 +2,8 @@
 
 import h from '../../../helpers/h'
 
-export default function(change) {
-  change.toggleMark('bold').insertText('s')
+export default function(editor) {
+  editor.toggleMark('bold').insertText('s')
 }
 
 export const input = (

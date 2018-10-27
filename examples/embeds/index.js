@@ -62,7 +62,7 @@ class Embeds extends React.Component {
    * @param {Function} next
    */
 
-  renderNode = (props, next) => {
+  renderNode = (props, editor, next) => {
     switch (props.node.type) {
       case 'video':
         return <Video {...props} />
@@ -74,7 +74,7 @@ class Embeds extends React.Component {
   /**
    * On change.
    *
-   * @param {Change} change
+   * @param {Editor} editor
    */
 
   onChange = ({ value }) => {

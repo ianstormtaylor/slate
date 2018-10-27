@@ -203,7 +203,7 @@ class PasteHtml extends React.Component {
    * @return {Element}
    */
 
-  renderNode = (props, next) => {
+  renderNode = (props, editor, next) => {
     const { attributes, children, node, isFocused } = props
 
     switch (node.type) {
@@ -260,7 +260,7 @@ class PasteHtml extends React.Component {
    * @return {Element}
    */
 
-  renderMark = (props, next) => {
+  renderMark = (props, editor, next) => {
     const { children, mark, attributes } = props
 
     switch (mark.type) {
@@ -280,7 +280,7 @@ class PasteHtml extends React.Component {
   /**
    * On change, save the new value.
    *
-   * @param {Change} change
+   * @param {Editor} editor
    */
 
   onChange = ({ value }) => {
@@ -291,14 +291,14 @@ class PasteHtml extends React.Component {
    * On paste, deserialize the HTML and then insert the fragment.
    *
    * @param {Event} event
-   * @param {Change} change
+   * @param {Editor} editor
    */
 
-  onPaste = (event, change, next) => {
+  onPaste = (event, editor, next) => {
     const transfer = getEventTransfer(event)
     if (transfer.type != 'html') return next()
     const { document } = serializer.deserialize(transfer.html)
-    change.insertFragment(document)
+    editor.insertFragment(document)
   }
 }
 

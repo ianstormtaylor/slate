@@ -2,8 +2,8 @@
 
 import h from '../../../helpers/h'
 
-export default function(change) {
-  change.moveToRangeOfDocument()
+export default function(editor) {
+  editor.moveToRangeOfDocument()
 }
 
 export const input = (

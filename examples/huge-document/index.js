@@ -78,7 +78,7 @@ class HugeDocument extends React.Component {
    * @return {Element}
    */
 
-  renderNode = (props, next) => {
+  renderNode = (props, editor, next) => {
     const { attributes, children, node } = props
 
     switch (node.type) {
@@ -98,7 +98,7 @@ class HugeDocument extends React.Component {
    * @return {Element}
    */
 
-  renderMark = (props, next) => {
+  renderMark = (props, editor, next) => {
     const { children, mark, attributes } = props
 
     switch (mark.type) {
@@ -118,7 +118,7 @@ class HugeDocument extends React.Component {
   /**
    * On change.
    *
-   * @param {Change} change
+   * @param {Editor} editor
    */
 
   onChange = ({ value }) => {

@@ -2,10 +2,10 @@
 
 import h from '../../../helpers/h'
 
-export default function(change) {
-  const { anchor } = change.value.selection
+export default function(editor) {
+  const { anchor } = editor.value.selection
 
-  change.replaceTextByKey(anchor.key, anchor.offset, 3, 'cat is cute', [
+  editor.replaceTextByKey(anchor.key, anchor.offset, 3, 'cat is cute', [
     { type: 'italic' },
   ])
 }

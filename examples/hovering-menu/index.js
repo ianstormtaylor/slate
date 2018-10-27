@@ -87,7 +87,7 @@ class HoverMenu extends React.Component {
   onClickMark(event, type) {
     const { editor } = this.props
     event.preventDefault()
-    editor.change(change => change.toggleMark(type))
+    editor.toggleMark(type)
   }
 }
 
@@ -176,8 +176,7 @@ class HoveringMenu extends React.Component {
    * @return {Element}
    */
 
-  renderEditor = (props, next) => {
-    const { editor } = props
+  renderEditor = (props, editor, next) => {
     const children = next()
     return (
       <React.Fragment>
@@ -196,7 +195,7 @@ class HoveringMenu extends React.Component {
    * @return {Element}
    */
 
-  renderMark = (props, next) => {
+  renderMark = (props, editor, next) => {
     const { children, mark, attributes } = props
 
     switch (mark.type) {
@@ -216,7 +215,7 @@ class HoveringMenu extends React.Component {
   /**
    * On change.
    *
-   * @param {Change} change
+   * @param {Editor} editor
    */
 
   onChange = ({ value }) => {

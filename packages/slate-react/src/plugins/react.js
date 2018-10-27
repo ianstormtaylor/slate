@@ -41,14 +41,13 @@ function ReactPlugin(options = {}) {
    * @return {Object}
    */
 
-  function renderEditor(props, next) {
-    const { editor } = props
+  function renderEditor(props, editor, next) {
     return (
       <Content
-        onEvent={editor.event}
         autoCorrect={props.autoCorrect}
         className={props.className}
         editor={editor}
+        onEvent={(handler, event) => editor.run(handler, event)}
         readOnly={props.readOnly}
         role={props.role}
         spellCheck={props.spellCheck}
@@ -63,11 +62,12 @@ function ReactPlugin(options = {}) {
    * Render node.
    *
    * @param {Object} props
+   * @param {Editor} editor
    * @param {Function} next
    * @return {Element}
    */
 
-  function renderNode(props, next) {
+  function renderNode(props, editor, next) {
     const { attributes, children, node } = props
     const { object } = node
     if (object != 'block' && object != 'inline') return null
@@ -89,8 +89,8 @@ function ReactPlugin(options = {}) {
    * @return {Element}
    */
 
-  function renderPlaceholder(props, next) {
-    const { editor, node } = props
+  function renderPlaceholder(props, editor, next) {
+    const { node } = props
     if (!editor.props.placeholder) return null
     if (editor.state.isComposing) return null
     if (node.object != 'block') return null

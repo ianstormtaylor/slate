@@ -108,7 +108,7 @@ class SearchHighlighting extends React.Component {
    * @return {Element}
    */
 
-  renderMark = (props, next) => {
+  renderMark = (props, editor, next) => {
     const { children, mark, attributes } = props
 
     switch (mark.type) {
@@ -126,7 +126,7 @@ class SearchHighlighting extends React.Component {
   /**
    * On change, save the new `value`.
    *
-   * @param {Change} change
+   * @param {Editor} editor
    */
 
   onChange = ({ value }) => {
@@ -140,35 +140,34 @@ class SearchHighlighting extends React.Component {
    */
 
   onInputChange = event => {
-    this.editor.change(change => {
-      const { value } = change
-      const string = event.target.value
-      const texts = value.document.getTexts()
-      const decorations = []
+    const { editor } = this
+    const { value } = editor
+    const string = event.target.value
+    const texts = value.document.getTexts()
+    const decorations = []
 
-      texts.forEach(node => {
-        const { key, text } = node
-        const parts = text.split(string)
-        let offset = 0
+    texts.forEach(node => {
+      const { key, text } = node
+      const parts = text.split(string)
+      let offset = 0
 
-        parts.forEach((part, i) => {
-          if (i != 0) {
-            decorations.push({
-              anchor: { key, offset: offset - string.length },
-              focus: { key, offset },
-              mark: { type: 'highlight' },
-            })
-          }
+      parts.forEach((part, i) => {
+        if (i != 0) {
+          decorations.push({
+            anchor: { key, offset: offset - string.length },
+            focus: { key, offset },
+            mark: { type: 'highlight' },
+          })
+        }
 
-          offset = offset + part.length + string.length
-        })
+        offset = offset + part.length + string.length
       })
+    })
 
-      // Make the change to decorations without saving it into the undo history,
-      // so that there isn't a confusing behavior when undoing.
-      change.withoutSaving(() => {
-        change.setValue({ decorations })
-      })
+    // Make the change to decorations without saving it into the undo history,
+    // so that there isn't a confusing behavior when undoing.
+    editor.withoutSaving(() => {
+      editor.setDecorations(decorations)
     })
   }
 }

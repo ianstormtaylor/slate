@@ -2,8 +2,8 @@
 
 import h from '../../../helpers/h'
 
-export default function(change) {
-  change.setNodeByKey('a', {
+export default function(editor) {
+  editor.setNodeByKey('a', {
     type: 'quote',
     data: { thing: false },
   })

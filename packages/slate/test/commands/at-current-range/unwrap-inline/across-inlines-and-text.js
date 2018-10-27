@@ -2,8 +2,8 @@
 
 import h from '../../../helpers/h'
 
-export default function(change) {
-  change.unwrapInline('link')
+export default function(editor) {
+  editor.unwrapInline('link')
 }
 
 export const input = (

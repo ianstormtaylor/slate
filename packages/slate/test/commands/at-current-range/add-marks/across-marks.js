@@ -2,8 +2,8 @@
 
 import h from '../../../helpers/h'
 
-export default function(change) {
-  change.addMarks(['underline'])
+export default function(editor) {
+  editor.addMarks(['underline'])
 }
 
 export const input = (

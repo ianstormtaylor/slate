@@ -2,8 +2,8 @@
 
 import h from '../../../helpers/h'
 
-export default function(change) {
-  change.insertTextByKey('a', 3, 'x')
+export default function(editor) {
+  editor.insertTextByKey('a', 3, 'x')
 }
 
 export const input = (

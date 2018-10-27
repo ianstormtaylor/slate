@@ -2,8 +2,8 @@
 
 import h from '../../../helpers/h'
 
-export default function(change) {
-  change.setMarkByKey(
+export default function(editor) {
+  editor.setMarkByKey(
     'a',
     0,
     2,

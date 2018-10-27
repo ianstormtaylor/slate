@@ -2,8 +2,8 @@
 
 import h from '../../../helpers/h'
 
-export default function(change) {
-  change.deleteCharBackward()
+export default function(editor) {
+  editor.deleteCharBackward()
 }
 
 export const input = (

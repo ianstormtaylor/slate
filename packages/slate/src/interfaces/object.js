@@ -1,5 +1,5 @@
 import Block from '../models/block'
-import Change from '../controllers/change'
+import Change from '../models/change'
 import Decoration from '../models/decoration'
 import Document from '../models/document'
 import Editor from '../controllers/editor'

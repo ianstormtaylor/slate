@@ -17,16 +17,18 @@ So a basic plugin might look like this:
 ```js
 export default function MySlatePlugin(options) {
   return {
-    onKeyDown(event, change, next) {
+    onKeyDown(event, editor, next) {
       if (event.key == options.key) {
-        change.blur()
-        return true
+        editor.blur()
+      } else {
+        return next()
       }
     },
-    onClick(event, change, next) {
-      if (change.value.selection.isBlurred) {
-        change.moveToRangeOfDocument().focus()
-        return true
+    onClick(event, editor, next) {
+      if (editor.value.selection.isBlurred) {
+        editor.moveToRangeOfDocument().focus()
+      } else {
+        return next()
       }
     },
   }
@@ -36,8 +38,6 @@ export default function MySlatePlugin(options) {
 It focuses the editor and selects everything when it is clicked, and it blurs the editor when `options.key` is pressed.
 
 Notice how it's able to define a set of behaviors, reacting to different events, that work together to form a single "feature" in the editor. That's what makes Slate's plugins a powerful form of encapsulation.
-
-Also notice how it returns `true`. This is a convention that allows other plugins in the stack to know that an event has been "handled" and that they can abort without duplicating logic.
 
 ## The Plugins "Stack"
 
@@ -120,9 +120,11 @@ For example, you may have a simple `Hotkey` plugin that makes binding behaviors 
 ```js
 function Hotkey(hotkey, fn) {
   return {
-    onKeyDown(event, change, editor) {
+    onKeyDown(event, editor, next) {
       if (isHotkey(hotkey, event)) {
-        change.call(fn)
+        editor.command(fn)
+      } else {
+        return next()
       }
     },
   }
@@ -134,7 +136,7 @@ That pseudo-code allows you to encapsulate the hotkey-binding logic in one place
 ```js
 const plugins = [
   ...,
-  Hotkey('cmd+b', change => change.addMark('bold')),
+  Hotkey('cmd+b', editor => editor.addMark('bold')),
 ]
 ```
 

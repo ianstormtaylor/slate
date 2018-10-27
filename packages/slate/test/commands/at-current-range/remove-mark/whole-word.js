@@ -2,8 +2,8 @@
 
 import h from '../../../helpers/h'
 
-export default function(change) {
-  change.removeMark('bold')
+export default function(editor) {
+  editor.removeMark('bold')
 }
 
 export const input = (

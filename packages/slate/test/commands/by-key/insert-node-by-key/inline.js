@@ -3,8 +3,8 @@
 import h from '../../../helpers/h'
 import { Inline } from 'slate'
 
-export default function(change) {
-  change.insertNodeByKey('a', 0, Inline.create('emoji'))
+export default function(editor) {
+  editor.insertNodeByKey('a', 0, Inline.create('emoji'))
 }
 
 export const input = (

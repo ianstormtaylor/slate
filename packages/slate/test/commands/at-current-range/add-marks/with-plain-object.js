@@ -2,7 +2,7 @@
 
 import h from '../../../helpers/h'
 
-export default function(change) {
+export default function(editor) {
   const marks = []
 
   marks.push({
@@ -15,7 +15,7 @@ export default function(change) {
     data: { thing2: 'value2' },
   })
 
-  change.addMarks(marks)
+  editor.addMarks(marks)
 }
 
 export const input = (

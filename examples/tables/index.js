@@ -50,7 +50,7 @@ class Tables extends React.Component {
    * @return {Element}
    */
 
-  renderNode = (props, next) => {
+  renderNode = (props, editor, next) => {
     const { attributes, children, node } = props
 
     switch (node.type) {
@@ -76,7 +76,7 @@ class Tables extends React.Component {
    * @return {Element}
    */
 
-  renderMark = (props, next) => {
+  renderMark = (props, editor, next) => {
     const { children, mark, attributes } = props
 
     switch (mark.type) {
@@ -91,11 +91,11 @@ class Tables extends React.Component {
    * On backspace, do nothing if at the start of a table cell.
    *
    * @param {Event} event
-   * @param {Change} change
+   * @param {Editor} editor
    */
 
-  onBackspace = (event, change, next) => {
-    const { value } = change
+  onBackspace = (event, editor, next) => {
+    const { value } = editor
     const { selection } = value
     if (selection.start.offset != 0) return next()
     event.preventDefault()
@@ -104,7 +104,7 @@ class Tables extends React.Component {
   /**
    * On change.
    *
-   * @param {Change} change
+   * @param {Editor} editor
    */
 
   onChange = ({ value }) => {
@@ -115,11 +115,11 @@ class Tables extends React.Component {
    * On delete, do nothing if at the end of a table cell.
    *
    * @param {Event} event
-   * @param {Change} change
+   * @param {Editor} editor
    */
 
-  onDelete = (event, change, next) => {
-    const { value } = change
+  onDelete = (event, editor, next) => {
+    const { value } = editor
     const { selection } = value
     if (selection.end.offset != value.startText.text.length) return next()
     event.preventDefault()
@@ -129,12 +129,12 @@ class Tables extends React.Component {
    * On paste or drop, only support plain text for this example.
    *
    * @param {Event} event
-   * @param {Change} change
+   * @param {Editor} editor
    */
 
-  onDropOrPaste = (event, change, next) => {
+  onDropOrPaste = (event, editor, next) => {
     const transfer = getEventTransfer(event)
-    const { value } = change
+    const { value } = editor
     const { text = '' } = transfer
 
     if (value.startBlock.type !== 'table-cell') {
@@ -147,17 +147,17 @@ class Tables extends React.Component {
 
     const lines = text.split('\n')
     const { document } = Plain.deserialize(lines[0] || '')
-    change.insertFragment(document)
+    editor.insertFragment(document)
   }
 
   /**
    * On return, do nothing if inside a table cell.
    *
    * @param {Event} event
-   * @param {Change} change
+   * @param {Editor} editor
    */
 
-  onEnter = (event, change, next) => {
+  onEnter = (event, editor, next) => {
     event.preventDefault()
   }
 
@@ -165,11 +165,11 @@ class Tables extends React.Component {
    * On key down, check for our specific key shortcuts.
    *
    * @param {Event} event
-   * @param {Change} change
+   * @param {Editor} editor
    */
 
-  onKeyDown = (event, change, next) => {
-    const { value } = change
+  onKeyDown = (event, editor, next) => {
+    const { value } = editor
     const { document, selection } = value
     const { start, isCollapsed } = selection
     const startNode = document.getDescendant(start.key)
@@ -193,11 +193,11 @@ class Tables extends React.Component {
 
     switch (event.key) {
       case 'Backspace':
-        return this.onBackspace(event, change, next)
+        return this.onBackspace(event, editor, next)
       case 'Delete':
-        return this.onDelete(event, change, next)
+        return this.onDelete(event, editor, next)
       case 'Enter':
-        return this.onEnter(event, change, next)
+        return this.onEnter(event, editor, next)
       default:
         return next()
     }

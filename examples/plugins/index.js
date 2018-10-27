@@ -52,7 +52,7 @@ The third is an example of using the plugin.render property to create a higher-o
   /**
    * On change.
    *
-   * @param {Change} change
+   * @param {Editor} editor
    */
 
   onChange = ({ value }) => {

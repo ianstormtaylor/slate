@@ -3,13 +3,8 @@
 import h from '../../helpers/h'
 
 export default function(editor) {
-  editor.change(change => {
-    change.insertText('text')
-  })
-
-  editor.change(change => {
-    change.undo()
-  })
+  editor.insertText('text')
+  editor.flush().undo()
 }
 
 export const input = (

@@ -2,8 +2,8 @@
 
 import h from '../../../helpers/h'
 
-export default function(change) {
-  change.addMarks(['bold', 'italic']).insertText('a')
+export default function(editor) {
+  editor.addMarks(['bold', 'italic']).insertText('a')
 }
 
 export const input = (

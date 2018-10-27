@@ -9,27 +9,27 @@ import { Button, Icon, Toolbar } from '../components'
 /**
  * A change helper to standardize wrapping links.
  *
- * @param {Change} change
+ * @param {Editor} editor
  * @param {String} href
  */
 
-function wrapLink(change, href) {
-  change.wrapInline({
+function wrapLink(editor, href) {
+  editor.wrapInline({
     type: 'link',
     data: { href },
   })
 
-  change.moveToEnd()
+  editor.moveToEnd()
 }
 
 /**
  * A change helper to standardize unwrapping links.
  *
- * @param {Change} change
+ * @param {Editor} editor
  */
 
-function unwrapLink(change) {
-  change.unwrapInline('link')
+function unwrapLink(editor) {
+  editor.unwrapInline('link')
 }
 
 /**
@@ -105,7 +105,7 @@ class Links extends React.Component {
    * @return {Element}
    */
 
-  renderNode = (props, next) => {
+  renderNode = (props, editor, next) => {
     const { attributes, children, node } = props
 
     switch (node.type) {
@@ -128,7 +128,7 @@ class Links extends React.Component {
   /**
    * On change.
    *
-   * @param {Change} change
+   * @param {Editor} editor
    */
 
   onChange = ({ value }) => {
@@ -145,51 +145,50 @@ class Links extends React.Component {
   onClickLink = event => {
     event.preventDefault()
 
-    this.editor.change(change => {
-      const { value } = change
-      const hasLinks = this.hasLinks()
+    const { editor } = this
+    const { value } = editor
+    const hasLinks = this.hasLinks()
 
-      if (hasLinks) {
-        change.call(unwrapLink)
-      } else if (value.selection.isExpanded) {
-        const href = window.prompt('Enter the URL of the link:')
+    if (hasLinks) {
+      editor.command(unwrapLink)
+    } else if (value.selection.isExpanded) {
+      const href = window.prompt('Enter the URL of the link:')
 
-        if (href === null) {
-          return
-        }
-
-        change.call(wrapLink, href)
-      } else {
-        const href = window.prompt('Enter the URL of the link:')
-
-        if (href === null) {
-          return
-        }
-
-        const text = window.prompt('Enter the text for the link:')
-
-        if (text === null) {
-          return
-        }
-
-        change
-          .insertText(text)
-          .moveFocusBackward(text.length)
-          .call(wrapLink, href)
+      if (href === null) {
+        return
       }
-    })
+
+      editor.command(wrapLink, href)
+    } else {
+      const href = window.prompt('Enter the URL of the link:')
+
+      if (href === null) {
+        return
+      }
+
+      const text = window.prompt('Enter the text for the link:')
+
+      if (text === null) {
+        return
+      }
+
+      editor
+        .insertText(text)
+        .moveFocusBackward(text.length)
+        .command(wrapLink, href)
+    }
   }
 
   /**
    * On paste, if the text is a link, wrap the selection in a link.
    *
    * @param {Event} event
-   * @param {Change} change
+   * @param {Editor} editor
    * @param {Function} next
    */
 
-  onPaste = (event, change, next) => {
-    if (change.value.selection.isCollapsed) return next()
+  onPaste = (event, editor, next) => {
+    if (editor.value.selection.isCollapsed) return next()
 
     const transfer = getEventTransfer(event)
     const { type, text } = transfer
@@ -197,10 +196,10 @@ class Links extends React.Component {
     if (!isUrl(text)) return next()
 
     if (this.hasLinks()) {
-      change.call(unwrapLink)
+      editor.command(unwrapLink)
     }
 
-    change.call(wrapLink, text)
+    editor.command(wrapLink, text)
   }
 }
 

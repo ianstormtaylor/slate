@@ -13,13 +13,13 @@ import { Button, Icon, Toolbar } from '../components'
  */
 
 const commands = {
-  resetHistory(change) {
-    const { value } = change
+  resetHistory(editor) {
+    const { value } = editor
     const { data } = value
     const newData = data.set('undos', List()).set('redos', List())
 
-    change.withoutSaving(() => {
-      change.setValue({ data: newData })
+    editor.withoutSaving(() => {
+      editor.setData(newData)
     })
   },
 }
@@ -103,7 +103,7 @@ class Versions extends React.Component {
   /**
    * On change.
    *
-   * @param {Change} change
+   * @param {Editor} editor
    */
 
   onChange = ({ value }) => {
@@ -129,32 +129,31 @@ class Versions extends React.Component {
    */
 
   setVersion = n => {
+    const { editor } = this
     const { versions, v } = this.state
     const isForward = n > v
     if (n === v) return
 
-    this.editor.change(change => {
-      let operations
+    let operations
 
-      if (isForward) {
-        operations = versions
-          .slice(v + 1, n + 1)
-          .map(vers => vers.operations)
-          .flat()
-      } else {
-        operations = versions
-          .slice(n + 1, v + 1)
-          .map(vers => vers.operations)
-          .flat()
-          .reverse()
-          .map(op => op.invert())
-      }
+    if (isForward) {
+      operations = versions
+        .slice(v + 1, n + 1)
+        .map(vers => vers.operations)
+        .flat()
+    } else {
+      operations = versions
+        .slice(n + 1, v + 1)
+        .map(vers => vers.operations)
+        .flat()
+        .reverse()
+        .map(op => op.invert())
+    }
 
-      change.withoutNormalizing(() => {
-        change.withoutSaving(() => {
-          change.applyOperations(operations)
-          change.resetHistory()
-        })
+    editor.withoutNormalizing(() => {
+      editor.withoutSaving(() => {
+        operations.forEach(op => editor.applyOperation(op))
+        editor.resetHistory()
       })
     })
 
@@ -190,9 +189,7 @@ class Versions extends React.Component {
         }
       },
       () => {
-        this.editor.change(change => {
-          change.resetHistory()
-        })
+        this.editor.resetHistory()
       }
     )
   }

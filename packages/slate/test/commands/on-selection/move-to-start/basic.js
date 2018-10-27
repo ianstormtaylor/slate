@@ -2,8 +2,8 @@
 
 import h from '../../../helpers/h'
 
-export default function(change) {
-  change.moveToStart()
+export default function(editor) {
+  editor.moveToStart()
 }
 
 export const input = (

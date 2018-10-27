@@ -88,13 +88,13 @@ Taken together, commands and queries offer a better way for plugins to manage th
 
 ```js
 // Previously, you'd return `undefined` to continue.
-function onKeyDown(event, change, editor) {
+function onKeyDown(event, editor, next) {
   if (event.key !== 'Enter') return
   ...
 }
 
 // Now, you call `next()` to continue...
-function onKeyDown(event, change, next) {
+function onKeyDown(event, editor, next) {
   if (event.key !== 'Enter') return next()
   ...
 }
@@ -103,7 +103,7 @@ function onKeyDown(event, change, next) {
 While that may seem inconvenient, it opens up an entire new behavior, which is deferring to the plugins later in the stack to see if they "handle" a specific case, and if not, handling it yourself:
 
 ```js
-function onKeyDown(event, change, next) {
+function onKeyDown(event, editor, next) {
   if (event.key === 'Enter') {
     const handled = next()
     if (handled) return handled
@@ -119,7 +119,7 @@ Under the covers, the `schema`, `commands` and `queries` concept are all impleme
 
 ```js
 const plugin = {
-  onCommand(command, change, next) {
+  onCommand(command, editor, next) {
     ...
   }
 }

@@ -2,8 +2,8 @@
 
 import h from '../../../helpers/h'
 
-export default function(change) {
-  change.wrapInline({
+export default function(editor) {
+  editor.wrapInline({
     type: 'link',
   })
 }

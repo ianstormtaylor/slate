@@ -6,9 +6,9 @@ import h from '../../../helpers/h'
  * This test makes sure a normalization happens on insertText on expandedRange
  */
 
-export default function(change) {
-  change.insertText('a')
-  change.insertText('b')
+export default function(editor) {
+  editor.insertText('a')
+  editor.insertText('b')
 }
 
 export const input = (

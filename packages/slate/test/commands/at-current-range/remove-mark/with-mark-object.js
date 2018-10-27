@@ -3,8 +3,8 @@
 import h from '../../../helpers/h'
 import { Mark } from 'slate'
 
-export default function(change) {
-  change.removeMark(
+export default function(editor) {
+  editor.removeMark(
     Mark.create({
       type: 'bold',
       data: { thing: 'value' },
