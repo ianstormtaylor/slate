@@ -4,6 +4,59 @@ A list of changes to the `slate` package with each new version. Until `1.0.0` is
 
 ---
 
+### `0.43.0` — October 27, 2018
+
+###### NEW
+
+**The `editor.command` and `editor.query` methods can take functions.** Previously they only accepted a `type` string and would look up the command or query by type. Now, they also accept a custom function. This is helpful for plugin authors, who want to accept a "command option", since it gives users more flexibility to write one-off commands or queries. For example a plugin could be passed either:
+
+```js
+Hotkey({
+  hotkey: 'cmd+b',
+  command: 'addBoldMark',
+})
+```
+
+Or a custom command function:
+
+```js
+Hotkey({
+  hotkey: 'cmd+b',
+  command: editor => editor.addBoldMark().moveToEnd(),
+})
+```
+
+###### BREAKING
+
+**The `Change` object has been removed.** The `Change` object as we know it previously has been removed, and all of its behaviors have been folded into the `Editor` controller. This includes the top-level commands and queries methods, as well as methods like `applyOperation` and `normalize`. _All places that used to receive `change` now receive `editor`, which is API equivalent._
+
+**Changes are now flushed to `onChange` asynchronously.** Previously this was done synchronously, which resulted in some strange race conditions in React environments. Now they will always be flushed asynchronously, just like `setState`.
+
+**The `normalize*` and `validate*` middleware signatures have changed!** Previously the `normalize*` and `validate*` middleware was passed `(node, next)`. However now, for consistency with the other middleware they are all passed `(node, editor, next)`. This way, all middleware always receive `editor` and `next` as their final two arguments.
+
+**The `editor.event` method has been removed.** Previously this is what you'd use when writing tests to simulate events being fired—which were slightly different to other running other middleware. With the simplification to the editor and to the newly-consistent middleware signatures, you can now use `editor.run` directly to simulate events:
+
+```js
+editor.run('onKeyDown', { key: 'Tab', ... })
+```
+
+###### DEPRECATED
+
+**The `editor.change` method is deprecated.** With the removal of the `Change` object, there's no need anymore to create the small closures with `editor.change()`. Instead you can directly invoke commands on the editor in series, and all of the changes will be emitted asynchronously on the next tick.
+
+```js
+editor
+  .insertText('word')
+  .moveFocusForward(10)
+  .addMark('bold')
+```
+
+**The `applyOperations` method is deprecated.** Instead you can loop a set of operations and apply each one using `applyOperation`. This is to reduce the number of methods exposed on the `Editor` to keep it simpler.
+
+**The `change.call` method is deprecated.** Previously this was used to call a one-off function as a change method. Now this behavior is equivalent to calling `editor.command(fn)` instead.
+
+---
+
 ### `0.42.0` — October 9, 2018
 
 ###### NEW

@@ -4,6 +4,20 @@ This document maintains a list of changes to the `slate-react` package with each
 
 ---
 
+### `0.20.0` — October 27, 2018
+
+###### BREAKING
+
+**Updated to work with `slate@0.43`.** The React bindings have been updated to work with the newest version of Slate which removes the `Change` object.
+
+**The `Change` object has been removed.** The `Change` object as we know it previously has been removed, and all of its behaviors have been folded into the `Editor` controller. This includes the top-level commands and queries methods, as well as methods like `applyOperation` and `normalize`. _All places that used to receive `change` now receive `editor`, which is API equivalent._
+
+**Changes are now flushed to `onChange` asynchronously.** Previously this was done synchronously, which resulted in some strange race conditions in React environments. Now they will always be flushed asynchronously, just like `setState`.
+
+**The `render*` and `decorate*` middleware signatures have changed!** Previously the `render*` and `decorate*` middleware was passed `(props, next)`. However now, for consistency with the other middleware they are all passed `(props, editor, next)`. This way, all middleware always receive `editor` and `next` as their final two arguments.
+
+---
+
 ### `0.19.0` — October 9, 2018
 
 ###### NEW
