@@ -25,7 +25,7 @@
             "leaves": [
               {
                 "text":
-                  "Try it out for yourself! Copy and paste some rendered HTML content (not the actual syntax) from another site into this editor."
+                  "Try it out for yourself! Copy and paste some rendered HTML content (not the source code) from another site into this editor."
               }
             ]
           }
