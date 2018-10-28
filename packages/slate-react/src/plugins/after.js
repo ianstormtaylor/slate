@@ -226,11 +226,11 @@ function AfterPlugin(options = {}) {
       const isVoidInline = endInline && editor.isVoid(endInline) && isCollapsed
 
       if (isVoidBlock) {
-        editor.editor(c => c.removeNodeByKey(endBlock.key))
+        editor.removeNodeByKey(endBlock.key)
       } else if (isVoidInline) {
-        editor.editor(c => c.removeNodeByKey(endInline.key))
+        editor.removeNodeByKey(endInline.key)
       } else {
-        editor.editor(c => c.delete())
+        editor.delete()
       }
     })
 
