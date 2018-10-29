@@ -1,6 +1,5 @@
 import omit from 'lodash/omit'
 import { List } from 'immutable'
-import Selection from '../models/selection'
 import Operation from '../models/operation'
 
 /**
