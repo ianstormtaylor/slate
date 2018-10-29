@@ -1,5 +1,7 @@
 import omit from 'lodash/omit'
 import { List } from 'immutable'
+import Selection from '../models/selection'
+import Operation from '../models/operation'
 
 /**
  * Commands.
@@ -22,6 +24,12 @@ Commands.save = (editor, operation) => {
   let { save, merge } = editor.tmp
   if (save === false) return
 
+  //  Don't snapshot selections unless isFocused is true
+  //  If isFocused is true, this is a programatically set
+  //  selection with all properties and should be saved
+  const isSelection = operation.type === 'set_selection'
+  if (isSelection && !operation.properties.isFocused) return
+
   let undos = data.get('undos') || List()
   const lastBatch = undos.last()
   const lastOperation = lastBatch && lastBatch.last()
@@ -43,7 +51,27 @@ Commands.save = (editor, operation) => {
     undos = undos.push(batch)
   } else {
     // Otherwise, create a new batch with the operation.
-    const batch = List([operation])
+    const { selection } = value
+    const { anchor, focus } = selection
+
+    let batch
+
+    if (isSelection || operation.type === 'insert_text') {
+      batch = List([operation])
+    } else {
+      //  Create a selection operation using the editor's current selection
+      const currentSelectionOp = Operation.create({
+        type: 'set_selection',
+        properties: { anchor, focus },
+        selection,
+      })
+
+      //  Sandwich the provided operation with currentSelectionOp.
+      //  This ensures that selection will be correct in both directions.
+      //  Both directions meaning undo or redo.
+      batch = List([currentSelectionOp, operation, currentSelectionOp])
+    }
+
     undos = undos.push(batch)
   }
 
