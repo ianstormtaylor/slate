@@ -135,6 +135,7 @@ Commands.insertFragment = (editor, fragment) => {
   const { startText, endText, startInline } = value
   const lastText = fragment.getLastText()
   const lastInline = fragment.getClosestInline(lastText.key)
+  const lastBlock = fragment.getClosestBlock(lastText.key)
   const firstChild = fragment.nodes.first()
   const lastChild = fragment.nodes.last()
   const keys = document.getTexts().map(text => text.key)
@@ -154,13 +155,11 @@ Commands.insertFragment = (editor, fragment) => {
   const newText = isAppending ? newTexts.last() : newTexts.takeLast(2).first()
 
   if (newText && (lastInline || isInserting)) {
-    editor.select(selection.moveToEndOfNode(newText))
+    editor.moveToEndOfNode(newText)
   } else if (newText) {
-    editor.select(
-      selection.moveToStartOfNode(newText).moveForward(lastText.text.length)
-    )
+    editor.moveToStartOfNode(newText).moveForward(lastBlock.text.length)
   } else {
-    editor.select(selection.moveToStart().moveForward(lastText.text.length))
+    editor.moveToStart().moveForward(lastBlock.text.length)
   }
 }
 
