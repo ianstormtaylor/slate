@@ -158,8 +158,6 @@ Commands.insertFragment = (editor, fragment) => {
     editor.moveToEndOfNode(newText)
   } else if (newText) {
     editor.moveToStartOfNode(newText).moveForward(lastBlock.text.length)
-  } else {
-    editor.moveToStart().moveForward(lastBlock.text.length)
   }
 }
 
