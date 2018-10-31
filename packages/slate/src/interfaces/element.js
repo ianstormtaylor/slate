@@ -1428,6 +1428,7 @@ class ElementInterface {
 
   isLeafBlock() {
     const { object, nodes } = this
+    if (!nodes.size) return true
     const first = nodes.first()
     return object === 'block' && first.object !== 'block'
   }
@@ -1440,6 +1441,7 @@ class ElementInterface {
 
   isLeafInline() {
     const { object, nodes } = this
+    if (!nodes.size) return true
     const first = nodes.first()
     return object === 'inline' && first.object !== 'inline'
   }
