@@ -168,38 +168,33 @@ class MentionsExample extends React.Component {
   insertMention = user => {
     const value = this.state.value
     const inputValue = getInput(value)
+    const editor = this.editorRef.current
 
     // Delete the captured value, including the `@` symbol
-    this.editorRef.current.change(change => {
-      change = change.deleteBackward(inputValue.length + 1)
+    editor.deleteBackward(inputValue.length + 1)
 
-      const selectedRange = change.value.selection
+    const selectedRange = editor.value.selection
 
-      change
-        .insertText(' ')
-        .insertInlineAtRange(selectedRange, {
-          data: {
-            userId: user.id,
-            username: user.username,
+    editor
+      .insertText(' ')
+      .insertInlineAtRange(selectedRange, {
+        data: {
+          userId: user.id,
+          username: user.username,
+        },
+        nodes: [
+          {
+            object: 'text',
+            leaves: [
+              {
+                text: `@${user.username}`,
+              },
+            ],
           },
-          nodes: [
-            {
-              object: 'text',
-              leaves: [
-                {
-                  text: `@${user.username}`,
-                },
-              ],
-            },
-          ],
-          type: USER_MENTION_NODE_TYPE,
-        })
-        .focus()
-
-      this.setState({
-        value: change.value,
+        ],
+        type: USER_MENTION_NODE_TYPE,
       })
-    })
+      .focus()
   }
 
   /**
@@ -240,7 +235,11 @@ class MentionsExample extends React.Component {
         })
       }
 
-      return change.withoutSaving(() => change.setDecorations(decorations))
+      this.setState({ value: change.value }, () => {
+        // We need to set decorations after the value flushes into the editor.
+        this.editorRef.current.setDecorations(decorations)
+      })
+      return
     }
 
     this.setState({ value: change.value })
