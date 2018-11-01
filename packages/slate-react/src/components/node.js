@@ -135,25 +135,28 @@ class Node extends React.Component {
     const decs = decorations.concat(node.getDecorations(editor))
     const childrenDecorations = getChildrenDecorations(node, decs)
 
-    let children = []
-
-    node.nodes.forEach((child, i) => {
-      const isChildSelected = !!indexes && indexes.start <= i && i < indexes.end
-
-      children.push(
-        this.renderNode(child, isChildSelected, childrenDecorations[i])
-      )
-    })
-
     // Attributes that the developer must mix into the element in their
     // custom node renderer component.
     const attributes = { 'data-key': node.key }
 
-    // If it's a block node with inline children, add the proper `dir` attribute
-    // for text direction.
-    if (node.object == 'block' && node.nodes.first().object != 'block') {
-      const direction = node.getTextDirection()
-      if (direction == 'rtl') attributes.dir = 'rtl'
+    let children = []
+
+    if (node.nodes.size) {
+      node.nodes.forEach((child, i) => {
+        const isChildSelected =
+          !!indexes && indexes.start <= i && i < indexes.end
+
+        children.push(
+          this.renderNode(child, isChildSelected, childrenDecorations[i])
+        )
+      })
+
+      // If it's a block node with inline children, add the proper `dir` attribute
+      // for text direction.
+      if (node.object == 'block' && node.nodes.first().object != 'block') {
+        const direction = node.getTextDirection()
+        if (direction == 'rtl') attributes.dir = 'rtl'
+      }
     }
 
     const props = {
