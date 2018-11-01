@@ -139,7 +139,7 @@ The third place you may perform change operationsâ€”for more complex use casesâ€
 }
 ```
 
-When a rule's validation fails, Slate passes the editor to the `normalize` function of the rule, if one exists. You can use these normalizing funcrtions to apply the commands necessary to make your document valid on the next normalization pass.
+When a rule's validation fails, Slate passes the editor to the `normalize` function of the rule, if one exists. You can use these normalizing functions to apply the commands necessary to make your document valid on the next normalization pass.
 
 ### 4. From Outside Slate
 
