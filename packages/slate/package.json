@@ -1,7 +1,7 @@
 {
   "name": "slate",
   "description": "A completely customizable framework for building rich text editors.",
-  "version": "0.43.3",
+  "version": "0.43.4",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
   "main": "lib/slate.js",
@@ -28,7 +28,7 @@
   },
   "devDependencies": {
     "slate-dev-test-utils": "^0.0.1",
-    "slate-hyperscript": "^0.11.10"
+    "slate-hyperscript": "^0.11.11"
   },
   "scripts": {
     "clean": "rm -rf ./dist ./lib ./node_modules"
