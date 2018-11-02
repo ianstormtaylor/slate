@@ -94,7 +94,7 @@ Commands.deleteBackward = (editor, n = 1) => {
   if (selection.isExpanded) {
     editor.delete()
   } else {
-    editor.deleteBackwardAtRange(selection, n).moveToStart()
+    editor.deleteBackwardAtRange(selection, n)
   }
 }
 
@@ -111,7 +111,7 @@ Commands.deleteCharBackward = editor => {
   if (selection.isExpanded) {
     editor.delete()
   } else {
-    editor.deleteCharBackwardAtRange(selection).moveToStart()
+    editor.deleteCharBackwardAtRange(selection)
   }
 }
 
@@ -128,7 +128,7 @@ Commands.deleteLineBackward = editor => {
   if (selection.isExpanded) {
     editor.delete()
   } else {
-    editor.deleteLineBackwardAtRange(selection).moveToStart()
+    editor.deleteLineBackwardAtRange(selection)
   }
 }
 
@@ -145,7 +145,7 @@ Commands.deleteWordBackward = editor => {
   if (selection.isExpanded) {
     editor.delete()
   } else {
-    editor.deleteWordBackwardAtRange(selection).moveToStart()
+    editor.deleteWordBackwardAtRange(selection)
   }
 }
 
@@ -163,7 +163,7 @@ Commands.deleteForward = (editor, n = 1) => {
   if (selection.isExpanded) {
     editor.delete()
   } else {
-    editor.deleteForwardAtRange(selection, n).moveToEnd()
+    editor.deleteForwardAtRange(selection, n)
   }
 }
 
@@ -180,7 +180,7 @@ Commands.deleteCharForward = editor => {
   if (selection.isExpanded) {
     editor.delete()
   } else {
-    editor.deleteCharForwardAtRange(selection).moveToEnd()
+    editor.deleteCharForwardAtRange(selection)
   }
 }
 
@@ -197,7 +197,7 @@ Commands.deleteLineForward = editor => {
   if (selection.isExpanded) {
     editor.delete()
   } else {
-    editor.deleteLineForwardAtRange(selection).moveToEnd()
+    editor.deleteLineForwardAtRange(selection)
   }
 }
 
@@ -212,7 +212,7 @@ Commands.deleteWordForward = editor => {
   const { selection } = value
 
   if (selection.isExpanded) {
-    editor.delete().moveToEnd()
+    editor.delete()
   } else {
     editor.deleteWordForwardAtRange(selection)
   }
