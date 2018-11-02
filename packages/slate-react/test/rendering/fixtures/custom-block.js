@@ -35,7 +35,9 @@ export const output = `
   <pre>
     <code>
       <span>
-        <span>word</span>
+        <span data-slate-leaf="true">
+          <span data-slate-content="true">word</span>
+        </span>
       </span>
     </code>
   </pre>

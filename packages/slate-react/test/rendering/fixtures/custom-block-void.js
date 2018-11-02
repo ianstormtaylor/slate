@@ -45,7 +45,7 @@ export const output = `
   <div data-slate-void="true">
     <div data-slate-spacer="true" style="height:0;color:transparent;outline:none;position:absolute">
       <span>
-        <span>
+        <span data-slate-leaf="true">
           <span data-slate-zero-width="z">&#xFEFF;</span>
         </span>
       </span>

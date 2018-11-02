@@ -18,17 +18,23 @@ export const output = `
 <div data-slate-editor="true" contenteditable="true" role="textbox">
   <div style="position:relative">
     <span>
-      <span>Hello, world!</span>
+      <span data-slate-leaf="true">
+        <span data-slate-content="true">Hello, world!</span>
+      </span>
     </span>
   </div>
   <div dir="rtl" style="position:relative">
     <span>
-      <span>مرحبا بالعالم</span>
+      <span data-slate-leaf="true">
+        <span data-slate-content="true">مرحبا بالعالم</span>
+      </span>
     </span>
   </div>
   <div dir="rtl" style="position:relative">
     <span>
-      <span>שלום עולם</span>
+      <span data-slate-leaf="true">
+        <span data-slate-content="true">שלום עולם</span>
+      </span>
     </span>
   </div>
 </div>

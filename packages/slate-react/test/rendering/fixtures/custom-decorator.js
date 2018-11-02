@@ -52,9 +52,17 @@ export const output = `
 <div data-slate-editor="true" contenteditable="true" role="textbox">
   <div style="position:relative">
     <span>
-      <span>o</span>
-      <span><strong data-slate-leaf="true">n</strong></span>
-      <span>e</span>
+      <span data-slate-leaf="true">
+        <span data-slate-content="true">o</span>
+      </span>
+      <span data-slate-leaf="true">
+        <strong data-slate-mark="true">
+          <span data-slate-content="true">n</span>
+        </strong>
+      </span>
+      <span data-slate-leaf="true">
+        <span data-slate-content="true">e</span>
+      </span>
     </span>
   </div>
 </div>

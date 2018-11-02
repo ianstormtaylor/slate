@@ -169,8 +169,8 @@ class Leaf extends React.Component {
     const isLastLeaf = index === leaves.size - 1
     if (isLastText && isLastLeaf && lastChar === '\n') return `${text}\n`
 
-    // Otherwise, just return the text.
-    return <span data-slate-text>{text}</span>
+    // Otherwise, just return the content.
+    return <span data-slate-content>{text}</span>
   }
 }
 

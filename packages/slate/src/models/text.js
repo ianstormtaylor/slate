@@ -108,6 +108,10 @@ class Text extends Record(DEFAULTS) {
       throw new Error('leaves must be either Array or Immutable.List')
     }
 
+    if (leaves.size === 0) {
+      leaves = leaves.push(Leaf.create())
+    }
+
     const node = new Text({
       leaves: Leaf.createLeaves(leaves),
       key,
@@ -631,19 +635,23 @@ class Text extends Record(DEFAULTS) {
    */
 
   setLeaves(leaves) {
-    const result = Leaf.createLeaves(leaves)
+    leaves = Leaf.createLeaves(leaves)
 
-    if (result.size === 1) {
-      const first = result.first()
+    if (leaves.size === 1) {
+      const first = leaves.first()
 
       if (!first.marks || first.marks.size === 0) {
         if (first.text === '') {
-          return this.set('leaves', List())
+          return this.set('leaves', List([Leaf.create()]))
         }
       }
     }
 
-    return this.set('leaves', Leaf.createLeaves(leaves))
+    if (leaves.size === 0) {
+      leaves = leaves.push(Leaf.create())
+    }
+
+    return this.set('leaves', leaves)
   }
 }
 

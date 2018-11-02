@@ -16,7 +16,7 @@ function findDOMPoint(point, win = window) {
   // direct text and zero-width spans. (We have to filter out any other siblings
   // that may have been rendered alongside them.)
   const texts = Array.from(
-    el.querySelectorAll('[data-slate-text], [data-slate-zero-width]')
+    el.querySelectorAll('[data-slate-content], [data-slate-zero-width]')
   )
 
   for (const text of texts) {
