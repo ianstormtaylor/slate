@@ -26,6 +26,7 @@
     "slate-hotkeys": "^0.2.7",
     "slate-plain-serializer": "^0.6.20",
     "slate-prop-types": "^0.5.11",
+    "slate-react-placeholder": "^0.0.0",
     "tiny-invariant": "^1.0.1",
     "tiny-warning": "^0.0.3"
   },

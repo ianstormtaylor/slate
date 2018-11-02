@@ -18,7 +18,7 @@ function DOMPlugin(options = {}) {
 /**
  * Export.
  *
- * @type {Object}
+ * @type {Function}
  */
 
 export default DOMPlugin

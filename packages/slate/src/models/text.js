@@ -234,7 +234,14 @@ class Text extends Record(DEFAULTS) {
       return List([leaf])
     }
 
-    if (this.text.length === 0) return leaves
+    // HACK: this shouldn't be necessary, because the loop below should handle
+    // the `0` case without failures. It may already even, not sure.
+    if (this.text.length === 0) {
+      const marks = decorations.map(d => d.mark)
+      const leaf = Leaf.create({ marks })
+      return List([leaf])
+    }
+
     const { key, text } = this
 
     decorations.forEach(dec => {

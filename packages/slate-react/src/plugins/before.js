@@ -502,7 +502,7 @@ function BeforePlugin() {
 /**
  * Export.
  *
- * @type {Object}
+ * @type {Function}
  */
 
 export default BeforePlugin

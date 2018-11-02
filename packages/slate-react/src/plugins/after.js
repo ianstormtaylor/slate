@@ -725,7 +725,7 @@ function AfterPlugin(options = {}) {
 /**
  * Export.
  *
- * @type {Object}
+ * @type {Function}
  */
 
 export default AfterPlugin

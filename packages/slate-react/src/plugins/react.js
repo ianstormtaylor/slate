@@ -1,8 +1,7 @@
+import PlaceholderPlugin from 'slate-react-placeholder'
 import React from 'react'
-import { Text } from 'slate'
 
 import DOMPlugin from './dom'
-import PlaceholderPlugin from './placeholder'
 import Content from '../components/content'
 import EVENT_HANDLERS from '../constants/event-handlers'
 
@@ -32,6 +31,19 @@ const PROPS = [
 
 function ReactPlugin(options = {}) {
   const { placeholder, plugins = [] } = options
+
+  /**
+   * Decorate node.
+   *
+   * @param {Object} node
+   * @param {Editor} editor
+   * @param {Function} next
+   * @return {Array}
+   */
+
+  function decorateNode(node, editor, next) {
+    return []
+  }
 
   /**
    * Render editor.
@@ -88,33 +100,43 @@ function ReactPlugin(options = {}) {
    * @type {Array}
    */
 
+  const ret = []
   const editorPlugin = PROPS.reduce((memo, prop) => {
     if (prop in options) memo[prop] = options[prop]
     return memo
   }, {})
 
-  const domPlugin = DOMPlugin({
-    plugins: [editorPlugin, ...plugins],
-  })
+  ret.push(
+    DOMPlugin({
+      plugins: [editorPlugin, ...plugins],
+    })
+  )
 
-  const placeholderPlugin = PlaceholderPlugin({
-    placeholder,
-    when: (editor, node) =>
-      node.object === 'document' && node.text === '' && node.nodes.size === 1,
-  })
-
-  const defaultsPlugin = {
-    renderEditor,
-    renderNode,
+  if (placeholder) {
+    ret.push(
+      PlaceholderPlugin({
+        placeholder,
+        when: (editor, node) =>
+          node.object === 'document' &&
+          node.text === '' &&
+          node.nodes.size === 1,
+      })
+    )
   }
 
-  return [domPlugin, placeholderPlugin, defaultsPlugin]
+  ret.push({
+    decorateNode,
+    renderEditor,
+    renderNode,
+  })
+
+  return ret
 }
 
 /**
  * Export.
  *
- * @type {Object}
+ * @type {Function}
  */
 
 export default ReactPlugin

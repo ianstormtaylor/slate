@@ -63,6 +63,7 @@ class Editor extends React.Component {
     autoCorrect: true,
     onChange: () => {},
     options: {},
+    placeholder: '',
     plugins: [],
     readOnly: false,
     schema: {},
@@ -132,8 +133,8 @@ class Editor extends React.Component {
     const props = { ...this.props, editor: this }
 
     // Re-resolve the controller if needed based on memoized props.
-    const { commands, plugins, queries, schema } = props
-    this.resolveController(plugins, schema, commands, queries)
+    const { commands, placeholder, plugins, queries, schema } = props
+    this.resolveController(plugins, schema, commands, queries, placeholder)
 
     // Set the current props on the controller.
     const { options, readOnly, value } = props
@@ -154,35 +155,38 @@ class Editor extends React.Component {
    * @param {Object} schema
    * @param {Object} commands
    * @param {Object} queries
+   * @param {String} placeholder
    * @return {Editor}
    */
 
-  resolveController = memoizeOne((plugins = [], schema, commands, queries) => {
-    // If we've resolved a few times already, and it's exactly in line with
-    // the updates, then warn the user that they may be doing something wrong.
-    warning(
-      this.tmp.resolves < 5 || this.tmp.resolves !== this.tmp.updates,
-      'A Slate <Editor> component is re-resolving the `plugins`, `schema`, `commands` or `queries` on each update, which leads to poor performance. This is often due to passing in a new references for these props with each render by declaring them inline in your render function. Do not do this! Declare them outside your render function, or memoize them instead.'
-    )
+  resolveController = memoizeOne(
+    (plugins = [], schema, commands, queries, placeholder) => {
+      // If we've resolved a few times already, and it's exactly in line with
+      // the updates, then warn the user that they may be doing something wrong.
+      warning(
+        this.tmp.resolves < 5 || this.tmp.resolves !== this.tmp.updates,
+        'A Slate <Editor> component is re-resolving the `plugins`, `schema`, `commands`, `queries` or `placeholder` prop on each update, which leads to poor performance. This is often due to passing in a new references for these props with each render by declaring them inline in your render function. Do not do this! Declare them outside your render function, or memoize them instead.'
+      )
 
-    this.tmp.resolves++
-    const react = ReactPlugin(this.props)
+      this.tmp.resolves++
+      const react = ReactPlugin(this.props)
 
-    const onChange = change => {
-      if (this.tmp.mounted) {
-        this.props.onChange(change)
-      } else {
-        this.tmp.change = change
+      const onChange = change => {
+        if (this.tmp.mounted) {
+          this.props.onChange(change)
+        } else {
+          this.tmp.change = change
+        }
       }
+
+      this.controller = new Controller(
+        { plugins: [react], onChange },
+        { controller: this, construct: false }
+      )
+
+      this.controller.run('onConstruct')
     }
-
-    this.controller = new Controller(
-      { plugins: [react], onChange },
-      { controller: this, construct: false }
-    )
-
-    this.controller.run('onConstruct')
-  })
+  )
 
   /**
    * Mimic the API of the `Editor` controller, so that this component instance
