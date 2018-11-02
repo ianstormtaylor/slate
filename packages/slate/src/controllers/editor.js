@@ -399,7 +399,7 @@ class Editor {
   call(fn, ...args) {
     warning(
       false,
-      'As of Slate 0.43 the `editor.command(fn)` method has been deprecated, please use `editor.command(fn)` instead.'
+      'As of Slate 0.43 the `editor.call(fn)` method has been deprecated, please use `editor.command(fn)` instead.'
     )
 
     fn(this.controller, ...args)
