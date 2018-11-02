@@ -20,7 +20,6 @@ const PROPS = [
   'renderEditor',
   'renderMark',
   'renderNode',
-  'renderPlaceholder',
   'schema',
 ]
 
@@ -80,39 +79,6 @@ function ReactPlugin(options = {}) {
       <Tag {...attributes} style={style}>
         {children}
       </Tag>
-    )
-  }
-
-  /**
-   * Render placeholder.
-   *
-   * @param {Object} props
-   * @param {Function} next
-   * @return {Element}
-   */
-
-  function renderPlaceholder(props, editor, next) {
-    const { node } = props
-    if (!editor.props.placeholder) return null
-    if (editor.state.isComposing) return null
-    if (node.object != 'block') return null
-    if (!Text.isTextList(node.nodes)) return null
-    if (node.text != '') return null
-    if (editor.value.document.getBlocks().size > 1) return null
-
-    const style = {
-      pointerEvents: 'none',
-      display: 'inline-block',
-      width: '0',
-      maxWidth: '100%',
-      whiteSpace: 'nowrap',
-      opacity: '0.333',
-    }
-
-    return (
-      <span contentEditable={false} style={style}>
-        {editor.props.placeholder}
-      </span>
     )
   }
 

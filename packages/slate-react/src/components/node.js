@@ -166,16 +166,6 @@ class Node extends React.Component {
       readOnly,
     }
 
-    let placeholder = editor.run('renderPlaceholder', props)
-
-    if (placeholder) {
-      placeholder = React.cloneElement(placeholder, {
-        key: `${node.key}-placeholder`,
-      })
-
-      children = [placeholder, ...children]
-    }
-
     const element = editor.run('renderNode', {
       ...props,
       attributes,
