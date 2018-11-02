@@ -141,22 +141,19 @@ class Node extends React.Component {
 
     let children = []
 
-    if (node.nodes.size) {
-      node.nodes.forEach((child, i) => {
-        const isChildSelected =
-          !!indexes && indexes.start <= i && i < indexes.end
+    node.nodes.forEach((child, i) => {
+      const isChildSelected = !!indexes && indexes.start <= i && i < indexes.end
 
-        children.push(
-          this.renderNode(child, isChildSelected, childrenDecorations[i])
-        )
-      })
+      children.push(
+        this.renderNode(child, isChildSelected, childrenDecorations[i])
+      )
+    })
 
-      // If it's a block node with inline children, add the proper `dir` attribute
-      // for text direction.
-      if (node.object == 'block' && node.nodes.first().object != 'block') {
-        const direction = node.getTextDirection()
-        if (direction == 'rtl') attributes.dir = 'rtl'
-      }
+    // If it's a block node with inline children, add the proper `dir` attribute
+    // for text direction.
+    if (node.isLeafBlock()) {
+      const direction = node.getTextDirection()
+      if (direction == 'rtl') attributes.dir = 'rtl'
     }
 
     const props = {
