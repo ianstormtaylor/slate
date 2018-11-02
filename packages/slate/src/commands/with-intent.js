@@ -3,50 +3,29 @@ import Inline from '../models/inline'
 import Mark from '../models/mark'
 
 /**
+ * Ensure that an expanded selection is deleted first using the `editor.delete`
+ * command. This guarantees that it uses the proper semantic "intent" instead of
+ * using `deleteAtRange` under the covers and skipping `delete`.
+ *
+ * @param {Editor}
+ */
+
+function deleteExpanded(editor) {
+  const { value } = editor
+  const { selection } = value
+
+  if (selection.isExpanded) {
+    editor.delete()
+  }
+}
+
+/**
  * Commands.
  *
  * @type {Object}
  */
 
 const Commands = {}
-
-/**
- * Mix in the changes that pass through to their at-range equivalents because
- * they don't have any effect on the selection.
- */
-
-const PROXY_TRANSFORMS = [
-  'deleteBackward',
-  'deleteCharBackward',
-  'deleteLineBackward',
-  'deleteWordBackward',
-  'deleteForward',
-  'deleteCharForward',
-  'deleteWordForward',
-  'deleteLineForward',
-  'setBlocks',
-  'setInlines',
-  'splitInline',
-  'unwrapBlock',
-  'unwrapInline',
-  'wrapBlock',
-  'wrapInline',
-]
-
-PROXY_TRANSFORMS.forEach(method => {
-  Commands[method] = (editor, ...args) => {
-    const { value } = editor
-    const { selection } = value
-    const methodAtRange = `${method}AtRange`
-    editor[methodAtRange](selection, ...args)
-
-    if (method.match(/Backward$/)) {
-      editor.moveToStart()
-    } else if (method.match(/Forward$/)) {
-      editor.moveToEnd()
-    }
-  }
-})
 
 /**
  * Add a `mark` to the characters in the current selection.
@@ -77,7 +56,7 @@ Commands.addMark = (editor, mark) => {
  * Add a list of `marks` to the characters in the current selection.
  *
  * @param {Editor} editor
- * @param {Mark} mark
+ * @param {Set<Mark>|Array<Object>} marks
  */
 
 Commands.addMarks = (editor, marks) => {
@@ -95,10 +74,148 @@ Commands.delete = editor => {
   const { selection } = value
   editor.deleteAtRange(selection)
 
-  // Ensure that the selection is collapsed to the start, because in certain
-  // cases when deleting across inline nodes, when splitting the inline node the
-  // end point of the selection will end up after the split point.
-  editor.moveToStart()
+  // COMPAT: Ensure that the selection is collapsed, because in certain cases
+  // when deleting across inline nodes, when splitting the inline node the end
+  // point of the selection will end up after the split point.
+  editor.moveToFocus()
+}
+
+/**
+ * Delete backward `n` characters.
+ *
+ * @param {Editor} editor
+ * @param {Number} n (optional)
+ */
+
+Commands.deleteBackward = (editor, n = 1) => {
+  const { value } = editor
+  const { selection } = value
+
+  if (selection.isExpanded) {
+    editor.delete()
+  } else {
+    editor.deleteBackwardAtRange(selection, n).moveToStart()
+  }
+}
+
+/**
+ * Delete backward one character.
+ *
+ * @param {Editor} editor
+ */
+
+Commands.deleteCharBackward = editor => {
+  const { value } = editor
+  const { selection } = value
+
+  if (selection.isExpanded) {
+    editor.delete()
+  } else {
+    editor.deleteCharBackwardAtRange(selection).moveToStart()
+  }
+}
+
+/**
+ * Delete backward one line.
+ *
+ * @param {Editor} editor
+ */
+
+Commands.deleteLineBackward = editor => {
+  const { value } = editor
+  const { selection } = value
+
+  if (selection.isExpanded) {
+    editor.delete()
+  } else {
+    editor.deleteLineBackwardAtRange(selection).moveToStart()
+  }
+}
+
+/**
+ * Delete backward one word.
+ *
+ * @param {Editor} editor
+ */
+
+Commands.deleteWordBackward = editor => {
+  const { value } = editor
+  const { selection } = value
+
+  if (selection.isExpanded) {
+    editor.delete()
+  } else {
+    editor.deleteWordBackwardAtRange(selection).moveToStart()
+  }
+}
+
+/**
+ * Delete backward `n` characters.
+ *
+ * @param {Editor} editor
+ * @param {Number} n (optional)
+ */
+
+Commands.deleteForward = (editor, n = 1) => {
+  const { value } = editor
+  const { selection } = value
+
+  if (selection.isExpanded) {
+    editor.delete()
+  } else {
+    editor.deleteForwardAtRange(selection, n).moveToEnd()
+  }
+}
+
+/**
+ * Delete backward one character.
+ *
+ * @param {Editor} editor
+ */
+
+Commands.deleteCharForward = editor => {
+  const { value } = editor
+  const { selection } = value
+
+  if (selection.isExpanded) {
+    editor.delete()
+  } else {
+    editor.deleteCharForwardAtRange(selection).moveToEnd()
+  }
+}
+
+/**
+ * Delete backward one line.
+ *
+ * @param {Editor} editor
+ */
+
+Commands.deleteLineForward = editor => {
+  const { value } = editor
+  const { selection } = value
+
+  if (selection.isExpanded) {
+    editor.delete()
+  } else {
+    editor.deleteLineForwardAtRange(selection).moveToEnd()
+  }
+}
+
+/**
+ * Delete backward one word.
+ *
+ * @param {Editor} editor
+ */
+
+Commands.deleteWordForward = editor => {
+  const { value } = editor
+  const { selection } = value
+
+  if (selection.isExpanded) {
+    editor.delete().moveToEnd()
+  } else {
+    editor.deleteWordForwardAtRange(selection)
+  }
 }
 
 /**
@@ -109,6 +226,8 @@ Commands.delete = editor => {
  */
 
 Commands.insertBlock = (editor, block) => {
+  deleteExpanded(editor)
+
   block = Block.create(block)
   const { value } = editor
   const { selection } = value
@@ -128,6 +247,8 @@ Commands.insertBlock = (editor, block) => {
 
 Commands.insertFragment = (editor, fragment) => {
   if (!fragment.nodes.size) return
+
+  deleteExpanded(editor)
 
   let { value } = editor
   let { document, selection } = value
@@ -169,6 +290,8 @@ Commands.insertFragment = (editor, fragment) => {
  */
 
 Commands.insertInline = (editor, inline) => {
+  deleteExpanded(editor)
+
   inline = Inline.create(inline)
   const { value } = editor
   const { selection } = value
@@ -188,6 +311,8 @@ Commands.insertInline = (editor, inline) => {
  */
 
 Commands.insertText = (editor, text, marks) => {
+  deleteExpanded(editor)
+
   const { value } = editor
   const { document, selection } = value
   marks = marks || selection.marks || document.getInsertMarksAtRange(selection)
@@ -239,6 +364,32 @@ Commands.replaceMark = (editor, oldMark, newMark) => {
 }
 
 /**
+ * Set the `properties` of block nodes.
+ *
+ * @param {Editor} editor
+ * @param {Object|String} properties
+ */
+
+Commands.setBlocks = (editor, properties) => {
+  const { value } = editor
+  const { selection } = value
+  editor.setBlocksAtRange(selection, properties)
+}
+
+/**
+ * Set the `properties` of inline nodes.
+ *
+ * @param {Editor} editor
+ * @param {Object|String} properties
+ */
+
+Commands.setInlines = (editor, properties) => {
+  const { value } = editor
+  const { selection } = value
+  editor.setInlinesAtRange(selection, properties)
+}
+
+/**
  * Split the block node at the current selection, to optional `depth`.
  *
  * @param {Editor} editor
@@ -246,6 +397,8 @@ Commands.replaceMark = (editor, oldMark, newMark) => {
  */
 
 Commands.splitBlock = (editor, depth = 1) => {
+  deleteExpanded(editor)
+
   const { value } = editor
   const { selection, document } = value
   const marks = selection.marks || document.getInsertMarksAtRange(selection)
@@ -254,6 +407,20 @@ Commands.splitBlock = (editor, depth = 1) => {
   if (marks && marks.size !== 0) {
     editor.select({ marks })
   }
+}
+
+/**
+ * Split the inline nodes to optional `height`.
+ *
+ * @param {Editor} editor
+ * @param {Number} height (optional)
+ */
+
+Commands.splitInline = (editor, height) => {
+  deleteExpanded(editor)
+  const { value } = editor
+  const { selection } = value
+  editor.splitInlineAtRange(selection, height)
 }
 
 /**
@@ -274,6 +441,58 @@ Commands.toggleMark = (editor, mark) => {
   } else {
     editor.addMark(mark)
   }
+}
+
+/**
+ * Unwrap nodes from a block with `properties`.
+ *
+ * @param {Editor} editor
+ * @param {String|Object} properties
+ */
+
+Commands.unwrapBlock = (editor, properties) => {
+  const { value } = editor
+  const { selection } = value
+  editor.unwrapBlockAtRange(selection, properties)
+}
+
+/**
+ * Unwrap nodes from an inline with `properties`.
+ *
+ * @param {Editor} editor
+ * @param {String|Object} properties
+ */
+
+Commands.unwrapInline = (editor, properties) => {
+  const { value } = editor
+  const { selection } = value
+  editor.unwrapInlineAtRange(selection, properties)
+}
+
+/**
+ * Wrap nodes in a new `block`.
+ *
+ * @param {Editor} editor
+ * @param {Block|Object|String} block
+ */
+
+Commands.wrapBlock = (editor, block) => {
+  const { value } = editor
+  const { selection } = value
+  editor.wrapBlockAtRange(selection, block)
+}
+
+/**
+ * Wrap nodes in a new `inline`.
+ *
+ * @param {Editor} editor
+ * @param {Inline|Object|String} inline
+ */
+
+Commands.wrapInline = (editor, inline) => {
+  const { value } = editor
+  const { selection } = value
+  editor.wrapInlineAtRange(selection, inline)
 }
 
 /**
