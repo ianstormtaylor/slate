@@ -6,6 +6,31 @@ import Node from '../models/node'
 import TextUtils from '../utils/text-utils'
 
 /**
+ * Ensure that an expanded selection is deleted first, and return the updated
+ * range to account for the deleted part.
+ *
+ * @param {Editor}
+ */
+
+function deleteExpandedAtRange(editor, range) {
+  if (range.isExpanded) {
+    editor.deleteAtRange(range)
+  }
+
+  const { value } = editor
+  const { document } = value
+  const { start, end } = range
+
+  if (document.hasDescendant(start.key)) {
+    range = range.moveToStart()
+  } else {
+    range = range.moveTo(end.key, 0).normalize(document)
+  }
+
+  return range
+}
+
+/**
  * Commands.
  *
  * @type {Object}
@@ -575,12 +600,8 @@ Commands.deleteForwardAtRange = (editor, range, n = 1) => {
  */
 
 Commands.insertBlockAtRange = (editor, range, block) => {
+  range = deleteExpandedAtRange(editor, range)
   block = Block.create(block)
-
-  if (range.isExpanded) {
-    editor.deleteAtRange(range)
-    range = range.moveToStart()
-  }
 
   const { value } = editor
   const { document } = value
@@ -633,16 +654,7 @@ Commands.insertBlockAtRange = (editor, range, block) => {
 
 Commands.insertFragmentAtRange = (editor, range, fragment) => {
   editor.withoutNormalizing(() => {
-    // If the range is expanded, delete it first.
-    if (range.isExpanded) {
-      editor.deleteAtRange(range)
-
-      if (editor.value.document.getDescendant(range.start.key)) {
-        range = range.moveToStart()
-      } else {
-        range = range.moveTo(range.end.key, 0).normalize(editor.value.document)
-      }
-    }
+    range = deleteExpandedAtRange(editor, range)
 
     // If the fragment is empty, there's nothing to do after deleting.
     if (!fragment.nodes.size) return
@@ -795,10 +807,7 @@ Commands.insertInlineAtRange = (editor, range, inline) => {
   inline = Inline.create(inline)
 
   editor.withoutNormalizing(() => {
-    if (range.isExpanded) {
-      editor.deleteAtRange(range)
-      range = range.moveToStart()
-    }
+    range = deleteExpandedAtRange(editor, range)
 
     const { value } = editor
     const { document } = value
@@ -824,32 +833,19 @@ Commands.insertInlineAtRange = (editor, range, inline) => {
  */
 
 Commands.insertTextAtRange = (editor, range, text, marks) => {
+  range = deleteExpandedAtRange(editor, range)
+
   const { value } = editor
   const { document } = value
   const { start } = range
-  let key = start.key
   const offset = start.offset
-  const path = start.path
   const parent = document.getParent(start.key)
 
   if (editor.isVoid(parent)) {
     return
   }
 
-  editor.withoutNormalizing(() => {
-    if (range.isExpanded) {
-      editor.deleteAtRange(range)
-
-      const startText = editor.value.document.getNode(path)
-
-      // Update range start after delete
-      if (startText && startText.key !== key) {
-        key = startText.key
-      }
-    }
-
-    editor.insertTextByKey(key, offset, text, marks)
-  })
+  editor.insertTextByKey(start.key, offset, text, marks)
 }
 
 /**
@@ -951,6 +947,8 @@ Commands.setInlinesAtRange = (editor, range, properties) => {
  */
 
 Commands.splitBlockAtRange = (editor, range, height = 1) => {
+  range = deleteExpandedAtRange(editor, range)
+
   const { start, end } = range
   let { value } = editor
   let { document } = value
@@ -995,10 +993,7 @@ Commands.splitBlockAtRange = (editor, range, height = 1) => {
  */
 
 Commands.splitInlineAtRange = (editor, range, height = Infinity) => {
-  if (range.isExpanded) {
-    editor.deleteAtRange(range)
-    range = range.moveToStart()
-  }
+  range = deleteExpandedAtRange(editor, range)
 
   const { start } = range
   const { value } = editor
