@@ -6,6 +6,31 @@ import Node from '../models/node'
 import TextUtils from '../utils/text-utils'
 
 /**
+ * Ensure that an expanded selection is deleted first, and return the updated
+ * range to account for the deleted part.
+ *
+ * @param {Editor}
+ */
+
+function deleteExpandedAtRange(editor, range) {
+  if (range.isExpanded) {
+    editor.deleteAtRange(range)
+  }
+
+  const { value } = editor
+  const { document } = value
+  const { start, end } = range
+
+  if (document.hasDescendant(start.key)) {
+    range = range.moveToStart()
+  } else {
+    range = range.moveTo(end.key, 0).normalize(document)
+  }
+
+  return range
+}
+
+/**
  * Commands.
  *
  * @type {Object}
@@ -251,61 +276,6 @@ Commands.deleteAtRange = (editor, range) => {
 }
 
 /**
- * Delete backward until the character boundary at a `range`.
- *
- * @param {Editor} editor
- * @param {Range} range
- */
-
-Commands.deleteCharBackwardAtRange = (editor, range) => {
-  const { value } = editor
-  const { document } = value
-  const { start } = range
-  const startBlock = document.getClosestBlock(start.key)
-  const offset = startBlock.getOffset(start.key)
-  const o = offset + start.offset
-  const { text } = startBlock
-  const n = TextUtils.getCharOffsetBackward(text, o)
-  editor.deleteBackwardAtRange(range, n)
-}
-
-/**
- * Delete backward until the line boundary at a `range`.
- *
- * @param {Editor} editor
- * @param {Range} range
- */
-
-Commands.deleteLineBackwardAtRange = (editor, range) => {
-  const { value } = editor
-  const { document } = value
-  const { start } = range
-  const startBlock = document.getClosestBlock(start.key)
-  const offset = startBlock.getOffset(start.key)
-  const o = offset + start.offset
-  editor.deleteBackwardAtRange(range, o)
-}
-
-/**
- * Delete backward until the word boundary at a `range`.
- *
- * @param {Editor} editor
- * @param {Range} range
- */
-
-Commands.deleteWordBackwardAtRange = (editor, range) => {
-  const { value } = editor
-  const { document } = value
-  const { start } = range
-  const startBlock = document.getClosestBlock(start.key)
-  const offset = startBlock.getOffset(start.key)
-  const o = offset + start.offset
-  const { text } = startBlock
-  const n = o === 0 ? 1 : TextUtils.getWordOffsetBackward(text, o)
-  editor.deleteBackwardAtRange(range, n)
-}
-
-/**
  * Delete backward `n` characters at a `range`.
  *
  * @param {Editor} editor
@@ -333,21 +303,17 @@ Commands.deleteBackwardAtRange = (editor, range, n = 1) => {
     return
   }
 
-  const block = document.getClosestBlock(start.key)
-
-  // If the closest is not void, but empty, remove it
-  if (
-    block &&
-    !editor.isVoid(block) &&
-    block.text === '' &&
-    document.nodes.size !== 1
-  ) {
-    editor.removeNodeByKey(block.key)
+  // If the range is at the start of the document, abort.
+  if (start.isAtStartOfNode(document)) {
     return
   }
 
-  // If the range is at the start of the document, abort.
-  if (start.isAtStartOfNode(document)) {
+  const block = document.getClosestBlock(start.key)
+
+  // PERF: If the closest block is empty, remove it. This is just a shortcut,
+  // since merging it would result in the same outcome.
+  if (document.nodes.size !== 1 && block && block.text === '') {
+    editor.removeNodeByKey(block.key)
     return
   }
 
@@ -405,6 +371,30 @@ Commands.deleteBackwardAtRange = (editor, range, n = 1) => {
 }
 
 /**
+ * Delete backward until the character boundary at a `range`.
+ *
+ * @param {Editor} editor
+ * @param {Range} range
+ */
+
+Commands.deleteCharBackwardAtRange = (editor, range) => {
+  if (range.isExpanded) {
+    editor.deleteAtRange(range)
+    return
+  }
+
+  const { value } = editor
+  const { document } = value
+  const { start } = range
+  const startBlock = document.getClosestBlock(start.key)
+  const offset = startBlock.getOffset(start.key)
+  const o = offset + start.offset
+  const { text } = startBlock
+  const n = TextUtils.getCharOffsetBackward(text, o)
+  editor.deleteBackwardAtRange(range, n)
+}
+
+/**
  * Delete forward until the character boundary at a `range`.
  *
  * @param {Editor} editor
@@ -412,6 +402,11 @@ Commands.deleteBackwardAtRange = (editor, range, n = 1) => {
  */
 
 Commands.deleteCharForwardAtRange = (editor, range) => {
+  if (range.isExpanded) {
+    editor.deleteAtRange(range)
+    return
+  }
+
   const { value } = editor
   const { document } = value
   const { start } = range
@@ -420,43 +415,6 @@ Commands.deleteCharForwardAtRange = (editor, range) => {
   const o = offset + start.offset
   const { text } = startBlock
   const n = TextUtils.getCharOffsetForward(text, o)
-  editor.deleteForwardAtRange(range, n)
-}
-
-/**
- * Delete forward until the line boundary at a `range`.
- *
- * @param {Editor} editor
- * @param {Range} range
- */
-
-Commands.deleteLineForwardAtRange = (editor, range) => {
-  const { value } = editor
-  const { document } = value
-  const { start } = range
-  const startBlock = document.getClosestBlock(start.key)
-  const offset = startBlock.getOffset(start.key)
-  const o = offset + start.offset
-  editor.deleteForwardAtRange(range, startBlock.text.length - o)
-}
-
-/**
- * Delete forward until the word boundary at a `range`.
- *
- * @param {Editor} editor
- * @param {Range} range
- */
-
-Commands.deleteWordForwardAtRange = (editor, range) => {
-  const { value } = editor
-  const { document } = value
-  const { start } = range
-  const startBlock = document.getClosestBlock(start.key)
-  const offset = startBlock.getOffset(start.key)
-  const o = offset + start.offset
-  const { text } = startBlock
-  const wordOffset = TextUtils.getWordOffsetForward(text, o)
-  const n = wordOffset === 0 ? 1 : wordOffset
   editor.deleteForwardAtRange(range, n)
 }
 
@@ -567,6 +525,99 @@ Commands.deleteForwardAtRange = (editor, range, n = 1) => {
 }
 
 /**
+ * Delete backward until the line boundary at a `range`.
+ *
+ * @param {Editor} editor
+ * @param {Range} range
+ */
+
+Commands.deleteLineBackwardAtRange = (editor, range) => {
+  if (range.isExpanded) {
+    editor.deleteAtRange(range)
+    return
+  }
+
+  const { value } = editor
+  const { document } = value
+  const { start } = range
+  const startBlock = document.getClosestBlock(start.key)
+  const offset = startBlock.getOffset(start.key)
+  const o = offset + start.offset
+  editor.deleteBackwardAtRange(range, o)
+}
+
+/**
+ * Delete forward until the line boundary at a `range`.
+ *
+ * @param {Editor} editor
+ * @param {Range} range
+ */
+
+Commands.deleteLineForwardAtRange = (editor, range) => {
+  if (range.isExpanded) {
+    editor.deleteAtRange(range)
+    return
+  }
+
+  const { value } = editor
+  const { document } = value
+  const { start } = range
+  const startBlock = document.getClosestBlock(start.key)
+  const offset = startBlock.getOffset(start.key)
+  const o = offset + start.offset
+  editor.deleteForwardAtRange(range, startBlock.text.length - o)
+}
+
+/**
+ * Delete backward until the word boundary at a `range`.
+ *
+ * @param {Editor} editor
+ * @param {Range} range
+ */
+
+Commands.deleteWordBackwardAtRange = (editor, range) => {
+  if (range.isExpanded) {
+    editor.deleteAtRange(range)
+    return
+  }
+
+  const { value } = editor
+  const { document } = value
+  const { start } = range
+  const startBlock = document.getClosestBlock(start.key)
+  const offset = startBlock.getOffset(start.key)
+  const o = offset + start.offset
+  const { text } = startBlock
+  const n = o === 0 ? 1 : TextUtils.getWordOffsetBackward(text, o)
+  editor.deleteBackwardAtRange(range, n)
+}
+
+/**
+ * Delete forward until the word boundary at a `range`.
+ *
+ * @param {Editor} editor
+ * @param {Range} range
+ */
+
+Commands.deleteWordForwardAtRange = (editor, range) => {
+  if (range.isExpanded) {
+    editor.deleteAtRange(range)
+    return
+  }
+
+  const { value } = editor
+  const { document } = value
+  const { start } = range
+  const startBlock = document.getClosestBlock(start.key)
+  const offset = startBlock.getOffset(start.key)
+  const o = offset + start.offset
+  const { text } = startBlock
+  const wordOffset = TextUtils.getWordOffsetForward(text, o)
+  const n = wordOffset === 0 ? 1 : wordOffset
+  editor.deleteForwardAtRange(range, n)
+}
+
+/**
  * Insert a `block` node at `range`.
  *
  * @param {Editor} editor
@@ -575,12 +626,8 @@ Commands.deleteForwardAtRange = (editor, range, n = 1) => {
  */
 
 Commands.insertBlockAtRange = (editor, range, block) => {
+  range = deleteExpandedAtRange(editor, range)
   block = Block.create(block)
-
-  if (range.isExpanded) {
-    editor.deleteAtRange(range)
-    range = range.moveToStart()
-  }
 
   const { value } = editor
   const { document } = value
@@ -633,16 +680,7 @@ Commands.insertBlockAtRange = (editor, range, block) => {
 
 Commands.insertFragmentAtRange = (editor, range, fragment) => {
   editor.withoutNormalizing(() => {
-    // If the range is expanded, delete it first.
-    if (range.isExpanded) {
-      editor.deleteAtRange(range)
-
-      if (editor.value.document.getDescendant(range.start.key)) {
-        range = range.moveToStart()
-      } else {
-        range = range.moveTo(range.end.key, 0).normalize(editor.value.document)
-      }
-    }
+    range = deleteExpandedAtRange(editor, range)
 
     // If the fragment is empty, there's nothing to do after deleting.
     if (!fragment.nodes.size) return
@@ -795,10 +833,7 @@ Commands.insertInlineAtRange = (editor, range, inline) => {
   inline = Inline.create(inline)
 
   editor.withoutNormalizing(() => {
-    if (range.isExpanded) {
-      editor.deleteAtRange(range)
-      range = range.moveToStart()
-    }
+    range = deleteExpandedAtRange(editor, range)
 
     const { value } = editor
     const { document } = value
@@ -824,32 +859,19 @@ Commands.insertInlineAtRange = (editor, range, inline) => {
  */
 
 Commands.insertTextAtRange = (editor, range, text, marks) => {
+  range = deleteExpandedAtRange(editor, range)
+
   const { value } = editor
   const { document } = value
   const { start } = range
-  let key = start.key
   const offset = start.offset
-  const path = start.path
   const parent = document.getParent(start.key)
 
   if (editor.isVoid(parent)) {
     return
   }
 
-  editor.withoutNormalizing(() => {
-    if (range.isExpanded) {
-      editor.deleteAtRange(range)
-
-      const startText = editor.value.document.getNode(path)
-
-      // Update range start after delete
-      if (startText && startText.key !== key) {
-        key = startText.key
-      }
-    }
-
-    editor.insertTextByKey(key, offset, text, marks)
-  })
+  editor.insertTextByKey(start.key, offset, text, marks)
 }
 
 /**
@@ -951,6 +973,8 @@ Commands.setInlinesAtRange = (editor, range, properties) => {
  */
 
 Commands.splitBlockAtRange = (editor, range, height = 1) => {
+  range = deleteExpandedAtRange(editor, range)
+
   const { start, end } = range
   let { value } = editor
   let { document } = value
@@ -995,10 +1019,7 @@ Commands.splitBlockAtRange = (editor, range, height = 1) => {
  */
 
 Commands.splitInlineAtRange = (editor, range, height = Infinity) => {
-  if (range.isExpanded) {
-    editor.deleteAtRange(range)
-    range = range.moveToStart()
-  }
+  range = deleteExpandedAtRange(editor, range)
 
   const { start } = range
   const { value } = editor

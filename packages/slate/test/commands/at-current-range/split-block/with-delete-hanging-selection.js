@@ -24,7 +24,7 @@ export const output = (
   <value>
     <document>
       <paragraph>zero</paragraph>
-      <paragraph />
+      <quote />
       <quote>
         <cursor />cat is cute
       </quote>

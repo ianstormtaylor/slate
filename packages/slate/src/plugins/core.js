@@ -1,4 +1,3 @@
-import AtCurrentRange from '../commands/at-current-range'
 import AtRange from '../commands/at-range'
 import ByPath from '../commands/by-path'
 import Commands from './commands'
@@ -8,6 +7,7 @@ import OnValue from '../commands/on-value'
 import Queries from './queries'
 import Schema from './schema'
 import Text from '../models/text'
+import WithIntent from '../commands/with-intent'
 
 /**
  * A plugin that defines the core Slate logic.
@@ -26,12 +26,12 @@ function CorePlugin(options = {}) {
    */
 
   const commands = Commands({
-    ...AtCurrentRange,
     ...AtRange,
     ...ByPath,
     ...OnHistory,
     ...OnSelection,
     ...OnValue,
+    ...WithIntent,
   })
 
   /**
