@@ -135,10 +135,6 @@ class Node extends React.Component {
     const decs = decorations.concat(node.getDecorations(editor))
     const childrenDecorations = getChildrenDecorations(node, decs)
 
-    // Attributes that the developer must mix into the element in their
-    // custom node renderer component.
-    const attributes = { 'data-key': node.key }
-
     let children = []
 
     node.nodes.forEach((child, i) => {
@@ -148,6 +144,10 @@ class Node extends React.Component {
         this.renderNode(child, isChildSelected, childrenDecorations[i])
       )
     })
+
+    // Attributes that the developer must mix into the element in their
+    // custom node renderer component.
+    const attributes = { 'data-key': node.key }
 
     // If it's a block node with inline children, add the proper `dir` attribute
     // for text direction.
