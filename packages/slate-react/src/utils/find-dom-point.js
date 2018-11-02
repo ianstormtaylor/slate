@@ -11,24 +11,25 @@ import findDOMNode from './find-dom-node'
 function findDOMPoint(point, win = window) {
   const el = findDOMNode(point.key, win)
   let start = 0
-  let n
 
-  // COMPAT: In IE, this method's arguments are not optional, so we have to
-  // pass in all four even though the last two are defaults. (2017/10/25)
-  const iterator = win.document.createNodeIterator(
-    el,
-    NodeFilter.SHOW_TEXT,
-    () => NodeFilter.FILTER_ACCEPT,
-    false
+  // For each leaf, we need to isolate its content, which means filtering to its
+  // direct text and zero-width spans. (We have to filter out any other siblings
+  // that may have been rendered alongside them.)
+  const texts = Array.from(
+    el.querySelectorAll('[data-slate-text], [data-slate-zero-width]')
   )
 
-  while ((n = iterator.nextNode())) {
-    const { length } = n.textContent
+  for (const text of texts) {
+    const node = text.childNodes[0]
+
+    // Account zero-width spaces which shouldn't really take up space, because
+    // we only render them when the text is empty.
+    const length = node.textContent === '\uFEFF' ? 0 : node.textContent.length
     const end = start + length
 
     if (point.offset <= end) {
-      const o = point.offset - start
-      return { node: n, offset: o >= 0 ? o : 0 }
+      const offset = Math.max(0, point.offset - start)
+      return { node, offset }
     }
 
     start = end

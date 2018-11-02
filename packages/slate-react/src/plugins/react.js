@@ -2,6 +2,7 @@ import React from 'react'
 import { Text } from 'slate'
 
 import DOMPlugin from './dom'
+import PlaceholderPlugin from './placeholder'
 import Content from '../components/content'
 import EVENT_HANDLERS from '../constants/event-handlers'
 
@@ -31,14 +32,15 @@ const PROPS = [
  */
 
 function ReactPlugin(options = {}) {
-  const { plugins = [] } = options
+  const { placeholder, plugins = [] } = options
 
   /**
    * Render editor.
    *
    * @param {Object} props
+   * @param {Editor} editor
    * @param {Function} next
-   * @return {Object}
+   * @return {Element}
    */
 
   function renderEditor(props, editor, next) {
@@ -129,8 +131,18 @@ function ReactPlugin(options = {}) {
     plugins: [editorPlugin, ...plugins],
   })
 
-  const defaultsPlugin = { renderEditor, renderNode, renderPlaceholder }
-  return [domPlugin, defaultsPlugin]
+  const placeholderPlugin = PlaceholderPlugin({
+    placeholder,
+    when: (editor, node) =>
+      node.object === 'document' && node.text === '' && node.nodes.size === 1,
+  })
+
+  const defaultsPlugin = {
+    renderEditor,
+    renderNode,
+  }
+
+  return [domPlugin, placeholderPlugin, defaultsPlugin]
 }
 
 /**
