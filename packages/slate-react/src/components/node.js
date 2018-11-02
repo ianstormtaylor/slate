@@ -151,7 +151,7 @@ class Node extends React.Component {
 
     // If it's a block node with inline children, add the proper `dir` attribute
     // for text direction.
-    if (node.object == 'block' && node.nodes.first().object != 'block') {
+    if (node.isLeafBlock()) {
       const direction = node.getTextDirection()
       if (direction == 'rtl') attributes.dir = 'rtl'
     }
