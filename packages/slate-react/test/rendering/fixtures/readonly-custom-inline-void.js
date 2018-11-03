@@ -44,7 +44,7 @@ export const output = `
 <div data-slate-editor="true">
   <div style="position:relative">
     <span>
-      <span>
+      <span data-slate-leaf="true">
         <span data-slate-zero-width="z">&#xFEFF;</span>
       </span>
     </span>
@@ -54,7 +54,7 @@ export const output = `
       </span>
     </span>
     <span>
-      <span>
+      <span data-slate-leaf="true">
         <span data-slate-zero-width="n">&#xFEFF;<br /></span>
       </span>
     </span>

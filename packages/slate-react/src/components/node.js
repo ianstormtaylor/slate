@@ -134,8 +134,7 @@ class Node extends React.Component {
     const indexes = node.getSelectionIndexes(selection, isSelected)
     const decs = decorations.concat(node.getDecorations(editor))
     const childrenDecorations = getChildrenDecorations(node, decs)
-
-    let children = []
+    const children = []
 
     node.nodes.forEach((child, i) => {
       const isChildSelected = !!indexes && indexes.start <= i && i < indexes.end
@@ -164,16 +163,6 @@ class Node extends React.Component {
       node,
       parent,
       readOnly,
-    }
-
-    let placeholder = editor.run('renderPlaceholder', props)
-
-    if (placeholder) {
-      placeholder = React.cloneElement(placeholder, {
-        key: `${node.key}-placeholder`,
-      })
-
-      children = [placeholder, ...children]
     }
 
     const element = editor.run('renderNode', {

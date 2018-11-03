@@ -86,7 +86,11 @@ class Leaf extends React.Component {
       index,
     })
 
-    return <span data-offset-key={offsetKey}>{this.renderMarks()}</span>
+    return (
+      <span data-slate-leaf data-offset-key={offsetKey}>
+        {this.renderMarks()}
+      </span>
+    )
   }
 
   /**
@@ -99,7 +103,7 @@ class Leaf extends React.Component {
     const { marks, node, offset, text, editor } = this.props
     const leaf = this.renderText()
     const attributes = {
-      'data-slate-leaf': true,
+      'data-slate-mark': true,
     }
 
     return marks.reduce((children, mark) => {
@@ -165,8 +169,8 @@ class Leaf extends React.Component {
     const isLastLeaf = index === leaves.size - 1
     if (isLastText && isLastLeaf && lastChar === '\n') return `${text}\n`
 
-    // Otherwise, just return the text.
-    return text
+    // Otherwise, just return the content.
+    return <span data-slate-content>{text}</span>
   }
 }
 

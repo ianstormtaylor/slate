@@ -2,7 +2,7 @@
 
 One of the best parts of Slate is that it's built with React, so it fits right into your existing application. It doesn't re-invent its own view layer that you have to learn. It tries to keep everything as React-y as possible.
 
-To that end, Slate gives you control over the rendering behavior of every node and mark in your document, any placeholders you want to render, and even the top-level editor itself.
+To that end, Slate gives you control over the rendering behavior of every node and mark in your document, and even the top-level editor itself.
 
 You can define these behaviors by passing `props` into the editor, or you can define them in Slate plugins.
 
@@ -99,37 +99,6 @@ Be sure to mix `props.attributes` in your `renderMark`. `attributes` provides `d
 That way, if you happen to have a global stylesheet that defines `strong`, `em`, etc. styles then your editor's content will already be formatted!
 
 > 🤖 Be aware though that marks aren't guaranteed to be "contiguous". Which means even though a **word** is bolded, it's not guaranteed to render as a single `<strong>` element. If some of its characters are also italic, it might be split up into multiple elements—one `<strong>wo</strong>` and one `<em><strong>rd</strong></em>`.
-
-## Placeholders
-
-By default Slate will render a placeholder for you which mimics the native DOM `placeholder` attribute of `<input>` and `<textarea>` elements—it's in the same typeface as the editor, and it's slightly translucent. And as soon as the document has any content, the placeholder disappears.
-
-However sometimes you want to customize things. Or maybe you want to render placeholders inside specific blocks like inside an image caption. To do that, you can define your own `renderPlaceholder` function:
-
-```js
-function renderPlaceholder(props, editor, next) {
-  const { node } = props
-  if (node.object != 'block') return next()
-  if (node.type != 'caption') return next()
-  if (node.text != '') return next()
-
-  return (
-    <span
-      contentEditable={false}
-      style={{ display: 'inline-block', width: '0', whiteSpace: 'nowrap', opacity: '0.33' }}
-    >
-      {editor.props.placeholder}
-    </span>
-  )
-}
-
-<Editor
-  renderPlaceholder={renderPlaceholder}
-  ...
-/>
-```
-
-That will render a simple placeholder element inside all of your `caption` blocks until someone decides to write in a caption.
 
 ## The Editor Itself
 

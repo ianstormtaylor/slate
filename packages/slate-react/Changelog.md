@@ -4,6 +4,18 @@ This document maintains a list of changes to the `slate-react` package with each
 
 ---
 
+### `0.21.0` — November 2, 2018
+
+###### NEW
+
+**Introducing the `slate-react-placeholder` package.** This new package is what handles the default `placeholder=` prop logic for the editor, and it can be used yourself for situations where you want to render browser-like placeholders in custom nodes.
+
+###### BREAKING
+
+**The `renderPlacehodler` middleware has been removed.** Previously this was how you rendered custom placeholders in the editor, but that logic can now be implemented with `decorateNode` instead, in a way that causes less confusion and overlap in the API. The new `slate-react-placeholder` package does exactly that, adding a decoration to the editor when it is empty.
+
+---
+
 ### `0.20.0` — October 27, 2018
 
 ###### BREAKING

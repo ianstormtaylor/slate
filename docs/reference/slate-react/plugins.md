@@ -24,7 +24,6 @@ In addition to the [core plugin hooks](../slate/plugins.md), when using `slate-r
   renderEditor: Function,
   renderMark: Function,
   renderNode: Function,
-  renderPlaceholder: Function,
   shouldNodeComponentUpdate: Function,
 }
 ```
@@ -152,21 +151,6 @@ Render a `Node` with `props`. The `props` object contains:
 ```
 
 You must spread the `props.attributes` onto the top-level DOM node you use to render the node.
-
-### `renderPlaceholder`
-
-`Function renderPlaceholder(props: Object, editor: Editor, next: Function) => ReactNode|Void`
-
-Render the placeholder that is shown when the editor has no `value`. The `props` object contains:
-
-```js
-{
-  editor: Editor,
-  readOnly: Boolean,
-}
-```
-
-The `placeholder` prop that was passed to the editor can be found at `editor.props.placeholder`.
 
 ### `shouldNodeComponentUpdate`
 

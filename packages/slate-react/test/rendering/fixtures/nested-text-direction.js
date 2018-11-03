@@ -20,12 +20,16 @@ export const output = `
   <div style="position:relative">
   <div dir="rtl" style="position:relative">
     <span>
-      <span>مرحبا بالعالم</span>
+      <span data-slate-leaf="true">
+        <span data-slate-content="true">مرحبا بالعالم</span>
+      </span>
     </span>
   </div>
   <div dir="rtl" style="position:relative">
     <span>
-      <span>שלום עולם</span>
+      <span data-slate-leaf="true">
+        <span data-slate-content="true">שלום עולם</span>
+      </span>
     </span>
   </div>
 </div>

@@ -1,5 +1,5 @@
+import PlaceholderPlugin from 'slate-react-placeholder'
 import React from 'react'
-import { Text } from 'slate'
 
 import DOMPlugin from './dom'
 import Content from '../components/content'
@@ -19,7 +19,6 @@ const PROPS = [
   'renderEditor',
   'renderMark',
   'renderNode',
-  'renderPlaceholder',
   'schema',
 ]
 
@@ -31,14 +30,28 @@ const PROPS = [
  */
 
 function ReactPlugin(options = {}) {
-  const { plugins = [] } = options
+  const { placeholder, plugins = [] } = options
+
+  /**
+   * Decorate node.
+   *
+   * @param {Object} node
+   * @param {Editor} editor
+   * @param {Function} next
+   * @return {Array}
+   */
+
+  function decorateNode(node, editor, next) {
+    return []
+  }
 
   /**
    * Render editor.
    *
    * @param {Object} props
+   * @param {Editor} editor
    * @param {Function} next
-   * @return {Object}
+   * @return {Element}
    */
 
   function renderEditor(props, editor, next) {
@@ -82,61 +95,48 @@ function ReactPlugin(options = {}) {
   }
 
   /**
-   * Render placeholder.
-   *
-   * @param {Object} props
-   * @param {Function} next
-   * @return {Element}
-   */
-
-  function renderPlaceholder(props, editor, next) {
-    const { node } = props
-    if (!editor.props.placeholder) return null
-    if (editor.state.isComposing) return null
-    if (node.object != 'block') return null
-    if (!Text.isTextList(node.nodes)) return null
-    if (node.text != '') return null
-    if (editor.value.document.getBlocks().size > 1) return null
-
-    const style = {
-      pointerEvents: 'none',
-      display: 'inline-block',
-      width: '0',
-      maxWidth: '100%',
-      whiteSpace: 'nowrap',
-      opacity: '0.333',
-    }
-
-    return (
-      <span contentEditable={false} style={style}>
-        {editor.props.placeholder}
-      </span>
-    )
-  }
-
-  /**
    * Return the plugins.
    *
    * @type {Array}
    */
 
+  const ret = []
   const editorPlugin = PROPS.reduce((memo, prop) => {
     if (prop in options) memo[prop] = options[prop]
     return memo
   }, {})
 
-  const domPlugin = DOMPlugin({
-    plugins: [editorPlugin, ...plugins],
+  ret.push(
+    DOMPlugin({
+      plugins: [editorPlugin, ...plugins],
+    })
+  )
+
+  if (placeholder) {
+    ret.push(
+      PlaceholderPlugin({
+        placeholder,
+        when: (editor, node) =>
+          node.object === 'document' &&
+          node.text === '' &&
+          node.nodes.size === 1,
+      })
+    )
+  }
+
+  ret.push({
+    decorateNode,
+    renderEditor,
+    renderNode,
   })
 
-  const defaultsPlugin = { renderEditor, renderNode, renderPlaceholder }
-  return [domPlugin, defaultsPlugin]
+  return ret
 }
 
 /**
  * Export.
  *
- * @type {Object}
+ * @type {Function}
  */
 
 export default ReactPlugin

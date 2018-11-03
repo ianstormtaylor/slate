@@ -108,6 +108,10 @@ class Text extends Record(DEFAULTS) {
       throw new Error('leaves must be either Array or Immutable.List')
     }
 
+    if (leaves.size === 0) {
+      leaves = leaves.push(Leaf.create())
+    }
+
     const node = new Text({
       leaves: Leaf.createLeaves(leaves),
       key,
@@ -216,16 +220,33 @@ class Text extends Record(DEFAULTS) {
   /**
    * Derive the leaves for a list of `decorations`.
    *
-   * @param {Array|Void} decorations (optional)
+   * @param {List} decorations (optional)
    * @return {List<Leaf>}
    */
 
-  getLeaves(decorations = []) {
+  getLeaves(decorations) {
     let { leaves } = this
-    if (leaves.size === 0) return List.of(Leaf.create({}))
-    if (!decorations || decorations.length === 0) return leaves
-    if (this.text.length === 0) return leaves
-    const { key } = this
+
+    // PERF: We can exit early without decorations.
+    if (!decorations || decorations.size === 0) return leaves
+
+    // HACK: We shouldn't need this, because text nodes should never be in a
+    // position of not having any leaves...
+    if (leaves.size === 0) {
+      const marks = decorations.map(d => d.mark)
+      const leaf = Leaf.create({ marks })
+      return List([leaf])
+    }
+
+    // HACK: this shouldn't be necessary, because the loop below should handle
+    // the `0` case without failures. It may already even, not sure.
+    if (this.text.length === 0) {
+      const marks = decorations.map(d => d.mark)
+      const leaf = Leaf.create({ marks })
+      return List([leaf])
+    }
+
+    const { key, text } = this
 
     decorations.forEach(dec => {
       const { start, end, mark } = dec
@@ -234,12 +255,12 @@ class Text extends Record(DEFAULTS) {
 
       if (hasStart && hasEnd) {
         const index = hasStart ? start.offset : 0
-        const length = hasEnd ? end.offset - index : this.text.length - index
+        const length = hasEnd ? end.offset - index : text.length - index
 
         if (length < 1) return
-        if (index >= this.text.length) return
+        if (index >= text.length) return
 
-        if (index !== 0 || length < this.text.length) {
+        if (index !== 0 || length < text.length) {
           const [before, bundle] = Leaf.splitLeaves(leaves, index)
           const [middle, after] = Leaf.splitLeaves(bundle, length)
           leaves = before.concat(middle.map(x => x.addMark(mark)), after)
@@ -614,19 +635,23 @@ class Text extends Record(DEFAULTS) {
    */
 
   setLeaves(leaves) {
-    const result = Leaf.createLeaves(leaves)
+    leaves = Leaf.createLeaves(leaves)
 
-    if (result.size === 1) {
-      const first = result.first()
+    if (leaves.size === 1) {
+      const first = leaves.first()
 
       if (!first.marks || first.marks.size === 0) {
         if (first.text === '') {
-          return this.set('leaves', List())
+          return this.set('leaves', List([Leaf.create()]))
         }
       }
     }
 
-    return this.set('leaves', Leaf.createLeaves(leaves))
+    if (leaves.size === 0) {
+      leaves = leaves.push(Leaf.create())
+    }
+
+    return this.set('leaves', leaves)
   }
 }
 

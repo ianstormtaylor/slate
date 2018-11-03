@@ -448,7 +448,7 @@ class ElementInterface {
       'As of Slate 0.42.0, the `node.getDecorations` method takes an `editor` instead of a `value`.'
     )
 
-    const array = editor.run('decorateNode', this) || []
+    const array = editor.run('decorateNode', this)
     const decorations = Decoration.createList(array)
     return decorations
   }

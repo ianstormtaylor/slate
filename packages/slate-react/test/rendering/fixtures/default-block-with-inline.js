@@ -20,17 +20,19 @@ export const output = `
 <div data-slate-editor="true" contenteditable="true" role="textbox">
   <div style="position:relative">
     <span>
-      <span>
+      <span data-slate-leaf="true">
         <span data-slate-zero-width="z">&#xFEFF;</span>
       </span>
     </span>
     <span style="position:relative">
       <span>
-        <span>word</span>
+        <span data-slate-leaf="true">
+          <span data-slate-content="true">word</span>
+        </span>
       </span>
     </span>
     <span>
-      <span>
+      <span data-slate-leaf="true">
         <span data-slate-zero-width="z">&#xFEFF;</span>
       </span>
     </span>

@@ -56,7 +56,7 @@ A change handler that will be called with the `change` that applied the change. 
 
 `String || Element`
 
-A placeholder string (or React element) that will be rendered as the default block type's placeholder.
+A placeholder string (or React element) that will be rendered if the document only contains a single empty block.
 
 ### `plugins`
 
