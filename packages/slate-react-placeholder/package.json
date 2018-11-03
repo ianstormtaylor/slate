@@ -14,7 +14,7 @@
   ],
   "peerDependencies": {
     "react": ">=0.14.0",
-    "slate": ">=0.32.0"
+    "slate": ">=0.43.6"
   },
   "devDependencies": {
     "mocha": "^2.5.3",
