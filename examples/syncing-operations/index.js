@@ -239,35 +239,43 @@ class SyncingOperationsExample extends React.Component {
   }
 
   /**
-   * When editor one changes, send document-alterting operations to edtior two.
+   * When editor one changes, send document-altering operations to editor two.
    *
    * @param {Array} operations
    */
 
   onOneChange = change => {
     const ops = change.operations
-      .filter(o => o.type != 'set_selection' && o.type != 'set_value')
+      .filter(
+        o =>
+          o.type != 'set_selection' &&
+          o.type != 'set_value' &&
+          (!o.data || !o.data.has('source'))
+      )
       .toJS()
+      .map(o => ({ ...o, data: { source: 'one' } }))
 
-    setTimeout(() => {
-      ops.forEach(o => this.two.applyOperation(o))
-    })
+    setTimeout(() => this.two.applyOperations(ops))
   }
 
   /**
-   * When editor two changes, send document-alterting operations to edtior one.
+   * When editor two changes, send document-altering operations to editor one.
    *
    * @param {Array} operations
    */
 
   onTwoChange = change => {
     const ops = change.operations
-      .filter(o => o.type != 'set_selection' && o.type != 'set_value')
+      .filter(
+        o =>
+          o.type != 'set_selection' &&
+          o.type != 'set_value' &&
+          (!o.data || !o.data.has('source'))
+      )
       .toJS()
+      .map(o => ({ ...o, data: { source: 'two' } }))
 
-    setTimeout(() => {
-      ops.forEach(o => this.one.applyOperation(o))
-    })
+    setTimeout(() => this.one.applyOperations(ops))
   }
 }
 
