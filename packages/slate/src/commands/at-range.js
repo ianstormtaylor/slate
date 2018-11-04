@@ -1268,6 +1268,10 @@ Commands.wrapInlineAtRange = (editor, range, inline) => {
     // Wrapping an inline void
     const inlineParent = document.getClosestInline(start.key)
 
+    if (!inlineParent) {
+      return
+    }
+
     if (!editor.isVoid(inlineParent)) {
       return
     }
