@@ -8,7 +8,7 @@ There are a handful of Slate operation types. The goal is to have the fewest pos
 
 ## Properties
 
-See each operation separately below too see what they consist of. 
+See each operation separately below to see what they consist of.
 
 Note that all operations have a `data` property which can be used to attach arbitrary data to the operation, just like the [`Node`](./node.md) models ([`Block`](./block.md), [`Inline`](./inline.md), etc).
 
