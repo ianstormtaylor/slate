@@ -329,7 +329,7 @@ class Content extends React.Component {
       const native = window.getSelection()
       const range = findRange(native, editor)
 
-      if (range && range.equals(selection.toRange())) {
+      if (range && range.equals(selection.toRange()) && !editor.state.isComposing) {
         this.updateSelection()
         return
       }
