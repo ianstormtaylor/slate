@@ -33,6 +33,14 @@ describe('slate', () => {
     assert.deepEqual(actual, expected)
   })
 
+  fixtures(__dirname, 'models/operation', ({ module }) => {
+    const { input, output } = module
+    const fn = module.default
+    const actual = fn(input).toJSON()
+    const expected = output
+    assert.deepEqual(actual, expected)
+  })
+
   fixtures(__dirname, 'models/point', ({ module }) => {
     const { input, output } = module
     const fn = module.default

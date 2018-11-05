@@ -1,5 +1,5 @@
 import isPlainObject from 'is-plain-object'
-import { List, Record } from 'immutable'
+import { List, Record, Map } from 'immutable'
 
 import Mark from './mark'
 import Node from './node'
@@ -16,19 +16,19 @@ import invert from '../operations/invert'
  */
 
 const OPERATION_ATTRIBUTES = {
-  add_mark: ['value', 'path', 'offset', 'length', 'mark'],
-  insert_node: ['value', 'path', 'node'],
-  insert_text: ['value', 'path', 'offset', 'text', 'marks'],
-  merge_node: ['value', 'path', 'position', 'properties', 'target'],
-  move_node: ['value', 'path', 'newPath'],
-  remove_mark: ['value', 'path', 'offset', 'length', 'mark'],
-  remove_node: ['value', 'path', 'node'],
-  remove_text: ['value', 'path', 'offset', 'text', 'marks'],
-  set_mark: ['value', 'path', 'offset', 'length', 'mark', 'properties'],
-  set_node: ['value', 'path', 'node', 'properties'],
-  set_selection: ['value', 'selection', 'properties'],
-  set_value: ['value', 'properties'],
-  split_node: ['value', 'path', 'position', 'properties', 'target'],
+  add_mark: ['value', 'path', 'offset', 'length', 'mark', 'data'],
+  insert_node: ['value', 'path', 'node', 'data'],
+  insert_text: ['value', 'path', 'offset', 'text', 'marks', 'data'],
+  merge_node: ['value', 'path', 'position', 'properties', 'target', 'data'],
+  move_node: ['value', 'path', 'newPath', 'data'],
+  remove_mark: ['value', 'path', 'offset', 'length', 'mark', 'data'],
+  remove_node: ['value', 'path', 'node', 'data'],
+  remove_text: ['value', 'path', 'offset', 'text', 'marks', 'data'],
+  set_mark: ['value', 'path', 'offset', 'length', 'mark', 'properties', 'data'],
+  set_node: ['value', 'path', 'node', 'properties', 'data'],
+  set_selection: ['value', 'selection', 'properties', 'data'],
+  set_value: ['value', 'properties', 'data'],
+  split_node: ['value', 'path', 'position', 'properties', 'target', 'data'],
 }
 
 /**
@@ -52,6 +52,7 @@ const DEFAULTS = {
   text: undefined,
   type: undefined,
   value: undefined,
+  data: undefined,
 }
 
 /**
@@ -133,6 +134,9 @@ class Operation extends Record(DEFAULTS) {
         if (key == 'value') continue
         if (key == 'node' && type != 'insert_node') continue
 
+        // Skip optional user defined data
+        if (key == 'data') continue
+
         throw new Error(
           `\`Operation.fromJSON\` was passed a "${type}" operation without the required "${key}" attribute.`
         )
@@ -184,6 +188,10 @@ class Operation extends Record(DEFAULTS) {
 
       if (key === 'properties' && type === 'split_node') {
         v = Node.createProperties(v)
+      }
+
+      if (key === 'data') {
+        v = Map(v)
       }
 
       attrs[key] = v
@@ -301,6 +309,10 @@ class Operation extends Record(DEFAULTS) {
         if ('data' in value) v.data = value.data.toJS()
         if ('type' in value) v.type = value.type
         value = v
+      }
+
+      if (key === 'data' && value) {
+        value = value.toJSON()
       }
 
       json[key] = value
