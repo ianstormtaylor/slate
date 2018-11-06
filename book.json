@@ -3,7 +3,7 @@
   "root": "./docs",
   "structure": {
     "readme": "Introduction.md",
-    "summary": "Readme.md"
+    "summary": "Summary.md"
   },
   "plugins": ["-highlight", "prism", "github"],
   "pluginsConfig": {

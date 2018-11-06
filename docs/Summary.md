@@ -42,6 +42,7 @@
 * [Plugins](./reference/slate/plugins.md)
 * [Point](./reference/slate/point.md)
 * [Range](./reference/slate/range.md)
+* [Schema](./reference/slate/schema.md)
 * [Selection](./reference/slate/selection.md)
 * [Text](./reference/slate/text.md)
 * [Utils](./reference/slate/utils.md)
