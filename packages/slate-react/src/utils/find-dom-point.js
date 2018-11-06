@@ -21,10 +21,7 @@ function findDOMPoint(point, win = window) {
 
   for (const text of texts) {
     const node = text.childNodes[0]
-
-    // Account zero-width spaces which shouldn't really take up space, because
-    // we only render them when the text is empty.
-    const length = node.textContent === '\uFEFF' ? 0 : node.textContent.length
+    const { length } = node.textContent
     const end = start + length
 
     if (point.offset <= end) {
