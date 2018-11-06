@@ -63,7 +63,7 @@ export const output = `
    <div style="position:relative">
     <span>
       <span data-slate-leaf="true">
-        <span data-slate-zero-width="n">&#xFEFF;<br /></span>
+        <span data-slate-zero-width="n" data-slate-length="0">&#xFEFF;<br /></span>
       </span>
     </span>
   </div>
@@ -71,7 +71,7 @@ export const output = `
     <div data-slate-spacer="true" style="height:0;color:transparent;outline:none;position:absolute">
       <span>
         <span data-slate-leaf="true">
-          <span data-slate-zero-width="z">&#xFEFF;</span>
+          <span data-slate-zero-width="z" data-slate-length="0">&#xFEFF;</span>
         </span>
       </span>
     </div>
@@ -82,7 +82,7 @@ export const output = `
   <div style="position:relative">
     <span>
       <span data-slate-leaf="true">
-        <span data-slate-zero-width="n">&#xFEFF;<br /></span>
+        <span data-slate-zero-width="n" data-slate-length="0">&#xFEFF;<br /></span>
       </span>
     </span>
   </div>
@@ -90,7 +90,7 @@ export const output = `
     <div data-slate-spacer="true" style="height:0;color:transparent;outline:none;position:absolute">
       <span>
         <span data-slate-leaf="true">
-          <span data-slate-zero-width="z">&#xFEFF;</span>
+          <span data-slate-zero-width="z" data-slate-length="0">&#xFEFF;</span>
         </span>
       </span>
     </div>
