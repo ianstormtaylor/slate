@@ -22,7 +22,7 @@ const schema = {
           const type = index === 0 ? 'title' : 'paragraph'
           return editor.setNodeByKey(child.key, type)
         }
-        case 'child_required': {
+        case 'child_required_underflow': {
           const block = Block.create(index === 0 ? 'title' : 'paragraph')
           return editor.insertNodeByKey(node.key, index, block)
         }

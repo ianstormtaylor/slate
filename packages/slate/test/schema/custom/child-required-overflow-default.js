@@ -8,18 +8,13 @@ export const schema = {
     quote: {
       nodes: [
         {
+          match: [{ type: 'title' }],
+          max: 1,
+        },
+        {
           match: [{ type: 'paragraph' }],
-          min: 2,
         },
       ],
-      normalize: (editor, { code, node, index }) => {
-        if (code == 'child_required') {
-          editor.insertNodeByKey(node.key, index, {
-            object: 'block',
-            type: 'paragraph',
-          })
-        }
-      },
     },
   },
 }
@@ -28,6 +23,8 @@ export const input = (
   <value>
     <document>
       <quote>
+        <block type="title">One</block>
+        <block type="title">Two</block>
         <paragraph>
           <text />
         </paragraph>
@@ -40,9 +37,7 @@ export const output = (
   <value>
     <document>
       <quote>
-        <paragraph>
-          <text />
-        </paragraph>
+        <block type="title">One</block>
         <paragraph>
           <text />
         </paragraph>

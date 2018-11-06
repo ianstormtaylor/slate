@@ -100,7 +100,7 @@ function CorePlugin(options = {}) {
         normalize: (editor, error) => {
           const { code, node } = error
 
-          if (code === 'child_required') {
+          if (code === 'child_required_underflow' && node.nodes.isEmpty()) {
             editor.insertNodeByKey(node.key, 0, Text.create())
           }
         },
