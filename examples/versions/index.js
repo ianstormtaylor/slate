@@ -68,7 +68,7 @@ class Versions extends React.Component {
    */
 
   render() {
-    const { versions, v } = this.state
+    const { value, versions, v } = this.state
     return (
       <div>
         <Toolbar>
@@ -93,7 +93,7 @@ class Versions extends React.Component {
           placeholder="Enter some text..."
           commands={commands}
           ref={this.ref}
-          value={this.state.value}
+          value={value}
           onChange={this.onChange}
         />
       </div>
@@ -106,9 +106,7 @@ class Versions extends React.Component {
    * @param {Editor} editor
    */
 
-  onChange = ({ value }) => {
-    this.setState({ value })
-  }
+  onChange = ({ value }) => this.setState(() => ({ value }))
 
   /**
    * On version select change.
@@ -157,12 +155,12 @@ class Versions extends React.Component {
       })
     })
 
-    this.setState(state => {
-      return {
+    setTimeout(() =>
+      this.setState(state => ({
         versions: state.versions.slice(0, n + 1),
         v: n,
-      }
-    })
+      }))
+    )
   }
 
   /**
@@ -178,16 +176,15 @@ class Versions extends React.Component {
       operations: undos
         .toArray()
         .reverse()
-        .map(list => list.toArray()),
+        .map(list => list.toArray())
+        .flat(),
     }
 
     this.setState(
-      state => {
-        return {
-          versions: [...state.versions, version],
-          v: state.v === '' ? 0 : state.v + 1,
-        }
-      },
+      state => ({
+        versions: [...state.versions, version],
+        v: state.v === '' ? 0 : state.v + 1,
+      }),
       () => {
         this.editor.resetHistory()
       }
