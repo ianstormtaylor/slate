@@ -61,9 +61,9 @@ Get the ancestors of a descendant by `path` or `key`.
 
 Get all of the bottom-most [`Block`](./block.md) node descendants.
 
-### `getBlocksAtRange`
+### `getLeafBlocksAtRange`
 
-`getBlocksAtRange(range: Range) => List`
+`getLeafBlocksAtRange(range: Range) => List`
 
 Get all of the bottom-most [`Block`](./block.md) nodes in a `range`.
 

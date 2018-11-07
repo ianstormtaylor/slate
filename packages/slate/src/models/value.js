@@ -378,7 +378,7 @@ class Value extends Record(DEFAULTS) {
   get blocks() {
     return this.selection.isUnset
       ? new List()
-      : this.document.getBlocksAtRange(this.selection)
+      : this.document.getLeafBlocksAtRange(this.selection)
   }
 
   /**

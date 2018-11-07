@@ -276,9 +276,12 @@ class ElementInterface {
    */
 
   getBlocksAtRange(range) {
-    const array = this.getLeafBlocksAtRangeAsArray(range)
-    // Eliminate duplicates by converting to an `OrderedSet` first.
-    return List(OrderedSet(array))
+    warning(
+      false,
+      'As of slate@0.44 the `node.getBlocksAtRange` method has been renamed to `getLeafBlocksAtRange`.'
+    )
+
+    return this.getLeafBlocksAtRange(range)
   }
 
   /**
@@ -724,7 +727,20 @@ class ElementInterface {
   }
 
   /**
-   * Get the bottom-most block descendants in a `range` as an array
+   * Get the bottom-most block descendants in a `range`.
+   *
+   * @param {Range} range
+   * @return {List<Node>}
+   */
+
+  getLeafBlocksAtRange(range) {
+    const array = this.getLeafBlocksAtRangeAsArray(range)
+    // Eliminate duplicates by converting to an `OrderedSet` first.
+    return List(OrderedSet(array))
+  }
+
+  /**
+   * Get the bottom-most descendants in a `range` as an array
    *
    * @param {Range} range
    * @return {Array}
