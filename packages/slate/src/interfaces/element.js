@@ -1,5 +1,6 @@
 import direction from 'direction'
 import invariant from 'tiny-invariant'
+import warning from 'tiny-warning'
 import { List, OrderedSet, Set, Stack } from 'immutable'
 
 import mixin from '../utils/mixin'
@@ -275,34 +276,25 @@ class ElementInterface {
    */
 
   getBlocksAtRange(range) {
-    const array = this.getBlocksAtRangeAsArray(range)
+    const array = this.getLeafBlocksAtRangeAsArray(range)
     // Eliminate duplicates by converting to an `OrderedSet` first.
     return List(OrderedSet(array))
   }
 
   /**
-   * Get the leaf block descendants in a `range` as an array
+   * Get the bottom-most block descendants in a `range` as an array
    *
    * @param {Range} range
    * @return {Array}
    */
 
   getBlocksAtRangeAsArray(range) {
-    range = this.resolveRange(range)
-    if (range.isUnset) return []
+    warning(
+      false,
+      'As of slate@0.44 the `node.getBlocksAtRangeAsArray` method has been renamed to `getLeafBlocksAtRangeAsArray`.'
+    )
 
-    const { start, end } = range
-    const startBlock = this.getClosestBlock(start.key)
-
-    // PERF: the most common case is when the range is in a single block node,
-    // where we can avoid a lot of iterating of the tree.
-    if (start.key === end.key) return [startBlock]
-
-    const endBlock = this.getClosestBlock(end.key)
-    const blocks = this.getBlocksAsArray()
-    const startIndex = blocks.indexOf(startBlock)
-    const endIndex = blocks.indexOf(endBlock)
-    return blocks.slice(startIndex, endIndex + 1)
+    return this.getLeafBlocksAtRangeAsArray(range)
   }
 
   /**
@@ -729,6 +721,31 @@ class ElementInterface {
     const text = this.getDescendant(start.key)
     const marks = text.getMarksAtIndex(start.offset + 1)
     return marks
+  }
+
+  /**
+   * Get the bottom-most block descendants in a `range` as an array
+   *
+   * @param {Range} range
+   * @return {Array}
+   */
+
+  getLeafBlocksAtRangeAsArray(range) {
+    range = this.resolveRange(range)
+    if (range.isUnset) return []
+
+    const { start, end } = range
+    const startBlock = this.getClosestBlock(start.key)
+
+    // PERF: the most common case is when the range is in a single block node,
+    // where we can avoid a lot of iterating of the tree.
+    if (start.key === end.key) return [startBlock]
+
+    const endBlock = this.getClosestBlock(end.key)
+    const blocks = this.getBlocksAsArray()
+    const startIndex = blocks.indexOf(startBlock)
+    const endIndex = blocks.indexOf(endBlock)
+    return blocks.slice(startIndex, endIndex + 1)
   }
 
   /**
@@ -1864,6 +1881,7 @@ memoize(ElementInterface.prototype, [
   'getInlinesAsArray',
   'getInlinesAtRangeAsArray',
   'getInlinesByTypeAsArray',
+  'getLeafBlocksAtRangeAsArray',
   'getMarksAsArray',
   'getMarksAtPosition',
   'getNodesAtRange',
