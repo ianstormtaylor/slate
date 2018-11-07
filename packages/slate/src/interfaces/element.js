@@ -642,28 +642,26 @@ class ElementInterface {
    */
 
   getInlinesAtRange(range) {
-    const array = this.getInlinesAtRangeAsArray(range)
+    const array = this.getLeafInlinesAtRangeAsArray(range)
     // Remove duplicates by converting it to an `OrderedSet` first.
     const list = List(OrderedSet(array))
     return list
   }
 
   /**
-   * Get the closest inline nodes for each text node in a `range` as an array.
+   * Get the bottom-most inline nodes for each text node in a `range` as an array.
    *
    * @param {Range} range
    * @return {Array}
    */
 
   getInlinesAtRangeAsArray(range) {
-    range = this.resolveRange(range)
-    if (range.isUnset) return []
+    warning(
+      false,
+      'As of slate@0.44 the `node.getInlinesAtRangeAsArray` method has been renamed to `getLeafInlinesAtRangeAsArray`.'
+    )
 
-    const array = this.getTextsAtRangeAsArray(range)
-      .map(text => this.getClosestInline(text.key))
-      .filter(exists => exists)
-
-    return array
+    return this.getLeafInlinesAtRangeAsArray(range)
   }
 
   /**
@@ -762,6 +760,24 @@ class ElementInterface {
     const startIndex = blocks.indexOf(startBlock)
     const endIndex = blocks.indexOf(endBlock)
     return blocks.slice(startIndex, endIndex + 1)
+  }
+
+  /**
+   * Get the bottom-most inline nodes for each text node in a `range` as an array.
+   *
+   * @param {Range} range
+   * @return {Array}
+   */
+
+  getLeafInlinesAtRangeAsArray(range) {
+    range = this.resolveRange(range)
+    if (range.isUnset) return []
+
+    const array = this.getTextsAtRangeAsArray(range)
+      .map(text => this.getClosestInline(text.key))
+      .filter(exists => exists)
+
+    return array
   }
 
   /**
@@ -1919,9 +1935,9 @@ memoize(ElementInterface.prototype, [
   'getDecorations',
   'getFragmentAtRange',
   'getInlinesAsArray',
-  'getInlinesAtRangeAsArray',
   'getInlinesByTypeAsArray',
   'getLeafBlocksAtRangeAsArray',
+  'getLeafInlinesAtRangeAsArray',
   'getMarksAsArray',
   'getMarksAtPosition',
   'getNodesAtRange',
