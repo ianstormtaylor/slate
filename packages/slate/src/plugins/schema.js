@@ -503,7 +503,7 @@ function validateNodes(node, rule, rules = []) {
     return fail('child_max_invalid', {
       rule,
       node,
-      index,
+      index: index - 1,
       count,
       limit: max,
     })

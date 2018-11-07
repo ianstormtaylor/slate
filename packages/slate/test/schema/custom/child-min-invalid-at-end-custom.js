@@ -5,25 +5,21 @@ import h from '../../helpers/h'
 export const schema = {
   blocks: {
     paragraph: {},
-    title: {},
     quote: {
       nodes: [
         {
-          match: [{ type: 'title' }],
-          min: 1,
-        },
-        {
           match: [{ type: 'paragraph' }],
+          min: 2,
         },
       ],
       normalize: (editor, { code, node, index }) => {
-        if (code == 'child_min_invalid' && index == 0) {
+        if (code == 'child_min_invalid') {
           editor.insertNodeByKey(node.key, index, {
             object: 'block',
-            type: 'title',
+            type: 'paragraph',
           })
         }
-      }
+      },
     },
   },
 }
@@ -44,9 +40,9 @@ export const output = (
   <value>
     <document>
       <quote>
-        <block type="title">
+        <paragraph>
           <text />
-        </block>
+        </paragraph>
         <paragraph>
           <text />
         </paragraph>
