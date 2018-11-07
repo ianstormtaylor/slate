@@ -1188,6 +1188,30 @@ class ElementInterface {
   }
 
   /**
+   * Get the highest block descendants in a `range`.
+   *
+   * @param {Range} range
+   * @return {List<Node>}
+   */
+
+  getRootBlocksAtRange(range) {
+    range = this.resolveRange(range)
+    if (range.isUnset) return List()
+
+    const { start, end } = range
+    const startBlock = this.getFurthestBlock(start.key)
+
+    // PERF: the most common case is when the range is in a single block node,
+    // where we can avoid a lot of iterating of the tree.
+    if (start.key === end.key) return List([startBlock])
+
+    const endBlock = this.getFurthestBlock(end.key)
+    const startIndex = this.nodes.indexOf(startBlock)
+    const endIndex = this.nodes.indexOf(endBlock)
+    return this.nodes.slice(startIndex, endIndex + 1)
+  }
+
+  /**
    * Get the previous node from a node in the tree.
    *
    * This will not only check for siblings but instead move up the tree
@@ -1908,6 +1932,7 @@ memoize(ElementInterface.prototype, [
   'getOffset',
   'getOffsetAtRange',
   'getPreviousBlock',
+  'getRootBlocksAtRange',
   'getTextAtOffset',
   'getTextDirection',
   'getTextsAsArray',

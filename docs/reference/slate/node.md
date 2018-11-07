@@ -308,6 +308,12 @@ Get the previous sibling of a descendant by `path` or `key`.
 
 Get the previous [`Text`](./text.md) node before a descendant by `path` or `key`.
 
+### `getRootBlocksAtRange`
+
+`getRootBlocksAtRange(range: Range) => List`
+
+Get all of the top-most [`Block`](./block.md) nodes in a `range`.
+
 ### `getTextAtOffset`
 
 `getTextAtOffset(offset: Number) => Text || Void`
