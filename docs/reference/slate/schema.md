@@ -329,7 +329,7 @@ Raised when a child node repeats less than required by a rule's `min` property.
 }
 ```
 
-Raised when a child node repeats more than permitted by a rule's `max` 
+Raised when a child node repeats more than permitted by a rule's `max`
 property.
 
 ### `'child_type_invalid'`
