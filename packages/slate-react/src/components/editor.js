@@ -125,6 +125,7 @@ class Editor extends React.Component {
   /**
    * When the component unmounts, make sure async commands don't trigger react updates.
    */
+
   componentWillUnmount() {
     this.tmp.mounted = false
   }
