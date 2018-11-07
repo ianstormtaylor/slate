@@ -635,17 +635,19 @@ class ElementInterface {
   }
 
   /**
-   * Get the closest inline nodes for each text node in a `range`.
+   * Get the bottom-most inline nodes for each text node in a `range`.
    *
    * @param {Range} range
    * @return {List<Node>}
    */
 
   getInlinesAtRange(range) {
-    const array = this.getLeafInlinesAtRangeAsArray(range)
-    // Remove duplicates by converting it to an `OrderedSet` first.
-    const list = List(OrderedSet(array))
-    return list
+    warning(
+      false,
+      'As of slate@0.44 the `node.getInlinesAtRange` method has been renamed to `getLeafInlinesAtRange`.'
+    )
+
+    return this.getLeafInlinesAtRange(range)
   }
 
   /**
@@ -760,6 +762,20 @@ class ElementInterface {
     const startIndex = blocks.indexOf(startBlock)
     const endIndex = blocks.indexOf(endBlock)
     return blocks.slice(startIndex, endIndex + 1)
+  }
+
+  /**
+   * Get the bottom-most inline nodes for each text node in a `range`.
+   *
+   * @param {Range} range
+   * @return {List<Node>}
+   */
+
+  getLeafInlinesAtRange(range) {
+    const array = this.getLeafInlinesAtRangeAsArray(range)
+    // Remove duplicates by converting it to an `OrderedSet` first.
+    const list = List(OrderedSet(array))
+    return list
   }
 
   /**

@@ -182,11 +182,11 @@ Get the furthest ancestor of a node by `path` or `key` that has only one child.
 
 Get all of the top-most [`Inline`](./inline.md) nodes in a node.
 
-### `getInlinesAtRange`
+### `getLeafInlinesAtRange`
 
-`getInlinesAtRange(range: Range) => List`
+`getLeafInlinesAtRange(range: Range) => List`
 
-Get all of the top-most [`Inline`](./inline.md) nodes in a `range`.
+Get all of the bottom-most [`Inline`](./inline.md) nodes in a `range`.
 
 ### `getInlinesByType`
 

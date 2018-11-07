@@ -955,7 +955,7 @@ Commands.setBlocksAtRange = (editor, range, properties) => {
 Commands.setInlinesAtRange = (editor, range, properties) => {
   const { value } = editor
   const { document } = value
-  const inlines = document.getInlinesAtRange(range)
+  const inlines = document.getLeafInlinesAtRange(range)
 
   editor.withoutNormalizing(() => {
     inlines.forEach(inline => {
