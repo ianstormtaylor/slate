@@ -314,6 +314,12 @@ Get the previous [`Text`](./text.md) node before a descendant by `path` or `key`
 
 Get all of the top-most [`Block`](./block.md) nodes in a `range`.
 
+### `getRootInlinesAtRange`
+
+`getRootInlinesAtRange(range: Range) => List`
+
+Get all of the top-most [`Inline`](./inline.md) nodes in a `range`.
+
 ### `getTextAtOffset`
 
 `getTextAtOffset(offset: Number) => Text || Void`

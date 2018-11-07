@@ -1244,6 +1244,20 @@ class ElementInterface {
   }
 
   /**
+   * Get the top-most inline nodes for each text node in a `range`.
+   *
+   * @param {Range} range
+   * @return {List<Node>}
+   */
+
+  getRootInlinesAtRange(range) {
+    const array = this.getRootInlinesAtRangeAsArray(range)
+    // Remove duplicates by converting it to an `OrderedSet` first.
+    const list = List(OrderedSet(array))
+    return list
+  }
+
+  /**
    * Get the top-most inline nodes for each text node in a `range` as an array.
    *
    * @param {Range} range
