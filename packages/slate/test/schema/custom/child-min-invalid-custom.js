@@ -23,7 +23,7 @@ export const schema = {
             type: 'title',
           })
         }
-      }
+      },
     },
   },
 }
