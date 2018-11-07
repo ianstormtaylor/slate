@@ -303,7 +303,7 @@ When supplying your own `normalize` property for a schema rule, it will be calle
 
 Raised when the `object` property of a child node is invalid.
 
-### `child_required_underflow`
+### `child_min_invalid`
 
 ```js
 {
@@ -317,7 +317,7 @@ Raised when the `object` property of a child node is invalid.
 
 Raised when a child node repeats less than required by a rule's `min` property.
 
-### `child_required_overflow`
+### `child_max_invalid`
 
 ```js
 {

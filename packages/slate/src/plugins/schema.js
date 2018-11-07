@@ -192,7 +192,7 @@ function defaultNormalize(editor, error) {
         : editor.removeNodeByKey(next.key)
     }
 
-    case 'child_required_underflow':
+    case 'child_min_invalid':
     case 'node_text_invalid':
     case 'parent_object_invalid':
     case 'parent_type_invalid': {
@@ -201,7 +201,7 @@ function defaultNormalize(editor, error) {
         : editor.removeNodeByKey(node.key)
     }
 
-    case 'child_required_overflow': {
+    case 'child_max_invalid': {
       return editor.removeNodeByKey(node.nodes.get(index).key)
     }
 
@@ -427,7 +427,7 @@ function validateNodes(node, rule, rules = []) {
             // immediately check for count > max, but instead do so once we find
             // a child that doesn't match.
             rewind()
-            return fail('child_required_overflow', {
+            return fail('child_max_invalid', {
               rule,
               node,
               index,
@@ -458,7 +458,7 @@ function validateNodes(node, rule, rules = []) {
             if (validateRules(child, def.match) == null) {
               // It's the first case, so we just report an underflow.
               rewind()
-              return fail('child_required_underflow', {
+              return fail('child_min_invalid', {
                 rule,
                 node,
                 index,
@@ -500,7 +500,7 @@ function validateNodes(node, rule, rules = []) {
   if (max != null && count > max) {
     // Since we want to report overflow on last matching child we don't
     // immediately check for count > max, but do so after processing all nodes.
-    return fail('child_required_overflow', {
+    return fail('child_max_invalid', {
       rule,
       node,
       index,
@@ -512,7 +512,7 @@ function validateNodes(node, rule, rules = []) {
   if (rule.nodes != null) {
     do {
       if (count < min) {
-        return fail('child_required_underflow', {
+        return fail('child_min_invalid', {
           rule,
           node,
           index,
