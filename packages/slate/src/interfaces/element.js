@@ -1244,6 +1244,24 @@ class ElementInterface {
   }
 
   /**
+   * Get the top-most inline nodes for each text node in a `range` as an array.
+   *
+   * @param {Range} range
+   * @return {Array}
+   */
+
+  getRootInlinesAtRangeAsArray(range) {
+    range = this.resolveRange(range)
+    if (range.isUnset) return List()
+
+    const array = this.getTextsAtRangeAsArray(range)
+      .map(text => this.getFurthestInline(text.key))
+      .filter(exists => exists)
+
+    return array
+  }
+
+  /**
    * Get the previous node from a node in the tree.
    *
    * This will not only check for siblings but instead move up the tree
@@ -1965,6 +1983,7 @@ memoize(ElementInterface.prototype, [
   'getOffsetAtRange',
   'getPreviousBlock',
   'getRootBlocksAtRange',
+  'getRootInlinesAtRangeAsArray',
   'getTextAtOffset',
   'getTextDirection',
   'getTextsAsArray',
