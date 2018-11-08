@@ -1,5 +1,6 @@
 import direction from 'direction'
 import invariant from 'tiny-invariant'
+import warning from 'tiny-warning'
 import { List, OrderedSet, Set, Stack } from 'immutable'
 
 import mixin from '../utils/mixin'
@@ -275,34 +276,28 @@ class ElementInterface {
    */
 
   getBlocksAtRange(range) {
-    const array = this.getBlocksAtRangeAsArray(range)
-    // Eliminate duplicates by converting to an `OrderedSet` first.
-    return List(OrderedSet(array))
+    warning(
+      false,
+      'As of slate@0.44 the `node.getBlocksAtRange` method has been renamed to `getLeafBlocksAtRange`.'
+    )
+
+    return this.getLeafBlocksAtRange(range)
   }
 
   /**
-   * Get the leaf block descendants in a `range` as an array
+   * Get the bottom-most block descendants in a `range` as an array
    *
    * @param {Range} range
    * @return {Array}
    */
 
   getBlocksAtRangeAsArray(range) {
-    range = this.resolveRange(range)
-    if (range.isUnset) return []
+    warning(
+      false,
+      'As of slate@0.44 the `node.getBlocksAtRangeAsArray` method has been renamed to `getLeafBlocksAtRangeAsArray`.'
+    )
 
-    const { start, end } = range
-    const startBlock = this.getClosestBlock(start.key)
-
-    // PERF: the most common case is when the range is in a single block node,
-    // where we can avoid a lot of iterating of the tree.
-    if (start.key === end.key) return [startBlock]
-
-    const endBlock = this.getClosestBlock(end.key)
-    const blocks = this.getBlocksAsArray()
-    const startIndex = blocks.indexOf(startBlock)
-    const endIndex = blocks.indexOf(endBlock)
-    return blocks.slice(startIndex, endIndex + 1)
+    return this.getLeafBlocksAtRangeAsArray(range)
   }
 
   /**
@@ -640,35 +635,35 @@ class ElementInterface {
   }
 
   /**
-   * Get the closest inline nodes for each text node in a `range`.
+   * Get the bottom-most inline nodes for each text node in a `range`.
    *
    * @param {Range} range
    * @return {List<Node>}
    */
 
   getInlinesAtRange(range) {
-    const array = this.getInlinesAtRangeAsArray(range)
-    // Remove duplicates by converting it to an `OrderedSet` first.
-    const list = List(OrderedSet(array))
-    return list
+    warning(
+      false,
+      'As of slate@0.44 the `node.getInlinesAtRange` method has been renamed to `getLeafInlinesAtRange`.'
+    )
+
+    return this.getLeafInlinesAtRange(range)
   }
 
   /**
-   * Get the closest inline nodes for each text node in a `range` as an array.
+   * Get the bottom-most inline nodes for each text node in a `range` as an array.
    *
    * @param {Range} range
    * @return {Array}
    */
 
   getInlinesAtRangeAsArray(range) {
-    range = this.resolveRange(range)
-    if (range.isUnset) return []
+    warning(
+      false,
+      'As of slate@0.44 the `node.getInlinesAtRangeAsArray` method has been renamed to `getLeafInlinesAtRangeAsArray`.'
+    )
 
-    const array = this.getTextsAtRangeAsArray(range)
-      .map(text => this.getClosestInline(text.key))
-      .filter(exists => exists)
-
-    return array
+    return this.getLeafInlinesAtRangeAsArray(range)
   }
 
   /**
@@ -729,6 +724,76 @@ class ElementInterface {
     const text = this.getDescendant(start.key)
     const marks = text.getMarksAtIndex(start.offset + 1)
     return marks
+  }
+
+  /**
+   * Get the bottom-most block descendants in a `range`.
+   *
+   * @param {Range} range
+   * @return {List<Node>}
+   */
+
+  getLeafBlocksAtRange(range) {
+    const array = this.getLeafBlocksAtRangeAsArray(range)
+    // Eliminate duplicates by converting to an `OrderedSet` first.
+    return List(OrderedSet(array))
+  }
+
+  /**
+   * Get the bottom-most descendants in a `range` as an array
+   *
+   * @param {Range} range
+   * @return {Array}
+   */
+
+  getLeafBlocksAtRangeAsArray(range) {
+    range = this.resolveRange(range)
+    if (range.isUnset) return []
+
+    const { start, end } = range
+    const startBlock = this.getClosestBlock(start.key)
+
+    // PERF: the most common case is when the range is in a single block node,
+    // where we can avoid a lot of iterating of the tree.
+    if (start.key === end.key) return [startBlock]
+
+    const endBlock = this.getClosestBlock(end.key)
+    const blocks = this.getBlocksAsArray()
+    const startIndex = blocks.indexOf(startBlock)
+    const endIndex = blocks.indexOf(endBlock)
+    return blocks.slice(startIndex, endIndex + 1)
+  }
+
+  /**
+   * Get the bottom-most inline nodes for each text node in a `range`.
+   *
+   * @param {Range} range
+   * @return {List<Node>}
+   */
+
+  getLeafInlinesAtRange(range) {
+    const array = this.getLeafInlinesAtRangeAsArray(range)
+    // Remove duplicates by converting it to an `OrderedSet` first.
+    const list = List(OrderedSet(array))
+    return list
+  }
+
+  /**
+   * Get the bottom-most inline nodes for each text node in a `range` as an array.
+   *
+   * @param {Range} range
+   * @return {Array}
+   */
+
+  getLeafInlinesAtRangeAsArray(range) {
+    range = this.resolveRange(range)
+    if (range.isUnset) return []
+
+    const array = this.getTextsAtRangeAsArray(range)
+      .map(text => this.getClosestInline(text.key))
+      .filter(exists => exists)
+
+    return array
   }
 
   /**
@@ -1152,6 +1217,62 @@ class ElementInterface {
 
     const closest = this.getClosestBlock(previous.key)
     return closest
+  }
+
+  /**
+   * Get the highest block descendants in a `range`.
+   *
+   * @param {Range} range
+   * @return {List<Node>}
+   */
+
+  getRootBlocksAtRange(range) {
+    range = this.resolveRange(range)
+    if (range.isUnset) return List()
+
+    const { start, end } = range
+    const startBlock = this.getFurthestBlock(start.key)
+
+    // PERF: the most common case is when the range is in a single block node,
+    // where we can avoid a lot of iterating of the tree.
+    if (start.key === end.key) return List([startBlock])
+
+    const endBlock = this.getFurthestBlock(end.key)
+    const startIndex = this.nodes.indexOf(startBlock)
+    const endIndex = this.nodes.indexOf(endBlock)
+    return this.nodes.slice(startIndex, endIndex + 1)
+  }
+
+  /**
+   * Get the top-most inline nodes for each text node in a `range`.
+   *
+   * @param {Range} range
+   * @return {List<Node>}
+   */
+
+  getRootInlinesAtRange(range) {
+    const array = this.getRootInlinesAtRangeAsArray(range)
+    // Remove duplicates by converting it to an `OrderedSet` first.
+    const list = List(OrderedSet(array))
+    return list
+  }
+
+  /**
+   * Get the top-most inline nodes for each text node in a `range` as an array.
+   *
+   * @param {Range} range
+   * @return {Array}
+   */
+
+  getRootInlinesAtRangeAsArray(range) {
+    range = this.resolveRange(range)
+    if (range.isUnset) return List()
+
+    const array = this.getTextsAtRangeAsArray(range)
+      .map(text => this.getFurthestInline(text.key))
+      .filter(exists => exists)
+
+    return array
   }
 
   /**
@@ -1862,8 +1983,9 @@ memoize(ElementInterface.prototype, [
   'getDecorations',
   'getFragmentAtRange',
   'getInlinesAsArray',
-  'getInlinesAtRangeAsArray',
   'getInlinesByTypeAsArray',
+  'getLeafBlocksAtRangeAsArray',
+  'getLeafInlinesAtRangeAsArray',
   'getMarksAsArray',
   'getMarksAtPosition',
   'getNodesAtRange',
@@ -1874,6 +1996,8 @@ memoize(ElementInterface.prototype, [
   'getOffset',
   'getOffsetAtRange',
   'getPreviousBlock',
+  'getRootBlocksAtRange',
+  'getRootInlinesAtRangeAsArray',
   'getTextAtOffset',
   'getTextDirection',
   'getTextsAsArray',

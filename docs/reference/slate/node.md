@@ -61,9 +61,9 @@ Get the ancestors of a descendant by `path` or `key`.
 
 Get all of the bottom-most [`Block`](./block.md) node descendants.
 
-### `getBlocksAtRange`
+### `getLeafBlocksAtRange`
 
-`getBlocksAtRange(range: Range) => List`
+`getLeafBlocksAtRange(range: Range) => List`
 
 Get all of the bottom-most [`Block`](./block.md) nodes in a `range`.
 
@@ -182,11 +182,11 @@ Get the furthest ancestor of a node by `path` or `key` that has only one child.
 
 Get all of the top-most [`Inline`](./inline.md) nodes in a node.
 
-### `getInlinesAtRange`
+### `getLeafInlinesAtRange`
 
-`getInlinesAtRange(range: Range) => List`
+`getLeafInlinesAtRange(range: Range) => List`
 
-Get all of the top-most [`Inline`](./inline.md) nodes in a `range`.
+Get all of the bottom-most [`Inline`](./inline.md) nodes in a `range`.
 
 ### `getInlinesByType`
 
@@ -307,6 +307,18 @@ Get the previous sibling of a descendant by `path` or `key`.
 `getPreviousText(key: String) => Node|Void`
 
 Get the previous [`Text`](./text.md) node before a descendant by `path` or `key`.
+
+### `getRootBlocksAtRange`
+
+`getRootBlocksAtRange(range: Range) => List`
+
+Get all of the top-most [`Block`](./block.md) nodes in a `range`.
+
+### `getRootInlinesAtRange`
+
+`getRootInlinesAtRange(range: Range) => List`
+
+Get all of the top-most [`Inline`](./inline.md) nodes in a `range`.
 
 ### `getTextAtOffset`
 
