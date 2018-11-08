@@ -35,6 +35,7 @@ class Editor extends React.Component {
     autoCorrect: Types.bool,
     autoFocus: Types.bool,
     className: Types.string,
+    id: Types.string,
     onChange: Types.func,
     options: Types.object,
     placeholder: Types.any,

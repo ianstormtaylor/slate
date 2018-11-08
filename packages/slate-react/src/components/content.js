@@ -41,6 +41,7 @@ class Content extends React.Component {
     autoCorrect: Types.bool.isRequired,
     className: Types.string,
     editor: Types.object.isRequired,
+    id: Types.string,
     readOnly: Types.bool.isRequired,
     role: Types.string,
     spellCheck: Types.bool.isRequired,
@@ -421,6 +422,7 @@ class Content extends React.Component {
   render() {
     const { props, handlers } = this
     const {
+      id,
       className,
       readOnly,
       editor,
@@ -467,6 +469,7 @@ class Content extends React.Component {
         data-key={document.key}
         contentEditable={readOnly ? null : true}
         suppressContentEditableWarning
+        id={id}
         className={className}
         autoCorrect={props.autoCorrect ? 'on' : 'off'}
         spellCheck={spellCheck}
