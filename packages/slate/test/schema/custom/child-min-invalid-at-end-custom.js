@@ -13,7 +13,7 @@ export const schema = {
         },
       ],
       normalize: (editor, { code, node, index }) => {
-        if (code == 'child_required') {
+        if (code == 'child_min_invalid') {
           editor.insertNodeByKey(node.key, index, {
             object: 'block',
             type: 'paragraph',

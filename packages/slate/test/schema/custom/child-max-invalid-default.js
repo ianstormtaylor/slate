@@ -8,8 +8,11 @@ export const schema = {
     quote: {
       nodes: [
         {
-          match: [{ type: 'paragraph' }],
+          match: [{ type: 'title' }],
           max: 1,
+        },
+        {
+          match: [{ type: 'paragraph' }],
         },
       ],
     },
@@ -20,8 +23,11 @@ export const input = (
   <value>
     <document>
       <quote>
-        <paragraph>one</paragraph>
-        <block type="title">two</block>
+        <block type="title">One</block>
+        <block type="title">Two</block>
+        <paragraph>
+          <text />
+        </paragraph>
       </quote>
     </document>
   </value>
@@ -31,7 +37,10 @@ export const output = (
   <value>
     <document>
       <quote>
-        <paragraph>one</paragraph>
+        <block type="title">One</block>
+        <paragraph>
+          <text />
+        </paragraph>
       </quote>
     </document>
   </value>

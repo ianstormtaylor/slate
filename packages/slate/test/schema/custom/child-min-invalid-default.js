@@ -5,11 +5,15 @@ import h from '../../helpers/h'
 export const schema = {
   blocks: {
     paragraph: {},
+    title: {},
     quote: {
       nodes: [
         {
+          match: [{ type: 'title' }],
+          min: 1,
+        },
+        {
           match: [{ type: 'paragraph' }],
-          max: 1,
         },
       ],
     },
@@ -20,8 +24,9 @@ export const input = (
   <value>
     <document>
       <quote>
-        <paragraph>one</paragraph>
-        <block type="title">two</block>
+        <paragraph>
+          <text />
+        </paragraph>
       </quote>
     </document>
   </value>
@@ -29,10 +34,6 @@ export const input = (
 
 export const output = (
   <value>
-    <document>
-      <quote>
-        <paragraph>one</paragraph>
-      </quote>
-    </document>
+    <document />
   </value>
 )
