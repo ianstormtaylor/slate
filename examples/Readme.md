@@ -27,16 +27,20 @@ yarn install
 yarn build
 ```
 
-For those who have problem when start, you must install all the peer dependencies first on `package.json`
-- for npm (automatically) or install manually:
+For those who have problem when run start, you must install all the peer dependencies first on `package.json`
+
+* For npm (automatically) or install manually:
+
 ```
 npm install -g npm-install-peers
 npm-install-peers
 ```
-- for yarn:
+
+* For yarn:
+
 ```
 yarn install --peer
-``` 
+```
 
 Then start the watcher and examples server:
 
