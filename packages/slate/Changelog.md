@@ -725,6 +725,8 @@ This is just an attempt to make dealing with normalization errors slightly more 
 
 **A new set of `*ByPath` change methods have been added.** All of the changes you could previously do with a `*ByKey` change are now also supported with a `*ByPath` change of the same name. The path-based changes are often more performant than the key-based ones.
 
+**Paths are now of type [`List`](https://facebook.github.io/immutable-js/docs/#/List) instead of array.** See the documentation of [`List`](https://facebook.github.io/immutable-js/docs/#/List) for its differences to array (`get` method instead of array indexing, `size` instead of `length`, etc).
+
 ###### BREAKING
 
 **Internal-yet-public `Node` methods have been changed.** There were a handful of internal methods that shouldn't be used in 99% of Slate implementations that updated or removed. This was done in the process of streamlining many of the `Node` methods to make them more consistent and easier to use. For a list of those affected:
