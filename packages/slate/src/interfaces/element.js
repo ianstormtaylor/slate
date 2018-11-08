@@ -1637,6 +1637,31 @@ class ElementInterface {
   }
 
   /**
+   * Check whether a descendant node is inside a range. This will return true for all
+   * text nodes inside the range and all ancestors of those text nodes up to this node.
+   *
+   * @param {List|Key} path
+   * @param {Range} range
+   * @return {Node}
+   */
+
+  isNodeInRange(path, range) {
+    this.assertDescendant(path)
+    path = this.resolvePath(path)
+    range = this.resolveRange(range)
+    if (range.isUnset) return false
+
+    const toStart = PathUtils.compare(path, range.start.path)
+    const toEnd =
+      range.start.key === range.end.key
+        ? toStart
+        : PathUtils.compare(path, range.end.path)
+
+    const is = toStart !== -1 && toEnd !== 1
+    return is
+  }
+
+  /**
    * Map all child nodes, updating them in their parents. This method is
    * optimized to not return a new node if no changes are made.
    *
