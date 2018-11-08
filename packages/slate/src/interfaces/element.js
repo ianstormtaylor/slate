@@ -1,6 +1,6 @@
 import direction from 'direction'
 import invariant from 'tiny-invariant'
-import { List, OrderedSet, Set } from 'immutable'
+import { List, OrderedSet, Set, Stack } from 'immutable'
 
 import mixin from '../utils/mixin'
 import Block from '../models/block'
@@ -914,6 +914,75 @@ class ElementInterface {
   }
 
   /**
+   * Get all of the nodes in a `range`. This includes all of the
+   * text nodes inside the range and all ancestors of those text
+   * nodes up to this node.
+   *
+   * @param {Range} range
+   * @return {List<Node>}
+   */
+
+  getNodesAtRange(range) {
+    range = this.resolveRange(range)
+    if (range.isUnset) return List()
+    const { start, end } = range
+
+    // Do a depth-first stack-based search for all nodes in the range
+    // Nodes that are pushed to the stack are inside the range
+
+    // Start with the nodes that are on the highest level in the tree
+    let stack = Stack(
+      this.nodes
+        .slice(start.path.get(0), end.path.get(0) + 1)
+        .map((node, index) => ({
+          node,
+          onStartEdge: index === 0,
+          onEndEdge: index === end.path.get(0) - start.path.get(0),
+          relativeStartPath: start.path.slice(1),
+          relativeEndPath: end.path.slice(1),
+        }))
+    )
+
+    const result = []
+
+    while (stack.size > 0) {
+      const {
+        node,
+        onStartEdge,
+        onEndEdge,
+        relativeStartPath,
+        relativeEndPath,
+      } = stack.peek()
+
+      stack = stack.shift()
+      result.push(node)
+
+      if (node.object === 'text') continue
+
+      // Modify indexes to exclude children that are outside of the range
+      const startIndex = onStartEdge ? relativeStartPath.get(0) : 0
+      const endIndex = onEndEdge ? relativeEndPath.get(0) : node.nodes.size - 1
+
+      // Push children that are inside the range to the stack
+      stack = stack.pushAll(
+        node.nodes.slice(startIndex, endIndex + 1).map((n, i) => ({
+          node: n,
+          onStartEdge: onStartEdge && i === 0,
+          onEndEdge: onEndEdge && i === endIndex - startIndex,
+          relativeStartPath:
+            onStartEdge && i === 0 ? relativeStartPath.slice(1) : null,
+          relativeEndPath:
+            onEndEdge && i === endIndex - startIndex
+              ? relativeEndPath.slice(1)
+              : null,
+        }))
+      )
+    }
+
+    return List(result)
+  }
+
+  /**
    * Get the offset for a descendant text node by `key`.
    *
    * @param {String} key
@@ -1797,6 +1866,7 @@ memoize(ElementInterface.prototype, [
   'getInlinesByTypeAsArray',
   'getMarksAsArray',
   'getMarksAtPosition',
+  'getNodesAtRange',
   'getOrderedMarksBetweenPositions',
   'getInsertMarksAtRange',
   'getMarksByTypeAsArray',

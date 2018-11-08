@@ -253,6 +253,12 @@ Get the next [`Text`](./text.md) node after a descendant by `path` or `key`.
 
 Get a node in the tree by `path` or `key`.
 
+### `getNodesAtRange`
+
+`getNodesAtRange(range: Range) => List`
+
+Get all of the nodes in a `range`. This includes all of the [`Text`](./text.md) nodes inside the range and all ancestors of those [`Text`](./text.md) nodes up to this node.
+
 ### `getOffset`
 
 `getOffset(path: List|Array) => Number`
