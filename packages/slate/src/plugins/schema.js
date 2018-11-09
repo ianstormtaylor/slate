@@ -361,7 +361,7 @@ function validateLast(node, rule) {
 function validateNodes(node, rule, rules = []) {
   if (node.nodes == null) return
 
-  const children = node.nodes.toArray()
+  const children = node.nodes
   const defs = rule.nodes != null ? rule.nodes.slice() : []
   let count = 0
   let lastCount = 0
@@ -386,8 +386,8 @@ function validateNodes(node, rule, rules = []) {
   function nextChild() {
     index += 1
     previous = child
-    child = children[index]
-    next = children[index + 1]
+    child = children.get(index)
+    next = children.get(index + 1)
     if (!child) return false
     lastCount = count
     count += 1
