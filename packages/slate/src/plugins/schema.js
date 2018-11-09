@@ -357,7 +357,7 @@ function validateLast(node, rule) {
 function validateNodes(node, rule, rules = []) {
   if (node.nodes == null) return
 
-  const children = node.nodes.toArray()
+  const children = node.nodes
   const defs = rule.nodes != null ? rule.nodes.slice() : []
   let offset
   let min
@@ -380,8 +380,8 @@ function validateNodes(node, rule, rules = []) {
     index = index == null ? 0 : index + 1
     offset = offset == null ? 0 : offset + 1
     previous = child
-    child = children[index]
-    next = children[index + 1]
+    child = children.get(index)
+    next  = children.get(index + 1)
     if (max != null && offset == max) nextDef()
     return !!child
   }
