@@ -381,7 +381,7 @@ function validateNodes(node, rule, rules = []) {
     offset = offset == null ? 0 : offset + 1
     previous = child
     child = children.get(index)
-    next  = children.get(index + 1)
+    next = children.get(index + 1)
     if (max != null && offset == max) nextDef()
     return !!child
   }
