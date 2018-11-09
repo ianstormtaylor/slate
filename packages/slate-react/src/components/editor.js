@@ -35,6 +35,7 @@ class Editor extends React.Component {
     autoCorrect: Types.bool,
     autoFocus: Types.bool,
     className: Types.string,
+    id: Types.string,
     onChange: Types.func,
     options: Types.object,
     placeholder: Types.any,
@@ -120,6 +121,14 @@ class Editor extends React.Component {
       this.props.onChange(this.tmp.change)
       this.tmp.change = null
     }
+  }
+
+  /**
+   * When the component unmounts, make sure async commands don't trigger react updates.
+   */
+
+  componentWillUnmount() {
+    this.tmp.mounted = false
   }
 
   /**

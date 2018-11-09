@@ -916,7 +916,7 @@ Commands.removeMarkAtRange = (editor, range, mark) => {
 Commands.setBlocksAtRange = (editor, range, properties) => {
   const { value } = editor
   const { document } = value
-  const blocks = document.getBlocksAtRange(range)
+  const blocks = document.getLeafBlocksAtRange(range)
 
   const { start, end, isCollapsed } = range
   const isStartVoid = document.hasVoidParent(start.key, editor)
@@ -955,7 +955,7 @@ Commands.setBlocksAtRange = (editor, range, properties) => {
 Commands.setInlinesAtRange = (editor, range, properties) => {
   const { value } = editor
   const { document } = value
-  const inlines = document.getInlinesAtRange(range)
+  const inlines = document.getLeafInlinesAtRange(range)
 
   editor.withoutNormalizing(() => {
     inlines.forEach(inline => {
@@ -1076,7 +1076,7 @@ Commands.unwrapBlockAtRange = (editor, range, properties) => {
 
   const { value } = editor
   let { document } = value
-  const blocks = document.getBlocksAtRange(range)
+  const blocks = document.getLeafBlocksAtRange(range)
   const wrappers = blocks
     .map(block => {
       return document.getClosest(block.key, parent => {
@@ -1202,7 +1202,7 @@ Commands.wrapBlockAtRange = (editor, range, block) => {
   const { value } = editor
   const { document } = value
 
-  const blocks = document.getBlocksAtRange(range)
+  const blocks = document.getLeafBlocksAtRange(range)
   const firstblock = blocks.first()
   const lastblock = blocks.last()
   let parent, siblings, index
@@ -1282,7 +1282,7 @@ Commands.wrapInlineAtRange = (editor, range, inline) => {
   inline = Inline.create(inline)
   inline = inline.set('nodes', inline.nodes.clear())
 
-  const blocks = document.getBlocksAtRange(range)
+  const blocks = document.getLeafBlocksAtRange(range)
   let startBlock = document.getClosestBlock(start.key)
   let endBlock = document.getClosestBlock(end.key)
   const startInline = document.getClosestInline(start.key)

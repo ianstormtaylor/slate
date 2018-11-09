@@ -68,6 +68,16 @@ const config = {
       title: 'Slate',
       template: HtmlWebpackTemplate,
       inject: false,
+      // Note: this is not the correct format meta for HtmlWebpackPlugin, which
+      // accepts a single object of key=name and value=content. We need to
+      // format it this way for HtmlWebpackTemplate which expects an array of
+      // objects instead.
+      meta: [
+        {
+          name: 'viewport',
+          content: 'width=device-width, initial-scale=1',
+        },
+      ],
       scripts: ['https://cdn.polyfill.io/v2/polyfill.min.js'],
       links: [
         'https://fonts.googleapis.com/css?family=Roboto:400,400i,700,700i&subset=latin-ext',

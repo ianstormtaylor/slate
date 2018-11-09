@@ -31,6 +31,7 @@ const debug = Debug('slate:after')
 
 function AfterPlugin(options = {}) {
   let isDraggingInternally = null
+  let isMouseDown = false
 
   /**
    * On before input.
@@ -376,6 +377,30 @@ function AfterPlugin(options = {}) {
   }
 
   /**
+   * On focus.
+   *
+   * @param {Event} event
+   * @param {Editor} editor
+   * @param {Function} next
+   */
+
+  function onFocus(event, editor, next) {
+    debug('onFocus', { event })
+
+    // COMPAT: If the focus event is a mouse-based one, it will be shortly
+    // followed by a `selectionchange`, so we need to deselect here to prevent
+    // the old selection from being set by the `updateSelection` of `<Content>`,
+    // preventing the `selectionchange` from firing. (2018/11/07)
+    if (isMouseDown) {
+      editor.deselect().focus()
+    } else {
+      editor.focus()
+    }
+
+    next()
+  }
+
+  /**
    * On input.
    *
    * @param {Event} event
@@ -581,6 +606,34 @@ function AfterPlugin(options = {}) {
   }
 
   /**
+   * On mouse down.
+   *
+   * @param {Event} event
+   * @param {Editor} editor
+   * @param {Function} next
+   */
+
+  function onMouseDown(event, editor, next) {
+    debug('onMouseDown', { event })
+    isMouseDown = true
+    next()
+  }
+
+  /**
+   * On mouse up.
+   *
+   * @param {Event} event
+   * @param {Editor} editor
+   * @param {Function} next
+   */
+
+  function onMouseUp(event, editor, next) {
+    debug('onMouseUp', { event })
+    isMouseDown = false
+    next()
+  }
+
+  /**
    * On paste.
    *
    * @param {Event} event
@@ -638,7 +691,10 @@ function AfterPlugin(options = {}) {
 
     // Otherwise, determine the Slate selection from the native one.
     let range = findRange(native, editor)
-    if (!range) return
+
+    if (!range) {
+      return
+    }
 
     const { anchor, focus } = range
     const anchorText = document.getNode(anchor.key)
@@ -715,8 +771,11 @@ function AfterPlugin(options = {}) {
     onDragEnd,
     onDragStart,
     onDrop,
+    onFocus,
     onInput,
     onKeyDown,
+    onMouseDown,
+    onMouseUp,
     onPaste,
     onSelect,
   }

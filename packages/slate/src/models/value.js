@@ -378,7 +378,7 @@ class Value extends Record(DEFAULTS) {
   get blocks() {
     return this.selection.isUnset
       ? new List()
-      : this.document.getBlocksAtRange(this.selection)
+      : this.document.getLeafBlocksAtRange(this.selection)
   }
 
   /**
@@ -394,7 +394,7 @@ class Value extends Record(DEFAULTS) {
   }
 
   /**
-   * Get the inline nodes in the current selection.
+   * Get the bottom-most inline nodes in the current selection.
    *
    * @return {List<Inline>}
    */
@@ -402,7 +402,7 @@ class Value extends Record(DEFAULTS) {
   get inlines() {
     return this.selection.isUnset
       ? new List()
-      : this.document.getInlinesAtRange(this.selection)
+      : this.document.getLeafInlinesAtRange(this.selection)
   }
 
   /**

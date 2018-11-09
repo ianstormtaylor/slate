@@ -134,7 +134,11 @@ class Leaf extends React.Component {
     // COMPAT: Render text inside void nodes with a zero-width space.
     // So the node can contain selection but the text is not visible.
     if (editor.query('isVoid', parent)) {
-      return <span data-slate-zero-width="z">{'\uFEFF'}</span>
+      return (
+        <span data-slate-zero-width="z" data-slate-length={parent.text.length}>
+          {'\uFEFF'}
+        </span>
+      )
     }
 
     // COMPAT: If this is the last text node in an empty block, render a zero-
@@ -147,7 +151,7 @@ class Leaf extends React.Component {
       parent.nodes.last() === node
     ) {
       return (
-        <span data-slate-zero-width="n">
+        <span data-slate-zero-width="n" data-slate-length={0}>
           {'\uFEFF'}
           <br />
         </span>
@@ -158,7 +162,11 @@ class Leaf extends React.Component {
     // node, so we render a zero-width space so that the selection can be
     // inserted next to it still.
     if (text === '') {
-      return <span data-slate-zero-width="z">{'\uFEFF'}</span>
+      return (
+        <span data-slate-zero-width="z" data-slate-length={0}>
+          {'\uFEFF'}
+        </span>
+      )
     }
 
     // COMPAT: Browsers will collapse trailing new lines at the end of blocks,
@@ -167,7 +175,8 @@ class Leaf extends React.Component {
     const lastChar = text.charAt(text.length - 1)
     const isLastText = node === lastText
     const isLastLeaf = index === leaves.size - 1
-    if (isLastText && isLastLeaf && lastChar === '\n') return `${text}\n`
+    if (isLastText && isLastLeaf && lastChar === '\n')
+      return <span data-slate-content>{`${text}\n`}</span>
 
     // Otherwise, just return the content.
     return <span data-slate-content>{text}</span>

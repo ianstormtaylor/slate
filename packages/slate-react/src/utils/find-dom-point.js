@@ -21,14 +21,17 @@ function findDOMPoint(point, win = window) {
 
   for (const text of texts) {
     const node = text.childNodes[0]
+    const domLength = node.textContent.length
+    let slateLength = domLength
 
-    // Account zero-width spaces which shouldn't really take up space, because
-    // we only render them when the text is empty.
-    const length = node.textContent === '\uFEFF' ? 0 : node.textContent.length
-    const end = start + length
+    if (text.hasAttribute('data-slate-length')) {
+      slateLength = parseInt(text.getAttribute('data-slate-length'), 10)
+    }
+
+    const end = start + slateLength
 
     if (point.offset <= end) {
-      const offset = Math.max(0, point.offset - start)
+      const offset = Math.min(domLength, Math.max(0, point.offset - start))
       return { node, offset }
     }
 

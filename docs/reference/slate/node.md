@@ -61,9 +61,9 @@ Get the ancestors of a descendant by `path` or `key`.
 
 Get all of the bottom-most [`Block`](./block.md) node descendants.
 
-### `getBlocksAtRange`
+### `getLeafBlocksAtRange`
 
-`getBlocksAtRange(range: Range) => List`
+`getLeafBlocksAtRange(range: Range) => List`
 
 Get all of the bottom-most [`Block`](./block.md) nodes in a `range`.
 
@@ -182,11 +182,11 @@ Get the furthest ancestor of a node by `path` or `key` that has only one child.
 
 Get all of the top-most [`Inline`](./inline.md) nodes in a node.
 
-### `getInlinesAtRange`
+### `getLeafInlinesAtRange`
 
-`getInlinesAtRange(range: Range) => List`
+`getLeafInlinesAtRange(range: Range) => List`
 
-Get all of the top-most [`Inline`](./inline.md) nodes in a `range`.
+Get all of the bottom-most [`Inline`](./inline.md) nodes in a `range`.
 
 ### `getInlinesByType`
 
@@ -253,6 +253,12 @@ Get the next [`Text`](./text.md) node after a descendant by `path` or `key`.
 
 Get a node in the tree by `path` or `key`.
 
+### `getNodesAtRange`
+
+`getNodesAtRange(range: Range) => List`
+
+Get all of the nodes in a `range`. This includes all of the [`Text`](./text.md) nodes inside the range and all ancestors of those [`Text`](./text.md) nodes up to this node.
+
 ### `getOffset`
 
 `getOffset(path: List|Array) => Number`
@@ -302,6 +308,18 @@ Get the previous sibling of a descendant by `path` or `key`.
 
 Get the previous [`Text`](./text.md) node before a descendant by `path` or `key`.
 
+### `getRootBlocksAtRange`
+
+`getRootBlocksAtRange(range: Range) => List`
+
+Get all of the top-most [`Block`](./block.md) nodes in a `range`.
+
+### `getRootInlinesAtRange`
+
+`getRootInlinesAtRange(range: Range) => List`
+
+Get all of the top-most [`Inline`](./inline.md) nodes in a `range`.
+
 ### `getTextAtOffset`
 
 `getTextAtOffset(offset: Number) => Text || Void`
@@ -346,3 +364,10 @@ Check whether the node has a descendant node by `path` or `key`.
 `hasNode(key: String) => Boolean`
 
 Check whether a node exists in the tree by `path` or `key`.
+
+### `isNodeInRange`
+
+`isNodeInRange(path: List|Array) => Boolean`
+`isNodeInRange(key: String) => Boolean`
+
+Check whether a node is inside a `range`. This will return true for all [`Text`](./text.md) nodes inside the range and all ancestors of those [`Text`](./text.md) nodes up to this node.

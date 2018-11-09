@@ -10,6 +10,7 @@ The top-level React component that renders the Slate editor itself.
 
 ```js
 <Editor
+  id={String}
   autoCorrect={Boolean}
   autoFocus={Boolean}
   className={String}
@@ -27,6 +28,12 @@ The top-level React component that renders the Slate editor itself.
   tabIndex={Number}
 />
 ```
+
+### `id`
+
+`String`
+
+Id for the top-level rendered HTML element of the editor.
 
 ### `autoCorrect`
 

@@ -21,7 +21,7 @@ export const input = (
     <document>
       <quote>
         <paragraph>one</paragraph>
-        <paragraph>two</paragraph>
+        <block type="title">two</block>
       </quote>
     </document>
   </value>

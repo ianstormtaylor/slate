@@ -41,6 +41,7 @@ class Content extends React.Component {
     autoCorrect: Types.bool.isRequired,
     className: Types.string,
     editor: Types.object.isRequired,
+    id: Types.string,
     readOnly: Types.bool.isRequired,
     role: Types.string,
     spellCheck: Types.bool.isRequired,
@@ -146,103 +147,120 @@ class Content extends React.Component {
     const { isBackward } = selection
     const window = getWindow(this.element)
     const native = window.getSelection()
+    const { activeElement } = window.document
 
-    // .getSelection() can return null in some cases
-    // https://bugzilla.mozilla.org/show_bug.cgi?id=827585
-    if (!native) return
+    // COMPAT: In Firefox, there's a but where `getSelection` can return `null`.
+    // https://bugzilla.mozilla.org/show_bug.cgi?id=827585 (2018/11/07)
+    if (!native) {
+      return
+    }
 
     const { rangeCount, anchorNode } = native
+    let updated = false
 
-    // If both selections are blurred, do nothing.
-    if (!rangeCount && selection.isBlurred) return
-
-    // If the selection has been blurred, but is still inside the editor in the
-    // DOM, blur it manually.
-    if (selection.isBlurred) {
-      if (!this.isInEditor(anchorNode)) return
-      removeAllRanges(native)
+    // If the Slate selection is blurred, but the DOM's active element is still
+    // the editor, we need to blur it.
+    if (selection.isBlurred && activeElement === this.element) {
       this.element.blur()
-      debug('updateSelection', { selection, native })
-      return
+      updated = true
     }
 
-    // If the selection isn't set, do nothing.
-    if (selection.isUnset) return
+    // If the Slate selection is unset, but the DOM selection has a range
+    // selected in the editor, we need to remove the range.
+    if (selection.isUnset && rangeCount && this.isInEditor(anchorNode)) {
+      removeAllRanges(native)
+      updated = true
+    }
+
+    // If the Slate selection is focused, but the DOM's active element is not
+    // the editor, we need to focus it.
+    if (selection.isFocused && activeElement !== this.element) {
+      this.element.focus()
+      updated = true
+    }
 
     // Otherwise, figure out which DOM nodes should be selected...
-    const current = !!rangeCount && native.getRangeAt(0)
-    const range = findDOMRange(selection, window)
+    if (selection.isFocused && selection.isSet) {
+      const current = !!rangeCount && native.getRangeAt(0)
+      const range = findDOMRange(selection, window)
 
-    if (!range) {
-      warning(
-        false,
-        'Unable to find a native DOM range from the current selection.'
-      )
+      if (!range) {
+        warning(
+          false,
+          'Unable to find a native DOM range from the current selection.'
+        )
 
-      return
-    }
-
-    const { startContainer, startOffset, endContainer, endOffset } = range
-
-    // If the new range matches the current selection, there is nothing to fix.
-    // COMPAT: The native `Range` object always has it's "start" first and "end"
-    // last in the DOM. It has no concept of "backwards/forwards", so we have
-    // to check both orientations here. (2017/10/31)
-    if (current) {
-      if (
-        (startContainer == current.startContainer &&
-          startOffset == current.startOffset &&
-          endContainer == current.endContainer &&
-          endOffset == current.endOffset) ||
-        (startContainer == current.endContainer &&
-          startOffset == current.endOffset &&
-          endContainer == current.startContainer &&
-          endOffset == current.startOffset)
-      ) {
         return
       }
-    }
 
-    // Otherwise, set the `isUpdatingSelection` flag and update the selection.
-    this.tmp.isUpdatingSelection = true
-    removeAllRanges(native)
+      const { startContainer, startOffset, endContainer, endOffset } = range
 
-    // COMPAT: IE 11 does not support Selection.setBaseAndExtent
-    if (native.setBaseAndExtent) {
-      // COMPAT: Since the DOM range has no concept of backwards/forwards
-      // we need to check and do the right thing here.
-      if (isBackward) {
-        native.setBaseAndExtent(
-          range.endContainer,
-          range.endOffset,
-          range.startContainer,
-          range.startOffset
-        )
-      } else {
-        native.setBaseAndExtent(
-          range.startContainer,
-          range.startOffset,
-          range.endContainer,
-          range.endOffset
-        )
+      // If the new range matches the current selection, there is nothing to fix.
+      // COMPAT: The native `Range` object always has it's "start" first and "end"
+      // last in the DOM. It has no concept of "backwards/forwards", so we have
+      // to check both orientations here. (2017/10/31)
+      if (current) {
+        if (
+          (startContainer == current.startContainer &&
+            startOffset == current.startOffset &&
+            endContainer == current.endContainer &&
+            endOffset == current.endOffset) ||
+          (startContainer == current.endContainer &&
+            startOffset == current.endOffset &&
+            endContainer == current.startContainer &&
+            endOffset == current.startOffset)
+        ) {
+          return
+        }
       }
-    } else {
-      // COMPAT: IE 11 does not support Selection.extend, fallback to addRange
-      native.addRange(range)
+
+      // Otherwise, set the `isUpdatingSelection` flag and update the selection.
+      updated = true
+      this.tmp.isUpdatingSelection = true
+      removeAllRanges(native)
+
+      // COMPAT: IE 11 does not support `setBaseAndExtent`. (2018/11/07)
+      if (native.setBaseAndExtent) {
+        // COMPAT: Since the DOM range has no concept of backwards/forwards
+        // we need to check and do the right thing here.
+        if (isBackward) {
+          native.setBaseAndExtent(
+            range.endContainer,
+            range.endOffset,
+            range.startContainer,
+            range.startOffset
+          )
+        } else {
+          native.setBaseAndExtent(
+            range.startContainer,
+            range.startOffset,
+            range.endContainer,
+            range.endOffset
+          )
+        }
+      } else {
+        native.addRange(range)
+      }
+
+      // Scroll to the selection, in case it's out of view.
+      scrollToSelection(native)
+
+      // Then unset the `isUpdatingSelection` flag after a delay, to ensure that
+      // it is still set when selection-related events from updating it fire.
+      setTimeout(() => {
+        // COMPAT: In Firefox, it's not enough to create a range, you also need
+        // to focus the contenteditable element too. (2016/11/16)
+        if (IS_FIREFOX && this.element) {
+          this.element.focus()
+        }
+
+        this.tmp.isUpdatingSelection = false
+      })
     }
 
-    // Scroll to the selection, in case it's out of view.
-    scrollToSelection(native)
-
-    // Then unset the `isUpdatingSelection` flag after a delay.
-    setTimeout(() => {
-      // COMPAT: In Firefox, it's not enough to create a range, you also need to
-      // focus the contenteditable element too. (2016/11/16)
-      if (IS_FIREFOX && this.element) this.element.focus()
-      this.tmp.isUpdatingSelection = false
-    })
-
-    debug('updateSelection', { selection, native })
+    if (updated) {
+      debug('updateSelection', { selection, native, activeElement })
+    }
   }
 
   /**
@@ -345,9 +363,11 @@ class Content extends React.Component {
       handler == 'onDragStart' ||
       handler == 'onDrop'
     ) {
-      const { target } = event
-      const targetEditorNode = target.closest('[data-slate-editor]')
-      if (targetEditorNode !== this.element) return
+      const closest = event.target.closest('[data-slate-editor]')
+
+      if (closest !== this.element) {
+        return
+      }
     }
 
     // Some events require being in editable in the editor, so if the event
@@ -366,7 +386,9 @@ class Content extends React.Component {
       handler == 'onPaste' ||
       handler == 'onSelect'
     ) {
-      if (!this.isInEditor(event.target)) return
+      if (!this.isInEditor(event.target)) {
+        return
+      }
     }
 
     this.props.onEvent(handler, event)
@@ -400,6 +422,7 @@ class Content extends React.Component {
   render() {
     const { props, handlers } = this
     const {
+      id,
       className,
       readOnly,
       editor,
@@ -446,6 +469,7 @@ class Content extends React.Component {
         data-key={document.key}
         contentEditable={readOnly ? null : true}
         suppressContentEditableWarning
+        id={id}
         className={className}
         autoCorrect={props.autoCorrect ? 'on' : 'off'}
         spellCheck={spellCheck}

@@ -4,6 +4,24 @@ A list of changes to the `slate` package with each new version. Until `1.0.0` is
 
 ---
 
+### `0.44.0` — November 8, 2018
+
+###### NEW
+
+**Introducing the `child_min_invalid` and `child_max_invalid` schema errors.** These new schema errors map directly to the `mix` and `max` schema rule definitions, and make it easier to determine exactly what your normalization logic needs to do to fix the document.
+
+**Added new node retrieval methods.** There are three new methdos for node retrieval. The first is `getNodesAtRange` which will retrieve _all_ of the nodes in the tree in a given range. And the second two are `getRootBlocksAtRange` and `getRootInlinesAtRange` for retrieving the top-most blocks or inlines in a given range. These should be helpful in defining your own command logic.
+
+###### BREAKING
+
+**Schema errors for `min` and `max` rules have changed.** Previously they would result in errors of `child_required`, `child_object_invalid`, `child_type_invalid` and `child_unknown`. Now that we have the new `child_min_invalid` and `child_max_invalid` errors, these schema rules will return them instead, making it much easier to determine exactly which rule is causing a schema error.
+
+###### DEPRECATED
+
+**The `getBlocksAtRange` and `getInlinesAtRange` methods have been renamed.** To clear up confusion about which blocks and inlines are retrieve in the case of nesting, these two methods have been renamed to `getLeafBlocksAtRange` and `getLeafInlinesAtRange` to clarify that they retrieve the bottom-most nodes. And now there are two additional methods called `getRootBlocksAtRange` and `getRootInlinesAtRange` for cases where you want the top-most nodes instead.
+
+---
+
 ### `0.43.0` — October 27, 2018
 
 ###### NEW
@@ -706,6 +724,8 @@ This is just an attempt to make dealing with normalization errors slightly more 
 **`Range` objects now keep track of paths, in addition to keys.** Previously ranges only stored their points as keys. Now both paths and keys are used, which allows you to choose which one is the most convenient or most performant for your use case. They are kept in sync my Slate under the covers.
 
 **A new set of `*ByPath` change methods have been added.** All of the changes you could previously do with a `*ByKey` change are now also supported with a `*ByPath` change of the same name. The path-based changes are often more performant than the key-based ones.
+
+**Paths are now of type [`List`](https://facebook.github.io/immutable-js/docs/#/List) instead of array.** See the documentation of [`List`](https://facebook.github.io/immutable-js/docs/#/List) for its differences to array (`get` method instead of array indexing, `size` instead of `length`, etc).
 
 ###### BREAKING
 
