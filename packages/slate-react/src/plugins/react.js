@@ -120,7 +120,8 @@ function ReactPlugin(options = {}) {
         when: (editor, node) =>
           node.object === 'document' &&
           node.text === '' &&
-          node.nodes.size === 1,
+          node.nodes.size === 1 &&
+          node.getTexts().size === 1,
       })
     )
   }
