@@ -8,17 +8,17 @@ before_install:
 cache: yarn
 
 env:
-  # Do two runs, one for testing and one for linting.
+  # Do multiple runs for testing and linting.
   matrix:
-    - TEST_TYPE=test:coverage	
+    - TEST_TYPE=test
     - TEST_TYPE=lint:eslint
     - TEST_TYPE=lint:prettier
 
 before_script:
+  # When linting, build the dependencies so they can be resolved.
   - |
     set -e
     if [[ $TEST_TYPE == 'lint:eslint' ]]; then
-      lerna bootstrap
       yarn build
     fi
     set +e
@@ -28,5 +28,4 @@ script:
   - |
     set -e
     yarn $TEST_TYPE
-    if [[ $TEST_TYPE == 'test:coverage' ]]; then yarn codecov; fi	
     set +e

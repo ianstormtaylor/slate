@@ -10,7 +10,6 @@
     "babel-eslint": "^8.2.1",
     "babel-loader": "^7.1.2",
     "babel-plugin-external-helpers": "^6.22.0",
-    "babel-plugin-istanbul": "^4.1.6",
     "babel-plugin-module-resolver": "^3.1.1",
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-env": "^1.6.1",
@@ -19,7 +18,6 @@
     "babel-runtime": "^6.26.0",
     "blanket": "^1.2.3",
     "chalk": "^1.1.3",
-    "codecov": "^3.0.4",
     "commander": "^2.15.1",
     "copy-webpack-plugin": "^4.4.1",
     "cross-env": "^5.1.3",
@@ -50,7 +48,6 @@
     "mocha": "^2.5.3",
     "mocha-lcov-reporter": "^1.3.0",
     "npm-run-all": "^4.1.2",
-    "nyc": "^12.0.2",
     "prettier": "^1.10.2",
     "prismjs": "^1.5.1",
     "react": "^16.4.1",
@@ -107,7 +104,6 @@
     "server": "webpack-dev-server --config ./support/webpack/config.js",
     "start": "npm-run-all --parallel --print-label watch server",
     "test": "cross-env BABEL_ENV=test FORBID_WARNINGS=true mocha --require babel-core/register ./packages/*/test/index.js",
-    "test:coverage": "cross-env NODE_ENV=test nyc yarn test",
     "watch": "rollup --config ./support/rollup/config.js --watch"
   }
 }
