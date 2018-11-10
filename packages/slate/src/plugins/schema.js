@@ -160,6 +160,7 @@ function defaultNormalize(editor, error) {
   const { code, node, child, next, previous, key, mark, index } = error
 
   switch (code) {
+    case 'child_max_invalid':
     case 'child_object_invalid':
     case 'child_type_invalid':
     case 'child_unknown':
@@ -199,10 +200,6 @@ function defaultNormalize(editor, error) {
       return node.object === 'document'
         ? node.nodes.forEach(n => editor.removeNodeByKey(n.key))
         : editor.removeNodeByKey(node.key)
-    }
-
-    case 'child_max_invalid': {
-      return editor.removeNodeByKey(node.nodes.get(index).key)
     }
 
     case 'node_data_invalid': {
@@ -431,6 +428,7 @@ function validateNodes(node, rule, rules = []) {
               rule,
               node,
               index,
+              child: children.get(index),
               count,
               limit: max,
             })
@@ -508,6 +506,7 @@ function validateNodes(node, rule, rules = []) {
       node,
       index: index - 1,
       count,
+      child: children.get(index - 1),
       limit: max,
     })
   }
