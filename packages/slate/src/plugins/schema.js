@@ -394,8 +394,8 @@ function validateNodes(node, rule, rules = []) {
     return true
   }
 
-  function rewind(pastZero = false) {
-    if (index > 0 || pastZero) {
+  function rewind() {
+    if (index > 0) {
       index -= 1
       count = lastCount
     }
@@ -422,10 +422,10 @@ function validateNodes(node, rule, rules = []) {
         const error = validateRules(child, def.match)
 
         if (error) {
+          // Since we want to report overflow on last matching child we don't
+          // immediately check for count > max, but instead do so once we find
+          // a child that doesn't match.
           if (max != null && count - 1 > max) {
-            // Since we want to report overflow on last matching child we don't
-            // immediately check for count > max, but instead do so once we find
-            // a child that doesn't match.
             rewind()
             return fail('child_max_invalid', {
               rule,
@@ -441,22 +441,21 @@ function validateNodes(node, rule, rules = []) {
           // If there are more groups after this one then child might actually
           // be valid.
           if (nextDef()) {
-            // We already have all children required for current group, so this
-            // error can safely be ignored.
+            // If we've already satisfied the minimum for the current group,
+            // then we can rewind and proceed to the next group.
             if (lastCount - 1 >= lastMin) {
-              rewind(true)
+              index -= 1
               continue
             }
 
             // Otherwise we know that current value is underflowing. There are
-            // three possible causes: there might just not be enough elements
-            // for current group, and current child is in fact the first of
-            // the next group; current group is underflowing, but there is also
-            // an invalid child before the next group; or current group is not
-            // underflowing but it appears so because there's an invalid child
-            // between its members.
+            // three possible causes for this...
+
+            // 1. There might just not be enough elements for current group, and
+            // current child is in fact the first of the next group. If so, the
+            // next def will not report errors, in which case we can rewind and
+            // report an minimum error.
             if (validateRules(child, def.match) == null) {
-              // It's the first case, so we just report an underflow.
               rewind()
               return fail('child_min_invalid', {
                 rule,
@@ -466,11 +465,15 @@ function validateNodes(node, rule, rules = []) {
                 limit: lastMin,
               })
             }
+
+            // 2. The current group is underflowing, but there is also an
+            // invalid child before the next group.
+            // 3. Or the current group is not underflowing but it appears so
+            // because there's an invalid child between its members.
             // It's either the second or third case. If it's the second then
             // we could report an underflow, but presence of an invalid child
             // is arguably more important, so we report it first. It also lets
             // us avoid checking for which case exactly is it.
-
             error.rule = rule
             error.node = node
             error.child = child
@@ -497,9 +500,9 @@ function validateNodes(node, rule, rules = []) {
     }
   }
 
+  // Since we want to report overflow on last matching child we don't
+  // immediately check for count > max, but do so after processing all nodes.
   if (max != null && count > max) {
-    // Since we want to report overflow on last matching child we don't
-    // immediately check for count > max, but do so after processing all nodes.
     return fail('child_max_invalid', {
       rule,
       node,
