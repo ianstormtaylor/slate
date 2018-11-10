@@ -157,7 +157,7 @@ function SchemaPlugin(schema) {
  */
 
 function defaultNormalize(editor, error) {
-  const { code, node, child, next, previous, key, mark, index } = error
+  const { code, node, child, next, previous, key, mark } = error
 
   switch (code) {
     case 'child_max_invalid':
