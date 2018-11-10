@@ -352,10 +352,10 @@ function transform(path, operation) {
 
     if (pAbove) {
       path = np.concat(path.slice(p.size))
+    } else if (pEqual) {
+      path = np
     } else {
-      if (pEqual) {
-        path = np
-      } else if (pYounger) {
+      if (pYounger) {
         path = decrement(path, 1, pIndex)
       }
 
