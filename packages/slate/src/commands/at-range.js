@@ -794,8 +794,8 @@ Commands.insertFragmentAtRange = (editor, range, fragment) => {
 }
 
 const findInsertionNode = (fragment, document, startKey) => {
-  const hasSingleNode = object => object && object.nodes.size === 1
-  const firstNode = object => object && object.nodes.first()
+  const hasSingleNode = object => object && object.nodes && object.nodes.size === 1
+  const firstNode = object => object && object.nodes && object.nodes.first()
   let node = fragment
 
   if (hasSingleNode(fragment)) {
