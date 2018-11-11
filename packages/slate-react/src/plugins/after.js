@@ -352,7 +352,13 @@ function AfterPlugin(options = {}) {
       }
     }
 
-    if (type == 'fragment') {
+    const schemaHashCodeChecksOut =
+      fragment &&
+      fragment.data.has('schemaHashCode') &&
+      editor.getSchemaHashCode &&
+      fragment.data.get('schemaHashCode') === editor.getSchemaHashCode()
+
+    if (type == 'fragment' && schemaHashCodeChecksOut) {
       editor.insertFragment(fragment)
     }
 
@@ -648,11 +654,21 @@ function AfterPlugin(options = {}) {
     const transfer = getEventTransfer(event)
     const { type, fragment, text } = transfer
 
-    if (type == 'fragment') {
+    const schemaHashCodeChecksOut =
+      fragment &&
+      fragment.data.has('schemaHashCode') &&
+      editor.getSchemaHashCode &&
+      fragment.data.get('schemaHashCode') === editor.getSchemaHashCode()
+
+    if (type == 'fragment' && schemaHashCodeChecksOut) {
       editor.insertFragment(fragment)
     }
 
-    if (type == 'text' || type == 'html') {
+    if (
+      type == 'text' ||
+      type == 'html' ||
+      (type == 'fragment' && !schemaHashCodeChecksOut)
+    ) {
       if (!text) return next()
       const { document, selection, startBlock } = value
       if (editor.isVoid(startBlock)) return next()

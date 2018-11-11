@@ -1,3 +1,5 @@
+import { List } from 'immutable'
+
 import SlateError from '../utils/slate-error'
 import Queries from './queries'
 
@@ -50,6 +52,8 @@ function SchemaPlugin(schema) {
     }
   }
 
+  const schemaHashCode = List(schemaRules).hashCode()
+
   /**
    * Check if a `mark` is void based on the schema rules.
    *
@@ -80,6 +84,16 @@ function SchemaPlugin(schema) {
     )
 
     return rule && rule.isVoid
+  }
+
+  /**
+   * Get hash code of this schema.
+   *
+   * @return {Number}
+   */
+
+  function getSchemaHashCode() {
+    return schemaHashCode
   }
 
   /**
@@ -138,7 +152,7 @@ function SchemaPlugin(schema) {
    * @param {Function} next
    */
 
-  const queries = Queries({ isAtomic, isVoid })
+  const queries = Queries({ isAtomic, isVoid, getSchemaHashCode })
 
   /**
    * Return the plugins.

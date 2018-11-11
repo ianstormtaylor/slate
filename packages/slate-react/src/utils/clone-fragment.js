@@ -32,12 +32,23 @@ function cloneFragment(event, editor, callback = () => undefined) {
   const startVoid = document.getClosestVoid(start.key, editor)
   const endVoid = document.getClosestVoid(end.key, editor)
 
+  let fragmentToSerialize = fragment
+
+  if (editor.getSchemaHashCode) {
+    const schemaHashCode = editor.getSchemaHashCode()
+    const newData = fragmentToSerialize
+      .get('data')
+      .set('schemaHashCode', schemaHashCode)
+
+    fragmentToSerialize = fragmentToSerialize.set('data', newData)
+  }
+
   // If the selection is collapsed, and it isn't inside a void node, abort.
   if (native.isCollapsed && !startVoid) return
 
   // Create a fake selection so that we can add a Base64-encoded copy of the
   // fragment to the HTML, to decode on future pastes.
-  const encoded = Base64.serializeNode(fragment)
+  const encoded = Base64.serializeNode(fragmentToSerialize)
   const range = native.getRangeAt(0)
   let contents = range.cloneContents()
   let attach = contents.childNodes[0]
@@ -94,7 +105,7 @@ function cloneFragment(event, editor, callback = () => undefined) {
   //  Creates value from only the selected blocks
   //  Then gets plaintext for clipboard with proper linebreaks for BLOCK elements
   //  Via Plain serializer
-  const valFromSelection = Value.create({ document: fragment })
+  const valFromSelection = Value.create({ document: fragmentToSerialize })
   const plainText = Plain.serialize(valFromSelection)
 
   // Add the phony content to a div element. This is needed to copy the
