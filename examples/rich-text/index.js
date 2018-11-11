@@ -144,9 +144,12 @@ class RichTextExample extends React.Component {
     let isActive = this.hasBlock(type)
 
     if (['numbered-list', 'bulleted-list'].includes(type)) {
-      const { value } = this.state
-      const parent = value.document.getParent(value.blocks.first().key)
-      isActive = this.hasBlock('list-item') && parent && parent.type === type
+      const { value: { document, blocks } } = this.state
+
+      if (blocks.size > 0) {
+        const parent = document.getParent(blocks.first().key)
+        isActive = this.hasBlock('list-item') && parent && parent.type === type
+      }
     }
 
     return (
