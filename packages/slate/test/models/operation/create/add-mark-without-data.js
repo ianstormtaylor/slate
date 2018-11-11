@@ -23,5 +23,5 @@ export const output = {
     object: 'mark',
     type: 'b',
   },
-  data: undefined,
+  data: {},
 }

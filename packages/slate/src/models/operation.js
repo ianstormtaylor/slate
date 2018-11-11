@@ -126,6 +126,11 @@ class Operation extends Record(DEFAULTS) {
     for (const key of ATTRIBUTES) {
       let v = object[key]
 
+      // Default `data` to an empty object.
+      if (key === 'data' && v === undefined) {
+        v = {}
+      }
+
       if (v === undefined) {
         // Skip keys for objects that should not be serialized, and are only used
         // for providing the local-only invert behavior for the history stack.
@@ -133,9 +138,6 @@ class Operation extends Record(DEFAULTS) {
         if (key == 'selection') continue
         if (key == 'value') continue
         if (key == 'node' && type != 'insert_node') continue
-
-        // Skip optional user defined data
-        if (key == 'data') continue
 
         throw new Error(
           `\`Operation.fromJSON\` was passed a "${type}" operation without the required "${key}" attribute.`
@@ -311,7 +313,7 @@ class Operation extends Record(DEFAULTS) {
         value = v
       }
 
-      if (key === 'data' && value) {
+      if (key === 'data') {
         value = value.toJSON()
       }
 
