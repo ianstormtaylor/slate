@@ -322,7 +322,16 @@ Commands.deleteBackwardAtRange = (editor, range, n = 1) => {
   const text = document.getDescendant(start.key)
 
   if (start.isAtStartOfNode(text)) {
-    const prev = document.getPreviousText(text.key)
+    let prev = document.getPreviousText(text.key)
+    const inline = document.getClosestInline(text.key)
+
+    // If the range is at the start of the inline node, and previous text node
+    // is empty, take the text node before that, or "prevBlock" would be the
+    // same node as "block"
+    if (inline && prev.text === '') {
+      prev = document.getPreviousText(prev.key)
+    }
+
     const prevBlock = document.getClosestBlock(prev.key)
     const prevVoid = document.getClosestVoid(prev.key, editor)
 
