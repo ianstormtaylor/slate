@@ -32,6 +32,17 @@ function BeforePlugin() {
   let isCopying = false
   let isDragging = false
 
+
+  /**
+   * The before plugin queries.
+   *
+   * @type {Object}
+   */
+
+  const queries = {
+    isComposing: () => isComposing,
+  }
+
   /**
    * On before input.
    *
@@ -480,6 +491,7 @@ function BeforePlugin() {
     onKeyDown,
     onPaste,
     onSelect,
+    queries,
   }
 }
 
