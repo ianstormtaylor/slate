@@ -561,7 +561,7 @@ function normalizeNodeByPath(editor, path) {
   let { document } = value
   let node = document.assertNode(path)
   let iterations = 0
-  const max = 1000 + (node.object === 'text' ? 1 : node.nodes.size)
+  const max = 100 + (node.object === 'text' ? 1 : node.nodes.size)
 
   const iterate = () => {
     const fn = node.normalize(controller)
