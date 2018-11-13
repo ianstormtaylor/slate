@@ -26,7 +26,7 @@ This document maintains a list of changes to the `slate-react` package with each
 
 **Changes are now flushed to `onChange` asynchronously.** Previously this was done synchronously, which resulted in some strange race conditions in React environments. Now they will always be flushed asynchronously, just like `setState`.
 
-**The `render*` and `decorate*` middleware signatures have changed!** Previously the `render*` and `decorate*` middleware was passed `(props, next)`. However now, for consistency with the other middleware they are all passed `(props, editor, next)`. This way, all middleware always receive `editor` and `next` as their final two arguments.
+**The `render*`, `decorate*` and `shouldNodeComponentUpdate` middleware signatures have changed!** Previously the `render*`, `decorate*` and `shouldNodeComponentUpdate` middleware was passed `(props, next)`. However now, for consistency with the other middleware they are all passed `(props, editor, next)`. The `shouldNodeComponentUpdate` is passed `(prevProps, props, editor, next)`. This way, all middleware always receive `editor` and `next` as their final two arguments.
 
 ---
 
