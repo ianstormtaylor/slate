@@ -160,6 +160,7 @@ function defaultNormalize(editor, error) {
   const { code, node, child, next, previous, key, mark } = error
 
   switch (code) {
+    case 'child_max_invalid':
     case 'child_object_invalid':
     case 'child_type_invalid':
     case 'child_unknown':
@@ -192,7 +193,7 @@ function defaultNormalize(editor, error) {
         : editor.removeNodeByKey(next.key)
     }
 
-    case 'child_required':
+    case 'child_min_invalid':
     case 'node_text_invalid':
     case 'parent_object_invalid':
     case 'parent_type_invalid': {
@@ -357,38 +358,44 @@ function validateLast(node, rule) {
 function validateNodes(node, rule, rules = []) {
   if (node.nodes == null) return
 
-  const children = node.nodes.toArray()
+  const children = node.nodes
   const defs = rule.nodes != null ? rule.nodes.slice() : []
-  let offset
-  let min
-  let index
-  let def
-  let max
-  let child
-  let previous
-  let next
+  let count = 0
+  let lastCount = 0
+  let min = null
+  let index = -1
+  let def = null
+  let max = null
+  let child = null
+  let previous = null
+  let next = null
 
   function nextDef() {
-    offset = offset == null ? null : 0
+    if (defs.length === 0) return false
     def = defs.shift()
-    min = def && def.min
-    max = def && def.max
-    return !!def
+    lastCount = count
+    count = 0
+    min = def.min || null
+    max = def.max || null
+    return true
   }
 
   function nextChild() {
-    index = index == null ? 0 : index + 1
-    offset = offset == null ? 0 : offset + 1
+    index += 1
     previous = child
-    child = children[index]
-    next = children[index + 1]
-    if (max != null && offset == max) nextDef()
-    return !!child
+    child = children.get(index)
+    next = children.get(index + 1)
+    if (!child) return false
+    lastCount = count
+    count += 1
+    return true
   }
 
   function rewind() {
-    offset -= 1
-    index -= 1
+    if (index > 0) {
+      index -= 1
+      count = lastCount
+    }
   }
 
   if (rule.nodes != null) {
@@ -411,12 +418,75 @@ function validateNodes(node, rule, rules = []) {
       if (def.match) {
         const error = validateRules(child, def.match)
 
-        if (error && offset >= min && nextDef()) {
-          rewind()
-          continue
-        }
-
         if (error) {
+          // Since we want to report overflow on last matching child we don't
+          // immediately check for count > max, but instead do so once we find
+          // a child that doesn't match.
+          if (max != null && count - 1 > max) {
+            rewind()
+            return fail('child_max_invalid', {
+              rule,
+              node,
+              index,
+              child: children.get(index),
+              count,
+              limit: max,
+            })
+          }
+
+          const lastMin = min
+
+          // If there are more groups after this one then child might actually
+          // be valid.
+          if (nextDef()) {
+            // If we've already satisfied the minimum for the current group,
+            // then we can rewind and proceed to the next group.
+            if (lastCount - 1 >= lastMin) {
+              index -= 1
+              continue
+            }
+
+            // Otherwise we know that current value is underflowing. There are
+            // three possible causes for this...
+
+            // 1. There might just not be enough elements for current group, and
+            // current child is in fact the first of the next group. If so, the
+            // next def will not report errors, in which case we can rewind and
+            // report an minimum error.
+            if (validateRules(child, def.match) == null) {
+              rewind()
+              return fail('child_min_invalid', {
+                rule,
+                node,
+                index,
+                count: lastCount - 1,
+                limit: lastMin,
+              })
+            }
+
+            // 2. The current group is underflowing, but there is also an
+            // invalid child before the next group.
+            // 3. Or the current group is not underflowing but it appears so
+            // because there's an invalid child between its members.
+            // It's either the second or third case. If it's the second then
+            // we could report an underflow, but presence of an invalid child
+            // is arguably more important, so we report it first. It also lets
+            // us avoid checking for which case exactly is it.
+            error.rule = rule
+            error.node = node
+            error.child = child
+            error.index = index
+            error.code = error.code.replace('node_', 'child_')
+            return error
+          }
+
+          // Otherwise either we exhausted the last group, in which case it's
+          // an unknown child, ...
+          if (max != null && count > max) {
+            return fail('child_unknown', { rule, node, child, index })
+          }
+
+          // ... or it's an invalid child for the last group.
           error.rule = rule
           error.node = node
           error.child = child
@@ -428,14 +498,31 @@ function validateNodes(node, rule, rules = []) {
     }
   }
 
-  if (rule.nodes != null) {
-    while (min != null) {
-      if (offset < min) {
-        return fail('child_required', { rule, node, index })
-      }
+  // Since we want to report overflow on last matching child we don't
+  // immediately check for count > max, but do so after processing all nodes.
+  if (max != null && count > max) {
+    return fail('child_max_invalid', {
+      rule,
+      node,
+      index: index - 1,
+      count,
+      child: children.get(index - 1),
+      limit: max,
+    })
+  }
 
-      nextDef()
-    }
+  if (rule.nodes != null) {
+    do {
+      if (count < min) {
+        return fail('child_min_invalid', {
+          rule,
+          node,
+          index,
+          count,
+          limit: min,
+        })
+      }
+    } while (nextDef())
   }
 }
 

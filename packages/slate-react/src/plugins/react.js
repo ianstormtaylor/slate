@@ -60,6 +60,7 @@ function ReactPlugin(options = {}) {
         autoCorrect={props.autoCorrect}
         className={props.className}
         editor={editor}
+        id={props.id}
         onEvent={(handler, event) => editor.run(handler, event)}
         readOnly={props.readOnly}
         role={props.role}
@@ -119,7 +120,8 @@ function ReactPlugin(options = {}) {
         when: (editor, node) =>
           node.object === 'document' &&
           node.text === '' &&
-          node.nodes.size === 1,
+          node.nodes.size === 1 &&
+          node.getTexts().size === 1,
       })
     )
   }

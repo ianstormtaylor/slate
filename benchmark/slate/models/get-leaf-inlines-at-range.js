@@ -4,7 +4,7 @@
 const h = require('../../helpers/h')
 
 module.exports.default = function(value) {
-  value.document.getBlocksAtRange(value.selection)
+  value.document.getLeafInlinesAtRange(value.selection)
 }
 
 const value = (
@@ -26,6 +26,6 @@ const value = (
   .change()
   .moveToRangeOfDocument().value
 
-module.exports.input = () => {
+module.exports.input = function() {
   return value
 }
