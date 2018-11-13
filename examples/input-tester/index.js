@@ -3,9 +3,17 @@ import { Value } from 'slate'
 
 import React from 'react'
 import styled from 'react-emotion'
-import initialValue from './value.json'
+import initialValueAsJson from './value.json'
 import { Icon } from '../components'
 import { createArrayValue } from 'react-values'
+
+/**
+ * Deserialize the initial editor value.
+ *
+ * @type {Object}
+ */
+
+const initialValue = Value.fromJSON(initialValueAsJson)
 
 const EventsValue = createArrayValue()
 
@@ -193,10 +201,6 @@ const Event = ({ event, targetRange, selection }) => {
 }
 
 class InputTester extends React.Component {
-  state = {
-    value: Value.fromJSON(initialValue),
-  }
-
   componentDidMount() {
     const editor = this.el.querySelector('[contenteditable="true"]')
     editor.addEventListener('keydown', this.onEvent)
@@ -221,7 +225,7 @@ class InputTester extends React.Component {
           spellCheck
           placeholder="Enter some text..."
           ref={this.ref}
-          value={this.state.value}
+          defaultValue={initialValue}
           onChange={this.onChange}
           renderNode={this.renderNode}
           renderMark={this.renderMark}
