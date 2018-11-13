@@ -2,7 +2,15 @@ import { Editor } from 'slate-react'
 import { Value } from 'slate'
 
 import React from 'react'
-import initialValue from './value.json'
+import initialValueAsJson from './value.json'
+
+/**
+ * Deserialize the initial editor value.
+ *
+ * @type {Object}
+ */
+
+const initialValue = Value.fromJSON(initialValueAsJson)
 
 /**
  * A right-to-left text example.
@@ -11,16 +19,6 @@ import initialValue from './value.json'
  */
 
 class RTL extends React.Component {
-  /**
-   * Deserialize the initial editor value.
-   *
-   * @type {Object}
-   */
-
-  state = {
-    value: Value.fromJSON(initialValue),
-  }
-
   /**
    * Render the editor.
    *
@@ -31,8 +29,7 @@ class RTL extends React.Component {
     return (
       <Editor
         placeholder="Enter some plain text..."
-        value={this.state.value}
-        onChange={this.onChange}
+        defaultValue={initialValue}
         onKeyDown={this.onKeyDown}
         renderNode={this.renderNode}
       />
@@ -55,16 +52,6 @@ class RTL extends React.Component {
       default:
         return next()
     }
-  }
-
-  /**
-   * On change.
-   *
-   * @param {Editor} editor
-   */
-
-  onChange = ({ value }) => {
-    this.setState({ value })
   }
 
   /**
