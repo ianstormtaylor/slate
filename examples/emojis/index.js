@@ -2,9 +2,17 @@ import { Editor } from 'slate-react'
 import { Value } from 'slate'
 
 import React from 'react'
-import initialValue from './value.json'
+import initialValueAsJson from './value.json'
 import styled from 'react-emotion'
 import { Button, Icon, Toolbar } from '../components'
+
+/**
+ * Deserialize the initial editor value.
+ *
+ * @type {Object}
+ */
+
+const initialValue = Value.fromJSON(initialValueAsJson)
 
 /**
  * A styled emoji inline component.
@@ -58,16 +66,6 @@ const noop = e => e.preventDefault()
 
 class Emojis extends React.Component {
   /**
-   * Deserialize the raw initial value.
-   *
-   * @type {Object}
-   */
-
-  state = {
-    value: Value.fromJSON(initialValue),
-  }
-
-  /**
    * The editor's schema.
    *
    * @type {Object}
@@ -110,9 +108,8 @@ class Emojis extends React.Component {
         <Editor
           placeholder="Write some 😍👋🎉..."
           ref={this.ref}
-          value={this.state.value}
+          defaultValue={initialValue}
           schema={this.schema}
-          onChange={this.onChange}
           renderNode={this.renderNode}
         />
       </div>
@@ -154,16 +151,6 @@ class Emojis extends React.Component {
         return next()
       }
     }
-  }
-
-  /**
-   * On change.
-   *
-   * @param {Editor} editor
-   */
-
-  onChange = ({ value }) => {
-    this.setState({ value })
   }
 
   /**
