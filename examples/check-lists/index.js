@@ -2,8 +2,16 @@ import { Editor } from 'slate-react'
 import { Value } from 'slate'
 
 import React from 'react'
-import initialValue from './value.json'
+import initialValueAsJson from './value.json'
 import styled from 'react-emotion'
+
+/**
+ * Deserialize the initial editor value.
+ *
+ * @type {Object}
+ */
+
+const initialValue = Value.fromJSON(initialValueAsJson)
 
 /**
  * Create a few styling components.
@@ -89,16 +97,6 @@ class CheckListItem extends React.Component {
 
 class CheckLists extends React.Component {
   /**
-   * Deserialize the initial editor value.
-   *
-   * @type {Object}
-   */
-
-  state = {
-    value: Value.fromJSON(initialValue),
-  }
-
-  /**
    * Render.
    *
    * @return {Element}
@@ -109,8 +107,7 @@ class CheckLists extends React.Component {
       <Editor
         spellCheck
         placeholder="Get to work..."
-        value={this.state.value}
-        onChange={this.onChange}
+        defaultValue={initialValue}
         onKeyDown={this.onKeyDown}
         renderNode={this.renderNode}
       />
@@ -131,16 +128,6 @@ class CheckLists extends React.Component {
       default:
         return next()
     }
-  }
-
-  /**
-   * On change, save the new value.
-   *
-   * @param {Editor} editor
-   */
-
-  onChange = ({ value }) => {
-    this.setState({ value })
   }
 
   /**
