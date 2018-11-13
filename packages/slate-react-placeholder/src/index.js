@@ -69,12 +69,12 @@ function SlateReactPlaceholder(options = {}) {
         opacity: '0.333',
       }
 
-      const placeholder = mark.data.get('placeholder')
+      const content = mark.data.get('placeholder')
 
       return (
         <React.Fragment>
           <span contentEditable={false} style={style}>
-            {placeholder}
+            {content}
           </span>
           {children}
         </React.Fragment>
