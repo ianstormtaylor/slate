@@ -41,7 +41,7 @@ function SlateReactPlaceholder(options = {}) {
     const decoration = {
       anchor: { key: first.key, offset: 0 },
       focus: { key: last.key, offset: last.text.length },
-      mark: { type: 'placeholder' },
+      mark: { type: 'placeholder', data: { placeholder } },
     }
 
     return [...others, decoration]
@@ -68,6 +68,8 @@ function SlateReactPlaceholder(options = {}) {
         whiteSpace: 'nowrap',
         opacity: '0.333',
       }
+
+      const placeholder = mark.data.get('placeholder')
 
       return (
         <React.Fragment>
