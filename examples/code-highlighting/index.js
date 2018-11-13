@@ -3,7 +3,15 @@ import { Value } from 'slate'
 
 import Prism from 'prismjs'
 import React from 'react'
-import initialValue from './value.json'
+import initialValueAsJson from './value.json'
+
+/**
+ * Deserialize the initial editor value.
+ *
+ * @type {Object}
+ */
+
+const initialValue = Value.fromJSON(initialValueAsJson)
 
 /**
  * Define our code components.
@@ -68,16 +76,6 @@ function getContent(token) {
 
 class CodeHighlighting extends React.Component {
   /**
-   * Deserialize the raw initial value.
-   *
-   * @type {Object}
-   */
-
-  state = {
-    value: Value.fromJSON(initialValue),
-  }
-
-  /**
    * Render.
    *
    * @return {Component}
@@ -87,8 +85,7 @@ class CodeHighlighting extends React.Component {
     return (
       <Editor
         placeholder="Write some code..."
-        value={this.state.value}
-        onChange={this.onChange}
+        defaultValue={initialValue}
         onKeyDown={this.onKeyDown}
         renderNode={this.renderNode}
         renderMark={this.renderMark}
@@ -153,16 +150,6 @@ class CodeHighlighting extends React.Component {
       default:
         return next()
     }
-  }
-
-  /**
-   * On change, save the new value.
-   *
-   * @param {Editor} editor
-   */
-
-  onChange = ({ value }) => {
-    this.setState({ value })
   }
 
   /**
