@@ -4,24 +4,22 @@ import { Editor } from 'slate-react'
 import React from 'react'
 
 /**
+ * Deserialize the initial editor value.
+ *
+ * @type {Object}
+ */
+
+const initialValue = Plain.deserialize(
+  'This is editable plain text, just like a <textarea>!'
+)
+
+/**
  * The plain text example.
  *
  * @type {Component}
  */
 
 class PlainText extends React.Component {
-  /**
-   * Deserialize the initial editor value.
-   *
-   * @type {Object}
-   */
-
-  state = {
-    value: Plain.deserialize(
-      'This is editable plain text, just like a <textarea>!'
-    ),
-  }
-
   /**
    * Render the editor.
    *
@@ -32,20 +30,9 @@ class PlainText extends React.Component {
     return (
       <Editor
         placeholder="Enter some plain text..."
-        value={this.state.value}
-        onChange={this.onChange}
+        defaultValue={initialValue}
       />
     )
-  }
-
-  /**
-   * On change.
-   *
-   * @param {Editor} editor
-   */
-
-  onChange = ({ value }) => {
-    this.setState({ value })
   }
 }
 
