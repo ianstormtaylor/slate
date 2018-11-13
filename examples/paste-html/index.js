@@ -3,8 +3,16 @@ import { Editor, getEventTransfer } from 'slate-react'
 import { Value } from 'slate'
 
 import React from 'react'
-import initialValue from './value.json'
+import initialValueAsJson from './value.json'
 import styled from 'react-emotion'
+
+/**
+ * Deserialize the initial editor value.
+ *
+ * @type {Object}
+ */
+
+const initialValue = Value.fromJSON(initialValueAsJson)
 
 /**
  * Tags to blocks.
@@ -153,16 +161,6 @@ const serializer = new Html({ rules: RULES })
 
 class PasteHtml extends React.Component {
   /**
-   * Deserialize the raw initial value.
-   *
-   * @type {Object}
-   */
-
-  state = {
-    value: Value.fromJSON(initialValue),
-  }
-
-  /**
    * The editor's schema.
    *
    * @type {Object}
@@ -186,10 +184,9 @@ class PasteHtml extends React.Component {
     return (
       <Editor
         placeholder="Paste in some HTML..."
-        value={this.state.value}
+        defaultValue={initialValue}
         schema={this.schema}
         onPaste={this.onPaste}
-        onChange={this.onChange}
         renderNode={this.renderNode}
         renderMark={this.renderMark}
       />
@@ -275,16 +272,6 @@ class PasteHtml extends React.Component {
       default:
         return next()
     }
-  }
-
-  /**
-   * On change, save the new value.
-   *
-   * @param {Editor} editor
-   */
-
-  onChange = ({ value }) => {
-    this.setState({ value })
   }
 
   /**
