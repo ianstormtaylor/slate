@@ -2,7 +2,15 @@ import { Editor } from 'slate-react'
 import { Block, Value } from 'slate'
 
 import React from 'react'
-import initialValue from './value.json'
+import initialValueAsJson from './value.json'
+
+/**
+ * Deserialize the initial editor value.
+ *
+ * @type {Object}
+ */
+
+const initialValue = Value.fromJSON(initialValueAsJson)
 
 /**
  * A simple schema to enforce the nodes in the Slate document.
@@ -39,16 +47,6 @@ const schema = {
 
 class ForcedLayout extends React.Component {
   /**
-   * Deserialize the initial editor value.
-   *
-   * @type {Object}
-   */
-
-  state = {
-    value: Value.fromJSON(initialValue),
-  }
-
-  /**
    * Render the editor.
    *
    * @return {Component} component
@@ -58,9 +56,8 @@ class ForcedLayout extends React.Component {
     return (
       <Editor
         placeholder="Enter a title..."
-        value={this.state.value}
+        defaultValue={initialValue}
         schema={schema}
-        onChange={this.onChange}
         renderNode={this.renderNode}
       />
     )
@@ -86,16 +83,6 @@ class ForcedLayout extends React.Component {
       default:
         return next()
     }
-  }
-
-  /**
-   * On change.
-   *
-   * @param {Editor} editor
-   */
-
-  onChange = ({ value }) => {
-    this.setState({ value })
   }
 }
 
