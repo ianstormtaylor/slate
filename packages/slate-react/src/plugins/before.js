@@ -32,7 +32,6 @@ function BeforePlugin() {
   let isCopying = false
   let isDragging = false
 
-
   /**
    * The before plugin queries.
    *
