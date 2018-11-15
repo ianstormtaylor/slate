@@ -95,7 +95,7 @@ If you're using Slate for the first time, check out the [Getting Started](http:/
 * [**FAQ**](http://docs.slatejs.org/general/faq)
 * [**Resources**](http://docs.slatejs.org/general/resources)
 
-If even that's not enough, you can always [read the source itself](./src), which is heavily commented.
+If even that's not enough, you can always [read the source itself](../packages/), which is heavily commented.
 
 There are also translations of the documentation into other languages:
 
@@ -105,6 +105,6 @@ If you're maintaining a translation, feel free to pull request it here!
 
 ## Contributing!
 
-All contributions are super welcome! Check out the [Contributing instructions](./Contributing.md) for more info!
+All contributions are super welcome! Check out the [Contributing instructions](../Contributing.md) for more info!
 
-Slate is [MIT-licensed](./License.md).
+Slate is [MIT-licensed](../License.md).
