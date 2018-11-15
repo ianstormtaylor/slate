@@ -105,6 +105,6 @@ If you're maintaining a translation, feel free to pull request it here!
 
 ## Contributing!
 
-All contributions are super welcome! Check out the [Contributing instructions](./Contributing.md) for more info!
+All contributions are super welcome! Check out the [Contributing instructions](../Contributing.md) for more info!
 
 Slate is [MIT-licensed](./License.md).
