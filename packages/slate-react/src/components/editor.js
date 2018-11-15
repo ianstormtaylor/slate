@@ -35,6 +35,7 @@ class Editor extends React.Component {
     autoCorrect: Types.bool,
     autoFocus: Types.bool,
     className: Types.string,
+    defaultValue: SlateTypes.value,
     id: Types.string,
     onChange: Types.func,
     options: Types.object,
@@ -46,7 +47,7 @@ class Editor extends React.Component {
     spellCheck: Types.bool,
     style: Types.object,
     tabIndex: Types.number,
-    value: SlateTypes.value.isRequired,
+    value: SlateTypes.value,
     ...EVENT_HANDLERS.reduce((obj, handler) => {
       obj[handler] = Types.func
       return obj
@@ -77,7 +78,7 @@ class Editor extends React.Component {
    * @type {Object}
    */
 
-  state = {}
+  state = { value: this.props.defaultValue }
 
   /**
    * Temporary values.
@@ -105,7 +106,7 @@ class Editor extends React.Component {
     }
 
     if (this.tmp.change) {
-      this.props.onChange(this.tmp.change)
+      this.handleChange(this.tmp.change)
       this.tmp.change = null
     }
   }
@@ -118,7 +119,7 @@ class Editor extends React.Component {
     this.tmp.updates++
 
     if (this.tmp.change) {
-      this.props.onChange(this.tmp.change)
+      this.handleChange(this.tmp.change)
       this.tmp.change = null
     }
   }
@@ -146,12 +147,17 @@ class Editor extends React.Component {
     this.resolveController(plugins, schema, commands, queries, placeholder)
 
     // Set the current props on the controller.
-    const { options, readOnly, value } = props
+    const { options, readOnly, value: valueFromProps } = props
+    const { value: valueFromState } = this.state
+    const value = valueFromProps || valueFromState
     this.controller.setReadOnly(readOnly)
     this.controller.setValue(value, options)
 
     // Render the editor's children with the controller.
-    const children = this.controller.run('renderEditor', props)
+    const children = this.controller.run('renderEditor', {
+      ...props,
+      value,
+    })
     return children
   }
 
@@ -178,11 +184,14 @@ class Editor extends React.Component {
       )
 
       this.tmp.resolves++
-      const react = ReactPlugin(this.props)
+      const react = ReactPlugin({
+        ...this.props,
+        value: this.props.value || this.state.value,
+      })
 
       const onChange = change => {
         if (this.tmp.mounted) {
-          this.props.onChange(change)
+          this.handleChange(change)
         } else {
           this.tmp.change = change
         }
@@ -196,6 +205,18 @@ class Editor extends React.Component {
       this.controller.run('onConstruct')
     }
   )
+
+  handleChange(change) {
+    const { onChange } = this.props
+    const { value } = this.state
+
+    if (value) {
+      // Syncing value inside this component since parent does not want control of it (defaultValue was used)
+      this.setState({ value: change.value })
+    }
+
+    onChange(change)
+  }
 
   /**
    * Mimic the API of the `Editor` controller, so that this component instance

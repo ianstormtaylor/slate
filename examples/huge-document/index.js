@@ -36,20 +36,20 @@ for (let h = 0; h < HEADINGS; h++) {
 }
 
 /**
+ * Deserialize the initial editor value.
+ *
+ * @type {Object}
+ */
+
+const initialValue = Value.fromJSON(json, { normalize: false })
+
+/**
  * The huge document example.
  *
  * @type {Component}
  */
 
 class HugeDocument extends React.Component {
-  /**
-   * Deserialize the initial editor value.
-   *
-   * @type {Object}
-   */
-
-  state = { value: Value.fromJSON(json, { normalize: false }) }
-
   /**
    * Render the editor.
    *
@@ -61,8 +61,7 @@ class HugeDocument extends React.Component {
       <Editor
         placeholder="Enter some text..."
         spellCheck={false}
-        value={this.state.value}
-        onChange={this.onChange}
+        defaultValue={initialValue}
         renderNode={this.renderNode}
         renderMark={this.renderMark}
       />
@@ -113,16 +112,6 @@ class HugeDocument extends React.Component {
       default:
         return next()
     }
-  }
-
-  /**
-   * On change.
-   *
-   * @param {Editor} editor
-   */
-
-  onChange = ({ value }) => {
-    this.setState({ value })
   }
 }
 

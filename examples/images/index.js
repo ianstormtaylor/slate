@@ -2,11 +2,19 @@ import { Editor, getEventRange, getEventTransfer } from 'slate-react'
 import { Block, Value } from 'slate'
 
 import React from 'react'
-import initialValue from './value.json'
+import initialValueAsJson from './value.json'
 import imageExtensions from 'image-extensions'
 import isUrl from 'is-url'
 import styled from 'react-emotion'
 import { Button, Icon, Toolbar } from '../components'
+
+/**
+ * Deserialize the initial editor value.
+ *
+ * @type {Object}
+ */
+
+const initialValue = Value.fromJSON(initialValueAsJson)
 
 /**
  * A styled image block component.
@@ -84,16 +92,6 @@ const schema = {
 
 class Images extends React.Component {
   /**
-   * Deserialize the raw initial value.
-   *
-   * @type {Object}
-   */
-
-  state = {
-    value: Value.fromJSON(initialValue),
-  }
-
-  /**
    * Store a reference to the `editor`.
    *
    * @param {Editor} editor
@@ -120,9 +118,8 @@ class Images extends React.Component {
         <Editor
           placeholder="Enter some text..."
           ref={this.ref}
-          value={this.state.value}
+          defaultValue={initialValue}
           schema={schema}
-          onChange={this.onChange}
           onDrop={this.onDropOrPaste}
           onPaste={this.onDropOrPaste}
           renderNode={this.renderNode}
@@ -151,16 +148,6 @@ class Images extends React.Component {
         return next()
       }
     }
-  }
-
-  /**
-   * On change.
-   *
-   * @param {Editor} editor
-   */
-
-  onChange = ({ value }) => {
-    this.setState({ value })
   }
 
   /**

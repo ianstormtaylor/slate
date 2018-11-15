@@ -2,9 +2,17 @@ import { Editor } from 'slate-react'
 import { Value } from 'slate'
 
 import React from 'react'
-import initialValue from './value.json'
+import initialValueAsJson from './value.json'
 import styled from 'react-emotion'
 import { Icon, Toolbar } from '../components'
+
+/**
+ * Deserialize the initial editor value.
+ *
+ * @type {Object}
+ */
+
+const initialValue = Value.fromJSON(initialValueAsJson)
 
 /**
  * Some styled components for the search box.
@@ -35,16 +43,6 @@ const SearchInput = styled('input')`
  */
 
 class SearchHighlighting extends React.Component {
-  /**
-   * Deserialize the initial editor value.
-   *
-   * @type {Object}
-   */
-
-  state = {
-    value: Value.fromJSON(initialValue),
-  }
-
   /**
    * The editor's schema.
    *
@@ -91,9 +89,8 @@ class SearchHighlighting extends React.Component {
         <Editor
           placeholder="Enter some rich text..."
           ref={this.ref}
-          value={this.state.value}
+          defaultValue={initialValue}
           schema={this.schema}
-          onChange={this.onChange}
           renderMark={this.renderMark}
           spellCheck
         />
@@ -121,16 +118,6 @@ class SearchHighlighting extends React.Component {
       default:
         return next()
     }
-  }
-
-  /**
-   * On change, save the new `value`.
-   *
-   * @param {Editor} editor
-   */
-
-  onChange = ({ value }) => {
-    this.setState({ value })
   }
 
   /**

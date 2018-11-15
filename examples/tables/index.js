@@ -3,7 +3,15 @@ import { Editor, getEventTransfer } from 'slate-react'
 import { Value } from 'slate'
 
 import React from 'react'
-import initialValue from './value.json'
+import initialValueAsJson from './value.json'
+
+/**
+ * Deserialize the initial editor value.
+ *
+ * @type {Object}
+ */
+
+const initialValue = Value.fromJSON(initialValueAsJson)
 
 /**
  * The tables example.
@@ -12,16 +20,6 @@ import initialValue from './value.json'
  */
 
 class Tables extends React.Component {
-  /**
-   * Deserialize the raw initial value.
-   *
-   * @type {Object}
-   */
-
-  state = {
-    value: Value.fromJSON(initialValue),
-  }
-
   /**
    * Render the example.
    *
@@ -32,8 +30,7 @@ class Tables extends React.Component {
     return (
       <Editor
         placeholder="Enter some text..."
-        value={this.state.value}
-        onChange={this.onChange}
+        defaultValue={initialValue}
         onKeyDown={this.onKeyDown}
         onDrop={this.onDropOrPaste}
         onPaste={this.onDropOrPaste}
@@ -99,16 +96,6 @@ class Tables extends React.Component {
     const { selection } = value
     if (selection.start.offset != 0) return next()
     event.preventDefault()
-  }
-
-  /**
-   * On change.
-   *
-   * @param {Editor} editor
-   */
-
-  onChange = ({ value }) => {
-    this.setState({ value })
   }
 
   /**
