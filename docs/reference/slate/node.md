@@ -85,28 +85,28 @@ Get a child by `path` or `key`.
 `getClosest(path: List|Array, match: Function) => Node|Void`
 `getClosest(key: String, match: Function) => Node|Void`
 
-Get the closest parent node of a descendant node by `path` or `key` that matches a `match` function.
+Get the closest ancestor to a descendant node (by `path` or `key`) OR the descendant node itself which matches a `match` function.
 
 ### `getClosestBlock`
 
 `getClosestBlock(path: List|Array) => Node|Void`
 `getClosestBlock(key: String) => Node|Void`
 
-Get the closest [`Block`](./block.md) node to a descendant node by `path` or `key`.
+Get the closest [`Block`](./block.md) node to a descendant node (by `path` or `key`) OR the descendant node itself if it is a [`Block`](./block.md) node.
 
 ### `getClosestInline`
 
 `getClosestInline(path: List|Array) => Node|Void`
 `getClosestInline(key: String) => Node|Void`
 
-Get the closest [`Inline`](./inline.md) node to a descendant node by `path` or `key`.
+Get the closest [`Inline`](./inline.md) node to a descendant node (by `path` or `key`) OR the descendant node itself if it is a [`Inline`](./inline.md) node.
 
 ### `getClosestVoid`
 
 `getClosestVoid(path: List|Array) => Node|Void`
 `getClosestVoid(key: String) => Node|Void`
 
-Get the closest void parent of a descendant node by `path` or `key`.
+Get the closest void parent of a descendant node (by `path` or `key`) OR the descendant node itself if it is a void node.
 
 ### `getCommonAncestor`
 

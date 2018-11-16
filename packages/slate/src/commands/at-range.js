@@ -993,7 +993,7 @@ Commands.splitBlockAtRange = (editor, range, height = 1) => {
 
   while (parent && parent.object == 'block' && h < height) {
     node = parent
-    parent = document.getClosestBlock(parent.key)
+    parent = document.getParent(parent.key)
     h++
   }
 
@@ -1039,7 +1039,7 @@ Commands.splitInlineAtRange = (editor, range, height = Infinity) => {
 
   while (parent && parent.object == 'inline' && h < height) {
     node = parent
-    parent = document.getClosestInline(parent.key)
+    parent = document.getParent(parent.key)
     h++
   }
 
@@ -1089,6 +1089,7 @@ Commands.unwrapBlockAtRange = (editor, range, properties) => {
   const wrappers = blocks
     .map(block => {
       return document.getClosest(block.key, parent => {
+        if (parent.key === block.key) return false
         if (parent.object != 'block') return false
         if (properties.type != null && parent.type != properties.type)
           return false
@@ -1170,6 +1171,7 @@ Commands.unwrapInlineAtRange = (editor, range, properties) => {
   const inlines = texts
     .map(text => {
       return document.getClosest(text.key, parent => {
+        if (parent.key === text.key) return false
         if (parent.object != 'inline') return false
         if (properties.type != null && parent.type != properties.type)
           return false
@@ -1224,7 +1226,10 @@ Commands.wrapBlockAtRange = (editor, range, block) => {
   } else {
     // Determine closest shared parent to all blocks in selection.
     parent = document.getClosest(firstblock.key, p1 => {
-      return !!document.getClosest(lastblock.key, p2 => p1 == p2)
+      return (
+        p1.key !== firstblock.key &&
+        !!document.getClosest(lastblock.key, p2 => p1 == p2)
+      )
     })
   }
 

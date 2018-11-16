@@ -355,10 +355,11 @@ class ElementInterface {
    */
 
   getClosest(path, iterator) {
+    const n = this.assertNode(path)
     const ancestors = this.getAncestors(path)
     if (!ancestors) return null
 
-    const closest = ancestors.findLast((node, ...args) => {
+    const closest = ancestors.push(n).findLast((node, ...args) => {
       // We never want to include the top-level node.
       if (node === this) return false
       return iterator(node, ...args)
@@ -405,11 +406,8 @@ class ElementInterface {
       'As of Slate 0.42.0, the `node.getClosestVoid` method takes an `editor` instead of a `value`.'
     )
 
-    const ancestors = this.getAncestors(path)
-    if (!ancestors) return null
-
-    const ancestor = ancestors.findLast(a => editor.query('isVoid', a))
-    return ancestor
+    const closest = this.getClosest(path, n => editor.query('isVoid', n))
+    return closest
   }
 
   /**
@@ -1569,7 +1567,11 @@ class ElementInterface {
       'As of Slate 0.42.0, the `node.hasVoidParent` method takes an `editor` instead of a `value`.'
     )
 
-    const closest = this.getClosestVoid(path, editor)
+    const node = this.assertNode(path)
+    const closest = this.getClosest(
+      path,
+      n => n.key !== node.key && editor.query('isVoid', n)
+    )
     return !!closest
   }
 
