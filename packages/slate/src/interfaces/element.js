@@ -347,14 +347,14 @@ class ElementInterface {
   }
 
   /**
-   * Get closest parent of node that matches an `iterator`.
+   * Get closest parent of node OR the node itself which matches a `predicate`.
    *
    * @param {List|String} path
-   * @param {Function} iterator
+   * @param {Function} predicate
    * @return {Node|Null}
    */
 
-  getClosest(path, iterator) {
+  getClosest(path, predicate) {
     const n = this.assertNode(path)
     const ancestors = this.getAncestors(path)
     if (!ancestors) return null
@@ -362,7 +362,7 @@ class ElementInterface {
     const closest = ancestors.push(n).findLast((node, ...args) => {
       // We never want to include the top-level node.
       if (node === this) return false
-      return iterator(node, ...args)
+      return predicate(node, ...args)
     })
 
     return closest || null

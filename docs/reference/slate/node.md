@@ -82,10 +82,10 @@ Get a child by `path` or `key`.
 
 ### `getClosest`
 
-`getClosest(path: List|Array, match: Function) => Node|Void`
-`getClosest(key: String, match: Function) => Node|Void`
+`getClosest(path: List|Array, predicate: Function) => Node|Void`
+`getClosest(key: String, predicate: Function) => Node|Void`
 
-Get the closest ancestor to a descendant node (by `path` or `key`) OR the descendant node itself which matches a `match` function.
+Get the closest ancestor to a descendant node (by `path` or `key`) OR the descendant node itself which matches a `predicate` function.
 
 ### `getClosestBlock`
 
