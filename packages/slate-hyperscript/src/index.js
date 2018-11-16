@@ -77,6 +77,13 @@ function createHyperscript(options = {}) {
       .filter(child => Boolean(child))
       .reduce((memo, child) => memo.concat(child), [])
 
+    // by convention, strip attributes prefixed with double underscores
+    for (const key in attributes) {
+      if (key.lastIndexOf('__', 0) === 0) {
+        delete attributes[key]
+      }
+    }
+
     const ret = creator(tagName, attributes, children)
     return ret
   }
