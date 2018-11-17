@@ -159,6 +159,20 @@ class Editor {
   }
 
   /**
+   * Checks if a command by `type` has been registered.
+   *
+   * @param {String} type
+   * @return {Boolean}
+   */
+
+  hasCommand(type) {
+    const { controller } = this
+    const has = type in controller && controller[type].__command
+
+    return has
+  }
+
+  /**
    * Normalize all of the nodes in the document from scratch.
    *
    * @return {Editor}

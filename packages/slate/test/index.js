@@ -126,6 +126,15 @@ describe('slate', () => {
     assert.deepEqual(actual, expected)
   })
 
+  fixtures(__dirname, 'controllers', ({ module }) => {
+    const { input, output, default: fn } = module
+
+    const actual = fn(input)
+    const expected = output
+
+    assert.equal(actual, expected)
+  })
+
   fixtures(__dirname, 'schema', ({ module }) => {
     const { input, output, schema } = module
     const editor = new Editor({ value: input, plugins: [{ schema }] })
