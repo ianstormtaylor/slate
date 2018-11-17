@@ -89,6 +89,16 @@ editor.hasCommand('insertLink')
 
 Checks if a command by `type` has been registered.
 
+### `hasQuery`
+
+`hasQuery(type: String) => Boolean`
+
+```js
+editor.hasQuery('isLinkActive')
+```
+
+Checks if a query by `type` has been registered.
+
 ### `query`
 
 `query(type: String, ...args) => Any`

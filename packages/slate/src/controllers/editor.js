@@ -173,6 +173,20 @@ class Editor {
   }
 
   /**
+   * Checks if a query by `type` has been registered.
+   *
+   * @param {String} type
+   * @return {Boolean}
+   */
+
+  hasQuery(type) {
+    const { controller } = this
+    const has = type in controller && controller[type].__query
+
+    return has
+  }
+
+  /**
    * Normalize all of the nodes in the document from scratch.
    *
    * @return {Editor}
