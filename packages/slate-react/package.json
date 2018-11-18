@@ -39,6 +39,7 @@
   "devDependencies": {
     "immutable": "^3.8.1",
     "mocha": "^2.5.3",
+    "react-test-renderer": "^16.6.3",
     "slate": "^0.44.6",
     "slate-hyperscript": "^0.11.21",
     "slate-simulator": "^0.4.67"
