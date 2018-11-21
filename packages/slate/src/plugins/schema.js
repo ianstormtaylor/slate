@@ -517,7 +517,7 @@ function validateNodes(node, rule, rules = []) {
         return fail('child_min_invalid', {
           rule,
           node,
-          index,
+          index: count === 0 ? index : index - 1,
           count,
           limit: min,
         })
