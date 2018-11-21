@@ -8,6 +8,7 @@ import {
   Switch,
 } from 'react-router-dom'
 
+import { Icon } from './components'
 import CheckLists from './check-lists'
 import CodeHighlighting from './code-highlighting'
 import Embeds from './embeds'
@@ -97,14 +98,33 @@ const Link = styled('a')`
   }
 `
 
+const TabListContainer = styled('div')`
+  background-color: #222;
+`
+
 const TabList = styled('div')`
   padding: 15px 15px;
-  background-color: #222;
   text-align: center;
   margin-bottom: 30px;
 
   & > * + * {
     margin-left: 0.5em;
+  }
+
+  @media (max-width: 600px) {
+    display: ${props => (props.isVisible ? 'block' : 'none')};
+  }
+`
+
+const TabButton = styled('button')`
+  background-color: #222;
+  border: none;
+  color: white;
+  display: none;
+  height: 32px;
+
+  @media (max-width: 600px) {
+    display: block;
   }
 `
 
@@ -161,6 +181,7 @@ export default class App extends React.Component {
   state = {
     error: null,
     info: null,
+    isTabListVisible: false,
   }
 
   /**
@@ -191,17 +212,28 @@ export default class App extends React.Component {
               <Link href="https://docs.slatejs.org/">Docs</Link>
             </LinkList>
           </Nav>
-          <TabList>
-            {EXAMPLES.map(([name, Component, path]) => (
-              <Route key={path} exact path={path}>
-                {({ match }) => (
-                  <Tab to={path} active={match && match.isExact}>
-                    {name}
-                  </Tab>
-                )}
-              </Route>
-            ))}
-          </TabList>
+          <TabListContainer>
+            <TabButton
+              onClick={() =>
+                this.setState({
+                  isTabListVisible: !this.state.isTabListVisible,
+                })
+              }
+            >
+              <Icon>menu</Icon>
+            </TabButton>
+            <TabList isVisible={this.state.isTabListVisible || null}>
+              {EXAMPLES.map(([name, Component, path]) => (
+                <Route key={path} exact path={path}>
+                  {({ match }) => (
+                    <Tab to={path} active={match && match.isExact}>
+                      {name}
+                    </Tab>
+                  )}
+                </Route>
+              ))}
+            </TabList>
+          </TabListContainer>
           {this.state.error ? (
             <Warning>
               <p>
