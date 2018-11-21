@@ -317,10 +317,15 @@ Raised when the `object` property of a child node is invalid.
 
 Raised when a child node repeats less than required by a rule's `min` property.
 
+* `index`: index of the last matching node, or where the first matching would be, if there are no matching nodes
+* `count`: number of matching nodes
+* `limit`: value of rule's `min` property
+
 ### `child_max_invalid`
 
 ```js
 {
+  child: Node,
   index: Number,
   count: Number,
   limit: Number,
@@ -331,6 +336,10 @@ Raised when a child node repeats less than required by a rule's `min` property.
 
 Raised when a child node repeats more than permitted by a rule's `max`
 property.
+
+* `index`: index of the last matching node
+* `count`: number of matching nodes
+* `limit`: value of rule's `max` property
 
 ### `'child_type_invalid'`
 
