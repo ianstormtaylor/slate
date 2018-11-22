@@ -274,7 +274,7 @@ class App extends React.Component {
         )
       case 'paragraph':
         return (
-          <p {...props.attributes} className={node.data.get('className')}>
+          <p {...props.attributes} className={props.node.data.get('className')}>
             {props.children}
           </p>
         )
