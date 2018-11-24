@@ -93,7 +93,7 @@ function SchemaPlugin(schema) {
    */
 
   function normalizeNode(node, editor, next) {
-    const error = validateNode(node, editor, () => {})
+    const error = editor.run('validateNode', node)
     if (!error) return next()
 
     return () => {
