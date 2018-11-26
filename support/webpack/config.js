@@ -2,7 +2,7 @@ const path = require('path')
 const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const HtmlWebpackTemplate = require('html-webpack-template')
-const ExtractTextPlugin = require('extract-text-webpack-plugin')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
 
@@ -51,17 +51,12 @@ const config = {
       },
       {
         test: /\.css$/,
-        use: ExtractTextPlugin.extract({
-          fallback: 'style-loader',
-          use: [
-            {
-              loader: 'css-loader',
-              options: {
-                sourceMap: true,
-              },
-            },
-          ],
-        }),
+        use: [
+          {
+            loader: MiniCssExtractPlugin.loader,
+          },
+          'css-loader',
+        ],
       },
     ],
   },
@@ -71,7 +66,10 @@ const config = {
         IS_PROD ? 'production' : 'development'
       ),
     }),
-    new ExtractTextPlugin('[name]-[contenthash].css'),
+    new MiniCssExtractPlugin({
+      filename: `components/[name].css`,
+    }),
+    ,
     new HtmlWebpackPlugin({
       title: 'Slate',
       template: HtmlWebpackTemplate,

@@ -101,6 +101,7 @@ class Content extends React.Component {
    */
 
   tmp = {
+    isComposing: false,
     isUpdatingSelection: false,
     nodeRef: React.createRef(),
     nodeRefs: {},
@@ -435,8 +436,16 @@ class Content extends React.Component {
       event.type === 'keydown' &&
       (Hotkeys.isUndo(nativeEvent) || Hotkeys.isRedo(nativeEvent))
 
+    if (handler === 'onCompositionStart') {
+      this.tmp.isComposing = true
+    }
+
+    if (handler === 'onCompositionEnd') {
+      window.requestAnimationFrame(() => (this.tmp.isComposing = false))
+    }
     // Ignore `onBlur`, `onFocus` and `onSelect` events generated
     // programmatically while updating selection.
+
     if (
       (this.tmp.isUpdatingSelection || isUndoRedo) &&
       (handler === 'onSelect' || handler === 'onBlur' || handler === 'onFocus')
@@ -454,7 +463,7 @@ class Content extends React.Component {
     // at the end of a block. The selection ends up to the left of the inserted
     // character instead of to the right. This behavior continues even if
     // you enter more than one character. (2019/01/03)
-    if (!IS_ANDROID && handler === 'onSelect') {
+    if (!IS_ANDROID && handler === 'onSelect' && !this.tmp.isComposing) {
       const { editor } = this.props
       const { value } = editor
       const { selection } = value
