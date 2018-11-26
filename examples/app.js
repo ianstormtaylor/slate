@@ -74,17 +74,22 @@ const EXAMPLES = [
  */
 
 const Nav = styled('div')`
-  padding: 10px 15px;
-  color: #aaa;
+  align-items: center;
   background: #000;
+  color: #aaa;
+  display: flex;
+  height: 42px;
+  position: relative;
+  z-index: 1; /* To appear above the underlay */
 `
 
 const Title = styled('span')`
-  margin-right: 0.5em;
+  margin-left: 1em;
 `
 
 const LinkList = styled('div')`
-  float: right;
+  margin-left: auto;
+  margin-right: 1em;
 `
 
 const Link = styled('a')`
@@ -98,33 +103,35 @@ const Link = styled('a')`
   }
 `
 
-const TabListContainer = styled('div')`
-  background-color: #222;
-`
-
 const TabList = styled('div')`
+  background-color: #222;
+  display: ${props => (props.isVisible ? 'flex' : 'none')};
+  flex-direction: column;
   padding: 15px 15px;
-  text-align: center;
-  margin-bottom: 30px;
-
-  & > * + * {
-    margin-left: 0.5em;
-  }
-
-  @media (max-width: 600px) {
-    display: ${props => (props.isVisible ? 'block' : 'none')};
-  }
+  position: absolute;
+  width: 240px;
+  z-index: 1;
 `
 
-const TabButton = styled('button')`
-  background-color: #222;
-  border: none;
-  color: white;
-  display: none;
-  height: 32px;
+const TabListUnderlay = styled('div')`
+  background-color: rgba(200, 200, 200, 0.8);
+  display: ${props => (props.isVisible ? 'block' : 'none')};
+  height: 100%;
+  top: 0;
+  position: fixed;
+  width: 100%;
+`
 
-  @media (max-width: 600px) {
-    display: block;
+const TabButton = styled('span')`
+  margin-left: 8px;
+
+  &:hover {
+    cursor: pointer;
+  }
+
+  .material-icons {
+    color: #aaa;
+    font-size: 24px;
   }
 `
 
@@ -206,34 +213,38 @@ export default class App extends React.Component {
       <HashRouter>
         <div>
           <Nav>
+            <TabButton
+              onClick={e => {
+                e.stopPropagation()
+
+                this.setState({
+                  isTabListVisible: !this.state.isTabListVisible,
+                })
+              }}
+            >
+              <Icon>menu</Icon>
+            </TabButton>
             <Title>Slate Examples</Title>
             <LinkList>
               <Link href="https://github.com/ianstormtaylor/slate">GitHub</Link>
               <Link href="https://docs.slatejs.org/">Docs</Link>
             </LinkList>
           </Nav>
-          <TabListContainer>
-            <TabButton
-              onClick={() =>
-                this.setState({
-                  isTabListVisible: !this.state.isTabListVisible,
-                })
-              }
-            >
-              <Icon>menu</Icon>
-            </TabButton>
-            <TabList isVisible={this.state.isTabListVisible || null}>
-              {EXAMPLES.map(([name, Component, path]) => (
-                <Route key={path} exact path={path}>
-                  {({ match }) => (
-                    <Tab to={path} active={match && match.isExact}>
-                      {name}
-                    </Tab>
-                  )}
-                </Route>
-              ))}
-            </TabList>
-          </TabListContainer>
+          <TabList isVisible={this.state.isTabListVisible}>
+            {EXAMPLES.map(([name, Component, path]) => (
+              <Route key={path} exact path={path}>
+                {({ match }) => (
+                  <Tab
+                    to={path}
+                    active={match && match.isExact}
+                    onClick={this._hideTabList}
+                  >
+                    {name}
+                  </Tab>
+                )}
+              </Route>
+            ))}
+          </TabList>
           {this.state.error ? (
             <Warning>
               <p>
@@ -257,8 +268,16 @@ export default class App extends React.Component {
               </Switch>
             </Example>
           )}
+          <TabListUnderlay
+            isVisible={this.state.isTabListVisible}
+            onClick={this._hideTabList}
+          />
         </div>
       </HashRouter>
     )
+  }
+
+  _hideTabList = () => {
+    this.setState({ isTabListVisible: false })
   }
 }
