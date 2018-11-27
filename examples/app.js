@@ -105,11 +105,13 @@ const Link = styled('a')`
 
 const TabList = styled('div')`
   background-color: #222;
-  display: ${props => (props.isVisible ? 'flex' : 'none')};
+  display: flex;
   flex-direction: column;
-  padding: 15px 15px;
+  overflow: hidden;
   position: absolute;
-  width: 240px;
+  transition: width 0.2s;
+  width: ${props => (props.isVisible ? '200px' : '0')};
+  white-space: nowrap;
   z-index: 1;
 `
 
