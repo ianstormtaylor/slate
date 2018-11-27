@@ -108,6 +108,7 @@ const TabList = styled('div')`
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  padding-top: 0.2em;
   position: absolute;
   transition: width 0.2s;
   width: ${props => (props.isVisible ? '200px' : '0')};
@@ -125,7 +126,7 @@ const TabListUnderlay = styled('div')`
 `
 
 const TabButton = styled('span')`
-  margin-left: 8px;
+  margin-left: 0.8em;
 
   &:hover {
     cursor: pointer;
@@ -142,7 +143,7 @@ const MaskedRouterLink = ({ active, ...props }) => <RouterLink {...props} />
 const Tab = styled(MaskedRouterLink)`
   display: inline-block;
   margin-bottom: 0.2em;
-  padding: 0.2em 0.5em;
+  padding: 0.2em 1em;
   border-radius: 0.2em;
   text-decoration: none;
   color: ${p => (p.active ? 'white' : '#777')};
@@ -159,7 +160,16 @@ const Wrapper = styled('div')`
   padding: 20px;
 `
 
-const Example = styled(Wrapper)`
+const ExampleTitle = styled('div')`
+  align-items: center;
+  background-color: #555;
+  color: #ddd;
+  display: flex;
+  height: 42px;
+  padding-left: 1em;
+`
+
+const ExampleContent = styled(Wrapper)`
   background: #fff;
 `
 
@@ -261,14 +271,19 @@ export default class App extends React.Component {
               </pre>
             </Warning>
           ) : (
-            <Example>
-              <Switch>
-                {EXAMPLES.map(([name, Component, path]) => (
-                  <Route key={path} path={path} component={Component} />
-                ))}
-                <Redirect from="/" to="/rich-text" />
-              </Switch>
-            </Example>
+            <Switch>
+              {EXAMPLES.map(([name, Component, path]) => (
+                <Route key={path} path={path}>
+                  <div>
+                    <ExampleTitle>{name}</ExampleTitle>
+                    <ExampleContent>
+                      <Component />
+                    </ExampleContent>
+                  </div>
+                </Route>
+              ))}
+              <Redirect from="/" to="/rich-text" />
+            </Switch>
           )}
           <TabListUnderlay
             isVisible={this.state.isTabListVisible}
