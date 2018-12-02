@@ -543,10 +543,16 @@ function normalizeDirtyPaths(editor) {
     return
   }
 
-  while (editor.tmp.dirty.length) {
-    const path = editor.tmp.dirty.pop()
-    normalizeNodeByPath(editor, path)
+  if (!editor.tmp.dirty.length) {
+    return
   }
+
+  editor.withoutNormalizing(() => {
+    while (editor.tmp.dirty.length) {
+      const path = editor.tmp.dirty.pop()
+      normalizeNodeByPath(editor, path)
+    }
+  })
 }
 
 /**
@@ -557,22 +563,27 @@ function normalizeDirtyPaths(editor) {
  */
 
 function normalizeNodeByPath(editor, path) {
-  const { controller, value } = editor
+  const { controller } = editor
+  let { value } = editor
   let { document } = value
   let node = document.assertNode(path)
   let iterations = 0
   const max = 100 + (node.object === 'text' ? 1 : node.nodes.size)
 
-  const iterate = () => {
+  while (node) {
     const fn = node.normalize(controller)
-    if (!fn) return
+
+    if (!fn) {
+      break
+    }
 
     // Run the normalize `fn` to fix the node.
     fn(controller)
 
     // Attempt to re-find the node by path, or by key if it has changed
     // locations in the tree continue iterating.
-    document = editor.value.document
+    value = editor.value
+    document = value.document
     const { key } = node
     let found = document.getDescendant(path)
 
@@ -585,8 +596,8 @@ function normalizeNodeByPath(editor, path) {
         node = found
         path = document.getPath(key)
       } else {
-        // If it no longer exists by key, it was removed, so abort.
-        return
+        // If it no longer exists by key, it was removed, so we're done.
+        break
       }
     }
 
@@ -601,14 +612,7 @@ function normalizeNodeByPath(editor, path) {
         'A schema rule could not be normalized after sufficient iterations. This is usually due to a `rule.normalize` or `plugin.normalizeNode` function of a schema being incorrectly written, causing an infinite loop.'
       )
     }
-
-    // Otherwise, iterate again.
-    iterate()
   }
-
-  editor.withoutNormalizing(() => {
-    iterate()
-  })
 }
 
 /**
