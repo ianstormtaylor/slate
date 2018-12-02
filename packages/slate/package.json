@@ -23,8 +23,7 @@
     "type-of": "^2.0.1"
   },
   "peerDependencies": {
-    "immutable": ">=3.8.1",
-    "react": ">=0.14.0"
+    "immutable": ">=3.8.1"
   },
   "devDependencies": {
     "slate-dev-test-utils": "^0.0.1",
