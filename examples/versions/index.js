@@ -129,24 +129,13 @@ class Versions extends React.Component {
   setVersion = n => {
     const { editor } = this
     const { versions, v } = this.state
-    const isForward = n > v
     if (n === v) return
 
-    let operations
-
-    if (isForward) {
-      operations = versions
-        .slice(v + 1, n + 1)
-        .map(vers => vers.operations)
-        .flat()
-    } else {
-      operations = versions
-        .slice(n + 1, v + 1)
-        .map(vers => vers.operations)
-        .flat()
-        .reverse()
-        .map(op => op.invert())
-    }
+    const operations = versions
+      .slice(n + 1, v + 1)
+      .reduce((acc, val) => acc.concat(val.operations), []) // Make a flat array of all version operations
+      .reverse()
+      .map(op => op.invert())
 
     editor.withoutNormalizing(() => {
       editor.withoutSaving(() => {
@@ -171,13 +160,10 @@ class Versions extends React.Component {
     const { value } = this.state
     const { data } = value
     const undos = data.get('undos') || List()
+
     const version = {
       createdAt: new Date(),
-      operations: undos
-        .toArray()
-        .reverse()
-        .map(list => list.toArray())
-        .flat(),
+      operations: undos.flatten(1).toArray(),
     }
 
     this.setState(
