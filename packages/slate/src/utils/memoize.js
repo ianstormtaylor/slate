@@ -74,7 +74,7 @@ function memoize(object, properties) {
       if (!memoizeStore.has(this)) {
         memoizeStore.set(this, {
           noArgs: {},
-          hasArgs: {}, // eslint-disable-line no-restricted-globals
+          hasArgs: {},
         })
       }
 
