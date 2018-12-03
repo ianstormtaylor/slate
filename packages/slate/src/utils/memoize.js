@@ -78,7 +78,7 @@ function memoize(object, properties) {
         keys = [property, ...args]
         cachedValue = getIn(hasArgs, keys)
       } else {
-        cachedValue = noArgs[property] === undefined ? UNSET : noArgs[property]
+        cachedValue = noArgs[property]
       }
 
       // If we've got a result already, return it.
