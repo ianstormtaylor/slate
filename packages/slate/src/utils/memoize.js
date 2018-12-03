@@ -1,3 +1,5 @@
+/* global WeakMap, Map, Symbol */
+
 /**
  * GLOBAL: True if memoization should is enabled.
  *
@@ -5,14 +7,6 @@
  */
 
 let ENABLED = true
-
-/**
- * GLOBAL: Changing this cache key will clear all previous cached results.
- *
- * @type {Number}
- */
-
-let CACHE_KEY = 0
 
 /**
  * The leaf node of a cache tree. Used to support variable argument length. A
@@ -30,7 +24,7 @@ const LEAF = {}
  * @type {Object}
  */
 
-const UNDEFINED = {}
+const UNDEFINED = Symbol('undefined')
 
 /**
  * Default value for unset keys in native Maps
@@ -39,6 +33,12 @@ const UNDEFINED = {}
  */
 
 const UNSET = undefined
+
+/**
+ * Global Store for all cached values
+ */
+
+let memoizeStore = new WeakMap()
 
 /**
  * Memoize all of the `properties` on a `object`.
@@ -60,20 +60,14 @@ function memoize(object, properties) {
       // If memoization is disabled, call into the original method.
       if (!ENABLED) return original.apply(this, args)
 
-      // If the cache key is different, previous caches must be cleared.
-      if (CACHE_KEY !== this.__cache_key) {
-        this.__cache_key = CACHE_KEY
-        this.__cache = new Map() // eslint-disable-line no-undef,no-restricted-globals
-        this.__cache_no_args = {}
+      if (!memoizeStore.has(this)) {
+        memoizeStore.set(this, {
+          noArgs: {},
+          hasArgs: new Map(), // eslint-disable-line no-restricted-globals
+        })
       }
 
-      if (!this.__cache) {
-        this.__cache = new Map() // eslint-disable-line no-undef,no-restricted-globals
-      }
-
-      if (!this.__cache_no_args) {
-        this.__cache_no_args = {}
-      }
+      const { noArgs, hasArgs } = memoizeStore.get(this)
 
       const takesArguments = args.length !== 0
 
@@ -82,9 +76,9 @@ function memoize(object, properties) {
 
       if (takesArguments) {
         keys = [property, ...args]
-        cachedValue = getIn(this.__cache, keys)
+        cachedValue = getIn(hasArgs, keys)
       } else {
-        cachedValue = this.__cache_no_args[property]
+        cachedValue = noArgs[property] === undefined ? UNSET : noArgs[property]
       }
 
       // If we've got a result already, return it.
@@ -97,9 +91,9 @@ function memoize(object, properties) {
       const v = value === undefined ? UNDEFINED : value
 
       if (takesArguments) {
-        this.__cache = setIn(this.__cache, keys, v)
+        setIn(hasArgs, keys, v)
       } else {
-        this.__cache_no_args[property] = v
+        noArgs[property] = v
       }
 
       return value
@@ -164,11 +158,7 @@ function setIn(map, keys, value) {
  */
 
 function resetMemoization() {
-  CACHE_KEY++
-
-  if (CACHE_KEY >= Number.MAX_SAFE_INTEGER) {
-    CACHE_KEY = 0
-  }
+  memoizeStore = new WeakMap()
 }
 
 /**
