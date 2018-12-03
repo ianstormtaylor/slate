@@ -45,6 +45,8 @@ const UNSET = undefined
 
 /**
  * Global Store for all cached values
+ *
+ * @type {WeakMap}
  */
 
 let memoizeStore = new WeakMap()
