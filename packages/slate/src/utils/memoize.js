@@ -25,7 +25,7 @@ const LEAF = Symbol('LEAF')
  */
 
 const UNDEFINED = Symbol('undefined')
-const NULL = Symbol('NULL')
+const NULL = Symbol('null')
 
 /**
  * Default value for unset keys in native Maps
@@ -102,7 +102,7 @@ function memoize(object, properties) {
   }
 }
 
-const STOREKEY = Symbol('STOREKEY')
+const STORE_KEY = Symbol('STORE_KEY')
 
 /**
  * Get a value at a key path in a tree of Map.
@@ -124,7 +124,7 @@ function getIn(map, keys) {
     }
 
     if (typeof key === 'object') {
-      map = map[STOREKEY] && map[STOREKEY].get(key)
+      map = map[STORE_KEY] && map[STORE_KEY].get(key)
     } else {
       map = map[key]
     }
@@ -163,18 +163,18 @@ function setIn(map, keys, value) {
       continue
     }
 
-    if (!child[STOREKEY]) {
-      child[STOREKEY] = new WeakMap()
+    if (!child[STORE_KEY]) {
+      child[STORE_KEY] = new WeakMap()
     }
 
-    if (!child[STOREKEY].has(key)) {
+    if (!child[STORE_KEY].has(key)) {
       const newChild = {}
-      child[STOREKEY].set(key, newChild)
+      child[STORE_KEY].set(key, newChild)
       child = newChild
       continue
     }
 
-    child = child[STOREKEY].get(key)
+    child = child[STORE_KEY].get(key)
   }
 
   // The whole path has been created, so set the value to the bottom most map.
