@@ -12,16 +12,24 @@ let ENABLED = true
  * The leaf node of a cache tree. Used to support variable argument length. A
  * unique object, so that native Maps will key it by reference.
  *
- * @type {Object}
+ * @type {Symbol}
  */
 
 const LEAF = Symbol('LEAF')
 
 /**
- * A value to represent a memoized undefined value. Allows efficient value
+ * The node of a cache tree for a WeakMap to store cache visited by objects
+ *
+ * @type {Symbol}
+ */
+
+const STORE_KEY = Symbol('STORE_KEY')
+
+/**
+ * A value to represent a memoized undefined and null value. Allows efficient value
  * retrieval using Map.get only.
  *
- * @type {Object}
+ * @type {Symbol}
  */
 
 const UNDEFINED = Symbol('undefined')
@@ -101,8 +109,6 @@ function memoize(object, properties) {
     }
   }
 }
-
-const STORE_KEY = Symbol('STORE_KEY')
 
 /**
  * Get a value at a key path in a tree of Map.
