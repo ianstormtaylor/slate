@@ -15,7 +15,7 @@ let ENABLED = true
  * @type {Object}
  */
 
-const LEAF = {}
+const LEAF = Symbol('LEAF')
 
 /**
  * A value to represent a memoized undefined value. Allows efficient value
@@ -25,6 +25,7 @@ const LEAF = {}
  */
 
 const UNDEFINED = Symbol('undefined')
+const NULL = Symbol('NULL')
 
 /**
  * Default value for unset keys in native Maps
@@ -63,7 +64,7 @@ function memoize(object, properties) {
       if (!memoizeStore.has(this)) {
         memoizeStore.set(this, {
           noArgs: {},
-          hasArgs: new Map(), // eslint-disable-line no-restricted-globals
+          hasArgs: {}, // eslint-disable-line no-restricted-globals
         })
       }
 
@@ -101,6 +102,8 @@ function memoize(object, properties) {
   }
 }
 
+const STOREKEY = Symbol('STOREKEY')
+
 /**
  * Get a value at a key path in a tree of Map.
  *
@@ -113,12 +116,23 @@ function memoize(object, properties) {
  */
 
 function getIn(map, keys) {
-  for (const key of keys) {
-    map = map.get(key)
+  for (let key of keys) {
+    if (key === undefined) {
+      key = UNDEFINED
+    } else if (key === null) {
+      key = NULL
+    }
+
+    if (typeof key === 'object') {
+      map = map[STOREKEY] && map[STOREKEY].get(key)
+    } else {
+      map = map[key]
+    }
+
     if (map === UNSET) return UNSET
   }
 
-  return map.get(LEAF)
+  return map[LEAF]
 }
 
 /**
@@ -131,23 +145,40 @@ function getIn(map, keys) {
  */
 
 function setIn(map, keys, value) {
-  let parent = map
-  let child
+  let child = map
 
-  for (const key of keys) {
-    child = parent.get(key)
-
-    // If the path was not created yet...
-    if (child === UNSET) {
-      child = new Map() // eslint-disable-line no-undef,no-restricted-globals
-      parent.set(key, child)
+  for (let key of keys) {
+    if (key === undefined) {
+      key = UNDEFINED
+    } else if (key === null) {
+      key = NULL
     }
 
-    parent = child
+    if (typeof key !== 'object') {
+      if (!child[key]) {
+        child[key] = {}
+      }
+
+      child = child[key]
+      continue
+    }
+
+    if (!child[STOREKEY]) {
+      child[STOREKEY] = new WeakMap()
+    }
+
+    if (!child[STOREKEY].has(key)) {
+      const newChild = {}
+      child[STOREKEY].set(key, newChild)
+      child = newChild
+      continue
+    }
+
+    child = child[STOREKEY].get(key)
   }
 
   // The whole path has been created, so set the value to the bottom most map.
-  child.set(LEAF, value)
+  child[LEAF] = value
   return map
 }
 
