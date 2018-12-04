@@ -24,6 +24,7 @@ These products use Slate, and can give you an idea of what's possible:
 * [GitBook](https://www.gitbook.com/)
 * [Grafana](https://grafana.com/)
 * [Guru](https://www.getguru.com/)
+* [Netlify CMS](https://www.netlifycms.org)
 * [Outline](https://www.getoutline.com/)
 * [Sanity.io](https://www.sanity.io)
 * [Taskade](https://www.taskade.com/)
