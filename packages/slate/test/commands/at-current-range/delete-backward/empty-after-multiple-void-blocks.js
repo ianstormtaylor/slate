@@ -14,8 +14,7 @@ export const input = (
         <emoji />
         <cursor />
       </paragraph>
-      <paragraph>
-      </paragraph>
+      <paragraph />
     </document>
   </value>
 )
@@ -27,8 +26,7 @@ export const output = (
         <emoji />
         <cursor />
       </paragraph>
-      <paragraph>
-      </paragraph>
+      <paragraph />
     </document>
   </value>
 )
