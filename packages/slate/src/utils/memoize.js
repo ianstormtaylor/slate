@@ -26,7 +26,7 @@ const LEAF = Symbol('LEAF')
 const STORE_KEY = Symbol('STORE_KEY')
 
 /**
- * A value to represent a memoized undefined and null value. Allows efficient value
+ * Values to represent a memoized undefined and null value. Allows efficient value
  * retrieval using Map.get only.
  *
  * @type {Symbol}
