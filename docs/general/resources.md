@@ -23,7 +23,7 @@ These products use Slate, and can give you an idea of what's possible:
 * [Chatterbug](https://chatterbug.com)
 * [GitBook](https://www.gitbook.com/)
 * [Grafana](https://grafana.com/)
-* [Guilded](https:/www.guilded.gg)
+* [Guilded](https://www.guilded.gg)
 * [Guru](https://www.getguru.com/)
 * [Netlify CMS](https://www.netlifycms.org)
 * [Outline](https://www.getoutline.com/)
