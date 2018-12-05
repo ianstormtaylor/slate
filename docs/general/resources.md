@@ -26,6 +26,7 @@ These products use Slate, and can give you an idea of what's possible:
 * [Guru](https://www.getguru.com/)
 * [Netlify CMS](https://www.netlifycms.org)
 * [Outline](https://www.getoutline.com/)
+* [Prezly](https://www.prezly.com/)
 * [Sanity.io](https://www.sanity.io)
 * [Taskade](https://www.taskade.com/)
 * [Yuque](https://www.yuque.com/)
