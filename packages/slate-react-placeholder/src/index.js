@@ -4,6 +4,7 @@ import React from 'react'
 /*
  * Instance counter to enable unique marks for multiple Placeholder instances.
  */
+
 let instanceCounter = 0
 
 /**
