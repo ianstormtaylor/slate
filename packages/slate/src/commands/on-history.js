@@ -22,6 +22,17 @@ Commands.save = (editor, operation) => {
   let { save, merge } = editor.tmp
   if (save === false) return
 
+  // Remove the undo/redo history from the operation's Value. This prevents
+  // us from recursively retaining the entire history of all Value objects.
+  operation = operation.withMutations(op => {
+    op.set(
+      'value',
+      op.value.withMutations(v => {
+        v.set('data', op.value.data.remove('undos').remove('redos'))
+      })
+    )
+  })
+
   let undos = data.get('undos') || List()
   const lastBatch = undos.last()
   const lastOperation = lastBatch && lastBatch.last()
