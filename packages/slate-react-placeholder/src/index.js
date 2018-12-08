@@ -70,12 +70,12 @@ function SlateReactPlaceholder(options = {}) {
       }
 
       return (
-        <React.Fragment>
+        <span>
           <span contentEditable={false} style={style}>
             {placeholder}
           </span>
           {children}
-        </React.Fragment>
+        </span>
       )
     }
 
