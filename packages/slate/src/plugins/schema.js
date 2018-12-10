@@ -382,7 +382,7 @@ function validateNodes(node, rule, rules = []) {
 
   function nextChild() {
     index += 1
-    previous = child
+    previous = index ? children.get(index - 1) : null
     child = children.get(index)
     next = children.get(index + 1)
     if (!child) return false
