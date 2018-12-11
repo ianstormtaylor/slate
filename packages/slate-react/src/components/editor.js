@@ -243,6 +243,14 @@ class Editor extends React.Component {
     return this.controller.command(...args)
   }
 
+  hasCommand(...args) {
+    return this.controller.hasCommand(...args)
+  }
+
+  hasQuery(...args) {
+    return this.controller.hasQuery(...args)
+  }
+
   normalize(...args) {
     return this.controller.normalize(...args)
   }
