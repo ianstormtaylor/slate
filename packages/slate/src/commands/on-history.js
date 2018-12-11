@@ -75,24 +75,26 @@ Commands.redo = editor => {
   if (!batch) return
 
   editor.withoutSaving(() => {
-    // Replay the batch of operations.
-    batch.forEach(op => {
-      const { type, properties } = op
+    editor.withoutNormalizing(() => {
+      // Replay the batch of operations.
+      batch.forEach(op => {
+        const { type, properties } = op
 
-      // When the operation mutates the selection, omit its `isFocused` value to
-      // prevent the editor focus from changing during redoing.
-      if (type === 'set_selection') {
-        op = op.set('properties', omit(properties, 'isFocused'))
-      }
+        // When the operation mutates the selection, omit its `isFocused` value to
+        // prevent the editor focus from changing during redoing.
+        if (type === 'set_selection') {
+          op = op.set('properties', omit(properties, 'isFocused'))
+        }
 
-      editor.applyOperation(op)
+        editor.applyOperation(op)
+      })
+
+      // Shift the next value into the undo stack.
+      redos = redos.pop()
+      undos = undos.push(batch)
+      const newData = data.set('undos', undos).set('redos', redos)
+      editor.setData(newData)
     })
-
-    // Shift the next value into the undo stack.
-    redos = redos.pop()
-    undos = undos.push(batch)
-    const newData = data.set('undos', undos).set('redos', redos)
-    editor.setData(newData)
   })
 }
 
@@ -111,28 +113,30 @@ Commands.undo = editor => {
   if (!batch) return
 
   editor.withoutSaving(() => {
-    // Replay the inverse of the previous operations.
-    batch
-      .slice()
-      .reverse()
-      .map(op => op.invert())
-      .forEach(inverse => {
-        const { type, properties } = inverse
+    editor.withoutNormalizing(() => {
+      // Replay the inverse of the previous operations.
+      batch
+        .slice()
+        .reverse()
+        .map(op => op.invert())
+        .forEach(inverse => {
+          const { type, properties } = inverse
 
-        // When the operation mutates the selection, omit its `isFocused` value to
-        // prevent the editor focus from changing during undoing.
-        if (type === 'set_selection') {
-          inverse = inverse.set('properties', omit(properties, 'isFocused'))
-        }
+          // When the operation mutates the selection, omit its `isFocused` value to
+          // prevent the editor focus from changing during undoing.
+          if (type === 'set_selection') {
+            inverse = inverse.set('properties', omit(properties, 'isFocused'))
+          }
 
-        editor.applyOperation(inverse)
-      })
+          editor.applyOperation(inverse)
+        })
 
-    // Shift the previous operations into the redo stack.
-    redos = redos.push(batch)
-    undos = undos.pop()
-    const newData = data.set('undos', undos).set('redos', redos)
-    editor.setData(newData)
+      // Shift the previous operations into the redo stack.
+      redos = redos.push(batch)
+      undos = undos.pop()
+      const newData = data.set('undos', undos).set('redos', redos)
+      editor.setData(newData)
+    })
   })
 }
 

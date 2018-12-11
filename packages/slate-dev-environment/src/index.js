@@ -65,7 +65,7 @@ const FEATURE_RULES = [
   [
     'inputeventslevel1',
     window => {
-      const event = window.InputEvent ? new InputEvent('input') : {}
+      const event = window.InputEvent ? new window.InputEvent('input') : {}
       const support = 'inputType' in event
       return support
     },

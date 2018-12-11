@@ -312,7 +312,12 @@ Commands.deleteBackwardAtRange = (editor, range, n = 1) => {
 
   // PERF: If the closest block is empty, remove it. This is just a shortcut,
   // since merging it would result in the same outcome.
-  if (document.nodes.size !== 1 && block && block.text === '') {
+  if (
+    document.nodes.size !== 1 &&
+    block &&
+    block.text === '' &&
+    block.nodes.size === 1
+  ) {
     editor.removeNodeByKey(block.key)
     return
   }

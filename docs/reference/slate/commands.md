@@ -563,7 +563,7 @@ Move backward one step in the history.
 
 `snapshotSelection() => Editor`
 
-Snapshot `value.selection` for `undo` purposes, useful with delete operations like `change.removeNodeByKey(focusBlock.key).undo()`.
+Snapshot `value.selection` for `undo` purposes, useful with delete operations like `editor.removeNodeByKey(focusBlock.key).undo()`.
 
 ## Miscellaneous Commands
 
@@ -598,8 +598,8 @@ editor.withoutNormalizing(() => {
 By default all new operations are saved to the editor's history. If you have changes that you don't want to show up in the history when the user presses <kbd>cmd+z</kbd>, you can use `withoutSaving` to skip those changes.
 
 ```js
-change.withoutSaving(() => {
-  change.setDecorations(decorations)
+editor.withoutSaving(() => {
+  editor.setDecorations(decorations)
 })
 ```
 
