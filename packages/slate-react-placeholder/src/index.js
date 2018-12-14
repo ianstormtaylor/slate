@@ -15,7 +15,11 @@ let instanceCounter = 0
  */
 
 function SlateReactPlaceholder(options = {}) {
-  const placeholderMark = `placeholder${instanceCounter++}`
+  const instanceId = instanceCounter++
+  const placeholderMark = {
+    type: 'placeholder',
+    data: { key: instanceId },
+  }
 
   const { placeholder, when } = options
 
@@ -49,7 +53,7 @@ function SlateReactPlaceholder(options = {}) {
     const decoration = {
       anchor: { key: first.key, offset: 0 },
       focus: { key: last.key, offset: last.text.length },
-      mark: { type: placeholderMark },
+      mark: placeholderMark,
     }
 
     return [...others, decoration]
@@ -67,7 +71,7 @@ function SlateReactPlaceholder(options = {}) {
   function renderMark(props, editor, next) {
     const { children, mark } = props
 
-    if (mark.type === placeholderMark) {
+    if (mark.type === 'placeholder' && mark.data.get('key') === instanceId) {
       const style = {
         pointerEvents: 'none',
         display: 'inline-block',
