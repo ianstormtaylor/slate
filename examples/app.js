@@ -73,7 +73,7 @@ const EXAMPLES = [
  * @type {Component}
  */
 
-const Nav = styled('div')`
+const Header = styled('div')`
   align-items: center;
   background: #000;
   color: #aaa;
@@ -113,7 +113,7 @@ const TabList = styled('div')`
   transition: width 0.2s;
   width: ${props => (props.isVisible ? '200px' : '0')};
   white-space: nowrap;
-  z-index: 1;
+  z-index: 1; /* To appear above the underlay */
 `
 
 const TabListUnderlay = styled('div')`
@@ -156,17 +156,22 @@ const Tab = styled(MaskedRouterLink)`
 
 const Wrapper = styled('div')`
   max-width: 42em;
-  margin: 0 auto 20px;
+  margin: 20px auto;
   padding: 20px;
 `
 
-const ExampleTitle = styled('div')`
+const ExampleHeader = styled('div')`
   align-items: center;
   background-color: #555;
   color: #ddd;
   display: flex;
   height: 42px;
-  padding-left: 1em;
+  position: relative;
+  z-index: 1; /* To appear above the underlay */
+`
+
+const ExampleTitle = styled('span')`
+  margin-left: 1em;
 `
 
 const ExampleContent = styled(Wrapper)`
@@ -224,67 +229,10 @@ export default class App extends React.Component {
     return (
       <HashRouter>
         <div>
-          <Nav>
-            <TabButton
-              onClick={e => {
-                e.stopPropagation()
-
-                this.setState({
-                  isTabListVisible: !this.state.isTabListVisible,
-                })
-              }}
-            >
-              <Icon>menu</Icon>
-            </TabButton>
-            <Title>Slate Examples</Title>
-            <LinkList>
-              <Link href="https://github.com/ianstormtaylor/slate">GitHub</Link>
-              <Link href="https://docs.slatejs.org/">Docs</Link>
-            </LinkList>
-          </Nav>
-          <TabList isVisible={this.state.isTabListVisible}>
-            {EXAMPLES.map(([name, Component, path]) => (
-              <Route key={path} exact path={path}>
-                {({ match }) => (
-                  <Tab
-                    to={path}
-                    active={match && match.isExact}
-                    onClick={this._hideTabList}
-                  >
-                    {name}
-                  </Tab>
-                )}
-              </Route>
-            ))}
-          </TabList>
-          {this.state.error ? (
-            <Warning>
-              <p>
-                An error was thrown by one of the example's React components!
-              </p>
-              <pre>
-                <code>
-                  {this.state.error.stack}
-                  {'\n'}
-                  {this.state.info.componentStack}
-                </code>
-              </pre>
-            </Warning>
-          ) : (
-            <Switch>
-              {EXAMPLES.map(([name, Component, path]) => (
-                <Route key={path} path={path}>
-                  <div>
-                    <ExampleTitle>{name}</ExampleTitle>
-                    <ExampleContent>
-                      <Component />
-                    </ExampleContent>
-                  </div>
-                </Route>
-              ))}
-              <Redirect from="/" to="/rich-text" />
-            </Switch>
-          )}
+          {this.renderHeader()}
+          {this.renderExampleHeader()}
+          {this.renderTabList()}
+          {this.state.error ? this.renderError() : this.renderExample()}
           <TabListUnderlay
             isVisible={this.state.isTabListVisible}
             onClick={this._hideTabList}
@@ -294,6 +242,96 @@ export default class App extends React.Component {
     )
   }
 
+  renderError() {
+    return (
+      <Warning>
+        <p>An error was thrown by one of the example's React components!</p>
+        <pre>
+          <code>
+            {this.state.error.stack}
+            {'\n'}
+            {this.state.info.componentStack}
+          </code>
+        </pre>
+      </Warning>
+    )
+  }
+
+  renderExample() {
+    return (
+      <Switch>
+        {EXAMPLES.map(([name, Component, path]) => (
+          <Route key={path} path={path}>
+            <div>
+              <ExampleContent>
+                <Component />
+              </ExampleContent>
+            </div>
+          </Route>
+        ))}
+        <Redirect from="/" to="/rich-text" />
+      </Switch>
+    )
+  }
+
+  renderExampleHeader() {
+    return (
+      <ExampleHeader>
+        <TabButton
+          onClick={e => {
+            e.stopPropagation()
+
+            this.setState({
+              isTabListVisible: !this.state.isTabListVisible,
+            })
+          }}
+        >
+          <Icon>menu</Icon>
+        </TabButton>
+        <Switch>
+          {EXAMPLES.map(([name, Component, path]) => (
+            <Route key={path} exact path={path}>
+              <ExampleTitle>{name}</ExampleTitle>
+            </Route>
+          ))}
+        </Switch>
+      </ExampleHeader>
+    )
+  }
+
+  renderHeader() {
+    return (
+      <Header>
+        <Title>Slate Examples</Title>
+        <LinkList>
+          <Link href="https://github.com/ianstormtaylor/slate">GitHub</Link>
+          <Link href="https://docs.slatejs.org/">Docs</Link>
+        </LinkList>
+      </Header>
+    )
+  }
+
+  renderTabList() {
+    return (
+      <TabList isVisible={this.state.isTabListVisible}>
+        {EXAMPLES.map(([name, Component, path]) => (
+          <Route key={path} exact path={path}>
+            {({ match }) => (
+              <Tab
+                to={path}
+                active={match && match.isExact}
+                onClick={this._hideTabList}
+              >
+                {name}
+              </Tab>
+            )}
+          </Route>
+        ))}
+      </TabList>
+    )
+  }
+
+  // -- Protected Methods ------------------------------------------------------
   _hideTabList = () => {
     this.setState({ isTabListVisible: false })
   }
