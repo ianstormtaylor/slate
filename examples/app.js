@@ -331,7 +331,6 @@ export default class App extends React.Component {
     )
   }
 
-  // -- Protected Methods ------------------------------------------------------
   _hideTabList = () => {
     this.setState({ isTabListVisible: false })
   }
