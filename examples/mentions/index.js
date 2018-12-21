@@ -1,6 +1,6 @@
 /*
 This example is intended to be a super basic mentions implementation that
-people can work off of. What is show here is how to detect when a user starts
+people can work off of. What is shown here is how to detect when a user starts
 typing a mention, making a search query, and then inserting a mention when
 the user selects an item. There are a few improvements that can be made in a
 production implementation:
@@ -134,7 +134,7 @@ class MentionsExample extends React.Component {
   renderMark(props, editor, next) {
     if (props.mark.type === CONTEXT_MARK_TYPE) {
       return (
-        // Adding the className here is important so taht the `Suggestions`
+        // Adding the className here is important so that the `Suggestions`
         // component can find an anchor.
         <span {...props.attributes} className="mention-context">
           {props.children}
