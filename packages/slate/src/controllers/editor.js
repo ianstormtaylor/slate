@@ -99,15 +99,15 @@ class Editor {
     this.operations = operations.push(operation)
 
     // Get the paths of the affected nodes, and mark them as dirty.
-    const newDirtyPaths = getDirtyPaths(operation)
-    const dirty = this.tmp.dirty.reduce((memo, path) => {
-      path = PathUtils.create(path)
-      const transformed = PathUtils.transform(path, operation)
-      memo = memo.concat(transformed.toArray())
-      return memo
-    }, newDirtyPaths)
+    const newDirtyPaths = getDirtyPaths(operation).map(path => path.join('.'))
+    const { document } = this.value
+    const table = document.getKeysToPathsTable()
 
-    this.tmp.dirty = dirty
+    for (const key in table) {
+      if (newDirtyPaths.includes(table[key].join('.'))) {
+        this.tmp.dirty.push(key)
+      }
+    }
 
     // If we're not already, queue the flushing process on the next tick.
     if (!this.tmp.flushing) {
@@ -196,8 +196,8 @@ class Editor {
     const { value, controller } = this
     let { document } = value
     const table = document.getKeysToPathsTable()
-    const paths = Object.values(table).map(PathUtils.create)
-    this.tmp.dirty = this.tmp.dirty.concat(paths)
+    const keys = Object.keys(table)
+    this.tmp.dirty.push(...keys)
     normalizeDirtyPaths(this)
 
     const { selection } = value
@@ -586,7 +586,12 @@ function normalizeNodeByPath(editor, path) {
   const { controller } = editor
   let { value } = editor
   let { document } = value
-  let node = document.assertNode(path)
+  let node = document.getNode(path)
+
+  if (!node) {
+    return
+  }
+
   let iterations = 0
   const max = 100 + (node.object === 'text' ? 1 : node.nodes.size)
 
