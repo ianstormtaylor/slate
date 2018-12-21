@@ -1,6 +1,7 @@
 import assert from 'assert'
 import { fixtures } from 'slate-dev-test-utils'
 import { Node, Editor, Value } from 'slate'
+import Operation from '../src/models/operation'
 
 const plugins = [
   {
@@ -36,7 +37,12 @@ describe('slate', () => {
   fixtures(__dirname, 'models/operation', ({ module }) => {
     const { input, output } = module
     const fn = module.default
-    const actual = fn(input).toJSON()
+    let actual = fn(input)
+
+    if (Operation.isOperation(actual)) {
+      actual = actual.toJSON()
+    }
+
     const expected = output
     assert.deepEqual(actual, expected)
   })

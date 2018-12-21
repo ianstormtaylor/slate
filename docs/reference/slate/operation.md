@@ -10,7 +10,7 @@ There are a handful of Slate operation types. The goal is to have the fewest pos
 
 See each operation separately below to see what they consist of.
 
-Note that all operations have a `data` property which can be used to attach arbitrary data to the operation, just like the [`Node`](./node.md) models ([`Block`](./block.md), [`Inline`](./inline.md), etc).
+Note that all operations have a `data` property which can be used to attach arbitrary data to the operation, just like the [`Node`](./node.md) models ([`Block`](./block.md), [`Inline`](./inline.md), etc), and an `isInverted` boolean.
 
 ## Text Operations
 
@@ -207,12 +207,12 @@ Set new `properties` on a value. Properties can contain `data` and `decorations`
 
 ### `apply`
 
-`apply(value: Value, operation: Object) => Value`
+`apply(value: Value) => Value`
 
 Applies an `operation` to a `value` object.
 
 ### `invert`
 
-`invert(operation: Object) => Object`
+`invert() => Operation`
 
 Create an inverse operation that will undo the changes made by the original.

@@ -20,7 +20,7 @@ const debug = Debug('slate:operation:invert')
  */
 
 function invertOperation(op) {
-  op = Operation.create(op)
+  op = Operation.create(op).set('isInverted', !op.get('isInverted'))
   const { type } = op
   debug(type, op)
 

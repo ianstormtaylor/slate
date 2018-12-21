@@ -53,6 +53,7 @@ const DEFAULTS = {
   type: undefined,
   value: undefined,
   data: undefined,
+  isInverted: false,
 }
 
 /**
