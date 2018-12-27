@@ -5,8 +5,8 @@ import h from '../helpers/h'
 
 export const rules = [
   {
-    serialize(obj, children) {
-      if (obj.object == 'block' && obj.type == 'paragraph') {
+    serialize:(obj, children) {
+      if (obj.object === 'block' && obj.type === 'paragraph') {
         return React.createElement(
           'p',
           { 'data-thing': obj.data.get('thing') },
