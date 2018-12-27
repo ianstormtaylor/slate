@@ -5,12 +5,12 @@ import h from '../helpers/h'
 
 export const rules = [
   {
-    serialize(obj, children) {
-      if (obj.object == 'block' && obj.type == 'paragraph') {
+    serialize:(obj, children) {
+      if (obj.object === 'block' && obj.type === 'paragraph') {
         return React.createElement('p', {}, children)
       }
 
-      if (obj.object == 'inline' && obj.type == 'link') {
+      if (obj.object === 'inline' && obj.type === 'link') {
         return React.createElement(
           'a',
           { href: obj.data.get('href') },
