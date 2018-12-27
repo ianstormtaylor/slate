@@ -10,14 +10,14 @@ const { Suite, Bench } = require('slate-dev-benchmark')
 module.exports.run = function(include) {
   const categoryDir = resolve(__dirname)
   const categories = readdirSync(categoryDir).filter(
-    c => c[0] != '.' && c != 'index.js'
+    c => c[0] !== '.' && c !== 'index.js'
   )
 
   categories.forEach(category => {
     const suite = new Suite(category, { minTries: 100, minTime: 1000 })
     const benchmarkDir = resolve(categoryDir, category)
     const benchmarks = readdirSync(benchmarkDir)
-      .filter(b => b[0] != '.' && !!~b.indexOf('.js'))
+      .filter(b => b[0] !== '.' && !!~b.indexOf('.js'))
       .map(b => basename(b, extname(b)))
 
     benchmarks.forEach(benchmark => {
