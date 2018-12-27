@@ -52,7 +52,7 @@ function invertOperation(op) {
       // its new position, we need to adjust part of the path by -1.
       if (
         path.size < inversePath.size &&
-        path.slice(0, pathLast).every((e, i) => e == inversePath.get(i)) &&
+        path.slice(0, pathLast).every((e, i) => e === inversePath.get(i)) &&
         path.last() < inversePath.get(pathLast)
       ) {
         inversePath = inversePath
@@ -68,7 +68,7 @@ function invertOperation(op) {
         newPath.size < inverseNewPath.size &&
         newPath
           .slice(0, newPathLast)
-          .every((e, i) => e == inverseNewPath.get(i)) &&
+          .every((e, i) => e === inverseNewPath.get(i)) &&
         newPath.last() <= inverseNewPath.get(newPathLast)
       ) {
         inverseNewPath = inverseNewPath
