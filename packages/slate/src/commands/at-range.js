@@ -62,7 +62,8 @@ Commands.addMarkAtRange = (editor, range, mark) => {
 
       if (key === start.key) index = start.offset
       if (key === end.key) length = end.offset
-      if (key === start.key && key === end.key) length = end.offset - start.offset
+      if (key === start.key && key === end.key)
+        length = end.offset - start.offset
 
       editor.addMarkByKey(key, index, length, mark)
     })
@@ -912,7 +913,8 @@ Commands.removeMarkAtRange = (editor, range, mark) => {
 
       if (key === start.key) index = start.offset
       if (key === end.key) length = end.offset
-      if (key === start.key && key === end.key) length = end.offset - start.offset
+      if (key === start.key && key === end.key)
+        length = end.offset - start.offset
 
       editor.removeMarkByKey(key, index, length, mark)
     })
