@@ -5,7 +5,7 @@ import h from '../helpers/h'
 
 export const rules = [
   {
-    serialize:(obj, children) {
+    serialize(obj, children) {
       if (obj.object !== 'block') return
 
       switch (obj.type) {
