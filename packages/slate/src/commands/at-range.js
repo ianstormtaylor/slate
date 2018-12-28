@@ -1095,9 +1095,9 @@ Commands.unwrapBlockAtRange = (editor, range, properties) => {
     .map(block => {
       return document.getClosest(block.key, parent => {
         if (parent.object !== 'block') return false
-        if (properties.type !== null && parent.type !== properties.type)
+        if (properties.type != null && parent.type !== properties.type)
           return false
-        if (properties.data !== null && !parent.data.isSuperset(properties.data))
+        if (properties.data != null && !parent.data.isSuperset(properties.data))
           return false
         return true
       })
@@ -1176,9 +1176,9 @@ Commands.unwrapInlineAtRange = (editor, range, properties) => {
     .map(text => {
       return document.getClosest(text.key, parent => {
         if (parent.object !== 'inline') return false
-        if (properties.type !== null && parent.type !== properties.type)
+        if (properties.type != null && parent.type !== properties.type)
           return false
-        if (properties.data !== null && !parent.data.isSuperset(properties.data))
+        if (properties.data != null && !parent.data.isSuperset(properties.data))
           return false
         return true
       })
@@ -1234,11 +1234,11 @@ Commands.wrapBlockAtRange = (editor, range, block) => {
   }
 
   // If no shared parent could be found then the parent is the document.
-  if (parent === null) parent = document
+  if (parent == null) parent = document
 
   // Create a list of direct children siblings of parent that fall in the
   // selection.
-  if (siblings === null) {
+  if (siblings == null) {
     const indexes = parent.nodes.reduce((ind, node, i) => {
       if (node === firstblock || node.hasDescendant(firstblock.key)) ind[0] = i
       if (node === lastblock || node.hasDescendant(lastblock.key)) ind[1] = i
@@ -1250,7 +1250,7 @@ Commands.wrapBlockAtRange = (editor, range, block) => {
   }
 
   // Get the index to place the new wrapped node at.
-  if (index === null) {
+  if (index == null) {
     index = parent.nodes.indexOf(siblings.first())
   }
 
