@@ -410,7 +410,7 @@ function AfterPlugin(options = {}) {
    */
 
   function onInput(event, editor, next) {
-    console.log('onInput')
+    debug('onInput')
     const window = getWindow(event.target)
     const { value } = editor
 
@@ -454,7 +454,7 @@ function AfterPlugin(options = {}) {
     // If the text is no different, abort.
     if (textContent == text) return next()
 
-    debug('onInput', { event })
+    debug('onInput:fix', { event })
 
     // Determine what the selection should be after changing the text.
     const delta = textContent.length - text.length
