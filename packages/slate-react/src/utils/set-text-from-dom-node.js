@@ -39,7 +39,6 @@ export default function setTextFromDomNode(window, editor, domNode) {
 
   // If the text is no different, abort.
   if (textContent == text) return
-  console.log('fixed')
 
   // Determine what the selection should be after changing the text.
   // const delta = textContent.length - text.length
