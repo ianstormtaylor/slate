@@ -1,5 +1,4 @@
 import findPoint from './find-point'
-import setSelectionFromDom from './set-selection-from-dom'
 
 export default function setTextFromDomNode(window, editor, domNode) {
   const point = findPoint(domNode, 0, editor)
@@ -50,6 +49,5 @@ export default function setTextFromDomNode(window, editor, domNode) {
   entire = document.resolveRange(entire)
 
   // Change the current value to have the leaf's text replaced.
-  editor.insertTextAtRange(entire, textContent, leaf.marks) //.select(corrected)
-  // setSelectionFromDom(window, editor)
+  editor.insertTextAtRange(entire, textContent, leaf.marks)
 }
