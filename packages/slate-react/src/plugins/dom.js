@@ -1,3 +1,4 @@
+import AndroidPlugin from './android'
 import AfterPlugin from './after'
 import BeforePlugin from './before'
 
@@ -10,9 +11,10 @@ import BeforePlugin from './before'
 
 function DOMPlugin(options = {}) {
   const { plugins = [] } = options
+  const androidPlugin = AndroidPlugin()
   const beforePlugin = BeforePlugin()
   const afterPlugin = AfterPlugin()
-  return [beforePlugin, ...plugins, afterPlugin]
+  return [androidPlugin, beforePlugin, ...plugins, afterPlugin]
 }
 
 /**

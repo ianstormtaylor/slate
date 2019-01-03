@@ -25,6 +25,14 @@ const FIREFOX_NODE_TYPE_ACCESS_ERROR = /Permission denied to access property "no
 const debug = Debug('slate:content')
 
 /**
+ * Separate debug to easily see when a render has happened.
+ *
+ * @type {Function}
+ */
+
+const debugRender = Debug('slate:render')
+
+/**
  * Content.
  *
  * @type {Component}
@@ -460,6 +468,7 @@ class Content extends React.Component {
     }
 
     debug('render', { props })
+    debugRender({ text: value.document.text, value: value.toJSON() })
 
     return (
       <Container
