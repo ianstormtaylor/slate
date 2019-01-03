@@ -23,6 +23,7 @@ const config = {
     contentBase: './examples',
     publicPath: '/',
     hot: true,
+    host: '0.0.0.0',
   },
   module: {
     rules: [
