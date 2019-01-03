@@ -1,18 +1,17 @@
 import findRange from './find-range'
 
-export default function setSelectionFromDOM(window, editor) {
+export default function setSelectionFromDOM(window, editor, domSelection) {
   const { value } = editor
   const { document } = value
-  const native = window.getSelection()
 
   // If there are no ranges, the editor was blurred natively.
-  if (!native.rangeCount) {
+  if (!domSelection.rangeCount) {
     editor.blur()
     return
   }
 
   // Otherwise, determine the Slate selection from the native one.
-  let range = findRange(native, editor)
+  let range = findRange(domSelection, editor)
 
   if (!range) {
     return

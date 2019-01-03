@@ -13,7 +13,8 @@ import findRange from '../utils/find-range'
 import getEventRange from '../utils/get-event-range'
 import getEventTransfer from '../utils/get-event-transfer'
 import setEventTransfer from '../utils/set-event-transfer'
-import setSelectionFromDOM from '../utils/set-selection-from-dom'
+import setSelectionFromDom from '../utils/set-selection-from-dom'
+import setTextFromDomNode from '../utils/set-text-from-dom-node'
 
 /**
  * Debug.
@@ -412,61 +413,13 @@ function AfterPlugin(options = {}) {
   function onInput(event, editor, next) {
     debug('onInput')
     const window = getWindow(event.target)
-    const { value } = editor
 
     // Get the selection point.
-    const native = window.getSelection()
-    const { anchorNode } = native
-    const point = findPoint(anchorNode, 0, editor)
-    if (!point) return next()
+    const selection = window.getSelection()
+    const { anchorNode } = selection
 
-    // Get the text node and leaf in question.
-    const { document, selection } = value
-    const node = document.getDescendant(point.key)
-    const block = document.getClosestBlock(node.key)
-    const leaves = node.getLeaves()
-    const lastText = block.getLastText()
-    const lastLeaf = leaves.last()
-    let start = 0
-    let end = 0
-
-    const leaf =
-      leaves.find(r => {
-        start = end
-        end += r.text.length
-        if (end > point.offset) return true
-      }) || lastLeaf
-
-    // Get the text information.
-    const { text } = leaf
-    let { textContent } = anchorNode
-    const isLastText = node == lastText
-    const isLastLeaf = leaf == lastLeaf
-    const lastChar = textContent.charAt(textContent.length - 1)
-
-    // COMPAT: If this is the last leaf, and the DOM text ends in a new line,
-    // we will have added another new line in <Leaf>'s render method to account
-    // for browsers collapsing a single trailing new lines, so remove it.
-    if (isLastText && isLastLeaf && lastChar == '\n') {
-      textContent = textContent.slice(0, -1)
-    }
-
-    // If the text is no different, abort.
-    if (textContent == text) return next()
-
-    debug('onInput:fix', { event })
-
-    // Determine what the selection should be after changing the text.
-    const delta = textContent.length - text.length
-    const corrected = selection.moveToEnd().moveForward(delta)
-    let entire = selection
-      .moveAnchorTo(point.key, start)
-      .moveFocusTo(point.key, end)
-
-    entire = document.resolveRange(entire)
-
-    // Change the current value to have the leaf's text replaced.
-    editor.insertTextAtRange(entire, textContent, leaf.marks).select(corrected)
+    setTextFromDomNode(window, editor, anchorNode)
+    setSelectionFromDom(window, editor, selection)
     next()
   }
 
@@ -680,7 +633,8 @@ function AfterPlugin(options = {}) {
   function onSelect(event, editor, next) {
     debug('onSelect', { event })
     const window = getWindow(event.target)
-    setSelectionFromDOM(window, editor)
+    const selection = window.getSelection()
+    setSelectionFromDom(window, editor, selection)
     next()
   }
 
