@@ -106,6 +106,13 @@ const TabList = styled('div')`
   & > * + * {
     margin-left: 0.5em;
   }
+
+  @media only screen and (max-width: 768px) {
+    box-sizing: border-box;
+    width: 100%;
+    overflow-x: scroll;
+    white-space: nowrap;
+  }
 `
 
 const MaskedRouterLink = ({ active, ...props }) => <RouterLink {...props} />
