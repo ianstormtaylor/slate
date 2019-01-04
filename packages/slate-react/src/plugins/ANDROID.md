@@ -2,9 +2,50 @@
 
 The following is a list of unexpected behaviors in Android
 
+# Debugging
+
+```
+slate:android,slate:before,slate:render,slate:reconcile
+```
+
+# API 28
+
+## DOM breaks when suggestion selected on text entirely within a `strong` tag
+
+Appears similar to the bug in API 27.
+
+
+## Can't split word with Enter (PARTIAL FIXED)
+
+Move the cursor to `edit|able` where | is the cursor.
+
+Hit `enter` on the virtual keyboard.
+
+The `keydown` event does not indicate what key is being pressed so we don't know that we should be handling an enter. There are two opportunities:
+
+1. The onBeforeInput event has a `data` property that contains the text immediately before the cursor and it includes `edit|` where the pipe indicates an enter.
+2. We can look through the text at the end of a composition and simulate hitting enter maybe.
+
+### Fixed for API 28
+
+Allow enter to go through to the before plugin even during a compositiong and it works in API 28.
+
+### Broken in API 27
+
+
 # API 27
 
-## Missing `onCompositionStar` (FIXED)
+## Typing at end of line yields wrong cursor position (FIXED)
+
+When you enter any text at the end of a block, the text gets entered in the wrong position.
+
+### Fix
+
+Fixed by ignoring the `updateSelection` code in `content.js` on the `onEvent` method if we are in Android. This doesn't ignore `updateSelection` altogether, only in that one place.
+
+
+
+## Missing `onCompositionStart` (FIXED)
 
 ### Desciption
 
@@ -15,7 +56,7 @@ Insert a word using the virtual keyboard. Click outside the editor. Touch after 
 Fixed by setting `isComposing` from the `onCompositionEnd` event until the `requestAnimationFrame` callback is executed.
 
 
-## DOM recreated when suggestion selected on text entirely within a `strong` tag
+## DOM breaks when suggestion selected on text entirely within a `strong` tag
 
 Touch anywhere in the bold word "rich" in the example. Select an alternative recommendation and we get a failure.
 
@@ -24,3 +65,5 @@ Android is destroying the `strong` tag and replacing it with a `b` tag.
 The problem does not present itself if the word is surrounding by spaces before the `strong` tag.
 
 A possible fix may be to surround the word with a `ZERO WIDTH NO-BREAK SPACE` represented as `&#65279;` in HTML. It appears in React for empty paragraphs.
+
+

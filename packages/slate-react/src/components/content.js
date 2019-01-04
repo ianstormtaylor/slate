@@ -4,7 +4,11 @@ import Types from 'prop-types'
 import getWindow from 'get-window'
 import warning from 'tiny-warning'
 import throttle from 'lodash/throttle'
-import { IS_FIREFOX, HAS_INPUT_EVENTS_LEVEL_2 } from 'slate-dev-environment'
+import {
+  IS_ANDROID,
+  IS_FIREFOX,
+  HAS_INPUT_EVENTS_LEVEL_2,
+} from 'slate-dev-environment'
 
 import EVENT_HANDLERS from '../constants/event-handlers'
 import Node from './node'
@@ -141,6 +145,14 @@ class Content extends React.Component {
    */
 
   componentDidUpdate() {
+    console.log('componentDidUpdate')
+    // NOTE:
+    // Don't disable `updateSelection` on Android. Clicking a word and a
+    // suggestion breaks on API27. It does fix the crazy jumping cursor loop
+    // when doing an auto-suggest on a fully enclosed text with bold though.
+    // Most likely it still needs other fix issues though.
+    // 
+    // if (IS_ANDROID) return
     this.updateSelection()
   }
 
@@ -149,6 +161,7 @@ class Content extends React.Component {
    */
 
   updateSelection = () => {
+    console.log('updateSelection!!!!!!!!!!!!!!!!!!!')
     const { editor } = this.props
     const { value } = editor
     const { selection } = value
@@ -347,7 +360,12 @@ class Content extends React.Component {
     // cases we don't need to trigger any changes, since our internal model is
     // already up to date, but we do want to update the native selection again
     // to make sure it is in sync. (2017/10/16)
-    if (handler == 'onSelect') {
+    //
+    // ANDROID: The updateSelection causes issues in Android when you are
+    // at the end of a black. The selection ends up to the left of the inserted
+    // character instead of to the right. This behavior continues even if
+    // you enter more than one character. (2019/01/03)
+    if (!IS_ANDROID && handler == 'onSelect') {
       const { editor } = this.props
       const { value } = editor
       const { selection } = value
