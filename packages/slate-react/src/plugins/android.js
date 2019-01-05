@@ -171,6 +171,7 @@ function AndroidPlugin() {
           next()
         }
         break
+      case 26:
       case 27:
       case 28:
         if (event.key === 'Enter') {
