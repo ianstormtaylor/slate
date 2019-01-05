@@ -29,12 +29,13 @@ const FIREFOX_NODE_TYPE_ACCESS_ERROR = /Permission denied to access property "no
 const debug = Debug('slate:content')
 
 /**
- * Separate debug to easily see when a render has happened.
+ * Separate debug to easily see when the DOM has updated either by render or
+ * changing selection.
  *
  * @type {Function}
  */
 
-const debugRender = Debug('slate:render')
+debug.update = Debug('slate:update')
 
 /**
  * Content.
@@ -145,7 +146,7 @@ class Content extends React.Component {
    */
 
   componentDidUpdate() {
-    console.log('componentDidUpdate')
+    debug.update('componentDidUpdate')
     // NOTE:
     // Don't disable `updateSelection` on Android. Clicking a word and a
     // suggestion breaks on API27. It does fix the crazy jumping cursor loop
@@ -161,7 +162,7 @@ class Content extends React.Component {
    */
 
   updateSelection = () => {
-    console.log('updateSelection!!!!!!!!!!!!!!!!!!!')
+    debug.update('updateSelection')
     const { editor } = this.props
     const { value } = editor
     const { selection } = value
@@ -281,6 +282,7 @@ class Content extends React.Component {
 
     if (updated) {
       debug('updateSelection', { selection, native, activeElement })
+      debug.update('updateSelection-applied', { selection })
     }
   }
 
@@ -486,7 +488,7 @@ class Content extends React.Component {
     }
 
     debug('render', { props })
-    debugRender({
+    debug.update('render', {
       text: value.document.text,
       selection: value.selection.toJSON(),
       value: value.toJSON(),

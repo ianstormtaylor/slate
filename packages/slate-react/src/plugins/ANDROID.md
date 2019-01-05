@@ -5,7 +5,7 @@ The following is a list of unexpected behaviors in Android
 # Debugging
 
 ```
-slate:android,slate:before,slate:render,slate:reconcile
+slate:android,slate:before,slate:update,slate:reconcile
 ```
 
 # API 28
