@@ -151,7 +151,7 @@ class Content extends React.Component {
     // suggestion breaks on API27. It does fix the crazy jumping cursor loop
     // when doing an auto-suggest on a fully enclosed text with bold though.
     // Most likely it still needs other fix issues though.
-    // 
+    //
     // if (IS_ANDROID) return
     this.updateSelection()
   }
@@ -486,7 +486,11 @@ class Content extends React.Component {
     }
 
     debug('render', { props })
-    debugRender({ text: value.document.text, value: value.toJSON() })
+    debugRender({
+      text: value.document.text,
+      selection: value.selection.toJSON(),
+      value: value.toJSON(),
+    })
 
     return (
       <Container

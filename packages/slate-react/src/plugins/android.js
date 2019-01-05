@@ -79,8 +79,14 @@ function AndroidPlugin() {
       status,
       e: pick(event, ['data', 'inputType', 'isComposing']),
     })
-    if (status === COMPOSING) return
-    next()
+    switch (API_VERSION) {
+      case 25:
+        // prevent onBeforeInput to allow selecting an alternate suggest to
+        // work.
+        break
+      default:
+        if (status !== COMPOSING) next()
+    }
   }
 
   function onCompositionEnd(event, editor, next) {
@@ -147,10 +153,27 @@ function AndroidPlugin() {
       // 1. We want to allow enter keydown to allows go through
       // 2. We want to deny keydown, I think, when it fires before the composition
       //    or something. Need to remember what it was.
-      case 28:
-      case 27:
+
+      case 25:
+        // in API25 prevent other keys to fix clicking a word and then
+        // selecting an alternate suggestion.
+        // 
+        // NOTE:
+        // The `setSelectionFromDom` is to allow hitting `Enter` to work
+        // because the selection needs to be in the right place; however,
+        // for now we've removed the cancelling of `onSelect` and everything
+        // appears to be working. Not sure why we removed `onSelect` though
+        // in API25.
         if (event.key === 'Enter') {
-          console.log('pass through')
+          // const window = getWindow(event.target)
+          // const selection = window.getSelection()
+          // setSelectionFromDom(window, editor, selection)
+          next()
+        }
+        break
+      case 27:
+      case 28:
+        if (event.key === 'Enter') {
           next()
         }
         break
@@ -161,12 +184,21 @@ function AndroidPlugin() {
     }
   }
 
-  function onKeyPress(event, editor, next) {}
-
   function onSelect(event, editor, next) {
     debug('onSelect', { event, status })
-    if (status === COMPOSING) return
-    next()
+    switch (API_VERSION) {
+      // NOTE:
+      // Not sure why we had this exception to not handle `onSelect` before.
+      // If we add this code back in, make sure to re-enable the `onKeyDown`
+      // special case.
+      
+      // case 25:
+      //   break
+      default:
+        if (status !== COMPOSING) next()
+    }
+    // if (status === COMPOSING) return
+    // next()
   }
 
   /**
@@ -194,7 +226,6 @@ function AndroidPlugin() {
     // onFocus,
     onInput,
     onKeyDown,
-    onKeyPress,
     // onPaste,
     onSelect,
   }

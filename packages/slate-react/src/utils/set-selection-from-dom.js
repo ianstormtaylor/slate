@@ -3,12 +3,14 @@ import findRange from './find-range'
 export default function setSelectionFromDOM(window, editor, domSelection) {
   const { value } = editor
   const { document } = value
+  console.log('a')
 
   // If there are no ranges, the editor was blurred natively.
   if (!domSelection.rangeCount) {
     editor.blur()
     return
   }
+  console.log('b')
 
   // Otherwise, determine the Slate selection from the native one.
   let range = findRange(domSelection, editor)
@@ -16,6 +18,8 @@ export default function setSelectionFromDOM(window, editor, domSelection) {
   if (!range) {
     return
   }
+
+  console.log('c')
 
   const { anchor, focus } = range
   const anchorText = document.getNode(anchor.key)
@@ -43,6 +47,8 @@ export default function setSelectionFromDOM(window, editor, domSelection) {
     range = range.setFocus(focus.setOffset(0))
   }
 
+  console.log('d')
+
   // COMPAT: If the selection is at the end of a non-void inline node, and
   // there is a node after it, put it in the node after instead. This
   // standardizes the behavior, since it's indistinguishable to the user.
@@ -56,6 +62,8 @@ export default function setSelectionFromDOM(window, editor, domSelection) {
     if (nextText) range = range.moveAnchorTo(nextText.key, 0)
   }
 
+  console.log('e')
+
   if (
     focusInline &&
     !editor.isVoid(focusInline) &&
@@ -66,12 +74,16 @@ export default function setSelectionFromDOM(window, editor, domSelection) {
     if (nextText) range = range.moveFocusTo(nextText.key, 0)
   }
 
+  console.log('f')
+
   let selection = document.createSelection(range)
   selection = selection.setIsFocused(true)
 
   // Preserve active marks from the current selection.
   // They will be cleared by `editor.select` if the selection actually moved.
   selection = selection.set('marks', value.selection.marks)
+
+  console.log('setSelectionFromDom', selection.toJSON())
 
   editor.select(selection)
 }
