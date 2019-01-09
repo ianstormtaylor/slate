@@ -20,5 +20,11 @@ export default function mixin(Interface, Classes) {
       const desc = Object.getOwnPropertyDescriptor(Interface.prototype, name)
       Object.defineProperty(Class.prototype, name, desc)
     }
+
+    for (const name of Object.getOwnPropertySymbols(Interface.prototype)) {
+      if (Class.prototype.hasOwnProperty(name)) continue
+      const desc = Object.getOwnPropertyDescriptor(Interface.prototype, name)
+      Object.defineProperty(Class.prototype, name, desc)
+    }
   }
 }
