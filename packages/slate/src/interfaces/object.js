@@ -48,8 +48,6 @@ function create(type) {
  * Mix in the object interfaces.
  */
 
-debugger
-
 Object.entries({
   Block,
   Change,
