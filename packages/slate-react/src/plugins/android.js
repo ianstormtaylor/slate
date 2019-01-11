@@ -201,10 +201,10 @@ function AndroidPlugin() {
       // causes the cursor position to not be properly placed.
       case 26:
       case 27:
-        const window = getWindow(event.target)
-        const selection = window.getSelection()
-        beforeSplitSelection = getSelectionFromDom(window, editor, selection)
-        console.log('onSelect', beforeSplitSelection.toJSON())
+        // const window = getWindow(event.target)
+        // const selection = window.getSelection()
+        // beforeSplitSelection = getSelectionFromDom(window, editor, selection)
+        // console.log('onSelect', beforeSplitSelection.toJSON())
         break
       default:
         if (status !== COMPOSING) next()
