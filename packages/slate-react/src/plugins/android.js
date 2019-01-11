@@ -204,6 +204,7 @@ function AndroidPlugin() {
             editor.deleteBackward()
           })
         }
+        return
         break
     }
     if (status === COMPOSING) return
