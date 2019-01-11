@@ -163,11 +163,11 @@ class Content extends React.Component {
    */
 
   updateSelection = () => {
-    debug.update('updateSelection')
     const { editor } = this.props
     const { value } = editor
     const { selection } = value
     const { isBackward } = selection
+    debug.update('updateSelection', { selection: selection.toJSON() })
     const window = getWindow(this.element)
     const native = window.getSelection()
     const { activeElement } = window.document

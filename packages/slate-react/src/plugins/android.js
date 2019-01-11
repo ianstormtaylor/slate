@@ -44,7 +44,15 @@ function AndroidPlugin() {
   // certain scenarios like hitting 'enter' at the end of a word.
   let beforeSplitSnapshot = null
   let beforeSplitSelection = null
-  let beforeSplitReconcileId = null
+  let reconcileCallbackId = null
+
+  // Keey a snapshot after a `keydown` event in API 26/27.
+  // If an `input` gets called with `inputType` of `deleteContentBackward`
+  // immediately after then we need to undo the delete to keep React in sync
+  // with the DOM.
+  let beforeDeleteSnapshot = null
+  let beforeDeleteSelection = null
+  let deleteCallbackId = null
 
   // Because Slate implements its own event handler for `beforeInput` in
   // addition to React's version, we actually get two. If we cancel the
@@ -54,8 +62,8 @@ function AndroidPlugin() {
   // through React's event system.
   let preventNextBeforeInput = false
 
-  function reconcile(window, editor) {
-    debug.reconcile()
+  function reconcile(window, editor, { from }) {
+    debug.reconcile({ from })
     const selection = window.getSelection()
     nodes.forEach(node => {
       setTextFromDomNode(window, editor, node)
@@ -72,6 +80,11 @@ function AndroidPlugin() {
       status,
       e: pick(event, ['data', 'inputType', 'isComposing', 'nativeEvent']),
     })
+    if (preventNextBeforeInput) {
+      event.preventDefault()
+      preventNextBeforeInput = false
+      return
+    }
     switch (API_VERSION) {
       case 25:
         // prevent onBeforeInput to allow selecting an alternate suggest to
@@ -79,11 +92,8 @@ function AndroidPlugin() {
         break
       case 26:
       case 27:
-        if (preventNextBeforeInput) {
-          event.preventDefault()
-          preventNextBeforeInput = false
-          return
-        }
+        const window = getWindow(event.target)
+        window.cancelAnimationFrame(deleteCallbackId)
         // This analyses Android's native `beforeInput` which Slate adds
         // on in the `Content` component. It only fires if the cursor is at
         // the end of a block. Otherwise, the code below checks.
@@ -107,8 +117,7 @@ function AndroidPlugin() {
           // of line where it doesn't work.
           const isEnter = isInputDataEnter(event.data)
           if (isEnter) {
-            const window = getWindow(event.target)
-            window.cancelAnimationFrame(beforeSplitReconcileId)
+            window.cancelAnimationFrame(reconcileCallbackId)
             window.requestAnimationFrame(() => {
               debug('onBeforeInput:enter:react', {})
               beforeSplitSnapshot.apply()
@@ -132,7 +141,7 @@ function AndroidPlugin() {
     if (API_VERSION === 26 || API_VERSION === 27) {
       const subrootEl = closest(anchorNode, '[data-slate-editor] > *')
       beforeSplitSelection = getSelectionFromDom(window, editor, selection)
-      beforeSplitSnapshot = new ElementSnapshot(subrootEl)
+      beforeSplitSnapshot = new ElementSnapshot([subrootEl])
       // fixes a bug in Android API 26 & 27 where a `compositionEnd` is triggered
       // without the corresponding `compositionStart` event when clicking a
       // suggestion.
@@ -143,9 +152,9 @@ function AndroidPlugin() {
     }
 
     nodes.add(anchorNode)
-    beforeSplitReconcileId = window.requestAnimationFrame(() => {
+    reconcileCallbackId = window.requestAnimationFrame(() => {
       status = NONE
-      reconcile(window, editor)
+      reconcile(window, editor, { from: onCompositionEnd })
     })
   }
 
@@ -165,8 +174,38 @@ function AndroidPlugin() {
     debug('onInput', {
       event,
       status,
-      e: pick(event, ['data', 'inputType', 'isComposing']),
+      e: pick(event, ['data', 'nativeEvent', 'inputType', 'isComposing']),
     })
+    switch (API_VERSION) {
+      case 26:
+      case 27:
+        if (event.nativeEvent.inputType === 'deleteContentBackward') {
+          debug('onInput:delete', {
+            beforeDeleteSnapshot,
+            beforeDeleteSelection: beforeDeleteSelection.toJSON(),
+          })
+          const window = getWindow(event.target)
+          window.cancelAnimationFrame(reconcileCallbackId)
+          // We need this call because when we select an alternate suggestion
+          // we can get two `deleteContentBackward` calls in a row.
+          // We want to make sure they are all cancelled. This is kind of a
+          // guard against that because we might get multiple `keyDown` events
+          // before we get the `beforeInput` that cancels only the last
+          // deleteCallback.
+          window.cancelAnimationFrame(deleteCallbackId)
+          deleteCallbackId = window.requestAnimationFrame(() => {
+            debug('onInput:delete:callback', {
+              beforeDeleteSnapshot,
+              beforeDeleteSelection: beforeDeleteSelection.toJSON(),
+            })
+            beforeDeleteSnapshot.apply()
+            const selection = beforeDeleteSelection
+            editor.moveTo(selection.anchor.key, selection.anchor.offset)
+            editor.deleteBackward()
+          })
+        }
+        break
+    }
     if (status === COMPOSING) return
     next()
   }
@@ -184,6 +223,7 @@ function AndroidPlugin() {
         'keyIdentifier',
         'keyLocation',
         'location',
+        'nativeEvent',
         'which',
       ]),
     })
@@ -211,8 +251,24 @@ function AndroidPlugin() {
         break
       case 26:
       case 27:
+        // We need to take a snapshot of the current selection and the
+        // element before when the user hits the backspace key. This is because
+        // we only know if the user hit backspace if the `onInput` event that
+        // follows has an `inputType` of `deleteContentBackward`. At that time
+        // it's too late to stop the event.
+        const window = getWindow(event.target)
+        const selection = window.getSelection()
+        const { anchorNode } = selection
+        const subrootEl = closest(anchorNode, '[data-slate-editor] > *')
+        const elements = [subrootEl]
+        const { previousElementSibling } = subrootEl
+        if (previousElementSibling) {
+          elements.unshift(previousElementSibling)
+        }
+        beforeDeleteSelection = getSelectionFromDom(window, editor, selection)
+        beforeDeleteSnapshot = new ElementSnapshot(elements)
         // If we let 'Enter' through it breaks handling of hitting
-        // enter at the beginning of a word.
+        // enter at the beginning of a word so we need to stop it.
         break
       case 28:
         // API 28 handles the 'Enter' key properly so we can let that through.
@@ -230,14 +286,6 @@ function AndroidPlugin() {
   function onSelect(event, editor, next) {
     debug('onSelect', { event, status })
     switch (API_VERSION) {
-      // NOTE:
-      // Not sure why we had this exception to not handle `onSelect` before.
-      // If we add this code back in, make sure to re-enable the `onKeyDown`
-      // special case.
-
-      // case 25:
-      //   break
-
       // We don't want to have the selection move around in an onSelect because
       // it happens after we press `enter` in the same transaction. This
       // causes the cursor position to not be properly placed.
@@ -251,8 +299,6 @@ function AndroidPlugin() {
       default:
         if (status !== COMPOSING) next()
     }
-    // if (status === COMPOSING) return
-    // next()
   }
 
   /**
