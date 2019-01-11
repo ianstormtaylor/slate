@@ -36,10 +36,12 @@ function AndroidPlugin() {
 
   let nodes = new Set()
 
-  // Keep a snapshot after a composition end for API 27.
+  // Keep a snapshot after a composition end for API 26/27.
   // If a `beforeInput` gets called with data that ends in an ENTER then we
   // need to use this snapshot to revert the DOM so that React doesn't get
   // out of sync with the DOM.
+  // We also need to cancel the `reconcile` operation as it interferes in
+  // certain scenarios like hitting 'enter' at the end of a word.
   let beforeSplitSnapshot = null
   let beforeSplitSelection = null
   let beforeSplitReconcileId = null
@@ -73,7 +75,9 @@ function AndroidPlugin() {
         const isEnter = isInputDataEnter(event.data)
         if (isEnter) {
           const window = getWindow(event.target)
+          window.cancelAnimationFrame(beforeSplitReconcileId)
           window.requestAnimationFrame(() => {
+            debug('onBeforeInput:enter', {})
             beforeSplitSnapshot.apply()
             const selection = beforeSplitSelection
             editor.moveTo(selection.anchor.key, selection.anchor.offset)
@@ -105,7 +109,7 @@ function AndroidPlugin() {
     }
 
     nodes.add(anchorNode)
-    window.requestAnimationFrame(() => {
+    beforeSplitReconcileId = window.requestAnimationFrame(() => {
       status = NONE
       reconcile(window, editor)
     })
@@ -173,7 +177,11 @@ function AndroidPlugin() {
         break
       case 26:
       case 27:
+        // If we let 'Enter' through it breaks handling of hitting
+        // enter at the beginning of a word.
+        break
       case 28:
+        // API 28 handles the 'Enter' key properly so we can let that through.
         if (event.key === 'Enter') {
           next()
         }
