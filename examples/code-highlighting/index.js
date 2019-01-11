@@ -68,6 +68,14 @@ function getContent(token) {
   }
 }
 
+function initPointWithCache(pointCache, textNode, document) {
+  if (pointCache[0] !== textNode) {
+    pointCache[0] = textNode;
+    pointCache[1] = pointCache[1].moveToStartOfNode(textNode).normalize(document);
+  }
+  return pointCache[1];
+}
+
 /**
  * The code highlighting example.
  *
@@ -195,6 +203,9 @@ class CodeHighlighting extends React.Component {
     let endOffset = 0
     let start = 0
 
+    const document = editor.value.document;
+    const pointCache = [null, Point.create({})];
+
     for (const token of tokens) {
       startText = endText
       startOffset = endOffset
@@ -220,10 +231,12 @@ class CodeHighlighting extends React.Component {
         const dec = {
           anchor: {
             key: startText.key,
+            path: initPointWithCache(pointCache, startText, document),
             offset: startOffset,
           },
           focus: {
             key: endText.key,
+            path: initPointWithCache(pointCache, endText, document),
             offset: endOffset,
           },
           mark: {
