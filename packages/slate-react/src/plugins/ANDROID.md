@@ -8,6 +8,16 @@ The following is a list of unexpected behaviors in Android
 slate:android,slate:before,slate:update,slate:reconcile
 ```
 
+
+# API 26/27
+
+Although there are minor differences, API 26/27 behave similarly.
+
+## Enter Handling
+
+- You can't detect an `enter` until it is too late. You detect it by looking for a `beforeInput` event with a data property that is a string that ends in the last character having a character code 10. At this point, Android has manipulated the DOM. We use an ElementSnapshot to record the state of the element earlier and then revert it later so that React doesn't get confused by an out-of-sync DOM. We then programmatically split the block through Slate.
+- One exception is hitting enter at the end of a line. In this case, you can detect it by a `beforeInput` with a property `inputType` having a value `insertParagraph`. In this case, we actually can't detect it in the other way because this version of `beforeInput` event has no `data` property for some reason.
+
 # API 28
 
 ## DOM breaks when suggestion selected on text entirely within a `strong` tag

@@ -46,6 +46,14 @@ function AndroidPlugin() {
   let beforeSplitSelection = null
   let beforeSplitReconcileId = null
 
+  // Because Slate implements its own event handler for `beforeInput` in
+  // addition to React's version, we actually get two. If we cancel the
+  // first native version, the React one will still fire. We set this to
+  // `true` if we don't want that to happen. Remember that when we prevent it,
+  // we need to tell React to `preventDefault` so the event doesn't continue
+  // through React's event system.
+  let preventNextBeforeInput = false
+
   function reconcile(window, editor) {
     debug.reconcile()
     const selection = window.getSelection()
@@ -69,9 +77,15 @@ function AndroidPlugin() {
         break
       case 26:
       case 27:
+        if (preventNextBeforeInput) {
+          event.preventDefault()
+          preventNextBeforeInput = false
+          return
+        }
         // This looks at the beforeInput event's data property and sees if it
-        // ends in an Enter. This appears to be the only possible way to detect
-        // that enter has been pressed.
+        // ends in an 'enter' which is character code 10. This appears to be
+        // the only way to detect that enter has been pressed except at end
+        // of line where it doesn't work.
         const isEnter = isInputDataEnter(event.data)
         if (isEnter) {
           const window = getWindow(event.target)
@@ -83,6 +97,20 @@ function AndroidPlugin() {
             editor.moveTo(selection.anchor.key, selection.anchor.offset)
             editor.splitBlock()
           })
+          // This analyses Android's native `beforeInput` which Slate adds
+          // on in the `Content` component. It only fires if the cursor is at
+          // the end of a block. Otherwise, the code above detects the `enter.
+          //
+        } else if (
+          event.inputType === 'insertParagraph' ||
+          event.inputType === 'insertLineBreak'
+        ) {
+          const domSelection = window.getSelection()
+          const selection = getSelectionFromDom(window, editor, domSelection)
+          preventNextBeforeInput = true
+          event.preventDefault()
+          editor.moveTo(selection.anchor.key, selection.anchor.offset)
+          editor.splitBlock()
         }
         break
       default:
